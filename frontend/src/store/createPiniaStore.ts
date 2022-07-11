@@ -11,7 +11,6 @@ export default defineStore("main", {
   state: () =>
     ({
       noteUndoHistories: [],
-      popupInfo: undefined,
       currentUser: null,
       featureToggle: false,
       environment: "production",

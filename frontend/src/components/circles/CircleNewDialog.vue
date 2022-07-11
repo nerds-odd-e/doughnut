@@ -20,6 +20,7 @@ export default {
     return useLoadingApi({ hasFormError: true });
   },
   props: { notebook: Object, user: Object },
+  emits: ["done"],
   components: { TextInput },
   data() {
     return {
@@ -31,6 +32,7 @@ export default {
   methods: {
     processForm() {
       this.api.circleMethods.createCircle(this.formData).then((res) => {
+        this.$emit("done", res);
         this.$router.push({
           name: "circleShow",
           params: { circleId: res.id },

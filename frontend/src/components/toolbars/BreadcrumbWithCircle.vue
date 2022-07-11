@@ -2,7 +2,14 @@
   <BasicBreadcrumb v-bind="{ ancestors }">
     <template #topLink>
       <li>
-        <a href="#" role="button" title="choose a circle"><SvgForward /></a>
+        <PopupButton title="choose a circle">
+          <template #button_face>
+            <SvgForward />
+          </template>
+          <template #dialog_body="{ doneHandler }">
+            <CircleSelector @done="doneHandler($event)" />
+          </template>
+        </PopupButton>
       </li>
       <li v-if="fromBazaar" class="breadcrumb-item">
         <router-link :to="{ name: 'bazaar' }">Bazaar</router-link>
@@ -31,6 +38,8 @@
 import { defineComponent, PropType } from "vue";
 import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue";
 import SvgForward from "../svgs/SvgForward.vue";
+import CircleSelector from "../circles/CircleSelector.vue";
+import PopupButton from "../commons/Popups/PopupButton.vue";
 
 export default defineComponent({
   props: {
@@ -41,6 +50,8 @@ export default defineComponent({
   components: {
     BasicBreadcrumb,
     SvgForward,
+    CircleSelector,
+    PopupButton,
   },
 });
 </script>

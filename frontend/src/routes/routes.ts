@@ -1,7 +1,6 @@
 import { RouteLocation, RouteRecordRaw } from "vue-router";
 import HomePage from "@/pages/HomePage.vue";
 import BazaarPage from "@/pages/BazaarPage.vue";
-import CirclesPage from "@/pages/CirclesPage.vue";
 import NotebooksPage from "@/pages/NotebooksPage.vue";
 import NoteShowPage from "@/pages/NoteShowPage.vue";
 import NoteShowMindmapPage from "@/pages/NoteShowMindmapPage.vue";
@@ -52,7 +51,6 @@ const noteAndLinkRoutes = [
     component: AnswerShowPage,
     props: true,
   },
-  { path: "circles", name: "circles", component: CirclesPage },
   {
     path: "circles/:circleId",
     name: "circleShow",

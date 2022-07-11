@@ -89,8 +89,8 @@ const apiCollection = (managedApi: ManagedApi) => ({
     joinCircle(data: Generated.CircleJoiningByInvitation) {
       return managedApi.restPostMultiplePartForm(`circles/join`, data);
     },
-    getCirclesOfCurrentUser() {
-      return managedApi.restGet("circles");
+    async getCirclesOfCurrentUser() {
+      return (await managedApi.restGet("circles")) as Generated.Circle[];
     },
   },
 

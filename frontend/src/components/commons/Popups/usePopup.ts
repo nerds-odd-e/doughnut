@@ -15,7 +15,7 @@ class Popup {
 
 function usePopups() {
   const push = (info: PopupInfo) => {
-    Popup.popupDataWrap.popupData.popupInfo.push(info);
+    Popup.popupDataWrap.popupData.popupInfo?.push(info);
   };
   const pop = () => {
     return Popup.popupDataWrap.popupData.popupInfo.pop();

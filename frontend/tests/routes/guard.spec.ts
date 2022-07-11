@@ -24,11 +24,6 @@ describe("router guards", () => {
     expect(next).toHaveBeenCalledWith();
   });
 
-  it("when in repeat, and going circles", async () => {
-    await guard({ name: "circles" }, next);
-    expect(next).toHaveBeenCalledWith({ name: "repeat-circles" });
-  });
-
   it("when in repeat, and going to a route that doesnot have nested route", async () => {
     await guard({ name: "initial", params: { noteId: 3 } }, next);
     expect(next).toHaveBeenCalledWith();
