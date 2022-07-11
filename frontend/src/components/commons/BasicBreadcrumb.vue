@@ -19,4 +19,4 @@ import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";
 const props = defineProps({ ancestors: Array });
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped></style>

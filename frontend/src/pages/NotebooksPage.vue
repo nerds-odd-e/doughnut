@@ -1,4 +1,5 @@
 <template>
+  <BreadcrumbWithCircle v-bind="{ ancestors: [] }" />
   <NotebooksToolbar @note-realm-updated="fetchData" />
   <ContainerPage v-bind="{ loading, contentExists: true, title: 'Notebooks' }">
     <p>
@@ -15,6 +16,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue";
 import NotebookViewCards from "../components/notebook/NotebookViewCards.vue";
 import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
 import NotebooksToolbar from "../components/toolbars/NotebooksToolbar.vue";
@@ -33,6 +35,7 @@ export default defineComponent({
     NotebookViewCards,
     NotebookSubscriptionCards,
     NotebookNewButton,
+    BreadcrumbWithCircle,
   },
   data() {
     return {

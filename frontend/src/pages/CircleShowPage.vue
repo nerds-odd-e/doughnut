@@ -1,6 +1,7 @@
 <template>
   <ContainerPage v-bind="{ loading, contentExists: !!circle }">
     <div v-if="circle">
+      <BreadcrumbWithCircle v-bind="{ ancestors: [], circle }" />
       <h1 v-text="circle.name" />
       <p>
         <NotebookNewButton :circle="circle">
@@ -43,6 +44,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue";
 import SvgMissingAvatar from "../components/svgs/SvgMissingAvatar.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import NotebookCardsWithButtons from "../components/notebook/NotebookCardsWithButtons.vue";
@@ -62,6 +64,7 @@ export default defineComponent({
     NotebookNewButton,
     BazaarNotebookButtons,
     ContainerPage,
+    BreadcrumbWithCircle,
   },
   props: { circleId: { type: Number, required: true } },
 

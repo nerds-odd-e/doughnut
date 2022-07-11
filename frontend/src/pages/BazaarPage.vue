@@ -1,4 +1,5 @@
 <template>
+  <BreadcrumbWithCircle v-bind="{ ancestors: [], fromBazaar: true }" />
   <ContainerPage
     v-bind="{
       loading,
@@ -17,6 +18,7 @@
 </template>
 
 <script>
+import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue";
 import NotebookBazaarViewCards from "../components/bazaar/NotebookBazaarViewCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
@@ -26,7 +28,7 @@ export default {
     return useStoredLoadingApi({ initalLoading: true });
   },
   name: "NotebooksPage",
-  components: { ContainerPage, NotebookBazaarViewCards },
+  components: { ContainerPage, NotebookBazaarViewCards, BreadcrumbWithCircle },
   data() {
     return {
       notebooksViewedByUser: null,
