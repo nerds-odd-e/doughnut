@@ -16,6 +16,6 @@ Feature: Note overview with nested children
     Then I should see the title "Singapore" of the notebook
     And I should see the child notes "History,Geography" in order
     And I should see the child notes "History,Leaving Malaysia,Geography" in order
-    And I should see "Top" in breadcrumb
+    And I should see "My Notes" in breadcrumb
     When I double click "Singapore" and edit the description to "Founded in 1819"
     Then I should see "Founded in 1819" in the page

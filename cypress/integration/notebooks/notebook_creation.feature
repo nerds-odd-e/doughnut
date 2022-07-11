@@ -14,7 +14,7 @@ Feature: Notebook creation
       | title    |
       | Sedation |
       | Sedition |
-    And I navigate to "Top/Sedation" note
+    And I navigate to "My Notes/Sedation" note
     And I should see the screenshot matches
 
   Scenario: Create a new note with invalid information

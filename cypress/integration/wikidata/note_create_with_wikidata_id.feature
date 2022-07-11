@@ -27,7 +27,7 @@ Feature: Nested Note Create with wikidata
   @usingDummyWikidataService
   Scenario: Select one of the Wikidata entries from the search result
     Given Wikidata has search result for "rock music" with wikidata ID "Q11399"
-    When I am creating a note under "Top/Animals"
+    When I am creating a note under "My Notes/Animals"
     And I search with title "Rock" on Wikidata
     And I select "rock music" with wikidataID "Q11399" from the Wikidata search result
     Then I should see that the "Title" becomes "rock music"

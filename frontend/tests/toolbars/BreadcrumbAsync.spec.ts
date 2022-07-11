@@ -25,7 +25,7 @@ describe("repetition page", () => {
         .withProps({ noteId })
         .mount();
       await flushPromises();
-      expect(wrapper.find(".breadcrumb-item").text()).toEqual("Top");
+      expect(wrapper.find(".breadcrumb-item").text()).toEqual("My Notes");
     });
 
     it("reload when id changes", async () => {

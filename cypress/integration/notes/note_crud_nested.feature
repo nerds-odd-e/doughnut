@@ -14,7 +14,7 @@ Feature: Nested Note CRUD
     When I create a note belonging to "LeSS in Action":
       | Title        | Description                        |
       | Re-quirement | Re-think the way we do requirement |
-    And I navigate to "Top/LeSS in Action" note
+    And I navigate to "My Notes/LeSS in Action" note
     Then I should see "LeSS in Action" in note title
     And I should see these notes as children
       | note-title   |
@@ -33,7 +33,7 @@ Feature: Nested Note CRUD
     When I create a sibling note of "Re-quirement":
       | Title     | Description                   | Link Type To Parent |
       | Re-Design | Re-think the way we do design | a specialization of |
-    When I navigate to "Top/LeSS in Action" note
+    When I navigate to "My Notes/LeSS in Action" note
     And I should see these notes as children
       | note-title   |
       | Re-quirement |

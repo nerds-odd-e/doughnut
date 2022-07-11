@@ -165,8 +165,8 @@ Cypress.Commands.add("navigateToChild", (noteTitle) => {
 })
 
 Cypress.Commands.add("navigateToNotePage", (notePath: NotePath) => {
-  if (notePath.root !== "Top") {
-    throw new Error("only Top is implmemented")
+  if (notePath.root !== "My Notes") {
+    throw new Error("only My Notes is implmemented")
   }
   cy.visitMyNotebooks()
   notePath.path.forEach((noteTitle) => cy.navigateToChild(noteTitle))

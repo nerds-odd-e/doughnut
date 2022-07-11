@@ -2,7 +2,7 @@
 // @ts-check
 
 class NotePath {
-  static regex = /"(Top|Bazaar|Circle)\/([^"]*)"/
+  static regex = /"(My Notes|Bazaar|Circle)\/([^"]*)"/
 
   path: string[]
   root
@@ -10,7 +10,7 @@ class NotePath {
   constructor(value: string) {
     const m = value.match(NotePath.regex)
     if (!m) {
-      throw new Error("the note path should be something like `Top/path/to/note`")
+      throw new Error("the note path should be something like `My Notes/path/to/note`")
     }
     this.root = m[1]
     this.path = m[2].commonSenseSplit("/")

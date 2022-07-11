@@ -7,7 +7,7 @@
       </li>
       <template v-else>
         <li class="breadcrumb-item" v-if="!circle">
-          <router-link :to="{ name: 'notebooks' }">Top</router-link>
+          <router-link :to="{ name: 'notebooks' }">My Notes</router-link>
         </li>
         <template v-else>
           <li class="breadcrumb-item">
