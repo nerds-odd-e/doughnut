@@ -1,7 +1,11 @@
 <template>
   <ContainerPage v-bind="{ loading, contentExists: !!circle }">
     <div v-if="circle">
-      <BreadcrumbWithCircle v-bind="{ ancestors: [], circle }" />
+      <BreadcrumbWithCircle
+        v-bind="{ ancestors: [], circle }"
+        @open-circle-selector="$emit('open-circle-selector')"
+      />
+      />
       <h1 v-text="circle.name" />
       <p>
         <NotebookNewButton :circle="circle">
@@ -67,7 +71,7 @@ export default defineComponent({
     BreadcrumbWithCircle,
   },
   props: { circleId: { type: Number, required: true } },
-
+  emits: ["open-circle-selector"],
   data() {
     return {
       queryCounter: 0,

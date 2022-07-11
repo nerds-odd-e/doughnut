@@ -1,5 +1,9 @@
 <template>
-  <BreadcrumbWithCircle v-bind="{ ancestors: [], fromBazaar: true }" />
+  <BreadcrumbWithCircle
+    v-bind="{ ancestors: [], fromBazaar: true }"
+    @open-circle-selector="$emit('open-circle-selector')"
+  />
+  />
   <ContainerPage
     v-bind="{
       loading,
@@ -29,6 +33,7 @@ export default {
   },
   name: "NotebooksPage",
   components: { ContainerPage, NotebookBazaarViewCards, BreadcrumbWithCircle },
+  emits: ["open-circle-selector"],
   data() {
     return {
       notebooksViewedByUser: null,

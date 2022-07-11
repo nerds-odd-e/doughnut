@@ -7,7 +7,7 @@ Feature: Notes in circles
 
   Scenario: Creating note that belongs to the circle
     When I create a notebook "Team agreement" in circle "Odd-e SG Team"
-    Then I should see "Circles, Odd-e SG Team" in breadcrumb
+    Then I should see "Odd-e SG Team" in breadcrumb
     When I've logged in as "another_old_learner"
     Then I should see the notebook "Team agreement" in circle "Odd-e SG Team"
     When I add a note "Keep it complex" under "Team agreement"
