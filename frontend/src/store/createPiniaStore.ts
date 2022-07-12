@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import history, { HistoryState } from "./history";
 
 interface State extends HistoryState {
-  currentUser: Generated.User | null;
+  currentUser: Generated.User | undefined;
   featureToggle: boolean;
   environment: "production" | "testing";
 }
@@ -11,7 +11,7 @@ export default defineStore("main", {
   state: () =>
     ({
       noteUndoHistories: [],
-      currentUser: null,
+      currentUser: undefined,
       featureToggle: false,
       environment: "production",
     } as State),

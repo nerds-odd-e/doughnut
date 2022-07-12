@@ -1,4 +1,5 @@
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
 import Popups from "./components/commons/Popups/Popups.vue";
 import TestMenu from "./components/commons/TestMenu.vue";
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
@@ -7,7 +8,7 @@ import usePopups from "./components/commons/Popups/usePopup";
 import ReviewDoughnut from "./components/review/ReviewDoughnut.vue";
 import LoginButton from "./components/toolbars/LoginButton.vue";
 
-export default {
+export default defineComponent({
   setup() {
     return {
       ...useStoredLoadingApi({ initalLoading: true, skipLoading: true }),
@@ -16,8 +17,8 @@ export default {
   },
   data() {
     return {
-      reviewData: null,
-      externalIdentifier: null,
+      externalIdentifier: undefined as undefined | string,
+      showNavBar: true,
     };
   },
 
@@ -27,6 +28,12 @@ export default {
     UserNewRegisterPage,
     ReviewDoughnut,
     LoginButton,
+  },
+
+  watch: {
+    $route() {
+      this.popups.done(false);
+    },
   },
 
   computed: {
@@ -54,7 +61,7 @@ export default {
       })
       .finally(() => (this.loading = false));
   },
-};
+});
 </script>
 
 <template>
@@ -63,9 +70,9 @@ export default {
     <UserNewRegisterPage v-if="newUser" />
     <template v-else>
       <div v-if="!loading" class="content">
-        <router-view @update-reviewing="reviewData = $event" />
+        <router-view />
       </div>
-      <ReviewDoughnut v-if="user" :user="user" :review-data="reviewData" />
+      <ReviewDoughnut v-if="user" :user="user" />
       <LoginButton v-else />
       <TestMenu
         v-if="environment === 'testing'"
