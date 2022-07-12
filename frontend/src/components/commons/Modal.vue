@@ -33,7 +33,7 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .modal-mask {
   position: fixed;
   z-index: 9990;
@@ -70,10 +70,14 @@ export default defineComponent({
   height: 100vh;
   overflow: auto;
   margin-left: 0px;
-  padding: 5px 0px;
+  padding: 0px 0px;
   background-color: #fff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
   transition: all 0.3s ease;
+  .modal-body {
+    margin: 0;
+    padding: 0;
+  }
 }
 
 .modal-header h3 {

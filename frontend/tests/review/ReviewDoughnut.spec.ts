@@ -31,7 +31,7 @@ describe("review doughnut", () => {
         .withProps({ user })
         .mount();
       await flushPromises();
-      expect(wrapper.find(".doughnut-ring .initial-review").text()).toBe("3/6");
+      expect(wrapper.find(".doughnut-ring .initial-review text").text()).toBe("3/6");
     });
 
     it("refreshes", async () => {
