@@ -18,7 +18,6 @@ export default {
     return {
       reviewData: null,
       externalIdentifier: null,
-      showNavBar: true,
     };
   },
 
@@ -28,17 +27,6 @@ export default {
     UserNewRegisterPage,
     ReviewDoughnut,
     LoginButton,
-  },
-
-  watch: {
-    $route(to) {
-      this.popups.done(false);
-      if (to.name) {
-        this.showNavBar = !["repeat", "initial"].includes(
-          to.name.split("-").shift()
-        );
-      }
-    },
   },
 
   computed: {

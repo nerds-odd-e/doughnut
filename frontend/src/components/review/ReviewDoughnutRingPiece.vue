@@ -6,6 +6,7 @@
       fill="none"
       stroke-width="20"
     />
+    <title>{{ title }}</title>
     <text>
       <textPath
         startOffset="50%"
@@ -25,6 +26,7 @@ import { defineComponent } from "vue";
 export default defineComponent({
   props: {
     name: String,
+    title: String,
     bigArc: Boolean,
     startPoint: String,
     endPoint: String,

@@ -3,21 +3,23 @@
     <g class="doughnut-ring-pieces">
       <ReviewDoughnutRingPiece
         role="button"
-        class="initial-review"
+        class="ring-piece initial-review"
         name="initial"
         :start-point="startPoint"
         :big-arc="moreTInitialReview"
         :end-point="endPoint"
+        title="Initial Review"
         :text="`${reviewing.toInitialReviewCount}/${reviewing.notLearntCount}`"
         @click="$router.push({ name: 'initial' })"
       />
       <ReviewDoughnutRingPiece
         role="button"
-        class="repeat-review"
+        class="ring-piece repeat-review"
         name="repeat"
         :big-arc="!moreTInitialReview"
         :start-point="endPoint"
         :end-point="startPoint"
+        title="Repeat Old"
         :text="`${reviewing.toRepeatCount}/${reviewing.learntCount}`"
         @click="$router.push({ name: 'repeat' })"
       />
@@ -84,6 +86,13 @@ export default defineComponent({
 }
 .initial-review {
   stroke: #3bafda;
+}
+
+.ring-piece {
+  opacity: 0.5;
+  &:hover {
+    opacity: 1;
+  }
 }
 
 .repeat-review {
