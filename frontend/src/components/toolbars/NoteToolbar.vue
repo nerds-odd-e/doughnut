@@ -1,4 +1,5 @@
 <template>
+  <Breadcrumb v-bind="selectedNotePosition" />
   <ToolbarFrame>
     <div class="btn-group btn-group-sm">
       <ViewTypeButtons v-bind="{ viewType, noteId: selectedNote.id }" />
@@ -88,7 +89,6 @@
       </div>
     </div>
   </ToolbarFrame>
-  <Breadcrumb v-bind="selectedNotePosition" />
 </template>
 
 <script lang="ts">

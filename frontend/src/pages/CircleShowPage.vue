@@ -69,23 +69,19 @@ export default defineComponent({
 
   data() {
     return {
-      queryCounter: 0,
-      circle: null,
-    } as {
-      queryCounter: number;
-      circle: Generated.CircleForUserView | null;
+      circle: null as Generated.CircleForUserView | null,
+      timer: null as NodeJS.Timeout | null,
     };
   },
 
   methods: {
-    getCircle() {
+    fetchData() {
+      this.timer = setTimeout(() => {
+        this.fetchData();
+      }, 5000);
       this.storedApi
         .getCircle(this.circleId)
         .then((res) => (this.circle = res));
-      this.queryCounter += 1;
-    },
-    fetchData() {
-      this.getCircle();
     },
   },
 
@@ -101,15 +97,13 @@ export default defineComponent({
     },
   },
 
-  watch: {
-    queryCounter() {
-      setTimeout(() => {
-        this.getCircle();
-      }, 5000);
-    },
-  },
   mounted() {
     this.fetchData();
+  },
+  beforeUnmount() {
+    if (this.timer) {
+      clearTimeout(this.timer);
+    }
   },
 });
 </script>
