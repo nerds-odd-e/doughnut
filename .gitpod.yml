@@ -13,7 +13,7 @@ tasks:
 
 ports:
   # Vite Frontend Dev Server
-  - port: 3000
+  - port: 5173
     onOpen: open-browser
     visibility: public
   # Springboot Backend Server
@@ -43,7 +43,6 @@ vscode:
     - dbaeumer.vscode-eslint
     - lukashass.volar
     - johnsoncodehk.volar
-    - johnsoncodehk.vscode-typescript-vue-plugin
     - HansUXdev.bootstrap5-snippets
     - Shelex.vscode-cy-helper
     - xyz.plsql-language

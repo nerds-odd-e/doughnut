@@ -122,7 +122,7 @@ From `doughnut` source root directory
 yarn frontend:test
 ```
 
-##### Run frontend web-app (app will launch on port 3000)
+##### Run frontend web-app (app will launch on port 5173)
 
 ```bash
 yarn frontend:sut
