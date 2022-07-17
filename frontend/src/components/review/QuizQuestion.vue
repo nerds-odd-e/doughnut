@@ -1,35 +1,35 @@
 <template>
-  <BasicBreadcrumb :ancestors="quizQuestion.scope" />
+  <BasicBreadcrumb :ancestors="quizQuestion?.scope" />
   <ShowPicture
-    v-if="quizQuestion.pictureWithMask"
-    v-bind="quizQuestion.pictureWithMask"
+    v-if="quizQuestion?.pictureWithMask"
+    v-bind="quizQuestion?.pictureWithMask"
     :opacity="1"
   />
-  <NoteFrameOfLinks v-bind="{ links: quizQuestion.hintLinks }">
+  <NoteFrameOfLinks v-bind="{ links: quizQuestion?.hintLinks }">
     <div class="quiz-instruction">
       <pre
         style="white-space: pre-wrap"
-        v-if="quizQuestion.questionType !== 'PICTURE_TITLE'"
-        v-html="quizQuestion.description"
+        v-if="quizQuestion?.questionType !== 'PICTURE_TITLE'"
+        v-html="quizQuestion?.description"
       />
-      <h2 v-if="!!quizQuestion.mainTopic" class="text-center">
-        {{ quizQuestion.mainTopic }}
+      <h2 v-if="!!quizQuestion?.mainTopic" class="text-center">
+        {{ quizQuestion?.mainTopic }}
       </h2>
     </div>
   </NoteFrameOfLinks>
 
-  <div v-if="quizQuestion.questionType === 'JUST_REVIEW'">
+  <div v-if="quizQuestion?.questionType === 'JUST_REVIEW'">
     <ReviewPointAsync
       v-bind="{
-        reviewPointId: quizQuestion.quizQuestion.reviewPoint,
+        reviewPointId: quizQuestion?.quizQuestion.reviewPoint,
       }"
     />
     <SelfEvaluateButtons
       @self-evaluated-memory-state="submitAnswer({ spellingAnswer: $event })"
-      :key="quizQuestion.quizQuestion.reviewPoint"
+      :key="quizQuestion?.quizQuestion.reviewPoint"
     />
   </div>
-  <div v-else-if="quizQuestion.questionType === 'SPELLING'">
+  <div v-else-if="quizQuestion?.questionType === 'SPELLING'">
     <form @submit.prevent.once="submitAnswer({ spellingAnswer: answer })">
       <div class="aaa">
         <TextInput
@@ -50,7 +50,7 @@
   <div class="row" v-else>
     <div
       class="col-sm-6 mb-3 d-grid"
-      v-for="option in quizQuestion.options"
+      v-for="option in quizQuestion?.options"
       :key="option.noteId"
     >
       <button
@@ -83,7 +83,7 @@ export default defineComponent({
   },
   props: {
     quizQuestion: {
-      type: Object as PropType<Generated.QuizQuestionViewedByUser>,
+      type: Object as PropType<Generated.QuizQuestionViewedByUser | undefined>,
       required: true,
     },
   },
@@ -105,7 +105,7 @@ export default defineComponent({
     async submitAnswer(answerData: Partial<Generated.Answer>) {
       try {
         const answerResult = await this.api.reviewMethods.processAnswer({
-          question: this.quizQuestion.quizQuestion,
+          question: this.quizQuestion?.quizQuestion,
           ...answerData,
         });
         this.$emit("answered", answerResult);

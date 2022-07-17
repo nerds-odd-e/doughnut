@@ -180,7 +180,7 @@ declare namespace Generated {
     interface Answer {
         spellingAnswer?: string;
         answerNoteId?: number;
-        question: QuizQuestion;
+        question?: QuizQuestion;
     }
 
     interface Link extends Thingy {

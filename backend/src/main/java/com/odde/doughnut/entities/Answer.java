@@ -40,6 +40,7 @@ public class Answer {
   @JoinColumn(name = "quiz_question_id", referencedColumnName = "id")
   @Getter
   @Setter
+  @Nullable
   QuizQuestion question;
 
   @Column(name = "created_at")

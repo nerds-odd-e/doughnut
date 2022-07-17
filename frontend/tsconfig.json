@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
+    "useDefineForClassFields": true,
     "strict": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
@@ -20,7 +21,9 @@
     "noImplicitAny": false,
     "baseUrl": "./",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": [
+        "src/*"
+      ]
     },
     "lib": [
       "esnext",
@@ -31,9 +34,13 @@
   "typeAcquisition": {
     "enable": true
   },
-  "files": ["./vite.config.ts"],
+  "files": [
+    "./vite.config.ts"
+  ],
   "include": [
     "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.tsx",
     "src/**/*.vue",
     "tests/**/*.ts"
   ]

@@ -47,11 +47,7 @@ class MindmapSector {
     return { x: this.nx, y: this.ny };
   }
 
-  getChildSector(
-    siblingCount: number,
-    index: number,
-    extraScale = 1
-  ): MindmapSector {
+  getChildSector(siblingCount = 0, index = 0, extraScale = 1): MindmapSector {
     const radius = (this.radius * Math.max(5, siblingCount)) / 5;
     const ang = splitAngle(
       this.startAngle,

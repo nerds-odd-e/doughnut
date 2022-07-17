@@ -12,7 +12,7 @@
       />
       <QuizQuestion
         v-if="showQuiz === 'quiz'"
-        :quiz-question="answerResult.quizQuestion"
+        :quiz-question="answerResult?.quizQuestion"
       />
       <div v-else-if="reviewPoint">
         <ShowReviewPoint v-bind="{ reviewPoint }" />

@@ -4,6 +4,7 @@ import vue from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
 import checker from 'vite-plugin-checker'
 import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
 
 export default defineConfig({
   css: {
@@ -37,6 +38,7 @@ export default defineConfig({
       ],
       dts: true, // generate TypeScript declaration
     }),
+    Components()
   ],
   server: {
     proxy: {

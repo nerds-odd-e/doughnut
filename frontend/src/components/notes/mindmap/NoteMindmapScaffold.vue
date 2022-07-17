@@ -6,7 +6,7 @@
       v-bind="{
         noteId: child.id,
         noteRealms,
-        mindmapSector: mindmapSector.getChildSector(children.length, index),
+        mindmapSector: mindmapSector.getChildSector(children?.length, index),
       }"
       :key="child.id"
     >
