@@ -233,7 +233,7 @@ Cypress.Commands.add("clickNotePageButton", (noteTitle, btnTextOrTitle, forceLoa
 })
 
 Cypress.Commands.add("clickNotePageMoreOptionsButton", (noteTitle, btnTextOrTitle) => {
-  cy.jumpToNotePage(noteTitle)
+  cy.jumpToNotePage(noteTitle, true)
   cy.clickNotePageMoreOptionsButtonOnCurrentPage(btnTextOrTitle)
 })
 
@@ -479,7 +479,7 @@ Cypress.Commands.add("noteByTitle", (noteTitle: string) => {
 })
 
 Cypress.Commands.add("clickAssociateWikiDataButton", (title, wikiID) => {
-  cy.clickNotePageButton(title, "associate wikidata")
+  cy.clickNotePageButton(title, "associate wikidata", true)
   cy.replaceFocusedText(wikiID)
 })
 

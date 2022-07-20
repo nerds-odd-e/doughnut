@@ -8,14 +8,24 @@ declare namespace Cypress {
     space_intervals?: number
   }
   interface Chainable<Subject = any> {
+    assertBlogPostInWebsiteByTitle(article: any): Chainable<any>
     cleanDownloadFolder(): Chainable<any>
     clickAddChildNoteButton(): Chainable<any>
+    clickAssociateWikiDataButton(title: any, wikiID: any): Chainable<any>
     clickButtonOnCardBody(noteTitle: any, buttonTitle: any): Chainable<any>
     clickNotePageButton(noteTitle: any, btnTextOrTitle: any, forceLoadPage: any): Chainable<any>
     clickNotePageMoreOptionsButton(noteTitle: any, btnTextOrTitle: any): Chainable<any>
     clickNotePageMoreOptionsButtonOnCurrentPage(btnTextOrTitle: any): Chainable<any>
+    clickNoteToolbarButton(btnTextOrTitle: any): Chainable<any>
     clickLinkNob(target: string): Chainable<any>
     clickRadioByLabel(labelText: any): Chainable<any>
+    deleteNoteViaAPI(subject: any): Chainable<any>
+    distanceBetweenCardsGreaterThan(
+      cards: any,
+      note1: any,
+      note2: any,
+      min: any,
+    ): Chainable<any>
     expectExactLinkTargets(targets: any): Chainable<any>
     expectNoteCards(expectedCards: any): Chainable<any>
     failure(): Chainable<any>
@@ -58,12 +68,24 @@ declare namespace Cypress {
     searchNote(searchKey: any, options: any): Chainable<any>
     shouldSeeQuizWithOptions(questionParts: any, options: any): Chainable<any>
     startSearching(): Chainable<any>
-    subscribeToNotebook(notebookTitle: string, dailyLearningCount: number): Chainable<any>
+    stubWikidataEntityQuery(
+      wikidataServiceTester: WikidataServiceTester,
+      wikidataId: string,
+      wikidataTitle: string,
+      wikipediaLink: string,
+    ): Chainable<any>
+    stubWikidataSearchResult(
+      wikidataServiceTester: WikidataServiceTester,
+      wikidataLabel: string,
+      wikidataId: string,
+    ): Chainable<any>
+    subscribeToNotebook(notebookTitle: string, dailyLearningCount: string): Chainable<any>
     submitNoteFormWith(noteAttributes: any): Chainable<any>
     submitNoteFormsWith(notes: any): Chainable<any>
     submitNoteCreationFormWith(noteAttributes: any): Chainable<any>
     submitNoteCreationFormsWith(notes: any): Chainable<any>
     unsubscribeFromNotebook(noteTitle: string): Chainable<any>
+    withinMindmap(): Chainable<any>
     yesIRemember(): Chainable<any>
   }
 }
