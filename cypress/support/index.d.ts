@@ -9,6 +9,9 @@ declare namespace Cypress {
   }
   interface Chainable<Subject = any> {
     assertBlogPostInWebsiteByTitle(article: any): Chainable<any>
+    backendTimeTravelTo(testability: TestabilityHelper, day: number, hour: number): Chainable<any>
+    backendTimeTravelRelativeToNow(testability: TestabilityHelper, hours: number): Chainable<any>
+    cleanDBAndResetTestabilitySettings(testability: TestabilityHelper): Chainable<any>
     cleanDownloadFolder(): Chainable<any>
     clickAddChildNoteButton(): Chainable<any>
     clickAssociateWikiDataButton(title: any, wikiID: any): Chainable<any>
@@ -20,21 +23,18 @@ declare namespace Cypress {
     clickLinkNob(target: string): Chainable<any>
     clickRadioByLabel(labelText: any): Chainable<any>
     deleteNoteViaAPI(subject: any): Chainable<any>
-    distanceBetweenCardsGreaterThan(
-      cards: any,
-      note1: any,
-      note2: any,
-      min: any,
-    ): Chainable<any>
+    distanceBetweenCardsGreaterThan(cards: any, note1: any, note2: any, min: any): Chainable<any>
+    expectCurrentNoteDescription(expectedDescription: string): Chainable<any>
     expectExactLinkTargets(targets: any): Chainable<any>
+    expectFieldErrorMessage(message: string): Chainable<any>
     expectNoteCards(expectedCards: any): Chainable<any>
+    expectNoteTitle(title: string): Chainable<any>
     failure(): Chainable<any>
+    featureToggle(testability: TestabilityHelper, enabled: boolean): Chainable<any>
     findNoteCardButton(noteTitle: string, btnTextOrTitle: string): Chainable<any>
     findNoteCardEditButton(noteTitle: string): Chainable<any>
     getFormControl(label: string): Chainable<any>
-    expectFieldErrorMessage(message: string): Chainable<any>
-    expectNoteTitle(title: string): Chainable<any>
-    expectCurrentNoteDescription(expectedDescription: string): Chainable<any>
+    getSeededNoteIdByTitle(testability: TestabilityHelper, noteTitle: string): Chainable<any>
     initialReviewInSequence(reviews: any): Chainable<any>
     initialReviewNotes(noteTitles: any): Chainable<any>
     initialReviewOneNoteIfThereIs({
@@ -66,6 +66,18 @@ declare namespace Cypress {
     routerToRepeatReview(): Chainable<any>
     routerToNotebooks(noteTitle?: string): Chainable<any>
     searchNote(searchKey: any, options: any): Chainable<any>
+    seedNotes(
+      testability: TestabilityHelper,
+      seedNotes: unknown[],
+      externalIdentifier: any,
+      circleName: any,
+    ): Chainable<any>
+    seedLink(
+      testability: TestabilityHelper,
+      seedNotes: unknown[],
+      externalIdentifier: any,
+      circleName: any,
+    ): Chainable<any>
     shouldSeeQuizWithOptions(questionParts: any, options: any): Chainable<any>
     startSearching(): Chainable<any>
     stubWikidataEntityQuery(
@@ -84,6 +96,8 @@ declare namespace Cypress {
     submitNoteFormsWith(notes: any): Chainable<any>
     submitNoteCreationFormWith(noteAttributes: any): Chainable<any>
     submitNoteCreationFormsWith(notes: any): Chainable<any>
+    testability(): Chainable<any>
+    timeTravelTo(testability: TestabilityHelper, day: number, hour: number): Chainable<any>
     unsubscribeFromNotebook(noteTitle: string): Chainable<any>
     withinMindmap(): Chainable<any>
     yesIRemember(): Chainable<any>

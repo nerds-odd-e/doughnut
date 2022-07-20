@@ -23,7 +23,7 @@
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
 /// <reference types="cypress" />
-
+// @ts-check
 import "@testing-library/cypress/add-commands"
 import "cypress-file-upload"
 import NotePath from "./NotePath"
