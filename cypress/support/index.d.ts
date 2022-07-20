@@ -1,3 +1,4 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 /// <reference types="cypress" />
 // @ts-check
 declare namespace Cypress {
