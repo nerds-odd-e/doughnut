@@ -5,22 +5,36 @@ declare namespace Cypress {
     daily_new_notes_count?: number
     space_intervals?: number
   }
-  interface IChainable {
-    routerToReviews(): Chainable<Element>
-    routerToInitialReview(): Chainable<Element>
-    routerToRepeatReview(): Chainable<Element>
-    cleanDownloadFolder(): void
-    failure(): void
-    findNoteCardButton(noteTitle: string, btnTextOrTitle: string): Chainable<Element>
-    findNoteCardEditButton(noteTitle: string): Chainable<Element>
-    getFormControl(label: string): Chainable<Element>
-    expectNoteTitle(title: string): void
-    expectCurrentNoteDescription(expectedDescription: string): void
-    loginAs(username: string): void
-    logout(username?: string): void
-    pageIsNotLoading(): void
-    subscribeToNotebook(notebookTitle: string, dailyLearningCount: number): Chainable<Element>
-    unsubscribeFromNotebook(noteTitle: string): Chainable<Element>
-    routerToNotebooks(noteTitle?: string): Chainable<Element>
+  interface Chainable<Subject = any> {
+    cleanDownloadFolder(): Chainable<any>
+    clickAddChildNoteButton(): Chainable<any>
+    clickRadioByLabel(labelText: any): Chainable<any>
+    expectNoteCards(expectedCards: any): Chainable<any>
+    failure(): Chainable<any>
+    findNoteCardButton(noteTitle: string, btnTextOrTitle: string): Chainable<any>
+    findNoteCardEditButton(noteTitle: string): Chainable<any>
+    getFormControl(label: string): Chainable<any>
+    expectNoteTitle(title: string): Chainable<any>
+    expectCurrentNoteDescription(expectedDescription: string): Chainable<any>
+    inPlaceEdit(noteAttributes: any): Chainable<any>
+    jumpToNotePage(noteTitle: any, forceLoadPage: any): Chainable<any>
+    loginAs(username: string): Chainable<any>
+    logout(username?: string): Chainable<any>
+    navigateToChild(noteTitle: any): Chainable<any>
+    navigateToNotePage(notePath: NotePath): Chainable<any>
+    openAndSubmitNoteAccessoriesFormWith(noteTitle: string, NoteAccessoriesAttributes: Record<string, string>): Chainable<any>
+    pageIsNotLoading(): Chainable<any>
+    replaceFocusedText(test:any): Chainable<any>
+    routerPush(fallback:any, name:any, params:any): Chainable<any>
+    routerToReviews(): Chainable<any>
+    routerToInitialReview(): Chainable<any>
+    routerToRepeatReview(): Chainable<any>
+    routerToNotebooks(noteTitle?: string): Chainable<any>
+    subscribeToNotebook(notebookTitle: string, dailyLearningCount: number): Chainable<any>
+    submitNoteFormWith(noteAttributes: any): Chainable<any>
+    submitNoteFormsWith(notes: any): Chainable<any>
+    submitNoteCreationFormWith(noteAttributes: any): Chainable<any>
+    submitNoteCreationFormsWith(notes: any): Chainable<any>
+    unsubscribeFromNotebook(noteTitle: string): Chainable<any>
   }
 }
