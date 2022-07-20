@@ -111,7 +111,7 @@
   dependencies:
     regexp-match-indices "1.0.2"
 
-"@cucumber/cucumber@^8.4":
+"@cucumber/cucumber@^8.5":
   version "8.5.0"
   resolved "https://registry.yarnpkg.com/@cucumber/cucumber/-/cucumber-8.5.0.tgz#265348b0c7680426006fc4e41abc9424bd5cc8b3"
   integrity sha512-Ac64lYhgzRxFGf3MnlysMG0zmHa18HfuOU1BA5RfXsrHeWtZx525zH4FsqtRW2AnlYHGu3pQpww5zyQKWi1WDA==
