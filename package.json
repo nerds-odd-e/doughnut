@@ -79,6 +79,6 @@
     "wireit": "^0.7"
   },
   "dependencies": {
-    "@cucumber/cucumber": "^8.4"
+    "@cucumber/cucumber": "^8.5"
   }
 }

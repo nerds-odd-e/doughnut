@@ -21,6 +21,7 @@ in mkShell {
     openssh
     pkg-config
     rsync
+    autojump
     fasd
     fzf
     gnupg
