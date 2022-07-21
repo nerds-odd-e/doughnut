@@ -105,7 +105,10 @@ declare namespace Cypress {
     timeTravelTo(testability: TestabilityHelper, day: number, hour: number): Chainable<any>
     triggerException(testatbility: TestabilityHelper): Chainable<any>
     unsubscribeFromNotebook(noteTitle: string): Chainable<any>
-    updateCurrentUserSettingsWith(testability: TestabilityHelper, hash: Record<string, string>): Chainable<any>
+    updateCurrentUserSettingsWith(
+      testability: TestabilityHelper,
+      hash: Record<string, string>,
+    ): Chainable<any>
     wikidataService(): Chainable<any>
     withinMindmap(): Chainable<any>
     yesIRemember(): Chainable<any>
