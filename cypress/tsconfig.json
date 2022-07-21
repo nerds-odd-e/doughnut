@@ -20,7 +20,8 @@
       "@testing-library/cypress",
       "./support"
     ],
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
   },
   "include": [
     "**/*.ts",

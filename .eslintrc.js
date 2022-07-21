@@ -4,7 +4,7 @@ module.exports = {
   settings: {
     'import/resolver': {
       node: {
-        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+        extensions: ['.js', '.ts'],
       },
     },
   },
@@ -17,8 +17,10 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 12, // Allows for the parsing of modern ECMAScript features
     sourceType: 'module', // Allows for the use of imports
-    project: './cypress/tsconfig.json',
+    tsconfigRootDir: './cypress',
+    project: './tsconfig.json',
   },
+  ignorePatterns: ['tsconfig.json']
   rules: {
     'prettier/prettier': [
       'warn',
