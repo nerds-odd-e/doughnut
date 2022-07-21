@@ -47,6 +47,7 @@ declare namespace Cypress {
     jumpToNotePage(noteTitle: any, forceLoadPage: any): Chainable<any>
     loginAs(username: string): Chainable<any>
     logout(username?: string): Chainable<any>
+    mock(wikidataServiceTester: WikidataServiceTester): Chainable<any>
     navigateToChild(noteTitle: any): Chainable<any>
     navigateToCircle(circleName: any): Chainable<any>
     navigateToNotePage(notePath: NotePath): Chainable<any>
@@ -57,8 +58,10 @@ declare namespace Cypress {
     ): Chainable<any>
     openCirclesSelector(): Chainable<any>
     pageIsNotLoading(): Chainable<any>
+    randomizerAlwaysChooseLast(testatbility: TestabilityHelper): Chainable<any>
     replaceFocusedText(test: any): Chainable<any>
     repeatReviewNotes(noteTitles: string): Chainable<any>
+    restore(wikidataServiceTester: WikidataServiceTester): Chainable<any>
     routerPush(fallback: any, name: any, params: any): Chainable<any>
     routerToReviews(): Chainable<any>
     routerToRoot(): Chainable<any>
@@ -78,6 +81,8 @@ declare namespace Cypress {
       externalIdentifier: any,
       circleName: any,
     ): Chainable<any>
+    seedCircle(testability: TestabilityHelper, circleInfo: Record<string, string>): Chainable<any>
+    shareToBazaar(testability: TestabilityHelper, noteTitle: string): Chainable<any>
     shouldSeeQuizWithOptions(questionParts: any, options: any): Chainable<any>
     startSearching(): Chainable<any>
     stubWikidataEntityQuery(
@@ -98,7 +103,10 @@ declare namespace Cypress {
     submitNoteCreationFormsWith(notes: any): Chainable<any>
     testability(): Chainable<any>
     timeTravelTo(testability: TestabilityHelper, day: number, hour: number): Chainable<any>
+    triggerException(testatbility: TestabilityHelper): Chainable<any>
     unsubscribeFromNotebook(noteTitle: string): Chainable<any>
+    updateCurrentUserSettingsWith(testability: TestabilityHelper, hash: Record<string, string>): Chainable<any>
+    wikidataService(): Chainable<any>
     withinMindmap(): Chainable<any>
     yesIRemember(): Chainable<any>
   }
