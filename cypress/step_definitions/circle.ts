@@ -5,7 +5,7 @@
 
 import { And, Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 
-When("I create a new circle {string} and copy the invitation code", (circleName) => {
+When("I create a new circle {string} and copy the invitation code", (circleName: string) => {
   cy.openCirclesSelector()
   cy.findByRole("button", { name: "Create a new circle" }).click()
   cy.getFormControl("Name").type(circleName)
@@ -31,7 +31,7 @@ When("I should see the circle {string} and it has two members in it", (circleNam
   cy.get("body").find(".circle-member").should("have.length", 2)
 })
 
-Given("There is a circle {string} with {string} members", (circleName, members) => {
+Given("There is a circle {string} with {string} members", (circleName: string, members: string) => {
   cy.testability().seedCircle({ circleName: circleName, members: members })
 })
 
@@ -41,12 +41,12 @@ When("I create a notebook {string} in circle {string}", (noteTitle, circleName) 
   cy.submitNoteCreationFormsWith([{ Title: noteTitle }])
 })
 
-When("I should see the notebook {string} in circle {string}", (noteTitle, circleName) => {
+When("I should see the notebook {string} in circle {string}", (noteTitle: string, circleName) => {
   cy.navigateToCircle(circleName)
   cy.findByText(noteTitle).should("be.visible")
 })
 
-When("I add a note {string} under {string}", (noteTitle, parentNoteTitle) => {
+When("I add a note {string} under {string}", (noteTitle: string, parentNoteTitle: string) => {
   cy.findByText(parentNoteTitle).click()
   cy.clickAddChildNoteButton()
   cy.submitNoteCreationFormsWith([{ Title: noteTitle }])
@@ -55,7 +55,7 @@ When("I add a note {string} under {string}", (noteTitle, parentNoteTitle) => {
 
 When(
   "I subscribe to notebook {string} in the circle {string}, with target of learning {int} notes per day",
-  (notebookTitle, circleName, count) => {
+  (notebookTitle: string, circleName: string, count: string) => {
     cy.navigateToCircle(circleName)
     cy.subscribeToNotebook(notebookTitle, count)
   },
@@ -69,16 +69,22 @@ When("There is a notebook {string} in circle {string}", (title, circleName) => {
   cy.testability().seedNotes([{ title }], "", circleName)
 })
 
-And("someone of my circle deletes the {string} notebook", (noteTitle) => {
+And("someone of my circle deletes the {string} notebook", (noteTitle: string) => {
   cy.noteByTitle(noteTitle).deleteNoteViaAPI()
 })
 
-Then("I should see {string} in the circle page within {int} seconds", (noteTitle, seconds) => {
-  cy.tick(seconds * 1000)
-  cy.findByText(noteTitle)
-})
+Then(
+  "I should see {string} in the circle page within {int} seconds",
+  (noteTitle: string, seconds: number) => {
+    cy.tick(seconds * 1000)
+    cy.findByText(noteTitle)
+  },
+)
 
-Then("I should not see {string} in the circle page within {int} seconds", (noteTitle, seconds) => {
-  cy.tick(seconds * 1000)
-  cy.findByText(noteTitle).should("not.exist")
-})
+Then(
+  "I should not see {string} in the circle page within {int} seconds",
+  (noteTitle: string, seconds: number) => {
+    cy.tick(seconds * 1000)
+    cy.findByText(noteTitle).should("not.exist")
+  },
+)

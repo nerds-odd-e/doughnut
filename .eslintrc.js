@@ -20,7 +20,7 @@ module.exports = {
     tsconfigRootDir: './cypress',
     project: './tsconfig.json',
   },
-  ignorePatterns: ['tsconfig.json']
+  ignorePatterns: ['tsconfig.json'],
   rules: {
     'prettier/prettier': [
       'warn',

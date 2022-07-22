@@ -5,7 +5,7 @@
 
 import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 
-Given("I've logged in as {string}", (externalIdentifier) => {
+Given("I've logged in as {string}", (externalIdentifier: string) => {
   if (externalIdentifier === "none") {
     return
   }
@@ -52,16 +52,16 @@ Then("I should see {string} in the page", (content) => {
   cy.get("body").should("contain", content)
 })
 
-Then("My name {string} is in the user action menu", (name) => {
+Then("My name {string} is in the user action menu", (name: string) => {
   cy.findByRole("button", { name: "User actions" }).click()
   cy.findByRole("button", { name })
 })
 
-Then("my daily new notes to review is set to {int}", (number) => {
+Then("my daily new notes to review is set to {int}", (number: string) => {
   cy.testability().updateCurrentUserSettingsWith({ daily_new_notes_count: number })
 })
 
-Then("my space setting is {string}", (number) => {
+Then("my space setting is {string}", (number: string) => {
   cy.testability().updateCurrentUserSettingsWith({ space_intervals: number })
 })
 
@@ -97,7 +97,7 @@ Then("The {string} page is displayed", (pageName) => {
   }
 })
 
-Then("I login as {string} I should see {string}", (username, expectation) => {
+Then("I login as {string} I should see {string}", (username: string, expectation: string) => {
   cy.get("#username").type(username)
   cy.get("#password").type("password")
   cy.get("form.form-signin").submit()
@@ -110,7 +110,7 @@ Then("I edit user profile", () => {
   cy.findByRole("button", { name: "Old Learner" }).click()
 })
 
-Then("I change my name to {string}", (name) => {
+Then("I change my name to {string}", (name: string) => {
   cy.getFormControl("Name").clear().type(name)
   cy.findByText("Submit").click()
 })

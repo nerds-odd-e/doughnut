@@ -16,7 +16,7 @@ Then("I should see {string} is shared in the Bazaar", (noteTitle: string) => {
   cy.findByText(noteTitle)
 })
 
-Then("notebook {string} is shared to the Bazaar", (noteTitle) => {
+Then("notebook {string} is shared to the Bazaar", (noteTitle: string) => {
   cy.testability().shareToBazaar(noteTitle)
 })
 

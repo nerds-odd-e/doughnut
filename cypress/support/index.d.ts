@@ -9,9 +9,9 @@ declare namespace Cypress {
   }
   interface Chainable<Subject = any> {
     assertBlogPostInWebsiteByTitle(article: any): Chainable<any>
-    backendTimeTravelTo(testability: TestabilityHelper, day: number, hour: number): Chainable<any>
+    backendTimeTravelTo(day: number, hour: number): Chainable<Subject>
     backendTimeTravelRelativeToNow(testability: TestabilityHelper, hours: number): Chainable<any>
-    cleanDBAndResetTestabilitySettings(testability: TestabilityHelper): Chainable<any>
+    cleanDBAndResetTestabilitySettings(testability: TestabilityHelper): Chainable<Subject>
     cleanDownloadFolder(): Chainable<any>
     clickAddChildNoteButton(): Chainable<any>
     clickAssociateWikiDataButton(title: any, wikiID: any): Chainable<any>
@@ -22,7 +22,7 @@ declare namespace Cypress {
     clickNoteToolbarButton(btnTextOrTitle: any): Chainable<any>
     clickLinkNob(target: string): Chainable<any>
     clickRadioByLabel(labelText: any): Chainable<any>
-    deleteNoteViaAPI(subject: any): Chainable<any>
+    deleteNoteViaAPI(): Chainable<Subject>
     distanceBetweenCardsGreaterThan(cards: any, note1: any, note2: any, min: any): Chainable<any>
     expectCurrentNoteDescription(expectedDescription: string): Chainable<any>
     expectExactLinkTargets(targets: any): Chainable<any>
@@ -69,20 +69,10 @@ declare namespace Cypress {
     routerToRepeatReview(): Chainable<any>
     routerToNotebooks(noteTitle?: string): Chainable<any>
     searchNote(searchKey: any, options: any): Chainable<any>
-    seedNotes(
-      testability: TestabilityHelper,
-      seedNotes: unknown[],
-      externalIdentifier: any,
-      circleName: any,
-    ): Chainable<any>
-    seedLink(
-      testability: TestabilityHelper,
-      seedNotes: unknown[],
-      externalIdentifier: any,
-      circleName: any,
-    ): Chainable<any>
-    seedCircle(testability: TestabilityHelper, circleInfo: Record<string, string>): Chainable<any>
-    shareToBazaar(testability: TestabilityHelper, noteTitle: string): Chainable<any>
+    seedNotes(seedNotes: unknown[], externalIdentifier: any, circleName: any): Chainable<Subject>
+    seedLink(type: string, fromNoteTitle: string, toNoteTitle: string): Chainable<Subject>
+    seedCircle(circleInfo: Record<string, string>): Chainable<Subject>
+    shareToBazaar(noteTitle: string): Chainable<Subject>
     shouldSeeQuizWithOptions(questionParts: any, options: any): Chainable<any>
     startSearching(): Chainable<any>
     stubWikidataEntityQuery(
@@ -105,10 +95,7 @@ declare namespace Cypress {
     timeTravelTo(testability: TestabilityHelper, day: number, hour: number): Chainable<any>
     triggerException(testatbility: TestabilityHelper): Chainable<any>
     unsubscribeFromNotebook(noteTitle: string): Chainable<any>
-    updateCurrentUserSettingsWith(
-      testability: TestabilityHelper,
-      hash: Record<string, string>,
-    ): Chainable<any>
+    updateCurrentUserSettingsWith(hash: Record<string, string>): Chainable<Subject>
     wikidataService(): Chainable<any>
     withinMindmap(): Chainable<any>
     yesIRemember(): Chainable<any>
