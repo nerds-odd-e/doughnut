@@ -147,7 +147,7 @@ Cypress.Commands.add("submitNoteFormsWith", (notes) => {
   notes.forEach((noteAttributes) => cy.submitNoteFormWith(noteAttributes))
 })
 
-Cypress.Commands.add("expectNoteCards", (expectedCards) => {
+Cypress.Commands.add("expectNoteCards", (expectedCards: string[]) => {
   expectedCards.forEach((elem) => {
     for (const propName in elem) {
       if (propName === "note-title") {
@@ -174,7 +174,7 @@ Cypress.Commands.add("navigateToNotePage", (notePath: NotePath) => {
 
 // jumptoNotePage is faster than navigateToNotePage
 //    it uses the note id memorized when creating them with testability api
-Cypress.Commands.add("jumpToNotePage", (noteTitle, forceLoadPage) => {
+Cypress.Commands.add("jumpToNotePage", (noteTitle: string, forceLoadPage = false) => {
   cy.testability()
     .getSeededNoteIdByTitle(noteTitle)
     .then((noteId) => {
@@ -383,11 +383,13 @@ Cypress.Commands.add("repeatReviewNotes", (noteTitles: string) => {
   })
 })
 
-Cypress.Commands.add("shouldSeeQuizWithOptions", (questionParts, options) => {
+Cypress.Commands.add("shouldSeeQuizWithOptions", (questionParts: string[], options: string) => {
   questionParts.forEach((part) => {
     cy.get(".quiz-instruction").contains(part)
   })
-  options.commonSenseSplit(",").forEach((option) => cy.findByText(option).should("be.visible"))
+  options
+    .commonSenseSplit(",")
+    .forEach((option: string) => cy.findByText(option).should("be.visible"))
 })
 
 Cypress.Commands.add("getFormControl", (label) => {
@@ -405,8 +407,8 @@ Cypress.Commands.add("unsubscribeFromNotebook", (noteTitle) => {
   cy.findNoteCardButton(noteTitle, "Unsubscribe").click()
 })
 
-Cypress.Commands.add("searchNote", (searchKey, options) => {
-  options?.forEach((option) => cy.getFormControl(option).check())
+Cypress.Commands.add("searchNote", (searchKey: string, options: string[]) => {
+  options?.forEach((option: string) => cy.getFormControl(option).check())
   cy.findByPlaceholderText("Search").clear().type(searchKey)
   cy.tick(500)
 })

@@ -49,27 +49,33 @@ When("I update note {string} to become:", (noteTitle, data) => {
   cy.inPlaceEdit(data.hashes()[0])
 })
 
-Given("I update note title {string} to become {string}", (noteTitle, newNoteTitle) => {
-  cy.jumpToNotePage(noteTitle)
-  cy.findByText(noteTitle).click()
-  cy.replaceFocusedText(newNoteTitle)
-})
+Given(
+  "I update note title {string} to become {string}",
+  (noteTitle: string, newNoteTitle: string) => {
+    cy.jumpToNotePage(noteTitle)
+    cy.findByText(noteTitle).click()
+    cy.replaceFocusedText(newNoteTitle)
+  },
+)
 
 Given(
   "I update note {string} description from {string} to become {string}",
-  (noteTitle, noteDescription, newNoteDescription) => {
+  (noteTitle: string, noteDescription: string, newNoteDescription: string) => {
     cy.findByText(noteDescription).click({ force: true })
     cy.replaceFocusedText(newNoteDescription)
   },
 )
 
-When("I update note {string} with description {string}", (noteTitle, newDescription) => {
-  cy.jumpToNotePage(noteTitle)
-  cy.inPlaceEdit({ Description: newDescription })
-  cy.expectCurrentNoteDescription(newDescription)
-})
+When(
+  "I update note {string} with description {string}",
+  (noteTitle: string, newDescription: string) => {
+    cy.jumpToNotePage(noteTitle)
+    cy.inPlaceEdit({ Description: newDescription })
+    cy.expectCurrentNoteDescription(newDescription)
+  },
+)
 
-When("I create a note belonging to {string}:", (noteTitle, data) => {
+When("I create a note belonging to {string}:", (noteTitle: string, data) => {
   cy.jumpToNotePage(noteTitle)
   cy.findByText(noteTitle)
   cy.clickAddChildNoteButton()
@@ -81,12 +87,12 @@ When("I am creating a note under {notepath}", (notePath: NotePath) => {
   cy.clickAddChildNoteButton()
 })
 
-Then("I should see {string} in breadcrumb", (noteTitles) => {
+Then("I should see {string} in breadcrumb", (noteTitles: string) => {
   cy.pageIsNotLoading()
   cy.get(".breadcrumb").within(() =>
     noteTitles
       .commonSenseSplit(", ")
-      .forEach((noteTitle) => cy.findByText(noteTitle, { timeout: 2000 })),
+      .forEach((noteTitle: string) => cy.findByText(noteTitle, { timeout: 2000 })),
   )
 })
 
@@ -109,7 +115,7 @@ When("I delete notebook {string}", (noteTitle) => {
   cy.findByRole("button", { name: "OK" }).click()
 })
 
-When("I create a sibling note of {string}:", (noteTitle, data) => {
+When("I create a sibling note of {string}:", (noteTitle: string, data) => {
   cy.findByText(noteTitle)
   cy.findByRole("button", { name: "Add Sibling Note" }).click()
   cy.submitNoteCreationFormsWith(data.hashes())
@@ -119,11 +125,11 @@ When("I should see that the note creation is not successful", () => {
   cy.expectFieldErrorMessage("size must be between 1 and 100")
 })
 
-Then("I should see {string} in note title", (noteTitle) => {
+Then("I should see {string} in note title", (noteTitle: string) => {
   cy.expectNoteTitle(noteTitle)
 })
 
-Then("I should not see note {string} at the top level of all my notes", (noteTitle) => {
+Then("I should not see note {string} at the top level of all my notes", (noteTitle: string) => {
   cy.pageIsNotLoading()
   cy.findByText("Notebooks")
   cy.findByText(noteTitle).should("not.exist")
@@ -145,7 +151,7 @@ When("I move note {string} left", (noteTitle) => {
 
 When(
   "I double click {string} and edit the description to {string}",
-  (noteTitle, newDescription) => {
+  (noteTitle: string, newDescription: string) => {
     cy.findByText(noteTitle).click()
     cy.replaceFocusedText(newDescription)
   },
@@ -155,7 +161,7 @@ When("I should see the screenshot matches", () => {
   // cy.get('.content').compareSnapshot('page-snapshot', 0.001);
 })
 
-When("I move note {string} right", (noteTitle) => {
+When("I move note {string} right", (noteTitle: string) => {
   cy.jumpToNotePage(noteTitle)
   cy.findByText("Move This Note").click()
   cy.findByRole("button", { name: "Move Right" }).click()
@@ -163,7 +169,7 @@ When("I move note {string} right", (noteTitle) => {
 
 When(
   "I should see {string} is before {string} in {string}",
-  (noteTitle1, noteTitle2, parentNoteTitle) => {
+  (noteTitle1: string, noteTitle2: string, parentNoteTitle: string) => {
     cy.jumpToNotePage(parentNoteTitle)
     const matcher = new RegExp(noteTitle1 + ".*" + noteTitle2, "g")
 
@@ -175,13 +181,13 @@ When(
 )
 
 // This step definition is for demo purpose
-Then("*for demo* I should see there are {int} descendants", (numberOfDescendants) => {
+Then("*for demo* I should see there are {int} descendants", (numberOfDescendants: number) => {
   cy.findByText("" + numberOfDescendants, {
     selector: ".descendant-counter",
   })
 })
 
-When("I should be asked to log in again when I click the link {string}", (noteTitle) => {
+When("I should be asked to log in again when I click the link {string}", (noteTitle: string) => {
   cy.on("uncaught:exception", () => {
     return false
   })
@@ -189,13 +195,13 @@ When("I should be asked to log in again when I click the link {string}", (noteTi
   cy.get("#username").should("exist")
 })
 
-When("I open the {string} view of note {string}", (viewType, noteTitle) => {
+When("I open the {string} view of note {string}", (viewType: string, noteTitle: string) => {
   cy.clickNotePageButton(noteTitle, `${viewType} view`, true)
 })
 
 When(
   "I should see the note {string} is {int}px * {int}px offset the center of the map",
-  (noteTitle, dx, dy) => {
+  (noteTitle: string, dx: number, dy: number) => {
     cy.withinMindmap().then((cards) => {
       const rect = cards.mindmapRect
       const frameCenterX = rect.left + rect.width / 2
@@ -209,31 +215,37 @@ When(
   },
 )
 
-When("I click note {string}", (noteTitle) => {
+When("I click note {string}", (noteTitle: string) => {
   cy.findByRole("card", { name: noteTitle }).click("bottomRight", {
     force: true,
   })
   //cy.findByRole("card", { name: noteTitle }).click();
 })
 
-When("I click note title {string}", (noteTitle) => {
+When("I click note title {string}", (noteTitle: string) => {
   cy.findByText(noteTitle).click()
 })
 
-When("The note {string} {string} have the description indicator", (noteTitle, shouldOrNot) => {
-  cy.findByRole("card", { name: noteTitle }).within(() =>
-    cy.get(".description-indicator").should(shouldOrNot === "should" ? "exist" : "not.exist"),
-  )
-})
+When(
+  "The note {string} {string} have the description indicator",
+  (noteTitle: string, shouldOrNot: string) => {
+    cy.findByRole("card", { name: noteTitle }).within(() =>
+      cy.get(".description-indicator").should(shouldOrNot === "should" ? "exist" : "not.exist"),
+    )
+  },
+)
 
-When("I should see the note {string} is {string}", (noteTitle, highlightedOrNot) => {
-  cy.findByRole("card", { name: noteTitle }).should(
-    `${highlightedOrNot === "highlighted" ? "" : "not."}have.class`,
-    "highlighted",
-  )
-})
+When(
+  "I should see the note {string} is {string}",
+  (noteTitle: string, highlightedOrNot: string) => {
+    cy.findByRole("card", { name: noteTitle }).should(
+      `${highlightedOrNot === "highlighted" ? "" : "not."}have.class`,
+      "highlighted",
+    )
+  },
+)
 
-When("I drag the map by {int}px * {int}px", (dx, dy) => {
+When("I drag the map by {int}px * {int}px", (dx: number, dy: number) => {
   cy.get(".mindmap-event-receiver")
     .trigger("pointerdown", "topLeft")
     .trigger("pointermove", "topLeft", { clientX: dx, clientY: dy })

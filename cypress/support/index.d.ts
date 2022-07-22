@@ -11,7 +11,7 @@ declare namespace Cypress {
     assertBlogPostInWebsiteByTitle(article: any): Chainable<any>
     backendTimeTravelTo(day: number, hour: number): Chainable<Subject>
     backendTimeTravelRelativeToNow(testability: TestabilityHelper, hours: number): Chainable<any>
-    cleanDBAndResetTestabilitySettings(testability: TestabilityHelper): Chainable<Subject>
+    cleanDBAndResetTestabilitySettings(): Chainable<Subject>
     cleanDownloadFolder(): Chainable<any>
     clickAddChildNoteButton(): Chainable<any>
     clickAssociateWikiDataButton(title: any, wikiID: any): Chainable<any>
@@ -30,11 +30,11 @@ declare namespace Cypress {
     expectNoteCards(expectedCards: any): Chainable<any>
     expectNoteTitle(title: string): Chainable<any>
     failure(): Chainable<any>
-    featureToggle(testability: TestabilityHelper, enabled: boolean): Chainable<any>
+    featureToggle(enabled: boolean): Chainable<Subject>
     findNoteCardButton(noteTitle: string, btnTextOrTitle: string): Chainable<any>
     findNoteCardEditButton(noteTitle: string): Chainable<any>
     getFormControl(label: string): Chainable<any>
-    getSeededNoteIdByTitle(testability: TestabilityHelper, noteTitle: string): Chainable<any>
+    getSeededNoteIdByTitle(noteTitle: string): Chainable<Subject>
     initialReviewInSequence(reviews: any): Chainable<any>
     initialReviewNotes(noteTitles: any): Chainable<any>
     initialReviewOneNoteIfThereIs({
@@ -44,10 +44,10 @@ declare namespace Cypress {
       skip,
     }: any): Chainable<any>
     inPlaceEdit(noteAttributes: any): Chainable<any>
-    jumpToNotePage(noteTitle: any, forceLoadPage: any): Chainable<any>
+    jumpToNotePage(noteTitle: any, forceLoadPage?: any): Chainable<any>
     loginAs(username: string): Chainable<any>
     logout(username?: string): Chainable<any>
-    mock(wikidataServiceTester: WikidataServiceTester): Chainable<any>
+    mock(): Chainable<Subject>
     navigateToChild(noteTitle: any): Chainable<any>
     navigateToCircle(circleName: any): Chainable<any>
     navigateToNotePage(notePath: NotePath): Chainable<any>
@@ -61,7 +61,7 @@ declare namespace Cypress {
     randomizerAlwaysChooseLast(testatbility: TestabilityHelper): Chainable<any>
     replaceFocusedText(test: any): Chainable<any>
     repeatReviewNotes(noteTitles: string): Chainable<any>
-    restore(wikidataServiceTester: WikidataServiceTester): Chainable<any>
+    restore(): Chainable<Subject>
     routerPush(fallback: any, name: any, params: any): Chainable<any>
     routerToReviews(): Chainable<any>
     routerToRoot(): Chainable<any>
@@ -69,7 +69,7 @@ declare namespace Cypress {
     routerToRepeatReview(): Chainable<any>
     routerToNotebooks(noteTitle?: string): Chainable<any>
     searchNote(searchKey: any, options: any): Chainable<any>
-    seedNotes(seedNotes: unknown[], externalIdentifier: any, circleName: any): Chainable<Subject>
+    seedNotes(seedNotes: unknown[], externalIdentifier?: any, circleName?: any): Chainable<Subject>
     seedLink(type: string, fromNoteTitle: string, toNoteTitle: string): Chainable<Subject>
     seedCircle(circleInfo: Record<string, string>): Chainable<Subject>
     shareToBazaar(noteTitle: string): Chainable<Subject>
