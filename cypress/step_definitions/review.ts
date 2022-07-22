@@ -8,13 +8,13 @@ Then("I do these initial reviews in sequence:", (data) => {
   cy.initialReviewInSequence(data.hashes())
 })
 
-Given("It's day {int}, {int} hour", (day, hour) => {
+Given("It's day {int}, {int} hour", (day: number, hour: number) => {
   cy.testability().backendTimeTravelTo(day, hour)
 })
 
 Then(
   "On day {int} I repeat old {string} and initial review new {string}",
-  (day, repeatNotes, initialNotes) => {
+  (day: number, repeatNotes: string, initialNotes: string) => {
     cy.testability().backendTimeTravelTo(day, 8)
 
     cy.repeatReviewNotes(repeatNotes)
@@ -36,7 +36,7 @@ Then("I should see that I have new notes to learn", () => {
 
 Then(
   "On day {int} I should have {string} note for initial review and {string} for repeat",
-  (day, numberOfInitialReviews, numberOfRepeats) => {
+  (day: number, numberOfInitialReviews: string, numberOfRepeats: string) => {
     cy.testability().timeTravelTo(day, 8)
     cy.routerToRoot()
     cy.contains(numberOfInitialReviews, {
@@ -63,23 +63,23 @@ Then("I initial review {string}", (noteTitle) => {
   cy.initialReviewNotes(noteTitle)
 })
 
-Then("I added and learned one note {string} on day {int}", (noteTitle, day) => {
+Then("I added and learned one note {string} on day {int}", (noteTitle: string, day: number) => {
   cy.testability().seedNotes([{ title: noteTitle }])
   cy.testability().backendTimeTravelTo(day, 8)
   cy.initialReviewNotes(noteTitle)
 })
 
-Then("I learned one note {string} on day {int}", (noteTitle, day) => {
+Then("I learned one note {string} on day {int}", (noteTitle: string, day: number) => {
   cy.testability().backendTimeTravelTo(day, 8)
   cy.initialReviewNotes(noteTitle)
 })
 
-Then("I am repeat-reviewing my old note on day {int}", (day) => {
+Then("I am repeat-reviewing my old note on day {int}", (day: number) => {
   cy.testability().backendTimeTravelTo(day, 8)
   cy.routerToRepeatReview()
 })
 
-Then("I am learning new note on day {int}", (day) => {
+Then("I am learning new note on day {int}", (day: number) => {
   cy.testability().backendTimeTravelTo(day, 8)
   cy.routerToInitialReview()
 })
@@ -93,7 +93,7 @@ Then("I set the level of {string} to be {int}", (noteTitle: string, level: numbe
   })
 })
 
-Then("I have selected the option {string}", (option) => {
+Then("I have selected the option {string}", (option: string) => {
   cy.getFormControl(option).check()
   cy.findByRole("button", { name: "Keep for repetition" }).click()
 })
@@ -109,39 +109,39 @@ Then("I choose yes I remember", () => {
 
 Then(
   "I should be asked cloze deletion question {string} with options {string}",
-  (question, options) => {
+  (question: string, options: string) => {
     cy.shouldSeeQuizWithOptions([question], options)
   },
 )
 
 Then(
   "I should be asked picture question {string} with options {string}",
-  (pictureInQuestion, options) => {
+  (pictureInQuestion: string, options: string) => {
     cy.shouldSeeQuizWithOptions([], options)
   },
 )
 
-Then("I should be asked picture selection question {string} with {string}", (question) => {
+Then("I should be asked picture selection question {string} with {string}", (question: string) => {
   cy.shouldSeeQuizWithOptions([question], "")
 })
 
-Then("I should be asked spelling question {string}", (question) => {
+Then("I should be asked spelling question {string}", (question: string) => {
   cy.findByText(question).should("be.visible")
 })
 
 Then(
   "I should be asked link question {string} {string} with options {string}",
-  (noteTitle, linkType, options) => {
+  (noteTitle: string, linkType: string, options: string) => {
     cy.shouldSeeQuizWithOptions([noteTitle, linkType], options)
   },
 )
 
-Then("I type my answer {string}", (answer) => {
+Then("I type my answer {string}", (answer: string) => {
   cy.getFormControl("Answer").type(answer)
   cy.findByRole("button", { name: "OK" }).click()
 })
 
-Then("I choose answer {string}", (noteTitle) => {
+Then("I choose answer {string}", (noteTitle: string) => {
   cy.findByRole("button", { name: noteTitle }).click()
 })
 
@@ -151,7 +151,7 @@ Then("I should see that my answer is correct", () => {
   cy.get(".alert-success").should("exist")
 })
 
-Then("I should see the information of note {string}", (noteTitle) => {
+Then("I should see the information of note {string}", (noteTitle: string) => {
   cy.findByText(noteTitle)
 })
 
@@ -169,7 +169,7 @@ Then("The randomizer always choose the last", () => {
   cy.testability().randomizerAlwaysChooseLast()
 })
 
-Then("I should see the info of note {string}", (noteTitle, data) => {
+Then("I should see the info of note {string}", (noteTitle: string, data) => {
   cy.findByText(noteTitle)
   cy.findByRole("button", { name: "i..." }).click({ force: true })
   const attrs = data.hashes()[0]

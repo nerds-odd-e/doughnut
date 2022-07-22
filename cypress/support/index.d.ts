@@ -58,7 +58,7 @@ declare namespace Cypress {
     ): Chainable<any>
     openCirclesSelector(): Chainable<any>
     pageIsNotLoading(): Chainable<any>
-    randomizerAlwaysChooseLast(testatbility: TestabilityHelper): Chainable<any>
+    randomizerAlwaysChooseLast(): Chainable<Subject>
     replaceFocusedText(test: any): Chainable<any>
     repeatReviewNotes(noteTitles: string): Chainable<any>
     restore(): Chainable<Subject>
@@ -92,7 +92,7 @@ declare namespace Cypress {
     submitNoteCreationFormWith(noteAttributes: any): Chainable<any>
     submitNoteCreationFormsWith(notes: any): Chainable<any>
     testability(): Chainable<any>
-    timeTravelTo(testability: TestabilityHelper, day: number, hour: number): Chainable<any>
+    timeTravelTo(day: number, hour: number): Chainable<Subject>
     triggerException(testatbility: TestabilityHelper): Chainable<any>
     unsubscribeFromNotebook(noteTitle: string): Chainable<any>
     updateCurrentUserSettingsWith(hash: Record<string, string>): Chainable<Subject>
