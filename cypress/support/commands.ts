@@ -148,7 +148,7 @@ Cypress.Commands.add("submitNoteFormsWith", (notes) => {
   notes.forEach((noteAttributes: string) => cy.submitNoteFormWith(noteAttributes))
 })
 
-Cypress.Commands.add("expectNoteCards", (expectedCards: any[]) => {
+Cypress.Commands.add("expectNoteCards", (expectedCards: string[]) => {
   expectedCards.forEach((elem) => {
     for (const propName in elem) {
       if (propName === "note-title") {
