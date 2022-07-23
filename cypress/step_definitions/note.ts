@@ -4,6 +4,7 @@
 
 import { Given, Then, When, defineParameterType } from "@badeball/cypress-cucumber-preprocessor"
 import NotePath from "../support/NotePath"
+import "../support/string.extensions"
 
 defineParameterType({
   name: "notepath",
@@ -263,15 +264,15 @@ When("I drag the map by {int}px * {int}px when holding the shift button", (dx, d
     .trigger("pointerup", { force: true })
 })
 
-When("I zoom in at the {string}", (position) => {
-  cy.get(".mindmap-event-receiver").trigger("wheel", position, {
+When("I zoom in at the {string}", (position: string) => {
+  cy.get(".mindmap-event-receiver").trigger("wheel", Number(position), {
     clientX: 0,
     clientY: 0,
     deltaY: 50,
   })
 })
 
-When("I should see the zoom scale is {string}", (scale) => {
+When("I should see the zoom scale is {string}", (scale: string) => {
   cy.get(".mindmap-info").findByText(scale)
 })
 
@@ -281,11 +282,11 @@ When("I click the zoom indicator", () => {
 
 When(
   "I should see the notes {string} are around note {string} and apart from each other",
-  (noteTitles, parentNoteTitle) => {
+  (noteTitles: string, parentNoteTitle: string) => {
     const titles = noteTitles.commonSenseSplit(",")
     cy.findByText(titles[titles.length - 1])
     cy.withinMindmap().then((cards) => {
-      titles.forEach((noteTitle) => {
+      titles.forEach((noteTitle: string) => {
         cy.distanceBetweenCardsGreaterThan(cards, parentNoteTitle, noteTitle, 100)
       })
       cy.distanceBetweenCardsGreaterThan(cards, titles[0], titles[1], 100)
@@ -293,46 +294,49 @@ When(
   },
 )
 
-Then("I should see the title {string} of the notebook", (noteTitle) => {
+Then("I should see the title {string} of the notebook", (noteTitle: string) => {
   cy.expectNoteTitle(noteTitle)
 })
 
-Then("I should see the child notes {string} in order", (notesStr) => {
+Then("I should see the child notes {string} in order", (notesStr: string) => {
   const notes = notesStr.split(",")
   notes.forEach((n) => cy.findByText(n))
   cy.findAllByRole("title").then((elms) => {
-    let actual = []
+    let actual: string[] = []
     elms.map((i, actualNote) => actual.push(actualNote.innerText))
     actual = actual.filter((c) => notes.includes(c))
     expect(actual.join(",")).to.equal(notes.join(","))
   })
 })
 
-Then("I should see {string} is {string} than {string}", (left, aging, right) => {
-  let leftColor
-  cy.jumpToNotePage(left)
-  cy.get(".note-body")
-    .invoke("css", "border-color")
-    .then((val) => (leftColor = val))
-  cy.jumpToNotePage(right)
-  cy.get(".note-body")
-    .invoke("css", "border-color")
-    .then((val) => {
-      const leftColorIndex = parseInt(leftColor.match(/\d+/)[0])
-      const rightColorIndex = parseInt(val.match(/\d+/)[0])
-      if (aging === "newer") {
-        expect(leftColorIndex).to.greaterThan(rightColorIndex)
-      } else {
-        expect(leftColorIndex).to.equal(rightColorIndex)
-      }
-    })
-})
+Then(
+  "I should see {string} is {string} than {string}",
+  (left: string, aging: string, right: string) => {
+    let leftColor: string
+    cy.jumpToNotePage(left)
+    cy.get(".note-body")
+      .invoke("css", "border-color")
+      .then((val) => (leftColor = val))
+    cy.jumpToNotePage(right)
+    cy.get(".note-body")
+      .invoke("css", "border-color")
+      .then((val) => {
+        const leftColorIndex = parseInt(leftColor.match(/\d+/)[0])
+        const rightColorIndex = parseInt(val.match(/\d+/)[0])
+        if (aging === "newer") {
+          expect(leftColorIndex).to.greaterThan(rightColorIndex)
+        } else {
+          expect(leftColorIndex).to.equal(rightColorIndex)
+        }
+      })
+  },
+)
 
-When("I undo {string}", (undoType) => {
+When("I undo {string}", (undoType: string) => {
   cy.findByTitle(`undo ${undoType}`).click()
 })
 
-Then("the deleted notebook with title {string} should be restored", (title) => {
+Then("the deleted notebook with title {string} should be restored", (title: string) => {
   cy.findByText(title).should("exist")
 })
 
@@ -340,6 +344,6 @@ Then("there should be no more undo to do", () => {
   cy.get('.btn[title="undo"]').should("be.disabled")
 })
 
-Then("I type {string} in the title", (content) => {
+Then("I type {string} in the title", (content: string) => {
   cy.focused().clear().type(content)
 })

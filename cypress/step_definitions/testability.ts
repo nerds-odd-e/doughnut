@@ -33,7 +33,7 @@ Given("Use real github sandbox and there are no open issues on github", () => {
   )
 })
 
-Then("The {string} alert {string}", (expectedContent, shouldExistOrNot) => {
+Then("The {string} alert {string}", (expectedContent: string, shouldExistOrNot: string) => {
   cy.visit("/")
   cy.contains("Welcome")
   cy.contains(expectedContent).should(shouldExistOrNot === "should exist" ? "exist" : "not.exist")

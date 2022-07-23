@@ -28,6 +28,7 @@ import "@testing-library/cypress/add-commands"
 import "cypress-file-upload"
 import NotePath from "./NotePath"
 import WikidataServiceTester from "./WikidataServiceTester"
+import "../support/string.extensions"
 
 Cypress.Commands.add("pageIsNotLoading", () => {
   cy.get(".loading-bar").should("not.exist")
@@ -140,14 +141,14 @@ Cypress.Commands.add("clickRadioByLabel", (labelText) => {
 })
 
 Cypress.Commands.add("submitNoteCreationFormsWith", (notes) => {
-  notes.forEach((noteAttributes) => cy.submitNoteCreationFormWith(noteAttributes))
+  notes.forEach((noteAttributes: string) => cy.submitNoteCreationFormWith(noteAttributes))
 })
 
 Cypress.Commands.add("submitNoteFormsWith", (notes) => {
-  notes.forEach((noteAttributes) => cy.submitNoteFormWith(noteAttributes))
+  notes.forEach((noteAttributes: string) => cy.submitNoteFormWith(noteAttributes))
 })
 
-Cypress.Commands.add("expectNoteCards", (expectedCards: string[]) => {
+Cypress.Commands.add("expectNoteCards", (expectedCards: any[]) => {
   expectedCards.forEach((elem) => {
     for (const propName in elem) {
       if (propName === "note-title") {
@@ -354,14 +355,14 @@ Cypress.Commands.add("routerToRepeatReview", () => {
 
 Cypress.Commands.add("initialReviewInSequence", (reviews) => {
   cy.routerToInitialReview()
-  reviews.forEach((initialReview) => {
+  reviews.forEach((initialReview: string) => {
     cy.initialReviewOneNoteIfThereIs(initialReview)
   })
 })
 
-Cypress.Commands.add("initialReviewNotes", (noteTitles) => {
+Cypress.Commands.add("initialReviewNotes", (noteTitles: string) => {
   cy.initialReviewInSequence(
-    noteTitles.commonSenseSplit(", ").map((title) => {
+    noteTitles.commonSenseSplit(", ").map((title: string) => {
       return {
         review_type: title === "end" ? "initial done" : "single note",
         title,

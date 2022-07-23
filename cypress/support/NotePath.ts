@@ -1,6 +1,8 @@
 /// <reference types="cypress" />
 // @ts-check
 
+import "../support/string.extensions"
+
 class NotePath {
   static regex = /"(My Notes|Bazaar|Circle)\/([^"]*)"/
 

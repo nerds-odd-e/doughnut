@@ -10,7 +10,7 @@ declare namespace Cypress {
   interface Chainable<Subject = any> {
     assertBlogPostInWebsiteByTitle(article: any): Chainable<any>
     backendTimeTravelTo(day: number, hour: number): Chainable<Subject>
-    backendTimeTravelRelativeToNow(testability: TestabilityHelper, hours: number): Chainable<any>
+    backendTimeTravelRelativeToNow(hours: number): Chainable<Subject>
     cleanDBAndResetTestabilitySettings(): Chainable<Subject>
     cleanDownloadFolder(): Chainable<any>
     clickAddChildNoteButton(): Chainable<any>
@@ -76,16 +76,14 @@ declare namespace Cypress {
     shouldSeeQuizWithOptions(questionParts: any, options: any): Chainable<any>
     startSearching(): Chainable<any>
     stubWikidataEntityQuery(
-      wikidataServiceTester: WikidataServiceTester,
       wikidataId: string,
       wikidataTitle: string,
-      wikipediaLink: string,
-    ): Chainable<any>
+      wikipediaLink: string | undefined,
+    ): Chainable<Subject>
     stubWikidataSearchResult(
-      wikidataServiceTester: WikidataServiceTester,
       wikidataLabel: string,
       wikidataId: string,
-    ): Chainable<any>
+    ): Chainable<Subject>
     subscribeToNotebook(notebookTitle: string, dailyLearningCount: string): Chainable<any>
     submitNoteFormWith(noteAttributes: any): Chainable<any>
     submitNoteFormsWith(notes: any): Chainable<any>
@@ -93,7 +91,7 @@ declare namespace Cypress {
     submitNoteCreationFormsWith(notes: any): Chainable<any>
     testability(): Chainable<any>
     timeTravelTo(day: number, hour: number): Chainable<Subject>
-    triggerException(testatbility: TestabilityHelper): Chainable<any>
+    triggerException(): Chainable<Subject>
     unsubscribeFromNotebook(noteTitle: string): Chainable<any>
     updateCurrentUserSettingsWith(hash: Record<string, string>): Chainable<Subject>
     wikidataService(): Chainable<any>

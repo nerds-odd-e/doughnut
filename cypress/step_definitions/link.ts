@@ -4,6 +4,7 @@
 // @ts-check
 
 import { And, Then, When } from "@badeball/cypress-cucumber-preprocessor"
+import "../support/string.extensions"
 
 When("I start searching", () => {
   cy.startSearching()
@@ -14,7 +15,7 @@ When("I am creating link for note {string}", (noteTitle: string) => {
   cy.startSearching()
 })
 
-function makingLink(cy, fromNoteTitle, linkType, toNoteTitle) {
+function makingLink(cy, fromNoteTitle: string, linkType: string, toNoteTitle: string) {
   cy.jumpToNotePage(fromNoteTitle)
   cy.startSearching()
   cy.searchNote(toNoteTitle, ["All My Notebooks And Subscriptions"])
@@ -22,14 +23,17 @@ function makingLink(cy, fromNoteTitle, linkType, toNoteTitle) {
   cy.clickRadioByLabel(linkType)
 }
 
-When("I link note {string} as {string} note {string}", (fromNoteTitle, linkType, toNoteTitle) => {
-  makingLink(cy, fromNoteTitle, linkType, toNoteTitle)
-  cy.findByRole("button", { name: "Create Link" }).click()
-})
+When(
+  "I link note {string} as {string} note {string}",
+  (fromNoteTitle: string, linkType: string, toNoteTitle: string) => {
+    makingLink(cy, fromNoteTitle, linkType, toNoteTitle)
+    cy.findByRole("button", { name: "Create Link" }).click()
+  },
+)
 
 When(
   "I link note {string} as {string} note {string} and move under it",
-  (fromNoteTitle, linkType, toNoteTitle) => {
+  (fromNoteTitle: string, linkType: string, toNoteTitle: string) => {
     makingLink(cy, fromNoteTitle, linkType, toNoteTitle)
     cy.getFormControl("Also Move To Under Target Note").check()
     cy.findByRole("button", { name: "Create Link" }).click()
@@ -50,14 +54,14 @@ And("I should see the source note as {string}", (noteTitle: string) => {
 
 And("I should see {string} as the possible duplicate", (noteTitlesAsString: string) => {
   cy.tick(500)
-  cy.expectExactLinkTargets(noteTitlesAsString.commonSenseSplit(",").map((i) => i.trim()))
+  cy.expectExactLinkTargets(noteTitlesAsString.commonSenseSplit(",").map((i: string) => i.trim()))
 })
 
 And(
   "I should see {string} as targets only when searching {string}",
   (noteTitlesAsString: string, searchKey: string) => {
     cy.searchNote(searchKey, [])
-    cy.expectExactLinkTargets(noteTitlesAsString.commonSenseSplit(",").map((i) => i.trim()))
+    cy.expectExactLinkTargets(noteTitlesAsString.commonSenseSplit(",").map((i: string) => i.trim()))
   },
 )
 
@@ -65,7 +69,7 @@ And(
   "I should see {string} as targets only when searching in all my notebooks {string}",
   (noteTitlesAsString: string, searchKey: string) => {
     cy.searchNote(searchKey, ["All My Notebooks And Subscriptions"])
-    cy.expectExactLinkTargets(noteTitlesAsString.commonSenseSplit(",").map((i) => i.trim()))
+    cy.expectExactLinkTargets(noteTitlesAsString.commonSenseSplit(",").map((i: string) => i.trim()))
   },
 )
 
@@ -89,7 +93,7 @@ Then(
       .within(() => {
         targetNoteTitles
           .commonSenseSplit(",")
-          .forEach((targetNoteTitle) => cy.contains(targetNoteTitle))
+          .forEach((targetNoteTitle: string) => cy.contains(targetNoteTitle))
       })
   },
 )
