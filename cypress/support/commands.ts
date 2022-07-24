@@ -327,8 +327,9 @@ Cypress.Commands.add("yesIRemember", () => {
 })
 
 Cypress.Commands.add("openCirclesSelector", () => {
-  cy.routerToNotebooks()
-  cy.findByRole("button", { name: "choose a circle" }).click()
+  cy.routerToNotebooks().then(() => {
+    cy.findByRole("button", { name: "choose a circle" }).click({ force: true })
+  })
 })
 
 Cypress.Commands.add("navigateToCircle", (circleName) => {
