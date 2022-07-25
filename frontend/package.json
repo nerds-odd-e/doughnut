@@ -17,7 +17,7 @@
     "bootstrap": "^5.2",
     "gsap": "^3.10.4",
     "lodash": "^4.17",
-    "pinia": "^2.0.16",
+    "pinia": "^2.0.17",
     "unplugin-vue-components": "^0.21.1",
     "vue": "^3.2.37",
     "vue-content-loader": "^2.0",
