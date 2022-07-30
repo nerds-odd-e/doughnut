@@ -15,7 +15,7 @@
       "^.+\\.(js|jsx|ts|tsx)$": "babel-jest"
     },
     "transformIgnorePatterns": [
-      "node_modules/(?!got|p-cancelable|@szmarczak|lowercase-keys/)"
+      "node_modules/(?!got|p-cancelable|@szmarczak|@sindresorhus|lowercase-keys|form-data-encoder/)"
     ],
     "moduleFileExtensions": [
       "js"
@@ -25,13 +25,12 @@
     ]
   },
   "devDependencies": {
-    "@babel/core": "^7.17",
-    "@babel/preset-env": "^7.16",
+    "@babel/core": "^7.18",
+    "@babel/preset-env": "^7.18",
     "babel-jest": "^27.5.1",
     "jest": "^27.5.1"
   },
   "dependencies": {
-    "got": "^12.1",
-    "request": "^2.88.2"
+    "got": "11.8.3"
   }
 }

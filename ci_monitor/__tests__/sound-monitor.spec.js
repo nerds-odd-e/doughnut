@@ -1,12 +1,12 @@
-const request = require("request");
+const got = require('got');
 const {
   buildState,
   BuildState,
   englishDictionary,
-  timer
-} = require("../sound-monitor");
+  timer,
+} = require('../sound-monitor');
 
-jest.mock("request");
+jest.mock('got');
 
 const html = `
 <div id="check_suite_2467107019">
@@ -19,55 +19,56 @@ afterAll((done) => {
   done();
 });
 
-test("get content from github action", () => {
-  request.mockImplementation((url, cb) => cb(null, null, html));
-  return expect(buildState()).resolves.toMatchObject({
-    status: "completed successfully.",
-    gitLog: "move code",
-    buildName: "check_suite_2467107019",
+test('get content from github action', async () => {
+  got.get.mockResolvedValue({ body: html });
+  const state = await buildState();
+  expect(state).toMatchObject({
+    status: 'completed successfully.',
+    gitLog: 'move code',
+    buildName: 'check_suite_2467107019',
   });
 });
 
-test("should not say anything is state not changed", () => {
+test('should not say anything is state not changed', () => {
   const state = new BuildState(
-    "build1",
-    "completed successfully.",
-    "do something"
+    'build1',
+    'completed successfully.',
+    'do something'
   );
   const state2 = new BuildState(
-    "build1",
-    "completed successfully.",
-    "do something"
+    'build1',
+    'completed successfully.',
+    'do something'
   );
-  expect(state.diffToSentence(state2, englishDictionary)).toContain("");
+  expect(state.diffToSentence(state2, englishDictionary)).toContain('');
 });
 
-test("found a new build", () => {
+test('found a new build', () => {
   const state = new BuildState(
-    "build1",
-    "completed successfully.",
-    "do something"
+    'build1',
+    'completed successfully.',
+    'do something'
   );
   const state2 = new BuildState(
-    "build2",
-    "completed successfully.",
-    "do something"
+    'build2',
+    'completed successfully.',
+    'do something'
   );
   expect(state.diffToSentence(state2, englishDictionary)).toContain(
     `A new build 'do something' completed successfully`
   );
 });
 
-test("found a new status", () => {
+test('found a new status', () => {
   const state = new BuildState(
-    "build1",
-    "is currently running.",
-    "do something"
+    'build1',
+    'is currently running.',
+    'do something'
   );
   const state2 = new BuildState(
-    "build1",
-    "completed successfully.",
-    "do something"
+    'build1',
+    'completed successfully.',
+    'do something'
   );
   expect(state.diffToSentence(state2, englishDictionary)).toContain(
     `The build is currently running`
