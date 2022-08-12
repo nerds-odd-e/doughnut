@@ -73,7 +73,7 @@
     "unplugin-auto-import": "^0.10",
     "vite": "^3.0",
     "vite-plugin-checker": "^0.4",
-    "vite-plugin-eslint": "^1.7",
+    "vite-plugin-eslint": "^1.8",
     "vue-tsc": "^0.38"
   }
 }
