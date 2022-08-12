@@ -105,7 +105,7 @@ jobs:
       - name: Setup JDK with cache
         uses: ./.github/setup_jdk_with_cache
       - uses: ./.github/setup_nodejs_with_cache
-      - uses: cypress-io/github-action@v3
+      - uses: cypress-io/github-action@v4
         with:
           browser: chrome
           headless: true
