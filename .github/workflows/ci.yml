@@ -108,11 +108,10 @@ jobs:
       - uses: cypress-io/github-action@v4
         with:
           browser: chrome
-          headless: true
           config-file: cypress/config/ci.ts
           install-command: yarn --frozen-lockfile --silent
           build: yarn frontend:build
-          start: yarn run-p -clnr start:mb sut
+          start: yarn run-p -clnr sut start:mb
           wait-on: "http://127.0.0.1:9081/api/healthcheck"
           wait-on-timeout: 150
           spec: ${{ matrix.spec }}
