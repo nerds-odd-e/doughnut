@@ -12,7 +12,7 @@ env:
   ARTIFACT: "doughnut"
   VERSION: "0.0.1-SNAPSHOT"
   GCS_BUCKET: "dough-01"
-  RUNNER_OS: "ubuntu-latest"
+  RUNNER_OS: "ubuntu-22.04"
   MYSQL_UT_DB: "doughnut_test"
   MYSQL_E2E_DB: "doughnut_e2e_test"
   MYSQL_DB_USER: ${{ secrets.DBUSER }}
@@ -25,7 +25,7 @@ env:
 jobs:
   Linting:
     name: Backend + Frontend + Cypress Lint
-    runs-on: ubuntu-latest
+    runs-on: ${{ env.RUNNER_OS }}
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/setup_jdk_with_cache
@@ -35,7 +35,7 @@ jobs:
 
   Backend-unit-tests:
     name: Backend Unit tests
-    runs-on: ubuntu-latest
+    runs-on: ${{ env.RUNNER_OS }}
     steps:
       - uses: actions/checkout@v3
       - name: Setup MySQL DB Server
@@ -51,7 +51,7 @@ jobs:
 
   Frontend-unit-tests:
     name: Frontend Unit tests
-    runs-on: ubuntu-latest
+    runs-on: ${{ env.RUNNER_OS }}
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/setup_nodejs_with_cache
@@ -59,7 +59,7 @@ jobs:
 
   Package-artifacts:
     name: Package backend & frontend artifacts for deployment
-    runs-on: ubuntu-latest
+    runs-on: ${{ env.RUNNER_OS }}
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/setup_jdk_with_cache
@@ -75,7 +75,7 @@ jobs:
 
   E2E-tests:
     name: End-to-End tests with Database
-    runs-on: ubuntu-latest
+    runs-on: ${{ env.RUNNER_OS }}
     strategy:
       matrix:
         spec:
@@ -123,7 +123,7 @@ jobs:
 
   Deploy:
     name: GCP MIG Rolling Update Deploy
-    runs-on: ubuntu-latest
+    runs-on: ${{ env.RUNNER_OS }}
     needs:
       [
         Linting,
@@ -150,7 +150,7 @@ jobs:
 
   Notify-on-failure:
     name: Single slack/discord notification on CI/CD failure
-    runs-on: ubuntu-latest
+    runs-on: ${{ env.RUNNER_OS }}
     needs:
       [
         Linting,
@@ -174,7 +174,7 @@ jobs:
   #        github-token: ${{ env.GITHUB_TOKEN }}
   #        discord-webhook: ${{ env.DISCORD_WEBHOOK_URL }}
   # mobile-unit-test:
-  #   runs-on: ubuntu-latest
+  #   runs-on: ${{ env.RUNNER_OS }}
   #   steps:
   #     - uses: actions/checkout@v3
   #     - uses: subosito/flutter-action@v1
@@ -190,7 +190,7 @@ jobs:
   #       device:
   #         - "iPhone 11"
   #     fail-fast: false
-  #   runs-on: ubuntu-latest
+  #   runs-on: ${{ env.RUNNER_OS }}
   #   steps:
   #     - name: List Simulators
   #       run: xcrun xctrace list devices
@@ -208,7 +208,7 @@ jobs:
   #     - run: dart test_driver/app_test.dart
   #       working-directory: ./doughnut_mobile
   # drive_android:
-  #   runs-on: ubuntu-latest
+  #   runs-on: ${{ env.RUNNER_OS }}
   #   #creates a build matrix for your jobs
   #   strategy:
   #     #set of different configurations of the virtual environment.
