@@ -104,7 +104,7 @@ jobs:
           mysql_db_password: ${{ env.MYSQL_DB_PASSWORD }}
       - name: Setup JDK with cache
         uses: ./.github/setup_jdk_with_cache
-      - uses: ./.github/setup_nodejs_with_cache
+      - uses: ./.github/setup_nodejs
       - uses: cypress-io/github-action@v4
         with:
           browser: chrome

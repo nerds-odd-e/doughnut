@@ -1,4 +1,4 @@
-name: "Setup NodeJS with Gradle cache"
+name: "Setup NodeJS with yarn cache"
 description: "Setup NodeJS with yarn cache"
 inputs:
   node-version:

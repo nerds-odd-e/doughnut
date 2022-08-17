@@ -1,0 +1,14 @@
+name: "Setup NodeJS"
+description: "Setup NodeJS"
+inputs:
+  node-version:
+    description: "NodeJS Version"
+    required: true
+    default: "18"
+runs:
+  using: "composite"
+  steps:
+    - name: Setup NodeJS
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ inputs.node-version }}
