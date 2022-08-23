@@ -10,10 +10,7 @@
 
       <NotebookCardsWithButtons :notebooks="circle.notebooks.notebooks">
         <template #default="{ notebook }">
-          <NotebookButtons
-            v-bind="{ notebook, featureToggle }"
-            class="card-header-btn"
-          >
+          <NotebookButtons v-bind="{ notebook }" class="card-header-btn">
             <template #additional-buttons>
               <BazaarNotebookButtons :notebook="notebook" :logged-in="true" />
             </template>
@@ -91,9 +88,6 @@ export default defineComponent({
         /* eslint-disable  @typescript-eslint/no-non-null-assertion */
         this.circle!.invitationCode
       }`;
-    },
-    featureToggle() {
-      return this.piniaStore.featureToggle;
     },
   },
 

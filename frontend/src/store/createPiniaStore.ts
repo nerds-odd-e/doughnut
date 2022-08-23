@@ -3,7 +3,6 @@ import history, { HistoryState } from "./history";
 
 interface State extends HistoryState {
   currentUser: Generated.User | undefined;
-  featureToggle: boolean;
   environment: "production" | "testing";
 }
 
@@ -12,7 +11,6 @@ export default defineStore("main", {
     ({
       noteUndoHistories: [],
       currentUser: undefined,
-      featureToggle: false,
       environment: "production",
     } as State),
 
@@ -38,10 +36,6 @@ export default defineStore("main", {
 
     setCurrentUser(user: Generated.User) {
       this.currentUser = user;
-    },
-    setFeatureToggle(ft: boolean) {
-      this.environment = "testing";
-      this.featureToggle = ft;
     },
   },
 });

@@ -51,7 +51,6 @@ export default defineComponent({
 
   async mounted() {
     this.featureToggle = await this.storedApi.testability.getFeatureToggle();
-    this.piniaStore.setFeatureToggle(this.featureToggle);
     this.storedApi
       .getCurrentUserInfo()
       .then((res) => {

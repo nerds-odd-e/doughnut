@@ -67,11 +67,6 @@ export default defineComponent({
       selectedNoteId: undefined as Doughnut.ID | undefined,
     };
   },
-  computed: {
-    featureToggle() {
-      return this.piniaStore.featureToggle;
-    },
-  },
   methods: {
     onNoteDeleted() {
       if (this.noteRealm?.note.parentId) {

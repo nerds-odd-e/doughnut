@@ -144,11 +144,6 @@ export default defineComponent({
     NoteEditDialog,
     NoteDeleteButton,
   },
-  computed: {
-    featureToggle() {
-      return this.piniaStore.featureToggle;
-    },
-  },
   methods: {
     onNewNoteAdded(newNote: Generated.NoteRealmWithPosition) {
       this.$emit("newNoteAdded", newNote);
