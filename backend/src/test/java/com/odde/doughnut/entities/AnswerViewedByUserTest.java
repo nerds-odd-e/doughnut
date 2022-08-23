@@ -46,6 +46,17 @@ class AnswerViewedByUserTest {
     }
 
     @Test
+    void correctWhenThereAreExtraSpace() {
+      AnswerViewedByUser answer =
+        makeMe
+          .anAnswerViewedByUserFor(reviewPoint)
+          .validQuestionOfType(CLOZE_SELECTION)
+          .answerWithSpelling("this ")
+          .inMemoryPlease();
+      assertTrue(answer.correct);
+    }
+
+    @Test
     void literalAnswer() {
       AnswerViewedByUser answerResult =
           makeMe
