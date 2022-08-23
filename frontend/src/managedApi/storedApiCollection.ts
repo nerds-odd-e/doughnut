@@ -19,12 +19,10 @@ const storedApiCollection = (
 
   return {
     testability: {
-      getFeatureToggle() {
+      async getFeatureToggle() {
         return (
           !window.location.href.includes("odd-e.com") &&
-          managedApi
-            .restGet(`testability/feature_toggle`)
-            .then((res) => piniaStore.setFeatureToggle(res as boolean))
+          ((await managedApi.restGet(`testability/feature_toggle`)) as boolean)
         );
       },
 
@@ -32,7 +30,6 @@ const storedApiCollection = (
         const res = await managedApi.restPost(`testability/feature_toggle`, {
           enabled: data,
         });
-        this.getFeatureToggle();
         return res;
       },
 

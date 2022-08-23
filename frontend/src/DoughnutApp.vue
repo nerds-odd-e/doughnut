@@ -19,6 +19,7 @@ export default defineComponent({
     return {
       externalIdentifier: undefined as undefined | string,
       showNavBar: true,
+      featureToggle: false,
     };
   },
 
@@ -46,14 +47,11 @@ export default defineComponent({
     environment() {
       return this.piniaStore.environment;
     },
-    featureToggle() {
-      return this.piniaStore.featureToggle;
-    },
   },
 
-  mounted() {
-    this.storedApi.testability.getFeatureToggle();
-
+  async mounted() {
+    this.featureToggle = await this.storedApi.testability.getFeatureToggle();
+    this.piniaStore.setFeatureToggle(this.featureToggle);
     this.storedApi
       .getCurrentUserInfo()
       .then((res) => {
