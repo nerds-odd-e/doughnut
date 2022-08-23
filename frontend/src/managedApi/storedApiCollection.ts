@@ -19,6 +19,11 @@ const storedApiCollection = (
 
   return {
     testability: {
+      getEnvironment() {
+        return window.location.href.includes("odd-e.com")
+          ? "production"
+          : "testing";
+      },
       async getFeatureToggle() {
         return (
           !window.location.href.includes("odd-e.com") &&

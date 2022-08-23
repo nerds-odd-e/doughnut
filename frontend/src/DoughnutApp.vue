@@ -20,6 +20,7 @@ export default defineComponent({
       externalIdentifier: undefined as undefined | string,
       showNavBar: true,
       featureToggle: false,
+      environment: "production",
     };
   },
 
@@ -44,12 +45,10 @@ export default defineComponent({
     user() {
       return this.piniaStore.currentUser;
     },
-    environment() {
-      return this.piniaStore.environment;
-    },
   },
 
   async mounted() {
+    this.environment = this.storedApi.testability.getEnvironment();
     this.featureToggle = await this.storedApi.testability.getFeatureToggle();
     this.storedApi
       .getCurrentUserInfo()

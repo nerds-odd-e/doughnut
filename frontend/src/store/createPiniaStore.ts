@@ -3,7 +3,6 @@ import history, { HistoryState } from "./history";
 
 interface State extends HistoryState {
   currentUser: Generated.User | undefined;
-  environment: "production" | "testing";
 }
 
 export default defineStore("main", {
@@ -11,7 +10,6 @@ export default defineStore("main", {
     ({
       noteUndoHistories: [],
       currentUser: undefined,
-      environment: "production",
     } as State),
 
   getters: {
