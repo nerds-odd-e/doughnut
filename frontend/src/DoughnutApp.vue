@@ -76,8 +76,9 @@ export default defineComponent({
       <LoginButton v-else />
       <TestMenu
         v-if="environment === 'testing'"
-        :feature-toggle="featureToggle"
+        :feature-toggle-value="featureToggle"
         :user="user"
+        @feature-toggle="featureToggle = $event"
       />
     </template>
   </div>
