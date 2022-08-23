@@ -37,7 +37,7 @@ class TitleFragment {
   }
 
   boolean matches(String answer) {
-    return content.equalsIgnoreCase(answer);
+    return content.equalsIgnoreCase(answer.strip());
   }
 
   public String replaceSimilar(String literal) {

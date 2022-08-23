@@ -30,21 +30,17 @@ import org.apache.logging.log4j.util.Strings;
 public class QuizQuestion {
 
   public Boolean isAnswerCorrect(Note answerNote, String spellingAnswer) {
-    return spellingAnswer == null || isTrimmedSpellingAnswerCorrect(answerNote, spellingAnswer.trim());
-  }
-
-  private Boolean isTrimmedSpellingAnswerCorrect(Note answerNote, String trimmedSpellingAnswer) {
     if (getQuestionType() == QuestionType.JUST_REVIEW) {
-      return trimmedSpellingAnswer.equals("yes");
+      return spellingAnswer.equals("yes");
     }
     return buildPresenter().knownRightAnswers().stream()
-      .anyMatch(
-        correctAnswerNote -> {
-          if (answerNote != null) {
-            return correctAnswerNote.equals(answerNote);
-          }
-          return correctAnswerNote.getNoteTitle().matches(trimmedSpellingAnswer);
-        });
+        .anyMatch(
+            correctAnswerNote -> {
+              if (answerNote != null) {
+                return correctAnswerNote.equals(answerNote);
+              }
+              return correctAnswerNote.getNoteTitle().matches(spellingAnswer);
+            });
   }
 
   public QuizQuestionPresenter buildPresenter() {
