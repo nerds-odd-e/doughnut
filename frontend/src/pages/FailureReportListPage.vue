@@ -52,10 +52,5 @@ export default {
   mounted() {
     this.fetchData();
   },
-  computed: {
-    user() {
-      return this.$store.getters.getCurrentUser();
-    },
-  },
 };
 </script>

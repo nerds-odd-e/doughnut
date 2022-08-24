@@ -18,6 +18,7 @@ export default defineComponent({
   data() {
     return {
       externalIdentifier: undefined as undefined | string,
+      user: undefined as undefined | Generated.User,
       showNavBar: true,
       featureToggle: false,
       environment: "production",
@@ -42,9 +43,6 @@ export default defineComponent({
     newUser() {
       return !this.user && !!this.externalIdentifier;
     },
-    user() {
-      return this.piniaStore.currentUser;
-    },
   },
 
   async mounted() {
@@ -53,7 +51,7 @@ export default defineComponent({
     this.storedApi
       .getCurrentUserInfo()
       .then((res) => {
-        this.piniaStore.setCurrentUser(res.user);
+        this.user = res.user;
         this.externalIdentifier = res.externalIdentifier;
       })
       .finally(() => (this.loading = false));
@@ -64,7 +62,7 @@ export default defineComponent({
 <template>
   <div class="box">
     <Popups />
-    <UserNewRegisterPage v-if="newUser" />
+    <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
     <template v-else>
       <div v-if="!loading" class="content">
         <router-view v-if="$route.meta['userProp']" :user="user" />

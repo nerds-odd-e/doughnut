@@ -29,6 +29,7 @@ export default {
   setup() {
     return useStoredLoadingApi({ hasFormError: true });
   },
+  emits: ["updateUser"],
   components: { ContainerPage, TextInput },
   data() {
     return {
@@ -38,7 +39,7 @@ export default {
   methods: {
     processForm() {
       const user = this.storedApi.createUser(this.formData);
-      this.piniaStore.setCurrentUser(user);
+      this.$emit("updateUser", user);
     },
   },
 };

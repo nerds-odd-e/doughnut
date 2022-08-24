@@ -55,7 +55,6 @@ export default {
       this.storedApi
         .updateUser(this.formData.id, this.formData)
         .then((user) => {
-          this.piniaStore.setCurrentUser(user);
           this.$emit("done", user);
         });
     },

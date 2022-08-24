@@ -1,15 +1,12 @@
 import { defineStore } from "pinia";
 import history, { HistoryState } from "./history";
 
-interface State extends HistoryState {
-  currentUser: Generated.User | undefined;
-}
+type State = HistoryState;
 
 export default defineStore("main", {
   state: () =>
     ({
       noteUndoHistories: [],
-      currentUser: undefined,
     } as State),
 
   getters: {
@@ -30,10 +27,6 @@ export default defineStore("main", {
 
     deleteNote(noteId: Doughnut.ID) {
       history(this).deleteNote(noteId);
-    },
-
-    setCurrentUser(user: Generated.User) {
-      this.currentUser = user;
     },
   },
 });
