@@ -4,15 +4,13 @@
   </ContainerPage>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { RouteLocationNormalized, NavigationGuardNext } from "vue-router";
+<script lang="js">
 import CircleJoinForm from "../components/circles/CircleJoinForm.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import loginOrRegisterAndHaltThisThread from "../managedApi/window/loginOrRegisterAndHaltThisThread";
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 
-export default defineComponent({
+export default {
   setup() {
     return useStoredLoadingApi();
   },
@@ -20,23 +18,23 @@ export default defineComponent({
   props: {
     invitationCode: Number,
     user: {
-      type: Object as PropType<Generated.User>,
+      type: Object,
       required: false,
     },
   },
   beforeRouteEnter(
-    _to: RouteLocationNormalized,
-    _from: RouteLocationNormalized,
-    next: NavigationGuardNext
+    _to,
+    _from,
+    next
   ) {
-    next((vm) => {
-      // eslint-disable-next-line dot-notation
-      if (!vm["user"]) {
+    next(async (vm) => {
+      const x = await vm.storedApi.getCurrentUserInfo();
+      if (!x?.user) {
         loginOrRegisterAndHaltThisThread();
         next(false);
       }
       next();
     });
   },
-});
+};
 </script>
