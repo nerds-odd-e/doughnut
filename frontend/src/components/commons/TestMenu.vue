@@ -6,7 +6,8 @@
           <h1>Testability</h1>
           <CheckInput
             scope-name="testability"
-            v-model="featureToggle"
+            :model-value="featureToggle"
+            @update:model-value="updateFeatureToggle"
             field="featureToggle"
           />
           <TextInput
@@ -37,7 +38,7 @@ export default defineComponent({
     return useStoredLoadingApi();
   },
   props: {
-    featureToggleValue: Boolean,
+    featureToggle: Boolean,
     user: Object as PropType<Generated.User>,
   },
   emits: ["featureToggle"],
@@ -48,7 +49,6 @@ export default defineComponent({
   },
   data() {
     return {
-      featureToggle: this.featureToggleValue,
       randomSelector: "",
     };
   },
@@ -56,11 +56,9 @@ export default defineComponent({
     updateRandomSelector() {
       this.storedApi.testability.setRandomizer(this.randomSelector);
     },
-  },
-  watch: {
-    featureToggle() {
-      this.storedApi.testability.setFeatureToggle(this.featureToggle);
-      this.$emit("featureToggle", this.featureToggle);
+    updateFeatureToggle(value) {
+      this.storedApi.testability.setFeatureToggle(value);
+      this.$emit("featureToggle", value);
     },
   },
 });

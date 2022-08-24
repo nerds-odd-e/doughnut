@@ -53,6 +53,7 @@ export default defineComponent({
     this.storedApi
       .getCurrentUserInfo()
       .then((res) => {
+        this.piniaStore.setCurrentUser(res.user);
         this.externalIdentifier = res.externalIdentifier;
       })
       .finally(() => (this.loading = false));
@@ -72,7 +73,7 @@ export default defineComponent({
       <LoginButton v-else />
       <TestMenu
         v-if="environment === 'testing'"
-        :feature-toggle-value="featureToggle"
+        :feature-toggle="featureToggle"
         :user="user"
         @feature-toggle="featureToggle = $event"
       />

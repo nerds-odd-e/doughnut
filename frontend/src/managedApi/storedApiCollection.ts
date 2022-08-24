@@ -122,7 +122,6 @@ const storedApiCollection = (
       const res = (await managedApi.restGet(
         `user/current-user-info`
       )) as Generated.CurrentUserInfo;
-      piniaStore.setCurrentUser(res.user);
       return res;
     },
 
@@ -131,7 +130,6 @@ const storedApiCollection = (
         `user/${userId}`,
         data
       )) as Generated.User;
-      piniaStore.setCurrentUser(res);
       return res;
     },
 
@@ -140,7 +138,6 @@ const storedApiCollection = (
         `user`,
         data
       )) as Generated.User;
-      piniaStore.setCurrentUser(res);
       return res;
     },
 

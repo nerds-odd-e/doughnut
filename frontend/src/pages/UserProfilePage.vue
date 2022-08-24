@@ -54,7 +54,10 @@ export default {
     processForm() {
       this.storedApi
         .updateUser(this.formData.id, this.formData)
-        .then(() => this.$router.push({ name: "root" }));
+        .then((user) => {
+          this.piniaStore.setCurrentUser(user);
+          this.$router.push({ name: "root" });
+        });
     },
   },
 

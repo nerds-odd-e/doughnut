@@ -37,7 +37,8 @@ export default {
   },
   methods: {
     processForm() {
-      this.storedApi.createUser(this.formData);
+      const user = this.storedApi.createUser(this.formData);
+      this.piniaStore.setCurrentUser(user);
     },
   },
 };
