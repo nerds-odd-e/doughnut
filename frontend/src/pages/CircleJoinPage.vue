@@ -4,31 +4,39 @@
   </ContainerPage>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
+import { RouteLocationNormalized, NavigationGuardNext } from "vue-router";
 import CircleJoinForm from "../components/circles/CircleJoinForm.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import loginOrRegisterAndHaltThisThread from "../managedApi/window/loginOrRegisterAndHaltThisThread";
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 
-export default {
+export default defineComponent({
   setup() {
     return useStoredLoadingApi();
   },
   components: { CircleJoinForm, ContainerPage },
-  props: { invitationCode: Number },
-  computed: {
-    user() {
-      return this.piniaStore.currentUser;
+  props: {
+    invitationCode: Number,
+    user: {
+      type: Object as PropType<Generated.User>,
+      required: false,
     },
   },
-  beforeRouteEnter(to, from, next) {
+  beforeRouteEnter(
+    _to: RouteLocationNormalized,
+    _from: RouteLocationNormalized,
+    next: NavigationGuardNext
+  ) {
     next((vm) => {
-      if (!vm.user) {
+      // eslint-disable-next-line dot-notation
+      if (!vm["user"]) {
         loginOrRegisterAndHaltThisThread();
         next(false);
       }
       next();
     });
   },
-};
+});
 </script>

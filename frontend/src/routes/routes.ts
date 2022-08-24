@@ -75,6 +75,7 @@ const routes = [
     name: "circleJoin",
     component: CircleJoinPage,
     props: true,
+    meta: { userProp: true },
   },
   {
     path: "/bazaar/notes/:noteId",

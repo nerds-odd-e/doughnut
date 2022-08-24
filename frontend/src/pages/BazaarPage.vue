@@ -22,11 +22,11 @@ import { defineComponent, PropType } from "vue";
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue";
 import NotebookBazaarViewCards from "../components/bazaar/NotebookBazaarViewCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
-import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
+import useLoadingApi from "../managedApi/useLoadingApi";
 
 export default defineComponent({
   setup() {
-    return useStoredLoadingApi({ initalLoading: true });
+    return useLoadingApi({ initalLoading: true });
   },
   components: { ContainerPage, NotebookBazaarViewCards, BreadcrumbWithCircle },
   props: {
