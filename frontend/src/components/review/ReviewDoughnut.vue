@@ -1,5 +1,9 @@
 <template>
-  <UserActionsButton :user="user" @logout="logout" />
+  <UserActionsButton
+    :user="user"
+    @logout="logout"
+    @update-user="$emit('updateUser', $event)"
+  />
   <ReviewDoughnutRing v-if="reviewing" :reviewing="reviewing" />
 </template>
 
@@ -20,6 +24,7 @@ export default defineComponent({
     },
     reviewData: Object,
   },
+  emits: ["updateUser"],
   data() {
     return {
       reviewing: undefined as undefined | Generated.ReviewStatus,

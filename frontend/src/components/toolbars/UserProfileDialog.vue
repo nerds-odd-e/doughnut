@@ -30,16 +30,16 @@
 </template>
 
 <script>
-import ContainerPage from "./commons/ContainerPage.vue";
-import TextInput from "../components/form/TextInput.vue";
-import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
+import ContainerPage from "../../pages/commons/ContainerPage.vue";
+import TextInput from "../form/TextInput.vue";
+import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 
 export default {
   setup() {
     return useStoredLoadingApi({ initalLoading: true, hasFormError: true });
   },
   components: { ContainerPage, TextInput },
-  emits: ["userUpdated"],
+  emits: ["done"],
   data() {
     return {
       formData: null,
@@ -56,7 +56,7 @@ export default {
         .updateUser(this.formData.id, this.formData)
         .then((user) => {
           this.piniaStore.setCurrentUser(user);
-          this.$router.push({ name: "root" });
+          this.$emit("done", user);
         });
     },
   },

@@ -70,7 +70,7 @@ export default defineComponent({
         <router-view v-if="$route.meta['userProp']" :user="user" />
         <router-view v-else />
       </div>
-      <ReviewDoughnut v-if="user" :user="user" />
+      <ReviewDoughnut v-if="user" :user="user" @update-user="user = $event" />
       <LoginButton v-else />
       <TestMenu
         v-if="environment === 'testing'"

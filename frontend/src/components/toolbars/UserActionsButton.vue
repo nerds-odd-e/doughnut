@@ -33,13 +33,19 @@
       >Review</router-link
     >
     <div class="dropdown-divider"></div>
-    <router-link
-      class="dropdown-item"
-      role="button"
-      :to="{ name: 'userProfile' }"
-    >
-      {{ user.name }}
-    </router-link>
+    <PopupButton class="dropdown-item" title="choose a circle">
+      <template #button_face>{{ user.name }}</template>
+      <template #dialog_body="{ doneHandler }">
+        <UserProfileDialog
+          @done="
+            doneHandler($event);
+            if ($event) {
+              $emit('updateUser', $event);
+            }
+          "
+        />
+      </template>
+    </PopupButton>
     <a href="#" class="dropdown-item" role="button" @click="$emit('logout')"
       >Logout</a
     >
@@ -51,6 +57,7 @@ import { defineComponent, PropType } from "vue";
 import UserIconMenu from "./UserIconMenu.vue";
 import PopupButton from "../commons/Popups/PopupButton.vue";
 import CircleSelector from "../circles/CircleSelector.vue";
+import UserProfileDialog from "./UserProfileDialog.vue";
 
 export default defineComponent({
   props: {
@@ -59,8 +66,8 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["logout"],
-  components: { UserIconMenu, PopupButton, CircleSelector },
+  emits: ["updateUser", "logout"],
+  components: { UserIconMenu, PopupButton, CircleSelector, UserProfileDialog },
 });
 </script>
 

@@ -12,7 +12,6 @@ import CircleShowPage from "@/pages/CircleShowPage.vue";
 import CircleJoinPage from "@/pages/CircleJoinPage.vue";
 import FailureReportListPage from "@/pages/FailureReportListPage.vue";
 import FailureReportPage from "@/pages/FailureReportPage.vue";
-import UserProfilePage from "@/pages/UserProfilePage.vue";
 import AnswerShowPage from "@/pages/AnswerShowPage.vue";
 import NestedPage from "../pages/commons/NestedPage";
 
@@ -107,7 +106,6 @@ const routes = [
     component: FailureReportPage,
     props: true,
   },
-  { path: "/user-profile", name: "userProfile", component: UserProfilePage },
 ] as RouteRecordRaw[];
 
 export default routes;

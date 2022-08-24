@@ -176,6 +176,8 @@ declare module '@vue/runtime-core' {
     ToolbarFrame: typeof import('./src/components/toolbars/ToolbarFrame.vue')['default']
     UserActionsButton: typeof import('./src/components/toolbars/UserActionsButton.vue')['default']
     UserIconMenu: typeof import('./src/components/toolbars/UserIconMenu.vue')['default']
+    UserProfileDialog: typeof import('./src/components/toolbars/UserProfileDialog.vue')['default']
+    UserProfilePpopup: typeof import('./src/components/toolbars/UserProfilePpopup.vue')['default']
     ViewTypeButtons: typeof import('./src/components/toolbars/ViewTypeButtons.vue')['default']
     WikidataAssociationDialog: typeof import('./src/components/notes/WikidataAssociationDialog.vue')['default']
     WikidataSearchByLabel: typeof import('./src/components/notes/WikidataSearchByLabel.vue')['default']
