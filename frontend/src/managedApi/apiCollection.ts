@@ -9,6 +9,29 @@ const apiCollection = (managedApi: ManagedApi) => ({
     currentUser() {
       return managedApi.restGet(`user`);
     },
+
+    async getCurrentUserInfo() {
+      const res = (await managedApi.restGet(
+        `user/current-user-info`
+      )) as Generated.CurrentUserInfo;
+      return res;
+    },
+
+    async updateUser(userId: Doughnut.ID, data: Generated.User) {
+      const res = (await managedApi.restPatchMultiplePartForm(
+        `user/${userId}`,
+        data
+      )) as Generated.User;
+      return res;
+    },
+
+    async createUser(data: Generated.User) {
+      const res = (await managedApi.restPostMultiplePartForm(
+        `user`,
+        data
+      )) as Generated.User;
+      return res;
+    },
   },
   reviewMethods: {
     async removeFromReview(reviewPointId: Doughnut.ID) {
@@ -209,6 +232,33 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return (await managedApi.restGet(
         `wikidata/search/${keyword}`
       )) as Generated.WikidataSearchEntity[];
+    },
+  },
+  testability: {
+    getEnvironment() {
+      return window.location.href.includes("odd-e.com")
+        ? "production"
+        : "testing";
+    },
+    async getFeatureToggle() {
+      return (
+        !window.location.href.includes("odd-e.com") &&
+        ((await managedApi.restGet(`testability/feature_toggle`)) as boolean)
+      );
+    },
+
+    async setFeatureToggle(data: boolean) {
+      const res = await managedApi.restPost(`testability/feature_toggle`, {
+        enabled: data,
+      });
+      return res;
+    },
+
+    async setRandomizer(data: string) {
+      const res = await managedApi.restPost(`testability/randomizer`, {
+        choose: data,
+      });
+      return res;
     },
   },
 });

@@ -23,11 +23,11 @@
 <script>
 import ContainerPage from "./commons/ContainerPage.vue";
 import TextInput from "../components/form/TextInput.vue";
-import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
+import useLoadingApi from "../managedApi/useLoadingApi";
 
 export default {
   setup() {
-    return useStoredLoadingApi({ hasFormError: true });
+    return useLoadingApi({ hasFormError: true });
   },
   emits: ["updateUser"],
   components: { ContainerPage, TextInput },
@@ -38,7 +38,7 @@ export default {
   },
   methods: {
     processForm() {
-      const user = this.storedApi.createUser(this.formData);
+      const user = this.api.userMethods.createUser(this.formData);
       this.$emit("updateUser", user);
     },
   },

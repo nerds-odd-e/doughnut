@@ -31,11 +31,11 @@ import { defineComponent, PropType } from "vue";
 import PopupButton from "./Popups/PopupButton.vue";
 import CheckInput from "../form/CheckInput.vue";
 import TextInput from "../form/TextInput.vue";
-import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
+import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default defineComponent({
   setup() {
-    return useStoredLoadingApi();
+    return useLoadingApi();
   },
   props: {
     featureToggle: Boolean,
@@ -54,10 +54,10 @@ export default defineComponent({
   },
   methods: {
     updateRandomSelector() {
-      this.storedApi.testability.setRandomizer(this.randomSelector);
+      this.api.testability.setRandomizer(this.randomSelector);
     },
     updateFeatureToggle(value) {
-      this.storedApi.testability.setFeatureToggle(value);
+      this.api.testability.setFeatureToggle(value);
       this.$emit("featureToggle", value);
     },
   },

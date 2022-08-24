@@ -8,11 +8,11 @@
 import CircleJoinForm from "../components/circles/CircleJoinForm.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import loginOrRegisterAndHaltThisThread from "../managedApi/window/loginOrRegisterAndHaltThisThread";
-import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
+import useLoadingApi from "../managedApi/useStoredLoadingApi";
 
 export default {
   setup() {
-    return useStoredLoadingApi();
+    return useLoadingApi();
   },
   components: { CircleJoinForm, ContainerPage },
   props: {
@@ -28,7 +28,7 @@ export default {
     next
   ) {
     next(async (vm) => {
-      const x = await vm.storedApi.getCurrentUserInfo();
+      const x = await vm.api.userMethods.getCurrentUserInfo();
       if (!x?.user) {
         loginOrRegisterAndHaltThisThread();
         next(false);

@@ -30,9 +30,9 @@
 </template>
 
 <script>
-import ContainerPage from "../../pages/commons/ContainerPage.vue";
-import TextInput from "../form/TextInput.vue";
-import useLoadingApi from "../../managedApi/useLoadingApi";
+import ContainerPage from "./commons/ContainerPage.vue";
+import TextInput from "../components/form/TextInput.vue";
+import useLoadingApi from "../managedApi/useLoadingApi";
 
 export default {
   setup() {
@@ -55,6 +55,7 @@ export default {
       this.api.userMethods
         .updateUser(this.formData.id, this.formData)
         .then((user) => {
+          this.piniaStore.setCurrentUser(user);
           this.$emit("done", user);
         });
     },

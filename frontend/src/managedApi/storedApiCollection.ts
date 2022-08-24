@@ -18,34 +18,6 @@ const storedApiCollection = (
   }
 
   return {
-    testability: {
-      getEnvironment() {
-        return window.location.href.includes("odd-e.com")
-          ? "production"
-          : "testing";
-      },
-      async getFeatureToggle() {
-        return (
-          !window.location.href.includes("odd-e.com") &&
-          ((await managedApi.restGet(`testability/feature_toggle`)) as boolean)
-        );
-      },
-
-      async setFeatureToggle(data: boolean) {
-        const res = await managedApi.restPost(`testability/feature_toggle`, {
-          enabled: data,
-        });
-        return res;
-      },
-
-      async setRandomizer(data: string) {
-        const res = await managedApi.restPost(`testability/randomizer`, {
-          choose: data,
-        });
-        return res;
-      },
-    },
-
     async createNote(parentId: Doughnut.ID, data: Generated.NoteCreation) {
       return (await managedApi.restPostMultiplePartForm(
         `notes/${parentId}/create`,
@@ -115,29 +87,6 @@ const storedApiCollection = (
     async deleteNote(noteId: Doughnut.ID) {
       const res = await managedApi.restPost(`notes/${noteId}/delete`, {});
       piniaStore.deleteNote(noteId);
-      return res;
-    },
-
-    async getCurrentUserInfo() {
-      const res = (await managedApi.restGet(
-        `user/current-user-info`
-      )) as Generated.CurrentUserInfo;
-      return res;
-    },
-
-    async updateUser(userId: Doughnut.ID, data: Generated.User) {
-      const res = (await managedApi.restPatchMultiplePartForm(
-        `user/${userId}`,
-        data
-      )) as Generated.User;
-      return res;
-    },
-
-    async createUser(data: Generated.User) {
-      const res = (await managedApi.restPostMultiplePartForm(
-        `user`,
-        data
-      )) as Generated.User;
       return res;
     },
 
