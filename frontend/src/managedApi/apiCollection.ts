@@ -101,8 +101,10 @@ const apiCollection = (managedApi: ManagedApi) => ({
     )) as Generated.Note[];
   },
 
-  getBazaar() {
-    return managedApi.restGet("bazaar");
+  async getBazaar() {
+    return (await managedApi.restGet(
+      "bazaar"
+    )) as Generated.NotebooksViewedByUser;
   },
   shareToBazaar(notebookId: Doughnut.ID) {
     return managedApi.restPost(`notebooks/${notebookId}/share`, {});

@@ -67,7 +67,8 @@ export default defineComponent({
     <UserNewRegisterPage v-if="newUser" />
     <template v-else>
       <div v-if="!loading" class="content">
-        <router-view />
+        <router-view v-if="$route.meta['userProp']" :user="user" />
+        <router-view v-else />
       </div>
       <ReviewDoughnut v-if="user" :user="user" />
       <LoginButton v-else />

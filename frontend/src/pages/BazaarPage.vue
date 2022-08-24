@@ -8,7 +8,7 @@
     }"
   >
     <p>These are shared notes from doughnut users.</p>
-    <div v-if="!!notebooksViewedByUser">
+    <div v-if="notebooksViewedByUser">
       <NotebookBazaarViewCards
         :notebooks="notebooksViewedByUser.notebooks"
         :logged-in="!!user"
@@ -17,27 +17,28 @@
   </ContainerPage>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue";
 import NotebookBazaarViewCards from "../components/bazaar/NotebookBazaarViewCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 
-export default {
+export default defineComponent({
   setup() {
     return useStoredLoadingApi({ initalLoading: true });
   },
-  name: "NotebooksPage",
   components: { ContainerPage, NotebookBazaarViewCards, BreadcrumbWithCircle },
+  props: {
+    user: {
+      type: Object as PropType<Generated.User>,
+      required: false,
+    },
+  },
   data() {
     return {
-      notebooksViewedByUser: null,
+      notebooksViewedByUser: null as Generated.NotebooksViewedByUser | null,
     };
-  },
-  computed: {
-    user() {
-      return this.piniaStore.currentUser;
-    },
   },
 
   methods: {
@@ -50,5 +51,5 @@ export default {
   mounted() {
     this.fetchData();
   },
-};
+});
 </script>
