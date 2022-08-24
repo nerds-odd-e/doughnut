@@ -79,22 +79,20 @@
   </ContainerPage>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
 import PopupButton from "@/components/commons/Popups/PopupButton.vue";
 import CircleSelector from "@/components/circles/CircleSelector.vue";
 import BrandBar from "@/components/toolbars/BrandBar.vue";
-import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 import ContainerPage from "./commons/ContainerPage.vue";
 
-export default {
-  setup() {
-    return useStoredLoadingApi();
-  },
-  components: { ContainerPage, PopupButton, CircleSelector, BrandBar },
-  computed: {
-    user() {
-      return this.piniaStore.currentUser;
+export default defineComponent({
+  props: {
+    user: {
+      type: Object as PropType<Generated.User>,
+      required: false,
     },
   },
-};
+  components: { ContainerPage, PopupButton, CircleSelector, BrandBar },
+});
 </script>
