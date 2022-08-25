@@ -77,7 +77,7 @@ export default defineComponent({
       this.storedApi
         .createNote(this.parentId, this.creationData)
         .then((res) => {
-          this.$emit("done", res);
+          this.$emit("done", res.noteRealm);
         })
         .catch((res) => (this.formErrors = res));
     },

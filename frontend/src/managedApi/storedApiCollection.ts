@@ -22,7 +22,7 @@ const storedApiCollection = (
       return (await managedApi.restPostMultiplePartForm(
         `notes/${parentId}/create`,
         data
-      )) as Generated.NoteRealm;
+      )) as Generated.NoteRealmWithPosition;
     },
 
     async createLink(
