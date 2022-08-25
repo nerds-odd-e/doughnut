@@ -64,13 +64,17 @@
           <SvgSearch />
         </template>
         <template #dialog_body="{ doneHandler }">
-          <LinkNoteDialog
-            :note="selectedNote"
-            @done="
-              doneHandler($event);
-              $emit('noteRealmUpdated', $event);
-            "
-          />
+          <NoteDialogFrame :note-id="selectedNoteId">
+            <template #default="{ note }">
+              <LinkNoteDialog
+                :note="note"
+                @done="
+                  doneHandler($event);
+                  $emit('noteRealmUpdated', $event);
+                "
+              />
+            </template>
+          </NoteDialogFrame>
         </template>
       </PopupButton>
 
@@ -126,7 +130,7 @@ export default defineComponent({
     return { ...useStoredLoadingApi(), ...usePopups() };
   },
   props: {
-    selectedNote: { type: Object as PropType<Generated.Note>, required: true },
+    selectedNoteId: { type: Number, required: true },
     selectedNotePosition: {
       type: Object as PropType<Generated.NotePositionViewedByUser>,
       required: true,
@@ -153,9 +157,6 @@ export default defineComponent({
     NoteDeleteButton,
   },
   computed: {
-    selectedNoteId() {
-      return this.selectedNote.id;
-    },
     parentId() {
       const { ancestors } = this.selectedNotePosition;
       if (ancestors.length > 0) {

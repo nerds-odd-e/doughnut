@@ -5,7 +5,7 @@
         <NoteToolbar
           v-if="notePosition"
           v-bind="{
-            selectedNote: noteRealm.note,
+            selectedNoteId: noteId,
             selectedNotePosition: notePosition,
             viewType: 'cards',
           }"
@@ -21,9 +21,9 @@
       >
         <template #footer>
           <NoteInfoButton
-            :note-id="noteRealm.id"
+            :note-id="noteId"
             :expanded="expandInfo"
-            :key="noteRealm.id"
+            :key="noteId"
             @level-changed="$emit('levelChanged', $event)"
             @self-evaluated="$emit('selfEvaluated', $event)"
           />

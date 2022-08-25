@@ -3,8 +3,8 @@
     <div class="inner-box" :key="noteId">
       <div class="header">
         <NoteToolbar
-          v-if="selectedNote && selectedNotePosition"
-          v-bind="{ selectedNote, selectedNotePosition, viewType: 'mindmap' }"
+          v-if="selectedNoteId && selectedNotePosition"
+          v-bind="{ selectedNoteId, selectedNotePosition, viewType: 'mindmap' }"
           @note-deleted="onNoteDeleted"
           @note-realm-updated="noteRealmUpdated($event)"
           @new-note-added="newNoteAdded()"
@@ -54,9 +54,6 @@ export default defineComponent({
     },
     selectedNotePosition(): Generated.NotePositionViewedByUser | undefined {
       return this.noteRealmCache?.getNotePosition(this.selectedNoteId);
-    },
-    selectedNote() {
-      return this.noteRealmCache?.getNoteRealmById(this.selectedNoteId)?.note;
     },
   },
   methods: {
