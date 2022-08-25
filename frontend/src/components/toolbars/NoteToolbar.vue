@@ -42,7 +42,7 @@
         </template>
         <template #dialog_body="{ doneHandler }">
           <WikidataAssociationDialog
-            :note="selectedNote"
+            :note-id="selectedNote.id"
             @done="
               doneHandler($event);
               $emit('noteRealmUpdated', $event);

@@ -22,7 +22,7 @@ declare module '@vue/runtime-core' {
     CircleNewDialog: typeof import('./src/components/circles/CircleNewDialog.vue')['default']
     CircleSelector: typeof import('./src/components/circles/CircleSelector.vue')['default']
     ContentLoader: typeof import('./src/components/commons/ContentLoader.vue')['default']
-    copy: typeof import('./src/components/toolbars/NoteToolbar copy.vue')['default']
+    copy: typeof import('./src/components/notes/WikidataAssociationDialog copy.vue')['default']
     DragListner: typeof import('./src/components/commons/DragListner.vue')['default']
     EditableText: typeof import('./src/components/form/EditableText.vue')['default']
     Feather: typeof import('./src/components/svgs/link_types/Feather.vue')['default']
@@ -182,6 +182,7 @@ declare module '@vue/runtime-core' {
     UserProfilePpopup: typeof import('./src/components/toolbars/UserProfilePpopup.vue')['default']
     ViewTypeButtons: typeof import('./src/components/toolbars/ViewTypeButtons.vue')['default']
     WikidataAssociationDialog: typeof import('./src/components/notes/WikidataAssociationDialog.vue')['default']
+    WikidataAssociationDialogInner: typeof import('./src/components/notes/WikidataAssociationDialogInner.vue')['default']
     WikidataSearchByLabel: typeof import('./src/components/notes/WikidataSearchByLabel.vue')['default']
   }
 }
