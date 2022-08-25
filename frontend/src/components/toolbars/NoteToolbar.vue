@@ -7,7 +7,7 @@
       <NoteNewButton
         :parent-id="selectedNoteId"
         button-title="Add Child Note"
-        @new-note-added="onNewNoteAdded($event)"
+        @note-realm-updated="$emit('noteRealmUpdated', $event)"
       >
         <SvgAddChild />
       </NoteNewButton>
@@ -16,7 +16,7 @@
         :parent-id="parentId"
         button-title="Add Sibling Note"
         v-if="parentId"
-        @new-note-added="onNewNoteAdded($event)"
+        @note-realm-updated="$emit('noteRealmUpdated', $event)"
       >
         <SvgAddSibling />
       </NoteNewButton>
@@ -138,7 +138,7 @@ export default defineComponent({
     },
     viewType: { type: String as PropType<ViewTypeName>, required: true },
   },
-  emits: ["noteDeleted", "noteRealmUpdated", "newNoteAdded"],
+  emits: ["noteDeleted", "noteRealmUpdated"],
   components: {
     NoteUndoButton,
     Breadcrumb,
@@ -165,11 +165,6 @@ export default defineComponent({
         return ancestors[ancestors.length - 1].id;
       }
       return undefined;
-    },
-  },
-  methods: {
-    onNewNoteAdded(newNote: Generated.NoteRealmWithPosition) {
-      this.$emit("newNoteAdded", newNote);
     },
   },
 });

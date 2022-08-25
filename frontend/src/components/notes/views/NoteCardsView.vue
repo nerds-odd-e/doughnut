@@ -11,7 +11,6 @@
           }"
           @note-deleted="onNoteDeleted"
           @note-realm-updated="noteRealmUpdated($event)"
-          @new-note-added="newNoteAdded($event)"
         />
       </div>
 
@@ -79,15 +78,16 @@ export default defineComponent({
       }
       this.$emit("noteDeleted");
     },
-    newNoteAdded(newNote: Generated.NoteRealmWithPosition) {
-      this.$router.push({
-        name: "noteShow",
-        params: { noteId: newNote.notePosition.noteId },
-      });
-    },
     noteRealmUpdated(updatedNoteRealm?: Generated.NoteRealm) {
       if (!updatedNoteRealm) {
         this.fetchData();
+        return;
+      }
+      if (updatedNoteRealm.id !== this.noteId) {
+        this.$router.push({
+          name: "noteShow",
+          params: { noteId: updatedNoteRealm.id },
+        });
         return;
       }
       this.noteRealm = updatedNoteRealm;

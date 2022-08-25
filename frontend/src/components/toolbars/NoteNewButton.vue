@@ -8,7 +8,7 @@
         v-bind="{ parentId }"
         @done="
           doneHandler($event);
-          $emit('newNoteAdded', $event);
+          $emit('noteRealmUpdated', $event);
         "
       />
     </template>
@@ -25,7 +25,7 @@ export default defineComponent({
     parentId: { type: Number, required: true },
     buttonTitle: { type: String, required: true },
   },
-  emits: ["newNoteAdded"],
+  emits: ["noteRealmUpdated"],
   components: { PopupButton, NoteNewDialog },
 });
 </script>
