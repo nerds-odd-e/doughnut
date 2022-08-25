@@ -8,6 +8,7 @@ import usePopups from "./components/commons/Popups/usePopup";
 import ReviewDoughnut from "./components/review/ReviewDoughnut.vue";
 import LoginButton from "./components/toolbars/LoginButton.vue";
 import NoteControlCenter from "./components/toolbars/NoteControlCenter.vue";
+import { sanitizeViewTypeName } from "./models/viewTypes";
 
 export default defineComponent({
   setup() {
@@ -45,6 +46,9 @@ export default defineComponent({
     newUser() {
       return !this.user && !!this.externalIdentifier;
     },
+    viewType() {
+      return sanitizeViewTypeName(this.$route.meta.viewType as string);
+    },
   },
 
   async mounted() {
@@ -68,7 +72,11 @@ export default defineComponent({
     <template v-else>
       <div v-if="!loading" class="content">
         <template v-if="$route.meta['useControlCenter']">
-          <NoteControlCenter @note-realm-updated="updatedNoteRealm = $event" />
+          <NoteControlCenter
+            :selected-note-id="Number($route.params.noteId)"
+            :view-type="viewType"
+            @note-realm-updated="updatedNoteRealm = $event"
+          />
           <router-view :updated-note-realm="updatedNoteRealm" />
         </template>
         <router-view v-else-if="$route.meta['userProp']" :user="user" />

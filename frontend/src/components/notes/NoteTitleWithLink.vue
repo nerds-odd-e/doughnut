@@ -5,10 +5,7 @@
 </template>
 
 <script>
-import {
-  routeNameForViewType,
-  viewTypeFromRouteName,
-} from "../../models/viewTypes";
+import { routeNameForViewType } from "../../models/viewTypes";
 
 export default {
   props: {
@@ -26,7 +23,7 @@ export default {
       if (this.viewType) {
         return this.viewType;
       }
-      return viewTypeFromRouteName(this.$route?.name);
+      return this.$route?.meta?.viewType;
     },
   },
 };

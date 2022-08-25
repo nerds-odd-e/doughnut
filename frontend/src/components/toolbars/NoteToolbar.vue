@@ -2,16 +2,6 @@
   <Breadcrumb v-bind="selectedNotePosition" />
   <ToolbarFrame>
     <div class="btn-group btn-group-sm">
-      <ViewTypeButtons v-bind="{ viewType, noteId: selectedNoteId }" />
-
-      <NoteNewButton
-        :parent-id="selectedNoteId"
-        button-title="Add Child Note"
-        @note-realm-updated="$emit('noteRealmUpdated', $event)"
-      >
-        <SvgAddChild />
-      </NoteNewButton>
-
       <NoteNewButton
         :parent-id="parentId"
         button-title="Add Sibling Note"
@@ -20,63 +10,6 @@
       >
         <SvgAddSibling />
       </NoteNewButton>
-
-      <PopupButton title="edit note">
-        <template #button_face>
-          <SvgEdit />
-        </template>
-        <template #dialog_body="{ doneHandler }">
-          <NoteDialogFrame :note-id="selectedNoteId">
-            <template #default="{ note }">
-              <NoteEditDialog
-                :note="note"
-                @done="
-                  doneHandler($event);
-                  $emit('noteRealmUpdated');
-                "
-              />
-            </template>
-          </NoteDialogFrame>
-        </template>
-      </PopupButton>
-
-      <PopupButton title="associate wikidata">
-        <template #button_face>
-          <SvgWikiData />
-        </template>
-        <template #dialog_body="{ doneHandler }">
-          <NoteDialogFrame :note-id="selectedNoteId">
-            <template #default="{ note }">
-              <WikidataAssociationDialog
-                :note="note"
-                @done="
-                  doneHandler($event);
-                  $emit('noteRealmUpdated', $event);
-                "
-              />
-            </template>
-          </NoteDialogFrame>
-        </template>
-      </PopupButton>
-
-      <PopupButton title="link note">
-        <template #button_face>
-          <SvgSearch />
-        </template>
-        <template #dialog_body="{ doneHandler }">
-          <NoteDialogFrame :note-id="selectedNoteId">
-            <template #default="{ note }">
-              <LinkNoteDialog
-                :note="note"
-                @done="
-                  doneHandler($event);
-                  $emit('noteRealmUpdated', $event);
-                "
-              />
-            </template>
-          </NoteDialogFrame>
-        </template>
-      </PopupButton>
 
       <div class="dropdown">
         <button
@@ -106,23 +39,13 @@
 import { defineComponent, PropType } from "vue";
 import Breadcrumb from "./Breadcrumb.vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
-import PopupButton from "../commons/Popups/PopupButton.vue";
-import SvgSearch from "../svgs/SvgSearch.vue";
-import LinkNoteDialog from "../links/LinkNoteDialog.vue";
 import { ViewTypeName } from "../../models/viewTypes";
 import ToolbarFrame from "./ToolbarFrame.vue";
-import SvgWikiData from "../svgs/SvgWikiData.vue";
-import WikidataAssociationDialog from "../notes/WikidataAssociationDialog.vue";
-import SvgAddChild from "../svgs/SvgAddChild.vue";
 import SvgAddSibling from "../svgs/SvgAddSibling.vue";
 import SvgCog from "../svgs/SvgCog.vue";
 import NoteNewButton from "./NoteNewButton.vue";
-import ViewTypeButtons from "./ViewTypeButtons.vue";
-import SvgEdit from "../svgs/SvgEdit.vue";
-import NoteEditDialog from "../notes/NoteEditDialog.vue";
 import usePopups from "../commons/Popups/usePopup";
 import NoteDeleteButton from "./NoteDeleteButton.vue";
-import NoteDialogFrame from "../notes/NoteDialogFrame.vue";
 
 export default defineComponent({
   setup() {
@@ -139,21 +62,11 @@ export default defineComponent({
   emits: ["noteDeleted", "noteRealmUpdated"],
   components: {
     Breadcrumb,
-    PopupButton,
-    SvgSearch,
-    LinkNoteDialog,
     ToolbarFrame,
-    SvgWikiData,
-    WikidataAssociationDialog,
     SvgCog,
-    SvgAddChild,
     SvgAddSibling,
     NoteNewButton,
-    ViewTypeButtons,
-    SvgEdit,
-    NoteEditDialog,
     NoteDeleteButton,
-    NoteDialogFrame,
   },
   computed: {
     parentId() {

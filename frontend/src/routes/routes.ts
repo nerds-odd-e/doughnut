@@ -27,7 +27,7 @@ const noteAndLinkRoutes = [
     name: "noteShow",
     component: NoteShowPage,
     props: (route: RouteLocation) => ({ noteId: Number(route.params.noteId) }),
-    meta: { useControlCenter: true },
+    meta: { useControlCenter: true, viewType: "card" },
   },
 
   {
@@ -35,6 +35,7 @@ const noteAndLinkRoutes = [
     name: "noteShowMindmap",
     component: NoteShowMindmapPage,
     props: (route: RouteLocation) => ({ noteId: Number(route.params.noteId) }),
+    meta: { useControlCenter: true, viewType: "mindmap" },
   },
 
   {
@@ -42,6 +43,7 @@ const noteAndLinkRoutes = [
     name: "noteShowArticle",
     component: NoteShowArticlePage,
     props: (route: RouteLocation) => ({ noteId: Number(route.params.noteId) }),
+    meta: { viewType: "mindmap" },
   },
 
   {

@@ -23,20 +23,5 @@ const routeNameForViewType = (viewType: string) => {
   return "noteShow";
 };
 
-const viewTypeFromRouteName = (routeName: string | undefined): ViewTypeName => {
-  if (routeName === "noteShowMindmap") {
-    return "mindmap";
-  }
-  if (routeName === "noteShowArticle") {
-    return "article";
-  }
-  return "cards";
-};
-
-export {
-  viewTypeNames,
-  sanitizeViewTypeName,
-  routeNameForViewType,
-  viewTypeFromRouteName,
-};
+export { viewTypeNames, sanitizeViewTypeName, routeNameForViewType };
 export type { ViewTypeName };
