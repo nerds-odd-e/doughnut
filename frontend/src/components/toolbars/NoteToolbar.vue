@@ -2,10 +2,10 @@
   <Breadcrumb v-bind="selectedNotePosition" />
   <ToolbarFrame>
     <div class="btn-group btn-group-sm">
-      <ViewTypeButtons v-bind="{ viewType, noteId: selecteNoteId }" />
+      <ViewTypeButtons v-bind="{ viewType, noteId: selectedNoteId }" />
 
       <NoteNewButton
-        :parent-id="selecteNoteId"
+        :parent-id="selectedNoteId"
         button-title="Add Child Note"
         @new-note-added="onNewNoteAdded($event)"
       >
@@ -27,7 +27,7 @@
         </template>
         <template #dialog_body="{ doneHandler }">
           <NoteEditDialog
-            :note-id="selecteNoteId"
+            :note-id="selectedNoteId"
             @done="
               doneHandler($event);
               $emit('noteRealmUpdated');
@@ -42,7 +42,7 @@
         </template>
         <template #dialog_body="{ doneHandler }">
           <WikidataAssociationDialog
-            :note-id="selecteNoteId"
+            :note-id="selectedNoteId"
             @done="
               doneHandler($event);
               $emit('noteRealmUpdated', $event);
@@ -82,7 +82,7 @@
         <div class="dropdown-menu dropdown-menu-end">
           <NoteDeleteButton
             class="dropdown-item"
-            :note-id="selecteNoteId"
+            :note-id="selectedNoteId"
             @note-deleted="$emit('noteDeleted', $event)"
           />
         </div>
