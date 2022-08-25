@@ -13,9 +13,9 @@
       </NoteNewButton>
 
       <NoteNewButton
-        :parent-id="selectedNote.parentId"
+        :parent-id="parentId"
         button-title="Add Sibling Note"
-        v-if="!!selectedNote.parentId"
+        v-if="parentId"
         @new-note-added="onNewNoteAdded($event)"
       >
         <SvgAddSibling />
@@ -82,7 +82,7 @@
         <div class="dropdown-menu dropdown-menu-end">
           <NoteDeleteButton
             class="dropdown-item"
-            :note="selectedNote"
+            :note-id="selectedNote.id"
             @note-deleted="$emit('noteDeleted', $event)"
           />
         </div>
@@ -143,6 +143,15 @@ export default defineComponent({
     SvgEdit,
     NoteEditDialog,
     NoteDeleteButton,
+  },
+  computed: {
+    parentId() {
+      const { ancestors } = this.selectedNotePosition;
+      if (ancestors.length > 0) {
+        return ancestors[ancestors.length - 1].id;
+      }
+      return undefined;
+    },
   },
   methods: {
     onNewNoteAdded(newNote: Generated.NoteRealmWithPosition) {

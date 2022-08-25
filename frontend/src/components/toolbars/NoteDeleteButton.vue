@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+import { defineComponent } from "vue";
 import SvgRemove from "../svgs/SvgRemove.vue";
 import usePopups from "../commons/Popups/usePopup";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
@@ -15,7 +15,7 @@ export default defineComponent({
     return { ...useStoredLoadingApi(), ...usePopups() };
   },
   props: {
-    note: { type: Object as PropType<Generated.Note>, required: true },
+    noteId: { type: Number, required: true },
   },
   emits: ["noteDeleted"],
   components: {
@@ -24,9 +24,8 @@ export default defineComponent({
   methods: {
     async deleteNote() {
       if (await this.popups.confirm(`Confirm to delete this note?`)) {
-        const { id } = this.note;
-        await this.storedApi.deleteNote(id);
-        this.$emit("noteDeleted", id);
+        await this.storedApi.deleteNote(this.noteId);
+        this.$emit("noteDeleted", this.noteId);
       }
     },
   },
