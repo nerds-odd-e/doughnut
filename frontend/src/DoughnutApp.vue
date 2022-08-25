@@ -7,6 +7,7 @@ import useLoadingApi from "./managedApi/useLoadingApi";
 import usePopups from "./components/commons/Popups/usePopup";
 import ReviewDoughnut from "./components/review/ReviewDoughnut.vue";
 import LoginButton from "./components/toolbars/LoginButton.vue";
+import NoteControlCenter from "./components/toolbars/NoteControlCenter.vue";
 
 export default defineComponent({
   setup() {
@@ -31,6 +32,7 @@ export default defineComponent({
     UserNewRegisterPage,
     ReviewDoughnut,
     LoginButton,
+    NoteControlCenter,
   },
 
   watch: {
@@ -65,6 +67,7 @@ export default defineComponent({
     <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
     <template v-else>
       <div v-if="!loading" class="content">
+        <NoteControlCenter v-if="$route.meta['useControlCenter']" />
         <router-view v-if="$route.meta['userProp']" :user="user" />
         <router-view v-else />
       </div>

@@ -56,7 +56,7 @@ export default defineComponent({
       return this.noteRealmCache?.getNotePosition(this.selectedNoteId);
     },
     selectedNote() {
-      return this.noteRealm?.note;
+      return this.noteRealmCache?.getNoteRealmById(this.selectedNoteId)?.note;
     },
   },
   methods: {

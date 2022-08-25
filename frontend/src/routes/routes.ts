@@ -27,6 +27,7 @@ const noteAndLinkRoutes = [
     name: "noteShow",
     component: NoteShowPage,
     props: (route: RouteLocation) => ({ noteId: Number(route.params.noteId) }),
+    meta: { useControlCenter: true },
   },
 
   {
