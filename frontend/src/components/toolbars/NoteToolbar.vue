@@ -66,7 +66,6 @@
         </template>
       </PopupButton>
 
-      <NoteUndoButton @note-realm-updated="$emit('noteRealmUpdated', $event)" />
       <div class="dropdown">
         <button
           class="btn btn-light dropdown-toggle"
@@ -94,7 +93,6 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import Breadcrumb from "./Breadcrumb.vue";
-import NoteUndoButton from "./NoteUndoButton.vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import PopupButton from "../commons/Popups/PopupButton.vue";
 import SvgSearch from "../svgs/SvgSearch.vue";
@@ -127,7 +125,6 @@ export default defineComponent({
   },
   emits: ["noteDeleted", "noteRealmUpdated", "newNoteAdded"],
   components: {
-    NoteUndoButton,
     Breadcrumb,
     PopupButton,
     SvgSearch,
