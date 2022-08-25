@@ -9,7 +9,6 @@
             selectedNotePosition: notePosition,
             viewType: 'cards',
           }"
-          @note-deleted="onNoteDeleted"
           @note-realm-updated="noteRealmUpdated($event)"
         />
       </div>
@@ -49,10 +48,11 @@ export default defineComponent({
   props: {
     noteId: { type: Number, required: true },
     updatedNoteRealm: { type: Object },
+    deletedNoteId: { type: Number },
     expandChildren: { type: Boolean, required: true },
     expandInfo: { type: Boolean, default: false },
   },
-  emits: ["levelChanged", "noteDeleted", "selfEvaluated"],
+  emits: ["levelChanged", "selfEvaluated"],
   components: {
     NoteWithLinks,
     Cards,
@@ -77,7 +77,6 @@ export default defineComponent({
       } else {
         this.$router.push({ name: "notebooks" });
       }
-      this.$emit("noteDeleted");
     },
     noteRealmUpdated(updatedNoteRealm?: Generated.NoteRealm) {
       if (!updatedNoteRealm) {
@@ -103,6 +102,9 @@ export default defineComponent({
   watch: {
     updatedNoteRealm(updatedNoteRealm) {
       this.noteRealmUpdated(updatedNoteRealm);
+    },
+    deletedNoteId() {
+      this.onNoteDeleted();
     },
     noteId() {
       this.fetchData();

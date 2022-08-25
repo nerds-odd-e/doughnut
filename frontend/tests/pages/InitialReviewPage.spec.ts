@@ -54,11 +54,7 @@ describe("repeat page", () => {
     });
 
     (
-      ["levelChanged", "noteDeleted", "linkDeleted"] as (
-        | "levelChanged"
-        | "noteDeleted"
-        | "linkDeleted"
-      )[]
+      ["levelChanged", "linkDeleted"] as ("levelChanged" | "linkDeleted")[]
     ).forEach((event) => {
       it(`reloads when ${event}`, async () => {
         const wrapper = renderer.currentRoute({ name: "initial" }).mount();

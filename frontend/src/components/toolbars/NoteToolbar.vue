@@ -10,27 +10,6 @@
       >
         <SvgAddSibling />
       </NoteNewButton>
-
-      <div class="dropdown">
-        <button
-          class="btn btn-light dropdown-toggle"
-          id="dropdownMenuButton"
-          data-bs-toggle="dropdown"
-          aria-haspopup="true"
-          aria-expanded="false"
-          role="button"
-          title="more options"
-        >
-          <SvgCog />
-        </button>
-        <div class="dropdown-menu dropdown-menu-end">
-          <NoteDeleteButton
-            class="dropdown-item"
-            :note-id="selectedNoteId"
-            @note-deleted="$emit('noteDeleted', $event)"
-          />
-        </div>
-      </div>
     </div>
   </ToolbarFrame>
 </template>
@@ -42,10 +21,8 @@ import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import { ViewTypeName } from "../../models/viewTypes";
 import ToolbarFrame from "./ToolbarFrame.vue";
 import SvgAddSibling from "../svgs/SvgAddSibling.vue";
-import SvgCog from "../svgs/SvgCog.vue";
 import NoteNewButton from "./NoteNewButton.vue";
 import usePopups from "../commons/Popups/usePopup";
-import NoteDeleteButton from "./NoteDeleteButton.vue";
 
 export default defineComponent({
   setup() {
@@ -59,14 +36,12 @@ export default defineComponent({
     },
     viewType: { type: String as PropType<ViewTypeName>, required: true },
   },
-  emits: ["noteDeleted", "noteRealmUpdated"],
+  emits: ["noteRealmUpdated"],
   components: {
     Breadcrumb,
     ToolbarFrame,
-    SvgCog,
     SvgAddSibling,
     NoteNewButton,
-    NoteDeleteButton,
   },
   computed: {
     parentId() {

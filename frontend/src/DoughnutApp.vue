@@ -22,6 +22,7 @@ export default defineComponent({
       externalIdentifier: undefined as undefined | string,
       user: undefined as undefined | Generated.User,
       updatedNoteRealm: undefined as undefined | Generated.NoteRealm,
+      deletedNoteId: undefined as undefined | number,
       featureToggle: false,
       environment: "production",
     };
@@ -76,8 +77,12 @@ export default defineComponent({
             :selected-note-id="Number($route.params.noteId)"
             :view-type="viewType"
             @note-realm-updated="updatedNoteRealm = $event"
+            @note-deleted="deletedNoteId = $event"
           />
-          <router-view :updated-note-realm="updatedNoteRealm" />
+          <router-view
+            :updated-note-realm="updatedNoteRealm"
+            :deleted-note-id="deletedNoteId"
+          />
         </template>
         <router-view v-else-if="$route.meta['userProp']" :user="user" />
         <router-view v-else />

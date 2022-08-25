@@ -67,6 +67,26 @@
             </NoteDialogFrame>
           </template>
         </PopupButton>
+        <div class="dropdown">
+          <button
+            class="btn btn-light dropdown-toggle"
+            id="dropdownMenuButton"
+            data-bs-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+            role="button"
+            title="more options"
+          >
+            <SvgCog />
+          </button>
+          <div class="dropdown-menu dropdown-menu-end">
+            <NoteDeleteButton
+              class="dropdown-item"
+              :note-id="selectedNoteId"
+              @note-deleted="$emit('noteDeleted', $event)"
+            />
+          </div>
+        </div>
       </template>
 
       <NoteUndoButton @note-realm-updated="$emit('noteRealmUpdated', $event)" />
@@ -89,6 +109,8 @@ import SvgSearch from "../svgs/SvgSearch.vue";
 import LinkNoteDialog from "../links/LinkNoteDialog.vue";
 import ViewTypeButtons from "./ViewTypeButtons.vue";
 import { ViewTypeName } from "../../models/viewTypes";
+import SvgCog from "../svgs/SvgCog.vue";
+import NoteDeleteButton from "./NoteDeleteButton.vue";
 
 export default defineComponent({
   props: {
@@ -109,6 +131,8 @@ export default defineComponent({
     SvgSearch,
     LinkNoteDialog,
     ViewTypeButtons,
+    SvgCog,
+    NoteDeleteButton,
   },
 });
 </script>

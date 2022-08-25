@@ -12,7 +12,6 @@
       }"
       :key="noteId"
       @level-changed="$emit('levelChanged', $event)"
-      @note-deleted="$emit('noteDeleted', $event)"
       @self-evaluated="$emit('selfEvaluated', $event)"
     />
   </div>
@@ -41,13 +40,7 @@ export default defineComponent({
     },
     expandInfo: { type: Boolean, default: false },
   },
-  emits: [
-    "noteRealmUpdated",
-    "levelChanged",
-    "noteDeleted",
-    "linkDeleted",
-    "selfEvaluated",
-  ],
+  emits: ["noteRealmUpdated", "levelChanged", "linkDeleted", "selfEvaluated"],
   components: { LinkShow, NoteCardsView },
   computed: {
     noteId() {
