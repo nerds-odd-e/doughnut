@@ -10,7 +10,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
+import { HistoryState } from "../../store/history";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import SvgUndo from "../svgs/SvgUndo.vue";
 
@@ -24,6 +25,7 @@ export default defineComponent({
   },
   props: {
     noteId: Number,
+    historyState: { type: Object as PropType<HistoryState>, required: true },
   },
   emits: ["noteRealmUpdated"],
   computed: {
