@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import NoteFormBody from "./NoteFormBody.vue";
 
@@ -18,11 +18,12 @@ export default defineComponent({
   components: {
     NoteFormBody,
   },
-  props: { noteId: { type: Number, required: true } },
+  props: { note: { type: Object as PropType<Generated.Note>, required: true } },
   emits: ["done"],
   data() {
+    const { updatedAt, ...rest } = this.note.noteAccessories;
     return {
-      formData: null,
+      formData: rest,
     } as {
       /* eslint-disable  @typescript-eslint/no-explicit-any */
       formData: any;
@@ -30,21 +31,11 @@ export default defineComponent({
   },
 
   methods: {
-    fetchData() {
-      this.api.noteMethods.getNoteRealmWithPosition(this.noteId).then((res) => {
-        const { updatedAt, ...rest } = res.noteRealm.note.noteAccessories;
-        this.formData = rest;
-      });
-    },
-
     processForm() {
-      this.storedApi.updateNote(this.noteId, this.formData).then(() => {
+      this.storedApi.updateNote(this.note.id, this.formData).then(() => {
         this.$emit("done");
       });
     },
-  },
-  mounted() {
-    this.fetchData();
   },
 });
 </script>

@@ -26,13 +26,17 @@
           <SvgEdit />
         </template>
         <template #dialog_body="{ doneHandler }">
-          <NoteEditDialog
-            :note-id="selectedNoteId"
-            @done="
-              doneHandler($event);
-              $emit('noteRealmUpdated');
-            "
-          />
+          <NoteDialogFrame :note-id="selectedNoteId">
+            <template #default="{ note }">
+              <NoteEditDialog
+                :note="note"
+                @done="
+                  doneHandler($event);
+                  $emit('noteRealmUpdated');
+                "
+              />
+            </template>
+          </NoteDialogFrame>
         </template>
       </PopupButton>
 
@@ -41,13 +45,17 @@
           <SvgWikiData />
         </template>
         <template #dialog_body="{ doneHandler }">
-          <WikidataAssociationDialog
-            :note-id="selectedNoteId"
-            @done="
-              doneHandler($event);
-              $emit('noteRealmUpdated', $event);
-            "
-          />
+          <NoteDialogFrame :note-id="selectedNoteId">
+            <template #default="{ note }">
+              <WikidataAssociationDialog
+                :note="note"
+                @done="
+                  doneHandler($event);
+                  $emit('noteRealmUpdated', $event);
+                "
+              />
+            </template>
+          </NoteDialogFrame>
         </template>
       </PopupButton>
 
