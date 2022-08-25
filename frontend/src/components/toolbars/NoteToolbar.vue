@@ -124,6 +124,7 @@ import SvgEdit from "../svgs/SvgEdit.vue";
 import NoteEditDialog from "../notes/NoteEditDialog.vue";
 import usePopups from "../commons/Popups/usePopup";
 import NoteDeleteButton from "./NoteDeleteButton.vue";
+import NoteDialogFrame from "../notes/NoteDialogFrame.vue";
 
 export default defineComponent({
   setup() {
@@ -155,6 +156,7 @@ export default defineComponent({
     SvgEdit,
     NoteEditDialog,
     NoteDeleteButton,
+    NoteDialogFrame,
   },
   computed: {
     parentId() {
