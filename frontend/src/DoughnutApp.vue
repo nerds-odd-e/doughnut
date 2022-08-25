@@ -22,7 +22,6 @@ export default defineComponent({
       externalIdentifier: undefined as undefined | string,
       user: undefined as undefined | Generated.User,
       updatedNoteRealm: undefined as undefined | Generated.NoteRealm,
-      deletedNoteId: undefined as undefined | number,
       featureToggle: false,
       environment: "production",
     };
@@ -52,6 +51,19 @@ export default defineComponent({
     },
   },
 
+  methods: {
+    onNoteDeleted(parentId: Doughnut.ID) {
+      if (parentId) {
+        this.$router.push({
+          name: "noteShow",
+          params: { noteId: parentId },
+        });
+      } else {
+        this.$router.push({ name: "notebooks" });
+      }
+    },
+  },
+
   async mounted() {
     this.environment = this.api.testability.getEnvironment();
     this.featureToggle = await this.api.testability.getFeatureToggle();
@@ -71,22 +83,20 @@ export default defineComponent({
     <Popups />
     <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
     <template v-else>
-      <div v-if="!loading" class="content">
+      <template v-if="!loading">
         <template v-if="$route.meta['useControlCenter']">
           <NoteControlCenter
+            class="header"
             :selected-note-id="Number($route.params.noteId)"
             :view-type="viewType"
             @note-realm-updated="updatedNoteRealm = $event"
-            @note-deleted="deletedNoteId = $event"
+            @note-deleted="onNoteDeleted($event)"
           />
-          <router-view
-            :updated-note-realm="updatedNoteRealm"
-            :deleted-note-id="deletedNoteId"
-          />
+          <router-view :updated-note-realm="updatedNoteRealm" />
         </template>
         <router-view v-else-if="$route.meta['userProp']" :user="user" />
         <router-view v-else />
-      </div>
+      </template>
       <ReviewDoughnut v-if="user" :user="user" @update-user="user = $event" />
       <LoginButton v-else />
       <TestMenu

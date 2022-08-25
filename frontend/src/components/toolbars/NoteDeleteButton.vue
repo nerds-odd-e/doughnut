@@ -24,8 +24,8 @@ export default defineComponent({
   methods: {
     async deleteNote() {
       if (await this.popups.confirm(`Confirm to delete this note?`)) {
-        await this.storedApi.deleteNote(this.noteId);
-        this.$emit("noteDeleted", this.noteId);
+        const parentId = await this.storedApi.deleteNote(this.noteId);
+        this.$emit("noteDeleted", parentId);
       }
     },
   },

@@ -440,7 +440,7 @@ Cypress.Commands.add("withinMindmap", () => {
   cy.pageIsNotLoading()
   cy.wrap(
     new Promise((resolve) => {
-      cy.get(`.box .content .inner-box .content`).then((mindmap) => {
+      cy.get(`.box .inner-box .content`).then((mindmap) => {
         const rect = mindmap[0].getBoundingClientRect()
         cy.get("[role='card']").then(($elms) => {
           const cards = Object.fromEntries(

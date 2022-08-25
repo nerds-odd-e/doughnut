@@ -140,7 +140,7 @@ class RestNoteController {
     currentUserFetcher.getUser().getAuthorization().assertAuthorization(note);
     modelFactoryService.toNoteModel(note).destroy(testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.entityManager.flush();
-    return note.getId();
+    return note.getParentId().orElse(null);
   }
 
   @PatchMapping(value = "/{note}/undo-delete")

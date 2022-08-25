@@ -1,5 +1,7 @@
 <template>
-  <BreadcrumbWithCircle v-bind="{ ancestors, circle, fromBazaar }" />
+  <BreadcrumbWithCircle v-bind="{ ancestors, circle, fromBazaar }">
+    <slot />
+  </BreadcrumbWithCircle>
 </template>
 
 <script lang="ts">

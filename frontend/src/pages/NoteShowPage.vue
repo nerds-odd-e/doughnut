@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <NoteCardsView
-      v-bind="{ noteId, updatedNoteRealm, deletedNoteId, expandChildren: true }"
+      v-bind="{ noteId, updatedNoteRealm, expandChildren: true }"
     />
   </div>
 </template>
@@ -14,7 +14,6 @@ export default defineComponent({
   props: {
     noteId: { type: Number, required: true },
     updatedNoteRealm: { type: Object },
-    deletedNoteId: { type: Number },
   },
   components: { NoteCardsView },
 });

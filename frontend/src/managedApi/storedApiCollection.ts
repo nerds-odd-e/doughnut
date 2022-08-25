@@ -87,7 +87,7 @@ const storedApiCollection = (
     async deleteNote(noteId: Doughnut.ID) {
       const res = await managedApi.restPost(`notes/${noteId}/delete`, {});
       piniaStore.deleteNote(noteId);
-      return res;
+      return res as number | undefined;
     },
 
     async getCircle(circleId: Doughnut.ID) {
