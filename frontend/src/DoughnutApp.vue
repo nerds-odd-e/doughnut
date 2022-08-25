@@ -20,7 +20,7 @@ export default defineComponent({
     return {
       externalIdentifier: undefined as undefined | string,
       user: undefined as undefined | Generated.User,
-      updatedNoteRealm: undefined as undefined | Generated.NoteRealm,
+      showNavBar: true,
       featureToggle: false,
       environment: "production",
     };
@@ -67,11 +67,8 @@ export default defineComponent({
     <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
     <template v-else>
       <div v-if="!loading" class="content">
-        <template v-if="$route.meta['useControlCenter']">
-          <NoteControlCenter @note-realm-updated="updatedNoteRealm = $event" />
-          <router-view :updated-note-realm="updatedNoteRealm" />
-        </template>
-        <router-view v-else-if="$route.meta['userProp']" :user="user" />
+        <NoteControlCenter v-if="$route.meta['useControlCenter']" />
+        <router-view v-if="$route.meta['userProp']" :user="user" />
         <router-view v-else />
       </div>
       <ReviewDoughnut v-if="user" :user="user" @update-user="user = $event" />

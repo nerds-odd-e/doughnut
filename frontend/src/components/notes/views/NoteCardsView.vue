@@ -49,7 +49,6 @@ export default defineComponent({
   },
   props: {
     noteId: { type: Number, required: true },
-    updatedNoteRealm: { type: Object },
     expandChildren: { type: Boolean, required: true },
     expandInfo: { type: Boolean, default: false },
   },
@@ -101,9 +100,6 @@ export default defineComponent({
     },
   },
   watch: {
-    updatedNoteRealm(updatedNoteRealm) {
-      this.noteRealmUpdated(updatedNoteRealm);
-    },
     noteId() {
       this.fetchData();
     },
