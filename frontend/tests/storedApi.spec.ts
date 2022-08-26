@@ -2,13 +2,11 @@
  * @jest-environment jsdom
  */
 import fetchMock from "jest-fetch-mock";
-import store from "./fixtures/testingStore";
 import makeMe from "./fixtures/makeMe";
 import useStoredLoadingApi from "../src/managedApi/useStoredLoadingApi";
 
 beforeEach(() => {
   fetchMock.resetMocks();
-  store.$reset();
 });
 
 describe("storedApiCollection", () => {
