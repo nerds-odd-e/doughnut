@@ -22,6 +22,7 @@
     <ReviewPointAsync
       v-bind="{
         reviewPointId: quizQuestion?.quizQuestion.reviewPoint,
+        historyWriter,
       }"
     />
     <SelfEvaluateButtons
@@ -76,6 +77,7 @@ import ReviewPointAsync from "./ReviewPointAsync.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopup";
 import SelfEvaluateButtons from "./SelfEvaluateButtons.vue";
+import { HistoryWriter } from "../../store/history";
 
 export default defineComponent({
   setup() {
@@ -84,6 +86,10 @@ export default defineComponent({
   props: {
     quizQuestion: {
       type: Object as PropType<Generated.QuizQuestionViewedByUser | undefined>,
+      required: true,
+    },
+    historyWriter: {
+      type: Function as PropType<HistoryWriter>,
       required: true,
     },
   },

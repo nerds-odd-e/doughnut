@@ -47,5 +47,7 @@ function history(state: HistoryState) {
   return new History(state);
 }
 
+type HistoryWriter = (writer: (h: History) => void) => void;
+
 export default history;
-export type { HistoryState, History };
+export type { HistoryState, History, HistoryWriter };

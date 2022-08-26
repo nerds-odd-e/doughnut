@@ -10,13 +10,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import SvgUndo from "../svgs/SvgUndo.vue";
+import { HistoryWriter } from "../../store/history";
 
 export default defineComponent({
-  setup() {
-    return useStoredLoadingApi();
+  setup(props) {
+    return useStoredLoadingApi({ undoHistory: props.historyWriter });
   },
   name: "NoteUndoButton",
   components: {
@@ -24,6 +25,10 @@ export default defineComponent({
   },
   props: {
     noteId: Number,
+    historyWriter: {
+      type: Function as PropType<HistoryWriter>,
+      required: true,
+    },
   },
   emits: ["noteRealmUpdated"],
   computed: {

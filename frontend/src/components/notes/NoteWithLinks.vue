@@ -9,7 +9,7 @@
       @note-realm-updated="$emit('noteRealmUpdated', $event)"
     >
       <NoteContent
-        v-bind="{ note }"
+        v-bind="{ note, historyWriter }"
         @note-realm-updated="$emit('noteRealmUpdated', $event)"
       />
     </NoteFrameOfLinks>
@@ -24,12 +24,17 @@ import { defineComponent, PropType } from "vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteShell from "./NoteShell.vue";
 import NoteContent from "./NoteContent.vue";
+import { HistoryWriter } from "../../store/history";
 
 export default defineComponent({
   props: {
     note: { type: Object as PropType<Generated.Note>, required: true },
     links: {
       type: Object as PropType<Generated.LinksOfANote>,
+    },
+    historyWriter: {
+      type: Function as PropType<HistoryWriter>,
+      required: true,
     },
   },
   emits: ["noteRealmUpdated"],

@@ -89,7 +89,10 @@
         </div>
       </template>
 
-      <NoteUndoButton @note-realm-updated="$emit('noteRealmUpdated', $event)" />
+      <NoteUndoButton
+        v-bind="{ historyWriter }"
+        @note-realm-updated="$emit('noteRealmUpdated', $event)"
+      />
     </div>
   </ToolbarFrame>
 </template>
@@ -111,11 +114,16 @@ import ViewTypeButtons from "./ViewTypeButtons.vue";
 import { ViewTypeName } from "../../models/viewTypes";
 import SvgCog from "../svgs/SvgCog.vue";
 import NoteDeleteButton from "./NoteDeleteButton.vue";
+import { HistoryWriter } from "../../store/history";
 
 export default defineComponent({
   props: {
     selectedNoteId: Number,
     viewType: { type: String as PropType<ViewTypeName>, required: true },
+    historyWriter: {
+      type: Function as PropType<HistoryWriter>,
+      required: true,
+    },
   },
   emits: ["noteDeleted", "noteRealmUpdated"],
   components: {

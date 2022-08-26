@@ -1,12 +1,10 @@
-import { History } from "../store/history";
+import { HistoryWriter } from "../store/history";
 import useStore from "../store/createPiniaStore";
 import storedApiCollection from "./storedApiCollection";
 import useLoadingApi from "./useLoadingApi";
 
 export default function useStoredLoadingApi({
-  undoHistory = undefined as
-    | ((writer: (h: History) => void) => void)
-    | undefined,
+  undoHistory = undefined as HistoryWriter | undefined,
   initalLoading = false,
   hasFormError = false,
   skipLoading = false,

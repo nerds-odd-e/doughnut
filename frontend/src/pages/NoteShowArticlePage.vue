@@ -10,7 +10,7 @@
             <Breadcrumb v-bind="notePosition" />
           </div>
           <NoteArticleView
-            v-bind="{ noteId, noteRealms: noteRealmCache }"
+            v-bind="{ noteId, noteRealms: noteRealmCache, historyWriter }"
             @note-realm-updated="noteRealmUpdated($event)"
           />
         </div>
@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import NoteArticleView from "../components/notes/views/NoteArticleView.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
 import LoadingPage from "./commons/LoadingPage.vue";
@@ -28,6 +28,7 @@ import NoteRealmCache from "../store/NoteRealmCache";
 import ToolbarFrame from "../components/toolbars/ToolbarFrame.vue";
 import Breadcrumb from "../components/toolbars/Breadcrumb.vue";
 import ViewTypeButtons from "../components/toolbars/ViewTypeButtons.vue";
+import { HistoryWriter } from "../store/history";
 
 export default defineComponent({
   setup() {
@@ -35,6 +36,10 @@ export default defineComponent({
   },
   props: {
     noteId: { type: Number, required: true },
+    historyWriter: {
+      type: Function as PropType<HistoryWriter>,
+      required: true,
+    },
   },
   components: {
     LoadingPage,

@@ -2,7 +2,7 @@
   <LoadingPage v-bind="{ loading, contentExists: !!reviewPoint }">
     <ShowReviewPoint
       v-if="reviewPoint"
-      v-bind="{ reviewPoint }"
+      v-bind="{ reviewPoint, historyWriter }"
       :key="reviewPointId"
       @self-evaluated="onSelfEvaluted($event)"
     />
@@ -10,10 +10,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
 import ShowReviewPoint from "./ShowReviewPoint.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
+import { HistoryWriter } from "../../store/history";
 
 export default defineComponent({
   setup() {
@@ -21,6 +22,10 @@ export default defineComponent({
   },
   props: {
     reviewPointId: { type: Number, required: true },
+    historyWriter: {
+      type: Function as PropType<HistoryWriter>,
+      required: true,
+    },
   },
   components: {
     LoadingPage,

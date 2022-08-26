@@ -1,9 +1,9 @@
 import ManagedApi from "./ManagedApi";
 import createPiniaStore from "../store/createPiniaStore";
-import { History } from "../store/history";
+import { History, HistoryWriter } from "../store/history";
 
 const storedApiCollection = (
-  undoHistory: ((writer: (h: History) => void) => void) | undefined,
+  undoHistory: HistoryWriter | undefined,
   managedApi: ManagedApi,
   piniaStore: ReturnType<typeof createPiniaStore>
 ) => {
@@ -75,7 +75,9 @@ const storedApiCollection = (
       oldContent: Generated.TextContent
     ) {
       piniaStore.addEditingToUndoHistory(noteId, oldContent);
-      writeHistory((h) => h.addEditingToUndoHistory(noteId, oldContent));
+      writeHistory((h: History) =>
+        h.addEditingToUndoHistory(noteId, oldContent)
+      );
       return updateTextContentWithoutUndo(noteId, noteContentData);
     },
 

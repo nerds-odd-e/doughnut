@@ -24,7 +24,7 @@
     </ProgressBar>
     <InitialReview
       v-if="!minimized && reviewPoint"
-      v-bind="{ reviewPoint }"
+      v-bind="{ reviewPoint, historyWriter }"
       @initial-review-done="initialReviewDone"
       @reload-needed="onReloadNeeded"
       :key="reviewPoint.thing.id"
@@ -33,20 +33,27 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import ProgressBar from "../components/commons/ProgressBar.vue";
 import SvgResume from "../components/svgs/SvgResume.vue";
 import ReviewPointAbbr from "../components/review/ReviewPointAbbr.vue";
 import InitialReview from "../components/review/InitialReview.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
+import { HistoryWriter } from "../store/history";
 
 export default defineComponent({
   name: "InitialReviewPage",
   setup() {
     return { ...useLoadingApi() };
   },
-  props: { minimized: Boolean },
+  props: {
+    minimized: Boolean,
+    historyWriter: {
+      type: Function as PropType<HistoryWriter>,
+      required: true,
+    },
+  },
   components: {
     ContainerPage,
     InitialReview,

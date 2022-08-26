@@ -14,7 +14,7 @@
       </div>
 
       <NoteWithLinks
-        v-bind="{ note: noteRealm.note, links: noteRealm.links }"
+        v-bind="{ note: noteRealm.note, links: noteRealm.links, historyWriter }"
         @note-realm-updated="noteRealmUpdated($event)"
       >
         <template #footer>
@@ -40,6 +40,7 @@ import NoteWithLinks from "../NoteWithLinks.vue";
 import Cards from "../Cards.vue";
 import useLoadingApi from "../../../managedApi/useLoadingApi";
 import NoteInfoButton from "../NoteInfoButton.vue";
+import { HistoryWriter } from "../../../store/history";
 
 export default defineComponent({
   setup() {
@@ -51,6 +52,10 @@ export default defineComponent({
     updatedAt: { type: Date },
     expandChildren: { type: Boolean, required: true },
     expandInfo: { type: Boolean, default: false },
+    historyWriter: {
+      type: Function as PropType<HistoryWriter>,
+      required: true,
+    },
   },
   emits: ["levelChanged", "selfEvaluated"],
   components: {

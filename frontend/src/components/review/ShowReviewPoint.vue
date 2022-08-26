@@ -9,6 +9,7 @@
         noteId,
         expandChildren: false,
         expandInfo,
+        historyWriter,
       }"
       :key="noteId"
       @level-changed="$emit('levelChanged', $event)"
@@ -31,6 +32,7 @@
 import { defineComponent, PropType } from "vue";
 import LinkShow from "../links/LinkShow.vue";
 import NoteCardsView from "../notes/views/NoteCardsView.vue";
+import { HistoryWriter } from "../../store/history";
 
 export default defineComponent({
   props: {
@@ -39,6 +41,10 @@ export default defineComponent({
       required: true,
     },
     expandInfo: { type: Boolean, default: false },
+    historyWriter: {
+      type: Function as PropType<HistoryWriter>,
+      required: true,
+    },
   },
   emits: ["noteRealmUpdated", "levelChanged", "linkDeleted", "selfEvaluated"],
   components: { LinkShow, NoteCardsView },

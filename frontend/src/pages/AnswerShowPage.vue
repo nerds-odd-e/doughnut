@@ -12,10 +12,10 @@
       />
       <QuizQuestion
         v-if="showQuiz === 'quiz'"
-        :quiz-question="answerResult?.quizQuestion"
+        v-bind="{ quizQuestion: answerResult?.quizQuestion, historyWriter }"
       />
       <div v-else-if="reviewPoint">
-        <ShowReviewPoint v-bind="{ reviewPoint }" />
+        <ShowReviewPoint v-bind="{ reviewPoint, historyWriter }" />
         <NoteInfoReviewPoint
           v-bind="{ reviewPoint }"
           @self-evaluated="onSelfEvaluated($event)"
@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import NoteInfoReviewPoint from "@/components/notes/NoteInfoReviewPoint.vue";
 import LoadingPage from "./commons/LoadingPage.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
@@ -34,12 +34,19 @@ import AnswerResult from "../components/review/AnswerResult.vue";
 import QuizQuestion from "../components/review/QuizQuestion.vue";
 import RadioButtons from "../components/form/RadioButtons.vue";
 import ShowReviewPoint from "../components/review/ShowReviewPoint.vue";
+import { HistoryWriter } from "../store/history";
 
 export default defineComponent({
   setup() {
     return useLoadingApi({ initalLoading: true });
   },
-  props: { answerId: { type: Number, required: true } },
+  props: {
+    answerId: { type: Number, required: true },
+    historyWriter: {
+      type: Function as PropType<HistoryWriter>,
+      required: true,
+    },
+  },
   components: {
     LoadingPage,
     AnswerResult,

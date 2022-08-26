@@ -8,7 +8,7 @@
     @click="$emit('highlight', note.id)"
   >
     <NoteContent
-      v-bind="{ note, size }"
+      v-bind="{ note, size, historyWriter }"
       :title-as-link="true"
       @note-realm-updated="$emit('noteRealmUpdated', $event)"
     />
@@ -26,6 +26,7 @@ export default {
     mindmapSector: MindmapSector,
     mindmap: Object,
     highlightNoteId: Number,
+    historyWriter: Function,
   },
   emits: ["highlight", "noteRealmUpdated"],
   components: {

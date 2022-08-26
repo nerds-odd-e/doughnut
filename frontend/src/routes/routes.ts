@@ -20,7 +20,12 @@ const NestedInitialReviewPage = NestedPage(InitialReviewPage, "initial");
 const NestedRepeatPage = NestedPage(RepeatPage, "repeat");
 
 const noteAndLinkRoutes = [
-  { path: "notebooks", name: "notebooks", component: NotebooksPage },
+  {
+    path: "notebooks",
+    name: "notebooks",
+    component: NotebooksPage,
+    meta: { useControlCenter: true },
+  },
 
   {
     path: `notes/:noteId`,

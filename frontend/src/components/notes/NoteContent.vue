@@ -70,15 +70,23 @@ import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
 import EditableText from "../form/EditableText.vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import NoteWikidataAssociation from "./NoteWikidataAssociation.vue";
+import { HistoryWriter } from "../../store/history";
 
 export default defineComponent({
-  setup() {
-    return useStoredLoadingApi({ hasFormError: true });
+  setup(props) {
+    return useStoredLoadingApi({
+      undoHistory: props.historyWriter,
+      hasFormError: true,
+    });
   },
   props: {
     note: { type: Object as PropType<Generated.Note>, required: true },
     size: { type: String, default: "large" },
     titleAsLink: Boolean,
+    historyWriter: {
+      type: Function as PropType<HistoryWriter>,
+      required: true,
+    },
   },
   emits: ["noteRealmUpdated"],
   components: {

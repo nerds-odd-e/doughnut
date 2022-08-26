@@ -9,6 +9,7 @@ import ReviewDoughnut from "./components/review/ReviewDoughnut.vue";
 import LoginButton from "./components/toolbars/LoginButton.vue";
 import NoteControlCenter from "./components/toolbars/NoteControlCenter.vue";
 import { sanitizeViewTypeName } from "./models/viewTypes";
+import history, { HistoryState, History } from "./store/history";
 
 export default defineComponent({
   setup() {
@@ -25,6 +26,7 @@ export default defineComponent({
       updatedAt: undefined as undefined | Date,
       featureToggle: false,
       environment: "production",
+      historyState: { noteUndoHistories: [] } as HistoryState,
     };
   },
 
@@ -53,6 +55,9 @@ export default defineComponent({
   },
 
   methods: {
+    historyWriter(writer: (h: History) => void) {
+      writer(history(this.historyState));
+    },
     onNoteDeleted(parentId: Doughnut.ID) {
       if (parentId) {
         this.$router.push({
@@ -93,13 +98,14 @@ export default defineComponent({
           <NoteControlCenter
             class="header"
             :selected-note-id="Number($route.params.noteId)"
-            :view-type="viewType"
+            v-bind="{ viewType, historyWriter }"
             @note-realm-updated="onUpdateNoteRealm($event)"
             @note-deleted="onNoteDeleted($event)"
           />
           <router-view
             :updated-note-realm="updatedNoteRealm"
             :updated-at="updatedAt"
+            :history-writer="historyWriter"
           />
         </template>
         <router-view v-else-if="$route.meta['userProp']" :user="user" />
