@@ -5,7 +5,7 @@ import { screen } from "@testing-library/vue";
 import NoteControlCenter from "@/components/toolbars/NoteControlCenter.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
-import history, { HistoryState } from "../../src/store/history";
+import createHistory, { HistoryState } from "../../src/store/history";
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
@@ -17,7 +17,7 @@ describe("Note Control Center", () => {
   };
 
   beforeEach(() => {
-    histories = history();
+    histories = createHistory();
   });
 
   it("fetch API to be called ONCE", async () => {

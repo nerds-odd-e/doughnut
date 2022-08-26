@@ -9,7 +9,7 @@ import ReviewDoughnut from "./components/review/ReviewDoughnut.vue";
 import LoginButton from "./components/toolbars/LoginButton.vue";
 import NoteControlCenter from "./components/toolbars/NoteControlCenter.vue";
 import { sanitizeViewTypeName } from "./models/viewTypes";
-import history, { HistoryState } from "./store/history";
+import createHistory, { HistoryState } from "./store/history";
 
 export default defineComponent({
   setup() {
@@ -26,7 +26,7 @@ export default defineComponent({
       updatedAt: undefined as undefined | Date,
       featureToggle: false,
       environment: "production",
-      histories: history(),
+      histories: createHistory(),
     };
   },
 

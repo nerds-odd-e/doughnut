@@ -50,11 +50,11 @@ class History implements HistoryState {
   }
 }
 
-function history(): HistoryState {
+function createHistory(): HistoryState {
   return new History();
 }
 
 type HistoryWriter = (writer: (h: HistoryState) => void) => void;
 
-export default history;
+export default createHistory;
 export type { HistoryState, HistoryWriter };
