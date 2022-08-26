@@ -52,11 +52,14 @@ export default defineComponent({
     viewType() {
       return sanitizeViewTypeName(this.$route.meta.viewType as string);
     },
+    histories() {
+      return history(this.historyState);
+    },
   },
 
   methods: {
     historyWriter(writer: (h: History) => void) {
-      writer(history(this.historyState));
+      writer(this.histories);
     },
     onNoteDeleted(parentId: Doughnut.ID) {
       if (parentId) {
@@ -98,7 +101,7 @@ export default defineComponent({
           <NoteControlCenter
             class="header"
             :selected-note-id="Number($route.params.noteId)"
-            v-bind="{ viewType, historyWriter }"
+            v-bind="{ viewType, historyWriter, histories }"
             @note-realm-updated="onUpdateNoteRealm($event)"
             @note-deleted="onNoteDeleted($event)"
           />

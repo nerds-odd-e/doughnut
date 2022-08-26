@@ -13,7 +13,7 @@
 import { defineComponent, PropType } from "vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import SvgUndo from "../svgs/SvgUndo.vue";
-import { HistoryWriter } from "../../store/history";
+import { History, HistoryWriter } from "../../store/history";
 
 export default defineComponent({
   setup(props) {
@@ -25,6 +25,10 @@ export default defineComponent({
   },
   props: {
     noteId: Number,
+    histories: {
+      type: Object as PropType<History>,
+      required: true,
+    },
     historyWriter: {
       type: Function as PropType<HistoryWriter>,
       required: true,
@@ -33,7 +37,7 @@ export default defineComponent({
   emits: ["noteRealmUpdated"],
   computed: {
     history() {
-      return this.piniaStore.peekUndo();
+      return this.histories.peekUndo();
     },
     undoTitle() {
       if (this.history) {

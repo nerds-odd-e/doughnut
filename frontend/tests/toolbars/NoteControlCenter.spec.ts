@@ -10,26 +10,32 @@ import history, { History } from "../../src/store/history";
 helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("Note Control Center", () => {
-  let testHistory: History;
+  let histories: History;
 
   const historyWriter = (writer: (h: History) => void) => {
-    writer(testHistory);
+    writer(histories);
   };
 
   beforeEach(() => {
-    testHistory = history({ noteUndoHistories: [] });
+    histories = history({ noteUndoHistories: [] });
   });
 
   it("fetch API to be called ONCE", async () => {
-    helper.component(NoteControlCenter).withProps({ historyWriter }).render();
+    helper
+      .component(NoteControlCenter)
+      .withProps({ histories, historyWriter })
+      .render();
 
     expect(await screen.findByTitle("undo")).toBeDisabled();
   });
 
-  xit("show undo when there is something to undo", async () => {
+  it("show undo when there is something to undo", async () => {
     const notebook = makeMe.aNotebook.please();
-    testHistory.deleteNote(notebook.headNote.id);
-    helper.component(NoteControlCenter).withProps({ historyWriter }).render();
+    histories.deleteNote(notebook.headNote.id);
+    helper
+      .component(NoteControlCenter)
+      .withProps({ histories, historyWriter })
+      .render();
 
     expect(await screen.findByTitle("undo delete note")).not.toBeDisabled();
   });
