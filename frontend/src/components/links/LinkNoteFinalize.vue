@@ -4,7 +4,7 @@
       field="linkType"
       scope-name="link"
       v-model="formData.linkType"
-      :errors="formErrors.linkType"
+      :errors="linkFormErrors.linkType"
       :inverse-icon="true"
     />
     <div>
@@ -13,7 +13,7 @@
     <CheckInput
       scope-name="link"
       v-model="formData.moveUnder"
-      :errors="formErrors.moveUnder"
+      :errors="linkFormErrors.moveUnder"
       field="alsoMoveToUnderTargetNote"
     />
 
@@ -21,7 +21,7 @@
       v-if="!!formData.moveUnder"
       scope-name="link"
       v-model="formData.asFirstChild"
-      :errors="formErrors.asFirstChild"
+      :errors="linkFormErrors.asFirstChild"
       :options="[
         { value: true, label: 'as its first child' },
         { value: false, label: 'as its last child' },
@@ -73,7 +73,7 @@ export default defineComponent({
         linkType: "no link",
         moveUnder: false,
       } as Generated.LinkCreation,
-      formErrors: {
+      linkFormErrors: {
         asFirstChild: undefined as string | undefined,
         linkType: undefined as string | undefined,
         moveUnder: undefined as string | undefined,
@@ -95,7 +95,7 @@ export default defineComponent({
         .createLink(this.note.id, this.targetNote.id, this.formData)
         .then((r) => this.$emit("success", r))
         .catch((res) => {
-          this.formErrors = res;
+          this.linkFormErrors = res;
         });
     },
   },

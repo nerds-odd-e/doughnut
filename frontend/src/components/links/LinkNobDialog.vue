@@ -13,7 +13,7 @@
     field="linkType"
     scope-name="link"
     v-model="formData.linkType"
-    :errors="formErrors.linkType"
+    :errors="linkFormErrors.linkType"
     :inverse-icon="true"
   />
   <div v-if="!inverseIcon">
@@ -66,7 +66,7 @@ export default defineComponent({
       formData: {
         linkType: this.link.linkType,
       } as Generated.LinkCreation,
-      formErrors: { linkType: undefined as string | undefined },
+      linkFormErrors: { linkType: undefined as string | undefined },
     };
   },
 
@@ -78,7 +78,7 @@ export default defineComponent({
           this.$emit("done");
         })
         .catch((error) => {
-          this.formErrors = error;
+          this.linkFormErrors = error;
         });
     },
 

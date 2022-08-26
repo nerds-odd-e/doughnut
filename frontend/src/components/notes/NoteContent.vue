@@ -113,8 +113,7 @@ export default defineComponent({
         )
         .then((res) => {
           this.$emit("noteRealmUpdated", res);
-        })
-        .catch((res) => (this.formErrors = res));
+        });
     },
   },
 });
