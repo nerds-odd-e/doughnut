@@ -1,6 +1,13 @@
+import { HistoryState } from "../store/history";
 import useStore from "../store/createPiniaStore";
 import storedApiCollection from "./storedApiCollection";
 import useLoadingApi from "./useLoadingApi";
+
+class GlobalStorage {
+  static storageWrapper = {
+    historyState: { noteUndoHistories: [] } as HistoryState,
+  };
+}
 
 export default function useStoredLoadingApi({
   initalLoading = false,
@@ -13,6 +20,9 @@ export default function useStoredLoadingApi({
     piniaStore,
     get storedApi(): ReturnType<typeof storedApiCollection> {
       return storedApiCollection(this.managedApi, piniaStore);
+    },
+    get globalHistory(): HistoryState {
+      return GlobalStorage.storageWrapper.historyState;
     },
   };
 }
