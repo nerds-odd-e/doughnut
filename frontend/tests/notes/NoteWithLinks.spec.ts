@@ -73,7 +73,6 @@ describe("undo editing", () => {
       writer(histories);
     };
 
-    helper.store.$reset();
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please();
     helper.apiMock.expectingPatch(`/api/text_content/${noteRealm.id}`);
 
