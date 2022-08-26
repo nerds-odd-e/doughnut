@@ -52,7 +52,6 @@ export default defineComponent({
     return {
       ...useStoredLoadingApi({
         historyWriter: props.historyWriter,
-        hasFormError: true,
       }),
       ...usePopups(),
     };
