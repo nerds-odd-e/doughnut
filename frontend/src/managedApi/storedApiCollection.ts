@@ -1,12 +1,20 @@
 import ManagedApi from "./ManagedApi";
 import createPiniaStore from "../store/createPiniaStore";
-import history, { HistoryState } from "../store/history";
+import { History } from "../store/history";
 
 const storedApiCollection = (
+  undoHistory: ((writer: (h: History) => void) => void) | undefined,
   managedApi: ManagedApi,
-  piniaStore: ReturnType<typeof createPiniaStore>,
-  historyState: HistoryState
+  piniaStore: ReturnType<typeof createPiniaStore>
 ) => {
+  function writeHistory(w: (h: History) => void) {
+    if (undoHistory) {
+      undoHistory((h) => {
+        w(h);
+      });
+    }
+  }
+
   async function updateTextContentWithoutUndo(
     noteId: Doughnut.ID,
     noteContentData: Generated.TextContent
@@ -67,15 +75,18 @@ const storedApiCollection = (
       oldContent: Generated.TextContent
     ) {
       piniaStore.addEditingToUndoHistory(noteId, oldContent);
-      history(historyState).addEditingToUndoHistory(noteId, oldContent);
+      writeHistory((h) => h.addEditingToUndoHistory(noteId, oldContent));
       return updateTextContentWithoutUndo(noteId, noteContentData);
     },
 
     async undo() {
-      const undone = history(historyState).peekUndo();
-      if (!undone) throw new Error("undo history is empty");
-      piniaStore.popUndoHistory();
-      history(historyState).popUndoHistory();
+      let undone;
+      writeHistory((h) => {
+        undone = h.peekUndo();
+        if (!undone) throw new Error("undo history is empty");
+        piniaStore.popUndoHistory();
+        h.popUndoHistory();
+      });
       if (undone.type === "editing" && undone.textContent) {
         return updateTextContentWithoutUndo(undone.noteId, undone.textContent);
       }
@@ -91,7 +102,7 @@ const storedApiCollection = (
         {}
       )) as number[];
       piniaStore.deleteNote(noteId);
-      history(historyState).deleteNote(noteId);
+      writeHistory((h) => h.deleteNote(noteId));
       if (res.length > 0) {
         return res[0];
       }
