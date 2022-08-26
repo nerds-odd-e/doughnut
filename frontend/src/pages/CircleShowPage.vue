@@ -47,11 +47,11 @@ import NotebookCardsWithButtons from "../components/notebook/NotebookCardsWithBu
 import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
 import NotebookButtons from "../components/notebook/NotebookButtons.vue";
 import BazaarNotebookButtons from "../components/bazaar/BazaarNotebookButtons.vue";
-import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
+import useLoadingApi from "../managedApi/useLoadingApi";
 
 export default defineComponent({
   setup() {
-    return useStoredLoadingApi({ initalLoading: true, hasFormError: true });
+    return useLoadingApi({ initalLoading: true, hasFormError: true });
   },
   components: {
     SvgMissingAvatar,
@@ -76,7 +76,7 @@ export default defineComponent({
       this.timer = setTimeout(() => {
         this.fetchData();
       }, 5000);
-      this.storedApi
+      this.api.circleMethods
         .getCircle(this.circleId)
         .then((res) => (this.circle = res));
     },

@@ -106,6 +106,11 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
   },
   circleMethods: {
+    async getCircle(circleId: Doughnut.ID) {
+      return (await managedApi.restGet(
+        `circles/${circleId}`
+      )) as Generated.CircleForUserView;
+    },
     createCircle(data: Generated.Circle) {
       return managedApi.restPostMultiplePartForm("circles", data);
     },

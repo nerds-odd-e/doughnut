@@ -8,7 +8,7 @@
 import CircleJoinForm from "../components/circles/CircleJoinForm.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import loginOrRegisterAndHaltThisThread from "../managedApi/window/loginOrRegisterAndHaltThisThread";
-import useLoadingApi from "../managedApi/useStoredLoadingApi";
+import useLoadingApi from "../managedApi/useLoadingApi";
 
 export default {
   setup() {

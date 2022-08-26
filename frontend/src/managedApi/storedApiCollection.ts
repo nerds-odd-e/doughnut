@@ -97,12 +97,6 @@ const storedApiCollection = (
       }
       return undefined;
     },
-
-    async getCircle(circleId: Doughnut.ID) {
-      return (await managedApi.restGet(
-        `circles/${circleId}`
-      )) as Generated.CircleForUserView;
-    },
   };
 };
 

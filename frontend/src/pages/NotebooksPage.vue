@@ -22,7 +22,7 @@ import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
 import NotebooksToolbar from "../components/toolbars/NotebooksToolbar.vue";
 import NotebookSubscriptionCards from "../components/subscriptions/NotebookSubscriptionCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
-import useLoadingApi from "../managedApi/useStoredLoadingApi";
+import useLoadingApi from "../managedApi/useLoadingApi";
 
 export default defineComponent({
   setup() {

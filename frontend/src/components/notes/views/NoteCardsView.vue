@@ -38,12 +38,12 @@ import LoadingPage from "@/pages/commons/LoadingPage.vue";
 import NoteToolbar from "@/components/toolbars/NoteToolbar.vue";
 import NoteWithLinks from "../NoteWithLinks.vue";
 import Cards from "../Cards.vue";
-import useStoredLoadingApi from "../../../managedApi/useStoredLoadingApi";
+import useLoadingApi from "../../../managedApi/useLoadingApi";
 import NoteInfoButton from "../NoteInfoButton.vue";
 
 export default defineComponent({
   setup() {
-    return useStoredLoadingApi();
+    return useLoadingApi();
   },
   props: {
     noteId: { type: Number, required: true },

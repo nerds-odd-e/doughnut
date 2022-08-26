@@ -14,16 +14,11 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import Breadcrumb from "./Breadcrumb.vue";
-import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import { ViewTypeName } from "../../models/viewTypes";
 import SvgAddSibling from "../svgs/SvgAddSibling.vue";
 import NoteNewButton from "./NoteNewButton.vue";
-import usePopups from "../commons/Popups/usePopup";
 
 export default defineComponent({
-  setup() {
-    return { ...useStoredLoadingApi(), ...usePopups() };
-  },
   props: {
     selectedNoteId: { type: Number, required: true },
     selectedNotePosition: {

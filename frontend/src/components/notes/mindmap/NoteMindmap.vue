@@ -51,16 +51,12 @@ import NoteCard from "./NoteCard.vue";
 import NoteParentChildConnection from "./NoteParentChildConnection.vue";
 import MindmapSvgDefs from "./MindmapSvgDefs.vue";
 import NoteLinks from "./NoteLinks.vue";
-import useStoredLoadingApi from "../../../managedApi/useStoredLoadingApi";
 import MindmapSector from "../../../models/MindmapSector";
 import Mindmap from "../../../models/Mindmap";
 import MindmapOffset from "../../../models/MindmapOffset";
 import { NoteRealmsReader } from "../../../store/NoteRealmCache";
 
 export default defineComponent({
-  setup() {
-    return useStoredLoadingApi();
-  },
   name: "NoteMindmap",
   props: {
     highlightNoteId: Number,

@@ -3,7 +3,7 @@ import { defineComponent } from "vue";
 import Popups from "./components/commons/Popups/Popups.vue";
 import TestMenu from "./components/commons/TestMenu.vue";
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
-import useStoredLoadingApi from "./managedApi/useStoredLoadingApi";
+import useLoadingApi from "./managedApi/useLoadingApi";
 import usePopups from "./components/commons/Popups/usePopup";
 import ReviewDoughnut from "./components/review/ReviewDoughnut.vue";
 import LoginButton from "./components/toolbars/LoginButton.vue";
@@ -13,7 +13,7 @@ import { sanitizeViewTypeName } from "./models/viewTypes";
 export default defineComponent({
   setup() {
     return {
-      ...useStoredLoadingApi({ initalLoading: true, skipLoading: true }),
+      ...useLoadingApi({ initalLoading: true, skipLoading: true }),
       ...usePopups(),
     };
   },
