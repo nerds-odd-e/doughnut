@@ -1,6 +1,5 @@
 <template>
   <BreadcrumbWithCircle v-bind="{ ancestors: [] }" />
-  <NotebooksToolbar @note-realm-updated="fetchData" />
   <ContainerPage v-bind="{ loading, contentExists: true, title: 'Notebooks' }">
     <p>
       <NotebookNewButton>Add New Notebook</NotebookNewButton>
@@ -19,7 +18,6 @@ import { defineComponent } from "vue";
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue";
 import NotebookViewCards from "../components/notebook/NotebookViewCards.vue";
 import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
-import NotebooksToolbar from "../components/toolbars/NotebooksToolbar.vue";
 import NotebookSubscriptionCards from "../components/subscriptions/NotebookSubscriptionCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
@@ -32,7 +30,6 @@ export default defineComponent({
   name: "NotebooksPage",
   components: {
     ContainerPage,
-    NotebooksToolbar,
     NotebookViewCards,
     NotebookSubscriptionCards,
     NotebookNewButton,

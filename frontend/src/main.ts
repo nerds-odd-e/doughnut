@@ -1,6 +1,5 @@
 import { createApp } from "vue";
 import { createRouter, createWebHistory } from "vue-router";
-import { createPinia } from "pinia";
 
 import routes from "./routes/routes";
 import "bootstrap/scss/bootstrap.scss";
@@ -18,7 +17,6 @@ Object.assign(window, { router });
 const app = createApp(DoughnutAppVue);
 
 app.use(router);
-app.use(createPinia());
 
 app.directive("focus", {
   mounted(el) {

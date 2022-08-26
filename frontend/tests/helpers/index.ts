@@ -1,18 +1,10 @@
-import { createTestingPinia, TestingPinia } from "@pinia/testing";
 import { defineComponent } from "vue";
 import RenderingHelper from "./RenderingHelper";
 import setupApiMock from "./apiMockImpl/setupApiMock";
 import { ApiMock } from "./ApiMock";
 
 class StoredComponentTestHelper {
-  private piniaInstance?: TestingPinia;
-
   private mockedApi?: ApiMock;
-
-  private get pinia() {
-    if (!this.piniaInstance) this.piniaInstance = createTestingPinia();
-    return this.piniaInstance;
-  }
 
   get apiMock(): ApiMock {
     if (!this.mockedApi) throw new Error("please call resetWithApiMock first.");
@@ -20,7 +12,6 @@ class StoredComponentTestHelper {
   }
 
   reset() {
-    this.piniaInstance = undefined;
     this.mockedApi = undefined;
     return this;
   }
@@ -36,8 +27,9 @@ class StoredComponentTestHelper {
     return this;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   component(comp: ReturnType<typeof defineComponent>) {
-    return new RenderingHelper(comp).withGlobalPlugin(this.pinia);
+    return new RenderingHelper(comp);
   }
 }
 

@@ -1,6 +1,16 @@
 <template>
   <ToolbarFrame>
     <div class="btn-group btn-group-sm">
+      <template v-if="!selectedNoteId">
+        <PopupButton title="link note">
+          <template #button_face>
+            <SvgSearch />
+          </template>
+          <template #dialog_body="{ doneHandler }">
+            <LinkNoteDialog @done="doneHandler($event)" />
+          </template>
+        </PopupButton>
+      </template>
       <template v-if="selectedNoteId">
         <ViewTypeButtons v-bind="{ viewType, noteId: selectedNoteId }" />
         <NoteNewButton
