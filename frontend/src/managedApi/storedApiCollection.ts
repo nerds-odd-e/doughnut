@@ -1,11 +1,11 @@
 import ManagedApi from "./ManagedApi";
-import { History, HistoryWriter } from "../store/history";
+import { HistoryState, HistoryWriter } from "../store/history";
 
 const storedApiCollection = (
   undoHistory: HistoryWriter | undefined,
   managedApi: ManagedApi
 ) => {
-  function writeHistory(w: (h: History) => void) {
+  function writeHistory(w: (h: HistoryState) => void) {
     if (undoHistory) {
       undoHistory((h) => {
         w(h);
@@ -72,7 +72,7 @@ const storedApiCollection = (
       noteContentData: Generated.TextContent,
       oldContent: Generated.TextContent
     ) {
-      writeHistory((h: History) =>
+      writeHistory((h: HistoryState) =>
         h.addEditingToUndoHistory(noteId, oldContent)
       );
       return updateTextContentWithoutUndo(noteId, noteContentData);

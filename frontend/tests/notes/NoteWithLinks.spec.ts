@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import NoteWithLinks from "@/components/notes/NoteWithLinks.vue";
-import history, { History } from "../../src/store/history";
+import history, { HistoryState } from "../../src/store/history";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
@@ -68,8 +68,8 @@ describe("in place edit on title", () => {
 
 describe("undo editing", () => {
   it("should call addEditingToUndoHistory on submitChange", async () => {
-    const histories = history({ noteUndoHistories: [] });
-    const historyWriter = (writer: (h: History) => void) => {
+    const histories = history();
+    const historyWriter = (writer: (h: HistoryState) => void) => {
       writer(histories);
     };
 

@@ -13,7 +13,7 @@
 import { defineComponent, PropType } from "vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import SvgUndo from "../svgs/SvgUndo.vue";
-import { History, HistoryWriter } from "../../store/history";
+import { HistoryState, HistoryWriter } from "../../store/history";
 
 export default defineComponent({
   setup(props) {
@@ -26,7 +26,7 @@ export default defineComponent({
   props: {
     noteId: Number,
     histories: {
-      type: Object as PropType<History>,
+      type: Object as PropType<HistoryState>,
       required: true,
     },
     historyWriter: {

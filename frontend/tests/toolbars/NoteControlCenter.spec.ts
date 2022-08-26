@@ -5,19 +5,19 @@ import { screen } from "@testing-library/vue";
 import NoteControlCenter from "@/components/toolbars/NoteControlCenter.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
-import history, { History } from "../../src/store/history";
+import history, { HistoryState } from "../../src/store/history";
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("Note Control Center", () => {
-  let histories: History;
+  let histories: HistoryState;
 
-  const historyWriter = (writer: (h: History) => void) => {
+  const historyWriter = (writer: (h: HistoryState) => void) => {
     writer(histories);
   };
 
   beforeEach(() => {
-    histories = history({ noteUndoHistories: [] });
+    histories = history();
   });
 
   it("fetch API to be called ONCE", async () => {

@@ -124,7 +124,7 @@ import ViewTypeButtons from "./ViewTypeButtons.vue";
 import { ViewTypeName } from "../../models/viewTypes";
 import SvgCog from "../svgs/SvgCog.vue";
 import NoteDeleteButton from "./NoteDeleteButton.vue";
-import { HistoryWriter, History } from "../../store/history";
+import { HistoryState, HistoryWriter } from "../../store/history";
 import PopupButton from "../commons/Popups/PopupButton.vue";
 
 export default defineComponent({
@@ -132,7 +132,7 @@ export default defineComponent({
     selectedNoteId: Number,
     viewType: { type: String as PropType<ViewTypeName> },
     histories: {
-      type: Object as PropType<History>,
+      type: Object as PropType<HistoryState>,
       required: true,
     },
     historyWriter: {

@@ -6,13 +6,20 @@ interface HistoryRecord {
 
 interface HistoryState {
   noteUndoHistories: HistoryRecord[];
+  peekUndo(): null | HistoryRecord;
+  popUndoHistory(): void;
+  addEditingToUndoHistory(
+    noteId: Doughnut.ID,
+    textContent: Generated.TextContent
+  ): void;
+  deleteNote(noteId: Doughnut.ID): void;
 }
 
 class History implements HistoryState {
   noteUndoHistories: HistoryRecord[];
 
-  constructor(state: HistoryState) {
-    this.noteUndoHistories = state.noteUndoHistories;
+  constructor() {
+    this.noteUndoHistories = [];
   }
 
   peekUndo() {
@@ -43,11 +50,11 @@ class History implements HistoryState {
   }
 }
 
-function history(state: HistoryState) {
-  return new History(state);
+function history(): HistoryState {
+  return new History();
 }
 
-type HistoryWriter = (writer: (h: History) => void) => void;
+type HistoryWriter = (writer: (h: HistoryState) => void) => void;
 
 export default history;
-export type { HistoryState, History, HistoryWriter };
+export type { HistoryState, HistoryWriter };

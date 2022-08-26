@@ -9,7 +9,7 @@ import ReviewDoughnut from "./components/review/ReviewDoughnut.vue";
 import LoginButton from "./components/toolbars/LoginButton.vue";
 import NoteControlCenter from "./components/toolbars/NoteControlCenter.vue";
 import { sanitizeViewTypeName } from "./models/viewTypes";
-import history, { HistoryState, History } from "./store/history";
+import history, { HistoryState } from "./store/history";
 
 export default defineComponent({
   setup() {
@@ -26,7 +26,7 @@ export default defineComponent({
       updatedAt: undefined as undefined | Date,
       featureToggle: false,
       environment: "production",
-      historyState: { noteUndoHistories: [] } as HistoryState,
+      histories: history(),
     };
   },
 
@@ -52,13 +52,10 @@ export default defineComponent({
     viewType() {
       return sanitizeViewTypeName(this.$route.meta.viewType as string);
     },
-    histories() {
-      return history(this.historyState);
-    },
   },
 
   methods: {
-    historyWriter(writer: (h: History) => void) {
+    historyWriter(writer: (h: HistoryState) => void) {
       writer(this.histories);
     },
     onNoteDeleted(parentId: Doughnut.ID) {
