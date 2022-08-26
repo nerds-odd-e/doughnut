@@ -22,6 +22,7 @@ export default defineComponent({
       externalIdentifier: undefined as undefined | string,
       user: undefined as undefined | Generated.User,
       updatedNoteRealm: undefined as undefined | Generated.NoteRealm,
+      updatedAt: undefined as undefined | Date,
       featureToggle: false,
       environment: "production",
     };
@@ -62,6 +63,10 @@ export default defineComponent({
         this.$router.push({ name: "notebooks" });
       }
     },
+    onUpdateNoteRealm(updatedNoteRealm: Generated.NoteRealm) {
+      this.updatedNoteRealm = updatedNoteRealm;
+      this.updatedAt = new Date();
+    },
   },
 
   async mounted() {
@@ -89,10 +94,13 @@ export default defineComponent({
             class="header"
             :selected-note-id="Number($route.params.noteId)"
             :view-type="viewType"
-            @note-realm-updated="updatedNoteRealm = $event"
+            @note-realm-updated="onUpdateNoteRealm($event)"
             @note-deleted="onNoteDeleted($event)"
           />
-          <router-view :updated-note-realm="updatedNoteRealm" />
+          <router-view
+            :updated-note-realm="updatedNoteRealm"
+            :updated-at="updatedAt"
+          />
         </template>
         <router-view v-else-if="$route.meta['userProp']" :user="user" />
         <router-view v-else />

@@ -33,7 +33,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import LoadingPage from "@/pages/commons/LoadingPage.vue";
 import NoteToolbar from "@/components/toolbars/NoteToolbar.vue";
 import NoteWithLinks from "../NoteWithLinks.vue";
@@ -47,7 +47,8 @@ export default defineComponent({
   },
   props: {
     noteId: { type: Number, required: true },
-    updatedNoteRealm: { type: Object },
+    updatedNoteRealm: { type: Object as PropType<Generated.NoteRealm> },
+    updatedAt: { type: Date },
     expandChildren: { type: Boolean, required: true },
     expandInfo: { type: Boolean, default: false },
   },
@@ -89,8 +90,8 @@ export default defineComponent({
     },
   },
   watch: {
-    updatedNoteRealm(updatedNoteRealm) {
-      this.noteRealmUpdated(updatedNoteRealm);
+    updatedAt() {
+      this.noteRealmUpdated(this.updatedNoteRealm);
     },
     noteId() {
       this.fetchData();
