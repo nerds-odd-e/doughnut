@@ -23,7 +23,6 @@ export default defineComponent({
       user: undefined as undefined | Generated.User,
       updatedNoteRealm: undefined as undefined | Generated.NoteRealm,
       updatedAt: undefined as undefined | Date,
-      historyState: this.globalHistory,
       featureToggle: false,
       environment: "production",
     };

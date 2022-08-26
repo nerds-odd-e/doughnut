@@ -4,8 +4,6 @@ import createPiniaStore from "../../src/store/createPiniaStore";
 import RenderingHelper from "./RenderingHelper";
 import setupApiMock from "./apiMockImpl/setupApiMock";
 import { ApiMock } from "./ApiMock";
-import { HistoryState } from "../../src/store/history";
-import useStoredLoadingApi from "../../src/managedApi/useStoredLoadingApi";
 
 type PiniaStore = ReturnType<typeof createPiniaStore>;
 
@@ -16,8 +14,6 @@ class StoredComponentTestHelper {
 
   private mockedApi?: ApiMock;
 
-  private historyState?: HistoryState;
-
   private get pinia() {
     if (!this.piniaInstance) this.piniaInstance = createTestingPinia();
     return this.piniaInstance;
@@ -26,12 +22,6 @@ class StoredComponentTestHelper {
   get store(): PiniaStore {
     if (!this.piniaStore) this.piniaStore = createPiniaStore(this.pinia);
     return this.piniaStore;
-  }
-
-  get history(): HistoryState {
-    if (!this.historyState)
-      this.historyState = useStoredLoadingApi().globalHistory;
-    return this.historyState;
   }
 
   get apiMock(): ApiMock {

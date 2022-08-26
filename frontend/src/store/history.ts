@@ -8,25 +8,23 @@ interface HistoryState {
   noteUndoHistories: HistoryRecord[];
 }
 
-class History {
-  state;
+class History implements HistoryState {
+  noteUndoHistories: HistoryRecord[];
 
   constructor(state: HistoryState) {
-    this.state = state;
+    this.noteUndoHistories = state.noteUndoHistories;
   }
 
   peekUndo() {
-    if (this.state.noteUndoHistories.length === 0) return null;
-    return this.state.noteUndoHistories[
-      this.state.noteUndoHistories.length - 1
-    ];
+    if (this.noteUndoHistories.length === 0) return null;
+    return this.noteUndoHistories[this.noteUndoHistories.length - 1];
   }
 
   addEditingToUndoHistory(
     noteId: Doughnut.ID,
     textContent: Generated.TextContent
   ) {
-    this.state.noteUndoHistories.push({
+    this.noteUndoHistories.push({
       type: "editing",
       noteId,
       textContent: { ...textContent },
@@ -34,14 +32,14 @@ class History {
   }
 
   popUndoHistory() {
-    if (this.state.noteUndoHistories.length === 0) {
+    if (this.noteUndoHistories.length === 0) {
       return;
     }
-    this.state.noteUndoHistories.pop();
+    this.noteUndoHistories.pop();
   }
 
   deleteNote(noteId: Doughnut.ID) {
-    this.state.noteUndoHistories.push({ type: "delete note", noteId });
+    this.noteUndoHistories.push({ type: "delete note", noteId });
   }
 }
 
@@ -50,4 +48,4 @@ function history(state: HistoryState) {
 }
 
 export default history;
-export type { HistoryState };
+export type { HistoryState, History };

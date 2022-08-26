@@ -5,7 +5,6 @@ import { screen } from "@testing-library/vue";
 import NotebooksPage from "@/pages/NotebooksPage.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
-import history from "../../src/store/history";
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
@@ -25,7 +24,7 @@ describe("Notebooks Page", () => {
 
   it("show undo when there is something to undo", async () => {
     const notebook = makeMe.aNotebook.please();
-    history(helper.history).deleteNote(notebook.headNote.id);
+    helper.store.deleteNote(notebook.headNote.id);
     helper.apiMock.expectingGet("/api/notebooks").andReturnOnce({
       notebooks: [],
       subscriptions: [],
