@@ -5,7 +5,7 @@
   >
     <NoteFrameOfLinks
       v-if="links && links.links"
-      v-bind="{ links }"
+      v-bind="{ links, historyWriter }"
       @note-realm-updated="$emit('noteRealmUpdated', $event)"
     >
       <NoteContent

@@ -1,7 +1,7 @@
 <template>
   <span class="link-link">
     <LinkNob
-      v-bind="{ link, colors }"
+      v-bind="{ link, colors, historyWriter }"
       v-if="!!reverse"
       :inverse-icon="true"
       @link-deleted="$emit('noteRealmUpdated', $event)"
@@ -9,7 +9,7 @@
     />
     <NoteTitleWithLink class="link-title" v-bind="{ note }" />
     <LinkNob
-      v-bind="{ link, colors }"
+      v-bind="{ link, colors, historyWriter }"
       v-if="!reverse"
       :inverse-icon="false"
       @link-deleted="$emit('noteRealmUpdated', $event)"
@@ -23,11 +23,15 @@ import { defineComponent, PropType } from "vue";
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";
 import LinkNob from "./LinkNob.vue";
 import { colors } from "../../colors";
+import { HistoryWriter } from "../../store/history";
 
 export default defineComponent({
   props: {
     link: { type: Object as PropType<Generated.Link>, required: true },
     reverse: Boolean,
+    historyWriter: {
+      type: Function as PropType<HistoryWriter>,
+    },
   },
   emits: ["noteRealmUpdated"],
   components: { NoteTitleWithLink, LinkNob },

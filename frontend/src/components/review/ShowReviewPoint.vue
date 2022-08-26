@@ -20,7 +20,7 @@
   <div v-if="link">
     <div class="jumbotron py-4 mb-2">
       <LinkShow
-        v-bind="{ link }"
+        v-bind="{ link, historyWriter }"
         @link-updated="$emit('noteRealmUpdated', $event)"
         @link-deleted="$emit('linkDeleted', $event)"
       />

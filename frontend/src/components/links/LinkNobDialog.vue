@@ -36,15 +36,25 @@ import LinkTypeSelect from "./LinkTypeSelect.vue";
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import usePopups from "../commons/Popups/usePopup";
+import { HistoryWriter } from "../../store/history";
 
 export default defineComponent({
-  setup() {
-    return { ...useStoredLoadingApi({ hasFormError: true }), ...usePopups() };
+  setup(props) {
+    return {
+      ...useStoredLoadingApi({
+        undoHistory: props.historyWriter,
+        hasFormError: true,
+      }),
+      ...usePopups(),
+    };
   },
   props: {
     link: {
       type: Object as PropType<Generated.Link>,
       required: true,
+    },
+    historyWriter: {
+      type: Function as PropType<HistoryWriter>,
     },
     inverseIcon: Boolean,
     colors: Object,

@@ -6,7 +6,7 @@
     >
       <li v-for="link in linksOfType.direct" :key="link.id">
         <LinkOfNote
-          v-bind="{ link }"
+          v-bind="{ link, historyWriter }"
           :reverse="false"
           @note-realm-updated="$emit('noteRealmUpdated', $event)"
         />
@@ -23,7 +23,7 @@
           class="link-multi"
           v-for="link in direct"
           :key="link.id"
-          v-bind="{ link }"
+          v-bind="{ link, historyWriter }"
           :reverse="false"
           @note-realm-updated="$emit('noteRealmUpdated', $event)"
         />
@@ -31,7 +31,7 @@
           class="link-multi"
           v-for="link in reverse"
           :key="link.id"
-          v-bind="{ link }"
+          v-bind="{ link, historyWriter }"
           :reverse="true"
           @note-realm-updated="$emit('noteRealmUpdated', $event)"
         />
@@ -46,7 +46,7 @@
           class="link-multi"
           v-for="link in linksOfType.direct"
           :key="link.id"
-          v-bind="{ link }"
+          v-bind="{ link, historyWriter }"
           :reverse="false"
           @note-realm-updated="$emit('noteRealmUpdated', $event)"
         />
@@ -67,7 +67,7 @@
           class="link-multi"
           v-for="link in linksOfType.reverse"
           :key="link.id"
-          v-bind="{ link }"
+          v-bind="{ link, historyWriter }"
           :reverse="true"
           @note-realm-updated="$emit('noteRealmUpdated', $event)"
         />
@@ -81,10 +81,14 @@ import { defineComponent, PropType } from "vue";
 import LinkOfNote from "./LinkOfNote.vue";
 import LinksReader from "../../models/LinksReader";
 import { reverseLabel } from "../../models/linkTypeOptions";
+import { HistoryWriter } from "../../store/history";
 
 export default defineComponent({
   props: {
     links: Object as PropType<Generated.LinksOfANote>,
+    historyWriter: {
+      type: Function as PropType<HistoryWriter>,
+    },
   },
   emits: ["noteRealmUpdated"],
   components: { LinkOfNote },
