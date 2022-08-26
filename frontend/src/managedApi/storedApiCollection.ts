@@ -1,11 +1,9 @@
 import ManagedApi from "./ManagedApi";
-import createPiniaStore from "../store/createPiniaStore";
 import { History, HistoryWriter } from "../store/history";
 
 const storedApiCollection = (
   undoHistory: HistoryWriter | undefined,
-  managedApi: ManagedApi,
-  piniaStore: ReturnType<typeof createPiniaStore>
+  managedApi: ManagedApi
 ) => {
   function writeHistory(w: (h: History) => void) {
     if (undoHistory) {
@@ -74,7 +72,6 @@ const storedApiCollection = (
       noteContentData: Generated.TextContent,
       oldContent: Generated.TextContent
     ) {
-      piniaStore.addEditingToUndoHistory(noteId, oldContent);
       writeHistory((h: History) =>
         h.addEditingToUndoHistory(noteId, oldContent)
       );
@@ -86,7 +83,6 @@ const storedApiCollection = (
       writeHistory((h) => {
         undone = h.peekUndo();
         if (!undone) throw new Error("undo history is empty");
-        piniaStore.popUndoHistory();
         h.popUndoHistory();
       });
       if (undone.type === "editing" && undone.textContent) {
@@ -103,7 +99,6 @@ const storedApiCollection = (
         `notes/${noteId}/delete`,
         {}
       )) as number[];
-      piniaStore.deleteNote(noteId);
       writeHistory((h) => h.deleteNote(noteId));
       if (res.length > 0) {
         return res[0];

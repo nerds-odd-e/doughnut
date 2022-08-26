@@ -2,6 +2,7 @@
  * @jest-environment jsdom
  */
 import NoteWithLinks from "@/components/notes/NoteWithLinks.vue";
+import history, { History } from "../../src/store/history";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
@@ -67,6 +68,11 @@ describe("in place edit on title", () => {
 
 describe("undo editing", () => {
   it("should call addEditingToUndoHistory on submitChange", async () => {
+    const histories = history({ noteUndoHistories: [] });
+    const historyWriter = (writer: (h: History) => void) => {
+      writer(histories);
+    };
+
     helper.store.$reset();
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please();
     helper.apiMock.expectingPatch(`/api/text_content/${noteRealm.id}`);
@@ -74,14 +80,18 @@ describe("undo editing", () => {
     const updatedTitle = "updated";
     const wrapper = helper
       .component(NoteWithLinks)
-      .withProps({ note: noteRealm.note, links: noteRealm.links })
+      .withProps({
+        note: noteRealm.note,
+        links: noteRealm.links,
+        historyWriter,
+      })
       .mount();
 
     await wrapper.find('[role="title"]').trigger("click");
     await wrapper.find('[role="title"] input').setValue(updatedTitle);
     await wrapper.find('[role="title"] input').trigger("blur");
 
-    expect(helper.store.peekUndo()).toMatchObject({ type: "editing" });
+    expect(histories.peekUndo()).toMatchObject({ type: "editing" });
   });
 });
 
