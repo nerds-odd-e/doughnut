@@ -41,10 +41,7 @@ import { HistoryWriter } from "../../store/history";
 export default defineComponent({
   setup(props) {
     return {
-      ...useStoredLoadingApi({
-        historyWriter: props.historyWriter,
-        hasFormError: true,
-      }),
+      ...useStoredLoadingApi({ historyWriter: props.historyWriter }),
       ...usePopups(),
     };
   },
@@ -69,14 +66,20 @@ export default defineComponent({
       formData: {
         linkType: this.link.linkType,
       } as Generated.LinkCreation,
-      formErrors: { linkType: undefined },
+      formErrors: { linkType: undefined as string | undefined },
     };
   },
 
   methods: {
-    async updateLink() {
-      await this.storedApi.updateLink(this.link.id, this.formData);
-      this.$emit("done");
+    updateLink() {
+      this.storedApi
+        .updateLink(this.link.id, this.formData)
+        .then(() => {
+          this.$emit("done");
+        })
+        .catch((error) => {
+          this.formErrors = error;
+        });
     },
 
     async deleteLink() {
