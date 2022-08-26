@@ -8,6 +8,7 @@
             selectedNoteId: noteId,
             selectedNotePosition: notePosition,
             viewType: 'cards',
+            historyWriter,
           }"
           @note-realm-updated="noteRealmUpdated($event)"
         />

@@ -10,7 +10,7 @@
   />
   <LinkNoteFinalize
     v-if="targetNote && note"
-    v-bind="{ targetNote, note }"
+    v-bind="{ targetNote, note, historyWriter }"
     @success="$emit('done', $event)"
     @go-back="targetNote = undefined"
   />
@@ -20,9 +20,16 @@
 import { defineComponent, PropType } from "vue";
 import LinkNoteFinalize from "./LinkNoteFinalize.vue";
 import SearchNote from "../search/SearchNote.vue";
+import { HistoryWriter } from "../../store/history";
 
 export default defineComponent({
-  props: { note: Object as PropType<Generated.Note> },
+  props: {
+    note: Object as PropType<Generated.Note>,
+    historyWriter: {
+      type: Function as PropType<HistoryWriter>,
+      required: true,
+    },
+  },
   components: { LinkNoteFinalize, SearchNote },
   emits: ["done"],
   data() {

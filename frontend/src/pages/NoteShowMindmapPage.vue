@@ -4,7 +4,12 @@
       <div class="header">
         <NoteToolbar
           v-if="selectedNoteId && selectedNotePosition"
-          v-bind="{ selectedNoteId, selectedNotePosition, viewType: 'mindmap' }"
+          v-bind="{
+            selectedNoteId,
+            selectedNotePosition,
+            viewType: 'mindmap',
+            historyWriter,
+          }"
           @note-realm-updated="noteRealmUpdated($event)"
         />
       </div>
@@ -21,12 +26,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import NoteToolbar from "../components/toolbars/NoteToolbar.vue";
 import NoteMindmapView from "../components/notes/views/NoteMindmapView.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
 import LoadingPage from "./commons/LoadingPage.vue";
 import NoteRealmCache from "../store/NoteRealmCache";
+import { HistoryWriter } from "../store/history";
 
 export default defineComponent({
   setup() {
@@ -34,6 +40,9 @@ export default defineComponent({
   },
   props: {
     noteId: { type: Number, required: true },
+    historyWriter: {
+      type: Function as PropType<HistoryWriter>,
+    },
   },
   components: {
     LoadingPage,

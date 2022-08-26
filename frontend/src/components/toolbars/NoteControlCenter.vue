@@ -7,14 +7,17 @@
             <SvgSearch />
           </template>
           <template #dialog_body="{ doneHandler }">
-            <LinkNoteDialog @done="doneHandler($event)" />
+            <LinkNoteDialog
+              v-bind="{ historyWriter }"
+              @done="doneHandler($event)"
+            />
           </template>
         </PopupButton>
       </template>
       <template v-if="selectedNoteId">
         <ViewTypeButtons v-bind="{ viewType, noteId: selectedNoteId }" />
         <NoteNewButton
-          :parent-id="selectedNoteId"
+          v-bind="{ parentId: selectedNoteId, historyWriter }"
           button-title="Add Child Note"
           @note-realm-updated="$emit('noteRealmUpdated', $event)"
         >
@@ -29,7 +32,7 @@
             <NoteDialogFrame :note-id="selectedNoteId">
               <template #default="{ note }">
                 <NoteEditDialog
-                  :note="note"
+                  v-bind="{ note, historyWriter }"
                   @done="
                     doneHandler($event);
                     $emit('noteRealmUpdated');
@@ -67,7 +70,7 @@
             <NoteDialogFrame :note-id="selectedNoteId">
               <template #default="{ note }">
                 <LinkNoteDialog
-                  :note="note"
+                  v-bind="{ note, historyWriter }"
                   @done="
                     doneHandler($event);
                     $emit('noteRealmUpdated', $event);

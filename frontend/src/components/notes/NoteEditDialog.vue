@@ -7,18 +7,29 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { HistoryWriter } from "../../store/history";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import NoteFormBody from "./NoteFormBody.vue";
 
 export default defineComponent({
-  setup() {
-    return useStoredLoadingApi({ initalLoading: true, hasFormError: true });
+  setup(props) {
+    return useStoredLoadingApi({
+      undoHistory: props.historyWriter,
+      initalLoading: true,
+      hasFormError: true,
+    });
   },
   name: "NoteEditDialog",
   components: {
     NoteFormBody,
   },
-  props: { note: { type: Object as PropType<Generated.Note>, required: true } },
+  props: {
+    note: { type: Object as PropType<Generated.Note>, required: true },
+    historyWriter: {
+      type: Function as PropType<HistoryWriter>,
+      required: true,
+    },
+  },
   emits: ["done"],
   data() {
     const { updatedAt, ...rest } = this.note.noteAccessories;

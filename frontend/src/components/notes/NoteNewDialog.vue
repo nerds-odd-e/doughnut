@@ -35,17 +35,22 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import TextInput from "../form/TextInput.vue";
 import NoteFormTitleOnly from "./NoteFormTitleOnly.vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import SearchResults from "../search/SearchResults.vue";
 import LinkTypeSelectCompact from "../links/LinkTypeSelectCompact.vue";
 import WikidataSearchByLabel from "./WikidataSearchByLabel.vue";
+import { HistoryWriter } from "../../store/history";
 
 export default defineComponent({
-  setup() {
-    return useStoredLoadingApi({ initalLoading: true, hasFormError: true });
+  setup(props) {
+    return useStoredLoadingApi({
+      undoHistory: props.historyWriter,
+      initalLoading: true,
+      hasFormError: true,
+    });
   },
   components: {
     NoteFormTitleOnly,
@@ -54,7 +59,12 @@ export default defineComponent({
     TextInput,
     WikidataSearchByLabel,
   },
-  props: { parentId: { type: Number, required: true } },
+  props: {
+    parentId: { type: Number, required: true },
+    historyWriter: {
+      type: Function as PropType<HistoryWriter>,
+    },
+  },
   emits: ["done"],
   data() {
     return {

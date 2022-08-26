@@ -45,15 +45,26 @@ import RadioButtons from "../form/RadioButtons.vue";
 import SvgGoBack from "../svgs/SvgGoBack.vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import usePopups from "../commons/Popups/usePopup";
+import { HistoryWriter } from "../../store/history";
 
 export default defineComponent({
-  setup() {
-    return { ...useStoredLoadingApi({ hasFormError: true }), ...usePopups() };
+  setup(props) {
+    return {
+      ...useStoredLoadingApi({
+        undoHistory: props.historyWriter,
+        hasFormError: true,
+      }),
+      ...usePopups(),
+    };
   },
   name: "LinkNoteFinalize",
   props: {
     note: { type: Object as PropType<Generated.Note>, required: true },
     targetNote: { type: Object as PropType<Generated.Note>, required: true },
+    historyWriter: {
+      type: Function as PropType<HistoryWriter>,
+      required: true,
+    },
   },
   components: { LinkTypeSelect, SvgGoBack, CheckInput, RadioButtons },
   emits: ["success", "goBack"],
