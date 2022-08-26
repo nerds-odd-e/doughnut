@@ -19,7 +19,11 @@ export default function useStoredLoadingApi({
     ...useLoadingApi({ initalLoading, hasFormError, skipLoading }),
     piniaStore,
     get storedApi(): ReturnType<typeof storedApiCollection> {
-      return storedApiCollection(this.managedApi, piniaStore);
+      return storedApiCollection(
+        this.managedApi,
+        piniaStore,
+        this.globalHistory
+      );
     },
     get globalHistory(): HistoryState {
       return GlobalStorage.storageWrapper.historyState;
