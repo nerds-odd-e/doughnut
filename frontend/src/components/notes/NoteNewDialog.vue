@@ -5,17 +5,17 @@
       field="linkTypeToParent"
       :allow-empty="true"
       v-model="creationData.linkTypeToParent"
-      :errors="formErrors.linkTypeToParent"
+      :errors="noteFormErrors.linkTypeToParent"
     />
     <NoteFormTitleOnly
       v-model="creationData.textContent"
-      :errors="formErrors.textContent"
+      :errors="noteFormErrors.textContent"
     />
     <TextInput
       scope-name="wikidataID"
       field="wikidataID"
       v-model="creationData.wikidataId"
-      :errors="formErrors.wikiDataId"
+      :errors="noteFormErrors.wikiDataId"
       placeholder="example: `Q1234`"
     />
     <WikidataSearchByLabel
@@ -49,7 +49,6 @@ export default defineComponent({
     return useStoredLoadingApi({
       historyWriter: props.historyWriter,
       initalLoading: true,
-      hasFormError: true,
     });
   },
   components: {
@@ -73,7 +72,7 @@ export default defineComponent({
         textContent: { title: "" },
         wikidataId: "",
       } as Generated.NoteCreation,
-      formErrors: {
+      noteFormErrors: {
         linkTypeToParent: undefined,
         textContent: {},
         wikiDataId: undefined as undefined | string,
@@ -82,14 +81,14 @@ export default defineComponent({
   },
   methods: {
     processForm() {
-      this.formErrors.wikiDataId = undefined;
-      this.formErrors.textContent = {};
+      this.noteFormErrors.wikiDataId = undefined;
+      this.noteFormErrors.textContent = {};
       this.storedApi
         .createNote(this.parentId, this.creationData)
         .then((res) => {
           this.$emit("done", res.noteRealm);
         })
-        .catch((res) => (this.formErrors = res));
+        .catch((res) => (this.noteFormErrors = res));
     },
     onSelectWikidataEntry(selectedSuggestion: Generated.WikidataSearchEntity) {
       this.creationData.textContent.title = selectedSuggestion.label;

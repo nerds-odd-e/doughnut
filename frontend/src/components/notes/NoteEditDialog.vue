@@ -1,6 +1,10 @@
 <template>
   <form @submit.prevent.once="processForm">
-    <NoteFormBody v-if="!!formData" v-model="formData" :errors="formErrors" />
+    <NoteFormBody
+      v-if="!!formData"
+      v-model="formData"
+      :errors="noteFormErrors"
+    />
     <input type="submit" value="Submit" class="btn btn-primary" />
   </form>
 </template>
@@ -16,7 +20,6 @@ export default defineComponent({
     return useStoredLoadingApi({
       historyWriter: props.historyWriter,
       initalLoading: true,
-      hasFormError: true,
     });
   },
   name: "NoteEditDialog",
@@ -34,18 +37,22 @@ export default defineComponent({
   data() {
     const { updatedAt, ...rest } = this.note.noteAccessories;
     return {
-      formData: rest,
-    } as {
       /* eslint-disable  @typescript-eslint/no-explicit-any */
-      formData: any;
+      formData: rest as any,
+      noteFormErrors: {},
     };
   },
 
   methods: {
     processForm() {
-      this.storedApi.updateNote(this.note.id, this.formData).then(() => {
-        this.$emit("done");
-      });
+      this.storedApi
+        .updateNote(this.note.id, this.formData)
+        .then(() => {
+          this.$emit("done");
+        })
+        .catch((error) => {
+          this.noteFormErrors = error;
+        });
     },
   },
 });

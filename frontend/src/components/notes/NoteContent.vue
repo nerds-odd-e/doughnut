@@ -76,7 +76,6 @@ export default defineComponent({
   setup(props) {
     return useStoredLoadingApi({
       historyWriter: props.historyWriter,
-      hasFormError: true,
     });
   },
   props: {
