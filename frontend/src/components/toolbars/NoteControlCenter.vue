@@ -82,7 +82,7 @@
           <div class="dropdown-menu dropdown-menu-end">
             <NoteDeleteButton
               class="dropdown-item"
-              :note-id="selectedNoteId"
+              v-bind="{ noteId: selectedNoteId, historyWriter }"
               @note-deleted="$emit('noteDeleted', $event)"
             />
           </div>
@@ -115,11 +115,12 @@ import { ViewTypeName } from "../../models/viewTypes";
 import SvgCog from "../svgs/SvgCog.vue";
 import NoteDeleteButton from "./NoteDeleteButton.vue";
 import { HistoryWriter } from "../../store/history";
+import PopupButton from "../commons/Popups/PopupButton.vue";
 
 export default defineComponent({
   props: {
     selectedNoteId: Number,
-    viewType: { type: String as PropType<ViewTypeName>, required: true },
+    viewType: { type: String as PropType<ViewTypeName> },
     historyWriter: {
       type: Function as PropType<HistoryWriter>,
       required: true,
@@ -141,6 +142,7 @@ export default defineComponent({
     ViewTypeButtons,
     SvgCog,
     NoteDeleteButton,
+    PopupButton,
   },
 });
 </script>

@@ -24,7 +24,6 @@ export default defineComponent({
     reviewPointId: { type: Number, required: true },
     historyWriter: {
       type: Function as PropType<HistoryWriter>,
-      required: true,
     },
   },
   components: {

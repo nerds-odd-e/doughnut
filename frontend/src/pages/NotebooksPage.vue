@@ -28,6 +28,7 @@ export default defineComponent({
   setup() {
     return useLoadingApi();
   },
+  props: { updatedAt: Date },
   name: "NotebooksPage",
   components: {
     ContainerPage,
@@ -49,6 +50,11 @@ export default defineComponent({
         this.notebooks = res.notebooks;
         this.subscriptions = res.subscriptions;
       });
+    },
+  },
+  watch: {
+    updatedAt() {
+      this.fetchData();
     },
   },
   mounted() {

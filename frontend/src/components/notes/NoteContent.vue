@@ -85,7 +85,6 @@ export default defineComponent({
     titleAsLink: Boolean,
     historyWriter: {
       type: Function as PropType<HistoryWriter>,
-      required: true,
     },
   },
   emits: ["noteRealmUpdated"],

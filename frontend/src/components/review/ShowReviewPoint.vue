@@ -43,7 +43,6 @@ export default defineComponent({
     expandInfo: { type: Boolean, default: false },
     historyWriter: {
       type: Function as PropType<HistoryWriter>,
-      required: true,
     },
   },
   emits: ["noteRealmUpdated", "levelChanged", "linkDeleted", "selfEvaluated"],
