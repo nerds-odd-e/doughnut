@@ -11,6 +11,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import history from "../../store/history";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import SvgUndo from "../svgs/SvgUndo.vue";
 
@@ -28,7 +29,7 @@ export default defineComponent({
   emits: ["noteRealmUpdated"],
   computed: {
     history() {
-      return this.piniaStore.peekUndo();
+      return history(this.globalHistory).peekUndo();
     },
     undoTitle() {
       if (this.history) {
