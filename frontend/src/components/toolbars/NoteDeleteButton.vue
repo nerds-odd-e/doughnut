@@ -14,7 +14,7 @@ import { HistoryWriter } from "../../store/history";
 export default defineComponent({
   setup(props) {
     return {
-      ...useStoredLoadingApi({ undoHistory: props.historyWriter }),
+      ...useStoredLoadingApi({ historyWriter: props.historyWriter }),
       ...usePopups(),
     };
   },

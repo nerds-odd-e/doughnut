@@ -47,7 +47,7 @@ import { HistoryWriter } from "../../store/history";
 export default defineComponent({
   setup(props) {
     return useStoredLoadingApi({
-      undoHistory: props.historyWriter,
+      historyWriter: props.historyWriter,
       initalLoading: true,
       hasFormError: true,
     });

@@ -3,7 +3,7 @@ import storedApiCollection from "./storedApiCollection";
 import useLoadingApi from "./useLoadingApi";
 
 export default function useStoredLoadingApi({
-  undoHistory = undefined as HistoryWriter | undefined,
+  historyWriter: undoHistory = undefined as HistoryWriter | undefined,
   initalLoading = false,
   hasFormError = false,
   skipLoading = false,

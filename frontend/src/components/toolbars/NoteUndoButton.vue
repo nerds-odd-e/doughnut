@@ -17,7 +17,7 @@ import { HistoryState, HistoryWriter } from "../../store/history";
 
 export default defineComponent({
   setup(props) {
-    return useStoredLoadingApi({ undoHistory: props.historyWriter });
+    return useStoredLoadingApi({ historyWriter: props.historyWriter });
   },
   name: "NoteUndoButton",
   components: {

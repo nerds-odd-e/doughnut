@@ -51,7 +51,7 @@ export default defineComponent({
   setup(props) {
     return {
       ...useStoredLoadingApi({
-        undoHistory: props.historyWriter,
+        historyWriter: props.historyWriter,
         hasFormError: true,
       }),
       ...usePopups(),
@@ -63,7 +63,6 @@ export default defineComponent({
     targetNote: { type: Object as PropType<Generated.Note>, required: true },
     historyWriter: {
       type: Function as PropType<HistoryWriter>,
-      required: true,
     },
   },
   components: { LinkTypeSelect, SvgGoBack, CheckInput, RadioButtons },
