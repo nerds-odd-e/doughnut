@@ -15,7 +15,7 @@ class ManagedApi {
   skipLoading: boolean;
 
   constructor(
-    component: ManagedComponent,
+    component: ManagedComponent | undefined,
     options: { skipLoading: boolean } = { skipLoading: false }
   ) {
     this.api = new Api("/api/");
@@ -26,7 +26,7 @@ class ManagedApi {
   private around<T>(promise: Promise<T>) {
     const assignLoading = (value: boolean) => {
       if (this.skipLoading) return;
-      if (this.component !== null && this.component !== undefined) {
+      if (this.component) {
         this.component.loading.value = value;
       }
     };
@@ -36,10 +36,7 @@ class ManagedApi {
       promise
         .then(resolve)
         .catch((error) => {
-          if (
-            this.component != null &&
-            this.component.formErrors !== undefined
-          ) {
+          if (this.component && this.component.formErrors !== undefined) {
             this.component.formErrors.value = error;
             return;
           }
