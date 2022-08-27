@@ -43,7 +43,7 @@ export default defineComponent({
   props: {
     answerId: { type: Number, required: true },
     historyWriter: {
-      type: Function as PropType<HistoryWriter>,
+      type: Object as PropType<HistoryWriter>,
     },
   },
   components: {

@@ -28,7 +28,7 @@ export default defineComponent({
     },
     viewType: { type: String as PropType<ViewTypeName>, required: true },
     historyWriter: {
-      type: Function as PropType<HistoryWriter>,
+      type: Object as PropType<HistoryWriter>,
     },
   },
   emits: ["noteRealmUpdated"],

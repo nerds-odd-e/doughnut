@@ -26,7 +26,7 @@ export default {
     mindmapSector: MindmapSector,
     mindmap: Object,
     highlightNoteId: Number,
-    historyWriter: Function,
+    historyWriter: Object,
   },
   emits: ["highlight", "noteRealmUpdated"],
   components: {

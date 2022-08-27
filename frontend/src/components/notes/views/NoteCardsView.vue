@@ -54,7 +54,7 @@ export default defineComponent({
     expandChildren: { type: Boolean, required: true },
     expandInfo: { type: Boolean, default: false },
     historyWriter: {
-      type: Function as PropType<HistoryWriter>,
+      type: Object as PropType<HistoryWriter>,
     },
   },
   emits: ["levelChanged", "selfEvaluated"],

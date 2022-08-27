@@ -1,18 +1,10 @@
 import ManagedApi from "./ManagedApi";
-import { HistoryState, HistoryWriter } from "../store/history";
+import { HistoryWriter } from "../store/history";
 
 const storedApiCollection = (
   undoHistory: HistoryWriter | undefined,
   managedApi: ManagedApi
 ) => {
-  function writeHistory(w: (h: HistoryState) => void) {
-    if (undoHistory) {
-      undoHistory((h) => {
-        w(h);
-      });
-    }
-  }
-
   async function updateTextContentWithoutUndo(
     noteId: Doughnut.ID,
     noteContentData: Generated.TextContent
@@ -72,19 +64,14 @@ const storedApiCollection = (
       noteContentData: Generated.TextContent,
       oldContent: Generated.TextContent
     ) {
-      writeHistory((h: HistoryState) =>
-        h.addEditingToUndoHistory(noteId, oldContent)
-      );
+      undoHistory?.addEditingToUndoHistory(noteId, oldContent);
       return updateTextContentWithoutUndo(noteId, noteContentData);
     },
 
     async undo() {
-      let undone;
-      writeHistory((h) => {
-        undone = h.peekUndo();
-        if (!undone) throw new Error("undo history is empty");
-        h.popUndoHistory();
-      });
+      const undone = undoHistory?.peekUndo();
+      if (!undone) throw new Error("undo history is empty");
+      undoHistory?.popUndoHistory();
       if (undone.type === "editing" && undone.textContent) {
         return updateTextContentWithoutUndo(undone.noteId, undone.textContent);
       }
@@ -99,7 +86,7 @@ const storedApiCollection = (
         `notes/${noteId}/delete`,
         {}
       )) as number[];
-      writeHistory((h) => h.deleteNote(noteId));
+      undoHistory?.deleteNote(noteId);
       if (res.length > 0) {
         return res[0];
       }

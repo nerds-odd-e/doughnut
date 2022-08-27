@@ -60,7 +60,7 @@ export default defineComponent({
   props: {
     parentId: { type: Number, required: true },
     historyWriter: {
-      type: Function as PropType<HistoryWriter>,
+      type: Object as PropType<HistoryWriter>,
     },
   },
   emits: ["done"],

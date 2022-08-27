@@ -30,7 +30,7 @@ export default defineComponent({
     link: { type: Object as PropType<Generated.Link>, required: true },
     reverse: Boolean,
     historyWriter: {
-      type: Function as PropType<HistoryWriter>,
+      type: Object as PropType<HistoryWriter>,
     },
   },
   emits: ["noteRealmUpdated"],

@@ -61,7 +61,7 @@ export default defineComponent({
     note: { type: Object as PropType<Generated.Note>, required: true },
     targetNote: { type: Object as PropType<Generated.Note>, required: true },
     historyWriter: {
-      type: Function as PropType<HistoryWriter>,
+      type: Object as PropType<HistoryWriter>,
     },
   },
   components: { LinkTypeSelect, SvgGoBack, CheckInput, RadioButtons },

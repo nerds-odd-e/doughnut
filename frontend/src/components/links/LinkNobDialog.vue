@@ -51,7 +51,7 @@ export default defineComponent({
       required: true,
     },
     historyWriter: {
-      type: Function as PropType<HistoryWriter>,
+      type: Object as PropType<HistoryWriter>,
     },
     inverseIcon: Boolean,
     colors: Object,

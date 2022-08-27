@@ -55,9 +55,6 @@ export default defineComponent({
   },
 
   methods: {
-    historyWriter(writer: (h: HistoryState) => void) {
-      writer(this.histories);
-    },
     onNoteDeleted(parentId: Doughnut.ID) {
       if (parentId) {
         this.$router.push({
@@ -98,14 +95,14 @@ export default defineComponent({
           <NoteControlCenter
             class="header"
             :selected-note-id="Number($route.params.noteId)"
-            v-bind="{ viewType, historyWriter, histories }"
+            v-bind="{ viewType, historyWriter: histories, histories }"
             @note-realm-updated="onUpdateNoteRealm($event)"
             @note-deleted="onNoteDeleted($event)"
           />
           <router-view
             :updated-note-realm="updatedNoteRealm"
             :updated-at="updatedAt"
-            :history-writer="historyWriter"
+            :history-writer="histories"
           />
         </template>
         <router-view v-else-if="$route.meta['userProp']" :user="user" />

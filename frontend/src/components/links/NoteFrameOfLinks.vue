@@ -87,7 +87,7 @@ export default defineComponent({
   props: {
     links: Object as PropType<Generated.LinksOfANote>,
     historyWriter: {
-      type: Function as PropType<HistoryWriter>,
+      type: Object as PropType<HistoryWriter>,
     },
   },
   emits: ["noteRealmUpdated"],

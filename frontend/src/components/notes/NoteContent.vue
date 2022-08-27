@@ -83,7 +83,7 @@ export default defineComponent({
     size: { type: String, default: "large" },
     titleAsLink: Boolean,
     historyWriter: {
-      type: Function as PropType<HistoryWriter>,
+      type: Object as PropType<HistoryWriter>,
     },
   },
   emits: ["noteRealmUpdated"],

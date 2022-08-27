@@ -28,7 +28,7 @@ export default defineComponent({
   props: {
     note: { type: Object as PropType<Generated.Note>, required: true },
     historyWriter: {
-      type: Function as PropType<HistoryWriter>,
+      type: Object as PropType<HistoryWriter>,
       required: true,
     },
   },

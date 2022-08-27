@@ -23,7 +23,7 @@ export default defineComponent({
     updatedNoteRealm: { type: Object as PropType<Generated.NoteRealm> },
     updatedAt: { type: Date },
     historyWriter: {
-      type: Function as PropType<HistoryWriter>,
+      type: Object as PropType<HistoryWriter>,
     },
   },
   components: { NoteCardsView },
