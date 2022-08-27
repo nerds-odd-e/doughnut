@@ -22,7 +22,6 @@ declare module '@vue/runtime-core' {
     CircleNewDialog: typeof import('./src/components/circles/CircleNewDialog.vue')['default']
     CircleSelector: typeof import('./src/components/circles/CircleSelector.vue')['default']
     ContentLoader: typeof import('./src/components/commons/ContentLoader.vue')['default']
-    copy: typeof import('./src/components/notes/WikidataAssociationDialog copy.vue')['default']
     DragListner: typeof import('./src/components/commons/DragListner.vue')['default']
     EditableText: typeof import('./src/components/form/EditableText.vue')['default']
     Feather: typeof import('./src/components/svgs/link_types/Feather.vue')['default']
@@ -52,7 +51,6 @@ declare module '@vue/runtime-core' {
     NotebookEditDialog: typeof import('./src/components/notebook/NotebookEditDialog.vue')['default']
     NotebookNewButton: typeof import('./src/components/notebook/NotebookNewButton.vue')['default']
     NotebookNewDialog: typeof import('./src/components/notebook/NotebookNewDialog.vue')['default']
-    NotebooksToolbar: typeof import('./src/components/toolbars/NotebooksToolbar.vue')['default']
     NotebookSubscriptionCards: typeof import('./src/components/subscriptions/NotebookSubscriptionCards.vue')['default']
     NotebookViewCards: typeof import('./src/components/notebook/NotebookViewCards.vue')['default']
     NoteCard: typeof import('./src/components/notes/mindmap/NoteCard.vue')['default']
@@ -180,10 +178,8 @@ declare module '@vue/runtime-core' {
     UserActionsButton: typeof import('./src/components/toolbars/UserActionsButton.vue')['default']
     UserIconMenu: typeof import('./src/components/toolbars/UserIconMenu.vue')['default']
     UserProfileDialog: typeof import('./src/components/toolbars/UserProfileDialog.vue')['default']
-    UserProfilePpopup: typeof import('./src/components/toolbars/UserProfilePpopup.vue')['default']
     ViewTypeButtons: typeof import('./src/components/toolbars/ViewTypeButtons.vue')['default']
     WikidataAssociationDialog: typeof import('./src/components/notes/WikidataAssociationDialog.vue')['default']
-    WikidataAssociationDialogInner: typeof import('./src/components/notes/WikidataAssociationDialogInner.vue')['default']
     WikidataSearchByLabel: typeof import('./src/components/notes/WikidataSearchByLabel.vue')['default']
   }
 }
