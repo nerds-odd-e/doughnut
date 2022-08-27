@@ -19,7 +19,7 @@ describe("Note Control Center", () => {
   it("fetch API to be called ONCE", async () => {
     helper
       .component(NoteControlCenter)
-      .withProps({ histories, historyWriter: histories })
+      .withProps({ historyWriter: histories })
       .render();
 
     expect(await screen.findByTitle("undo")).toBeDisabled();
@@ -30,7 +30,7 @@ describe("Note Control Center", () => {
     histories.deleteNote(notebook.headNote.id);
     helper
       .component(NoteControlCenter)
-      .withProps({ histories, historyWriter: histories })
+      .withProps({ historyWriter: histories })
       .render();
 
     expect(await screen.findByTitle("undo delete note")).not.toBeDisabled();

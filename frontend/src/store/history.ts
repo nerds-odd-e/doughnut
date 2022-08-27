@@ -57,4 +57,4 @@ function createHistory(): HistoryWriter {
 }
 
 export default createHistory;
-export type { HistoryState, HistoryWriter };
+export type { HistoryWriter };
