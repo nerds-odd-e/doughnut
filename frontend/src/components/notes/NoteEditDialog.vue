@@ -19,7 +19,6 @@ export default defineComponent({
   setup(props) {
     return useStoredLoadingApi({
       historyWriter: props.historyWriter,
-      initalLoading: true,
     });
   },
   name: "NoteEditDialog",
