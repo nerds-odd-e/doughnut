@@ -3,7 +3,7 @@
  */
 import fetchMock from "jest-fetch-mock";
 import makeMe from "./fixtures/makeMe";
-import createHistory from "../src/store/history";
+import createNoteStorage from "../src/store/history";
 
 beforeEach(() => {
   fetchMock.resetMocks();
@@ -11,7 +11,7 @@ beforeEach(() => {
 
 describe("storedApiCollection", () => {
   const note = makeMe.aNoteRealm.please();
-  const history = createHistory();
+  const history = createNoteStorage();
   const sa = history.api();
 
   describe("delete note", () => {

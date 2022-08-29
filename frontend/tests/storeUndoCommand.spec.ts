@@ -1,14 +1,14 @@
 /**
  * @jest-environment jsdom
  */
-import createHistory from "../src/store/history";
+import { HistoryWorkImpl } from "../src/store/history";
 import makeMe from "./fixtures/makeMe";
 
 describe("storeUndoCommand", () => {
   const note = makeMe.aNoteRealm.title("Dummy Title").please();
 
   describe("addEditingToUndoHistory", () => {
-    const histories = createHistory();
+    const histories = new HistoryWorkImpl();
     it("should push textContent into store state noteUndoHistories ", () => {
       histories.addEditingToUndoHistory(note.id, note.note.textContent);
 
@@ -18,7 +18,7 @@ describe("storeUndoCommand", () => {
 
   describe("popUndoHistory", () => {
     let initialUndoCount;
-    const histories = createHistory();
+    const histories = new HistoryWorkImpl();
 
     beforeEach(() => {
       histories.addEditingToUndoHistory(note.id, note.note.textContent);

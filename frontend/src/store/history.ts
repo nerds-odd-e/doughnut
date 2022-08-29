@@ -8,8 +8,11 @@ interface HistoryRecord {
 }
 
 interface HistoryState {
-  noteUndoHistories: HistoryRecord[];
   api(): StoredApiCollection;
+  peekUndo(): null | HistoryRecord;
+}
+
+interface HistoryWork {
   peekUndo(): null | HistoryRecord;
   popUndoHistory(): void;
   addEditingToUndoHistory(
@@ -55,11 +58,11 @@ interface StoredApi {
 }
 
 class StoredApiCollection implements StoredApi {
-  undoHistory: HistoryWriter;
+  undoHistory: HistoryWork;
 
   managedApi: ManagedApi;
 
-  constructor(undoHistory: HistoryWriter) {
+  constructor(undoHistory: HistoryWork) {
     this.managedApi = new ManagedApi(undefined);
     this.undoHistory = undoHistory;
   }
@@ -158,14 +161,30 @@ class StoredApiCollection implements StoredApi {
 export { StoredApiCollection };
 
 class History implements HistoryState {
+  historyWork: HistoryWork;
+
+  constructor(historyWork?: HistoryWork) {
+    if (historyWork) {
+      this.historyWork = historyWork;
+    } else {
+      this.historyWork = new HistoryWorkImpl();
+    }
+  }
+
+  peekUndo(): HistoryRecord | null {
+    return this.historyWork.peekUndo();
+  }
+
+  api(): StoredApiCollection {
+    return new StoredApiCollection(this.historyWork);
+  }
+}
+
+class HistoryWorkImpl implements HistoryWork {
   noteUndoHistories: HistoryRecord[];
 
   constructor() {
     this.noteUndoHistories = [];
-  }
-
-  api(): StoredApiCollection {
-    return new StoredApiCollection(this);
   }
 
   peekUndo() {
@@ -198,9 +217,10 @@ class History implements HistoryState {
 
 type HistoryWriter = HistoryState;
 
-function createHistory(): HistoryWriter {
-  return new History();
+function createNoteStorage(historyWork?: HistoryWorkImpl): HistoryWriter {
+  return new History(historyWork);
 }
 
-export default createHistory;
+export default createNoteStorage;
 export type { HistoryWriter };
+export { HistoryWorkImpl };

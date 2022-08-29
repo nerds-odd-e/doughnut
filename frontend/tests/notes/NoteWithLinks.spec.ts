@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import NoteWithLinks from "@/components/notes/NoteWithLinks.vue";
-import createHistory from "../../src/store/history";
+import createNoteStorage from "../../src/store/history";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
@@ -74,7 +74,7 @@ describe("in place edit on title", () => {
 
 describe("undo editing", () => {
   it("should call addEditingToUndoHistory on submitChange", async () => {
-    const histories = createHistory();
+    const histories = createNoteStorage();
 
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please();
     helper.apiMock.expectingPatch(`/api/text_content/${noteRealm.id}`);

@@ -3,7 +3,7 @@ import { mount } from "@vue/test-utils";
 import { render } from "@testing-library/vue";
 import { App, DefineComponent } from "vue";
 import { RouteLocationRaw } from "vue-router";
-import createHistory from "../../src/store/history";
+import createNoteStorage from "../../src/store/history";
 
 interface VuePlugin {
   install: (app: App) => void;
@@ -36,7 +36,7 @@ class RenderingHelper {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   withHistoryProps(props: any) {
-    return this.withProps({ historyWriter: createHistory(), ...props });
+    return this.withProps({ historyWriter: createNoteStorage(), ...props });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
