@@ -27,7 +27,10 @@ describe("NoteRealm", () => {
     it("should render note with one child", async () => {
       helper
         .component(NoteShowPage)
-        .withProps({ noteId: noteRealm.id, expandChildren: true })
+        .withHistoryProps({
+          noteId: noteRealm.id,
+          expandChildren: true,
+        })
         .render();
       await flushPromises();
       expect(screen.getAllByRole("title")).toHaveLength(1);

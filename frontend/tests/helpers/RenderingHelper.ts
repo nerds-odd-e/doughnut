@@ -3,6 +3,7 @@ import { mount } from "@vue/test-utils";
 import { render } from "@testing-library/vue";
 import { App, DefineComponent } from "vue";
 import { RouteLocationRaw } from "vue-router";
+import createHistory from "../../src/store/history";
 
 interface VuePlugin {
   install: (app: App) => void;
@@ -31,6 +32,11 @@ class RenderingHelper {
 
   constructor(comp: DefineComponent) {
     this.comp = comp;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  withHistoryProps(props: any) {
+    return this.withProps({ historyWriter: createHistory(), ...props });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
