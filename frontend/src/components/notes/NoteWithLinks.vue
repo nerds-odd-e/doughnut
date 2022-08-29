@@ -34,6 +34,7 @@ export default defineComponent({
     },
     historyWriter: {
       type: Object as PropType<HistoryWriter>,
+      required: true,
     },
   },
   emits: ["noteRealmUpdated"],

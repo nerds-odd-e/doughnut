@@ -46,9 +46,7 @@ import { HistoryWriter } from "../../store/history";
 
 export default defineComponent({
   setup(props) {
-    return useStoredLoadingApi({
-      historyWriter: props.historyWriter,
-    });
+    return useStoredLoadingApi(props.historyWriter);
   },
   components: {
     NoteFormTitleOnly,
@@ -61,6 +59,7 @@ export default defineComponent({
     parentId: { type: Number, required: true },
     historyWriter: {
       type: Object as PropType<HistoryWriter>,
+      required: true,
     },
   },
   emits: ["done"],

@@ -13,7 +13,7 @@ beforeEach(() => {
 describe("storedApiCollection", () => {
   const note = makeMe.aNoteRealm.please();
   const history = createHistory();
-  const sa = useStoredLoadingApi({ historyWriter: history }).storedApi;
+  const sa = useStoredLoadingApi(history).storedApi;
 
   describe("delete note", () => {
     beforeEach(() => {

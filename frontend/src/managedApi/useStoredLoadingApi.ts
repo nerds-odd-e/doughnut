@@ -1,12 +1,10 @@
 import { HistoryWriter } from "../store/history";
 import storedApiCollection from "./storedApiCollection";
 
-export default function useStoredLoadingApi({
-  historyWriter: undoHistory = undefined as HistoryWriter | undefined,
-} = {}) {
+export default function useStoredLoadingApi(historyWriter: HistoryWriter) {
   return {
     get storedApi(): ReturnType<typeof storedApiCollection> {
-      return storedApiCollection(undoHistory);
+      return storedApiCollection(historyWriter);
     },
   };
 }

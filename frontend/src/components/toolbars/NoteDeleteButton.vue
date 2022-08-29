@@ -14,7 +14,7 @@ import { HistoryWriter } from "../../store/history";
 export default defineComponent({
   setup(props) {
     return {
-      ...useStoredLoadingApi({ historyWriter: props.historyWriter }),
+      ...useStoredLoadingApi(props.historyWriter),
       ...usePopups(),
     };
   },
@@ -22,6 +22,7 @@ export default defineComponent({
     noteId: { type: Number, required: true },
     historyWriter: {
       type: Object as PropType<HistoryWriter>,
+      required: true,
     },
   },
   emits: ["noteDeleted"],

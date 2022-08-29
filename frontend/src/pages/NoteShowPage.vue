@@ -24,6 +24,7 @@ export default defineComponent({
     updatedAt: { type: Date },
     historyWriter: {
       type: Object as PropType<HistoryWriter>,
+      required: true,
     },
   },
   components: { NoteCardsView },

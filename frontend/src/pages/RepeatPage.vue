@@ -49,6 +49,7 @@ export default defineComponent({
     minimized: Boolean,
     historyWriter: {
       type: Object as PropType<HistoryWriter>,
+      required: true,
     },
   },
   components: {

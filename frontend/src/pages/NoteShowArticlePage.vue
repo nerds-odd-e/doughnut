@@ -38,6 +38,7 @@ export default defineComponent({
     noteId: { type: Number, required: true },
     historyWriter: {
       type: Object as PropType<HistoryWriter>,
+      required: true,
     },
   },
   components: {

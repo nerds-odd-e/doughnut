@@ -27,6 +27,7 @@ export default defineComponent({
     buttonTitle: { type: String, required: true },
     historyWriter: {
       type: Object as PropType<HistoryWriter>,
+      required: true,
     },
   },
   emits: ["noteRealmUpdated"],

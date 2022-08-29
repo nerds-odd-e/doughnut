@@ -50,9 +50,7 @@ import { HistoryWriter } from "../../store/history";
 export default defineComponent({
   setup(props) {
     return {
-      ...useStoredLoadingApi({
-        historyWriter: props.historyWriter,
-      }),
+      ...useStoredLoadingApi(props.historyWriter),
       ...usePopups(),
     };
   },
@@ -62,6 +60,7 @@ export default defineComponent({
     targetNote: { type: Object as PropType<Generated.Note>, required: true },
     historyWriter: {
       type: Object as PropType<HistoryWriter>,
+      required: true,
     },
   },
   components: { LinkTypeSelect, SvgGoBack, CheckInput, RadioButtons },

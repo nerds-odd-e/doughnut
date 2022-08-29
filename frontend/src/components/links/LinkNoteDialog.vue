@@ -27,6 +27,7 @@ export default defineComponent({
     note: Object as PropType<Generated.Note>,
     historyWriter: {
       type: Object as PropType<HistoryWriter>,
+      required: true,
     },
   },
   components: { LinkNoteFinalize, SearchNote },

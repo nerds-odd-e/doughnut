@@ -74,9 +74,7 @@ import { HistoryWriter } from "../../store/history";
 
 export default defineComponent({
   setup(props) {
-    return useStoredLoadingApi({
-      historyWriter: props.historyWriter,
-    });
+    return useStoredLoadingApi(props.historyWriter);
   },
   props: {
     note: { type: Object as PropType<Generated.Note>, required: true },
@@ -84,6 +82,7 @@ export default defineComponent({
     titleAsLink: Boolean,
     historyWriter: {
       type: Object as PropType<HistoryWriter>,
+      required: true,
     },
   },
   emits: ["noteRealmUpdated"],

@@ -17,9 +17,7 @@ import NoteFormBody from "./NoteFormBody.vue";
 
 export default defineComponent({
   setup(props) {
-    return useStoredLoadingApi({
-      historyWriter: props.historyWriter,
-    });
+    return useStoredLoadingApi(props.historyWriter);
   },
   name: "NoteEditDialog",
   components: {
