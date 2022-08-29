@@ -73,7 +73,8 @@ export default defineComponent({
 
   methods: {
     updateLink() {
-      this.storedApi
+      this.historyWriter
+        .api()
         .updateLink(this.link.id, this.formData)
         .then(() => {
           this.$emit("done");
@@ -88,7 +89,7 @@ export default defineComponent({
         this.$emit("done", null);
         return;
       }
-      await this.storedApi.deleteLink(this.link.id);
+      await this.historyWriter.api().deleteLink(this.link.id);
       this.$emit("done");
     },
   },

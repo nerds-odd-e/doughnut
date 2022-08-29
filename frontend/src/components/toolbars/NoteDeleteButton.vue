@@ -32,7 +32,7 @@ export default defineComponent({
   methods: {
     async deleteNote() {
       if (await this.popups.confirm(`Confirm to delete this note?`)) {
-        const parentId = await this.storedApi.deleteNote(this.noteId);
+        const parentId = await this.historyWriter.api().deleteNote(this.noteId);
         this.$emit("noteDeleted", parentId);
       }
     },

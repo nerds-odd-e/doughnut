@@ -103,7 +103,8 @@ export default defineComponent({
   },
   methods: {
     onBlurTextField() {
-      this.storedApi
+      this.historyWriter
+        .api()
         .updateTextContent(
           this.note.id,
           this.textContent,

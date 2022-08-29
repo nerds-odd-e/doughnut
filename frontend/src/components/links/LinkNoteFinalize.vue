@@ -90,7 +90,8 @@ export default defineComponent({
           return;
         }
       }
-      this.storedApi
+      this.historyWriter
+        .api()
         .createLink(this.note.id, this.targetNote.id, this.formData)
         .then((r) => this.$emit("success", r))
         .catch((res) => {

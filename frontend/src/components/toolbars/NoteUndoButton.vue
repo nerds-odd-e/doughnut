@@ -44,7 +44,7 @@ export default defineComponent({
   },
   methods: {
     async undoDelete() {
-      const noteRealm = await this.storedApi.undo();
+      const noteRealm = await this.historyWriter.api().undo();
       this.$emit("noteRealmUpdated", noteRealm);
     },
   },

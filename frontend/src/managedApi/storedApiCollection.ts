@@ -107,3 +107,4 @@ class StoredApiCollection {
 }
 
 export default storedApiCollection;
+export { StoredApiCollection };

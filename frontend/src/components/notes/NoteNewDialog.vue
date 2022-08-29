@@ -81,7 +81,8 @@ export default defineComponent({
     processForm() {
       this.noteFormErrors.wikiDataId = undefined;
       this.noteFormErrors.textContent = {};
-      this.storedApi
+      this.historyWriter
+        .api()
         .createNote(this.parentId, this.creationData)
         .then((res) => {
           this.$emit("done", res.noteRealm);

@@ -42,7 +42,8 @@ export default defineComponent({
 
   methods: {
     processForm() {
-      this.storedApi
+      this.historyWriter
+        .api()
         .updateNote(this.note.id, this.formData)
         .then(() => {
           this.$emit("done");
