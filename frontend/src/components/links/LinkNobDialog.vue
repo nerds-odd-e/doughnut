@@ -34,14 +34,12 @@
 import { defineComponent, PropType } from "vue";
 import LinkTypeSelect from "./LinkTypeSelect.vue";
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";
-import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import usePopups from "../commons/Popups/usePopup";
 import { HistoryWriter } from "../../store/history";
 
 export default defineComponent({
-  setup(props) {
+  setup() {
     return {
-      ...useStoredLoadingApi(props.historyWriter),
       ...usePopups(),
     };
   },

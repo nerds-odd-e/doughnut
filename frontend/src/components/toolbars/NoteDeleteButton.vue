@@ -8,13 +8,11 @@
 import { defineComponent, PropType } from "vue";
 import SvgRemove from "../svgs/SvgRemove.vue";
 import usePopups from "../commons/Popups/usePopup";
-import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import { HistoryWriter } from "../../store/history";
 
 export default defineComponent({
-  setup(props) {
+  setup() {
     return {
-      ...useStoredLoadingApi(props.historyWriter),
       ...usePopups(),
     };
   },

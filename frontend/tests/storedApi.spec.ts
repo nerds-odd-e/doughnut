@@ -3,7 +3,6 @@
  */
 import fetchMock from "jest-fetch-mock";
 import makeMe from "./fixtures/makeMe";
-import useStoredLoadingApi from "../src/managedApi/useStoredLoadingApi";
 import createHistory from "../src/store/history";
 
 beforeEach(() => {
@@ -13,7 +12,7 @@ beforeEach(() => {
 describe("storedApiCollection", () => {
   const note = makeMe.aNoteRealm.please();
   const history = createHistory();
-  const sa = useStoredLoadingApi(history).storedApi;
+  const sa = history.api();
 
   describe("delete note", () => {
     beforeEach(() => {

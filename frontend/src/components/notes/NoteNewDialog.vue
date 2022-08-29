@@ -38,16 +38,12 @@
 import { defineComponent, PropType } from "vue";
 import TextInput from "../form/TextInput.vue";
 import NoteFormTitleOnly from "./NoteFormTitleOnly.vue";
-import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import SearchResults from "../search/SearchResults.vue";
 import LinkTypeSelectCompact from "../links/LinkTypeSelectCompact.vue";
 import WikidataSearchByLabel from "./WikidataSearchByLabel.vue";
 import { HistoryWriter } from "../../store/history";
 
 export default defineComponent({
-  setup(props) {
-    return useStoredLoadingApi(props.historyWriter);
-  },
   components: {
     NoteFormTitleOnly,
     SearchResults,

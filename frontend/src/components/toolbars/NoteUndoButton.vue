@@ -11,14 +11,10 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import SvgUndo from "../svgs/SvgUndo.vue";
 import { HistoryWriter } from "../../store/history";
 
 export default defineComponent({
-  setup(props) {
-    return useStoredLoadingApi(props.historyWriter);
-  },
   name: "NoteUndoButton",
   components: {
     SvgUndo,

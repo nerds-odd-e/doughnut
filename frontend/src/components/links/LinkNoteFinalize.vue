@@ -43,14 +43,12 @@ import LinkTypeSelect from "./LinkTypeSelect.vue";
 import CheckInput from "../form/CheckInput.vue";
 import RadioButtons from "../form/RadioButtons.vue";
 import SvgGoBack from "../svgs/SvgGoBack.vue";
-import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import usePopups from "../commons/Popups/usePopup";
 import { HistoryWriter } from "../../store/history";
 
 export default defineComponent({
-  setup(props) {
+  setup() {
     return {
-      ...useStoredLoadingApi(props.historyWriter),
       ...usePopups(),
     };
   },

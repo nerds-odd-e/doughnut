@@ -68,14 +68,10 @@ import SvgDescriptionIndicator from "../svgs/SvgDescriptionIndicator.vue";
 import SvgPictureIndicator from "../svgs/SvgPictureIndicator.vue";
 import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
 import EditableText from "../form/EditableText.vue";
-import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import NoteWikidataAssociation from "./NoteWikidataAssociation.vue";
 import { HistoryWriter } from "../../store/history";
 
 export default defineComponent({
-  setup(props) {
-    return useStoredLoadingApi(props.historyWriter);
-  },
   props: {
     note: { type: Object as PropType<Generated.Note>, required: true },
     size: { type: String, default: "large" },

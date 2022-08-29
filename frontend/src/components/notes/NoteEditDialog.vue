@@ -12,13 +12,9 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { HistoryWriter } from "../../store/history";
-import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import NoteFormBody from "./NoteFormBody.vue";
 
 export default defineComponent({
-  setup(props) {
-    return useStoredLoadingApi(props.historyWriter);
-  },
   name: "NoteEditDialog",
   components: {
     NoteFormBody,
