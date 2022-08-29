@@ -1,16 +1,16 @@
 import ManagedApi from "./ManagedApi";
 import { HistoryWriter } from "../store/history";
 
-const storedApiCollection = (undoHistory: HistoryWriter | undefined) => {
+const storedApiCollection = (undoHistory: HistoryWriter) => {
   return new StoredApiCollection(undoHistory);
 };
 
 class StoredApiCollection {
-  undoHistory?: HistoryWriter;
+  undoHistory: HistoryWriter;
 
   managedApi: ManagedApi;
 
-  constructor(undoHistory: HistoryWriter | undefined) {
+  constructor(undoHistory: HistoryWriter) {
     this.managedApi = new ManagedApi(undefined);
     this.undoHistory = undoHistory;
   }
@@ -73,14 +73,14 @@ class StoredApiCollection {
     noteContentData: Generated.TextContent,
     oldContent: Generated.TextContent
   ) {
-    this.undoHistory?.addEditingToUndoHistory(noteId, oldContent);
+    this.undoHistory.addEditingToUndoHistory(noteId, oldContent);
     return this.updateTextContentWithoutUndo(noteId, noteContentData);
   }
 
   async undo() {
-    const undone = this.undoHistory?.peekUndo();
+    const undone = this.undoHistory.peekUndo();
     if (!undone) throw new Error("undo history is empty");
-    this.undoHistory?.popUndoHistory();
+    this.undoHistory.popUndoHistory();
     if (undone.type === "editing" && undone.textContent) {
       return this.updateTextContentWithoutUndo(
         undone.noteId,
@@ -98,7 +98,7 @@ class StoredApiCollection {
       `notes/${noteId}/delete`,
       {}
     )) as number[];
-    this.undoHistory?.deleteNote(noteId);
+    this.undoHistory.deleteNote(noteId);
     if (res.length > 0) {
       return res[0];
     }

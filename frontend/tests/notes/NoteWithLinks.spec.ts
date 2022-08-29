@@ -8,6 +8,8 @@ import helper from "../helpers";
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
+const historyWriter = createHistory();
+
 describe("new/updated pink banner", () => {
   beforeAll(() => {
     Date.now = jest.fn(() => new Date(Date.UTC(2017, 1, 14)).valueOf());
@@ -25,7 +27,7 @@ describe("new/updated pink banner", () => {
 
       const wrapper = helper
         .component(NoteWithLinks)
-        .withProps({ note: note.note, links: note.links })
+        .withProps({ note: note.note, links: note.links, historyWriter })
         .mount();
 
       expect(wrapper.find(".note-body").element).toHaveStyle(
@@ -41,7 +43,11 @@ describe("in place edit on title", () => {
 
     const wrapper = helper
       .component(NoteWithLinks)
-      .withProps({ note: noteParent.note, links: noteParent.links })
+      .withProps({
+        note: noteParent.note,
+        links: noteParent.links,
+        historyWriter,
+      })
       .mount();
 
     expect(wrapper.findAll('[role="title"] input')).toHaveLength(0);
@@ -57,7 +63,11 @@ describe("in place edit on title", () => {
 
     const wrapper = helper
       .component(NoteWithLinks)
-      .withProps({ note: noteParentSphere.note, links: noteParentSphere.links })
+      .withProps({
+        note: noteParentSphere.note,
+        links: noteParentSphere.links,
+        historyWriter,
+      })
       .mount();
 
     await wrapper.find('[role="title"]').trigger("click");
@@ -100,7 +110,11 @@ describe("note associated with wikidata", () => {
 
     const wrapper = helper
       .component(NoteWithLinks)
-      .withProps({ note: noteRealm.note, links: noteRealm.links })
+      .withProps({
+        note: noteRealm.note,
+        links: noteRealm.links,
+        historyWriter,
+      })
       .mount();
 
     const element = await wrapper.find('[role="button"]');
