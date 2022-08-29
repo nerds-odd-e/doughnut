@@ -6,19 +6,19 @@ import NoteControlCenter from "@/components/toolbars/NoteControlCenter.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 import createNoteStorage, {
-  HistoryWorkImpl,
+  NoteEditingHistory,
   HistoryWriter,
 } from "../../src/store/history";
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("Note Control Center", () => {
-  let historyWork: HistoryWorkImpl;
+  let noteEditingHistory: NoteEditingHistory;
   let histories: HistoryWriter;
 
   beforeEach(() => {
-    historyWork = new HistoryWorkImpl();
-    histories = createNoteStorage(historyWork);
+    noteEditingHistory = new NoteEditingHistory();
+    histories = createNoteStorage(noteEditingHistory);
   });
 
   it("fetch API to be called ONCE", async () => {
@@ -32,7 +32,7 @@ describe("Note Control Center", () => {
 
   it("show undo when there is something to undo", async () => {
     const notebook = makeMe.aNotebook.please();
-    historyWork.deleteNote(notebook.headNote.id);
+    noteEditingHistory.deleteNote(notebook.headNote.id);
     helper
       .component(NoteControlCenter)
       .withProps({ historyWriter: histories })

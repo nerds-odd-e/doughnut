@@ -12,16 +12,6 @@ interface HistoryState {
   peekUndo(): null | HistoryRecord;
 }
 
-interface HistoryWork {
-  peekUndo(): null | HistoryRecord;
-  popUndoHistory(): void;
-  addEditingToUndoHistory(
-    noteId: Doughnut.ID,
-    textContent: Generated.TextContent
-  ): void;
-  deleteNote(noteId: Doughnut.ID): void;
-}
-
 interface StoredApi {
   createNote(
     parentId: Doughnut.ID,
@@ -58,11 +48,11 @@ interface StoredApi {
 }
 
 class StoredApiCollection implements StoredApi {
-  undoHistory: HistoryWork;
+  undoHistory: NoteEditingHistory;
 
   managedApi: ManagedApi;
 
-  constructor(undoHistory: HistoryWork) {
+  constructor(undoHistory: NoteEditingHistory) {
     this.managedApi = new ManagedApi(undefined);
     this.undoHistory = undoHistory;
   }
@@ -160,27 +150,27 @@ class StoredApiCollection implements StoredApi {
 
 export { StoredApiCollection };
 
-class History implements HistoryState {
-  historyWork: HistoryWork;
+class NoteStorage implements HistoryState {
+  noteEditingHistory: NoteEditingHistory;
 
-  constructor(historyWork?: HistoryWork) {
-    if (historyWork) {
-      this.historyWork = historyWork;
+  constructor(noteEditingHistory?: NoteEditingHistory) {
+    if (noteEditingHistory) {
+      this.noteEditingHistory = noteEditingHistory;
     } else {
-      this.historyWork = new HistoryWorkImpl();
+      this.noteEditingHistory = new NoteEditingHistory();
     }
   }
 
   peekUndo(): HistoryRecord | null {
-    return this.historyWork.peekUndo();
+    return this.noteEditingHistory.peekUndo();
   }
 
   api(): StoredApiCollection {
-    return new StoredApiCollection(this.historyWork);
+    return new StoredApiCollection(this.noteEditingHistory);
   }
 }
 
-class HistoryWorkImpl implements HistoryWork {
+class NoteEditingHistory implements NoteEditingHistory {
   noteUndoHistories: HistoryRecord[];
 
   constructor() {
@@ -215,12 +205,14 @@ class HistoryWorkImpl implements HistoryWork {
   }
 }
 
-type HistoryWriter = HistoryState;
+type StorageAccessor = HistoryState;
 
-function createNoteStorage(historyWork?: HistoryWorkImpl): HistoryWriter {
-  return new History(historyWork);
+function createNoteStorage(
+  noteEditingHistory?: NoteEditingHistory
+): StorageAccessor {
+  return new NoteStorage(noteEditingHistory);
 }
 
 export default createNoteStorage;
-export type { HistoryWriter };
-export { HistoryWorkImpl };
+export type { StorageAccessor as HistoryWriter };
+export { NoteEditingHistory };
