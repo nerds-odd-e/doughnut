@@ -2,6 +2,7 @@
  * @jest-environment jsdom
  */
 import NoteMinmap from "@/components/notes/mindmap/NoteMindmap.vue";
+import createHistory from "../../src/store/history";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 import NoteRealmCache from "../../src/store/NoteRealmCache";
@@ -24,6 +25,7 @@ describe("note mindmap", () => {
           notePosition: makeMe.aNotePosition.please(),
         }),
         offset: { scale: 1, rotate: 0 },
+        historyWriter: createHistory(),
         ...props,
       })
       .mount();

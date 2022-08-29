@@ -7,6 +7,7 @@
           noteId,
           noteRealms,
           offset,
+          historyWriter,
         }"
         @select-note="$emit('selectNote', $event)"
         @note-realm-updated="$emit('noteRealmUpdated', $event)"
@@ -25,6 +26,7 @@ import { defineComponent, PropType } from "vue";
 import NoteMindmap from "../mindmap/NoteMindmap.vue";
 import DragListner from "../../commons/DragListner.vue";
 import { NoteRealmsReader } from "../../../store/NoteRealmCache";
+import { HistoryWriter } from "../../../store/history";
 
 const defaultOffset = { x: 0, y: 0, scale: 1.0, rotate: 0 };
 
@@ -33,6 +35,10 @@ export default defineComponent({
     noteId: { type: Number, required: true },
     noteRealms: {
       type: Object as PropType<NoteRealmsReader>,
+      required: true,
+    },
+    historyWriter: {
+      type: Object as PropType<HistoryWriter>,
       required: true,
     },
     highlightNoteId: Number,

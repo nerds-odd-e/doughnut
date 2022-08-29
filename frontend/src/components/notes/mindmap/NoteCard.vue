@@ -15,18 +15,24 @@
   </NoteShell>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
 import NoteShell from "../NoteShell.vue";
 import NoteContent from "../NoteContent.vue";
 import MindmapSector from "../../../models/MindmapSector";
+import Mindmap from "../../../models/Mindmap";
+import { HistoryWriter } from "../../../store/history";
 
-export default {
+export default defineComponent({
   props: {
-    note: Object,
-    mindmapSector: MindmapSector,
-    mindmap: Object,
+    note: { type: Object as PropType<Generated.Note>, required: true },
+    mindmapSector: { type: MindmapSector, required: true },
+    mindmap: { type: Object as PropType<Mindmap>, required: true },
     highlightNoteId: Number,
-    historyWriter: Object,
+    historyWriter: {
+      type: Object as PropType<HistoryWriter>,
+      required: true,
+    },
   },
   emits: ["highlight", "noteRealmUpdated"],
   components: {
@@ -46,7 +52,7 @@ export default {
       return this.mindmap.size();
     },
   },
-};
+});
 </script>
 
 <style lang="sass" scoped>
