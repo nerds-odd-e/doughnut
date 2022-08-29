@@ -4,9 +4,6 @@
       <div class="content" v-if="noteRealm && noteRealmCache">
         <div class="container">
           <div class="header">
-            <ToolbarFrame>
-              <ViewTypeButtons v-bind="{ viewType: 'article', noteId }" />
-            </ToolbarFrame>
             <Breadcrumb v-bind="notePosition" />
           </div>
           <NoteArticleView
@@ -25,9 +22,7 @@ import NoteArticleView from "../components/notes/views/NoteArticleView.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
 import LoadingPage from "./commons/LoadingPage.vue";
 import NoteRealmCache from "../store/NoteRealmCache";
-import ToolbarFrame from "../components/toolbars/ToolbarFrame.vue";
 import Breadcrumb from "../components/toolbars/Breadcrumb.vue";
-import ViewTypeButtons from "../components/toolbars/ViewTypeButtons.vue";
 import { HistoryWriter } from "../store/history";
 
 export default defineComponent({
@@ -44,9 +39,7 @@ export default defineComponent({
   components: {
     LoadingPage,
     NoteArticleView,
-    ToolbarFrame,
     Breadcrumb,
-    ViewTypeButtons,
   },
   data() {
     return {

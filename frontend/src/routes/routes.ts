@@ -48,7 +48,7 @@ const noteAndLinkRoutes = [
     name: "noteShowArticle",
     component: NoteShowArticlePage,
     props: (route: RouteLocation) => ({ noteId: Number(route.params.noteId) }),
-    meta: { viewType: "mindmap" },
+    meta: { useControlCenter: true, viewType: "article" },
   },
 
   {
