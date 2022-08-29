@@ -1,5 +1,4 @@
 import { HistoryWriter } from "../store/history";
-import ManagedApi from "./ManagedApi";
 import storedApiCollection from "./storedApiCollection";
 
 export default function useStoredLoadingApi({
@@ -7,7 +6,7 @@ export default function useStoredLoadingApi({
 } = {}) {
   return {
     get storedApi(): ReturnType<typeof storedApiCollection> {
-      return storedApiCollection(undoHistory, new ManagedApi(undefined));
+      return storedApiCollection(undoHistory);
     },
   };
 }

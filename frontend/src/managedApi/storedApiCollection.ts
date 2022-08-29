@@ -1,11 +1,8 @@
 import ManagedApi from "./ManagedApi";
 import { HistoryWriter } from "../store/history";
 
-const storedApiCollection = (
-  undoHistory: HistoryWriter | undefined,
-  managedApi: ManagedApi
-) => {
-  return new StoredApiCollection(undoHistory, managedApi);
+const storedApiCollection = (undoHistory: HistoryWriter | undefined) => {
+  return new StoredApiCollection(undoHistory, new ManagedApi(undefined));
 };
 
 class StoredApiCollection {
