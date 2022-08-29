@@ -9,7 +9,7 @@
       </template>
       <template #dialog_body="{ doneHandler }">
         <LinkNobDialog
-          v-bind="{ link, inverseIcon, colors, historyWriter }"
+          v-bind="{ link, inverseIcon, colors, storageAccessor }"
           @done="
             doneHandler($event);
             $emit('linkUpdated', $event);
@@ -29,7 +29,7 @@ import { defineComponent, PropType } from "vue";
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue";
 import PopupButton from "../commons/Popups/PopupButton.vue";
 import LinkNobDialog from "./LinkNobDialog.vue";
-import { HistoryWriter } from "../../store/history";
+import { StorageAccessor } from "../../store/history";
 
 export default defineComponent({
   props: {
@@ -37,8 +37,8 @@ export default defineComponent({
       type: Object as PropType<Generated.Link>,
       required: true,
     },
-    historyWriter: {
-      type: Object as PropType<HistoryWriter>,
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
       required: true,
     },
     inverseIcon: Boolean,

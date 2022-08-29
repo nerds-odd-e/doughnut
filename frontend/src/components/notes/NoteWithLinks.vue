@@ -5,11 +5,11 @@
   >
     <NoteFrameOfLinks
       v-if="links && links.links"
-      v-bind="{ links, historyWriter }"
+      v-bind="{ links, storageAccessor }"
       @note-realm-updated="$emit('noteRealmUpdated', $event)"
     >
       <NoteContent
-        v-bind="{ note, historyWriter }"
+        v-bind="{ note, storageAccessor }"
         @note-realm-updated="$emit('noteRealmUpdated', $event)"
       />
     </NoteFrameOfLinks>
@@ -24,7 +24,7 @@ import { defineComponent, PropType } from "vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteShell from "./NoteShell.vue";
 import NoteContent from "./NoteContent.vue";
-import { HistoryWriter } from "../../store/history";
+import { StorageAccessor } from "../../store/history";
 
 export default defineComponent({
   props: {
@@ -32,8 +32,8 @@ export default defineComponent({
     links: {
       type: Object as PropType<Generated.LinksOfANote>,
     },
-    historyWriter: {
-      type: Object as PropType<HistoryWriter>,
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
       required: true,
     },
   },

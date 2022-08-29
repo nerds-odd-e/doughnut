@@ -36,7 +36,7 @@
           mindmapSector,
           mindmap,
           highlightNoteId,
-          historyWriter,
+          storageAccessor,
         }"
         @note-realm-updated="$emit('noteRealmUpdated', $event)"
         @highlight="$emit('selectNote', $event)"
@@ -56,7 +56,7 @@ import MindmapSector from "../../../models/MindmapSector";
 import Mindmap from "../../../models/Mindmap";
 import MindmapOffset from "../../../models/MindmapOffset";
 import { NoteRealmsReader } from "../../../store/NoteRealmCache";
-import { HistoryWriter } from "../../../store/history";
+import { StorageAccessor } from "../../../store/history";
 
 export default defineComponent({
   name: "NoteMindmap",
@@ -68,8 +68,8 @@ export default defineComponent({
       required: true,
     },
     offset: { type: Object as PropType<MindmapOffset>, required: true },
-    historyWriter: {
-      type: Object as PropType<HistoryWriter>,
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
       required: true,
     },
   },

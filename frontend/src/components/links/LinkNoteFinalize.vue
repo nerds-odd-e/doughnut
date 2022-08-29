@@ -44,7 +44,7 @@ import CheckInput from "../form/CheckInput.vue";
 import RadioButtons from "../form/RadioButtons.vue";
 import SvgGoBack from "../svgs/SvgGoBack.vue";
 import usePopups from "../commons/Popups/usePopup";
-import { HistoryWriter } from "../../store/history";
+import { StorageAccessor } from "../../store/history";
 
 export default defineComponent({
   setup() {
@@ -56,8 +56,8 @@ export default defineComponent({
   props: {
     note: { type: Object as PropType<Generated.Note>, required: true },
     targetNote: { type: Object as PropType<Generated.Note>, required: true },
-    historyWriter: {
-      type: Object as PropType<HistoryWriter>,
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
       required: true,
     },
   },
@@ -88,7 +88,7 @@ export default defineComponent({
           return;
         }
       }
-      this.historyWriter
+      this.storageAccessor
         .api()
         .createLink(this.note.id, this.targetNote.id, this.formData)
         .then((r) => this.$emit("success", r))

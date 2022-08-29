@@ -41,7 +41,7 @@ import NoteFormTitleOnly from "./NoteFormTitleOnly.vue";
 import SearchResults from "../search/SearchResults.vue";
 import LinkTypeSelectCompact from "../links/LinkTypeSelectCompact.vue";
 import WikidataSearchByLabel from "./WikidataSearchByLabel.vue";
-import { HistoryWriter } from "../../store/history";
+import { StorageAccessor } from "../../store/history";
 
 export default defineComponent({
   components: {
@@ -53,8 +53,8 @@ export default defineComponent({
   },
   props: {
     parentId: { type: Number, required: true },
-    historyWriter: {
-      type: Object as PropType<HistoryWriter>,
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
       required: true,
     },
   },
@@ -77,7 +77,7 @@ export default defineComponent({
     processForm() {
       this.noteFormErrors.wikiDataId = undefined;
       this.noteFormErrors.textContent = {};
-      this.historyWriter
+      this.storageAccessor
         .api()
         .createNote(this.parentId, this.creationData)
         .then((res) => {

@@ -95,7 +95,7 @@ export default defineComponent({
           <NoteControlCenter
             class="header"
             :selected-note-id="Number($route.params.noteId)"
-            v-bind="{ viewType, historyWriter: histories }"
+            v-bind="{ viewType, storageAccessor: histories }"
             @note-realm-updated="onUpdateNoteRealm($event)"
             @note-deleted="onNoteDeleted($event)"
           />

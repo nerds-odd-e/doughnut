@@ -1,7 +1,7 @@
 <template>
   <ContainerPage v-bind="{ loading, contentExists: true }">
     <ShowReviewPoint
-      v-bind="{ reviewPoint, expandInfo: true, historyWriter }"
+      v-bind="{ reviewPoint, expandInfo: true, storageAccessor }"
       @level-changed="$emit('reloadNeeded', $event)"
       @link-deleted="$emit('reloadNeeded', $event)"
     />
@@ -19,7 +19,7 @@ import InitialReviewButtons from "./InitialReviewButtons.vue";
 import ContainerPage from "../../pages/commons/ContainerPage.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopup";
-import { HistoryWriter } from "../../store/history";
+import { StorageAccessor } from "../../store/history";
 
 export default defineComponent({
   name: "InitialReview",
@@ -31,8 +31,8 @@ export default defineComponent({
       type: Object as PropType<Generated.ReviewPoint>,
       required: true,
     },
-    historyWriter: {
-      type: Object as PropType<HistoryWriter>,
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
       required: true,
     },
   },

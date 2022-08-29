@@ -6,7 +6,7 @@
         updatedNoteRealm,
         updatedAt,
         expandChildren: true,
-        historyWriter,
+        storageAccessor,
       }"
     />
   </div>
@@ -15,15 +15,15 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import NoteCardsView from "../components/notes/views/NoteCardsView.vue";
-import { HistoryWriter } from "../store/history";
+import { StorageAccessor } from "../store/history";
 
 export default defineComponent({
   props: {
     noteId: { type: Number, required: true },
     updatedNoteRealm: { type: Object as PropType<Generated.NoteRealm> },
     updatedAt: { type: Date },
-    historyWriter: {
-      type: Object as PropType<HistoryWriter>,
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
       required: true,
     },
   },

@@ -8,7 +8,7 @@
           </template>
           <template #dialog_body="{ doneHandler }">
             <LinkNoteDialog
-              v-bind="{ historyWriter }"
+              v-bind="{ storageAccessor }"
               @done="doneHandler($event)"
             />
           </template>
@@ -17,7 +17,7 @@
       <template v-if="selectedNoteId">
         <ViewTypeButtons v-bind="{ viewType, noteId: selectedNoteId }" />
         <NoteNewButton
-          v-bind="{ parentId: selectedNoteId, historyWriter }"
+          v-bind="{ parentId: selectedNoteId, storageAccessor }"
           button-title="Add Child Note"
           @note-realm-updated="$emit('noteRealmUpdated', $event)"
         >
@@ -32,7 +32,7 @@
             <NoteDialogFrame :note-id="selectedNoteId">
               <template #default="{ note }">
                 <NoteEditDialog
-                  v-bind="{ note, historyWriter }"
+                  v-bind="{ note, storageAccessor }"
                   @done="
                     doneHandler($event);
                     $emit('noteRealmUpdated');
@@ -70,7 +70,7 @@
             <NoteDialogFrame :note-id="selectedNoteId">
               <template #default="{ note }">
                 <LinkNoteDialog
-                  v-bind="{ note, historyWriter }"
+                  v-bind="{ note, storageAccessor }"
                   @done="
                     doneHandler($event);
                     $emit('noteRealmUpdated', $event);
@@ -95,7 +95,7 @@
           <div class="dropdown-menu dropdown-menu-end">
             <NoteDeleteButton
               class="dropdown-item"
-              v-bind="{ noteId: selectedNoteId, historyWriter }"
+              v-bind="{ noteId: selectedNoteId, storageAccessor }"
               @note-deleted="$emit('noteDeleted', $event)"
             />
           </div>
@@ -103,7 +103,7 @@
       </template>
 
       <NoteUndoButton
-        v-bind="{ historyWriter }"
+        v-bind="{ storageAccessor }"
         @note-realm-updated="$emit('noteRealmUpdated', $event)"
       />
     </div>
@@ -127,15 +127,15 @@ import ViewTypeButtons from "./ViewTypeButtons.vue";
 import { ViewTypeName } from "../../models/viewTypes";
 import SvgCog from "../svgs/SvgCog.vue";
 import NoteDeleteButton from "./NoteDeleteButton.vue";
-import { HistoryWriter } from "../../store/history";
+import { StorageAccessor } from "../../store/history";
 import PopupButton from "../commons/Popups/PopupButton.vue";
 
 export default defineComponent({
   props: {
     selectedNoteId: Number,
     viewType: { type: String as PropType<ViewTypeName> },
-    historyWriter: {
-      type: Object as PropType<HistoryWriter>,
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
       required: true,
     },
   },

@@ -16,7 +16,7 @@
         <QuizQuestion
           v-bind="{
             quizQuestion: repetition.quizQuestion,
-            historyWriter,
+            storageAccessor,
           }"
           @answered="onAnswered($event)"
           @reload-needed="fetchData"
@@ -38,7 +38,7 @@ import QuizQuestion from "../components/review/QuizQuestion.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
-import { HistoryWriter } from "../store/history";
+import { StorageAccessor } from "../store/history";
 
 export default defineComponent({
   setup() {
@@ -47,8 +47,8 @@ export default defineComponent({
   name: "RepeatPage",
   props: {
     minimized: Boolean,
-    historyWriter: {
-      type: Object as PropType<HistoryWriter>,
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
       required: true,
     },
   },

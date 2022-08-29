@@ -9,7 +9,7 @@
         noteId,
         expandChildren: false,
         expandInfo,
-        historyWriter,
+        storageAccessor,
       }"
       :key="noteId"
       @level-changed="$emit('levelChanged', $event)"
@@ -20,7 +20,7 @@
   <div v-if="link">
     <div class="jumbotron py-4 mb-2">
       <LinkShow
-        v-bind="{ link, historyWriter }"
+        v-bind="{ link, storageAccessor }"
         @link-updated="$emit('noteRealmUpdated', $event)"
         @link-deleted="$emit('linkDeleted', $event)"
       />
@@ -32,7 +32,7 @@
 import { defineComponent, PropType } from "vue";
 import LinkShow from "../links/LinkShow.vue";
 import NoteCardsView from "../notes/views/NoteCardsView.vue";
-import { HistoryWriter } from "../../store/history";
+import { StorageAccessor } from "../../store/history";
 
 export default defineComponent({
   props: {
@@ -41,8 +41,8 @@ export default defineComponent({
       required: true,
     },
     expandInfo: { type: Boolean, default: false },
-    historyWriter: {
-      type: Object as PropType<HistoryWriter>,
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
       required: true,
     },
   },

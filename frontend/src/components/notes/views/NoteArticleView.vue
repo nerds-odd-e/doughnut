@@ -1,13 +1,13 @@
 <template>
   <template v-if="noteRealm">
     <NoteWithLinks
-      v-bind="{ note: noteRealm.note, links: noteRealm.links, historyWriter }"
+      v-bind="{ note: noteRealm.note, links: noteRealm.links, storageAccessor }"
       @note-realm-updated="$emit('noteRealmUpdated', $event)"
     />
     <div class="note-list">
       <NoteArticleView
         v-for="child in children"
-        v-bind="{ noteId: child.id, noteRealms, historyWriter }"
+        v-bind="{ noteId: child.id, noteRealms, storageAccessor }"
         :key="child.id"
         @note-realm-updated="$emit('noteRealmUpdated', $event)"
       />
@@ -19,7 +19,7 @@
 import { defineComponent, PropType } from "vue";
 import NoteWithLinks from "../NoteWithLinks.vue";
 import { NoteRealmsReader } from "../../../store/NoteRealmCache";
-import { HistoryWriter } from "../../../store/history";
+import { StorageAccessor } from "../../../store/history";
 
 export default defineComponent({
   props: {
@@ -28,8 +28,8 @@ export default defineComponent({
       type: Object as PropType<NoteRealmsReader>,
       required: true,
     },
-    historyWriter: {
-      type: Object as PropType<HistoryWriter>,
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
       required: true,
     },
   },

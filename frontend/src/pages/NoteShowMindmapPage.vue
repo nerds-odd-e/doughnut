@@ -8,14 +8,14 @@
             selectedNoteId,
             selectedNotePosition,
             viewType: 'mindmap',
-            historyWriter,
+            storageAccessor,
           }"
           @note-realm-updated="noteRealmUpdated($event)"
         />
       </div>
       <div class="content" v-if="noteRealm && noteRealmCache">
         <NoteMindmapView
-          v-bind="{ noteId, noteRealms: noteRealmCache, historyWriter }"
+          v-bind="{ noteId, noteRealms: noteRealmCache, storageAccessor }"
           :highlight-note-id="selectedNoteId"
           @select-note="highlight($event)"
           @note-realm-updated="noteRealmUpdated($event)"
@@ -32,7 +32,7 @@ import NoteMindmapView from "../components/notes/views/NoteMindmapView.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
 import LoadingPage from "./commons/LoadingPage.vue";
 import NoteRealmCache from "../store/NoteRealmCache";
-import { HistoryWriter } from "../store/history";
+import { StorageAccessor } from "../store/history";
 
 export default defineComponent({
   setup() {
@@ -40,8 +40,8 @@ export default defineComponent({
   },
   props: {
     noteId: { type: Number, required: true },
-    historyWriter: {
-      type: Object as PropType<HistoryWriter>,
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
       required: true,
     },
   },

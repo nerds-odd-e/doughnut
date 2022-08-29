@@ -8,7 +8,7 @@
 import { defineComponent, PropType } from "vue";
 import SvgRemove from "../svgs/SvgRemove.vue";
 import usePopups from "../commons/Popups/usePopup";
-import { HistoryWriter } from "../../store/history";
+import { StorageAccessor } from "../../store/history";
 
 export default defineComponent({
   setup() {
@@ -18,8 +18,8 @@ export default defineComponent({
   },
   props: {
     noteId: { type: Number, required: true },
-    historyWriter: {
-      type: Object as PropType<HistoryWriter>,
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
       required: true,
     },
   },
@@ -30,7 +30,9 @@ export default defineComponent({
   methods: {
     async deleteNote() {
       if (await this.popups.confirm(`Confirm to delete this note?`)) {
-        const parentId = await this.historyWriter.api().deleteNote(this.noteId);
+        const parentId = await this.storageAccessor
+          .api()
+          .deleteNote(this.noteId);
         this.$emit("noteDeleted", parentId);
       }
     },

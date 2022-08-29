@@ -5,7 +5,7 @@
     </div>
     <div class="col-12 col-md-4 text-center">
       <LinkNob
-        v-bind="{ link, historyWriter }"
+        v-bind="{ link, storageAccessor }"
         @link-deleted="$emit('linkDeleted', $event)"
         @link-updated="$emit('linkUpdated', $event)"
       />
@@ -21,7 +21,7 @@
 import { defineComponent, PropType } from "vue";
 import LinkNoteShow from "./LinkNoteShow.vue";
 import LinkNob from "./LinkNob.vue";
-import { HistoryWriter } from "../../store/history";
+import { StorageAccessor } from "../../store/history";
 
 export default defineComponent({
   props: {
@@ -29,8 +29,8 @@ export default defineComponent({
       type: Object as PropType<Generated.Link>,
       required: true,
     },
-    historyWriter: {
-      type: Object as PropType<HistoryWriter>,
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
       required: true,
     },
   },

@@ -35,7 +35,7 @@ import { defineComponent, PropType } from "vue";
 import LinkTypeSelect from "./LinkTypeSelect.vue";
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";
 import usePopups from "../commons/Popups/usePopup";
-import { HistoryWriter } from "../../store/history";
+import { StorageAccessor } from "../../store/history";
 
 export default defineComponent({
   setup() {
@@ -48,8 +48,8 @@ export default defineComponent({
       type: Object as PropType<Generated.Link>,
       required: true,
     },
-    historyWriter: {
-      type: Object as PropType<HistoryWriter>,
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
       required: true,
     },
     inverseIcon: Boolean,
@@ -71,7 +71,7 @@ export default defineComponent({
 
   methods: {
     updateLink() {
-      this.historyWriter
+      this.storageAccessor
         .api()
         .updateLink(this.link.id, this.formData)
         .then(() => {
@@ -87,7 +87,7 @@ export default defineComponent({
         this.$emit("done", null);
         return;
       }
-      await this.historyWriter.api().deleteLink(this.link.id);
+      await this.storageAccessor.api().deleteLink(this.link.id);
       this.$emit("done");
     },
   },

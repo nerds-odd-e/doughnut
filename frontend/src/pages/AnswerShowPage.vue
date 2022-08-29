@@ -12,10 +12,10 @@
       />
       <QuizQuestion
         v-if="showQuiz === 'quiz'"
-        v-bind="{ quizQuestion: answerResult?.quizQuestion, historyWriter }"
+        v-bind="{ quizQuestion: answerResult?.quizQuestion, storageAccessor }"
       />
       <div v-else-if="reviewPoint">
-        <ShowReviewPoint v-bind="{ reviewPoint, historyWriter }" />
+        <ShowReviewPoint v-bind="{ reviewPoint, storageAccessor }" />
         <NoteInfoReviewPoint
           v-bind="{ reviewPoint }"
           @self-evaluated="onSelfEvaluated($event)"
@@ -34,7 +34,7 @@ import AnswerResult from "../components/review/AnswerResult.vue";
 import QuizQuestion from "../components/review/QuizQuestion.vue";
 import RadioButtons from "../components/form/RadioButtons.vue";
 import ShowReviewPoint from "../components/review/ShowReviewPoint.vue";
-import { HistoryWriter } from "../store/history";
+import { StorageAccessor } from "../store/history";
 
 export default defineComponent({
   setup() {
@@ -42,8 +42,8 @@ export default defineComponent({
   },
   props: {
     answerId: { type: Number, required: true },
-    historyWriter: {
-      type: Object as PropType<HistoryWriter>,
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
       required: true,
     },
   },

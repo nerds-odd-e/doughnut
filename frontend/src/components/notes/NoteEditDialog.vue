@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { HistoryWriter } from "../../store/history";
+import { StorageAccessor } from "../../store/history";
 import NoteFormBody from "./NoteFormBody.vue";
 
 export default defineComponent({
@@ -21,8 +21,8 @@ export default defineComponent({
   },
   props: {
     note: { type: Object as PropType<Generated.Note>, required: true },
-    historyWriter: {
-      type: Object as PropType<HistoryWriter>,
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
       required: true,
     },
   },
@@ -38,7 +38,7 @@ export default defineComponent({
 
   methods: {
     processForm() {
-      this.historyWriter
+      this.storageAccessor
         .api()
         .updateNote(this.note.id, this.formData)
         .then(() => {

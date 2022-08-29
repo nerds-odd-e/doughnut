@@ -8,7 +8,7 @@
     @click="$emit('highlight', note.id)"
   >
     <NoteContent
-      v-bind="{ note, size, historyWriter }"
+      v-bind="{ note, size, storageAccessor }"
       :title-as-link="true"
       @note-realm-updated="$emit('noteRealmUpdated', $event)"
     />
@@ -21,7 +21,7 @@ import NoteShell from "../NoteShell.vue";
 import NoteContent from "../NoteContent.vue";
 import MindmapSector from "../../../models/MindmapSector";
 import Mindmap from "../../../models/Mindmap";
-import { HistoryWriter } from "../../../store/history";
+import { StorageAccessor } from "../../../store/history";
 
 export default defineComponent({
   props: {
@@ -29,8 +29,8 @@ export default defineComponent({
     mindmapSector: { type: MindmapSector, required: true },
     mindmap: { type: Object as PropType<Mindmap>, required: true },
     highlightNoteId: Number,
-    historyWriter: {
-      type: Object as PropType<HistoryWriter>,
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
       required: true,
     },
   },

@@ -5,7 +5,7 @@
     </template>
     <template #dialog_body="{ doneHandler }">
       <NoteNewDialog
-        v-bind="{ parentId, historyWriter }"
+        v-bind="{ parentId, storageAccessor }"
         @done="
           doneHandler($event);
           $emit('noteRealmUpdated', $event);
@@ -19,14 +19,14 @@
 import { defineComponent, PropType } from "vue";
 import NoteNewDialog from "../notes/NoteNewDialog.vue";
 import PopupButton from "../commons/Popups/PopupButton.vue";
-import { HistoryWriter } from "../../store/history";
+import { StorageAccessor } from "../../store/history";
 
 export default defineComponent({
   props: {
     parentId: { type: Number, required: true },
     buttonTitle: { type: String, required: true },
-    historyWriter: {
-      type: Object as PropType<HistoryWriter>,
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
       required: true,
     },
   },

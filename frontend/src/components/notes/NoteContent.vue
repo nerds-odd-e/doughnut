@@ -69,15 +69,15 @@ import SvgPictureIndicator from "../svgs/SvgPictureIndicator.vue";
 import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
 import EditableText from "../form/EditableText.vue";
 import NoteWikidataAssociation from "./NoteWikidataAssociation.vue";
-import { HistoryWriter } from "../../store/history";
+import { StorageAccessor } from "../../store/history";
 
 export default defineComponent({
   props: {
     note: { type: Object as PropType<Generated.Note>, required: true },
     size: { type: String, default: "large" },
     titleAsLink: Boolean,
-    historyWriter: {
-      type: Object as PropType<HistoryWriter>,
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
       required: true,
     },
   },
@@ -99,7 +99,7 @@ export default defineComponent({
   },
   methods: {
     onBlurTextField() {
-      this.historyWriter
+      this.storageAccessor
         .api()
         .updateTextContent(
           this.note.id,

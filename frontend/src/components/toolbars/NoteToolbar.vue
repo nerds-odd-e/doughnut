@@ -1,7 +1,7 @@
 <template>
   <Breadcrumb v-bind="selectedNotePosition">
     <NoteNewButton
-      v-bind="{ parentId, historyWriter }"
+      v-bind="{ parentId, storageAccessor }"
       button-title="Add Sibling Note"
       v-if="parentId"
       @note-realm-updated="$emit('noteRealmUpdated', $event)"
@@ -17,7 +17,7 @@ import Breadcrumb from "./Breadcrumb.vue";
 import { ViewTypeName } from "../../models/viewTypes";
 import SvgAddSibling from "../svgs/SvgAddSibling.vue";
 import NoteNewButton from "./NoteNewButton.vue";
-import { HistoryWriter } from "../../store/history";
+import { StorageAccessor } from "../../store/history";
 
 export default defineComponent({
   props: {
@@ -27,8 +27,8 @@ export default defineComponent({
       required: true,
     },
     viewType: { type: String as PropType<ViewTypeName>, required: true },
-    historyWriter: {
-      type: Object as PropType<HistoryWriter>,
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
       required: true,
     },
   },

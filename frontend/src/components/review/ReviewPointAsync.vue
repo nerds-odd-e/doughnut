@@ -2,7 +2,7 @@
   <LoadingPage v-bind="{ loading, contentExists: !!reviewPoint }">
     <ShowReviewPoint
       v-if="reviewPoint"
-      v-bind="{ reviewPoint, historyWriter }"
+      v-bind="{ reviewPoint, storageAccessor }"
       :key="reviewPointId"
       @self-evaluated="onSelfEvaluted($event)"
     />
@@ -14,7 +14,7 @@ import { defineComponent, PropType } from "vue";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
 import ShowReviewPoint from "./ShowReviewPoint.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
-import { HistoryWriter } from "../../store/history";
+import { StorageAccessor } from "../../store/history";
 
 export default defineComponent({
   setup() {
@@ -22,8 +22,8 @@ export default defineComponent({
   },
   props: {
     reviewPointId: { type: Number, required: true },
-    historyWriter: {
-      type: Object as PropType<HistoryWriter>,
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
       required: true,
     },
   },

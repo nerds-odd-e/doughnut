@@ -5,7 +5,9 @@
     v-bind="quizQuestion?.pictureWithMask"
     :opacity="1"
   />
-  <NoteFrameOfLinks v-bind="{ links: quizQuestion?.hintLinks, historyWriter }">
+  <NoteFrameOfLinks
+    v-bind="{ links: quizQuestion?.hintLinks, storageAccessor }"
+  >
     <div class="quiz-instruction">
       <pre
         style="white-space: pre-wrap"
@@ -22,7 +24,7 @@
     <ReviewPointAsync
       v-bind="{
         reviewPointId: quizQuestion?.quizQuestion.reviewPoint,
-        historyWriter,
+        storageAccessor,
       }"
     />
     <SelfEvaluateButtons
@@ -77,7 +79,7 @@ import ReviewPointAsync from "./ReviewPointAsync.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopup";
 import SelfEvaluateButtons from "./SelfEvaluateButtons.vue";
-import { HistoryWriter } from "../../store/history";
+import { StorageAccessor } from "../../store/history";
 
 export default defineComponent({
   setup() {
@@ -88,8 +90,8 @@ export default defineComponent({
       type: Object as PropType<Generated.QuizQuestionViewedByUser | undefined>,
       required: true,
     },
-    historyWriter: {
-      type: Object as PropType<HistoryWriter>,
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
       required: true,
     },
   },

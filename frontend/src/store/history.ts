@@ -214,5 +214,5 @@ function createNoteStorage(
 }
 
 export default createNoteStorage;
-export type { StorageAccessor as HistoryWriter };
+export type { StorageAccessor };
 export { NoteEditingHistory };

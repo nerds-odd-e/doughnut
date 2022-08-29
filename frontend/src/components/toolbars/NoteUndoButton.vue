@@ -12,7 +12,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import SvgUndo from "../svgs/SvgUndo.vue";
-import { HistoryWriter } from "../../store/history";
+import { StorageAccessor } from "../../store/history";
 
 export default defineComponent({
   name: "NoteUndoButton",
@@ -21,15 +21,15 @@ export default defineComponent({
   },
   props: {
     noteId: Number,
-    historyWriter: {
-      type: Object as PropType<HistoryWriter>,
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
       required: true,
     },
   },
   emits: ["noteRealmUpdated"],
   computed: {
     history() {
-      return this.historyWriter.peekUndo();
+      return this.storageAccessor.peekUndo();
     },
     undoTitle() {
       if (this.history) {
@@ -40,7 +40,7 @@ export default defineComponent({
   },
   methods: {
     async undoDelete() {
-      const noteRealm = await this.historyWriter.api().undo();
+      const noteRealm = await this.storageAccessor.api().undo();
       this.$emit("noteRealmUpdated", noteRealm);
     },
   },

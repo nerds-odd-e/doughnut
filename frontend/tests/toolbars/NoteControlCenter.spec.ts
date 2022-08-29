@@ -7,14 +7,14 @@ import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 import createNoteStorage, {
   NoteEditingHistory,
-  HistoryWriter,
+  StorageAccessor,
 } from "../../src/store/history";
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("Note Control Center", () => {
   let noteEditingHistory: NoteEditingHistory;
-  let histories: HistoryWriter;
+  let histories: StorageAccessor;
 
   beforeEach(() => {
     noteEditingHistory = new NoteEditingHistory();
@@ -24,7 +24,7 @@ describe("Note Control Center", () => {
   it("fetch API to be called ONCE", async () => {
     helper
       .component(NoteControlCenter)
-      .withProps({ historyWriter: histories })
+      .withProps({ storageAccessor: histories })
       .render();
 
     expect(await screen.findByTitle("undo")).toBeDisabled();
@@ -35,7 +35,7 @@ describe("Note Control Center", () => {
     noteEditingHistory.deleteNote(notebook.headNote.id);
     helper
       .component(NoteControlCenter)
-      .withProps({ historyWriter: histories })
+      .withProps({ storageAccessor: histories })
       .render();
 
     expect(await screen.findByTitle("undo delete note")).not.toBeDisabled();
