@@ -2,13 +2,14 @@
  * @jest-environment jsdom
  */
 import LinkNoteDialog from "@/components/links/LinkNoteDialog.vue";
-import { render, screen } from "@testing-library/vue";
+import { screen } from "@testing-library/vue";
 import { flushPromises } from "@vue/test-utils";
 import MakeMe from "../fixtures/makeMe";
+import helper from "../helpers";
 
 describe("LinkNoteDialog", () => {
   it("Search at the top level with no note", async () => {
-    render(LinkNoteDialog, { props: { note: null } });
+    helper.component(LinkNoteDialog).withHistoryProps({ note: null }).render();
     await screen.findByText("Searching");
     expect(
       await screen.findByLabelText("All My Notebooks And Subscriptions")
@@ -17,13 +18,13 @@ describe("LinkNoteDialog", () => {
 
   it("Search from a note", async () => {
     const note = MakeMe.aNote.please();
-    render(LinkNoteDialog, { props: { note } });
+    helper.component(LinkNoteDialog).withHistoryProps({ note }).render();
     await screen.findByText(`Link to`);
   });
 
   it("toggle search settings", async () => {
     const note = MakeMe.aNote.please();
-    render(LinkNoteDialog, { props: { note } });
+    helper.component(LinkNoteDialog).withHistoryProps({ note }).render();
     (await screen.findByLabelText("All My Circles")).click();
     expect(
       await screen.findByLabelText("All My Notebooks And Subscriptions")

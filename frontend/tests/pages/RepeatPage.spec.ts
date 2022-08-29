@@ -14,7 +14,10 @@ helper.resetWithApiMock(beforeEach, afterEach);
 
 beforeEach(() => {
   mockRouterPush = jest.fn();
-  renderer = helper.component(RepeatPage).withMockRouterPush(mockRouterPush);
+  renderer = helper
+    .component(RepeatPage)
+    .withMockRouterPush(mockRouterPush)
+    .withHistoryProps({});
 });
 
 describe("repeat page", () => {

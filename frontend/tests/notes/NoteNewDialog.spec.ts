@@ -24,7 +24,7 @@ describe("adding new note", () => {
     helper.apiMock.expectingPost(`/api/notes/search`).andReturnOnce([note]);
     const wrapper = helper
       .component(NoteNewDialog)
-      .withProps({ parentId: 123 })
+      .withHistoryProps({ parentId: 123 })
       .mount();
     await wrapper.find("input#note-title").setValue("myth");
     jest.runAllTimers();
@@ -41,7 +41,7 @@ describe("adding new note", () => {
       .andReturnOnce([searchResult]);
     const wrapper = helper
       .component(NoteNewDialog)
-      .withProps({ parentId: 123 })
+      .withHistoryProps({ parentId: 123 })
       .mount();
     await wrapper.find("input#note-title").setValue(searchInput);
     await wrapper.find("button#search-wikidata").trigger("click");

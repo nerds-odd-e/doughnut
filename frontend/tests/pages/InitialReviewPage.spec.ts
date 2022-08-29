@@ -17,6 +17,7 @@ beforeEach(() => {
   mockRouterPush = jest.fn();
   renderer = helper
     .component(InitialReviewPage)
+    .withHistoryProps({})
     .withMockRouterPush(mockRouterPush);
 });
 
@@ -72,7 +73,7 @@ describe("repeat page", () => {
       .expectingGet("/api/reviews/initial")
       .andReturnOnce([reviewPoint]);
     const wrapper = renderer
-      .withProps({ minimized: true })
+      .withHistoryProps({ minimized: true })
       .currentRoute({ name: "initial" })
       .mount();
     await flushPromises();
@@ -90,7 +91,7 @@ describe("repeat page", () => {
       .expectingGet("/api/reviews/initial")
       .andReturnOnce([reviewPoint]);
     const wrapper = renderer
-      .withProps({ minimized: true })
+      .withHistoryProps({ minimized: true })
       .currentRoute({ name: "initial" })
       .mount();
     await flushPromises();

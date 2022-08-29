@@ -23,7 +23,7 @@ describe("all in note show page", () => {
         .andReturnOnce({ notePosition, noteRealm });
       helper
         .component(NoteShowPage)
-        .withProps({ noteId: noteRealm.id })
+        .withHistoryProps({ noteId: noteRealm.id })
         .render();
       await screen.findByText(noteRealm.note.title);
     });
@@ -34,7 +34,7 @@ describe("all in note show page", () => {
         .andReturnOnce({ notePosition, notes: [noteRealm] });
       helper
         .component(NoteShowMindmapPage)
-        .withProps({ noteId: noteRealm.id })
+        .withHistoryProps({ noteId: noteRealm.id })
         .render();
       helper.apiMock.verifyCall(`/api/notes/${noteRealm.id}/overview`);
       await screen.findByText(noteRealm.note.title);

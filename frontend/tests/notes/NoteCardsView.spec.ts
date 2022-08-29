@@ -17,7 +17,7 @@ describe("note wth child cards", () => {
       .andReturnOnce({ noteRealm: noteParent });
     helper
       .component(NoteCardsView)
-      .withProps({
+      .withHistoryProps({
         noteId: noteParent.id,
         expandChildren: true,
       })

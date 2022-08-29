@@ -8,8 +8,6 @@ import helper from "../helpers";
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
-const historyWriter = createHistory();
-
 describe("new/updated pink banner", () => {
   beforeAll(() => {
     Date.now = jest.fn(() => new Date(Date.UTC(2017, 1, 14)).valueOf());
@@ -27,7 +25,7 @@ describe("new/updated pink banner", () => {
 
       const wrapper = helper
         .component(NoteWithLinks)
-        .withProps({ note: note.note, links: note.links, historyWriter })
+        .withHistoryProps({ note: note.note, links: note.links })
         .mount();
 
       expect(wrapper.find(".note-body").element).toHaveStyle(
@@ -43,10 +41,9 @@ describe("in place edit on title", () => {
 
     const wrapper = helper
       .component(NoteWithLinks)
-      .withProps({
+      .withHistoryProps({
         note: noteParent.note,
         links: noteParent.links,
-        historyWriter,
       })
       .mount();
 
@@ -63,10 +60,9 @@ describe("in place edit on title", () => {
 
     const wrapper = helper
       .component(NoteWithLinks)
-      .withProps({
+      .withHistoryProps({
         note: noteParentSphere.note,
         links: noteParentSphere.links,
-        historyWriter,
       })
       .mount();
 
@@ -110,10 +106,9 @@ describe("note associated with wikidata", () => {
 
     const wrapper = helper
       .component(NoteWithLinks)
-      .withProps({
+      .withHistoryProps({
         note: noteRealm.note,
         links: noteRealm.links,
-        historyWriter,
       })
       .mount();
 

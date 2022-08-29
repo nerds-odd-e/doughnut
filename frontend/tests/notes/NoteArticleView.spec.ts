@@ -23,7 +23,7 @@ describe("note overview", () => {
     const note = makeMe.aNoteRealm.title("single note").please();
     helper
       .component(NoteArticleView)
-      .withProps({
+      .withHistoryProps({
         noteId: note.id,
         noteRealms: toNoteRealmsCache([note]),
       })
@@ -39,7 +39,7 @@ describe("note overview", () => {
       .please();
     helper
       .component(NoteArticleView)
-      .withProps({
+      .withHistoryProps({
         noteId: note.id,
         noteRealms: toNoteRealmsCache([note]),
       })
@@ -55,7 +55,7 @@ describe("note overview", () => {
       .please();
     helper
       .component(NoteArticleView)
-      .withProps({
+      .withHistoryProps({
         noteId: noteParent.id,
         noteRealms: toNoteRealmsCache([noteParent, noteChild]),
       })
@@ -78,7 +78,7 @@ describe("note overview", () => {
       .please();
     helper
       .component(NoteArticleView)
-      .withProps({
+      .withHistoryProps({
         noteId: noteParent.id,
         noteRealms: toNoteRealmsCache([noteParent, noteChild, noteGrandchild]),
       })

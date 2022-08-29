@@ -2,7 +2,6 @@
  * @jest-environment jsdom
  */
 import LinkNoteFinalize from "@/components/links/LinkNoteFinalize.vue";
-import createHistory from "../../src/store/history";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
@@ -15,10 +14,9 @@ describe("LinkNoteFinalize", () => {
     const note = makeMe.aNoteRealm.please();
     const wrapper = helper
       .component(LinkNoteFinalize)
-      .withProps({
+      .withHistoryProps({
         note,
         targetNote: note,
-        historyWriter: createHistory(),
       })
       .mount();
     await wrapper.find(".go-back-button").trigger("click");
