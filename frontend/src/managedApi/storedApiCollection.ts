@@ -2,7 +2,7 @@ import ManagedApi from "./ManagedApi";
 import { HistoryWriter } from "../store/history";
 
 const storedApiCollection = (undoHistory: HistoryWriter | undefined) => {
-  return new StoredApiCollection(undoHistory, new ManagedApi(undefined));
+  return new StoredApiCollection(undoHistory);
 };
 
 class StoredApiCollection {
@@ -10,8 +10,8 @@ class StoredApiCollection {
 
   managedApi: ManagedApi;
 
-  constructor(undoHistory: HistoryWriter | undefined, managedApi: ManagedApi) {
-    this.managedApi = managedApi;
+  constructor(undoHistory: HistoryWriter | undefined) {
+    this.managedApi = new ManagedApi(undefined);
     this.undoHistory = undoHistory;
   }
 
