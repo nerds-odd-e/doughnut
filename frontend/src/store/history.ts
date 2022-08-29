@@ -19,7 +19,42 @@ interface HistoryState {
   deleteNote(noteId: Doughnut.ID): void;
 }
 
-class StoredApiCollection {
+interface StoredApi {
+  createNote(
+    parentId: Doughnut.ID,
+    data: Generated.NoteCreation
+  ): Promise<Generated.NoteRealmWithPosition>;
+
+  createLink(
+    sourceId: Doughnut.ID,
+    targetId: Doughnut.ID,
+    data: Generated.LinkCreation
+  ): Promise<Generated.NoteRealm>;
+
+  updateLink(
+    linkId: Doughnut.ID,
+    data: Generated.LinkCreation
+  ): Promise<number>;
+
+  deleteLink(linkId: Doughnut.ID): Promise<number>;
+
+  updateNote(
+    noteId: Doughnut.ID,
+    noteContentData: Generated.NoteAccessories
+  ): Promise<Generated.NoteRealm>;
+
+  updateTextContent(
+    noteId: Doughnut.ID,
+    noteContentData: Generated.TextContent,
+    oldContent: Generated.TextContent
+  ): Promise<Generated.NoteRealm>;
+
+  undo(): Promise<Generated.NoteRealm>;
+
+  deleteNote(noteId: Doughnut.ID): Promise<number | undefined>;
+}
+
+class StoredApiCollection implements StoredApi {
   undoHistory: HistoryWriter;
 
   managedApi: ManagedApi;
