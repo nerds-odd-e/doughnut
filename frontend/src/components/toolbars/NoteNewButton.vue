@@ -19,7 +19,7 @@
 import { defineComponent, PropType } from "vue";
 import NoteNewDialog from "../notes/NoteNewDialog.vue";
 import PopupButton from "../commons/Popups/PopupButton.vue";
-import { StorageAccessor } from "../../store/history";
+import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   props: {

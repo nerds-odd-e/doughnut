@@ -15,7 +15,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import NoteCardsView from "../components/notes/views/NoteCardsView.vue";
-import { StorageAccessor } from "../store/history";
+import { StorageAccessor } from "../store/createNoteStorage";
 
 export default defineComponent({
   props: {

@@ -20,7 +20,7 @@
 import { defineComponent, PropType } from "vue";
 import LinkNoteFinalize from "./LinkNoteFinalize.vue";
 import SearchNote from "../search/SearchNote.vue";
-import { StorageAccessor } from "../../store/history";
+import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   props: {

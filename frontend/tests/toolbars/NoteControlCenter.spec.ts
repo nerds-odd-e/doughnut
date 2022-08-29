@@ -8,7 +8,7 @@ import makeMe from "../fixtures/makeMe";
 import createNoteStorage, {
   NoteEditingHistory,
   StorageAccessor,
-} from "../../src/store/history";
+} from "../../src/store/createNoteStorage";
 
 helper.resetWithApiMock(beforeEach, afterEach);
 

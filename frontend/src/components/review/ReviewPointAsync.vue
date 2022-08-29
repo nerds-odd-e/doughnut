@@ -14,7 +14,7 @@ import { defineComponent, PropType } from "vue";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
 import ShowReviewPoint from "./ShowReviewPoint.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
-import { StorageAccessor } from "../../store/history";
+import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   setup() {

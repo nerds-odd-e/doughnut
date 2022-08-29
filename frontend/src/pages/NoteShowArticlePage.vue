@@ -23,7 +23,7 @@ import useLoadingApi from "../managedApi/useLoadingApi";
 import LoadingPage from "./commons/LoadingPage.vue";
 import NoteRealmCache from "../store/NoteRealmCache";
 import Breadcrumb from "../components/toolbars/Breadcrumb.vue";
-import { StorageAccessor } from "../store/history";
+import { StorageAccessor } from "../store/createNoteStorage";
 
 export default defineComponent({
   setup() {

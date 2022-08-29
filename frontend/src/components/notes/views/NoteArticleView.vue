@@ -19,7 +19,7 @@
 import { defineComponent, PropType } from "vue";
 import NoteWithLinks from "../NoteWithLinks.vue";
 import { NoteRealmsReader } from "../../../store/NoteRealmCache";
-import { StorageAccessor } from "../../../store/history";
+import { StorageAccessor } from "../../../store/createNoteStorage";
 
 export default defineComponent({
   props: {

@@ -32,7 +32,7 @@
 import { defineComponent, PropType } from "vue";
 import LinkShow from "../links/LinkShow.vue";
 import NoteCardsView from "../notes/views/NoteCardsView.vue";
-import { StorageAccessor } from "../../store/history";
+import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   props: {

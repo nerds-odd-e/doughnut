@@ -23,7 +23,7 @@ import { defineComponent, PropType } from "vue";
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";
 import LinkNob from "./LinkNob.vue";
 import { colors } from "../../colors";
-import { StorageAccessor } from "../../store/history";
+import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   props: {

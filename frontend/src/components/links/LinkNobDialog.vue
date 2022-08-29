@@ -35,7 +35,7 @@ import { defineComponent, PropType } from "vue";
 import LinkTypeSelect from "./LinkTypeSelect.vue";
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";
 import usePopups from "../commons/Popups/usePopup";
-import { StorageAccessor } from "../../store/history";
+import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   setup() {

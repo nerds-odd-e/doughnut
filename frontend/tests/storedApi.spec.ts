@@ -3,7 +3,7 @@
  */
 import fetchMock from "jest-fetch-mock";
 import makeMe from "./fixtures/makeMe";
-import createNoteStorage from "../src/store/history";
+import createNoteStorage from "../src/store/createNoteStorage";
 
 beforeEach(() => {
   fetchMock.resetMocks();

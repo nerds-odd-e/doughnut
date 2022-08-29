@@ -26,7 +26,7 @@ import { defineComponent, PropType } from "vue";
 import NoteMindmap from "../mindmap/NoteMindmap.vue";
 import DragListner from "../../commons/DragListner.vue";
 import { NoteRealmsReader } from "../../../store/NoteRealmCache";
-import { StorageAccessor } from "../../../store/history";
+import { StorageAccessor } from "../../../store/createNoteStorage";
 
 const defaultOffset = { x: 0, y: 0, scale: 1.0, rotate: 0 };
 

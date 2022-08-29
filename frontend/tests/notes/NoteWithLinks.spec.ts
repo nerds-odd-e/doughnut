@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import NoteWithLinks from "@/components/notes/NoteWithLinks.vue";
-import createNoteStorage from "../../src/store/history";
+import createNoteStorage from "../../src/store/createNoteStorage";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 

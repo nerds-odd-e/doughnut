@@ -56,7 +56,7 @@ import MindmapSector from "../../../models/MindmapSector";
 import Mindmap from "../../../models/Mindmap";
 import MindmapOffset from "../../../models/MindmapOffset";
 import { NoteRealmsReader } from "../../../store/NoteRealmCache";
-import { StorageAccessor } from "../../../store/history";
+import { StorageAccessor } from "../../../store/createNoteStorage";
 
 export default defineComponent({
   name: "NoteMindmap",

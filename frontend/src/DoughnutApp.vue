@@ -9,7 +9,7 @@ import ReviewDoughnut from "./components/review/ReviewDoughnut.vue";
 import LoginButton from "./components/toolbars/LoginButton.vue";
 import NoteControlCenter from "./components/toolbars/NoteControlCenter.vue";
 import { sanitizeViewTypeName } from "./models/viewTypes";
-import createHistory from "./store/history";
+import createHistory from "./store/createNoteStorage";
 
 export default defineComponent({
   setup() {

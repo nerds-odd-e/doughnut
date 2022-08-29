@@ -29,7 +29,7 @@ import { defineComponent, PropType } from "vue";
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue";
 import PopupButton from "../commons/Popups/PopupButton.vue";
 import LinkNobDialog from "./LinkNobDialog.vue";
-import { StorageAccessor } from "../../store/history";
+import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   props: {

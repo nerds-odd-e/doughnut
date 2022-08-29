@@ -81,7 +81,7 @@ import { defineComponent, PropType } from "vue";
 import LinkOfNote from "./LinkOfNote.vue";
 import LinksReader from "../../models/LinksReader";
 import { reverseLabel } from "../../models/linkTypeOptions";
-import { StorageAccessor } from "../../store/history";
+import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   props: {

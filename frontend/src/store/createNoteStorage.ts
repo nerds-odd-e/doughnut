@@ -8,7 +8,7 @@ interface HistoryRecord {
 }
 
 interface HistoryState {
-  api(): StoredApiCollection;
+  api(): StoredApi;
   peekUndo(): null | HistoryRecord;
 }
 
@@ -48,13 +48,13 @@ interface StoredApi {
 }
 
 class StoredApiCollection implements StoredApi {
-  undoHistory: NoteEditingHistory;
+  noteEditingHistory: NoteEditingHistory;
 
   managedApi: ManagedApi;
 
   constructor(undoHistory: NoteEditingHistory) {
     this.managedApi = new ManagedApi(undefined);
-    this.undoHistory = undoHistory;
+    this.noteEditingHistory = undoHistory;
   }
 
   private async updateTextContentWithoutUndo(
@@ -115,14 +115,14 @@ class StoredApiCollection implements StoredApi {
     noteContentData: Generated.TextContent,
     oldContent: Generated.TextContent
   ) {
-    this.undoHistory.addEditingToUndoHistory(noteId, oldContent);
+    this.noteEditingHistory.addEditingToUndoHistory(noteId, oldContent);
     return this.updateTextContentWithoutUndo(noteId, noteContentData);
   }
 
   async undo() {
-    const undone = this.undoHistory.peekUndo();
+    const undone = this.noteEditingHistory.peekUndo();
     if (!undone) throw new Error("undo history is empty");
-    this.undoHistory.popUndoHistory();
+    this.noteEditingHistory.popUndoHistory();
     if (undone.type === "editing" && undone.textContent) {
       return this.updateTextContentWithoutUndo(
         undone.noteId,
@@ -140,15 +140,13 @@ class StoredApiCollection implements StoredApi {
       `notes/${noteId}/delete`,
       {}
     )) as number[];
-    this.undoHistory.deleteNote(noteId);
+    this.noteEditingHistory.deleteNote(noteId);
     if (res.length > 0) {
       return res[0];
     }
     return undefined;
   }
 }
-
-export { StoredApiCollection };
 
 class NoteStorage implements HistoryState {
   noteEditingHistory: NoteEditingHistory;
@@ -165,7 +163,7 @@ class NoteStorage implements HistoryState {
     return this.noteEditingHistory.peekUndo();
   }
 
-  api(): StoredApiCollection {
+  api(): StoredApi {
     return new StoredApiCollection(this.noteEditingHistory);
   }
 }

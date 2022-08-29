@@ -21,7 +21,7 @@
 import { defineComponent, PropType } from "vue";
 import LinkNoteShow from "./LinkNoteShow.vue";
 import LinkNob from "./LinkNob.vue";
-import { StorageAccessor } from "../../store/history";
+import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   props: {

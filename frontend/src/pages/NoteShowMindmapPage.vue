@@ -32,7 +32,7 @@ import NoteMindmapView from "../components/notes/views/NoteMindmapView.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
 import LoadingPage from "./commons/LoadingPage.vue";
 import NoteRealmCache from "../store/NoteRealmCache";
-import { StorageAccessor } from "../store/history";
+import { StorageAccessor } from "../store/createNoteStorage";
 
 export default defineComponent({
   setup() {

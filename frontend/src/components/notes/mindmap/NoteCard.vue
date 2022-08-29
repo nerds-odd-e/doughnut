@@ -21,7 +21,7 @@ import NoteShell from "../NoteShell.vue";
 import NoteContent from "../NoteContent.vue";
 import MindmapSector from "../../../models/MindmapSector";
 import Mindmap from "../../../models/Mindmap";
-import { StorageAccessor } from "../../../store/history";
+import { StorageAccessor } from "../../../store/createNoteStorage";
 
 export default defineComponent({
   props: {

@@ -12,7 +12,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import SvgUndo from "../svgs/SvgUndo.vue";
-import { StorageAccessor } from "../../store/history";
+import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   name: "NoteUndoButton",

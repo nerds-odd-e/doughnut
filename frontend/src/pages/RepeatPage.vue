@@ -38,7 +38,7 @@ import QuizQuestion from "../components/review/QuizQuestion.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
-import { StorageAccessor } from "../store/history";
+import { StorageAccessor } from "../store/createNoteStorage";
 
 export default defineComponent({
   setup() {

@@ -8,7 +8,7 @@
 import { defineComponent, PropType } from "vue";
 import SvgRemove from "../svgs/SvgRemove.vue";
 import usePopups from "../commons/Popups/usePopup";
-import { StorageAccessor } from "../../store/history";
+import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   setup() {

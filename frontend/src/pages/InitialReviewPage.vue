@@ -40,7 +40,7 @@ import SvgResume from "../components/svgs/SvgResume.vue";
 import ReviewPointAbbr from "../components/review/ReviewPointAbbr.vue";
 import InitialReview from "../components/review/InitialReview.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
-import { StorageAccessor } from "../store/history";
+import { StorageAccessor } from "../store/createNoteStorage";
 
 export default defineComponent({
   name: "InitialReviewPage",

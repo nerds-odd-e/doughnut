@@ -127,7 +127,7 @@ import ViewTypeButtons from "./ViewTypeButtons.vue";
 import { ViewTypeName } from "../../models/viewTypes";
 import SvgCog from "../svgs/SvgCog.vue";
 import NoteDeleteButton from "./NoteDeleteButton.vue";
-import { StorageAccessor } from "../../store/history";
+import { StorageAccessor } from "../../store/createNoteStorage";
 import PopupButton from "../commons/Popups/PopupButton.vue";
 
 export default defineComponent({

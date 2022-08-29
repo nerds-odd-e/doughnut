@@ -79,7 +79,7 @@ import ReviewPointAsync from "./ReviewPointAsync.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopup";
 import SelfEvaluateButtons from "./SelfEvaluateButtons.vue";
-import { StorageAccessor } from "../../store/history";
+import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   setup() {

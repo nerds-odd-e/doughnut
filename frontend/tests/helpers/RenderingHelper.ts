@@ -3,7 +3,7 @@ import { mount } from "@vue/test-utils";
 import { render } from "@testing-library/vue";
 import { App, DefineComponent } from "vue";
 import { RouteLocationRaw } from "vue-router";
-import createNoteStorage from "../../src/store/history";
+import createNoteStorage from "../../src/store/createNoteStorage";
 
 interface VuePlugin {
   install: (app: App) => void;

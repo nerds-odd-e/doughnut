@@ -17,7 +17,7 @@ import Breadcrumb from "./Breadcrumb.vue";
 import { ViewTypeName } from "../../models/viewTypes";
 import SvgAddSibling from "../svgs/SvgAddSibling.vue";
 import NoteNewButton from "./NoteNewButton.vue";
-import { StorageAccessor } from "../../store/history";
+import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   props: {

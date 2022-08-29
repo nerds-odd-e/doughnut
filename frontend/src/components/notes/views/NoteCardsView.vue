@@ -45,7 +45,7 @@ import NoteWithLinks from "../NoteWithLinks.vue";
 import Cards from "../Cards.vue";
 import useLoadingApi from "../../../managedApi/useLoadingApi";
 import NoteInfoButton from "../NoteInfoButton.vue";
-import { StorageAccessor } from "../../../store/history";
+import { StorageAccessor } from "../../../store/createNoteStorage";
 
 export default defineComponent({
   setup() {

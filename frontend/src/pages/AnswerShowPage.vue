@@ -34,7 +34,7 @@ import AnswerResult from "../components/review/AnswerResult.vue";
 import QuizQuestion from "../components/review/QuizQuestion.vue";
 import RadioButtons from "../components/form/RadioButtons.vue";
 import ShowReviewPoint from "../components/review/ShowReviewPoint.vue";
-import { StorageAccessor } from "../store/history";
+import { StorageAccessor } from "../store/createNoteStorage";
 
 export default defineComponent({
   setup() {
