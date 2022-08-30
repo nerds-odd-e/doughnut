@@ -17,7 +17,7 @@ beforeEach(() => {
   renderer = helper
     .component(RepeatPage)
     .withMockRouterPush(mockRouterPush)
-    .withHistoryProps({});
+    .withStorageProps({});
 });
 
 describe("repeat page", () => {

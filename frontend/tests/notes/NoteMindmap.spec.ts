@@ -17,7 +17,7 @@ describe("note mindmap", () => {
   const getMountedElement = (noteId: Doughnut.ID, props = {}) => {
     return helper
       .component(NoteMinmap)
-      .withHistoryProps({
+      .withStorageProps({
         noteId,
         noteRealms: new NoteRealmCache({
           notes,

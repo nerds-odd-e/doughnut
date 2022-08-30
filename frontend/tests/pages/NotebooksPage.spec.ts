@@ -15,7 +15,7 @@ describe("Notebooks Page", () => {
       notebooks: [notebook],
       subscriptions: [],
     });
-    helper.component(NotebooksPage).render();
+    helper.component(NotebooksPage).withStorageProps({}).render();
 
     helper.apiMock.verifyCall("/api/notebooks");
   });

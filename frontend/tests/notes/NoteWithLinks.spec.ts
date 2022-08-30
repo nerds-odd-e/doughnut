@@ -25,7 +25,7 @@ describe("new/updated pink banner", () => {
 
       const wrapper = helper
         .component(NoteWithLinks)
-        .withHistoryProps({ note: note.note, links: note.links })
+        .withStorageProps({ note: note.note, links: note.links })
         .mount();
 
       expect(wrapper.find(".note-body").element).toHaveStyle(
@@ -41,7 +41,7 @@ describe("in place edit on title", () => {
 
     const wrapper = helper
       .component(NoteWithLinks)
-      .withHistoryProps({
+      .withStorageProps({
         note: noteParent.note,
         links: noteParent.links,
       })
@@ -60,7 +60,7 @@ describe("in place edit on title", () => {
 
     const wrapper = helper
       .component(NoteWithLinks)
-      .withHistoryProps({
+      .withStorageProps({
         note: noteParentSphere.note,
         links: noteParentSphere.links,
       })
@@ -106,7 +106,7 @@ describe("note associated with wikidata", () => {
 
     const wrapper = helper
       .component(NoteWithLinks)
-      .withHistoryProps({
+      .withStorageProps({
         note: noteRealm.note,
         links: noteRealm.links,
       })

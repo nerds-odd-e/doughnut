@@ -14,7 +14,7 @@ describe("LinkNoteFinalize", () => {
     const note = makeMe.aNoteRealm.please();
     const wrapper = helper
       .component(LinkNoteFinalize)
-      .withHistoryProps({
+      .withStorageProps({
         note,
         targetNote: note,
       })

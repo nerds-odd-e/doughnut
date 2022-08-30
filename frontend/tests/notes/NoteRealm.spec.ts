@@ -27,7 +27,7 @@ describe("NoteRealm", () => {
     it("should render note with one child", async () => {
       helper
         .component(NoteShowPage)
-        .withHistoryProps({
+        .withStorageProps({
           noteId: noteRealm.id,
           expandChildren: true,
         })

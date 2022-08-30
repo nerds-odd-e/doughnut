@@ -34,7 +34,7 @@ describe("repetition page", () => {
     it("click on note when doing review", async () => {
       const wrapper = helper
         .component(AnswerShowPage)
-        .withHistoryProps({ answerId: 1 })
+        .withStorageProps({ answerId: 1 })
         .currentRoute({ name: "repeat" })
         .mount();
       await flushPromises();
@@ -47,7 +47,7 @@ describe("repetition page", () => {
     it("click on note when doing review and in a nested page", async () => {
       const wrapper = helper
         .component(AnswerShowPage)
-        .withHistoryProps({ answerId: 1 })
+        .withStorageProps({ answerId: 1 })
         .currentRoute({ name: "repeat-noteShow", params: { noteId: 123 } })
         .mount();
       await flushPromises();

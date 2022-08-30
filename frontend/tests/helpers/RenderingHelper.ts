@@ -35,7 +35,7 @@ class RenderingHelper {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  withHistoryProps(props: any) {
+  withStorageProps(props: any) {
     return this.withProps({ storageAccessor: createNoteStorage(), ...props });
   }
 
