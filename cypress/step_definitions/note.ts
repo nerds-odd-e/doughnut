@@ -96,9 +96,7 @@ When("I am creating a note under {notepath}", (notePath: NotePath) => {
 Then("I should see {string} in breadcrumb", (noteTitles: string) => {
   cy.pageIsNotLoading()
   cy.get(".breadcrumb").within(() =>
-    noteTitles
-      .commonSenseSplit(", ")
-      .forEach((noteTitle: string) => cy.findByText(noteTitle)),
+    noteTitles.commonSenseSplit(", ").forEach((noteTitle: string) => cy.findByText(noteTitle)),
   )
 })
 

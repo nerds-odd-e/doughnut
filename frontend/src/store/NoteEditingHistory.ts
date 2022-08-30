@@ -1,21 +1,10 @@
-interface HistoryRecord {
+export interface HistoryRecord {
   type: "editing" | "delete note";
   noteId: Doughnut.ID;
   textContent?: Generated.TextContent;
 }
 
-interface HistoryState {
-  noteUndoHistories: HistoryRecord[];
-  peekUndo(): null | HistoryRecord;
-  popUndoHistory(): void;
-  addEditingToUndoHistory(
-    noteId: Doughnut.ID,
-    textContent: Generated.TextContent
-  ): void;
-  deleteNote(noteId: Doughnut.ID): void;
-}
-
-class History implements HistoryState {
+export default class NoteEditingHistory {
   noteUndoHistories: HistoryRecord[];
 
   constructor() {
@@ -49,12 +38,3 @@ class History implements HistoryState {
     this.noteUndoHistories.push({ type: "delete note", noteId });
   }
 }
-
-type HistoryWriter = HistoryState;
-
-function createNoteStorage(): HistoryWriter {
-  return new History();
-}
-
-export default createNoteStorage;
-export type { HistoryWriter };

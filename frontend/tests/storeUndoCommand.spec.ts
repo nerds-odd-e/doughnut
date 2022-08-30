@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { NoteEditingHistory } from "../src/store/createNoteStorage";
+import NoteEditingHistory from "../src/store/NoteEditingHistory";
 import makeMe from "./fixtures/makeMe";
 
 describe("storeUndoCommand", () => {

@@ -321,9 +321,7 @@ Cypress.Commands.add("findNoteTitle", (title) =>
   cy.findByText(title, { selector: "[role=title] *" }),
 )
 
-Cypress.Commands.add("findCardTitle", (title) =>
-  cy.findByText(title, { selector: "a.card-title" }),
-)
+Cypress.Commands.add("findCardTitle", (title) => cy.findByText(title, { selector: "a.card-title" }))
 
 Cypress.Commands.add("yesIRemember", () => {
   cy.tick(10 * 1000)

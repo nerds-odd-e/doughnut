@@ -6,9 +6,9 @@ import NoteControlCenter from "@/components/toolbars/NoteControlCenter.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 import createNoteStorage, {
-  NoteEditingHistory,
   StorageAccessor,
 } from "../../src/store/createNoteStorage";
+import NoteEditingHistory from "../../src/store/NoteEditingHistory";
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
