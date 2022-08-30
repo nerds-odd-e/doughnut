@@ -15,7 +15,6 @@ import SvgUndo from "../svgs/SvgUndo.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
-  name: "NoteUndoButton",
   components: {
     SvgUndo,
   },
@@ -26,7 +25,6 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["noteRealmUpdated"],
   computed: {
     history() {
       return this.storageAccessor.peekUndo();
@@ -39,9 +37,8 @@ export default defineComponent({
     },
   },
   methods: {
-    async undoDelete() {
-      const noteRealm = await this.storageAccessor.api().undo();
-      this.$emit("noteRealmUpdated", noteRealm);
+    undoDelete() {
+      this.storageAccessor.api().undo();
     },
   },
 });

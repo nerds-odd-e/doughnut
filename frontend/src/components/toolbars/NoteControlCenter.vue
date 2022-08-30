@@ -102,10 +102,7 @@
         </div>
       </template>
 
-      <NoteUndoButton
-        v-bind="{ storageAccessor }"
-        @note-realm-updated="$emit('noteRealmUpdated', $event)"
-      />
+      <NoteUndoButton v-bind="{ storageAccessor }" />
     </div>
   </ToolbarFrame>
 </template>

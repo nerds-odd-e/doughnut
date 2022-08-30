@@ -1,5 +1,6 @@
 import ManagedApi from "../managedApi/ManagedApi";
 import NoteEditingHistory from "./NoteEditingHistory";
+import NoteStorage from "./NoteStorage";
 
 export interface StoredApi {
   createNote(
@@ -40,9 +41,12 @@ export default class StoredApiCollection implements StoredApi {
 
   managedApi: ManagedApi;
 
-  constructor(undoHistory: NoteEditingHistory) {
+  storage: NoteStorage;
+
+  constructor(undoHistory: NoteEditingHistory, storage: NoteStorage) {
     this.managedApi = new ManagedApi(undefined);
     this.noteEditingHistory = undoHistory;
+    this.storage = storage;
   }
 
   private async updateTextContentWithoutUndo(
@@ -107,7 +111,7 @@ export default class StoredApiCollection implements StoredApi {
     return this.updateTextContentWithoutUndo(noteId, noteContentData);
   }
 
-  async undo() {
+  private async undoInner() {
     const undone = this.noteEditingHistory.peekUndo();
     if (!undone) throw new Error("undo history is empty");
     this.noteEditingHistory.popUndoHistory();
@@ -121,6 +125,12 @@ export default class StoredApiCollection implements StoredApi {
       `notes/${undone.noteId}/undo-delete`,
       {}
     )) as Generated.NoteRealm;
+  }
+
+  async undo() {
+    const res = await this.undoInner();
+    this.storage.refreshNoteRealm(res);
+    return res;
   }
 
   async deleteNote(noteId: Doughnut.ID) {

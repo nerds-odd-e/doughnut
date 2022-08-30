@@ -1,11 +1,9 @@
 import NoteEditingHistory, { HistoryRecord } from "./NoteEditingHistory";
 import StoredApiCollection, { StoredApi } from "./StoredApiCollection";
 
-interface StorageAccessor {
+interface StorageAccessor extends NoteStorage {
   api(): StoredApi;
   peekUndo(): null | HistoryRecord;
-  updatedNoteRealm?: Generated.NoteRealm;
-  updatedAt?: Date;
 }
 
 class NoteStorage implements StorageAccessor {
@@ -28,7 +26,12 @@ class NoteStorage implements StorageAccessor {
   }
 
   api(): StoredApi {
-    return new StoredApiCollection(this.noteEditingHistory);
+    return new StoredApiCollection(this.noteEditingHistory, this);
+  }
+
+  refreshNoteRealm(noteRealm: Generated.NoteRealm): void {
+    this.updatedNoteRealm = noteRealm;
+    this.updatedAt = new Date();
   }
 }
 
