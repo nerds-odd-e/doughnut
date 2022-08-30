@@ -77,7 +77,7 @@ Then(
   "I should see {string} in the circle page within {int} seconds",
   (noteTitle: string, seconds: number) => {
     cy.tick(seconds * 1000)
-    cy.findNoteTitle(noteTitle)
+    cy.findCardTitle(noteTitle)
   },
 )
 
@@ -85,6 +85,6 @@ Then(
   "I should not see {string} in the circle page within {int} seconds",
   (noteTitle: string, seconds: number) => {
     cy.tick(seconds * 1000)
-    cy.findNoteTitle(noteTitle).should("not.exist")
+    cy.findCardTitle(noteTitle).should("not.exist")
   },
 )

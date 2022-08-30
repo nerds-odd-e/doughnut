@@ -52,6 +52,19 @@ export default defineComponent({
     viewType() {
       return sanitizeViewTypeName(this.$route.meta.viewType as string);
     },
+    routeViewProps() {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const props = {} as any;
+      if (this.$route.meta.useControlCenter) {
+        props.updatedNoteRealm = this.updatedNoteRealm;
+        props.updatedAt = this.updatedAt;
+        props.storageAccessor = this.storageAccessor;
+      }
+      if (this.$route.meta.userProp) {
+        props.user = this.user;
+      }
+      return props;
+    },
   },
 
   methods: {
@@ -99,14 +112,8 @@ export default defineComponent({
             @note-realm-updated="onUpdateNoteRealm($event)"
             @note-deleted="onNoteDeleted($event)"
           />
-          <router-view
-            :updated-note-realm="updatedNoteRealm"
-            :updated-at="updatedAt"
-            :storage-accessor="storageAccessor"
-          />
         </template>
-        <router-view v-else-if="$route.meta['userProp']" :user="user" />
-        <router-view v-else />
+        <router-view v-bind="routeViewProps" />
       </template>
       <ReviewDoughnut v-if="user" :user="user" @update-user="user = $event" />
       <LoginButton v-else />
