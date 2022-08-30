@@ -56,12 +56,14 @@ const noteAndLinkRoutes = [
     name: "answer",
     component: AnswerShowPage,
     props: true,
+    meta: { useControlCenter: true },
   },
   {
     path: "circles/:circleId",
     name: "circleShow",
     component: CircleShowPage,
     props: true,
+    meta: { useControlCenter: true },
   },
 ];
 
@@ -96,12 +98,14 @@ const routes = [
     name: "initial",
     component: NestedInitialReviewPage,
     children: nestedNoteAndLinkRoutes("initial-"),
+    meta: { useControlCenter: true },
   },
   {
     path: "/reviews/repeat",
     name: "repeat",
     component: NestedRepeatPage,
     children: [...nestedNoteAndLinkRoutes("repeat-")],
+    meta: { useControlCenter: true },
   },
   {
     path: "/failure-report-list",

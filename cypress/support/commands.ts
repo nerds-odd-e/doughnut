@@ -162,7 +162,7 @@ Cypress.Commands.add("expectNoteCards", (expectedCards: string[]) => {
 
 Cypress.Commands.add("navigateToChild", (noteTitle) => {
   cy.findByText(noteTitle, { selector: ".card-title" }).click()
-  cy.expectNoteTitle(noteTitle)
+  cy.findNoteTitle(noteTitle)
 })
 
 Cypress.Commands.add("navigateToNotePage", (notePath: NotePath) => {
@@ -183,7 +183,7 @@ Cypress.Commands.add("jumpToNotePage", (noteTitle: string, forceLoadPage = false
       if (forceLoadPage) cy.visit(url)
       else cy.routerPush(url, "noteShow", { noteId: noteId })
     })
-  cy.expectNoteTitle(noteTitle)
+  cy.findNoteTitle(noteTitle)
 })
 
 Cypress.Commands.add("routerPush", (fallback, name, params) => {
@@ -317,7 +317,7 @@ Cypress.Commands.add(
   },
 )
 
-Cypress.Commands.add("expectNoteTitle", (title) =>
+Cypress.Commands.add("findNoteTitle", (title) =>
   cy.findByText(title, { selector: "[role=title] *" }),
 )
 

@@ -45,9 +45,15 @@ When("I create a notebook with:", (data) => {
   cy.submitNoteCreationFormsWith(data.hashes())
 })
 
-When("I update note {string} to become:", (noteTitle, data) => {
+When("I update note {string} to become:", (noteTitle: string, data) => {
   cy.jumpToNotePage(noteTitle)
   cy.inPlaceEdit(data.hashes()[0])
+})
+
+When("I can change the title {string} to {string}", (noteTitle: string, newNoteTitle: string) => {
+  cy.findNoteTitle(noteTitle)
+  cy.inPlaceEdit({ title: newNoteTitle })
+  cy.findNoteTitle(newNoteTitle)
 })
 
 Given(
@@ -127,7 +133,7 @@ When("I should see that the note creation is not successful", () => {
 })
 
 Then("I should see {string} in note title", (noteTitle: string) => {
-  cy.expectNoteTitle(noteTitle)
+  cy.findNoteTitle(noteTitle)
 })
 
 Then("I should not see note {string} at the top level of all my notes", (noteTitle: string) => {
@@ -295,7 +301,7 @@ When(
 )
 
 Then("I should see the title {string} of the notebook", (noteTitle: string) => {
-  cy.expectNoteTitle(noteTitle)
+  cy.findNoteTitle(noteTitle)
 })
 
 Then("I should see the child notes {string} in order", (notesStr: string) => {

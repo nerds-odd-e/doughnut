@@ -101,7 +101,7 @@ Then("I login as {string} I should see {string}", (username: string, expectation
   cy.get("#username").type(username)
   cy.get("#password").type("password")
   cy.get("form.form-signin").submit()
-  cy.expectNoteTitle(expectation)
+  cy.findNoteTitle(expectation)
 })
 
 Then("I edit user profile", () => {

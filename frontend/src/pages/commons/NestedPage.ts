@@ -1,7 +1,8 @@
-import { defineComponent, h } from "vue";
+import { defineComponent, h, PropType } from "vue";
 import { RouterView } from "vue-router";
 import usePopups from "../../components/commons/Popups/usePopup";
 import routerScopeGuard from "../../routes/relative_routes";
+import { StorageAccessor } from "../../store/createNoteStorage";
 
 function NestedPage(
   WrappedComponent: ReturnType<typeof defineComponent>,
@@ -11,6 +12,12 @@ function NestedPage(
     name: "NestedPage",
     setup() {
       return usePopups();
+    },
+    props: {
+      storageAccessor: {
+        type: Object as PropType<StorageAccessor>,
+        required: true,
+      },
     },
     computed: {
       isNested() {
@@ -33,7 +40,7 @@ function NestedPage(
     render() {
       return h("div", { class: "inner-box" }, [
         h(WrappedComponent, { ...this.$props, minimized: this.isNested }),
-        h(RouterView, {}),
+        h(RouterView, { ...this.$props }),
       ]);
     },
   });

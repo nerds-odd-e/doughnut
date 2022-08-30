@@ -76,7 +76,7 @@ When("I change notebook {string} to skip review", (noteTitle: string) => {
 
 Then("I should see it has link to {string}", (noteTitle: string) => {
   cy.findByText(noteTitle, { selector: ".link-title" }).click()
-  cy.expectNoteTitle(noteTitle)
+  cy.findNoteTitle(noteTitle)
 })
 
 Then("I unsubscribe from notebook {string}", (noteTitle: string) => {

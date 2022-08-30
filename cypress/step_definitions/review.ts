@@ -85,7 +85,7 @@ Then("I am learning new note on day {int}", (day: number) => {
 })
 
 Then("I set the level of {string} to be {int}", (noteTitle: string, level: number) => {
-  cy.expectNoteTitle(noteTitle)
+  cy.findNoteTitle(noteTitle)
   cy.getFormControl("Level").then(($control) => {
     cy.wrap($control).within(() => {
       cy.findByRole("button", { name: "" + level }).click()

@@ -28,7 +28,7 @@ declare namespace Cypress {
     expectExactLinkTargets(targets: any): Chainable<any>
     expectFieldErrorMessage(message: string): Chainable<any>
     expectNoteCards(expectedCards: any): Chainable<any>
-    expectNoteTitle(title: string): Chainable<any>
+    findNoteTitle(title: string): Chainable<any>
     failure(): Chainable<any>
     featureToggle(enabled: boolean): Chainable<Subject>
     findNoteCardButton(noteTitle: string, btnTextOrTitle: string): Chainable<any>
