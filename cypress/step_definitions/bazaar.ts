@@ -13,7 +13,7 @@ Given("I choose to share my notebook {string}", (noteTitle: string) => {
 
 Then("I should see {string} is shared in the Bazaar", (noteTitle: string) => {
   cy.visit("/bazaar")
-  cy.findByText(noteTitle)
+  cy.findCardTitle(noteTitle)
 })
 
 Then("notebook {string} is shared to the Bazaar", (noteTitle: string) => {
@@ -25,7 +25,7 @@ Then("there shouldn't be any note edit button for {string}", (noteTitle: string)
 })
 
 When("I open the notebook {string} in the Bazaar", (noteTitle: string) => {
-  cy.findByText(noteTitle).click()
+  cy.findCardTitle(noteTitle).click()
 })
 
 When("I go to the bazaar", () => {
@@ -76,7 +76,7 @@ When("I change notebook {string} to skip review", (noteTitle: string) => {
 
 Then("I should see it has link to {string}", (noteTitle: string) => {
   cy.findByText(noteTitle, { selector: ".link-title" }).click()
-  cy.findNoteTitle(noteTitle)
+  cy.expectNoteTitle(noteTitle)
 })
 
 Then("I unsubscribe from notebook {string}", (noteTitle: string) => {
