@@ -3,8 +3,6 @@
     <NoteCardsView
       v-bind="{
         noteId,
-        updatedNoteRealm,
-        updatedAt,
         expandChildren: true,
         storageAccessor,
       }"
@@ -20,8 +18,6 @@ import { StorageAccessor } from "../store/createNoteStorage";
 export default defineComponent({
   props: {
     noteId: { type: Number, required: true },
-    updatedNoteRealm: { type: Object as PropType<Generated.NoteRealm> },
-    updatedAt: { type: Date },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,

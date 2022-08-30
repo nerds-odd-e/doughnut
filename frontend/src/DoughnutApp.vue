@@ -22,8 +22,6 @@ export default defineComponent({
     return {
       externalIdentifier: undefined as undefined | string,
       user: undefined as undefined | Generated.User,
-      updatedNoteRealm: undefined as undefined | Generated.NoteRealm,
-      updatedAt: undefined as undefined | Date,
       featureToggle: false,
       environment: "production",
       storageAccessor: createNoteStorage(),
@@ -56,8 +54,6 @@ export default defineComponent({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const props = {} as any;
       if (this.$route.meta.useControlCenter) {
-        props.updatedNoteRealm = this.updatedNoteRealm;
-        props.updatedAt = this.updatedAt;
         props.storageAccessor = this.storageAccessor;
       }
       if (this.$route.meta.userProp) {
@@ -79,8 +75,8 @@ export default defineComponent({
       }
     },
     onUpdateNoteRealm(updatedNoteRealm: Generated.NoteRealm) {
-      this.updatedNoteRealm = updatedNoteRealm;
-      this.updatedAt = new Date();
+      this.storageAccessor.updatedNoteRealm = updatedNoteRealm;
+      this.storageAccessor.updatedAt = new Date();
     },
   },
 

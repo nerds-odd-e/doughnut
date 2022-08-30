@@ -53,8 +53,6 @@ export default defineComponent({
   },
   props: {
     noteId: { type: Number, required: true },
-    updatedNoteRealm: { type: Object as PropType<Generated.NoteRealm> },
-    updatedAt: { type: Date },
     expandChildren: { type: Boolean, required: true },
     expandInfo: { type: Boolean, default: false },
     storageAccessor: {
@@ -100,8 +98,8 @@ export default defineComponent({
     },
   },
   watch: {
-    updatedAt() {
-      this.noteRealmUpdated(this.updatedNoteRealm);
+    "storageAccessor.updatedAt": function updateAt() {
+      this.noteRealmUpdated(this.storageAccessor.updatedNoteRealm);
     },
     noteId() {
       this.fetchData();
