@@ -31,14 +31,14 @@ Feature: Mindmap view
 
     @mockBrowserTime
   Scenario: highlight a note
-    When I click note "History"
+    When I click note "History" avoiding the title
     Then I should see the note "History" is "highlighted"
-    When I click note "Singapore"
+    When I click note "Singapore" avoiding the title
     Then I should see the note "Singapore" is "highlighted"
     And I should see the note "History" is "not highlighted"
 
   Scenario: view parents
-    When I click note title "History"
+    When I click note card title "History"
     Then I should see the note "History" is 0px * 0px offset the center of the map
     And I should see the note "History" is "highlighted"
     And I should see "Singapore" in breadcrumb

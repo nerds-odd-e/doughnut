@@ -221,15 +221,15 @@ When(
   },
 )
 
-When("I click note {string}", (noteTitle: string) => {
+When("I click note {string} avoiding the title", (noteTitle: string) => {
   cy.findByRole("card", { name: noteTitle }).click("bottomRight", {
     force: true,
   })
   //cy.findByRole("card", { name: noteTitle }).click();
 })
 
-When("I click note title {string}", (noteTitle: string) => {
-  cy.findNoteTitle(noteTitle).click()
+When("I click note card title {string}", (noteTitle: string) => {
+  cy.findCardTitle(noteTitle).click()
 })
 
 When(
@@ -289,7 +289,7 @@ When(
   "I should see the notes {string} are around note {string} and apart from each other",
   (noteTitles: string, parentNoteTitle: string) => {
     const titles = noteTitles.commonSenseSplit(",")
-    cy.findByText(titles[titles.length - 1])
+    cy.findCardTitle(titles[titles.length - 1])
     cy.withinMindmap().then((cards) => {
       titles.forEach((noteTitle: string) => {
         cy.distanceBetweenCardsGreaterThan(cards, parentNoteTitle, noteTitle, 100)
@@ -342,7 +342,7 @@ When("I undo {string}", (undoType: string) => {
 })
 
 Then("the deleted notebook with title {string} should be restored", (title: string) => {
-  cy.findByText(title).should("exist")
+  cy.findCardTitle(title)
 })
 
 Then("there should be no more undo to do", () => {

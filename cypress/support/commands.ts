@@ -152,7 +152,7 @@ Cypress.Commands.add("expectNoteCards", (expectedCards: string[]) => {
   expectedCards.forEach((elem) => {
     for (const propName in elem) {
       if (propName === "note-title") {
-        cy.findByText(elem[propName], { selector: ".card-title a" }).should("be.visible")
+        cy.findCardTitle(elem[propName])
       } else {
         cy.findByText(elem[propName])
       }
