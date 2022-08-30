@@ -43,14 +43,14 @@ When("I create a notebook {string} in circle {string}", (noteTitle, circleName) 
 
 When("I should see the notebook {string} in circle {string}", (noteTitle: string, circleName) => {
   cy.navigateToCircle(circleName)
-  cy.findByText(noteTitle).should("be.visible")
+  cy.findCardTitle(noteTitle)
 })
 
 When("I add a note {string} under {string}", (noteTitle: string, parentNoteTitle: string) => {
   cy.findByText(parentNoteTitle).click()
   cy.clickAddChildNoteButton()
   cy.submitNoteCreationFormsWith([{ Title: noteTitle }])
-  cy.findByText(noteTitle).should("be.visible")
+  cy.findNoteTitle(noteTitle)
 })
 
 When(
@@ -85,6 +85,6 @@ Then(
   "I should not see {string} in the circle page within {int} seconds",
   (noteTitle: string, seconds: number) => {
     cy.tick(seconds * 1000)
-    cy.findByText(noteTitle).should("not.exist")
+    cy.findNoteTitle(noteTitle).should("not.exist")
   },
 )

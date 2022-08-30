@@ -53,12 +53,12 @@ Then("I should see readonly notebook {string} in my notes", (noteTitle: string) 
 })
 
 Then("I should see I've subscribed to {string}", (noteTitle: string) => {
-  cy.findByText(noteTitle).should("be.visible")
+  cy.findCardTitle(noteTitle)
 })
 
 Then("I should see I've not subscribed to {string}", (noteTitle: string) => {
   cy.findByText("Subscribed Notes").should("exist")
-  cy.findByText(noteTitle).should("not.exist")
+  cy.findCardTitle(noteTitle).should("not.exist")
 })
 
 Then("I should be able to edit the subscription to notebook {string}", (noteTitle: string) => {
@@ -76,7 +76,7 @@ When("I change notebook {string} to skip review", (noteTitle: string) => {
 
 Then("I should see it has link to {string}", (noteTitle: string) => {
   cy.findByText(noteTitle, { selector: ".link-title" }).click()
-  cy.expectNoteTitle(noteTitle)
+  cy.findNoteTitle(noteTitle)
 })
 
 Then("I unsubscribe from notebook {string}", (noteTitle: string) => {
