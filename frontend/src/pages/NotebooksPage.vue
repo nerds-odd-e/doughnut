@@ -14,19 +14,26 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue";
 import NotebookViewCards from "../components/notebook/NotebookViewCards.vue";
 import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
 import NotebookSubscriptionCards from "../components/subscriptions/NotebookSubscriptionCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
+import { StorageAccessor } from "../store/createNoteStorage";
 
 export default defineComponent({
   setup() {
     return useLoadingApi();
   },
-  props: { updatedAt: Date },
+  props: {
+    selectedNoteId: Number,
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
+      required: true,
+    },
+  },
   name: "NotebooksPage",
   components: {
     ContainerPage,
@@ -50,7 +57,7 @@ export default defineComponent({
     },
   },
   watch: {
-    updatedAt() {
+    "storageAccessor.updatedAt": function updateAt() {
       this.fetchData();
     },
   },
