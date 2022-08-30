@@ -152,7 +152,7 @@ Then("I should see that my answer is correct", () => {
 })
 
 Then("I should see the information of note {string}", (noteTitle: string) => {
-  cy.findByText(noteTitle)
+  cy.findNoteTitle(noteTitle)
 })
 
 Then("I should see that my answer {string} is wrong", (answer) => {
@@ -170,7 +170,7 @@ Then("The randomizer always choose the last", () => {
 })
 
 Then("I should see the info of note {string}", (noteTitle: string, data) => {
-  cy.findByText(noteTitle)
+  cy.findNoteTitle(noteTitle)
   cy.findByRole("button", { name: "i..." }).click({ force: true })
   const attrs = data.hashes()[0]
   for (const k in attrs) {

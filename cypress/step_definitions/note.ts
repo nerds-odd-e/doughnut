@@ -60,7 +60,7 @@ Given(
   "I update note title {string} to become {string}",
   (noteTitle: string, newNoteTitle: string) => {
     cy.jumpToNotePage(noteTitle)
-    cy.findByText(noteTitle).click()
+    cy.findNoteTitle(noteTitle).click()
     cy.replaceFocusedText(newNoteTitle)
   },
 )
@@ -84,7 +84,6 @@ When(
 
 When("I create a note belonging to {string}:", (noteTitle: string, data) => {
   cy.jumpToNotePage(noteTitle)
-  cy.findByText(noteTitle)
   cy.clickAddChildNoteButton()
   cy.submitNoteCreationFormsWith(data.hashes())
 })
@@ -99,7 +98,7 @@ Then("I should see {string} in breadcrumb", (noteTitles: string) => {
   cy.get(".breadcrumb").within(() =>
     noteTitles
       .commonSenseSplit(", ")
-      .forEach((noteTitle: string) => cy.findByText(noteTitle, { timeout: 2000 })),
+      .forEach((noteTitle: string) => cy.findByText(noteTitle)),
   )
 })
 
@@ -123,7 +122,7 @@ When("I delete notebook {string}", (noteTitle) => {
 })
 
 When("I create a sibling note of {string}:", (noteTitle: string, data) => {
-  cy.findByText(noteTitle)
+  cy.findNoteTitle(noteTitle)
   cy.findByRole("button", { name: "Add Sibling Note" }).click()
   cy.submitNoteCreationFormsWith(data.hashes())
 })
@@ -139,7 +138,7 @@ Then("I should see {string} in note title", (noteTitle: string) => {
 Then("I should not see note {string} at the top level of all my notes", (noteTitle: string) => {
   cy.pageIsNotLoading()
   cy.findByText("Notebooks")
-  cy.findByText(noteTitle).should("not.exist")
+  cy.findCardTitle(noteTitle).should("not.exist")
 })
 
 When("I navigate to {notepath} note", (notePath: NotePath) => {
@@ -158,8 +157,8 @@ When("I move note {string} left", (noteTitle) => {
 
 When(
   "I double click {string} and edit the description to {string}",
-  (noteTitle: string, newDescription: string) => {
-    cy.findByText(noteTitle).click()
+  (oldDescription: string, newDescription: string) => {
+    cy.findByText(oldDescription).click()
     cy.replaceFocusedText(newDescription)
   },
 )
@@ -198,7 +197,7 @@ When("I should be asked to log in again when I click the link {string}", (noteTi
   cy.on("uncaught:exception", () => {
     return false
   })
-  cy.findByText(noteTitle).click()
+  cy.findCardTitle(noteTitle).click()
   cy.get("#username").should("exist")
 })
 
@@ -230,7 +229,7 @@ When("I click note {string}", (noteTitle: string) => {
 })
 
 When("I click note title {string}", (noteTitle: string) => {
-  cy.findByText(noteTitle).click()
+  cy.findNoteTitle(noteTitle).click()
 })
 
 When(

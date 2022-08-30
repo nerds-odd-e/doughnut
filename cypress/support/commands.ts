@@ -81,7 +81,7 @@ Cypress.Commands.add("submitNoteCreationFormWith", (noteAttributes) => {
 Cypress.Commands.add(
   "openAndSubmitNoteAccessoriesFormWith",
   (noteTitle: string, noteAccessoriesAttributes: Record<string, string>) => {
-    cy.findByText(noteTitle)
+    cy.findNoteTitle(noteTitle)
     cy.clickNoteToolbarButton("edit note")
     cy.submitNoteFormWith(noteAccessoriesAttributes)
   },
@@ -161,7 +161,7 @@ Cypress.Commands.add("expectNoteCards", (expectedCards: string[]) => {
 })
 
 Cypress.Commands.add("navigateToChild", (noteTitle) => {
-  cy.findByText(noteTitle, { selector: ".card-title" }).click()
+  cy.findCardTitle(noteTitle).click()
   cy.findNoteTitle(noteTitle)
 })
 
@@ -209,7 +209,7 @@ Cypress.Commands.add("routerPush", (fallback, name, params) => {
 })
 
 Cypress.Commands.add("clickButtonOnCardBody", (noteTitle, buttonTitle) => {
-  cy.findByText(noteTitle, { selector: ".card-title a" }).then(($card) => {
+  cy.findCardTitle(noteTitle).then(($card) => {
     cy.wrap($card)
       .parent()
       .parent()
@@ -255,7 +255,7 @@ Cypress.Commands.add("clickLinkNob", (target: string) => {
 
 Cypress.Commands.add("findNoteCardButton", (noteTitle, btnTextOrTitle) => {
   return cy
-    .findByText(noteTitle)
+    .findCardTitle(noteTitle)
     .parent()
     .parent()
     .parent()
@@ -322,7 +322,7 @@ Cypress.Commands.add("findNoteTitle", (title) =>
 )
 
 Cypress.Commands.add("findCardTitle", (title) =>
-  cy.findByText(title, { selector: ".card-title" }),
+  cy.findByText(title, { selector: "a.card-title" }),
 )
 
 Cypress.Commands.add("yesIRemember", () => {
@@ -481,7 +481,7 @@ Cypress.Commands.add("deleteNoteViaAPI", { prevSubject: true }, (subject) => {
 
 Cypress.Commands.add("noteByTitle", (noteTitle: string) => {
   return cy
-    .findByText(noteTitle, { selector: "a.card-title" })
+    .findCardTitle(noteTitle)
     .invoke("attr", "href")
     .then(($attr) => /notes\/(\d+)/g.exec($attr)[1])
 })

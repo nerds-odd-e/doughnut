@@ -77,7 +77,7 @@ Then(
   "I should see {string} in the circle page within {int} seconds",
   (noteTitle: string, seconds: number) => {
     cy.tick(seconds * 1000)
-    cy.findByText(noteTitle)
+    cy.findNoteTitle(noteTitle)
   },
 )
 
