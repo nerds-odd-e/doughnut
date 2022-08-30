@@ -33,10 +33,7 @@
               <template #default="{ note }">
                 <NoteEditDialog
                   v-bind="{ note, storageAccessor }"
-                  @done="
-                    doneHandler($event);
-                    $emit('noteRealmUpdated');
-                  "
+                  @done="doneHandler($event)"
                 />
               </template>
             </NoteDialogFrame>

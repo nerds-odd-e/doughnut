@@ -96,10 +96,12 @@ export default class StoredApiCollection implements StoredApi {
   ) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { updatedAt, ...data } = noteContentData;
-    return (await this.managedApi.restPatchMultiplePartForm(
-      `notes/${noteId}`,
-      data
-    )) as Generated.NoteRealm;
+    return this.storage.refreshNoteRealm(
+      (await this.managedApi.restPatchMultiplePartForm(
+        `notes/${noteId}`,
+        data
+      )) as Generated.NoteRealm
+    );
   }
 
   async updateTextContent(
@@ -128,9 +130,7 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   async undo() {
-    const res = await this.undoInner();
-    this.storage.refreshNoteRealm(res);
-    return res;
+    return this.storage.refreshNoteRealm(await this.undoInner());
   }
 
   async deleteNote(noteId: Doughnut.ID) {
