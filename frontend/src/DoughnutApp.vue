@@ -74,10 +74,6 @@ export default defineComponent({
         this.$router.push({ name: "notebooks" });
       }
     },
-    onUpdateNoteRealm(updatedNoteRealm: Generated.NoteRealm) {
-      this.storageAccessor.updatedNoteRealm = updatedNoteRealm;
-      this.storageAccessor.updatedAt = new Date();
-    },
   },
 
   async mounted() {
@@ -105,7 +101,6 @@ export default defineComponent({
             class="header"
             :selected-note-id="Number($route.params.noteId)"
             v-bind="{ viewType, storageAccessor }"
-            @note-realm-updated="onUpdateNoteRealm($event)"
             @note-deleted="onNoteDeleted($event)"
           />
         </template>

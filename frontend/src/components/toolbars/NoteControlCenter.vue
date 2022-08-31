@@ -19,7 +19,6 @@
         <NoteNewButton
           v-bind="{ parentId: selectedNoteId, storageAccessor }"
           button-title="Add Child Note"
-          @note-realm-updated="$emit('noteRealmUpdated', $event)"
         >
           <SvgAddChild />
         </NoteNewButton>
@@ -127,7 +126,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["noteDeleted", "noteRealmUpdated"],
+  emits: ["noteDeleted"],
   components: {
     ToolbarFrame,
     NoteUndoButton,
