@@ -26,11 +26,10 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
 
     async createUser(data: Generated.User) {
-      const res = (await managedApi.restPostMultiplePartForm(
+      return (await managedApi.restPostMultiplePartForm(
         `user`,
         data
       )) as Generated.User;
-      return res;
     },
   },
   reviewMethods: {
