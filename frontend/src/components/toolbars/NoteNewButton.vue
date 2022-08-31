@@ -6,10 +6,7 @@
     <template #dialog_body="{ doneHandler }">
       <NoteNewDialog
         v-bind="{ parentId, storageAccessor }"
-        @done="
-          doneHandler($event);
-          $emit('noteRealmUpdated', $event);
-        "
+        @done="doneHandler($event)"
       />
     </template>
   </PopupButton>
@@ -30,7 +27,6 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["noteRealmUpdated"],
   components: { PopupButton, NoteNewDialog },
 });
 </script>

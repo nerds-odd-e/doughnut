@@ -65,10 +65,7 @@
               <template #default="{ note }">
                 <LinkNoteDialog
                   v-bind="{ note, storageAccessor }"
-                  @done="
-                    doneHandler($event);
-                    $emit('noteRealmUpdated', $event);
-                  "
+                  @done="doneHandler($event)"
                 />
               </template>
             </NoteDialogFrame>

@@ -81,7 +81,7 @@ export default defineComponent({
         .api()
         .createNote(this.parentId, this.creationData)
         .then((res) => {
-          this.$emit("done", res.noteRealm);
+          this.$emit("done", res);
         })
         .catch((res) => (this.noteFormErrors = res));
     },

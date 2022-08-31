@@ -7,7 +7,7 @@ export interface StoredApi {
   createNote(
     parentId: Doughnut.ID,
     data: Generated.NoteCreation
-  ): Promise<Generated.NoteRealmWithPosition>;
+  ): Promise<Generated.NoteRealm>;
 
   createLink(
     sourceId: Doughnut.ID,
@@ -81,10 +81,12 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   async createNote(parentId: Doughnut.ID, data: Generated.NoteCreation) {
-    return (await this.managedApi.restPostMultiplePartForm(
-      `notes/${parentId}/create`,
-      data
-    )) as Generated.NoteRealmWithPosition;
+    return this.storage.refreshNoteRealm(
+      (await this.managedApi.restPostMultiplePartForm(
+        `notes/${parentId}/create`,
+        data
+      )) as Generated.NoteRealmWithPosition
+    );
   }
 
   async createLink(
@@ -92,10 +94,12 @@ export default class StoredApiCollection implements StoredApi {
     targetId: Doughnut.ID,
     data: Generated.LinkCreation
   ) {
-    return (await this.managedApi.restPost(
-      `links/create/${sourceId}/${targetId}`,
-      data
-    )) as Generated.NoteRealm;
+    return this.storage.refreshNoteRealm(
+      (await this.managedApi.restPost(
+        `links/create/${sourceId}/${targetId}`,
+        data
+      )) as Generated.NoteRealm
+    );
   }
 
   async updateLink(linkId: Doughnut.ID, data: Generated.LinkCreation) {

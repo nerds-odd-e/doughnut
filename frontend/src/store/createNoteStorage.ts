@@ -29,7 +29,15 @@ class NoteStorage implements StorageAccessor {
     return new StoredApiCollection(this.noteEditingHistory, this);
   }
 
-  refreshNoteRealm(noteRealm: Generated.NoteRealm): Generated.NoteRealm {
+  refreshNoteRealm(
+    data: Generated.NoteRealm | Generated.NoteRealmWithPosition
+  ): Generated.NoteRealm {
+    let noteRealm: Generated.NoteRealm;
+    if ("noteRealm" in data) {
+      noteRealm = data.noteRealm;
+    } else {
+      noteRealm = data;
+    }
     this.updatedNoteRealm = noteRealm;
     this.updatedAt = new Date();
     return noteRealm;

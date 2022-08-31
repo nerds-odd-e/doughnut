@@ -1,5 +1,7 @@
 export default interface NoteStorage {
   updatedNoteRealm?: Generated.NoteRealm;
   updatedAt?: Date;
-  refreshNoteRealm(noteRealm: Generated.NoteRealm): Generated.NoteRealm;
+  refreshNoteRealm(
+    data: Generated.NoteRealm | Generated.NoteRealmWithPosition
+  ): Generated.NoteRealm;
 }
