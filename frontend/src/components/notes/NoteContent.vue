@@ -81,7 +81,6 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["noteRealmUpdated"],
   components: {
     NoteShortDescription,
     ShowPicture,
@@ -105,10 +104,7 @@ export default defineComponent({
           this.note.id,
           this.textContent,
           this.note.textContent
-        )
-        .then((res) => {
-          this.$emit("noteRealmUpdated", res);
-        });
+        );
     },
   },
 });

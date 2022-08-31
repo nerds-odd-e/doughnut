@@ -38,7 +38,6 @@
           highlightNoteId,
           storageAccessor,
         }"
-        @note-realm-updated="$emit('noteRealmUpdated', $event)"
         @highlight="$emit('selectNote', $event)"
       />
     </template>
@@ -80,7 +79,7 @@ export default defineComponent({
     NoteParentChildConnection,
     NoteLinks,
   },
-  emits: ["selectNote", "noteRealmUpdated"],
+  emits: ["selectNote"],
   computed: {
     mindmapSector() {
       return new MindmapSector(

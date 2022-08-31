@@ -133,7 +133,9 @@ export default class StoredApiCollection implements StoredApi {
     oldContent: Generated.TextContent
   ) {
     this.noteEditingHistory.addEditingToUndoHistory(noteId, oldContent);
-    return this.updateTextContentWithoutUndo(noteId, noteContentData);
+    return this.storage.refreshNoteRealm(
+      await this.updateTextContentWithoutUndo(noteId, noteContentData)
+    );
   }
 
   private async undoInner() {

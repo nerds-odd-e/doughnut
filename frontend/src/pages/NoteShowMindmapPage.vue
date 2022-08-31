@@ -10,7 +10,6 @@
             viewType: 'mindmap',
             storageAccessor,
           }"
-          @note-realm-updated="noteRealmUpdated($event)"
         />
       </div>
       <div class="content" v-if="noteRealm && noteRealmCache">
@@ -18,7 +17,6 @@
           v-bind="{ noteId, noteRealms: noteRealmCache, storageAccessor }"
           :highlight-note-id="selectedNoteId"
           @select-note="highlight($event)"
-          @note-realm-updated="noteRealmUpdated($event)"
         />
       </div>
     </div>
@@ -85,6 +83,9 @@ export default defineComponent({
     },
   },
   watch: {
+    "storageAccessor.updatedAt": function updateAt() {
+      this.noteRealmUpdated(this.storageAccessor.updatedNoteRealm);
+    },
     noteId() {
       this.fetchData();
     },

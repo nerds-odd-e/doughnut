@@ -8,10 +8,7 @@
       v-bind="{ links, storageAccessor }"
       @note-realm-updated="$emit('noteRealmUpdated', $event)"
     >
-      <NoteContent
-        v-bind="{ note, storageAccessor }"
-        @note-realm-updated="$emit('noteRealmUpdated', $event)"
-      />
+      <NoteContent v-bind="{ note, storageAccessor }" />
     </NoteFrameOfLinks>
     <template #footer>
       <slot name="footer" />

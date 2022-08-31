@@ -10,7 +10,6 @@
           storageAccessor,
         }"
         @select-note="$emit('selectNote', $event)"
-        @note-realm-updated="$emit('noteRealmUpdated', $event)"
       />
     </div>
     <div class="mindmap-info" @click.prevent="reset">
@@ -43,7 +42,7 @@ export default defineComponent({
     },
     highlightNoteId: Number,
   },
-  emits: ["selectNote", "noteRealmUpdated"],
+  emits: ["selectNote"],
   data() {
     return {
       offset: { ...defaultOffset },

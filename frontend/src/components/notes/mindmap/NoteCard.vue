@@ -10,7 +10,6 @@
     <NoteContent
       v-bind="{ note, size, storageAccessor }"
       :title-as-link="true"
-      @note-realm-updated="$emit('noteRealmUpdated', $event)"
     />
   </NoteShell>
 </template>
@@ -34,7 +33,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["highlight", "noteRealmUpdated"],
+  emits: ["highlight"],
   components: {
     NoteShell,
     NoteContent,
