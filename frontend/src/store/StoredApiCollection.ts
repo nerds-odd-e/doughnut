@@ -1,4 +1,5 @@
 import ManagedApi from "../managedApi/ManagedApi";
+import apiCollection from "../managedApi/apiCollection";
 import NoteEditingHistory from "./NoteEditingHistory";
 import NoteStorage from "./NoteStorage";
 
@@ -32,6 +33,11 @@ export interface StoredApi {
     oldContent: Generated.TextContent
   ): Promise<Generated.NoteRealm>;
 
+  updateWikidataId(
+    noteId: Doughnut.ID,
+    data: Generated.WikidataAssociationCreation
+  ): Promise<Generated.NoteRealm>;
+
   undo(): Promise<Generated.NoteRealm>;
 
   deleteNote(noteId: Doughnut.ID): Promise<number | undefined>;
@@ -49,6 +55,10 @@ export default class StoredApiCollection implements StoredApi {
     this.storage = storage;
   }
 
+  private get statelessApi(): ReturnType<typeof apiCollection> {
+    return apiCollection(this.managedApi);
+  }
+
   private async updateTextContentWithoutUndo(
     noteId: Doughnut.ID,
     noteContentData: Generated.TextContent
@@ -59,6 +69,15 @@ export default class StoredApiCollection implements StoredApi {
       `text_content/${noteId}`,
       data
     )) as Generated.NoteRealm;
+  }
+
+  async updateWikidataId(
+    noteId: Doughnut.ID,
+    data: Generated.WikidataAssociationCreation
+  ): Promise<Generated.NoteRealm> {
+    return this.storage.refreshNoteRealm(
+      await this.statelessApi.wikidata.updateWikidataId(noteId, data)
+    );
   }
 
   async createNote(parentId: Doughnut.ID, data: Generated.NoteCreation) {

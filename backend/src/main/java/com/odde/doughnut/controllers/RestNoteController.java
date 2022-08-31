@@ -44,12 +44,12 @@ class RestNoteController {
 
   @PostMapping(value = "/{note}/updateWikidataId")
   @Transactional
-  public String updateWikidataId(
+  public NoteRealm updateWikidataId(
       @PathVariable(name = "note") Note note,
       @RequestBody WikidataAssociationCreation wikidataAssociationCreation) {
     note.setWikidataId(wikidataAssociationCreation.wikidataId);
     modelFactoryService.noteRepository.save(note);
-    return "{}";
+    return new NoteViewer(currentUserFetcher.getUser().getEntity(), note).toJsonObject();
   }
 
   @PostMapping(value = "/{parentNote}/create")

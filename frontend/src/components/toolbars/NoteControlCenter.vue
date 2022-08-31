@@ -48,11 +48,8 @@
             <NoteDialogFrame :note-id="selectedNoteId">
               <template #default="{ note }">
                 <WikidataAssociationDialog
-                  :note="note"
-                  @done="
-                    doneHandler($event);
-                    $emit('noteRealmUpdated', $event);
-                  "
+                  v-bind="{ note, storageAccessor }"
+                  @done="doneHandler($event)"
                 />
               </template>
             </NoteDialogFrame>

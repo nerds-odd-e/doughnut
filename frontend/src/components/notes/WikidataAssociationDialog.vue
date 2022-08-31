@@ -37,12 +37,19 @@
 import { defineComponent, PropType } from "vue";
 import TextInput from "../form/TextInput.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
+import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   setup() {
     return useLoadingApi({ initalLoading: true, hasFormError: false });
   },
-  props: { note: { type: Object as PropType<Generated.Note>, required: true } },
+  props: {
+    note: { type: Object as PropType<Generated.Note>, required: true },
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
+      required: true,
+    },
+  },
   components: { TextInput },
   emits: ["done"],
   data() {
@@ -71,10 +78,9 @@ export default defineComponent({
       }
     },
     async save() {
-      await this.api.wikidata.updateWikidataId(
-        this.note.id,
-        this.associationData
-      );
+      await this.storageAccessor
+        .api()
+        .updateWikidataId(this.note.id, this.associationData);
       this.$emit("done");
     },
   },
