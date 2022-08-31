@@ -11,3 +11,9 @@ import { defineComponent } from "vue";
 
 export default defineComponent({});
 </script>
+
+<style lang="scss">
+.btn:disabled {
+  border-color: transparent;
+}
+</style>

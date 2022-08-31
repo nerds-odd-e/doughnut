@@ -1,6 +1,7 @@
 <template>
   <button
-    class="btn btn-small"
+    class="btn"
+    role="button"
     :title="undoTitle"
     @click="undoDelete()"
     :disabled="!history"

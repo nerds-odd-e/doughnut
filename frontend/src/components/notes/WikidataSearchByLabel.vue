@@ -4,7 +4,7 @@
       <input type="submit" value="Submit" class="btn btn-primary" />
       <button
         id="search-wikidata"
-        class="btn btn-outline-primary"
+        class="btn"
         @click.prevent="fetchSearchResult"
       >
         Search on Wikidata
