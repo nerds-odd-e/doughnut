@@ -54,7 +54,6 @@ export default defineComponent({
   },
   data() {
     return {
-      notePosition: undefined as Generated.NotePositionViewedByUser | undefined,
       noteRealm: undefined as Generated.NoteRealm | undefined,
       selectedNoteId: undefined as Doughnut.ID | undefined,
     };
@@ -77,7 +76,6 @@ export default defineComponent({
       const noteRealmWithPosition = await this.storageAccessor
         .api()
         .getNoteRealmWithPosition(this.noteId);
-      this.notePosition = noteRealmWithPosition.notePosition;
       this.noteRealm = noteRealmWithPosition.noteRealm;
     },
   },

@@ -45,9 +45,6 @@ export default defineComponent({
     noteRealm() {
       return this.noteRealmCache?.getNoteRealmById(this.noteId);
     },
-    selectedNotePosition(): Generated.NotePositionViewedByUser | undefined {
-      return this.noteRealmCache?.getNotePosition(this.selectedNoteId);
-    },
   },
   methods: {
     onNoteDeleted(deletedNoteId: Doughnut.ID) {
@@ -62,6 +59,9 @@ export default defineComponent({
     },
     highlight(id: Doughnut.ID) {
       this.selectedNoteId = id;
+      this.storageAccessor.setPosition(
+        this.noteRealmCache?.getNotePosition(this.selectedNoteId)
+      );
     },
     async fetchData() {
       this.noteRealmCache = new NoteRealmCache(
@@ -77,9 +77,9 @@ export default defineComponent({
       this.fetchData();
     },
   },
-  mounted() {
+  async mounted() {
+    await this.fetchData();
     this.highlight(this.noteId);
-    this.fetchData();
   },
 });
 </script>

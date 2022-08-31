@@ -50,6 +50,10 @@ class NoteStorage implements StorageAccessor {
     this.updatedAt = new Date();
     return noteRealm;
   }
+
+  setPosition(notePosition?: Generated.NotePositionViewedByUser) {
+    this.notePosition = notePosition;
+  }
 }
 
 function createNoteStorage(
