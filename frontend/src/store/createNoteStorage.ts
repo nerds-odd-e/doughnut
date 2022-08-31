@@ -9,6 +9,8 @@ interface StorageAccessor extends NoteStorage {
 class NoteStorage implements StorageAccessor {
   noteEditingHistory: NoteEditingHistory;
 
+  notePosition?: Generated.NotePositionViewedByUser;
+
   updatedNoteRealm?: Generated.NoteRealm;
 
   updatedAt?: Date;

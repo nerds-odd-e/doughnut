@@ -4,6 +4,10 @@ import NoteEditingHistory from "./NoteEditingHistory";
 import NoteStorage from "./NoteStorage";
 
 export interface StoredApi {
+  getNoteRealmWithPosition(
+    noteId: Doughnut.ID
+  ): Promise<Generated.NoteRealmWithPosition>;
+
   createNote(
     parentId: Doughnut.ID,
     data: Generated.NoteCreation
@@ -81,6 +85,14 @@ export default class StoredApiCollection implements StoredApi {
     return this.storage.refreshNoteRealm(
       await this.statelessApi.wikidata.updateWikidataId(noteId, data)
     );
+  }
+
+  async getNoteRealmWithPosition(noteId: Doughnut.ID) {
+    const nrwp = await this.statelessApi.noteMethods.getNoteRealmWithPosition(
+      noteId
+    );
+    this.storage.refreshNoteRealm(nrwp);
+    return nrwp;
   }
 
   async createNote(parentId: Doughnut.ID, data: Generated.NoteCreation) {

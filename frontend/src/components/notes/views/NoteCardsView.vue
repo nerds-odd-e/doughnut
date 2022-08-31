@@ -76,7 +76,6 @@ export default defineComponent({
   methods: {
     noteRealmUpdated(updatedNoteRealm?: Generated.NoteRealm) {
       if (!updatedNoteRealm) {
-        this.fetchData();
         return;
       }
       if (updatedNoteRealm.id !== this.noteId) {
