@@ -23,17 +23,13 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["noteDeleted"],
   components: {
     SvgRemove,
   },
   methods: {
     async deleteNote() {
       if (await this.popups.confirm(`Confirm to delete this note?`)) {
-        const parentId = await this.storageAccessor
-          .api()
-          .deleteNote(this.noteId);
-        this.$emit("noteDeleted", parentId);
+        await this.storageAccessor.api().deleteNote(this.noteId);
       }
     },
   },

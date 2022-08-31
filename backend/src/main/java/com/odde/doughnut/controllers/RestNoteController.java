@@ -136,11 +136,16 @@ class RestNoteController {
 
   @PostMapping(value = "/{note}/delete")
   @Transactional
-  public List<Integer> deleteNote(@PathVariable("note") Note note) throws NoAccessRightException {
-    currentUserFetcher.getUser().getAuthorization().assertAuthorization(note);
+  public List<NoteRealm> deleteNote(@PathVariable("note") Note note) throws NoAccessRightException {
+    UserModel user = currentUserFetcher.getUser();
+    user.getAuthorization().assertAuthorization(note);
     modelFactoryService.toNoteModel(note).destroy(testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.entityManager.flush();
-    return note.getParentId().map(List::of).orElse(List.of());
+    Note parentNote = note.getParentNote();
+    if(parentNote != null) {
+      return List.of(new NoteViewer(user.getEntity(), parentNote).toJsonObject());
+    }
+    return List.of();
   }
 
   @PatchMapping(value = "/{note}/undo-delete")

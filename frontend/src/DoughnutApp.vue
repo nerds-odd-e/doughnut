@@ -41,6 +41,11 @@ export default defineComponent({
     $route() {
       this.popups.done(false);
     },
+    "storageAccessor.updatedAt": function updatedAt() {
+      if (!this.storageAccessor.updatedNoteRealm) {
+        this.$router.push({ name: "notebooks" });
+      }
+    },
   },
 
   computed: {
@@ -60,19 +65,6 @@ export default defineComponent({
         props.user = this.user;
       }
       return props;
-    },
-  },
-
-  methods: {
-    onNoteDeleted(parentId: Doughnut.ID) {
-      if (parentId) {
-        this.$router.push({
-          name: "noteShow",
-          params: { noteId: parentId },
-        });
-      } else {
-        this.$router.push({ name: "notebooks" });
-      }
     },
   },
 
@@ -101,7 +93,6 @@ export default defineComponent({
             class="header"
             :selected-note-id="Number($route.params.noteId)"
             v-bind="{ viewType, storageAccessor }"
-            @note-deleted="onNoteDeleted($event)"
           />
         </template>
         <router-view v-bind="routeViewProps" />

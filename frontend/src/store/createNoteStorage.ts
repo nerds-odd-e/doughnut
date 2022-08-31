@@ -29,11 +29,16 @@ class NoteStorage implements StorageAccessor {
     return new StoredApiCollection(this.noteEditingHistory, this);
   }
 
+  notebookDeleted(): void {
+    this.updatedNoteRealm = undefined;
+    this.updatedAt = new Date();
+  }
+
   refreshNoteRealm(
     data: Generated.NoteRealm | Generated.NoteRealmWithPosition
   ): Generated.NoteRealm {
     let noteRealm: Generated.NoteRealm;
-    if ("noteRealm" in data) {
+    if (data && "noteRealm" in data) {
       noteRealm = data.noteRealm;
     } else {
       noteRealm = data;

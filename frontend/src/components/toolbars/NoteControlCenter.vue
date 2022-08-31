@@ -86,7 +86,6 @@
             <NoteDeleteButton
               class="dropdown-item"
               v-bind="{ noteId: selectedNoteId, storageAccessor }"
-              @note-deleted="$emit('noteDeleted', $event)"
             />
           </div>
         </div>
@@ -126,7 +125,6 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["noteDeleted"],
   components: {
     ToolbarFrame,
     NoteUndoButton,

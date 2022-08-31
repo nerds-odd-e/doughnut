@@ -40,7 +40,7 @@ export interface StoredApi {
 
   undo(): Promise<Generated.NoteRealm>;
 
-  deleteNote(noteId: Doughnut.ID): Promise<number | undefined>;
+  deleteNote(noteId: Doughnut.ID): Promise<Generated.NoteRealm | undefined>;
 }
 export default class StoredApiCollection implements StoredApi {
   noteEditingHistory: NoteEditingHistory;
@@ -160,11 +160,12 @@ export default class StoredApiCollection implements StoredApi {
     const res = (await this.managedApi.restPost(
       `notes/${noteId}/delete`,
       {}
-    )) as number[];
+    )) as Generated.NoteRealm[];
     this.noteEditingHistory.deleteNote(noteId);
-    if (res.length > 0) {
-      return res[0];
+    if (res.length === 0) {
+      this.storage.notebookDeleted();
+      return undefined;
     }
-    return undefined;
+    return this.storage.refreshNoteRealm(res[0]);
   }
 }
