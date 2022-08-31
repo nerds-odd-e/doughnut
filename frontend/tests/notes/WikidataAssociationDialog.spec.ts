@@ -20,7 +20,7 @@ describe("Save wikidata id", () => {
 
     const wrapper = helper
       .component(WikidataAssociationDialog)
-      .withProps({
+      .withStorageProps({
         note,
       })
       .mount();
@@ -33,7 +33,7 @@ describe("Save wikidata id", () => {
     const note = makeMe.aNote.title("Test-Driven Development").please();
     const wrapper = helper
       .component(WikidataAssociationDialog)
-      .withProps({
+      .withStorageProps({
         note,
       })
       .mount();
