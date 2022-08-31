@@ -2,7 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Given, Then, When, defineParameterType } from "@badeball/cypress-cucumber-preprocessor"
+import { DataTable, Given, Then, When, defineParameterType } from "@badeball/cypress-cucumber-preprocessor"
 import NotePath from "../support/NotePath"
 import "../support/string.extensions"
 
@@ -39,10 +39,15 @@ Given("there are notes from Note {int} to Note {int}", (from, to) => {
   cy.testability().seedNotes(notes)
 })
 
-When("I create a notebook with:", (data) => {
-  cy.routerToNotebooks()
-  cy.findByText("Add New Notebook").click()
-  cy.submitNoteCreationFormsWith(data.hashes())
+When("I create notebooks with:", (notes: DataTable) => {
+  notes.hashes().forEach((noteAttributes) => {
+    cy.createNotebookWith(noteAttributes)
+    cy.findNoteTitle(noteAttributes["Title"])
+  })
+})
+
+When("I create a notebook with empty title", () => {
+  cy.createNotebookWith({Title: ''})
 })
 
 When("I update note {string} to become:", (noteTitle: string, data) => {
@@ -82,10 +87,11 @@ When(
   },
 )
 
-When("I create a note belonging to {string}:", (noteTitle: string, data) => {
+When("I create a note belonging to {string}:", (noteTitle: string, data: DataTable) => {
+  expect(data.hashes().length).to.equal(1)
   cy.jumpToNotePage(noteTitle)
   cy.clickAddChildNoteButton()
-  cy.submitNoteCreationFormsWith(data.hashes())
+  cy.submitNoteCreationFormWith(data.hashes()[0])
 })
 
 When("I am creating a note under {notepath}", (notePath: NotePath) => {
@@ -119,10 +125,11 @@ When("I delete notebook {string}", (noteTitle) => {
   cy.findByRole("button", { name: "OK" }).click()
 })
 
-When("I create a sibling note of {string}:", (noteTitle: string, data) => {
+When("I create a sibling note of {string}:", (noteTitle: string, data: DataTable) => {
+  expect(data.hashes().length).to.equal(1)
   cy.findNoteTitle(noteTitle)
   cy.findByRole("button", { name: "Add Sibling Note" }).click()
-  cy.submitNoteCreationFormsWith(data.hashes())
+  cy.submitNoteCreationFormWith(data.hashes()[0])
 })
 
 When("I should see that the note creation is not successful", () => {

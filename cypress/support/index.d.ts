@@ -86,7 +86,7 @@ declare namespace Cypress {
     submitNoteFormWith(noteAttributes: any): Chainable<any>
     submitNoteFormsWith(notes: any): Chainable<any>
     submitNoteCreationFormWith(noteAttributes: any): Chainable<any>
-    submitNoteCreationFormsWith(notes: any): Chainable<any>
+    createNotebookWith(notes: any): Chainable<any>
     testability(): Chainable<any>
     timeTravelTo(day: number, hour: number): Chainable<Subject>
     triggerException(): Chainable<Subject>

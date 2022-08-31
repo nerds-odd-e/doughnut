@@ -38,7 +38,7 @@ Given("There is a circle {string} with {string} members", (circleName: string, m
 When("I create a notebook {string} in circle {string}", (noteTitle, circleName) => {
   cy.navigateToCircle(circleName)
   cy.findByText("Add New Notebook In This Circle").click()
-  cy.submitNoteCreationFormsWith([{ Title: noteTitle }])
+  cy.submitNoteCreationFormWith({ Title: noteTitle })
 })
 
 When("I should see the notebook {string} in circle {string}", (noteTitle: string, circleName) => {
@@ -49,7 +49,7 @@ When("I should see the notebook {string} in circle {string}", (noteTitle: string
 When("I add a note {string} under {string}", (noteTitle: string, parentNoteTitle: string) => {
   cy.findByText(parentNoteTitle).click()
   cy.clickAddChildNoteButton()
-  cy.submitNoteCreationFormsWith([{ Title: noteTitle }])
+  cy.submitNoteCreationFormWith({ Title: noteTitle })
   cy.findNoteTitle(noteTitle)
 })
 

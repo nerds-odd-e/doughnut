@@ -140,8 +140,10 @@ Cypress.Commands.add("clickRadioByLabel", (labelText) => {
   cy.findByText(labelText, { selector: "label" }).click({ force: true })
 })
 
-Cypress.Commands.add("submitNoteCreationFormsWith", (notes) => {
-  notes.forEach((noteAttributes: string) => cy.submitNoteCreationFormWith(noteAttributes))
+Cypress.Commands.add("createNotebookWith", (notebookAttributes) => {
+  cy.routerToNotebooks()
+  cy.findByText("Add New Notebook").click()
+  cy.submitNoteCreationFormWith(notebookAttributes)
 })
 
 Cypress.Commands.add("submitNoteFormsWith", (notes) => {
