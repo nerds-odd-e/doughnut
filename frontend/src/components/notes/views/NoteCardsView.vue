@@ -1,18 +1,6 @@
 <template>
   <LoadingPage v-bind="{ loading, contentExists: !!noteRealm }">
     <div class="inner-box" v-if="noteRealm" :key="noteId">
-      <div class="header">
-        <NoteToolbar
-          v-if="notePosition"
-          v-bind="{
-            selectedNoteId: noteId,
-            selectedNotePosition: notePosition,
-            viewType: 'cards',
-            storageAccessor,
-          }"
-        />
-      </div>
-
       <NoteWithLinks
         v-bind="{
           note: noteRealm.note,
@@ -38,7 +26,6 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import LoadingPage from "@/pages/commons/LoadingPage.vue";
-import NoteToolbar from "@/components/toolbars/NoteToolbar.vue";
 import NoteWithLinks from "../NoteWithLinks.vue";
 import Cards from "../Cards.vue";
 import useLoadingApi from "../../../managedApi/useLoadingApi";
@@ -63,7 +50,6 @@ export default defineComponent({
     NoteWithLinks,
     Cards,
     LoadingPage,
-    NoteToolbar,
     NoteInfoButton,
   },
   data() {
@@ -88,8 +74,9 @@ export default defineComponent({
       this.noteRealm = updatedNoteRealm;
     },
     async fetchData() {
-      const noteRealmWithPosition =
-        await this.api.noteMethods.getNoteRealmWithPosition(this.noteId);
+      const noteRealmWithPosition = await this.storageAccessor
+        .api()
+        .getNoteRealmWithPosition(this.noteId);
       this.notePosition = noteRealmWithPosition.notePosition;
       this.noteRealm = noteRealmWithPosition.noteRealm;
     },

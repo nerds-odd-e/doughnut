@@ -42,6 +42,7 @@ class NoteStorage implements StorageAccessor {
     let noteRealm: Generated.NoteRealm;
     if (data && "noteRealm" in data) {
       noteRealm = data.noteRealm;
+      this.notePosition = data.notePosition;
     } else {
       noteRealm = data;
     }

@@ -1,4 +1,13 @@
 <template>
+  <Breadcrumb v-bind="selectedNotePosition">
+    <NoteNewButton
+      v-if="parentId"
+      v-bind="{ parentId, storageAccessor }"
+      button-title="Add Sibling Note"
+    >
+      <SvgAddSibling />
+    </NoteNewButton>
+  </Breadcrumb>
   <ToolbarFrame>
     <div class="btn-group btn-group-sm">
       <template v-if="!selectedNoteId">
@@ -115,6 +124,8 @@ import SvgCog from "../svgs/SvgCog.vue";
 import NoteDeleteButton from "./NoteDeleteButton.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import PopupButton from "../commons/Popups/PopupButton.vue";
+import Breadcrumb from "./Breadcrumb.vue";
+import SvgAddSibling from "../svgs/SvgAddSibling.vue";
 
 export default defineComponent({
   props: {
@@ -141,6 +152,21 @@ export default defineComponent({
     SvgCog,
     NoteDeleteButton,
     PopupButton,
+    Breadcrumb,
+    SvgAddSibling,
+  },
+  computed: {
+    parentId() {
+      if (!this.selectedNotePosition) return undefined;
+      const { ancestors } = this.selectedNotePosition;
+      if (ancestors.length > 0) {
+        return ancestors[ancestors.length - 1].id;
+      }
+      return undefined;
+    },
+    selectedNotePosition() {
+      return this.storageAccessor.notePosition;
+    },
   },
 });
 </script>
