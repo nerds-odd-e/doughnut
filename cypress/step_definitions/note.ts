@@ -2,7 +2,13 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { DataTable, Given, Then, When, defineParameterType } from "@badeball/cypress-cucumber-preprocessor"
+import {
+  DataTable,
+  Given,
+  Then,
+  When,
+  defineParameterType,
+} from "@badeball/cypress-cucumber-preprocessor"
 import NotePath from "../support/NotePath"
 import "../support/string.extensions"
 
@@ -47,7 +53,7 @@ When("I create notebooks with:", (notes: DataTable) => {
 })
 
 When("I create a notebook with empty title", () => {
-  cy.createNotebookWith({Title: ''})
+  cy.createNotebookWith({ Title: "" })
 })
 
 When("I update note {string} to become:", (noteTitle: string, data) => {

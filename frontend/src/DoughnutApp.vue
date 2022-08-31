@@ -43,7 +43,7 @@ export default defineComponent({
     },
     "storageAccessor.updatedAt": function updatedAt() {
       if (!this.storageAccessor.updatedNoteRealm) {
-        this.$router.push({ name: "notebooks" });
+        this.$router.replace({ name: "notebooks" });
       }
     },
   },
