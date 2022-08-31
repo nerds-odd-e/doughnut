@@ -6,7 +6,6 @@
     <NoteFrameOfLinks
       v-if="links && links.links"
       v-bind="{ links, storageAccessor }"
-      @note-realm-updated="$emit('noteRealmUpdated', $event)"
     >
       <NoteContent v-bind="{ note, storageAccessor }" />
     </NoteFrameOfLinks>
@@ -34,7 +33,6 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["noteRealmUpdated"],
   components: {
     NoteFrameOfLinks,
     NoteShell,

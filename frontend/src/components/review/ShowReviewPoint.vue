@@ -19,11 +19,7 @@
 
   <div v-if="link">
     <div class="jumbotron py-4 mb-2">
-      <LinkShow
-        v-bind="{ link, storageAccessor }"
-        @link-updated="$emit('noteRealmUpdated', $event)"
-        @link-deleted="$emit('linkDeleted', $event)"
-      />
+      <LinkShow v-bind="{ link, storageAccessor }" />
     </div>
   </div>
 </template>
@@ -46,7 +42,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["noteRealmUpdated", "levelChanged", "linkDeleted", "selfEvaluated"],
+  emits: ["levelChanged", "selfEvaluated"],
   components: { LinkShow, NoteCardsView },
   computed: {
     noteId() {

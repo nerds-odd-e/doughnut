@@ -18,9 +18,12 @@ export interface StoredApi {
   updateLink(
     linkId: Doughnut.ID,
     data: Generated.LinkCreation
-  ): Promise<number>;
+  ): Promise<Generated.NoteRealm>;
 
-  deleteLink(linkId: Doughnut.ID): Promise<number>;
+  deleteLink(
+    linkId: Doughnut.ID,
+    fromTargetPerspective: boolean
+  ): Promise<Generated.NoteRealm>;
 
   updateNote(
     noteId: Doughnut.ID,
@@ -103,14 +106,21 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   async updateLink(linkId: Doughnut.ID, data: Generated.LinkCreation) {
-    return (await this.managedApi.restPost(`links/${linkId}`, data)) as number;
+    return this.storage.refreshNoteRealm(
+      (await this.managedApi.restPost(
+        `links/${linkId}`,
+        data
+      )) as Generated.NoteRealm
+    );
   }
 
-  async deleteLink(linkId: Doughnut.ID) {
-    return (await this.managedApi.restPost(
-      `links/${linkId}/delete`,
-      {}
-    )) as number;
+  async deleteLink(linkId: Doughnut.ID, fromTargetPerspective: boolean) {
+    return this.storage.refreshNoteRealm(
+      (await this.managedApi.restPost(
+        `links/${linkId}/${fromTargetPerspective ? "tview" : "sview"}/delete`,
+        {}
+      )) as Generated.NoteRealm
+    );
   }
 
   async updateNote(

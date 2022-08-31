@@ -51,21 +51,29 @@ class RestLinkController {
 
   @PostMapping(value = "/{link}")
   @Transactional
-  public Integer updateLink(Link link, @RequestBody LinkCreation linkCreation)
+  public NoteRealm updateLink(Link link, @RequestBody LinkCreation linkCreation)
       throws NoAccessRightException {
-    currentUserFetcher.getUser().getAuthorization().assertAuthorization(link);
+    UserModel user = currentUserFetcher.getUser();
+    user.getAuthorization().assertAuthorization(link);
     link.setLinkType(linkCreation.linkType);
     modelFactoryService.linkRepository.save(link);
-    return link.getId();
+    return getNoteRealm(link, user, linkCreation.fromTargetPerspective);
   }
 
-  @PostMapping(value = "/{link}/delete")
+  private NoteRealm getNoteRealm(Link link, UserModel user, Boolean fromTargetPerspective) {
+    Note note = fromTargetPerspective ? link.getTargetNote() : link.getSourceNote();
+    return new NoteViewer(user.getEntity(), note).toJsonObject();
+  }
+
+  @PostMapping(value = "/{link}/{perspective}/delete")
   @Transactional
-  public Integer deleteLink(Link link) throws NoAccessRightException {
-    currentUserFetcher.getUser().getAuthorization().assertAuthorization(link);
+  public NoteRealm deleteLink(@PathVariable Link link, @PathVariable String perspective)
+      throws NoAccessRightException {
+    UserModel user = currentUserFetcher.getUser();
+    user.getAuthorization().assertAuthorization(link);
     LinkModel linkModel = modelFactoryService.toLinkModel(link);
     linkModel.destroy();
-    return link.getId();
+    return getNoteRealm(link, user, perspective.equals("tview"));
   }
 
   @PostMapping(value = "/create/{sourceNote}/{targetNote}")
@@ -94,6 +102,6 @@ class RestLinkController {
             linkCreation.linkType,
             testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.linkRepository.save(link);
-    return new NoteViewer(userModel.getEntity(), link.getSourceNote()).toJsonObject();
+    return getNoteRealm(link, userModel, linkCreation.fromTargetPerspective);
   }
 }

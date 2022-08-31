@@ -33,6 +33,7 @@ declare namespace Generated {
 
     interface LinkCreation {
         linkType: LinkType;
+        fromTargetPerspective: boolean;
         moveUnder: boolean;
         asFirstChild: boolean;
     }

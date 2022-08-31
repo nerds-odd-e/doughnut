@@ -5,6 +5,7 @@ import javax.validation.constraints.NotNull;
 
 public class LinkCreation {
   @NotNull public Link.LinkType linkType;
+  public Boolean fromTargetPerspective = false;
   public Boolean moveUnder;
   public Boolean asFirstChild = false;
 }

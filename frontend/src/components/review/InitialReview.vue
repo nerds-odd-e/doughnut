@@ -3,7 +3,6 @@
     <ShowReviewPoint
       v-bind="{ reviewPoint, expandInfo: true, storageAccessor }"
       @level-changed="$emit('reloadNeeded', $event)"
-      @link-deleted="$emit('reloadNeeded', $event)"
     />
     <InitialReviewButtons
       :key="buttonKey"

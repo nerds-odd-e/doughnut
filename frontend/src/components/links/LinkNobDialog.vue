@@ -55,7 +55,7 @@ export default defineComponent({
     inverseIcon: Boolean,
     colors: Object,
   },
-  emits: ["done", "linkDeleted"],
+  emits: ["done"],
   components: {
     LinkTypeSelect,
     NoteTitleWithLink,
@@ -64,6 +64,7 @@ export default defineComponent({
     return {
       formData: {
         linkType: this.link.linkType,
+        fromTargetPerspective: this.inverseIcon,
       } as Generated.LinkCreation,
       linkFormErrors: { linkType: undefined as string | undefined },
     };
@@ -74,9 +75,7 @@ export default defineComponent({
       this.storageAccessor
         .api()
         .updateLink(this.link.id, this.formData)
-        .then(() => {
-          this.$emit("done");
-        })
+        .then(() => this.$emit("done"))
         .catch((error) => {
           this.linkFormErrors = error;
         });
@@ -87,7 +86,9 @@ export default defineComponent({
         this.$emit("done", null);
         return;
       }
-      await this.storageAccessor.api().deleteLink(this.link.id);
+      await this.storageAccessor
+        .api()
+        .deleteLink(this.link.id, this.inverseIcon);
       this.$emit("done");
     },
   },

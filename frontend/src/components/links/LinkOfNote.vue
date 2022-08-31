@@ -4,16 +4,12 @@
       v-bind="{ link, colors, storageAccessor }"
       v-if="!!reverse"
       :inverse-icon="true"
-      @link-deleted="$emit('noteRealmUpdated', $event)"
-      @link-updated="$emit('noteRealmUpdated', $event)"
     />
     <NoteTitleWithLink class="link-title" v-bind="{ note }" />
     <LinkNob
       v-bind="{ link, colors, storageAccessor }"
       v-if="!reverse"
       :inverse-icon="false"
-      @link-deleted="$emit('noteRealmUpdated', $event)"
-      @link-updated="$emit('noteRealmUpdated', $event)"
     />
   </span>
 </template>
@@ -34,7 +30,6 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["noteRealmUpdated"],
   components: { NoteTitleWithLink, LinkNob },
   computed: {
     note() {

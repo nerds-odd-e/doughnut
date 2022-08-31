@@ -54,9 +54,7 @@ describe("repeat page", () => {
       );
     });
 
-    (
-      ["levelChanged", "linkDeleted"] as ("levelChanged" | "linkDeleted")[]
-    ).forEach((event) => {
+    (["levelChanged"] as "levelChanged"[]).forEach((event) => {
       it(`reloads when ${event}`, async () => {
         const wrapper = renderer.currentRoute({ name: "initial" }).mount();
         await flushPromises();

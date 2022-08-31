@@ -8,7 +8,6 @@
           </div>
           <NoteArticleView
             v-bind="{ noteId, noteRealms: noteRealmCache, storageAccessor }"
-            @note-realm-updated="noteRealmUpdated($event)"
           />
         </div>
       </div>
@@ -53,13 +52,6 @@ export default defineComponent({
     },
   },
   methods: {
-    noteRealmUpdated(updatedNoteRealm?: Generated.NoteRealm) {
-      if (!updatedNoteRealm) {
-        this.fetchData();
-        return;
-      }
-      this.noteRealmCache?.updateNoteRealm(updatedNoteRealm);
-    },
     async fetchData() {
       const noteWithDescendents =
         await this.api.noteMethods.getNoteWithDescendents(this.noteId);
@@ -68,6 +60,16 @@ export default defineComponent({
     },
   },
   watch: {
+    "storageAccessor.updatedAt": function noteRealmUpdated() {
+      if (!this.storageAccessor.updatedNoteRealm) {
+        this.fetchData();
+        return;
+      }
+      this.noteRealmCache?.updateNoteRealm(
+        this.storageAccessor.updatedNoteRealm
+      );
+    },
+
     noteId() {
       this.fetchData();
     },

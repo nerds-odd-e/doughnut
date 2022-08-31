@@ -5,11 +5,7 @@
       :key="_linkType"
     >
       <li v-for="link in linksOfType.direct" :key="link.id">
-        <LinkOfNote
-          v-bind="{ link, storageAccessor }"
-          :reverse="false"
-          @note-realm-updated="$emit('noteRealmUpdated', $event)"
-        />
+        <LinkOfNote v-bind="{ link, storageAccessor }" :reverse="false" />
       </li>
     </template>
     <li
@@ -25,7 +21,6 @@
           :key="link.id"
           v-bind="{ link, storageAccessor }"
           :reverse="false"
-          @note-realm-updated="$emit('noteRealmUpdated', $event)"
         />
         <LinkOfNote
           class="link-multi"
@@ -33,7 +28,6 @@
           :key="link.id"
           v-bind="{ link, storageAccessor }"
           :reverse="true"
-          @note-realm-updated="$emit('noteRealmUpdated', $event)"
         />
       </template>
     </li>
@@ -48,7 +42,6 @@
           :key="link.id"
           v-bind="{ link, storageAccessor }"
           :reverse="false"
-          @note-realm-updated="$emit('noteRealmUpdated', $event)"
         />
       </li>
     </template>
@@ -69,7 +62,6 @@
           :key="link.id"
           v-bind="{ link, storageAccessor }"
           :reverse="true"
-          @note-realm-updated="$emit('noteRealmUpdated', $event)"
         />
       </li>
     </template>
@@ -91,7 +83,6 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["noteRealmUpdated"],
   components: { LinkOfNote },
   methods: {
     reverseLabel(lbl) {

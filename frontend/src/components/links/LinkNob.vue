@@ -10,14 +10,7 @@
       <template #dialog_body="{ doneHandler }">
         <LinkNobDialog
           v-bind="{ link, inverseIcon, colors, storageAccessor }"
-          @done="
-            doneHandler($event);
-            $emit('linkUpdated', $event);
-          "
-          @link-deleted="
-            doneHandler($event);
-            $emit('linkDeleted', $event);
-          "
+          @done="doneHandler($event)"
         />
       </template>
     </PopupButton>
@@ -44,7 +37,6 @@ export default defineComponent({
     inverseIcon: Boolean,
     colors: Object,
   },
-  emits: ["linkUpdated", "linkDeleted"],
   components: { SvgLinkTypeIcon, PopupButton, LinkNobDialog },
 });
 </script>

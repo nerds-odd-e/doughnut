@@ -4,11 +4,7 @@
       <LinkNoteShow :note="link.sourceNote" />
     </div>
     <div class="col-12 col-md-4 text-center">
-      <LinkNob
-        v-bind="{ link, storageAccessor }"
-        @link-deleted="$emit('linkDeleted', $event)"
-        @link-updated="$emit('linkUpdated', $event)"
-      />
+      <LinkNob v-bind="{ link, storageAccessor }" />
       <span class="badge bg-light text-dark"> {{ link.linkType }}</span>
     </div>
     <div class="col-12 col-md-4 link-target">
@@ -34,7 +30,6 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["linkDeleted", "linkUpdated"],
   components: { LinkNoteShow, LinkNob },
 });
 </script>

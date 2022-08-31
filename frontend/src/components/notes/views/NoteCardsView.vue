@@ -19,7 +19,6 @@
           links: noteRealm.links,
           storageAccessor,
         }"
-        @note-realm-updated="noteRealmUpdated($event)"
       >
         <template #footer>
           <NoteInfoButton

@@ -2,14 +2,12 @@
   <template v-if="noteRealm">
     <NoteWithLinks
       v-bind="{ note: noteRealm.note, links: noteRealm.links, storageAccessor }"
-      @note-realm-updated="$emit('noteRealmUpdated', $event)"
     />
     <div class="note-list">
       <NoteArticleView
         v-for="child in children"
         v-bind="{ noteId: child.id, noteRealms, storageAccessor }"
         :key="child.id"
-        @note-realm-updated="$emit('noteRealmUpdated', $event)"
       />
     </div>
   </template>
@@ -34,7 +32,6 @@ export default defineComponent({
     },
   },
   components: { NoteWithLinks },
-  emits: ["noteRealmUpdated"],
   computed: {
     noteRealm() {
       return this.noteRealms.getNoteRealmById(this.noteId);
