@@ -4,7 +4,6 @@
       v-bind="{ parentId, storageAccessor }"
       button-title="Add Sibling Note"
       v-if="parentId"
-      @note-realm-updated="$emit('noteRealmUpdated', $event)"
     >
       <SvgAddSibling />
     </NoteNewButton>
@@ -32,7 +31,6 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["noteRealmUpdated"],
   components: {
     Breadcrumb,
     SvgAddSibling,

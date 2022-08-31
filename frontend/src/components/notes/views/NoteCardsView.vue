@@ -10,7 +10,6 @@
             viewType: 'cards',
             storageAccessor,
           }"
-          @note-realm-updated="noteRealmUpdated($event)"
         />
       </div>
 
