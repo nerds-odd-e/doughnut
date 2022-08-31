@@ -23,6 +23,7 @@ declare namespace Cypress {
     clickLinkNob(target: string): Chainable<any>
     clickRadioByLabel(labelText: any): Chainable<any>
     deleteNoteViaAPI(): Chainable<Subject>
+    dialogDisappeared(): Chainable<any>
     distanceBetweenCardsGreaterThan(cards: any, note1: any, note2: any, min: any): Chainable<any>
     expectCurrentNoteDescription(expectedDescription: string): Chainable<any>
     expectExactLinkTargets(targets: any): Chainable<any>

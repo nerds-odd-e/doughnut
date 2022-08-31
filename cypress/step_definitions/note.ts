@@ -42,7 +42,7 @@ Given("there are notes from Note {int} to Note {int}", (from, to) => {
 When("I create notebooks with:", (notes: DataTable) => {
   notes.hashes().forEach((noteAttributes) => {
     cy.createNotebookWith(noteAttributes)
-    cy.findNoteTitle(noteAttributes["Title"])
+    cy.dialogDisappeared()
   })
 })
 
