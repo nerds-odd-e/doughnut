@@ -28,7 +28,7 @@ When("I join the circle", () => {
 
 When("I should see the circle {string} and it has two members in it", (circleName: string) => {
   cy.navigateToCircle(circleName)
-  cy.expectBreadcrumb(circleName)
+  cy.expectBreadcrumb(circleName, false)
   cy.get("body").find(".circle-member").should("have.length", 2)
 })
 

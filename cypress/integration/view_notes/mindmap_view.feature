@@ -41,4 +41,4 @@ Feature: Mindmap view
     When I click note card title "History"
     Then I should see the note "History" is 0px * 0px offset the center of the map
     And I should see the note "History" is "highlighted"
-    And I should see "Singapore" in breadcrumb
+    And I should see "Singapore" in breadcrumb with add sibling button
