@@ -353,7 +353,7 @@ Cypress.Commands.add("openCirclesSelector", () => {
 
 Cypress.Commands.add("navigateToCircle", (circleName) => {
   cy.openCirclesSelector()
-  cy.findByText(circleName).click()
+  cy.findByText(circleName, { selector: ".modal-body a" }).click()
 })
 
 Cypress.Commands.add("routerToInitialReview", () => {
