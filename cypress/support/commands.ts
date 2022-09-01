@@ -60,10 +60,15 @@ Cypress.Commands.add("dialogDisappeared", () => {
   cy.get(".modal-body").should("not.exist")
 })
 
-Cypress.Commands.add("expectBreadcrumb", (items: string) => {
+Cypress.Commands.add("expectBreadcrumb", (items: string, addChildButton: boolean = true) => {
   cy.get(".breadcrumb").within(() =>
     items.commonSenseSplit(", ").forEach((noteTitle: string) => cy.findByText(noteTitle)),
   )
+  if (addChildButton) {
+    cy.addSiblingNoteButton()
+  } else {
+    cy.addSiblingNoteButton().should("not.exist")
+  }
 })
 
 Cypress.Commands.add("selectViewOfNote", (noteTitle: string, viewType: string) => {
@@ -152,9 +157,13 @@ Cypress.Commands.add("submitNoteFormWith", (noteAttributes) => {
   cy.get('input[value="Submit"]').click()
 })
 
+Cypress.Commands.add("addSiblingNoteButton", () => {
+  cy.findByRole("button", { name: "Add Sibling Note" })
+})
+
 Cypress.Commands.add("clickAddChildNoteButton", () => {
   cy.pageIsNotLoading()
-  cy.findAllByRole("button", { name: "Add Child Note" }).first().click()
+  cy.findByRole("button", { name: "Add Child Note" }).click()
 })
 
 Cypress.Commands.add("clickRadioByLabel", (labelText) => {

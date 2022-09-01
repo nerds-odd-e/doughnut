@@ -175,6 +175,7 @@ export default defineComponent({
   computed: {
     parentId() {
       if (!this.notePosition) return undefined;
+      if (!this.selectedNoteId) return undefined;
       const { ancestors } = this.notePosition;
       if (ancestors.length > 0) {
         return ancestors[ancestors.length - 1].id;

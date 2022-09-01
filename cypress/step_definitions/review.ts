@@ -125,9 +125,13 @@ Then("I should be asked picture selection question {string} with {string}", (que
   cy.shouldSeeQuizWithOptions([question], "")
 })
 
-Then("I should be asked spelling question {string}", (question: string) => {
-  cy.findByText(question).should("be.visible")
-})
+Then(
+  "I should be asked spelling question {string} from notebook {string}",
+  (question: string, notebook: string) => {
+    cy.expectBreadcrumb(notebook, false)
+    cy.findByText(question).should("be.visible")
+  },
+)
 
 Then(
   "I should be asked link question {string} {string} with options {string}",

@@ -139,7 +139,7 @@ When("I delete notebook {string}", (noteTitle) => {
 When("I create a sibling note of {string}:", (noteTitle: string, data: DataTable) => {
   expect(data.hashes().length).to.equal(1)
   cy.findNoteTitle(noteTitle)
-  cy.findByRole("button", { name: "Add Sibling Note" }).click()
+  cy.addSiblingNoteButton().click()
   cy.submitNoteCreationFormSuccessfully(data.hashes()[0])
 })
 

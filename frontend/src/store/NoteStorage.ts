@@ -1,4 +1,5 @@
 export default interface NoteStorage {
+  selectedNote?: Generated.Note;
   notePosition?: Generated.NotePositionViewedByUser;
   circle?: Generated.Circle;
   updatedNoteRealm?: Generated.NoteRealm;
@@ -14,6 +15,8 @@ export default interface NoteStorage {
 }
 
 export class StorageImplementation implements NoteStorage {
+  selectedNote?: Generated.Note;
+
   notePosition?: Generated.NotePositionViewedByUser;
 
   circle?: Generated.Circle;

@@ -79,6 +79,7 @@ export default defineComponent({
   methods: {
     loadNew(resp?: Generated.RepetitionForUser) {
       this.repetition = resp;
+      this.storageAccessor.setPosition(resp?.quizQuestion.notebookPosition);
     },
 
     viewLastResult(cursor: number | undefined) {

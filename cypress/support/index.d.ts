@@ -8,6 +8,7 @@ declare namespace Cypress {
     space_intervals?: number
   }
   interface Chainable<Subject = any> {
+    addSiblingNoteButton(): Chainable<any>
     assertBlogPostInWebsiteByTitle(article: any): Chainable<any>
     backendTimeTravelTo(day: number, hour: number): Chainable<Subject>
     backendTimeTravelRelativeToNow(hours: number): Chainable<Subject>
@@ -25,7 +26,7 @@ declare namespace Cypress {
     deleteNoteViaAPI(): Chainable<Subject>
     dialogDisappeared(): Chainable<any>
     distanceBetweenCardsGreaterThan(cards: any, note1: any, note2: any, min: any): Chainable<any>
-    expectBreadcrumb(item: string): Chainable<any>
+    expectBreadcrumb(item: string, addChildButton: boolean = true): Chainable<any>
     expectCurrentNoteDescription(expectedDescription: string): Chainable<any>
     expectExactLinkTargets(targets: any): Chainable<any>
     expectFieldErrorMessage(message: string): Chainable<any>
