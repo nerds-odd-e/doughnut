@@ -1,4 +1,5 @@
 import NoteEditingHistory, { HistoryRecord } from "./NoteEditingHistory";
+import NoteStorage, { StorageImplementation } from "./NoteStorage";
 import StoredApiCollection, { StoredApi } from "./StoredApiCollection";
 
 interface StorageAccessor extends NoteStorage {
@@ -6,16 +7,14 @@ interface StorageAccessor extends NoteStorage {
   peekUndo(): null | HistoryRecord;
 }
 
-class NoteStorage implements StorageAccessor {
+class AccessorImplementation
+  extends StorageImplementation
+  implements StorageAccessor
+{
   noteEditingHistory: NoteEditingHistory;
 
-  notePosition?: Generated.NotePositionViewedByUser;
-
-  updatedNoteRealm?: Generated.NoteRealm;
-
-  updatedAt?: Date;
-
   constructor(noteEditingHistory?: NoteEditingHistory) {
+    super();
     if (noteEditingHistory) {
       this.noteEditingHistory = noteEditingHistory;
     } else {
@@ -30,36 +29,12 @@ class NoteStorage implements StorageAccessor {
   api(): StoredApi {
     return new StoredApiCollection(this.noteEditingHistory, this);
   }
-
-  notebookDeleted(): void {
-    this.updatedNoteRealm = undefined;
-    this.updatedAt = new Date();
-  }
-
-  refreshNoteRealm(
-    data: Generated.NoteRealm | Generated.NoteRealmWithPosition
-  ): Generated.NoteRealm {
-    let noteRealm: Generated.NoteRealm;
-    if (data && "noteRealm" in data) {
-      noteRealm = data.noteRealm;
-      this.notePosition = data.notePosition;
-    } else {
-      noteRealm = data;
-    }
-    this.updatedNoteRealm = noteRealm;
-    this.updatedAt = new Date();
-    return noteRealm;
-  }
-
-  setPosition(notePosition?: Generated.NotePositionViewedByUser) {
-    this.notePosition = notePosition;
-  }
 }
 
 function createNoteStorage(
   noteEditingHistory?: NoteEditingHistory
 ): StorageAccessor {
-  return new NoteStorage(noteEditingHistory);
+  return new AccessorImplementation(noteEditingHistory);
 }
 
 export default createNoteStorage;
