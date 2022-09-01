@@ -24,7 +24,7 @@ const noteAndLinkRoutes = [
     path: "notebooks",
     name: "notebooks",
     component: NotebooksPage,
-    meta: { useControlCenter: true },
+    meta: { useNoteStorageAccessor: true },
   },
 
   {
@@ -32,7 +32,7 @@ const noteAndLinkRoutes = [
     name: "noteShow",
     component: NoteShowPage,
     props: (route: RouteLocation) => ({ noteId: Number(route.params.noteId) }),
-    meta: { useControlCenter: true, viewType: "card" },
+    meta: { useNoteStorageAccessor: true, viewType: "card" },
   },
 
   {
@@ -40,7 +40,7 @@ const noteAndLinkRoutes = [
     name: "noteShowMindmap",
     component: NoteShowMindmapPage,
     props: (route: RouteLocation) => ({ noteId: Number(route.params.noteId) }),
-    meta: { useControlCenter: true, viewType: "mindmap" },
+    meta: { useNoteStorageAccessor: true, viewType: "mindmap" },
   },
 
   {
@@ -48,7 +48,7 @@ const noteAndLinkRoutes = [
     name: "noteShowArticle",
     component: NoteShowArticlePage,
     props: (route: RouteLocation) => ({ noteId: Number(route.params.noteId) }),
-    meta: { useControlCenter: true, viewType: "article" },
+    meta: { useNoteStorageAccessor: true, viewType: "article" },
   },
 
   {
@@ -56,14 +56,14 @@ const noteAndLinkRoutes = [
     name: "answer",
     component: AnswerShowPage,
     props: true,
-    meta: { useControlCenter: true },
+    meta: { useNoteStorageAccessor: true },
   },
   {
     path: "circles/:circleId",
     name: "circleShow",
     component: CircleShowPage,
     props: true,
-    meta: { useControlCenter: true },
+    meta: { useNoteStorageAccessor: true },
   },
 ];
 
@@ -98,14 +98,14 @@ const routes = [
     name: "initial",
     component: NestedInitialReviewPage,
     children: nestedNoteAndLinkRoutes("initial-"),
-    meta: { useControlCenter: true },
+    meta: { useNoteStorageAccessor: true },
   },
   {
     path: "/reviews/repeat",
     name: "repeat",
     component: NestedRepeatPage,
     children: [...nestedNoteAndLinkRoutes("repeat-")],
-    meta: { useControlCenter: true },
+    meta: { useNoteStorageAccessor: true },
   },
   {
     path: "/failure-report-list",

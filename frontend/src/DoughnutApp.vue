@@ -58,7 +58,7 @@ export default defineComponent({
     routeViewProps() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const props = {} as any;
-      if (this.$route.meta.useControlCenter) {
+      if (this.$route.meta.useNoteStorageAccessor) {
         props.storageAccessor = this.storageAccessor;
       }
       if (this.$route.meta.userProp) {
@@ -88,14 +88,12 @@ export default defineComponent({
     <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
     <template v-else>
       <template v-if="!loading">
-        <template v-if="$route.meta['useControlCenter']">
-          <div class="header">
-            <NoteControlCenter
-              :selected-note-id="Number($route.params.noteId)"
-              v-bind="{ viewType, storageAccessor }"
-            />
-          </div>
-        </template>
+        <div class="header">
+          <NoteControlCenter
+            :selected-note-id="Number($route.params.noteId)"
+            v-bind="{ viewType, storageAccessor, user }"
+          />
+        </div>
         <router-view v-bind="routeViewProps" />
       </template>
       <ReviewDoughnut v-if="user" :user="user" @update-user="user = $event" />

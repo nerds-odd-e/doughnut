@@ -16,7 +16,7 @@ describe("circle show page", () => {
       .andReturnOnce(circleNote);
     helper
       .component(CircleShowPage)
-      .withProps({ circleId: circleNote.id })
+      .withStorageProps({ circleId: circleNote.id })
       .render();
   });
 });
