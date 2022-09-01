@@ -3,9 +3,6 @@
     <div class="inner-box" :key="noteId">
       <div class="content" v-if="noteRealm && noteRealmCache">
         <div class="container">
-          <div class="header">
-            <Breadcrumb v-bind="notePosition" />
-          </div>
           <NoteArticleView
             v-bind="{ noteId, noteRealms: noteRealmCache, storageAccessor }"
           />
@@ -21,7 +18,6 @@ import NoteArticleView from "../components/notes/views/NoteArticleView.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
 import LoadingPage from "./commons/LoadingPage.vue";
 import NoteRealmCache from "../store/NoteRealmCache";
-import Breadcrumb from "../components/toolbars/Breadcrumb.vue";
 import { StorageAccessor } from "../store/createNoteStorage";
 
 export default defineComponent({
@@ -38,12 +34,10 @@ export default defineComponent({
   components: {
     LoadingPage,
     NoteArticleView,
-    Breadcrumb,
   },
   data() {
     return {
       noteRealmCache: undefined as NoteRealmCache | undefined,
-      notePosition: undefined as Generated.NotePositionViewedByUser | undefined,
     };
   },
   computed: {
@@ -55,7 +49,7 @@ export default defineComponent({
     async fetchData() {
       const noteWithDescendents =
         await this.api.noteMethods.getNoteWithDescendents(this.noteId);
-      this.notePosition = noteWithDescendents.notePosition;
+      this.storageAccessor.setPosition(noteWithDescendents.notePosition);
       this.noteRealmCache = new NoteRealmCache(noteWithDescendents);
     },
   },
