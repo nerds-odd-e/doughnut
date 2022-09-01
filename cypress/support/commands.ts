@@ -59,6 +59,11 @@ Cypress.Commands.add("dialogDisappeared", () => {
   cy.get(".modal-body").should("not.exist")
 })
 
+Cypress.Commands.add("submitNoteCreationFormSuccessfully", (noteAttributes) => {
+  cy.submitNoteCreationFormWith(noteAttributes)
+  cy.dialogDisappeared()
+})
+
 Cypress.Commands.add("submitNoteCreationFormWith", (noteAttributes) => {
   const linkTypeToParent = noteAttributes["Link Type To Parent"]
   delete noteAttributes["Link Type To Parent"]

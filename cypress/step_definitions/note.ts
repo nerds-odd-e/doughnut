@@ -97,7 +97,7 @@ When("I create a note belonging to {string}:", (noteTitle: string, data: DataTab
   expect(data.hashes().length).to.equal(1)
   cy.jumpToNotePage(noteTitle)
   cy.clickAddChildNoteButton()
-  cy.submitNoteCreationFormWith(data.hashes()[0])
+  cy.submitNoteCreationFormSuccessfully(data.hashes()[0])
 })
 
 When("I am creating a note under {notepath}", (notePath: NotePath) => {
@@ -135,7 +135,7 @@ When("I create a sibling note of {string}:", (noteTitle: string, data: DataTable
   expect(data.hashes().length).to.equal(1)
   cy.findNoteTitle(noteTitle)
   cy.findByRole("button", { name: "Add Sibling Note" }).click()
-  cy.submitNoteCreationFormWith(data.hashes()[0])
+  cy.submitNoteCreationFormSuccessfully(data.hashes()[0])
 })
 
 When("I should see that the note creation is not successful", () => {
