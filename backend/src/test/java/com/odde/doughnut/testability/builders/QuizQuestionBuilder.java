@@ -34,6 +34,7 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestion> {
   public QuizQuestionViewedByUser ViewedByUserPlease() {
     QuizQuestion quizQuestion = inMemoryPlease();
     if (quizQuestion == null) return null;
-    return new QuizQuestionViewedByUser(quizQuestion, makeMe.modelFactoryService);
+    return new QuizQuestionViewedByUser(
+        makeMe.aNullUserModel(), quizQuestion, makeMe.modelFactoryService);
   }
 }

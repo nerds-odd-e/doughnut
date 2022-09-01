@@ -1,5 +1,4 @@
 <template>
-  <BasicBreadcrumb :ancestors="quizQuestion?.scope" />
   <ShowPicture
     v-if="quizQuestion?.pictureWithMask"
     v-bind="quizQuestion?.pictureWithMask"
@@ -71,7 +70,6 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue";
 import ShowPicture from "../notes/ShowPicture.vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import TextInput from "../form/TextInput.vue";
@@ -96,7 +94,6 @@ export default defineComponent({
     },
   },
   components: {
-    BasicBreadcrumb,
     ShowPicture,
     NoteFrameOfLinks,
     TextInput,

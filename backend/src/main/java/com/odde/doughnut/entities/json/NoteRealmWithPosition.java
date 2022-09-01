@@ -11,8 +11,7 @@ public class NoteRealmWithPosition {
   public static NoteRealmWithPosition fromNote(Note note, UserModel user) {
     NoteRealmWithPosition noteRealmWithPosition = new NoteRealmWithPosition();
 
-    noteRealmWithPosition.notePosition =
-        new NoteViewer(user.getEntity(), note).jsonNotePosition(note);
+    noteRealmWithPosition.notePosition = new NoteViewer(user.getEntity(), note).jsonNotePosition();
     noteRealmWithPosition.noteRealm = new NoteViewer(user.getEntity(), note).toJsonObject();
     return noteRealmWithPosition;
   }

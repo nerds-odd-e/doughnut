@@ -26,7 +26,6 @@ class RepetitionBuilder extends Builder<Generated.RepetitionForUser> {
     hintLinks: {
       links: {},
     },
-    scope: [],
   };
 
   withQuestion() {

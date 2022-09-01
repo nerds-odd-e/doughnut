@@ -5,6 +5,8 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PictureWithMask;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.NoteViewer;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionPresenter;
 import java.util.Arrays;
 import java.util.List;
@@ -29,14 +31,14 @@ public class QuizQuestionViewedByUser {
 
   @Getter public List<Integer> viceReviewPointIdList;
 
-  public List<Note> scope;
+  @Getter @Nullable public NotePositionViewedByUser notebookPosition;
 
   @Getter public List<Option> options;
 
   public Optional<PictureWithMask> pictureWithMask;
 
   public QuizQuestionViewedByUser(
-      QuizQuestion quizQuestion, ModelFactoryService modelFactoryService) {
+      UserModel user, QuizQuestion quizQuestion, ModelFactoryService modelFactoryService) {
     QuizQuestionPresenter presenter = quizQuestion.buildPresenter();
     this.quizQuestion = quizQuestion;
     questionType = quizQuestion.getQuestionType();
@@ -48,7 +50,9 @@ public class QuizQuestionViewedByUser {
         presenter.optionCreator().getOptions(modelFactoryService, quizQuestion.getOptionNoteIds());
     viceReviewPointIdList = quizQuestion.getViceReviewPointIdList();
     if (questionType == QuizQuestion.QuestionType.JUST_REVIEW) return;
-    scope = List.of(quizQuestion.getReviewPoint().getHeadNote());
+    notebookPosition =
+        new NoteViewer(user.getEntity(), quizQuestion.getReviewPoint().getHeadNote())
+            .jsonNotePosition();
   }
 
   public static class Option {

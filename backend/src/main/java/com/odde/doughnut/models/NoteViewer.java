@@ -64,7 +64,7 @@ public class NoteViewer {
         .filter(l -> l.sourceVisibleAsTargetOrTo(viewer));
   }
 
-  public NotePositionViewedByUser jsonNotePosition(Note note) {
+  public NotePositionViewedByUser jsonNotePosition() {
     NotePositionViewedByUser nvb = new NotePositionViewedByUser();
     nvb.setNoteId(note.getId());
     nvb.setNotebook(jsonViewer.jsonNotebookViewedByUser(note.getNotebook()));

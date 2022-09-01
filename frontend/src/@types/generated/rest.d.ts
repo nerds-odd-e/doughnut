@@ -104,7 +104,7 @@ declare namespace Generated {
         mainTopic: string;
         hintLinks: LinksOfANote;
         viceReviewPointIdList: number[];
-        scope: Note[];
+        notebookPosition?: NotePositionViewedByUser;
         options: Option[];
         pictureWithMask?: PictureWithMask;
     }

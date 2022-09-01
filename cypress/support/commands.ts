@@ -47,7 +47,7 @@ Cypress.Commands.add("loginAs", (username) => {
 })
 
 Cypress.Commands.add("logout", () => {
-  cy.pageIsNotLoading();
+  cy.pageIsNotLoading()
   cy.request({
     method: "POST",
     url: "/logout",
@@ -353,7 +353,7 @@ Cypress.Commands.add("yesIRemember", () => {
 
 Cypress.Commands.add("openCirclesSelector", () => {
   cy.routerToNotebooks().then(() => {
-    cy.pageIsNotLoading();
+    cy.pageIsNotLoading()
     cy.findByRole("button", { name: "choose a circle" }).click({ force: true })
   })
 })

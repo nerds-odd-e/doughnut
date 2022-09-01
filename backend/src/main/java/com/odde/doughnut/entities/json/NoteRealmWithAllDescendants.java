@@ -12,7 +12,7 @@ public class NoteRealmWithAllDescendants {
 
   public static NoteRealmWithAllDescendants fromNote(Note note, UserModel user) {
     NoteRealmWithAllDescendants notesBulk = new NoteRealmWithAllDescendants();
-    notesBulk.notePosition = new NoteViewer(user.getEntity(), note).jsonNotePosition(note);
+    notesBulk.notePosition = new NoteViewer(user.getEntity(), note).jsonNotePosition();
     notesBulk.notes.add(new NoteViewer(user.getEntity(), note).toJsonObject());
     note.getDescendantsInBreathFirstOrder()
         .forEach(n -> notesBulk.notes.add(new NoteViewer(user.getEntity(), n).toJsonObject()));
