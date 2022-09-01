@@ -1,5 +1,5 @@
 <template>
-  <content-loader></content-loader>
+  <content-loader class="loading-bar" />
 </template>
 
 <script>

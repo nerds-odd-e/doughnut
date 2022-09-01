@@ -47,6 +47,7 @@ Cypress.Commands.add("loginAs", (username) => {
 })
 
 Cypress.Commands.add("logout", () => {
+  cy.pageIsNotLoading();
   cy.request({
     method: "POST",
     url: "/logout",
