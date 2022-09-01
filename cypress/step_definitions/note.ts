@@ -362,7 +362,7 @@ Then("the deleted notebook with title {string} should be restored", (title: stri
 })
 
 Then("there should be no more undo to do", () => {
-  cy.get('.btn[title="undo"]').should("be.disabled")
+  cy.get('.btn[title="undo"]').should("not.exist")
 })
 
 Then("I type {string} in the title", (content: string) => {
