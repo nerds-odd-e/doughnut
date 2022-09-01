@@ -2,7 +2,8 @@ export default interface NoteStorage {
   notePosition?: Generated.NotePositionViewedByUser;
   updatedNoteRealm?: Generated.NoteRealm;
   updatedAt?: Date;
-  notebookDeleted(): void;
+  focusOnNotebooks(): void;
+  setPosition(notePosition?: Generated.NotePositionViewedByUser): void;
   refreshNoteRealm(
     data: Generated.NoteRealm | Generated.NoteRealmWithPosition
   ): Generated.NoteRealm;
@@ -15,7 +16,8 @@ export class StorageImplementation implements NoteStorage {
 
   updatedAt?: Date;
 
-  notebookDeleted(): void {
+  focusOnNotebooks(): void {
+    this.notePosition = undefined;
     this.updatedNoteRealm = undefined;
     this.updatedAt = new Date();
   }

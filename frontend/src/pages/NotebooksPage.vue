@@ -1,5 +1,4 @@
 <template>
-  <BreadcrumbWithCircle v-bind="{ ancestors: [] }" />
   <ContainerPage v-bind="{ loading, contentExists: true, title: 'Notebooks' }">
     <p>
       <NotebookNewButton>Add New Notebook</NotebookNewButton>
@@ -15,7 +14,6 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue";
 import NotebookViewCards from "../components/notebook/NotebookViewCards.vue";
 import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
 import NotebookSubscriptionCards from "../components/subscriptions/NotebookSubscriptionCards.vue";
@@ -40,7 +38,6 @@ export default defineComponent({
     NotebookViewCards,
     NotebookSubscriptionCards,
     NotebookNewButton,
-    BreadcrumbWithCircle,
   },
   data() {
     return {
@@ -50,6 +47,7 @@ export default defineComponent({
   },
   methods: {
     fetchData() {
+      this.storageAccessor.setPosition();
       this.api.notebookMethods.getNotebooks().then((res) => {
         this.notebooks = res.notebooks;
         this.subscriptions = res.subscriptions;

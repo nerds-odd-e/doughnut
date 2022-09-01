@@ -1,5 +1,10 @@
 <template>
-  <Breadcrumb v-bind="selectedNotePosition">
+  <Breadcrumb
+    v-bind="{
+      ancestors: notePosition?.ancestors,
+      notebook: notePosition?.notebook,
+    }"
+  >
     <NoteNewButton
       v-if="parentId"
       v-bind="{ parentId, storageAccessor }"
@@ -157,14 +162,14 @@ export default defineComponent({
   },
   computed: {
     parentId() {
-      if (!this.selectedNotePosition) return undefined;
-      const { ancestors } = this.selectedNotePosition;
+      if (!this.notePosition) return undefined;
+      const { ancestors } = this.notePosition;
       if (ancestors.length > 0) {
         return ancestors[ancestors.length - 1].id;
       }
       return undefined;
     },
-    selectedNotePosition() {
+    notePosition() {
       return this.storageAccessor.notePosition;
     },
   },

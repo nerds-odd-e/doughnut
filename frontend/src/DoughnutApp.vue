@@ -89,11 +89,12 @@ export default defineComponent({
     <template v-else>
       <template v-if="!loading">
         <template v-if="$route.meta['useControlCenter']">
-          <NoteControlCenter
-            class="header"
-            :selected-note-id="Number($route.params.noteId)"
-            v-bind="{ viewType, storageAccessor }"
-          />
+          <div class="header">
+            <NoteControlCenter
+              :selected-note-id="Number($route.params.noteId)"
+              v-bind="{ viewType, storageAccessor }"
+            />
+          </div>
         </template>
         <router-view v-bind="routeViewProps" />
       </template>
