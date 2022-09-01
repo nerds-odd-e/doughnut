@@ -218,7 +218,7 @@ When("I should be asked to log in again when I click the link {string}", (noteTi
 })
 
 When("I open the {string} view of note {string}", (viewType: string, noteTitle: string) => {
-  cy.clickNotePageButton(noteTitle, `${viewType} view`, true)
+  cy.selectViewOfNote(noteTitle, viewType)
 })
 
 When(

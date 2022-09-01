@@ -75,6 +75,7 @@ declare namespace Cypress {
     seedNotes(seedNotes: unknown[], externalIdentifier?: any, circleName?: any): Chainable<Subject>
     seedLink(type: string, fromNoteTitle: string, toNoteTitle: string): Chainable<Subject>
     seedCircle(circleInfo: Record<string, string>): Chainable<Subject>
+    selectViewOfNote(noteTitle: string, viewType: stirng): Chainable<any>
     shareToBazaar(noteTitle: string): Chainable<Subject>
     shouldSeeQuizWithOptions(questionParts: any, options: any): Chainable<any>
     startSearching(): Chainable<any>

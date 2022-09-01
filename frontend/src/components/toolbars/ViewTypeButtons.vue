@@ -1,24 +1,31 @@
 <template>
-  <RadioButtons
-    :model-value="viewType"
-    @update:model-value="viewTypeChange"
-    v-bind="{ options }"
-  >
-    <template #labelAddition="{ value }">
-      <SvgMindmap v-if="value === 'mindmap'" />
-      <SvgArticle v-if="value === 'article'" />
-      <SvgCards v-if="value === 'cards'" />
-    </template>
-  </RadioButtons>
+  <ViewTypeButton
+    class="btn active btn-outline-secondary"
+    data-bs-toggle="dropdown"
+    data-toggle="dropdown"
+    aria-haspopup="true"
+    aria-expanded="false"
+    :view-type="viewType"
+    role="button"
+    title="view type"
+  />
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <ViewTypeButton
+      class="dropdown-item"
+      role="button"
+      v-for="(type, index) in options"
+      :view-type="type.value"
+      :title="type.title"
+      @click="viewTypeChange(type.value)"
+      :key="index"
+    />
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import RadioButtons from "../form/RadioButtons.vue";
-import SvgArticle from "../svgs/SvgArticle.vue";
-import SvgMindmap from "../svgs/SvgMindmap.vue";
-import SvgCards from "../svgs/SvgCards.vue";
 import { routeNameForViewType, viewTypeNames } from "../../models/viewTypes";
+import ViewTypeButton from "./ViewTypeButton.vue";
 
 export default defineComponent({
   props: {
@@ -26,10 +33,7 @@ export default defineComponent({
     viewType: String,
   },
   components: {
-    RadioButtons,
-    SvgCards,
-    SvgMindmap,
-    SvgArticle,
+    ViewTypeButton,
   },
 
   computed: {
