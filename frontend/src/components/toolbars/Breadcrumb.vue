@@ -1,5 +1,5 @@
 <template>
-  <BreadcrumbWithCircle v-bind="{ ancestors, circle, fromBazaar }">
+  <BreadcrumbWithCircle v-bind="{ ancestors, circle: cCircle, fromBazaar }">
     <slot />
   </BreadcrumbWithCircle>
 </template>
@@ -13,13 +13,15 @@ export default defineComponent({
   props: {
     ancestors: Array,
     notebook: Object as PropType<Generated.NotebookViewedByUser>,
+    circle: Object as PropType<Generated.Circle>,
   },
   components: { BreadcrumbWithCircle },
   computed: {
     fromBazaar() {
       return this.notebook?.fromBazaar;
     },
-    circle() {
+    cCircle() {
+      if (this.circle) return this.circle;
       return this.notebook ? this.notebook.ownership.circle : undefined;
     },
   },

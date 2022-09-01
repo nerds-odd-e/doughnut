@@ -59,6 +59,12 @@ Cypress.Commands.add("dialogDisappeared", () => {
   cy.get(".modal-body").should("not.exist")
 })
 
+Cypress.Commands.add("expectBreadcrumb", (items: string) => {
+  cy.get(".breadcrumb").within(() =>
+    items.commonSenseSplit(", ").forEach((noteTitle: string) => cy.findByText(noteTitle)),
+  )
+})
+
 Cypress.Commands.add("submitNoteCreationFormSuccessfully", (noteAttributes) => {
   cy.submitNoteCreationFormWith(noteAttributes)
   cy.dialogDisappeared()

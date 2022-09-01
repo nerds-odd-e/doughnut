@@ -21,7 +21,7 @@ Feature: Nested Note CRUD
       | Re-quirement |
 
   Scenario: Create a new note with wrong info
-    When I create a note belonging to "LeSS in Action":
+    When I try to create a note belonging to "LeSS in Action":
       | Title |
       |       |
     Then I should see that the note creation is not successful

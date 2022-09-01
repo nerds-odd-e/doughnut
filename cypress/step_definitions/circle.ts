@@ -26,8 +26,9 @@ When("I join the circle", () => {
   cy.get('input[value="Join"]').click()
 })
 
-When("I should see the circle {string} and it has two members in it", (circleName) => {
+When("I should see the circle {string} and it has two members in it", (circleName: string) => {
   cy.navigateToCircle(circleName)
+  cy.expectBreadcrumb(circleName)
   cy.get("body").find(".circle-member").should("have.length", 2)
 })
 
@@ -50,7 +51,6 @@ When("I add a note {string} under {string}", (noteTitle: string, parentNoteTitle
   cy.findByText(parentNoteTitle).click()
   cy.clickAddChildNoteButton()
   cy.submitNoteCreationFormSuccessfully({ Title: noteTitle })
-  cy.findNoteTitle(noteTitle)
 })
 
 When(

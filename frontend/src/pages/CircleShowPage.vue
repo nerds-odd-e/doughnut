@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import SvgMissingAvatar from "../components/svgs/SvgMissingAvatar.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import NotebookCardsWithButtons from "../components/notebook/NotebookCardsWithButtons.vue";
@@ -46,6 +46,7 @@ import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
 import NotebookButtons from "../components/notebook/NotebookButtons.vue";
 import BazaarNotebookButtons from "../components/bazaar/BazaarNotebookButtons.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
+import { StorageAccessor } from "../store/createNoteStorage";
 
 export default defineComponent({
   setup() {
@@ -59,7 +60,13 @@ export default defineComponent({
     BazaarNotebookButtons,
     ContainerPage,
   },
-  props: { circleId: { type: Number, required: true } },
+  props: {
+    circleId: { type: Number, required: true },
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
+      required: true,
+    },
+  },
 
   data() {
     return {
@@ -73,9 +80,10 @@ export default defineComponent({
       this.timer = setTimeout(() => {
         this.fetchData();
       }, 5000);
-      this.api.circleMethods
-        .getCircle(this.circleId)
-        .then((res) => (this.circle = res));
+      this.api.circleMethods.getCircle(this.circleId).then((res) => {
+        this.circle = res;
+        this.storageAccessor.setPosition(undefined, res);
+      });
     },
   },
 

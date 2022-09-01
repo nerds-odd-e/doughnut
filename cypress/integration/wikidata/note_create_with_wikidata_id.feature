@@ -19,7 +19,7 @@ Feature: Nested Note Create with wikidata
   @usingDummyWikidataService
   Scenario: Create a new note with invalid wikidata id
     Given The wikidata service is not available
-    When I create a note belonging to "Animals":
+    When I try to create a note belonging to "Animals":
       | Title | Wikidata Id |
       | snake | Q12345R     |
     Then I should see a message "The wikidata service is not available"

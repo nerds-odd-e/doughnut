@@ -100,6 +100,13 @@ When("I create a note belonging to {string}:", (noteTitle: string, data: DataTab
   cy.submitNoteCreationFormSuccessfully(data.hashes()[0])
 })
 
+When("I try to create a note belonging to {string}:", (noteTitle: string, data: DataTable) => {
+  expect(data.hashes().length).to.equal(1)
+  cy.jumpToNotePage(noteTitle)
+  cy.clickAddChildNoteButton()
+  cy.submitNoteCreationFormWith(data.hashes()[0])
+})
+
 When("I am creating a note under {notepath}", (notePath: NotePath) => {
   cy.navigateToNotePage(notePath)
   cy.clickAddChildNoteButton()
@@ -107,9 +114,7 @@ When("I am creating a note under {notepath}", (notePath: NotePath) => {
 
 Then("I should see {string} in breadcrumb", (noteTitles: string) => {
   cy.pageIsNotLoading()
-  cy.get(".breadcrumb").within(() =>
-    noteTitles.commonSenseSplit(", ").forEach((noteTitle: string) => cy.findByText(noteTitle)),
-  )
+  cy.expectBreadcrumb(noteTitles)
 })
 
 When("I visit all my notebooks", () => {

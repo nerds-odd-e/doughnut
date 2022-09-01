@@ -3,6 +3,7 @@
     v-bind="{
       ancestors: notePosition?.ancestors,
       notebook: notePosition?.notebook,
+      circle: storageAccessor.circle,
     }"
   >
     <NoteNewButton
