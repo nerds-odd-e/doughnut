@@ -1,8 +1,6 @@
 <template>
-  <nav class="navbar toolbar">
-    <div class="btn-group btn-group-sm">
-      <slot />
-    </div>
+  <nav class="navbar toolbar justify-content-between">
+    <slot />
   </nav>
 </template>
 

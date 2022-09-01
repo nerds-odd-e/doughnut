@@ -1,27 +1,17 @@
 <template>
-  <UserActionsButton
-    :user="user"
-    @logout="logout"
-    @update-user="$emit('updateUser', $event)"
-  />
   <ReviewDoughnutRing v-if="reviewing" :reviewing="reviewing" />
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+import { defineComponent } from "vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import ReviewDoughnutRing from "./ReviewDoughnutRing.vue";
-import UserActionsButton from "../toolbars/UserActionsButton.vue";
 
 export default defineComponent({
   setup() {
     return useLoadingApi();
   },
   props: {
-    user: {
-      type: Object as PropType<Generated.User>,
-      required: true,
-    },
     reviewData: Object,
   },
   emits: ["updateUser"],
@@ -60,6 +50,6 @@ export default defineComponent({
       clearTimeout(this.timer);
     }
   },
-  components: { ReviewDoughnutRing, UserActionsButton },
+  components: { ReviewDoughnutRing },
 });
 </script>

@@ -72,7 +72,7 @@ export default defineComponent({
   font-size: 0.8rem;
   font-weight: bold;
   position: absolute;
-  top: 0.5rem;
+  top: 6.5rem;
   right: 0.5rem;
 }
 .doughnut-ring-pieces {
@@ -80,10 +80,6 @@ export default defineComponent({
   transform: rotate(45deg);
 }
 
-.login {
-  pointer-events: visiblePainted;
-  top: -20px;
-}
 .initial-review {
   stroke: #3bafda;
 }

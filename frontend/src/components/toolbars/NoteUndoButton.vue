@@ -4,7 +4,7 @@
     role="button"
     :title="undoTitle"
     @click="undoDelete()"
-    :disabled="!history"
+    v-if="history"
   >
     <SvgUndo />
   </button>

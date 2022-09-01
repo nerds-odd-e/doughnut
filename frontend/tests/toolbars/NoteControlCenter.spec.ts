@@ -27,7 +27,7 @@ describe("Note Control Center", () => {
       .withProps({ storageAccessor: histories })
       .render();
 
-    expect(await screen.findByTitle("undo")).toBeDisabled();
+    expect(screen.queryByTitle("undo")).toBeNull();
   });
 
   it("show undo when there is something to undo", async () => {

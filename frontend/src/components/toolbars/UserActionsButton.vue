@@ -1,25 +1,18 @@
 <template>
-  <svg
-    id="dropdownMenuButton"
+  <UserIconMenu
+    v-if="user"
+    role="button"
+    aria-label="User actions"
+    class="user-icon-menu"
     data-bs-toggle="dropdown"
     data-toggle="dropdown"
     aria-haspopup="true"
     aria-expanded="false"
-    title="more options"
-    class="doughnut-ring"
-    viewBox="-50 -50 100 100"
-    width="100"
-    height="100"
-  >
-    <UserIconMenu
-      role="button"
-      aria-label="User actions"
-      class="user-icon-menu"
-      style="pointer-events: visiblePainted"
-    />
-  </svg>
+  />
+  <LoginButton v-else />
 
   <div
+    v-if="user"
     class="dropdown-menu dropdown-menu-end"
     aria-labelledby="dropdownMenuButton"
   >
@@ -46,9 +39,7 @@
         />
       </template>
     </PopupButton>
-    <a href="#" class="dropdown-item" role="button" @click="$emit('logout')"
-      >Logout</a
-    >
+    <a href="#" class="dropdown-item" role="button" @click="logout">Logout</a>
   </div>
 </template>
 
@@ -58,16 +49,30 @@ import UserIconMenu from "./UserIconMenu.vue";
 import PopupButton from "../commons/Popups/PopupButton.vue";
 import CircleSelector from "../circles/CircleSelector.vue";
 import UserProfileDialog from "./UserProfileDialog.vue";
+import LoginButton from "./LoginButton.vue";
+import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default defineComponent({
+  setup() {
+    return useLoadingApi();
+  },
   props: {
-    user: {
-      type: Object as PropType<Generated.User>,
-      required: true,
+    user: { type: Object as PropType<Generated.User> },
+  },
+  emits: ["updateUser"],
+  components: {
+    UserIconMenu,
+    PopupButton,
+    CircleSelector,
+    UserProfileDialog,
+    LoginButton,
+  },
+  methods: {
+    async logout() {
+      await this.api.userMethods.logout();
+      window.location.href = "/bazaar";
     },
   },
-  emits: ["updateUser", "logout"],
-  components: { UserIconMenu, PopupButton, CircleSelector, UserProfileDialog },
 });
 </script>
 

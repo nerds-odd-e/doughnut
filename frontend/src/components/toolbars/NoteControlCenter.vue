@@ -7,7 +7,7 @@
     }"
   >
     <NoteNewButton
-      v-if="parentId"
+      v-if="parentId && user"
       v-bind="{ parentId, storageAccessor }"
       button-title="Add Sibling Note"
     >
@@ -15,98 +15,105 @@
     </NoteNewButton>
   </Breadcrumb>
   <ToolbarFrame>
-    <div class="btn-group btn-group-sm">
-      <template v-if="!selectedNoteId">
-        <PopupButton title="link note">
-          <template #button_face>
-            <SvgSearch />
-          </template>
-          <template #dialog_body="{ doneHandler }">
-            <LinkNoteDialog
-              v-bind="{ storageAccessor }"
-              @done="doneHandler($event)"
-            />
-          </template>
-        </PopupButton>
-      </template>
-      <template v-if="selectedNoteId">
-        <ViewTypeButtons v-bind="{ viewType, noteId: selectedNoteId }" />
-        <NoteNewButton
-          v-bind="{ parentId: selectedNoteId, storageAccessor }"
-          button-title="Add Child Note"
-        >
-          <SvgAddChild />
-        </NoteNewButton>
-
-        <PopupButton title="edit note">
-          <template #button_face>
-            <SvgEdit />
-          </template>
-          <template #dialog_body="{ doneHandler }">
-            <NoteDialogFrame :note-id="selectedNoteId">
-              <template #default="{ note }">
-                <NoteEditDialog
-                  v-bind="{ note, storageAccessor }"
-                  @done="doneHandler($event)"
-                />
-              </template>
-            </NoteDialogFrame>
-          </template>
-        </PopupButton>
-
-        <PopupButton title="associate wikidata">
-          <template #button_face>
-            <SvgWikiData />
-          </template>
-          <template #dialog_body="{ doneHandler }">
-            <NoteDialogFrame :note-id="selectedNoteId">
-              <template #default="{ note }">
-                <WikidataAssociationDialog
-                  v-bind="{ note, storageAccessor }"
-                  @done="doneHandler($event)"
-                />
-              </template>
-            </NoteDialogFrame>
-          </template>
-        </PopupButton>
-
-        <PopupButton title="link note">
-          <template #button_face>
-            <SvgSearch />
-          </template>
-          <template #dialog_body="{ doneHandler }">
-            <NoteDialogFrame :note-id="selectedNoteId">
-              <template #default="{ note }">
-                <LinkNoteDialog
-                  v-bind="{ note, storageAccessor }"
-                  @done="doneHandler($event)"
-                />
-              </template>
-            </NoteDialogFrame>
-          </template>
-        </PopupButton>
-        <div class="dropdown">
-          <button
-            class="btn btn-light dropdown-toggle"
-            id="dropdownMenuButton"
-            data-bs-toggle="dropdown"
-            aria-haspopup="true"
-            aria-expanded="false"
-            role="button"
-            title="more options"
+    <template v-if="user">
+      <div class="btn-group btn-group-sm">
+        <template v-if="!selectedNoteId">
+          <PopupButton title="link note">
+            <template #button_face>
+              <SvgSearch />
+            </template>
+            <template #dialog_body="{ doneHandler }">
+              <LinkNoteDialog
+                v-bind="{ storageAccessor }"
+                @done="doneHandler($event)"
+              />
+            </template>
+          </PopupButton>
+        </template>
+        <template v-if="selectedNoteId">
+          <ViewTypeButtons v-bind="{ viewType, noteId: selectedNoteId }" />
+          <NoteNewButton
+            v-bind="{ parentId: selectedNoteId, storageAccessor }"
+            button-title="Add Child Note"
           >
-            <SvgCog />
-          </button>
-          <div class="dropdown-menu dropdown-menu-end">
-            <NoteDeleteButton
-              class="dropdown-item"
-              v-bind="{ noteId: selectedNoteId, storageAccessor }"
-            />
-          </div>
-        </div>
-      </template>
+            <SvgAddChild />
+          </NoteNewButton>
 
+          <PopupButton title="edit note">
+            <template #button_face>
+              <SvgEdit />
+            </template>
+            <template #dialog_body="{ doneHandler }">
+              <NoteDialogFrame :note-id="selectedNoteId">
+                <template #default="{ note }">
+                  <NoteEditDialog
+                    v-bind="{ note, storageAccessor }"
+                    @done="doneHandler($event)"
+                  />
+                </template>
+              </NoteDialogFrame>
+            </template>
+          </PopupButton>
+
+          <PopupButton title="associate wikidata">
+            <template #button_face>
+              <SvgWikiData />
+            </template>
+            <template #dialog_body="{ doneHandler }">
+              <NoteDialogFrame :note-id="selectedNoteId">
+                <template #default="{ note }">
+                  <WikidataAssociationDialog
+                    v-bind="{ note, storageAccessor }"
+                    @done="doneHandler($event)"
+                  />
+                </template>
+              </NoteDialogFrame>
+            </template>
+          </PopupButton>
+
+          <PopupButton title="link note">
+            <template #button_face>
+              <SvgSearch />
+            </template>
+            <template #dialog_body="{ doneHandler }">
+              <NoteDialogFrame :note-id="selectedNoteId">
+                <template #default="{ note }">
+                  <LinkNoteDialog
+                    v-bind="{ note, storageAccessor }"
+                    @done="doneHandler($event)"
+                  />
+                </template>
+              </NoteDialogFrame>
+            </template>
+          </PopupButton>
+          <div class="dropdown">
+            <button
+              class="btn btn-light dropdown-toggle"
+              id="dropdownMenuButton"
+              data-bs-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+              role="button"
+              title="more options"
+            >
+              <SvgCog />
+            </button>
+            <div class="dropdown-menu dropdown-menu-end">
+              <NoteDeleteButton
+                class="dropdown-item"
+                v-bind="{ noteId: selectedNoteId, storageAccessor }"
+              />
+            </div>
+          </div>
+        </template>
+      </div>
+    </template>
+    <div class="btn-group btn-group-sm">
       <NoteUndoButton v-bind="{ storageAccessor }" />
+      <UserActionsButton
+        v-bind="{ user }"
+        @update-user="$emit('updateUser', $event)"
+      />
     </div>
   </ToolbarFrame>
 </template>
@@ -132,6 +139,7 @@ import { StorageAccessor } from "../../store/createNoteStorage";
 import PopupButton from "../commons/Popups/PopupButton.vue";
 import Breadcrumb from "./Breadcrumb.vue";
 import SvgAddSibling from "../svgs/SvgAddSibling.vue";
+import UserActionsButton from "./UserActionsButton.vue";
 
 export default defineComponent({
   props: {
@@ -143,6 +151,7 @@ export default defineComponent({
     },
     user: { type: Object as PropType<Generated.User> },
   },
+  emits: ["updateUser"],
   components: {
     ToolbarFrame,
     NoteUndoButton,
@@ -161,6 +170,7 @@ export default defineComponent({
     PopupButton,
     Breadcrumb,
     SvgAddSibling,
+    UserActionsButton,
   },
   computed: {
     parentId() {

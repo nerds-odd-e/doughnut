@@ -6,7 +6,6 @@ import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
 import useLoadingApi from "./managedApi/useLoadingApi";
 import usePopups from "./components/commons/Popups/usePopup";
 import ReviewDoughnut from "./components/review/ReviewDoughnut.vue";
-import LoginButton from "./components/toolbars/LoginButton.vue";
 import NoteControlCenter from "./components/toolbars/NoteControlCenter.vue";
 import { sanitizeViewTypeName } from "./models/viewTypes";
 import createNoteStorage from "./store/createNoteStorage";
@@ -33,7 +32,6 @@ export default defineComponent({
     TestMenu,
     UserNewRegisterPage,
     ReviewDoughnut,
-    LoginButton,
     NoteControlCenter,
   },
 
@@ -92,12 +90,12 @@ export default defineComponent({
           <NoteControlCenter
             :selected-note-id="Number($route.params.noteId)"
             v-bind="{ viewType, storageAccessor, user }"
+            @update-user="user = $event"
           />
         </div>
         <router-view v-bind="routeViewProps" />
       </template>
-      <ReviewDoughnut v-if="user" :user="user" @update-user="user = $event" />
-      <LoginButton v-else />
+      <ReviewDoughnut v-if="user" />
       <TestMenu
         v-if="environment === 'testing'"
         :feature-toggle="featureToggle"
