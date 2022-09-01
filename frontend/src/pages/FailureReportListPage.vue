@@ -1,6 +1,6 @@
 <template>
   <p v-if="!!errorMessage" v-text="errorMessage"></p>
-  <ContainerPage v-bind="{ loading, contentExists: !!failureReports }">
+  <ContainerPage v-else v-bind="{ loading, contentExists: !!failureReports }">
     <div v-if="!!failureReports">
       <h2>Failure report list</h2>
       <div
