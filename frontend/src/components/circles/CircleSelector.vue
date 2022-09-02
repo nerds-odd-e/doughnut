@@ -22,12 +22,16 @@
         </li>
       </ul>
     </div>
-    <PopupButton title="Create a new circle">
-      <template #dialog_body="{ doneHandler }">
-        <CircleNewDialog @done="$emit('done', doneHandler($event))" />
-      </template>
-    </PopupButton>
-    <router-link :to="{ name: 'circleJoin' }"> Join a circle </router-link>
+    <div class="btn-group">
+      <PopupButton class="btn btn-secondary" title="Create a new circle">
+        <template #dialog_body="{ doneHandler }">
+          <CircleNewDialog @done="$emit('done', doneHandler($event))" />
+        </template>
+      </PopupButton>
+      <router-link class="btn btn-primary" :to="{ name: 'circleJoin' }">
+        Join a circle
+      </router-link>
+    </div>
   </LoadingPage>
 </template>
 
