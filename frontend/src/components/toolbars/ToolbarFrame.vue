@@ -15,3 +15,9 @@ export default defineComponent({});
   border-color: transparent;
 }
 </style>
+
+<style scoped lang="scss">
+.toolbar {
+  background-color: #cee0fa;
+}
+</style>
