@@ -1,7 +1,8 @@
-export default interface NoteStorage {
-  selectedNote?: Generated.Note;
-  notePosition?: Generated.NotePositionViewedByUser;
-  circle?: Generated.Circle;
+import CurrentPosition, {
+  CurrentPositionImplementation,
+} from "./CurrentPosition";
+
+export default interface NoteStorage extends CurrentPosition {
   updatedNoteRealm?: Generated.NoteRealm;
   updatedAt?: Date;
   focusOnNotebooks(): void;
@@ -15,13 +16,10 @@ export default interface NoteStorage {
   ): Generated.NoteRealm;
 }
 
-export class StorageImplementation implements NoteStorage {
-  selectedNote?: Generated.Note;
-
-  notePosition?: Generated.NotePositionViewedByUser;
-
-  circle?: Generated.Circle;
-
+export class StorageImplementation
+  extends CurrentPositionImplementation
+  implements NoteStorage
+{
   updatedNoteRealm?: Generated.NoteRealm;
 
   updatedAt?: Date;
@@ -45,15 +43,5 @@ export class StorageImplementation implements NoteStorage {
     this.updatedNoteRealm = noteRealm;
     this.updatedAt = new Date();
     return noteRealm;
-  }
-
-  selectPosition(
-    note?: Generated.Note,
-    notePosition?: Generated.NotePositionViewedByUser,
-    circle?: Generated.Circle
-  ): void {
-    this.selectedNote = note;
-    this.notePosition = notePosition;
-    this.circle = circle;
   }
 }
