@@ -15,7 +15,12 @@
     </NoteNewButton>
   </Breadcrumb>
   <ToolbarFrame>
-    <template v-if="user">
+    <template v-if="!user">
+      <div class="btn-group btn-group-sm">
+        <BrandBar />
+      </div>
+    </template>
+    <template v-else>
       <div class="btn-group btn-group-sm">
         <template v-if="!selectedNoteId">
           <PopupButton title="link note">

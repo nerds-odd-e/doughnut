@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar toolbar justify-content-between">
+  <nav class="toolbar navbar justify-content-between">
     <slot />
   </nav>
 </template>
@@ -19,5 +19,6 @@ export default defineComponent({});
 <style scoped lang="scss">
 .toolbar {
   background-color: #cee0fa;
+  padding: 0px 5px;
 }
 </style>

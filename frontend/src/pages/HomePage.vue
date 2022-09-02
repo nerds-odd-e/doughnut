@@ -1,5 +1,4 @@
 <template>
-  <BrandBar />
   <ContainerPage v-bind="{ loading: false, contentExists: true }">
     <h1 v-if="!!user" class="display-4">Welcome {{ user.name }}!</h1>
     <h1 v-else class="display-4">Welcome to Doughnut!!!</h1>
@@ -83,7 +82,6 @@
 import { defineComponent, PropType } from "vue";
 import PopupButton from "@/components/commons/Popups/PopupButton.vue";
 import CircleSelector from "@/components/circles/CircleSelector.vue";
-import BrandBar from "@/components/toolbars/BrandBar.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 
 export default defineComponent({
@@ -93,6 +91,6 @@ export default defineComponent({
       required: false,
     },
   },
-  components: { ContainerPage, PopupButton, CircleSelector, BrandBar },
+  components: { ContainerPage, PopupButton, CircleSelector },
 });
 </script>
