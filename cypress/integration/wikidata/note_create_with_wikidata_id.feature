@@ -8,7 +8,7 @@ Feature: Nested Note Create with wikidata
       | title   | testingParent  | description         |
       | Animals |                | An awesome training |
 
-  @usingDummyWikidataService
+  @usingDummyWikidataService @mockBrowserTime
   Scenario: Create a new note with a wikidata id
     Given Wikidata.org has an entity "Q2102" with "long animal"
     When I create a note belonging to "Animals":
@@ -16,7 +16,7 @@ Feature: Nested Note Create with wikidata
       | snake |  Q2102       |
     Then I should see the icon beside title linking to "https://www.wikidata.org/wiki/Q2102"
 
-  @usingDummyWikidataService
+  @usingDummyWikidataService @mockBrowserTime
   Scenario: Create a new note with invalid wikidata id
     Given The wikidata service is not available
     When I try to create a note belonging to "Animals":
@@ -24,7 +24,7 @@ Feature: Nested Note Create with wikidata
       | snake | Q12345R     |
     Then I should see a message "The wikidata service is not available"
 
-  @usingDummyWikidataService
+  @usingDummyWikidataService @mockBrowserTime
   Scenario: Select one of the Wikidata entries from the search result
     Given Wikidata has search result for "rock music" with wikidata ID "Q11399"
     When I am creating a note under "My Notes/Animals"
