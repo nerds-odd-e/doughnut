@@ -64,11 +64,18 @@ public class NoteViewer {
         .filter(l -> l.sourceVisibleAsTargetOrTo(viewer));
   }
 
-  public NotePositionViewedByUser jsonNotePosition() {
+  public NotePositionViewedByUser jsonNotePosition(boolean inclusive) {
     NotePositionViewedByUser nvb = new NotePositionViewedByUser();
     nvb.setNoteId(note.getId());
     nvb.setNotebook(jsonViewer.jsonNotebookViewedByUser(note.getNotebook()));
     nvb.setAncestors(note.getAncestors());
+    if (inclusive) {
+      nvb.getAncestors().add(note);
+    }
     return nvb;
+  }
+
+  public NotePositionViewedByUser jsonNotePosition() {
+    return jsonNotePosition(false);
   }
 }

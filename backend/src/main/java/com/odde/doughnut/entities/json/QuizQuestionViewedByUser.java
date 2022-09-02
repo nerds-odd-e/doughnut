@@ -52,7 +52,7 @@ public class QuizQuestionViewedByUser {
     if (questionType == QuizQuestion.QuestionType.JUST_REVIEW) return;
     notebookPosition =
         new NoteViewer(user.getEntity(), quizQuestion.getReviewPoint().getHeadNote())
-            .jsonNotePosition();
+            .jsonNotePosition(true);
   }
 
   public static class Option {

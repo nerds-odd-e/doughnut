@@ -61,14 +61,14 @@ Cypress.Commands.add("dialogDisappeared", () => {
 })
 
 Cypress.Commands.add("expectBreadcrumb", (items: string, addChildButton: boolean = true) => {
-  cy.get(".breadcrumb").within(() =>
-    items.commonSenseSplit(", ").forEach((noteTitle: string) => cy.findByText(noteTitle)),
-  )
   if (addChildButton) {
     cy.addSiblingNoteButton()
   } else {
     cy.addSiblingNoteButton().should("not.exist")
   }
+  cy.get(".breadcrumb").within(() =>
+    items.commonSenseSplit(", ").forEach((noteTitle: string) => cy.findByText(noteTitle)),
+  )
 })
 
 Cypress.Commands.add("selectViewOfNote", (noteTitle: string, viewType: string) => {

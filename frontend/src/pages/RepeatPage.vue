@@ -77,14 +77,6 @@ export default defineComponent({
     },
   },
   methods: {
-    loadNew(resp?: Generated.RepetitionForUser) {
-      this.repetition = resp;
-      this.storageAccessor.selectPosition(
-        undefined,
-        resp?.quizQuestion.notebookPosition
-      );
-    },
-
     viewLastResult(cursor: number | undefined) {
       this.previousResultCursor = cursor;
       if (this.currentResult) {
@@ -95,9 +87,16 @@ export default defineComponent({
       this.$router.push({ name: "repeat" });
     },
 
+    selectPosition() {
+      this.storageAccessor.selectPosition(
+        undefined,
+        this.repetition?.quizQuestion.notebookPosition
+      );
+    },
     async fetchData() {
       try {
         this.repetition = await this.api.reviewMethods.getNextReviewItem();
+        this.selectPosition();
       } catch (_e) {
         this.repetition = undefined;
         if (this.finished === 0) {
@@ -113,6 +112,13 @@ export default defineComponent({
         return;
       }
       this.viewLastResult(this.previousResults.length - 1);
+    },
+  },
+  watch: {
+    minimized() {
+      if (!this.minimized) {
+        this.selectPosition();
+      }
     },
   },
 
