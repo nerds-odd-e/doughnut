@@ -145,6 +145,7 @@ import PopupButton from "../commons/Popups/PopupButton.vue";
 import Breadcrumb from "./Breadcrumb.vue";
 import SvgAddSibling from "../svgs/SvgAddSibling.vue";
 import UserActionsButton from "./UserActionsButton.vue";
+import BrandBar from "./BrandBar.vue";
 
 export default defineComponent({
   props: {
@@ -176,6 +177,7 @@ export default defineComponent({
     Breadcrumb,
     SvgAddSibling,
     UserActionsButton,
+    BrandBar,
   },
   computed: {
     parentId() {
