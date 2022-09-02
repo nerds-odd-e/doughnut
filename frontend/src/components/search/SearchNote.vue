@@ -5,6 +5,7 @@
       field="searchKey"
       v-model="inputSearchKey"
       placeholder="Search"
+      v-focus
     />
     <SearchResults v-bind="{ noteId, inputSearchKey }">
       <template #button="{ note }">
