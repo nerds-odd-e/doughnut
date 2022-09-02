@@ -18,10 +18,10 @@ Feature: Mindmap view
     And The note "History" "should not" have the description indicator
     And The note "Leaving Malaysia" "should" have the description indicator
     When I drag the map by 200px * 100px
-    Then I should see the note "Singapore" is 200px * -27px offset the center of the map
+    Then I should see the note "Singapore" is 200px * 27px offset the center of the map
     When I zoom in at the "topLeft"
-    Then I should see the note "Singapore" is 550px * 183px offset the center of the map
-    And I should see the note "Geography" is 235px * 183px offset the center of the map
+    Then I should see the note "Singapore" is 550px * 223px offset the center of the map
+    And I should see the note "Geography" is 235px * 223px offset the center of the map
     And I should see the zoom scale is "150%"
     When I click the zoom indicator
     Then I should see the note "Singapore" is 0px * 0px offset the center of the map
