@@ -16,13 +16,6 @@
     class="dropdown-menu dropdown-menu-end"
     aria-labelledby="dropdownMenuButton"
   >
-    <PopupButton class="dropdown-item" title="choose a circle" :sidebar="true">
-      <template #button_face>All Notes</template>
-      <template #dialog_body="{ doneHandler }">
-        <CircleSelector @done="doneHandler($event)" />
-      </template>
-    </PopupButton>
-    <div class="dropdown-divider"></div>
     <PopupButton class="dropdown-item" title="choose a circle">
       <template #button_face> Settings for {{ user.name }}</template>
       <template #dialog_body="{ doneHandler }">
@@ -44,7 +37,6 @@
 import { defineComponent, PropType } from "vue";
 import UserIconMenu from "./UserIconMenu.vue";
 import PopupButton from "../commons/Popups/PopupButton.vue";
-import CircleSelector from "../circles/CircleSelector.vue";
 import UserProfileDialog from "./UserProfileDialog.vue";
 import LoginButton from "./LoginButton.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
@@ -60,7 +52,6 @@ export default defineComponent({
   components: {
     UserIconMenu,
     PopupButton,
-    CircleSelector,
     UserProfileDialog,
     LoginButton,
   },
