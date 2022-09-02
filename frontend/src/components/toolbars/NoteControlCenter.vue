@@ -119,7 +119,6 @@ import BrandBar from "./BrandBar.vue";
 
 export default defineComponent({
   props: {
-    selectedNoteId: Number,
     viewType: { type: String as PropType<ViewTypeName> },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,

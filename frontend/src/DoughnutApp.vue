@@ -89,12 +89,8 @@ export default defineComponent({
     <template v-else>
       <template v-if="!loading">
         <div class="header">
-          <BreadcrumbX
-            :selected-note-id="Number($route.params.noteId)"
-            v-bind="{ storageAccessor, user }"
-          />
+          <BreadcrumbX v-bind="{ storageAccessor, user }" />
           <NoteControlCenter
-            :selected-note-id="Number($route.params.noteId)"
             v-bind="{ viewType, storageAccessor, user }"
             @update-user="user = $event"
           />

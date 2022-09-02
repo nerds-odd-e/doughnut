@@ -25,7 +25,6 @@ import SvgAddSibling from "../svgs/SvgAddSibling.vue";
 
 export default defineComponent({
   props: {
-    selectedNoteId: Number,
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,
@@ -40,7 +39,7 @@ export default defineComponent({
   computed: {
     parentId() {
       if (!this.notePosition) return undefined;
-      if (!this.selectedNoteId) return undefined;
+      if (!this.storageAccessor.selectedNote) return undefined;
       const { ancestors } = this.notePosition;
       if (ancestors.length > 0) {
         return ancestors[ancestors.length - 1].id;
