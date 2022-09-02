@@ -14,6 +14,7 @@ declare module '@vue/runtime-core' {
     BrandBar: typeof import('./src/components/toolbars/BrandBar.vue')['default']
     Breadcrumb: typeof import('./src/components/toolbars/Breadcrumb.vue')['default']
     BreadcrumbAsync: typeof import('./src/components/toolbars/BreadcrumbAsync.vue')['default']
+    BreadcrumbMain: typeof import('./src/components/toolbars/BreadcrumbMain.vue')['default']
     BreadcrumbWith: typeof import('./src/components/toolbars/BreadcrumbWith.vue')['default']
     BreadcrumbWithCircle: typeof import('./src/components/toolbars/BreadcrumbWithCircle.vue')['default']
     BreadcrumbX: typeof import('./src/components/toolbars/BreadcrumbX.vue')['default']

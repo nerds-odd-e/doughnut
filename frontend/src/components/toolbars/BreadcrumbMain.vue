@@ -6,6 +6,17 @@
       circle: storageAccessor.circle,
     }"
   >
+    <template #head>
+      <PopupButton title="choose a circle" :sidebar="true">
+        <template #button_face>
+          <SvgForward />
+        </template>
+        <template #dialog_body="{ doneHandler }">
+          <CircleSelector @done="doneHandler($event)" />
+        </template>
+      </PopupButton>
+    </template>
+
     <NoteNewButton
       v-if="parentId && user"
       v-bind="{ parentId, storageAccessor }"
@@ -22,6 +33,9 @@ import NoteNewButton from "./NoteNewButton.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import Breadcrumb from "./Breadcrumb.vue";
 import SvgAddSibling from "../svgs/SvgAddSibling.vue";
+import PopupButton from "../commons/Popups/PopupButton.vue";
+import SvgForward from "../svgs/SvgForward.vue";
+import CircleSelector from "../circles/CircleSelector.vue";
 
 export default defineComponent({
   props: {
@@ -35,6 +49,9 @@ export default defineComponent({
     NoteNewButton,
     Breadcrumb,
     SvgAddSibling,
+    PopupButton,
+    SvgForward,
+    CircleSelector,
   },
   computed: {
     parentId() {
