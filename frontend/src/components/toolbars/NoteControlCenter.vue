@@ -1,19 +1,4 @@
 <template>
-  <Breadcrumb
-    v-bind="{
-      ancestors: notePosition?.ancestors,
-      notebook: notePosition?.notebook,
-      circle: storageAccessor.circle,
-    }"
-  >
-    <NoteNewButton
-      v-if="parentId && user"
-      v-bind="{ parentId, storageAccessor }"
-      button-title="Add Sibling Note"
-    >
-      <SvgAddSibling />
-    </NoteNewButton>
-  </Breadcrumb>
   <ToolbarFrame>
     <template v-if="!user">
       <div class="btn-group btn-group-sm">
@@ -22,7 +7,7 @@
     </template>
     <template v-else>
       <div class="btn-group btn-group-sm">
-        <template v-if="!selectedNoteId">
+        <template v-if="!selectedNote">
           <PopupButton title="link note">
             <template #button_face>
               <SvgSearch />
@@ -35,10 +20,10 @@
             </template>
           </PopupButton>
         </template>
-        <template v-if="selectedNoteId">
-          <ViewTypeButtons v-bind="{ viewType, noteId: selectedNoteId }" />
+        <template v-if="selectedNote">
+          <ViewTypeButtons v-bind="{ viewType, noteId: selectedNote.id }" />
           <NoteNewButton
-            v-bind="{ parentId: selectedNoteId, storageAccessor }"
+            v-bind="{ parentId: selectedNote.id, storageAccessor }"
             button-title="Add Child Note"
           >
             <SvgAddChild />
@@ -49,7 +34,7 @@
               <SvgEdit />
             </template>
             <template #dialog_body="{ doneHandler }">
-              <NoteDialogFrame :note-id="selectedNoteId">
+              <NoteDialogFrame :note-id="selectedNote.id">
                 <template #default="{ note }">
                   <NoteEditDialog
                     v-bind="{ note, storageAccessor }"
@@ -65,7 +50,7 @@
               <SvgWikiData />
             </template>
             <template #dialog_body="{ doneHandler }">
-              <NoteDialogFrame :note-id="selectedNoteId">
+              <NoteDialogFrame :note-id="selectedNote.id">
                 <template #default="{ note }">
                   <WikidataAssociationDialog
                     v-bind="{ note, storageAccessor }"
@@ -81,7 +66,7 @@
               <SvgSearch />
             </template>
             <template #dialog_body="{ doneHandler }">
-              <NoteDialogFrame :note-id="selectedNoteId">
+              <NoteDialogFrame :note-id="selectedNote.id">
                 <template #default="{ note }">
                   <LinkNoteDialog
                     v-bind="{ note, storageAccessor }"
@@ -106,7 +91,7 @@
             <div class="dropdown-menu dropdown-menu-end">
               <NoteDeleteButton
                 class="dropdown-item"
-                v-bind="{ noteId: selectedNoteId, storageAccessor }"
+                v-bind="{ noteId: selectedNote.id, storageAccessor }"
               />
             </div>
           </div>
@@ -142,8 +127,6 @@ import SvgCog from "../svgs/SvgCog.vue";
 import NoteDeleteButton from "./NoteDeleteButton.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import PopupButton from "../commons/Popups/PopupButton.vue";
-import Breadcrumb from "./Breadcrumb.vue";
-import SvgAddSibling from "../svgs/SvgAddSibling.vue";
 import UserActionsButton from "./UserActionsButton.vue";
 import BrandBar from "./BrandBar.vue";
 
@@ -174,23 +157,12 @@ export default defineComponent({
     SvgCog,
     NoteDeleteButton,
     PopupButton,
-    Breadcrumb,
-    SvgAddSibling,
     UserActionsButton,
     BrandBar,
   },
   computed: {
-    parentId() {
-      if (!this.notePosition) return undefined;
-      if (!this.selectedNoteId) return undefined;
-      const { ancestors } = this.notePosition;
-      if (ancestors.length > 0) {
-        return ancestors[ancestors.length - 1].id;
-      }
-      return undefined;
-    },
-    notePosition() {
-      return this.storageAccessor.notePosition;
+    selectedNote(): Generated.Note | undefined {
+      return this.storageAccessor.selectedNote;
     },
   },
 });

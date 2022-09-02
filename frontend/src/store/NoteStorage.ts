@@ -5,7 +5,8 @@ export default interface NoteStorage {
   updatedNoteRealm?: Generated.NoteRealm;
   updatedAt?: Date;
   focusOnNotebooks(): void;
-  setPosition(
+  selectPosition(
+    note?: Generated.Note,
     notePosition?: Generated.NotePositionViewedByUser,
     circle?: Generated.Circle
   ): void;
@@ -26,7 +27,7 @@ export class StorageImplementation implements NoteStorage {
   updatedAt?: Date;
 
   focusOnNotebooks(): void {
-    this.setPosition();
+    this.selectPosition();
     this.updatedNoteRealm = undefined;
     this.updatedAt = new Date();
   }
@@ -37,7 +38,7 @@ export class StorageImplementation implements NoteStorage {
     let noteRealm: Generated.NoteRealm;
     if (data && "noteRealm" in data) {
       noteRealm = data.noteRealm;
-      this.setPosition(data.notePosition);
+      this.selectPosition(noteRealm.note, data.notePosition);
     } else {
       noteRealm = data;
     }
@@ -46,10 +47,12 @@ export class StorageImplementation implements NoteStorage {
     return noteRealm;
   }
 
-  setPosition(
+  selectPosition(
+    note?: Generated.Note,
     notePosition?: Generated.NotePositionViewedByUser,
     circle?: Generated.Circle
   ): void {
+    this.selectedNote = note;
     this.notePosition = notePosition;
     this.circle = circle;
   }

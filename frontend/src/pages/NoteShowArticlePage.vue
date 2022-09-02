@@ -49,7 +49,10 @@ export default defineComponent({
     async fetchData() {
       const noteWithDescendents =
         await this.api.noteMethods.getNoteWithDescendents(this.noteId);
-      this.storageAccessor.setPosition(noteWithDescendents.notePosition);
+      this.storageAccessor.selectPosition(
+        noteWithDescendents.notes[0].note,
+        noteWithDescendents.notePosition
+      );
       this.noteRealmCache = new NoteRealmCache(noteWithDescendents);
     },
   },

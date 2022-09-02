@@ -59,7 +59,8 @@ export default defineComponent({
     },
     highlight(id: Doughnut.ID) {
       this.selectedNoteId = id;
-      this.storageAccessor.setPosition(
+      this.storageAccessor.selectPosition(
+        this.noteRealmCache?.getNoteRealmById(this.selectedNoteId)?.note,
         this.noteRealmCache?.getNotePosition(this.selectedNoteId)
       );
     },

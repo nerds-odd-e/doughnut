@@ -47,7 +47,7 @@ export default defineComponent({
   },
   methods: {
     fetchData() {
-      this.storageAccessor.setPosition();
+      this.storageAccessor.selectPosition();
       this.api.notebookMethods.getNotebooks().then((res) => {
         this.notebooks = res.notebooks;
         this.subscriptions = res.subscriptions;

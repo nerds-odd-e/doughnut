@@ -9,6 +9,7 @@ import ReviewDoughnut from "./components/review/ReviewDoughnut.vue";
 import NoteControlCenter from "./components/toolbars/NoteControlCenter.vue";
 import { sanitizeViewTypeName } from "./models/viewTypes";
 import createNoteStorage from "./store/createNoteStorage";
+import BreadcrumbX from "./components/toolbars/BreadcrumbX.vue";
 
 export default defineComponent({
   setup() {
@@ -33,6 +34,7 @@ export default defineComponent({
     UserNewRegisterPage,
     ReviewDoughnut,
     NoteControlCenter,
+    BreadcrumbX,
   },
 
   watch: {
@@ -87,6 +89,10 @@ export default defineComponent({
     <template v-else>
       <template v-if="!loading">
         <div class="header">
+          <BreadcrumbX
+            :selected-note-id="Number($route.params.noteId)"
+            v-bind="{ storageAccessor, user }"
+          />
           <NoteControlCenter
             :selected-note-id="Number($route.params.noteId)"
             v-bind="{ viewType, storageAccessor, user }"

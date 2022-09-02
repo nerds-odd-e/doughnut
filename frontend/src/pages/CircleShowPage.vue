@@ -82,7 +82,7 @@ export default defineComponent({
       }, 5000);
       this.api.circleMethods.getCircle(this.circleId).then((res) => {
         this.circle = res;
-        this.storageAccessor.setPosition(undefined, res);
+        this.storageAccessor.selectPosition(undefined, undefined, res);
       });
     },
   },
