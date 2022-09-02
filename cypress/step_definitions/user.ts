@@ -54,7 +54,7 @@ Then("I should see {string} in the page", (content) => {
 
 Then("My name {string} is in the user action menu", (name: string) => {
   cy.findByRole("button", { name: "User actions" }).click()
-  cy.findByRole("button", { name })
+  cy.findByRole("button", { name: `Setting for ${name}` })
 })
 
 Then("my daily new notes to review is set to {int}", (number: string) => {
