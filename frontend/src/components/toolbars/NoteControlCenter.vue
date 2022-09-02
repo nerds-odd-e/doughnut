@@ -34,14 +34,10 @@
               <SvgEdit />
             </template>
             <template #dialog_body="{ doneHandler }">
-              <NoteDialogFrame :note-id="selectedNote.id">
-                <template #default="{ note }">
-                  <NoteEditDialog
-                    v-bind="{ note, storageAccessor }"
-                    @done="doneHandler($event)"
-                  />
-                </template>
-              </NoteDialogFrame>
+              <NoteEditDialog
+                v-bind="{ note: selectedNote, storageAccessor }"
+                @done="doneHandler($event)"
+              />
             </template>
           </PopupButton>
 
@@ -50,14 +46,10 @@
               <SvgWikiData />
             </template>
             <template #dialog_body="{ doneHandler }">
-              <NoteDialogFrame :note-id="selectedNote.id">
-                <template #default="{ note }">
-                  <WikidataAssociationDialog
-                    v-bind="{ note, storageAccessor }"
-                    @done="doneHandler($event)"
-                  />
-                </template>
-              </NoteDialogFrame>
+              <WikidataAssociationDialog
+                v-bind="{ note: selectedNote, storageAccessor }"
+                @done="doneHandler($event)"
+              />
             </template>
           </PopupButton>
 
@@ -66,14 +58,10 @@
               <SvgSearch />
             </template>
             <template #dialog_body="{ doneHandler }">
-              <NoteDialogFrame :note-id="selectedNote.id">
-                <template #default="{ note }">
-                  <LinkNoteDialog
-                    v-bind="{ note, storageAccessor }"
-                    @done="doneHandler($event)"
-                  />
-                </template>
-              </NoteDialogFrame>
+              <LinkNoteDialog
+                v-bind="{ note: selectedNote, storageAccessor }"
+                @done="doneHandler($event)"
+              />
             </template>
           </PopupButton>
           <div class="dropdown">
@@ -115,7 +103,6 @@ import NoteUndoButton from "./NoteUndoButton.vue";
 import NoteNewButton from "./NoteNewButton.vue";
 import SvgAddChild from "../svgs/SvgAddChild.vue";
 import SvgEdit from "../svgs/SvgEdit.vue";
-import NoteDialogFrame from "../notes/NoteDialogFrame.vue";
 import NoteEditDialog from "../notes/NoteEditDialog.vue";
 import SvgWikiData from "../svgs/SvgWikiData.vue";
 import WikidataAssociationDialog from "../notes/WikidataAssociationDialog.vue";
@@ -147,7 +134,6 @@ export default defineComponent({
     NoteNewButton,
     SvgAddChild,
     SvgEdit,
-    NoteDialogFrame,
     NoteEditDialog,
     SvgWikiData,
     WikidataAssociationDialog,
