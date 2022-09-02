@@ -5,8 +5,7 @@ import TestMenu from "./components/commons/TestMenu.vue";
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
 import useLoadingApi from "./managedApi/useLoadingApi";
 import usePopups from "./components/commons/Popups/usePopup";
-import ReviewDoughnut from "./components/review/ReviewDoughnut.vue";
-import NoteControlCenter from "./components/toolbars/NoteControlCenter.vue";
+import ControlCenter from "./components/toolbars/ControlCenter.vue";
 import createNoteStorage from "./store/createNoteStorage";
 import BreadcrumbMain from "./components/toolbars/BreadcrumbMain.vue";
 
@@ -31,8 +30,7 @@ export default defineComponent({
     Popups,
     TestMenu,
     UserNewRegisterPage,
-    ReviewDoughnut,
-    NoteControlCenter,
+    ControlCenter,
     BreadcrumbMain,
   },
 
@@ -86,14 +84,13 @@ export default defineComponent({
       <template v-if="!loading">
         <div class="header">
           <BreadcrumbMain v-bind="{ storageAccessor, user }" />
-          <NoteControlCenter
+          <ControlCenter
             v-bind="{ storageAccessor, user }"
             @update-user="user = $event"
           />
         </div>
         <router-view v-bind="routeViewProps" />
       </template>
-      <ReviewDoughnut v-if="user" />
       <TestMenu
         v-if="environment === 'testing'"
         :feature-toggle="featureToggle"

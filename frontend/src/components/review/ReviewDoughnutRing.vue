@@ -71,9 +71,6 @@ export default defineComponent({
   pointer-events: none;
   font-size: 0.8rem;
   font-weight: bold;
-  position: absolute;
-  top: 6.5rem;
-  right: 0.5rem;
 }
 .doughnut-ring-pieces {
   pointer-events: visiblePainted;

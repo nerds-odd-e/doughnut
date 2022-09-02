@@ -22,12 +22,9 @@
         <CircleSelector @done="doneHandler($event)" />
       </template>
     </PopupButton>
-    <router-link class="dropdown-item" :to="{ name: 'reviews' }"
-      >Review</router-link
-    >
     <div class="dropdown-divider"></div>
     <PopupButton class="dropdown-item" title="choose a circle">
-      <template #button_face>{{ user.name }}</template>
+      <template #button_face> Settings for {{ user.name }}</template>
       <template #dialog_body="{ doneHandler }">
         <UserProfileDialog
           @done="
