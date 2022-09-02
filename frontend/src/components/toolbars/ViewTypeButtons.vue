@@ -1,6 +1,7 @@
 <template>
   <ViewTypeButton
     class="btn active btn-outline-secondary"
+    id="viewTypeSelect"
     data-bs-toggle="dropdown"
     data-toggle="dropdown"
     aria-haspopup="true"
@@ -9,7 +10,7 @@
     role="button"
     title="view type"
   />
-  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+  <div class="dropdown-menu" aria-labelledby="viewTypeSelect">
     <ViewTypeButton
       class="dropdown-item"
       role="button"

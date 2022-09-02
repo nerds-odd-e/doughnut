@@ -7,7 +7,6 @@ import useLoadingApi from "./managedApi/useLoadingApi";
 import usePopups from "./components/commons/Popups/usePopup";
 import ReviewDoughnut from "./components/review/ReviewDoughnut.vue";
 import NoteControlCenter from "./components/toolbars/NoteControlCenter.vue";
-import { sanitizeViewTypeName } from "./models/viewTypes";
 import createNoteStorage from "./store/createNoteStorage";
 import BreadcrumbMain from "./components/toolbars/BreadcrumbMain.vue";
 
@@ -52,9 +51,6 @@ export default defineComponent({
     newUser() {
       return !this.user && !!this.externalIdentifier;
     },
-    viewType() {
-      return sanitizeViewTypeName(this.$route.meta.viewType as string);
-    },
     routeViewProps() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const props = {} as any;
@@ -91,7 +87,7 @@ export default defineComponent({
         <div class="header">
           <BreadcrumbMain v-bind="{ storageAccessor, user }" />
           <NoteControlCenter
-            v-bind="{ viewType, storageAccessor, user }"
+            v-bind="{ storageAccessor, user }"
             @update-user="user = $event"
           />
         </div>
