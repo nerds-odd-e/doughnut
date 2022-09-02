@@ -38,7 +38,7 @@ Then(
   "On day {int} I should have {string} note for initial review and {string} for repeat",
   (day: number, numberOfInitialReviews: string, numberOfRepeats: string) => {
     cy.testability().timeTravelTo(day, 8)
-    cy.routerToRoot()
+    cy.routerToReviews()
     cy.contains(numberOfInitialReviews, {
       selector: ".doughnut-ring .initial-review",
     })
