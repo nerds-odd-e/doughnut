@@ -53,8 +53,7 @@ Then("I should see {string} in the page", (content) => {
 })
 
 Then("My name {string} is in the user action menu", (name: string) => {
-  cy.findByRole("button", { name: "User actions" }).click()
-  cy.findByRole("button", { name: `Setting for ${name}` })
+  cy.findUserSettingsButton(name)
 })
 
 Then("my daily new notes to review is set to {int}", (number: string) => {
@@ -106,8 +105,7 @@ Then("I login as {string} I should see {string}", (username: string, expectation
 
 Then("I edit user profile", () => {
   cy.visit("/")
-  cy.findByRole("button", { name: "User actions" }).click()
-  cy.findByRole("button", { name: "Old Learner" }).click()
+  cy.findUserSettingsButton("Old Learner").click()
 })
 
 Then("I change my name to {string}", (name: string) => {

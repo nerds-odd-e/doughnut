@@ -60,6 +60,11 @@ Cypress.Commands.add("dialogDisappeared", () => {
   cy.get(".modal-body").should("not.exist")
 })
 
+Cypress.Commands.add("findUserSettingsButton", (userName: string) => {
+  cy.findByRole("button", { name: "User actions" }).click()
+  cy.findByRole("button", { name: `Settings for ${userName}` })
+})
+
 Cypress.Commands.add("expectBreadcrumb", (items: string, addChildButton: boolean = true) => {
   if (addChildButton) {
     cy.addSiblingNoteButton()

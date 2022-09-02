@@ -1,5 +1,7 @@
 <template>
-  <BrandBar />
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <BrandBar />
+  </nav>
   <LoadingPage
     v-bind="{ loading, contentExists: !!circles, title: 'My Circles' }"
   >

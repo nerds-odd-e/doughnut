@@ -33,6 +33,7 @@ declare namespace Cypress {
     expectNoteCards(expectedCards: any): Chainable<any>
     findNoteTitle(title: string): Chainable<any>
     findCardTitle(title: string): Chainable<any>
+    findUserSettingsButton(userName: string): Chainable<any>
     failure(): Chainable<any>
     featureToggle(enabled: boolean): Chainable<Subject>
     findNoteCardButton(noteTitle: string, btnTextOrTitle: string): Chainable<any>
