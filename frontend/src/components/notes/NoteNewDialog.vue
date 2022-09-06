@@ -22,6 +22,9 @@
       :title="creationData.textContent.title"
       @selected="onSelectWikidataEntry"
     />
+    <p v-if="noteFormErrors.isDuplicate" style="color: red">
+      Duplicate Wikidata ID detected.
+    </p>
     <fieldset class="secondary-info">
       <legend>Similar Notes</legend>
       <SearchResults
@@ -70,6 +73,7 @@ export default defineComponent({
         linkTypeToParent: undefined,
         textContent: {},
         wikiDataId: undefined as undefined | string,
+        isDuplicate: false,
       },
     };
   },
@@ -83,7 +87,13 @@ export default defineComponent({
         .then((res) => {
           this.$emit("done", res);
         })
-        .catch((res) => (this.noteFormErrors = res));
+        .catch((res) => {
+          this.noteFormErrors = res;
+          const errorCode = res.code;
+          if (errorCode === "DUPLICATE") {
+            this.noteFormErrors.isDuplicate = true;
+          }
+        });
     },
     onSelectWikidataEntry(selectedSuggestion: Generated.WikidataSearchEntity) {
       this.creationData.textContent.title = selectedSuggestion.label;
