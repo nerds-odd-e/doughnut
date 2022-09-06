@@ -138,14 +138,16 @@ class RestNoteControllerTests {
 
     @Test
     void shouldBeAbleToSaveNoteWhenValid()
-      throws NoAccessRightException, BindException, InterruptedException, DuplicateWikidataIdException {
+        throws NoAccessRightException, BindException, InterruptedException,
+            DuplicateWikidataIdException {
       NoteRealmWithPosition response = controller.createNote(parent, noteCreation);
       assertThat(response.noteRealm.getId(), not(nullValue()));
     }
 
     @Test
     void shouldBeAbleToCreateAThing()
-      throws NoAccessRightException, BindException, InterruptedException, DuplicateWikidataIdException {
+        throws NoAccessRightException, BindException, InterruptedException,
+            DuplicateWikidataIdException {
       long beforeThingCount = makeMe.modelFactoryService.thingRepository.count();
       controller.createNote(parent, noteCreation);
       long afterThingCount = makeMe.modelFactoryService.thingRepository.count();
@@ -154,7 +156,8 @@ class RestNoteControllerTests {
 
     @Test
     void shouldBeAbleToSaveNoteWithWikidataIdWhenValid()
-      throws NoAccessRightException, BindException, InterruptedException, IOException, DuplicateWikidataIdException {
+        throws NoAccessRightException, BindException, InterruptedException, IOException,
+            DuplicateWikidataIdException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(new MakeMe().wikidataEntityJson().entityId("Q12345").please());
       noteCreation.setWikidataId("Q12345");
@@ -164,7 +167,8 @@ class RestNoteControllerTests {
 
     @Test
     void shouldCallTheCorrectApi()
-      throws NoAccessRightException, BindException, InterruptedException, IOException, DuplicateWikidataIdException {
+        throws NoAccessRightException, BindException, InterruptedException, IOException,
+            DuplicateWikidataIdException {
       noteCreation.setWikidataId("Q12345");
       controller.createNote(parent, noteCreation);
       Mockito.verify(httpClientAdapter)
@@ -174,7 +178,8 @@ class RestNoteControllerTests {
 
     @Test
     void shouldBeAbleToSaveNoteWithoutWikidataIdWhenValid()
-      throws NoAccessRightException, BindException, InterruptedException, DuplicateWikidataIdException {
+        throws NoAccessRightException, BindException, InterruptedException,
+            DuplicateWikidataIdException {
       NoteRealmWithPosition response = controller.createNote(parent, noteCreation);
 
       assertThat(response.noteRealm.getNote().getWikidataId(), equalTo(null));
@@ -185,7 +190,8 @@ class RestNoteControllerTests {
       String conflictingWikidataId = "Q123";
       parent.setWikidataId(conflictingWikidataId);
       noteCreation.setWikidataId(conflictingWikidataId);
-      assertThrows(DuplicateWikidataIdException.class, () -> controller.createNote(parent, noteCreation));
+      assertThrows(
+          DuplicateWikidataIdException.class, () -> controller.createNote(parent, noteCreation));
     }
   }
 
@@ -321,7 +327,9 @@ class RestNoteControllerTests {
       newNote.setParentNote(note);
       WikidataAssociationCreation wikidataAssociationCreation = new WikidataAssociationCreation();
       wikidataAssociationCreation.wikidataId = "Q123";
-      assertThrows(DuplicateWikidataIdException.class, () -> controller.updateWikidataId(newNote, wikidataAssociationCreation));
+      assertThrows(
+          DuplicateWikidataIdException.class,
+          () -> controller.updateWikidataId(newNote, wikidataAssociationCreation));
     }
   }
 }

@@ -47,7 +47,8 @@ class RestNoteController {
   @Transactional
   public NoteRealm updateWikidataId(
       @PathVariable(name = "note") Note note,
-      @RequestBody WikidataAssociationCreation wikidataAssociationCreation) throws DuplicateWikidataIdException {
+      @RequestBody WikidataAssociationCreation wikidataAssociationCreation)
+      throws DuplicateWikidataIdException {
     Notebook notebook = note.getNotebook();
     this.checkDuplicateWikidataId(notebook, wikidataAssociationCreation.wikidataId);
     note.setWikidataId(wikidataAssociationCreation.wikidataId);
@@ -60,7 +61,8 @@ class RestNoteController {
   public NoteRealmWithPosition createNote(
       @PathVariable(name = "parentNote") Note parentNote,
       @Valid @ModelAttribute NoteCreation noteCreation)
-    throws NoAccessRightException, BindException, InterruptedException, DuplicateWikidataIdException {
+      throws NoAccessRightException, BindException, InterruptedException,
+          DuplicateWikidataIdException {
     Notebook notebook = parentNote.getNotebook();
     this.checkDuplicateWikidataId(notebook, noteCreation.getWikidataId());
 
@@ -187,8 +189,10 @@ class RestNoteController {
     return new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
   }
 
-  private String checkDuplicateWikidataId(Notebook notebook, String wikidataId) throws DuplicateWikidataIdException {
-    List<Note> notes = modelFactoryService.noteRepository.searchInNotebookByWikidataId(notebook, wikidataId);
+  private String checkDuplicateWikidataId(Notebook notebook, String wikidataId)
+      throws DuplicateWikidataIdException {
+    List<Note> notes =
+        modelFactoryService.noteRepository.searchInNotebookByWikidataId(notebook, wikidataId);
     if (!notes.isEmpty()) {
       throw new DuplicateWikidataIdException();
     }
