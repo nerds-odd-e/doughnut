@@ -6,6 +6,7 @@ import com.odde.doughnut.services.HttpClientAdapter;
 import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 import javax.annotation.Resource;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -56,5 +57,13 @@ public class RestWikidataController {
 
   private WikidataService getWikiDataService() {
     return new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
+  }
+
+  public String getWikidataLocation(String id) throws IOException, InterruptedException {
+    return httpClientAdapter.getResponseString(
+        URI.create(
+            "https://www.wikidata.org/w/api.php?action=wbgetentities&ids="
+                + id
+                + "&props=claims&format=json"));
   }
 }

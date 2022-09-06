@@ -153,4 +153,19 @@ class RestWikiDataControllerTests {
                   "https://www.wikidata.org/w/api.php?action=wbsearchentities&search=%E6%A2%B5%E6%88%91%E4%B8%80%E5%A6%82&format=json&language=en&uselang=en&type=item&limit=10"));
     }
   }
+
+  @Test
+  void shouldCallTheWikidataUriAndReturnLocationData() throws IOException, InterruptedException {
+    Mockito.when(httpClientAdapter.getResponseString(any()))
+        .thenReturn(getWikidataLocationString("Q334", "1.3", "103.8"));
+    controller.getWikidataLocation("Q334");
+    Mockito.verify(httpClientAdapter)
+        .getResponseString(
+            URI.create(
+                "https://www.wikidata.org/w/api.php?action=wbgetentities&ids=Q334&props=claims&format=json"));
+  }
+
+  private String getWikidataLocationString(String id, String latitude, String longitude) {
+    return "{\"latitude\":" + latitude + "\", \"longitude\":" + longitude + "}";
+  }
 }
