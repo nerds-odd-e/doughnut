@@ -27,7 +27,7 @@
     "test": "yarn frontend:build && run-p -clnr start:mb sut cy:run",
     "test:dev": "yarn frontend:build && run-p -clnr start:mb sut frontend:sut cy:run",
     "test:open": "yarn run-p -clnr start:mb sut frontend:sut cy:open",
-    "sound": "node ci_monitor/sound-monitor.js",
+    "sound": "node scripts/sound-monitor.js",
     "lint:all": "yarn && yarn backend:lint && yarn frontend:lint && yarn cy:lint",
     "format:all": "yarn && yarn backend:format && yarn frontend:format && yarn cy:format"
   },
@@ -56,7 +56,7 @@
   },
   "devDependencies": {
     "@anev/ts-mountebank": "^1.5",
-    "@badeball/cypress-cucumber-preprocessor": "^12.1",
+    "@badeball/cypress-cucumber-preprocessor": "^12.2",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.1",
     "@esbuild-plugins/node-modules-polyfill": "^0.1",
     "@testing-library/cypress": "8.0",
