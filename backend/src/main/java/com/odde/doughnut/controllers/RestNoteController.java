@@ -180,4 +180,12 @@ class RestNoteController {
   private WikidataService getWikiDataService() {
     return new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
   }
+
+  private String checkDuplicateWikidataId(Notebook notebook, String wikidataId) throws DuplicateWikidataIdException {
+    List<Note> notes = modelFactoryService.noteRepository.searchInNotebookByWikidataId(notebook, wikidataId);
+    if (!notes.isEmpty()) {
+      throw new DuplicateWikidataIdException();
+    }
+    return wikidataId;
+  }
 }
