@@ -8,12 +8,9 @@
 // https://on.cypress.io/plugins-guide
 // ***********************************************************
 
-/// <reference types="cypress" />
-
 // This function is called when a project is opened or re-opened (e.g. due to
 // the project's config changing)
 
-import { defineConfig } from "cypress"
 import createBundler from "@bahmutov/cypress-esbuild-preprocessor"
 import { addCucumberPreprocessorPlugin } from "@badeball/cypress-cucumber-preprocessor"
 import { createEsbuildPlugin } from "@badeball/cypress-cucumber-preprocessor/esbuild"
