@@ -66,7 +66,6 @@ async function buildState(url) {
     const gitLog = resp.body
       .match(/aria\-label\=\"Run \d+ of[^\>]+\>(.*)\<\/a\>/)
       ?.pop();
-    console.table({ currentBuild, currentStatus, gitLog });
     return new BuildState(currentBuild, currentStatus, gitLog);
   } catch (err) {
     console.error(err);

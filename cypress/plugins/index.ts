@@ -8,20 +8,21 @@
 // https://on.cypress.io/plugins-guide
 // ***********************************************************
 
-/// <reference types="cypress" />
-
 // This function is called when a project is opened or re-opened (e.g. due to
 // the project's config changing)
 
 import createBundler from "@bahmutov/cypress-esbuild-preprocessor"
+import { addCucumberPreprocessorPlugin } from "@badeball/cypress-cucumber-preprocessor"
 import { createEsbuildPlugin } from "@badeball/cypress-cucumber-preprocessor/esbuild"
 import NodeModulesPolyfills from "@esbuild-plugins/node-modules-polyfill"
 
-export default (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions): void => {
+export default async (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions): void => {
+  await addCucumberPreprocessorPlugin(on, config)
   on(
     "file:preprocessor",
     createBundler({
       plugins: [NodeModulesPolyfills(), createEsbuildPlugin(config)],
     }),
   )
+  return config
 }
