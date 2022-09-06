@@ -89,8 +89,8 @@ export default defineComponent({
         })
         .catch((res) => {
           this.noteFormErrors = res;
-          const errorCode = res.code;
-          if (errorCode === "DUPLICATE") {
+          const errorCode = res.status;
+          if (errorCode === 500) {
             this.noteFormErrors.isDuplicate = true;
           }
         });

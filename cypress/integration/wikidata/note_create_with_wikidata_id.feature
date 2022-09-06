@@ -39,4 +39,12 @@ Feature: Nested Note Create with wikidata
     When I am creating a note under "My Notes/Animals"
     And I search with title "Singapore" on Wikidata
     And I select "singapore" with wikidataID "Q334" from the Wikidata search result
-    Then I should see a textfield with the text "Location selected. The following text will be prepended to the note: "latitude	1.3 longitude	103.8"
+    Then I should see a textfield with the text "Location selected. The following text will be prepended to the note: latitude	1.3 longitude	103.8"
+
+  @usingDummyWikidataService @mockBrowserTime @ignore
+  Scenario: Create a new note with exisitng wikidata id
+    Given Wikidata has search result for "pop music" with wikidata ID "Q37073"
+    And I have an exisitng note with wikidataID "Q2102"
+    And I am creating a note under "My Notes/Animals"
+    And I am creating a note with wikidataID "Q2102" under "My Notes/Animals"
+    Then I should see a message "Duplicate Wikidata ID detected."
