@@ -11,6 +11,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessories;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.*;
+import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.TimestampOperations;
@@ -137,14 +138,14 @@ class RestNoteControllerTests {
 
     @Test
     void shouldBeAbleToSaveNoteWhenValid()
-        throws NoAccessRightException, BindException, InterruptedException {
+      throws NoAccessRightException, BindException, InterruptedException, DuplicateWikidataIdException {
       NoteRealmWithPosition response = controller.createNote(parent, noteCreation);
       assertThat(response.noteRealm.getId(), not(nullValue()));
     }
 
     @Test
     void shouldBeAbleToCreateAThing()
-        throws NoAccessRightException, BindException, InterruptedException {
+      throws NoAccessRightException, BindException, InterruptedException, DuplicateWikidataIdException {
       long beforeThingCount = makeMe.modelFactoryService.thingRepository.count();
       controller.createNote(parent, noteCreation);
       long afterThingCount = makeMe.modelFactoryService.thingRepository.count();
@@ -153,7 +154,7 @@ class RestNoteControllerTests {
 
     @Test
     void shouldBeAbleToSaveNoteWithWikidataIdWhenValid()
-        throws NoAccessRightException, BindException, InterruptedException, IOException {
+      throws NoAccessRightException, BindException, InterruptedException, IOException, DuplicateWikidataIdException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(new MakeMe().wikidataEntityJson().entityId("Q12345").please());
       noteCreation.setWikidataId("Q12345");
@@ -163,7 +164,7 @@ class RestNoteControllerTests {
 
     @Test
     void shouldCallTheCorrectApi()
-        throws NoAccessRightException, BindException, InterruptedException, IOException {
+      throws NoAccessRightException, BindException, InterruptedException, IOException, DuplicateWikidataIdException {
       noteCreation.setWikidataId("Q12345");
       controller.createNote(parent, noteCreation);
       Mockito.verify(httpClientAdapter)
@@ -173,10 +174,18 @@ class RestNoteControllerTests {
 
     @Test
     void shouldBeAbleToSaveNoteWithoutWikidataIdWhenValid()
-        throws NoAccessRightException, BindException, InterruptedException {
+      throws NoAccessRightException, BindException, InterruptedException, DuplicateWikidataIdException {
       NoteRealmWithPosition response = controller.createNote(parent, noteCreation);
 
       assertThat(response.noteRealm.getNote().getWikidataId(), equalTo(null));
+    }
+
+    @Test
+    void shouldThrowWhenCreatingNoteWithWikidataIdExistsInAnotherNote() {
+      String conflictingWikidataId = "Q123";
+      parent.setWikidataId(conflictingWikidataId);
+      noteCreation.setWikidataId(conflictingWikidataId);
+      assertThrows(DuplicateWikidataIdException.class, () -> controller.createNote(parent, noteCreation));
     }
   }
 
@@ -294,13 +303,25 @@ class RestNoteControllerTests {
   @Nested
   class UpdateWikidataId {
     @Test
-    void shouldUpdateWikidataId() {
+    void shouldUpdateWikidataId() throws DuplicateWikidataIdException {
       Note note = makeMe.aNote().creatorAndOwner(userModel).please();
       WikidataAssociationCreation wikidataAssociationCreation = new WikidataAssociationCreation();
       wikidataAssociationCreation.wikidataId = "Q123";
       controller.updateWikidataId(note, wikidataAssociationCreation);
       Note sameNote = makeMe.modelFactoryService.noteRepository.findById(note.getId()).get();
       assertThat(sameNote.getWikidataId(), equalTo("Q123"));
+    }
+
+    @Test
+    void shouldNotUpdateDuplicateWikidataId() {
+      Note note = makeMe.aNote().creatorAndOwner(userModel).please();
+      Note newNote = makeMe.aNote().inMemoryPlease();
+      note.setWikidataId("Q123");
+      newNote.setWikidataId(("Q1234"));
+      newNote.setParentNote(note);
+      WikidataAssociationCreation wikidataAssociationCreation = new WikidataAssociationCreation();
+      wikidataAssociationCreation.wikidataId = "Q123";
+      assertThrows(DuplicateWikidataIdException.class, () -> controller.updateWikidataId(newNote, wikidataAssociationCreation));
     }
   }
 }
