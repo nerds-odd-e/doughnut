@@ -32,9 +32,9 @@ describe("adding new note", () => {
     expect(wrapper.text()).toContain("mythical");
   });
 
-  it("search wikidata for result suggestions", async () => {
+  it("search wikidata for result suggestions and replace title if title is the same but case is different", async () => {
     const searchInput = "rock";
-    const searchResult = makeMe.aWikidataSearchEntity.label("rock").please();
+    const searchResult = makeMe.aWikidataSearchEntity.label("Rock").please();
     helper.apiMock.expectingPost(`/api/notes/search`).andReturnOnce([]);
     helper.apiMock
       .expectingGet(`/api/wikidata/search/${searchInput}`)
@@ -46,9 +46,10 @@ describe("adding new note", () => {
     await wrapper.find("input#note-title").setValue(searchInput);
     await wrapper.find("button#search-wikidata").trigger("click");
     await flushPromises();
-    await wrapper.find('select[name="wikidataSearchResult"]').trigger("click");
-    await wrapper.find("option").trigger("click");
+    const result = await wrapper.find('select[name="wikidataSearchResult"]');
+    result.findAll("option").at(1)?.setValue();
     await flushPromises();
-    expect(wrapper.text()).toContain(searchInput);
+    const input = <HTMLInputElement>wrapper.find("input#note-title").element;
+    expect(input.value).toBe("Rock");
   });
 });
