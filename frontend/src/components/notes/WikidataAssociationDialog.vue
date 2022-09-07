@@ -64,17 +64,15 @@ export default defineComponent({
   methods: {
     async validateAndSave() {
       try {
-        const res = await this.api.wikidata.getWikiData(
-          this.associationData.wikidataId
-        );
+        const res = await this.api.wikidata.getWikiData(this.associationData.wikidataId);
         if (res.WikiDataTitleInEnglish !== this.note.title) {
           this.conflictWikidataTitle = res.WikiDataTitleInEnglish;
           return;
         }
-        this.save();
+        await this.save();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
-        this.wikidataIdError = e.wikidataId;
+        this.wikidataIdError = e.wikidataId ?? e.wikiDataId;
       }
     },
     async save() {
