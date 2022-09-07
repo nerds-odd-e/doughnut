@@ -129,10 +129,10 @@ export default defineComponent({
         this.creationData.previousTextContent =
           this.creationData.textContent.title;
         this.creationData.textContent.title =
-          this.creationData.suggestedTextContent;
+          this.creationData.suggestedTextContent || "";
       } else {
         this.creationData.textContent.title =
-          this.creationData.previousTextContent;
+          this.creationData.previousTextContent || "";
       }
     },
   },
