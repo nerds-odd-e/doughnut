@@ -4,16 +4,20 @@ Feature: New note creation should have description if wikidata is a location
 
   Background:
     Given I've logged in as an existing user
-    And when I want to create a new note where the note title is a location
-  @ignore
+    And there are some notes for the current user
+      | title    | description    |      
+      | places   | some desc      |         
+
+   @ignore
   Scenario Outline: New Note creation and wikidata is selected by user
-    Given I click submit on new note creation
-    Then I select the item from the search result list and click submit
-    Then I should see <LATLNG> getting prepend into note description
-    
+    Given I am creating a note under "My Notes/places"
+    When I create a note belonging to "places":
+      | Title     |  Wikidata Id |
+      | Singapore |  Q334        |
+    Then I should see the "<Location>" data prepend in description
+      
     Examples:
-      | title      | Location           |
+      | Title      | Location           |
       | Singapore  | 1°18'N, 103°48'E   |
       | Bangkok    | 2°18'N, 89°48'E    |
       | Covid      |                    |
-

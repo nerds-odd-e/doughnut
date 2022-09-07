@@ -32,6 +32,7 @@ declare namespace Cypress {
     expectFieldErrorMessage(message: string): Chainable<any>
     expectNoteCards(expectedCards: any): Chainable<any>
     findNoteTitle(title: string): Chainable<any>
+    findNoteDescription(title: string): Chainable<any>
     findCardTitle(title: string): Chainable<any>
     findUserSettingsButton(userName: string): Chainable<any>
     failure(): Chainable<any>
