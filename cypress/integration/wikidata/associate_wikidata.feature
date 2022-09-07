@@ -42,3 +42,14 @@ Feature: associate wikidata ID to note
     When I associate the note "TDD" with wikidata id "Q12345"
     Then I need to confirm the association with different title "Count von Count"
     And I should see the icon beside title linking to "https://en.wikipedia.org/wiki/Count_von_Count"
+
+
+  @usingDummyWikidataService @mockBrowserTime @ignore
+  Scenario: Create a new note with exisitng wikidata id
+    Given Wikidata.org has an entity "Q1111" with "long animal"
+    And I create a note belonging to "Animals":
+      | Title | Wikidata Id |
+      | snake | Q1111       |
+    Then I should see the icon beside title linking to "https://www.wikidata.org/wiki/Q1111"
+    When I associate the note "TDD" with wikidata id "Q1111"
+    Then I should see a message "Duplicate Wikidata ID Detected."
