@@ -48,7 +48,8 @@ Feature: Nested Note Create with wikidata
     And I create a note belonging to "Animals":
       | Title | Wikidata Id |
       | snake | Q1111       |
+    Then I should see the icon beside title linking to "https://www.wikidata.org/wiki/Q1111"
     When I try to create a note belonging to "Animals":
       | Title | Wikidata Id  |
       | long animal | Q1111  |
-    Then I should see a message "Duplicate Wikidata ID detected."
+    Then I should see a message "Duplicate Wikidata ID Detected."
