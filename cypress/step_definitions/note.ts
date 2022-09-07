@@ -116,11 +116,14 @@ When("I am creating a note under {notepath}", (notePath: NotePath) => {
   cy.clickAddChildNoteButton()
 })
 
-When("I am creating a note with wikidataID {string} under {notepath}", (string: string, notePath: NotePath) => {
-  cy.navigateToNotePage(notePath)
-  cy.get('select[name="wikidataSearchResult"]').select(wikidataID)
-  cy.clickAddChildNoteButton()
-})
+When(
+  "I am creating a note with wikidataID {string} under {notepath}",
+  (string: string, notePath: NotePath) => {
+    cy.navigateToNotePage(notePath)
+    cy.get('select[name="wikidataSearchResult"]').select(wikidataID)
+    cy.clickAddChildNoteButton()
+  },
+)
 
 Then("I should see {string} in breadcrumb", (noteTitles: string) => {
   cy.pageIsNotLoading()
@@ -383,7 +386,6 @@ Then("there should be no more undo to do", () => {
 Then("I type {string} in the title", (content: string) => {
   cy.focused().clear().type(content)
 })
-
 
 Then("I should see the {string} data prepend in description", (location: string) => {
   cy.findNoteDescription(location)
