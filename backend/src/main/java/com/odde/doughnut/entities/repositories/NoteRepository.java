@@ -39,15 +39,6 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   List<Note> searchInNotebook(
       @Param("notebook") Notebook notebook, @Param("pattern") String pattern);
 
-  @Query(
-    value =
-      selectFromNoteJoinTextContent
-        + " WHERE note.notebook_id = :notebook "
-        + searchForExistingWikidataId,
-    nativeQuery = true)
-  List<Note> searchInNotebookByWikidataId(
-    @Param("notebook") Notebook notebook, @Param("wikidataId") String wikidataId);
-
   String joinNotebooksBegin =
       selectFromNoteJoinTextContent + "  JOIN (" + "          SELECT notebook.id FROM notebook ";
 
@@ -74,9 +65,6 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
 
   String searchForLinkTarget =
       " AND REGEXP_LIKE(text_content.title, :pattern) AND note.deleted_at IS NULL ";
-
-  String searchForExistingWikidataId =
-    " AND note.wikidata_id = :wikidataId AND note.deleted_at IS NULL ";
 
   @Modifying
   @Query(
