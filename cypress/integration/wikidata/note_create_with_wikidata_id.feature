@@ -5,15 +5,15 @@ Feature: Nested Note Create with wikidata
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user
-      | title   | testingParent  | description         |
-      | Animals |                | An awesome training |
+      | title   | testingParent | description         |
+      | Animals |               | An awesome training |
 
   @usingDummyWikidataService @mockBrowserTime
   Scenario: Create a new note with a wikidata id
     Given Wikidata.org has an entity "Q2102" with "long animal"
     When I create a note belonging to "Animals":
-      | Title |  Wikidata Id |
-      | snake |  Q2102       |
+      | Title | Wikidata Id |
+      | snake | Q2102       |
     Then I should see the icon beside title linking to "https://www.wikidata.org/wiki/Q2102"
 
   @usingDummyWikidataService @mockBrowserTime
@@ -33,9 +33,9 @@ Feature: Nested Note Create with wikidata
     Then I should see that the "Title" becomes "rock music"
     Then I should see that the "Wikidata Id" becomes "Q11399"
 
- @usingDummyWikidataService @mockBrowserTime @ignore
- Scenario: Create a new note with wikidata id that is a location with lat long coordinates
-   Given Wikidata has a result for "Singapore" with wikidata ID "Q334" and contains claims ID "P625"
+  @usingDummyWikidataService @mockBrowserTime @ignore
+  Scenario: Create a new note with wikidata id that is a location with lat long coordinates
+    Given Wikidata has a result for "Singapore" with wikidata ID "Q334" and contains claims ID "P625"
     When I am creating a note under "My Notes/Animals"
     And I search with title "Singapore" on Wikidata
     And I select "singapore" with wikidataID "Q334" from the Wikidata search result
@@ -43,8 +43,8 @@ Feature: Nested Note Create with wikidata
 
   @usingDummyWikidataService @mockBrowserTime @ignore
   Scenario: Create a new note with exisitng wikidata id
-    Given Wikidata has search result for "pop music" with wikidata ID "Q37073"
-    And I have an exisitng note with wikidataID "Q2102"
-    And I am creating a note under "My Notes/Animals"
-    And I am creating a note with wikidataID "Q2102" under "My Notes/Animals"
+    Given I visit note "Animals"
+    When I try to create a note belonging to "Animals":
+      | Title | Wikidata Id |
+      | snake | Q2102       |
     Then I should see a message "Duplicate Wikidata ID detected."
