@@ -16,7 +16,7 @@ Feature: New note creation prompt for title replacement
     Then I should see that the "Title" becomes "rocky"
 
   @usingDummyWikidataService @mockBrowserTime
-  Scenario Outline: Create a new note with a wikidata id without selecting replace title
+  Scenario Outline: Create a new note with a wikidata id without selecting replace or append title
     Given Wikidata has search result for "<dataSearchTitle>" with wikidata ID "Q90"
     When I am creating a note under "My Notes/Animals"
     And I search with title "<oldTitle>" on Wikidata
@@ -28,3 +28,20 @@ Feature: New note creation prompt for title replacement
       | rocky           | apple    | apple         |
       | Apple           | apple    | Apple         |
 
+  @usingDummyWikidataService @mockBrowserTime @ignore
+  Scenario: Create a new note with a wikidata id and replace title
+    Given Wikidata has search result for "rocky" with wikidata ID "Q90"
+    When I am creating a note under "My Notes/Animals"
+    And I search with title "apple" on Wikidata
+    And I select "rocky" with wikidataID "Q90" from the Wikidata search result
+    And I select the option to replace the title
+    Then I should see that the "Title" becomes "rocky"
+
+  @usingDummyWikidataService @mockBrowserTime @ignore
+  Scenario: Create a new note with a wikidata id and append title
+    Given Wikidata has search result for "rocky" with wikidata ID "Q90"
+    When I am creating a note under "My Notes/Animals"
+    And I search with title "apple" on Wikidata
+    And I select "rocky" with wikidataID "Q90" from the Wikidata search result
+    And I select the option to append the title
+    Then I should see that the "Title" becomes "apple / rocky"
