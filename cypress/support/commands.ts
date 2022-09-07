@@ -361,6 +361,10 @@ Cypress.Commands.add(
 Cypress.Commands.add("findNoteTitle", (title) =>
   cy.findByText(title, { selector: "[role=title] *" }),
 )
+Cypress.Commands.add("findNoteDescription", (title) =>
+  cy.findByText(title, { selector: "[role=description] *" }),
+)
+
 
 Cypress.Commands.add("findCardTitle", (title) => cy.findByText(title, { selector: "a.card-title" }))
 

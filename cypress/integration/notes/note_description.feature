@@ -8,16 +8,14 @@ Feature: New note creation should have description if wikidata is a location
       | title    | description    |      
       | places   | some desc      |         
 
-   @ignore
+  @ignore
   Scenario Outline: New Note creation and wikidata is selected by user
     Given I am creating a note under "My Notes/places"
     When I create a note belonging to "places":
-      | Title     |  Wikidata Id |
-      | Singapore |  Q334        |
+      | Title     |  Wikidata Id | 
+      | <Title>   |  Q334        | 
     Then I should see the "<Location>" data prepend in description
       
     Examples:
-      | Title      | Location           |
-      | Singapore  | 1°18'N, 103°48'E   |
-      | Bangkok    | 2°18'N, 89°48'E    |
-      | Covid      |                    |
+      | Title      | Location                 |
+      | Singapore  | Location: 1.3'N, 103.8'E |
