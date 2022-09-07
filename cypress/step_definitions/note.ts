@@ -93,6 +93,10 @@ When(
   },
 )
 
+When("I check the checkbox to replace the title", () => {
+  cy.get('[id="titleCheckbox- Click to replace title"]').check()
+})
+
 When("I create a note belonging to {string}:", (noteTitle: string, data: DataTable) => {
   expect(data.hashes().length).to.equal(1)
   cy.jumpToNotePage(noteTitle)

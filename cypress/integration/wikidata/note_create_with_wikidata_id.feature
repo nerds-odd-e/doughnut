@@ -30,6 +30,7 @@ Feature: Nested Note Create with wikidata
     When I am creating a note under "My Notes/Animals"
     And I search with title "Rock" on Wikidata
     And I select "rock music" with wikidataID "Q11399" from the Wikidata search result
+    And I check the checkbox to replace the title 
     Then I should see that the "Title" becomes "rock music"
     Then I should see that the "Wikidata Id" becomes "Q11399"
 
