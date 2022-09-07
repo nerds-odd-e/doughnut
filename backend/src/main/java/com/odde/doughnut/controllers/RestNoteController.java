@@ -17,7 +17,9 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -46,7 +48,11 @@ class RestNoteController {
   @Transactional
   public NoteRealm updateWikidataId(
       @PathVariable(name = "note") Note note,
-      @RequestBody WikidataAssociationCreation wikidataAssociationCreation) {
+      @RequestBody WikidataAssociationCreation wikidataAssociationCreation)
+      throws BindException {
+
+    checkDuplicateWikidataId(note.getNotebook(), wikidataAssociationCreation.wikidataId);
+
     note.setWikidataId(wikidataAssociationCreation.wikidataId);
     modelFactoryService.noteRepository.save(note);
     return new NoteViewer(currentUserFetcher.getUser().getEntity(), note).toJsonObject();
@@ -58,6 +64,7 @@ class RestNoteController {
       @PathVariable(name = "parentNote") Note parentNote,
       @Valid @ModelAttribute NoteCreation noteCreation)
       throws NoAccessRightException, BindException, InterruptedException {
+    checkDuplicateWikidataId(parentNote.getNotebook(), noteCreation.getWikidataId());
     final UserModel userModel = currentUserFetcher.getUser();
     userModel.getAuthorization().assertAuthorization(parentNote);
     User user = userModel.getEntity();
@@ -179,5 +186,16 @@ class RestNoteController {
 
   private WikidataService getWikiDataService() {
     return new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
+  }
+
+  private void checkDuplicateWikidataId(Notebook notebook, String wikidataId) throws BindException {
+    List<Note> existingNotes =
+        modelFactoryService.noteRepository.searchInNotebookForNoteByWikidataId(
+            notebook, wikidataId);
+    if (!existingNotes.isEmpty()) {
+      BindingResult bindingResult = new BeanPropertyBindingResult(wikidataId, "wikiDataId");
+      bindingResult.rejectValue(null, "error.error", "Duplicate Wikidata ID Detected.");
+      throw new BindException(bindingResult);
+    }
   }
 }

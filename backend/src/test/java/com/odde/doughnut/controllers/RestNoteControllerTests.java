@@ -178,6 +178,17 @@ class RestNoteControllerTests {
 
       assertThat(response.noteRealm.getNote().getWikidataId(), equalTo(null));
     }
+
+    @Test
+    void shouldThrowWhenCreatingNoteWithWikidataIdExistsInAnotherNote() {
+      String conflictingWikidataId = "Q123";
+      parent.setWikidataId(conflictingWikidataId);
+      noteCreation.setWikidataId(conflictingWikidataId);
+      BindException bindException =
+          assertThrows(BindException.class, () -> controller.createNote(parent, noteCreation));
+      assertThat(
+          bindException.getMessage(), stringContainsInOrder("Duplicate Wikidata ID Detected."));
+    }
   }
 
   @Nested
@@ -293,14 +304,39 @@ class RestNoteControllerTests {
 
   @Nested
   class UpdateWikidataId {
+    Note note;
+    Note parent;
+    String noteWikidataId = "Q1234";
+
+    @BeforeEach
+    void setup() {
+      parent = makeMe.aNote().creatorAndOwner(userModel).please();
+      note = makeMe.aNote().under(parent).please();
+      note.setWikidataId(noteWikidataId);
+      makeMe.refresh(note);
+    }
+
     @Test
-    void shouldUpdateWikidataId() {
-      Note note = makeMe.aNote().creatorAndOwner(userModel).please();
+    void shouldUpdateNoteWithUniqueWikidataId() throws BindException {
       WikidataAssociationCreation wikidataAssociationCreation = new WikidataAssociationCreation();
       wikidataAssociationCreation.wikidataId = "Q123";
       controller.updateWikidataId(note, wikidataAssociationCreation);
       Note sameNote = makeMe.modelFactoryService.noteRepository.findById(note.getId()).get();
       assertThat(sameNote.getWikidataId(), equalTo("Q123"));
+    }
+
+    @Test
+    void shouldNotUpdateWikidataIdIfParentNoteSameWikidataId() {
+      parent.setWikidataId(noteWikidataId);
+
+      WikidataAssociationCreation wikidataAssociationCreation = new WikidataAssociationCreation();
+      wikidataAssociationCreation.wikidataId = noteWikidataId;
+      BindException bindException =
+          assertThrows(
+              BindException.class,
+              () -> controller.updateWikidataId(note, wikidataAssociationCreation));
+      assertThat(
+          bindException.getMessage(), stringContainsInOrder("Duplicate Wikidata ID Detected."));
     }
   }
 }
