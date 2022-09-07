@@ -64,7 +64,9 @@ export default defineComponent({
   methods: {
     async validateAndSave() {
       try {
-        const res = await this.api.wikidata.getWikiData(this.associationData.wikidataId);
+        const res = await this.api.wikidata.getWikiData(
+          this.associationData.wikidataId
+        );
         if (res.WikiDataTitleInEnglish !== this.note.title) {
           this.conflictWikidataTitle = res.WikiDataTitleInEnglish;
           return;
