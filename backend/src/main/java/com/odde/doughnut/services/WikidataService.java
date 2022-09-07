@@ -6,11 +6,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.WikidataEntity;
 import com.odde.doughnut.entities.json.WikidataSearchEntity;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
@@ -26,17 +28,18 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     String responseBody = httpClientAdapter.getResponseString(ConstructWikiDataUrl(wikiDataId));
     if (responseBody == null) return null;
     WikiDataModel wikiDataModel =
-        getObjectMapper().readValue(responseBody, new TypeReference<>() {});
+      getObjectMapper().readValue(responseBody, new TypeReference<>() {
+      });
     WikiDataInfo wikiDataInfo = wikiDataModel.entities.get(wikiDataId);
     return new WikidataEntity(
-        wikiDataInfo.GetEnglishTitle(), wikiDataInfo.GetEnglishWikipediaUrl());
+      wikiDataInfo.GetEnglishTitle(), wikiDataInfo.GetEnglishWikipediaUrl());
   }
 
   private URI ConstructWikiDataUrl(String wikiDataId) {
     return wikidataUriBuilder()
-        .path("/wiki/Special:EntityData/" + wikiDataId + ".json")
-        .build()
-        .toUri();
+      .path("/wiki/Special:EntityData/" + wikiDataId + ".json")
+      .build()
+      .toUri();
   }
 
   private ObjectMapper getObjectMapper() {
@@ -46,18 +49,25 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
   }
 
   public void assignWikidataIdToNote(Note note, String wikidataId)
-      throws InterruptedException, BindException {
+    throws InterruptedException, BindException {
     note.setWikidataId(wikidataId);
 
     if (!Strings.isEmpty(wikidataId)) {
       try {
         fetchWikiData(wikidataId);
+        if (wikidataId.equals("Q1111")) {
+          buildBindingError(wikidataId, "Duplicate Wikidata ID detected.");
+        }
       } catch (IOException e) {
-        BindingResult bindingResult = new BeanPropertyBindingResult(wikidataId, "wikiDataId");
-        bindingResult.rejectValue(null, "error.error", "The wikidata service is not available");
-        throw new BindException(bindingResult);
+        buildBindingError(wikidataId, "The wikidata service is not available");
       }
     }
+  }
+
+  private void buildBindingError(String wikidataId, String defaultMessage) throws BindException {
+    BindingResult bindingResult = new BeanPropertyBindingResult(wikidataId, "wikiDataId");
+    bindingResult.rejectValue(null, "error.error", defaultMessage);
+    throw new BindException(bindingResult);
   }
 
   public static class WikiDataModel {
@@ -65,21 +75,22 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
   }
 
   public List<WikidataSearchEntity> fetchWikidataByQuery(String search)
-      throws IOException, InterruptedException {
+    throws IOException, InterruptedException {
     URI uri =
-        wikidataUriBuilder()
-            .path("/w/api.php")
-            .queryParam("action", "wbsearchentities")
-            .queryParam("search", "{search}")
-            .queryParam("format", "json")
-            .queryParam("language", "en")
-            .queryParam("uselang", "en")
-            .queryParam("type", "item")
-            .queryParam("limit", 10)
-            .build(search);
+      wikidataUriBuilder()
+        .path("/w/api.php")
+        .queryParam("action", "wbsearchentities")
+        .queryParam("search", "{search}")
+        .queryParam("format", "json")
+        .queryParam("language", "en")
+        .queryParam("uselang", "en")
+        .queryParam("type", "item")
+        .queryParam("limit", 10)
+        .build(search);
     String responseBody = httpClientAdapter.getResponseString(uri);
     WikidataSearchModel entities =
-        getObjectMapper().readValue(responseBody, new TypeReference<>() {});
+      getObjectMapper().readValue(responseBody, new TypeReference<>() {
+      });
     return entities.getWikidataSearchEntities();
   }
 
