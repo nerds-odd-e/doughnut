@@ -14,5 +14,5 @@ public class NoteCreation {
   @Getter @Setter @Nullable public String wikidataId;
   @Getter @Setter @Nullable public String suggestedTextContent;
   @Getter @Setter @Nullable public String previousTextContent;
-  @Getter @Setter @Nullable public String replaceTextContentChecked;
+  @Getter @Setter @Nullable public Boolean replaceTextContentChecked;
 }

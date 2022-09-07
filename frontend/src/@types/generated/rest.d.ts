@@ -53,7 +53,7 @@ declare namespace Generated {
         wikidataId?: string;
         suggestedTextContent?: string;
         previousTextContent?: string;
-        replaceTextContentChecked?: string;
+        replaceTextContentChecked?: boolean;
     }
 
     interface NoteInfo {
