@@ -1,3 +1,8 @@
 package com.odde.doughnut.models;
 
-public record WikidataLocationModel(String latitude, String longitude) {}
+public record WikidataLocationModel(String latitude, String longitude) {
+  @Override
+  public String toString() {
+    return "Location: " + latitude() + ", " + longitude();
+  }
+}

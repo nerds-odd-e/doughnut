@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.any;
 
 import com.odde.doughnut.entities.json.WikidataEntity;
 import com.odde.doughnut.entities.json.WikidataSearchEntity;
-import com.odde.doughnut.models.WikidataLocationModel;
 import com.odde.doughnut.services.HttpClientAdapter;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -153,31 +152,5 @@ class RestWikiDataControllerTests {
               URI.create(
                   "https://www.wikidata.org/w/api.php?action=wbsearchentities&search=%E6%A2%B5%E6%88%91%E4%B8%80%E5%A6%82&format=json&language=en&uselang=en&type=item&limit=10"));
     }
-  }
-
-  @Test
-  void shouldCallTheWikidataUriAndReturnLocationData() throws IOException, InterruptedException {
-    Mockito.when(httpClientAdapter.getResponseString(any()))
-        .thenReturn(getWikidataLocationString("Q334", "1.3", "103.8"));
-    controller.getWikidataLocation("Q334");
-    Mockito.verify(httpClientAdapter)
-        .getResponseString(
-            URI.create(
-                "https://www.wikidata.org/w/api.php?action=wbgetentities&ids=Q334&props=claims&format=json"));
-  }
-
-  @Test
-  void shouldReturnLocationDataForSingapore() throws IOException, InterruptedException {
-    Mockito.when(httpClientAdapter.getResponseString(any()))
-        .thenReturn(getWikidataLocationString("Q334", "1.3", "103.8"));
-
-    WikidataLocationModel result = controller.getWikidataLocation("Q334");
-
-    assertThat(result.latitude(), equalTo("1.3"));
-    assertThat(result.longitude(), equalTo("103.8"));
-  }
-
-  private String getWikidataLocationString(String id, String latitude, String longitude) {
-    return "{\"latitude\":" + latitude + "\", \"longitude\":" + longitude + "}";
   }
 }
