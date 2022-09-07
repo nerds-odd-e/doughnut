@@ -4,7 +4,6 @@ import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.Link.LinkType;
 import com.odde.doughnut.entities.json.*;
-import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteViewer;
@@ -47,9 +46,7 @@ class RestNoteController {
   @Transactional
   public NoteRealm updateWikidataId(
       @PathVariable(name = "note") Note note,
-      @RequestBody WikidataAssociationCreation wikidataAssociationCreation) throws DuplicateWikidataIdException {
-    Notebook notebook = note.getNotebook();
-    this.checkDuplicateWikidataId(notebook, wikidataAssociationCreation.wikidataId);
+      @RequestBody WikidataAssociationCreation wikidataAssociationCreation) {
     note.setWikidataId(wikidataAssociationCreation.wikidataId);
     modelFactoryService.noteRepository.save(note);
     return new NoteViewer(currentUserFetcher.getUser().getEntity(), note).toJsonObject();
@@ -60,10 +57,7 @@ class RestNoteController {
   public NoteRealmWithPosition createNote(
       @PathVariable(name = "parentNote") Note parentNote,
       @Valid @ModelAttribute NoteCreation noteCreation)
-    throws NoAccessRightException, BindException, InterruptedException, DuplicateWikidataIdException {
-    Notebook notebook = parentNote.getNotebook();
-    this.checkDuplicateWikidataId(notebook, noteCreation.getWikidataId());
-
+      throws NoAccessRightException, BindException, InterruptedException {
     final UserModel userModel = currentUserFetcher.getUser();
     userModel.getAuthorization().assertAuthorization(parentNote);
     User user = userModel.getEntity();
