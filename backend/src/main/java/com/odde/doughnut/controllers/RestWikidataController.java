@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.json.WikidataEntity;
 import com.odde.doughnut.entities.json.WikidataSearchEntity;
+import com.odde.doughnut.models.WikidataLocationModel;
 import com.odde.doughnut.services.HttpClientAdapter;
 import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -59,11 +60,15 @@ public class RestWikidataController {
     return new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
   }
 
-  public String getWikidataLocation(String id) throws IOException, InterruptedException {
-    return httpClientAdapter.getResponseString(
+  @GetMapping("/wikidata/entity/{id}/location")
+  public WikidataLocationModel getWikidataLocation(String id)
+      throws IOException, InterruptedException {
+    httpClientAdapter.getResponseString(
         URI.create(
             "https://www.wikidata.org/w/api.php?action=wbgetentities&ids="
                 + id
                 + "&props=claims&format=json"));
+
+    return new WikidataLocationModel("1.3", "103.8");
   }
 }
