@@ -43,8 +43,11 @@ Feature: Nested Note Create with wikidata
 
   @usingDummyWikidataService @mockBrowserTime @ignore
   Scenario: Create a new note with exisitng wikidata id
-    Given I visit note "Animals"
-    When I try to create a note belonging to "Animals":
+    Given Wikidata.org has an entity "Q1111" with "long animal"
+    And I create a note belonging to "Animals":
       | Title | Wikidata Id |
-      | snake | Q2102       |
+      | snake | Q1111       |
+    When I try to create a note belonging to "Animals":
+      | Title | Wikidata Id  |
+      | long animal | Q1111  |
     Then I should see a message "Duplicate Wikidata ID detected."
