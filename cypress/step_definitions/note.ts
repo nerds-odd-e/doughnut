@@ -387,6 +387,6 @@ Then("I type {string} in the title", (content: string) => {
   cy.focused().clear().type(content)
 })
 
-Then("I should see the {string} data prepend in description", (location: string) => {
-  cy.findNoteDescription(location)
+Then("I should see the description with {string}", (descriptionText: string) => {
+  cy.findNoteDescription(descriptionText)
 })

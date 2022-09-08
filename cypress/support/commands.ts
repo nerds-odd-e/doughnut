@@ -136,11 +136,11 @@ Cypress.Commands.add("inPlaceEdit", (noteAttributes) => {
 })
 
 Cypress.Commands.add("submitNoteFormWith", (noteAttributes) => {
-  cy.fillNoteCreationForm(noteAttributes)
+  cy.fillNoteFormWith(noteAttributes)
   cy.get('input[value="Submit"]').click()
 })
 
-Cypress.Commands.add("fillNoteCreationForm", (noteAttributes) => {
+Cypress.Commands.add("fillNoteFormWith", (noteAttributes) => {
   for (const propName in noteAttributes) {
     const value = noteAttributes[propName]
     if (value) {
