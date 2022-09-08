@@ -369,7 +369,6 @@ Cypress.Commands.add("findNoteDescription", (title) =>
   cy.findByText(title, { selector: "[role=description] *" }),
 )
 
-
 Cypress.Commands.add("findCardTitle", (title) => cy.findByText(title, { selector: "a.card-title" }))
 
 Cypress.Commands.add("yesIRemember", () => {

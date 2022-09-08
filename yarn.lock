@@ -2,7 +2,7 @@
 # yarn lockfile v1
 
 
-"@anev/ts-mountebank@^1.5":
+"@anev/ts-mountebank@^1.6":
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/@anev/ts-mountebank/-/ts-mountebank-1.6.0.tgz#b09d9161f9b47d2da43940a84ed57bc1acf50c61"
   integrity sha512-2tHj8wPvLd9LsvOek+M//zPpKgqcqIxGGaQl2mqeSu4NcA0/TlO4Lglq93P4AYmpfnSX6GxYkF7NxK7UfOahiQ==
