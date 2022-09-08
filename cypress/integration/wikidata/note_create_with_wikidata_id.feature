@@ -42,14 +42,14 @@ Feature: Nested Note Create with wikidata
     And I select "singapore" with wikidataID "Q334" from the Wikidata search result
     Then I should see a textfield with the text "Location selected. The following text will be prepended to the note: latitude	1.3 longitude	103.8"
 
-  @usingDummyWikidataService @mockBrowserTime @ignore
+  @usingDummyWikidataService @mockBrowserTime
   Scenario: Create a new note with exisitng wikidata id
-    Given Wikidata.org has an entity "Q1111" with "long animal"
+    Given Wikidata.org has an entity "Q144" with "dog"
     And I create a note belonging to "Animals":
       | Title | Wikidata Id |
-      | snake | Q1111       |
-    Then I should see the icon beside title linking to "https://www.wikidata.org/wiki/Q1111"
+      | dog | Q144       |
+    Then I should see the icon beside title linking to "https://www.wikidata.org/wiki/Q144"
     When I try to create a note belonging to "Animals":
       | Title | Wikidata Id  |
-      | long animal | Q1111  |
+      | long animal | Q144  |
     Then I should see a message "Duplicate Wikidata ID Detected."
