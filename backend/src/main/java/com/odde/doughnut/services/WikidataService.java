@@ -107,18 +107,20 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
   }
 
   @SneakyThrows
-  public void assignWikidataLocationDataToNote(Note note, String wikidataId) throws InterruptedException {
+  public void assignWikidataLocationDataToNote(Note note, String wikidataId)
+      throws InterruptedException {
     if (Strings.isEmpty(wikidataId)) {
       return;
     }
     WikidataLocationModel locationData = getEntityLocationDataById(wikidataId);
     if (locationData != null) {
-      String prevDesc = note.getTextContent().getDescription() != null ? note.getTextContent().getDescription()
-        + "\n" : "";
+      String prevDesc =
+          note.getTextContent().getDescription() != null
+              ? note.getTextContent().getDescription() + "\n"
+              : "";
       String desc = locationData + prevDesc;
       note.getTextContent().setDescription(desc);
     }
-
   }
 
   public WikidataLocationModel getEntityLocationDataById(String wikidataId)
@@ -126,18 +128,18 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     final String locationId = "P625";
     WikidataEntityModel entity = getEntityDataById(wikidataId);
 
-    if(entity == null) return null;
+    if (entity == null) return null;
 
     if (!entity.getEntities().containsKey(wikidataId)) return null;
     List<WikidataEntityItemObjectModel> locationClaims =
-      extractClaimsDataFromWikiDataEntityItem(entity.getEntities().get(wikidataId), locationId);
+        extractClaimsDataFromWikiDataEntityItem(entity.getEntities().get(wikidataId), locationId);
     if (locationClaims == null) {
       return null;
     }
     Map<String, Object> locationValue = locationClaims.get(0).getData();
 
     return new WikidataLocationModel(
-      locationValue.get("latitude").toString(), locationValue.get("longitude").toString());
+        locationValue.get("latitude").toString(), locationValue.get("longitude").toString());
   }
 
   @Nullable
@@ -156,17 +158,17 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
   private WikidataEntityModel getEntityDataById(String wikidataId)
       throws IOException, InterruptedException {
     URI uri =
-      wikidataUriBuilder()
-        .path("/w/api.php")
-        .queryParam("action", "wbgetentities")
-        .queryParam("ids", "{id}")
-        .queryParam("format", "json")
-        .queryParam("props", "claims")
-        .build(wikidataId);
+        wikidataUriBuilder()
+            .path("/w/api.php")
+            .queryParam("action", "wbgetentities")
+            .queryParam("ids", "{id}")
+            .queryParam("format", "json")
+            .queryParam("props", "claims")
+            .build(wikidataId);
     String responseBody = httpClientAdapter.getResponseString(uri);
     if (responseBody == null) return null;
     WikidataEntityModel entity =
-      getObjectMapper().readValue(responseBody, new TypeReference<>() {});
+        getObjectMapper().readValue(responseBody, new TypeReference<>() {});
     return entity;
   }
 
@@ -190,34 +192,32 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     static String DATAVALUE_KEY = "datavalue";
     static String VALUE_KEY = "value";
     static String VALUE_TYPE_KEY = "type";
+
     static class VALUE_TYPE {
       public static String GLOBE_COORDINATE = "globecoordinate";
       public static String STRING = "string";
     }
+
     private String type;
     private String id;
     Map<String, Object> data;
 
     @JsonProperty("mainsnak")
     private void unpackNested(Map<String, JsonNode> mainsnak) {
-      if (mainsnak.containsKey(DATAVALUE_KEY)
-        && mainsnak.get(DATAVALUE_KEY).has(VALUE_KEY)) {
+      if (mainsnak.containsKey(DATAVALUE_KEY) && mainsnak.get(DATAVALUE_KEY).has(VALUE_KEY)) {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode value = mainsnak.get(DATAVALUE_KEY);
-        if (VALUE_TYPE.GLOBE_COORDINATE.compareToIgnoreCase(
-          value.get(VALUE_TYPE_KEY).textValue()) == 0) {
+        if (VALUE_TYPE.GLOBE_COORDINATE.compareToIgnoreCase(value.get(VALUE_TYPE_KEY).textValue())
+            == 0) {
           data =
-            mapper.convertValue(
-              mainsnak.get(DATAVALUE_KEY).get(VALUE_KEY),
-              new TypeReference<Map<String, Object>>() {
-              });
-        }
-        else if (VALUE_TYPE.STRING.compareToIgnoreCase(
-          value.get(VALUE_TYPE_KEY).textValue()) == 0) {
-          String stringValue = mapper.convertValue(
-            mainsnak.get(DATAVALUE_KEY).get(VALUE_KEY),
-            new TypeReference<String>() {
-            });
+              mapper.convertValue(
+                  mainsnak.get(DATAVALUE_KEY).get(VALUE_KEY),
+                  new TypeReference<Map<String, Object>>() {});
+        } else if (VALUE_TYPE.STRING.compareToIgnoreCase(value.get(VALUE_TYPE_KEY).textValue())
+            == 0) {
+          String stringValue =
+              mapper.convertValue(
+                  mainsnak.get(DATAVALUE_KEY).get(VALUE_KEY), new TypeReference<String>() {});
           data = new LinkedHashMap<>();
           data.put(VALUE_KEY, stringValue);
         }
