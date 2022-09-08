@@ -13,14 +13,14 @@ Feature: Note creation/edit should have description if wikidata is a location
     Given I am creating a note under "My Notes/places"
     When I create a note belonging to "places":
       | Title   | Wikidata Id |
-      | <Title> | Q334        |
-    Then I should see the description with "<DescriptionText>"
+      | <Title> | <WikiID>    |
+    Then I should see the description with "<Text>"
 
     Examples:
-      | Title     | DescriptionText          |
-      | Singapore | Location: 1.3'N, 103.8'E |
-      | Germany   | Location: 51'N, 10'E     |
-      | Covid     |                          |
+      | Title     | Text                     | WikiID    |
+      | Singapore | Location: 1.3'N, 103.8'E | Q334      |
+      | Germany   | Location: 51'N, 10'E     | Q183      |
+      | Covid     |                          | Q84263196 |
 
   @ignore @usingRealWikidataService
   Scenario Outline: Existing Note wikidata edited by user
@@ -36,5 +36,7 @@ Feature: Note creation/edit should have description if wikidata is a location
     And I should see the description with "<FinalText>"
 
     Examples:
-      | OldTitle  | WikiId | NewTitle | NewWikiId | InitialText              | FinalText                                       |
-      | Singapore | Q334   | Germany  | Q183      | Location: 1.3'N, 103.8'E | Location: 51'N, 10'E \nLocation: 1.3'N, 103.8'E |
+      | OldTitle  | WikiId    | NewTitle | NewWikiId | InitialText              | FinalText                                       |
+      | Singapore | Q334      | Germany  | Q183      | Location: 1.3'N, 103.8'E | Location: 51'N, 10'E \nLocation: 1.3'N, 103.8'E |
+      | Singapore | Q334      | Jackie   | Q16277237 | Location: 1.3'N, 103.8'E | Location: 1.3'N, 103.8'E                        |
+      | Covic     | Q84263196 | Japan    | Q17       |                          | Location: 35°N, 136°E                           |
