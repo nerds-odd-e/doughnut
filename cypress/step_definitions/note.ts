@@ -124,15 +124,6 @@ When("I am creating a note under {notepath}", (notePath: NotePath) => {
   cy.clickAddChildNoteButton()
 })
 
-When(
-  "I am creating a note with wikidataID {string} under {notepath}",
-  (string: string, notePath: NotePath) => {
-    cy.navigateToNotePage(notePath)
-    cy.get('select[name="wikidataSearchResult"]').select(wikidataID)
-    cy.clickAddChildNoteButton()
-  },
-)
-
 Then("I should see {string} in breadcrumb", (noteTitles: string) => {
   cy.pageIsNotLoading()
   cy.expectBreadcrumb(noteTitles, false)

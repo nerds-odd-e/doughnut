@@ -47,9 +47,9 @@ Feature: Nested Note Create with wikidata
     Given Wikidata.org has an entity "Q144" with "dog"
     And I create a note belonging to "Animals":
       | Title | Wikidata Id |
-      | dog | Q144       |
+      | dog   | Q144        |
     Then I should see the icon beside title linking to "https://www.wikidata.org/wiki/Q144"
     When I try to create a note belonging to "Animals":
-      | Title | Wikidata Id  |
-      | long animal | Q144  |
+      | Title       | Wikidata Id |
+      | long animal | Q144        |
     Then I should see a message "Duplicate Wikidata ID Detected."
