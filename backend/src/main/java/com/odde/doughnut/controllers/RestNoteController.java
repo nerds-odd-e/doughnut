@@ -190,6 +190,9 @@ class RestNoteController {
   }
 
   private void checkDuplicateWikidataId(Notebook notebook, String wikidataId) throws BindException {
+    if(wikidataId.isEmpty()) {
+      return;
+    }
     List<Note> existingNotes =
         modelFactoryService.noteRepository.searchInNotebookForNoteByWikidataId(
             notebook, wikidataId);
