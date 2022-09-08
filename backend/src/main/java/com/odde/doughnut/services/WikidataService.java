@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.Data;
-import lombok.SneakyThrows;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.lang.Nullable;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -106,13 +105,17 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     }
   }
 
-  @SneakyThrows
   public void assignWikidataLocationDataToNote(Note note, String wikidataId)
-      throws InterruptedException {
+      throws InterruptedException, BindException {
     if (Strings.isEmpty(wikidataId)) {
       return;
     }
-    WikidataLocationModel locationData = getEntityLocationDataById(wikidataId);
+    WikidataLocationModel locationData = null;
+    try {
+      locationData = getEntityLocationDataById(wikidataId);
+    } catch (IOException e) {
+      buildBindingError(wikidataId, "The wikidata service is not available");
+    }
     if (locationData != null) {
       String prevDesc =
           note.getTextContent().getDescription() != null
