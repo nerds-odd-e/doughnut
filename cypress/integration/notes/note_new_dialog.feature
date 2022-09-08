@@ -3,8 +3,8 @@ Feature: New note creation prompt for title replacement
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user
-      | title   | testingParent | description         |
-      | Animals |               | An awesome training |
+      | title   | description         |
+      | Animals | An awesome training |
 
   @usingDummyWikidataService @mockBrowserTime
   Scenario Outline: Ask when replacing title with wikidata suggested title when creating new note
