@@ -18,6 +18,7 @@ declare namespace Cypress {
     clickAssociateWikiDataButton(title: any, wikiID: any): Chainable<any>
     clickButtonOnCardBody(noteTitle: any, buttonTitle: any): Chainable<any>
     clickNotePageButton(noteTitle: any, btnTextOrTitle: any, forceLoadPage: any): Chainable<any>
+    clickNotePageButtonOnCurrentPage(btnTextOrTitle: any): Chainable<any>
     clickNotePageMoreOptionsButton(noteTitle: any, btnTextOrTitle: any): Chainable<any>
     clickNotePageMoreOptionsButtonOnCurrentPage(btnTextOrTitle: any): Chainable<any>
     clickNoteToolbarButton(btnTextOrTitle: any): Chainable<any>

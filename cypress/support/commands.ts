@@ -271,6 +271,10 @@ Cypress.Commands.add("startSearching", () => {
 
 Cypress.Commands.add("clickNotePageButton", (noteTitle, btnTextOrTitle, forceLoadPage) => {
   cy.jumpToNotePage(noteTitle, forceLoadPage)
+  cy.clickNotePageButtonOnCurrentPage(btnTextOrTitle)
+})
+
+Cypress.Commands.add("clickNotePageButtonOnCurrentPage", (btnTextOrTitle) => {
   cy.clickNoteToolbarButton(btnTextOrTitle)
 })
 
