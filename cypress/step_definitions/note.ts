@@ -101,7 +101,9 @@ When("I select append title", () => {
   cy.get('[id="titleRadio-Append"]').check({ force: true })
 })
 
-When("I do not select anything", () => {})
+When("I do not select anything", () => {
+  // do nothing
+})
 
 When("I create a note belonging to {string}:", (noteTitle: string, data: DataTable) => {
   expect(data.hashes().length).to.equal(1)
