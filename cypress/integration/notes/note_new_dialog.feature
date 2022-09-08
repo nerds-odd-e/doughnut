@@ -6,33 +6,18 @@ Feature: New note creation prompt for title replacement
       | title   | testingParent | description         |
       | Animals |               | An awesome training |
 
-  @usingDummyWikidataService @mockBrowserTime 
-  Scenario Outline: Create a new note with a wikidata id without selecting replace or append title
+  @usingDummyWikidataService @mockBrowserTime
+  Scenario Outline: Ask when replacing title with wikidata suggested title when creating new note
     Given Wikidata has search result for "<dataSearchTitle>" with wikidata ID "Q90"
     When I am creating a note under "My Notes/Animals"
     And I search with title "<oldTitle>" on Wikidata
     And I select "<dataSearchTitle>" with wikidataID "Q90" from the Wikidata search result
+    And I <action>
     Then I should see that the "Title" becomes "<expectedTitle>"
 
     Examples:
-      | dataSearchTitle | oldTitle | expectedTitle |
-      | rocky           | apple    | apple         |
-      | Apple           | apple    | Apple         |
-
-  @usingDummyWikidataService @mockBrowserTime 
-  Scenario: Create a new note with a wikidata id and replace title
-    Given Wikidata has search result for "rocky" with wikidata ID "Q90"
-    When I am creating a note under "My Notes/Animals"
-    And I search with title "apple" on Wikidata
-    And I select "rocky" with wikidataID "Q90" from the Wikidata search result
-    And I select replace title
-    Then I should see that the "Title" becomes "rocky"
-
-  @usingDummyWikidataService @mockBrowserTime
-  Scenario: Create a new note with a wikidata id and append title
-    Given Wikidata has search result for "rocky" with wikidata ID "Q90"
-    When I am creating a note under "My Notes/Animals"
-    And I search with title "apple" on Wikidata
-    And I select "rocky" with wikidataID "Q90" from the Wikidata search result
-    And I select append title
-    Then I should see that the "Title" becomes "apple / rocky"
+      | dataSearchTitle | action                 | oldTitle | expectedTitle |
+      | rocky           | do not select anything | apple    | apple         |
+      | Apple           | do not select anything | apple    | Apple         |
+      | rocky           | select replace title   | apple    | rocky         |
+      | rocky           | select append title    | apple    | apple / rocky |
