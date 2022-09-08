@@ -93,8 +93,12 @@ When(
   },
 )
 
-When("I check the checkbox to replace the title", () => {
-  cy.get('[id="titleCheckbox- Click to replace title"]').check()
+When("I select replace title", () => {
+  cy.get('[id="titleRadio-Replace"]').check({ force: true })
+})
+
+When("I select append title", () => {
+  cy.get('[id="titleRadio-Append"]').check({ force: true })
 })
 
 When("I create a note belonging to {string}:", (noteTitle: string, data: DataTable) => {

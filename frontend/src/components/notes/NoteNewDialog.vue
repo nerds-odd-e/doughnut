@@ -11,13 +11,16 @@
       v-model="creationData.textContent"
       :errors="noteFormErrors.textContent"
     />
-    <template v-if="creationData.suggestedTextContent">
-      <label>Suggested Title: {{ creationData.suggestedTextContent }}</label>
-      <CheckInput
-        scope-name="titleCheckbox"
-        field=" Click to replace title"
-        v-model="creationData.replaceTextContentChecked"
-        @change="updateCurrentLabel"
+    <template v-if="creationData.suggestedTitle">
+      <label>Suggested Title: {{ creationData.suggestedTitle }}</label>
+      <RadioButtons
+        v-model="creationData.replaceOrAppendTitle"
+        scope-name="titleRadio"
+        :options="[
+          { value: 'Replace', label: 'Replace title' },
+          { value: 'Append', label: 'Append title' },
+        ]"
+        @change="updateModelValue()"
       />
     </template>
     <TextInput
@@ -46,7 +49,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import TextInput from "../form/TextInput.vue";
-import CheckInput from "../form/CheckInput.vue";
+import RadioButtons from "../form/RadioButtons.vue";
 import NoteFormTitleOnly from "./NoteFormTitleOnly.vue";
 import SearchResults from "../search/SearchResults.vue";
 import LinkTypeSelectCompact from "../links/LinkTypeSelectCompact.vue";
@@ -59,7 +62,7 @@ export default defineComponent({
     SearchResults,
     LinkTypeSelectCompact,
     TextInput,
-    CheckInput,
+    RadioButtons,
     WikidataSearchByLabel,
   },
   props: {
@@ -76,9 +79,9 @@ export default defineComponent({
         linkTypeToParent: "no link",
         textContent: { title: "" },
         wikidataId: "",
-        suggestedTextContent: "",
-        previousTextContent: "",
-        replaceTextContentChecked: false,
+        suggestedTitle: "",
+        originalTitle: "",
+        replaceOrAppendTitle: "",
       } as Generated.NoteCreation,
       noteFormErrors: {
         linkTypeToParent: undefined,
@@ -102,29 +105,27 @@ export default defineComponent({
         });
     },
     onSelectWikidataEntry(selectedSuggestion: Generated.WikidataSearchEntity) {
-      this.creationData.replaceTextContentChecked = false;
-
       const currentLabel = this.creationData.textContent.title.toUpperCase();
       const newLabel = selectedSuggestion.label.toUpperCase();
 
       if (currentLabel === newLabel) {
         this.creationData.textContent.title = selectedSuggestion.label;
-        this.creationData.suggestedTextContent = "";
+        this.creationData.suggestedTitle = "";
       } else {
-        this.creationData.suggestedTextContent = selectedSuggestion.label;
+        this.creationData.suggestedTitle = selectedSuggestion.label;
       }
 
+      this.creationData.originalTitle = this.creationData.textContent.title;
       this.creationData.wikidataId = selectedSuggestion.id;
     },
-    updateCurrentLabel() {
-      if (this.creationData.replaceTextContentChecked) {
-        this.creationData.previousTextContent =
-          this.creationData.textContent.title;
+    updateModelValue() {
+      if (this.creationData.replaceOrAppendTitle === "Replace") {
         this.creationData.textContent.title =
-          this.creationData.suggestedTextContent || "";
-      } else {
-        this.creationData.textContent.title =
-          this.creationData.previousTextContent || "";
+          this.creationData.suggestedTitle || "";
+      }
+
+      if (this.creationData.replaceOrAppendTitle === "Append") {
+        this.creationData.textContent.title = `${this.creationData.originalTitle} / ${this.creationData.suggestedTitle}`;
       }
     },
   },

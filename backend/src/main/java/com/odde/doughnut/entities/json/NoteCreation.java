@@ -12,7 +12,7 @@ public class NoteCreation {
   @Getter @Setter @NotNull public LinkType linkTypeToParent;
   @Getter @Setter @Valid @NotNull public TextContent textContent = new TextContent();
   @Getter @Setter @Nullable public String wikidataId;
-  @Getter @Setter @Nullable public String suggestedTextContent;
-  @Getter @Setter @Nullable public String previousTextContent;
-  @Getter @Setter @Nullable public Boolean replaceTextContentChecked;
+  @Getter @Setter @Nullable public String suggestedTitle;
+  @Getter @Setter @Nullable public String originalTitle;
+  @Getter @Setter @Nullable public String replaceOrAppendTitle;
 }
