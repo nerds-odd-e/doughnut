@@ -113,7 +113,10 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     }
     WikidataLocationModel locationData = getEntityLocationDataById(wikidataId);
     if (locationData != null) {
-      note.getTextContent().setDescription(locationData + "\n" + note.getTextContent().getDescription());
+      String prevDesc = note.getTextContent().getDescription() != null ? note.getTextContent().getDescription()
+        + "\n" : "";
+      String desc = locationData + prevDesc;
+      note.getTextContent().setDescription(desc);
     }
 
   }
