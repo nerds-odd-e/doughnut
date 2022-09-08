@@ -189,6 +189,36 @@ class RestNoteControllerTests {
       assertThat(
           bindException.getMessage(), stringContainsInOrder("Duplicate Wikidata ID Detected."));
     }
+
+    @Nested
+    class AddingNoteWithLocationWikidataId {
+      String wikidataIdOfALocation = "Q334";
+      String lnglat = "1.3'N, 103.8'E";
+      String singapore = "Singapore";
+
+      @BeforeEach
+      void thereIsAWikidataEntryOfALocation() throws IOException, InterruptedException {
+        noteCreation.setWikidataId(wikidataIdOfALocation);
+        noteCreation.getTextContent().setDescription(singapore);
+        Mockito.when(httpClientAdapter.getResponseString(
+          URI.create("https://www.wikidata.org/w/api.php?action=wbgetentities&ids="
+            + wikidataIdOfALocation + "&format=json&props=claims")))
+        .thenReturn("{\"entities\":{\"Q334\":{\"type\":\"item\",\"id\":\"Q334\",\"claims\":{\"P625\":[{\"mainsnak\":{\"snaktype\":\"value\",\"property\":\"P625\",\"hash\":\"93c1b6e7e347bc89ca0cde59b402ac9dacde41f6\",\"datavalue\":{\"value\":{\"latitude\":1.3,\"longitude\":103.8,\"altitude\":null,\"precision\":0.0166667,\"globe\":\"http://www.wikidata.org/entity/Q2\"},\"type\":\"globecoordinate\"},\"datatype\":\"globe-coordinate\"},\"type\":\"statement\",\"id\":\"q334$C02C45FD-AF0E-4064-913F-1443C629F96A\",\"rank\":\"normal\",\"references\":[{\"hash\":\"fa278ebfc458360e5aed63d5058cca83c46134f1\",\"snaks\":{\"P143\":[{\"snaktype\":\"value\",\"property\":\"P143\",\"hash\":\"e4f6d9441d0600513c4533c672b5ab472dc73694\",\"datavalue\":{\"value\":{\"entity-type\":\"item\",\"numeric-id\":328,\"id\":\"Q328\"},\"type\":\"wikibase-entityid\"},\"datatype\":\"wikibase-item\"}]},\"snaks-order\":[\"P143\"]}]}]}}},\"success\":1}");
+      }
+      @Test
+      void shouldAddLocationInfoWhenAddingNoteWithWikidataId() throws BindException, InterruptedException, NoAccessRightException {
+        NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
+        assertThat(note.noteRealm.getNote().getTextContent().getDescription(), stringContainsInOrder("Location: " +
+          lnglat));
+      }
+
+      @Test
+      void shouldPrependLocationInfoWhenAddingNoteWithWikidataId() throws BindException, InterruptedException, NoAccessRightException {
+        NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
+        assertThat(note.noteRealm.getNote().getTextContent().getDescription(), stringContainsInOrder("Location: " +
+          lnglat, singapore));
+      }
+    }
   }
 
   @Nested
