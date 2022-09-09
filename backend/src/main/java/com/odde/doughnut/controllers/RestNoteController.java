@@ -54,6 +54,7 @@ class RestNoteController {
     checkDuplicateWikidataId(note.getNotebook(), wikidataAssociationCreation.wikidataId);
 
     note.setWikidataId(wikidataAssociationCreation.wikidataId);
+    getWikiDataService().assignWikidataLocationDataToNote(note, note.getWikidataId());
     modelFactoryService.noteRepository.save(note);
     return new NoteViewer(currentUserFetcher.getUser().getEntity(), note).toJsonObject();
   }

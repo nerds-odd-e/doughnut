@@ -104,8 +104,7 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     }
   }
 
-  public void assignWikidataLocationDataToNote(Note note, String wikidataId)
-      throws InterruptedException {
+  public void assignWikidataLocationDataToNote(Note note, String wikidataId) {
     if (Strings.isEmpty(wikidataId)) {
       return;
     }
@@ -114,20 +113,21 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     if (locationData != null) {
       String prevDesc =
           note.getTextContent().getDescription() != null
-              ? note.getTextContent().getDescription() + "\n"
+              ? note.getTextContent().getDescription()
               : "";
-      String desc = locationData + prevDesc;
+      String desc = locationData + "\n" + prevDesc;
       note.getTextContent().setDescription(desc);
     }
   }
 
-  public WikidataLocationModel getEntityLocationDataById(String wikidataId)
-      throws InterruptedException {
+  public WikidataLocationModel getEntityLocationDataById(String wikidataId) {
     final String locationId = "P625";
     WikidataEntityModel entity = null;
     try {
       entity = getEntityDataById(wikidataId);
     } catch (IOException e) {
+    } catch (InterruptedException e) {
+
     }
 
     if (entity == null) return null;
