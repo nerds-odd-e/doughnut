@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.Data;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.lang.Nullable;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -133,29 +132,11 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
 
     if (entity == null) return null;
 
-    if (!entity.getEntities().containsKey(wikidataId)) return null;
-    List<WikidataEntityItemObjectModel> locationClaims =
-        extractClaimsDataFromWikiDataEntityItem(entity.getEntities().get(wikidataId), locationId);
-    if (locationClaims == null) {
-      return null;
-    }
-    Map<String, Object> locationValue = locationClaims.get(0).getData();
+    Map<String, Object> locationValue = entity.getStringObjectMap(wikidataId, locationId);
+    if (locationValue == null) return null;
 
     return new WikidataLocationModel(
         locationValue.get("latitude").toString(), locationValue.get("longitude").toString());
-  }
-
-  @Nullable
-  private List<WikidataEntityItemObjectModel> extractClaimsDataFromWikiDataEntityItem(
-      WikidataEntityItemModel entityItem, String objectId) {
-    if (entityItem.getClaims() == null) {
-      return null;
-    }
-    if (entityItem.getClaims().containsKey(objectId)) {
-      return entityItem.getClaims().get(objectId);
-    }
-
-    return null;
   }
 
   private WikidataEntityModel getEntityDataById(String wikidataId)
@@ -180,6 +161,30 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
   public static class WikidataEntityModel {
     private Map<String, WikidataEntityItemModel> entities;
     private Number success;
+
+    public List<WikidataEntityItemObjectModel> getLocationClaims(
+        String wikidataId, String locationId) {
+      WikidataEntityItemModel entityItem = getEntities().get(wikidataId);
+      if (entityItem.getClaims() == null) {
+        return null;
+      }
+      if (entityItem.getClaims().containsKey(locationId)) {
+        return entityItem.getClaims().get(locationId);
+      }
+
+      return null;
+    }
+
+    public Map<String, Object> getStringObjectMap(String wikidataId, String locationId) {
+      if (!getEntities().containsKey(wikidataId)) return null;
+      List<WikidataEntityItemObjectModel> locationClaims =
+          getLocationClaims(wikidataId, locationId);
+      if (locationClaims == null) {
+        return null;
+      }
+      Map<String, Object> locationValue = locationClaims.get(0).getData();
+      return locationValue;
+    }
   }
 
   @Data
