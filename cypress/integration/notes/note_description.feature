@@ -8,7 +8,7 @@ Feature: Note creation/edit should have description if wikidata is a location
       | title  | description |
       | places | some desc   |
 
-  @ignore @usingRealWikidataService
+  @usingRealWikidataService
   Scenario Outline: New Note creation and wikidata is selected by user
     Given I am creating a note under "My Notes/places"
     When I create a note belonging to "places":
@@ -20,7 +20,6 @@ Feature: Note creation/edit should have description if wikidata is a location
       | Title     | Text                     | WikiID    |
       | Singapore | Location: 1.3'N, 103.8'E | Q334      |
       | Germany   | Location: 51'N, 10'E     | Q183      |
-      | Covid     |                          | Q84263196 |
 
   @ignore @usingRealWikidataService
   Scenario Outline: Existing Note wikidata edited by user
@@ -39,4 +38,3 @@ Feature: Note creation/edit should have description if wikidata is a location
       | OldTitle  | WikiId    | NewTitle | NewWikiId | InitialText              | FinalText                                       |
       | Singapore | Q334      | Germany  | Q183      | Location: 1.3'N, 103.8'E | Location: 51'N, 10'E \nLocation: 1.3'N, 103.8'E |
       | Singapore | Q334      | Jackie   | Q16277237 | Location: 1.3'N, 103.8'E | Location: 1.3'N, 103.8'E                        |
-      | Covic     | Q84263196 | Japan    | Q17       |                          | Location: 35°N, 136°E                           |

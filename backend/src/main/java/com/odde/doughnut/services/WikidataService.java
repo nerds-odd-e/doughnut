@@ -106,16 +106,12 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
   }
 
   public void assignWikidataLocationDataToNote(Note note, String wikidataId)
-      throws InterruptedException, BindException {
+      throws InterruptedException {
     if (Strings.isEmpty(wikidataId)) {
       return;
     }
-    WikidataLocationModel locationData = null;
-    try {
-      locationData = getEntityLocationDataById(wikidataId);
-    } catch (IOException e) {
-      buildBindingError(wikidataId, "The wikidata service is not available");
-    }
+    WikidataLocationModel locationData;
+    locationData = getEntityLocationDataById(wikidataId);
     if (locationData != null) {
       String prevDesc =
           note.getTextContent().getDescription() != null
@@ -127,9 +123,13 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
   }
 
   public WikidataLocationModel getEntityLocationDataById(String wikidataId)
-      throws IOException, InterruptedException {
+      throws InterruptedException {
     final String locationId = "P625";
-    WikidataEntityModel entity = getEntityDataById(wikidataId);
+    WikidataEntityModel entity = null;
+    try {
+      entity = getEntityDataById(wikidataId);
+    } catch (IOException e) {
+    }
 
     if (entity == null) return null;
 
