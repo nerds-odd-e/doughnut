@@ -389,3 +389,7 @@ Then("I type {string} in the title", (content: string) => {
 Then("I should see the description with {string}", (descriptionText: string) => {
   cy.findNoteDescription(descriptionText)
 })
+
+Then("I should see the description with edit icon", () => {
+  cy.get('g[id="Group_2"]').should("exist")
+})
