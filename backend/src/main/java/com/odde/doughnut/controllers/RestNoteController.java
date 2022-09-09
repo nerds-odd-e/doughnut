@@ -73,7 +73,7 @@ class RestNoteController {
             user, testabilitySettings.getCurrentUTCTimestamp(), noteCreation.textContent);
     note.setParentNote(parentNote);
     getWikiDataService().assignWikidataIdToNote(note, noteCreation.getWikidataId());
-    // getWikiDataService().assignWikidataLocationDataToNote(note, noteCreation.getWikidataId());
+    getWikiDataService().assignWikidataLocationDataToNote(note, noteCreation.getWikidataId());
 
     modelFactoryService.noteRepository.save(note);
     LinkType linkTypeToParent = noteCreation.getLinkTypeToParent();
