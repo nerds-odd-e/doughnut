@@ -65,22 +65,24 @@ Then("I should see the icon beside title linking to {string}", (associationUrl: 
   })
 })
 
-
-Then("I should see the icon beside title {string} linking to {string}", (title: string, associationUrl: string) => {
-  cy.findNoteTitle(title)
-  cy.window().then((win) => {
-    const popupWindowStub = { location: { href: undefined }, focus: cy.stub() }
-    cy.stub(win, "open").as("open").returns(popupWindowStub)
-    cy.findByRole("button", { name: "Wikidata" }).click()
-    cy.get("@open").should("have.been.calledWith", "")
-    // using a callback so that cypress can wait until the stubbed value is assigned
-    cy.wrap(() => popupWindowStub.location.href)
-      .should((cb) => expect(cb()).equal(associationUrl))
-      .then(() => {
-        expect(popupWindowStub.focus).to.have.been.called
-      })
-  })
-})
+Then(
+  "I should see the icon beside title {string} linking to {string}",
+  (title: string, associationUrl: string) => {
+    cy.findNoteTitle(title)
+    cy.window().then((win) => {
+      const popupWindowStub = { location: { href: undefined }, focus: cy.stub() }
+      cy.stub(win, "open").as("open").returns(popupWindowStub)
+      cy.findByRole("button", { name: "Wikidata" }).click()
+      cy.get("@open").should("have.been.calledWith", "")
+      // using a callback so that cypress can wait until the stubbed value is assigned
+      cy.wrap(() => popupWindowStub.location.href)
+        .should((cb) => expect(cb()).equal(associationUrl))
+        .then(() => {
+          expect(popupWindowStub.focus).to.have.been.called
+        })
+    })
+  },
+)
 
 Given(
   "Wikidata has search result for {string} with wikidata ID {string}",

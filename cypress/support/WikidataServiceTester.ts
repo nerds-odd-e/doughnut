@@ -6,13 +6,17 @@ import TestabilityHelper from "./TestabilityHelper"
 // @ts-check
 
 class WikidataServiceTester {
+  imposter = new Imposter().withPort(5001)
+
   restore(cy: Cypress.cy & CyEventEmitter) {
     cy.get(`@${this.savedServiceUrlName}`).then((saved: string) =>
       this.setWikidataServiceUrl(cy, saved),
     )
   }
   mock(cy: Cypress.cy & CyEventEmitter) {
-    this.setWikidataServiceUrl(cy, `http://localhost:${this.port}`).as(this.savedServiceUrlName)
+    this.setWikidataServiceUrl(cy, `http://localhost:${this.imposter.port}`).as(
+      this.savedServiceUrlName,
+    )
   }
   stubWikidataEntityQuery(wikidataId: string, wikidataTitle: string, wikipediaLink: string) {
     const wikipedia = wikipediaLink ? { enwiki: { site: "enwiki", url: wikipediaLink } } : {}
@@ -47,9 +51,6 @@ class WikidataServiceTester {
   get savedServiceUrlName() {
     return "savedWikidataServiceUrl"
   }
-  get port() {
-    return 5001
-  }
   private setWikidataServiceUrl(cy: Cypress.cy & CyEventEmitter, wikidataServiceUrl: string) {
     return new TestabilityHelper()
       .postToTestabilityApi(cy, `use_wikidata_service`, { body: { wikidataServiceUrl } })
@@ -58,12 +59,11 @@ class WikidataServiceTester {
         cy.wrap(response.body)
       })
   }
-  private stub(url: string, data: unknown) {
+  private async stub(url: string, data: unknown) {
     const mb = new Mountebank()
-    const imposter = new Imposter()
-      .withPort(this.port)
-      .withStub(new DefaultStub(url, HttpMethod.GET, data, 200))
-    return mb.createImposter(imposter)
+    await mb.deleteImposter(this.imposter.port)
+    this.imposter.withStub(new DefaultStub(url, HttpMethod.GET, data, 200))
+    await mb.createImposter(this.imposter)
   }
 }
 
