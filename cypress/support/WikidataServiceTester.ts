@@ -9,8 +9,8 @@ class WikidataServiceTester {
   imposter = new Imposter().withPort(5001)
 
   restore(cy: Cypress.cy & CyEventEmitter) {
-    cy.get(`@${this.savedServiceUrlName}`).then((saved: string) =>
-      this.setWikidataServiceUrl(cy, saved),
+    cy.get(`@${this.savedServiceUrlName}`).then((saved) =>
+      this.setWikidataServiceUrl(cy, saved as unknown as string),
     )
   }
   mock(cy: Cypress.cy & CyEventEmitter) {

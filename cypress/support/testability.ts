@@ -124,7 +124,7 @@ Cypress.Commands.add(
 )
 
 Cypress.Commands.add("wikidataService", () => {
-  cy.wrap(new WikidataServiceTester())
+  cy.get("@WikidataServiceTester")
 })
 
 Cypress.Commands.add(
