@@ -50,10 +50,10 @@ Before({ tags: "@featureToggle" }, () => {
   cy.testability().featureToggle(true)
 })
 
-Before({ tags: "@usingDummyWikidataService" }, () => {
+Before({ tags: "@usingMockedWikidataService" }, () => {
   cy.wikidataService().mock()
 })
 
-After({ tags: "@usingDummyWikidataService" }, () => {
+After({ tags: "@usingMockedWikidataService" }, () => {
   cy.wikidataService().restore()
 })

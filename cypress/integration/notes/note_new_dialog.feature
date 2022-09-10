@@ -6,7 +6,7 @@ Feature: New note creation prompt for title replacement
       | title   | description         |
       | Animals | An awesome training |
 
-  @usingDummyWikidataService @mockBrowserTime
+  @usingMockedWikidataService @mockBrowserTime
   Scenario Outline: Ask when replacing title with wikidata suggested title when creating new note
     Given Wikidata has search result for "<dataSearchTitle>" with wikidata ID "Q90"
     When I am creating a note under "My Notes/Animals"
