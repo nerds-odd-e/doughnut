@@ -1,6 +1,7 @@
+import { Stub } from '@anev/ts-mountebank';
 /// <reference types="cypress" />
 
-import { Mountebank, Imposter, DefaultStub, HttpMethod } from "@anev/ts-mountebank"
+import { Mountebank, Imposter, DefaultStub, HttpMethod, FlexiPredicate } from "@anev/ts-mountebank"
 import TestabilityHelper from "./TestabilityHelper"
 
 // @ts-check
@@ -20,7 +21,7 @@ class WikidataServiceTester {
   }
   stubWikidataEntityQuery(wikidataId: string, wikidataTitle: string, wikipediaLink: string) {
     const wikipedia = wikipediaLink ? { enwiki: { site: "enwiki", url: wikipediaLink } } : {}
-    this.stub(`/wiki/Special:EntityData/${wikidataId}.json`, {
+    this.stubByUrl(`/wiki/Special:EntityData/${wikidataId}.json`, {
       entities: {
         [wikidataId]: {
           labels: {
@@ -36,7 +37,7 @@ class WikidataServiceTester {
   }
 
   stubWikidataSearchResult(wikidataLabel: string, wikidataId: string) {
-    this.stub(`/w/api.php`, {
+    this.stubByPathAndQuery(`/w/api.php`, {action: "wbsearchentities"}, {
       search: [
         {
           id: wikidataId,
@@ -59,12 +60,23 @@ class WikidataServiceTester {
         cy.wrap(response.body)
       })
   }
-  private async stub(url: string, data: unknown) {
+
+  private stubByUrl(url: string, data: unknown) {
+    return this.stub(new DefaultStub(url, HttpMethod.GET, data, 200));
+  }
+
+  private stubByPathAndQuery(path: string, query: Record<string, string>, data: unknown) {
+    return this.stub(new DefaultStub(path, HttpMethod.GET, data, 200)
+    .withPredicate(new FlexiPredicate().withPath(path).withQuery(query).withMethod(HttpMethod.GET)))
+  }
+
+  private async stub(stub: Stub) {
     const mb = new Mountebank()
     await mb.deleteImposter(this.imposter.port)
-    this.imposter.withStub(new DefaultStub(url, HttpMethod.GET, data, 200))
+    this.imposter.withStub(stub)
     await mb.createImposter(this.imposter)
   }
+
 }
 
 export default WikidataServiceTester
