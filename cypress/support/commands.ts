@@ -365,7 +365,7 @@ Cypress.Commands.add(
 Cypress.Commands.add("findNoteTitle", (title) =>
   cy.findByText(title, { selector: "[role=title] *" }),
 )
-Cypress.Commands.add("findNoteDescription", (title) =>
+Cypress.Commands.add("findNoteDescriptionOnCurrentPage", (title) =>
   cy.findByText(title, { selector: "[role=description] *" }),
 )
 
@@ -481,10 +481,6 @@ Cypress.Commands.add("assertBlogPostInWebsiteByTitle", (article) => {
 
 Cypress.Commands.add("failure", () => {
   throw new Error("Deliberate CYPRESS test Failure!!!")
-})
-
-Cypress.Commands.add("expectCurrentNoteDescription", (expectedDescription) => {
-  cy.findByText(expectedDescription, { selector: ".note-description *" })
 })
 
 Cypress.Commands.add("withinMindmap", () => {

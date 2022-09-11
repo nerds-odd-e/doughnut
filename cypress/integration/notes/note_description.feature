@@ -12,11 +12,10 @@ Feature: Note creation/edit should have description if wikidata is a location
   Scenario Outline: New Note creation and wikidata is selected by user
     Given Wikidata.org has an entity "<WikidataId>" with "<Title>"
     And Wikidata.org entity "<WikidataId>" is a location at <Lat>, <Lng>
-    And I am creating a note under "My Notes/places"
     When I create a note belonging to "places":
       | Title   | Wikidata Id     |
       | <Title> | <WikidataId>    |
-    Then I should see the description with "<Text>"
+    Then I should see the description becomes "<Text>"
 
     Examples:
       | Title     | Lat | Lng   | Text                     | WikidataId |
@@ -29,12 +28,12 @@ Feature: Note creation/edit should have description if wikidata is a location
     When I create a note belonging to "places":
       | Title      | Wikidata Id     |
       | <OldTitle> | <WikidataId>    |
-    Then I should see the description with "<InitialText>"
+    Then I should see the description becomes "<InitialText>"
     When I navigate to "My Notes/places/Singapore" note
     And I associate the current note with wikidata id "<NewWikiId>"
     And  I need to confirm the association with different title "<NewTitle>"
     Then I should see the icon beside title linking to "https://en.wikipedia.org/wiki/<NewTitle>"
-    And I should see the description with "<FinalText>"
+    And I should see the description becomes "<FinalText>"
 
     Examples:
       | OldTitle  | WikidataId | NewTitle | NewWikiId | InitialText              | FinalText                                     |

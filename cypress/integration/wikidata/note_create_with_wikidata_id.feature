@@ -15,7 +15,6 @@ Feature: Nested Note Create with wikidata
       | Title | Wikidata Id |
       | snake | Q2102       |
     Then I should see the icon beside title linking to "https://www.wikidata.org/wiki/Q2102"
-    And I should see the description with edit icon
 
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Create a new note with invalid wikidata id

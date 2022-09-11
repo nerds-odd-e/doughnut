@@ -28,12 +28,11 @@ declare namespace Cypress {
     dialogDisappeared(): Chainable<any>
     distanceBetweenCardsGreaterThan(cards: any, note1: any, note2: any, min: any): Chainable<any>
     expectBreadcrumb(item: string, addChildButton: boolean = true): Chainable<any>
-    expectCurrentNoteDescription(expectedDescription: string): Chainable<any>
     expectExactLinkTargets(targets: any): Chainable<any>
     expectFieldErrorMessage(message: string): Chainable<any>
     expectNoteCards(expectedCards: any): Chainable<any>
     findNoteTitle(title: string): Chainable<any>
-    findNoteDescription(title: string): Chainable<any>
+    findNoteDescriptionOnCurrentPage(title: string): Chainable<any>
     findCardTitle(title: string): Chainable<any>
     findUserSettingsButton(userName: string): Chainable<any>
     failure(): Chainable<any>

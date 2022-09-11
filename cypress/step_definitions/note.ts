@@ -89,7 +89,7 @@ When(
   (noteTitle: string, newDescription: string) => {
     cy.jumpToNotePage(noteTitle)
     cy.inPlaceEdit({ Description: newDescription })
-    cy.expectCurrentNoteDescription(newDescription)
+    cy.findNoteDescriptionOnCurrentPage(newDescription)
   },
 )
 
@@ -386,10 +386,6 @@ Then("I type {string} in the title", (content: string) => {
   cy.focused().clear().type(content)
 })
 
-Then("I should see the description with {string}", (descriptionText: string) => {
-  cy.findNoteDescription(descriptionText)
-})
-
-Then("I should see the description with edit icon", () => {
-  cy.get('g[id="Group_2"]').should("exist")
+Then("I should see the description becomes {string}", (descriptionText: string) => {
+  cy.findNoteDescriptionOnCurrentPage(descriptionText)
 })
