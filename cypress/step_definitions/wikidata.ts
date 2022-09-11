@@ -48,11 +48,7 @@ Given("The wikidata service is not available", () => {
   })
 })
 
-Then("I should see a message {string}", (message: string) => {
-  cy.expectFieldErrorMessage(message)
-})
-
-Then("I should see a error {string} on {string}", (message: string, field: string) => {
+Then("I should see an error {string} on {string}", (message: string, field: string) => {
   cy.expectFieldErrorMessage(message, field)
 })
 

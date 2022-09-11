@@ -12,7 +12,7 @@ Feature: associate wikidata ID to note
   Scenario: Associate note to wikidata when the service is not available
     Given The wikidata service is not available
     When I associate the note "TDD" with wikidata id "Q1"
-    Then I should see a message "The wikidata service is not available"
+    Then I should see an error "The wikidata service is not available" on "Wikidata Id"
 
 
   @usingMockedWikidataService
@@ -51,5 +51,6 @@ Feature: associate wikidata ID to note
       | Animals |            |               |
       | Dog     | Q123       | Animals       |
       | Canine  | Q456       | Animals       |
+    And Wikidata.org has an entity "Q123" with title "Canine"
     And I associate the note "Canine" with wikidata id "Q123"
-    Then I should see a message "Duplicate Wikidata ID Detected."
+    Then I should see an error "Duplicate Wikidata ID Detected." on "Wikidata Id"
