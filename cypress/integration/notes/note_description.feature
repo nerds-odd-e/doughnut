@@ -9,18 +9,13 @@ Feature: Note creation/edit should have description if wikidata is a location
       | places | some desc   |
 
   @usingMockedWikidataService
-  Scenario Outline: New Note creation and wikidata is selected by user
-    Given Wikidata.org has an entity "<WikidataId>" with "<Title>"
-    And Wikidata.org entity "<WikidataId>" is a location at <Lat>, <Lng>
+  Scenario: New Note creation and wikidata is selected by user
+    Given Wikidata.org has an entity "Q334" with title "Singapore"
+    And Wikidata.org entity "Q334" is a location at 1.3, 103.8
     When I create a note belonging to "places":
-      | Title   | Wikidata Id     |
-      | <Title> | <WikidataId>    |
-    Then I should see the description becomes "<Text>"
-
-    Examples:
-      | Title     | Lat | Lng   | Text                     | WikidataId |
-      | Singapore | 1.3 | 103.8 | Location: 1.3'N, 103.8'E | Q334       |
-      | Germany   | 51  | 10    | Location: 51'N, 10'E     | Q183       |
+      | Title     | Wikidata Id  |
+      | Singapore | Q334         |
+    Then I should see the description becomes "Location: 1.3'N, 103.8'E"
 
   @usingRealWikidataService
   Scenario Outline: Existing Note wikidata edited by user

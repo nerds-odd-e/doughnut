@@ -25,14 +25,14 @@ When("I don't need to confirm the association with different title {string}", ()
 })
 
 Given(
-  "Wikidata.org has an entity {string} with {string} and {string}",
+  "Wikidata.org has an entity {string} with tltle {string} and link to wikipedia {string}",
   (wikidataId: string, wikidataTitle: string, wikipediaLink: string) => {
     cy.wikidataService().stubWikidataEntityQuery(wikidataId, wikidataTitle, wikipediaLink)
   },
 )
 
 Given(
-  "Wikidata.org has an entity {string} with {string}",
+  "Wikidata.org has an entity {string} with title {string}",
   (wikidataId: string, wikidataTitle: string) => {
     cy.wikidataService().stubWikidataEntityQuery(wikidataId, wikidataTitle, undefined)
   },

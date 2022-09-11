@@ -17,7 +17,7 @@ Feature: associate wikidata ID to note
 
   @usingMockedWikidataService
   Scenario Outline: Associate note to wikidata with validation
-    Given Wikidata.org has an entity "<id>" with "<wikidata title>"
+    Given Wikidata.org has an entity "<id>" with title "<wikidata title>"
     When I associate the note "TDD" with wikidata id "<id>"
     Then I <need to confirm> the association with different title "<wikidata title>"
 
@@ -28,7 +28,7 @@ Feature: associate wikidata ID to note
 
   @usingMockedWikidataService
   Scenario Outline: Associate note to wikipedia via wikidata
-    Given Wikidata.org has an entity "<id>" with "TDD" and "<wikipedia link>"
+    Given Wikidata.org has an entity "<id>" with title "TDD" and link to wikipedia "<wikipedia link>"
     When I associate the note "TDD" with wikidata id "<id>"
     Then I should see the icon beside title linking to "<expected url>"
 
@@ -46,11 +46,11 @@ Feature: associate wikidata ID to note
 
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Associate a new note with exisitng wikidata id
-    Given Wikidata.org has an entity "Q144" with "TDD"
+    Given Wikidata.org has an entity "Q144" with title "TDD"
     And I associate the note "TDD" with wikidata id "Q144"
     And I don't need to confirm the association with different title "TDD"
     And I should see the icon beside title linking to "https://www.wikidata.org/wiki/Q144"
-    And Wikidata.org has an entity "Q143" with "short animal"
+    And Wikidata.org has an entity "Q143" with title "short animal"
     And I create a note belonging to "TDD":
       | Title | Wikidata Id |
       | TDD | Q143       |

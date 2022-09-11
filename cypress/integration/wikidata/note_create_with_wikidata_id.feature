@@ -10,7 +10,7 @@ Feature: Nested Note Create with wikidata
 
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Create a new note with a wikidata id
-    Given Wikidata.org has an entity "Q2102" with "long animal"
+    Given Wikidata.org has an entity "Q2102" with title "long animal"
     When I create a note belonging to "Animals":
       | Title | Wikidata Id |
       | snake | Q2102       |
@@ -44,7 +44,7 @@ Feature: Nested Note Create with wikidata
 
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Create a new note with exisitng wikidata id
-    Given Wikidata.org has an entity "Q144" with "dog"
+    Given Wikidata.org has an entity "Q144" with title "dog"
     And I create a note belonging to "Animals":
       | Title | Wikidata Id |
       | dog   | Q144        |

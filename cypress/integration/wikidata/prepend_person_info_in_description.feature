@@ -10,7 +10,7 @@ Feature: Prepend Person Info in Description
 
   @usingMockedWikidataService @mockBrowserTime @ignore
   Scenario: Add person with single birth date and country of citizenship
-    Given Wikidata.org has an entity "Q36970" with "Jackie Chan"
+    Given Wikidata.org has an entity "Q36970" with title "Jackie Chan"
     And "Jackie Chan" has "01-Jan-1955" in field "birth date" # not implemented yet
     And "Jackie Chan" has "Hong Kong" in field "country of citizenship" # also not implemented
     When I create a note belonging to "People":
