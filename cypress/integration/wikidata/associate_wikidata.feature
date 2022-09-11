@@ -54,6 +54,6 @@ Feature: associate wikidata ID to note
     And I create a note belonging to "TDD":
       | Title | Wikidata Id |
       | TDD | Q143       |
-    And Wikidata.org has an entity "Q144" with "TDD"
+    And Wikidata.org has an entity "Q144" with title "TDD"
     And I associate the current note with wikidata id "Q144"
     Then I should see a message "Duplicate Wikidata ID Detected."
