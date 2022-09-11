@@ -10,25 +10,25 @@ Feature: Note creation/edit should have description if wikidata is a location
 
   @usingMockedWikidataService
   Scenario Outline: New Note creation and wikidata is selected by user
-    Given Wikidata.org has an entity "<WikiID>" with "<Title>"
-    And Wikidata.org entity "<WikiID>" is a location at <Lat>, <Lng>
+    Given Wikidata.org has an entity "<WikidataId>" with "<Title>"
+    And Wikidata.org entity "<WikidataId>" is a location at <Lat>, <Lng>
     And I am creating a note under "My Notes/places"
     When I create a note belonging to "places":
-      | Title   | Wikidata Id |
-      | <Title> | <WikiID>    |
+      | Title   | Wikidata Id     |
+      | <Title> | <WikidataId>    |
     Then I should see the description with "<Text>"
 
     Examples:
-      | Title     | Lat | Lng   | Text                     | WikiID |
-      | Singapore | 1.3 | 103.8 | Location: 1.3'N, 103.8'E | Q334   |
-      | Germany   | 51  | 10    | Location: 51'N, 10'E     | Q183   |
+      | Title     | Lat | Lng   | Text                     | WikidataId |
+      | Singapore | 1.3 | 103.8 | Location: 1.3'N, 103.8'E | Q334       |
+      | Germany   | 51  | 10    | Location: 51'N, 10'E     | Q183       |
 
   @usingRealWikidataService
   Scenario Outline: Existing Note wikidata edited by user
     Given I am creating a note under "My Notes/places"
     When I create a note belonging to "places":
-      | Title      | Wikidata Id |
-      | <OldTitle> | <WikiId>    |
+      | Title      | Wikidata Id     |
+      | <OldTitle> | <WikidataId>    |
     Then I should see the description with "<InitialText>"
     When I navigate to "My Notes/places/Singapore" note
     And I associate the current note with wikidata id "<NewWikiId>"
@@ -37,5 +37,5 @@ Feature: Note creation/edit should have description if wikidata is a location
     And I should see the description with "<FinalText>"
 
     Examples:
-      | OldTitle  | WikiId | NewTitle | NewWikiId | InitialText              | FinalText                                     |
-      | Singapore | Q334   | Germany  | Q183      | Location: 1.3'N, 103.8'E | Location: 51'N, 10'E Location: 1.3'N, 103.8'E |
+      | OldTitle  | WikidataId | NewTitle | NewWikiId | InitialText              | FinalText                                     |
+      | Singapore | Q334       | Germany  | Q183      | Location: 1.3'N, 103.8'E | Location: 51'N, 10'E Location: 1.3'N, 103.8'E |
