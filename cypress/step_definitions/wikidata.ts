@@ -14,6 +14,11 @@ When("I need to confirm the association with different title {string}", (wikidat
   cy.findByRole("button", { name: "Wikidata" })
 })
 
+Then("I don't need to confirm the association with different title {string}", () => {
+  // no action needed
+  cy.findByRole("button", { name: "Wikidata" })
+})
+
 Given(
   "Wikidata.org has an entity {string} with title {string} and link to wikipedia {string}",
   (wikidataId: string, wikidataTitle: string, wikipediaLink: string) => {
@@ -45,6 +50,10 @@ Given("The wikidata service is not available", () => {
 
 Then("I should see a message {string}", (message: string) => {
   cy.expectFieldErrorMessage(message)
+})
+
+Then("I should see a error {string} on {string}", (message: string, field: string) => {
+  cy.expectFieldErrorMessage(message, field)
 })
 
 Then("I should see the icon beside title linking to {string}", (associationUrl: string) => {
