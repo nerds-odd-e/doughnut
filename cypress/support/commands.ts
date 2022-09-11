@@ -539,6 +539,14 @@ Cypress.Commands.add("clickAssociateWikiDataButton", (title, wikiID) => {
 })
 
 Cypress.Commands.add(
+  "stubWikidataEntityLocation",
+  { prevSubject: true },
+  (wikidataServiceTester: WikidataServiceTester, wikidataId: string, lat: number, lng: number) => {
+    wikidataServiceTester.stubWikidataEntityLocation(wikidataId, lat, lng)
+  },
+)
+
+Cypress.Commands.add(
   "stubWikidataEntityQuery",
   { prevSubject: true },
   (
