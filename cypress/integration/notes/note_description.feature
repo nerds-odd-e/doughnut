@@ -19,11 +19,9 @@ Feature: Note creation/edit should have description if wikidata is a location
 
   @usingRealWikidataService
   Scenario Outline: Existing Note wikidata edited by user
-    Given I am creating a note under "My Notes/places"
-    When I create a note belonging to "places":
-      | Title      | Wikidata Id     |
-      | <OldTitle> | <WikidataId>    |
-    Then I should see the description becomes "<InitialText>"
+    And there are some notes for the current user
+      | title      | description    | testingParent |
+      | <OldTitle> | <InitialText>  | places        |
     When I navigate to "My Notes/places/Singapore" note
     And I associate the current note with wikidata id "<NewWikiId>"
     And  I need to confirm the association with different title "<NewTitle>"

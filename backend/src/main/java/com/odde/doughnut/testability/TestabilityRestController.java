@@ -129,7 +129,11 @@ class TestabilityRestController {
           .collect(Collectors.toMap(Note::getTitle, n -> n));
     }
 
-    private void buildNoteTree(User user, Ownership ownership, Map<String, Note> titleNoteMap) {
+    private void buildNoteTree(
+        User user,
+        Ownership ownership,
+        Map<String, Note> titleNoteMap,
+        NoteRepository noteRepository) {
       seedNotes.forEach(
           seed -> {
             Note note = titleNoteMap.get(seed.title);
@@ -137,9 +141,16 @@ class TestabilityRestController {
             if (Strings.isBlank(seed.testingParent)) {
               note.buildNotebookForHeadNote(ownership, user);
             } else {
-              note.setParentNote(titleNoteMap.get(seed.testingParent));
+              note.setParentNote(getParentNote(titleNoteMap, noteRepository, seed.testingParent));
             }
           });
+    }
+
+    private Note getParentNote(
+        Map<String, Note> titleNoteMap, NoteRepository noteRepository, String testingParent) {
+      Note parentNote = titleNoteMap.get(testingParent);
+      if (parentNote != null) return parentNote;
+      return noteRepository.findFirstByTitle(testingParent);
     }
 
     private void saveByOriginalOrder(
@@ -157,7 +168,7 @@ class TestabilityRestController {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
     Map<String, Note> titleNoteMap = seedInfo.buildIndividualNotes(user, currentUTCTimestamp);
-    seedInfo.buildNoteTree(user, ownership, titleNoteMap);
+    seedInfo.buildNoteTree(user, ownership, titleNoteMap, this.noteRepository);
     seedInfo.saveByOriginalOrder(titleNoteMap, this.noteRepository);
     return titleNoteMap.values().stream().collect(Collectors.toMap(Note::getTitle, Thingy::getId));
   }
