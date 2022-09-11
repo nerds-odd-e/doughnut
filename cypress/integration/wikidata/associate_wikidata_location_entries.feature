@@ -22,6 +22,5 @@ Feature: Note creation/edit should have description if wikidata is a location
     And there are some notes for the current user
       | title      | description  | testingParent |
       | Singapore  | The red dot  | places        |
-    When I navigate to "My Notes/places/Singapore" note
-    And I associate the current note with wikidata id "Q334"
+    And I associate the note "Singapore" with wikidata id "Q334"
     And I should see the description becomes "Location: 1.3'N, 103.8'E The red dot"

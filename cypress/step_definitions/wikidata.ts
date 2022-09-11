@@ -8,19 +8,9 @@ When("I associate the note {string} with wikidata id {string}", (title, wikiID) 
   cy.clickAssociateWikiDataButton(title, wikiID)
 })
 
-When("I associate the current note with wikidata id {string}", (wikiID) => {
-  cy.clickNotePageButtonOnCurrentPage("associate wikidata")
-  cy.replaceFocusedText(wikiID)
-})
-
 When("I need to confirm the association with different title {string}", (wikidataTitle: string) => {
   cy.findAllByText(wikidataTitle).should("exist")
   cy.findByRole("button", { name: "Confirm" }).click()
-  cy.findByRole("button", { name: "Wikidata" })
-})
-
-When("I don't need to confirm the association with different title {string}", () => {
-  // no action needed
   cy.findByRole("button", { name: "Wikidata" })
 })
 

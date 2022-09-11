@@ -46,14 +46,10 @@ Feature: associate wikidata ID to note
 
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Associate a new note with exisitng wikidata id
-    Given Wikidata.org has an entity "Q144" with title "TDD"
-    And I associate the note "TDD" with wikidata id "Q144"
-    And I don't need to confirm the association with different title "TDD"
-    And I should see the icon beside title linking to "https://www.wikidata.org/wiki/Q144"
-    And Wikidata.org has an entity "Q143" with title "short animal"
-    And I create a note belonging to "TDD":
-      | Title | Wikidata Id |
-      | TDD | Q143       |
-    And Wikidata.org has an entity "Q144" with title "TDD"
-    And I associate the current note with wikidata id "Q144"
+    Given there are some notes for the current user
+      | title   | wikidataId | testingParent |
+      | Animals |            |               |
+      | Dog     | Q123       | Animals       |
+      | Canine  | Q456       | Animals       |
+    And I associate the note "Canine" with wikidata id "Q123"
     Then I should see a message "Duplicate Wikidata ID Detected."
