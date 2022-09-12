@@ -34,6 +34,7 @@ declare namespace Cypress {
     findNoteTitle(title: string): Chainable<any>
     findNoteDescriptionOnCurrentPage(title: string): Chainable<any>
     findCardTitle(title: string): Chainable<any>
+    findPopupLink(url: string): Chainable<any>
     findUserSettingsButton(userName: string): Chainable<any>
     failure(): Chainable<any>
     featureToggle(enabled: boolean): Chainable<Subject>

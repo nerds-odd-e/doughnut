@@ -14,7 +14,7 @@ Feature: Nested Note Create with wikidata
     When I create a note belonging to "Animals":
       | Title | Wikidata Id |
       | snake | Q2102       |
-    Then I should see the icon beside title linking to "https://www.wikidata.org/wiki/Q2102"
+    Then I should see the icon beside title "snake" linking to "https://www.wikidata.org/wiki/Q2102"
 
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Create a new note with invalid wikidata id
