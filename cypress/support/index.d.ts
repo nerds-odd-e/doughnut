@@ -91,7 +91,6 @@ declare namespace Cypress {
     ): Chainable<Subject>
     stubWikidataSearchResult(wikidataLabel: string, wikidataId: string): Chainable<Subject>
     subscribeToNotebook(notebookTitle: string, dailyLearningCount: string): Chainable<any>
-    fillNoteFormWith(noteAttributes: any): Chainable<any>
     submitNoteFormWith(noteAttributes: any): Chainable<any>
     submitNoteFormsWith(notes: any): Chainable<any>
     submitNoteCreationFormWith(noteAttributes: any): Chainable<any>
