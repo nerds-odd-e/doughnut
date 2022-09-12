@@ -56,6 +56,11 @@ describe("adding new note", () => {
       await flushPromises();
     };
 
+    const chooseReplaceTitle = async () => {
+      await wrapper.find("[id='titleRadio-Replace']").setChecked();
+      await flushPromises();
+    };
+
     it("search wikidata for result suggestions and replace title if title is the same but case is different", async () => {
       const searchResult = makeMe.aWikidataSearchEntity.label("Rock").please();
       helper.apiMock
@@ -74,6 +79,9 @@ describe("adding new note", () => {
         .andReturnOnce([searchResult]);
       await searchAndSelectFirstResult("dog");
       expect(<HTMLInputElement>titleInput().element.value).toBe("dog");
+      await chooseReplaceTitle();
+      expect(<HTMLInputElement>titleInput().element.value).toBe("Canine");
     });
+
   });
 });
