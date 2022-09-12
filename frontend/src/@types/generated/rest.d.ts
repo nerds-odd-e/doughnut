@@ -51,9 +51,6 @@ declare namespace Generated {
         linkTypeToParent: LinkType;
         textContent: TextContent;
         wikidataId?: string;
-        suggestedTitle?: string;
-        originalTitle?: string;
-        replaceOrAppendTitle?: string;
     }
 
     interface NoteInfo {

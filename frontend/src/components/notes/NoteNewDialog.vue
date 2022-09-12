@@ -11,10 +11,10 @@
       v-model="creationData.textContent"
       :errors="noteFormErrors.textContent"
     />
-    <template v-if="creationData.suggestedTitle">
-      <label>Suggested Title: {{ creationData.suggestedTitle }}</label>
+    <template v-if="suggestedTitle">
+      <label>Suggested Title: {{ suggestedTitle }}</label>
       <RadioButtons
-        v-model="creationData.replaceOrAppendTitle"
+        v-model="replaceOrAppendTitle"
         scope-name="titleRadio"
         :options="[
           { value: 'Replace', label: 'Replace title' },
@@ -79,15 +79,15 @@ export default defineComponent({
         linkTypeToParent: "no link",
         textContent: { title: "" },
         wikidataId: "",
-        suggestedTitle: "",
-        originalTitle: "",
-        replaceOrAppendTitle: "",
       } as Generated.NoteCreation,
       noteFormErrors: {
         linkTypeToParent: undefined,
         textContent: {},
         wikiDataId: undefined as undefined | string,
       },
+      replaceOrAppendTitle: "",
+      originalTitle: "",
+      suggestedTitle: "",
     };
   },
   methods: {
@@ -110,22 +110,21 @@ export default defineComponent({
 
       if (currentLabel === newLabel) {
         this.creationData.textContent.title = selectedSuggestion.label;
-        this.creationData.suggestedTitle = "";
+        this.suggestedTitle = "";
       } else {
-        this.creationData.suggestedTitle = selectedSuggestion.label;
+        this.suggestedTitle = selectedSuggestion.label;
       }
 
-      this.creationData.originalTitle = this.creationData.textContent.title;
+      this.originalTitle = this.creationData.textContent.title;
       this.creationData.wikidataId = selectedSuggestion.id;
     },
     updateModelValue() {
-      if (this.creationData.replaceOrAppendTitle === "Replace") {
-        this.creationData.textContent.title =
-          this.creationData.suggestedTitle || "";
+      if (this.replaceOrAppendTitle === "Replace") {
+        this.creationData.textContent.title = this.suggestedTitle || "";
       }
 
-      if (this.creationData.replaceOrAppendTitle === "Append") {
-        this.creationData.textContent.title = `${this.creationData.originalTitle} / ${this.creationData.suggestedTitle}`;
+      if (this.replaceOrAppendTitle === "Append") {
+        this.creationData.textContent.title = `${this.originalTitle} / ${this.suggestedTitle}`;
       }
     },
   },
