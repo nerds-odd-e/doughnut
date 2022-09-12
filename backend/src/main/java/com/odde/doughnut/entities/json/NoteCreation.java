@@ -16,6 +16,6 @@ public class NoteCreation {
   @Getter
   @Setter
   @Nullable
-  @Pattern(regexp = "Q\\d+", message = "The wikidata Id should be Q<numbers>")
+  @Pattern(regexp = "^$|Q\\d+", message = "The wikidata Id should be Q<numbers>")
   public String wikidataId;
 }
