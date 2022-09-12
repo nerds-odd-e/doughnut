@@ -53,35 +53,38 @@ describe("adding new note", () => {
       await flushPromises();
       const result = await wrapper.find('select[name="wikidataSearchResult"]');
       result.findAll("option").at(1)?.setValue();
-      await flushPromises();
     };
 
-    const chooseReplaceTitle = async () => {
+    const replaceTitle = async () => {
       await wrapper.find("[id='titleRadio-Replace']").setChecked();
-      await flushPromises();
     };
+    const appendTitle = async () => {
+      await wrapper.find("[id='titleRadio-Append']").setChecked();
+    };
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    const doNothing = () => {};
 
-    it("search wikidata for result suggestions and replace title if title is the same but case is different", async () => {
-      const searchResult = makeMe.aWikidataSearchEntity.label("Rock").please();
-      helper.apiMock
-        .expectingGet(`/api/wikidata/search/${"rock"}`)
-        .andReturnOnce([searchResult]);
-      await searchAndSelectFirstResult("rock");
-      expect(<HTMLInputElement>titleInput().element.value).toBe("Rock");
-    });
-
-    it("search wikidata for result suggestions and replace title if title is the same but case is different", async () => {
-      const searchResult = makeMe.aWikidataSearchEntity
-        .label("Canine")
-        .please();
-      helper.apiMock
-        .expectingGet(`/api/wikidata/search/${"dog"}`)
-        .andReturnOnce([searchResult]);
-      await searchAndSelectFirstResult("dog");
-      expect(<HTMLInputElement>titleInput().element.value).toBe("dog");
-      await chooseReplaceTitle();
-      expect(<HTMLInputElement>titleInput().element.value).toBe("Canine");
-    });
-
+    it.each`
+      searchTitle | wikidataTitle | action          | expectedTitle
+      ${"dog"}    | ${"dog"}      | ${doNothing}    | ${"dog"}
+      ${"dog"}    | ${"Dog"}      | ${doNothing}    | ${"Dog"}
+      ${"dog"}    | ${"Canine"}   | ${replaceTitle} | ${"Canine"}
+      ${"dog"}    | ${"Canine"}   | ${appendTitle}  | ${"dog / Canine"}
+    `(
+      "searh $searchTitle get $wikidataTitle and choose to $action",
+      async ({ searchTitle, wikidataTitle, action, expectedTitle }) => {
+        const searchResult = makeMe.aWikidataSearchEntity
+          .label(wikidataTitle)
+          .please();
+        helper.apiMock
+          .expectingGet(`/api/wikidata/search/${searchTitle}`)
+          .andReturnOnce([searchResult]);
+        await searchAndSelectFirstResult(searchTitle);
+        await action();
+        expect(<HTMLInputElement>titleInput().element.value).toBe(
+          expectedTitle
+        );
+      }
+    );
   });
 });
