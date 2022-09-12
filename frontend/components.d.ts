@@ -169,7 +169,6 @@ declare module '@vue/runtime-core' {
     SvgUnsubscribe: typeof import('./src/components/svgs/SvgUnsubscribe.vue')['default']
     SvgUrlIndicator: typeof import('./src/components/svgs/SvgUrlIndicator.vue')['default']
     SvgWikidata: typeof import('./src/components/svgs/SvgWikidata.vue')['default']
-    SvgWikiData: typeof import('./src/components/svgs/SvgWikiData.vue')['default']
     Tag: typeof import('./src/components/svgs/link_types/Tag.vue')['default']
     TestMenu: typeof import('./src/components/commons/TestMenu.vue')['default']
     TextArea: typeof import('./src/components/form/TextArea.vue')['default']

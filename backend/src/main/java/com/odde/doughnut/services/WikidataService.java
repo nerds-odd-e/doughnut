@@ -18,9 +18,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.Data;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.BindException;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.util.UriComponentsBuilder;
 
 public record WikidataService(HttpClientAdapter httpClientAdapter, String wikidataUrl) {
@@ -49,28 +46,6 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     return mapper;
-  }
-
-  public void assignWikidataIdToNote(Note note, String wikidataId)
-      throws InterruptedException, BindException {
-    note.setWikidataId(wikidataId);
-
-    if (!Strings.isEmpty(wikidataId)) {
-      try {
-        fetchWikidata(wikidataId);
-        if (wikidataId.equals("Q1111")) {
-          buildBindingError(wikidataId, "Duplicate Wikidata ID detected.");
-        }
-      } catch (IOException e) {
-        buildBindingError(wikidataId, "The wikidata service is not available");
-      }
-    }
-  }
-
-  private void buildBindingError(String wikidataId, String defaultMessage) throws BindException {
-    BindingResult bindingResult = new BeanPropertyBindingResult(wikidataId, "wikidataId");
-    bindingResult.rejectValue(null, "error.error", defaultMessage);
-    throw new BindException(bindingResult);
   }
 
   public static class WikidataModel {

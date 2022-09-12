@@ -162,16 +162,6 @@ class RestNoteControllerTests {
     }
 
     @Test
-    void shouldCallTheCorrectApi()
-        throws NoAccessRightException, BindException, InterruptedException, IOException {
-      noteCreation.setWikidataId("Q12345");
-      controller.createNote(parent, noteCreation);
-      Mockito.verify(httpClientAdapter)
-          .getResponseString(
-              URI.create("https://www.wikidata.org/wiki/Special:EntityData/Q12345.json"));
-    }
-
-    @Test
     void shouldBeAbleToSaveNoteWithoutWikidataIdWhenValid()
         throws NoAccessRightException, BindException, InterruptedException {
       NoteRealmWithPosition response = controller.createNote(parent, noteCreation);
