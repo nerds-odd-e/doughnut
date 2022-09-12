@@ -5,7 +5,7 @@
 import { And, Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 
 When("I associate the note {string} with wikidata id {string}", (title, wikiID) => {
-  cy.clickAssociateWikiDataButton(title, wikiID)
+  cy.associateNoteWithWikidataId(title, wikiID)
 })
 
 When("I need to confirm the association with different title {string}", (wikidataTitle: string) => {

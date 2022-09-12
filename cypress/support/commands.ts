@@ -118,7 +118,7 @@ Cypress.Commands.add(
   },
 )
 
-Cypress.Commands.add("replaceFocusedText", (text) => {
+Cypress.Commands.add("replaceFocusedTextAndEnter", (text) => {
   // cy.clear for now is an alias of cy.type('{selectall}{backspace}')
   // it doesn't clear the text sometimes.
   // Invoking it twice seems to solve the problem.
@@ -130,7 +130,7 @@ Cypress.Commands.add("inPlaceEdit", (noteAttributes) => {
     const value = noteAttributes[propName]
     if (value) {
       cy.findByRole(propName.toLowerCase()).click()
-      cy.replaceFocusedText(value)
+      cy.replaceFocusedTextAndEnter(value)
     }
   }
 })
@@ -529,9 +529,9 @@ Cypress.Commands.add("noteByTitle", (noteTitle: string) => {
     .then(($attr) => /notes\/(\d+)/g.exec($attr)[1])
 })
 
-Cypress.Commands.add("clickAssociateWikiDataButton", (title, wikiID) => {
+Cypress.Commands.add("associateNoteWithWikidataId", (title, wikiID) => {
   cy.clickNotePageButton(title, "associate wikidata", true)
-  cy.replaceFocusedText(wikiID)
+  cy.replaceFocusedTextAndEnter(wikiID)
 })
 
 Cypress.Commands.add(

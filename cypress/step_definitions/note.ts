@@ -72,7 +72,7 @@ Given(
   (noteTitle: string, newNoteTitle: string) => {
     cy.jumpToNotePage(noteTitle)
     cy.findNoteTitle(noteTitle).click()
-    cy.replaceFocusedText(newNoteTitle)
+    cy.replaceFocusedTextAndEnter(newNoteTitle)
   },
 )
 
@@ -80,7 +80,7 @@ Given(
   "I update note {string} description from {string} to become {string}",
   (noteTitle: string, noteDescription: string, newNoteDescription: string) => {
     cy.findByText(noteDescription).click({ force: true })
-    cy.replaceFocusedText(newNoteDescription)
+    cy.replaceFocusedTextAndEnter(newNoteDescription)
   },
 )
 
@@ -180,7 +180,7 @@ When(
   "I double click {string} and edit the description to {string}",
   (oldDescription: string, newDescription: string) => {
     cy.findByText(oldDescription).click()
-    cy.replaceFocusedText(newDescription)
+    cy.replaceFocusedTextAndEnter(newDescription)
   },
 )
 
