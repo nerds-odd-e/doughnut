@@ -18,11 +18,10 @@ Feature: Nested Note Create with wikidata
 
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Create a new note with invalid wikidata id
-    Given The wikidata service is not available
     When I try to create a note belonging to "Animals":
       | Title | Wikidata Id |
       | snake | Q12345R     |
-    Then I should see an error "The wikidata service is not available" on "Wikidata Id"
+    Then I should see an error "The wikidata Id should be Q<numbers>" on "Wikidata Id"
 
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Select one of the Wikidata entries from the search result
