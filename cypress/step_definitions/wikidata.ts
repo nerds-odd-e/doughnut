@@ -87,7 +87,7 @@ Then(
 )
 
 Given(
-  "Wikidata has search result for {string} with wikidata ID {string}",
+  "Wikidata search result always has {string} with ID {string}",
   (wikidataLabel: string, wikidataId: string) => {
     cy.wikidataService().stubWikidataSearchResult(wikidataLabel, wikidataId)
   },

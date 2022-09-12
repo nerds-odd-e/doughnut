@@ -26,12 +26,11 @@ Feature: Nested Note Create with wikidata
 
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Select one of the Wikidata entries from the search result
-    Given Wikidata has search result for "rock music" with wikidata ID "Q11399"
+    Given Wikidata search result always has "Dog" with ID "Q11399"
     When I am creating a note under "My Notes/Animals"
-    And I search with title "Rock" on Wikidata
-    And I select "rock music" with wikidataID "Q11399" from the Wikidata search result
-    And I select replace title
-    Then I should see that the "Title" becomes "rock music"
+    And I search with title "dog" on Wikidata
+    And I select "Dog" with wikidataID "Q11399" from the Wikidata search result
+    Then I should see that the "Title" becomes "Dog"
     Then I should see that the "Wikidata Id" becomes "Q11399"
 
   @usingMockedWikidataService @mockBrowserTime @ignore
