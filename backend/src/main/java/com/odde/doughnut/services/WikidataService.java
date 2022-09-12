@@ -28,19 +28,19 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     return UriComponentsBuilder.fromHttpUrl(wikidataUrl);
   }
 
-  public WikidataEntity fetchWikiData(String wikiDataId) throws IOException, InterruptedException {
-    String responseBody = httpClientAdapter.getResponseString(ConstructWikiDataUrl(wikiDataId));
+  public WikidataEntity fetchWikidata(String wikidataId) throws IOException, InterruptedException {
+    String responseBody = httpClientAdapter.getResponseString(ConstructWikidataUrl(wikidataId));
     if (responseBody == null) return null;
-    WikiDataModel wikiDataModel =
+    WikidataModel wikidataModel =
         getObjectMapper().readValue(responseBody, new TypeReference<>() {});
-    WikiDataInfo wikiDataInfo = wikiDataModel.entities.get(wikiDataId);
+    WikidataInfo wikidataInfo = wikidataModel.entities.get(wikidataId);
     return new WikidataEntity(
-        wikiDataInfo.GetEnglishTitle(), wikiDataInfo.GetEnglishWikipediaUrl());
+        wikidataInfo.GetEnglishTitle(), wikidataInfo.GetEnglishWikipediaUrl());
   }
 
-  private URI ConstructWikiDataUrl(String wikiDataId) {
+  private URI ConstructWikidataUrl(String wikidataId) {
     return wikidataUriBuilder()
-        .path("/wiki/Special:EntityData/" + wikiDataId + ".json")
+        .path("/wiki/Special:EntityData/" + wikidataId + ".json")
         .build()
         .toUri();
   }
@@ -57,7 +57,7 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
 
     if (!Strings.isEmpty(wikidataId)) {
       try {
-        fetchWikiData(wikidataId);
+        fetchWikidata(wikidataId);
         if (wikidataId.equals("Q1111")) {
           buildBindingError(wikidataId, "Duplicate Wikidata ID detected.");
         }
@@ -68,13 +68,13 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
   }
 
   private void buildBindingError(String wikidataId, String defaultMessage) throws BindException {
-    BindingResult bindingResult = new BeanPropertyBindingResult(wikidataId, "wikiDataId");
+    BindingResult bindingResult = new BeanPropertyBindingResult(wikidataId, "wikidataId");
     bindingResult.rejectValue(null, "error.error", defaultMessage);
     throw new BindException(bindingResult);
   }
 
-  public static class WikiDataModel {
-    public Map<String, WikiDataInfo> entities;
+  public static class WikidataModel {
+    public Map<String, WikidataInfo> entities;
   }
 
   public List<WikidataSearchEntity> fetchWikidataByQuery(String search)

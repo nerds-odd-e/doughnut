@@ -20,7 +20,7 @@
       scope-name="wikidataID"
       field="wikidataID"
       v-model="creationData.wikidataId"
-      :errors="noteFormErrors.wikiDataId"
+      :errors="noteFormErrors.wikidataId"
       placeholder="example: `Q1234`"
     />
     <WikidataSearchByLabel
@@ -76,14 +76,14 @@ export default defineComponent({
       noteFormErrors: {
         linkTypeToParent: undefined,
         textContent: {},
-        wikiDataId: undefined as undefined | string,
+        wikidataId: undefined as undefined | string,
       },
       suggestedTitle: "",
     };
   },
   methods: {
     processForm() {
-      this.noteFormErrors.wikiDataId = undefined;
+      this.noteFormErrors.wikidataId = undefined;
       this.noteFormErrors.textContent = {};
       this.storageAccessor
         .api()

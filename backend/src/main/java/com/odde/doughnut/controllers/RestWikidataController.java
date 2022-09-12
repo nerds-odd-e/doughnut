@@ -30,13 +30,13 @@ public class RestWikidataController {
     this.httpClientAdapter = httpClientAdapter;
   }
 
-  @GetMapping("/wikidata/{wikiDataId}")
-  public WikidataEntity fetchWikiDataByID(@PathVariable("wikiDataId") String wikiDataId)
+  @GetMapping("/wikidata/{wikidataId}")
+  public WikidataEntity fetchWikidataByID(@PathVariable("wikidataId") String wikidataId)
       throws InterruptedException, BindException {
     try {
-      return getWikiDataService().fetchWikiData(wikiDataId);
+      return getWikidataService().fetchWikidata(wikidataId);
     } catch (IOException e) {
-      BindingResult bindingResult = new BeanPropertyBindingResult(wikiDataId, "wikidataId");
+      BindingResult bindingResult = new BeanPropertyBindingResult(wikidataId, "wikidataId");
       bindingResult.rejectValue(null, "error.error", "The wikidata service is not available");
       throw new BindException(bindingResult);
     }
@@ -46,7 +46,7 @@ public class RestWikidataController {
   public List<WikidataSearchEntity> searchWikidata(@PathVariable("search") String search)
       throws InterruptedException, BindException {
     try {
-      return getWikiDataService().fetchWikidataByQuery(search);
+      return getWikidataService().fetchWikidataByQuery(search);
     } catch (IOException e) {
       BindingResult bindingResult = new BeanPropertyBindingResult(search, "search");
       bindingResult.rejectValue(null, "error.error", "The wikidata service is not available");
@@ -54,7 +54,7 @@ public class RestWikidataController {
     }
   }
 
-  private WikidataService getWikiDataService() {
+  private WikidataService getWikidataService() {
     return new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
   }
 }

@@ -58,7 +58,7 @@ export default defineComponent({
       this.selectedOption = "";
     },
     async fetchSearchResult() {
-      this.wikiSearchSuggestions = await this.api.wikidata.getWikiDatas(
+      this.wikiSearchSuggestions = await this.api.wikidata.getWikidatas(
         this.title
       );
     },

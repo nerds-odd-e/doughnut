@@ -54,7 +54,7 @@ class RestNoteController {
     checkDuplicateWikidataId(note.getNotebook(), wikidataAssociationCreation.wikidataId);
 
     note.setWikidataId(wikidataAssociationCreation.wikidataId);
-    getWikiDataService().assignWikidataLocationDataToNote(note, note.getWikidataId());
+    getWikidataService().assignWikidataLocationDataToNote(note, note.getWikidataId());
     modelFactoryService.noteRepository.save(note);
     return new NoteViewer(currentUserFetcher.getUser().getEntity(), note).toJsonObject();
   }
@@ -73,8 +73,8 @@ class RestNoteController {
         Note.createNote(
             user, testabilitySettings.getCurrentUTCTimestamp(), noteCreation.textContent);
     note.setParentNote(parentNote);
-    getWikiDataService().assignWikidataIdToNote(note, noteCreation.getWikidataId());
-    getWikiDataService().assignWikidataLocationDataToNote(note, noteCreation.getWikidataId());
+    getWikidataService().assignWikidataIdToNote(note, noteCreation.getWikidataId());
+    getWikidataService().assignWikidataLocationDataToNote(note, noteCreation.getWikidataId());
 
     modelFactoryService.noteRepository.save(note);
     LinkType linkTypeToParent = noteCreation.getLinkTypeToParent();
@@ -186,7 +186,7 @@ class RestNoteController {
     return new RedirectToNoteResponse(note.getId());
   }
 
-  private WikidataService getWikiDataService() {
+  private WikidataService getWikidataService() {
     return new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
   }
 
@@ -198,7 +198,7 @@ class RestNoteController {
         modelFactoryService.noteRepository.searchInNotebookForNoteByWikidataId(
             notebook, wikidataId);
     if (!existingNotes.isEmpty()) {
-      BindingResult bindingResult = new BeanPropertyBindingResult(wikidataId, "wikiDataId");
+      BindingResult bindingResult = new BeanPropertyBindingResult(wikidataId, "wikidataId");
       bindingResult.rejectValue(null, "error.error", "Duplicate Wikidata ID Detected.");
       throw new BindException(bindingResult);
     }

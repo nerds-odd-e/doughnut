@@ -229,13 +229,13 @@ const apiCollection = (managedApi: ManagedApi) => ({
       )) as Generated.NoteRealm;
     },
 
-    async getWikiData(wikiDataId: string) {
+    async getWikidata(wikidataId: string) {
       return (await managedApi.restGet(
-        `wikidata/${wikiDataId}`
+        `wikidata/${wikidataId}`
       )) as Generated.WikidataEntity;
     },
 
-    async getWikiDatas(keyword: string) {
+    async getWikidatas(keyword: string) {
       return (await managedApi.restGet(
         `wikidata/search/${keyword}`
       )) as Generated.WikidataSearchEntity[];

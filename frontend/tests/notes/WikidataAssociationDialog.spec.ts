@@ -10,8 +10,8 @@ describe("Save wikidata id", () => {
   helper.resetWithApiMock(beforeEach, afterEach);
 
   beforeEach(() => {
-    const wikiData = makeMe.aWikidataEntity.wikidataTitle("TDD").please();
-    helper.apiMock.expectingGet("/api/wikidata/Q12434").andReturnOnce(wikiData);
+    const wikidata = makeMe.aWikidataEntity.wikidataTitle("TDD").please();
+    helper.apiMock.expectingGet("/api/wikidata/Q12434").andReturnOnce(wikidata);
   });
 
   it("should call the update API when save", async () => {

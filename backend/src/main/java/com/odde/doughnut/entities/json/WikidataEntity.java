@@ -1,11 +1,11 @@
 package com.odde.doughnut.entities.json;
 
 public class WikidataEntity {
-  public String WikiDataTitleInEnglish;
+  public String WikidataTitleInEnglish;
   public String WikipediaEnglishUrl;
 
-  public WikidataEntity(String wikiDataTitleInEnglish, String wikipediaEnglishUrl) {
-    this.WikiDataTitleInEnglish = wikiDataTitleInEnglish;
+  public WikidataEntity(String wikidataTitleInEnglish, String wikipediaEnglishUrl) {
+    this.WikidataTitleInEnglish = wikidataTitleInEnglish;
     this.WikipediaEnglishUrl = wikipediaEnglishUrl;
   }
 }

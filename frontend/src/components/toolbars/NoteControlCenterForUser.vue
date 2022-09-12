@@ -36,7 +36,7 @@
 
       <PopupButton title="associate wikidata">
         <template #button_face>
-          <SvgWikiData />
+          <SvgWikidata />
         </template>
         <template #dialog_body="{ doneHandler }">
           <WikidataAssociationDialog
@@ -86,7 +86,7 @@ import NoteNewButton from "./NoteNewButton.vue";
 import SvgAddChild from "../svgs/SvgAddChild.vue";
 import SvgEdit from "../svgs/SvgEdit.vue";
 import NoteEditDialog from "../notes/NoteEditDialog.vue";
-import SvgWikiData from "../svgs/SvgWikiData.vue";
+import SvgWikidata from "../svgs/SvgWikidata.vue";
 import WikidataAssociationDialog from "../notes/WikidataAssociationDialog.vue";
 import SvgSearch from "../svgs/SvgSearch.vue";
 import LinkNoteDialog from "../links/LinkNoteDialog.vue";
@@ -111,7 +111,7 @@ export default defineComponent({
     SvgAddChild,
     SvgEdit,
     NoteEditDialog,
-    SvgWikiData,
+    SvgWikidata,
     WikidataAssociationDialog,
     SvgSearch,
     LinkNoteDialog,

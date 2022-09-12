@@ -2,7 +2,7 @@ package com.odde.doughnut.services;
 
 import java.util.Map;
 
-public class WikiDataInfo {
+public class WikidataInfo {
   public Map<String, LanguageValueModel> labels;
   public Map<String, WikiSiteLinkModel> sitelinks;
 

@@ -6,13 +6,13 @@ class WikidataEntityBuilder extends Builder<Generated.WikidataEntity> {
   constructor() {
     super();
     this.data = {
-      WikiDataTitleInEnglish: "default title",
+      WikidataTitleInEnglish: "default title",
       WikipediaEnglishUrl: "",
     };
   }
 
   wikidataTitle(value: string) {
-    this.data.WikiDataTitleInEnglish = value;
+    this.data.WikidataTitleInEnglish = value;
     return this;
   }
 

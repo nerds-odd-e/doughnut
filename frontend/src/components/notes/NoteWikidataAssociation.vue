@@ -25,14 +25,14 @@ export default defineComponent({
       nonBlockingPopup(this.wikiUrl());
     },
     async wikiUrl() {
-      const wikipediaEnglishUrl = await this.getWikiDataItem();
+      const wikipediaEnglishUrl = await this.getWikidataItem();
       if (wikipediaEnglishUrl !== "") {
         return wikipediaEnglishUrl;
       }
       return `https://www.wikidata.org/wiki/${this.wikidataId}`;
     },
-    async getWikiDataItem() {
-      return (await this.api.wikidata.getWikiData(this.wikidataId))
+    async getWikidataItem() {
+      return (await this.api.wikidata.getWikidata(this.wikidataId))
         .WikipediaEnglishUrl;
     },
   },

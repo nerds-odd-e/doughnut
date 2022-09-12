@@ -22,7 +22,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindException;
 
-class RestWikiDataControllerTests {
+class RestWikidataControllerTests {
   RestWikidataController controller;
   @Mock HttpClientAdapter httpClientAdapter;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -34,7 +34,7 @@ class RestWikiDataControllerTests {
   }
 
   @Nested
-  class FetchWikiData {
+  class FetchWikidata {
 
     private String getEntityDataJsonSearch(String search) {
       return getString(search, "{\"id\":\"Q64\",\"label\":\"" + search + "\"" + "}");
@@ -48,7 +48,7 @@ class RestWikiDataControllerTests {
     void serviceNotAvailable() throws IOException, InterruptedException {
       Mockito.when(httpClientAdapter.getResponseString(any())).thenThrow(new IOException());
       BindException exception =
-          assertThrows(BindException.class, () -> controller.fetchWikiDataByID("Q1"));
+          assertThrows(BindException.class, () -> controller.fetchWikidataByID("Q1"));
       assertThat(exception.getErrorCount(), equalTo(1));
     }
 
@@ -57,7 +57,7 @@ class RestWikiDataControllerTests {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(
               new MakeMe().wikidataEntityJson().entityId("Q1").entitleTitle("Mohawk").please());
-      controller.fetchWikiDataByID("Q1");
+      controller.fetchWikidataByID("Q1");
       Mockito.verify(httpClientAdapter)
           .getResponseString(
               URI.create("https://www.wikidata.org/wiki/Special:EntityData/Q1.json"));
@@ -68,8 +68,8 @@ class RestWikiDataControllerTests {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(
               new MakeMe().wikidataEntityJson().entityId("Q1").entitleTitle("Mohawk").please());
-      WikidataEntity result = controller.fetchWikiDataByID("Q1");
-      assertThat(result.WikiDataTitleInEnglish, equalTo("Mohawk"));
+      WikidataEntity result = controller.fetchWikidataByID("Q1");
+      assertThat(result.WikidataTitleInEnglish, equalTo("Mohawk"));
     }
 
     @Test
@@ -83,7 +83,7 @@ class RestWikiDataControllerTests {
                   .entitleTitle("Mohawk")
                   .enwiki("https://en.wikipedia.org/wiki/Mohawk_language")
                   .please());
-      WikidataEntity result = controller.fetchWikiDataByID("Q13339");
+      WikidataEntity result = controller.fetchWikidataByID("Q13339");
       assertThat(
           result.WikipediaEnglishUrl, equalTo("https://en.wikipedia.org/wiki/Mohawk_language"));
     }
@@ -93,7 +93,7 @@ class RestWikiDataControllerTests {
         throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(new MakeMe().wikidataEntityJson().entityId("Q13339").please());
-      WikidataEntity result = controller.fetchWikiDataByID("Q13339");
+      WikidataEntity result = controller.fetchWikidataByID("Q13339");
       assertThat(StringUtils.isBlank(result.WikipediaEnglishUrl), is(true));
     }
 
