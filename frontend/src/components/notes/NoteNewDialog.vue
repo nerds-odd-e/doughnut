@@ -11,18 +11,11 @@
       v-model="creationData.textContent"
       :errors="noteFormErrors.textContent"
     />
-    <template v-if="suggestedTitle">
-      <label>Suggested Title: {{ suggestedTitle }}</label>
-      <RadioButtons
-        v-model="replaceOrAppendTitle"
-        scope-name="titleRadio"
-        :options="[
-          { value: 'Replace', label: 'Replace title' },
-          { value: 'Append', label: 'Append title' },
-        ]"
-        @change="updateModelValue()"
-      />
-    </template>
+    <SuggestTitle
+      :original-title="creationData.textContent.title"
+      :suggested-title="suggestedTitle"
+      @suggested-title-selected="takeSuggestedTitle"
+    />
     <TextInput
       scope-name="wikidataID"
       field="wikidataID"
@@ -49,12 +42,12 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import TextInput from "../form/TextInput.vue";
-import RadioButtons from "../form/RadioButtons.vue";
 import NoteFormTitleOnly from "./NoteFormTitleOnly.vue";
 import SearchResults from "../search/SearchResults.vue";
 import LinkTypeSelectCompact from "../links/LinkTypeSelectCompact.vue";
 import WikidataSearchByLabel from "./WikidataSearchByLabel.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
+import SuggestTitle from "./SuggestTitle.vue";
 
 export default defineComponent({
   components: {
@@ -62,8 +55,8 @@ export default defineComponent({
     SearchResults,
     LinkTypeSelectCompact,
     TextInput,
-    RadioButtons,
     WikidataSearchByLabel,
+    SuggestTitle,
   },
   props: {
     parentId: { type: Number, required: true },
@@ -85,8 +78,6 @@ export default defineComponent({
         textContent: {},
         wikiDataId: undefined as undefined | string,
       },
-      replaceOrAppendTitle: "",
-      originalTitle: "",
       suggestedTitle: "",
     };
   },
@@ -115,17 +106,11 @@ export default defineComponent({
         this.suggestedTitle = selectedSuggestion.label;
       }
 
-      this.originalTitle = this.creationData.textContent.title;
       this.creationData.wikidataId = selectedSuggestion.id;
     },
-    updateModelValue() {
-      if (this.replaceOrAppendTitle === "Replace") {
-        this.creationData.textContent.title = this.suggestedTitle || "";
-      }
-
-      if (this.replaceOrAppendTitle === "Append") {
-        this.creationData.textContent.title = `${this.originalTitle} / ${this.suggestedTitle}`;
-      }
+    takeSuggestedTitle(title: string) {
+      this.creationData.textContent.title = title;
+      this.suggestedTitle = "";
     },
   },
 });

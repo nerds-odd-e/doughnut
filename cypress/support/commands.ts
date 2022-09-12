@@ -572,5 +572,4 @@ Cypress.Commands.add("findPopupLink", (url: string) => {
         expect(popupWindowStub.focus).to.have.been.called
       })
   })
-
 })

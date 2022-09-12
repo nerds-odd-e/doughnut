@@ -72,12 +72,9 @@ And("I search with title {string} on Wikidata", (title: string) => {
   cy.findByRole("button", { name: "Search on Wikidata" }).click()
 })
 
-And(
-  "I select wikidataID {string} from the Wikidata search result",
-  (wikidataID: string) => {
-    cy.get('select[name="wikidataSearchResult"]').select(wikidataID)
-  },
-)
+And("I select wikidataID {string} from the Wikidata search result", (wikidataID: string) => {
+  cy.get('select[name="wikidataSearchResult"]').select(wikidataID)
+})
 
 Then("I should see that the {string} becomes {string}", (field: string, value: string) => {
   cy.getFormControl(field).should("have.value", value)
