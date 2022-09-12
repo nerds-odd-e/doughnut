@@ -99,8 +99,8 @@ And("I search with title {string} on Wikidata", (title: string) => {
 })
 
 And(
-  "I select {string} with wikidataID {string} from the Wikidata search result",
-  (wikidataEntry: string, wikidataID: string) => {
+  "I select wikidataID {string} from the Wikidata search result",
+  (wikidataID: string) => {
     cy.get('select[name="wikidataSearchResult"]').select(wikidataID)
   },
 )

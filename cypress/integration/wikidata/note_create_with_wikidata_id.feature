@@ -29,7 +29,7 @@ Feature: Nested Note Create with wikidata
     Given Wikidata search result always has "Dog" with ID "Q11399"
     When I am creating a note under "My Notes/Animals"
     And I search with title "dog" on Wikidata
-    And I select "Dog" with wikidataID "Q11399" from the Wikidata search result
+    And I select wikidataID "Q11399" from the Wikidata search result
     Then I should see that the "Title" becomes "Dog"
     Then I should see that the "Wikidata Id" becomes "Q11399"
 
@@ -38,7 +38,7 @@ Feature: Nested Note Create with wikidata
     Given Wikidata has a result for "Singapore" with wikidata ID "Q334" and contains claims ID "P625"
     When I am creating a note under "My Notes/Animals"
     And I search with title "Singapore" on Wikidata
-    And I select "singapore" with wikidataID "Q334" from the Wikidata search result
+    And I select wikidataID "Q334" from the Wikidata search result
     Then I should see a textfield with the text "Location selected. The following text will be prepended to the note: latitude	1.3 longitude	103.8"
 
   @usingMockedWikidataService @mockBrowserTime
