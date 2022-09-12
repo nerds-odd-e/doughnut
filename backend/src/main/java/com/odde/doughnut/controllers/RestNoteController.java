@@ -51,12 +51,18 @@ class RestNoteController {
       @RequestBody WikidataAssociationCreation wikidataAssociationCreation)
       throws BindException {
 
-    checkDuplicateWikidataId(note.getNotebook(), wikidataAssociationCreation.wikidataId);
-
-    note.setWikidataId(wikidataAssociationCreation.wikidataId);
-    getWikidataService().assignWikidataLocationDataToNote(note, note.getWikidataId());
+    String wikidataId = wikidataAssociationCreation.wikidataId;
+    WikidataService wikidataService = getWikidataService();
+    assignWikidataInfo(note, wikidataId, wikidataService);
     modelFactoryService.noteRepository.save(note);
     return new NoteViewer(currentUserFetcher.getUser().getEntity(), note).toJsonObject();
+  }
+
+  private void assignWikidataInfo(Note note, String wikidataId, WikidataService wikidataService)
+      throws BindException {
+    checkDuplicateWikidataId(note.getNotebook(), wikidataId);
+    note.setWikidataId(wikidataId);
+    wikidataService.assignWikidataLocationDataToNote(note, wikidataId);
   }
 
   @PostMapping(value = "/{parentNote}/create")
@@ -65,7 +71,6 @@ class RestNoteController {
       @PathVariable(name = "parentNote") Note parentNote,
       @Valid @ModelAttribute NoteCreation noteCreation)
       throws NoAccessRightException, BindException, InterruptedException {
-    checkDuplicateWikidataId(parentNote.getNotebook(), noteCreation.getWikidataId());
     final UserModel userModel = currentUserFetcher.getUser();
     userModel.getAuthorization().assertAuthorization(parentNote);
     User user = userModel.getEntity();
@@ -73,8 +78,7 @@ class RestNoteController {
         Note.createNote(
             user, testabilitySettings.getCurrentUTCTimestamp(), noteCreation.textContent);
     note.setParentNote(parentNote);
-    note.setWikidataId(noteCreation.getWikidataId());
-    getWikidataService().assignWikidataLocationDataToNote(note, noteCreation.getWikidataId());
+    assignWikidataInfo(note, noteCreation.getWikidataId(), getWikidataService());
 
     modelFactoryService.noteRepository.save(note);
     LinkType linkTypeToParent = noteCreation.getLinkTypeToParent();
