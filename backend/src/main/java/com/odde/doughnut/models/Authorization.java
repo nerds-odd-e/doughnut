@@ -17,31 +17,45 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
 
   public <T> void assertAuthorization(T object) throws NoAccessRightException {
     if (object instanceof Note) {
-      assertAuthorization((Note) object);
+      assertAuthorizationNote((Note) object);
     } else if (object instanceof Notebook) {
-      assertAuthorization((Notebook) object);
+      assertAuthorizationNotebook((Notebook) object);
     } else if (object instanceof Circle) {
-      assertAuthorization((Circle) object);
+      assertAuthorizationCircle((Circle) object);
     } else if (object instanceof Subscription) {
-      assertAuthorization((Subscription) object);
+      assertAuthorizationSubscription((Subscription) object);
     } else if (object instanceof User) {
-      assertAuthorization((User) object);
+      assertAuthorizationUser((User) object);
     } else if (object instanceof Link) {
-      assertAuthorization((Link) object);
+      assertAuthorizationLink((Link) object);
     } else {
       throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unknown object type");
     }
   }
 
-  private void assertAuthorization(Note note) throws NoAccessRightException {
+  public <T> void assertReadAuthorization(T object) throws NoAccessRightException {
+    if (object instanceof Note) {
+      assertReadAuthorizationNote((Note) object);
+    } else if (object instanceof Notebook) {
+      assertReadAuthorizationNotebook((Notebook) object);
+    } else if (object instanceof Subscription) {
+      assertReadAuthorization((Subscription) object);
+    } else if (object instanceof Link) {
+      assertReadAuthorizationLink((Link) object);
+    } else {
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unknown object type");
+    }
+  }
+
+  private void assertAuthorizationNote(Note note) throws NoAccessRightException {
     assertLoggedIn();
     if (!hasFullAuthority(note.getNotebook())) {
       throw new NoAccessRightException();
     }
   }
 
-  public void assertReadAuthorization(Note note) throws NoAccessRightException {
-    assertReadAuthorization(note.getNotebook());
+  private void assertReadAuthorizationNote(Note note) throws NoAccessRightException {
+    assertReadAuthorizationNotebook(note.getNotebook());
   }
 
   private boolean hasFullAuthority(Notebook notebook) {
@@ -54,7 +68,7 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
     return user.canReferTo(note.getNotebook());
   }
 
-  public void assertReadAuthorization(Notebook notebook) throws NoAccessRightException {
+  private void assertReadAuthorizationNotebook(Notebook notebook) throws NoAccessRightException {
     if (notebook != null) {
       if (hasReferenceAuthority(notebook.getHeadNote())) {
         return;
@@ -67,32 +81,33 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
     throw new NoAccessRightException();
   }
 
-  private void assertAuthorization(Notebook notebook) throws NoAccessRightException {
+  private void assertAuthorizationNotebook(Notebook notebook) throws NoAccessRightException {
     if (!hasFullAuthority(notebook)) {
       throw new NoAccessRightException();
     }
   }
 
-  private void assertAuthorization(Circle circle) throws NoAccessRightException {
+  private void assertAuthorizationCircle(Circle circle) throws NoAccessRightException {
     assertLoggedIn();
     if (user == null || !user.inCircle(circle)) {
       throw new NoAccessRightException();
     }
   }
 
-  private void assertAuthorization(Subscription subscription) throws NoAccessRightException {
+  private void assertAuthorizationSubscription(Subscription subscription)
+      throws NoAccessRightException {
     if (subscription.getUser() != user) {
       throw new NoAccessRightException();
     }
   }
 
-  private void assertAuthorization(User user) throws NoAccessRightException {
+  private void assertAuthorizationUser(User user) throws NoAccessRightException {
     if (!this.user.getId().equals(user.getId())) {
       throw new NoAccessRightException();
     }
   }
 
-  private void assertAuthorization(Link link) throws NoAccessRightException {
+  private void assertAuthorizationLink(Link link) throws NoAccessRightException {
     if (!link.getSourceNote().getThing().getCreator().getId().equals(user.getId())) {
       throw new NoAccessRightException();
     }
@@ -122,7 +137,7 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
     throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User Not Found");
   }
 
-  public void assertReadAuthorization(Link link) throws NoAccessRightException {
-    assertReadAuthorization(link.getSourceNote());
+  private void assertReadAuthorizationLink(Link link) throws NoAccessRightException {
+    assertReadAuthorizationNote(link.getSourceNote());
   }
 }

@@ -19,16 +19,8 @@ public interface CurrentUserFetcher {
     getUser().getAuthorization().assertAuthorization(object);
   }
 
-  default void assertReadAuthorization(Note note) throws NoAccessRightException {
-    getUser().getAuthorization().assertReadAuthorization(note);
-  }
-
-  default void assertReadAuthorization(Notebook notebook) throws NoAccessRightException {
-    getUser().getAuthorization().assertReadAuthorization(notebook);
-  }
-
-  default void assertReadAuthorization(Link link) throws NoAccessRightException {
-    getUser().getAuthorization().assertReadAuthorization(link);
+  default <T> void assertReadAuthorization(T object) throws NoAccessRightException {
+    getUser().getAuthorization().assertReadAuthorization(object);
   }
 
   default void assertDeveloperAuthorization() throws NoAccessRightException {
