@@ -197,10 +197,11 @@ class TestabilityRestController {
 
   private User getUserModelByExternalIdentifierOrCurrentUser(String externalIdentifier) {
     if (Strings.isEmpty(externalIdentifier)) {
-      if (currentUser.getUser() == null) {
+      User user = currentUser.getUserEntity();
+      if (user == null) {
         throw new RuntimeException("There is no current user");
       }
-      return currentUser.getUserEntity();
+      return user;
     }
     return getUserModelByExternalIdentifier(externalIdentifier);
   }

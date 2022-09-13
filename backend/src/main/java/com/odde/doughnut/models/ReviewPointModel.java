@@ -2,6 +2,7 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
 import java.sql.Timestamp;
@@ -12,8 +13,8 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
     return entity;
   }
 
-  public void initialReview(UserModel userModel, Timestamp currentUTCTimestamp) {
-    entity.setUser(userModel.getEntity());
+  public void initialReview(Timestamp currentUTCTimestamp, User user) {
+    entity.setUser(user);
     entity.setInitialReviewedAt(currentUTCTimestamp);
     entity.setLastReviewedAt(currentUTCTimestamp);
     updateForgettingCurve(0);

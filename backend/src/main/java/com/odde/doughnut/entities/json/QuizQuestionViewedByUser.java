@@ -1,12 +1,8 @@
 package com.odde.doughnut.entities.json;
 
-import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.PictureWithMask;
-import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteViewer;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionPresenter;
 import java.util.Arrays;
 import java.util.List;
@@ -38,7 +34,7 @@ public class QuizQuestionViewedByUser {
   public Optional<PictureWithMask> pictureWithMask;
 
   public QuizQuestionViewedByUser(
-      UserModel user, QuizQuestion quizQuestion, ModelFactoryService modelFactoryService) {
+      QuizQuestion quizQuestion, ModelFactoryService modelFactoryService, User user) {
     QuizQuestionPresenter presenter = quizQuestion.buildPresenter();
     this.quizQuestion = quizQuestion;
     questionType = quizQuestion.getQuestionType();
@@ -51,8 +47,7 @@ public class QuizQuestionViewedByUser {
     viceReviewPointIdList = quizQuestion.getViceReviewPointIdList();
     if (questionType == QuizQuestion.QuestionType.JUST_REVIEW) return;
     notebookPosition =
-        new NoteViewer(user.getEntity(), quizQuestion.getReviewPoint().getHeadNote())
-            .jsonNotePosition(true);
+        new NoteViewer(user, quizQuestion.getReviewPoint().getHeadNote()).jsonNotePosition(true);
   }
 
   public static class Option {

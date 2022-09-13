@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.LinkCreation;
 import com.odde.doughnut.entities.json.NoteRealm;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
@@ -10,7 +11,6 @@ import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.LinkModel;
 import com.odde.doughnut.models.NoteViewer;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -55,12 +55,13 @@ class RestLinkController {
     currentUserFetcher.assertAuthorization(link);
     link.setLinkType(linkCreation.linkType);
     modelFactoryService.linkRepository.save(link);
-    return getNoteRealm(link, currentUserFetcher.getUser(), linkCreation.fromTargetPerspective);
+    return getNoteRealm(
+        link, currentUserFetcher.getUserEntity(), linkCreation.fromTargetPerspective);
   }
 
-  private NoteRealm getNoteRealm(Link link, UserModel user, Boolean fromTargetPerspective) {
+  private NoteRealm getNoteRealm(Link link, User user, Boolean fromTargetPerspective) {
     Note note = fromTargetPerspective ? link.getTargetNote() : link.getSourceNote();
-    return new NoteViewer(user.getEntity(), note).toJsonObject();
+    return new NoteViewer(user, note).toJsonObject();
   }
 
   @PostMapping(value = "/{link}/{perspective}/delete")
@@ -70,7 +71,7 @@ class RestLinkController {
     currentUserFetcher.assertAuthorization(link);
     LinkModel linkModel = modelFactoryService.toLinkModel(link);
     linkModel.destroy();
-    return getNoteRealm(link, currentUserFetcher.getUser(), perspective.equals("tview"));
+    return getNoteRealm(link, currentUserFetcher.getUserEntity(), perspective.equals("tview"));
   }
 
   @PostMapping(value = "/create/{sourceNote}/{targetNote}")
@@ -90,15 +91,15 @@ class RestLinkController {
           .toNoteMotionModel(sourceNote, targetNote, linkCreation.asFirstChild)
           .execute();
     }
-    UserModel userModel = currentUserFetcher.getUser();
+    User user = currentUserFetcher.getUserEntity();
     Link link =
         Link.createLink(
             sourceNote,
             targetNote,
-            userModel.getEntity(),
+            user,
             linkCreation.linkType,
             testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.linkRepository.save(link);
-    return getNoteRealm(link, userModel, linkCreation.fromTargetPerspective);
+    return getNoteRealm(link, user, linkCreation.fromTargetPerspective);
   }
 }

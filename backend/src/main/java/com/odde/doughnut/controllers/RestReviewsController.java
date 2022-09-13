@@ -77,7 +77,7 @@ class RestReviewsController {
 
     ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPoint);
     reviewPointModel.initialReview(
-        currentUserFetcher.getUser(), testabilitySettings.getCurrentUTCTimestamp());
+        testabilitySettings.getCurrentUTCTimestamp(), currentUserFetcher.getUserEntity());
     return reviewPointModel.getEntity();
   }
 
@@ -121,7 +121,7 @@ class RestReviewsController {
     answerResult.reviewPoint = answer.getQuestion().getReviewPoint();
     answerResult.quizQuestion =
         new QuizQuestionViewedByUser(
-            currentUserFetcher.getUser(), answer.getQuestion(), modelFactoryService);
+            answer.getQuestion(), modelFactoryService, currentUserFetcher.getUserEntity());
     return answerResult;
   }
 }

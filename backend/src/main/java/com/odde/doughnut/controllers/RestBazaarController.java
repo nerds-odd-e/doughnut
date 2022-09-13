@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
-import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.NotebooksViewedByUser;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.BazaarModel;
@@ -24,8 +23,8 @@ class RestBazaarController {
 
   @GetMapping("")
   public NotebooksViewedByUser bazaar() {
-    User user = currentUserFetcher.getUserEntity();
     BazaarModel bazaar = modelFactoryService.toBazaarModel();
-    return new JsonViewer(user).jsonNotebooksViewedByUser(bazaar.getAllNotebooks());
+    return new JsonViewer(currentUserFetcher.getUserEntity())
+        .jsonNotebooksViewedByUser(bazaar.getAllNotebooks());
   }
 }

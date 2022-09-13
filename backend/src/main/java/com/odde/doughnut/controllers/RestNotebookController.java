@@ -11,7 +11,6 @@ import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.models.JsonViewer;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -45,11 +44,10 @@ class RestNotebookController {
   public NotebooksViewedByUser myNotebooks() {
     currentUserFetcher.assertLoggedIn();
 
-    UserModel user = currentUserFetcher.getUser();
+    User user = currentUserFetcher.getUserEntity();
     NotebooksViewedByUser notebooksViewedByUser =
-        new JsonViewer(user.getEntity())
-            .jsonNotebooksViewedByUser(user.getEntity().getOwnership().getNotebooks());
-    notebooksViewedByUser.subscriptions = user.getEntity().getSubscriptions();
+        new JsonViewer(user).jsonNotebooksViewedByUser(user.getOwnership().getNotebooks());
+    notebooksViewedByUser.subscriptions = user.getSubscriptions();
     return notebooksViewedByUser;
   }
 

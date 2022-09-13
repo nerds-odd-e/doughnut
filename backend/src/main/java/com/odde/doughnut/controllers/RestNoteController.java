@@ -84,7 +84,7 @@ class RestNoteController {
   public NoteRealmWithAllDescendants showOverview(@PathVariable("note") Note note)
       throws NoAccessRightException {
     currentUserFetcher.assertReadAuthorization(note);
-    return NoteRealmWithAllDescendants.fromNote(note, currentUserFetcher.getUser());
+    return NoteRealmWithAllDescendants.fromNote(note, currentUserFetcher.getUserEntity());
   }
 
   @PatchMapping(path = "/{note}")
