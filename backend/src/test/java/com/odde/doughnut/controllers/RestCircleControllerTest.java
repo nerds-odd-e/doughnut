@@ -86,7 +86,7 @@ class RestCircleControllerTest {
       circle.setName("Some circle");
 
       CircleModel circleModel = modelFactoryService.toCircleModel(circle);
-      circleModel.joinAndSave(user);
+      circleModel.joinAndSave(user.getEntity());
 
       CircleForUserView expected = new CircleForUserView();
       expected.setId(circle.getId());

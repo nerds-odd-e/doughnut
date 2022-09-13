@@ -47,6 +47,6 @@ class RestTextContentController {
     note.getTextContent().updateTextContent(textContent, currentUTCTimestamp);
 
     modelFactoryService.noteRepository.save(note);
-    return new NoteViewer(currentUserFetcher.getUser().getEntity(), note).toJsonObject();
+    return new NoteViewer(currentUserFetcher.getUserEntity(), note).toJsonObject();
   }
 }

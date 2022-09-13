@@ -1,6 +1,7 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Circle;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import lombok.Getter;
 
@@ -13,8 +14,8 @@ public class CircleModel {
     this.modelFactoryService = modelFactoryService;
   }
 
-  public void joinAndSave(UserModel userModel) {
-    entity.getMembers().add(userModel.getEntity());
+  public void joinAndSave(User user) {
+    entity.getMembers().add(user);
     modelFactoryService.circleRepository.save(entity);
   }
 }

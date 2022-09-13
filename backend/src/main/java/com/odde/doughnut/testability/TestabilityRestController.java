@@ -162,8 +162,7 @@ class TestabilityRestController {
   @PostMapping("/seed_notes")
   @Transactional
   public Map<String, Integer> seedNote(@RequestBody SeedInfo seedInfo) {
-    final User user =
-        getUserModelByExternalIdentifierOrCurrentUser(seedInfo.externalIdentifier).getEntity();
+    final User user = getUserModelByExternalIdentifierOrCurrentUser(seedInfo.externalIdentifier);
     Ownership ownership = getOwnership(seedInfo, user);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
@@ -196,12 +195,12 @@ class TestabilityRestController {
     return "OK";
   }
 
-  private UserModel getUserModelByExternalIdentifierOrCurrentUser(String externalIdentifier) {
+  private User getUserModelByExternalIdentifierOrCurrentUser(String externalIdentifier) {
     if (Strings.isEmpty(externalIdentifier)) {
       if (currentUser.getUser() == null) {
         throw new RuntimeException("There is no current user");
       }
-      return currentUser.getUser();
+      return currentUser.getUserEntity();
     }
     return getUserModelByExternalIdentifier(externalIdentifier);
   }
@@ -243,13 +242,13 @@ class TestabilityRestController {
     return "OK";
   }
 
-  private UserModel getUserModelByExternalIdentifier(String externalIdentifier) {
+  private User getUserModelByExternalIdentifier(String externalIdentifier) {
     User user = userRepository.findByExternalIdentifier(externalIdentifier);
-    if (user != null) {
-      return modelFactoryService.toUserModel(user);
+    if (user == null) {
+      throw new RuntimeException(
+          "User with external identifier `" + externalIdentifier + "` does not exist");
     }
-    throw new RuntimeException(
-        "User with external identifier `" + externalIdentifier + "` does not exist");
+    return user;
   }
 
   static DateTimeFormatter getDateTimeFormatter() {

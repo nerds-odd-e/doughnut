@@ -11,6 +11,10 @@ public interface CurrentUserFetcher {
 
   void setExternalIdentifier(String name);
 
+  default User getUserEntity() {
+    return getUser().getEntity();
+  }
+
   default void assertAuthorization(Note note) throws NoAccessRightException {
     getUser().getAuthorization().assertAuthorization(note);
   }

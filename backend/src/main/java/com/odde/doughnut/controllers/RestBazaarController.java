@@ -24,7 +24,7 @@ class RestBazaarController {
 
   @GetMapping("")
   public NotebooksViewedByUser bazaar() {
-    User user = currentUserFetcher.getUser().getEntity();
+    User user = currentUserFetcher.getUserEntity();
     BazaarModel bazaar = modelFactoryService.toBazaarModel();
     return new JsonViewer(user).jsonNotebooksViewedByUser(bazaar.getAllNotebooks());
   }

@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.TextContent;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.CircleForUserView;
 import com.odde.doughnut.entities.json.CircleJoiningByInvitation;
 import com.odde.doughnut.entities.json.RedirectToNoteResponse;
@@ -11,7 +12,6 @@ import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.JsonViewer;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.util.List;
 import javax.annotation.Resource;
@@ -49,21 +49,20 @@ class RestCircleController {
   public CircleForUserView showCircle(@PathVariable("circle") Circle circle)
       throws NoAccessRightException {
     currentUserFetcher.assertAuthorization(circle);
-    JsonViewer jsonViewer = new JsonViewer(currentUserFetcher.getUser().getEntity());
+    JsonViewer jsonViewer = new JsonViewer(currentUserFetcher.getUserEntity());
     return jsonViewer.jsonCircleForUserView(circle);
   }
 
   @GetMapping("")
   public List<Circle> index() {
     currentUserFetcher.assertLoggedIn();
-    return currentUserFetcher.getUser().getEntity().getCircles();
+    return currentUserFetcher.getUserEntity().getCircles();
   }
 
   @PostMapping("")
   public Circle createCircle(@Valid Circle circle) {
-    UserModel userModel = currentUserFetcher.getUser();
     CircleModel circleModel = modelFactoryService.toCircleModel(circle);
-    circleModel.joinAndSave(userModel);
+    circleModel.joinAndSave(currentUserFetcher.getUserEntity());
     return circle;
   }
 
@@ -81,14 +80,14 @@ class RestCircleController {
 
       throw new BindException(bindingResult);
     }
-    UserModel userModel = currentUserFetcher.getUser();
-    if (userModel.getEntity().inCircle(circleModel.getEntity())) {
+    User user = currentUserFetcher.getUserEntity();
+    if (user.inCircle(circleModel.getEntity())) {
       BindingResult bindingResult =
           new BeanPropertyBindingResult(circleJoiningByInvitation, "circle");
       bindingResult.rejectValue("invitationCode", "error.error", "You are already in this circle");
       throw new BindException(bindingResult);
     }
-    circleModel.joinAndSave(userModel);
+    circleModel.joinAndSave(user);
     return circleModel.getEntity();
   }
 
@@ -101,7 +100,7 @@ class RestCircleController {
         circle
             .getOwnership()
             .createNotebook(
-                currentUserFetcher.getUser().getEntity(),
+                currentUserFetcher.getUserEntity(),
                 textContent,
                 testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.noteRepository.save(note);

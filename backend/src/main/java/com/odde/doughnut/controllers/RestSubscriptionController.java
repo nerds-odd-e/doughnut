@@ -32,7 +32,7 @@ class RestSubscriptionController {
       throws NoAccessRightException {
     currentUserFetcher.assertReadAuthorization(notebook);
     subscription.setNotebook(notebook);
-    subscription.setUser(currentUserFetcher.getUser().getEntity());
+    subscription.setUser(currentUserFetcher.getUserEntity());
     modelFactoryService.entityManager.persist(subscription);
     return subscription;
   }

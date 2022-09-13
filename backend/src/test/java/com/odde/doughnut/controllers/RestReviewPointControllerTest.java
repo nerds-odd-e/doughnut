@@ -47,7 +47,14 @@ class RestReviewPointControllerTest {
     }
 
     @Test
-    void show() {
+    void shouldBeAbleToSeeOwn() throws NoAccessRightException {
+      ReviewPoint reviewPoint = controller.show(rp);
+      assertThat(reviewPoint, equalTo(rp));
+    }
+
+    @Test
+    void shouldNotBeAbleToSeeOthers() {
+      rp = makeMe.aReviewPointFor(makeMe.aHeadNote().please()).by(makeMe.aUser().please()).please();
       assertThrows(NoAccessRightException.class, () -> controller.show(rp));
     }
 

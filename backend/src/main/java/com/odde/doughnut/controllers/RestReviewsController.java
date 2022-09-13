@@ -115,7 +115,7 @@ class RestReviewsController {
   @Transactional
   public AnswerViewedByUser getAnswer(@PathVariable("answer") Answer answer)
       throws NoAccessRightException {
-    currentUserFetcher.assertAuthorization(answer.getQuestion().getReviewPoint().getNote());
+    currentUserFetcher.assertAuthorization(answer.getQuestion().getReviewPoint().getHeadNote());
     AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
     AnswerViewedByUser answerResult = answerModel.getAnswerViewedByUser();
     answerResult.reviewPoint = answer.getQuestion().getReviewPoint();

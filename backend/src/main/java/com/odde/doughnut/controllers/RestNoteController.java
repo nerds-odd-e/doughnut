@@ -51,7 +51,7 @@ class RestNoteController {
     currentUserFetcher.assertAuthorization(note);
     associateToWikidata(note, wikidataAssociationCreation.wikidataId);
     modelFactoryService.noteRepository.save(note);
-    return new NoteViewer(currentUserFetcher.getUser().getEntity(), note).toJsonObject();
+    return new NoteViewer(currentUserFetcher.getUserEntity(), note).toJsonObject();
   }
 
   @PostMapping(value = "/{parentNote}/create")
@@ -61,7 +61,7 @@ class RestNoteController {
       @Valid @ModelAttribute NoteCreation noteCreation)
       throws NoAccessRightException, BindException, InterruptedException {
     currentUserFetcher.assertAuthorization(parentNote);
-    User user = currentUserFetcher.getUser().getEntity();
+    User user = currentUserFetcher.getUserEntity();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     Note note = parentNote.buildChildNote(user, currentUTCTimestamp, noteCreation.textContent);
     associateToWikidata(note, noteCreation.wikidataId);
@@ -77,7 +77,7 @@ class RestNoteController {
   @GetMapping("/{note}")
   public NoteRealmWithPosition show(@PathVariable("note") Note note) throws NoAccessRightException {
     currentUserFetcher.assertReadAuthorization(note);
-    return NoteRealmWithPosition.fromNote(note, currentUserFetcher.getUser().getEntity());
+    return NoteRealmWithPosition.fromNote(note, currentUserFetcher.getUserEntity());
   }
 
   @GetMapping("/{note}/overview")
@@ -95,7 +95,7 @@ class RestNoteController {
       throws NoAccessRightException, IOException {
     currentUserFetcher.assertAuthorization(note);
 
-    final User user = currentUserFetcher.getUser().getEntity();
+    final User user = currentUserFetcher.getUserEntity();
     noteAccessories.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     note.updateNoteContent(noteAccessories, user);
     modelFactoryService.noteRepository.save(note);
@@ -118,7 +118,7 @@ class RestNoteController {
   @Transactional
   public List<Note> searchForLinkTarget(@Valid @RequestBody SearchTerm searchTerm) {
     SearchTermModel searchTermModel =
-        modelFactoryService.toSearchTermModel(currentUserFetcher.getUser().getEntity(), searchTerm);
+        modelFactoryService.toSearchTermModel(currentUserFetcher.getUserEntity(), searchTerm);
     return searchTermModel.searchForNotes();
   }
 
@@ -130,8 +130,7 @@ class RestNoteController {
     modelFactoryService.entityManager.flush();
     Note parentNote = note.getParentNote();
     if (parentNote != null) {
-      return List.of(
-          new NoteViewer(currentUserFetcher.getUser().getEntity(), parentNote).toJsonObject());
+      return List.of(new NoteViewer(currentUserFetcher.getUserEntity(), parentNote).toJsonObject());
     }
     return List.of();
   }
@@ -143,13 +142,13 @@ class RestNoteController {
     modelFactoryService.toNoteModel(note).restore();
     modelFactoryService.entityManager.flush();
 
-    return new NoteViewer(currentUserFetcher.getUser().getEntity(), note).toJsonObject();
+    return new NoteViewer(currentUserFetcher.getUserEntity(), note).toJsonObject();
   }
 
   @GetMapping("/{note}/position")
   public NotePositionViewedByUser getPosition(Note note) throws NoAccessRightException {
     currentUserFetcher.assertAuthorization(note);
-    return new NoteViewer(currentUserFetcher.getUser().getEntity(), note).jsonNotePosition();
+    return new NoteViewer(currentUserFetcher.getUserEntity(), note).jsonNotePosition();
   }
 
   @PostMapping(value = "/{note}/review-setting")

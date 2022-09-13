@@ -29,7 +29,7 @@ record RestUserController(
 
   @GetMapping("")
   public User getUserProfile() {
-    return currentUserFetcher.getUser().getEntity();
+    return currentUserFetcher.getUserEntity();
   }
 
   @PatchMapping("/{user}")
@@ -42,7 +42,7 @@ record RestUserController(
   @GetMapping("/current-user-info")
   public CurrentUserInfo currentUserInfo() {
     CurrentUserInfo currentUserInfo = new CurrentUserInfo();
-    currentUserInfo.user = currentUserFetcher.getUser().getEntity();
+    currentUserInfo.user = currentUserFetcher.getUserEntity();
     currentUserInfo.externalIdentifier = currentUserFetcher.getExternalIdentifier();
     return currentUserInfo;
   }
