@@ -2,7 +2,6 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.Link.LinkType;
 import com.odde.doughnut.entities.json.*;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -49,9 +48,7 @@ class RestNoteController {
       @PathVariable(name = "note") Note note,
       @RequestBody WikidataAssociationCreation wikidataAssociationCreation)
       throws BindException {
-    modelFactoryService
-        .toNoteModel(note)
-        .associateWithWikidataId(wikidataAssociationCreation.wikidataId, getWikidataService());
+    associateToWikidata(note, wikidataAssociationCreation.wikidataId);
     modelFactoryService.noteRepository.save(note);
     return new NoteViewer(currentUserFetcher.getUser().getEntity(), note).toJsonObject();
   }
@@ -66,23 +63,15 @@ class RestNoteController {
     userModel.getAuthorization().assertAuthorization(parentNote);
     User user = userModel.getEntity();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    Note note = Note.createNote(user, currentUTCTimestamp, noteCreation.textContent);
-    note.setParentNote(parentNote);
-    modelFactoryService
-        .toNoteModel(note)
-        .associateWithWikidataId(noteCreation.wikidataId, getWikidataService());
+    Note note = parentNote.buildChildNote(user, currentUTCTimestamp, noteCreation.textContent);
+    associateToWikidata(note, noteCreation.wikidataId);
+    note.buildLinkToParent(user, noteCreation.getLinkTypeToParent(), currentUTCTimestamp);
     modelFactoryService.noteRepository.save(note);
-    createLinkToParent(user, note, noteCreation.getLinkTypeToParent(), currentUTCTimestamp);
     return NoteRealmWithPosition.fromNote(note, user);
   }
 
-  private void createLinkToParent(
-      User user, Note note, LinkType linkTypeToParent, Timestamp currentUTCTimestamp) {
-    if (linkTypeToParent != LinkType.NO_LINK) {
-      Link link =
-          Link.createLink(note, note.getParentNote(), user, linkTypeToParent, currentUTCTimestamp);
-      modelFactoryService.linkRepository.save(link);
-    }
+  private void associateToWikidata(Note note, String wikidataId) throws BindException {
+    modelFactoryService.toNoteModel(note).associateWithWikidataId(wikidataId, getWikidataService());
   }
 
   @GetMapping("/{note}")

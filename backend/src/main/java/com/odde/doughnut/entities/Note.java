@@ -335,4 +335,19 @@ public class Note extends Thingy {
   public void prependDescription(String addition) {
     textContent.prependDescription(addition);
   }
+
+  public void buildLinkToParent(
+      User user, Link.LinkType linkTypeToParent, Timestamp currentUTCTimestamp) {
+    if (linkTypeToParent != Link.LinkType.NO_LINK) {
+      Link link =
+          Link.createLink(this, getParentNote(), user, linkTypeToParent, currentUTCTimestamp);
+      getRefers().add(link);
+    }
+  }
+
+  public Note buildChildNote(User user, Timestamp currentUTCTimestamp, TextContent textContent) {
+    Note note = createNote(user, currentUTCTimestamp, textContent);
+    note.setParentNote(this);
+    return note;
+  }
 }
