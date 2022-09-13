@@ -48,16 +48,15 @@ class RestCircleController {
   @GetMapping("/{circle}")
   public CircleForUserView showCircle(@PathVariable("circle") Circle circle)
       throws NoAccessRightException {
-    currentUserFetcher.getUser().getAuthorization().assertAuthorization(circle);
+    currentUserFetcher.assertAuthorization(circle);
     JsonViewer jsonViewer = new JsonViewer(currentUserFetcher.getUser().getEntity());
     return jsonViewer.jsonCircleForUserView(circle);
   }
 
   @GetMapping("")
   public List<Circle> index() {
-    UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertLoggedIn();
-    return user.getEntity().getCircles();
+    currentUserFetcher.assertLoggedIn();
+    return currentUserFetcher.getUser().getEntity().getCircles();
   }
 
   @PostMapping("")
@@ -96,14 +95,15 @@ class RestCircleController {
   @PostMapping({"/{circle}/notebooks"})
   public RedirectToNoteResponse createNotebook(
       Circle circle, @Valid @ModelAttribute TextContent textContent) throws NoAccessRightException {
-    UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertLoggedIn();
-    currentUserFetcher.getUser().getAuthorization().assertAuthorization(circle);
+    currentUserFetcher.assertLoggedIn();
+    currentUserFetcher.assertAuthorization(circle);
     Note note =
         circle
             .getOwnership()
             .createNotebook(
-                user.getEntity(), textContent, testabilitySettings.getCurrentUTCTimestamp());
+                currentUserFetcher.getUser().getEntity(),
+                textContent,
+                testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.noteRepository.save(note);
     return new RedirectToNoteResponse(note.getId());
   }

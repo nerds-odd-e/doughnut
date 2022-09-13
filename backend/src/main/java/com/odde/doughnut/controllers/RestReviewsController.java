@@ -9,6 +9,7 @@ import com.odde.doughnut.entities.json.InitialInfo;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.entities.json.RepetitionForUser;
 import com.odde.doughnut.entities.json.ReviewStatus;
+import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.ReviewPointModel;
@@ -50,16 +51,16 @@ class RestReviewsController {
   @GetMapping("/overview")
   @Transactional(readOnly = true)
   public ReviewStatus overview() {
+    currentUserFetcher.assertLoggedIn();
     UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertLoggedIn();
     return user.createReviewing(testabilitySettings.getCurrentUTCTimestamp()).getReviewStatus();
   }
 
   @GetMapping("/initial")
   @Transactional(readOnly = true)
   public List<ReviewPoint> initialReview() {
+    currentUserFetcher.assertLoggedIn();
     UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertLoggedIn();
     Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
 
     return reviewing.getDueInitialReviewPoints().collect(Collectors.toList());
@@ -68,23 +69,23 @@ class RestReviewsController {
   @PostMapping(path = "")
   @Transactional
   public ReviewPoint create(@RequestBody InitialInfo initialInfo) {
-    UserModel userModel = currentUserFetcher.getUser();
-    userModel.getAuthorization().assertLoggedIn();
+    currentUserFetcher.assertLoggedIn();
     ReviewPoint reviewPoint = new ReviewPoint();
     reviewPoint.setThing(
         modelFactoryService.thingRepository.findById(initialInfo.thingId).orElse(null));
     reviewPoint.setRemovedFromReview(initialInfo.skipReview);
 
     ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPoint);
-    reviewPointModel.initialReview(userModel, testabilitySettings.getCurrentUTCTimestamp());
+    reviewPointModel.initialReview(
+        currentUserFetcher.getUser(), testabilitySettings.getCurrentUTCTimestamp());
     return reviewPointModel.getEntity();
   }
 
   @GetMapping("/repeat")
   @Transactional
   public RepetitionForUser repeatReview() {
+    currentUserFetcher.assertLoggedIn();
     UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertLoggedIn();
     Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
     return reviewing
         .getOneRepetitionForUser(testabilitySettings.getRandomizer())
@@ -98,13 +99,13 @@ class RestReviewsController {
   @PostMapping("/answer")
   @Transactional
   public AnswerResult answerQuiz(@Valid @RequestBody Answer answer) {
-    UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertLoggedIn();
+    currentUserFetcher.assertLoggedIn();
     AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
     answerModel.updateReviewPoints(testabilitySettings.getCurrentUTCTimestamp());
     answerModel.save();
     AnswerResult answerResult = answerModel.getAnswerResult();
-    Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
+    Reviewing reviewing =
+        currentUserFetcher.getUser().createReviewing(testabilitySettings.getCurrentUTCTimestamp());
     answerResult.nextRepetition =
         reviewing.getOneRepetitionForUser(testabilitySettings.getRandomizer()).orElse(null);
     return answerResult;
@@ -112,14 +113,15 @@ class RestReviewsController {
 
   @GetMapping(path = "/answers/{answer}")
   @Transactional
-  public AnswerViewedByUser getAnswer(@PathVariable("answer") Answer answer) {
-    UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertAuthorization(answer.getQuestion().getReviewPoint());
+  public AnswerViewedByUser getAnswer(@PathVariable("answer") Answer answer)
+      throws NoAccessRightException {
+    currentUserFetcher.assertAuthorization(answer.getQuestion().getReviewPoint().getNote());
     AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
     AnswerViewedByUser answerResult = answerModel.getAnswerViewedByUser();
     answerResult.reviewPoint = answer.getQuestion().getReviewPoint();
     answerResult.quizQuestion =
-        new QuizQuestionViewedByUser(user, answer.getQuestion(), modelFactoryService);
+        new QuizQuestionViewedByUser(
+            currentUserFetcher.getUser(), answer.getQuestion(), modelFactoryService);
     return answerResult;
   }
 }

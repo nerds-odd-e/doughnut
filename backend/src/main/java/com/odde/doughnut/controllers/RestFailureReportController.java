@@ -27,7 +27,7 @@ class RestFailureReportController {
 
   @GetMapping("")
   public Iterable<FailureReport> failureReports() throws NoAccessRightException {
-    currentUserFetcher.getUser().getAuthorization().assertDeveloperAuthorization();
+    currentUserFetcher.assertDeveloperAuthorization();
     return modelFactoryService.failureReportRepository.findAll();
   }
 
@@ -39,7 +39,7 @@ class RestFailureReportController {
   @GetMapping("/{failureReport}")
   public FailureReportForView failureReport(FailureReport failureReport)
       throws NoAccessRightException {
-    currentUserFetcher.getUser().getAuthorization().assertDeveloperAuthorization();
+    currentUserFetcher.assertDeveloperAuthorization();
     FailureReportForView failureReportForView = new FailureReportForView();
     failureReportForView.failureReport = failureReport;
     failureReportForView.githubIssueUrl =

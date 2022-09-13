@@ -7,7 +7,6 @@ import com.odde.doughnut.entities.json.NoteRealm;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteViewer;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
 import javax.annotation.Resource;

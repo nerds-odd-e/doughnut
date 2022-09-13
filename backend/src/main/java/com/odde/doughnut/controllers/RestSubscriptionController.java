@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import java.util.List;
 import javax.validation.Valid;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,10 +30,9 @@ class RestSubscriptionController {
   public @Valid Subscription createSubscription(
       @PathVariable(name = "notebook") Notebook notebook, @Valid Subscription subscription)
       throws NoAccessRightException {
-    final UserModel userModel = currentUserFetcher.getUser();
-    userModel.getAuthorization().assertReadAuthorization(notebook);
+    currentUserFetcher.assertReadAuthorization(notebook);
     subscription.setNotebook(notebook);
-    subscription.setUser(userModel.getEntity());
+    subscription.setUser(currentUserFetcher.getUser().getEntity());
     modelFactoryService.entityManager.persist(subscription);
     return subscription;
   }
@@ -50,8 +48,7 @@ class RestSubscriptionController {
   @Transactional
   public List<Integer> destroySubscription(@Valid Subscription subscription)
       throws NoAccessRightException {
-    final UserModel userModel = currentUserFetcher.getUser();
-    userModel.getAuthorization().assertAuthorization(subscription);
+    currentUserFetcher.assertAuthorization(subscription);
     modelFactoryService.entityManager.remove(subscription);
     return List.of(1);
   }

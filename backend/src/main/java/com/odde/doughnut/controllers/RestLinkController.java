@@ -44,8 +44,7 @@ class RestLinkController {
 
   @GetMapping("/{link}")
   public Link show(@PathVariable("link") Link link) throws NoAccessRightException {
-    UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertReadAuthorization(link);
+    currentUserFetcher.assertReadAuthorization(link);
     return link;
   }
 
@@ -53,11 +52,10 @@ class RestLinkController {
   @Transactional
   public NoteRealm updateLink(Link link, @RequestBody LinkCreation linkCreation)
       throws NoAccessRightException {
-    UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertAuthorization(link);
+    currentUserFetcher.assertAuthorization(link);
     link.setLinkType(linkCreation.linkType);
     modelFactoryService.linkRepository.save(link);
-    return getNoteRealm(link, user, linkCreation.fromTargetPerspective);
+    return getNoteRealm(link, currentUserFetcher.getUser(), linkCreation.fromTargetPerspective);
   }
 
   private NoteRealm getNoteRealm(Link link, UserModel user, Boolean fromTargetPerspective) {
@@ -69,11 +67,10 @@ class RestLinkController {
   @Transactional
   public NoteRealm deleteLink(@PathVariable Link link, @PathVariable String perspective)
       throws NoAccessRightException {
-    UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertAuthorization(link);
+    currentUserFetcher.assertAuthorization(link);
     LinkModel linkModel = modelFactoryService.toLinkModel(link);
     linkModel.destroy();
-    return getNoteRealm(link, user, perspective.equals("tview"));
+    return getNoteRealm(link, currentUserFetcher.getUser(), perspective.equals("tview"));
   }
 
   @PostMapping(value = "/create/{sourceNote}/{targetNote}")

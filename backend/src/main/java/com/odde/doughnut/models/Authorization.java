@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.NoAccessRightException;
@@ -18,27 +17,23 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
 
   public void assertAuthorization(Note note) throws NoAccessRightException {
     assertLoggedIn();
-    if (!hasFullAuthority(note)) {
+    if (!hasFullAuthority(note.getNotebook())) {
       throw new NoAccessRightException();
     }
   }
 
-  public boolean hasFullAuthority(Note note) {
-    return hasFullAuthority(note.getNotebook());
+  public void assertReadAuthorization(Note note) throws NoAccessRightException {
+    assertReadAuthorization(note.getNotebook());
   }
 
-  public boolean hasFullAuthority(Notebook notebook) {
+  private boolean hasFullAuthority(Notebook notebook) {
     if (user == null) return false;
     return user.owns(notebook);
   }
 
-  public boolean hasReferenceAuthority(Note note) {
+  private boolean hasReferenceAuthority(Note note) {
     if (user == null) return false;
     return user.canReferTo(note.getNotebook());
-  }
-
-  public void assertReadAuthorization(Note note) throws NoAccessRightException {
-    assertReadAuthorization(note.getNotebook());
   }
 
   public void assertReadAuthorization(Notebook notebook) throws NoAccessRightException {
@@ -108,8 +103,6 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
   public static void throwUserNotFound() {
     throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User Not Found");
   }
-
-  public void assertAuthorization(ReviewPoint reviewPoint) {}
 
   public void assertReadAuthorization(Link link) throws NoAccessRightException {
     assertReadAuthorization(link.getSourceNote());

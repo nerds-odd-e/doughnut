@@ -43,9 +43,9 @@ class RestNotebookController {
 
   @GetMapping("")
   public NotebooksViewedByUser myNotebooks() {
-    UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertLoggedIn();
+    currentUserFetcher.assertLoggedIn();
 
+    UserModel user = currentUserFetcher.getUser();
     NotebooksViewedByUser notebooksViewedByUser =
         new JsonViewer(user.getEntity())
             .jsonNotebooksViewedByUser(user.getEntity().getOwnership().getNotebooks());
@@ -55,9 +55,8 @@ class RestNotebookController {
 
   @PostMapping({"/create"})
   public RedirectToNoteResponse createNotebook(@Valid @ModelAttribute TextContent textContent) {
-    UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertLoggedIn();
-    User userEntity = user.getEntity();
+    currentUserFetcher.assertLoggedIn();
+    User userEntity = currentUserFetcher.getUser().getEntity();
     Note note =
         userEntity
             .getOwnership()
@@ -69,8 +68,7 @@ class RestNotebookController {
   @PostMapping(value = "/{notebook}")
   @Transactional
   public Notebook update(@Valid Notebook notebook) throws NoAccessRightException {
-    UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertAuthorization(notebook);
+    currentUserFetcher.assertAuthorization(notebook);
     modelFactoryService.notebookRepository.save(notebook);
     return notebook;
   }
@@ -78,8 +76,7 @@ class RestNotebookController {
   @PostMapping(value = "/{notebook}/share")
   public Notebook shareNote(@PathVariable("notebook") Notebook notebook)
       throws NoAccessRightException {
-    UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertAuthorization(notebook);
+    currentUserFetcher.assertAuthorization(notebook);
     BazaarModel bazaar = modelFactoryService.toBazaarModel();
     bazaar.shareNote(notebook);
     return notebook;

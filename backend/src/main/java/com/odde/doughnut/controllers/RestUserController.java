@@ -34,7 +34,7 @@ record RestUserController(
 
   @PatchMapping("/{user}")
   public @Valid User updateUser(@Valid User user) throws NoAccessRightException {
-    currentUserFetcher.getUser().getAuthorization().assertAuthorization(user);
+    currentUserFetcher.assertAuthorization(user);
     modelFactoryService.userRepository.save(user);
     return user;
   }
