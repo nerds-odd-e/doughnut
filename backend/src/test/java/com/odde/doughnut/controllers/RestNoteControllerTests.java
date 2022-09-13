@@ -344,7 +344,7 @@ class RestNoteControllerTests {
     }
 
     @Test
-    void shouldUpdateNoteWithUniqueWikidataId() throws BindException {
+    void shouldUpdateNoteWithUniqueWikidataId() throws BindException, NoAccessRightException {
       WikidataAssociationCreation wikidataAssociationCreation = new WikidataAssociationCreation();
       wikidataAssociationCreation.wikidataId = "Q123";
       controller.updateWikidataId(note, wikidataAssociationCreation);

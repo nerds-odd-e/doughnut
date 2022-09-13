@@ -47,7 +47,8 @@ class RestNoteController {
   public NoteRealm updateWikidataId(
       @PathVariable(name = "note") Note note,
       @RequestBody WikidataAssociationCreation wikidataAssociationCreation)
-      throws BindException {
+      throws BindException, NoAccessRightException {
+    currentUserFetcher.assertAuthorization(note);
     associateToWikidata(note, wikidataAssociationCreation.wikidataId);
     modelFactoryService.noteRepository.save(note);
     return new NoteViewer(currentUserFetcher.getUser().getEntity(), note).toJsonObject();
@@ -59,9 +60,8 @@ class RestNoteController {
       @PathVariable(name = "parentNote") Note parentNote,
       @Valid @ModelAttribute NoteCreation noteCreation)
       throws NoAccessRightException, BindException, InterruptedException {
-    final UserModel userModel = currentUserFetcher.getUser();
-    userModel.getAuthorization().assertAuthorization(parentNote);
-    User user = userModel.getEntity();
+    currentUserFetcher.assertAuthorization(parentNote);
+    User user = currentUserFetcher.getUser().getEntity();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     Note note = parentNote.buildChildNote(user, currentUTCTimestamp, noteCreation.textContent);
     associateToWikidata(note, noteCreation.wikidataId);
@@ -76,18 +76,15 @@ class RestNoteController {
 
   @GetMapping("/{note}")
   public NoteRealmWithPosition show(@PathVariable("note") Note note) throws NoAccessRightException {
-    final UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertReadAuthorization(note);
-    return NoteRealmWithPosition.fromNote(note, user.getEntity());
+    currentUserFetcher.assertReadAuthorization(note);
+    return NoteRealmWithPosition.fromNote(note, currentUserFetcher.getUser().getEntity());
   }
 
   @GetMapping("/{note}/overview")
   public NoteRealmWithAllDescendants showOverview(@PathVariable("note") Note note)
       throws NoAccessRightException {
-    final UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertReadAuthorization(note);
-
-    return NoteRealmWithAllDescendants.fromNote(note, user);
+    currentUserFetcher.assertReadAuthorization(note);
+    return NoteRealmWithAllDescendants.fromNote(note, currentUserFetcher.getUser());
   }
 
   @PatchMapping(path = "/{note}")
@@ -96,20 +93,19 @@ class RestNoteController {
       @PathVariable(name = "note") Note note,
       @Valid @ModelAttribute NoteAccessories noteAccessories)
       throws NoAccessRightException, IOException {
-    final UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertAuthorization(note);
+    currentUserFetcher.assertAuthorization(note);
 
+    final User user = currentUserFetcher.getUser().getEntity();
     noteAccessories.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
-
-    note.updateNoteContent(noteAccessories, user.getEntity());
+    note.updateNoteContent(noteAccessories, user);
     modelFactoryService.noteRepository.save(note);
-    return new NoteViewer(user.getEntity(), note).toJsonObject();
+    return new NoteViewer(user, note).toJsonObject();
   }
 
   @GetMapping("/{note}/note-info")
   public NoteInfo getNoteInfo(@PathVariable("note") Note note) throws NoAccessRightException {
+    currentUserFetcher.assertReadAuthorization(note);
     final UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertReadAuthorization(note);
     NoteInfo noteInfo = new NoteInfo();
     noteInfo.setReviewPoint(user.getReviewPointFor(note));
     noteInfo.setNote(new NoteViewer(user.getEntity(), note).toJsonObject());
@@ -129,13 +125,13 @@ class RestNoteController {
   @PostMapping(value = "/{note}/delete")
   @Transactional
   public List<NoteRealm> deleteNote(@PathVariable("note") Note note) throws NoAccessRightException {
-    UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertAuthorization(note);
+    currentUserFetcher.assertAuthorization(note);
     modelFactoryService.toNoteModel(note).destroy(testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.entityManager.flush();
     Note parentNote = note.getParentNote();
     if (parentNote != null) {
-      return List.of(new NoteViewer(user.getEntity(), parentNote).toJsonObject());
+      return List.of(
+          new NoteViewer(currentUserFetcher.getUser().getEntity(), parentNote).toJsonObject());
     }
     return List.of();
   }
@@ -143,19 +139,17 @@ class RestNoteController {
   @PatchMapping(value = "/{note}/undo-delete")
   @Transactional
   public NoteRealm undoDeleteNote(@PathVariable("note") Note note) throws NoAccessRightException {
-    UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertAuthorization(note);
+    currentUserFetcher.assertAuthorization(note);
     modelFactoryService.toNoteModel(note).restore();
     modelFactoryService.entityManager.flush();
 
-    return new NoteViewer(user.getEntity(), note).toJsonObject();
+    return new NoteViewer(currentUserFetcher.getUser().getEntity(), note).toJsonObject();
   }
 
   @GetMapping("/{note}/position")
   public NotePositionViewedByUser getPosition(Note note) throws NoAccessRightException {
-    UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertAuthorization(note);
-    return new NoteViewer(user.getEntity(), note).jsonNotePosition();
+    currentUserFetcher.assertAuthorization(note);
+    return new NoteViewer(currentUserFetcher.getUser().getEntity(), note).jsonNotePosition();
   }
 
   @PostMapping(value = "/{note}/review-setting")
@@ -163,7 +157,7 @@ class RestNoteController {
   public RedirectToNoteResponse updateReviewSetting(
       @PathVariable("note") Note note, @Valid @RequestBody ReviewSetting reviewSetting)
       throws NoAccessRightException {
-    currentUserFetcher.getUser().getAuthorization().assertAuthorization(note);
+    currentUserFetcher.assertAuthorization(note);
     note.mergeMasterReviewSetting(reviewSetting);
     modelFactoryService.noteRepository.save(note);
     return new RedirectToNoteResponse(note.getId());
