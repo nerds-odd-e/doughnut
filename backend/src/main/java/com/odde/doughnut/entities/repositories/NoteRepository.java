@@ -43,7 +43,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
       value =
           selectFromNoteJoinTextContent
               + " WHERE note.notebook_id = :#{#newNote.notebook} "
-            + " AND note.wikidata_id = :#{#newNote.wikidataId} AND note.wikidata_id IS NOT NULL AND note.deleted_at IS NULL ",
+              + " AND note.wikidata_id = :#{#newNote.wikidataId} AND note.wikidata_id IS NOT NULL AND note.deleted_at IS NULL ",
       nativeQuery = true)
   List<Note> duplicateNotesWithinSameNotebook(@Param("newNote") Note newNote);
 

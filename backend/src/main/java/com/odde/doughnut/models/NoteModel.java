@@ -3,9 +3,14 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
+import java.util.List;
+import org.apache.logging.log4j.util.Strings;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
 
 public class NoteModel {
-  protected final Note entity;
+  public final Note entity;
   protected final ModelFactoryService modelFactoryService;
 
   public NoteModel(Note note, ModelFactoryService modelFactoryService) {
@@ -36,5 +41,19 @@ public class NoteModel {
     modelFactoryService.noteRepository.undoDeleteDescendants(entity, entity.getDeletedAt());
     entity.setDeletedAt(null);
     modelFactoryService.noteRepository.save(entity);
+  }
+
+  public void checkDuplicateWikidataId() throws BindException {
+    if (Strings.isEmpty(entity.getWikidataId())) {
+      return;
+    }
+    List<Note> existingNotes =
+        modelFactoryService.noteRepository.duplicateNotesWithinSameNotebook(entity);
+    if (existingNotes.stream().anyMatch(n -> !n.equals(entity))) {
+      BindingResult bindingResult =
+          new BeanPropertyBindingResult(entity.getWikidataId(), "wikidataId");
+      bindingResult.rejectValue(null, "error.error", "Duplicate Wikidata ID Detected.");
+      throw new BindException(bindingResult);
+    }
   }
 }

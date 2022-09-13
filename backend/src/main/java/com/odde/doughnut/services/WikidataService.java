@@ -6,7 +6,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.WikidataEntity;
 import com.odde.doughnut.entities.json.WikidataSearchEntity;
 import com.odde.doughnut.models.WikidataLocationModel;
@@ -17,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.Data;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.util.UriComponentsBuilder;
 
 public record WikidataService(HttpClientAdapter httpClientAdapter, String wikidataUrl) {
@@ -79,20 +77,12 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     }
   }
 
-  public void assignWikidataLocationDataToNote(Note note, String wikidataId) {
-    if (Strings.isEmpty(wikidataId)) {
-      return;
-    }
-    WikidataLocationModel locationData;
-    locationData = getEntityLocationDataById(wikidataId);
+  public String getLocationDescription(String wikidataId) {
+    WikidataLocationModel locationData = getEntityLocationDataById(wikidataId);
     if (locationData != null) {
-      String prevDesc =
-          note.getTextContent().getDescription() != null
-              ? note.getTextContent().getDescription()
-              : "";
-      String desc = locationData + "\n" + prevDesc;
-      note.getTextContent().setDescription(desc);
+      return locationData.toString();
     }
+    return null;
   }
 
   public WikidataLocationModel getEntityLocationDataById(String wikidataId) {

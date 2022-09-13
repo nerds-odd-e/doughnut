@@ -331,4 +331,8 @@ public class Note extends Thingy {
     if (masterReviewSetting == null) return ReviewSetting.defaultLevel;
     return masterReviewSetting.getLevel();
   }
+
+  public void prependDescription(String addition) {
+    textContent.prependDescription(addition);
+  }
 }

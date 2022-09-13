@@ -38,4 +38,10 @@ public class TextContent {
     setTitle(textContent.getTitle());
     setDescription(textContent.getDescription());
   }
+
+  void prependDescription(String addition) {
+    String prevDesc = getDescription() != null ? getDescription() : "";
+    String desc = addition + "\n" + prevDesc;
+    setDescription(desc);
+  }
 }

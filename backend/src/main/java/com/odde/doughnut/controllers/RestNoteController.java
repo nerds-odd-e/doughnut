@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.Link.LinkType;
 import com.odde.doughnut.entities.json.*;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.NoteModel;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.SearchTermModel;
 import com.odde.doughnut.models.UserModel;
@@ -16,12 +17,9 @@ import java.io.IOException;
 import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.Valid;
-
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -53,9 +51,9 @@ class RestNoteController {
       @RequestBody WikidataAssociationCreation wikidataAssociationCreation)
       throws BindException {
 
-    String wikidataId = wikidataAssociationCreation.wikidataId;
+    note.setWikidataId(wikidataAssociationCreation.wikidataId);
     WikidataService wikidataService = getWikidataService();
-    assignWikidataInfo(note, wikidataId, wikidataService);
+    assignWikidataInfo(note, wikidataService);
     modelFactoryService.noteRepository.save(note);
     return new NoteViewer(currentUserFetcher.getUser().getEntity(), note).toJsonObject();
   }
@@ -73,7 +71,8 @@ class RestNoteController {
         Note.createNote(
             user, testabilitySettings.getCurrentUTCTimestamp(), noteCreation.textContent);
     note.setParentNote(parentNote);
-    assignWikidataInfo(note, noteCreation.getWikidataId(), getWikidataService());
+    note.setWikidataId(noteCreation.getWikidataId());
+    assignWikidataInfo(note, getWikidataService());
 
     modelFactoryService.noteRepository.save(note);
     LinkType linkTypeToParent = noteCreation.getLinkTypeToParent();
@@ -189,24 +188,15 @@ class RestNoteController {
     return new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
   }
 
-  private void assignWikidataInfo(Note note, String wikidataId, WikidataService wikidataService)
-      throws BindException {
-    note.setWikidataId(wikidataId);
-    checkDuplicateWikidataId(note);
-    wikidataService.assignWikidataLocationDataToNote(note, wikidataId);
-  }
-
-  private void checkDuplicateWikidataId(Note note)
-      throws BindException {
+  private void assignWikidataInfo(Note note, WikidataService wikidataService) throws BindException {
+    NoteModel noteModel = modelFactoryService.toNoteModel(note);
+    noteModel.checkDuplicateWikidataId();
     if (Strings.isEmpty(note.getWikidataId())) {
       return;
     }
-    List<Note> existingNotes =
-        modelFactoryService.noteRepository.duplicateNotesWithinSameNotebook(note);
-    if (existingNotes.stream().anyMatch(n -> !n.equals(note))) {
-      BindingResult bindingResult = new BeanPropertyBindingResult(note.getWikidataId(), "wikidataId");
-      bindingResult.rejectValue(null, "error.error", "Duplicate Wikidata ID Detected.");
-      throw new BindException(bindingResult);
+    String locationDescription = wikidataService.getLocationDescription(note.getWikidataId());
+    if (locationDescription != null) {
+      note.prependDescription(locationDescription);
     }
   }
 }
