@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.Data;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.util.UriComponentsBuilder;
 
 public record WikidataService(HttpClientAdapter httpClientAdapter, String wikidataUrl) {
@@ -78,6 +79,9 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
   }
 
   public String getLocationDescription(String wikidataId) {
+    if (Strings.isEmpty(wikidataId)) {
+      return null;
+    }
     WikidataLocationModel locationData = getEntityLocationDataById(wikidataId);
     if (locationData != null) {
       return locationData.toString();

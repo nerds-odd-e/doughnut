@@ -6,7 +6,6 @@ import com.odde.doughnut.entities.Link.LinkType;
 import com.odde.doughnut.entities.json.*;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.NoteModel;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.SearchTermModel;
 import com.odde.doughnut.models.UserModel;
@@ -14,10 +13,10 @@ import com.odde.doughnut.services.HttpClientAdapter;
 import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
@@ -50,10 +49,9 @@ class RestNoteController {
       @PathVariable(name = "note") Note note,
       @RequestBody WikidataAssociationCreation wikidataAssociationCreation)
       throws BindException {
-
-    note.setWikidataId(wikidataAssociationCreation.wikidataId);
-    WikidataService wikidataService = getWikidataService();
-    assignWikidataInfo(note, wikidataService);
+    modelFactoryService
+        .toNoteModel(note)
+        .associateWithWikidataId(wikidataAssociationCreation.wikidataId, getWikidataService());
     modelFactoryService.noteRepository.save(note);
     return new NoteViewer(currentUserFetcher.getUser().getEntity(), note).toJsonObject();
   }
@@ -67,33 +65,31 @@ class RestNoteController {
     final UserModel userModel = currentUserFetcher.getUser();
     userModel.getAuthorization().assertAuthorization(parentNote);
     User user = userModel.getEntity();
-    Note note =
-        Note.createNote(
-            user, testabilitySettings.getCurrentUTCTimestamp(), noteCreation.textContent);
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+    Note note = Note.createNote(user, currentUTCTimestamp, noteCreation.textContent);
     note.setParentNote(parentNote);
-    note.setWikidataId(noteCreation.getWikidataId());
-    assignWikidataInfo(note, getWikidataService());
-
+    modelFactoryService
+        .toNoteModel(note)
+        .associateWithWikidataId(noteCreation.wikidataId, getWikidataService());
     modelFactoryService.noteRepository.save(note);
-    LinkType linkTypeToParent = noteCreation.getLinkTypeToParent();
+    createLinkToParent(user, note, noteCreation.getLinkTypeToParent(), currentUTCTimestamp);
+    return NoteRealmWithPosition.fromNote(note, user);
+  }
+
+  private void createLinkToParent(
+      User user, Note note, LinkType linkTypeToParent, Timestamp currentUTCTimestamp) {
     if (linkTypeToParent != LinkType.NO_LINK) {
       Link link =
-          Link.createLink(
-              note,
-              parentNote,
-              user,
-              linkTypeToParent,
-              testabilitySettings.getCurrentUTCTimestamp());
+          Link.createLink(note, note.getParentNote(), user, linkTypeToParent, currentUTCTimestamp);
       modelFactoryService.linkRepository.save(link);
     }
-    return NoteRealmWithPosition.fromNote(note, userModel);
   }
 
   @GetMapping("/{note}")
   public NoteRealmWithPosition show(@PathVariable("note") Note note) throws NoAccessRightException {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertReadAuthorization(note);
-    return NoteRealmWithPosition.fromNote(note, user);
+    return NoteRealmWithPosition.fromNote(note, user.getEntity());
   }
 
   @GetMapping("/{note}/overview")
@@ -186,17 +182,5 @@ class RestNoteController {
 
   private WikidataService getWikidataService() {
     return new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
-  }
-
-  private void assignWikidataInfo(Note note, WikidataService wikidataService) throws BindException {
-    NoteModel noteModel = modelFactoryService.toNoteModel(note);
-    noteModel.checkDuplicateWikidataId();
-    if (Strings.isEmpty(note.getWikidataId())) {
-      return;
-    }
-    String locationDescription = wikidataService.getLocationDescription(note.getWikidataId());
-    if (locationDescription != null) {
-      note.prependDescription(locationDescription);
-    }
   }
 }

@@ -2,6 +2,7 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.services.WikidataService;
 import java.sql.Timestamp;
 import java.util.List;
 import org.apache.logging.log4j.util.Strings;
@@ -10,8 +11,8 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 
 public class NoteModel {
-  public final Note entity;
-  protected final ModelFactoryService modelFactoryService;
+  private final Note entity;
+  private final ModelFactoryService modelFactoryService;
 
   public NoteModel(Note note, ModelFactoryService modelFactoryService) {
     this.entity = note;
@@ -43,7 +44,7 @@ public class NoteModel {
     modelFactoryService.noteRepository.save(entity);
   }
 
-  public void checkDuplicateWikidataId() throws BindException {
+  private void checkDuplicateWikidataId() throws BindException {
     if (Strings.isEmpty(entity.getWikidataId())) {
       return;
     }
@@ -54,6 +55,16 @@ public class NoteModel {
           new BeanPropertyBindingResult(entity.getWikidataId(), "wikidataId");
       bindingResult.rejectValue(null, "error.error", "Duplicate Wikidata ID Detected.");
       throw new BindException(bindingResult);
+    }
+  }
+
+  public void associateWithWikidataId(String wikidataId, WikidataService wikidataService)
+      throws BindException {
+    entity.setWikidataId(wikidataId);
+    checkDuplicateWikidataId();
+    String locationDescription = wikidataService.getLocationDescription(entity.getWikidataId());
+    if (locationDescription != null) {
+      entity.prependDescription(locationDescription);
     }
   }
 }
