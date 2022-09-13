@@ -42,13 +42,12 @@ class RestTextContentController {
   public NoteRealm updateNote(
       @PathVariable(name = "note") Note note, @Valid @ModelAttribute TextContent textContent)
       throws NoAccessRightException {
-    final UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertAuthorization(note);
+    currentUserFetcher.assertAuthorization(note);
 
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     note.getTextContent().updateTextContent(textContent, currentUTCTimestamp);
 
     modelFactoryService.noteRepository.save(note);
-    return new NoteViewer(user.getEntity(), note).toJsonObject();
+    return new NoteViewer(currentUserFetcher.getUser().getEntity(), note).toJsonObject();
   }
 }

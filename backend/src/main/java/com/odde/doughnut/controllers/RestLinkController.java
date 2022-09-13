@@ -85,15 +85,15 @@ class RestLinkController {
       BindingResult bindingResult)
       throws NoAccessRightException, CyclicLinkDetectedException, BindException {
     if (bindingResult.hasErrors()) throw new BindException(bindingResult);
-    UserModel userModel = currentUserFetcher.getUser();
-    userModel.getAuthorization().assertAuthorization(sourceNote);
-    userModel.getAuthorization().assertReadAuthorization(targetNote);
+    currentUserFetcher.assertAuthorization(sourceNote);
+    currentUserFetcher.assertReadAuthorization(targetNote);
     if (linkCreation != null && linkCreation.moveUnder != null && linkCreation.moveUnder) {
-      userModel.getAuthorization().assertAuthorization(targetNote);
+      currentUserFetcher.assertAuthorization(targetNote);
       modelFactoryService
           .toNoteMotionModel(sourceNote, targetNote, linkCreation.asFirstChild)
           .execute();
     }
+    UserModel userModel = currentUserFetcher.getUser();
     Link link =
         Link.createLink(
             sourceNote,
