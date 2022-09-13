@@ -58,13 +58,6 @@ class RestNoteController {
     return new NoteViewer(currentUserFetcher.getUser().getEntity(), note).toJsonObject();
   }
 
-  private void assignWikidataInfo(Note note, String wikidataId, WikidataService wikidataService)
-      throws BindException {
-    checkDuplicateWikidataId(note.getNotebook(), wikidataId);
-    note.setWikidataId(wikidataId);
-    wikidataService.assignWikidataLocationDataToNote(note, wikidataId);
-  }
-
   @PostMapping(value = "/{parentNote}/create")
   @Transactional
   public NoteRealmWithPosition createNote(
@@ -194,13 +187,21 @@ class RestNoteController {
     return new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
   }
 
-  private void checkDuplicateWikidataId(Notebook notebook, String wikidataId) throws BindException {
+  private void assignWikidataInfo(Note note, String wikidataId, WikidataService wikidataService)
+      throws BindException {
+    checkDuplicateWikidataId(note, note.getNotebook(), wikidataId);
+    note.setWikidataId(wikidataId);
+    wikidataService.assignWikidataLocationDataToNote(note, wikidataId);
+  }
+
+  private void checkDuplicateWikidataId(Note note, Notebook notebook, String wikidataId)
+      throws BindException {
     if (wikidataId == null || wikidataId.isEmpty()) {
       return;
     }
     List<Note> existingNotes =
         modelFactoryService.noteRepository.searchInNotebookForNoteByWikidataId(
-            notebook, wikidataId);
+            notebook, wikidataId, note);
     if (!existingNotes.isEmpty()) {
       BindingResult bindingResult = new BeanPropertyBindingResult(wikidataId, "wikidataId");
       bindingResult.rejectValue(null, "error.error", "Duplicate Wikidata ID Detected.");

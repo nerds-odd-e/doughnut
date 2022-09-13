@@ -46,7 +46,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
               + searchForExistingWikidataId,
       nativeQuery = true)
   List<Note> searchInNotebookForNoteByWikidataId(
-      @Param("notebook") Notebook notebook, @Param("wikidataId") String wikidataId);
+      @Param("notebook") Notebook notebook, @Param("wikidataId") String wikidataId, Note note);
 
   String joinNotebooksBegin =
       selectFromNoteJoinTextContent + "  JOIN (" + "          SELECT notebook.id FROM notebook ";

@@ -175,4 +175,9 @@ public class NoteBuilder extends EntityBuilder<Note> {
     entity.setDeletedAt(timestamp);
     return this;
   }
+
+  public NoteBuilder wikidataId(String wikidataId) {
+    entity.setWikidataId(wikidataId);
+    return this;
+  }
 }

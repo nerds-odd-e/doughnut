@@ -172,7 +172,7 @@ class RestNoteControllerTests {
     @Test
     void shouldThrowWhenCreatingNoteWithWikidataIdExistsInAnotherNote() {
       String conflictingWikidataId = "Q123";
-      parent.setWikidataId(conflictingWikidataId);
+      makeMe.aNote().under(parent).wikidataId(conflictingWikidataId).please();
       noteCreation.setWikidataId(conflictingWikidataId);
       BindException bindException =
           assertThrows(BindException.class, () -> controller.createNote(parent, noteCreation));
@@ -341,8 +341,6 @@ class RestNoteControllerTests {
     void setup() {
       parent = makeMe.aNote().creatorAndOwner(userModel).please();
       note = makeMe.aNote().under(parent).please();
-      note.setWikidataId(noteWikidataId);
-      makeMe.refresh(note);
     }
 
     @Test
@@ -356,7 +354,7 @@ class RestNoteControllerTests {
 
     @Test
     void shouldNotUpdateWikidataIdIfParentNoteSameWikidataId() {
-      parent.setWikidataId(noteWikidataId);
+      makeMe.aNote().under(parent).wikidataId(noteWikidataId).please();
 
       WikidataAssociationCreation wikidataAssociationCreation = new WikidataAssociationCreation();
       wikidataAssociationCreation.wikidataId = noteWikidataId;
