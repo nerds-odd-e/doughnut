@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.Valid;
+
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
@@ -189,21 +191,20 @@ class RestNoteController {
 
   private void assignWikidataInfo(Note note, String wikidataId, WikidataService wikidataService)
       throws BindException {
-    checkDuplicateWikidataId(note, note.getNotebook(), wikidataId);
     note.setWikidataId(wikidataId);
+    checkDuplicateWikidataId(note);
     wikidataService.assignWikidataLocationDataToNote(note, wikidataId);
   }
 
-  private void checkDuplicateWikidataId(Note note, Notebook notebook, String wikidataId)
+  private void checkDuplicateWikidataId(Note note)
       throws BindException {
-    if (wikidataId == null || wikidataId.isEmpty()) {
+    if (Strings.isEmpty(note.getWikidataId())) {
       return;
     }
     List<Note> existingNotes =
-        modelFactoryService.noteRepository.searchInNotebookForNoteByWikidataId(
-            notebook, wikidataId, note);
-    if (!existingNotes.isEmpty()) {
-      BindingResult bindingResult = new BeanPropertyBindingResult(wikidataId, "wikidataId");
+        modelFactoryService.noteRepository.duplicateNotesWithinSameNotebook(note);
+    if (existingNotes.stream().anyMatch(n -> !n.equals(note))) {
+      BindingResult bindingResult = new BeanPropertyBindingResult(note.getWikidataId(), "wikidataId");
       bindingResult.rejectValue(null, "error.error", "Duplicate Wikidata ID Detected.");
       throw new BindException(bindingResult);
     }
