@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.algorithms.ClozeDescription;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
-import com.odde.doughnut.entities.validators.ValidateWikidataIdUniquenessWithinNotebook;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -27,7 +26,6 @@ import org.thymeleaf.util.StringUtils;
 @Entity
 @Table(name = "note")
 @JsonPropertyOrder({"title", "shortDescription", "parentId"})
-@ValidateWikidataIdUniquenessWithinNotebook
 public class Note extends Thingy {
   private Note() {}
 
