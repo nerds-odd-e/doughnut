@@ -15,36 +15,16 @@ public interface CurrentUserFetcher {
     return getUser().getEntity();
   }
 
-  default void assertAuthorization(Note note) throws NoAccessRightException {
-    getUser().getAuthorization().assertAuthorization(note);
+  default <T> void assertAuthorization(T object) throws NoAccessRightException {
+    getUser().getAuthorization().assertAuthorization(object);
   }
 
   default void assertReadAuthorization(Note note) throws NoAccessRightException {
     getUser().getAuthorization().assertReadAuthorization(note);
   }
 
-  default void assertAuthorization(Notebook notebook) throws NoAccessRightException {
-    getUser().getAuthorization().assertAuthorization(notebook);
-  }
-
   default void assertReadAuthorization(Notebook notebook) throws NoAccessRightException {
     getUser().getAuthorization().assertReadAuthorization(notebook);
-  }
-
-  default void assertAuthorization(Circle circle) throws NoAccessRightException {
-    getUser().getAuthorization().assertAuthorization(circle);
-  }
-
-  default void assertAuthorization(Subscription subscription) throws NoAccessRightException {
-    getUser().getAuthorization().assertAuthorization(subscription);
-  }
-
-  default void assertAuthorization(User user) throws NoAccessRightException {
-    getUser().getAuthorization().assertAuthorization(user);
-  }
-
-  default void assertAuthorization(Link link) throws NoAccessRightException {
-    getUser().getAuthorization().assertAuthorization(link);
   }
 
   default void assertReadAuthorization(Link link) throws NoAccessRightException {

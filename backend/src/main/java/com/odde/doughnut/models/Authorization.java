@@ -15,7 +15,25 @@ import org.springframework.web.server.ResponseStatusException;
 
 public record Authorization(User user, ModelFactoryService modelFactoryService) {
 
-  public void assertAuthorization(Note note) throws NoAccessRightException {
+  public <T> void assertAuthorization(T object) throws NoAccessRightException {
+    if (object instanceof Note) {
+      assertAuthorization((Note) object);
+    } else if (object instanceof Notebook) {
+      assertAuthorization((Notebook) object);
+    } else if (object instanceof Circle) {
+      assertAuthorization((Circle) object);
+    } else if (object instanceof Subscription) {
+      assertAuthorization((Subscription) object);
+    } else if (object instanceof User) {
+      assertAuthorization((User) object);
+    } else if (object instanceof Link) {
+      assertAuthorization((Link) object);
+    } else {
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unknown object type");
+    }
+  }
+
+  private void assertAuthorization(Note note) throws NoAccessRightException {
     assertLoggedIn();
     if (!hasFullAuthority(note.getNotebook())) {
       throw new NoAccessRightException();
@@ -49,32 +67,32 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
     throw new NoAccessRightException();
   }
 
-  public void assertAuthorization(Notebook notebook) throws NoAccessRightException {
+  private void assertAuthorization(Notebook notebook) throws NoAccessRightException {
     if (!hasFullAuthority(notebook)) {
       throw new NoAccessRightException();
     }
   }
 
-  public void assertAuthorization(Circle circle) throws NoAccessRightException {
+  private void assertAuthorization(Circle circle) throws NoAccessRightException {
     assertLoggedIn();
     if (user == null || !user.inCircle(circle)) {
       throw new NoAccessRightException();
     }
   }
 
-  public void assertAuthorization(Subscription subscription) throws NoAccessRightException {
+  private void assertAuthorization(Subscription subscription) throws NoAccessRightException {
     if (subscription.getUser() != user) {
       throw new NoAccessRightException();
     }
   }
 
-  public void assertAuthorization(User user) throws NoAccessRightException {
+  private void assertAuthorization(User user) throws NoAccessRightException {
     if (!this.user.getId().equals(user.getId())) {
       throw new NoAccessRightException();
     }
   }
 
-  public void assertAuthorization(Link link) throws NoAccessRightException {
+  private void assertAuthorization(Link link) throws NoAccessRightException {
     if (!link.getSourceNote().getThing().getCreator().getId().equals(user.getId())) {
       throw new NoAccessRightException();
     }
