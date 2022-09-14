@@ -62,7 +62,10 @@ public class NoteModel {
       throws BindException {
     entity.setWikidataId(wikidataId);
     checkDuplicateWikidataId();
-    String locationDescription = wikidataService.getLocationDescription(entity.getWikidataId());
+    if (Strings.isEmpty(wikidataId)) {
+      return;
+    }
+    String locationDescription = wikidataService.getWikidataLocationDescription(wikidataId);
     if (locationDescription != null) {
       entity.prependDescription(locationDescription);
     }

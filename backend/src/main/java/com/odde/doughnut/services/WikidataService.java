@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.json.WikidataEntity;
 import com.odde.doughnut.entities.json.WikidataSearchEntity;
-import com.odde.doughnut.models.WikidataLocationModel;
 import java.io.IOException;
 import java.net.URI;
 import java.util.LinkedHashMap;
@@ -16,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.Data;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.util.UriComponentsBuilder;
 
 public record WikidataService(HttpClientAdapter httpClientAdapter, String wikidataUrl) {
@@ -78,25 +76,12 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     }
   }
 
-  public String getLocationDescription(String wikidataId) {
-    if (Strings.isEmpty(wikidataId)) {
-      return null;
-    }
-    WikidataLocationModel locationData = getEntityLocationDataById(wikidataId);
-    if (locationData != null) {
-      return locationData.toString();
-    }
-    return null;
-  }
-
-  public WikidataLocationModel getEntityLocationDataById(String wikidataId) {
+  public String getWikidataLocationDescription(String wikidataId) {
     final String locationId = "P625";
     WikidataEntityModel entity = null;
     try {
       entity = getEntityDataById(wikidataId);
-    } catch (IOException e) {
-    } catch (InterruptedException e) {
-
+    } catch (IOException | InterruptedException e) {
     }
 
     if (entity == null) return null;
@@ -104,8 +89,11 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     Map<String, Object> locationValue = entity.getStringObjectMap(wikidataId, locationId);
     if (locationValue == null) return null;
 
-    return new WikidataLocationModel(
-        locationValue.get("latitude").toString(), locationValue.get("longitude").toString());
+    return "Location: "
+        + locationValue.get("latitude").toString()
+        + "'N, "
+        + locationValue.get("longitude").toString()
+        + "'E";
   }
 
   private WikidataEntityModel getEntityDataById(String wikidataId)
