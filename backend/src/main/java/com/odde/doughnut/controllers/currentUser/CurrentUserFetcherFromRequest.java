@@ -7,6 +7,7 @@ import com.odde.doughnut.models.UserModel;
 import java.security.Principal;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
@@ -37,5 +38,11 @@ public class CurrentUserFetcherFromRequest implements CurrentUserFetcher {
   @Override
   public String getExternalIdentifier() {
     return externalId;
+  }
+
+  @Bean("currentUser")
+  @RequestScope
+  public UserModel getCurrentUser() {
+    return null;
   }
 }

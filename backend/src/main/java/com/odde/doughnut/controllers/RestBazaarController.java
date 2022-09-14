@@ -1,10 +1,10 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.json.NotebooksViewedByUser;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.models.JsonViewer;
+import com.odde.doughnut.models.UserModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,18 +13,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/bazaar")
 class RestBazaarController {
   private final ModelFactoryService modelFactoryService;
-  private final CurrentUserFetcher currentUserFetcher;
+  private UserModel currentUser;
 
-  public RestBazaarController(
-      ModelFactoryService modelFactoryService, CurrentUserFetcher currentUserFetcher) {
+  public RestBazaarController(ModelFactoryService modelFactoryService, UserModel currentUser) {
     this.modelFactoryService = modelFactoryService;
-    this.currentUserFetcher = currentUserFetcher;
+    this.currentUser = currentUser;
   }
 
   @GetMapping("")
   public NotebooksViewedByUser bazaar() {
     BazaarModel bazaar = modelFactoryService.toBazaarModel();
-    return new JsonViewer(currentUserFetcher.getUserEntity())
+    return new JsonViewer(currentUser.getEntity())
         .jsonNotebooksViewedByUser(bazaar.getAllNotebooks());
   }
 }
