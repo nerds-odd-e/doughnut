@@ -50,10 +50,7 @@ class RestNoteControllerTests {
     userModel = makeMe.aUser().toModelPlease();
     controller =
         new RestNoteController(
-            modelFactoryService,
-            new TestCurrentUserFetcher(userModel),
-            httpClientAdapter,
-            testabilitySettings);
+            modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
   }
 
   @Nested

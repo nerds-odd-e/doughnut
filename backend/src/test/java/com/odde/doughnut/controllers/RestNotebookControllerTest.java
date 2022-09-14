@@ -40,9 +40,7 @@ class RestNotebookControllerTest {
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
     topNote = makeMe.aNote().creatorAndOwner(userModel).please();
-    controller =
-        new RestNotebookController(
-            modelFactoryService, new TestCurrentUserFetcher(userModel), testabilitySettings);
+    controller = new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
   }
 
   @Nested
@@ -50,9 +48,7 @@ class RestNotebookControllerTest {
     @Test
     void whenNotLogin() {
       userModel = modelFactoryService.toUserModel(null);
-      controller =
-          new RestNotebookController(
-              modelFactoryService, new TestCurrentUserFetcher(userModel), testabilitySettings);
+      controller = new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
       assertThrows(ResponseStatusException.class, () -> controller.myNotebooks());
     }
 
@@ -61,9 +57,7 @@ class RestNotebookControllerTest {
       User user = new User();
       userModel = modelFactoryService.toUserModel(user);
       List<Notebook> notebooks = userModel.getEntity().getOwnership().getNotebooks();
-      controller =
-          new RestNotebookController(
-              modelFactoryService, new TestCurrentUserFetcher(userModel), testabilitySettings);
+      controller = new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
       assertEquals(notebooks, controller.myNotebooks().notebooks);
     }
   }
