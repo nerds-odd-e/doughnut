@@ -14,19 +14,11 @@ public class WikidataEntityModel {
     return entities.get(wikidataId);
   }
 
-  private Optional<Map<String, Object>> getFirstClaimOfProperty(
-      String wikidataId, String propertyId) {
+  private Optional<WikidataValue> getFirstClaimOfProperty(String wikidataId, String propertyId) {
     return Optional.ofNullable(getEntityItem(wikidataId).getFirstClaimOfProperty(propertyId));
   }
 
   public Optional<String> getLocationDescription(String wikidataId) {
-    return getFirstClaimOfProperty(wikidataId, "P625")
-        .map(
-            locationValue ->
-                "Location: "
-                    + locationValue.get("latitude").toString()
-                    + "'N, "
-                    + locationValue.get("longitude").toString()
-                    + "'E");
+    return getFirstClaimOfProperty(wikidataId, "P625").map(WikidataValue::toLocationDescription);
   }
 }

@@ -19,11 +19,11 @@ public class WikidataEntityItemModel {
     return claims.getOrDefault(propertyId, null);
   }
 
-  Map<String, Object> getFirstClaimOfProperty(String propertyId) {
+  WikidataValue getFirstClaimOfProperty(String propertyId) {
     List<WikidataEntityItemObjectModel> locationClaims = getProperty(propertyId);
     if (locationClaims == null) {
       return null;
     }
-    return locationClaims.get(0).getData();
+    return locationClaims.get(0).getValue();
   }
 }
