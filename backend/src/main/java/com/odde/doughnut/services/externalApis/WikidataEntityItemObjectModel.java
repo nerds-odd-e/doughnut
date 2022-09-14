@@ -25,7 +25,7 @@ public class WikidataEntityItemObjectModel {
 
   @JsonProperty("mainsnak")
   private void unpackNested(Map<String, JsonNode> mainsnak) {
-    if (mainsnak.containsKey(DATAVALUE_KEY) && mainsnak.get(DATAVALUE_KEY).has(VALUE_KEY)) {
+    if (mainsnak.containsKey(DATAVALUE_KEY) ) {
       ObjectMapper mapper = new ObjectMapper();
       JsonNode value = mainsnak.get(DATAVALUE_KEY);
       if (VALUE_TYPE.GLOBE_COORDINATE.compareToIgnoreCase(value.get(VALUE_TYPE_KEY).textValue())

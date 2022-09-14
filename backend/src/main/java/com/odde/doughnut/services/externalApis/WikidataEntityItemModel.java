@@ -13,14 +13,10 @@ public class WikidataEntityItemModel {
   Map<String, List<WikidataEntityItemObjectModel>> claims;
 
   List<WikidataEntityItemObjectModel> getProperty(String propertyId) {
-    if (getClaims() == null) {
+    if (claims == null) {
       return null;
     }
-    if (getClaims().containsKey(propertyId)) {
-      return getClaims().get(propertyId);
-    }
-
-    return null;
+    return claims.getOrDefault(propertyId, null);
   }
 
   Map<String, Object> getFirstClaimOfProperty(String propertyId) {
