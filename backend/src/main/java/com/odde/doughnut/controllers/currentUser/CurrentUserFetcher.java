@@ -14,18 +14,18 @@ public interface CurrentUserFetcher {
   }
 
   default <T> void assertAuthorization(T object) throws NoAccessRightException {
-    getUser().getAuthorization().assertAuthorization(object);
+    getUser().assertAuthorization(object);
   }
 
   default <T> void assertReadAuthorization(T object) throws NoAccessRightException {
-    getUser().getAuthorization().assertReadAuthorization(object);
+    getUser().assertReadAuthorization(object);
   }
 
   default void assertDeveloperAuthorization() throws NoAccessRightException {
-    getUser().getAuthorization().assertDeveloperAuthorization();
+    getUser().assertDeveloperAuthorization();
   }
 
   default void assertLoggedIn() {
-    getUser().getAuthorization().assertLoggedIn();
+    getUser().assertLoggedIn();
   }
 }

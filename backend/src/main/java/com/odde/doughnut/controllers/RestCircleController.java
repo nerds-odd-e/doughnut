@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.TextContent;
@@ -12,6 +11,7 @@ import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.JsonViewer;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.util.List;
 import javax.annotation.Resource;
@@ -31,38 +31,39 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/circles")
 class RestCircleController {
   private final ModelFactoryService modelFactoryService;
-  private final CurrentUserFetcher currentUserFetcher;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
+  private UserModel currentUser;
+
   public RestCircleController(
       ModelFactoryService modelFactoryService,
-      CurrentUserFetcher currentUserFetcher,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      UserModel currentUser) {
     this.modelFactoryService = modelFactoryService;
-    this.currentUserFetcher = currentUserFetcher;
     this.testabilitySettings = testabilitySettings;
+    this.currentUser = currentUser;
   }
 
   @GetMapping("/{circle}")
   public CircleForUserView showCircle(@PathVariable("circle") Circle circle)
       throws NoAccessRightException {
-    currentUserFetcher.assertAuthorization(circle);
-    JsonViewer jsonViewer = new JsonViewer(currentUserFetcher.getUserEntity());
+    currentUser.assertAuthorization(circle);
+    JsonViewer jsonViewer = new JsonViewer(currentUser.getEntity());
     return jsonViewer.jsonCircleForUserView(circle);
   }
 
   @GetMapping("")
   public List<Circle> index() {
-    currentUserFetcher.assertLoggedIn();
-    return currentUserFetcher.getUserEntity().getCircles();
+    currentUser.assertLoggedIn();
+    return currentUser.getEntity().getCircles();
   }
 
   @PostMapping("")
   public Circle createCircle(@Valid Circle circle) {
     CircleModel circleModel = modelFactoryService.toCircleModel(circle);
-    circleModel.joinAndSave(currentUserFetcher.getUserEntity());
+    circleModel.joinAndSave(currentUser.getEntity());
     return circle;
   }
 
@@ -80,7 +81,7 @@ class RestCircleController {
 
       throw new BindException(bindingResult);
     }
-    User user = currentUserFetcher.getUserEntity();
+    User user = currentUser.getEntity();
     if (user.inCircle(circleModel.getEntity())) {
       BindingResult bindingResult =
           new BeanPropertyBindingResult(circleJoiningByInvitation, "circle");
@@ -94,15 +95,13 @@ class RestCircleController {
   @PostMapping({"/{circle}/notebooks"})
   public RedirectToNoteResponse createNotebook(
       Circle circle, @Valid @ModelAttribute TextContent textContent) throws NoAccessRightException {
-    currentUserFetcher.assertLoggedIn();
-    currentUserFetcher.assertAuthorization(circle);
+    currentUser.assertLoggedIn();
+    currentUser.assertAuthorization(circle);
     Note note =
         circle
             .getOwnership()
             .createNotebook(
-                currentUserFetcher.getUserEntity(),
-                textContent,
-                testabilitySettings.getCurrentUTCTimestamp());
+                currentUser.getEntity(), textContent, testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.noteRepository.save(note);
     return new RedirectToNoteResponse(note.getId());
   }

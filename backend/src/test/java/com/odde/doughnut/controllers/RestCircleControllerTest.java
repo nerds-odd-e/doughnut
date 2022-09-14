@@ -40,9 +40,7 @@ class RestCircleControllerTest {
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    controller =
-        new RestCircleController(
-            modelFactoryService, new TestCurrentUserFetcher(userModel), testabilitySettings);
+    controller = new RestCircleController(modelFactoryService, testabilitySettings, userModel);
   }
 
   @Nested
@@ -51,9 +49,7 @@ class RestCircleControllerTest {
     void itShouldNotAllowNonMemberToSeeACircle() {
       controller =
           new RestCircleController(
-              modelFactoryService,
-              new TestCurrentUserFetcher(makeMe.aNullUserModel()),
-              testabilitySettings);
+              modelFactoryService, testabilitySettings, makeMe.aNullUserModel());
       assertThrows(
           ResponseStatusException.class,
           () -> {
@@ -78,9 +74,7 @@ class RestCircleControllerTest {
     @Test
     void itShouldCircleForUserViewIfAuthorized() throws NoAccessRightException {
       UserModel user = makeMe.aUser().toModelPlease();
-      controller =
-          new RestCircleController(
-              modelFactoryService, new TestCurrentUserFetcher(user), testabilitySettings);
+      controller = new RestCircleController(modelFactoryService, testabilitySettings, user);
 
       Circle circle = makeMe.aCircle().please();
       circle.setName("Some circle");
@@ -105,9 +99,7 @@ class RestCircleControllerTest {
       Circle circle = makeMe.aCircle().please();
       controller =
           new RestCircleController(
-              modelFactoryService,
-              new TestCurrentUserFetcher(makeMe.aNullUserModel()),
-              testabilitySettings);
+              modelFactoryService, testabilitySettings, makeMe.aNullUserModel());
       assertThrows(
           ResponseStatusException.class,
           () -> {

@@ -43,6 +43,6 @@ public class CurrentUserFetcherFromRequest implements CurrentUserFetcher {
   @Bean("currentUser")
   @RequestScope
   public UserModel getCurrentUser() {
-    return null;
+    return getUser();
   }
 }

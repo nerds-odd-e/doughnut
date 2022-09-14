@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -96,5 +97,21 @@ public class UserModel implements ReviewScope {
 
   public ReviewPoint getReviewPointFor(Thing thing) {
     return modelFactoryService.reviewPointRepository.findByUserAndThing(entity, thing);
+  }
+
+  public <T> void assertAuthorization(T object) throws NoAccessRightException {
+    getAuthorization().assertAuthorization(object);
+  }
+
+  public <T> void assertReadAuthorization(T object) throws NoAccessRightException {
+    getAuthorization().assertReadAuthorization(object);
+  }
+
+  public void assertDeveloperAuthorization() throws NoAccessRightException {
+    getAuthorization().assertDeveloperAuthorization();
+  }
+
+  public void assertLoggedIn() {
+    getAuthorization().assertLoggedIn();
   }
 }
