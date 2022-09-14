@@ -25,7 +25,6 @@ public class WikidataEntityModel {
   }
 
   private Map<String, Object> getStringObjectMap(String wikidataId, String locationId) {
-    if (!getEntities().containsKey(wikidataId)) return null;
     List<WikidataEntityItemObjectModel> locationClaims = getLocationClaims(wikidataId, locationId);
     if (locationClaims == null) {
       return null;
