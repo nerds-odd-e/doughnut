@@ -36,9 +36,7 @@ public class RestWikidataController {
     try {
       return getWikidataService().fetchWikidata(wikidataId);
     } catch (IOException e) {
-      BindingResult bindingResult = new BeanPropertyBindingResult(wikidataId, "wikidataId");
-      bindingResult.rejectValue(null, "error.error", "The wikidata service is not available");
-      throw new BindException(bindingResult);
+      throw buildWikidataServiceNotAvailableException(wikidataId, "wikidataId");
     }
   }
 
@@ -48,13 +46,18 @@ public class RestWikidataController {
     try {
       return getWikidataService().fetchWikidataByQuery(search);
     } catch (IOException e) {
-      BindingResult bindingResult = new BeanPropertyBindingResult(search, "search");
-      bindingResult.rejectValue(null, "error.error", "The wikidata service is not available");
-      throw new BindException(bindingResult);
+      throw buildWikidataServiceNotAvailableException(search, "search");
     }
   }
 
   private WikidataService getWikidataService() {
     return new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
+  }
+
+  private BindException buildWikidataServiceNotAvailableException(
+      String wikidataId, String wikidataId1) throws BindException {
+    BindingResult bindingResult = new BeanPropertyBindingResult(wikidataId, wikidataId1);
+    bindingResult.rejectValue(null, "error.error", "The wikidata service is not available");
+    return new BindException(bindingResult);
   }
 }
