@@ -6,13 +6,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.json.WikidataEntity;
 import com.odde.doughnut.entities.json.WikidataSearchEntity;
 import com.odde.doughnut.services.externalApis.WikidataEntityModel;
-import com.odde.doughnut.services.externalApis.WikidataInfo;
+import com.odde.doughnut.services.externalApis.WikidataModel;
 import com.odde.doughnut.services.externalApis.WikidataSearchModel;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import lombok.SneakyThrows;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -26,9 +26,7 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     if (responseBody == null) return null;
     WikidataModel wikidataModel =
         getObjectMapper().readValue(responseBody, new TypeReference<>() {});
-    WikidataInfo wikidataInfo = wikidataModel.entities.get(wikidataId);
-    return new WikidataEntity(
-        wikidataInfo.GetEnglishTitle(), wikidataInfo.GetEnglishWikipediaUrl());
+    return wikidataModel.getWikidataEntity(wikidataId);
   }
 
   private URI ConstructWikidataUrl(String wikidataId) {
@@ -44,24 +42,20 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     return mapper;
   }
 
-  public static class WikidataModel {
-    public Map<String, WikidataInfo> entities;
-  }
-
   public List<WikidataSearchEntity> fetchWikidataByQuery(String search)
       throws IOException, InterruptedException {
-    URI uri =
-        wikidataUriBuilder()
-            .path("/w/api.php")
-            .queryParam("action", "wbsearchentities")
-            .queryParam("search", "{search}")
-            .queryParam("format", "json")
-            .queryParam("language", "en")
-            .queryParam("uselang", "en")
-            .queryParam("type", "item")
-            .queryParam("limit", 10)
-            .build(search);
-    String responseBody = httpClientAdapter.getResponseString(uri);
+    String responseBody =
+        queryWikidataApi(
+            "wbsearchentities",
+            (uriComponentsBuilder ->
+                uriComponentsBuilder
+                    .queryParam("search", "{search}")
+                    .queryParam("format", "json")
+                    .queryParam("language", "en")
+                    .queryParam("uselang", "en")
+                    .queryParam("type", "item")
+                    .queryParam("limit", 10)
+                    .build(search)));
     WikidataSearchModel entities =
         getObjectMapper().readValue(responseBody, new TypeReference<>() {});
     return entities.getWikidataSearchEntities();
@@ -82,16 +76,23 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
 
   private WikidataEntityModel getEntityDataById(String wikidataId)
       throws IOException, InterruptedException {
-    URI uri =
-        wikidataUriBuilder()
-            .path("/w/api.php")
-            .queryParam("action", "wbgetentities")
-            .queryParam("ids", "{id}")
-            .queryParam("format", "json")
-            .queryParam("props", "claims")
-            .build(wikidataId);
-    String responseBody = httpClientAdapter.getResponseString(uri);
+    String responseBody =
+        queryWikidataApi(
+            "wbgetentities",
+            (builder) ->
+                builder
+                    .queryParam("ids", "{id}")
+                    .queryParam("format", "json")
+                    .queryParam("props", "claims")
+                    .build(wikidataId));
     if (responseBody == null) return null;
     return getObjectMapper().readValue(responseBody, new TypeReference<>() {});
+  }
+
+  private String queryWikidataApi(String action, Function<UriComponentsBuilder, URI> uriBuilder)
+      throws IOException, InterruptedException {
+    URI uri =
+        uriBuilder.apply(wikidataUriBuilder().path("/w/api.php").queryParam("action", action));
+    return httpClientAdapter.getResponseString(uri);
   }
 }

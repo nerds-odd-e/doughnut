@@ -36,7 +36,7 @@ public class RestWikidataController {
     try {
       return getWikidataService().fetchWikidata(wikidataId);
     } catch (IOException e) {
-      throw buildWikidataServiceNotAvailableException(wikidataId, "wikidataId");
+      throw buildWikidataServiceNotAvailableException("wikidataId");
     }
   }
 
@@ -46,7 +46,7 @@ public class RestWikidataController {
     try {
       return getWikidataService().fetchWikidataByQuery(search);
     } catch (IOException e) {
-      throw buildWikidataServiceNotAvailableException(search, "search");
+      throw buildWikidataServiceNotAvailableException("search");
     }
   }
 
@@ -54,9 +54,8 @@ public class RestWikidataController {
     return new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
   }
 
-  private BindException buildWikidataServiceNotAvailableException(
-      String wikidataId, String wikidataId1) throws BindException {
-    BindingResult bindingResult = new BeanPropertyBindingResult(wikidataId, wikidataId1);
+  private BindException buildWikidataServiceNotAvailableException(String fieldName) {
+    BindingResult bindingResult = new BeanPropertyBindingResult(null, fieldName);
     bindingResult.rejectValue(null, "error.error", "The wikidata service is not available");
     return new BindException(bindingResult);
   }
