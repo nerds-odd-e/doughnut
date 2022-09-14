@@ -38,9 +38,4 @@ public class CurrentUserFetcherFromRequest implements CurrentUserFetcher {
   public String getExternalIdentifier() {
     return externalId;
   }
-
-  @Override
-  public void setExternalIdentifier(String name) {
-    externalId = name;
-  }
 }

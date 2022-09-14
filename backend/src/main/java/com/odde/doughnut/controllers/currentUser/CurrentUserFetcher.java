@@ -9,8 +9,6 @@ public interface CurrentUserFetcher {
 
   String getExternalIdentifier();
 
-  void setExternalIdentifier(String name);
-
   default User getUserEntity() {
     return getUser().getEntity();
   }

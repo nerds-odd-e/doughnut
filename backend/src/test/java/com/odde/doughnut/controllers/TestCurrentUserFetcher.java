@@ -22,7 +22,4 @@ public class TestCurrentUserFetcher implements CurrentUserFetcher {
     }
     return userModel.getEntity().getExternalIdentifier();
   }
-
-  @Override
-  public void setExternalIdentifier(String name) {}
 }
