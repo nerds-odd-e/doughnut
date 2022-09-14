@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.Data;
+import lombok.SneakyThrows;
 import org.springframework.web.util.UriComponentsBuilder;
 
 public record WikidataService(HttpClientAdapter httpClientAdapter, String wikidataUrl) {
@@ -76,17 +77,18 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     }
   }
 
+  @SneakyThrows
   public String getWikidataLocationDescription(String wikidataId) {
-    final String locationId = "P625";
-    WikidataEntityModel entity = null;
+    WikidataEntityModel entity;
     try {
       entity = getEntityDataById(wikidataId);
-    } catch (IOException | InterruptedException e) {
+    } catch (IOException e) {
+      return null;
     }
 
     if (entity == null) return null;
 
-    Map<String, Object> locationValue = entity.getStringObjectMap(wikidataId, locationId);
+    Map<String, Object> locationValue = entity.getStringObjectMap(wikidataId, "P625");
     if (locationValue == null) return null;
 
     return "Location: "
@@ -108,9 +110,7 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
             .build(wikidataId);
     String responseBody = httpClientAdapter.getResponseString(uri);
     if (responseBody == null) return null;
-    WikidataEntityModel entity =
-        getObjectMapper().readValue(responseBody, new TypeReference<>() {});
-    return entity;
+    return getObjectMapper().readValue(responseBody, new TypeReference<>() {});
   }
 
   @Data
