@@ -15,7 +15,7 @@ public class WikidataEntityModel {
   }
 
   private Optional<WikidataValue> getFirstClaimOfProperty(String wikidataId, String propertyId) {
-    return Optional.ofNullable(getEntityItem(wikidataId).getFirstClaimOfProperty(propertyId));
+    return getEntityItem(wikidataId).getFirstClaimOfProperty(propertyId);
   }
 
   public Optional<String> getLocationDescription(String wikidataId) {
