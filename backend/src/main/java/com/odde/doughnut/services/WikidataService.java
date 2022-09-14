@@ -7,11 +7,12 @@ import com.odde.doughnut.entities.json.WikidataEntity;
 import com.odde.doughnut.entities.json.WikidataSearchEntity;
 import com.odde.doughnut.services.externalApis.WikidataEntityModel;
 import com.odde.doughnut.services.externalApis.WikidataInfo;
+import com.odde.doughnut.services.externalApis.WikidataSearchModel;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
 import lombok.SneakyThrows;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -66,26 +67,17 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     return entities.getWikidataSearchEntities();
   }
 
-  public static class WikidataSearchModel {
-    public List<Map<String, Object>> search;
-
-    private List<WikidataSearchEntity> getWikidataSearchEntities() {
-      return search.stream().map(WikidataSearchEntity::new).collect(Collectors.toList());
+  @SneakyThrows
+  private Optional<WikidataEntityModel> getWikidataEntityModel(String wikidataId) {
+    try {
+      return Optional.ofNullable(getEntityDataById(wikidataId));
+    } catch (IOException e) {
+      return Optional.empty();
     }
   }
 
-  @SneakyThrows
-  public String getWikidataLocationDescription(String wikidataId) {
-    WikidataEntityModel entity;
-    try {
-      entity = getEntityDataById(wikidataId);
-    } catch (IOException e) {
-      return null;
-    }
-
-    if (entity == null) return null;
-
-    return entity.getLocationDescription(wikidataId);
+  public Optional<String> getWikidataLocationDescription(String wikidataId) {
+    return getWikidataEntityModel(wikidataId).flatMap(d -> d.getLocationDescription(wikidataId));
   }
 
   private WikidataEntityModel getEntityDataById(String wikidataId)

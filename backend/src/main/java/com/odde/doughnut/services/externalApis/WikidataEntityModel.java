@@ -19,7 +19,7 @@ public class WikidataEntityModel {
     return Optional.ofNullable(getEntityItem(wikidataId).getFirstClaimOfProperty(propertyId));
   }
 
-  public String getLocationDescription(String wikidataId) {
+  public Optional<String> getLocationDescription(String wikidataId) {
     return getFirstClaimOfProperty(wikidataId, "P625")
         .map(
             locationValue ->
@@ -27,7 +27,6 @@ public class WikidataEntityModel {
                     + locationValue.get("latitude").toString()
                     + "'N, "
                     + locationValue.get("longitude").toString()
-                    + "'E")
-        .orElse(null);
+                    + "'E");
   }
 }
