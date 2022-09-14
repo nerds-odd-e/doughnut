@@ -1,20 +1,17 @@
 package com.odde.doughnut.services;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.json.WikidataEntity;
 import com.odde.doughnut.entities.json.WikidataSearchEntity;
+import com.odde.doughnut.services.externalApis.WikidataEntityModel;
+import com.odde.doughnut.services.externalApis.WikidataInfo;
 import java.io.IOException;
 import java.net.URI;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import lombok.Data;
 import lombok.SneakyThrows;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -88,14 +85,7 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
 
     if (entity == null) return null;
 
-    Map<String, Object> locationValue = entity.getStringObjectMap(wikidataId, "P625");
-    if (locationValue == null) return null;
-
-    return "Location: "
-        + locationValue.get("latitude").toString()
-        + "'N, "
-        + locationValue.get("longitude").toString()
-        + "'E";
+    return entity.getLocationDescription(wikidataId);
   }
 
   private WikidataEntityModel getEntityDataById(String wikidataId)
@@ -111,82 +101,5 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     String responseBody = httpClientAdapter.getResponseString(uri);
     if (responseBody == null) return null;
     return getObjectMapper().readValue(responseBody, new TypeReference<>() {});
-  }
-
-  @Data
-  @JsonIgnoreProperties(ignoreUnknown = true)
-  public static class WikidataEntityModel {
-    private Map<String, WikidataEntityItemModel> entities;
-    private Number success;
-
-    public List<WikidataEntityItemObjectModel> getLocationClaims(
-        String wikidataId, String locationId) {
-      WikidataEntityItemModel entityItem = getEntities().get(wikidataId);
-      if (entityItem.getClaims() == null) {
-        return null;
-      }
-      if (entityItem.getClaims().containsKey(locationId)) {
-        return entityItem.getClaims().get(locationId);
-      }
-
-      return null;
-    }
-
-    public Map<String, Object> getStringObjectMap(String wikidataId, String locationId) {
-      if (!getEntities().containsKey(wikidataId)) return null;
-      List<WikidataEntityItemObjectModel> locationClaims =
-          getLocationClaims(wikidataId, locationId);
-      if (locationClaims == null) {
-        return null;
-      }
-      Map<String, Object> locationValue = locationClaims.get(0).getData();
-      return locationValue;
-    }
-  }
-
-  @Data
-  @JsonIgnoreProperties(ignoreUnknown = true)
-  public static class WikidataEntityItemModel {
-    private String type;
-    private String id;
-    Map<String, List<WikidataEntityItemObjectModel>> claims;
-  }
-
-  @Data
-  public static class WikidataEntityItemObjectModel {
-    static String DATAVALUE_KEY = "datavalue";
-    static String VALUE_KEY = "value";
-    static String VALUE_TYPE_KEY = "type";
-
-    static class VALUE_TYPE {
-      public static String GLOBE_COORDINATE = "globecoordinate";
-      public static String STRING = "string";
-    }
-
-    private String type;
-    private String id;
-    Map<String, Object> data;
-
-    @JsonProperty("mainsnak")
-    private void unpackNested(Map<String, JsonNode> mainsnak) {
-      if (mainsnak.containsKey(DATAVALUE_KEY) && mainsnak.get(DATAVALUE_KEY).has(VALUE_KEY)) {
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode value = mainsnak.get(DATAVALUE_KEY);
-        if (VALUE_TYPE.GLOBE_COORDINATE.compareToIgnoreCase(value.get(VALUE_TYPE_KEY).textValue())
-            == 0) {
-          data =
-              mapper.convertValue(
-                  mainsnak.get(DATAVALUE_KEY).get(VALUE_KEY),
-                  new TypeReference<Map<String, Object>>() {});
-        } else if (VALUE_TYPE.STRING.compareToIgnoreCase(value.get(VALUE_TYPE_KEY).textValue())
-            == 0) {
-          String stringValue =
-              mapper.convertValue(
-                  mainsnak.get(DATAVALUE_KEY).get(VALUE_KEY), new TypeReference<String>() {});
-          data = new LinkedHashMap<>();
-          data.put(VALUE_KEY, stringValue);
-        }
-      }
-    }
   }
 }

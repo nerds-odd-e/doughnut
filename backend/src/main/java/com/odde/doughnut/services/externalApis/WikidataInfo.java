@@ -1,4 +1,4 @@
-package com.odde.doughnut.services;
+package com.odde.doughnut.services.externalApis;
 
 import java.util.Map;
 
