@@ -41,8 +41,7 @@ class RestLinkControllerTests {
   }
 
   RestLinkController controller() {
-    return new RestLinkController(
-        modelFactoryService, new TestCurrentUserFetcher(userModel), new TestabilitySettings());
+    return new RestLinkController(modelFactoryService, new TestabilitySettings(), userModel);
   }
 
   @Nested

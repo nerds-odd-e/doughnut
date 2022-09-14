@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
@@ -11,6 +10,7 @@ import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.LinkModel;
 import com.odde.doughnut.models.NoteViewer;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -28,23 +28,24 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/links")
 class RestLinkController {
   private final ModelFactoryService modelFactoryService;
-  private final CurrentUserFetcher currentUserFetcher;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
+  private UserModel currentUser;
+
   public RestLinkController(
       ModelFactoryService modelFactoryService,
-      CurrentUserFetcher currentUserFetcher,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      UserModel currentUser) {
     this.modelFactoryService = modelFactoryService;
-    this.currentUserFetcher = currentUserFetcher;
     this.testabilitySettings = testabilitySettings;
+    this.currentUser = currentUser;
   }
 
   @GetMapping("/{link}")
   public Link show(@PathVariable("link") Link link) throws NoAccessRightException {
-    currentUserFetcher.assertReadAuthorization(link);
+    currentUser.assertReadAuthorization(link);
     return link;
   }
 
@@ -52,11 +53,10 @@ class RestLinkController {
   @Transactional
   public NoteRealm updateLink(Link link, @RequestBody LinkCreation linkCreation)
       throws NoAccessRightException {
-    currentUserFetcher.assertAuthorization(link);
+    currentUser.assertAuthorization(link);
     link.setLinkType(linkCreation.linkType);
     modelFactoryService.linkRepository.save(link);
-    return getNoteRealm(
-        link, currentUserFetcher.getUserEntity(), linkCreation.fromTargetPerspective);
+    return getNoteRealm(link, currentUser.getEntity(), linkCreation.fromTargetPerspective);
   }
 
   private NoteRealm getNoteRealm(Link link, User user, Boolean fromTargetPerspective) {
@@ -68,10 +68,10 @@ class RestLinkController {
   @Transactional
   public NoteRealm deleteLink(@PathVariable Link link, @PathVariable String perspective)
       throws NoAccessRightException {
-    currentUserFetcher.assertAuthorization(link);
+    currentUser.assertAuthorization(link);
     LinkModel linkModel = modelFactoryService.toLinkModel(link);
     linkModel.destroy();
-    return getNoteRealm(link, currentUserFetcher.getUserEntity(), perspective.equals("tview"));
+    return getNoteRealm(link, currentUser.getEntity(), perspective.equals("tview"));
   }
 
   @PostMapping(value = "/create/{sourceNote}/{targetNote}")
@@ -83,15 +83,15 @@ class RestLinkController {
       BindingResult bindingResult)
       throws NoAccessRightException, CyclicLinkDetectedException, BindException {
     if (bindingResult.hasErrors()) throw new BindException(bindingResult);
-    currentUserFetcher.assertAuthorization(sourceNote);
-    currentUserFetcher.assertReadAuthorization(targetNote);
+    currentUser.assertAuthorization(sourceNote);
+    currentUser.assertReadAuthorization(targetNote);
     if (linkCreation != null && linkCreation.moveUnder != null && linkCreation.moveUnder) {
-      currentUserFetcher.assertAuthorization(targetNote);
+      currentUser.assertAuthorization(targetNote);
       modelFactoryService
           .toNoteMotionModel(sourceNote, targetNote, linkCreation.asFirstChild)
           .execute();
     }
-    User user = currentUserFetcher.getUserEntity();
+    User user = currentUser.getEntity();
     Link link =
         Link.createLink(
             sourceNote,

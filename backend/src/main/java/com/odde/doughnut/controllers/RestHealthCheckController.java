@@ -1,6 +1,8 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.UserModel;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -16,6 +18,8 @@ class RestHealthCheckController {
 
   @Autowired private ModelFactoryService modelFactoryService;
 
+  @Autowired private UserModel currentUser;
+
   @GetMapping("/healthcheck")
   public String ping() {
     return "OK. Active Profile: " + String.join(", ", environment.getActiveProfiles());
@@ -23,15 +27,8 @@ class RestHealthCheckController {
 
   @GetMapping("/data_upgrade")
   @Transactional(timeout = 200)
-  public List dataUpgrade() {
-    modelFactoryService
-        .entityManager
-        .createNativeQuery(
-            "delete from text_content where id not in (select text_content_id from note)")
-        .executeUpdate();
-    long count = modelFactoryService.textContentRepository.count();
-    long countNotes = modelFactoryService.noteRepository.count();
-
-    return List.of(count, countNotes);
+  public List dataUpgrade() throws NoAccessRightException {
+    currentUser.assertDeveloperAuthorization();
+    return List.of();
   }
 }
