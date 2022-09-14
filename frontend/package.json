@@ -32,8 +32,8 @@
     "@testing-library/vue": "^6.6",
     "@types/jest": "^29.0",
     "@types/lodash": "^4.14",
-    "@typescript-eslint/eslint-plugin": "^5.36",
-    "@typescript-eslint/parser": "^5.36",
+    "@typescript-eslint/eslint-plugin": "^5.37",
+    "@typescript-eslint/parser": "^5.37",
     "@vitejs/plugin-vue": "^3.1",
     "@vitejs/plugin-vue-jsx": "^2.0",
     "@vue/compiler-sfc": "^3.2",
@@ -66,12 +66,12 @@
     "sass": "^1.54",
     "sass-loader": "^13.0",
     "style-loader": "^3.3",
-    "ts-jest": "29.0.0-next.0",
+    "ts-jest": "^29.0",
     "typescript": "^4.8",
-    "unplugin-auto-import": "^0.10",
+    "unplugin-auto-import": "^0.11",
     "vite": "^3.1",
-    "vite-plugin-checker": "^0.4",
+    "vite-plugin-checker": "^0.5",
     "vite-plugin-eslint": "^1.8",
-    "vue-tsc": "^0.38"
+    "vue-tsc": "^0.40"
   }
 }
