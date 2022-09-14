@@ -26,13 +26,13 @@ EOF
 # Install dependencies
 apt-key adv --keyserver hkp://pool.sks-keyservers.net:80 --recv-keys 8C718D3B5072E1F5
 apt-get -y update && apt-get upgrade && apt-get dist-upgrade
-apt-get -y install jq openjdk-11-jre gnupg gnupg-agent libmysqlclient21 mysql-community-client ca-certificates openssl readline-common
+apt-get -y install jq openjdk-17-jre gnupg gnupg-agent libmysqlclient21 mysql-community-client ca-certificates openssl readline-common
 apt-get -y autoremove
 
-# Make Java 11 default
-export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+# Make Java 17 default
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 export PATH=$PATH:$JAVA_HOME/bin
-update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/bin/java
+update-alternatives --set java /usr/lib/jvm/java-17-openjdk-amd64/bin/java
 
 # Download and setup traefik-v2
 mkdir -p /opt/traefik/logs
