@@ -1,10 +1,10 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Authorization;
+import com.odde.doughnut.models.UserModel;
 import java.security.Principal;
 import javax.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,8 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/user")
-record RestUserController(
-    ModelFactoryService modelFactoryService, CurrentUserFetcher currentUserFetcher) {
+record RestUserController(ModelFactoryService modelFactoryService, UserModel currentUser) {
 
   @PostMapping("")
   public User createUser(Principal principal, User user) {
@@ -28,12 +27,12 @@ record RestUserController(
 
   @GetMapping("")
   public User getUserProfile() {
-    return currentUserFetcher.getUserEntity();
+    return currentUser.getEntity();
   }
 
   @PatchMapping("/{user}")
   public @Valid User updateUser(@Valid User user) throws NoAccessRightException {
-    currentUserFetcher.assertAuthorization(user);
+    currentUser.assertAuthorization(user);
     modelFactoryService.userRepository.save(user);
     return user;
   }

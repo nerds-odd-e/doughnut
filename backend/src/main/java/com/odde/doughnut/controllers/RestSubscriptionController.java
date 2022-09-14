@@ -1,10 +1,10 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.UserModel;
 import java.util.List;
 import javax.validation.Valid;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,12 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/subscriptions")
 class RestSubscriptionController {
   private final ModelFactoryService modelFactoryService;
-  private final CurrentUserFetcher currentUserFetcher;
+  private final UserModel currentUser;
 
   public RestSubscriptionController(
-      ModelFactoryService modelFactoryService, CurrentUserFetcher currentUserFetcher) {
+      ModelFactoryService modelFactoryService, UserModel currentUser) {
     this.modelFactoryService = modelFactoryService;
-    this.currentUserFetcher = currentUserFetcher;
+    this.currentUser = currentUser;
   }
 
   @PostMapping("/notebooks/{notebook}/subscribe")
@@ -30,9 +30,9 @@ class RestSubscriptionController {
   public @Valid Subscription createSubscription(
       @PathVariable(name = "notebook") Notebook notebook, @Valid Subscription subscription)
       throws NoAccessRightException {
-    currentUserFetcher.assertReadAuthorization(notebook);
+    currentUser.assertReadAuthorization(notebook);
     subscription.setNotebook(notebook);
-    subscription.setUser(currentUserFetcher.getUserEntity());
+    subscription.setUser(currentUser.getEntity());
     modelFactoryService.entityManager.persist(subscription);
     return subscription;
   }
@@ -48,7 +48,7 @@ class RestSubscriptionController {
   @Transactional
   public List<Integer> destroySubscription(@Valid Subscription subscription)
       throws NoAccessRightException {
-    currentUserFetcher.assertAuthorization(subscription);
+    currentUser.assertAuthorization(subscription);
     modelFactoryService.entityManager.remove(subscription);
     return List.of(1);
   }

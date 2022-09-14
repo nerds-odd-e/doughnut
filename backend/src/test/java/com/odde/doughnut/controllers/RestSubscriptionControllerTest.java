@@ -39,9 +39,7 @@ class RestSubscriptionControllerTest {
     topNote = makeMe.aNote().creatorAndOwner(userModel).please();
     notebook = topNote.getNotebook();
     makeMe.aBazaarNodebook(topNote.getNotebook()).please();
-    controller =
-        new RestSubscriptionController(
-            makeMe.modelFactoryService, new TestCurrentUserFetcher(userModel));
+    controller = new RestSubscriptionController(makeMe.modelFactoryService, userModel);
   }
 
   @Test

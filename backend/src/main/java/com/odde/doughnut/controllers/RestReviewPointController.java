@@ -1,10 +1,10 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.SelfEvaluation;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.UserModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -14,18 +14,17 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/api/review-points")
 class RestReviewPointController {
   private final ModelFactoryService modelFactoryService;
-  private final CurrentUserFetcher currentUserFetcher;
+  private UserModel currentUser;
 
-  public RestReviewPointController(
-      ModelFactoryService modelFactoryService, CurrentUserFetcher currentUserFetcher) {
+  public RestReviewPointController(ModelFactoryService modelFactoryService, UserModel currentUser) {
     this.modelFactoryService = modelFactoryService;
-    this.currentUserFetcher = currentUserFetcher;
+    this.currentUser = currentUser;
   }
 
   @GetMapping("/{reviewPoint}")
   public ReviewPoint show(@PathVariable("reviewPoint") ReviewPoint reviewPoint)
       throws NoAccessRightException {
-    currentUserFetcher.assertAuthorization(reviewPoint.getUser());
+    currentUser.assertAuthorization(reviewPoint.getUser());
     return reviewPoint;
   }
 
@@ -43,7 +42,7 @@ class RestReviewPointController {
     if (reviewPoint == null || reviewPoint.getId() == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The review point does not exist.");
     }
-    currentUserFetcher.assertLoggedIn();
+    currentUser.assertLoggedIn();
     modelFactoryService
         .toReviewPointModel(reviewPoint)
         .updateForgettingCurve(selfEvaluation.adjustment);

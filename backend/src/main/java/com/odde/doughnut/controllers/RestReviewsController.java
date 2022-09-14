@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.AnswerResult;
 import com.odde.doughnut.entities.AnswerViewedByUser;
@@ -34,34 +33,35 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/api/reviews")
 class RestReviewsController {
   private final ModelFactoryService modelFactoryService;
-  private final CurrentUserFetcher currentUserFetcher;
+
+  private UserModel currentUser;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
   public RestReviewsController(
       ModelFactoryService modelFactoryService,
-      CurrentUserFetcher currentUserFetcher,
+      UserModel currentUser,
       TestabilitySettings testabilitySettings) {
     this.modelFactoryService = modelFactoryService;
-    this.currentUserFetcher = currentUserFetcher;
+    this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
   }
 
   @GetMapping("/overview")
   @Transactional(readOnly = true)
   public ReviewStatus overview() {
-    currentUserFetcher.assertLoggedIn();
-    UserModel user = currentUserFetcher.getUser();
-    return user.createReviewing(testabilitySettings.getCurrentUTCTimestamp()).getReviewStatus();
+    currentUser.assertLoggedIn();
+    return currentUser
+        .createReviewing(testabilitySettings.getCurrentUTCTimestamp())
+        .getReviewStatus();
   }
 
   @GetMapping("/initial")
   @Transactional(readOnly = true)
   public List<ReviewPoint> initialReview() {
-    currentUserFetcher.assertLoggedIn();
-    UserModel user = currentUserFetcher.getUser();
-    Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
+    currentUser.assertLoggedIn();
+    Reviewing reviewing = currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
 
     return reviewing.getDueInitialReviewPoints().collect(Collectors.toList());
   }
@@ -69,7 +69,7 @@ class RestReviewsController {
   @PostMapping(path = "")
   @Transactional
   public ReviewPoint create(@RequestBody InitialInfo initialInfo) {
-    currentUserFetcher.assertLoggedIn();
+    currentUser.assertLoggedIn();
     ReviewPoint reviewPoint = new ReviewPoint();
     reviewPoint.setThing(
         modelFactoryService.thingRepository.findById(initialInfo.thingId).orElse(null));
@@ -77,16 +77,15 @@ class RestReviewsController {
 
     ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPoint);
     reviewPointModel.initialReview(
-        testabilitySettings.getCurrentUTCTimestamp(), currentUserFetcher.getUserEntity());
+        testabilitySettings.getCurrentUTCTimestamp(), currentUser.getEntity());
     return reviewPointModel.getEntity();
   }
 
   @GetMapping("/repeat")
   @Transactional
   public RepetitionForUser repeatReview() {
-    currentUserFetcher.assertLoggedIn();
-    UserModel user = currentUserFetcher.getUser();
-    Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
+    currentUser.assertLoggedIn();
+    Reviewing reviewing = currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
     return reviewing
         .getOneRepetitionForUser(testabilitySettings.getRandomizer())
         .orElseThrow(
@@ -99,13 +98,12 @@ class RestReviewsController {
   @PostMapping("/answer")
   @Transactional
   public AnswerResult answerQuiz(@Valid @RequestBody Answer answer) {
-    currentUserFetcher.assertLoggedIn();
+    currentUser.assertLoggedIn();
     AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
     answerModel.updateReviewPoints(testabilitySettings.getCurrentUTCTimestamp());
     answerModel.save();
     AnswerResult answerResult = answerModel.getAnswerResult();
-    Reviewing reviewing =
-        currentUserFetcher.getUser().createReviewing(testabilitySettings.getCurrentUTCTimestamp());
+    Reviewing reviewing = currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
     answerResult.nextRepetition =
         reviewing.getOneRepetitionForUser(testabilitySettings.getRandomizer()).orElse(null);
     return answerResult;
@@ -115,13 +113,13 @@ class RestReviewsController {
   @Transactional
   public AnswerViewedByUser getAnswer(@PathVariable("answer") Answer answer)
       throws NoAccessRightException {
-    currentUserFetcher.assertAuthorization(answer.getQuestion().getReviewPoint().getHeadNote());
+    currentUser.assertAuthorization(answer.getQuestion().getReviewPoint().getHeadNote());
     AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
     AnswerViewedByUser answerResult = answerModel.getAnswerViewedByUser();
     answerResult.reviewPoint = answer.getQuestion().getReviewPoint();
     answerResult.quizQuestion =
         new QuizQuestionViewedByUser(
-            answer.getQuestion(), modelFactoryService, currentUserFetcher.getUserEntity());
+            answer.getQuestion(), modelFactoryService, currentUser.getEntity());
     return answerResult;
   }
 }

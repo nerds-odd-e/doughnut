@@ -28,8 +28,7 @@ class RestUserControllerTest {
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    controller =
-        new RestUserController(makeMe.modelFactoryService, new TestCurrentUserFetcher(userModel));
+    controller = new RestUserController(makeMe.modelFactoryService, userModel);
   }
 
   @Test

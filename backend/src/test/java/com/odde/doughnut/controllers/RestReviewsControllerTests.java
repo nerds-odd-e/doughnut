@@ -43,16 +43,12 @@ class RestReviewsControllerTests {
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    controller =
-        new RestReviewsController(
-            modelFactoryService, new TestCurrentUserFetcher(userModel), testabilitySettings);
+    controller = new RestReviewsController(modelFactoryService, userModel, testabilitySettings);
   }
 
   RestReviewsController nullUserController() {
     return new RestReviewsController(
-        modelFactoryService,
-        new TestCurrentUserFetcher(makeMe.aNullUserModel()),
-        testabilitySettings);
+        modelFactoryService, makeMe.aNullUserModel(), testabilitySettings);
   }
 
   @Nested

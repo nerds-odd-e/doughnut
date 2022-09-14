@@ -36,9 +36,7 @@ class RestTextContentControllerTests {
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    controller =
-        new RestTextContentController(
-            modelFactoryService, new TestCurrentUserFetcher(userModel), testabilitySettings);
+    controller = new RestTextContentController(modelFactoryService, userModel, testabilitySettings);
   }
 
   @Nested
