@@ -42,15 +42,13 @@ public class UserModelAuthorityTest {
 
     @Test
     void userCanNotAccessNotesBelongToCircle() {
-      assertThrows(
-          NoAccessRightException.class,
-          () -> userModel.getAuthorization().assertAuthorization(note));
+      assertThrows(NoAccessRightException.class, () -> userModel.assertAuthorization(note));
     }
 
     @Test
     void userCanAccessNotesBelongToCircleIfIsAMember() throws NoAccessRightException {
       makeMe.theCircle(circleModel).hasMember(userModel).please();
-      userModel.getAuthorization().assertAuthorization(note);
+      userModel.assertAuthorization(note);
     }
   }
 
@@ -67,7 +65,7 @@ public class UserModelAuthorityTest {
     void userCanNotAccessNotesBelongToCircle() {
       assertThrows(
           ResponseStatusException.class,
-          () -> makeMe.aNullUserModel().getAuthorization().assertReadAuthorization(note));
+          () -> makeMe.aNullUserModel().assertReadAuthorization(note));
     }
   }
 }

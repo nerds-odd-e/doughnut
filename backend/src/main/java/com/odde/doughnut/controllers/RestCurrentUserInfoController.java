@@ -12,7 +12,7 @@ record RestCurrentUserInfoController(
   @GetMapping("/current-user-info")
   public CurrentUserInfo currentUserInfo() {
     CurrentUserInfo currentUserInfo = new CurrentUserInfo();
-    currentUserInfo.user = currentUserFetcher.getUserEntity();
+    currentUserInfo.user = currentUserFetcher.getUser().getEntity();
     currentUserInfo.externalIdentifier = currentUserFetcher.getExternalIdentifier();
     return currentUserInfo;
   }

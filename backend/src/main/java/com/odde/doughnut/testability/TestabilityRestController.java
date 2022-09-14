@@ -1,6 +1,5 @@
 package com.odde.doughnut.testability;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUserFetcherFromRequest;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Link.LinkType;
@@ -51,8 +50,7 @@ class TestabilityRestController {
   @Autowired NoteRepository noteRepository;
   @Autowired LinkRepository linkRepository;
   @Autowired UserRepository userRepository;
-  @Autowired CurrentUserFetcherFromRequest currentUser;
-
+  @Autowired UserModel currentUser;
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired TestabilitySettings testabilitySettings;
 
@@ -197,7 +195,7 @@ class TestabilityRestController {
 
   private User getUserModelByExternalIdentifierOrCurrentUser(String externalIdentifier) {
     if (Strings.isEmpty(externalIdentifier)) {
-      User user = currentUser.getUserEntity();
+      User user = currentUser.getEntity();
       if (user == null) {
         throw new RuntimeException("There is no current user");
       }
@@ -217,13 +215,12 @@ class TestabilityRestController {
   @PostMapping("/update_current_user")
   @Transactional
   public String updateCurrentUser(@RequestBody HashMap<String, String> userInfo) {
-    UserModel currentUserModel = currentUser.getUser();
     if (userInfo.containsKey("daily_new_notes_count")) {
-      currentUserModel.setAndSaveDailyNewNotesCount(
+      currentUser.setAndSaveDailyNewNotesCount(
           Integer.valueOf(userInfo.get("daily_new_notes_count")));
     }
     if (userInfo.containsKey("space_intervals")) {
-      currentUserModel.setAndSaveSpaceIntervals(userInfo.get("space_intervals"));
+      currentUser.setAndSaveSpaceIntervals(userInfo.get("space_intervals"));
     }
     return "OK";
   }

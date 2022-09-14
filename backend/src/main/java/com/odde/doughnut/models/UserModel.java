@@ -23,12 +23,8 @@ public class UserModel implements ReviewScope {
     this.modelFactoryService = modelFactoryService;
   }
 
-  public Authorization getAuthorization() {
+  private Authorization getAuthorization() {
     return modelFactoryService.toAuthorization(entity);
-  }
-
-  public boolean loggedIn() {
-    return entity != null;
   }
 
   public String getName() {
