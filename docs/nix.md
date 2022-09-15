@@ -49,7 +49,7 @@ Run E2E profile springboot backend server with gradle (backend app started on po
 # from doughnut source root dir
 yarn && yarn frontend:build
 yarn sut
-open http://localhost:9081
+open http://localhost:5173
 ```
 
 Run E2E profile with backend server & frontend in dev mode & Cypress IDE (frontend app on port 5173; backend app on port 9081)
@@ -62,13 +62,13 @@ yarn sut
 yarn cy:open
 ```
 
-Run Dev profile springboot backend server with gradle (backend app started on port 9082)
+Run E2E (same as Dev) profile springboot backend server with gradle (backend app started on port 5173)
 
 ```bash
 # from doughnut source root dir
 yarn && yarn frontend:build
-./gradlew bootRunDev
-open http://localhost:9082
+./gradlew bootRunE2E
+open http://localhost:5173
 ```
 
 #### IntelliJ IDEA (Community) IDE project import

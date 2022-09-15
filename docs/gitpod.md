@@ -30,14 +30,6 @@ git config user.email "your_email@your_domain.com"
 
 - From root of `doughnut` run `yarn sut` to setup and migrate your base virgin `doughnut` DB tables via `flyway` migrations. Once the migrations have completed (read the `springboot` startup logs from the VSCode terminal), use `Ctrl-C` to exit `springboot` backend server application process. (this might take some time - once done, `Ctrl-C` to exit process on completion).
 
-```bash
-### You should see in the springboot terminal log output a line similar to the below ###
-.
-INFO 2142 --- [  restartedMain] o.f.core.internal.command.DbMigrate      : Successfully applied 57 migrations to schema `doughnut_e2e_test`
-.
-.
-```
-
 ### Preparation steps to run doughnut backend unit tests & cypress End-to-End tests
 
 - From the root of the `doughnut` codebase (this should be on path `/workspace/doughnut`), run `yarn` to get End-to-End testing tooling setup.

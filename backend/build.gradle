@@ -50,12 +50,6 @@ dependencies {
   testImplementation  'org.springframework.boot:spring-boot-starter-test'
 }
 
-task testDBMigrate(type: Test) {
-  useJUnitPlatform {
-    includeTags 'dbMigrate'
-  }
-}
-
 test {
   useJUnitPlatform()
   testLogging {
@@ -63,29 +57,13 @@ test {
   }
 }
 
-tasks.register("bootRunDev") {
+tasks.register("testDBMigrate") {
   group = "application"
-  description = "Runs Doughnut SpringBoot application in dev profile"
-  doFirst {
-    tasks.bootRun.configure {
-      systemProperty("spring.profiles.active", "dev")
-      systemProperty("spring.datasource.url", "jdbc:mysql://127.0.0.1:3309/doughnut_development")
-      systemProperty("spring.datasource.username", "doughnut")
-      systemProperty("spring.datasource.username", "doughnut")
-    }
-  }
-  finalizedBy("bootRun")
-}
-
-tasks.register("bootRunTest") {
-  group = "application"
-  description = "Runs Doughnut SpringBoot application in test profile"
+  description = "Runs DB mirgration for test profile"
   doFirst {
     tasks.bootRun.configure {
       systemProperty("spring.profiles.active", "test")
-      systemProperty("spring.datasource.url", "jdbc:mysql://127.0.0.1:3309/doughnut_test")
-      systemProperty("spring.datasource.username", "doughnut")
-      systemProperty("spring.datasource.username", "doughnut")
+      systemProperty("odd-e.doughnut.task", "testDBMigrate")
     }
   }
   finalizedBy("bootRun")
