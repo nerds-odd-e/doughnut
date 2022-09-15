@@ -116,7 +116,7 @@ EOF
           mysqld --datadir=$MYSQL_DATADIR --pid-file=$MYSQL_PID_FILE --port=$MYSQL_TCP_PORT --socket=$MYSQL_UNIX_SOCKET --mysqlx-socket=$MYSQLX_UNIX_SOCKET --mysqlx_port=$MYSQLX_TCP_PORT --tls-version=TLSv1.2 &
           export MYSQLD_PID=$!
 
-          sleep 5 && mysql -u root -S $MYSQL_UNIX_SOCKET < $MYSQL_HOME/init_doughnut_db.sql
+          sleep 6 && mysql -u root -S $MYSQL_UNIX_SOCKET < $MYSQL_HOME/init_doughnut_db.sql
         fi
 
         export GPG_TTY=$(tty)
@@ -125,7 +125,7 @@ EOF
            export NIX_SSL_CERT_FILE=/etc/ssl/cert.pem
         fi
 
-        export GPG_TTY='(tty)'
+        backend/gradlew testDBMigrate
 
         cleanup()
         {
