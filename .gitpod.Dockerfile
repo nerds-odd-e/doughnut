@@ -89,12 +89,12 @@ RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
   && nix-env -i git git-lfs
 
 # xclip
-cat << EOF >> ~/.bashrc
+RUN cat << EOF >> ~/.bashrc
 alias pbcopy='xclip -selection clipboard'
 alias pbpaste='xclip -selection clipboard -o'
 EOF
 
-cat << EOF >> ~/.zshrc
+RUN cat << EOF >> ~/.zshrc
 alias pbcopy='xclip -selection clipboard'
 alias pbpaste='xclip -selection clipboard -o'
 EOF
