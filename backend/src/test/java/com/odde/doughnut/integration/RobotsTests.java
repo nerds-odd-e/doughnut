@@ -23,7 +23,6 @@ class RobotsTests {
   void robotsTxt() throws Exception {
     this.mockMvc
         .perform(get("/robots.txt"))
-        .andDo(print())
         .andExpect(status().isOk())
         .andExpect(content().string(containsString("User-agent: *")));
   }
