@@ -1,6 +1,6 @@
 <template>
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-    <path
-        d="M18.885 3.515c-4.617-4.618-12.056-4.676-16.756-.195l-2.129-2.258v7.938h7.484l-2.066-2.191c2.82-2.706 7.297-2.676 10.073.1 4.341 4.341 1.737 12.291-5.491 12.291v4.8c3.708 0 6.614-1.244 8.885-3.515 4.686-4.686 4.686-12.284 0-16.97z"/>
+  <svg x="0px" y="0px" width="24" height="24" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve">
+    <path fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" d="M5.4,14H21c3.3,0,6,2.7,6,6v7"/>
+    <polyline fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" points="13.5,6 5.5,14 13.5,22 "/>
   </svg>
 </template>

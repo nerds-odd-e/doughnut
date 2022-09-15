@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.odde.doughnut.entities.json.WikidataEntity;
 import com.odde.doughnut.entities.json.WikidataSearchEntity;
 import com.odde.doughnut.services.externalApis.WikidataEntityModel;
@@ -62,16 +63,9 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
   }
 
   @SneakyThrows
-  private Optional<WikidataEntityModel> getWikidataEntityModel(String wikidataId) {
-    try {
-      return Optional.ofNullable(getEntityDataById(wikidataId));
-    } catch (IOException e) {
-      return Optional.empty();
-    }
-  }
-
   public Optional<String> getWikidataLocationDescription(String wikidataId) {
-    return getWikidataEntityModel(wikidataId).flatMap(d -> d.getLocationDescription(wikidataId));
+    return Optional.ofNullable(getEntityDataById(wikidataId))
+        .flatMap(d -> d.getLocationDescription(wikidataId));
   }
 
   private WikidataEntityModel getEntityDataById(String wikidataId)
@@ -86,7 +80,11 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
                     .queryParam("props", "claims")
                     .build(wikidataId));
     if (responseBody == null) return null;
-    return getObjectMapper().readValue(responseBody, new TypeReference<>() {});
+    try {
+      return getObjectMapper().readValue(responseBody, new TypeReference<>() {});
+    } catch (MismatchedInputException e) {
+      return null;
+    }
   }
 
   private String queryWikidataApi(String action, Function<UriComponentsBuilder, URI> uriBuilder)
