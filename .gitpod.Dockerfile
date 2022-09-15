@@ -70,7 +70,7 @@ WORKDIR /home/gitpod
 
 # Install Nix
 RUN touch .bash_profile \
-    && curl https://nixos.org/releases/nix/nix-2.9.1/install | sh
+    && curl https://nixos.org/releases/nix/nix-2.11.0/install | sh
 
 RUN echo '. /home/gitpod/.nix-profile/etc/profile.d/nix.sh' >> /home/gitpod/.bashrc
 RUN mkdir -p /home/gitpod/.config/nixpkgs && echo '{ allowUnfree = true; }' >> /home/gitpod/.config/nixpkgs/config.nix
@@ -99,7 +99,7 @@ alias pbcopy='xclip -selection clipboard'
 alias pbpaste='xclip -selection clipboard -o'
 EOF
 
-EXPOSE 3000
+EXPOSE 5173
 EXPOSE 3309
 EXPOSE 5900
 EXPOSE 6080
