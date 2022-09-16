@@ -41,9 +41,6 @@ class ManagedApi {
       } else {
         ManagedApi.statusWrap.apiStatus.states.pop();
       }
-      if (this.component) {
-        this.component.loading.value = value;
-      }
     };
 
     assignLoading(true);
