@@ -1,22 +1,20 @@
 <template>
   <ToolbarFrame>
     <LoadingThinBar v-if="apiStatus.states.length > 0" />
-    <template v-else>
-      <template v-if="!user">
-        <div class="btn-group btn-group-sm">
-          <BrandBar />
-        </div>
-      </template>
-      <NoteControlCenterForUser v-else v-bind="{ user, storageAccessor }" />
+    <template v-if="!user">
       <div class="btn-group btn-group-sm">
-        <ReviewButton class="btn" v-if="user" />
-        <NoteUndoButton v-bind="{ storageAccessor }" />
-        <UserActionsButton
-          v-bind="{ user }"
-          @update-user="$emit('updateUser', $event)"
-        />
+        <BrandBar />
       </div>
     </template>
+    <NoteControlCenterForUser v-else v-bind="{ user, storageAccessor }" />
+    <div class="btn-group btn-group-sm">
+      <ReviewButton class="btn" v-if="user" />
+      <NoteUndoButton v-bind="{ storageAccessor }" />
+      <UserActionsButton
+        v-bind="{ user }"
+        @update-user="$emit('updateUser', $event)"
+      />
+    </div>
   </ToolbarFrame>
 </template>
 

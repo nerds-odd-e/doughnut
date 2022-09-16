@@ -1,7 +1,6 @@
 <template>
   <ContainerPage
     v-bind="{
-      loading,
       contentExists: !!notebooksViewedByUser,
       title: 'Welcome To The Bazaar',
     }"

@@ -25,6 +25,7 @@ export default defineComponent({
       environment: "production",
       storageAccessor: createNoteStorage(),
       apiStatus: { states: [] } as ApiStatus,
+      userLoaded: false,
     };
   },
 
@@ -68,13 +69,10 @@ export default defineComponent({
     ManagedApi.registerStatus(this.apiStatus);
     this.environment = this.api.testability.getEnvironment();
     this.featureToggle = await this.api.testability.getFeatureToggle();
-    this.api.userMethods
-      .getCurrentUserInfo()
-      .then((res) => {
-        this.user = res.user;
-        this.externalIdentifier = res.externalIdentifier;
-      })
-      .finally(() => (this.loading = false));
+    const userInfo = await this.api.userMethods.getCurrentUserInfo();
+    this.user = userInfo.user;
+    this.externalIdentifier = userInfo.externalIdentifier;
+    this.userLoaded = true;
   },
 });
 </script>
@@ -84,7 +82,7 @@ export default defineComponent({
     <Popups />
     <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
     <template v-else>
-      <template v-if="!loading">
+      <template v-if="userLoaded">
         <div class="header">
           <BreadcrumbMain v-bind="{ storageAccessor, user }" />
           <ControlCenter
