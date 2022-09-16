@@ -202,7 +202,6 @@ public class Link extends Thingy {
     public final Integer id;
     public String reversedLabel;
     @Getter private final QuestionType[] questionTypes;
-    private DoughPredicate doughPredicate;
 
     LinkType(
         Integer id,
@@ -210,7 +209,6 @@ public class Link extends Thingy {
         String label,
         String reversedLabel,
         QuestionType[] questionTypes) {
-      this.doughPredicate = new DoughPredicate(this);
       this.nameOfSource = nameOfSource;
       this.label = label;
       this.id = id;
