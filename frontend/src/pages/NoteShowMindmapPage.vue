@@ -1,22 +1,19 @@
 <template>
-  <LoadingPage v-bind="{ loading, contentExists: true }">
-    <div class="inner-box" :key="noteId">
-      <div class="content" v-if="noteRealm && noteRealmCache">
-        <NoteMindmapView
-          v-bind="{ noteId, noteRealms: noteRealmCache, storageAccessor }"
-          :highlight-note-id="selectedNoteId"
-          @select-note="highlight($event)"
-        />
-      </div>
+  <div class="inner-box" :key="noteId">
+    <div class="content" v-if="noteRealm && noteRealmCache">
+      <NoteMindmapView
+        v-bind="{ noteId, noteRealms: noteRealmCache, storageAccessor }"
+        :highlight-note-id="selectedNoteId"
+        @select-note="highlight($event)"
+      />
     </div>
-  </LoadingPage>
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import NoteMindmapView from "../components/notes/views/NoteMindmapView.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
-import LoadingPage from "./commons/LoadingPage.vue";
 import NoteRealmCache from "../store/NoteRealmCache";
 import { StorageAccessor } from "../store/createNoteStorage";
 
@@ -32,7 +29,6 @@ export default defineComponent({
     },
   },
   components: {
-    LoadingPage,
     NoteMindmapView,
   },
   data() {

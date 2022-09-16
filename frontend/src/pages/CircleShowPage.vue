@@ -1,5 +1,5 @@
 <template>
-  <ContainerPage v-bind="{ loading, contentExists: !!circle }">
+  <ContainerPage v-bind="{ contentExists: !!circle }">
     <div v-if="circle">
       <p>
         <NotebookNewButton :circle="circle">

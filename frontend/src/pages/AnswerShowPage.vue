@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <LoadingPage v-bind="{ loading, contentExists: !!answerResult }">
+    <LoadingPage v-bind="{ contentExists: !!answerResult }">
       <AnswerResult v-if="answerResult" v-bind="{ answerResult }" />
 
       <RadioButtons

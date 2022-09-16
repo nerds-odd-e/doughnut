@@ -1,22 +1,19 @@
 <template>
-  <LoadingPage v-bind="{ loading, contentExists: true }">
-    <div class="inner-box" :key="noteId">
-      <div class="content" v-if="noteRealm && noteRealmCache">
-        <div class="container">
-          <NoteArticleView
-            v-bind="{ noteId, noteRealms: noteRealmCache, storageAccessor }"
-          />
-        </div>
+  <div class="inner-box" :key="noteId">
+    <div class="content" v-if="noteRealm && noteRealmCache">
+      <div class="container">
+        <NoteArticleView
+          v-bind="{ noteId, noteRealms: noteRealmCache, storageAccessor }"
+        />
       </div>
     </div>
-  </LoadingPage>
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import NoteArticleView from "../components/notes/views/NoteArticleView.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
-import LoadingPage from "./commons/LoadingPage.vue";
 import NoteRealmCache from "../store/NoteRealmCache";
 import { StorageAccessor } from "../store/createNoteStorage";
 
@@ -32,7 +29,6 @@ export default defineComponent({
     },
   },
   components: {
-    LoadingPage,
     NoteArticleView,
   },
   data() {

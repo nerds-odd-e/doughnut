@@ -1,5 +1,5 @@
 <template>
-  <LoadingPage v-bind="{ loading, contentExists: !!notePosition }">
+  <LoadingPage v-bind="{ contentExists: !!notePosition }">
     <Breadcrumb v-bind="notePosition" />
   </LoadingPage>
 </template>

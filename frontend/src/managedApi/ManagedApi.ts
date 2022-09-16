@@ -4,7 +4,6 @@ import { JsonData } from "./window/RestfulFetch";
 
 interface ManagedComponent {
   formErrors: Ref<JsonData> | undefined;
-  loading: Ref<boolean>;
 }
 
 type ApiStatus = { states: boolean[] };
