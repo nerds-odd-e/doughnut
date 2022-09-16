@@ -28,13 +28,17 @@ ports:
   # MySQL 8.0 DB Server
   - port: 3309
     onOpen: ignore
-    visibility: public
   # Remote VNC
   - port: 5900
     onOpen: ignore
-    visibility: public
   - port: 6080
     onOpen: open-browser
+    visibility: public
+  # Mountebank Control Server
+  - port: 2525
+    visibility: public
+  # Mountebank Mock Server
+  - port: 5001
     visibility: public
 
 vscode:
