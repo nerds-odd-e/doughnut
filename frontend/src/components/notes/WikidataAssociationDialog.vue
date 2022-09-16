@@ -15,7 +15,7 @@
     <input type="submit" value="Save" class="btn btn-primary" />
   </form>
 
-  <form v-else @submit.prevent.once="save">
+  <form v-else @submit.prevent="save">
     <p>
       Confirm to associate <strong>{{ note.title }}</strong> with
       <strong>{{ conflictWikidataTitle }}</strong
@@ -67,7 +67,11 @@ export default defineComponent({
         const res = await this.api.wikidata.getWikidataEntityById(
           this.associationData.wikidataId
         );
-        if (res.WikidataTitleInEnglish !== this.note.title) {
+        if (
+          res.WikidataTitleInEnglish !== "" &&
+          res.WikidataTitleInEnglish.toUpperCase() !==
+            this.note.title.toUpperCase()
+        ) {
           this.conflictWikidataTitle = res.WikidataTitleInEnglish;
           return;
         }

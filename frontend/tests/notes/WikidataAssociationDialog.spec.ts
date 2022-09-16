@@ -3,48 +3,66 @@
  */
 import flushPromises from "flush-promises";
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue";
+import { VueWrapper } from "@vue/test-utils";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
+helper.resetWithApiMock(beforeEach, afterEach);
+
 describe("Save wikidata id", () => {
-  helper.resetWithApiMock(beforeEach, afterEach);
+  const wikidataId = "Q123";
+  it.each`
+    noteTitle   | wikidataTitle | userAction           | shouldSave
+    ${"dog"}    | ${"dog"}      | ${doNothing}         | ${true}
+    ${"Dog"}    | ${"dog"}      | ${doNothing}         | ${true}
+    ${"Canine"} | ${"dog"}      | ${doNothing}         | ${false}
+    ${"Canine"} | ${"dog"}      | ${cancelOperation}   | ${false}
+    ${"Canine"} | ${"dog"}      | ${confirmDifference} | ${true}
+    ${"Canine"} | ${""}         | ${doNothing}         | ${true}
+  `(
+    "associate $noteTitle with $wikidataTitle and choose to $userAction",
+    async ({ noteTitle, wikidataTitle, userAction, shouldSave }) => {
+      const note = makeMe.aNote.title(noteTitle).please();
+      const wikidata = makeMe.aWikidataEntity
+        .wikidataTitle(wikidataTitle)
+        .please();
 
-  beforeEach(() => {
-    const wikidata = makeMe.aWikidataEntity.wikidataTitle("TDD").please();
-    helper.apiMock.expectingGet("/api/wikidata/Q12434").andReturnOnce(wikidata);
-  });
+      helper.apiMock
+        .expectingGet(`/api/wikidata/${wikidataId}`)
+        .andReturnOnce(wikidata);
 
-  it("should call the update API when save", async () => {
-    const note = makeMe.aNote.title("TDD").please();
-    helper.apiMock.expectingPost(`/api/notes/${note.id}/updateWikidataId`);
+      if (shouldSave) {
+        helper.apiMock.expectingPost(`/api/notes/${note.id}/updateWikidataId`);
+      }
+      const wrapper = await putWikidataIdAndSubmit(note);
+      await userAction(wrapper);
+      helper.apiMock.assertNoUnexpectedOrMissedCalls();
+    }
+  );
 
+  async function putWikidataIdAndSubmit(note: Generated.Note) {
     const wrapper = helper
       .component(WikidataAssociationDialog)
       .withStorageProps({
         note,
       })
       .mount();
-
-    wrapper.find("#wikidataID-wikidataID").setValue("Q12434");
-    await wrapper.find('input[value="Save"]').trigger("submit");
-  });
-
-  it("should ask for confirmation if the title is different", async () => {
-    const note = makeMe.aNote.title("Test-Driven Development").please();
-    const wrapper = helper
-      .component(WikidataAssociationDialog)
-      .withStorageProps({
-        note,
-      })
-      .mount();
-
-    wrapper.find("#wikidataID-wikidataID").setValue("Q12434");
+    wrapper.find("#wikidataID-wikidataID").setValue(wikidataId);
     await wrapper.find('input[value="Save"]').trigger("submit");
     await flushPromises();
+    return wrapper;
+  }
+
+  async function cancelOperation(wrapper: VueWrapper) {
     await wrapper.find('input[type="cancel"]').trigger("click");
     await flushPromises();
-    expect(wrapper.text()).toContain(
-      "Associate Test-Driven Development to Wikidata"
-    );
-  });
+  }
+
+  async function confirmDifference(wrapper: VueWrapper) {
+    await wrapper.find('input[value="Confirm"]').trigger("submit");
+    await flushPromises();
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
+  function doNothing(_: VueWrapper) {}
 });
