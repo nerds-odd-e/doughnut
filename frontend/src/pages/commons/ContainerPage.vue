@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <LoadingPage v-bind="{ loading, contentExists }">
+    <LoadingPage v-bind="{ contentExists }">
       <h2 v-if="!!title">{{ title }}</h2>
       <slot />
     </LoadingPage>
@@ -12,7 +12,6 @@ import LoadingPage from "./LoadingPage.vue";
 
 const props = defineProps({
   title: String,
-  loading: Boolean,
   contentExists: Boolean,
 });
 </script>

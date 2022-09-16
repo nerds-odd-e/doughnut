@@ -2,9 +2,7 @@
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <BrandBar />
   </nav>
-  <LoadingPage
-    v-bind="{ loading, contentExists: !!circles, title: 'My Circles' }"
-  >
+  <LoadingPage v-bind="{ contentExists: circles, title: 'My Circles' }">
     <div v-if="!!circles">
       <ul class="list-group">
         <li class="list-group-item">

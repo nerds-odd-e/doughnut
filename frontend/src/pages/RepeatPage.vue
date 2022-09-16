@@ -1,41 +1,38 @@
 <template>
-  <ContainerPage v-bind="{ loading, contentExists: true }">
-    <div :class="currentResult ? 'repeat-paused' : ''">
-      <RepeatProgressBar
+  <div :class="currentResult ? 'repeat-paused' : ''">
+    <RepeatProgressBar
+      v-bind="{
+        finished,
+        toRepeatCount,
+        previousResultCursor,
+      }"
+      @view-last-result="viewLastResult($event)"
+    >
+    </RepeatProgressBar>
+  </div>
+  <template v-if="!minimized">
+    <template v-if="repetition">
+      <QuizQuestion
         v-bind="{
-          finished,
-          toRepeatCount,
-          previousResultCursor,
+          quizQuestion: repetition.quizQuestion,
+          storageAccessor,
         }"
-        @view-last-result="viewLastResult($event)"
-      >
-      </RepeatProgressBar>
-    </div>
-    <template v-if="!minimized">
-      <template v-if="repetition">
-        <QuizQuestion
-          v-bind="{
-            quizQuestion: repetition.quizQuestion,
-            storageAccessor,
-          }"
-          @answered="onAnswered($event)"
-          @reload-needed="fetchData"
-          :key="repetition.quizQuestion.quizQuestion.reviewPoint"
-        />
-      </template>
-      <template v-else>
-        <div v-if="finished > 0" class="alert alert-success">
-          You have finished all repetitions for this half a day!
-        </div>
-      </template>
+        @answered="onAnswered($event)"
+        @reload-needed="fetchData"
+        :key="repetition.quizQuestion.quizQuestion.reviewPoint"
+      />
     </template>
-  </ContainerPage>
+    <template v-else>
+      <div v-if="finished > 0" class="alert alert-success">
+        You have finished all repetitions for this half a day!
+      </div>
+    </template>
+  </template>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import QuizQuestion from "../components/review/QuizQuestion.vue";
-import ContainerPage from "./commons/ContainerPage.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
 import { StorageAccessor } from "../store/createNoteStorage";
@@ -54,7 +51,6 @@ export default defineComponent({
   },
   components: {
     QuizQuestion,
-    ContainerPage,
     RepeatProgressBar,
   },
   data() {

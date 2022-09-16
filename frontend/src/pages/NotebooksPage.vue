@@ -1,5 +1,5 @@
 <template>
-  <ContainerPage v-bind="{ loading, contentExists: true, title: 'Notebooks' }">
+  <ContainerPage v-bind="{ contentExists: true, title: 'Notebooks' }">
     <p>
       <NotebookNewButton>Add New Notebook</NotebookNewButton>
     </p>

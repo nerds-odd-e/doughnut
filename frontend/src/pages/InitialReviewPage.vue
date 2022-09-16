@@ -1,10 +1,5 @@
 <template>
-  <ContainerPage
-    v-bind="{
-      loading,
-      contentExists: !!reviewPoint,
-    }"
-  >
+  <ContainerPage v-bind="{ contentExists: !!reviewPoint }">
     <ProgressBar
       :class="minimized ? 'initial-review-paused' : ''"
       v-bind="{
