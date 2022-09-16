@@ -7,7 +7,17 @@ interface ManagedComponent {
   loading: Ref<boolean>;
 }
 
+type ApiStatus = { states: boolean[] };
+
 class ManagedApi {
+  static statusWrap = {
+    apiStatus: { states: [] } as ApiStatus,
+  };
+
+  static registerStatus(apiStatus: ApiStatus) {
+    ManagedApi.statusWrap.apiStatus = apiStatus;
+  }
+
   api;
 
   component;
@@ -26,6 +36,11 @@ class ManagedApi {
   private around<T>(promise: Promise<T>) {
     const assignLoading = (value: boolean) => {
       if (this.skipLoading) return;
+      if (value) {
+        ManagedApi.statusWrap.apiStatus.states.push(true);
+      } else {
+        ManagedApi.statusWrap.apiStatus.states.pop();
+      }
       if (this.component) {
         this.component.loading.value = value;
       }
@@ -72,3 +87,4 @@ class ManagedApi {
 }
 
 export default ManagedApi;
+export type { ApiStatus };

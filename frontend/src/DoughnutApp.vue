@@ -8,6 +8,7 @@ import usePopups from "./components/commons/Popups/usePopup";
 import ControlCenter from "./components/toolbars/ControlCenter.vue";
 import createNoteStorage from "./store/createNoteStorage";
 import BreadcrumbMain from "./components/toolbars/BreadcrumbMain.vue";
+import ManagedApi, { ApiStatus } from "./managedApi/ManagedApi";
 
 export default defineComponent({
   setup() {
@@ -23,6 +24,7 @@ export default defineComponent({
       featureToggle: false,
       environment: "production",
       storageAccessor: createNoteStorage(),
+      apiStatus: { states: [] } as ApiStatus,
     };
   },
 
@@ -63,6 +65,7 @@ export default defineComponent({
   },
 
   async mounted() {
+    ManagedApi.registerStatus(this.apiStatus);
     this.environment = this.api.testability.getEnvironment();
     this.featureToggle = await this.api.testability.getFeatureToggle();
     this.api.userMethods
@@ -85,7 +88,7 @@ export default defineComponent({
         <div class="header">
           <BreadcrumbMain v-bind="{ storageAccessor, user }" />
           <ControlCenter
-            v-bind="{ storageAccessor, user }"
+            v-bind="{ storageAccessor, user, apiStatus }"
             @update-user="user = $event"
           />
         </div>

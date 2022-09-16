@@ -1,19 +1,22 @@
 <template>
   <ToolbarFrame>
-    <template v-if="!user">
+    <LoadingThinBar v-if="apiStatus.states.length > 0" />
+    <template v-else>
+      <template v-if="!user">
+        <div class="btn-group btn-group-sm">
+          <BrandBar />
+        </div>
+      </template>
+      <NoteControlCenterForUser v-else v-bind="{ user, storageAccessor }" />
       <div class="btn-group btn-group-sm">
-        <BrandBar />
+        <ReviewButton class="btn" v-if="user" />
+        <NoteUndoButton v-bind="{ storageAccessor }" />
+        <UserActionsButton
+          v-bind="{ user }"
+          @update-user="$emit('updateUser', $event)"
+        />
       </div>
     </template>
-    <NoteControlCenterForUser v-else v-bind="{ user, storageAccessor }" />
-    <div class="btn-group btn-group-sm">
-      <ReviewButton class="btn" v-if="user" />
-      <NoteUndoButton v-bind="{ storageAccessor }" />
-      <UserActionsButton
-        v-bind="{ user }"
-        @update-user="$emit('updateUser', $event)"
-      />
-    </div>
   </ToolbarFrame>
 </template>
 
@@ -26,6 +29,8 @@ import UserActionsButton from "./UserActionsButton.vue";
 import BrandBar from "./BrandBar.vue";
 import NoteControlCenterForUser from "./NoteControlCenterForUser.vue";
 import ReviewButton from "./ReviewButton.vue";
+import { ApiStatus } from "../../managedApi/ManagedApi";
+import LoadingThinBar from "../commons/LoadingThinBar.vue";
 
 export default defineComponent({
   props: {
@@ -33,6 +38,7 @@ export default defineComponent({
       type: Object as PropType<StorageAccessor>,
       required: true,
     },
+    apiStatus: { type: Object as PropType<ApiStatus>, required: true },
     user: { type: Object as PropType<Generated.User> },
   },
   emits: ["updateUser"],
@@ -43,6 +49,7 @@ export default defineComponent({
     BrandBar,
     NoteControlCenterForUser,
     ReviewButton,
+    LoadingThinBar,
   },
 });
 </script>

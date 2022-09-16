@@ -24,7 +24,7 @@ describe("Note Control Center", () => {
   it("fetch API to be called ONCE", async () => {
     helper
       .component(ControlCenter)
-      .withProps({ storageAccessor: histories })
+      .withProps({ storageAccessor: histories, apiStatus: { states: [] } })
       .render();
 
     expect(screen.queryByTitle("undo")).toBeNull();
@@ -35,7 +35,7 @@ describe("Note Control Center", () => {
     noteEditingHistory.deleteNote(notebook.headNote.id);
     helper
       .component(ControlCenter)
-      .withProps({ storageAccessor: histories })
+      .withProps({ storageAccessor: histories, apiStatus: { states: [] } })
       .render();
 
     expect(await screen.findByTitle("undo delete note")).not.toBeDisabled();
