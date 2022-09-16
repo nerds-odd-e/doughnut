@@ -1,5 +1,5 @@
 <template>
-  <LoadingPage v-bind="{ loading, contentExists: !!reviewPoint }">
+  <LoadingPage v-bind="{ contentExists: !!reviewPoint }">
     <ShowReviewPoint
       v-if="reviewPoint"
       v-bind="{ reviewPoint, storageAccessor }"

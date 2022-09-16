@@ -9,7 +9,7 @@
   >
     i...
   </span>
-  <LoadingPage v-bind="{ loading, contentExists: true }">
+  <LoadingPage v-bind="{ contentExists: true }">
     <NoteInfo
       v-if="noteInfo"
       :note-info="noteInfo"

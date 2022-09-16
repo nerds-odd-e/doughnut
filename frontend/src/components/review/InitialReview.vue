@@ -1,5 +1,5 @@
 <template>
-  <ContainerPage v-bind="{ loading, contentExists: true }">
+  <ContainerPage v-bind="{ contentExists: true }">
     <ShowReviewPoint
       v-bind="{ reviewPoint, expandInfo: true, storageAccessor }"
       @level-changed="$emit('reloadNeeded', $event)"

@@ -1,5 +1,5 @@
 <template>
-  <LoadingPage v-bind="{ loading, contentExists: !!noteRealm }">
+  <LoadingPage v-bind="{ contentExists: !!noteRealm }">
     <div class="inner-box" v-if="noteRealm" :key="noteId">
       <NoteWithLinks
         v-bind="{

@@ -1,5 +1,5 @@
 <template>
-  <LoadingPage v-bind="{ loading, contentExists: true }">
+  <LoadingPage v-bind="{ contentExists: true }">
     <form @submit.prevent.once="processForm">
       <NoteFormTitleOnly v-model="noteFormData" :errors="formErrors" />
       <input type="submit" value="Submit" class="btn btn-primary" />

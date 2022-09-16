@@ -13,16 +13,14 @@
     />
   </div>
 
-  <LoadingPage v-bind="{ loading, contentExists: true }">
-    <div v-if="!searchResult || searchResult.length === 0">
-      <em>No matching notes found.</em>
-    </div>
-    <Cards v-else class="search-result" :notes="searchResult" :columns="3">
-      <template #button="{ note }">
-        <slot name="button" :note="note" />
-      </template>
-    </Cards>
-  </LoadingPage>
+  <div v-if="!searchResult || searchResult.length === 0">
+    <em>No matching notes found.</em>
+  </div>
+  <Cards v-else class="search-result" :notes="searchResult" :columns="3">
+    <template #button="{ note }">
+      <slot name="button" :note="note" />
+    </template>
+  </Cards>
 </template>
 
 <script lang="ts">
@@ -31,7 +29,6 @@ import _ from "lodash";
 import CheckInput from "../form/CheckInput.vue";
 import Cards from "../notes/Cards.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
-import LoadingPage from "../../pages/commons/LoadingPage.vue";
 
 const debounced = _.debounce((callback) => callback(), 500);
 
@@ -41,7 +38,7 @@ export default defineComponent({
   },
   name: "SearchNote",
   props: { noteId: Number, inputSearchKey: { type: String, required: true } },
-  components: { CheckInput, Cards, LoadingPage },
+  components: { CheckInput, Cards },
   data() {
     return {
       searchTerm: {
