@@ -12,14 +12,7 @@ class ManagedApi {
     ManagedApi.statusWrap.apiStatus = apiStatus;
   }
 
-  api;
-
-  constructor() {
-    this.api = new Api("/api/");
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  private around<T>(promise: Promise<T>): Promise<T> {
+  static around<T>(promise: Promise<T>): Promise<T> {
     const assignLoading = (value: boolean) => {
       if (value) {
         ManagedApi.statusWrap.apiStatus.states.push(true);
@@ -32,28 +25,34 @@ class ManagedApi {
     return promise.finally(() => assignLoading(false));
   }
 
+  api;
+
+  constructor() {
+    this.api = new Api("/api/");
+  }
+
   restGet(url: string) {
-    return this.around(this.api.restGet(url));
+    return ManagedApi.around(this.api.restGet(url));
   }
 
   restPost(url: string, data: JsonData) {
-    return this.around(this.api.restPost(url, data));
+    return ManagedApi.around(this.api.restPost(url, data));
   }
 
   restPatch(url: string, data: JsonData) {
-    return this.around(this.api.restPatch(url, data));
+    return ManagedApi.around(this.api.restPatch(url, data));
   }
 
   restPostMultiplePartForm(url: string, data: JsonData) {
-    return this.around(this.api.restPostMultiplePartForm(url, data));
+    return ManagedApi.around(this.api.restPostMultiplePartForm(url, data));
   }
 
   restPatchMultiplePartForm(url: string, data: JsonData) {
-    return this.around(this.api.restPatchMultiplePartForm(url, data));
+    return ManagedApi.around(this.api.restPatchMultiplePartForm(url, data));
   }
 
   restPostWithHtmlResponse(url: string, data: JsonData) {
-    return this.around(this.api.restPostWithHtmlResponse(url, data));
+    return ManagedApi.around(this.api.restPostWithHtmlResponse(url, data));
   }
 }
 
