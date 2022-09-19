@@ -6,7 +6,7 @@
       scope-name="subscription"
       field="dailyTargetOfNewNotes"
       v-model="formData.dailyTargetOfNewNotes"
-      :errors="formErrors.dailyTargetOfNewNotes"
+      :errors="errors.dailyTargetOfNewNotes"
     />
     <input type="submit" value="Submit" class="btn btn-primary" />
   </form>
@@ -18,13 +18,14 @@ import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default {
   setup() {
-    return useLoadingApi({ hasFormError: true });
+    return useLoadingApi();
   },
   props: { notebook: Object, loggedIn: Boolean },
   components: { TextInput },
   data() {
     return {
       formData: { dailyTargetOfNewNotes: 5 },
+      errors: {},
     };
   },
 
@@ -35,7 +36,7 @@ export default {
         .then((res) => {
           this.$router.push({ name: "notebooks" });
         })
-        .catch((res) => (this.formErrors = res));
+        .catch((res) => (this.errors = res));
     },
   },
 };

@@ -5,7 +5,7 @@
       scope-name="notebook"
       field="skipReviewEntirely"
       v-model="formData.skipReviewEntirely"
-      :errors="formErrors.skipReviewEntirely"
+      :errors="errors.skipReviewEntirely"
     />
     <input type="submit" value="Update" class="btn btn-primary" />
   </form>
@@ -17,7 +17,7 @@ import CheckInput from "../form/CheckInput.vue";
 
 export default {
   setup() {
-    return useLoadingApi({ hasFormError: true });
+    return useLoadingApi();
   },
   props: { notebook: Object },
   components: { CheckInput },
@@ -25,6 +25,7 @@ export default {
     const { skipReviewEntirely } = this.notebook;
     return {
       formData: { skipReviewEntirely },
+      errors: {},
     };
   },
 
@@ -34,7 +35,8 @@ export default {
         .updateNotebookSettings(this.notebook.id, this.formData)
         .then(() => {
           this.$router.push({ name: "notebooks" });
-        });
+        })
+        .catch((err) => (this.errors = err));
     },
   },
 };

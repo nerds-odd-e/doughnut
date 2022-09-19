@@ -6,7 +6,7 @@
       field="invitationCode"
       v-model="formData.invitationCode"
       :autofocus="true"
-      :errors="formErrors.invitationCode"
+      :errors="errors.invitationCode"
     />
     <input type="submit" value="Join" class="btn btn-primary" />
   </form>
@@ -18,7 +18,7 @@ import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default {
   setup() {
-    return useLoadingApi({ hasFormError: true });
+    return useLoadingApi();
   },
   components: { TextInput },
   props: { invitationCode: Number },
@@ -27,17 +27,21 @@ export default {
     return {
       circle: null,
       formData: { invitationCode: this.invitationCode },
+      errors: {},
     };
   },
 
   methods: {
     processForm() {
-      this.api.circleMethods.joinCircle(this.formData).then((res) => {
-        this.$router.push({
-          name: "circleShow",
-          params: { circleId: res.id },
-        });
-      });
+      this.api.circleMethods
+        .joinCircle(this.formData)
+        .then((res) => {
+          this.$router.push({
+            name: "circleShow",
+            params: { circleId: res.id },
+          });
+        })
+        .catch((err) => (this.errors = err));
     },
   },
 };

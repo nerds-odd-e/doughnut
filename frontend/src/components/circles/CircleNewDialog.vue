@@ -5,7 +5,7 @@
       scope-name="circle"
       field="name"
       v-model="formData.name"
-      :errors="formErrors.name"
+      :errors="errors.name"
     />
     <input type="submit" value="Submit" class="btn btn-primary" />
   </form>
@@ -17,7 +17,7 @@ import TextInput from "../form/TextInput.vue";
 
 export default {
   setup() {
-    return useLoadingApi({ hasFormError: true });
+    return useLoadingApi();
   },
   props: { notebook: Object, user: Object },
   emits: ["done"],
@@ -25,19 +25,22 @@ export default {
   data() {
     return {
       formData: {},
-      formErrors: {},
+      errors: {},
     };
   },
 
   methods: {
     processForm() {
-      this.api.circleMethods.createCircle(this.formData).then((res) => {
-        this.$emit("done", res);
-        this.$router.push({
-          name: "circleShow",
-          params: { circleId: res.id },
-        });
-      });
+      this.api.circleMethods
+        .createCircle(this.formData)
+        .then((res) => {
+          this.$emit("done", res);
+          this.$router.push({
+            name: "circleShow",
+            params: { circleId: res.id },
+          });
+        })
+        .catch((err) => (this.errors = err));
     },
   },
 };
