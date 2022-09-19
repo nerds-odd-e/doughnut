@@ -14,16 +14,13 @@ class ManagedApi {
 
   api;
 
-  skipLoading: boolean;
-
-  constructor(options: { skipLoading: boolean } = { skipLoading: false }) {
+  constructor() {
     this.api = new Api("/api/");
-    this.skipLoading = options.skipLoading;
   }
 
-  private around<T>(promise: Promise<T>) {
+  // eslint-disable-next-line class-methods-use-this
+  private around<T>(promise: Promise<T>): Promise<T> {
     const assignLoading = (value: boolean) => {
-      if (this.skipLoading) return;
       if (value) {
         ManagedApi.statusWrap.apiStatus.states.push(true);
       } else {
