@@ -29,9 +29,7 @@ class ManagedApi {
     };
 
     assignLoading(true);
-    return new Promise((resolve) => {
-      promise.then(resolve).finally(() => assignLoading(false));
-    });
+    return promise.finally(() => assignLoading(false));
   }
 
   restGet(url: string) {
