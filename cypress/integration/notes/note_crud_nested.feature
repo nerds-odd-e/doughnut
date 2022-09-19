@@ -14,10 +14,10 @@ Feature: Nested Note CRUD
     When I create a note belonging to "LeSS in Action":
       | Title        | Description                        |
       | Re-quirement | Re-think the way we do requirement |
-    And I navigate to "My Notes/LeSS in Action" note
-    Then I should see "LeSS in Action" in note title
-    And I should see these notes as children
+    And I should see "My Notes/LeSS in Action" with these children
       | note-title   |
+      | team|
+      | tech|
       | Re-quirement |
 
   Scenario: Create a new note with wrong info
@@ -33,11 +33,12 @@ Feature: Nested Note CRUD
     When I create a sibling note of "Re-quirement":
       | Title     | Description                   | Link Type To Parent |
       | Re-Design | Re-think the way we do design | a specialization of |
-    When I navigate to "My Notes/LeSS in Action" note
-    And I should see these notes as children
+    And I should see "My Notes/LeSS in Action" with these children
       | note-title   |
       | Re-quirement |
       | Re-Design    |
+      | team|
+      | tech|
     And On the current page, I should see "LeSS in Action" has link "a specialization of" "Re-Design"
 
   Scenario: Edit a note

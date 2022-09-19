@@ -186,6 +186,7 @@ Cypress.Commands.add("submitNoteFormsWith", (notes) => {
 })
 
 Cypress.Commands.add("expectNoteCards", (expectedCards: string[]) => {
+  cy.get("a.card-title").should("have.length", expectedCards.length)
   expectedCards.forEach((elem) => {
     for (const propName in elem) {
       if (propName === "note-title") {
@@ -203,9 +204,6 @@ Cypress.Commands.add("navigateToChild", (noteTitle) => {
 })
 
 Cypress.Commands.add("navigateToNotePage", (notePath: NotePath) => {
-  if (notePath.root !== "My Notes") {
-    throw new Error("only My Notes is implmemented")
-  }
   cy.routerToNotebooks()
   notePath.path.forEach((noteTitle) => cy.navigateToChild(noteTitle))
 })

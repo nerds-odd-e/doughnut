@@ -131,12 +131,17 @@ Then("I should see these notes belonging to the user at the top level of all my 
   cy.expectNoteCards(data.hashes())
 })
 
-Then("I should see these notes as children", (data) => {
-  cy.expectNoteCards(data.hashes())
+Then("I should see {notepath} with these children", (notePath: NotePath, data) => {
+  cy.navigateToNotePage(notePath).then(() => cy.expectNoteCards(data.hashes()))
 })
 
 When("I delete notebook {string}", (noteTitle) => {
   cy.visit("/")
+  cy.clickNotePageMoreOptionsButton(noteTitle, "Delete note")
+  cy.findByRole("button", { name: "OK" }).click()
+})
+
+When("I delete note {string}", (noteTitle) => {
   cy.clickNotePageMoreOptionsButton(noteTitle, "Delete note")
   cy.findByRole("button", { name: "OK" }).click()
 })
