@@ -1,0 +1,1 @@
+ALTER TABLE note ADD `wikidata_id` VARCHAR(50) DEFAULT NULL;
