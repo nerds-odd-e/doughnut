@@ -13,6 +13,7 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
@@ -22,19 +23,18 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/notes")
 class RestNoteController {
   private final ModelFactoryService modelFactoryService;
-  private Timestamp currentUTCTimestamp;
   private UserModel currentUser;
   private HttpClientAdapter httpClientAdapter;
-  private TestabilitySettings testabilitySettings;
+
+  @Resource(name = "testabilitySettings")
+  private final TestabilitySettings testabilitySettings;
 
   public RestNoteController(
       ModelFactoryService modelFactoryService,
-      Timestamp currentUTCTimestamp,
       UserModel currentUser,
       HttpClientAdapter httpClientAdapter,
       TestabilitySettings testabilitySettings) {
     this.modelFactoryService = modelFactoryService;
-    this.currentUTCTimestamp = currentUTCTimestamp;
     this.currentUser = currentUser;
     this.httpClientAdapter = httpClientAdapter;
     this.testabilitySettings = testabilitySettings;
@@ -60,6 +60,7 @@ class RestNoteController {
       throws NoAccessRightException, BindException, InterruptedException {
     currentUser.assertAuthorization(parentNote);
     User user = currentUser.getEntity();
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     Note note = parentNote.buildChildNote(user, currentUTCTimestamp, noteCreation.textContent);
     associateToWikidata(note, noteCreation.wikidataId);
     note.buildLinkToParent(user, noteCreation.getLinkTypeToParent(), currentUTCTimestamp);
@@ -93,7 +94,7 @@ class RestNoteController {
     currentUser.assertAuthorization(note);
 
     final User user = currentUser.getEntity();
-    noteAccessories.setUpdatedAt(currentUTCTimestamp);
+    noteAccessories.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     note.updateNoteContent(noteAccessories, user);
     modelFactoryService.noteRepository.save(note);
     return new NoteViewer(user, note).toJsonObject();
@@ -122,7 +123,7 @@ class RestNoteController {
   @Transactional
   public List<NoteRealm> deleteNote(@PathVariable("note") Note note) throws NoAccessRightException {
     currentUser.assertAuthorization(note);
-    modelFactoryService.toNoteModel(note).destroy(currentUTCTimestamp);
+    modelFactoryService.toNoteModel(note).destroy(testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.entityManager.flush();
     Note parentNote = note.getParentNote();
     if (parentNote != null) {

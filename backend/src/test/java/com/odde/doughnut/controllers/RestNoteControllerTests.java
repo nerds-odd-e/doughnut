@@ -13,6 +13,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.*;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.HttpClientAdapter;
 import com.odde.doughnut.testability.MakeMe;
@@ -49,11 +50,7 @@ class RestNoteControllerTests {
     userModel = makeMe.aUser().toModelPlease();
     controller =
         new RestNoteController(
-            modelFactoryService,
-            makeMe.aTimestamp().please(),
-            userModel,
-            httpClientAdapter,
-            testabilitySettings);
+            modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
   }
 
   @Nested
@@ -314,7 +311,7 @@ class RestNoteControllerTests {
     class UndoDeleteNoteTest {
       @Test
       void shouldUndoDeleteTheNote() throws NoAccessRightException {
-        deleteWithTimestamp(subject, makeMe.aTimestamp().please());
+        controller.deleteNote(subject);
         makeMe.refresh(subject);
         controller.undoDeleteNote(subject);
         makeMe.refresh(parent);
@@ -324,23 +321,19 @@ class RestNoteControllerTests {
 
       @Test
       void shouldUndoOnlyLastChange() throws NoAccessRightException {
-        deleteWithTimestamp(child, makeMe.aTimestamp().of(0, 8).please());
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        testabilitySettings.timeTravelTo(timestamp);
+        controller.deleteNote(child);
         makeMe.refresh(subject);
 
-        deleteWithTimestamp(subject, makeMe.aTimestamp().of(0, 9).please());
+        timestamp = TimestampOperations.addHoursToTimestamp(timestamp, 1);
+        testabilitySettings.timeTravelTo(timestamp);
+        controller.deleteNote(subject);
         makeMe.refresh(subject);
 
         controller.undoDeleteNote(subject);
         makeMe.refresh(parent);
         assertThat(parent.getDescendantsInBreathFirstOrder(), hasSize(1));
-      }
-
-      private void deleteWithTimestamp(Note note, Timestamp timestamp)
-          throws NoAccessRightException {
-        RestNoteController restNoteController =
-            new RestNoteController(
-                modelFactoryService, timestamp, userModel, httpClientAdapter, testabilitySettings);
-        restNoteController.deleteNote(note);
       }
     }
   }

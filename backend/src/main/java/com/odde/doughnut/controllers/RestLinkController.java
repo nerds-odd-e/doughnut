@@ -11,7 +11,8 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.LinkModel;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
-import java.sql.Timestamp;
+import com.odde.doughnut.testability.TestabilitySettings;
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
@@ -28,15 +29,17 @@ import org.springframework.web.bind.annotation.RestController;
 class RestLinkController {
   private final ModelFactoryService modelFactoryService;
 
-  private Timestamp currentUTCTimestamp;
+  @Resource(name = "testabilitySettings")
+  private final TestabilitySettings testabilitySettings;
+
   private UserModel currentUser;
 
   public RestLinkController(
       ModelFactoryService modelFactoryService,
-      Timestamp currentUTCTimestamp,
+      TestabilitySettings testabilitySettings,
       UserModel currentUser) {
     this.modelFactoryService = modelFactoryService;
-    this.currentUTCTimestamp = currentUTCTimestamp;
+    this.testabilitySettings = testabilitySettings;
     this.currentUser = currentUser;
   }
 
@@ -90,7 +93,12 @@ class RestLinkController {
     }
     User user = currentUser.getEntity();
     Link link =
-        Link.createLink(sourceNote, targetNote, user, linkCreation.linkType, currentUTCTimestamp);
+        Link.createLink(
+            sourceNote,
+            targetNote,
+            user,
+            linkCreation.linkType,
+            testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.linkRepository.save(link);
     return getNoteRealm(link, user, linkCreation.fromTargetPerspective);
   }
