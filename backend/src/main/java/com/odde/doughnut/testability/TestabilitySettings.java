@@ -8,7 +8,6 @@ import java.sql.Timestamp;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 
@@ -30,21 +29,11 @@ public class TestabilitySettings {
     }
   }
 
-  // To return a Timestamp as a Bean,
-  // we need to make it not final, so that CGLIB can create a subclass
-  static class MyTimestamp extends Timestamp {
-    public MyTimestamp(long time) {
-      super(time);
-    }
-  }
-
-  @Bean("currentUTCTimestamp")
-  @SessionScope
-  public MyTimestamp getCurrentUTCTimestamp() {
+  public Timestamp getCurrentUTCTimestamp() {
     if (timestamp == null) {
-      return new MyTimestamp(System.currentTimeMillis());
+      return new Timestamp(System.currentTimeMillis());
     }
-    return new MyTimestamp(timestamp.getTime());
+    return timestamp;
   }
 
   public Randomizer getRandomizer() {
