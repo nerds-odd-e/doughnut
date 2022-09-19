@@ -63,17 +63,17 @@ public class ReviewPoint {
   @Column(name = "last_reviewed_at")
   @Getter
   @Setter
-  private Timestamp lastReviewedAt = new Timestamp(System.currentTimeMillis());
+  private Timestamp lastReviewedAt;
 
   @Column(name = "next_review_at")
   @Getter
   @Setter
-  private Timestamp nextReviewAt = new Timestamp(System.currentTimeMillis());
+  private Timestamp nextReviewAt;
 
   @Column(name = "initial_reviewed_at")
   @Getter
   @Setter
-  private Timestamp initialReviewedAt = new Timestamp(System.currentTimeMillis());
+  private Timestamp initialReviewedAt;
 
   @Column(name = "repetition_count")
   @Getter

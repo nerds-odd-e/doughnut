@@ -14,6 +14,7 @@ public class ReviewPointBuilder extends EntityBuilder<ReviewPoint> {
 
   public ReviewPointBuilder(ReviewPoint reviewPoint, MakeMe makeMe) {
     super(makeMe, reviewPoint);
+    initiallyReviewedOn(makeMe.aTimestamp().of(0, 0).please());
   }
 
   public ReviewPointBuilder forNote(Note note) {
@@ -38,6 +39,7 @@ public class ReviewPointBuilder extends EntityBuilder<ReviewPoint> {
   public ReviewPointBuilder initiallyReviewedOn(Timestamp reviewTimestamp) {
     entity.setInitialReviewedAt(reviewTimestamp);
     entity.setLastReviewedAt(reviewTimestamp);
+    entity.setNextReviewAt(reviewTimestamp);
     return this;
   }
 

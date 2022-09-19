@@ -8,7 +8,7 @@ import java.time.ZonedDateTime;
 public class TimestampBuilder {
   private int day;
   private int hour;
-  ZoneId userTimeZone = null;
+  ZoneId userTimeZone = ZoneId.of("UTC");
 
   public TimestampBuilder of(int day, int hour) {
     this.day = day;
@@ -22,9 +22,6 @@ public class TimestampBuilder {
   }
 
   public Timestamp please() {
-    if (userTimeZone == null) {
-      throw new RuntimeException("We don't know the user's time zone yet");
-    }
     ZonedDateTime userDateTime = ZonedDateTime.of(1989, 1, 1, hour, 0, 0, 0, userTimeZone);
     ZonedDateTime utc = userDateTime.withZoneSameInstant(ZoneId.systemDefault());
 
