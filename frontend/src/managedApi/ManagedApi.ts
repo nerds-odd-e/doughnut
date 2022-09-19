@@ -1,10 +1,5 @@
-import { Ref } from "vue";
 import Api from "./Api";
 import { JsonData } from "./window/RestfulFetch";
-
-interface ManagedComponent {
-  formErrors: Ref<JsonData> | undefined;
-}
 
 type ApiStatus = { states: boolean[] };
 
@@ -19,16 +14,10 @@ class ManagedApi {
 
   api;
 
-  component;
-
   skipLoading: boolean;
 
-  constructor(
-    component: ManagedComponent | undefined,
-    options: { skipLoading: boolean } = { skipLoading: false }
-  ) {
+  constructor(options: { skipLoading: boolean } = { skipLoading: false }) {
     this.api = new Api("/api/");
-    this.component = component;
     this.skipLoading = options.skipLoading;
   }
 
@@ -43,17 +32,8 @@ class ManagedApi {
     };
 
     assignLoading(true);
-    return new Promise((resolve, reject) => {
-      promise
-        .then(resolve)
-        .catch((error) => {
-          if (this.component && this.component.formErrors !== undefined) {
-            this.component.formErrors.value = error;
-            return;
-          }
-          reject(error);
-        })
-        .finally(() => assignLoading(false));
+    return new Promise((resolve) => {
+      promise.then(resolve).finally(() => assignLoading(false));
     });
   }
 
