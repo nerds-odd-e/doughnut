@@ -57,7 +57,7 @@ export default class StoredApiCollection implements StoredApi {
   storage: NoteStorage;
 
   constructor(undoHistory: NoteEditingHistory, storage: NoteStorage) {
-    this.managedApi = new ManagedApi(undefined);
+    this.managedApi = new ManagedApi();
     this.noteEditingHistory = undoHistory;
     this.storage = storage;
   }
