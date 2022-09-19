@@ -24,7 +24,6 @@
   </bean>
   <bean id="emf"
   class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-
     <property name="packagesToScan"
     value="com.odde.doughnut.entities" />
     <property name="dataSource" ref="dataSource" />

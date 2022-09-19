@@ -320,7 +320,7 @@ class RestNoteControllerTests {
       }
 
       @Test
-      void shouldUndoOnlylastChange() throws NoAccessRightException {
+      void shouldUndoOnlyLastChange() throws NoAccessRightException {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         testabilitySettings.timeTravelTo(timestamp);
         controller.deleteNote(child);
