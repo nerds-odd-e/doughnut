@@ -14,7 +14,6 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -35,12 +34,12 @@ class RestCircleControllerTest {
   @Autowired MakeMe makeMe;
   private UserModel userModel;
   RestCircleController controller;
-  private TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    controller = new RestCircleController(modelFactoryService, testabilitySettings, userModel);
+    controller =
+        new RestCircleController(modelFactoryService, makeMe.aTimestamp().please(), userModel);
   }
 
   @Nested
@@ -49,7 +48,7 @@ class RestCircleControllerTest {
     void itShouldNotAllowNonMemberToSeeACircle() {
       controller =
           new RestCircleController(
-              modelFactoryService, testabilitySettings, makeMe.aNullUserModel());
+              modelFactoryService, makeMe.aTimestamp().please(), makeMe.aNullUserModel());
       assertThrows(
           ResponseStatusException.class,
           () -> {
@@ -74,7 +73,8 @@ class RestCircleControllerTest {
     @Test
     void itShouldCircleForUserViewIfAuthorized() throws NoAccessRightException {
       UserModel user = makeMe.aUser().toModelPlease();
-      controller = new RestCircleController(modelFactoryService, testabilitySettings, user);
+      controller =
+          new RestCircleController(modelFactoryService, makeMe.aTimestamp().please(), user);
 
       Circle circle = makeMe.aCircle().please();
       circle.setName("Some circle");
@@ -99,7 +99,7 @@ class RestCircleControllerTest {
       Circle circle = makeMe.aCircle().please();
       controller =
           new RestCircleController(
-              modelFactoryService, testabilitySettings, makeMe.aNullUserModel());
+              modelFactoryService, makeMe.aTimestamp().please(), makeMe.aNullUserModel());
       assertThrows(
           ResponseStatusException.class,
           () -> {
