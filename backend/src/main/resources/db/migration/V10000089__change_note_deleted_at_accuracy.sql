@@ -1,1 +1,1 @@
-ALTER TABLE note ADD `wikidata_id` VARCHAR(50) DEFAULT NULL;
+ALTER TABLE note MODIFY `deleted_at` timestamp(3);
