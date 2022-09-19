@@ -98,6 +98,7 @@ declare namespace Cypress {
     testability(): Chainable<any>
     timeTravelTo(day: number, hour: number): Chainable<Subject>
     triggerException(): Chainable<Subject>
+    undoLast(undoThpe: string): Chainable<any>
     unsubscribeFromNotebook(noteTitle: string): Chainable<any>
     updateCurrentUserSettingsWith(hash: Record<string, string>): Chainable<Subject>
     wikidataService(): Chainable<any>

@@ -36,7 +36,7 @@ import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default {
   setup() {
-    return useLoadingApi({ initalLoading: true, hasFormError: true });
+    return useLoadingApi({ hasFormError: true });
   },
   components: { ContainerPage, TextInput },
   emits: ["done"],

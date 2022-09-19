@@ -38,7 +38,7 @@ import { StorageAccessor } from "../store/createNoteStorage";
 
 export default defineComponent({
   setup() {
-    return useLoadingApi({ initalLoading: true });
+    return useLoadingApi();
   },
   props: {
     answerId: { type: Number, required: true },

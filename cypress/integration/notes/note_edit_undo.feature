@@ -15,6 +15,6 @@ Feature: Undo Note Edit
     And I should see "A super awesome training" in the page
     When I undo "editing"
     Then I should see "An awesome training" in the page
-    When I undo "editing"
+    When I undo "editing" again
     Then I should see "LeSS in Action" in the page
     And there should be no more undo to do

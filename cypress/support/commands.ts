@@ -269,7 +269,7 @@ Cypress.Commands.add("clickNotePageButton", (noteTitle, btnTextOrTitle, forceLoa
 })
 
 Cypress.Commands.add("clickNotePageMoreOptionsButton", (noteTitle, btnTextOrTitle) => {
-  cy.jumpToNotePage(noteTitle, true)
+  cy.jumpToNotePage(noteTitle)
   cy.clickNotePageMoreOptionsButtonOnCurrentPage(btnTextOrTitle)
 })
 
@@ -501,6 +501,10 @@ Cypress.Commands.add("distanceBetweenCardsGreaterThan", (cards, note1, note2, mi
 
 Cypress.Commands.add("clickNotePageButtonOnCurrentPage", (btnTextOrTitle) => {
   cy.get(".toolbar").findByRole("button", { name: btnTextOrTitle }).click()
+})
+
+Cypress.Commands.add("undoLast", (undoType: string) => {
+  cy.findByTitle(`undo ${undoType}`).click()
 })
 
 Cypress.Commands.add("deleteNoteViaAPI", { prevSubject: true }, (subject) => {

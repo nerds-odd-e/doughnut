@@ -364,7 +364,11 @@ Then(
 )
 
 When("I undo {string}", (undoType: string) => {
-  cy.findByTitle(`undo ${undoType}`).click()
+  cy.undoLast(undoType)
+})
+
+When("I undo {string} again", (undoType: string) => {
+  cy.undoLast(undoType)
 })
 
 Then("the deleted notebook with title {string} should be restored", (title: string) => {

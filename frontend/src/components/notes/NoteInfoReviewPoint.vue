@@ -54,7 +54,7 @@ import SvgHappy from "../svgs/SvgHappy.vue";
 
 export default defineComponent({
   setup() {
-    return { ...useLoadingApi({ initalLoading: true }), ...usePopups() };
+    return { ...useLoadingApi(), ...usePopups() };
   },
   props: {
     reviewPoint: {

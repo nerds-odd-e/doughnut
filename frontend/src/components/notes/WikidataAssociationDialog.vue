@@ -41,7 +41,7 @@ import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   setup() {
-    return useLoadingApi({ initalLoading: true, hasFormError: false });
+    return useLoadingApi({ hasFormError: false });
   },
   props: {
     note: { type: Object as PropType<Generated.Note>, required: true },

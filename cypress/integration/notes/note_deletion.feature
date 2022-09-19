@@ -17,7 +17,7 @@ Feature: Note deletion
     And I should see "My Notes/LeSS in Action/tech" with these children
       | note-title   |
       | CI System    |
-    When I undo "delete note"
+    When I undo "delete note" again
     And I should see "My Notes/LeSS in Action/tech" with these children
       | note-title   |
       | CI System    |

@@ -50,7 +50,7 @@ import { StorageAccessor } from "../store/createNoteStorage";
 
 export default defineComponent({
   setup() {
-    return useLoadingApi({ initalLoading: true, hasFormError: true });
+    return useLoadingApi({ hasFormError: true });
   },
   components: {
     SvgMissingAvatar,

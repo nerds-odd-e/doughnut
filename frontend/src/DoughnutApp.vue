@@ -13,7 +13,7 @@ import ManagedApi, { ApiStatus } from "./managedApi/ManagedApi";
 export default defineComponent({
   setup() {
     return {
-      ...useLoadingApi({ initalLoading: true, skipLoading: true }),
+      ...useLoadingApi(),
       ...usePopups(),
     };
   },

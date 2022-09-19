@@ -23,7 +23,7 @@ import useLoadingApi from "../managedApi/useLoadingApi";
 
 export default defineComponent({
   setup() {
-    return useLoadingApi({ initalLoading: true });
+    return useLoadingApi();
   },
   components: { ContainerPage, NotebookBazaarViewCards },
   props: {

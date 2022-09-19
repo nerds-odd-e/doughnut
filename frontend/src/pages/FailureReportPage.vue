@@ -27,7 +27,7 @@ import ContainerPage from "./commons/ContainerPage.vue";
 
 export default {
   setup() {
-    return useLoadingApi({ initalLoading: true });
+    return useLoadingApi();
   },
   props: { failureReportId: [String, Number] },
   components: { ContainerPage },

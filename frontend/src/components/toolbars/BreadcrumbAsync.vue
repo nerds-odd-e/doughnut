@@ -12,7 +12,7 @@ import Breadcrumb from "./Breadcrumb.vue";
 
 export default defineComponent({
   setup() {
-    return { ...useLoadingApi({ initalLoading: true }) };
+    return { ...useLoadingApi() };
   },
   props: {
     noteId: { type: Number, required: true },

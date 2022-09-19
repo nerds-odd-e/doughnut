@@ -38,7 +38,7 @@ import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default defineComponent({
   setup() {
-    return useLoadingApi({ initalLoading: true, hasFormError: false });
+    return useLoadingApi({ hasFormError: false });
   },
   props: { title: { type: String, required: true } },
   emits: ["selected"],

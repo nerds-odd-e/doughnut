@@ -30,7 +30,7 @@ import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default defineComponent({
   setup() {
-    return useLoadingApi({ initalLoading: true, hasFormError: true });
+    return useLoadingApi({ hasFormError: true });
   },
   props: {
     noteId: { type: Number, required: true },

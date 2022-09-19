@@ -19,7 +19,7 @@ import { StorageAccessor } from "../store/createNoteStorage";
 
 export default defineComponent({
   setup() {
-    return useLoadingApi({ initalLoading: true });
+    return useLoadingApi();
   },
   props: {
     noteId: { type: Number, required: true },
