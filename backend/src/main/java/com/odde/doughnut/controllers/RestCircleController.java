@@ -12,8 +12,9 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.JsonViewer;
 import com.odde.doughnut.models.UserModel;
-import java.sql.Timestamp;
+import com.odde.doughnut.testability.TestabilitySettings;
 import java.util.List;
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -31,15 +32,17 @@ import org.springframework.web.bind.annotation.RestController;
 class RestCircleController {
   private final ModelFactoryService modelFactoryService;
 
-  private Timestamp currentUTCTimestamp;
+  @Resource(name = "testabilitySettings")
+  private final TestabilitySettings testabilitySettings;
+
   private UserModel currentUser;
 
   public RestCircleController(
       ModelFactoryService modelFactoryService,
-      Timestamp currentUTCTimestamp,
+      TestabilitySettings testabilitySettings,
       UserModel currentUser) {
     this.modelFactoryService = modelFactoryService;
-    this.currentUTCTimestamp = currentUTCTimestamp;
+    this.testabilitySettings = testabilitySettings;
     this.currentUser = currentUser;
   }
 
@@ -97,7 +100,8 @@ class RestCircleController {
     Note note =
         circle
             .getOwnership()
-            .createNotebook(currentUser.getEntity(), textContent, currentUTCTimestamp);
+            .createNotebook(
+                currentUser.getEntity(), textContent, testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.noteRepository.save(note);
     return new RedirectToNoteResponse(note.getId());
   }
