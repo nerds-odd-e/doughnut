@@ -1,7 +1,7 @@
 <template>
   <LoadingPage v-bind="{ contentExists: true }">
     <form @submit.prevent.once="processForm">
-      <NoteFormTitleOnly v-model="noteFormData" :errors="formErrors" />
+      <NoteFormTitleOnly v-model="noteFormData" :errors="errors" />
       <input type="submit" value="Submit" class="btn btn-primary" />
     </form>
   </LoadingPage>
@@ -14,7 +14,7 @@ import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default {
   setup() {
-    return useLoadingApi({ hasFormError: true });
+    return useLoadingApi();
   },
   props: { circle: Object },
   components: {
@@ -24,6 +24,7 @@ export default {
   data() {
     return {
       noteFormData: {},
+      errors: {},
     };
   },
   methods: {
@@ -35,7 +36,8 @@ export default {
             name: "noteShow",
             params: { noteId: res.noteId },
           })
-        );
+        )
+        .catch((err) => (this.errors = err));
     },
   },
 };

@@ -3,7 +3,7 @@
     scope-name="review_setting"
     field="level"
     :model-value="formData.level"
-    :errors="formErrors.level"
+    :errors="errors.level"
     :options="
       [0, 1, 2, 3, 4, 5, 6].map((level) => ({
         value: level,
@@ -17,7 +17,7 @@
     scope-name="review_setting"
     field="rememberSpelling"
     :model-value="formData.rememberSpelling"
-    :errors="formErrors.rememberSpelling"
+    :errors="errors.rememberSpelling"
     @update:model-value="updateModelValue({ rememberSpelling: $event })"
   />
 </template>
@@ -30,7 +30,7 @@ import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default defineComponent({
   setup() {
-    return useLoadingApi({ hasFormError: true });
+    return useLoadingApi();
   },
   props: {
     noteId: { type: Number, required: true },
@@ -47,7 +47,7 @@ export default defineComponent({
         Generated.ReviewSetting,
         "id"
       >,
-      formErrors: {} as Partial<Generated.ReviewSetting>,
+      errors: {} as Partial<Generated.ReviewSetting>,
     };
   },
   methods: {
@@ -62,7 +62,8 @@ export default defineComponent({
           if (newValue.level !== undefined) {
             this.$emit("levelChanged", newValue.level);
           }
-        });
+        })
+        .catch((error) => (this.errors = error));
     },
   },
 });

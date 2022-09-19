@@ -9,19 +9,19 @@
           field="name"
           v-model="formData.name"
           :autofocus="true"
-          :errors="formErrors.name"
+          :errors="errors.name"
         />
         <TextInput
           scope-name="user"
           field="dailyNewNotesCount"
           v-model="formData.dailyNewNotesCount"
-          :errors="formErrors.dailyNewNotesCount"
+          :errors="errors.dailyNewNotesCount"
         />
         <TextInput
           scope-name="user"
           field="spaceIntervals"
           v-model="formData.spaceIntervals"
-          :errors="formErrors.spaceIntervals"
+          :errors="errors.spaceIntervals"
         />
         <input type="submit" value="Submit" class="btn btn-primary" />
       </form>
@@ -36,13 +36,14 @@ import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default {
   setup() {
-    return useLoadingApi({ hasFormError: true });
+    return useLoadingApi();
   },
   components: { ContainerPage, TextInput },
   emits: ["done"],
   data() {
     return {
       formData: null,
+      errors: {},
     };
   },
   methods: {
@@ -50,10 +51,11 @@ export default {
       this.formData = await this.api.userMethods.currentUser();
     },
     async processForm() {
-      const updated = await this.api.userMethods.updateUser(
-        this.formData.id,
-        this.formData
-      );
+      const updated = await this.api.userMethods
+        .updateUser(this.formData.id, this.formData)
+        .catch((err) => {
+          this.errors = err;
+        });
       this.$emit("done", updated);
     },
   },

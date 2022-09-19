@@ -11,7 +11,7 @@
         field="name"
         v-model="formData.name"
         :autofocus="true"
-        :errors="formErrors.name"
+        :errors="errors.name"
         placeholder="Nickname"
       />
       <input type="submit" value="Submit" class="btn btn-primary" />
@@ -27,7 +27,7 @@ import useLoadingApi from "../managedApi/useLoadingApi";
 
 export default defineComponent({
   setup() {
-    return useLoadingApi({ hasFormError: true });
+    return useLoadingApi();
   },
   emits: ["updateUser"],
   components: { ContainerPage, TextInput },
@@ -36,15 +36,20 @@ export default defineComponent({
       formData: {
         name: undefined as undefined | string,
       } as Generated.User,
-      formErrors: {
+      errors: {
         name: undefined as undefined | string,
       },
     };
   },
   methods: {
     async processForm() {
-      const user = await this.api.userMethods.createUser(this.formData);
-      this.$emit("updateUser", user);
+      try {
+        const user = await this.api.userMethods.createUser(this.formData);
+        this.$emit("updateUser", user);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (err: any) {
+        this.errors = err;
+      }
     },
   },
 });

@@ -5,7 +5,7 @@
       scope-name="subscription"
       field="dailyTargetOfNewNotes"
       v-model="formData.dailyTargetOfNewNotes"
-      :errors="formErrors.dailyTargetOfNewNotes"
+      :errors="errors.dailyTargetOfNewNotes"
     />
     <input type="submit" value="Update" class="btn btn-primary" />
   </form>
@@ -17,7 +17,7 @@ import TextInput from "../form/TextInput.vue";
 
 export default {
   setup() {
-    return useLoadingApi({ hasFormError: true });
+    return useLoadingApi();
   },
   props: { subscription: Object },
   components: { TextInput },
@@ -25,6 +25,7 @@ export default {
     const { dailyTargetOfNewNotes } = this.subscription;
     return {
       formData: { dailyTargetOfNewNotes },
+      errors: {},
     };
   },
 
@@ -34,7 +35,8 @@ export default {
         .updateSubscription(this.subscription.id, this.formData)
         .then(() => {
           this.$router.push({ name: "notebooks" });
-        });
+        })
+        .catch((err) => (this.errors = err));
     },
   },
 };
