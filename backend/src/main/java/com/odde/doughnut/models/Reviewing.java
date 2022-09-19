@@ -44,7 +44,7 @@ public class Reviewing {
     return reviewScope
         .getThingHaveNotBeenReviewedAtAll()
         .limit(count)
-        .map(ReviewPoint::createReviewPointForThing);
+        .map(ReviewPoint::buildReviewPointForThing);
   }
 
   private int toRepeatCount() {

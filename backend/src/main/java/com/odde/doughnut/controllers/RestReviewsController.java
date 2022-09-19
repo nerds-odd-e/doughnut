@@ -70,9 +70,9 @@ class RestReviewsController {
   @Transactional
   public ReviewPoint create(@RequestBody InitialInfo initialInfo) {
     currentUser.assertLoggedIn();
-    ReviewPoint reviewPoint = new ReviewPoint();
-    reviewPoint.setThing(
-        modelFactoryService.thingRepository.findById(initialInfo.thingId).orElse(null));
+    ReviewPoint reviewPoint =
+        ReviewPoint.buildReviewPointForThing(
+            modelFactoryService.thingRepository.findById(initialInfo.thingId).orElse(null));
     reviewPoint.setRemovedFromReview(initialInfo.skipReview);
 
     ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPoint);

@@ -73,12 +73,12 @@ public class MakeMe {
   }
 
   public ReviewPointBuilder aReviewPointFor(Note note) {
-    ReviewPoint reviewPoint = new ReviewPoint();
+    ReviewPoint reviewPoint = ReviewPoint.buildReviewPointForThing(note.getThing());
     return new ReviewPointBuilder(reviewPoint, this).forNote(note);
   }
 
   public ReviewPointBuilder aReviewPointFor(Link link) {
-    ReviewPoint reviewPoint = new ReviewPoint();
+    ReviewPoint reviewPoint = ReviewPoint.buildReviewPointForThing(link.getThing());
     return new ReviewPointBuilder(reviewPoint, this).forLink(link);
   }
 

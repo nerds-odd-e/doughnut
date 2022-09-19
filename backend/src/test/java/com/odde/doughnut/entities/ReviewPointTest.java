@@ -21,7 +21,7 @@ public class ReviewPointTest {
   User user;
   Note note;
   Link link;
-  ReviewPoint reviewPoint = new ReviewPoint();
+  ReviewPoint reviewPoint;
 
   @BeforeEach
   void setup() {
@@ -29,7 +29,7 @@ public class ReviewPointTest {
     note = makeMe.aNote().creatorAndOwner(user).please();
     Note note2 = makeMe.aNote().creatorAndOwner(user).linkTo(note).please();
     link = note2.getLinks().get(0);
-    reviewPoint.setUser(user);
+    reviewPoint = makeMe.aReviewPointFor(note).by(user).inMemoryPlease();
   }
 
   @Test

@@ -29,12 +29,10 @@ public class ReviewPoint {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-  public static ReviewPoint createReviewPointForThing(Thing thing) {
-    return new ReviewPoint() {
-      {
-        this.setThing(thing);
-      }
-    };
+  public static ReviewPoint buildReviewPointForThing(Thing thing) {
+    ReviewPoint entity = new ReviewPoint();
+    entity.setThing(thing);
+    return entity;
   }
 
   public QuizQuestion createAQuizQuestionOfType(QuestionType questionType) {
@@ -91,6 +89,8 @@ public class ReviewPoint {
   @Getter
   @Setter
   private Boolean removedFromReview = false;
+
+  private ReviewPoint() {}
 
   @JsonIgnore
   public Note getNote() {
