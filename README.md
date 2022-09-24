@@ -48,9 +48,16 @@ run `sudo dpkg-reconfigure dash` and answer "No" to reconfigure to `bash` as def
 If you hit problems with the above quick-start setup, you should manually walk through
 the [local development environment nix setup](./docs/nix.md).
 
+[Additional things to note for Windows10 or Windows11 developers using WSL2 with Ubuntu-20.04 or Ubuntu-22.04.](./docs/wsl2.md)
+
 (NB: Nix and [sdkman](https://sdkman.io/) don't play very well together. A simple way around is to move or rename `~/.sdkman` dir and comment out sdkman related config in `~/.<SHELL>rc`.)
 
 ### 2. Setup and run doughnut with migrations in 'E2E' profile (backend app started on port 9081)
+
+From the root of your doughnut directory, start your doughnut nix development environment with
+```bash
+nix develop
+```
 
 ```bash
 yarn frontend:build && yarn sut
