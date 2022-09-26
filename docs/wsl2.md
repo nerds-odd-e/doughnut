@@ -14,3 +14,8 @@ Open your start menu > right-click XLaunch shortcut > More > Open file location;
 Right-click XLaunch shortcut in the Explorer window > Properties;
 
 Add `-ac` option right after the closing double quote in the Target field - i.e. "C:\Program Files\VcXsrv\xlaunch.exe" -ac;
+
+If you still failed to open cypress after following above instructions, you may try replace `DISPLAY` by below commands in `.bashrc`.
+```
+export DISPLAY=$(route.exe print | grep 0.0.0.0 | head -1 | awk '{print $4}'):0.0
+```
