@@ -221,6 +221,7 @@ declare namespace Generated {
         noteAccessories: NoteAccessories;
         wikidataId: string;
         textContent: TextContent;
+        location?: NoteLocation;
         pictureWithMask?: PictureWithMask;
     }
 
@@ -280,6 +281,11 @@ declare namespace Generated {
         useParentPicture: boolean;
         skipReview: boolean;
         updatedAt: string;
+    }
+
+    interface NoteLocation {
+        photoUrl?: string;
+        mapUrl?: string;
     }
 
     interface Circle {
