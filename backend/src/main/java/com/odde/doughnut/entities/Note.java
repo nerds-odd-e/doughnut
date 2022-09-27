@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.*;
 import javax.validation.Valid;
+
+import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
@@ -318,7 +320,12 @@ public class Note extends Thingy {
               return pictureWithMask;
             });
   }
-
+  public Optional<NoteLocation> getLocation() {
+    NoteLocation noteLocation = new NoteLocation();
+    noteLocation.photoUrl = Optional.of("http://www.google.com");
+    noteLocation.mapUrl = Optional.of("http://www.google.com");
+    return Optional.of(noteLocation);
+  }
   private Optional<String> getNotePicture() {
     if (noteAccessories.getUseParentPicture() && getParentNote() != null) {
       return getParentNote().getNotePicture();
