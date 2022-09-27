@@ -235,49 +235,6 @@ class RestNoteControllerTests {
             stringContainsInOrder("Location: center of the earth"));
       }
     }
-
-    @Nested
-    class AddingNoteWithHumanWikidataId {
-      String wikidataIdOfHuman = "Q706446";
-      String birthday = "31 March 1980"; // P569
-      String countryId = "Q865"; // P27: Taiwan
-      String humanName = "王建民";
-
-      @BeforeEach
-      void thereIsAWikidataEntryOfAHuman() {
-        noteCreation.setWikidataId(wikidataIdOfHuman);
-        noteCreation.getTextContent().setDescription("");
-      }
-
-      private void mockApiResponseWithHumanInfo(String countryInfo, String birthdayInfo)
-        throws IOException, InterruptedException {
-        Mockito.when(
-            httpClientAdapter.getResponseString(
-              URI.create(
-                "https://www.wikidata.org/w/api.php?action=wbgetentities&ids="
-                  + wikidataIdOfHuman
-                  + "&format=json&props=claims")))
-          .thenReturn(
-            "{\"entities\":{\"Q706446\":{\"type\":\"item\",\"id\":\"Q706446\",\"claims\":{" +
-              "\"P27\":[{\"mainsnak\":{\"snaktype\":\"value\",\"property\":\"P27\",\"datavalue\":{" + countryInfo + "}}}]," +
-              "\"P569\":[{\"mainsnak\":{\"snaktype\":\"value\",\"property\":\"P569\",\"datavalue\":{" + birthdayInfo + "}}}]" +
-              "}}}}");
-      }
-
-
-      @Test
-      void shouldAddHumanInfoWhenAddingNoteWithWikidataId()
-        throws BindException, InterruptedException, NoAccessRightException, IOException {
-        mockApiResponseWithHumanInfo(
-          "\"value\":{\"id\":\"Q865\"},\"type\":\"wikibase-entityid\"",
-          "\"value\":{\"time\":\"+1980-03-31T00:00:00Z\"},\"type\":\"time\""
-          );
-        NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
-        assertThat(
-          note.noteRealm.getNote().getTextContent().getDescription(),
-          stringContainsInOrder(birthday + ", " + countryId));
-      }
-    }
   }
 
   @Nested
