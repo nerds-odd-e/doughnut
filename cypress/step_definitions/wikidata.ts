@@ -21,8 +21,7 @@ Then("I don't need to confirm the association with different title {string}", ()
 
 Given(
   "Wikidata.org entity {string} is a human with date on birthday {string} and country of citizenship {string}",
-  (wikidataTitle: string, birthday: string, country: string) => {
-  },
+  () => ({}),
 )
 
 Given(
