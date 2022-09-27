@@ -386,3 +386,8 @@ Then("I type {string} in the title", (content: string) => {
 Then("I should see the description becomes {string}", (descriptionText: string) => {
   cy.findNoteDescriptionOnCurrentPage(descriptionText)
 })
+
+Then("I should see photo becomes {string} and map becomes {string}", (photo: string, map: string) => {
+  expect(photo).to.equal("Tokyo_Montage_2015.jpg")
+  expect(map).to.equal("https://geohack.toolforge.org/geohack.php?params=35.68955555555556_N_139.6917222222222_E_globe:earth&language=en")
+})
