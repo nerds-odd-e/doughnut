@@ -44,6 +44,16 @@
       />
       <SvgPictureIndicator v-else class="picture-indicator" />
     </template>
+    <ShowLocation
+      v-bind="{
+        photoUrl:
+          'https://content.r9cdn.net/rimg/dimg/c1/f7/06109851-ctry-132-171a795fe02.jpg?width=1366&height=768&xhint=3330&yhint=2439&crop=true',
+        mapUrl:
+          'https://upload.wikimedia.org/wikipedia/commons/0/06/OOjs_UI_icon_add.svg',
+      }"
+      v-if="!!note.location"
+    />
+
     <template v-if="!!note.noteAccessories.url">
       <div v-if="size != 'small'">
         <label v-if="note.noteAccessories.urlIsVideo">Video Url:</label>
@@ -70,6 +80,7 @@ import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
 import EditableText from "../form/EditableText.vue";
 import NoteWikidataAssociation from "./NoteWikidataAssociation.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
+import ShowLocation from "./ShowLocation.vue";
 
 export default defineComponent({
   props: {
@@ -82,6 +93,7 @@ export default defineComponent({
     },
   },
   components: {
+    ShowLocation,
     NoteShortDescription,
     ShowPicture,
     SvgDescriptionIndicator,
@@ -114,6 +126,7 @@ export default defineComponent({
 .note-content
   display: flex
   flex-wrap: wrap
+
   .col
     flex: 1 1 auto
     width: 50%
