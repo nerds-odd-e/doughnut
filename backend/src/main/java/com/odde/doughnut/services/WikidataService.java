@@ -99,4 +99,12 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
         uriBuilder.apply(wikidataUriBuilder().path("/w/api.php").queryParam("action", action));
     return httpClientAdapter.getResponseString(uri);
   }
+
+  public Optional<String> getWikidataLocationPhotoUrl(String wikidataId) {
+    String s = "Seul_montaje.png";
+    return Optional.of(
+        "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/"
+            + s
+            + "&width=300");
+  }
 }

@@ -13,6 +13,7 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,7 +66,7 @@ class RestNoteController {
     associateToWikidata(note, noteCreation.wikidataId);
     note.buildLinkToParent(user, noteCreation.getLinkTypeToParent(), currentUTCTimestamp);
     modelFactoryService.noteRepository.save(note);
-    
+
     return NoteRealmWithPosition.fromNote(note, user);
   }
 
@@ -76,7 +77,18 @@ class RestNoteController {
   @GetMapping("/{note}")
   public NoteRealmWithPosition show(@PathVariable("note") Note note) throws NoAccessRightException {
     currentUser.assertReadAuthorization(note);
-    return NoteRealmWithPosition.fromNote(note, currentUser.getEntity());
+    NoteRealmWithPosition noteRealmWithPosition =
+        NoteRealmWithPosition.fromNote(note, currentUser.getEntity());
+
+    boolean featureToggleOfLocationImageUrls = false;
+    if (featureToggleOfLocationImageUrls) {
+      WikidataService wikidataService = getWikidataService();
+      Optional<String> locationPhotoUrl =
+          wikidataService.getWikidataLocationPhotoUrl(note.getWikidataId());
+      noteRealmWithPosition.noteRealm.getNote().getLocation().get().photoUrl = locationPhotoUrl;
+    }
+
+    return noteRealmWithPosition;
   }
 
   @GetMapping("/{note}/overview")

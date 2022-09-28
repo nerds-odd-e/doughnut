@@ -21,7 +21,9 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.net.URI;
 import java.sql.Timestamp;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -93,6 +95,19 @@ class RestNoteControllerTests {
       assertThat(showOverview.notes, hasSize(12));
       assertThat(showOverview.notePosition.getNotebook().getFromBazaar(), equalTo(false));
       assertThat(showOverview.notes.get(0).getChildren(), hasSize(1));
+    }
+
+    @Disabled("not yet ready , Please ignore.")
+    @Test
+    void shouldBeAbleToSeeOwnNoteWithLocationPhoto() throws NoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(userModel).please();
+      makeMe.refresh(userModel.getEntity());
+      final NoteRealmWithPosition show = controller.show(note);
+      assertThat(
+          show.noteRealm.getNote().getLocation().get().photoUrl,
+          equalTo(
+              Optional.of(
+                  "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/Seul_montaje.png&width=300")));
     }
   }
 
