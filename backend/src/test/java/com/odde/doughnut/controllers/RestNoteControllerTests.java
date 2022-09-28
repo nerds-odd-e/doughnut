@@ -268,24 +268,44 @@ class RestNoteControllerTests {
                     + "}}}}");
       }
 
+      private void mockApiResponseWithCountryInfo(
+          String wikidataIdOfCountry, String wikidataCountryName)
+          throws IOException, InterruptedException {
+        Mockito.when(
+                httpClientAdapter.getResponseString(
+                    URI.create(
+                        "https://www.wikidata.org/w/api.php?action=wbgetentities&ids="
+                            + wikidataIdOfCountry
+                            + "&format=json&props=labels")))
+            .thenReturn(
+                "{\"entities\":{\""
+                    + wikidataIdOfCountry
+                    + "\":{\"type\":\"item\",\"id\":\""
+                    + wikidataIdOfCountry
+                    + "\",\"labels\":{"
+                    + "{\"en\":{\"language\":\"en\",\"value\":\"Taiwan\"}}"
+                    + "}}}}");
+      }
+
       @Test
       void shouldAddHumanInfoWhenAddingNoteWithWikidataId()
           throws BindException, InterruptedException, NoAccessRightException, IOException {
         String wikidataIdOfHuman = "Q706446"; // Wang Chien-ming
-        String wikidataIdOfCountry = "Taiwan"; // P27 (Country) : Taiwan
+        String wikidataIdOfCountry = "Q865"; // P27 (Country) : Taiwan
+        String wikidataCountryName = "Taiwan";
         String birthday = "31 March 1980"; // P569 (Birthday)
         String birthdayByISO = "+1980-03-31T00:00:00Z";
 
         mockApiResponseWithHumanInfo(
             wikidataIdOfHuman,
-            "\"value\":{\"id\":\"Taiwan\"},\"type\":\"wikibase-entityid\"",
+            "\"value\":{\"id\":\"Q865\"},\"type\":\"wikibase-entityid\"",
             "\"value\":{\"time\":\"" + birthdayByISO + "\"},\"type\":\"time\"");
-
+        mockApiResponseWithCountryInfo(wikidataIdOfCountry, wikidataCountryName);
         noteCreation.setWikidataId(wikidataIdOfHuman);
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
         assertThat(
             note.noteRealm.getNote().getTextContent().getDescription(),
-            stringContainsInOrder(birthday + ", " + wikidataIdOfCountry));
+            stringContainsInOrder(birthday + ", " + wikidataCountryName));
       }
     }
   }
