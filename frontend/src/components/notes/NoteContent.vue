@@ -51,7 +51,7 @@
           mapUrl:
             'https://upload.wikimedia.org/wikipedia/commons/0/06/OOjs_UI_icon_add.svg',
         }"
-        v-if="!!note.location"
+        v-if="isDev && !!note.location"
       />
     </div>
 
@@ -107,6 +107,9 @@ export default defineComponent({
   computed: {
     textContent() {
       return { ...this.note.textContent };
+    },
+    isDev() {
+      return import.meta.env.DEV;
     },
   },
   methods: {
