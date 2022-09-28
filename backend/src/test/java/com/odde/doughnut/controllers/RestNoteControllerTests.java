@@ -272,13 +272,13 @@ class RestNoteControllerTests {
       void shouldAddHumanInfoWhenAddingNoteWithWikidataId()
           throws BindException, InterruptedException, NoAccessRightException, IOException {
         String wikidataIdOfHuman = "Q706446"; // Wang Chien-ming
-        String wikidataIdOfCountry = "Q865"; // P27 (Country) : Taiwan
+        String wikidataIdOfCountry = "Taiwan"; // P27 (Country) : Taiwan
         String birthday = "31 March 1980"; // P569 (Birthday)
         String birthdayByISO = "+1980-03-31T00:00:00Z";
 
         mockApiResponseWithHumanInfo(
             wikidataIdOfHuman,
-            "\"value\":{\"id\":\"Q865\"},\"type\":\"wikibase-entityid\"",
+            "\"value\":{\"id\":\"Taiwan\"},\"type\":\"wikibase-entityid\"",
             "\"value\":{\"time\":\"" + birthdayByISO + "\"},\"type\":\"time\"");
 
         noteCreation.setWikidataId(wikidataIdOfHuman);
