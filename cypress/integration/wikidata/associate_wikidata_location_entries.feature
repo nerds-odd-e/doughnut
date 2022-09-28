@@ -24,3 +24,14 @@ Feature: Note creation/edit should have description if wikidata is a location
       | Singapore  | The red dot  | places        |
     And I associate the note "Singapore" with wikidata id "Q334"
     And I should see the description becomes "Location: 1.3'N, 103.8'E The red dot"
+
+  @usingMockedWikidataService @ignore
+  Scenario: Update existing Note wikidata id to other location
+    Given there are some notes for the current user
+      | title      | description  | testingParent |
+      | Singapore  | The red dot  | places        |
+    And I associate the note "Singapore" with wikidata id "Q334"
+    And Wikidata.org has an entity "Q1490" with title "Tokyo"
+    And Wikidata.org entity "Q1490" is a location at 35.1, 139.4
+    When I associate the note "Singapore" with wikidata id "Q1490"
+    Then I should see photo becomes "Tokyo_Montage_2015.jpg" and map becomes "https://geohack.toolforge.org/geohack.php?params=35.68955555555556_N_139.6917222222222_E_globe:earth&language=en"
