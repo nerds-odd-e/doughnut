@@ -396,8 +396,7 @@ Then("I should see map becomes {string}", (map: string) => {
 })
 
 Then("I will see location photo and location map", () => {
-  cy.get(".note-picture")
-    .find("img")
+  cy.get("[data-testid='location-photo']")
     .should("have.attr", "src")
     .should("include", "https://upload.wikimedia.org/wikipedia/commons/0/0e/Seul_montaje.png")
 })

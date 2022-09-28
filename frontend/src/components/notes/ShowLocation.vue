@@ -15,7 +15,12 @@
       style="position: relative; display: inline-block"
       v-if="mapUrl.length > 0"
     >
-      <img alt="location map" data-testid="location-map" :src="mapUrl" />
+      <img
+        alt="location map"
+        class="img-fluid"
+        data-testid="location-map"
+        :src="mapUrl"
+      />
     </div>
   </div>
 </template>
