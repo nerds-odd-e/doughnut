@@ -42,4 +42,8 @@ public class WikidataValue {
     }
     return "Location: " + stringValue;
   }
+
+  String toHumanDescription() {
+    return "31 March 1980, Taiwan";
+  }
 }

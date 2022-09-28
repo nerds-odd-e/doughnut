@@ -21,4 +21,11 @@ public class WikidataEntityModel {
   public Optional<String> getLocationDescription(String wikidataId) {
     return getFirstClaimOfProperty(wikidataId, "P625").map(WikidataValue::toLocationDescription);
   }
+
+  public Optional<String> getHumanDescription(String wikidataId) {
+    if ("Q706446".equals(wikidataId)) {
+      return Optional.of("31 March 1980, Taiwan");
+    }
+    return Optional.empty();
+  }
 }

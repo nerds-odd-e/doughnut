@@ -11,8 +11,8 @@ Feature: Note creation should have description if wikidata is a human
     And Wikidata.org has an entity "Q706446" with title "Wang Chien-ming"
     And Wikidata.org entity "Q706446" is a human with date on birthday "31 March 1980" and country of citizenship "Taiwan"
 
-  @ignore
-  @usingMockedWikidataService
+#  @ignore
+#  @usingMockedWikidataService
   Scenario: New Note creation and wikidata is selected by user
     When I create a note belonging to "human":
       | Title           | Wikidata Id |

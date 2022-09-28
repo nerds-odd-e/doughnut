@@ -68,6 +68,12 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
         .flatMap(d -> d.getLocationDescription(wikidataId));
   }
 
+  @SneakyThrows
+  public Optional<String> getWikidataHumanDescription(String wikidataId) {
+    return Optional.ofNullable(getEntityDataById(wikidataId))
+        .flatMap(d -> d.getHumanDescription(wikidataId));
+  }
+
   private WikidataEntityModel getEntityDataById(String wikidataId)
       throws IOException, InterruptedException {
     String responseBody =

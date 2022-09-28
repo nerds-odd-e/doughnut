@@ -68,5 +68,6 @@ public class NoteModel {
     wikidataService
         .getWikidataLocationDescription(wikidataId)
         .ifPresent(entity::prependDescription);
+    wikidataService.getWikidataHumanDescription(wikidataId).ifPresent(entity::prependDescription);
   }
 }
