@@ -152,8 +152,6 @@ describe("note mindmap", () => {
       expect(description).toHaveLength(0);
       const pictureIndicators = wrapper.findAll(".picture-indicator");
       expect(pictureIndicators).toHaveLength(1);
-      const pictures = wrapper.findAll(".note-picture");
-      expect(pictures).toHaveLength(0);
     });
 
     it("medium", async () => {
