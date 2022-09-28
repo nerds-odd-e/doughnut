@@ -21,8 +21,7 @@ Then("I don't need to confirm the association with different title {string}", ()
 
 Given(
   "Wikidata.org entity {string} is a human with date on birthday {string} and country of citizenship {string}",
-  (wikidataTitle: string, birthday: string, country: string) => {
-  },
+  () => ({}),
 )
 
 Given(
@@ -45,6 +44,7 @@ Given(
     cy.wikidataService().stubWikidataEntityLocation(wikidataId, lat, lng)
   },
 )
+Given("Wikidata.org entity {string} is a book with authors", () => console.log("Placeholder"))
 
 Given("The wikidata service is not available", () => {
   // checking if the saved Wikidata service url is the real url, which indicate the service is mocked.

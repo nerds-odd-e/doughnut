@@ -235,6 +235,59 @@ class RestNoteControllerTests {
             stringContainsInOrder("Location: center of the earth"));
       }
     }
+
+    @Nested
+    class AddingNoteWithHumanWikidataId {
+      @BeforeEach
+      void thereIsAWikidataEntryOfAHuman() {
+        noteCreation.setWikidataId("");
+        noteCreation.getTextContent().setDescription("");
+      }
+
+      private void mockApiResponseWithHumanInfo(
+          String humanId, String countryInfo, String birthdayInfo)
+          throws IOException, InterruptedException {
+        Mockito.when(
+                httpClientAdapter.getResponseString(
+                    URI.create(
+                        "https://www.wikidata.org/w/api.php?action=wbgetentities&ids="
+                            + humanId
+                            + "&format=json&props=claims")))
+            .thenReturn(
+                "{\"entities\":{\""
+                    + humanId
+                    + "\":{\"type\":\"item\",\"id\":\""
+                    + humanId
+                    + "\",\"claims\":{"
+                    + "\"P27\":[{\"mainsnak\":{\"snaktype\":\"value\",\"property\":\"P27\",\"datavalue\":{"
+                    + countryInfo
+                    + "}}}],"
+                    + "\"P569\":[{\"mainsnak\":{\"snaktype\":\"value\",\"property\":\"P569\",\"datavalue\":{"
+                    + birthdayInfo
+                    + "}}}]"
+                    + "}}}}");
+      }
+
+      @Test
+      void shouldAddHumanInfoWhenAddingNoteWithWikidataId()
+          throws BindException, InterruptedException, NoAccessRightException, IOException {
+        String wikidataIdOfHuman = "Q706446"; // Wang Chien-ming
+        String wikidataIdOfCountry = "Q865"; // P27 (Country) : Taiwan
+        String birthday = "31 March 1980"; // P569 (Birthday)
+        String birthdayByISO = "+1980-03-31T00:00:00Z";
+
+        mockApiResponseWithHumanInfo(
+            wikidataIdOfHuman,
+            "\"value\":{\"id\":\"Q865\"},\"type\":\"wikibase-entityid\"",
+            "\"value\":{\"time\":\"" + birthdayByISO + "\"},\"type\":\"time\"");
+
+        noteCreation.setWikidataId(wikidataIdOfHuman);
+        NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
+        assertThat(
+            note.noteRealm.getNote().getTextContent().getDescription(),
+            stringContainsInOrder(birthday + ", " + wikidataIdOfCountry));
+      }
+    }
   }
 
   @Nested

@@ -319,6 +319,13 @@ public class Note extends Thingy {
             });
   }
 
+  public Optional<NoteLocation> getLocation() {
+    NoteLocation noteLocation = new NoteLocation();
+    noteLocation.photoUrl = Optional.of("http://www.google.com");
+    noteLocation.mapUrl = Optional.of("http://www.google.com");
+    return Optional.of(noteLocation);
+  }
+
   private Optional<String> getNotePicture() {
     if (noteAccessories.getUseParentPicture() && getParentNote() != null) {
       return getParentNote().getNotePicture();
