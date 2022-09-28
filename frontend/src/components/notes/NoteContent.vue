@@ -35,24 +35,25 @@
       v-if="size === 'small' && !!textContent.description"
       class="description-indicator"
     />
-    <template v-if="note.pictureWithMask">
-      <ShowPicture
-        v-if="size !== 'small'"
-        class="col text-center"
-        v-bind="note.pictureWithMask"
-        :opacity="0.2"
+    <div class="note-picture text-center col">
+      <template v-if="note.pictureWithMask">
+        <ShowPicture
+          v-if="size !== 'small' && !!note.pictureWithMask.notePicture"
+          v-bind="note.pictureWithMask"
+          :opacity="0.2"
+        />
+        <SvgPictureIndicator v-else class="picture-indicator" />
+      </template>
+      <ShowLocation
+        v-bind="{
+          photoUrl:
+            'https://content.r9cdn.net/rimg/dimg/c1/f7/06109851-ctry-132-171a795fe02.jpg?width=1366&height=768&xhint=3330&yhint=2439&crop=true',
+          mapUrl:
+            'https://upload.wikimedia.org/wikipedia/commons/0/06/OOjs_UI_icon_add.svg',
+        }"
+        v-if="!!note.location"
       />
-      <SvgPictureIndicator v-else class="picture-indicator" />
-    </template>
-    <ShowLocation
-      v-bind="{
-        photoUrl:
-          'https://content.r9cdn.net/rimg/dimg/c1/f7/06109851-ctry-132-171a795fe02.jpg?width=1366&height=768&xhint=3330&yhint=2439&crop=true',
-        mapUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/0/06/OOjs_UI_icon_add.svg',
-      }"
-      v-if="!!note.location"
-    />
+    </div>
 
     <template v-if="!!note.noteAccessories.url">
       <div v-if="size != 'small'">
