@@ -8,6 +8,8 @@
 .buildlog/
 .history
 .svn/
+.bash_profile
+install-nix
 
 # cypress screenshots & videos
 cypress/downloads/
