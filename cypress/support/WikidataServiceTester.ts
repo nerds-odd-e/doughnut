@@ -70,6 +70,54 @@ class WikidataServiceTester {
     )
   }
 
+  async stubWikidataEntityLocationWithPhoto(
+    wikidataId: string,
+    latitude: number,
+    longitude: number,
+    photo: string,
+  ) {
+    return await this.stubByPathAndQuery(
+      `/w/api.php`,
+      { action: "wbgetentities", ids: wikidataId },
+      {
+        entities: {
+          [wikidataId]: {
+            type: "item",
+            id: wikidataId,
+            claims: {
+              P625: [
+                {
+                  mainsnak: {
+                    snaktype: "value",
+                    property: "P625",
+                    datavalue: {
+                      value: {
+                        latitude,
+                        longitude,
+                      },
+                      type: "globecoordinate",
+                    },
+                  },
+                },
+              ],
+              P18: [
+                {
+                  mainsnak: {
+                    snaktype: "value",
+                    property: "P18",
+                    datavalue: {
+                      value: photo,
+                      type: "string",
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        },
+      },
+    )
+  }
   async stubWikidataSearchResult(wikidataLabel: string, wikidataId: string) {
     return await this.stubByPathAndQuery(
       `/w/api.php`,

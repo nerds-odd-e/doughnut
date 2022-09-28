@@ -537,6 +537,20 @@ Cypress.Commands.add(
 )
 
 Cypress.Commands.add(
+  "stubWikidataEntityLocationWithPhoto",
+  { prevSubject: true },
+  (
+    wikidataServiceTester: WikidataServiceTester,
+    wikidataId: string,
+    lat: number,
+    lng: number,
+    photo: string,
+  ) => {
+    wikidataServiceTester.stubWikidataEntityLocationWithPhoto(wikidataId, lat, lng, photo)
+  },
+)
+
+Cypress.Commands.add(
   "stubWikidataEntityQuery",
   { prevSubject: true },
   (

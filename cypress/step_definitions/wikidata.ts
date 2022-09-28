@@ -44,6 +44,14 @@ Given(
     cy.wikidataService().stubWikidataEntityLocation(wikidataId, lat, lng)
   },
 )
+
+Given(
+  "Wikidata.org entity {string} has a location at {float}, {float} with photo {string}",
+  (wikidataId: string, lat: number, lng: number, photo: string) => {
+    cy.wikidataService().stubWikidataEntityLocationWithPhoto(wikidataId, lat, lng, photo)
+  },
+)
+
 Given("Wikidata.org entity {string} is a book with authors", () => console.log("Placeholder"))
 
 Given("The wikidata service is not available", () => {
