@@ -394,3 +394,10 @@ Then("I should see photo becomes {string}", (photo: string) => {
 Then("I should see map becomes {string}", (map: string) => {
   expect(map).to.equal("not implement yet")
 })
+
+Then("I will see location photo and location map", () => {
+  cy.get(".note-picture")
+    .find("img")
+    .should("have.attr", "src")
+    .should("include", "https://upload.wikimedia.org/wikipedia/commons/0/0e/Seul_montaje.png")
+})
