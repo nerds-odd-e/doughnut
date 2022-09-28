@@ -9,7 +9,7 @@ combining [zettelkasten](https://eugeneyan.com/writing/note-taking-zettelkasten/
 capture with some features to enhance learning (spaced-repetition, smart reminders) and ability to
 share knowledge bits with other people (for buddy/team learning).
 
-For more background info you can read:
+For more background info you can read::
 
 - [Scholarship & Learning](https://www.lesswrong.com/tag/scholarship-and-learning)
 - [Knowledge Acquisition & Documentation Structuring](https://en.m.wikipedia.org/wiki/Knowledge_Acquisition_and_Documentation_Structuring)
