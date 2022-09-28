@@ -45,13 +45,14 @@
         <SvgPictureIndicator v-else class="picture-indicator" />
       </template>
       <ShowLocation
+        style="display: none"
         v-bind="{
           photoUrl:
             'https://content.r9cdn.net/rimg/dimg/c1/f7/06109851-ctry-132-171a795fe02.jpg?width=1366&height=768&xhint=3330&yhint=2439&crop=true',
           mapUrl:
             'https://upload.wikimedia.org/wikipedia/commons/0/06/OOjs_UI_icon_add.svg',
         }"
-        v-if="isDev && !!note.location"
+        v-if="!!note.location"
       />
     </div>
 
@@ -107,9 +108,6 @@ export default defineComponent({
   computed: {
     textContent() {
       return { ...this.note.textContent };
-    },
-    isDev() {
-      return import.meta.env.DEV;
     },
   },
   methods: {
