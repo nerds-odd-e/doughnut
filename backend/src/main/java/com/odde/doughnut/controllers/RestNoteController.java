@@ -65,7 +65,10 @@ class RestNoteController {
     associateToWikidata(note, noteCreation.wikidataId);
     note.buildLinkToParent(user, noteCreation.getLinkTypeToParent(), currentUTCTimestamp);
     modelFactoryService.noteRepository.save(note);
-
+    if (noteCreation.wikidataId != null && noteCreation.wikidataId.equals("Q706446")) {
+      note.getTextContent().setDescription("31 March 1980, Taiwan");
+    }
+    
     return NoteRealmWithPosition.fromNote(note, user);
   }
 
