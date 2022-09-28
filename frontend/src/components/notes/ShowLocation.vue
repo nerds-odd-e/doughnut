@@ -1,22 +1,33 @@
 <template>
-  <div
-    style="position: relative; display: inline-block"
-    id="country-photo-picture"
-  >
-    <img
-      class="img-fluid"
-      data-testid="country-photo"
-      :src="photoUrl"
+  <div>
+    <div
+      style="position: relative; display: inline-block"
       v-if="photoUrl.length > 0"
-    />
+    >
+      <img
+        alt="location photo"
+        class="img-fluid"
+        data-testid="location-photo"
+        :src="photoUrl"
+      />
+    </div>
+    <div
+      style="position: relative; display: inline-block"
+      v-if="mapUrl.length > 0"
+    >
+      <img alt="location map" data-testid="location-map" :src="mapUrl" />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 interface LocationProps {
-  photoUrl: string;
-  mapUrl: string;
+  photoUrl?: string;
+  mapUrl?: string;
 }
 
-defineProps<LocationProps>();
+withDefaults(defineProps<LocationProps>(), {
+  photoUrl: "",
+  mapUrl: "",
+});
 </script>
