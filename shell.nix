@@ -125,8 +125,6 @@ EOF
            export NIX_SSL_CERT_FILE=/etc/ssl/cert.pem
         fi
 
-        backend/gradlew testDBMigrate
-
         cleanup()
         {
           echo -e "\nBYE!!! EXITING doughnut NIX DEVELOPMENT ENVIRONMENT."
