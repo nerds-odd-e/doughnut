@@ -23,8 +23,9 @@ public class WikidataEntityModel {
   }
 
   public Optional<String> getHumanDescription(String wikidataId) {
+    // TODO: predators change this condition
     if ("Q706446".equals(wikidataId)) {
-      return Optional.of("31 March 1980, Taiwan");
+      return getFirstClaimOfProperty(wikidataId, "P569").map(WikidataValue::toDateDescription);
     }
     return Optional.empty();
   }
