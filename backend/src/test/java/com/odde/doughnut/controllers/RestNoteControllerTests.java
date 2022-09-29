@@ -99,10 +99,12 @@ class RestNoteControllerTests {
 
     @Disabled("not yet ready , Please ignore.")
     @Test
-    void shouldBeAbleToSeeOwnNoteWithLocationPhoto() throws NoAccessRightException, IOException, InterruptedException {
+    void shouldBeAbleToSeeOwnNoteWithLocationPhoto()
+        throws NoAccessRightException, IOException, InterruptedException {
       Note note = makeMe.aNote().creatorAndOwner(userModel).please();
       Mockito.when(httpClientAdapter.getResponseString(any()))
-        .thenReturn("""
+          .thenReturn(
+              """
           {
               "entities": {
                   "Q8684": {
@@ -160,10 +162,10 @@ class RestNoteControllerTests {
       makeMe.refresh(userModel.getEntity());
       final NoteRealmWithPosition show = controller.show(note);
       assertThat(
-        show.noteRealm.getNote().getLocation().get().photoUrl,
-        equalTo(
-          Optional.of(
-            "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/Seul_montaje.png&width=300")));
+          show.noteRealm.getNote().getLocation().get().photoUrl,
+          equalTo(
+              Optional.of(
+                  "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/Seul_montaje.png&width=300")));
     }
   }
 

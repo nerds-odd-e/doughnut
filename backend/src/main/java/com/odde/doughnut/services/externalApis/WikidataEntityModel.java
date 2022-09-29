@@ -26,9 +26,11 @@ public class WikidataEntityModel {
       return getFirstClaimOfProperty(wikidataId, "P625").map(WikidataValue::toLocationDescription);
     }
   }
+
   public Optional<String> getLocationPhotoFileName(String wikidataId) {
     return getFirstClaimOfProperty(wikidataId, "P18").map(WikidataValue::toLocationPhotoFileName);
   }
+
   private Optional<String> getWikiClass(String wikidataId) {
     return getFirstClaimOfProperty(wikidataId, "P31").map(WikidataValue::toWikiClass);
   }

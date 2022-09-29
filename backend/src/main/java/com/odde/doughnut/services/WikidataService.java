@@ -96,11 +96,12 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
 
   @SneakyThrows
   public Optional<String> getWikidataLocationPhotoUrl(String wikidataId) {
-    Optional<String> s = Optional.ofNullable(getEntityDataById(wikidataId))
-      .flatMap(d -> d.getLocationPhotoFileName(wikidataId));
+    Optional<String> s =
+        Optional.ofNullable(getEntityDataById(wikidataId))
+            .flatMap(d -> d.getLocationPhotoFileName(wikidataId));
     return Optional.of(
-      "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/"
-        + s.get().replace(" ","_")
-        + "&width=300");
+        "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/"
+            + s.get().replace(" ", "_")
+            + "&width=300");
   }
 }
