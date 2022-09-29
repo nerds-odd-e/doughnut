@@ -7,22 +7,25 @@ import { screen } from "@testing-library/vue";
 import helper from "../helpers";
 
 describe("ShowLocation tests", () => {
-  const LOCATION_PHOTO_TEST_ID = "location-photo";
-  const LOCATION_MAP_TEST_ID = "location-map";
+  const LOCATION_PHOTO_ALT = "location photo";
+  const LOCATION_MAP_ALT = "location map";
   const createTestWrapper = (props: { photoUrl?: string; mapUrl?: string }) =>
     helper.component(ShowLocation).withStorageProps(props).render();
 
   function getLocationPhotoElement(): HTMLImageElement {
-    return screen.getByTestId(LOCATION_PHOTO_TEST_ID) as HTMLImageElement;
+    return screen.getByAltText(LOCATION_PHOTO_ALT) as HTMLImageElement;
   }
+
   function findLocationPhotoElement(): HTMLImageElement {
-    return screen.queryByTestId(LOCATION_PHOTO_TEST_ID) as HTMLImageElement;
+    return screen.queryByAltText(LOCATION_PHOTO_ALT) as HTMLImageElement;
   }
+
   function getLocationMapElement(): HTMLImageElement {
-    return screen.getByTestId(LOCATION_MAP_TEST_ID) as HTMLImageElement;
+    return screen.getByAltText(LOCATION_MAP_ALT) as HTMLImageElement;
   }
+
   function findLocationMapElement(): HTMLImageElement {
-    return screen.queryByTestId(LOCATION_MAP_TEST_ID) as HTMLImageElement;
+    return screen.queryByAltText(LOCATION_MAP_ALT) as HTMLImageElement;
   }
 
   it("should show location photo img tag when location data include photo url", async () => {
