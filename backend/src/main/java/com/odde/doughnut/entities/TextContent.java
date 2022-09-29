@@ -41,7 +41,7 @@ public class TextContent {
 
   void prependDescription(String addition) {
     String prevDesc = getDescription() != null ? getDescription() : "";
-    String desc = addition + "\n" + prevDesc;
+    String desc = prevDesc.isEmpty() ? addition : addition + "\n" + prevDesc;
     setDescription(desc);
   }
 }

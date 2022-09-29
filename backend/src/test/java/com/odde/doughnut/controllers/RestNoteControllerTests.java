@@ -316,31 +316,7 @@ class RestNoteControllerTests {
         mockApiResponseWithCountryInfo(wikidataIdOfCountry, wikidataCountryName);
         noteCreation.setWikidataId(wikidataIdOfHuman);
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
-        assertThat(
-            note.noteRealm.getNote().getTextContent().getDescription(),
-            equalTo(birthday + "\n")); // '\n' is caused by TextContent::prependDescription()
-      }
-
-      @Disabled
-      @Test
-      void shouldAddHumanInfoWhenAddingNoteWithWikidataId()
-          throws BindException, InterruptedException, NoAccessRightException, IOException {
-        String wikidataIdOfHuman = "Q706446"; // Wang Chien-ming
-        String wikidataIdOfCountry = "Q865"; // P27 (Country) : Taiwan
-        String wikidataCountryName = "Taiwan";
-        String birthday = "31 March 1980"; // P569 (Birthday)
-        String birthdayByISO = "+1980-03-31T00:00:00Z";
-
-        mockApiResponseWithHumanInfo(
-            wikidataIdOfHuman,
-            "\"value\":{\"id\":\"Q865\"},\"type\":\"wikibase-entityid\"",
-            "\"value\":{\"time\":\"" + birthdayByISO + "\"},\"type\":\"time\"");
-        mockApiResponseWithCountryInfo(wikidataIdOfCountry, wikidataCountryName);
-        noteCreation.setWikidataId(wikidataIdOfHuman);
-        NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
-        assertThat(
-            note.noteRealm.getNote().getTextContent().getDescription(),
-            stringContainsInOrder(birthday + ", " + wikidataCountryName));
+        assertThat(note.noteRealm.getNote().getTextContent().getDescription(), equalTo(birthday));
       }
     }
   }

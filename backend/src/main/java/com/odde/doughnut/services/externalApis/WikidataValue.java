@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Map;
 
 public class WikidataValue {
@@ -30,7 +31,9 @@ public class WikidataValue {
       // ToDo: change time formatter to identify/handle '+' in front of time string
       // time string example "+1980-03-31T00:00:00Z"
       DateTimeFormatter formatter =
-          DateTimeFormatter.ofPattern("dd MMMM yyyy").withZone(ZoneId.systemDefault());
+          DateTimeFormatter.ofPattern("dd MMMM yyyy")
+              .withZone(ZoneId.systemDefault())
+              .localizedBy(Locale.ENGLISH);
       Instant instant = Instant.parse(value.get("time").textValue().substring(1));
       timeValue = formatter.format(instant);
 
