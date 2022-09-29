@@ -101,7 +101,7 @@ export default defineComponent({
       return { ...this.note.textContent };
     },
     isProd() {
-      return !import.meta.env.PROD;
+      return import.meta.env.PROD;
     },
   },
   methods: {
