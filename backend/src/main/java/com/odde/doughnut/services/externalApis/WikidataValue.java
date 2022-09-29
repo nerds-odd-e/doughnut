@@ -13,6 +13,7 @@ public class WikidataValue {
   private Map<String, Object> data = null;
   private String stringValue = null;
   private String type;
+  private String wikiClass;
 
   private String timeValue;
 
@@ -39,7 +40,16 @@ public class WikidataValue {
 
       return;
     }
+    if (isWikibase(type)) {
+      wikiClass = value.get("id").textValue();
+      return;
+    }
+
     throw new RuntimeException("Unsupported wikidata value type: " + type);
+  }
+
+  private boolean isWikibase(String type) {
+    return "wikibase-entityid".compareToIgnoreCase(type) == 0;
   }
 
   private boolean isTimeValue(String type) {
@@ -67,5 +77,9 @@ public class WikidataValue {
 
   public String toDateDescription() {
     return timeValue;
+  }
+
+  public String toWikiClass() {
+    return wikiClass;
   }
 }

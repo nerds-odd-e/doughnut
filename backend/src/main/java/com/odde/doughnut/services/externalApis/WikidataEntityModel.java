@@ -18,12 +18,16 @@ public class WikidataEntityModel {
     return getEntityItem(wikidataId).getFirstClaimOfProperty(propertyId);
   }
 
-  public Optional<String> getLocationDescription(String wikidataId) {
-    return getFirstClaimOfProperty(wikidataId, "P625").map(WikidataValue::toLocationDescription);
+  public Optional<String> getDescription(String wikidataId) {
+    if (getWikiClass(wikidataId).equals(Optional.of("Q5"))) {
+      // P569: Birthday
+      return getFirstClaimOfProperty(wikidataId, "P569").map(WikidataValue::toDateDescription);
+    } else {
+      return getFirstClaimOfProperty(wikidataId, "P625").map(WikidataValue::toLocationDescription);
+    }
   }
 
-  public Optional<String> getHumanDescription(String wikidataId) {
-    // P569: Birthday
-    return getFirstClaimOfProperty(wikidataId, "P569").map(WikidataValue::toDateDescription);
+  private Optional<String> getWikiClass(String wikidataId) {
+    return getFirstClaimOfProperty(wikidataId, "P31").map(WikidataValue::toWikiClass);
   }
 }

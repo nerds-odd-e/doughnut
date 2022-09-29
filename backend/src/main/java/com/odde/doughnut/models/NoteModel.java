@@ -65,9 +65,6 @@ public class NoteModel {
     if (Strings.isEmpty(wikidataId)) {
       return;
     }
-    wikidataService
-        .getWikidataLocationDescription(wikidataId)
-        .ifPresent(entity::prependDescription);
-    wikidataService.getWikidataHumanDescription(wikidataId).ifPresent(entity::prependDescription);
+    wikidataService.getWikidataDescription(wikidataId).ifPresent(entity::prependDescription);
   }
 }

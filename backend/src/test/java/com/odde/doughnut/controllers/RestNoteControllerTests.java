@@ -279,6 +279,9 @@ class RestNoteControllerTests {
                     + "}}}],"
                     + "\"P569\":[{\"mainsnak\":{\"snaktype\":\"value\",\"property\":\"P569\",\"datavalue\":{"
                     + birthdayInfo
+                    + "}}}],"
+                    + "\"P31\":[{\"mainsnak\":{\"snaktype\":\"value\",\"property\":\"P569\",\"datavalue\":{"
+                    + "\"value\":{\"id\":\"Q5\"},\"type\":\"wikibase-entityid\""
                     + "}}}]"
                     + "}}}}");
       }
