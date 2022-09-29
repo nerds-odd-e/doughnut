@@ -111,9 +111,3 @@ mb.log
 mb1.log
 mb.pid
 
-# invisiblen change files
-infra/scripts/*.sh
-gradlew
-backend/gradlew
-assert_generated_type_script_up_to_date.sh
-setup-doughnut-dev.sh
