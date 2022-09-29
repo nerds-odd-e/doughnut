@@ -19,3 +19,8 @@ If you still failed to open cypress after following above instructions, you may 
 ```
 export DISPLAY=$(route.exe print | grep 0.0.0.0 | head -1 | awk '{print $4}'):0.0
 ```
+
+### 3. Git checkout as-is, commit Unix-style
+```bash
+git config --global core.autocrlf input
+```
