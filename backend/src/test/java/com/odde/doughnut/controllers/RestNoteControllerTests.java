@@ -23,6 +23,7 @@ import java.net.URI;
 import java.sql.Timestamp;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -96,6 +97,7 @@ class RestNoteControllerTests {
       assertThat(showOverview.notes.get(0).getChildren(), hasSize(1));
     }
 
+    @Disabled("not yet ready , Please ignore.")
     @Test
     void shouldBeAbleToSeeOwnNoteWithLocationPhoto() throws NoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(userModel).please();
