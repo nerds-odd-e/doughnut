@@ -94,11 +94,13 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     return httpClientAdapter.getResponseString(uri);
   }
 
+  @SneakyThrows
   public Optional<String> getWikidataLocationPhotoUrl(String wikidataId) {
-    String s = "Seul_montaje.png";
+    Optional<String> s = Optional.ofNullable(getEntityDataById(wikidataId))
+      .flatMap(d -> d.getLocationPhotoFileName(wikidataId));
     return Optional.of(
-        "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/"
-            + s
-            + "&width=300");
+      "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/"
+        + s.get().replace(" ","_")
+        + "&width=300");
   }
 }

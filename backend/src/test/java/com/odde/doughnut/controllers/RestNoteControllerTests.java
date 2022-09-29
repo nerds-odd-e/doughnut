@@ -99,15 +99,72 @@ class RestNoteControllerTests {
 
     @Disabled("not yet ready , Please ignore.")
     @Test
-    void shouldBeAbleToSeeOwnNoteWithLocationPhoto() throws NoAccessRightException {
+    @Disabled
+    void shouldBeAbleToSeeOwnNoteWithLocationPhoto() throws NoAccessRightException, IOException, InterruptedException {
       Note note = makeMe.aNote().creatorAndOwner(userModel).please();
+      Mockito.when(httpClientAdapter.getResponseString(any()))
+        .thenReturn("""
+          {
+              "entities": {
+                  "Q8684": {
+                      "type": "item",
+                      "id": "Q8684",
+                      "claims": {
+                          "P18": [
+                              {
+                                  "mainsnak": {
+                                      "snaktype": "value",
+                                      "property": "P18",
+                                      "hash": "6a398e6fc1b3236d88446adb01213f9d0f1f5049",
+                                      "datavalue": {
+                                          "value": "Seul montaje.png",
+                                          "type": "string"
+                                      },
+                                      "datatype": "commonsMedia"
+                                  },
+                                  "type": "statement",
+                                  "id": "Q8684$EE19E80F-8A9A-4777-B335-7FB1834E2591",
+                                  "rank": "normal",
+                                  "references": [
+                                      {
+                                          "hash": "9cdd4f1d064faebc44a10fbd408afa604f3b89f6",
+                                          "snaks": {
+                                              "P143": [
+                                                  {
+                                                      "snaktype": "value",
+                                                      "property": "P143",
+                                                      "hash": "16eef556b717b1b9c8e2599faef3af2af8537632",
+                                                      "datavalue": {
+                                                          "value": {
+                                                              "entity-type": "item",
+                                                              "numeric-id": 199700,
+                                                              "id": "Q199700"
+                                                          },
+                                                          "type": "wikibase-entityid"
+                                                      },
+                                                      "datatype": "wikibase-item"
+                                                  }
+                                              ]
+                                          },
+                                          "snaks-order": ["P143"]
+                                      }
+                                  ]
+                              }
+                          ]
+                      }
+                  }
+              },
+              "success": 1
+          }
+          """);
+      note.setWikidataId("Q8684");
       makeMe.refresh(userModel.getEntity());
       final NoteRealmWithPosition show = controller.show(note);
       assertThat(
-          show.noteRealm.getNote().getLocation().get().photoUrl,
-          equalTo(
-              Optional.of(
-                  "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/Seul_montaje.png&width=300")));
+        show.noteRealm.getNote().getLocation().get().photoUrl,
+        equalTo(
+          Optional.of(
+            "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/Seul_montaje.png&width=300")));
     }
   }
 
