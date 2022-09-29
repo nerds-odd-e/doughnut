@@ -259,8 +259,7 @@ class RestNoteControllerTests {
         noteCreation.getTextContent().setDescription("");
       }
 
-      private void mockApiResponseWithHumanInfo(
-          String humanId, String countryInfo, String birthdayInfo)
+      private void mockApiResponseWithHumanInfo(String humanId, String birthdayByISO)
           throws IOException, InterruptedException {
         Mockito.when(
                 httpClientAdapter.getResponseString(
@@ -269,56 +268,53 @@ class RestNoteControllerTests {
                             + humanId
                             + "&format=json&props=claims")))
             .thenReturn(
-                "{\"entities\":{\""
-                    + humanId
-                    + "\":{\"type\":\"item\",\"id\":\""
-                    + humanId
-                    + "\",\"claims\":{"
-                    + "\"P27\":[{\"mainsnak\":{\"snaktype\":\"value\",\"property\":\"P27\",\"datavalue\":{"
-                    + countryInfo
-                    + "}}}],"
-                    + "\"P569\":[{\"mainsnak\":{\"snaktype\":\"value\",\"property\":\"P569\",\"datavalue\":{"
-                    + birthdayInfo
-                    + "}}}],"
-                    + "\"P31\":[{\"mainsnak\":{\"snaktype\":\"value\",\"property\":\"P569\",\"datavalue\":{"
-                    + "\"value\":{\"id\":\"Q5\"},\"type\":\"wikibase-entityid\""
-                    + "}}}]"
-                    + "}}}}");
-      }
-
-      private void mockApiResponseWithCountryInfo(
-          String wikidataIdOfCountry, String wikidataCountryName)
-          throws IOException, InterruptedException {
-        Mockito.when(
-                httpClientAdapter.getResponseString(
-                    URI.create(
-                        "https://www.wikidata.org/w/api.php?action=wbgetentities&ids="
-                            + wikidataIdOfCountry
-                            + "&format=json&props=labels")))
-            .thenReturn(
-                "{\"entities\":{\""
-                    + wikidataIdOfCountry
-                    + "\":{\"type\":\"item\",\"id\":\""
-                    + wikidataIdOfCountry
-                    + "\",\"labels\":{"
-                    + "{\"en\":{\"language\":\"en\",\"value\":\"Taiwan\"}}"
-                    + "}}}}");
+                """
+                  {
+                    "entities": {
+                      "%s": {
+                        "type": "item",
+                        "id": "%s",
+                        "claims": {
+                          "P569": [
+                            {
+                              "mainsnak": {
+                                "snaktype": "value",
+                                "property": "P569",
+                                "datavalue": {
+                                  "value": { "time": "%s"},
+                                  "type": "time"
+                                }
+                              }
+                            }
+                          ],
+                          "P31": [
+                            {
+                              "mainsnak": {
+                                "snaktype": "value",
+                                "property": "P31",
+                                "datavalue": {
+                                  "value": { "id": "Q5"},
+                                  "type": "wikibase-entityid"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                """
+                    .formatted(humanId, humanId, birthdayByISO));
       }
 
       @Test
       void shouldAddHumanBirthdayWhenAddingNoteWithWikidataId()
           throws BindException, InterruptedException, NoAccessRightException, IOException {
         String wikidataIdOfHuman = "Q706446"; // Wang Chien-ming
-        String wikidataIdOfCountry = "Q865"; // P27 (Country) : Taiwan
-        String wikidataCountryName = "Taiwan";
         String birthday = "31 March 1980"; // P569 (Birthday)
         String birthdayByISO = "+1980-03-31T00:00:00Z";
 
-        mockApiResponseWithHumanInfo(
-            wikidataIdOfHuman,
-            "\"value\":{\"id\":\"Q865\"},\"type\":\"wikibase-entityid\"",
-            "\"value\":{\"time\":\"" + birthdayByISO + "\"},\"type\":\"time\"");
-        mockApiResponseWithCountryInfo(wikidataIdOfCountry, wikidataCountryName);
+        mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO);
         noteCreation.setWikidataId(wikidataIdOfHuman);
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
         assertThat(note.noteRealm.getNote().getTextContent().getDescription(), equalTo(birthday));
