@@ -82,6 +82,9 @@ in mkShell {
 
         export PATH=$JAVA_HOME/bin:$NODE_HOME/bin:$MYSQL_BASEDIR/bin:$PATH
 
+        export LANG="en_US.UTF-8"
+        export LC_ALL="en_US.UTF-8"
+
         echo "###################################################################################################################"
         echo "                                                                                "
         echo "##   !! DOUGHNUT NIX DEVELOPMENT ENVIRONMENT ;) !!  "
