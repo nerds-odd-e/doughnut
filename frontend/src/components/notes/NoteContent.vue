@@ -44,7 +44,7 @@
         />
         <SvgPictureIndicator v-else class="picture-indicator" />
       </template>
-      <ShowLocation v-bind="note.location" style="display: none" />
+      <ShowLocation v-bind="note.location" v-if="!isProd" />
     </div>
 
     <template v-if="!!note.noteAccessories.url">
@@ -99,6 +99,9 @@ export default defineComponent({
   computed: {
     textContent() {
       return { ...this.note.textContent };
+    },
+    isProd() {
+      return !import.meta.env.PROD;
     },
   },
   methods: {

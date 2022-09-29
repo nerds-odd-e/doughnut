@@ -2,6 +2,9 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
+    "types": [
+      "vite/client", "jest" , "@types/jest" , "node" , "@testing-library/jest-dom"
+    ],
     "useDefineForClassFields": true,
     "strict": true,
     "strictNullChecks": true,
