@@ -387,16 +387,14 @@ Then("I should see the description becomes {string}", (descriptionText: string) 
   cy.findNoteDescriptionOnCurrentPage(descriptionText)
 })
 
-Then("I should see photo becomes {string}", (photo: string) => {
-  expect(photo).to.equal("not implement yet")
-})
-
-Then("I should see map becomes {string}", (map: string) => {
-  expect(map).to.equal("not implement yet")
-})
-
 Then("I will see location photo and location map", () => {
   cy.get("[data-testid='location-photo']")
     .should("have.attr", "src")
     .should("include", "https://upload.wikimedia.org/wikipedia/commons/0/0e/Seul_montaje.png")
+})
+
+Then("I will see {string} and location map", (locationPhoto: string) => {
+  cy.get("[data-testid='location-photo']")
+    .should("have.attr", "src")
+    .should("include", locationPhoto)
 })

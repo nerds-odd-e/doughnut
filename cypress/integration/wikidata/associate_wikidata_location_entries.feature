@@ -32,7 +32,6 @@ Feature: Note creation/edit should have description if wikidata is a location
       | Singapore  | The red dot  | places        |
     And I associate the note "Singapore" with wikidata id "Q334"
     And Wikidata.org has an entity "Q1490" with title "Tokyo"
-    And Wikidata.org entity "Q1490" has a location at 35.1, 139.4 with photo "Tokyo_Montage_2015.jpg"
-    When I associate the note "Singapore" with wikidata id "Q1490"
-    Then I should see photo becomes "Tokyo_Montage_2015.jpg"
-    And I should see map becomes "https://geohack.toolforge.org/geohack.php?params=35.68955555555556_N_139.6917222222222_E_globe:earth&language=en"
+    And Wikidata.org entity "Q1490" has a location at 35.1, 139.4 with photo "Seul_montaje.png"
+    When I associate the note "Singapore" with wikidata id "Q1490" and confirm
+    Then I will see "https://upload.wikimedia.org/wikipedia/commons/0/0e/Seul_montaje.png" and location map
