@@ -394,6 +394,12 @@ Then("I will see location photo and location map", () => {
       "include",
       "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/Seul_montaje.png&width=300",
     )
+  cy.get("[data-testid='location-map']")
+    .should("have.attr", "src")
+    .should(
+      "include",
+      "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/Map_Seoul-teukbyeolsi_ja.png&width=300",
+    )
 })
 
 Then(
