@@ -396,8 +396,12 @@ Then("I will see location photo and location map", () => {
     )
 })
 
-Then("I will see {string} and location map", (locationPhoto: string) => {
-  cy.get("[data-testid='location-photo']")
-    .should("have.attr", "src")
-    .should("include", locationPhoto)
-})
+Then(
+  "I will see {string} and {string} with {string}",
+  (locationPhoto: string, locationMap: string, mapUrl: string) => {
+    cy.findByAltText(locationMap).then((elem) => {
+      expect(elem).to.be.visible()
+      expect(elem).to.have.attr("src", mapUrl)
+    })
+  },
+)
