@@ -99,7 +99,6 @@ class RestNoteControllerTests {
 
     @Disabled("not yet ready , Please ignore.")
     @Test
-    @Disabled
     void shouldBeAbleToSeeOwnNoteWithLocationPhoto() throws NoAccessRightException, IOException, InterruptedException {
       Note note = makeMe.aNote().creatorAndOwner(userModel).please();
       Mockito.when(httpClientAdapter.getResponseString(any()))
