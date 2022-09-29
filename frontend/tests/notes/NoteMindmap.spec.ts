@@ -2,9 +2,15 @@
  * @jest-environment jsdom
  */
 import NoteMinmap from "@/components/notes/mindmap/NoteMindmap.vue";
+import ShowPicture from "@/components/notes/ShowPicture.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 import NoteRealmCache from "../../src/store/NoteRealmCache";
+
+jest.mock("@/components/notes/ShowPicture.vue", () => ({
+  __esModule: true,
+  default: { template: "<div></div>" },
+}));
 
 describe("note mindmap", () => {
   const notes: Generated.NoteRealm[] = [];
@@ -152,6 +158,7 @@ describe("note mindmap", () => {
       expect(description).toHaveLength(0);
       const pictureIndicators = wrapper.findAll(".picture-indicator");
       expect(pictureIndicators).toHaveLength(1);
+      expect(wrapper.findComponent(ShowPicture).exists()).toBeFalsy();
     });
 
     it("medium", async () => {
