@@ -1,8 +1,9 @@
 package com.odde.doughnut.entities;
 
 import java.util.Optional;
+import org.springframework.lang.Nullable;
 
 public class NoteLocation {
-  public Optional<String> photoUrl;
-  public Optional<String> mapUrl;
+  @Nullable public Optional<String> photoUrl;
+  @Nullable public Optional<String> mapUrl;
 }

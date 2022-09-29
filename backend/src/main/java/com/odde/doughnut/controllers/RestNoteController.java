@@ -85,7 +85,9 @@ class RestNoteController {
       WikidataService wikidataService = getWikidataService();
       Optional<String> locationPhotoUrl =
           wikidataService.getWikidataLocationPhotoUrl(note.getWikidataId());
-      noteRealmWithPosition.noteRealm.getNote().getLocation().get().photoUrl = locationPhotoUrl;
+      NoteLocation noteLocation = new NoteLocation();
+      noteLocation.photoUrl = locationPhotoUrl;
+      noteRealmWithPosition.noteRealm.getNote().setNoteLocation(noteLocation);
     }
 
     return noteRealmWithPosition;

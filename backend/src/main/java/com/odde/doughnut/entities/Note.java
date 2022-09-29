@@ -48,6 +48,8 @@ public class Note extends Thingy {
   @Setter
   private TextContent textContent = new TextContent();
 
+  @JsonIgnore @Transient @Getter @Setter private NoteLocation noteLocation;
+
   @Column(name = "sibling_order")
   private Long siblingOrder = SiblingOrder.getGoodEnoughOrderNumber();
 
@@ -320,10 +322,7 @@ public class Note extends Thingy {
   }
 
   public Optional<NoteLocation> getLocation() {
-    NoteLocation noteLocation = new NoteLocation();
-    noteLocation.photoUrl = Optional.of("http://www.google.com");
-    noteLocation.mapUrl = Optional.of("http://www.google.com");
-    return Optional.of(noteLocation);
+    return Optional.ofNullable(noteLocation);
   }
 
   private Optional<String> getNotePicture() {

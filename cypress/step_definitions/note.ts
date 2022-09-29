@@ -390,7 +390,10 @@ Then("I should see the description becomes {string}", (descriptionText: string) 
 Then("I will see location photo and location map", () => {
   cy.get("[data-testid='location-photo']")
     .should("have.attr", "src")
-    .should("include", "https://upload.wikimedia.org/wikipedia/commons/0/0e/Seul_montaje.png")
+    .should(
+      "include",
+      "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/Seul_montaje.png&width=300",
+    )
 })
 
 Then("I will see {string} and location map", (locationPhoto: string) => {

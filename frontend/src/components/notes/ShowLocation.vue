@@ -2,7 +2,7 @@
   <div>
     <div
       style="position: relative; display: inline-block"
-      v-if="photoUrl.length > 0"
+      v-if="photoUrl != null && photoUrl.length > 0"
     >
       <img
         alt="location photo"
@@ -13,7 +13,7 @@
     </div>
     <div
       style="position: relative; display: inline-block"
-      v-if="mapUrl.length > 0"
+      v-if="mapUrl != null && mapUrl.length > 0"
     >
       <img
         alt="location map"
