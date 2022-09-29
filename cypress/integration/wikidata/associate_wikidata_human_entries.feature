@@ -16,3 +16,10 @@ Feature: Note creation should have description if wikidata is a human
       | Title           | Wikidata Id |
       | Wang Chien-ming | Q706446     |
     Then I should see the description becomes "31 March 1980"
+
+  @ignore
+  Scenario: New Note creation and wikidata is selected by user
+    When I create a note belonging to "human":
+      | Title           | Wikidata Id |
+      | Wang Chien-ming | Q706446     |
+    Then I should see the description becomes "31 March 1980, Taiwan"
