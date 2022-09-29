@@ -388,18 +388,18 @@ Then("I should see the description becomes {string}", (descriptionText: string) 
 })
 
 Then("I will see location photo and location map", () => {
-  cy.get("[data-testid='location-photo']")
-    .should("have.attr", "src")
-    .should(
-      "include",
+  cy.findByAltText("location photo").then((ele) => {
+    expect(ele).to.have.attr(
+      "src",
       "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/Seul_montaje.png&width=300",
     )
-  cy.get("[data-testid='location-map']")
-    .should("have.attr", "src")
-    .should(
-      "include",
+  })
+  cy.findByAltText("location map").then((ele) => {
+    expect(ele).to.have.attr(
+      "src",
       "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/Map_Seoul-teukbyeolsi_ja.png&width=300",
     )
+  })
 })
 
 Then(
