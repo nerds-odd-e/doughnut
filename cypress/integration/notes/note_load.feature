@@ -11,3 +11,10 @@ Feature: note load
       | Title | Wikidata Id |
       | Seoul | Q8684       |
     Then I will see location photo and location map
+
+  @ignore
+  Scenario: Create a none location child note
+    When I create a note belonging to "AnyTitle":
+      | Title | Wikidata Id |
+      | Seoul | Q706446     |
+    Then I will see location photo and location map

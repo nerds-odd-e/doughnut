@@ -1,7 +1,13 @@
 <template>
   <div>
     <div class="location-img" v-for="image of renderPhotos" :key="image.alt">
-      <img :alt="image.alt" class="img-fluid" :src="image.url" />
+      <img
+        :alt="image.alt"
+        class="img-fluid"
+        :src="image.url"
+        width="300"
+        height="300"
+      />
     </div>
   </div>
 </template>
