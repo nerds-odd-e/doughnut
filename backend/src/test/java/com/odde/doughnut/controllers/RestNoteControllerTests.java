@@ -318,6 +318,12 @@ class RestNoteControllerTests {
 
       private void mockApiResponseWithHumanInfo(String humanId, String birthdayByISO)
           throws IOException, InterruptedException {
+        mockApiResponseWithHumanInfo(humanId, birthdayByISO, "Q865");
+      }
+
+      private void mockApiResponseWithHumanInfo(
+          String humanId, String birthdayByISO, String countryId)
+          throws IOException, InterruptedException {
         Mockito.when(
                 httpClientAdapter.getResponseString(
                     URI.create(
@@ -326,42 +332,54 @@ class RestNoteControllerTests {
                             + "&format=json&props=claims")))
             .thenReturn(
                 """
-                  {
-                    "entities": {
-                      "%s": {
-                        "type": "item",
-                        "id": "%s",
-                        "claims": {
-                          "P569": [
-                            {
-                              "mainsnak": {
-                                "snaktype": "value",
-                                "property": "P569",
-                                "datavalue": {
-                                  "value": { "time": "%s"},
-                                  "type": "time"
+                    {
+                      "entities": {
+                        "%s": {
+                          "type": "item",
+                          "id": "%s",
+                          "claims": {
+                            "P569": [
+                              {
+                                "mainsnak": {
+                                  "snaktype": "value",
+                                  "property": "P569",
+                                  "datavalue": {
+                                    "value": { "time": "%s"},
+                                    "type": "time"
+                                  }
                                 }
                               }
-                            }
-                          ],
-                          "P31": [
-                            {
-                              "mainsnak": {
-                                "snaktype": "value",
-                                "property": "P31",
-                                "datavalue": {
-                                  "value": { "id": "Q5"},
-                                  "type": "wikibase-entityid"
+                            ],
+                            "P31": [
+                              {
+                                "mainsnak": {
+                                  "snaktype": "value",
+                                  "property": "P31",
+                                  "datavalue": {
+                                    "value": { "id": "Q5"},
+                                    "type": "wikibase-entityid"
+                                  }
                                 }
                               }
-                            }
-                          ]
+                            ],
+                            "P27": [
+                              {
+                                "mainsnak": {
+                                  "snaktype": "value",
+                                  "property": "P27",
+                                  "datavalue": {
+                                    "value": { "id": "%s"},
+                                    "type": "wikibase-entityid"
+                                  }
+                                }
+                              }
+                            ]
+                          }
                         }
                       }
                     }
-                  }
-                """
-                    .formatted(humanId, humanId, birthdayByISO));
+                  """
+                    .formatted(humanId, humanId, birthdayByISO, countryId));
       }
 
       @Test
@@ -384,6 +402,7 @@ class RestNoteControllerTests {
         String wikidataIdOfHuman = "Q706446"; // Wang Chien-ming
         String country = "Taiwan";
 
+        mockApiResponseWithHumanInfo(wikidataIdOfHuman, "+1980-03-31T00:00:00Z", "Q865");
         noteCreation.setWikidataId(wikidataIdOfHuman);
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
         assertThat(
