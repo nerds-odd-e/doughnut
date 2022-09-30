@@ -104,59 +104,59 @@ class RestNoteControllerTests {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(
               """
-          {
-              "entities": {
-                  "Q8684": {
-                      "type": "item",
-                      "id": "Q8684",
-                      "claims": {
-                          "P18": [
-                              {
-                                  "mainsnak": {
-                                      "snaktype": "value",
-                                      "property": "P18",
-                                      "hash": "6a398e6fc1b3236d88446adb01213f9d0f1f5049",
-                                      "datavalue": {
-                                          "value": "Seul montaje.png",
-                                          "type": "string"
-                                      },
-                                      "datatype": "commonsMedia"
-                                  },
-                                  "type": "statement",
-                                  "id": "Q8684$EE19E80F-8A9A-4777-B335-7FB1834E2591",
-                                  "rank": "normal",
-                                  "references": [
-                                      {
-                                          "hash": "9cdd4f1d064faebc44a10fbd408afa604f3b89f6",
-                                          "snaks": {
-                                              "P143": [
-                                                  {
-                                                      "snaktype": "value",
-                                                      "property": "P143",
-                                                      "hash": "16eef556b717b1b9c8e2599faef3af2af8537632",
-                                                      "datavalue": {
-                                                          "value": {
-                                                              "entity-type": "item",
-                                                              "numeric-id": 199700,
-                                                              "id": "Q199700"
-                                                          },
-                                                          "type": "wikibase-entityid"
-                                                      },
-                                                      "datatype": "wikibase-item"
-                                                  }
-                                              ]
-                                          },
-                                          "snaks-order": ["P143"]
-                                      }
-                                  ]
-                              }
-                          ]
-                      }
-                  }
-              },
-              "success": 1
-          }
-          """);
+                {
+                    "entities": {
+                        "Q8684": {
+                            "type": "item",
+                            "id": "Q8684",
+                            "claims": {
+                                "P18": [
+                                    {
+                                        "mainsnak": {
+                                            "snaktype": "value",
+                                            "property": "P18",
+                                            "hash": "6a398e6fc1b3236d88446adb01213f9d0f1f5049",
+                                            "datavalue": {
+                                                "value": "Seul montaje.png",
+                                                "type": "string"
+                                            },
+                                            "datatype": "commonsMedia"
+                                        },
+                                        "type": "statement",
+                                        "id": "Q8684$EE19E80F-8A9A-4777-B335-7FB1834E2591",
+                                        "rank": "normal",
+                                        "references": [
+                                            {
+                                                "hash": "9cdd4f1d064faebc44a10fbd408afa604f3b89f6",
+                                                "snaks": {
+                                                    "P143": [
+                                                        {
+                                                            "snaktype": "value",
+                                                            "property": "P143",
+                                                            "hash": "16eef556b717b1b9c8e2599faef3af2af8537632",
+                                                            "datavalue": {
+                                                                "value": {
+                                                                    "entity-type": "item",
+                                                                    "numeric-id": 199700,
+                                                                    "id": "Q199700"
+                                                                },
+                                                                "type": "wikibase-entityid"
+                                                            },
+                                                            "datatype": "wikibase-item"
+                                                        }
+                                                    ]
+                                                },
+                                                "snaks-order": ["P143"]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "success": 1
+                }
+                """);
       note.setWikidataId("Q8684");
       makeMe.refresh(userModel.getEntity());
       final NoteRealmWithPosition show = controller.show(note);
@@ -165,6 +165,67 @@ class RestNoteControllerTests {
           equalTo(
               Optional.of(
                   "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/Seul_montaje.png&width=300")));
+    }
+
+    @Test
+    void shouldBeAbleToSeeOwnNoteWithLocationMap()
+        throws NoAccessRightException, IOException, InterruptedException {
+      Note note = makeMe.aNote().creatorAndOwner(userModel).please();
+      Mockito.when(httpClientAdapter.getResponseString(any()))
+          .thenReturn(
+              """
+            {
+                "entities": {
+                    "Q8684": {
+                        "type": "item",
+                        "id": "Q8684",
+                        "claims": {
+                            "P1943": [
+                                {
+                                    "mainsnak": {
+                                        "snaktype": "value",
+                                        "property": "P1943",
+                                        "hash": "379bb9637ff890d41f42f155eec92a65db554eee",
+                                        "datavalue": {
+                                            "value": "Map Seoul-teukbyeolsi ja.png",
+                                            "type": "string"
+                                        },
+                                        "datatype": "commonsMedia"
+                                    },
+                                    "type": "statement",
+                                    "id": "Q8684$d92eedee-4ffe-3b2a-ceeb-044ff89a7892",
+                                    "rank": "normal"
+                                },
+                                {
+                                    "mainsnak": {
+                                        "snaktype": "value",
+                                        "property": "P1943",
+                                        "hash": "355a658a37baf7358ec496a85bce4960472fa499",
+                                        "datavalue": {
+                                            "value": "01-00-seoul-en.svg",
+                                            "type": "string"
+                                        },
+                                        "datatype": "commonsMedia"
+                                    },
+                                    "type": "statement",
+                                    "id": "Q8684$96348bdc-4b44-afc2-ff84-dcde4d34862a",
+                                    "rank": "preferred"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "success": 1
+            }
+            """);
+      note.setWikidataId("Q8684");
+      makeMe.refresh(userModel.getEntity());
+      final NoteRealmWithPosition show = controller.show(note);
+      assertThat(
+          show.noteRealm.getNote().getLocation().get().mapUrl,
+          equalTo(
+              Optional.of(
+                  "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/Map_Seoul-teukbyeolsi_ja.png&width=300")));
     }
   }
 

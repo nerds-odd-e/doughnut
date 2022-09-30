@@ -84,7 +84,7 @@ public class WikidataValue {
     return wikiClass;
   }
 
-  String toLocationPhotoFileName() {
+  String getStringValue() {
     return stringValue;
   }
 }

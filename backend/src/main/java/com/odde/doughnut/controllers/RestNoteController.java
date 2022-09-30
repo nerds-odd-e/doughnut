@@ -83,11 +83,11 @@ class RestNoteController {
     WikidataService wikidataService = getWikidataService();
     Optional<String> locationPhotoUrl =
         wikidataService.getWikidataLocationPhotoUrl(note.getWikidataId());
+    Optional<String> locationMapUrl =
+        wikidataService.getWikidataLocationMapUrl(note.getWikidataId());
     NoteLocation noteLocation = new NoteLocation();
     noteLocation.photoUrl = locationPhotoUrl;
-    noteLocation.mapUrl =
-        Optional.of(
-            "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/Map_Seoul-teukbyeolsi_ja.png&width=300");
+    noteLocation.mapUrl = locationMapUrl;
     noteRealmWithPosition.noteRealm.getNote().setNoteLocation(noteLocation);
 
     return noteRealmWithPosition;
