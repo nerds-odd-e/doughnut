@@ -101,12 +101,17 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
       return null;
     }
 
-    Optional<String> s =
+    Optional<String> photoFileName =
         Optional.ofNullable(getEntityDataById(wikidataId))
             .flatMap(d -> d.getLocationPhotoFileName(wikidataId));
+
+    if (!photoFileName.isPresent()) {
+      return null;
+    }
+
     return Optional.of(
         "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/"
-            + s.get().replace(" ", "_")
+            + photoFileName.get().replace(" ", "_")
             + "&width=300");
   }
 }
