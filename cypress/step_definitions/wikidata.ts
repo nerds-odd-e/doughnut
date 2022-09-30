@@ -98,3 +98,10 @@ And("I select wikidataID {string} from the Wikidata search result", (wikidataID:
 Then("I should see that the {string} becomes {string}", (field: string, value: string) => {
   cy.getFormControl(field).should("have.value", value)
 })
+
+Given(
+  "location wikidataId {string} and this wikidata only have location photo",
+  (wikidataId: string) => {
+    cy.wikidataService().stubWikidataEntityLocationWithPhoto(wikidataId, 0, 0, "photo")
+  },
+)
