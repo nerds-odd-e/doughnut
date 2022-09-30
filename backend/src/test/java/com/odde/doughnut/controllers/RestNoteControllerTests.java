@@ -375,6 +375,21 @@ class RestNoteControllerTests {
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
         assertThat(note.noteRealm.getNote().getTextContent().getDescription(), equalTo(birthday));
       }
+
+      @Test
+      void shouldAddHumanBCBirthdayWhenAddingNoteWithWikidataId()
+          throws BindException, InterruptedException, NoAccessRightException, IOException {
+        String wikidataIdOfHuman = "Q4604"; // Wang Chien-ming
+        String birthdayYear = "552 B.C."; // P569 (Birthday)
+        String birthdayByISO = "-0552-10-09T00:00:00Z";
+
+        mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO);
+        noteCreation.setWikidataId(wikidataIdOfHuman);
+        NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
+        assertThat(
+            note.noteRealm.getNote().getTextContent().getDescription(),
+            stringContainsInOrder(birthdayYear));
+      }
     }
   }
 

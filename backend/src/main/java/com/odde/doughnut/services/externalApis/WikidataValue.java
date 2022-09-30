@@ -29,14 +29,15 @@ public class WikidataValue {
       return;
     }
     if (isTimeValue(type)) {
-      // ToDo: change time formatter to identify/handle '+' in front of time string
-      // time string example "+1980-03-31T00:00:00Z"
       DateTimeFormatter formatter =
           DateTimeFormatter.ofPattern("dd MMMM yyyy")
               .withZone(ZoneId.systemDefault())
               .localizedBy(Locale.ENGLISH);
-      Instant instant = Instant.parse(value.get("time").textValue().substring(1));
+      String inputTime = value.get("time").textValue();
+      Instant instant = Instant.parse(inputTime.substring(1));
       timeValue = formatter.format(instant);
+      String postFix = inputTime.startsWith("-") ? " B.C." : "";
+      timeValue += postFix;
 
       return;
     }
