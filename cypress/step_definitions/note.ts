@@ -413,3 +413,10 @@ Then(
     })
   },
 )
+
+Then("I will see {string} with {string}", (altText: string, srcUrl: string) => {
+  cy.findByAltText(altText).then((elem) => {
+    expect(elem).to.be.visible()
+    expect(elem).to.have.attr("src", srcUrl)
+  })
+})
