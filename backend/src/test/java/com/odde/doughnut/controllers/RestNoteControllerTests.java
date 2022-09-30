@@ -23,6 +23,7 @@ import java.net.URI;
 import java.sql.Timestamp;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -374,6 +375,20 @@ class RestNoteControllerTests {
         noteCreation.setWikidataId(wikidataIdOfHuman);
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
         assertThat(note.noteRealm.getNote().getTextContent().getDescription(), equalTo(birthday));
+      }
+
+      @Disabled
+      @Test
+      void shouldAddHumanCountryWhenAddingNoteWithWikidataId()
+          throws BindException, InterruptedException, NoAccessRightException, IOException {
+        String wikidataIdOfHuman = "Q706446"; // Wang Chien-ming
+        String country = "Taiwan";
+
+        noteCreation.setWikidataId(wikidataIdOfHuman);
+        NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
+        assertThat(
+            note.noteRealm.getNote().getTextContent().getDescription(),
+            stringContainsInOrder(country));
       }
 
       @Test
