@@ -29,7 +29,7 @@ export default defineConfig({
   screenshotOnRunFailure: true,
   video: false,
   pageLoadTimeout: 100000,
-  defaultCommandTimeout: 6000,
+  defaultCommandTimeout: 10000,
   trashAssetsBeforeRuns: true,
   watchForFileChanges: false,
   environment: "ci",
