@@ -6,6 +6,7 @@ Feature: note load
       | title    | description    | testingParent |
       | AnyTitle | Any content    |               |
 
+  @ignore
   Scenario: Create a location child note
     When I create a note belonging to "AnyTitle":
       | Title | Wikidata Id |
