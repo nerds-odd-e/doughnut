@@ -57,8 +57,6 @@ Given(
   },
 )
 
-Given("Wikidata.org entity {string} is a book with authors", () => console.log("Placeholder"))
-
 Given("The wikidata service is not available", () => {
   // checking if the saved Wikidata service url is the real url, which indicate the service is mocked.
   // This test require the service to be mocked first.
