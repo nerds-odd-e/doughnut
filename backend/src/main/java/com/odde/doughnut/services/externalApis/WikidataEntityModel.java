@@ -29,5 +29,4 @@ public class WikidataEntityModel {
   private Optional<String> getWikiClass(String wikidataId) {
     return getFirstClaimOfProperty(wikidataId, "P31").map(WikidataValue::toWikiClass);
   }
-
 }

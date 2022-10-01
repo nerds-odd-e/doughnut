@@ -383,6 +383,9 @@ Then("I type {string} in the title", (content: string) => {
   cy.focused().clear().type(content)
 })
 
-Then("I should see the note description on current page becomes {string}", (descriptionText: string) => {
-  cy.findNoteDescriptionOnCurrentPage(descriptionText)
-})
+Then(
+  "I should see the note description on current page becomes {string}",
+  (descriptionText: string) => {
+    cy.findNoteDescriptionOnCurrentPage(descriptionText)
+  },
+)

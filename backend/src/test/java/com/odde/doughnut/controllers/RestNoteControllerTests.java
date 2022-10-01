@@ -21,7 +21,6 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.net.URI;
 import java.sql.Timestamp;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;

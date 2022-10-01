@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import lombok.SneakyThrows;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.util.UriComponentsBuilder;
 
 public record WikidataService(HttpClientAdapter httpClientAdapter, String wikidataUrl) {
@@ -94,5 +93,4 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
         uriBuilder.apply(wikidataUriBuilder().path("/w/api.php").queryParam("action", action));
     return httpClientAdapter.getResponseString(uri);
   }
-
 }
