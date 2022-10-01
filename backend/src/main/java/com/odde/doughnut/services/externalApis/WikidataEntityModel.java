@@ -22,20 +22,12 @@ public class WikidataEntityModel {
     if (getWikiClass(wikidataId).equals(Optional.of("Q5"))) {
       // P569: Birthday
       return getFirstClaimOfProperty(wikidataId, "P569").map(WikidataValue::toDateDescription);
-    } else {
-      return getFirstClaimOfProperty(wikidataId, "P625").map(WikidataValue::toLocationDescription);
     }
-  }
-
-  public Optional<String> getLocationPhotoFileName(String wikidataId) {
-    return getFirstClaimOfProperty(wikidataId, "P18").map(WikidataValue::getStringValue);
+    return getFirstClaimOfProperty(wikidataId, "P625").map(WikidataValue::toLocationDescription);
   }
 
   private Optional<String> getWikiClass(String wikidataId) {
     return getFirstClaimOfProperty(wikidataId, "P31").map(WikidataValue::toWikiClass);
   }
 
-  public Optional<String> getLocationMapFileName(String wikidataId) {
-    return getFirstClaimOfProperty(wikidataId, "P1943").map(WikidataValue::getStringValue);
-  }
 }

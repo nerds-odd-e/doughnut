@@ -95,43 +95,4 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     return httpClientAdapter.getResponseString(uri);
   }
 
-  @SneakyThrows
-  public Optional<String> getWikidataLocationPhotoUrl(String wikidataId) {
-    if (Strings.isEmpty(wikidataId)) {
-      return null;
-    }
-
-    Optional<String> photoFileName =
-        Optional.ofNullable(getEntityDataById(wikidataId))
-            .flatMap(d -> d.getLocationPhotoFileName(wikidataId));
-
-    if (!photoFileName.isPresent()) {
-      return null;
-    }
-
-    return Optional.of(
-        "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/"
-            + photoFileName.get().replace(" ", "_")
-            + "&width=300");
-  }
-
-  @SneakyThrows
-  public Optional<String> getWikidataLocationMapUrl(String wikidataId) {
-    if (Strings.isEmpty(wikidataId)) {
-      return null;
-    }
-
-    Optional<String> mapFileName =
-        Optional.ofNullable(getEntityDataById(wikidataId))
-            .flatMap(d -> d.getLocationMapFileName(wikidataId));
-
-    if (!mapFileName.isPresent()) {
-      return null;
-    }
-
-    return Optional.of(
-        "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/"
-            + mapFileName.get().replace(" ", "_")
-            + "&width=300");
-  }
 }

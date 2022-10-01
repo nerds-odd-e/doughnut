@@ -48,8 +48,6 @@ public class Note extends Thingy {
   @Setter
   private TextContent textContent = new TextContent();
 
-  @JsonIgnore @Transient @Getter @Setter private NoteLocation noteLocation;
-
   @Column(name = "sibling_order")
   private Long siblingOrder = SiblingOrder.getGoodEnoughOrderNumber();
 
@@ -319,10 +317,6 @@ public class Note extends Thingy {
               pictureWithMask.pictureMask = getNoteAccessories().getPictureMask();
               return pictureWithMask;
             });
-  }
-
-  public Optional<NoteLocation> getLocation() {
-    return Optional.ofNullable(noteLocation);
   }
 
   private Optional<String> getNotePicture() {
