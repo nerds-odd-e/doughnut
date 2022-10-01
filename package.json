@@ -56,7 +56,7 @@
   },
   "devDependencies": {
     "@anev/ts-mountebank": "^1.6",
-    "@badeball/cypress-cucumber-preprocessor": "^12.2",
+    "@badeball/cypress-cucumber-preprocessor": "^13.0",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.1",
     "@esbuild-plugins/node-modules-polyfill": "^0.1",
     "@testing-library/cypress": "8.0",
@@ -64,7 +64,7 @@
     "@types/node": "^18.7",
     "@typescript-eslint/eslint-plugin": "^5.37",
     "@typescript-eslint/parser": "^5.37",
-    "cypress": "^10.8",
+    "cypress": "^10.9",
     "cypress-file-upload": "^5.0",
     "esbuild": "^0.15",
     "eslint": "^8.22",

@@ -3,7 +3,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { And, Then, When } from "@badeball/cypress-cucumber-preprocessor"
+import { Then, When } from "@badeball/cypress-cucumber-preprocessor"
 import "../support/string.extensions"
 
 When("I start searching", () => {
@@ -48,16 +48,16 @@ When(
   },
 )
 
-And("I should see the source note as {string}", (noteTitle: string) => {
+When("I should see the source note as {string}", (noteTitle: string) => {
   cy.findByText(noteTitle, { selector: "strong" }).should("be.visible")
 })
 
-And("I should see {string} as the possible duplicate", (noteTitlesAsString: string) => {
+When("I should see {string} as the possible duplicate", (noteTitlesAsString: string) => {
   cy.tick(500)
   cy.expectExactLinkTargets(noteTitlesAsString.commonSenseSplit(",").map((i: string) => i.trim()))
 })
 
-And(
+When(
   "I should see {string} as targets only when searching {string}",
   (noteTitlesAsString: string, searchKey: string) => {
     cy.searchNote(searchKey, [])
@@ -65,7 +65,7 @@ And(
   },
 )
 
-And(
+When(
   "I should see {string} as targets only when searching in all my notebooks {string}",
   (noteTitlesAsString: string, searchKey: string) => {
     cy.searchNote(searchKey, ["All My Notebooks And Subscriptions"])
@@ -73,7 +73,7 @@ And(
   },
 )
 
-And(
+When(
   "I should see note cannot be found when searching in all my notebooks {string}",
   (searchKey: string) => {
     cy.searchNote(searchKey, ["All My Notebooks And Subscriptions"])

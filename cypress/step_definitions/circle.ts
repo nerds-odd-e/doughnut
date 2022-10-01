@@ -3,7 +3,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { And, Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
+import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 
 When("I create a new circle {string} and copy the invitation code", (circleName: string) => {
   cy.openCirclesSelector()
@@ -69,7 +69,7 @@ When("There is a notebook {string} in circle {string}", (title, circleName) => {
   cy.testability().seedNotes([{ title }], "", circleName)
 })
 
-And("someone of my circle deletes the {string} notebook", (noteTitle: string) => {
+When("someone of my circle deletes the {string} notebook", (noteTitle: string) => {
   cy.noteByTitle(noteTitle).deleteNoteViaAPI()
 })
 

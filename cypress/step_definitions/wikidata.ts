@@ -2,7 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { And, Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
+import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 
 When("I associate the note {string} with wikidata id {string}", (title, wikiID) => {
   cy.associateNoteWithWikidataId(title, wikiID)
@@ -72,12 +72,12 @@ Given(
   },
 )
 
-And("I search with title {string} on Wikidata", (title: string) => {
+When("I search with title {string} on Wikidata", (title: string) => {
   cy.focused().clear().type(title)
   cy.findByRole("button", { name: "Search on Wikidata" }).click()
 })
 
-And("I select wikidataID {string} from the Wikidata search result", (wikidataID: string) => {
+When("I select wikidataID {string} from the Wikidata search result", (wikidataID: string) => {
   cy.get('select[name="wikidataSearchResult"]').select(wikidataID)
 })
 
