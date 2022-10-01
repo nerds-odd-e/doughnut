@@ -35,18 +35,15 @@
       v-if="size === 'small' && !!textContent.description"
       class="description-indicator"
     />
-    <div class="note-picture text-center col">
-      <template v-if="note.pictureWithMask">
-        <ShowPicture
-          v-if="size !== 'small' && !!note.pictureWithMask.notePicture"
-          v-bind="note.pictureWithMask"
-          :opacity="0.2"
-        />
-        <SvgPictureIndicator v-else class="picture-indicator" />
-      </template>
-      <ShowLocation v-bind="note.location" v-if="!isProd" />
-    </div>
-
+    <template v-if="note.pictureWithMask">
+      <ShowPicture
+        v-if="size !== 'small'"
+        class="col text-center"
+        v-bind="note.pictureWithMask"
+        :opacity="0.2"
+      />
+      <SvgPictureIndicator v-else class="picture-indicator" />
+    </template>
     <template v-if="!!note.noteAccessories.url">
       <div v-if="size != 'small'">
         <label v-if="note.noteAccessories.urlIsVideo">Video Url:</label>
@@ -73,7 +70,6 @@ import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
 import EditableText from "../form/EditableText.vue";
 import NoteWikidataAssociation from "./NoteWikidataAssociation.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
-import ShowLocation from "./ShowLocation.vue";
 
 export default defineComponent({
   props: {
@@ -86,7 +82,6 @@ export default defineComponent({
     },
   },
   components: {
-    ShowLocation,
     NoteShortDescription,
     ShowPicture,
     SvgDescriptionIndicator,
@@ -99,9 +94,6 @@ export default defineComponent({
   computed: {
     textContent() {
       return { ...this.note.textContent };
-    },
-    isProd() {
-      return import.meta.env.PROD;
     },
   },
   methods: {
@@ -122,7 +114,6 @@ export default defineComponent({
 .note-content
   display: flex
   flex-wrap: wrap
-
   .col
     flex: 1 1 auto
     width: 50%

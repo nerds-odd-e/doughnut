@@ -104,7 +104,6 @@ declare module '@vue/runtime-core' {
     SearchResults: typeof import('./src/components/search/SearchResults.vue')['default']
     Select: typeof import('./src/components/form/Select.vue')['default']
     SelfEvaluateButtons: typeof import('./src/components/review/SelfEvaluateButtons.vue')['default']
-    ShowLocation: typeof import('./src/components/notes/ShowLocation.vue')['default']
     ShowPicture: typeof import('./src/components/notes/ShowPicture.vue')['default']
     ShowReviewPoint: typeof import('./src/components/review/ShowReviewPoint.vue')['default']
     StopRepeatButton: typeof import('./src/components/review/StopRepeatButton.vue')['default']

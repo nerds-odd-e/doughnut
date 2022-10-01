@@ -1,32 +1,30 @@
 <template>
-  <div
-    style="position: relative; display: inline-block"
-    id="note-picture"
-    v-if="!!notePicture"
-  >
-    <img class="img-fluid" :src="notePicture" />
-    <svg
-      v-if="!!pictureMask"
-      viewBox="0 0 100 100"
-      style="
-        position: absolute;
-        top: 0;
-        left: 0;
-        color: #11f1f1;
-        width: 100%;
-        height: 100%;
-      "
-    >
-      <template v-for="item in getMasks()" :key="item.index">
-        <rect
-          :x="item.x"
-          :y="item.y"
-          :width="item.width"
-          :height="item.height"
-          :style="`fill:blue;stroke:pink;stroke-width:1;fill-opacity:${opacity};stroke-opacity:0.8`"
-        />
-      </template>
-    </svg>
+  <div class="note-picture text-center" v-if="!!notePicture">
+    <div style="position: relative; display: inline-block" id="note-picture">
+      <img class="img-fluid" :src="notePicture" />
+      <svg
+        v-if="!!pictureMask"
+        viewBox="0 0 100 100"
+        style="
+          position: absolute;
+          top: 0;
+          left: 0;
+          color: #11f1f1;
+          width: 100%;
+          height: 100%;
+        "
+      >
+        <template v-for="item in getMasks()" :key="item.index">
+          <rect
+            :x="item.x"
+            :y="item.y"
+            :width="item.width"
+            :height="item.height"
+            :style="`fill:blue;stroke:pink;stroke-width:1;fill-opacity:${opacity};stroke-opacity:0.8`"
+          />
+        </template>
+      </svg>
+    </div>
   </div>
 </template>
 
