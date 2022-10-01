@@ -26,22 +26,6 @@ export default defineConfig({
       template: {
         compilerOptions: {
           isCustomElement: (tag) => /^x-/.test(tag),
-          nodeTransforms: [
-            (node) => {
-              if (process.env.NODE_ENV === "production") {
-                //clean up test attrs
-                if (node.type === 1 /*NodeTypes.ELEMENT*/) {
-                  for (let i = 0; i < node.props.length; i++) {
-                    const element = node.props[i]
-                    if (element && element.type === 6/*NodeTypes.ATTRIBUTE*/ && element.name === "data-testid") {
-                      node.props.splice(i, 1)
-                      i--
-                    }
-                  }
-                }
-              }
-            },
-          ]
         },
       },
     }),
