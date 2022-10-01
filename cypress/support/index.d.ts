@@ -83,12 +83,6 @@ declare namespace Cypress {
     shouldSeeQuizWithOptions(questionParts: any, options: any): Chainable<any>
     startSearching(): Chainable<any>
     stubWikidataEntityLocation(wikidataId: string, lat: number, lng: number): Chainable<Subject>
-    stubWikidataEntityLocationWithPhoto(
-      wikidataId: string,
-      lat: number,
-      lng: number,
-      photo: string,
-    ): Chainable<Subject>
     stubWikidataEntityQuery(
       wikidataId: string,
       wikidataTitle: string,
