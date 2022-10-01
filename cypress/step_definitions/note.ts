@@ -391,20 +391,3 @@ Then("I will not see location photo and location map", () => {
   cy.findByAltText("location photo").should("not.exist")
   cy.findByAltText("location map").should("not.exist")
 })
-
-Then(
-  "I will see {string} and {string} with {string}",
-  (locationPhoto: string, locationMap: string, mapUrl: string) => {
-    cy.findByAltText(locationMap).then((elem) => {
-      expect(elem).to.be.visible()
-      expect(elem).to.have.attr("src", mapUrl)
-    })
-  },
-)
-
-Then("I will see {string} with {string}", (altText: string, srcUrl: string) => {
-  cy.findByAltText(altText).then((elem) => {
-    expect(elem).to.be.visible()
-    expect(elem).to.have.attr("src", srcUrl)
-  })
-})

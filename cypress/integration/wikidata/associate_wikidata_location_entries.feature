@@ -24,16 +24,3 @@ Feature: Note creation/edit should have description if wikidata is a location
       | Singapore  | The red dot  | places        |
     And I associate the note "Singapore" with wikidata id "Q334"
     And I should see the note description on current page becomes "Location: 1.3'N, 103.8'E The red dot"
-
-  @usingMockedWikidataServicek @ignore
-  Scenario: Update existing Note wikidata id to other location
-    Given there are some notes for the current user
-      | title      | description  | testingParent |
-      | Singapore  | The red dot  | places        |
-    And I associate the note "Singapore" with wikidata id "Q334"
-    And Wikidata.org has an entity "Q1490" with title "Tokyo"
-    And Wikidata.org entity "Q1490" has a location at 35.68955555555556, 139.6917222222222 with photo "Seul_montaje.png"
-    When I associate the note "Singapore" with wikidata id "Q1490" and confirm
-    Then I will see "location photo" with "https://upload.wikimedia.org/wikipedia/commons/0/0e/Seul_montaje.png"
-    Then I will see "location map" with "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Map_of_Tokyo_Ja.svg/300px-Map_of_Tokyo_Ja.svg.png"
-

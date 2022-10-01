@@ -50,13 +50,6 @@ Given(
   },
 )
 
-Given(
-  "Wikidata.org entity {string} has a location at {float}, {float} with photo {string}",
-  (wikidataId: string, lat: number, lng: number, photo: string) => {
-    cy.wikidataService().stubWikidataEntityLocationWithPhoto(wikidataId, lat, lng, photo)
-  },
-)
-
 Given("The wikidata service is not available", () => {
   // checking if the saved Wikidata service url is the real url, which indicate the service is mocked.
   // This test require the service to be mocked first.
