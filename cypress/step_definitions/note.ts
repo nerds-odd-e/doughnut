@@ -387,24 +387,6 @@ Then("I should see the description becomes {string}", (descriptionText: string) 
   cy.findNoteDescriptionOnCurrentPage(descriptionText)
 })
 
-Then("I will see location photo and location map", () => {
-  cy.findByAltText("location photo").then((ele) => {
-    expect(ele).to.be.visible
-    expect(ele).to.have.attr(
-      "src",
-      "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/Seul_montaje.png&width=300",
-    )
-  })
-
-  cy.findByAltText("location map").then((ele) => {
-    expect(ele).to.be.visible
-    expect(ele).to.have.attr(
-      "src",
-      "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/Map_Seoul-teukbyeolsi_ja.png&width=300",
-    )
-  })
-})
-
 Then("I will not see location photo and location map", () => {
   cy.findByAltText("location photo").should("not.exist")
   cy.findByAltText("location map").should("not.exist")
@@ -425,8 +407,4 @@ Then("I will see {string} with {string}", (altText: string, srcUrl: string) => {
     expect(elem).to.be.visible()
     expect(elem).to.have.attr("src", srcUrl)
   })
-})
-
-Then("I will only see location photo", () => {
-  cy.get(".location-img").find(".img-fluid").should("have.length", 1)
 })
