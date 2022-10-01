@@ -49,8 +49,7 @@ export default defineConfig({
     AutoImport({
       imports: [
         'vue',
-        'vue-router',
-        'pinia'
+        'vue-router'
       ],
       dts: true, // generate TypeScript declaration
     }),

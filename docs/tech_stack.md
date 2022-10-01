@@ -13,7 +13,6 @@
 - [Cypress Testing Library](https://testing-library.com/docs/cypress-testing-library/intro/)
 - [Vue3](https://v3.vuejs.org/guide/introduction.html)
 - [vue-router 4.x](https://router.vuejs.org/)
-- [pinia](https://pinia.vuejs.org/)
 - [Vite](https://vitejs.dev)
 - [Jest](https://jestjs.io/)
 - [Vue Testing Library](https://testing-library.com/docs/vue-testing-library/intro/)

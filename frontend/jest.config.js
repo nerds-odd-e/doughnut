@@ -12,7 +12,6 @@ module.exports = {
     '^.+\\.(j|t)s?$': '@swc/jest',
     '.*\\.(vue)$': '@vue/vue3-jest',
   },
-  transformIgnorePatterns: ['/node_modules/(?!pinia)'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
