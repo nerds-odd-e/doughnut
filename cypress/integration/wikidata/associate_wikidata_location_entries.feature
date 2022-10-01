@@ -15,7 +15,7 @@ Feature: Note creation/edit should have description if wikidata is a location
     When I create a note belonging to "places":
       | Title     | Wikidata Id  |
       | Singapore | Q334         |
-    Then I should see the description becomes "Location: 1.3'N, 103.8'E"
+    Then I should see the note description on current page becomes "Location: 1.3'N, 103.8'E"
 
   @usingMockedWikidataService
   Scenario: Existing Note wikidata edited by user
@@ -23,7 +23,7 @@ Feature: Note creation/edit should have description if wikidata is a location
       | title      | description  | testingParent |
       | Singapore  | The red dot  | places        |
     And I associate the note "Singapore" with wikidata id "Q334"
-    And I should see the description becomes "Location: 1.3'N, 103.8'E The red dot"
+    And I should see the note description on current page becomes "Location: 1.3'N, 103.8'E The red dot"
 
   @usingMockedWikidataServicek @ignore
   Scenario: Update existing Note wikidata id to other location
