@@ -2,7 +2,6 @@ Feature: Note creation should have description if wikidata is a human
   As a learner, I want to to create a note. If the note is a human I want the birthday and country
   to be included in the description of the new note.
 
-
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user
@@ -22,10 +21,3 @@ Feature: Note creation should have description if wikidata is a human
       | Title           | Wikidata Id |
       | Confucius       | Q4604     |
     Then I should see the description becomes "09 October 0552 B.C."
-
-  @ignore
-  Scenario: New Note creation and wikidata is selected by user
-    When I create a note belonging to "human":
-      | Title           | Wikidata Id |
-      | Wang Chien-ming | Q706446     |
-    Then I should see the description becomes "31 March 1980, Taiwan"
