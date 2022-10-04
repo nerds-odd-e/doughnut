@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -245,8 +244,7 @@ class RestNoteControllerTests {
         noteCreation.getTextContent().setDescription("");
       }
 
-      private void mockApiResponseWithHumanInfo(
-          String humanId, String birthdayByISO, String countryQId)
+      private void mockApiResponseWithHumanInfo(String humanId, String birthdayByISO)
           throws IOException, InterruptedException {
         Mockito.when(
                 httpClientAdapter.getResponseString(
@@ -263,24 +261,15 @@ class RestNoteControllerTests {
                           "id": "%s",
                           "claims": {
                           "P27": [{
-                             "mainsnak": {
-                                 "snaktype": "value",
-                                 "property": "P27",
-                                 "hash": "5e51bd61971a52beebe110cd5232eb4cb1a99a3f",
-                                 "datavalue": {
-                                     "value": {
-                                         "entity-type": "item",
-                                         "numeric-id": 865,
-                                         "id": "%s"
-                                     },
-                                     "type": "wikibase-entityid"
-                                 },
-                                 "datatype": "wikibase-item"
-                             },
-                             "type": "statement",
-                             "id": "Q706446$B98C0820-A8FD-465F-93E0-3A6BF8A4A856",
-                             "rank": "normal"
-                         }
+                            "mainsnak": {
+                            "snaktype": "value",
+                            "property": "P27",
+                            "datavalue": {
+                                  "value": "",
+                                  "type": "string"
+                            }
+                            }
+                          }
                           ],
                             "P569": [
                               {
@@ -311,7 +300,7 @@ class RestNoteControllerTests {
                       }
                     }
                   """
-                    .formatted(humanId, humanId, countryQId, birthdayByISO));
+                    .formatted(humanId, humanId, birthdayByISO));
       }
 
       @Test
@@ -321,11 +310,10 @@ class RestNoteControllerTests {
         String birthday = "31 March 1980"; // P569 (Birthday)
         String birthdayByISO = "+1980-03-31T00:00:00Z";
 
-        mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO, "");
+        mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO);
         noteCreation.setWikidataId(wikidataIdOfHuman);
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
-        assertThat(
-            note.noteRealm.getNote().getTextContent().getDescription(), containsString(birthday));
+        assertThat(note.noteRealm.getNote().getTextContent().getDescription(), equalTo(birthday));
       }
 
       @Test
@@ -335,7 +323,7 @@ class RestNoteControllerTests {
         String birthdayYear = "552 B.C."; // P569 (Birthday)
         String birthdayByISO = "-0552-10-09T00:00:00Z";
 
-        mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO, "");
+        mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO);
         noteCreation.setWikidataId(wikidataIdOfHuman);
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
         assertThat(
@@ -347,26 +335,10 @@ class RestNoteControllerTests {
       void shouldAddHumanCountryOfBirthWhenAddingNoteWithWikidataId()
           throws BindException, InterruptedException, NoAccessRightException, IOException {
         String wikidataIdOfHuman = "Q706446"; // Wang Chien-ming
-        String countryOfBirth = "Taiwan";
+        String countryOfBirth = "";
         String birthdayByISO = "+1980-03-31T00:00:00Z";
 
-        mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO, "Q865");
-        noteCreation.setWikidataId(wikidataIdOfHuman);
-        NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
-        assertThat(
-            note.noteRealm.getNote().getTextContent().getDescription(),
-            containsString(countryOfBirth));
-      }
-
-      @Test
-      @Disabled
-      void shouldAddADifferentHumanCountryOfBirthWhenAddingNoteWithWikidataId()
-          throws BindException, InterruptedException, NoAccessRightException, IOException {
-        String wikidataIdOfHuman = "Q706446"; // Wang Chien-ming
-        String countryOfBirth = "The United States of America";
-        String birthdayByISO = "+1980-03-31T00:00:00Z";
-
-        mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO, "Q30");
+        mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO);
         noteCreation.setWikidataId(wikidataIdOfHuman);
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
         assertThat(

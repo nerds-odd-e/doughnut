@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Map;
 import java.util.Optional;
 import lombok.Data;
-import org.thymeleaf.util.StringUtils;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -27,21 +26,12 @@ public class WikidataEntityModel {
     if (getWikiClass(wikidataId).equals(Optional.of(WikidataItems.HUMAN.label))) {
       Optional<String> country =
           getFirstClaimOfProperty(wikidataId, WikidataFields.COUNTRY_OF_CITIZENSHIP)
-              .map(
-                  wikiId -> {
-                    if (StringUtils.equals("Q865", wikiId.toWikiClass())) {
-                      return "Taiwan";
-                    } else {
-                      return "";
-                    }
-                  });
+              .map(WikidataValue::toCountryOfCitizenship);
       Optional<String> birthday =
           getFirstClaimOfProperty(wikidataId, WikidataFields.BIRTHDAY)
               .map(WikidataValue::toDateDescription);
-      // Add spacing between birthday and country only if country is not empty
-      Optional<String> countryString =
-          country.isEmpty() ? Optional.empty() : Optional.of(country.get() + ", ");
-      description = Optional.of(countryString.get() + birthday.get());
+
+      description = Optional.of(country.get() + birthday.get());
 
     } else {
       description =
