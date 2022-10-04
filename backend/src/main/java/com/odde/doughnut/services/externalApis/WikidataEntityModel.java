@@ -14,7 +14,8 @@ public class WikidataEntityModel {
     return entities.get(wikidataId);
   }
 
-  private Optional<WikidataValue> getFirstClaimOfProperty(String wikidataId, WikidataFields propertyId) {
+  private Optional<WikidataValue> getFirstClaimOfProperty(
+      String wikidataId, WikidataFields propertyId) {
     return getEntityItem(wikidataId).getFirstClaimOfProperty(propertyId.label);
   }
 
@@ -23,20 +24,26 @@ public class WikidataEntityModel {
     Optional<String> description;
 
     if (getWikiClass(wikidataId).equals(Optional.of("Q5"))) {
-      Optional<String> country = getFirstClaimOfProperty(wikidataId, WikidataFields.COUNTRY_OF_CITIZENSHIP).map(WikidataValue::toCountryOfCitizenship);
-      Optional<String> birthday = getFirstClaimOfProperty(wikidataId, WikidataFields.BIRTHDAY).map(WikidataValue::toDateDescription);
+      Optional<String> country =
+          getFirstClaimOfProperty(wikidataId, WikidataFields.COUNTRY_OF_CITIZENSHIP)
+              .map(WikidataValue::toCountryOfCitizenship);
+      Optional<String> birthday =
+          getFirstClaimOfProperty(wikidataId, WikidataFields.BIRTHDAY)
+              .map(WikidataValue::toDateDescription);
 
       description = Optional.of(country.get() + birthday.get());
 
     } else {
-      description = getFirstClaimOfProperty(wikidataId, WikidataFields.COORDINATE_LOCATION).map(WikidataValue::toLocationDescription);
+      description =
+          getFirstClaimOfProperty(wikidataId, WikidataFields.COORDINATE_LOCATION)
+              .map(WikidataValue::toLocationDescription);
     }
 
     return description;
   }
 
   private Optional<String> getWikiClass(String wikidataId) {
-    return getFirstClaimOfProperty(wikidataId, WikidataFields.INSTANCE_OF).map(WikidataValue::toWikiClass);
+    return getFirstClaimOfProperty(wikidataId, WikidataFields.INSTANCE_OF)
+        .map(WikidataValue::toWikiClass);
   }
-
 }
