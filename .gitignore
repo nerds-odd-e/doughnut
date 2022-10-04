@@ -9,7 +9,6 @@
 .history
 .svn/
 .bash_profile
-install-nix
 
 # cypress screenshots & videos
 cypress/downloads/
@@ -53,9 +52,10 @@ hs_err_pid*
 *.iws
 .idea/
 
-# nodes
+# nodejs
 node_modules/
 **/package-lock.json
+**/yarn.error
 
 # git-secret
 .gitsecret/keys/random_seed
@@ -100,6 +100,8 @@ frontend/app.*.map.json
 
 # local nix env related e.g. MySQL DB instance folder/files
 .envrc
+.direnv/
+install-nix
 mysql/
 
 # gitpod inteliij-projector
@@ -110,10 +112,3 @@ mysql/
 mb.log
 mb1.log
 mb.pid
-
-# invisiblen change files
-infra/scripts/*.sh
-gradlew
-backend/gradlew
-assert_generated_type_script_up_to_date.sh
-setup-doughnut-dev.sh
