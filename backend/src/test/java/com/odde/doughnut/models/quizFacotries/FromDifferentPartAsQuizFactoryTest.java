@@ -73,7 +73,7 @@ class FromDifferentPartAsQuizFactoryTest {
   }
 
   @Nested
-  class WhenThereIsAnCousin {
+  class WhenThereIsACousin {
     Link prettySubjective;
 
     @BeforeEach
