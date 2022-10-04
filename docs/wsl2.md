@@ -24,3 +24,6 @@ export DISPLAY=$(route.exe print | grep 0.0.0.0 | head -1 | awk '{print $4}'):0.
 ```bash
 git config --global core.autocrlf true
 ```
+
+### 4. Git credentials
+You can config wsl2 git to use windows credential manager to avoid personal access token by following [this article](https://learn.microsoft.com/en-us/windows/wsl/tutorials/wsl-git)
