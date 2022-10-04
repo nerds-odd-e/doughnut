@@ -9,11 +9,9 @@ import java.util.Optional;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.Embedded;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
-import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,9 +33,6 @@ public class NoteAccessories {
   @Getter
   @Setter
   private String pictureUrl;
-
-
-  @Embedded @Valid @Getter private final NoteLocation location = null;
 
   @Pattern(
       regexp = "^(((-?[0-9.]+\\s+){3}-?[0-9.]+\\s+)*((-?[0-9.]+\\s+){3}-?[0-9.]+))?$",
