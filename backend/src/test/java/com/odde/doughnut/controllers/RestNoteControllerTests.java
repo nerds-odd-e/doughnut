@@ -260,6 +260,17 @@ class RestNoteControllerTests {
                           "type": "item",
                           "id": "%s",
                           "claims": {
+                          "P27": [{
+                            "mainsnak": {
+                            "snaktype": "value",
+                            "property": "P27",
+                            "datavalue": {
+                                  "value": "",
+                                  "type": "string"
+                            }
+                            }
+                          }
+                          ],
                             "P569": [
                               {
                                 "mainsnak": {
@@ -318,6 +329,20 @@ class RestNoteControllerTests {
         assertThat(
             note.noteRealm.getNote().getTextContent().getDescription(),
             stringContainsInOrder(birthdayYear));
+      }
+
+      @Test
+      void shouldAddHumanCountryOfBirthWhenAddingNoteWithWikidataId()
+          throws BindException, InterruptedException, NoAccessRightException, IOException {
+        String wikidataIdOfHuman = "Q706446"; // Wang Chien-ming
+        String countryOfBirth = "";
+        String birthdayByISO = "+1980-03-31T00:00:00Z";
+
+
+        mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO);
+        noteCreation.setWikidataId(wikidataIdOfHuman);
+        NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
+        assertThat(note.noteRealm.getNote().getTextContent().getDescription(), containsString(countryOfBirth));
       }
     }
   }
