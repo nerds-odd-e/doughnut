@@ -24,7 +24,7 @@ public class WikidataEntityModel {
 
     Optional<String> description;
 
-    if (getWikiClass(wikidataId).equals(Optional.of(WikidataItems.HUMAN.label))) {
+    if (getWikiClass(wikidataId).equals(Optional.of("Q5"))) {
       Optional<String> country =
           getFirstClaimOfProperty(wikidataId, WikidataFields.COUNTRY_OF_CITIZENSHIP)
               .map(
