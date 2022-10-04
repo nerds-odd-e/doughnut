@@ -561,11 +561,11 @@ Cypress.Commands.add("expectFieldErrorMessage", (message: string, field: string)
   cy.findByLabelText(field).siblings(".error-msg").findByText(message)
 })
 
-Cypress.Commands.add("findPopupLink", (url: string) => {
+Cypress.Commands.add("findPopupLink", (buttonName: string, url: string) => {
   cy.window().then((win) => {
     const popupWindowStub = { location: { href: undefined }, focus: cy.stub() }
     cy.stub(win, "open").as("open").returns(popupWindowStub)
-    cy.findByRole("button", { name: "Wikidata" }).click()
+    cy.findByRole("button", { name: buttonName }).click()
     cy.get("@open").should("have.been.calledWith", "")
     // using a callback so that cypress can wait until the stubbed value is assigned
     cy.wrap(() => popupWindowStub.location.href)

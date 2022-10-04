@@ -30,7 +30,7 @@ Feature: associate wikidata ID to note
   Scenario Outline: Associate note to wikipedia via wikidata
     Given Wikidata.org has an entity "<id>" with title "TDD" and link to wikipedia "<wikipedia link>"
     When I associate the note "TDD" with wikidata id "<id>"
-    Then I should see the icon beside title "TDD" linking to "<expected url>"
+    Then I should see the "Wikidata" icon beside title "TDD" linking to "<expected url>"
 
     Examples:
       | id | wikipedia link               | expected url                     |
@@ -41,7 +41,7 @@ Feature: associate wikidata ID to note
   Scenario: Associate note to wikipedia via wikidata using real service
     When I associate the note "TDD" with wikidata id "Q12345"
     Then I need to confirm the association with different title "Count von Count"
-    And I should see the icon beside title "TDD" linking to "https://en.wikipedia.org/wiki/Count_von_Count"
+    And I should see the "Wikidata" icon beside title "TDD" linking to "https://en.wikipedia.org/wiki/Count_von_Count"
 
 
   @usingMockedWikidataService @mockBrowserTime

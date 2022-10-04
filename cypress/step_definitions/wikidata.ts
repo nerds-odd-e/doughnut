@@ -58,10 +58,10 @@ Then("I should see an error {string} on {string}", (message: string, field: stri
 })
 
 Then(
-  "I should see the icon beside title {string} linking to {string}",
-  (title: string, associationUrl: string) => {
+  "I should see the {string} icon beside title {string} linking to {string}",
+  (buttonName: string, title: string, associationUrl: string) => {
     cy.findNoteTitle(title)
-    cy.findPopupLink(associationUrl)
+    cy.findPopupLink(buttonName, associationUrl)
   },
 )
 
