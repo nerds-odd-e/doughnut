@@ -338,11 +338,12 @@ class RestNoteControllerTests {
         String countryOfBirth = "";
         String birthdayByISO = "+1980-03-31T00:00:00Z";
 
-
         mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO);
         noteCreation.setWikidataId(wikidataIdOfHuman);
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
-        assertThat(note.noteRealm.getNote().getTextContent().getDescription(), containsString(countryOfBirth));
+        assertThat(
+            note.noteRealm.getNote().getTextContent().getDescription(),
+            containsString(countryOfBirth));
       }
     }
   }

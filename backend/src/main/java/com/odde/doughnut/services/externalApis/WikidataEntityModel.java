@@ -20,9 +20,11 @@ public class WikidataEntityModel {
 
   public Optional<String> getDescription(String wikidataId) {
     if (getWikiClass(wikidataId).equals(Optional.of("Q5"))) {
-      Optional<String> country = getFirstClaimOfProperty(wikidataId, "P27").map(WikidataValue::toCountryOfCitizenship);
-      Optional<String> birthday = getFirstClaimOfProperty(wikidataId, "P569").map(WikidataValue::toDateDescription);
-      return Optional.of(country.get()+birthday.get());
+      Optional<String> country =
+          getFirstClaimOfProperty(wikidataId, "P27").map(WikidataValue::toCountryOfCitizenship);
+      Optional<String> birthday =
+          getFirstClaimOfProperty(wikidataId, "P569").map(WikidataValue::toDateDescription);
+      return Optional.of(country.get() + birthday.get());
     } else {
       return getFirstClaimOfProperty(wikidataId, "P625").map(WikidataValue::toLocationDescription);
     }
