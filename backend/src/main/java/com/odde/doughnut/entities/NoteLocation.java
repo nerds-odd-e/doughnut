@@ -1,9 +1,23 @@
 package com.odde.doughnut.entities;
 
-import java.util.Optional;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.lang.Nullable;
 
+@Embeddable
 public class NoteLocation {
-  @Nullable public Optional<String> photoUrl;
-  @Nullable public Optional<String> mapUrl;
+
+  @Column(name = "latitude")
+  @Getter
+  @Setter
+  @Nullable
+  public String latitude;
+
+  @Column(name = "longitude")
+  @Getter
+  @Setter
+  @Nullable
+  public String longitude;
 }
