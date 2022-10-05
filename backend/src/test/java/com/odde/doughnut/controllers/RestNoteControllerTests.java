@@ -246,6 +246,17 @@ class RestNoteControllerTests {
         noteCreation.getTextContent().setDescription("");
       }
 
+      private void mockApiResponseWithBookInfo(String bookId)
+          throws IOException, InterruptedException {
+        Mockito.when(
+                httpClientAdapter.getResponseString(
+                    URI.create(
+                        "https://www.wikidata.org/w/api.php?action=wbgetentities&ids="
+                            + bookId
+                            + "&format=json&props=claims")))
+            .thenReturn("");
+      }
+
       private void mockApiResponseWithHumanInfo(
           String humanId, String birthdayByISO, String countryQId)
           throws IOException, InterruptedException {
@@ -371,6 +382,19 @@ class RestNoteControllerTests {
         assertThat(
             note.noteRealm.getNote().getTextContent().getDescription(),
             containsString(countryOfBirth));
+      }
+
+      @Test
+      @Disabled
+      void shouldCreateAuthorNoteWhenCreatingBookNoteWithWikidataId()
+          throws BindException, InterruptedException, NoAccessRightException, IOException {
+        String bookWikidataId = "Q277260"; // Rage
+        mockApiResponseWithBookInfo(bookWikidataId);
+
+        noteCreation.setWikidataId(bookWikidataId);
+        NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
+
+        assertEquals(1, note.noteRealm.getChildren().size());
       }
     }
   }
