@@ -120,9 +120,7 @@ describe("note associated with wikidata", () => {
 
 describe("note associated with location", () => {
   it.skip("should display map icon besides title when note is location", async () => {
-    const noteRealm = makeMe.aNoteRealm
-      .title("Dummy Title")
-      .please();
+    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please();
 
     const wrapper = helper
       .component(NoteWithLinks)
