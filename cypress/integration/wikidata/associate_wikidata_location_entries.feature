@@ -20,11 +20,11 @@ Feature: Note creation/edit for a location
 
   @usingMockedWikidataService
   Scenario: Existing Note wikidata edited by user
-    And there are some notes for the current user
+    When there are some notes for the current user
       | title      | description  | testingParent |
       | Singapore  | The red dot  | places        |
     And I associate the note "Singapore" with wikidata id "Q334"
-    And I should see the note description on current page becomes "Location: 1.3'N, 103.8'E The red dot"
+    Then I should see the note description on current page becomes "Location: 1.3'N, 103.8'E The red dot"
 
   @usingMockedWikidataService
   @ignore
