@@ -13,11 +13,11 @@ public class NoteLocation {
   @Getter
   @Setter
   @Nullable
-  public String latitude;
+  public Double latitude;
 
   @Column(name = "longitude")
   @Getter
   @Setter
   @Nullable
-  public String longitude;
+  public Double longitude;
 }
