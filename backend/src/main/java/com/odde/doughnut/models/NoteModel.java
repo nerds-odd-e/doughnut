@@ -3,6 +3,7 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.WikidataService;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 import org.apache.logging.log4j.util.Strings;
@@ -66,5 +67,9 @@ public class NoteModel {
       return;
     }
     wikidataService.getWikidataDescription(wikidataId).ifPresent(entity::prependDescription);
+    try {
+      wikidataService.createChildNotes(wikidataId);
+    } catch (IOException | InterruptedException exception) {
+    }
   }
 }

@@ -21,6 +21,10 @@ public class WikidataEntityModel {
     return getEntityItem(wikidataId).getFirstClaimOfProperty(propertyId.label);
   }
 
+  public boolean isBook(String wikidataId) {
+    return getWikiClass(wikidataId).equals(Optional.of(WikidataItems.BOOK.label));
+  }
+
   public Optional<String> getDescription(WikidataService service, String wikidataId) {
 
     Optional<String> description;

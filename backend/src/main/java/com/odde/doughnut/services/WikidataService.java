@@ -68,6 +68,12 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
         .flatMap(d -> d.getDescription(this, wikidataId));
   }
 
+  public void createChildNotes(String wikidataId) throws IOException, InterruptedException {
+    var wikidataEntity = getEntityDataById(wikidataId);
+
+    if (wikidataEntity != null && wikidataEntity.isBook(wikidataId)) {}
+  }
+
   public WikidataEntityModel getEntityDataById(String wikidataId)
       throws IOException, InterruptedException {
     String responseBody =
