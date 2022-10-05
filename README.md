@@ -62,7 +62,7 @@ nix develop
 ```
 
 ```bash
-yarn frontend:build && yarn sut
+yarn && yarn frontend:build && yarn sut
 ```
 
 - Rerun it each time you reset the database.
