@@ -1,10 +1,9 @@
 package com.odde.doughnut.services.externalApis;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.odde.doughnut.services.WikidataService;
 import java.util.Map;
 import java.util.Optional;
-
-import com.odde.doughnut.services.WikidataService;
 import lombok.Data;
 import org.thymeleaf.util.StringUtils;
 
@@ -36,7 +35,7 @@ public class WikidataEntityModel {
                       // TODO: Parse object and get the country
                       try {
                         service.getEntityDataById(wikiId.toWikiClass());
-                      } catch(Exception e) {
+                      } catch (Exception e) {
                         // TODO: handle exception
                       }
                       return "Taiwan";
