@@ -17,7 +17,6 @@ Feature: Note creation/edit for a location
       | Title     | Wikidata Id  |
       | Singapore | Q334         |
     Then I should see the note description on current page becomes "Location: 1.3'N, 103.8'E"
-#    And I should see the "Map" icon beside title "Singapore" linking to "https://geohack.toolforge.org/geohack.php?params=1.3_N_103.8_E_globe:earth&language=en"
 
   @usingMockedWikidataService
   Scenario: Existing Note wikidata edited by user
