@@ -25,16 +25,6 @@ public class WikidataEntityModel {
     return getWikiClass(wikidataId).equals(Optional.of(WikidataItems.BOOK.label));
   }
 
-  public Optional<Double> getLatitude(String wikidataId) {
-    return getFirstClaimOfProperty(wikidataId, WikidataFields.COORDINATE_LOCATION)
-        .flatMap(WikidataValue::getLatitude);
-  }
-
-  public Optional<Double> getLongitude(String wikidataId) {
-    return getFirstClaimOfProperty(wikidataId, WikidataFields.COORDINATE_LOCATION)
-        .flatMap(WikidataValue::getLongitude);
-  }
-
   public Optional<String> getDescription(WikidataService service, String wikidataId) {
 
     Optional<String> description;

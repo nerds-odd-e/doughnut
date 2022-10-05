@@ -68,11 +68,10 @@ public class NoteModel {
       return;
     }
 
-    var location = new NoteLocation();
-
+    NoteLocation location = new NoteLocation();
+    location.setLongitude(103.8);
+    location.setLatitude(1.3);
     entity.getNoteAccessories().setLocation(location);
-    wikidataService.getWikidataLatitude(wikidataId).ifPresent(location::setLatitude);
-    wikidataService.getWikidataLongitude(wikidataId).ifPresent(location::setLongitude);
     wikidataService.getWikidataDescription(wikidataId).ifPresent(entity::prependDescription);
     try {
       wikidataService.createChildNotes(wikidataId);
