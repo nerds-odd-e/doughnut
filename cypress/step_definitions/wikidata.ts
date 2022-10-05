@@ -84,3 +84,11 @@ When("I select wikidataID {string} from the Wikidata search result", (wikidataID
 Then("I should see that the {string} becomes {string}", (field: string, value: string) => {
   cy.getFormControl(field).should("have.value", value)
 })
+
+Then("a map is added to the note", () => {
+  cy.findByRole("link", {name: "map"})
+})
+
+Then(  "an identifying picture is shown", () => {
+  cy.findByRole("link", {name: "picture"})
+})
