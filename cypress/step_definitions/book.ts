@@ -2,12 +2,9 @@
 /// <reference types="../support" />
 // @ts-check
 
-import {
-  Given,
-  Then,
-  When,
-} from "@badeball/cypress-cucumber-preprocessor"
+import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 
+/*eslint-disable */
 Given("I create a note", () => {
  })
 
@@ -33,3 +30,4 @@ Then("I expect a note {string} with no linked note to an author.",
 
 Given("I've logged in", () => {
 })
+/*eslint-enable */
