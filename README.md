@@ -36,7 +36,7 @@ For more background info you can read::
 
 ### 1. Quick Start - doughnut development environment setup
 
-From the root of doughnut directory:
+:checkered_flag: From the root of doughnut directory, in a terminal, run:
 
 ```bash
 ./setup-doughnut-dev.sh
@@ -46,7 +46,7 @@ Ensure your OS (WSL2/Ubuntu/Fedora, etc) has `/bin/sh` point to `bash`.
 If you are using Ubuntu where `/bin/sh` is symlinked to `dash`, please
 run `sudo dpkg-reconfigure dash` and answer "No" to reconfigure to `bash` as default.
 
-**WSL2**: [Additional things to note for Windows10 or Windows11 developers using WSL2 with Ubuntu-20.04 or Ubuntu-22.04.](./docs/wsl2.md)
+:window: **WSL2**: [Additional things to note for Windows10 or Windows11 developers using WSL2 with Ubuntu-20.04 or Ubuntu-22.04.](./docs/wsl2.md)
 
 :warning: Nix and [sdkman](https://sdkman.io/) don't play very well together. A simple way around is to move or rename `~/.sdkman` dir and comment out sdkman related config in `~/.<SHELL>rc`.
 
@@ -67,7 +67,7 @@ yarn && yarn frontend:build && yarn sut
 
 - Rerun it each time you reset the database.
 
-#### Run full backend unit tests suite from terminal/CLI
+#### 2.1 Run full backend unit tests suite from terminal/CLI
 
 - From doughnut source root directory:
 
@@ -75,16 +75,9 @@ yarn && yarn frontend:build && yarn sut
 yarn backend:test
 ```
 
-#### 2.1 [IntelliJ IDEA settings](./docs/idea.md)
+### 3. [IntelliJ IDEA settings](./docs/idea.md)
 
-#### 2.2 Database migrations
-
-You can find the database migrations in `backend/src/main/resources/db.migration/`.
-The migrations are run automatically when the backend app starts up.
-It will also run the migrations for test when you run `yarn backend:test`.
-To trigger the test DB migration manually, run `backend/gradlew testDBMigrate`.
-
-### 3. End-to-End Test / Features / Cucumber / SbE / ATDD
+### 4. End-to-End Test / Features / Cucumber / SbE / ATDD
 
 We use cucumber [Gherkin](https://cucumber.io/docs/gherkin/) + cypress (test driver)
 Javascript/Typescript framework to drive the end-to-end test suite.
@@ -129,7 +122,14 @@ For MS Windows WSL2 users:
 | cypress config   | `cypress/config/*.json`                   |
 | cypress plugins  | `cypress/plugins/index.ts`                |
 
-### 4. Vue3 web-app frontend
+### 5. Database migrations
+
+You can find the database migrations in `backend/src/main/resources/db.migration/`.
+The migrations are run automatically when the backend app starts up.
+It will also run the migrations for test when you run `yarn backend:test`.
+To trigger the test DB migration manually, run `backend/gradlew testDBMigrate`.
+
+### 6. Vue3 web-app frontend
 
 We chose Vue3 + Vite to build our frontend.
 
@@ -175,9 +175,9 @@ directory:
 1 directory, 6 files
 ```
 
-### 5. [Style Guide & Code linting/formating](./docs/linting_formating.md)
+### 7. [Style Guide & Code linting/formating](./docs/linting_formating.md)
 
-### 6. [Production environment](./docs/prod_env.md)
+### 8. [Production environment](./docs/prod_env.md)
 
-### 7. [Doughnut source code secrets management](./docs/secrets_management.md)
+### 9. [Doughnut source code secrets management](./docs/secrets_management.md)
 
