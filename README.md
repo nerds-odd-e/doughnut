@@ -108,6 +108,8 @@ For MS Windows WSL2 users:
 |---------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
 | Install needed e2e tooling            | `yarn`                                                                                                                                          |
 | Start SUT (backend system under test) | `yarn sut` (starts backend SUT ONLY)                                                                                                            |
+| Start Mock for external backend       | `yarn mb` (starts mocked external backend ONLY)                                                                                                 |
+| Start only the Cypress IDE            | `yarn cy:open` (starts Cypress IDE ONLY)                                                                                                        |
 | Run all e2e test                      | `yarn test` (compile frontend assets, start backend SUT, mountebank virtual service provider & cypress headless e2e testing)                    |
 | Run all e2e test with FE in dev mode  | `yarn test:dev` (starts backend SUT, frontend SUT in HMR mode, mountebank virtual service provider & cypress headless e2e testing)              |
 | Run cypress IDE                       | `yarn test:open` (starts frontend SUT in HMR mode, backend SUT, mountebank virtual service provider & cypress IDE)                              |
