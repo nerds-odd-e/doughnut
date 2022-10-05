@@ -119,8 +119,11 @@ describe("note associated with wikidata", () => {
 });
 
 describe("note associated with location", () => {
-  it.skip("should display map icon besides title when note is location", async () => {
-    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please();
+  it("should display a map in the description when the note is location", async () => {
+    const noteRealm = makeMe.aNoteRealm
+      .title("Dummy Title")
+      .location(1.2345, 67.89)
+      .please();
 
     const wrapper = helper
       .component(NoteWithLinks)
@@ -130,8 +133,9 @@ describe("note associated with location", () => {
       })
       .mount();
 
-    const element = await wrapper.find('[role="button"]');
+    const element = await wrapper.find(".map-applet");
     element.isVisible();
-    expect(element.attributes("title")).toMatch("Map");
+    expect(element.attributes("data-lon")).toMatch("1.2345");
+    expect(element.attributes("data-lat")).toMatch("67.89");
   });
 });

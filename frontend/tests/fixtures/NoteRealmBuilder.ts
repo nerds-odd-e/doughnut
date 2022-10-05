@@ -69,6 +69,12 @@ class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
     return this;
   }
 
+  location(longitude: number, latitude: number): NoteRealmBuilder {
+    this.data.note.noteAccessories.location.latitude = latitude;
+    this.data.note.noteAccessories.location.longitude = longitude;
+    return this;
+  }
+
   do(): Generated.NoteRealm {
     this.data.note = this.noteBuilder.do();
     return this.data;
