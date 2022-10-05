@@ -246,6 +246,34 @@ class RestNoteControllerTests {
         noteCreation.getTextContent().setDescription("");
       }
 
+      private void mockApiResponseWithAuthorInfo(String authorId)
+          throws IOException, InterruptedException {
+        Mockito.when(
+                httpClientAdapter.getResponseString(
+                    URI.create(
+                        "https://www.wikidata.org/w/api.php?action=wbgetentities&ids="
+                            + authorId
+                            + "&format=json&props=claims")))
+            .thenReturn(
+                """
+              {
+                  "entities": {
+                      "Q39829": {
+                          "type": "item",
+                          "id": "%s",
+                          "labels": {
+                            "en": {
+                                "language": "en",
+                                "value": "Stephen King"
+                            }
+                          }
+                      }
+                  }
+              }
+              """
+                    .formatted(authorId));
+      }
+
       private void mockApiResponseWithBookInfo(String bookId)
           throws IOException, InterruptedException {
         Mockito.when(
@@ -256,39 +284,56 @@ class RestNoteControllerTests {
                             + "&format=json&props=claims")))
             .thenReturn(
                 """
-                {
-                    "entities": {
-                        "Q277260": {
-                            "pageid": 268034,
-                            "ns": 0,
-                            "title": "Q277260",
-                            "lastrevid": 1618357304,
-                            "modified": "2022-04-13T18:25:27Z",
-                            "type": "item",
-                            "id": "%s",
-                            "claims": {
-                            "P50": [
-                                {
-                                    "mainsnak": {
-                                        "snaktype": "value",
-                                        "property": "P50",
-                                        "hash": "76876b860342e8dcad2d00fb04ddf3b6e9cde934",
-                                        "datavalue": {
-                                            "value": {
-                                                "entity-type": "item",
-                                                "numeric-id": 39829,
-                                                "id": "Q39829"
-                                            },
-                                            "type": "wikibase-entityid"
-                                        },
-                                        "datatype": "wikibase-item"
+                  {
+                      "entities": {
+                          "Q277260": {
+                              "pageid": 268034,
+                              "ns": 0,
+                              "title": "Q277260",
+                              "lastrevid": 1618357304,
+                              "modified": "2022-04-13T18:25:27Z",
+                              "type": "item",
+                              "id": "%s",
+                              "claims": {
+                              "P31": [
+                                  {
+                                      "mainsnak": {
+                                          "snaktype": "value",
+                                          "property": "P31",
+                                          "datavalue": {
+                                              "value": {
+                                                  "entity-type": "item",
+                                                  "numeric-id": 47461344,
+                                                  "id": "Q47461344"
+                                              },
+                                              "type": "wikibase-entityid"
+                                          },
+                                          "datatype": "wikibase-item"
                                       }
-                                    }]
-                            }
-                        }
-                    }
-                }
-                """
+                                  }
+                              ],
+                              "P50": [
+                                  {
+                                      "mainsnak": {
+                                          "snaktype": "value",
+                                          "property": "P50",
+                                          "hash": "76876b860342e8dcad2d00fb04ddf3b6e9cde934",
+                                          "datavalue": {
+                                              "value": {
+                                                  "entity-type": "item",
+                                                  "numeric-id": 39829,
+                                                  "id": "Q39829"
+                                              },
+                                              "type": "wikibase-entityid"
+                                          },
+                                          "datatype": "wikibase-item"
+                                        }
+                                      }]
+                              }
+                          }
+                      }
+                  }
+                  """
                     .formatted(bookId));
       }
 
@@ -420,16 +465,18 @@ class RestNoteControllerTests {
       }
 
       @Test
-      @Disabled
       void shouldCreateAuthorNoteWhenCreatingBookNoteWithWikidataId()
           throws BindException, InterruptedException, NoAccessRightException, IOException {
         String bookWikidataId = "Q277260"; // Rage
+        String authorWikidataId = "Q39829";
         mockApiResponseWithBookInfo(bookWikidataId);
+        mockApiResponseWithAuthorInfo(authorWikidataId);
 
         noteCreation.setWikidataId(bookWikidataId);
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
 
-        assertEquals(1, note.noteRealm.getChildren().size());
+        makeMe.refresh(note.noteRealm.getNote());
+        assertEquals(1, note.noteRealm.getNote().getChildren().size());
       }
     }
   }

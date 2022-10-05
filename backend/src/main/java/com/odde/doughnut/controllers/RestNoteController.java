@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.Link.LinkType;
 import com.odde.doughnut.entities.json.*;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -63,9 +64,22 @@ class RestNoteController {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     Note note = parentNote.buildChildNote(user, currentUTCTimestamp, noteCreation.textContent);
     List<String> childNoteQuids = associateToWikidata(note, noteCreation.wikidataId);
-
     note.buildLinkToParent(user, noteCreation.getLinkTypeToParent(), currentUTCTimestamp);
     modelFactoryService.noteRepository.save(note);
+    childNoteQuids.stream()
+        .forEach(
+            quid -> {
+              Note childNote =
+                  note.buildChildNote(user, currentUTCTimestamp, noteCreation.textContent);
+              try {
+                associateToWikidata(childNote, quid);
+              } catch (BindException e) {
+                throw new RuntimeException(e);
+              }
+              childNote.buildLinkToParent(user, LinkType.AUTHOR_OF, currentUTCTimestamp);
+              modelFactoryService.noteRepository.save(childNote);
+            });
+
     return NoteRealmWithPosition.fromNote(note, user);
   }
 
