@@ -36,7 +36,7 @@ public class NoteAccessories {
   @Setter
   private String pictureUrl;
 
-  @Embedded @Valid @Getter @Setter private NoteLocation location = null;
+  @Embedded @Valid @Getter private final NoteLocation location = null;
 
   @Pattern(
       regexp = "^(((-?[0-9.]+\\s+){3}-?[0-9.]+\\s+)*((-?[0-9.]+\\s+){3}-?[0-9.]+))?$",

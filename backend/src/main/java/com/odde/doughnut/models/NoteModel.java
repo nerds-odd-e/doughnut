@@ -1,7 +1,6 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteLocation;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.WikidataService;
 import java.io.IOException;
@@ -67,11 +66,6 @@ public class NoteModel {
     if (Strings.isEmpty(wikidataId)) {
       return;
     }
-
-    NoteLocation location = new NoteLocation();
-    location.setLongitude(103.8);
-    location.setLatitude(1.3);
-    entity.getNoteAccessories().setLocation(location);
     wikidataService.getWikidataDescription(wikidataId).ifPresent(entity::prependDescription);
     try {
       wikidataService.createChildNotes(wikidataId);
