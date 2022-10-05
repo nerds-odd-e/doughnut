@@ -40,7 +40,7 @@ public class WikidataEntityModel {
               .map(WikidataValue::toDateDescription);
       // Add spacing between birthday and country only if country is not empty
       Optional<String> countryString =
-          country.isEmpty() ? Optional.empty() : Optional.of(country.get() + ", ");
+          StringUtils.isEmpty(country.get()) ? Optional.of("") : Optional.of(country.get() + ", ");
       description = Optional.of(countryString.get() + birthday.get());
 
     } else {

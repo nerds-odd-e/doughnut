@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -331,16 +332,14 @@ class RestNoteControllerTests {
       @Test
       void shouldAddHumanBCBirthdayWhenAddingNoteWithWikidataId()
           throws BindException, InterruptedException, NoAccessRightException, IOException {
-        String wikidataIdOfHuman = "Q4604"; // Wang Chien-ming
-        String birthdayYear = "552 B.C."; // P569 (Birthday)
+        String wikidataIdOfHuman = "Q4604"; // Confucius
+        String birthdayYear = "09 October 0552 B.C."; // P569 (Birthday)
         String birthdayByISO = "-0552-10-09T00:00:00Z";
 
-        mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO, "");
+        mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO, "Q736936");
         noteCreation.setWikidataId(wikidataIdOfHuman);
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
-        assertThat(
-            note.noteRealm.getNote().getTextContent().getDescription(),
-            stringContainsInOrder(birthdayYear));
+        assertEquals(note.noteRealm.getNote().getTextContent().getDescription(), birthdayYear);
       }
 
       @Test
