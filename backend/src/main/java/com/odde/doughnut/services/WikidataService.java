@@ -65,7 +65,7 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
   @SneakyThrows
   public Optional<String> getWikidataDescription(String wikidataId) {
     return Optional.ofNullable(getEntityDataById(wikidataId))
-        .flatMap(d -> d.getDescription(wikidataId));
+        .flatMap(d -> d.getDescription(this, wikidataId));
   }
 
   public WikidataEntityModel getEntityDataById(String wikidataId)
@@ -85,6 +85,10 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     } catch (MismatchedInputException e) {
       return null;
     }
+  }
+
+  public Optional<String> getCountryFromEntity(String wikidataId) {
+    return Optional.of("Taiwan");
   }
 
   private String queryWikidataApi(String action, Function<UriComponentsBuilder, URI> uriBuilder)

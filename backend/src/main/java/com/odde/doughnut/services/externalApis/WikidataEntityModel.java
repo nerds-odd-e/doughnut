@@ -11,7 +11,6 @@ import org.thymeleaf.util.StringUtils;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WikidataEntityModel {
   private Map<String, WikidataEntityItemModel> entities;
-  private WikidataService service;
 
   private WikidataEntityItemModel getEntityItem(String wikidataId) {
     return entities.get(wikidataId);
@@ -22,7 +21,7 @@ public class WikidataEntityModel {
     return getEntityItem(wikidataId).getFirstClaimOfProperty(propertyId.label);
   }
 
-  public Optional<String> getDescription(String wikidataId) {
+  public Optional<String> getDescription(WikidataService service, String wikidataId) {
 
     Optional<String> description;
 
@@ -31,17 +30,10 @@ public class WikidataEntityModel {
           getFirstClaimOfProperty(wikidataId, WikidataFields.COUNTRY_OF_CITIZENSHIP)
               .map(
                   wikiId -> {
-                    if (StringUtils.equals("Q865", wikiId.toWikiClass())) {
-                      // TODO: Parse object and get the country
-                      try {
-                        service.getEntityDataById(wikiId.toWikiClass());
-                      } catch (Exception e) {
-                        // TODO: handle exception
-                      }
-                      return "Taiwan";
-                    } else {
-                      return "";
+                    if ("Q865".equalsIgnoreCase(wikiId.toWikiClass())) {
+                      return service.getCountryFromEntity(wikiId.toWikiClass()).get();
                     }
+                    return "";
                   });
       Optional<String> birthday =
           getFirstClaimOfProperty(wikidataId, WikidataFields.BIRTHDAY)
