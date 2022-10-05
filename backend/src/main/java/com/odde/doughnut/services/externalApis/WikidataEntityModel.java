@@ -3,6 +3,8 @@ package com.odde.doughnut.services.externalApis;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Map;
 import java.util.Optional;
+
+import com.odde.doughnut.services.WikidataService;
 import lombok.Data;
 import org.thymeleaf.util.StringUtils;
 
@@ -10,6 +12,7 @@ import org.thymeleaf.util.StringUtils;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WikidataEntityModel {
   private Map<String, WikidataEntityItemModel> entities;
+  private WikidataService service;
 
   private WikidataEntityItemModel getEntityItem(String wikidataId) {
     return entities.get(wikidataId);
@@ -30,6 +33,12 @@ public class WikidataEntityModel {
               .map(
                   wikiId -> {
                     if (StringUtils.equals("Q865", wikiId.toWikiClass())) {
+                      // TODO: Parse object and get the country
+                      try {
+                        service.getEntityDataById(wikiId.toWikiClass());
+                      } catch(Exception e) {
+                        // TODO: handle exception
+                      }
                       return "Taiwan";
                     } else {
                       return "";

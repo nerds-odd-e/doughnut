@@ -361,7 +361,7 @@ class RestNoteControllerTests {
       @Disabled
       void shouldAddADifferentHumanCountryOfBirthWhenAddingNoteWithWikidataId()
           throws BindException, InterruptedException, NoAccessRightException, IOException {
-        String wikidataIdOfHuman = "Q706446"; // Wang Chien-ming
+        String wikidataIdOfHuman = "Q706446";
         String countryOfBirth = "The United States of America";
         String birthdayByISO = "+1980-03-31T00:00:00Z";
 

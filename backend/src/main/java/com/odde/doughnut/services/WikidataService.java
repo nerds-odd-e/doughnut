@@ -68,7 +68,7 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
         .flatMap(d -> d.getDescription(wikidataId));
   }
 
-  private WikidataEntityModel getEntityDataById(String wikidataId)
+  public WikidataEntityModel getEntityDataById(String wikidataId)
       throws IOException, InterruptedException {
     String responseBody =
         queryWikidataApi(
