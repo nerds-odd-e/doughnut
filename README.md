@@ -67,7 +67,7 @@ yarn && yarn frontend:build && yarn sut
 
 - Rerun it each time you reset the database.
 
-#### Run full backend unit tests suite
+#### Run full backend unit tests suite from terminal/CLI
 
 - From doughnut source root directory:
 
@@ -75,7 +75,9 @@ yarn && yarn frontend:build && yarn sut
 yarn backend:test
 ```
 
-#### 2.1 Database migrations
+#### 2.1 [IntelliJ IDEA settings](./docs/idea.md)
+
+#### 2.2 Database migrations
 
 You can find the database migrations in `backend/src/main/resources/db.migration/`.
 The migrations are run automatically when the backend app starts up.
