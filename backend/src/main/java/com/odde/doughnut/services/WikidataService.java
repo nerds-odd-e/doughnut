@@ -10,6 +10,7 @@ import com.odde.doughnut.services.externalApis.WikidataEntityModel;
 import com.odde.doughnut.services.externalApis.WikidataFields;
 import com.odde.doughnut.services.externalApis.WikidataModel;
 import com.odde.doughnut.services.externalApis.WikidataSearchModel;
+import com.odde.doughnut.services.externalApis.WikidataValue;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
@@ -103,14 +104,17 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     }
   }
 
-  public Optional<String> getCountryFromEntity(String wikidataId) {
-    return Optional.of("Taiwan");
-  }
-
   private String queryWikidataApi(String action, Function<UriComponentsBuilder, URI> uriBuilder)
       throws IOException, InterruptedException {
     URI uri =
         uriBuilder.apply(wikidataUriBuilder().path("/w/api.php").queryParam("action", action));
     return httpClientAdapter.getResponseString(uri);
+  }
+
+  public String getCountry(WikidataValue wikiId) {
+    if ("Q865".equalsIgnoreCase(wikiId.toWikiClass())) {
+      return "Taiwan";
+    }
+    return "";
   }
 }

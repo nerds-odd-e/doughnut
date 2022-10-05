@@ -32,13 +32,7 @@ public class WikidataEntityModel {
     if (getWikiClass(wikidataId).equals(Optional.of(WikidataItems.HUMAN.label))) {
       Optional<String> country =
           getFirstClaimOfProperty(wikidataId, WikidataFields.COUNTRY_OF_CITIZENSHIP)
-              .map(
-                  wikiId -> {
-                    if ("Q865".equalsIgnoreCase(wikiId.toWikiClass())) {
-                      return service.getCountryFromEntity(wikiId.toWikiClass()).get();
-                    }
-                    return "";
-                  });
+              .map(wikiId -> service.getCountry(wikiId));
       Optional<String> birthday =
           getFirstClaimOfProperty(wikidataId, WikidataFields.BIRTHDAY)
               .map(WikidataValue::toDateDescription);
