@@ -16,7 +16,7 @@ public class WikidataEntityModel {
     return entities.get(wikidataId);
   }
 
-  private Optional<WikidataValue> getFirstClaimOfProperty(
+  public Optional<WikidataValue> getFirstClaimOfProperty(
       String wikidataId, WikidataFields propertyId) {
     return getEntityItem(wikidataId).getFirstClaimOfProperty(propertyId.label);
   }

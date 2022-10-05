@@ -7,10 +7,12 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.odde.doughnut.entities.json.WikidataEntity;
 import com.odde.doughnut.entities.json.WikidataSearchEntity;
 import com.odde.doughnut.services.externalApis.WikidataEntityModel;
+import com.odde.doughnut.services.externalApis.WikidataFields;
 import com.odde.doughnut.services.externalApis.WikidataModel;
 import com.odde.doughnut.services.externalApis.WikidataSearchModel;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -68,10 +70,20 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
         .flatMap(d -> d.getDescription(this, wikidataId));
   }
 
-  public void createChildNotes(String wikidataId) throws IOException, InterruptedException {
+  public List<String> getChildNotesQids(String wikidataId)
+      throws IOException, InterruptedException {
     var wikidataEntity = getEntityDataById(wikidataId);
 
-    if (wikidataEntity != null && wikidataEntity.isBook(wikidataId)) {}
+    var childQids = new ArrayList<String>();
+
+    if (wikidataEntity != null && wikidataEntity.isBook(wikidataId)) {
+      var optionalAuthor =
+          wikidataEntity.getFirstClaimOfProperty(wikidataId, WikidataFields.AUTHOR);
+
+      optionalAuthor.ifPresent(wikidataValue -> childQids.add(wikidataValue.toWikiClass()));
+    }
+
+    return childQids;
   }
 
   public WikidataEntityModel getEntityDataById(String wikidataId)

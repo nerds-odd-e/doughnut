@@ -62,14 +62,17 @@ class RestNoteController {
     User user = currentUser.getEntity();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     Note note = parentNote.buildChildNote(user, currentUTCTimestamp, noteCreation.textContent);
-    associateToWikidata(note, noteCreation.wikidataId);
+    List<String> childNoteQuids = associateToWikidata(note, noteCreation.wikidataId);
+
     note.buildLinkToParent(user, noteCreation.getLinkTypeToParent(), currentUTCTimestamp);
     modelFactoryService.noteRepository.save(note);
     return NoteRealmWithPosition.fromNote(note, user);
   }
 
-  private void associateToWikidata(Note note, String wikidataId) throws BindException {
-    modelFactoryService.toNoteModel(note).associateWithWikidataId(wikidataId, getWikidataService());
+  private List<String> associateToWikidata(Note note, String wikidataId) throws BindException {
+    return modelFactoryService
+        .toNoteModel(note)
+        .associateWithWikidataId(wikidataId, getWikidataService());
   }
 
   @GetMapping("/{note}")

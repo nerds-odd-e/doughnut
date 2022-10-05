@@ -5,6 +5,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.WikidataService;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -59,17 +60,19 @@ public class NoteModel {
     }
   }
 
-  public void associateWithWikidataId(String wikidataId, WikidataService wikidataService)
+  public List<String> associateWithWikidataId(String wikidataId, WikidataService wikidataService)
       throws BindException {
     entity.setWikidataId(wikidataId);
     checkDuplicateWikidataId();
+    List<String> childNoteQuids = new ArrayList<>();
     if (Strings.isEmpty(wikidataId)) {
-      return;
+      return childNoteQuids;
     }
     wikidataService.getWikidataDescription(wikidataId).ifPresent(entity::prependDescription);
     try {
-      wikidataService.createChildNotes(wikidataId);
+      childNoteQuids = wikidataService.getChildNotesQids(wikidataId);
     } catch (IOException | InterruptedException exception) {
     }
+    return childNoteQuids;
   }
 }
