@@ -254,7 +254,42 @@ class RestNoteControllerTests {
                         "https://www.wikidata.org/w/api.php?action=wbgetentities&ids="
                             + bookId
                             + "&format=json&props=claims")))
-            .thenReturn("");
+            .thenReturn(
+                """
+                {
+                    "entities": {
+                        "Q277260": {
+                            "pageid": 268034,
+                            "ns": 0,
+                            "title": "Q277260",
+                            "lastrevid": 1618357304,
+                            "modified": "2022-04-13T18:25:27Z",
+                            "type": "item",
+                            "id": "%s",
+                            "claims": {
+                            "P50": [
+                                {
+                                    "mainsnak": {
+                                        "snaktype": "value",
+                                        "property": "P50",
+                                        "hash": "76876b860342e8dcad2d00fb04ddf3b6e9cde934",
+                                        "datavalue": {
+                                            "value": {
+                                                "entity-type": "item",
+                                                "numeric-id": 39829,
+                                                "id": "Q39829"
+                                            },
+                                            "type": "wikibase-entityid"
+                                        },
+                                        "datatype": "wikibase-item"
+                                      }
+                                    }]
+                            }
+                        }
+                    }
+                }
+                """
+                    .formatted(bookId));
       }
 
       private void mockApiResponseWithHumanInfo(
