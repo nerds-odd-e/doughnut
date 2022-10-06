@@ -206,17 +206,6 @@ class RestNoteControllerTests {
       }
 
       @Test
-      void shouldAddLocationInfoWhenAddingNoteWithWikidataId()
-          throws BindException, InterruptedException, NoAccessRightException, IOException {
-        mockApiResponseWithLocationInfo(
-            "\"value\":{\"latitude\":1.3,\"longitude\":103.8},\"type\":\"globecoordinate\"");
-        NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
-        assertThat(
-            note.noteRealm.getNote().getTextContent().getDescription(),
-            stringContainsInOrder("Location: " + lnglat));
-      }
-
-      @Test
       void shouldPrependLocationInfoWhenAddingNoteWithWikidataId()
           throws BindException, InterruptedException, NoAccessRightException, IOException {
         mockApiResponseWithLocationInfo(
