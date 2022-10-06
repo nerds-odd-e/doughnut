@@ -8,7 +8,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 
 public class WikidataValue {
   private Map<String, Object> data = null;
@@ -64,18 +63,6 @@ public class WikidataValue {
 
   private boolean isGlobeCoordinate(String type) {
     return "globecoordinate".compareToIgnoreCase(type) == 0;
-  }
-
-  public Optional<Double> getLatitude() {
-    if (!isGlobeCoordinate(type)) return Optional.empty();
-
-    return Optional.of((Double) data.get("latitude"));
-  }
-
-  public Optional<Double> getLongitude() {
-    if (!isGlobeCoordinate(type)) return Optional.empty();
-
-    return Optional.of((Double) data.get("longitude"));
   }
 
   String toLocationDescription() {

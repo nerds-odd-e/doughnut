@@ -93,18 +93,6 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     return Optional.empty();
   }
 
-  @SneakyThrows
-  public Optional<Double> getWikidataLatitude(String wikidataId) {
-    return Optional.ofNullable(getEntityDataById(wikidataId))
-        .flatMap(d -> d.getLatitude(wikidataId));
-  }
-
-  @SneakyThrows
-  public Optional<Double> getWikidataLongitude(String wikidataId) {
-    return Optional.ofNullable(getEntityDataById(wikidataId))
-        .flatMap(d -> d.getLongitude(wikidataId));
-  }
-
   public WikidataEntityModel getEntityDataById(String wikidataId)
       throws IOException, InterruptedException {
     String responseBody =
