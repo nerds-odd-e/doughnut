@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import lombok.SneakyThrows;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
@@ -80,15 +79,19 @@ class RestNoteController {
       Note note,
       String authorId) {
     Note childNote = note.buildChildNote(user, currentUTCTimestamp, noteCreation.textContent);
-    associateToWikidata(childNote, authorId);
+    try {
+      associateToWikidata(childNote, authorId);
+    } catch (BindException e) {
+      throw new RuntimeException(e);
+    }
     childNote.buildLinkToParent(user, LinkType.AUTHOR_OF, currentUTCTimestamp);
     modelFactoryService.noteRepository.save(childNote);
   }
 
-  @SneakyThrows
-  private Optional<String> associateToWikidata(Note note, String wikidataId) {
-    modelFactoryService.toNoteModel(note).associateWithWikidataId(wikidataId, getWikidataService());
-    return getWikidataService().getAuthorQid(wikidataId);
+  private Optional<String> associateToWikidata(Note note, String wikidataId) throws BindException {
+    return modelFactoryService
+        .toNoteModel(note)
+        .associateWithWikidataId(wikidataId, getWikidataService());
   }
 
   @GetMapping("/{note}")

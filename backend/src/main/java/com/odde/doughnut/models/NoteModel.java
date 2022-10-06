@@ -5,6 +5,8 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.WikidataService;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
+import lombok.SneakyThrows;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
@@ -58,10 +60,16 @@ public class NoteModel {
     }
   }
 
-  public void associateWithWikidataId(String wikidataId, WikidataService wikidataService)
-      throws BindException {
+  @SneakyThrows
+  public Optional<String> associateWithWikidataId(
+      String wikidataId, WikidataService wikidataService) {
     entity.setWikidataId(wikidataId);
     checkDuplicateWikidataId();
+    if (Strings.isEmpty(wikidataId)) {
+      return Optional.empty();
+    }
     wikidataService.getWikidataDescription(wikidataId).ifPresent(entity::prependDescription);
+
+    return wikidataService.getAuthorQid(wikidataId);
   }
 }
