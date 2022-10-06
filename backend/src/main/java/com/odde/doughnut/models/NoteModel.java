@@ -1,6 +1,7 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteLocation;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.WikidataService;
 import java.sql.Timestamp;
@@ -62,6 +63,12 @@ public class NoteModel {
       throws BindException {
     entity.setWikidataId(wikidataId);
     checkDuplicateWikidataId();
+
+    var location = new NoteLocation();
+
+    entity.setLocation(location);
+    wikidataService.getWikidataLatitude(wikidataId).ifPresent(location::setLatitude);
+    wikidataService.getWikidataLongitude(wikidataId).ifPresent(location::setLongitude);
     wikidataService.getWikidataDescription(wikidataId).ifPresent(entity::prependDescription);
   }
 }

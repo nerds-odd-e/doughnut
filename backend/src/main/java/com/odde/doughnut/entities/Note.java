@@ -31,7 +31,7 @@ public class Note extends Thingy {
   private Note() {}
 
   @Embedded @Valid @Getter private final NoteAccessories noteAccessories = new NoteAccessories();
-  @Embedded @Valid @Getter @Nullable private final NoteLocation location = null;
+  @Embedded @Valid @Getter @Setter @Nullable private NoteLocation location = null;
 
   @OneToOne(mappedBy = "note", cascade = CascadeType.ALL)
   @Getter
