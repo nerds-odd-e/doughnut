@@ -115,11 +115,8 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     return httpClientAdapter.getResponseString(uri);
   }
 
+  @SneakyThrows
   public String getCountry(WikidataValue wikiId) {
-    try {
-      return fetchWikidata(wikiId.toWikiClass()).WikidataTitleInEnglish;
-    } catch (Exception e) {
-    }
-    return "";
+    return fetchWikidata(wikiId.toWikiClass()).WikidataTitleInEnglish;
   }
 }
