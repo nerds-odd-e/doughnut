@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import com.odde.doughnut.entities.Coordinate;
 import com.odde.doughnut.entities.json.WikidataEntity;
 import com.odde.doughnut.entities.json.WikidataSearchEntity;
 import com.odde.doughnut.services.externalApis.WikidataEntityModel;
@@ -72,6 +73,11 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
   public Optional<String> getWikidataDescription(String wikidataId) {
     return Optional.ofNullable(getEntityDataById(wikidataId))
         .flatMap(d -> d.getDescription(this, wikidataId));
+  }
+
+  @SneakyThrows
+  public Optional<Coordinate> getWikidataCoordinate(String wikidataId) {
+    return Optional.ofNullable(getEntityDataById(wikidataId)).map(d -> new Coordinate(1.3, 103.8));
   }
 
   public Optional<String> getAuthorQid(String wikidataId) {

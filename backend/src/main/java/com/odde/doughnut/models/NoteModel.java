@@ -63,10 +63,17 @@ public class NoteModel {
       throws BindException {
     entity.setWikidataId(wikidataId);
     checkDuplicateWikidataId();
-    var location = new NoteLocation();
-    location.setLatitude(1.3);
-    location.setLongitude(103.8);
-    entity.setLocation(location);
+
     wikidataService.getWikidataDescription(wikidataId).ifPresent(entity::prependDescription);
+    wikidataService
+        .getWikidataCoordinate(wikidataId)
+        .map(
+            coordinate -> {
+              var location = new NoteLocation();
+              location.setLatitude(coordinate.latitude());
+              location.setLongitude(coordinate.longitude());
+              return location;
+            })
+        .ifPresent(entity::setLocation);
   }
 }
