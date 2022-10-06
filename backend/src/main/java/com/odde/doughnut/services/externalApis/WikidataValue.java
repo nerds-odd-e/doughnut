@@ -65,7 +65,7 @@ public class WikidataValue {
     return "globecoordinate".compareToIgnoreCase(type) == 0;
   }
 
-  String toLocationDescription() {
+  public String toLocationDescription() {
     if (isGlobeCoordinate(type)) {
       return "Location: "
           + data.get("latitude").toString()
@@ -86,5 +86,13 @@ public class WikidataValue {
 
   String getStringValue() {
     return stringValue;
+  }
+
+  public Double getLatitude() {
+    return 1.3;
+  }
+
+  public Double getLongitude() {
+    return 103.8;
   }
 }

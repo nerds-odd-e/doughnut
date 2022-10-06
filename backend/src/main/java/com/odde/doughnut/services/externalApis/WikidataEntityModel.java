@@ -1,6 +1,7 @@
 package com.odde.doughnut.services.externalApis;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.odde.doughnut.entities.Coordinate;
 import com.odde.doughnut.services.WikidataService;
 import java.util.Map;
 import java.util.Optional;
@@ -18,6 +19,11 @@ public class WikidataEntityModel {
       return Optional.empty();
     }
     return entities.get(wikidataId).getFirstClaimOfProperty(propertyId.label);
+  }
+
+  public Optional<Coordinate> getCoordinate(String wikidataId) {
+    return getFirstClaimOfProperty(wikidataId, WikidataFields.COORDINATE_LOCATION)
+        .map(v -> new Coordinate(v.getLatitude(), v.getLongitude()));
   }
 
   public boolean isBook(String wikidataId) {

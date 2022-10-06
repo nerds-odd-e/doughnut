@@ -77,7 +77,8 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
 
   @SneakyThrows
   public Optional<Coordinate> getWikidataCoordinate(String wikidataId) {
-    return Optional.ofNullable(getEntityDataById(wikidataId)).map(d -> new Coordinate(1.3, 103.8));
+    return Optional.ofNullable(getEntityDataById(wikidataId))
+        .flatMap(d -> d.getCoordinate(wikidataId));
   }
 
   public Optional<String> getAuthorQid(String wikidataId) {
