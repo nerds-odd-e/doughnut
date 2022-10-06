@@ -21,6 +21,7 @@ import org.apache.logging.log4j.util.Strings;
 import org.hibernate.annotations.Where;
 import org.hibernate.annotations.WhereJoinTable;
 import org.springframework.beans.BeanUtils;
+import org.springframework.lang.Nullable;
 import org.thymeleaf.util.StringUtils;
 
 @Entity
@@ -30,6 +31,7 @@ public class Note extends Thingy {
   private Note() {}
 
   @Embedded @Valid @Getter private final NoteAccessories noteAccessories = new NoteAccessories();
+  @Embedded @Valid @Getter @Nullable private final NoteLocation location = null;
 
   @OneToOne(mappedBy = "note", cascade = CascadeType.ALL)
   @Getter
