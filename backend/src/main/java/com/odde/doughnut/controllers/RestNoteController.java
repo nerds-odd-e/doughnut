@@ -67,19 +67,25 @@ class RestNoteController {
     Optional<String> authorId = associateToWikidata(note, noteCreation.wikidataId);
     note.buildLinkToParent(user, noteCreation.getLinkTypeToParent(), currentUTCTimestamp);
     modelFactoryService.noteRepository.save(note);
-    authorId.ifPresent(
-        id -> {
-          Note childNote = note.buildChildNote(user, currentUTCTimestamp, noteCreation.textContent);
-          try {
-            associateToWikidata(childNote, id);
-          } catch (BindException e) {
-            throw new RuntimeException(e);
-          }
-          childNote.buildLinkToParent(user, LinkType.AUTHOR_OF, currentUTCTimestamp);
-          modelFactoryService.noteRepository.save(childNote);
-        });
+    authorId.ifPresent(id -> createAuthorNote(noteCreation, user, currentUTCTimestamp, note, id));
 
     return NoteRealmWithPosition.fromNote(note, user);
+  }
+
+  private void createAuthorNote(
+      NoteCreation noteCreation,
+      User user,
+      Timestamp currentUTCTimestamp,
+      Note note,
+      String authorId) {
+    Note childNote = note.buildChildNote(user, currentUTCTimestamp, noteCreation.textContent);
+    try {
+      associateToWikidata(childNote, authorId);
+    } catch (BindException e) {
+      throw new RuntimeException(e);
+    }
+    childNote.buildLinkToParent(user, LinkType.AUTHOR_OF, currentUTCTimestamp);
+    modelFactoryService.noteRepository.save(childNote);
   }
 
   private Optional<String> associateToWikidata(Note note, String wikidataId) throws BindException {
