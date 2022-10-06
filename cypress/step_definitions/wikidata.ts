@@ -81,7 +81,7 @@ When("I select wikidataID {string} from the Wikidata search result", (wikidataID
   cy.get('select[name="wikidataSearchResult"]').select(wikidataID)
 })
 
-When("I create a note belonging to {string} with id {string}", (name:string, id:string) => {
+When("I create a note belonging to {string} with id {string}", (name: string, id: string) => {
   cy.clickAddChildNoteButton()
 })
 
