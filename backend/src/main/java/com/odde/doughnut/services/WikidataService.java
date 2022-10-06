@@ -12,7 +12,6 @@ import com.odde.doughnut.services.externalApis.WikidataModel;
 import com.odde.doughnut.services.externalApis.WikidataSearchModel;
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -70,20 +69,19 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
         .flatMap(d -> d.getDescription(this, wikidataId));
   }
 
-  public List<String> getChildNotesQids(String wikidataId)
-      throws IOException, InterruptedException {
+  public Optional<String> getAuthorQid(String wikidataId) throws IOException, InterruptedException {
     var wikidataEntity = getEntityDataById(wikidataId);
-
-    var childQids = new ArrayList<String>();
 
     if (wikidataEntity != null && wikidataEntity.isBook(wikidataId)) {
       var optionalAuthor =
           wikidataEntity.getFirstClaimOfProperty(wikidataId, WikidataFields.AUTHOR);
 
-      optionalAuthor.ifPresent(wikidataValue -> childQids.add(wikidataValue.toWikiClass()));
+      if (optionalAuthor.isPresent()) {
+        return Optional.of(optionalAuthor.get().toWikiClass());
+      }
     }
 
-    return childQids;
+    return Optional.empty();
   }
 
   public WikidataEntityModel getEntityDataById(String wikidataId)

@@ -86,9 +86,9 @@ Then("I should see that the {string} becomes {string}", (field: string, value: s
 })
 
 Then("a map is added to the note", () => {
-  cy.findByRole("link", {name: "map"})
+  cy.findByRole("link", { name: "map" })
 })
 
-Then(  "an identifying picture is shown", () => {
-  cy.findByRole("link", {name: "picture"})
+Then("an identifying picture is shown", () => {
+  cy.findByRole("link", { name: "picture" })
 })
