@@ -17,11 +17,6 @@
     />
   </div>
   <div class="note-content">
-    <a
-      class="map-applet"
-      :data-lat="note.noteAccessories.location.latitude"
-      :data-lon="note.noteAccessories.location.longitude"
-    />
     <EditableText
       :multiple-line="true"
       role="description"
@@ -118,7 +113,6 @@ export default defineComponent({
 <style lang="sass" scoped>
 .note-content
   display: flex
-  flex-direction: column
   flex-wrap: wrap
   .col
     flex: 1 1 auto
