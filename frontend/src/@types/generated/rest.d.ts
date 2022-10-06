@@ -276,7 +276,7 @@ declare namespace Generated {
         url: string;
         urlIsVideo: boolean;
         pictureUrl: string;
-        location?: NoteLocation;
+        location: NoteLocation;
         pictureMask: string;
         useParentPicture: boolean;
         skipReview: boolean;

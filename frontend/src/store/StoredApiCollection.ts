@@ -142,7 +142,7 @@ export default class StoredApiCollection implements StoredApi {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { updatedAt, ...data } = noteContentData;
     return this.storage.refreshNoteRealm(
-      (await this.managedApi.restPatch(
+      (await this.managedApi.restPatchMultiplePartForm(
         `notes/${noteId}`,
         data
       )) as Generated.NoteRealm

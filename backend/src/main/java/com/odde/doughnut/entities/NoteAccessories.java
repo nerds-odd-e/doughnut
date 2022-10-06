@@ -18,7 +18,6 @@ import javax.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.lang.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
 @Embeddable
@@ -37,7 +36,7 @@ public class NoteAccessories {
   @Setter
   private String pictureUrl;
 
-  @Embedded @Valid @Getter @Nullable private final NoteLocation location = null;
+  @Embedded @Valid @Getter private final NoteLocation location = null;
 
   @Pattern(
       regexp = "^(((-?[0-9.]+\\s+){3}-?[0-9.]+\\s+)*((-?[0-9.]+\\s+){3}-?[0-9.]+))?$",
