@@ -14,7 +14,6 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import lombok.SneakyThrows;
@@ -65,10 +64,12 @@ class RestNoteController {
     User user = currentUser.getEntity();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     Note note = parentNote.buildChildNote(user, currentUTCTimestamp, noteCreation.textContent);
-    Optional<String> authorId = associateToWikidata(note, noteCreation.wikidataId);
+    associateToWikidata(note, noteCreation.wikidataId);
     note.buildLinkToParent(user, noteCreation.getLinkTypeToParent(), currentUTCTimestamp);
     modelFactoryService.noteRepository.save(note);
-    authorId.ifPresent(id -> createAuthorNote(noteCreation, user, currentUTCTimestamp, note, id));
+    getWikidataService()
+        .getAuthorQid(noteCreation.wikidataId)
+        .ifPresent(id -> createAuthorNote(noteCreation, user, currentUTCTimestamp, note, id));
 
     return NoteRealmWithPosition.fromNote(note, user);
   }
@@ -86,9 +87,8 @@ class RestNoteController {
   }
 
   @SneakyThrows
-  private Optional<String> associateToWikidata(Note note, String wikidataId) {
+  private void associateToWikidata(Note note, String wikidataId) {
     modelFactoryService.toNoteModel(note).associateWithWikidataId(wikidataId, getWikidataService());
-    return getWikidataService().getAuthorQid(wikidataId);
   }
 
   @GetMapping("/{note}")

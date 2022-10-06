@@ -74,8 +74,12 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
         .flatMap(d -> d.getDescription(this, wikidataId));
   }
 
-  public Optional<String> getAuthorQid(String wikidataId) throws IOException, InterruptedException {
-    var wikidataEntity = getEntityDataById(wikidataId);
+  public Optional<String> getAuthorQid(String wikidataId) {
+    WikidataEntityModel wikidataEntity = null;
+    try {
+      wikidataEntity = getEntityDataById(wikidataId);
+    } catch (Exception e) {
+    }
 
     if (wikidataEntity != null && wikidataEntity.isBook(wikidataId)) {
       var optionalAuthor =
