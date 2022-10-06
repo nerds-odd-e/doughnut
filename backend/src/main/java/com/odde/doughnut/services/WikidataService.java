@@ -26,11 +26,7 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
 
   public WikidataEntity fetchWikidata(String wikidataId) throws IOException, InterruptedException {
     String responseBody = httpClientAdapter.getResponseString(ConstructWikidataUrl(wikidataId));
-
-    if (responseBody == null) {
-      return null;
-    }
-
+    if (responseBody == null) return null;
     WikidataModel wikidataModel =
         getObjectMapper().readValue(responseBody, new TypeReference<>() {});
     return wikidataModel.getWikidataEntity(wikidataId);
@@ -116,11 +112,6 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
   }
 
   public String getCountry(WikidataValue wikiId) {
-    try {
-      return fetchWikidata(wikiId.toWikiClass()).WikidataTitleInEnglish;
-    } catch (Exception e) {
-    }
-
     if ("Q865".equalsIgnoreCase(wikiId.toWikiClass())) {
       return "Taiwan";
     }
