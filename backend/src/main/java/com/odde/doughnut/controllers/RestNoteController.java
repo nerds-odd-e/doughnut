@@ -107,8 +107,7 @@ class RestNoteController {
   @PatchMapping(path = "/{note}")
   @Transactional
   public NoteRealm updateNote(
-      @PathVariable(name = "note") Note note,
-      @Valid @ModelAttribute NoteAccessories noteAccessories)
+      @PathVariable(name = "note") Note note, @Valid NoteAccessories noteAccessories)
       throws NoAccessRightException, IOException {
     currentUser.assertAuthorization(note);
 
