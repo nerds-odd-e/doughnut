@@ -12,16 +12,21 @@ import org.thymeleaf.util.StringUtils;
 public class WikidataEntityModel {
   private Map<String, WikidataEntityItemModel> entities;
 
-  private WikidataEntityItemModel getEntityItem(String wikidataId) {
-    return entities.get(wikidataId);
+  private Optional<WikidataEntityItemModel> getEntityItem(String wikidataId) {
+    if (entities == null) {
+      return Optional.empty();
+    }
+    
+    return Optional.of(entities.get(wikidataId));
   }
 
   public Optional<WikidataValue> getFirstClaimOfProperty(
       String wikidataId, WikidataFields propertyId) {
-    if (entities == null) {
-      return Optional.empty();
+    var entityItem = getEntityItem(wikidataId);
+    if (entityItem.isPresent()) {
+      return entityItem.get().getFirstClaimOfProperty(propertyId.label);
     }
-    return getEntityItem(wikidataId).getFirstClaimOfProperty(propertyId.label);
+    return Optional.empty();
   }
 
   public boolean isBook(String wikidataId) {
