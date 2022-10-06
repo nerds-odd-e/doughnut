@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+
+import lombok.SneakyThrows;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
@@ -60,19 +62,15 @@ public class NoteModel {
     }
   }
 
-  public List<String> associateWithWikidataId(String wikidataId, WikidataService wikidataService)
-      throws BindException {
+  @SneakyThrows
+  public List<String> associateWithWikidataId(String wikidataId, WikidataService wikidataService) {
     entity.setWikidataId(wikidataId);
     checkDuplicateWikidataId();
-    List<String> childNoteQuids = new ArrayList<>();
     if (Strings.isEmpty(wikidataId)) {
-      return childNoteQuids;
+      return List.of();
     }
     wikidataService.getWikidataDescription(wikidataId).ifPresent(entity::prependDescription);
-    try {
-      childNoteQuids = wikidataService.getChildNotesQids(wikidataId);
-    } catch (IOException | InterruptedException exception) {
-    }
-    return childNoteQuids;
+
+    return wikidataService.getChildNotesQids(wikidataId);
   }
 }
