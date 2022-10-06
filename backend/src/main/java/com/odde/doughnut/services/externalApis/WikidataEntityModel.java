@@ -23,7 +23,7 @@ public class WikidataEntityModel {
 
   public Optional<Coordinate> getCoordinate(String wikidataId) {
     return getFirstClaimOfProperty(wikidataId, WikidataFields.COORDINATE_LOCATION)
-        .map(v -> new Coordinate(v.getLatitude(), v.getLongitude()));
+        .flatMap(WikidataValue::getCoordinate);
   }
 
   public boolean isBook(String wikidataId) {

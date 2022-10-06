@@ -3,11 +3,13 @@ package com.odde.doughnut.services.externalApis;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.entities.Coordinate;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 public class WikidataValue {
   private Map<String, Object> data = null;
@@ -88,11 +90,13 @@ public class WikidataValue {
     return stringValue;
   }
 
-  public Double getLatitude() {
-    return 1.3;
-  }
+  public Optional<Coordinate> getCoordinate() {
+    if (isGlobeCoordinate(type)) {
+      var latitude = (Double) data.get("latitude");
+      var longitude = (Double) data.get("longitude");
+      return Optional.of(new Coordinate(latitude, longitude));
+    }
 
-  public Double getLongitude() {
-    return 103.8;
+    return Optional.empty();
   }
 }
