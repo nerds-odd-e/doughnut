@@ -68,14 +68,9 @@ public class WikidataValue {
   }
 
   public String toLocationDescription() {
-    if (isGlobeCoordinate(type)) {
-      return "Location: "
-          + data.get("latitude").toString()
-          + "'N, "
-          + data.get("longitude").toString()
-          + "'E";
-    }
-    return "Location: " + stringValue;
+    return getCoordinate()
+        .map(c -> "Location: %s'N, %s'E".formatted(c.latitude(), c.longitude()))
+        .orElseGet(() -> "Location: " + stringValue);
   }
 
   public String toDateDescription() {
