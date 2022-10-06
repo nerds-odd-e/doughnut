@@ -14,6 +14,7 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,27 +64,25 @@ class RestNoteController {
     User user = currentUser.getEntity();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     Note note = parentNote.buildChildNote(user, currentUTCTimestamp, noteCreation.textContent);
-    List<String> childNoteQuids = associateToWikidata(note, noteCreation.wikidataId);
+    Optional<String> authorId = associateToWikidata(note, noteCreation.wikidataId);
     note.buildLinkToParent(user, noteCreation.getLinkTypeToParent(), currentUTCTimestamp);
     modelFactoryService.noteRepository.save(note);
-    childNoteQuids.stream()
-        .forEach(
-            quid -> {
-              Note childNote =
-                  note.buildChildNote(user, currentUTCTimestamp, noteCreation.textContent);
-              try {
-                associateToWikidata(childNote, quid);
-              } catch (BindException e) {
-                throw new RuntimeException(e);
-              }
-              childNote.buildLinkToParent(user, LinkType.AUTHOR_OF, currentUTCTimestamp);
-              modelFactoryService.noteRepository.save(childNote);
-            });
+    authorId.ifPresent(
+        id -> {
+          Note childNote = note.buildChildNote(user, currentUTCTimestamp, noteCreation.textContent);
+          try {
+            associateToWikidata(childNote, id);
+          } catch (BindException e) {
+            throw new RuntimeException(e);
+          }
+          childNote.buildLinkToParent(user, LinkType.AUTHOR_OF, currentUTCTimestamp);
+          modelFactoryService.noteRepository.save(childNote);
+        });
 
     return NoteRealmWithPosition.fromNote(note, user);
   }
 
-  private List<String> associateToWikidata(Note note, String wikidataId) throws BindException {
+  private Optional<String> associateToWikidata(Note note, String wikidataId) throws BindException {
     return modelFactoryService
         .toNoteModel(note)
         .associateWithWikidataId(wikidataId, getWikidataService());

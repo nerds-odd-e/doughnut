@@ -5,6 +5,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.WikidataService;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -60,14 +61,15 @@ public class NoteModel {
   }
 
   @SneakyThrows
-  public List<String> associateWithWikidataId(String wikidataId, WikidataService wikidataService) {
+  public Optional<String> associateWithWikidataId(
+      String wikidataId, WikidataService wikidataService) {
     entity.setWikidataId(wikidataId);
     checkDuplicateWikidataId();
     if (Strings.isEmpty(wikidataId)) {
-      return List.of();
+      return Optional.empty();
     }
     wikidataService.getWikidataDescription(wikidataId).ifPresent(entity::prependDescription);
 
-    return List.of(wikidataService.getAuthorQid(wikidataId).orElse(""));
+    return wikidataService.getAuthorQid(wikidataId);
   }
 }
