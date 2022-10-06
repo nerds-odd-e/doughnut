@@ -5,20 +5,16 @@ Feature: Note creation should have description if wikidata is a human
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user
-      | title | description |
-      | human | some desc   |
-    And Wikidata.org has an entity "Q706446" with title "Wang Chien-ming"
-    And Wikidata.org entity "Q706446" is a human with date on birthday "31 March 1980" and country of citizenship "Taiwan"
+      | title  | description |
+      | places | some desc   |
+    And Wikidata.org has an entity "Q334" with title "Singapore"
 
-  Scenario: New Note creation and wikidata is selected by user
-    When I create a note belonging to "human":
-      | Title           | Wikidata Id |
-      | Wang Chien-ming | Q706446     |
-    Then I should see the note description on current page becomes "Taiwan, 31 March 1980"
-
-    @test1
-  Scenario: New Note creation and wikidata is selected by user
-    When I create a note belonging to "human":
-      | Title           | Wikidata Id |
-      | Confucius       | Q4604     |
-    Then I should see the note description on current page becomes "Lu, 09 October 0552 B.C."
+  @usingMockedWikidataService
+  @ignore
+  Scenario Outline: New Note creation and human wikidata is selected
+    When I create a note belonging to "<name>" with id "<wikidataId>"
+    Then I should see the note description on current page becomes "<description>"
+    Examples:
+      | name            | wikidataId | description |
+      | Wang Chien-ming | Q706446    | Taiwan, 31 March 1980 |
+      | Confucius       | Q4604      | Lu, 09 October 0552 B.C. |

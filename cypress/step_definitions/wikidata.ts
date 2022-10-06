@@ -81,6 +81,10 @@ When("I select wikidataID {string} from the Wikidata search result", (wikidataID
   cy.get('select[name="wikidataSearchResult"]').select(wikidataID)
 })
 
+When("I create a note belonging to {string} with id {string}", (name:string, id:string) => {
+  cy.clickAddChildNoteButton()
+})
+
 Then("I should see that the {string} becomes {string}", (field: string, value: string) => {
   cy.getFormControl(field).should("have.value", value)
 })
