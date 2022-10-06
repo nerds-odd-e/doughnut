@@ -120,10 +120,6 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
       return fetchWikidata(wikiId.toWikiClass()).WikidataTitleInEnglish;
     } catch (Exception e) {
     }
-
-    if ("Q865".equalsIgnoreCase(wikiId.toWikiClass())) {
-      return "Taiwan";
-    }
     return "";
   }
 }
