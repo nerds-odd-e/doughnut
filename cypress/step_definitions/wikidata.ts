@@ -85,10 +85,14 @@ Then("I should see that the {string} becomes {string}", (field: string, value: s
   cy.getFormControl(field).should("have.value", value)
 })
 
-Then("a map is added to the note", () => {
-  cy.findByRole("link", { name: "map" })
-})
+Then(
+  "a map pointing to {string}, {string} is added to the note",
+  (longitude: string, latitude: string) => {
+    cy.get("map").invoke("attr", "lon").should("eq", longitude)
+    cy.get("map").invoke("attr", "lat").should("eq", latitude)
+  },
+)
 
-Then("an identifying picture is shown", () => {
-  cy.findByRole("link", { name: "picture" })
+Then("an identifying picture with the name {string} is shown in the note", (fileName: string) => {
+  cy.get("picture").invoke("attr", "ref").should("contain", fileName)
 })

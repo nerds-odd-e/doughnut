@@ -32,5 +32,5 @@ Feature: Note creation/edit for a location
     When I create a note belonging to "places":
       | Title     | Wikidata Id  |
       | Singapore | Q334         |
-    Then a map is added to the note
-    And an identifying picture is shown
+    Then a map pointing to "1.3", "103.8" is added to the note
+    And an identifying picture with the name "Raffles Place.jpg" is shown in the note
