@@ -29,23 +29,31 @@ public class WikidataEntityModel {
     Optional<String> description;
 
     if (getWikiClass(wikidataId).equals(Optional.of(WikidataItems.HUMAN.label))) {
-      Optional<String> country =
-          getFirstClaimOfProperty(wikidataId, WikidataFields.COUNTRY_OF_CITIZENSHIP)
-              .map(wikiId -> service.getCountry(wikiId));
-      Optional<String> birthday =
-          getFirstClaimOfProperty(wikidataId, WikidataFields.BIRTHDAY)
-              .map(WikidataValue::toDateDescription);
-      // Add spacing between birthday and country only if country is not empty
-      Optional<String> countryString =
-          StringUtils.isEmpty(country.get()) ? Optional.of("") : Optional.of(country.get() + ", ");
-      description = Optional.of(countryString.get() + birthday.get());
-
+      description = getHumanDescription(service, wikidataId);
     } else {
-      description =
-          getFirstClaimOfProperty(wikidataId, WikidataFields.COORDINATE_LOCATION)
-              .map(WikidataValue::toLocationDescription);
+      description = getCountryDescription(wikidataId);
     }
 
+    return description;
+  }
+
+  private Optional<String> getCountryDescription(String wikidataId) {
+    return getFirstClaimOfProperty(wikidataId, WikidataFields.COORDINATE_LOCATION)
+        .map(WikidataValue::toLocationDescription);
+  }
+
+  private Optional<String> getHumanDescription(WikidataService service, String wikidataId) {
+    Optional<String> description;
+    Optional<String> country =
+        getFirstClaimOfProperty(wikidataId, WikidataFields.COUNTRY_OF_CITIZENSHIP)
+            .map(wikiId -> service.getCountry(wikiId));
+    Optional<String> birthday =
+        getFirstClaimOfProperty(wikidataId, WikidataFields.BIRTHDAY)
+            .map(WikidataValue::toDateDescription);
+    // Add spacing between birthday and country only if country is not empty
+    Optional<String> countryString =
+        StringUtils.isEmpty(country.get()) ? Optional.of("") : Optional.of(country.get() + ", ");
+    description = Optional.of(countryString.get() + birthday.get());
     return description;
   }
 
