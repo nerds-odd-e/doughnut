@@ -10,6 +10,7 @@ import static org.mockito.ArgumentMatchers.any;
 import com.odde.doughnut.entities.Link.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessories;
+import com.odde.doughnut.entities.NoteLocation;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.*;
 import com.odde.doughnut.exceptions.NoAccessRightException;
@@ -213,6 +214,19 @@ class RestNoteControllerTests {
         assertThat(
             note.noteRealm.getNote().getTextContent().getDescription(),
             stringContainsInOrder("Location: " + lnglat, singapore));
+      }
+
+      @Test
+      void shouldAddCoordinatesWhenAddingLocationNoteWithWikidataId() throws Exception {
+        mockApiResponseWithLocationInfo(
+            "\"value\":{\"latitude\":1.3,\"longitude\":103.8},\"type\":\"globecoordinate\"");
+
+        var note = controller.createNote(parent, noteCreation);
+
+        var expectedLocation = new NoteLocation();
+        expectedLocation.setLatitude(1.3);
+        expectedLocation.setLongitude(103.8);
+        assertThat(note.noteRealm.getNote().getLocation(), is(expectedLocation));
       }
 
       @Test
