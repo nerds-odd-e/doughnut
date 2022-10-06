@@ -16,7 +16,7 @@ public class WikidataEntityModel {
     if (entities == null) {
       return Optional.empty();
     }
-    
+
     return Optional.of(entities.get(wikidataId));
   }
 
