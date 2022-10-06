@@ -80,11 +80,6 @@ public class WikidataValue {
     return timeValue;
   }
 
-  public String toCountryOfCitizenship() {
-    // TODO: get string from another Wikidata Entity
-    return "";
-  }
-
   public String toWikiClass() {
     return wikiClass;
   }
