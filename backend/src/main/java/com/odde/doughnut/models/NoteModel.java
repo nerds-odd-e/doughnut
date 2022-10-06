@@ -67,13 +67,7 @@ public class NoteModel {
     wikidataService.getWikidataDescription(wikidataId).ifPresent(entity::prependDescription);
     wikidataService
         .getWikidataCoordinate(wikidataId)
-        .map(
-            coordinate -> {
-              var location = new NoteLocation();
-              location.setLatitude(coordinate.latitude());
-              location.setLongitude(coordinate.longitude());
-              return location;
-            })
+        .map(coordinate -> new NoteLocation(coordinate.latitude(), coordinate.longitude()))
         .ifPresent(entity::setLocation);
   }
 }
