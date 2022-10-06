@@ -10,6 +10,7 @@ Feature: Note deletion
       | TDD            | tech           |
       | CI System      | tech           |
 
+  @ignore
   Scenario: Delete a note then delete its parent and undo
     Given I delete note "TDD"
     And I delete note "tech"
