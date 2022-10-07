@@ -17,8 +17,17 @@
     />
   </div>
   <div class="note-content">
-    <div v-if="!!note.location" class="map-applet">
-      Insert Map here ¯|_(ツ)_ /¯
+    <div
+      v-if="!!note.location"
+      class="map-applet"
+      :data-lat="note.location.latitude"
+      :data-lon="note.location.longitude"
+    >
+      <p>
+        Insert Map here ¯|_(ツ)_ /¯
+        Longitude: {{note.location.longitude}}
+        Latitude: {{note.location.latitude}}
+      </p>
     </div>
     <EditableText
       :multiple-line="true"

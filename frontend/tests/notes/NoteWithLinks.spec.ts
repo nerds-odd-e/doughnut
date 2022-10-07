@@ -119,7 +119,7 @@ describe("note associated with wikidata", () => {
 });
 
 describe("note associated with location", () => {
-  it("should display a map placeholder", async () => {
+  it("should display a map placeholder with longitude and latitude as data attribute", async () => {
     const noteRealm = makeMe.aNoteRealm
       .title("Dummy Title")
       .location({ longitude: 123, latitude: 456 })
@@ -136,5 +136,7 @@ describe("note associated with location", () => {
     const element = await wrapper.find(".map-applet");
     element.isVisible();
     expect(element.exists()).toBe(true);
+    expect(element.attributes("data-lat")).toMatch("456");
+    expect(element.attributes("data-lon")).toMatch("123");
   });
 });
