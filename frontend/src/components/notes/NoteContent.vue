@@ -24,9 +24,8 @@
       :data-lon="note.location.longitude"
     >
       <p>
-        Insert Map here ¯|_(ツ)_ /¯
-        Longitude: {{note.location.longitude}}
-        Latitude: {{note.location.latitude}}
+        Insert Map here ¯|_(ツ)_ /¯ Longitude:
+        {{ note.location.longitude }} Latitude: {{ note.location.latitude }}
       </p>
     </div>
     <EditableText
