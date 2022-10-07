@@ -82,7 +82,7 @@ When("I select wikidataID {string} from the Wikidata search result", (wikidataID
 })
 
 When(
-  "I create a note belonging to {string} with id {string}",
+  "I create a note with title {string} and wiki id {string}",
   (noteTitle: string, wikiId: string) => {
     cy.clickAddChildNoteButton()
     cy.submitNoteCreationFormWith({ Title: noteTitle, "Wikidata Id": wikiId })

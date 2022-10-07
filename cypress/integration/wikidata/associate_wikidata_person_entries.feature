@@ -7,7 +7,7 @@ Feature: Note creation should have description if wikidata is a person
     And I create a notebook with title
 
   Scenario Outline: New Note creation and person wikidata is selected
-    When I create a note belonging to "<name>" with id "<wikidataId>"
+    When I create a note with title "<name>" and wiki id "<wikidataId>"
     When I should see the note description on current page becomes "<description>"
     Examples:
       | name            | wikidataId | description |
