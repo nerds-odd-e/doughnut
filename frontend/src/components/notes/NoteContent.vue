@@ -17,6 +17,7 @@
     />
   </div>
   <div class="note-content">
+    <div class="map-applet">Insert Map here ¯|_(ツ)_ /¯</div>
     <EditableText
       :multiple-line="true"
       role="description"
@@ -113,6 +114,7 @@ export default defineComponent({
 <style lang="sass" scoped>
 .note-content
   display: flex
+  flex-direction: column
   flex-wrap: wrap
   .col
     flex: 1 1 auto
