@@ -74,6 +74,7 @@ class RestNoteController {
     return NoteRealmWithPosition.fromNote(note, user);
   }
 
+  @SneakyThrows
   private void createAuthorNote(
       NoteCreation noteCreation,
       User user,
@@ -82,6 +83,9 @@ class RestNoteController {
       String authorId) {
     Note childNote = note.buildChildNote(user, currentUTCTimestamp, noteCreation.textContent);
     associateToWikidata(childNote, authorId);
+
+    childNote.getTextContent().setTitle(" ");
+
     childNote.buildLinkToParent(user, LinkType.AUTHOR_OF, currentUTCTimestamp);
     modelFactoryService.noteRepository.save(childNote);
   }
