@@ -27,6 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.platform.commons.util.StringUtils;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -342,6 +343,18 @@ class RestNoteControllerTests {
       private void mockApiResponseWithHumanInfo(
           String humanId, String birthdayByISO, String countryQId, String countryName)
           throws IOException, InterruptedException {
+        var birthDayJsonObject =
+            StringUtils.isBlank(birthdayByISO)
+                ? ""
+                : String.format(
+                    """
+          ,
+                                  "datavalue": {
+                                    "value": { "time": "%s"},
+                                    "type": "time"
+                                  }
+          """,
+                    birthdayByISO);
         Mockito.when(httpClientAdapter.getResponseString(any()))
             .thenReturn(
                 """
@@ -375,11 +388,7 @@ class RestNoteControllerTests {
                               {
                                 "mainsnak": {
                                   "snaktype": "value",
-                                  "property": "P569",
-                                  "datavalue": {
-                                    "value": { "time": "%s"},
-                                    "type": "time"
-                                  }
+                                  "property": "P569"%s
                                 }
                               }
                             ],
@@ -400,7 +409,7 @@ class RestNoteControllerTests {
                       }
                     }
                   """
-                    .formatted(humanId, humanId, countryQId, birthdayByISO),
+                    .formatted(humanId, humanId, countryQId, birthDayJsonObject),
                 """
                 {"entities":
                   {"%s":
@@ -462,6 +471,21 @@ class RestNoteControllerTests {
         String wikidataIdOfHuman = "Q706446"; // Wang Chien-ming
         String countryOfBirth = "Taiwan";
         String birthdayByISO = "+1980-03-31T00:00:00Z";
+
+        mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO, "Q865", countryOfBirth);
+        noteCreation.setWikidataId(wikidataIdOfHuman);
+        NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
+        assertThat(
+            note.noteRealm.getNote().getTextContent().getDescription(),
+            containsString(countryOfBirth));
+      }
+
+      @Test
+      void shouldAddHumanCountryOfBirthWhenBirthdayIsEmptyAddingNoteWithWikidataId()
+          throws BindException, InterruptedException, NoAccessRightException, IOException {
+        String wikidataIdOfHuman = "Q706446"; // Wang Chien-ming
+        String countryOfBirth = "Taiwan";
+        String birthdayByISO = "";
 
         mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO, "Q865", countryOfBirth);
         noteCreation.setWikidataId(wikidataIdOfHuman);
