@@ -27,9 +27,8 @@ Feature: Note creation/edit for a location
     Then I should see the note description on current page becomes "Location: 1.3'N, 103.8'E The red dot"
 
   @usingMockedWikidataService
-  @ignore
   Scenario: A note can be created for a location with a map and identifying picture
     When I create a note belonging to "places":
       | Title     | Wikidata Id  |
       | Singapore | Q334         |
-    Then a map pointing to "1.3", "103.8" is added to the note
+    Then a map pointing to lat: "1.3", lon: "103.8" is added to the note

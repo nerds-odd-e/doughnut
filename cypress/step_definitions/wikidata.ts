@@ -94,9 +94,9 @@ Then("I should see that the {string} becomes {string}", (field: string, value: s
 })
 
 Then(
-  "a map pointing to {string}, {string} is added to the note",
-  (longitude: string, latitude: string) => {
-    cy.get("map").invoke("attr", "lon").should("eq", longitude)
-    cy.get("map").invoke("attr", "lat").should("eq", latitude)
+  "a map pointing to lat: {string}, lon: {string} is added to the note",
+  (latitude: string, longitude: string) => {
+    cy.get(".map-applet").invoke("attr", "data-lon").should("eq", longitude)
+    cy.get(".map-applet").invoke("attr", "data-lat").should("eq", latitude)
   },
 )
