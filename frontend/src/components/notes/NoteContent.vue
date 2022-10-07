@@ -23,6 +23,23 @@
       :data-lat="note.location.latitude"
       :data-lon="note.location.longitude"
     >
+      <div class="mapouter">
+        ..
+        <div class="gmap_canvas">
+          ..
+          <iframe
+            width="600"
+            height="500"
+            id="gmap_canvas"
+            src="https://maps.google.com/maps?q=1.3%20N%20103%20E&t=&z=7&ie=UTF8&iwloc=&output=embed"
+            frameborder="0"
+            scrolling="no"
+            marginheight="0"
+            marginwidth="0"
+          >
+          </iframe>
+        </div>
+      </div>
       <p>
         Insert Map here ¯|_(ツ)_ /¯ Longitude:
         {{ note.location.longitude }} Latitude: {{ note.location.latitude }}
