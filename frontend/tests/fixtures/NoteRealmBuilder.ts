@@ -58,7 +58,7 @@ class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
   }
 
   location(location: Generated.NoteLocation): NoteRealmBuilder {
-    this.data.note.location = location
+    this.data.note.location = location;
     return this;
   }
 

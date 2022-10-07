@@ -120,7 +120,10 @@ describe("note associated with wikidata", () => {
 
 describe("note associated with location", () => {
   it("should display a map placeholder", async () => {
-    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").location({longitude: 123, latitude: 456}).please();
+    const noteRealm = makeMe.aNoteRealm
+      .title("Dummy Title")
+      .location({ longitude: 123, latitude: 456 })
+      .please();
 
     const wrapper = helper
       .component(NoteWithLinks)
