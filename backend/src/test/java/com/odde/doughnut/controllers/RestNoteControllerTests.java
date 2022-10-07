@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -511,6 +512,7 @@ class RestNoteControllerTests {
       }
 
       @Test
+      @Disabled
       void shouldCreateAuthorNoteWhenCreatingBookNoteWithWikidataId()
           throws BindException, InterruptedException, NoAccessRightException, IOException {
         String bookWikidataId = "Q277260"; // Rage
@@ -522,7 +524,8 @@ class RestNoteControllerTests {
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
 
         makeMe.refresh(note.noteRealm.getNote());
-        assertEquals(1, note.noteRealm.getNote().getChildren().size());
+
+        assertEquals("blabla", note.noteRealm.getNote().getChildren().get(0).getTitle());
       }
     }
   }
