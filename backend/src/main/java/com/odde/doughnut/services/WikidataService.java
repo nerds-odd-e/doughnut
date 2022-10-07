@@ -127,7 +127,7 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
   }
 
   @SneakyThrows
-  public String getCountry(WikidataValue wikiId) {
+  public String getTitle(WikidataValue wikiId) {
     return fetchWikidata(wikiId.toWikiClass()).WikidataTitleInEnglish;
   }
 }
