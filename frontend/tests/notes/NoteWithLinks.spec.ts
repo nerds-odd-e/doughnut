@@ -119,7 +119,7 @@ describe("note associated with wikidata", () => {
 });
 
 describe("note associated with location", () => {
-  it.skip("should display map icon besides title when note is location", async () => {
+  it("should display a map placeholder", async () => {
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please();
 
     const wrapper = helper
@@ -130,8 +130,8 @@ describe("note associated with location", () => {
       })
       .mount();
 
-    const element = await wrapper.find('[role="button"]');
+    const element = await wrapper.find(".map-applet");
     element.isVisible();
-    expect(element.attributes("title")).toMatch("Map");
+    expect(element.exists()).toBe(true);
   });
 });
