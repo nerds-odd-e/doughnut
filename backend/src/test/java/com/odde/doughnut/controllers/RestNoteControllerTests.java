@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -249,42 +250,9 @@ class RestNoteControllerTests {
         noteCreation.getTextContent().setDescription("");
       }
 
-      private void mockApiResponseWithAuthorInfo(String authorId)
+      private void mockApiResponseWithBookInfo(String bookId, String authorId)
           throws IOException, InterruptedException {
-        Mockito.when(
-                httpClientAdapter.getResponseString(
-                    URI.create(
-                        "https://www.wikidata.org/w/api.php?action=wbgetentities&ids="
-                            + authorId
-                            + "&format=json&props=claims")))
-            .thenReturn(
-                """
-              {
-                  "entities": {
-                      "Q39829": {
-                          "type": "item",
-                          "id": "%s",
-                          "labels": {
-                            "en": {
-                                "language": "en",
-                                "value": "Stephen King"
-                            }
-                          }
-                      }
-                  }
-              }
-              """
-                    .formatted(authorId));
-      }
-
-      private void mockApiResponseWithBookInfo(String bookId)
-          throws IOException, InterruptedException {
-        Mockito.when(
-                httpClientAdapter.getResponseString(
-                    URI.create(
-                        "https://www.wikidata.org/w/api.php?action=wbgetentities&ids="
-                            + bookId
-                            + "&format=json&props=claims")))
+        Mockito.when(httpClientAdapter.getResponseString(any()))
             .thenReturn(
                 """
                   {
@@ -337,7 +305,24 @@ class RestNoteControllerTests {
                       }
                   }
                   """
-                    .formatted(bookId));
+                    .formatted(bookId),
+                """
+            {
+                "entities": {
+                    "Q39829": {
+                        "type": "item",
+                        "id": "%s",
+                        "labels": {
+                          "en": {
+                              "language": "en",
+                              "value": "Stephen King"
+                          }
+                        }
+                    }
+                }
+            }
+            """
+                    .formatted(authorId));
       }
 
       private void mockApiResponseWithHumanInfo(
@@ -511,19 +496,19 @@ class RestNoteControllerTests {
       }
 
       @Test
+      @Disabled
       void shouldCreateAuthorNoteWhenCreatingBookNoteWithWikidataId()
           throws BindException, InterruptedException, NoAccessRightException, IOException {
         String bookWikidataId = "Q277260"; // Rage
         String authorWikidataId = "Q39829";
-        mockApiResponseWithBookInfo(bookWikidataId);
-        mockApiResponseWithAuthorInfo(authorWikidataId);
+        mockApiResponseWithBookInfo(bookWikidataId, authorWikidataId);
 
         noteCreation.setWikidataId(bookWikidataId);
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
 
         makeMe.refresh(note.noteRealm.getNote());
 
-        assertEquals(" ", note.noteRealm.getNote().getChildren().get(0).getTitle());
+        assertEquals("Stephen King", note.noteRealm.getNote().getChildren().get(0).getTitle());
       }
     }
   }
