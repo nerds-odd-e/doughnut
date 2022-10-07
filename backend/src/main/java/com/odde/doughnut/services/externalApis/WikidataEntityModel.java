@@ -5,8 +5,9 @@ import com.odde.doughnut.entities.Coordinate;
 import com.odde.doughnut.services.WikidataService;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.Data;
-import org.thymeleaf.util.StringUtils;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -49,18 +50,18 @@ public class WikidataEntityModel {
   }
 
   private Optional<String> getHumanDescription(WikidataService service, String wikidataId) {
-    Optional<String> description;
-    Optional<String> country =
-        getFirstClaimOfProperty(wikidataId, WikidataFields.COUNTRY_OF_CITIZENSHIP)
-            .map(wikiId -> service.getCountry(wikiId));
-    Optional<String> birthday =
-        getFirstClaimOfProperty(wikidataId, WikidataFields.BIRTHDAY)
-            .map(WikidataValue::toDateDescription);
-    // Add spacing between birthday and country only if country is not empty
-    Optional<String> countryString =
-        StringUtils.isEmpty(country.get()) ? Optional.of("") : Optional.of(country.get() + ", ");
-    description = Optional.of(countryString.get() + birthday.orElse(""));
-    return description;
+    String description =
+        Stream.of(
+                getFirstClaimOfProperty(wikidataId, WikidataFields.COUNTRY_OF_CITIZENSHIP)
+                    .map(service::getCountry)
+                    .orElse(""),
+                getFirstClaimOfProperty(wikidataId, WikidataFields.BIRTHDAY)
+                    .map(WikidataValue::toDateDescription)
+                    .orElse(""))
+            .filter(value -> !value.isBlank())
+            .collect(Collectors.joining(", "));
+
+    return Optional.of(description);
   }
 
   private Optional<String> getWikiClass(String wikidataId) {
