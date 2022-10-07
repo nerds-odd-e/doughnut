@@ -96,7 +96,3 @@ Then(
     cy.get("map").invoke("attr", "lat").should("eq", latitude)
   },
 )
-
-Then("an identifying picture with the name {string} is shown in the note", (fileName: string) => {
-  cy.get("picture").invoke("attr", "ref").should("contain", fileName)
-})
