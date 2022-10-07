@@ -56,6 +56,10 @@ When("I create a notebook with empty title", () => {
   cy.createNotebookWith({ Title: "" })
 })
 
+When("I create a notebook with title", () => {
+  cy.createNotebookWith({ Title: "Test title" })
+})
+
 When("I update note {string} to become:", (noteTitle: string, data) => {
   cy.jumpToNotePage(noteTitle)
   cy.inPlaceEdit(data.hashes()[0])
