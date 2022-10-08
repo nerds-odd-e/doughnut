@@ -11,12 +11,11 @@ When("I associate the note {string} with wikidata id {string}", (title, wikiID) 
 When("I need to confirm the association with different title {string}", (wikidataTitle: string) => {
   cy.findAllByText(wikidataTitle).should("exist")
   cy.findByRole("button", { name: "Confirm" }).click()
-  cy.findByRole("button", { name: "Wiki Association" })
+  cy.findWikiAssociationButton()
 })
 
 Then("I don't need to confirm the association with different title {string}", () => {
-  // no action needed
-  cy.findByRole("button", { name: "Wiki Association" })
+  cy.findWikiAssociationButton()
 })
 
 Given(
