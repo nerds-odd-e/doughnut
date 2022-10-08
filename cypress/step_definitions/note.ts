@@ -145,7 +145,8 @@ When("I delete notebook {string}", (noteTitle) => {
   cy.findByRole("button", { name: "OK" }).click()
 })
 
-When("I delete note {string}", (noteTitle) => {
+When("I delete note {string} at {int}:00", (noteTitle: string, hour: number) => {
+  cy.testability().backendTimeTravelTo(0, hour)
   cy.clickNotePageMoreOptionsButton(noteTitle, "Delete note")
   cy.findByRole("button", { name: "OK" }).click()
 })
