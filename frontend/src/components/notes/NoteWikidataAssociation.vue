@@ -1,5 +1,10 @@
 <template>
-  <a class="btn" role="button" title="Wikidata" @click="onClickWikidata">
+  <a
+    class="btn"
+    role="button"
+    title="Wiki Association"
+    @click="onClickWikidata"
+  >
     <SvgAssociation />
   </a>
 </template>

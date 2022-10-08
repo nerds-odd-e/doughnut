@@ -114,7 +114,7 @@ describe("note associated with wikidata", () => {
 
     const element = await wrapper.find('[role="button"]');
     element.isVisible();
-    expect(element.attributes("title")).toMatch("Wikidata");
+    expect(element.attributes("title")).toMatch("Wiki Association");
   });
 });
 
