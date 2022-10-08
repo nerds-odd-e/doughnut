@@ -70,6 +70,46 @@ class WikidataServiceTester {
     )
   }
 
+  async stubWikidataEntityPerson(wikidataId: string, countryOfOrigin: string, birthday: string) {
+    return await this.stubByPathAndQuery(
+      `/w/api.php`,
+      { action: "wbgetentities", ids: wikidataId },
+      {
+        entities: {
+          [wikidataId]: {
+            type: "item",
+            id: wikidataId,
+            claims: {
+              P31: [
+                {
+                  mainsnak: {
+                    property: "P31",
+                    datavalue: {
+                      value: { id: "Q5" },
+                      type: "wikibase-entityid",
+                    },
+                  },
+                },
+              ],
+              P569: [
+                {
+                  mainsnak: {
+                    snaktype: "value",
+                    property: "P569",
+                    datavalue: {
+                      value: { time: birthday },
+                      type: "time",
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        },
+      },
+    )
+  }
+
   async stubWikidataSearchResult(wikidataLabel: string, wikidataId: string) {
     return await this.stubByPathAndQuery(
       `/w/api.php`,

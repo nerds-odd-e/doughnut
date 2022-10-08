@@ -537,6 +537,19 @@ Cypress.Commands.add(
 )
 
 Cypress.Commands.add(
+  "stubWikidataEntityPerson",
+  { prevSubject: true },
+  (
+    wikidataServiceTester: WikidataServiceTester,
+    wikidataId: string,
+    countryOfOrigin: string,
+    birthday: string,
+  ) => {
+    wikidataServiceTester.stubWikidataEntityPerson(wikidataId, countryOfOrigin, birthday)
+  },
+)
+
+Cypress.Commands.add(
   "stubWikidataEntityQuery",
   { prevSubject: true },
   (

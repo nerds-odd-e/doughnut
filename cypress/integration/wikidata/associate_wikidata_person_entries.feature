@@ -6,10 +6,21 @@ Feature: Note creation should have description if wikidata is a person
     Given I've logged in as an existing user
     And I create a notebook with title
 
+  @usingMockedWikidataService
   Scenario Outline: New Note creation and person wikidata is selected
-    When I create a note with title "<name>" and wiki id "<wikidataId>"
+    Given Wikidata.org has an entity "<wikidataId>" with title "<person name>"
+    And Wikidata.org entity "<wikidataId>" is a person from "<country of origin>" and birthday is "<birthday>"
+    When I create a note with title "<person name>" and wiki id "<wikidataId>"
     When I should see the note description on current page becomes "<description>"
     Examples:
-      | name            | wikidataId | description |
-      | Wang Chien-ming | Q706446    | Taiwan, 31 March 1980 |
-      | Confucius       | Q4604      | Lu, 09 October 0552 B.C. |
+      | person name    | wikidataId | contry of origin | birthday              | description |
+      | Wang Chien-ming | Q706446    | Taiwan           | +1980-03-31T00:00:00Z | 31 March 1980 |
+      | Confucius       | Q4604      | Lu               | -0552-10-09T00:00:00Z | 09 October 0552 B.C. |
+
+  Scenario Outline: New Note creation and person wikidata is selected
+    When I create a note with title "<person name>" and wiki id "<wikidataId>"
+    When I should see the note description on current page becomes "<description>"
+    Examples:
+      | person name    | wikidataId | contry of origin | birthday              | description |
+      | Wang Chien-ming | Q706446    | Taiwan           | +1980-03-31T00:00:00Z | Taiwan, 31 March 1980 |
+      | Confucius       | Q4604      | Lu               | +1980-03-31T00:00:00Z | Lu, 09 October 0552 B.C. |

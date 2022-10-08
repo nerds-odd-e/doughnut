@@ -38,6 +38,13 @@ Given(
 )
 
 Given(
+  "Wikidata.org entity {string} is a person from {string} and birthday is {string}",
+  (wikidataId: string, countryOfOrigin: string, birthday: string) => {
+    cy.wikidataService().stubWikidataEntityPerson(wikidataId, countryOfOrigin, birthday)
+  },
+)
+
+Given(
   "Wikidata.org entity {string} is a location at {float}, {float}",
   (wikidataId: string, lat: number, lng: number) => {
     cy.wikidataService().stubWikidataEntityLocation(wikidataId, lat, lng)
