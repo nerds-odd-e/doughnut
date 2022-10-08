@@ -565,17 +565,21 @@ Cypress.Commands.add("findWikiAssociationButton", () => {
   cy.findByRole("button", { name: "Wiki Association" })
 })
 
-Cypress.Commands.add("expectWikiAssociationLink", { prevSubject: true }, (elm: Element, url: string) => {
-  cy.window().then((win) => {
-    const popupWindowStub = { location: { href: undefined }, focus: cy.stub() }
-    cy.stub(win, "open").as("open").returns(popupWindowStub)
-    cy.wrap(elm).click()
-    cy.get("@open").should("have.been.calledWith", "")
-    // using a callback so that cypress can wait until the stubbed value is assigned
-    cy.wrap(() => popupWindowStub.location.href)
-      .should((cb) => expect(cb()).equal(url))
-      .then(() => {
-        expect(popupWindowStub.focus).to.have.been.called
-      })
-  })
-})
+Cypress.Commands.add(
+  "expectALinkThatOpensANewWindowWithURL",
+  { prevSubject: true },
+  (elm: Element, url: string) => {
+    cy.window().then((win) => {
+      const popupWindowStub = { location: { href: undefined }, focus: cy.stub() }
+      cy.stub(win, "open").as("open").returns(popupWindowStub)
+      cy.wrap(elm).click()
+      cy.get("@open").should("have.been.calledWith", "")
+      // using a callback so that cypress can wait until the stubbed value is assigned
+      cy.wrap(() => popupWindowStub.location.href)
+        .should((cb) => expect(cb()).equal(url))
+        .then(() => {
+          expect(popupWindowStub.focus).to.have.been.called
+        })
+    })
+  },
+)

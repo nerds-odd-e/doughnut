@@ -60,7 +60,7 @@ Then(
   "the Wiki association of note {string} should link to {string}",
   (title: string, associationUrl: string) => {
     cy.findNoteTitle(title)
-    cy.findWikiAssociationButton().expectWikiAssociationLink(associationUrl)
+    cy.findWikiAssociationButton().expectALinkThatOpensANewWindowWithURL(associationUrl)
   },
 )
 
