@@ -61,7 +61,7 @@ Then(
   "the Wiki association of note {string} should link to {string}",
   (title: string, associationUrl: string) => {
     cy.findNoteTitle(title)
-    cy.findPopupLink("Wikidata", associationUrl)
+    cy.expectWikiAssociationLink(associationUrl)
   },
 )
 
