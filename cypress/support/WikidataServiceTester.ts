@@ -38,7 +38,24 @@ class WikidataServiceTester {
     })
   }
 
-  async stubWikidataEntityLocation(wikidataId: string, latitude: number, longitude: number) {
+  claim(wikidataId: string, type: string, value: unknown) {
+    return {
+      [wikidataId]: [
+        {
+          mainsnak: {
+            snaktype: "value",
+            property: wikidataId,
+            datavalue: {
+              value,
+              type,
+            },
+          },
+        },
+      ],
+    }
+  }
+
+  async stubWikidataEntity(wikidataId: string, claims: unknown) {
     return await this.stubByPathAndQuery(
       `/w/api.php`,
       { action: "wbgetentities", ids: wikidataId },
@@ -47,67 +64,25 @@ class WikidataServiceTester {
           [wikidataId]: {
             type: "item",
             id: wikidataId,
-            claims: {
-              P625: [
-                {
-                  mainsnak: {
-                    snaktype: "value",
-                    property: "P625",
-                    datavalue: {
-                      value: {
-                        latitude,
-                        longitude,
-                      },
-                      type: "globecoordinate",
-                    },
-                  },
-                },
-              ],
-            },
+            claims,
           },
         },
       },
     )
   }
 
-  async stubWikidataEntityPerson(wikidataId: string, countryOfOrigin: string, birthday: string) {
-    return await this.stubByPathAndQuery(
-      `/w/api.php`,
-      { action: "wbgetentities", ids: wikidataId },
-      {
-        entities: {
-          [wikidataId]: {
-            type: "item",
-            id: wikidataId,
-            claims: {
-              P31: [
-                {
-                  mainsnak: {
-                    property: "P31",
-                    datavalue: {
-                      value: { id: "Q5" },
-                      type: "wikibase-entityid",
-                    },
-                  },
-                },
-              ],
-              P569: [
-                {
-                  mainsnak: {
-                    snaktype: "value",
-                    property: "P569",
-                    datavalue: {
-                      value: { time: birthday },
-                      type: "time",
-                    },
-                  },
-                },
-              ],
-            },
-          },
-        },
-      },
+  async stubWikidataEntityLocation(wikidataId: string, latitude: number, longitude: number) {
+    return await this.stubWikidataEntity(
+      wikidataId,
+      this.claim("P625", "globecoordinate", { latitude, longitude }),
     )
+  }
+
+  async stubWikidataEntityPerson(wikidataId: string, countryOfOrigin: string, birthday: string) {
+    return await this.stubWikidataEntity(wikidataId, {
+      ...this.claim("P31", "wikibase-entityid", { id: "Q5" }),
+      ...this.claim("P569", "time", { time: birthday }),
+    })
   }
 
   async stubWikidataSearchResult(wikidataLabel: string, wikidataId: string) {
