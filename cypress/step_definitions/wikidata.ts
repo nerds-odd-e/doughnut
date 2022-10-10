@@ -19,11 +19,6 @@ Then("I don't need to confirm the association with different title {string}", ()
 })
 
 Given(
-  "Wikidata.org entity {string} is a human with date on birthday {string} and country of citizenship {string}",
-  () => ({}),
-)
-
-Given(
   "Wikidata.org has an entity {string} with title {string} and link to wikipedia {string}",
   (wikidataId: string, wikidataTitle: string, wikipediaLink: string) => {
     cy.wikidataService().stubWikidataEntityQuery(wikidataId, wikidataTitle, wikipediaLink)
