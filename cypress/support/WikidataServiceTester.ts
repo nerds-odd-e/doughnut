@@ -57,9 +57,9 @@ class WikidataServiceTester {
   }
 
   async stubWikidataEntity(wikidataId: string, claims: Record<string, unknown>) {
-    return await this.stubByPathAndQuery(
-      `/w/api.php`,
-      { action: "wbgetentities", ids: wikidataId },
+    return await this.stubWikidataApi(
+      "wbgetentities",
+      { ids: wikidataId },
       new WikidataEntitiesBuilder(wikidataId).wclaims(claims).build(),
     )
   }
@@ -79,9 +79,9 @@ class WikidataServiceTester {
   }
 
   async stubWikidataSearchResult(wikidataLabel: string, wikidataId: string) {
-    return await this.stubByPathAndQuery(
-      `/w/api.php`,
-      { action: "wbsearchentities" },
+    return await this.stubWikidataApi(
+      "wbsearchentities",
+      {},
       {
         search: [
           {
@@ -111,10 +111,14 @@ class WikidataServiceTester {
     return this.stub(new DefaultStub(url, HttpMethod.GET, data, 200))
   }
 
-  private stubByPathAndQuery(path: string, query: Record<string, string>, data: unknown) {
+  private stubWikidataApi(action: string, query: Record<string, string>, data: unknown) {
+    const path = `/w/api.php`
     return this.stub(
       new DefaultStub(path, HttpMethod.GET, data, 200).withPredicate(
-        new FlexiPredicate().withPath(path).withQuery(query).withMethod(HttpMethod.GET),
+        new FlexiPredicate()
+          .withPath(path)
+          .withQuery({ action, ...query })
+          .withMethod(HttpMethod.GET),
       ),
     )
   }
