@@ -2,27 +2,10 @@ import { Stub } from "@anev/ts-mountebank"
 /// <reference types="cypress" />
 
 import { Mountebank, Imposter, DefaultStub, HttpMethod, FlexiPredicate } from "@anev/ts-mountebank"
-import WikidataEntitiesBuilder from "./json/WikidataEntitiesBuilder"
+import WikidataEntitiesBuilder, { Claim } from "./json/WikidataEntitiesBuilder"
 import TestabilityHelper from "./TestabilityHelper"
 
 // @ts-check
-
-const claim = (wikidataId: string, type: string, value: unknown) => {
-  return {
-    [wikidataId]: [
-      {
-        mainsnak: {
-          snaktype: "value",
-          property: wikidataId,
-          datavalue: {
-            value,
-            type,
-          },
-        },
-      },
-    ],
-  }
-}
 
 class WikidataServiceTester {
   imposter = new Imposter().withPort(5001)
@@ -56,7 +39,7 @@ class WikidataServiceTester {
     })
   }
 
-  async stubWikidataEntity(wikidataId: string, claims: Record<string, unknown>) {
+  async stubWikidataEntity(wikidataId: string, claims: Claim[]) {
     return await this.stubWikidataApi(
       "wbgetentities",
       { ids: wikidataId },
@@ -65,17 +48,16 @@ class WikidataServiceTester {
   }
 
   async stubWikidataEntityLocation(wikidataId: string, latitude: number, longitude: number) {
-    return await this.stubWikidataEntity(
-      wikidataId,
-      claim("P625", "globecoordinate", { latitude, longitude }),
-    )
+    return await this.stubWikidataEntity(wikidataId, [
+      { claimId: "P625", type: "globecoordinate", value: { latitude, longitude } },
+    ])
   }
 
   async stubWikidataEntityPerson(wikidataId: string, countryOfOrigin: string, birthday: string) {
-    return await this.stubWikidataEntity(wikidataId, {
-      ...claim("P31", "wikibase-entityid", { id: "Q5" }),
-      ...claim("P569", "time", { time: birthday }),
-    })
+    return await this.stubWikidataEntity(wikidataId, [
+      { claimId: "P31", type: "wikibase-entityid", value: { id: "Q5" } },
+      { claimId: "P569", type: "time", value: { time: birthday } },
+    ])
   }
 
   async stubWikidataSearchResult(wikidataLabel: string, wikidataId: string) {
