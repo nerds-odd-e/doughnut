@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import lombok.SneakyThrows;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.util.UriComponentsBuilder;
 
 public record WikidataService(HttpClientAdapter httpClientAdapter, String wikidataUrl) {
@@ -25,16 +26,17 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     return UriComponentsBuilder.fromHttpUrl(wikidataUrl);
   }
 
-  public WikidataEntity fetchWikidata(String wikidataId) throws IOException, InterruptedException {
+  public Optional<WikidataEntity> fetchWikidata(String wikidataId)
+      throws IOException, InterruptedException {
     String responseBody = httpClientAdapter.getResponseString(ConstructWikidataUrl(wikidataId));
 
-    if (responseBody == null) {
-      return null;
+    if (Strings.isEmpty(responseBody)) {
+      return Optional.empty();
     }
 
     WikidataModel wikidataModel =
         getObjectMapper().readValue(responseBody, new TypeReference<>() {});
-    return wikidataModel.getWikidataEntity(wikidataId);
+    return Optional.of(wikidataModel.getWikidataEntity(wikidataId));
   }
 
   private URI ConstructWikidataUrl(String wikidataId) {
@@ -127,7 +129,7 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
   }
 
   @SneakyThrows
-  public String getTitle(WikidataValue wikiId) {
-    return fetchWikidata(wikiId.toWikiClass()).WikidataTitleInEnglish;
+  public Optional<String> getTitle(WikidataValue wikiId) {
+    return fetchWikidata(wikiId.toWikiClass()).map(e -> e.WikidataTitleInEnglish);
   }
 }

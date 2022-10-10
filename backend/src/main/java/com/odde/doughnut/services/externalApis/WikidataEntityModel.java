@@ -53,7 +53,7 @@ public class WikidataEntityModel {
     String description =
         Stream.of(
                 getFirstClaimOfProperty(wikidataId, WikidataFields.COUNTRY_OF_CITIZENSHIP)
-                    .map(service::getTitle)
+                    .flatMap(service::getTitle)
                     .orElse(""),
                 getFirstClaimOfProperty(wikidataId, WikidataFields.BIRTHDAY)
                     .map(WikidataValue::toDateDescription)

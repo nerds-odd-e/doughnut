@@ -7,6 +7,7 @@ import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Resource;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
@@ -31,7 +32,7 @@ public class RestWikidataController {
   }
 
   @GetMapping("/wikidata/{wikidataId}")
-  public WikidataEntity fetchWikidataByID(@PathVariable("wikidataId") String wikidataId)
+  public Optional<WikidataEntity> fetchWikidataByID(@PathVariable("wikidataId") String wikidataId)
       throws InterruptedException, BindException {
     try {
       return getWikidataService().fetchWikidata(wikidataId);
