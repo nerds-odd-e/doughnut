@@ -6,6 +6,23 @@ import TestabilityHelper from "./TestabilityHelper"
 
 // @ts-check
 
+const claim = (wikidataId: string, type: string, value: unknown) => {
+  return {
+    [wikidataId]: [
+      {
+        mainsnak: {
+          snaktype: "value",
+          property: wikidataId,
+          datavalue: {
+            value,
+            type,
+          },
+        },
+      },
+    ],
+  }
+}
+
 class WikidataServiceTester {
   imposter = new Imposter().withPort(5001)
   onGoingStubbing?: Promise<void>
@@ -38,23 +55,6 @@ class WikidataServiceTester {
     })
   }
 
-  claim(wikidataId: string, type: string, value: unknown) {
-    return {
-      [wikidataId]: [
-        {
-          mainsnak: {
-            snaktype: "value",
-            property: wikidataId,
-            datavalue: {
-              value,
-              type,
-            },
-          },
-        },
-      ],
-    }
-  }
-
   async stubWikidataEntity(wikidataId: string, claims: unknown) {
     return await this.stubByPathAndQuery(
       `/w/api.php`,
@@ -74,14 +74,14 @@ class WikidataServiceTester {
   async stubWikidataEntityLocation(wikidataId: string, latitude: number, longitude: number) {
     return await this.stubWikidataEntity(
       wikidataId,
-      this.claim("P625", "globecoordinate", { latitude, longitude }),
+      claim("P625", "globecoordinate", { latitude, longitude }),
     )
   }
 
   async stubWikidataEntityPerson(wikidataId: string, countryOfOrigin: string, birthday: string) {
     return await this.stubWikidataEntity(wikidataId, {
-      ...this.claim("P31", "wikibase-entityid", { id: "Q5" }),
-      ...this.claim("P569", "time", { time: birthday }),
+      ...claim("P31", "wikibase-entityid", { id: "Q5" }),
+      ...claim("P569", "time", { time: birthday }),
     })
   }
 
