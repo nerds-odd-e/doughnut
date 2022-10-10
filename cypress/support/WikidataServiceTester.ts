@@ -106,11 +106,18 @@ class WikidataServiceTester {
     )
   }
 
+  // each stub step in Gherkin will call mountebank API again,
+  // however only the last step will take affect.
+  // But we have to wait until the previous stubs are done.
+  // Alternatively, we can combine all stubs in one step, or have an additional step.
   private async stub(stub: Stub) {
     this.imposter.withStub(stub)
 
     if (this.onGoingStubbing) {
-      await this.onGoingStubbing
+      this.onGoingStubbing = this.onGoingStubbing.then(() =>
+        new Mountebank().createImposter(this.imposter),
+      )
+      return
     }
     this.onGoingStubbing = new Mountebank().createImposter(this.imposter)
   }
