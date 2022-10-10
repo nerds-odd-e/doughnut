@@ -2,6 +2,7 @@ import { Stub } from "@anev/ts-mountebank"
 /// <reference types="cypress" />
 
 import { Mountebank, Imposter, DefaultStub, HttpMethod, FlexiPredicate } from "@anev/ts-mountebank"
+import WikidataEntitiesBuilder from "./json/WikidataEntitiesBuilder"
 import TestabilityHelper from "./TestabilityHelper"
 
 // @ts-check
@@ -55,19 +56,11 @@ class WikidataServiceTester {
     })
   }
 
-  async stubWikidataEntity(wikidataId: string, claims: unknown) {
+  async stubWikidataEntity(wikidataId: string, claims: Record<string, unknown>) {
     return await this.stubByPathAndQuery(
       `/w/api.php`,
       { action: "wbgetentities", ids: wikidataId },
-      {
-        entities: {
-          [wikidataId]: {
-            type: "item",
-            id: wikidataId,
-            claims,
-          },
-        },
-      },
+      new WikidataEntitiesBuilder(wikidataId).wclaims(claims).build(),
     )
   }
 
