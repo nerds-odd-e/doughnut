@@ -542,10 +542,10 @@ Cypress.Commands.add(
   (
     wikidataServiceTester: WikidataServiceTester,
     wikidataId: string,
-    countryOfOrigin: string,
+    countryId: string,
     birthday: string,
   ) => {
-    wikidataServiceTester.stubWikidataEntityPerson(wikidataId, countryOfOrigin, birthday)
+    wikidataServiceTester.stubWikidataEntityPerson(wikidataId, countryId, birthday)
   },
 )
 

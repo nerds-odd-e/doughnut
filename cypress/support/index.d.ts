@@ -87,7 +87,7 @@ declare namespace Cypress {
     stubWikidataEntityLocation(wikidataId: string, lat: number, lng: number): Chainable<Subject>
     stubWikidataEntityPerson(
       wikidataId: string,
-      countryOfOrigin: string,
+      countryId: string,
       birthday: string,
     ): Chainable<Subject>
     stubWikidataEntityQuery(

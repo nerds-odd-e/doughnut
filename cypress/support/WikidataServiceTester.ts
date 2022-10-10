@@ -53,10 +53,11 @@ class WikidataServiceTester {
     ])
   }
 
-  async stubWikidataEntityPerson(wikidataId: string, countryOfOrigin: string, birthday: string) {
+  async stubWikidataEntityPerson(wikidataId: string, countryId: string, birthday: string) {
     return await this.stubWikidataEntity(wikidataId, [
       { claimId: "P31", type: "wikibase-entityid", value: { id: "Q5" } },
       { claimId: "P569", type: "time", value: { time: birthday } },
+      { claimId: "P27", type: "wikibase-entityid", value: { id: countryId } },
     ])
   }
 

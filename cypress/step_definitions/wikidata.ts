@@ -39,8 +39,8 @@ Given(
 
 Given(
   "Wikidata.org entity {string} is a person from {string} and birthday is {string}",
-  (wikidataId: string, countryOfOrigin: string, birthday: string) => {
-    cy.wikidataService().stubWikidataEntityPerson(wikidataId, countryOfOrigin, birthday)
+  (wikidataId: string, countryId: string, birthday: string) => {
+    cy.wikidataService().stubWikidataEntityPerson(wikidataId, countryId, birthday)
   },
 )
 
