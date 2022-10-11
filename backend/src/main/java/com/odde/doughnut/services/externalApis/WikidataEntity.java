@@ -46,18 +46,26 @@ public class WikidataEntity {
   }
 
   private Optional<String> getCountryDescription() {
-    return getFirstLocationClaimValue().map(WikidataValue::toLocationDescription);
+    return getFirstClaimValue("P625").map(WikidataValue::toLocationDescription);
   }
 
   public Optional<String> getDescription(WikidataApi wikidataApi) {
-    if (getInstanceOf().map(WikidataValue::isHuman).orElse(false)) {
+    if (getInstanceOfx().orElse(false)) {
       return getHumanDescription(wikidataApi);
     }
     return getCountryDescription();
   }
 
+  private Optional<Boolean> getInstanceOfx() {
+    return getInstanceOfy().map(x -> x.equals("Q5"));
+  }
+
+  private Optional<String> getInstanceOfy() {
+    return getInstanceOf().map(WikidataValue::toWikiClass);
+  }
+
   public Optional<Coordinate> getCoordinate() {
-    return getFirstLocationClaimValue().flatMap(WikidataValue::getCoordinate);
+    return getFirstClaimValue("P625").flatMap(WikidataValue::getCoordinate);
   }
 
   private Optional<WikidataValue> getBirthdayData() {
@@ -70,9 +78,5 @@ public class WikidataEntity {
 
   private Optional<WikidataValue> getInstanceOf() {
     return getFirstClaimValue("P31");
-  }
-
-  private Optional<WikidataValue> getFirstLocationClaimValue() {
-    return getFirstClaimValue("P625");
   }
 }
