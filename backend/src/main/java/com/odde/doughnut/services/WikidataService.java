@@ -8,7 +8,7 @@ import com.odde.doughnut.entities.Coordinate;
 import com.odde.doughnut.entities.json.WikidataEntityData;
 import com.odde.doughnut.entities.json.WikidataSearchEntity;
 import com.odde.doughnut.services.externalApis.WikidataEntityDataHash;
-import com.odde.doughnut.services.externalApis.WikidataEntityModel;
+import com.odde.doughnut.services.externalApis.WikidataEntityHash;
 import com.odde.doughnut.services.externalApis.WikidataSearchModel;
 import com.odde.doughnut.services.externalApis.WikidataValue;
 import java.io.IOException;
@@ -72,17 +72,17 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
 
   @SneakyThrows
   public Optional<String> getWikidataDescription(String wikidataId) {
-    return Optional.ofNullable(getEntityDataById(wikidataId))
+    return Optional.ofNullable(getEntityHashById(wikidataId))
         .flatMap(d -> d.getDescription(this, wikidataId));
   }
 
   @SneakyThrows
   public Optional<Coordinate> getWikidataCoordinate(String wikidataId) {
-    return Optional.ofNullable(getEntityDataById(wikidataId))
+    return Optional.ofNullable(getEntityHashById(wikidataId))
         .flatMap(d -> d.getCoordinate(wikidataId));
   }
 
-  public WikidataEntityModel getEntityDataById(String wikidataId)
+  public WikidataEntityHash getEntityHashById(String wikidataId)
       throws IOException, InterruptedException {
     String responseBody =
         queryWikidataApi(
