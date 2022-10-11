@@ -10,7 +10,6 @@ import static org.mockito.ArgumentMatchers.any;
 import com.odde.doughnut.entities.Link.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessories;
-import com.odde.doughnut.entities.NoteLocation;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.*;
 import com.odde.doughnut.exceptions.NoAccessRightException;
@@ -225,10 +224,8 @@ class RestNoteControllerTests {
 
         var note = controller.createNote(parent, noteCreation);
 
-        var expectedLocation = new NoteLocation();
-        expectedLocation.setLatitude(1.3);
-        expectedLocation.setLongitude(103.8);
-        assertThat(note.noteRealm.getNote().getLocation(), is(expectedLocation));
+        assertThat(note.noteRealm.getNote().getLocation().getLatitude(), equalTo(1.3));
+        assertThat(note.noteRealm.getNote().getLocation().getLongitude(), equalTo(103.8));
       }
 
       @Test

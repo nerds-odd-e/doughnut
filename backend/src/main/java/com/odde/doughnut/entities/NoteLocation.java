@@ -1,20 +1,37 @@
 package com.odde.doughnut.entities;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import javax.persistence.*;
+import lombok.*;
 
-@Embeddable
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Entity
+@Table(name = "location")
 public class NoteLocation {
+  @Id
+  @Getter
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Integer id;
+
+  @OneToOne(cascade = CascadeType.PERSIST)
+  @JoinColumn(name = "note_id", referencedColumnName = "id")
+  @Getter
+  private Note note;
 
   @Column(name = "latitude")
-  public Double latitude;
+  @Getter
+  @Setter
+  private Double latitude;
 
   @Column(name = "longitude")
-  public Double longitude;
+  @Getter
+  @Setter
+  private Double longitude;
+
+  public static NoteLocation build(Note note, Double latitude, Double longitude) {
+    NoteLocation noteLocation = new NoteLocation();
+    noteLocation.latitude = latitude;
+    noteLocation.longitude = longitude;
+    noteLocation.note = note;
+    note.setLocation(noteLocation);
+    return noteLocation;
+  }
 }

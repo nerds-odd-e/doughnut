@@ -8,7 +8,6 @@ import com.odde.doughnut.entities.Coordinate;
 import com.odde.doughnut.entities.json.WikidataEntity;
 import com.odde.doughnut.entities.json.WikidataSearchEntity;
 import com.odde.doughnut.services.externalApis.WikidataEntityModel;
-import com.odde.doughnut.services.externalApis.WikidataFields;
 import com.odde.doughnut.services.externalApis.WikidataModel;
 import com.odde.doughnut.services.externalApis.WikidataSearchModel;
 import com.odde.doughnut.services.externalApis.WikidataValue;
