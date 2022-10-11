@@ -26,41 +26,35 @@ public class WikidataEntityHash {
         .flatMap(WikidataValue::getCoordinate);
   }
 
-  public boolean isBook(String wikidataId) {
-    return getEntity(wikidataId)
-        .flatMap(x -> x.getFirstClaimOfProperty(WikidataFields.INSTANCE_OF.label))
-        .map(WikidataValue::toWikiClass)
-        .equals(Optional.of(WikidataItems.BOOK.label));
-  }
-
   public Optional<String> getDescription(WikidataService service, Optional<WikidataEntity> entity) {
-    if (entity
-        .flatMap(x -> x.getFirstClaimOfProperty(WikidataFields.INSTANCE_OF.label))
-        .map(WikidataValue::toWikiClass)
-        .equals(Optional.of(WikidataItems.HUMAN.label))) {
-      return getHumanDescription(service, entity);
+    if (entity.map(x -> isInstanceOf(x, WikidataItems.HUMAN)).orElse(false)) {
+      return entity.flatMap(x -> getHumanDescription(service, x));
     }
-    return getCountryDescription(entity);
+    return entity.flatMap(this::getCountryDescription);
   }
 
-  private Optional<String> getCountryDescription(Optional<WikidataEntity> entity) {
+  private boolean isInstanceOf(WikidataEntity entity, WikidataItems human) {
     return entity
-        .flatMap(x -> x.getFirstClaimOfProperty(WikidataFields.COORDINATE_LOCATION.label))
+        .getFirstClaimOfProperty(WikidataFields.INSTANCE_OF.label)
+        .map(WikidataValue::toWikiClass)
+        .equals(Optional.of(human.label));
+  }
+
+  private Optional<String> getCountryDescription(WikidataEntity entity) {
+    return entity
+        .getFirstClaimOfProperty(WikidataFields.COORDINATE_LOCATION.label)
         .map(WikidataValue::toLocationDescription);
   }
 
-  private Optional<String> getHumanDescription(
-      WikidataService service, Optional<WikidataEntity> entity) {
+  private Optional<String> getHumanDescription(WikidataService service, WikidataEntity entity) {
     String description =
         Stream.of(
                 entity
-                    .flatMap(
-                        x1 ->
-                            x1.getFirstClaimOfProperty(WikidataFields.COUNTRY_OF_CITIZENSHIP.label))
+                    .getFirstClaimOfProperty(WikidataFields.COUNTRY_OF_CITIZENSHIP.label)
                     .flatMap(service::getTitle)
                     .orElse(""),
                 entity
-                    .flatMap(x -> x.getFirstClaimOfProperty(WikidataFields.BIRTHDAY.label))
+                    .getFirstClaimOfProperty(WikidataFields.BIRTHDAY.label)
                     .map(WikidataValue::toDateDescription)
                     .orElse(""))
             .filter(value -> !value.isBlank())

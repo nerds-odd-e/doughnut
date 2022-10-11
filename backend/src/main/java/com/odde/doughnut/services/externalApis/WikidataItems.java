@@ -1,8 +1,7 @@
 package com.odde.doughnut.services.externalApis;
 
 public enum WikidataItems {
-  HUMAN("Q5"),
-  BOOK("Q47461344");
+  HUMAN("Q5");
 
   public final String label;
 
