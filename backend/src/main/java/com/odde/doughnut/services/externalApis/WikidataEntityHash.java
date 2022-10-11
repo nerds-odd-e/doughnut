@@ -11,9 +11,9 @@ import lombok.Setter;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WikidataEntityHash {
-  @Setter private Map<String, WikidataEntityItemModel> entities;
+  @Setter private Map<String, WikidataEntity> entities;
 
-  public Optional<WikidataEntityItemModel> getEntity(String wikidataId) {
+  public Optional<WikidataEntity> getEntity(String wikidataId) {
     if (entities == null || !entities.containsKey(wikidataId)) {
       return Optional.empty();
     }
@@ -33,8 +33,7 @@ public class WikidataEntityHash {
         .equals(Optional.of(WikidataItems.BOOK.label));
   }
 
-  public Optional<String> getDescription(WikidataService service, String wikidataId) {
-    Optional<WikidataEntityItemModel> entity = getEntity(wikidataId);
+  public Optional<String> getDescription(WikidataService service, Optional<WikidataEntity> entity) {
     if (entity
         .flatMap(x -> x.getFirstClaimOfProperty(WikidataFields.INSTANCE_OF.label))
         .map(WikidataValue::toWikiClass)
@@ -44,14 +43,14 @@ public class WikidataEntityHash {
     return getCountryDescription(entity);
   }
 
-  private Optional<String> getCountryDescription(Optional<WikidataEntityItemModel> entity) {
+  private Optional<String> getCountryDescription(Optional<WikidataEntity> entity) {
     return entity
         .flatMap(x -> x.getFirstClaimOfProperty(WikidataFields.COORDINATE_LOCATION.label))
         .map(WikidataValue::toLocationDescription);
   }
 
   private Optional<String> getHumanDescription(
-      WikidataService service, Optional<WikidataEntityItemModel> entity) {
+      WikidataService service, Optional<WikidataEntity> entity) {
     String description =
         Stream.of(
                 entity

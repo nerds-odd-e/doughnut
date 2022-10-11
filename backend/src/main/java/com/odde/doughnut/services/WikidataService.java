@@ -73,7 +73,10 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
   @SneakyThrows
   public Optional<String> getWikidataDescription(String wikidataId) {
     return Optional.ofNullable(getEntityHashById(wikidataId))
-        .flatMap(d -> d.getDescription(this, wikidataId));
+        .flatMap(
+            d -> {
+              return d.getDescription(this, d.getEntity(wikidataId));
+            });
   }
 
   @SneakyThrows

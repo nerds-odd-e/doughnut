@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class WikidataEntityItemModel {
+public class WikidataEntity {
   private String type;
   private String id;
   Map<String, List<WikidataEntityItemObjectModel>> claims;
