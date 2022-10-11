@@ -17,18 +17,19 @@ import lombok.SneakyThrows;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.util.UriComponentsBuilder;
 
-public record WikidataService(HttpClientAdapter httpClientAdapter, String wikidataUrl) {
-  public WikidataService(WikidataApi wikidataApi) {
-    this(wikidataApi.getHttpClientAdapter(), wikidataApi.getWikidataUrl());
+public record WikidataService(WikidataApi wikidataApi) {
+  public WikidataService(HttpClientAdapter httpClientAdapter, String wikidataUrl) {
+    this(new WikidataApi(httpClientAdapter, wikidataUrl));
   }
 
   private UriComponentsBuilder wikidataUriBuilder() {
-    return UriComponentsBuilder.fromHttpUrl(wikidataUrl);
+    return UriComponentsBuilder.fromHttpUrl(wikidataApi.getWikidataUrl());
   }
 
   public Optional<WikidataEntityData> fetchWikidataEntityData(String wikidataId)
       throws IOException, InterruptedException {
-    String responseBody = httpClientAdapter.getResponseString(ConstructWikidataUrl(wikidataId));
+    String responseBody =
+        wikidataApi.getHttpClientAdapter().getResponseString(ConstructWikidataUrl(wikidataId));
 
     if (Strings.isEmpty(responseBody)) {
       return Optional.empty();
@@ -111,7 +112,7 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
       throws IOException, InterruptedException {
     URI uri =
         uriBuilder.apply(wikidataUriBuilder().path("/w/api.php").queryParam("action", action));
-    return httpClientAdapter.getResponseString(uri);
+    return wikidataApi.getHttpClientAdapter().getResponseString(uri);
   }
 
   @SneakyThrows
