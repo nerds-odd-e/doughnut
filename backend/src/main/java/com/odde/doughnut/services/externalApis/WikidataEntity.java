@@ -30,7 +30,7 @@ public class WikidataEntity {
   private Optional<String> getHumanDescription(WikidataApi wikidataApi) {
     String description =
         Stream.of(
-                getFirstClaimValue("P27")
+                getCountryOfOriginValue()
                     .map(WikidataValue::toWikiClass)
                     .flatMap(
                         wikidataId ->
@@ -38,7 +38,7 @@ public class WikidataEntity {
                                 .getWikidataEntityData(wikidataId)
                                 .map(e -> e.WikidataTitleInEnglish))
                     .orElse(""),
-                getFirstClaimValue("P569").map(WikidataValue::toDateDescription).orElse(""))
+                getBirthdayData().map(WikidataValue::toDateDescription).orElse(""))
             .filter(value -> !value.isBlank())
             .collect(Collectors.joining(", "));
 
@@ -58,6 +58,14 @@ public class WikidataEntity {
 
   public Optional<Coordinate> getCoordinate() {
     return getFirstLocationClaimValue().flatMap(WikidataValue::getCoordinate);
+  }
+
+  private Optional<WikidataValue> getBirthdayData() {
+    return getFirstClaimValue("P569");
+  }
+
+  private Optional<WikidataValue> getCountryOfOriginValue() {
+    return getFirstClaimValue("P27");
   }
 
   private Optional<WikidataValue> getInstanceOf() {
