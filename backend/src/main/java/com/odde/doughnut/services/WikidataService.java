@@ -1,8 +1,6 @@
 package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.odde.doughnut.entities.Coordinate;
 import com.odde.doughnut.entities.json.WikidataEntityData;
@@ -14,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import lombok.SneakyThrows;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.util.UriComponentsBuilder;
 
 public record WikidataService(WikidataApi wikidataApi) {
@@ -22,35 +19,11 @@ public record WikidataService(WikidataApi wikidataApi) {
     this(new WikidataApi(httpClientAdapter, wikidataUrl));
   }
 
-  private UriComponentsBuilder wikidataUriBuilder() {
-    return UriComponentsBuilder.fromHttpUrl(wikidataApi.getWikidataUrl());
-  }
-
   public Optional<WikidataEntityData> fetchWikidataEntityData(String wikidataId)
       throws IOException, InterruptedException {
-    String responseBody =
-        wikidataApi.getHttpClientAdapter().getResponseString(ConstructWikidataUrl(wikidataId));
-
-    if (Strings.isEmpty(responseBody)) {
-      return Optional.empty();
-    }
-
-    WikidataEntityDataHash wikidataEntityDataHash =
-        getObjectMapper().readValue(responseBody, new TypeReference<>() {});
-    return Optional.of(wikidataEntityDataHash.getWikidataEntity(wikidataId));
-  }
-
-  private URI ConstructWikidataUrl(String wikidataId) {
-    return wikidataUriBuilder()
-        .path("/wiki/Special:EntityData/" + wikidataId + ".json")
-        .build()
-        .toUri();
-  }
-
-  private ObjectMapper getObjectMapper() {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    return mapper;
+    return wikidataApi
+        .fetchWikidataEntityDataHash(wikidataId)
+        .map(x -> x.getWikidataEntity(wikidataId));
   }
 
   public List<WikidataSearchEntity> fetchWikidataByQuery(String search)
@@ -68,7 +41,7 @@ public record WikidataService(WikidataApi wikidataApi) {
                     .queryParam("limit", 10)
                     .build(search)));
     WikidataSearchModel entities =
-        getObjectMapper().readValue(responseBody, new TypeReference<>() {});
+        wikidataApi.getObjectMapper().readValue(responseBody, new TypeReference<>() {});
     return entities.getWikidataSearchEntities();
   }
 
@@ -102,7 +75,7 @@ public record WikidataService(WikidataApi wikidataApi) {
                     .build(wikidataId));
     if (responseBody == null) return null;
     try {
-      return getObjectMapper().readValue(responseBody, new TypeReference<>() {});
+      return wikidataApi.getObjectMapper().readValue(responseBody, new TypeReference<>() {});
     } catch (MismatchedInputException e) {
       return null;
     }
@@ -111,7 +84,8 @@ public record WikidataService(WikidataApi wikidataApi) {
   private String queryWikidataApi(String action, Function<UriComponentsBuilder, URI> uriBuilder)
       throws IOException, InterruptedException {
     URI uri =
-        uriBuilder.apply(wikidataUriBuilder().path("/w/api.php").queryParam("action", action));
+        uriBuilder.apply(
+            wikidataApi.wikidataUriBuilder().path("/w/api.php").queryParam("action", action));
     return wikidataApi.getHttpClientAdapter().getResponseString(uri);
   }
 
