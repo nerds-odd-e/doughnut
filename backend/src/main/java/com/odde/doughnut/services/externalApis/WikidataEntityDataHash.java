@@ -1,14 +1,14 @@
 package com.odde.doughnut.services.externalApis;
 
-import com.odde.doughnut.entities.json.WikidataEntity;
+import com.odde.doughnut.entities.json.WikidataEntityData;
 import java.util.Map;
 
-public class WikidataModel {
+public class WikidataEntityDataHash {
   public Map<String, WikidataInfo> entities;
 
-  public WikidataEntity getWikidataEntity(String wikidataId) {
+  public WikidataEntityData getWikidataEntity(String wikidataId) {
     WikidataInfo wikidataInfo = entities.get(wikidataId);
-    return new WikidataEntity(
+    return new WikidataEntityData(
         wikidataInfo.GetEnglishTitle(), wikidataInfo.GetEnglishWikipediaUrl());
   }
 }

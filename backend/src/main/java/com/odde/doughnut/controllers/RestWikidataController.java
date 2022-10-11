@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.entities.json.WikidataEntity;
+import com.odde.doughnut.entities.json.WikidataEntityData;
 import com.odde.doughnut.entities.json.WikidataSearchEntity;
 import com.odde.doughnut.services.HttpClientAdapter;
 import com.odde.doughnut.services.WikidataService;
@@ -32,10 +32,10 @@ public class RestWikidataController {
   }
 
   @GetMapping("/wikidata/{wikidataId}")
-  public Optional<WikidataEntity> fetchWikidataByID(@PathVariable("wikidataId") String wikidataId)
-      throws InterruptedException, BindException {
+  public Optional<WikidataEntityData> fetchWikidataEntityDataByID(
+      @PathVariable("wikidataId") String wikidataId) throws InterruptedException, BindException {
     try {
-      return getWikidataService().fetchWikidata(wikidataId);
+      return getWikidataService().fetchWikidataEntityData(wikidataId);
     } catch (IOException e) {
       throw buildWikidataServiceNotAvailableException("wikidataId");
     }

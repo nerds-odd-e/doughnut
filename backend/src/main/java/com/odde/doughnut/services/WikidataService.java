@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.odde.doughnut.entities.Coordinate;
-import com.odde.doughnut.entities.json.WikidataEntity;
+import com.odde.doughnut.entities.json.WikidataEntityData;
 import com.odde.doughnut.entities.json.WikidataSearchEntity;
+import com.odde.doughnut.services.externalApis.WikidataEntityDataHash;
 import com.odde.doughnut.services.externalApis.WikidataEntityModel;
-import com.odde.doughnut.services.externalApis.WikidataModel;
 import com.odde.doughnut.services.externalApis.WikidataSearchModel;
 import com.odde.doughnut.services.externalApis.WikidataValue;
 import java.io.IOException;
@@ -25,7 +25,7 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     return UriComponentsBuilder.fromHttpUrl(wikidataUrl);
   }
 
-  public Optional<WikidataEntity> fetchWikidata(String wikidataId)
+  public Optional<WikidataEntityData> fetchWikidataEntityData(String wikidataId)
       throws IOException, InterruptedException {
     String responseBody = httpClientAdapter.getResponseString(ConstructWikidataUrl(wikidataId));
 
@@ -33,9 +33,9 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
       return Optional.empty();
     }
 
-    WikidataModel wikidataModel =
+    WikidataEntityDataHash wikidataEntityDataHash =
         getObjectMapper().readValue(responseBody, new TypeReference<>() {});
-    return Optional.of(wikidataModel.getWikidataEntity(wikidataId));
+    return Optional.of(wikidataEntityDataHash.getWikidataEntity(wikidataId));
   }
 
   private URI ConstructWikidataUrl(String wikidataId) {
@@ -110,6 +110,6 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
 
   @SneakyThrows
   public Optional<String> getTitle(WikidataValue wikiId) {
-    return fetchWikidata(wikiId.toWikiClass()).map(e -> e.WikidataTitleInEnglish);
+    return fetchWikidataEntityData(wikiId.toWikiClass()).map(e -> e.WikidataTitleInEnglish);
   }
 }
