@@ -1,11 +1,9 @@
 package com.odde.doughnut.services.externalApis;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.odde.doughnut.entities.json.WikidataEntityData;
 import com.odde.doughnut.services.HttpClientAdapter;
+import com.odde.doughnut.services.QueryBuilder;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Optional;
@@ -14,15 +12,14 @@ import lombok.SneakyThrows;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.util.UriComponentsBuilder;
 
-public record WikidataApi(HttpClientAdapter httpClientAdapter, String wikidataUrl) {
-  private UriComponentsBuilder wikidataUriBuilder() {
-    return UriComponentsBuilder.fromHttpUrl(wikidataUrl);
+public record WikidataApi(
+    HttpClientAdapter httpClientAdapter, String wikidataUrl, QueryBuilder queryBuilder) {
+  public WikidataApi(HttpClientAdapter httpClientAdapter, String wikidataUrl) {
+    this(httpClientAdapter, wikidataUrl, new QueryBuilder());
   }
 
-  private ObjectMapper getObjectMapper() {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    return mapper;
+  private UriComponentsBuilder wikidataUriBuilder() {
+    return UriComponentsBuilder.fromHttpUrl(wikidataUrl);
   }
 
   private String queryWikidataApi(String action, Function<UriComponentsBuilder, URI> uriBuilder)
@@ -46,7 +43,7 @@ public record WikidataApi(HttpClientAdapter httpClientAdapter, String wikidataUr
                     .queryParam("type", "item")
                     .queryParam("limit", 10)
                     .build(search)));
-    return getObjectMapper().readValue(responseBody, new TypeReference<>() {});
+    return new WikidataObjectMapper().getWikidataSearchModel(responseBody);
   }
 
   public WikidataEntityHash getEntityHashById(String wikidataId)
@@ -62,7 +59,7 @@ public record WikidataApi(HttpClientAdapter httpClientAdapter, String wikidataUr
                     .build(wikidataId));
     if (responseBody == null) return null;
     try {
-      return getObjectMapper().readValue(responseBody, new TypeReference<>() {});
+      return new WikidataObjectMapper().getWikidataEntityHash(responseBody);
     } catch (MismatchedInputException e) {
       return null;
     }
@@ -80,7 +77,7 @@ public record WikidataApi(HttpClientAdapter httpClientAdapter, String wikidataUr
       return Optional.empty();
     }
     WikidataEntityDataHash result =
-        getObjectMapper().readValue(responseBody, new TypeReference<>() {});
+        new WikidataObjectMapper().getWikidataEntityDataHash(responseBody);
     return Optional.of(result.getWikidataEntity(wikidataId));
   }
 }
