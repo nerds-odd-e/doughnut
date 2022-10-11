@@ -13,31 +13,28 @@ public record WikidataApi(QueryBuilder queryBuilder) {
     return queryBuilder.path("/w/api.php").queryParam("action", action);
   }
 
-  public WikidataSearchModel getWikidataSearchEntities(String search)
+  public WikidataSearchResult getWikidataSearchEntities(String search)
       throws IOException, InterruptedException {
-    String responseBody =
-        queryWikidataApi("wbsearchentities")
-            .queryParam("search", "{search}")
-            .queryParam("format", "json")
-            .queryParam("language", "en")
-            .queryParam("uselang", "en")
-            .queryParam("type", "item")
-            .queryParam("limit", 10)
-            .query(search);
-    return new WikidataObjectMapper().getWikidataSearchModel(responseBody);
+    return queryWikidataApi("wbsearchentities")
+        .queryParam("search", "{search}")
+        .queryParam("format", "json")
+        .queryParam("language", "en")
+        .queryParam("uselang", "en")
+        .queryParam("type", "item")
+        .queryParam("limit", 10)
+        .queryResult(search)
+        .mapToObject(WikidataSearchResult.class);
   }
 
   public WikidataEntityHash getEntityHashById(String wikidataId)
       throws IOException, InterruptedException {
-    String responseBody =
-        queryWikidataApi("wbgetentities")
-            .queryParam("ids", wikidataId)
-            .queryParam("format", "json")
-            .queryParam("props", "claims")
-            .query();
-    if (responseBody == null) return null;
     try {
-      return new WikidataObjectMapper().getWikidataEntityHash(responseBody);
+      return queryWikidataApi("wbgetentities")
+          .queryParam("ids", wikidataId)
+          .queryParam("format", "json")
+          .queryParam("props", "claims")
+          .queryResult()
+          .mapToObject(WikidataEntityHash.class);
     } catch (MismatchedInputException e) {
       return null;
     }
@@ -48,7 +45,7 @@ public record WikidataApi(QueryBuilder queryBuilder) {
     return queryBuilder
         .path("/wiki/Special:EntityData/" + wikidataId + ".json")
         .queryResult()
-        .mapToObject(WikidataEntityDataHash.class)
+        .mapToOptional(WikidataEntityDataHash.class)
         .map(hash -> hash.getWikidataEntity(wikidataId));
   }
 }

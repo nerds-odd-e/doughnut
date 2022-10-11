@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class WikidataSearchModel {
+public class WikidataSearchResult {
   public List<Map<String, Object>> search;
 
   public List<WikidataSearchEntity> getWikidataSearchEntities() {
