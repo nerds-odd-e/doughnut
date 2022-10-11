@@ -7,10 +7,7 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.odde.doughnut.entities.Coordinate;
 import com.odde.doughnut.entities.json.WikidataEntityData;
 import com.odde.doughnut.entities.json.WikidataSearchEntity;
-import com.odde.doughnut.services.externalApis.WikidataEntityDataHash;
-import com.odde.doughnut.services.externalApis.WikidataEntityHash;
-import com.odde.doughnut.services.externalApis.WikidataSearchModel;
-import com.odde.doughnut.services.externalApis.WikidataValue;
+import com.odde.doughnut.services.externalApis.*;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
@@ -73,13 +70,13 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
   @SneakyThrows
   public Optional<String> getWikidataDescription(String wikidataId) {
     return Optional.ofNullable(getEntityHashById(wikidataId))
-        .flatMap(d -> d.getEntity(wikidataId).flatMap(x -> d.getDescription(this, x)));
+        .flatMap(d -> d.getEntity(wikidataId).flatMap(x -> x.getDescription(this)));
   }
 
   @SneakyThrows
   public Optional<Coordinate> getWikidataCoordinate(String wikidataId) {
     return Optional.ofNullable(getEntityHashById(wikidataId))
-        .flatMap(d -> d.getEntity(wikidataId).flatMap(d::getCoordinate));
+        .flatMap(d -> d.getEntity(wikidataId).flatMap(WikidataEntity::getCoordinate));
   }
 
   public WikidataEntityHash getEntityHashById(String wikidataId)
