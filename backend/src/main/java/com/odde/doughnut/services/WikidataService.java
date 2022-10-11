@@ -18,6 +18,10 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.util.UriComponentsBuilder;
 
 public record WikidataService(HttpClientAdapter httpClientAdapter, String wikidataUrl) {
+  public WikidataService(WikidataApi wikidataApi) {
+    this(wikidataApi.getHttpClientAdapter(), wikidataApi.getWikidataUrl());
+  }
+
   private UriComponentsBuilder wikidataUriBuilder() {
     return UriComponentsBuilder.fromHttpUrl(wikidataUrl);
   }
