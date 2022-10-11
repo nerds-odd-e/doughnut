@@ -1,18 +1,21 @@
 package com.odde.doughnut.entities;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 @Entity
 @Table(name = "location")
 public class NoteLocation {
   @Id
-  @Getter
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @JsonIgnore
   private Integer id;
 
   @OneToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "note_id", referencedColumnName = "id")
+  @JsonIgnore
   @Getter
   private Note note;
 

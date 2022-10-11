@@ -17,9 +17,10 @@ public class DoughnutApplication {
     if (!"testDBMigrate".equals(System.getProperty("odd-e.doughnut.task"))) {
       return;
     }
-    Flyway flyway = run.getBean(Flyway.class);
-    flyway.repair();
-    flyway.migrate();
-    run.close();
+    try (run) {
+      Flyway flyway = run.getBean(Flyway.class);
+      flyway.repair();
+      flyway.migrate();
+    }
   }
 }
