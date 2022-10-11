@@ -79,7 +79,7 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
   @SneakyThrows
   public Optional<Coordinate> getWikidataCoordinate(String wikidataId) {
     return Optional.ofNullable(getEntityHashById(wikidataId))
-        .flatMap(d -> d.getCoordinate(wikidataId));
+        .flatMap(d -> d.getEntity(wikidataId).flatMap(d::getCoordinate));
   }
 
   public WikidataEntityHash getEntityHashById(String wikidataId)

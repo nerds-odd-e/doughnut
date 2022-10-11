@@ -20,11 +20,7 @@ public class WikidataEntityHash {
     return Optional.of(entities.get(wikidataId));
   }
 
-  public Optional<Coordinate> getCoordinate(String wikidataId) {
-    return getEntity(wikidataId).flatMap(this::getCoordinateX);
-  }
-
-  public Optional<Coordinate> getCoordinateX(WikidataEntity entity) {
+  public Optional<Coordinate> getCoordinate(WikidataEntity entity) {
     return entity
         .getFirstClaimOfProperty(WikidataFields.COORDINATE_LOCATION.label)
         .flatMap(WikidataValue::getCoordinate);
