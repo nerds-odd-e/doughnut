@@ -21,16 +21,20 @@ public class WikidataEntityHash {
   }
 
   public Optional<Coordinate> getCoordinate(String wikidataId) {
-    return getEntity(wikidataId)
-        .flatMap(x -> x.getFirstClaimOfProperty(WikidataFields.COORDINATE_LOCATION.label))
+    return getEntity(wikidataId).flatMap(this::getCoordinateX);
+  }
+
+  public Optional<Coordinate> getCoordinateX(WikidataEntity entity) {
+    return entity
+        .getFirstClaimOfProperty(WikidataFields.COORDINATE_LOCATION.label)
         .flatMap(WikidataValue::getCoordinate);
   }
 
-  public Optional<String> getDescription(WikidataService service, Optional<WikidataEntity> entity) {
-    if (entity.map(x -> isInstanceOf(x, WikidataItems.HUMAN)).orElse(false)) {
-      return entity.flatMap(x -> getHumanDescription(service, x));
+  public Optional<String> getDescription(WikidataService service, WikidataEntity entity) {
+    if (isInstanceOf(entity, WikidataItems.HUMAN)) {
+      return getHumanDescription(service, entity);
     }
-    return entity.flatMap(this::getCountryDescription);
+    return getCountryDescription(entity);
   }
 
   private boolean isInstanceOf(WikidataEntity entity, WikidataItems human) {
