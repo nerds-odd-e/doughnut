@@ -7,19 +7,22 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lombok.Data;
+import lombok.Setter;
 
-@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WikidataEntityHash {
-  private Map<String, WikidataEntityItemModel> entities;
+  @Setter private Map<String, WikidataEntityItemModel> entities;
 
   public Optional<WikidataValue> getFirstClaimOfProperty(
       String wikidataId, WikidataFields propertyId) {
+    return getEntity(wikidataId).flatMap(x -> x.getFirstClaimOfProperty(propertyId.label));
+  }
+
+  private Optional<WikidataEntityItemModel> getEntity(String wikidataId) {
     if (entities == null || !entities.containsKey(wikidataId)) {
       return Optional.empty();
     }
-    return entities.get(wikidataId).getFirstClaimOfProperty(propertyId.label);
+    return Optional.of(entities.get(wikidataId));
   }
 
   public Optional<Coordinate> getCoordinate(String wikidataId) {
@@ -28,14 +31,18 @@ public class WikidataEntityHash {
   }
 
   public boolean isBook(String wikidataId) {
-    return getWikiClass(wikidataId).equals(Optional.of(WikidataItems.BOOK.label));
+    return getFirstClaimOfProperty(wikidataId, WikidataFields.INSTANCE_OF)
+        .map(WikidataValue::toWikiClass)
+        .equals(Optional.of(WikidataItems.BOOK.label));
   }
 
   public Optional<String> getDescription(WikidataService service, String wikidataId) {
 
     Optional<String> description;
 
-    if (getWikiClass(wikidataId).equals(Optional.of(WikidataItems.HUMAN.label))) {
+    if (getFirstClaimOfProperty(wikidataId, WikidataFields.INSTANCE_OF)
+        .map(WikidataValue::toWikiClass)
+        .equals(Optional.of(WikidataItems.HUMAN.label))) {
       description = getHumanDescription(service, wikidataId);
     } else {
       description = getCountryDescription(wikidataId);
@@ -62,10 +69,5 @@ public class WikidataEntityHash {
             .collect(Collectors.joining(", "));
 
     return Optional.of(description);
-  }
-
-  private Optional<String> getWikiClass(String wikidataId) {
-    return getFirstClaimOfProperty(wikidataId, WikidataFields.INSTANCE_OF)
-        .map(WikidataValue::toWikiClass);
   }
 }
