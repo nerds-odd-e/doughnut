@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/wikidata")
 public class RestWikidataController {
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
@@ -31,7 +31,7 @@ public class RestWikidataController {
     this.httpClientAdapter = httpClientAdapter;
   }
 
-  @GetMapping("/wikidata/{wikidataId}")
+  @GetMapping("/entity-data/{wikidataId}")
   public Optional<WikidataEntityData> fetchWikidataEntityDataByID(
       @PathVariable("wikidataId") String wikidataId) throws InterruptedException, BindException {
     try {
@@ -41,7 +41,7 @@ public class RestWikidataController {
     }
   }
 
-  @GetMapping("/wikidata/search/{search}")
+  @GetMapping("/search/{search}")
   public List<WikidataSearchEntity> searchWikidata(@PathVariable("search") String search)
       throws InterruptedException, BindException {
     try {

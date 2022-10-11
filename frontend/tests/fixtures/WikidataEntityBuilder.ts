@@ -1,7 +1,7 @@
 import Builder from "./Builder";
 
-class WikidataEntityBuilder extends Builder<Generated.WikidataEntity> {
-  data: Generated.WikidataEntity;
+class WikidataEntityBuilder extends Builder<Generated.WikidataEntityData> {
+  data: Generated.WikidataEntityData;
 
   constructor() {
     super();

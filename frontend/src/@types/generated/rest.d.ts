@@ -144,7 +144,7 @@ declare namespace Generated {
         wikidataId: string;
     }
 
-    interface WikidataEntity {
+    interface WikidataEntityData {
         WikidataTitleInEnglish: string;
         WikipediaEnglishUrl: string;
     }
