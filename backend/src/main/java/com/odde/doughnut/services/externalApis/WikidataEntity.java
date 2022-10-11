@@ -35,7 +35,12 @@ public class WikidataEntity {
     String description =
         Stream.of(
                 getFirstClaimOfProperty(WikidataFields.COUNTRY_OF_CITIZENSHIP.label)
-                    .flatMap(wikidataApi::getTitleOfWikidataId)
+                    .map(WikidataValue::toWikiClass)
+                    .flatMap(
+                        wikidataId ->
+                            wikidataApi
+                                .getWikidataEntityData(wikidataId)
+                                .map(e -> e.WikidataTitleInEnglish))
                     .orElse(""),
                 getFirstClaimOfProperty(WikidataFields.BIRTHDAY.label)
                     .map(WikidataValue::toDateDescription)

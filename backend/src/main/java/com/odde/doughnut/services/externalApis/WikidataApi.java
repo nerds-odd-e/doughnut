@@ -19,13 +19,6 @@ public record WikidataApi(HttpClientAdapter httpClientAdapter, String wikidataUr
     return UriComponentsBuilder.fromHttpUrl(wikidataUrl);
   }
 
-  private URI constructWikidataUrl(String wikidataId) {
-    return wikidataUriBuilder()
-        .path("/wiki/Special:EntityData/" + wikidataId + ".json")
-        .build()
-        .toUri();
-  }
-
   private ObjectMapper getObjectMapper() {
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -75,19 +68,19 @@ public record WikidataApi(HttpClientAdapter httpClientAdapter, String wikidataUr
     }
   }
 
-  public Optional<WikidataEntityData> getWikidataEntityData(String wikidataId)
-      throws IOException, InterruptedException {
-    String responseBody = httpClientAdapter.getResponseString(constructWikidataUrl(wikidataId));
+  @SneakyThrows
+  public Optional<WikidataEntityData> getWikidataEntityData(String wikidataId) {
+    URI uri =
+        wikidataUriBuilder()
+            .path("/wiki/Special:EntityData/" + wikidataId + ".json")
+            .build()
+            .toUri();
+    String responseBody = httpClientAdapter.getResponseString(uri);
     if (Strings.isEmpty(responseBody)) {
       return Optional.empty();
     }
     WikidataEntityDataHash result =
         getObjectMapper().readValue(responseBody, new TypeReference<>() {});
     return Optional.of(result.getWikidataEntity(wikidataId));
-  }
-
-  @SneakyThrows
-  public Optional<String> getTitleOfWikidataId(WikidataValue wikiId) {
-    return getWikidataEntityData(wikiId.toWikiClass()).map(e -> e.WikidataTitleInEnglish);
   }
 }

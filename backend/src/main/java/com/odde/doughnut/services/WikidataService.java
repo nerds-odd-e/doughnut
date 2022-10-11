@@ -16,7 +16,7 @@ public record WikidataService(WikidataApi wikidataApi) {
   }
 
   public Optional<WikidataEntityData> fetchWikidataEntityData(String wikidataId)
-      throws IOException, InterruptedException {
+      throws IOException {
     return wikidataApi.getWikidataEntityData(wikidataId);
   }
 
