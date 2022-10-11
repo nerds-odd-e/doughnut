@@ -72,7 +72,9 @@ class RestNoteController {
 
   @SneakyThrows
   private void associateToWikidata(Note note, String wikidataId) {
-    modelFactoryService.toNoteModel(note).associateWithWikidataId(wikidataId, getWikidataService());
+    note.setWikidataId(wikidataId);
+    modelFactoryService.toNoteModel(note).checkDuplicateWikidataId();
+    getWikidataService().extractWikidataInfoToNote(wikidataId, note);
   }
 
   @GetMapping("/{note}")

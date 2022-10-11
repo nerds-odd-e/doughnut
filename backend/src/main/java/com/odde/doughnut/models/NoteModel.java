@@ -2,7 +2,6 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.services.WikidataService;
 import java.sql.Timestamp;
 import java.util.List;
 import org.apache.logging.log4j.util.Strings;
@@ -44,7 +43,7 @@ public class NoteModel {
     modelFactoryService.noteRepository.save(entity);
   }
 
-  private void checkDuplicateWikidataId() throws BindException {
+  public void checkDuplicateWikidataId() throws BindException {
     if (Strings.isEmpty(entity.getWikidataId())) {
       return;
     }
@@ -56,12 +55,5 @@ public class NoteModel {
       bindingResult.rejectValue(null, "error.error", "Duplicate Wikidata ID Detected.");
       throw new BindException(bindingResult);
     }
-  }
-
-  public void associateWithWikidataId(String wikidataId, WikidataService wikidataService)
-      throws BindException {
-    entity.setWikidataId(wikidataId);
-    checkDuplicateWikidataId();
-    wikidataService.extractWikidataInfoToNote(wikidataId, entity);
   }
 }
