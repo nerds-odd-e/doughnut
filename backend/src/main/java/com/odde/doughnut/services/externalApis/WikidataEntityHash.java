@@ -11,7 +11,7 @@ import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class WikidataEntityModel {
+public class WikidataEntityHash {
   private Map<String, WikidataEntityItemModel> entities;
 
   public Optional<WikidataValue> getFirstClaimOfProperty(

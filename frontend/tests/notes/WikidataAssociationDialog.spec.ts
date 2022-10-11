@@ -28,7 +28,7 @@ describe("Save wikidata id", () => {
         .please();
 
       helper.apiMock
-        .expectingGet(`/api/wikidata/${wikidataId}`)
+        .expectingGet(`/api/wikidata/entity-data/${wikidataId}`)
         .andReturnOnce(wikidata);
 
       if (shouldSave) {
