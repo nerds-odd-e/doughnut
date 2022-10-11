@@ -27,23 +27,22 @@ public class WikidataEntity {
     return listOfItems.get(0).getValue();
   }
 
-  public Optional<String> getHumanDescription(WikidataApi wikidataApi) {
-    String description =
-        Stream.of(
-                getCountryOfOriginValue()
-                  .flatMap(wikidataId -> wikidataId.fetchEnglishTitleFromApi(wikidataApi)),
-                getBirthdayData().map(WikidataValue::toDateDescription))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-          .filter(value -> !value.isBlank())
-          .collect(Collectors.joining(", "));
-
-    return Optional.of(description);
+  public String getHumanDescription(WikidataApi wikidataApi) {
+    return Stream.of(
+            getCountryOfOriginValue()
+                .flatMap(wikidataId -> wikidataId.fetchEnglishTitleFromApi(wikidataApi)),
+            getBirthdayData().map(WikidataDate::format))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .filter(value -> !value.isBlank())
+        .collect(Collectors.joining(", "));
   }
 
   public Optional<String> getCountryDescription() {
-    return getFirstClaimValue("P625").map(WikidataValue::toLocationDescription);
+    return getFirstClaimValue("P625")
+        .map(wikidataValue -> wikidataValue.toLocationDescription(wikidataValue.getCoordinate()));
   }
+
   public Optional<WikidataId> getInstanceOf() {
     return getFirstClaimValue("P31").map(WikidataValue::toWikiClass);
   }
@@ -52,8 +51,8 @@ public class WikidataEntity {
     return getFirstClaimValue("P625").flatMap(WikidataValue::getCoordinate);
   }
 
-  private Optional<WikidataValue> getBirthdayData() {
-    return getFirstClaimValue("P569");
+  private Optional<WikidataDate> getBirthdayData() {
+    return getFirstClaimValue("P569").map(WikidataValue::toDateDescription);
   }
 
   private Optional<WikidataId> getCountryOfOriginValue() {

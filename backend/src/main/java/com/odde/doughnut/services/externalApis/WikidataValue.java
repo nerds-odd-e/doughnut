@@ -67,14 +67,14 @@ public class WikidataValue {
     return "globecoordinate".compareToIgnoreCase(type) == 0;
   }
 
-  public String toLocationDescription() {
-    return getCoordinate()
+  public String toLocationDescription(Optional<Coordinate> coordinate) {
+    return coordinate
         .map(c -> "Location: %s'N, %s'E".formatted(c.latitude(), c.longitude()))
         .orElseGet(() -> "Location: " + stringValue);
   }
 
-  public String toDateDescription() {
-    return timeValue;
+  public WikidataDate toDateDescription() {
+    return new WikidataDate(timeValue);
   }
 
   public WikidataId toWikiClass() {

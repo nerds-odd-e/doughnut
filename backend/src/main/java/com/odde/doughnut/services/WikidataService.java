@@ -34,7 +34,7 @@ public record WikidataService(WikidataApi wikidataApi) {
         .flatMap(
             x -> {
               if (x.getInstanceOf().map(WikidataId::isHuman).orElse(false)) {
-                return x.getHumanDescription(wikidataApi);
+                return Optional.of(x.getHumanDescription(wikidataApi));
               }
               return x.getCountryDescription();
             });
