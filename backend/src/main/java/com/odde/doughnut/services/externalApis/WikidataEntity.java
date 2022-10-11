@@ -27,36 +27,24 @@ public class WikidataEntity {
     return listOfItems.get(0).getValue();
   }
 
-  private Optional<String> getHumanDescription(WikidataApi wikidataApi) {
+  public Optional<String> getHumanDescription(WikidataApi wikidataApi) {
     String description =
         Stream.of(
                 getCountryOfOriginValue()
-                    .map(WikidataValue::toWikiClass)
-                    .flatMap(
-                        wikidataId ->
-                            wikidataApi
-                                .getWikidataEntityData(wikidataId.wikidataId())
-                                .map(e -> e.WikidataTitleInEnglish))
-                    .orElse(""),
-                getBirthdayData().map(WikidataValue::toDateDescription).orElse(""))
-            .filter(value -> !value.isBlank())
-            .collect(Collectors.joining(", "));
+                  .flatMap(wikidataId -> wikidataId.fetchEnglishTitleFromApi(wikidataApi)),
+                getBirthdayData().map(WikidataValue::toDateDescription))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+          .filter(value -> !value.isBlank())
+          .collect(Collectors.joining(", "));
 
     return Optional.of(description);
   }
 
-  private Optional<String> getCountryDescription() {
+  public Optional<String> getCountryDescription() {
     return getFirstClaimValue("P625").map(WikidataValue::toLocationDescription);
   }
-
-  public Optional<String> getDescription(WikidataApi wikidataApi) {
-    if (getInstanceOf().map(WikidataId::isHuman).orElse(false)) {
-      return getHumanDescription(wikidataApi);
-    }
-    return getCountryDescription();
-  }
-
-  private Optional<WikidataId> getInstanceOf() {
+  public Optional<WikidataId> getInstanceOf() {
     return getFirstClaimValue("P31").map(WikidataValue::toWikiClass);
   }
 
@@ -68,7 +56,7 @@ public class WikidataEntity {
     return getFirstClaimValue("P569");
   }
 
-  private Optional<WikidataValue> getCountryOfOriginValue() {
-    return getFirstClaimValue("P27");
+  private Optional<WikidataId> getCountryOfOriginValue() {
+    return getFirstClaimValue("P27").map(WikidataValue::toWikiClass);
   }
 }

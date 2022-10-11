@@ -444,7 +444,7 @@ class RestNoteControllerTests {
         mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO, "Q736936", "");
         noteCreation.setWikidataId(wikidataIdOfHuman);
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
-        assertEquals(note.noteRealm.getNote().getTextContent().getDescription(), birthdayYear);
+        assertEquals(birthdayYear, note.noteRealm.getNote().getTextContent().getDescription());
       }
 
       @Test

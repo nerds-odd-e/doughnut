@@ -30,7 +30,14 @@ public record WikidataService(WikidataApi wikidataApi) {
 
   @SneakyThrows
   public Optional<String> fetchWikidataDescription(String wikidataId) {
-    return getWikidataEntity(wikidataId).flatMap(x -> x.getDescription(wikidataApi));
+    return getWikidataEntity(wikidataId)
+        .flatMap(
+            x -> {
+              if (x.getInstanceOf().map(WikidataId::isHuman).orElse(false)) {
+                return x.getHumanDescription(wikidataApi);
+              }
+              return x.getCountryDescription();
+            });
   }
 
   @SneakyThrows
