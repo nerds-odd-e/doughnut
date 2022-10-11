@@ -1,8 +1,7 @@
 package com.odde.doughnut.entities;
 
-import javax.persistence.*;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import javax.persistence.*;
 import lombok.*;
 
 @Entity
@@ -16,7 +15,7 @@ public class NoteLocation {
   @OneToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "note_id", referencedColumnName = "id")
   @JsonIgnore
-  @Getter
+  @Setter
   private Note note;
 
   @Column(name = "latitude")
@@ -28,13 +27,4 @@ public class NoteLocation {
   @Getter
   @Setter
   private Double longitude;
-
-  public static NoteLocation build(Note note, Double latitude, Double longitude) {
-    NoteLocation noteLocation = new NoteLocation();
-    noteLocation.latitude = latitude;
-    noteLocation.longitude = longitude;
-    noteLocation.note = note;
-    note.setLocation(noteLocation);
-    return noteLocation;
-  }
 }

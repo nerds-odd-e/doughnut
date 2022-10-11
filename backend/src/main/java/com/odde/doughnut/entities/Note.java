@@ -70,6 +70,14 @@ public class Note extends Thingy {
   @JsonIgnore
   private Timestamp deletedAt;
 
+  public void buildLocation(Coordinate coordinate) {
+    NoteLocation noteLocation = new NoteLocation();
+    noteLocation.setLatitude(coordinate.latitude());
+    noteLocation.setLongitude(coordinate.longitude());
+    noteLocation.setNote(this);
+    this.setLocation(noteLocation);
+  }
+
   public void setDeletedAt(Timestamp value) {
     this.deletedAt = value;
     if (this.thing != null) this.thing.setDeletedAt(value);
