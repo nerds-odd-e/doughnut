@@ -83,25 +83,6 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
         .flatMap(d -> d.getCoordinate(wikidataId));
   }
 
-  public Optional<String> getAuthorQid(String wikidataId) {
-    WikidataEntityModel wikidataEntity = null;
-    try {
-      wikidataEntity = getEntityDataById(wikidataId);
-    } catch (Exception e) {
-    }
-
-    if (wikidataEntity != null && wikidataEntity.isBook(wikidataId)) {
-      var optionalAuthor =
-          wikidataEntity.getFirstClaimOfProperty(wikidataId, WikidataFields.AUTHOR);
-
-      if (optionalAuthor.isPresent()) {
-        return Optional.of(optionalAuthor.get().toWikiClass());
-      }
-    }
-
-    return Optional.empty();
-  }
-
   public WikidataEntityModel getEntityDataById(String wikidataId)
       throws IOException, InterruptedException {
     String responseBody =

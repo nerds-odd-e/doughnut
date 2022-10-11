@@ -66,7 +66,6 @@ class RestNoteController {
     associateToWikidata(note, noteCreation.wikidataId);
     note.buildLinkToParent(user, noteCreation.getLinkTypeToParent(), currentUTCTimestamp);
     modelFactoryService.noteRepository.save(note);
-    getWikidataService().getAuthorQid(noteCreation.wikidataId);
 
     return NoteRealmWithPosition.fromNote(note, user);
   }
