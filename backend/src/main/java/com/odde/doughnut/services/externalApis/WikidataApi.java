@@ -15,7 +15,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 public record WikidataApi(
     HttpClientAdapter httpClientAdapter, String wikidataUrl, QueryBuilder queryBuilder) {
   public WikidataApi(HttpClientAdapter httpClientAdapter, String wikidataUrl) {
-    this(httpClientAdapter, wikidataUrl, new QueryBuilder());
+    this(httpClientAdapter, wikidataUrl, new QueryBuilder(httpClientAdapter, wikidataUrl));
   }
 
   private UriComponentsBuilder wikidataUriBuilder() {
@@ -26,7 +26,7 @@ public record WikidataApi(
       throws IOException, InterruptedException {
     URI uri =
         uriBuilder.apply(wikidataUriBuilder().path("/w/api.php").queryParam("action", action));
-    return httpClientAdapter.getResponseString(uri);
+    return queryBuilder.query(uri);
   }
 
   public WikidataSearchModel getWikidataSearchEntities(String search)
@@ -72,7 +72,7 @@ public record WikidataApi(
             .path("/wiki/Special:EntityData/" + wikidataId + ".json")
             .build()
             .toUri();
-    String responseBody = httpClientAdapter.getResponseString(uri);
+    String responseBody = queryBuilder.query(uri);
     if (Strings.isEmpty(responseBody)) {
       return Optional.empty();
     }
