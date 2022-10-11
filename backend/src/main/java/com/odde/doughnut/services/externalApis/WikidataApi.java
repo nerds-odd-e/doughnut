@@ -2,22 +2,12 @@ package com.odde.doughnut.services.externalApis;
 
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.odde.doughnut.entities.json.WikidataEntityData;
-import com.odde.doughnut.services.HttpClientAdapter;
 import com.odde.doughnut.services.QueryBuilder;
 import java.io.IOException;
 import java.util.Optional;
 import lombok.SneakyThrows;
-import org.apache.logging.log4j.util.Strings;
-import org.springframework.web.util.UriComponentsBuilder;
 
-public record WikidataApi(
-    HttpClientAdapter httpClientAdapter, String wikidataUrl, QueryBuilder queryBuilder) {
-  public WikidataApi(HttpClientAdapter httpClientAdapter, String wikidataUrl) {
-    this(
-        httpClientAdapter,
-        wikidataUrl,
-        new QueryBuilder(httpClientAdapter, UriComponentsBuilder.fromHttpUrl(wikidataUrl)));
-  }
+public record WikidataApi(QueryBuilder queryBuilder) {
 
   private QueryBuilder queryWikidataApi(String action) {
     return queryBuilder.path("/w/api.php").queryParam("action", action);
@@ -55,13 +45,10 @@ public record WikidataApi(
 
   @SneakyThrows
   public Optional<WikidataEntityData> getWikidataEntityData(String wikidataId) {
-    String responseBody =
-        queryBuilder.path("/wiki/Special:EntityData/" + wikidataId + ".json").query();
-    if (Strings.isEmpty(responseBody)) {
-      return Optional.empty();
-    }
-    WikidataEntityDataHash result =
-        new WikidataObjectMapper().getWikidataEntityDataHash(responseBody);
-    return Optional.of(result.getWikidataEntity(wikidataId));
+    return queryBuilder
+        .path("/wiki/Special:EntityData/" + wikidataId + ".json")
+        .queryResult()
+        .mapToObject(WikidataEntityDataHash.class)
+        .map(hash -> hash.getWikidataEntity(wikidataId));
   }
 }

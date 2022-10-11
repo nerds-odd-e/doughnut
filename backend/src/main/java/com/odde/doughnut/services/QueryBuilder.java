@@ -22,4 +22,8 @@ public record QueryBuilder(
   public String query(Object... uriVariables) throws IOException, InterruptedException {
     return httpClientAdapter.getResponseString(uriComponentsBuilder.build(uriVariables));
   }
+
+  public QueryResult queryResult() throws IOException, InterruptedException {
+    return new QueryResult(query());
+  }
 }

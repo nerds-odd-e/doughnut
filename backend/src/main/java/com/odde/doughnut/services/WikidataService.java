@@ -9,10 +9,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import lombok.SneakyThrows;
+import org.springframework.web.util.UriComponentsBuilder;
 
 public record WikidataService(WikidataApi wikidataApi) {
   public WikidataService(HttpClientAdapter httpClientAdapter, String wikidataUrl) {
-    this(new WikidataApi(httpClientAdapter, wikidataUrl));
+    this(
+        new WikidataApi(
+            new QueryBuilder(httpClientAdapter, UriComponentsBuilder.fromHttpUrl(wikidataUrl))));
   }
 
   public Optional<WikidataEntityData> fetchWikidataEntityData(String wikidataId)
