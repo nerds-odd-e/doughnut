@@ -35,7 +35,7 @@ public class WikidataEntity {
                     .flatMap(
                         wikidataId ->
                             wikidataApi
-                                .getWikidataEntityData(wikidataId)
+                                .getWikidataEntityData(wikidataId.wikidataId())
                                 .map(e -> e.WikidataTitleInEnglish))
                     .orElse(""),
                 getBirthdayData().map(WikidataValue::toDateDescription).orElse(""))
@@ -50,18 +50,14 @@ public class WikidataEntity {
   }
 
   public Optional<String> getDescription(WikidataApi wikidataApi) {
-    if (getInstanceOfx().orElse(false)) {
+    if (getInstanceOf().map(WikidataId::isHuman).orElse(false)) {
       return getHumanDescription(wikidataApi);
     }
     return getCountryDescription();
   }
 
-  private Optional<Boolean> getInstanceOfx() {
-    return getInstanceOfy().map(x -> x.equals("Q5"));
-  }
-
-  private Optional<String> getInstanceOfy() {
-    return getInstanceOf().map(WikidataValue::toWikiClass);
+  private Optional<WikidataId> getInstanceOf() {
+    return getFirstClaimValue("P31").map(WikidataValue::toWikiClass);
   }
 
   public Optional<Coordinate> getCoordinate() {
@@ -74,9 +70,5 @@ public class WikidataEntity {
 
   private Optional<WikidataValue> getCountryOfOriginValue() {
     return getFirstClaimValue("P27");
-  }
-
-  private Optional<WikidataValue> getInstanceOf() {
-    return getFirstClaimValue("P31");
   }
 }

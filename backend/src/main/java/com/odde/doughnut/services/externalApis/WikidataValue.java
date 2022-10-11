@@ -77,8 +77,8 @@ public class WikidataValue {
     return timeValue;
   }
 
-  public String toWikiClass() {
-    return wikiClass;
+  public WikidataId toWikiClass() {
+    return new WikidataId(wikiClass);
   }
 
   String getStringValue() {
