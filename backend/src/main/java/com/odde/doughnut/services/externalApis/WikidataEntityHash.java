@@ -13,12 +13,7 @@ import lombok.Setter;
 public class WikidataEntityHash {
   @Setter private Map<String, WikidataEntityItemModel> entities;
 
-  public Optional<WikidataValue> getFirstClaimOfProperty(
-      String wikidataId, WikidataFields propertyId) {
-    return getEntity(wikidataId).flatMap(x -> x.getFirstClaimOfProperty(propertyId.label));
-  }
-
-  private Optional<WikidataEntityItemModel> getEntity(String wikidataId) {
+  public Optional<WikidataEntityItemModel> getEntity(String wikidataId) {
     if (entities == null || !entities.containsKey(wikidataId)) {
       return Optional.empty();
     }
@@ -26,43 +21,47 @@ public class WikidataEntityHash {
   }
 
   public Optional<Coordinate> getCoordinate(String wikidataId) {
-    return getFirstClaimOfProperty(wikidataId, WikidataFields.COORDINATE_LOCATION)
+    return getEntity(wikidataId)
+        .flatMap(x -> x.getFirstClaimOfProperty(WikidataFields.COORDINATE_LOCATION.label))
         .flatMap(WikidataValue::getCoordinate);
   }
 
   public boolean isBook(String wikidataId) {
-    return getFirstClaimOfProperty(wikidataId, WikidataFields.INSTANCE_OF)
+    return getEntity(wikidataId)
+        .flatMap(x -> x.getFirstClaimOfProperty(WikidataFields.INSTANCE_OF.label))
         .map(WikidataValue::toWikiClass)
         .equals(Optional.of(WikidataItems.BOOK.label));
   }
 
   public Optional<String> getDescription(WikidataService service, String wikidataId) {
-
-    Optional<String> description;
-
-    if (getFirstClaimOfProperty(wikidataId, WikidataFields.INSTANCE_OF)
+    Optional<WikidataEntityItemModel> entity = getEntity(wikidataId);
+    if (entity
+        .flatMap(x -> x.getFirstClaimOfProperty(WikidataFields.INSTANCE_OF.label))
         .map(WikidataValue::toWikiClass)
         .equals(Optional.of(WikidataItems.HUMAN.label))) {
-      description = getHumanDescription(service, wikidataId);
-    } else {
-      description = getCountryDescription(wikidataId);
+      return getHumanDescription(service, entity);
     }
-
-    return description;
+    return getCountryDescription(entity);
   }
 
-  private Optional<String> getCountryDescription(String wikidataId) {
-    return getFirstClaimOfProperty(wikidataId, WikidataFields.COORDINATE_LOCATION)
+  private Optional<String> getCountryDescription(Optional<WikidataEntityItemModel> entity) {
+    return entity
+        .flatMap(x -> x.getFirstClaimOfProperty(WikidataFields.COORDINATE_LOCATION.label))
         .map(WikidataValue::toLocationDescription);
   }
 
-  private Optional<String> getHumanDescription(WikidataService service, String wikidataId) {
+  private Optional<String> getHumanDescription(
+      WikidataService service, Optional<WikidataEntityItemModel> entity) {
     String description =
         Stream.of(
-                getFirstClaimOfProperty(wikidataId, WikidataFields.COUNTRY_OF_CITIZENSHIP)
+                entity
+                    .flatMap(
+                        x1 ->
+                            x1.getFirstClaimOfProperty(WikidataFields.COUNTRY_OF_CITIZENSHIP.label))
                     .flatMap(service::getTitle)
                     .orElse(""),
-                getFirstClaimOfProperty(wikidataId, WikidataFields.BIRTHDAY)
+                entity
+                    .flatMap(x -> x.getFirstClaimOfProperty(WikidataFields.BIRTHDAY.label))
                     .map(WikidataValue::toDateDescription)
                     .orElse(""))
             .filter(value -> !value.isBlank())
