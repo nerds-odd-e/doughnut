@@ -63,7 +63,7 @@ public class NoteModel {
     entity.setWikidataId(wikidataId);
     checkDuplicateWikidataId();
 
-    wikidataService.getWikidataDescription(wikidataId).ifPresent(entity::prependDescription);
-    wikidataService.getWikidataCoordinate(wikidataId).ifPresent(entity::buildLocation);
+    wikidataService.fetchWikidataDescription(wikidataId).ifPresent(entity::prependDescription);
+    wikidataService.fetchWikidataCoordinate(wikidataId).ifPresent(entity::buildLocation);
   }
 }

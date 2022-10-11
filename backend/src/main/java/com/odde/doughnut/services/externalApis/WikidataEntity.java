@@ -2,7 +2,6 @@ package com.odde.doughnut.services.externalApis;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.odde.doughnut.entities.Coordinate;
-import com.odde.doughnut.services.WikidataService;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -32,11 +31,11 @@ public class WikidataEntity {
     return locationClaims.get(0).getValue();
   }
 
-  private Optional<String> getHumanDescription(WikidataService service) {
+  private Optional<String> getHumanDescription(WikidataApi wikidataApi) {
     String description =
         Stream.of(
                 getFirstClaimOfProperty(WikidataFields.COUNTRY_OF_CITIZENSHIP.label)
-                    .flatMap(service::getTitle)
+                    .flatMap(wikidataApi::getTitleOfWikidataId)
                     .orElse(""),
                 getFirstClaimOfProperty(WikidataFields.BIRTHDAY.label)
                     .map(WikidataValue::toDateDescription)
@@ -58,9 +57,9 @@ public class WikidataEntity {
         .equals(Optional.of(human.label));
   }
 
-  public Optional<String> getDescription(WikidataService service) {
+  public Optional<String> getDescription(WikidataApi wikidataApi) {
     if (isInstanceOf(WikidataItems.HUMAN)) {
-      return getHumanDescription(service);
+      return getHumanDescription(wikidataApi);
     }
     return getCountryDescription();
   }

@@ -4,11 +4,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import com.odde.doughnut.entities.json.WikidataEntityData;
 import com.odde.doughnut.services.HttpClientAdapter;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Optional;
 import java.util.function.Function;
+import lombok.SneakyThrows;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -35,15 +37,6 @@ public record WikidataApi(HttpClientAdapter httpClientAdapter, String wikidataUr
     URI uri =
         uriBuilder.apply(wikidataUriBuilder().path("/w/api.php").queryParam("action", action));
     return httpClientAdapter.getResponseString(uri);
-  }
-
-  public Optional<WikidataEntityDataHash> fetchWikidataEntityDataHash(String wikidataId)
-      throws IOException, InterruptedException {
-    String responseBody = httpClientAdapter.getResponseString(constructWikidataUrl(wikidataId));
-    if (Strings.isEmpty(responseBody)) {
-      return Optional.empty();
-    }
-    return Optional.of(getObjectMapper().readValue(responseBody, new TypeReference<>() {}));
   }
 
   public WikidataSearchModel getWikidataSearchEntities(String search)
@@ -80,5 +73,21 @@ public record WikidataApi(HttpClientAdapter httpClientAdapter, String wikidataUr
     } catch (MismatchedInputException e) {
       return null;
     }
+  }
+
+  public Optional<WikidataEntityData> getWikidataEntityData(String wikidataId)
+      throws IOException, InterruptedException {
+    String responseBody = httpClientAdapter.getResponseString(constructWikidataUrl(wikidataId));
+    if (Strings.isEmpty(responseBody)) {
+      return Optional.empty();
+    }
+    WikidataEntityDataHash result =
+        getObjectMapper().readValue(responseBody, new TypeReference<>() {});
+    return Optional.of(result.getWikidataEntity(wikidataId));
+  }
+
+  @SneakyThrows
+  public Optional<String> getTitleOfWikidataId(WikidataValue wikiId) {
+    return getWikidataEntityData(wikiId.toWikiClass()).map(e -> e.WikidataTitleInEnglish);
   }
 }

@@ -16,9 +16,7 @@ public record WikidataService(WikidataApi wikidataApi) {
 
   public Optional<WikidataEntityData> fetchWikidataEntityData(String wikidataId)
       throws IOException, InterruptedException {
-    return wikidataApi
-        .fetchWikidataEntityDataHash(wikidataId)
-        .map(hash -> hash.getWikidataEntity(wikidataId));
+    return wikidataApi.getWikidataEntityData(wikidataId);
   }
 
   public List<WikidataSearchEntity> fetchWikidataByQuery(String search)
@@ -27,12 +25,12 @@ public record WikidataService(WikidataApi wikidataApi) {
   }
 
   @SneakyThrows
-  public Optional<String> getWikidataDescription(String wikidataId) {
-    return getWikidataEntity(wikidataId).flatMap(x -> x.getDescription(this));
+  public Optional<String> fetchWikidataDescription(String wikidataId) {
+    return getWikidataEntity(wikidataId).flatMap(x -> x.getDescription(wikidataApi));
   }
 
   @SneakyThrows
-  public Optional<Coordinate> getWikidataCoordinate(String wikidataId) {
+  public Optional<Coordinate> fetchWikidataCoordinate(String wikidataId) {
     return getWikidataEntity(wikidataId).flatMap(WikidataEntity::getCoordinate);
   }
 
@@ -41,10 +39,5 @@ public record WikidataService(WikidataApi wikidataApi) {
     WikidataEntityHash entityHash = wikidataApi.getEntityHashById(wikidataId);
     if (entityHash == null) return Optional.empty();
     return entityHash.getEntity(wikidataId);
-  }
-
-  @SneakyThrows
-  public Optional<String> getTitle(WikidataValue wikiId) {
-    return fetchWikidataEntityData(wikiId.toWikiClass()).map(e -> e.WikidataTitleInEnglish);
   }
 }
