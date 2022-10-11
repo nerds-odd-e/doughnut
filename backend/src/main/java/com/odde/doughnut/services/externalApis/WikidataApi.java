@@ -5,9 +5,7 @@ import com.odde.doughnut.entities.json.WikidataEntityData;
 import com.odde.doughnut.services.HttpClientAdapter;
 import com.odde.doughnut.services.QueryBuilder;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Optional;
-import java.util.function.Function;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -15,48 +13,38 @@ import org.springframework.web.util.UriComponentsBuilder;
 public record WikidataApi(
     HttpClientAdapter httpClientAdapter, String wikidataUrl, QueryBuilder queryBuilder) {
   public WikidataApi(HttpClientAdapter httpClientAdapter, String wikidataUrl) {
-    this(httpClientAdapter, wikidataUrl, new QueryBuilder(httpClientAdapter, wikidataUrl));
+    this(
+        httpClientAdapter,
+        wikidataUrl,
+        new QueryBuilder(httpClientAdapter, UriComponentsBuilder.fromHttpUrl(wikidataUrl)));
   }
 
-  private UriComponentsBuilder wikidataUriBuilder() {
-    return UriComponentsBuilder.fromHttpUrl(wikidataUrl);
-  }
-
-  private String queryWikidataApi(String action, Function<UriComponentsBuilder, URI> uriBuilder)
-      throws IOException, InterruptedException {
-    URI uri =
-        uriBuilder.apply(wikidataUriBuilder().path("/w/api.php").queryParam("action", action));
-    return queryBuilder.query(uri);
+  private QueryBuilder queryWikidataApi(String action) {
+    return queryBuilder.path("/w/api.php").queryParam("action", action);
   }
 
   public WikidataSearchModel getWikidataSearchEntities(String search)
       throws IOException, InterruptedException {
     String responseBody =
-        queryWikidataApi(
-            "wbsearchentities",
-            (uriComponentsBuilder ->
-                uriComponentsBuilder
-                    .queryParam("search", "{search}")
-                    .queryParam("format", "json")
-                    .queryParam("language", "en")
-                    .queryParam("uselang", "en")
-                    .queryParam("type", "item")
-                    .queryParam("limit", 10)
-                    .build(search)));
+        queryWikidataApi("wbsearchentities")
+            .queryParam("search", "{search}")
+            .queryParam("format", "json")
+            .queryParam("language", "en")
+            .queryParam("uselang", "en")
+            .queryParam("type", "item")
+            .queryParam("limit", 10)
+            .query(search);
     return new WikidataObjectMapper().getWikidataSearchModel(responseBody);
   }
 
   public WikidataEntityHash getEntityHashById(String wikidataId)
       throws IOException, InterruptedException {
     String responseBody =
-        queryWikidataApi(
-            "wbgetentities",
-            (builder) ->
-                builder
-                    .queryParam("ids", "{id}")
-                    .queryParam("format", "json")
-                    .queryParam("props", "claims")
-                    .build(wikidataId));
+        queryWikidataApi("wbgetentities")
+            .queryParam("ids", wikidataId)
+            .queryParam("format", "json")
+            .queryParam("props", "claims")
+            .query();
     if (responseBody == null) return null;
     try {
       return new WikidataObjectMapper().getWikidataEntityHash(responseBody);
@@ -67,12 +55,8 @@ public record WikidataApi(
 
   @SneakyThrows
   public Optional<WikidataEntityData> getWikidataEntityData(String wikidataId) {
-    URI uri =
-        wikidataUriBuilder()
-            .path("/wiki/Special:EntityData/" + wikidataId + ".json")
-            .build()
-            .toUri();
-    String responseBody = queryBuilder.query(uri);
+    String responseBody =
+        queryBuilder.path("/wiki/Special:EntityData/" + wikidataId + ".json").query();
     if (Strings.isEmpty(responseBody)) {
       return Optional.empty();
     }
