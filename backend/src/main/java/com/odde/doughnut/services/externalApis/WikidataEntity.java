@@ -14,27 +14,23 @@ import lombok.Data;
 public class WikidataEntity {
   private String type;
   private String id;
-  Map<String, List<WikidataEntityItemObjectModel>> claims;
+  Map<String, List<WikidataClaimItem>> claims;
 
-  private List<WikidataEntityItemObjectModel> getProperty(String propertyId) {
+  private Optional<WikidataValue> getFirstClaimValue(String propertyId) {
     if (claims == null) {
-      return null;
-    }
-    return claims.getOrDefault(propertyId, null);
-  }
-
-  private Optional<WikidataValue> getFirstClaimOfProperty(String propertyId) {
-    List<WikidataEntityItemObjectModel> locationClaims = getProperty(propertyId);
-    if (locationClaims == null) {
       return Optional.empty();
     }
-    return locationClaims.get(0).getValue();
+    List<WikidataClaimItem> listOfItems = claims.getOrDefault(propertyId, null);
+    if (listOfItems == null || listOfItems.isEmpty()) {
+      return Optional.empty();
+    }
+    return listOfItems.get(0).getValue();
   }
 
   private Optional<String> getHumanDescription(WikidataApi wikidataApi) {
     String description =
         Stream.of(
-                getFirstClaimOfProperty(WikidataFields.COUNTRY_OF_CITIZENSHIP.label)
+                getFirstClaimValue("P27")
                     .map(WikidataValue::toWikiClass)
                     .flatMap(
                         wikidataId ->
@@ -42,9 +38,7 @@ public class WikidataEntity {
                                 .getWikidataEntityData(wikidataId)
                                 .map(e -> e.WikidataTitleInEnglish))
                     .orElse(""),
-                getFirstClaimOfProperty(WikidataFields.BIRTHDAY.label)
-                    .map(WikidataValue::toDateDescription)
-                    .orElse(""))
+                getFirstClaimValue("P569").map(WikidataValue::toDateDescription).orElse(""))
             .filter(value -> !value.isBlank())
             .collect(Collectors.joining(", "));
 
@@ -52,12 +46,11 @@ public class WikidataEntity {
   }
 
   private Optional<String> getCountryDescription() {
-    return getFirstClaimOfProperty(WikidataFields.COORDINATE_LOCATION.label)
-        .map(WikidataValue::toLocationDescription);
+    return getFirstLocationClaimValue().map(WikidataValue::toLocationDescription);
   }
 
   private boolean isInstanceOf(WikidataItems human) {
-    return getFirstClaimOfProperty(WikidataFields.INSTANCE_OF.label)
+    return getFirstClaimValue("P31")
         .map(WikidataValue::toWikiClass)
         .equals(Optional.of(human.label));
   }
@@ -70,7 +63,10 @@ public class WikidataEntity {
   }
 
   public Optional<Coordinate> getCoordinate() {
-    return getFirstClaimOfProperty(WikidataFields.COORDINATE_LOCATION.label)
-        .flatMap(WikidataValue::getCoordinate);
+    return getFirstLocationClaimValue().flatMap(WikidataValue::getCoordinate);
+  }
+
+  private Optional<WikidataValue> getFirstLocationClaimValue() {
+    return getFirstClaimValue("P625");
   }
 }

@@ -7,7 +7,7 @@ import java.util.Optional;
 import lombok.Data;
 
 @Data
-public class WikidataEntityItemObjectModel {
+public class WikidataClaimItem {
   static String DATAVALUE_KEY = "datavalue";
   static String VALUE_KEY = "value";
   static String VALUE_TYPE_KEY = "type";
