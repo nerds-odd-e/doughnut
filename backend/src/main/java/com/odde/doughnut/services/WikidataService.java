@@ -69,17 +69,22 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
 
   @SneakyThrows
   public Optional<String> getWikidataDescription(String wikidataId) {
-    return Optional.ofNullable(getEntityHashById(wikidataId))
-        .flatMap(d -> d.getEntity(wikidataId).flatMap(x -> x.getDescription(this)));
+    return getWikidataEntity(wikidataId).flatMap(x -> x.getDescription(this));
   }
 
   @SneakyThrows
   public Optional<Coordinate> getWikidataCoordinate(String wikidataId) {
-    return Optional.ofNullable(getEntityHashById(wikidataId))
-        .flatMap(d -> d.getEntity(wikidataId).flatMap(WikidataEntity::getCoordinate));
+    return getWikidataEntity(wikidataId).flatMap(WikidataEntity::getCoordinate);
   }
 
-  public WikidataEntityHash getEntityHashById(String wikidataId)
+  private Optional<WikidataEntity> getWikidataEntity(String wikidataId)
+      throws IOException, InterruptedException {
+    WikidataEntityHash entityHash = getEntityHashById(wikidataId);
+    if (entityHash == null) return Optional.empty();
+    return entityHash.getEntity(wikidataId);
+  }
+
+  private WikidataEntityHash getEntityHashById(String wikidataId)
       throws IOException, InterruptedException {
     String responseBody =
         queryWikidataApi(
