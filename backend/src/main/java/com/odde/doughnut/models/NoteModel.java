@@ -62,8 +62,6 @@ public class NoteModel {
       throws BindException {
     entity.setWikidataId(wikidataId);
     checkDuplicateWikidataId();
-
-    wikidataService.fetchWikidataDescription(wikidataId).ifPresent(entity::prependDescription);
-    wikidataService.fetchWikidataCoordinate(wikidataId).ifPresent(entity::buildLocation);
+    wikidataService.extractWikidataInfoToNote(wikidataId, entity);
   }
 }

@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.Coordinate;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.WikidataEntityData;
 import com.odde.doughnut.entities.json.WikidataSearchEntity;
 import com.odde.doughnut.services.externalApis.*;
@@ -39,5 +40,10 @@ public record WikidataService(WikidataApi wikidataApi) {
     WikidataEntityHash entityHash = wikidataApi.getEntityHashById(wikidataId);
     if (entityHash == null) return Optional.empty();
     return entityHash.getEntity(wikidataId);
+  }
+
+  public void extractWikidataInfoToNote(String wikidataId, Note note) {
+    fetchWikidataDescription(wikidataId).ifPresent(note::prependDescription);
+    fetchWikidataCoordinate(wikidataId).ifPresent(note::buildLocation);
   }
 }
