@@ -49,14 +49,8 @@ public class WikidataEntity {
     return getFirstLocationClaimValue().map(WikidataValue::toLocationDescription);
   }
 
-  private boolean isInstanceOf(WikidataItems human) {
-    return getFirstClaimValue("P31")
-        .map(WikidataValue::toWikiClass)
-        .equals(Optional.of(human.label));
-  }
-
   public Optional<String> getDescription(WikidataApi wikidataApi) {
-    if (isInstanceOf(WikidataItems.HUMAN)) {
+    if (getInstanceOf().map(WikidataValue::isHuman).orElse(false)) {
       return getHumanDescription(wikidataApi);
     }
     return getCountryDescription();
@@ -64,6 +58,10 @@ public class WikidataEntity {
 
   public Optional<Coordinate> getCoordinate() {
     return getFirstLocationClaimValue().flatMap(WikidataValue::getCoordinate);
+  }
+
+  private Optional<WikidataValue> getInstanceOf() {
+    return getFirstClaimValue("P31");
   }
 
   private Optional<WikidataValue> getFirstLocationClaimValue() {

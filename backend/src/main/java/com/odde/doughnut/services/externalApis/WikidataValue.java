@@ -94,4 +94,8 @@ public class WikidataValue {
 
     return Optional.empty();
   }
+
+  boolean isHuman() {
+    return toWikiClass().equals("Q5");
+  }
 }
