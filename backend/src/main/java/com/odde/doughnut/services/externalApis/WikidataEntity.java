@@ -5,15 +5,11 @@ import com.odde.doughnut.entities.Coordinate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WikidataEntity {
-  private String type;
-  private String id;
   Map<String, List<WikidataClaimItem>> claims;
 
   private Optional<WikidataValue> getFirstClaimValue(String propertyId) {
@@ -27,20 +23,8 @@ public class WikidataEntity {
     return listOfItems.get(0).getValue();
   }
 
-  public String getHumanDescription(WikidataApi wikidataApi) {
-    return Stream.of(
-            getCountryOfOriginValue()
-                .flatMap(wikidataId -> wikidataId.fetchEnglishTitleFromApi(wikidataApi)),
-            getBirthdayData().map(WikidataDate::format))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .filter(value -> !value.isBlank())
-        .collect(Collectors.joining(", "));
-  }
-
-  public Optional<String> getCountryDescription() {
-    return getFirstClaimValue("P625")
-        .map(wikidataValue -> wikidataValue.toLocationDescription(wikidataValue.getCoordinate()));
+  public Optional<Coordinate> getGeographicCoordinate() {
+    return getFirstClaimValue("P625").map(WikidataValue::getCoordinate);
   }
 
   public Optional<WikidataId> getInstanceOf() {
@@ -48,14 +32,14 @@ public class WikidataEntity {
   }
 
   public Optional<Coordinate> getCoordinate() {
-    return getFirstClaimValue("P625").flatMap(WikidataValue::getCoordinate);
+    return getFirstClaimValue("P625").map(WikidataValue::getCoordinate);
   }
 
-  private Optional<WikidataDate> getBirthdayData() {
+  public Optional<WikidataDate> getBirthdayData() {
     return getFirstClaimValue("P569").map(WikidataValue::toDateDescription);
   }
 
-  private Optional<WikidataId> getCountryOfOriginValue() {
+  public Optional<WikidataId> getCountryOfOriginValue() {
     return getFirstClaimValue("P27").map(WikidataValue::toWikiClass);
   }
 }

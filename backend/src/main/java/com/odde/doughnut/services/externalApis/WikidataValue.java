@@ -9,7 +9,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 
 public class WikidataValue {
   private Map<String, Object> data = null;
@@ -67,12 +66,6 @@ public class WikidataValue {
     return "globecoordinate".compareToIgnoreCase(type) == 0;
   }
 
-  public String toLocationDescription(Optional<Coordinate> coordinate) {
-    return coordinate
-        .map(c -> "Location: %s'N, %s'E".formatted(c.latitude(), c.longitude()))
-        .orElseGet(() -> "Location: " + stringValue);
-  }
-
   public WikidataDate toDateDescription() {
     return new WikidataDate(timeValue);
   }
@@ -85,13 +78,13 @@ public class WikidataValue {
     return stringValue;
   }
 
-  public Optional<Coordinate> getCoordinate() {
+  public Coordinate getCoordinate() {
     if (isGlobeCoordinate(type)) {
       var latitude = (Double) data.get("latitude");
       var longitude = (Double) data.get("longitude");
-      return Optional.of(new Coordinate(latitude, longitude));
+      return new Coordinate(latitude, longitude);
     }
 
-    return Optional.empty();
+    return new Coordinate(stringValue);
   }
 }

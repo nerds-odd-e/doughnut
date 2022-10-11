@@ -8,6 +8,8 @@ import com.odde.doughnut.services.externalApis.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.SneakyThrows;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -30,14 +32,22 @@ public record WikidataService(WikidataApi wikidataApi) {
 
   @SneakyThrows
   public Optional<String> fetchWikidataDescription(String wikidataId) {
-    return getWikidataEntity(wikidataId)
-        .flatMap(
-            x -> {
-              if (x.getInstanceOf().map(WikidataId::isHuman).orElse(false)) {
-                return Optional.of(x.getHumanDescription(wikidataApi));
-              }
-              return x.getCountryDescription();
-            });
+    return getWikidataEntity(wikidataId).map(this::wikidataDescription);
+  }
+
+  private String wikidataDescription(WikidataEntity entity) {
+    if (entity.getInstanceOf().map(WikidataId::isHuman).orElse(false)) {
+      return Stream.of(
+              entity
+                  .getCountryOfOriginValue()
+                  .flatMap(wikidataId1 -> wikidataId1.fetchEnglishTitleFromApi(wikidataApi)),
+              entity.getBirthdayData().map(WikidataDate::format))
+          .filter(Optional::isPresent)
+          .map(Optional::get)
+          .filter(value -> !value.isBlank())
+          .collect(Collectors.joining(", "));
+    }
+    return entity.getGeographicCoordinate().map(Coordinate::toLocationDescription).orElse(null);
   }
 
   @SneakyThrows

@@ -7,7 +7,7 @@ public record WikidataId(String wikidataId) {
     return "Q5".equals(wikidataId);
   }
 
-  Optional<String> fetchEnglishTitleFromApi(WikidataApi wikidataApi) {
+  public Optional<String> fetchEnglishTitleFromApi(WikidataApi wikidataApi) {
     return wikidataApi.getWikidataEntityData(wikidataId()).map(e -> e.WikidataTitleInEnglish);
   }
 }
