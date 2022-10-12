@@ -2,7 +2,7 @@ package com.odde.doughnut.services.wikidataApis.thirdPartyEntities;
 
 import java.util.Map;
 
-public class WikidataInfo {
+public class WikidataEntityDataEntity {
   public Map<String, LanguageValueModel> labels;
   public Map<String, WikiSiteLinkModel> sitelinks;
 

@@ -2,11 +2,8 @@ package com.odde.doughnut.services.wikidataApis;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.entities.Coordinate;
+import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.services.wikidataApis.thirdPartyEntities.WikidataDatavalue;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
 public record WikidataValue(WikidataDatavalue datavalue) {
 
@@ -25,13 +22,6 @@ public record WikidataValue(WikidataDatavalue datavalue) {
   }
 
   public String formattedTime() {
-    datavalue.assertTimeType();
-    DateTimeFormatter formatter =
-        DateTimeFormatter.ofPattern("dd MMMM yyyy")
-            .withZone(ZoneId.systemDefault())
-            .localizedBy(Locale.ENGLISH);
-    String inputTime = datavalue.getValue().get("time").textValue();
-    Instant instant = Instant.parse(inputTime.substring(1));
-    return formatter.format(instant) + (inputTime.startsWith("-") ? " B.C." : "");
+    return TimestampOperations.formatISOTimeToYearSupportingBC(datavalue.mustGetISOTime());
   }
 }

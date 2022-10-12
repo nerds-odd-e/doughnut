@@ -15,10 +15,6 @@ public class WikidataDatavalue {
     }
   }
 
-  public void assertTimeType() {
-    assertType("time");
-  }
-
   public String mustGetStringValue() {
     assertType("string");
     return value.textValue();
@@ -34,5 +30,10 @@ public class WikidataDatavalue {
       return null;
     }
     return value;
+  }
+
+  public String mustGetISOTime() {
+    assertType("time");
+    return getValue().get("time").textValue();
   }
 }

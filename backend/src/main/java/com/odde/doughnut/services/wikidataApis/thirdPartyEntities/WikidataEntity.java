@@ -20,6 +20,6 @@ public class WikidataEntity {
     if (listOfItems == null || listOfItems.isEmpty()) {
       return Optional.empty();
     }
-    return listOfItems.get(0).toWikidataValue();
+    return Optional.of(listOfItems.get(0).toWikidataValue());
   }
 }

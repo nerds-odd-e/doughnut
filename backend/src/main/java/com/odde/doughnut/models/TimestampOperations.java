@@ -1,8 +1,11 @@
 package com.odde.doughnut.models;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public abstract class TimestampOperations {
@@ -40,5 +43,14 @@ public abstract class TimestampOperations {
   public static long getDiffInHours(Timestamp currentUTCTimestamp, Timestamp nextReviewAt) {
     long diff = currentUTCTimestamp.getTime() - nextReviewAt.getTime();
     return TimeUnit.HOURS.convert(diff, TimeUnit.MILLISECONDS);
+  }
+
+  public static String formatISOTimeToYearSupportingBC(String inputTime) {
+    DateTimeFormatter formatter =
+        DateTimeFormatter.ofPattern("dd MMMM yyyy")
+            .withZone(ZoneId.systemDefault())
+            .localizedBy(Locale.ENGLISH);
+    Instant instant = Instant.parse(inputTime.substring(1));
+    return formatter.format(instant) + (inputTime.startsWith("-") ? " B.C." : "");
   }
 }
