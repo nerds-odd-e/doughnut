@@ -247,81 +247,6 @@ class RestNoteControllerTests {
         noteCreation.getTextContent().setDescription("");
       }
 
-      private void mockApiResponseWithBookInfo(String bookId, String authorId)
-          throws IOException, InterruptedException {
-        Mockito.when(httpClientAdapter.getResponseString(any()))
-            .thenReturn(
-                """
-                  {
-                      "entities": {
-                          "Q277260": {
-                              "pageid": 268034,
-                              "ns": 0,
-                              "title": "Q277260",
-                              "lastrevid": 1618357304,
-                              "modified": "2022-04-13T18:25:27Z",
-                              "type": "item",
-                              "id": "%s",
-                              "claims": {
-                              "P31": [
-                                  {
-                                      "mainsnak": {
-                                          "snaktype": "value",
-                                          "property": "P31",
-                                          "datavalue": {
-                                              "value": {
-                                                  "entity-type": "item",
-                                                  "numeric-id": 47461344,
-                                                  "id": "Q47461344"
-                                              },
-                                              "type": "wikibase-entityid"
-                                          },
-                                          "datatype": "wikibase-item"
-                                      }
-                                  }
-                              ],
-                              "P50": [
-                                  {
-                                      "mainsnak": {
-                                          "snaktype": "value",
-                                          "property": "P50",
-                                          "hash": "76876b860342e8dcad2d00fb04ddf3b6e9cde934",
-                                          "datavalue": {
-                                              "value": {
-                                                  "entity-type": "item",
-                                                  "numeric-id": 39829,
-                                                  "id": "Q39829"
-                                              },
-                                              "type": "wikibase-entityid"
-                                          },
-                                          "datatype": "wikibase-item"
-                                        }
-                                      }]
-                              }
-                          }
-                      }
-                  }
-                  """
-                    .formatted(bookId),
-                """
-            {
-                "entities": {
-                    "Q39829": {
-                        "type": "item",
-                        "id": "%s",
-                        "labels": {
-                          "en": {
-                              "language": "en",
-                              "value": "Stephen King"
-                          }
-                        }
-                    }
-                }
-            }
-            """
-                    .formatted(authorId));
-      }
-
       private void mockApiResponseWithHumanInfo(
           String humanId, String birthdayByISO, String countryQId, String countryName)
           throws IOException, InterruptedException {
@@ -490,22 +415,6 @@ class RestNoteControllerTests {
         assertThat(
             note.noteRealm.getNote().getTextContent().getDescription(),
             containsString(countryOfBirth));
-      }
-
-      @Test
-      @Disabled
-      void shouldCreateAuthorNoteWhenCreatingBookNoteWithWikidataId()
-          throws BindException, InterruptedException, NoAccessRightException, IOException {
-        String bookWikidataId = "Q277260"; // Rage
-        String authorWikidataId = "Q39829";
-        mockApiResponseWithBookInfo(bookWikidataId, authorWikidataId);
-
-        noteCreation.setWikidataId(bookWikidataId);
-        NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
-
-        makeMe.refresh(note.noteRealm.getNote());
-
-        assertEquals("Stephen King", note.noteRealm.getNote().getChildren().get(0).getTitle());
       }
     }
   }
