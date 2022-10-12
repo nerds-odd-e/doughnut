@@ -139,7 +139,7 @@ public class MakeMe {
     return new WikidataEntityJsonBuilder();
   }
 
-  public WikidataClaimJsonBuilder wikidataClaimsJson() {
-    return new WikidataClaimJsonBuilder();
+  public WikidataClaimJsonBuilder wikidataClaimsJson(String wikidataId) {
+    return new WikidataClaimJsonBuilder(wikidataId);
   }
 }

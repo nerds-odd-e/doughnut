@@ -26,7 +26,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.platform.commons.util.StringUtils;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -249,30 +248,16 @@ class RestNoteControllerTests {
       private void mockApiResponseWithHumanInfo(
           String humanId, String birthdayByISO, String countryQId, String countryName)
           throws IOException, InterruptedException {
-        var birthDayJsonObject =
-            StringUtils.isBlank(birthdayByISO)
-                ? ""
-                : String.format(
-                    """
-                            "P569": [
-                                {
-                                "mainsnak": {
-                                "snaktype": "value",
-                                "property": "P569",
-                                  "datavalue": {
-                                    "value": { "time": "%s"},
-                                    "type": "time"
-                                  }
-                                }
-                                }
-                                ],
-          """,
-                    birthdayByISO);
 
         Mockito.when(httpClientAdapter.getResponseString(any()))
             .thenReturn(
-                makeMe.wikidataClaimsJson().human(humanId, countryQId, birthDayJsonObject).please(),
-                makeMe.wikidataClaimsJson().country(countryQId, countryName).please());
+                makeMe
+                    .wikidataClaimsJson(humanId)
+                    .asHuman()
+                    .countryOfOrigin(countryQId)
+                    .birthdayIf(birthdayByISO)
+                    .please(),
+                makeMe.wikidataClaimsJson(countryQId).label(countryName).please());
       }
 
       @Test

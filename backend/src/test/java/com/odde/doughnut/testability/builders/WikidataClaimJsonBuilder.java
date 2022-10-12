@@ -1,20 +1,26 @@
 package com.odde.doughnut.testability.builders;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.junit.platform.commons.util.StringUtils;
 
 public class WikidataClaimJsonBuilder {
-  private String formatted = null;
   private String wikidataId;
   private String englishLabel = null;
+  private List<String> claims = new ArrayList<>();
 
-  public WikidataClaimJsonBuilder country(String countryQId, String countryName) {
-    this.wikidataId = countryQId;
+  public WikidataClaimJsonBuilder(String wikidataId) {
+    this.wikidataId = wikidataId;
+  }
+
+  public WikidataClaimJsonBuilder label(String name) {
     this.englishLabel =
         """
       "labels":{"en":{"language":"en","value":"%s"}}
-      """.formatted(countryName);
+      """.formatted(name);
     return this;
   }
 
@@ -30,53 +36,62 @@ public class WikidataClaimJsonBuilder {
   """
         .formatted(
             wikidataId,
-            Stream.of(englishLabel, formatted)
+            Stream.of(englishLabel, getClaims())
                 .filter(Objects::nonNull)
                 .collect(Collectors.joining(",")));
   }
 
-  public WikidataClaimJsonBuilder human(
-      String humanId, String countryQId, String birthDayJsonObject) {
-    this.wikidataId = humanId;
-    this.formatted =
+  private String getClaims() {
+    if (claims.isEmpty()) {
+      return null;
+    }
+    return "\"claims\":{" + String.join(",", claims) + "}";
+  }
+
+  private void addClaim(String property, String type, String value) {
+    this.claims.add(
         """
-              "claims": {
-              "P27": [{
-                 "mainsnak": {
-                     "snaktype": "value",
-                     "property": "P27",
-                     "hash": "5e51bd61971a52beebe110cd5232eb4cb1a99a3f",
-                     "datavalue": {
-                         "value": {
-                             "entity-type": "item",
-                             "numeric-id": 865,
-                             "id": "%s"
-                         },
-                         "type": "wikibase-entityid"
-                     },
-                     "datatype": "wikibase-item"
-                 },
-                 "type": "statement",
-                 "id": "Q706446$B98C0820-A8FD-465F-93E0-3A6BF8A4A856",
-                 "rank": "normal"
-             }
-              ],
-                %s
-                "P31": [
-                  {
-                    "mainsnak": {
-                      "snaktype": "value",
-                      "property": "P31",
-                      "datavalue": {
-                        "value": { "id": "Q5"},
-                        "type": "wikibase-entityid"
+                  "%s": [
+                    {
+                      "mainsnak": {
+                        "snaktype": "value",
+                        "property": "%s",
+                        "datavalue": {
+                          "value": %s,
+                          "type": "%s"
+                        }
                       }
                     }
-                  }
-                ]
-              }
-      """
-            .formatted(countryQId, birthDayJsonObject);
+                  ]
+        """
+            .formatted(property, property, value, type));
+  }
+
+  public WikidataClaimJsonBuilder countryOfOrigin(String countryQId) {
+
+    this.addClaim(
+        "P27",
+        "wikibase-entityid",
+        """
+        {
+          "entity-type": "item",
+          "numeric-id": 865,
+          "id": "%s"
+        }
+        """
+            .formatted(countryQId));
+    return this;
+  }
+
+  public WikidataClaimJsonBuilder asHuman() {
+    this.addClaim("P31", "wikibase-entityid", "{\"id\": \"Q5\"}");
+    return this;
+  }
+
+  public WikidataClaimJsonBuilder birthdayIf(String birthdayByISO) {
+    if (!StringUtils.isBlank(birthdayByISO)) {
+      this.addClaim("P569", "time", "{ \"time\": \"" + birthdayByISO + "\"}");
+    }
     return this;
   }
 }
