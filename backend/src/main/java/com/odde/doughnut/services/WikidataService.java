@@ -32,10 +32,10 @@ public record WikidataService(WikidataApi wikidataApi) {
 
   @SneakyThrows
   public Optional<String> fetchWikidataDescription(String wikidataId) {
-    return getWikidataEntity(wikidataId).map(this::wikidataDescription);
+    return getWikidataEntityModel(wikidataId).map(this::wikidataDescription);
   }
 
-  private String wikidataDescription(WikidataEntity entity) {
+  private String wikidataDescription(WikidataEntityModelOfProperties entity) {
     if (entity.getInstanceOf().map(WikidataId::isHuman).orElse(false)) {
       return Stream.of(
               entity
@@ -52,14 +52,15 @@ public record WikidataService(WikidataApi wikidataApi) {
 
   @SneakyThrows
   public Optional<Coordinate> fetchWikidataCoordinate(String wikidataId) {
-    return getWikidataEntity(wikidataId).flatMap(WikidataEntity::getCoordinate);
+    return getWikidataEntityModel(wikidataId)
+        .flatMap(WikidataEntityModelOfProperties::getCoordinate);
   }
 
-  private Optional<WikidataEntity> getWikidataEntity(String wikidataId)
+  private Optional<WikidataEntityModelOfProperties> getWikidataEntityModel(String wikidataId)
       throws IOException, InterruptedException {
     WikidataEntityHash entityHash = wikidataApi.getEntityHashById(wikidataId);
     if (entityHash == null) return Optional.empty();
-    return entityHash.getEntity(wikidataId);
+    return entityHash.getEntityModel(wikidataId);
   }
 
   public void extractWikidataInfoToNote(String wikidataId, Note note) {
