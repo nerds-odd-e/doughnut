@@ -1,6 +1,5 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.entities.Coordinate;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.WikidataEntityData;
 import com.odde.doughnut.entities.json.WikidataSearchEntity;
@@ -29,17 +28,6 @@ public record WikidataService(WikidataApi wikidataApi) {
     return wikidataApi.getWikidataSearchEntities(search).getWikidataSearchEntities();
   }
 
-  @SneakyThrows
-  private Optional<String> fetchWikidataDescription(String wikidataId) {
-    return getWikidataEntityModel(wikidataId)
-        .map(entity -> entity.wikidataDescription(wikidataApi));
-  }
-
-  @SneakyThrows
-  private Optional<Coordinate> fetchWikidataCoordinate(String wikidataId) {
-    return getWikidataEntityModel(wikidataId).flatMap(WikidataEntityModel::getCoordinate);
-  }
-
   private Optional<WikidataEntityModel> getWikidataEntityModel(String wikidataId)
       throws IOException, InterruptedException {
     WikidataEntityHash entityHash = wikidataApi.getEntityHashById(wikidataId);
@@ -47,8 +35,12 @@ public record WikidataService(WikidataApi wikidataApi) {
     return entityHash.getEntityModel(wikidataId);
   }
 
+  @SneakyThrows
   public void extractWikidataInfoToNote(String wikidataId, Note note) {
-    fetchWikidataDescription(wikidataId).ifPresent(note::prependDescription);
-    fetchWikidataCoordinate(wikidataId).ifPresent(note::buildLocation);
+    Optional<WikidataEntityModel> wikidataEntityModel = getWikidataEntityModel(wikidataId);
+    wikidataEntityModel
+        .map(entity -> entity.wikidataDescription(wikidataApi))
+        .ifPresent(note::prependDescription);
+    wikidataEntityModel.flatMap(WikidataEntityModel::getCoordinate).ifPresent(note::buildLocation);
   }
 }
