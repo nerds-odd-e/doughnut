@@ -94,4 +94,9 @@ public class WikidataClaimJsonBuilder {
     }
     return this;
   }
+
+  public WikidataClaimJsonBuilder globeCoordinate(String value, String type) {
+    this.addClaim("P625", type, value);
+    return this;
+  }
 }

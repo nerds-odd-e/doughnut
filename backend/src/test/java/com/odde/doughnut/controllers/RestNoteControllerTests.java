@@ -190,7 +190,7 @@ class RestNoteControllerTests {
         noteCreation.getTextContent().setDescription(singapore);
       }
 
-      private void mockApiResponseWithLocationInfo(String locationInfo)
+      private void mockApiResponseWithLocationInfo(String locationInfo, String type)
           throws IOException, InterruptedException {
         Mockito.when(
                 httpClientAdapter.getResponseString(
@@ -199,16 +199,14 @@ class RestNoteControllerTests {
                             + wikidataIdOfALocation
                             + "&format=json&props=claims")))
             .thenReturn(
-                "{\"entities\":{\"Q334\":{\"type\":\"item\",\"id\":\"Q334\",\"claims\":{\"P625\":[{\"mainsnak\":{\"snaktype\":\"value\",\"property\":\"P625\",\"datavalue\":{"
-                    + locationInfo
-                    + "}}}]}}}}");
+                makeMe.wikidataClaimsJson("Q334").globeCoordinate(locationInfo, type).please());
       }
 
       @Test
       void shouldPrependLocationInfoWhenAddingNoteWithWikidataId()
           throws BindException, InterruptedException, NoAccessRightException, IOException {
         mockApiResponseWithLocationInfo(
-            "\"value\":{\"latitude\":1.3,\"longitude\":103.8},\"type\":\"globecoordinate\"");
+            "{\"latitude\":1.3,\"longitude\":103.8}", "globecoordinate");
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
         assertThat(
             note.noteRealm.getNote().getTextContent().getDescription(),
@@ -218,7 +216,7 @@ class RestNoteControllerTests {
       @Test
       void shouldAddCoordinatesWhenAddingLocationNoteWithWikidataId() throws Exception {
         mockApiResponseWithLocationInfo(
-            "\"value\":{\"latitude\":1.3,\"longitude\":103.8},\"type\":\"globecoordinate\"");
+            "{\"latitude\":1.3,\"longitude\":103.8}", "globecoordinate");
 
         var note = controller.createNote(parent, noteCreation);
 
@@ -229,7 +227,7 @@ class RestNoteControllerTests {
       @Test
       void shouldPrependLocationInfoWhenAddingNoteWithWikidataIdWithStringValue()
           throws BindException, InterruptedException, NoAccessRightException, IOException {
-        mockApiResponseWithLocationInfo("\"value\": \"center of the earth\",\"type\":\"string\"");
+        mockApiResponseWithLocationInfo("\"center of the earth\"", "string");
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
         assertThat(
             note.noteRealm.getNote().getTextContent().getDescription(),
