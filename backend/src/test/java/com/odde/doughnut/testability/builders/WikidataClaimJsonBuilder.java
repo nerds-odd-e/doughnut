@@ -1,32 +1,20 @@
 package com.odde.doughnut.testability.builders;
 
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 public class WikidataClaimJsonBuilder {
-  private String formatted = "";
+  private String formatted = null;
   private String wikidataId;
+  private String englishLabel = null;
 
   public WikidataClaimJsonBuilder country(String countryQId, String countryName) {
     this.wikidataId = countryQId;
-    this.formatted =
+    this.englishLabel =
         """
-          "title":"%s","type":"item","id":"%s",
-          "labels":{"en":{"language":"en","value":"%s"}},
-          "claims":{
-              "P31": [
-                  {
-                    "mainsnak": {
-                      "snaktype": "value",
-                      "property": "P31",
-                      "datavalue": {
-                        "value": { "id": "Q1115"},
-                        "type": "wikibase-entityid"
-                      }
-                    }
-                  }
-                ]
-            }
-
-      """
-            .formatted(countryQId, countryQId, countryName);
+      "labels":{"en":{"language":"en","value":"%s"}}
+      """.formatted(countryName);
     return this;
   }
 
@@ -40,7 +28,11 @@ public class WikidataClaimJsonBuilder {
         }
       }
   """
-        .formatted(wikidataId, formatted);
+        .formatted(
+            wikidataId,
+            Stream.of(englishLabel, formatted)
+                .filter(Objects::nonNull)
+                .collect(Collectors.joining(",")));
   }
 
   public WikidataClaimJsonBuilder human(
@@ -48,8 +40,6 @@ public class WikidataClaimJsonBuilder {
     this.wikidataId = humanId;
     this.formatted =
         """
-              "type": "item",
-              "id": "%s",
               "claims": {
               "P27": [{
                  "mainsnak": {
@@ -86,7 +76,7 @@ public class WikidataClaimJsonBuilder {
                 ]
               }
       """
-            .formatted(humanId, countryQId, birthDayJsonObject);
+            .formatted(countryQId, birthDayJsonObject);
     return this;
   }
 }
