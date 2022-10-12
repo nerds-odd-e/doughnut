@@ -19,10 +19,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class RealGithubService implements GithubService {
-  @Value("${spring.github-for-issues.repo}")
+  @Value("${spring.github_for_issues.repo}")
   private String githubForIssuesRepo;
 
-  @Value("${spring.github-for-issues.token}")
+  @Value("${spring.github_for_issues.token}")
   private String githubForIssuesToken;
 
   @Override

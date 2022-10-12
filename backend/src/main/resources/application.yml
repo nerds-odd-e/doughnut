@@ -23,7 +23,7 @@ spring:
     show-sql: false
     properties.hibernate:
       enable_lazy_load_no_trans: true
-  github-for-issues:
+  github_for_issues:
     repo: nerds-odd-e/doughnut_sandbox
     token: ${GITHUB_FOR_ISSUES_API_TOKEN}
 server:
@@ -57,7 +57,7 @@ spring:
     show-sql: false
     properties.hibernate:
       enable_lazy_load_no_trans: true
-  github-for-issues:
+  github_for_issues:
     repo: nerds-odd-e/doughnut_sandbox
     token: ${GITHUB_FOR_ISSUES_API_TOKEN}
 server:
@@ -90,7 +90,7 @@ spring:
     show-sql: false
     properties.hibernate:
       enable_lazy_load_no_trans: true
-  github-for-issues:
+  github_for_issues:
     repo: nerds-odd-e/doughnut_sandbox
     token: ${GITHUB_FOR_ISSUES_API_TOKEN}
   devtools:
@@ -133,7 +133,7 @@ spring:
           github:
             clientId: ${OAUTH2_github_client_id}
             clientSecret: ${OAUTH2_github_client_secret}
-  github-for-issues:
+  github_for_issues:
     repo: nerds-odd-e/doughnut
     token: ${GITHUB_FOR_ISSUES_API_TOKEN}
 server:
