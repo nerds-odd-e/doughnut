@@ -23,7 +23,7 @@ public class WikidataEntityModel extends WikidataEntityModelOfProperties {
     return Stream.of(
             getCountryOfOriginValue()
                 .flatMap(wikidataId1 -> wikidataId1.fetchEnglishTitleFromApi(wikidataApi)),
-            getBirthdayValue().map(WikidataDate::format))
+            getBirthdayValue().map(WikidataValue::format))
         .filter(Optional::isPresent)
         .map(Optional::get)
         .filter(value -> !value.isBlank())

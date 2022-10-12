@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Coordinate;
+import com.odde.doughnut.services.wikidataApis.thirdPartyEntities.WikidataClaimItem;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -13,12 +14,12 @@ import java.util.Map;
 public class WikidataValue {
   private Map<String, Object> data = null;
   private String stringValue = null;
+  private WikidataClaimItem wikidataClaimItem;
   private String type;
   private String wikiClass;
 
-  private String timeValue;
-
-  public WikidataValue(JsonNode value, String type) {
+  public WikidataValue(WikidataClaimItem wikidataClaimItem, JsonNode value, String type) {
+    this.wikidataClaimItem = wikidataClaimItem;
     this.type = type;
     if (isGlobeCoordinate(type)) {
       this.data =
@@ -29,25 +30,11 @@ public class WikidataValue {
       stringValue = value.textValue();
       return;
     }
-    if (isTimeValue(type)) {
-      DateTimeFormatter formatter =
-          DateTimeFormatter.ofPattern("dd MMMM yyyy")
-              .withZone(ZoneId.systemDefault())
-              .localizedBy(Locale.ENGLISH);
-      String inputTime = value.get("time").textValue();
-      Instant instant = Instant.parse(inputTime.substring(1));
-      timeValue = formatter.format(instant);
-      String postFix = inputTime.startsWith("-") ? " B.C." : "";
-      timeValue += postFix;
 
-      return;
-    }
     if (isWikibase(type)) {
       wikiClass = value.get("id").textValue();
       return;
     }
-
-    throw new RuntimeException("Unsupported wikidata value type: " + type);
   }
 
   private boolean isWikibase(String type) {
@@ -66,16 +53,8 @@ public class WikidataValue {
     return "globecoordinate".compareToIgnoreCase(type) == 0;
   }
 
-  public WikidataDate toDateDescription() {
-    return new WikidataDate(timeValue);
-  }
-
   public WikidataId toWikiClass() {
     return new WikidataId(wikiClass);
-  }
-
-  String getStringValue() {
-    return stringValue;
   }
 
   public Coordinate getCoordinate() {
@@ -86,5 +65,18 @@ public class WikidataValue {
     }
 
     return new Coordinate(stringValue);
+  }
+
+  public String format() {
+    if (!isTimeValue(type)) {
+      throw new RuntimeException("Unsupported wikidata value type: " + type + ", expected time");
+    }
+    DateTimeFormatter formatter =
+        DateTimeFormatter.ofPattern("dd MMMM yyyy")
+            .withZone(ZoneId.systemDefault())
+            .localizedBy(Locale.ENGLISH);
+    String inputTime = this.wikidataClaimItem.getValue1().get("time").textValue();
+    Instant instant = Instant.parse(inputTime.substring(1));
+    return formatter.format(instant) + (inputTime.startsWith("-") ? " B.C." : "");
   }
 }

@@ -20,8 +20,15 @@ public class WikidataClaimItem {
     if (!mainsnak.containsKey(DATA_VALUE_KEY)) {
       return Optional.empty();
     }
-    JsonNode dataValue = mainsnak.get(DATA_VALUE_KEY);
     return Optional.of(
-        new WikidataValue(dataValue.get(VALUE_KEY), dataValue.get(VALUE_TYPE_KEY).textValue()));
+        new WikidataValue(this, getValue1(), getDataValue().get(VALUE_TYPE_KEY).textValue()));
+  }
+
+  public JsonNode getValue1() {
+    return getDataValue().get(VALUE_KEY);
+  }
+
+  private JsonNode getDataValue() {
+    return mainsnak.get(DATA_VALUE_KEY);
   }
 }

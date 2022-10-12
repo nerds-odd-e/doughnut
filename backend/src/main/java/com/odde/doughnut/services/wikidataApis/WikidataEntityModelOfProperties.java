@@ -23,8 +23,8 @@ public class WikidataEntityModelOfProperties {
     return entity.getFirstClaimValue("P625").map(WikidataValue::getCoordinate);
   }
 
-  public Optional<WikidataDate> getBirthdayValue() {
-    return entity.getFirstClaimValue("P569").map(WikidataValue::toDateDescription);
+  public Optional<WikidataValue> getBirthdayValue() {
+    return entity.getFirstClaimValue("P569");
   }
 
   public Optional<WikidataId> getCountryOfOriginValue() {
