@@ -12,8 +12,6 @@ import java.util.Locale;
 import java.util.Map;
 
 public class WikidataValue {
-  private Map<String, Object> data = null;
-  private String stringValue = null;
   private WikidataClaimItem wikidataClaimItem;
   private String type;
   private String wikiClass;
@@ -21,35 +19,26 @@ public class WikidataValue {
   public WikidataValue(WikidataClaimItem wikidataClaimItem, JsonNode value, String type) {
     this.wikidataClaimItem = wikidataClaimItem;
     this.type = type;
-    if (isGlobeCoordinate(type)) {
-      this.data =
-          new ObjectMapper().convertValue(value, new TypeReference<Map<String, Object>>() {});
-      return;
-    }
-    if (isStringValue(type)) {
-      stringValue = value.textValue();
-      return;
-    }
 
-    if (isWikibase(type)) {
+    if (isWikibase()) {
       wikiClass = value.get("id").textValue();
       return;
     }
   }
 
-  private boolean isWikibase(String type) {
+  private boolean isWikibase() {
     return "wikibase-entityid".compareToIgnoreCase(type) == 0;
   }
 
-  private boolean isTimeValue(String type) {
+  private boolean isTimeValue() {
     return "time".compareToIgnoreCase(type) == 0;
   }
 
-  private boolean isStringValue(String type) {
+  private boolean isStringValue() {
     return "string".compareToIgnoreCase(type) == 0;
   }
 
-  private boolean isGlobeCoordinate(String type) {
+  private boolean isGlobeCoordinate() {
     return "globecoordinate".compareToIgnoreCase(type) == 0;
   }
 
@@ -58,17 +47,27 @@ public class WikidataValue {
   }
 
   public Coordinate getCoordinate() {
-    if (isGlobeCoordinate(type)) {
+    if (isGlobeCoordinate()) {
+      Map<String, Object> data =
+          new ObjectMapper()
+              .convertValue(this.wikidataClaimItem.getValue1(), new TypeReference<>() {});
+
       var latitude = (Double) data.get("latitude");
       var longitude = (Double) data.get("longitude");
       return new Coordinate(latitude, longitude);
     }
+    return new Coordinate(getStringValue());
+  }
 
-    return new Coordinate(stringValue);
+  private String getStringValue() {
+    if (!isStringValue()) {
+      throw new RuntimeException("Unsupported wikidata value type: " + type + ", expected string");
+    }
+    return this.wikidataClaimItem.getValue1().textValue();
   }
 
   public String format() {
-    if (!isTimeValue(type)) {
+    if (!isTimeValue()) {
       throw new RuntimeException("Unsupported wikidata value type: " + type + ", expected time");
     }
     DateTimeFormatter formatter =
