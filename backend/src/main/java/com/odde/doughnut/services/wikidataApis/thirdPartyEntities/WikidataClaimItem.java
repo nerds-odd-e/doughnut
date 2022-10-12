@@ -20,7 +20,11 @@ public class WikidataClaimItem {
     if (!mainsnak.containsKey(DATA_VALUE_KEY)) {
       return Optional.empty();
     }
-    return Optional.of(new WikidataValue(this, getDataValue().get(VALUE_TYPE_KEY).textValue()));
+    return Optional.of(new WikidataValue(this));
+  }
+
+  public String getType() {
+    return getDataValue().get(VALUE_TYPE_KEY).textValue();
   }
 
   public JsonNode getValue1() {
@@ -29,5 +33,30 @@ public class WikidataClaimItem {
 
   private JsonNode getDataValue() {
     return mainsnak.get(DATA_VALUE_KEY);
+  }
+
+  public void assertTimeType() {
+    if (!("time".compareToIgnoreCase(getType()) == 0)) {
+      throw new RuntimeException(
+          "Unsupported wikidata value type: " + getType() + ", expected time");
+    }
+  }
+
+  public void assertWikibaseType() {
+    if (!("wikibase-entityid".compareToIgnoreCase(getType()) == 0)) {
+      throw new RuntimeException(
+          "Unsupported wikidata value type: " + getType() + ", expected wikibase-entityid");
+    }
+  }
+
+  public boolean isGlobeCoordinate() {
+    return "globecoordinate".compareToIgnoreCase(getType()) == 0;
+  }
+
+  public void assertStringType() {
+    if ("string".compareToIgnoreCase(getType()) != 0) {
+      throw new RuntimeException(
+          "Unsupported wikidata value type: " + getType() + ", expected string");
+    }
   }
 }

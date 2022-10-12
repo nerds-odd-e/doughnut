@@ -10,39 +10,15 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Map;
 
-public class WikidataValue {
-  private WikidataClaimItem wikidataClaimItem;
-  private String type;
-
-  public WikidataValue(WikidataClaimItem wikidataClaimItem, String type) {
-    this.wikidataClaimItem = wikidataClaimItem;
-    this.type = type;
-  }
-
-  private void assertStringType() {
-    if ("string".compareToIgnoreCase(type) != 0) {
-      throw new RuntimeException("Unsupported wikidata value type: " + type + ", expected string");
-    }
-  }
-
-  private boolean isGlobeCoordinate() {
-    return "globecoordinate".compareToIgnoreCase(type) == 0;
-  }
+public record WikidataValue(WikidataClaimItem wikidataClaimItem) {
 
   public WikidataId toWikiClass() {
-    assertWikibaseType();
+    wikidataClaimItem.assertWikibaseType();
     return new WikidataId(this.wikidataClaimItem.getValue1().get("id").textValue());
   }
 
-  private void assertWikibaseType() {
-    if (!("wikibase-entityid".compareToIgnoreCase(type) == 0)) {
-      throw new RuntimeException(
-          "Unsupported wikidata value type: " + type + ", expected wikibase-entityid");
-    }
-  }
-
   public Coordinate getCoordinate() {
-    if (isGlobeCoordinate()) {
+    if (wikidataClaimItem.isGlobeCoordinate()) {
       Map<String, Object> data =
           new ObjectMapper()
               .convertValue(this.wikidataClaimItem.getValue1(), new TypeReference<>() {});
@@ -55,24 +31,18 @@ public class WikidataValue {
   }
 
   private String getStringValue() {
-    assertStringType();
-    return this.wikidataClaimItem.getValue1().textValue();
+    wikidataClaimItem.assertStringType();
+    return wikidataClaimItem.getValue1().textValue();
   }
 
   public String format() {
-    assertTimeType();
+    wikidataClaimItem.assertTimeType();
     DateTimeFormatter formatter =
         DateTimeFormatter.ofPattern("dd MMMM yyyy")
             .withZone(ZoneId.systemDefault())
             .localizedBy(Locale.ENGLISH);
-    String inputTime = this.wikidataClaimItem.getValue1().get("time").textValue();
+    String inputTime = wikidataClaimItem.getValue1().get("time").textValue();
     Instant instant = Instant.parse(inputTime.substring(1));
     return formatter.format(instant) + (inputTime.startsWith("-") ? " B.C." : "");
-  }
-
-  private void assertTimeType() {
-    if (!("time".compareToIgnoreCase(type) == 0)) {
-      throw new RuntimeException("Unsupported wikidata value type: " + type + ", expected time");
-    }
   }
 }
