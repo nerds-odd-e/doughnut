@@ -1,6 +1,7 @@
-package com.odde.doughnut.services.externalApis;
+package com.odde.doughnut.services.wikidataApis.thirdPartyEntities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.odde.doughnut.services.wikidataApis.WikidataEntityModel;
 import java.util.Map;
 import java.util.Optional;
 import lombok.Setter;

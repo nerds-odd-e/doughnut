@@ -1,4 +1,4 @@
-package com.odde.doughnut.services.externalApis;
+package com.odde.doughnut.services.wikidataApis.thirdPartyEntities;
 
 import java.util.Map;
 

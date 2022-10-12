@@ -1,6 +1,7 @@
-package com.odde.doughnut.services.externalApis;
+package com.odde.doughnut.services.wikidataApis;
 
 import com.odde.doughnut.entities.Coordinate;
+import com.odde.doughnut.services.wikidataApis.thirdPartyEntities.WikidataEntity;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

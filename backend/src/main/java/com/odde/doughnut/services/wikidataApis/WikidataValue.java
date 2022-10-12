@@ -1,4 +1,4 @@
-package com.odde.doughnut.services.externalApis;
+package com.odde.doughnut.services.wikidataApis;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;

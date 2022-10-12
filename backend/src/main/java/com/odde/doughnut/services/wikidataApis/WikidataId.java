@@ -1,4 +1,4 @@
-package com.odde.doughnut.services.externalApis;
+package com.odde.doughnut.services.wikidataApis;
 
 import java.util.Optional;
 

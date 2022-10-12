@@ -1,6 +1,7 @@
-package com.odde.doughnut.services.externalApis;
+package com.odde.doughnut.services.wikidataApis.thirdPartyEntities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.odde.doughnut.services.wikidataApis.WikidataValue;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
