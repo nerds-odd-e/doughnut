@@ -3,24 +3,24 @@ package com.odde.doughnut.services.wikidataApis;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Coordinate;
+import com.odde.doughnut.services.wikidataApis.thirdPartyEntities.WikidataDatavalue;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Map;
 
-public record WikidataValue(
-    com.odde.doughnut.services.wikidataApis.thirdPartyEntities.WikidataMainsnak mainsnak) {
+public record WikidataValue(WikidataDatavalue datavalue) {
 
   public WikidataId toWikiClass() {
-    mainsnak.assertWikibaseType();
-    return new WikidataId(this.mainsnak.getValue().get("id").textValue());
+    datavalue.assertWikibaseType();
+    return new WikidataId(datavalue.getValue().get("id").textValue());
   }
 
   public Coordinate getCoordinate() {
-    if (mainsnak.isGlobeCoordinate()) {
+    if (datavalue.isGlobeCoordinate()) {
       Map<String, Object> data =
-          new ObjectMapper().convertValue(this.mainsnak.getValue(), new TypeReference<>() {});
+          new ObjectMapper().convertValue(datavalue.getValue(), new TypeReference<>() {});
 
       var latitude = (Double) data.get("latitude");
       var longitude = (Double) data.get("longitude");
@@ -30,17 +30,17 @@ public record WikidataValue(
   }
 
   private String getStringValue() {
-    mainsnak.assertStringType();
-    return mainsnak.getValue().textValue();
+    datavalue.assertStringType();
+    return datavalue.getValue().textValue();
   }
 
   public String format() {
-    mainsnak.assertTimeType();
+    datavalue.assertTimeType();
     DateTimeFormatter formatter =
         DateTimeFormatter.ofPattern("dd MMMM yyyy")
             .withZone(ZoneId.systemDefault())
             .localizedBy(Locale.ENGLISH);
-    String inputTime = mainsnak.getValue().get("time").textValue();
+    String inputTime = datavalue.getValue().get("time").textValue();
     Instant instant = Instant.parse(inputTime.substring(1));
     return formatter.format(instant) + (inputTime.startsWith("-") ? " B.C." : "");
   }
