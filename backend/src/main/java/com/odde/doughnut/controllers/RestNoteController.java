@@ -74,7 +74,7 @@ class RestNoteController {
   private void associateToWikidata(Note note, String wikidataId) {
     note.setWikidataId(wikidataId);
     modelFactoryService.toNoteModel(note).checkDuplicateWikidataId();
-    getWikidataService().extractWikidataInfoToNote(wikidataId, note);
+    getWikidataService().wrapWikidataIdWithApi(wikidataId).extractWikidataInfoToNote(note);
   }
 
   @GetMapping("/{note}")

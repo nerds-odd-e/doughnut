@@ -22,7 +22,8 @@ public class WikidataEntityModel extends WikidataEntityModelOfProperties {
   private String getHumanDescription(WikidataApi wikidataApi) {
     return Stream.of(
             getCountryOfOriginValue()
-                .flatMap(wikidataId1 -> wikidataId1.fetchEnglishTitleFromApi(wikidataApi)),
+                .flatMap(
+                    wikidataId1 -> wikidataId1.withApi(wikidataApi).fetchEnglishTitleFromApi()),
             getBirthdayValue().map(WikidataValue::formattedTime))
         .filter(Optional::isPresent)
         .map(Optional::get)

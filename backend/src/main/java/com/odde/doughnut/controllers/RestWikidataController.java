@@ -33,9 +33,9 @@ public class RestWikidataController {
 
   @GetMapping("/entity-data/{wikidataId}")
   public Optional<WikidataEntityData> fetchWikidataEntityDataByID(
-      @PathVariable("wikidataId") String wikidataId) throws InterruptedException, BindException {
+      @PathVariable("wikidataId") String wikidataId) throws BindException {
     try {
-      return getWikidataService().fetchWikidataEntityData(wikidataId);
+      return getWikidataService().wrapWikidataIdWithApi(wikidataId).fetchWikidataEntityData();
     } catch (IOException e) {
       throw buildWikidataServiceNotAvailableException("wikidataId");
     }
