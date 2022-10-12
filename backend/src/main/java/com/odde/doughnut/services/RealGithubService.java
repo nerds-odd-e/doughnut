@@ -22,6 +22,9 @@ public class RealGithubService implements GithubService {
   @Value("${spring.github-for-issues.repo}")
   private String githubForIssuesRepo;
 
+  @Value("${spring.github-for-issues.token}")
+  private String githubForIssuesToken;
+
   @Override
   public String getIssueUrl(Integer issueNumber) {
     return "https://github.com/" + githubForIssuesRepo + "/issues/" + issueNumber;

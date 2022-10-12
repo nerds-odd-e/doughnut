@@ -133,6 +133,7 @@ spring:
             clientSecret: ${OAUTH2_github_client_secret}
   github-for-issues:
     repo: nerds-odd-e/doughnut
+    token: ${GITHUB_FOR_ISSUES_API_TOKEN}
 server:
   error:
     include-stacktrace: never
