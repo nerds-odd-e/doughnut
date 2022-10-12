@@ -24,19 +24,19 @@ public record WikidataService(WikidataApi wikidataApi) {
     return wikidataApi.getWikidataEntityData(wikidataId);
   }
 
-  public List<WikidataSearchEntity> fetchWikidataByQuery(String search)
+  public List<WikidataSearchEntity> searchWikidata(String search)
       throws IOException, InterruptedException {
     return wikidataApi.getWikidataSearchEntities(search).getWikidataSearchEntities();
   }
 
   @SneakyThrows
-  public Optional<String> fetchWikidataDescription(String wikidataId) {
+  private Optional<String> fetchWikidataDescription(String wikidataId) {
     return getWikidataEntityModel(wikidataId)
         .map(entity -> entity.wikidataDescription(wikidataApi));
   }
 
   @SneakyThrows
-  public Optional<Coordinate> fetchWikidataCoordinate(String wikidataId) {
+  private Optional<Coordinate> fetchWikidataCoordinate(String wikidataId) {
     return getWikidataEntityModel(wikidataId).flatMap(WikidataEntityModel::getCoordinate);
   }
 

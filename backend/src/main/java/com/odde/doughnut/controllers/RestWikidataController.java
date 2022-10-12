@@ -45,7 +45,7 @@ public class RestWikidataController {
   public List<WikidataSearchEntity> searchWikidata(@PathVariable("search") String search)
       throws InterruptedException, BindException {
     try {
-      return getWikidataService().fetchWikidataByQuery(search);
+      return getWikidataService().searchWikidata(search);
     } catch (IOException e) {
       throw buildWikidataServiceNotAvailableException("search");
     }
