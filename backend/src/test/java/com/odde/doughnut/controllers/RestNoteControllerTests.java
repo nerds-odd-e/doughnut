@@ -330,11 +330,18 @@ class RestNoteControllerTests {
                 ? ""
                 : String.format(
                     """
-          ,
+                            "P569": [
+                                {
+                                "mainsnak": {
+                                "snaktype": "value",
+                                "property": "P569",
                                   "datavalue": {
                                     "value": { "time": "%s"},
                                     "type": "time"
                                   }
+                                }
+                                }
+                                ],
           """,
                     birthdayByISO);
         Mockito.when(httpClientAdapter.getResponseString(any()))
@@ -366,14 +373,7 @@ class RestNoteControllerTests {
                              "rank": "normal"
                          }
                           ],
-                            "P569": [
-                              {
-                                "mainsnak": {
-                                  "snaktype": "value",
-                                  "property": "P569"%s
-                                }
-                              }
-                            ],
+                            %s
                             "P31": [
                               {
                                 "mainsnak": {

@@ -11,10 +11,7 @@ public class WikidataClaimItem {
   public WikidataMainsnak mainsnak;
 
   @JsonIgnore
-  public Optional<WikidataValue> getValue() {
-    if (mainsnak == null || mainsnak.getDatavalue() == null) {
-      return Optional.empty();
-    }
+  public Optional<WikidataValue> toWikidataValue() {
     return Optional.of(new WikidataValue(mainsnak.datavalue));
   }
 }

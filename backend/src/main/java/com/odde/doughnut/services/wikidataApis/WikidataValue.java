@@ -24,7 +24,7 @@ public record WikidataValue(WikidataDatavalue datavalue) {
     return new Coordinate(datavalue.mustGetStringValue());
   }
 
-  public String format() {
+  public String formattedTime() {
     datavalue.assertTimeType();
     DateTimeFormatter formatter =
         DateTimeFormatter.ofPattern("dd MMMM yyyy")
