@@ -9,10 +9,10 @@ import lombok.Setter;
 public class WikidataEntityHash {
   @Setter private Map<String, WikidataEntity> entities;
 
-  public Optional<WikidataEntityModelOfProperties> getEntityModel(String wikidataId) {
+  public Optional<WikidataEntityModel> getEntityModel(String wikidataId) {
     if (entities == null || !entities.containsKey(wikidataId)) {
       return Optional.empty();
     }
-    return Optional.of(new WikidataEntityModelOfProperties(entities.get(wikidataId)));
+    return Optional.of(new WikidataEntityModel(entities.get(wikidataId)));
   }
 }

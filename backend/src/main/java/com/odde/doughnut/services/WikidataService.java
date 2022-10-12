@@ -8,8 +8,6 @@ import com.odde.doughnut.services.externalApis.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.SneakyThrows;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -32,31 +30,16 @@ public record WikidataService(WikidataApi wikidataApi) {
 
   @SneakyThrows
   public Optional<String> fetchWikidataDescription(String wikidataId) {
-    return getWikidataEntityModel(wikidataId).map(this::wikidataDescription);
-  }
-
-  private String wikidataDescription(WikidataEntityModelOfProperties entity) {
-    if (entity.getInstanceOf().map(WikidataId::isHuman).orElse(false)) {
-      return Stream.of(
-              entity
-                  .getCountryOfOriginValue()
-                  .flatMap(wikidataId1 -> wikidataId1.fetchEnglishTitleFromApi(wikidataApi)),
-              entity.getBirthdayData().map(WikidataDate::format))
-          .filter(Optional::isPresent)
-          .map(Optional::get)
-          .filter(value -> !value.isBlank())
-          .collect(Collectors.joining(", "));
-    }
-    return entity.getGeographicCoordinate().map(Coordinate::toLocationDescription).orElse(null);
+    return getWikidataEntityModel(wikidataId)
+        .map(entity -> entity.wikidataDescription(wikidataApi));
   }
 
   @SneakyThrows
   public Optional<Coordinate> fetchWikidataCoordinate(String wikidataId) {
-    return getWikidataEntityModel(wikidataId)
-        .flatMap(WikidataEntityModelOfProperties::getCoordinate);
+    return getWikidataEntityModel(wikidataId).flatMap(WikidataEntityModel::getCoordinate);
   }
 
-  private Optional<WikidataEntityModelOfProperties> getWikidataEntityModel(String wikidataId)
+  private Optional<WikidataEntityModel> getWikidataEntityModel(String wikidataId)
       throws IOException, InterruptedException {
     WikidataEntityHash entityHash = wikidataApi.getEntityHashById(wikidataId);
     if (entityHash == null) return Optional.empty();

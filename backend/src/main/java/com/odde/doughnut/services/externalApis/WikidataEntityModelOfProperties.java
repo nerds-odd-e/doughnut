@@ -3,7 +3,13 @@ package com.odde.doughnut.services.externalApis;
 import com.odde.doughnut.entities.Coordinate;
 import java.util.Optional;
 
-public record WikidataEntityModelOfProperties(WikidataEntity entity) {
+public class WikidataEntityModelOfProperties {
+  private final WikidataEntity entity;
+
+  public WikidataEntityModelOfProperties(WikidataEntity entity) {
+    this.entity = entity;
+  }
+
   public Optional<Coordinate> getGeographicCoordinate() {
     return entity.getFirstClaimValue("P625").map(WikidataValue::getCoordinate);
   }
@@ -16,7 +22,7 @@ public record WikidataEntityModelOfProperties(WikidataEntity entity) {
     return entity.getFirstClaimValue("P625").map(WikidataValue::getCoordinate);
   }
 
-  public Optional<WikidataDate> getBirthdayData() {
+  public Optional<WikidataDate> getBirthdayValue() {
     return entity.getFirstClaimValue("P569").map(WikidataValue::toDateDescription);
   }
 
