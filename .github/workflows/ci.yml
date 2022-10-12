@@ -21,6 +21,7 @@ env:
   DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+  GITHUB_FOR_ISSUES_API_TOKEN: ${{ secrets.GITHUB_FOR_ISSUES_API_TOKEN }}
 
 jobs:
   Linting:

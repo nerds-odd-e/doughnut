@@ -25,7 +25,7 @@ spring:
       enable_lazy_load_no_trans: true
   github-for-issues:
     repo: nerds-odd-e/doughnut_sandbox
-
+    token: ${GITHUB_FOR_ISSUES_API_TOKEN}
 server:
   forward-headers-strategy: FRAMEWORK
   port: 8081
@@ -59,7 +59,7 @@ spring:
       enable_lazy_load_no_trans: true
   github-for-issues:
     repo: nerds-odd-e/doughnut_sandbox
-
+    token: ${GITHUB_FOR_ISSUES_API_TOKEN}
 server:
   forward-headers-strategy: FRAMEWORK
   port: 9081
@@ -90,10 +90,12 @@ spring:
     show-sql: false
     properties.hibernate:
       enable_lazy_load_no_trans: true
+  github-for-issues:
+    repo: nerds-odd-e/doughnut_sandbox
+    token: ${GITHUB_FOR_ISSUES_API_TOKEN}
   devtools:
     restart:
       additional-paths: static/**,templates/**
-
 server:
   forward-headers-strategy: FRAMEWORK
   port: 9082
