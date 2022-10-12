@@ -20,8 +20,7 @@ public class WikidataClaimItem {
     if (!mainsnak.containsKey(DATA_VALUE_KEY)) {
       return Optional.empty();
     }
-    return Optional.of(
-        new WikidataValue(this, getValue1(), getDataValue().get(VALUE_TYPE_KEY).textValue()));
+    return Optional.of(new WikidataValue(this, getDataValue().get(VALUE_TYPE_KEY).textValue()));
   }
 
   public JsonNode getValue1() {

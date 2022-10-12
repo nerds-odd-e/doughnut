@@ -1,7 +1,6 @@
 package com.odde.doughnut.services.wikidataApis;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Coordinate;
 import com.odde.doughnut.services.wikidataApis.thirdPartyEntities.WikidataClaimItem;
@@ -14,28 +13,16 @@ import java.util.Map;
 public class WikidataValue {
   private WikidataClaimItem wikidataClaimItem;
   private String type;
-  private String wikiClass;
 
-  public WikidataValue(WikidataClaimItem wikidataClaimItem, JsonNode value, String type) {
+  public WikidataValue(WikidataClaimItem wikidataClaimItem, String type) {
     this.wikidataClaimItem = wikidataClaimItem;
     this.type = type;
+  }
 
-    if (isWikibase()) {
-      wikiClass = value.get("id").textValue();
-      return;
+  private void assertStringType() {
+    if ("string".compareToIgnoreCase(type) != 0) {
+      throw new RuntimeException("Unsupported wikidata value type: " + type + ", expected string");
     }
-  }
-
-  private boolean isWikibase() {
-    return "wikibase-entityid".compareToIgnoreCase(type) == 0;
-  }
-
-  private boolean isTimeValue() {
-    return "time".compareToIgnoreCase(type) == 0;
-  }
-
-  private boolean isStringValue() {
-    return "string".compareToIgnoreCase(type) == 0;
   }
 
   private boolean isGlobeCoordinate() {
@@ -43,7 +30,15 @@ public class WikidataValue {
   }
 
   public WikidataId toWikiClass() {
-    return new WikidataId(wikiClass);
+    assertWikibaseType();
+    return new WikidataId(this.wikidataClaimItem.getValue1().get("id").textValue());
+  }
+
+  private void assertWikibaseType() {
+    if (!("wikibase-entityid".compareToIgnoreCase(type) == 0)) {
+      throw new RuntimeException(
+          "Unsupported wikidata value type: " + type + ", expected wikibase-entityid");
+    }
   }
 
   public Coordinate getCoordinate() {
@@ -60,16 +55,12 @@ public class WikidataValue {
   }
 
   private String getStringValue() {
-    if (!isStringValue()) {
-      throw new RuntimeException("Unsupported wikidata value type: " + type + ", expected string");
-    }
+    assertStringType();
     return this.wikidataClaimItem.getValue1().textValue();
   }
 
   public String format() {
-    if (!isTimeValue()) {
-      throw new RuntimeException("Unsupported wikidata value type: " + type + ", expected time");
-    }
+    assertTimeType();
     DateTimeFormatter formatter =
         DateTimeFormatter.ofPattern("dd MMMM yyyy")
             .withZone(ZoneId.systemDefault())
@@ -77,5 +68,11 @@ public class WikidataValue {
     String inputTime = this.wikidataClaimItem.getValue1().get("time").textValue();
     Instant instant = Instant.parse(inputTime.substring(1));
     return formatter.format(instant) + (inputTime.startsWith("-") ? " B.C." : "");
+  }
+
+  private void assertTimeType() {
+    if (!("time".compareToIgnoreCase(type) == 0)) {
+      throw new RuntimeException("Unsupported wikidata value type: " + type + ", expected time");
+    }
   }
 }
