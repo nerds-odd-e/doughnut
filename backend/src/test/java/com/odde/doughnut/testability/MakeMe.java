@@ -138,4 +138,8 @@ public class MakeMe {
   public WikidataEntityJsonBuilder wikidataEntityJson() {
     return new WikidataEntityJsonBuilder();
   }
+
+  public WikidataClaimJsonBuilder wikidataClaimsJson() {
+    return new WikidataClaimJsonBuilder();
+  }
 }

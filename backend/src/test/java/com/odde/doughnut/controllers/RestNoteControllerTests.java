@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -269,80 +268,11 @@ class RestNoteControllerTests {
                                 ],
           """,
                     birthdayByISO);
+
         Mockito.when(httpClientAdapter.getResponseString(any()))
             .thenReturn(
-                """
-                    {
-                      "entities": {
-                        "%s": {
-                          "type": "item",
-                          "id": "%s",
-                          "claims": {
-                          "P27": [{
-                             "mainsnak": {
-                                 "snaktype": "value",
-                                 "property": "P27",
-                                 "hash": "5e51bd61971a52beebe110cd5232eb4cb1a99a3f",
-                                 "datavalue": {
-                                     "value": {
-                                         "entity-type": "item",
-                                         "numeric-id": 865,
-                                         "id": "%s"
-                                     },
-                                     "type": "wikibase-entityid"
-                                 },
-                                 "datatype": "wikibase-item"
-                             },
-                             "type": "statement",
-                             "id": "Q706446$B98C0820-A8FD-465F-93E0-3A6BF8A4A856",
-                             "rank": "normal"
-                         }
-                          ],
-                            %s
-                            "P31": [
-                              {
-                                "mainsnak": {
-                                  "snaktype": "value",
-                                  "property": "P31",
-                                  "datavalue": {
-                                    "value": { "id": "Q5"},
-                                    "type": "wikibase-entityid"
-                                  }
-                                }
-                              }
-                            ]
-                          }
-                        }
-                      }
-                    }
-                  """
-                    .formatted(humanId, humanId, countryQId, birthDayJsonObject),
-                """
-                {"entities":
-                  {"%s":
-                    {"pageid":126,
-                    "title":"%s","type":"item","id":"%s",
-                    "labels":{"en":{"language":"en","value":"%s"}},
-                    "claims":{
-                        "P31": [
-                            {
-                              "mainsnak": {
-                                "snaktype": "value",
-                                "property": "P31",
-                                "datavalue": {
-                                  "value": { "id": "Q1115"},
-                                  "type": "wikibase-entityid"
-                                }
-                              }
-                            }
-                          ]
-                      }
-                    }
-                  }
-                }
-
-                """
-                    .formatted(countryQId, countryQId, countryQId, countryName));
+                makeMe.wikidataClaimsJson().human(humanId, countryQId, birthDayJsonObject).please(),
+                makeMe.wikidataClaimsJson().country(countryQId, countryName).please());
       }
 
       @Test
