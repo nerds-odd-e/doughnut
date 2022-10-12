@@ -8,28 +8,31 @@ public class WikidataDatavalue {
   private String type;
   private JsonNode value;
 
+  private void assertType(String expectedType) {
+    if (expectedType.compareToIgnoreCase(type) != 0) {
+      throw new RuntimeException(
+          "Unsupported wikidata value type: " + type + ", expected " + expectedType);
+    }
+  }
+
   public void assertTimeType() {
-    if (!("time".compareToIgnoreCase(getType()) == 0)) {
-      throw new RuntimeException(
-          "Unsupported wikidata value type: " + getType() + ", expected time");
-    }
+    assertType("time");
   }
 
-  public void assertWikibaseType() {
-    if (!("wikibase-entityid".compareToIgnoreCase(getType()) == 0)) {
-      throw new RuntimeException(
-          "Unsupported wikidata value type: " + getType() + ", expected wikibase-entityid");
-    }
+  public String mustGetStringValue() {
+    assertType("string");
+    return value.textValue();
   }
 
-  public boolean isGlobeCoordinate() {
-    return "globecoordinate".compareToIgnoreCase(getType()) == 0;
+  public String mustGetWikibaseEntityId() {
+    assertType("wikibase-entityid");
+    return value.get("id").textValue();
   }
 
-  public void assertStringType() {
-    if ("string".compareToIgnoreCase(getType()) != 0) {
-      throw new RuntimeException(
-          "Unsupported wikidata value type: " + getType() + ", expected string");
+  public JsonNode tryGetGlobeCoordinate() {
+    if ("globecoordinate".compareToIgnoreCase(type) != 0) {
+      return null;
     }
+    return value;
   }
 }
