@@ -49,11 +49,11 @@ export GITHUB_DOUGHNUT_REPO_ACCESS_TOKEN=$(curl "https://secretmanager.googleapi
     --header "x-goog-user-project: ${PROJECTID}" |
     jq -r ".payload.data" | base64 --decode)
 
-export GITHUB_FOR_ISSUES_API_TOKEN=$(curl "https://secretmanager.googleapis.com/v1/projects/${PROJECTID}/secrets/github_for_issues_api_token/versions/1:access" \
+export GITHUB_FOR_ISSUES_API_TOKEN=$(curl "https://secretmanager.googleapis.com/v1/projects/${PROJECTID}/secrets/github_for_issues_api_token/versions/2:access" \
     --request "GET" \
     --header "authorization: Bearer ${ACCESS_TOKEN}" \
     --header "content-type: application/json" \
     --header "x-goog-user-project: ${PROJECTID}" |
     jq -r ".payload.data" | base64 --decode)
 # Start server
-bash -c "java -jar -Dspring-boot.run.profiles=prod -Dspring.profiles.active=prod -Dspring.datasource.url='jdbc:mysql://db-server:3306/doughnut' -Dspring.datasource.password=${MYSQL_PASSWORD} -Dspring.github-for-issues.token=${GITHUB_FOR_ISSUES_API_TOKEN} /opt/doughnut_app/${ARTIFACT}-${VERSION}.jar" &
+bash -c "java -jar -Dspring-boot.run.profiles=prod -Dspring.profiles.active=prod -Dspring.datasource.url='jdbc:mysql://db-server:3306/doughnut' -Dspring.datasource.password=${MYSQL_PASSWORD} -Dspring.github_for_issues.token=${GITHUB_FOR_ISSUES_API_TOKEN} /opt/doughnut_app/${ARTIFACT}-${VERSION}.jar" &

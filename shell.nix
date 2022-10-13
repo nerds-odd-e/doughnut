@@ -78,11 +78,8 @@ in mkShell {
         export MYSQL_PID_FILE=$MYSQL_HOME/mysql.pid
         export MYSQL_TCP_PORT=3309
         export MYSQLX_TCP_PORT=33090
-        export GITHUB_FOR_ISSUES_API_TOKEN=fake_issues_api_token
-        #export NODE_OPTIONS="--max-old-space-size=4096" # For MS Windows WSL2 env ONLY
-
+        export GITHUB_FOR_ISSUES_API_TOKEN=gh_issues_api_token
         export PATH=$JAVA_HOME/bin:$NODE_HOME/bin:$MYSQL_BASEDIR/bin:$PATH
-
         export LANG="en_US.UTF-8"
         export LC_ALL="en_US.UTF-8"
 

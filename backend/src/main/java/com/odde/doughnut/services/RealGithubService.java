@@ -84,21 +84,10 @@ public class RealGithubService implements GithubService {
         builderWithRequest
             .setHeader("Content-Type", "application/json")
             .setHeader("Accept", "application/vnd.github.v3+json")
-            .setHeader("Authorization", GithubApiToken.getToken())
+            .setHeader("Authorization", "token " + githubForIssuesToken)
             .build();
     HttpResponse.BodyHandler<String> bodyHandler =
         HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8);
     return HttpClient.newBuilder().build().send(request, bodyHandler);
-  }
-
-  private static class GithubApiToken {
-    private static final String token = "token ";
-    private static final String ghp = "ghp_";
-    private static final String value1 = "4TY2c34azFl3Si8YkFS";
-    private static final String value2 = "0KqaxfB8eAy0kGmjR";
-
-    public static String getToken() {
-      return token + ghp + value1 + value2;
-    }
   }
 }
