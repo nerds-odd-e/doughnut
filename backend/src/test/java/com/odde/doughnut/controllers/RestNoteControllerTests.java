@@ -2,7 +2,6 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,6 +25,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -258,76 +259,37 @@ class RestNoteControllerTests {
                 makeMe.wikidataClaimsJson(countryQId).labelIf(countryName).please());
       }
 
-      @Test
-      void shouldAddHumanBirthdayWhenAddingNoteWithWikidataId()
+      @ParameterizedTest
+      @CsvSource(
+          useHeadersInDisplayName = true,
+          delimiter = '|',
+          textBlock =
+              """
+        WikidataId | Birthday from Wikidata | CountryQID | Country Name | Expected Birthday    | Name
+       #---------------------------------------------------------------------------------------------
+        Q706446    | +1980-03-31T00:00:00Z  |            |              | 31 March 1980        |
+        Q4604      | -0552-10-09T00:00:00Z  | Q736936    |              | 09 October 0552 B.C. | Confucius
+        Q706446    | +1980-03-31T00:00:00Z  | Q865       | Taiwan       | 31 March 1980        | Wang Chen-ming
+        Q706446    |                        | Q865       | Taiwan       |                      |
+        Q706446    | +1980-03-31T00:00:00Z  | Q30        | The US of A  |  31 March 1980       |
+        """)
+      void shouldAddHumanBirthdayAndCountryOfOriginWhenAddingNoteWithWikidataId(
+          String wikidataIdOfHuman,
+          String birthdayByISO,
+          String countryQid,
+          String countryName,
+          String expectedBirthday)
           throws BindException, InterruptedException, NoAccessRightException, IOException {
-        String wikidataIdOfHuman = "Q706446"; // Wang Chien-ming
-        String birthday = "31 March 1980"; // P569 (Birthday)
-        String birthdayByISO = "+1980-03-31T00:00:00Z";
-
-        mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO, "", "");
+        mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO, countryQid, countryName);
         noteCreation.setWikidataId(wikidataIdOfHuman);
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
-        assertThat(
-            note.noteRealm.getNote().getTextContent().getDescription(), containsString(birthday));
-      }
-
-      @Test
-      void shouldAddHumanBCBirthdayWhenAddingNoteWithWikidataId()
-          throws BindException, InterruptedException, NoAccessRightException, IOException {
-        String wikidataIdOfHuman = "Q4604"; // Confucius
-        String birthdayYear = "09 October 0552 B.C."; // P569 (Birthday)
-        String birthdayByISO = "-0552-10-09T00:00:00Z";
-
-        mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO, "Q736936", null);
-        noteCreation.setWikidataId(wikidataIdOfHuman);
-        NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
-        assertEquals(birthdayYear, note.noteRealm.getNote().getTextContent().getDescription());
-      }
-
-      @Test
-      void shouldAddHumanCountryOfBirthWhenAddingNoteWithWikidataId()
-          throws BindException, InterruptedException, NoAccessRightException, IOException {
-        String wikidataIdOfHuman = "Q706446"; // Wang Chien-ming
-        String countryOfBirth = "Taiwan";
-        String birthdayByISO = "+1980-03-31T00:00:00Z";
-
-        mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO, "Q865", countryOfBirth);
-        noteCreation.setWikidataId(wikidataIdOfHuman);
-        NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
-        assertThat(
-            note.noteRealm.getNote().getTextContent().getDescription(),
-            containsString(countryOfBirth));
-      }
-
-      @Test
-      void shouldAddHumanCountryOfBirthWhenBirthdayIsEmptyAddingNoteWithWikidataId()
-          throws BindException, InterruptedException, NoAccessRightException, IOException {
-        String wikidataIdOfHuman = "Q706446"; // Wang Chien-ming
-        String countryOfBirth = "Taiwan";
-        String birthdayByISO = "";
-
-        mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO, "Q865", countryOfBirth);
-        noteCreation.setWikidataId(wikidataIdOfHuman);
-        NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
-        assertThat(
-            note.noteRealm.getNote().getTextContent().getDescription(),
-            containsString(countryOfBirth));
-      }
-
-      @Test
-      void shouldAddADifferentHumanCountryOfBirthWhenAddingNoteWithWikidataId()
-          throws BindException, InterruptedException, NoAccessRightException, IOException {
-        String wikidataIdOfHuman = "Q706446";
-        String countryOfBirth = "The United States of America";
-        String birthdayByISO = "+1980-03-31T00:00:00Z";
-
-        mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO, "Q30", countryOfBirth);
-        noteCreation.setWikidataId(wikidataIdOfHuman);
-        NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
-        assertThat(
-            note.noteRealm.getNote().getTextContent().getDescription(),
-            containsString(countryOfBirth));
+        String description = note.noteRealm.getNote().getTextContent().getDescription();
+        if (expectedBirthday != null) {
+          assertThat(description, containsString(expectedBirthday));
+        }
+        if (countryName != null) {
+          assertThat(description, containsString(countryName));
+        }
       }
     }
   }
