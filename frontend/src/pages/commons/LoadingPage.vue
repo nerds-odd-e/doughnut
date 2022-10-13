@@ -4,11 +4,14 @@
 </template>
 
 <script lang="ts">
+import { PropType } from "vue";
 import ContentLoader from "../../components/commons/ContentLoader.vue";
 
 export default {
   props: {
-    contentExists: Boolean,
+    contentExists: null as unknown as PropType<
+      Record<number, string>[] | boolean | null | undefined
+    >,
   },
   components: { ContentLoader },
 };
