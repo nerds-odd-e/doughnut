@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.logging.log4j.util.Strings;
 import org.junit.platform.commons.util.StringUtils;
 
 public class WikidataClaimJsonBuilder {
@@ -16,11 +17,14 @@ public class WikidataClaimJsonBuilder {
     this.wikidataId = wikidataId;
   }
 
-  public WikidataClaimJsonBuilder label(String name) {
-    this.englishLabel =
-        """
-      "labels":{"en":{"language":"en","value":"%s"}}
-      """.formatted(name);
+  public WikidataClaimJsonBuilder labelIf(String name) {
+    if (!Strings.isEmpty(name)) {
+      this.englishLabel =
+          """
+          "labels":{"en":{"language":"en","value":"%s"}}
+          """
+              .formatted(name);
+    }
     return this;
   }
 

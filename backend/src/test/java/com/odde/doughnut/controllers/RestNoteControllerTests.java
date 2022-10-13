@@ -255,7 +255,7 @@ class RestNoteControllerTests {
                     .countryOfOrigin(countryQId)
                     .birthdayIf(birthdayByISO)
                     .please(),
-                makeMe.wikidataClaimsJson(countryQId).label(countryName).please());
+                makeMe.wikidataClaimsJson(countryQId).labelIf(countryName).please());
       }
 
       @Test
@@ -279,7 +279,7 @@ class RestNoteControllerTests {
         String birthdayYear = "09 October 0552 B.C."; // P569 (Birthday)
         String birthdayByISO = "-0552-10-09T00:00:00Z";
 
-        mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO, "Q736936", "");
+        mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO, "Q736936", null);
         noteCreation.setWikidataId(wikidataIdOfHuman);
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
         assertEquals(birthdayYear, note.noteRealm.getNote().getTextContent().getDescription());
