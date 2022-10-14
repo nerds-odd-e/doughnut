@@ -3,7 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.TextContent;
 import com.odde.doughnut.entities.json.NoteRealm;
-import com.odde.doughnut.exceptions.NoAccessRightException;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
@@ -41,7 +41,7 @@ class RestTextContentController {
   @Transactional
   public NoteRealm updateNote(
       @PathVariable(name = "note") Note note, @Valid @ModelAttribute TextContent textContent)
-      throws NoAccessRightException {
+      throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
 
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();

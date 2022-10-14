@@ -6,7 +6,7 @@ import com.odde.doughnut.entities.TextContent;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.NotebooksViewedByUser;
 import com.odde.doughnut.entities.json.RedirectToNoteResponse;
-import com.odde.doughnut.exceptions.NoAccessRightException;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.models.JsonViewer;
@@ -65,7 +65,7 @@ class RestNotebookController {
 
   @PostMapping(value = "/{notebook}")
   @Transactional
-  public Notebook update(@Valid Notebook notebook) throws NoAccessRightException {
+  public Notebook update(@Valid Notebook notebook) throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(notebook);
     modelFactoryService.notebookRepository.save(notebook);
     return notebook;
@@ -73,7 +73,7 @@ class RestNotebookController {
 
   @PostMapping(value = "/{notebook}/share")
   public Notebook shareNote(@PathVariable("notebook") Notebook notebook)
-      throws NoAccessRightException {
+      throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(notebook);
     BazaarModel bazaar = modelFactoryService.toBazaarModel();
     bazaar.shareNote(notebook);

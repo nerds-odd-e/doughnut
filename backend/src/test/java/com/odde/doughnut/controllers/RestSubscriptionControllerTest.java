@@ -10,7 +10,7 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.SubscriptionRepository;
-import com.odde.doughnut.exceptions.NoAccessRightException;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,7 +43,7 @@ class RestSubscriptionControllerTest {
   }
 
   @Test
-  void subscribeToNoteSuccessfully() throws NoAccessRightException {
+  void subscribeToNoteSuccessfully() throws UnexpectedNoAccessRightException {
     Subscription subscription = makeMe.aSubscription().inMemoryPlease();
     Subscription result = controller.createSubscription(notebook, subscription);
     assertEquals(topNote, result.getHeadNote());
@@ -55,14 +55,14 @@ class RestSubscriptionControllerTest {
     Note anotherNote = makeMe.aNote().creatorAndOwner(makeMe.aUser().please()).please();
     Subscription subscription = makeMe.aSubscription().inMemoryPlease();
     assertThrows(
-        NoAccessRightException.class,
+        UnexpectedNoAccessRightException.class,
         () -> controller.createSubscription(anotherNote.getNotebook(), subscription));
   }
 
   @Nested
   class Unsubscribe {
     @Test
-    void shouldRemoveTheSubscription() throws NoAccessRightException {
+    void shouldRemoveTheSubscription() throws UnexpectedNoAccessRightException {
       Subscription subscription = makeMe.aSubscription().forUser(userModel.getEntity()).please();
       long beforeDestroy = subscriptionRepository.count();
       controller.destroySubscription(subscription);
@@ -74,7 +74,7 @@ class RestSubscriptionControllerTest {
       User anotherUser = makeMe.aUser().please();
       Subscription subscription = makeMe.aSubscription().forUser(anotherUser).please();
       assertThrows(
-          NoAccessRightException.class, () -> controller.destroySubscription(subscription));
+          UnexpectedNoAccessRightException.class, () -> controller.destroySubscription(subscription));
     }
   }
 }

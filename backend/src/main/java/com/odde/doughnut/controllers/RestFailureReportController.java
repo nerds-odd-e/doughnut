@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.FailureReport;
-import com.odde.doughnut.exceptions.NoAccessRightException;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.RealGithubService;
@@ -26,7 +26,7 @@ class RestFailureReportController {
   }
 
   @GetMapping("")
-  public Iterable<FailureReport> failureReports() throws NoAccessRightException {
+  public Iterable<FailureReport> failureReports() throws UnexpectedNoAccessRightException {
     currentUser.assertDeveloperAuthorization();
     return modelFactoryService.failureReportRepository.findAll();
   }
@@ -38,7 +38,7 @@ class RestFailureReportController {
 
   @GetMapping("/{failureReport}")
   public FailureReportForView failureReport(FailureReport failureReport)
-      throws NoAccessRightException {
+      throws UnexpectedNoAccessRightException {
     currentUser.assertDeveloperAuthorization();
     FailureReportForView failureReportForView = new FailureReportForView();
     failureReportForView.failureReport = failureReport;

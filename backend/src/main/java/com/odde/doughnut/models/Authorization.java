@@ -6,7 +6,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.exceptions.NoAccessRightException;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 public record Authorization(User user, ModelFactoryService modelFactoryService) {
 
-  public <T> void assertAuthorization(T object) throws NoAccessRightException {
+  public <T> void assertAuthorization(T object) throws UnexpectedNoAccessRightException {
     if (object instanceof Note) {
       assertAuthorizationNote((Note) object);
     } else if (object instanceof Notebook) {
@@ -33,7 +33,7 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
     }
   }
 
-  public <T> void assertReadAuthorization(T object) throws NoAccessRightException {
+  public <T> void assertReadAuthorization(T object) throws UnexpectedNoAccessRightException {
     if (object instanceof Note) {
       assertReadAuthorizationNote((Note) object);
     } else if (object instanceof Notebook) {
@@ -47,14 +47,14 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
     }
   }
 
-  private void assertAuthorizationNote(Note note) throws NoAccessRightException {
+  private void assertAuthorizationNote(Note note) throws UnexpectedNoAccessRightException {
     assertLoggedIn();
     if (!hasFullAuthority(note.getNotebook())) {
-      throw new NoAccessRightException();
+      throw new UnexpectedNoAccessRightException();
     }
   }
 
-  private void assertReadAuthorizationNote(Note note) throws NoAccessRightException {
+  private void assertReadAuthorizationNote(Note note) throws UnexpectedNoAccessRightException {
     assertReadAuthorizationNotebook(note.getNotebook());
   }
 
@@ -68,7 +68,7 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
     return user.canReferTo(note.getNotebook());
   }
 
-  private void assertReadAuthorizationNotebook(Notebook notebook) throws NoAccessRightException {
+  private void assertReadAuthorizationNotebook(Notebook notebook) throws UnexpectedNoAccessRightException {
     if (notebook != null) {
       if (hasReferenceAuthority(notebook.getHeadNote())) {
         return;
@@ -78,44 +78,44 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
       }
     }
     assertLoggedIn();
-    throw new NoAccessRightException();
+    throw new UnexpectedNoAccessRightException();
   }
 
-  private void assertAuthorizationNotebook(Notebook notebook) throws NoAccessRightException {
+  private void assertAuthorizationNotebook(Notebook notebook) throws UnexpectedNoAccessRightException {
     if (!hasFullAuthority(notebook)) {
-      throw new NoAccessRightException();
+      throw new UnexpectedNoAccessRightException();
     }
   }
 
-  private void assertAuthorizationCircle(Circle circle) throws NoAccessRightException {
+  private void assertAuthorizationCircle(Circle circle) throws UnexpectedNoAccessRightException {
     assertLoggedIn();
     if (user == null || !user.inCircle(circle)) {
-      throw new NoAccessRightException();
+      throw new UnexpectedNoAccessRightException();
     }
   }
 
   private void assertAuthorizationSubscription(Subscription subscription)
-      throws NoAccessRightException {
+      throws UnexpectedNoAccessRightException {
     if (subscription.getUser() != user) {
-      throw new NoAccessRightException();
+      throw new UnexpectedNoAccessRightException();
     }
   }
 
-  private void assertAuthorizationUser(User user) throws NoAccessRightException {
+  private void assertAuthorizationUser(User user) throws UnexpectedNoAccessRightException {
     if (!this.user.getId().equals(user.getId())) {
-      throw new NoAccessRightException();
+      throw new UnexpectedNoAccessRightException();
     }
   }
 
-  private void assertAuthorizationLink(Link link) throws NoAccessRightException {
+  private void assertAuthorizationLink(Link link) throws UnexpectedNoAccessRightException {
     if (!link.getSourceNote().getThing().getCreator().getId().equals(user.getId())) {
-      throw new NoAccessRightException();
+      throw new UnexpectedNoAccessRightException();
     }
   }
 
-  public void assertDeveloperAuthorization() throws NoAccessRightException {
+  public void assertDeveloperAuthorization() throws UnexpectedNoAccessRightException {
     if (!isDeveloper()) {
-      throw new NoAccessRightException();
+      throw new UnexpectedNoAccessRightException();
     }
   }
 
@@ -137,7 +137,7 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
     throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User Not Found");
   }
 
-  private void assertReadAuthorizationLink(Link link) throws NoAccessRightException {
+  private void assertReadAuthorizationLink(Link link) throws UnexpectedNoAccessRightException {
     assertReadAuthorizationNote(link.getSourceNote());
   }
 }

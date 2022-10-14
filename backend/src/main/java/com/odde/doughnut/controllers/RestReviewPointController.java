@@ -2,7 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.SelfEvaluation;
-import com.odde.doughnut.exceptions.NoAccessRightException;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import org.springframework.http.HttpStatus;
@@ -23,7 +23,7 @@ class RestReviewPointController {
 
   @GetMapping("/{reviewPoint}")
   public ReviewPoint show(@PathVariable("reviewPoint") ReviewPoint reviewPoint)
-      throws NoAccessRightException {
+      throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(reviewPoint.getUser());
     return reviewPoint;
   }

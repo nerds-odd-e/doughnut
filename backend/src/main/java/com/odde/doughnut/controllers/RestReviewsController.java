@@ -8,7 +8,7 @@ import com.odde.doughnut.entities.json.InitialInfo;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.entities.json.RepetitionForUser;
 import com.odde.doughnut.entities.json.ReviewStatus;
-import com.odde.doughnut.exceptions.NoAccessRightException;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.ReviewPointModel;
@@ -112,7 +112,7 @@ class RestReviewsController {
   @GetMapping(path = "/answers/{answer}")
   @Transactional
   public AnswerViewedByUser getAnswer(@PathVariable("answer") Answer answer)
-      throws NoAccessRightException {
+      throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(answer.getQuestion().getReviewPoint().getHeadNote());
     AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
     AnswerViewedByUser answerResult = answerModel.getAnswerViewedByUser();

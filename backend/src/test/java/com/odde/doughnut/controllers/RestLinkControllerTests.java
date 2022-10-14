@@ -10,7 +10,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.LinkCreation;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
-import com.odde.doughnut.exceptions.NoAccessRightException;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
@@ -61,17 +61,17 @@ class RestLinkControllerTests {
 
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-      assertThrows(NoAccessRightException.class, () -> controller().show(link));
+      assertThrows(UnexpectedNoAccessRightException.class, () -> controller().show(link));
     }
 
     @Test
-    void shouldNotBeAbleToSeeItIfICanReadOneNote() throws NoAccessRightException {
+    void shouldNotBeAbleToSeeItIfICanReadOneNote() throws UnexpectedNoAccessRightException {
       makeMe.aBazaarNodebook(note1.getNotebook()).please();
-      assertThrows(NoAccessRightException.class, () -> controller().show(link));
+      assertThrows(UnexpectedNoAccessRightException.class, () -> controller().show(link));
     }
 
     @Test
-    void shouldBeAbleToSeeItIfICanReadBothNote() throws NoAccessRightException {
+    void shouldBeAbleToSeeItIfICanReadBothNote() throws UnexpectedNoAccessRightException {
       makeMe.aBazaarNodebook(note1.getNotebook()).please();
       makeMe.aBazaarNodebook(note2.getNotebook()).please();
       Link linkViewedByUser = controller().show(link);
@@ -97,7 +97,7 @@ class RestLinkControllerTests {
 
     @Test
     void createdSuccessfully()
-        throws CyclicLinkDetectedException, BindException, NoAccessRightException {
+        throws CyclicLinkDetectedException, BindException, UnexpectedNoAccessRightException {
       Note note3 = makeMe.aNote().creatorAndOwner(userModel).please();
       long beforeThingCount = makeMe.modelFactoryService.thingRepository.count();
       controller().linkNoteFinalize(note3, note2, linkCreation, makeMe.successfulBindingResult());
@@ -127,7 +127,7 @@ class RestLinkControllerTests {
     @Test
     void shouldNotAllowMoveOtherPeoplesNote() {
       assertThrows(
-          NoAccessRightException.class,
+          UnexpectedNoAccessRightException.class,
           () ->
               controller()
                   .linkNoteFinalize(note1, note2, linkCreation, makeMe.successfulBindingResult()));
@@ -136,7 +136,7 @@ class RestLinkControllerTests {
     @Test
     void shouldNotAllowMoveToOtherPeoplesNote() {
       assertThrows(
-          NoAccessRightException.class,
+          UnexpectedNoAccessRightException.class,
           () ->
               controller()
                   .linkNoteFinalize(note2, note1, linkCreation, makeMe.successfulBindingResult()));

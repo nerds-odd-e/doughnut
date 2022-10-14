@@ -11,7 +11,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessories;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.*;
-import com.odde.doughnut.exceptions.NoAccessRightException;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
@@ -61,11 +61,11 @@ class RestNoteControllerTests {
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       User otherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(otherUser).please();
-      assertThrows(NoAccessRightException.class, () -> controller.show(note));
+      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.show(note));
     }
 
     @Test
-    void shouldReturnTheNoteInfoIfHavingReadingAuth() throws NoAccessRightException {
+    void shouldReturnTheNoteInfoIfHavingReadingAuth() throws UnexpectedNoAccessRightException {
       User otherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(otherUser).please();
       makeMe.aBazaarNodebook(note.getNotebook()).please();
@@ -76,7 +76,7 @@ class RestNoteControllerTests {
     }
 
     @Test
-    void shouldBeAbleToSeeOwnNote() throws NoAccessRightException {
+    void shouldBeAbleToSeeOwnNote() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(userModel).please();
       makeMe.refresh(userModel.getEntity());
       final NoteRealmWithPosition show = controller.show(note);
@@ -85,7 +85,7 @@ class RestNoteControllerTests {
     }
 
     @Test
-    void shouldBeAbleToSeeOwnNoteOverview() throws NoAccessRightException {
+    void shouldBeAbleToSeeOwnNoteOverview() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(userModel).please();
       Note childNote = makeMe.aNote().creatorAndOwner(userModel).under(note).please();
       makeMe.theNote(childNote).with10Children().please();
@@ -104,11 +104,11 @@ class RestNoteControllerTests {
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       User otherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(otherUser).please();
-      assertThrows(NoAccessRightException.class, () -> controller.getNoteInfo(note));
+      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.getNoteInfo(note));
     }
 
     @Test
-    void shouldReturnTheNoteInfoIfHavingReadingAuth() throws NoAccessRightException {
+    void shouldReturnTheNoteInfoIfHavingReadingAuth() throws UnexpectedNoAccessRightException {
       User otherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(otherUser).please();
       makeMe
@@ -136,14 +136,14 @@ class RestNoteControllerTests {
 
     @Test
     void shouldBeAbleToSaveNoteWhenValid()
-        throws NoAccessRightException, BindException, InterruptedException {
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException {
       NoteRealmWithPosition response = controller.createNote(parent, noteCreation);
       assertThat(response.noteRealm.getId(), not(nullValue()));
     }
 
     @Test
     void shouldBeAbleToCreateAThing()
-        throws NoAccessRightException, BindException, InterruptedException {
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException {
       long beforeThingCount = makeMe.modelFactoryService.thingRepository.count();
       controller.createNote(parent, noteCreation);
       long afterThingCount = makeMe.modelFactoryService.thingRepository.count();
@@ -152,7 +152,7 @@ class RestNoteControllerTests {
 
     @Test
     void shouldBeAbleToSaveNoteWithWikidataIdWhenValid()
-        throws NoAccessRightException, BindException, InterruptedException, IOException {
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(new MakeMe().wikidataEntityJson().entityId("Q12345").please());
       noteCreation.setWikidataId("Q12345");
@@ -162,7 +162,7 @@ class RestNoteControllerTests {
 
     @Test
     void shouldBeAbleToSaveNoteWithoutWikidataIdWhenValid()
-        throws NoAccessRightException, BindException, InterruptedException {
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException {
       NoteRealmWithPosition response = controller.createNote(parent, noteCreation);
 
       assertThat(response.noteRealm.getNote().getWikidataId(), equalTo(null));
@@ -205,7 +205,7 @@ class RestNoteControllerTests {
 
       @Test
       void shouldPrependLocationInfoWhenAddingNoteWithWikidataId()
-          throws BindException, InterruptedException, NoAccessRightException, IOException {
+          throws BindException, InterruptedException, UnexpectedNoAccessRightException, IOException {
         mockApiResponseWithLocationInfo(
             "{\"latitude\":1.3,\"longitude\":103.8}", "globecoordinate");
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
@@ -227,7 +227,7 @@ class RestNoteControllerTests {
 
       @Test
       void shouldPrependLocationInfoWhenAddingNoteWithWikidataIdWithStringValue()
-          throws BindException, InterruptedException, NoAccessRightException, IOException {
+          throws BindException, InterruptedException, UnexpectedNoAccessRightException, IOException {
         mockApiResponseWithLocationInfo("\"center of the earth\"", "string");
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
         assertThat(
@@ -279,7 +279,7 @@ class RestNoteControllerTests {
           String countryQid,
           String countryName,
           String expectedBirthday)
-          throws BindException, InterruptedException, NoAccessRightException, IOException {
+          throws BindException, InterruptedException, UnexpectedNoAccessRightException, IOException {
         mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO, countryQid, countryName);
         noteCreation.setWikidataId(wikidataIdOfHuman);
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
@@ -304,13 +304,13 @@ class RestNoteControllerTests {
     }
 
     @Test
-    void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException, IOException {
+    void shouldBeAbleToSaveNoteWhenValid() throws UnexpectedNoAccessRightException, IOException {
       NoteRealm response = controller.updateNote(note, note.getNoteAccessories());
       assertThat(response.getId(), equalTo(note.getId()));
     }
 
     @Test
-    void shouldAddUploadedPicture() throws NoAccessRightException, IOException {
+    void shouldAddUploadedPicture() throws UnexpectedNoAccessRightException, IOException {
       makeMe.theNote(note).withNewlyUploadedPicture();
       controller.updateNote(note, note.getNoteAccessories());
       assertThat(note.getNoteAccessories().getUploadPicture(), is(not(nullValue())));
@@ -318,7 +318,7 @@ class RestNoteControllerTests {
 
     @Test
     void shouldNotRemoveThePictureIfNoNewPictureInTheUpdate()
-        throws NoAccessRightException, IOException {
+        throws UnexpectedNoAccessRightException, IOException {
       makeMe.theNote(note).withUploadedPicture();
       NoteAccessories newContent = makeMe.aNote().inMemoryPlease().getNoteAccessories();
       controller.updateNote(note, newContent);
@@ -344,11 +344,11 @@ class RestNoteControllerTests {
     void shouldNotBeAbleToDeleteNoteThatBelongsToOtherUser() {
       User anotherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
-      assertThrows(NoAccessRightException.class, () -> controller.deleteNote(note));
+      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.deleteNote(note));
     }
 
     @Test
-    void shouldDeleteTheNoteButNotTheUser() throws NoAccessRightException {
+    void shouldDeleteTheNoteButNotTheUser() throws UnexpectedNoAccessRightException {
       controller.deleteNote(subject);
       makeMe.refresh(parent);
       assertThat(parent.getChildren(), hasSize(0));
@@ -356,7 +356,7 @@ class RestNoteControllerTests {
     }
 
     @Test
-    void shouldDeleteTheChildNoteButNotSibling() throws NoAccessRightException {
+    void shouldDeleteTheChildNoteButNotSibling() throws UnexpectedNoAccessRightException {
       makeMe.aNote("silbling").under(parent).please();
       controller.deleteNote(subject);
       makeMe.refresh(parent);
@@ -367,7 +367,7 @@ class RestNoteControllerTests {
     @Nested
     class UndoDeleteNoteTest {
       @Test
-      void shouldUndoDeleteTheNote() throws NoAccessRightException {
+      void shouldUndoDeleteTheNote() throws UnexpectedNoAccessRightException {
         controller.deleteNote(subject);
         makeMe.refresh(subject);
         controller.undoDeleteNote(subject);
@@ -377,7 +377,7 @@ class RestNoteControllerTests {
       }
 
       @Test
-      void shouldUndoOnlylastChange() throws NoAccessRightException {
+      void shouldUndoOnlylastChange() throws UnexpectedNoAccessRightException {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         testabilitySettings.timeTravelTo(timestamp);
         controller.deleteNote(child);
@@ -402,7 +402,7 @@ class RestNoteControllerTests {
   void shouldNotBeAbleToAddCommentToNoteTheUserCannotSee() {
     User anotherUser = makeMe.aUser().please();
     Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
-    assertThrows(NoAccessRightException.class, () -> controller.getPosition(note));
+    assertThrows(UnexpectedNoAccessRightException.class, () -> controller.getPosition(note));
   }
 
   @Nested
@@ -418,7 +418,7 @@ class RestNoteControllerTests {
     }
 
     @Test
-    void shouldUpdateNoteWithUniqueWikidataId() throws BindException, NoAccessRightException {
+    void shouldUpdateNoteWithUniqueWikidataId() throws BindException, UnexpectedNoAccessRightException {
       WikidataAssociationCreation wikidataAssociationCreation = new WikidataAssociationCreation();
       wikidataAssociationCreation.wikidataId = "Q123";
       controller.updateWikidataId(note, wikidataAssociationCreation);

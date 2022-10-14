@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.exceptions.NoAccessRightException;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import java.util.List;
@@ -27,7 +27,7 @@ class RestHealthCheckController {
 
   @GetMapping("/data_upgrade")
   @Transactional(timeout = 200)
-  public List dataUpgrade() throws NoAccessRightException {
+  public List dataUpgrade() throws UnexpectedNoAccessRightException {
     currentUser.assertDeveloperAuthorization();
     return List.of();
   }

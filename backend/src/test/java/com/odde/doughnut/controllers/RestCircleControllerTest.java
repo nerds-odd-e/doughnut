@@ -9,7 +9,7 @@ import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.TextContent;
 import com.odde.doughnut.entities.json.CircleForUserView;
 import com.odde.doughnut.entities.json.CircleJoiningByInvitation;
-import com.odde.doughnut.exceptions.NoAccessRightException;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
@@ -65,14 +65,14 @@ class RestCircleControllerTest {
       Circle circle = makeMe.aCircle().please();
       TextContent textContent = makeMe.aNote().inMemoryPlease().getTextContent();
       assertThrows(
-          NoAccessRightException.class, () -> controller.createNotebook(circle, textContent));
+          UnexpectedNoAccessRightException.class, () -> controller.createNotebook(circle, textContent));
     }
   }
 
   @Nested
   class ShowCircle {
     @Test
-    void itShouldCircleForUserViewIfAuthorized() throws NoAccessRightException {
+    void itShouldCircleForUserViewIfAuthorized() throws UnexpectedNoAccessRightException {
       UserModel user = makeMe.aUser().toModelPlease();
       controller = new RestCircleController(modelFactoryService, testabilitySettings, user);
 
@@ -111,7 +111,7 @@ class RestCircleControllerTest {
     void itShouldNotAllowNonMemberToSeeACircle() {
       Circle circle = makeMe.aCircle().please();
       assertThrows(
-          NoAccessRightException.class,
+          UnexpectedNoAccessRightException.class,
           () -> {
             controller.showCircle(circle);
           });

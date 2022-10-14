@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.exceptions.NoAccessRightException;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
@@ -66,7 +66,7 @@ class RestNotebookControllerTest {
   class ShareMyNotebook {
 
     @Test
-    void shareMyNote() throws NoAccessRightException {
+    void shareMyNote() throws UnexpectedNoAccessRightException {
       long oldCount = modelFactoryService.bazaarNotebookRepository.count();
       controller.shareNote(topNote.getNotebook());
       assertThat(modelFactoryService.bazaarNotebookRepository.count(), equalTo(oldCount + 1));
@@ -76,7 +76,7 @@ class RestNotebookControllerTest {
     void shouldNotBeAbleToShareNoteThatBelongsToOtherUser() {
       User anotherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
-      assertThrows(NoAccessRightException.class, () -> controller.shareNote(note.getNotebook()));
+      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.shareNote(note.getNotebook()));
     }
   }
 
@@ -86,7 +86,7 @@ class RestNotebookControllerTest {
     void shouldNotBeAbleToUpdateNotebookThatBelongsToOtherUser() {
       User anotherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
-      assertThrows(NoAccessRightException.class, () -> controller.update(note.getNotebook()));
+      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.update(note.getNotebook()));
     }
   }
 }

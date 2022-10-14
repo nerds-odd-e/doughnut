@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.exceptions.NoAccessRightException;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Authorization;
 import com.odde.doughnut.models.UserModel;
@@ -31,7 +31,7 @@ record RestUserController(ModelFactoryService modelFactoryService, UserModel cur
   }
 
   @PatchMapping("/{user}")
-  public @Valid User updateUser(@Valid User user) throws NoAccessRightException {
+  public @Valid User updateUser(@Valid User user) throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(user);
     modelFactoryService.userRepository.save(user);
     return user;

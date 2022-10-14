@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.exceptions.NoAccessRightException;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,7 +38,7 @@ class RestUserControllerTest {
   }
 
   @Test
-  void updateUserSuccessfully() throws NoAccessRightException {
+  void updateUserSuccessfully() throws UnexpectedNoAccessRightException {
     User response = controller.updateUser(userModel.getEntity());
     assertThat(response, equalTo(userModel.getEntity()));
   }
@@ -46,6 +46,6 @@ class RestUserControllerTest {
   @Test
   void updateOtherUserProfile() {
     User anotherUser = makeMe.aUser().please();
-    assertThrows(NoAccessRightException.class, () -> controller.updateUser(anotherUser));
+    assertThrows(UnexpectedNoAccessRightException.class, () -> controller.updateUser(anotherUser));
   }
 }

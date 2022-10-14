@@ -7,7 +7,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.CircleForUserView;
 import com.odde.doughnut.entities.json.CircleJoiningByInvitation;
 import com.odde.doughnut.entities.json.RedirectToNoteResponse;
-import com.odde.doughnut.exceptions.NoAccessRightException;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.JsonViewer;
@@ -48,7 +48,7 @@ class RestCircleController {
 
   @GetMapping("/{circle}")
   public CircleForUserView showCircle(@PathVariable("circle") Circle circle)
-      throws NoAccessRightException {
+      throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(circle);
     JsonViewer jsonViewer = new JsonViewer(currentUser.getEntity());
     return jsonViewer.jsonCircleForUserView(circle);
@@ -94,7 +94,7 @@ class RestCircleController {
 
   @PostMapping({"/{circle}/notebooks"})
   public RedirectToNoteResponse createNotebook(
-      Circle circle, @Valid @ModelAttribute TextContent textContent) throws NoAccessRightException {
+      Circle circle, @Valid @ModelAttribute TextContent textContent) throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
     currentUser.assertAuthorization(circle);
     Note note =

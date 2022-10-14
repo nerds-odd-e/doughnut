@@ -2,7 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.Subscription;
-import com.odde.doughnut.exceptions.NoAccessRightException;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import java.util.List;
@@ -29,7 +29,7 @@ class RestSubscriptionController {
   @Transactional
   public @Valid Subscription createSubscription(
       @PathVariable(name = "notebook") Notebook notebook, @Valid Subscription subscription)
-      throws NoAccessRightException {
+      throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(notebook);
     subscription.setNotebook(notebook);
     subscription.setUser(currentUser.getEntity());
@@ -47,7 +47,7 @@ class RestSubscriptionController {
   @PostMapping("/{subscription}/delete")
   @Transactional
   public List<Integer> destroySubscription(@Valid Subscription subscription)
-      throws NoAccessRightException {
+      throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(subscription);
     modelFactoryService.entityManager.remove(subscription);
     return List.of(1);

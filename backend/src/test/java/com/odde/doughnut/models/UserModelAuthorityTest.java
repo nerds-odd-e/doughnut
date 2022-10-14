@@ -3,7 +3,7 @@ package com.odde.doughnut.models;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.exceptions.NoAccessRightException;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -42,11 +42,11 @@ public class UserModelAuthorityTest {
 
     @Test
     void userCanNotAccessNotesBelongToCircle() {
-      assertThrows(NoAccessRightException.class, () -> userModel.assertAuthorization(note));
+      assertThrows(UnexpectedNoAccessRightException.class, () -> userModel.assertAuthorization(note));
     }
 
     @Test
-    void userCanAccessNotesBelongToCircleIfIsAMember() throws NoAccessRightException {
+    void userCanAccessNotesBelongToCircleIfIsAMember() throws UnexpectedNoAccessRightException {
       makeMe.theCircle(circleModel).hasMember(userModel).please();
       userModel.assertAuthorization(note);
     }

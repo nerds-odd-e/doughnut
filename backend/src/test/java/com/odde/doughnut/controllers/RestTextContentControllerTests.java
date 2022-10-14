@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.TextContent;
 import com.odde.doughnut.entities.json.NoteRealm;
-import com.odde.doughnut.exceptions.NoAccessRightException;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
@@ -52,7 +52,7 @@ class RestTextContentControllerTests {
     }
 
     @Test
-    void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException, IOException {
+    void shouldBeAbleToSaveNoteWhenValid() throws UnexpectedNoAccessRightException, IOException {
       NoteRealm response = controller.updateNote(note, textContent);
       assertThat(response.getId(), equalTo(note.getId()));
       assertThat(response.getNote().getTextContent().getDescription(), equalTo("new description"));
@@ -61,7 +61,7 @@ class RestTextContentControllerTests {
     @Test
     void shouldNotAllowOthersToChange() {
       note = makeMe.aNote("another").creatorAndOwner(makeMe.aUser().please()).please();
-      assertThrows(NoAccessRightException.class, () -> controller.updateNote(note, textContent));
+      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.updateNote(note, textContent));
     }
   }
 }

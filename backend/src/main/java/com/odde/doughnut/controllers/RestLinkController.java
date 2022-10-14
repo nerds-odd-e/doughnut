@@ -6,7 +6,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.LinkCreation;
 import com.odde.doughnut.entities.json.NoteRealm;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
-import com.odde.doughnut.exceptions.NoAccessRightException;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.LinkModel;
 import com.odde.doughnut.models.NoteViewer;
@@ -44,7 +44,7 @@ class RestLinkController {
   }
 
   @GetMapping("/{link}")
-  public Link show(@PathVariable("link") Link link) throws NoAccessRightException {
+  public Link show(@PathVariable("link") Link link) throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(link);
     return link;
   }
@@ -52,7 +52,7 @@ class RestLinkController {
   @PostMapping(value = "/{link}")
   @Transactional
   public NoteRealm updateLink(Link link, @RequestBody LinkCreation linkCreation)
-      throws NoAccessRightException {
+      throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(link);
     link.setLinkType(linkCreation.linkType);
     modelFactoryService.linkRepository.save(link);
@@ -67,7 +67,7 @@ class RestLinkController {
   @PostMapping(value = "/{link}/{perspective}/delete")
   @Transactional
   public NoteRealm deleteLink(@PathVariable Link link, @PathVariable String perspective)
-      throws NoAccessRightException {
+      throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(link);
     LinkModel linkModel = modelFactoryService.toLinkModel(link);
     linkModel.destroy();
@@ -81,7 +81,7 @@ class RestLinkController {
       @PathVariable Note targetNote,
       @RequestBody @Valid LinkCreation linkCreation,
       BindingResult bindingResult)
-      throws NoAccessRightException, CyclicLinkDetectedException, BindException {
+      throws UnexpectedNoAccessRightException, CyclicLinkDetectedException, BindException {
     if (bindingResult.hasErrors()) throw new BindException(bindingResult);
     currentUser.assertAuthorization(sourceNote);
     currentUser.assertReadAuthorization(targetNote);

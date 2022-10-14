@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.SelfEvaluation;
-import com.odde.doughnut.exceptions.NoAccessRightException;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
@@ -46,7 +46,7 @@ class RestReviewPointControllerTest {
     }
 
     @Test
-    void shouldBeAbleToSeeOwn() throws NoAccessRightException {
+    void shouldBeAbleToSeeOwn() throws UnexpectedNoAccessRightException {
       ReviewPoint reviewPoint = controller.show(rp);
       assertThat(reviewPoint, equalTo(rp));
     }
@@ -54,7 +54,7 @@ class RestReviewPointControllerTest {
     @Test
     void shouldNotBeAbleToSeeOthers() {
       rp = makeMe.aReviewPointFor(makeMe.aHeadNote().please()).by(makeMe.aUser().please()).please();
-      assertThrows(NoAccessRightException.class, () -> controller.show(rp));
+      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.show(rp));
     }
 
     @Test
