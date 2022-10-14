@@ -142,4 +142,8 @@ public class MakeMe {
   public WikidataClaimJsonBuilder wikidataClaimsJson(String wikidataId) {
     return new WikidataClaimJsonBuilder(wikidataId);
   }
+
+  public FailureReportBuilder aFailureReport() {
+    return new FailureReportBuilder(this);
+  }
 }

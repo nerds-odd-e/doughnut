@@ -94,7 +94,8 @@ class RestCircleController {
 
   @PostMapping({"/{circle}/notebooks"})
   public RedirectToNoteResponse createNotebook(
-      Circle circle, @Valid @ModelAttribute TextContent textContent) throws UnexpectedNoAccessRightException {
+      Circle circle, @Valid @ModelAttribute TextContent textContent)
+      throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
     currentUser.assertAuthorization(circle);
     Note note =

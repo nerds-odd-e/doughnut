@@ -76,7 +76,8 @@ class RestNotebookControllerTest {
     void shouldNotBeAbleToShareNoteThatBelongsToOtherUser() {
       User anotherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
-      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.shareNote(note.getNotebook()));
+      assertThrows(
+          UnexpectedNoAccessRightException.class, () -> controller.shareNote(note.getNotebook()));
     }
   }
 
@@ -86,7 +87,8 @@ class RestNotebookControllerTest {
     void shouldNotBeAbleToUpdateNotebookThatBelongsToOtherUser() {
       User anotherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
-      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.update(note.getNotebook()));
+      assertThrows(
+          UnexpectedNoAccessRightException.class, () -> controller.update(note.getNotebook()));
     }
   }
 }

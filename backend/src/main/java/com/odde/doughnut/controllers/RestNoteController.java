@@ -78,7 +78,8 @@ class RestNoteController {
   }
 
   @GetMapping("/{note}")
-  public NoteRealmWithPosition show(@PathVariable("note") Note note) throws UnexpectedNoAccessRightException {
+  public NoteRealmWithPosition show(@PathVariable("note") Note note)
+      throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
     return NoteRealmWithPosition.fromNote(note, currentUser.getEntity());
   }
@@ -106,7 +107,8 @@ class RestNoteController {
   }
 
   @GetMapping("/{note}/note-info")
-  public NoteInfo getNoteInfo(@PathVariable("note") Note note) throws UnexpectedNoAccessRightException {
+  public NoteInfo getNoteInfo(@PathVariable("note") Note note)
+      throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
     NoteInfo noteInfo = new NoteInfo();
     noteInfo.setReviewPoint(currentUser.getReviewPointFor(note));
@@ -126,7 +128,8 @@ class RestNoteController {
 
   @PostMapping(value = "/{note}/delete")
   @Transactional
-  public List<NoteRealm> deleteNote(@PathVariable("note") Note note) throws UnexpectedNoAccessRightException {
+  public List<NoteRealm> deleteNote(@PathVariable("note") Note note)
+      throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
     modelFactoryService.toNoteModel(note).destroy(testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.entityManager.flush();
@@ -139,7 +142,8 @@ class RestNoteController {
 
   @PatchMapping(value = "/{note}/undo-delete")
   @Transactional
-  public NoteRealm undoDeleteNote(@PathVariable("note") Note note) throws UnexpectedNoAccessRightException {
+  public NoteRealm undoDeleteNote(@PathVariable("note") Note note)
+      throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
     modelFactoryService.toNoteModel(note).restore();
     modelFactoryService.entityManager.flush();

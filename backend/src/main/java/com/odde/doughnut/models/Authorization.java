@@ -68,7 +68,8 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
     return user.canReferTo(note.getNotebook());
   }
 
-  private void assertReadAuthorizationNotebook(Notebook notebook) throws UnexpectedNoAccessRightException {
+  private void assertReadAuthorizationNotebook(Notebook notebook)
+      throws UnexpectedNoAccessRightException {
     if (notebook != null) {
       if (hasReferenceAuthority(notebook.getHeadNote())) {
         return;
@@ -81,7 +82,8 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
     throw new UnexpectedNoAccessRightException();
   }
 
-  private void assertAuthorizationNotebook(Notebook notebook) throws UnexpectedNoAccessRightException {
+  private void assertAuthorizationNotebook(Notebook notebook)
+      throws UnexpectedNoAccessRightException {
     if (!hasFullAuthority(notebook)) {
       throw new UnexpectedNoAccessRightException();
     }

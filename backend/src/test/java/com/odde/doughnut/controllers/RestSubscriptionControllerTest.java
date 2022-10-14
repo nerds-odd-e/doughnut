@@ -74,7 +74,8 @@ class RestSubscriptionControllerTest {
       User anotherUser = makeMe.aUser().please();
       Subscription subscription = makeMe.aSubscription().forUser(anotherUser).please();
       assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.destroySubscription(subscription));
+          UnexpectedNoAccessRightException.class,
+          () -> controller.destroySubscription(subscription));
     }
   }
 }

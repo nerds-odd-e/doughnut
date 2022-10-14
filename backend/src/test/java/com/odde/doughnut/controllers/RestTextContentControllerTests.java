@@ -61,7 +61,8 @@ class RestTextContentControllerTests {
     @Test
     void shouldNotAllowOthersToChange() {
       note = makeMe.aNote("another").creatorAndOwner(makeMe.aUser().please()).please();
-      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.updateNote(note, textContent));
+      assertThrows(
+          UnexpectedNoAccessRightException.class, () -> controller.updateNote(note, textContent));
     }
   }
 }

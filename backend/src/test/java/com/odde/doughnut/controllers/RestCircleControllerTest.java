@@ -65,7 +65,8 @@ class RestCircleControllerTest {
       Circle circle = makeMe.aCircle().please();
       TextContent textContent = makeMe.aNote().inMemoryPlease().getTextContent();
       assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.createNotebook(circle, textContent));
+          UnexpectedNoAccessRightException.class,
+          () -> controller.createNotebook(circle, textContent));
     }
   }
 

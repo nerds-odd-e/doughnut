@@ -205,7 +205,8 @@ class RestNoteControllerTests {
 
       @Test
       void shouldPrependLocationInfoWhenAddingNoteWithWikidataId()
-          throws BindException, InterruptedException, UnexpectedNoAccessRightException, IOException {
+          throws BindException, InterruptedException, UnexpectedNoAccessRightException,
+              IOException {
         mockApiResponseWithLocationInfo(
             "{\"latitude\":1.3,\"longitude\":103.8}", "globecoordinate");
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
@@ -227,7 +228,8 @@ class RestNoteControllerTests {
 
       @Test
       void shouldPrependLocationInfoWhenAddingNoteWithWikidataIdWithStringValue()
-          throws BindException, InterruptedException, UnexpectedNoAccessRightException, IOException {
+          throws BindException, InterruptedException, UnexpectedNoAccessRightException,
+              IOException {
         mockApiResponseWithLocationInfo("\"center of the earth\"", "string");
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
         assertThat(
@@ -279,7 +281,8 @@ class RestNoteControllerTests {
           String countryQid,
           String countryName,
           String expectedBirthday)
-          throws BindException, InterruptedException, UnexpectedNoAccessRightException, IOException {
+          throws BindException, InterruptedException, UnexpectedNoAccessRightException,
+              IOException {
         mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO, countryQid, countryName);
         noteCreation.setWikidataId(wikidataIdOfHuman);
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
@@ -418,7 +421,8 @@ class RestNoteControllerTests {
     }
 
     @Test
-    void shouldUpdateNoteWithUniqueWikidataId() throws BindException, UnexpectedNoAccessRightException {
+    void shouldUpdateNoteWithUniqueWikidataId()
+        throws BindException, UnexpectedNoAccessRightException {
       WikidataAssociationCreation wikidataAssociationCreation = new WikidataAssociationCreation();
       wikidataAssociationCreation.wikidataId = "Q123";
       controller.updateWikidataId(note, wikidataAssociationCreation);

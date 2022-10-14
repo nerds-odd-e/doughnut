@@ -42,7 +42,8 @@ public class UserModelAuthorityTest {
 
     @Test
     void userCanNotAccessNotesBelongToCircle() {
-      assertThrows(UnexpectedNoAccessRightException.class, () -> userModel.assertAuthorization(note));
+      assertThrows(
+          UnexpectedNoAccessRightException.class, () -> userModel.assertAuthorization(note));
     }
 
     @Test
