@@ -23,7 +23,7 @@ async function setupNodeEvents(
 
 export default defineConfig({
   env: {
-    TAGS: "not @ignore and not @slow",
+    TAGS: "not @ignore",
   },
   chromeWebSecurity: false,
   screenshotOnRunFailure: true,

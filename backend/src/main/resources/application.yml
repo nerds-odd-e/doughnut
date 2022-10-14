@@ -59,7 +59,7 @@ spring:
       enable_lazy_load_no_trans: true
   github_for_issues:
     repo: nerds-odd-e/doughnut_sandbox
-    token: ${GITHUB_FOR_ISSUES_API_TOKEN}
+    token: token_from_github
 server:
   forward-headers-strategy: FRAMEWORK
   port: 9081

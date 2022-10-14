@@ -2,7 +2,7 @@ import { defineConfig } from 'cypress'
 
 export default defineConfig({
   env: {
-    TAGS: 'not @ignore and not @slow',
+    TAGS: 'not @ignore and not @requiresDeveloperSecret',
   },
   chromeWebSecurity: false,
   screenshotOnRunFailure: true,
