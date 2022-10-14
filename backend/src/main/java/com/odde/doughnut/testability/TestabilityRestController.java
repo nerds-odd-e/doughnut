@@ -42,7 +42,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Profile({"e2e", "test", "dev"})
+@Profile({"e2e", "test"})
 @RequestMapping("/api/testability")
 class TestabilityRestController {
 

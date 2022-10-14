@@ -68,42 +68,6 @@ server:
 spring:
   config:
     activate:
-      on-profile: dev
-  resources:
-    cache:
-      cachecontrol:
-        max-age: 365d
-  servlet:
-    multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
-  datasource:
-    url: jdbc:mysql://127.0.0.1:3309/doughnut_development
-    username: doughnut
-    password: doughnut
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  flyway:
-    clean-on-validation-error: false
-    clean-disabled: true
-  jpa:
-    generate-ddl: false
-    show-sql: false
-    properties.hibernate:
-      enable_lazy_load_no_trans: true
-  github_for_issues:
-    repo: nerds-odd-e/doughnut_sandbox
-    token: ${GITHUB_FOR_ISSUES_API_TOKEN:token_not_set}
-  devtools:
-    restart:
-      additional-paths: static/**,templates/**
-server:
-  forward-headers-strategy: FRAMEWORK
-  port: 9082
-
----
-spring:
-  config:
-    activate:
       on-profile: prod
   resources:
     cache:

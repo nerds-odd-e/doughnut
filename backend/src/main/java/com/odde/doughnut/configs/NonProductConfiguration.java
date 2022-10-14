@@ -10,7 +10,7 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
-@Profile({"e2e", "test", "dev"})
+@Profile({"e2e", "test"})
 public class NonProductConfiguration extends WebSecurityConfigurerAdapter {
 
   @Autowired private CommonConfiguration commonConfiguration;
