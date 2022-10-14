@@ -76,6 +76,7 @@ public class RealGithubService implements GithubService {
   private HttpResponse<String> apiRequest(
       String action, Function<HttpRequest.Builder, HttpRequest.Builder> callback)
       throws IOException, InterruptedException {
+    assertToken();
     final HttpRequest.Builder builder =
         HttpRequest.newBuilder(
             URI.create("https://api.github.com/repos/" + githubForIssuesRepo + "/" + action));
@@ -89,5 +90,12 @@ public class RealGithubService implements GithubService {
     HttpResponse.BodyHandler<String> bodyHandler =
         HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8);
     return HttpClient.newBuilder().build().send(request, bodyHandler);
+  }
+
+  private void assertToken() {
+    if ("token_not_set".equals(githubForIssuesToken)) {
+      throw new RuntimeException(
+          "Github token is not set. To test this feature please make sure you have set the token in your development enironment.");
+    }
   }
 }
