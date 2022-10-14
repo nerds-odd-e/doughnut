@@ -21,7 +21,7 @@ env:
   DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
-  GITHUB_FOR_ISSUES_API_TOKEN: ${{ secrets.GITHUB_FOR_ISSUES_API_TOKEN }}
+  GITHUB_FOR_ISSUES_API_TOKEN: ${{ secrets.GH_ISSUES_API_TOKEN }}
 
 jobs:
   Linting:
@@ -112,7 +112,7 @@ jobs:
           config-file: cypress/config/ci.ts
           install-command: yarn --frozen-lockfile --silent
           build: yarn frontend:build
-          start: yarn run-p -clnr sut start:mb
+          start: GITHUB_FOR_ISSUES_API_TOKEN=${{ env.GITHUB_FOR_ISSUES_API_TOKEN }} yarn run-p -clnr sut start:mb
           wait-on: "http://127.0.0.1:9081/api/healthcheck"
           wait-on-timeout: 150
           spec: ${{ matrix.spec }}
