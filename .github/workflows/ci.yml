@@ -108,8 +108,6 @@ jobs:
       - uses: ./.github/setup_nodejs
       - uses: cypress-io/github-action@v4
         with:
-          env:
-            GITHUB_FOR_ISSUES_API_TOKEN: ${{ env.GITHUB_FOR_ISSUES_API_TOKEN }}
           browser: chrome
           config-file: cypress/config/ci.ts
           install-command: yarn --frozen-lockfile --silent
@@ -118,6 +116,8 @@ jobs:
           wait-on: "http://127.0.0.1:9081/api/healthcheck"
           wait-on-timeout: 150
           spec: ${{ matrix.spec }}
+        env:
+          GITHUB_FOR_ISSUES_API_TOKEN: ${{ env.GITHUB_FOR_ISSUES_API_TOKEN }}
       - uses: actions/upload-artifact@v3
         if: failure()
         with:
