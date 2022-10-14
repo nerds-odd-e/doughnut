@@ -25,7 +25,7 @@ spring:
       enable_lazy_load_no_trans: true
   github_for_issues:
     repo: nerds-odd-e/doughnut_sandbox
-    token: ${GITHUB_FOR_ISSUES_API_TOKEN:token_not_set}
+    token: ${GITHUB_FOR_ISSUES_API_TOKEN:-token_not_set}
 server:
   forward-headers-strategy: FRAMEWORK
   port: 8081
@@ -59,7 +59,7 @@ spring:
       enable_lazy_load_no_trans: true
   github_for_issues:
     repo: nerds-odd-e/doughnut_sandbox
-    token: ${GITHUB_FOR_ISSUES_API_TOKEN:token_not_set}
+    token: ${GITHUB_FOR_ISSUES_API_TOKEN:-token_not_set}
 server:
   forward-headers-strategy: FRAMEWORK
   port: 9081
