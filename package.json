@@ -72,14 +72,14 @@
     "eslint-plugin-cypress": "^2.12",
     "eslint-plugin-prettier": "^4.2",
     "got": "^12.5",
-    "mountebank": "^2.7",
+    "mountebank": "^2.8",
     "npm-run-all": "4.1.5",
     "prettier": "^2.7",
     "typescript": "^4.8",
     "wireit": "^0.7"
   },
   "dependencies": {
-    "@cucumber/cucumber": "^8.6",
+    "@cucumber/cucumber": "^8.7",
     "formidable": "^2"
   }
 }
