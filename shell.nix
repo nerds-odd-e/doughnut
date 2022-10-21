@@ -68,7 +68,7 @@ in mkShell {
         export NIXPKGS_ALLOW_UNFREE=1
         export GPG_TTY=$(tty)
         export JAVA_HOME="$(readlink -e $(type -p javac) | sed  -e 's/\/bin\/javac//g')"
-        export NODE_HOME="${pkgs.nodejs-18_x}"
+        export NODE_PATH="${pkgs.nodejs-18_x}"
 
         export MYSQL_BASEDIR=${pkgs.mysql80}
         export MYSQL_HOME="''${MYSQL_HOME:-$PWD/mysql}"
@@ -78,7 +78,7 @@ in mkShell {
         export MYSQL_PID_FILE=$MYSQL_HOME/mysql.pid
         export MYSQL_TCP_PORT=3309
         export MYSQLX_TCP_PORT=33090
-        export PATH=$JAVA_HOME/bin:$NODE_HOME/bin:$MYSQL_BASEDIR/bin:$PATH
+        export PATH=$JAVA_HOME/bin:$NODE_PATH/bin:$MYSQL_BASEDIR/bin:$PATH
         export LANG="en_US.UTF-8"
         export LC_ALL="en_US.UTF-8"
 
@@ -86,7 +86,7 @@ in mkShell {
         echo "                                                                                "
         echo "##   !! DOUGHNUT NIX DEVELOPMENT ENVIRONMENT ;) !!  "
         echo "##   JAVA_HOME: $JAVA_HOME                          "
-        echo "##   NODE_HOME: $NODE_HOME                          "
+        echo "##   NODE_PATH: $NODE_PATH                          "
         echo "##   MYSQL_BASEDIR: $MYSQL_BASEDIR                  "
         echo "##   MYSQL_HOME: $MYSQL_HOME                        "
         echo "##   MYSQL_DATADIR: $MYSQL_DATADIR                  "
@@ -119,7 +119,6 @@ EOF
           sleep 6 && mysql -u root -S $MYSQL_UNIX_SOCKET < $MYSQL_HOME/init_doughnut_db.sql
         fi
 
-        export GPG_TTY=$(tty)
         export NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
         if [[ "$OSTYPE" == "darwin"* ]]; then
            export NIX_SSL_CERT_FILE=/etc/ssl/cert.pem
