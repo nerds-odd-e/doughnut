@@ -15,12 +15,12 @@
     "@popperjs/core": "^2.11",
     "@vue/runtime-core": "3.2.40",
     "bootstrap": "^5.2",
-    "gsap": "^3.10",
+    "gsap": "^3.11",
     "lodash": "^4.17",
     "unplugin-vue-components": "^0.22",
     "vue": "3.2.40",
     "vue-content-loader": "^2.0",
-    "vue-router": "^4.1"
+    "vue-router": "4.1.6"
   },
   "devDependencies": {
     "@babel/core": "^7.19",
