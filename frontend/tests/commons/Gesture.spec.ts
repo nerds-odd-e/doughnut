@@ -1,6 +1,7 @@
 /**
  * @jest-environment jsdom
  */
+import { describe, it, expect } from "vitest";
 import Gesture from "../../src/components/commons/Gesture";
 
 describe("Gesture", () => {

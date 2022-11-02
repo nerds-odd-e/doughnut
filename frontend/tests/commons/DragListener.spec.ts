@@ -1,12 +1,13 @@
 /**
  * @jest-environment jsdom
  */
-import DragListner from "@/components/commons/DragListner.vue";
+import { describe, it, expect, vi } from "vitest";
 import { mount } from "@vue/test-utils";
+import DragListner from "@/components/commons/DragListner.vue";
 
 describe("DragListner", () => {
   const currentTarget = {
-    getBoundingClientRect: jest
+    getBoundingClientRect: vi
       .fn()
       .mockReturnValue({ width: 1000, height: 1000, top: 0 }),
   };
