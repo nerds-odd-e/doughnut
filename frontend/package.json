@@ -7,8 +7,8 @@
     "build": "vite build --emptyOutDir",
     "serve": "vite preview",
     "test": "jest",
-    "test:unit": "vitest run --environment jsdom",
-    "test:unit:watch": "vitest --environment jsdom",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
     "lint": "eslint src tests",
     "prettier:check": "prettier --check src tests",
     "prettier:apply": "prettier --write src tests"
@@ -44,7 +44,7 @@
     "@vue/eslint-config-prettier": "^7.0",
     "@vue/eslint-config-typescript": "^11.0",
     "@vue/test-utils": "^2.2",
-    "@vue/vue3-jest": "^29.1",
+    "@vue/vue3-jest": "^29.2",
     "autoprefixer": "^10.4",
     "babel-jest": "^29.2",
     "babel-loader": "^9.0",
@@ -78,6 +78,7 @@
     "vite-plugin-checker": "^0.5",
     "vite-plugin-eslint": "^1.8",
     "vitest": "^0.24.5",
+    "vitest-fetch-mock": "^0.2.1",
     "vue-tsc": "1.0.9"
   }
 }

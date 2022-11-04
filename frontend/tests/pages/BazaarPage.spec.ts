@@ -1,6 +1,4 @@
-/**
- * @jest-environment jsdom
- */
+import { describe, it, beforeEach, afterEach } from "vitest";
 import BazaarPage from "@/pages/BazaarPage.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";

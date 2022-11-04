@@ -1,6 +1,4 @@
-/**
- * @jest-environment jsdom
- */
+import { describe, it, beforeEach, afterEach } from "vitest";
 import CircleShowPage from "@/pages/CircleShowPage.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";

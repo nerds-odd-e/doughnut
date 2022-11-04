@@ -1,6 +1,4 @@
-/**
- * @jest-environment jsdom
- */
+import { describe, it, expect, beforeEach } from "vitest";
 import NoteFrameOfLinks from "@/components/links/NoteFrameOfLinks.vue";
 import makeMe from "../fixtures/makeMe";
 import RenderingHelper from "../helpers/RenderingHelper";

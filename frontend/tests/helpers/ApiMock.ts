@@ -1,10 +1,11 @@
-import { MockParams } from "jest-fetch-mock";
+// import { MockParams } from "jest-fetch-mock";
 
 interface ApiMockBuilder {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   andReturnOnce(value: any): void;
   andRespondOnceWith404(): void;
-  andRespondOnce(response: MockParams): void;
+  // andRespondOnce(response: MockParams): void;
+  andRespondOnce(response: string): void;
 }
 
 interface ApiMock {

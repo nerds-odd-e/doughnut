@@ -18,7 +18,7 @@ describe("storeUndoCommand", () => {
   });
 
   describe("popUndoHistory", () => {
-    let initialUndoCount;
+    let initialUndoCount: int;
     const histories = new NoteEditingHistory();
 
     beforeEach(() => {

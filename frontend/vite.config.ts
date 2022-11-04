@@ -8,6 +8,10 @@ import Components from 'unplugin-vue-components/vite'
 
 export default defineConfig({
   test: {
+    environment: "jsdom",
+    "setupFiles": [
+      "./tests/setupVitest.js"
+    ]
   },
   css: {
     preprocessorOptions: {

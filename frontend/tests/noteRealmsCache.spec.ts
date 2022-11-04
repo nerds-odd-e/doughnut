@@ -1,7 +1,4 @@
-/**
- * @jest-environment jsdom
- */
-import fetchMock from "jest-fetch-mock";
+import { describe, it, expect, beforeEach } from "vitest";
 import makeMe from "./fixtures/makeMe";
 import NoteRealmCache from "../src/store/NoteRealmCache";
 
