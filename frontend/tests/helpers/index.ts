@@ -16,7 +16,7 @@ class StoredComponentTestHelper {
     return this;
   }
 
-  resetWithApiMock(beforeEach: vi.Lifecycle, afterEach: vi.Lifecycle) {
+  resetWithApiMock(beforeEach, afterEach) {
     beforeEach(() => {
       this.reset();
       this.mockedApi = setupApiMock();

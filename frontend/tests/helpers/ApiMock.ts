@@ -5,7 +5,6 @@ interface ApiMockBuilder {
   andReturnOnce(value: any): void;
   andRespondOnceWith404(): void;
   andRespondOnce(response: MockParams): void;
-  andRespondOnce(response: string): void;
 }
 
 interface ApiMock {

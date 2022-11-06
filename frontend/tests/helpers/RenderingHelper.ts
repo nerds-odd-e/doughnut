@@ -45,7 +45,7 @@ class RenderingHelper {
     return this;
   }
 
-  withMockRouterPush(push: vi.Mock) {
+  withMockRouterPush(push) {
     this.withGlobalMock({ $router: { push } });
     return this;
   }
