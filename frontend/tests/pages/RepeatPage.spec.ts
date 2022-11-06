@@ -1,6 +1,6 @@
 import { describe, it, vi, expect, beforeEach, afterEach } from "vitest";
+import { flushPromises } from "@vue/test-utils";
 import RepeatPage from "@/pages/RepeatPage.vue";
-import flushPromises from "flush-promises";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 import RenderingHelper from "../helpers/RenderingHelper";

@@ -3,7 +3,5 @@ vite.config.ts
 auto-imports.d.ts
 index.d.ts
 rest.d.ts
-babel.config.js
-jest.config.js
-tests/setupJest.js
+tests/setupVitest.js
 src/components/svgs/**/*.vue

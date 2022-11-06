@@ -1,5 +1,4 @@
 import { flushPromises } from "@vue/test-utils";
-// import flushPromises from "flush-promises";
 import NoteWithLinks from "@/components/notes/NoteWithLinks.vue";
 import createNoteStorage from "../../src/store/createNoteStorage";
 import makeMe from "../fixtures/makeMe";

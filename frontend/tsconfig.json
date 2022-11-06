@@ -5,10 +5,8 @@
     "types": [
       "vite/client",
       "vitest/globals",
-      "jest",
-      "@types/jest",
-      "node",
-      "@testing-library/jest-dom"
+      "vitest-dom/extend-expect",
+      "node"
     ],
     "useDefineForClassFields": true,
     "strict": true,

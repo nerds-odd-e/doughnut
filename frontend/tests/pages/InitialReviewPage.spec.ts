@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { flushPromises } from "@vue/test-utils";
 import InitialReviewPage from "@/pages/InitialReviewPage.vue";
 import ShowReviewPoint from "@/components/review/ShowReviewPoint.vue";
-import flushPromises from "flush-promises";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 import RenderingHelper from "../helpers/RenderingHelper";

@@ -23,7 +23,6 @@ module.exports = {
     browser: true,
     es2021: true,
     node: true,
-    jest: true,
   },
   extends: [
     "airbnb-base",
@@ -38,12 +37,7 @@ module.exports = {
     "plugin:prettier/recommended",
     "prettier",
   ],
-  ignorePatterns: [
-    "vite.config.ts",
-    "babel.config.js",
-    "jest.config.js",
-    "tests/setupJest.js",
-  ],
+  ignorePatterns: ["vite.config.ts", "tests/setupVitest.js"],
   settings: {
     "import/extensions": [".ts", ".tsx"],
     "import/resolver": {
@@ -52,7 +46,7 @@ module.exports = {
       },
     },
   },
-  plugins: ["vue", "testing-library", "@typescript-eslint", "jest-dom"],
+  plugins: ["vue", "testing-library", "@typescript-eslint", "vitest"],
   rules: {
     "no-unused-vars": ["error", { varsIgnorePattern: ".*", args: "none" }],
     "no-param-reassign": ["error", { props: false }],

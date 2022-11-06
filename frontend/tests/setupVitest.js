@@ -1,5 +1,5 @@
-import createFetchMock from "vitest-fetch-mock";
 import * as matchers from "vitest-dom/matchers";
+import createFetchMock from "vitest-fetch-mock";
 import { vi, expect } from "vitest";
 expect.extend(matchers);
 
