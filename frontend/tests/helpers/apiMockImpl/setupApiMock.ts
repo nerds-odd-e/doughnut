@@ -1,4 +1,3 @@
-import { expect } from "vitest";
 import { HttpMethod } from "../../../src/managedApi/window/RestfulFetch";
 import { ApiMock } from "../ApiMock";
 import ApiMockBuilderImpl from "./ApiMockBuilderImpl";

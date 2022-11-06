@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 import AnswerShowPage from "@/pages/AnswerShowPage.vue";
 import { flushPromises } from "@vue/test-utils";
 import helper from "../helpers";

@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 import NoteNewDialog from "@/components/notes/NoteNewDialog.vue";
 import { flushPromises } from "@vue/test-utils";
 import helper from "../helpers";
@@ -10,12 +7,12 @@ helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("adding new note", () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
   });
 
   const note = makeMe.aNote.title("mythical").please();
@@ -27,8 +24,10 @@ describe("adding new note", () => {
       .withStorageProps({ parentId: 123 })
       .mount();
     await wrapper.find("input#note-title").setValue("myth");
-    jest.runAllTimers();
+
+    vi.runOnlyPendingTimers();
     await flushPromises();
+
     expect(wrapper.text()).toContain("mythical");
   });
 

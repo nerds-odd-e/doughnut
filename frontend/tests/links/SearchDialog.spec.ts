@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 import LinkNoteDialog from "@/components/links/LinkNoteDialog.vue";
 import { screen } from "@testing-library/vue";
 import { flushPromises } from "@vue/test-utils";

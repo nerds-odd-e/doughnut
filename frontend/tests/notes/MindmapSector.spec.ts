@@ -1,4 +1,3 @@
-import { describe, it, expect } from "vitest";
 import Mindmap from "../../src/models/Mindmap";
 import MindmapSector from "../../src/models/MindmapSector";
 

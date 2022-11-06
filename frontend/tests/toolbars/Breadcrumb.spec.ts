@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 import BreadcrumbMain from "@/components/toolbars/BreadcrumbMain.vue";
 import usePopups, {
   PopupInfo,

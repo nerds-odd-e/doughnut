@@ -1,7 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-import fetchMock from "jest-fetch-mock";
 import NoteInfoButton from "@/components/notes/NoteInfoButton.vue";
 import { mount } from "@vue/test-utils";
 import flushPromises from "flush-promises";

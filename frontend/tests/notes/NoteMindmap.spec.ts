@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 import NoteMinmap from "@/components/notes/mindmap/NoteMindmap.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";

@@ -96,8 +96,8 @@ export default defineComponent({
         });
     },
     onSelectWikidataEntry(selectedSuggestion: Generated.WikidataSearchEntity) {
-      const currentLabel = this.creationData.textContent.title.toUpperCase();
-      const newLabel = selectedSuggestion.label.toUpperCase();
+      const currentLabel = this.creationData.textContent.title?.toUpperCase();
+      const newLabel = selectedSuggestion.label?.toUpperCase();
 
       if (currentLabel === newLabel) {
         this.creationData.textContent.title = selectedSuggestion.label;

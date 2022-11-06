@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 import { screen } from "@testing-library/vue";
 import NoteCardsView from "@/components/notes/views/NoteCardsView.vue";
 import helper from "../helpers";

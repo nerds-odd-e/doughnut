@@ -8,6 +8,7 @@ import Components from 'unplugin-vue-components/vite'
 
 export default defineConfig({
   test: {
+    globals: true,
     environment: "jsdom",
     "setupFiles": [
       "./tests/setupVitest.js"
@@ -39,7 +40,8 @@ export default defineConfig({
     AutoImport({
       imports: [
         'vue',
-        'vue-router'
+        'vue-router',
+        'vitest'
       ],
       dts: true, // generate TypeScript declaration
     }),

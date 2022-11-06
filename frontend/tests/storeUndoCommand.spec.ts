@@ -1,7 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-import { describe, it, expect, beforeEach } from "vitest";
 import NoteEditingHistory from "../src/store/NoteEditingHistory";
 import makeMe from "./fixtures/makeMe";
 

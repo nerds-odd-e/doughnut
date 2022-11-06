@@ -1,4 +1,3 @@
-import { describe, it, expect, beforeEach } from "vitest";
 import makeMe from "./fixtures/makeMe";
 import createNoteStorage from "../src/store/createNoteStorage";
 

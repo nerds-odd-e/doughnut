@@ -1,7 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-import { describe, it, expect } from "vitest";
 import { mount } from "@vue/test-utils";
 import Modal from "@/components/commons/Modal.vue";
 

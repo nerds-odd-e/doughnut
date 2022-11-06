@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 import { screen } from "@testing-library/vue";
 import Breadcrumb from "@/components/toolbars/Breadcrumb.vue";
 import helper from "../helpers";
