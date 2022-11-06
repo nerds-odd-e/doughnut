@@ -43,7 +43,6 @@
     "eslint-import-resolver-alias": "^1.1",
     "eslint-import-resolver-typescript": "^3.3",
     "eslint-plugin-import": "^2.26",
-    "eslint-plugin-jest-dom": "^4.0",
     "eslint-plugin-testing-library": "^5.7",
     "eslint-plugin-vitest": "^0.0.11",
     "eslint-plugin-vue": "^9.6",

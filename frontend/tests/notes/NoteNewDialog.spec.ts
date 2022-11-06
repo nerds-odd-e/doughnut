@@ -62,14 +62,6 @@ describe("adding new note", () => {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     const doNothing = () => {};
 
-    // it.each`
-    //   searchTitle | wikidataTitle | action          | expectedTitle
-    //   ${"dog"}    | ${"dog"}      | ${doNothing}    | ${"dog"}
-    //   ${"dog"}    | ${"Dog"}      | ${doNothing}    | ${"Dog"}
-    //   ${"dog"}    | ${"Canine"}   | ${replaceTitle} | ${"Canine"}
-    //   ${"dog"}    | ${"Canine"}   | ${appendTitle}  | ${"dog / Canine"}
-    // `(
-    //   "search $searchTitle get $wikidataTitle and choose to $action",
     it.each([
       ["dog", "dog", doNothing, "dog"],
       ["dog", "Dog", doNothing, "Dog"],
