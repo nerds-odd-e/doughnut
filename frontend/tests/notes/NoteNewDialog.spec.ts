@@ -1,5 +1,5 @@
-import NoteNewDialog from "@/components/notes/NoteNewDialog.vue";
 import { flushPromises } from "@vue/test-utils";
+import NoteNewDialog from "@/components/notes/NoteNewDialog.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
@@ -24,9 +24,10 @@ describe("adding new note", () => {
       .withStorageProps({ parentId: 123 })
       .mount();
     await wrapper.find("input#note-title").setValue("myth");
-    await flushPromises();
+
     vi.runOnlyPendingTimers();
     await flushPromises();
+
     expect(wrapper.text()).toContain("mythical");
   });
 
@@ -48,7 +49,9 @@ describe("adding new note", () => {
     const searchAndSelectFirstResult = async (key: string) => {
       await titleInput().setValue(key);
       await wrapper.find("button#search-wikidata").trigger("click");
+
       await flushPromises();
+
       const result = await wrapper.find('select[name="wikidataSearchResult"]');
       result.findAll("option").at(1)?.setValue();
     };
