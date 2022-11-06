@@ -66,7 +66,7 @@ describe("Save wikidata id", () => {
         helper.apiMock.expectingPost(`/api/notes/${note.id}/updateWikidataId`);
       }
       const wrapper = await putWikidataIdAndSubmit(note);
-      await userAction(wrapper);
+      userAction(wrapper);
       helper.apiMock.assertNoUnexpectedOrMissedCalls();
     }
   );

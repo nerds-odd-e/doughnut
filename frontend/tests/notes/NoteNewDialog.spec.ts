@@ -75,7 +75,8 @@ describe("adding new note", () => {
       ["dog", "Dog", doNothing, "Dog"],
       ["dog", "Canine", replaceTitle, "Canine"],
       ["dog", "Canine", appendTitle, "dog / Canine"],
-    ])("search %s get %s and choose to %s",
+    ])(
+      "search %s get %s and choose to %s",
       async (searchTitle, wikidataTitle, action, expectedTitle) => {
         const searchResult = makeMe.aWikidataSearchEntity
           .label(wikidataTitle)
@@ -85,7 +86,7 @@ describe("adding new note", () => {
           .andReturnOnce([searchResult]);
         await searchAndSelectFirstResult(searchTitle);
 
-        await action();
+        action();
 
         expect(<HTMLInputElement>titleInput().element.value).toBe(
           expectedTitle
