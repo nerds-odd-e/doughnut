@@ -24,10 +24,9 @@ describe("adding new note", () => {
       .withStorageProps({ parentId: 123 })
       .mount();
     await wrapper.find("input#note-title").setValue("myth");
-
+    await flushPromises();
     vi.runOnlyPendingTimers();
     await flushPromises();
-
     expect(wrapper.text()).toContain("mythical");
   });
 
@@ -38,7 +37,7 @@ describe("adding new note", () => {
       helper.apiMock.expectingPost(`/api/notes/search`).andReturnOnce([]);
       wrapper = helper
         .component(NoteNewDialog)
-        .withStorageProps({ parentId: 123 })
+        .withStorageProps({ parentId: 123, searchTitle: "abc" })
         .mount();
     });
 
@@ -63,15 +62,21 @@ describe("adding new note", () => {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     const doNothing = () => {};
 
-    it.each`
-      searchTitle | wikidataTitle | action          | expectedTitle
-      ${"dog"}    | ${"dog"}      | ${doNothing}    | ${"dog"}
-      ${"dog"}    | ${"Dog"}      | ${doNothing}    | ${"Dog"}
-      ${"dog"}    | ${"Canine"}   | ${replaceTitle} | ${"Canine"}
-      ${"dog"}    | ${"Canine"}   | ${appendTitle}  | ${"dog / Canine"}
-    `(
-      "searh $searchTitle get $wikidataTitle and choose to $action",
-      async ({ searchTitle, wikidataTitle, action, expectedTitle }) => {
+    // it.each`
+    //   searchTitle | wikidataTitle | action          | expectedTitle
+    //   ${"dog"}    | ${"dog"}      | ${doNothing}    | ${"dog"}
+    //   ${"dog"}    | ${"Dog"}      | ${doNothing}    | ${"Dog"}
+    //   ${"dog"}    | ${"Canine"}   | ${replaceTitle} | ${"Canine"}
+    //   ${"dog"}    | ${"Canine"}   | ${appendTitle}  | ${"dog / Canine"}
+    // `(
+    //   "search $searchTitle get $wikidataTitle and choose to $action",
+    it.each([
+      ["dog", "dog", doNothing, "dog"],
+      ["dog", "Dog", doNothing, "Dog"],
+      ["dog", "Canine", replaceTitle, "Canine"],
+      ["dog", "Canine", appendTitle, "dog / Canine"],
+    ])("search %s get %s and choose to %s",
+      async (searchTitle, wikidataTitle, action, expectedTitle) => {
         const searchResult = makeMe.aWikidataSearchEntity
           .label(wikidataTitle)
           .please();
@@ -79,7 +84,9 @@ describe("adding new note", () => {
           .expectingGet(`/api/wikidata/search/${searchTitle}`)
           .andReturnOnce([searchResult]);
         await searchAndSelectFirstResult(searchTitle);
+
         await action();
+
         expect(<HTMLInputElement>titleInput().element.value).toBe(
           expectedTitle
         );
