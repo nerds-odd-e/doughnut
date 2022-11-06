@@ -14,7 +14,7 @@
 - [Vue3](https://v3.vuejs.org/guide/introduction.html)
 - [Vite](https://vitejs.dev)
 - [vue-router 4.x](https://router.vuejs.org/)
-- [Jest](https://jestjs.io/)
+- [Vitest](https://vitest.dev/)
 - [Vue Testing Library](https://testing-library.com/docs/vue-testing-library/intro/)
 - [Bootstrap 5](https://getbootstrap.com/docs/5.0/getting-started/introduction/)
 - [MySQL 8.0](https://dev.mysql.com/doc/refman/8.0/en/)
