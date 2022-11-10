@@ -8,7 +8,7 @@
         { value: 'Replace', label: 'Replace title' },
         { value: 'Append', label: 'Append title' },
       ]"
-      @update:modelValue="updateModelValue"
+      @update:model-value="updateModelValue"
     />
   </template>
 </template>
