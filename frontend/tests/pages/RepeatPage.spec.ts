@@ -31,9 +31,7 @@ describe("repeat page", () => {
   };
 
   it("redirect to review page if nothing to repeat", async () => {
-    helper.apiMock
-      .expectingGet("/api/reviews/repeat")
-      .andRespondOnce({ status: 404 });
+    helper.apiMock.expectingGet("/api/reviews/repeat").andRespondOnceWith404();
     renderer.currentRoute({ name: "repeat" }).mount();
     await flushPromises();
     expect(mockRouterPush).toHaveBeenCalledWith({ name: "reviews" });

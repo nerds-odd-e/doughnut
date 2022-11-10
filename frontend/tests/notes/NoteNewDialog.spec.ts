@@ -38,7 +38,7 @@ describe("adding new note", () => {
       helper.apiMock.expectingPost(`/api/notes/search`).andReturnOnce([]);
       wrapper = helper
         .component(NoteNewDialog)
-        .withStorageProps({ parentId: 123, searchTitle: "abc" })
+        .withStorageProps({ parentId: 123 })
         .mount();
     });
 
@@ -76,12 +76,20 @@ describe("adding new note", () => {
         const searchResult = makeMe.aWikidataSearchEntity
           .label(wikidataTitle)
           .please();
+
         helper.apiMock
           .expectingGet(`/api/wikidata/search/${searchTitle}`)
           .andReturnOnce([searchResult]);
         await searchAndSelectFirstResult(searchTitle);
 
         action();
+        await flushPromises();
+
+        // onTestFailed(() => {
+        //   console.log("searchResult:", searchResult);
+        //   console.log("First Option:", firstOption.element.value);
+        //   console.log("Input Title:", titleInput().element.value);
+        // });
 
         expect(<HTMLInputElement>titleInput().element.value).toBe(
           expectedTitle

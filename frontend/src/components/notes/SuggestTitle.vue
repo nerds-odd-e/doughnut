@@ -8,7 +8,7 @@
         { value: 'Replace', label: 'Replace title' },
         { value: 'Append', label: 'Append title' },
       ]"
-      @change="updateModelValue()"
+      @update:modelValue="updateModelValue"
     />
   </template>
 </template>
@@ -38,10 +38,8 @@ export default defineComponent({
       }
 
       if (this.replaceOrAppendTitle === "Append") {
-        this.$emit(
-          "suggestedTitleSelected",
-          `${this.originalTitle} / ${this.suggestedTitle}`
-        );
+        const newTitle = `${this.originalTitle} / ${this.suggestedTitle}`;
+        this.$emit("suggestedTitleSelected", newTitle);
       }
     },
   },
