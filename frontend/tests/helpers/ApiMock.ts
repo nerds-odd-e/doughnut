@@ -1,4 +1,4 @@
-import { MockParams } from "jest-fetch-mock";
+import { MockParams } from "vitest-fetch-mock";
 
 interface ApiMockBuilder {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

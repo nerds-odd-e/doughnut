@@ -3,7 +3,10 @@
     "target": "esnext",
     "module": "esnext",
     "types": [
-      "vite/client", "jest" , "@types/jest" , "node" , "@testing-library/jest-dom"
+      "vite/client",
+      "vitest/globals",
+      "vitest-dom/extend-expect",
+      "node"
     ],
     "useDefineForClassFields": true,
     "strict": true,

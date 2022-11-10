@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import routerScopeGuard from "../../src/routes/relative_routes";
 
 describe("router guards", () => {
@@ -6,7 +7,7 @@ describe("router guards", () => {
 
   beforeEach(async () => {
     guard = routerScopeGuard("repeat");
-    next = jest.fn();
+    next = vi.fn();
   });
   it("when in repeat, go to nested noteShow", async () => {
     await guard(

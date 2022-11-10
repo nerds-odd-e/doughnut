@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 import Gesture from "../../src/components/commons/Gesture";
 
 describe("Gesture", () => {

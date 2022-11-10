@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 import { screen } from "@testing-library/vue";
 import ControlCenter from "@/components/toolbars/ControlCenter.vue";
 import helper from "../helpers";

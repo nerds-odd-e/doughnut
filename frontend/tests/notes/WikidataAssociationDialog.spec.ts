@@ -1,9 +1,5 @@
-/**
- * @jest-environment jsdom
- */
-import flushPromises from "flush-promises";
+import { VueWrapper, flushPromises } from "@vue/test-utils";
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue";
-import { VueWrapper } from "@vue/test-utils";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
@@ -11,35 +7,6 @@ helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("Save wikidata id", () => {
   const wikidataId = "Q123";
-  it.each`
-    noteTitle   | wikidataTitle | userAction           | shouldSave
-    ${"dog"}    | ${"dog"}      | ${doNothing}         | ${true}
-    ${"Dog"}    | ${"dog"}      | ${doNothing}         | ${true}
-    ${"Canine"} | ${"dog"}      | ${doNothing}         | ${false}
-    ${"Canine"} | ${"dog"}      | ${cancelOperation}   | ${false}
-    ${"Canine"} | ${"dog"}      | ${confirmDifference} | ${true}
-    ${"Canine"} | ${""}         | ${doNothing}         | ${true}
-  `(
-    "associate $noteTitle with $wikidataTitle and choose to $userAction",
-    async ({ noteTitle, wikidataTitle, userAction, shouldSave }) => {
-      const note = makeMe.aNote.title(noteTitle).please();
-      const wikidata = makeMe.aWikidataEntity
-        .wikidataTitle(wikidataTitle)
-        .please();
-
-      helper.apiMock
-        .expectingGet(`/api/wikidata/entity-data/${wikidataId}`)
-        .andReturnOnce(wikidata);
-
-      if (shouldSave) {
-        helper.apiMock.expectingPost(`/api/notes/${note.id}/updateWikidataId`);
-      }
-      const wrapper = await putWikidataIdAndSubmit(note);
-      await userAction(wrapper);
-      helper.apiMock.assertNoUnexpectedOrMissedCalls();
-    }
-  );
-
   async function putWikidataIdAndSubmit(note: Generated.Note) {
     const wrapper = helper
       .component(WikidataAssociationDialog)
@@ -65,4 +32,32 @@ describe("Save wikidata id", () => {
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   function doNothing(_: VueWrapper) {}
+
+  it.each([
+    ["dog", "dog", doNothing, true],
+    ["Dog", "dog", doNothing, true],
+    ["Canine", "dog", doNothing, false],
+    ["Canine", "dog", cancelOperation, false],
+    ["Canine", "dog", confirmDifference, true],
+    ["Canine", "", doNothing, true],
+  ])(
+    "associate %s with %s and choose to %s",
+    async (noteTitle, wikidataTitle, userAction, shouldSave) => {
+      const note = makeMe.aNote.title(noteTitle).please();
+      const wikidata = makeMe.aWikidataEntity
+        .wikidataTitle(wikidataTitle)
+        .please();
+
+      helper.apiMock
+        .expectingGet(`/api/wikidata/entity-data/${wikidataId}`)
+        .andReturnOnce(wikidata);
+
+      if (shouldSave) {
+        helper.apiMock.expectingPost(`/api/notes/${note.id}/updateWikidataId`);
+      }
+      const wrapper = await putWikidataIdAndSubmit(note);
+      userAction(wrapper);
+      helper.apiMock.assertNoUnexpectedOrMissedCalls();
+    }
+  );
 });

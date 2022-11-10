@@ -16,7 +16,7 @@ class StoredComponentTestHelper {
     return this;
   }
 
-  resetWithApiMock(beforeEach: jest.Lifecycle, afterEach: jest.Lifecycle) {
+  resetWithApiMock(beforeEach, afterEach) {
     beforeEach(() => {
       this.reset();
       this.mockedApi = setupApiMock();

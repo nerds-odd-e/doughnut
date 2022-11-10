@@ -1,4 +1,4 @@
-import { MockParams } from "jest-fetch-mock";
+import { MockParams } from "vitest-fetch-mock";
 import { HttpMethod } from "../../../src/managedApi/window/RestfulFetch";
 
 class ApiMockExpectation {

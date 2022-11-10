@@ -1,19 +1,17 @@
-/**
- * @jest-environment jsdom
- */
+import { describe, it, vi, expect, beforeEach, afterEach } from "vitest";
+import { flushPromises } from "@vue/test-utils";
 import RepeatPage from "@/pages/RepeatPage.vue";
-import flushPromises from "flush-promises";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 import RenderingHelper from "../helpers/RenderingHelper";
 
 let renderer: RenderingHelper;
-let mockRouterPush = jest.fn();
+let mockRouterPush = vi.fn();
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
 beforeEach(() => {
-  mockRouterPush = jest.fn();
+  mockRouterPush = vi.fn();
   renderer = helper
     .component(RepeatPage)
     .withMockRouterPush(mockRouterPush)
@@ -33,9 +31,7 @@ describe("repeat page", () => {
   };
 
   it("redirect to review page if nothing to repeat", async () => {
-    helper.apiMock
-      .expectingGet("/api/reviews/repeat")
-      .andRespondOnce({ status: 404 });
+    helper.apiMock.expectingGet("/api/reviews/repeat").andRespondOnceWith404();
     renderer.currentRoute({ name: "repeat" }).mount();
     await flushPromises();
     expect(mockRouterPush).toHaveBeenCalledWith({ name: "reviews" });
@@ -45,7 +41,7 @@ describe("repeat page", () => {
     let repetition: Generated.RepetitionForUser;
 
     beforeEach(() => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const reviewPoint = makeMe.aReviewPoint.please();
       repetition = makeMe.aRepetition
         .withReviewPointId(reviewPoint.id)
@@ -58,7 +54,10 @@ describe("repeat page", () => {
     it("should call the answer api", async () => {
       const wrapper = await mountPage(repetition);
       helper.apiMock.expectingPost(`/api/reviews/answer`);
-      await jest.runAllTimers();
+
+      vi.runOnlyPendingTimers();
+
+      await flushPromises();
       await wrapper.find("button.btn-primary").trigger("click");
     });
   });

@@ -1,6 +1,4 @@
-/**
- * @jest-environment jsdom
- */
+import { flushPromises } from "@vue/test-utils";
 import NoteWithLinks from "@/components/notes/NoteWithLinks.vue";
 import createNoteStorage from "../../src/store/createNoteStorage";
 import makeMe from "../fixtures/makeMe";
@@ -10,7 +8,7 @@ helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("new/updated pink banner", () => {
   beforeAll(() => {
-    Date.now = jest.fn(() => new Date(Date.UTC(2017, 1, 14)).valueOf());
+    Date.now = vi.fn(() => new Date(Date.UTC(2017, 1, 14)).valueOf());
   });
 
   it.each([
@@ -49,6 +47,8 @@ describe("in place edit on title", () => {
 
     expect(wrapper.findAll('[role="title"] input')).toHaveLength(0);
     await wrapper.find('[role="title"] h2').trigger("click");
+
+    await flushPromises();
 
     expect(wrapper.findAll('[role="title"] input')).toHaveLength(1);
     expect(wrapper.findAll('[role="title"] h2')).toHaveLength(0);
@@ -92,6 +92,7 @@ describe("undo editing", () => {
     await wrapper.find('[role="title"]').trigger("click");
     await wrapper.find('[role="title"] input').setValue(updatedTitle);
     await wrapper.find('[role="title"] input').trigger("blur");
+    await flushPromises();
 
     expect(histories.peekUndo()).toMatchObject({ type: "editing" });
   });

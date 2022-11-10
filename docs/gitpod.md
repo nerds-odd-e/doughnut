@@ -39,6 +39,7 @@ git config user.email "your_email@your_domain.com"
 
 - From the root of the `doughnut` codebase, run `.\gradlew test`. This assumes you have had your doughnut DB tables setup from above.
 
-### Running frontend JS/TS Vue3 unit tests
+### Running frontend Vue3 unit tests
 
-- Navigate to `doughnut` source root directory. Execute `yarn frontend:test` to run the full frontend `jest` unit tests.
+- Navigate to `doughnut` source root directory. Execute `yarn frontend:test` to run the full frontend unit tests ONCE.
+- Navigate to `doughnut` source root directory. Execute `yarn frontend:test:watch` to run the full frontend unit tests in dev-mode with HMR live reload as you make frontend production/test code changes.

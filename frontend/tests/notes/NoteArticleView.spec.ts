@@ -1,7 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-
 import { flushPromises } from "@vue/test-utils";
 import NoteArticleView from "@/components/notes/views/NoteArticleView.vue";
 import { screen } from "@testing-library/vue";

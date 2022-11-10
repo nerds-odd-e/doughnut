@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 import BreadcrumbAsync from "@/components/toolbars/BreadcrumbAsync.vue";
 import { flushPromises } from "@vue/test-utils";
 import helper from "../helpers";

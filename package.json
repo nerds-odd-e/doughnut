@@ -11,6 +11,7 @@
     "frontend:format": "wireit",
     "frontend:lint": "wireit",
     "frontend:test": "yarn --cwd frontend --frozen-lockfile --silent install && yarn --cwd frontend test",
+    "frontend:test:watch": "yarn --cwd frontend --frozen-lockfile --silent install && yarn --cwd frontend test:watch",
     "frontend:sut": "yarn --cwd frontend --frozen-lockfile --silent install && yarn --cwd frontend dev",
     "backend:format": "wireit",
     "backend:lint": "wireit",

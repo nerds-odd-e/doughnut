@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 import Mindmap from "../../src/models/Mindmap";
 import MindmapSector from "../../src/models/MindmapSector";
 

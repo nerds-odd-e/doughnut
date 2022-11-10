@@ -1,8 +1,5 @@
-/**
- * @jest-environment jsdom
- */
-import Modal from "@/components/commons/Modal.vue";
 import { mount } from "@vue/test-utils";
+import Modal from "@/components/commons/Modal.vue";
 
 describe("Modal", () => {
   const Comp = Modal;

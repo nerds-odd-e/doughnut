@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 import LinkNoteFinalize from "@/components/links/LinkNoteFinalize.vue";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";

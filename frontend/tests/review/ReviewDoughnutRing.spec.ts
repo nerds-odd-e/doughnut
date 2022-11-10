@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 import ReviewDoughnutRing from "@/components/review/ReviewDoughnutRing.vue";
 import { mount } from "@vue/test-utils";
 

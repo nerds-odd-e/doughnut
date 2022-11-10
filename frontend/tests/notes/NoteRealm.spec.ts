@@ -1,9 +1,6 @@
-/**
- * @jest-environment jsdom
- */
+import { flushPromises } from "@vue/test-utils";
 import { screen } from "@testing-library/vue";
 import NoteShowPage from "@/pages/NoteShowPage.vue";
-import flushPromises from "flush-promises";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
