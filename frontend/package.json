@@ -12,12 +12,12 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11",
-    "@vue/runtime-core": "3.2.44",
+    "@vue/runtime-core": "3.2.45",
     "bootstrap": "5.2.2",
     "gsap": "^3.11",
     "lodash": "^4.17",
     "unplugin-vue-components": "0.22.8",
-    "vue": "3.2.44",
+    "vue": "3.2.45",
     "vue-content-loader": "^2.0",
     "vue-router": "4.1.6"
   },
@@ -30,7 +30,7 @@
     "@typescript-eslint/parser": "^5.40",
     "@vitejs/plugin-vue": "3.2.0",
     "@vitejs/plugin-vue-jsx": "2.1.1",
-    "@vue/compiler-sfc": "3.2.44",
+    "@vue/compiler-sfc": "3.2.45",
     "@vue/eslint-config-prettier": "^7.0",
     "@vue/eslint-config-typescript": "^11.0",
     "@vue/test-utils": "^2.2",
