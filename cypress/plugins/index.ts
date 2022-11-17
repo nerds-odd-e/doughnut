@@ -13,15 +13,14 @@
 
 import createBundler from "@bahmutov/cypress-esbuild-preprocessor"
 import { addCucumberPreprocessorPlugin } from "@badeball/cypress-cucumber-preprocessor"
-import { createEsbuildPlugin } from "@badeball/cypress-cucumber-preprocessor/esbuild"
-import NodeModulesPolyfills from "@esbuild-plugins/node-modules-polyfill"
+import createEsbuildPlugin from "@badeball/cypress-cucumber-preprocessor/esbuild"
 
 export default async (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions): void => {
   await addCucumberPreprocessorPlugin(on, config)
   on(
     "file:preprocessor",
     createBundler({
-      plugins: [NodeModulesPolyfills(), createEsbuildPlugin(config)],
+      plugins: [createEsbuildPlugin(config)],
     }),
   )
   return config
