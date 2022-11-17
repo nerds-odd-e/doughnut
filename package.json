@@ -56,7 +56,7 @@
     "stepDefinitions": "cypress/step_definitions/**/*.{js,ts}"
   },
   "devDependencies": {
-    "@anev/ts-mountebank": "^1.6",
+    "@anev/ts-mountebank": "1.6.1",
     "@badeball/cypress-cucumber-preprocessor": "^14.0",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.1",
     "@esbuild-plugins/node-modules-polyfill": "^0.1",
