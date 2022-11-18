@@ -3,7 +3,7 @@
 - No “code smells” or lint  errors
 - Treat warnings as errors
 - Unit tested (all types of code)
-- End-to-end tested
+- End-to-end tested with all services integrated
 - No dead code (code that is not useful “yet,” even if it comes with UT)
 - use English in code, test, and documents (translation can be kept, but the original need to be in English)
 
