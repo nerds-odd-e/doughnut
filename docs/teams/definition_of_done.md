@@ -18,4 +18,5 @@
 
 - No downtime during deployment
 - No known defects (Bugs should be fixed with the highest priority)
+- User manual updated and users are informed
 - Accepted by the Product Owner (this doesn't block deployment)
