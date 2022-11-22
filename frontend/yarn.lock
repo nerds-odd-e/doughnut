@@ -10,10 +10,10 @@
     "@jridgewell/gen-mapping" "^0.1.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
-"@antfu/utils@0.6.3", "@antfu/utils@^0.6.0":
-  version "0.6.3"
-  resolved "https://registry.yarnpkg.com/@antfu/utils/-/utils-0.6.3.tgz#0bc85e4368c83a18590682276a69fbae61a0f1f3"
-  integrity sha512-sEYpyyKUPOew9QsXZ8feRVMzW6DWLviwOl+/ap06UQW02A8Srbc95CPHVm4eUbiBzBgD46eyIT+przv//KSSlQ==
+"@antfu/utils@^0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@antfu/utils/-/utils-0.7.0.tgz#bbf4e1b0601e2b9db6dc51e6bd1020958d6a1520"
+  integrity sha512-tH38JQEFLOdvZJC32ZbPTvWOQzxEtOQh5jOqBPDLw8sxBr0PFF+f2Csgwb7mRpD0QB1xu+PDoAifIPiCNneeNA==
 
 "@babel/code-frame@^7.10.4", "@babel/code-frame@^7.12.13", "@babel/code-frame@^7.18.6":
   version "7.18.6"
@@ -3346,10 +3346,10 @@ unbox-primitive@^1.0.2:
     has-symbols "^1.0.3"
     which-boxed-primitive "^1.0.2"
 
-unimport@^0.7.0:
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/unimport/-/unimport-0.7.1.tgz#d0e9323504418c04c823a640f21b8ac136c5447f"
-  integrity sha512-rn/hRpCtFxVVT3T8a6sG738xiA6yp8eFzzMLVr+ebp2FBU1gF0Qo6SfOGrrXATDmKruskhYAvPN7djhydgHU8A==
+unimport@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/unimport/-/unimport-1.0.1.tgz#7d3f865f0d4577e9b93adcd1292f67a676e80359"
+  integrity sha512-SEPKl3uyqUvi6c0MnyCmUF9H07CuC9j9p2p33F03LmegU0sxjpnjL0fLKAhh7BTfcKaJKj+1iOiAFtg7P3m5mQ==
   dependencies:
     "@rollup/pluginutils" "^5.0.2"
     escape-string-regexp "^5.0.0"
@@ -3368,24 +3368,24 @@ universalify@^0.2.0:
   resolved "https://registry.yarnpkg.com/universalify/-/universalify-0.2.0.tgz#6451760566fa857534745ab1dde952d1b1761be0"
   integrity sha512-CJ1QgKmNg3CwvAv/kOFmtnEN05f0D/cn9QntgNOQlQF9dgvVTHj3t+8JPdjqawCHk7V/KA+fbUqzZ9XWhcqPUg==
 
-unplugin-auto-import@0.11.4:
-  version "0.11.4"
-  resolved "https://registry.yarnpkg.com/unplugin-auto-import/-/unplugin-auto-import-0.11.4.tgz#b18f2d9ed832025abc0bc69da22b185b3ce82b81"
-  integrity sha512-lh/bRDRYwgnb9Cm5ur8TlTMGxA1GRZvgzCvBIf0vyuVRy7ebWcWefFElpUDpr8vLl+ZRGsPVCOGiYJ8TCR625Q==
+unplugin-auto-import@0.11.5:
+  version "0.11.5"
+  resolved "https://registry.yarnpkg.com/unplugin-auto-import/-/unplugin-auto-import-0.11.5.tgz#84c27e5f230bc1fc9004c162a39b81fcf89da740"
+  integrity sha512-nvbL2AQwLRR8wbHpJ6L1EBVNmjN045RSedTa4NtsGRkSQFXkI1iKHs4dTqJwcKZsnFrZOAKtLPiN1/oQTObLZw==
   dependencies:
-    "@antfu/utils" "^0.6.0"
+    "@antfu/utils" "^0.7.0"
     "@rollup/pluginutils" "^5.0.2"
     local-pkg "^0.4.2"
     magic-string "^0.26.7"
-    unimport "^0.7.0"
-    unplugin "^0.10.2"
+    unimport "^1.0.1"
+    unplugin "^1.0.0"
 
-unplugin-vue-components@0.22.9:
-  version "0.22.9"
-  resolved "https://registry.yarnpkg.com/unplugin-vue-components/-/unplugin-vue-components-0.22.9.tgz#68f0824a606d07b20fc2636b46ce63c1d960c1b6"
-  integrity sha512-qBvooq3EgpjtYicxeccRUGUBBQCCw9rJ0kHPZPOSJd8TBZViSv86vuKLTRDHPyjWtclwOIkVStZJfPdJFhYUMw==
+unplugin-vue-components@0.22.11:
+  version "0.22.11"
+  resolved "https://registry.yarnpkg.com/unplugin-vue-components/-/unplugin-vue-components-0.22.11.tgz#5e2f4ad776cc5540546a7cdaf6408e037b3c73b1"
+  integrity sha512-GTzqPl0Ek8fq8qMufjR6hvtnjnSwMpJ1Rg2Ez9AcKZVp1piWoU/Q4FDnI9wHVKX8eenYL0nqAF3ejYAk1TUfqQ==
   dependencies:
-    "@antfu/utils" "^0.6.0"
+    "@antfu/utils" "^0.7.0"
     "@rollup/pluginutils" "^5.0.2"
     chokidar "^3.5.3"
     debug "^4.3.4"
@@ -3394,17 +3394,7 @@ unplugin-vue-components@0.22.9:
     magic-string "^0.26.7"
     minimatch "^5.1.0"
     resolve "^1.22.1"
-    unplugin "^0.10.1"
-
-unplugin@^0.10.1, unplugin@^0.10.2:
-  version "0.10.2"
-  resolved "https://registry.yarnpkg.com/unplugin/-/unplugin-0.10.2.tgz#0f7089c3666f592cc448d746e39e7f41e9afb01a"
-  integrity sha512-6rk7GUa4ICYjae5PrAllvcDeuT8pA9+j5J5EkxbMFaV+SalHhxZ7X2dohMzu6C3XzsMT+6jwR/+pwPNR3uK9MA==
-  dependencies:
-    acorn "^8.8.0"
-    chokidar "^3.5.3"
-    webpack-sources "^3.2.3"
-    webpack-virtual-modules "^0.4.5"
+    unplugin "^1.0.0"
 
 unplugin@^1.0.0:
   version "1.0.0"
@@ -3642,7 +3632,7 @@ webpack-sources@^3.2.3:
   resolved "https://registry.yarnpkg.com/webpack-sources/-/webpack-sources-3.2.3.tgz#2d4daab8451fd4b240cc27055ff6a0c2ccea0cde"
   integrity sha512-/DyMEOrDgLKKIG0fmvtz+4dUX/3Ghozwgm6iPp8KRhvn+eQf9+Q7GWxVNMk3+uCPWfdXYC4ExGBckIXdFEfH1w==
 
-webpack-virtual-modules@^0.4.5, webpack-virtual-modules@^0.4.6:
+webpack-virtual-modules@^0.4.6:
   version "0.4.6"
   resolved "https://registry.yarnpkg.com/webpack-virtual-modules/-/webpack-virtual-modules-0.4.6.tgz#3e4008230731f1db078d9cb6f68baf8571182b45"
   integrity sha512-5tyDlKLqPfMqjT3Q9TAqf2YqjwmnUleZwzJi1A5qXnlBCdj2AtOJ6wAWdglTIDOPgOiOrXeBeFcsQ8+aGQ6QbA==
