@@ -65,14 +65,15 @@ describe("adding new note", () => {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     const doNothing = () => {};
 
-    it.each([
-      ["dog", "dog", doNothing, "dog"],
-      ["dog", "Dog", doNothing, "Dog"],
-      ["dog", "Canine", replaceTitle, "Canine"],
-      ["dog", "Canine", appendTitle, "dog / Canine"],
-    ])(
-      "search %s get %s and choose to %s",
-      async (searchTitle, wikidataTitle, action, expectedTitle) => {
+    it.each`
+      searchTitle | wikidataTitle | action          | expectedTitle
+      ${"dog"}    | ${"dog"}      | ${doNothing}    | ${"dog"}
+      ${"dog"}    | ${"Dog"}      | ${doNothing}    | ${"Dog"}
+      ${"dog"}    | ${"Canine"}   | ${replaceTitle} | ${"Canine"}
+      ${"dog"}    | ${"Canine"}   | ${appendTitle}  | ${"dog / Canine"}
+    `(
+      "search $searchTitle get $wikidataTitle and choose to $action",
+      async ({ searchTitle, wikidataTitle, action, expectedTitle }) => {
         const searchResult = makeMe.aWikidataSearchEntity
           .label(wikidataTitle)
           .please();
@@ -84,12 +85,6 @@ describe("adding new note", () => {
 
         action();
         await flushPromises();
-
-        // onTestFailed(() => {
-        //   console.log("searchResult:", searchResult);
-        //   console.log("First Option:", firstOption.element.value);
-        //   console.log("Input Title:", titleInput().element.value);
-        // });
 
         expect(<HTMLInputElement>titleInput().element.value).toBe(
           expectedTitle

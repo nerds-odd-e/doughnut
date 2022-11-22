@@ -33,16 +33,17 @@ describe("Save wikidata id", () => {
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   function doNothing(_: VueWrapper) {}
 
-  it.each([
-    ["dog", "dog", doNothing, true],
-    ["Dog", "dog", doNothing, true],
-    ["Canine", "dog", doNothing, false],
-    ["Canine", "dog", cancelOperation, false],
-    ["Canine", "dog", confirmDifference, true],
-    ["Canine", "", doNothing, true],
-  ])(
-    "associate %s with %s and choose to %s",
-    async (noteTitle, wikidataTitle, userAction, shouldSave) => {
+  it.each`
+    noteTitle   | wikidataTitle | userAction           | shouldSave
+    ${"dog"}    | ${"dog"}      | ${doNothing}         | ${true}
+    ${"Dog"}    | ${"dog"}      | ${doNothing}         | ${true}
+    ${"Canine"} | ${"dog"}      | ${doNothing}         | ${false}
+    ${"Canine"} | ${"dog"}      | ${cancelOperation}   | ${false}
+    ${"Canine"} | ${"dog"}      | ${confirmDifference} | ${true}
+    ${"Canine"} | ${""}         | ${doNothing}         | ${true}
+  `(
+    "associate $noteTitle with $wikidataTitle and choose to $userAction",
+    async ({ noteTitle, wikidataTitle, userAction, shouldSave }) => {
       const note = makeMe.aNote.title(noteTitle).please();
       const wikidata = makeMe.aWikidataEntity
         .wikidataTitle(wikidataTitle)
