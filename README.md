@@ -1,4 +1,5 @@
 # Doughnut
+
 ![dough CI CD](https://github.com/nerds-odd-e/doughnut/workflows/dough%20CI%20CD/badge.svg) [![Join the chat at https://gitter.im/Odd-e-doughnut/community](https://badges.gitter.im/Odd-e-doughnut/community.svg)](https://gitter.im/Odd-e-doughnut/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## About
@@ -53,10 +54,10 @@ run `sudo dpkg-reconfigure dash` and answer "No" to reconfigure to `bash` as def
 :vertical_traffic_light: :construction: **ONLY** if you hit problems with the above quick-start setup, you should manually walk through
 the [local development environment nix setup](./docs/nix.md).
 
-
 ### 2. Setup and run doughnut with migrations in 'E2E' profile (backend app started on port 9081)
 
 From the root of your doughnut directory, start your doughnut nix development environment with
+
 ```bash
 nix develop
 ```
@@ -88,7 +89,7 @@ The Cypress+Cucumber tests are in JavaScript/TypeScript.
 
 [cypress](https://docs.cypress.io/guides/getting-started/writing-your-first-test#Add-a-test-file)
 
-+ [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor)
+- [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor)
 
 #### Commands
 
@@ -100,7 +101,7 @@ For MS Windows WSL2 users:
    e.g. `cy:open` or `cy:run`).
 
 | Purpose                               | Command (run from `doughnut` source root directory)                                                                                             |
-|---------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | Install needed e2e tooling            | `yarn`                                                                                                                                          |
 | Start SUT (backend system under test) | `yarn sut` (starts backend SUT ONLY)                                                                                                            |
 | Start Mock for external backend       | `yarn mb` (starts mocked external backend ONLY)                                                                                                 |
@@ -113,7 +114,7 @@ For MS Windows WSL2 users:
 #### Structure
 
 | Purpose          | Location                                  |
-|------------------|-------------------------------------------|
+| ---------------- | ----------------------------------------- |
 | feature files    | `cypress/integration/*.feature`           |
 | step definitions | `cypress/step_definitions/*.ts`           |
 | custom DSL       | `cypress/support/*.ts`                    |
@@ -135,7 +136,7 @@ We chose Vue3 + Vite to build our frontend.
 
 #### How-to
 
-##### Run frontend unit tests
+##### Run frontend unit tests (with Vitest)
 
 From `doughnut` source root directory
 
@@ -180,4 +181,3 @@ directory:
 ### 8. [Production environment](./docs/prod_env.md)
 
 ### 9. [Doughnut source code secrets management](./docs/secrets_management.md)
-
