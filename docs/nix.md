@@ -22,11 +22,11 @@ sh < (curl -k -L https://nixos.org/nix/install) --no-daemon
 
 ### 2. Setup and run doughnut for the first time (local development profile)
 
-
 ```bash
 mkdir -p ~/.config/nix
 echo 'experimental-features = nix-command flakes' >> ~/.config/nix/nix.conf
 ```
+
 Launch a new terminal in your favourite shell (I highly recommend zsh).
 Clone full all-in-one doughnut codebase from Github (Microsoft Windows OS users, please clone the repo to a non-Windows mount directory)
 
@@ -47,8 +47,8 @@ Run E2E profile springboot backend server with gradle (backend app started on po
 
 ```bash
 # from doughnut source root dir
-yarn && yarn frontend:build
-yarn sut
+dum install && dum frontend:build
+dum sut
 open http://localhost:5173
 ```
 
@@ -57,17 +57,17 @@ For MS Windows users, you need to ensure your WSL2 Linux has `xvfb` installed. T
 
 ```bash
 # from doughnut source root dir
-yarn && yarn frontend:sut
-yarn sut
-yarn cy:open
+dum install && dum frontend:sut
+dum sut
+dum start:mb
+dum cy:open
 ```
 
-Run E2E (same as Dev) profile springboot backend server with gradle (backend app started on port 5173)
+Run E2E (same as Dev) profile springboot backend server with gradle (doughnut full stack started on port 9081)
 
 ```bash
 # from doughnut source root dir
-yarn && yarn frontend:build
-./gradlew bootRunE2E
+dum install && dum frontend:build
+dum sut
 open http://localhost:5173
 ```
-

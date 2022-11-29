@@ -39,6 +39,7 @@ RUN apt-get -y update \
     xclip \
     fasd \
     fzf \
+    cargo \
     && apt-get autoremove \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /var/cache/apt \
@@ -50,13 +51,14 @@ RUN apt-get -y update \
 
 # use bash over dash for /bin/sh
 RUN dpkg-reconfigure dash
+RUN cargo install dum
 
 # RUN addgroup --system nixbld \
 #  && adduser gitpod nixbld \
 #  && for i in $(seq 1 30); do useradd -ms /bin/bash nixbld$i && adduser nixbld$i nixbld; done
 
 RUN mkdir -m 0755 /nix && chown gitpod /nix \
-  && mkdir -p /etc/nix && echo 'sandbox = false' > /etc/nix/nix.conf
+    && mkdir -p /etc/nix && echo 'sandbox = false' > /etc/nix/nix.conf
 
 # -----------------------------------------------------
 # -------------------- USER gitpod --------------------
@@ -82,19 +84,21 @@ RUN mkdir -p /home/gitpod/.config/nix \
 
 # Install cachix
 RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
-  && nix-env -iA cachix -f https://cachix.org/api/v1/install \
-  && cachix use cachix
+    && nix-env -iA cachix -f https://cachix.org/api/v1/install \
+    && cachix use cachix
 
 # Install git
 RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
-  && nix-env -i git git-lfs
+    && nix-env -i git git-lfs
 
 # xclip
 RUN echo "alias pbcopy='xclip -selection clipboard'" >> /home/gitpod/.bashrc \
-  && echo "alias pbpaste='xclip -selection clipboard -o'" >> /home/gitpod/.bashrc
+    && echo "alias pbpaste='xclip -selection clipboard -o'" >> /home/gitpod/.bashrc
 
 RUN echo "alias pbcopy='xclip -selection clipboard'" >> /home/gitpod/.zshrc \
-  && echo "alias pbpaste='xclip -selection clipboard -o'" >> /home/gitpod/.zshrc
+    && echo "alias pbpaste='xclip -selection clipboard -o'" >> /home/gitpod/.zshrc
+
+RUN cargo install dum
 
 EXPOSE 5173
 EXPOSE 3309

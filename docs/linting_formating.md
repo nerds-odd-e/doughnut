@@ -2,7 +2,7 @@
 
 ## Code linting and formating (cypress, frontend & backend code)
 
-Details of yarn task aliases described below is visible in `doughnut/package.json`
+Details of dum/yarn task aliases described below is visible in `doughnut/package.json`
 and `doughnut/frontend/package.json`.
 
 ### 1. VSCode IDE extension for Vue3 Typescript
@@ -19,8 +19,7 @@ If you have Vetur currently installed, make sure to disable it in Vue 3 projects
 To enable Takeover Mode, you need to disable VSCode's built-in TS language service in your project's
 workspace only by following these steps:
 
-- In your project workspace, bring up the command palette with Ctrl + Shift + P (macOS: Cmd + Shift
-  + P).
+- In your project workspace, bring up the command palette with Ctrl + Shift + P (macOS: Cmd + Shift + P).
 - Type built and select "Extensions: Show Built-in Extensions".
 - Type typescript in the extension search box (do not remove @builtin prefix).
 - Click the little gear icon of "TypeScript and JavaScript Language Features", and select "Disable (
@@ -35,25 +34,25 @@ From `doughnut` source root directory, run:
 ##### 2.1. Format All code
 
 ```bash
-yarn format:all
+dum format:all
 ```
 
 ##### 2.2. Backend Java code formatting
 
 ```bash
-yarn backend:format
+dum backend:format
 ```
 
 ##### 2.3. Frontend Vue3/Typescript code formatting
 
 ```bash
-yarn frontend:format
+dum frontend:format
 ```
 
 ##### 2.4. Cypress E2E Typescript code formatting
 
 ```bash
-yarn cy:format
+dum cy:format
 ```
 
 ### 3. Linting
@@ -63,23 +62,23 @@ From `doughnut` source root directory, run:
 ##### 3.1. Lint All code
 
 ```bash
-yarn lint:all
+dum lint:all
 ```
 
 ##### 3.2. Backend Java code linting
 
 ```bash
-yarn backend:lint
+dum backend:lint
 ```
 
 ##### 3.3. Frontend Vue3/Typescript code linting
 
 ```bash
-yarn frontend:lint
+dum frontend:lint
 ```
 
 ##### 3.4. Cypress E2E Typescript code linting
 
 ```bash
-yarn cy:lint
+dum cy:lint
 ```

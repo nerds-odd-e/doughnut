@@ -18,6 +18,7 @@ export default defineConfig({
     setupNodeEvents(on, config) {
       return require('./cypress/plugins/index.ts').default(on, config)
     },
+    experimentalRunAllSpecs: true,
     specPattern: 'cypress/integration/**/*.feature',
     excludeSpecPattern: [
       '**/*.{js,ts}',

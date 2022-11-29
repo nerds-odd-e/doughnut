@@ -63,7 +63,7 @@ nix develop
 ```
 
 ```bash
-yarn && yarn frontend:build && yarn sut
+dum install && dum frontend:build && dum sut
 ```
 
 - Rerun it each time you reset the database.
@@ -73,7 +73,7 @@ yarn && yarn frontend:build && yarn sut
 - From doughnut source root directory:
 
 ```bash
-yarn backend:test
+dum backend:test
 ```
 
 ### 3. [IntelliJ IDEA settings](./docs/idea.md)
@@ -100,16 +100,15 @@ For MS Windows WSL2 users:
 2. `export NODE_OPTIONS="--max-old-space-size=4096"` before running any cypress related commands (
    e.g. `cy:open` or `cy:run`).
 
-| Purpose                               | Command (run from `doughnut` source root directory)                                                                                             |
-| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| Install needed e2e tooling            | `yarn`                                                                                                                                          |
-| Start SUT (backend system under test) | `yarn sut` (starts backend SUT ONLY)                                                                                                            |
-| Start Mock for external backend       | `yarn mb` (starts mocked external backend ONLY)                                                                                                 |
-| Start only the Cypress IDE            | `yarn cy:open` (starts Cypress IDE ONLY)                                                                                                        |
-| Run all e2e test                      | `yarn test` (compile frontend assets, start backend SUT, mountebank virtual service provider & cypress headless e2e testing)                    |
-| Run all e2e test with FE in dev mode  | `yarn test:dev` (starts backend SUT, frontend SUT in HMR mode, mountebank virtual service provider & cypress headless e2e testing)              |
-| Run cypress IDE                       | `yarn test:open` (starts frontend SUT in HMR mode, backend SUT, mountebank virtual service provider & cypress IDE)                              |
-| Generate TypeScript Interfaces        | `yarn generateTypeScript` (Generate TypeScript Interfaces from backend JSON classes. Should run manually every time backend JSON class changes) |
+| Purpose                               | Command (run from `doughnut` source root directory)                                                                                            |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Install needed e2e tooling            | `dum install`                                                                                                                                  |
+| Start SUT (backend system under test) | `dum sut` (starts backend SUT ONLY)                                                                                                            |
+| Start Mock for external backend       | `dum start:mb` (starts mocked external backend ONLY)                                                                                           |
+| Start only the Cypress IDE            | `dum cy:open` (starts Cypress IDE ONLY)                                                                                                        |
+| Run all e2e test                      | `dum test` (compile frontend assets, start backend SUT, mountebank virtual service provider & cypress headless e2e testing)                    |
+| Run cypress IDE                       | `dum test:open` (starts frontend SUT in HMR mode, backend SUT, mountebank virtual service provider & cypress IDE)                              |
+| Generate TypeScript Interfaces        | `dum generateTypeScript` (Generate TypeScript Interfaces from backend JSON classes. Should run manually every time backend JSON class changes) |
 
 #### Structure
 
@@ -127,7 +126,7 @@ For MS Windows WSL2 users:
 
 You can find the database migrations in `backend/src/main/resources/db.migration/`.
 The migrations are run automatically when the backend app starts up.
-It will also run the migrations for test when you run `yarn backend:test`.
+It will also run the migrations for test when you run `dum backend:test`.
 To trigger the test DB migration manually, run `backend/gradlew testDBMigrate`.
 
 ### 6. Vue3 web-app frontend
@@ -141,20 +140,20 @@ We chose Vue3 + Vite to build our frontend.
 From `doughnut` source root directory
 
 ```bash
-yarn frontend:test
+dum frontend:test
 ```
 
 ##### Run frontend web-app (app will launch on port 5173)
 
 ```bash
-yarn frontend:sut
+dum frontend:sut
 ```
 
 ##### Build & Bundle Vue3 frontend web-app assets and startup backend app (backend webapp will launch on port 9081).
 
 ```bash
-yarn frontend:build
-yarn sut
+dum frontend:build
+dum sut
 ```
 
 Expect to find minified and uglified web bundle assets in `backend/src/main/resources/static`
