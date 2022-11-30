@@ -47,17 +47,18 @@ Run E2E profile springboot backend server with gradle (backend app started on po
 
 ```bash
 # from doughnut source root dir
-dum install && dum frontend:build
+dum i && dum frontend:build
 dum sut
-open http://localhost:5173
 ```
+
+Open your browser to visit http://localhost:5173
 
 Run E2E profile with backend server & frontend in dev mode & Cypress IDE (frontend app on port 5173; backend app on port 9081)
 For MS Windows users, you need to ensure your WSL2 Linux has `xvfb` installed. This is not managed by Nix!
 
 ```bash
 # from doughnut source root dir
-dum install && dum frontend:sut
+dum i && dum frontend:sut
 dum sut
 dum start:mb
 dum cy:open
@@ -67,7 +68,8 @@ Run E2E (same as Dev) profile springboot backend server with gradle (doughnut fu
 
 ```bash
 # from doughnut source root dir
-dum install && dum frontend:build
+dum i && dum frontend:build
 dum sut
-open http://localhost:5173
 ```
+
+Open your browser to visit http://localhost:5173

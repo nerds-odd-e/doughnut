@@ -32,8 +32,8 @@ git config user.email "your_email@your_domain.com"
 
 ### Preparation steps to run doughnut backend unit tests & cypress End-to-End tests
 
-- From the root of the `doughnut` codebase (this should be on path `/workspace/doughnut`), run `dum install` to get End-to-End testing tooling setup.
-- From root of `doughnut` source path, execute `dum test:dev` to execute the full headless cypress End-to-End test suite.
+- From the root of the `doughnut` codebase (this should be on path `/workspace/doughnut`), run `dum i` to get End-to-End testing tooling setup.
+- From root of `doughnut` source path, execute `dum t` to execute the full headless cypress End-to-End test suite.
 
 ### Running java springboot unit tests
 

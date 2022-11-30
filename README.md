@@ -63,7 +63,7 @@ nix develop
 ```
 
 ```bash
-dum install && dum frontend:build && dum sut
+dum i && dum frontend:build && dum sut
 ```
 
 - Rerun it each time you reset the database.
@@ -102,11 +102,11 @@ For MS Windows WSL2 users:
 
 | Purpose                               | Command (run from `doughnut` source root directory)                                                                                            |
 | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Install needed e2e tooling            | `dum install`                                                                                                                                  |
+| Install needed e2e tooling            | `dum i`                                                                                                                                        |
 | Start SUT (backend system under test) | `dum sut` (starts backend SUT ONLY)                                                                                                            |
 | Start Mock for external backend       | `dum start:mb` (starts mocked external backend ONLY)                                                                                           |
 | Start only the Cypress IDE            | `dum cy:open` (starts Cypress IDE ONLY)                                                                                                        |
-| Run all e2e test                      | `dum test` (compile frontend assets, start backend SUT, mountebank virtual service provider & cypress headless e2e testing)                    |
+| Run all e2e test                      | `dum t` (compile frontend assets, start backend SUT, mountebank virtual service provider & cypress headless e2e testing)                       |
 | Run cypress IDE                       | `dum test:open` (starts frontend SUT in HMR mode, backend SUT, mountebank virtual service provider & cypress IDE)                              |
 | Generate TypeScript Interfaces        | `dum generateTypeScript` (Generate TypeScript Interfaces from backend JSON classes. Should run manually every time backend JSON class changes) |
 
