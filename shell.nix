@@ -8,7 +8,8 @@ in mkShell {
   MYSQL_HOME = builtins.getEnv "MYSQL_HOME";
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
-    nodejs-18_x
+    nodejs-19_x
+    zsh
     dum
     yarn
     jdk
@@ -69,7 +70,7 @@ in mkShell {
             export NIXPKGS_ALLOW_UNFREE=1
             export GPG_TTY=$(tty)
             export JAVA_HOME="$(readlink -e $(type -p javac) | sed  -e 's/\/bin\/javac//g')"
-            export NODE_PATH="${pkgs.nodejs-18_x}"
+            export NODE_PATH="${pkgs.nodejs-19_x}"
             export DUM_PATH="${pkgs.dum}"
 
             export MYSQL_BASEDIR=${pkgs.mysql80}
