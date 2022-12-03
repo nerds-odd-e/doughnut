@@ -73,7 +73,7 @@ WORKDIR /home/gitpod
 
 # Install Nix
 RUN touch .bash_profile \
-    && curl https://nixos.org/releases/nix/nix-2.11.0/install | sh
+    && curl https://nixos.org/releases/nix/nix-2.11.1/install | sh
 
 RUN echo '. /home/gitpod/.nix-profile/etc/profile.d/nix.sh' >> /home/gitpod/.bashrc
 RUN mkdir -p /home/gitpod/.config/nixpkgs && echo '{ allowUnfree = true; }' >> /home/gitpod/.config/nixpkgs/config.nix

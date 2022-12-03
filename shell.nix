@@ -12,7 +12,7 @@ in mkShell {
     zsh
     dum
     yarn
-    jdk
+    jdk17
     libiconv
     git
     git-secret

@@ -16,29 +16,29 @@ get_os_type() {
 
 download_nixpkg_manager_install_script() {
   rm -f ./install-nix
-  curl -o install-nix https://nixos.org/releases/nix/nix-2.11.0/install
+  curl -o install-nix https://nixos.org/releases/nix/nix-2.11.1/install
   chmod +x ./install-nix
 }
 
 configure_nix_flakes() {
-  if [ ! -f ${HOME}/.config/nix/nix/nix.conf ]; then
-    mkdir -p ${HOME}/.config/nix
-    touch ${HOME}/.config/nix/nix.conf
+  if [ ! -f "${HOME}/.config/nix/nix/nix.conf" ]; then
+    mkdir -p "${HOME}/.config/nix"
+    touch "${HOME}/.config/nix/nix.conf"
   fi
 
-  if ! grep -Fxq "experimental-features = nix-command flakes" ${HOME}/.config/nix/nix.conf; then
-    echo 'experimental-features = nix-command flakes' >> ${HOME}/.config/nix/nix.conf
+  if ! grep -Fxq "experimental-features = nix-command flakes" "${HOME}/.config/nix/nix.conf"; then
+    echo "experimental-features = nix-command flakes" >> "${HOME}/.config/nix/nix.conf"
   fi
 }
 
 allow_nix_unfree() {
-  mkdir -p ${HOME}/.config/nixpkgs && echo '{ allowUnfree = true; }' >> ${HOME}/.config/nixpkgs/config.nix
+  mkdir -p "${HOME}/.config/nixpkgs" && echo "{ allowUnfree = true; }" >> "${HOME}/.config/nixpkgs/config.nix"
 }
 
 ensure_nix_profile() {
-  if [ ! -f ${HOME}/.nix-profile/etc/profile.d/nix.sh ]; then
+  if [ ! -f "${HOME}/.nix-profile/etc/profile.d/nix.sh" ]; then
     user=$(whoami)
-    ln -sf /nix/var/nix/profiles/per-user/${user}/profile ${HOME}/.nix-profile
+    ln -sf "/nix/var/nix/profiles/per-user/${user}/profile" "${HOME}/.nix-profile"
   fi
 }
 
