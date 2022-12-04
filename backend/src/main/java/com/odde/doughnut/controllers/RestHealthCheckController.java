@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 class RestHealthCheckController {
   @Autowired private Environment environment;
-
-  @Autowired private ModelFactoryService modelFactoryService;
 
   @Autowired private UserModel currentUser;
 
