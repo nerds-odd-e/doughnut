@@ -54,7 +54,7 @@
     "style-loader": "^3.3",
     "typescript": "^4.9",
     "unplugin-auto-import": "0.12.0",
-    "vite": "3.2.4",
+    "vite": "3.2.5",
     "vite-plugin-checker": "^0.5",
     "vite-plugin-eslint": "^1.8",
     "vitest": "0.25.3",
