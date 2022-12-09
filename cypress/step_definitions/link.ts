@@ -84,16 +84,22 @@ When(
 Then(
   "On the current page, I should see {string} has link {string} {string}",
   (noteTitle: string, linkType: string, targetNoteTitles: string) => {
+    const targetNoteTitlesList = targetNoteTitles.commonSenseSplit(",")
     cy.findByText(targetNoteTitles.commonSenseSplit(",").pop(), {
       selector: ".link-title",
     })
+    const linksForNoteFound: string[] = []
     cy.findAllByRole("button", { name: linkType })
       .parent()
       .parent()
-      .within(() => {
-        targetNoteTitles
-          .commonSenseSplit(",")
-          .forEach((targetNoteTitle: string) => cy.contains(targetNoteTitle))
+      .each(($link) => {
+        cy.wrap($link).within(() => {
+          linksForNoteFound.push($link.text())
+        })
+      })
+      .then(() => {
+        expect(targetNoteTitlesList.every((linkItem) => linksForNoteFound.includes(linkItem))).to.be
+          .true
       })
   },
 )
