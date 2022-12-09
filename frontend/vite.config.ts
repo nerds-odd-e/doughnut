@@ -1,5 +1,5 @@
-import { fileURLToPath, URL } from "url";
 import { defineConfig } from "vite";
+import { fileURLToPath, URL } from "url";
 import vue from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
 import checker from 'vite-plugin-checker'
@@ -7,13 +7,6 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 
 export default defineConfig({
-  test: {
-    globals: true,
-    environment: "jsdom",
-    "setupFiles": [
-      "./tests/setupVitest.js"
-    ]
-  },
   css: {
     preprocessorOptions: {
       scss: {
