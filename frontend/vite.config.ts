@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from "vite";
 import { fileURLToPath, URL } from "url";
 import vue from "@vitejs/plugin-vue";
@@ -7,6 +8,18 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 
 export default defineConfig({
+  test: {
+    exclude: [
+      "packages/template/*",
+      "node_modules/**/*.spec.js",
+      "node_modules/**/*.test.js"
+    ],
+    globals: true,
+    environment: "jsdom",
+    "setupFiles": [
+      "./tests/setupVitest.js"
+    ]
+  },
   css: {
     preprocessorOptions: {
       scss: {
