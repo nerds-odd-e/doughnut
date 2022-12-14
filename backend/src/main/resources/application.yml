@@ -3,10 +3,11 @@ spring:
     active: "test"
   config:
     import: db-test.properties
-  resources:
-    cache:
-      cachecontrol:
-        max-age: 365d
+  web:
+    resources:
+      cache:
+        cachecontrol:
+          max-age: 365d
   servlet:
     multipart:
       max-file-size: 10MB
@@ -36,10 +37,11 @@ spring:
     import: db-e2e.properties
     activate:
       on-profile: e2e
-  resources:
-    cache:
-      cachecontrol:
-        max-age: 365d
+  web:
+    resources:
+      cache:
+        cachecontrol:
+          max-age: 365d
   servlet:
     multipart:
       max-file-size: 10MB
