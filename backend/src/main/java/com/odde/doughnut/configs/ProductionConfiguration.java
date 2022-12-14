@@ -19,7 +19,7 @@ public class ProductionConfiguration {
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http.csrf().disable().authorizeRequests().antMatchers("/api/healthcheck").permitAll();
+    http.csrf().disable().authorizeRequests().requestMatchers("/api/healthcheck").permitAll();
 
     commonConfiguration.commonConfig(http, http.oauth2Login());
     return http.build();

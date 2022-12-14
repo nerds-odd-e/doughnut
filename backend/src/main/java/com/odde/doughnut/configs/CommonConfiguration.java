@@ -11,9 +11,9 @@ public class CommonConfiguration {
       HttpSecurity http, AbstractAuthenticationFilterConfigurer authenticationFilterConfigurer)
       throws Exception {
     http.authorizeRequests()
-        .mvcMatchers("/robots.txt")
+        .requestMatchers("/robots.txt")
         .permitAll()
-        .antMatchers(
+        .requestMatchers(
             "/",
             "/login",
             "/error",

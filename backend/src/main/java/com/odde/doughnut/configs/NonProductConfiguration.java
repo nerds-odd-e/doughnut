@@ -27,7 +27,7 @@ public class NonProductConfiguration {
     http.csrf()
         .disable()
         .authorizeRequests()
-        .antMatchers("/api/healthcheck", "/api/testability/**")
+        .requestMatchers("/api/healthcheck", "/api/testability/**")
         .permitAll();
 
     commonConfiguration.commonConfig(http, http.httpBasic().and().formLogin());
