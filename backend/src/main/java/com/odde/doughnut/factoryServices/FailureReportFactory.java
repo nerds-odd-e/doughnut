@@ -6,7 +6,7 @@ import com.odde.doughnut.services.GithubService;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.server.ResponseStatusException;
 
 public record FailureReportFactory(

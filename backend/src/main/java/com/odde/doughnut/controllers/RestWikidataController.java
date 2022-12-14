@@ -8,7 +8,7 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;

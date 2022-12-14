@@ -1,7 +1,7 @@
 package com.odde.doughnut.entities.json;
 
 import com.odde.doughnut.entities.Link;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 public class LinkCreation {
   @NotNull public Link.LinkType linkType;
