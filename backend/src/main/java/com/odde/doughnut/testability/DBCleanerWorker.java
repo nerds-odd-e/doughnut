@@ -9,7 +9,7 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Table;
 import jakarta.persistence.metamodel.EntityType;
-import org.hibernate.Metamodel;
+import org.hibernate.metamodel.model.domain.JpaMetamodel;
 import org.springframework.transaction.annotation.Transactional;
 
 public class DBCleanerWorker {
@@ -50,7 +50,7 @@ public class DBCleanerWorker {
   }
 
   private List<String> getAnnotatedTableNames(EntityManager manager) {
-    Metamodel metamodel = (Metamodel) manager.getMetamodel();
+    JpaMetamodel metamodel = (JpaMetamodel) manager.getMetamodel();
     Set<EntityType<?>> entities = metamodel.getEntities();
 
     return entities.stream()

@@ -10,7 +10,7 @@ public class CommonConfiguration {
   void commonConfig(
       HttpSecurity http, AbstractAuthenticationFilterConfigurer authenticationFilterConfigurer)
       throws Exception {
-    http.authorizeRequests()
+    http.authorizeHttpRequests()
         .requestMatchers("/robots.txt")
         .permitAll()
         .requestMatchers(
