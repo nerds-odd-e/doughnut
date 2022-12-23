@@ -24,6 +24,9 @@ spring:
     show-sql: false
     properties.hibernate:
       enable_lazy_load_no_trans: true
+      globally_quoted_identifiers: true
+      globally_quoted_identifiers_skip_column_definitions: true
+    open-in-view: false
   github_for_issues:
     repo: nerds-odd-e/doughnut_sandbox
     token: ${GITHUB_FOR_ISSUES_API_TOKEN:-token_not_set}
@@ -59,6 +62,9 @@ spring:
     show-sql: false
     properties.hibernate:
       enable_lazy_load_no_trans: true
+      globally_quoted_identifiers: true
+      globally_quoted_identifiers_skip_column_definitions: true
+    open-in-view: false
   github_for_issues:
     repo: nerds-odd-e/doughnut_sandbox
     token: ${GITHUB_FOR_ISSUES_API_TOKEN:-token_not_set}
@@ -92,6 +98,9 @@ spring:
     show-sql: false
     properties.hibernate:
       enable_lazy_load_no_trans: true
+      globally_quoted_identifiers: true
+      globally_quoted_identifiers_skip_column_definitions: true
+    open-in-view: false
   security:
     oauth2:
       client:
