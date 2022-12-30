@@ -119,7 +119,7 @@ export default defineComponent({
 <style lang="sass" scoped>
 .note-content
   display: flex
-  flex-direction: column
+  flex-direction: row
   flex-wrap: wrap
   .col
     flex: 1 1 auto
