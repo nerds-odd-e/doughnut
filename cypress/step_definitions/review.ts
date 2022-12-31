@@ -141,8 +141,7 @@ Then(
 )
 
 Then("I type my answer {string}", (answer: string) => {
-  cy.getFormControl("Answer").type(answer)
-  cy.findByRole("button", { name: "OK" }).click()
+  cy.replaceFocusedTextAndEnter(answer)
 })
 
 Then("I choose answer {string}", (noteTitle: string) => {

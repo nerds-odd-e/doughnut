@@ -39,7 +39,7 @@
           field="answer"
           v-model="answer"
           placeholder="put your answer here"
-          :autofocus="true"
+          v-focus
         />
       </div>
       <input
