@@ -35,6 +35,7 @@ public class ClozedString {
   }
 
   public String cloze() {
+    if (Strings.isEmpty(originalContent)) return originalContent;
     final Pattern pattern =
         Pattern.compile("\\/[^\\s^\\/][^\\/\\n]*\\/(?!\\w)", Pattern.CASE_INSENSITIVE);
     String d = pattern.matcher(originalContent).replaceAll(internalPronunciationReplacement);
@@ -45,7 +46,7 @@ public class ClozedString {
   }
 
   public boolean isPresent() {
-    return Strings.isNotBlank(originalContent);
+    return Strings.isNotEmpty(originalContent);
   }
 
   public ClozedString hide(NoteTitle noteTitle) {
