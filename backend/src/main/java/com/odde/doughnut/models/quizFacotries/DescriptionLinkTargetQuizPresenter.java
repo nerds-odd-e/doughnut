@@ -1,6 +1,7 @@
 package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.algorithms.ClozeDescription;
+import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.entities.QuizQuestion;
 
 public class DescriptionLinkTargetQuizPresenter extends LinkTargetQuizPresenter {
@@ -11,18 +12,18 @@ public class DescriptionLinkTargetQuizPresenter extends LinkTargetQuizPresenter 
 
   @Override
   public String instruction() {
-    String clozeDescription =
+    ClozedString clozeDescription =
         ClozeDescription.htmlClosedDescription()
-            .getClozeDescription(answerNote.getNoteTitle(), getSourceDescription());
+            .getClozeDescriptionXX(answerNote.getNoteTitle(), getSourceDescription());
     return "<p>The following descriptions is "
         + link.getLinkTypeLabel()
         + ":</p>"
         + "<pre style='white-space: pre-wrap;'>"
-        + clozeDescription
+        + clozeDescription.cloze()
         + "</pre> ";
   }
 
-  private String getSourceDescription() {
+  private ClozedString getSourceDescription() {
     return link.getSourceNote().getClozeDescription();
   }
 }

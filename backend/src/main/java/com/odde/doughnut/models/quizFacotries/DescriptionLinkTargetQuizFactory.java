@@ -23,7 +23,7 @@ public class DescriptionLinkTargetQuizFactory extends LinkTargetQuizFactory
   @Override
   public boolean isValidQuestion() {
     return super.isValidQuestion()
-        && Strings.isNotEmpty(link.getSourceNote().getClozeDescription());
+        && Strings.isNotEmpty(link.getSourceNote().getClozeDescription().cloze());
   }
 
   @Override

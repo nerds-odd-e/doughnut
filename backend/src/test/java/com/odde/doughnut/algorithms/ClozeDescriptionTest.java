@@ -54,14 +54,14 @@ public class ClozeDescriptionTest {
   })
   void clozeDescription(String title, String description, String expectedClozeDescription) {
     assertThat(
-        clozeDescription.getClozeDescription(new NoteTitle(title), description),
+        clozeDescription.getClozeDescription(new NoteTitle(title), description).cloze(),
         equalTo(expectedClozeDescription));
   }
 
   @Test
   void clozeDescriptionWithMultipleLink() {
     assertThat(
-        clozeDescription.getClozeDescription(new NoteTitle("title"), "a /b\nc/ d"),
+        clozeDescription.getClozeDescription(new NoteTitle("title"), "a /b\nc/ d").cloze(),
         equalTo("a /b\nc/ d"));
   }
 
@@ -69,6 +69,6 @@ public class ClozeDescriptionTest {
   void theReplacementsShouldNotInterfereEachOther() {
     ClozeDescription clozeDescription =
         new ClozeDescription("/..~/", "/.../", "(...)", "<.._>", "<...>");
-    assertThat(clozeDescription.getClozeDescription(new NoteTitle("abc"), "abc"), equalTo("/.../"));
+    assertThat(clozeDescription.getClozeDescription(new NoteTitle("abc"), "abc").cloze(), equalTo("/.../"));
   }
 }
