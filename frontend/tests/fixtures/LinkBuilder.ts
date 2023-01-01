@@ -8,7 +8,6 @@ class LinkBuilder extends Builder<Generated.Link> {
     return {
       id: 8,
       linkType: "related to",
-      clozeSource: "xxx",
       sourceNote: this.sourceNoteBuilder.do().note,
       targetNote: new NoteRealmBuilder().do().note,
     };

@@ -264,6 +264,7 @@ public class Link extends Thingy {
     return LinkType.fromId(typeId);
   }
 
+  @JsonIgnore
   public ClozedString getClozeSource() {
     return ClozedString.htmlClosedString(getSourceNote().getTitle())
         .hide(getTargetNote().getNoteTitle());
