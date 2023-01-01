@@ -12,7 +12,6 @@ import static com.odde.doughnut.entities.QuizQuestion.QuestionType.WHICH_SPEC_HA
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.odde.doughnut.algorithms.ClozeDescription;
 import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.entities.QuizQuestion.QuestionType;
 import com.odde.doughnut.entities.validators.ValidateLinkType;
@@ -266,8 +265,8 @@ public class Link extends Thingy {
   }
 
   public ClozedString getClozeSource() {
-    return ClozeDescription.htmlClosedDescription()
-        .getClozeDescription(getTargetNote().getNoteTitle(), getSourceNote().getTitle());
+    return ClozedString.htmlClosedString(getSourceNote().getTitle())
+        .hide(getTargetNote().getNoteTitle());
   }
 
   @JsonIgnore

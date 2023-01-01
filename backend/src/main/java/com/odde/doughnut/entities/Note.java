@@ -4,7 +4,6 @@ import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.odde.doughnut.algorithms.ClozeDescription;
 import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
@@ -316,8 +315,7 @@ public class Note extends Thingy {
     String description = getTextContent().getDescription();
     if (Strings.isEmpty(description)) return new ClozedString(null, "");
 
-    return ClozeDescription.htmlClosedDescription()
-        .getClozeDescription(getNoteTitle(), description);
+    return ClozedString.htmlClosedString(description).hide(getNoteTitle());
   }
 
   @JsonIgnore

@@ -8,8 +8,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 public class ClozeDescriptionTest {
-  ClozeDescription clozeDescription =
-      new ClozeDescription("[..~]", "[...]", "/.../", "<..~>", "<...>");
+  ClozeReplacement clozeReplacement =
+      new ClozeReplacement("[..~]", "[...]", "/.../", "<..~>", "<...>");
 
   @ParameterizedTest
   @CsvSource({
@@ -54,23 +54,23 @@ public class ClozeDescriptionTest {
   })
   void clozeDescription(String title, String description, String expectedClozeDescription) {
     assertThat(
-        clozeDescription.getClozeDescription(new NoteTitle(title), description).cloze(),
+        new ClozedString(clozeReplacement, description).hide(new NoteTitle(title)).cloze(),
         equalTo(expectedClozeDescription));
   }
 
   @Test
   void clozeDescriptionWithMultipleLink() {
     assertThat(
-        clozeDescription.getClozeDescription(new NoteTitle("title"), "a /b\nc/ d").cloze(),
+        new ClozedString(clozeReplacement, "a /b\nc/ d").hide(new NoteTitle("title")).cloze(),
         equalTo("a /b\nc/ d"));
   }
 
   @Test
   void theReplacementsShouldNotInterfereEachOther() {
-    ClozeDescription clozeDescription =
-        new ClozeDescription("/..~/", "/.../", "(...)", "<.._>", "<...>");
+    ClozeReplacement clozeReplacement =
+        new ClozeReplacement("/..~/", "/.../", "(...)", "<.._>", "<...>");
     assertThat(
-        clozeDescription.getClozeDescription(new NoteTitle("abc"), "abc").cloze(),
+        new ClozedString(clozeReplacement, "abc").hide(new NoteTitle("abc")).cloze(),
         equalTo("/.../"));
   }
 }

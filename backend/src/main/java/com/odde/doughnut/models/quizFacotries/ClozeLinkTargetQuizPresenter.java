@@ -1,6 +1,5 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.algorithms.ClozeDescription;
 import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.entities.QuizQuestion;
 
@@ -13,8 +12,8 @@ public class ClozeLinkTargetQuizPresenter extends LinkTargetQuizPresenter {
   @Override
   public String instruction() {
     ClozedString clozeTitle =
-        ClozeDescription.htmlClosedDescription()
-            .getClozeDescription(answerNote.getNoteTitle(), link.getSourceNote().getTitle());
+        ClozedString.htmlClosedString(link.getSourceNote().getTitle())
+            .hide(answerNote.getNoteTitle());
     return "<mark>" + clozeTitle.cloze() + "</mark> is " + link.getLinkTypeLabel() + ":";
   }
 }
