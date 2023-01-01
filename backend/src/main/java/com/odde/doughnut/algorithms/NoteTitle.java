@@ -31,7 +31,7 @@ public class NoteTitle {
     String titlePreMasked =
         getTitles().stream()
             .reduce(literalMatchPreMasked, (d, t) -> t.replaceSimilar(d), (x, y) -> y);
-    return TitleFragment.replaceMasks(titlePreMasked, clozeReplacement);
+    return clozeReplacement.replaceMasks(titlePreMasked);
   }
 
   private List<TitleFragment> getTitles() {

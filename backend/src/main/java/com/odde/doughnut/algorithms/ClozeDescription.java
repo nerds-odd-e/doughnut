@@ -34,6 +34,7 @@ public class ClozeDescription {
         Pattern.compile("\\/[^\\s^\\/][^\\/\\n]*\\/(?!\\w)", Pattern.CASE_INSENSITIVE);
     String d = pattern.matcher(description).replaceAll(internalPronunciationReplacement);
     return new ClozedString(
+        this,
         noteTitle
             .replaceTitleFragments(d, this.clozeReplacement)
             .replace(internalPronunciationReplacement, pronunciationReplacement));

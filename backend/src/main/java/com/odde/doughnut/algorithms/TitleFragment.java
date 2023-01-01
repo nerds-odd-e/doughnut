@@ -25,17 +25,6 @@ class TitleFragment {
     }
   }
 
-  static String replaceMasks(String titleMasked, ClozeReplacement clozeReplacement) {
-    return titleMasked
-        .replace(internalFullMatchReplacement, clozeReplacement.fullMatchReplacement)
-        .replace(internalPartialMatchReplacement, clozeReplacement.partialMatchReplacement)
-        .replace(
-            internalFullMatchReplacementForSubtitle, clozeReplacement.fullMatchSubtitleReplacement)
-        .replace(
-            internalPartialMatchReplacementForSubtitle,
-            clozeReplacement.partialMatchSubtitleReplacement);
-  }
-
   boolean matches(String answer) {
     return content.equalsIgnoreCase(answer.strip());
   }

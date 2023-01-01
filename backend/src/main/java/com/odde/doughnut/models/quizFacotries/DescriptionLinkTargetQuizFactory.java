@@ -6,7 +6,6 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.models.UserModel;
 import java.util.Collections;
 import java.util.List;
-import org.apache.logging.log4j.util.Strings;
 
 public class DescriptionLinkTargetQuizFactory extends LinkTargetQuizFactory
     implements SecondaryReviewPointsFactory {
@@ -22,8 +21,7 @@ public class DescriptionLinkTargetQuizFactory extends LinkTargetQuizFactory
 
   @Override
   public boolean isValidQuestion() {
-    return super.isValidQuestion()
-        && Strings.isNotEmpty(link.getSourceNote().getClozeDescription().cloze());
+    return super.isValidQuestion() && link.getSourceNote().getClozeDescription().isPresent();
   }
 
   @Override
