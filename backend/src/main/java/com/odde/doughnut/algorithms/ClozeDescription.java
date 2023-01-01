@@ -1,9 +1,10 @@
 package com.odde.doughnut.algorithms;
 
+import static com.odde.doughnut.algorithms.ClozedString.internalPronunciationReplacement;
+
 import java.util.regex.Pattern;
 
 public class ClozeDescription {
-  private final String pronunciationReplacement;
   private final ClozeReplacement clozeReplacement = new ClozeReplacement();
 
   public ClozeDescription(
@@ -16,7 +17,7 @@ public class ClozeDescription {
     clozeReplacement.fullMatchReplacement = fullMatchReplacement;
     clozeReplacement.partialMatchSubtitleReplacement = partialMatchSubtitleReplacement;
     clozeReplacement.fullMatchSubtitleReplacement = fullMatchSubtitleReplacement;
-    this.pronunciationReplacement = pronunciationReplacement;
+    clozeReplacement.pronunciationReplacement = pronunciationReplacement;
   }
 
   public static ClozeDescription htmlClosedDescription() {
@@ -29,15 +30,10 @@ public class ClozeDescription {
   }
 
   public ClozedString getClozeDescription(NoteTitle noteTitle, String description) {
-    final String internalPronunciationReplacement = "__p_r_o_n_u_n_c__";
     final Pattern pattern =
         Pattern.compile("\\/[^\\s^\\/][^\\/\\n]*\\/(?!\\w)", Pattern.CASE_INSENSITIVE);
     String d = pattern.matcher(description).replaceAll(internalPronunciationReplacement);
-    return new ClozedString(
-        this,
-        noteTitle
-            .replaceTitleFragments(d, this.clozeReplacement)
-            .replace(internalPronunciationReplacement, pronunciationReplacement));
+    return new ClozedString(this.clozeReplacement, d, noteTitle);
   }
 
   public ClozedString getClozeDescriptionXX(NoteTitle noteTitle, ClozedString sourceDescription) {

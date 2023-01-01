@@ -314,7 +314,7 @@ public class Note extends Thingy {
   @JsonIgnore
   public ClozedString getClozeDescription() {
     String description = getTextContent().getDescription();
-    if (Strings.isEmpty(description)) return new ClozedString(null, "");
+    if (Strings.isEmpty(description)) return new ClozedString(null, "", null);
 
     return ClozeDescription.htmlClosedDescription()
         .getClozeDescription(getNoteTitle(), description);

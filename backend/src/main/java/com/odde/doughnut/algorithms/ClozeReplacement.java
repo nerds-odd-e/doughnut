@@ -7,7 +7,9 @@ class ClozeReplacement {
   public String fullMatchSubtitleReplacement;
   public String partialMatchSubtitleReplacement;
 
-  String replaceMasks(String titleMasked) {
+  public String pronunciationReplacement;
+
+  private String replaceMasks(String titleMasked) {
     return titleMasked
         .replace(TitleFragment.internalFullMatchReplacement, fullMatchReplacement)
         .replace(TitleFragment.internalPartialMatchReplacement, partialMatchReplacement)
@@ -16,5 +18,15 @@ class ClozeReplacement {
         .replace(
             TitleFragment.internalPartialMatchReplacementForSubtitle,
             partialMatchSubtitleReplacement);
+  }
+
+  String replaceTitleFragments(String pronunciationMasked, NoteTitle noteTitle) {
+    String literalMatchPreMasked =
+        noteTitle.getTitles().stream()
+            .reduce(pronunciationMasked, (d, t) -> t.replaceLiteralWords(d), (x, y) -> y);
+    String titlePreMasked =
+        noteTitle.getTitles().stream()
+            .reduce(literalMatchPreMasked, (d, t) -> t.replaceSimilar(d), (x, y) -> y);
+    return replaceMasks(titlePreMasked);
   }
 }

@@ -24,17 +24,7 @@ public class NoteTitle {
     return getTitles().stream().anyMatch(t -> t.matches(answer));
   }
 
-  String replaceTitleFragments(String pronunciationMasked, ClozeReplacement clozeReplacement) {
-    String literalMatchPreMasked =
-        getTitles().stream()
-            .reduce(pronunciationMasked, (d, t) -> t.replaceLiteralWords(d), (x, y) -> y);
-    String titlePreMasked =
-        getTitles().stream()
-            .reduce(literalMatchPreMasked, (d, t) -> t.replaceSimilar(d), (x, y) -> y);
-    return clozeReplacement.replaceMasks(titlePreMasked);
-  }
-
-  private List<TitleFragment> getTitles() {
+  public List<TitleFragment> getTitles() {
     List<TitleFragment> result = new ArrayList<>();
     Pattern pattern = Pattern.compile("(?U)(.+?)(\\p{Ps}([^\\p{Ps}\\p{Pe}]+)\\p{Pe})?$");
     Matcher matcher = pattern.matcher(title);

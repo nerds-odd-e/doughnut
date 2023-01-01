@@ -3,13 +3,17 @@ package com.odde.doughnut.algorithms;
 import org.apache.logging.log4j.util.Strings;
 
 public class ClozedString {
-  private ClozeDescription clozeDescription;
+  private ClozeReplacement clozeReplacement;
   private String cnt;
+  private NoteTitle noteTitle;
 
-  public ClozedString(ClozeDescription clozeDescription, String cnt) {
-    this.clozeDescription = clozeDescription;
+  static final String internalPronunciationReplacement = "__p_r_o_n_u_n_c__";
+
+  public ClozedString(ClozeReplacement clozeReplacement, String cnt, NoteTitle noteTitle) {
+    this.clozeReplacement = clozeReplacement;
 
     this.cnt = cnt;
+    this.noteTitle = noteTitle;
   }
 
   @Override
@@ -18,7 +22,9 @@ public class ClozedString {
   }
 
   public String cloze() {
-    return cnt;
+    return clozeReplacement
+        .replaceTitleFragments(cnt, noteTitle)
+        .replace(internalPronunciationReplacement, clozeReplacement.pronunciationReplacement);
   }
 
   public boolean isPresent() {
