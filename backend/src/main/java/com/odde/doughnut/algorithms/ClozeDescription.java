@@ -1,9 +1,5 @@
 package com.odde.doughnut.algorithms;
 
-import static com.odde.doughnut.algorithms.ClozedString.internalPronunciationReplacement;
-
-import java.util.regex.Pattern;
-
 public class ClozeDescription {
   private final ClozeReplacement clozeReplacement = new ClozeReplacement();
 
@@ -30,13 +26,10 @@ public class ClozeDescription {
   }
 
   public ClozedString getClozeDescription(NoteTitle noteTitle, String description) {
-    final Pattern pattern =
-        Pattern.compile("\\/[^\\s^\\/][^\\/\\n]*\\/(?!\\w)", Pattern.CASE_INSENSITIVE);
-    String d = pattern.matcher(description).replaceAll(internalPronunciationReplacement);
-    return new ClozedString(this.clozeReplacement, d, noteTitle);
+    return new ClozedString(this.clozeReplacement, description).hide(noteTitle);
   }
 
   public ClozedString getClozeDescriptionXX(NoteTitle noteTitle, ClozedString sourceDescription) {
-    return getClozeDescription(noteTitle, sourceDescription.cloze());
+    return sourceDescription.hide(noteTitle);
   }
 }
