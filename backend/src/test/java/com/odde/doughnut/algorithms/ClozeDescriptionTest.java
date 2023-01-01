@@ -69,6 +69,8 @@ public class ClozeDescriptionTest {
   void theReplacementsShouldNotInterfereEachOther() {
     ClozeDescription clozeDescription =
         new ClozeDescription("/..~/", "/.../", "(...)", "<.._>", "<...>");
-    assertThat(clozeDescription.getClozeDescription(new NoteTitle("abc"), "abc").cloze(), equalTo("/.../"));
+    assertThat(
+        clozeDescription.getClozeDescription(new NoteTitle("abc"), "abc").cloze(),
+        equalTo("/.../"));
   }
 }

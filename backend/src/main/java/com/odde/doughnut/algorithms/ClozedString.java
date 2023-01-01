@@ -16,5 +16,4 @@ public class ClozedString {
   public String cloze() {
     return cnt;
   }
-
 }
