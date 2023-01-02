@@ -10,6 +10,9 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface ThingRepository extends CrudRepository<Thing, Integer> {
+  @Query(value = "SELECT thing.* FROM thing where id in (:ids)", nativeQuery = true)
+  Stream<Thing> findAllByIds(List<Integer> ids);
+
   String selectThingsFrom =
       "SELECT thing.*,  IFNULL(IFNULL(jlink.level, jnote.level),0) as level from thing  ";
 

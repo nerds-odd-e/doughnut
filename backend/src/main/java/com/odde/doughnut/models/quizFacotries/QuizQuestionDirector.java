@@ -29,8 +29,8 @@ public record QuizQuestionDirector(
       if (optionsEntities.size() <= 1) {
         return Optional.empty();
       }
-      quizQuestion.setOptionNoteIds(toIdsString(optionsEntities));
       quizQuestion.setOptionThingIds(toThingIdsString(optionsEntities));
+      quizQuestion.setOptionNoteIds(toIdsString(optionsEntities));
     }
 
     if (quizQuestionFactory instanceof SecondaryReviewPointsFactory secondaryReviewPointsFactory) {
@@ -55,9 +55,9 @@ public record QuizQuestionDirector(
 
   private String toThingIdsString(List<Thingy> options) {
     return randomizer.shuffle(options).stream()
-      .map(Thingy::getThing)
-      .map(Thing::getId)
-      .map(Object::toString)
-      .collect(Collectors.joining(","));
+        .map(Thingy::getThing)
+        .map(Thing::getId)
+        .map(Object::toString)
+        .collect(Collectors.joining(","));
   }
 }

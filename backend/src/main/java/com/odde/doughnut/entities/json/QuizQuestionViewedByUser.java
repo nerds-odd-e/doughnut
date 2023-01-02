@@ -44,7 +44,7 @@ public class QuizQuestionViewedByUser {
     hintLinks = presenter.hintLinks();
     pictureWithMask = presenter.pictureWithMask();
     options =
-        presenter.optionCreator().getOptions(modelFactoryService, quizQuestion.getOptionNoteIds());
+        presenter.optionCreator().getOptions(modelFactoryService, quizQuestion.getOptionThingIds());
     viceReviewPointIdList = quizQuestion.getViceReviewPointIdList();
     if (questionType == QuizQuestion.QuestionType.JUST_REVIEW) return;
     notebookPosition =
@@ -62,40 +62,41 @@ public class QuizQuestionViewedByUser {
 
   public interface OptionCreator {
 
-    default List<Option> getOptions(ModelFactoryService modelFactoryService, String optionNoteIds) {
-      if (Strings.isBlank(optionNoteIds)) return List.of();
+    default List<Option> getOptions(
+        ModelFactoryService modelFactoryService, String optionThingIds) {
+      if (Strings.isBlank(optionThingIds)) return List.of();
       List<Integer> idList =
-          Arrays.stream(optionNoteIds.split(","))
+          Arrays.stream(optionThingIds.split(","))
               .map(Integer::parseInt)
               .collect(Collectors.toList());
-      Stream<Note> noteStream =
+      Stream<Thing> noteStream =
           modelFactoryService
-              .noteRepository
+              .thingRepository
               .findAllByIds(idList)
               .sorted(Comparator.comparing(v -> idList.indexOf(v.getId())));
-      return noteStream.map(this::optionFromNote).toList();
+      return noteStream.map(this::optionFromThing).toList();
     }
 
-    Option optionFromNote(Note note);
+    Option optionFromThing(Thing thing);
   }
 
   public static class TitleOptionCreator implements OptionCreator {
     @Override
-    public Option optionFromNote(Note note) {
+    public Option optionFromThing(Thing thing) {
       Option option = new Option();
-      option.noteId = note.getId();
-      option.display = note.getTitle();
+      option.noteId = thing.getNote().getId();
+      option.display = thing.getNote().getTitle();
       return option;
     }
   }
 
   public static class PictureOptionCreator implements OptionCreator {
     @Override
-    public Option optionFromNote(Note note) {
+    public Option optionFromThing(Thing thing) {
       Option option = new Option();
-      option.noteId = note.getId();
-      option.display = note.getTitle();
-      option.pictureWithMask = note.getPictureWithMask().orElse(null);
+      option.noteId = thing.getNote().getId();
+      option.display = thing.getNote().getTitle();
+      option.pictureWithMask = thing.getNote().getPictureWithMask().orElse(null);
       option.isPicture = true;
       return option;
     }
@@ -103,22 +104,11 @@ public class QuizQuestionViewedByUser {
 
   public static class ClozeLinkOptionCreator implements OptionCreator {
     @Override
-    public List<Option> getOptions(ModelFactoryService modelFactoryService, String optionNoteIds) {
-      Stream<Link> noteStream =
-          modelFactoryService.linkRepository.findAllByIds(optionNoteIds.split(","));
-      return noteStream.map(this::optionFromLink).toList();
-    }
-
-    public Option optionFromLink(Link link) {
+    public Option optionFromThing(Thing thing) {
       Option option = new Option();
-      option.noteId = link.getSourceNote().getId();
-      option.display = link.getClozeSource().cloze();
+      option.noteId = thing.getLink().getSourceNote().getId();
+      option.display = thing.getLink().getClozeSource().cloze();
       return option;
-    }
-
-    @Override
-    public Option optionFromNote(Note note) {
-      return null;
     }
   }
 }

@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.stream.Stream;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -89,7 +88,4 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
       nativeQuery = true)
   void undoDeleteDescendants(
       @Param("note") Note note, @Param("currentUTCTimestamp") Timestamp currentUTCTimestamp);
-
-  @Query(value = "SELECT note.* FROM note where id in (:ids)", nativeQuery = true)
-  Stream<Note> findAllByIds(List<Integer> ids);
 }
