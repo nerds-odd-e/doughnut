@@ -15,4 +15,5 @@ public abstract class Thingy {
   protected Integer id;
 
   abstract void setThing(Thing thing);
+  public abstract Thing getThing();
 }

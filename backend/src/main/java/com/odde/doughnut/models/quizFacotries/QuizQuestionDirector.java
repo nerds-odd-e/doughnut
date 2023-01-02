@@ -3,6 +3,7 @@ package com.odde.doughnut.models.quizFacotries;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.QuizQuestion.QuestionType;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.entities.Thingy;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Randomizer;
@@ -29,6 +30,7 @@ public record QuizQuestionDirector(
         return Optional.empty();
       }
       quizQuestion.setOptionNoteIds(toIdsString(optionsEntities));
+      quizQuestion.setOptionThingIds(toThingIdsString(optionsEntities));
     }
 
     if (quizQuestionFactory instanceof SecondaryReviewPointsFactory secondaryReviewPointsFactory) {
@@ -49,5 +51,13 @@ public record QuizQuestionDirector(
         .map(Thingy::getId)
         .map(Object::toString)
         .collect(Collectors.joining(","));
+  }
+
+  private String toThingIdsString(List<Thingy> options) {
+    return randomizer.shuffle(options).stream()
+      .map(Thingy::getThing)
+      .map(Thing::getId)
+      .map(Object::toString)
+      .collect(Collectors.joining(","));
   }
 }
