@@ -45,7 +45,7 @@ public record QuizQuestionDirector(
   }
 
   private String toIdsString(List<Thingy> options) {
-    return options.stream()
+    return randomizer.shuffle(options).stream()
         .map(Thingy::getId)
         .map(Object::toString)
         .collect(Collectors.joining(","));

@@ -5,6 +5,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionPresenter;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -67,7 +68,11 @@ public class QuizQuestionViewedByUser {
           Arrays.stream(optionNoteIds.split(","))
               .map(Integer::parseInt)
               .collect(Collectors.toList());
-      Stream<Note> noteStream = modelFactoryService.noteRepository.findAllByIds(idList);
+      Stream<Note> noteStream =
+          modelFactoryService
+              .noteRepository
+              .findAllByIds(idList)
+              .sorted(Comparator.comparing(v -> idList.indexOf(v.getId())));
       return noteStream.map(this::optionFromNote).toList();
     }
 

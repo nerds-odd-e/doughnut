@@ -1,10 +1,7 @@
 package com.odde.doughnut.entities;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.models.ReviewPointModel;
@@ -73,14 +70,31 @@ class QuizQuestionTest {
       assertThat(quizQuestion.getQuestionType(), equalTo(QuizQuestion.QuestionType.JUST_REVIEW));
     }
 
-    @Test
-    void aNoteWithOneSibling() {
-      Note top = makeMe.aHeadNote().please();
-      Note note1 = makeMe.aNote().under(top).please();
-      Note note2 = makeMe.aNote().under(top).please();
-      makeMe.refresh(top);
-      List<String> options = getOptions(note1);
-      assertThat(options, containsInAnyOrder(note1.getTitle(), note2.getTitle()));
+    @Nested
+    class aNoteWithOneSibling {
+      Note note1;
+      Note note2;
+
+      @BeforeEach
+      void setup() {
+        Note top = makeMe.aHeadNote().please();
+        note1 = makeMe.aNote().under(top).please();
+        note2 = makeMe.aNote().under(top).please();
+        makeMe.refresh(top);
+      }
+
+      @Test
+      void descendingRandomizer() {
+        List<String> options = getOptions(note1);
+        assertThat(options, containsInRelativeOrder(note2.getTitle(), note1.getTitle()));
+      }
+
+      @Test
+      void ascendingRandomizer() {
+        randomizer.alwaysChoose = "last";
+        List<String> options = getOptions(note1);
+        assertThat(options, containsInRelativeOrder(note1.getTitle(), note2.getTitle()));
+      }
     }
 
     @Test
