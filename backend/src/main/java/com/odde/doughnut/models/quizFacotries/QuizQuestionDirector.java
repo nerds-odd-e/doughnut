@@ -44,8 +44,8 @@ public record QuizQuestionDirector(
         reviewPoint, new QuizQuestionServant(randomizer, modelFactoryService));
   }
 
-  private String toIdsString(List<Thingy> options1) {
-    return randomizer.shuffle(options1).stream()
+  private String toIdsString(List<Thingy> options) {
+    return randomizer.shuffle(options).stream()
         .map(Thingy::getId)
         .map(Object::toString)
         .collect(Collectors.joining(","));
