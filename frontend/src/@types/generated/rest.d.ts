@@ -244,7 +244,6 @@ declare namespace Generated {
         reviewPoint: number;
         questionTypeId: number;
         categoryLink: number;
-        optionNoteIds: string;
         viceReviewPointIds: string;
         createdAt: string;
     }

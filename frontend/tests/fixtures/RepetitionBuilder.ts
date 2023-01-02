@@ -8,7 +8,6 @@ class RepetitionBuilder extends Builder<Generated.RepetitionForUser> {
       reviewPoint: 0,
       questionTypeId: 0,
       categoryLink: 0,
-      optionNoteIds: "",
       viceReviewPointIds: "",
       createdAt: "",
     },
