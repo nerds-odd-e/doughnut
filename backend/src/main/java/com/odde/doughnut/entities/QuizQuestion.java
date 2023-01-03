@@ -118,13 +118,11 @@ public class QuizQuestion {
   @Column(name = "option_notes")
   @Getter
   @Setter
-  @JsonIgnore
   private String optionNoteIds = "";
 
   @Column(name = "option_thing_ids")
   @Getter
   @Setter
-  @JsonIgnore
   private String optionThingIds = "";
 
   @Column(name = "vice_review_point_ids")
