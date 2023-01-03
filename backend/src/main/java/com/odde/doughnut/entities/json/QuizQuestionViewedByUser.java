@@ -44,11 +44,27 @@ public class QuizQuestionViewedByUser {
     hintLinks = presenter.hintLinks();
     pictureWithMask = presenter.pictureWithMask();
     options =
-        presenter.optionCreator().getOptions(modelFactoryService, quizQuestion.getOptionThingIds());
+        getOptions(
+            presenter.optionCreator(), modelFactoryService, quizQuestion.getOptionThingIds());
     viceReviewPointIdList = quizQuestion.getViceReviewPointIdList();
     if (questionType == QuizQuestion.QuestionType.JUST_REVIEW) return;
     notebookPosition =
         new NoteViewer(user, quizQuestion.getReviewPoint().getHeadNote()).jsonNotePosition(true);
+  }
+
+  static List<Option> getOptions(
+      OptionCreator optionCreator, ModelFactoryService modelFactoryService, String optionThingIds) {
+    if (Strings.isBlank(optionThingIds)) return List.of();
+    List<Integer> idList =
+        Arrays.stream(optionThingIds.split(","))
+            .map(Integer::parseInt)
+            .collect(Collectors.toList());
+    Stream<Thing> noteStream =
+        modelFactoryService
+            .thingRepository
+            .findAllByIds(idList)
+            .sorted(Comparator.comparing(v -> idList.indexOf(v.getId())));
+    return noteStream.map(optionCreator::optionFromThing).toList();
   }
 
   public static class Option {
@@ -61,22 +77,6 @@ public class QuizQuestionViewedByUser {
   }
 
   public interface OptionCreator {
-
-    default List<Option> getOptions(
-        ModelFactoryService modelFactoryService, String optionThingIds) {
-      if (Strings.isBlank(optionThingIds)) return List.of();
-      List<Integer> idList =
-          Arrays.stream(optionThingIds.split(","))
-              .map(Integer::parseInt)
-              .collect(Collectors.toList());
-      Stream<Thing> noteStream =
-          modelFactoryService
-              .thingRepository
-              .findAllByIds(idList)
-              .sorted(Comparator.comparing(v -> idList.indexOf(v.getId())));
-      return noteStream.map(this::optionFromThing).toList();
-    }
-
     Option optionFromThing(Thing thing);
   }
 

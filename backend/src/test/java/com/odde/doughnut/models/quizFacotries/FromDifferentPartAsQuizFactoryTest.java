@@ -2,11 +2,7 @@ package com.odde.doughnut.models.quizFacotries;
 
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.FROM_DIFFERENT_PART_AS;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.in;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -99,116 +95,132 @@ class FromDifferentPartAsQuizFactoryTest {
       }
 
       @Test
-      void shouldIncludeRightAnswersAndFillingOptions() {
-        QuizQuestionViewedByUser quizQuestion = buildQuestion();
-        assertThat(
-            quizQuestion.getDescription(),
-            containsString(
-                "<p>Which one <mark>is tagged by</mark> a <em>DIFFERENT</em> part of <mark>perspective</mark> than:"));
-        assertThat(quizQuestion.getMainTopic(), containsString(ugly.getTitle()));
-        List<String> strings = toOptionStrings(quizQuestion);
-        assertThat(tall.getTitle(), in(strings));
-        assertThat(kind.getTitle(), in(strings));
-        assertThat(pretty.getTitle(), not(in(strings)));
-        assertThat(ugly.getTitle(), not(in(strings)));
+      void noRightAnswers() {
+        makeMe.refresh(userModel.getEntity());
+        assertThat(buildQuestion(), nullValue());
       }
 
       @Nested
-      class WhenTheSupposedDifferentChoiceIsAlsoHavingTheSamePart {
-        @BeforeEach
-        void setup() {
-          makeMe.aLink().between(tall, subjective, Link.LinkType.TAGGED_BY).please();
-        }
-
-        @Test
-        void noRightAnswers() {
-          makeMe.refresh(userModel.getEntity());
-          assertThat(buildQuestion(), nullValue());
-        }
-      }
-
-      @Nested
-      class WhenTheReviewingSourceNoteIsAlsoTaggedByADifferentPart {
+      class WhenThereIsEnoughFillingOption {
 
         @BeforeEach
         void setup() {
-          makeMe.aLink().between(ugly, objective, Link.LinkType.TAGGED_BY).please();
+          makeMe.aReviewPointFor(prettySubjective).by(userModel).please();
+          makeMe.refresh(userModel.getEntity());
         }
 
         @Test
-        void noRightAnswers() {
-          makeMe.refresh(userModel.getEntity());
-          assertThat(buildQuestion(), nullValue());
+        void shouldIncludeRightAnswersAndFillingOptions() {
+          QuizQuestionViewedByUser quizQuestion = buildQuestion();
+          assertThat(
+              quizQuestion.getDescription(),
+              containsString(
+                  "<p>Which one <mark>is tagged by</mark> a <em>DIFFERENT</em> part of <mark>perspective</mark> than:"));
+          assertThat(quizQuestion.getMainTopic(), containsString(ugly.getTitle()));
+          List<String> strings = toOptionStrings(quizQuestion);
+          assertThat(tall.getTitle(), in(strings));
+          assertThat(kind.getTitle(), in(strings));
+          assertThat(pretty.getTitle(), in(strings));
+          assertThat(ugly.getTitle(), not(in(strings)));
         }
 
         @Nested
-        class thereIsAThirdPerspective {
-          Note pi;
+        class WhenTheSupposedDifferentChoiceIsAlsoHavingTheSamePart {
+          @BeforeEach
+          void setup() {
+            makeMe.aLink().between(tall, subjective, Link.LinkType.TAGGED_BY).please();
+          }
+
+          @Test
+          void noRightAnswers() {
+            makeMe.refresh(userModel.getEntity());
+            assertThat(buildQuestion(), nullValue());
+          }
+        }
+
+        @Nested
+        class WhenTheReviewingSourceNoteIsAlsoTaggedByADifferentPart {
 
           @BeforeEach
           void setup() {
-            Note axiom = makeMe.aNote("objective").under(top).please();
-            makeMe.aLink().between(axiom, perspective, LinkType.PART).please();
-            pi = makeMe.aNote("pi").under(top).please();
-            makeMe.aLink().between(pi, axiom, LinkType.TAGGED_BY).please();
+            makeMe.aLink().between(ugly, objective, Link.LinkType.TAGGED_BY).please();
           }
 
           @Test
-          void thereIsAThirdPerspective() {
+          void noRightAnswers() {
             makeMe.refresh(userModel.getEntity());
-            assertThat(buildQuestion(), not(nullValue()));
+            assertThat(buildQuestion(), nullValue());
+          }
+
+          @Nested
+          class thereIsAThirdPerspective {
+            Note pi;
+
+            @BeforeEach
+            void setup() {
+              Note axiom = makeMe.aNote("objective").under(top).please();
+              makeMe.aLink().between(axiom, perspective, LinkType.PART).please();
+              pi = makeMe.aNote("pi").under(top).please();
+              makeMe.aLink().between(pi, axiom, LinkType.TAGGED_BY).please();
+            }
+
+            @Test
+            void thereIsAThirdPerspective() {
+              makeMe.refresh(userModel.getEntity());
+              assertThat(buildQuestion(), not(nullValue()));
+            }
+
+            @Test
+            void whenTheOptionOfTheThirdPerspectiveIsAlsoObjective() {
+              makeMe.aLink().between(pi, objective, LinkType.TAGGED_BY).please();
+              makeMe.refresh(userModel.getEntity());
+              assertThat(buildQuestion(), not(nullValue())); // wrong, this should be null
+            }
+          }
+        }
+
+        @Nested
+        class WhenThereIsReviewPointOfTheCategory {
+          ReviewPoint additionalReviewPoint;
+
+          @BeforeEach
+          void setup() {
+            additionalReviewPoint =
+                makeMe.aReviewPointFor(subjectivePerspective).by(userModel).please();
           }
 
           @Test
-          void whenTheOptionOfTheThirdPerspectiveIsAlsoObjective() {
-            makeMe.aLink().between(pi, objective, LinkType.TAGGED_BY).please();
-            makeMe.refresh(userModel.getEntity());
-            assertThat(buildQuestion(), not(nullValue())); // wrong, this should be null
+          void shouldInclude2ViceReviewPoints() {
+            QuizQuestionViewedByUser quizQuestion = buildQuestion();
+            assertThat(
+                quizQuestion.getViceReviewPointIdList(), contains(additionalReviewPoint.getId()));
           }
         }
-      }
 
-      @Nested
-      class WhenThereIsReviewPointOfTheCategory {
-        ReviewPoint additionalReviewPoint;
+        @Nested
+        class Answer {
 
-        @BeforeEach
-        void setup() {
-          additionalReviewPoint =
-              makeMe.aReviewPointFor(subjectivePerspective).by(userModel).please();
-        }
+          @Test
+          void correct() {
+            AnswerViewedByUser answerResult =
+                makeMe
+                    .anAnswerViewedByUserFor(uglySubjectiveRp)
+                    .validQuestionOfType(FROM_DIFFERENT_PART_AS)
+                    .answerWithSpelling(tall.getTitle())
+                    .inMemoryPlease();
+            assertTrue(answerResult.correct);
+          }
 
-        @Test
-        void shouldInclude2ViceReviewPoints() {
-          QuizQuestionViewedByUser quizQuestion = buildQuestion();
-          assertThat(
-              quizQuestion.getViceReviewPointIdList(), contains(additionalReviewPoint.getId()));
-        }
-      }
-
-      @Nested
-      class Answer {
-
-        @Test
-        void correct() {
-          AnswerViewedByUser answerResult =
-              makeMe
-                  .anAnswerViewedByUserFor(uglySubjectiveRp)
-                  .validQuestionOfType(FROM_DIFFERENT_PART_AS)
-                  .answerWithSpelling(tall.getTitle())
-                  .inMemoryPlease();
-          assertTrue(answerResult.correct);
-        }
-
-        @Test
-        void wrongWhenChooseCousin() {
-          AnswerViewedByUser answerResult =
-              makeMe
-                  .anAnswerViewedByUserFor(uglySubjectiveRp)
-                  .validQuestionOfType(FROM_DIFFERENT_PART_AS)
-                  .answerWithSpelling(pretty.getTitle())
-                  .inMemoryPlease();
-          assertFalse(answerResult.correct);
+          @Test
+          void wrongWhenChooseCousin() {
+            AnswerViewedByUser answerResult =
+                makeMe
+                    .anAnswerViewedByUserFor(uglySubjectiveRp)
+                    .validQuestionOfType(FROM_DIFFERENT_PART_AS)
+                    .answerWithSpelling(pretty.getTitle())
+                    .inMemoryPlease();
+            assertFalse(answerResult.correct);
+          }
         }
       }
     }
