@@ -115,11 +115,6 @@ public class QuizQuestion {
   @Setter
   private Link categoryLink;
 
-  @Column(name = "option_notes")
-  @Getter
-  @Setter
-  private String optionNoteIds = "";
-
   @Column(name = "option_thing_ids")
   @Getter
   @Setter

@@ -30,7 +30,6 @@ public record QuizQuestionDirector(
         return Optional.empty();
       }
       quizQuestion.setOptionThingIds(toThingIdsString(optionsEntities));
-      quizQuestion.setOptionNoteIds(toIdsString(optionsEntities));
     }
 
     if (quizQuestionFactory instanceof SecondaryReviewPointsFactory secondaryReviewPointsFactory) {
@@ -44,13 +43,6 @@ public record QuizQuestionDirector(
   private QuizQuestionFactory buildQuizQuestionFactory() {
     return questionType.factory.apply(
         reviewPoint, new QuizQuestionServant(randomizer, modelFactoryService));
-  }
-
-  private String toIdsString(List<Thingy> options) {
-    return randomizer.shuffle(options).stream()
-        .map(Thingy::getId)
-        .map(Object::toString)
-        .collect(Collectors.joining(","));
   }
 
   private String toThingIdsString(List<Thingy> options) {

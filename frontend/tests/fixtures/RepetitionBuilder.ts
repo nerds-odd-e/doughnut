@@ -10,7 +10,6 @@ class RepetitionBuilder extends Builder<Generated.RepetitionForUser> {
       categoryLink: 0,
       viceReviewPointIds: "",
       createdAt: "",
-      optionNoteIds: "",
       optionThingIds: "",
     },
     questionType: "JUST_REVIEW",
