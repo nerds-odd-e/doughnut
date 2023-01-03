@@ -16,4 +16,9 @@ public interface QuestionOptionsFactory {
     options.add(answerNote);
     return options;
   }
+
+  default int minimumOptionCount() {
+    return 2;
+  }
+  ;
 }

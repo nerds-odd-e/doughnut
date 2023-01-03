@@ -23,6 +23,11 @@ public class FromDifferentPartAsQuizFactory
   }
 
   @Override
+  public int minimumOptionCount() {
+    return 3;
+  }
+
+  @Override
   public List<Note> generateFillingOptions() {
     if (getCategoryLink() == null) {
       return null;
@@ -31,9 +36,6 @@ public class FromDifferentPartAsQuizFactory
         servant
             .getSiblingLinksOfSameLinkTypeHavingReviewPoint(link, user)
             .collect(Collectors.toList());
-    if (cousinLinks.size() < 2) {
-      return List.of();
-    }
     return servant.chooseFillingOptionsRandomly(cousinLinks).stream()
         .map(Link::getSourceNote)
         .collect(Collectors.toList());

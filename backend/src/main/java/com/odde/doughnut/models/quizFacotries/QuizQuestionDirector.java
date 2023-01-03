@@ -26,7 +26,7 @@ public record QuizQuestionDirector(
 
     if (quizQuestionFactory instanceof QuestionOptionsFactory optionsFactory) {
       List<Thingy> optionsEntities = optionsFactory.getOptionEntities();
-      if (optionsEntities.size() <= 1) {
+      if (optionsEntities.size() < optionsFactory.minimumOptionCount()) {
         return Optional.empty();
       }
       quizQuestion.setOptionThingIds(toThingIdsString(optionsEntities));
