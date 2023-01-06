@@ -38,7 +38,7 @@ function NestedPage(
       routerScopeGuard(scopeName)(to, next);
     },
     render() {
-      return h("div", { class: "inner-box" }, [
+      return h("div", { class: "content" }, [
         h(WrappedComponent, { ...this.$props, minimized: this.isNested }),
         h(RouterView, { ...this.$props }),
       ]);

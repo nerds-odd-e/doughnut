@@ -1,33 +1,39 @@
 <template>
-  <div :class="currentResult ? 'repeat-paused' : ''">
-    <RepeatProgressBar
-      v-bind="{
-        finished,
-        toRepeatCount,
-        previousResultCursor,
-      }"
-      @view-last-result="viewLastResult($event)"
-    >
-    </RepeatProgressBar>
-  </div>
-  <template v-if="!minimized">
-    <template v-if="repetition">
-      <QuizQuestion
+  <div class="inner-box">
+    <div class="header" :class="currentResult ? 'repeat-paused' : ''">
+      <RepeatProgressBar
         v-bind="{
-          quizQuestion: repetition.quizQuestion,
-          storageAccessor,
+          finished,
+          toRepeatCount,
+          previousResultCursor,
         }"
-        @answered="onAnswered($event)"
-        @reload-needed="fetchData"
-        :key="repetition.quizQuestion.quizQuestion.reviewPoint"
-      />
-    </template>
-    <template v-else>
-      <div v-if="finished > 0" class="alert alert-success">
-        You have finished all repetitions for this half a day!
+        @view-last-result="viewLastResult($event)"
+      >
+      </RepeatProgressBar>
+    </div>
+    <div class="content">
+      <div class="inner-box">
+        <template v-if="!minimized">
+          <template v-if="repetition">
+            <QuizQuestion
+              v-bind="{
+                quizQuestion: repetition.quizQuestion,
+                storageAccessor,
+              }"
+              @answered="onAnswered($event)"
+              @reload-needed="fetchData"
+              :key="repetition.quizQuestion.quizQuestion.reviewPoint"
+            />
+          </template>
+          <template v-else>
+            <div v-if="finished > 0" class="alert alert-success">
+              You have finished all repetitions for this half a day!
+            </div>
+          </template>
+        </template>
       </div>
-    </template>
-  </template>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">

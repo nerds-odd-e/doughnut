@@ -105,14 +105,16 @@ export default defineComponent({
 <style lang="sass" scoped>
 .box
   display: flex
-  flex-flow: column
+  flex-direction: column
   height: 100vh
 
 .box .header
-  flex: 0 1 auto
+  flex: 0 0 auto
 
 .box .content
-  flex: 1 1 auto
+  flex: 1
+  -ms-flex: 1 1 auto
+  overflow-y: auto
 
 .box .footer
   flex: 0 1 40px
@@ -121,15 +123,15 @@ export default defineComponent({
 <style lang="sass">
 .inner-box
   display: flex
-  flex-flow: column
+  flex-direction: column
   height: 100%
 
 .inner-box .header
   flex: 0 1 auto
 
 .inner-box .content
-  flex: 1 1 auto
-  overflow: hidden
+  flex: 1
+  overflow-y: auto
 
 .inner-box .footer
   flex: 0 1 40px

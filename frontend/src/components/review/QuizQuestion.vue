@@ -1,5 +1,5 @@
 <template>
-  <div class="quiz-instruction">
+  <div class="quiz-instruction inner-box">
     <ShowPicture
       v-if="quizQuestion?.pictureWithMask"
       v-bind="quizQuestion?.pictureWithMask"
@@ -9,7 +9,7 @@
       v-bind="{ links: quizQuestion?.hintLinks, storageAccessor }"
     >
       <pre
-        style="white-space: pre-wrap"
+        class="quiz-description"
         v-if="quizQuestion?.questionType !== 'PICTURE_TITLE'"
         v-html="quizQuestion?.description"
       />
@@ -71,6 +71,10 @@
 <style scoped lang="sass">
 .quiz-instruction
   height: 50%
+.quiz-description
+  white-space: pre-wrap
+  height: 100%
+  overflow: auto
 .quiz-answering
   height: 50%
 .options
