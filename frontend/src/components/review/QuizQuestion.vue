@@ -1,13 +1,13 @@
 <template>
-  <ShowPicture
-    v-if="quizQuestion?.pictureWithMask"
-    v-bind="quizQuestion?.pictureWithMask"
-    :opacity="1"
-  />
-  <NoteFrameOfLinks
-    v-bind="{ links: quizQuestion?.hintLinks, storageAccessor }"
-  >
-    <div class="quiz-instruction">
+  <div class="quiz-instruction">
+    <ShowPicture
+      v-if="quizQuestion?.pictureWithMask"
+      v-bind="quizQuestion?.pictureWithMask"
+      :opacity="1"
+    />
+    <NoteFrameOfLinks
+      v-bind="{ links: quizQuestion?.hintLinks, storageAccessor }"
+    >
       <pre
         style="white-space: pre-wrap"
         v-if="quizQuestion?.questionType !== 'PICTURE_TITLE'"
@@ -16,24 +16,24 @@
       <h2 v-if="!!quizQuestion?.mainTopic" class="text-center">
         {{ quizQuestion?.mainTopic }}
       </h2>
-    </div>
-  </NoteFrameOfLinks>
-
-  <div v-if="quizQuestion?.questionType === 'JUST_REVIEW'">
-    <ReviewPointAsync
-      v-bind="{
-        reviewPointId: quizQuestion?.quizQuestion.reviewPoint,
-        storageAccessor,
-      }"
-    />
-    <SelfEvaluateButtons
-      @self-evaluated-memory-state="submitAnswer({ spellingAnswer: $event })"
-      :key="quizQuestion?.quizQuestion.reviewPoint"
-    />
+    </NoteFrameOfLinks>
   </div>
-  <div v-else-if="quizQuestion?.questionType === 'SPELLING'">
-    <form @submit.prevent.once="submitAnswer({ spellingAnswer: answer })">
-      <div class="aaa">
+
+  <div class="quiz-answering">
+    <div v-if="quizQuestion?.questionType === 'JUST_REVIEW'">
+      <ReviewPointAsync
+        v-bind="{
+          reviewPointId: quizQuestion?.quizQuestion.reviewPoint,
+          storageAccessor,
+        }"
+      />
+      <SelfEvaluateButtons
+        @self-evaluated-memory-state="submitAnswer({ spellingAnswer: $event })"
+        :key="quizQuestion?.quizQuestion.reviewPoint"
+      />
+    </div>
+    <div v-else-if="quizQuestion?.questionType === 'SPELLING'">
+      <form @submit.prevent.once="submitAnswer({ spellingAnswer: answer })">
         <TextInput
           scope-name="review_point"
           field="answer"
@@ -41,32 +41,39 @@
           placeholder="put your answer here"
           v-focus
         />
-      </div>
-      <input
-        type="submit"
-        value="OK"
-        class="btn btn-primary btn-lg btn-block"
-      />
-    </form>
-  </div>
-  <div class="row" v-else>
-    <div
-      class="col-sm-6 mb-3 d-grid"
-      v-for="option in quizQuestion?.options"
-      :key="option.noteId"
-    >
-      <button
-        class="btn btn-secondary btn-lg"
-        @click.once="submitAnswer({ answerNoteId: option.noteId })"
+        <input
+          type="submit"
+          value="OK"
+          class="btn btn-primary btn-lg btn-block"
+        />
+      </form>
+    </div>
+    <div class="options" v-else>
+      <div
+        class="col-sm-6 mb-3 d-grid"
+        v-for="option in quizQuestion?.options"
+        :key="option.noteId"
       >
-        <div v-if="!option.picture" v-html="option.display" />
-        <div v-else>
-          <ShowPicture v-bind="option.pictureWithMask" :opacity="1" />
-        </div>
-      </button>
+        <button
+          class="btn btn-secondary btn-lg"
+          @click.once="submitAnswer({ answerNoteId: option.noteId })"
+        >
+          <div v-if="!option.picture" v-html="option.display" />
+          <div v-else>
+            <ShowPicture v-bind="option.pictureWithMask" :opacity="1" />
+          </div>
+        </button>
+      </div>
     </div>
   </div>
 </template>
+
+<style scoped lang="sass">
+.quiz-instruction
+  height: 50%
+.quiz-answering
+  height: 50%
+</style>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
