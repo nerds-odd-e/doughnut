@@ -50,7 +50,7 @@
     </div>
     <div class="options" v-else>
       <div
-        class="col-sm-6 mb-3 d-grid"
+        class="option"
         v-for="option in quizQuestion?.options"
         :key="option.noteId"
       >
@@ -73,6 +73,43 @@
   height: 50%
 .quiz-answering
   height: 50%
+.options
+  display: flex
+  flex-wrap: wrap
+  flex-direction: row
+  justify-content: flex-start
+  height: 100%
+.option
+  width: 46%
+  margin: 2%
+  @media(max-width: 500px)
+    width: 100%
+  button
+    width: 100%
+    height: 100%
+    padding: 0
+    display: flex
+    justify-content: center
+    align-items: center
+    text-align: center
+    border: 0
+    border-radius: 0.5rem
+    background-color: #e8e9ea
+    color: #212529
+    text-decoration: none
+    white-space: normal
+    word-break: break-word
+    cursor: pointer
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out
+    &:hover
+      color: #fff
+      background-color: #007bff
+      border-color: #007bff
+    &:focus
+      outline: 0
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25)
+    &:disabled
+      opacity: 0.65
 </style>
 
 <script lang="ts">
