@@ -107,6 +107,7 @@ export default defineComponent({
   display: flex
   flex-direction: column
   height: 100vh
+  max-height: -webkit-fill-available
 
 .box .header
   flex: 0 0 auto
