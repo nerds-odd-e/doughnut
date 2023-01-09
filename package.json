@@ -57,18 +57,18 @@
   },
   "devDependencies": {
     "@anev/ts-mountebank": "1.6.1",
-    "@badeball/cypress-cucumber-preprocessor": "^15.0",
+    "@badeball/cypress-cucumber-preprocessor": "^15.1",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.1",
     "@testing-library/cypress": "9.0",
     "@types/cypress-cucumber-preprocessor": "^4.0",
     "@types/node": "^18.11",
-    "@typescript-eslint/eslint-plugin": "^5.46",
-    "@typescript-eslint/parser": "^5.46",
-    "cypress": "12.1.0",
+    "@typescript-eslint/eslint-plugin": "^5.48",
+    "@typescript-eslint/parser": "^5.48",
+    "cypress": "12.3.0",
     "cypress-file-upload": "^5.0",
-    "esbuild": "0.16.6",
-    "eslint": "^8.29",
-    "eslint-config-prettier": "^8.5",
+    "esbuild": "^0.16",
+    "eslint": "^8.31",
+    "eslint-config-prettier": "^8.6",
     "eslint-plugin-cypress": "^2.12",
     "eslint-plugin-prettier": "^4.2",
     "got": "^12.5",
@@ -79,7 +79,7 @@
     "wireit": "^0.9"
   },
   "dependencies": {
-    "@cucumber/cucumber": "^8.9",
+    "@cucumber/cucumber": "^8.10",
     "@xmldom/xmldom": "^0.8.4"
   }
 }
