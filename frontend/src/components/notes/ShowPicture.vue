@@ -1,7 +1,7 @@
 <template>
   <div class="note-picture text-center" v-if="!!notePicture">
     <div style="position: relative; display: inline-block" id="note-picture">
-      <img class="img-fluid" :src="notePicture" />
+      <img :src="notePicture" />
       <svg
         v-if="!!pictureMask"
         viewBox="0 0 100 100"
@@ -49,3 +49,12 @@ const getMasks = () => {
   });
 };
 </script>
+
+<style lang="sass" scoped>
+.note-picture
+  width: 100%
+  height: 100%
+  img
+    max-width: 100%
+    max-height: 100%
+</style>

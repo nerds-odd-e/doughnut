@@ -71,6 +71,7 @@
 <style scoped lang="sass">
 .quiz-instruction
   height: 50%
+  overflow-y: auto
 .quiz-description
   white-space: pre-wrap
   height: 100%
