@@ -83,7 +83,7 @@ in mkShell {
             export MYSQLX_TCP_PORT=33090
             export PATH=$JAVA_HOME/bin:$DUM_PATH/bin:$NODE_PATH/bin:$MYSQL_BASEDIR/bin:$PATH
             export LANG="en_US.UTF-8"
-            export LC_ALL="en_US.UTF-8"
+            #export LC_ALL="en_US.UTF-8"
 
             echo "###################################################################################################################"
             echo "                                                                                "
