@@ -646,10 +646,10 @@
     "@typescript-eslint/types" "5.48.2"
     eslint-visitor-keys "^3.3.0"
 
-"@xmldom/xmldom@0.8.3":
-  version "0.8.3"
-  resolved "https://registry.yarnpkg.com/@xmldom/xmldom/-/xmldom-0.8.3.tgz#beaf980612532aa9a3004aff7e428943aeaa0711"
-  integrity sha512-Lv2vySXypg4nfa51LY1nU8yDAGo/5YwF+EY/rUZgIbfvwVARcd67ttCM8SMsTeJy51YhHYavEq+FS6R0hW9PFQ==
+"@xmldom/xmldom@0.8.4":
+  version "0.8.4"
+  resolved "https://registry.yarnpkg.com/@xmldom/xmldom/-/xmldom-0.8.4.tgz#05b76034d3e09d4b9d309d9b862994de23e7687d"
+  integrity sha512-JIsjTbWBWJHb2t1D4UNZIJ6ohlRYCdoGzeHSzTorMH2zOq3UKlSBzFBMBdFK3xnUD/ANHw/SUzl/vx0z0JrqRw==
 
 "@xmldom/xmldom@^0.8.4":
   version "0.8.6"
@@ -3302,11 +3302,11 @@ mountebank-formatters@0.0.2:
     fs-extra "9.0.1"
 
 mountebank@^2.8:
-  version "2.8.1"
-  resolved "https://registry.yarnpkg.com/mountebank/-/mountebank-2.8.1.tgz#0e672937ea23e6167daccd723e0f5c0dbe47de79"
-  integrity sha512-S2LRnV1NS2Rgip4+0vXItFGooEIrKOreSfPdLRUm6sEPn0x4gCq1k+9l+u9Y44qoLBhtwMsOjSlw+TbN3kjdpg==
+  version "2.8.2"
+  resolved "https://registry.yarnpkg.com/mountebank/-/mountebank-2.8.2.tgz#c7e36aa85fe4a19886062e10498969e8137ea322"
+  integrity sha512-CkmvZl6y7LTvCwpkmANkMJz03opR5vyUtfHn2+IE84YTS19KWzDrf6k+5a3O0RnRukBdov0QajFfdQ/hzFB+2w==
   dependencies:
-    "@xmldom/xmldom" "0.8.3"
+    "@xmldom/xmldom" "0.8.4"
     cors "2.8.5"
     csv-parse "5.3.1"
     ejs "3.1.8"
