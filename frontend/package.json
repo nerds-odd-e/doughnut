@@ -58,7 +58,6 @@
     "vite-plugin-checker": "^0.5",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-eslint": "^1.8",
-    "vite-plugin-imagemin": "^0.6.1",
     "vitest": "0.28.1",
     "vitest-dom": "^0.0.4",
     "vitest-fetch-mock": "^0.2.1",
