@@ -25,12 +25,12 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import _ from "lodash";
+import { debounce } from "mini-debounce";
 import CheckInput from "../form/CheckInput.vue";
 import Cards from "../notes/Cards.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
-const debounced = _.debounce((callback) => callback(), 500);
+const debounced = debounce((callback) => callback(), 500);
 
 export default defineComponent({
   setup() {
@@ -59,6 +59,7 @@ export default defineComponent({
         local: Record<string, Generated.Note[]>;
       },
       recentResult: undefined as Generated.Note[] | undefined,
+      timeoutId: null as unknown as ReturnType<typeof setTimeout>,
     };
   },
   watch: {
@@ -113,8 +114,7 @@ export default defineComponent({
         return;
       }
 
-      debounced.cancel();
-      debounced(async () => {
+      this.timeoutId = debounced(async () => {
         const originalTrimmedKey = this.trimmedSearchKey;
         const result = await this.api.relativeSearch({
           ...this.searchTerm,
@@ -132,7 +132,7 @@ export default defineComponent({
     this.searchTerm.searchKey = this.inputSearchKey;
   },
   beforeUnmount() {
-    debounced.cancel();
+    clearTimeout(this.timeoutId);
   },
 });
 </script>
