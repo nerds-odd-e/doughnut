@@ -16,7 +16,7 @@ get_os_type() {
 
 download_nixpkg_manager_install_script() {
   rm -f ./install-nix
-  curl -o install-nix https://nixos.org/releases/nix/nix-2.12.0/install
+  curl -o install-nix https://nixos.org/releases/nix/nix-2.13.2/install
   chmod +x ./install-nix
 }
 
@@ -70,3 +70,4 @@ echo "------------------------------------------ CONGRATS !!! ------------------
 echo "  doughnut basic nix development environment tooling setup complete."
 echo "  Please exit this shell terminal and start a new one in doughnut root directory then execute 'nix develop'."
 echo "------------------------------------------    END       ----------------------------------------------------"
+rm -f ./install-nix
