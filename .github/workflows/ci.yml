@@ -81,21 +81,21 @@ jobs:
       matrix:
         spec:
           - |
-            cypress/integration/b*/**
+            cypress/e2e/b*/**
           - |
-            cypress/integration/c*/**
-            cypress/integration/l*/**
+            cypress/e2e/c*/**
+            cypress/e2e/l*/**
           - |
-            cypress/integration/n*/**
+            cypress/e2e/n*/**
           - |
-            cypress/integration/r*/**
+            cypress/e2e/r*/**
           - |
-            cypress/integration/t*/**
-            cypress/integration/u*/**
+            cypress/e2e/t*/**
+            cypress/e2e/u*/**
           - |
-            cypress/integration/v*/**
+            cypress/e2e/v*/**
           - |
-            cypress/integration/w*/**
+            cypress/e2e/w*/**
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/mysql_db
