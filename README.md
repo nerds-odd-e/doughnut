@@ -19,6 +19,10 @@ For more background info you can read::
 
 [Story Map](https://miro.com/app/board/o9J_lTB77Mc=/)
 
+## [Doughnut Technology Stack](./docs/tech_stack.md)
+
+## [Current Architecture Videos](./docs/current_architecture_workshops.md)
+
 ## How to Contribute
 
 - We welcome product ideas and code contribution.
@@ -30,8 +34,6 @@ For more background info you can read::
 - FOSS style; Fork and submit GitHub PR.
   - Please keep the PR small and on only one topic
   - The code need to come with tests
-
-## [Doughnut Technology Stack](./docs/tech_stack.md)
 
 ## Getting started
 
