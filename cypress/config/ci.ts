@@ -37,7 +37,7 @@ export default defineConfig({
     setupNodeEvents(on, config) {
       return require("../plugins/index.ts").default(on, config)
     },
-    specPattern: "cypress/integration/**/*.feature",
+    specPattern: "cypress/e2e/**/*.feature",
     excludeSpecPattern: ["**/*.{js,ts}", "**/__snapshots__/*", "**/__image_snapshots__/*"],
     baseUrl: "http://localhost:9081",
   },
