@@ -17,7 +17,7 @@ export default defineConfig({
       return require('./cypress/plugins/index.ts').default(on, config)
     },
     experimentalRunAllSpecs: true,
-    specPattern: 'cypress/integration/**/*.feature',
+    specPattern: 'cypress/e2e/**/*.feature',
     excludeSpecPattern: [
       '**/*.{js,ts}',
       '**/__snapshots__/*',

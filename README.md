@@ -104,7 +104,7 @@ For MS Windows WSL2 users:
 
 | Purpose          | Location                                  |
 | ---------------- | ----------------------------------------- |
-| feature files    | `cypress/integration/*.feature`           |
+| feature files    | `cypress/e2e/*.feature`                   |
 | step definitions | `cypress/step_definitions/*.ts`           |
 | custom DSL       | `cypress/support/*.ts`                    |
 | cucumber hooks   | `cypress/step_definitions/common/hook.ts` |
