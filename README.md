@@ -23,18 +23,6 @@ For more background info you can read::
 
 ## [Current Architecture Videos](./docs/current_architecture_workshops.md)
 
-## How to Contribute
-
-- We welcome product ideas and code contribution.
-- Collaborate over:
-  - [GitHub Discussions](https://github.com/nerds-odd-e/doughnut/discussions) for product
-    ideas/features,
-  - [GitHub Issues](https://github.com/nerds-odd-e/doughnut/issues) for reporting issues or bugs, OR
-  - [doughnut gitter.im](https://gitter.im/Odd-e-doughnut/community)
-- FOSS style; Fork and submit GitHub PR.
-  - Please keep the PR small and on only one topic
-  - The code need to come with tests
-
 ## Getting started
 
 ### 1. Quick Start - doughnut development environment setup
@@ -182,3 +170,15 @@ directory:
 ### 8. [Production environment](./docs/prod_env.md)
 
 ### 9. [Doughnut source code secrets management](./docs/secrets_management.md)
+
+## How to Contribute
+
+- We welcome product ideas and code contribution.
+- Collaborate over:
+  - [GitHub Discussions](https://github.com/nerds-odd-e/doughnut/discussions) for product
+    ideas/features,
+  - [GitHub Issues](https://github.com/nerds-odd-e/doughnut/issues) for reporting issues or bugs, OR
+  - [doughnut gitter.im](https://gitter.im/Odd-e-doughnut/community)
+- FOSS style; Fork and submit GitHub PR.
+  - Please keep the PR small and on only one topic
+  - The code need to come with tests
