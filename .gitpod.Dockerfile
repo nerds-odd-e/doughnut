@@ -1,4 +1,4 @@
-# syntax=docker.io/docker/dockerfile:1.4.1
+# syntax=docker.io/docker/dockerfile:1.5.1
 FROM gitpod/workspace-full-vnc
 # ---------------------------------------------------
 # -------------------- USER root --------------------
@@ -97,8 +97,6 @@ RUN echo "alias pbcopy='xclip -selection clipboard'" >> /home/gitpod/.bashrc \
 
 RUN echo "alias pbcopy='xclip -selection clipboard'" >> /home/gitpod/.zshrc \
     && echo "alias pbpaste='xclip -selection clipboard -o'" >> /home/gitpod/.zshrc
-
-RUN cargo install dum
 
 EXPOSE 5173
 EXPOSE 3309
