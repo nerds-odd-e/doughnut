@@ -45,12 +45,14 @@ class RestNoteController {
 
   @PostMapping(value = "/{note}/updateWikidataId")
   @Transactional
+  @SneakyThrows
   public NoteRealm updateWikidataId(
       @PathVariable(name = "note") Note note,
       @RequestBody WikidataAssociationCreation wikidataAssociationCreation)
       throws BindException, UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
-    associateToWikidata(note, wikidataAssociationCreation.wikidataId);
+    WikidataIdWithApi wikidataIdWithApi = associateToWikidata(note, wikidataAssociationCreation.wikidataId);
+    wikidataIdWithApi.extractWikidataInfoToNote(note);
     modelFactoryService.noteRepository.save(note);
     return new NoteViewer(currentUser.getEntity(), note).toJsonObject();
   }
@@ -73,7 +75,7 @@ class RestNoteController {
 
     Optional<String> countryOfOrigin = wikidataIdWithApi.getCountryOfOrigin(parentNote);
     if (countryOfOrigin.isPresent()) {
-      createNote(parentNote, createCountryOfOriginNoteCreation(countryOfOrigin.get()));
+      createNote(note, createCountryOfOriginNoteCreation(countryOfOrigin.get()));
     }
 
     return NoteRealmWithPosition.fromNote(note, user);
