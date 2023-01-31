@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/OpenAi")
 public class RestOpenAiController {
 
-  @PostMapping(value = "/{title}/openai")
+  @GetMapping(value = "/{title}")
   @Transactional
   public String getOpenAiResponse(@PathVariable(name = "title") String title)
-      throws BindException, UnexpectedNoAccessRightException {
+    throws BindException, UnexpectedNoAccessRightException {
     OpenAiService service =
-        new OpenAiService("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");
+      new OpenAiService("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");
     CompletionRequest completionRequest =
-        CompletionRequest.builder().prompt(title).model("davinci").echo(true).build();
+      CompletionRequest.builder().prompt(title).model("davinci").echo(true).build();
     return service.createCompletion(completionRequest).getChoices().get(0).getText();
   }
 }
