@@ -57,6 +57,7 @@ class RestNoteController {
 
   @PostMapping(value = "/{parentNote}/create")
   @Transactional
+  @SneakyThrows
   public NoteRealmWithPosition createNote(
       @PathVariable(name = "parentNote") Note parentNote,
       @Valid @ModelAttribute NoteCreation noteCreation)
@@ -65,35 +66,35 @@ class RestNoteController {
     User user = currentUser.getEntity();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     Note note = parentNote.buildChildNote(user, currentUTCTimestamp, noteCreation.textContent);
-    associateToWikidata(note, noteCreation.wikidataId);
+    WikidataIdWithApi wikidataIdWithApi = associateToWikidata(note, noteCreation.wikidataId);
+    wikidataIdWithApi.extractWikidataInfoToNote(note);
     note.buildLinkToParent(user, noteCreation.getLinkTypeToParent(), currentUTCTimestamp);
     modelFactoryService.noteRepository.save(note);
-    createCountryOfOriginNote(note, noteCreation.wikidataId);
+
+    Optional<String> countryOfOrigin = wikidataIdWithApi.getCountryOfOrigin(parentNote);
+    if (countryOfOrigin.isPresent()) {
+      createNote(parentNote, createCountryOfOriginNoteCreation(countryOfOrigin.get()));
+    }
 
     return NoteRealmWithPosition.fromNote(note, user);
   }
 
   @SneakyThrows
-  private void associateToWikidata(Note note, String wikidataId) {
+  private WikidataIdWithApi associateToWikidata(Note note, String wikidataId) {
     note.setWikidataId(wikidataId);
     modelFactoryService.toNoteModel(note).checkDuplicateWikidataId();
-    getWikidataService().wrapWikidataIdWithApi(wikidataId).extractWikidataInfoToNote(note);
+    return getWikidataService().wrapWikidataIdWithApi(wikidataId);
   }
 
   @SneakyThrows
-  private void createCountryOfOriginNote(Note parentNote, String wikidataId) {
-    WikidataIdWithApi wikidataApi = getWikidataService().wrapWikidataIdWithApi(wikidataId);
-    Optional<String> countryOfOrigin = wikidataApi.getCountryOfOrigin(parentNote);
+  private NoteCreation createCountryOfOriginNoteCreation(String countryOfOrigin) {
+    NoteCreation noteCreation = new NoteCreation();
+    TextContent textContent = new TextContent();
+    textContent.setTitle(countryOfOrigin);
+    noteCreation.linkTypeToParent = Link.LinkType.RELATED_TO;
+    noteCreation.setTextContent(textContent);
 
-    if (countryOfOrigin.isPresent()) {
-      NoteCreation noteCreation = new NoteCreation();
-      TextContent textContent = new TextContent();
-      textContent.setTitle(countryOfOrigin.get());
-      noteCreation.linkTypeToParent = Link.LinkType.RELATED_TO;
-      noteCreation.setTextContent(textContent);
-
-      createNote(parentNote, noteCreation);
-    }
+    return noteCreation;
   }
 
   @GetMapping("/{note}")
