@@ -1,12 +1,12 @@
 package com.odde.doughnut.controllers;
 
+import static org.springframework.test.util.AssertionErrors.assertNotNull;
+import static org.springframework.test.util.AssertionErrors.assertTrue;
+
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.validation.BindException;
-
-import static org.springframework.test.util.AssertionErrors.assertNotNull;
-import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 public class RestOpenAiControllerTest {
   RestOpenAiController controller;
@@ -15,7 +15,6 @@ public class RestOpenAiControllerTest {
   void setup() {
     controller = new RestOpenAiController();
   }
-
 
   @Test
   void whenUserCallsOpenAiWithTitle() throws UnexpectedNoAccessRightException, BindException {

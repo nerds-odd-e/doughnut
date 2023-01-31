@@ -14,11 +14,11 @@ public class RestOpenAiController {
   @GetMapping(value = "/{title}")
   @Transactional
   public String getOpenAiResponse(@PathVariable(name = "title") String title)
-    throws BindException, UnexpectedNoAccessRightException {
+      throws BindException, UnexpectedNoAccessRightException {
     OpenAiService service =
-      new OpenAiService("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");
+        new OpenAiService("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");
     CompletionRequest completionRequest =
-      CompletionRequest.builder().prompt(title).model("davinci").echo(true).build();
+        CompletionRequest.builder().prompt(title).model("davinci").echo(true).build();
     return service.createCompletion(completionRequest).getChoices().get(0).getText();
   }
 }
