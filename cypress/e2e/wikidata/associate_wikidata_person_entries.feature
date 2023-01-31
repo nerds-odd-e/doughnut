@@ -8,7 +8,7 @@ Feature: Note creation should have description if wikidata is a person
       | title  |
       | People |
 
-  @usingMockedWikidataService @ignore
+  @usingMockedWikidataService
   Scenario Outline: New Note creation and person wikidata is selected
     Given Wikidata.org has an entity "<wikidataId>" with title "<person name>"
     And Wikidata.org has an entity "Q12345" with title "<country of origin>"

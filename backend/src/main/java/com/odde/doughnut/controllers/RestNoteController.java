@@ -9,10 +9,12 @@ import com.odde.doughnut.models.SearchTermModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.HttpClientAdapter;
 import com.odde.doughnut.services.WikidataService;
+import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import lombok.SneakyThrows;
@@ -66,6 +68,7 @@ class RestNoteController {
     associateToWikidata(note, noteCreation.wikidataId);
     note.buildLinkToParent(user, noteCreation.getLinkTypeToParent(), currentUTCTimestamp);
     modelFactoryService.noteRepository.save(note);
+    createCountryOfOriginNote(note, noteCreation.wikidataId);
 
     return NoteRealmWithPosition.fromNote(note, user);
   }
@@ -75,6 +78,22 @@ class RestNoteController {
     note.setWikidataId(wikidataId);
     modelFactoryService.toNoteModel(note).checkDuplicateWikidataId();
     getWikidataService().wrapWikidataIdWithApi(wikidataId).extractWikidataInfoToNote(note);
+  }
+
+  @SneakyThrows
+  private void createCountryOfOriginNote(Note parentNote, String wikidataId) {
+    WikidataIdWithApi wikidataApi = getWikidataService().wrapWikidataIdWithApi(wikidataId);
+    Optional<String> countryOfOrigin = wikidataApi.getCountryOfOrigin(parentNote);
+
+    if (countryOfOrigin.isPresent()) {
+      NoteCreation noteCreation = new NoteCreation();
+      TextContent textContent = new TextContent();
+      textContent.setTitle(countryOfOrigin.get());
+      noteCreation.linkTypeToParent = Link.LinkType.RELATED_TO;
+      noteCreation.setTextContent(textContent);
+
+      createNote(parentNote, noteCreation);
+    }
   }
 
   @GetMapping("/{note}")

@@ -29,4 +29,9 @@ public record WikidataIdWithApi(String wikidataId, WikidataApi wikidataApi) {
         .ifPresent(note::prependDescription);
     model.flatMap(WikidataEntityModel::getCoordinate).ifPresent(note::buildLocation);
   }
+
+  public Optional<String> getCountryOfOrigin(Note note) throws IOException, InterruptedException {
+    Optional<WikidataEntityModel> model = getWikidataEntityModel();
+    return model.flatMap(entity -> entity.getCountryOfOrigin(wikidataApi));
+  }
 }
