@@ -45,6 +45,18 @@ Given("there are notes from Note {int} to Note {int}", (from, to) => {
   cy.testability().seedNotes(notes)
 })
 
+Given(
+  "that OpenAI thinks that {string} means {string}",
+  (noteTitle: string, description: string) => {
+    cy.log(noteTitle)
+    cy.log(description)
+  },
+)
+
+Given("I am prompted with a suggested description {string}", (description: string) => {
+  cy.log(description)
+})
+
 When("I create notebooks with:", (notes: DataTable) => {
   notes.hashes().forEach((noteAttributes) => {
     cy.createNotebookWith(noteAttributes)
@@ -390,3 +402,19 @@ Then(
     cy.findNoteDescriptionOnCurrentPage(descriptionText)
   },
 )
+
+When("I ask for a description suggestion for {string}", (noteTitle: string) => {
+  cy.log(noteTitle)
+})
+
+Then("I will be prompted with a suggested description {string}", (description: string) => {
+  cy.log(description)
+})
+
+When("I {string} the suggested description", (action: string) => {
+  cy.log(action)
+})
+
+Then("I expect that {string}", (expectation: string) => {
+  cy.log(expectation)
+})
