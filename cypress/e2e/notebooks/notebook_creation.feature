@@ -18,3 +18,12 @@ Feature: Notebook creation
   Scenario: Create a new note with invalid information
     When I create a notebook with empty title
     Then I should see that the note creation is not successful
+
+    @ignore
+  Scenario: Create a new book note with author note not exists in Notebook
+    Given in Wikidata that "LOTR" is a book with wikidataId "LOTRWikidataId"
+    And in Wikidata the wikidataId of author "LOTR" is "LOTRAuthorWikidataId"
+    And in Wikidata the name of author "LOTR" is "J K Rowling"
+    And there is no note with wikidataId "LOTRAuthorWikidataId" in noteBook "MyNoteBook"
+    When I create the new note titled "LOTR" with wikidataId "LOTRWikidataId" in noteBook "MyNoteBook"
+    Then new note with title "LOTR" is created with child Note with name "J K Rowling" in noteBook "MyNoteBook"
