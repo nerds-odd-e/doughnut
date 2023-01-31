@@ -92,3 +92,7 @@ Then(
     cy.expectAMapTo(latitude, longitude)
   },
 )
+
+Given("in Wikidata there is a book {string} with author {string} and author name is {string}",
+  (bookWikidataId: string, authorWikidataId: string, authorName: string) => {
+})
