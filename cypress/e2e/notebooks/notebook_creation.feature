@@ -19,7 +19,6 @@ Feature: Notebook creation
     When I create a notebook with empty title
     Then I should see that the note creation is not successful
 
-    @ignore
   Scenario: Create a new book note with author note not exists in Notebook
     Given in Wikidata that "LOTR" is a book with wikidataId "LOTRWikidataId"
     And in Wikidata the wikidataId of author "LOTR" is "LOTRAuthorWikidataId"

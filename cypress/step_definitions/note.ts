@@ -403,6 +403,26 @@ Then(
   },
 )
 
+Given("in Wikidata that {string} is a book with wikidataId {string}", (bookTitle: string, bookWikidataId: string) => {
+})
+
+Given("in Wikidata the wikidataId of author {string} is {string}", (bookTitle: string, bookWikidataId: string) => {
+})
+
+Given("in Wikidata the name of author {string} is {string}", (bookTitle: string, bookWikidataId: string) => {
+})
+
+Given("there is no note with wikidataId {string} in noteBook {string}", (bookTitle: string, bookWikidataId: string) => {
+})
+
+When("I create the new note titled {string} with wikidataId {string} in noteBook {string}",
+ (bookTitle: string, bookWikidataId: string, noteBook: string) => {
+})
+
+Then("new note with title {string} is created with child Note with name {string} in noteBook {string}",
+ (bookTitle: string, bookAuthorNoteName: string, noteBook: string) => {
+})
+
 When("I ask for a description suggestion for {string}", (noteTitle: string) => {
   cy.log(noteTitle)
 })
