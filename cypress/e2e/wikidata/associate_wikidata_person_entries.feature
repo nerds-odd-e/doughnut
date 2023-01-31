@@ -8,7 +8,7 @@ Feature: Note creation should have description if wikidata is a person
       | title  |
       | People |
 
-  @usingMockedWikidataService
+  @usingMockedWikidataService @ignore
   Scenario Outline: New Note creation and person wikidata is selected
     Given Wikidata.org has an entity "<wikidataId>" with title "<person name>"
     And Wikidata.org has an entity "Q12345" with title "<country of origin>"
@@ -17,6 +17,9 @@ Feature: Note creation should have description if wikidata is a person
       | Title         | Wikidata Id  |
       | <person name> | <wikidataId> |
     Then I should see the note description on current page becomes "<description>"
+    And I should see "My Notes/People/<person name>" with these children
+      | note-title          |
+      | <country of origin> |
 
     Examples:
       | person name     | wikidataId | country of origin | birthday              | description              |
