@@ -26,6 +26,8 @@ spring:
   github_for_issues:
     repo: nerds-odd-e/doughnut_sandbox
     token: ${GITHUB_FOR_ISSUES_API_TOKEN:-token_not_set}
+  openai:
+    token: ${OPENAI_API_TOKEN}
 server:
   forward-headers-strategy: FRAMEWORK
   port: 8081
@@ -60,6 +62,8 @@ spring:
   github_for_issues:
     repo: nerds-odd-e/doughnut_sandbox
     token: ${GITHUB_FOR_ISSUES_API_TOKEN:-token_not_set}
+  openai:
+    token: ${OPENAI_API_TOKEN}
 server:
   forward-headers-strategy: FRAMEWORK
   port: 9081
@@ -100,6 +104,8 @@ spring:
   github_for_issues:
     repo: nerds-odd-e/doughnut
     token: ${GITHUB_FOR_ISSUES_API_TOKEN}
+  openai:
+    token: ${OPENAI_API_TOKEN}
 server:
   error:
     include-stacktrace: never
