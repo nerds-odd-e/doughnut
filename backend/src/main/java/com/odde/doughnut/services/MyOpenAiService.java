@@ -8,12 +8,8 @@ public class MyOpenAiService {
 
   public String getOpenAiResponse(String title) {
     OpenAiService service = new OpenAiService(_apiKey);
-    CompletionRequest completionRequest = CompletionRequest.builder()
-      .prompt(title)
-      .model("davinci")
-      .echo(true)
-      .build();
+    CompletionRequest completionRequest =
+        CompletionRequest.builder().prompt(title).model("davinci").echo(true).build();
     return service.createCompletion(completionRequest).getChoices().get(0).getText();
   }
 }
-
