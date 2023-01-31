@@ -2,7 +2,9 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.theokanning.openai.OpenAiService;
+import com.theokanning.openai.completion.CompletionChoice;
 import com.theokanning.openai.completion.CompletionRequest;
+import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +18,13 @@ public class RestOpenAiController {
   public String getOpenAiResponse(@PathVariable(name = "title") String title)
       throws BindException, UnexpectedNoAccessRightException {
     OpenAiService service =
-        new OpenAiService("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");
+        new OpenAiService("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");
     CompletionRequest completionRequest =
-        CompletionRequest.builder().prompt(title).model("davinci").echo(true).build();
-    return service.createCompletion(completionRequest).getChoices().get(0).getText();
+        CompletionRequest.builder().prompt(title).model("text-davinci-003").echo(true).build();
+
+    var choices = service.createCompletion(completionRequest).getChoices();
+    System.out.println(choices.size());
+    choices.forEach(choice -> System.out.println(choice.getText()));
+    return choices.stream().map(CompletionChoice::getText).collect(Collectors.joining(""));
   }
 }
