@@ -13,8 +13,8 @@
     "frontend:test": "yarn --cwd frontend --frozen-lockfile --silent install && yarn --cwd frontend test",
     "frontend:test:watch": "yarn --cwd frontend --frozen-lockfile --silent install && yarn --cwd frontend test:watch",
     "frontend:sut": "yarn --cwd frontend --frozen-lockfile --silent install && yarn --cwd frontend dev",
-    "backend:format": "wireit",
-    "backend:lint": "wireit",
+    "backend:format": "backend/gradlew -p backend spotlessApply",
+    "backend:lint": "backend/gradlew -p backend lint",
     "backend:test": "backend/gradlew -p backend testDBMigrate -Dspring.profiles.active=test && backend/gradlew -p backend test --build-cache --parallel",
     "backend:build": "backend/gradlew -p backend build -x test --build-cache --parallel",
     "backend:prod_build": "backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel",
@@ -37,12 +37,6 @@
     },
     "frontend:lint": {
       "command": "yarn --cwd frontend --frozen-lockfile --silent install && yarn --cwd frontend lint"
-    },
-    "backend:format": {
-      "command": "backend/gradlew -p backend spotlessApply"
-    },
-    "backend:lint": {
-      "command": "backend/gradlew -p backend lint"
     },
     "cy:format": {
       "command": "yarn --frozen-lockfile --silent install && eslint cypress --fix"
