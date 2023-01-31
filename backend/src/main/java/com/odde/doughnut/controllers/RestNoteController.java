@@ -51,7 +51,8 @@ class RestNoteController {
       @RequestBody WikidataAssociationCreation wikidataAssociationCreation)
       throws BindException, UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
-    WikidataIdWithApi wikidataIdWithApi = associateToWikidata(note, wikidataAssociationCreation.wikidataId);
+    WikidataIdWithApi wikidataIdWithApi =
+        associateToWikidata(note, wikidataAssociationCreation.wikidataId);
     wikidataIdWithApi.extractWikidataInfoToNote(note);
     modelFactoryService.noteRepository.save(note);
     return new NoteViewer(currentUser.getEntity(), note).toJsonObject();
