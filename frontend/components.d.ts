@@ -53,6 +53,8 @@ declare module '@vue/runtime-core' {
     NotebookNewButton: typeof import('./src/components/notebook/NotebookNewButton.vue')['default']
     NotebookNewDialog: typeof import('./src/components/notebook/NotebookNewDialog.vue')['default']
     NotebookSubscriptionCards: typeof import('./src/components/subscriptions/NotebookSubscriptionCards.vue')['default']
+    NotebookSuggestButton: typeof import('./src/components/notes/NotebookSuggestButton.vue')['default']
+    NotebookSuggestDialog: typeof import('./src/components/notes/NotebookSuggestDialog.vue')['default']
     NotebookViewCards: typeof import('./src/components/notebook/NotebookViewCards.vue')['default']
     NoteCard: typeof import('./src/components/notes/mindmap/NoteCard.vue')['default']
     NoteCardsView: typeof import('./src/components/notes/views/NoteCardsView.vue')['default']
