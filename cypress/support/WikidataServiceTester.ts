@@ -61,6 +61,12 @@ class WikidataServiceTester {
     ])
   }
 
+  async stubWikidataEntityBook(wikidataId: string, authorWikidataId: string) {
+    return await this.stubWikidataEntity(wikidataId, [
+      { claimId: "P50", type: "author", value: { id: authorWikidataId } },
+    ])
+  }
+
   async stubWikidataSearchResult(wikidataLabel: string, wikidataId: string) {
     return await this.stubWikidataApi(
       "wbsearchentities",

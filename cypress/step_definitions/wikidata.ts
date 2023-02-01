@@ -93,6 +93,7 @@ Then(
   },
 )
 
-Given("in Wikidata there is a book {string} with author {string} and author name is {string}",
-  (bookWikidataId: string, authorWikidataId: string, authorName: string) => {
+Given("the Wikidata.org entity {string} is written by {string} with {string}",
+  (wikidataId: string, authorName: string, authorWikidataId: string) => {
+   cy.wikidataService().stubWikidataEntityBook(wikidataId, authorWikidataId)
 })

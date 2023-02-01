@@ -403,9 +403,6 @@ Then(
   },
 )
 
-Given("there is no note with wikidataId {string} in noteBook {string}", (bookTitle: string, bookWikidataId: string) => {
-})
-
 When("I create the new note titled {string} with wikidataId {string} in noteBook {string}",
  (bookTitle: string, bookWikidataId: string, noteBook: string) => {
 })

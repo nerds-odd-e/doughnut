@@ -19,8 +19,17 @@ Feature: Notebook creation
     When I create a notebook with empty title
     Then I should see that the note creation is not successful
 
-  Scenario: Create a new book note with author note not exists in Notebook
-    Given in Wikidata there is a book "LOTRWikidataId" with author "LOTRAuthorWikidataId" and author name is "J K Rowling"
-    And there is no note with wikidataId "LOTRAuthorWikidataId" in noteBook "MyNoteBook"
-    When I create the new note titled "LOTR" with wikidataId "LOTRWikidataId" in noteBook "MyNoteBook"
-    Then new note with title "LOTR" is created with child Note with name "J K Rowling" in noteBook "MyNoteBook"
+  Scenario Outline: Create a new book note with author note not exists in notebook
+    Given Wikidata.org has an entity "<wikidataId>" with title "<book name>"
+    And the Wikidata.org entity "<wikidataId>" is written by "<author name>" with "<author wikidataId>"
+    And there are some notes for the current user
+      | title            |
+      | <note book name> |
+    When I create a note belonging to "<note book name>":
+      | Title         | Wikidata Id  |
+      | <book name>   | <wikidataId> |
+#    Then new note with title "<book name>" is created with child Note with name "<author name>" in noteBook "<note book name>"
+
+    Examples:
+      | wikidataId | book name    | author wikidataId | author name   | note book name     |
+      | Q8337      | Harry Potter | Q34660            | J. K. Rowling | My Favourite Books |
