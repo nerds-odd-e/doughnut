@@ -30,4 +30,8 @@ public class WikidataEntityModelOfProperties {
   public Optional<WikidataId> getCountryOfOriginValue() {
     return entity.getFirstClaimValue("P27").map(WikidataValue::toWikiClass);
   }
+
+  public Optional<WikidataId> getAuthor() {
+    return entity.getFirstClaimValue("P50").map(WikidataValue::toWikiClass);
+  }
 }

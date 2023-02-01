@@ -94,6 +94,11 @@ class RestNoteController {
       }
     }
 
+    Optional<String> author = wikidataIdWithApi.getAuthor(parentNote);
+    if (author.isPresent()) {
+      createNote(note, createCountryOfOriginNoteCreation(author.get()));
+    }
+
     return NoteRealmWithPosition.fromNote(note, user);
   }
 

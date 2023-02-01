@@ -34,4 +34,9 @@ public record WikidataIdWithApi(String wikidataId, WikidataApi wikidataApi) {
     Optional<WikidataEntityModel> model = getWikidataEntityModel();
     return model.flatMap(entity -> entity.getCountryOfOrigin(wikidataApi));
   }
+
+  public Optional<String> getAuthor(Note note) throws IOException, InterruptedException {
+    Optional<WikidataEntityModel> model = getWikidataEntityModel();
+    return model.flatMap(entity -> entity.getAuthor(wikidataApi));
+  }
 }

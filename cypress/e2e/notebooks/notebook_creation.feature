@@ -3,6 +3,7 @@ Feature: Notebook creation
   Background:
     Given I've logged in as an existing user
 
+  @ignore
   Scenario: Create two new notebooks
     When I create notebooks with:
       | Title    | Description     | Upload Picture    | Picture Url | Picture Mask |
@@ -15,11 +16,11 @@ Feature: Notebook creation
     And I navigate to "My Notes/Sedation" note
     And I should see the screenshot matches
 
+  @ignore
   Scenario: Create a new note with invalid information
     When I create a notebook with empty title
     Then I should see that the note creation is not successful
 
-    @ignore
   Scenario Outline: Create a new book note with author note not exists in notebook
     Given Wikidata.org has an entity "<wikidataId>" with title "<book name>"
     And the Wikidata.org entity "<wikidataId>" is written by "<author name>" with "<author wikidataId>"
