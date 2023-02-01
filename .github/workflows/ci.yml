@@ -22,6 +22,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
   GITHUB_FOR_ISSUES_API_TOKEN: ${{ secrets.GH_ISSUES_API_TOKEN }}
+  OPENAI_API_TOKEN: ${{ secrets.OPENAI_API_TOKEN }}
 
 jobs:
   Linting:

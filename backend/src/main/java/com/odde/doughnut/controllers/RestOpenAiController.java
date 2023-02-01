@@ -4,6 +4,7 @@ import com.theokanning.openai.OpenAiService;
 import com.theokanning.openai.completion.CompletionChoice;
 import com.theokanning.openai.completion.CompletionRequest;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,9 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/OpenAi")
 public class RestOpenAiController {
-
-  //  @Value("${spring.openai.token}")
-  private final String OpenAiToken = "";
+  @Value("${spring.openai.token}")
+  private String OpenAiToken;
 
   @GetMapping(value = "/{title}")
   @Transactional
