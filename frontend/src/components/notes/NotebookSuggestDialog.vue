@@ -13,8 +13,7 @@
           :id="`description-input`"
           :name="field"
           :value="modelValue"
-          :placeholder="placeholder"
-          :autofocus="autofocus"
+          :autofocus="true"
           role="suggestdescription"
           autocomplete="off"
           autocapitalize="off"
@@ -33,16 +32,23 @@
   </LoadingPage>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import InputWithType from "../form/InputWithType.vue";
+import { StorageAccessor } from "../../store/createNoteStorage";
 
-export default {
+export default defineComponent({
   setup() {
     return useLoadingApi();
   },
   props: {
+    note: { type: Object as PropType<Generated.Note>, required: true },
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
+      required: true,
+    },
     size: { type: String, default: "" },
   },
   components: {
@@ -53,15 +59,22 @@ export default {
       noteFormData: {},
       errors: {},
       modelValue: "",
+      scopeName: "to be changed",
+      field: "to be changed",
     };
   },
   methods: {
     copyText() {
-      const element = this.$refs.input;
+      const element = this.$refs.input as InstanceType<
+        typeof HTMLTextAreaElement
+      >;
       element.select();
       element.setSelectionRange(0, 99999);
       document.execCommand("copy");
     },
+    processForm() {
+      return;
+    },
   },
-};
+});
 </script>

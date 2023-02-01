@@ -15,7 +15,9 @@
       v-if="note.wikidataId"
       :wikidata-id="note.wikidataId"
     />
-    <NotebookSuggestButton>Suggest</NotebookSuggestButton>
+    <NotebookSuggestButton v-bind="{ selectedNote: note, storageAccessor }">
+      Suggest
+    </NotebookSuggestButton>
   </div>
   <div class="note-content">
     <div
