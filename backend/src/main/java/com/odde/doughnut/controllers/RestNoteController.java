@@ -74,10 +74,10 @@ class RestNoteController {
     note.buildLinkToParent(user, noteCreation.getLinkTypeToParent(), currentUTCTimestamp);
     modelFactoryService.noteRepository.save(note);
 
-    Optional<String> countryOfOrigin = wikidataIdWithApi.getCountryOfOrigin(parentNote);
-    if (countryOfOrigin.isPresent()) {
-      Optional<Note> existingNote =
-          findExistingNoteInNotebook(note.getNotebook(), countryOfOrigin.get());
+    Optional<String> countryOfOriginOption = wikidataIdWithApi.getCountryOfOrigin(parentNote);
+    if (countryOfOriginOption.isPresent()) {
+      String countryOfOrigin = countryOfOriginOption.get();
+      Optional<Note> existingNote = findExistingNoteInNotebook(note.getNotebook(), countryOfOrigin);
       if (existingNote.isPresent()) {
         RestLinkController restLinkController =
             new RestLinkController(modelFactoryService, testabilitySettings, currentUser);
@@ -87,7 +87,7 @@ class RestNoteController {
             new BeanPropertyBindingResult(existingNote.get(), existingNote.get().getTitle());
         restLinkController.linkNoteFinalize(note, existingNote.get(), linkCreation, bindingResult);
       } else {
-        createNote(note, createCountryOfOriginNoteCreation(countryOfOrigin.get()));
+        createNote(note, createCountryOfOriginNoteCreation(countryOfOrigin));
       }
     }
 
