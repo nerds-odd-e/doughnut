@@ -81,13 +81,14 @@ class RestNoteController {
           findExistingNoteInNotebook(note.getNotebook(), countryOfOrigin);
       if (existingNoteOption.isPresent()) {
         Note existingNote = existingNoteOption.get();
-        RestLinkController restLinkController =
-            new RestLinkController(modelFactoryService, testabilitySettings, currentUser);
-        LinkCreation linkCreation = new LinkCreation();
-        linkCreation.linkType = Link.LinkType.RELATED_TO;
-        BindingResult bindingResult =
-            new BeanPropertyBindingResult(existingNote, existingNote.getTitle());
-        restLinkController.linkNoteFinalize(note, existingNote, linkCreation, bindingResult);
+        Link link =
+            Link.createLink(
+                note,
+                existingNote,
+                user,
+                Link.LinkType.RELATED_TO,
+                testabilitySettings.getCurrentUTCTimestamp());
+        modelFactoryService.linkRepository.save(link);
       } else {
         createNote(note, createCountryOfOriginNoteCreation(countryOfOrigin));
       }
