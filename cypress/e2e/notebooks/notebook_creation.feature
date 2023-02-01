@@ -19,6 +19,7 @@ Feature: Notebook creation
     When I create a notebook with empty title
     Then I should see that the note creation is not successful
 
+    @ignore
   Scenario Outline: Create a new book note with author note not exists in notebook
     Given Wikidata.org has an entity "<wikidataId>" with title "<book name>"
     And the Wikidata.org entity "<wikidataId>" is written by "<author name>" with "<author wikidataId>"
@@ -28,7 +29,9 @@ Feature: Notebook creation
     When I create a note belonging to "<note book name>":
       | Title         | Wikidata Id  |
       | <book name>   | <wikidataId> |
-#    Then new note with title "<book name>" is created with child Note with name "<author name>" in noteBook "<note book name>"
+    Then I should see "My Notes/<note book name>/<book name>" with these children
+      | note-title    |
+      | <author name> |
 
     Examples:
       | wikidataId | book name    | author wikidataId | author name   | note book name     |

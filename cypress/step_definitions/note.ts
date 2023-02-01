@@ -407,10 +407,6 @@ When("I create the new note titled {string} with wikidataId {string} in noteBook
  (bookTitle: string, bookWikidataId: string, noteBook: string) => {
 })
 
-Then("new note with title {string} is created with child Note with name {string} in noteBook {string}",
- (bookTitle: string, bookAuthorNoteName: string, noteBook: string) => {
-})
-
 When("I ask for a description suggestion for {string}", (noteTitle: string) => {
   cy.log(noteTitle)
 })
