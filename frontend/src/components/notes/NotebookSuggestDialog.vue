@@ -10,23 +10,19 @@
       >
         <textarea
           :class="`area-control form-control`"
-          :id="`${scopeName}-${field}`"
+          :id="`description-input`"
           :name="field"
           :value="modelValue"
           :placeholder="placeholder"
           :autofocus="autofocus"
+          role="suggestdescription"
           autocomplete="off"
           autocapitalize="off"
           rows="8"
           ref="input"
         />
       </InputWithType>
-      <input
-        type="submit"
-        value="Use"
-        class="btn btn-primary"
-        disabled="true"
-      />
+      <input type="submit" value="Use" class="btn btn-primary" />
       <input
         type="submit"
         value="Copy to clipboard"

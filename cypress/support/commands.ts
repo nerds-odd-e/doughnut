@@ -609,3 +609,11 @@ Cypress.Commands.add("expectAMapTo", (latitude: string, longitude: string) => {
   cy.get(".map-applet").invoke("attr", "data-lon").should("eq", longitude)
   cy.get(".map-applet").invoke("attr", "data-lat").should("eq", latitude)
 })
+
+Cypress.Commands.add("assertValueCopiedToClipboard", (value) => {
+  cy.window().then((win) => {
+    win.navigator.clipboard.readText().then((text) => {
+      expect(text).to.eq(value)
+    })
+  })
+})

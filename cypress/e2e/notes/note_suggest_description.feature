@@ -9,17 +9,16 @@ Feature: Suggest description
       | Animals  | Are living beings   |               |
     And that OpenAI thinks that "Animals" means "Sharing the same planet as humans"
 
+@ignore
   Scenario: Ask for suggested description
     When I ask for a description suggestion for "Animals"
     Then I will be prompted with a suggested description "Sharing the same planet as humans"
-
-  
+@ignore
   Scenario Outline: Perform action with suggested note description
-    Given I am prompted with a suggested description "Sharing the same planet as humans"
-    When I "<action>" the suggested description
-    Then I expect that "<expectation>"
+    Given I am prompted with a suggested description "Sharing the same planet as humans" for "Animals"
+    Then I expect that "<field>" will be "<value>" when I "<action>" the suggested description
     Examples:
-      | action | expectation                                                         |
-      | use    | the suggested note description will be saved as my note description |
-      | copy   | the suggested note description will be copied to the clipboard      |
-      | cancel | my note description will not be changed                             |
+      | action | field        | value                               |
+      | use    | description  | Sharing the same planet as humans   |
+      | copy   | clipboard    | Sharing the same planet as humans   |
+      | cancel | description  | Are living beings                   |

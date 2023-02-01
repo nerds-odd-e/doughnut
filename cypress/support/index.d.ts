@@ -10,6 +10,7 @@ declare namespace Cypress {
   interface Chainable<Subject = any> {
     addSiblingNoteButton(): Chainable<any>
     assertBlogPostInWebsiteByTitle(article: any): Chainable<any>
+    assertValueCopiedToClipboard(value: any): Chainable<any>
     associateNoteWithWikidataId(title: any, wikiID: any): Chainable<any>
     backendTimeTravelTo(day: number, hour: number): Chainable<Subject>
     backendTimeTravelRelativeToNow(hours: number): Chainable<Subject>

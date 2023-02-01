@@ -53,9 +53,14 @@ Given(
   },
 )
 
-Given("I am prompted with a suggested description {string}", (description: string) => {
-  cy.log(description)
-})
+Given(
+  "I am prompted with a suggested description {string} for {string}",
+  (description: string, noteTitle: string) => {
+    cy.jumpToNotePage(noteTitle)
+    cy.findByRole("button", { name: "Suggest" }).click()
+    cy.inPlaceEdit({ SuggestDescription: description })
+  },
+)
 
 When("I create notebooks with:", (notes: DataTable) => {
   notes.hashes().forEach((noteAttributes) => {
@@ -415,10 +420,21 @@ Then("I will be prompted with a suggested description {string}", (description: s
   cy.log(description)
 })
 
-When("I {string} the suggested description", (action: string) => {
-  cy.log(action)
-})
+Then(
+  "I expect that {string} will be {string} when I {string} the suggested description",
+  (field: string, value: string, action: string) => {
+    if (action === "use") {
+      cy.findByRole("button", { name: "Use" }).click()
+    } else if (action === "copy") {
+      cy.findByRole("button", { name: "Copy to clipboard" }).click()
+    } else if (action === "cancel") {
+      cy.get(".close-button").click()
+    }
 
-Then("I expect that {string}", (expectation: string) => {
-  cy.log(expectation)
-})
+    if (field === "clipboard") {
+      cy.assertValueCopiedToClipboard(value)
+    } else if (field === "description") {
+      cy.findNoteDescriptionOnCurrentPage(value)
+    }
+  },
+)
