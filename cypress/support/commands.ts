@@ -552,11 +552,7 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   "stubWikidataEntityBook",
   { prevSubject: true },
-  (
-    wikidataServiceTester: WikidataServiceTester,
-    wikidataId: string,
-    authorWikidataId: string,
-  ) => {
+  (wikidataServiceTester: WikidataServiceTester, wikidataId: string, authorWikidataId: string) => {
     wikidataServiceTester.stubWikidataEntityBook(wikidataId, authorWikidataId)
   },
 )

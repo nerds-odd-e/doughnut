@@ -403,8 +403,8 @@ Then(
   },
 )
 
-When("I create the new note titled {string} with wikidataId {string} in noteBook {string}",
- (bookTitle: string, bookWikidataId: string, noteBook: string) => {
+When("I create the new note titled {string} with wikidataId {string} in noteBook {string}", () => {
+  return
 })
 
 When("I ask for a description suggestion for {string}", (noteTitle: string) => {

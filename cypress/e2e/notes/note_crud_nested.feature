@@ -16,8 +16,8 @@ Feature: Nested Note CRUD
       | Re-quirement | Re-think the way we do requirement |
     And I should see "My Notes/LeSS in Action" with these children
       | note-title   |
-      | team|
-      | tech|
+      | team         |
+      | tech         |
       | Re-quirement |
 
   Scenario: Create a new note with wrong info
@@ -37,8 +37,8 @@ Feature: Nested Note CRUD
       | note-title   |
       | Re-quirement |
       | Re-Design    |
-      | team|
-      | tech|
+      | team         |
+      | tech         |
     And On the current page, I should see "LeSS in Action" has link "a specialization of" "Re-Design"
 
   Scenario: Edit a note
@@ -49,3 +49,6 @@ Feature: Nested Note CRUD
     And I should see these notes belonging to the user at the top level of all my notes
       | title     | description       |
       | Odd-e CSD | Our best training |
+
+#  Scenario: Create new note should auto-generate description from OpenAi
+#    Given OpenAi has some description

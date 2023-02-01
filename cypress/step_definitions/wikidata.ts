@@ -93,7 +93,10 @@ Then(
   },
 )
 
-Given("the Wikidata.org entity {string} is written by {string} with {string}",
+Given(
+  "the Wikidata.org entity {string} is written by {string} with {string}",
   (wikidataId: string, authorName: string, authorWikidataId: string) => {
-   cy.wikidataService().stubWikidataEntityBook(wikidataId, authorWikidataId)
-})
+    cy.wikidataService().stubWikidataEntityBook(wikidataId, authorWikidataId)
+    cy.log(authorName)
+  },
+)
