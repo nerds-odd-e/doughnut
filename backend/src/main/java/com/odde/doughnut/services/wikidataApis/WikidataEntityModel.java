@@ -39,11 +39,7 @@ public class WikidataEntityModel extends WikidataEntityModelOfProperties {
   }
 
   public Optional<String> getCountryOfOrigin(WikidataApi wikidataApi) {
-    if (isHuman()) {
-      return getCountryOfOriginValue()
-          .flatMap(wikidataId1 -> wikidataId1.withApi(wikidataApi).fetchEnglishTitleFromApi());
-    }
-
-    return Optional.empty();
+    return getCountryOfOriginValue()
+      .flatMap(wikidataId1 -> wikidataId1.withApi(wikidataApi).fetchEnglishTitleFromApi());
   }
 }
