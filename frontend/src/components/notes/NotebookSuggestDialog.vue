@@ -12,8 +12,8 @@
           :class="`area-control form-control`"
           :id="`description-input`"
           :name="field"
-          :value="modelValue"
           :autofocus="true"
+          v-model="modelValue"
           role="suggestdescription"
           autocomplete="off"
           autocapitalize="off"
@@ -58,11 +58,21 @@ export default defineComponent({
     return {
       noteFormData: {},
       errors: {},
-      modelValue: "",
+      modelValue: "Placeholder",
       scopeName: "to be changed",
       field: "to be changed",
     };
   },
+  computed: {
+    textContent() {
+      return {
+        title: this.note.textContent.title,
+        description: this.modelValue,
+        updatedAt: this.note.textContent.updatedAt,
+      };
+    },
+  },
+  emits: ["done"],
   methods: {
     copyText() {
       const element = this.$refs.input as InstanceType<
@@ -73,7 +83,16 @@ export default defineComponent({
       document.execCommand("copy");
     },
     processForm() {
-      return;
+      this.storageAccessor
+        .api()
+        .updateTextContent(
+          this.note.id,
+          this.textContent,
+          this.note.textContent
+        )
+        .then(() => {
+          this.$emit("done");
+        });
     },
   },
 });
