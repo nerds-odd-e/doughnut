@@ -77,15 +77,17 @@ class RestNoteController {
     Optional<String> countryOfOriginOption = wikidataIdWithApi.getCountryOfOrigin(parentNote);
     if (countryOfOriginOption.isPresent()) {
       String countryOfOrigin = countryOfOriginOption.get();
-      Optional<Note> existingNote = findExistingNoteInNotebook(note.getNotebook(), countryOfOrigin);
-      if (existingNote.isPresent()) {
+      Optional<Note> existingNoteOption =
+          findExistingNoteInNotebook(note.getNotebook(), countryOfOrigin);
+      if (existingNoteOption.isPresent()) {
+        Note existingNote = existingNoteOption.get();
         RestLinkController restLinkController =
             new RestLinkController(modelFactoryService, testabilitySettings, currentUser);
         LinkCreation linkCreation = new LinkCreation();
         linkCreation.linkType = Link.LinkType.RELATED_TO;
         BindingResult bindingResult =
-            new BeanPropertyBindingResult(existingNote.get(), existingNote.get().getTitle());
-        restLinkController.linkNoteFinalize(note, existingNote.get(), linkCreation, bindingResult);
+            new BeanPropertyBindingResult(existingNote, existingNote.getTitle());
+        restLinkController.linkNoteFinalize(note, existingNote, linkCreation, bindingResult);
       } else {
         createNote(note, createCountryOfOriginNoteCreation(countryOfOrigin));
       }
