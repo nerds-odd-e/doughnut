@@ -16,7 +16,7 @@ public class WikidataEntityModel extends WikidataEntityModelOfProperties {
   }
 
   private Boolean isBook() {
-    return getInstanceOf().map(WikidataId::isBook).orElse(false);
+    return !getAuthor().isEmpty();
   }
 
   private String getLocationDescription() {
