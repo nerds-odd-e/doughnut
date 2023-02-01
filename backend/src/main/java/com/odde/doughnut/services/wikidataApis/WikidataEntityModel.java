@@ -40,6 +40,6 @@ public class WikidataEntityModel extends WikidataEntityModelOfProperties {
 
   public Optional<String> getCountryOfOrigin(WikidataApi wikidataApi) {
     return getCountryOfOriginValue()
-      .flatMap(wikidataId1 -> wikidataId1.withApi(wikidataApi).fetchEnglishTitleFromApi());
+        .flatMap(wikidataId1 -> wikidataId1.withApi(wikidataApi).fetchEnglishTitleFromApi());
   }
 }
