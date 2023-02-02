@@ -6,6 +6,7 @@ import com.theokanning.openai.completion.CompletionRequest;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import retrofit2.HttpException;
 
 @Service("RealOpenAiWrapperService")
 public class RealOpenAiWrapperService implements OpenAiWrapperService {
@@ -23,7 +24,12 @@ public class RealOpenAiWrapperService implements OpenAiWrapperService {
   }
 
   public String getDescription(String item) {
-    String prompt = "What is " + item;
-    return getOpenAiResponse(prompt);
+    try {
+
+      String prompt = "What is " + item;
+      return getOpenAiResponse(prompt);
+    } catch (HttpException e) {
+      return null;
+    }
   }
 }

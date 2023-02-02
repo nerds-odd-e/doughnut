@@ -12,14 +12,12 @@ import com.odde.doughnut.services.OpenAiWrapperService;
 import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.doughnut.testability.TestabilitySettings;
-
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Resource;
 import javax.validation.Valid;
-
 import lombok.SneakyThrows;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.*;
@@ -37,11 +35,11 @@ class RestNoteController {
   private final TestabilitySettings testabilitySettings;
 
   public RestNoteController(
-    ModelFactoryService modelFactoryService,
-    UserModel currentUser,
-    HttpClientAdapter httpClientAdapter,
-    TestabilitySettings testabilitySettings,
-    OpenAiWrapperService openAiWrapperService) {
+      ModelFactoryService modelFactoryService,
+      UserModel currentUser,
+      HttpClientAdapter httpClientAdapter,
+      TestabilitySettings testabilitySettings,
+      OpenAiWrapperService openAiWrapperService) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.httpClientAdapter = httpClientAdapter;
@@ -53,12 +51,12 @@ class RestNoteController {
   @Transactional
   @SneakyThrows
   public NoteRealm updateWikidataId(
-    @PathVariable(name = "note") Note note,
-    @RequestBody WikidataAssociationCreation wikidataAssociationCreation)
-    throws BindException, UnexpectedNoAccessRightException {
+      @PathVariable(name = "note") Note note,
+      @RequestBody WikidataAssociationCreation wikidataAssociationCreation)
+      throws BindException, UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
     WikidataIdWithApi wikidataIdWithApi =
-      associateToWikidata(note, wikidataAssociationCreation.wikidataId);
+        associateToWikidata(note, wikidataAssociationCreation.wikidataId);
     wikidataIdWithApi.extractWikidataInfoToNote(note);
     modelFactoryService.noteRepository.save(note);
     return new NoteViewer(currentUser.getEntity(), note).toJsonObject();
@@ -68,9 +66,9 @@ class RestNoteController {
   @Transactional
   @SneakyThrows
   public NoteRealmWithPosition createNote(
-    @PathVariable(name = "parentNote") Note parentNote,
-    @Valid @ModelAttribute NoteCreation noteCreation)
-    throws UnexpectedNoAccessRightException, BindException, InterruptedException {
+      @PathVariable(name = "parentNote") Note parentNote,
+      @Valid @ModelAttribute NoteCreation noteCreation)
+      throws UnexpectedNoAccessRightException, BindException, InterruptedException {
     currentUser.assertAuthorization(parentNote);
     User user = currentUser.getEntity();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
@@ -84,16 +82,16 @@ class RestNoteController {
     if (countryOfOriginOption.isPresent()) {
       String countryOfOrigin = countryOfOriginOption.get();
       Optional<Note> existingNoteOption =
-        findExistingNoteInNotebook(note.getNotebook(), countryOfOrigin);
+          findExistingNoteInNotebook(note.getNotebook(), countryOfOrigin);
       if (existingNoteOption.isPresent()) {
         Note existingNote = existingNoteOption.get();
         Link link =
-          Link.createLink(
-            note,
-            existingNote,
-            user,
-            Link.LinkType.RELATED_TO,
-            testabilitySettings.getCurrentUTCTimestamp());
+            Link.createLink(
+                note,
+                existingNote,
+                user,
+                Link.LinkType.RELATED_TO,
+                testabilitySettings.getCurrentUTCTimestamp());
         modelFactoryService.linkRepository.save(link);
       } else {
         createNote(note, createCountryOfOriginNoteCreation(countryOfOrigin));
@@ -104,7 +102,6 @@ class RestNoteController {
     if (author.isPresent()) {
       createNote(note, createCountryOfOriginNoteCreation(author.get()));
     }
-
     String description = openAiWrapperService.getDescription(noteCreation.textContent.getTitle());
 
     if (description != null) {
@@ -138,14 +135,14 @@ class RestNoteController {
 
   @GetMapping("/{note}")
   public NoteRealmWithPosition show(@PathVariable("note") Note note)
-    throws UnexpectedNoAccessRightException {
+      throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
     return NoteRealmWithPosition.fromNote(note, currentUser.getEntity());
   }
 
   @GetMapping("/{note}/overview")
   public NoteRealmWithAllDescendants showOverview(@PathVariable("note") Note note)
-    throws UnexpectedNoAccessRightException {
+      throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
     return NoteRealmWithAllDescendants.fromNote(note, currentUser.getEntity());
   }
@@ -153,9 +150,9 @@ class RestNoteController {
   @PatchMapping(path = "/{note}")
   @Transactional
   public NoteRealm updateNote(
-    @PathVariable(name = "note") Note note,
-    @Valid @ModelAttribute NoteAccessories noteAccessories)
-    throws UnexpectedNoAccessRightException, IOException {
+      @PathVariable(name = "note") Note note,
+      @Valid @ModelAttribute NoteAccessories noteAccessories)
+      throws UnexpectedNoAccessRightException, IOException {
     currentUser.assertAuthorization(note);
 
     final User user = currentUser.getEntity();
@@ -167,7 +164,7 @@ class RestNoteController {
 
   @GetMapping("/{note}/note-info")
   public NoteInfo getNoteInfo(@PathVariable("note") Note note)
-    throws UnexpectedNoAccessRightException {
+      throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
     NoteInfo noteInfo = new NoteInfo();
     noteInfo.setReviewPoint(currentUser.getReviewPointFor(note));
@@ -181,14 +178,14 @@ class RestNoteController {
   @Transactional
   public List<Note> searchForLinkTarget(@Valid @RequestBody SearchTerm searchTerm) {
     SearchTermModel searchTermModel =
-      modelFactoryService.toSearchTermModel(currentUser.getEntity(), searchTerm);
+        modelFactoryService.toSearchTermModel(currentUser.getEntity(), searchTerm);
     return searchTermModel.searchForNotes();
   }
 
   @PostMapping(value = "/{note}/delete")
   @Transactional
   public List<NoteRealm> deleteNote(@PathVariable("note") Note note)
-    throws UnexpectedNoAccessRightException {
+      throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
     modelFactoryService.toNoteModel(note).destroy(testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.entityManager.flush();
@@ -202,7 +199,7 @@ class RestNoteController {
   @PatchMapping(value = "/{note}/undo-delete")
   @Transactional
   public NoteRealm undoDeleteNote(@PathVariable("note") Note note)
-    throws UnexpectedNoAccessRightException {
+      throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
     modelFactoryService.toNoteModel(note).restore();
     modelFactoryService.entityManager.flush();
@@ -219,8 +216,8 @@ class RestNoteController {
   @PostMapping(value = "/{note}/review-setting")
   @Transactional
   public RedirectToNoteResponse updateReviewSetting(
-    @PathVariable("note") Note note, @Valid @RequestBody ReviewSetting reviewSetting)
-    throws UnexpectedNoAccessRightException {
+      @PathVariable("note") Note note, @Valid @RequestBody ReviewSetting reviewSetting)
+      throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
     note.mergeMasterReviewSetting(reviewSetting);
     modelFactoryService.noteRepository.save(note);
