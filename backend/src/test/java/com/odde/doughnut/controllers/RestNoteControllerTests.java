@@ -313,11 +313,9 @@ class RestNoteControllerTests {
 
     @Nested
     class AddingBookNoteWithAuthorInformation {
-
       private void mockApiResponseForBookWithAuthorTag(
           String bookWikiDataId, String bookAuthorWikiDataId)
           throws IOException, InterruptedException {
-
         Mockito.when(
                 httpClientAdapter.getResponseString(
                     URI.create(
@@ -330,7 +328,6 @@ class RestNoteControllerTests {
 
       private void mockApiResponseForAuthor(String bookAuthorWikiDataId, String authorName)
           throws IOException, InterruptedException {
-        /// wiki/Special:EntityData/Q34660.json
         Mockito.when(
                 httpClientAdapter.getResponseString(
                     URI.create(
