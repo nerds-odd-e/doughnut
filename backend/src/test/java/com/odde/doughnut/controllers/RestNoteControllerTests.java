@@ -16,12 +16,14 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.HttpClientAdapter;
+import com.odde.doughnut.services.OpenAiWrapperService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.net.URI;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,6 +45,7 @@ class RestNoteControllerTests {
 
   @Autowired MakeMe makeMe;
   @Mock HttpClientAdapter httpClientAdapter;
+  @Mock OpenAiWrapperService openAiWrapperService;
   private UserModel userModel;
   RestNoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -50,9 +53,14 @@ class RestNoteControllerTests {
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
+
     controller =
         new RestNoteController(
-            modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
+            modelFactoryService,
+            userModel,
+            httpClientAdapter,
+            testabilitySettings,
+            openAiWrapperService);
   }
 
   @Nested
@@ -132,6 +140,16 @@ class RestNoteControllerTests {
       Note newNote = makeMe.aNote().inMemoryPlease();
       noteCreation.setTextContent(newNote.getTextContent());
       noteCreation.setLinkTypeToParent(LinkType.NO_LINK);
+    }
+
+    @Disabled("Disabled until OpenAiService is ready")
+    @Test
+    void shouldBeAbleToSaveNoteWithAiDescription()
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException {
+      String expectedDescription = "This is a description from OpenAi";
+      Mockito.when(openAiWrapperService.getDescription(any())).thenReturn(expectedDescription);
+      NoteRealmWithPosition response = controller.createNote(parent, noteCreation);
+      assertThat(response.noteRealm.getNote().getShortDescription(), equalTo(expectedDescription));
     }
 
     @Test

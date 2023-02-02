@@ -8,6 +8,7 @@ import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.SearchTermModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.HttpClientAdapter;
+import com.odde.doughnut.services.OpenAiWrapperService;
 import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -28,6 +29,7 @@ class RestNoteController {
   private final ModelFactoryService modelFactoryService;
   private UserModel currentUser;
   private HttpClientAdapter httpClientAdapter;
+  private OpenAiWrapperService openAiWrapperService;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
@@ -36,11 +38,13 @@ class RestNoteController {
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       HttpClientAdapter httpClientAdapter,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      OpenAiWrapperService openAiWrapperService) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.httpClientAdapter = httpClientAdapter;
     this.testabilitySettings = testabilitySettings;
+    this.openAiWrapperService = openAiWrapperService;
   }
 
   @PostMapping(value = "/{note}/updateWikidataId")
