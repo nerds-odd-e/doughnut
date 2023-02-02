@@ -309,7 +309,69 @@ class RestNoteControllerTests {
           assertThat(description, containsString(countryName));
         }
       }
+
+      private void mockApiResponseForPersonWithCountry(
+        String personWikiDataId, String countryWikiDataId)
+        throws IOException, InterruptedException {
+
+        Mockito.when(
+            httpClientAdapter.getResponseString(
+              URI.create(
+                "https://www.wikidata.org/w/api.php?action=wbgetentities&ids="
+                  + personWikiDataId
+                  + "&format=json&props=claims")))
+          .thenReturn(
+            makeMe.wikidataClaimsJson(personWikiDataId).asBook(countryWikiDataId).please());
+      }
+
+      private void mockApiResponseForCountry(String countryWikiDataId, String countryName)
+        throws IOException, InterruptedException {
+        /// wiki/Special:EntityData/Q34660.json
+        Mockito.when(
+            httpClientAdapter.getResponseString(
+              URI.create(
+                "https://www.wikidata.org/wiki/Special:EntityData/"
+                  + countryWikiDataId
+                  + ".json")))
+          .thenReturn(
+            makeMe.wikidataClaimsJson(countryWikiDataId).labelIf(countryName).please());
+      }
+
+      @ParameterizedTest
+      @CsvSource(
+        useHeadersInDisplayName = true,
+        delimiter = '|',
+        textBlock =
+          """
+  wikidataIdOfPerson | personName | countryWikiDataId | countryWikiDataName
+  #---------------------------------------------------------------------------------------------
+  Q8337    | Johnny boy  | Q34660           |  Canada
+  """)
+      void shouldAddPersonNoteWithCountryNoteWithWikidataId(
+        String wikidataIdOfPerson,
+        String personName,
+        String countryWikiDataId,
+        String countryWikiDataName)
+        throws BindException, InterruptedException, UnexpectedNoAccessRightException,
+        IOException {
+        mockApiResponseForPersonWithCountry(wikidataIdOfPerson, countryWikiDataId);
+        mockApiResponseForCountry(countryWikiDataId, countryWikiDataName);
+        noteCreation.setWikidataId(wikidataIdOfPerson);
+        noteCreation.getTextContent().setTitle(personName);
+        NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
+        makeMe.refresh(note.noteRealm.getNote());
+
+        String actualPersonNoteWikiDataId = note.noteRealm.getNote().getWikidataId();
+        String actualCountryNoteTitle = note.noteRealm.getNote().getChildren().get(0).getTitle();
+        String actualPersonNoteTitle = note.noteRealm.getNote().getTitle();
+
+        assertEquals(personName, actualPersonNoteTitle);
+        assertEquals(wikidataIdOfPerson, actualPersonNoteWikiDataId);
+        assertEquals(countryWikiDataName, actualCountryNoteTitle);
+      }
     }
+
+
 
     @Nested
     class AddingBookNoteWithAuthorInformation {
