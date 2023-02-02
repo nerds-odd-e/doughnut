@@ -18,7 +18,7 @@ Feature: Suggest description
     Given I am prompted with a suggested description "Sharing the same planet as humans" for "Animals"
     Then I expect that "<field>" will be "<value>" when I "<action>" the suggested description
     Examples:
-      | action | field        | value                               |
-      | use    | description  | Sharing the same planet as humans   |
-      | copy   | clipboard    | Sharing the same planet as humans   |
-      | cancel | description  | Are living beings                   |
+      | action | field        | value                             |
+      | use    | description  | Sharing the same planet as humans |
+      | copy   | clipboard    | Sharing the same planet as humans |
+      | cancel | description  | Are living beings                 |
