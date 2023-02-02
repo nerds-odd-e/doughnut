@@ -29,3 +29,8 @@ export default defineComponent({
   components: { PopupButton, NoteSuggestDescriptionDialog },
 });
 </script>
+
+<style lang="sass" scoped>
+.btn-primary
+  align-items: center
+</style>

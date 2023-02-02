@@ -11,15 +11,17 @@
       v-model="textContent.title"
       @blur="onBlurTextField"
     />
-    <NoteWikidataAssociation
-      v-if="note.wikidataId"
-      :wikidata-id="note.wikidataId"
-    />
-    <NoteSuggestDescriptionButton
-      v-bind="{ selectedNote: note, storageAccessor }"
-    >
-      Suggest
-    </NoteSuggestDescriptionButton>
+    <div class="header-options">
+      <NoteWikidataAssociation
+        v-if="note.wikidataId"
+        :wikidata-id="note.wikidataId"
+      />
+      <NoteSuggestDescriptionButton
+        v-bind="{ selectedNote: note, storageAccessor }"
+      >
+        Suggest
+      </NoteSuggestDescriptionButton>
+    </div>
   </div>
   <div class="note-content">
     <div
@@ -131,4 +133,8 @@ export default defineComponent({
   .col
     flex: 1 1 auto
     width: 50%
+.header-options
+  display: flex
+  align-items: center
+  margin: 0 10px
 </style>

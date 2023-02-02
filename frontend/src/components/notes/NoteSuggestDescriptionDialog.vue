@@ -12,15 +12,17 @@
         rows="8"
         ref="input"
       />
-      <input type="submit" value="Use" class="btn btn-primary" />
-      <button
-        type="button"
-        value="Copy to clipboard"
-        class="btn btn-primary"
-        @click="copyText()"
-      >
-        Copy to clipboard
-      </button>
+      <div class="dialog-buttons">
+        <input type="submit" value="Use" class="btn btn-primary" />
+        <button
+          type="button"
+          value="Copy to clipboard"
+          class="btn btn-primary"
+          @click="copyText()"
+        >
+          Copy to clipboard
+        </button>
+      </div>
     </form>
   </LoadingPage>
 </template>
@@ -92,3 +94,10 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="sass" scoped>
+.dialog-buttons
+  display: flex
+  column-gap: 10px
+  margin: 10px 0
+</style>
