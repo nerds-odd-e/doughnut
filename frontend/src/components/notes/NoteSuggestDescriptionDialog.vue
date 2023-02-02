@@ -2,27 +2,19 @@
   <LoadingPage v-bind="{ contentExists: true }">
     <h1>Suggested Description</h1>
     <form @submit.prevent.once="processForm">
-      <InputWithType
-        v-bind="{
-          scopeName,
-          field,
-        }"
-      >
-        <textarea
-          :class="`area-control form-control`"
-          :id="`description-input`"
-          :name="field"
-          :autofocus="true"
-          v-model="modelValue"
-          role="suggestdescription"
-          autocomplete="off"
-          autocapitalize="off"
-          rows="8"
-          ref="input"
-        />
-      </InputWithType>
+      <textarea
+        :class="`area-control form-control`"
+        :autofocus="true"
+        v-model="suggestedDescription"
+        role="suggestdescription"
+        autocomplete="off"
+        autocapitalize="off"
+        rows="8"
+        ref="input"
+      />
       <input type="submit" value="Use" class="btn btn-primary" />
       <button
+        type="button"
         value="Copy to clipboard"
         class="btn btn-primary"
         @click="copyText()"
@@ -37,39 +29,39 @@
 import { defineComponent, PropType } from "vue";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
-import InputWithType from "../form/InputWithType.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
+
+function selectAllTextInTextAreaElement(element: HTMLTextAreaElement) {
+  element.select();
+  element.setSelectionRange(0, 99999);
+  document.execCommand("copy");
+}
 
 export default defineComponent({
   setup() {
     return useLoadingApi();
   },
   props: {
-    note: { type: Object as PropType<Generated.Note>, required: true },
+    selectedNote: { type: Object as PropType<Generated.Note>, required: true },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,
     },
-    size: { type: String, default: "" },
   },
   components: {
     LoadingPage,
   },
   data() {
     return {
-      noteFormData: {},
-      errors: {},
-      modelValue: "Placeholder",
-      scopeName: "to be changed",
-      field: "to be changed",
+      suggestedDescription: "Placeholder",
     };
   },
   computed: {
     textContent() {
       return {
-        title: this.note.textContent.title,
-        description: this.modelValue,
-        updatedAt: this.note.textContent.updatedAt,
+        title: this.selectedNote.textContent.title,
+        description: this.suggestedDescription,
+        updatedAt: this.selectedNote.textContent.updatedAt,
       };
     },
   },
@@ -79,17 +71,19 @@ export default defineComponent({
       const element = this.$refs.input as InstanceType<
         typeof HTMLTextAreaElement
       >;
-      element.select();
-      element.setSelectionRange(0, 99999);
-      document.execCommand("copy");
+      if (!navigator.clipboard) {
+        selectAllTextInTextAreaElement(element);
+      } else {
+        navigator.clipboard.writeText(element.value);
+      }
     },
     processForm() {
       this.storageAccessor
         .api()
         .updateTextContent(
-          this.note.id,
+          this.selectedNote.id,
           this.textContent,
-          this.note.textContent
+          this.selectedNote.textContent
         )
         .then(() => {
           this.$emit("done");

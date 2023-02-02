@@ -15,9 +15,11 @@
       v-if="note.wikidataId"
       :wikidata-id="note.wikidataId"
     />
-    <NotebookSuggestButton v-bind="{ selectedNote: note, storageAccessor }">
+    <NoteSuggestDescriptionButton
+      v-bind="{ selectedNote: note, storageAccessor }"
+    >
       Suggest
-    </NotebookSuggestButton>
+    </NoteSuggestDescriptionButton>
   </div>
   <div class="note-content">
     <div
@@ -78,7 +80,7 @@ import SvgPictureIndicator from "../svgs/SvgPictureIndicator.vue";
 import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
 import EditableText from "../form/EditableText.vue";
 import NoteWikidataAssociation from "./NoteWikidataAssociation.vue";
-import NotebookSuggestButton from "./NotebookSuggestButton.vue";
+import NoteSuggestDescriptionButton from "./NoteSuggestDescriptionButton.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
@@ -100,7 +102,7 @@ export default defineComponent({
     EditableText,
     NoteTitleWithLink,
     NoteWikidataAssociation,
-    NotebookSuggestButton,
+    NoteSuggestDescriptionButton,
   },
   computed: {
     textContent() {

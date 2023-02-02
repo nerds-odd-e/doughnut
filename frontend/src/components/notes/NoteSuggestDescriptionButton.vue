@@ -4,8 +4,8 @@
       <slot />
     </template>
     <template #dialog_body="{ doneHandler }">
-      <NotebookSuggestDialog
-        v-bind="{ note: selectedNote, storageAccessor }"
+      <NoteSuggestDescriptionDialog
+        v-bind="{ selectedNote, storageAccessor }"
         @done="doneHandler($event)"
       />
     </template>
@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import NotebookSuggestDialog from "./NotebookSuggestDialog.vue";
+import NoteSuggestDescriptionDialog from "./NoteSuggestDescriptionDialog.vue";
 import PopupButton from "../commons/Popups/PopupButton.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
@@ -26,6 +26,6 @@ export default defineComponent({
       required: true,
     },
   },
-  components: { PopupButton, NotebookSuggestDialog },
+  components: { PopupButton, NoteSuggestDescriptionDialog },
 });
 </script>
