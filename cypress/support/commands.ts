@@ -624,7 +624,7 @@ Cypress.Commands.add("performActionWithSuggestedDescription", (action: string) =
       cy.findByRole("button", { name: "Use" }).click()
       break
     case "copy":
-      cy.findByRole("button", { name: "Copy to clipboard" }).click()
+      cy.findByRole("button", { name: "Copy to clipboard" }).focused().click()
       break
     case "cancel":
       cy.get(".close-button").click()
