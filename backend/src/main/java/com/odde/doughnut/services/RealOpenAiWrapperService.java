@@ -25,11 +25,10 @@ public class RealOpenAiWrapperService implements OpenAiWrapperService {
 
   public String getDescription(String item) {
     try {
-
-      String prompt = "What is " + item;
-      return getOpenAiResponse(prompt);
+      String prompt = "Tell me about " + item + ".";
+      return getOpenAiResponse(prompt).replace(prompt, "").trim();
     } catch (HttpException e) {
-      return null;
+      return "";
     }
   }
 }

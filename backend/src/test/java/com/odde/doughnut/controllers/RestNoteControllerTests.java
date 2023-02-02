@@ -143,6 +143,7 @@ class RestNoteControllerTests {
     @Test
     void shouldBeAbleToSaveNoteWithAiDescription()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException {
+      noteCreation.getTextContent().setDescription("");
       String expectedDescription = "This is a description from OpenAi";
       Mockito.when(openAiWrapperService.getDescription(any())).thenReturn(expectedDescription);
       NoteRealmWithPosition response = controller.createNote(parent, noteCreation);

@@ -51,17 +51,15 @@ Feature: Nested Note CRUD
       | Odd-e CSD | Our best training |
 
   @ignore
-  Scenario Outline: Create new note should auto-generate description from OpenAi
+  Scenario: Create new note should auto-generate description from OpenAi
+    Given that OpenAI thinks that "Animals" means "Sharing the same planet as humans"
     When I create a note belonging to "LeSS in Action":
-      | Title       | Description |
-      | <noteTitle> |             |
+      | Title  | Description |
+      | Animal |             |
     Then I should see "My Notes/LeSS in Action" with these children
-      | note-title  |
-      | <noteTitle> |
-      | team        |
-      | tech        |
-    And I should see non-empty description for "<noteTitle>"
-    Examples:
-      | noteTitle |
-      | Singapore |
+      | note-title |
+      | Animal     |
+      | team       |
+      | tech       |
+    And I should see non-empty description for "Animal"
 
