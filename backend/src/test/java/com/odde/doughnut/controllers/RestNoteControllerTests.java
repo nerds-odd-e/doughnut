@@ -2,8 +2,7 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 
 import com.odde.doughnut.entities.Link.LinkType;
@@ -309,6 +308,70 @@ class RestNoteControllerTests {
         if (countryName != null) {
           assertThat(description, containsString(countryName));
         }
+      }
+    }
+
+    @Nested
+    class AddingBookNoteWithAuthorInformation {
+
+      private void mockApiResponseForBookWithAuthorTag(
+          String bookWikiDataId, String bookAuthorWikiDataId)
+          throws IOException, InterruptedException {
+
+        Mockito.when(
+                httpClientAdapter.getResponseString(
+                    URI.create(
+                        "https://www.wikidata.org/w/api.php?action=wbgetentities&ids="
+                            + bookWikiDataId
+                            + "&format=json&props=claims")))
+            .thenReturn(
+                makeMe.wikidataClaimsJson(bookWikiDataId).asBook(bookAuthorWikiDataId).please());
+      }
+
+      private void mockApiResponseForAuthor(String bookAuthorWikiDataId, String authorName)
+          throws IOException, InterruptedException {
+        /// wiki/Special:EntityData/Q34660.json
+        Mockito.when(
+                httpClientAdapter.getResponseString(
+                    URI.create(
+                        "https://www.wikidata.org/wiki/Special:EntityData/"
+                            + bookAuthorWikiDataId
+                            + ".json")))
+            .thenReturn(
+                makeMe.wikidataClaimsJson(bookAuthorWikiDataId).labelIf(authorName).please());
+      }
+
+      @ParameterizedTest
+      @CsvSource(
+          useHeadersInDisplayName = true,
+          delimiter = '|',
+          textBlock =
+              """
+    bookWikiDataId | bookName | AuthorWikiDataId | AuthorWikiDataName
+   #---------------------------------------------------------------------------------------------
+    Q8337    | Harry Potter  | Q34660           |  J. K. Rowling
+    """)
+      void shouldAddBookNoteWithAuthorNoteWithWikidataId(
+          String wikidataIdOfBook,
+          String bookName,
+          String authorWikiDataId,
+          String authorWikiDataName)
+          throws BindException, InterruptedException, UnexpectedNoAccessRightException,
+              IOException {
+        mockApiResponseForBookWithAuthorTag(wikidataIdOfBook, authorWikiDataId);
+        mockApiResponseForAuthor(authorWikiDataId, authorWikiDataName);
+        noteCreation.setWikidataId(wikidataIdOfBook);
+        noteCreation.getTextContent().setTitle(bookName);
+        NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
+        makeMe.refresh(note.noteRealm.getNote());
+
+        String actualBookNoteWikiDataId = note.noteRealm.getNote().getWikidataId();
+        String actualAuthorNoteTitle = note.noteRealm.getNote().getChildren().get(0).getTitle();
+        String actualBookNoteTitle = note.noteRealm.getNote().getTitle();
+
+        assertEquals(bookName, actualBookNoteTitle);
+        assertEquals(wikidataIdOfBook, actualBookNoteWikiDataId);
+        assertEquals(authorWikiDataName, actualAuthorNoteTitle);
       }
     }
   }

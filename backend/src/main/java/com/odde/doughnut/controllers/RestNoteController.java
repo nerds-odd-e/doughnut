@@ -78,6 +78,30 @@ class RestNoteController {
     note.buildLinkToParent(user, noteCreation.getLinkTypeToParent(), currentUTCTimestamp);
     modelFactoryService.noteRepository.save(note);
 
+    createCountryOfOriginNote(user, note, wikidataIdWithApi);
+
+    createAuthorNoteForBook(parentNote, note, wikidataIdWithApi);
+    String description = openAiWrapperService.getDescription(noteCreation.textContent.getTitle());
+
+    if (description != null) {
+      note.getTextContent().setDescription(description);
+    }
+
+    modelFactoryService.noteRepository.save(note);
+    return NoteRealmWithPosition.fromNote(note, user);
+  }
+
+  private void createAuthorNoteForBook(
+      Note bookNote, Note authorNote, WikidataIdWithApi wikidataIdWithApi)
+      throws IOException, InterruptedException, UnexpectedNoAccessRightException, BindException {
+    Optional<String> author = wikidataIdWithApi.getAuthor(bookNote);
+    if (author.isPresent()) {
+      createNote(authorNote, createNoteWithTitle(author.get()));
+    }
+  }
+
+  private void createCountryOfOriginNote(User user, Note note, WikidataIdWithApi wikidataIdWithApi)
+      throws IOException, InterruptedException, UnexpectedNoAccessRightException, BindException {
     Optional<String> countryOfOriginOption = wikidataIdWithApi.getCountryOfOrigin();
     if (countryOfOriginOption.isPresent()) {
       String countryOfOrigin = countryOfOriginOption.get();
@@ -94,21 +118,9 @@ class RestNoteController {
                 testabilitySettings.getCurrentUTCTimestamp());
         modelFactoryService.linkRepository.save(link);
       } else {
-        createNote(note, createCountryOfOriginNoteCreation(countryOfOrigin));
+        createNote(note, createNoteWithTitle(countryOfOrigin));
       }
     }
-
-    Optional<String> author = wikidataIdWithApi.getAuthor(parentNote);
-    if (author.isPresent()) {
-      createNote(note, createCountryOfOriginNoteCreation(author.get()));
-    }
-    String description = openAiWrapperService.getDescription(noteCreation.textContent.getTitle());
-
-    if (description != null) {
-      note.getTextContent().setDescription(description);
-    }
-
-    return NoteRealmWithPosition.fromNote(note, user);
   }
 
   private Optional<Note> findExistingNoteInNotebook(Notebook notebook, String title) {
@@ -123,7 +135,7 @@ class RestNoteController {
   }
 
   @SneakyThrows
-  private NoteCreation createCountryOfOriginNoteCreation(String countryOfOrigin) {
+  private NoteCreation createNoteWithTitle(String countryOfOrigin) {
     NoteCreation noteCreation = new NoteCreation();
     TextContent textContent = new TextContent();
     textContent.setTitle(countryOfOrigin);
