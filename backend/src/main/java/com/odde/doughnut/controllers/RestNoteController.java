@@ -78,7 +78,7 @@ class RestNoteController {
     note.buildLinkToParent(user, noteCreation.getLinkTypeToParent(), currentUTCTimestamp);
     modelFactoryService.noteRepository.save(note);
 
-    Optional<String> countryOfOriginOption = wikidataIdWithApi.getCountryOfOrigin(parentNote);
+    Optional<String> countryOfOriginOption = wikidataIdWithApi.getCountryOfOrigin();
     if (countryOfOriginOption.isPresent()) {
       String countryOfOrigin = countryOfOriginOption.get();
       Optional<Note> existingNoteOption =
