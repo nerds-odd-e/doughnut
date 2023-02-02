@@ -55,7 +55,7 @@ hs_err_pid*
 # nodejs
 node_modules/
 **/package-lock.json
-**/yarn.error
+**/yarn.errorw
 
 # git-secret
 .gitsecret/keys/random_seed
@@ -63,6 +63,7 @@ node_modules/
 env.sh
 public_keys/
 **/carbon-syntax-298809-f31377ba77a9.json
+.gitsecret/keys/pubring.kbx~
 
 # VSCode
 **/.vscode/

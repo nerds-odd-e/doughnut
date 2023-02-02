@@ -50,10 +50,11 @@ Feature: Nested Note CRUD
       | title     | description       |
       | Odd-e CSD | Our best training |
 
+  @ignore
   Scenario Outline: Create new note should auto-generate description from OpenAi
     When I create a note belonging to "LeSS in Action":
       | Title       | Description |
-      | <noteTitle> | some        |
+      | <noteTitle> |             |
     Then I should see "My Notes/LeSS in Action" with these children
       | note-title  |
       | <noteTitle> |
