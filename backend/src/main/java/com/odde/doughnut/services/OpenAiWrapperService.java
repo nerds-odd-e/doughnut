@@ -1,5 +1,5 @@
 package com.odde.doughnut.services;
 
-public interface OpenAiService {
+public interface OpenAiWrapperService {
   public String getOpenAiResponse(String prompt);
 }
