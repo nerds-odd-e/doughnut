@@ -56,6 +56,7 @@ in mkShell {
     apple_sdk.Security
     apple_sdk.SystemConfiguration
     xcodebuild
+    pinentry_mac
   ] ++ lib.optionals (!stdenv.isDarwin) [
     dbeaver
     ungoogled-chromium
@@ -63,6 +64,7 @@ in mkShell {
     x11vnc
     xclip
     xvfb-run
+    pinentry
   ];
   shellHook = ''
             #!/usr/bin/env bash
