@@ -425,17 +425,13 @@ Then("I will be prompted with a suggested description {string}", (description: s
 Then(
   "I expect that {string} will be {string} when I {string} the suggested description",
   (field: string, value: string, action: string) => {
-    if (action === "use") {
-      cy.findByRole("button", { name: "Use" }).click()
-    } else if (action === "copy") {
-      cy.findByRole("button", { name: "Copy to clipboard" }).click()
-    } else if (action === "cancel") {
-      cy.get(".close-button").click()
-    }
+    cy.performActionWithSuggestedDescription(action)
 
     if (field === "clipboard") {
       cy.assertValueCopiedToClipboard(value)
-    } else if (field === "description") {
+    }
+
+    if (field === "description") {
       cy.findNoteDescriptionOnCurrentPage(value)
     }
   },

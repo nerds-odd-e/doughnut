@@ -67,6 +67,7 @@ declare namespace Cypress {
     ): Chainable<any>
     openCirclesSelector(): Chainable<any>
     pageIsNotLoading(): Chainable<any>
+    performActionWithSuggestedDescription(action: string): Chainable<any>
     randomizerAlwaysChooseLast(): Chainable<Subject>
     replaceFocusedTextAndEnter(test: any): Chainable<any>
     repeatReviewNotes(noteTitles: string): Chainable<any>

@@ -13,7 +13,7 @@ Feature: Suggest description
   Scenario: Ask for suggested description
     When I ask for a description suggestion for "Animals"
     Then I will be prompted with a suggested description "Sharing the same planet as humans"
-@ignore
+
   Scenario Outline: Perform action with suggested note description
     Given I am prompted with a suggested description "Sharing the same planet as humans" for "Animals"
     Then I expect that "<field>" will be "<value>" when I "<action>" the suggested description

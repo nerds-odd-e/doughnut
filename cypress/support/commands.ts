@@ -617,3 +617,19 @@ Cypress.Commands.add("assertValueCopiedToClipboard", (value) => {
     })
   })
 })
+
+Cypress.Commands.add("performActionWithSuggestedDescription", (action: string) => {
+  switch (action) {
+    case "use":
+      cy.findByRole("button", { name: "Use" }).click()
+      break
+    case "copy":
+      cy.findByRole("button", { name: "Copy to clipboard" }).click()
+      break
+    case "cancel":
+      cy.get(".close-button").click()
+      break
+    default:
+      break
+  }
+})

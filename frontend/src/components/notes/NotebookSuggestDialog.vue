@@ -22,12 +22,13 @@
         />
       </InputWithType>
       <input type="submit" value="Use" class="btn btn-primary" />
-      <input
-        type="submit"
+      <button
         value="Copy to clipboard"
         class="btn btn-primary"
         @click="copyText()"
-      />
+      >
+        Copy to clipboard
+      </button>
     </form>
   </LoadingPage>
 </template>
