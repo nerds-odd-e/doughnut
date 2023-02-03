@@ -322,7 +322,11 @@ class RestNoteControllerTests {
                             + personWikiDataId
                             + "&format=json&props=claims")))
             .thenReturn(
-                makeMe.wikidataClaimsJson(personWikiDataId).asBook(countryWikiDataId).please());
+                makeMe
+                    .wikidataClaimsJson(personWikiDataId)
+                    .countryOfOrigin(countryWikiDataId)
+                    .asHuman()
+                    .please());
       }
 
       private void mockApiResponseForCountry(String countryWikiDataId, String countryName)
