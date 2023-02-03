@@ -18,7 +18,12 @@ public class RealOpenAiWrapperService implements OpenAiWrapperService {
   private String getOpenAiResponse(String prompt) {
     var service = new OpenAiService(OpenAiToken);
     CompletionRequest completionRequest =
-        CompletionRequest.builder().prompt(prompt).model(textModel).echo(true).build();
+        CompletionRequest.builder()
+            .prompt(prompt)
+            .maxTokens(256)
+            .model(textModel)
+            .echo(false)
+            .build();
     var choices = service.createCompletion(completionRequest).getChoices();
     return choices.stream().map(CompletionChoice::getText).collect(Collectors.joining(""));
   }
