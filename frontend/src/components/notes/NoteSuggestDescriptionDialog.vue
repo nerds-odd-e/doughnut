@@ -2,16 +2,7 @@
   <LoadingPage v-bind="{ contentExists: true }">
     <h1>Suggested Description</h1>
     <form @submit.prevent.once="processForm">
-      <textarea
-        :class="`area-control form-control`"
-        :autofocus="true"
-        v-model="suggestedDescription"
-        role="suggestdescription"
-        autocomplete="off"
-        autocapitalize="off"
-        rows="8"
-        ref="input"
-      />
+      <TextArea v-model="suggestedDescription" />
       <div class="dialog-buttons">
         <input type="submit" value="Use" class="btn btn-primary" />
         <button
@@ -29,15 +20,10 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import TextArea from "../form/TextArea.vue";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import { StorageAccessor } from "../../store/createNoteStorage";
-
-function selectAllTextInTextAreaElement(element: HTMLTextAreaElement) {
-  element.select();
-  element.setSelectionRange(0, 99999);
-  document.execCommand("copy");
-}
 
 export default defineComponent({
   setup() {
@@ -70,14 +56,7 @@ export default defineComponent({
   emits: ["done"],
   methods: {
     copyText() {
-      const element = this.$refs.input as InstanceType<
-        typeof HTMLTextAreaElement
-      >;
-      if (!navigator.clipboard) {
-        selectAllTextInTextAreaElement(element);
-      } else {
-        navigator.clipboard.writeText(element.value);
-      }
+      navigator.clipboard.writeText(this.suggestedDescription);
     },
     processForm() {
       this.storageAccessor

@@ -83,6 +83,8 @@ Cypress.Commands.add("selectViewOfNote", (noteTitle: string, viewType: string) =
 
 Cypress.Commands.add("submitNoteCreationFormSuccessfully", (noteAttributes) => {
   cy.submitNoteCreationFormWith(noteAttributes)
+  // eslint-disable-next-line cypress/no-unnecessary-waiting
+  cy.wait(3000)
   cy.dialogDisappeared()
 })
 
@@ -632,4 +634,9 @@ Cypress.Commands.add("performActionWithSuggestedDescription", (action: string) =
     default:
       break
   }
+})
+
+Cypress.Commands.add("replaceSuggestedDescriptionTextArea", (description: string) => {
+  cy.get(".area-control.form-control").focus()
+  cy.replaceFocusedTextAndEnter(description)
 })

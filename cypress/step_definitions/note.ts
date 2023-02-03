@@ -58,7 +58,7 @@ Given(
   (description: string, noteTitle: string) => {
     cy.jumpToNotePage(noteTitle)
     cy.findByRole("button", { name: "Suggest" }).click()
-    cy.inPlaceEdit({ SuggestDescription: description })
+    cy.replaceSuggestedDescriptionTextArea(description)
   },
 )
 

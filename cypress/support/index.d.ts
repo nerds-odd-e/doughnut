@@ -71,6 +71,7 @@ declare namespace Cypress {
     randomizerAlwaysChooseLast(): Chainable<Subject>
     replaceFocusedTextAndEnter(test: any): Chainable<any>
     repeatReviewNotes(noteTitles: string): Chainable<any>
+    replaceSuggestedDescriptionTextArea(description: string): Chainable<any>
     restore(): Chainable<Subject>
     routerPush(fallback: any, name: any, params: any): Chainable<any>
     routerToReviews(): Chainable<any>
