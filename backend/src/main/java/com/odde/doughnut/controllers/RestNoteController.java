@@ -80,8 +80,8 @@ class RestNoteController {
     note.buildLinkToParent(user, noteCreation.getLinkTypeToParent(), currentUTCTimestamp);
     modelFactoryService.noteRepository.save(note);
 
-    createCountryOfOriginNoteForPerson(user, note, wikidataIdWithApi);
-    createAuthorNoteForBook(user, note, wikidataIdWithApi);
+    createSubNote(user, note, wikidataIdWithApi.getCountryOfOrigin());
+    createSubNote(user, note, wikidataIdWithApi.getAuthor());
 
     note.generateDescriptionForEmptyNote(noteCreation, openAiWrapperService);
 
@@ -110,16 +110,8 @@ class RestNoteController {
     }
   }
 
-  private void createAuthorNoteForBook(
-      User user, Note bookNote, WikidataIdWithApi wikidataIdWithApi)
-      throws IOException, InterruptedException, UnexpectedNoAccessRightException, BindException {
-    createSubNote(user, bookNote, wikidataIdWithApi.getAuthor());
-  }
-
-  private void createCountryOfOriginNoteForPerson(
-      User user, Note personNote, WikidataIdWithApi wikidataIdWithApi)
-      throws IOException, InterruptedException, UnexpectedNoAccessRightException, BindException {
-    createSubNote(user, personNote, wikidataIdWithApi.getCountryOfOrigin());
+  private Optional<Note> findExistingNoteInNotebook(Notebook notebook, String title) {
+    return notebook.getNotes().stream().filter(x -> x.getTitle().equals(title)).findFirst();
   }
 
   @GetMapping("/{note}")
