@@ -80,7 +80,7 @@ class RestNoteController {
 
     createCountryOfOriginNote(user, note, wikidataIdWithApi);
 
-    createAuthorNoteForBook(parentNote, note, wikidataIdWithApi);
+    createAuthorNoteForBook(user, note, wikidataIdWithApi);
 
     note.generateDescriptionForEmptyNote(noteCreation, openAiWrapperService);
 
@@ -88,33 +88,49 @@ class RestNoteController {
   }
 
   private void createAuthorNoteForBook(
-      Note bookNote, Note authorNote, WikidataIdWithApi wikidataIdWithApi)
+      User user, Note bookNote, WikidataIdWithApi wikidataIdWithApi)
       throws IOException, InterruptedException, UnexpectedNoAccessRightException, BindException {
-    Optional<String> author = wikidataIdWithApi.getAuthor();
-    if (author.isPresent()) {
-      createNote(authorNote, authorNote.createNoteWithTitle(author.get()));
-    }
-  }
-
-  private void createCountryOfOriginNote(User user, Note note, WikidataIdWithApi wikidataIdWithApi)
-      throws IOException, InterruptedException, UnexpectedNoAccessRightException, BindException {
-    Optional<String> countryOfOriginOption = wikidataIdWithApi.getCountryOfOrigin();
-    if (countryOfOriginOption.isPresent()) {
-      String countryOfOrigin = countryOfOriginOption.get();
+    Optional<String> authorOption = wikidataIdWithApi.getAuthor();
+    if (authorOption.isPresent()) {
+      String author = authorOption.get();
       Optional<Note> existingNoteOption =
-          findExistingNoteInNotebook(note.getNotebook(), countryOfOrigin);
+          findExistingNoteInNotebook(bookNote.getNotebook(), author);
       if (existingNoteOption.isPresent()) {
         Note existingNote = existingNoteOption.get();
         Link link =
             Link.createLink(
-                note,
+                bookNote,
                 existingNote,
                 user,
                 Link.LinkType.RELATED_TO,
                 testabilitySettings.getCurrentUTCTimestamp());
         modelFactoryService.linkRepository.save(link);
       } else {
-        createNote(note, note.createNoteWithTitle(countryOfOrigin));
+        createNote(bookNote, bookNote.createNoteWithTitle(author));
+      }
+    }
+  }
+
+  private void createCountryOfOriginNote(
+      User user, Note personNote, WikidataIdWithApi wikidataIdWithApi)
+      throws IOException, InterruptedException, UnexpectedNoAccessRightException, BindException {
+    Optional<String> countryOfOriginOption = wikidataIdWithApi.getCountryOfOrigin();
+    if (countryOfOriginOption.isPresent()) {
+      String countryOfOrigin = countryOfOriginOption.get();
+      Optional<Note> existingNoteOption =
+          findExistingNoteInNotebook(personNote.getNotebook(), countryOfOrigin);
+      if (existingNoteOption.isPresent()) {
+        Note existingNote = existingNoteOption.get();
+        Link link =
+            Link.createLink(
+                personNote,
+                existingNote,
+                user,
+                Link.LinkType.RELATED_TO,
+                testabilitySettings.getCurrentUTCTimestamp());
+        modelFactoryService.linkRepository.save(link);
+      } else {
+        createNote(personNote, personNote.createNoteWithTitle(countryOfOrigin));
       }
     }
   }
