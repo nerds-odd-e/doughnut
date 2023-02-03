@@ -80,7 +80,7 @@ class RestNoteController {
     note.buildLinkToParent(user, noteCreation.getLinkTypeToParent(), currentUTCTimestamp);
     modelFactoryService.noteRepository.save(note);
 
-    createCountryOfOriginNote(user, note, wikidataIdWithApi);
+    createCountryOfOriginNoteForPerson(user, note, wikidataIdWithApi);
     createAuthorNoteForBook(user, note, wikidataIdWithApi);
 
     note.generateDescriptionForEmptyNote(noteCreation, openAiWrapperService);
@@ -116,7 +116,7 @@ class RestNoteController {
     createSubNote(user, bookNote, wikidataIdWithApi.getAuthor());
   }
 
-  private void createCountryOfOriginNote(
+  private void createCountryOfOriginNoteForPerson(
       User user, Note personNote, WikidataIdWithApi wikidataIdWithApi)
       throws IOException, InterruptedException, UnexpectedNoAccessRightException, BindException {
     createSubNote(user, personNote, wikidataIdWithApi.getCountryOfOrigin());

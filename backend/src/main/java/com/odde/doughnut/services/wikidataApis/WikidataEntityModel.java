@@ -15,10 +15,6 @@ public class WikidataEntityModel extends WikidataEntityModelOfProperties {
     return getInstanceOf().map(WikidataId::isHuman).orElse(false);
   }
 
-  private Boolean isBook() {
-    return !getAuthor().isEmpty();
-  }
-
   private String getLocationDescription() {
     return getGeographicCoordinate().map(Coordinate::toLocationDescription).orElse(null);
   }
@@ -48,11 +44,7 @@ public class WikidataEntityModel extends WikidataEntityModelOfProperties {
   }
 
   public Optional<String> getAuthor(WikidataApi wikidataApi) {
-    if (isBook()) {
       return getAuthor()
           .flatMap(wikidataId1 -> wikidataId1.withApi(wikidataApi).fetchEnglishTitleFromApi());
     }
-
-    return Optional.empty();
-  }
 }
