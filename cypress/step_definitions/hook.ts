@@ -59,3 +59,11 @@ Before({ tags: "@usingMockedWikidataService" }, () => {
 After({ tags: "@usingMockedWikidataService" }, () => {
   cy.wikidataService().restore()
 })
+
+Before({ tags: "@usingMockedOpenAiService" }, () => {
+  cy.openAiService().mock()
+})
+
+After({ tags: "@usingMockedOpenAiService" }, () => {
+  cy.openAiService().restore()
+})

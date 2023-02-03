@@ -311,6 +311,15 @@ class TestabilityRestController {
     return testabilitySettings.setWikidataService(setWikidataService.wikidataServiceUrl);
   }
 
+  static class SetOpenAiService {
+    public String openAiServiceUrl;
+  }
+
+  @PostMapping(value = "/use_openai_service")
+  public String useOpenAiService(@RequestBody SetOpenAiService setOpenAiService) {
+    return testabilitySettings.setOpenAiService(setOpenAiService.openAiServiceUrl);
+  }
+
   static class Randomization {
     public String choose;
   }

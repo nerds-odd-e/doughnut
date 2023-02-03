@@ -112,6 +112,7 @@ declare namespace Cypress {
     unsubscribeFromNotebook(noteTitle: string): Chainable<any>
     updateCurrentUserSettingsWith(hash: Record<string, string>): Chainable<Subject>
     wikidataService(): Chainable<any>
+    openAiService(): Chainable<any>
     withinMindmap(): Chainable<any>
     yesIRemember(): Chainable<any>
   }
