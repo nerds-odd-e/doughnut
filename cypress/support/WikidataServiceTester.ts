@@ -12,7 +12,6 @@ class WikidataServiceTester {
   onGoingStubbing?: Promise<void>
 
   restore(cy: Cypress.cy & CyEventEmitter) {
-    cy.get("@savedWikidataServiceUrl")
     cy.get(`@${this.savedServiceUrlName}`).then((saved) =>
       this.setWikidataServiceUrl(cy, saved as unknown as string),
     )

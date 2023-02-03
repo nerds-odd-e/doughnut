@@ -21,7 +21,6 @@ public class TestabilitySettings {
   @Getter private boolean featureToggleEnabled = false;
 
   @Getter private String wikidataServiceUrl = "https://www.wikidata.org";
-  @Getter private String openAiServiceUrl = "https://api.openai.com/";
 
   public void timeTravelTo(Timestamp timestamp) {
     this.timestamp = timestamp;
@@ -65,12 +64,6 @@ public class TestabilitySettings {
   public String setWikidataService(String wikidataServiceUrl) {
     String saved = this.wikidataServiceUrl;
     this.wikidataServiceUrl = wikidataServiceUrl;
-    return saved;
-  }
-
-  public String setOpenAiService(String openAiServiceUrl) {
-    String saved = this.openAiServiceUrl;
-    this.openAiServiceUrl = openAiServiceUrl;
     return saved;
   }
 }

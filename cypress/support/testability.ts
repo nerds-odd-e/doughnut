@@ -127,10 +127,6 @@ Cypress.Commands.add("wikidataService", () => {
   cy.get("@WikidataServiceTester")
 })
 
-Cypress.Commands.add("openAiService", () => {
-  cy.get("@OpenAiServiceTester")
-})
-
 Cypress.Commands.add(
   "mock",
   { prevSubject: true },
