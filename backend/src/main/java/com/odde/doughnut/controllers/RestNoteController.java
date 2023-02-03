@@ -56,7 +56,8 @@ class RestNoteController {
       throws BindException, UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
     WikidataIdWithApi wikidataIdWithApi =
-        associateToWikidata(note, wikidataAssociationCreation.wikidataId);
+        getWikidataService(httpClientAdapter, testabilitySettings)
+            .associateToWikidata(note, wikidataAssociationCreation.wikidataId, modelFactoryService);
     wikidataIdWithApi.extractWikidataInfoToNote(note);
     modelFactoryService.noteRepository.save(note);
     return new NoteViewer(currentUser.getEntity(), note).toJsonObject();
@@ -73,7 +74,9 @@ class RestNoteController {
     User user = currentUser.getEntity();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     Note note = parentNote.buildChildNote(user, currentUTCTimestamp, noteCreation.textContent);
-    WikidataIdWithApi wikidataIdWithApi = associateToWikidata(note, noteCreation.wikidataId);
+    WikidataService wikidataService = getWikidataService(httpClientAdapter, testabilitySettings);
+    WikidataIdWithApi wikidataIdWithApi =
+        wikidataService.associateToWikidata(note, noteCreation.wikidataId, modelFactoryService);
     wikidataIdWithApi.extractWikidataInfoToNote(note);
     note.buildLinkToParent(user, noteCreation.getLinkTypeToParent(), currentUTCTimestamp);
     modelFactoryService.noteRepository.save(note);
@@ -122,13 +125,6 @@ class RestNoteController {
 
   private Optional<Note> findExistingNoteInNotebook(Notebook notebook, String title) {
     return notebook.getNotes().stream().filter(x -> x.getTitle().equals(title)).findFirst();
-  }
-
-  @SneakyThrows
-  private WikidataIdWithApi associateToWikidata(Note note, String wikidataId) {
-    note.setWikidataId(wikidataId);
-    modelFactoryService.toNoteModel(note).checkDuplicateWikidataId();
-    return getWikidataService().wrapWikidataIdWithApi(wikidataId);
   }
 
   @GetMapping("/{note}")
@@ -222,7 +218,8 @@ class RestNoteController {
     return new RedirectToNoteResponse(note.getId());
   }
 
-  private WikidataService getWikidataService() {
+  public WikidataService getWikidataService(
+      HttpClientAdapter httpClientAdapter, TestabilitySettings testabilitySettings) {
     return new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
   }
 }
