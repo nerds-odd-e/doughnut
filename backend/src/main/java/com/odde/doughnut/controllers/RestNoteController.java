@@ -100,7 +100,7 @@ class RestNoteController {
       throws IOException, InterruptedException, UnexpectedNoAccessRightException, BindException {
     Optional<String> author = wikidataIdWithApi.getAuthor();
     if (author.isPresent()) {
-      createNote(authorNote, createNoteWithTitle(author.get()));
+      createNote(authorNote, authorNote.createNoteWithTitle(author.get()));
     }
   }
 
@@ -122,7 +122,7 @@ class RestNoteController {
                 testabilitySettings.getCurrentUTCTimestamp());
         modelFactoryService.linkRepository.save(link);
       } else {
-        createNote(note, createNoteWithTitle(countryOfOrigin));
+        createNote(note, note.createNoteWithTitle(countryOfOrigin));
       }
     }
   }
@@ -136,17 +136,6 @@ class RestNoteController {
     note.setWikidataId(wikidataId);
     modelFactoryService.toNoteModel(note).checkDuplicateWikidataId();
     return getWikidataService().wrapWikidataIdWithApi(wikidataId);
-  }
-
-  @SneakyThrows
-  private NoteCreation createNoteWithTitle(String countryOfOrigin) {
-    NoteCreation noteCreation = new NoteCreation();
-    TextContent textContent = new TextContent();
-    textContent.setTitle(countryOfOrigin);
-    noteCreation.linkTypeToParent = Link.LinkType.RELATED_TO;
-    noteCreation.setTextContent(textContent);
-
-    return noteCreation;
   }
 
   @GetMapping("/{note}")

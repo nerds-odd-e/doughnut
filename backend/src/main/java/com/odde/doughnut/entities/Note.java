@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
+import com.odde.doughnut.entities.json.NoteCreation;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import javax.persistence.*;
 import javax.validation.Valid;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import org.apache.logging.log4j.util.Strings;
 import org.hibernate.annotations.Where;
 import org.hibernate.annotations.WhereJoinTable;
@@ -69,6 +71,17 @@ public class Note extends Thingy {
   @Getter
   @JsonIgnore
   private Timestamp deletedAt;
+
+  @SneakyThrows
+  public NoteCreation createNoteWithTitle(String countryOfOrigin) {
+    NoteCreation noteCreation = new NoteCreation();
+    TextContent textContent = new TextContent();
+    textContent.setTitle(countryOfOrigin);
+    noteCreation.linkTypeToParent = Link.LinkType.RELATED_TO;
+    noteCreation.setTextContent(textContent);
+
+    return noteCreation;
+  }
 
   public void buildLocation(Coordinate coordinate) {
     NoteLocation noteLocation = new NoteLocation();
