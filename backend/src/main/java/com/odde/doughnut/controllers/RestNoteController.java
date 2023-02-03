@@ -74,10 +74,9 @@ class RestNoteController {
     User user = currentUser.getEntity();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     Note note = parentNote.buildChildNote(user, currentUTCTimestamp, noteCreation.textContent);
-    WikidataService wikidataService = getWikidataService(httpClientAdapter, testabilitySettings);
     WikidataIdWithApi wikidataIdWithApi =
-        wikidataService.associateToWikidata(note, noteCreation.wikidataId, modelFactoryService);
-    wikidataIdWithApi.extractWikidataInfoToNote(note);
+        getWikidataService(httpClientAdapter, testabilitySettings)
+            .associateToWikiDataAndExtractInfoToNote(noteCreation, note, modelFactoryService);
     note.buildLinkToParent(user, noteCreation.getLinkTypeToParent(), currentUTCTimestamp);
     modelFactoryService.noteRepository.save(note);
 
