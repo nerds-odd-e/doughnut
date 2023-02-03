@@ -19,8 +19,10 @@ Feature: Notebook creation
     When I create a notebook with empty title
     Then I should see that the note creation is not successful
 
+  @usingMockedWikidataService
   Scenario Outline: Create a new book note with author note not exists in notebook
     Given Wikidata.org has an entity "<wikidataId>" with title "<book name>"
+    And Wikidata.org has an entity "<author wikidataId>" with title "<author name>"
     And the Wikidata.org entity "<wikidataId>" is written by "<author name>" with "<author wikidataId>"
     And there are some notes for the current user
       | title            |

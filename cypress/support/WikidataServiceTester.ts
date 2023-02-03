@@ -63,7 +63,7 @@ class WikidataServiceTester {
 
   async stubWikidataEntityBook(wikidataId: string, authorWikidataId: string) {
     return await this.stubWikidataEntity(wikidataId, [
-      { claimId: "P50", type: "author", value: { id: authorWikidataId } },
+      { claimId: "P50", type: "wikibase-entityid", value: { id: authorWikidataId } },
     ])
   }
 

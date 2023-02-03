@@ -11,7 +11,7 @@ public class WikidataDatavalue {
   private void assertType(String expectedType) {
     if (expectedType.compareToIgnoreCase(type) != 0) {
       throw new RuntimeException(
-          "Unsupported wikidata value type: " + type + ", expected " + expectedType);
+          "Unexpected wikidata value type: " + type + ", expected " + expectedType);
     }
   }
 
