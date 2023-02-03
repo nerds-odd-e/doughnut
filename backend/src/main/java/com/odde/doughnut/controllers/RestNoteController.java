@@ -110,10 +110,6 @@ class RestNoteController {
     }
   }
 
-  private Optional<Note> findExistingNoteInNotebook(Notebook notebook, String title) {
-    return notebook.getNotes().stream().filter(x -> x.getTitle().equals(title)).findFirst();
-  }
-
   @GetMapping("/{note}")
   public NoteRealmWithPosition show(@PathVariable("note") Note note)
       throws UnexpectedNoAccessRightException {
