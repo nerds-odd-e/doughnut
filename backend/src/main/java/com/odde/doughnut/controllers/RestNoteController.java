@@ -84,7 +84,6 @@ class RestNoteController {
 
     generateDescriptionForEmptyNote(noteCreation, note);
 
-    modelFactoryService.noteRepository.save(note);
     return NoteRealmWithPosition.fromNote(note, user);
   }
 
