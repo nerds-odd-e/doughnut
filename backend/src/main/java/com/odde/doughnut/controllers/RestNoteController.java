@@ -93,7 +93,7 @@ class RestNoteController {
     if (subNoteTitleOption.isPresent()) {
       String subNoteTitle = subNoteTitleOption.get();
       Optional<Note> existingNoteOption =
-          findExistingNoteInNotebook(parentNote.getNotebook(), subNoteTitle);
+          parentNote.getNotebook().findExistingNoteInNotebook(subNoteTitle);
       if (existingNoteOption.isPresent()) {
         Note existingNote = existingNoteOption.get();
         Link link =
@@ -120,10 +120,6 @@ class RestNoteController {
       User user, Note personNote, WikidataIdWithApi wikidataIdWithApi)
       throws IOException, InterruptedException, UnexpectedNoAccessRightException, BindException {
     createSubNote(user, personNote, wikidataIdWithApi.getCountryOfOrigin());
-  }
-
-  private Optional<Note> findExistingNoteInNotebook(Notebook notebook, String title) {
-    return notebook.getNotes().stream().filter(x -> x.getTitle().equals(title)).findFirst();
   }
 
   @GetMapping("/{note}")
