@@ -99,7 +99,7 @@ class RestNoteController {
   private void createAuthorNoteForBook(
       Note bookNote, Note authorNote, WikidataIdWithApi wikidataIdWithApi)
       throws IOException, InterruptedException, UnexpectedNoAccessRightException, BindException {
-    Optional<String> author = wikidataIdWithApi.getAuthor(bookNote);
+    Optional<String> author = wikidataIdWithApi.getAuthor();
     if (author.isPresent()) {
       createNote(authorNote, createNoteWithTitle(author.get()));
     }
