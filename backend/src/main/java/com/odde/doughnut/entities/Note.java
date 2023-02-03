@@ -74,10 +74,10 @@ public class Note extends Thingy {
   private Timestamp deletedAt;
 
   @SneakyThrows
-  public NoteCreation createNoteWithTitle(String countryOfOrigin) {
+  public NoteCreation createNoteWithTitle(String title) {
     NoteCreation noteCreation = new NoteCreation();
     TextContent textContent = new TextContent();
-    textContent.setTitle(countryOfOrigin);
+    textContent.setTitle(title);
     noteCreation.linkTypeToParent = Link.LinkType.RELATED_TO;
     noteCreation.setTextContent(textContent);
 
