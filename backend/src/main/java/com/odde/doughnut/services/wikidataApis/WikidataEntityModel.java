@@ -44,7 +44,7 @@ public class WikidataEntityModel extends WikidataEntityModelOfProperties {
   }
 
   public Optional<String> getAuthor(WikidataApi wikidataApi) {
-      return getAuthor()
-          .flatMap(wikidataId1 -> wikidataId1.withApi(wikidataApi).fetchEnglishTitleFromApi());
-    }
+    return getAuthor()
+        .flatMap(wikidataId1 -> wikidataId1.withApi(wikidataApi).fetchEnglishTitleFromApi());
+  }
 }
