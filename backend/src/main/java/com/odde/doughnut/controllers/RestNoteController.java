@@ -82,17 +82,9 @@ class RestNoteController {
 
     createAuthorNoteForBook(parentNote, note, wikidataIdWithApi);
 
-    generateDescriptionForEmptyNote(noteCreation, note);
+    note.generateDescriptionForEmptyNote(noteCreation, openAiWrapperService);
 
     return NoteRealmWithPosition.fromNote(note, user);
-  }
-
-  private void generateDescriptionForEmptyNote(NoteCreation noteCreation, Note note) {
-    String currentDescription = note.getTextContent().getDescription();
-    if (currentDescription == null || currentDescription.isEmpty()) {
-      String description = openAiWrapperService.getDescription(noteCreation.textContent.getTitle());
-      note.getTextContent().setDescription(description);
-    }
   }
 
   private void createAuthorNoteForBook(
