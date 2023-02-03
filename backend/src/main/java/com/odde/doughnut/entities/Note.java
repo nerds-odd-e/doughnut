@@ -9,6 +9,7 @@ import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.entities.json.NoteCreation;
 import com.odde.doughnut.services.OpenAiWrapperService;
+import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import lombok.SneakyThrows;
 import org.apache.logging.log4j.util.Strings;
 import org.hibernate.annotations.Where;
 import org.hibernate.annotations.WhereJoinTable;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.lang.Nullable;
 import org.thymeleaf.util.StringUtils;
@@ -387,5 +389,19 @@ public class Note extends Thingy {
       String description = openAiWrapperService.getDescription(noteCreation.textContent.getTitle());
       getTextContent().setDescription(description);
     }
+  }
+
+  @NotNull
+  public Link getLink(
+      User user, Optional<Note> existingNoteOption, TestabilitySettings testabilitySettings) {
+    Note existingNote = existingNoteOption.get();
+    Link link =
+        Link.createLink(
+            this,
+            existingNote,
+            user,
+            Link.LinkType.RELATED_TO,
+            testabilitySettings.getCurrentUTCTimestamp());
+    return link;
   }
 }

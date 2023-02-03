@@ -95,14 +95,7 @@ class RestNoteController {
       Optional<Note> existingNoteOption =
           parentNote.getNotebook().findExistingNoteInNotebook(subNoteTitle);
       if (existingNoteOption.isPresent()) {
-        Note existingNote = existingNoteOption.get();
-        Link link =
-            Link.createLink(
-                parentNote,
-                existingNote,
-                user,
-                Link.LinkType.RELATED_TO,
-                testabilitySettings.getCurrentUTCTimestamp());
+        Link link = parentNote.getLink(user, existingNoteOption, testabilitySettings);
         modelFactoryService.linkRepository.save(link);
       } else {
         createNote(parentNote, parentNote.createNoteWithTitle(subNoteTitle));
