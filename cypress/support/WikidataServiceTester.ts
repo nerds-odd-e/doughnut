@@ -11,12 +11,15 @@ import TestabilityHelper from "./TestabilityHelper"
 class MountebankWrapper {
   mountebank = new Mountebank()
 
-  private async createImposter(imposter: Imposter): Promise<void> {
+  private async tryDeleteImposter(port: number): Promise<void> {
     try {
       // just try to delete in case an imposter is there
-      await this.mountebank.deleteImposter(imposter.port)
+      await this.mountebank.deleteImposter(port)
     } catch (error) {} // eslint-disable-line
+  }
 
+  public async createImposter(imposter: Imposter): Promise<void> {
+    this.tryDeleteImposter(imposter.port)
     const response = await request
       .post(`${this.mountebank.mountebankUrl}/imposters`)
       .send(JSON.stringify(imposter))
@@ -24,21 +27,32 @@ class MountebankWrapper {
     if (response.statusCode != 201)
       throw new Error(`Problem creating imposter: ${JSON.stringify(response?.error)}`)
   }
+
+  public async addStubToImposter(imposter: Imposter, stub: Stub): Promise<void> {
+    const response = await request
+      .post(`${this.mountebank.mountebankUrl}/imposters/${imposter.port}/stubs`)
+      .send(JSON.stringify({ stub }))
+
+    if (response.statusCode != 200)
+      throw new Error(`Problem adding stub to imposter: ${JSON.stringify(response?.error)}`)
+  }
 }
 
 class WikidataServiceTester {
   imposter = new Imposter().withPort(5001)
   onGoingStubbing?: Promise<void>
 
+  mock(cy: Cypress.cy & CyEventEmitter) {
+    new MountebankWrapper().createImposter(this.imposter)
+    this.setWikidataServiceUrl(cy, `http://localhost:${this.imposter.port}`).as(
+      this.savedServiceUrlName,
+    )
+  }
+
   restore(cy: Cypress.cy & CyEventEmitter) {
     cy.get("@savedWikidataServiceUrl")
     cy.get(`@${this.savedServiceUrlName}`).then((saved) =>
       this.setWikidataServiceUrl(cy, saved as unknown as string),
-    )
-  }
-  mock(cy: Cypress.cy & CyEventEmitter) {
-    this.setWikidataServiceUrl(cy, `http://localhost:${this.imposter.port}`).as(
-      this.savedServiceUrlName,
     )
   }
 
@@ -137,14 +151,7 @@ class WikidataServiceTester {
   // But we have to wait until the previous stubs are done.
   // Alternatively, we can combine all stubs in one step, or have an additional step.
   private async stub(stub: Stub) {
-    this.imposter.withStub(stub)
-    if (this.onGoingStubbing) {
-      this.onGoingStubbing = this.onGoingStubbing.then(() =>
-        new MountebankWrapper().createImposter(this.imposter),
-      )
-      return
-    }
-    this.onGoingStubbing = new MountebankWrapper().createImposter(this.imposter)
+    new MountebankWrapper().addStubToImposter(this.imposter, stub)
   }
 }
 
