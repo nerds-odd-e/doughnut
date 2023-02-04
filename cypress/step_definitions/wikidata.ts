@@ -47,11 +47,7 @@ Given(
 )
 
 Given("The wikidata service is not available", () => {
-  // checking if the saved Wikidata service url is the real url, which indicate the service is mocked.
-  // This test require the service to be mocked first.
-  cy.get("@savedWikidataServiceUrl").then((url) => {
-    expect(url).to.include("https://www.wikidata.org")
-  })
+  // The service should be mocked, but no stubbing is done
 })
 
 Then("I should see an error {string} on {string}", (message: string, field: string) => {

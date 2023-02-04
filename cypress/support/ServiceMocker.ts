@@ -31,7 +31,9 @@ class ServiceMocker {
 
   private setWikidataServiceUrl(cy: Cypress.cy & CyEventEmitter, wikidataServiceUrl: string) {
     return new TestabilityHelper()
-      .postToTestabilityApi(cy, `use_wikidata_service`, { body: { wikidataServiceUrl } })
+      .postToTestabilityApi(cy, `replace_service_url`, {
+        body: { [this.serviceName]: wikidataServiceUrl },
+      })
       .then((response) => {
         expect(response.body).to.include("http")
         cy.wrap(response.body)
