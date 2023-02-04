@@ -27,7 +27,7 @@ spring:
     repo: nerds-odd-e/doughnut_sandbox
     token: ${GITHUB_FOR_ISSUES_API_TOKEN:-token_not_set}
   openai:
-    token: ${OPENAI_API_TOKEN}
+    token: ${OPENAI_API_TOKEN:-token_not_set}
 server:
   forward-headers-strategy: FRAMEWORK
   port: 8081
