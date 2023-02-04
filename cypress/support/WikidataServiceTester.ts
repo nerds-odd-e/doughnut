@@ -10,16 +10,22 @@ import TestabilityHelper from "./TestabilityHelper"
 
 class MountebankWrapper {
   mountebank = new Mountebank()
+  port: number
 
-  private async tryDeleteImposter(port: number): Promise<void> {
+  constructor(port: number) {
+    this.port = port
+  }
+
+  private async tryDeleteImposter(): Promise<void> {
     try {
       // just try to delete in case an imposter is there
-      await this.mountebank.deleteImposter(port)
+      await this.mountebank.deleteImposter(this.port)
     } catch (error) {} // eslint-disable-line
   }
 
-  public async createImposter(imposter: Imposter): Promise<void> {
-    this.tryDeleteImposter(imposter.port)
+  public async createImposter(): Promise<void> {
+    const imposter = new Imposter().withPort(this.port)
+    this.tryDeleteImposter()
     const response = await request
       .post(`${this.mountebank.mountebankUrl}/imposters`)
       .send(JSON.stringify(imposter))
@@ -28,9 +34,9 @@ class MountebankWrapper {
       throw new Error(`Problem creating imposter: ${JSON.stringify(response?.error)}`)
   }
 
-  public async addStubToImposter(imposter: Imposter, stub: Stub): Promise<void> {
+  public async addStubToImposter(stub: Stub): Promise<void> {
     const response = await request
-      .post(`${this.mountebank.mountebankUrl}/imposters/${imposter.port}/stubs`)
+      .post(`${this.mountebank.mountebankUrl}/imposters/${this.port}/stubs`)
       .send(JSON.stringify({ stub }))
 
     if (response.statusCode != 200)
@@ -39,14 +45,12 @@ class MountebankWrapper {
 }
 
 class WikidataServiceTester {
-  imposter = new Imposter().withPort(5001)
-  mountebank = new MountebankWrapper()
+  port = 5001
+  mountebank = new MountebankWrapper(this.port)
 
   mock(cy: Cypress.cy & CyEventEmitter) {
-    this.mountebank.createImposter(this.imposter)
-    this.setWikidataServiceUrl(cy, `http://localhost:${this.imposter.port}`).as(
-      this.savedServiceUrlName,
-    )
+    this.mountebank.createImposter()
+    this.setWikidataServiceUrl(cy, `http://localhost:${this.port}`).as(this.savedServiceUrlName)
   }
 
   restore(cy: Cypress.cy & CyEventEmitter) {
@@ -151,7 +155,7 @@ class WikidataServiceTester {
   // But we have to wait until the previous stubs are done.
   // Alternatively, we can combine all stubs in one step, or have an additional step.
   private async stub(stub: Stub) {
-    this.mountebank.addStubToImposter(this.imposter, stub)
+    this.mountebank.addStubToImposter(stub)
   }
 }
 
