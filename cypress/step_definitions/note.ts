@@ -171,12 +171,6 @@ When("I create a sibling note of {string}:", (noteTitle: string, data: DataTable
   cy.submitNoteCreationFormSuccessfully(data.hashes()[0])
 })
 
-When("I should see non-empty description for {string}", (noteTitle: string) => {
-  cy.findByText(noteTitle).click()
-  cy.pageIsNotLoading()
-  cy.get("[role=description] *").invoke("text").should("not.be.empty")
-})
-
 When("I should see that the note creation is not successful", () => {
   cy.expectFieldErrorMessage("size must be between 1 and 100", "Title")
 })

@@ -49,17 +49,3 @@ Feature: Nested Note CRUD
     And I should see these notes belonging to the user at the top level of all my notes
       | title     | description       |
       | Odd-e CSD | Our best training |
-
-  @ignore
-  Scenario: Create new note should auto-generate description from OpenAi
-    Given that OpenAI thinks that "Animals" means "Sharing the same planet as humans"
-    When I create a note belonging to "LeSS in Action":
-      | Title  | Description |
-      | Animal |             |
-    Then I should see "My Notes/LeSS in Action" with these children
-      | note-title |
-      | Animal     |
-      | team       |
-      | tech       |
-    And I should see non-empty description for "Animal"
-
