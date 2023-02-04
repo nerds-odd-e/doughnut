@@ -38,6 +38,22 @@ class ServiceMocker {
         cy.wrap(response.body)
       })
   }
+
+  public stubByUrl(url: string, data: unknown) {
+    return this.stub(new DefaultStub(url, HttpMethod.GET, data, 200))
+  }
+
+  public stubGetter(path: string, queryData: unknown, data: unknown) {
+    return this.stub(
+      new DefaultStub(path, HttpMethod.GET, data, 200).withPredicate(
+        new FlexiPredicate().withPath(path).withQuery(queryData).withMethod(HttpMethod.GET),
+      ),
+    )
+  }
+
+  private async stub(stub: Stub) {
+    this.mountebank.addStubToImposter(stub)
+  }
 }
 
 class WikidataServiceTester {
@@ -54,7 +70,7 @@ class WikidataServiceTester {
 
   async stubWikidataEntityQuery(wikidataId: string, wikidataTitle: string, wikipediaLink: string) {
     const wikipedia = wikipediaLink ? { enwiki: { site: "enwiki", url: wikipediaLink } } : {}
-    return await this.stubByUrl(`/wiki/Special:EntityData/${wikidataId}.json`, {
+    return await this.serviceMocker.stubByUrl(`/wiki/Special:EntityData/${wikidataId}.json`, {
       entities: {
         [wikidataId]: {
           labels: {
@@ -114,28 +130,8 @@ class WikidataServiceTester {
     )
   }
 
-  private stubByUrl(url: string, data: unknown) {
-    return this.stub(new DefaultStub(url, HttpMethod.GET, data, 200))
-  }
-
   private stubWikidataApi(action: string, query: Record<string, string>, data: unknown) {
-    const path = `/w/api.php`
-    return this.stub(
-      new DefaultStub(path, HttpMethod.GET, data, 200).withPredicate(
-        new FlexiPredicate()
-          .withPath(path)
-          .withQuery({ action, ...query })
-          .withMethod(HttpMethod.GET),
-      ),
-    )
-  }
-
-  // each stub step in Gherkin will call mountebank API again,
-  // however only the last step will take affect.
-  // But we have to wait until the previous stubs are done.
-  // Alternatively, we can combine all stubs in one step, or have an additional step.
-  private async stub(stub: Stub) {
-    this.mountebank.addStubToImposter(stub)
+    return this.serviceMocker.stubGetter(`/w/api.php`, { action, ...query }, data)
   }
 }
 
