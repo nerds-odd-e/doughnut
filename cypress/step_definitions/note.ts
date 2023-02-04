@@ -53,15 +53,6 @@ Given(
   },
 )
 
-Given(
-  "I am prompted with a suggested description {string} for {string}",
-  (description: string, noteTitle: string) => {
-    cy.jumpToNotePage(noteTitle)
-    cy.findByRole("button", { name: "Suggest" }).click()
-    cy.replaceSuggestedDescriptionTextArea(description)
-  },
-)
-
 When("I create notebooks with:", (notes: DataTable) => {
   notes.hashes().forEach((noteAttributes) => {
     cy.createNotebookWith(noteAttributes)
@@ -409,10 +400,12 @@ Then(
 )
 
 When("I ask for a description suggestion for {string}", (noteTitle: string) => {
-  cy.log(noteTitle)
+  cy.jumpToNotePage(noteTitle)
+  cy.findByRole("button", { name: "Suggest" }).click()
+  cy.replaceSuggestedDescriptionTextArea("Sharing the same planet as humans")
 })
 
-Then("I will be prompted with a suggested description {string}", (description: string) => {
+Then("I should be prompted with a suggested description {string}", (description: string) => {
   cy.log(description)
 })
 
