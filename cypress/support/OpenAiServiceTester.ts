@@ -22,7 +22,7 @@ class OpenAiServiceTester {
   }
 
   get savedServiceUrlName() {
-    return "savedOpenAiServiceUrl"
+    return "OpenAiServiceTester"
   }
   private setOpenAiServiceUrl(cy: Cypress.cy & CyEventEmitter, openAiServiceUrl: string) {
     return new TestabilityHelper()

@@ -9,14 +9,11 @@ Feature: Suggest description
       | Animals  | Are living beings   |               |
     And that OpenAI thinks that "Animals" means "Sharing the same planet as humans"
 
-  Scenario: Ask for suggested description
-    When I ask for a description suggestion for "Animals"
-    Then I should be prompted with a suggested description "Sharing the same planet as humans"
-
+#  @usingMockedOpenAiService
   Scenario Outline: Perform action with suggested note description
     When I ask for a description suggestion for "Animals"
     Then I should be prompted with a suggested description "Sharing the same planet as humans"
-    Then I expect that "<field>" will be "<value>" when I "<action>" the suggested description
+    And I expect that "<field>" will be "<value>" when I "<action>" the suggested description
     Examples:
       | action | field        | value                             |
       | use    | description  | Sharing the same planet as humans |
