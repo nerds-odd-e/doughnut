@@ -1,7 +1,7 @@
 import { Stub } from "@anev/ts-mountebank"
 /// <reference types="cypress" />
 
-// import request from "superagent"
+import request from "superagent"
 import { Mountebank, Imposter, DefaultStub, HttpMethod, FlexiPredicate } from "@anev/ts-mountebank"
 import WikidataEntitiesBuilder, { Claim } from "./json/WikidataEntitiesBuilder"
 import TestabilityHelper from "./TestabilityHelper"
@@ -9,8 +9,20 @@ import TestabilityHelper from "./TestabilityHelper"
 // @ts-check
 
 class MountebankWrapper {
-  async createImposter(imposter: Imposter) {
-    return new Mountebank().createImposter(imposter)
+  mountebank = new Mountebank()
+
+  private async createImposter(imposter: Imposter): Promise<void> {
+    try {
+      // just try to delete in case an imposter is there
+      await this.mountebank.deleteImposter(imposter.port)
+    } catch (error) {} // eslint-disable-line
+
+    const response = await request
+      .post(`${this.mountebank.mountebankUrl}/imposters`)
+      .send(JSON.stringify(imposter))
+
+    if (response.statusCode != 201)
+      throw new Error(`Problem creating imposter: ${JSON.stringify(response?.error)}`)
   }
 }
 
