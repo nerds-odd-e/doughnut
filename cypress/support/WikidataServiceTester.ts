@@ -6,8 +6,14 @@ import WikidataEntitiesBuilder, { Claim } from "./json/WikidataEntitiesBuilder"
 import TestabilityHelper from "./TestabilityHelper"
 import MountebankWrapper from "./MountebankWrapper"
 
-class WikidataServiceTester {
-  mountebank = new MountebankWrapper(5001)
+class ServiceMocker {
+  mountebank
+  serviceName
+
+  constructor(port: number, serviceName: string) {
+    this.mountebank = new MountebankWrapper(port)
+    this.serviceName = serviceName
+  }
 
   mock(cy: Cypress.cy & CyEventEmitter) {
     this.mountebank.createImposter()
@@ -15,10 +21,35 @@ class WikidataServiceTester {
   }
 
   restore(cy: Cypress.cy & CyEventEmitter) {
-    cy.get("@savedWikidataServiceUrl")
     cy.get(`@${this.savedServiceUrlName}`).then((saved) =>
       this.setWikidataServiceUrl(cy, saved as unknown as string),
     )
+  }
+
+  get savedServiceUrlName() {
+    return `saved${this.serviceName}Url`
+  }
+
+  private setWikidataServiceUrl(cy: Cypress.cy & CyEventEmitter, wikidataServiceUrl: string) {
+    return new TestabilityHelper()
+      .postToTestabilityApi(cy, `use_wikidata_service`, { body: { wikidataServiceUrl } })
+      .then((response) => {
+        expect(response.body).to.include("http")
+        cy.wrap(response.body)
+      })
+  }
+}
+
+class WikidataServiceTester {
+  serviceMocker = new ServiceMocker(5001, "wikidataService")
+  mountebank = new MountebankWrapper(5001)
+
+  mock(cy: Cypress.cy & CyEventEmitter) {
+    this.serviceMocker.mock(cy)
+  }
+
+  restore(cy: Cypress.cy & CyEventEmitter) {
+    this.serviceMocker.restore(cy)
   }
 
   async stubWikidataEntityQuery(wikidataId: string, wikidataTitle: string, wikipediaLink: string) {
@@ -81,18 +112,6 @@ class WikidataServiceTester {
         ],
       },
     )
-  }
-
-  get savedServiceUrlName() {
-    return "savedWikidataServiceUrl"
-  }
-  private setWikidataServiceUrl(cy: Cypress.cy & CyEventEmitter, wikidataServiceUrl: string) {
-    return new TestabilityHelper()
-      .postToTestabilityApi(cy, `use_wikidata_service`, { body: { wikidataServiceUrl } })
-      .then((response) => {
-        expect(response.body).to.include("http")
-        cy.wrap(response.body)
-      })
   }
 
   private stubByUrl(url: string, data: unknown) {
