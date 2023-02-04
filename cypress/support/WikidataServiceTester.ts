@@ -40,10 +40,10 @@ class MountebankWrapper {
 
 class WikidataServiceTester {
   imposter = new Imposter().withPort(5001)
-  onGoingStubbing?: Promise<void>
+  mountebank = new MountebankWrapper()
 
   mock(cy: Cypress.cy & CyEventEmitter) {
-    new MountebankWrapper().createImposter(this.imposter)
+    this.mountebank.createImposter(this.imposter)
     this.setWikidataServiceUrl(cy, `http://localhost:${this.imposter.port}`).as(
       this.savedServiceUrlName,
     )
@@ -151,7 +151,7 @@ class WikidataServiceTester {
   // But we have to wait until the previous stubs are done.
   // Alternatively, we can combine all stubs in one step, or have an additional step.
   private async stub(stub: Stub) {
-    new MountebankWrapper().addStubToImposter(this.imposter, stub)
+    this.mountebank.addStubToImposter(this.imposter, stub)
   }
 }
 
