@@ -1,11 +1,18 @@
 import { Stub } from "@anev/ts-mountebank"
 /// <reference types="cypress" />
 
+// import request from "superagent"
 import { Mountebank, Imposter, DefaultStub, HttpMethod, FlexiPredicate } from "@anev/ts-mountebank"
 import WikidataEntitiesBuilder, { Claim } from "./json/WikidataEntitiesBuilder"
 import TestabilityHelper from "./TestabilityHelper"
 
 // @ts-check
+
+class MountebankWrapper {
+  async createImposter(imposter: Imposter) {
+    return new Mountebank().createImposter(imposter)
+  }
+}
 
 class WikidataServiceTester {
   imposter = new Imposter().withPort(5001)
@@ -119,14 +126,13 @@ class WikidataServiceTester {
   // Alternatively, we can combine all stubs in one step, or have an additional step.
   private async stub(stub: Stub) {
     this.imposter.withStub(stub)
-
     if (this.onGoingStubbing) {
       this.onGoingStubbing = this.onGoingStubbing.then(() =>
-        new Mountebank().createImposter(this.imposter),
+        new MountebankWrapper().createImposter(this.imposter),
       )
       return
     }
-    this.onGoingStubbing = new Mountebank().createImposter(this.imposter)
+    this.onGoingStubbing = new MountebankWrapper().createImposter(this.imposter)
   }
 }
 
