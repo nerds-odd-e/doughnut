@@ -83,8 +83,6 @@ Cypress.Commands.add("selectViewOfNote", (noteTitle: string, viewType: string) =
 
 Cypress.Commands.add("submitNoteCreationFormSuccessfully", (noteAttributes) => {
   cy.submitNoteCreationFormWith(noteAttributes)
-  // eslint-disable-next-line cypress/no-unnecessary-waiting
-  cy.wait(3000)
   cy.dialogDisappeared()
 })
 
