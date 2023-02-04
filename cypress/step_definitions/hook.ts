@@ -5,12 +5,10 @@
 
 import { Before, After } from "@badeball/cypress-cucumber-preprocessor"
 import TestabilityHelper from "../support/TestabilityHelper"
-import WikidataServiceTester from "../support/WikidataServiceTester"
 
 Before(() => {
   cy.testability().cleanDBAndResetTestabilitySettings()
   cy.wrap("no").as("firstVisited")
-  cy.wrap(new WikidataServiceTester()).as("WikidataServiceTester")
 })
 
 After(() => {

@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 // @ts-check
 import WikidataServiceTester from "./WikidataServiceTester"
+import OpenAiServiceTester from "./OpenAiServiceTester"
 import TestabilityHelper from "./TestabilityHelper"
 
 Cypress.Commands.add("testability", () => {
@@ -124,11 +125,11 @@ Cypress.Commands.add(
 )
 
 Cypress.Commands.add("wikidataService", () => {
-  cy.get("@WikidataServiceTester")
+  cy.wrap(new WikidataServiceTester())
 })
 
 Cypress.Commands.add("openAiService", () => {
-  cy.get("@OpenAiServiceTester")
+  cy.wrap(new OpenAiServiceTester())
 })
 
 Cypress.Commands.add(
