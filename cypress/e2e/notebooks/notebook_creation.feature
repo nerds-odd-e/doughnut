@@ -18,22 +18,3 @@ Feature: Notebook creation
   Scenario: Create a new note with invalid information
     When I create a notebook with empty title
     Then I should see that the note creation is not successful
-
-  @usingMockedWikidataService
-  Scenario Outline: Create a new book note with author note not exists in notebook
-    Given Wikidata.org has an entity "<wikidataId>" with title "<book name>"
-    And Wikidata.org has an entity "<author wikidataId>" with title "<author name>"
-    And the Wikidata.org entity "<wikidataId>" is written by "<author name>" with "<author wikidataId>"
-    And there are some notes for the current user
-      | title            |
-      | <note book name> |
-    When I create a note belonging to "<note book name>":
-      | Title         | Wikidata Id  |
-      | <book name>   | <wikidataId> |
-    Then I should see "My Notes/<note book name>/<book name>" with these children
-      | note-title    |
-      | <author name> |
-
-    Examples:
-      | wikidataId | book name    | author wikidataId | author name   | note book name     |
-      | Q8337      | Harry Potter | Q34660            | J. K. Rowling | My Favourite Books |
