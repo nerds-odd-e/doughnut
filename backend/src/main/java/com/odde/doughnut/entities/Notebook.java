@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -63,8 +62,4 @@ public class Notebook {
   @Column(name = "deleted_at")
   @Setter
   private Timestamp deletedAt;
-
-  public Optional<Note> findExistingNoteInNotebook(String wikidataId) {
-    return notes.stream().filter(x -> wikidataId.equals(x.getWikidataId())).findFirst();
-  }
 }

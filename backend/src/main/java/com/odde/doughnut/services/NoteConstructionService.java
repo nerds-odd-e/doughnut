@@ -35,9 +35,12 @@ public record NoteConstructionService(
     Optional<String> optionalTitle = subWikidataIdWithApi.fetchEnglishTitleFromApi();
     optionalTitle.ifPresent(
         subNoteTitle ->
-            parentNote
-                .getNotebook()
-                .findExistingNoteInNotebook(subWikidataIdWithApi.wikidataId())
+            modelFactoryService
+                .noteRepository
+                .noteWithWikidataIdWithinNotebook(
+                    parentNote.getNotebook(), subWikidataIdWithApi.wikidataId())
+                .stream()
+                .findFirst()
                 .ifPresentOrElse(
                     existingNote -> {
                       Link link =

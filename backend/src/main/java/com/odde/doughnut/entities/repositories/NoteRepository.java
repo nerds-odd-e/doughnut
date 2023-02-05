@@ -41,10 +41,11 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   @Query(
       value =
           selectFromNoteJoinTextContent
-              + " WHERE note.notebook_id = :#{#newNote.notebook} "
-              + " AND note.wikidata_id = :#{#newNote.wikidataId} AND note.wikidata_id IS NOT NULL AND note.deleted_at IS NULL ",
+              + " WHERE note.notebook_id = :notebook "
+              + " AND note.wikidata_id = :wikidataId AND note.wikidata_id IS NOT NULL AND note.deleted_at IS NULL ",
       nativeQuery = true)
-  List<Note> duplicateNotesWithinSameNotebook(@Param("newNote") Note newNote);
+  List<Note> noteWithWikidataIdWithinNotebook(
+      @Param("notebook") Notebook notebook, @Param("wikidataId") String wikidataId);
 
   String joinNotebooksBegin =
       selectFromNoteJoinTextContent + "  JOIN (" + "          SELECT notebook.id FROM notebook ";
