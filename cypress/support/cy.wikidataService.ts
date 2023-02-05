@@ -40,6 +40,16 @@ const stubWikidataApi = (
 ) => {
   return serviceMocker.stubGetter(`/w/api.php`, { action, ...query }, data)
 }
+
+const stubWikidataEntity = (serviceMocker: ServiceMocker, wikidataId: string, claims: Claim[]) => {
+  stubWikidataApi(
+    serviceMocker,
+    "wbgetentities",
+    { ids: wikidataId },
+    new WikidataEntitiesBuilder(wikidataId).wclaims(claims).build(),
+  )
+}
+
 Cypress.Commands.add(
   "stubWikidataEntityQuery",
   { prevSubject: true },
@@ -67,19 +77,6 @@ Cypress.Commands.add(
 )
 
 Cypress.Commands.add(
-  "stubWikidataEntity",
-  { prevSubject: true },
-  (wikidataServiceTester: WikidataServiceTester, wikidataId: string, claims: Claim[]) => {
-    stubWikidataApi(
-      wikidataServiceTester.serviceMocker,
-      "wbgetentities",
-      { ids: wikidataId },
-      new WikidataEntitiesBuilder(wikidataId).wclaims(claims).build(),
-    )
-  },
-)
-
-Cypress.Commands.add(
   "stubWikidataEntityLocation",
   { prevSubject: true },
   (
@@ -88,7 +85,7 @@ Cypress.Commands.add(
     latitude: number,
     longitude: number,
   ) => {
-    cy.wrap(wikidataServiceTester).stubWikidataEntity(wikidataId, [
+    stubWikidataEntity(wikidataServiceTester.serviceMocker, wikidataId, [
       { claimId: "P625", type: "globecoordinate", value: { latitude, longitude } },
     ])
   },
@@ -103,7 +100,7 @@ Cypress.Commands.add(
     countryId: string,
     birthday: string,
   ) => {
-    cy.wrap(wikidataServiceTester).stubWikidataEntity(wikidataId, [
+    stubWikidataEntity(wikidataServiceTester.serviceMocker, wikidataId, [
       { claimId: "P31", type: "wikibase-entityid", value: { id: "Q5" } },
       { claimId: "P569", type: "time", value: { time: birthday } },
       { claimId: "P27", type: "wikibase-entityid", value: { id: countryId } },
@@ -115,7 +112,7 @@ Cypress.Commands.add(
   "stubWikidataEntityBook",
   { prevSubject: true },
   (wikidataServiceTester: WikidataServiceTester, wikidataId: string, authorWikidataId: string) => {
-    cy.wrap(wikidataServiceTester).stubWikidataEntity(wikidataId, [
+    stubWikidataEntity(wikidataServiceTester.serviceMocker, wikidataId, [
       { claimId: "P50", type: "wikibase-entityid", value: { id: authorWikidataId } },
     ])
   },
