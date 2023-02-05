@@ -50,8 +50,9 @@ class RestNoteController {
       @RequestBody WikidataAssociationCreation wikidataAssociationCreation)
       throws BindException, UnexpectedNoAccessRightException, IOException, InterruptedException {
     currentUser.assertAuthorization(note);
-    wikidataService.associateToWikidata(
-        note, wikidataAssociationCreation.wikidataId, modelFactoryService);
+    WikidataIdWithApi wikidataIdWithApi =
+        wikidataService.wrapWikidataIdWithApi(wikidataAssociationCreation.wikidataId);
+    wikidataIdWithApi.associateNoteToWikidata(note, modelFactoryService);
     modelFactoryService.noteRepository.save(note);
     return new NoteViewer(currentUser.getEntity(), note).toJsonObject();
   }
@@ -76,6 +77,22 @@ class RestNoteController {
     return NoteRealmWithPosition.fromNote(note, user);
   }
 
+  record NoteConstructionService(
+      Timestamp currentUTCTimestamp,
+      WikidataIdWithApi wikidataIdWithApi,
+      ModelFactoryService modelFactoryService) {
+
+    private Note createNoteWithWikidataInfo(
+        Note parentNote, User user, TextContent textContent, Link.LinkType linkTypeToParent)
+        throws BindException, IOException, InterruptedException {
+      Note note = parentNote.buildChildNote(user, currentUTCTimestamp, textContent);
+      wikidataIdWithApi.associateNoteToWikidata(note, this.modelFactoryService);
+      note.buildLinkToParent(user, linkTypeToParent, currentUTCTimestamp);
+      this.modelFactoryService.noteRepository.save(note);
+      return note;
+    }
+  }
+
   private Note createNoteAndExtractChildrenFromWikidata(
       Note parentNote,
       User user,
@@ -83,12 +100,13 @@ class RestNoteController {
       String wikidataId,
       Link.LinkType linkTypeToParent)
       throws IOException, InterruptedException, BindException, UnexpectedNoAccessRightException {
-    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    Note note = parentNote.buildChildNote(user, currentUTCTimestamp, textContent);
-    WikidataIdWithApi wikidataIdWithApi =
-        wikidataService.associateToWikidata(note, wikidataId, modelFactoryService);
-    note.buildLinkToParent(user, linkTypeToParent, currentUTCTimestamp);
-    modelFactoryService.noteRepository.save(note);
+    WikidataIdWithApi wikidataIdWithApi = wikidataService.wrapWikidataIdWithApi(wikidataId);
+    NoteConstructionService noteConstructionService =
+        new NoteConstructionService(
+            testabilitySettings.getCurrentUTCTimestamp(), wikidataIdWithApi, modelFactoryService);
+    Note note =
+        noteConstructionService.createNoteWithWikidataInfo(
+            parentNote, user, textContent, linkTypeToParent);
 
     createSubNote(user, note, wikidataIdWithApi.getCountryOfOrigin());
     createSubNote(user, note, wikidataIdWithApi.getAuthor());

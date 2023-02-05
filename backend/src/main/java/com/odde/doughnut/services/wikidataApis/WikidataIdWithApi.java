@@ -2,9 +2,11 @@ package com.odde.doughnut.services.wikidataApis;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.WikidataEntityData;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.wikidataApis.thirdPartyEntities.WikidataEntityHash;
 import java.io.IOException;
 import java.util.Optional;
+import org.springframework.validation.BindException;
 
 public record WikidataIdWithApi(String wikidataId, WikidataApi wikidataApi) {
   public Optional<String> fetchEnglishTitleFromApi() {
@@ -38,5 +40,12 @@ public record WikidataIdWithApi(String wikidataId, WikidataApi wikidataApi) {
   public Optional<WikidataIdWithApi> getAuthor() throws IOException, InterruptedException {
     Optional<WikidataEntityModel> model = getWikidataEntityModel();
     return model.flatMap(entity -> entity.getAuthor(wikidataApi));
+  }
+
+  public void associateNoteToWikidata(Note note, ModelFactoryService modelFactoryService)
+      throws BindException, IOException, InterruptedException {
+    note.setWikidataId(this.wikidataId);
+    modelFactoryService.toNoteModel(note).checkDuplicateWikidataId();
+    extractWikidataInfoToNote(note);
   }
 }
