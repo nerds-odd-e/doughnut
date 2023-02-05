@@ -65,19 +65,29 @@ class RestNoteController {
       throws UnexpectedNoAccessRightException, BindException, InterruptedException {
     currentUser.assertAuthorization(parentNote);
     User user = currentUser.getEntity();
-    Note note = createNoteAndExtractChildrenFromWikidata(parentNote, noteCreation, user);
+    Note note =
+        createNoteAndExtractChildrenFromWikidata(
+            parentNote,
+            user,
+            noteCreation.textContent,
+            noteCreation.wikidataId,
+            noteCreation.getLinkTypeToParent());
 
     return NoteRealmWithPosition.fromNote(note, user);
   }
 
   private Note createNoteAndExtractChildrenFromWikidata(
-      Note parentNote, NoteCreation noteCreation, User user)
+      Note parentNote,
+      User user,
+      TextContent textContent,
+      String wikidataId,
+      Link.LinkType linkTypeToParent)
       throws IOException, InterruptedException, BindException, UnexpectedNoAccessRightException {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    Note note = parentNote.buildChildNote(user, currentUTCTimestamp, noteCreation.textContent);
+    Note note = parentNote.buildChildNote(user, currentUTCTimestamp, textContent);
     WikidataIdWithApi wikidataIdWithApi =
-        wikidataService.associateToWikidata(note, noteCreation.wikidataId, modelFactoryService);
-    note.buildLinkToParent(user, noteCreation.getLinkTypeToParent(), currentUTCTimestamp);
+        wikidataService.associateToWikidata(note, wikidataId, modelFactoryService);
+    note.buildLinkToParent(user, linkTypeToParent, currentUTCTimestamp);
     modelFactoryService.noteRepository.save(note);
 
     createSubNote(user, note, wikidataIdWithApi.getCountryOfOrigin());
@@ -95,13 +105,10 @@ class RestNoteController {
         Link link = parentNote.getLink(user, existingNoteOption, testabilitySettings);
         modelFactoryService.linkRepository.save(link);
       } else {
-        NoteCreation noteCreation = new NoteCreation();
         TextContent textContent = new TextContent();
         textContent.setTitle(subNoteTitle);
-        noteCreation.linkTypeToParent = Link.LinkType.RELATED_TO;
-        noteCreation.setTextContent(textContent);
-
-        createNoteAndExtractChildrenFromWikidata(parentNote, noteCreation, user);
+        createNoteAndExtractChildrenFromWikidata(
+            parentNote, user, textContent, null, Link.LinkType.RELATED_TO);
       }
     }
   }
