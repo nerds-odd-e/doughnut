@@ -16,14 +16,6 @@ class WikidataServiceTester extends ServiceTester {
     )
   }
 
-  async stubWikidataEntityPerson(wikidataId: string, countryId: string, birthday: string) {
-    return await this.stubWikidataEntity(wikidataId, [
-      { claimId: "P31", type: "wikibase-entityid", value: { id: "Q5" } },
-      { claimId: "P569", type: "time", value: { time: birthday } },
-      { claimId: "P27", type: "wikibase-entityid", value: { id: countryId } },
-    ])
-  }
-
   async stubWikidataEntityBook(wikidataId: string, authorWikidataId: string) {
     return await this.stubWikidataEntity(wikidataId, [
       { claimId: "P50", type: "wikibase-entityid", value: { id: authorWikidataId } },

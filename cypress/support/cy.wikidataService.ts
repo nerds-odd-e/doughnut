@@ -93,7 +93,11 @@ Cypress.Commands.add(
     countryId: string,
     birthday: string,
   ) => {
-    wikidataServiceTester.stubWikidataEntityPerson(wikidataId, countryId, birthday)
+    cy.wrap(wikidataServiceTester).stubWikidataEntity(wikidataId, [
+      { claimId: "P31", type: "wikibase-entityid", value: { id: "Q5" } },
+      { claimId: "P569", type: "time", value: { time: birthday } },
+      { claimId: "P27", type: "wikibase-entityid", value: { id: countryId } },
+    ])
   },
 )
 
