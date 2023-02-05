@@ -14,9 +14,8 @@ class ServiceMocker {
     this.serviceName = serviceName
   }
 
-  install(cy: Cypress.cy & CyEventEmitter) {
+  install() {
     this.mountebank.createImposter()
-    this.setServiceUrl(cy, this.mountebank.serviceUrl).as(this.savedServiceUrlName)
   }
 
   restore(cy: Cypress.cy & CyEventEmitter) {

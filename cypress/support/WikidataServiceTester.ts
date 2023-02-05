@@ -14,8 +14,12 @@ class WikidataServiceTester {
     return this.serviceMocker.serviceUrl
   }
 
-  mock(cy: Cypress.cy & CyEventEmitter) {
-    this.serviceMocker.install(cy)
+  get savedServiceUrlName() {
+    return `saved${this.serviceName}Url`
+  }
+
+  install() {
+    this.serviceMocker.install()
   }
 
   restore(cy: Cypress.cy & CyEventEmitter) {
