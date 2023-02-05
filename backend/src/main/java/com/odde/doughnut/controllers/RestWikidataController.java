@@ -8,7 +8,6 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Resource;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -16,26 +15,26 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.annotation.SessionScope;
 
 @RestController
+@SessionScope
 @RequestMapping("/api/wikidata")
 public class RestWikidataController {
-  @Resource(name = "testabilitySettings")
-  private final TestabilitySettings testabilitySettings;
 
-  private HttpClientAdapter httpClientAdapter;
+  WikidataService wikidataService;
 
   public RestWikidataController(
       TestabilitySettings testabilitySettings, HttpClientAdapter httpClientAdapter) {
-    this.testabilitySettings = testabilitySettings;
-    this.httpClientAdapter = httpClientAdapter;
+    wikidataService =
+        new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
   }
 
   @GetMapping("/entity-data/{wikidataId}")
   public Optional<WikidataEntityData> fetchWikidataEntityDataByID(
       @PathVariable("wikidataId") String wikidataId) throws BindException {
     try {
-      return getWikidataService().wrapWikidataIdWithApi(wikidataId).fetchWikidataEntityData();
+      return wikidataService.wrapWikidataIdWithApi(wikidataId).fetchWikidataEntityData();
     } catch (IOException e) {
       throw buildWikidataServiceNotAvailableException("wikidataId");
     }
@@ -45,14 +44,10 @@ public class RestWikidataController {
   public List<WikidataSearchEntity> searchWikidata(@PathVariable("search") String search)
       throws InterruptedException, BindException {
     try {
-      return getWikidataService().searchWikidata(search);
+      return wikidataService.searchWikidata(search);
     } catch (IOException e) {
       throw buildWikidataServiceNotAvailableException("search");
     }
-  }
-
-  private WikidataService getWikidataService() {
-    return new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
   }
 
   private BindException buildWikidataServiceNotAvailableException(String fieldName) {

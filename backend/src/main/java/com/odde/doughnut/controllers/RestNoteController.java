@@ -16,22 +16,21 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Resource;
 import javax.validation.Valid;
 import lombok.SneakyThrows;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.annotation.SessionScope;
 
 @RestController
+@SessionScope
 @RequestMapping("/api/notes")
 class RestNoteController {
   private final ModelFactoryService modelFactoryService;
   private UserModel currentUser;
-  private HttpClientAdapter httpClientAdapter;
+  private final WikidataService wikidataService;
   private OpenAiWrapperService openAiWrapperService;
-
-  @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
   public RestNoteController(
@@ -42,9 +41,10 @@ class RestNoteController {
       OpenAiWrapperService openAiWrapperService) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
-    this.httpClientAdapter = httpClientAdapter;
     this.testabilitySettings = testabilitySettings;
     this.openAiWrapperService = openAiWrapperService;
+    this.wikidataService =
+        new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
   }
 
   @PostMapping(value = "/{note}/updateWikidataId")
@@ -56,8 +56,8 @@ class RestNoteController {
       throws BindException, UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
     WikidataIdWithApi wikidataIdWithApi =
-        getWikidataService(httpClientAdapter, testabilitySettings)
-            .associateToWikidata(note, wikidataAssociationCreation.wikidataId, modelFactoryService);
+        wikidataService.associateToWikidata(
+            note, wikidataAssociationCreation.wikidataId, modelFactoryService);
     wikidataIdWithApi.extractWikidataInfoToNote(note);
     modelFactoryService.noteRepository.save(note);
     return new NoteViewer(currentUser.getEntity(), note).toJsonObject();
@@ -75,8 +75,8 @@ class RestNoteController {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     Note note = parentNote.buildChildNote(user, currentUTCTimestamp, noteCreation.textContent);
     WikidataIdWithApi wikidataIdWithApi =
-        getWikidataService(httpClientAdapter, testabilitySettings)
-            .associateToWikiDataAndExtractInfoToNote(noteCreation, note, modelFactoryService);
+        wikidataService.associateToWikiDataAndExtractInfoToNote(
+            noteCreation, note, modelFactoryService);
     note.buildLinkToParent(user, noteCreation.getLinkTypeToParent(), currentUTCTimestamp);
     modelFactoryService.noteRepository.save(note);
 
@@ -192,10 +192,5 @@ class RestNoteController {
     note.mergeMasterReviewSetting(reviewSetting);
     modelFactoryService.noteRepository.save(note);
     return new RedirectToNoteResponse(note.getId());
-  }
-
-  public WikidataService getWikidataService(
-      HttpClientAdapter httpClientAdapter, TestabilitySettings testabilitySettings) {
-    return new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
   }
 }
