@@ -21,6 +21,7 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.net.URI;
 import java.sql.Timestamp;
+import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -262,19 +263,36 @@ class RestNoteControllerTests {
         noteCreation.getTextContent().setDescription("");
       }
 
-      private void mockApiResponseWithHumanInfo(
-          String humanId, String birthdayByISO, String countryQId, String countryName)
+      private void mockWikidataCountryEntity(String countryQId, String countryName)
           throws IOException, InterruptedException {
+        if (Strings.isEmpty(countryQId) || Strings.isEmpty(countryName)) {
+          return;
+        }
+        Mockito.when(
+                httpClientAdapter.getResponseString(
+                    URI.create(
+                        "https://www.wikidata.org/wiki/Special:EntityData/"
+                            + countryQId
+                            + ".json")))
+            .thenReturn(makeMe.wikidataClaimsJson(countryQId).labelIf(countryName).please());
+      }
 
-        Mockito.when(httpClientAdapter.getResponseString(any()))
+      private void mockWikidataHumanEntity(
+          String personWikidataId, String birthdayByISO, String countryQId)
+          throws IOException, InterruptedException {
+        Mockito.when(
+                httpClientAdapter.getResponseString(
+                    URI.create(
+                        "https://www.wikidata.org/w/api.php?action=wbgetentities&ids="
+                            + personWikidataId
+                            + "&format=json&props=claims")))
             .thenReturn(
                 makeMe
-                    .wikidataClaimsJson(humanId)
+                    .wikidataClaimsJson(personWikidataId)
                     .asHuman()
                     .countryOfOrigin(countryQId)
                     .birthdayIf(birthdayByISO)
-                    .please(),
-                makeMe.wikidataClaimsJson(countryQId).labelIf(countryName).please());
+                    .please());
       }
 
       @ParameterizedTest
@@ -299,7 +317,8 @@ class RestNoteControllerTests {
           String expectedBirthday)
           throws BindException, InterruptedException, UnexpectedNoAccessRightException,
               IOException {
-        mockApiResponseWithHumanInfo(wikidataIdOfHuman, birthdayByISO, countryQid, countryName);
+        mockWikidataHumanEntity(wikidataIdOfHuman, birthdayByISO, countryQid);
+        mockWikidataCountryEntity(countryQid, countryName);
         noteCreation.setWikidataId(wikidataIdOfHuman);
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
         String description = note.noteRealm.getNote().getTextContent().getDescription();
@@ -311,67 +330,21 @@ class RestNoteControllerTests {
         }
       }
 
-      private void mockApiResponseForPersonWithCountry(
-          String personWikiDataId, String countryWikiDataId)
-          throws IOException, InterruptedException {
-
-        Mockito.when(
-                httpClientAdapter.getResponseString(
-                    URI.create(
-                        "https://www.wikidata.org/w/api.php?action=wbgetentities&ids="
-                            + personWikiDataId
-                            + "&format=json&props=claims")))
-            .thenReturn(
-                makeMe
-                    .wikidataClaimsJson(personWikiDataId)
-                    .countryOfOrigin(countryWikiDataId)
-                    .asHuman()
-                    .please());
-      }
-
-      private void mockApiResponseForCountry(String countryWikiDataId, String countryName)
-          throws IOException, InterruptedException {
-        /// wiki/Special:EntityData/Q34660.json
-        Mockito.when(
-                httpClientAdapter.getResponseString(
-                    URI.create(
-                        "https://www.wikidata.org/wiki/Special:EntityData/"
-                            + countryWikiDataId
-                            + ".json")))
-            .thenReturn(makeMe.wikidataClaimsJson(countryWikiDataId).labelIf(countryName).please());
-      }
-
-      @ParameterizedTest
-      @CsvSource(
-          useHeadersInDisplayName = true,
-          delimiter = '|',
-          textBlock =
-              """
-  wikidataIdOfPerson | personName | countryWikiDataId | countryWikiDataName
-  #---------------------------------------------------------------------------------------------
-  Q8337    | Johnny boy  | Q34660           |  Canada
-  """)
-      void shouldAddPersonNoteWithCountryNoteWithWikidataId(
-          String wikidataIdOfPerson,
-          String personName,
-          String countryWikiDataId,
-          String countryWikiDataName)
+      @Test
+      void shouldAddPersonNoteWithCountryNoteWithWikidataId()
           throws BindException, InterruptedException, UnexpectedNoAccessRightException,
               IOException {
-        mockApiResponseForPersonWithCountry(wikidataIdOfPerson, countryWikiDataId);
-        mockApiResponseForCountry(countryWikiDataId, countryWikiDataName);
-        noteCreation.setWikidataId(wikidataIdOfPerson);
-        noteCreation.getTextContent().setTitle(personName);
+
+        mockWikidataHumanEntity("Q8337", null, "Q34660");
+        mockWikidataCountryEntity("Q34660", "Canada");
+        noteCreation.setWikidataId("Q8337");
+        noteCreation.getTextContent().setTitle("Johnny boy");
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
         makeMe.refresh(note.noteRealm.getNote());
 
-        String actualPersonNoteWikiDataId = note.noteRealm.getNote().getWikidataId();
-        String actualCountryNoteTitle = note.noteRealm.getNote().getChildren().get(0).getTitle();
-        String actualPersonNoteTitle = note.noteRealm.getNote().getTitle();
-
-        assertEquals(personName, actualPersonNoteTitle);
-        assertEquals(wikidataIdOfPerson, actualPersonNoteWikiDataId);
-        assertEquals(countryWikiDataName, actualCountryNoteTitle);
+        assertEquals("Johnny boy", note.noteRealm.getNote().getTitle());
+        assertEquals("Q8337", note.noteRealm.getNote().getWikidataId());
+        assertEquals("Canada", note.noteRealm.getNote().getChildren().get(0).getTitle());
       }
     }
 

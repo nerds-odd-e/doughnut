@@ -579,6 +579,7 @@ Cypress.Commands.add("performActionWithSuggestedDescription", (action: string) =
       cy.get(".close-button").click()
       break
     default:
+      cy.failure()
       break
   }
 })
