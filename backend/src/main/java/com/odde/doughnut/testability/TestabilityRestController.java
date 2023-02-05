@@ -303,17 +303,9 @@ class TestabilityRestController {
   }
 
   @PostMapping(value = "/replace_service_url")
-  public String replaceServiceUrl(@RequestBody Map<String, String> setWikidataService) {
+  public Map<String, String> replaceServiceUrl(
+      @RequestBody Map<String, String> setWikidataService) {
     return testabilitySettings.replaceServiceUrl(setWikidataService);
-  }
-
-  static class SetOpenAiService {
-    public String openAiServiceUrl;
-  }
-
-  @PostMapping(value = "/use_openai_service")
-  public String useOpenAiService(@RequestBody SetOpenAiService setOpenAiService) {
-    return testabilitySettings.setOpenAiService(setOpenAiService.openAiServiceUrl);
   }
 
   static class Randomization {

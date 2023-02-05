@@ -35,8 +35,9 @@ class ServiceMocker {
         body: { [this.serviceName]: wikidataServiceUrl },
       })
       .then((response) => {
-        expect(response.body).to.include("http")
-        cy.wrap(response.body)
+        expect(response.body).to.haveOwnProperty(this.serviceName)
+        expect(response.body[this.serviceName]).to.include("http")
+        cy.wrap(response.body[this.serviceName])
       })
   }
 

@@ -28,7 +28,6 @@ public class TestabilitySettings {
           put("openai", "https://api.openai.com/");
         }
       };
-  @Getter private String openAiServiceUrl = "https://api.openai.com/";
 
   public void timeTravelTo(Timestamp timestamp) {
     this.timestamp = timestamp;
@@ -73,14 +72,9 @@ public class TestabilitySettings {
     return this.serviceUrls.get("wikidata");
   }
 
-  public String setOpenAiService(String openAiServiceUrl) {
-    String saved = this.openAiServiceUrl;
-    this.openAiServiceUrl = openAiServiceUrl;
-    return saved;
-  }
-
-  public String replaceServiceUrl(Map<String, String> setWikidataService) {
-    String saved = this.serviceUrls.get("wikidata");
+  public Map<String, String> replaceServiceUrl(Map<String, String> setWikidataService) {
+    HashMap<String, String> saved = new HashMap<>();
+    saved.put("wikidata", this.serviceUrls.get("wikidata"));
     this.serviceUrls.put("wikidata", setWikidataService.get("wikidata"));
     return saved;
   }
