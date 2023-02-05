@@ -35,21 +35,22 @@ public record NoteConstructionService(
     Optional<String> optionalTitle = subWikidataIdWithApi.fetchEnglishTitleFromApi();
     optionalTitle.ifPresent(
         subNoteTitle -> {
-          Optional<Note> existingNoteOption =
-              parentNote
-                  .getNotebook()
-                  .findExistingNoteInNotebook(subWikidataIdWithApi.wikidataId());
-          if (existingNoteOption.isPresent()) {
-            Link link =
-                parentNote.buildLinkToNote(
-                    user, Link.LinkType.RELATED_TO, currentUTCTimestamp, existingNoteOption.get());
-            this.modelFactoryService.linkRepository.save(link);
-          } else {
-            TextContent textContent = new TextContent();
-            textContent.setTitle(subNoteTitle);
-            createNoteWithWikidataInfo(
-                parentNote, subWikidataIdWithApi, textContent, Link.LinkType.RELATED_TO);
-          }
+          parentNote
+              .getNotebook()
+              .findExistingNoteInNotebook(subWikidataIdWithApi.wikidataId())
+              .ifPresentOrElse(
+                  existingNote -> {
+                    Link link =
+                        parentNote.buildLinkToNote(
+                            user, Link.LinkType.RELATED_TO, currentUTCTimestamp, existingNote);
+                    this.modelFactoryService.linkRepository.save(link);
+                  },
+                  () -> {
+                    TextContent textContent = new TextContent();
+                    textContent.setTitle(subNoteTitle);
+                    createNoteWithWikidataInfo(
+                        parentNote, subWikidataIdWithApi, textContent, Link.LinkType.RELATED_TO);
+                  });
         });
   }
 }
