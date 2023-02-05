@@ -8,7 +8,6 @@ import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.SearchTermModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.HttpClientAdapter;
-import com.odde.doughnut.services.OpenAiWrapperService;
 import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -30,19 +29,16 @@ class RestNoteController {
   private final ModelFactoryService modelFactoryService;
   private UserModel currentUser;
   private final WikidataService wikidataService;
-  private OpenAiWrapperService openAiWrapperService;
   private final TestabilitySettings testabilitySettings;
 
   public RestNoteController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       HttpClientAdapter httpClientAdapter,
-      TestabilitySettings testabilitySettings,
-      OpenAiWrapperService openAiWrapperService) {
+      TestabilitySettings testabilitySettings) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
-    this.openAiWrapperService = openAiWrapperService;
     this.wikidataService =
         new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
   }
@@ -82,8 +78,6 @@ class RestNoteController {
 
     createSubNote(user, note, wikidataIdWithApi.getCountryOfOrigin());
     createSubNote(user, note, wikidataIdWithApi.getAuthor());
-
-    note.generateDescriptionForEmptyNote(noteCreation, openAiWrapperService);
 
     return NoteRealmWithPosition.fromNote(note, user);
   }

@@ -15,7 +15,6 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.HttpClientAdapter;
-import com.odde.doughnut.services.OpenAiWrapperService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
@@ -44,7 +43,6 @@ class RestNoteControllerTests {
 
   @Autowired MakeMe makeMe;
   @Mock HttpClientAdapter httpClientAdapter;
-  @Mock OpenAiWrapperService openAiWrapperService;
   private UserModel userModel;
   RestNoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -55,11 +53,7 @@ class RestNoteControllerTests {
 
     controller =
         new RestNoteController(
-            modelFactoryService,
-            userModel,
-            httpClientAdapter,
-            testabilitySettings,
-            openAiWrapperService);
+            modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
   }
 
   private void mockWikidataEntity(String wikidataId, String label)
@@ -162,16 +156,6 @@ class RestNoteControllerTests {
       Note newNote = makeMe.aNote().inMemoryPlease();
       noteCreation.setTextContent(newNote.getTextContent());
       noteCreation.setLinkTypeToParent(LinkType.NO_LINK);
-    }
-
-    @Test
-    void shouldBeAbleToSaveNoteWithAiDescription()
-        throws UnexpectedNoAccessRightException, BindException, InterruptedException {
-      noteCreation.getTextContent().setDescription("");
-      String expectedDescription = "This is a description from OpenAi";
-      Mockito.when(openAiWrapperService.getDescription(any())).thenReturn(expectedDescription);
-      NoteRealmWithPosition response = controller.createNote(parent, noteCreation);
-      assertThat(response.noteRealm.getNote().getShortDescription(), equalTo(expectedDescription));
     }
 
     @Test
@@ -357,37 +341,20 @@ class RestNoteControllerTests {
             makeMe.wikidataClaimsJson(bookWikiDataId).asBook(bookAuthorWikiDataId).please());
       }
 
-      @ParameterizedTest
-      @CsvSource(
-          useHeadersInDisplayName = true,
-          delimiter = '|',
-          textBlock =
-              """
-    bookWikiDataId | bookName | AuthorWikiDataId | AuthorWikiDataName
-   #---------------------------------------------------------------------------------------------
-    Q8337    | Harry Potter  | Q34660           |  J. K. Rowling
-    """)
-      void shouldAddBookNoteWithAuthorNoteWithWikidataId(
-          String wikidataIdOfBook,
-          String bookName,
-          String authorWikiDataId,
-          String authorWikiDataName)
+      @Test
+      void shouldAddBookNoteWithAuthorNoteWithWikidataId()
           throws BindException, InterruptedException, UnexpectedNoAccessRightException,
               IOException {
-        mockApiResponseForBookWithAuthorTag(wikidataIdOfBook, authorWikiDataId);
-        mockWikidataEntity(authorWikiDataId, authorWikiDataName);
-        noteCreation.setWikidataId(wikidataIdOfBook);
-        noteCreation.getTextContent().setTitle(bookName);
+        mockApiResponseForBookWithAuthorTag("Q8337", "Q34660");
+        mockWikidataEntity("Q34660", "J. K. Rowling");
+        noteCreation.setWikidataId("Q8337");
+        noteCreation.getTextContent().setTitle("Harry Potter");
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
         makeMe.refresh(note.noteRealm.getNote());
 
-        String actualBookNoteWikiDataId = note.noteRealm.getNote().getWikidataId();
-        String actualAuthorNoteTitle = note.noteRealm.getNote().getChildren().get(0).getTitle();
-        String actualBookNoteTitle = note.noteRealm.getNote().getTitle();
-
-        assertEquals(bookName, actualBookNoteTitle);
-        assertEquals(wikidataIdOfBook, actualBookNoteWikiDataId);
-        assertEquals(authorWikiDataName, actualAuthorNoteTitle);
+        assertEquals("Harry Potter", note.noteRealm.getNote().getTitle());
+        assertEquals("Q8337", note.noteRealm.getNote().getWikidataId());
+        assertEquals("J. K. Rowling", note.noteRealm.getNote().getChildren().get(0).getTitle());
       }
     }
   }

@@ -8,7 +8,6 @@ import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.entities.json.NoteCreation;
-import com.odde.doughnut.services.OpenAiWrapperService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -380,15 +379,6 @@ public class Note extends Thingy {
     Note note = createNote(user, currentUTCTimestamp, textContent);
     note.setParentNote(this);
     return note;
-  }
-
-  public void generateDescriptionForEmptyNote(
-      NoteCreation noteCreation, OpenAiWrapperService openAiWrapperService) {
-    String currentDescription = getTextContent().getDescription();
-    if (currentDescription == null || currentDescription.isEmpty()) {
-      String description = openAiWrapperService.getDescription(noteCreation.textContent.getTitle());
-      getTextContent().setDescription(description);
-    }
   }
 
   @NotNull
