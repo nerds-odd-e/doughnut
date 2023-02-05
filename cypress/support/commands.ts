@@ -27,7 +27,6 @@
 import "@testing-library/cypress/add-commands"
 import "cypress-file-upload"
 import NotePath from "./NotePath"
-import WikidataServiceTester from "./WikidataServiceTester"
 import "../support/string.extensions"
 
 Cypress.Commands.add("pageIsNotLoading", () => {
@@ -527,56 +526,6 @@ Cypress.Commands.add("associateNoteWithWikidataId", (title, wikiID) => {
   cy.clickNotePageButton(title, "associate wikidata", true)
   cy.replaceFocusedTextAndEnter(wikiID)
 })
-
-Cypress.Commands.add(
-  "stubWikidataEntityLocation",
-  { prevSubject: true },
-  (wikidataServiceTester: WikidataServiceTester, wikidataId: string, lat: number, lng: number) => {
-    wikidataServiceTester.stubWikidataEntityLocation(wikidataId, lat, lng)
-  },
-)
-
-Cypress.Commands.add(
-  "stubWikidataEntityPerson",
-  { prevSubject: true },
-  (
-    wikidataServiceTester: WikidataServiceTester,
-    wikidataId: string,
-    countryId: string,
-    birthday: string,
-  ) => {
-    wikidataServiceTester.stubWikidataEntityPerson(wikidataId, countryId, birthday)
-  },
-)
-
-Cypress.Commands.add(
-  "stubWikidataEntityBook",
-  { prevSubject: true },
-  (wikidataServiceTester: WikidataServiceTester, wikidataId: string, authorWikidataId: string) => {
-    wikidataServiceTester.stubWikidataEntityBook(wikidataId, authorWikidataId)
-  },
-)
-
-Cypress.Commands.add(
-  "stubWikidataEntityQuery",
-  { prevSubject: true },
-  (
-    wikidataServiceTester: WikidataServiceTester,
-    wikidataId: string,
-    wikidataTitle: string,
-    wikipediaLink: string,
-  ) => {
-    wikidataServiceTester.stubWikidataEntityQuery(wikidataId, wikidataTitle, wikipediaLink)
-  },
-)
-
-Cypress.Commands.add(
-  "stubWikidataSearchResult",
-  { prevSubject: true },
-  (wikidataServiceTester: WikidataServiceTester, wikidataLabel: string, wikidataId: string) => {
-    wikidataServiceTester.stubWikidataSearchResult(wikidataLabel, wikidataId)
-  },
-)
 
 Cypress.Commands.add("expectFieldErrorMessage", (message: string, field: string) => {
   cy.findByLabelText(field).siblings(".error-msg").findByText(message)
