@@ -8,23 +8,6 @@ class WikidataServiceTester extends ServiceTester {
     super("wikidata")
   }
 
-  async stubWikidataEntityQuery(wikidataId: string, wikidataTitle: string, wikipediaLink: string) {
-    const wikipedia = wikipediaLink ? { enwiki: { site: "enwiki", url: wikipediaLink } } : {}
-    return await this.serviceMocker.stubByUrl(`/wiki/Special:EntityData/${wikidataId}.json`, {
-      entities: {
-        [wikidataId]: {
-          labels: {
-            en: {
-              language: "en",
-              value: wikidataTitle,
-            },
-          },
-          sitelinks: { ...wikipedia },
-        },
-      },
-    })
-  }
-
   async stubWikidataEntity(wikidataId: string, claims: Claim[]) {
     return await this.stubWikidataApi(
       "wbgetentities",

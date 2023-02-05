@@ -28,6 +28,33 @@ import "@testing-library/cypress/add-commands"
 import "cypress-file-upload"
 import WikidataServiceTester from "./WikidataServiceTester"
 import "./string.extensions"
+import ServiceTester from "./ServiceTester"
+
+Cypress.Commands.add(
+  "stubWikidataEntityQuery",
+  { prevSubject: true },
+  (
+    serviceTester: ServiceTester,
+    wikidataId: string,
+    wikidataTitle: string,
+    wikipediaLink: string,
+  ) => {
+    const wikipedia = wikipediaLink ? { enwiki: { site: "enwiki", url: wikipediaLink } } : {}
+    serviceTester.serviceMocker.stubByUrl(`/wiki/Special:EntityData/${wikidataId}.json`, {
+      entities: {
+        [wikidataId]: {
+          labels: {
+            en: {
+              language: "en",
+              value: wikidataTitle,
+            },
+          },
+          sitelinks: { ...wikipedia },
+        },
+      },
+    })
+  },
+)
 
 Cypress.Commands.add(
   "stubWikidataEntityLocation",
@@ -55,19 +82,6 @@ Cypress.Commands.add(
   { prevSubject: true },
   (wikidataServiceTester: WikidataServiceTester, wikidataId: string, authorWikidataId: string) => {
     wikidataServiceTester.stubWikidataEntityBook(wikidataId, authorWikidataId)
-  },
-)
-
-Cypress.Commands.add(
-  "stubWikidataEntityQuery",
-  { prevSubject: true },
-  (
-    wikidataServiceTester: WikidataServiceTester,
-    wikidataId: string,
-    wikidataTitle: string,
-    wikipediaLink: string,
-  ) => {
-    wikidataServiceTester.stubWikidataEntityQuery(wikidataId, wikidataTitle, wikipediaLink)
   },
 )
 
