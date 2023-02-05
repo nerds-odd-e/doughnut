@@ -484,7 +484,7 @@ class RestNoteControllerTests {
 
     @Test
     void shouldUpdateNoteWithUniqueWikidataId()
-        throws BindException, UnexpectedNoAccessRightException {
+        throws BindException, UnexpectedNoAccessRightException, IOException, InterruptedException {
       WikidataAssociationCreation wikidataAssociationCreation = new WikidataAssociationCreation();
       wikidataAssociationCreation.wikidataId = "Q123";
       controller.updateWikidataId(note, wikidataAssociationCreation);

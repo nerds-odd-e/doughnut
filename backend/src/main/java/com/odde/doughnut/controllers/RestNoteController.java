@@ -45,16 +45,13 @@ class RestNoteController {
 
   @PostMapping(value = "/{note}/updateWikidataId")
   @Transactional
-  @SneakyThrows
   public NoteRealm updateWikidataId(
       @PathVariable(name = "note") Note note,
       @RequestBody WikidataAssociationCreation wikidataAssociationCreation)
-      throws BindException, UnexpectedNoAccessRightException {
+      throws BindException, UnexpectedNoAccessRightException, IOException, InterruptedException {
     currentUser.assertAuthorization(note);
-    WikidataIdWithApi wikidataIdWithApi =
-        wikidataService.associateToWikidata(
-            note, wikidataAssociationCreation.wikidataId, modelFactoryService);
-    wikidataIdWithApi.extractWikidataInfoToNote(note);
+    wikidataService.associateToWikidata(
+        note, wikidataAssociationCreation.wikidataId, modelFactoryService);
     modelFactoryService.noteRepository.save(note);
     return new NoteViewer(currentUser.getEntity(), note).toJsonObject();
   }
@@ -68,22 +65,28 @@ class RestNoteController {
       throws UnexpectedNoAccessRightException, BindException, InterruptedException {
     currentUser.assertAuthorization(parentNote);
     User user = currentUser.getEntity();
+    Note note = createNoteAndExtractChildrenFromWikidata(parentNote, noteCreation, user);
+
+    return NoteRealmWithPosition.fromNote(note, user);
+  }
+
+  private Note createNoteAndExtractChildrenFromWikidata(
+      Note parentNote, NoteCreation noteCreation, User user)
+      throws IOException, InterruptedException, BindException, UnexpectedNoAccessRightException {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     Note note = parentNote.buildChildNote(user, currentUTCTimestamp, noteCreation.textContent);
     WikidataIdWithApi wikidataIdWithApi =
-        wikidataService.associateToWikiDataAndExtractInfoToNote(
-            noteCreation, note, modelFactoryService);
+        wikidataService.associateToWikidata(note, noteCreation.wikidataId, modelFactoryService);
     note.buildLinkToParent(user, noteCreation.getLinkTypeToParent(), currentUTCTimestamp);
     modelFactoryService.noteRepository.save(note);
 
     createSubNote(user, note, wikidataIdWithApi.getCountryOfOrigin());
     createSubNote(user, note, wikidataIdWithApi.getAuthor());
-
-    return NoteRealmWithPosition.fromNote(note, user);
+    return note;
   }
 
   private void createSubNote(User user, Note parentNote, Optional<String> subNoteTitleOption)
-      throws InterruptedException, UnexpectedNoAccessRightException, BindException {
+      throws InterruptedException, UnexpectedNoAccessRightException, BindException, IOException {
     if (subNoteTitleOption.isPresent()) {
       String subNoteTitle = subNoteTitleOption.get();
       Optional<Note> existingNoteOption =
@@ -92,7 +95,13 @@ class RestNoteController {
         Link link = parentNote.getLink(user, existingNoteOption, testabilitySettings);
         modelFactoryService.linkRepository.save(link);
       } else {
-        createNote(parentNote, parentNote.createNoteWithTitle(subNoteTitle));
+        NoteCreation noteCreation = new NoteCreation();
+        TextContent textContent = new TextContent();
+        textContent.setTitle(subNoteTitle);
+        noteCreation.linkTypeToParent = Link.LinkType.RELATED_TO;
+        noteCreation.setTextContent(textContent);
+
+        createNoteAndExtractChildrenFromWikidata(parentNote, noteCreation, user);
       }
     }
   }
