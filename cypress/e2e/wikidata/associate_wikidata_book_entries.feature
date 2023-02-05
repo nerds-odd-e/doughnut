@@ -10,7 +10,7 @@ Feature: Note creation for a book
   Scenario: Create a new book note with author note not exists in notebook
     Given Wikidata.org has an entity "Q34668" with title "J. K. Rowling"
     And Wikidata.org has an entity "Q8337" with title "Harry Potter"
-    And the Wikidata.org entity "Q8337" is written by "J. K. Rowling" with "Q34668"
+    And the Wikidata.org entity "Q8337" is written by an author with ID "Q34668"
     When I create a note belonging to "My Favourite Books":
       | Title         | Wikidata Id  |
       | Harry Potter  | Q8337        |
