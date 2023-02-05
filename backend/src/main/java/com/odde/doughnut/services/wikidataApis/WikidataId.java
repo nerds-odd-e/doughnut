@@ -5,10 +5,6 @@ public record WikidataId(String wikidataId) {
     return "Q5".equals(wikidataId);
   }
 
-  public boolean isBook() {
-    return "Q571".equals(wikidataId);
-  }
-
   public WikidataIdWithApi withApi(WikidataApi wikidataApi) {
     return new WikidataIdWithApi(wikidataId, wikidataApi);
   }
