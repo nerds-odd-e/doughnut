@@ -303,8 +303,8 @@ class TestabilityRestController {
   }
 
   @PostMapping(value = "/replace_service_url")
-  public String replaceServiceUrl(@RequestBody HashMap<String, String> setWikidataService) {
-    return testabilitySettings.setWikidataService(setWikidataService.get("wikidataService"));
+  public String replaceServiceUrl(@RequestBody Map<String, String> setWikidataService) {
+    return testabilitySettings.replaceServiceUrl(setWikidataService);
   }
 
   static class SetOpenAiService {

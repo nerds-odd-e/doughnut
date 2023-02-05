@@ -4,7 +4,7 @@ import WikidataEntitiesBuilder, { Claim } from "./json/WikidataEntitiesBuilder"
 import ServiceMocker from "./ServiceMocker"
 
 class WikidataServiceTester {
-  serviceMocker = new ServiceMocker(5001, "wikidataService")
+  serviceMocker = new ServiceMocker(5001, "wikidata")
 
   mock(cy: Cypress.cy & CyEventEmitter) {
     this.serviceMocker.mock(cy)

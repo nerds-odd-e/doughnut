@@ -5,6 +5,8 @@ import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.models.randomizers.RealRandomizer;
 import com.odde.doughnut.services.GithubService;
 import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +21,13 @@ public class TestabilitySettings {
   @Getter @Setter Boolean useRealGithub = true;
   @Autowired GithubService githubService;
   @Getter private boolean featureToggleEnabled = false;
-
-  @Getter private String wikidataServiceUrl = "https://www.wikidata.org";
+  private Map<String, String> serviceUrls =
+      new HashMap<>() {
+        {
+          put("wikidata", "https://www.wikidata.org");
+          put("openai", "https://api.openai.com/");
+        }
+      };
   @Getter private String openAiServiceUrl = "https://api.openai.com/";
 
   public void timeTravelTo(Timestamp timestamp) {
@@ -62,15 +69,19 @@ public class TestabilitySettings {
     this.featureToggleEnabled = enabled;
   }
 
-  public String setWikidataService(String wikidataServiceUrl) {
-    String saved = this.wikidataServiceUrl;
-    this.wikidataServiceUrl = wikidataServiceUrl;
-    return saved;
+  public String getWikidataServiceUrl() {
+    return this.serviceUrls.get("wikidata");
   }
 
   public String setOpenAiService(String openAiServiceUrl) {
     String saved = this.openAiServiceUrl;
     this.openAiServiceUrl = openAiServiceUrl;
+    return saved;
+  }
+
+  public String replaceServiceUrl(Map<String, String> setWikidataService) {
+    String saved = this.serviceUrls.get("wikidata");
+    this.serviceUrls.put("wikidata", setWikidataService.get("wikidata"));
     return saved;
   }
 }
