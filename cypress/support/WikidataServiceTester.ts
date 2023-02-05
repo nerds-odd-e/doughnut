@@ -16,12 +16,6 @@ class WikidataServiceTester extends ServiceTester {
     )
   }
 
-  async stubWikidataEntityLocation(wikidataId: string, latitude: number, longitude: number) {
-    return await this.stubWikidataEntity(wikidataId, [
-      { claimId: "P625", type: "globecoordinate", value: { latitude, longitude } },
-    ])
-  }
-
   async stubWikidataEntityPerson(wikidataId: string, countryId: string, birthday: string) {
     return await this.stubWikidataEntity(wikidataId, [
       { claimId: "P31", type: "wikibase-entityid", value: { id: "Q5" } },
@@ -53,7 +47,7 @@ class WikidataServiceTester extends ServiceTester {
     )
   }
 
-  private stubWikidataApi(action: string, query: Record<string, string>, data: unknown) {
+  public stubWikidataApi(action: string, query: Record<string, string>, data: unknown) {
     return this.serviceMocker.stubGetter(`/w/api.php`, { action, ...query }, data)
   }
 }

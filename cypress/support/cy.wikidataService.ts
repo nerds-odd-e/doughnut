@@ -29,6 +29,7 @@ import "cypress-file-upload"
 import WikidataServiceTester from "./WikidataServiceTester"
 import "./string.extensions"
 import ServiceTester from "./ServiceTester"
+import WikidataEntitiesBuilder, { Claim } from "./json/WikidataEntitiesBuilder"
 
 Cypress.Commands.add(
   "stubWikidataEntityQuery",
@@ -57,10 +58,29 @@ Cypress.Commands.add(
 )
 
 Cypress.Commands.add(
+  "stubWikidataEntity",
+  { prevSubject: true },
+  (wikidataServiceTester: WikidataServiceTester, wikidataId: string, claims: Claim[]) => {
+    wikidataServiceTester.stubWikidataApi(
+      "wbgetentities",
+      { ids: wikidataId },
+      new WikidataEntitiesBuilder(wikidataId).wclaims(claims).build(),
+    )
+  },
+)
+
+Cypress.Commands.add(
   "stubWikidataEntityLocation",
   { prevSubject: true },
-  (wikidataServiceTester: WikidataServiceTester, wikidataId: string, lat: number, lng: number) => {
-    wikidataServiceTester.stubWikidataEntityLocation(wikidataId, lat, lng)
+  (
+    wikidataServiceTester: WikidataServiceTester,
+    wikidataId: string,
+    latitude: number,
+    longitude: number,
+  ) => {
+    cy.wrap(wikidataServiceTester).stubWikidataEntity(wikidataId, [
+      { claimId: "P625", type: "globecoordinate", value: { latitude, longitude } },
+    ])
   },
 )
 
