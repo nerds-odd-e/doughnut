@@ -633,8 +633,3 @@ Cypress.Commands.add("performActionWithSuggestedDescription", (action: string) =
       break
   }
 })
-
-Cypress.Commands.add("replaceSuggestedDescriptionTextArea", (description: string) => {
-  cy.get(".area-control.form-control").focus()
-  cy.replaceFocusedTextAndEnter(description)
-})
