@@ -38,13 +38,11 @@ public class WikidataEntityModel extends WikidataEntityModelOfProperties {
     return getLocationDescription();
   }
 
-  public Optional<String> getCountryOfOrigin(WikidataApi wikidataApi) {
-    return getCountryOfOriginValue()
-        .flatMap(wikidataId1 -> wikidataId1.withApi(wikidataApi).fetchEnglishTitleFromApi());
+  public Optional<WikidataIdWithApi> getCountryOfOrigin(WikidataApi wikidataApi) {
+    return getCountryOfOriginValue().map(wikidataId1 -> wikidataId1.withApi(wikidataApi));
   }
 
-  public Optional<String> getAuthor(WikidataApi wikidataApi) {
-    return getAuthor()
-        .flatMap(wikidataId1 -> wikidataId1.withApi(wikidataApi).fetchEnglishTitleFromApi());
+  public Optional<WikidataIdWithApi> getAuthor(WikidataApi wikidataApi) {
+    return getAuthor().map(wikidataId -> wikidataId.withApi(wikidataApi));
   }
 }

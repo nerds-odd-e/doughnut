@@ -95,10 +95,13 @@ class RestNoteController {
     return note;
   }
 
-  private void createSubNote(User user, Note parentNote, Optional<String> subNoteTitleOption)
+  private void createSubNote(
+      User user, Note parentNote, Optional<WikidataIdWithApi> subNoteTitleOption)
       throws InterruptedException, UnexpectedNoAccessRightException, BindException, IOException {
-    if (subNoteTitleOption.isPresent()) {
-      String subNoteTitle = subNoteTitleOption.get();
+    Optional<String> optionalTitle =
+        subNoteTitleOption.flatMap(WikidataIdWithApi::fetchEnglishTitleFromApi);
+    if (optionalTitle.isPresent()) {
+      String subNoteTitle = optionalTitle.get();
       Optional<Note> existingNoteOption =
           parentNote.getNotebook().findExistingNoteInNotebook(subNoteTitle);
       if (existingNoteOption.isPresent()) {

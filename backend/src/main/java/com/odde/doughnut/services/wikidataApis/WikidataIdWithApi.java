@@ -30,12 +30,12 @@ public record WikidataIdWithApi(String wikidataId, WikidataApi wikidataApi) {
     model.flatMap(WikidataEntityModel::getCoordinate).ifPresent(note::buildLocation);
   }
 
-  public Optional<String> getCountryOfOrigin() throws IOException, InterruptedException {
+  public Optional<WikidataIdWithApi> getCountryOfOrigin() throws IOException, InterruptedException {
     Optional<WikidataEntityModel> model = getWikidataEntityModel();
     return model.flatMap(entity -> entity.getCountryOfOrigin(wikidataApi));
   }
 
-  public Optional<String> getAuthor() throws IOException, InterruptedException {
+  public Optional<WikidataIdWithApi> getAuthor() throws IOException, InterruptedException {
     Optional<WikidataEntityModel> model = getWikidataEntityModel();
     return model.flatMap(entity -> entity.getAuthor(wikidataApi));
   }
