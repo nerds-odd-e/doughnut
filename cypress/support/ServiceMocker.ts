@@ -6,11 +6,9 @@ import MountebankWrapper from "./MountebankWrapper"
 
 class ServiceMocker {
   mountebank
-  serviceName
 
-  constructor(port: number, serviceName: string) {
+  constructor(port: number) {
     this.mountebank = new MountebankWrapper(port)
-    this.serviceName = serviceName
   }
 
   install() {

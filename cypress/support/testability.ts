@@ -3,6 +3,7 @@
 import WikidataServiceTester from "./WikidataServiceTester"
 import OpenAiServiceTester from "./OpenAiServiceTester"
 import TestabilityHelper from "./TestabilityHelper"
+import ServiceTester from "./ServiceTester"
 
 Cypress.Commands.add("testability", () => {
   cy.wrap(new TestabilityHelper())
@@ -144,23 +145,15 @@ Cypress.Commands.add("setServiceUrl", (serviceName: string, serviceUrl: string) 
     })
 })
 
-Cypress.Commands.add(
-  "mock",
-  { prevSubject: true },
-  (wikidataServiceTester: WikidataServiceTester) => {
-    cy.setServiceUrl(wikidataServiceTester.serviceName, wikidataServiceTester.serviceUrl).as(
-      wikidataServiceTester.savedServiceUrlName,
-    )
-    wikidataServiceTester.install()
-  },
-)
+Cypress.Commands.add("mock", { prevSubject: true }, (serviceTester: ServiceTester) => {
+  cy.setServiceUrl(serviceTester.serviceName, serviceTester.serviceUrl).as(
+    serviceTester.savedServiceUrlName,
+  )
+  serviceTester.install()
+})
 
-Cypress.Commands.add(
-  "restore",
-  { prevSubject: true },
-  (wikidataServiceTester: WikidataServiceTester) => {
-    cy.get(`@${wikidataServiceTester.savedServiceUrlName}`).then((saved) =>
-      cy.setServiceUrl(wikidataServiceTester.serviceName, saved as unknown as string),
-    )
-  },
-)
+Cypress.Commands.add("restore", { prevSubject: true }, (serviceTester: ServiceTester): void => {
+  cy.get(`@${serviceTester.savedServiceUrlName}`).then((saved) =>
+    cy.setServiceUrl(serviceTester.serviceName, saved as unknown as string),
+  )
+})

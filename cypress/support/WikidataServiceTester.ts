@@ -1,25 +1,11 @@
 /// <reference types="cypress" />
 
 import WikidataEntitiesBuilder, { Claim } from "./json/WikidataEntitiesBuilder"
-import ServiceMocker from "./ServiceMocker"
+import ServiceTester from "./ServiceTester"
 
-class WikidataServiceTester {
-  serviceMocker = new ServiceMocker(5001, "wikidata")
-
-  get serviceName(): string {
-    return this.serviceMocker.serviceName
-  }
-
-  get serviceUrl(): string {
-    return this.serviceMocker.serviceUrl
-  }
-
-  get savedServiceUrlName() {
-    return `saved${this.serviceName}Url`
-  }
-
-  install() {
-    this.serviceMocker.install()
+class WikidataServiceTester extends ServiceTester {
+  constructor() {
+    super("wikidata")
   }
 
   async stubWikidataEntityQuery(wikidataId: string, wikidataTitle: string, wikipediaLink: string) {
