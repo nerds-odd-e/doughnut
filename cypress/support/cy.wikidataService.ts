@@ -26,9 +26,7 @@
 // @ts-check
 import "@testing-library/cypress/add-commands"
 import "cypress-file-upload"
-import WikidataServiceTester from "./WikidataServiceTester"
 import "./string.extensions"
-import ServiceTester from "./ServiceTester"
 import WikidataEntitiesBuilder, { Claim } from "./json/WikidataEntitiesBuilder"
 import ServiceMocker from "./ServiceMocker"
 
@@ -54,13 +52,13 @@ Cypress.Commands.add(
   "stubWikidataEntityQuery",
   { prevSubject: true },
   (
-    serviceTester: ServiceTester,
+    serviceMocker: ServiceMocker,
     wikidataId: string,
     wikidataTitle: string,
     wikipediaLink: string,
   ) => {
     const wikipedia = wikipediaLink ? { enwiki: { site: "enwiki", url: wikipediaLink } } : {}
-    serviceTester.serviceMocker.stubByUrl(`/wiki/Special:EntityData/${wikidataId}.json`, {
+    serviceMocker.stubByUrl(`/wiki/Special:EntityData/${wikidataId}.json`, {
       entities: {
         [wikidataId]: {
           labels: {
@@ -79,13 +77,8 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   "stubWikidataEntityLocation",
   { prevSubject: true },
-  (
-    wikidataServiceTester: WikidataServiceTester,
-    wikidataId: string,
-    latitude: number,
-    longitude: number,
-  ) => {
-    stubWikidataEntity(wikidataServiceTester.serviceMocker, wikidataId, [
+  (serviceMocker: ServiceMocker, wikidataId: string, latitude: number, longitude: number) => {
+    stubWikidataEntity(serviceMocker, wikidataId, [
       { claimId: "P625", type: "globecoordinate", value: { latitude, longitude } },
     ])
   },
@@ -94,13 +87,8 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   "stubWikidataEntityPerson",
   { prevSubject: true },
-  (
-    wikidataServiceTester: WikidataServiceTester,
-    wikidataId: string,
-    countryId: string,
-    birthday: string,
-  ) => {
-    stubWikidataEntity(wikidataServiceTester.serviceMocker, wikidataId, [
+  (serviceMocker: ServiceMocker, wikidataId: string, countryId: string, birthday: string) => {
+    stubWikidataEntity(serviceMocker, wikidataId, [
       { claimId: "P31", type: "wikibase-entityid", value: { id: "Q5" } },
       { claimId: "P569", type: "time", value: { time: birthday } },
       { claimId: "P27", type: "wikibase-entityid", value: { id: countryId } },
@@ -111,8 +99,8 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   "stubWikidataEntityBook",
   { prevSubject: true },
-  (wikidataServiceTester: WikidataServiceTester, wikidataId: string, authorWikidataId: string) => {
-    stubWikidataEntity(wikidataServiceTester.serviceMocker, wikidataId, [
+  (serviceMocker: ServiceMocker, wikidataId: string, authorWikidataId: string) => {
+    stubWikidataEntity(serviceMocker, wikidataId, [
       { claimId: "P50", type: "wikibase-entityid", value: { id: authorWikidataId } },
     ])
   },
@@ -121,9 +109,9 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   "stubWikidataSearchResult",
   { prevSubject: true },
-  (wikidataServiceTester: WikidataServiceTester, wikidataLabel: string, wikidataId: string) => {
+  (serviceMocker: ServiceMocker, wikidataLabel: string, wikidataId: string) => {
     stubWikidataApi(
-      wikidataServiceTester.serviceMocker,
+      serviceMocker,
       "wbsearchentities",
       {},
       {

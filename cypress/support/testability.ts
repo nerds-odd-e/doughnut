@@ -1,9 +1,8 @@
 /// <reference types="cypress" />
 // @ts-check
-import WikidataServiceTester from "./WikidataServiceTester"
 import OpenAiServiceTester from "./OpenAiServiceTester"
 import TestabilityHelper from "./TestabilityHelper"
-import ServiceTester from "./ServiceTester"
+import ServiceMocker from "./ServiceMocker"
 
 Cypress.Commands.add("testability", () => {
   cy.wrap(new TestabilityHelper())
@@ -126,7 +125,7 @@ Cypress.Commands.add(
 )
 
 Cypress.Commands.add("wikidataService", () => {
-  cy.wrap(new WikidataServiceTester())
+  cy.wrap(new ServiceMocker("wikidata", 5001))
 })
 
 Cypress.Commands.add("openAiService", () => {
@@ -145,15 +144,15 @@ Cypress.Commands.add("setServiceUrl", (serviceName: string, serviceUrl: string) 
     })
 })
 
-Cypress.Commands.add("mock", { prevSubject: true }, (serviceTester: ServiceTester) => {
-  cy.setServiceUrl(serviceTester.serviceName, serviceTester.serviceUrl).as(
-    serviceTester.savedServiceUrlName,
+Cypress.Commands.add("mock", { prevSubject: true }, (serviceMocker: ServiceMocker) => {
+  cy.setServiceUrl(serviceMocker.serviceName, serviceMocker.serviceUrl).as(
+    serviceMocker.savedServiceUrlName,
   )
-  serviceTester.install()
+  serviceMocker.install()
 })
 
-Cypress.Commands.add("restore", { prevSubject: true }, (serviceTester: ServiceTester): void => {
-  cy.get(`@${serviceTester.savedServiceUrlName}`).then((saved) =>
-    cy.setServiceUrl(serviceTester.serviceName, saved as unknown as string),
+Cypress.Commands.add("restore", { prevSubject: true }, (serviceMocker: ServiceMocker): void => {
+  cy.get(`@${serviceMocker.savedServiceUrlName}`).then((saved) =>
+    cy.setServiceUrl(serviceMocker.serviceName, saved as unknown as string),
   )
 })

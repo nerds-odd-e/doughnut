@@ -5,10 +5,16 @@ import { DefaultStub, HttpMethod, FlexiPredicate } from "@anev/ts-mountebank"
 import MountebankWrapper from "./MountebankWrapper"
 
 class ServiceMocker {
-  mountebank
+  private readonly mountebank
+  readonly serviceName: string
 
-  constructor(port: number) {
+  constructor(serviceName: string, port: number) {
     this.mountebank = new MountebankWrapper(port)
+    this.serviceName = serviceName
+  }
+
+  get savedServiceUrlName() {
+    return `saved${this.serviceName}Url`
   }
 
   install() {
