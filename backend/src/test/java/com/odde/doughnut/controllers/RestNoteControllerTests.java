@@ -160,14 +160,14 @@ class RestNoteControllerTests {
 
     @Test
     void shouldBeAbleToSaveNoteWhenValid()
-        throws UnexpectedNoAccessRightException, BindException, InterruptedException {
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       NoteRealmWithPosition response = controller.createNote(parent, noteCreation);
       assertThat(response.noteRealm.getId(), not(nullValue()));
     }
 
     @Test
     void shouldBeAbleToCreateAThing()
-        throws UnexpectedNoAccessRightException, BindException, InterruptedException {
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       long beforeThingCount = makeMe.modelFactoryService.thingRepository.count();
       controller.createNote(parent, noteCreation);
       long afterThingCount = makeMe.modelFactoryService.thingRepository.count();
@@ -186,7 +186,7 @@ class RestNoteControllerTests {
 
     @Test
     void shouldBeAbleToSaveNoteWithoutWikidataIdWhenValid()
-        throws UnexpectedNoAccessRightException, BindException, InterruptedException {
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       NoteRealmWithPosition response = controller.createNote(parent, noteCreation);
 
       assertThat(response.noteRealm.getNote().getWikidataId(), equalTo(null));

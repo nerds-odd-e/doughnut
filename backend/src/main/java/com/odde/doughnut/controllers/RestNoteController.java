@@ -8,15 +8,13 @@ import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.SearchTermModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.HttpClientAdapter;
+import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
 import javax.validation.Valid;
-import lombok.SneakyThrows;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.*;
 import org.springframework.web.bind.annotation.*;
@@ -59,88 +57,27 @@ class RestNoteController {
 
   @PostMapping(value = "/{parentNote}/create")
   @Transactional
-  @SneakyThrows
   public NoteRealmWithPosition createNote(
       @PathVariable(name = "parentNote") Note parentNote,
       @Valid @ModelAttribute NoteCreation noteCreation)
-      throws UnexpectedNoAccessRightException, BindException, InterruptedException {
+      throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
     currentUser.assertAuthorization(parentNote);
     User user = currentUser.getEntity();
+
     Note note =
-        createNoteAndExtractChildrenFromWikidata(
-            parentNote,
-            user,
-            noteCreation.textContent,
-            noteCreation.wikidataId,
-            noteCreation.getLinkTypeToParent());
+        getNoteConstructionService(user)
+            .createNoteWithWikidataInfo(
+                parentNote,
+                wikidataService.wrapWikidataIdWithApi(noteCreation.wikidataId),
+                noteCreation.textContent,
+                noteCreation.getLinkTypeToParent());
 
     return NoteRealmWithPosition.fromNote(note, user);
   }
 
-  record NoteConstructionService(
-      User user, Timestamp currentUTCTimestamp, ModelFactoryService modelFactoryService) {
-
-    private Note createNoteWithWikidataInfo(
-        Note parentNote,
-        WikidataIdWithApi wikidataIdWithApi,
-        TextContent textContent,
-        Link.LinkType linkTypeToParent)
-        throws BindException, IOException, InterruptedException {
-      Note note = parentNote.buildChildNote(this.user, currentUTCTimestamp, textContent);
-      wikidataIdWithApi.associateNoteToWikidata(note, this.modelFactoryService);
-      note.buildLinkToParent(this.user, linkTypeToParent, currentUTCTimestamp);
-      this.modelFactoryService.noteRepository.save(note);
-      return note;
-    }
-  }
-
-  private Note createNoteAndExtractChildrenFromWikidata(
-      Note parentNote,
-      User user,
-      TextContent textContent,
-      String wikidataId,
-      Link.LinkType linkTypeToParent)
-      throws IOException, InterruptedException, BindException, UnexpectedNoAccessRightException {
-    WikidataIdWithApi wikidataIdWithApi = wikidataService.wrapWikidataIdWithApi(wikidataId);
-    NoteConstructionService noteConstructionService =
-        new NoteConstructionService(
-            user, testabilitySettings.getCurrentUTCTimestamp(), modelFactoryService);
-    Note note =
-        noteConstructionService.createNoteWithWikidataInfo(
-            parentNote, wikidataIdWithApi,
-            textContent, linkTypeToParent);
-
-    createSubNote(noteConstructionService, note, wikidataIdWithApi.getCountryOfOrigin());
-    createSubNote(noteConstructionService, note, wikidataIdWithApi.getAuthor());
-    return note;
-  }
-
-  private void createSubNote(
-      NoteConstructionService noteConstructionService,
-      Note parentNote,
-      Optional<WikidataIdWithApi> subNoteTitleOption)
-      throws InterruptedException, UnexpectedNoAccessRightException, BindException, IOException {
-    Optional<String> optionalTitle =
-        subNoteTitleOption.flatMap(WikidataIdWithApi::fetchEnglishTitleFromApi);
-    if (optionalTitle.isPresent()) {
-      String subNoteTitle = optionalTitle.get();
-      Optional<Note> existingNoteOption =
-          parentNote.getNotebook().findExistingNoteInNotebook(subNoteTitle);
-      if (existingNoteOption.isPresent()) {
-        Link link =
-            parentNote.buildLinkToNote(
-                noteConstructionService.user,
-                Link.LinkType.RELATED_TO,
-                noteConstructionService.currentUTCTimestamp,
-                existingNoteOption.get());
-        modelFactoryService.linkRepository.save(link);
-      } else {
-        TextContent textContent = new TextContent();
-        textContent.setTitle(subNoteTitle);
-        createNoteAndExtractChildrenFromWikidata(
-            parentNote, noteConstructionService.user, textContent, null, Link.LinkType.RELATED_TO);
-      }
-    }
+  private NoteConstructionService getNoteConstructionService(User user) {
+    return new NoteConstructionService(
+        user, testabilitySettings.getCurrentUTCTimestamp(), modelFactoryService);
   }
 
   @GetMapping("/{note}")

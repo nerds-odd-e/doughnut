@@ -64,7 +64,7 @@ public class Notebook {
   @Setter
   private Timestamp deletedAt;
 
-  public Optional<Note> findExistingNoteInNotebook(String title) {
-    return notes.stream().filter(x -> x.getTitle().equals(title)).findFirst();
+  public Optional<Note> findExistingNoteInNotebook(String wikidataId) {
+    return notes.stream().filter(x -> wikidataId.equals(x.getWikidataId())).findFirst();
   }
 }

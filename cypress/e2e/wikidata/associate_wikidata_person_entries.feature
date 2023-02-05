@@ -11,9 +11,9 @@ Feature: Note creation should have description if wikidata is a person
     And Wikidata.org entity "Q706446" is a person from "Q22502" and birthday is "+1980-03-31T00:00:00Z"
     And Wikidata.org entity "Q4604" is a person from "Q736936" and birthday is "-0552-10-09T00:00:00Z"
     And there are some notes for the current user
-      | title  | testingParent |
-      | People |               |
-      | Taiwan | People        |
+      | title  | testingParent | wikidataId |
+      | People |               |            |
+      | Taiwan | People        | Q22502     |
 
   @usingMockedWikidataService
   Scenario Outline: Create a note for a person with wikidata should auto fill the description
@@ -44,3 +44,4 @@ Feature: Note creation should have description if wikidata is a person
       | Title           | Wikidata Id  |
       | Wang Chien-ming | Q706446      |
     Then On the current page, I should see "Wang Chien-ming" has link "related to" "Taiwan"
+    # this check is not sufficient, should check new note is not create for taiwan
