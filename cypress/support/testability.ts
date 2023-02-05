@@ -133,6 +133,22 @@ Cypress.Commands.add("openAiService", () => {
 })
 
 Cypress.Commands.add(
+  "setServiceUrl",
+  { prevSubject: true },
+  (wikidataServiceTester: WikidataServiceTester, serviceUrl: string) => {
+    return new TestabilityHelper()
+      .postToTestabilityApi(cy, `replace_service_url`, {
+        body: { [wikidataServiceTester.serviceName]: serviceUrl },
+      })
+      .then((response) => {
+        expect(response.body).to.haveOwnProperty(wikidataServiceTester.serviceName)
+        expect(response.body[wikidataServiceTester.serviceName]).to.include("http")
+        cy.wrap(response.body[wikidataServiceTester.serviceName])
+      })
+  },
+)
+
+Cypress.Commands.add(
   "mock",
   { prevSubject: true },
   (wikidataServiceTester: WikidataServiceTester) => {

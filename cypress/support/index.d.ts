@@ -111,6 +111,7 @@ declare namespace Cypress {
     undoLast(undoThpe: string): Chainable<any>
     unsubscribeFromNotebook(noteTitle: string): Chainable<any>
     updateCurrentUserSettingsWith(hash: Record<string, string>): Chainable<Subject>
+    setServiceUrl(serviceUrl: string): Chainable<any>
     wikidataService(): Chainable<any>
     openAiService(): Chainable<any>
     withinMindmap(): Chainable<any>

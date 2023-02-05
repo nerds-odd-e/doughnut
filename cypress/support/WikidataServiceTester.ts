@@ -6,8 +6,16 @@ import ServiceMocker from "./ServiceMocker"
 class WikidataServiceTester {
   serviceMocker = new ServiceMocker(5001, "wikidata")
 
+  get serviceName(): string {
+    return this.serviceMocker.serviceName
+  }
+
+  get serviceUrl(): string {
+    return this.serviceMocker.serviceUrl
+  }
+
   mock(cy: Cypress.cy & CyEventEmitter) {
-    this.serviceMocker.mock(cy)
+    this.serviceMocker.install(cy)
   }
 
   restore(cy: Cypress.cy & CyEventEmitter) {

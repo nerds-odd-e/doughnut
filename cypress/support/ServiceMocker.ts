@@ -14,14 +14,14 @@ class ServiceMocker {
     this.serviceName = serviceName
   }
 
-  mock(cy: Cypress.cy & CyEventEmitter) {
+  install(cy: Cypress.cy & CyEventEmitter) {
     this.mountebank.createImposter()
-    this.setWikidataServiceUrl(cy, this.mountebank.serviceUrl).as(this.savedServiceUrlName)
+    this.setServiceUrl(cy, this.mountebank.serviceUrl).as(this.savedServiceUrlName)
   }
 
   restore(cy: Cypress.cy & CyEventEmitter) {
     cy.get(`@${this.savedServiceUrlName}`).then((saved) =>
-      this.setWikidataServiceUrl(cy, saved as unknown as string),
+      this.setServiceUrl(cy, saved as unknown as string),
     )
   }
 
@@ -29,10 +29,14 @@ class ServiceMocker {
     return `saved${this.serviceName}Url`
   }
 
-  private setWikidataServiceUrl(cy: Cypress.cy & CyEventEmitter, wikidataServiceUrl: string) {
+  get serviceUrl() {
+    return this.mountebank.serviceUrl
+  }
+
+  private setServiceUrl(cy: Cypress.cy & CyEventEmitter, serviceUrl: string) {
     return new TestabilityHelper()
       .postToTestabilityApi(cy, `replace_service_url`, {
-        body: { [this.serviceName]: wikidataServiceUrl },
+        body: { [this.serviceName]: serviceUrl },
       })
       .then((response) => {
         expect(response.body).to.haveOwnProperty(this.serviceName)
