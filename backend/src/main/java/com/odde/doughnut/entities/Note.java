@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
-import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -21,7 +20,6 @@ import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
 import org.hibernate.annotations.Where;
 import org.hibernate.annotations.WhereJoinTable;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.lang.Nullable;
 import org.thymeleaf.util.StringUtils;
@@ -355,30 +353,22 @@ public class Note extends Thingy {
 
   public void buildLinkToParent(
       User user, Link.LinkType linkTypeToParent, Timestamp currentUTCTimestamp) {
-    if (linkTypeToParent != Link.LinkType.NO_LINK) {
-      Link link =
-          Link.createLink(this, getParentNote(), user, linkTypeToParent, currentUTCTimestamp);
-      getRefers().add(link);
+    buildLinkToNote(user, linkTypeToParent, currentUTCTimestamp, getParentNote());
+  }
+
+  public Link buildLinkToNote(
+      User user, Link.LinkType linkType, Timestamp currentUTCTimestamp, Note targetNote) {
+    if (linkType == Link.LinkType.NO_LINK) {
+      return null;
     }
+    Link link = Link.createLink(this, targetNote, user, linkType, currentUTCTimestamp);
+    getRefers().add(link);
+    return link;
   }
 
   public Note buildChildNote(User user, Timestamp currentUTCTimestamp, TextContent textContent) {
     Note note = createNote(user, currentUTCTimestamp, textContent);
     note.setParentNote(this);
     return note;
-  }
-
-  @NotNull
-  public Link getLink(
-      User user, Optional<Note> existingNoteOption, TestabilitySettings testabilitySettings) {
-    Note existingNote = existingNoteOption.get();
-    Link link =
-        Link.createLink(
-            this,
-            existingNote,
-            user,
-            Link.LinkType.RELATED_TO,
-            testabilitySettings.getCurrentUTCTimestamp());
-    return link;
   }
 }

@@ -78,16 +78,17 @@ class RestNoteController {
   }
 
   record NoteConstructionService(
-      Timestamp currentUTCTimestamp,
-      WikidataIdWithApi wikidataIdWithApi,
-      ModelFactoryService modelFactoryService) {
+      User user, Timestamp currentUTCTimestamp, ModelFactoryService modelFactoryService) {
 
     private Note createNoteWithWikidataInfo(
-        Note parentNote, User user, TextContent textContent, Link.LinkType linkTypeToParent)
+        Note parentNote,
+        WikidataIdWithApi wikidataIdWithApi,
+        TextContent textContent,
+        Link.LinkType linkTypeToParent)
         throws BindException, IOException, InterruptedException {
-      Note note = parentNote.buildChildNote(user, currentUTCTimestamp, textContent);
+      Note note = parentNote.buildChildNote(this.user, currentUTCTimestamp, textContent);
       wikidataIdWithApi.associateNoteToWikidata(note, this.modelFactoryService);
-      note.buildLinkToParent(user, linkTypeToParent, currentUTCTimestamp);
+      note.buildLinkToParent(this.user, linkTypeToParent, currentUTCTimestamp);
       this.modelFactoryService.noteRepository.save(note);
       return note;
     }
@@ -103,18 +104,21 @@ class RestNoteController {
     WikidataIdWithApi wikidataIdWithApi = wikidataService.wrapWikidataIdWithApi(wikidataId);
     NoteConstructionService noteConstructionService =
         new NoteConstructionService(
-            testabilitySettings.getCurrentUTCTimestamp(), wikidataIdWithApi, modelFactoryService);
+            user, testabilitySettings.getCurrentUTCTimestamp(), modelFactoryService);
     Note note =
         noteConstructionService.createNoteWithWikidataInfo(
-            parentNote, user, textContent, linkTypeToParent);
+            parentNote, wikidataIdWithApi,
+            textContent, linkTypeToParent);
 
-    createSubNote(user, note, wikidataIdWithApi.getCountryOfOrigin());
-    createSubNote(user, note, wikidataIdWithApi.getAuthor());
+    createSubNote(noteConstructionService, note, wikidataIdWithApi.getCountryOfOrigin());
+    createSubNote(noteConstructionService, note, wikidataIdWithApi.getAuthor());
     return note;
   }
 
   private void createSubNote(
-      User user, Note parentNote, Optional<WikidataIdWithApi> subNoteTitleOption)
+      NoteConstructionService noteConstructionService,
+      Note parentNote,
+      Optional<WikidataIdWithApi> subNoteTitleOption)
       throws InterruptedException, UnexpectedNoAccessRightException, BindException, IOException {
     Optional<String> optionalTitle =
         subNoteTitleOption.flatMap(WikidataIdWithApi::fetchEnglishTitleFromApi);
@@ -123,13 +127,18 @@ class RestNoteController {
       Optional<Note> existingNoteOption =
           parentNote.getNotebook().findExistingNoteInNotebook(subNoteTitle);
       if (existingNoteOption.isPresent()) {
-        Link link = parentNote.getLink(user, existingNoteOption, testabilitySettings);
+        Link link =
+            parentNote.buildLinkToNote(
+                noteConstructionService.user,
+                Link.LinkType.RELATED_TO,
+                noteConstructionService.currentUTCTimestamp,
+                existingNoteOption.get());
         modelFactoryService.linkRepository.save(link);
       } else {
         TextContent textContent = new TextContent();
         textContent.setTitle(subNoteTitle);
         createNoteAndExtractChildrenFromWikidata(
-            parentNote, user, textContent, null, Link.LinkType.RELATED_TO);
+            parentNote, noteConstructionService.user, textContent, null, Link.LinkType.RELATED_TO);
       }
     }
   }
