@@ -11,12 +11,12 @@ import retrofit2.HttpException;
 @Service
 public class OpenAiWrapperService {
   @Value("${spring.openai.token}")
-  private String OpenAiToken;
+  private String openAiToken;
 
   private String textModel = "text-davinci-003";
 
   private String getOpenAiResponse(String prompt) {
-    var service = new OpenAiService(OpenAiToken);
+    var service = new OpenAiService(openAiToken);
     CompletionRequest completionRequest =
         CompletionRequest.builder().prompt(prompt).model(textModel).echo(true).build();
     var choices = service.createCompletion(completionRequest).getChoices();
