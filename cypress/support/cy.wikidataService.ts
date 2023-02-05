@@ -30,7 +30,16 @@ import WikidataServiceTester from "./WikidataServiceTester"
 import "./string.extensions"
 import ServiceTester from "./ServiceTester"
 import WikidataEntitiesBuilder, { Claim } from "./json/WikidataEntitiesBuilder"
+import ServiceMocker from "./ServiceMocker"
 
+const stubWikidataApi = (
+  serviceMocker: ServiceMocker,
+  action: string,
+  query: Record<string, string>,
+  data: unknown,
+) => {
+  return serviceMocker.stubGetter(`/w/api.php`, { action, ...query }, data)
+}
 Cypress.Commands.add(
   "stubWikidataEntityQuery",
   { prevSubject: true },
@@ -61,7 +70,8 @@ Cypress.Commands.add(
   "stubWikidataEntity",
   { prevSubject: true },
   (wikidataServiceTester: WikidataServiceTester, wikidataId: string, claims: Claim[]) => {
-    wikidataServiceTester.stubWikidataApi(
+    stubWikidataApi(
+      wikidataServiceTester.serviceMocker,
       "wbgetentities",
       { ids: wikidataId },
       new WikidataEntitiesBuilder(wikidataId).wclaims(claims).build(),
@@ -105,7 +115,9 @@ Cypress.Commands.add(
   "stubWikidataEntityBook",
   { prevSubject: true },
   (wikidataServiceTester: WikidataServiceTester, wikidataId: string, authorWikidataId: string) => {
-    wikidataServiceTester.stubWikidataEntityBook(wikidataId, authorWikidataId)
+    cy.wrap(wikidataServiceTester).stubWikidataEntity(wikidataId, [
+      { claimId: "P50", type: "wikibase-entityid", value: { id: authorWikidataId } },
+    ])
   },
 )
 
@@ -113,6 +125,20 @@ Cypress.Commands.add(
   "stubWikidataSearchResult",
   { prevSubject: true },
   (wikidataServiceTester: WikidataServiceTester, wikidataLabel: string, wikidataId: string) => {
-    wikidataServiceTester.stubWikidataSearchResult(wikidataLabel, wikidataId)
+    stubWikidataApi(
+      wikidataServiceTester.serviceMocker,
+      "wbsearchentities",
+      {},
+      {
+        search: [
+          {
+            id: wikidataId,
+            label: wikidataLabel,
+            description:
+              'genre of popular music that originated as"rock and roll"in 1950s United States',
+          },
+        ],
+      },
+    )
   },
 )
