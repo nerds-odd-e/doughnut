@@ -22,10 +22,6 @@ class WikidataServiceTester {
     this.serviceMocker.install()
   }
 
-  restore(cy: Cypress.cy & CyEventEmitter) {
-    this.serviceMocker.restore(cy)
-  }
-
   async stubWikidataEntityQuery(wikidataId: string, wikidataTitle: string, wikipediaLink: string) {
     const wikipedia = wikipediaLink ? { enwiki: { site: "enwiki", url: wikipediaLink } } : {}
     return await this.serviceMocker.stubByUrl(`/wiki/Special:EntityData/${wikidataId}.json`, {

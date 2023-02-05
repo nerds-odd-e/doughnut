@@ -159,6 +159,8 @@ Cypress.Commands.add(
   "restore",
   { prevSubject: true },
   (wikidataServiceTester: WikidataServiceTester) => {
-    wikidataServiceTester.restore(cy)
+    cy.get(`@${wikidataServiceTester.savedServiceUrlName}`).then((saved) =>
+      cy.setServiceUrl(wikidataServiceTester.serviceName, saved as unknown as string),
+    )
   },
 )
