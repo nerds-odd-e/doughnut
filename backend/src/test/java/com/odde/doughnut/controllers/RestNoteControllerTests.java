@@ -62,6 +62,29 @@ class RestNoteControllerTests {
             openAiWrapperService);
   }
 
+  private void mockWikidataEntity(String wikidataId, String label)
+      throws IOException, InterruptedException {
+    if (Strings.isEmpty(wikidataId) || Strings.isEmpty(label)) {
+      return;
+    }
+    Mockito.when(
+            httpClientAdapter.getResponseString(
+                URI.create(
+                    "https://www.wikidata.org/wiki/Special:EntityData/" + wikidataId + ".json")))
+        .thenReturn(makeMe.wikidataClaimsJson(wikidataId).labelIf(label).please());
+  }
+
+  private void mockWikidataWBGetEntity(String personWikidataId, String value)
+      throws IOException, InterruptedException {
+    Mockito.when(
+            httpClientAdapter.getResponseString(
+                URI.create(
+                    "https://www.wikidata.org/w/api.php?action=wbgetentities&ids="
+                        + personWikidataId
+                        + "&format=json&props=claims")))
+        .thenReturn(value);
+  }
+
   @Nested
   class showNoteTest {
     @Test
@@ -210,14 +233,9 @@ class RestNoteControllerTests {
 
       private void mockApiResponseWithLocationInfo(String locationInfo, String type)
           throws IOException, InterruptedException {
-        Mockito.when(
-                httpClientAdapter.getResponseString(
-                    URI.create(
-                        "https://www.wikidata.org/w/api.php?action=wbgetentities&ids="
-                            + wikidataIdOfALocation
-                            + "&format=json&props=claims")))
-            .thenReturn(
-                makeMe.wikidataClaimsJson("Q334").globeCoordinate(locationInfo, type).please());
+        mockWikidataWBGetEntity(
+            wikidataIdOfALocation,
+            makeMe.wikidataClaimsJson("Q334").globeCoordinate(locationInfo, type).please());
       }
 
       @Test
@@ -263,36 +281,17 @@ class RestNoteControllerTests {
         noteCreation.getTextContent().setDescription("");
       }
 
-      private void mockWikidataCountryEntity(String countryQId, String countryName)
-          throws IOException, InterruptedException {
-        if (Strings.isEmpty(countryQId) || Strings.isEmpty(countryName)) {
-          return;
-        }
-        Mockito.when(
-                httpClientAdapter.getResponseString(
-                    URI.create(
-                        "https://www.wikidata.org/wiki/Special:EntityData/"
-                            + countryQId
-                            + ".json")))
-            .thenReturn(makeMe.wikidataClaimsJson(countryQId).labelIf(countryName).please());
-      }
-
       private void mockWikidataHumanEntity(
           String personWikidataId, String birthdayByISO, String countryQId)
           throws IOException, InterruptedException {
-        Mockito.when(
-                httpClientAdapter.getResponseString(
-                    URI.create(
-                        "https://www.wikidata.org/w/api.php?action=wbgetentities&ids="
-                            + personWikidataId
-                            + "&format=json&props=claims")))
-            .thenReturn(
-                makeMe
-                    .wikidataClaimsJson(personWikidataId)
-                    .asHuman()
-                    .countryOfOrigin(countryQId)
-                    .birthdayIf(birthdayByISO)
-                    .please());
+        mockWikidataWBGetEntity(
+            personWikidataId,
+            makeMe
+                .wikidataClaimsJson(personWikidataId)
+                .asHuman()
+                .countryOfOrigin(countryQId)
+                .birthdayIf(birthdayByISO)
+                .please());
       }
 
       @ParameterizedTest
@@ -318,7 +317,7 @@ class RestNoteControllerTests {
           throws BindException, InterruptedException, UnexpectedNoAccessRightException,
               IOException {
         mockWikidataHumanEntity(wikidataIdOfHuman, birthdayByISO, countryQid);
-        mockWikidataCountryEntity(countryQid, countryName);
+        mockWikidataEntity(countryQid, countryName);
         noteCreation.setWikidataId(wikidataIdOfHuman);
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
         String description = note.noteRealm.getNote().getTextContent().getDescription();
@@ -336,7 +335,7 @@ class RestNoteControllerTests {
               IOException {
 
         mockWikidataHumanEntity("Q8337", null, "Q34660");
-        mockWikidataCountryEntity("Q34660", "Canada");
+        mockWikidataEntity("Q34660", "Canada");
         noteCreation.setWikidataId("Q8337");
         noteCreation.getTextContent().setTitle("Johnny boy");
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
@@ -353,26 +352,9 @@ class RestNoteControllerTests {
       private void mockApiResponseForBookWithAuthorTag(
           String bookWikiDataId, String bookAuthorWikiDataId)
           throws IOException, InterruptedException {
-        Mockito.when(
-                httpClientAdapter.getResponseString(
-                    URI.create(
-                        "https://www.wikidata.org/w/api.php?action=wbgetentities&ids="
-                            + bookWikiDataId
-                            + "&format=json&props=claims")))
-            .thenReturn(
-                makeMe.wikidataClaimsJson(bookWikiDataId).asBook(bookAuthorWikiDataId).please());
-      }
-
-      private void mockApiResponseForAuthor(String bookAuthorWikiDataId, String authorName)
-          throws IOException, InterruptedException {
-        Mockito.when(
-                httpClientAdapter.getResponseString(
-                    URI.create(
-                        "https://www.wikidata.org/wiki/Special:EntityData/"
-                            + bookAuthorWikiDataId
-                            + ".json")))
-            .thenReturn(
-                makeMe.wikidataClaimsJson(bookAuthorWikiDataId).labelIf(authorName).please());
+        mockWikidataWBGetEntity(
+            bookWikiDataId,
+            makeMe.wikidataClaimsJson(bookWikiDataId).asBook(bookAuthorWikiDataId).please());
       }
 
       @ParameterizedTest
@@ -393,7 +375,7 @@ class RestNoteControllerTests {
           throws BindException, InterruptedException, UnexpectedNoAccessRightException,
               IOException {
         mockApiResponseForBookWithAuthorTag(wikidataIdOfBook, authorWikiDataId);
-        mockApiResponseForAuthor(authorWikiDataId, authorWikiDataName);
+        mockWikidataEntity(authorWikiDataId, authorWikiDataName);
         noteCreation.setWikidataId(wikidataIdOfBook);
         noteCreation.getTextContent().setTitle(bookName);
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
