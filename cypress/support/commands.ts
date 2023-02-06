@@ -558,28 +558,3 @@ Cypress.Commands.add("expectAMapTo", (latitude: string, longitude: string) => {
   cy.get(".map-applet").invoke("attr", "data-lon").should("eq", longitude)
   cy.get(".map-applet").invoke("attr", "data-lat").should("eq", latitude)
 })
-
-Cypress.Commands.add("assertValueCopiedToClipboard", (value) => {
-  cy.window().then((win) => {
-    win.navigator.clipboard.readText().then((text) => {
-      expect(text).to.eq(value)
-    })
-  })
-})
-
-Cypress.Commands.add("performActionWithSuggestedDescription", (action: string) => {
-  switch (action) {
-    case "use":
-      cy.findByRole("button", { name: "Use" }).click()
-      break
-    case "copy":
-      cy.findByRole("button", { name: "Copy to clipboard" }).focused().click()
-      break
-    case "cancel":
-      cy.get(".close-button").click()
-      break
-    default:
-      cy.failure()
-      break
-  }
-})

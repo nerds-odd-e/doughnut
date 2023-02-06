@@ -25,7 +25,7 @@ public class TestabilitySettings {
       new HashMap<>() {
         {
           put("wikidata", "https://www.wikidata.org");
-          put("openai", "https://api.openai.com/");
+          put("openAi", "https://api.openai.com/");
         }
       };
 
@@ -72,10 +72,17 @@ public class TestabilitySettings {
     return this.serviceUrls.get("wikidata");
   }
 
-  public Map<String, String> replaceServiceUrl(Map<String, String> setWikidataService) {
+  public Map<String, String> replaceServiceUrls(Map<String, String> setWikidataService) {
     HashMap<String, String> saved = new HashMap<>();
-    saved.put("wikidata", this.serviceUrls.get("wikidata"));
-    this.serviceUrls.put("wikidata", setWikidataService.get("wikidata"));
+    replaceServiceUrl(setWikidataService, saved, "wikidata");
+    replaceServiceUrl(setWikidataService, saved, "openAi");
     return saved;
+  }
+
+  private void replaceServiceUrl(Map<String, String> setWikidataService, HashMap<String, String> saved, String serviceName) {
+    if(setWikidataService.containsKey(serviceName)) {
+      saved.put(serviceName, this.serviceUrls.get(serviceName));
+      this.serviceUrls.put(serviceName, setWikidataService.get(serviceName));
+    }
   }
 }

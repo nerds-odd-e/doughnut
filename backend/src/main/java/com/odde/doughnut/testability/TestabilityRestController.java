@@ -305,7 +305,7 @@ class TestabilityRestController {
   @PostMapping(value = "/replace_service_url")
   public Map<String, String> replaceServiceUrl(
       @RequestBody Map<String, String> setWikidataService) {
-    return testabilitySettings.replaceServiceUrl(setWikidataService);
+    return testabilitySettings.replaceServiceUrls(setWikidataService);
   }
 
   static class Randomization {

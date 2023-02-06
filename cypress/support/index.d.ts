@@ -10,7 +10,6 @@ declare namespace Cypress {
   interface Chainable<Subject = any> {
     addSiblingNoteButton(): Chainable<any>
     assertBlogPostInWebsiteByTitle(article: any): Chainable<any>
-    assertValueCopiedToClipboard(value: any): Chainable<any>
     associateNoteWithWikidataId(title: any, wikiID: any): Chainable<any>
     backendTimeTravelTo(day: number, hour: number): Chainable<Subject>
     backendTimeTravelRelativeToNow(hours: number): Chainable<Subject>
@@ -67,7 +66,6 @@ declare namespace Cypress {
     ): Chainable<any>
     openCirclesSelector(): Chainable<any>
     pageIsNotLoading(): Chainable<any>
-    performActionWithSuggestedDescription(action: string): Chainable<any>
     randomizerAlwaysChooseLast(): Chainable<Subject>
     replaceFocusedTextAndEnter(test: any): Chainable<any>
     repeatReviewNotes(noteTitles: string): Chainable<any>

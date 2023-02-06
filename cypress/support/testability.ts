@@ -129,7 +129,7 @@ Cypress.Commands.add("wikidataService", () => {
 })
 
 Cypress.Commands.add("openAiService", () => {
-  cy.wrap(new OpenAiServiceTester())
+  cy.wrap(new ServiceMocker("openAi", 5001))
 })
 
 Cypress.Commands.add("setServiceUrl", (serviceName: string, serviceUrl: string) => {

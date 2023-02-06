@@ -5,14 +5,6 @@
       <TextArea v-model="suggestedDescription" />
       <div class="dialog-buttons">
         <input type="submit" value="Use" class="btn btn-primary" />
-        <button
-          type="button"
-          value="Copy to clipboard"
-          class="btn btn-primary"
-          @click="copyText()"
-        >
-          Copy to clipboard
-        </button>
       </div>
     </form>
   </LoadingPage>
@@ -55,9 +47,6 @@ export default defineComponent({
   },
   emits: ["done"],
   methods: {
-    copyText() {
-      navigator.clipboard.writeText(this.suggestedDescription);
-    },
     processForm() {
       this.storageAccessor
         .api()
