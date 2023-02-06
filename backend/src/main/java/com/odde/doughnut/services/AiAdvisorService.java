@@ -6,10 +6,10 @@ import com.theokanning.openai.completion.CompletionRequest;
 import java.util.stream.Collectors;
 import retrofit2.HttpException;
 
-public class OpenAiWrapperService {
+public class AiAdvisorService {
   private final OpenAiService service;
 
-  public OpenAiWrapperService(OpenAiService openAiService) {
+  public AiAdvisorService(OpenAiService openAiService) {
     service = openAiService;
   }
 
