@@ -7,7 +7,7 @@ Feature: Suggest description
     And there are some notes for the current user
       | title    | description         | testingParent |
       | Animals  | Are living beings   |               |
-    And that OpenAI thinks that "Animals" means "Sharing the same planet as humans"
+    And OpenAI thinks that "Animals" means "Sharing the same planet as humans"
 
   @usingMockedOpenAiService
   Scenario Outline: Perform action with suggested note description

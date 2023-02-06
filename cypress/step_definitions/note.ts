@@ -45,13 +45,9 @@ Given("there are notes from Note {int} to Note {int}", (from, to) => {
   cy.testability().seedNotes(notes)
 })
 
-Given(
-  "that OpenAI thinks that {string} means {string}",
-  (noteTitle: string, description: string) => {
-    cy.log(noteTitle)
-    cy.log(description)
-  },
-)
+Given("OpenAI thinks that {string} means {string}", (noteTitle: string, description: string) => {
+  cy.openAiService().stubOpenAiCompletion(noteTitle, description)
+})
 
 When("I create notebooks with:", (notes: DataTable) => {
   notes.hashes().forEach((noteAttributes) => {

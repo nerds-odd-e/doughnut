@@ -29,10 +29,18 @@ class ServiceMocker {
     return this.stub(new DefaultStub(url, HttpMethod.GET, data, 200))
   }
 
-  public stubGetter(path: string, queryData: unknown, data: unknown) {
+  public stubGetter(path: string, queryData: unknown, response: unknown) {
     return this.stub(
-      new DefaultStub(path, HttpMethod.GET, data, 200).withPredicate(
+      new DefaultStub(path, HttpMethod.GET, response, 200).withPredicate(
         new FlexiPredicate().withPath(path).withQuery(queryData).withMethod(HttpMethod.GET),
+      ),
+    )
+  }
+
+  public stubPoster(path: string, response: unknown) {
+    return this.stub(
+      new DefaultStub(path, HttpMethod.POST, response, 200).withPredicate(
+        new FlexiPredicate().withPath(path).withMethod(HttpMethod.POST),
       ),
     )
   }

@@ -19,6 +19,7 @@
 import "./commands"
 import "./testability"
 import "./cy.wikidataService"
+import "./cy.openAiService"
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')

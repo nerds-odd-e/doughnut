@@ -21,11 +21,7 @@ public class RestAiController {
   @PostMapping("/ask-suggestions")
   public AiSuggestion askSuggestion(@RequestBody HashMap<String, String> params) {
     AiSuggestion aiSuggestion = new AiSuggestion();
-    if (params.get("title").equals("Animals")) {
-      aiSuggestion.suggestion = "Sharing the same planet as humans";
-    } else {
-      aiSuggestion.suggestion = openAiWrapperService.getDescription(params.get("title"));
-    }
+    aiSuggestion.suggestion = openAiWrapperService.getDescription(params.get("title"));
     return aiSuggestion;
   }
 }
