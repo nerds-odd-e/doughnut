@@ -79,8 +79,9 @@ public class TestabilitySettings {
     return saved;
   }
 
-  private void replaceServiceUrl(Map<String, String> setWikidataService, HashMap<String, String> saved, String serviceName) {
-    if(setWikidataService.containsKey(serviceName)) {
+  private void replaceServiceUrl(
+      Map<String, String> setWikidataService, HashMap<String, String> saved, String serviceName) {
+    if (setWikidataService.containsKey(serviceName)) {
       saved.put(serviceName, this.serviceUrls.get(serviceName));
       this.serviceUrls.put(serviceName, setWikidataService.get(serviceName));
     }

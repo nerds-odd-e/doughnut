@@ -1,6 +1,5 @@
 /// <reference types="cypress" />
 // @ts-check
-import OpenAiServiceTester from "./OpenAiServiceTester"
 import TestabilityHelper from "./TestabilityHelper"
 import ServiceMocker from "./ServiceMocker"
 
