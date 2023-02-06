@@ -241,6 +241,13 @@ const apiCollection = (managedApi: ManagedApi) => ({
       )) as Generated.WikidataSearchEntity[];
     },
   },
+  ai: {
+    async askAiSuggestions(title: string) {
+      return (await managedApi.restPost(`ai/ask-suggestions`, {
+        title,
+      })) as Generated.AiSuggestion;
+    },
+  },
   testability: {
     getEnvironment() {
       return window.location.href.includes("odd-e.com")

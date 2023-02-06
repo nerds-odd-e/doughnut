@@ -60,6 +60,11 @@ export default defineComponent({
         });
     },
   },
+  mounted() {
+    this.api.ai.askAiSuggestions(this.selectedNote.title).then((res) => {
+      this.suggestedDescription = res.suggestion;
+    });
+  },
 });
 </script>
 

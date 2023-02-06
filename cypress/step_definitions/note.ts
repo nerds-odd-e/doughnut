@@ -402,12 +402,10 @@ Then(
 When("I ask for a description suggestion for {string}", (noteTitle: string) => {
   cy.jumpToNotePage(noteTitle)
   cy.findByRole("button", { name: "Suggest" }).click()
-  cy.get(".area-control.form-control").focus()
-  cy.replaceFocusedTextAndEnter("Sharing the same planet as humans")
 })
 
 Then("I should be prompted with a suggested description {string}", (description: string) => {
-  cy.get(".area-control.form-control").should("have.value", description + "\n")
+  cy.get(".area-control.form-control").should("have.value", description)
 })
 
 Then(
