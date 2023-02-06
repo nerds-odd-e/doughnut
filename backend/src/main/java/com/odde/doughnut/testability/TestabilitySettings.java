@@ -4,12 +4,17 @@ import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.models.randomizers.RealRandomizer;
 import com.odde.doughnut.services.GithubService;
+import com.theokanning.openai.OpenAiService;
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 
@@ -85,5 +90,13 @@ public class TestabilitySettings {
       saved.put(serviceName, this.serviceUrls.get(serviceName));
       this.serviceUrls.put(serviceName, setWikidataService.get(serviceName));
     }
+  }
+
+  @Bean
+  @SessionScope
+  @Qualifier("testableOpenAiService")
+  public OpenAiService getTestableOpenAiService(
+      @Value("${spring.openai.token}") String openAiToken) {
+    return new OpenAiService(openAiToken, this.serviceUrls.get("openAi"), Duration.ofSeconds(10));
   }
 }

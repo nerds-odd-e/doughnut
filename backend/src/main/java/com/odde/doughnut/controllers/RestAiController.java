@@ -1,9 +1,11 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.json.AiSuggestion;
-import com.odde.doughnut.services.HttpClientAdapter;
+import com.odde.doughnut.services.OpenAiWrapperService;
 import com.odde.doughnut.testability.TestabilitySettings;
+import com.theokanning.openai.OpenAiService;
 import java.util.HashMap;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
@@ -12,9 +14,11 @@ import org.springframework.web.context.annotation.SessionScope;
 @SessionScope
 @RequestMapping("/api/ai")
 public class RestAiController {
+  OpenAiWrapperService openAiWrapperService;
 
   public RestAiController(
-      TestabilitySettings testabilitySettings, HttpClientAdapter httpClientAdapter) {}
+      @Qualifier("testableOpenAiService") OpenAiService openAiService,
+      TestabilitySettings testabilitySettings) {}
 
   @PostMapping("/ask-suggestions")
   public AiSuggestion askSuggestion(@RequestBody HashMap<String, String> params)
