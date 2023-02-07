@@ -59,11 +59,7 @@ class RestAiControllerTest {
   @Test
   void streamSomeStrings() {
     Flux<String> aiSuggestion = controller.stream();
-    StepVerifier.create(aiSuggestion)
-      .expectNext("foo")
-      .expectNext("bar")
-      .expectComplete()
-      .verify();
+    StepVerifier.create(aiSuggestion).expectNext("foo").expectNext("bar").expectComplete().verify();
   }
 
   @NotNull

@@ -28,6 +28,7 @@ public class RestAiController {
   public AiSuggestion askSuggestion(@RequestBody HashMap<String, String> params) {
     return aiAdvisorService.getAiSuggestion(params.get("title"));
   }
+
   @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   public Flux<String> stream() {
     return Flux.just("foo", "bar");
