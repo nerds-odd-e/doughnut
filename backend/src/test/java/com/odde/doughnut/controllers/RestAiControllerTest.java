@@ -40,7 +40,7 @@ class RestAiControllerTest {
             argThat(
                 request -> {
                   assertEquals(request.getPrompt(), "Tell me about Earth.");
-                  assertEquals(request.getMaxTokens(), 500);
+                  assertEquals(request.getMaxTokens(), 100);
                   return true;
                 })))
         .thenReturn(buildCompletionResult("blue planet"));

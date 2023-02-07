@@ -18,7 +18,7 @@ public class AiAdvisorService {
         CompletionRequest.builder()
             .prompt(prompt)
             .model("text-davinci-003")
-            .maxTokens(500)
+            .maxTokens(100)
             .echo(true)
             .build();
     var choices = service.createCompletion(completionRequest).getChoices();
