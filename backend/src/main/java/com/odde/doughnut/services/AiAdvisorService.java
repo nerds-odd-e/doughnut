@@ -15,7 +15,12 @@ public class AiAdvisorService {
 
   private String getOpenAiResponse(String prompt) {
     CompletionRequest completionRequest =
-        CompletionRequest.builder().prompt(prompt).model("text-davinci-003").echo(true).build();
+        CompletionRequest.builder()
+            .prompt(prompt)
+            .model("text-davinci-003")
+            .maxTokens(500)
+            .echo(true)
+            .build();
     var choices = service.createCompletion(completionRequest).getChoices();
     return choices.stream().map(CompletionChoice::getText).collect(Collectors.joining(""));
   }
