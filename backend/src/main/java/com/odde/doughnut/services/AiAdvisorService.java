@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.entities.json.AiSuggestion;
 import com.theokanning.openai.OpenAiService;
 import com.theokanning.openai.completion.CompletionChoice;
 import com.theokanning.openai.completion.CompletionRequest;
@@ -25,12 +26,12 @@ public class AiAdvisorService {
     return choices.stream().map(CompletionChoice::getText).collect(Collectors.joining(""));
   }
 
-  public String getSuggestedDescription(String item) {
+  public AiSuggestion getAiSuggestion(String item) {
     try {
       String prompt = "Tell me about " + item + ".";
-      return getOpenAiResponse(prompt).replace(prompt, "").trim();
+      return new AiSuggestion(getOpenAiResponse(prompt).replace(prompt, "").trim());
     } catch (HttpException e) {
-      return "";
+      return new AiSuggestion("");
     }
   }
 }

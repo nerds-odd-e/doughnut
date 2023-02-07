@@ -51,7 +51,7 @@ class RestAiControllerTest {
   void askSuggestionAndUseResponse() {
     when(openAiService.createCompletion(any())).thenReturn(buildCompletionResult("blue planet"));
     AiSuggestion aiSuggestion = controller.askSuggestion(params);
-    assertEquals("blue planet", aiSuggestion.suggestion);
+    assertEquals("blue planet", aiSuggestion.suggestion());
   }
 
   @NotNull

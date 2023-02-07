@@ -20,8 +20,6 @@ public class RestAiController {
 
   @PostMapping("/ask-suggestions")
   public AiSuggestion askSuggestion(@RequestBody HashMap<String, String> params) {
-    AiSuggestion aiSuggestion = new AiSuggestion();
-    aiSuggestion.suggestion = aiAdvisorService.getSuggestedDescription(params.get("title"));
-    return aiSuggestion;
+    return aiAdvisorService.getAiSuggestion(params.get("title"));
   }
 }
