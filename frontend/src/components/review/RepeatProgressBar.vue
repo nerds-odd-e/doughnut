@@ -10,9 +10,7 @@
             @click="
               $emit(
                 'viewLastResult',
-                previousResultCursor === undefind
-                  ? finished - 1
-                  : previousResultCursor - 1
+                !previousResultCursor ? finished - 1 : previousResultCursor - 1
               )
             "
           >
