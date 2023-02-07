@@ -35,6 +35,7 @@ repositories {
 dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
   implementation 'org.springframework.boot:spring-boot-starter-web'
+  implementation 'org.springframework.boot:spring-boot-starter-webflux'
   implementation 'org.flywaydb:flyway-mysql'
   compileOnly 'org.flywaydb:flyway-core'
   implementation 'org.springframework.session:spring-session-core'
@@ -48,6 +49,7 @@ dependencies {
   annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
   annotationProcessor 'org.projectlombok:lombok'
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'io.projectreactor:reactor-test:3.2.3.RELEASE'
   implementation 'com.theokanning.openai-gpt3-java:client:0.9.0'
 }
 
@@ -106,5 +108,5 @@ generateTypeScript {
   ]
   outputFile = '../frontend/src/@types/generated/rest.d.ts'
   outputKind = 'global'
-  namespace = 'Generated';
+  namespace = 'Generated'
 }
