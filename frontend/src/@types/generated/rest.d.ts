@@ -3,6 +3,10 @@
 
 declare namespace Generated {
 
+    interface AiStory {
+        story: string;
+    }
+
     interface AiSuggestion {
         suggestion: string;
     }
