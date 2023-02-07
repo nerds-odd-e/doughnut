@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.when;
@@ -16,8 +16,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import reactor.core.publisher.Flux;
-import reactor.test.StepVerifier;
 
 class RestAiControllerTest {
   RestAiController controller;
@@ -54,16 +52,6 @@ class RestAiControllerTest {
     when(openAiService.createCompletion(any())).thenReturn(buildCompletionResult("blue planet"));
     AiSuggestion aiSuggestion = controller.askSuggestion(params);
     assertEquals("blue planet", aiSuggestion.suggestion());
-  }
-
-  @Test
-  void streamSomeStrings() {
-    Flux<String> aiSuggestion = controller.stream();
-    StepVerifier.create(aiSuggestion)
-      .expectNext("foo")
-      .expectNext("bar")
-      .expectComplete()
-      .verify();
   }
 
   @NotNull
