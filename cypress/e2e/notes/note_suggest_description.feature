@@ -7,6 +7,7 @@ Feature: Suggest description
     And there are some notes for the current user
       | title    | description         | testingParent |
       | Animals  | Are living beings   |               |
+    And An OpenAi token is available in the system
     And OpenAI thinks that "Animals" means "Sharing the same planet as humans"
 
   @usingMockedOpenAiService
