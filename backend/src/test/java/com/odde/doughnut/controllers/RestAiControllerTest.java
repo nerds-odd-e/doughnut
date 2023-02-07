@@ -74,4 +74,9 @@ class RestAiControllerTest {
             }));
     return completionResult;
   }
+
+  @Test
+  void askStoryAndReturnResponse() {
+    assertEquals("Coming soon ", controller.askStory(null).getStory());
+  }
 }

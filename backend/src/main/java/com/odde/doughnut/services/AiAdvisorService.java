@@ -1,9 +1,12 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.json.AiSuggestion;
+import com.odde.doughnut.entities.json.AiStory;
 import com.theokanning.openai.OpenAiService;
 import com.theokanning.openai.completion.CompletionChoice;
 import com.theokanning.openai.completion.CompletionRequest;
+
+import java.util.List;
 import java.util.stream.Collectors;
 import retrofit2.HttpException;
 
@@ -33,5 +36,10 @@ public class AiAdvisorService {
     } catch (HttpException e) {
       return new AiSuggestion("");
     }
+  }
+
+  public AiStory getEngagingStory(List<String> items) {
+    final String story = String.join("", items);
+    return AiStory.builder().story(story).build();
   }
 }
