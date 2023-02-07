@@ -57,9 +57,13 @@ class RestAiControllerTest {
   }
 
   @Test
-  void streamSomeStrings() {
-    Flux<String> aiSuggestion = controller.stream();
-    StepVerifier.create(aiSuggestion).expectNext("foo").expectNext("bar").expectComplete().verify();
+  void streamSuggestions() {
+    when(openAiService.createCompletion(any())).thenReturn(buildCompletionResult("Harry Potter"));
+    Flux<AiSuggestion> aiSuggestion = controller.streamSuggestions();
+    StepVerifier.create(aiSuggestion)
+        .expectNext(new AiSuggestion("Harry Potter"))
+        .expectComplete()
+        .verify();
   }
 
   @NotNull

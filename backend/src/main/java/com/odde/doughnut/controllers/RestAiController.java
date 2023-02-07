@@ -33,9 +33,9 @@ public class RestAiController {
     return aiAdvisorService.getAiSuggestion(params.get("title"));
   }
 
-  @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-  public Flux<String> stream() {
-    return Flux.just("foo", "bar");
+  @GetMapping(value = "/stream-suggestions", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+  public Flux<AiSuggestion> streamSuggestions() {
+    return Flux.just(aiAdvisorService.getAiSuggestion("Harry Potter"));
   }
 
   @GetMapping("/ask-story/{note}")
