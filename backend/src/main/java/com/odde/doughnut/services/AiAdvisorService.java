@@ -1,11 +1,10 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.entities.json.AiStory;
+import com.odde.doughnut.entities.json.AiSuggestion;
 import com.theokanning.openai.OpenAiService;
 import com.theokanning.openai.completion.CompletionChoice;
 import com.theokanning.openai.completion.CompletionRequest;
-
 import java.util.List;
 import java.util.stream.Collectors;
 import retrofit2.HttpException;

@@ -5,10 +5,8 @@ import com.odde.doughnut.entities.json.AiStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.theokanning.openai.OpenAiService;
-
 import java.util.Collections;
 import java.util.HashMap;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
