@@ -1,25 +1,25 @@
 package com.odde.doughnut.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
+import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.theokanning.openai.OpenAiService;
 import com.theokanning.openai.completion.CompletionChoice;
 import com.theokanning.openai.completion.CompletionRequest;
 import com.theokanning.openai.completion.CompletionResult;
 import java.util.Collections;
 import java.util.List;
-import okhttp3.MediaType;
-import okhttp3.ResponseBody;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import retrofit2.HttpException;
-import retrofit2.Response;
 
 class AiAdvisorServiceTest {
 
@@ -60,12 +60,9 @@ class AiAdvisorServiceTest {
   @Test
   void getAiSuggestion_givenAString_whenHttpError_returnsEmptySuggestion() {
     AiSuggestion expected = new AiSuggestion("");
-    HttpException exceptionFromOpenAi =
-        new HttpException(
-            Response.error(403, ResponseBody.create("response", MediaType.parse("plain/text"))));
-
+    HttpException httpExceptionMock = Mockito.mock(HttpException.class);
     Mockito.when(openAiServiceMock.createCompletion(ArgumentMatchers.any()))
-        .thenThrow(exceptionFromOpenAi);
+        .thenThrow(httpExceptionMock);
 
     assertEquals(expected, aiAdvisorService.getAiSuggestion("suggestion_prompt"));
 
@@ -96,5 +93,15 @@ class AiAdvisorServiceTest {
     assertEquals(expected, aiAdvisorService.getEngagingStory(Collections.singletonList("title")));
 
     Mockito.verify(openAiServiceMock).createCompletion(completionRequest);
+  }
+
+  @Test
+  @Disabled
+  void getAiSuggestion_given_invalidToken_return_401() {
+    HttpException httpExceptionMock = Mockito.mock(HttpException.class);
+    Mockito.when(httpExceptionMock.code()).thenReturn(401);
+    Mockito.when(openAiServiceMock.createCompletion(ArgumentMatchers.any()))
+        .thenThrow(httpExceptionMock);
+    assertThrows(OpenAiUnauthorizedException.class, () -> aiAdvisorService.getAiSuggestion(""));
   }
 }
