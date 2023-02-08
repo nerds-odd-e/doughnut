@@ -442,6 +442,6 @@ Then("I should get a suggestion {string}", (description: string) => {
   cy.get(".area-control.form-control").should("have.value", description)
 })
 
-Then("I should not get a suggestion {string}", (description: string) => {
-  cy.get(".area-control.form-control").should("have.value", description)
+Then("I should not get a suggestion {string}", () => {
+  cy.get(".alert").should("have.value", "your open ai token is invalid")
 })
