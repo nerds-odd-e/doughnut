@@ -9,7 +9,6 @@ Feature: Tell me a engaging story
     And OpenAI thinks that "Animals" means "Cow says moo"
 
   @usingMockedOpenAiService
-  @ignore
   Scenario: Click the Engaging Story button creates a modal message
     When I ask for an engaging story for "Animals"
     Then I should be prompted with an engaging story description "Cow says moo"

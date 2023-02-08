@@ -97,6 +97,6 @@ public class TestabilitySettings {
   @Qualifier("testableOpenAiService")
   public OpenAiService getTestableOpenAiService(
       @Value("${spring.openai.token}") String openAiToken) {
-    return new OpenAiService(openAiToken, this.serviceUrls.get("openAi"), Duration.ofSeconds(15));
+    return new OpenAiService(openAiToken, this.serviceUrls.get("openAi"), Duration.ofSeconds(60));
   }
 }

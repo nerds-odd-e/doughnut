@@ -429,6 +429,9 @@ Then("I should be prompted with an engaging story description {string}", (descri
 Then("I expect that the description will be {string} when I {string} the engaging story", () => {
   cy.get(".close-button").click()
 })
+Then("I expect that the description will be {string} when I {string} the engaging story", () => {
+  cy.get(".close-button").click()
+})
 
 Given("the fallback key of the system is {string}", () => {
   // comment
