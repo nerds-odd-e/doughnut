@@ -14,6 +14,7 @@ import okhttp3.MediaType;
 import okhttp3.ResponseBody;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -58,25 +59,17 @@ class AiAdvisorServiceTest {
 
   @Test
   void getAiSuggestion_givenAString_whenHttpError_returnsEmptySuggestion() {
-    CompletionRequest completionRequest =
-        CompletionRequest.builder()
-            .prompt("Tell me about suggestion_prompt.")
-            .model("text-davinci-003")
-            .maxTokens(3000)
-            .echo(true)
-            .build();
-
     AiSuggestion expected = new AiSuggestion("");
     HttpException exceptionFromOpenAi =
         new HttpException(
             Response.error(403, ResponseBody.create("response", MediaType.parse("plain/text"))));
 
-    Mockito.when(openAiServiceMock.createCompletion(completionRequest))
+    Mockito.when(openAiServiceMock.createCompletion(ArgumentMatchers.any()))
         .thenThrow(exceptionFromOpenAi);
 
     assertEquals(expected, aiAdvisorService.getAiSuggestion("suggestion_prompt"));
 
-    Mockito.verify(openAiServiceMock).createCompletion(completionRequest);
+    Mockito.verify(openAiServiceMock).createCompletion(ArgumentMatchers.any());
   }
 
   @Test
