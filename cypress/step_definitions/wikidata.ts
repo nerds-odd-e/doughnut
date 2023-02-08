@@ -2,7 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
+import { DataTable, Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 
 When("I associate the note {string} with wikidata id {string}", (title, wikiID) => {
   cy.associateNoteWithWikidataId(title, wikiID)
@@ -90,8 +90,11 @@ Then(
 )
 
 Given(
-  "the Wikidata.org entity {string} is written by an author with ID {string}",
-  (wikidataId: string, authorWikidataId: string) => {
-    cy.wikidataService().stubWikidataEntityBook(wikidataId, authorWikidataId)
+  "the Wikidata.org entity {string} is written by authors with ID",
+  (wikidataId: string, data: DataTable) => {
+    cy.wikidataService().stubWikidataEntityBook(
+      wikidataId,
+      data.hashes().map((hash) => hash["Wikidata Id"]),
+    )
   },
 )

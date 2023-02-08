@@ -121,7 +121,7 @@ public class WikidataClaimJsonBuilder {
   }
 
   public WikidataClaimJsonBuilder asBook(String authorWikiDataId) {
-    this.addClaim("P50", "wikibase-entityid", "{ \"id\": \"" + authorWikiDataId + "\"}");
+    this.addClaim("P50", "wikibase-entityid", "[{ \"id\": \"" + authorWikiDataId + "\"}]");
     return this;
   }
 }
