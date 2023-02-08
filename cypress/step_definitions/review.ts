@@ -2,7 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Given, Then } from "@badeball/cypress-cucumber-preprocessor"
+import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 
 Then("I do these initial reviews in sequence:", (data) => {
   cy.initialReviewInSequence(data.hashes())
@@ -187,4 +187,9 @@ Then("I view the last result", () => {
 
 Then("I should see the review point is removed from review", () => {
   cy.findByText("This review point has been removed from reviewing.")
+})
+
+When("I request an engaging story on the review page", () => {
+  cy.routerToReviews()
+  cy.findByRole("button", { name: "Engaging Story" }).click()
 })
