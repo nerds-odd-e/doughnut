@@ -422,7 +422,6 @@ When("I ask for a story for {string}", (noteTitle: string) => {
   cy.findByRole("button", { name: "Story" }).click()
 })
 
-
 Then("I should be prompted with a story description {string}", (description: string) => {
   cy.get(".area-control.form-control").should("have.value", description)
 })

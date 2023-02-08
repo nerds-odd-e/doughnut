@@ -82,12 +82,12 @@ class AiAdvisorServiceTest {
   @Test
   void getAiEngagingStory_givenAlistOfStrings_returnsAStory() {
     CompletionRequest completionRequest =
-      CompletionRequest.builder()
-        .prompt("Tell me an engaging story to learn about title")
-        .model("text-davinci-003")
-        .maxTokens(3000)
-        .echo(true)
-        .build();
+        CompletionRequest.builder()
+            .prompt("Tell me an engaging story to learn about title")
+            .model("text-davinci-003")
+            .maxTokens(3000)
+            .echo(true)
+            .build();
 
     AiStory expected = new AiStory("This is a story");
 
@@ -98,7 +98,7 @@ class AiAdvisorServiceTest {
     List<CompletionChoice> completionChoices = List.of(completionChoice);
     completionResult.setChoices(completionChoices);
     Mockito.when(openAiServiceMock.createCompletion(completionRequest))
-      .thenReturn(completionResult);
+        .thenReturn(completionResult);
 
     assertEquals(expected, aiAdvisorService.getEngagingStory(Collections.singletonList("title")));
 

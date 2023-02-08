@@ -5,12 +5,10 @@ import com.odde.doughnut.entities.json.AiStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.theokanning.openai.OpenAiService;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,7 +44,8 @@ public class RestAiController {
   public AiStory askStory(@PathVariable Note note) {
     List<Note> allNotes = new ArrayList<>();
     allNotes = getAllNotes(allNotes, note.getChildren());
-    final List<String> allNoteTitles = allNotes.stream().map(Note::getTitle).collect(Collectors.toList());
+    final List<String> allNoteTitles =
+        allNotes.stream().map(Note::getTitle).collect(Collectors.toList());
     allNoteTitles.add(note.getTitle());
     return aiAdvisorService.getEngagingStory(allNoteTitles);
   }

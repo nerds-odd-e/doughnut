@@ -76,25 +76,28 @@ class RestAiControllerTest {
   @Test
   void askEngagingStoryWithRightParams() {
     CompletionRequest completionRequest =
-      CompletionRequest.builder()
-        .prompt("Tell me an engaging story to learn about Coming soon")
-        .model("text-davinci-003")
-        .maxTokens(3000)
-        .echo(true)
-        .build();
+        CompletionRequest.builder()
+            .prompt("Tell me an engaging story to learn about Coming soon")
+            .model("text-davinci-003")
+            .maxTokens(3000)
+            .echo(true)
+            .build();
 
     when(openAiService.createCompletion(
-      argThat(
-        request -> {
-          assertEquals("Tell me an engaging story to learn about Coming soon", request.getPrompt());
-          assertEquals(3000, request.getMaxTokens());
-          return true;
-        })))
-      .thenReturn(buildCompletionResult("This is an engaging story."));
+            argThat(
+                request -> {
+                  assertEquals(
+                      "Tell me an engaging story to learn about Coming soon", request.getPrompt());
+                  assertEquals(3000, request.getMaxTokens());
+                  return true;
+                })))
+        .thenReturn(buildCompletionResult("This is an engaging story."));
 
     final TextContent textContent = new TextContent();
     textContent.setTitle("Coming soon");
-    final AiStory aiStory = controller.askStory(Note.createNote(null, new Timestamp(System.currentTimeMillis()), textContent));
+    final AiStory aiStory =
+        controller.askStory(
+            Note.createNote(null, new Timestamp(System.currentTimeMillis()), textContent));
     assertEquals("This is an engaging story.", aiStory.story());
     verify(openAiService, times(1)).createCompletion(completionRequest);
   }
@@ -102,18 +105,22 @@ class RestAiControllerTest {
   @Test
   void askEngagingStoryFor1NoteAnd2ChildNotes() {
     when(openAiService.createCompletion(
-      argThat(
-        request -> {
-          assertEquals("Tell me an engaging story to learn about Coming soon", request.getPrompt());
-          assertEquals(3000, request.getMaxTokens());
-          return true;
-        })))
-      .thenReturn(buildCompletionResult("This is an engaging story."));
+            argThat(
+                request -> {
+                  assertEquals(
+                      "Tell me an engaging story to learn about Coming soonComingsoon",
+                      request.getPrompt());
+                  assertEquals(3000, request.getMaxTokens());
+                  return true;
+                })))
+        .thenReturn(buildCompletionResult("This is an engaging story."));
 
     final TextContent textContent = new TextContent();
     textContent.setTitle("Coming soon");
-    final Note childNode = Note.createNote(null, new Timestamp(System.currentTimeMillis()), textContent);
-    final Note parentNode = Note.createNote(null, new Timestamp(System.currentTimeMillis()), textContent);
+    final Note childNode =
+        Note.createNote(null, new Timestamp(System.currentTimeMillis()), textContent);
+    final Note parentNode =
+        Note.createNote(null, new Timestamp(System.currentTimeMillis()), textContent);
     childNode.setParentNote(parentNode);
     final AiStory aiStory = controller.askStory(parentNode);
     assertEquals("This is an engaging story.", aiStory.story());
