@@ -430,5 +430,11 @@ Then(
   "I expect that the description will be {string} when I {string} the engaging story",
   () => {
     cy.get(".close-button").click()
-  },
+  }
 )
+
+Given("the fallback key of the system is {string}", (fallbackKey: string) => {})
+
+Then("I have a personal openAI token {string}", (personalKey: string) => {})
+
+Then("I should get a suggestion {string}", (description: string) => {})

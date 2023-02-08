@@ -4,21 +4,20 @@ Feature: Personal token entry for Open AI functionality
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user
-      | title          |
-      | Flowers        |
+      | title          | description    |
+      | Flowers        | Something else |
     And OpenAI thinks that "Flowers" means "Flowers are beautiful creations of the earth"
 
-
-    @ignore
-    Scenario Outline: get suggest with open AI personal or fallback token
-      Given the fallback key of the system is <fallback key>
-      And I have a personal openAI token <personal key>
-      When I trigger use of get suggestion of "Flowers"
-      Then I should get a suggestion "Flowers are beautiful creations of the earth": <result>
+    @usingMockedOpenAiService
+    Scenario Outline: Get suggestions with open AI personal or fallback token
+      Given the fallback key of the system is "<fallback key>"
+      And I have a personal openAI token "<personal key>"
+      When I ask for a description suggestion for "Flowers"
+      Then I <result> get a suggestion "Flowers are beautiful creations of the earth"
 
       Examples:
      | fallback key | personal key | result  |
-     | valid key    | valid key    | work    |
-     | invalid key  | valid key    | work    |
-     | valid key    | invalid      | work    |
-     | invalid      | invalid      | no work |
+     | valid key    | valid key    | should    |
+     #| invalid key  | valid key    | should    |
+     #| valid key    | invalid      | should    |
+     #| invalid      | invalid      | should not |
