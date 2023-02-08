@@ -6,28 +6,19 @@ Feature: Personal token entry for Open AI functionality
     And there are some notes for the current user
       | title          |
       | Flowers        |
-
-    @ignore
-  Scenario: User should be able to use personal token for openAI related service
-    Given I have a personal openAI token "sk-validtoken"
-    #implementation of modal
-
     And OpenAI thinks that "Flowers" means "Flowers are beautiful creations of the earth"
-    #mocked return from OpenAI
 
-    When I trigger use of get suggestion of "Flowers" with openAI token "sk-validtoken"
-    #click the Suggest button
-
-    Then I should get a suggestion "Flowers are beautiful creations of the earth"
-    #expected return from OpenAI (mocked in the And above)
 
     @ignore
     Scenario Outline: get suggest with open AI personal or fallback token
+      Given the fallback key of the system is <fallback key>
+      And I have a personal openAI token <personal key>
+      When I trigger use of get suggestion of "Flowers"
+      Then I should get a suggestion "Flowers are beautiful creations of the earth": <result>
 
       Examples:
-
      | fallback key | personal key | result  |
-     | valid key    | valid key    | works   |
-     | invalid key  | valid key    | works   |
-     | valid key    | invalid      | works   |
+     | valid key    | valid key    | work    |
+     | invalid key  | valid key    | work    |
+     | valid key    | invalid      | work    |
      | invalid      | invalid      | no work |
