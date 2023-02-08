@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.json.AiStory;
+import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.theokanning.openai.OpenAiService;
@@ -39,8 +39,8 @@ public class RestAiController {
     return Flux.just(aiAdvisorService.getAiSuggestion("Harry Potter"));
   }
 
-  @GetMapping("/ask-story/{note}")
-  public AiStory askStory(@PathVariable Note note) {
+  @GetMapping("/ask-engaging-stories/{note}")
+  public AiEngagingStory askEngagingStories(@PathVariable Note note) {
     List<String> titles = new ArrayList<>();
     titles.add(note.getTitle());
     if (note.getChildren().size() == 1) {

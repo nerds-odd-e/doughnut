@@ -3,8 +3,8 @@
 
 declare namespace Generated {
 
-    interface AiStory {
-        story: string;
+    interface AiEngagingStory {
+        engagingStory: string;
     }
 
     interface AiSuggestion {

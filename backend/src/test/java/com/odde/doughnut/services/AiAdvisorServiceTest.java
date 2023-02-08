@@ -2,7 +2,7 @@ package com.odde.doughnut.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.odde.doughnut.entities.json.AiStory;
+import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.theokanning.openai.OpenAiService;
 import com.theokanning.openai.completion.CompletionChoice;
@@ -89,11 +89,11 @@ class AiAdvisorServiceTest {
             .echo(true)
             .build();
 
-    AiStory expected = new AiStory("This is a story");
+    AiEngagingStory expected = new AiEngagingStory("This is an engaging story");
 
     CompletionResult completionResult = new CompletionResult();
     CompletionChoice completionChoice = new CompletionChoice();
-    completionChoice.setText("This is a story");
+    completionChoice.setText("This is an engaging story");
 
     List<CompletionChoice> completionChoices = List.of(completionChoice);
     completionResult.setChoices(completionChoices);

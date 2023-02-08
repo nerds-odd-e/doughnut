@@ -9,7 +9,7 @@ import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.TextContent;
-import com.odde.doughnut.entities.json.AiStory;
+import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiService;
@@ -106,10 +106,10 @@ class RestAiControllerTest {
 
     final TextContent textContent = new TextContent();
     textContent.setTitle("Coming soon");
-    final AiStory aiStory =
-        controller.askStory(
+    final AiEngagingStory aiEngagingStory =
+        controller.askEngagingStories(
             Note.createNote(null, new Timestamp(System.currentTimeMillis()), textContent));
-    assertEquals("This is an engaging story.", aiStory.story());
+    assertEquals("This is an engaging story.", aiEngagingStory.engagingStory());
     verify(openAiService, times(1)).createCompletion(completionRequest);
   }
 
@@ -128,7 +128,7 @@ class RestAiControllerTest {
     Note parentNote = makeMe.aNote("Coming soon parent").please();
     makeMe.aNote("Coming soon child").under(parentNote).please();
     makeMe.refresh(parentNote);
-    controller.askStory(parentNote);
+    controller.askEngagingStories(parentNote);
   }
 
   @NotNull

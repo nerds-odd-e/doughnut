@@ -1,6 +1,6 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.entities.json.AiStory;
+import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.theokanning.openai.OpenAiService;
 import com.theokanning.openai.completion.CompletionChoice;
@@ -37,11 +37,11 @@ public class AiAdvisorService {
     }
   }
 
-  public AiStory getEngagingStory(List<String> items) {
+  public AiEngagingStory getEngagingStory(List<String> items) {
     final String topics = String.join("", items);
     final String prompt = String.format("Tell me an engaging story to learn about %s", topics);
     final String story = getOpenAiResponse(prompt);
 
-    return new AiStory(story);
+    return new AiEngagingStory(story);
   }
 }
