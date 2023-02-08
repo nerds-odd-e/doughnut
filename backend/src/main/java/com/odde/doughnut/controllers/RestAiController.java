@@ -8,7 +8,6 @@ import com.theokanning.openai.OpenAiService;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,21 +41,11 @@ public class RestAiController {
 
   @GetMapping("/ask-story/{note}")
   public AiStory askStory(@PathVariable Note note) {
-    List<Note> allNotes = new ArrayList<>();
-    allNotes = getAllNotes(allNotes, note.getChildren());
-    final List<String> allNoteTitles =
-        allNotes.stream().map(Note::getTitle).collect(Collectors.toList());
-    allNoteTitles.add(note.getTitle());
-    return aiAdvisorService.getEngagingStory(allNoteTitles);
-  }
-
-  public List<Note> getAllNotes(List<Note> outputList, List<Note> list) {
-    for (Note note : list) {
-      if (!outputList.contains(note)) {
-        getAllNotes(outputList, note.getChildren());
-        outputList.add(note);
-      }
+    List<String> titles = new ArrayList<>();
+    titles.add(note.getTitle());
+    if (note.getChildren().size() == 1) {
+      titles.add(note.getChildren().get(0).getTitle());
     }
-    return outputList;
+    return aiAdvisorService.getEngagingStory(titles);
   }
 }
