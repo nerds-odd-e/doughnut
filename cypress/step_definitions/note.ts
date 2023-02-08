@@ -426,17 +426,22 @@ Then("I should be prompted with an engaging story description {string}", (descri
   cy.get("textarea").should("have.value", description)
 })
 
-Then(
-  "I expect that the description will be {string} when I {string} the engaging story",
-  () => {
-    cy.get(".close-button").click()
-  }
-)
+Then("I expect that the description will be {string} when I {string} the engaging story", () => {
+  cy.get(".close-button").click()
+})
 
-Given("the fallback key of the system is {string}", (fallbackKey: string) => {})
+Given("the fallback key of the system is {string}", () => {
+  // comment
+})
 
-Then("I have a personal openAI token {string}", (personalKey: string) => {})
+Then("I have a personal openAI token {string}", () => {
+  // comment
+})
 
 Then("I should get a suggestion {string}", (description: string) => {
+  cy.get(".area-control.form-control").should("have.value", description)
+})
+
+Then("I should not get a suggestion {string}", (description: string) => {
   cy.get(".area-control.form-control").should("have.value", description)
 })
