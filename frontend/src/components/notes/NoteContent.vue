@@ -21,6 +21,10 @@
       >
         Suggest
       </NoteSuggestDescriptionButton>
+      <span> </span>
+      <NoteEngagingStoryButton v-bind="{ selectedNote: note, storageAccessor }">
+        Engaging Story
+      </NoteEngagingStoryButton>
     </div>
   </div>
   <div class="note-content">
@@ -74,6 +78,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import NoteEngagingStoryButton from "@/components/notes/NoteEngagingStoryButton.vue";
 import NoteTitleWithLink from "./NoteTitleWithLink.vue";
 import NoteShortDescription from "./NoteShortDescription.vue";
 import ShowPicture from "./ShowPicture.vue";
@@ -83,7 +88,7 @@ import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
 import EditableText from "../form/EditableText.vue";
 import NoteWikidataAssociation from "./NoteWikidataAssociation.vue";
 import NoteSuggestDescriptionButton from "./NoteSuggestDescriptionButton.vue";
-import { StorageAccessor } from "../../store/createNoteStorage";
+import type { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   props: {
@@ -105,6 +110,7 @@ export default defineComponent({
     NoteTitleWithLink,
     NoteWikidataAssociation,
     NoteSuggestDescriptionButton,
+    NoteEngagingStoryButton,
   },
   computed: {
     textContent() {

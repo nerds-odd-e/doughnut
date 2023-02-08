@@ -60,6 +60,8 @@ declare module '@vue/runtime-core' {
     NoteControlCenterForUser: typeof import('./src/components/toolbars/NoteControlCenterForUser.vue')['default']
     NoteDeleteButton: typeof import('./src/components/toolbars/NoteDeleteButton.vue')['default']
     NoteEditDialog: typeof import('./src/components/notes/NoteEditDialog.vue')['default']
+    NoteEngagingStoryButton: typeof import('./src/components/notes/NoteEngagingStoryButton.vue')['default']
+    NoteEngagingStoryDialog: typeof import('./src/components/notes/NoteEngagingStoryDialog.vue')['default']
     NoteFormBody: typeof import('./src/components/notes/NoteFormBody.vue')['default']
     NoteFormTitleOnly: typeof import('./src/components/notes/NoteFormTitleOnly.vue')['default']
     NoteFrameOfLinks: typeof import('./src/components/links/NoteFrameOfLinks.vue')['default']

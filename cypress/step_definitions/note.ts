@@ -417,11 +417,18 @@ Then(
   },
 )
 
-When("I ask for a story for {string}", (noteTitle: string) => {
+When("I ask for an engaging story for {string}", (noteTitle: string) => {
   cy.jumpToNotePage(noteTitle)
-  cy.findByRole("button", { name: "Story" }).click()
+  cy.findByRole("button", { name: "Engaging Story" }).click()
 })
 
-Then("I should be prompted with a story description {string}", (description: string) => {
+Then("I should be prompted with an engaging story description {string}", (description: string) => {
   cy.get(".area-control.form-control").should("have.value", description)
 })
+
+Then(
+  "I expect that the description will be {string} when I {string} the engaging story",
+  (value: string, action: string) => {
+    cy.get(".close-button").click()
+  },
+)
