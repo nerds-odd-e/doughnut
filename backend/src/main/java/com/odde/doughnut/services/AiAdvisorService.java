@@ -21,7 +21,7 @@ public class AiAdvisorService {
         CompletionRequest.builder()
             .prompt(prompt)
             .model("text-davinci-003")
-            .maxTokens(100)
+            .maxTokens(3000)
             .echo(true)
             .build();
     var choices = service.createCompletion(completionRequest).getChoices();
@@ -38,7 +38,10 @@ public class AiAdvisorService {
   }
 
   public AiStory getEngagingStory(List<String> items) {
-    final String story = String.join("", items);
-    return AiStory.builder().story(story).build();
+    final String topics = String.join("", items);
+    final String prompt = String.format("Tell me an engaging story to learn about %s", topics);
+    final String story = getOpenAiResponse(prompt);
+
+    return new AiStory(story);
   }
 }

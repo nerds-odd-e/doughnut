@@ -2,11 +2,13 @@ package com.odde.doughnut.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.odde.doughnut.entities.json.AiStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.theokanning.openai.OpenAiService;
 import com.theokanning.openai.completion.CompletionChoice;
 import com.theokanning.openai.completion.CompletionRequest;
 import com.theokanning.openai.completion.CompletionResult;
+import java.util.Collections;
 import java.util.List;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
@@ -36,7 +38,7 @@ class AiAdvisorServiceTest {
         CompletionRequest.builder()
             .prompt("Tell me about suggestion_prompt.")
             .model("text-davinci-003")
-            .maxTokens(100)
+            .maxTokens(3000)
             .echo(true)
             .build();
     CompletionResult completionResult = new CompletionResult();
@@ -60,7 +62,7 @@ class AiAdvisorServiceTest {
         CompletionRequest.builder()
             .prompt("Tell me about suggestion_prompt.")
             .model("text-davinci-003")
-            .maxTokens(100)
+            .maxTokens(3000)
             .echo(true)
             .build();
 
@@ -73,6 +75,32 @@ class AiAdvisorServiceTest {
         .thenThrow(exceptionFromOpenAi);
 
     assertEquals(expected, aiAdvisorService.getAiSuggestion("suggestion_prompt"));
+
+    Mockito.verify(openAiServiceMock).createCompletion(completionRequest);
+  }
+
+  @Test
+  void getAiEngagingStory_givenAlistOfStrings_returnsAStory() {
+    CompletionRequest completionRequest =
+      CompletionRequest.builder()
+        .prompt("Tell me an engaging story to learn about title")
+        .model("text-davinci-003")
+        .maxTokens(3000)
+        .echo(true)
+        .build();
+
+    AiStory expected = new AiStory("This is a story");
+
+    CompletionResult completionResult = new CompletionResult();
+    CompletionChoice completionChoice = new CompletionChoice();
+    completionChoice.setText("This is a story");
+
+    List<CompletionChoice> completionChoices = List.of(completionChoice);
+    completionResult.setChoices(completionChoices);
+    Mockito.when(openAiServiceMock.createCompletion(completionRequest))
+      .thenReturn(completionResult);
+
+    assertEquals(expected, aiAdvisorService.getEngagingStory(Collections.singletonList("title")));
 
     Mockito.verify(openAiServiceMock).createCompletion(completionRequest);
   }
