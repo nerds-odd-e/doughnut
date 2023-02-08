@@ -9,8 +9,9 @@ import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.TextContent;
-import com.odde.doughnut.entities.json.AiStory;
+import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
+import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiService;
 import com.theokanning.openai.completion.CompletionChoice;
 import com.theokanning.openai.completion.CompletionRequest;
@@ -20,16 +21,25 @@ import java.util.HashMap;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(locations = {"classpath:repository.xml"})
+@Transactional
 class RestAiControllerTest {
   RestAiController controller;
   @Mock OpenAiService openAiService;
+
+  @Autowired MakeMe makeMe;
 
   HashMap<String, String> params =
       new HashMap<>() {
@@ -96,36 +106,29 @@ class RestAiControllerTest {
 
     final TextContent textContent = new TextContent();
     textContent.setTitle("Coming soon");
-    final AiStory aiStory =
-        controller.askStory(
+    final AiEngagingStory aiEngagingStory =
+        controller.askEngagingStories(
             Note.createNote(null, new Timestamp(System.currentTimeMillis()), textContent));
-    assertEquals("This is an engaging story.", aiStory.story());
+    assertEquals("This is an engaging story.", aiEngagingStory.engagingStory());
     verify(openAiService, times(1)).createCompletion(completionRequest);
   }
 
-  @Disabled
   @Test
-  void askEngagingStoryFor1NoteAnd2ChildNotes() {
+  void askEngagingStoryFor1NoteAnd1ChildNote() {
     when(openAiService.createCompletion(
             argThat(
                 request -> {
                   assertEquals(
-                      "Tell me an engaging story to learn about Coming soonComing soon",
+                      "Tell me an engaging story to learn about Coming soon parentComing soon child",
                       request.getPrompt());
-                  assertEquals(3000, request.getMaxTokens());
                   return true;
                 })))
         .thenReturn(buildCompletionResult("This is an engaging story."));
 
-    final TextContent textContent = new TextContent();
-    textContent.setTitle("Coming soon");
-    final Note childNode =
-        Note.createNote(null, new Timestamp(System.currentTimeMillis()), textContent);
-    final Note parentNode =
-        Note.createNote(null, new Timestamp(System.currentTimeMillis()), textContent);
-    childNode.setParentNote(parentNode);
-    final AiStory aiStory = controller.askStory(parentNode);
-    assertEquals("This is an engaging story.", aiStory.story());
+    Note parentNote = makeMe.aNote("Coming soon parent").please();
+    makeMe.aNote("Coming soon child").under(parentNote).please();
+    makeMe.refresh(parentNote);
+    controller.askEngagingStories(parentNote);
   }
 
   @NotNull

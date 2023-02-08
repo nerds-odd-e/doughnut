@@ -417,11 +417,31 @@ Then(
   },
 )
 
-When("I ask for a story for {string}", (noteTitle: string) => {
+When("I ask for an engaging story for {string}", (noteTitle: string) => {
   cy.jumpToNotePage(noteTitle)
-  cy.findByRole("button", { name: "Story" }).click()
+  cy.findByRole("button", { name: "Engaging Story" }).click()
 })
 
-Then("I should be prompted with a story description {string}", (description: string) => {
+Then("I should be prompted with an engaging story description {string}", (description: string) => {
+  cy.get("textarea").should("have.value", description)
+})
+
+Then("I expect that the description will be {string} when I {string} the engaging story", () => {
+  cy.get(".close-button").click()
+})
+
+Given("the fallback key of the system is {string}", () => {
+  // comment
+})
+
+Then("I have a personal openAI token {string}", () => {
+  // comment
+})
+
+Then("I should get a suggestion {string}", (description: string) => {
   cy.get(".area-control.form-control").should("have.value", description)
+})
+
+Then("I should not get a suggestion {string}", () => {
+  cy.get(".alert").should("have.value", "your open ai token is invalid")
 })
