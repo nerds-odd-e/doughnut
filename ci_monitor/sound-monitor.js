@@ -1,5 +1,7 @@
 const { exec } = require('child_process');
 const got = require('got');
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
 
 const Reset = '\x1b[0m';
 const Bright = '\x1b[1m';
@@ -59,13 +61,11 @@ function say(sentence, colorCode) {
 async function buildState(url) {
   try {
     const resp = await got.get(url);
-    const currentBuild = resp.body.match(/check_suite_\d+/)?.shift();
-    const currentStatus = resp.body
-      .match(/This workflow run ([^\.]+\.)/)
-      ?.pop();
-    const gitLog = resp.body
-      .match(/aria\-label\=\"Run \d+ of[^\>]+\>(.*)\<\/a\>/)
-      ?.pop();
+    const dom = new JSDOM(resp.body);
+    const currentBuildElm = dom.window.document.querySelector("[id^='check_suite_']");
+    const currentBuild = currentBuildElm.id;
+    const currentStatus = currentBuildElm.querySelector('svg').getAttribute('aria-label');
+    const gitLog = currentBuildElm.querySelector('a.Link--primary').textContent;
     return new BuildState(currentBuild, currentStatus, gitLog);
   } catch (err) {
     console.error(err);
@@ -97,10 +97,10 @@ class BuildState {
 
   colorCode() {
     return {
-      'has been queued.': BgBlue + FgYellow + Blink,
-      'is currently running.': BgBlue + FgYellow + Blink,
-      'completed successfully.': BgGreen + FgBlack,
-      'faild.': BgRed + FgYellow + Blink,
+      'queued': BgBlue + FgYellow + Blink,
+      'currently running': BgBlue + FgYellow + Blink,
+      'completed successfully': BgGreen + FgBlack,
+      'faild': BgRed + FgYellow + Blink,
     }[this.status];
   }
 }
