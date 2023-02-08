@@ -1,10 +1,7 @@
 package com.odde.doughnut.services.wikidataApis;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.entities.Coordinate;
 import com.odde.doughnut.services.wikidataApis.thirdPartyEntities.WikidataEntity;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 public class WikidataEntityModelOfProperties {
@@ -34,15 +31,7 @@ public class WikidataEntityModelOfProperties {
     return entity.getFirstClaimValue("P27").map(WikidataValue::toWikiClass);
   }
 
-  public List<WikidataId> getAuthors() {
-    var myList = new ArrayList<WikidataId>();
-    if (entity.getClaimValues("P50").isEmpty()) return myList;
-
-    JsonNode node = entity.getClaimValues("P50").get(0).datavalue().getValue();
-
-    for (JsonNode jsonNode : node) {
-      myList.add(new WikidataId(jsonNode.get("id").textValue()));
-    }
-    return myList;
+  public Optional<WikidataId> getAuthor() {
+    return entity.getFirstClaimValue("P50").map(WikidataValue::toWikiClass);
   }
 }
