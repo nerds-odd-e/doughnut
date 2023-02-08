@@ -437,4 +437,6 @@ Given("the fallback key of the system is {string}", (fallbackKey: string) => {})
 
 Then("I have a personal openAI token {string}", (personalKey: string) => {})
 
-Then("I should get a suggestion {string}", (description: string) => {})
+Then("I should get a suggestion {string}", (description: string) => {
+  cy.get(".area-control.form-control").should("have.value", description)
+})
