@@ -56,7 +56,9 @@ public class NoteTest {
     Note parentNote = makeMe.aNote("This is a parent note").please();
     makeMe.aNote("This is a child note").under(parentNote).please();
     makeMe.refresh(parentNote);
-    assertEquals(List.of("This is a parent note", "This is a child note"), parentNote.getTitleAndOffSpringTitles());
+    assertEquals(
+        List.of("This is a parent note", "This is a child note"),
+        parentNote.getTitleAndOffSpringTitles());
   }
 
   @Test

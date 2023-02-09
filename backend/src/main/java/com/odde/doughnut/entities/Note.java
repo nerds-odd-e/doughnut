@@ -376,7 +376,10 @@ public class Note extends Thingy {
   public List<String> getTitleAndOffSpringTitles() {
     List<String> titles = new ArrayList<>();
     titles.add(getTitle());
-    getChildren().stream().map(Note::getTitleAndOffSpringTitles).flatMap(List::stream).forEach(titles::add);
+    getChildren().stream()
+        .map(Note::getTitleAndOffSpringTitles)
+        .flatMap(List::stream)
+        .forEach(titles::add);
 
     return titles;
   }
