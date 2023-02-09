@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.theokanning.openai.OpenAiService;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -41,11 +40,7 @@ public class RestAiController {
 
   @GetMapping("/ask-engaging-stories/{note}")
   public AiEngagingStory askEngagingStories(@PathVariable Note note) {
-    List<String> titles = new ArrayList<>();
-    titles.add(note.getTitle());
-    if (note.getChildren().size() == 1) {
-      titles.add(note.getChildren().get(0).getTitle());
-    }
+    List<String> titles = note.getTitles();
     return aiAdvisorService.getEngagingStory(titles);
   }
 }

@@ -371,4 +371,14 @@ public class Note extends Thingy {
     note.setParentNote(this);
     return note;
   }
+
+  public List<String> getTitles() {
+    List<String> titles = new ArrayList<>();
+    titles.add(getTitle());
+    if (getChildren().size() == 1) {
+      titles.add(getChildren().get(0).getTitle());
+    }
+
+    return titles;
+  }
 }

@@ -105,21 +105,15 @@ class RestAiControllerTest {
   }
 
   @Test
-  void askEngagingStoryFor1NoteAnd1ChildNote() {
-    when(openAiService.createCompletion(
-            argThat(
-                request -> {
-                  assertEquals(
-                      "Tell me an engaging story to learn about Coming soon parent and Coming soon child.",
-                      request.getPrompt());
-                  return true;
-                })))
+  void askEngagingStoryFor1NoteAnd1ChildNoteReturnsEngagingStory() {
+    when(openAiService.createCompletion(any()))
         .thenReturn(buildCompletionResult("This is an engaging story."));
 
     Note parentNote = makeMe.aNote("Coming soon parent").please();
     makeMe.aNote("Coming soon child").under(parentNote).please();
     makeMe.refresh(parentNote);
-    controller.askEngagingStories(parentNote);
+    final AiEngagingStory aiEngagingStory = controller.askEngagingStories(parentNote);
+    assertEquals("This is an engaging story.", aiEngagingStory.engagingStory());
   }
 
   @NotNull

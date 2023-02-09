@@ -8,6 +8,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.testability.MakeMe;
@@ -42,6 +43,20 @@ public class NoteTest {
     Note note2 = makeMe.aNote().under(parent).please();
     makeMe.refresh(parent);
     assertThat(parent.getChildren(), containsInRelativeOrder(note1, note2));
+  }
+
+  @Test
+  void getTitles_givenSingleNote_returnsOneTitle() {
+    Note aNote = makeMe.aNote("This is a Title").please();
+    assertEquals(aNote.getTitles(), List.of("This is a Title"));
+  }
+
+  @Test
+  void getTitles_givenNoteHasChild_returnsTwoTitles() {
+    Note parentNote = makeMe.aNote("This is a parent note").please();
+    makeMe.aNote("This is a child note").under(parentNote).please();
+    makeMe.refresh(parentNote);
+    assertEquals(parentNote.getTitles(), List.of("This is a parent note", "This is a child note"));
   }
 
   @Nested
