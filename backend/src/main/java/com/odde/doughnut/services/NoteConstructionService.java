@@ -25,7 +25,7 @@ public record NoteConstructionService(
     modelFactoryService.noteRepository.save(note);
 
     wikidataIdWithApi.getCountryOfOrigin().ifPresent(wwa -> createSubNote(note, wwa));
-    wikidataIdWithApi.getAuthor().ifPresent(wwa -> createSubNote(note, wwa));
+    wikidataIdWithApi.getAuthors().forEach(wwa -> createSubNote(note, wwa));
 
     return note;
   }
