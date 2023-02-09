@@ -18,4 +18,21 @@ describe("NoteSuggestDescriptionDialog", () => {
     await flushPromises();
     expect(wrapper.find("textarea").element).toHaveValue("suggestion");
   });
+
+  it.skip("opens an alert when the api returns an empty string", async () => {
+    const note = makeMe.aNoteRealm.please();
+    helper.apiMock
+      .expectingPost(`/api/ai/ask-suggestions`)
+      .andReturnOnce({ suggestion: "" });
+    const wrapper = helper
+      .component(NoteSuggestDescriptionDialog)
+      .withStorageProps({ selectedNote: note })
+      .mount();
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const spy = vi.spyOn(wrapper.vm, "openAlert");
+    expect(spy).not.toHaveBeenCalled();
+    await flushPromises();
+    expect(spy).toHaveBeenCalled();
+  });
 });

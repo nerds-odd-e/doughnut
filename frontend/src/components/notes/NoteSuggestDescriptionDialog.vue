@@ -59,10 +59,19 @@ export default defineComponent({
           this.$emit("done");
         });
     },
+    openAlert() {
+      // comment
+    },
   },
   mounted() {
     this.api.ai.askAiSuggestions(this.selectedNote.title).then((res) => {
-      this.suggestedDescription = res.suggestion;
+      if (res.suggestion === "") {
+        // res.error
+        this.openAlert();
+        //   close SuggestedDescriptionModalWindow
+      } else {
+        this.suggestedDescription = res.suggestion;
+      }
     });
   },
 });
