@@ -1,5 +1,6 @@
 import { flushPromises } from "@vue/test-utils";
 import NoteEngagingStoryDialog from "@/components/notes/NoteEngagingStoryDialog.vue";
+import { expect } from "vitest";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
@@ -19,5 +20,20 @@ describe("NoteEngagingStoryDialog", () => {
     expect(wrapper.find("textarea").element).toHaveValue(
       "This is an engaging story."
     );
+  });
+
+  it("Engaging story dialog close button exits the dialog", async () => {
+    const note = makeMe.aNoteRealm.please();
+    helper.apiMock
+      .expectingGet(`/api/ai/ask-engaging-stories/${note.note.id}`)
+      .andReturnOnce({ engagingStory: "This is an engaging story." });
+    const wrapper = helper
+      .component(NoteEngagingStoryDialog)
+      .withStorageProps({ selectedNote: note })
+      .mount();
+    await flushPromises();
+    await wrapper.find("input[value='Close']").trigger("click");
+
+    expect(wrapper.emitted("done")).toBeTruthy();
   });
 });

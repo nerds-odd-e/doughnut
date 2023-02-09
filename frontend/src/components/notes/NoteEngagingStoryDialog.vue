@@ -3,7 +3,12 @@
   <form>
     <TextArea v-model="engagingStory" />
     <div class="dialog-buttons">
-      <input type="button" value="Close" class="btn btn-primary" />
+      <input
+        @click.once="handleClose"
+        type="button"
+        value="Close"
+        class="btn btn-primary"
+      />
     </div>
   </form>
 </template>
@@ -24,6 +29,7 @@ export default defineComponent({
       required: true,
     },
   },
+  emits: ["done"],
   data() {
     return {
       engagingStory: "Coming soon.",
@@ -33,6 +39,11 @@ export default defineComponent({
     this.api.ai.askAiEngagingStories(this.selectedNote.id).then((res) => {
       this.engagingStory = res.engagingStory;
     });
+  },
+  methods: {
+    handleClose() {
+      this.$emit("done");
+    },
   },
 });
 </script>

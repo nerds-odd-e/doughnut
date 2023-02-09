@@ -3,8 +3,11 @@
     <template #button_face>
       <slot />
     </template>
-    <template #dialog_body="{}">
-      <NoteStoryDialog v-bind="{ selectedNote, storageAccessor }" />
+    <template #dialog_body="{ doneHandler }">
+      <NoteStoryDialog
+        v-bind="{ selectedNote, storageAccessor }"
+        @done="doneHandler($event)"
+      />
     </template>
   </PopupButton>
 </template>
