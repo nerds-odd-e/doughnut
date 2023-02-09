@@ -372,6 +372,7 @@ public class Note extends Thingy {
     return note;
   }
 
+  @JsonIgnore
   public List<String> getTitles() {
     List<String> titles = new ArrayList<>();
     titles.add(getTitle());
