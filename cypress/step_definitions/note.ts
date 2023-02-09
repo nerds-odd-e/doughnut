@@ -423,7 +423,7 @@ When("I ask for an engaging story for {string}", (noteTitle: string) => {
 })
 
 Then("I should be prompted with an engaging story description {string}", (description: string) => {
-  cy.get("textarea").should("have.value", description)
+  cy.get(".engaging-story").should("have.value", description)
 })
 
 Then("I expect that the description will be {string} when I {string} the engaging story", () => {

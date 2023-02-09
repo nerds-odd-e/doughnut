@@ -17,7 +17,7 @@ describe("NoteEngagingStoryDialog", () => {
       .withStorageProps({ selectedNote: note })
       .mount();
     await flushPromises();
-    expect(wrapper.find("textarea").element).toHaveValue(
+    expect(wrapper.find(".engaging-story").text()).toEqual(
       "This is an engaging story."
     );
   });

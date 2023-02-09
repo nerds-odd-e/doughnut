@@ -1,7 +1,7 @@
 <template>
   <h1>Have fun reading this engaging story</h1>
   <form>
-    <TextArea v-model="engagingStory" />
+    <div class="engaging-story">{{ engagingStory }}</div>
     <div class="dialog-buttons">
       <input
         @click.once="handleClose"
@@ -49,6 +49,9 @@ export default defineComponent({
 </script>
 
 <style lang="sass" scoped>
+.engaging-story
+  max-height: 35vh
+  overflow-y: auto
 .dialog-buttons
   display: flex
   column-gap: 10px
