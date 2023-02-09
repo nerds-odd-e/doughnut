@@ -56,7 +56,18 @@ public class NoteTest {
     Note parentNote = makeMe.aNote("This is a parent note").please();
     makeMe.aNote("This is a child note").under(parentNote).please();
     makeMe.refresh(parentNote);
-    assertEquals(parentNote.getTitles(), List.of("This is a parent note", "This is a child note"));
+    assertEquals(List.of("This is a parent note", "This is a child note"), parentNote.getTitles());
+  }
+
+  @Test
+  void getTitles_givenNoteHasTwoChildren_returnsThreeTitles() {
+    Note parentNote = makeMe.aNote("This is a parent note").please();
+    makeMe.aNote("This is a child note").under(parentNote).please();
+    makeMe.aNote("This is a child note too").under(parentNote).please();
+    makeMe.refresh(parentNote);
+    assertEquals(
+        List.of("This is a parent note", "This is a child note", "This is a child note too"),
+        parentNote.getTitles());
   }
 
   @Nested
