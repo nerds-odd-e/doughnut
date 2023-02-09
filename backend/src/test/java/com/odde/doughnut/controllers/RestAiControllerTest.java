@@ -3,20 +3,15 @@ package com.odde.doughnut.controllers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.TextContent;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiService;
 import com.theokanning.openai.completion.CompletionChoice;
-import com.theokanning.openai.completion.CompletionRequest;
 import com.theokanning.openai.completion.CompletionResult;
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -102,7 +97,7 @@ class RestAiControllerTest {
   @Test
   void askEngagingStoryReturnsEngagingStory() {
     when(openAiService.createCompletion(Mockito.any()))
-      .thenReturn(buildCompletionResult("This is an engaging story."));
+        .thenReturn(buildCompletionResult("This is an engaging story."));
 
     Note aNote = makeMe.aNote().please();
     final AiEngagingStory aiEngagingStory = controller.askEngagingStories(aNote);

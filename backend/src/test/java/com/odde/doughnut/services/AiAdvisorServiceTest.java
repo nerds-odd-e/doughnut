@@ -8,7 +8,6 @@ import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.theokanning.openai.OpenAiService;
 import com.theokanning.openai.completion.CompletionChoice;
-import com.theokanning.openai.completion.CompletionRequest;
 import com.theokanning.openai.completion.CompletionResult;
 import java.util.Collections;
 import java.util.List;
@@ -41,11 +40,9 @@ class AiAdvisorServiceTest {
     completionResult.setChoices(completionChoices);
     AiSuggestion expected = new AiSuggestion("suggestion_value");
 
-    Mockito.when(openAiServiceMock.createCompletion(Mockito.any()))
-        .thenReturn(completionResult);
+    Mockito.when(openAiServiceMock.createCompletion(Mockito.any())).thenReturn(completionResult);
 
     assertEquals(expected, aiAdvisorService.getAiSuggestion("suggestion_prompt"));
-
   }
 
   @Test
@@ -72,8 +69,7 @@ class AiAdvisorServiceTest {
 
     List<CompletionChoice> completionChoices = List.of(completionChoice);
     completionResult.setChoices(completionChoices);
-    Mockito.when(openAiServiceMock.createCompletion(Mockito.any()))
-        .thenReturn(completionResult);
+    Mockito.when(openAiServiceMock.createCompletion(Mockito.any())).thenReturn(completionResult);
 
     assertEquals(expected, aiAdvisorService.getEngagingStory(Collections.singletonList("title")));
   }

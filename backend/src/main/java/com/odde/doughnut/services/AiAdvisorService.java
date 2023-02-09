@@ -23,7 +23,9 @@ public class AiAdvisorService {
         CompletionRequest.builder()
             .prompt(prompt)
             .model("text-davinci-003")
-            .maxTokens(500)  // This can go higher (up to 4000 - prompt size), but openAI performance goes down
+            .maxTokens(
+                500) // This can go higher (up to 4000 - prompt size), but openAI performance goes
+            // down
             .echo(true)
             .build();
     var choices = service.createCompletion(completionRequest).getChoices();
