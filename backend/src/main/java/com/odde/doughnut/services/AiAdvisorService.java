@@ -29,13 +29,17 @@ public class AiAdvisorService {
             .echo(true)
             .build();
     var choices = service.createCompletion(completionRequest).getChoices();
-    return choices.stream().map(CompletionChoice::getText).collect(Collectors.joining(""));
+    return choices.stream()
+      .map(CompletionChoice::getText)
+      .collect(Collectors.joining(""))
+      .replace(prompt, "")
+      .trim();
   }
 
   public AiSuggestion getAiSuggestion(String item) {
     try {
       String prompt = "Tell me about " + item + ".";
-      return new AiSuggestion(getOpenAiResponse(prompt).replace(prompt, "").trim());
+      return new AiSuggestion(getOpenAiResponse(prompt));
     } catch (HttpException e) {
       if (HttpStatus.UNAUTHORIZED.value() == e.code()) {
         throw new OpenAiUnauthorizedException(e.getMessage());
