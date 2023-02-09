@@ -60,6 +60,7 @@ class AiAdvisorServiceTest {
   void getAiSuggestion_givenAString_whenHttpError_returnsEmptySuggestion() {
     AiSuggestion expected = new AiSuggestion("");
     HttpException httpExceptionMock = Mockito.mock(HttpException.class);
+    Mockito.when(httpExceptionMock.code()).thenReturn(400);
     Mockito.when(openAiServiceMock.createCompletion(ArgumentMatchers.any()))
         .thenThrow(httpExceptionMock);
 

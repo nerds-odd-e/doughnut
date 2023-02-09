@@ -1,5 +1,6 @@
 package com.odde.doughnut.configs;
 
+import com.odde.doughnut.configs.CustomRestExceptionHandler.ApiError;
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.factoryServices.FailureReportFactory;
@@ -10,6 +11,7 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -54,5 +56,8 @@ public class ControllerSetup {
     throw exception;
   }
 
-  public void handleOpenAIUnauthorizedException(OpenAiUnauthorizedException exception) {}
+  public ResponseEntity<ApiError> handleOpenAIUnauthorizedException(
+      OpenAiUnauthorizedException exception) {
+    return null;
+  }
 }

@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import com.odde.doughnut.configs.CustomRestExceptionHandler.ApiError;
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.FailureReport;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -97,9 +99,9 @@ public class ControllerSetupTest {
   @Disabled
   void shouldHandleOpenAIUnauthorizedException() {
     OpenAiUnauthorizedException exception = new OpenAiUnauthorizedException("Unauthorized");
-    assertThrows(
-        OpenAiUnauthorizedException.class,
-        () -> controllerSetup.handleOpenAIUnauthorizedException(exception));
+    ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED, exception.getMessage());
+    ResponseEntity<ApiError> response = ResponseEntity.status(401).body(apiError);
+    assertEquals(response, controllerSetup.handleOpenAIUnauthorizedException(exception));
   }
 
   private FailureReport catchExceptionAndGetFailureReport() {
