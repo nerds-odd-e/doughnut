@@ -52,6 +52,7 @@ export default defineComponent({
 .engaging-story
   max-height: 35vh
   overflow-y: auto
+  white-space: pre-wrap
 .dialog-buttons
   display: flex
   column-gap: 10px
