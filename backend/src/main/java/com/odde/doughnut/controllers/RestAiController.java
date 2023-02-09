@@ -40,7 +40,7 @@ public class RestAiController {
 
   @GetMapping("/ask-engaging-stories/{note}")
   public AiEngagingStory askEngagingStories(@PathVariable Note note) {
-    List<String> titles = note.getTitles();
+    List<String> titles = note.getTitleAndOffSpringTitles();
     return aiAdvisorService.getEngagingStory(titles);
   }
 }

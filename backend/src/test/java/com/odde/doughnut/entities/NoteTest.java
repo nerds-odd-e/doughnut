@@ -48,7 +48,7 @@ public class NoteTest {
   @Test
   void getTitles_givenSingleNote_returnsOneTitle() {
     Note aNote = makeMe.aNote("This is a Title").please();
-    assertEquals(aNote.getTitles(), List.of("This is a Title"));
+    assertEquals(aNote.getTitleAndOffSpringTitles(), List.of("This is a Title"));
   }
 
   @Test
@@ -56,7 +56,7 @@ public class NoteTest {
     Note parentNote = makeMe.aNote("This is a parent note").please();
     makeMe.aNote("This is a child note").under(parentNote).please();
     makeMe.refresh(parentNote);
-    assertEquals(List.of("This is a parent note", "This is a child note"), parentNote.getTitles());
+    assertEquals(List.of("This is a parent note", "This is a child note"), parentNote.getTitleAndOffSpringTitles());
   }
 
   @Test
@@ -67,7 +67,7 @@ public class NoteTest {
     makeMe.refresh(parentNote);
     assertEquals(
         List.of("This is a parent note", "This is a child note", "This is a child note too"),
-        parentNote.getTitles());
+        parentNote.getTitleAndOffSpringTitles());
   }
 
   @Test
@@ -79,7 +79,7 @@ public class NoteTest {
     makeMe.refresh(childNote);
     assertEquals(
         List.of("This is a parent note", "This is a child note", "This is a grand child note"),
-        parentNote.getTitles());
+        parentNote.getTitleAndOffSpringTitles());
   }
 
   @Test
@@ -103,7 +103,7 @@ public class NoteTest {
             "child 2",
             "grand child 3",
             "grand child 4"),
-        parentNote.getTitles());
+        parentNote.getTitleAndOffSpringTitles());
   }
 
   @Nested
