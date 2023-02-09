@@ -28,11 +28,7 @@ describe("NoteSuggestDescriptionDialog", () => {
       .component(NoteSuggestDescriptionDialog)
       .withStorageProps({ selectedNote: note })
       .mount();
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const spy = vi.spyOn(wrapper.vm, "openAlert");
-    expect(spy).not.toHaveBeenCalled();
     await flushPromises();
-    expect(spy).toHaveBeenCalled();
+    expect(wrapper.text()).toContain("invalid open ai token , 401")
   });
 });
