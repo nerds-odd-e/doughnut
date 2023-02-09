@@ -230,6 +230,7 @@ declare namespace Generated {
         wikidataId: string;
         textContent: TextContent;
         pictureWithMask?: PictureWithMask;
+        titles: string[];
     }
 
     interface Ownership {
