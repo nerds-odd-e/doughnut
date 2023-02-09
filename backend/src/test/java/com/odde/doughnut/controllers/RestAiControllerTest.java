@@ -85,7 +85,7 @@ class RestAiControllerTest {
             argThat(
                 request -> {
                   assertEquals(
-                      "Tell me an engaging story to learn about Coming soon", request.getPrompt());
+                      "Tell me an engaging story to learn about Coming soon.", request.getPrompt());
                   return true;
                 })))
         .thenReturn(buildCompletionResult("This is an engaging story."));
@@ -110,7 +110,7 @@ class RestAiControllerTest {
             argThat(
                 request -> {
                   assertEquals(
-                      "Tell me an engaging story to learn about Coming soon parent and Coming soon child",
+                      "Tell me an engaging story to learn about Coming soon parent and Coming soon child.",
                       request.getPrompt());
                   return true;
                 })))
