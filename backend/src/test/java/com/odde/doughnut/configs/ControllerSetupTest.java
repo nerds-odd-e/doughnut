@@ -1,5 +1,6 @@
 package com.odde.doughnut.configs;
 
+import static com.odde.doughnut.configs.ControllerSetup.UNAUTHORIZED_DEFAULT_MESSAGE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -19,7 +20,6 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -96,11 +96,12 @@ public class ControllerSetupTest {
   }
 
   @Test
-  @Disabled
   void shouldHandleOpenAIUnauthorizedException() {
     OpenAiUnauthorizedException exception = new OpenAiUnauthorizedException("Unauthorized");
-    ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED, exception.getMessage());
-    ResponseEntity<ApiError> response = ResponseEntity.status(401).body(apiError);
+    ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED, UNAUTHORIZED_DEFAULT_MESSAGE);
+    apiError.add("OpenAi Error", exception.getMessage());
+    ResponseEntity<ApiError> response =
+        ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiError);
     assertEquals(response, controllerSetup.handleOpenAIUnauthorizedException(exception));
   }
 

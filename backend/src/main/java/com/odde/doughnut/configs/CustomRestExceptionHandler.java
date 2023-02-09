@@ -2,6 +2,7 @@ package com.odde.doughnut.configs;
 
 import java.util.HashMap;
 import java.util.Map;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -18,6 +19,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice()
 public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
+  @EqualsAndHashCode
   public static class ApiError {
 
     @Getter private final HttpStatus status;
