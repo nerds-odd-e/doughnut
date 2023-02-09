@@ -100,9 +100,11 @@ Cypress.Commands.add(
   "stubWikidataEntityBook",
   { prevSubject: true },
   (serviceMocker: ServiceMocker, wikidataId: string, authorWikidataIds: Array<string>) => {
-    stubWikidataEntity(serviceMocker, wikidataId, [
-      { claimId: "P50", type: "wikibase-entityid", value: authorWikidataIds.map((id) => ({ id })) },
-    ])
+    stubWikidataEntity(
+      serviceMocker,
+      wikidataId,
+      authorWikidataIds.map((id) => ({ claimId: "P50", type: "wikibase-entityid", value: { id } })),
+    )
   },
 )
 

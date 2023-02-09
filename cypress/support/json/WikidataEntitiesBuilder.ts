@@ -4,25 +4,8 @@ interface Claim {
   value: unknown
 }
 
-const claim = (claimValue: Claim) => {
-  return {
-    [claimValue.claimId]: [
-      {
-        mainsnak: {
-          snaktype: "value",
-          property: claimValue.claimId,
-          datavalue: {
-            value: claimValue.value,
-            type: claimValue.type,
-          },
-        },
-      },
-    ],
-  }
-}
-
 class WikidataEntitiesBuilder {
-  claims: Record<string, unknown> = {}
+  claims: Record<string, Array<unknown>> = {}
   wikidataId: string
 
   constructor(wikidataId: string) {
@@ -30,9 +13,25 @@ class WikidataEntitiesBuilder {
   }
 
   wclaims(claims: Claim[]): WikidataEntitiesBuilder {
-    this.claims = claims.reduce<Record<string, unknown>>((claimsIter, claimIter) => {
-      return { ...claimsIter, ...claim(claimIter) }
+    this.claims = claims.reduce<Record<string, Array<unknown>>>((claimsIter, claimIter) => {
+      const toClaim = {
+        [claimIter.claimId]: [
+          ...(claimsIter[claimIter.claimId] || []),
+          {
+            mainsnak: {
+              snaktype: "value",
+              property: claimIter.claimId,
+              datavalue: {
+                value: claimIter.value,
+                type: claimIter.type,
+              },
+            },
+          },
+        ],
+      }
+      return { ...claimsIter, ...toClaim }
     }, this.claims)
+    console.log(this.claims)
     return this
   }
 
@@ -50,4 +49,4 @@ class WikidataEntitiesBuilder {
 }
 
 export default WikidataEntitiesBuilder
-export { Claim, claim }
+export { Claim }

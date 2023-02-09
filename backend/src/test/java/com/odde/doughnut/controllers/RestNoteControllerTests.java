@@ -20,6 +20,7 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.net.URI;
 import java.sql.Timestamp;
+import java.util.List;
 import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -334,18 +335,18 @@ class RestNoteControllerTests {
     @Nested
     class AddingBookNoteWithAuthorInformation {
       private void mockApiResponseForBookWithAuthorTag(
-          String bookWikiDataId, String bookAuthorWikiDataId)
+          String bookWikiDataId, List<String> bookAuthorWikiDataIds)
           throws IOException, InterruptedException {
         mockWikidataWBGetEntity(
             bookWikiDataId,
-            makeMe.wikidataClaimsJson(bookWikiDataId).asBook(bookAuthorWikiDataId).please());
+            makeMe.wikidataClaimsJson(bookWikiDataId).asBook(bookAuthorWikiDataIds).please());
       }
 
       @Test
       void shouldAddBookNoteWithAuthorNoteWithWikidataId()
           throws BindException, InterruptedException, UnexpectedNoAccessRightException,
               IOException {
-        mockApiResponseForBookWithAuthorTag("Q8337", "Q34660");
+        mockApiResponseForBookWithAuthorTag("Q8337", List.of("Q34660", "Q12345"));
         mockWikidataEntity("Q34660", "J. K. Rowling");
         noteCreation.setWikidataId("Q8337");
         noteCreation.getTextContent().setTitle("Harry Potter");
