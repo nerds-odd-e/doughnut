@@ -105,39 +105,27 @@ public class WikidataClaimJsonBuilder {
   }
 
   public WikidataClaimJsonBuilder asBook(List<String> authorWikiDataIds) {
-    this.claims.add(
-        """
-                "%s": [
-                  {
-                    "mainsnak": {
-                      "snaktype": "value",
-                      "property": "%s",
-                      "datavalue": {
-                        "value": %s,
-                        "type": "%s"
-                      }
-                    }
-                  },
-                  {
-                    "mainsnak": {
-                      "snaktype": "value",
-                      "property": "%s",
-                      "datavalue": {
-                        "value": %s,
-                        "type": "%s"
-                      }
+    String authorJsons =
+        authorWikiDataIds.stream()
+            .map(
+                """
+                {
+                  "mainsnak": {
+                    "snaktype": "value",
+                    "datavalue": {
+                      "value": { "id": "%s" },
+                      "type": "wikibase-entityid"
                     }
                   }
-                ]
-      """
-            .formatted(
-                "P50",
-                "P50",
-                "{ \"id\": \"" + authorWikiDataIds.get(0) + "\"}",
-                "wikibase-entityid",
-                "P50",
-                "{ \"id\": \"" + authorWikiDataIds.get(1) + "\"}",
-                "wikibase-entityid"));
+                }
+                """
+                    ::formatted)
+            .collect(Collectors.joining(","));
+
+    this.claims.add("""
+      "%s": [%s]
+  """.formatted("P50", authorJsons));
+
     return this;
   }
 }
