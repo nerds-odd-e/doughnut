@@ -45,6 +45,14 @@ class ServiceMocker {
     )
   }
 
+  public stubPosterUnauthorized(path: string) {
+    return this.stub(
+      new DefaultStub(path, HttpMethod.POST, "", 401).withPredicate(
+        new FlexiPredicate().withPath(path).withMethod(HttpMethod.POST),
+      ),
+    )
+  }
+
   public stubGetterWithError500Response(path: string, response: unknown) {
     return this.stub(
       new DefaultStub(path, HttpMethod.GET, response, 500).withPredicate(

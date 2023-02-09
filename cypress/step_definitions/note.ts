@@ -432,8 +432,8 @@ Then("I expect that the description will be {string} when I {string} the engagin
   cy.get(".close-button").click()
 })
 
-Given("the fallback key of the system is {string}", () => {
-  // comment
+Given("the fallback key of the system is {string}", (tokenValidity: string) => {
+  cy.openAiService().responseAsIfTheTokenIs(tokenValidity)
 })
 
 Then("I have a personal openAI token {string}", () => {
@@ -444,8 +444,8 @@ Then("I should get a suggestion {string}", (description: string) => {
   cy.get(".area-control.form-control").should("have.value", description)
 })
 
-Then("I should not get a suggestion {string}", () => {
-  cy.get(".alert").should("have.value", "your open ai token is invalid")
+Then("I should not get a suggestion {string}", (description: string) => {
+  cy.get(".area-control.form-control").should("not.have.value", description)
 })
 
 Given("An OpenAI response is unavailable", () => {

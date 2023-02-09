@@ -62,3 +62,13 @@ Cypress.Commands.add(
     serviceMocker.stubGetterWithError500Response(`/v1/completions`, {})
   },
 )
+
+Cypress.Commands.add(
+  "responseAsIfTheTokenIs",
+  { prevSubject: true },
+  (serviceMocker: ServiceMocker, tokenValidity) => {
+    if (tokenValidity === "invalid") {
+      serviceMocker.stubPosterUnauthorized(`/v1/completions`)
+    }
+  },
+)

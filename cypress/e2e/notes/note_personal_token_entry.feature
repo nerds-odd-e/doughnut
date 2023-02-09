@@ -20,4 +20,5 @@ Feature: Personal token entry for Open AI functionality
      | valid key    | valid key    | should    |
      #| invalid key  | valid key    | should    |
      #| valid key    | invalid      | should    |
-     # | invalid      | invalid      | should not |
+     #| invalid      | invalid      | should not |
+
