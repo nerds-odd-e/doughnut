@@ -6,11 +6,17 @@ Feature: Tell me a engaging story
     And there are some notes for the current user
       | title    | description         |
       | Animals  | Are living beings   |
-    And OpenAI thinks that "Animals" means "Cow says moo"
 
   @usingMockedOpenAiService
   Scenario: Click the Engaging Story button creates a modal message
+    Given OpenAI thinks that "Animals" means "Cow says moo"
     When I ask for an engaging story for "Animals"
     Then I should be prompted with an engaging story description "Cow says moo"
 
+  @ignore
+  @usingMockedOpenAiService
+  Scenario: Show error message when things don't work
+    Given An OpenAI response is unavailable
+    When I ask for an engaging story for "Animals"
+    Then I should be prompted with an error message saying "There is a problem"
 

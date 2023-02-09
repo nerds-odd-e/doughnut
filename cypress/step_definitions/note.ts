@@ -447,3 +447,11 @@ Then("I should get a suggestion {string}", (description: string) => {
 Then("I should not get a suggestion {string}", () => {
   cy.get(".alert").should("have.value", "your open ai token is invalid")
 })
+
+Given("An OpenAI response is unavailable", () => {
+  cy.openAiService().stubOpenAiCompletionWithErrorResponse()
+})
+
+Then("I should be prompted with an error message saying {string}", (errorMessage: string) => {
+  cy.get(".engaging-story").should("contain.text", errorMessage)
+})

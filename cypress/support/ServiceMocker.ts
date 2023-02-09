@@ -45,6 +45,14 @@ class ServiceMocker {
     )
   }
 
+  public stubGetterWithError500Response(path: string, response: unknown) {
+    return this.stub(
+      new DefaultStub(path, HttpMethod.GET, response, 500).withPredicate(
+        new FlexiPredicate().withPath(path).withMethod(HttpMethod.GET),
+      ),
+    )
+  }
+
   private async stub(stub: Stub) {
     this.mountebank.addStubToImposter(stub)
   }
