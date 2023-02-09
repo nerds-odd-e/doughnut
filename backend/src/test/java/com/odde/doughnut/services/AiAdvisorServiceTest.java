@@ -13,7 +13,6 @@ import com.theokanning.openai.completion.CompletionResult;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
@@ -99,8 +98,12 @@ class AiAdvisorServiceTest {
   void getAiSuggestion_given_invalidToken_return_401() {
     HttpException httpExceptionMock = Mockito.mock(HttpException.class);
     Mockito.when(httpExceptionMock.code()).thenReturn(401);
+    String unauthorized = "Unauthorized";
+    Mockito.when(httpExceptionMock.getMessage()).thenReturn(unauthorized);
     Mockito.when(openAiServiceMock.createCompletion(ArgumentMatchers.any()))
         .thenThrow(httpExceptionMock);
-    assertThrows(OpenAiUnauthorizedException.class, () -> aiAdvisorService.getAiSuggestion(""));
+    OpenAiUnauthorizedException exception =
+        assertThrows(OpenAiUnauthorizedException.class, () -> aiAdvisorService.getAiSuggestion(""));
+    assertEquals(unauthorized, exception.getMessage());
   }
 }
