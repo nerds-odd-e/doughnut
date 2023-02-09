@@ -19,7 +19,7 @@ describe("NoteSuggestDescriptionDialog", () => {
     expect(wrapper.find("textarea").element).toHaveValue("suggestion");
   });
 
-  it.skip("opens an alert when the api returns an empty string", async () => {
+  it("opens an alert when the api returns an empty string", async () => {
     const note = makeMe.aNoteRealm.please();
     helper.apiMock
       .expectingPost(`/api/ai/ask-suggestions`)
@@ -29,6 +29,6 @@ describe("NoteSuggestDescriptionDialog", () => {
       .withStorageProps({ selectedNote: note })
       .mount();
     await flushPromises();
-    expect(wrapper.text()).toContain("invalid open ai token , 401")
+    expect(wrapper.text()).toContain("invalid open ai token , 401");
   });
 });
