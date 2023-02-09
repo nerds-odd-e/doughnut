@@ -93,7 +93,8 @@ class AiAdvisorServiceTest {
 
     CompletionResult completionResult = new CompletionResult();
     CompletionChoice completionChoice = new CompletionChoice();
-    completionChoice.setText("Tell me an engaging story to learn about title\n\nThis is an engaging story");
+    completionChoice.setText(
+        "Tell me an engaging story to learn about title.\n\nThis is an engaging story");
 
     List<CompletionChoice> completionChoices = List.of(completionChoice);
     completionResult.setChoices(completionChoices);

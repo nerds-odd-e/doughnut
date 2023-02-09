@@ -30,15 +30,15 @@ public class AiAdvisorService {
             .build();
     var choices = service.createCompletion(completionRequest).getChoices();
     return choices.stream()
-      .map(CompletionChoice::getText)
-      .collect(Collectors.joining(""))
-      .replace(prompt, "")
-      .trim();
+        .map(CompletionChoice::getText)
+        .collect(Collectors.joining(""))
+        .replace(prompt, "")
+        .trim();
   }
 
   public AiSuggestion getAiSuggestion(String item) {
     try {
-      String prompt = "Tell me about " + item + ".";
+      String prompt = String.format("Tell me about %s.", item);
       return new AiSuggestion(getOpenAiResponse(prompt));
     } catch (HttpException e) {
       if (HttpStatus.UNAUTHORIZED.value() == e.code()) {
@@ -49,8 +49,8 @@ public class AiAdvisorService {
   }
 
   public AiEngagingStory getEngagingStory(List<String> items) {
-    final String topics = String.join("", items);
-    final String prompt = String.format("Tell me an engaging story to learn about %s", topics);
+    final String topics = String.join(" and ", items);
+    final String prompt = String.format("Tell me an engaging story to learn about %s.", topics);
     final String story = getOpenAiResponse(prompt);
 
     return new AiEngagingStory(story);
