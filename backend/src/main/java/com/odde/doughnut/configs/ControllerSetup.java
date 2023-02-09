@@ -1,6 +1,7 @@
 package com.odde.doughnut.configs;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
+import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.factoryServices.FailureReportFactory;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -52,4 +53,6 @@ public class ControllerSetup {
 
     throw exception;
   }
+
+  public void handleOpenAIUnauthorizedException(OpenAiUnauthorizedException exception) {}
 }

@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.FailureReport;
+import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.RealGithubService;
@@ -17,6 +18,7 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -89,6 +91,15 @@ public class ControllerSetupTest {
     request.setRequestURI("/path");
     FailureReport failureReport = catchExceptionAndGetFailureReport();
     assertThat(failureReport.getErrorDetail(), containsString("/path"));
+  }
+
+  @Test
+  @Disabled
+  void shouldHandleOpenAIUnauthorizedException() {
+    OpenAiUnauthorizedException exception = new OpenAiUnauthorizedException("Unauthorized");
+    assertThrows(
+        OpenAiUnauthorizedException.class,
+        () -> controllerSetup.handleOpenAIUnauthorizedException(exception));
   }
 
   private FailureReport catchExceptionAndGetFailureReport() {
