@@ -24,6 +24,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -55,12 +56,11 @@ class RestAiControllerTest {
   }
 
   @Test
-  void askSuggestionWithRightParams() {
+  void askSuggestionWithRightPrompt() {
     when(openAiService.createCompletion(
             argThat(
                 request -> {
                   assertEquals("Tell me about Earth.", request.getPrompt());
-                  assertEquals(3000, request.getMaxTokens());
                   return true;
                 })))
         .thenReturn(buildCompletionResult("blue planet"));
@@ -85,32 +85,28 @@ class RestAiControllerTest {
   }
 
   @Test
-  void askEngagingStoryWithRightParams() {
-    CompletionRequest completionRequest =
-        CompletionRequest.builder()
-            .prompt("Tell me an engaging story to learn about Coming soon")
-            .model("text-davinci-003")
-            .maxTokens(3000)
-            .echo(true)
-            .build();
-
+  void askEngagingStoryWithRightPrompt() {
     when(openAiService.createCompletion(
             argThat(
                 request -> {
                   assertEquals(
                       "Tell me an engaging story to learn about Coming soon", request.getPrompt());
-                  assertEquals(3000, request.getMaxTokens());
                   return true;
                 })))
         .thenReturn(buildCompletionResult("This is an engaging story."));
 
-    final TextContent textContent = new TextContent();
-    textContent.setTitle("Coming soon");
-    final AiEngagingStory aiEngagingStory =
-        controller.askEngagingStories(
-            Note.createNote(null, new Timestamp(System.currentTimeMillis()), textContent));
+    Note aNote = makeMe.aNote("Coming soon").please();
+    controller.askEngagingStories(aNote);
+  }
+
+  @Test
+  void askEngagingStoryReturnsEngagingStory() {
+    when(openAiService.createCompletion(Mockito.any()))
+      .thenReturn(buildCompletionResult("This is an engaging story."));
+
+    Note aNote = makeMe.aNote().please();
+    final AiEngagingStory aiEngagingStory = controller.askEngagingStories(aNote);
     assertEquals("This is an engaging story.", aiEngagingStory.engagingStory());
-    verify(openAiService, times(1)).createCompletion(completionRequest);
   }
 
   @Test

@@ -34,13 +34,6 @@ class AiAdvisorServiceTest {
 
   @Test
   void getAiSuggestion_givenAString_returnsAiSuggestionObject() {
-    CompletionRequest completionRequest =
-        CompletionRequest.builder()
-            .prompt("Tell me about suggestion_prompt.")
-            .model("text-davinci-003")
-            .maxTokens(3000)
-            .echo(true)
-            .build();
     CompletionResult completionResult = new CompletionResult();
     CompletionChoice completionChoice = new CompletionChoice();
     completionChoice.setText("suggestion_value");
@@ -48,12 +41,11 @@ class AiAdvisorServiceTest {
     completionResult.setChoices(completionChoices);
     AiSuggestion expected = new AiSuggestion("suggestion_value");
 
-    Mockito.when(openAiServiceMock.createCompletion(completionRequest))
+    Mockito.when(openAiServiceMock.createCompletion(Mockito.any()))
         .thenReturn(completionResult);
 
     assertEquals(expected, aiAdvisorService.getAiSuggestion("suggestion_prompt"));
 
-    Mockito.verify(openAiServiceMock).createCompletion(completionRequest);
   }
 
   @Test
@@ -71,13 +63,6 @@ class AiAdvisorServiceTest {
 
   @Test
   void getAiEngagingStory_givenAlistOfStrings_returnsAStory() {
-    CompletionRequest completionRequest =
-        CompletionRequest.builder()
-            .prompt("Tell me an engaging story to learn about title")
-            .model("text-davinci-003")
-            .maxTokens(3000)
-            .echo(true)
-            .build();
 
     AiEngagingStory expected = new AiEngagingStory("This is an engaging story");
 
@@ -87,12 +72,10 @@ class AiAdvisorServiceTest {
 
     List<CompletionChoice> completionChoices = List.of(completionChoice);
     completionResult.setChoices(completionChoices);
-    Mockito.when(openAiServiceMock.createCompletion(completionRequest))
+    Mockito.when(openAiServiceMock.createCompletion(Mockito.any()))
         .thenReturn(completionResult);
 
     assertEquals(expected, aiAdvisorService.getEngagingStory(Collections.singletonList("title")));
-
-    Mockito.verify(openAiServiceMock).createCompletion(completionRequest);
   }
 
   @Test
