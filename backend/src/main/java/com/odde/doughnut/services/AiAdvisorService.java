@@ -2,11 +2,13 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
+import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.theokanning.openai.OpenAiService;
 import com.theokanning.openai.completion.CompletionChoice;
 import com.theokanning.openai.completion.CompletionRequest;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.http.HttpStatus;
 import retrofit2.HttpException;
 
 public class AiAdvisorService {
@@ -33,6 +35,9 @@ public class AiAdvisorService {
       String prompt = "Tell me about " + item + ".";
       return new AiSuggestion(getOpenAiResponse(prompt).replace(prompt, "").trim());
     } catch (HttpException e) {
+      if (HttpStatus.UNAUTHORIZED.value() == e.code()) {
+        throw new OpenAiUnauthorizedException(e.getMessage());
+      }
       return new AiSuggestion("");
     }
   }

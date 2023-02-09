@@ -96,7 +96,6 @@ class AiAdvisorServiceTest {
   }
 
   @Test
-  @Disabled
   void getAiSuggestion_given_invalidToken_return_401() {
     HttpException httpExceptionMock = Mockito.mock(HttpException.class);
     Mockito.when(httpExceptionMock.code()).thenReturn(401);
