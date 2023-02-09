@@ -87,22 +87,6 @@ public class WikidataClaimJsonBuilder {
     return this;
   }
 
-  public WikidataClaimJsonBuilder addAuthorInformation(String authorWikiDataId) {
-
-    this.addClaim(
-        "P50",
-        "wikibase-entityid",
-        """
-      {
-        "entity-type": "item",
-        "numeric-id": 865,
-        "id": "%s"
-      }
-      """
-            .formatted(authorWikiDataId));
-    return this;
-  }
-
   public WikidataClaimJsonBuilder asHuman() {
     this.addClaim("P31", "wikibase-entityid", "{\"id\": \"Q5\"}");
     return this;
