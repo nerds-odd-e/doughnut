@@ -102,6 +102,4 @@ class AiAdvisorServiceTest {
 
     assertEquals(expected, aiAdvisorService.getEngagingStory(Collections.singletonList("title")));
   }
-
-  
 }
