@@ -256,7 +256,6 @@ When("I click note {string} avoiding the title", (noteTitle: string) => {
   cy.findByRole("card", { name: noteTitle }).click("bottomRight", {
     force: true,
   })
-  //cy.findByRole("card", { name: noteTitle }).click();
 })
 
 When("I click note card title {string}", (noteTitle: string) => {
