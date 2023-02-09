@@ -1,7 +1,9 @@
 <template>
   <h1>Have fun reading this engaging story</h1>
   <form>
-    <div class="engaging-story">{{ engagingStory }}</div>
+    <div class="engaging-story" :class="{ error: engagingStoryInError }">
+      {{ engagingStory }}
+    </div>
     <div class="dialog-buttons">
       <input
         @click.once="handleClose"
@@ -33,12 +35,20 @@ export default defineComponent({
   data() {
     return {
       engagingStory: "Coming soon.",
+      engagingStoryInError: false,
     };
   },
   mounted() {
-    this.api.ai.askAiEngagingStories(this.selectedNote.id).then((res) => {
-      this.engagingStory = res.engagingStory;
-    });
+    this.api.ai
+      .askAiEngagingStories(this.selectedNote.id)
+      .then((res) => {
+        this.engagingStoryInError = false;
+        this.engagingStory = res.engagingStory;
+      })
+      .catch(() => {
+        this.engagingStoryInError = true;
+        this.engagingStory = "There is a problem";
+      });
   },
   methods: {
     handleClose() {
@@ -53,6 +63,8 @@ export default defineComponent({
   max-height: 35vh
   overflow-y: auto
   white-space: pre-wrap
+.engaging-story.error
+  color: red
 .dialog-buttons
   display: flex
   column-gap: 10px

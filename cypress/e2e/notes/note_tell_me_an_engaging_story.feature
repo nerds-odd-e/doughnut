@@ -13,7 +13,6 @@ Feature: Tell me a engaging story
     When I ask for an engaging story for "Animals"
     Then I should be prompted with an engaging story description "Cow says moo"
 
-  @ignore
   @usingMockedOpenAiService
   Scenario: Show error message when things don't work
     Given An OpenAI response is unavailable
