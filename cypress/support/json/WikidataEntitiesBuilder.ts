@@ -31,7 +31,6 @@ class WikidataEntitiesBuilder {
       }
       return { ...claimsIter, ...toClaim }
     }, this.claims)
-    console.log(this.claims)
     return this
   }
 
