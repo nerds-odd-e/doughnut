@@ -70,6 +70,42 @@ public class NoteTest {
         parentNote.getTitles());
   }
 
+  @Test
+  void getTitles_givenNoteHasGrandchild_returnsThreeTitles() {
+    Note parentNote = makeMe.aNote("This is a parent note").please();
+    Note childNote = makeMe.aNote("This is a child note").under(parentNote).please();
+    makeMe.aNote("This is a grand child note").under(childNote).please();
+    makeMe.refresh(parentNote);
+    makeMe.refresh(childNote);
+    assertEquals(
+        List.of("This is a parent note", "This is a child note", "This is a grand child note"),
+        parentNote.getTitles());
+  }
+
+  @Test
+  void getTitles_givenNoteHasGrandchildren_returnsSevenTitles() {
+    Note parentNote = makeMe.aNote("parent").please();
+    Note childNote = makeMe.aNote("child 1").under(parentNote).please();
+    Note childNoteTwo = makeMe.aNote("child 2").under(parentNote).please();
+    makeMe.aNote("grand child 1").under(childNote).please();
+    makeMe.aNote("grand child 2").under(childNote).please();
+    makeMe.aNote("grand child 3").under(childNoteTwo).please();
+    makeMe.aNote("grand child 4").under(childNoteTwo).please();
+    makeMe.refresh(parentNote);
+    makeMe.refresh(childNote);
+    makeMe.refresh(childNoteTwo);
+    assertEquals(
+        List.of(
+            "parent",
+            "child 1",
+            "grand child 1",
+            "grand child 2",
+            "child 2",
+            "grand child 3",
+            "grand child 4"),
+        parentNote.getTitles());
+  }
+
   @Nested
   class Picture {
 

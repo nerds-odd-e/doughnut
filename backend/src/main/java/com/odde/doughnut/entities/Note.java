@@ -376,7 +376,7 @@ public class Note extends Thingy {
   public List<String> getTitles() {
     List<String> titles = new ArrayList<>();
     titles.add(getTitle());
-    getChildren().stream().map(Note::getTitle).forEach(titles::add);
+    getChildren().stream().map(Note::getTitles).flatMap(List::stream).forEach(titles::add);
 
     return titles;
   }
