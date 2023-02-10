@@ -69,8 +69,8 @@ export default defineComponent({
       .then((res) => {
         this.suggestedDescription = res.suggestion;
       })
-      .catch(() => {
-        this.openAlert();
+      .catch((er) => {
+        this.suggestedDescription = er.message;
       });
   },
 });

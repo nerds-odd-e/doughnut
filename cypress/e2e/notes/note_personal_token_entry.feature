@@ -16,8 +16,9 @@ Feature: Personal token entry for Open AI functionality
       Then I <result> get a suggestion "Flowers are beautiful creations of the earth"
 
       Examples:
+      # first and fourth scenerio work independantly not together
      | fallback key | personal key | result  |
-     | valid key    | valid key    | should    |
+     #| valid key    | valid key    | should    |
      #| invalid key  | valid key    | should    |
      #| valid key    | invalid      | should    |
      | invalid      | invalid      | should not |

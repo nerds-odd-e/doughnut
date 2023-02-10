@@ -98,10 +98,10 @@ public class ControllerSetupTest {
   @Test
   void shouldHandleOpenAIUnauthorizedException() {
     OpenAiUnauthorizedException exception = new OpenAiUnauthorizedException("Unauthorized");
-    ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED, UNAUTHORIZED_DEFAULT_MESSAGE);
+    ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, UNAUTHORIZED_DEFAULT_MESSAGE);
     apiError.add("OpenAi Error", exception.getMessage());
     ResponseEntity<ApiError> response =
-        ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiError);
+        ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
     assertEquals(response, controllerSetup.handleOpenAIUnauthorizedException(exception));
   }
 

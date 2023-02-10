@@ -60,11 +60,11 @@ public class ControllerSetup {
   }
 
   @ExceptionHandler(OpenAiUnauthorizedException.class)
-  @ResponseStatus(HttpStatus.UNAUTHORIZED)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseEntity<ApiError> handleOpenAIUnauthorizedException(
       OpenAiUnauthorizedException exception) {
-    ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED, UNAUTHORIZED_DEFAULT_MESSAGE);
+    ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, UNAUTHORIZED_DEFAULT_MESSAGE);
     apiError.add("OpenAi Error", exception.getMessage());
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiError);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
   }
 }
