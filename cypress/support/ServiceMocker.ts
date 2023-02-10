@@ -45,9 +45,9 @@ class ServiceMocker {
     )
   }
 
-  public stubPosterUnauthorized(path: string) {
+  public stubPosterUnauthorized(path: string, response: unknown) {
     return this.stub(
-      new DefaultStub(path, HttpMethod.POST, "", 401).withPredicate(
+      new DefaultStub(path, HttpMethod.POST, response, 401).withPredicate(
         new FlexiPredicate().withPath(path).withMethod(HttpMethod.POST),
       ),
     )

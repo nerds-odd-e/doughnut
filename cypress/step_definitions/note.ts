@@ -444,8 +444,8 @@ Then("I should get a suggestion {string}", (description: string) => {
   cy.get(".area-control.form-control").should("have.value", description)
 })
 
-Then("I should not get a suggestion {string}", (description: string) => {
-  cy.get(".area-control.form-control").should("not.have.value", description)
+Then("I should not get a suggestion {string}", () => {
+  cy.get(".area-control.form-control").should("not.exist")
 })
 
 Given("An OpenAI response is unavailable", () => {

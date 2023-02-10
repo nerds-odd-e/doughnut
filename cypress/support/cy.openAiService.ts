@@ -68,7 +68,13 @@ Cypress.Commands.add(
   { prevSubject: true },
   (serviceMocker: ServiceMocker, tokenValidity) => {
     if (tokenValidity === "invalid") {
-      serviceMocker.stubPosterUnauthorized(`/v1/completions`)
+      serviceMocker.stubPosterUnauthorized(`/v1/completions`, {
+        status: "UNAUTHORIZED",
+        message: "The OpenAI request was not Authorized.",
+        errors: {
+          "OpenAi Error": "HTTP 401 ",
+        },
+      })
     }
   },
 )

@@ -64,15 +64,15 @@ export default defineComponent({
     },
   },
   mounted() {
-    this.api.ai.askAiSuggestions(this.selectedNote.title).then((res) => {
-      if (res.suggestion === "") {
-        // res.error
-        this.openAlert();
-        //   close SuggestedDescriptionModalWindow
-      } else {
+    this.api.ai
+      .askAiSuggestions(this.selectedNote.title)
+      .then((res) => {
         this.suggestedDescription = res.suggestion;
-      }
-    });
+      })
+      .catch((er) => {
+        // eslint-disable-line @typescript-eslint/no-unused-vars
+        this.openAlert();
+      });
   },
 });
 </script>
