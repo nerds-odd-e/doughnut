@@ -12,6 +12,7 @@ import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiService;
 import com.theokanning.openai.completion.CompletionChoice;
 import com.theokanning.openai.completion.CompletionResult;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -79,7 +80,7 @@ class RestAiControllerTest {
         .thenReturn(buildCompletionResult("This is an engaging story."));
 
     Note aNote = makeMe.aNote("Coming soon").please();
-    controller.askEngagingStories(aNote);
+    controller.askEngagingStories(Collections.singletonList(aNote));
   }
 
   @Test
@@ -97,7 +98,7 @@ class RestAiControllerTest {
         .thenReturn(buildCompletionResult("This is an engaging story."));
 
     Note aNote = makeMe.aNote("Coming soon").please();
-    controller.askEngagingStories(aNote);
+    controller.askEngagingStories(Collections.singletonList(aNote));
   }
 
   @Test
@@ -106,7 +107,8 @@ class RestAiControllerTest {
         .thenReturn(buildCompletionResult("This is an engaging story."));
 
     Note aNote = makeMe.aNote().please();
-    final AiEngagingStory aiEngagingStory = controller.askEngagingStories(aNote);
+    final AiEngagingStory aiEngagingStory =
+        controller.askEngagingStories(Collections.singletonList(aNote));
     assertEquals("This is an engaging story.", aiEngagingStory.engagingStory());
   }
 
@@ -118,8 +120,27 @@ class RestAiControllerTest {
     Note parentNote = makeMe.aNote("Coming soon parent").please();
     makeMe.aNote("Coming soon child").under(parentNote).please();
     makeMe.refresh(parentNote);
-    final AiEngagingStory aiEngagingStory = controller.askEngagingStories(parentNote);
+    final AiEngagingStory aiEngagingStory =
+        controller.askEngagingStories(Collections.singletonList(parentNote));
     assertEquals("This is an engaging story.", aiEngagingStory.engagingStory());
+  }
+
+  @Test
+  void askEngagingStoryForMultipleNotes_returnsEngagingStory() {
+    when(openAiService.createCompletion(
+            argThat(
+                request -> {
+                  assertEquals(
+                      "Tell me an engaging story to learn about note and note2.",
+                      request.getPrompt());
+                  return true;
+                })))
+        .thenReturn(buildCompletionResult("This is an engaging story."));
+
+    Note note = makeMe.aNote("note").please();
+    Note note2 = makeMe.aNote("note2").please();
+
+    final AiEngagingStory aiEngagingStory = controller.askEngagingStories(List.of(note, note2));
   }
 
   @NotNull

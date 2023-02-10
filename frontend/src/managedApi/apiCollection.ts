@@ -249,7 +249,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
     async askAiEngagingStories(noteId: number) {
       return (await managedApi.restGet(
-        `ai/ask-engaging-stories/${noteId}`
+        `ai/ask-engaging-stories?notes=${noteId}`
       )) as Generated.AiEngagingStory;
     },
   },
