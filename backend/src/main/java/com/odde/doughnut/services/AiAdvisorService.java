@@ -33,7 +33,7 @@ public class AiAdvisorService {
 
   public AiSuggestion getAiSuggestion(String item) {
     try {
-      String prompt = String.format("Tell me about %s.", item);
+      String prompt = String.format("Tell me about %s in a paragraph.", item);
       return new AiSuggestion(getOpenAiResponse(prompt));
     } catch (HttpException e) {
       if (HttpStatus.UNAUTHORIZED.value() == e.code()) {
