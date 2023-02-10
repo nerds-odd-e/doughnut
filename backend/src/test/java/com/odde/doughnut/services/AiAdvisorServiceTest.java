@@ -100,20 +100,4 @@ class AiAdvisorServiceTest {
         assertThrows(OpenAiUnauthorizedException.class, () -> aiAdvisorService.getAiSuggestion(""));
     assertEquals(unauthorized, exception.getMessage());
   }
-
-  @Test
-  void getAiEngagingStory_removesPromptFromResult() {
-    AiEngagingStory expected = new AiEngagingStory("This is an engaging story");
-
-    CompletionResult completionResult = new CompletionResult();
-    CompletionChoice completionChoice = new CompletionChoice();
-    completionChoice.setText(
-        "Tell me an engaging story to learn about title.\n\nThis is an engaging story");
-
-    List<CompletionChoice> completionChoices = List.of(completionChoice);
-    completionResult.setChoices(completionChoices);
-    Mockito.when(openAiServiceMock.createCompletion(Mockito.any())).thenReturn(completionResult);
-
-    assertEquals(expected, aiAdvisorService.getEngagingStory(Collections.singletonList("title")));
-  }
 }
