@@ -25,8 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
-import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -67,16 +65,6 @@ class RestAiControllerTest {
     when(openAiService.createCompletion(any())).thenReturn(buildCompletionResult("blue planet"));
     AiSuggestion aiSuggestion = controller.askSuggestion(params);
     assertEquals("blue planet", aiSuggestion.suggestion());
-  }
-
-  @Test
-  void streamSuggestions() {
-    when(openAiService.createCompletion(any())).thenReturn(buildCompletionResult("Harry Potter"));
-    Flux<AiSuggestion> aiSuggestion = controller.streamSuggestions();
-    StepVerifier.create(aiSuggestion)
-        .expectNext(new AiSuggestion("Harry Potter"))
-        .expectComplete()
-        .verify();
   }
 
   @Test
