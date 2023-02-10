@@ -95,6 +95,24 @@ class RestAiControllerTest {
   }
 
   @Test
+  void askEngagingStoryWithRightMaxTokens() {
+    // We are testing on maxTokens, because changing this setting will have an effect on request
+    // performance.
+    // When this setting is changed please do a manual test that engaging stories can still be
+    // requested.
+    when(openAiService.createCompletion(
+            argThat(
+                request -> {
+                  assertEquals(500, request.getMaxTokens());
+                  return true;
+                })))
+        .thenReturn(buildCompletionResult("This is an engaging story."));
+
+    Note aNote = makeMe.aNote("Coming soon").please();
+    controller.askEngagingStories(aNote);
+  }
+
+  @Test
   void askEngagingStoryReturnsEngagingStory() {
     when(openAiService.createCompletion(Mockito.any()))
         .thenReturn(buildCompletionResult("This is an engaging story."));

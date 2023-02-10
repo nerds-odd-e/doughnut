@@ -46,6 +46,20 @@ class AiAdvisorServiceTest {
   }
 
   @Test
+  void getAiSuggestion_givenAString_sendsOpenAIRequestWithRightParams() {
+    CompletionResult completionResult = new CompletionResult();
+    CompletionChoice completionChoice = new CompletionChoice();
+    completionChoice.setText("suggestion_value");
+    List<CompletionChoice> completionChoices = List.of(completionChoice);
+    completionResult.setChoices(completionChoices);
+    AiSuggestion expected = new AiSuggestion("suggestion_value");
+
+    Mockito.when(openAiServiceMock.createCompletion(Mockito.any())).thenReturn(completionResult);
+
+    assertEquals(expected, aiAdvisorService.getAiSuggestion("suggestion_prompt"));
+  }
+
+  @Test
   void getAiSuggestion_givenAString_whenHttpError_returnsEmptySuggestion() {
     AiSuggestion expected = new AiSuggestion("");
     HttpException httpExceptionMock = Mockito.mock(HttpException.class);
