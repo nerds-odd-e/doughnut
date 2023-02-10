@@ -34,7 +34,7 @@ export default defineComponent({
   emits: ["done"],
   data() {
     return {
-      engagingStory: "Coming soon.",
+      engagingStory: "In progress... waiting for engaging story",
       engagingStoryInError: false,
     };
   },
