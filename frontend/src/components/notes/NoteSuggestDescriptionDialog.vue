@@ -69,8 +69,7 @@ export default defineComponent({
       .then((res) => {
         this.suggestedDescription = res.suggestion;
       })
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      .catch((er) => {
+      .catch(() => {
         this.openAlert();
       });
   },
