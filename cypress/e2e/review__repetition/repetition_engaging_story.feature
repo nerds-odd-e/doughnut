@@ -11,6 +11,11 @@ Feature: Review Pages with an Engaging Story
   @ignore
   @usingMockedOpenAiService
   Scenario: I want to review my old notes through an engaging story
-    When I request an engaging story on the review page
+    Given It's day 1, 8 hour
+    And I do these initial reviews in sequence:
+      | review_type | title    |
+      | single note | Sedition |
+    When It's day 2, 9 hour
+    And I request an engaging story on the review page
     Then I should be prompted with a story description "To incite violence"
 
