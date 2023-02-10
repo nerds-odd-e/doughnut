@@ -42,14 +42,16 @@
             Using spaced repetition technique, you only need to review the old
             notes you have learned at the optimal time.
           </p>
-          <router-link
-            v-if="reviewing.toRepeatCount > 0"
-            role="button"
-            class="btn btn-light"
-            :to="{ name: 'repeat' }"
-          >
-            Start reviewing old notes
-          </router-link>
+          <span v-if="reviewing.toRepeatCount > 0">
+            <router-link
+              role="button"
+              class="btn btn-light"
+              :to="{ name: 'repeat' }"
+            >
+              Start reviewing old notes
+            </router-link>
+          </span>
+
           <h2 v-else class="">
             You have reviewed all the old notes for today.
           </h2>

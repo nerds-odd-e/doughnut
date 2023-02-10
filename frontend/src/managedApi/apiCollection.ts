@@ -252,6 +252,11 @@ const apiCollection = (managedApi: ManagedApi) => ({
         `ai/ask-engaging-stories?notes=${noteId}`
       )) as Generated.AiEngagingStory;
     },
+    async askAiReviewEngagingStory() {
+      return (await managedApi.restGet(
+        "ai/ask-engaging-stories/review"
+      )) as Generated.AiEngagingStory;
+    },
   },
   testability: {
     getEnvironment() {

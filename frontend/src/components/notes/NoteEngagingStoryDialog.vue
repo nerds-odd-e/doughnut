@@ -25,10 +25,10 @@ export default defineComponent({
     return useLoadingApi();
   },
   props: {
-    selectedNote: { type: Object as PropType<Generated.Note>, required: true },
+    selectedNote: { type: Object as PropType<Generated.Note>, required: false },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
-      required: true,
+      required: false,
     },
   },
   emits: ["done"],
@@ -39,8 +39,11 @@ export default defineComponent({
     };
   },
   mounted() {
-    this.api.ai
-      .askAiEngagingStories(this.selectedNote.id)
+    const request = this.selectedNote
+      ? this.api.ai.askAiEngagingStories(this.selectedNote.id)
+      : this.api.ai.askAiReviewEngagingStory();
+
+    request
       .then((res) => {
         this.engagingStoryInError = false;
         this.engagingStory = res.engagingStory;

@@ -20,10 +20,10 @@ import type { StorageAccessor } from "@/store/createNoteStorage";
 
 export default defineComponent({
   props: {
-    selectedNote: { type: Object as PropType<Generated.Note>, required: true },
+    selectedNote: { type: Object as PropType<Generated.Note>, required: false },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
-      required: true,
+      required: false,
     },
   },
   components: { NoteStoryDialog, PopupButton },
