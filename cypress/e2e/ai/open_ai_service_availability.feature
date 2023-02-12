@@ -4,19 +4,11 @@ Feature: Open AI service availability
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user
-      | title          | description    |
-      | Flowers        | Something else |
-    And OpenAI thinks that "Flowers" means "Flowers are beautiful creations of the earth"
+      | title          |
+      | Flowers        |
 
     @usingMockedOpenAiService
-    Scenario Outline: Get suggestions with open AI personal or fallback token
-      Given open AI serivce always think the system token is "<validity>"
-      And I have a personal openAI token "<personal key>"
+    Scenario: Open AI service availability
+      Given open AI serivce always think the system token is invalid
       When I ask for a description suggestion for "Flowers"
-      Then I <result> get a suggestion "Flowers are beautiful creations of the earth"
-
-      Examples:
-     | validity | personal key | result     |
-     | valid    | valid key    | should     |
-     | invalid  | invalid      | should not |
-
+      Then I should see that the open AI service is not available

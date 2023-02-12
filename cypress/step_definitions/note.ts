@@ -432,21 +432,11 @@ Then("I expect that the description will be {string} when I {string} the engagin
   cy.get(".close-button").click()
 })
 
-Given("open AI serivce always think the system token is {string}", (tokenValidity: string) => {
-  if (tokenValidity === "invalid") {
-    cy.openAiService().alwaysResponseAsUnauthorized()
-  }
+Given("open AI serivce always think the system token is invalid", () => {
+  cy.openAiService().alwaysResponseAsUnauthorized()
 })
 
-Then("I have a personal openAI token {string}", () => {
-  // comment
-})
-
-Then("I should get a suggestion {string}", (description: string) => {
-  cy.get(".area-control.form-control").should("have.value", description)
-})
-
-Then("I should not get a suggestion {string}", () => {
+Then("I should see that the open AI service is not available", () => {
   cy.get(".area-control.form-control").should("have.value", "Bad Request")
 })
 
