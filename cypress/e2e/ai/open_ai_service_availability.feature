@@ -10,13 +10,13 @@ Feature: Open AI service availability
 
     @usingMockedOpenAiService
     Scenario Outline: Get suggestions with open AI personal or fallback token
-      Given the fallback key of the system is "<fallback key>"
+      Given open AI serivce always think the system token is "<validity>"
       And I have a personal openAI token "<personal key>"
       When I ask for a description suggestion for "Flowers"
       Then I <result> get a suggestion "Flowers are beautiful creations of the earth"
 
       Examples:
-     | fallback key | personal key | result     |
-     | valid key    | valid key    | should     |
-     | invalid      | invalid      | should not |
+     | validity | personal key | result     |
+     | valid    | valid key    | should     |
+     | invalid  | invalid      | should not |
 

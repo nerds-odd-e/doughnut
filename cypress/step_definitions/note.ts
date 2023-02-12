@@ -432,7 +432,7 @@ Then("I expect that the description will be {string} when I {string} the engagin
   cy.get(".close-button").click()
 })
 
-Given("the fallback key of the system is {string}", (tokenValidity: string) => {
+Given("open AI serivce always think the system token is {string}", (tokenValidity: string) => {
   if (tokenValidity === "invalid") {
     cy.openAiService().alwaysResponseAsUnauthorized()
   }
