@@ -82,6 +82,7 @@ jobs:
       matrix:
         spec:
           - |
+            cypress/e2e/a*/**
             cypress/e2e/b*/**
           - |
             cypress/e2e/c*/**
