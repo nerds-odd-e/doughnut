@@ -1,4 +1,4 @@
-Feature: Personal token entry for Open AI functionality
+Feature: Open AI service availability
   As a learner, I want to use my personal token to utilize the OpenAI features for getting suggestions on this note
 
   Background:
