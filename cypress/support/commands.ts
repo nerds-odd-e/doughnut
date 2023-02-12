@@ -145,6 +145,14 @@ Cypress.Commands.add("submitNoteFormWith", (noteAttributes) => {
 })
 
 Cypress.Commands.add(
+  "fieldShouldHaveValue",
+  { prevSubject: true },
+  ($input: JQuery<HTMLElement>, value: string) => {
+    cy.wrap($input).should("have.value", value)
+  },
+)
+
+Cypress.Commands.add(
   "assignFieldValue",
   { prevSubject: true },
   ($input: JQuery<HTMLElement>, value: string) => {

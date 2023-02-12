@@ -43,6 +43,7 @@ declare namespace Cypress {
     findNoteCardEditButton(noteTitle: string): Chainable<any>
     formField(label: string): Chainable<any>
     assignFieldValue(value: string): Chainable<any>
+    fieldShouldHaveValue(value: string): Chainable<any>
     getSeededNoteIdByTitle(noteTitle: string): Chainable<Subject>
     initialReviewInSequence(reviews: any): Chainable<any>
     initialReviewNotes(noteTitles: any): Chainable<any>
