@@ -28,7 +28,7 @@ Given("there are some notes for the current user", (data) => {
   cy.testability().seedNotes(data.hashes())
 })
 
-Given("I have a note with title {string}", (noteTitle: string) => {
+Given("I have a note with the title {string}", (noteTitle: string) => {
   cy.testability().seedNotes([{ title: noteTitle }])
 })
 

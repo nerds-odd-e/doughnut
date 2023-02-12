@@ -3,9 +3,7 @@ Feature: Tell me a engaging story
 
   Background:
     Given I've logged in as an existing user
-    And there are some notes for the current user
-      | title    | description         |
-      | Animals  | Are living beings   |
+    And I have a note with the title "Animals"
 
   @usingMockedOpenAiService
   Scenario: Click the Engaging Story button creates a modal message

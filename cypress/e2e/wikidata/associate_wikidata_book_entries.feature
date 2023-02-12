@@ -2,9 +2,7 @@ Feature: Note creation for a book
 
   Background:
     Given I've logged in as an existing user
-    And there are some notes for the current user
-      | title              |
-      | My Favourite Books |
+    And I have a note with the title "My Favourite Books"
 
   @usingMockedWikidataService
   Scenario: Create a new book note with author note not exists in notebook

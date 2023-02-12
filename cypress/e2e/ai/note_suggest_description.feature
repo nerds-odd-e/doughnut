@@ -5,8 +5,8 @@ Feature: Suggest description
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user
-      | title    | description         | testingParent |
-      | Animals  | Are living beings   |               |
+      | title    | description         |
+      | Animals  | Are living beings   |
     And OpenAI thinks that "Animals" means "Sharing the same planet as humans"
 
   @usingMockedOpenAiService

@@ -5,9 +5,7 @@ Feature: Note creation/edit for a location
 
   Background:
     Given I've logged in as an existing user
-    And there are some notes for the current user
-      | title  | description |
-      | places | some desc   |
+    And I have a note with the title "places"
     And Wikidata.org has an entity "Q334" with title "Singapore"
     And Wikidata.org entity "Q334" is a location at 1.3, 103.8
 

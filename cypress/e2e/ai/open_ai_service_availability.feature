@@ -5,9 +5,7 @@ Feature: Open AI service availability
 
   Background:
     Given I've logged in as an existing user
-    And there are some notes for the current user
-      | title          |
-      | Flowers        |
+    And I have a note with the title "Flowers"
 
     @usingMockedOpenAiService
     Scenario: Open AI service availability

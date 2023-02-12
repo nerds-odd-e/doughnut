@@ -6,7 +6,7 @@ Feature: associate wikidata ID to note
 
   Background:
     Given I've logged in as an existing user
-    And I have a note with title "TDD"
+    And I have a note with the title "TDD"
 
   @usingMockedWikidataService
   Scenario: Associate note to wikidata when the service is not available
