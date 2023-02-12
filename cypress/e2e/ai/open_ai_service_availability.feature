@@ -1,5 +1,7 @@
 Feature: Open AI service availability
-  As a learner, I want to use my personal token to utilize the OpenAI features for getting suggestions on this note
+  As the system manager, I want the user get informed when
+  the Open AI service is not available, so that they can
+  still use the system without it.
 
   Background:
     Given I've logged in as an existing user
