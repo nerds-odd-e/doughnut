@@ -542,7 +542,7 @@ Cypress.Commands.add("associateNoteWithWikidataId", (title, wikiID) => {
 })
 
 Cypress.Commands.add("expectFieldErrorMessage", (message: string, field: string) => {
-  cy.findByLabelText(field).siblings(".error-msg").findByText(message)
+  cy.formField(field).siblings(".error-msg").findByText(message)
 })
 
 Cypress.Commands.add("findWikiAssociationButton", () => {
