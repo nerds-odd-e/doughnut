@@ -1,23 +1,18 @@
 <template>
   <h1>Have fun reading this engaging story</h1>
   <form>
-    <div class="engaging-story" :class="{ error: engagingStoryInError }">
-      {{ engagingStory }}
-    </div>
-    <div class="dialog-buttons">
-      <input
-        @click.once="handleClose"
-        type="button"
-        value="Close"
-        class="btn btn-primary"
-      />
-    </div>
+    <TextArea
+      v-model="engagingStory"
+      field="engagingStory"
+      :errors="engagingStoryInError"
+    />
   </form>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import type { StorageAccessor } from "@/store/createNoteStorage";
+import TextArea from "../form/TextArea.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default defineComponent({
@@ -31,11 +26,13 @@ export default defineComponent({
       required: false,
     },
   },
-  emits: ["done"],
+  components: {
+    TextArea,
+  },
   data() {
     return {
       engagingStory: "In progress... waiting for engaging story",
-      engagingStoryInError: false,
+      engagingStoryInError: undefined as string | undefined,
     };
   },
   mounted() {
@@ -45,31 +42,12 @@ export default defineComponent({
 
     request
       .then((res) => {
-        this.engagingStoryInError = false;
         this.engagingStory = res.engagingStory;
+        console.log(this.engagingStory);
       })
       .catch(() => {
-        this.engagingStoryInError = true;
-        this.engagingStory = "There is a problem";
+        this.engagingStoryInError = "There is a problem";
       });
-  },
-  methods: {
-    handleClose() {
-      this.$emit("done");
-    },
   },
 });
 </script>
-
-<style lang="sass" scoped>
-.engaging-story
-  max-height: 35vh
-  overflow-y: auto
-  white-space: pre-wrap
-.engaging-story.error
-  color: red
-.dialog-buttons
-  display: flex
-  column-gap: 10px
-  margin: 10px 0
-</style>

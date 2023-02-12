@@ -24,17 +24,11 @@ const createWrapper = async (review = false) => {
 };
 
 describe("NoteEngagingStoryDialog", () => {
-  it("Engaging story dialog close button exits the dialog", async () => {
-    const wrapper = await createWrapper();
-    await wrapper.find("input[value='Close']").trigger("click");
-    expect(wrapper.emitted("done")).toBeTruthy();
-  });
-
   it.each([true, false])(
     "fetches engaging story for review or single note",
     async (review) => {
       const wrapper = await createWrapper(review);
-      expect(wrapper.find(".engaging-story").text()).toEqual(
+      expect(wrapper.find("textarea").element).toHaveValue(
         "This is an engaging story."
       );
     }

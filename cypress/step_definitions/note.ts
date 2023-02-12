@@ -421,7 +421,7 @@ When("I ask for an engaging story for {string}", (noteTitle: string) => {
 })
 
 Then("I should be prompted with an engaging story description {string}", (description: string) => {
-  cy.get(".engaging-story").should("contain.text", description)
+  cy.formField("Engaging Story").fieldShouldHaveValue(description)
 })
 
 Then("I expect that the description will be {string} when I {string} the engaging story", () => {
@@ -444,5 +444,5 @@ Given("An OpenAI response is unavailable", () => {
 })
 
 Then("I should be prompted with an error message saying {string}", (errorMessage: string) => {
-  cy.get(".engaging-story").should("contain.text", errorMessage)
+  cy.expectFieldErrorMessage(errorMessage, "Engaging Story")
 })
