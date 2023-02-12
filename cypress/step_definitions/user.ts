@@ -42,7 +42,7 @@ When("I should be asked to create my profile", () => {
 When("I save my profile with:", (data) => {
   data.hashes().forEach((elem) => {
     for (const propName in elem) {
-      cy.getFormControl(propName).type(elem[propName])
+      cy.formField(propName).type(elem[propName])
     }
   })
   cy.get('input[value="Submit"]').click()
@@ -109,7 +109,7 @@ Then("I edit user profile", () => {
 })
 
 Then("I change my name to {string}", (name: string) => {
-  cy.getFormControl("Name").clear().type(name)
+  cy.formField("Name").clear().type(name)
   cy.findByText("Submit").click()
 })
 

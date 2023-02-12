@@ -79,7 +79,7 @@ When("I select wikidataID {string} from the Wikidata search result", (wikidataID
 })
 
 Then("I should see that the {string} becomes {string}", (field: string, value: string) => {
-  cy.getFormControl(field).should("have.value", value)
+  cy.formField(field).should("have.value", value)
 })
 
 Then(

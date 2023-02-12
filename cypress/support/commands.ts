@@ -138,28 +138,34 @@ Cypress.Commands.add("submitNoteFormWith", (noteAttributes) => {
   for (const propName in noteAttributes) {
     const value = noteAttributes[propName]
     if (value) {
-      cy.getFormControl(propName).then(($input) => {
-        if ($input.attr("type") === "file") {
-          cy.fixture(value).then((img) => {
-            cy.wrap($input).attachFile({
-              fileContent: Cypress.Blob.base64StringToBlob(img),
-              fileName: value,
-              mimeType: "image/png",
-            })
-          })
-        } else if ($input.attr("role") === "radiogroup") {
-          cy.clickRadioByLabel(value)
-        } else if ($input.attr("role") === "button") {
-          cy.wrap($input).click()
-          cy.clickRadioByLabel(value)
-        } else {
-          cy.wrap($input).clear().type(value)
-        }
-      })
+      cy.formField(propName).assignFieldValue(value)
     }
   }
   cy.get('input[value="Submit"]').click()
 })
+
+Cypress.Commands.add(
+  "assignFieldValue",
+  { prevSubject: true },
+  ($input: JQuery<HTMLElement>, value: string) => {
+    if ($input.attr("type") === "file") {
+      cy.fixture(value).then((img) => {
+        cy.wrap($input).attachFile({
+          fileContent: Cypress.Blob.base64StringToBlob(img),
+          fileName: value,
+          mimeType: "image/png",
+        })
+      })
+    } else if ($input.attr("role") === "radiogroup") {
+      cy.clickRadioByLabel(value)
+    } else if ($input.attr("role") === "button") {
+      cy.wrap($input).click()
+      cy.clickRadioByLabel(value)
+    } else {
+      cy.wrap($input).clear().type(value)
+    }
+  },
+)
 
 Cypress.Commands.add("addSiblingNoteButton", () => {
   cy.findByRole("button", { name: "Add Sibling Note" })
@@ -434,7 +440,7 @@ Cypress.Commands.add("shouldSeeQuizWithOptions", (questionParts: string[], optio
     .forEach((option: string) => cy.findByText(option).should("be.visible"))
 })
 
-Cypress.Commands.add("getFormControl", (label) => {
+Cypress.Commands.add("formField", (label) => {
   return cy.findByLabelText(label)
 })
 
@@ -450,7 +456,7 @@ Cypress.Commands.add("unsubscribeFromNotebook", (noteTitle) => {
 })
 
 Cypress.Commands.add("searchNote", (searchKey: string, options: string[]) => {
-  options?.forEach((option: string) => cy.getFormControl(option).check())
+  options?.forEach((option: string) => cy.formField(option).check())
   cy.findByPlaceholderText("Search").clear().type(searchKey)
   cy.tick(500)
 })

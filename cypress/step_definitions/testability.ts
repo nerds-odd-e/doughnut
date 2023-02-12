@@ -41,5 +41,5 @@ Then("The {string} alert {string}", (expectedContent: string, shouldExistOrNot: 
 
 Then("I go to the testability page to turn on the feature toggle", () => {
   cy.findByText("Testability").click()
-  cy.getFormControl("Feature Toggle").click()
+  cy.formField("Feature Toggle").click()
 })

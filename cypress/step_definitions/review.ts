@@ -86,7 +86,7 @@ Then("I am learning new note on day {int}", (day: number) => {
 
 Then("I set the level of {string} to be {int}", (noteTitle: string, level: number) => {
   cy.findNoteTitle(noteTitle)
-  cy.getFormControl("Level").then(($control) => {
+  cy.formField("Level").then(($control) => {
     cy.wrap($control).within(() => {
       cy.findByRole("button", { name: "" + level }).click()
     })
@@ -94,7 +94,7 @@ Then("I set the level of {string} to be {int}", (noteTitle: string, level: numbe
 })
 
 Then("I have selected the option {string}", (option: string) => {
-  cy.getFormControl(option).check()
+  cy.formField(option).check()
   cy.findByRole("button", { name: "Keep for repetition" }).click()
 })
 

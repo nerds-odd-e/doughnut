@@ -70,7 +70,7 @@ Then("I should be able to edit the subscription to notebook {string}", (noteTitl
 When("I change notebook {string} to skip review", (noteTitle: string) => {
   cy.routerToNotebooks()
   cy.findNoteCardButton(noteTitle, "Edit notebook settings").click()
-  cy.getFormControl("Skip Review Entirely").check()
+  cy.formField("Skip Review Entirely").check()
   cy.findByRole("button", { name: "Update" }).click()
 })
 

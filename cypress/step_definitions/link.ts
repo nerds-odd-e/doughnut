@@ -35,7 +35,7 @@ When(
   "I link note {string} as {string} note {string} and move under it",
   (fromNoteTitle: string, linkType: string, toNoteTitle: string) => {
     makingLink(cy, fromNoteTitle, linkType, toNoteTitle)
-    cy.getFormControl("Also Move To Under Target Note").check()
+    cy.formField("Also Move To Under Target Note").check()
     cy.findByRole("button", { name: "Create Link" }).click()
     cy.findByRole("button", { name: "OK" }).click()
   },
