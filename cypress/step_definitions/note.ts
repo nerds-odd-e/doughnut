@@ -437,7 +437,7 @@ Given("open AI serivce always think the system token is invalid", () => {
 })
 
 Then("I should see that the open AI service is not available", () => {
-  cy.get(".area-control.form-control").should("have.value", "Bad Request")
+  cy.expectFieldErrorMessage("The OpenAI request was not Authorized.", "Suggestion")
 })
 
 Given("An OpenAI response is unavailable", () => {

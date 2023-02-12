@@ -1,6 +1,7 @@
 class BadRequestError extends Error {
-  constructor(data) {
-    super("Bad Request");
+  constructor(response) {
+    const data = response.errors;
+    super(response.message || "Bad Request");
     Object.keys(data).forEach((key) => {
       if (key.includes(".")) {
         const [namespace, subkey] = key.split(".");

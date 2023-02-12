@@ -2,7 +2,11 @@
   <LoadingPage v-bind="{ contentExists: true }">
     <h1>Suggested Description</h1>
     <form @submit.prevent.once="processForm">
-      <TextArea v-model="suggestedDescription" />
+      <TextArea
+        v-model="suggestedDescription"
+        field="suggestion"
+        :errors="errorMessage"
+      />
       <div class="dialog-buttons">
         <input type="submit" value="Use" class="btn btn-primary" />
       </div>
@@ -33,7 +37,8 @@ export default defineComponent({
   },
   data() {
     return {
-      suggestedDescription: "Placeholder",
+      suggestedDescription: "",
+      errorMessage: undefined as string | undefined,
     };
   },
   computed: {
@@ -70,7 +75,7 @@ export default defineComponent({
         this.suggestedDescription = res.suggestion;
       })
       .catch((er) => {
-        this.suggestedDescription = er.message;
+        this.errorMessage = er.message;
       });
   },
 });
