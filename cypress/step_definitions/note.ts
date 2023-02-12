@@ -400,7 +400,7 @@ When("I ask for a description suggestion for {string}", (noteTitle: string) => {
 })
 
 Then("I should be prompted with a suggested description {string}", (description: string) => {
-  cy.get(".area-control.form-control").should("have.value", description)
+  cy.formField("Suggestion").fieldShouldHaveValue(description)
 })
 
 Then(
