@@ -572,3 +572,8 @@ Cypress.Commands.add("expectAMapTo", (latitude: string, longitude: string) => {
   cy.get(".map-applet").invoke("attr", "data-lon").should("eq", longitude)
   cy.get(".map-applet").invoke("attr", "data-lat").should("eq", latitude)
 })
+
+Cypress.Commands.add("askForEngagingStory", (noteTitle: string) => {
+  cy.jumpToNotePage(noteTitle)
+  cy.findByRole("button", { name: "Engaging Story" }).click()
+})

@@ -119,5 +119,6 @@ declare namespace Cypress {
     openAiService(): Chainable<any>
     withinMindmap(): Chainable<any>
     yesIRemember(): Chainable<any>
+    askForEngagingStory(noteTitle: string): Chainable<any>
   }
 }

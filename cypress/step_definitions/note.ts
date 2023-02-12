@@ -417,8 +417,7 @@ Then(
 )
 
 When("I ask for an engaging story for {string}", (noteTitle: string) => {
-  cy.jumpToNotePage(noteTitle)
-  cy.findByRole("button", { name: "Engaging Story" }).click()
+  cy.askForEngagingStory(noteTitle)
 })
 
 Then("I should be prompted with an engaging story description {string}", (description: string) => {
