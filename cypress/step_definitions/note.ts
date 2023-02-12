@@ -433,7 +433,9 @@ Then("I expect that the description will be {string} when I {string} the engagin
 })
 
 Given("the fallback key of the system is {string}", (tokenValidity: string) => {
-  cy.openAiService().responseAsIfTheTokenIs(tokenValidity)
+  if (tokenValidity === "invalid") {
+    cy.openAiService().alwaysResponseAsUnauthorized()
+  }
 })
 
 Then("I have a personal openAI token {string}", () => {
