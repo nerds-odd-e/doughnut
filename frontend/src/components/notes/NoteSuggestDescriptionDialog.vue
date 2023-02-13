@@ -17,7 +17,7 @@ import { defineComponent, PropType } from "vue";
 import TextArea from "../form/TextArea.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import { StorageAccessor } from "../../store/createNoteStorage";
-import asPopup from "../commons/Popups/usePopups";
+import asPopup from "../commons/Popups/asPopup";
 
 export default defineComponent({
   setup() {
@@ -54,10 +54,7 @@ export default defineComponent({
           this.textContent,
           this.selectedNote.textContent
         )
-        .then(this.popups.done);
-    },
-    openAlert() {
-      // comment
+        .then(this.popup.done);
     },
   },
   mounted() {
