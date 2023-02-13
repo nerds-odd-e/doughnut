@@ -17,10 +17,11 @@ import { defineComponent, PropType } from "vue";
 import TextArea from "../form/TextArea.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import { StorageAccessor } from "../../store/createNoteStorage";
+import asPopup from "../commons/Popups/usePopup";
 
 export default defineComponent({
   setup() {
-    return useLoadingApi();
+    return { ...useLoadingApi(), ...asPopup() };
   },
   props: {
     selectedNote: { type: Object as PropType<Generated.Note>, required: true },
@@ -44,7 +45,6 @@ export default defineComponent({
       };
     },
   },
-  emits: ["done"],
   methods: {
     processForm() {
       this.storageAccessor
@@ -54,9 +54,7 @@ export default defineComponent({
           this.textContent,
           this.selectedNote.textContent
         )
-        .then(() => {
-          this.$emit("done");
-        });
+        .then(this.popups.done);
     },
     openAlert() {
       // comment
