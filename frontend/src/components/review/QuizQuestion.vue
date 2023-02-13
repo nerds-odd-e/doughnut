@@ -124,7 +124,7 @@ import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import TextInput from "../form/TextInput.vue";
 import ReviewPointAsync from "./ReviewPointAsync.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
-import usePopups from "../commons/Popups/usePopup";
+import usePopups from "../commons/Popups/usePopups";
 import SelfEvaluateButtons from "./SelfEvaluateButtons.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 

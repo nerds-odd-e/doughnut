@@ -20,7 +20,7 @@
 <script>
 import SvgUnsubscribe from "../svgs/SvgUnsubscribe.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
-import usePopups from "../commons/Popups/usePopup";
+import usePopups from "../commons/Popups/usePopups";
 import PopupButton from "../commons/Popups/PopupButton.vue";
 import SvgEdit from "../svgs/SvgEdit.vue";
 import SubscriptionEditDialog from "./SubscriptionEditDialog.vue";

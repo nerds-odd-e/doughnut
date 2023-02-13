@@ -7,7 +7,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import SvgRemove from "../svgs/SvgRemove.vue";
-import usePopups from "../commons/Popups/usePopup";
+import usePopups from "../commons/Popups/usePopups";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({

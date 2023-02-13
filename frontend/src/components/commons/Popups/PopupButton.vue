@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import usePopups from "./usePopup";
+import usePopups from "./usePopups";
 
 export default defineComponent({
   setup() {

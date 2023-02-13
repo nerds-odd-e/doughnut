@@ -17,7 +17,7 @@ import ShowReviewPoint from "./ShowReviewPoint.vue";
 import InitialReviewButtons from "./InitialReviewButtons.vue";
 import ContainerPage from "../../pages/commons/ContainerPage.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
-import usePopups from "../commons/Popups/usePopup";
+import usePopups from "../commons/Popups/usePopups";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({

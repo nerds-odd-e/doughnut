@@ -17,7 +17,7 @@ import { defineComponent, PropType } from "vue";
 import TextArea from "../form/TextArea.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import { StorageAccessor } from "../../store/createNoteStorage";
-import asPopup from "../commons/Popups/usePopup";
+import asPopup from "../commons/Popups/usePopups";
 
 export default defineComponent({
   setup() {

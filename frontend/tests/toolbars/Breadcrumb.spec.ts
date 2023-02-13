@@ -1,7 +1,7 @@
 import BreadcrumbMain from "@/components/toolbars/BreadcrumbMain.vue";
 import usePopups, {
   PopupInfo,
-} from "../../src/components/commons/Popups/usePopup";
+} from "../../src/components/commons/Popups/usePopups";
 import helper from "../helpers";
 
 helper.resetWithApiMock(beforeEach, afterEach);

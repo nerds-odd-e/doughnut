@@ -4,7 +4,7 @@ import Popups from "./components/commons/Popups/Popups.vue";
 import TestMenu from "./components/commons/TestMenu.vue";
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
 import useLoadingApi from "./managedApi/useLoadingApi";
-import usePopups from "./components/commons/Popups/usePopup";
+import usePopups from "./components/commons/Popups/usePopups";
 import ControlCenter from "./components/toolbars/ControlCenter.vue";
 import createNoteStorage from "./store/createNoteStorage";
 import BreadcrumbMain from "./components/toolbars/BreadcrumbMain.vue";
