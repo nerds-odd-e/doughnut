@@ -1,21 +1,16 @@
 <template>
-  <PopupButton class="btn-primary" title="Engaging Story">
+  <PopButton class="btn-primary" title="Engaging Story">
     <template #button_face>
       <slot />
     </template>
-    <template #dialog_body="{ doneHandler }">
-      <NoteStoryDialog
-        v-bind="{ selectedNoteId, storageAccessor }"
-        @done="doneHandler($event)"
-      />
-    </template>
-  </PopupButton>
+    <NoteStoryDialog v-bind="{ selectedNoteId, storageAccessor }" />
+  </PopButton>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import NoteStoryDialog from "@/components/notes/NoteEngagingStoryDialog.vue";
-import PopupButton from "../commons/Popups/PopupButton.vue";
+import PopButton from "../commons/Popups/PopButton.vue";
 import type { StorageAccessor } from "@/store/createNoteStorage";
 
 export default defineComponent({
@@ -26,7 +21,7 @@ export default defineComponent({
       required: false,
     },
   },
-  components: { NoteStoryDialog, PopupButton },
+  components: { NoteStoryDialog, PopButton },
 });
 </script>
 
