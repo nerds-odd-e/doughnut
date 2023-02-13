@@ -68,9 +68,9 @@ Cypress.Commands.add(
   { prevSubject: true },
   (serviceMocker: ServiceMocker) => {
     serviceMocker.install()
-    serviceMocker.stubPosterUnauthorized(`/v1/completions`, {
+    serviceMocker.stubPosterUnauthorized(`/*`, {
       status: "BAD_REQUEST",
-      message: "The OpenAI request was not Authorized.",
+      message: "nah nah nah, you need a valid token",
       errors: {
         "OpenAi Error": "BAD_REQUEST",
       },

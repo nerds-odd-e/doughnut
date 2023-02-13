@@ -1,4 +1,4 @@
-import { Stub } from "@anev/ts-mountebank"
+import { Operator, Response, Stub } from "@anev/ts-mountebank"
 /// <reference types="cypress" />
 
 import { DefaultStub, HttpMethod, FlexiPredicate } from "@anev/ts-mountebank"
@@ -45,11 +45,16 @@ class ServiceMocker {
     )
   }
 
-  public stubPosterUnauthorized(path: string, response: unknown) {
+  public stubPosterUnauthorized(pathMatcher: string, response: unknown) {
     return this.stub(
-      new DefaultStub(path, HttpMethod.POST, response, 401).withPredicate(
-        new FlexiPredicate().withPath(path).withMethod(HttpMethod.POST),
-      ),
+      new Stub()
+        .withPredicate(
+          new FlexiPredicate()
+            .withOperator(Operator.matches)
+            .withPath(pathMatcher)
+            .withMethod(HttpMethod.POST),
+        )
+        .withResponse(new Response().withStatusCode(401).withJSONBody(response)),
     )
   }
 
