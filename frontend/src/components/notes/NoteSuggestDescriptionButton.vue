@@ -1,21 +1,13 @@
 <template>
-  <PopupButton class="btn-primary" title="Suggest">
-    <template #button_face>
-      <slot />
-    </template>
-    <template #dialog_body="{ doneHandler }">
-      <NoteSuggestDescriptionDialog
-        v-bind="{ selectedNote, storageAccessor }"
-        @done="doneHandler($event)"
-      />
-    </template>
-  </PopupButton>
+  <PopButton class="btn-primary" title="Suggest">
+    <NoteSuggestDescriptionDialog v-bind="{ selectedNote, storageAccessor }" />
+  </PopButton>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import NoteSuggestDescriptionDialog from "./NoteSuggestDescriptionDialog.vue";
-import PopupButton from "../commons/Popups/PopupButton.vue";
+import PopButton from "../commons/Popups/PopButton.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
@@ -26,7 +18,7 @@ export default defineComponent({
       required: true,
     },
   },
-  components: { PopupButton, NoteSuggestDescriptionDialog },
+  components: { PopButton, NoteSuggestDescriptionDialog },
 });
 </script>
 

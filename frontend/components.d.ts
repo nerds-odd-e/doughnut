@@ -89,6 +89,7 @@ declare module '@vue/runtime-core' {
     ObjectLeft: typeof import('./src/components/svgs/link_types/ObjectLeft.vue')['default']
     ObjectRight: typeof import('./src/components/svgs/link_types/ObjectRight.vue')['default']
     Person: typeof import('./src/components/svgs/link_types/Person.vue')['default']
+    PopButton: typeof import('./src/components/commons/Popups/PopButton.vue')['default']
     PopupButton: typeof import('./src/components/commons/Popups/PopupButton.vue')['default']
     Popups: typeof import('./src/components/commons/Popups/Popups.vue')['default']
     ProgressBar: typeof import('./src/components/commons/ProgressBar.vue')['default']
