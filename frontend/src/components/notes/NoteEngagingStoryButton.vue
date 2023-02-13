@@ -5,7 +5,7 @@
     </template>
     <template #dialog_body="{ doneHandler }">
       <NoteStoryDialog
-        v-bind="{ selectedNote, storageAccessor }"
+        v-bind="{ selectedNoteId, storageAccessor }"
         @done="doneHandler($event)"
       />
     </template>
@@ -20,7 +20,7 @@ import type { StorageAccessor } from "@/store/createNoteStorage";
 
 export default defineComponent({
   props: {
-    selectedNote: { type: Object as PropType<Generated.Note>, required: false },
+    selectedNoteId: { type: Number, required: false },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: false,

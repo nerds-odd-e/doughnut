@@ -22,7 +22,9 @@
         Suggest
       </NoteSuggestDescriptionButton>
       <span> </span>
-      <NoteEngagingStoryButton v-bind="{ selectedNote: note, storageAccessor }">
+      <NoteEngagingStoryButton
+        v-bind="{ selectedNoteId: note.id, storageAccessor }"
+      >
         Engaging Story
       </NoteEngagingStoryButton>
     </div>

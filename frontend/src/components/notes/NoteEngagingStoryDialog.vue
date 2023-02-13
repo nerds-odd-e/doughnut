@@ -20,7 +20,7 @@ export default defineComponent({
     return useLoadingApi();
   },
   props: {
-    selectedNote: { type: Object as PropType<Generated.Note>, required: false },
+    selectedNoteId: { type: Number, required: false },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: false,
@@ -36,8 +36,8 @@ export default defineComponent({
     };
   },
   mounted() {
-    const request = this.selectedNote
-      ? this.api.ai.askAiEngagingStories(this.selectedNote.id)
+    const request = this.selectedNoteId
+      ? this.api.ai.askAiEngagingStories(this.selectedNoteId)
       : this.api.ai.askAiReviewEngagingStory();
 
     request

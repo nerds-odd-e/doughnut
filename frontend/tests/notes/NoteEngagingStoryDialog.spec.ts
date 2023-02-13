@@ -17,7 +17,7 @@ const createWrapper = async (review = false) => {
     .andReturnOnce({ engagingStory: "This is an engaging story." });
   const wrapper = helper
     .component(NoteEngagingStoryDialog)
-    .withStorageProps({ selectedNote: review ? undefined : note })
+    .withStorageProps({ selectedNoteId: review ? undefined : note.note.id })
     .mount();
   await flushPromises();
   return wrapper;
