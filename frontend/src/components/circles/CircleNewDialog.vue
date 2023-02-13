@@ -5,26 +5,27 @@
       scope-name="circle"
       field="name"
       v-model="formData.name"
-      :errors="errors.name"
+      :errors="errors['name']"
     />
     <input type="submit" value="Submit" class="btn btn-primary" />
   </form>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
+import asPopup from "../commons/Popups/asPopup";
 import TextInput from "../form/TextInput.vue";
 
-export default {
+export default defineComponent({
   setup() {
-    return useLoadingApi();
+    return { ...useLoadingApi(), ...asPopup() };
   },
   props: { notebook: Object, user: Object },
-  emits: ["done"],
   components: { TextInput },
   data() {
     return {
-      formData: {},
+      formData: {} as Generated.Circle,
       errors: {},
     };
   },
@@ -34,7 +35,7 @@ export default {
       this.api.circleMethods
         .createCircle(this.formData)
         .then((res) => {
-          this.$emit("done", res);
+          this.popup.done(res);
           this.$router.push({
             name: "circleShow",
             params: { circleId: res.id },
@@ -43,5 +44,5 @@ export default {
         .catch((err) => (this.errors = err));
     },
   },
-};
+});
 </script>

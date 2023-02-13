@@ -110,8 +110,11 @@ const apiCollection = (managedApi: ManagedApi) => ({
         `circles/${circleId}`
       )) as Generated.CircleForUserView;
     },
-    createCircle(data: Generated.Circle) {
-      return managedApi.restPostMultiplePartForm("circles", data);
+    async createCircle(data: Generated.Circle) {
+      return (await managedApi.restPostMultiplePartForm(
+        "circles",
+        data
+      )) as Generated.Circle;
     },
     joinCircle(data: Generated.CircleJoiningByInvitation) {
       return managedApi.restPostMultiplePartForm(`circles/join`, data);

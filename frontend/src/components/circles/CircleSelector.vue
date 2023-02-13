@@ -21,11 +21,9 @@
       </ul>
     </div>
     <div class="btn-group">
-      <PopupButton class="btn btn-secondary" title="Create a new circle">
-        <template #dialog_body="{ doneHandler }">
-          <CircleNewDialog @done="$emit('done', doneHandler($event))" />
-        </template>
-      </PopupButton>
+      <PopButton class="btn btn-secondary" title="Create a new circle">
+        <CircleNewDialog />
+      </PopButton>
       <router-link class="btn btn-primary" :to="{ name: 'circleJoin' }">
         Join a circle
       </router-link>
@@ -37,7 +35,7 @@
 import { defineComponent } from "vue";
 import LoadingPage from "@/pages/commons/LoadingPage.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
-import PopupButton from "../commons/Popups/PopupButton.vue";
+import PopButton from "../commons/Popups/PopButton.vue";
 import CircleNewDialog from "./CircleNewDialog.vue";
 import BrandBar from "../toolbars/BrandBar.vue";
 
@@ -45,7 +43,6 @@ export default defineComponent({
   setup() {
     return useLoadingApi();
   },
-  emits: ["done"],
   data() {
     return {
       circles: null as Generated.Circle[] | null,
@@ -62,7 +59,7 @@ export default defineComponent({
     this.fetchData();
   },
   components: {
-    PopupButton,
+    PopButton,
     CircleNewDialog,
     LoadingPage,
     BrandBar,
