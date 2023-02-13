@@ -1,8 +1,5 @@
 <template>
   <PopButton class="btn-primary" title="Engaging Story">
-    <template #button_face>
-      <slot />
-    </template>
     <NoteStoryDialog v-bind="{ selectedNoteId, storageAccessor }" />
   </PopButton>
 </template>

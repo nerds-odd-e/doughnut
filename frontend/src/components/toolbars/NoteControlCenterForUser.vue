@@ -70,10 +70,11 @@
           <SvgCog />
         </button>
         <div class="dropdown-menu dropdown-menu-end">
-          <NoteEngagingStoryButton
-            class="dropdown-item"
-            v-bind="{ selectedNoteId: selectedNote.id, storageAccessor }"
-          />
+          <PopButton class="dropdown-item btn-primary" title="Engaging Story">
+            <NoteEngagingStoryDialog
+              v-bind="{ selectedNoteId: selectedNote.id, storageAccessor }"
+            />
+          </PopButton>
           <NoteDeleteButton
             class="dropdown-item"
             v-bind="{ noteId: selectedNote.id, storageAccessor }"
@@ -100,7 +101,7 @@ import SvgCog from "../svgs/SvgCog.vue";
 import NoteDeleteButton from "./NoteDeleteButton.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import PopupButton from "../commons/Popups/PopupButton.vue";
-import NoteEngagingStoryButton from "../notes/NoteEngagingStoryButton.vue";
+import NoteEngagingStoryDialog from "../notes/NoteEngagingStoryDialog.vue";
 
 export default defineComponent({
   props: {
@@ -124,7 +125,7 @@ export default defineComponent({
     SvgCog,
     NoteDeleteButton,
     PopupButton,
-    NoteEngagingStoryButton,
+    NoteEngagingStoryDialog,
   },
   computed: {
     selectedNote(): Generated.Note | undefined {
