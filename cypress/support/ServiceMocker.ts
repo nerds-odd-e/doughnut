@@ -1,7 +1,14 @@
-import { Operator, Response, Stub } from "@anev/ts-mountebank"
+import {
+  DefaultPredicate,
+  HttpMethod,
+  FlexiPredicate,
+  Operator,
+  Predicate,
+  Response,
+  Stub,
+} from "@anev/ts-mountebank"
 /// <reference types="cypress" />
 
-import { DefaultStub, HttpMethod, FlexiPredicate } from "@anev/ts-mountebank"
 import MountebankWrapper from "./MountebankWrapper"
 
 class ServiceMocker {
@@ -26,23 +33,18 @@ class ServiceMocker {
   }
 
   public stubByUrl(url: string, data: unknown) {
-    return this.stub(new DefaultStub(url, HttpMethod.GET, data, 200))
+    return this.stubGetter(url, {}, data)
   }
 
   public stubGetter(path: string, queryData: unknown, response: unknown) {
-    return this.stub(
-      new DefaultStub(path, HttpMethod.GET, response, 200).withPredicate(
-        new FlexiPredicate().withPath(path).withQuery(queryData).withMethod(HttpMethod.GET),
-      ),
+    return this.stubWithPredicate(
+      new FlexiPredicate().withPath(path).withMethod(HttpMethod.GET).withQuery(queryData),
+      response,
     )
   }
 
   public stubPoster(path: string, response: unknown) {
-    return this.stub(
-      new DefaultStub(path, HttpMethod.POST, response, 200).withPredicate(
-        new FlexiPredicate().withPath(path).withMethod(HttpMethod.POST),
-      ),
-    )
+    return this.stubWithPredicate(new DefaultPredicate(path, HttpMethod.POST), response)
   }
 
   public stubPosterUnauthorized(pathMatcher: string, response: unknown) {
@@ -51,6 +53,14 @@ class ServiceMocker {
 
   public stubGetterWithError500Response(pathMatcher: string, response: unknown) {
     return this.stubWithErrorResponse(pathMatcher, HttpMethod.GET, 500, response)
+  }
+
+  private stubWithPredicate(predicate: Predicate, response: unknown) {
+    return this.stub(
+      new Stub()
+        .withPredicate(predicate)
+        .withResponse(new Response().withStatusCode(200).withJSONBody(response)),
+    )
   }
 
   private stubWithErrorResponse(
