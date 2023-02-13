@@ -575,5 +575,5 @@ Cypress.Commands.add("expectAMapTo", (latitude: string, longitude: string) => {
 
 Cypress.Commands.add("askForEngagingStory", (noteTitle: string) => {
   cy.jumpToNotePage(noteTitle)
-  cy.findByRole("button", { name: "Engaging Story" }).click()
+  cy.clickNotePageMoreOptionsButton(noteTitle, "Engaging Story")
 })
