@@ -1,24 +1,22 @@
 <template>
   <nav class="vertical-menu">
     <div class="menu">
-      <PopupButton title="Testability">
-        <template #dialog_body>
-          <h1>Testability</h1>
-          <CheckInput
-            scope-name="testability"
-            :model-value="featureToggle"
-            @update:model-value="updateFeatureToggle"
-            field="featureToggle"
-          />
-          <TextInput
-            scope-name="testability"
-            v-model="randomSelector"
-            field="randomSelector"
-            hint="can be 'first' or 'last'"
-            @blur="updateRandomSelector"
-          />
-        </template>
-      </PopupButton>
+      <PopButton title="Testability">
+        <h1>Testability</h1>
+        <CheckInput
+          scope-name="testability"
+          :model-value="featureToggle"
+          @update:model-value="updateFeatureToggle"
+          field="featureToggle"
+        />
+        <TextInput
+          scope-name="testability"
+          v-model="randomSelector"
+          field="randomSelector"
+          hint="can be 'first' or 'last'"
+          @blur="updateRandomSelector"
+        />
+      </PopButton>
       <div v-if="featureToggle" class="nav-item">
         <em class="nav-link btn-danger">Feature Toggle is On </em>
       </div>
@@ -28,7 +26,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import PopupButton from "./Popups/PopupButton.vue";
+import PopButton from "./Popups/PopButton.vue";
 import CheckInput from "../form/CheckInput.vue";
 import TextInput from "../form/TextInput.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
@@ -43,7 +41,7 @@ export default defineComponent({
   },
   emits: ["featureToggle"],
   components: {
-    PopupButton,
+    PopButton,
     CheckInput,
     TextInput,
   },
