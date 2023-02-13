@@ -541,7 +541,7 @@ Cypress.Commands.add("associateNoteWithWikidataId", (title, wikiID) => {
   cy.replaceFocusedTextAndEnter(wikiID)
 })
 
-Cypress.Commands.add("expectFieldErrorMessage", (message: string, field: string) => {
+Cypress.Commands.add("expectFieldErrorMessage", (field: string, message: string) => {
   cy.formField(field).siblings(".error-msg").findByText(message)
 })
 

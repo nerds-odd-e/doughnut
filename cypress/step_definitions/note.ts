@@ -159,7 +159,7 @@ When("I create a sibling note of {string}:", (noteTitle: string, data: DataTable
 })
 
 When("I should see that the note creation is not successful", () => {
-  cy.expectFieldErrorMessage("size must be between 1 and 100", "Title")
+  cy.expectFieldErrorMessage("Title", "size must be between 1 and 100")
 })
 
 Then("I should see {string} in note title", (noteTitle: string) => {
@@ -424,19 +424,12 @@ Then("I should be prompted with an engaging story description {string}", (descri
   cy.formField("Engaging Story").fieldShouldHaveValue(description)
 })
 
-Then("I expect that the description will be {string} when I {string} the engaging story", () => {
-  cy.get(".close-button").click()
-})
-Then("I expect that the description will be {string} when I {string} the engaging story", () => {
-  cy.get(".close-button").click()
-})
-
 Given("open AI serivce always think the system token is invalid", () => {
   cy.openAiService().alwaysResponseAsUnauthorized()
 })
 
 Then("I should see that the open AI service is not available", () => {
-  cy.expectFieldErrorMessage("The OpenAI request was not Authorized.", "Suggestion")
+  cy.expectFieldErrorMessage("Suggestion", "The OpenAI request was not Authorized.")
 })
 
 Given("An OpenAI response is unavailable", () => {
@@ -444,5 +437,5 @@ Given("An OpenAI response is unavailable", () => {
 })
 
 Then("I should be prompted with an error message saying {string}", (errorMessage: string) => {
-  cy.expectFieldErrorMessage(errorMessage, "Engaging Story")
+  cy.expectFieldErrorMessage("Engaging Story", errorMessage)
 })
