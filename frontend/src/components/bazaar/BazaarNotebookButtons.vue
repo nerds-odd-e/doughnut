@@ -1,22 +1,17 @@
 <template>
   <div class="btn-group btn-group-sm">
-    <PopupButton v-if="!notebook.skipReviewEntirely" title="Add to my learning">
+    <PopButton v-if="!notebook.skipReviewEntirely" title="Add to my learning">
       <template #button_face>
         <SvgAdd />
       </template>
-      <template #dialog_body="{ doneHandler }">
-        <SubscribeDialog
-          v-bind="{ notebook, loggedIn }"
-          @done="doneHandler($event)"
-        />
-      </template>
-    </PopupButton>
+      <SubscribeDialog v-bind="{ notebook, loggedIn }" />
+    </PopButton>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import PopupButton from "../commons/Popups/PopupButton.vue";
+import PopButton from "../commons/Popups/PopButton.vue";
 import SubscribeDialog from "./SubscribeDialog.vue";
 import SvgAdd from "../svgs/SvgAdd.vue";
 
@@ -26,7 +21,7 @@ export default defineComponent({
     loggedIn: Boolean,
   },
   components: {
-    PopupButton,
+    PopButton,
     SvgAdd,
     SubscribeDialog,
   },

@@ -6,25 +6,30 @@
       scope-name="subscription"
       field="dailyTargetOfNewNotes"
       v-model="formData.dailyTargetOfNewNotes"
-      :errors="errors.dailyTargetOfNewNotes"
+      :errors="errors['dailyTargetOfNewNotes']"
     />
     <input type="submit" value="Submit" class="btn btn-primary" />
   </form>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
 import TextInput from "../form/TextInput.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
+import asPopup from "../commons/Popups/asPopup";
 
-export default {
+export default defineComponent({
   setup() {
-    return useLoadingApi();
+    return { ...useLoadingApi(), ...asPopup() };
   },
-  props: { notebook: Object, loggedIn: Boolean },
+  props: {
+    notebook: { type: Object as PropType<Generated.Notebook>, required: true },
+    loggedIn: Boolean,
+  },
   components: { TextInput },
   data() {
     return {
-      formData: { dailyTargetOfNewNotes: 5 },
+      formData: { dailyTargetOfNewNotes: 5 } as Generated.Subscription,
       errors: {},
     };
   },
@@ -34,10 +39,11 @@ export default {
       this.api.subscriptionMethods
         .subscribe(this.notebook.id, this.formData)
         .then((res) => {
+          this.popup.done(res);
           this.$router.push({ name: "notebooks" });
         })
         .catch((res) => (this.errors = res));
     },
   },
-};
+});
 </script>
