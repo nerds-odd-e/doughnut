@@ -14,24 +14,27 @@ class WikidataEntitiesBuilder {
 
   wclaims(claims: Claim[]): WikidataEntitiesBuilder {
     this.claims = claims.reduce<Record<string, Array<unknown>>>((claimsIter, claimIter) => {
-      const toClaim = {
-        [claimIter.claimId]: [
-          ...(claimsIter[claimIter.claimId] || []),
-          {
-            mainsnak: {
-              snaktype: "value",
-              property: claimIter.claimId,
-              datavalue: {
-                value: claimIter.value,
-                type: claimIter.type,
-              },
-            },
-          },
-        ],
-      }
-      return { ...claimsIter, ...toClaim }
+      return { ...claimsIter, ...this.toClaim(claimIter, claimsIter[claimIter.claimId]) }
     }, this.claims)
     return this
+  }
+
+  private toClaim(claimIter: Claim, data: Array<unknown>): Record<string, Array<unknown>> {
+    return {
+      [claimIter.claimId]: [
+        ...(data || []),
+        {
+          mainsnak: {
+            snaktype: "value",
+            property: claimIter.claimId,
+            datavalue: {
+              value: claimIter.value,
+              type: claimIter.type,
+            },
+          },
+        },
+      ],
+    }
   }
 
   build(): unknown {
