@@ -1,10 +1,8 @@
 <template>
-  <LoadingPage v-bind="{ contentExists: true }">
-    <form @submit.prevent.once="processForm">
-      <NoteFormTitleOnly v-model="noteFormData" :errors="errors" />
-      <input type="submit" value="Submit" class="btn btn-primary" />
-    </form>
-  </LoadingPage>
+  <form @submit.prevent.once="processForm">
+    <NoteFormTitleOnly v-model="noteFormData" :errors="errors" />
+    <input type="submit" value="Submit" class="btn btn-primary" />
+  </form>
 </template>
 
 <script>
@@ -19,7 +17,6 @@ export default {
   props: { circle: Object },
   components: {
     NoteFormTitleOnly,
-    LoadingPage,
   },
   data() {
     return {

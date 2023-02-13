@@ -9,19 +9,16 @@
   >
     i...
   </span>
-  <LoadingPage v-bind="{ contentExists: true }">
-    <NoteInfo
-      v-if="noteInfo"
-      :note-info="noteInfo"
-      @level-changed="$emit('levelChanged', $event)"
-      @self-evaluated="$emit('selfEvaluated', $event)"
-    />
-  </LoadingPage>
+  <NoteInfo
+    v-if="noteInfo"
+    :note-info="noteInfo"
+    @level-changed="$emit('levelChanged', $event)"
+    @self-evaluated="$emit('selfEvaluated', $event)"
+  />
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import LoadingPage from "@/pages/commons/LoadingPage.vue";
 import NoteInfo from "./NoteInfo.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
@@ -31,7 +28,7 @@ export default defineComponent({
   },
   props: { noteId: { type: Number, required: true }, expanded: Boolean },
   emits: ["levelChanged", "selfEvaluated"],
-  components: { LoadingPage, NoteInfo },
+  components: { NoteInfo },
   data() {
     return { noteInfo: undefined as undefined | Generated.NoteInfo };
   },

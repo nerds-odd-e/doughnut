@@ -1,23 +1,20 @@
 <template>
-  <LoadingPage v-bind="{ contentExists: true }">
-    <h1>Suggested Description</h1>
-    <form @submit.prevent.once="processForm">
-      <TextArea
-        v-model="suggestedDescription"
-        field="suggestion"
-        :errors="errorMessage"
-      />
-      <div class="dialog-buttons">
-        <input type="submit" value="Use" class="btn btn-primary" />
-      </div>
-    </form>
-  </LoadingPage>
+  <h1>Suggested Description</h1>
+  <form @submit.prevent.once="processForm">
+    <TextArea
+      v-model="suggestedDescription"
+      field="suggestion"
+      :errors="errorMessage"
+    />
+    <div class="dialog-buttons">
+      <input type="submit" value="Use" class="btn btn-primary" />
+    </div>
+  </form>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import TextArea from "../form/TextArea.vue";
-import LoadingPage from "../../pages/commons/LoadingPage.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
@@ -31,9 +28,6 @@ export default defineComponent({
       type: Object as PropType<StorageAccessor>,
       required: true,
     },
-  },
-  components: {
-    LoadingPage,
   },
   data() {
     return {
