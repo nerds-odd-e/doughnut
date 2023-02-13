@@ -46,23 +46,28 @@ class ServiceMocker {
   }
 
   public stubPosterUnauthorized(pathMatcher: string, response: unknown) {
+    return this.stubWithErrorResponse(pathMatcher, HttpMethod.POST, 401, response)
+  }
+
+  public stubGetterWithError500Response(pathMatcher: string, response: unknown) {
+    return this.stubWithErrorResponse(pathMatcher, HttpMethod.GET, 500, response)
+  }
+
+  private stubWithErrorResponse(
+    pathMatcher: string,
+    method: HttpMethod,
+    status: number,
+    response: unknown,
+  ) {
     return this.stub(
       new Stub()
         .withPredicate(
           new FlexiPredicate()
             .withOperator(Operator.matches)
             .withPath(pathMatcher)
-            .withMethod(HttpMethod.POST),
+            .withMethod(method),
         )
-        .withResponse(new Response().withStatusCode(401).withJSONBody(response)),
-    )
-  }
-
-  public stubGetterWithError500Response(path: string, response: unknown) {
-    return this.stub(
-      new DefaultStub(path, HttpMethod.GET, response, 500).withPredicate(
-        new FlexiPredicate().withPath(path).withMethod(HttpMethod.GET),
-      ),
+        .withResponse(new Response().withStatusCode(status).withJSONBody(response)),
     )
   }
 

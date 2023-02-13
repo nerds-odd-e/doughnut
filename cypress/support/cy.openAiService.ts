@@ -59,7 +59,7 @@ Cypress.Commands.add(
   "stubOpenAiCompletionWithErrorResponse",
   { prevSubject: true },
   (serviceMocker: ServiceMocker) => {
-    serviceMocker.stubGetterWithError500Response(`/v1/completions`, {})
+    serviceMocker.stubGetterWithError500Response(`/*`, {})
   },
 )
 
