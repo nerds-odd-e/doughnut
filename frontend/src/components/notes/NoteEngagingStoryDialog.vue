@@ -43,7 +43,6 @@ export default defineComponent({
     request
       .then((res) => {
         this.engagingStory = res.engagingStory;
-        console.log(this.engagingStory);
       })
       .catch(() => {
         this.engagingStoryInError = "There is a problem";
