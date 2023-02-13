@@ -1,8 +1,16 @@
-import { Stub } from "@anev/ts-mountebank"
+import {
+  Predicate,
+  Response,
+  Stub,
+  Mountebank,
+  Imposter,
+  HttpMethod,
+  FlexiPredicate,
+  Operator,
+} from "@anev/ts-mountebank"
 /// <reference types="cypress" />
 
 import request from "superagent"
-import { Mountebank, Imposter } from "@anev/ts-mountebank"
 
 // @ts-check
 
@@ -35,7 +43,33 @@ class MountebankWrapper {
       throw new Error(`Problem creating imposter: ${JSON.stringify(response?.error)}`)
   }
 
-  public async addStubToImposter(stub: Stub): Promise<void> {
+  public stubWithPredicate(predicate: Predicate, response: unknown) {
+    return this.addStubToImposter(
+      new Stub()
+        .withPredicate(predicate)
+        .withResponse(new Response().withStatusCode(200).withJSONBody(response)),
+    )
+  }
+
+  public stubWithErrorResponse(
+    pathMatcher: string,
+    method: HttpMethod,
+    status: number,
+    response: unknown,
+  ) {
+    return this.addStubToImposter(
+      new Stub()
+        .withPredicate(
+          new FlexiPredicate()
+            .withOperator(Operator.matches)
+            .withPath(pathMatcher)
+            .withMethod(method),
+        )
+        .withResponse(new Response().withStatusCode(status).withJSONBody(response)),
+    )
+  }
+
+  private async addStubToImposter(stub: Stub): Promise<void> {
     const response = await request
       .post(`${this.mountebank.mountebankUrl}/imposters/${this.port}/stubs`)
       .send(JSON.stringify({ stub }))
