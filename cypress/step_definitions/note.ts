@@ -24,7 +24,7 @@ Given("I visit note {string}", (noteTitle) => {
   cy.jumpToNotePage(noteTitle)
 })
 
-Given("there are some notes for the current user", (data) => {
+Given("there are some notes for the current user", (data: DataTable) => {
   cy.testability().seedNotes(data.hashes())
 })
 
@@ -32,11 +32,11 @@ Given("I have a note with the title {string}", (noteTitle: string) => {
   cy.testability().seedNotes([{ title: noteTitle }])
 })
 
-Given("there are some notes for existing user {string}", (externalIdentifier, data) => {
+Given("there are some notes for existing user {string}", (externalIdentifier, data: DataTable) => {
   cy.testability().seedNotes(data.hashes(), externalIdentifier)
 })
 
-Given("there are notes from Note {int} to Note {int}", (from, to) => {
+Given("there are notes from Note {int} to Note {int}", (from: number, to: number) => {
   const notes = Array(to - from + 1)
     .fill(0)
     .map((_, i) => {
@@ -60,7 +60,7 @@ When("I create a notebook with empty title", () => {
   cy.createNotebookWith({ Title: "" })
 })
 
-When("I update note {string} to become:", (noteTitle: string, data) => {
+When("I update note {string} to become:", (noteTitle: string, data: DataTable) => {
   cy.jumpToNotePage(noteTitle)
   cy.inPlaceEdit(data.hashes()[0])
 })
@@ -130,12 +130,15 @@ When("I visit all my notebooks", () => {
   cy.routerToNotebooks()
 })
 
-Then("I should see these notes belonging to the user at the top level of all my notes", (data) => {
-  cy.routerToNotebooks()
-  cy.expectNoteCards(data.hashes())
-})
+Then(
+  "I should see these notes belonging to the user at the top level of all my notes",
+  (data: DataTable) => {
+    cy.routerToNotebooks()
+    cy.expectNoteCards(data.hashes())
+  },
+)
 
-Then("I should see {notepath} with these children", (notePath: NotePath, data) => {
+Then("I should see {notepath} with these children", (notePath: NotePath, data: DataTable) => {
   cy.navigateToNotePage(notePath).then(() => cy.expectNoteCards(data.hashes()))
 })
 
