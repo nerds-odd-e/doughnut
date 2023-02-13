@@ -1,14 +1,12 @@
 <template>
   <div class="btn-group btn-group-sm">
     <slot name="additional-buttons" />
-    <PopupButton title="Edit notebook settings">
+    <PopButton title="Edit notebook settings">
       <template #button_face>
         <SvgEditNotebook />
       </template>
-      <template #dialog_body="{ doneHandler }">
-        <NotebookEditDialog v-bind="{ notebook }" @done="doneHandler($event)" />
-      </template>
-    </PopupButton>
+      <NotebookEditDialog v-bind="{ notebook }" />
+    </PopButton>
     <button
       class="btn btn-sm"
       title="Share notebook to bazaar"
@@ -24,7 +22,7 @@ import { defineComponent, PropType } from "vue";
 import SvgBazaarShare from "../svgs/SvgBazaarShare.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopups";
-import PopupButton from "../commons/Popups/PopupButton.vue";
+import PopButton from "../commons/Popups/PopButton.vue";
 import NotebookEditDialog from "./NotebookEditDialog.vue";
 import SvgEditNotebook from "../svgs/SvgEditNotebook.vue";
 
@@ -37,7 +35,7 @@ export default defineComponent({
   },
   components: {
     SvgBazaarShare,
-    PopupButton,
+    PopButton,
     NotebookEditDialog,
     SvgEditNotebook,
   },
