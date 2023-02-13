@@ -1,39 +1,41 @@
 <template>
   <InputWithType v-bind="{ scopeName, field: '', errors, title: titlized }">
-    <PopupButton :aria-label="titlized">
+    <PopButton :aria-label="titlized">
       <template #button_face>
         <SvgLinkTypeIcon :link-type="modelValue" :inverse-icon="inverseIcon" />
         {{ label }}
       </template>
-      <template #dialog_body="{ doneHandler }">
-        <LinkTypeSelect
-          v-bind="{
-            scopeName,
-            modelValue,
-            errors,
-            allowEmpty,
-            field,
-            inverseIcon,
-          }"
-          @update:model-value="
-            doneHandler($event);
-            $emit('update:modelValue', $event);
-          "
-        />
-      </template>
-    </PopupButton>
+      <LinkTypeSelect
+        v-bind="{
+          scopeName,
+          modelValue,
+          errors,
+          allowEmpty,
+          field,
+          inverseIcon,
+        }"
+        @update:model-value="
+          popup.done($event);
+          $emit('update:modelValue', $event);
+        "
+      />
+    </PopButton>
   </InputWithType>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { startCase, camelCase } from "lodash";
-import PopupButton from "../commons/Popups/PopupButton.vue";
+import PopButton from "../commons/Popups/PopButton.vue";
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue";
 import LinkTypeSelect from "./LinkTypeSelect.vue";
 import InputWithType from "../form/InputWithType.vue";
+import asPopup from "../commons/Popups/asPopup";
 
 export default defineComponent({
+  setup() {
+    return { ...asPopup() };
+  },
   props: {
     scopeName: String,
     modelValue: {
@@ -45,7 +47,7 @@ export default defineComponent({
     field: { type: String, defalt: "linkType" },
     inverseIcon: Boolean,
   },
-  components: { PopupButton, SvgLinkTypeIcon, LinkTypeSelect, InputWithType },
+  components: { PopButton, SvgLinkTypeIcon, LinkTypeSelect, InputWithType },
   emits: ["update:modelValue"],
   computed: {
     titlized() {
