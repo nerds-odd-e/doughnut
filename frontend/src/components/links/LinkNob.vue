@@ -1,26 +1,21 @@
 <template>
   <span class="link-nob">
-    <PopupButton :title="link.linkType">
+    <PopButton :title="link.linkType">
       <template #button_face>
         <SvgLinkTypeIcon
           :link-type="link.linkType"
           :inverse-icon="inverseIcon"
         />
       </template>
-      <template #dialog_body="{ doneHandler }">
-        <LinkNobDialog
-          v-bind="{ link, inverseIcon, colors, storageAccessor }"
-          @done="doneHandler($event)"
-        />
-      </template>
-    </PopupButton>
+      <LinkNobDialog v-bind="{ link, inverseIcon, colors, storageAccessor }" />
+    </PopButton>
   </span>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue";
-import PopupButton from "../commons/Popups/PopupButton.vue";
+import PopButton from "../commons/Popups/PopButton.vue";
 import LinkNobDialog from "./LinkNobDialog.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
@@ -37,6 +32,6 @@ export default defineComponent({
     inverseIcon: Boolean,
     colors: Object,
   },
-  components: { SvgLinkTypeIcon, PopupButton, LinkNobDialog },
+  components: { SvgLinkTypeIcon, PopButton, LinkNobDialog },
 });
 </script>

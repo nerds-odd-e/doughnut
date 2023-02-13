@@ -36,11 +36,13 @@ import LinkTypeSelect from "./LinkTypeSelect.vue";
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";
 import usePopups from "../commons/Popups/usePopups";
 import { StorageAccessor } from "../../store/createNoteStorage";
+import asPopup from "../commons/Popups/asPopup";
 
 export default defineComponent({
   setup() {
     return {
       ...usePopups(),
+      ...asPopup(),
     };
   },
   props: {
@@ -55,7 +57,6 @@ export default defineComponent({
     inverseIcon: Boolean,
     colors: Object,
   },
-  emits: ["done"],
   components: {
     LinkTypeSelect,
     NoteTitleWithLink,
@@ -75,7 +76,7 @@ export default defineComponent({
       this.storageAccessor
         .api()
         .updateLink(this.link.id, this.formData)
-        .then(() => this.$emit("done"))
+        .then(this.popup.done)
         .catch((error) => {
           this.linkFormErrors = error;
         });
@@ -83,13 +84,13 @@ export default defineComponent({
 
     async deleteLink() {
       if (!(await this.popups.confirm("Confirm to delete this link?"))) {
-        this.$emit("done", null);
+        this.popup.done(null);
         return;
       }
       await this.storageAccessor
         .api()
         .deleteLink(this.link.id, this.inverseIcon);
-      this.$emit("done");
+      this.popup.done(null);
     },
   },
 });
