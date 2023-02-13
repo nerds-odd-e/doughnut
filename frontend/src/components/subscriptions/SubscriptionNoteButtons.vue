@@ -1,16 +1,14 @@
 <template>
   <div class="btn-group btn-group-sm">
-    <PopupButton title="Edit subscription">
+    <PopButton title="Edit subscription">
       <template #button_face>
         <SvgEdit />
       </template>
-      <template #dialog_body="{ doneHandler }">
-        <SubscriptionEditDialog
-          :subscription="subscription"
-          @done="doneHandler($event)"
-        />
-      </template>
-    </PopupButton>
+      <SubscriptionEditDialog
+        :subscription="subscription"
+        @done="doneHandler($event)"
+      />
+    </PopButton>
     <button class="btn btn-sm" title="Unsubscribe" @click="processForm()">
       <SvgUnsubscribe />
     </button>
@@ -21,7 +19,7 @@
 import SvgUnsubscribe from "../svgs/SvgUnsubscribe.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopups";
-import PopupButton from "../commons/Popups/PopupButton.vue";
+import PopButton from "../commons/Popups/PopButton.vue";
 import SvgEdit from "../svgs/SvgEdit.vue";
 import SubscriptionEditDialog from "./SubscriptionEditDialog.vue";
 
@@ -31,7 +29,7 @@ export default {
   },
   props: { subscription: Object },
   emits: ["updated"],
-  components: { SvgUnsubscribe, PopupButton, SvgEdit, SubscriptionEditDialog },
+  components: { SvgUnsubscribe, PopButton, SvgEdit, SubscriptionEditDialog },
   methods: {
     async processForm() {
       if (
