@@ -103,6 +103,12 @@ public class UserModel implements ReviewScope {
     getAuthorization().assertReadAuthorization(object);
   }
 
+  public <T> void assertReadAuthorization(List<T> objects) throws UnexpectedNoAccessRightException {
+    for (var object : objects) {
+      getAuthorization().assertReadAuthorization(object);
+    }
+  }
+
   public void assertDeveloperAuthorization() throws UnexpectedNoAccessRightException {
     getAuthorization().assertDeveloperAuthorization();
   }

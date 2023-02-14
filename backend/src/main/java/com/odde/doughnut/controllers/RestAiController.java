@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.theokanning.openai.OpenAiService;
@@ -36,7 +37,9 @@ public class RestAiController {
   }
 
   @GetMapping("/ask-engaging-stories")
-  public AiEngagingStory askEngagingStories(@RequestParam List<Note> notes) {
+  public AiEngagingStory askEngagingStories(@RequestParam List<Note> notes)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertReadAuthorization(notes);
     List<String> titles =
         notes.stream().map(Note::getTitleAndOffSpringTitles).flatMap(List::stream).toList();
     return aiAdvisorService.getEngagingStory(titles);

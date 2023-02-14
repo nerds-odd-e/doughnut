@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.when;
@@ -8,6 +9,7 @@ import static org.mockito.Mockito.when;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiService;
@@ -82,7 +84,15 @@ class RestAiControllerTest {
     }
 
     @Test
-    void askEngagingStoryWithRightPrompt() {
+    void askWithNoteThatCannotAccess() {
+      Note otherPeopleNote = makeMe.aNote().please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.askEngagingStories(List.of(otherPeopleNote)));
+    }
+
+    @Test
+    void askEngagingStoryWithRightPrompt() throws UnexpectedNoAccessRightException {
       when(openAiService.createCompletion(
               argThat(
                   request -> {
@@ -92,12 +102,11 @@ class RestAiControllerTest {
                     return true;
                   })))
           .thenReturn(buildCompletionResult("This is an engaging story."));
-
       controller.askEngagingStories(Collections.singletonList(aNote));
     }
 
     @Test
-    void askEngagingStoryWithRightMaxTokens() {
+    void askEngagingStoryWithRightMaxTokens() throws UnexpectedNoAccessRightException {
       // We are testing on maxTokens, because changing this setting will have an effect on request
       // performance.
       // When this setting is changed please do a manual test that engaging stories can still be
@@ -114,7 +123,7 @@ class RestAiControllerTest {
     }
 
     @Test
-    void askEngagingStoryReturnsEngagingStory() {
+    void askEngagingStoryReturnsEngagingStory() throws UnexpectedNoAccessRightException {
       when(openAiService.createCompletion(Mockito.any()))
           .thenReturn(buildCompletionResult("This is an engaging story."));
 
@@ -124,34 +133,21 @@ class RestAiControllerTest {
     }
 
     @Test
-    void askEngagingStoryFor1NoteAnd1ChildNoteReturnsEngagingStory() {
-      when(openAiService.createCompletion(any()))
-          .thenReturn(buildCompletionResult("This is an engaging story."));
-
-      Note parentNote = makeMe.aNote("Coming soon parent").please();
-      makeMe.aNote("Coming soon child").under(parentNote).please();
-      makeMe.refresh(parentNote);
-      final AiEngagingStory aiEngagingStory =
-          controller.askEngagingStories(Collections.singletonList(parentNote));
-      assertEquals("This is an engaging story.", aiEngagingStory.engagingStory());
-    }
-
-    @Test
-    void askEngagingStoryForMultipleNotes_returnsEngagingStory() {
+    void askEngagingStoryForMultipleNotes_returnsEngagingStory()
+        throws UnexpectedNoAccessRightException {
       when(openAiService.createCompletion(
               argThat(
                   request -> {
                     assertEquals(
-                        "Tell me an engaging story to learn about note and note2.",
+                        "Tell me an engaging story to learn about Coming soon and note2.",
                         request.getPrompt());
                     return true;
                   })))
           .thenReturn(buildCompletionResult("This is an engaging story."));
 
-      Note note = makeMe.aNote("note").please();
-      Note note2 = makeMe.aNote("note2").please();
+      Note anotherNote = makeMe.aNote("note2").creatorAndOwner(currentUser).please();
 
-      final AiEngagingStory aiEngagingStory = controller.askEngagingStories(List.of(note, note2));
+      controller.askEngagingStories(List.of(aNote, anotherNote));
     }
   }
 
