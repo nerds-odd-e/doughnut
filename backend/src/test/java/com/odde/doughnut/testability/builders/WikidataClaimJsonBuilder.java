@@ -56,6 +56,16 @@ public class WikidataClaimJsonBuilder {
     this.addClaimToTheSamePropertyOfTheSameType(property, type, List.of(value));
   }
 
+  private void addClaimsOfWikiBaseEntityIds(String property, List<String> ids) {
+    List<String> wikibaseIds =
+        ids.stream()
+            .map("""
+                { "id": "%s" }
+                """::formatted)
+            .toList();
+    this.addClaimToTheSamePropertyOfTheSameType(property, "wikibase-entityid", wikibaseIds);
+  }
+
   private void addClaimToTheSamePropertyOfTheSameType(
       String property, String type, List<String> values) {
     String innerArray =
@@ -86,23 +96,13 @@ public class WikidataClaimJsonBuilder {
   }
 
   public WikidataClaimJsonBuilder countryOfOrigin(String countryQId) {
-
-    this.addClaim(
-        "P27",
-        "wikibase-entityid",
-        """
-        {
-          "entity-type": "item",
-          "numeric-id": 865,
-          "id": "%s"
-        }
-        """
-            .formatted(countryQId));
+    if (countryQId == null) return this;
+    this.addClaimsOfWikiBaseEntityIds("P27", List.of(countryQId));
     return this;
   }
 
   public WikidataClaimJsonBuilder asAHuman() {
-    this.addClaim("P31", "wikibase-entityid", "{\"id\": \"Q5\"}");
+    this.addClaimsOfWikiBaseEntityIds("P31", List.of("Q5"));
     return this;
   }
 
@@ -119,32 +119,11 @@ public class WikidataClaimJsonBuilder {
   }
 
   public WikidataClaimJsonBuilder asABookWithSingleAuthor(String authorWikiDataId) {
-    this.addClaim("P50", "wikibase-entityid", "{ \"id\": \"" + authorWikiDataId + "\"}");
-    return this;
+    return asABookWithMultipleAuthors(List.of(authorWikiDataId));
   }
 
   public WikidataClaimJsonBuilder asABookWithMultipleAuthors(List<String> authorWikiDataIds) {
-    String authorJsons =
-        authorWikiDataIds.stream()
-            .map(
-                """
-                {
-                  "mainsnak": {
-                    "snaktype": "value",
-                    "datavalue": {
-                      "value": { "id": "%s" },
-                      "type": "wikibase-entityid"
-                    }
-                  }
-                }
-                """
-                    ::formatted)
-            .collect(Collectors.joining(","));
-
-    this.claims.add("""
-      "%s": [%s]
-  """.formatted("P50", authorJsons));
-
+    this.addClaimsOfWikiBaseEntityIds("P50", authorWikiDataIds);
     return this;
   }
 }
