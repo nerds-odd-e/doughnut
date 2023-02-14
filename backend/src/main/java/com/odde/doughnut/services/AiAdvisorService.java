@@ -27,20 +27,24 @@ public class AiAdvisorService {
             // https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
             .maxTokens(500)
             .build();
-    var choices = service.createCompletion(completionRequest).getChoices();
+    List<CompletionChoice> choices = getCompletionChoices(completionRequest);
     return choices.stream().map(CompletionChoice::getText).collect(Collectors.joining("")).trim();
   }
 
-  public AiSuggestion getAiSuggestion(String item) {
+  private List<CompletionChoice> getCompletionChoices(CompletionRequest completionRequest) {
     try {
-      String prompt = String.format("Tell me about %s in a paragraph.", item);
-      return new AiSuggestion(getOpenAiCompletion(prompt));
+      return service.createCompletion(completionRequest).getChoices();
     } catch (HttpException e) {
       if (HttpStatus.UNAUTHORIZED.value() == e.code()) {
         throw new OpenAiUnauthorizedException(e.getMessage());
       }
       throw e;
     }
+  }
+
+  public AiSuggestion getAiSuggestion(String item) {
+    String prompt = String.format("Tell me about %s in a paragraph.", item);
+    return new AiSuggestion(getOpenAiCompletion(prompt));
   }
 
   public AiEngagingStory getEngagingStory(List<String> items) {

@@ -1,5 +1,7 @@
 package com.odde.doughnut.services;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -8,6 +10,7 @@ import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.theokanning.openai.OpenAiService;
 import com.theokanning.openai.completion.CompletionResult;
 import java.util.Collections;
+import okhttp3.MediaType;
 import okhttp3.ResponseBody;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,20 +62,16 @@ class AiAdvisorServiceTest {
 
   @Test
   void getAiSuggestion_given_invalidToken_return_401() {
-    HttpException httpExceptionMock = Mockito.mock(HttpException.class);
-    Mockito.when(httpExceptionMock.code()).thenReturn(401);
-    String unauthorized = "Unauthorized";
-    Mockito.when(httpExceptionMock.getMessage()).thenReturn(unauthorized);
+    HttpException httpException = buildHttpException(401);
     Mockito.when(openAiServiceMock.createCompletion(ArgumentMatchers.any()))
-        .thenThrow(httpExceptionMock);
+        .thenThrow(httpException);
     OpenAiUnauthorizedException exception =
         assertThrows(OpenAiUnauthorizedException.class, () -> aiAdvisorService.getAiSuggestion(""));
-    assertEquals(unauthorized, exception.getMessage());
+    assertThat(exception.getMessage(), containsString("401"));
   }
 
   private static HttpException buildHttpException(int statusCode) {
-    HttpException httpException =
-        new HttpException(Response.error(statusCode, ResponseBody.create(null, "")));
-    return httpException;
+    return new HttpException(
+        Response.error(statusCode, ResponseBody.create("{}", MediaType.parse("application/json"))));
   }
 }
