@@ -32,7 +32,7 @@ export default defineComponent({
   },
   data() {
     return {
-      suggestedDescription: "",
+      suggestedDescription: undefined as string | undefined,
       errorMessage: undefined as string | undefined,
     };
   },
@@ -42,7 +42,7 @@ export default defineComponent({
         title: this.selectedNote.textContent.title,
         description: this.suggestedDescription,
         updatedAt: this.selectedNote.textContent.updatedAt,
-      };
+      } as Generated.TextContent;
     },
   },
   methods: {
