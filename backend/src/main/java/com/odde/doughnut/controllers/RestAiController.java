@@ -33,6 +33,7 @@ public class RestAiController {
 
   @PostMapping("/ask-suggestions")
   public AiSuggestion askSuggestion(@RequestBody HashMap<String, String> params) {
+    currentUser.assertLoggedIn();
     return aiAdvisorService.getAiSuggestion(params.get("title"));
   }
 

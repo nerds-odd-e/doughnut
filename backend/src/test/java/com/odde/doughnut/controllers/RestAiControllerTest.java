@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -54,6 +55,13 @@ class RestAiControllerTest {
 
   @Nested
   class AskSuggestion {
+    @Test
+    void askWithNoteThatCannotAccess() {
+      assertThrows(
+          ResponseStatusException.class,
+          () -> new RestAiController(openAiService, makeMe.aNullUserModel()).askSuggestion(params));
+    }
+
     @Test
     void askSuggestionWithRightPrompt() {
       when(openAiService.createCompletion(
