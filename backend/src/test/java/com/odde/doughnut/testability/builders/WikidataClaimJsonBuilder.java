@@ -53,22 +53,36 @@ public class WikidataClaimJsonBuilder {
   }
 
   private void addClaim(String property, String type, String value) {
+    this.addClaimToTheSamePropertyOfTheSameType(property, type, List.of(value));
+  }
+
+  private void addClaimToTheSamePropertyOfTheSameType(
+      String property, String type, List<String> values) {
+    String innerArray =
+        values.stream()
+            .map(
+                value ->
+                    """
+          {
+            "mainsnak": {
+              "snaktype": "value",
+              "property": "%s",
+              "datavalue": {
+                "value": %s,
+                "type": "%s"
+              }
+            }
+          }
+          """
+                        .formatted(property, value, type))
+            .collect(Collectors.joining(","));
     this.claims.add(
         """
-                  "%s": [
-                    {
-                      "mainsnak": {
-                        "snaktype": "value",
-                        "property": "%s",
-                        "datavalue": {
-                          "value": %s,
-                          "type": "%s"
-                        }
-                      }
-                    }
-                  ]
-        """
-            .formatted(property, property, value, type));
+                "%s": [
+                  %s
+                ]
+      """
+            .formatted(property, innerArray));
   }
 
   public WikidataClaimJsonBuilder countryOfOrigin(String countryQId) {
