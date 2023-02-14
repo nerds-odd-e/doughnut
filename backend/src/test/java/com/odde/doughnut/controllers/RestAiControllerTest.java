@@ -13,7 +13,6 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiService;
-import com.theokanning.openai.completion.CompletionChoice;
 import com.theokanning.openai.completion.CompletionResult;
 import java.util.Collections;
 import java.util.HashMap;
@@ -155,15 +154,7 @@ class RestAiControllerTest {
   }
 
   @NotNull
-  private static CompletionResult buildCompletionResult(String text) {
-    CompletionResult completionResult = new CompletionResult();
-    completionResult.setChoices(
-        List.of(
-            new CompletionChoice() {
-              {
-                this.setText(text);
-              }
-            }));
-    return completionResult;
+  private CompletionResult buildCompletionResult(String text) {
+    return makeMe.openAiCompletionResult().choice(text).please();
   }
 }

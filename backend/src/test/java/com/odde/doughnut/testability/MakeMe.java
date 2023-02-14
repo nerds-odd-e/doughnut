@@ -146,4 +146,8 @@ public class MakeMe {
   public FailureReportBuilder aFailureReport() {
     return new FailureReportBuilder(this);
   }
+
+  public OpenAICompletionResultBuilder openAiCompletionResult() {
+    return new OpenAICompletionResultBuilder();
+  }
 }
