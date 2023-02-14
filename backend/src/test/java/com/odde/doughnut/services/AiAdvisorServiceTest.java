@@ -6,11 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
+import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.theokanning.openai.OpenAiService;
-import com.theokanning.openai.completion.CompletionChoice;
 import com.theokanning.openai.completion.CompletionResult;
 import java.util.Collections;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -22,8 +21,8 @@ import retrofit2.HttpException;
 class AiAdvisorServiceTest {
 
   private AiAdvisorService aiAdvisorService;
-
   @Mock private OpenAiService openAiServiceMock;
+  MakeMeWithoutDB makeMe = new MakeMeWithoutDB();
 
   @BeforeEach
   void Setup() {
@@ -33,11 +32,8 @@ class AiAdvisorServiceTest {
 
   @Test
   void getAiSuggestion_givenAString_returnsAiSuggestionObject() {
-    CompletionResult completionResult = new CompletionResult();
-    CompletionChoice completionChoice = new CompletionChoice();
-    completionChoice.setText("suggestion_value");
-    List<CompletionChoice> completionChoices = List.of(completionChoice);
-    completionResult.setChoices(completionChoices);
+    CompletionResult completionResult =
+        makeMe.openAiCompletionResult().choice("suggestion_value").please();
     AiSuggestion expected = new AiSuggestion("suggestion_value");
 
     Mockito.when(openAiServiceMock.createCompletion(Mockito.any())).thenReturn(completionResult);
@@ -47,11 +43,8 @@ class AiAdvisorServiceTest {
 
   @Test
   void getAiSuggestion_givenAString_sendsOpenAIRequestWithRightParams() {
-    CompletionResult completionResult = new CompletionResult();
-    CompletionChoice completionChoice = new CompletionChoice();
-    completionChoice.setText("suggestion_value");
-    List<CompletionChoice> completionChoices = List.of(completionChoice);
-    completionResult.setChoices(completionChoices);
+    CompletionResult completionResult =
+        makeMe.openAiCompletionResult().choice("suggestion_value").please();
     AiSuggestion expected = new AiSuggestion("suggestion_value");
 
     Mockito.when(openAiServiceMock.createCompletion(Mockito.any())).thenReturn(completionResult);
@@ -77,12 +70,8 @@ class AiAdvisorServiceTest {
 
     AiEngagingStory expected = new AiEngagingStory("This is an engaging story");
 
-    CompletionResult completionResult = new CompletionResult();
-    CompletionChoice completionChoice = new CompletionChoice();
-    completionChoice.setText("This is an engaging story");
-
-    List<CompletionChoice> completionChoices = List.of(completionChoice);
-    completionResult.setChoices(completionChoices);
+    CompletionResult completionResult =
+        makeMe.openAiCompletionResult().choice("This is an engaging story").please();
     Mockito.when(openAiServiceMock.createCompletion(Mockito.any())).thenReturn(completionResult);
 
     assertEquals(expected, aiAdvisorService.getEngagingStory(Collections.singletonList("title")));
