@@ -45,44 +45,6 @@ public class NoteTest {
     assertThat(parent.getChildren(), containsInRelativeOrder(note1, note2));
   }
 
-  @Test
-  void getTitleAndOffSpringTitles_givenSingleNote_returnsOneTitle() {
-    Note aNote = makeMe.aNote("This is a Title").please();
-    assertEquals(aNote.getTitleAndOffSpringTitles(), List.of("This is a Title"));
-  }
-
-  @Test
-  void getTitleAndOffSpringTitles_givenNoteHasChild_returnsTwoTitles() {
-    Note parentNote = makeMe.aNote("This is a parent note").please();
-    makeMe.aNote("This is a child note").under(parentNote).please();
-    makeMe.refresh(parentNote);
-    assertEquals(
-        List.of("This is a parent note", "This is a child note"),
-        parentNote.getTitleAndOffSpringTitles());
-  }
-
-  @Test
-  void getTitleAndOffSpringTitles_givenNoteHasTwoChildren_returnsThreeTitles() {
-    Note parentNote = makeMe.aNote("This is a parent note").please();
-    makeMe.aNote("This is a child note").under(parentNote).please();
-    makeMe.aNote("This is a child note too").under(parentNote).please();
-    makeMe.refresh(parentNote);
-    assertEquals(
-        List.of("This is a parent note", "This is a child note", "This is a child note too"),
-        parentNote.getTitleAndOffSpringTitles());
-  }
-
-  @Test
-  void getTitleAndOffSpringTitles_givenNoteHasGrandchild_returnsThreeTitles() {
-    Note parentNote = makeMe.aNote("parent").please();
-    Note childNote = makeMe.aNote("child").under(parentNote).please();
-    makeMe.aNote("grand child").under(childNote).please();
-    makeMe.refresh(parentNote);
-    makeMe.refresh(childNote);
-    assertEquals(
-        List.of("parent", "child", "grand child"), parentNote.getTitleAndOffSpringTitles());
-  }
-
   @Nested
   class Picture {
 

@@ -371,16 +371,4 @@ public class Note extends Thingy {
     note.setParentNote(this);
     return note;
   }
-
-  @JsonIgnore
-  public List<String> getTitleAndOffSpringTitles() {
-    List<String> titles = new ArrayList<>();
-    titles.add(getTitle());
-    getChildren().stream()
-        .map(Note::getTitleAndOffSpringTitles)
-        .flatMap(List::stream)
-        .forEach(titles::add);
-
-    return titles;
-  }
 }
