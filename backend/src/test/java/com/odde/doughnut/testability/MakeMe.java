@@ -6,13 +6,11 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.builders.*;
-import java.nio.CharBuffer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.BindingResult;
 
 @Component
-public class MakeMe {
+public class MakeMe extends MakeMeWithoutDB {
   @Autowired public ModelFactoryService modelFactoryService;
 
   public UserBuilder aUser() {
@@ -56,22 +54,6 @@ public class MakeMe {
     return object;
   }
 
-  public String aStringOfLength(int length, char withChar) {
-    return CharBuffer.allocate(length).toString().replace('\0', withChar);
-  }
-
-  public String aStringOfLength(int length) {
-    return aStringOfLength(length, 'a');
-  }
-
-  public BindingResult successfulBindingResult() {
-    return new FakeBindingResult(false);
-  }
-
-  public BindingResult failedBindingResult() {
-    return new FakeBindingResult(true);
-  }
-
   public ReviewPointBuilder aReviewPointFor(Note note) {
     ReviewPoint reviewPoint = ReviewPoint.buildReviewPointForThing(note.getThing());
     return new ReviewPointBuilder(reviewPoint, this).forNote(note);
@@ -80,10 +62,6 @@ public class MakeMe {
   public ReviewPointBuilder aReviewPointFor(Link link) {
     ReviewPoint reviewPoint = ReviewPoint.buildReviewPointForThing(link.getThing());
     return new ReviewPointBuilder(reviewPoint, this).forLink(link);
-  }
-
-  public TimestampBuilder aTimestamp() {
-    return new TimestampBuilder();
   }
 
   public CircleBuilder aCircle() {
@@ -96,10 +74,6 @@ public class MakeMe {
 
   public ImageBuilder anImage() {
     return new ImageBuilder(new Image(), this);
-  }
-
-  public UploadedPictureBuilder anUploadedPicture() {
-    return new UploadedPictureBuilder();
   }
 
   public AnswerViewedByUserBuilder anAnswerViewedByUserFor(ReviewPoint reviewPoint) {
@@ -135,19 +109,7 @@ public class MakeMe {
     return aQuestion().buildValid(questionType, reviewPoint).ViewedByUserPlease();
   }
 
-  public WikidataEntityJsonBuilder wikidataEntityJson() {
-    return new WikidataEntityJsonBuilder();
-  }
-
-  public WikidataClaimJsonBuilder wikidataClaimsJson(String wikidataId) {
-    return new WikidataClaimJsonBuilder(wikidataId);
-  }
-
   public FailureReportBuilder aFailureReport() {
     return new FailureReportBuilder(this);
-  }
-
-  public OpenAICompletionResultBuilder openAiCompletionResult() {
-    return new OpenAICompletionResultBuilder();
   }
 }
