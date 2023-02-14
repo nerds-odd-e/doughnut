@@ -274,7 +274,7 @@ class RestNoteControllerTests {
             personWikidataId,
             makeMe
                 .wikidataClaimsJson(personWikidataId)
-                .asHuman()
+                .asAHuman()
                 .countryOfOrigin(countryQId)
                 .birthdayIf(birthdayByISO)
                 .please());
@@ -340,7 +340,7 @@ class RestNoteControllerTests {
           throws IOException, InterruptedException {
         mockWikidataWBGetEntity(
             bookWikiDataId,
-            makeMe.wikidataClaimsJson(bookWikiDataId).asBook(bookAuthorWikiDataIds).please());
+            makeMe.wikidataClaimsJson(bookWikiDataId).asABook(bookAuthorWikiDataIds).please());
       }
 
       @Test

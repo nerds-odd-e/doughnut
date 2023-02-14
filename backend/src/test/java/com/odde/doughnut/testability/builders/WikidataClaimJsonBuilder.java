@@ -87,7 +87,7 @@ public class WikidataClaimJsonBuilder {
     return this;
   }
 
-  public WikidataClaimJsonBuilder asHuman() {
+  public WikidataClaimJsonBuilder asAHuman() {
     this.addClaim("P31", "wikibase-entityid", "{\"id\": \"Q5\"}");
     return this;
   }
@@ -104,7 +104,7 @@ public class WikidataClaimJsonBuilder {
     return this;
   }
 
-  public WikidataClaimJsonBuilder asBook(List<String> authorWikiDataIds) {
+  public WikidataClaimJsonBuilder asABook(List<String> authorWikiDataIds) {
     String authorJsons =
         authorWikiDataIds.stream()
             .map(
