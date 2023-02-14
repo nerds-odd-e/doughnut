@@ -10,6 +10,7 @@ import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.theokanning.openai.OpenAiService;
 import com.theokanning.openai.completion.CompletionResult;
 import java.util.Collections;
+import okhttp3.ResponseBody;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -17,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import retrofit2.HttpException;
+import retrofit2.Response;
 
 class AiAdvisorServiceTest {
 
@@ -42,10 +44,10 @@ class AiAdvisorServiceTest {
   @Test
   void getAiSuggestion_givenAString_whenHttpError_returnsEmptySuggestion() {
     AiSuggestion expected = new AiSuggestion("");
-    HttpException httpExceptionMock = Mockito.mock(HttpException.class);
-    Mockito.when(httpExceptionMock.code()).thenReturn(400);
+    HttpException httpException =
+        new HttpException(Response.error(400, ResponseBody.create(null, "")));
     Mockito.when(openAiServiceMock.createCompletion(ArgumentMatchers.any()))
-        .thenThrow(httpExceptionMock);
+        .thenThrow(httpException);
 
     assertEquals(expected, aiAdvisorService.getAiSuggestion("suggestion_prompt"));
 
