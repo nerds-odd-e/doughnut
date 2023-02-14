@@ -34,7 +34,7 @@ public class OpenAiApis {
             .model("text-davinci-003")
             // This can go higher (up to 4000 - prompt size), but openAI performance goes down
             // https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
-            .maxTokens(500)
+            .maxTokens(150)
             .build();
     List<CompletionChoice> choices = getCompletionChoices(completionRequest);
     return choices.stream().map(CompletionChoice::getText).collect(Collectors.joining("")).trim();

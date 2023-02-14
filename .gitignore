@@ -51,6 +51,7 @@ hs_err_pid*
 *.ipr
 *.iws
 .idea/
+.run/
 
 # nodejs
 node_modules/

@@ -120,7 +120,7 @@ class RestAiControllerTest {
       when(openAiService.createCompletion(
               argThat(
                   request -> {
-                    assertEquals(500, request.getMaxTokens());
+                    assertEquals(150, request.getMaxTokens());
                     return true;
                   })))
           .thenReturn(buildCompletionResult("This is an engaging story."));
