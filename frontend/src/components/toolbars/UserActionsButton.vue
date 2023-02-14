@@ -16,19 +16,16 @@
     class="dropdown-menu dropdown-menu-end"
     aria-labelledby="dropdownMenuButton"
   >
-    <PopupButton class="dropdown-item" title="choose a circle">
+    <PopButton class="dropdown-item" title="choose a circle">
       <template #button_face> Settings for {{ user.name }}</template>
-      <template #dialog_body="{ doneHandler }">
-        <UserProfileDialog
-          @done="
-            doneHandler($event);
-            if ($event) {
-              $emit('updateUser', $event);
-            }
-          "
-        />
-      </template>
-    </PopupButton>
+      <UserProfileDialog
+        @user-updated="
+          if ($event) {
+            $emit('updateUser', $event);
+          }
+        "
+      />
+    </PopButton>
     <a href="#" class="dropdown-item" role="button" @click="logout">Logout</a>
   </div>
 </template>
@@ -36,7 +33,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import UserIconMenu from "./UserIconMenu.vue";
-import PopupButton from "../commons/Popups/PopupButton.vue";
+import PopButton from "../commons/Popups/PopButton.vue";
 import UserProfileDialog from "./UserProfileDialog.vue";
 import LoginButton from "./LoginButton.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
@@ -51,7 +48,7 @@ export default defineComponent({
   emits: ["updateUser"],
   components: {
     UserIconMenu,
-    PopupButton,
+    PopButton,
     UserProfileDialog,
     LoginButton,
   },

@@ -33,13 +33,14 @@
 import ContainerPage from "../../pages/commons/ContainerPage.vue";
 import TextInput from "../form/TextInput.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
+import asPopup from "../commons/Popups/asPopup";
 
 export default {
   setup() {
-    return useLoadingApi();
+    return { ...useLoadingApi(), ...asPopup() };
   },
   components: { ContainerPage, TextInput },
-  emits: ["done"],
+  emits: ["user-updated"],
   data() {
     return {
       formData: null,
@@ -56,7 +57,8 @@ export default {
         .catch((err) => {
           this.errors = err;
         });
-      this.$emit("done", updated);
+      this.popup.done(updated);
+      this.$emit("user-updated", updated);
     },
   },
 
