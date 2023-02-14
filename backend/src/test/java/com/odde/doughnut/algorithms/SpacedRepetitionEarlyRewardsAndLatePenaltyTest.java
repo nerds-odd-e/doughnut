@@ -76,10 +76,11 @@ public class SpacedRepetitionEarlyRewardsAndLatePenaltyTest {
   }
 
   private int getNextForgettingCurveIndexWithDelay(int delayInHours) {
-    User user = new MakeMe().aUser().withSpaceIntervals("3, 6, 9, 12, 15").inMemoryPlease();
-    Note note = new MakeMe().aNote().inMemoryPlease();
+    MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
+    User user = makeMe.aUser().withSpaceIntervals("3, 6, 9, 12, 15").inMemoryPlease();
+    Note note = makeMe.aNote().inMemoryPlease();
     ReviewPoint reviewPoint =
-        new MakeMe().aReviewPointFor(note).by(user).afterNthStrictRepetition(3).inMemoryPlease();
+        makeMe.aReviewPointFor(note).by(user).afterNthStrictRepetition(3).inMemoryPlease();
     reviewPoint.reviewedSuccessfully(
         TimestampOperations.addHoursToTimestamp(reviewPoint.getNextReviewAt(), delayInHours));
     return reviewPoint.getForgettingCurveIndex();

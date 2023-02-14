@@ -4,12 +4,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 
-import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.Test;
 
 public class FailureReportTest {
-  MakeMe makeMe = new MakeMe();
-
   @Test
   void githubIssue() {
     FailureReport failureReport = new FailureReport();

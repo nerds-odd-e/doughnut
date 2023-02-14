@@ -13,6 +13,12 @@ import org.springframework.stereotype.Component;
 public class MakeMe extends MakeMeWithoutDB {
   @Autowired public ModelFactoryService modelFactoryService;
 
+  private MakeMe() {}
+
+  public static MakeMe makeMeWithoutFactoryService() {
+    return new MakeMe();
+  }
+
   public UserBuilder aUser() {
     return new UserBuilder(this);
   }

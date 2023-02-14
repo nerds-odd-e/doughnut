@@ -16,6 +16,7 @@ import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.HttpClientAdapter;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.net.URI;
@@ -179,7 +180,7 @@ class RestNoteControllerTests {
     void shouldBeAbleToSaveNoteWithWikidataIdWhenValid()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
-          .thenReturn(new MakeMe().wikidataEntityJson().entityId("Q12345").please());
+          .thenReturn(new MakeMeWithoutDB().wikidataEntityJson().entityId("Q12345").please());
       noteCreation.setWikidataId("Q12345");
       NoteRealmWithPosition response = controller.createNote(parent, noteCreation);
       assertThat(response.noteRealm.getNote().getWikidataId(), equalTo("Q12345"));

@@ -24,7 +24,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class QuizQuestionGeneratorTest {
-  MakeMe makeMe = new MakeMe();
+  MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
   Note note = makeMe.aNote().inMemoryPlease();
 
   @Test

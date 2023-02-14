@@ -3,7 +3,7 @@ package com.odde.doughnut.algorithms;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.MakeMeWithoutDB;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.core.io.InputStreamSource;
 
 class ImageUtilsTest {
-  MakeMe makeMe = new MakeMe();
+  MakeMeWithoutDB makeMe = new MakeMeWithoutDB();
 
   @Test
   void shouldNotTouchSmallImage() throws IOException {
