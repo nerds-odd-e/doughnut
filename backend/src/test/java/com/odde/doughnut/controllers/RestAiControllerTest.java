@@ -80,7 +80,7 @@ class RestAiControllerTest {
 
     @BeforeEach
     void setup() {
-      aNote = makeMe.aNote("Coming soon").creatorAndOwner(currentUser).please();
+      aNote = makeMe.aNote("sanskrit").creatorAndOwner(currentUser).please();
     }
 
     @Test
@@ -97,8 +97,7 @@ class RestAiControllerTest {
               argThat(
                   request -> {
                     assertEquals(
-                        "Tell me an engaging story to learn about Coming soon.",
-                        request.getPrompt());
+                        "Tell me an engaging story to learn about sanskrit.", request.getPrompt());
                     return true;
                   })))
           .thenReturn(buildCompletionResult("This is an engaging story."));
@@ -118,7 +117,6 @@ class RestAiControllerTest {
                     return true;
                   })))
           .thenReturn(buildCompletionResult("This is an engaging story."));
-
       controller.askEngagingStories(Collections.singletonList(aNote));
     }
 
@@ -126,7 +124,6 @@ class RestAiControllerTest {
     void askEngagingStoryReturnsEngagingStory() throws UnexpectedNoAccessRightException {
       when(openAiService.createCompletion(Mockito.any()))
           .thenReturn(buildCompletionResult("This is an engaging story."));
-
       final AiEngagingStory aiEngagingStory =
           controller.askEngagingStories(Collections.singletonList(aNote));
       assertEquals("This is an engaging story.", aiEngagingStory.engagingStory());
@@ -139,14 +136,12 @@ class RestAiControllerTest {
               argThat(
                   request -> {
                     assertEquals(
-                        "Tell me an engaging story to learn about Coming soon and note2.",
+                        "Tell me an engaging story to learn about sanskrit and mandala.",
                         request.getPrompt());
                     return true;
                   })))
           .thenReturn(buildCompletionResult("This is an engaging story."));
-
-      Note anotherNote = makeMe.aNote("note2").creatorAndOwner(currentUser).please();
-
+      Note anotherNote = makeMe.aNote("mandala").creatorAndOwner(currentUser).please();
       controller.askEngagingStories(List.of(aNote, anotherNote));
     }
   }
