@@ -335,28 +335,44 @@ class RestNoteControllerTests {
 
     @Nested
     class AddingBookNoteWithAuthorInformation {
-      private void mockApiResponseForBookWithAuthorTag(
-          String bookWikiDataId, List<String> bookAuthorWikiDataIds)
-          throws IOException, InterruptedException {
-        mockWikidataWBGetEntity(
-            bookWikiDataId,
-            makeMe.wikidataClaimsJson(bookWikiDataId).asABook(bookAuthorWikiDataIds).please());
+      @BeforeEach
+      void setup() throws IOException, InterruptedException {
+        mockWikidataEntity("Q34660", "J. K. Rowling");
+        mockWikidataEntity("Q12345", "The girl sat next to the window");
+        noteCreation.setWikidataId("Q8337");
+        noteCreation.getTextContent().setTitle("Harry Potter");
       }
 
       @Test
       void shouldAddBookNoteWithAuthorNoteWithWikidataId()
           throws BindException, InterruptedException, UnexpectedNoAccessRightException,
               IOException {
-        mockApiResponseForBookWithAuthorTag("Q8337", List.of("Q34660", "Q12345"));
-        mockWikidataEntity("Q34660", "J. K. Rowling");
-        noteCreation.setWikidataId("Q8337");
-        noteCreation.getTextContent().setTitle("Harry Potter");
+        mockWikidataWBGetEntity(
+            "Q8337", makeMe.wikidataClaimsJson("Q8337").asABookWithSingleAuthor("Q34660").please());
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
         makeMe.refresh(note.noteRealm.getNote());
 
         assertEquals("Harry Potter", note.noteRealm.getNote().getTitle());
         assertEquals("Q8337", note.noteRealm.getNote().getWikidataId());
         assertEquals("J. K. Rowling", note.noteRealm.getNote().getChildren().get(0).getTitle());
+      }
+
+      @Test
+      void shouldAddBookNoteWithMultipleAuthorsNoteWithWikidataId()
+          throws BindException, InterruptedException, UnexpectedNoAccessRightException,
+              IOException {
+        mockWikidataWBGetEntity(
+            "Q8337",
+            makeMe
+                .wikidataClaimsJson("Q8337")
+                .asABookWithMultipleAuthors(List.of("Q34660", "Q12345"))
+                .please());
+        NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
+        makeMe.refresh(note.noteRealm.getNote());
+
+        assertEquals(
+            "The girl sat next to the window",
+            note.noteRealm.getNote().getChildren().get(1).getTitle());
       }
     }
   }
@@ -463,13 +479,13 @@ class RestNoteControllerTests {
   }
 
   @Nested
-  class gettingPosition {}
-
-  @Test
-  void shouldNotBeAbleToAddCommentToNoteTheUserCannotSee() {
-    User anotherUser = makeMe.aUser().please();
-    Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
-    assertThrows(UnexpectedNoAccessRightException.class, () -> controller.getPosition(note));
+  class gettingPosition {
+    @Test
+    void shouldNotBeAbleToAddCommentToNoteTheUserCannotSee() {
+      User anotherUser = makeMe.aUser().please();
+      Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
+      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.getPosition(note));
+    }
   }
 
   @Nested

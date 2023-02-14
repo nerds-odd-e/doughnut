@@ -104,7 +104,12 @@ public class WikidataClaimJsonBuilder {
     return this;
   }
 
-  public WikidataClaimJsonBuilder asABook(List<String> authorWikiDataIds) {
+  public WikidataClaimJsonBuilder asABookWithSingleAuthor(String authorWikiDataId) {
+    this.addClaim("P50", "wikibase-entityid", "{ \"id\": \"" + authorWikiDataId + "\"}");
+    return this;
+  }
+
+  public WikidataClaimJsonBuilder asABookWithMultipleAuthors(List<String> authorWikiDataIds) {
     String authorJsons =
         authorWikiDataIds.stream()
             .map(
