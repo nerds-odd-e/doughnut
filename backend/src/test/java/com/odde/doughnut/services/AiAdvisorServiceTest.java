@@ -3,7 +3,6 @@ package com.odde.doughnut.services;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.theokanning.openai.OpenAiService;
@@ -42,24 +41,20 @@ class AiAdvisorServiceTest {
 
   @Test
   void getAiSuggestion_givenAString_whenHttpError_returnsEmptySuggestion() {
-    HttpException httpException =
-        new HttpException(Response.error(400, ResponseBody.create(null, "")));
+    HttpException httpException = buildHttpException(400);
     Mockito.when(openAiServiceMock.createCompletion(ArgumentMatchers.any()))
         .thenThrow(httpException);
-
     assertThrows(HttpException.class, () -> aiAdvisorService.getAiSuggestion("suggestion_prompt"));
   }
 
   @Test
   void getAiEngagingStory_givenAlistOfStrings_returnsAStory() {
-
-    AiEngagingStory expected = new AiEngagingStory("This is an engaging story");
-
     CompletionResult completionResult =
         makeMe.openAiCompletionResult().choice("This is an engaging story").please();
     Mockito.when(openAiServiceMock.createCompletion(Mockito.any())).thenReturn(completionResult);
-
-    assertEquals(expected, aiAdvisorService.getEngagingStory(Collections.singletonList("title")));
+    assertEquals(
+        "This is an engaging story",
+        aiAdvisorService.getEngagingStory(Collections.singletonList("title")).engagingStory());
   }
 
   @Test
@@ -73,5 +68,11 @@ class AiAdvisorServiceTest {
     OpenAiUnauthorizedException exception =
         assertThrows(OpenAiUnauthorizedException.class, () -> aiAdvisorService.getAiSuggestion(""));
     assertEquals(unauthorized, exception.getMessage());
+  }
+
+  private static HttpException buildHttpException(int statusCode) {
+    HttpException httpException =
+        new HttpException(Response.error(statusCode, ResponseBody.create(null, "")));
+    return httpException;
   }
 }
