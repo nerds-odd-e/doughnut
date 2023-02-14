@@ -24,9 +24,6 @@ public class ControllerSetup {
   @Autowired private final CurrentUserFetcher currentUserFetcher;
   @Autowired private final TestabilitySettings testabilitySettings;
 
-  public static final String UNAUTHORIZED_DEFAULT_MESSAGE =
-      "The OpenAI request was not Authorized.";
-
   public ControllerSetup(
       ModelFactoryService modelFactoryService,
       CurrentUserFetcher currentUserFetcher,
@@ -63,7 +60,8 @@ public class ControllerSetup {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseEntity<ApiError> handleOpenAIUnauthorizedException(
       OpenAiUnauthorizedException exception) {
-    ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, UNAUTHORIZED_DEFAULT_MESSAGE);
+    ApiError apiError =
+        new ApiError(HttpStatus.BAD_REQUEST, "The OpenAI request was not Authorized.");
     apiError.add("OpenAi Error", exception.getMessage());
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
   }
