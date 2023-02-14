@@ -14,7 +14,7 @@ const CONSOLE_FAIL_TYPES = ["error", "warn"];
 CONSOLE_FAIL_TYPES.forEach((type) => {
   console[type] = (message) => {
     throw new Error(
-      `Failing due to console.${type} while running test!\n\n${message}`
+      `Failing due to console.${type} while running test! The original message:\n\n${message}`
     );
   };
 });

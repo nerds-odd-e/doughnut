@@ -19,7 +19,7 @@ function usePopups() {
     Popup.popupDataWrap.popupData.popupInfo?.push(info);
   };
   const pop = () => {
-    return Popup.popupDataWrap.popupData.popupInfo.pop();
+    return Popup.popupDataWrap.popupData.popupInfo?.pop();
   };
   return {
     popups: {
