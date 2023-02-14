@@ -18,7 +18,7 @@ public class AiAdvisorService {
     service = openAiService;
   }
 
-  private String getOpenAiResponse(String prompt) {
+  private String getOpenAiCompletion(String prompt) {
     CompletionRequest completionRequest =
         CompletionRequest.builder()
             .prompt(prompt)
@@ -34,7 +34,7 @@ public class AiAdvisorService {
   public AiSuggestion getAiSuggestion(String item) {
     try {
       String prompt = String.format("Tell me about %s in a paragraph.", item);
-      return new AiSuggestion(getOpenAiResponse(prompt));
+      return new AiSuggestion(getOpenAiCompletion(prompt));
     } catch (HttpException e) {
       if (HttpStatus.UNAUTHORIZED.value() == e.code()) {
         throw new OpenAiUnauthorizedException(e.getMessage());
@@ -46,7 +46,7 @@ public class AiAdvisorService {
   public AiEngagingStory getEngagingStory(List<String> items) {
     final String topics = String.join(" and ", items);
     final String prompt = String.format("Tell me an engaging story to learn about %s.", topics);
-    final String story = getOpenAiResponse(prompt);
+    final String story = getOpenAiCompletion(prompt);
 
     return new AiEngagingStory(story);
   }
