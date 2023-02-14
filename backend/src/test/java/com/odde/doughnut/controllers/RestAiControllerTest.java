@@ -74,6 +74,13 @@ class RestAiControllerTest {
 
   @Nested
   class AskEngagingStory {
+    Note aNote;
+
+    @BeforeEach
+    void setup() {
+      aNote = makeMe.aNote("Coming soon").creatorAndOwner(currentUser).please();
+    }
+
     @Test
     void askEngagingStoryWithRightPrompt() {
       when(openAiService.createCompletion(
@@ -86,7 +93,6 @@ class RestAiControllerTest {
                   })))
           .thenReturn(buildCompletionResult("This is an engaging story."));
 
-      Note aNote = makeMe.aNote("Coming soon").please();
       controller.askEngagingStories(Collections.singletonList(aNote));
     }
 
@@ -104,7 +110,6 @@ class RestAiControllerTest {
                   })))
           .thenReturn(buildCompletionResult("This is an engaging story."));
 
-      Note aNote = makeMe.aNote("Coming soon").please();
       controller.askEngagingStories(Collections.singletonList(aNote));
     }
 
@@ -113,7 +118,6 @@ class RestAiControllerTest {
       when(openAiService.createCompletion(Mockito.any()))
           .thenReturn(buildCompletionResult("This is an engaging story."));
 
-      Note aNote = makeMe.aNote().please();
       final AiEngagingStory aiEngagingStory =
           controller.askEngagingStories(Collections.singletonList(aNote));
       assertEquals("This is an engaging story.", aiEngagingStory.engagingStory());
