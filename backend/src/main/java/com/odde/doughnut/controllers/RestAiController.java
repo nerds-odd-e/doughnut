@@ -41,8 +41,7 @@ public class RestAiController {
   public AiEngagingStory askEngagingStories(@RequestParam List<Note> notes)
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(notes);
-    List<String> titles =
-        notes.stream().map(Note::getTitleAndOffSpringTitles).flatMap(List::stream).toList();
+    List<String> titles = notes.stream().map(Note::getTitle).toList();
     return aiAdvisorService.getEngagingStory(titles);
   }
 }
