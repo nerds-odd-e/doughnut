@@ -21,7 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -33,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 class RestAiControllerTest {
   RestAiController controller;
   @Mock OpenAiService openAiService;
-
   @Autowired MakeMe makeMe;
 
   HashMap<String, String> params =
@@ -45,7 +43,6 @@ class RestAiControllerTest {
 
   @BeforeEach
   void Setup() {
-    MockitoAnnotations.openMocks(this);
     controller = new RestAiController(openAiService);
   }
 

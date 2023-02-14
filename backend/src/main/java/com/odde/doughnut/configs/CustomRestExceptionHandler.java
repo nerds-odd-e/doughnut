@@ -2,7 +2,6 @@ package com.odde.doughnut.configs;
 
 import java.util.HashMap;
 import java.util.Map;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
