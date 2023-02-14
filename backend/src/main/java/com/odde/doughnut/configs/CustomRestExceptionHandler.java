@@ -19,7 +19,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice()
 public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
-  @EqualsAndHashCode
   public static class ApiError {
 
     @Getter private final HttpStatus status;
