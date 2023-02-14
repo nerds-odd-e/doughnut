@@ -34,22 +34,9 @@ class AiAdvisorServiceTest {
   void getAiSuggestion_givenAString_returnsAiSuggestionObject() {
     CompletionResult completionResult =
         makeMe.openAiCompletionResult().choice("suggestion_value").please();
-    AiSuggestion expected = new AiSuggestion("suggestion_value");
-
     Mockito.when(openAiServiceMock.createCompletion(Mockito.any())).thenReturn(completionResult);
-
-    assertEquals(expected, aiAdvisorService.getAiSuggestion("suggestion_prompt"));
-  }
-
-  @Test
-  void getAiSuggestion_givenAString_sendsOpenAIRequestWithRightParams() {
-    CompletionResult completionResult =
-        makeMe.openAiCompletionResult().choice("suggestion_value").please();
-    AiSuggestion expected = new AiSuggestion("suggestion_value");
-
-    Mockito.when(openAiServiceMock.createCompletion(Mockito.any())).thenReturn(completionResult);
-
-    assertEquals(expected, aiAdvisorService.getAiSuggestion("suggestion_prompt"));
+    assertEquals(
+        "suggestion_value", aiAdvisorService.getAiSuggestion("suggestion_prompt").suggestion());
   }
 
   @Test
