@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.theokanning.openai.OpenAiService;
 import java.util.HashMap;
@@ -21,9 +22,12 @@ import org.springframework.web.context.annotation.SessionScope;
 @RequestMapping("/api/ai")
 public class RestAiController {
   AiAdvisorService aiAdvisorService;
+  private UserModel currentUser;
 
-  public RestAiController(@Qualifier("testableOpenAiService") OpenAiService openAiService) {
+  public RestAiController(
+      @Qualifier("testableOpenAiService") OpenAiService openAiService, UserModel currentUser) {
     aiAdvisorService = new AiAdvisorService(openAiService);
+    this.currentUser = currentUser;
   }
 
   @PostMapping("/ask-suggestions")

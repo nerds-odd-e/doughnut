@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiService;
 import com.theokanning.openai.completion.CompletionChoice;
@@ -32,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class RestAiControllerTest {
   RestAiController controller;
+  UserModel currentUser;
   @Mock OpenAiService openAiService;
   @Autowired MakeMe makeMe;
 
@@ -44,7 +46,8 @@ class RestAiControllerTest {
 
   @BeforeEach
   void Setup() {
-    controller = new RestAiController(openAiService);
+    currentUser = makeMe.aUser().toModelPlease();
+    controller = new RestAiController(openAiService, currentUser);
   }
 
   @Nested
