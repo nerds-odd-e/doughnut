@@ -1,5 +1,5 @@
 <template>
-  <h1>Have fun reading this engaging story</h1>
+  <h2>Have fun reading this engaging story</h2>
   <form>
     <TextArea
       v-model="engagingStory"
@@ -20,7 +20,7 @@ export default defineComponent({
     return useLoadingApi();
   },
   props: {
-    selectedNoteId: { type: Number, required: false },
+    selectedNoteId: { type: Number, required: true },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: false,
@@ -36,9 +36,7 @@ export default defineComponent({
     };
   },
   mounted() {
-    const request = this.selectedNoteId
-      ? this.api.ai.askAiEngagingStories(this.selectedNoteId)
-      : this.api.ai.askAiReviewEngagingStory();
+    const request = this.api.ai.askAiEngagingStories(this.selectedNoteId);
 
     request
       .then((res) => {

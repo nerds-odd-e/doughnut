@@ -6,31 +6,24 @@ import helper from "../helpers";
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
-const createWrapper = async (review = false) => {
+const createWrapper = async () => {
   const note = makeMe.aNoteRealm.please();
   helper.apiMock
-    .expectingGet(
-      `/api/ai/ask-engaging-stories${
-        review ? "/review" : `?notes=${note.note.id}`
-      }`
-    )
+    .expectingGet(`/api/ai/ask-engaging-stories?notes=${note.note.id}`)
     .andReturnOnce({ engagingStory: "This is an engaging story." });
   const wrapper = helper
     .component(NoteEngagingStoryDialog)
-    .withStorageProps({ selectedNoteId: review ? undefined : note.note.id })
+    .withStorageProps({ selectedNoteId: note.note.id })
     .mount();
   await flushPromises();
   return wrapper;
 };
 
 describe("NoteEngagingStoryDialog", () => {
-  it.each([true, false])(
-    "fetches engaging story for review or single note",
-    async (review) => {
-      const wrapper = await createWrapper(review);
-      expect(wrapper.find("textarea").element).toHaveValue(
-        "This is an engaging story."
-      );
-    }
-  );
+  it("fetches engaging story for review or single note", async () => {
+    const wrapper = await createWrapper();
+    expect(wrapper.find("textarea").element).toHaveValue(
+      "This is an engaging story."
+    );
+  });
 });
