@@ -1,17 +1,12 @@
 <template>
   <div class="btn-group btn-group-sm">
     <template v-if="!selectedNote">
-      <PopupButton title="link note">
+      <PopButton title="link note">
         <template #button_face>
           <SvgSearch />
         </template>
-        <template #dialog_body="{ doneHandler }">
-          <LinkNoteDialog
-            v-bind="{ storageAccessor }"
-            @done="doneHandler($event)"
-          />
-        </template>
-      </PopupButton>
+        <LinkNoteDialog v-bind="{ storageAccessor }" />
+      </PopButton>
     </template>
     <template v-if="selectedNote">
       <ViewTypeButtons v-bind="{ viewType, noteId: selectedNote.id }" />
@@ -22,41 +17,28 @@
         <SvgAddChild />
       </NoteNewButton>
 
-      <PopupButton title="edit note">
+      <PopButton title="edit note">
         <template #button_face>
           <SvgEdit />
         </template>
-        <template #dialog_body="{ doneHandler }">
-          <NoteEditDialog
-            v-bind="{ note: selectedNote, storageAccessor }"
-            @done="doneHandler($event)"
-          />
-        </template>
-      </PopupButton>
+        <NoteEditDialog v-bind="{ note: selectedNote, storageAccessor }" />
+      </PopButton>
 
-      <PopupButton title="associate wikidata">
+      <PopButton title="associate wikidata">
         <template #button_face>
           <SvgWikidata />
         </template>
-        <template #dialog_body="{ doneHandler }">
-          <WikidataAssociationDialog
-            v-bind="{ note: selectedNote, storageAccessor }"
-            @done="doneHandler($event)"
-          />
-        </template>
-      </PopupButton>
+        <WikidataAssociationDialog
+          v-bind="{ note: selectedNote, storageAccessor }"
+        />
+      </PopButton>
 
-      <PopupButton title="link note">
+      <PopButton title="link note">
         <template #button_face>
           <SvgSearch />
         </template>
-        <template #dialog_body="{ doneHandler }">
-          <LinkNoteDialog
-            v-bind="{ note: selectedNote, storageAccessor }"
-            @done="doneHandler($event)"
-          />
-        </template>
-      </PopupButton>
+        <LinkNoteDialog v-bind="{ note: selectedNote, storageAccessor }" />
+      </PopButton>
       <div class="dropdown">
         <button
           class="btn dropdown-toggle"
@@ -100,7 +82,7 @@ import { sanitizeViewTypeName } from "../../models/viewTypes";
 import SvgCog from "../svgs/SvgCog.vue";
 import NoteDeleteButton from "./NoteDeleteButton.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
-import PopupButton from "../commons/Popups/PopupButton.vue";
+import PopButton from "../commons/Popups/PopButton.vue";
 import NoteEngagingStoryDialog from "../notes/NoteEngagingStoryDialog.vue";
 
 export default defineComponent({
@@ -124,7 +106,7 @@ export default defineComponent({
     ViewTypeButtons,
     SvgCog,
     NoteDeleteButton,
-    PopupButton,
+    PopButton,
     NoteEngagingStoryDialog,
   },
   computed: {

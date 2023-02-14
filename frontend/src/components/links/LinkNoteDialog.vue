@@ -11,7 +11,7 @@
   <LinkNoteFinalize
     v-if="targetNote && note"
     v-bind="{ targetNote, note, storageAccessor }"
-    @success="$emit('done', $event)"
+    @success="popup.done($event)"
     @go-back="targetNote = undefined"
   />
 </template>
@@ -21,8 +21,12 @@ import { defineComponent, PropType } from "vue";
 import LinkNoteFinalize from "./LinkNoteFinalize.vue";
 import SearchNote from "../search/SearchNote.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
+import asPopup from "../commons/Popups/asPopup";
 
 export default defineComponent({
+  setup() {
+    return asPopup();
+  },
   props: {
     note: Object as PropType<Generated.Note>,
     storageAccessor: {
@@ -31,7 +35,6 @@ export default defineComponent({
     },
   },
   components: { LinkNoteFinalize, SearchNote },
-  emits: ["done"],
   data() {
     return {
       targetNote: undefined,

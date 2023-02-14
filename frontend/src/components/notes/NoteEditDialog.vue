@@ -12,10 +12,13 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
+import asPopup from "../commons/Popups/asPopup";
 import NoteFormBody from "./NoteFormBody.vue";
 
 export default defineComponent({
-  name: "NoteEditDialog",
+  setup() {
+    return asPopup();
+  },
   components: {
     NoteFormBody,
   },
@@ -26,7 +29,6 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["done"],
   data() {
     const { updatedAt, ...rest } = this.note.noteAccessories;
     return {
@@ -41,9 +43,7 @@ export default defineComponent({
       this.storageAccessor
         .api()
         .updateNote(this.note.id, this.formData)
-        .then(() => {
-          this.$emit("done");
-        })
+        .then(this.popup.done)
         .catch((error) => {
           this.noteFormErrors = error;
         });
