@@ -61,19 +61,19 @@ class WikidataEntityTest {
 
   @Test
   void getMultipleValuePropertyIfThePropertyExists() {
-    List<WikidataValue> result = wikidataEntity.getClaimValues("P31");
+    List<WikidataValue> result = wikidataEntity.getClaimValues("P31").toList();
     assertEquals(List.of(new WikidataValue(wikidataDataValue)), result);
   }
 
   @Test
   void getMultipleValuePropertyDoesNotExist() {
-    List<WikidataValue> result = wikidataEntity.getClaimValues("P33");
+    List<WikidataValue> result = wikidataEntity.getClaimValues("P33").toList();
     assertEquals(Collections.emptyList(), result);
   }
 
   @Test
   void getMultipleValuePropertyIsEmpty() {
-    List<WikidataValue> result = wikidataEntity.getClaimValues("P32");
+    List<WikidataValue> result = wikidataEntity.getClaimValues("P32").toList();
     assertEquals(Collections.emptyList(), result);
   }
 }

@@ -2,7 +2,6 @@ package com.odde.doughnut.services.wikidataApis;
 
 import com.odde.doughnut.entities.Coordinate;
 import com.odde.doughnut.services.wikidataApis.thirdPartyEntities.WikidataEntity;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -43,7 +42,7 @@ public class WikidataEntityModel extends WikidataEntityModelOfProperties {
     return getCountryOfOriginValue().map(wikidataId1 -> wikidataId1.withApi(wikidataApi));
   }
 
-  public List<WikidataIdWithApi> getAuthorList(WikidataApi wikidataApi) {
-    return getAuthors().stream().map(wikidataId -> wikidataId.withApi(wikidataApi)).toList();
+  public Stream<WikidataIdWithApi> getAuthorList(WikidataApi wikidataApi) {
+    return getAuthors().map(wikidataId -> wikidataId.withApi(wikidataApi));
   }
 }

@@ -5,9 +5,8 @@ import com.odde.doughnut.entities.json.WikidataEntityData;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.wikidataApis.thirdPartyEntities.WikidataEntityHash;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.springframework.validation.BindException;
 
 public record WikidataIdWithApi(String wikidataId, WikidataApi wikidataApi) {
@@ -39,9 +38,9 @@ public record WikidataIdWithApi(String wikidataId, WikidataApi wikidataApi) {
     return model.flatMap(entity -> entity.getCountryOfOrigin(wikidataApi));
   }
 
-  public List<WikidataIdWithApi> getAuthors() throws IOException, InterruptedException {
+  public Stream<WikidataIdWithApi> getAuthors() throws IOException, InterruptedException {
     Optional<WikidataEntityModel> model = getWikidataEntityModel();
-    return model.map(i -> i.getAuthorList(wikidataApi)).orElse(new ArrayList<>());
+    return model.map(i -> i.getAuthorList(wikidataApi)).orElse(Stream.empty());
   }
 
   public void associateNoteToWikidata(Note note, ModelFactoryService modelFactoryService)
