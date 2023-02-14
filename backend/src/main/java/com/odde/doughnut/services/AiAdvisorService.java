@@ -39,7 +39,7 @@ public class AiAdvisorService {
       if (HttpStatus.UNAUTHORIZED.value() == e.code()) {
         throw new OpenAiUnauthorizedException(e.getMessage());
       }
-      return new AiSuggestion("");
+      throw e;
     }
   }
 

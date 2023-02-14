@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.json.AiEngagingStory;
-import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.theokanning.openai.OpenAiService;
@@ -43,15 +42,12 @@ class AiAdvisorServiceTest {
 
   @Test
   void getAiSuggestion_givenAString_whenHttpError_returnsEmptySuggestion() {
-    AiSuggestion expected = new AiSuggestion("");
     HttpException httpException =
         new HttpException(Response.error(400, ResponseBody.create(null, "")));
     Mockito.when(openAiServiceMock.createCompletion(ArgumentMatchers.any()))
         .thenThrow(httpException);
 
-    assertEquals(expected, aiAdvisorService.getAiSuggestion("suggestion_prompt"));
-
-    Mockito.verify(openAiServiceMock).createCompletion(ArgumentMatchers.any());
+    assertThrows(HttpException.class, () -> aiAdvisorService.getAiSuggestion("suggestion_prompt"));
   }
 
   @Test
