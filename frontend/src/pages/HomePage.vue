@@ -55,16 +55,14 @@
             Create and join circles. You can own notes together within a circle.
           </p>
           <p v-if="!user">Please login</p>
-          <PopupButton
+          <PopButton
             class="btn btn-light"
             title="choose a circle"
             :sidebar="true"
           >
             <template #button_face> Go To Circles </template>
-            <template #dialog_body="{ doneHandler }">
-              <CircleSelector @done="doneHandler($event)" />
-            </template>
-          </PopupButton>
+            <CircleSelector />
+          </PopButton>
         </div>
       </div>
     </div>
@@ -73,7 +71,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import PopupButton from "@/components/commons/Popups/PopupButton.vue";
+import PopButton from "@/components/commons/Popups/PopButton.vue";
 import CircleSelector from "@/components/circles/CircleSelector.vue";
 
 export default defineComponent({
@@ -83,6 +81,6 @@ export default defineComponent({
       required: false,
     },
   },
-  components: { PopupButton, CircleSelector },
+  components: { PopButton, CircleSelector },
 });
 </script>
