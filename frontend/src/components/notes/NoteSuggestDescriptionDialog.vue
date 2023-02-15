@@ -1,6 +1,12 @@
 <template>
   <h1>Suggested Description</h1>
   <form @submit.prevent.once="processForm">
+    <EditableText
+      role="prompt"
+      field="prompt"
+      :multiple-line="true"
+      v-model="aiSuggestionRequest.prompt"
+    />
     <TextArea
       v-model="suggestedDescription"
       field="suggestion"
@@ -18,6 +24,7 @@ import TextArea from "../form/TextArea.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import asPopup from "../commons/Popups/asPopup";
+import EditableText from "../form/EditableText.vue";
 
 export default defineComponent({
   setup() {
@@ -46,7 +53,7 @@ export default defineComponent({
     },
     aiSuggestionRequest(): Generated.AiSuggestionRequest {
       return {
-        prompt: `In one paragraph, tell me about ${this.selectedNote.title}`,
+        prompt: `In one paragraph, tell me about "${this.selectedNote.title}"`,
       };
     },
   },
@@ -72,6 +79,7 @@ export default defineComponent({
         this.errorMessage = er.message;
       });
   },
+  components: { EditableText },
 });
 </script>
 

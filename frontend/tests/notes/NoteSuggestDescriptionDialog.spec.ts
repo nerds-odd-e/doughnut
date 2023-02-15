@@ -6,7 +6,7 @@ import helper from "../helpers";
 helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("NoteSuggestDescriptionDialog", () => {
-  const note = makeMe.aNoteRealm.please();
+  const note = makeMe.aNote.please();
 
   beforeEach(() => {
     helper.apiMock
@@ -32,7 +32,7 @@ describe("NoteSuggestDescriptionDialog", () => {
       "/api/ai/ask-suggestions",
       expect.objectContaining({
         body: expect.stringContaining(
-          `"prompt":"In one paragraph, tell me about undefined"`
+          `"prompt":"In one paragraph, tell me about \\"${note.title}\\""`
         ),
       })
     );
