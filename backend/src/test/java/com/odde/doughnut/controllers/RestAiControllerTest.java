@@ -66,7 +66,7 @@ class RestAiControllerTest {
       when(openAiService.createCompletion(
               argThat(
                   request -> {
-                    assertEquals("Tell me about Earth in a paragraph.", request.getPrompt());
+                    assertEquals("Earth", request.getPrompt());
                     return true;
                   })))
           .thenReturn(buildCompletionResult("blue planet"));

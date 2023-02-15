@@ -14,8 +14,7 @@ public class AiAdvisorService {
   }
 
   public AiSuggestion getAiSuggestion(String item) {
-    String prompt = String.format("Tell me about %s in a paragraph.", item);
-    return new AiSuggestion(openAiApis.getOpenAiCompletion(prompt));
+    return new AiSuggestion(openAiApis.getOpenAiCompletion(item));
   }
 
   public AiEngagingStory getEngagingStory(List<String> items) {

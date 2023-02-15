@@ -59,7 +59,9 @@ export default defineComponent({
   },
   mounted() {
     this.api.ai
-      .askAiSuggestions(this.selectedNote.title)
+      .askAiSuggestions(
+        `In one paragraph, tell me about ${this.selectedNote.title}`
+      )
       .then((res) => {
         this.suggestedDescription = res.suggestion;
       })
