@@ -48,7 +48,7 @@ dependencies {
   annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
   annotationProcessor 'org.projectlombok:lombok'
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
-  implementation 'com.theokanning.openai-gpt3-java:client:0.9.0'
+  implementation 'com.theokanning.openai-gpt3-java:service:0.10.0'
 }
 
 test {
