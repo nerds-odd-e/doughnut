@@ -3,7 +3,7 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.services.openAiApis.OpenAiApis;
-import com.theokanning.openai.OpenAiService;
+import com.theokanning.openai.service.OpenAiService;
 import java.util.List;
 
 public class AiAdvisorService {

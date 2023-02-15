@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
-import com.theokanning.openai.OpenAiService;
 import com.theokanning.openai.completion.CompletionResult;
+import com.theokanning.openai.service.OpenAiService;
 import java.util.Collections;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;

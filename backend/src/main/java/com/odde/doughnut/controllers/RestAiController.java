@@ -7,7 +7,7 @@ import com.odde.doughnut.entities.json.AiSuggestionRequest;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
-import com.theokanning.openai.OpenAiService;
+import com.theokanning.openai.service.OpenAiService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
