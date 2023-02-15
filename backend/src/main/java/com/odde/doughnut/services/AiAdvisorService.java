@@ -9,11 +9,9 @@ import java.util.List;
 
 public class AiAdvisorService {
   private final OpenAiApis openAiApis;
-  private final OpenAiApi openAiApi;
 
   public AiAdvisorService(OpenAiService openAiService, OpenAiApi openAiApi) {
-    openAiApis = new OpenAiApis(openAiService);
-    this.openAiApi = openAiApi;
+    openAiApis = new OpenAiApis(openAiService, openAiApi);
   }
 
   public AiSuggestion getAiSuggestion(String prompt) {

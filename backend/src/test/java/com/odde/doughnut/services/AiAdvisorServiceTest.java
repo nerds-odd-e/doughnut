@@ -9,7 +9,7 @@ import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.CompletionResult;
-import com.theokanning.openai.service.OpenAiService;
+import io.reactivex.Single;
 import java.util.Collections;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
@@ -25,21 +25,21 @@ import retrofit2.Response;
 class AiAdvisorServiceTest {
 
   private AiAdvisorService aiAdvisorService;
-  @Mock private OpenAiService openAiServiceMock;
   @Mock private OpenAiApi openAiApi;
   MakeMeWithoutDB makeMe = new MakeMeWithoutDB();
 
   @BeforeEach
   void Setup() {
     MockitoAnnotations.openMocks(this);
-    aiAdvisorService = new AiAdvisorService(openAiServiceMock, openAiApi);
+    aiAdvisorService = new AiAdvisorService(null, openAiApi);
   }
 
   @Test
   void getAiSuggestion_givenAString_returnsAiSuggestionObject() {
     CompletionResult completionResult =
         makeMe.openAiCompletionResult().choice("suggestion_value").please();
-    Mockito.when(openAiServiceMock.createCompletion(Mockito.any())).thenReturn(completionResult);
+    Mockito.when(openAiApi.createCompletion(Mockito.any()))
+        .thenReturn(Single.just(completionResult));
     assertEquals(
         "suggestion_value", aiAdvisorService.getAiSuggestion("suggestion_prompt").suggestion());
   }
@@ -47,8 +47,8 @@ class AiAdvisorServiceTest {
   @Test
   void getAiSuggestion_givenAString_whenHttpError_returnsEmptySuggestion() {
     HttpException httpException = buildHttpException(400);
-    Mockito.when(openAiServiceMock.createCompletion(ArgumentMatchers.any()))
-        .thenThrow(httpException);
+    Mockito.when(openAiApi.createCompletion(ArgumentMatchers.any()))
+        .thenReturn(Single.error(httpException));
     assertThrows(HttpException.class, () -> aiAdvisorService.getAiSuggestion("suggestion_prompt"));
   }
 
@@ -56,7 +56,8 @@ class AiAdvisorServiceTest {
   void getAiEngagingStory_givenAlistOfStrings_returnsAStory() {
     CompletionResult completionResult =
         makeMe.openAiCompletionResult().choice("This is an engaging story").please();
-    Mockito.when(openAiServiceMock.createCompletion(Mockito.any())).thenReturn(completionResult);
+    Mockito.when(openAiApi.createCompletion(Mockito.any()))
+        .thenReturn(Single.just(completionResult));
     assertEquals(
         "This is an engaging story",
         aiAdvisorService.getEngagingStory(Collections.singletonList("title")).engagingStory());
@@ -65,8 +66,8 @@ class AiAdvisorServiceTest {
   @Test
   void getAiSuggestion_given_invalidToken_return_401() {
     HttpException httpException = buildHttpException(401);
-    Mockito.when(openAiServiceMock.createCompletion(ArgumentMatchers.any()))
-        .thenThrow(httpException);
+    Mockito.when(openAiApi.createCompletion(ArgumentMatchers.any()))
+        .thenReturn(Single.error(httpException));
     OpenAiUnauthorizedException exception =
         assertThrows(OpenAiUnauthorizedException.class, () -> aiAdvisorService.getAiSuggestion(""));
     assertThat(exception.getMessage(), containsString("401"));

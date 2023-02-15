@@ -15,7 +15,7 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.CompletionResult;
-import com.theokanning.openai.service.OpenAiService;
+import io.reactivex.Single;
 import java.util.Collections;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +37,6 @@ import org.springframework.web.server.ResponseStatusException;
 class RestAiControllerTest {
   RestAiController controller;
   UserModel currentUser;
-  @Mock OpenAiService openAiService;
   @Mock OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
 
@@ -51,7 +50,7 @@ class RestAiControllerTest {
   @BeforeEach
   void Setup() {
     currentUser = makeMe.aUser().toModelPlease();
-    controller = new RestAiController(openAiService, openAiApi, currentUser);
+    controller = new RestAiController(null, openAiApi, currentUser);
   }
 
   @Nested
@@ -61,13 +60,12 @@ class RestAiControllerTest {
       assertThrows(
           ResponseStatusException.class,
           () ->
-              new RestAiController(openAiService, openAiApi, makeMe.aNullUserModel())
-                  .askSuggestion(params));
+              new RestAiController(null, openAiApi, makeMe.aNullUserModel()).askSuggestion(params));
     }
 
     @Test
     void askSuggestionWithRightPrompt() {
-      when(openAiService.createCompletion(
+      when(openAiApi.createCompletion(
               argThat(
                   request -> {
                     assertEquals("Earth", request.getPrompt());
@@ -79,7 +77,7 @@ class RestAiControllerTest {
 
     @Test
     void askSuggestionAndUseResponse() {
-      when(openAiService.createCompletion(any())).thenReturn(buildCompletionResult("blue planet"));
+      when(openAiApi.createCompletion(any())).thenReturn(buildCompletionResult("blue planet"));
       AiSuggestion aiSuggestion = controller.askSuggestion(params);
       assertEquals("blue planet", aiSuggestion.suggestion());
     }
@@ -104,7 +102,7 @@ class RestAiControllerTest {
 
     @Test
     void askEngagingStoryWithRightPrompt() throws UnexpectedNoAccessRightException {
-      when(openAiService.createCompletion(
+      when(openAiApi.createCompletion(
               argThat(
                   request -> {
                     assertEquals(
@@ -121,7 +119,7 @@ class RestAiControllerTest {
       // performance.
       // When this setting is changed please do a manual test that engaging stories can still be
       // requested.
-      when(openAiService.createCompletion(
+      when(openAiApi.createCompletion(
               argThat(
                   request -> {
                     assertEquals(150, request.getMaxTokens());
@@ -133,7 +131,7 @@ class RestAiControllerTest {
 
     @Test
     void askEngagingStoryReturnsEngagingStory() throws UnexpectedNoAccessRightException {
-      when(openAiService.createCompletion(Mockito.any()))
+      when(openAiApi.createCompletion(Mockito.any()))
           .thenReturn(buildCompletionResult("This is an engaging story."));
       final AiEngagingStory aiEngagingStory =
           controller.askEngagingStories(Collections.singletonList(aNote));
@@ -143,7 +141,7 @@ class RestAiControllerTest {
     @Test
     void askEngagingStoryForMultipleNotes_returnsEngagingStory()
         throws UnexpectedNoAccessRightException {
-      when(openAiService.createCompletion(
+      when(openAiApi.createCompletion(
               argThat(
                   request -> {
                     assertEquals(
@@ -158,7 +156,7 @@ class RestAiControllerTest {
   }
 
   @NotNull
-  private CompletionResult buildCompletionResult(String text) {
-    return makeMe.openAiCompletionResult().choice(text).please();
+  private Single<CompletionResult> buildCompletionResult(String text) {
+    return Single.just(makeMe.openAiCompletionResult().choice(text).please());
   }
 }

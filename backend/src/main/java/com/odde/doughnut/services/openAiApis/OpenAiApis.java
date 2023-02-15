@@ -20,9 +20,11 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 
 public class OpenAiApis {
   private OpenAiService service;
+  private OpenAiApi openAiApi;
 
-  public OpenAiApis(OpenAiService service) {
+  public OpenAiApis(OpenAiService service, OpenAiApi openAiApi) {
     this.service = service;
+    this.openAiApi = openAiApi;
   }
 
   public static OpenAiApi getOpenAiApi(String openAiToken, String baseUrl) {
@@ -41,7 +43,7 @@ public class OpenAiApis {
 
   private List<CompletionChoice> getCompletionChoices(CompletionRequest completionRequest) {
     try {
-      return service.createCompletion(completionRequest).getChoices();
+      return openAiApi.createCompletion(completionRequest).blockingGet().getChoices();
     } catch (HttpException e) {
       if (HttpStatus.UNAUTHORIZED.value() == e.code()) {
         throw new OpenAiUnauthorizedException(e.getMessage());
