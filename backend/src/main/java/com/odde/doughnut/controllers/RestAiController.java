@@ -30,7 +30,7 @@ public class RestAiController {
       @Qualifier("testableOpenAiService") OpenAiService openAiService,
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       UserModel currentUser) {
-    aiAdvisorService = new AiAdvisorService(openAiService);
+    aiAdvisorService = new AiAdvisorService(openAiService, openAiApi);
     this.currentUser = currentUser;
   }
 

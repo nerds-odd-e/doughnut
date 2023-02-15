@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
+import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.CompletionResult;
 import com.theokanning.openai.service.OpenAiService;
 import java.util.Collections;
@@ -25,12 +26,13 @@ class AiAdvisorServiceTest {
 
   private AiAdvisorService aiAdvisorService;
   @Mock private OpenAiService openAiServiceMock;
+  @Mock private OpenAiApi openAiApi;
   MakeMeWithoutDB makeMe = new MakeMeWithoutDB();
 
   @BeforeEach
   void Setup() {
     MockitoAnnotations.openMocks(this);
-    aiAdvisorService = new AiAdvisorService(openAiServiceMock);
+    aiAdvisorService = new AiAdvisorService(openAiServiceMock, openAiApi);
   }
 
   @Test

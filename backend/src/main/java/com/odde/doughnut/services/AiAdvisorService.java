@@ -3,14 +3,17 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.services.openAiApis.OpenAiApis;
+import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.service.OpenAiService;
 import java.util.List;
 
 public class AiAdvisorService {
   private final OpenAiApis openAiApis;
+  private final OpenAiApi openAiApi;
 
-  public AiAdvisorService(OpenAiService openAiService) {
+  public AiAdvisorService(OpenAiService openAiService, OpenAiApi openAiApi) {
     openAiApis = new OpenAiApis(openAiService);
+    this.openAiApi = openAiApi;
   }
 
   public AiSuggestion getAiSuggestion(String prompt) {
