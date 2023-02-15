@@ -7,7 +7,6 @@ import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.CompletionChoice;
 import com.theokanning.openai.completion.CompletionRequest;
-import com.theokanning.openai.service.OpenAiService;
 import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,11 +18,9 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 public class OpenAiApis {
-  private OpenAiService service;
   private OpenAiApi openAiApi;
 
-  public OpenAiApis(OpenAiService service, OpenAiApi openAiApi) {
-    this.service = service;
+  public OpenAiApis(OpenAiApi openAiApi) {
     this.openAiApi = openAiApi;
   }
 

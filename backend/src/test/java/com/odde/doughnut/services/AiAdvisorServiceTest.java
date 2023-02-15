@@ -31,7 +31,7 @@ class AiAdvisorServiceTest {
   @BeforeEach
   void Setup() {
     MockitoAnnotations.openMocks(this);
-    aiAdvisorService = new AiAdvisorService(null, openAiApi);
+    aiAdvisorService = new AiAdvisorService(openAiApi);
   }
 
   @Test

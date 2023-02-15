@@ -50,7 +50,7 @@ class RestAiControllerTest {
   @BeforeEach
   void Setup() {
     currentUser = makeMe.aUser().toModelPlease();
-    controller = new RestAiController(null, openAiApi, currentUser);
+    controller = new RestAiController(openAiApi, currentUser);
   }
 
   @Nested
@@ -59,8 +59,7 @@ class RestAiControllerTest {
     void askWithNoteThatCannotAccess() {
       assertThrows(
           ResponseStatusException.class,
-          () ->
-              new RestAiController(null, openAiApi, makeMe.aNullUserModel()).askSuggestion(params));
+          () -> new RestAiController(openAiApi, makeMe.aNullUserModel()).askSuggestion(params));
     }
 
     @Test

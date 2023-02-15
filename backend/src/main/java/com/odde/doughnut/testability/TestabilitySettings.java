@@ -6,7 +6,6 @@ import com.odde.doughnut.models.randomizers.RealRandomizer;
 import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.services.openAiApis.OpenAiApis;
 import com.theokanning.openai.OpenAiApi;
-import com.theokanning.openai.service.OpenAiService;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
@@ -91,13 +90,6 @@ public class TestabilitySettings {
       saved.put(serviceName, this.serviceUrls.get(serviceName));
       this.serviceUrls.put(serviceName, setWikidataService.get(serviceName));
     }
-  }
-
-  @Bean
-  @SessionScope
-  @Qualifier("testableOpenAiService")
-  public OpenAiService getTestableOpenAiService(OpenAiApi testableOpenAiApi) {
-    return new OpenAiService(testableOpenAiApi);
   }
 
   @Bean
