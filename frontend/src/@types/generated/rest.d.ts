@@ -11,6 +11,10 @@ declare namespace Generated {
         suggestion: string;
     }
 
+    interface AiSuggestionRequest {
+        title: string;
+    }
+
     interface CircleForUserView {
         id: number;
         name: string;

@@ -3,11 +3,11 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
+import com.odde.doughnut.entities.json.AiSuggestionRequest;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.theokanning.openai.OpenAiService;
-import java.util.HashMap;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,9 +32,9 @@ public class RestAiController {
   }
 
   @PostMapping("/ask-suggestions")
-  public AiSuggestion askSuggestion(@RequestBody HashMap<String, String> params) {
+  public AiSuggestion askSuggestion(@RequestBody AiSuggestionRequest aiSuggestionRequest) {
     currentUser.assertLoggedIn();
-    return aiAdvisorService.getAiSuggestion(params.get("title"));
+    return aiAdvisorService.getAiSuggestion(aiSuggestionRequest.title);
   }
 
   @GetMapping("/ask-engaging-stories")

@@ -13,8 +13,8 @@ public class AiAdvisorService {
     openAiApis = new OpenAiApis(openAiService);
   }
 
-  public AiSuggestion getAiSuggestion(String item) {
-    return new AiSuggestion(openAiApis.getOpenAiCompletion(item));
+  public AiSuggestion getAiSuggestion(String prompt) {
+    return new AiSuggestion(openAiApis.getOpenAiCompletion(prompt));
   }
 
   public AiEngagingStory getEngagingStory(List<String> items) {

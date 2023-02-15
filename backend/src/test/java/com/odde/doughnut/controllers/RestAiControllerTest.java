@@ -9,13 +9,13 @@ import static org.mockito.Mockito.when;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
+import com.odde.doughnut.entities.json.AiSuggestionRequest;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiService;
 import com.theokanning.openai.completion.CompletionResult;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,10 +39,10 @@ class RestAiControllerTest {
   @Mock OpenAiService openAiService;
   @Autowired MakeMe makeMe;
 
-  HashMap<String, String> params =
-      new HashMap<>() {
+  AiSuggestionRequest params =
+      new AiSuggestionRequest() {
         {
-          this.put("title", "Earth");
+          this.title = "Earth";
         }
       };
 
