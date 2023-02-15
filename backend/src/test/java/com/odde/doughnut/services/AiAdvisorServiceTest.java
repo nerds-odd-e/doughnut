@@ -37,7 +37,7 @@ class AiAdvisorServiceTest {
   @Test
   void getAiSuggestion_givenAString_returnsAiSuggestionObject() {
     CompletionResult completionResult =
-        makeMe.openAiCompletionResult().choice("suggestion_value").please();
+        makeMe.openAiCompletionResult().choice(" suggestion_value").please();
     Mockito.when(openAiApi.createCompletion(Mockito.any()))
         .thenReturn(Single.just(completionResult));
     assertEquals(

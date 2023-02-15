@@ -9,7 +9,6 @@ import com.theokanning.openai.completion.CompletionChoice;
 import com.theokanning.openai.completion.CompletionRequest;
 import java.time.Duration;
 import java.util.List;
-import java.util.stream.Collectors;
 import okhttp3.OkHttpClient;
 import org.springframework.http.HttpStatus;
 import retrofit2.HttpException;
@@ -59,6 +58,6 @@ public class OpenAiApis {
             .maxTokens(150)
             .build();
     List<CompletionChoice> choices = getCompletionChoices(completionRequest);
-    return choices.stream().map(CompletionChoice::getText).collect(Collectors.joining("")).trim();
+    return choices.stream().findFirst().map(CompletionChoice::getText).orElse("").trim();
   }
 }

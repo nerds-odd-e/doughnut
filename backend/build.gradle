@@ -45,6 +45,7 @@ dependencies {
   implementation 'com.theokanning.openai-gpt3-java:service:0.10.0'
   implementation 'com.squareup.retrofit2:adapter-rxjava2:2.9.0'
   implementation 'com.squareup.retrofit2:converter-jackson:2.9.0'
+  implementation 'io.projectreactor:reactor-core:3.5.3'
   compileOnly 'org.projectlombok:lombok'
   developmentOnly 'org.springframework.boot:spring-boot-devtools'
   runtimeOnly 'com.mysql:mysql-connector-j'
