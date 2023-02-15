@@ -12,7 +12,7 @@ declare namespace Generated {
     }
 
     interface AiSuggestionRequest {
-        title: string;
+        prompt: string;
     }
 
     interface CircleForUserView {

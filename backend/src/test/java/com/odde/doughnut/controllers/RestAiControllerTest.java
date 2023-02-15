@@ -42,7 +42,7 @@ class RestAiControllerTest {
   AiSuggestionRequest params =
       new AiSuggestionRequest() {
         {
-          this.title = "Earth";
+          this.prompt = "Earth";
         }
       };
 

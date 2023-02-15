@@ -44,6 +44,11 @@ export default defineComponent({
         updatedAt: this.selectedNote.textContent.updatedAt,
       } as Generated.TextContent;
     },
+    aiSuggestionRequest(): Generated.AiSuggestionRequest {
+      return {
+        prompt: `In one paragraph, tell me about ${this.selectedNote.title}`,
+      };
+    },
   },
   methods: {
     processForm() {
@@ -59,9 +64,7 @@ export default defineComponent({
   },
   mounted() {
     this.api.ai
-      .askAiSuggestions(
-        `In one paragraph, tell me about ${this.selectedNote.title}`
-      )
+      .askAiSuggestions(this.aiSuggestionRequest)
       .then((res) => {
         this.suggestedDescription = res.suggestion;
       })

@@ -245,10 +245,11 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
   },
   ai: {
-    async askAiSuggestions(title: string) {
-      return (await managedApi.restPost(`ai/ask-suggestions`, {
-        title,
-      })) as Generated.AiSuggestion;
+    async askAiSuggestions(request: Generated.AiSuggestionRequest) {
+      return (await managedApi.restPost(
+        `ai/ask-suggestions`,
+        request
+      )) as Generated.AiSuggestion;
     },
     async askAiEngagingStories(noteId: number) {
       return (await managedApi.restGet(
