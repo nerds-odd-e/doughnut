@@ -7,6 +7,7 @@ import com.odde.doughnut.entities.json.AiSuggestionRequest;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
+import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.service.OpenAiService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -26,7 +27,9 @@ public class RestAiController {
   private UserModel currentUser;
 
   public RestAiController(
-      @Qualifier("testableOpenAiService") OpenAiService openAiService, UserModel currentUser) {
+      @Qualifier("testableOpenAiService") OpenAiService openAiService,
+      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
+      UserModel currentUser) {
     aiAdvisorService = new AiAdvisorService(openAiService);
     this.currentUser = currentUser;
   }

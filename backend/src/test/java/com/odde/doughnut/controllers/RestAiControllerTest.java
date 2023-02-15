@@ -13,6 +13,7 @@ import com.odde.doughnut.entities.json.AiSuggestionRequest;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
+import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.CompletionResult;
 import com.theokanning.openai.service.OpenAiService;
 import java.util.Collections;
@@ -37,6 +38,7 @@ class RestAiControllerTest {
   RestAiController controller;
   UserModel currentUser;
   @Mock OpenAiService openAiService;
+  @Mock OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
 
   AiSuggestionRequest params =
@@ -49,7 +51,7 @@ class RestAiControllerTest {
   @BeforeEach
   void Setup() {
     currentUser = makeMe.aUser().toModelPlease();
-    controller = new RestAiController(openAiService, currentUser);
+    controller = new RestAiController(openAiService, openAiApi, currentUser);
   }
 
   @Nested
@@ -58,7 +60,9 @@ class RestAiControllerTest {
     void askWithNoteThatCannotAccess() {
       assertThrows(
           ResponseStatusException.class,
-          () -> new RestAiController(openAiService, makeMe.aNullUserModel()).askSuggestion(params));
+          () ->
+              new RestAiController(openAiService, openAiApi, makeMe.aNullUserModel())
+                  .askSuggestion(params));
     }
 
     @Test
