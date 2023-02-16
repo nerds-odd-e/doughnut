@@ -20,6 +20,7 @@ import java.util.Collections;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -54,6 +55,15 @@ class AiAdvisorServiceTest {
       assertEquals(
           "what goes up must come down",
           aiAdvisorService.getAiSuggestion("suggestion_prompt").blockLast().suggestion());
+    }
+
+    @Test
+    @Disabled
+    void the_data_returned_is_incomplete() {
+      when(openAiApi.createCompletion(completionRequestArgumentCaptor.capture()))
+          .thenReturn(IncompleteCompletionResultSingle);
+      aiAdvisorService.getAiSuggestion("what").blockFirst();
+      verify(openAiApi, Mockito.times(1)).createCompletion(any());
     }
 
     @Test

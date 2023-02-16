@@ -11,7 +11,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import okhttp3.OkHttpClient;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import reactor.core.publisher.Flux;
 import retrofit2.HttpException;
@@ -53,27 +52,12 @@ public class OpenAiApis {
 
   public Flux<String> getOpenAiCompletion(String prompt) {
     Optional<CompletionChoice> first = getCompletionChoice(prompt, 4);
-    String completedRaw = first.map(CompletionChoice::getText).orElse("").trim();
-    return Flux.just(completedRaw);
+    Flux<CompletionChoice> completionChoiceFlux = first.map(Flux::just).orElseGet(Flux::empty);
+    return completionChoiceFlux.map(CompletionChoice::getText);
   }
 
-  @NotNull
   private Optional<CompletionChoice> getCompletionChoice(String prompt, int retriesLeft) {
-    CompletionRequest completionRequest =
-        CompletionRequest.builder()
-            .prompt(prompt)
-            .model("text-davinci-003")
-            // This can go higher (up to 4000 - prompt size), but openAI performance goes down
-            // https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
-            .maxTokens(50)
-            //
-            // an effort has been made the response more responsive by using stream(true)
-            // how every, due to the library limitation, we cannot do it yet.
-            // find more details here:
-            //     https://github.com/TheoKanning/openai-java/issues/83
-            .stream(false)
-            .echo(true)
-            .build();
+    CompletionRequest completionRequest = getCompletionRequest(prompt);
     List<CompletionChoice> choices = getCompletionChoices(completionRequest);
 
     Optional<CompletionChoice> first = choices.stream().findFirst();
@@ -82,5 +66,22 @@ public class OpenAiApis {
             "length".equals(choice.getFinish_reason()) && retriesLeft > 0
                 ? getCompletionChoice(choice.getText(), retriesLeft - 1)
                 : first);
+  }
+
+  private static CompletionRequest getCompletionRequest(String prompt) {
+    return CompletionRequest.builder()
+        .prompt(prompt)
+        .model("text-davinci-003")
+        // This can go higher (up to 4000 - prompt size), but openAI performance goes down
+        // https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
+        .maxTokens(50)
+        //
+        // an effort has been made the response more responsive by using stream(true)
+        // how every, due to the library limitation, we cannot do it yet.
+        // find more details here:
+        //     https://github.com/TheoKanning/openai-java/issues/83
+        .stream(false)
+        .echo(true)
+        .build();
   }
 }
