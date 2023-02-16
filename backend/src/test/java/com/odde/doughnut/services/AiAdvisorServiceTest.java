@@ -39,29 +39,26 @@ class AiAdvisorServiceTest {
 
   @Nested
   class GetSuggestion {
+    Single<CompletionResult> completionResultSingle =
+        Single.just(makeMe.openAiCompletionResult().choice("what goes up must come down").please());
+
+    Single<CompletionResult> IncompleteCompletionResultSingle =
+        Single.just(
+            makeMe.openAiCompletionResult().choiceReachingLengthLimit("what goes up").please());
 
     @Test
     void getAiSuggestion_givenAString_returnsAiSuggestionObject() {
-      CompletionResult completionResult =
-          makeMe.openAiCompletionResult().choice(" suggestion_value").please();
-      Mockito.when(openAiApi.createCompletion(Mockito.any()))
-          .thenReturn(Single.just(completionResult));
+      Mockito.when(openAiApi.createCompletion(Mockito.any())).thenReturn(completionResultSingle);
       assertEquals(
-          "suggestion_value", aiAdvisorService.getAiSuggestion("suggestion_prompt").suggestion());
+          "what goes up must come down",
+          aiAdvisorService.getAiSuggestion("suggestion_prompt").suggestion());
     }
 
     @Test
     void the_data_returned_is_incomplete() {
       when(openAiApi.createCompletion(completionRequestArgumentCaptor.capture()))
-          .thenReturn(
-              Single.just(
-                  makeMe
-                      .openAiCompletionResult()
-                      .choiceReachingLengthLimit("what goes up")
-                      .please()))
-          .thenReturn(
-              Single.just(
-                  makeMe.openAiCompletionResult().choice("what goes up must come down").please()));
+          .thenReturn(IncompleteCompletionResultSingle)
+          .thenReturn(completionResultSingle);
       AiSuggestion aiSuggestion = aiAdvisorService.getAiSuggestion("what");
       assertEquals("what goes up must come down", aiSuggestion.suggestion());
       AssertionsForClassTypes.assertThat(

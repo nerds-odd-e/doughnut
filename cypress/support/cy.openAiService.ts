@@ -43,7 +43,7 @@ Cypress.Commands.add(
           text: reply,
           index: 0,
           logprobs: null,
-          finish_reason: "length",
+          finish_reason: "stop",
         },
       ],
       usage: {
