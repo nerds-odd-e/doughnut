@@ -15,14 +15,13 @@ public class AiAdvisorService {
   }
 
   public Flux<AiSuggestion> getAiSuggestion(String prompt) {
-    AiSuggestion aiSuggestion = new AiSuggestion(openAiApis.getOpenAiCompletion(prompt));
-    return Flux.just(aiSuggestion);
+    return openAiApis.getOpenAiCompletion(prompt).map(AiSuggestion::new);
   }
 
   public AiEngagingStory getEngagingStory(List<String> items) {
     final String topics = String.join(" and ", items);
     final String prompt = String.format("Tell me an engaging story to learn about %s.", topics);
 
-    return new AiEngagingStory(openAiApis.getOpenAiCompletion(prompt));
+    return new AiEngagingStory(openAiApis.getOpenAiCompletion(prompt).blockLast());
   }
 }

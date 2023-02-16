@@ -13,6 +13,7 @@ import java.util.Optional;
 import okhttp3.OkHttpClient;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
+import reactor.core.publisher.Flux;
 import retrofit2.HttpException;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -50,9 +51,10 @@ public class OpenAiApis {
     }
   }
 
-  public String getOpenAiCompletion(String prompt) {
+  public Flux<String> getOpenAiCompletion(String prompt) {
     Optional<CompletionChoice> first = getCompletionChoice(prompt, 4);
-    return first.map(CompletionChoice::getText).orElse("").trim();
+    String completedRaw = first.map(CompletionChoice::getText).orElse("").trim();
+    return Flux.just(completedRaw);
   }
 
   @NotNull
