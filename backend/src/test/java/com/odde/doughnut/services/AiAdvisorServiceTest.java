@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -18,7 +19,6 @@ import io.reactivex.Single;
 import java.util.Collections;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
-import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -57,15 +57,15 @@ class AiAdvisorServiceTest {
     }
 
     @Test
-    void the_data_returned_is_incomplete() {
+    void the_data_returned_is_incomplete_and_keep_receiving() {
       when(openAiApi.createCompletion(completionRequestArgumentCaptor.capture()))
           .thenReturn(IncompleteCompletionResultSingle)
           .thenReturn(completionResultSingle);
       AiSuggestion aiSuggestion = aiAdvisorService.getAiSuggestion("what").blockLast();
       assertEquals("what goes up must come down", aiSuggestion.suggestion());
-      AssertionsForClassTypes.assertThat(
-              completionRequestArgumentCaptor.getAllValues().get(1).getPrompt())
-          .isEqualTo("what goes up");
+      assertThat(
+          completionRequestArgumentCaptor.getAllValues().get(1).getPrompt(),
+          equalTo("what goes up"));
     }
 
     @Test
