@@ -60,7 +60,7 @@ public class OpenAiApis {
     CompletionRequest completionRequest =
         CompletionRequest.builder()
             .prompt(prompt)
-            .model("text-davinci-003"
+            .model("text-davinci-003")
             // This can go higher (up to 4000 - prompt size), but openAI performance goes down
             // https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
             .maxTokens(50)
