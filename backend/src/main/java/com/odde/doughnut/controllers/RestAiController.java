@@ -35,8 +35,7 @@ public class RestAiController {
   @PostMapping("/ask-suggestions")
   public Flux<AiSuggestion> askSuggestion(@RequestBody AiSuggestionRequest aiSuggestionRequest) {
     currentUser.assertLoggedIn();
-    AiSuggestion aiSuggestion = aiAdvisorService.getAiSuggestion(aiSuggestionRequest.prompt);
-    return Flux.just(aiSuggestion);
+    return aiAdvisorService.getAiSuggestion(aiSuggestionRequest.prompt);
   }
 
   @GetMapping("/ask-engaging-stories")

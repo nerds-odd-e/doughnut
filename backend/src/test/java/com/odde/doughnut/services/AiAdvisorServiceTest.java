@@ -53,7 +53,7 @@ class AiAdvisorServiceTest {
       Mockito.when(openAiApi.createCompletion(Mockito.any())).thenReturn(completionResultSingle);
       assertEquals(
           "what goes up must come down",
-          aiAdvisorService.getAiSuggestion("suggestion_prompt").suggestion());
+          aiAdvisorService.getAiSuggestion("suggestion_prompt").blockLast().suggestion());
     }
 
     @Test
@@ -61,7 +61,7 @@ class AiAdvisorServiceTest {
       when(openAiApi.createCompletion(completionRequestArgumentCaptor.capture()))
           .thenReturn(IncompleteCompletionResultSingle)
           .thenReturn(completionResultSingle);
-      AiSuggestion aiSuggestion = aiAdvisorService.getAiSuggestion("what");
+      AiSuggestion aiSuggestion = aiAdvisorService.getAiSuggestion("what").blockLast();
       assertEquals("what goes up must come down", aiSuggestion.suggestion());
       AssertionsForClassTypes.assertThat(
               completionRequestArgumentCaptor.getAllValues().get(1).getPrompt())
