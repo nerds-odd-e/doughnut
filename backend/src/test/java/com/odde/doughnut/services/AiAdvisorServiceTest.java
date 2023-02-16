@@ -4,22 +4,23 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
+import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.theokanning.openai.OpenAiApi;
+import com.theokanning.openai.completion.CompletionRequest;
 import com.theokanning.openai.completion.CompletionResult;
 import io.reactivex.Single;
 import java.util.Collections;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import retrofit2.HttpException;
 import retrofit2.Response;
 
@@ -27,6 +28,7 @@ class AiAdvisorServiceTest {
 
   private AiAdvisorService aiAdvisorService;
   @Mock private OpenAiApi openAiApi;
+  @Captor ArgumentCaptor<CompletionRequest> completionRequestArgumentCaptor;
   MakeMeWithoutDB makeMe = new MakeMeWithoutDB();
 
   @BeforeEach
@@ -37,6 +39,7 @@ class AiAdvisorServiceTest {
 
   @Nested
   class GetSuggestion {
+
     @Test
     void getAiSuggestion_givenAString_returnsAiSuggestionObject() {
       CompletionResult completionResult =
@@ -45,6 +48,25 @@ class AiAdvisorServiceTest {
           .thenReturn(Single.just(completionResult));
       assertEquals(
           "suggestion_value", aiAdvisorService.getAiSuggestion("suggestion_prompt").suggestion());
+    }
+
+    @Test
+    void the_data_returned_is_incomplete() {
+      when(openAiApi.createCompletion(completionRequestArgumentCaptor.capture()))
+          .thenReturn(
+              Single.just(
+                  makeMe
+                      .openAiCompletionResult()
+                      .choiceReachingLengthLimit("what goes up")
+                      .please()))
+          .thenReturn(
+              Single.just(
+                  makeMe.openAiCompletionResult().choice("what goes up must come down").please()));
+      AiSuggestion aiSuggestion = aiAdvisorService.getAiSuggestion("what");
+      assertEquals("what goes up must come down", aiSuggestion.suggestion());
+      AssertionsForClassTypes.assertThat(
+              completionRequestArgumentCaptor.getAllValues().get(1).getPrompt())
+          .isEqualTo("what goes up");
     }
 
     @Test

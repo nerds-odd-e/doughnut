@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -15,7 +14,6 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
-import com.theokanning.openai.completion.CompletionRequest;
 import com.theokanning.openai.completion.CompletionResult;
 import io.reactivex.Single;
 import java.util.Collections;
@@ -25,8 +23,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,8 +55,6 @@ class RestAiControllerTest {
 
   @Nested
   class AskSuggestion {
-    @Captor ArgumentCaptor<CompletionRequest> completionRequestArgumentCaptor;
-
     @Test
     void askWithNoteThatCannotAccess() {
       assertThrows(
@@ -85,19 +79,6 @@ class RestAiControllerTest {
       when(openAiApi.createCompletion(any())).thenReturn(buildCompletionResult("blue planet"));
       AiSuggestion aiSuggestion = controller.askSuggestion(params);
       assertEquals("blue planet", aiSuggestion.suggestion());
-    }
-
-    @Test
-    void the_data_returned_is_incomplete() {
-      when(openAiApi.createCompletion(completionRequestArgumentCaptor.capture()))
-          .thenReturn(
-              Single.just(
-                  makeMe.openAiCompletionResult().choiceReachingLengthLimit("blue").please()))
-          .thenReturn(buildCompletionResult("blue planet"));
-      AiSuggestion aiSuggestion = controller.askSuggestion(params);
-      assertEquals("blue planet", aiSuggestion.suggestion());
-      assertThat(completionRequestArgumentCaptor.getAllValues().get(1).getPrompt())
-          .isEqualTo("blue");
     }
   }
 
