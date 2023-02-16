@@ -33,17 +33,10 @@ public class RestAiController {
   }
 
   @PostMapping("/ask-suggestions")
-  public Flux<AiSuggestion> askSuggestion_new(
-      @RequestBody AiSuggestionRequest aiSuggestionRequest) {
+  public Flux<AiSuggestion> askSuggestion(@RequestBody AiSuggestionRequest aiSuggestionRequest) {
     currentUser.assertLoggedIn();
     AiSuggestion aiSuggestion = aiAdvisorService.getAiSuggestion(aiSuggestionRequest.prompt);
     return Flux.just(aiSuggestion);
-  }
-
-  @PostMapping("/ask-suggestions_old")
-  public AiSuggestion askSuggestion(@RequestBody AiSuggestionRequest aiSuggestionRequest) {
-    currentUser.assertLoggedIn();
-    return aiAdvisorService.getAiSuggestion(aiSuggestionRequest.prompt);
   }
 
   @GetMapping("/ask-engaging-stories")
