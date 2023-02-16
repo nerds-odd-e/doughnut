@@ -14,6 +14,7 @@ import java.util.Collections;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
@@ -34,43 +35,51 @@ class AiAdvisorServiceTest {
     aiAdvisorService = new AiAdvisorService(openAiApi);
   }
 
-  @Test
-  void getAiSuggestion_givenAString_returnsAiSuggestionObject() {
-    CompletionResult completionResult =
-        makeMe.openAiCompletionResult().choice(" suggestion_value").please();
-    Mockito.when(openAiApi.createCompletion(Mockito.any()))
-        .thenReturn(Single.just(completionResult));
-    assertEquals(
-        "suggestion_value", aiAdvisorService.getAiSuggestion("suggestion_prompt").suggestion());
+  @Nested
+  class GetSuggestion {
+    @Test
+    void getAiSuggestion_givenAString_returnsAiSuggestionObject() {
+      CompletionResult completionResult =
+          makeMe.openAiCompletionResult().choice(" suggestion_value").please();
+      Mockito.when(openAiApi.createCompletion(Mockito.any()))
+          .thenReturn(Single.just(completionResult));
+      assertEquals(
+          "suggestion_value", aiAdvisorService.getAiSuggestion("suggestion_prompt").suggestion());
+    }
+
+    @Test
+    void getAiSuggestion_givenAString_whenHttpError_returnsEmptySuggestion() {
+      HttpException httpException = buildHttpException(400);
+      Mockito.when(openAiApi.createCompletion(ArgumentMatchers.any()))
+          .thenReturn(Single.error(httpException));
+      assertThrows(
+          HttpException.class, () -> aiAdvisorService.getAiSuggestion("suggestion_prompt"));
+    }
+
+    @Test
+    void getAiSuggestion_given_invalidToken_return_401() {
+      HttpException httpException = buildHttpException(401);
+      Mockito.when(openAiApi.createCompletion(ArgumentMatchers.any()))
+          .thenReturn(Single.error(httpException));
+      OpenAiUnauthorizedException exception =
+          assertThrows(
+              OpenAiUnauthorizedException.class, () -> aiAdvisorService.getAiSuggestion(""));
+      assertThat(exception.getMessage(), containsString("401"));
+    }
   }
 
-  @Test
-  void getAiSuggestion_givenAString_whenHttpError_returnsEmptySuggestion() {
-    HttpException httpException = buildHttpException(400);
-    Mockito.when(openAiApi.createCompletion(ArgumentMatchers.any()))
-        .thenReturn(Single.error(httpException));
-    assertThrows(HttpException.class, () -> aiAdvisorService.getAiSuggestion("suggestion_prompt"));
-  }
-
-  @Test
-  void getAiEngagingStory_givenAlistOfStrings_returnsAStory() {
-    CompletionResult completionResult =
-        makeMe.openAiCompletionResult().choice("This is an engaging story").please();
-    Mockito.when(openAiApi.createCompletion(Mockito.any()))
-        .thenReturn(Single.just(completionResult));
-    assertEquals(
-        "This is an engaging story",
-        aiAdvisorService.getEngagingStory(Collections.singletonList("title")).engagingStory());
-  }
-
-  @Test
-  void getAiSuggestion_given_invalidToken_return_401() {
-    HttpException httpException = buildHttpException(401);
-    Mockito.when(openAiApi.createCompletion(ArgumentMatchers.any()))
-        .thenReturn(Single.error(httpException));
-    OpenAiUnauthorizedException exception =
-        assertThrows(OpenAiUnauthorizedException.class, () -> aiAdvisorService.getAiSuggestion(""));
-    assertThat(exception.getMessage(), containsString("401"));
+  @Nested
+  class GetEngagingStory {
+    @Test
+    void getAiEngagingStory_givenAlistOfStrings_returnsAStory() {
+      CompletionResult completionResult =
+          makeMe.openAiCompletionResult().choice("This is an engaging story").please();
+      Mockito.when(openAiApi.createCompletion(Mockito.any()))
+          .thenReturn(Single.just(completionResult));
+      assertEquals(
+          "This is an engaging story",
+          aiAdvisorService.getEngagingStory(Collections.singletonList("title")).engagingStory());
+    }
   }
 
   private static HttpException buildHttpException(int statusCode) {

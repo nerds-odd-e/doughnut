@@ -18,6 +18,17 @@ public class OpenAICompletionResultBuilder {
     return this;
   }
 
+  public OpenAICompletionResultBuilder choiceReachingLengthLimit(String incompleteText) {
+    choices.add(
+        new CompletionChoice() {
+          {
+            this.setText(incompleteText);
+            this.setFinish_reason("length");
+          }
+        });
+    return this;
+  }
+
   public CompletionResult please() {
     CompletionResult completionResult = new CompletionResult();
     completionResult.setChoices(choices);
