@@ -53,7 +53,7 @@ export default defineComponent({
     },
     aiSuggestionRequest(): Generated.AiSuggestionRequest {
       return {
-        prompt: `In one paragraph, tell me about "${this.selectedNote.title}"`,
+        prompt: `Tell me about "${this.selectedNote.title}"`,
       };
     },
   },

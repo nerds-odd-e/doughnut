@@ -32,7 +32,7 @@ describe("NoteSuggestDescriptionDialog", () => {
       "/api/ai/ask-suggestions",
       expect.objectContaining({
         body: expect.stringContaining(
-          `"prompt":"In one paragraph, tell me about \\"${note.title}\\""`
+          `"prompt":"Tell me about \\"${note.title}\\""`
         ),
       })
     );

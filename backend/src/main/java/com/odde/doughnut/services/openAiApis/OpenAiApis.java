@@ -56,6 +56,12 @@ public class OpenAiApis {
             // This can go higher (up to 4000 - prompt size), but openAI performance goes down
             // https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
             .maxTokens(150)
+            //
+            // an effort has been made the response more responsive by using stream(true)
+            // how every, due to the library limitation, we cannot do it yet.
+            // find more details here:
+            //     https://github.com/TheoKanning/openai-java/issues/83
+            .stream(false)
             .build();
     List<CompletionChoice> choices = getCompletionChoices(completionRequest);
     return choices.stream().findFirst().map(CompletionChoice::getText).orElse("").trim();
