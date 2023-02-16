@@ -4,6 +4,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.entities.json.AiSuggestion;
@@ -64,6 +66,13 @@ class AiAdvisorServiceTest {
       AssertionsForClassTypes.assertThat(
               completionRequestArgumentCaptor.getAllValues().get(1).getPrompt())
           .isEqualTo("what goes up");
+    }
+
+    @Test
+    void the_data_returned_is_incomplete_for_too_many_times() {
+      when(openAiApi.createCompletion(any())).thenReturn(IncompleteCompletionResultSingle);
+      aiAdvisorService.getAiSuggestion("what");
+      verify(openAiApi, Mockito.times(5)).createCompletion(any());
     }
 
     @Test

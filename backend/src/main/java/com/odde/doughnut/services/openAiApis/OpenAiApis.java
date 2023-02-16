@@ -51,16 +51,16 @@ public class OpenAiApis {
   }
 
   public String getOpenAiCompletion(String prompt) {
-    Optional<CompletionChoice> first = getCompletionChoice(prompt);
+    Optional<CompletionChoice> first = getCompletionChoice(prompt, 4);
     return first.map(CompletionChoice::getText).orElse("").trim();
   }
 
   @NotNull
-  private Optional<CompletionChoice> getCompletionChoice(String prompt) {
+  private Optional<CompletionChoice> getCompletionChoice(String prompt, int retriesLeft) {
     CompletionRequest completionRequest =
         CompletionRequest.builder()
             .prompt(prompt)
-            .model("text-davinci-003")
+            .model("text-davinci-003"
             // This can go higher (up to 4000 - prompt size), but openAI performance goes down
             // https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
             .maxTokens(50)
@@ -75,11 +75,10 @@ public class OpenAiApis {
     List<CompletionChoice> choices = getCompletionChoices(completionRequest);
 
     Optional<CompletionChoice> first = choices.stream().findFirst();
-    System.out.println("first: " + first);
     return first.flatMap(
         choice ->
-            "length".equals(choice.getFinish_reason())
-                ? getCompletionChoice(choice.getText())
+            "length".equals(choice.getFinish_reason()) && retriesLeft > 0
+                ? getCompletionChoice(choice.getText(), retriesLeft - 1)
                 : first);
   }
 }
