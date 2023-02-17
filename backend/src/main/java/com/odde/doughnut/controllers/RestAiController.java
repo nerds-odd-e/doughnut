@@ -10,6 +10,7 @@ import com.odde.doughnut.services.AiAdvisorService;
 import com.theokanning.openai.OpenAiApi;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,7 +33,7 @@ public class RestAiController {
     this.currentUser = currentUser;
   }
 
-  @PostMapping(value = "/ask-suggestions" /*, produces = MediaType.APPLICATION_NDJSON_VALUE*/)
+  @PostMapping(value = "/ask-suggestions", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
   public Flux<AiSuggestion> askSuggestion(@RequestBody AiSuggestionRequest aiSuggestionRequest) {
     currentUser.assertLoggedIn();
     return aiAdvisorService.getAiSuggestion(aiSuggestionRequest.prompt);

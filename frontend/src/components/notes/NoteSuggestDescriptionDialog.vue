@@ -73,7 +73,7 @@ export default defineComponent({
     this.api.ai
       .askAiSuggestions(this.aiSuggestionRequest)
       .then((res) => {
-        this.suggestedDescription = res[res.length - 1].suggestion;
+        this.suggestedDescription = res.suggestion;
       })
       .catch((er) => {
         this.errorMessage = er.message;

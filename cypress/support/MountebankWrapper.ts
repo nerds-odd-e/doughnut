@@ -47,7 +47,8 @@ class MountebankWrapper {
     return this.addStubToImposter(
       new Stub()
         .withPredicate(predicate)
-        .withResponse(new Response().withStatusCode(200).withJSONBody(response), wait),
+        .withResponse(new Response().withStatusCode(200).withJSONBody(response)),
+      wait,
     )
   }
 

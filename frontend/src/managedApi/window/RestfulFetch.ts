@@ -26,6 +26,49 @@ function objectToFormData(data: JsonData) {
   return formData;
 }
 
+function parseMultijson(multijson: string) {
+  let isEscaped = false;
+  let lastRootBracket = 0;
+  let inString = false;
+  let bracketDepth = 0;
+  let char: string;
+  for (let i = 0; i < multijson.length; i += 1) {
+    if (isEscaped) {
+      isEscaped = false;
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+    char = multijson.charAt(i);
+
+    if (char === "\\") {
+      if (inString) {
+        isEscaped = true;
+      } else {
+        throw new Error("Invalid json: backslash outside string");
+      }
+    } else if (char === '"') {
+      inString = !inString;
+    } else if (!inString) {
+      if (char === "{") {
+        if (bracketDepth === 0) {
+          lastRootBracket = i;
+        }
+        bracketDepth += 1;
+      } else if (char === "}") {
+        bracketDepth -= 1;
+        if (bracketDepth < 0) {
+          throw new Error("Invalid JSON: unbalanced brackets");
+        }
+      }
+    }
+  }
+
+  if (bracketDepth !== 0) {
+    throw new Error("Invalid JSON: unbalanced brackets");
+  }
+
+  return JSON.parse(multijson.substring(lastRootBracket));
+}
 interface RequestOptions {
   method: HttpMethod;
   contentType?: "json" | "MultiplePartForm";
@@ -70,10 +113,28 @@ class RestfulFetch {
   }
 
   async restRequest(url: string, data: JsonData, params: RequestOptions) {
+    const gen = this.restRequest1(url, data, params);
+    const item = gen.next();
+    return (await item).value;
+  }
+
+  async *restRequest1(url: string, data: JsonData, params: RequestOptions) {
     const response = await request(this.expandUrl(url), data, params);
-    const jsonResponse = await response.json();
-    if (response.status === 400) throw new BadRequestError(jsonResponse);
-    return jsonResponse;
+    if (response.status === 400)
+      throw new BadRequestError(await response.json());
+    const reader = response.body?.getReader();
+    let done = false;
+    while (reader && !done) {
+      // eslint-disable-next-line no-await-in-loop
+      const { done: isDone, value } = await reader.read();
+      done = done || isDone;
+      const jsonString = new TextDecoder("utf-8").decode(value);
+      try {
+        yield JSON.parse(jsonString);
+      } catch (_e) {
+        yield parseMultijson(jsonString);
+      }
+    }
   }
 
   async restRequestWithHtmlResponse(

@@ -13,6 +13,8 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import okhttp3.OkHttpClient;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 import reactor.core.publisher.Flux;
 import retrofit2.HttpException;
 import retrofit2.Retrofit;
@@ -57,8 +59,10 @@ public class OpenAiApis {
 
   private Flux<CompletionChoice> getCompletionChoice(String prompt, final int retriesLeft) {
     AtomicInteger count = new AtomicInteger();
+    RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
     return Flux.deferContextual(
         contextView -> {
+          RequestContextHolder.setRequestAttributes(requestAttributes, true);
           return Flux.generate(
               () -> prompt,
               (pmt, sink) -> {
@@ -82,8 +86,7 @@ public class OpenAiApis {
     CompletionRequest completionRequest = getCompletionRequest(prompt);
     List<CompletionChoice> choices = getCompletionChoices(completionRequest);
 
-    Optional<CompletionChoice> first = choices.stream().findFirst();
-    return first;
+    return choices.stream().findFirst();
   }
 
   private static CompletionRequest getCompletionRequest(String prompt) {
