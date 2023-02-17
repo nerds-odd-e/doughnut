@@ -35,7 +35,7 @@ const request = async (
   url: string,
   data: JsonData | undefined,
   { method, contentType = "json" }: RequestOptions
-) => {
+): Promise<Response> => {
   const headers = new Headers();
   headers.set("Accept", "*/*");
   let body: string | FormData | undefined;
@@ -48,11 +48,8 @@ const request = async (
     }
   }
   const res = await fetch(url, { method, headers, body });
-  if (res.status === 200 || res.status === 400) {
+  if (res.status === 200 || res.status === 204 || res.status === 400) {
     return res;
-  }
-  if (res.status === 204) {
-    return { status: 204, json: () => null, text: () => null };
   }
   if (res.status === 401) {
     await loginOrRegisterAndHaltThisThread();
