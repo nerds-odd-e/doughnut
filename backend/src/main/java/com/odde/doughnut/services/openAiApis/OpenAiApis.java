@@ -10,6 +10,7 @@ import com.theokanning.openai.completion.CompletionRequest;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import okhttp3.OkHttpClient;
 import org.springframework.http.HttpStatus;
 import reactor.core.publisher.Flux;
@@ -51,21 +52,38 @@ public class OpenAiApis {
   }
 
   public Flux<String> getOpenAiCompletion(String prompt) {
-    Optional<CompletionChoice> first = getCompletionChoice(prompt, 4);
-    Flux<CompletionChoice> completionChoiceFlux = first.map(Flux::just).orElseGet(Flux::empty);
-    return completionChoiceFlux.map(CompletionChoice::getText);
+    return getCompletionChoice(prompt, 5).map(CompletionChoice::getText);
   }
 
-  private Optional<CompletionChoice> getCompletionChoice(String prompt, int retriesLeft) {
+  private Flux<CompletionChoice> getCompletionChoice(String prompt, int retriesLeft) {
+    AtomicInteger count = new AtomicInteger();
+    return Flux.deferContextual(
+        contextView -> {
+          return Flux.generate(
+              () -> prompt,
+              (pmt, sink) -> {
+                if (count.getAndIncrement() < retriesLeft) {
+                  Optional<CompletionChoice> first = getCompletionChoice1(pmt);
+                  if (first.isPresent()) {
+                    CompletionChoice choice = first.get();
+                    sink.next(choice);
+                    if ("length".equals(choice.getFinish_reason())) {
+                      return choice.getText();
+                    }
+                  }
+                }
+                sink.complete();
+                return null;
+              });
+        });
+  }
+
+  private Optional<CompletionChoice> getCompletionChoice1(String prompt) {
     CompletionRequest completionRequest = getCompletionRequest(prompt);
     List<CompletionChoice> choices = getCompletionChoices(completionRequest);
 
     Optional<CompletionChoice> first = choices.stream().findFirst();
-    return first.flatMap(
-        choice ->
-            "length".equals(choice.getFinish_reason()) && retriesLeft > 0
-                ? getCompletionChoice(choice.getText(), retriesLeft - 1)
-                : first);
+    return first;
   }
 
   private static CompletionRequest getCompletionRequest(String prompt) {

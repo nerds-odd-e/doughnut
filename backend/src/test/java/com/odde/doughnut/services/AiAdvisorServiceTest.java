@@ -20,10 +20,10 @@ import java.util.Collections;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import reactor.core.publisher.Flux;
 import retrofit2.HttpException;
 import retrofit2.Response;
 
@@ -58,7 +58,6 @@ class AiAdvisorServiceTest {
     }
 
     @Test
-    @Disabled
     void the_data_returned_is_incomplete() {
       when(openAiApi.createCompletion(completionRequestArgumentCaptor.capture()))
           .thenReturn(IncompleteCompletionResultSingle);
@@ -81,7 +80,7 @@ class AiAdvisorServiceTest {
     @Test
     void the_data_returned_is_incomplete_for_too_many_times() {
       when(openAiApi.createCompletion(any())).thenReturn(IncompleteCompletionResultSingle);
-      aiAdvisorService.getAiSuggestion("what");
+      aiAdvisorService.getAiSuggestion("what").blockLast();
       verify(openAiApi, Mockito.times(5)).createCompletion(any());
     }
 
@@ -90,8 +89,8 @@ class AiAdvisorServiceTest {
       HttpException httpException = buildHttpException(400);
       Mockito.when(openAiApi.createCompletion(ArgumentMatchers.any()))
           .thenReturn(Single.error(httpException));
-      assertThrows(
-          HttpException.class, () -> aiAdvisorService.getAiSuggestion("suggestion_prompt"));
+      Flux<AiSuggestion> suggestionFlux = aiAdvisorService.getAiSuggestion("suggestion_prompt");
+      assertThrows(HttpException.class, () -> suggestionFlux.blockFirst());
     }
 
     @Test
@@ -99,9 +98,9 @@ class AiAdvisorServiceTest {
       HttpException httpException = buildHttpException(401);
       Mockito.when(openAiApi.createCompletion(ArgumentMatchers.any()))
           .thenReturn(Single.error(httpException));
+      Flux<AiSuggestion> aiSuggestion = aiAdvisorService.getAiSuggestion("");
       OpenAiUnauthorizedException exception =
-          assertThrows(
-              OpenAiUnauthorizedException.class, () -> aiAdvisorService.getAiSuggestion(""));
+          assertThrows(OpenAiUnauthorizedException.class, () -> aiSuggestion.blockFirst());
       assertThat(exception.getMessage(), containsString("401"));
     }
   }

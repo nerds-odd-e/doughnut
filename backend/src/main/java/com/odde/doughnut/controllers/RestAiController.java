@@ -32,7 +32,7 @@ public class RestAiController {
     this.currentUser = currentUser;
   }
 
-  @PostMapping("/ask-suggestions")
+  @PostMapping(value = "/ask-suggestions" /*, produces = MediaType.APPLICATION_NDJSON_VALUE*/)
   public Flux<AiSuggestion> askSuggestion(@RequestBody AiSuggestionRequest aiSuggestionRequest) {
     currentUser.assertLoggedIn();
     return aiAdvisorService.getAiSuggestion(aiSuggestionRequest.prompt);

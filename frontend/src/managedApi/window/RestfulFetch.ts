@@ -37,7 +37,7 @@ const request = async (
   { method, contentType = "json" }: RequestOptions
 ) => {
   const headers = new Headers();
-  headers.set("Accept", "application/json");
+  headers.set("Accept", "*/*");
   let body: string | FormData | undefined;
   if (method !== "GET" && data) {
     if (contentType === "json") {
