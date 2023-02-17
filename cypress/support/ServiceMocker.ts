@@ -35,12 +35,8 @@ class ServiceMocker {
     )
   }
 
-  public stubPoster(path: string, response: unknown, wait?: number) {
-    return this.mountebank.stubWithPredicate(
-      new DefaultPredicate(path, HttpMethod.POST),
-      response,
-      wait,
-    )
+  public stubPoster(path: string, response: unknown) {
+    return this.mountebank.stubWithPredicate(new DefaultPredicate(path, HttpMethod.POST), response)
   }
 
   public stubPosterUnauthorized(pathMatcher: string, response: unknown) {
