@@ -54,7 +54,7 @@ Cypress.Commands.add(
           total_tokens: 12,
         },
       },
-      finishReason === "length" ? 10 : undefined,
+      finishReason === "length" ? 100 : undefined,
     )
   },
 )

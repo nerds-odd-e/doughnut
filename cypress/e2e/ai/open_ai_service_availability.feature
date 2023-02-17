@@ -14,12 +14,9 @@ Feature: Open AI service availability
       Then I should see that the open AI service is not available
 
   @usingMockedOpenAiService
-  Scenario: Suggestions parts are displayed when failed to get full response
+  Scenario Outline: Suggestions parts are displayed as soon as they are available
     Given OpenAI has an incomplete idea that "Gravity" means "What goes up"
     When I ask for a description suggestion for "Gravity"
     Then I should be prompted with a suggested description "What goes up"
-
-  # this test is not possible to implement with the current implementation of Cypress.
-  # because the fetch request will block until the full response is received.
-  @usingMockedOpenAiService
-  Scenario: Suggestions parts are displayed as soon as they are available
+    When OpenAI thinks that "Gravity" means "What goes up must come down"
+    # Then I should be prompted with a suggested description "What goes up must come down"

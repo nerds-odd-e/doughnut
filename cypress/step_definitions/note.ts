@@ -52,13 +52,6 @@ Given("OpenAI thinks that {string} means {string}", (noteTitle: string, descript
 Given(
   "OpenAI has an incomplete idea that {string} means {string}",
   (noteTitle: string, description: string) => {
-    cy.intercept("POST", "/api/ai/ask-suggestions", (req) => {
-      console.log("intercepted ask-suggestions", req)
-      req.continue((res) => {
-        console.log("intercepted resp", res)
-        res.setDelay(0)
-      })
-    }).as("askSuggestions")
     cy.openAiService().stubOpenAiCompletion(noteTitle, description, "length")
   },
 )
