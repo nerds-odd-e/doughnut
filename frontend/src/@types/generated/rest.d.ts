@@ -9,6 +9,7 @@ declare namespace Generated {
 
     interface AiSuggestion {
         suggestion: string;
+        finishReason: string;
     }
 
     interface AiSuggestionRequest {

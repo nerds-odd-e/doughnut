@@ -5,9 +5,9 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.theokanning.openai.OpenAiApi;
@@ -56,10 +56,9 @@ class AiAdvisorServiceTest {
 
     @Test
     void the_data_returned_is_incomplete() {
-      when(openAiApi.createCompletion(completionRequestArgumentCaptor.capture()))
-          .thenReturn(IncompleteCompletionResultSingle);
-      aiAdvisorService.getAiSuggestion("what");
-      verify(openAiApi, Mockito.times(1)).createCompletion(any());
+      when(openAiApi.createCompletion(any())).thenReturn(IncompleteCompletionResultSingle);
+      AiSuggestion suggestion = aiAdvisorService.getAiSuggestion("what");
+      assertEquals("length", suggestion.getFinishReason());
     }
 
     @Test
