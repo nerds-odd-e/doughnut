@@ -11,7 +11,7 @@ describe("NoteSuggestDescriptionDialog", () => {
   beforeEach(() => {
     helper.apiMock
       .expectingPost(`/api/ai/ask-suggestions`)
-      .andReturnOnce([{ suggestion: "suggestion" }]);
+      .andReturnOnce({ suggestion: "suggestion" });
   });
 
   it("fetches from api", async () => {

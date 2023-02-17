@@ -34,7 +34,7 @@ public class RestAiController {
   @PostMapping(value = "/ask-suggestions" /*, produces = MediaType.APPLICATION_NDJSON_VALUE*/)
   public AiSuggestion askSuggestion(@RequestBody AiSuggestionRequest aiSuggestionRequest) {
     currentUser.assertLoggedIn();
-    return aiAdvisorService.getAiSuggestion(aiSuggestionRequest.prompt).blockFirst();
+    return aiAdvisorService.getAiSuggestion(aiSuggestionRequest.prompt);
   }
 
   @GetMapping("/ask-engaging-stories")
