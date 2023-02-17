@@ -51,8 +51,8 @@ public class OpenAiApis {
     }
   }
 
-  public Flux<String> getOpenAiCompletion(String prompt) {
-    return getCompletionChoice(prompt, 5).map(CompletionChoice::getText);
+  public String getOpenAiCompletion(String prompt) {
+    return getCompletionChoice(prompt, 5).map(CompletionChoice::getText).blockFirst();
   }
 
   private Flux<CompletionChoice> getCompletionChoice(String prompt, final int retriesLeft) {
