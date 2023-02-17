@@ -46,8 +46,15 @@ Given("there are notes from Note {int} to Note {int}", (from: number, to: number
 })
 
 Given("OpenAI thinks that {string} means {string}", (noteTitle: string, description: string) => {
-  cy.openAiService().stubOpenAiCompletion(noteTitle, description)
+  cy.openAiService().stubOpenAiCompletion(noteTitle, description, "stop")
 })
+
+Given(
+  "OpenAI has an incomplete idea that {string} means {string}",
+  (noteTitle: string, description: string) => {
+    cy.openAiService().stubOpenAiCompletion(noteTitle, description, "length")
+  },
+)
 
 When("I create notebooks with:", (notes: DataTable) => {
   notes.hashes().forEach((noteAttributes) => {

@@ -32,7 +32,7 @@ import ServiceMocker from "./ServiceMocker"
 Cypress.Commands.add(
   "stubOpenAiCompletion",
   { prevSubject: true },
-  (serviceMocker: ServiceMocker, title: string, reply: string) => {
+  (serviceMocker: ServiceMocker, title: string, reply: string, finishReason: "length" | "stop") => {
     serviceMocker.stubPoster(`/v1/completions`, {
       id: "cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7",
       object: "text_completion",
@@ -43,7 +43,7 @@ Cypress.Commands.add(
           text: reply,
           index: 0,
           logprobs: null,
-          finish_reason: "stop",
+          finish_reason: finishReason,
         },
       ],
       usage: {

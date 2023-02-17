@@ -99,7 +99,11 @@ declare namespace Cypress {
       wikipediaLink: string | undefined,
     ): Chainable<Subject>
     stubWikidataSearchResult(wikidataLabel: string, wikidataId: string): Chainable<Subject>
-    stubOpenAiCompletion(title: string, reply: string): Chainable<Subject>
+    stubOpenAiCompletion(
+      title: string,
+      reply: string,
+      finishReason: "length" | "stop",
+    ): Chainable<Subject>
     stubOpenAiCompletionWithErrorResponse(): Chainable<Subject>
     alwaysResponseAsUnauthorized(): Chainable<any>
     subscribeToNotebook(notebookTitle: string, dailyLearningCount: string): Chainable<any>
