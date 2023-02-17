@@ -7,7 +7,7 @@ Feature: Tell me a engaging story
 
   @usingMockedOpenAiService
   Scenario: get an engaging story for a note
-    Given OpenAI thinks that "Animals" means "Cow says moo"
+    Given OpenAI always return text completion "Cow says moo"
     When I ask for an engaging story for "Animals"
     Then I should be prompted with an engaging story description "Cow says moo"
 

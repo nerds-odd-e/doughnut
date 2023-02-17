@@ -45,16 +45,13 @@ Given("there are notes from Note {int} to Note {int}", (from: number, to: number
   cy.testability().seedNotes(notes)
 })
 
-Given("OpenAI thinks that {string} means {string}", (noteTitle: string, description: string) => {
-  cy.openAiService().stubOpenAiCompletion(noteTitle, description, "stop")
+Given("OpenAI always return text completion {string}", (description: string) => {
+  cy.openAiService().restartImposterAndStubTextCompletion(description, "stop")
 })
 
-Given(
-  "OpenAI has an incomplete idea that {string} means {string}",
-  (noteTitle: string, description: string) => {
-    cy.openAiService().stubOpenAiCompletion(noteTitle, description, "length")
-  },
-)
+Given("OpenAI returns an incomplete text completion {string}", (description: string) => {
+  cy.openAiService().restartImposterAndStubTextCompletion(description, "length")
+})
 
 When("I create notebooks with:", (notes: DataTable) => {
   notes.hashes().forEach((noteAttributes) => {

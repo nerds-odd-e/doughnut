@@ -30,9 +30,10 @@ import "./string.extensions"
 import ServiceMocker from "./ServiceMocker"
 
 Cypress.Commands.add(
-  "stubOpenAiCompletion",
+  "restartImposterAndStubTextCompletion",
   { prevSubject: true },
-  (serviceMocker: ServiceMocker, title: string, reply: string, finishReason: "length" | "stop") => {
+  (serviceMocker: ServiceMocker, reply: string, finishReason: "length" | "stop") => {
+    serviceMocker.install()
     serviceMocker.stubPoster(`/v1/completions`, {
       id: "cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7",
       object: "text_completion",
