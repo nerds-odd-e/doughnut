@@ -14,13 +14,13 @@ public class AiAdvisorService {
   }
 
   public AiSuggestion getAiSuggestion(String prompt) {
-    return new AiSuggestion(openAiApis.getOpenAiCompletion(prompt));
+    return openAiApis.getOpenAiCompletion(prompt);
   }
 
   public AiEngagingStory getEngagingStory(List<String> items) {
     final String topics = String.join(" and ", items);
     final String prompt = String.format("Tell me an engaging story to learn about %s.", topics);
 
-    return new AiEngagingStory(openAiApis.getOpenAiCompletion(prompt));
+    return new AiEngagingStory(openAiApis.getOpenAiCompletion(prompt).getSuggestion());
   }
 }

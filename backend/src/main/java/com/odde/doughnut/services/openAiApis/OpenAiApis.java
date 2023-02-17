@@ -3,6 +3,7 @@ package com.odde.doughnut.services.openAiApis;
 import static com.theokanning.openai.service.OpenAiService.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.CompletionChoice;
@@ -48,9 +49,9 @@ public class OpenAiApis {
     }
   }
 
-  public String getOpenAiCompletion(String prompt) {
+  public AiSuggestion getOpenAiCompletion(String prompt) {
     CompletionChoice completionChoice = getCompletionChoice(prompt);
-    return completionChoice.getText();
+    return new AiSuggestion(completionChoice);
   }
 
   private CompletionChoice getCompletionChoice(String prompt) {
