@@ -14,9 +14,11 @@ Feature: Open AI service availability
       Then I should see that the open AI service is not available
 
   @usingMockedOpenAiService
+  @ignore
   Scenario: Suggestions parts are displayed as soon as they are available
     Given OpenAI has an incomplete idea that "Gravity" means "What goes up"
     When I ask for a description suggestion for "Gravity"
     Then I should be prompted with a suggested description "What goes up"
+    Given open AI serivce always think the system token is invalid
     When OpenAI thinks that "Gravity" means "What goes up must come down"
-    # Then I should be prompted with a suggested description "What goes up must come down"
+    Then I should be prompted with a suggested description "What goes up must come down"

@@ -68,16 +68,22 @@ export default defineComponent({
         )
         .then(this.popup.done);
     },
+    askForSuggestion(prompt: Generated.AiSuggestionRequest) {
+      this.api.ai
+        .askAiSuggestions(prompt)
+        .then((res: Generated.AiSuggestion) => {
+          this.suggestedDescription = res.suggestion;
+          if (res.finishReason === "length") {
+            this.askForSuggestion({ prompt: res.suggestion });
+          }
+        })
+        .catch((er) => {
+          this.errorMessage = er.message;
+        });
+    },
   },
   mounted() {
-    this.api.ai
-      .askAiSuggestions(this.aiSuggestionRequest)
-      .then((res) => {
-        this.suggestedDescription = res.suggestion;
-      })
-      .catch((er) => {
-        this.errorMessage = er.message;
-      });
+    this.askForSuggestion(this.aiSuggestionRequest);
   },
   components: { EditableText },
 });
