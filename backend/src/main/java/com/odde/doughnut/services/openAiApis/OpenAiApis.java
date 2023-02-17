@@ -9,11 +9,8 @@ import com.theokanning.openai.completion.CompletionChoice;
 import com.theokanning.openai.completion.CompletionRequest;
 import java.time.Duration;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 import okhttp3.OkHttpClient;
 import org.springframework.http.HttpStatus;
-import reactor.core.publisher.Flux;
 import retrofit2.HttpException;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -52,38 +49,15 @@ public class OpenAiApis {
   }
 
   public String getOpenAiCompletion(String prompt) {
-    return getCompletionChoice(prompt, 5).map(CompletionChoice::getText).blockFirst();
+    CompletionChoice completionChoice = getCompletionChoice(prompt);
+    return completionChoice.getText();
   }
 
-  private Flux<CompletionChoice> getCompletionChoice(String prompt, final int retriesLeft) {
-    AtomicInteger count = new AtomicInteger();
-    return Flux.deferContextual(
-        contextView -> {
-          return Flux.generate(
-              () -> prompt,
-              (pmt, sink) -> {
-                if (count.getAndIncrement() < retriesLeft) {
-                  Optional<CompletionChoice> first = getCompletionChoice1(pmt);
-                  if (first.isPresent()) {
-                    CompletionChoice choice = first.get();
-                    sink.next(choice);
-                    if ("length".equals(choice.getFinish_reason())) {
-                      return choice.getText();
-                    }
-                  }
-                }
-                sink.complete();
-                return null;
-              });
-        });
-  }
-
-  private Optional<CompletionChoice> getCompletionChoice1(String prompt) {
+  private CompletionChoice getCompletionChoice(String prompt) {
     CompletionRequest completionRequest = getCompletionRequest(prompt);
     List<CompletionChoice> choices = getCompletionChoices(completionRequest);
 
-    Optional<CompletionChoice> first = choices.stream().findFirst();
-    return first;
+    return choices.stream().findFirst().orElse(null);
   }
 
   private static CompletionRequest getCompletionRequest(String prompt) {

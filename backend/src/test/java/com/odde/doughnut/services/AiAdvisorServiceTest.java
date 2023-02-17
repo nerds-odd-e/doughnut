@@ -63,13 +63,6 @@ class AiAdvisorServiceTest {
     }
 
     @Test
-    void the_data_returned_is_incomplete_for_too_many_times() {
-      when(openAiApi.createCompletion(any())).thenReturn(IncompleteCompletionResultSingle);
-      aiAdvisorService.getAiSuggestion("what");
-      verify(openAiApi, Mockito.times(1)).createCompletion(any());
-    }
-
-    @Test
     void getAiSuggestion_givenAString_whenHttpError_returnsEmptySuggestion() {
       HttpException httpException = buildHttpException(400);
       Mockito.when(openAiApi.createCompletion(ArgumentMatchers.any()))

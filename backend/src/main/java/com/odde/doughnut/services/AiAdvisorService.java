@@ -14,8 +14,7 @@ public class AiAdvisorService {
   }
 
   public AiSuggestion getAiSuggestion(String prompt) {
-    String openAiCompletion = openAiApis.getOpenAiCompletion(prompt);
-    return new AiSuggestion(openAiCompletion);
+    return new AiSuggestion(openAiApis.getOpenAiCompletion(prompt));
   }
 
   public AiEngagingStory getEngagingStory(List<String> items) {
