@@ -55,7 +55,7 @@ public class OpenAiApis {
     return getCompletionChoice(prompt, 5).map(CompletionChoice::getText);
   }
 
-  private Flux<CompletionChoice> getCompletionChoice(String prompt, int retriesLeft) {
+  private Flux<CompletionChoice> getCompletionChoice(String prompt, final int retriesLeft) {
     AtomicInteger count = new AtomicInteger();
     return Flux.deferContextual(
         contextView -> {

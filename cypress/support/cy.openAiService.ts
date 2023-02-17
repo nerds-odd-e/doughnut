@@ -33,25 +33,29 @@ Cypress.Commands.add(
   "stubOpenAiCompletion",
   { prevSubject: true },
   (serviceMocker: ServiceMocker, title: string, reply: string, finishReason: "length" | "stop") => {
-    serviceMocker.stubPoster(`/v1/completions`, {
-      id: "cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7",
-      object: "text_completion",
-      created: 1589478378,
-      model: "text-davinci-003",
-      choices: [
-        {
-          text: reply,
-          index: 0,
-          logprobs: null,
-          finish_reason: finishReason,
+    serviceMocker.stubPoster(
+      `/v1/completions`,
+      {
+        id: "cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7",
+        object: "text_completion",
+        created: 1589478378,
+        model: "text-davinci-003",
+        choices: [
+          {
+            text: reply,
+            index: 0,
+            logprobs: null,
+            finish_reason: finishReason,
+          },
+        ],
+        usage: {
+          prompt_tokens: 5,
+          completion_tokens: 7,
+          total_tokens: 12,
         },
-      ],
-      usage: {
-        prompt_tokens: 5,
-        completion_tokens: 7,
-        total_tokens: 12,
       },
-    })
+      finishReason === "length" ? 100 : undefined,
+    )
   },
 )
 
