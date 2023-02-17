@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.annotation.SessionScope;
-import reactor.core.publisher.Flux;
 
 @RestController
 @SessionScope
@@ -33,9 +32,9 @@ public class RestAiController {
   }
 
   @PostMapping(value = "/ask-suggestions" /*, produces = MediaType.APPLICATION_NDJSON_VALUE*/)
-  public Flux<AiSuggestion> askSuggestion(@RequestBody AiSuggestionRequest aiSuggestionRequest) {
+  public AiSuggestion askSuggestion(@RequestBody AiSuggestionRequest aiSuggestionRequest) {
     currentUser.assertLoggedIn();
-    return aiAdvisorService.getAiSuggestion(aiSuggestionRequest.prompt);
+    return aiAdvisorService.getAiSuggestion(aiSuggestionRequest.prompt).blockFirst();
   }
 
   @GetMapping("/ask-engaging-stories")
