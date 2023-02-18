@@ -55,5 +55,18 @@ describe("NoteSuggestDescriptionDialog", () => {
         })
       );
     });
+
+    it("can ask again when the text is changed", async () => {
+      await flushPromises();
+      wrapper.get("textarea").setValue("ask differently");
+      helper.apiMock.expectingPost(`/api/ai/ask-suggestions`);
+      wrapper.get("button.btn-secondary").trigger("click");
+      helper.apiMock.verifyCall(
+        "/api/ai/ask-suggestions",
+        expect.objectContaining({
+          body: expect.stringContaining(`"prompt":"ask differently"`),
+        })
+      );
+    });
   });
 });

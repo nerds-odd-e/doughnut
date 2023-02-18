@@ -15,8 +15,8 @@
     </button>
     <button
       class="btn btn-secondary"
-      @click="appendToDescription"
-      :disabled="true"
+      @click="askForSuggestion"
+      :disabled="!contentReady"
     >
       Ask again
     </button>
