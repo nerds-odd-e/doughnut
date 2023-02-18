@@ -47,6 +47,7 @@ export default defineComponent({
       errorMessage: undefined as string | undefined,
       contentReady: false as boolean,
       lastCompletionResult: undefined as undefined | string,
+      tries: 0 as number,
     };
   },
   computed: {
@@ -80,15 +81,21 @@ export default defineComponent({
         .then((res: Generated.AiSuggestion) => {
           this.textToComplete = res.suggestion;
           this.lastCompletionResult = res.suggestion;
-          if (res.finishReason === "length") {
-            this.askForSuggestion();
-            return;
+          if (res.finishReason !== "length") {
+            this.contentReady = true;
           }
-          this.contentReady = true;
+          this.tries += 1;
         })
         .catch((er) => {
           this.errorMessage = er.message;
         });
+    },
+  },
+  watch: {
+    tries() {
+      if (!this.contentReady) {
+        this.askForSuggestion();
+      }
     },
   },
   mounted() {
