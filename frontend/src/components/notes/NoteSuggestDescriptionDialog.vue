@@ -16,7 +16,7 @@
     <button
       class="btn btn-secondary"
       @click="askForSuggestion"
-      :disabled="!contentReady"
+      :disabled="!contentReady || lastCompletionResult === textToComplete"
     >
       Ask again
     </button>
@@ -46,6 +46,7 @@ export default defineComponent({
       textToComplete: `Tell me about "${this.selectedNote.title}"` as string,
       errorMessage: undefined as string | undefined,
       contentReady: false as boolean,
+      lastCompletionResult: undefined as undefined | string,
     };
   },
   computed: {
@@ -78,6 +79,7 @@ export default defineComponent({
         .askAiSuggestions(this.aiSuggestionRequest)
         .then((res: Generated.AiSuggestion) => {
           this.textToComplete = res.suggestion;
+          this.lastCompletionResult = res.suggestion;
           if (res.finishReason === "length") {
             this.askForSuggestion();
             return;

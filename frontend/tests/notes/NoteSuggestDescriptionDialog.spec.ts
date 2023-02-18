@@ -57,11 +57,19 @@ describe("NoteSuggestDescriptionDialog", () => {
       );
     });
 
+    it("kept the ask again button disabled if no text changes", async () => {
+      await flushPromises();
+      expect(wrapper.get("button.btn-secondary").element).toBeDisabled();
+    });
+
     describe("when the text is changed and ask again", () => {
       beforeEach(async () => {
         await flushPromises();
         wrapper.get("textarea").setValue("ask differently");
-        helper.apiMock.expectingPost(`/api/ai/ask-suggestions`);
+        await flushPromises();
+        helper.apiMock.expectingPost(`/api/ai/ask-suggestions`).andReturnOnce({
+          suggestion: "another suggestion",
+        });
         wrapper.get("button.btn-secondary").trigger("click");
       });
 
@@ -74,7 +82,8 @@ describe("NoteSuggestDescriptionDialog", () => {
         );
       });
       it("disables the buttons", async () => {
-        expect(wrapper.get("button.btn-primary").element).toBeDisabled();
+        await flushPromises();
+        expect(wrapper.get("button.btn-primary").element).not.toBeDisabled();
         expect(wrapper.get("button.btn-secondary").element).toBeDisabled();
       });
     });
