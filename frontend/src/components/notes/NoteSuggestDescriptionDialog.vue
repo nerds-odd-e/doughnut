@@ -13,6 +13,13 @@
     >
       Use
     </button>
+    <button
+      class="btn btn-secondary"
+      @click="appendToDescription"
+      :disabled="true"
+    >
+      Ask again
+    </button>
   </div>
 </template>
 
@@ -65,13 +72,13 @@ export default defineComponent({
         )
         .then(this.popup.done);
     },
-    askForSuggestion(prompt: Generated.AiSuggestionRequest) {
+    askForSuggestion() {
       this.api.ai
-        .askAiSuggestions(prompt)
+        .askAiSuggestions(this.aiSuggestionRequest)
         .then((res: Generated.AiSuggestion) => {
           this.textToComplete = res.suggestion;
           if (res.finishReason === "length") {
-            this.askForSuggestion(this.aiSuggestionRequest);
+            this.askForSuggestion();
             return;
           }
           this.contentReady = true;
@@ -82,7 +89,7 @@ export default defineComponent({
     },
   },
   mounted() {
-    this.askForSuggestion(this.aiSuggestionRequest);
+    this.askForSuggestion();
   },
 });
 </script>

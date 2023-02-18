@@ -39,8 +39,9 @@ describe("NoteSuggestDescriptionDialog", () => {
       );
     });
 
-    it("has the button disabled initially", async () => {
+    it("has the buttons disabled initially", async () => {
       expect(wrapper.get("button.btn-primary").element).toBeDisabled();
+      expect(wrapper.get("button.btn-secondary").element).toBeDisabled();
     });
 
     it("can append content to the description", async () => {
@@ -53,19 +54,6 @@ describe("NoteSuggestDescriptionDialog", () => {
           body: expect.objectContaining({ description: "suggestion" }),
         })
       );
-    });
-  });
-  describe("when getting incomplete suggestion", () => {
-    beforeEach(() => {
-      helper.apiMock
-        .expectingPost(`/api/ai/ask-suggestions`)
-        .andReturnOnce({ suggestion: "suggestion", finishReason: "length" });
-      wrapper = mountDialog();
-    });
-
-    it.skip("fetches from api", async () => {
-      await flushPromises();
-      expect(wrapper.get("textarea").element).toHaveValue("suggestion");
     });
   });
 });
