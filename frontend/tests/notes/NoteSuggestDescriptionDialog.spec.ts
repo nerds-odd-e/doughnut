@@ -55,4 +55,17 @@ describe("NoteSuggestDescriptionDialog", () => {
       );
     });
   });
+  describe("when getting incomplete suggestion", () => {
+    beforeEach(() => {
+      helper.apiMock
+        .expectingPost(`/api/ai/ask-suggestions`)
+        .andReturnOnce({ suggestion: "suggestion", finishReason: "length" });
+      wrapper = mountDialog();
+    });
+
+    it.skip("fetches from api", async () => {
+      await flushPromises();
+      expect(wrapper.get("textarea").element).toHaveValue("suggestion");
+    });
+  });
 });

@@ -1,7 +1,7 @@
 <template>
   <h1>Suggested Description</h1>
   <TextArea
-    v-model="suggestedDescription"
+    v-model="textToComplete"
     field="suggestion"
     :errors="errorMessage"
   />
@@ -36,7 +36,7 @@ export default defineComponent({
   },
   data() {
     return {
-      suggestedDescription: undefined as string | undefined,
+      textToComplete: undefined as string | undefined,
       errorMessage: undefined as string | undefined,
     };
   },
@@ -44,7 +44,7 @@ export default defineComponent({
     textContent() {
       return {
         title: this.selectedNote.title,
-        description: this.suggestedDescription,
+        description: this.textToComplete,
       } as Generated.TextContent;
     },
     aiSuggestionRequest(): Generated.AiSuggestionRequest {
@@ -53,7 +53,7 @@ export default defineComponent({
       };
     },
     contentReady() {
-      return this.suggestedDescription !== undefined;
+      return this.textToComplete !== undefined;
     },
   },
   methods: {
@@ -71,7 +71,7 @@ export default defineComponent({
       this.api.ai
         .askAiSuggestions(prompt)
         .then((res: Generated.AiSuggestion) => {
-          this.suggestedDescription = res.suggestion;
+          this.textToComplete = res.suggestion;
           if (res.finishReason === "length") {
             this.askForSuggestion({ prompt: res.suggestion });
           }
