@@ -1,5 +1,4 @@
-import { beforeEach } from 'vitest';
-import { describe } from 'vitest';
+import { beforeEach, describe } from "vitest";
 import { flushPromises, VueWrapper } from "@vue/test-utils";
 import NoteSuggestDescriptionDialog from "@/components/notes/NoteSuggestDescriptionDialog.vue";
 import makeMe from "../fixtures/makeMe";
