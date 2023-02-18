@@ -8,46 +8,51 @@ describe("NoteSuggestDescriptionDialog", () => {
 
   const note = makeMe.aNote.please();
   let wrapper: VueWrapper;
-
-  beforeEach(() => {
-    helper.apiMock
-      .expectingPost(`/api/ai/ask-suggestions`)
-      .andReturnOnce({ suggestion: "suggestion" });
-    wrapper = helper
+  const mountDialog = (): VueWrapper => {
+    return helper
       .component(NoteSuggestDescriptionDialog)
       .withStorageProps({ selectedNote: note })
       .mount();
-  });
+  };
 
-  it("fetches from api", async () => {
-    await flushPromises();
-    expect(wrapper.get("textarea").element).toHaveValue("suggestion");
-  });
+  describe("when getting complete suggestion", () => {
+    beforeEach(() => {
+      helper.apiMock
+        .expectingPost(`/api/ai/ask-suggestions`)
+        .andReturnOnce({ suggestion: "suggestion" });
+      wrapper = mountDialog();
+    });
 
-  it("uses right parameters", async () => {
-    helper.apiMock.verifyCall(
-      "/api/ai/ask-suggestions",
-      expect.objectContaining({
-        body: expect.stringContaining(
-          `"prompt":"Tell me about \\"${note.title}\\""`
-        ),
-      })
-    );
-  });
+    it("fetches from api", async () => {
+      await flushPromises();
+      expect(wrapper.get("textarea").element).toHaveValue("suggestion");
+    });
 
-  it("has the button disabled initially", async () => {
-    expect(wrapper.get("button.btn-primary").element).toBeDisabled();
-  });
+    it("uses right parameters", async () => {
+      helper.apiMock.verifyCall(
+        "/api/ai/ask-suggestions",
+        expect.objectContaining({
+          body: expect.stringContaining(
+            `"prompt":"Tell me about \\"${note.title}\\""`
+          ),
+        })
+      );
+    });
 
-  it("can append content to the description", async () => {
-    await flushPromises();
-    helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
-    wrapper.get("button.btn-primary").trigger("click");
-    helper.apiMock.verifyCall(
-      `/api/text_content/${note.id}`,
-      expect.objectContaining({
-        body: expect.objectContaining({ description: "suggestion" }),
-      })
-    );
+    it("has the button disabled initially", async () => {
+      expect(wrapper.get("button.btn-primary").element).toBeDisabled();
+    });
+
+    it("can append content to the description", async () => {
+      await flushPromises();
+      helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
+      wrapper.get("button.btn-primary").trigger("click");
+      helper.apiMock.verifyCall(
+        `/api/text_content/${note.id}`,
+        expect.objectContaining({
+          body: expect.objectContaining({ description: "suggestion" }),
+        })
+      );
+    });
   });
 });
