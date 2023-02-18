@@ -6,7 +6,7 @@
     :errors="errorMessage"
   />
   <div class="dialog-buttons">
-    <button value="Use" class="btn btn-primary" @click="appendToDescription" />
+    <button class="btn btn-primary" @click="appendToDescription">Use</button>
   </div>
 </template>
 
