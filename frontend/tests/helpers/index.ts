@@ -12,6 +12,7 @@ class StoredComponentTestHelper {
   }
 
   reset() {
+    this.mockedApi?.close();
     this.mockedApi = undefined;
     return this;
   }

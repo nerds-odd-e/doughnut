@@ -14,6 +14,15 @@ describe("apiMock", () => {
     mockedApi.assertNoUnexpectedOrMissedCalls();
   });
 
+  it("should not expect any api call after closd", async () => {
+    mockedApi.expectingGet("url");
+    mockedApi.close();
+    await fetch("url");
+    expect(() => mockedApi.assertNoUnexpectedOrMissedCalls()).toThrowError(
+      "Expected but missed API calls: url"
+    );
+  });
+
   it("should fail if expectation is not met", async () => {
     mockedApi.expectingGet("url");
     expect(() => mockedApi.assertNoUnexpectedOrMissedCalls()).toThrowError(

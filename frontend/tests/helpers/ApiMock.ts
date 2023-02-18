@@ -15,6 +15,7 @@ interface ApiMock {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   verifyCall(url: string, matcher: any): void;
   assertNoUnexpectedOrMissedCalls(): void;
+  close(): void;
 }
 
 export type { ApiMock, ApiMockBuilder };

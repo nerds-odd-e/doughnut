@@ -39,6 +39,10 @@ class ApiMockImpl implements ApiMock {
     return this;
   }
 
+  close() {
+    this.fetchMock.resetMocks();
+  }
+
   assertNoUnexpectedOrMissedCalls() {
     try {
       if (this.previousError) {
