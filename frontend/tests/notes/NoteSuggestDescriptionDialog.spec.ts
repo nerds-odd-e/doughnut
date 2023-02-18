@@ -1,3 +1,5 @@
+import { beforeEach } from 'vitest';
+import { describe } from 'vitest';
 import { flushPromises, VueWrapper } from "@vue/test-utils";
 import NoteSuggestDescriptionDialog from "@/components/notes/NoteSuggestDescriptionDialog.vue";
 import makeMe from "../fixtures/makeMe";
@@ -56,17 +58,22 @@ describe("NoteSuggestDescriptionDialog", () => {
       );
     });
 
-    it("can ask again when the text is changed", async () => {
-      await flushPromises();
-      wrapper.get("textarea").setValue("ask differently");
-      helper.apiMock.expectingPost(`/api/ai/ask-suggestions`);
-      wrapper.get("button.btn-secondary").trigger("click");
-      helper.apiMock.verifyCall(
-        "/api/ai/ask-suggestions",
-        expect.objectContaining({
-          body: expect.stringContaining(`"prompt":"ask differently"`),
-        })
-      );
+    describe("when the text is changed and ask again", () => {
+      beforeEach(async () => {
+        await flushPromises();
+        wrapper.get("textarea").setValue("ask differently");
+        helper.apiMock.expectingPost(`/api/ai/ask-suggestions`);
+        wrapper.get("button.btn-secondary").trigger("click");
+      });
+
+      it("can ask again when the text is changed", async () => {
+        helper.apiMock.verifyCall(
+          "/api/ai/ask-suggestions",
+          expect.objectContaining({
+            body: expect.stringContaining(`"prompt":"ask differently"`),
+          })
+        );
+      });
     });
   });
 });
