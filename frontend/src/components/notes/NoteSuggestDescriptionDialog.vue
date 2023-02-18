@@ -1,15 +1,13 @@
 <template>
   <h1>Suggested Description</h1>
-  <form @submit.prevent.once="processForm">
-    <TextArea
-      v-model="suggestedDescription"
-      field="suggestion"
-      :errors="errorMessage"
-    />
-    <div class="dialog-buttons">
-      <input type="submit" value="Use" class="btn btn-primary" />
-    </div>
-  </form>
+  <TextArea
+    v-model="suggestedDescription"
+    field="suggestion"
+    :errors="errorMessage"
+  />
+  <div class="dialog-buttons">
+    <button value="Use" class="btn btn-primary" @click="appendToDescription" />
+  </div>
 </template>
 
 <script lang="ts">
@@ -51,7 +49,7 @@ export default defineComponent({
     },
   },
   methods: {
-    processForm() {
+    appendToDescription() {
       this.storageAccessor
         .api()
         .updateTextContent(
