@@ -36,8 +36,9 @@ export default defineComponent({
   },
   data() {
     return {
-      textToComplete: undefined as string | undefined,
+      textToComplete: `Tell me about "${this.selectedNote.title}"` as string,
       errorMessage: undefined as string | undefined,
+      contentReady: false as boolean,
     };
   },
   computed: {
@@ -49,11 +50,8 @@ export default defineComponent({
     },
     aiSuggestionRequest(): Generated.AiSuggestionRequest {
       return {
-        prompt: `Tell me about "${this.selectedNote.title}"`,
+        prompt: this.textToComplete,
       };
-    },
-    contentReady() {
-      return this.textToComplete !== undefined;
     },
   },
   methods: {
@@ -73,8 +71,10 @@ export default defineComponent({
         .then((res: Generated.AiSuggestion) => {
           this.textToComplete = res.suggestion;
           if (res.finishReason === "length") {
-            this.askForSuggestion({ prompt: res.suggestion });
+            this.askForSuggestion(this.aiSuggestionRequest);
+            return;
           }
+          this.contentReady = true;
         })
         .catch((er) => {
           this.errorMessage = er.message;
