@@ -66,13 +66,17 @@ describe("NoteSuggestDescriptionDialog", () => {
         wrapper.get("button.btn-secondary").trigger("click");
       });
 
-      it("can ask again when the text is changed", async () => {
+      it("will ask server again", async () => {
         helper.apiMock.verifyCall(
           "/api/ai/ask-suggestions",
           expect.objectContaining({
             body: expect.stringContaining(`"prompt":"ask differently"`),
           })
         );
+      });
+      it("disables the buttons", async () => {
+        expect(wrapper.get("button.btn-primary").element).toBeDisabled();
+        expect(wrapper.get("button.btn-secondary").element).toBeDisabled();
       });
     });
   });

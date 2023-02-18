@@ -73,6 +73,7 @@ export default defineComponent({
         .then(this.popup.done);
     },
     askForSuggestion() {
+      this.contentReady = false;
       this.api.ai
         .askAiSuggestions(this.aiSuggestionRequest)
         .then((res: Generated.AiSuggestion) => {
