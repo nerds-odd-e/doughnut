@@ -6,7 +6,13 @@
     :errors="errorMessage"
   />
   <div class="dialog-buttons">
-    <button class="btn btn-primary" @click="appendToDescription">Use</button>
+    <button
+      class="btn btn-primary"
+      @click="appendToDescription"
+      :disabled="!contentReady"
+    >
+      Use
+    </button>
   </div>
 </template>
 
@@ -37,15 +43,17 @@ export default defineComponent({
   computed: {
     textContent() {
       return {
-        title: this.selectedNote.textContent.title,
+        title: this.selectedNote.title,
         description: this.suggestedDescription,
-        updatedAt: this.selectedNote.textContent.updatedAt,
       } as Generated.TextContent;
     },
     aiSuggestionRequest(): Generated.AiSuggestionRequest {
       return {
         prompt: `Tell me about "${this.selectedNote.title}"`,
       };
+    },
+    contentReady() {
+      return this.suggestedDescription !== undefined;
     },
   },
   methods: {
