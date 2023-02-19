@@ -40,7 +40,7 @@
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2",
     "@testing-library/cypress": "9.0",
     "@types/cypress-cucumber-preprocessor": "^4.0",
-    "@types/node": "^18.11",
+    "@types/node": "^18.14",
     "@typescript-eslint/eslint-plugin": "^5.52",
     "@typescript-eslint/parser": "^5.52",
     "cypress": "12.6.0",

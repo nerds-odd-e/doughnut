@@ -56,9 +56,9 @@
     node-hook "^1.0.0"
 
 "@badeball/cypress-cucumber-preprocessor@^15.1":
-  version "15.1.3"
-  resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-15.1.3.tgz#db515072ccfedad851bdd726e08134938475fe02"
-  integrity sha512-mt8RpkVpqzm6OtnegQ+dM+gZSg8p0luODT0UBr2y0+nQRUCdgp41Jn/bBioRPffFleqf4OsZFXPSei1kwbUKEg==
+  version "15.1.4"
+  resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-15.1.4.tgz#89f3c6735d592d41badee58ac92a17e71adeefed"
+  integrity sha512-CVagR47O7ZNOGVZJzBz6IJ5cVqj7zEUQEoI6br/gSdfZ8YVBbf8Eqx1pEZCWiDnzc7w20qj+IzM7Z8ExxYN4fQ==
   dependencies:
     "@badeball/cypress-configuration" "^4.0.0"
     "@cucumber/cucumber-expressions" "^16.0.0"
@@ -74,7 +74,7 @@
     cosmiconfig "^7.0.1"
     debug "^4.2.0"
     error-stack-parser "^2.0.7"
-    esbuild "^0.14.23"
+    esbuild "^0.17.8"
     glob "^7.2.0"
     is-path-inside "^3.0.3"
     module-alias "^2.2.2"
@@ -561,10 +561,10 @@
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.191.tgz#09511e7f7cba275acd8b419ddac8da9a6a79e2fa"
   integrity sha512-BdZ5BCCvho3EIXw6wUCXHe7rS53AIDPLE+JzwgT+OsJk53oBfbSmZZ7CX4VaRoN78N+TJpFi9QPlfIVNmJYWxQ==
 
-"@types/node@*", "@types/node@^18.11":
-  version "18.13.0"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.13.0.tgz#0400d1e6ce87e9d3032c19eb6c58205b0d3f7850"
-  integrity sha512-gC3TazRzGoOnoKAhUx+Q0t8S9Tzs74z7m0ipwGpSqQrleP14hKxP4/JUeEQcD3W1/aIpnWl8pHowI7WokuZpXg==
+"@types/node@*", "@types/node@^18.14":
+  version "18.14.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.14.0.tgz#94c47b9217bbac49d4a67a967fdcdeed89ebb7d0"
+  integrity sha512-5EWrvLmglK+imbCJY0+INViFWUHg1AHel1sq4ZVSfdcNqGy9Edv3UB9IIzzg+xPaUcAgZYcfVs2fBcwDeZzU0A==
 
 "@types/node@^14.14.31":
   version "14.18.36"
@@ -1886,7 +1886,7 @@ esbuild@^0.14.23:
     esbuild-windows-64 "0.14.54"
     esbuild-windows-arm64 "0.14.54"
 
-esbuild@^0.17:
+esbuild@^0.17, esbuild@^0.17.8:
   version "0.17.8"
   resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.17.8.tgz#f7f799abc7cdce3f0f2e3e0c01f120d4d55193b4"
   integrity sha512-g24ybC3fWhZddZK6R3uD2iF/RIPnRpwJAqLov6ouX3hMbY4+tKolP0VMF3zuIYCaXun+yHwS5IPQ91N2BT191g==
