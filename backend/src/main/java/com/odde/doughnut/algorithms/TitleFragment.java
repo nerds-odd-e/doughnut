@@ -29,23 +29,14 @@ class TitleFragment {
     return content.equalsIgnoreCase(answer.strip());
   }
 
-  public String replaceSimilar(String literal) {
-    if (content.length() < 4) {
-      return literal;
-    }
-    String substring = content.substring(0, (content.length() + 1) * 3 / 4);
-    Pattern pattern = Pattern.compile(Pattern.quote(substring), Pattern.CASE_INSENSITIVE);
-    return pattern.matcher(literal).replaceAll(getInternalPartialMatchReplacement());
-  }
-
-  private String getPatternStringForLiteralMatch() {
-    if (content.length() >= 4 || suffix) {
+  private String getPatternStringToMatch(String toMatch) {
+    if (toMatch.length() >= 4 || suffix) {
       return ignoreConjunctions();
     }
-    if (content.matches("^\\d+$")) {
-      return "(?<!\\d)" + Pattern.quote(content) + "(?!\\d)";
+    if (toMatch.matches("^\\d+$")) {
+      return "(?<!\\d)" + Pattern.quote(toMatch) + "(?!\\d)";
     }
-    return "(?<!\\w)" + Pattern.quote(content) + "(?!\\w)";
+    return "(?<!\\w)" + Pattern.quote(toMatch) + "(?!\\w)";
   }
 
   private String ignoreConjunctions() {
@@ -62,11 +53,23 @@ class TitleFragment {
     return pattern;
   }
 
+  private Pattern getPattern(String toMatch) {
+    return Pattern.compile(
+        suffixIfNeeded(getPatternStringToMatch(toMatch)), Pattern.CASE_INSENSITIVE);
+  }
+
   public String replaceLiteralWords(String description) {
-    Pattern pattern =
-        Pattern.compile(
-            suffixIfNeeded(getPatternStringForLiteralMatch()), Pattern.CASE_INSENSITIVE);
+    Pattern pattern = getPattern(content);
     return pattern.matcher(description).replaceAll(getInternalFullMatchReplacement());
+  }
+
+  public String replaceSimilar(String literal) {
+    if (content.length() < 4) {
+      return literal;
+    }
+    String substring = content.substring(0, (content.length() + 1) * 3 / 4);
+    Pattern pattern = getPattern(substring);
+    return pattern.matcher(literal).replaceAll(getInternalPartialMatchReplacement());
   }
 
   private String getInternalFullMatchReplacement() {

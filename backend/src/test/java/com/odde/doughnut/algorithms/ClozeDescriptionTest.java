@@ -27,6 +27,7 @@ public class ClozeDescriptionTest {
     "cat dog,         cat the dog,                         [...]",
     "cat the dog,     cat dog,                             [...]",
     "cat,             concat,                              concat",
+    "avid,            having,                              having",
     "よう,             どのよう,                              どの[...]",
     "cat,             /kat/,                               /.../",
     "cat,             (/kat/),                             (/.../)",
