@@ -40,6 +40,9 @@ class ClozeReplacement {
     String titlePreMasked =
         noteTitle.getTitles().stream()
             .reduce(literalMatchPreMasked, (d, t) -> t.replaceSimilar(d), (x, y) -> y);
-    return replaceMasks(titlePreMasked);
+    String titleAllPreMasked =
+        noteTitle.getSubtitles().stream()
+            .reduce(titlePreMasked, (d, t) -> t.replaceLiteralWords(d), (x, y) -> y);
+    return replaceMasks(titleAllPreMasked);
   }
 }

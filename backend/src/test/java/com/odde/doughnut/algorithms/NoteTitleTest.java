@@ -18,7 +18,7 @@ class NoteTitleTest {
   @Test
   void with_subtitle() {
     NoteTitle noteTitle = new NoteTitle("cat (animal)");
-    assertThat(noteTitle.getTitles(), hasSize(2));
+    assertThat(noteTitle.getTitles(), hasSize(1));
     assertThat(noteTitle.getSubtitles(), hasSize(1));
   }
 }
