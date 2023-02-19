@@ -27,10 +27,7 @@ class ClozeReplacement {
         .replace(TitleFragment.internalFullMatchReplacement, fullMatchReplacement)
         .replace(TitleFragment.internalPartialMatchReplacement, partialMatchReplacement)
         .replace(
-            TitleFragment.internalFullMatchReplacementForSubtitle, fullMatchSubtitleReplacement)
-        .replace(
-            TitleFragment.internalPartialMatchReplacementForSubtitle,
-            partialMatchSubtitleReplacement);
+            TitleFragment.internalFullMatchReplacementForSubtitle, fullMatchSubtitleReplacement);
   }
 
   String replaceTitleFragments(String pronunciationMasked, NoteTitle noteTitle) {
