@@ -3,27 +3,14 @@ package com.odde.doughnut.algorithms;
 import java.util.List;
 import java.util.regex.Pattern;
 
-class ClozeReplacement {
+record ClozeReplacement(
+    String partialMatchReplacement,
+    String fullMatchReplacement,
+    String pronunciationReplacement,
+    String fullMatchSubtitleReplacement) {
   private static final String internalPartialMatchReplacement = "__p_a_r_t_i_a_l__";
   private static final String internalFullMatchReplacement = "__f_u_l_l__";
   private static final String internalFullMatchReplacementForSubtitle = "__f_u_l_l_s_u_b__";
-
-  private final String fullMatchReplacement;
-  private final String partialMatchReplacement;
-  private final String fullMatchSubtitleReplacement;
-
-  private String pronunciationReplacement;
-
-  public ClozeReplacement(
-      String partialMatchReplacement,
-      String fullMatchReplacement,
-      String pronunciationReplacement,
-      String fullMatchSubtitleReplacement) {
-    this.partialMatchReplacement = partialMatchReplacement;
-    this.fullMatchReplacement = fullMatchReplacement;
-    this.fullMatchSubtitleReplacement = fullMatchSubtitleReplacement;
-    this.pronunciationReplacement = pronunciationReplacement;
-  }
 
   private String replaceMasks(String titleMasked) {
     return titleMasked
