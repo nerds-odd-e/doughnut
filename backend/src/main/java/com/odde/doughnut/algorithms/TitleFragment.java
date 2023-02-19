@@ -1,8 +1,6 @@
 package com.odde.doughnut.algorithms;
 
-import java.util.Arrays;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 class TitleFragment {
   static final String internalPartialMatchReplacement = "__p_a_r_t_i_a_l__";
@@ -10,18 +8,18 @@ class TitleFragment {
   static final String internalPartialMatchReplacementForSubtitle = "__p_a_r_t_i_a_l_s_u_b__";
   static final String internalFullMatchReplacementForSubtitle = "__f_u_l_l_s_u_b__";
   private final String content;
-  private final boolean suffix;
   private final boolean subtitle;
+  private final ClozePatternCreator clozePatternCreator;
 
   TitleFragment(String content, boolean subtitle) {
     this.subtitle = subtitle;
     String trimmed = content.trim();
     if (content.startsWith("~") || content.startsWith("〜") || content.startsWith("～")) {
       this.content = trimmed.substring(1);
-      this.suffix = true;
+      this.clozePatternCreator = new ClozePatternCreator(true);
     } else {
       this.content = trimmed;
-      this.suffix = false;
+      this.clozePatternCreator = new ClozePatternCreator(false);
     }
   }
 
@@ -29,37 +27,8 @@ class TitleFragment {
     return content.equalsIgnoreCase(answer.strip());
   }
 
-  private String getPatternStringToMatch(String toMatch) {
-    if (toMatch.length() >= 4 || suffix) {
-      return ignoreConjunctions();
-    }
-    if (toMatch.matches("^\\d+$")) {
-      return "(?<!\\d)" + Pattern.quote(toMatch) + "(?!\\d)";
-    }
-    return "(?<!\\w)" + Pattern.quote(toMatch) + "(?!\\w)";
-  }
-
-  private String ignoreConjunctions() {
-    return Arrays.stream(content.split("[\\s-]+"))
-        .filter(x -> !Arrays.asList("the", "a", "an").contains(x))
-        .map(Pattern::quote)
-        .collect(Collectors.joining("([\\s-]+)((and\\s+)|(the\\s+)|(a\\s+)|(an\\s+))?"));
-  }
-
-  private String suffixIfNeeded(String pattern) {
-    if (suffix) {
-      return "(?U)(?<=[^\\s])" + pattern;
-    }
-    return pattern;
-  }
-
-  private Pattern getPattern(String toMatch) {
-    return Pattern.compile(
-        suffixIfNeeded(getPatternStringToMatch(toMatch)), Pattern.CASE_INSENSITIVE);
-  }
-
   public String replaceLiteralWords(String description) {
-    Pattern pattern = getPattern(content);
+    Pattern pattern = clozePatternCreator.getPattern(content);
     return pattern.matcher(description).replaceAll(getInternalFullMatchReplacement());
   }
 
@@ -68,7 +37,7 @@ class TitleFragment {
       return literal;
     }
     String substring = content.substring(0, (content.length() + 1) * 3 / 4);
-    Pattern pattern = getPattern(substring);
+    Pattern pattern = clozePatternCreator.getPattern(substring);
     return pattern.matcher(literal).replaceAll(getInternalPartialMatchReplacement());
   }
 
