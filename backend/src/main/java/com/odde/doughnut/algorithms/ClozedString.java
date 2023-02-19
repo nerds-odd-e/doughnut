@@ -23,7 +23,6 @@ public class ClozedString {
             "<mark title='Hidden text that is partially matching the answer'>[..~]</mark>",
             "<mark title='Hidden text that is matching the answer'>[...]</mark>",
             "<mark title='Hidden pronunciation'>/.../</mark>",
-            "<mark title='Hidden subtitle that is partially matching the answer'>(..~)</mark>",
             "<mark title='Hidden subtitle that is matching the answer'>(...)</mark>");
     return new ClozedString(clozeReplacement, content);
   }

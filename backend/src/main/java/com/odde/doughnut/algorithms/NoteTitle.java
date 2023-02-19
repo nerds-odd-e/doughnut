@@ -33,16 +33,16 @@ public class NoteTitle {
     Pattern pattern = Pattern.compile("(?U)(.+?)(\\p{Ps}([^\\p{Ps}\\p{Pe}]+)\\p{Pe})?$");
     Matcher matcher = pattern.matcher(title);
     if (matcher.find()) {
-      getFragments(matcher.group(subtitle ? 3 : 1), subtitle).forEach(result::add);
+      getFragments(matcher.group(subtitle ? 3 : 1)).forEach(result::add);
     }
     result.sort(Comparator.comparing(TitleFragment::length));
     Collections.reverse(result);
     return result;
   }
 
-  private Stream<TitleFragment> getFragments(String subString, boolean subtitle) {
+  private Stream<TitleFragment> getFragments(String subString) {
     return Arrays.stream(subString != null ? subString.split("(?<!/)[/／](?!/)") : new String[] {})
-        .map(s -> new TitleFragment(s, subtitle));
+        .map(TitleFragment::new);
   }
 
   public List<TitleFragment> getSubtitles() {

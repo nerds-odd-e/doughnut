@@ -8,8 +8,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 public class ClozeDescriptionTest {
-  ClozeReplacement clozeReplacement =
-      new ClozeReplacement("[..~]", "[...]", "/.../", "<..~>", "<...>");
+  ClozeReplacement clozeReplacement = new ClozeReplacement("[..~]", "[...]", "/.../", "<...>");
 
   @ParameterizedTest
   @CsvSource({
@@ -68,8 +67,7 @@ public class ClozeDescriptionTest {
 
   @Test
   void theReplacementsShouldNotInterfereEachOther() {
-    ClozeReplacement clozeReplacement =
-        new ClozeReplacement("/..~/", "/.../", "(...)", "<.._>", "<...>");
+    ClozeReplacement clozeReplacement = new ClozeReplacement("/..~/", "/.../", "(...)", "<...>");
     assertThat(
         new ClozedString(clozeReplacement, "abc").hide(new NoteTitle("abc")).cloze(),
         equalTo("/.../"));
