@@ -1,5 +1,8 @@
 package com.odde.doughnut.algorithms;
 
+import java.util.List;
+import java.util.regex.Pattern;
+
 class ClozeReplacement {
   private static final String internalPartialMatchReplacement = "__p_a_r_t_i_a_l__";
   private static final String internalFullMatchReplacement = "__f_u_l_l__";
@@ -9,7 +12,7 @@ class ClozeReplacement {
   private final String partialMatchReplacement;
   private final String fullMatchSubtitleReplacement;
 
-  public String pronunciationReplacement;
+  private String pronunciationReplacement;
 
   public ClozeReplacement(
       String partialMatchReplacement,
@@ -29,7 +32,7 @@ class ClozeReplacement {
         .replace(internalFullMatchReplacementForSubtitle, fullMatchSubtitleReplacement);
   }
 
-  String replaceTitleFragments(String pronunciationMasked, NoteTitle noteTitle) {
+  private String replaceTitleFragments(String pronunciationMasked, NoteTitle noteTitle) {
     String literalMatchPreMasked =
         noteTitle.getTitles().stream()
             .reduce(
@@ -49,5 +52,16 @@ class ClozeReplacement {
                 (d, t) -> t.replaceLiteralWords(d, internalFullMatchReplacementForSubtitle),
                 (x, y) -> y);
     return replaceMasks(titleAllPreMasked);
+  }
+
+  String maskPronunciationsAndTitles(String originalContent1, List<NoteTitle> noteTitles1) {
+    final String internalPronunciationReplacement = "__p_r_o_n_u_n_c__";
+    final Pattern pattern =
+        Pattern.compile("\\/[^\\s^\\/][^\\/\\n]*\\/(?!\\w)", Pattern.CASE_INSENSITIVE);
+    String pronunciationsReplaced =
+        pattern.matcher(originalContent1).replaceAll(internalPronunciationReplacement);
+    return noteTitles1.stream()
+        .reduce(pronunciationsReplaced, this::replaceTitleFragments, (s, s2) -> s)
+        .replace(internalPronunciationReplacement, pronunciationReplacement);
   }
 }
