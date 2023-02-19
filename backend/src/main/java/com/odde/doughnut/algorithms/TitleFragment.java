@@ -2,18 +2,15 @@ package com.odde.doughnut.algorithms;
 
 import java.util.regex.Pattern;
 
-class TitleFragment {
-  private final boolean suffix;
-  private final String stem;
-
-  TitleFragment(String content) {
+record TitleFragment(boolean suffix, String stem) {
+  public static TitleFragment from(String content) {
     String trimmedContent = content.trim();
-    this.suffix = content.startsWith("~") || content.startsWith("〜") || content.startsWith("～");
-    if (suffix) {
-      this.stem = trimmedContent.substring(1);
-    } else {
-      this.stem = trimmedContent;
+    if (trimmedContent.startsWith("~")
+        || trimmedContent.startsWith("〜")
+        || trimmedContent.startsWith("～")) {
+      return new TitleFragment(true, trimmedContent.substring(1));
     }
+    return new TitleFragment(false, trimmedContent);
   }
 
   private ClozePatternCreator getClozePatternCreator() {

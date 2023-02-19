@@ -42,7 +42,7 @@ public class NoteTitle {
 
   private Stream<TitleFragment> getFragments(String subString) {
     return Arrays.stream(subString != null ? subString.split("(?<!/)[/／](?!/)") : new String[] {})
-        .map(TitleFragment::new);
+        .map(TitleFragment::from);
   }
 
   public List<TitleFragment> getSubtitles() {
