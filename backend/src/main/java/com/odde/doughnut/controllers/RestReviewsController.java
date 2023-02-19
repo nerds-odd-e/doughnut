@@ -113,7 +113,7 @@ class RestReviewsController {
   @Transactional
   public AnswerViewedByUser showAnswer(@PathVariable("answer") Answer answer)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(answer.getQuestion().getReviewPoint().getHeadNote());
+    currentUser.assertReadAuthorization(answer);
     AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
     AnswerViewedByUser answerResult = answerModel.getAnswerViewedByUser();
     answerResult.reviewPoint = answer.getQuestion().getReviewPoint();

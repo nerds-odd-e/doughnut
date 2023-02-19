@@ -1,11 +1,6 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.Circle;
-import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.Subscription;
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.util.Arrays;
@@ -42,9 +37,42 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
       assertReadAuthorization((Subscription) object);
     } else if (object instanceof Link) {
       assertReadAuthorizationLink((Link) object);
+    } else if (object instanceof Answer) {
+      assertReadAuthorizationAnswer((Answer) object);
+    } else if (object instanceof QuizQuestion) {
+      assertReadAuthorizationQuizQuestion((QuizQuestion) object);
+    } else if (object instanceof ReviewPoint) {
+      assertReadAuthorizationReviewPoint((ReviewPoint) object);
+    } else if (object instanceof Thing) {
+      assertReadAuthorizationThing((Thing) object);
+    } else if (object instanceof User) {
+      assertAuthorizationUser((User) object);
     } else {
       throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unknown object type");
     }
+  }
+
+  private void assertReadAuthorizationThing(Thing object) throws UnexpectedNoAccessRightException {
+    if (object.getNote() != null) {
+      assertReadAuthorizationNote(object.getNote());
+    } else {
+      assertReadAuthorizationLink(object.getLink());
+    }
+  }
+
+  private void assertReadAuthorizationReviewPoint(ReviewPoint object)
+      throws UnexpectedNoAccessRightException {
+    assertAuthorizationUser(object.getUser());
+  }
+
+  private void assertReadAuthorizationAnswer(Answer object)
+      throws UnexpectedNoAccessRightException {
+    assertReadAuthorizationQuizQuestion(object.getQuestion());
+  }
+
+  private void assertReadAuthorizationQuizQuestion(QuizQuestion question)
+      throws UnexpectedNoAccessRightException {
+    assertReadAuthorizationReviewPoint(question.getReviewPoint());
   }
 
   private void assertAuthorizationNote(Note note) throws UnexpectedNoAccessRightException {

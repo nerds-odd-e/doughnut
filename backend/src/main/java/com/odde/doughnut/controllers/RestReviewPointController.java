@@ -24,7 +24,7 @@ class RestReviewPointController {
   @GetMapping("/{reviewPoint}")
   public ReviewPoint show(@PathVariable("reviewPoint") ReviewPoint reviewPoint)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(reviewPoint.getUser());
+    currentUser.assertReadAuthorization(reviewPoint);
     return reviewPoint;
   }
 

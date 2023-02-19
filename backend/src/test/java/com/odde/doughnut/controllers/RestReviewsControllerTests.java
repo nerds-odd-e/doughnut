@@ -32,15 +32,15 @@ import org.springframework.web.server.ResponseStatusException;
 class RestReviewsControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
-  private UserModel userModel;
+  private UserModel currentUser;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   RestReviewsController controller;
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().toModelPlease();
-    controller = new RestReviewsController(modelFactoryService, userModel, testabilitySettings);
+    currentUser = makeMe.aUser().toModelPlease();
+    controller = new RestReviewsController(modelFactoryService, currentUser, testabilitySettings);
   }
 
   RestReviewsController nullUserController() {
@@ -60,7 +60,7 @@ class RestReviewsControllerTests {
   class initalReview {
     @Test
     void initialReview() {
-      Note n = makeMe.aNote().creatorAndOwner(userModel).please();
+      Note n = makeMe.aNote().creatorAndOwner(currentUser).please();
       makeMe.refresh(n);
       assertThat(n.getThing().getId(), notNullValue());
       List<ReviewPoint> reviewPointWithReviewSettings = controller.initialReview();
@@ -101,7 +101,7 @@ class RestReviewsControllerTests {
       reviewPoint =
           makeMe
               .aReviewPointFor(answerNote)
-              .by(userModel)
+              .by(currentUser)
               .forgettingCurveAndNextReviewAt(200)
               .please();
       answer =
@@ -141,7 +141,7 @@ class RestReviewsControllerTests {
     @Test
     void shouldIncreaseTheViceReviewPointToo() {
       Note note2 = makeMe.aNote().please();
-      ReviewPoint anotherReviewPoint = makeMe.aReviewPointFor(note2).by(userModel).please();
+      ReviewPoint anotherReviewPoint = makeMe.aReviewPointFor(note2).by(currentUser).please();
       answer.getQuestion().setViceReviewPoints(List.of(anotherReviewPoint));
       makeMe.refresh(anotherReviewPoint);
       makeMe.refresh(note2);
@@ -207,20 +207,36 @@ class RestReviewsControllerTests {
   @Nested
   class showAnswer {
     Answer answer;
+    Note noteByAnotherUser;
+    ReviewPoint reviewPoint;
+    User anotherUser;
 
     @Nested
     class ANoteFromOtherUser {
       @BeforeEach
       void setup() {
-        User user = makeMe.aUser().please();
-        Note note = makeMe.aNote().creatorAndOwner(user).please();
-        ReviewPoint reviewPoint = makeMe.aReviewPointFor(note).by(user).please();
-        answer = makeMe.anAnswerFor(reviewPoint).please();
+        anotherUser = makeMe.aUser().please();
+        noteByAnotherUser = makeMe.aNote().creatorAndOwner(anotherUser).please();
       }
 
       @Test
       void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
+        reviewPoint = makeMe.aReviewPointFor(noteByAnotherUser).by(anotherUser).please();
+        answer = makeMe.anAnswerFor(reviewPoint).please();
         assertThrows(UnexpectedNoAccessRightException.class, () -> controller.showAnswer(answer));
+      }
+
+      @Test
+      void canSeeNoteThatHasReadAccess() throws UnexpectedNoAccessRightException {
+        reviewPoint = makeMe.aReviewPointFor(noteByAnotherUser).by(currentUser).please();
+        answer = makeMe.anAnswerFor(reviewPoint).answerWithSpelling("xx").please();
+        makeMe
+            .aSubscription()
+            .forUser(currentUser.getEntity())
+            .forNotebook(noteByAnotherUser.getNotebook())
+            .please();
+        AnswerViewedByUser answerViewedByUser = controller.showAnswer(answer);
+        assertThat(answerViewedByUser.answerId, equalTo(answer.getId()));
       }
     }
   }
