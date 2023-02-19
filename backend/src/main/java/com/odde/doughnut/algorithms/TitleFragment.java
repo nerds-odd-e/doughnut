@@ -24,7 +24,7 @@ class TitleFragment {
     return stem.equalsIgnoreCase(answer.strip());
   }
 
-  public String replaceLiteralWords(String description, String replacement) {
+  public String replaceLiteralWords(String description, final String replacement) {
     Pattern pattern = getClozePatternCreator().getPattern(stem);
     return pattern.matcher(description).replaceAll(replacement);
   }

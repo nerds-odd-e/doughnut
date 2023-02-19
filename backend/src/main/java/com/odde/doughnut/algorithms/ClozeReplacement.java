@@ -9,11 +9,12 @@ record ClozeReplacement(
     String fullMatchReplacement,
     String pronunciationReplacement,
     String fullMatchSubtitleReplacement) {
-  private static final String internalPartialMatchReplacement = "__p_a_r_t_i_a_l__";
-  private static final String internalFullMatchReplacement = "__f_u_l_l__";
-  private static final String internalFullMatchReplacementForSubtitle = "__f_u_l_l_s_u_b__";
 
   private String replaceTitleFragments(String pronunciationMasked, NoteTitle noteTitle) {
+    final String internalPartialMatchReplacement = "__p_a_r_t_i_a_l__";
+    final String internalFullMatchReplacement = "__f_u_l_l__";
+    final String internalFullMatchReplacementForSubtitle = "__f_u_l_l_s_u_b__";
+
     String step1 =
         replaceTitlesWithInternalPlaceholder(
             noteTitle.getTitles(),
@@ -30,8 +31,8 @@ record ClozeReplacement(
             step2,
             (p, t) -> t.replaceLiteralWords(p, internalFullMatchReplacementForSubtitle));
     return step3
-        .replace(internalPartialMatchReplacement, partialMatchReplacement)
         .replace(internalFullMatchReplacement, fullMatchReplacement)
+        .replace(internalPartialMatchReplacement, partialMatchReplacement)
         .replace(internalFullMatchReplacementForSubtitle, fullMatchSubtitleReplacement);
   }
 
