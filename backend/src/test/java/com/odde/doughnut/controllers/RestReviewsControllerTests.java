@@ -6,12 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.odde.doughnut.entities.Answer;
-import com.odde.doughnut.entities.AnswerResult;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
-import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.json.InitialInfo;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
@@ -203,6 +200,27 @@ class RestReviewsControllerTests {
             lessThan(
                 TimestampOperations.addHoursToTimestamp(
                     testabilitySettings.getCurrentUTCTimestamp(), 25)));
+      }
+    }
+  }
+
+  @Nested
+  class showAnswer {
+    Answer answer;
+
+    @Nested
+    class ANoteFromOtherUser {
+      @BeforeEach
+      void setup() {
+        User user = makeMe.aUser().please();
+        Note note = makeMe.aNote().creatorAndOwner(user).please();
+        ReviewPoint reviewPoint = makeMe.aReviewPointFor(note).by(user).please();
+        answer = makeMe.anAnswerFor(reviewPoint).please();
+      }
+
+      @Test
+      void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
+        assertThrows(UnexpectedNoAccessRightException.class, () -> controller.showAnswer(answer));
       }
     }
   }
