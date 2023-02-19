@@ -7,34 +7,37 @@ class TitleFragment {
   static final String internalFullMatchReplacement = "__f_u_l_l__";
   static final String internalPartialMatchReplacementForSubtitle = "__p_a_r_t_i_a_l_s_u_b__";
   static final String internalFullMatchReplacementForSubtitle = "__f_u_l_l_s_u_b__";
-  private final String content;
   private final boolean subtitle;
-  private final ClozePatternCreator clozePatternCreator;
+  private final boolean suffix;
+  private final String stem;
 
   TitleFragment(String content, boolean subtitle) {
     this.subtitle = subtitle;
-    String trimmed = content.trim();
-    if (content.startsWith("~") || content.startsWith("〜") || content.startsWith("～")) {
-      this.content = trimmed.substring(1);
-      this.clozePatternCreator = new ClozePatternCreator(true);
+    String trimmedContent = content.trim();
+    this.suffix = content.startsWith("~") || content.startsWith("〜") || content.startsWith("～");
+    if (suffix) {
+      this.stem = trimmedContent.substring(1);
     } else {
-      this.content = trimmed;
-      this.clozePatternCreator = new ClozePatternCreator(false);
+      this.stem = trimmedContent;
     }
   }
 
+  private ClozePatternCreator getClozePatternCreator() {
+    return new ClozePatternCreator(suffix);
+  }
+
   boolean matches(String answer) {
-    return content.equalsIgnoreCase(answer.strip());
+    return stem.equalsIgnoreCase(answer.strip());
   }
 
   public String replaceLiteralWords(String description) {
-    Pattern pattern = clozePatternCreator.getPattern(content);
+    Pattern pattern = getClozePatternCreator().getPattern(stem);
     return pattern.matcher(description).replaceAll(getInternalFullMatchReplacement());
   }
 
   public String replaceSimilar(String literal) {
-    String substring = content.substring(0, (content.length() + 1) * 3 / 4);
-    Pattern pattern = clozePatternCreator.getPattern(substring);
+    String substring = stem.substring(0, (stem.length() + 1) * 3 / 4);
+    Pattern pattern = getClozePatternCreator().getPattern(substring);
     return pattern.matcher(literal).replaceAll(getInternalPartialMatchReplacement());
   }
 
@@ -49,6 +52,6 @@ class TitleFragment {
   }
 
   public int length() {
-    return content.length();
+    return stem.length();
   }
 }
