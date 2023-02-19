@@ -11,7 +11,7 @@ public class ClozePatternCreator {
     this.suffix = suffix;
   }
 
-  String getPatternStringToMatch(String toMatch) {
+  private String getPatternStringToMatch(String toMatch) {
     if (toMatch.length() >= 4 || suffix) {
       return ignoreConjunctions(toMatch);
     }
@@ -21,14 +21,14 @@ public class ClozePatternCreator {
     return "(?<!\\w)" + Pattern.quote(toMatch) + "(?!\\w)";
   }
 
-  String ignoreConjunctions(String toMatch) {
+  private String ignoreConjunctions(String toMatch) {
     return Arrays.stream(toMatch.split("[\\s-]+"))
         .filter(x -> !Arrays.asList("the", "a", "an").contains(x))
         .map(Pattern::quote)
         .collect(Collectors.joining("([\\s-]+)((and\\s+)|(the\\s+)|(a\\s+)|(an\\s+))?"));
   }
 
-  String suffixIfNeeded(String pattern) {
+  private String suffixIfNeeded(String pattern) {
     if (suffix) {
       return "(?U)(?<=[^\\s])" + pattern;
     }

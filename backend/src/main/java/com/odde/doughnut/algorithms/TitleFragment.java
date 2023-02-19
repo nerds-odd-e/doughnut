@@ -33,9 +33,6 @@ class TitleFragment {
   }
 
   public String replaceSimilar(String literal) {
-    if (content.length() < 4) {
-      return literal;
-    }
     String substring = content.substring(0, (content.length() + 1) * 3 / 4);
     Pattern pattern = clozePatternCreator.getPattern(substring);
     return pattern.matcher(literal).replaceAll(getInternalPartialMatchReplacement());
