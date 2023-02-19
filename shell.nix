@@ -57,8 +57,9 @@ in mkShell {
     apple_sdk.SystemConfiguration
     xcodebuild
     pinentry_mac
+    sequelpro
   ] ++ lib.optionals (!stdenv.isDarwin) [
-    dbeaver
+    sequeler 
     ungoogled-chromium
     psmisc
     x11vnc
