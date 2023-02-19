@@ -1,6 +1,7 @@
 package com.odde.doughnut.algorithms;
 
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 
 record ClozeReplacement(
@@ -12,33 +13,33 @@ record ClozeReplacement(
   private static final String internalFullMatchReplacement = "__f_u_l_l__";
   private static final String internalFullMatchReplacementForSubtitle = "__f_u_l_l_s_u_b__";
 
-  private String replaceMasks(String titleMasked) {
-    return titleMasked
-        .replace(internalFullMatchReplacement, fullMatchReplacement)
+  private String replaceTitleFragments(String pronunciationMasked, NoteTitle noteTitle) {
+    String step1 =
+        replaceTitlesWithInternalPlaceholder(
+            noteTitle.getTitles(),
+            pronunciationMasked,
+            (p, t) -> t.replaceLiteralWords(p, internalFullMatchReplacement));
+    String step2 =
+        replaceTitlesWithInternalPlaceholder(
+            noteTitle.getTitles(),
+            step1,
+            (p, t) -> t.replaceSimilar(p, internalPartialMatchReplacement));
+    String step3 =
+        replaceTitlesWithInternalPlaceholder(
+            noteTitle.getSubtitles(),
+            step2,
+            (p, t) -> t.replaceLiteralWords(p, internalFullMatchReplacementForSubtitle));
+    return step3
         .replace(internalPartialMatchReplacement, partialMatchReplacement)
+        .replace(internalFullMatchReplacement, fullMatchReplacement)
         .replace(internalFullMatchReplacementForSubtitle, fullMatchSubtitleReplacement);
   }
 
-  private String replaceTitleFragments(String pronunciationMasked, NoteTitle noteTitle) {
-    String literalMatchPreMasked =
-        noteTitle.getTitles().stream()
-            .reduce(
-                pronunciationMasked,
-                (d, t) -> t.replaceLiteralWords(d, internalFullMatchReplacement),
-                (x, y) -> y);
-    String titlePreMasked =
-        noteTitle.getTitles().stream()
-            .reduce(
-                literalMatchPreMasked,
-                (d, t) -> t.replaceSimilar(d, internalPartialMatchReplacement),
-                (x, y) -> y);
-    String titleAllPreMasked =
-        noteTitle.getSubtitles().stream()
-            .reduce(
-                titlePreMasked,
-                (d, t) -> t.replaceLiteralWords(d, internalFullMatchReplacementForSubtitle),
-                (x, y) -> y);
-    return replaceMasks(titleAllPreMasked);
+  private static String replaceTitlesWithInternalPlaceholder(
+      List<TitleFragment> noteTitle,
+      String processed,
+      BiFunction<String, TitleFragment, String> replacer) {
+    return noteTitle.stream().reduce(processed, replacer, (x, y) -> y);
   }
 
   String maskPronunciationsAndTitles(String originalContent1, List<NoteTitle> noteTitles1) {
