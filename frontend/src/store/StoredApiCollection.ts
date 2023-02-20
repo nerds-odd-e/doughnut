@@ -211,6 +211,9 @@ export default class StoredApiCollection implements StoredApi {
     this.noteEditingHistory.deleteNote(noteId);
     if (res.length === 0) {
       this.storage.focusOnNotebooks();
+      this.router.replace({
+        name: "notebooks",
+      });
       return undefined;
     }
     const noteRealm = this.storage.refreshNoteRealm(res[0], undefined);

@@ -30,7 +30,6 @@ export class StorageImplementation
 
   focusOnNotebooks(): void {
     this.selectPosition();
-    this.uglytemporarySolution = "replace";
     this.updatedNoteRealm = undefined;
     this.storageUpdatedAt = new Date();
   }
