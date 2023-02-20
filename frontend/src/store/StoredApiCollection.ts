@@ -48,10 +48,7 @@ export interface StoredApi {
 
   undo(router: Router): Promise<Generated.NoteRealm>;
 
-  deleteNote(
-    noteId: Doughnut.ID,
-    router: Router
-  ): Promise<Generated.NoteRealm | undefined>;
+  deleteNote(noteId: Doughnut.ID): Promise<Generated.NoteRealm | undefined>;
 }
 export default class StoredApiCollection implements StoredApi {
   noteEditingHistory: NoteEditingHistory;
@@ -206,7 +203,7 @@ export default class StoredApiCollection implements StoredApi {
     return noteRealm;
   }
 
-  async deleteNote(noteId: Doughnut.ID, router: Router) {
+  async deleteNote(noteId: Doughnut.ID) {
     const res = (await this.managedApi.restPost(
       `notes/${noteId}/delete`,
       {}
@@ -217,7 +214,7 @@ export default class StoredApiCollection implements StoredApi {
       return undefined;
     }
     const noteRealm = this.storage.refreshNoteRealm(res[0], undefined);
-    router.replace({
+    this.router.replace({
       name: "noteShow",
       params: { noteId: noteRealm?.id },
     });
