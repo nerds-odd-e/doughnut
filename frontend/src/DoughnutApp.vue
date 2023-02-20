@@ -41,7 +41,7 @@ export default defineComponent({
     $route() {
       this.popups.done(false);
     },
-    "storageAccessor.updatedAt": function updatedAt() {
+    "storageAccessor.storageUpdatedAt": function updatedAt() {
       if (!this.storageAccessor.updatedNoteRealm) {
         this.$router.replace({ name: "notebooks" });
       }

@@ -67,7 +67,7 @@ export default defineComponent({
     },
   },
   watch: {
-    "storageAccessor.updatedAt": function updateAt() {
+    "storageAccessor.storageUpdatedAt": function updateAt() {
       this.noteRealmUpdated(this.storageAccessor.updatedNoteRealm);
     },
     noteId() {

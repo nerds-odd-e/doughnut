@@ -4,7 +4,7 @@ import CurrentPosition, {
 
 export default interface NoteStorage extends CurrentPosition {
   updatedNoteRealm?: Generated.NoteRealm;
-  updatedAt?: Date;
+  storageUpdatedAt?: Date;
   focusOnNotebooks(): void;
   selectPosition(
     note?: Generated.Note,
@@ -22,12 +22,12 @@ export class StorageImplementation
 {
   updatedNoteRealm?: Generated.NoteRealm;
 
-  updatedAt?: Date;
+  storageUpdatedAt?: Date;
 
   focusOnNotebooks(): void {
     this.selectPosition();
     this.updatedNoteRealm = undefined;
-    this.updatedAt = new Date();
+    this.storageUpdatedAt = new Date();
   }
 
   refreshNoteRealm(
@@ -41,7 +41,7 @@ export class StorageImplementation
       noteRealm = data;
     }
     this.updatedNoteRealm = noteRealm;
-    this.updatedAt = new Date();
+    this.storageUpdatedAt = new Date();
     return noteRealm;
   }
 }
