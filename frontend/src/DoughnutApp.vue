@@ -42,9 +42,24 @@ export default defineComponent({
       this.popups.done(false);
     },
     "storageAccessor.storageUpdatedAt": function updatedAt() {
+      // eslint-disable-next-line no-console
+      console.log("storage updated at", this.storageAccessor);
+      const route =
+        // eslint-disable-next-line no-nested-ternary
+        this.storageAccessor.uglytemporarySolution === "replace"
+          ? (x) => this.$router.replace(x)
+          : this.storageAccessor.uglytemporarySolution === "push"
+          ? (x) => this.$router.push(x)
+          : // eslint-disable-next-line @typescript-eslint/no-empty-function
+            () => {};
       if (!this.storageAccessor.updatedNoteRealm) {
-        this.$router.replace({ name: "notebooks" });
+        route({ name: "notebooks" });
+        return;
       }
+      route({
+        name: "noteShow",
+        params: { noteId: this.storageAccessor.updatedNoteRealm.id },
+      });
     },
   },
 

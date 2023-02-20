@@ -4,6 +4,7 @@ import CurrentPosition, {
 
 export default interface NoteStorage extends CurrentPosition {
   updatedNoteRealm?: Generated.NoteRealm;
+  uglytemporarySolution?: string;
   storageUpdatedAt?: Date;
   focusOnNotebooks(): void;
   selectPosition(
@@ -12,7 +13,8 @@ export default interface NoteStorage extends CurrentPosition {
     circle?: Generated.Circle
   ): void;
   refreshNoteRealm(
-    data: Generated.NoteRealm | Generated.NoteRealmWithPosition
+    data: Generated.NoteRealm | Generated.NoteRealmWithPosition,
+    routerAction: "push" | "replace" | undefined
   ): Generated.NoteRealm;
 }
 
@@ -24,14 +26,18 @@ export class StorageImplementation
 
   storageUpdatedAt?: Date;
 
+  uglytemporarySolution?: string;
+
   focusOnNotebooks(): void {
     this.selectPosition();
+    this.uglytemporarySolution = "replace";
     this.updatedNoteRealm = undefined;
     this.storageUpdatedAt = new Date();
   }
 
   refreshNoteRealm(
-    data: Generated.NoteRealm | Generated.NoteRealmWithPosition
+    data: Generated.NoteRealm | Generated.NoteRealmWithPosition,
+    routerAction: "push" | "replace" | undefined
   ): Generated.NoteRealm {
     let noteRealm: Generated.NoteRealm;
     if (data && "noteRealm" in data) {
@@ -40,6 +46,7 @@ export class StorageImplementation
     } else {
       noteRealm = data;
     }
+    this.uglytemporarySolution = routerAction;
     this.updatedNoteRealm = noteRealm;
     this.storageUpdatedAt = new Date();
     return noteRealm;

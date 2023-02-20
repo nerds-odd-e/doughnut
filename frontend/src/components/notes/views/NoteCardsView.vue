@@ -60,17 +60,9 @@ export default defineComponent({
   },
   methods: {
     noteRealmUpdated(updatedNoteRealm?: Generated.NoteRealm) {
-      if (!updatedNoteRealm) {
-        return;
+      if (updatedNoteRealm?.id === this.noteId) {
+        this.noteRealm = updatedNoteRealm;
       }
-      if (updatedNoteRealm.id !== this.noteId) {
-        this.$router.push({
-          name: "noteShow",
-          params: { noteId: updatedNoteRealm.id },
-        });
-        return;
-      }
-      this.noteRealm = updatedNoteRealm;
     },
     async fetchData() {
       const noteRealmWithPosition = await this.storageAccessor

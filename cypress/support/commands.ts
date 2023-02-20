@@ -534,6 +534,7 @@ Cypress.Commands.add("clickNotePageButtonOnCurrentPage", (btnTextOrTitle) => {
 
 Cypress.Commands.add("undoLast", (undoType: string) => {
   cy.findByTitle(`undo ${undoType}`).click()
+  cy.pageIsNotLoading()
 })
 
 Cypress.Commands.add("deleteNoteViaAPI", { prevSubject: true }, (subject) => {

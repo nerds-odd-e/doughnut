@@ -147,7 +147,6 @@ Then("I should see {notepath} with these children", (notePath: NotePath, data: D
 })
 
 When("I delete notebook {string}", (noteTitle: string) => {
-  cy.visit("/")
   cy.deleteNote(noteTitle)
 })
 
