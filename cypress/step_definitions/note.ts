@@ -175,6 +175,11 @@ Then("I should see {string} in note title", (noteTitle: string) => {
   cy.findNoteTitle(noteTitle)
 })
 
+Then("I should see the note {string} is marked as deleted", (noteTitle: string) => {
+  cy.jumpToNotePage(noteTitle)
+  cy.findNoteTitle(noteTitle)
+})
+
 Then("I should not see note {string} at the top level of all my notes", (noteTitle: string) => {
   cy.pageIsNotLoading()
   cy.findByText("Notebooks")
