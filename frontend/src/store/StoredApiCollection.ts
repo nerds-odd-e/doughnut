@@ -46,7 +46,7 @@ export interface StoredApi {
     data: Generated.WikidataAssociationCreation
   ): Promise<Generated.NoteRealm>;
 
-  undo(): Promise<Generated.NoteRealm>;
+  undo(router: Router): Promise<Generated.NoteRealm>;
 
   deleteNote(
     noteId: Doughnut.ID,
@@ -187,8 +187,16 @@ export default class StoredApiCollection implements StoredApi {
     )) as Generated.NoteRealm;
   }
 
-  async undo() {
-    return this.storage.refreshNoteRealm(await this.undoInner(), "push");
+  async undo(router: Router) {
+    const noteRealm = this.storage.refreshNoteRealm(
+      await this.undoInner(),
+      undefined
+    );
+    router.push({
+      name: "noteShow",
+      params: { noteId: noteRealm?.id },
+    });
+    return noteRealm;
   }
 
   async deleteNote(noteId: Doughnut.ID, router: Router) {
