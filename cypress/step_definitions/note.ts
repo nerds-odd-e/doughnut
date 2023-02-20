@@ -390,7 +390,7 @@ When("I undo {string} again", (undoType: string) => {
 })
 
 Then("the deleted notebook with title {string} should be restored", (title: string) => {
-  cy.findCardTitle(title)
+  cy.findNoteTitle(title)
 })
 
 Then("there should be no more undo to do", () => {

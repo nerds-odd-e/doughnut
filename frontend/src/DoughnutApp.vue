@@ -42,8 +42,6 @@ export default defineComponent({
       this.popups.done(false);
     },
     "storageAccessor.storageUpdatedAt": function updatedAt() {
-      // eslint-disable-next-line no-console
-      console.log("storage updated at", this.storageAccessor);
       const route =
         // eslint-disable-next-line no-nested-ternary
         this.storageAccessor.uglytemporarySolution === "replace"
