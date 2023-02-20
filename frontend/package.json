@@ -32,7 +32,7 @@
     "@vitejs/plugin-vue-jsx": "3.0.0",
     "@vue/eslint-config-prettier": "^7.0",
     "@vue/eslint-config-typescript": "^11.0",
-    "@vue/test-utils": "2.2.10",
+    "@vue/test-utils": "2.3.0",
     "autoprefixer": "^10.4",
     "css-loader": "^6.7",
     "eslint": "^8.33",
