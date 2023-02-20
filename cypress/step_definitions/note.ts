@@ -146,16 +146,18 @@ Then("I should see {notepath} with these children", (notePath: NotePath, data: D
   cy.navigateToNotePage(notePath).then(() => cy.expectNoteCards(data.hashes()))
 })
 
-When("I delete notebook {string}", (noteTitle) => {
+When("I delete notebook {string}", (noteTitle: string) => {
   cy.visit("/")
-  cy.clickNotePageMoreOptionsButton(noteTitle, "Delete note")
-  cy.findByRole("button", { name: "OK" }).click()
+  cy.deleteNote(noteTitle)
 })
 
 When("I delete note {string} at {int}:00", (noteTitle: string, hour: number) => {
   cy.testability().backendTimeTravelTo(0, hour)
-  cy.clickNotePageMoreOptionsButton(noteTitle, "Delete note")
-  cy.findByRole("button", { name: "OK" }).click()
+  cy.deleteNote(noteTitle)
+})
+
+When("I delete note {string}", (noteTitle: string) => {
+  cy.deleteNote(noteTitle)
 })
 
 When("I create a sibling note of {string}:", (noteTitle: string, data: DataTable) => {

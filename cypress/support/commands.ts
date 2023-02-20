@@ -281,14 +281,22 @@ Cypress.Commands.add("clickNotePageButton", (noteTitle, btnTextOrTitle, forceLoa
   cy.clickNotePageButtonOnCurrentPage(btnTextOrTitle)
 })
 
-Cypress.Commands.add("clickNotePageMoreOptionsButton", (noteTitle, btnTextOrTitle) => {
-  cy.jumpToNotePage(noteTitle)
-  cy.clickNotePageMoreOptionsButtonOnCurrentPage(btnTextOrTitle)
-})
+Cypress.Commands.add(
+  "clickNotePageMoreOptionsButton",
+  (noteTitle: string, btnTextOrTitle: string) => {
+    cy.jumpToNotePage(noteTitle)
+    cy.clickNotePageMoreOptionsButtonOnCurrentPage(btnTextOrTitle)
+  },
+)
 
-Cypress.Commands.add("clickNotePageMoreOptionsButtonOnCurrentPage", (btnTextOrTitle) => {
+Cypress.Commands.add("clickNotePageMoreOptionsButtonOnCurrentPage", (btnTextOrTitle: string) => {
   cy.clickNotePageButtonOnCurrentPage("more options")
   cy.clickNotePageButtonOnCurrentPage(btnTextOrTitle)
+})
+
+Cypress.Commands.add("deleteNote", (noteTitle: string) => {
+  cy.clickNotePageMoreOptionsButton(noteTitle, "Delete note")
+  cy.findByRole("button", { name: "OK" }).click()
 })
 
 Cypress.Commands.add("expectExactLinkTargets", (targets) => {
