@@ -310,6 +310,13 @@ Cypress.Commands.add("clickLinkNob", (target: string) => {
   cy.findByText(target).siblings(".link-nob").click()
 })
 
+Cypress.Commands.add("changeLinkType", (targetTitle: string, linkType: string) => {
+  cy.clickLinkNob(targetTitle)
+  cy.clickRadioByLabel(linkType)
+  cy.pageIsNotLoading()
+  cy.findAllByRole("button", { name: linkType }).should("be.visible")
+})
+
 Cypress.Commands.add("findNoteCardButton", (noteTitle, btnTextOrTitle) => {
   return cy
     .findCardTitle(noteTitle)

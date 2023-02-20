@@ -23,6 +23,7 @@ declare namespace Cypress {
     clickNotePageMoreOptionsButtonOnCurrentPage(btnTextOrTitle: string): Chainable<any>
     deleteNote(noteTitle: string): Chainable<any>
     clickLinkNob(target: string): Chainable<any>
+    changeLinkType(targetNote: string, linkType: string): Chainable<any>
     clickRadioByLabel(labelText: any): Chainable<any>
     deleteNoteViaAPI(): Chainable<Subject>
     dialogDisappeared(): Chainable<any>

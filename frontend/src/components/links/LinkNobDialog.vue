@@ -15,6 +15,7 @@
     v-model="formData.linkType"
     :errors="linkFormErrors.linkType"
     :inverse-icon="true"
+    @update:model-value="updateLink"
   />
   <div v-if="!inverseIcon">
     Target:
@@ -26,7 +27,6 @@
     </strong>
   </div>
 
-  <button class="btn btn-primary" @click="updateLink()">Update</button>
   <button class="btn btn-danger" @click="deleteLink()">Delete</button>
 </template>
 

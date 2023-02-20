@@ -113,11 +113,7 @@ Then(
   "I change the link from {string} to {string} to {string}",
   (noteTitle: string, targetTitle: string, linkType: string) => {
     cy.jumpToNotePage(noteTitle)
-    cy.clickLinkNob(targetTitle)
-    cy.clickRadioByLabel(linkType)
-    cy.pageIsNotLoading()
-    cy.findByRole("button", { name: "Update" }).click()
-    cy.findAllByRole("button", { name: linkType }).should("be.visible")
+    cy.changeLinkType(targetTitle, linkType)
   },
 )
 
