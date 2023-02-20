@@ -14,6 +14,14 @@ Feature: Note deletion
     When I delete note "TDD"
     Then I should see the note "TDD" is marked as deleted
 
+  @ignore
+  Scenario: Delete a note will delete its links
+    Given there is "a part of" link between note "TDD" and "tech"
+    When I delete note "TDD"
+    Then I should see "tech" has no link to "TDD"
+    When I undo "delete note"
+    Then I should see "tech" has link "a par of" to "TDD"
+
   Scenario: Delete a note then delete its parent and undo
     Given I delete note "TDD" at 13:00
     And I delete note "tech" at 14:00
