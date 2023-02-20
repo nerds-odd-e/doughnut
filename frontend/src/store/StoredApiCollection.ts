@@ -1,3 +1,4 @@
+import { Router } from "vue-router";
 import ManagedApi from "../managedApi/ManagedApi";
 import apiCollection from "../managedApi/apiCollection";
 import NoteEditingHistory from "./NoteEditingHistory";
@@ -47,7 +48,10 @@ export interface StoredApi {
 
   undo(): Promise<Generated.NoteRealm>;
 
-  deleteNote(noteId: Doughnut.ID): Promise<Generated.NoteRealm | undefined>;
+  deleteNote(
+    noteId: Doughnut.ID,
+    router: Router
+  ): Promise<Generated.NoteRealm | undefined>;
 }
 export default class StoredApiCollection implements StoredApi {
   noteEditingHistory: NoteEditingHistory;
@@ -187,7 +191,7 @@ export default class StoredApiCollection implements StoredApi {
     return this.storage.refreshNoteRealm(await this.undoInner(), "push");
   }
 
-  async deleteNote(noteId: Doughnut.ID) {
+  async deleteNote(noteId: Doughnut.ID, router: Router) {
     const res = (await this.managedApi.restPost(
       `notes/${noteId}/delete`,
       {}
@@ -197,6 +201,11 @@ export default class StoredApiCollection implements StoredApi {
       this.storage.focusOnNotebooks();
       return undefined;
     }
-    return this.storage.refreshNoteRealm(res[0], "replace");
+    const noteRealm = this.storage.refreshNoteRealm(res[0], undefined);
+    router.replace({
+      name: "noteShow",
+      params: { noteId: noteRealm?.id },
+    });
+    return noteRealm;
   }
 }

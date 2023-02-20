@@ -29,7 +29,7 @@ export default defineComponent({
   methods: {
     async deleteNote() {
       if (await this.popups.confirm(`Confirm to delete this note?`)) {
-        await this.storageAccessor.api().deleteNote(this.noteId);
+        await this.storageAccessor.api().deleteNote(this.noteId, this.$router);
       }
     },
   },
