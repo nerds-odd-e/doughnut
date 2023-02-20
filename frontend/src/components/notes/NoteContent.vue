@@ -120,7 +120,7 @@ export default defineComponent({
   methods: {
     onBlurTextField() {
       this.storageAccessor
-        .api()
+        .api(this.$router)
         .updateTextContent(
           this.note.id,
           this.textContent,

@@ -66,7 +66,7 @@ export default defineComponent({
     },
     async fetchData() {
       const noteRealmWithPosition = await this.storageAccessor
-        .api()
+        .api(this.$router)
         .getNoteRealmWithPosition(this.noteId);
       this.noteRealm = noteRealmWithPosition.noteRealm;
     },

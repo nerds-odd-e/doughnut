@@ -29,7 +29,9 @@ export default defineComponent({
   methods: {
     async deleteNote() {
       if (await this.popups.confirm(`Confirm to delete this note?`)) {
-        await this.storageAccessor.api().deleteNote(this.noteId, this.$router);
+        await this.storageAccessor
+          .api(this.$router)
+          .deleteNote(this.noteId, this.$router);
       }
     },
   },

@@ -66,7 +66,7 @@ export default defineComponent({
   methods: {
     appendToDescription() {
       this.storageAccessor
-        .api()
+        .api(this.$router)
         .updateTextContent(
           this.selectedNote.id,
           this.textContent,

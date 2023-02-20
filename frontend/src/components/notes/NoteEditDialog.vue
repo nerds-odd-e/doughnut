@@ -41,7 +41,7 @@ export default defineComponent({
   methods: {
     processForm() {
       this.storageAccessor
-        .api()
+        .api(this.$router)
         .updateNote(this.note.id, this.formData)
         .then(this.popup.done)
         .catch((error) => {

@@ -9,7 +9,7 @@ beforeEach(() => {
 describe("storedApiCollection", () => {
   const note = makeMe.aNoteRealm.please();
   const history = createNoteStorage();
-  const sa = history.api();
+  const sa = history.api({} as unknown as Router);
 
   describe("delete note", () => {
     beforeEach(() => {

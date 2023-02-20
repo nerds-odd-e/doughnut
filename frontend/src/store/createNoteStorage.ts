@@ -1,9 +1,10 @@
+import { Router } from "vue-router";
 import NoteEditingHistory, { HistoryRecord } from "./NoteEditingHistory";
 import NoteStorage, { StorageImplementation } from "./NoteStorage";
 import StoredApiCollection, { StoredApi } from "./StoredApiCollection";
 
 interface StorageAccessor extends NoteStorage {
-  api(): StoredApi;
+  api(router: Router): StoredApi;
   peekUndo(): null | HistoryRecord;
 }
 
@@ -26,8 +27,8 @@ class AccessorImplementation
     return this.noteEditingHistory.peekUndo();
   }
 
-  api(): StoredApi {
-    return new StoredApiCollection(this.noteEditingHistory, this);
+  api(router: Router): StoredApi {
+    return new StoredApiCollection(this.noteEditingHistory, router, this);
   }
 }
 

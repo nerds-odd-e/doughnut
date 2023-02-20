@@ -83,7 +83,7 @@ export default defineComponent({
     },
     async save() {
       await this.storageAccessor
-        .api()
+        .api(this.$router)
         .updateWikidataId(this.note.id, this.associationData);
       this.popup.done(null);
     },

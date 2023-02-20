@@ -89,7 +89,7 @@ export default defineComponent({
       this.noteFormErrors.wikidataId = undefined;
       this.noteFormErrors.textContent = {};
       this.storageAccessor
-        .api()
+        .api(this.$router)
         .createNote(this.parentId, this.creationData)
         .then(this.popup.done)
         .catch((res) => {

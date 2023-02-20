@@ -60,10 +60,17 @@ export default class StoredApiCollection implements StoredApi {
 
   storage: NoteStorage;
 
-  constructor(undoHistory: NoteEditingHistory, storage: NoteStorage) {
+  router: Router;
+
+  constructor(
+    undoHistory: NoteEditingHistory,
+    router: Router,
+    storage: NoteStorage
+  ) {
     this.managedApi = new ManagedApi();
     this.noteEditingHistory = undoHistory;
     this.storage = storage;
+    this.router = router;
   }
 
   private get statelessApi(): ReturnType<typeof apiCollection> {
