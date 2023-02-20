@@ -297,6 +297,7 @@ Cypress.Commands.add("clickNotePageMoreOptionsButtonOnCurrentPage", (btnTextOrTi
 Cypress.Commands.add("deleteNote", (noteTitle: string) => {
   cy.clickNotePageMoreOptionsButton(noteTitle, "Delete note")
   cy.findByRole("button", { name: "OK" }).click()
+  cy.pageIsNotLoading()
 })
 
 Cypress.Commands.add("expectExactLinkTargets", (targets) => {

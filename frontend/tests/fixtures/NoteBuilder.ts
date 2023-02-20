@@ -11,6 +11,7 @@ class NoteBuilder extends Builder<Generated.Note> {
       title: "Note1.1.1",
       wikidataId: "",
       shortDescription: "",
+      deletedAt: "",
       noteAccessories: {
         url: "",
         urlIsVideo: false,

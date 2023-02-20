@@ -234,6 +234,7 @@ declare namespace Generated {
         location?: NoteLocation;
         wikidataId: string;
         textContent: TextContent;
+        deletedAt: string;
         pictureWithMask?: PictureWithMask;
     }
 

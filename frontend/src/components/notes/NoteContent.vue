@@ -1,4 +1,7 @@
 <template>
+  <div class="alert alert-warning" v-if="note.deletedAt">
+    This note has been deleted
+  </div>
   <h5 v-if="titleAsLink" class="header note-card-title">
     <NoteTitleWithLink :note="note" class="card-title" />
   </h5>

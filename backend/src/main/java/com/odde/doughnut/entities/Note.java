@@ -3,6 +3,7 @@ package com.odde.doughnut.entities;
 import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.algorithms.NoteTitle;
@@ -67,7 +68,7 @@ public class Note extends Thingy {
 
   @Column(name = "deleted_at")
   @Getter
-  @JsonIgnore
+  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private Timestamp deletedAt;
 
   public void buildLocation(Coordinate coordinate) {
