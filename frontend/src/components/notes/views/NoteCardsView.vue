@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+import { defineComponent, PropType, watch } from "vue";
 import LoadingPage from "@/pages/commons/LoadingPage.vue";
 import NoteWithLinks from "../NoteWithLinks.vue";
 import Cards from "../Cards.vue";
@@ -33,6 +33,14 @@ import { StorageAccessor } from "../../../store/createNoteStorage";
 
 export default defineComponent({
   setup(props) {
+    watch(
+      () => props.noteId,
+      () => {
+        throw new Error(
+          "NoteCardsView: noteId changed. Please make noteId the key in the parent component."
+        );
+      }
+    );
     return { noteRealm: props.storageAccessor.refOfNoteRealm(props.noteId) };
   },
   props: {
@@ -57,15 +65,10 @@ export default defineComponent({
     };
   },
   methods: {
-    async fetchData() {
-      this.noteRealm = await this.storageAccessor
+    fetchData() {
+      this.storageAccessor
         .api(this.$router)
         .getNoteRealmAndReloadPosition(this.noteId);
-    },
-  },
-  watch: {
-    noteId() {
-      this.fetchData();
     },
   },
   mounted() {

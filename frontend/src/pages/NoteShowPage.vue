@@ -6,6 +6,7 @@
         expandChildren: true,
         storageAccessor,
       }"
+      :key="noteId"
     />
   </div>
 </template>
