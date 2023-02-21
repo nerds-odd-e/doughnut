@@ -10,7 +10,7 @@
     i...
   </span>
   <NoteInfo
-    v-if="noteInfo"
+    v-if="noteInfo?.note"
     :note-info="noteInfo"
     @level-changed="$emit('levelChanged', $event)"
     @self-evaluated="$emit('selfEvaluated', $event)"

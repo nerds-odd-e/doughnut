@@ -11,9 +11,7 @@ export default interface NoteStorage extends CurrentPosition {
     notePosition?: Generated.NotePositionViewedByUser,
     circle?: Generated.Circle
   ): void;
-  refreshNoteRealm(
-    data: Generated.NoteRealm | Generated.NoteRealmWithPosition
-  ): Generated.NoteRealm;
+  refreshNoteRealm(data: Generated.NoteRealm): Generated.NoteRealm;
 }
 
 export class StorageImplementation
@@ -30,16 +28,7 @@ export class StorageImplementation
     this.storageUpdatedAt = new Date();
   }
 
-  refreshNoteRealm(
-    data: Generated.NoteRealm | Generated.NoteRealmWithPosition
-  ): Generated.NoteRealm {
-    let noteRealm: Generated.NoteRealm;
-    if (data && "noteRealm" in data) {
-      noteRealm = data.noteRealm;
-      this.selectPosition(noteRealm.note, data.notePosition);
-    } else {
-      noteRealm = data;
-    }
+  refreshNoteRealm(noteRealm: Generated.NoteRealm): Generated.NoteRealm {
     this.updatedNoteRealm = noteRealm;
     this.storageUpdatedAt = new Date();
     return noteRealm;
