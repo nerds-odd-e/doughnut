@@ -46,7 +46,7 @@ export interface StoredApi {
     data: Generated.WikidataAssociationCreation
   ): Promise<Generated.NoteRealm>;
 
-  undo(router: Router): Promise<Generated.NoteRealm>;
+  undo(): Promise<Generated.NoteRealm>;
 
   deleteNote(noteId: Doughnut.ID): Promise<Generated.NoteRealm | undefined>;
 }
@@ -68,6 +68,23 @@ export default class StoredApiCollection implements StoredApi {
     this.noteEditingHistory = undoHistory;
     this.storage = storage;
     this.router = router;
+  }
+
+  private routerReplace(focusOnNote?: Generated.NoteRealm) {
+    if (!focusOnNote) {
+      return this.router.replace({ name: "notebooks" });
+    }
+    return this.router.replace({
+      name: "noteShow",
+      params: { noteId: focusOnNote.id },
+    });
+  }
+
+  private routerPush(focusOnNote: Generated.NoteRealm) {
+    return this.router.push({
+      name: "noteShow",
+      params: { noteId: focusOnNote.id },
+    });
   }
 
   private get statelessApi(): ReturnType<typeof apiCollection> {
@@ -191,26 +208,13 @@ export default class StoredApiCollection implements StoredApi {
     )) as Generated.NoteRealm;
   }
 
-  async undo(router: Router) {
+  async undo() {
     const noteRealm = this.storage.refreshNoteRealm(
       await this.undoInner(),
       undefined
     );
-    router.push({
-      name: "noteShow",
-      params: { noteId: noteRealm?.id },
-    });
+    this.routerPush(noteRealm);
     return noteRealm;
-  }
-
-  private routerReplace(focusOnNote?: Generated.NoteRealm) {
-    if (!focusOnNote) {
-      return this.router.replace({ name: "notebooks" });
-    }
-    return this.router.replace({
-      name: "noteShow",
-      params: { noteId: focusOnNote.id },
-    });
   }
 
   async deleteNote(noteId: Doughnut.ID) {
