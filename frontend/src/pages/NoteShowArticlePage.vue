@@ -54,10 +54,6 @@ export default defineComponent({
   },
   watch: {
     "storageAccessor.storageUpdatedAt": function noteRealmUpdated() {
-      if (!this.storageAccessor.updatedNoteRealm) {
-        this.fetchData();
-        return;
-      }
       this.noteRealmCache?.updateNoteRealm(
         this.storageAccessor.updatedNoteRealm
       );

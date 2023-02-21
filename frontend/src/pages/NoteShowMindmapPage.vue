@@ -47,10 +47,6 @@ export default defineComponent({
       this.noteRealmCache?.deleteNoteAndDescendents(deletedNoteId);
     },
     noteRealmUpdated(updatedNoteRealm?: Generated.NoteRealm) {
-      if (!updatedNoteRealm) {
-        this.fetchData();
-        return;
-      }
       this.noteRealmCache?.updateNoteRealm(updatedNoteRealm);
     },
     highlight(id: Doughnut.ID) {
