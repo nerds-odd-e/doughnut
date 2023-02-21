@@ -54,11 +54,6 @@ export default defineComponent({
       });
     },
   },
-  watch: {
-    "storageAccessor.storageUpdatedAt": function updateAt() {
-      this.fetchData();
-    },
-  },
   mounted() {
     this.fetchData();
   },
