@@ -37,7 +37,7 @@ export class StorageImplementation
     this.storageUpdatedAt = new Date();
     return noteRealm;
   }
-  // eslint-disable-next-line lines-between-class-members, @typescript-eslint/no-unused-vars, class-methods-use-this
+
   refOfNoteRealm(noteId: Doughnut.ID): Ref<Generated.NoteRealm | undefined> {
     if (!this.cache.has(noteId)) {
       this.cache.set(noteId, ref(undefined));

@@ -1,48 +1,38 @@
 <template>
-  <LoadingPage v-bind="{ contentExists: !!noteRealm }">
-    <div class="inner-box" v-if="noteRealm" :key="noteId">
-      <NoteWithLinks
-        v-bind="{
-          note: noteRealm.note,
-          links: noteRealm.links,
-          storageAccessor,
-        }"
-      >
-        <template #footer>
-          <NoteInfoButton
-            :note-id="noteId"
-            :expanded="expandInfo"
-            :key="noteId"
-            @level-changed="$emit('levelChanged', $event)"
-            @self-evaluated="$emit('selfEvaluated', $event)"
-          />
-        </template>
-      </NoteWithLinks>
-      <Cards v-if="expandChildren" :notes="noteRealm.children" />
-    </div>
-  </LoadingPage>
+  <NoteRealmLoader v-bind="{ noteId, storageAccessor }">
+    <template #default="{ noteRealm }">
+      <div class="inner-box" v-if="noteRealm" :key="noteId">
+        <NoteWithLinks
+          v-bind="{
+            note: noteRealm.note,
+            links: noteRealm.links,
+            storageAccessor,
+          }"
+        >
+          <template #footer>
+            <NoteInfoButton
+              :note-id="noteId"
+              :expanded="expandInfo"
+              :key="noteId"
+              @level-changed="$emit('levelChanged', $event)"
+              @self-evaluated="$emit('selfEvaluated', $event)"
+            />
+          </template>
+        </NoteWithLinks>
+        <Cards v-if="expandChildren" :notes="noteRealm.children" />
+      </div>
+    </template>
+  </NoteRealmLoader>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, watch } from "vue";
-import LoadingPage from "@/pages/commons/LoadingPage.vue";
+import { defineComponent, PropType } from "vue";
 import NoteWithLinks from "../NoteWithLinks.vue";
 import Cards from "../Cards.vue";
 import NoteInfoButton from "../NoteInfoButton.vue";
 import { StorageAccessor } from "../../../store/createNoteStorage";
 
 export default defineComponent({
-  setup(props) {
-    watch(
-      () => props.noteId,
-      () => {
-        throw new Error(
-          "NoteCardsView: noteId changed. Please make noteId the key in the parent component."
-        );
-      }
-    );
-    return { noteRealm: props.storageAccessor.refOfNoteRealm(props.noteId) };
-  },
   props: {
     noteId: { type: Number, required: true },
     expandChildren: { type: Boolean, required: true },
@@ -56,23 +46,7 @@ export default defineComponent({
   components: {
     NoteWithLinks,
     Cards,
-    LoadingPage,
     NoteInfoButton,
-  },
-  data() {
-    return {
-      selectedNoteId: undefined as Doughnut.ID | undefined,
-    };
-  },
-  methods: {
-    fetchData() {
-      this.storageAccessor
-        .api(this.$router)
-        .getNoteRealmAndReloadPosition(this.noteId);
-    },
-  },
-  mounted() {
-    this.fetchData();
   },
 });
 </script>
