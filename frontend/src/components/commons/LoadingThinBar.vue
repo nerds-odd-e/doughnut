@@ -1,5 +1,5 @@
 <template>
-  <div class="thin-loading-bar">
+  <div class="thin-loading-bar loading-bar">
     <ContentLoader :height="15" :speed="2" primary-color="#888"></ContentLoader>
   </div>
 </template>
