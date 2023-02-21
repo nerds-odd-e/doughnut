@@ -1,12 +1,6 @@
 <template>
-  <div class="loading-bar">
-    <div>
-      <content-loader
-        height="2"
-        :speed="1"
-        primary-color="#00c"
-      ></content-loader>
-    </div>
+  <div class="thin-loading-bar">
+    <ContentLoader :height="15" :speed="2" primary-color="#888"></ContentLoader>
   </div>
 </template>
 
@@ -19,14 +13,18 @@ export default {
   },
 };
 </script>
-<style scoped>
-.loading-bar {
-  position: relative;
-}
-.loading-bar > div {
+<style lang="scss" scoped>
+.thin-loading-bar {
   position: absolute;
+  left: 0;
   width: 100%;
-  height: 2px;
-  top: -12px;
+  opacity: 0.5;
+  z-index: 999999;
+
+  svg {
+    width: 100%;
+    height: 100%;
+    z-index: 999999;
+  }
 }
 </style>

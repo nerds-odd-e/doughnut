@@ -1,6 +1,5 @@
 <template>
   <ToolbarFrame>
-    <LoadingThinBar v-if="apiStatus.states.length > 0" />
     <template v-if="!user">
       <div class="btn-group btn-group-sm">
         <BrandBar />
@@ -15,6 +14,7 @@
         @update-user="$emit('updateUser', $event)"
       />
     </div>
+    <LoadingThinBar v-if="apiStatus.states.length > 0" />
   </ToolbarFrame>
 </template>
 
