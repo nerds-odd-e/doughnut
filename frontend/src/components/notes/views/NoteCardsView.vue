@@ -59,18 +59,21 @@ export default defineComponent({
     };
   },
   methods: {
+    noteRealmUpdated(updatedNoteRealm?: Generated.NoteRealm) {
+      if (updatedNoteRealm?.id === this.noteId) {
+        this.noteRealm = updatedNoteRealm;
+      }
+    },
     async fetchData() {
-      const noteRealm = await this.storageAccessor
+      const noteRealmWithPosition = await this.storageAccessor
         .api(this.$router)
         .getNoteRealmWithPosition(this.noteId);
-      this.noteRealm = noteRealm;
+      this.noteRealm = noteRealmWithPosition.noteRealm;
     },
   },
   watch: {
     "storageAccessor.storageUpdatedAt": function updateAt() {
-      if (this.storageAccessor.updatedNoteRealm?.id === this.noteId) {
-        this.noteRealm = this.storageAccessor.updatedNoteRealm;
-      }
+      this.noteRealmUpdated(this.storageAccessor.updatedNoteRealm);
     },
     noteId() {
       this.fetchData();
