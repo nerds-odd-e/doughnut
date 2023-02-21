@@ -60,10 +60,9 @@ export default defineComponent({
   },
   methods: {
     async fetchData() {
-      const noteRealmWithPosition = await this.storageAccessor
+      this.noteRealm = await this.storageAccessor
         .api(this.$router)
-        .getNoteRealmWithPosition(this.noteId);
-      this.noteRealm = noteRealmWithPosition.noteRealm;
+        .getNoteRealmAndReloadPosition(this.noteId);
     },
   },
   watch: {
