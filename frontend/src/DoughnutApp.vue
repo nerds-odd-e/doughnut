@@ -41,24 +41,6 @@ export default defineComponent({
     $route() {
       this.popups.done(false);
     },
-    "storageAccessor.storageUpdatedAt": function updatedAt() {
-      const route =
-        // eslint-disable-next-line no-nested-ternary
-        this.storageAccessor.uglytemporarySolution === "replace"
-          ? (x) => this.$router.replace(x)
-          : this.storageAccessor.uglytemporarySolution === "push"
-          ? (x) => this.$router.push(x)
-          : // eslint-disable-next-line @typescript-eslint/no-empty-function
-            () => {};
-      if (!this.storageAccessor.updatedNoteRealm) {
-        route({ name: "notebooks" });
-        return;
-      }
-      route({
-        name: "noteShow",
-        params: { noteId: this.storageAccessor.updatedNoteRealm.id },
-      });
-    },
   },
 
   computed: {

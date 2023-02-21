@@ -108,8 +108,7 @@ export default class StoredApiCollection implements StoredApi {
     data: Generated.WikidataAssociationCreation
   ): Promise<Generated.NoteRealm> {
     return this.storage.refreshNoteRealm(
-      await this.statelessApi.wikidata.updateWikidataId(noteId, data),
-      undefined
+      await this.statelessApi.wikidata.updateWikidataId(noteId, data)
     );
   }
 
@@ -117,7 +116,7 @@ export default class StoredApiCollection implements StoredApi {
     const nrwp = await this.statelessApi.noteMethods.getNoteRealmWithPosition(
       noteId
     );
-    this.storage.refreshNoteRealm(nrwp, undefined);
+    this.storage.refreshNoteRealm(nrwp);
     return nrwp;
   }
 
@@ -126,8 +125,7 @@ export default class StoredApiCollection implements StoredApi {
       (await this.managedApi.restPostMultiplePartForm(
         `notes/${parentId}/create`,
         data
-      )) as Generated.NoteRealmWithPosition,
-      "replace"
+      )) as Generated.NoteRealmWithPosition
     );
     this.routerReplace(focus);
     return focus;
@@ -142,8 +140,7 @@ export default class StoredApiCollection implements StoredApi {
       (await this.managedApi.restPost(
         `links/create/${sourceId}/${targetId}`,
         data
-      )) as Generated.NoteRealm,
-      undefined
+      )) as Generated.NoteRealm
     );
   }
 
@@ -152,8 +149,7 @@ export default class StoredApiCollection implements StoredApi {
       (await this.managedApi.restPost(
         `links/${linkId}`,
         data
-      )) as Generated.NoteRealm,
-      undefined
+      )) as Generated.NoteRealm
     );
   }
 
@@ -162,8 +158,7 @@ export default class StoredApiCollection implements StoredApi {
       (await this.managedApi.restPost(
         `links/${linkId}/${fromTargetPerspective ? "tview" : "sview"}/delete`,
         {}
-      )) as Generated.NoteRealm,
-      undefined
+      )) as Generated.NoteRealm
     );
   }
 
@@ -177,8 +172,7 @@ export default class StoredApiCollection implements StoredApi {
       (await this.managedApi.restPatchMultiplePartForm(
         `notes/${noteId}`,
         data
-      )) as Generated.NoteRealm,
-      undefined
+      )) as Generated.NoteRealm
     );
   }
 
@@ -189,8 +183,7 @@ export default class StoredApiCollection implements StoredApi {
   ) {
     this.noteEditingHistory.addEditingToUndoHistory(noteId, oldContent);
     return this.storage.refreshNoteRealm(
-      await this.updateTextContentWithoutUndo(noteId, noteContentData),
-      undefined
+      await this.updateTextContentWithoutUndo(noteId, noteContentData)
     );
   }
 
@@ -211,10 +204,7 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   async undo() {
-    const noteRealm = this.storage.refreshNoteRealm(
-      await this.undoInner(),
-      undefined
-    );
+    const noteRealm = this.storage.refreshNoteRealm(await this.undoInner());
     this.routerPush(noteRealm);
     return noteRealm;
   }
@@ -230,7 +220,7 @@ export default class StoredApiCollection implements StoredApi {
       this.routerReplace();
       return undefined;
     }
-    const noteRealm = this.storage.refreshNoteRealm(res[0], undefined);
+    const noteRealm = this.storage.refreshNoteRealm(res[0]);
     this.routerReplace(noteRealm);
     return noteRealm;
   }
