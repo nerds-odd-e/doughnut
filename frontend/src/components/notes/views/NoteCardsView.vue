@@ -64,11 +64,6 @@ export default defineComponent({
     },
   },
   watch: {
-    "storageAccessor.storageUpdatedAt": function updateAt() {
-      if (this.storageAccessor.updatedNoteRealm?.id === this.noteId) {
-        this.noteRealm = this.storageAccessor.updatedNoteRealm;
-      }
-    },
     noteId() {
       this.fetchData();
     },

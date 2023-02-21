@@ -23,6 +23,8 @@ export class StorageImplementation
 
   storageUpdatedAt?: Date;
 
+  cache: Map<Doughnut.ID, Ref<Generated.NoteRealm | undefined>> = new Map();
+
   focusOnNotebooks(): void {
     this.selectPosition();
     this.updatedNoteRealm = undefined;
@@ -31,11 +33,15 @@ export class StorageImplementation
 
   refreshNoteRealm(noteRealm: Generated.NoteRealm): Generated.NoteRealm {
     this.updatedNoteRealm = noteRealm;
+    this.refOfNoteRealm(noteRealm?.id).value = noteRealm;
     this.storageUpdatedAt = new Date();
     return noteRealm;
   }
   // eslint-disable-next-line lines-between-class-members, @typescript-eslint/no-unused-vars, class-methods-use-this
-  refOfNoteRealm(_noteId: Doughnut.ID): Ref<Generated.NoteRealm | undefined> {
-    return ref(undefined);
+  refOfNoteRealm(noteId: Doughnut.ID): Ref<Generated.NoteRealm | undefined> {
+    if (!this.cache.has(noteId)) {
+      this.cache.set(noteId, ref(undefined));
+    }
+    return this.cache.get(noteId) as Ref<Generated.NoteRealm | undefined>;
   }
 }
