@@ -5,7 +5,6 @@ import CurrentPosition, {
 
 export default interface NoteStorage extends CurrentPosition {
   updatedNoteRealm?: Generated.NoteRealm;
-  storageUpdatedAt?: Date;
   focusOnNotebooks(): void;
   selectPosition(
     note?: Generated.Note,
@@ -21,20 +20,16 @@ export class StorageImplementation
 {
   updatedNoteRealm?: Generated.NoteRealm;
 
-  storageUpdatedAt?: Date;
-
   cache: Map<Doughnut.ID, Ref<Generated.NoteRealm | undefined>> = new Map();
 
   focusOnNotebooks(): void {
     this.selectPosition();
     this.updatedNoteRealm = undefined;
-    this.storageUpdatedAt = new Date();
   }
 
   refreshNoteRealm(noteRealm: Generated.NoteRealm): Generated.NoteRealm {
     this.updatedNoteRealm = noteRealm;
     this.refOfNoteRealm(noteRealm?.id).value = noteRealm;
-    this.storageUpdatedAt = new Date();
     return noteRealm;
   }
 

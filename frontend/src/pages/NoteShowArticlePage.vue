@@ -53,7 +53,7 @@ export default defineComponent({
     },
   },
   watch: {
-    "storageAccessor.storageUpdatedAt": function noteRealmUpdated() {
+    "storageAccessor.updatedNoteRealm": function noteRealmUpdated() {
       this.noteRealmCache?.updateNoteRealm(
         this.storageAccessor.updatedNoteRealm
       );

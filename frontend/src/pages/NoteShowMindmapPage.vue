@@ -46,9 +46,6 @@ export default defineComponent({
     onNoteDeleted(deletedNoteId: Doughnut.ID) {
       this.noteRealmCache?.deleteNoteAndDescendents(deletedNoteId);
     },
-    noteRealmUpdated(updatedNoteRealm?: Generated.NoteRealm) {
-      this.noteRealmCache?.updateNoteRealm(updatedNoteRealm);
-    },
     highlight(id: Doughnut.ID) {
       this.selectedNoteId = id;
       this.storageAccessor.selectPosition(
@@ -63,8 +60,10 @@ export default defineComponent({
     },
   },
   watch: {
-    "storageAccessor.storageUpdatedAt": function updateAt() {
-      this.noteRealmUpdated(this.storageAccessor.updatedNoteRealm);
+    "storageAccessor.updatedNoteRealm": function updateAt() {
+      this.noteRealmCache?.updateNoteRealm(
+        this.storageAccessor.updatedNoteRealm
+      );
     },
     noteId() {
       this.fetchData();
