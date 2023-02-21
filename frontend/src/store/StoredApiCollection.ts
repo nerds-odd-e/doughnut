@@ -203,6 +203,16 @@ export default class StoredApiCollection implements StoredApi {
     return noteRealm;
   }
 
+  private routerReplace(focusOnNote?: Generated.NoteRealm) {
+    if (!focusOnNote) {
+      return this.router.replace({ name: "notebooks" });
+    }
+    return this.router.replace({
+      name: "noteShow",
+      params: { noteId: focusOnNote.id },
+    });
+  }
+
   async deleteNote(noteId: Doughnut.ID) {
     const res = (await this.managedApi.restPost(
       `notes/${noteId}/delete`,
@@ -211,16 +221,11 @@ export default class StoredApiCollection implements StoredApi {
     this.noteEditingHistory.deleteNote(noteId);
     if (res.length === 0) {
       this.storage.focusOnNotebooks();
-      this.router.replace({
-        name: "notebooks",
-      });
+      this.routerReplace();
       return undefined;
     }
     const noteRealm = this.storage.refreshNoteRealm(res[0], undefined);
-    this.router.replace({
-      name: "noteShow",
-      params: { noteId: noteRealm?.id },
-    });
+    this.routerReplace(noteRealm);
     return noteRealm;
   }
 }
