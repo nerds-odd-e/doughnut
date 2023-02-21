@@ -1,3 +1,4 @@
+import { Ref, ref } from "vue";
 import CurrentPosition, {
   CurrentPositionImplementation,
 } from "./CurrentPosition";
@@ -32,5 +33,9 @@ export class StorageImplementation
     this.updatedNoteRealm = noteRealm;
     this.storageUpdatedAt = new Date();
     return noteRealm;
+  }
+  // eslint-disable-next-line lines-between-class-members, @typescript-eslint/no-unused-vars, class-methods-use-this
+  refOfNoteRealm(_noteId: Doughnut.ID): Ref<Generated.NoteRealm | undefined> {
+    return ref(undefined);
   }
 }

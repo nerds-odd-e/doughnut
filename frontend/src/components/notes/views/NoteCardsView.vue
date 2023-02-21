@@ -28,13 +28,12 @@ import { defineComponent, PropType } from "vue";
 import LoadingPage from "@/pages/commons/LoadingPage.vue";
 import NoteWithLinks from "../NoteWithLinks.vue";
 import Cards from "../Cards.vue";
-import useLoadingApi from "../../../managedApi/useLoadingApi";
 import NoteInfoButton from "../NoteInfoButton.vue";
 import { StorageAccessor } from "../../../store/createNoteStorage";
 
 export default defineComponent({
-  setup() {
-    return useLoadingApi();
+  setup(props) {
+    return { noteRealm: props.storageAccessor.refOfNoteRealm(props.noteId) };
   },
   props: {
     noteId: { type: Number, required: true },
@@ -54,7 +53,6 @@ export default defineComponent({
   },
   data() {
     return {
-      noteRealm: undefined as Generated.NoteRealm | undefined,
       selectedNoteId: undefined as Doughnut.ID | undefined,
     };
   },
