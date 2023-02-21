@@ -122,13 +122,15 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   async createNote(parentId: Doughnut.ID, data: Generated.NoteCreation) {
-    return this.storage.refreshNoteRealm(
+    const focus = await this.storage.refreshNoteRealm(
       (await this.managedApi.restPostMultiplePartForm(
         `notes/${parentId}/create`,
         data
       )) as Generated.NoteRealmWithPosition,
       "replace"
     );
+    this.routerReplace(focus);
+    return focus;
   }
 
   async createLink(
