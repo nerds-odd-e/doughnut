@@ -123,7 +123,9 @@ export default class StoredApiCollection implements StoredApi {
   async createNote(parentId: Doughnut.ID, data: Generated.NoteCreation) {
     const nrwp = await this.statelessApi.noteMethods.createNote(parentId, data);
     this.storage.selectPosition(nrwp.noteRealm.note, nrwp.notePosition);
-    return this.storage.refreshNoteRealm(nrwp.noteRealm);
+    const focus = this.storage.refreshNoteRealm(nrwp.noteRealm);
+    this.routerReplace(focus);
+    return focus;
   }
 
   async createLink(
