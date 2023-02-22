@@ -87,13 +87,13 @@ public class OpenAiApis {
   }
 
   private CreateImageRequest getImageRequest(String prompt) {
-    return CreateImageRequest.builder().prompt(prompt).responseFormat("url").build();
+    return CreateImageRequest.builder().prompt(prompt).responseFormat("b64_json").build();
   }
 
   public String getOpenAiImage(String prompt) {
     CreateImageRequest completionRequest = getImageRequest(prompt);
     ImageResult choices = getAImage(completionRequest);
-    return choices.getData().get(0).getUrl();
+    return choices.getData().get(0).getB64Json();
   }
 
   private ImageResult getAImage(CreateImageRequest completionRequest) {

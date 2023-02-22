@@ -22,8 +22,6 @@ const createWrapper = async () => {
 describe("NoteEngagingStoryDialog", () => {
   it("fetches engaging story for review or single note", async () => {
     const wrapper = await createWrapper();
-    expect(wrapper.find("textarea").element).toHaveValue(
-      "This is an engaging story."
-    );
+    expect(wrapper.find("img.ai-art").element).toBeDefined();
   });
 });

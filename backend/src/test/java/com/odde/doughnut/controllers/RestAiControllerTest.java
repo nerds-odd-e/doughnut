@@ -124,7 +124,7 @@ class RestAiControllerTest {
   private Single<ImageResult> buildImageResult(String s) {
     ImageResult result = new ImageResult();
     Image image = new Image();
-    image.setUrl(s);
+    image.setB64Json(s);
     result.setData(List.of(image));
     return Single.just(result);
   }

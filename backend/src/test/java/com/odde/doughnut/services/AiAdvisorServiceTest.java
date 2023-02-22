@@ -121,7 +121,7 @@ class AiAdvisorServiceTest {
     void getAiEngagingStory_givenAlistOfStrings_returnsAStory() {
       ImageResult result = new ImageResult();
       Image image = new Image();
-      image.setUrl("https://image.com");
+      image.setB64Json("https://image.com");
       result.setData(List.of(image));
       Mockito.when(openAiApi.createImage(Mockito.any())).thenReturn(Single.just(result));
       assertEquals(

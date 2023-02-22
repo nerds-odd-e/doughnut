@@ -63,7 +63,8 @@ Cypress.Commands.add("stubCreateImage", { prevSubject: true }, (serviceMocker: S
     data: [
       {
         url: "https://moon",
-        b64_json: "eyJpZCI6MSwiYWdlIjozMCwiZW1haWwiOiJqb2huLmRvZUBleGFtcGxlLmNvbSJ9",
+        b64_json:
+          "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
       },
     ],
   })
