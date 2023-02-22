@@ -21,7 +21,9 @@
         <template #button_face>
           <SvgEdit />
         </template>
-        <NoteEditDialog v-bind="{ note: selectedNote, storageAccessor }" />
+        <NoteEditAccessoriesDialog
+          v-bind="{ note: selectedNote, storageAccessor }"
+        />
       </PopButton>
 
       <PopButton title="associate wikidata">
@@ -80,7 +82,7 @@ import { defineComponent, PropType } from "vue";
 import NoteNewButton from "./NoteNewButton.vue";
 import SvgAddChild from "../svgs/SvgAddChild.vue";
 import SvgEdit from "../svgs/SvgEdit.vue";
-import NoteEditDialog from "../notes/NoteEditDialog.vue";
+import NoteEditAccessoriesDialog from "../notes/NoteEditAccessoriesDialog.vue";
 import SvgWikidata from "../svgs/SvgWikidata.vue";
 import WikidataAssociationDialog from "../notes/WikidataAssociationDialog.vue";
 import SvgSearch from "../svgs/SvgSearch.vue";
@@ -108,7 +110,7 @@ export default defineComponent({
     NoteNewButton,
     SvgAddChild,
     SvgEdit,
-    NoteEditDialog,
+    NoteEditAccessoriesDialog,
     SvgWikidata,
     WikidataAssociationDialog,
     SvgSearch,

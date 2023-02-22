@@ -30,9 +30,9 @@ export interface StoredApi {
     fromTargetPerspective: boolean
   ): Promise<Generated.NoteRealm>;
 
-  updateNote(
+  updateNoteAccessories(
     noteId: Doughnut.ID,
-    noteContentData: Generated.NoteAccessories
+    noteAccessories: Generated.NoteAccessories
   ): Promise<Generated.NoteRealm>;
 
   updateTextContent(
@@ -159,7 +159,7 @@ export default class StoredApiCollection implements StoredApi {
     );
   }
 
-  async updateNote(
+  async updateNoteAccessories(
     noteId: Doughnut.ID,
     noteContentData: Generated.NoteAccessories
   ) {
