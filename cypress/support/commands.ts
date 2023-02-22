@@ -598,14 +598,11 @@ Cypress.Commands.add("askForEngagingStory", (noteTitle: string) => {
 Cypress.Commands.add("aiSuggestionDialogButtonClick", (buttonName: string) => {
   if (buttonName === "use") {
     cy.findByRole("button", { name: "Use" }).click()
-  }
-  else if (buttonName === "ask again") {
+  } else if (buttonName === "ask again") {
     cy.findByRole("button", { name: "Ask again" }).click()
-  }
-  else if (buttonName === "cancel") {
+  } else if (buttonName === "cancel") {
     cy.get(".close-button").click()
-  }
-  else {
+  } else {
     throw new Error("Invalid button name")
   }
 })

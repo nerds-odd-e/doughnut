@@ -19,11 +19,6 @@
         v-if="note.wikidataId"
         :wikidata-id="note.wikidataId"
       />
-      <PopButton class="btn-primary" title="Suggest">
-        <NoteSuggestDescriptionDialog
-          v-bind="{ selectedNote: note, storageAccessor }"
-        />
-      </PopButton>
       <span> </span>
     </div>
   </div>
@@ -85,9 +80,7 @@ import SvgDescriptionIndicator from "../svgs/SvgDescriptionIndicator.vue";
 import SvgPictureIndicator from "../svgs/SvgPictureIndicator.vue";
 import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
 import EditableText from "../form/EditableText.vue";
-import PopButton from "../commons/Popups/PopButton.vue";
 import NoteWikidataAssociation from "./NoteWikidataAssociation.vue";
-import NoteSuggestDescriptionDialog from "./NoteSuggestDescriptionDialog.vue";
 import type { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
@@ -109,8 +102,6 @@ export default defineComponent({
     EditableText,
     NoteTitleWithLink,
     NoteWikidataAssociation,
-    NoteSuggestDescriptionDialog,
-    PopButton,
   },
   computed: {
     textContent() {

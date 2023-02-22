@@ -11,7 +11,6 @@ import {
 } from "@badeball/cypress-cucumber-preprocessor"
 import NotePath from "../support/NotePath"
 import "../support/string.extensions"
-import AiSuggestionDialogPageObject from "../support/pageObjects/AiSuggestionDialogPageObject"
 
 defineParameterType({
   name: "notepath",
@@ -426,12 +425,9 @@ Then(
   },
 )
 
-Then(
-  "I can ask the ai suggestion again",
-  () => {
-    cy.aiSuggestionDialogButtonClick("ask again")
-  },
-)
+Then("I can ask the ai suggestion again", () => {
+  cy.aiSuggestionDialogButtonClick("ask again")
+})
 
 When("I ask for an engaging story for {string}", (noteTitle: string) => {
   cy.askForEngagingStory(noteTitle)

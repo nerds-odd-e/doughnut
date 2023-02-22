@@ -32,6 +32,14 @@
           v-bind="{ note: selectedNote, storageAccessor }"
         />
       </PopButton>
+      <PopButton title="Suggest">
+        <template #button_face>
+          <SvgRobot />
+        </template>
+        <NoteSuggestDescriptionDialog
+          v-bind="{ selectedNote, storageAccessor }"
+        />
+      </PopButton>
 
       <PopButton title="link note">
         <template #button_face>
@@ -84,6 +92,8 @@ import NoteDeleteButton from "./NoteDeleteButton.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import PopButton from "../commons/Popups/PopButton.vue";
 import NoteEngagingStoryDialog from "../notes/NoteEngagingStoryDialog.vue";
+import SvgRobot from "../svgs/SvgRobot.vue";
+import NoteSuggestDescriptionDialog from "../notes/NoteSuggestDescriptionDialog.vue";
 
 export default defineComponent({
   props: {
@@ -108,6 +118,8 @@ export default defineComponent({
     NoteDeleteButton,
     PopButton,
     NoteEngagingStoryDialog,
+    SvgRobot,
+    NoteSuggestDescriptionDialog,
   },
   computed: {
     selectedNote(): Generated.Note | undefined {
