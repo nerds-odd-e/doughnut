@@ -88,6 +88,7 @@ export default defineComponent({
         })
         .catch((er) => {
           this.errorMessage = er.message;
+          this.contentReady = true;
         });
     },
   },

@@ -11,6 +11,7 @@ import {
 } from "@badeball/cypress-cucumber-preprocessor"
 import NotePath from "../support/NotePath"
 import "../support/string.extensions"
+import AiSuggestionDialogPageObject from "../support/pageObjects/AiSuggestionDialogPageObject"
 
 defineParameterType({
   name: "notepath",
@@ -420,13 +421,15 @@ Then("I should be prompted with a suggested description {string}", (description:
 Then(
   "I expect that the description will be {string} when I {string} the suggested description",
   (value: string, action: string) => {
-    if (action === "use") {
-      cy.findByRole("button", { name: "Use" }).click()
-    }
-    if (action === "cancel") {
-      cy.get(".close-button").click()
-    }
+    cy.aiSuggestionDialogButtonClick(action)
     cy.findNoteDescriptionOnCurrentPage(value)
+  },
+)
+
+Then(
+  "I can ask the ai suggestion again",
+  () => {
+    cy.aiSuggestionDialogButtonClick("ask again")
   },
 )
 
