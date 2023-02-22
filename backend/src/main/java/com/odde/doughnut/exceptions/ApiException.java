@@ -3,13 +3,15 @@ package com.odde.doughnut.exceptions;
 import com.odde.doughnut.entities.json.ApiError;
 
 public class ApiException extends RuntimeException {
-  public ApiException(String message) {
-    super(message);
+  private final ApiError apiError;
+
+  public ApiException(String originalMessage, ApiError.ErrorType type, String message) {
+    super(originalMessage);
+    apiError = new ApiError(message, type);
+    apiError.add("_originalMessage", getMessage());
   }
 
   public ApiError getErrorBody() {
-    ApiError apiError = new ApiError("The OpenAI request was not Authorized.");
-    apiError.add("_originalMessage", getMessage());
     return apiError;
   }
 }

@@ -4,10 +4,12 @@ import static com.theokanning.openai.service.OpenAiService.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.json.AiSuggestion;
+import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.CompletionChoice;
 import com.theokanning.openai.completion.CompletionRequest;
+import java.net.SocketTimeoutException;
 import java.time.Duration;
 import java.util.List;
 import okhttp3.OkHttpClient;
@@ -44,6 +46,12 @@ public class OpenAiApis {
     } catch (HttpException e) {
       if (HttpStatus.UNAUTHORIZED.value() == e.code()) {
         throw new OpenAiUnauthorizedException(e.getMessage());
+      }
+      throw e;
+    } catch (RuntimeException e) {
+      Throwable cause = e.getCause();
+      if (cause instanceof SocketTimeoutException) {
+        throw new OpenAITimeoutException(cause.getMessage());
       }
       throw e;
     }

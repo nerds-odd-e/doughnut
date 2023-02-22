@@ -2,18 +2,22 @@ package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.entities.json.AiSuggestion;
+import com.odde.doughnut.entities.json.ApiError;
+import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.CompletionRequest;
 import com.theokanning.openai.completion.CompletionResult;
 import io.reactivex.Single;
+import java.net.SocketTimeoutException;
 import java.util.Collections;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
@@ -68,6 +72,18 @@ class AiAdvisorServiceTest {
           .thenReturn(Single.error(httpException));
       assertThrows(
           HttpException.class, () -> aiAdvisorService.getAiSuggestion("suggestion_prompt"));
+    }
+
+    @Test
+    void getAiSuggestion_when_timeout() {
+      RuntimeException exception = new RuntimeException(new SocketTimeoutException());
+      Mockito.when(openAiApi.createCompletion(ArgumentMatchers.any()))
+          .thenReturn(Single.error(exception));
+      OpenAITimeoutException result =
+          assertThrows(
+              OpenAITimeoutException.class,
+              () -> aiAdvisorService.getAiSuggestion("suggestion_prompt"));
+      assertThat(result.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.OPENAI_TIMEOUT));
     }
 
     @Test

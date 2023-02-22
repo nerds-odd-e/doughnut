@@ -22,7 +22,7 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
       final HttpHeaders headers,
       final HttpStatus status,
       final WebRequest request) {
-    final ApiError apiError = new ApiError("binding error");
+    final ApiError apiError = new ApiError("binding error", ApiError.ErrorType.BINDING_ERROR);
     for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
       apiError.add(error.getField(), error.getDefaultMessage());
     }

@@ -13,10 +13,12 @@ public class ApiError {
 
   public enum ErrorType {
     OPENAI_UNAUTHORIZED,
+    BINDING_ERROR,
+    OPENAI_TIMEOUT,
   };
 
-  public ApiError(String message) {
-    this.errorType = ErrorType.OPENAI_UNAUTHORIZED;
+  public ApiError(String message, ErrorType type) {
+    this.errorType = type;
     this.message = message;
     this.errors = new HashMap<>();
   }
