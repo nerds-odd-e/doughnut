@@ -112,7 +112,7 @@ Cypress.Commands.add(
   "openAndSubmitNoteAccessoriesFormWith",
   (noteTitle: string, noteAccessoriesAttributes: Record<string, string>) => {
     cy.findNoteTitle(noteTitle)
-    cy.notePageButtonOnCurrentPage("edit note").click()
+    cy.notePageButtonOnCurrentPageEditNote().click()
     cy.submitNoteFormWith(noteAccessoriesAttributes)
   },
 )
@@ -532,6 +532,9 @@ Cypress.Commands.add("notePageButtonOnCurrentPage", (btnTextOrTitle) => {
   cy.get(".toolbar").findByRole("button", { name: btnTextOrTitle })
 })
 
+Cypress.Commands.add("notePageButtonOnCurrentPageEditNote", () => {
+  cy.notePageButtonOnCurrentPage("edit note")
+})
 
 Cypress.Commands.add("undoLast", (undoType: string) => {
   cy.findByTitle(`undo ${undoType}`).click()
