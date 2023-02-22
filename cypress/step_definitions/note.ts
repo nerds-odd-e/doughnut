@@ -74,10 +74,14 @@ When("I update note accessories of {string} to become:", (noteTitle: string, dat
   cy.openAndSubmitNoteAccessoriesFormWith(noteTitle, data.hashes()[0])
 })
 
-When("I should see note {string} has a url {string}", (noteTitle: string, expectedUrl: string) => {
-  cy.jumpToNotePage(noteTitle)
-  cy.findByLabelText("Url:").should("have.attr", "href", expectedUrl)
-})
+When(
+  "I should see note {string} has a picture and a url {string}",
+  (noteTitle: string, expectedUrl: string) => {
+    cy.jumpToNotePage(noteTitle)
+    cy.get("#note-picture").should("exist")
+    cy.findByLabelText("Url:").should("have.attr", "href", expectedUrl)
+  },
+)
 
 When("I can change the title {string} to {string}", (noteTitle: string, newNoteTitle: string) => {
   cy.findNoteTitle(noteTitle)

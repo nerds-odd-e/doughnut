@@ -9,7 +9,7 @@ Feature: Note Edit Accessories
     When I update note accessories of "lunar" to become:
       | Url               |
       | https://moon.com  |
-    # And I update note accessories of "lunar" to become:
-    #   | Upload Picture  |
-    #   | moon.jpg        |
-    Then I should see note "lunar" has a url "https://moon.com"
+    And I update note accessories of "lunar" to become:
+      | Upload Picture  |
+      | moon.jpg        |
+    Then I should see note "lunar" has a picture and a url "https://moon.com"
