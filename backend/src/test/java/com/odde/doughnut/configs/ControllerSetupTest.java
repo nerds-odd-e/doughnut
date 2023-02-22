@@ -7,9 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.odde.doughnut.entities.json.ApiError;
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.FailureReport;
+import com.odde.doughnut.entities.json.ApiError;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -100,6 +100,7 @@ public class ControllerSetupTest {
         controllerSetup.handleOpenAIUnauthorizedException(exception);
     assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     assertThat(response.getBody().getErrors().keySet(), contains("OpenAi Error"));
+    assertThat(response.getBody().getErrorType(), equalTo(ApiError.ErrorType.OPENAI_UNAUTHORIZED));
   }
 
   private FailureReport catchExceptionAndGetFailureReport() {
