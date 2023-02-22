@@ -19,7 +19,6 @@ import com.theokanning.openai.completion.CompletionRequest;
 import com.theokanning.openai.completion.CompletionResult;
 import io.reactivex.Single;
 import java.net.SocketTimeoutException;
-import java.util.Collections;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
 import org.junit.jupiter.api.BeforeEach;
@@ -122,8 +121,7 @@ class AiAdvisorServiceTest {
       Mockito.when(openAiApi.createCompletion(Mockito.any()))
           .thenReturn(Single.just(completionResult));
       assertEquals(
-          "This is an engaging story",
-          aiAdvisorService.getEngagingStory(Collections.singletonList("title")).engagingStory());
+          "This is an engaging story", aiAdvisorService.getEngagingStory("prompt").engagingStory());
     }
   }
 

@@ -16,8 +16,6 @@ import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.CompletionResult;
 import io.reactivex.Single;
-import java.util.Collections;
-import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -93,10 +91,10 @@ class RestAiControllerTest {
 
     @Test
     void askWithNoteThatCannotAccess() {
-      Note otherPeopleNote = makeMe.aNote().please();
       assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.askEngagingStories(List.of(otherPeopleNote)));
+          ResponseStatusException.class,
+          () ->
+              new RestAiController(openAiApi, makeMe.aNullUserModel()).askEngagingStories(params));
     }
 
     @Test
@@ -104,12 +102,11 @@ class RestAiControllerTest {
       when(openAiApi.createCompletion(
               argThat(
                   request -> {
-                    assertEquals(
-                        "Tell me an engaging story to learn about sanskrit.", request.getPrompt());
+                    assertEquals("Earth", request.getPrompt());
                     return true;
                   })))
           .thenReturn(buildCompletionResult("This is an engaging story."));
-      controller.askEngagingStories(Collections.singletonList(aNote));
+      controller.askEngagingStories(params);
     }
 
     @Test
@@ -125,32 +122,15 @@ class RestAiControllerTest {
                     return true;
                   })))
           .thenReturn(buildCompletionResult("This is an engaging story."));
-      controller.askEngagingStories(Collections.singletonList(aNote));
+      controller.askEngagingStories(params);
     }
 
     @Test
     void askEngagingStoryReturnsEngagingStory() throws UnexpectedNoAccessRightException {
       when(openAiApi.createCompletion(Mockito.any()))
           .thenReturn(buildCompletionResult("This is an engaging story."));
-      final AiEngagingStory aiEngagingStory =
-          controller.askEngagingStories(Collections.singletonList(aNote));
+      final AiEngagingStory aiEngagingStory = controller.askEngagingStories(params);
       assertEquals("This is an engaging story.", aiEngagingStory.engagingStory());
-    }
-
-    @Test
-    void askEngagingStoryForMultipleNotes_returnsEngagingStory()
-        throws UnexpectedNoAccessRightException {
-      when(openAiApi.createCompletion(
-              argThat(
-                  request -> {
-                    assertEquals(
-                        "Tell me an engaging story to learn about sanskrit and mandala.",
-                        request.getPrompt());
-                    return true;
-                  })))
-          .thenReturn(buildCompletionResult("This is an engaging story."));
-      Note anotherNote = makeMe.aNote("mandala").creatorAndOwner(currentUser).please();
-      controller.askEngagingStories(List.of(aNote, anotherNote));
     }
   }
 

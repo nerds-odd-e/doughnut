@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.services.openAiApis.OpenAiApis;
 import com.theokanning.openai.OpenAiApi;
-import java.util.List;
 
 public class AiAdvisorService {
   private final OpenAiApis openAiApis;
@@ -17,10 +16,7 @@ public class AiAdvisorService {
     return openAiApis.getOpenAiCompletion(prompt);
   }
 
-  public AiEngagingStory getEngagingStory(List<String> items) {
-    final String topics = String.join(" and ", items);
-    final String prompt = String.format("Tell me an engaging story to learn about %s.", topics);
-
+  public AiEngagingStory getEngagingStory(String prompt) {
     return new AiEngagingStory(openAiApis.getOpenAiCompletion(prompt).getSuggestion());
   }
 }

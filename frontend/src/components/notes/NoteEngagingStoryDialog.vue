@@ -20,7 +20,7 @@ export default defineComponent({
     return useLoadingApi();
   },
   props: {
-    selectedNoteId: { type: Number, required: true },
+    selectedNote: { type: Object as PropType<Generated.Note>, required: true },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: false,
@@ -31,12 +31,12 @@ export default defineComponent({
   },
   data() {
     return {
-      engagingStory: "In progress... waiting for engaging story",
+      engagingStory: `Draw me a picture, explaining wait is "${this.selectedNote.title}"?`,
       engagingStoryInError: undefined as string | undefined,
     };
   },
   mounted() {
-    const request = this.api.ai.askAiEngagingStories(this.selectedNoteId);
+    const request = this.api.ai.askAiEngagingStories(this.engagingStory);
 
     request
       .then((res) => {

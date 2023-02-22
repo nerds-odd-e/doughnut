@@ -64,7 +64,7 @@
         <div class="dropdown-menu dropdown-menu-end">
           <PopButton class="dropdown-item btn-primary" title="Engaging Story">
             <NoteEngagingStoryDialog
-              v-bind="{ selectedNoteId: selectedNote.id, storageAccessor }"
+              v-bind="{ selectedNote, storageAccessor }"
             />
           </PopButton>
           <NoteDeleteButton
