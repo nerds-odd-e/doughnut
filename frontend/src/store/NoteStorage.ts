@@ -30,7 +30,7 @@ export class StorageImplementation
   refreshNoteRealm(noteRealm: Generated.NoteRealm): Generated.NoteRealm {
     this.updatedNoteRealm = noteRealm;
     if (this.selectedNote?.id === noteRealm?.id) {
-      this.selectedNote = noteRealm.note;
+      this.selectedNote = noteRealm?.note;
     }
     this.refOfNoteRealm(noteRealm?.id).value = noteRealm;
     return noteRealm;
