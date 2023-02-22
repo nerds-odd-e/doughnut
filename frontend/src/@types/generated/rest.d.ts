@@ -16,6 +16,11 @@ declare namespace Generated {
         prompt: string;
     }
 
+    interface ApiError {
+        message: string;
+        errors: { [index: string]: string };
+    }
+
     interface CircleForUserView {
         id: number;
         name: string;

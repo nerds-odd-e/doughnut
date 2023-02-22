@@ -1,8 +1,6 @@
 package com.odde.doughnut.configs;
 
-import java.util.HashMap;
-import java.util.Map;
-import lombok.Getter;
+import com.odde.doughnut.entities.json.ApiError;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -18,36 +16,19 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice()
 public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
-  public static class ApiError {
-
-    @Getter private final HttpStatus status;
-    @Getter private final String message;
-    @Getter private final Map<String, String> errors;
-
-    public ApiError(HttpStatus status, String message) {
-      this.status = status;
-      this.message = message;
-      this.errors = new HashMap<>();
-    }
-
-    public void add(String field, String message) {
-      errors.put(field, message);
-    }
-  }
-
   @Override
   protected ResponseEntity<Object> handleBindException(
       final BindException ex,
       final HttpHeaders headers,
       final HttpStatus status,
       final WebRequest request) {
-    final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, "binding error");
+    final ApiError apiError = new ApiError("binding error");
     for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
       apiError.add(error.getField(), error.getDefaultMessage());
     }
     for (final ObjectError error : ex.getBindingResult().getGlobalErrors()) {
       apiError.add(error.getObjectName(), error.getDefaultMessage());
     }
-    return new ResponseEntity<Object>(apiError, new HttpHeaders(), apiError.getStatus());
+    return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
   }
 }

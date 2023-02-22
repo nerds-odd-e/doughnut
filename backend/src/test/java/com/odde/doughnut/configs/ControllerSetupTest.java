@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.odde.doughnut.configs.CustomRestExceptionHandler.ApiError;
+import com.odde.doughnut.entities.json.ApiError;
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.FailureReport;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
