@@ -20,8 +20,8 @@ Then("notebook {string} is shared to the Bazaar", (noteTitle: string) => {
   cy.testability().shareToBazaar(noteTitle)
 })
 
-Then("there shouldn't be any note edit button for {string}", (noteTitle: string) => {
-  cy.findNoteCardEditButton(noteTitle).should("not.exist")
+Then("there shouldn't be any note edit button", () => {
+  cy.notePageButtonOnCurrentPageEditNote().should("not.exist")
 })
 
 When("I open the notebook {string} in the Bazaar", (noteTitle: string) => {
@@ -49,7 +49,8 @@ Then(
 
 Then("I should see readonly notebook {string} in my notes", (noteTitle: string) => {
   cy.routerToNotebooks()
-  cy.findNoteCardButton(noteTitle, "edit note").should("not.exist")
+  cy.findByText(noteTitle).click()
+  cy.notePageButtonOnCurrentPageEditNote().should("not.exist")
 })
 
 Then("I should see I've subscribed to {string}", (noteTitle: string) => {

@@ -18,10 +18,10 @@ Feature: Bazaar browsing
   Scenario: Browsing as non-user
     When I haven't login
     Then I should see "Shape" is shared in the Bazaar
-    And there shouldn't be any note edit button for "Shape"
     When I open the notebook "Shape" in the Bazaar
-    Then there shouldn't be any note edit button for "Rectangle"
+    Then there shouldn't be any note edit button
     And I should see "Bazaar" in breadcrumb
     When I click the child note "Rectangle"
+    Then there shouldn't be any note edit button
     And I should see it has link to "Square"
 

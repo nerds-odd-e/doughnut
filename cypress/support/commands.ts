@@ -327,10 +327,6 @@ Cypress.Commands.add("findNoteCardButton", (noteTitle, btnTextOrTitle) => {
     .findByRole("button", { name: btnTextOrTitle })
 })
 
-Cypress.Commands.add("findNoteCardEditButton", (noteTitle) => {
-  return cy.findNoteCardButton(noteTitle, "edit note")
-})
-
 Cypress.Commands.add(
   "initialReviewOneNoteIfThereIs",
   ({ review_type, title, additional_info, skip }) => {

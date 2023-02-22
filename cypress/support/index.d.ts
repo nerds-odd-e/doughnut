@@ -44,7 +44,6 @@ declare namespace Cypress {
     failure(): Chainable<any>
     featureToggle(enabled: boolean): Chainable<Subject>
     findNoteCardButton(noteTitle: string, btnTextOrTitle: string): Chainable<any>
-    findNoteCardEditButton(noteTitle: string): Chainable<any>
     formField(label: string): Chainable<any>
     assignFieldValue(value: string): Chainable<any>
     fieldShouldHaveValue(value: string): Chainable<any>
