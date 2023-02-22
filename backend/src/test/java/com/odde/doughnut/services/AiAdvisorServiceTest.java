@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.entities.json.ApiError;
+import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
@@ -84,6 +85,20 @@ class AiAdvisorServiceTest {
               OpenAITimeoutException.class,
               () -> aiAdvisorService.getAiSuggestion("suggestion_prompt"));
       assertThat(result.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.OPENAI_TIMEOUT));
+    }
+
+    @Test
+    void getAiSuggestion_when_got_502() {
+      RuntimeException exception = buildHttpException(502);
+      Mockito.when(openAiApi.createCompletion(ArgumentMatchers.any()))
+          .thenReturn(Single.error(exception));
+      OpenAIServiceErrorException result =
+          assertThrows(
+              OpenAIServiceErrorException.class,
+              () -> aiAdvisorService.getAiSuggestion("suggestion_prompt"));
+      assertThat(
+          result.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.OPENAI_SERVICE_ERROR));
+      assertThat(result.getMessage(), containsString("502"));
     }
 
     @Test

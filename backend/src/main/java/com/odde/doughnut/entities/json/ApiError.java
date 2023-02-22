@@ -15,6 +15,7 @@ public class ApiError {
     OPENAI_UNAUTHORIZED,
     BINDING_ERROR,
     OPENAI_TIMEOUT,
+    OPENAI_SERVICE_ERROR,
   };
 
   public ApiError(String message, ErrorType type) {

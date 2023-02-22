@@ -4,6 +4,7 @@ import static com.theokanning.openai.service.OpenAiService.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.json.AiSuggestion;
+import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.theokanning.openai.OpenAiApi;
@@ -46,6 +47,9 @@ public class OpenAiApis {
     } catch (HttpException e) {
       if (HttpStatus.UNAUTHORIZED.value() == e.code()) {
         throw new OpenAiUnauthorizedException(e.getMessage());
+      }
+      if (5 == e.code() / 100) {
+        throw new OpenAIServiceErrorException(e.getMessage(), HttpStatus.valueOf(e.code()));
       }
       throw e;
     } catch (RuntimeException e) {
