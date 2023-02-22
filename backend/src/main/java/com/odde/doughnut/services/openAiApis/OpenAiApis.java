@@ -10,6 +10,8 @@ import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.CompletionChoice;
 import com.theokanning.openai.completion.CompletionRequest;
+import com.theokanning.openai.image.CreateImageRequest;
+import com.theokanning.openai.image.ImageResult;
 import java.net.SocketTimeoutException;
 import java.time.Duration;
 import java.util.List;
@@ -62,15 +64,9 @@ public class OpenAiApis {
   }
 
   public AiSuggestion getOpenAiCompletion(String prompt) {
-    CompletionChoice completionChoice = getCompletionChoice(prompt);
-    return new AiSuggestion(completionChoice);
-  }
-
-  private CompletionChoice getCompletionChoice(String prompt) {
     CompletionRequest completionRequest = getCompletionRequest(prompt);
     List<CompletionChoice> choices = getCompletionChoices(completionRequest);
-
-    return choices.stream().findFirst().orElse(null);
+    return new AiSuggestion(choices.stream().findFirst().orElse(null));
   }
 
   private static CompletionRequest getCompletionRequest(String prompt) {
@@ -88,5 +84,35 @@ public class OpenAiApis {
         .stream(false)
         .echo(true)
         .build();
+  }
+
+  private CreateImageRequest getImageRequest(String prompt) {
+    return CreateImageRequest.builder().prompt(prompt).responseFormat("url").build();
+  }
+
+  public String getOpenAiImage(String prompt) {
+    CreateImageRequest completionRequest = getImageRequest(prompt);
+    ImageResult choices = getAImage(completionRequest);
+    return choices.getData().get(0).getUrl();
+  }
+
+  private ImageResult getAImage(CreateImageRequest completionRequest) {
+    try {
+      return openAiApi.createImage(completionRequest).blockingGet();
+    } catch (HttpException e) {
+      if (HttpStatus.UNAUTHORIZED.value() == e.code()) {
+        throw new OpenAiUnauthorizedException(e.getMessage());
+      }
+      if (5 == e.code() / 100) {
+        throw new OpenAIServiceErrorException(e.getMessage(), HttpStatus.valueOf(e.code()));
+      }
+      throw e;
+    } catch (RuntimeException e) {
+      Throwable cause = e.getCause();
+      if (cause instanceof SocketTimeoutException) {
+        throw new OpenAITimeoutException(cause.getMessage());
+      }
+      throw e;
+    }
   }
 }

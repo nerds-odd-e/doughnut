@@ -49,6 +49,10 @@ Given("OpenAI always return text completion {string}", (description: string) => 
   cy.openAiService().restartImposterAndStubTextCompletion(description, "stop")
 })
 
+Given("OpenAI always return image of a moon", () => {
+  cy.openAiService().stubCreateImage()
+})
+
 Given("OpenAI returns an incomplete text completion {string}", (description: string) => {
   cy.openAiService().restartImposterAndStubTextCompletion(description, "length")
 })

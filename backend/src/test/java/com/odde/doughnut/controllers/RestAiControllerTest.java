@@ -15,7 +15,10 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.CompletionResult;
+import com.theokanning.openai.image.Image;
+import com.theokanning.openai.image.ImageResult;
 import io.reactivex.Single;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -99,39 +102,31 @@ class RestAiControllerTest {
 
     @Test
     void askEngagingStoryWithRightPrompt() throws UnexpectedNoAccessRightException {
-      when(openAiApi.createCompletion(
+      when(openAiApi.createImage(
               argThat(
                   request -> {
                     assertEquals("Earth", request.getPrompt());
                     return true;
                   })))
-          .thenReturn(buildCompletionResult("This is an engaging story."));
-      controller.askEngagingStories(params);
-    }
-
-    @Test
-    void askEngagingStoryWithRightMaxTokens() throws UnexpectedNoAccessRightException {
-      // We are testing on maxTokens, because changing this setting will have an effect on request
-      // performance.
-      // When this setting is changed please do a manual test that engaging stories can still be
-      // requested.
-      when(openAiApi.createCompletion(
-              argThat(
-                  request -> {
-                    assertEquals(50, request.getMaxTokens());
-                    return true;
-                  })))
-          .thenReturn(buildCompletionResult("This is an engaging story."));
+          .thenReturn(buildImageResult("This is an engaging story."));
       controller.askEngagingStories(params);
     }
 
     @Test
     void askEngagingStoryReturnsEngagingStory() throws UnexpectedNoAccessRightException {
-      when(openAiApi.createCompletion(Mockito.any()))
-          .thenReturn(buildCompletionResult("This is an engaging story."));
+      when(openAiApi.createImage(Mockito.any()))
+          .thenReturn(buildImageResult("This is an engaging story."));
       final AiEngagingStory aiEngagingStory = controller.askEngagingStories(params);
       assertEquals("This is an engaging story.", aiEngagingStory.engagingStory());
     }
+  }
+
+  private Single<ImageResult> buildImageResult(String s) {
+    ImageResult result = new ImageResult();
+    Image image = new Image();
+    image.setUrl(s);
+    result.setData(List.of(image));
+    return Single.just(result);
   }
 
   @NotNull

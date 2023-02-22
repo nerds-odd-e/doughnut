@@ -106,6 +106,7 @@ declare namespace Cypress {
       reply: string,
       finishReason: "length" | "stop",
     ): Chainable<Subject>
+    stubCreateImage(): Chainable<Subject>
     stubOpenAiCompletionWithErrorResponse(): Chainable<Subject>
     alwaysResponseAsUnauthorized(): Chainable<any>
     subscribeToNotebook(notebookTitle: string, dailyLearningCount: string): Chainable<any>

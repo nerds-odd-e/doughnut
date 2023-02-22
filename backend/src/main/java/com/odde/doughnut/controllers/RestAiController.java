@@ -3,7 +3,6 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.entities.json.AiSuggestionRequest;
-import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.theokanning.openai.OpenAiApi;
@@ -27,15 +26,14 @@ public class RestAiController {
     this.currentUser = currentUser;
   }
 
-  @PostMapping(value = "/ask-suggestions" /*, produces = MediaType.APPLICATION_NDJSON_VALUE*/)
+  @PostMapping("/ask-suggestions")
   public AiSuggestion askSuggestion(@RequestBody AiSuggestionRequest aiSuggestionRequest) {
     currentUser.assertLoggedIn();
     return aiAdvisorService.getAiSuggestion(aiSuggestionRequest.prompt);
   }
 
   @PostMapping("/ask-engaging-stories")
-  public AiEngagingStory askEngagingStories(@RequestBody AiSuggestionRequest aiSuggestionRequest)
-      throws UnexpectedNoAccessRightException {
+  public AiEngagingStory askEngagingStories(@RequestBody AiSuggestionRequest aiSuggestionRequest) {
     currentUser.assertLoggedIn();
     return aiAdvisorService.getEngagingStory(aiSuggestionRequest.prompt);
   }

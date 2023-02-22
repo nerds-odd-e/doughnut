@@ -17,8 +17,11 @@ import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.CompletionRequest;
 import com.theokanning.openai.completion.CompletionResult;
+import com.theokanning.openai.image.Image;
+import com.theokanning.openai.image.ImageResult;
 import io.reactivex.Single;
 import java.net.SocketTimeoutException;
+import java.util.List;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
 import org.junit.jupiter.api.BeforeEach;
@@ -116,12 +119,13 @@ class AiAdvisorServiceTest {
   class GetEngagingStory {
     @Test
     void getAiEngagingStory_givenAlistOfStrings_returnsAStory() {
-      CompletionResult completionResult =
-          makeMe.openAiCompletionResult().choice("This is an engaging story").please();
-      Mockito.when(openAiApi.createCompletion(Mockito.any()))
-          .thenReturn(Single.just(completionResult));
+      ImageResult result = new ImageResult();
+      Image image = new Image();
+      image.setUrl("https://image.com");
+      result.setData(List.of(image));
+      Mockito.when(openAiApi.createImage(Mockito.any())).thenReturn(Single.just(result));
       assertEquals(
-          "This is an engaging story", aiAdvisorService.getEngagingStory("prompt").engagingStory());
+          "https://image.com", aiAdvisorService.getEngagingStory("prompt").engagingStory());
     }
   }
 

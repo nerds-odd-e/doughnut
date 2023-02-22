@@ -17,6 +17,6 @@ public class AiAdvisorService {
   }
 
   public AiEngagingStory getEngagingStory(String prompt) {
-    return new AiEngagingStory(openAiApis.getOpenAiCompletion(prompt).getSuggestion());
+    return new AiEngagingStory(openAiApis.getOpenAiImage(prompt));
   }
 }

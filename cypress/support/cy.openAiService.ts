@@ -56,6 +56,19 @@ Cypress.Commands.add(
   },
 )
 
+Cypress.Commands.add("stubCreateImage", { prevSubject: true }, (serviceMocker: ServiceMocker) => {
+  serviceMocker.stubPoster(`/v1/images/generations`, {
+    id: "cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7",
+    created: 1589478378,
+    data: [
+      {
+        url: "https://moon",
+        b64_json: "eyJpZCI6MSwiYWdlIjozMCwiZW1haWwiOiJqb2huLmRvZUBleGFtcGxlLmNvbSJ9",
+      },
+    ],
+  })
+})
+
 Cypress.Commands.add(
   "stubOpenAiCompletionWithErrorResponse",
   { prevSubject: true },

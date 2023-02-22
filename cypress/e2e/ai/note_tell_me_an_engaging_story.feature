@@ -7,9 +7,9 @@ Feature: Tell me a engaging story
 
   @usingMockedOpenAiService
   Scenario: get an engaging story for a note
-    Given OpenAI always return text completion "Cow says moo"
+    Given OpenAI always return image of a moon
     When I ask for an engaging story for "Animals"
-    Then I should be prompted with an engaging story description "Cow says moo"
+    Then I should be prompted with an engaging story description "https://moon"
 
   @usingMockedOpenAiService
   Scenario: fail to get an engaging story for a note because the serivce is not available
