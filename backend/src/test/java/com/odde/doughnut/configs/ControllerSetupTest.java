@@ -99,7 +99,7 @@ public class ControllerSetupTest {
     ResponseEntity<ApiError> response =
         controllerSetup.handleOpenAIUnauthorizedException(exception);
     assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    assertThat(response.getBody().getErrors().keySet(), contains("OpenAi Error"));
+    assertThat(response.getBody().getErrors().keySet(), contains("_originalMessage"));
     assertThat(response.getBody().getErrorType(), equalTo(ApiError.ErrorType.OPENAI_UNAUTHORIZED));
   }
 
