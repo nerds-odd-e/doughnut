@@ -58,11 +58,16 @@
     </template>
     <template v-if="!!note.noteAccessories.url">
       <div v-if="size != 'small'">
-        <label v-if="note.noteAccessories.urlIsVideo">Video Url:</label>
-        <label v-else>Url:</label>
-        <a :href="note.noteAccessories.url" target="_blank">{{
-          note.noteAccessories.url
-        }}</a>
+        <label
+          id="note-url"
+          v-text="note.noteAccessories.urlIsVideo ? 'Video Url:' : 'Url:'"
+        />
+        <a
+          aria-labelledby="note-url"
+          :href="note.noteAccessories.url"
+          target="_blank"
+          >{{ note.noteAccessories.url }}</a
+        >
       </div>
       <a v-else :href="note.noteAccessories.url" target="_blank">
         <SvgUrlIndicator />

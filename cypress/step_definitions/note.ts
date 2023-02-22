@@ -69,6 +69,16 @@ When("I update note {string} to become:", (noteTitle: string, data: DataTable) =
   cy.inPlaceEdit(data.hashes()[0])
 })
 
+When("I update note accessories of {string} to become:", (noteTitle: string, data: DataTable) => {
+  cy.jumpToNotePage(noteTitle)
+  cy.openAndSubmitNoteAccessoriesFormWith(noteTitle, data.hashes()[0])
+})
+
+When("I should see note {string} has a url {string}", (noteTitle: string, expectedUrl: string) => {
+  cy.jumpToNotePage(noteTitle)
+  cy.findByLabelText("Url:").should("have.attr", "href", expectedUrl)
+})
+
 When("I can change the title {string} to {string}", (noteTitle: string, newNoteTitle: string) => {
   cy.findNoteTitle(noteTitle)
   cy.inPlaceEdit({ title: newNoteTitle })
