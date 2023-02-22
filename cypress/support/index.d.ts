@@ -19,7 +19,7 @@ declare namespace Cypress {
     clickAddChildNoteButton(): Chainable<any>
     clickButtonOnCardBody(noteTitle: any, buttonTitle: any): Chainable<any>
     clickNotePageButton(noteTitle: any, btnTextOrTitle: any, forceLoadPage: any): Chainable<any>
-    clickNotePageButtonOnCurrentPage(btnTextOrTitle: any): Chainable<any>
+    notePageButtonOnCurrentPage(btnTextOrTitle: any): Chainable<any>
     clickNotePageMoreOptionsButton(noteTitle: string, btnTextOrTitle: string): Chainable<any>
     clickNotePageMoreOptionsButtonOnCurrentPage(btnTextOrTitle: string): Chainable<any>
     deleteNote(noteTitle: string): Chainable<any>

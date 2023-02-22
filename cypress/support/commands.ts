@@ -77,7 +77,7 @@ Cypress.Commands.add("expectBreadcrumb", (items: string, addChildButton: boolean
 
 Cypress.Commands.add("selectViewOfNote", (noteTitle: string, viewType: string) => {
   cy.clickNotePageButton(noteTitle, `view type`, true)
-  cy.clickNotePageButtonOnCurrentPage(`${viewType} view`)
+  cy.notePageButtonOnCurrentPage(`${viewType} view`).click()
 })
 
 Cypress.Commands.add("submitNoteCreationFormSuccessfully", (noteAttributes) => {
@@ -112,7 +112,7 @@ Cypress.Commands.add(
   "openAndSubmitNoteAccessoriesFormWith",
   (noteTitle: string, noteAccessoriesAttributes: Record<string, string>) => {
     cy.findNoteTitle(noteTitle)
-    cy.clickNotePageButtonOnCurrentPage("edit note")
+    cy.notePageButtonOnCurrentPage("edit note").click()
     cy.submitNoteFormWith(noteAccessoriesAttributes)
   },
 )
@@ -273,12 +273,12 @@ Cypress.Commands.add("routerToNotebooks", () => {
 })
 
 Cypress.Commands.add("startSearching", () => {
-  cy.clickNotePageButtonOnCurrentPage("link note")
+  cy.notePageButtonOnCurrentPage("link note").click()
 })
 
 Cypress.Commands.add("clickNotePageButton", (noteTitle, btnTextOrTitle, forceLoadPage) => {
   cy.jumpToNotePage(noteTitle, forceLoadPage)
-  cy.clickNotePageButtonOnCurrentPage(btnTextOrTitle)
+  cy.notePageButtonOnCurrentPage(btnTextOrTitle).click()
 })
 
 Cypress.Commands.add(
@@ -290,8 +290,8 @@ Cypress.Commands.add(
 )
 
 Cypress.Commands.add("clickNotePageMoreOptionsButtonOnCurrentPage", (btnTextOrTitle: string) => {
-  cy.clickNotePageButtonOnCurrentPage("more options")
-  cy.clickNotePageButtonOnCurrentPage(btnTextOrTitle)
+  cy.notePageButtonOnCurrentPage("more options").click()
+  cy.notePageButtonOnCurrentPage(btnTextOrTitle).click()
 })
 
 Cypress.Commands.add("deleteNote", (noteTitle: string) => {
@@ -528,9 +528,10 @@ Cypress.Commands.add("distanceBetweenCardsGreaterThan", (cards, note1, note2, mi
   expect(Math.sqrt(xd * xd + yd * yd)).greaterThan(min)
 })
 
-Cypress.Commands.add("clickNotePageButtonOnCurrentPage", (btnTextOrTitle) => {
-  cy.get(".toolbar").findByRole("button", { name: btnTextOrTitle }).click()
+Cypress.Commands.add("notePageButtonOnCurrentPage", (btnTextOrTitle) => {
+  cy.get(".toolbar").findByRole("button", { name: btnTextOrTitle })
 })
+
 
 Cypress.Commands.add("undoLast", (undoType: string) => {
   cy.findByTitle(`undo ${undoType}`).click()
