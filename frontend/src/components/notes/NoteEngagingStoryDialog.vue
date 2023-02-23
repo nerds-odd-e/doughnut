@@ -35,7 +35,7 @@ export default defineComponent({
   },
   data() {
     return {
-      engagingStory: `Draw me a picture, explaining wait is "${this.selectedNote.title}"?`,
+      engagingStory: this.selectedNote.title,
       b64Json: undefined as string | undefined,
       engagingStoryInError: undefined as string | undefined,
     };
