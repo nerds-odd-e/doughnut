@@ -25,7 +25,6 @@ declare module '@vue/runtime-core' {
     CircleSelector: typeof import('./src/components/circles/CircleSelector.vue')['default']
     ContentLoader: typeof import('./src/components/commons/ContentLoader.vue')['default']
     ControlCenter: typeof import('./src/components/toolbars/ControlCenter.vue')['default']
-    copy: typeof import('./src/components/svgs/SvgCards copy.vue')['default']
     DragListner: typeof import('./src/components/commons/DragListner.vue')['default']
     EditableText: typeof import('./src/components/form/EditableText.vue')['default']
     Feather: typeof import('./src/components/svgs/link_types/Feather.vue')['default']
