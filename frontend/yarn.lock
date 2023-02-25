@@ -1615,9 +1615,9 @@ editorconfig@^0.15.3:
     sigmund "^1.0.1"
 
 electron-to-chromium@^1.4.284:
-  version "1.4.310"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.310.tgz#cb85dc8ceac536e99b20a364d7ab00ea35168f9e"
-  integrity sha512-/xlATgfwkm5uDDwLw5nt/MNEf7c1oazLURMZLy39vOioGYyYzLWIDT8fZMJak6qTiAJ7udFTy7JG7ziyjNutiA==
+  version "1.4.311"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.311.tgz#953bc9a4767f5ce8ec125f9a1ad8e00e8f67e479"
+  integrity sha512-RoDlZufvrtr2Nx3Yx5MB8jX3aHIxm8nRWPJm3yVvyHmyKaRvn90RjzB6hNnt0AkhS3IInJdyRfQb4mWhPvUjVw==
 
 emoji-regex@^9.2.2:
   version "9.2.2"
@@ -3020,9 +3020,9 @@ minimatch@^6.1.6, minimatch@^6.2.0:
     brace-expansion "^2.0.1"
 
 minimatch@^7.1.0:
-  version "7.1.1"
-  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-7.1.1.tgz#aeb8f7b0fef16531de96e56944b744860976d34a"
-  integrity sha512-jjK46CRPxSRHTwHYtg+7LJ4pmfg01JuCjYr24+PUi1zHtZ8rOABPA0cMHKBF4QNeKn1xYy4hiBOm57p56ClCjw==
+  version "7.1.3"
+  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-7.1.3.tgz#1e1f1af99d47b48b7133a641b0748ba039719d5e"
+  integrity sha512-kpcwpcyeYtgSzpOvUf+9RiaPgrqtR2NwuqejBV2VkWxR+KC8jMWTb76zSlVJXy6ypbY39u66Un4gTk0ryiXm2g==
   dependencies:
     brace-expansion "^2.0.1"
 
@@ -4040,9 +4040,9 @@ unimport@^2.2.4:
     unplugin "^1.0.1"
 
 unimport@^3.0.0:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/unimport/-/unimport-3.0.1.tgz#13fe4591d651775b56fafcd1ddbf2d889ee47de5"
-  integrity sha512-agdjfSLRp0Yi7qyRm3bwTdQR3NTN1JmuQmTj2b8hNZWTnphq5k4NugOad12t21ukD1uXvnYu1Tji7aNmzmCZGQ==
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/unimport/-/unimport-3.0.2.tgz#c7016df38775e03c4bc7682b0194c98236e308db"
+  integrity sha512-OQ0hShpcerS1PSsISsyn/NV2dGe5xfdUn4p5nwOodq0iqq5xxYQrTidHqlFGjxIliPDtDJp80OeySzyPTjYHmA==
   dependencies:
     "@rollup/pluginutils" "^5.0.2"
     escape-string-regexp "^5.0.0"
