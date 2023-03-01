@@ -12,7 +12,9 @@
         role="button"
         class="btn btn-sm btn-secondary"
         @click="fetchSearchResult"
-        >Wikidata Id</span
+      >
+        <SvgSearchWikidata />
+        Wikidata Id</span
       >
     </template>
   </TextInput>
@@ -42,6 +44,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import TextInput from "../form/TextInput.vue";
+import SvgSearchWikidata from "../svgs/SvgSearchWikidata.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default defineComponent({
@@ -56,6 +59,7 @@ export default defineComponent({
   emits: ["selected", "update:modelValue"],
   components: {
     TextInput,
+    SvgSearchWikidata,
   },
   data() {
     return {
