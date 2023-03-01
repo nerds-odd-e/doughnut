@@ -22,7 +22,11 @@
       v-model="creationData.wikidataId"
       :errors="noteFormErrors.wikidataId"
       placeholder="example: `Q1234`"
-    />
+    >
+      <template #label_content
+        ><span class="btn btn-sm btn-secondary">Wikidata Id</span>
+      </template>
+    </TextInput>
     <WikidataSearchByLabel
       :title="creationData.textContent.title"
       @selected="onSelectWikidataEntry"

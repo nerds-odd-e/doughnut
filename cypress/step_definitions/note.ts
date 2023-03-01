@@ -472,6 +472,6 @@ Then("I should be prompted with an error message saying {string}", (errorMessage
 })
 
 Then("I try to submit again immediately", () => {
-  cy.get('form').submit()
+  cy.get("form").submit()
   cy.pageIsNotLoading()
 })

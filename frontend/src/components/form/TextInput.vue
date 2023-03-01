@@ -1,5 +1,8 @@
 <template>
   <InputWithType v-bind="{ scopeName, field, title, errors, hint }">
+    <template #label_content v-if="$slots.label_content">
+      <slot name="label_content" />
+    </template>
     <input
       :class="`text-input-control form-control ${!!errors ? 'is-invalid' : ''}`"
       :id="`${scopeName}-${field}`"
