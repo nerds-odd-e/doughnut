@@ -2,14 +2,18 @@
   <div class="form-group">
     <slot v-if="beforeLabel" />
     <label v-if="!!field || !!title" :for="controlId">
-      <slot name="label_content" />
-      <template v-if="!$slots.label_content">
-        {{ titlized }}
-      </template>
+      {{ titlized }}
     </label>
     <i v-if="hint" class="hint" v-text="hint" />
-    <slot v-if="!beforeLabel" />
-    <div class="error-msg" v-if="!!errors">{{ errors }}</div>
+    <div class="input-group">
+      <template v-if="$slots.input_prepend">
+        <div class="input-group-prepend">
+          <slot name="input_prepend" />
+        </div>
+      </template>
+      <slot v-if="!beforeLabel" />
+      <div class="error-msg" v-if="!!errors">{{ errors }}</div>
+    </div>
   </div>
 </template>
 

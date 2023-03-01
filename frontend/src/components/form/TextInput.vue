@@ -1,7 +1,7 @@
 <template>
   <InputWithType v-bind="{ scopeName, field, title, errors, hint }">
-    <template #label_content v-if="$slots.label_content">
-      <slot name="label_content" />
+    <template #input_prepend v-if="$slots.input_prepend">
+      <slot name="input_prepend" />
     </template>
     <input
       :class="`text-input-control form-control ${!!errors ? 'is-invalid' : ''}`"

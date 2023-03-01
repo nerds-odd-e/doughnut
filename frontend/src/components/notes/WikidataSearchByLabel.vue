@@ -7,15 +7,14 @@
     :errors="errors"
     placeholder="example: `Q1234`"
   >
-    <template #label_content
-      ><span
-        role="button"
-        class="btn btn-sm btn-secondary"
-        @click="fetchSearchResult"
+    <template #input_prepend
+      ><button
+        title="Wikidata Id"
+        class="btn btn-outline-secondary"
+        @click.prevent="fetchSearchResult"
       >
         <SvgSearchWikidata />
-        Wikidata Id</span
-      >
+      </button>
     </template>
   </TextInput>
   <div class="row mt-2 mb-2">

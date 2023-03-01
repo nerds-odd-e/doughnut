@@ -48,7 +48,7 @@ describe("adding new note", () => {
 
     const searchAndSelectFirstResult = async (key: string) => {
       await titleInput().setValue(key);
-      await wrapper.find("[role='button'].btn-secondary").trigger("click");
+      await wrapper.find("button[title='Wikidata Id']").trigger("click");
 
       await flushPromises();
 
