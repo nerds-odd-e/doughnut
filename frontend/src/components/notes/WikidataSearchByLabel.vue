@@ -1,7 +1,18 @@
 <template>
+  <TextInput
+    scope-name="wikidataID"
+    field="wikidataID"
+    :model-value="modelValue"
+    @update:model-value="$emit('update:modelValue', $event)"
+    :errors="errors"
+    placeholder="example: `Q1234`"
+  >
+    <template #label_content
+      ><span class="btn btn-sm btn-secondary">Wikidata Id</span>
+    </template>
+  </TextInput>
   <div class="row mt-2 mb-2">
     <div class="col-6 btn-group" role="group" aria-label="Action Group">
-      <input type="submit" value="Submit" class="btn btn-primary" />
       <button
         id="search-wikidata"
         class="btn"
@@ -34,14 +45,22 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import TextInput from "../form/TextInput.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default defineComponent({
   setup() {
     return useLoadingApi();
   },
-  props: { title: { type: String, required: true } },
-  emits: ["selected"],
+  props: {
+    title: { type: String, required: true },
+    modelValue: String,
+    errors: String,
+  },
+  emits: ["selected", "update:modelValue"],
+  components: {
+    TextInput,
+  },
   data() {
     return {
       wikiSearchSuggestions: [] as Generated.WikidataSearchEntity[],

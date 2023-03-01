@@ -16,21 +16,13 @@
       :suggested-title="suggestedTitle"
       @suggested-title-selected="takeSuggestedTitle"
     />
-    <TextInput
-      scope-name="wikidataID"
-      field="wikidataID"
-      v-model="creationData.wikidataId"
-      :errors="noteFormErrors.wikidataId"
-      placeholder="example: `Q1234`"
-    >
-      <template #label_content
-        ><span class="btn btn-sm btn-secondary">Wikidata Id</span>
-      </template>
-    </TextInput>
     <WikidataSearchByLabel
       :title="creationData.textContent.title"
+      v-model="creationData.wikidataId"
+      :errors="noteFormErrors.wikidataId"
       @selected="onSelectWikidataEntry"
     />
+    <input type="submit" value="Submit" class="btn btn-primary" />
     <fieldset class="secondary-info">
       <legend>Similar Notes</legend>
       <SearchResults
@@ -45,7 +37,6 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import TextInput from "../form/TextInput.vue";
 import NoteFormTitleOnly from "./NoteFormTitleOnly.vue";
 import SearchResults from "../search/SearchResults.vue";
 import LinkTypeSelectCompact from "../links/LinkTypeSelectCompact.vue";
@@ -62,7 +53,6 @@ export default defineComponent({
     NoteFormTitleOnly,
     SearchResults,
     LinkTypeSelectCompact,
-    TextInput,
     WikidataSearchByLabel,
     SuggestTitle,
   },
