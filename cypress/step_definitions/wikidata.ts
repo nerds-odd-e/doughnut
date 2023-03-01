@@ -71,7 +71,7 @@ Given(
 
 When("I search with title {string} on Wikidata", (title: string) => {
   cy.focused().clear().type(title)
-  cy.findByRole("button", { name: "Search on Wikidata" }).click()
+  cy.findByRole("button", { name: "Wikidata Id" }).click()
 })
 
 When("I select wikidataID {string} from the Wikidata search result", (wikidataID: string) => {

@@ -8,19 +8,15 @@
     placeholder="example: `Q1234`"
   >
     <template #label_content
-      ><span class="btn btn-sm btn-secondary">Wikidata Id</span>
+      ><span
+        role="button"
+        class="btn btn-sm btn-secondary"
+        @click="fetchSearchResult"
+        >Wikidata Id</span
+      >
     </template>
   </TextInput>
   <div class="row mt-2 mb-2">
-    <div class="col-6 btn-group" role="group" aria-label="Action Group">
-      <button
-        id="search-wikidata"
-        class="btn"
-        @click.prevent="fetchSearchResult"
-      >
-        Search on Wikidata
-      </button>
-    </div>
     <div class="col-6">
       <select
         v-if="wikiSearchSuggestions?.length > 0"
