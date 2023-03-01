@@ -470,3 +470,8 @@ Given("An OpenAI response is unavailable", () => {
 Then("I should be prompted with an error message saying {string}", (errorMessage: string) => {
   cy.expectFieldErrorMessage("Engaging Story", errorMessage)
 })
+
+Then("I try to submit again immediately", () => {
+  cy.get('form').submit()
+  cy.pageIsNotLoading()
+})

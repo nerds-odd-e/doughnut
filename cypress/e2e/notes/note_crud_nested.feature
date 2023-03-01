@@ -26,6 +26,17 @@ Feature: Nested Note CRUD
       |       |
     Then I should see that the note creation is not successful
 
+  @ignore
+  Scenario: Create a new note and try to sumbit twice
+    When I try to create a note belonging to "tech":
+      | Title |
+      | integration  |
+    And I try to submit again immediately
+    Then I should see "integration" in note title
+    And I should see "My Notes/LeSS in Action/tech" with these children
+      | note-title   |
+      | integration  |
+
   Scenario: Create a new sibling note
     Given I create a note belonging to "LeSS in Action":
       | Title        | Description                        |
