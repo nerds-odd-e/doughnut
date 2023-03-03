@@ -7,24 +7,14 @@
     :errors="errors"
     placeholder="example: `Q1234`"
   >
-    <template #input_prepend
-      ><button
-        title="Wikidata Id"
-        class="btn btn-outline-secondary"
-        @click.prevent="fetchSearchResult"
-      >
-        <SvgSearchWikidata />
-      </button>
-    </template>
-  </TextInput>
-  <div class="row mt-2 mb-2">
-    <div class="col-6">
+    <template #input_prepend>
       <select
         v-if="wikiSearchSuggestions?.length > 0"
+        size="10"
         name="wikidataSearchResult"
         @change="onSelectSearchResult"
-        class="form-control"
         v-model="selectedOption"
+        class="popup-select"
       >
         <option disabled value="">- Choose Wikidata Search Result -</option>
         <option
@@ -36,8 +26,15 @@
           {{ suggestion.label }} - {{ suggestion.description }}
         </option>
       </select>
-    </div>
-  </div>
+      <button
+        title="Wikidata Id"
+        class="btn btn-outline-secondary"
+        @click.prevent="fetchSearchResult"
+      >
+        <SvgSearchWikidata />
+      </button>
+    </template>
+  </TextInput>
 </template>
 
 <script lang="ts">
@@ -71,6 +68,7 @@ export default defineComponent({
       const selectedSuggestion = this.wikiSearchSuggestions.find((obj) => {
         return obj.id === this.selectedOption;
       });
+      this.wikiSearchSuggestions = [];
       if (!selectedSuggestion) return;
       this.$emit("selected", selectedSuggestion);
       this.selectedOption = "";
@@ -83,3 +81,14 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.popup-select {
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  cursor: pointer;
+}
+</style>
