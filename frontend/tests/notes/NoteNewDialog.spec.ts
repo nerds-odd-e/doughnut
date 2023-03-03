@@ -39,21 +39,25 @@ describe("adding new note", () => {
       wrapper = helper
         .component(NoteNewDialog)
         .withStorageProps({ parentId: 123 })
-        .mount();
+        .mount({ attachTo: document.body });
     });
 
     const titleInput = () => {
       return wrapper.find("input#note-title");
     };
 
-    const searchAndSelectFirstResult = async (key: string) => {
+    const searchWikidata = async (key: string) => {
       await titleInput().setValue(key);
       await wrapper.find("button[title='Wikidata Id']").trigger("click");
 
       await flushPromises();
 
-      const result = await wrapper.find('select[name="wikidataSearchResult"]');
-      result.findAll("option").at(1)?.setValue();
+      return wrapper.find('select[name="wikidataSearchResult"]');
+    };
+
+    const searchAndSelectFirstResult = async (key: string) => {
+      const select = await searchWikidata(key);
+      select.findAll("option").at(1)?.setValue();
     };
 
     const replaceTitle = async () => {
@@ -64,6 +68,15 @@ describe("adding new note", () => {
     };
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     const doNothing = () => {};
+
+    it("focus on the select and remove it when lose focus", async () => {
+      const searchResult = makeMe.aWikidataSearchEntity.label("dog").please();
+      helper.apiMock
+        .expectingGet(`/api/wikidata/search/dog`)
+        .andReturnOnce([searchResult]);
+      const select = await searchWikidata("dog");
+      expect(select.element).toHaveFocus();
+    });
 
     it.each`
       searchTitle | wikidataTitle | action          | expectedTitle

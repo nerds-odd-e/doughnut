@@ -69,8 +69,8 @@ class RenderingHelper {
     return render(this.comp, this.options);
   }
 
-  mount() {
-    return mount(this.comp, this.options);
+  mount(options: Record<string, unknown> = {}) {
+    return mount(this.comp, { ...this.options, ...options });
   }
 
   private get options() {

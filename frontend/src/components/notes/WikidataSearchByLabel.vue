@@ -10,6 +10,7 @@
     <template #input_prepend>
       <select
         v-if="wikiSearchSuggestions?.length > 0"
+        ref="select"
         size="10"
         name="wikidataSearchResult"
         @change="onSelectSearchResult"
@@ -77,6 +78,10 @@ export default defineComponent({
       this.wikiSearchSuggestions = await this.api.wikidata.getWikidatas(
         this.title
       );
+      this.$nextTick(() => {
+        const select = this.$refs.select as HTMLSelectElement | undefined;
+        select?.focus();
+      });
     },
   },
 });
