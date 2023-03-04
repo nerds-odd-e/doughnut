@@ -26,7 +26,6 @@ Feature: Nested Note CRUD
       |       |
     Then I should see that the note creation is not successful
 
-  @ignore
   Scenario: Create a new note and try to sumbit twice
     When I try to create a note belonging to "tech":
       | Title |

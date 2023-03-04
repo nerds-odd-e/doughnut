@@ -1,36 +1,38 @@
 <template>
   <form @submit.prevent="processForm">
-    <LinkTypeSelectCompact
-      scope-name="note"
-      field="linkTypeToParent"
-      :allow-empty="true"
-      v-model="creationData.linkTypeToParent"
-      :errors="noteFormErrors.linkTypeToParent"
-    />
-    <NoteFormTitleOnly
-      v-model="creationData.textContent"
-      :errors="noteFormErrors.textContent"
-    />
-    <SuggestTitle
-      :original-title="creationData.textContent.title"
-      :suggested-title="suggestedTitle"
-      @suggested-title-selected="takeSuggestedTitle"
-    />
-    <WikidataSearchByLabel
-      :title="creationData.textContent.title"
-      v-model="creationData.wikidataId"
-      :errors="noteFormErrors.wikidataId"
-      @selected="onSelectWikidataEntry"
-    />
-    <input type="submit" value="Submit" class="btn btn-primary" />
-    <fieldset class="secondary-info">
-      <legend>Similar Notes</legend>
-      <SearchResults
-        v-bind="{
-          noteId: parentId,
-          inputSearchKey: creationData.textContent.title,
-        }"
+    <fieldset :disabled="processing">
+      <LinkTypeSelectCompact
+        scope-name="note"
+        field="linkTypeToParent"
+        :allow-empty="true"
+        v-model="creationData.linkTypeToParent"
+        :errors="noteFormErrors.linkTypeToParent"
       />
+      <NoteFormTitleOnly
+        v-model="creationData.textContent"
+        :errors="noteFormErrors.textContent"
+      />
+      <SuggestTitle
+        :original-title="creationData.textContent.title"
+        :suggested-title="suggestedTitle"
+        @suggested-title-selected="takeSuggestedTitle"
+      />
+      <WikidataSearchByLabel
+        :title="creationData.textContent.title"
+        v-model="creationData.wikidataId"
+        :errors="noteFormErrors.wikidataId"
+        @selected="onSelectWikidataEntry"
+      />
+      <input type="submit" value="Submit" class="btn btn-primary" />
+      <fieldset class="secondary-info">
+        <legend>Similar Notes</legend>
+        <SearchResults
+          v-bind="{
+            noteId: parentId,
+            inputSearchKey: creationData.textContent.title,
+          }"
+        />
+      </fieldset>
     </fieldset>
   </form>
 </template>
@@ -76,10 +78,13 @@ export default defineComponent({
         wikidataId: undefined as undefined | string,
       },
       suggestedTitle: "",
+      processing: false,
     };
   },
   methods: {
     processForm() {
+      if (this.processing) return;
+      this.processing = true;
       this.noteFormErrors.wikidataId = undefined;
       this.noteFormErrors.textContent = {};
       this.storageAccessor
@@ -88,6 +93,9 @@ export default defineComponent({
         .then(this.popup.done)
         .catch((res) => {
           this.noteFormErrors = res;
+        })
+        .finally(() => {
+          this.processing = false;
         });
     },
     onSelectWikidataEntry(selectedSuggestion: Generated.WikidataSearchEntity) {
