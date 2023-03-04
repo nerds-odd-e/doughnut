@@ -112,7 +112,7 @@ describe("adding new note", () => {
         action();
         await flushPromises();
 
-        expect(<HTMLInputElement>titleInput().element.value).toBe(
+        expect((<HTMLInputElement>titleInput().element).value).toBe(
           expectedTitle
         );
       }
