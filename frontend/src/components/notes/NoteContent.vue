@@ -23,12 +23,6 @@
     </div>
   </div>
   <div class="note-content">
-    <div
-      v-if="note.location"
-      class="map-applet"
-      :data-lat="note.location.latitude"
-      :data-lon="note.location.longitude"
-    ></div>
     <EditableText
       :multiple-line="true"
       role="description"

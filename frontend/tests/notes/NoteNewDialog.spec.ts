@@ -1,4 +1,4 @@
-import { flushPromises } from "@vue/test-utils";
+import { flushPromises, VueWrapper } from "@vue/test-utils";
 import NoteNewDialog from "@/components/notes/NoteNewDialog.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
@@ -32,7 +32,7 @@ describe("adding new note", () => {
   });
 
   describe("search wikidata entry", () => {
-    let wrapper;
+    let wrapper: VueWrapper;
 
     beforeEach(() => {
       helper.apiMock.expectingPost(`/api/notes/search`).andReturnOnce([]);
@@ -69,13 +69,25 @@ describe("adding new note", () => {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     const doNothing = () => {};
 
-    it("focus on the select and remove it when lose focus", async () => {
-      const searchResult = makeMe.aWikidataSearchEntity.label("dog").please();
-      helper.apiMock
-        .expectingGet(`/api/wikidata/search/dog`)
-        .andReturnOnce([searchResult]);
-      const select = await searchWikidata("dog");
-      expect(select.element).toHaveFocus();
+    describe("the select for wikidata id", () => {
+      let select;
+      beforeEach(async () => {
+        const searchResult = makeMe.aWikidataSearchEntity.label("dog").please();
+        helper.apiMock
+          .expectingGet(`/api/wikidata/search/dog`)
+          .andReturnOnce([searchResult]);
+        select = await searchWikidata("dog");
+      });
+
+      it("focus on the select", async () => {
+        expect(select.element).toHaveFocus();
+      });
+
+      it("remove the select when lose focus", async () => {
+        select.element.blur();
+        await flushPromises();
+        expect(wrapper.vm.$el).not.toContainElement(select.element);
+      });
     });
 
     it.each`

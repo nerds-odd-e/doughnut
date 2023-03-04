@@ -118,26 +118,3 @@ describe("note associated with wikidata", () => {
     expect(element.attributes("title")).toMatch("Wiki Association");
   });
 });
-
-describe("note associated with location", () => {
-  it("should display a map placeholder with longitude and latitude as data attribute", async () => {
-    const noteRealm = makeMe.aNoteRealm
-      .title("Dummy Title")
-      .location({ longitude: 123, latitude: 456 })
-      .please();
-
-    const wrapper = helper
-      .component(NoteWithLinks)
-      .withStorageProps({
-        note: noteRealm.note,
-        links: noteRealm.links,
-      })
-      .mount();
-
-    const element = await wrapper.find(".map-applet");
-    element.isVisible();
-    expect(element.exists()).toBe(true);
-    expect(element.attributes("data-lat")).toMatch("456");
-    expect(element.attributes("data-lon")).toMatch("123");
-  });
-});

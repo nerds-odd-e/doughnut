@@ -14,6 +14,7 @@
         size="10"
         name="wikidataSearchResult"
         @change="onSelectSearchResult"
+        @blur="removeSearchSuggestions"
         v-model="selectedOption"
         class="popup-select"
       >
@@ -73,6 +74,9 @@ export default defineComponent({
       if (!selectedSuggestion) return;
       this.$emit("selected", selectedSuggestion);
       this.selectedOption = "";
+    },
+    removeSearchSuggestions() {
+      this.wikiSearchSuggestions = [];
     },
     async fetchSearchResult() {
       this.wikiSearchSuggestions = await this.api.wikidata.getWikidatas(
