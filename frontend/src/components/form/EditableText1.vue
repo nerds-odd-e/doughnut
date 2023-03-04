@@ -37,7 +37,7 @@ export default defineComponent({
         },
         placeholder: "Enter note description here...",
       },
-      initialValue: this.modelValue as string | undefined,
+      initialValue: this.modelValue || ("" as string),
       localValue: this.modelValue || ("" as string),
     };
   },
@@ -50,8 +50,6 @@ export default defineComponent({
   },
   methods: {
     onEnterKey(event) {
-      // eslint-disable-next-line no-console
-      console.log(`key changed ${this.modelValue}`);
       if (!this.multipleLine || event.shiftKey) {
         this.onBlurTextField();
       }

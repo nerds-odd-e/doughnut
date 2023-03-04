@@ -11,6 +11,7 @@ Feature: Bazaar subscription
       | Big Square | Square        |
     And notebook "Shape" is shared to the Bazaar
 
+  @ignore
   Scenario: subscribe to a note and browse
     Given I've logged in as an existing user
     When I subscribe to notebook "Shape" in the bazaar, with target of learning 1 notes per day

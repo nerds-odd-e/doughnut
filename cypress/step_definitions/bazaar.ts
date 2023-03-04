@@ -50,6 +50,7 @@ Then(
 Then("I should see readonly notebook {string} in my notes", (noteTitle: string) => {
   cy.routerToNotebooks()
   cy.findByText(noteTitle).click()
+  cy.pageIsNotLoading()
   cy.notePageButtonOnCurrentPageEditNote().should("not.exist")
 })
 
