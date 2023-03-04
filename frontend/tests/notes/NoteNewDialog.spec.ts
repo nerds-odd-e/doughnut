@@ -1,5 +1,6 @@
 import { flushPromises, VueWrapper } from "@vue/test-utils";
 import NoteNewDialog from "@/components/notes/NoteNewDialog.vue";
+import { ComponentPublicInstance } from "vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
@@ -32,7 +33,7 @@ describe("adding new note", () => {
   });
 
   describe("search wikidata entry", () => {
-    let wrapper: VueWrapper;
+    let wrapper: VueWrapper<ComponentPublicInstance>;
 
     beforeEach(() => {
       helper.apiMock.expectingPost(`/api/notes/search`).andReturnOnce([]);
@@ -61,10 +62,10 @@ describe("adding new note", () => {
     };
 
     const replaceTitle = async () => {
-      await wrapper.find("[id='titleRadio-Replace']").setChecked();
+      await wrapper.find("[id='titleRadio-Replace']").setValue();
     };
     const appendTitle = async () => {
-      await wrapper.find("[id='titleRadio-Append']").setChecked();
+      await wrapper.find("[id='titleRadio-Append']").setValue();
     };
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     const doNothing = () => {};

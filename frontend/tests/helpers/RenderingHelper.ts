@@ -1,7 +1,7 @@
 import { merge } from "lodash";
-import { mount } from "@vue/test-utils";
+import { mount, VueWrapper } from "@vue/test-utils";
 import { render } from "@testing-library/vue";
-import { App, DefineComponent } from "vue";
+import { App, ComponentPublicInstance, DefineComponent } from "vue";
 import { RouteLocationRaw } from "vue-router";
 import createNoteStorage from "../../src/store/createNoteStorage";
 
@@ -69,7 +69,9 @@ class RenderingHelper {
     return render(this.comp, this.options);
   }
 
-  mount(options: Record<string, unknown> = {}) {
+  mount(
+    options: Record<string, unknown> = {}
+  ): VueWrapper<ComponentPublicInstance> {
     return mount(this.comp, { ...this.options, ...options });
   }
 

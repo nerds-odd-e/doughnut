@@ -27,13 +27,12 @@
       :multiple-line="true"
       role="description"
       v-if="size === 'large'"
-      class="col note-description"
+      class="note-description"
       scope-name="note"
       v-model="textContent.description"
       @blur="onBlurTextField"
     />
     <NoteShortDescription
-      class="col"
       v-if="size === 'medium'"
       :short-description="note.shortDescription"
     />
@@ -44,7 +43,7 @@
     <template v-if="note.pictureWithMask">
       <ShowPicture
         v-if="size !== 'small'"
-        class="col text-center"
+        class="text-center"
         v-bind="note.pictureWithMask"
         :opacity="0.2"
       />
@@ -126,9 +125,6 @@ export default defineComponent({
   display: flex
   flex-direction: row
   flex-wrap: wrap
-  .col
-    flex: 1 1 auto
-    width: 50%
 .header-options
   display: flex
   align-items: center
