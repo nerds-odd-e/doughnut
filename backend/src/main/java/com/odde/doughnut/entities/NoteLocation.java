@@ -12,6 +12,12 @@ public class NoteLocation {
   @JsonIgnore
   private Integer id;
 
+  @OneToOne(cascade = CascadeType.PERSIST)
+  @JoinColumn(name = "note_id", referencedColumnName = "id")
+  @JsonIgnore
+  @Setter
+  private Note note;
+
   @Column(name = "latitude")
   @Getter
   @Setter
