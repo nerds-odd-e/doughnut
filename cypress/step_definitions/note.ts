@@ -423,7 +423,7 @@ Then("I type {string} in the title", (content: string) => {
 Then(
   "I should see the note description on current page becomes {string}",
   (descriptionText: string) => {
-    descriptionText.split("\\n").forEach((line) => cy.findNoteDescriptionOnCurrentPage(line))
+    cy.findNoteDescriptionOnCurrentPage(descriptionText)
   },
 )
 

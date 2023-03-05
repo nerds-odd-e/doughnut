@@ -380,9 +380,9 @@ Cypress.Commands.add(
 Cypress.Commands.add("findNoteTitle", (title) =>
   cy.findByText(title, { selector: "[role=title] *" }),
 )
-Cypress.Commands.add("findNoteDescriptionOnCurrentPage", (title) =>
-  cy.findByText(title, { selector: "[role=description] *" }),
-)
+Cypress.Commands.add("findNoteDescriptionOnCurrentPage", (expected: string) => {
+  expected.split("\\n").forEach((line) => cy.get("[role=description]").should("contain", line))
+})
 
 Cypress.Commands.add("findCardTitle", (title) => cy.findByText(title, { selector: "a.card-title" }))
 
