@@ -25,4 +25,16 @@ describe("A child card of a note", () => {
       "nah nah nah nah nah nah nah nah nah nah nah nah..."
     );
   });
+
+  it("removes the html tags", async () => {
+    const note = makeMe.aNote
+      .title("this is a note")
+      .description("<p>nah</p>".repeat(20))
+      .please();
+    helper.component(Card).withStorageProps({ note }).render();
+    await screen.findByText("this is a note");
+    await screen.findByText(
+      "nahnahnahnahnahnahnahnahnahnahnahnahnahnahnahna..."
+    );
+  });
 });

@@ -6,10 +6,17 @@
 import { defineComponent } from "vue";
 
 function truncateString(str: string, maxLength = 50): string {
-  if (str.length > maxLength) {
-    return `${str.substring(0, maxLength - 3)}...`;
+  // Parse the input string as HTML using DOMParser
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(str, "text/html");
+
+  // Extract the plain text content from the parsed HTML
+  const plainText = doc.body.textContent || "";
+
+  if (plainText.length > maxLength) {
+    return `${plainText.substring(0, maxLength - 3)}...`;
   }
-  return str;
+  return plainText;
 }
 
 export default defineComponent({
