@@ -9,7 +9,6 @@
     <EditableText
       role="title"
       class="note-title"
-      :multiple-line="false"
       scope-name="note"
       v-model="textContent.title"
       @blur="onBlurTextField"

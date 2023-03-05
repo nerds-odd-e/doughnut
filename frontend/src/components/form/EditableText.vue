@@ -1,13 +1,12 @@
 <template>
   <div class="text" @click="startEditing">
     <template v-if="!isEditing">
-      <component v-bind:is="displayComponent" v-if="!!modelValue">
+      <h2 v-if="!!modelValue">
         {{ modelValue }}
-      </component>
+      </h2>
       <SvgEditText v-else />
     </template>
-    <component
-      v-bind:is="editingComponent"
+    <TextInput
       v-else
       v-focus
       class="editor"
@@ -23,14 +22,12 @@
 </template>
 
 <script>
-import TextArea from "./TextArea.vue";
 import TextInput from "./TextInput.vue";
 import SvgEditText from "../svgs/SvgEditText.vue";
 
 export default {
   name: "EditableLine",
   props: {
-    multipleLine: Boolean,
     modelValue: String,
     scopeName: String,
     field: String,
@@ -39,7 +36,6 @@ export default {
   },
   emits: ["update:modelValue", "blur"],
   components: {
-    TextArea,
     TextInput,
     SvgEditText,
   },
@@ -50,14 +46,6 @@ export default {
       isEditing: false,
     };
   },
-  computed: {
-    displayComponent() {
-      return this.multipleLine ? "pre" : "h2";
-    },
-    editingComponent() {
-      return this.multipleLine ? "TextArea" : "TextInput";
-    },
-  },
   methods: {
     startEditing() {
       if (this.isEditing) return;
@@ -66,9 +54,7 @@ export default {
       this.isEditing = true;
     },
     onEnterKey(event) {
-      if (!this.multipleLine || event.shiftKey) {
-        event.target.blur();
-      }
+      event.target.blur();
     },
     onBlurTextField() {
       this.isEditing = false;
@@ -84,9 +70,6 @@ export default {
 <style lang="sass" scoped>
 .editor
   width: 100%
-
-.text
-  cursor: text
 
 pre
  white-space: pre-wrap
