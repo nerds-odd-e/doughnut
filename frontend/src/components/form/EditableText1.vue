@@ -1,11 +1,11 @@
 <template>
   <div class="text">
     <QuillEditor
+      ref="quillEditor"
       v-model:content="localValue"
       :options="editorOptions"
       :content-type="'text'"
       @blur="onBlurTextField"
-      @keydown.enter="onEnterKey($event)"
     />
   </div>
 </template>
@@ -34,6 +34,15 @@ export default defineComponent({
       editorOptions: {
         modules: {
           toolbar: false,
+          keyboard: {
+            bindings: {
+              custom: {
+                key: 13,
+                shiftKey: true,
+                handler: this.onBlurTextField,
+              },
+            },
+          },
         },
         placeholder: "Enter note description here...",
       },
@@ -49,13 +58,8 @@ export default defineComponent({
     },
   },
   methods: {
-    onEnterKey(event) {
-      if (!this.multipleLine || event.shiftKey) {
-        this.onBlurTextField();
-      }
-    },
     onBlurTextField() {
-      if (this.initialValue !== this.localValue) {
+      if (this.initialValue.trim() !== this.localValue.trim()) {
         this.initialValue = this.localValue;
         this.$emit("update:modelValue", this.localValue);
         this.$emit("blur");

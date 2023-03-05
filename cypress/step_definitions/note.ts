@@ -380,6 +380,7 @@ Then(
   "I should see {string} is {string} than {string}",
   (left: string, aging: string, right: string) => {
     let leftColor: string
+    cy.pageIsNotLoading()
     cy.jumpToNotePage(left)
     cy.get(".note-body")
       .invoke("css", "border-color")

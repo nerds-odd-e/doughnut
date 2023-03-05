@@ -15,7 +15,7 @@ Feature: see recent note update
       | Note3    | NoteBook      |             |
     And I let the server to time travel to 24 hours ago
 
-  Scenario Outline: I should see new note banner on newly updated note
+  Scenario Outline: I should see the color of a newer note is fresher
     And I update note "Note1.1" with description "<new description>"
     Then I should see "Note1.1" is "<aging>" than "Note2"
 
