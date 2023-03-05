@@ -16,11 +16,6 @@ class NotePositionBuilder extends Builder<Generated.NotePositionViewedByUser> {
     return this;
   }
 
-  shortDescription(value: string): NotePositionBuilder {
-    this.notebookBuilder.shortDescription(value);
-    return this;
-  }
-
   inCircle(value: string): NotePositionBuilder {
     this.notebookBuilder.inCircle(value);
     return this;

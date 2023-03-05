@@ -60,14 +60,6 @@ class NoteBuilder extends Builder<Generated.Note> {
     return this;
   }
 
-  shortDescription(value: string): NoteBuilder {
-    this.data.shortDescription = value;
-    if (!this.data.textContent.description) {
-      this.data.textContent.description = value;
-    }
-    return this;
-  }
-
   under(value: Generated.NoteRealm): NoteBuilder {
     value.children ||= [];
     value.children.push(this.data);

@@ -40,11 +40,6 @@ class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
     return this;
   }
 
-  shortDescription(value: string): NoteRealmBuilder {
-    this.noteBuilder.shortDescription(value);
-    return this;
-  }
-
   under(value: Generated.NoteRealm): NoteRealmBuilder {
     value?.children?.push(this.data.note);
     this.data.note.parentId = value.id;

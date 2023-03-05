@@ -27,12 +27,7 @@ describe("note mindmap", () => {
   };
 
   it("should render one note", async () => {
-    notes.push(
-      makeMe.aNoteRealm
-        .title("single note")
-        .shortDescription("not long")
-        .please()
-    );
+    notes.push(makeMe.aNoteRealm.title("single note").please());
     const wrapper = getMountedElement(notes[0].id);
     expect(wrapper.find("[role='card']").text()).toContain("single note");
   });
@@ -131,11 +126,7 @@ describe("note mindmap", () => {
   describe("size", () => {
     beforeEach(() => {
       notes.push(
-        makeMe.aNoteRealm
-          .title("single note")
-          .picture("a.jpg")
-          .shortDescription("not long")
-          .please()
+        makeMe.aNoteRealm.title("single note").picture("a.jpg").please()
       );
     });
 

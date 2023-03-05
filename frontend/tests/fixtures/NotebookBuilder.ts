@@ -26,11 +26,6 @@ class NotebookBuilder extends Builder<Generated.NotebookViewedByUser> {
     return this;
   }
 
-  shortDescription(value: string): NotebookBuilder {
-    this.notebuilder.shortDescription(value);
-    return this;
-  }
-
   fromBazzar(): NotebookBuilder {
     this.data.fromBazaar = true;
     return this;
