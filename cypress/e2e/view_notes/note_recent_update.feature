@@ -10,7 +10,7 @@ Feature: see recent note update
       | NoteBook |               |             |
       | Note1    | NoteBook      |             |
       | Note2    | NoteBook      |             |
-      | Note1.1  | Note1         | note1.1     |
+      | Note1.1  | Note1         | <p>note1.1</p> |
       | Note1.2  | Note1         | note1.2     |
       | Note3    | NoteBook      |             |
     And I let the server to time travel to 24 hours ago

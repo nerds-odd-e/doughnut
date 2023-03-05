@@ -3,8 +3,9 @@
     ref="quillEditor"
     v-model:content="localValue"
     :options="editorOptions"
-    :content-type="'text'"
+    :content-type="'html'"
     @blur="onBlurTextField"
+    @focus="hadFocus = true"
   />
 </template>
 
@@ -46,6 +47,7 @@ export default defineComponent({
       },
       initialValue: this.modelValue || ("" as string),
       localValue: this.modelValue || ("" as string),
+      hadFocus: false as boolean,
     };
   },
   watch: {
@@ -57,6 +59,9 @@ export default defineComponent({
   },
   methods: {
     onBlurTextField() {
+      this.sumitChange();
+    },
+    sumitChange() {
       if (this.initialValue.trim() !== this.localValue.trim()) {
         this.initialValue = this.localValue;
         this.$emit("update:modelValue", this.localValue);
@@ -65,7 +70,9 @@ export default defineComponent({
     },
   },
   beforeUnmount() {
-    this.onBlurTextField();
+    if (this.hadFocus) {
+      this.sumitChange();
+    }
   },
 });
 </script>
