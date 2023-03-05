@@ -76,3 +76,8 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="sass">
+.ql-container
+  font-size: inherit !important
+</style>
