@@ -1,13 +1,11 @@
 <template>
-  <div class="text">
-    <QuillEditor
-      ref="quillEditor"
-      v-model:content="localValue"
-      :options="editorOptions"
-      :content-type="'text'"
-      @blur="onBlurTextField"
-    />
-  </div>
+  <QuillEditor
+    ref="quillEditor"
+    v-model:content="localValue"
+    :options="editorOptions"
+    :content-type="'text'"
+    @blur="onBlurTextField"
+  />
 </template>
 
 <script lang="ts">

@@ -22,7 +22,7 @@
     </div>
   </div>
   <div class="note-content">
-    <EditableText1
+    <DescriptionEditor
       :multiple-line="true"
       role="description"
       v-if="size === 'large'"
@@ -77,7 +77,7 @@ import SvgDescriptionIndicator from "../svgs/SvgDescriptionIndicator.vue";
 import SvgPictureIndicator from "../svgs/SvgPictureIndicator.vue";
 import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
 import EditableText from "../form/EditableText.vue";
-import EditableText1 from "../form/EditableText1.vue";
+import DescriptionEditor from "../form/DescriptionEditor.vue";
 import NoteWikidataAssociation from "./NoteWikidataAssociation.vue";
 import type { StorageAccessor } from "../../store/createNoteStorage";
 
@@ -98,7 +98,7 @@ export default defineComponent({
     SvgPictureIndicator,
     SvgUrlIndicator,
     EditableText,
-    EditableText1,
+    DescriptionEditor,
     NoteTitleWithLink,
     NoteWikidataAssociation,
   },
