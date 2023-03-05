@@ -23,7 +23,6 @@ import org.hibernate.annotations.Where;
 import org.hibernate.annotations.WhereJoinTable;
 import org.springframework.beans.BeanUtils;
 import org.springframework.lang.Nullable;
-import org.thymeleaf.util.StringUtils;
 
 @Entity
 @Table(name = "note")
