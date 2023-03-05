@@ -34,7 +34,7 @@
     />
     <NoteShortDescription
       v-if="size === 'medium'"
-      :short-description="note.shortDescription"
+      :description="note.textContent.description"
     />
     <SvgDescriptionIndicator
       v-if="size === 'small' && !!textContent.description"

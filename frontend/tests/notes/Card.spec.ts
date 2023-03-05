@@ -5,8 +5,24 @@ import makeMe from "../fixtures/makeMe";
 
 describe("A child card of a note", () => {
   it("render the card", async () => {
-    const note = makeMe.aNote.title("this is a note").please();
+    const note = makeMe.aNote
+      .title("this is a note")
+      .description("the description")
+      .please();
     helper.component(Card).withStorageProps({ note }).render();
     await screen.findByText("this is a note");
+    await screen.findByText("the description");
+  });
+
+  it("truncate the description", async () => {
+    const note = makeMe.aNote
+      .title("this is a note")
+      .description("nah ".repeat(20))
+      .please();
+    helper.component(Card).withStorageProps({ note }).render();
+    await screen.findByText("this is a note");
+    await screen.findByText(
+      "nah nah nah nah nah nah nah nah nah nah nah nah..."
+    );
   });
 });
