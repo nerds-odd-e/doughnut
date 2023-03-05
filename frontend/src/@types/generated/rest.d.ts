@@ -234,7 +234,6 @@ declare namespace Generated {
 
     interface Note extends Thingy {
         title: string;
-        shortDescription: string;
         parentId?: number;
         noteAccessories: NoteAccessories;
         location?: NoteLocation;
@@ -252,7 +251,6 @@ declare namespace Generated {
     interface Subscription {
         headNote: Note;
         title: string;
-        shortDescription: string;
         id: number;
         dailyTargetOfNewNotes: number;
         user: User;

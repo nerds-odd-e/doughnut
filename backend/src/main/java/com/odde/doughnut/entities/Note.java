@@ -175,10 +175,6 @@ public class Note extends Thingy {
     return "Note{" + "id=" + id + ", title='" + getTextContent().getTitle() + '\'' + '}';
   }
 
-  public String getShortDescription() {
-    return StringUtils.abbreviate(getTextContent().getDescription(), 50);
-  }
-
   private void addAncestors(List<Note> ancestors) {
     int[] counter = {1};
     ancestors.forEach(

@@ -10,7 +10,6 @@ class NoteBuilder extends Builder<Generated.Note> {
       id: generateId(),
       title: "Note1.1.1",
       wikidataId: "",
-      shortDescription: "",
       deletedAt: "",
       noteAccessories: {
         url: "",
