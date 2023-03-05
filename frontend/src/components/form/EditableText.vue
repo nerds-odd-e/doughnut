@@ -21,11 +21,13 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
+
 import TextInput from "./TextInput.vue";
 import SvgEditText from "../svgs/SvgEditText.vue";
 
-export default {
+export default defineComponent({
   name: "EditableLine",
   props: {
     modelValue: String,
@@ -41,8 +43,8 @@ export default {
   },
   data() {
     return {
-      initialValue: null,
-      localValue: null,
+      initialValue: undefined as string | undefined,
+      localValue: undefined as string | undefined,
       isEditing: false,
     };
   },
@@ -64,7 +66,7 @@ export default {
       }
     },
   },
-};
+});
 </script>
 
 <style lang="sass" scoped>
