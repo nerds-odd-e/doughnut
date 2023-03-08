@@ -78,6 +78,13 @@ export default defineComponent({
 </script>
 
 <style lang="sass">
-.ql-container
+.ql-editor
+  padding: 0
+  margin-bottom: 15px
+  &::before
+    left: 0 !important
+    right:0 !important
+.ql-container.ql-snow
+  border: none
   font-size: inherit !important
 </style>
