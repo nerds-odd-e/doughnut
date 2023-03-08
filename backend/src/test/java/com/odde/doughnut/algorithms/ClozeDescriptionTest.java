@@ -37,6 +37,7 @@ public class ClozeDescriptionTest {
     "t,               (t),                                 ([...])",
     "鳴く,             羊はなんて鳴くの？,                     羊はなんて[...]の？",
     "鳴く,             羊鳴く,                               羊[...]",
+    "鳴く,             ネコ鳴く,                             ネコ[...]",
     "cattle,          ironcattle,                          ironcattle",
     "~cato,           concato,                             con[...]",
     "~cat,            concat,                              con[...]",
