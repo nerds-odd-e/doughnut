@@ -1,5 +1,5 @@
-Feature: Undo Note Edit
-  As a learner, I want to undo editing for single user,
+Feature: Note Edit
+  As a learner, I want to edit and undo editing for single user,
   with title and description only within a session.
 
   Background:
@@ -7,6 +7,15 @@ Feature: Undo Note Edit
     And there are some notes for the current user
       | title          | description         |
       | LeSS in Action | An awesome training |
+
+  Scenario: Edit a note
+    And I update note "LeSS in Action" to become:
+      | Title     | Description       |
+      | Odd-e CSD | Our best training |
+    Then I should see "Odd-e CSD" in the page
+    And I should see these notes belonging to the user at the top level of all my notes
+      | title     | description       |
+      | Odd-e CSD | Our best training |
 
   Scenario: Edit a note title and edit description
     And I update note title "LeSS in Action" to become "Odd-e CSD"

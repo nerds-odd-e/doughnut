@@ -1,4 +1,4 @@
-Feature: Nested Note CRUD
+Feature: Nested Note creation
   As a learner, I want to maintain my newly acquired knowledge in
   notes, so that I can review them in the future.
 
@@ -50,12 +50,3 @@ Feature: Nested Note CRUD
       | team         |
       | tech         |
     And On the current page, I should see "LeSS in Action" has link "a specialization of" "Re-Design"
-
-  Scenario: Edit a note
-    And I update note "LeSS in Action" to become:
-      | Title     | Description       |
-      | Odd-e CSD | Our best training |
-    Then I should see "Odd-e CSD" in the page
-    And I should see these notes belonging to the user at the top level of all my notes
-      | title     | description       |
-      | Odd-e CSD | Our best training |
