@@ -50,7 +50,8 @@ public class ClozeDescriptionTest {
     "「いい和悪い」,      然后,                               然后",
     "ignore (complex (brackets)), ignore complex brackets,  ignore complex brackets",
     "cat/dog(animal/weather), dog day is a hot weather,   [...] day is a hot <...>",
-    "6,               6year,                               [...]year",
+    "6,               6year,                              [...]year",
+    "cat,             <p class='cat'>a cat</p>,           <p class='cat'>a [...]</p>",
   })
   void clozeDescription(String title, String description, String expectedClozeDescription) {
     assertThat(
