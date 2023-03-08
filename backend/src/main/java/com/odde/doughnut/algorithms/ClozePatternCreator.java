@@ -32,7 +32,7 @@ public class ClozePatternCreator {
     if (suffix) {
       return "(?U)(?<=[^\\s])" + pattern;
     }
-    return pattern;
+    return "(?<=\\b|\\p{IsHiragana})" + pattern;
   }
 
   Pattern getPattern(String toMatch) {
