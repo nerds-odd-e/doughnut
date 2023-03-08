@@ -8,7 +8,7 @@
     <NoteFrameOfLinks
       v-bind="{ links: quizQuestion?.hintLinks, storageAccessor }"
     >
-      <pre
+      <div
         class="quiz-description"
         v-if="quizQuestion?.questionType !== 'PICTURE_TITLE'"
         v-html="quizQuestion?.description"
