@@ -30,6 +30,7 @@
       </select>
       <button
         title="Wikidata Id"
+        type="button"
         class="btn btn-outline-secondary"
         @click.prevent="fetchSearchResult"
       >
