@@ -3,13 +3,12 @@ package com.odde.doughnut.algorithms;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ClozeDescriptionTest {
   ClozeReplacement clozeReplacement = new ClozeReplacement("[..~]", "[...]", "/.../", "<...>");
@@ -86,6 +85,7 @@ public class ClozeDescriptionTest {
     String result = matcher.replaceAll("[...]");
     assertThat(result, equalTo(expectedClozeDescription));
   }
+
   @Test
   void clozeDescriptionWithMultipleLink() {
     assertThat(
