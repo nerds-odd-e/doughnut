@@ -41,7 +41,7 @@ class RepetitionBuilder extends Builder<Generated.RepetitionForUser> {
   do(): Generated.RepetitionForUser {
     return {
       quizQuestion: this.quizQuestion,
-      toRepeatCount: 0,
+      toRepeat: [],
     };
   }
 }

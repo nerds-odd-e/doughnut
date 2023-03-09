@@ -47,10 +47,6 @@ public class Reviewing {
         .map(ReviewPoint::buildReviewPointForThing);
   }
 
-  private int toRepeatCount() {
-    return userModel.getReviewPointsNeedToRepeat(currentUTCTimestamp).size();
-  }
-
   private List<Integer> toRepeatList() {
     return userModel.getReviewPointsNeedToRepeat(currentUTCTimestamp).stream()
         .map(ReviewPoint::getId)
@@ -116,7 +112,7 @@ public class Reviewing {
             reviewPointModel.generateAQuizQuestion(randomizer),
             this.modelFactoryService,
             userModel.getEntity()));
-    repetitionForUser.setToRepeatCount(toRepeatCount());
+    repetitionForUser.setToRepeat(toRepeatList());
     return repetitionForUser;
   }
 

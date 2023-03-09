@@ -73,7 +73,7 @@ export default defineComponent({
       return this.previousResults.length;
     },
     toRepeatCount() {
-      return this.repetition?.toRepeatCount || 0;
+      return this.repetition?.toRepeat.length || 0;
     },
   },
   methods: {
