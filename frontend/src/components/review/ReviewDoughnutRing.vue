@@ -20,7 +20,7 @@
         :start-point="endPoint"
         :end-point="startPoint"
         title="Repeat Old"
-        :text="`${reviewing.toRepeatCount}/${reviewing.learntCount}`"
+        :text="`${reviewing.toRepeat.length}/${reviewing.learntCount}`"
         @click="$router.push({ name: 'repeat' })"
       />
     </g>
@@ -59,7 +59,7 @@ export default defineComponent({
       return Math.max(1, this.reviewing.toInitialReviewCount);
     },
     flooredToRepeatCount() {
-      return Math.max(1, this.reviewing.toRepeatCount);
+      return Math.max(1, this.reviewing.toRepeat.length);
     },
   },
   components: { ReviewDoughnutRingPiece },

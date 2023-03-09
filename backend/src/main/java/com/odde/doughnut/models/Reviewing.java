@@ -122,7 +122,6 @@ public class Reviewing {
 
   public ReviewStatus getReviewStatus() {
     ReviewStatus reviewStatus = new ReviewStatus();
-    reviewStatus.toRepeatCount = toRepeatCount();
     reviewStatus.toRepeat = toRepeatList();
     reviewStatus.learntCount = userModel.learntCount();
     reviewStatus.notLearntCount = notLearntCount();

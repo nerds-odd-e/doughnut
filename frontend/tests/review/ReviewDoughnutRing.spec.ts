@@ -6,7 +6,7 @@ describe("doughnut ring", () => {
     const reviewing = {
       learntCount: 10,
       notLearntCount: 10,
-      toRepeatCount: 5,
+      toRepeat: [1, 2, 3, 4, 5],
       toInitialReviewCount: 5,
     } as Generated.ReviewStatus;
     const wrapper = mount(ReviewDoughnutRing, {
@@ -26,7 +26,7 @@ describe("doughnut ring", () => {
     const reviewing = {
       learntCount: 10,
       notLearntCount: 10,
-      toRepeatCount: 10,
+      toRepeat: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
       toInitialReviewCount: 5,
     } as Generated.ReviewStatus;
     const wrapper = mount(ReviewDoughnutRing, {
@@ -45,7 +45,7 @@ describe("doughnut ring", () => {
     const reviewing = {
       learntCount: 0,
       notLearntCount: 0,
-      toRepeatCount: 0,
+      toRepeat: [],
       toInitialReviewCount: 0,
     } as Generated.ReviewStatus;
     const wrapper = mount(ReviewDoughnutRing, {
