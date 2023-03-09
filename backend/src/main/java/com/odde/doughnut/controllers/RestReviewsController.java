@@ -102,11 +102,7 @@ class RestReviewsController {
     AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
     answerModel.updateReviewPoints(testabilitySettings.getCurrentUTCTimestamp());
     answerModel.save();
-    AnswerResult answerResult = answerModel.getAnswerResult();
-    Reviewing reviewing = currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
-    answerResult.nextRepetition =
-        reviewing.getOneRepetitionForUser(testabilitySettings.getRandomizer()).orElse(null);
-    return answerResult;
+    return answerModel.getAnswerResult();
   }
 
   @GetMapping(path = "/answers/{answer}")

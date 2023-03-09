@@ -107,11 +107,10 @@ export default defineComponent({
 
     onAnswered(answerResult: Generated.AnswerResult) {
       this.previousResults.push(answerResult);
-      this.repetition = answerResult.nextRepetition;
-      if (answerResult.correct) {
-        return;
+      if (!answerResult.correct) {
+        this.viewLastResult(this.previousResults.length - 1);
       }
-      this.viewLastResult(this.previousResults.length - 1);
+      this.fetchData();
     },
   },
   watch: {

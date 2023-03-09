@@ -194,7 +194,6 @@ declare namespace Generated {
     interface AnswerResult {
         answerId: number;
         correct: boolean;
-        nextRepetition?: RepetitionForUser;
     }
 
     interface Answer {
