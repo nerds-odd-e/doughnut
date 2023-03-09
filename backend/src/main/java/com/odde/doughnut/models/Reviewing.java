@@ -1,5 +1,6 @@
 package com.odde.doughnut.models;
 
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
@@ -8,6 +9,7 @@ import com.odde.doughnut.entities.json.ReviewStatus;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -49,7 +51,9 @@ public class Reviewing {
 
   private List<Integer> toRepeatList() {
     return userModel.getReviewPointsNeedToRepeat(currentUTCTimestamp).stream()
-        .map(ReviewPoint::getId)
+        .map(ReviewPoint::getNote)
+        .filter(Objects::nonNull)
+        .map(Note::getId)
         .toList();
   }
 

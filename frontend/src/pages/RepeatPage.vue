@@ -73,7 +73,10 @@ export default defineComponent({
       return this.previousResults.length;
     },
     toRepeatCount() {
-      return this.repetition?.toRepeat.length || 0;
+      return this.toRepeat?.length || 0;
+    },
+    toRepeat() {
+      return this.repetition?.toRepeat;
     },
   },
   methods: {
