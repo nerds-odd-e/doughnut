@@ -34,9 +34,9 @@ public class ClozedString {
   }
 
   public class HtmlUtils {
-    public static String replaceText(String html, Function<String, String> callback) {
+    public static String replaceText(String htmlOrText, Function<String, String> callback) {
       Pattern pattern = Pattern.compile("(?s)(?<=^|>)[^><]+?(?=<|$)");
-      Matcher matcher = pattern.matcher(html);
+      Matcher matcher = pattern.matcher(htmlOrText.replace("$", "\\$"));
       return matcher.replaceAll(
           matchResult -> {
             String text = matchResult.group();

@@ -94,6 +94,13 @@ public class ClozeDescriptionTest {
   }
 
   @Test
+  void shouldAvoidTheDollarSignBug() {
+    assertThat(
+        new ClozedString(clozeReplacement, "$2").hide(new NoteTitle("Stable Diffusion")).cloze(),
+        equalTo("$2"));
+  }
+
+  @Test
   void theReplacementsShouldNotInterfereEachOther() {
     ClozeReplacement clozeReplacement = new ClozeReplacement("/..~/", "/.../", "(...)", "<...>");
     assertThat(
