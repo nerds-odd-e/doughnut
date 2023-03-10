@@ -110,6 +110,7 @@ export default defineComponent({
 
     onAnswered(answerResult: Generated.AnswerResult) {
       this.previousResults.push(answerResult);
+      this.toRepeat?.pop();
       if (!answerResult.correct) {
         this.viewLastResult(this.previousResults.length - 1);
       }

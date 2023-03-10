@@ -102,7 +102,7 @@ describe("repeat page", () => {
         await wrapper.vm.$nextTick();
         expect(wrapper.find(".progress-text").text()).toContainEither(
           "0/3",
-          "1/4"
+          "1/3"
         );
       }
     });
