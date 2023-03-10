@@ -74,7 +74,7 @@ export default defineComponent({
       return this.previousResults.length;
     },
     toRepeatCount() {
-      return this.toRepeat?.length || 0;
+      return (this.toRepeat?.length || 0) - this.finished;
     },
   },
   methods: {
@@ -97,7 +97,6 @@ export default defineComponent({
     async fetchData() {
       try {
         this.repetition = await this.api.reviewMethods.getNextReviewItem();
-        this.toRepeat = this.repetition?.toRepeat;
         this.selectPosition();
       } catch (_e) {
         this.repetition = undefined;
@@ -109,7 +108,6 @@ export default defineComponent({
 
     onAnswered(answerResult: Generated.AnswerResult) {
       this.previousResults.push(answerResult);
-      this.toRepeat?.pop();
       if (!answerResult.correct) {
         this.viewLastResult(this.previousResults.length - 1);
       }
@@ -124,8 +122,10 @@ export default defineComponent({
     },
   },
 
-  mounted() {
-    this.fetchData();
+  async mounted() {
+    this.fetchData().then(() => {
+      this.toRepeat = this.repetition?.toRepeat;
+    });
   },
 });
 </script>
