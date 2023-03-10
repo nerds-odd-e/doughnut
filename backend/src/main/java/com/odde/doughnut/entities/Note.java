@@ -18,7 +18,6 @@ import javax.persistence.*;
 import javax.validation.Valid;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.logging.log4j.util.Strings;
 import org.hibernate.annotations.Where;
 import org.hibernate.annotations.WhereJoinTable;
 import org.springframework.beans.BeanUtils;
@@ -309,7 +308,7 @@ public class Note extends Thingy {
   @JsonIgnore
   public ClozedString getClozeDescription() {
     String description = getTextContent().getDescription();
-    if (Strings.isEmpty(description)) return new ClozedString(null, "");
+    if (isDescriptionBlankHtml()) return new ClozedString(null, "");
 
     return ClozedString.htmlClosedString(description).hide(getNoteTitle());
   }
