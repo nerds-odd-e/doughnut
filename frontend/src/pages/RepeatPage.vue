@@ -60,6 +60,7 @@ export default defineComponent({
   data() {
     return {
       repetition: undefined as Generated.RepetitionForUser | undefined,
+      toRepeat: undefined as undefined | number[],
       previousResults: [] as Generated.AnswerResult[],
       previousResultCursor: undefined as number | undefined,
     };
@@ -74,9 +75,6 @@ export default defineComponent({
     },
     toRepeatCount() {
       return this.toRepeat?.length || 0;
-    },
-    toRepeat() {
-      return this.repetition?.toRepeat;
     },
   },
   methods: {
@@ -99,6 +97,7 @@ export default defineComponent({
     async fetchData() {
       try {
         this.repetition = await this.api.reviewMethods.getNextReviewItem();
+        this.toRepeat = this.repetition?.toRepeat;
         this.selectPosition();
       } catch (_e) {
         this.repetition = undefined;

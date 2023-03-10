@@ -101,7 +101,7 @@ const routes = [
     meta: { useNoteStorageAccessor: true },
   },
   {
-    path: "/reviews/repeat",
+    path: "/reviews/repeat/:more?",
     name: "repeat",
     component: NestedRepeatPage,
     children: [...nestedNoteAndLinkRoutes("repeat-")],
