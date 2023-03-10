@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.algorithms.HtmlOrText;
 import java.sql.Timestamp;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,7 +12,6 @@ import javax.persistence.Table;
 import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.logging.log4j.util.Strings;
 
 @Entity
 @Table(name = "text_content")
@@ -48,6 +48,6 @@ public class TextContent {
 
   @JsonIgnore
   boolean isDescriptionBlankHtml() {
-    return Strings.isEmpty(description);
+    return new HtmlOrText(description).isBlank();
   }
 }
