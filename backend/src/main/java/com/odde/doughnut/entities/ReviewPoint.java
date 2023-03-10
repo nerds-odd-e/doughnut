@@ -148,4 +148,9 @@ public class ReviewPoint {
     setLastReviewedAt(currentUTCTimestamp);
     setNextReviewAt(calculateNextReviewAt());
   }
+
+  @JsonIgnore
+  public boolean isDescriptionBlankHtml() {
+    return getNote().isDescriptionBlankHtml();
+  }
 }

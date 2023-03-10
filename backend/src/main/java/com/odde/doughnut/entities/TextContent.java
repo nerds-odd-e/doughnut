@@ -11,6 +11,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.logging.log4j.util.Strings;
 
 @Entity
 @Table(name = "text_content")
@@ -43,5 +44,10 @@ public class TextContent {
     String prevDesc = getDescription() != null ? getDescription() : "";
     String desc = prevDesc.isEmpty() ? addition : addition + "\n" + prevDesc;
     setDescription(desc);
+  }
+
+  @JsonIgnore
+  boolean isDescriptionBlankHtml() {
+    return Strings.isEmpty(description);
   }
 }

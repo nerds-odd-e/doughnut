@@ -367,4 +367,9 @@ public class Note extends Thingy {
     note.setParentNote(this);
     return note;
   }
+
+  @JsonIgnore
+  boolean isDescriptionBlankHtml() {
+    return getTextContent().isDescriptionBlankHtml();
+  }
 }

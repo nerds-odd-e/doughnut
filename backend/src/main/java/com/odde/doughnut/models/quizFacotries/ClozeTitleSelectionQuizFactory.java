@@ -3,7 +3,6 @@ package com.odde.doughnut.models.quizFacotries;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import java.util.List;
-import org.apache.logging.log4j.util.Strings;
 
 public class ClozeTitleSelectionQuizFactory implements QuestionOptionsFactory, QuizQuestionFactory {
 
@@ -29,6 +28,6 @@ public class ClozeTitleSelectionQuizFactory implements QuestionOptionsFactory, Q
 
   @Override
   public boolean isValidQuestion() {
-    return !Strings.isEmpty(reviewPoint.getNote().getTextContent().getDescription());
+    return !reviewPoint.isDescriptionBlankHtml();
   }
 }
