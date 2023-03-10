@@ -12,11 +12,18 @@ Given("It's day {int}, {int} hour", (day: number, hour: number) => {
   cy.testability().backendTimeTravelTo(day, hour)
 })
 
+Given("I ask to do more review", () => {
+  cy.repeatReviewNotes("test")
+})
+
+Then("I repeat old {string}", (repeatNotes: string) => {
+  cy.repeatReviewNotes(repeatNotes)
+})
+
 Then(
   "On day {int} I repeat old {string} and initial review new {string}",
   (day: number, repeatNotes: string, initialNotes: string) => {
     cy.testability().backendTimeTravelTo(day, 8)
-
     cy.repeatReviewNotes(repeatNotes)
     cy.initialReviewNotes(initialNotes)
   },
