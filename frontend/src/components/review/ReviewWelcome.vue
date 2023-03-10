@@ -55,6 +55,19 @@
           <h2 v-else class="">
             You have reviewed all the old notes for today.
           </h2>
+          <p>But if you want to do more:</p>
+          <router-link
+            role="button"
+            class="btn btn-secondary"
+            :to="{ name: 'repeat' }"
+          >
+            Do more repetition
+          </router-link>
+          <i
+            >This will take some review points from the next two weeks for you
+            to repeat. If you forsee that you will be busy in the next week or
+            two, you can do more repetition now.
+          </i>
         </div>
       </div>
     </div>
