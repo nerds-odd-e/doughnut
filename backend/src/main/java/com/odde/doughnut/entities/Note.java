@@ -369,7 +369,7 @@ public class Note extends Thingy {
   }
 
   @JsonIgnore
-  boolean isDescriptionBlankHtml() {
+  public boolean isDescriptionBlankHtml() {
     return getTextContent().isDescriptionBlankHtml();
   }
 }

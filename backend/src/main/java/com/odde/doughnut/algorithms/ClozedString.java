@@ -46,8 +46,6 @@ public class ClozedString {
   }
 
   public String cloze() {
-    if (Strings.isEmpty(originalContent)) return originalContent;
-
     return HtmlUtils.replaceText(
         originalContent, text -> clozeReplacement.maskPronunciationsAndTitles(text, noteTitles));
   }
