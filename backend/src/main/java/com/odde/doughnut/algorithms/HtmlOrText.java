@@ -3,7 +3,6 @@ package com.odde.doughnut.algorithms;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.logging.log4j.util.Strings;
 
 public record HtmlOrText(String htmlOrText) {
   public String replaceText(Function<String, String> callback) {
@@ -17,6 +16,14 @@ public record HtmlOrText(String htmlOrText) {
   }
 
   public boolean isBlank() {
-    return Strings.isEmpty(this.htmlOrText);
+    if (htmlOrText == null) return true;
+
+    String regexBr = "(\\s*<br[^>]*\\/?>\\s*)";
+    String regex = "^(?:\\s*((<p[^>]*>)(\\s|" + regexBr + ")*<\\/p>\\s*)|" + regexBr + ")*$";
+
+    Pattern pattern = Pattern.compile(regex);
+    Matcher matcher = pattern.matcher(htmlOrText);
+
+    return matcher.matches();
   }
 }

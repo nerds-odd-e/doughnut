@@ -2,9 +2,7 @@ package com.odde.doughnut.models.quizFacotries;
 
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.CLOZE_SELECTION;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.in;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
@@ -41,6 +39,14 @@ class QuizQuestionTypesClozeSelectionTest {
       note1 = makeMe.aNote("target").under(top).please();
       note2 = makeMe.aNote("source").under(top).please();
       reviewPoint = makeMe.aReviewPointFor(note1).inMemoryPlease();
+    }
+
+    @Test
+    void NotForNoteWithoutVisibleDescription() {
+      makeMe.theNote(note1).description("<p>  <br>  <br/>  </p>  <br>").please();
+      makeMe.refresh(top);
+      QuizQuestionViewedByUser quizQuestion = buildClozeQuizQuestion();
+      assertThat(quizQuestion, nullValue());
     }
 
     @Test
