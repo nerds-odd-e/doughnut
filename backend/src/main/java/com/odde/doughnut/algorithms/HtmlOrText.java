@@ -7,12 +7,9 @@ import java.util.regex.Pattern;
 public record HtmlOrText(String htmlOrText) {
   public String replaceText(Function<String, String> callback) {
     Pattern pattern = Pattern.compile("(?s)(?<=^|>)[^><]+?(?=<|$)");
-    Matcher matcher = pattern.matcher(htmlOrText.replace("$", "\\$"));
+    Matcher matcher = pattern.matcher(htmlOrText);
     return matcher.replaceAll(
-        matchResult -> {
-          String text = matchResult.group();
-          return callback.apply(text);
-        });
+        matchResult -> Matcher.quoteReplacement(callback.apply(matchResult.group())));
   }
 
   public boolean isBlank() {
