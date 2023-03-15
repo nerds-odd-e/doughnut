@@ -98,8 +98,6 @@ declare module '@vue/runtime-core' {
     RadioButtons: typeof import('./src/components/form/RadioButtons.vue')['default']
     RepeatProgressBar: typeof import('./src/components/review/RepeatProgressBar.vue')['default']
     ReviewButton: typeof import('./src/components/toolbars/ReviewButton.vue')['default']
-    ReviewDoughnutRing: typeof import('./src/components/review/ReviewDoughnutRing.vue')['default']
-    ReviewDoughnutRingPiece: typeof import('./src/components/review/ReviewDoughnutRingPiece.vue')['default']
     ReviewPointAbbr: typeof import('./src/components/review/ReviewPointAbbr.vue')['default']
     ReviewPointAsync: typeof import('./src/components/review/ReviewPointAsync.vue')['default']
     ReviewSettingForm: typeof import('./src/components/review/ReviewSettingForm.vue')['default']
