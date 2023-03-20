@@ -4016,9 +4016,9 @@ prettier-linter-helpers@^1.0.0:
     fast-diff "^1.1.2"
 
 prettier@^2.8:
-  version "2.8.4"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.8.4.tgz#34dd2595629bfbb79d344ac4a91ff948694463c3"
-  integrity sha512-vIS4Rlc2FNh0BySk3Wkd6xmwxB0FpOndW5fisM5H8hsZSxU2VWVB5CWIkIjWvrHjIhxk2g3bfMKM87zNTrZddw==
+  version "2.8.5"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.8.5.tgz#3dd8ae1ebddc4f6aa419c9b64d8c8319a7e0d982"
+  integrity sha512-3gzuxrHbKUePRBB4ZeU08VNkUcqEHaUaouNt0m7LGP4Hti/NuB07C7PPTM/LkWqXoJYJn2McEo5+kxPNrtQkLQ==
 
 pretty-bytes@^5.6.0:
   version "5.6.0"
@@ -4357,9 +4357,9 @@ safe-stable-stringify@2.4.0:
   integrity sha512-eehKHKpab6E741ud7ZIMcXhKcP6TSIezPkNZhy5U8xC6+VvrRdUA2tMgxGxaGl4cz7c2Ew5+mg5+wNB16KQqrA==
 
 safe-stable-stringify@^2.3.1:
-  version "2.4.2"
-  resolved "https://registry.yarnpkg.com/safe-stable-stringify/-/safe-stable-stringify-2.4.2.tgz#ec7b037768098bf65310d1d64370de0dc02353aa"
-  integrity sha512-gMxvPJYhP0O9n2pvcfYfIuYgbledAOJFcqRThtPRmjscaipiwcwPPKLytpVzMkG2HAN87Qmo2d4PtGiri1dSLA==
+  version "2.4.3"
+  resolved "https://registry.yarnpkg.com/safe-stable-stringify/-/safe-stable-stringify-2.4.3.tgz#138c84b6f6edb3db5f8ef3ef7115b8f55ccbf886"
+  integrity sha512-e2bDA2WJT0wxseVd4lsDP4+3ONX6HpMXQa1ZhFQ7SU+GjvORCmShbCMltrtIDfkYhVHrOcPtj+KhmDBdPdZD1g==
 
 "safer-buffer@>= 2.1.2 < 3", "safer-buffer@>= 2.1.2 < 3.0.0", safer-buffer@^2.0.2, safer-buffer@^2.1.0, safer-buffer@~2.1.0:
   version "2.1.2"
