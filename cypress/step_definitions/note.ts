@@ -479,5 +479,21 @@ Then("I try to submit again immediately", () => {
 
 Then("I generate description from {string}", (title: string) => {
   cy.jumpToNotePage(title)
-  cy.findByRole("button", { name: "Suggest1" }).click()
+  cy.findByRole("button", {name: "Suggest1"}).click()
+})
+Given("我打開標題為{string}這個筆記", (noteTitle: string) => {
+  cy.jumpToNotePage(noteTitle)
+})
+
+Given('AI會返回"{string}"', (returnMessage: string) => {
+  cy.openAiService().restartImposterAndStubTextCompletion(returnMessage, "stop")
+})
+When("要求補全描述", () => {
+  cy.findByRole("button", { name: "Complete" }).click()
+})
+Then("描述會變成{string}", (description: string) => {
+  cy.findNoteDescriptionOnCurrentPage(description)
+})
+Then("描述補全功能就無法使用但建議功能可以使用", () => {
+  cy.findByRole("button", { name: "Complete" }).should('not.exist');
 })
