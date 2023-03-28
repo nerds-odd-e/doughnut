@@ -34,6 +34,7 @@
           v-bind="{ note: selectedNote, storageAccessor }"
         />
       </PopButton>
+      <a class="btn btn-sm" role="button" :title="'Suggest1'"></a>
       <PopButton title="Suggest">
         <template #button_face>
           <SvgRobot />
