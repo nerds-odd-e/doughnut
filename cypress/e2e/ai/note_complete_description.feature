@@ -14,9 +14,10 @@ Feature: Complete description
   @usingMockedOpenAiService
     @ignore
   Scenario: Perform action with completed note unfinished description
-    When I ask for a description completion for "台北的冬天"
-    Then I should be prompted with a suggested description "Sharing the same planet as humans"
-    And I expect that the description will be "<value>" when I "<action>" the suggested description
+    Given Title is "台北的天氣"
+    And 我要求AI補全"台北的冬天"時，AI永遠return"台北冬天每天都在下雨,晴天的機率可能比刮刮樂還低"
+    When 我在描述輸入"台北冬天"，並且要求補全描述
+    Then 描述會變成"台北冬天每天都在下雨,晴天的機率可能比刮刮樂還低"
 
   @ignore
   Scenario: See the robot icon with empty description
