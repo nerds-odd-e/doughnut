@@ -476,3 +476,9 @@ Then("I try to submit again immediately", () => {
   cy.get("form").submit()
   cy.pageIsNotLoading()
 })
+
+Then("I generate description from {string}", (title: string) => {
+  cy.jumpToNotePage(title)
+  cy.findByRole("button", { name: "Suggest1" }).click()
+})
+

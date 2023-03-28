@@ -7,9 +7,9 @@ Feature: I want the AI to generate a description based on my note title, so I ca
     @usingMockedOpenAiService
     @ignore
     Scenario: Generate Description
-      When I click the robot button
-      And OpenAI always return text completion "What goes on"
-      Then I can see "What goes on" in description
+      Given OpenAI always return text completion "are all livings"
+      When I generate description from "Animals"
+      Then I should see the note description on current page becomes "are all livings"
 
     @usingMockedOpenAiService
     @ignore
