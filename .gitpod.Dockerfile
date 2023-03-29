@@ -50,7 +50,8 @@ RUN apt-get -y update \
     && rm -rf /home/gitpod/.config/nixpkgs
 
 RUN apt-get -y update \
-    && DEBIAN_FRONTEND=noninteractive apt-get upgrade
+    && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
+
 # use bash over dash for /bin/sh
 RUN dpkg-reconfigure dash
 RUN cargo install dum
