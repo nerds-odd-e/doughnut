@@ -4,13 +4,13 @@ Feature: 筆記描述補全功能
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user
-      | title    | description         |
-      | 台北的天氣  | 台北的冬天 |
-      | 描述為空的筆記  |  |
-      | 描述不為空的筆記  | 不是空白 |
+      | title    | description |
+      | 台北的天氣    | 台北的冬天       |
+      | 描述為空的筆記  |             |
+      | 描述不為空的筆記 | 不是空白        |
 
   @usingMockedOpenAiService
-    @ignore
+  @ignore
   Scenario: 有描述時可以使用補全功能
     Given 我打開標題為"台北的天氣"這個筆記
     And AI會返回"台北冬天每天都在下雨,晴天的機率可能比刮刮樂還低"
