@@ -147,7 +147,7 @@ export default defineComponent({
   },
   data() {
     return {
-      environment: "production",
+      environment: "testing",
     };
   },
   computed: {
@@ -155,7 +155,7 @@ export default defineComponent({
       return this.storageAccessor.selectedNote;
     },
     viewType() {
-      return sanitizeViewTypeName(this.$route.meta.viewType as string);
+      return sanitizeViewTypeName(this.$route.meta?.viewType as string);
     },
   },
   methods: {

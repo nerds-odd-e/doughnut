@@ -8,20 +8,21 @@ describe("NoteControlCenterForUser", () => {
   helper.resetWithApiMock(beforeEach, afterEach);
   let wrapper: VueWrapper;
 
-  const note = makeMe.aNote.please();
-
-  const mountComponent = (): VueWrapper => {
+  const mountComponent = (note?: Generated.Note): VueWrapper => {
     return helper
       .component(NoteControlCenterForUser)
-      .withStorageProps({ selectedNote: note })
+      .withStorageProps({ storageAccessor: { selectedNote: note } })
       .mount();
   };
 
-  beforeEach(() => {
+  it("has only the link-note button when no exist selected note", () => {
     wrapper = mountComponent();
+    expect(wrapper.findAll(".btn")[0].attributes("title")).toEqual("link note");
   });
 
-  it("has only the link-note button when no exist selected note", () => {
-    expect(wrapper.findAll(".btn")[0].attributes("title")).toEqual("link note");
+  it("has the suggest button when having selected note", () => {
+    const note = makeMe.aNote.please();
+    wrapper = mountComponent(note);
+    expect(wrapper.findAll(".btn")[4].attributes("title")).toEqual("Suggest1");
   });
 });
