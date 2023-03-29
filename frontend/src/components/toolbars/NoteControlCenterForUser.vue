@@ -41,6 +41,12 @@
         :title="'Suggest1'"
         @click="suggestDescriptionByTitle"
       />
+      <a
+        v-if="environment === 'testing'"
+        class="btn btn-sm"
+        role="button"
+        :title="'Complete'"
+      />
       <PopButton title="Suggest">
         <template #button_face>
           <SvgRobot />
