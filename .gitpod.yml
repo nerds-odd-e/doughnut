@@ -45,8 +45,7 @@ vscode:
   extensions:
     - esbenp.prettier-vscode
     - dbaeumer.vscode-eslint
-    - lukashass.volar
-    - johnsoncodehk.volar
+    - Vue.volar
     - HansUXdev.bootstrap5-snippets
     - Shelex.vscode-cy-helper
     - xyz.plsql-language
