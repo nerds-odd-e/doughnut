@@ -481,4 +481,3 @@ Then("I generate description from {string}", (title: string) => {
   cy.jumpToNotePage(title)
   cy.findByRole("button", { name: "Suggest1" }).click()
 })
-
