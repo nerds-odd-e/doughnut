@@ -153,16 +153,21 @@ export default defineComponent({
   },
   methods: {
     suggestDescriptionByTitle() {
-      if (this.storageAccessor.selectedNote) {
-        this.storageAccessor.api(this.$router).updateTextContent(
-          this.storageAccessor.selectedNote.id,
-          {
-            title: this.storageAccessor.selectedNote.textContent.title,
-            description: "are all livings",
-            updatedAt: this.storageAccessor.selectedNote.textContent.updatedAt,
-          },
-          this.storageAccessor.selectedNote.textContent
-        );
+      const { selectedNote } = this.storageAccessor;
+      if (selectedNote) {
+        this.api.ai
+          .askAiSuggestions({ prompt: `Tell me about "${selectedNote.title}"` })
+          .then((res: Generated.AiSuggestion) => {
+            this.storageAccessor.api(this.$router).updateTextContent(
+              selectedNote.id,
+              {
+                title: selectedNote.title,
+                description: res.suggestion,
+                updatedAt: new Date().toDateString(),
+              },
+              selectedNote.textContent
+            );
+          });
       }
     },
   },
