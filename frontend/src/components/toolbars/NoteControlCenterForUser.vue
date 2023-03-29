@@ -40,7 +40,9 @@
         role="button"
         :title="'Suggest1'"
         @click="suggestDescriptionByTitle"
-      />
+      >
+        <SvgRobot />
+      </a>
       <PopButton title="Suggest">
         <template #button_face>
           <SvgRobot />
