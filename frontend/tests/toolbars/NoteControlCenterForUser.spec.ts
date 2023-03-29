@@ -58,4 +58,23 @@ describe("NoteControlCenterForUser", () => {
 
     wrapper.findAll(".btn")[4].trigger("click");
   });
+
+  it.skip('ask api be called many times until res.finishReason equal "stop" when clicking the suggest button', () => {
+    let beCalledTimes = 0;
+
+    const updateTextContent: StoredApi["updateTextContent"] = async () => {
+      beCalledTimes += 1;
+      return {} as Generated.NoteRealm;
+    };
+
+    mountComponentWithNote(updateTextContent);
+
+    helper.apiMock
+      .expectingPost(`/api/ai/ask-suggestions`)
+      .andReturnOnce({ suggestion: "suggestion" });
+
+    wrapper.findAll(".btn")[4].trigger("click");
+
+    expect(beCalledTimes).toBe(2);
+  });
 });
