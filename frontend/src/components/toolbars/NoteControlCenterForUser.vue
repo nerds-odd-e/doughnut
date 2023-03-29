@@ -164,7 +164,7 @@ export default defineComponent({
       if (selectedNote) {
         this.api.ai
           .askAiSuggestions({
-            prompt: `finish "${selectedNote.textContent.description}"`,
+            prompt: selectedNote.textContent.description,
           })
           .then((res: Generated.AiSuggestion) => {
             this.storageAccessor.api(this.$router).updateTextContent(
