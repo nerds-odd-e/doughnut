@@ -43,12 +43,13 @@
     "@types/node": "^18.15",
     "@typescript-eslint/eslint-plugin": "^5.57",
     "@typescript-eslint/parser": "^5.57",
-    "cypress": "12.8.1",
+    "cypress": "12.9.0",
     "cypress-file-upload": "^5.0",
     "esbuild": "^0.17",
-    "eslint": "^8.36",
+    "eslint": "^8.37",
     "eslint-config-prettier": "^8.7",
-    "eslint-plugin-cypress": "^2.12",
+    "eslint-plugin-chai-friendly": "^0.7.2",
+    "eslint-plugin-cypress": "^2.13",
     "eslint-plugin-prettier": "^4.2",
     "github_action_sound": "^1.0.2",
     "got": "^12.6",
@@ -59,6 +60,6 @@
     "typescript": "^4.9"
   },
   "dependencies": {
-    "@cucumber/cucumber": "^9.0"
+    "@cucumber/cucumber": "^9.1"
   }
 }

@@ -1,6 +1,11 @@
 module.exports = {
   parser: "@typescript-eslint/parser",
-  plugins: ["@typescript-eslint", "cypress", "prettier"],
+  plugins: [
+    "@typescript-eslint",
+    "cypress",
+    "chai-friendly",
+    "prettier"
+  ],
   settings: {
     "import/resolver": {
       node: {
@@ -22,11 +27,14 @@ module.exports = {
   },
   ignorePatterns: ["tsconfig.json"],
   rules: {
+    "no-unused-expressions": "off",
+    "chai-friendly/no-unused-expressions": "error",
     "cypress/no-assigning-return-values": "error",
     "cypress/no-unnecessary-waiting": "error",
-    "cypress/assertion-before-screenshot": "warn",
     "cypress/no-async-tests": "error",
     "cypress/no-pause": "error",
+    "cypress/assertion-before-screenshot": "warn",
+    "cypress/unsafe-to-chain-command": "off",
     "prettier/prettier": [
       "warn",
       {
