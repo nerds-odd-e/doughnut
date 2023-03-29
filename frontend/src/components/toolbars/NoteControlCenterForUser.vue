@@ -11,8 +11,8 @@
     <template v-if="selectedNote">
       <ViewTypeButtons v-bind="{ viewType, noteId: selectedNote.id }" />
       <NoteNewButton
-        v-bind="{ parentId: selectedNote.id, storageAccessor }"
         button-title="Add Child Note"
+        v-bind="{ parentId: selectedNote.id, storageAccessor }"
       >
         <SvgAddChild />
       </NoteNewButton>
@@ -36,13 +36,14 @@
       </PopButton>
       <a
         v-if="environment === 'testing'"
+        :title="'Suggest1'"
         class="btn btn-sm"
         role="button"
-        :title="'Suggest1'"
         @click="suggestDescriptionByTitle"
       >
         <SvgRobot />
       </a>
+      <a v-if="false" :title="'Complete'" class="btn btn-sm" role="button"></a>
       <PopButton title="Suggest">
         <template #button_face>
           <SvgRobot />
@@ -60,11 +61,11 @@
       </PopButton>
       <div class="dropdown">
         <button
-          class="btn dropdown-toggle"
           id="dropdownMenuButton"
-          data-bs-toggle="dropdown"
-          aria-haspopup="true"
           aria-expanded="false"
+          aria-haspopup="true"
+          class="btn dropdown-toggle"
+          data-bs-toggle="dropdown"
           role="button"
           title="more options"
         >
@@ -87,9 +88,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+import {defineComponent, PropType} from "vue";
 import useLoadingApi from "@/managedApi/useLoadingApi";
-import { StorageAccessor } from "@/store/createNoteStorage";
+import {StorageAccessor} from "@/store/createNoteStorage";
 import NoteNewButton from "./NoteNewButton.vue";
 import SvgAddChild from "../svgs/SvgAddChild.vue";
 import SvgEdit from "../svgs/SvgEdit.vue";
@@ -99,7 +100,7 @@ import WikidataAssociationDialog from "../notes/WikidataAssociationDialog.vue";
 import SvgSearch from "../svgs/SvgSearch.vue";
 import LinkNoteDialog from "../links/LinkNoteDialog.vue";
 import ViewTypeButtons from "./ViewTypeButtons.vue";
-import { sanitizeViewTypeName } from "../../models/viewTypes";
+import {sanitizeViewTypeName} from "../../models/viewTypes";
 import SvgCog from "../svgs/SvgCog.vue";
 import NoteDeleteButton from "./NoteDeleteButton.vue";
 import PopButton from "../commons/Popups/PopButton.vue";
@@ -118,7 +119,7 @@ export default defineComponent({
       type: Object as PropType<StorageAccessor>,
       required: true,
     },
-    user: { type: Object as PropType<Generated.User> },
+    user: {type: Object as PropType<Generated.User>},
   },
   emits: ["updateUser"],
   components: {
@@ -153,10 +154,10 @@ export default defineComponent({
   },
   methods: {
     suggestDescriptionByTitle() {
-      const { selectedNote } = this.storageAccessor;
+      const {selectedNote} = this.storageAccessor;
       if (selectedNote) {
         this.api.ai
-          .askAiSuggestions({ prompt: `Tell me about "${selectedNote.title}"` })
+          .askAiSuggestions({prompt: `Tell me about "${selectedNote.title}"`})
           .then((res: Generated.AiSuggestion) => {
             this.storageAccessor.api(this.$router).updateTextContent(
               selectedNote.id,
