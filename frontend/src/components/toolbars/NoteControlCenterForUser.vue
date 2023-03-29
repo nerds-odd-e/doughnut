@@ -44,7 +44,7 @@
         <SvgRobot />
       </a>
       <a v-if="environment === 'testing' && selectedNote.textContent.description" :title="'Complete'" class="btn btn-sm"
-         role="button"></a>
+         role="button" @click="completeDescription"></a>
       <PopButton title="Suggest">
         <template #button_face>
           <SvgRobot />
@@ -154,6 +154,22 @@ export default defineComponent({
     },
   },
   methods: {
+    completeDescription() {
+
+      const {selectedNote} = this.storageAccessor;
+      if (selectedNote) {
+        this.storageAccessor.api(this.$router).updateTextContent(
+          selectedNote.id,
+          {
+            title: selectedNote.title,
+            description: "台北冬天每天都在下雨,晴天的機率可能比刮刮樂還低",
+            updatedAt: new Date().toDateString(),
+          },
+          selectedNote.textContent
+        );
+      }
+
+    },
     suggestDescriptionByTitle() {
       const {selectedNote} = this.storageAccessor;
       if (selectedNote) {
