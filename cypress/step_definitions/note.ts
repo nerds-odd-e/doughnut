@@ -2,13 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import {
-  DataTable,
-  defineParameterType,
-  Given,
-  Then,
-  When,
-} from "@badeball/cypress-cucumber-preprocessor"
+import {DataTable, defineParameterType, Given, Then, When,} from "@badeball/cypress-cucumber-preprocessor"
 import NotePath from "../support/NotePath"
 import "../support/string.extensions"
 
@@ -29,7 +23,7 @@ Given("there are some notes for the current user", (data: DataTable) => {
 })
 
 Given("I have a note with the title {string}", (noteTitle: string) => {
-  cy.testability().seedNotes([{ title: noteTitle }])
+  cy.testability().seedNotes([{title: noteTitle}])
 })
 
 Given("there are some notes for existing user {string}", (externalIdentifier, data: DataTable) => {
@@ -40,7 +34,7 @@ Given("there are notes from Note {int} to Note {int}", (from: number, to: number
   const notes = Array(to - from + 1)
     .fill(0)
     .map((_, i) => {
-      return { title: `Note ${i + from}` }
+      return {title: `Note ${i + from}`}
     })
   cy.testability().seedNotes(notes)
 })
@@ -65,7 +59,7 @@ When("I create notebooks with:", (notes: DataTable) => {
 })
 
 When("I create a notebook with empty title", () => {
-  cy.createNotebookWith({ Title: "" })
+  cy.createNotebookWith({Title: ""})
 })
 
 When("I update note {string} to become:", (noteTitle: string, data: DataTable) => {
@@ -89,7 +83,7 @@ When(
 
 When("I can change the title {string} to {string}", (noteTitle: string, newNoteTitle: string) => {
   cy.findNoteTitle(noteTitle)
-  cy.inPlaceEdit({ title: newNoteTitle })
+  cy.inPlaceEdit({title: newNoteTitle})
   cy.findNoteTitle(newNoteTitle)
 })
 
@@ -105,7 +99,7 @@ Given(
 Given(
   "I update note {string} description from {string} to become {string}",
   (noteTitle: string, noteDescription: string, newNoteDescription: string) => {
-    cy.findByText(noteDescription).click({ force: true })
+    cy.findByText(noteDescription).click({force: true})
     cy.replaceFocusedTextAndEnter(newNoteDescription)
   },
 )
@@ -114,7 +108,7 @@ When(
   "I update note {string} with description {string}",
   (noteTitle: string, newDescription: string) => {
     cy.jumpToNotePage(noteTitle)
-    cy.inPlaceEdit({ Description: newDescription })
+    cy.inPlaceEdit({Description: newDescription})
     cy.findNoteDescriptionOnCurrentPage(newDescription)
   },
 )
@@ -215,7 +209,7 @@ When("I click the child note {string}", (noteTitle) => {
 When("I move note {string} left", (noteTitle) => {
   cy.jumpToNotePage(noteTitle)
   cy.findByText("Move This Note").click()
-  cy.findByRole("button", { name: "Move Left" }).click()
+  cy.findByRole("button", {name: "Move Left"}).click()
 })
 
 When(
@@ -233,7 +227,7 @@ When("I should see the screenshot matches", () => {
 When("I move note {string} right", (noteTitle: string) => {
   cy.jumpToNotePage(noteTitle)
   cy.findByText("Move This Note").click()
-  cy.findByRole("button", { name: "Move Right" }).click()
+  cy.findByRole("button", {name: "Move Right"}).click()
 })
 
 When(
@@ -285,7 +279,7 @@ When(
 )
 
 When("I click note {string} avoiding the title", (noteTitle: string) => {
-  cy.findByRole("card", { name: noteTitle }).click("bottomRight", {
+  cy.findByRole("card", {name: noteTitle}).click("bottomRight", {
     force: true,
   })
 })
@@ -297,7 +291,7 @@ When("I click note card title {string}", (noteTitle: string) => {
 When(
   "The note {string} {string} have the description indicator",
   (noteTitle: string, shouldOrNot: string) => {
-    cy.findByRole("card", { name: noteTitle }).within(() =>
+    cy.findByRole("card", {name: noteTitle}).within(() =>
       cy.get(".description-indicator").should(shouldOrNot === "should" ? "exist" : "not.exist"),
     )
   },
@@ -306,7 +300,7 @@ When(
 When(
   "I should see the note {string} is {string}",
   (noteTitle: string, highlightedOrNot: string) => {
-    cy.findByRole("card", { name: noteTitle }).should(
+    cy.findByRole("card", {name: noteTitle}).should(
       `${highlightedOrNot === "highlighted" ? "" : "not."}have.class`,
       "highlighted",
     )
@@ -316,8 +310,8 @@ When(
 When("I drag the map by {int}px * {int}px", (dx: number, dy: number) => {
   cy.get(".mindmap-event-receiver")
     .trigger("pointerdown", "topLeft")
-    .trigger("pointermove", "topLeft", { clientX: dx, clientY: dy })
-    .trigger("pointerup", { force: true })
+    .trigger("pointermove", "topLeft", {clientX: dx, clientY: dy})
+    .trigger("pointerup", {force: true})
 })
 
 When("I drag the map by {int}px * {int}px when holding the shift button", (dx, dy) => {
@@ -328,7 +322,7 @@ When("I drag the map by {int}px * {int}px when holding the shift button", (dx, d
       clientX: dx,
       clientY: dy,
     })
-    .trigger("pointerup", { force: true })
+    .trigger("pointerup", {force: true})
 })
 
 When("I zoom in at the {string}", (position: string) => {
@@ -429,7 +423,7 @@ Then(
 
 When("I ask for a description suggestion for {string}", (noteTitle: string) => {
   cy.jumpToNotePage(noteTitle)
-  cy.findByRole("button", { name: "Suggest" }).click()
+  cy.findByRole("button", {name: "Suggest"}).click()
 })
 
 Then("I should be prompted with a suggested description {string}", (description: string) => {
@@ -485,15 +479,15 @@ Given("我打開標題為{string}這個筆記", (noteTitle: string) => {
   cy.jumpToNotePage(noteTitle)
 })
 
-Given('AI會返回"{string}"', (returnMessage: string) => {
+Given('AI會返回{string}', (returnMessage: string) => {
   cy.openAiService().restartImposterAndStubTextCompletion(returnMessage, "stop")
 })
 When("要求補全描述", () => {
-  cy.findByRole("button", { name: "Complete" }).click()
+  cy.findByRole("button", {name: "Complete"}).click()
 })
 Then("描述會變成{string}", (description: string) => {
   cy.findNoteDescriptionOnCurrentPage(description)
 })
 Then("描述補全功能就無法使用但建議功能可以使用", () => {
-  cy.findByRole("button", { name: "Complete" }).should('not.exist');
+  cy.findByRole("button", {name: "Complete"}).should('not.exist');
 })
