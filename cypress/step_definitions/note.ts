@@ -485,7 +485,7 @@ Given("我打開標題為{string}這個筆記", (noteTitle: string) => {
   cy.jumpToNotePage(noteTitle)
 })
 
-Given('AI會返回{string}', (returnMessage: string) => {
+Given('AI會返回"{string}"', (returnMessage: string) => {
   cy.openAiService().restartImposterAndStubTextCompletion(returnMessage, "stop")
 })
 When("要求補全描述", () => {
