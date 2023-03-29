@@ -53,3 +53,5 @@ vscode:
     - cweijan.vscode-mysql-client2
     - GulajavaMinistudio.mayukaithemevsc
     - GabrielBB.vscode-lombok
+    - jnoortheen.nix-ide
+    - unifiedjs.vscode-mdx
