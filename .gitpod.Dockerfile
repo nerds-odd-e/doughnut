@@ -49,6 +49,8 @@ RUN apt-get -y update \
     && rm -rf /home/gitpod/.nix-profile \
     && rm -rf /home/gitpod/.config/nixpkgs
 
+RUN apt-get -y update \
+    && DEBIAN_FRONTEND=noninteractive apt-get upgrade
 # use bash over dash for /bin/sh
 RUN dpkg-reconfigure dash
 RUN cargo install dum
@@ -73,7 +75,7 @@ WORKDIR /home/gitpod
 
 # Install Nix
 RUN touch .bash_profile \
-    && curl https://nixos.org/releases/nix/nix-2.13.2/install | sh
+    && curl https://nixos.org/releases/nix/nix-2.13.3/install | sh
 
 RUN echo '. /home/gitpod/.nix-profile/etc/profile.d/nix.sh' >> /home/gitpod/.bashrc
 RUN mkdir -p /home/gitpod/.config/nixpkgs && echo '{ allowUnfree = true; }' >> /home/gitpod/.config/nixpkgs/config.nix
