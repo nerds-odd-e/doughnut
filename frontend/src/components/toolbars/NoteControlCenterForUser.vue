@@ -43,8 +43,13 @@
       >
         <SvgRobot />
       </a>
-      <a v-if="environment === 'testing' && selectedNote.textContent.description" :title="'Complete'" class="btn btn-sm"
-         role="button" @click="completeDescription"></a>
+      <a
+        v-if="environment === 'testing' && selectedNote.textContent.description"
+        :title="'Complete'"
+        class="btn btn-sm"
+        role="button"
+        @click="completeDescription"
+      ></a>
       <PopButton title="Suggest">
         <template #button_face>
           <SvgRobot />
@@ -89,9 +94,9 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, PropType} from "vue";
+import { defineComponent, PropType } from "vue";
 import useLoadingApi from "@/managedApi/useLoadingApi";
-import {StorageAccessor} from "@/store/createNoteStorage";
+import { StorageAccessor } from "@/store/createNoteStorage";
 import NoteNewButton from "./NoteNewButton.vue";
 import SvgAddChild from "../svgs/SvgAddChild.vue";
 import SvgEdit from "../svgs/SvgEdit.vue";
@@ -101,7 +106,7 @@ import WikidataAssociationDialog from "../notes/WikidataAssociationDialog.vue";
 import SvgSearch from "../svgs/SvgSearch.vue";
 import LinkNoteDialog from "../links/LinkNoteDialog.vue";
 import ViewTypeButtons from "./ViewTypeButtons.vue";
-import {sanitizeViewTypeName} from "../../models/viewTypes";
+import { sanitizeViewTypeName } from "../../models/viewTypes";
 import SvgCog from "../svgs/SvgCog.vue";
 import NoteDeleteButton from "./NoteDeleteButton.vue";
 import PopButton from "../commons/Popups/PopButton.vue";
@@ -120,7 +125,7 @@ export default defineComponent({
       type: Object as PropType<StorageAccessor>,
       required: true,
     },
-    user: {type: Object as PropType<Generated.User>},
+    user: { type: Object as PropType<Generated.User> },
   },
   emits: ["updateUser"],
   components: {
@@ -155,26 +160,28 @@ export default defineComponent({
   },
   methods: {
     completeDescription() {
-
-      const {selectedNote} = this.storageAccessor;
-      if (selectedNote) {
-        this.storageAccessor.api(this.$router).updateTextContent(
-          selectedNote.id,
-          {
-            title: selectedNote.title,
-            description: "台北冬天每天都在下雨,晴天的機率可能比刮刮樂還低",
-            updatedAt: new Date().toDateString(),
-          },
-          selectedNote.textContent
-        );
-      }
-
-    },
-    suggestDescriptionByTitle() {
-      const {selectedNote} = this.storageAccessor;
+      const { selectedNote } = this.storageAccessor;
       if (selectedNote) {
         this.api.ai
-          .askAiSuggestions({prompt: `Tell me about "${selectedNote.title}"`})
+          .askAiSuggestions({ prompt: `Tell me about "${selectedNote.title}"` })
+          .then((res: Generated.AiSuggestion) => {
+            this.storageAccessor.api(this.$router).updateTextContent(
+              selectedNote.id,
+              {
+                title: selectedNote.title,
+                description: res.suggestion,
+                updatedAt: new Date().toDateString(),
+              },
+              selectedNote.textContent
+            );
+          });
+      }
+    },
+    suggestDescriptionByTitle() {
+      const { selectedNote } = this.storageAccessor;
+      if (selectedNote) {
+        this.api.ai
+          .askAiSuggestions({ prompt: `Tell me about "${selectedNote.title}"` })
           .then((res: Generated.AiSuggestion) => {
             this.storageAccessor.api(this.$router).updateTextContent(
               selectedNote.id,
