@@ -183,22 +183,25 @@ export default defineComponent({
           });
       }
     },
-    suggestDescriptionByTitle() {
+    async askSuggestionApi(selectedNote: Generated.Note) {
+      const res: Generated.AiSuggestion = await this.api.ai.askAiSuggestions({
+        prompt: `Tell me about "${selectedNote.title}"`,
+      });
+
+      await this.storageAccessor.api(this.$router).updateTextContent(
+        selectedNote.id,
+        {
+          title: selectedNote.title,
+          description: res.suggestion,
+          updatedAt: new Date().toDateString(),
+        },
+        selectedNote.textContent
+      );
+    },
+    async suggestDescriptionByTitle() {
       const { selectedNote } = this.storageAccessor;
       if (selectedNote) {
-        this.api.ai
-          .askAiSuggestions({ prompt: `Tell me about "${selectedNote.title}"` })
-          .then((res: Generated.AiSuggestion) => {
-            this.storageAccessor.api(this.$router).updateTextContent(
-              selectedNote.id,
-              {
-                title: selectedNote.title,
-                description: res.suggestion,
-                updatedAt: new Date().toDateString(),
-              },
-              selectedNote.textContent
-            );
-          });
+        await this.askSuggestionApi(selectedNote);
       }
     },
   },
