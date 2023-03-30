@@ -59,11 +59,14 @@ describe("NoteControlCenterForUser", () => {
     wrapper.findAll(".btn")[4].trigger("click");
   });
 
-  it.skip('ask api be called many times until res.finishReason equal "stop" when clicking the suggest button', () => {
+  it.skip('ask api be called many times until res.finishReason equal "stop" when clicking the suggest button', async () => {
     let beCalledTimes = 0;
 
     const updateTextContent: StoredApi["updateTextContent"] = async () => {
       beCalledTimes += 1;
+      helper.apiMock
+        .expectingPost(`/api/ai/ask-suggestions`)
+        .andReturnOnce({ suggestion: "suggestion", finishReason: "stop" });
       return {} as Generated.NoteRealm;
     };
 
@@ -71,10 +74,10 @@ describe("NoteControlCenterForUser", () => {
 
     helper.apiMock
       .expectingPost(`/api/ai/ask-suggestions`)
-      .andReturnOnce({ suggestion: "suggestion" });
+      .andReturnOnce({ suggestion: "suggestion", finishReason: "length" });
 
-    wrapper.findAll(".btn")[4].trigger("click");
+    await wrapper.findAll(".btn")[4].trigger("click");
 
-    expect(beCalledTimes).toBe(2);
+    setTimeout(() => expect(beCalledTimes).toBe(2), 1);
   });
 });
