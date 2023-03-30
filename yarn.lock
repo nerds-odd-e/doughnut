@@ -56,9 +56,9 @@
     node-hook "^1.0.0"
 
 "@badeball/cypress-cucumber-preprocessor@^16.0":
-  version "16.0.0"
-  resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-16.0.0.tgz#fde215d9cc14f24a77485d189f7ce4843989e5cb"
-  integrity sha512-XKHwKWbETToJf/lpNq2gPzSkJa8KYp1hgLgNT4kkWkX9fzEb3MJc+YwKOUsxliQCgmmt0NWIJwaJaY2izxYJTA==
+  version "16.0.1"
+  resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-16.0.1.tgz#cde4d65e06c2c4c74ca36180b0c1149429bcfe2a"
+  integrity sha512-5f3vHevWIVCUbjr6kRvQeOFkZikZ1mv+9gqvEZ/73FSc4GSYRQS9kZc3v3xSHE0XIUWdHfCgGTYplGsxyIKW4g==
   dependencies:
     "@badeball/cypress-configuration" "^4.0.0"
     "@cucumber/cucumber" "^8.11.1"
@@ -2051,9 +2051,9 @@ eslint-plugin-chai-friendly@^0.7.2:
   integrity sha512-LOIfGx5sZZ5FwM1shr2GlYAWV9Omdi+1/3byuVagvQNoGUuU0iHhp7AfjA1uR+4dJ4Isfb4+FwBJgQajIw9iAg==
 
 eslint-plugin-cypress@^2.13:
-  version "2.13.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-cypress/-/eslint-plugin-cypress-2.13.1.tgz#4127bb1aa558a9ca7e3d19b5ed997ccef52c95fb"
-  integrity sha512-THjc7IT3S9H4KwmRhzAhMGQaEqy78/7W75He/gBhJEH0vIuAY16vOI4YSliDo/ZY+Wm6DtvMHR+8uVvICcI3Lw==
+  version "2.13.2"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-cypress/-/eslint-plugin-cypress-2.13.2.tgz#b42b763f449ff713cecf6bdf1903e7cee6e48bfc"
+  integrity sha512-LlwjnBTzuKuC0A4H0RxVjs0YeAWK+CD1iM9Dp8un3lzT713ePQxfpPstCD+9HSAss8emuE3b2hCNUST+NrUwKw==
   dependencies:
     globals "^11.12.0"
 
