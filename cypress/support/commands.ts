@@ -117,11 +117,15 @@ Cypress.Commands.add(
   },
 )
 
-Cypress.Commands.add("replaceFocusedTextAndEnter", (text) => {
+Cypress.Commands.add("clearFocusedText", () => {
   // cy.clear for now is an alias of cy.type('{selectall}{backspace}')
   // it doesn't clear the text sometimes.
   // Invoking it twice seems to solve the problem.
-  cy.focused().clear().clear().type(text).type("{shift}{enter}")
+  cy.focused().clear().clear()
+})
+
+Cypress.Commands.add("replaceFocusedTextAndEnter", (text) => {
+  cy.clearFocusedText().type(text).type("{shift}{enter}")
 })
 
 Cypress.Commands.add("inPlaceEdit", (noteAttributes) => {
