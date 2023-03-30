@@ -197,6 +197,9 @@ export default defineComponent({
         },
         selectedNote.textContent
       );
+      if (res.finishReason === "length") {
+        await this.askSuggestionApi(selectedNote, res.suggestion);
+      }
     },
     async suggestDescriptionByTitle() {
       const { selectedNote } = this.storageAccessor;

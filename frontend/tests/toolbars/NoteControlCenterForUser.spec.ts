@@ -59,7 +59,7 @@ describe("NoteControlCenterForUser", () => {
     wrapper.findAll(".btn")[4].trigger("click");
   });
 
-  it.skip('ask api be called many times until res.finishReason equal "stop" when clicking the suggest button', async () => {
+  it('ask api be called many times until res.finishReason equal "stop" when clicking the suggest button', async () => {
     let beCalledTimes = 0;
 
     const updateTextContent: StoredApi["updateTextContent"] = async () => {
