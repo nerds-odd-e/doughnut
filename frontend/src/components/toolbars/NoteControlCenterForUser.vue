@@ -183,9 +183,9 @@ export default defineComponent({
           });
       }
     },
-    async askSuggestionApi(selectedNote: Generated.Note) {
+    async askSuggestionApi(selectedNote: Generated.Note, prompt: string) {
       const res: Generated.AiSuggestion = await this.api.ai.askAiSuggestions({
-        prompt: `Tell me about "${selectedNote.title}"`,
+        prompt,
       });
 
       await this.storageAccessor.api(this.$router).updateTextContent(
@@ -201,7 +201,10 @@ export default defineComponent({
     async suggestDescriptionByTitle() {
       const { selectedNote } = this.storageAccessor;
       if (selectedNote) {
-        await this.askSuggestionApi(selectedNote);
+        await this.askSuggestionApi(
+          selectedNote,
+          `Tell me about "${selectedNote.title}"`
+        );
       }
     },
   },
