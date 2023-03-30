@@ -493,12 +493,12 @@ When("要求補全描述", () => {
 })
 Then("描述會變成{string}", (description: string) => {
   cy.get("[role=description]").should((elem) => {
-    expect(elem.text()).to.equal(description);
-  });
+    expect(elem.text()).to.equal(description)
+  })
 })
 Then("刪除描述{string}", (noteDescription: string) => {
-    cy.findByText(noteDescription).click({ force: true })
-    cy.clearFocusedText()
+  cy.findByText(noteDescription).click({ force: true })
+  cy.clearFocusedText()
 })
 
 Then("描述補全功能就無法使用但建議功能可以使用", () => {
