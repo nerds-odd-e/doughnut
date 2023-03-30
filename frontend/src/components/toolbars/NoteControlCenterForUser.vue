@@ -35,6 +35,7 @@
         />
       </PopButton>
       <a
+        v-if="environment === 'testing'"
         :title="'Suggest1'"
         class="btn btn-sm"
         role="button"
@@ -51,6 +52,14 @@
       >
         <SvgArticle />
       </a>
+      <PopButton title="Suggest">
+        <template #button_face>
+          <SvgRobot />
+        </template>
+        <NoteSuggestDescriptionDialog
+          v-bind="{ selectedNote, storageAccessor }"
+        />
+      </PopButton>
 
       <PopButton title="link note">
         <template #button_face>
@@ -107,6 +116,8 @@ import NoteEngagingStoryDialog from "../notes/NoteEngagingStoryDialog.vue";
 import SvgRobot from "../svgs/SvgRobot.vue";
 import SvgArticle from "../svgs/SvgArticle.vue";
 
+import NoteSuggestDescriptionDialog from "../notes/NoteSuggestDescriptionDialog.vue";
+
 export default defineComponent({
   setup() {
     return {
@@ -136,7 +147,7 @@ export default defineComponent({
     PopButton,
     NoteEngagingStoryDialog,
     SvgRobot,
-    SvgArticle,
+    NoteSuggestDescriptionDialog,
   },
   data() {
     return {
