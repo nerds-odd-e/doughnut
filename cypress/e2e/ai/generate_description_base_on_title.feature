@@ -10,11 +10,4 @@ Feature: I want the AI to generate a description based on my note title, so I ca
       When I generate description from "Animals"
       Then I should see the note description on current page becomes "are all livings"
 
-    @usingMockedOpenAiService
-    @ignore
-    Scenario: Generate Description Again
-      Given I have a description "What goes on"
-      When I remove "What goes on" in description
-      And I click the robot button
-      And OpenAI always return text completion "are all livings"
-      Then I can see "are all livings" in description
+
