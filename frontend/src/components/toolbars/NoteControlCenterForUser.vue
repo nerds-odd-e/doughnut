@@ -184,10 +184,14 @@ export default defineComponent({
       }
     },
     async askSuggestionApi(selectedNote: Generated.Note, prompt: string) {
-      const res: Generated.AiSuggestion = await this.api.ai.askAiSuggestions({
-        prompt,
-      });
-
+      let res: Generated.AiSuggestion;
+      try {
+        res = await this.api.ai.askAiSuggestions({
+          prompt,
+        });
+      } catch (e) {
+        return;
+      }
       await this.storageAccessor.api(this.$router).updateTextContent(
         selectedNote.id,
         {
