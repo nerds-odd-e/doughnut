@@ -456,7 +456,7 @@ Then("I should find an art created by the ai", () => {
   cy.get("img.ai-art").should("be.visible")
 })
 
-Given("open AI serivce always think the system token is invalid", () => {
+Given("open AI service always think the system token is invalid", () => {
   cy.openAiService().alwaysResponseAsUnauthorized()
 })
 

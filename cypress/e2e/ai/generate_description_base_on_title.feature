@@ -1,4 +1,7 @@
-Feature: I want the AI to generate a description based on my note title, so I can overcome writer's block and generate fresh content quickly.
+Feature: Generate a description based on note title
+
+I want the AI to generate a description based on my note title, 
+so I can overcome writer's block and generate fresh content quickly.
 
   Background:
     Given I've logged in as an existing user
@@ -12,6 +15,6 @@ Feature: I want the AI to generate a description based on my note title, so I ca
 
     @usingMockedOpenAiService
     Scenario: Open AI service availability
-      Given open AI serivce always think the system token is invalid
+      Given open AI service always think the system token is invalid
       When I generate description from "Animals"
       Then I should see that the open AI service is not available in controller bar
