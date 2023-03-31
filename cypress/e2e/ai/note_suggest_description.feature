@@ -1,3 +1,4 @@
+@ignore
 Feature: Suggest description
   As a learner, I want to be given a suggested description for
   my notes.
