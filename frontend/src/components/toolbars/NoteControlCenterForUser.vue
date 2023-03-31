@@ -42,16 +42,6 @@
       >
         <SvgRobot />
       </a>
-      <a
-        v-if="environment === 'testing' && selectedNote.textContent.description"
-        :title="'Complete'"
-        class="btn btn-sm"
-        role="button"
-        @click="completeDescription"
-      >
-        <SvgArticle />
-      </a>
-
       <PopButton title="link note">
         <template #button_face>
           <SvgSearch />
@@ -108,7 +98,6 @@ import NoteDeleteButton from "./NoteDeleteButton.vue";
 import PopButton from "../commons/Popups/PopButton.vue";
 import NoteEngagingStoryDialog from "../notes/NoteEngagingStoryDialog.vue";
 import SvgRobot from "../svgs/SvgRobot.vue";
-import SvgArticle from "../svgs/SvgArticle.vue";
 
 export default defineComponent({
   setup() {
@@ -162,24 +151,6 @@ export default defineComponent({
         updatedAt: new Date().toDateString(),
       };
     },
-    completeDescription() {
-      const { selectedNote } = this.storageAccessor;
-      if (selectedNote) {
-        this.api.ai
-          .askAiSuggestions({
-            prompt: selectedNote.textContent.description,
-          })
-          .then((res: Generated.AiSuggestion) => {
-            this.storageAccessor
-              .api(this.$router)
-              .updateTextContent(
-                selectedNote.id,
-                this.generateTextContent(selectedNote.title, res.suggestion),
-                selectedNote.textContent
-              );
-          });
-      }
-    },
     async askSuggestionApi(selectedNote: Generated.Note, prompt: string) {
       try {
         const res = await this.api.ai.askAiSuggestions({
@@ -205,10 +176,11 @@ export default defineComponent({
     async suggestDescriptionByTitle() {
       const { selectedNote } = this.storageAccessor;
       if (selectedNote) {
-        await this.askSuggestionApi(
-          selectedNote,
-          `Tell me about "${selectedNote.title}"`
-        );
+          await this.askSuggestionApi(
+            selectedNote,
+            selectedNote.textContent.description.replace(/<\/?[^>]+(>|$)/g, "").trim()
+            || `Tell me about "${selectedNote.title}"`
+          );
       }
     },
   },
