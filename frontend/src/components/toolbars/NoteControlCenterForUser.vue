@@ -155,6 +155,13 @@ export default defineComponent({
     },
   },
   methods: {
+    generateTextContent(title: string, description: string) {
+      return {
+        title,
+        description,
+        updatedAt: new Date().toDateString(),
+      };
+    },
     completeDescription() {
       const { selectedNote } = this.storageAccessor;
       if (selectedNote) {
@@ -163,41 +170,36 @@ export default defineComponent({
             prompt: selectedNote.textContent.description,
           })
           .then((res: Generated.AiSuggestion) => {
-            this.storageAccessor.api(this.$router).updateTextContent(
-              selectedNote.id,
-              {
-                title: selectedNote.title,
-                description: res.suggestion,
-                updatedAt: new Date().toDateString(),
-              },
-              selectedNote.textContent
-            );
+            this.storageAccessor
+              .api(this.$router)
+              .updateTextContent(
+                selectedNote.id,
+                this.generateTextContent(selectedNote.title, res.suggestion),
+                selectedNote.textContent
+              );
           });
       }
     },
     async askSuggestionApi(selectedNote: Generated.Note, prompt: string) {
-      let res: Generated.AiSuggestion;
       try {
-        res = await this.api.ai.askAiSuggestions({
+        const res = await this.api.ai.askAiSuggestions({
           prompt,
         });
+
+        await this.storageAccessor
+          .api(this.$router)
+          .updateTextContent(
+            selectedNote.id,
+            this.generateTextContent(selectedNote.title, res.suggestion),
+            selectedNote.textContent
+          );
+        if (res.finishReason === "length") {
+          await this.askSuggestionApi(selectedNote, res.suggestion);
+        }
       } catch (e) {
         if (e instanceof Error) {
           this.errorMessage = e.message;
         }
-        return;
-      }
-      await this.storageAccessor.api(this.$router).updateTextContent(
-        selectedNote.id,
-        {
-          title: selectedNote.title,
-          description: res.suggestion,
-          updatedAt: new Date().toDateString(),
-        },
-        selectedNote.textContent
-      );
-      if (res.finishReason === "length") {
-        await this.askSuggestionApi(selectedNote, res.suggestion);
       }
     },
     async suggestDescriptionByTitle() {
