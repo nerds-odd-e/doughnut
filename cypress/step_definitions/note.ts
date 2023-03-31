@@ -504,3 +504,8 @@ Then("刪除描述{string}", (noteDescription: string) => {
 Then("描述補全功能就無法使用但建議功能可以使用", () => {
   cy.findByRole("button", { name: "Complete" }).should("not.exist")
 })
+Then("I should see that the open AI service is not available in controller bar", () => {
+  cy.findByTestId("errorMessage").should((elem) => {
+    expect(elem.text()).to.equal("The OpenAI request was not Authorized.")
+  })
+})

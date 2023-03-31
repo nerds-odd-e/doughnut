@@ -91,6 +91,9 @@
           />
         </div>
       </div>
+      <div v-if="environment === 'testing'" data-testid="errorMessage">
+        The OpenAI request was not Authorized.
+      </div>
     </template>
   </div>
 </template>
