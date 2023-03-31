@@ -1,4 +1,4 @@
-import { DefaultPredicate, HttpMethod, FlexiPredicate } from "@anev/ts-mountebank"
+import { EqualPredicate, DefaultPredicate, HttpMethod, FlexiPredicate } from "@anev/ts-mountebank"
 /// <reference types="cypress" />
 
 import MountebankWrapper from "./MountebankWrapper"
@@ -37,6 +37,14 @@ class ServiceMocker {
 
   public stubPoster(path: string, response: unknown) {
     return this.mountebank.stubWithPredicate(new DefaultPredicate(path, HttpMethod.POST), response)
+  }
+
+  public stubPosterWithBody(path: string, request: unknown, response: unknown) {
+    const predicate = new EqualPredicate()
+      .withPath(path)
+      .withMethod(HttpMethod.POST)
+      .withBody(request);
+    return this.mountebank.stubWithPredicate(predicate, response)
   }
 
   public stubPosterUnauthorized(pathMatcher: string, response: unknown) {
