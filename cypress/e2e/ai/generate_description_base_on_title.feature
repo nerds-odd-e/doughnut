@@ -11,7 +11,6 @@ Feature: I want the AI to generate a description based on my note title, so I ca
       Then I should see the note description on current page becomes "are all livings"
 
     @usingMockedOpenAiService
-      @ignore
     Scenario: Open AI service availability
       Given open AI serivce always think the system token is invalid
       When I generate description from "Animals"

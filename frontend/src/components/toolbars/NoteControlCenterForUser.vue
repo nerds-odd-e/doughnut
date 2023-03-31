@@ -91,8 +91,8 @@
           />
         </div>
       </div>
-      <div v-if="environment === 'testing'" data-testid="errorMessage">
-        The OpenAI request was not Authorized.
+      <div data-testid="errorMessage">
+        {{ errorMessage }}
       </div>
     </template>
   </div>
@@ -155,6 +155,7 @@ export default defineComponent({
   data() {
     return {
       environment: "testing",
+      errorMessage: "",
     };
   },
   computed: {
@@ -193,6 +194,9 @@ export default defineComponent({
           prompt,
         });
       } catch (e) {
+        if (e instanceof Error) {
+          this.errorMessage = e.message;
+        }
         return;
       }
       await this.storageAccessor.api(this.$router).updateTextContent(
