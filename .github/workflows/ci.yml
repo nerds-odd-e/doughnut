@@ -173,11 +173,11 @@ jobs:
         with:
           status: failure
           fields: repo,commit,message,author,action,workflow,eventName
-      - uses: nobrayner/discord-webhook@v1
-        if: env.WORKFLOW_CONCLUSION == 'failure'
-        with:
-          github-token: ${{ env.GITHUB_TOKEN }}
-          discord-webhook: ${{ env.DISCORD_WEBHOOK_URL }}
+      # - uses: nobrayner/discord-webhook@v1
+      #   if: env.WORKFLOW_CONCLUSION == 'failure'
+      #   with:
+      #     github-token: ${{ env.GITHUB_TOKEN }}
+      #     discord-webhook: ${{ env.DISCORD_WEBHOOK_URL }}
   # mobile-unit-test:
   #   runs-on: ubuntu-22.04
   #   steps:
