@@ -32,27 +32,36 @@ import ServiceMocker from "./ServiceMocker"
 Cypress.Commands.add(
   "restartImposterAndMockTextCompletion",
   { prevSubject: true },
-  (serviceMocker: ServiceMocker, request: string, reply: string, finishReason: "length" | "stop") => {
+  (
+    serviceMocker: ServiceMocker,
+    request: string,
+    reply: string,
+    finishReason: "length" | "stop",
+  ) => {
     serviceMocker.install()
-    serviceMocker.stubPosterWithBody(`/v1/completions`, { prompt: request}, {
-      id: "cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7",
-      object: "text_completion",
-      created: 1589478378,
-      model: "text-davinci-003",
-      choices: [
-        {
-          text: reply,
-          index: 0,
-          logprobs: null,
-          finish_reason: finishReason,
+    serviceMocker.stubPosterWithBody(
+      `/v1/completions`,
+      { prompt: request },
+      {
+        id: "cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7",
+        object: "text_completion",
+        created: 1589478378,
+        model: "text-davinci-003",
+        choices: [
+          {
+            text: reply,
+            index: 0,
+            logprobs: null,
+            finish_reason: finishReason,
+          },
+        ],
+        usage: {
+          prompt_tokens: 5,
+          completion_tokens: 7,
+          total_tokens: 12,
         },
-      ],
-      usage: {
-        prompt_tokens: 5,
-        completion_tokens: 7,
-        total_tokens: 12,
       },
-    })
+    )
   },
 )
 

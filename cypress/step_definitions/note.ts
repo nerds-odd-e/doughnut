@@ -485,8 +485,7 @@ Given("我打開標題為{string}這個筆記", (noteTitle: string) => {
   cy.jumpToNotePage(noteTitle)
 })
 
-Given("AI會基於{string}得到補全描述{string}", (requestMessage:string, returnMessage: string) => {
-
+Given("AI會基於{string}得到補全描述{string}", (requestMessage: string, returnMessage: string) => {
   cy.openAiService().restartImposterAndMockTextCompletion(requestMessage, returnMessage, "stop")
 })
 

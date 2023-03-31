@@ -2,7 +2,7 @@ import NoteControlCenterForUser from "@/components/toolbars/NoteControlCenterFor
 import { StoredApi } from "@/store/StoredApiCollection";
 import { VueWrapper } from "@vue/test-utils";
 import makeMe from "tests/fixtures/makeMe";
-import { beforeEach, describe } from "vitest";
+import { beforeEach, describe, vi } from "vitest";
 import helper from "../helpers";
 
 describe("NoteControlCenterForUser", () => {
@@ -60,17 +60,16 @@ describe("NoteControlCenterForUser", () => {
   });
 
   it('ask api be called many times until res.finishReason equal "stop" when clicking the suggest button', async () => {
-    let beCalledTimes = 0;
-
     const updateTextContent: StoredApi["updateTextContent"] = async () => {
-      beCalledTimes += 1;
       helper.apiMock
         .expectingPost(`/api/ai/ask-suggestions`)
         .andReturnOnce({ suggestion: "suggestion", finishReason: "stop" });
       return {} as Generated.NoteRealm;
     };
 
-    mountComponentWithNote(updateTextContent);
+    const mockFn = vi.fn().mockImplementation(updateTextContent);
+
+    mountComponentWithNote(mockFn);
 
     helper.apiMock
       .expectingPost(`/api/ai/ask-suggestions`)
@@ -78,6 +77,6 @@ describe("NoteControlCenterForUser", () => {
 
     await wrapper.findAll(".btn")[4].trigger("click");
 
-    setTimeout(() => expect(beCalledTimes).toBe(2), 1);
+    setTimeout(() => expect(mockFn).toBeCalledTimes(2), 1);
   });
 });

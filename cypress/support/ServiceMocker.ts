@@ -43,7 +43,7 @@ class ServiceMocker {
     const predicate = new EqualPredicate()
       .withPath(path)
       .withMethod(HttpMethod.POST)
-      .withBody(request);
+      .withBody(request)
     return this.mountebank.stubWithPredicate(predicate, response)
   }
 
