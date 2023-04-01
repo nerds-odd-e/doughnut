@@ -11,9 +11,9 @@
     typescript "^4.4.2"
 
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.10.4":
-  version "7.18.6"
-  resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.18.6.tgz#3b25d38c89600baa2dcc219edfa88a74eb2c427a"
-  integrity sha512-TDCmlK5eOvH+eH7cdAFlNXeVJqWIQ7gW9tY1GJIpUtFb6CmjVyq2VM3u71bOyR8CRihcCgMUYoDNyLXao3+70Q==
+  version "7.21.4"
+  resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.21.4.tgz#d0fa9e4413aca81f2b23b9442797bda1826edb39"
+  integrity sha512-LYvhNKfwWSPpocw8GI7gpK2nq3HSDuEPC/uSYaALSJu9xjsalaaYFOq0Pwt5KmVqwEbZlDu81aLXwBOmD/Fv9g==
   dependencies:
     "@babel/highlight" "^7.18.6"
 
@@ -32,9 +32,9 @@
     js-tokens "^4.0.0"
 
 "@babel/parser@^7.18.8":
-  version "7.21.3"
-  resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.21.3.tgz#1d285d67a19162ff9daa358d4cb41d50c06220b3"
-  integrity sha512-lobG0d7aOfQRXh8AyklEAgZGvA4FShxo6xQbUrrT/cNBPUdIDojlokwJsQyCC/eKia7ifqM0yP+2DRZ4WKw2RQ==
+  version "7.21.4"
+  resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.21.4.tgz#94003fdfc520bbe2875d4ae557b43ddb6d880f17"
+  integrity sha512-alVJj7k7zIxqBZ7BTRhz0IqJFxW1VJbm6N8JbcYhQ186df9ZBPbZBmWSqAMXwHGsCJdYks7z/voa3ibiS5bCIw==
 
 "@babel/runtime@^7.12.5", "@babel/runtime@^7.14.6", "@babel/runtime@^7.15.4":
   version "7.21.0"
@@ -56,9 +56,9 @@
     node-hook "^1.0.0"
 
 "@badeball/cypress-cucumber-preprocessor@^16.0":
-  version "16.0.1"
-  resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-16.0.1.tgz#cde4d65e06c2c4c74ca36180b0c1149429bcfe2a"
-  integrity sha512-5f3vHevWIVCUbjr6kRvQeOFkZikZ1mv+9gqvEZ/73FSc4GSYRQS9kZc3v3xSHE0XIUWdHfCgGTYplGsxyIKW4g==
+  version "16.0.2"
+  resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-16.0.2.tgz#4b2c002c4c4747510560042ec1db0130e56e0435"
+  integrity sha512-rbkFV+h3opm0bveghnw3sHdaE3w7Jt47cAUkbHmcUQSHo0D9KDoK/fbR3/CmlSdLFJSeyJ8nsHF2mBwI4jb5Nw==
   dependencies:
     "@badeball/cypress-configuration" "^4.0.0"
     "@cucumber/cucumber" "^8.11.1"
