@@ -1,5 +1,5 @@
 <template>
-  <div class="thin-loading-bar">
+  <div class="toolbar-overlap">
     <slot />
   </div>
 </template>
@@ -9,7 +9,7 @@ export default {};
 </script>
 
 <style lang="scss" scoped>
-.thin-loading-bar {
+.toolbar-overlap {
   position: absolute;
   left: 0;
   width: 100%;
