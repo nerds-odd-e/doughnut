@@ -1,5 +1,5 @@
 <template>
-  <div class="thin-loading-bar loading-bar">
+  <div class="thin-loading-bar">
     <slot />
   </div>
 </template>
