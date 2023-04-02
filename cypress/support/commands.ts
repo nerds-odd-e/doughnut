@@ -614,3 +614,8 @@ Cypress.Commands.add("aiSuggestionDialogButtonClick", (buttonName: string) => {
     throw new Error("Invalid button name")
   }
 })
+
+Cypress.Commands.add("dismissLastErrorMessage", () => {
+  cy.get(".last-error-message").click()
+})
+

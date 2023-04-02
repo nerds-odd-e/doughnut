@@ -90,7 +90,7 @@ Then("The {string} page is displayed", (pageName) => {
       break
     case "ErrorPage":
       cy.findAllByText("It seems you cannot access this page.")
-      cy.get(".last-error-message").click()
+      cy.dismissLastErrorMessage()
       break
     default:
       cy.failure()

@@ -186,6 +186,7 @@ When("I create a sibling note of {string}:", (noteTitle: string, data: DataTable
 
 When("I should see that the note creation is not successful", () => {
   cy.expectFieldErrorMessage("Title", "size must be between 1 and 100")
+  cy.dismissLastErrorMessage()
 })
 
 Then("I should see {string} in note title", (noteTitle: string) => {

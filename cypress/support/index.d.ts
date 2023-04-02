@@ -8,6 +8,7 @@ declare namespace Cypress {
     space_intervals?: number
   }
   interface Chainable<Subject = any> {
+    dismissLastErrorMessage(): Chainable<any>
     aiSuggestionDialogButtonClick(buttonName: string): Chainable<any>
     addSiblingNoteButton(): Chainable<any>
     assertBlogPostInWebsiteByTitle(article: any): Chainable<any>
