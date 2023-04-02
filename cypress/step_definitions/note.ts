@@ -427,9 +427,9 @@ Then(
   },
 )
 
-When("I ask for a description suggestion for {string}", (noteTitle: string) => {
+When("I ask for a description suggestion for note {string}", (noteTitle: string) => {
   cy.jumpToNotePage(noteTitle)
-  cy.findByRole("button", { name: "Suggest" }).click()
+  cy.findByRole("button", { name: "Suggest1" }).click()
 })
 
 Then("I should be prompted with a suggested description {string}", (description: string) => {
@@ -477,10 +477,6 @@ Then("I try to submit again immediately", () => {
   cy.pageIsNotLoading()
 })
 
-Then("I generate description from {string}", (title: string) => {
-  cy.jumpToNotePage(title)
-  cy.findByRole("button", { name: "Suggest1" }).click()
-})
 Given("我打開標題為{string}這個筆記", (noteTitle: string) => {
   cy.jumpToNotePage(noteTitle)
 })
