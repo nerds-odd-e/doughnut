@@ -15,7 +15,7 @@
       />
     </div>
     <LoadingThinBar v-if="apiStatus.states.length > 0" />
-    <div data-testid="errorMessage" v-if="apiStatus.lastErrorMessage">
+    <div v-if="apiStatus.lastErrorMessage">
       {{ apiStatus.lastErrorMessage }}
     </div>
   </ToolbarFrame>

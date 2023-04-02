@@ -1,30 +1,17 @@
 <template>
-  <div class="thin-loading-bar loading-bar">
+  <ToolbarCover>
     <ContentLoader :height="15" :speed="2" primary-color="#888"></ContentLoader>
-  </div>
+  </ToolbarCover>
 </template>
 
 <script>
 import { ContentLoader } from "vue-content-loader";
+import ToolbarCover from "./ToolbarOver.vue";
 
 export default {
   components: {
     ContentLoader,
+    ToolbarCover,
   },
 };
 </script>
-<style lang="scss" scoped>
-.thin-loading-bar {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  opacity: 0.5;
-  z-index: 999999;
-
-  svg {
-    width: 100%;
-    height: 100%;
-    z-index: 999999;
-  }
-}
-</style>
