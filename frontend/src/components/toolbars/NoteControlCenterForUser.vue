@@ -131,7 +131,6 @@ export default defineComponent({
   },
   data() {
     return {
-      environment: "testing",
       errorMessage: "",
     };
   },
@@ -184,9 +183,6 @@ export default defineComponent({
         );
       }
     },
-  },
-  async mounted() {
-    this.environment = await this.api.testability.getEnvironment();
   },
 });
 </script>
