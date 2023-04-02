@@ -24,7 +24,7 @@ export default defineComponent({
       featureToggle: false,
       environment: "production",
       storageAccessor: createNoteStorage(),
-      apiStatus: { states: [] } as ApiStatus,
+      apiStatus: { states: [], lastErrorMessage: undefined } as ApiStatus,
       userLoaded: false,
     };
   },

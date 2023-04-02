@@ -1,11 +1,14 @@
 import Api from "./Api";
 import { JsonData } from "./window/RestfulFetch";
 
-type ApiStatus = { states: boolean[] };
+type ApiStatus = {
+  states: boolean[];
+  lastErrorMessage: string | undefined;
+};
 
 class ManagedApi {
   static statusWrap = {
-    apiStatus: { states: [] } as ApiStatus,
+    apiStatus: { states: [], lastErrorMessage: undefined } as ApiStatus,
   };
 
   static registerStatus(apiStatus: ApiStatus) {
@@ -22,7 +25,14 @@ class ManagedApi {
     };
 
     assignLoading(true);
-    return promise.finally(() => assignLoading(false));
+    return promise
+      .catch((error) => {
+        if (error instanceof Error) {
+          ManagedApi.statusWrap.apiStatus.lastErrorMessage = error.message;
+        }
+        throw error;
+      })
+      .finally(() => assignLoading(false));
   }
 
   api;

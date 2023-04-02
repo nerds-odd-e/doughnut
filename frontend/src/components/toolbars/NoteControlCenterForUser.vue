@@ -72,9 +72,6 @@
           />
         </div>
       </div>
-      <div data-testid="errorMessage">
-        {{ errorMessage }}
-      </div>
     </template>
   </div>
 </template>
@@ -129,11 +126,6 @@ export default defineComponent({
     NoteEngagingStoryDialog,
     SvgRobot,
   },
-  data() {
-    return {
-      errorMessage: "",
-    };
-  },
   computed: {
     selectedNote(): Generated.Note | undefined {
       return this.storageAccessor.selectedNote;
@@ -151,25 +143,19 @@ export default defineComponent({
       };
     },
     async askSuggestionApi(selectedNote: Generated.Note, prompt: string) {
-      try {
-        const res = await this.api.ai.askAiSuggestions({
-          prompt,
-        });
+      const res = await this.api.ai.askAiSuggestions({
+        prompt,
+      });
 
-        await this.storageAccessor
-          .api(this.$router)
-          .updateTextContent(
-            selectedNote.id,
-            this.generateTextContent(selectedNote.title, res.suggestion),
-            selectedNote.textContent
-          );
-        if (res.finishReason === "length") {
-          await this.askSuggestionApi(selectedNote, res.suggestion);
-        }
-      } catch (e) {
-        if (e instanceof Error) {
-          this.errorMessage = e.message;
-        }
+      await this.storageAccessor
+        .api(this.$router)
+        .updateTextContent(
+          selectedNote.id,
+          this.generateTextContent(selectedNote.title, res.suggestion),
+          selectedNote.textContent
+        );
+      if (res.finishReason === "length") {
+        await this.askSuggestionApi(selectedNote, res.suggestion);
       }
     },
     async suggestDescriptionByTitle() {
