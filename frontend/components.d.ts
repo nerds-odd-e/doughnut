@@ -34,6 +34,7 @@ declare module '@vue/runtime-core' {
     InitialReview: typeof import('./src/components/review/InitialReview.vue')['default']
     InitialReviewButtons: typeof import('./src/components/review/InitialReviewButtons.vue')['default']
     InputWithType: typeof import('./src/components/form/InputWithType.vue')['default']
+    LastErrorMessage: typeof import('./src/components/commons/LastErrorMessage.vue')['default']
     LinkNob: typeof import('./src/components/links/LinkNob.vue')['default']
     LinkNobDialog: typeof import('./src/components/links/LinkNobDialog.vue')['default']
     LinkNoteDialog: typeof import('./src/components/links/LinkNoteDialog.vue')['default']

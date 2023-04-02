@@ -15,9 +15,11 @@
       />
     </div>
     <LoadingThinBar v-if="apiStatus.states.length > 0" />
-    <div v-if="apiStatus.lastErrorMessage">
-      {{ apiStatus.lastErrorMessage }}
-    </div>
+    <LastErrorMessage
+      v-if="apiStatus.lastErrorMessage"
+      :error-message="apiStatus.lastErrorMessage"
+      @close="$emit('clearErrorMessage')"
+    />
   </ToolbarFrame>
 </template>
 
@@ -32,6 +34,7 @@ import NoteControlCenterForUser from "./NoteControlCenterForUser.vue";
 import ReviewButton from "./ReviewButton.vue";
 import { ApiStatus } from "../../managedApi/ManagedApi";
 import LoadingThinBar from "../commons/LoadingThinBar.vue";
+import LastErrorMessage from "../commons/LastErrorMessage.vue";
 
 export default defineComponent({
   props: {
@@ -42,7 +45,7 @@ export default defineComponent({
     apiStatus: { type: Object as PropType<ApiStatus>, required: true },
     user: { type: Object as PropType<Generated.User> },
   },
-  emits: ["updateUser"],
+  emits: ["updateUser", "clearErrorMessage"],
   components: {
     ToolbarFrame,
     NoteUndoButton,
@@ -51,6 +54,7 @@ export default defineComponent({
     NoteControlCenterForUser,
     ReviewButton,
     LoadingThinBar,
+    LastErrorMessage,
   },
 });
 </script>

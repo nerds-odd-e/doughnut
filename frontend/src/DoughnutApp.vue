@@ -83,6 +83,7 @@ export default defineComponent({
           <ControlCenter
             v-bind="{ storageAccessor, user, apiStatus }"
             @update-user="user = $event"
+            @clear-error-message="apiStatus.lastErrorMessage = undefined"
           />
         </div>
         <router-view v-bind="routeViewProps" />

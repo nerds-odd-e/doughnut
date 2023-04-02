@@ -509,7 +509,9 @@ Then("描述補全功能就無法使用但建議功能可以使用", () => {
 })
 
 Then("I should see that the open AI service is not available in controller bar", () => {
-  cy.findByTestId("errorMessage").should((elem) => {
-    expect(elem.text()).to.equal("The OpenAI request was not Authorized.")
-  })
+  cy.get(".last-error-message")
+    .should((elem) => {
+      expect(elem.text()).to.equal("The OpenAI request was not Authorized.")
+    })
+    .click()
 })
