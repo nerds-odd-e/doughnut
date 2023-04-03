@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, provide } from "vue";
 import Popups from "./components/commons/Popups/Popups.vue";
 import TestMenu from "./components/commons/TestMenu.vue";
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
@@ -12,6 +12,9 @@ import ManagedApi, { ApiStatus } from "./managedApi/ManagedApi";
 
 export default defineComponent({
   setup() {
+    const managedApi = new ManagedApi();
+    provide("managedApi", managedApi);
+
     return {
       ...useLoadingApi(),
       ...usePopups(),

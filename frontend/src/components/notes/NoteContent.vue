@@ -122,7 +122,6 @@ export default defineComponent({
 </script>
 
 <style lang="sass" scoped>
-.note-content
 .header-options
   display: flex
   align-items: center
