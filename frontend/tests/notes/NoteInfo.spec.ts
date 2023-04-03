@@ -1,6 +1,7 @@
-import { mount, flushPromises } from "@vue/test-utils";
+import { flushPromises } from "@vue/test-utils";
 import NoteInfoButton from "@/components/notes/NoteInfoButton.vue";
 import makeMe from "../fixtures/makeMe";
+import helper from "../helpers";
 
 beforeEach(() => {
   fetchMock.resetMocks();
@@ -14,9 +15,13 @@ const stubResponse = {
 describe("note info", () => {
   it("should render values", async () => {
     fetchMock.mockResponseOnce(JSON.stringify(stubResponse));
-    const wrapper = mount(NoteInfoButton, {
-      propsData: { noteId: 123, expanded: true },
-    });
+    const wrapper = helper
+      .component(NoteInfoButton)
+      .withProps({
+        noteId: 123,
+        expanded: true,
+      })
+      .mount();
     await flushPromises();
     expect(wrapper.findAll(".statistics-value")).toHaveLength(5);
   });

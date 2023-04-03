@@ -3,6 +3,7 @@ import { mount, VueWrapper } from "@vue/test-utils";
 import { render } from "@testing-library/vue";
 import { App, ComponentPublicInstance, DefineComponent } from "vue";
 import { RouteLocationRaw } from "vue-router";
+import ManagedApi from "@/managedApi/ManagedApi";
 import createNoteStorage from "../../src/store/createNoteStorage";
 
 interface VuePlugin {
@@ -20,6 +21,9 @@ class RenderingHelper {
     directives: {
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       focus() {},
+    },
+    provide: {
+      managedApi: new ManagedApi(),
     },
     stubs: {
       "router-view": true,

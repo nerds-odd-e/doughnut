@@ -3,7 +3,7 @@ import { defineComponent, provide } from "vue";
 import Popups from "./components/commons/Popups/Popups.vue";
 import TestMenu from "./components/commons/TestMenu.vue";
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
-import { withLoadingApi } from "./managedApi/useLoadingApi1";
+import { withLoadingApi } from "./managedApi/useLoadingApi";
 import usePopups from "./components/commons/Popups/usePopups";
 import ControlCenter from "./components/toolbars/ControlCenter.vue";
 import createNoteStorage from "./store/createNoteStorage";
