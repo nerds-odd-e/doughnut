@@ -618,4 +618,3 @@ Cypress.Commands.add("aiSuggestionDialogButtonClick", (buttonName: string) => {
 Cypress.Commands.add("dismissLastErrorMessage", () => {
   cy.get(".last-error-message").click()
 })
-
