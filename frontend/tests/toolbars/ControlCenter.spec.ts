@@ -1,5 +1,6 @@
 import { screen } from "@testing-library/vue";
 import ControlCenter from "@/components/toolbars/ControlCenter.vue";
+import ManagedApi from "@/managedApi/ManagedApi";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 import createNoteStorage, {
@@ -15,7 +16,10 @@ describe("Note Control Center", () => {
 
   beforeEach(() => {
     noteEditingHistory = new NoteEditingHistory();
-    histories = createNoteStorage(noteEditingHistory);
+    histories = createNoteStorage(
+      new ManagedApi({ states: [], errors: [] }),
+      noteEditingHistory
+    );
   });
 
   it("fetch API to be called ONCE", async () => {

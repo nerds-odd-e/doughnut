@@ -17,13 +17,15 @@ class RenderingHelper {
 
   private route = {};
 
+  private managedApi = new ManagedApi({ states: [], errors: [] });
+
   private global = {
     directives: {
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       focus() {},
     },
     provide: {
-      managedApi: new ManagedApi(),
+      managedApi: this.managedApi,
     },
     stubs: {
       "router-view": true,
@@ -40,7 +42,10 @@ class RenderingHelper {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   withStorageProps(props: any) {
-    return this.withProps({ storageAccessor: createNoteStorage(), ...props });
+    return this.withProps({
+      storageAccessor: createNoteStorage(this.managedApi),
+      ...props,
+    });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

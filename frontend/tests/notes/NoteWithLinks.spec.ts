@@ -1,5 +1,6 @@
 import { flushPromises } from "@vue/test-utils";
 import NoteWithLinks from "@/components/notes/NoteWithLinks.vue";
+import ManagedApi from "@/managedApi/ManagedApi";
 import createNoteStorage from "../../src/store/createNoteStorage";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
@@ -74,7 +75,9 @@ describe("in place edit on title", () => {
 
 describe("undo editing", () => {
   it("should call addEditingToUndoHistory on submitChange", async () => {
-    const histories = createNoteStorage();
+    const histories = createNoteStorage(
+      new ManagedApi({ errors: [], states: [] })
+    );
 
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please();
     helper.apiMock.expectingPatch(`/api/text_content/${noteRealm.id}`);

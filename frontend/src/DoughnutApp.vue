@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, provide, ref, Ref } from "vue";
+import { defineComponent, provide, ref } from "vue";
 import Popups from "./components/commons/Popups/Popups.vue";
 import TestMenu from "./components/commons/TestMenu.vue";
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
@@ -12,16 +12,18 @@ import ManagedApi, { ApiStatus } from "./managedApi/ManagedApi";
 
 export default defineComponent({
   setup() {
-    const apiStatus: Ref<ApiStatus> = ref({
+    const apiStatus: ApiStatus = {
       errors: [],
       states: [],
-    });
-    ManagedApi.registerStatus(apiStatus.value);
+    };
+    ManagedApi.registerStatus(apiStatus);
     const managedApi = new ManagedApi();
+    const storageAccessor = createNoteStorage(managedApi);
     provide("managedApi", managedApi);
 
     return {
-      apiStatus,
+      apiStatus: ref(apiStatus),
+      storageAccessor: ref(storageAccessor),
       ...withLoadingApi(managedApi),
       ...usePopups(),
     };
@@ -32,7 +34,6 @@ export default defineComponent({
       user: undefined as undefined | Generated.User,
       featureToggle: false,
       environment: "production",
-      storageAccessor: createNoteStorage(),
       userLoaded: false,
     };
   },

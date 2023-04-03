@@ -48,7 +48,8 @@ class ManagedApi {
 
   api;
 
-  constructor() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  constructor(_apiStatus?: ApiStatus) {
     this.api = new Api("/api/");
   }
 

@@ -60,11 +60,12 @@ export default class StoredApiCollection implements StoredApi {
   router: Router;
 
   constructor(
+    managedApi: ManagedApi,
     undoHistory: NoteEditingHistory,
     router: Router,
     storage: NoteStorage
   ) {
-    this.managedApi = new ManagedApi();
+    this.managedApi = managedApi;
     this.noteEditingHistory = undoHistory;
     this.storage = storage;
     this.router = router;

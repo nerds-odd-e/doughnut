@@ -1,3 +1,4 @@
+import ManagedApi from "@/managedApi/ManagedApi";
 import { Ref } from "vue";
 import { Router } from "vue-router";
 import NoteEditingHistory, { HistoryRecord } from "./NoteEditingHistory";
@@ -16,8 +17,11 @@ class AccessorImplementation
 {
   noteEditingHistory: NoteEditingHistory;
 
-  constructor(noteEditingHistory?: NoteEditingHistory) {
+  managedApi: ManagedApi;
+
+  constructor(managedApi: ManagedApi, noteEditingHistory?: NoteEditingHistory) {
     super();
+    this.managedApi = managedApi;
     if (noteEditingHistory) {
       this.noteEditingHistory = noteEditingHistory;
     } else {
@@ -30,14 +34,20 @@ class AccessorImplementation
   }
 
   api(router: Router): StoredApi {
-    return new StoredApiCollection(this.noteEditingHistory, router, this);
+    return new StoredApiCollection(
+      this.managedApi,
+      this.noteEditingHistory,
+      router,
+      this
+    );
   }
 }
 
 function createNoteStorage(
+  managedApi: ManagedApi,
   noteEditingHistory?: NoteEditingHistory
 ): StorageAccessor {
-  return new AccessorImplementation(noteEditingHistory);
+  return new AccessorImplementation(managedApi, noteEditingHistory);
 }
 
 export default createNoteStorage;
