@@ -1,9 +1,10 @@
 <template>
   <LoadingThinBar v-if="apiStatus.states.length > 0" />
   <LastErrorMessage
-    v-if="apiStatus.lastErrorMessage"
-    :error-message="apiStatus.lastErrorMessage"
-    @close="$emit('clearErrorMessage')"
+    v-for="error in apiStatus.errors"
+    :error="error"
+    @close="$emit('clearErrorMessage', error.id)"
+    :key="error.id"
   />
 </template>
 

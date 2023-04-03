@@ -1,16 +1,17 @@
 <template>
   <ToolbarCover class="last-error-message" @click="$emit('close')">
-    {{ errorMessage }}
+    {{ error.message }}
   </ToolbarCover>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
+import { ApiError } from "@/managedApi/ManagedApi";
 import ToolbarCover from "./ToolbarOver.vue";
 
 export default defineComponent({
   props: {
-    errorMessage: { type: String, required: true },
+    error: { type: Object as PropType<ApiError>, required: true },
   },
   components: {
     ToolbarCover,

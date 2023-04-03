@@ -9,7 +9,6 @@ type ApiError = {
 type ApiStatus = {
   states: boolean[];
   errors: ApiError[];
-  lastErrorMessage: string | undefined;
 };
 
 class ManagedApi {
@@ -17,7 +16,6 @@ class ManagedApi {
     apiStatus: {
       states: [],
       errors: [],
-      lastErrorMessage: undefined,
     } as ApiStatus,
   };
 
@@ -38,7 +36,6 @@ class ManagedApi {
     return promise
       .catch((error) => {
         if (error instanceof Error) {
-          ManagedApi.statusWrap.apiStatus.lastErrorMessage = error.message;
           ManagedApi.statusWrap.apiStatus.errors.push({
             message: error.message,
             id: Date.now(),
@@ -81,4 +78,4 @@ class ManagedApi {
 }
 
 export default ManagedApi;
-export type { ApiStatus };
+export type { ApiStatus, ApiError };

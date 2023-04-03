@@ -27,7 +27,6 @@ export default defineComponent({
       apiStatus: {
         states: [],
         errors: [],
-        lastErrorMessage: undefined,
       } as ApiStatus,
       userLoaded: false,
     };
@@ -44,6 +43,12 @@ export default defineComponent({
   watch: {
     $route() {
       this.popups.done(false);
+    },
+  },
+
+  methods: {
+    clearErrorMessage(_id: number) {
+      this.apiStatus.errors = [];
     },
   },
 
@@ -87,7 +92,7 @@ export default defineComponent({
           <ControlCenter
             v-bind="{ storageAccessor, user, apiStatus }"
             @update-user="user = $event"
-            @clear-error-message="apiStatus.lastErrorMessage = undefined"
+            @clear-error-message="clearErrorMessage($event)"
           />
         </div>
         <router-view v-bind="routeViewProps" />
