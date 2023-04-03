@@ -1,14 +1,24 @@
 import Api from "./Api";
 import { JsonData } from "./window/RestfulFetch";
 
+type ApiError = {
+  id: number;
+  message: string;
+};
+
 type ApiStatus = {
   states: boolean[];
+  errors: ApiError[];
   lastErrorMessage: string | undefined;
 };
 
 class ManagedApi {
   static statusWrap = {
-    apiStatus: { states: [], lastErrorMessage: undefined } as ApiStatus,
+    apiStatus: {
+      states: [],
+      errors: [],
+      lastErrorMessage: undefined,
+    } as ApiStatus,
   };
 
   static registerStatus(apiStatus: ApiStatus) {
@@ -29,6 +39,10 @@ class ManagedApi {
       .catch((error) => {
         if (error instanceof Error) {
           ManagedApi.statusWrap.apiStatus.lastErrorMessage = error.message;
+          ManagedApi.statusWrap.apiStatus.errors.push({
+            message: error.message,
+            id: Date.now(),
+          });
         }
         throw error;
       })

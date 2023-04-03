@@ -17,9 +17,7 @@ describe("managdApi", () => {
       } catch (e) {
         // ignore
       }
-      expect(ManagedApi.statusWrap.apiStatus.lastErrorMessage).toEqual(
-        "got 404"
-      );
+      expect(ManagedApi.statusWrap.apiStatus.errors).toHaveLength(1);
     });
   });
 });
