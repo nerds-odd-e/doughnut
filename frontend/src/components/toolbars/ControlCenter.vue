@@ -14,11 +14,9 @@
         @update-user="$emit('updateUser', $event)"
       />
     </div>
-    <LoadingThinBar v-if="apiStatus.states.length > 0" />
-    <LastErrorMessage
-      v-if="apiStatus.lastErrorMessage"
-      :error-message="apiStatus.lastErrorMessage"
-      @close="$emit('clearErrorMessage')"
+    <ApiStatus
+      :api-status="apiStatus"
+      @clear-error-message="$emit('clearErrorMessage')"
     />
   </ToolbarFrame>
 </template>
@@ -33,8 +31,6 @@ import BrandBar from "./BrandBar.vue";
 import NoteControlCenterForUser from "./NoteControlCenterForUser.vue";
 import ReviewButton from "./ReviewButton.vue";
 import { ApiStatus } from "../../managedApi/ManagedApi";
-import LoadingThinBar from "../commons/LoadingThinBar.vue";
-import LastErrorMessage from "../commons/LastErrorMessage.vue";
 
 export default defineComponent({
   props: {
@@ -53,8 +49,6 @@ export default defineComponent({
     BrandBar,
     NoteControlCenterForUser,
     ReviewButton,
-    LoadingThinBar,
-    LastErrorMessage,
   },
 });
 </script>
