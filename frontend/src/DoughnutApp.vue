@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, provide } from "vue";
+import { defineComponent, provide, ref, Ref } from "vue";
 import Popups from "./components/commons/Popups/Popups.vue";
 import TestMenu from "./components/commons/TestMenu.vue";
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
@@ -12,10 +12,16 @@ import ManagedApi, { ApiStatus } from "./managedApi/ManagedApi";
 
 export default defineComponent({
   setup() {
+    const apiStatus: Ref<ApiStatus> = ref({
+      errors: [],
+      states: [],
+    });
+    ManagedApi.registerStatus(apiStatus.value);
     const managedApi = new ManagedApi();
     provide("managedApi", managedApi);
 
     return {
+      apiStatus,
       ...withLoadingApi(managedApi),
       ...usePopups(),
     };
@@ -27,10 +33,6 @@ export default defineComponent({
       featureToggle: false,
       environment: "production",
       storageAccessor: createNoteStorage(),
-      apiStatus: {
-        states: [],
-        errors: [],
-      } as ApiStatus,
       userLoaded: false,
     };
   },
@@ -73,7 +75,6 @@ export default defineComponent({
   },
 
   async mounted() {
-    ManagedApi.registerStatus(this.apiStatus);
     this.environment = this.api.testability.getEnvironment();
     this.featureToggle = await this.api.testability.getFeatureToggle();
     const userInfo = await this.api.userMethods.getCurrentUserInfo();
