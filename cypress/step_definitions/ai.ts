@@ -21,7 +21,7 @@ Given("OpenAI always returns text completion {string}", (description: string) =>
 })
 
 Given("OpenAI returns text completion {string} for prompt {string}", (returnMessage: string, requestMessage: string) => {
-  cy.openAiService().restartImposterAndMockTextCompletion(requestMessage, returnMessage, "stop")
+  cy.openAiService().restartImposterAndMockTextCompletion(requestMessage, returnMessage)
 })
 
 Given("OpenAI always return image of a moon", () => {

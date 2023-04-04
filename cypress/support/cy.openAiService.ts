@@ -36,7 +36,6 @@ Cypress.Commands.add(
     serviceMocker: ServiceMocker,
     request: string,
     reply: string,
-    finishReason: "length" | "stop",
   ) => {
     serviceMocker.install()
     serviceMocker.stubPosterWithBody(
@@ -52,7 +51,7 @@ Cypress.Commands.add(
             text: reply,
             index: 0,
             logprobs: null,
-            finish_reason: finishReason,
+            finish_reason: "stop",
           },
         ],
         usage: {
