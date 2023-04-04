@@ -465,10 +465,6 @@ Then("I try to submit again immediately", () => {
   cy.pageIsNotLoading()
 })
 
-Given("我打開標題為{string}這個筆記", (noteTitle: string) => {
-  cy.jumpToNotePage(noteTitle)
-})
-
 Given("AI會基於{string}得到補全描述{string}", (requestMessage: string, returnMessage: string) => {
   cy.openAiService().restartImposterAndMockTextCompletion(requestMessage, returnMessage, "stop")
 })
@@ -476,7 +472,8 @@ Given("AI會基於{string}得到補全描述{string}", (requestMessage: string, 
 Given("AI會返回{string}", (returnMessage: string) => {
   cy.openAiService().restartImposterAndStubTextCompletion(returnMessage, "stop")
 })
-When("要求補全描述", () => {
+Given("I ask to complete the description for note {string}", (noteTitle: string) => {
+  cy.jumpToNotePage(noteTitle)
   cy.findByRole("button", { name: "Suggest1" }).click()
 })
 Then("描述會變成{string}", (description: string) => {
