@@ -45,18 +45,6 @@ Given("there are notes from Note {int} to Note {int}", (from: number, to: number
   cy.testability().seedNotes(notes)
 })
 
-Given("OpenAI always return text completion {string}", (description: string) => {
-  cy.openAiService().restartImposterAndStubTextCompletion(description, "stop")
-})
-
-Given("OpenAI always return image of a moon", () => {
-  cy.openAiService().stubCreateImage()
-})
-
-Given("OpenAI returns an incomplete text completion {string}", (description: string) => {
-  cy.openAiService().restartImposterAndStubTextCompletion(description, "length")
-})
-
 When("I create notebooks with:", (notes: DataTable) => {
   notes.hashes().forEach((noteAttributes) => {
     cy.createNotebookWith(noteAttributes)
@@ -444,46 +432,14 @@ Then("I should find an art created by the ai", () => {
   cy.get("img.ai-art").should("be.visible")
 })
 
-Given("open AI service always think the system token is invalid", () => {
-  cy.openAiService().alwaysResponseAsUnauthorized()
-})
-
-Then("I should see that the open AI service is not available", () => {
-  cy.expectFieldErrorMessage("Suggestion", "The OpenAI request was not Authorized.")
-})
-
-Given("An OpenAI response is unavailable", () => {
-  cy.openAiService().stubOpenAiCompletionWithErrorResponse()
-})
-
-Then("I should be prompted with an error message saying {string}", (errorMessage: string) => {
-  cy.expectFieldErrorMessage("Engaging Story", errorMessage)
-})
-
 Then("I try to submit again immediately", () => {
   cy.get("form").submit()
   cy.pageIsNotLoading()
 })
 
-Given("AI會基於{string}得到補全描述{string}", (requestMessage: string, returnMessage: string) => {
-  cy.openAiService().restartImposterAndMockTextCompletion(requestMessage, returnMessage, "stop")
-})
-
-Given("AI會返回{string}", (returnMessage: string) => {
-  cy.openAiService().restartImposterAndStubTextCompletion(returnMessage, "stop")
-})
 Given("I ask to complete the description for note {string}", (noteTitle: string) => {
   cy.jumpToNotePage(noteTitle)
   cy.findByRole("button", { name: "Suggest1" }).click()
-})
-Then("描述會變成{string}", (description: string) => {
-  cy.get("[role=description]").should((elem) => {
-    expect(elem.text()).to.equal(description)
-  })
-})
-Then("刪除描述{string}", (noteDescription: string) => {
-  cy.findByText(noteDescription).click({ force: true })
-  cy.clearFocusedText()
 })
 
 Then("描述補全功能就無法使用但建議功能可以使用", () => {
