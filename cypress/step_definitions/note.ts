@@ -436,22 +436,6 @@ When("I ask for a description suggestion for note {string}", (noteTitle: string)
   cy.findByRole("button", { name: "Suggest1" }).click()
 })
 
-Then("I should be prompted with a suggested description {string}", (description: string) => {
-  cy.formField("Suggestion").fieldShouldHaveValue(description)
-})
-
-Then(
-  "I expect that the description will be {string} when I {string} the suggested description",
-  (value: string, action: string) => {
-    cy.aiSuggestionDialogButtonClick(action)
-    cy.findNoteDescriptionOnCurrentPage(value)
-  },
-)
-
-Then("I can ask the ai suggestion again", () => {
-  cy.aiSuggestionDialogButtonClick("ask again")
-})
-
 When("I ask for an engaging story for {string}", (noteTitle: string) => {
   cy.askForEngagingStory(noteTitle)
 })

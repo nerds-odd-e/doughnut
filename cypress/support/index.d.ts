@@ -9,7 +9,6 @@ declare namespace Cypress {
   }
   interface Chainable<Subject = any> {
     dismissLastErrorMessage(): Chainable<any>
-    aiSuggestionDialogButtonClick(buttonName: string): Chainable<any>
     addSiblingNoteButton(): Chainable<any>
     assertBlogPostInWebsiteByTitle(article: any): Chainable<any>
     associateNoteWithWikidataId(title: any, wikiID: any): Chainable<any>
