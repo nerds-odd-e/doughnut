@@ -16,8 +16,7 @@ export default defineComponent({
       errors: [],
       states: [],
     });
-    ManagedApi.registerStatus(apiStatus.value);
-    const managedApi = new ManagedApi();
+    const managedApi = new ManagedApi(apiStatus.value);
     const storageAccessor = createNoteStorage(managedApi);
     provide("managedApi", managedApi);
 

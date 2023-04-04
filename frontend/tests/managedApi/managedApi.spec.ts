@@ -1,10 +1,11 @@
-import ManagedApi from "@/managedApi/ManagedApi";
+import ManagedApi, { ApiStatus } from "@/managedApi/ManagedApi";
 import helper from "../helpers";
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("managdApi", () => {
-  const managedApi = new ManagedApi();
+  const apiStatus: ApiStatus = { states: [], errors: [] };
+  const managedApi = new ManagedApi(apiStatus);
 
   beforeEach(() => {
     helper.apiMock.expectingGet(`/api/call`).andRespondOnceWith404();
@@ -17,7 +18,7 @@ describe("managdApi", () => {
       } catch (e) {
         // ignore
       }
-      expect(ManagedApi.statusWrap.apiStatus.errors).toHaveLength(1);
+      expect(apiStatus.errors).toHaveLength(1);
     });
   });
 });
