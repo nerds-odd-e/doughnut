@@ -2,10 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import {
-  Given,
-  Then,
-} from "@badeball/cypress-cucumber-preprocessor"
+import { Given, Then } from "@badeball/cypress-cucumber-preprocessor"
 import "../support/string.extensions"
 
 Given("open AI service always think the system token is invalid", () => {
@@ -20,9 +17,12 @@ Given("OpenAI always returns text completion {string}", (description: string) =>
   cy.openAiService().restartImposterAndStubTextCompletion(description, "stop")
 })
 
-Given("OpenAI returns text completion {string} for prompt {string}", (returnMessage: string, requestMessage: string) => {
-  cy.openAiService().restartImposterAndMockTextCompletion(requestMessage, returnMessage)
-})
+Given(
+  "OpenAI returns text completion {string} for prompt {string}",
+  (returnMessage: string, requestMessage: string) => {
+    cy.openAiService().restartImposterAndMockTextCompletion(requestMessage, returnMessage)
+  },
+)
 
 Given("OpenAI always return image of a moon", () => {
   cy.openAiService().stubCreateImage()
