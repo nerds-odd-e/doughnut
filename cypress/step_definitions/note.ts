@@ -442,10 +442,6 @@ Given("I ask to complete the description for note {string}", (noteTitle: string)
   cy.findByRole("button", { name: "Suggest1" }).click()
 })
 
-Then("描述補全功能就無法使用但建議功能可以使用", () => {
-  cy.findByRole("button", { name: "Complete" }).should("not.exist")
-})
-
 Then("I should see that the open AI service is not available in controller bar", () => {
   cy.get(".last-error-message")
     .should((elem) => {
