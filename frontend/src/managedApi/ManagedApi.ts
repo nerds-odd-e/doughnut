@@ -29,6 +29,16 @@ class ManagedApi {
     }
   }
 
+  private addError(message: string): void {
+    const id = Date.now();
+    this.apiStatus.errors.push({ message, id });
+    setTimeout(() => {
+      this.apiStatus.errors = this.apiStatus.errors.filter(
+        (error) => error.id !== id
+      );
+    }, 2000);
+  }
+
   async around<T>(promise: Promise<T>): Promise<T> {
     this.assignLoading(true);
     try {
@@ -36,10 +46,7 @@ class ManagedApi {
         return await promise;
       } catch (error) {
         if (error instanceof Error) {
-          this.apiStatus.errors.push({
-            message: error.message,
-            id: Date.now(),
-          });
+          this.addError(error.message);
         }
         throw error;
       }

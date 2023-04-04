@@ -77,6 +77,6 @@ describe("NoteControlCenterForUser", () => {
 
     await wrapper.findAll(".btn")[4].trigger("click");
 
-    setTimeout(() => expect(mockFn).toBeCalledTimes(2), 1);
+    setTimeout(() => expect(mockFn).toBeCalledTimes(2), 0);
   });
 });
