@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, provide, ref } from "vue";
+import { defineComponent, provide, Ref, ref } from "vue";
 import Popups from "./components/commons/Popups/Popups.vue";
 import TestMenu from "./components/commons/TestMenu.vue";
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
@@ -12,17 +12,17 @@ import ManagedApi, { ApiStatus } from "./managedApi/ManagedApi";
 
 export default defineComponent({
   setup() {
-    const apiStatus: ApiStatus = {
+    const apiStatus: Ref<ApiStatus> = ref({
       errors: [],
       states: [],
-    };
-    ManagedApi.registerStatus(apiStatus);
+    });
+    ManagedApi.registerStatus(apiStatus.value);
     const managedApi = new ManagedApi();
     const storageAccessor = createNoteStorage(managedApi);
     provide("managedApi", managedApi);
 
     return {
-      apiStatus: ref(apiStatus),
+      apiStatus,
       storageAccessor: ref(storageAccessor),
       ...withLoadingApi(managedApi),
       ...usePopups(),
