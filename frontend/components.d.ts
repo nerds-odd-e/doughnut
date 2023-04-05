@@ -9,6 +9,8 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    AISuggest: typeof import('./src/components/toolbars/AISuggest.vue')['default']
+    AISuggestion: typeof import('./src/components/toolbars/AISuggestion.vue')['default']
     AnswerResult: typeof import('./src/components/review/AnswerResult.vue')['default']
     ApiStatus: typeof import('./src/components/toolbars/ApiStatus.vue')['default']
     Arrow: typeof import('./src/components/svgs/link_types/Arrow.vue')['default']

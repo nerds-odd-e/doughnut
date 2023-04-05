@@ -24,14 +24,7 @@
       v-bind="{ note: selectedNote, storageAccessor }"
     />
   </PopButton>
-  <a
-    :title="'Suggest1'"
-    class="btn btn-sm"
-    role="button"
-    @click="suggestDescriptionByTitle"
-  >
-    <SvgRobot />
-  </a>
+  <AISuggestion v-bind="{ selectedNote, storageAccessor }" />
   <PopButton title="search and link note">
     <template #button_face>
       <SvgSearch />
@@ -64,7 +57,6 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import useLoadingApi from "@/managedApi/useLoadingApi";
 import { StorageAccessor } from "@/store/createNoteStorage";
 import NoteNewButton from "./NoteNewButton.vue";
 import SvgAddChild from "../svgs/SvgAddChild.vue";
@@ -80,14 +72,9 @@ import SvgCog from "../svgs/SvgCog.vue";
 import NoteDeleteButton from "./NoteDeleteButton.vue";
 import PopButton from "../commons/Popups/PopButton.vue";
 import NoteEngagingStoryDialog from "../notes/NoteEngagingStoryDialog.vue";
-import SvgRobot from "../svgs/SvgRobot.vue";
+import AISuggestion from "./AISuggestion.vue";
 
 export default defineComponent({
-  setup() {
-    return {
-      ...useLoadingApi(),
-    };
-  },
   props: {
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
@@ -112,37 +99,11 @@ export default defineComponent({
     NoteDeleteButton,
     PopButton,
     NoteEngagingStoryDialog,
-    SvgRobot,
+    AISuggestion,
   },
   computed: {
     viewType() {
       return sanitizeViewTypeName(this.$route.meta?.viewType as string);
-    },
-  },
-  methods: {
-    async askSuggestionApi(prompt: string) {
-      const res = await this.api.ai.askAiSuggestions({
-        prompt,
-      });
-
-      await this.storageAccessor.api(this.$router).updateTextContent(
-        this.selectedNote.id,
-        {
-          title: this.selectedNote.title,
-          description: res.suggestion,
-        },
-        this.selectedNote.textContent
-      );
-      if (res.finishReason === "length") {
-        await this.askSuggestionApi(res.suggestion);
-      }
-    },
-    async suggestDescriptionByTitle() {
-      await this.askSuggestionApi(
-        this.selectedNote.textContent.description
-          ?.replace(/<\/?[^>]+(>|$)/g, "")
-          .trim() || `Tell me about "${this.selectedNote.title}"`
-      );
     },
   },
 });
