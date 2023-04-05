@@ -5,7 +5,7 @@
         <BrandBar />
       </div>
     </template>
-    <NoteControlCenterForUser v-else v-bind="{ user, storageAccessor }" />
+    <ControlCenterForUser v-else v-bind="{ user, storageAccessor }" />
     <div class="btn-group btn-group-sm">
       <ReviewButton class="btn" v-if="user" />
       <NoteUndoButton v-bind="{ storageAccessor }" />
@@ -28,7 +28,7 @@ import NoteUndoButton from "./NoteUndoButton.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import UserActionsButton from "./UserActionsButton.vue";
 import BrandBar from "./BrandBar.vue";
-import NoteControlCenterForUser from "./NoteControlCenterForUser.vue";
+import ControlCenterForUser from "./ControlCenterForUser.vue";
 import ReviewButton from "./ReviewButton.vue";
 import { ApiStatus } from "../../managedApi/ManagedApi";
 
@@ -47,7 +47,7 @@ export default defineComponent({
     NoteUndoButton,
     UserActionsButton,
     BrandBar,
-    NoteControlCenterForUser,
+    ControlCenterForUser,
     ReviewButton,
   },
 });

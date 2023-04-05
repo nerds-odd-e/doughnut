@@ -8,7 +8,7 @@
         <LinkNoteDialog v-bind="{ storageAccessor }" />
       </PopButton>
     </template>
-    <NoteControlCenter
+    <ControlCenterForNote
       v-if="selectedNote"
       v-bind="{ selectedNote, storageAccessor }"
     />
@@ -19,7 +19,7 @@
 import { defineComponent, PropType } from "vue";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import { StorageAccessor } from "@/store/createNoteStorage";
-import NoteControlCenter from "./NoteControlCenter.vue";
+import ControlCenterForNote from "./ControlCenterForNote.vue";
 import SvgSearch from "../svgs/SvgSearch.vue";
 import LinkNoteDialog from "../links/LinkNoteDialog.vue";
 import PopButton from "../commons/Popups/PopButton.vue";
@@ -39,7 +39,7 @@ export default defineComponent({
   },
   emits: ["updateUser"],
   components: {
-    NoteControlCenter,
+    ControlCenterForNote,
     SvgSearch,
     LinkNoteDialog,
     PopButton,

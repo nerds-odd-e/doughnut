@@ -26,6 +26,8 @@ declare module '@vue/runtime-core' {
     CircleSelector: typeof import('./src/components/circles/CircleSelector.vue')['default']
     ContentLoader: typeof import('./src/components/commons/ContentLoader.vue')['default']
     ControlCenter: typeof import('./src/components/toolbars/ControlCenter.vue')['default']
+    ControlCenterForNote: typeof import('./src/components/toolbars/ControlCenterForNote.vue')['default']
+    ControlCenterForUser: typeof import('./src/components/toolbars/ControlCenterForUser.vue')['default']
     copy: typeof import('./src/components/toolbars/NoteControlCenterForUser copy.vue')['default']
     DescriptionEditor: typeof import('./src/components/form/DescriptionEditor.vue')['default']
     DragListner: typeof import('./src/components/commons/DragListner.vue')['default']

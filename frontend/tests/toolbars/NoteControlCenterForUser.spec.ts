@@ -1,4 +1,4 @@
-import NoteControlCenterForUser from "@/components/toolbars/NoteControlCenterForUser.vue";
+import NoteControlCenterForUser from "@/components/toolbars/ControlCenterForUser.vue";
 import { StoredApi } from "@/store/StoredApiCollection";
 import { VueWrapper } from "@vue/test-utils";
 import makeMe from "tests/fixtures/makeMe";
