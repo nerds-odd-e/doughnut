@@ -124,7 +124,6 @@ export default defineComponent({
       return {
         title,
         description,
-        updatedAt: new Date().toDateString(),
       };
     },
     async askSuggestionApi(selectedNote: Generated.Note, prompt: string) {

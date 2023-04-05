@@ -37,7 +37,7 @@ export interface StoredApi {
 
   updateTextContent(
     noteId: Doughnut.ID,
-    noteContentData: Generated.TextContent,
+    noteContentData: Omit<Generated.TextContent, "updatedAt">,
     oldContent: Generated.TextContent
   ): Promise<Generated.NoteRealm>;
 
@@ -94,13 +94,11 @@ export default class StoredApiCollection implements StoredApi {
 
   private async updateTextContentWithoutUndo(
     noteId: Doughnut.ID,
-    noteContentData: Generated.TextContent
+    noteContentData: Omit<Generated.TextContent, "updatedAt">
   ) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { updatedAt, ...data } = noteContentData;
     return (await this.managedApi.restPatchMultiplePartForm(
       `text_content/${noteId}`,
-      data
+      noteContentData
     )) as Generated.NoteRealm;
   }
 
@@ -176,7 +174,7 @@ export default class StoredApiCollection implements StoredApi {
 
   async updateTextContent(
     noteId: Doughnut.ID,
-    noteContentData: Generated.TextContent,
+    noteContentData: Omit<Generated.TextContent, "updatedAt">,
     oldContent: Generated.TextContent
   ) {
     this.noteEditingHistory.addEditingToUndoHistory(noteId, oldContent);

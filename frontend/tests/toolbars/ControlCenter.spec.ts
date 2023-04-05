@@ -57,6 +57,7 @@ describe("ControlCenter with manual mock", () => {
     return helper
       .component(ControlCenter)
       .withStorageProps({
+        user: makeMe.aUser().please(),
         apiStatus: { states: [], errors: [] },
         storageAccessor: {
           selectedNote: note,
