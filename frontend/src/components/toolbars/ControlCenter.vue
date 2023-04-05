@@ -5,7 +5,20 @@
         <BrandBar />
       </div>
     </template>
-    <ControlCenterForUser v-else v-bind="{ user, storageAccessor }" />
+    <div class="btn-group btn-group-sm">
+      <template v-if="!selectedNote">
+        <PopButton title="search note">
+          <template #button_face>
+            <SvgSearch />
+          </template>
+          <LinkNoteDialog v-bind="{ storageAccessor }" />
+        </PopButton>
+      </template>
+      <ControlCenterForNote
+        v-if="selectedNote"
+        v-bind="{ selectedNote, storageAccessor }"
+      />
+    </div>
     <div class="btn-group btn-group-sm">
       <ReviewButton class="btn" v-if="user" />
       <NoteUndoButton v-bind="{ storageAccessor }" />
@@ -28,7 +41,7 @@ import NoteUndoButton from "./NoteUndoButton.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import UserActionsButton from "./UserActionsButton.vue";
 import BrandBar from "./BrandBar.vue";
-import ControlCenterForUser from "./ControlCenterForUser.vue";
+import ControlCenterForNote from "./ControlCenterForNote.vue";
 import ReviewButton from "./ReviewButton.vue";
 import { ApiStatus } from "../../managedApi/ManagedApi";
 
@@ -47,8 +60,13 @@ export default defineComponent({
     NoteUndoButton,
     UserActionsButton,
     BrandBar,
-    ControlCenterForUser,
+    ControlCenterForNote,
     ReviewButton,
+  },
+  computed: {
+    selectedNote(): Generated.Note | undefined {
+      return this.storageAccessor.selectedNote;
+    },
   },
 });
 </script>
