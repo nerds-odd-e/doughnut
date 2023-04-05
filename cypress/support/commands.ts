@@ -611,3 +611,14 @@ Cypress.Commands.add("askForEngagingStory", (noteTitle: string) => {
 Cypress.Commands.add("dismissLastErrorMessage", () => {
   cy.get(".last-error-message").click()
 })
+
+Cypress.Commands.add(
+  "aiSuggestDescriptionForNote",
+  (noteTitle: string) => {
+    cy.jumpToNotePage(noteTitle)
+    cy.on("uncaught:exception", () => {
+      return false
+    })
+    cy.findByRole("button", { name: "suggest description" }).click()
+  },
+)

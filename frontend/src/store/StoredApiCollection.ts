@@ -96,9 +96,17 @@ export default class StoredApiCollection implements StoredApi {
     noteId: Doughnut.ID,
     noteContentData: Omit<Generated.TextContent, "updatedAt">
   ) {
+    function excludeProperty<T, K extends string>(
+      obj: T,
+      property: K
+    ): Omit<T, K> {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { [property]: _, ...rest } = obj as T & Record<K, unknown>;
+      return rest;
+    }
     return (await this.managedApi.restPatchMultiplePartForm(
       `text_content/${noteId}`,
-      noteContentData
+      excludeProperty(noteContentData, "updatedAt")
     )) as Generated.NoteRealm;
   }
 

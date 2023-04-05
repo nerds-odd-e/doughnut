@@ -417,11 +417,7 @@ Then(
 )
 
 When("I ask for a description suggestion for note {string}", (noteTitle: string) => {
-  cy.jumpToNotePage(noteTitle)
-  cy.on("uncaught:exception", () => {
-    return false
-  })
-  cy.findByRole("button", { name: "suggest description" }).click()
+  cy.aiSuggestDescriptionForNote(noteTitle)
 })
 
 When("I ask for an engaging story for {string}", (noteTitle: string) => {
@@ -438,8 +434,7 @@ Then("I try to submit again immediately", () => {
 })
 
 Given("I ask to complete the description for note {string}", (noteTitle: string) => {
-  cy.jumpToNotePage(noteTitle)
-  cy.findByRole("button", { name: "suggest description" }).click()
+  cy.aiSuggestDescriptionForNote(noteTitle)
 })
 
 Then("I should see that the open AI service is not available in controller bar", () => {
