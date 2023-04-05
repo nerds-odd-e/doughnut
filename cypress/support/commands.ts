@@ -277,7 +277,12 @@ Cypress.Commands.add("routerToNotebooks", () => {
 })
 
 Cypress.Commands.add("startSearching", () => {
-  cy.notePageButtonOnCurrentPage("link note").click()
+  cy.notePageButtonOnCurrentPage("search note").click()
+})
+
+Cypress.Commands.add("startSearchingAndLinkNote", (noteTitle: string) => {
+  cy.jumpToNotePage(noteTitle)
+  cy.notePageButtonOnCurrentPage("search and link note").click()
 })
 
 Cypress.Commands.add("clickNotePageButton", (noteTitle, btnTextOrTitle, forceLoadPage) => {

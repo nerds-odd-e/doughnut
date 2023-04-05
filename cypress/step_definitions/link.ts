@@ -11,13 +11,11 @@ When("I start searching", () => {
 })
 
 When("I am creating link for note {string}", (noteTitle: string) => {
-  cy.jumpToNotePage(noteTitle)
-  cy.startSearching()
+  cy.startSearchingAndLinkNote(noteTitle)
 })
 
 function makingLink(cy, fromNoteTitle: string, linkType: string, toNoteTitle: string) {
-  cy.jumpToNotePage(fromNoteTitle)
-  cy.startSearching()
+  cy.startSearchingAndLinkNote(fromNoteTitle)
   cy.searchNote(toNoteTitle, ["All My Notebooks And Subscriptions"])
   cy.clickButtonOnCardBody(toNoteTitle, "Select")
   cy.clickRadioByLabel(linkType)

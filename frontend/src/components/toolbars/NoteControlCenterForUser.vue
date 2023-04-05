@@ -1,7 +1,7 @@
 <template>
   <div class="btn-group btn-group-sm">
     <template v-if="!selectedNote">
-      <PopButton title="link note">
+      <PopButton title="search note">
         <template #button_face>
           <SvgSearch />
         </template>

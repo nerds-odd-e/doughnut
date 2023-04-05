@@ -91,6 +91,7 @@ declare namespace Cypress {
     shareToBazaar(noteTitle: string): Chainable<Subject>
     shouldSeeQuizWithOptions(questionParts: any, options: any): Chainable<any>
     startSearching(): Chainable<any>
+    startSearchingAndLinkNote(noteTitle: string): Chainable<any>
     stubWikidataEntityLocation(wikidataId: string, lat: number, lng: number): Chainable<Subject>
     stubWikidataEntityBook(wikidataId: string, authorId: string[]): Chainable<Subject>
     stubWikidataEntityPerson(

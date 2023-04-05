@@ -32,7 +32,7 @@
   >
     <SvgRobot />
   </a>
-  <PopButton title="link note">
+  <PopButton title="search and link note">
     <template #button_face>
       <SvgSearch />
     </template>

@@ -34,7 +34,9 @@ describe("NoteControlCenterForUser", () => {
 
   it("has only the link-note button when no exist selected note", () => {
     wrapper = mountComponent();
-    expect(wrapper.findAll(".btn")[0].attributes("title")).toEqual("link note");
+    expect(wrapper.findAll(".btn")[0].attributes("title")).toEqual(
+      "search note"
+    );
   });
 
   it("has the suggest button when having selected note", () => {
