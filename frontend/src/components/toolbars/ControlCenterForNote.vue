@@ -120,31 +120,25 @@ export default defineComponent({
     },
   },
   methods: {
-    generateTextContent(title: string, description: string) {
-      return {
-        title,
-        description,
-      };
-    },
-    async askSuggestionApi(selectedNote: Generated.Note, prompt: string) {
+    async askSuggestionApi(prompt: string) {
       const res = await this.api.ai.askAiSuggestions({
         prompt,
       });
 
-      await this.storageAccessor
-        .api(this.$router)
-        .updateTextContent(
-          selectedNote.id,
-          this.generateTextContent(selectedNote.title, res.suggestion),
-          selectedNote.textContent
-        );
+      await this.storageAccessor.api(this.$router).updateTextContent(
+        this.selectedNote.id,
+        {
+          title: this.selectedNote.title,
+          description: res.suggestion,
+        },
+        this.selectedNote.textContent
+      );
       if (res.finishReason === "length") {
-        await this.askSuggestionApi(selectedNote, res.suggestion);
+        await this.askSuggestionApi(res.suggestion);
       }
     },
     async suggestDescriptionByTitle() {
       await this.askSuggestionApi(
-        this.selectedNote,
         this.selectedNote.textContent.description
           ?.replace(/<\/?[^>]+(>|$)/g, "")
           .trim() || `Tell me about "${this.selectedNote.title}"`
