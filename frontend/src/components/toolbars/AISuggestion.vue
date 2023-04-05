@@ -1,6 +1,6 @@
 <template>
   <a
-    :title="'Suggest1'"
+    :title="'suggest description'"
     class="btn btn-sm"
     role="button"
     @click="suggestDescription"

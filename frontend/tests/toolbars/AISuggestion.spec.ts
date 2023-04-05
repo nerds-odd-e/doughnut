@@ -37,7 +37,9 @@ describe("AISuggestion", () => {
 
   it("has the suggest button when having selected note", () => {
     mountComponentWithNote();
-    expect(wrapper.find(".btn").attributes("title")).toEqual("Suggest1");
+    expect(wrapper.find(".btn").attributes("title")).toEqual(
+      "suggest description"
+    );
   });
 
   it("ask api be called once when clicking the suggest button", () => {
