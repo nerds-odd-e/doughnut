@@ -5,7 +5,7 @@
         <BrandBar />
       </div>
     </template>
-    <div class="btn-group btn-group-sm">
+    <div v-else class="btn-group btn-group-sm">
       <template v-if="!selectedNote">
         <PopButton title="search note">
           <template #button_face>

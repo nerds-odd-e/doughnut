@@ -144,15 +144,12 @@ export default defineComponent({
       }
     },
     async suggestDescriptionByTitle() {
-      const { selectedNote } = this.storageAccessor;
-      if (selectedNote) {
-        await this.askSuggestionApi(
-          selectedNote,
-          selectedNote.textContent.description
-            ?.replace(/<\/?[^>]+(>|$)/g, "")
-            .trim() || `Tell me about "${selectedNote.title}"`
-        );
-      }
+      await this.askSuggestionApi(
+        this.selectedNote,
+        this.selectedNote.textContent.description
+          ?.replace(/<\/?[^>]+(>|$)/g, "")
+          .trim() || `Tell me about "${this.selectedNote.title}"`
+      );
     },
   },
 });
