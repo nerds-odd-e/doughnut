@@ -13,6 +13,7 @@
 import { defineComponent, PropType } from "vue";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import { StorageAccessor } from "@/store/createNoteStorage";
+import AiAdvicer from "@/models/AiAdvicer";
 import SvgRobot from "../svgs/SvgRobot.vue";
 
 export default defineComponent({
@@ -35,7 +36,9 @@ export default defineComponent({
     SvgRobot,
   },
   methods: {
-    async askSuggestionApi(prompt: string) {
+    async suggestDescription() {
+      const aiAdvicer = new AiAdvicer(this.selectedNote.textContent);
+      const prompt = aiAdvicer.prompt();
       const res = await this.api.ai.askAiSuggestions({
         prompt,
       });
@@ -44,23 +47,13 @@ export default defineComponent({
         this.selectedNote.id,
         {
           title: this.selectedNote.title,
-          description: res.suggestion,
+          description: aiAdvicer.processResult(res.suggestion),
         },
         this.selectedNote.textContent
       );
       if (res.finishReason === "length") {
-        await this.askSuggestionApi(res.suggestion);
+        await this.suggestDescription();
       }
-    },
-    async suggestDescription() {
-      await this.askSuggestionApi(
-        this.selectedNote.textContent.description
-          ?.replace(/<\/?[^>]+(>|$)/g, "")
-          .trim() || this.prompt()
-      );
-    },
-    prompt(): string {
-      return `Complete the description for the following note:\ntitle: ${this.selectedNote.title}\ndescription:\n---\n`;
     },
   },
 });
