@@ -45,7 +45,6 @@ export default defineComponent({
         },
         placeholder: "Enter note description here...",
       },
-      initialValue: this.modelValue || ("" as string),
       localValue: this.modelValue || ("" as string),
       hadFocus: false as boolean,
     };
@@ -62,8 +61,7 @@ export default defineComponent({
       this.sumitChange();
     },
     sumitChange() {
-      if (this.initialValue.trim() !== this.localValue.trim()) {
-        this.initialValue = this.localValue;
+      if (this.modelValue?.trim() !== this.localValue.trim()) {
         this.$emit("update:modelValue", this.localValue);
         this.$emit("blur");
       }
