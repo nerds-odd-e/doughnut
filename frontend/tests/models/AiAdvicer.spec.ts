@@ -5,6 +5,16 @@ describe("AiAdvicer", () => {
   const note = makeMe.aNote.description("").please();
   const advicer = new AiAdvicer(note.textContent);
 
+  it("in case the description is null", () => {
+    note.textContent.description = null as unknown as string;
+    expect(advicer.prompt()).toBe(
+      "Complete the description for the following note:\n" +
+        "title: Note1.1.1\n" +
+        "description:\n" +
+        "---\n"
+    );
+  });
+
   it("use the full text", () => {
     expect(advicer.processResult("abc")).toBe("abc");
   });

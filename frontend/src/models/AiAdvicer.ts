@@ -6,7 +6,9 @@ export default class AiAdvicer {
   }
 
   prompt(): string {
-    return `Complete the description for the following note:\ntitle: ${this.textContent.title}\ndescription:\n---\n${this.textContent.description}`;
+    return `Complete the description for the following note:\ntitle: ${
+      this.textContent.title
+    }\ndescription:\n---\n${this.textContent.description || ""}`;
   }
 
   // eslint-disable-next-line class-methods-use-this
