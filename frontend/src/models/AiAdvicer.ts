@@ -6,10 +6,7 @@ export default class AiAdvicer {
   }
 
   prompt(): string {
-    return (
-      this.textContent.description?.replace(/<\/?[^>]+(>|$)/g, "").trim() ||
-      this.suggestion()
-    );
+    return `Complete the description for the following note:\ntitle: ${this.textContent.title}\ndescription:\n---\n${this.textContent.description}`;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -23,9 +20,5 @@ export default class AiAdvicer {
     }
 
     return suggestion;
-  }
-
-  private suggestion(): string {
-    return `Complete the description for the following note:\ntitle: ${this.textContent.title}\ndescription:\n---\n`;
   }
 }

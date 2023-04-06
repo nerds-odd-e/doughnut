@@ -24,12 +24,12 @@
 
 /// <reference types="cypress" />
 // @ts-check
-import { DefaultPredicate } from "@anev/ts-mountebank"
+import { DefaultPredicate, FlexiPredicate, Operator } from "@anev/ts-mountebank"
 import "@testing-library/cypress/add-commands"
 import "cypress-file-upload"
 import "./string.extensions"
 import ServiceMocker from "./ServiceMocker"
-import { EqualPredicate, HttpMethod, Predicate } from "@anev/ts-mountebank"
+import { HttpMethod, Predicate } from "@anev/ts-mountebank"
 
 function restartImposterAndMockTextCompletion(
   predicate: Predicate,
@@ -64,7 +64,8 @@ Cypress.Commands.add(
   "restartImposterAndMockTextCompletion",
   { prevSubject: true },
   (serviceMocker: ServiceMocker, prompt: string, reply: string) => {
-    const predicate = new EqualPredicate()
+    const predicate = new FlexiPredicate()
+      .withOperator(Operator.matches)
       .withPath(`/v1/completions`)
       .withMethod(HttpMethod.POST)
       .withBody({ prompt })

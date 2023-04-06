@@ -43,7 +43,7 @@ describe("AISuggestion", () => {
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
     await triggerSuggestion(note);
     expect(expectation.actualRequestJsonBody()).toMatchObject({
-      prompt: "Desc",
+      prompt: expect.stringContaining("Desc"),
     });
   });
 
