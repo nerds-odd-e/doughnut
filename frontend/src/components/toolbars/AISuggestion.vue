@@ -56,8 +56,11 @@ export default defineComponent({
       await this.askSuggestionApi(
         this.selectedNote.textContent.description
           ?.replace(/<\/?[^>]+(>|$)/g, "")
-          .trim() || `Tell me about "${this.selectedNote.title}"`
+          .trim() || this.prompt()
       );
+    },
+    prompt(): string {
+      return `Complete the description for the following note:\ntitle: ${this.selectedNote.title}\ndescription:\n---\n`;
     },
   },
 });
