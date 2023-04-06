@@ -1,8 +1,9 @@
 import { MockParams } from "vitest-fetch-mock";
+import ApiMockExpectation from "./apiMockImpl/ApiMockExpectation";
 
 interface ApiMockBuilder {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  andReturnOnce(value: any): void;
+  andReturnOnce(value: any): ApiMockExpectation;
   andRespondOnceWith404(): void;
   andRespondOnce(response: MockParams): void;
 }

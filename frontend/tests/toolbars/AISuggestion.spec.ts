@@ -29,13 +29,16 @@ describe("AISuggestion", () => {
 
   it("ask api be called once when clicking the suggest button", async () => {
     mountComponentWithNote();
-    helper.apiMock
+    const expectation = helper.apiMock
       .expectingPost(`/api/ai/ask-suggestions`)
       .andReturnOnce({ suggestion: "suggestion" });
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
 
     await wrapper.find(".btn").trigger("click");
     await flushPromises();
+    expect(expectation.actualRequestJsonBody()).toMatchObject({
+      prompt: "Desc",
+    });
   });
 
   it('ask api be called many times until res.finishReason equal "stop" when clicking the suggest button', async () => {

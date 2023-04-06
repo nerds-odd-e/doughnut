@@ -18,8 +18,9 @@ class ApiMockBuilderImpl implements ApiMockBuilder {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  andReturnOnce(value: any): void {
+  andReturnOnce(value: any): ApiMockExpectation {
     this.expectation.value = value;
+    return this.expectation;
   }
 }
 

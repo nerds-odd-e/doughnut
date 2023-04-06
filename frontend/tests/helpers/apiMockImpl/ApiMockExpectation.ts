@@ -11,14 +11,31 @@ class ApiMockExpectation {
 
   method: HttpMethod;
 
+  actual?: Request;
+
   constructor(url: string, method: HttpMethod) {
     this.url = url;
     this.value = {};
     this.method = method;
   }
 
-  matchExpectation(request: Request) {
-    return this.url === request.url && this.method === request.method;
+  matchExpectation(request: Request): boolean {
+    if (this.url !== request.url || this.method !== request.method) {
+      return false;
+    }
+    this.actual = request;
+    return true;
+  }
+
+  actualRequest(): Request {
+    if (!this.actual) {
+      throw new Error("Expectation never matched");
+    }
+    return this.actual;
+  }
+
+  actualRequestJsonBody(): unknown {
+    return JSON.parse(this.actualRequest().body as unknown as string);
   }
 }
 
