@@ -19,15 +19,25 @@ describe("AISuggestion", () => {
     await flushPromises();
   };
 
+  it("ask api to generate suggested description when description is empty", async () => {
+    const note = makeMe.aNote.description("").please();
+    const expectation = helper.apiMock
+      .expectingPost(`/api/ai/ask-suggestions`)
+      .andReturnOnce({ suggestion: "suggestion" });
+    helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
+    await triggerSuggestion(note);
+    expect(expectation.actualRequestJsonBody()).toMatchObject({
+      prompt: "Desc",
+    });
+  });
+
   it("ask api be called once when clicking the suggest button", async () => {
     const note = makeMe.aNote.please();
     const expectation = helper.apiMock
       .expectingPost(`/api/ai/ask-suggestions`)
       .andReturnOnce({ suggestion: "suggestion" });
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
-
     await triggerSuggestion(note);
-
     expect(expectation.actualRequestJsonBody()).toMatchObject({
       prompt: "Desc",
     });
