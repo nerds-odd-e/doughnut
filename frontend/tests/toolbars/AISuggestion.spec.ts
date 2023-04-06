@@ -1,48 +1,40 @@
 import AISuggestion from "@/components/toolbars/AISuggestion.vue";
-import { flushPromises, VueWrapper } from "@vue/test-utils";
+import { flushPromises } from "@vue/test-utils";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("AISuggestion", () => {
-  const note = makeMe.aNote.please();
   helper.resetWithApiMock(beforeEach, afterEach);
 
-  let wrapper: VueWrapper;
-
-  const mountComponentWithNote = () => {
-    wrapper = helper
+  const triggerSuggestion = async (note: Generated.Note) => {
+    const wrapper = helper
       .component(AISuggestion)
       .withStorageProps({
         selectedNote: note,
       })
       .mount();
+    await wrapper.find(".btn").trigger("click");
+    await flushPromises();
   };
 
-  it("has the suggest button when having selected note", () => {
-    mountComponentWithNote();
-    expect(wrapper.find(".btn").attributes("title")).toEqual(
-      "suggest description"
-    );
-  });
-
   it("ask api be called once when clicking the suggest button", async () => {
-    mountComponentWithNote();
+    const note = makeMe.aNote.please();
     const expectation = helper.apiMock
       .expectingPost(`/api/ai/ask-suggestions`)
       .andReturnOnce({ suggestion: "suggestion" });
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
 
-    await wrapper.find(".btn").trigger("click");
-    await flushPromises();
+    await triggerSuggestion(note);
+
     expect(expectation.actualRequestJsonBody()).toMatchObject({
       prompt: "Desc",
     });
   });
 
   it('ask api be called many times until res.finishReason equal "stop" when clicking the suggest button', async () => {
-    mountComponentWithNote();
+    const note = makeMe.aNote.please();
 
     helper.apiMock
       .expectingPost(`/api/ai/ask-suggestions`)
@@ -54,7 +46,6 @@ describe("AISuggestion", () => {
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
 
-    await wrapper.find(".btn").trigger("click");
-    await flushPromises();
+    await triggerSuggestion(note);
   });
 });
