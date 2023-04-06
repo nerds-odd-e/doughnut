@@ -38,7 +38,7 @@ describe("AISuggestion", () => {
     await flushPromises();
   });
 
-  it.skip('ask api be called many times until res.finishReason equal "stop" when clicking the suggest button', async () => {
+  it('ask api be called many times until res.finishReason equal "stop" when clicking the suggest button', async () => {
     mountComponentWithNote();
 
     helper.apiMock
@@ -48,9 +48,10 @@ describe("AISuggestion", () => {
     helper.apiMock
       .expectingPost(`/api/ai/ask-suggestions`)
       .andReturnOnce({ suggestion: "suggestion", finishReason: "stop" });
+    helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
+    helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
 
     await wrapper.find(".btn").trigger("click");
-
-    // setTimeout(() => expect(mockFn).toBeCalledTimes(2), 0);
+    await flushPromises();
   });
 });

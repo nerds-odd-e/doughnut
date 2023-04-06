@@ -12,9 +12,11 @@ fetchMock.enableMocks();
 const CONSOLE_FAIL_TYPES = ["error", "warn"];
 
 CONSOLE_FAIL_TYPES.forEach((type) => {
+  const originalConsole = console[type];
   console[type] = (message) => {
+    originalConsole(message);
     throw new Error(
-      `Failing due to console.${type} while running test! The original message:\n\n${message}`
+      `Failing due to console.${type} while running test!`
     );
   };
 });
