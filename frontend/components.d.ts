@@ -9,7 +9,6 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
-    AISuggest: typeof import('./src/components/toolbars/AISuggest.vue')['default']
     AISuggestion: typeof import('./src/components/toolbars/AISuggestion.vue')['default']
     AnswerResult: typeof import('./src/components/review/AnswerResult.vue')['default']
     ApiStatus: typeof import('./src/components/toolbars/ApiStatus.vue')['default']
@@ -29,8 +28,6 @@ declare module '@vue/runtime-core' {
     ContentLoader: typeof import('./src/components/commons/ContentLoader.vue')['default']
     ControlCenter: typeof import('./src/components/toolbars/ControlCenter.vue')['default']
     ControlCenterForNote: typeof import('./src/components/toolbars/ControlCenterForNote.vue')['default']
-    ControlCenterForUser: typeof import('./src/components/toolbars/ControlCenterForUser.vue')['default']
-    copy: typeof import('./src/components/toolbars/NoteControlCenterForUser copy.vue')['default']
     DescriptionEditor: typeof import('./src/components/form/DescriptionEditor.vue')['default']
     DragListner: typeof import('./src/components/commons/DragListner.vue')['default']
     EditableText: typeof import('./src/components/form/EditableText.vue')['default']
@@ -67,9 +64,6 @@ declare module '@vue/runtime-core' {
     NoteCard: typeof import('./src/components/notes/mindmap/NoteCard.vue')['default']
     NoteCardsView: typeof import('./src/components/notes/views/NoteCardsView.vue')['default']
     NoteContent: typeof import('./src/components/notes/NoteContent.vue')['default']
-    NoteControlCenter: typeof import('./src/components/toolbars/NoteControlCenter.vue')['default']
-    NoteControlCenterForUser: typeof import('./src/components/toolbars/NoteControlCenterForUser.vue')['default']
-    NoteControlCenterForUser1: typeof import('./src/components/toolbars/NoteControlCenterForUser1.vue')['default']
     NoteDeleteButton: typeof import('./src/components/toolbars/NoteDeleteButton.vue')['default']
     NoteEditAccessoriesDialog: typeof import('./src/components/notes/NoteEditAccessoriesDialog.vue')['default']
     NoteEngagingStoryDialog: typeof import('./src/components/notes/NoteEngagingStoryDialog.vue')['default']
@@ -89,7 +83,6 @@ declare module '@vue/runtime-core' {
     NoteRealmLoader: typeof import('./src/components/notes/views/NoteRealmLoader.vue')['default']
     NoteShell: typeof import('./src/components/notes/NoteShell.vue')['default']
     NoteShortDescription: typeof import('./src/components/notes/NoteShortDescription.vue')['default']
-    NoteSuggestDescriptionDialog: typeof import('./src/components/notes/NoteSuggestDescriptionDialog.vue')['default']
     NoteTitleWithLink: typeof import('./src/components/notes/NoteTitleWithLink.vue')['default']
     NoteUndoButton: typeof import('./src/components/toolbars/NoteUndoButton.vue')['default']
     NoteWikidataAssociation: typeof import('./src/components/notes/NoteWikidataAssociation.vue')['default']
@@ -188,7 +181,6 @@ declare module '@vue/runtime-core' {
     TestMenu: typeof import('./src/components/commons/TestMenu.vue')['default']
     TextArea: typeof import('./src/components/form/TextArea.vue')['default']
     TextInput: typeof import('./src/components/form/TextInput.vue')['default']
-    ToobarOver: typeof import('./src/components/commons/ToobarOver.vue')['default']
     Tool: typeof import('./src/components/svgs/link_types/Tool.vue')['default']
     ToolbarFrame: typeof import('./src/components/toolbars/ToolbarFrame.vue')['default']
     ToolbarOver: typeof import('./src/components/commons/ToolbarOver.vue')['default']
