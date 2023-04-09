@@ -116,6 +116,8 @@ in mkShell {
     FLUSH PRIVILEGES;
     EOF
 
+            [[ -d /home/gitpod/.cache/Cypress ]] || npx --yes cypress install --force
+
             export MYSQLD_PID=$(ps -ax | grep -v " grep " | grep mysqld | awk '{ print $1 }')
             if [[ -z "$MYSQLD_PID" ]]; then
               [ ! "$(ls -A mysql/data)" ] && mysqld --initialize-insecure --port=$MYSQL_TCP_PORT --user=`whoami` --datadir=$MYSQL_DATADIR --tls-version=TLSv1.2 --basedir=$MYSQL_BASEDIR --explicit_defaults_for_timestamp

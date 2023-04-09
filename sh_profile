@@ -4,7 +4,6 @@ alias pbpaste='xclip -selection clipboard -o'
 if [[ -t 0 && -t 1 && -t 2 && "[$-]" = *i* ]]; then
   if [[ -f mysql/mysql.pid ]] && ps -p "$(cat mysql/mysql.pid)" &>/dev/null; then
     if [[ "${inside_nix_shell:-}" != impure ]]; then
-      [[ -d ~/.cache/Cypress ]] || yes | npx cypress install --force
       inside_nix_shell=impure exec nix develop
     fi
   else
