@@ -73,8 +73,8 @@ in mkShell {
             export NIXPKGS_ALLOW_UNFREE=1
             export GPG_TTY=$(tty)
             export JAVA_HOME="$(readlink -e $(type -p javac) | sed  -e 's/\/bin\/javac//g')"
-            export NODE_PATH="${pkgs.nodejs-19_x}"
-            export DUM_PATH="${pkgs.dum}"
+            export NODE_PATH="$(readlink -e $(type -p node) | sed  -e 's/\/bin\/node//g')"
+            export DUM_PATH="$(readlink -e $(type -p dum) | sed  -e 's/\/bin\/dum//g')"
 
             export MYSQL_BASEDIR=${pkgs.mysql80}
             export MYSQL_HOME="''${MYSQL_HOME:-$PWD/mysql}"
@@ -116,7 +116,9 @@ in mkShell {
     FLUSH PRIVILEGES;
     EOF
 
-            [[ -d /home/gitpod/.cache/Cypress ]] || npx --yes cypress install --force
+            if [ -d /home/gitpod ]; then
+              [[ -d /home/gitpod/.cache/Cypress ]] || npx --yes cypress install --force
+            fi
 
             export MYSQLD_PID=$(ps -ax | grep -v " grep " | grep mysqld | awk '{ print $1 }')
             if [[ -z "$MYSQLD_PID" ]]; then
