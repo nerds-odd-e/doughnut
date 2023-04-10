@@ -3,9 +3,7 @@ module.exports = {
   parser: "vue-eslint-parser",
   parserOptions: {
     parser: {
-      js: "espree",
       ts: "@typescript-eslint/parser",
-      "<template>": "espree",
     },
     ecmaVersion: 2021,
     sourceType: "module",
