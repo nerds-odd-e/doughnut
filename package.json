@@ -37,7 +37,7 @@
   "devDependencies": {
     "@anev/ts-mountebank": "1.6.1",
     "@badeball/cypress-cucumber-preprocessor": "^16.0",
-    "@bahmutov/cypress-esbuild-preprocessor": "^2.2",
+    "@bahmutov/cypress-esbuild-preprocessor": "^2.2.0",
     "@testing-library/cypress": "9.0",
     "@types/cypress-cucumber-preprocessor": "^4.0",
     "@types/node": "^18.15",
@@ -45,7 +45,7 @@
     "@typescript-eslint/parser": "^5.57",
     "cypress": "12.9.0",
     "cypress-file-upload": "^5.0",
-    "esbuild": "^0.17",
+    "esbuild": "^0.17.16",
     "eslint": "^8.38",
     "eslint-config-prettier": "^8.7",
     "eslint-plugin-chai-friendly": "^0.7.2",
