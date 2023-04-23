@@ -226,7 +226,9 @@ class RestNoteControllerTests {
 
       @Test
       void shouldPrependLocationInfoWhenAddingNoteWithWikidataId()
-          throws BindException, InterruptedException, UnexpectedNoAccessRightException,
+          throws BindException,
+              InterruptedException,
+              UnexpectedNoAccessRightException,
               IOException {
         mockApiResponseWithLocationInfo(
             "{\"latitude\":1.3,\"longitude\":103.8}", "globecoordinate");
@@ -249,7 +251,9 @@ class RestNoteControllerTests {
 
       @Test
       void shouldPrependLocationInfoWhenAddingNoteWithWikidataIdWithStringValue()
-          throws BindException, InterruptedException, UnexpectedNoAccessRightException,
+          throws BindException,
+              InterruptedException,
+              UnexpectedNoAccessRightException,
               IOException {
         mockApiResponseWithLocationInfo("\"center of the earth\"", "string");
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
@@ -300,7 +304,9 @@ class RestNoteControllerTests {
           String countryQid,
           String countryName,
           String expectedBirthday)
-          throws BindException, InterruptedException, UnexpectedNoAccessRightException,
+          throws BindException,
+              InterruptedException,
+              UnexpectedNoAccessRightException,
               IOException {
         mockWikidataHumanEntity(wikidataIdOfHuman, birthdayByISO, countryQid);
         mockWikidataEntity(countryQid, countryName);
@@ -317,7 +323,9 @@ class RestNoteControllerTests {
 
       @Test
       void shouldAddPersonNoteWithCountryNoteWithWikidataId()
-          throws BindException, InterruptedException, UnexpectedNoAccessRightException,
+          throws BindException,
+              InterruptedException,
+              UnexpectedNoAccessRightException,
               IOException {
 
         mockWikidataHumanEntity("Q8337", null, "Q34660");
@@ -345,7 +353,9 @@ class RestNoteControllerTests {
 
       @Test
       void shouldAddBookNoteWithAuthorNoteWithWikidataId()
-          throws BindException, InterruptedException, UnexpectedNoAccessRightException,
+          throws BindException,
+              InterruptedException,
+              UnexpectedNoAccessRightException,
               IOException {
         mockWikidataWBGetEntity(
             "Q8337", makeMe.wikidataClaimsJson("Q8337").asABookWithSingleAuthor("Q34660").please());
@@ -359,7 +369,9 @@ class RestNoteControllerTests {
 
       @Test
       void shouldAddBookNoteWithMultipleAuthorsNoteWithWikidataId()
-          throws BindException, InterruptedException, UnexpectedNoAccessRightException,
+          throws BindException,
+              InterruptedException,
+              UnexpectedNoAccessRightException,
               IOException {
         mockWikidataWBGetEntity(
             "Q8337",
