@@ -16,7 +16,7 @@ get_os_type() {
 
 download_nixpkg_manager_install_script() {
   rm -f ./install-nix
-  curl -o install-nix https://nixos.org/releases/nix/nix-2.14.1/install
+  curl -o install-nix https://nixos.org/releases/nix/nix-2.15.0/install
   chmod +x ./install-nix
 }
 
