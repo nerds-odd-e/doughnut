@@ -26,7 +26,6 @@ export default defineConfig({
       )
       return config
     },
-    experimentalRunAllSpecs: true,
     specPattern: 'cypress/e2e/**/*.feature',
     excludeSpecPattern: [
       '**/*.{js,ts}',
