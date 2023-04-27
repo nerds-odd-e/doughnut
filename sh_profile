@@ -3,6 +3,7 @@ alias pbpaste='xclip -selection clipboard -o'
 
 if [[ -t 0 && -t 1 && -t 2 && "[$-]" = *i* ]]; then
   user_profile="/nix/var/nix/profiles/per-user/"$(whoami)"/profile/etc/profile.d/nix.sh"
+  [[ -f "$user_profile" ]] || user_profile="${HOME}/.nix-profile/etc/profile.d/nix.sh"
   [[ -f "$user_profile" ]] && ! type nix &>/dev/null && source "$user_profile"
   if [[ -f "$user_profile" && -f mysql/mysql.pid && -d "$HOME/.cache/Cypress" ]] &&
        ps -p "$(cat mysql/mysql.pid)" &>/dev/null; then
