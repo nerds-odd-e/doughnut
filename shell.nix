@@ -59,7 +59,7 @@ in mkShell {
     pinentry_mac
     sequelpro
   ] ++ lib.optionals (!stdenv.isDarwin) [
-    sequeler 
+    sequeler
     ungoogled-chromium
     psmisc
     x11vnc
@@ -71,6 +71,7 @@ in mkShell {
             #!/usr/bin/env bash
 
             export NIXPKGS_ALLOW_UNFREE=1
+            export PS1="(nix)$PS1"
             export GPG_TTY=$(tty)
             export JAVA_HOME="$(readlink -e $(type -p javac) | sed  -e 's/\/bin\/javac//g')"
             export NODE_PATH="$(readlink -e $(type -p node) | sed  -e 's/\/bin\/node//g')"
@@ -88,6 +89,10 @@ in mkShell {
             export LANG="en_US.UTF-8"
             #export LC_ALL="en_US.UTF-8"
 
+            if [[ "$USER" = @(codespace|gitpod) ]]; then
+              [[ -d $HOME/.cache/Cypress ]] || npx --yes cypress install --force
+            fi
+
             echo "###################################################################################################################"
             echo "                                                                                "
             echo "##   !! DOUGHNUT NIX DEVELOPMENT ENVIRONMENT ;) !!  "
@@ -101,24 +106,20 @@ in mkShell {
             mkdir -p $MYSQL_HOME
             mkdir -p $MYSQL_DATADIR
 
-    cat <<EOF > $MYSQL_HOME/init_doughnut_db.sql
-    CREATE USER IF NOT EXISTS 'doughnut'@'localhost' IDENTIFIED BY 'doughnut';
-    CREATE USER IF NOT EXISTS 'doughnut'@'127.0.0.1' IDENTIFIED BY 'doughnut';
-    CREATE DATABASE IF NOT EXISTS doughnut_development DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-    CREATE DATABASE IF NOT EXISTS doughnut_test        DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-    CREATE DATABASE IF NOT EXISTS doughnut_e2e_test    DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-    GRANT ALL PRIVILEGES ON doughnut_development.* TO 'doughnut'@'localhost';
-    GRANT ALL PRIVILEGES ON doughnut_test.*        TO 'doughnut'@'localhost';
-    GRANT ALL PRIVILEGES ON doughnut_e2e_test.*    TO 'doughnut'@'localhost';
-    GRANT ALL PRIVILEGES ON doughnut_development.* TO 'doughnut'@'127.0.0.1';
-    GRANT ALL PRIVILEGES ON doughnut_test.*        TO 'doughnut'@'127.0.0.1';
-    GRANT ALL PRIVILEGES ON doughnut_e2e_test.*    TO 'doughnut'@'127.0.0.1';
-    FLUSH PRIVILEGES;
-    EOF
-
-            if [ -d /home/gitpod ]; then
-              [[ -d /home/gitpod/.cache/Cypress ]] || npx --yes cypress install --force
-            fi
+            cat <<EOF > $MYSQL_HOME/init_doughnut_db.sql
+            CREATE USER IF NOT EXISTS 'doughnut'@'localhost' IDENTIFIED BY 'doughnut';
+            CREATE USER IF NOT EXISTS 'doughnut'@'127.0.0.1' IDENTIFIED BY 'doughnut';
+            CREATE DATABASE IF NOT EXISTS doughnut_development DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+            CREATE DATABASE IF NOT EXISTS doughnut_test        DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+            CREATE DATABASE IF NOT EXISTS doughnut_e2e_test    DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+            GRANT ALL PRIVILEGES ON doughnut_development.* TO 'doughnut'@'localhost';
+            GRANT ALL PRIVILEGES ON doughnut_test.*        TO 'doughnut'@'localhost';
+            GRANT ALL PRIVILEGES ON doughnut_e2e_test.*    TO 'doughnut'@'localhost';
+            GRANT ALL PRIVILEGES ON doughnut_development.* TO 'doughnut'@'127.0.0.1';
+            GRANT ALL PRIVILEGES ON doughnut_test.*        TO 'doughnut'@'127.0.0.1';
+            GRANT ALL PRIVILEGES ON doughnut_e2e_test.*    TO 'doughnut'@'127.0.0.1';
+            FLUSH PRIVILEGES;
+            EOF
 
             export MYSQLD_PID=$(ps -ax | grep -v " grep " | grep mysqld | awk '{ print $1 }')
             if [[ -z "$MYSQLD_PID" ]]; then

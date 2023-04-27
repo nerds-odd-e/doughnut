@@ -2,16 +2,17 @@ alias pbcopy='xclip -selection clipboard'
 alias pbpaste='xclip -selection clipboard -o'
 
 if [[ -t 0 && -t 1 && -t 2 && "[$-]" = *i* ]]; then
-  if [[ -f mysql/mysql.pid ]] && ps -p "$(cat mysql/mysql.pid)" &>/dev/null; then
-    if [[ "${inside_nix_shell:-}" != impure ]]; then
-      inside_nix_shell=impure exec nix develop
-    fi
-  else
-    cat >&2 <<\:MESSAGE:
+  user_profile="/nix/var/nix/profiles/per-user/"$(whoami)"/profile/etc/profile.d/nix.sh"
+  [[ -f "$user_profile" ]] && ! type nix &>/dev/null && source "$user_profile"
+  if [[ -f "$user_profile" && -f mysql/mysql.pid && -d "$HOME/.cache/Cypress" ]] &&
+       ps -p "$(cat mysql/mysql.pid)" &>/dev/null; then
+    [[ "${inside_nix_shell:-}" = impure ]] || inside_nix_shell=impure exec nix develop
+  elif [[ -z "${inside_nix_shell:-}" ]]; then
+    cat >&2 <<:MESSAGE:
 #####################################################  INFO  ######################################################
-: Please run the following command to prepare the working environment:
+# Please run the following commands to prepare the working environment for this project:
 
-nix develop
+$(grep -F '```bash' -B2 -A2 -m3 --color=no README.md | sed -e '/``/d' -e 's/^\([A-Z]\)/## \1/' -e 's/^--$//')
 
 ###################################################################################################################
 :MESSAGE:

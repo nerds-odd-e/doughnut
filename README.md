@@ -34,6 +34,8 @@ Please ensure your git configuration is appropriate for your OS to respect the c
 - macOS/Linux run `git config --global core.autocrlf input` then `git add --renormalize .`
 - Microsoft Windows `git config --global core.autocrlf true` then `git add --renormalize .`
 
+Install Nix package manager if you haven't already with
+
 ```bash
 ./setup-doughnut-dev.sh
 ```
@@ -56,6 +58,8 @@ From the root of your doughnut directory, start your doughnut nix development en
 ```bash
 nix develop
 ```
+
+Install packages, build the frontend and start the backend
 
 ```bash
 dum i && dum frontend:build && dum sut
