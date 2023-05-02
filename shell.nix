@@ -8,7 +8,7 @@ in mkShell {
   MYSQL_HOME = builtins.getEnv "MYSQL_HOME";
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
-    nodejs-19_x
+    nodejs_20
     zsh
     dum
     yarn
