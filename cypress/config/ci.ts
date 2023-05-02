@@ -2,7 +2,7 @@
 import { defineConfig } from "cypress"
 import createBundler from "@bahmutov/cypress-esbuild-preprocessor"
 import { addCucumberPreprocessorPlugin } from "@badeball/cypress-cucumber-preprocessor"
-import { createEsbuildPlugin } from "@badeball/cypress-cucumber-preprocessor/esbuild"
+import createEsbuildPlugin from "@badeball/cypress-cucumber-preprocessor/esbuild"
 
 export default defineConfig({
   env: {
@@ -17,13 +17,16 @@ export default defineConfig({
   watchForFileChanges: false,
   environment: "ci",
   e2e: {
-    setupNodeEvents(on, config) {
+    setupNodeEvents(
+      on: Cypress.PluginEvents,
+      config: Cypress.PluginConfigOptions
+    ): Promise<Cypress.PluginConfigOptions> {
       addCucumberPreprocessorPlugin(on, config)
       on(
         "file:preprocessor",
         createBundler({
           plugins: [createEsbuildPlugin(config)],
-        }),
+        })
       )
       return config
     },
