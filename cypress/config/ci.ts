@@ -19,14 +19,14 @@ export default defineConfig({
   e2e: {
     setupNodeEvents(
       on: Cypress.PluginEvents,
-      config: Cypress.PluginConfigOptions
+      config: Cypress.PluginConfigOptions,
     ): Promise<Cypress.PluginConfigOptions> {
       addCucumberPreprocessorPlugin(on, config)
       on(
         "file:preprocessor",
         createBundler({
           plugins: [createEsbuildPlugin(config)],
-        })
+        }),
       )
       return config
     },
