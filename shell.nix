@@ -32,6 +32,7 @@ in mkShell {
     lesspipe
     lsof
     lzma
+    btop
     ps
     vgrep
     unixtools.whereis
