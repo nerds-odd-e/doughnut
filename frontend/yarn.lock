@@ -951,11 +951,15 @@
     "@vue/compiler-dom" "^3.0.1"
     "@vue/server-renderer" "^3.0.1"
 
-"@vue/test-utils@https://github.com/vuejs/test-utils.git#v2.4.0-alpha.1":
+"@vue/test-utils@^2.4.0-alpha.0":
   version "2.4.0-alpha.0"
-  resolved "https://github.com/vuejs/test-utils.git#adc1a13a3d61aee1734ba6bc037628fc9e46459f"
+  resolved "https://registry.yarnpkg.com/@vue/test-utils/-/test-utils-2.4.0-alpha.0.tgz#d907e6bc226b74b6bfa96b2c876bdf4ab4c5c63a"
+  integrity sha512-Ypl8ClDa298p+/MxqCtZaMXfDlIG2Qxz+6qqgmeEAkXDOnRO6OmUEPSmE66SO9zJf0kMhkElsGbdwtv78JiWoQ==
   dependencies:
     js-beautify "1.14.6"
+  optionalDependencies:
+    "@vue/compiler-dom" "^3.0.1"
+    "@vue/server-renderer" "^3.0.1"
 
 "@vueup/vue-quill@^1.1.1":
   version "1.2.0"
