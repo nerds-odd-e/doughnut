@@ -3,6 +3,7 @@
     "sourceMap": true,
     "target": "esnext",
     "module": "CommonJS",
+    "moduleResolution": "node16",
     "strict": true,
     "allowJs": true,
     "lib": [
