@@ -37,7 +37,7 @@
     "@vue/test-utils": "^2.4.0-alpha.1",
     "autoprefixer": "^10.4",
     "css-loader": "^6.8",
-    "eslint": "^8.41",
+    "eslint": "^8.42",
     "eslint-config-airbnb-base": "^15.0",
     "eslint-config-airbnb-typescript": "^17.0",
     "eslint-config-prettier": "^8.7",
