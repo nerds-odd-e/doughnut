@@ -103,6 +103,13 @@ const apiCollection = (managedApi: ManagedApi) => ({
       )) as Generated.RepetitionForUser;
       return res;
     },
+
+    async getRandomQuestionForReviewPoint(reviewPointId: Doughnut.ID) {
+      const res = (await managedApi.restGet(
+        `review-points/${reviewPointId}/random-question`
+      )) as Generated.QuizQuestionViewedByUser;
+      return res;
+    },
   },
   circleMethods: {
     async getCircle(circleId: Doughnut.ID) {
