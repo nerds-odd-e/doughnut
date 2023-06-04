@@ -2,13 +2,12 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.Thing;
-import com.odde.doughnut.entities.json.RepetitionForUser;
+import com.odde.doughnut.entities.json.DueReviewPoints;
 import com.odde.doughnut.entities.json.ReviewStatus;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 public class Reviewing {
@@ -91,14 +90,14 @@ public class Reviewing {
         .map(modelFactoryService::toSubscriptionModel);
   }
 
-  public RepetitionForUser getDueReviewPoints() {
+  public DueReviewPoints getDueReviewPoints() {
     return buildRepetitionForUser();
   }
 
-  private RepetitionForUser buildRepetitionForUser() {
-    RepetitionForUser repetitionForUser = new RepetitionForUser();
-    repetitionForUser.setToRepeat(toRepeatList());
-    return repetitionForUser;
+  private DueReviewPoints buildRepetitionForUser() {
+    DueReviewPoints dueReviewPoints = new DueReviewPoints();
+    dueReviewPoints.setToRepeat(toRepeatList());
+    return dueReviewPoints;
   }
 
   public ReviewStatus getReviewStatus() {

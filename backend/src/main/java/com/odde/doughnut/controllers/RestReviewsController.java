@@ -6,7 +6,7 @@ import com.odde.doughnut.entities.AnswerViewedByUser;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.InitialInfo;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
-import com.odde.doughnut.entities.json.RepetitionForUser;
+import com.odde.doughnut.entities.json.DueReviewPoints;
 import com.odde.doughnut.entities.json.ReviewStatus;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/reviews")
@@ -83,7 +82,7 @@ class RestReviewsController {
 
   @GetMapping("/repeat")
   @Transactional
-  public RepetitionForUser repeatReview() {
+  public DueReviewPoints repeatReview() {
     currentUser.assertLoggedIn();
     Reviewing reviewing = currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
     return reviewing.getDueReviewPoints();

@@ -4,6 +4,6 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
-public class RepetitionForUser {
+public class DueReviewPoints {
   @Getter @Setter private List<Integer> toRepeat;
 }

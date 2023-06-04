@@ -38,7 +38,7 @@ beforeEach(() => {
 
 describe("repeat page", () => {
   const mountPage = async (
-    repetition: Generated.RepetitionForUser | Record<string, never>
+    repetition: Generated.DueReviewPoints | Record<string, never>
   ) => {
     helper.apiMock
       .expectingGet("/api/reviews/repeat")
@@ -56,7 +56,7 @@ describe("repeat page", () => {
   });
 
   describe('repeat page with "just review" quiz', () => {
-    let repetition: Generated.RepetitionForUser;
+    let repetition: Generated.DueReviewPoints;
 
     beforeEach(() => {
       vi.useFakeTimers();

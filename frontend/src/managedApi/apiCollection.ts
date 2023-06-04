@@ -100,7 +100,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     async getDueReviewPoints() {
       const res = (await managedApi.restGet(
         `reviews/repeat`
-      )) as Generated.RepetitionForUser;
+      )) as Generated.DueReviewPoints;
       return res;
     },
 

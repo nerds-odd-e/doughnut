@@ -59,7 +59,7 @@ export default defineComponent({
   },
   data() {
     return {
-      repetition: undefined as Generated.RepetitionForUser | undefined,
+      repetition: undefined as Generated.DueReviewPoints | undefined,
       previousResults: [] as Generated.AnswerResult[],
       previousResultCursor: undefined as number | undefined,
     };

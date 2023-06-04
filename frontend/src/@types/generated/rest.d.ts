@@ -39,6 +39,10 @@ declare namespace Generated {
         externalIdentifier: string;
     }
 
+    interface DueReviewPoints {
+        toRepeat: number[];
+    }
+
     interface DummyForGeneratingTypes {
         answerViewedByUser: AnswerViewedByUser;
         answerResult: AnswerResult;
@@ -130,10 +134,6 @@ declare namespace Generated {
 
     interface RedirectToNoteResponse {
         noteId: number;
-    }
-
-    interface RepetitionForUser {
-        toRepeat: number[];
     }
 
     interface ReviewStatus {

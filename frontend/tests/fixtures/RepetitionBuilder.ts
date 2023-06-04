@@ -1,7 +1,7 @@
 import Builder from "./Builder";
 import generateId from "./generateId";
 
-class RepetitionBuilder extends Builder<Generated.RepetitionForUser> {
+class RepetitionBuilder extends Builder<Generated.DueReviewPoints> {
   quizQuestion: Generated.QuizQuestionViewedByUser = {
     quizQuestion: {
       id: generateId(),
@@ -38,7 +38,7 @@ class RepetitionBuilder extends Builder<Generated.RepetitionForUser> {
     return this;
   }
 
-  do(): Generated.RepetitionForUser {
+  do(): Generated.DueReviewPoints {
     return {
       quizQuestion: this.quizQuestion,
       toRepeat: [],
