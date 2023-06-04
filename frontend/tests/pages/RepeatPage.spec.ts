@@ -66,6 +66,9 @@ describe("repeat page", () => {
         .please();
       repetition.toRepeat = [1, 2, 3];
       helper.apiMock
+        .expectingGet(`/api/review-points/${1}/random-question`)
+        .andReturnOnce(repetition.quizQuestion);
+      helper.apiMock
         .expectingGet(`/api/review-points/${reviewPoint.id}`)
         .andReturnOnce(reviewPoint);
     });
@@ -73,14 +76,6 @@ describe("repeat page", () => {
     it("shows the progress", async () => {
       const wrapper = await mountPage(repetition);
       expect(wrapper.find(".progress-text").text()).toContain("0/3");
-    });
-
-    it("should call the answer api", async () => {
-      const wrapper = await mountPage(repetition);
-      helper.apiMock.expectingPost(`/api/reviews/answer`);
-      vi.runOnlyPendingTimers();
-      await flushPromises();
-      await wrapper.find("button.btn-primary").trigger("click");
     });
 
     it("should show progress", async () => {
@@ -95,7 +90,9 @@ describe("repeat page", () => {
       vi.runOnlyPendingTimers();
       await flushPromises();
       await wrapper.find("button.btn-primary").trigger("click");
-      helper.apiMock.expectingGet("/api/reviews/repeat");
+      helper.apiMock
+        .expectingGet(`/api/review-points/${2}/random-question`)
+        .andReturnOnce(repetition.quizQuestion);
 
       for (let i = 0; i < 10; i += 1) {
         // eslint-disable-next-line no-await-in-loop

@@ -37,7 +37,7 @@ class RestReviewPointController {
     return reviewPoint;
   }
 
-  @GetMapping("/repeat")
+  @GetMapping("/{reviewPoint}/random-question")
   @Transactional
   public QuizQuestionViewedByUser repeatReview(@PathVariable("reviewPoint") ReviewPoint reviewPoint) {
     currentUser.assertLoggedIn();
