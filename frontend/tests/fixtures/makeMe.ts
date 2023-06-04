@@ -3,7 +3,7 @@ import NoteRealmBuilder from "./NoteRealmBuilder";
 import NotePositionBuilder from "./NotePositionBuilder";
 import ReviewPointBuilder from "./ReviewPointBuilder";
 import LinkBuilder from "./LinkBuilder";
-import RepetitionBuilder from "./RepetitionBuilder";
+import DueReviewPointsBuilder from "./DueReviewPointsBuilder";
 import NotebookBuilder from "./NotebookBuilder";
 import CircleNoteBuilder from "./CircleNoteBuilder";
 import BazaarNoteBuilder from "./NotebooksBuilder";
@@ -11,6 +11,7 @@ import NoteBuilder from "./NoteBuilder";
 import UserBuilder from "./UserBuilder";
 import WikidataEntityBuilder from "./WikidataEntityBuilder";
 import WikidataSearchEntityBuilder from "./WikidataSearchEntityBuilder";
+import QuizQuestionBuilder from "./QuizQuestionBuilder";
 
 class MakeMe {
   static aUser() {
@@ -41,8 +42,12 @@ class MakeMe {
     return new LinkBuilder();
   }
 
-  static get aRepetition(): RepetitionBuilder {
-    return new RepetitionBuilder();
+  static get aDueReviewPointsList(): DueReviewPointsBuilder {
+    return new DueReviewPointsBuilder();
+  }
+
+  static get aQuizQuestion(): QuizQuestionBuilder {
+    return new QuizQuestionBuilder();
   }
 
   static get aCircleNote(): CircleNoteBuilder {

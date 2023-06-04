@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.entities.json.DueReviewPoints;
 import com.odde.doughnut.entities.json.ReviewStatus;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Stream;

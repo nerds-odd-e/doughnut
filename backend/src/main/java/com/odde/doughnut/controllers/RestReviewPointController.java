@@ -8,12 +8,11 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
+import javax.annotation.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-import javax.annotation.Resource;
 
 @RestController
 @RequestMapping("/api/review-points")
@@ -24,7 +23,10 @@ class RestReviewPointController {
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
-  public RestReviewPointController(ModelFactoryService modelFactoryService, UserModel currentUser, TestabilitySettings testabilitySettings) {
+  public RestReviewPointController(
+      ModelFactoryService modelFactoryService,
+      UserModel currentUser,
+      TestabilitySettings testabilitySettings) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
@@ -39,10 +41,12 @@ class RestReviewPointController {
 
   @GetMapping("/{reviewPoint}/random-question")
   @Transactional
-  public QuizQuestionViewedByUser repeatReview(@PathVariable("reviewPoint") ReviewPoint reviewPoint) {
+  public QuizQuestionViewedByUser repeatReview(
+      @PathVariable("reviewPoint") ReviewPoint reviewPoint) {
     currentUser.assertLoggedIn();
     ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPoint);
-    return reviewPointModel.getRandomQuizQuestion(testabilitySettings.getRandomizer(), currentUser.getEntity());
+    return reviewPointModel.getRandomQuizQuestion(
+        testabilitySettings.getRandomizer(), currentUser.getEntity());
   }
 
   @PostMapping(path = "/{reviewPoint}/remove")

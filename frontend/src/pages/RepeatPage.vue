@@ -13,15 +13,15 @@
   <template v-if="!minimized">
     <div class="content">
       <div class="inner-box">
-        <template v-if="repetition">
+        <template v-if="currentQuizQuestion">
           <QuizQuestion
             v-bind="{
-              quizQuestion: repetition.quizQuestion,
+              quizQuestion: currentQuizQuestion,
               storageAccessor,
             }"
             @answered="onAnswered($event)"
-            @reload-needed="fetchData"
-            :key="repetition.quizQuestion.quizQuestion.reviewPoint"
+            @reload-needed="fetchDueReviewPoints"
+            :key="currentQuizQuestion.quizQuestion.reviewPoint"
           />
         </template>
         <template v-else>
@@ -60,6 +60,9 @@ export default defineComponent({
   data() {
     return {
       repetition: undefined as Generated.DueReviewPoints | undefined,
+      currentQuizQuestion: undefined as
+        | Generated.QuizQuestionViewedByUser
+        | undefined,
       previousResults: [] as Generated.AnswerResult[],
       previousResultCursor: undefined as number | undefined,
     };
@@ -90,25 +93,31 @@ export default defineComponent({
     selectPosition() {
       this.storageAccessor.selectPosition(
         undefined,
-        this.repetition?.quizQuestion.notebookPosition
+        this.currentQuizQuestion?.notebookPosition
       );
     },
 
-    async fetchData() {
-      try {
-        this.repetition = await this.api.reviewMethods.getDueReviewPoints();
-        await this.fetchQuestion();
-      } catch (_e) {
+    async fetchDueReviewPoints() {
+      this.repetition = await this.api.reviewMethods.getDueReviewPoints();
+      if (this.repetition?.toRepeat?.length === 0) {
         this.repetition = undefined;
         if (this.finished === 0) {
           this.$router.push({ name: "reviews" });
         }
+        return;
       }
+      await this.fetchQuestion();
     },
 
     async fetchQuestion() {
-      if (!this.repetition) return;
-      this.repetition.quizQuestion =
+      if (
+        !this.repetition ||
+        this.finished >= this.repetition.toRepeat.length
+      ) {
+        this.currentQuizQuestion = undefined;
+        return;
+      }
+      this.currentQuizQuestion =
         await this.api.reviewMethods.getRandomQuestionForReviewPoint(
           this.repetition.toRepeat[this.finished]
         );
@@ -132,7 +141,7 @@ export default defineComponent({
   },
 
   async mounted() {
-    this.fetchData();
+    this.fetchDueReviewPoints();
   },
 });
 </script>
