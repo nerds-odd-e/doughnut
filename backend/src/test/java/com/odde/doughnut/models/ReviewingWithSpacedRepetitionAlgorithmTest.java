@@ -10,6 +10,8 @@ import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -131,13 +133,7 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
   }
 
   private ReviewPoint getOneReviewPointNeedToRepeat(Timestamp timestamp) {
-    return userModel
-        .createReviewing(timestamp)
-        .getOneRepetitionForUser(randomizer)
-        .map(
-            (repetitionForUser ->
-                repetitionForUser.getQuizQuestion().quizQuestion.getReviewPoint()))
-        .orElse(null);
+    return userModel.getReviewPointsNeedToRepeat(timestamp).get(0);
   }
 
   private Timestamp daysAfterBase(ReviewPoint reviewPoint, Integer reviewDay) {
