@@ -133,7 +133,6 @@ declare namespace Generated {
     }
 
     interface RepetitionForUser {
-        quizQuestion: QuizQuestionViewedByUser;
         toRepeat: number[];
     }
 

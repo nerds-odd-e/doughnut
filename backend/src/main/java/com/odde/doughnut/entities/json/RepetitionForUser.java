@@ -5,6 +5,5 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class RepetitionForUser {
-  @Getter @Setter private QuizQuestionViewedByUser quizQuestion;
   @Getter @Setter private List<Integer> toRepeat;
 }
