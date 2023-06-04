@@ -86,29 +86,17 @@ public class Reviewing {
         .toList();
   }
 
-  private Optional<ReviewPointModel> getOneReviewPointNeedToRepeat(Randomizer randomizer) {
-    List<ReviewPoint> reviewPointsNeedToRepeat =
-        userModel.getReviewPointsNeedToRepeat(currentUTCTimestamp);
-    return randomizer
-        .chooseOneRandomly(reviewPointsNeedToRepeat)
-        .map(modelFactoryService::toReviewPointModel);
-  }
-
   private Stream<SubscriptionModel> getSubscriptionModelStream() {
     return userModel.entity.getSubscriptions().stream()
         .map(modelFactoryService::toSubscriptionModel);
   }
 
-  public Optional<RepetitionForUser> getOneRepetitionForUser(Randomizer randomizer) {
-    return getOneReviewPointNeedToRepeat(randomizer)
-        .map(reviewPointModel -> buildRepetitionForUser(randomizer, reviewPointModel));
+  public RepetitionForUser getDueReviewPoints() {
+    return buildRepetitionForUser();
   }
 
-  private RepetitionForUser buildRepetitionForUser(
-      Randomizer randomizer, ReviewPointModel reviewPointModel) {
+  private RepetitionForUser buildRepetitionForUser() {
     RepetitionForUser repetitionForUser = new RepetitionForUser();
-    repetitionForUser.setQuizQuestion(
-      reviewPointModel.getRandomQuizQuestion(randomizer,  userModel.getEntity()));
     repetitionForUser.setToRepeat(toRepeatList());
     return repetitionForUser;
   }
