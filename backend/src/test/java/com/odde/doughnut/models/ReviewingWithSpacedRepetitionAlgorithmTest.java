@@ -133,7 +133,7 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
   }
 
   private ReviewPoint getOneReviewPointNeedToRepeat(Timestamp timestamp) {
-    return userModel.getReviewPointsNeedToRepeat(timestamp).get(0);
+    return userModel.getReviewPointsNeedToRepeat(timestamp).stream().findFirst().orElse(null);
   }
 
   private Timestamp daysAfterBase(ReviewPoint reviewPoint, Integer reviewDay) {
