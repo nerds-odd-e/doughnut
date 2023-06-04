@@ -2,10 +2,10 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.Thing;
-import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.entities.json.RepetitionForUser;
 import com.odde.doughnut.entities.json.ReviewStatus;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
@@ -108,10 +108,7 @@ public class Reviewing {
       Randomizer randomizer, ReviewPointModel reviewPointModel) {
     RepetitionForUser repetitionForUser = new RepetitionForUser();
     repetitionForUser.setQuizQuestion(
-        new QuizQuestionViewedByUser(
-            reviewPointModel.generateAQuizQuestion(randomizer),
-            this.modelFactoryService,
-            userModel.getEntity()));
+      reviewPointModel.getRandomQuizQuestion(randomizer,  userModel.getEntity()));
     repetitionForUser.setToRepeat(toRepeatList());
     return repetitionForUser;
   }

@@ -11,6 +11,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,13 +28,15 @@ import org.springframework.web.server.ResponseStatusException;
 class RestReviewPointControllerTest {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
+
+  private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   private UserModel userModel;
   RestReviewPointController controller;
 
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    controller = new RestReviewPointController(modelFactoryService, userModel);
+    controller = new RestReviewPointController(modelFactoryService, userModel, testabilitySettings);
   }
 
   @Nested

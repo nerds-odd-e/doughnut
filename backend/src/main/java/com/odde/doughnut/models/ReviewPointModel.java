@@ -3,12 +3,20 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
 import java.sql.Timestamp;
 import java.util.Optional;
 
 public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFactoryService) {
+  public QuizQuestionViewedByUser getRandomQuizQuestion(Randomizer randomizer, User user) {
+    return new QuizQuestionViewedByUser(
+      generateAQuizQuestion(randomizer),
+      modelFactoryService,
+      user);
+  }
+
   public ReviewPoint getEntity() {
     return entity;
   }
