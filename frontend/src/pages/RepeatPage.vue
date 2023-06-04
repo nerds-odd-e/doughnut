@@ -60,7 +60,6 @@ export default defineComponent({
   data() {
     return {
       repetition: undefined as Generated.RepetitionForUser | undefined,
-      toRepeat: undefined as undefined | number[],
       previousResults: [] as Generated.AnswerResult[],
       previousResultCursor: undefined as number | undefined,
     };
@@ -74,7 +73,7 @@ export default defineComponent({
       return this.previousResults.length;
     },
     toRepeatCount() {
-      return (this.toRepeat?.length || 0) - this.finished;
+      return (this.repetition?.toRepeat?.length || 0) - this.finished;
     },
   },
   methods: {
@@ -94,10 +93,11 @@ export default defineComponent({
         this.repetition?.quizQuestion.notebookPosition
       );
     },
+
     async fetchData() {
       try {
-        this.repetition = await this.api.reviewMethods.getNextReviewItem();
-        this.selectPosition();
+        this.repetition = await this.api.reviewMethods.getDueReviewPoints();
+        await this.fetchQuestion();
       } catch (_e) {
         this.repetition = undefined;
         if (this.finished === 0) {
@@ -106,12 +106,21 @@ export default defineComponent({
       }
     },
 
+    async fetchQuestion() {
+      if (!this.repetition) return;
+      this.repetition.quizQuestion =
+        await this.api.reviewMethods.getRandomQuestionForReviewPoint(
+          this.repetition.toRepeat[this.finished]
+        );
+      this.selectPosition();
+    },
+
     onAnswered(answerResult: Generated.AnswerResult) {
       this.previousResults.push(answerResult);
       if (!answerResult.correct) {
         this.viewLastResult(this.previousResults.length - 1);
       }
-      this.fetchData();
+      this.fetchQuestion();
     },
   },
   watch: {
@@ -123,9 +132,7 @@ export default defineComponent({
   },
 
   async mounted() {
-    this.fetchData().then(() => {
-      this.toRepeat = this.repetition?.toRepeat;
-    });
+    this.fetchData();
   },
 });
 </script>

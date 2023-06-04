@@ -97,7 +97,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return res;
     },
 
-    async getNextReviewItem() {
+    async getDueReviewPoints() {
       const res = (await managedApi.restGet(
         `reviews/repeat`
       )) as Generated.RepetitionForUser;
