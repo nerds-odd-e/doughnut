@@ -101,9 +101,13 @@ const routes = [
     meta: { useNoteStorageAccessor: true },
   },
   {
-    path: "/reviews/repeat/:more?",
+    path: "/reviews/repeat/:max?&:dueindays?",
     name: "repeat",
     component: NestedRepeatPage,
+    props: (route: RouteLocation) => ({
+      max: route.params.max && Number(route.params.max),
+      dueindays: route.params.max && Number(route.params.dueindays),
+    }),
     children: [...nestedNoteAndLinkRoutes("repeat-")],
     meta: { useNoteStorageAccessor: true },
   },

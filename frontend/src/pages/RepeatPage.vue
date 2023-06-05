@@ -50,6 +50,8 @@ export default defineComponent({
   name: "RepeatPage",
   props: {
     minimized: Boolean,
+    max: Number,
+    dueindays: Number,
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,
@@ -101,7 +103,10 @@ export default defineComponent({
     },
 
     async fetchDueReviewPoints() {
-      this.repetition = await this.api.reviewMethods.getDueReviewPoints();
+      this.repetition = await this.api.reviewMethods.getDueReviewPoints(
+        this.max,
+        this.dueindays
+      );
       if (this.repetition?.toRepeat?.length === 0) {
         this.repetition = undefined;
         if (this.finished === 0) {

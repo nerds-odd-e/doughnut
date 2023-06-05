@@ -58,7 +58,7 @@
             <router-link
               role="button"
               class="btn btn-secondary"
-              :to="{ name: 'repeat', params: { more: 10 } }"
+              :to="{ name: 'repeat', params: { max: 10, dueindays: 14 } }"
             >
               Do more repetition
             </router-link>

@@ -41,7 +41,7 @@ describe("repeat page", () => {
     repetition: Generated.DueReviewPoints | Record<string, never>
   ) => {
     helper.apiMock
-      .expectingGet("/api/reviews/repeat")
+      .expectingGet("/api/reviews/repeat?max=&dueindays=")
       .andReturnOnce(repetition);
     const wrapper = renderer.currentRoute({ name: "repeat" }).mount();
     await flushPromises();
