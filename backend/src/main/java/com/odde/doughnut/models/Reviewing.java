@@ -45,11 +45,9 @@ public class Reviewing {
         .map(ReviewPoint::buildReviewPointForThing);
   }
 
-  private List<Integer> toRepeatList() {
-    return userModel
-        .getReviewPointsNeedToRepeat(currentUTCTimestamp)
-        .map(ReviewPoint::getId)
-        .toList();
+  private Stream<ReviewPoint> getReviewPointsNeedToRepeat(int dueInDays) {
+    return userModel.getReviewPointsNeedToRepeat(
+        TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, dueInDays * 24));
   }
 
   private int notLearntCount() {
@@ -91,14 +89,18 @@ public class Reviewing {
   }
 
   public DueReviewPoints getDueReviewPoints(Integer max, Integer dueInDays, Randomizer randomizer) {
+    List<Integer> toRepeat =
+        getReviewPointsNeedToRepeat(dueInDays == null ? 0 : dueInDays)
+            .map(ReviewPoint::getId)
+            .toList();
     DueReviewPoints dueReviewPoints = new DueReviewPoints();
-    dueReviewPoints.setToRepeat(toRepeatList());
+    dueReviewPoints.setToRepeat(toRepeat);
     return dueReviewPoints;
   }
 
   public ReviewStatus getReviewStatus() {
     ReviewStatus reviewStatus = new ReviewStatus();
-    reviewStatus.toRepeat = toRepeatList();
+    reviewStatus.toRepeatCount = (int) getReviewPointsNeedToRepeat(0).count();
     reviewStatus.learntCount = userModel.learntCount();
     reviewStatus.notLearntCount = notLearntCount();
     reviewStatus.toInitialReviewCount = toInitialReviewCount();

@@ -34,7 +34,7 @@
         <div class="card-header">
           Repeat Old Notes
           <span class="badge bg-secondary number-of-repeats">
-            {{ `${reviewing.toRepeat.length}/${reviewing.learntCount}` }}
+            {{ `${reviewing.toRepeatCount}/${reviewing.learntCount}` }}
           </span>
         </div>
         <div class="card-body">
@@ -42,7 +42,7 @@
             Using spaced repetition technique, you only need to review the old
             notes you have learned at the optimal time.
           </p>
-          <span v-if="reviewing.toRepeat.length > 0">
+          <span v-if="reviewing.toRepeatCount > 0">
             <router-link
               role="button"
               class="btn btn-light"

@@ -1,9 +1,7 @@
 package com.odde.doughnut.entities.json;
 
-import java.util.List;
-
 public class ReviewStatus {
-  public List<Integer> toRepeat;
+  public int toRepeatCount;
   public int learntCount;
   public int notLearntCount;
 

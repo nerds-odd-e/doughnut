@@ -137,7 +137,7 @@ declare namespace Generated {
     }
 
     interface ReviewStatus {
-        toRepeat: number[];
+        toRepeatCount: number;
         learntCount: number;
         notLearntCount: number;
         toInitialReviewCount: number;

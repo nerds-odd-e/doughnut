@@ -79,10 +79,11 @@ class RestReviewsController {
     return reviewPointModel.getEntity();
   }
 
-  @GetMapping("/repeat{max}{dueindays}")
+  @GetMapping(value = {"/repeat", "/repeat{max}{dueindays}"})
   @Transactional
   public DueReviewPoints repeatReview(
-      @PathVariable("max") Integer max, @PathVariable("dueindays") Integer dueInDays) {
+      @PathVariable(value = "max", required = false) Integer max,
+      @PathVariable(value = "dueindays", required = false) Integer dueInDays) {
     currentUser.assertLoggedIn();
     Reviewing reviewing = currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
     return reviewing.getDueReviewPoints(max, dueInDays, testabilitySettings.getRandomizer());
