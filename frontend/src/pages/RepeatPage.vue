@@ -24,10 +24,11 @@
             :key="currentQuizQuestion.quizQuestion.reviewPoint"
           />
         </template>
-        <template v-else>
-          <div v-if="finished > 0" class="alert alert-success">
+        <template v-else-if="finished > 0">
+          <div class="alert alert-success">
             You have finished all repetitions for this half a day!
           </div>
+          <ReviewHome />
         </template>
       </div>
     </div>
@@ -37,6 +38,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import QuizQuestion from "../components/review/QuizQuestion.vue";
+import ReviewHome from "./ReviewHome.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
 import { StorageAccessor } from "../store/createNoteStorage";
@@ -56,6 +58,7 @@ export default defineComponent({
   components: {
     QuizQuestion,
     RepeatProgressBar,
+    ReviewHome,
   },
   data() {
     return {
