@@ -56,7 +56,7 @@ public class UserModel implements ReviewScope {
         entity, since);
   }
 
-  public List<ReviewPoint> getReviewPointsNeedToRepeat(Timestamp currentUTCTimestamp) {
+  public Stream<ReviewPoint> getReviewPointsNeedToRepeat(Timestamp currentUTCTimestamp) {
     final ZoneId timeZone = getTimeZone();
     final Timestamp timestamp = TimestampOperations.alignByHalfADay(currentUTCTimestamp, timeZone);
     return modelFactoryService.reviewPointRepository

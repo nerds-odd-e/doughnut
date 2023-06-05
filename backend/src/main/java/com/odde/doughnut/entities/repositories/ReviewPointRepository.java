@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.entities.User;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.stream.Stream;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -21,7 +22,7 @@ public interface ReviewPointRepository extends CrudRepository<ReviewPoint, Integ
               + byUser
               + " AND rp.next_review_at <= :nextReviewAt ORDER BY rp.next_review_at",
       nativeQuery = true)
-  List<ReviewPoint> findAllByUserAndNextReviewAtLessThanEqualOrderByNextReviewAt(
+  Stream<ReviewPoint> findAllByUserAndNextReviewAtLessThanEqualOrderByNextReviewAt(
       @Param("user") User user, @Param("nextReviewAt") Timestamp nextReviewAt);
 
   @Query(value = "SELECT * " + byUser + "AND rp.thing_id =:#{#thing.id}", nativeQuery = true)

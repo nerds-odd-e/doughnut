@@ -46,7 +46,8 @@ public class Reviewing {
   }
 
   private List<Integer> toRepeatList() {
-    return userModel.getReviewPointsNeedToRepeat(currentUTCTimestamp).stream()
+    return userModel
+        .getReviewPointsNeedToRepeat(currentUTCTimestamp)
         .map(ReviewPoint::getId)
         .toList();
   }
@@ -89,11 +90,7 @@ public class Reviewing {
         .map(modelFactoryService::toSubscriptionModel);
   }
 
-  public DueReviewPoints getDueReviewPoints() {
-    return buildRepetitionForUser();
-  }
-
-  private DueReviewPoints buildRepetitionForUser() {
+  public DueReviewPoints getDueReviewPoints(Integer max, Integer dueInDays, Randomizer randomizer) {
     DueReviewPoints dueReviewPoints = new DueReviewPoints();
     dueReviewPoints.setToRepeat(toRepeatList());
     return dueReviewPoints;
