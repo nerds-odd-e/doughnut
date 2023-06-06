@@ -20,12 +20,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/reviews")
@@ -79,11 +74,11 @@ class RestReviewsController {
     return reviewPointModel.getEntity();
   }
 
-  @GetMapping(value = {"/repeat", "/repeat{max}{dueindays}"})
+  @GetMapping(value = {"/repeat"})
   @Transactional
   public DueReviewPoints repeatReview(
-      @PathVariable(value = "max", required = false) Integer max,
-      @PathVariable(value = "dueindays", required = false) Integer dueInDays) {
+      @RequestParam(value = "max", required = false) Integer max,
+      @RequestParam(value = "dueindays", required = false) Integer dueInDays) {
     currentUser.assertLoggedIn();
     Reviewing reviewing = currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
     return reviewing.getDueReviewPoints(max, dueInDays, testabilitySettings.getRandomizer());

@@ -94,6 +94,8 @@ public class Reviewing {
             .map(ReviewPoint::getId)
             .toList();
     DueReviewPoints dueReviewPoints = new DueReviewPoints();
+    dueReviewPoints.setMax(max);
+    dueReviewPoints.setDueInDays(dueInDays);
     dueReviewPoints.setToRepeat(toRepeat);
     return dueReviewPoints;
   }

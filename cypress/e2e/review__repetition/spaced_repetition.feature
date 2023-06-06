@@ -25,12 +25,11 @@ Feature: Spaced-repetition
         * On day 7 I repeat old "                    " and initial review new "end         "
         * On day 8 I repeat old "Note 1, end         " and initial review new "end         "
 
-    @ignore
     @mockBrowserTime
     Scenario: Strictly follow the schedule but want to review more
         * On day 1 I repeat old "                    " and initial review new "Note 1, end "
         * On day 2 I repeat old "Note 1, end         " and initial review new "Note 2, end "
         * On day 3 I repeat old "Note 2, end         " and initial review new "Note 3, end "
         Given I ask to do more repetition
-        When I repeat old "Note 1, Note3, end        "
-        Then On day 4 I should have "0/0" note for initial review and "0/3" for repeat
+        When I repeat more old "Note 1         "
+        Then On day 4 I should have "0/0" note for initial review and "1/3" for repeat

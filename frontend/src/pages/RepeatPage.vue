@@ -146,6 +146,9 @@ export default defineComponent({
         this.selectPosition();
       }
     },
+    max() {
+      this.fetchDueReviewPoints();
+    },
   },
 
   async mounted() {

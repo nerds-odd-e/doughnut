@@ -448,8 +448,6 @@ Cypress.Commands.add("initialReviewNotes", (noteTitles: string) => {
 })
 
 Cypress.Commands.add("repeatReviewNotes", (noteTitles: string) => {
-  if (noteTitles.trim() === "") return
-  cy.routerToRepeatReview()
   noteTitles.commonSenseSplit(",").forEach((title) => {
     if (title == "end") {
       cy.findByText("You have finished all repetitions for this half a day!").should("be.visible")
@@ -458,6 +456,12 @@ Cypress.Commands.add("repeatReviewNotes", (noteTitles: string) => {
       cy.yesIRemember()
     }
   })
+})
+
+Cypress.Commands.add("goAndRepeatReviewNotes", (noteTitles: string) => {
+  if (noteTitles.trim() === "") return
+  cy.routerToRepeatReview()
+  cy.repeatReviewNotes(noteTitles)
 })
 
 Cypress.Commands.add("repeatMore", () => {

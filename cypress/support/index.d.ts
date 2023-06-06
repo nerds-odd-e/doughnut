@@ -75,6 +75,7 @@ declare namespace Cypress {
     clearFocusedText(): Chainable<any>
     replaceFocusedTextAndEnter(test: any): Chainable<any>
     repeatReviewNotes(noteTitles: string): Chainable<any>
+    goAndRepeatReviewNotes(noteTitles: string): Chainable<any>
     repeatMore(): Chainable<any>
     restore(): Chainable<Subject>
     routerPush(fallback: any, name: any, params: any): Chainable<any>
