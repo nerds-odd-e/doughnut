@@ -7,13 +7,15 @@ import checker from 'vite-plugin-checker';
 import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import viteCompression from 'vite-plugin-compression';
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
   test: {
     exclude: [
       "packages/template/*",
       "node_modules/**/*.spec.js",
-      "node_modules/**/*.test.js"
+      "node_modules/**/*.test.js",
+      "node_modules/**/test.js"
     ],
     globals: true,
     environment: "jsdom",
@@ -29,6 +31,7 @@ export default defineConfig({
     }
   },
   plugins: [
+    tsconfigPaths(),
     checker({
       vueTsc: true,
       eslint: {
