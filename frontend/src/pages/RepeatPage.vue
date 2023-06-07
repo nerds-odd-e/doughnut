@@ -37,6 +37,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import _ from "lodash";
 import QuizQuestion from "../components/review/QuizQuestion.vue";
 import ReviewHome from "./ReviewHome.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
@@ -113,6 +114,9 @@ export default defineComponent({
           this.$router.push({ name: "reviews" });
         }
         return;
+      }
+      if (this.api.testability.getEnvironment() !== "testing") {
+        this.repetition.toRepeat = _.shuffle(this.repetition.toRepeat);
       }
       await this.fetchQuestion();
     },
