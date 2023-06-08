@@ -50,9 +50,9 @@ describe("repeat page", () => {
 
   it("redirect to review page if nothing to repeat", async () => {
     const repetition = makeMe.aDueReviewPointsList.please();
-    await mountPage(repetition);
+    const wrapper = await mountPage(repetition);
     await flushPromises();
-    expect(mockRouterPush).toHaveBeenCalledWith({ name: "reviews" });
+    expect(wrapper.findAll("button").length).toBe(4);
   });
 
   describe('repeat page with "just review" quiz', () => {

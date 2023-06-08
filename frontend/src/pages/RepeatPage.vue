@@ -24,11 +24,33 @@
             :key="currentQuizQuestion.quizQuestion.reviewPoint"
           />
         </template>
-        <template v-else-if="finished > 0">
+        <template v-else-if="noMoreToRepeat">
           <div class="alert alert-success">
             You have finished all repetitions for this half a day!
           </div>
-          <ReviewHome />
+          <div>
+            <button
+              role="button"
+              class="btn btn-secondary"
+              @click="loadMore(3)"
+            >
+              Load more from next 3 days
+            </button>
+            <button
+              role="button"
+              class="btn btn-secondary"
+              @click="loadMore(7)"
+            >
+              Load more from next 7 days
+            </button>
+            <button
+              role="button"
+              class="btn btn-secondary"
+              @click="loadMore(14)"
+            >
+              Load more from next 14 days
+            </button>
+          </div>
         </template>
       </div>
     </div>
@@ -39,7 +61,6 @@
 import { defineComponent, PropType } from "vue";
 import _ from "lodash";
 import QuizQuestion from "../components/review/QuizQuestion.vue";
-import ReviewHome from "./ReviewHome.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
 import { StorageAccessor } from "../store/createNoteStorage";
@@ -61,7 +82,6 @@ export default defineComponent({
   components: {
     QuizQuestion,
     RepeatProgressBar,
-    ReviewHome,
   },
   data() {
     return {
@@ -84,6 +104,9 @@ export default defineComponent({
     toRepeatCount() {
       return (this.repetition?.toRepeat?.length || 0) - this.finished;
     },
+    noMoreToRepeat() {
+      return this.toRepeatCount <= 0;
+    },
   },
   methods: {
     viewLastResult(cursor: number | undefined) {
@@ -103,16 +126,13 @@ export default defineComponent({
       );
     },
 
-    async fetchDueReviewPoints() {
+    async loadMore(dueInDays?: number) {
       this.repetition = await this.api.reviewMethods.getDueReviewPoints(
         this.max,
-        this.dueindays
+        dueInDays
       );
       if (this.repetition?.toRepeat?.length === 0) {
         this.repetition = undefined;
-        if (this.finished === 0) {
-          this.$router.push({ name: "reviews" });
-        }
         return;
       }
       if (this.api.testability.getEnvironment() !== "testing") {
@@ -121,11 +141,12 @@ export default defineComponent({
       await this.fetchQuestion();
     },
 
+    async fetchDueReviewPoints() {
+      this.loadMore(this.dueindays);
+    },
+
     async fetchQuestion() {
-      if (
-        !this.repetition ||
-        this.finished >= this.repetition.toRepeat.length
-      ) {
+      if (!this.repetition || this.noMoreToRepeat) {
         this.currentQuizQuestion = undefined;
         return;
       }

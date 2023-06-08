@@ -465,8 +465,8 @@ Cypress.Commands.add("goAndRepeatReviewNotes", (noteTitles: string) => {
 })
 
 Cypress.Commands.add("repeatMore", () => {
-  cy.routerToReviews()
-  cy.findByRole("button", { name: "Do more repetition" }).click()
+  cy.routerToRepeatReview()
+  cy.findByRole("button", { name: "Load more from next 3 days" }).click()
 })
 
 Cypress.Commands.add("shouldSeeQuizWithOptions", (questionParts: string[], options: string) => {
