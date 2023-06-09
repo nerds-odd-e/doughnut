@@ -88,13 +88,12 @@ public class Reviewing {
         .map(modelFactoryService::toSubscriptionModel);
   }
 
-  public DueReviewPoints getDueReviewPoints(Integer max, Integer dueInDays, Randomizer randomizer) {
+  public DueReviewPoints getDueReviewPoints(Integer dueInDays, Randomizer randomizer) {
     List<Integer> toRepeat =
         getReviewPointsNeedToRepeat(dueInDays == null ? 0 : dueInDays)
             .map(ReviewPoint::getId)
             .toList();
     DueReviewPoints dueReviewPoints = new DueReviewPoints();
-    dueReviewPoints.setMax(max);
     dueReviewPoints.setDueInDays(dueInDays);
     dueReviewPoints.setToRepeat(toRepeat);
     return dueReviewPoints;

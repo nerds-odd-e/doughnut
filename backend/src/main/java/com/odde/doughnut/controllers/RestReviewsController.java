@@ -77,11 +77,10 @@ class RestReviewsController {
   @GetMapping(value = {"/repeat"})
   @Transactional
   public DueReviewPoints repeatReview(
-      @RequestParam(value = "max", required = false) Integer max,
       @RequestParam(value = "dueindays", required = false) Integer dueInDays) {
     currentUser.assertLoggedIn();
     Reviewing reviewing = currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
-    return reviewing.getDueReviewPoints(max, dueInDays, testabilitySettings.getRandomizer());
+    return reviewing.getDueReviewPoints(dueInDays, testabilitySettings.getRandomizer());
   }
 
   @PostMapping("/answer")

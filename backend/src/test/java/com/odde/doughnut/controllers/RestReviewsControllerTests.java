@@ -87,7 +87,7 @@ class RestReviewsControllerTests {
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       assertThrows(
-          ResponseStatusException.class, () -> nullUserController().repeatReview(null, null));
+          ResponseStatusException.class, () -> nullUserController().repeatReview( null));
     }
   }
 
