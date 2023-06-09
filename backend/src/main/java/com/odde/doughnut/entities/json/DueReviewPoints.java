@@ -6,6 +6,5 @@ import lombok.Setter;
 
 public class DueReviewPoints {
   @Getter @Setter private List<Integer> toRepeat;
-  @Getter @Setter private Integer max;
   @Getter @Setter private Integer dueInDays;
 }

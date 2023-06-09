@@ -5,7 +5,6 @@ class RepetitionBuilder extends Builder<Generated.DueReviewPoints> {
   do(): Generated.DueReviewPoints {
     return {
       toRepeat: [],
-      max: 0,
       dueInDays: 0,
     };
   }

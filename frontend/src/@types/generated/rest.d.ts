@@ -41,7 +41,6 @@ declare namespace Generated {
 
     interface DueReviewPoints {
         toRepeat: number[];
-        max: number;
         dueInDays: number;
     }
 
