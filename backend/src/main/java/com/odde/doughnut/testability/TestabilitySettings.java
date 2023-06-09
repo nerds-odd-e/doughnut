@@ -4,7 +4,7 @@ import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.models.randomizers.RealRandomizer;
 import com.odde.doughnut.services.GithubService;
-import com.odde.doughnut.services.openAiApis.OpenAiApis;
+import com.odde.doughnut.services.openAiApis.OpenAiAPITextCompletion;
 import com.theokanning.openai.OpenAiApi;
 import java.sql.Timestamp;
 import java.util.HashMap;
@@ -96,6 +96,6 @@ public class TestabilitySettings {
   @SessionScope
   @Qualifier("testableOpenAiApi")
   public OpenAiApi getTestableOpenAiApi(@Value("${spring.openai.token}") String openAiToken) {
-    return OpenAiApis.getOpenAiApi(openAiToken, this.serviceUrls.get("openAi"));
+    return OpenAiAPITextCompletion.getOpenAiApi(openAiToken, this.serviceUrls.get("openAi"));
   }
 }
