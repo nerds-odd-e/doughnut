@@ -97,9 +97,9 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return res;
     },
 
-    async getDueReviewPoints(max?: number, dueInDays?: number) {
+    async getDueReviewPoints(dueInDays?: number) {
       const res = (await managedApi.restGet(
-        `reviews/repeat?max=${max ?? ""}&dueindays=${dueInDays ?? ""}`
+        `reviews/repeat?dueindays=${dueInDays ?? ""}`
       )) as Generated.DueReviewPoints;
       return res;
     },

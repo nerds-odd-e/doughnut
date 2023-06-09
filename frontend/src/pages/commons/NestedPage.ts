@@ -18,8 +18,6 @@ function NestedPage(
         type: Object as PropType<StorageAccessor>,
         required: true,
       },
-      max: { type: Number, default: undefined },
-      dueindays: { type: Number, default: undefined },
     },
     computed: {
       isNested() {
