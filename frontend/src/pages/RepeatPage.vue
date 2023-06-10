@@ -98,8 +98,11 @@ export default defineComponent({
     finished() {
       return this.previousResults.length;
     },
+    toRepeat() {
+      return this.repetition?.toRepeat;
+    },
     toRepeatCount() {
-      return (this.repetition?.toRepeat?.length || 0) - this.finished;
+      return (this.toRepeat?.length || 0) - this.finished;
     },
     noMoreToRepeat() {
       return this.toRepeatCount <= 0;
@@ -127,24 +130,24 @@ export default defineComponent({
       this.repetition = await this.api.reviewMethods.getDueReviewPoints(
         dueInDays
       );
-      if (this.repetition?.toRepeat?.length === 0) {
+      if (this.toRepeat?.length === 0) {
         this.repetition = undefined;
         return;
       }
       if (this.api.testability.getEnvironment() !== "testing") {
-        this.repetition.toRepeat = _.shuffle(this.repetition.toRepeat);
+        this.toRepeat = _.shuffle(this.toRepeat);
       }
       await this.fetchQuestion();
     },
 
     async fetchQuestion() {
-      if (!this.repetition || this.noMoreToRepeat) {
+      if (!this.toRepeat || this.noMoreToRepeat) {
         this.currentQuizQuestion = undefined;
         return;
       }
       this.currentQuizQuestion =
         await this.api.reviewMethods.getRandomQuestionForReviewPoint(
-          this.repetition.toRepeat[this.finished]
+          this.toRepeat[this.finished]
         );
       this.selectPosition();
     },
