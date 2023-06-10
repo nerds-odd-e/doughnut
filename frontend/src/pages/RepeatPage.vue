@@ -82,7 +82,7 @@ export default defineComponent({
   },
   data() {
     return {
-      repetition: undefined as Generated.DueReviewPoints | undefined,
+      toRepeat: undefined as number[] | undefined,
       currentQuizQuestion: undefined as
         | Generated.QuizQuestionViewedByUser
         | undefined,
@@ -97,9 +97,6 @@ export default defineComponent({
     },
     finished() {
       return this.previousResults.length;
-    },
-    toRepeat() {
-      return this.repetition?.toRepeat;
     },
     toRepeatCount() {
       return (this.toRepeat?.length || 0) - this.finished;
@@ -127,11 +124,10 @@ export default defineComponent({
     },
 
     async loadMore(dueInDays?: number) {
-      this.repetition = await this.api.reviewMethods.getDueReviewPoints(
-        dueInDays
-      );
+      this.toRepeat = (
+        await this.api.reviewMethods.getDueReviewPoints(dueInDays)
+      ).toRepeat;
       if (this.toRepeat?.length === 0) {
-        this.repetition = undefined;
         return;
       }
       if (this.api.testability.getEnvironment() !== "testing") {
