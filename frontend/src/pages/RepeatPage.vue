@@ -20,7 +20,6 @@
               storageAccessor,
             }"
             @answered="onAnswered($event)"
-            @reload-needed="fetchDueReviewPoints"
             :key="currentQuizQuestion.quizQuestion.reviewPoint"
           />
         </template>
@@ -138,10 +137,6 @@ export default defineComponent({
       await this.fetchQuestion();
     },
 
-    async fetchDueReviewPoints() {
-      this.loadMore(0);
-    },
-
     async fetchQuestion() {
       if (!this.repetition || this.noMoreToRepeat) {
         this.currentQuizQuestion = undefined;
@@ -168,13 +163,10 @@ export default defineComponent({
         this.selectPosition();
       }
     },
-    max() {
-      this.fetchDueReviewPoints();
-    },
   },
 
   async mounted() {
-    this.fetchDueReviewPoints();
+    this.loadMore(0);
   },
 });
 </script>

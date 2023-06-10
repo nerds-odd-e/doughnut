@@ -149,7 +149,7 @@ export default defineComponent({
     ReviewPointAsync,
     SelfEvaluateButtons,
   },
-  emits: ["answered", "reloadNeeded"],
+  emits: ["answered"],
   data() {
     return {
       answer: "" as string,
@@ -167,7 +167,6 @@ export default defineComponent({
         await this.popups.alert(
           "This review point doesn't exist any more or is being skipped now. Moving on to the next review point..."
         );
-        this.$emit("reloadNeeded");
       }
     },
   },
