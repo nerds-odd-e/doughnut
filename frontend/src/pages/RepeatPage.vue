@@ -23,7 +23,7 @@
             :key="currentQuizQuestion.quizQuestion.reviewPoint"
           />
         </template>
-        <template v-else-if="noMoreToRepeat">
+        <template v-else-if="toRepeat !== undefined && toRepeat.length === 0">
           <div class="alert alert-success">
             You have finished all repetitions for this half a day!
           </div>
@@ -101,9 +101,6 @@ export default defineComponent({
     toRepeatCount() {
       return this.toRepeat?.length || 0;
     },
-    noMoreToRepeat() {
-      return this.toRepeatCount <= 0;
-    },
   },
   methods: {
     viewLastResult(cursor: number | undefined) {
@@ -137,7 +134,7 @@ export default defineComponent({
     },
 
     async fetchQuestion() {
-      if (!this.toRepeat || this.noMoreToRepeat) {
+      if (!this.toRepeat || this.toRepeat.length === 0) {
         this.currentQuizQuestion = undefined;
         return;
       }
