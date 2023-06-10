@@ -99,7 +99,7 @@ export default defineComponent({
       return this.previousResults.length;
     },
     toRepeatCount() {
-      return (this.toRepeat?.length || 0) - this.finished;
+      return this.toRepeat?.length || 0;
     },
     noMoreToRepeat() {
       return this.toRepeatCount <= 0;
@@ -143,13 +143,14 @@ export default defineComponent({
       }
       this.currentQuizQuestion =
         await this.api.reviewMethods.getRandomQuestionForReviewPoint(
-          this.toRepeat[this.finished]
+          this.toRepeat[0]
         );
       this.selectPosition();
     },
 
     onAnswered(answerResult: Generated.AnswerResult) {
       this.previousResults.push(answerResult);
+      this.toRepeat?.shift();
       if (!answerResult.correct) {
         this.viewLastResult(this.previousResults.length - 1);
       }
