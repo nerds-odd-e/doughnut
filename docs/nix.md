@@ -65,12 +65,10 @@ dum start:mb
 dum cy:open
 ```
 
-Run E2E (same as Dev) profile springboot backend server with gradle (doughnut full stack started on port 9081)
+Run headless E2E (doughnut full stack started on port 9081)
 
 ```bash
 # from doughnut source root dir
 dum i && dum frontend:build
-dum sut
+dum t
 ```
-
-Open your browser to visit http://localhost:5173
