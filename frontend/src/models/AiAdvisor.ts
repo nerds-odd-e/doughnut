@@ -1,4 +1,4 @@
-export default class AiAdvicer {
+export default class AiAdvisor {
   textContent: Generated.TextContent;
 
   constructor(textContent: Generated.TextContent) {

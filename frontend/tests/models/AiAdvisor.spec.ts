@@ -1,9 +1,9 @@
-import AiAdvicer from "@/models/AiAdvicer";
+import AiAdvisor from "@/models/AiAdvisor";
 import makeMe from "tests/fixtures/makeMe";
 
-describe("AiAdvicer", () => {
+describe("AiAdvisor", () => {
   const note = makeMe.aNote.description("").please();
-  const advicer = new AiAdvicer(note.textContent);
+  const advicer = new AiAdvisor(note.textContent);
 
   it("in case the description is null", () => {
     note.textContent.description = null as unknown as string;

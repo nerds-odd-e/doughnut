@@ -13,7 +13,7 @@
 import { defineComponent, PropType } from "vue";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import { StorageAccessor } from "@/store/createNoteStorage";
-import AiAdvicer from "@/models/AiAdvicer";
+import AiAdvisor from "@/models/AiAdvisor";
 import SvgRobot from "../svgs/SvgRobot.vue";
 
 export default defineComponent({
@@ -37,8 +37,8 @@ export default defineComponent({
   },
   methods: {
     async suggestDescription() {
-      const aiAdvicer = new AiAdvicer(this.selectedNote.textContent);
-      const prompt = aiAdvicer.prompt();
+      const aiAdvisor = new AiAdvisor(this.selectedNote.textContent);
+      const prompt = aiAdvisor.prompt();
       const res = await this.api.ai.askAiSuggestions({
         prompt,
       });
@@ -47,7 +47,7 @@ export default defineComponent({
         this.selectedNote.id,
         {
           title: this.selectedNote.title,
-          description: aiAdvicer.processResult(res.suggestion),
+          description: aiAdvisor.processResult(res.suggestion),
         },
         this.selectedNote.textContent
       );
