@@ -1,20 +1,18 @@
 package com.odde.doughnut.testability.builders;
 
-import com.theokanning.openai.completion.chat.ChatCompletionChoice;
-import com.theokanning.openai.completion.chat.ChatCompletionResult;
-import com.theokanning.openai.completion.chat.ChatMessage;
-import com.theokanning.openai.completion.chat.ChatMessageRole;
+import com.theokanning.openai.completion.CompletionChoice;
+import com.theokanning.openai.completion.CompletionResult;
 import java.util.ArrayList;
 import java.util.List;
 
 public class OpenAICompletionResultBuilder {
-  private final List<ChatCompletionChoice> choices = new ArrayList<>();
+  private List<CompletionChoice> choices = new ArrayList<>();
 
   public OpenAICompletionResultBuilder choice(String text) {
     choices.add(
-        new ChatCompletionChoice() {
+        new CompletionChoice() {
           {
-            this.setMessage(new ChatMessage(ChatMessageRole.USER.value(), text));
+            this.setText(text);
           }
         });
     return this;
@@ -22,18 +20,18 @@ public class OpenAICompletionResultBuilder {
 
   public OpenAICompletionResultBuilder choiceReachingLengthLimit(String incompleteText) {
     choices.add(
-        new ChatCompletionChoice() {
+        new CompletionChoice() {
           {
-            this.setMessage(new ChatMessage(ChatMessageRole.USER.value(), incompleteText));
-            this.setFinishReason("length");
+            this.setText(incompleteText);
+            this.setFinish_reason("length");
           }
         });
     return this;
   }
 
-  public ChatCompletionResult please() {
-    ChatCompletionResult chatCompletionResult = new ChatCompletionResult();
-    chatCompletionResult.setChoices(choices);
-    return chatCompletionResult;
+  public CompletionResult please() {
+    CompletionResult completionResult = new CompletionResult();
+    completionResult.setChoices(choices);
+    return completionResult;
   }
 }

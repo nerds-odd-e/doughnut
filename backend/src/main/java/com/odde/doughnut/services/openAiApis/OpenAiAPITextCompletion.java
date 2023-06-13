@@ -2,61 +2,52 @@ package com.odde.doughnut.services.openAiApis;
 
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.theokanning.openai.OpenAiApi;
-import com.theokanning.openai.completion.chat.ChatCompletionChoice;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
-import com.theokanning.openai.completion.chat.ChatMessage;
-import com.theokanning.openai.completion.chat.ChatMessageRole;
-import java.util.ArrayList;
-import java.util.HashMap;
+import com.theokanning.openai.completion.CompletionChoice;
+import com.theokanning.openai.completion.CompletionRequest;
 import java.util.List;
 
 public class OpenAiAPITextCompletion extends OpenAiApiHandlerBase {
 
   private OpenAiApi openAiApi;
-  public static final String OPEN_AI_MODEL = "gpt-3.5-turbo";
+  public static final String OPEN_AI_MODEL = "text-davinci-003";
 
   public OpenAiAPITextCompletion(OpenAiApi openAiApi) {
     this.openAiApi = openAiApi;
   }
 
-  private List<ChatCompletionChoice> getChatCompletionChoices(
-      ChatCompletionRequest completionRequest) {
-
-    return openAiApi
-        .createChatCompletion(completionRequest)
-        .doOnError(Throwable::printStackTrace)
-        .blockingGet()
-        .getChoices();
+  private List<CompletionChoice> getCompletionChoices(CompletionRequest completionRequest) {
+    return openAiApi.createCompletion(completionRequest).blockingGet().getChoices();
   }
 
   public AiSuggestion getOpenAiCompletion(String prompt) {
     return withExceptionHandler(
         () -> {
-          ChatCompletionRequest completionRequest = getChatCompletionRequest(prompt);
-          List<ChatCompletionChoice> choices = getChatCompletionChoices(completionRequest);
+          CompletionRequest completionRequest = getCompletionRequest(prompt);
+          List<CompletionChoice> choices = getCompletionChoices(completionRequest);
           return choices.stream()
               .findFirst()
               .map(
-                  chatCompletionChoice ->
+                  completionChoice ->
                       new AiSuggestion(
-                          chatCompletionChoice.getMessage().getContent(),
-                          chatCompletionChoice.getFinishReason()))
+                          completionChoice.getText(), completionChoice.getFinish_reason()))
               .orElse(null);
         });
   }
 
-  private static ChatCompletionRequest getChatCompletionRequest(String prompt) {
-
-    List<ChatMessage> messages = new ArrayList<>();
-    final ChatMessage systemMessage = new ChatMessage(ChatMessageRole.SYSTEM.value(), prompt);
-    messages.add(0, systemMessage);
-
-    return ChatCompletionRequest.builder()
+  private static CompletionRequest getCompletionRequest(String prompt) {
+    return CompletionRequest.builder()
+        .prompt(prompt)
         .model(OPEN_AI_MODEL)
-        .messages(messages)
-        .n(1)
+        // This can go higher (up to 4000 - prompt size), but openAI performance goes down
+        // https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
         .maxTokens(50)
-        .logitBias(new HashMap<>())
+        //
+        // an effort has been made the response more responsive by using stream(true)
+        // how every, due to the library limitation, we cannot do it yet.
+        // find more details here:
+        //     https://github.com/TheoKanning/openai-java/issues/83
+        .stream(false)
+        .echo(true)
         .build();
   }
 }
