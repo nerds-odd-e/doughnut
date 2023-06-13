@@ -15,28 +15,43 @@ public class OpenAiAPITextCompletion extends OpenAiApiHandlerBase {
     this.openAiApi = openAiApi;
   }
 
-  private List<CompletionChoice> getCompletionChoices(CompletionRequest completionRequest) {
-    return openAiApi.createCompletion(completionRequest).blockingGet().getChoices();
+  private List<ChatCompletionChoice> getChatCompletionChoices(
+      ChatCompletionRequest completionRequest) {
+    System.out.println("1 completetionRequest:" + completionRequest);
+    List<ChatCompletionChoice> list = openAiApi
+        .createChatCompletion(completionRequest)
+        .doOnError(Throwable::printStackTrace)
+        .blockingGet()
+        .getChoices();
+    System.out.print("5  ");
+    System.out.println(list);
+    return list;
   }
 
   public AiSuggestion getOpenAiCompletion(String prompt) {
+    System.out.println("2 getOpenAiCompletion prompt:" + prompt);
     return withExceptionHandler(
         () -> {
-          CompletionRequest completionRequest = getCompletionRequest(prompt);
-          List<CompletionChoice> choices = getCompletionChoices(completionRequest);
+          ChatCompletionRequest completionRequest = getChatCompletionRequest(prompt);
+          System.out.println("3 getOpenAiCompletion completionRequest:" +  completionRequest);
+          List<ChatCompletionChoice> choices = getChatCompletionChoices(completionRequest);
           return choices.stream()
               .findFirst()
               .map(
-                  completionChoice ->
-                      new AiSuggestion(
-                          completionChoice.getText(), completionChoice.getFinish_reason()))
+                  chatCompletionChoice -> new AiSuggestion(
+                      chatCompletionChoice.getMessage().getContent(),
+                      chatCompletionChoice.getFinishReason()))
               .orElse(null);
         });
   }
 
-  private static CompletionRequest getCompletionRequest(String prompt) {
-    return CompletionRequest.builder()
-        .prompt(prompt)
+  private static ChatCompletionRequest getChatCompletionRequest(String prompt) {
+    System.out.println("4 prompt:" + prompt);
+    List<ChatMessage> messages = new ArrayList<>();
+    final ChatMessage systemMessage = new ChatMessage(ChatMessageRole.USER.value(), prompt);
+    messages.add(0, systemMessage);
+
+    return ChatCompletionRequest.builder()
         .model(OPEN_AI_MODEL)
         // This can go higher (up to 4000 - prompt size), but openAI performance goes down
         // https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
