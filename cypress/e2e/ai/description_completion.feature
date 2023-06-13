@@ -1,4 +1,4 @@
-@Ignore
+@ignore
 Feature: Note description completion
 
   Background:
@@ -8,7 +8,7 @@ Feature: Note description completion
       | Taiwan | 台北 best     | N.A.        |
       | 台北的天氣  | 台北的冬天       | Taiwan      |
 
-  @Ignore
+  @ignore
   @usingMockedOpenAiService
   Scenario: AI will complete the description of a note taking into consideration all titles within same path and existing description
     Given OpenAI returns text completion "台北冬天每天都在下雨,晴天的機率可能比刮刮樂還低" for prompt "Taiwan 台北的天氣 台北的冬天"
