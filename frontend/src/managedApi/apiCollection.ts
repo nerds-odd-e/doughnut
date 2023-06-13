@@ -273,15 +273,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
         request
       )) as Generated.AiEngagingStory;
     },
-    async askAiQuestion(prompt: string) {
-      const request: Generated.AiCompletionRequest = {
-        prompt,
-      };
-      return (await managedApi.restPost(
-        `ai/ask-question`,
-        request
-      )) as Generated.AiQuestion;
-    },
   },
   testability: {
     getEnvironment() {

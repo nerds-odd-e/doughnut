@@ -26,9 +26,9 @@ export default class AiAdvisor {
       this.textContent.title
     }", "${
       this.textContent.description
-    }" ], generate a multiple-choice question with exactly 3 options and exactly 1 correct option. The response should be JSON-formatted as follows: ${
-      JSON.stringify(questionResponseFormatExample)
-    }`;
+    }" ], generate a multiple-choice question with exactly 3 options and exactly 1 correct option. The response should be JSON-formatted as follows: ${JSON.stringify(
+      questionResponseFormatExample
+    )}`;
   }
 
   // eslint-disable-next-line class-methods-use-this
