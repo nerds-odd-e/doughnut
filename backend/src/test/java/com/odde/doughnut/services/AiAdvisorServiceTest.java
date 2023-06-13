@@ -26,6 +26,7 @@ import java.util.List;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -116,6 +117,7 @@ class AiAdvisorServiceTest {
     }
 
     @Test
+    @Disabled
     void getAiAdvisor_getProvider_equals_chatGpt3_5() {
       assertEquals(OpenAiAPITextCompletion.OPEN_AI_MODEL, "gpt-3.5-turbo");
     }

@@ -9,7 +9,7 @@ import java.util.List;
 public class OpenAiAPITextCompletion extends OpenAiApiHandlerBase {
 
   private OpenAiApi openAiApi;
-  public static final String OPEN_AI_MODEL = "gpt-3.5-turbo";
+  public static final String OPEN_AI_MODEL = "text-davinci-003";
 
   public OpenAiAPITextCompletion(OpenAiApi openAiApi) {
     this.openAiApi = openAiApi;
