@@ -116,9 +116,8 @@ class AiAdvisorServiceTest {
     }
 
     @Test
-    @Disabled
     void getAiAdvisor_getProvider_equals_chatGpt3_5() {
-      assertEquals(aiAdvisorService.getProvider(),equalTo("gpt-3.5-turbo"));
+      assertEquals(aiAdvisorService.getProvider(),"gpt-3.5-turbo");
     }
   }
 
