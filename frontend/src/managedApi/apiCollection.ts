@@ -258,20 +258,29 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
   },
   ai: {
-    async askAiSuggestions(request: Generated.AiSuggestionRequest) {
+    async askAiSuggestions(request: Generated.AiCompletionRequest) {
       return (await managedApi.restPost(
         `ai/ask-suggestions`,
         request
       )) as Generated.AiSuggestion;
     },
     async askAiEngagingStories(prompt: string) {
-      const request: Generated.AiSuggestionRequest = {
+      const request: Generated.AiCompletionRequest = {
         prompt,
       };
       return (await managedApi.restPost(
         `ai/ask-engaging-stories`,
         request
       )) as Generated.AiEngagingStory;
+    },
+    async askAiQuestion(prompt: string) {
+      const request: Generated.AiCompletionRequest = {
+        prompt,
+      };
+      return (await managedApi.restPost(
+        `ai/ask-question`,
+        request
+      )) as Generated.AiQuestion;
     },
   },
   testability: {

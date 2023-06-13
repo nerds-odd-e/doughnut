@@ -25,6 +25,7 @@
     />
   </PopButton>
   <AISuggestion v-bind="{ selectedNote, storageAccessor }" />
+  <AiQuestionGeneration v-bind="{ selectedNote, storageAccessor }" />
   <PopButton title="search and link note">
     <template #button_face>
       <SvgSearch />

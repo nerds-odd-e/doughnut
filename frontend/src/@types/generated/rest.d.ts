@@ -12,7 +12,12 @@ declare namespace Generated {
         finishReason: string;
     }
 
-    interface AiSuggestionRequest {
+    interface AiQuestion {
+        question: string;
+        finishReason: string;
+    }
+
+    interface AiCompletionRequest {
         prompt: string;
     }
 

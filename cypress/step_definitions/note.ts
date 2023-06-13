@@ -444,3 +444,7 @@ Then("I should see that the open AI service is not available in controller bar",
     })
     .click()
 })
+
+When("I ask to generate a question for note {string}", (noteTitle: string) => {
+  cy.askForQuestion(noteTitle)
+})
