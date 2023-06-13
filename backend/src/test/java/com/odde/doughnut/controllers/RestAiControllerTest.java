@@ -14,7 +14,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
-import com.theokanning.openai.completion.CompletionResult;
+import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.image.Image;
 import com.theokanning.openai.image.ImageResult;
 import io.reactivex.Single;
@@ -65,10 +65,10 @@ class RestAiControllerTest {
 
     @Test
     void askSuggestionWithRightPrompt() {
-      when(openAiApi.createCompletion(
+      when(openAiApi.createChatCompletion(
               argThat(
                   request -> {
-                    assertEquals("Earth", request.getPrompt());
+                    assertEquals("Earth", request.getMessages().get(0).getContent());
                     return true;
                   })))
           .thenReturn(buildCompletionResult("blue planet"));
@@ -77,7 +77,7 @@ class RestAiControllerTest {
 
     @Test
     void askSuggestionAndUseResponse() {
-      when(openAiApi.createCompletion(any())).thenReturn(buildCompletionResult("blue planet"));
+      when(openAiApi.createChatCompletion(any())).thenReturn(buildCompletionResult("blue planet"));
       AiSuggestion aiSuggestion = controller.askSuggestion(params);
       assertEquals("blue planet", aiSuggestion.getSuggestion());
     }
@@ -130,7 +130,7 @@ class RestAiControllerTest {
   }
 
   @NotNull
-  private Single<CompletionResult> buildCompletionResult(String text) {
+  private Single<ChatCompletionResult> buildCompletionResult(String text) {
     return Single.just(makeMe.openAiCompletionResult().choice(text).please());
   }
 }

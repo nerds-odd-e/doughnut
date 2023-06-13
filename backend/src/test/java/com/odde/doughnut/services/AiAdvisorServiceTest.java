@@ -16,8 +16,8 @@ import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.services.openAiApis.OpenAiAPITextCompletion;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.theokanning.openai.OpenAiApi;
-import com.theokanning.openai.completion.CompletionRequest;
-import com.theokanning.openai.completion.CompletionResult;
+import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.image.Image;
 import com.theokanning.openai.image.ImageResult;
 import io.reactivex.Single;
@@ -37,7 +37,7 @@ class AiAdvisorServiceTest {
 
   private AiAdvisorService aiAdvisorService;
   @Mock private OpenAiApi openAiApi;
-  @Captor ArgumentCaptor<CompletionRequest> completionRequestArgumentCaptor;
+  @Captor ArgumentCaptor<ChatCompletionRequest> completionRequestArgumentCaptor;
   MakeMeWithoutDB makeMe = new MakeMeWithoutDB();
 
   @BeforeEach
@@ -48,16 +48,17 @@ class AiAdvisorServiceTest {
 
   @Nested
   class GetSuggestion {
-    Single<CompletionResult> completionResultSingle =
+    Single<ChatCompletionResult> completionResultSingle =
         Single.just(makeMe.openAiCompletionResult().choice("what goes up must come down").please());
 
-    Single<CompletionResult> IncompleteCompletionResultSingle =
+    Single<ChatCompletionResult> IncompleteCompletionResultSingle =
         Single.just(
             makeMe.openAiCompletionResult().choiceReachingLengthLimit("what goes up").please());
 
     @Test
     void getAiSuggestion_givenAString_returnsAiSuggestionObject() {
-      Mockito.when(openAiApi.createCompletion(Mockito.any())).thenReturn(completionResultSingle);
+      Mockito.when(openAiApi.createChatCompletion(Mockito.any()))
+          .thenReturn(completionResultSingle);
       assertEquals(
           "what goes up must come down",
           aiAdvisorService.getAiSuggestion("suggestion_prompt").getSuggestion());
@@ -65,7 +66,7 @@ class AiAdvisorServiceTest {
 
     @Test
     void the_data_returned_is_incomplete() {
-      when(openAiApi.createCompletion(any())).thenReturn(IncompleteCompletionResultSingle);
+      when(openAiApi.createChatCompletion(any())).thenReturn(IncompleteCompletionResultSingle);
       AiSuggestion suggestion = aiAdvisorService.getAiSuggestion("what");
       assertEquals("length", suggestion.getFinishReason());
     }
@@ -73,7 +74,7 @@ class AiAdvisorServiceTest {
     @Test
     void getAiSuggestion_givenAString_whenHttpError_returnsEmptySuggestion() {
       HttpException httpException = buildHttpException(400);
-      Mockito.when(openAiApi.createCompletion(ArgumentMatchers.any()))
+      Mockito.when(openAiApi.createChatCompletion(ArgumentMatchers.any()))
           .thenReturn(Single.error(httpException));
       assertThrows(
           HttpException.class, () -> aiAdvisorService.getAiSuggestion("suggestion_prompt"));
@@ -82,7 +83,7 @@ class AiAdvisorServiceTest {
     @Test
     void getAiSuggestion_when_timeout() {
       RuntimeException exception = new RuntimeException(new SocketTimeoutException());
-      Mockito.when(openAiApi.createCompletion(ArgumentMatchers.any()))
+      Mockito.when(openAiApi.createChatCompletion(ArgumentMatchers.any()))
           .thenReturn(Single.error(exception));
       OpenAITimeoutException result =
           assertThrows(
@@ -94,7 +95,7 @@ class AiAdvisorServiceTest {
     @Test
     void getAiSuggestion_when_got_502() {
       RuntimeException exception = buildHttpException(502);
-      Mockito.when(openAiApi.createCompletion(ArgumentMatchers.any()))
+      Mockito.when(openAiApi.createChatCompletion(ArgumentMatchers.any()))
           .thenReturn(Single.error(exception));
       OpenAIServiceErrorException result =
           assertThrows(
@@ -108,7 +109,7 @@ class AiAdvisorServiceTest {
     @Test
     void getAiSuggestion_given_invalidToken_return_401() {
       HttpException httpException = buildHttpException(401);
-      Mockito.when(openAiApi.createCompletion(ArgumentMatchers.any()))
+      Mockito.when(openAiApi.createChatCompletion(ArgumentMatchers.any()))
           .thenReturn(Single.error(httpException));
       OpenAiUnauthorizedException exception =
           assertThrows(
