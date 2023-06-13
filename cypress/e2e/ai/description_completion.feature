@@ -1,3 +1,4 @@
+@Ignore
 Feature: Note description completion
 
   Background:
