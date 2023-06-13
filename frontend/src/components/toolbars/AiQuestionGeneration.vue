@@ -33,19 +33,21 @@ export default defineComponent({
     },
   },
   components: {
-    SvgRobot,
+    SvgSad,
   },
   methods: {
     async generateQuestion() {
       const aiAdvisor = new AiAdvisor(this.selectedNote.textContent);
       const prompt = aiAdvisor.questionPrompt();
-      const res = await this.api.ai.askAiQuestion(prompt);
+      const res = await this.api.ai.askAiSuggestions({
+        prompt,
+      });
 
       await this.storageAccessor.api(this.$router).updateTextContent(
         this.selectedNote.id,
         {
           title: this.selectedNote.title,
-          description: aiAdvisor.processResult(res.question),
+          description: aiAdvisor.processResult(res.suggestion),
         },
         this.selectedNote.textContent
       );
