@@ -13,6 +13,7 @@ import com.odde.doughnut.entities.json.ApiError;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
+import com.odde.doughnut.services.openAiApis.OpenAiAPITextCompletion;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.CompletionRequest;
@@ -117,7 +118,7 @@ class AiAdvisorServiceTest {
 
     @Test
     void getAiAdvisor_getProvider_equals_chatGpt3_5() {
-      assertEquals(aiAdvisorService.getProvider(),"gpt-3.5-turbo");
+      assertEquals(OpenAiAPITextCompletion.OPEN_AI_MODEL,"gpt-3.5-turbo");
     }
   }
 

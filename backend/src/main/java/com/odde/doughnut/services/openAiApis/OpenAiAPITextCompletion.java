@@ -9,6 +9,7 @@ import java.util.List;
 public class OpenAiAPITextCompletion extends OpenAiApiHandlerBase {
 
   private OpenAiApi openAiApi;
+  public static final String OPEN_AI_MODEL = "gpt-3.5-turbo";
 
   public OpenAiAPITextCompletion(OpenAiApi openAiApi) {
     this.openAiApi = openAiApi;
@@ -36,7 +37,7 @@ public class OpenAiAPITextCompletion extends OpenAiApiHandlerBase {
   private static CompletionRequest getCompletionRequest(String prompt) {
     return CompletionRequest.builder()
         .prompt(prompt)
-        .model("text-davinci-003")
+        .model(OPEN_AI_MODEL)
         // This can go higher (up to 4000 - prompt size), but openAI performance goes down
         // https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
         .maxTokens(50)
