@@ -60,6 +60,37 @@ function restartImposterAndMockTextCompletion(
   })
 }
 
+function restartImposterAndMockChatCompletion(
+  predicate: Predicate,
+  serviceMocker: ServiceMocker,
+  reply: string,
+  finishReason: "length" | "stop",
+) {
+  serviceMocker.install()
+
+  serviceMocker.mockWithPredicate(predicate, {
+    id: "cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7",
+    object: "chat.completion",
+    created: 1589478378,
+    model: "gpt-3.5-turbo",
+    choices: [
+      {
+        message: {
+          role: "assistant",
+          content: reply,
+        },
+        index: 0,
+        finish_reason: finishReason,
+      },
+    ],
+    usage: {
+      prompt_tokens: 5,
+      completion_tokens: 7,
+      total_tokens: 12,
+    },
+  })
+}
+
 Cypress.Commands.add(
   "restartImposterAndMockTextCompletion",
   { prevSubject: true },
@@ -79,6 +110,15 @@ Cypress.Commands.add(
   (serviceMocker: ServiceMocker, reply: string, finishReason: "length" | "stop") => {
     const predicate = new DefaultPredicate(`/v1/completions`, HttpMethod.POST)
     restartImposterAndMockTextCompletion(predicate, serviceMocker, reply, finishReason)
+  },
+)
+
+Cypress.Commands.add(
+  "restartImposterAndMockChatCompletion",
+  { prevSubject: true },
+  (serviceMocker: ServiceMocker, reply: string, finishReason: "length" | "stop") => {
+    const predicate = new DefaultPredicate(`/v1/chat/completions`, HttpMethod.POST)
+    restartImposterAndMockChatCompletion(predicate, serviceMocker, reply, finishReason)
   },
 )
 

@@ -39,3 +39,29 @@ Given("An OpenAI response is unavailable", () => {
 Given("AI會返回{string}", (returnMessage: string) => {
   cy.openAiService().restartImposterAndStubTextCompletion(returnMessage, "stop")
 })
+
+Given("OpenAI returns a question", (question: DataTable) => {
+  const questionAsJsonReply = question.hashes().map((questionHash) => {
+    return JSON.stringify({
+      question: questionHash.question,
+      options: [
+        {
+          option: questionHash.option_a,
+          correct: true,
+          explanation: "",
+        },
+        {
+          option: questionHash.option_b,
+          correct: false,
+          explanation: "",
+        },
+        {
+          option: questionHash.option_c,
+          correct: false,
+          explanation: "",
+        },
+      ],
+    })
+  })
+  cy.openAiService().restartImposterAndMockChatCompletion(questionAsJsonReply, "stop")
+})
