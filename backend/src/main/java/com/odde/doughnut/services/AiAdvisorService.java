@@ -22,4 +22,8 @@ public class AiAdvisorService {
   public AiEngagingStory getEngagingStory(String prompt) {
     return new AiEngagingStory(openAiAPIImage.getOpenAiImage(prompt));
   }
+
+  public String getProvider() {
+    return "";
+  }
 }
