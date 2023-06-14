@@ -130,10 +130,8 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   "thePreviousRequestShouldHaveIncludedPathInfo",
   { prevSubject: true },
-  (serviceMocker: ServiceMocker, path: string) => {
-  },
+  (serviceMocker: ServiceMocker, path: string) => {},
 )
-
 
 Cypress.Commands.add(
   "restartImposterAndStubChatCompletion",

@@ -27,15 +27,16 @@ Given(
 Given(
   "OpenAI returns text completion {string} for the following values",
   (returnMessage: string, context: DataTable) => {
-    var parent, title,description;
+    let parent, title, description
     context.hashes().map((contextHash) => {
-        parent = contextHash.testingParent;
-        title = contextHash.title
-        description = contextHash.description;
-        })
-        var requestMessage = parent + " " + title + " " + description;
+      parent = contextHash.testingParent
+      title = contextHash.title
+      description = contextHash.description
+    })
+    const requestMessage = parent + " " + title + " " + description
     cy.openAiService().restartImposterAndMockChatCompletion(`---\n${requestMessage}`, returnMessage)
-  })
+  },
+)
 
 Given("OpenAI always return image of a moon", () => {
   cy.openAiService().stubCreateImage()
