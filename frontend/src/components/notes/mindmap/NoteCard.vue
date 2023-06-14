@@ -7,10 +7,7 @@
     :style="`top:${coord.y}px; left:${coord.x}px`"
     @click="$emit('highlight', note.id)"
   >
-    <NoteContent
-      v-bind="{ note, size, storageAccessor }"
-      :title-as-link="true"
-    />
+    <NoteContent v-bind="{ note, size, storageAccessor }" :title-as-link="true" />
   </NoteShell>
 </template>
 
