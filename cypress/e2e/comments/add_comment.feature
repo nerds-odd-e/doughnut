@@ -7,7 +7,7 @@ Feature: Add comment to note
       | title  | description | parentTitle |
       | Taiwan | 台北 best     | N.A.        |
 
-  @ignore
   Scenario: One or many comments can be added to a note
+    Given I visit note "Taiwan" 
     When I add a comment with "This is a new comment"
     Then I should see a comment added with "This is a new comment"
