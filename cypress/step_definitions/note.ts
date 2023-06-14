@@ -458,4 +458,5 @@ Then("I should see a question on current page", () => {
 })
 
 Then("it should consider the context {string}", (path: string) => {
+  cy.openAiService().thePreviousRequestShouldHaveIncludedPathInfo(path)
 })

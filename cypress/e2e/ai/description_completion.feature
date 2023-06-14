@@ -13,7 +13,7 @@ Feature: Note description completion
     Given OpenAI returns text completion "台北冬天每天都在下雨,晴天的機率可能比刮刮樂還低" for prompt "台北的冬天"
     When I ask to complete the description for note "台北的天氣"
     Then I should see the note description on current page becomes "台北冬天每天都在下雨,晴天的機率可能比刮刮樂還低"
-    
+
   @usingMockedOpenAiService
   Scenario: AI will complete the description of a note taking the context into consideration
     Given OpenAI returns text completion "台北冬天每天都在下雨,晴天的機率可能比刮刮樂還低" for prompt "台北的冬天"

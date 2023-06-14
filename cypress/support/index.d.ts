@@ -137,6 +137,7 @@ declare namespace Cypress {
     withinMindmap(): Chainable<any>
     yesIRemember(): Chainable<any>
     askForEngagingStory(noteTitle: string): Chainable<any>
+    thePreviousRequestShouldHaveIncludedPathInfo(path: string): Chainable<any>
     aiSuggestDescriptionForNote(noteTitle: string): Chainable<any>
     askForQuestion(noteTitle: string): Chainable<any>
   }
