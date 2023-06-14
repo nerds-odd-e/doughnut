@@ -29,6 +29,7 @@ public class RestAiController {
   @PostMapping("/ask-suggestions")
   public AiSuggestion askSuggestion(@RequestBody AiSuggestionRequest aiSuggestionRequest) {
     currentUser.assertLoggedIn();
+    System.out.println("entering");
     return aiAdvisorService.getAiSuggestion(aiSuggestionRequest.prompt);
   }
 
