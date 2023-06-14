@@ -7,6 +7,17 @@
     />
   </div>
   <button id="add-comment-button">Add comment</button>
+
+  <div
+    id="comments"
+    v-if="comments.length > 0"
+  >
+    <Comment
+      v-for="comment in comments"
+      :key="comment.id"
+      :text="comment.text"
+    />
+  </div>
 </template>
 
 <script lang="ts">
@@ -18,8 +29,8 @@ export default defineComponent({
   setup() {
     return useLoadingApi();
   },
-  props: { 
-    noteId: { type: Number, required: true } 
+  props: {
+    noteId: { type: Number, required: true }
   },
   emits: [],
   components: { QuillEditor },
@@ -32,9 +43,15 @@ export default defineComponent({
         },
         placeholder: "Enter comment here...",
       },
+      comments: []
     };
   },
-  methods: {},
+  methods: {
+    fetchData: () => {
+      // Call GetCommentsByNoteId(...)
+      // Store in data.comments
+    }
+  },
   mounted() {},
 });
 </script>

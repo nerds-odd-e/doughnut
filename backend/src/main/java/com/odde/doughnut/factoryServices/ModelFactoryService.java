@@ -1,27 +1,8 @@
 package com.odde.doughnut.factoryServices;
 
-import com.odde.doughnut.entities.Answer;
-import com.odde.doughnut.entities.Circle;
-import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteMotion;
-import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.Subscription;
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.json.SearchTerm;
-import com.odde.doughnut.entities.repositories.AnswerRepository;
-import com.odde.doughnut.entities.repositories.BazaarNotebookRepository;
-import com.odde.doughnut.entities.repositories.CircleRepository;
-import com.odde.doughnut.entities.repositories.FailureReportRepository;
-import com.odde.doughnut.entities.repositories.LinkRepository;
-import com.odde.doughnut.entities.repositories.NoteRepository;
-import com.odde.doughnut.entities.repositories.NotebookRepository;
-import com.odde.doughnut.entities.repositories.NotesClosureRepository;
-import com.odde.doughnut.entities.repositories.QuizQuestionRepository;
-import com.odde.doughnut.entities.repositories.ReviewPointRepository;
-import com.odde.doughnut.entities.repositories.TextContentRepository;
-import com.odde.doughnut.entities.repositories.ThingRepository;
-import com.odde.doughnut.entities.repositories.UserRepository;
+import com.odde.doughnut.entities.repositories.*;
 import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.Authorization;
 import com.odde.doughnut.models.BazaarModel;
@@ -56,6 +37,7 @@ public class ModelFactoryService {
   @Autowired public NotebookRepository notebookRepository;
   @Autowired public EntityManager entityManager;
   @Autowired public FailureReportRepository failureReportRepository;
+  @Autowired public CommentRepository commentRepository;
 
   public NoteModel toNoteModel(Note note) {
     return new NoteModel(note, this);
@@ -124,4 +106,9 @@ public class ModelFactoryService {
   public AnswerModel toAnswerModel(Answer answer) {
     return new AnswerModel(answer, this);
   }
+
+  public Optional<Comment> findCommentById(Integer id) {
+    return commentRepository.findById(id);
+  }
+
 }

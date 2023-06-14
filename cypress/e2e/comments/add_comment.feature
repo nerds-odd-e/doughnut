@@ -1,4 +1,4 @@
-@ignore
+#@ignore
 Feature: Add comment to note
 
   Background:
@@ -8,6 +8,6 @@ Feature: Add comment to note
       | Taiwan | 台北 best     | N.A.        |
 
   Scenario: One or many comments can be added to a note
-    Given I visit note "Taiwan" 
+    Given I visit note "Taiwan"
     When I add a comment with "This is a new comment"
     Then I should see a comment added with "This is a new comment"
