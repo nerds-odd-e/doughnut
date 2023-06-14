@@ -7,6 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AIQuestionGeneration: typeof import('./src/components/toolbars/AIQuestionGeneration.vue')['default']
     AISuggestion: typeof import('./src/components/toolbars/AISuggestion.vue')['default']
     AnswerResult: typeof import('./src/components/review/AnswerResult.vue')['default']
     ApiStatus: typeof import('./src/components/toolbars/ApiStatus.vue')['default']
@@ -123,6 +124,7 @@ declare module 'vue' {
     SvgBackward: typeof import('./src/components/svgs/SvgBackward.vue')['default']
     SvgBazaarShare: typeof import('./src/components/svgs/SvgBazaarShare.vue')['default']
     SvgCards: typeof import('./src/components/svgs/SvgCards.vue')['default']
+    SvgClipboard: typeof import('./src/components/svgs/SvgClipboard.vue')['default']
     SvgClose: typeof import('./src/components/svgs/SvgClose.vue')['default']
     SvgCog: typeof import('./src/components/svgs/SvgCog.vue')['default']
     SvgDescriptionIndicator: typeof import('./src/components/svgs/SvgDescriptionIndicator.vue')['default']

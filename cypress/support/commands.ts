@@ -623,3 +623,8 @@ Cypress.Commands.add("aiSuggestDescriptionForNote", (noteTitle: string) => {
   })
   cy.findByRole("button", { name: "suggest description" }).click()
 })
+
+Cypress.Commands.add("askForQuestion", (noteTitle: string) => {
+  cy.jumpToNotePage(noteTitle)
+  cy.clickNotePageMoreOptionsButton(noteTitle, "generate question")
+})

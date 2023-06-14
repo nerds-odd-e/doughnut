@@ -25,6 +25,7 @@
     />
   </PopButton>
   <AISuggestion v-bind="{ selectedNote, storageAccessor }" />
+  <AIQuestionGeneration v-bind="{ selectedNote, storageAccessor }" />
   <PopButton title="search and link note">
     <template #button_face>
       <SvgSearch />
@@ -73,6 +74,7 @@ import NoteDeleteButton from "./NoteDeleteButton.vue";
 import PopButton from "../commons/Popups/PopButton.vue";
 import NoteEngagingStoryDialog from "../notes/NoteEngagingStoryDialog.vue";
 import AISuggestion from "./AISuggestion.vue";
+import AIQuestionGeneration from "./AIQuestionGeneration.vue";
 
 export default defineComponent({
   props: {
@@ -100,6 +102,7 @@ export default defineComponent({
     PopButton,
     NoteEngagingStoryDialog,
     AISuggestion,
+    AIQuestionGeneration,
   },
   computed: {
     viewType() {

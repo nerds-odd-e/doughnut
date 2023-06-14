@@ -138,5 +138,6 @@ declare namespace Cypress {
     yesIRemember(): Chainable<any>
     askForEngagingStory(noteTitle: string): Chainable<any>
     aiSuggestDescriptionForNote(noteTitle: string): Chainable<any>
+    askForQuestion(noteTitle: string): Chainable<any>
   }
 }
