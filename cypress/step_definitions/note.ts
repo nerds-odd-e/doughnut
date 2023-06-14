@@ -437,6 +437,10 @@ Given("I ask to complete the description for note {string}", (noteTitle: string)
   cy.aiSuggestDescriptionForNote(noteTitle)
 })
 
+Given("I ask to complete the description for context with parent title {string} and note {string}", (noteParent: string, noteTitle: string) => {
+  cy.aiSuggestDescriptionForContext(noteParent, noteTitle)
+})
+
 Then("I should see that the open AI service is not available in controller bar", () => {
   cy.get(".last-error-message")
     .should((elem) => {
@@ -451,4 +455,7 @@ When("I ask to generate a question for note {string}", (noteTitle: string) => {
 
 Then("I should see a question on current page", () => {
   cy.findNoteDescriptionOnCurrentPage("")
+})
+
+Then("it should consider the context {string}", (path: string) => {
 })
