@@ -2,7 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Given, Then } from "@badeball/cypress-cucumber-preprocessor"
+import { Given, Then, DataTable } from "@badeball/cypress-cucumber-preprocessor"
 import "../support/string.extensions"
 
 Given("open AI service always think the system token is invalid", () => {
@@ -40,28 +40,27 @@ Given("AI會返回{string}", (returnMessage: string) => {
   cy.openAiService().restartImposterAndStubChatCompletion(returnMessage, "stop")
 })
 
-Given("OpenAI returns a question", (question: DataTable) => {
-  const questionAsJsonReply = question.hashes().map((questionHash) => {
-    return JSON.stringify({
-      question: questionHash.question,
-      options: [
-        {
-          option: questionHash.option_a,
-          correct: true,
-          explanation: "",
-        },
-        {
-          option: questionHash.option_b,
-          correct: false,
-          explanation: "",
-        },
-        {
-          option: questionHash.option_c,
-          correct: false,
-          explanation: "",
-        },
-      ],
-    })
+Given("OpenAI returns a question", (questionTable: DataTable) => {
+  const record = questionTable.hashes()[0]
+  const reply = JSON.stringify({
+    question: record.question,
+    options: [
+      {
+        option: record.option_a,
+        correct: true,
+        explanation: "",
+      },
+      {
+        option: record.option_b,
+        correct: false,
+        explanation: "",
+      },
+      {
+        option: record.option_c,
+        correct: false,
+        explanation: "",
+      },
+    ],
   })
-  cy.openAiService().restartImposterAndMockChatCompletion(questionAsJsonReply, "stop")
+  cy.openAiService().restartImposterAndMockChatCompletion(reply, "stop")
 })

@@ -4,9 +4,9 @@ const questionResponseFormatExample = {
     {
       option: "",
       correct: true,
-      explanation: "",
-    },
-  ],
+      explanation: ""
+    }
+  ]
 };
 export default class AiAdvisor {
   textContent: Generated.TextContent;
