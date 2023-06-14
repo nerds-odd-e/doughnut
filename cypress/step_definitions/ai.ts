@@ -14,13 +14,13 @@ Then("I should be prompted with an error message saying {string}", (errorMessage
 })
 
 Given("OpenAI always returns text completion {string}", (description: string) => {
-  cy.openAiService().restartImposterAndStubChatCompletion(description, "stop")
+  cy.openAiService().restartImposterAndStubTextCompletion(description, "stop")
 })
 
 Given(
   "OpenAI returns text completion {string} for prompt {string}",
   (returnMessage: string, requestMessage: string) => {
-    cy.openAiService().restartImposterAndMockChatCompletion(`---\n${requestMessage}`, returnMessage)
+    cy.openAiService().restartImposterAndMockTextCompletion(`---\n${requestMessage}`, returnMessage)
   },
 )
 
@@ -29,7 +29,7 @@ Given("OpenAI always return image of a moon", () => {
 })
 
 Given("OpenAI returns an incomplete text completion {string}", (description: string) => {
-  cy.openAiService().restartImposterAndStubChatCompletion(description, "length")
+  cy.openAiService().restartImposterAndStubTextCompletion(description, "length")
 })
 
 Given("An OpenAI response is unavailable", () => {
@@ -37,7 +37,7 @@ Given("An OpenAI response is unavailable", () => {
 })
 
 Given("AI會返回{string}", (returnMessage: string) => {
-  cy.openAiService().restartImposterAndStubChatCompletion(returnMessage, "stop")
+  cy.openAiService().restartImposterAndStubTextCompletion(returnMessage, "stop")
 })
 
 Given("OpenAI returns a question", (question: DataTable) => {

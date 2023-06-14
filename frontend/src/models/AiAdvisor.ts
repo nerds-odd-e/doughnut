@@ -1,13 +1,3 @@
-const questionResponseFormatExample = {
-  question: "",
-  options: [
-    {
-      option: "",
-      correct: true,
-      explanation: "",
-    },
-  ],
-};
 export default class AiAdvisor {
   textContent: Generated.TextContent;
 
@@ -19,16 +9,6 @@ export default class AiAdvisor {
     return `Complete the description for the following note:\ntitle: ${
       this.textContent.title
     }\ndescription:\n---\n${this.textContent.description || ""}`;
-  }
-
-  questionPrompt(): string {
-    return `Given the following text fragments: [ "${
-      this.textContent.title
-    }", "${
-      this.textContent.description
-    }" ], generate a multiple-choice question with exactly 3 options and exactly 1 correct option. The response should be JSON-formatted as follows: ${JSON.stringify(
-      questionResponseFormatExample
-    )}`;
   }
 
   // eslint-disable-next-line class-methods-use-this

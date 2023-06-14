@@ -7,7 +7,6 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    AiQuestionGeneration: typeof import('./src/components/toolbars/AiQuestionGeneration.vue')['default']
     AISuggestion: typeof import('./src/components/toolbars/AISuggestion.vue')['default']
     AnswerResult: typeof import('./src/components/review/AnswerResult.vue')['default']
     ApiStatus: typeof import('./src/components/toolbars/ApiStatus.vue')['default']

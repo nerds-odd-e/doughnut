@@ -111,11 +111,6 @@ declare namespace Cypress {
       reply: string,
       finishReason: "length" | "stop",
     ): Chainable<Subject>
-    restartImposterAndMockChatCompletion(prompt: string, reply: string): Chainable<Subject>
-    restartImposterAndStubChatCompletion(
-      reply: string,
-      finishReason: "length" | "stop",
-    ): Chainable<Subject>
     stubCreateImage(): Chainable<Subject>
     stubOpenAiCompletionWithErrorResponse(): Chainable<Subject>
     alwaysResponseAsUnauthorized(): Chainable<any>

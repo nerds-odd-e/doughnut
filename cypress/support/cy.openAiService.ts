@@ -116,20 +116,6 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   "restartImposterAndMockChatCompletion",
   { prevSubject: true },
-  (serviceMocker: ServiceMocker, prompt: string, reply: string) => {
-    const body = { messages: [{ role: "user", content: prompt }] }
-    const predicate = new FlexiPredicate()
-      .withOperator(Operator.matches)
-      .withPath(`/v1/chat/completions`)
-      .withMethod(HttpMethod.POST)
-      .withBody(body)
-    restartImposterAndMockChatCompletion(predicate, serviceMocker, reply, "stop")
-  },
-)
-
-Cypress.Commands.add(
-  "restartImposterAndStubChatCompletion",
-  { prevSubject: true },
   (serviceMocker: ServiceMocker, reply: string, finishReason: "length" | "stop") => {
     const predicate = new DefaultPredicate(`/v1/chat/completions`, HttpMethod.POST)
     restartImposterAndMockChatCompletion(predicate, serviceMocker, reply, finishReason)
