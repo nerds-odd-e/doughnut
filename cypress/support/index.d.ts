@@ -120,7 +120,7 @@ declare namespace Cypress {
     stubCreateImage(): Chainable<Subject>
     stubOpenAiCompletionWithErrorResponse(): Chainable<Subject>
     alwaysResponseAsUnauthorized(): Chainable<any>
-    subscribeToNotebook(notebookTitle: string, dailyLearningCount: string): Chainable<any>
+    subscribeToNotebook(notebookTitle: string, dailyLearningCount: string): Chinputainable<any>
     submitNoteFormWith(noteAttributes: any): Chainable<any>
     submitNoteFormsWith(notes: any): Chainable<any>
     submitNoteCreationFormWith(noteAttributes: any): Chainable<any>
@@ -141,5 +141,6 @@ declare namespace Cypress {
     thePreviousRequestShouldHaveIncludedPathInfo(path: string): Chainable<any>
     aiSuggestDescriptionForNote(noteTitle: string): Chainable<any>
     askForQuestion(noteTitle: string): Chainable<any>
+    addCommentToCurrentNote(commentText: string): Chainable<any>
   }
 }
