@@ -628,3 +628,9 @@ Cypress.Commands.add("askForQuestion", (noteTitle: string) => {
   cy.jumpToNotePage(noteTitle)
   cy.clickNotePageMoreOptionsButton(noteTitle, "generate question")
 })
+
+Cypress.Commands.add("addCommentToCurrentNote", (commentText: string) => {
+  cy.get("#add-comment-textbox > div > div.ql-editor.ql-blank > p").then(($input) => {
+    $input.html(commentText)
+  })
+})
