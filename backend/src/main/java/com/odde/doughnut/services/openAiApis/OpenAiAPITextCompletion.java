@@ -49,7 +49,7 @@ public class OpenAiAPITextCompletion extends OpenAiApiHandlerBase {
         .model(OPEN_AI_MODEL)
         .messages(messages)
         .n(1)
-        .maxTokens(50)
+        .maxTokens(200)
         .logitBias(new HashMap<>())
         .build();
   }
