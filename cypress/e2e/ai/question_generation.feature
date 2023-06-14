@@ -1,4 +1,4 @@
-#@ignore
+@ignore
 Feature: Question generation
 
   Background:
