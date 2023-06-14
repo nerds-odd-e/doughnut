@@ -20,8 +20,6 @@ public class OpenAiAPITextCompletion extends OpenAiApiHandlerBase {
   }
 
   private List<ChatCompletionChoice> getChatCompletionChoices(
-<<<<<<< HEAD
-<<<<<<< HEAD
       ChatCompletionRequest completionRequest) {
 
     return openAiApi
@@ -29,44 +27,10 @@ public class OpenAiAPITextCompletion extends OpenAiApiHandlerBase {
         .doOnError(Throwable::printStackTrace)
         .blockingGet()
         .getChoices();
-||||||| parent of adbd859e8 (debug)
-      ChatCompletionRequest completionRequest) {
-    System.out.println("1 completetionRequest:" + completionRequest);
-    List<ChatCompletionChoice> list = openAiApi
-        .createChatCompletion(completionRequest)
-        .doOnError(Throwable::printStackTrace)
-        .blockingGet()
-        .getChoices();
-    System.out.print("5  ");
-    System.out.println(list);
-    return list;
-=======
-    ChatCompletionRequest completionRequest) {
-||||||| parent of eb07f0538 (Change cypress functions for mocking to correct one)
-    ChatCompletionRequest completionRequest) {
-=======
-      ChatCompletionRequest completionRequest) {
->>>>>>> eb07f0538 (Change cypress functions for mocking to correct one)
-    return openAiApi.createChatCompletion(completionRequest).blockingGet().getChoices();
-<<<<<<< HEAD
-
->>>>>>> adbd859e8 (debug)
-||||||| parent of eb07f0538 (Change cypress functions for mocking to correct one)
-
-=======
->>>>>>> eb07f0538 (Change cypress functions for mocking to correct one)
   }
 
   public AiSuggestion getOpenAiCompletion(String prompt) {
-<<<<<<< HEAD
-||||||| parent of adbd859e8 (debug)
-    System.out.println("2 getOpenAiCompletion prompt:" + prompt);
-=======
-
->>>>>>> adbd859e8 (debug)
     return withExceptionHandler(
-<<<<<<< HEAD
-<<<<<<< HEAD
         () -> {
           ChatCompletionRequest completionRequest = getChatCompletionRequest(prompt);
           List<ChatCompletionChoice> choices = getChatCompletionChoices(completionRequest);
@@ -79,58 +43,6 @@ public class OpenAiAPITextCompletion extends OpenAiApiHandlerBase {
                           chatCompletionChoice.getFinishReason()))
               .orElse(null);
         });
-||||||| parent of adbd859e8 (debug)
-        () -> {
-          ChatCompletionRequest completionRequest = getChatCompletionRequest(prompt);
-          System.out.println("3 getOpenAiCompletion completionRequest:" +  completionRequest);
-          List<ChatCompletionChoice> choices = getChatCompletionChoices(completionRequest);
-          return choices.stream()
-              .findFirst()
-              .map(
-                  chatCompletionChoice -> new AiSuggestion(
-                      chatCompletionChoice.getMessage().getContent(),
-                      chatCompletionChoice.getFinishReason()))
-              .orElse(null);
-        });
-=======
-      () -> {
-        ChatCompletionRequest completionRequest = getChatCompletionRequest(prompt);
-        List<ChatCompletionChoice> choices = getChatCompletionChoices(completionRequest);
-        return choices.stream()
-          .findFirst()
-          .map(
-            chatCompletionChoice -> new AiSuggestion(
-              chatCompletionChoice.getMessage().getContent(),
-              chatCompletionChoice.getFinishReason()))
-          .orElse(null);
-      });
->>>>>>> adbd859e8 (debug)
-||||||| parent of eb07f0538 (Change cypress functions for mocking to correct one)
-      () -> {
-        ChatCompletionRequest completionRequest = getChatCompletionRequest(prompt);
-        List<ChatCompletionChoice> choices = getChatCompletionChoices(completionRequest);
-        return choices.stream()
-          .findFirst()
-          .map(
-            chatCompletionChoice -> new AiSuggestion(
-              chatCompletionChoice.getMessage().getContent(),
-              chatCompletionChoice.getFinishReason()))
-          .orElse(null);
-      });
-=======
-        () -> {
-          ChatCompletionRequest completionRequest = getChatCompletionRequest(prompt);
-          List<ChatCompletionChoice> choices = getChatCompletionChoices(completionRequest);
-          return choices.stream()
-              .findFirst()
-              .map(
-                  chatCompletionChoice ->
-                      new AiSuggestion(
-                          chatCompletionChoice.getMessage().getContent(),
-                          chatCompletionChoice.getFinishReason()))
-              .orElse(null);
-        });
->>>>>>> eb07f0538 (Change cypress functions for mocking to correct one)
   }
 
   private static ChatCompletionRequest getChatCompletionRequest(String prompt) {
