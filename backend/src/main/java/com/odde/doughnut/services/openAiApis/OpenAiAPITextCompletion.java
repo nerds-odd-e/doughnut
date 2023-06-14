@@ -21,12 +21,7 @@ public class OpenAiAPITextCompletion extends OpenAiApiHandlerBase {
 
   private List<ChatCompletionChoice> getChatCompletionChoices(
       ChatCompletionRequest completionRequest) {
-
-    return openAiApi
-        .createChatCompletion(completionRequest)
-        .doOnError(Throwable::printStackTrace)
-        .blockingGet()
-        .getChoices();
+    return openAiApi.createChatCompletion(completionRequest).blockingGet().getChoices();
   }
 
   public AiSuggestion getOpenAiCompletion(String prompt) {
