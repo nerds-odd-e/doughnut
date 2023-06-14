@@ -449,6 +449,6 @@ When("I ask to generate a question for note {string}", (noteTitle: string) => {
   cy.askForQuestion(noteTitle)
 })
 
-Then("I should see a question on current page", (question: DataTable) => {
+Then("I should see a question on current page", () => {
   cy.findNoteDescriptionOnCurrentPage("")
 })
