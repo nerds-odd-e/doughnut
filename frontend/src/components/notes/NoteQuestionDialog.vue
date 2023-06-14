@@ -1,14 +1,7 @@
 <template>
   <h2>Generate a question</h2>
   <form>
-    <TextInput
-      v-model="engagingStory"
-      field="engagingStory"
-      :errors="engagingStoryInError"
-    />
-    <div>
-      <img class="ai-art" v-if="imageSrc" :src="imageSrc" />
-    </div>
+    <div>{{ question }}</div>
   </form>
   <button class="btn btn-secondary" @click="generateQuestion">Ask again</button>
 </template>
@@ -16,9 +9,11 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import type { StorageAccessor } from "@/store/createNoteStorage";
-import AiAdvisor from "@/models/AiAdvisor";
+import AiAdvisor, {
+  AiQuestionOptionType,
+  AiQuestionType,
+} from "@/models/AiAdvisor";
 import useLoadingApi from "../../managedApi/useLoadingApi";
-import TextInput from "../form/TextInput.vue";
 
 export default defineComponent({
   setup() {
@@ -31,23 +26,12 @@ export default defineComponent({
       required: false,
     },
   },
-  components: {
-    TextInput,
-  },
+  components: {},
   data() {
     return {
-      engagingStory: this.selectedNote.title,
-      b64Json: undefined as string | undefined,
-      engagingStoryInError: undefined as string | undefined,
+      question: "",
+      options: [] as AiQuestionOptionType[],
     };
-  },
-  computed: {
-    imageSrc() {
-      if (!this.b64Json) {
-        return undefined;
-      }
-      return `data:image/png;base64,${this.b64Json}`;
-    },
   },
   methods: {
     async generateQuestion() {
@@ -56,6 +40,11 @@ export default defineComponent({
       const res = await this.api.ai.askAiSuggestions({
         prompt,
       });
+      const parsed: AiQuestionType = JSON.parse(res.suggestion);
+
+      this.question = parsed.question;
+      this.options = parsed.options;
+
       if (res.finishReason === "length") {
         await this.generateQuestion();
       }

@@ -457,7 +457,7 @@ When("I ask to generate a question for note {string}", (noteTitle: string) => {
 })
 
 Then("I should see a question on current page", () => {
-  cy.findNoteDescriptionOnCurrentPage("")
+   cy.find().findByText("adsf")
 })
 
 Then("it should consider the context {string}", (path: string) => {

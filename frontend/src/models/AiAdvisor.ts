@@ -1,3 +1,14 @@
+export type AiQuestionType = {
+  question: string;
+  options: AiQuestionOptionType[];
+};
+
+export type AiQuestionOptionType = {
+  option: string;
+  correct: boolean;
+  explanation: string;
+};
+
 const questionResponseFormatExample = {
   question: "",
   options: [
