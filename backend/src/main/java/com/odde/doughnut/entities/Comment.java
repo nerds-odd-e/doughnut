@@ -27,7 +27,6 @@ public class Comment {
   @Getter
   @Setter
   @Column(name = "text")
-  @Nullable
   String text;
 
   @ManyToOne(cascade = CascadeType.PERSIST)

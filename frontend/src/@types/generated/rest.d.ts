@@ -34,6 +34,15 @@ declare namespace Generated {
         invitationCode: string;
     }
 
+    interface CommentCreation {
+        note_id: number;
+        text: string;
+    }
+
+    interface CommentInfo {
+        comment: Comment;
+    }
+
     interface CurrentUserInfo {
         user: User;
         externalIdentifier: string;
@@ -172,6 +181,11 @@ declare namespace Generated {
         id: string;
         label: string;
         description: string;
+    }
+
+    interface Comment {
+        text: string;
+        note: Note;
     }
 
     interface User {
