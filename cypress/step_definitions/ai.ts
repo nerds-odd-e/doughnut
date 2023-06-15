@@ -18,22 +18,15 @@ Given("OpenAI always returns text completion {string}", (description: string) =>
 })
 
 Given(
-  "OpenAI returns text completion {string} for prompt {string}",
+  "OpenAI returns text completion {string} for prompt containing {string}",
   (returnMessage: string, requestMessage: string) => {
     cy.openAiService().restartImposterAndMockChatCompletion(`---\n${requestMessage}`, returnMessage)
   },
 )
 
 Given(
-  "OpenAI returns text completion {string} for the following values",
-  (returnMessage: string, context: DataTable) => {
-    let parent, title, description
-    context.hashes().map((contextHash) => {
-      parent = contextHash.testingParent
-      title = contextHash.title
-      description = contextHash.description
-    })
-    const requestMessage = parent + " " + title + " " + description
+  "OpenAI returns text completion {string} for prompt containing {string} and context containing {string}",
+  (returnMessage: string, requestMessage: string) => {
     cy.openAiService().restartImposterAndMockChatCompletion(`---\n${requestMessage}`, returnMessage)
   },
 )

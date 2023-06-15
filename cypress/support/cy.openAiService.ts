@@ -31,10 +31,6 @@ import "./string.extensions"
 import ServiceMocker from "./ServiceMocker"
 import { HttpMethod, Predicate } from "@anev/ts-mountebank"
 
-function thePreviousRequestShouldHaveIncludedPathInfo(path: string) {
-  return true
-}
-
 function restartImposterAndMockTextCompletion(
   predicate: Predicate,
   serviceMocker: ServiceMocker,
@@ -128,14 +124,6 @@ Cypress.Commands.add(
       .withMethod(HttpMethod.POST)
       .withBody(body)
     restartImposterAndMockChatCompletion(predicate, serviceMocker, reply, "stop")
-  },
-)
-
-Cypress.Commands.add(
-  "thePreviousRequestShouldHaveIncludedPathInfo",
-  { prevSubject: true },
-  (path: string) => {
-    thePreviousRequestShouldHaveIncludedPathInfo(path)
   },
 )
 
