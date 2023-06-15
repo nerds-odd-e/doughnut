@@ -450,15 +450,24 @@ When("I ask to generate a question for note {string}", (noteTitle: string) => {
   cy.askForQuestion(noteTitle)
 })
 
-const convertToQuestion = (table: DataTable) => {
-  return table.hashes()[0];
-}
+When("I select the correct option", () => {
+  // We assume the correct (mocked) option is always the first one
+  cy.get("#question-option-0").click()
+})
 
 Then("I should see a question on current page", (question: DataTable) => {
-   let q = convertToQuestion(question);
-   cy.findByText(q.question)
-   cy.findByText(q.option_a)
-   cy.findByText(q.option_b)
-   cy.findByText(q.option_c)
+  const q = question.hashes()[0]
+  cy.findByText(q.question)
+  cy.findByText(q.option_a)
+  cy.findByText(q.option_b)
+  cy.findByText(q.option_c)
+})
 
+Then("it should consider the context {string}", (path: string) => {
+  cy.openAiService().thePreviousRequestShouldHaveIncludedPathInfo(path)
+})
+
+Then("I should see the question dialog turn green", () => {
+  // We assume the correct (mocked) option should be the first one
+  cy.get("#question-option-0").invoke("attr", "class").should("contain", "is-correct")
 })

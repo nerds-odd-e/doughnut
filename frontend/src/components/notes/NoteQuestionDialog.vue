@@ -1,16 +1,29 @@
 <template>
-  <h2>Generate a question</h2>
-  <form>
-    <div v-if="question">
-      {{ question }}
-    </div>
-    <ol v-if="options.length > 0" type="A">
-      <li>{{ options[0].option }}</li>
-      <li>{{ options[1].option }}</li>
-      <li>{{ options[2].option }}</li>
-    </ol>
-  </form>
-  <button class="btn btn-secondary" @click="generateQuestion">Ask again</button>
+  <div id="note-question-dialog">
+    <h2>Generate a question</h2>
+    <form>
+      <div v-if="question">
+        {{ question }}
+      </div>
+      <ol v-if="options.length > 0" type="A">
+        <li
+          :id="'question-option-' + index"
+          v-for="(option, index) in options"
+          :key="index"
+          @click="selectOption(index)"
+          :class="{
+            'selected-option': isSelectedOption(index),
+            'is-correct': isSelectedOption(index) && isCorrectOption(option),
+          }"
+        >
+          {{ option.option }}
+        </li>
+      </ol>
+    </form>
+    <button class="btn btn-secondary" @click="generateQuestion">
+      Ask again
+    </button>
+  </div>
 </template>
 
 <script lang="ts">
@@ -38,6 +51,7 @@ export default defineComponent({
     return {
       question: "",
       options: [] as AiQuestionOption[],
+      selectedOptionIndex: -1 as number,
     };
   },
   methods: {
@@ -56,6 +70,15 @@ export default defineComponent({
         await this.generateQuestion();
       }
     },
+    selectOption(optionIndex: number) {
+      this.selectedOptionIndex = optionIndex;
+    },
+    isSelectedOption(optionIndex: number) {
+      return this.selectedOptionIndex === optionIndex;
+    },
+    isCorrectOption() {
+      return true;
+    },
   },
   mounted() {
     this.generateQuestion();
@@ -67,5 +90,13 @@ export default defineComponent({
 .ai-art {
   width: 100%;
   height: 100%;
+}
+
+.selected-option {
+  font-weight: bold;
+}
+
+.is-correct {
+  background-color: #00ff00;
 }
 </style>
