@@ -7,8 +7,6 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    AddCommentButton: typeof import('./src/components/notes/AddCommentButton.vue')['default']
-    AddCommentView: typeof import('./src/components/notes/views/AddCommentView.vue')['default']
     AIQuestionGeneration: typeof import('./src/components/toolbars/AIQuestionGeneration.vue')['default']
     AISuggestion: typeof import('./src/components/toolbars/AISuggestion.vue')['default']
     AnswerResult: typeof import('./src/components/review/AnswerResult.vue')['default']
@@ -26,11 +24,9 @@ declare module 'vue' {
     CircleJoinForm: typeof import('./src/components/circles/CircleJoinForm.vue')['default']
     CircleNewDialog: typeof import('./src/components/circles/CircleNewDialog.vue')['default']
     CircleSelector: typeof import('./src/components/circles/CircleSelector.vue')['default']
-    CommentButton: typeof import('./src/components/notes/CommentButton.vue')['default']
     ContentLoader: typeof import('./src/components/commons/ContentLoader.vue')['default']
     ControlCenter: typeof import('./src/components/toolbars/ControlCenter.vue')['default']
     ControlCenterForNote: typeof import('./src/components/toolbars/ControlCenterForNote.vue')['default']
-    copy: typeof import('./src/components/notes/NoteInfoButton copy.vue')['default']
     DescriptionEditor: typeof import('./src/components/form/DescriptionEditor.vue')['default']
     DragListner: typeof import('./src/components/commons/DragListner.vue')['default']
     EditableText: typeof import('./src/components/form/EditableText.vue')['default']
