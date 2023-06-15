@@ -27,17 +27,17 @@ configure_nix_flakes() {
   fi
 
   if ! grep -Fxq "experimental-features = nix-command flakes" "${HOME}/.config/nix/nix.conf"; then
-    cat <<EOF > "${HOME}/.config/nix/nix.conf"
+    cat <<-EOF > "${HOME}/.config/nix/nix.conf"
     experimental-features = nix-command flakes
-    EOF
+EOF
   fi
 }
 
 allow_nix_unfree() {
   mkdir -p "${HOME}/.config/nixpkgs"
-  cat <<EOF > "${HOME}/.config/nixpkgs/config.nix"
+  cat <<-EOF > "${HOME}/.config/nixpkgs/config.nix"
   { allowUnfree = true; }
-  EOF
+EOF
 }
 
 ensure_nix_profile() {
