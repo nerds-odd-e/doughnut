@@ -69,5 +69,5 @@ Given("OpenAI returns a question", (questionTable: DataTable) => {
       },
     ],
   })
-  cy.openAiService().restartImposterAndMockChatCompletion(reply, "stop")
+  cy.openAiService().restartImposterAndStubChatCompletion(reply, "stop")
 })

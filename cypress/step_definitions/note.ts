@@ -450,6 +450,15 @@ When("I ask to generate a question for note {string}", (noteTitle: string) => {
   cy.askForQuestion(noteTitle)
 })
 
-Then("I should see a question on current page", () => {
-   cy.find().findByText("adsf")
+const convertToQuestion = (table: DataTable) => {
+  return table.hashes()[0];
+}
+
+Then("I should see a question on current page", (question: DataTable) => {
+   let q = convertToQuestion(question);
+   cy.findByText(q.question)
+//    cy.findByText(q.option_a)
+//    cy.findByText(q.option_b)
+//    cy.findByText(q.option_c)
+
 })
