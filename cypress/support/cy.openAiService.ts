@@ -128,6 +128,20 @@ Cypress.Commands.add(
 )
 
 Cypress.Commands.add(
+  "restartImposterAndMockChatCompletionWithContext",
+  { prevSubject: true },
+  (serviceMocker: ServiceMocker, prompt: string, reply: string, context: string) => {
+    const body = { messages: [{ role: "user", content: `${prompt} ${context}` }] }
+    const predicate = new FlexiPredicate()
+      .withOperator(Operator.matches)
+      .withPath(`/v1/chat/completions`)
+      .withMethod(HttpMethod.POST)
+      .withBody(body)
+    restartImposterAndMockChatCompletion(predicate, serviceMocker, reply, "stop")
+  },
+)
+
+Cypress.Commands.add(
   "restartImposterAndStubChatCompletion",
   { prevSubject: true },
   (serviceMocker: ServiceMocker, reply: string, finishReason: "length" | "stop") => {

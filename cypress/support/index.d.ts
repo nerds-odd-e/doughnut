@@ -112,6 +112,7 @@ declare namespace Cypress {
       finishReason: "length" | "stop",
     ): Chainable<Subject>
     restartImposterAndMockChatCompletion(prompt: string, reply: string): Chainable<Subject>
+    restartImposterAndMockChatCompletionWithContext(prompt: string, reply: string, context: string): Chainable<Subject>
     restartImposterAndStubChatCompletion(
       reply: string,
       finishReason: "length" | "stop",

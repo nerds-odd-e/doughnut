@@ -8,7 +8,6 @@ Feature: Note description completion
       | Taipei  |             | Taiwan        |
       | Weather | It rains a  | Taipei        |
 
-
   @usingMockedOpenAiService
   Scenario: AI will complete the description of a note
     Given OpenAI returns text completion "It rains a lot." for prompt containing "It rains a"
