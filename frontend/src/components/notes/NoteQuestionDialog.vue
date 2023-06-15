@@ -14,6 +14,7 @@
           :class="{
             'selected-option': isSelectedOption(index),
             'is-correct': isSelectedOption(index) && isCorrectOption(option),
+            'is-wrong': isSelectedOption(index) && !isCorrectOption(option),
           }"
         >
           {{ option.option }}
@@ -76,8 +77,8 @@ export default defineComponent({
     isSelectedOption(optionIndex: number) {
       return this.selectedOptionIndex === optionIndex;
     },
-    isCorrectOption() {
-      return true;
+    isCorrectOption(optionObject: AiQuestionOption) {
+      return optionObject.correct;
     },
   },
   mounted() {
@@ -98,5 +99,9 @@ export default defineComponent({
 
 .is-correct {
   background-color: #00ff00;
+}
+
+.is-wrong {
+  background-color: #ff0000;
 }
 </style>

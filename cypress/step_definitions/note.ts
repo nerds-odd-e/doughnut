@@ -449,9 +449,20 @@ When("I ask to generate a question for note {string}", (noteTitle: string) => {
   cy.askForQuestion(noteTitle)
 })
 
-When("I select the correct option", () => {
-  // We assume the correct (mocked) option is always the first one
-  cy.get("#question-option-0").click()
+const convertOptionToIndex = (option: string) => {
+  return { a: 0, b: 1, c: 2 }[option.toLowerCase()]
+}
+
+const getOptionSelector = (option: string) => {
+  return `#question-option-${convertOptionToIndex(option)}`
+}
+
+When("I select the correct option {string}", (option: string) => {
+  cy.get(getOptionSelector(option)).click()
+})
+
+When("I select the wrong option {string}", (option: string) => {
+  cy.get(getOptionSelector(option)).click()
 })
 
 Then("I should see a question on current page", (question: DataTable) => {
@@ -466,7 +477,11 @@ Then("it should consider the context {string}", (path: string) => {
   cy.openAiService().thePreviousRequestShouldHaveIncludedPathInfo(path)
 })
 
-Then("I should see the question dialog turn green", () => {
+Then("I should see option {string} turn green", (option: string) => {
   // We assume the correct (mocked) option should be the first one
-  cy.get("#question-option-0").invoke("attr", "class").should("contain", "is-correct")
+  cy.get(getOptionSelector(option)).invoke("attr", "class").should("contain", "is-correct")
+})
+
+Then("I should see option {string} turn red", (option: string) => {
+  cy.get(getOptionSelector(option)).invoke("attr", "class").should("contain", "is-wrong")
 })
