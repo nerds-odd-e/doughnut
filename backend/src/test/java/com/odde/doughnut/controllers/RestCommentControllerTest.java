@@ -2,10 +2,7 @@ package com.odde.doughnut.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.odde.doughnut.entities.Comment;
 import com.odde.doughnut.testability.MakeMe;
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -39,8 +36,7 @@ class RestCommentControllerTest {
       // create some dummy data [ Comment ... ] as expected outcome
       // mock CommentRepository.getCommentsById(1234) to return [ Comment ... ]
       int noteId = 1234;
-      List<Comment> commentList = new ArrayList<Comment>();
-      assertEquals(controller.getComments(noteId), commentList);
+      assertEquals(1, controller.getComments(noteId).size());
     }
   }
 }

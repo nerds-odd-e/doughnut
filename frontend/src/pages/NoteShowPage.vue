@@ -8,18 +8,11 @@
       }"
       :key="noteId"
     />
-    <AddCommentView
-      v-bind="{
-        noteId,
-        storageAccessor,
-      }"
-    />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import AddCommentView from "../components/notes/views/NoteCommentsView.vue";
 import NoteCardsView from "../components/notes/views/NoteCardsView.vue";
 import { StorageAccessor } from "../store/createNoteStorage";
 
@@ -31,6 +24,6 @@ export default defineComponent({
       required: true,
     },
   },
-  components: { NoteCardsView, AddCommentView },
+  components: { NoteCardsView },
 });
 </script>
