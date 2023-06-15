@@ -37,8 +37,12 @@ export default defineComponent({
   },
   methods: {
     async suggestDescription() {
+      let context = "";
+      this.storageAccessor.notePosition?.ancestors?.forEach((x) => {
+        context = context.concat(`/${x.title}`);
+      });
       const aiAdvisor = new AiAdvisor(this.selectedNote.textContent);
-      const prompt = aiAdvisor.prompt();
+      const prompt = aiAdvisor.promptWithContext(context);
       const res = await this.api.ai.askAiSuggestions({
         prompt,
       });
