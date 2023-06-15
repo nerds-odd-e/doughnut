@@ -1,5 +1,7 @@
 <template>
-  <div class="alert alert-warning" v-if="note.deletedAt">This note has been deleted</div>
+  <div class="alert alert-warning" v-if="note.deletedAt">
+    This note has been deleted
+  </div>
   <h5 v-if="titleAsLink" class="header note-card-title">
     <NoteTitleWithLink :note="note" class="card-title" />
   </h5>
@@ -12,7 +14,10 @@
       @blur="onBlurTextField"
     />
     <div class="header-options">
-      <NoteWikidataAssociation v-if="note.wikidataId" :wikidata-id="note.wikidataId" />
+      <NoteWikidataAssociation
+        v-if="note.wikidataId"
+        :wikidata-id="note.wikidataId"
+      />
       <span> </span>
     </div>
   </div>
@@ -49,9 +54,12 @@
           id="note-url"
           v-text="note.noteAccessories.urlIsVideo ? 'Video Url:' : 'Url:'"
         />
-        <a aria-labelledby="note-url" :href="note.noteAccessories.url" target="_blank">{{
-          note.noteAccessories.url
-        }}</a>
+        <a
+          aria-labelledby="note-url"
+          :href="note.noteAccessories.url"
+          target="_blank"
+          >{{ note.noteAccessories.url }}</a
+        >
       </div>
       <a v-else :href="note.noteAccessories.url" target="_blank">
         <SvgUrlIndicator />
@@ -103,7 +111,11 @@ export default defineComponent({
     onBlurTextField() {
       this.storageAccessor
         .api(this.$router)
-        .updateTextContent(this.note.id, this.textContent, this.note.textContent);
+        .updateTextContent(
+          this.note.id,
+          this.textContent,
+          this.note.textContent
+        );
     },
   },
 });

@@ -1,6 +1,10 @@
 <template>
   <div id="add-comment-textbox">
-    <QuillEditor :content="commentText" :options="editorOptions" :content-type="'html'" />
+    <QuillEditor
+      :content="commentText"
+      :options="editorOptions"
+      :content-type="'html'"
+    />
   </div>
   <button id="add-comment-button">Add comment</button>
 
@@ -19,8 +23,8 @@
 <script lang="ts">
 import { PropType, defineComponent } from "vue";
 import { QuillEditor } from "@vueup/vue-quill";
-import useLoadingApi from "../../../managedApi/useLoadingApi";
 import { StorageAccessor } from "@/store/createNoteStorage";
+import useLoadingApi from "../../../managedApi/useLoadingApi";
 
 export default defineComponent({
   setup() {
@@ -55,9 +59,7 @@ export default defineComponent({
   },
 
   mounted() {
-    this.storageAccessor
-      .api(this.$router)
-      .getAllComments(this.noteId)
+    this.storageAccessor.api(this.$router).getAllComments(this.noteId);
   },
 });
 </script>

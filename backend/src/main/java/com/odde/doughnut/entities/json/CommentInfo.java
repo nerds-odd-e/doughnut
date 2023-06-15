@@ -6,5 +6,4 @@ import lombok.Setter;
 
 public class CommentInfo {
   @Getter @Setter private Comment comment;
-
 }

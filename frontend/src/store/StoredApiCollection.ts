@@ -46,9 +46,7 @@ export interface StoredApi {
     data: Generated.WikidataAssociationCreation
   ): Promise<Generated.NoteRealm>;
 
-  getAllComments(
-    noteId: Doughnut.ID    
-  ): Promise<Generated.Comment[]>;
+  getAllComments(noteId: Doughnut.ID): Promise<Generated.Comment[]>;
 
   undo(): Promise<Generated.NoteRealm>;
 
@@ -74,6 +72,7 @@ export default class StoredApiCollection implements StoredApi {
     this.storage = storage;
     this.router = router;
   }
+
   async getAllComments(noteId: number): Promise<Generated.Comment[]> {
     const response = this.managedApi.restGet(`comment/${noteId}`);
     return response as Promise<Generated.Comment[]>;

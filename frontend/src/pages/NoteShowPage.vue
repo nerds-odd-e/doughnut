@@ -8,7 +8,7 @@
       }"
       :key="noteId"
     />
-    <AddCommentView 
+    <AddCommentView
       v-bind="{
         noteId,
         storageAccessor,

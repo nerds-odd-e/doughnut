@@ -1,12 +1,11 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.sql.Timestamp;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-
-import javax.persistence.*;
-import java.sql.Timestamp;
 
 @Entity
 @AllArgsConstructor
@@ -35,7 +34,4 @@ public class Comment {
   @Setter
   @JsonIgnore
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
-
-
-
 }

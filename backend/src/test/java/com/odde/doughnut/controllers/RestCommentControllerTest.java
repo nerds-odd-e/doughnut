@@ -1,7 +1,11 @@
 package com.odde.doughnut.controllers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.odde.doughnut.entities.Comment;
 import com.odde.doughnut.testability.MakeMe;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -11,21 +15,15 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
 class RestCommentControllerTest {
   RestCommentController controller;
   //  UserModel currentUser;
-//  @Mock
-//  OpenAiApi openAiApi;
-  @Autowired
-  MakeMe makeMe;
+  //  @Mock
+  //  OpenAiApi openAiApi;
+  @Autowired MakeMe makeMe;
 
   @BeforeEach
   void Setup() {
@@ -42,7 +40,7 @@ class RestCommentControllerTest {
       // mock CommentRepository.getCommentsById(1234) to return [ Comment ... ]
       int noteId = 1234;
       List<Comment> commentList = new ArrayList<Comment>();
-      assertEquals(controller.getComments(noteId),commentList);
+      assertEquals(controller.getComments(noteId), commentList);
     }
   }
 }

@@ -110,5 +110,4 @@ public class ModelFactoryService {
   public Optional<Comment> findCommentById(Integer id) {
     return commentRepository.findById(id);
   }
-
 }
