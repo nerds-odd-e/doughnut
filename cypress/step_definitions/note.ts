@@ -437,7 +437,6 @@ Given("I ask to complete the description for note {string}", (noteTitle: string)
   cy.aiSuggestDescriptionForNote(noteTitle)
 })
 
-
 Then("I should see that the open AI service is not available in controller bar", () => {
   cy.get(".last-error-message")
     .should((elem) => {

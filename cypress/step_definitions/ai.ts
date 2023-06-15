@@ -27,7 +27,11 @@ Given(
 Given(
   "OpenAI returns text completion {string} for prompt containing {string} and context containing {string}",
   (returnMessage: string, description: string, context: string) => {
-    cy.openAiService().restartImposterAndMockChatCompletionWithContext(`---\n${description}`, returnMessage, context)
+    cy.openAiService().restartImposterAndMockChatCompletionWithContext(
+      `---\n${description}`,
+      returnMessage,
+      context,
+    )
   },
 )
 
