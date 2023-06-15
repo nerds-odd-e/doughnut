@@ -1,7 +1,14 @@
 <template>
   <h2>Generate a question</h2>
   <form>
-    <div>{{ question }}</div>
+    <div v-if="question">
+      {{ question }}
+    </div>
+    <ol v-if="options.length > 0" type="A">
+      <li>{{ options[0].option }}</li>
+      <li>{{ options[1].option }}</li>
+      <li>{{ options[2].option }}</li>
+    </ol>
   </form>
   <button class="btn btn-secondary" @click="generateQuestion">Ask again</button>
 </template>
@@ -10,8 +17,8 @@
 import { defineComponent, PropType } from "vue";
 import type { StorageAccessor } from "@/store/createNoteStorage";
 import AiAdvisor, {
-  AiQuestionOptionType,
-  AiQuestionType,
+  AiQuestionOptionType as AiQuestionOption,
+  AiQuestionType as AiQuestion,
 } from "@/models/AiAdvisor";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
@@ -30,7 +37,7 @@ export default defineComponent({
   data() {
     return {
       question: "",
-      options: [] as AiQuestionOptionType[],
+      options: [] as AiQuestionOption[],
     };
   },
   methods: {
@@ -40,7 +47,7 @@ export default defineComponent({
       const res = await this.api.ai.askAiSuggestions({
         prompt,
       });
-      const parsed: AiQuestionType = JSON.parse(res.suggestion);
+      const parsed: AiQuestion = JSON.parse(res.suggestion);
 
       this.question = parsed.question;
       this.options = parsed.options;

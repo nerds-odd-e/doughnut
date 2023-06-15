@@ -457,8 +457,8 @@ const convertToQuestion = (table: DataTable) => {
 Then("I should see a question on current page", (question: DataTable) => {
    let q = convertToQuestion(question);
    cy.findByText(q.question)
-//    cy.findByText(q.option_a)
-//    cy.findByText(q.option_b)
-//    cy.findByText(q.option_c)
+   cy.findByText(q.option_a)
+   cy.findByText(q.option_b)
+   cy.findByText(q.option_c)
 
 })
