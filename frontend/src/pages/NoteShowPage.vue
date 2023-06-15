@@ -9,14 +9,17 @@
       :key="noteId"
     />
     <AddCommentView 
-      :note-id="noteId"
+      v-bind="{
+        noteId,
+        storageAccessor,
+      }"
     />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import AddCommentView from "../components/notes/views/AddCommentView.vue";
+import AddCommentView from "../components/notes/views/NoteCommentsView.vue";
 import NoteCardsView from "../components/notes/views/NoteCardsView.vue";
 import { StorageAccessor } from "../store/createNoteStorage";
 

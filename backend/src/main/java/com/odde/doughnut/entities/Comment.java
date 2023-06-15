@@ -1,21 +1,15 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.sql.Timestamp;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.lang.Nullable;
+
+import javax.persistence.*;
+import java.sql.Timestamp;
 
 @Entity
+@AllArgsConstructor
 @Table(name = "comment")
 public class Comment {
   @Id
@@ -29,11 +23,12 @@ public class Comment {
   @Column(name = "text")
   String text;
 
-  @ManyToOne(cascade = CascadeType.PERSIST)
-  @JoinColumn(name = "note_id")
+  //  @ManyToOne(cascade = CascadeType.PERSIST)
+  //  @JoinColumn(name = "note_id")
+  @Column(name = "note_id")
   @Getter
   @Setter
-  Note note;
+  Integer note_id;
 
   @Column(name = "created_at")
   @Getter

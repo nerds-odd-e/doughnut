@@ -66,6 +66,7 @@ declare module 'vue' {
     NotebookViewCards: typeof import('./src/components/notebook/NotebookViewCards.vue')['default']
     NoteCard: typeof import('./src/components/notes/mindmap/NoteCard.vue')['default']
     NoteCardsView: typeof import('./src/components/notes/views/NoteCardsView.vue')['default']
+    NoteCommentsView: typeof import('./src/components/notes/views/NoteCommentsView.vue')['default']
     NoteContent: typeof import('./src/components/notes/NoteContent.vue')['default']
     NoteDeleteButton: typeof import('./src/components/toolbars/NoteDeleteButton.vue')['default']
     NoteEditAccessoriesDialog: typeof import('./src/components/notes/NoteEditAccessoriesDialog.vue')['default']

@@ -1,18 +1,13 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.entities.json.AiEngagingStory;
-import com.odde.doughnut.entities.json.AiSuggestion;
-import com.odde.doughnut.entities.json.AiSuggestionRequest;
+import com.odde.doughnut.entities.Comment;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.AiAdvisorService;
-import com.theokanning.openai.OpenAiApi;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.annotation.SessionScope;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.xml.stream.events.Comment;
-import java.util.ArrayList;
+import java.sql.Timestamp;
 import java.util.List;
 
 
@@ -21,7 +16,7 @@ import java.util.List;
 record RestCommentController(ModelFactoryService modelFactoryService) {
   @GetMapping("/{noteId}")
   public List<Comment> getComments(@PathVariable(name = "noteId") int noteId) {
-    return new ArrayList<Comment>();
+    return List.of(new Comment(1,"Taiwan #1",noteId, new Timestamp(System.currentTimeMillis())));
   }
 
 }

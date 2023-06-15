@@ -1,36 +1,38 @@
 <template>
   <div id="add-comment-textbox">
-    <QuillEditor
-    :content="commentText"
-    :options="editorOptions"
-    :content-type="'html'"
-    />
+    <QuillEditor :content="commentText" :options="editorOptions" :content-type="'html'" />
   </div>
   <button id="add-comment-button">Add comment</button>
 
-  <div
+  <!-- <div
     id="comments"
-    v-if="comments.length > 0"
+    v-if="comments?.length !== 0"
   >
     <Comment
       v-for="comment in comments"
-      :key="comment.id"
+      :key="comment.note.id"
       :text="comment.text"
     />
-  </div>
+  </div> -->
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { PropType, defineComponent } from "vue";
 import { QuillEditor } from "@vueup/vue-quill";
 import useLoadingApi from "../../../managedApi/useLoadingApi";
+import { StorageAccessor } from "@/store/createNoteStorage";
 
 export default defineComponent({
   setup() {
     return useLoadingApi();
   },
   props: {
-    noteId: { type: Number, required: true }
+    noteId: { type: Number, required: true },
+    // comments: { type: Array as PropType<Array<Generated.Comment>>, required: false },
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
+      required: true,
+    },
   },
   emits: [],
   components: { QuillEditor },
@@ -43,16 +45,20 @@ export default defineComponent({
         },
         placeholder: "Enter comment here...",
       },
-      comments: []
     };
   },
   methods: {
     fetchData: () => {
       // Call GetCommentsByNoteId(...)
       // Store in data.comments
-    }
+    },
   },
-  mounted() {},
+
+  mounted() {
+    this.storageAccessor
+      .api(this.$router)
+      .getAllComments(this.noteId)
+  },
 });
 </script>
 
