@@ -185,7 +185,7 @@ declare namespace Generated {
 
     interface Comment {
         text: string;
-        note: Note;
+        note_id: number;
     }
 
     interface User {
