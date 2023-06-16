@@ -21,7 +21,10 @@
         </li>
       </ol>
     </form>
-    <button class="btn btn-secondary" @click="generateQuestion">
+    <button
+      class="btn btn-secondary"
+      @click="generateQuestionAndResetSelectedOption"
+    >
       Ask again
     </button>
   </div>
@@ -71,6 +74,13 @@ export default defineComponent({
         await this.generateQuestion();
       }
     },
+    async generateQuestionAndResetSelectedOption() {
+      this.resetSelectedOption();
+      this.generateQuestion();
+    },
+    resetSelectedOption() {
+      this.selectOption(-1);
+    },
     selectOption(optionIndex: number) {
       this.selectedOptionIndex = optionIndex;
     },
@@ -82,7 +92,7 @@ export default defineComponent({
     },
   },
   mounted() {
-    this.generateQuestion();
+    this.generateQuestionAndResetSelectedOption();
   },
 });
 </script>
