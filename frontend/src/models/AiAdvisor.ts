@@ -26,12 +26,6 @@ export default class AiAdvisor {
     this.textContent = textContent;
   }
 
-  prompt(): string {
-    return `Complete the description for the following note:\ntitle: ${
-      this.textContent.title
-    }\ndescription:\n---\n${this.textContent.description || ""}`;
-  }
-
   promptWithContext(context: string): string {
     return `Complete the description for the following note:\ncontext: ${
       context || ""
