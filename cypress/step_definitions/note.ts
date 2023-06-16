@@ -485,3 +485,7 @@ Then("I should see option {string} turn green", (option: string) => {
 Then("I should see option {string} turn red", (option: string) => {
   cy.get(getOptionSelector(option)).invoke("attr", "class").should("contain", "is-wrong")
 })
+
+When("I click {string}", (buttonText: string) => {
+  cy.findByText(buttonText).click()
+})

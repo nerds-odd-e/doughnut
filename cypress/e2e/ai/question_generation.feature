@@ -1,6 +1,7 @@
 #@ignore
 @usingMockedOpenAiService
 Feature: Question generation
+
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user
@@ -23,3 +24,13 @@ Feature: Question generation
   Scenario: I should see negative feedback on selecting the wrong option
     When I select the wrong option "b"
     Then I should see option "b" turn red
+
+  Scenario: I should see a new question when I click 'Ask again'
+    Given OpenAI returns a question
+      | question                                             | option_a                 | option_b                   | option_c                       |
+      | What is the least common scuba diving certification? | Divemaster certification | Rescue Diver certification | Open Water Diver certification |
+    When I click "Ask again"
+    Then I should see a question on current page
+      | question                                             | option_a                 | option_b                   | option_c                       |
+      | What is the least common scuba diving certification? | Divemaster certification | Rescue Diver certification | Open Water Diver certification |
+
