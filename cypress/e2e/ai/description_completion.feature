@@ -14,7 +14,6 @@ Feature: Note description completion
     When I ask to complete the description for note "Weather"
     Then I should see the note description on current page becomes "It rains a lot."
 
-  @ignore
   @usingMockedOpenAiService
   Scenario: AI will complete the description of a note taking the context into consideration
     Given OpenAI returns text completion "It rains a lot." for prompt containing "It rains a" and context containing "/Taiwan/Taipei"
