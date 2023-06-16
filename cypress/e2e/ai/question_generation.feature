@@ -17,13 +17,13 @@ Feature: Question generation
       | question                                            | option_a                   | option_b                 | option_c                       |
       | What is the most common scuba diving certification? | Rescue Diver certification | Divemaster certification | Open Water Diver certification |
 
-  Scenario: I should see positive feedback on selecting the correct option
-    When I select the correct option "a"
-    Then I should see option "a" turn green
-
-  Scenario: I should see negative feedback on selecting the wrong option
-    When I select the wrong option "b"
-    Then I should see option "b" turn red
+  Scenario Outline: I should see feedback on selecting options
+    When I select the <CorrectOrWrong> option "<Option>"
+    Then I should see option "<Option>" turn <RedOrGreen>
+    Examples:
+      | Option | CorrectOrWrong | RedOrGreen |
+      | a      | correct        | green      |
+      | b      | wrong          | red        |
 
   Scenario: I should see a new question when I click 'Ask again'
     Given OpenAI returns a question
