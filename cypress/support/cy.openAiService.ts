@@ -130,7 +130,7 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   "restartImposterAndMockChatCompletionWithContext",
   { prevSubject: true },
-  (serviceMocker: ServiceMocker, prompt: string, reply: string, context: string) => {
+  (serviceMocker: ServiceMocker, prompt: string, reply: string) => {
     const body = { messages: [{ role: "user", content: prompt }] }
     const predicate = new FlexiPredicate()
       .withOperator(Operator.matches)

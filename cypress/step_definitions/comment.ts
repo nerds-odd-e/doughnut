@@ -11,6 +11,6 @@ When("I add a comment with {string}", (commentText: string) => {
   cy.addCommentToCurrentNote(commentText)
 })
 
-Then("I should see a comment added with {string}", (commentText: string) => {
+Then("I should see a comment added with {string}", () => {
   cy.get("#comments").should("exist")
 })
