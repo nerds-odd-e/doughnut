@@ -43,10 +43,15 @@ export default defineComponent({
   },
   data() {
     return {
-      initialValue: undefined as string | undefined,
-      localValue: undefined as string | undefined,
+      initialValue: this.modelValue as string | undefined,
+      localValue: this.modelValue as string | undefined,
       isEditing: false,
     };
+  },
+  watch: {
+    localValue() {
+      this.$emit("update:modelValue", this.localValue);
+    },
   },
   methods: {
     startEditing() {
@@ -60,10 +65,7 @@ export default defineComponent({
     },
     onBlurTextField() {
       this.isEditing = false;
-      if (this.initialValue !== this.localValue) {
-        this.$emit("update:modelValue", this.localValue);
-        this.$emit("blur");
-      }
+      this.$emit("blur");
     },
   },
 });
