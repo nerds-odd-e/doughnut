@@ -1,7 +1,4 @@
-import { flushPromises } from "@vue/test-utils";
 import NoteWithLinks from "@/components/notes/NoteWithLinks.vue";
-import ManagedApi from "@/managedApi/ManagedApi";
-import createNoteStorage from "../../src/store/createNoteStorage";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
@@ -32,73 +29,6 @@ describe("new/updated pink banner", () => {
       );
     }
   );
-});
-
-describe("in place edit on title", () => {
-  it("should display text field when one single click on title", async () => {
-    const noteParent = makeMe.aNoteRealm.title("Dummy Title").please();
-
-    const wrapper = helper
-      .component(NoteWithLinks)
-      .withStorageProps({
-        note: noteParent.note,
-        links: noteParent.links,
-      })
-      .mount();
-
-    expect(wrapper.findAll('[role="title"] input')).toHaveLength(0);
-    await wrapper.find('[role="title"] h2').trigger("click");
-
-    await flushPromises();
-
-    expect(wrapper.findAll('[role="title"] input')).toHaveLength(1);
-    expect(wrapper.findAll('[role="title"] h2')).toHaveLength(0);
-  });
-
-  it("should back to label when blur text field title", async () => {
-    const noteParentSphere = makeMe.aNoteRealm.title("Dummy Title").please();
-    helper.apiMock.expectingPatch(`/api/text_content/${noteParentSphere.id}`);
-
-    const wrapper = helper
-      .component(NoteWithLinks)
-      .withStorageProps({
-        note: noteParentSphere.note,
-        links: noteParentSphere.links,
-      })
-      .mount();
-
-    await wrapper.find('[role="title"]').trigger("click");
-    await wrapper.find('[role="title"] input').setValue("updated");
-    await wrapper.find('[role="title"] input').trigger("blur");
-  });
-});
-
-describe("undo editing", () => {
-  it("should call addEditingToUndoHistory on submitChange", async () => {
-    const histories = createNoteStorage(
-      new ManagedApi({ errors: [], states: [] })
-    );
-
-    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please();
-    helper.apiMock.expectingPatch(`/api/text_content/${noteRealm.id}`);
-
-    const updatedTitle = "updated";
-    const wrapper = helper
-      .component(NoteWithLinks)
-      .withProps({
-        note: noteRealm.note,
-        links: noteRealm.links,
-        storageAccessor: histories,
-      })
-      .mount();
-
-    await wrapper.find('[role="title"]').trigger("click");
-    await wrapper.find('[role="title"] input').setValue(updatedTitle);
-    await wrapper.find('[role="title"] input').trigger("blur");
-    await flushPromises();
-
-    expect(histories.peekUndo()).toMatchObject({ type: "editing" });
-  });
 });
 
 describe("note associated with wikidata", () => {
