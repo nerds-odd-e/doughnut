@@ -70,6 +70,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { debounce, DebouncedFunc } from "lodash";
 import NoteTitleWithLink from "./NoteTitleWithLink.vue";
 import NoteShortDescription from "./NoteShortDescription.vue";
 import ShowPicture from "./ShowPicture.vue";
@@ -84,7 +85,7 @@ import type { StorageAccessor } from "../../store/createNoteStorage";
 export default defineComponent({
   setup() {
     return {
-      submitChange: (() => {}) as () => void,
+      submitChange: null as DebouncedFunc<() => void> | null,
     };
   },
   props: {
@@ -114,11 +115,15 @@ export default defineComponent({
   },
   methods: {
     onBlurTextField() {
+      if (!this.submitChange) {
+        return;
+      }
       this.submitChange();
+      this.submitChange.flush();
     },
   },
   mounted() {
-    this.submitChange = () => {
+    this.submitChange = debounce(() => {
       this.storageAccessor
         .api(this.$router)
         .updateTextContent(
@@ -126,7 +131,7 @@ export default defineComponent({
           this.textContent,
           this.note.textContent
         );
-    };
+    }, 1000);
   },
 });
 </script>
