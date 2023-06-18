@@ -43,7 +43,6 @@ export default defineComponent({
   },
   data() {
     return {
-      initialValue: this.modelValue as string | undefined,
       localValue: this.modelValue as string | undefined,
       isEditing: false,
     };
@@ -56,7 +55,6 @@ export default defineComponent({
   methods: {
     startEditing() {
       if (this.isEditing) return;
-      this.initialValue = this.modelValue;
       this.localValue = this.modelValue;
       this.isEditing = true;
     },
