@@ -62,12 +62,7 @@ export default defineComponent({
       this.$emit("update:modelValue", this.localValue);
     },
     onBlurTextField() {
-      this.sumitChange();
-    },
-    sumitChange() {
-      if (this.modelValue?.trim() !== this.localValue.trim()) {
-        this.$emit("blur");
-      }
+      this.$emit("blur");
     },
   },
 });
