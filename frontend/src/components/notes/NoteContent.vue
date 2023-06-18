@@ -82,6 +82,11 @@ import NoteWikidataAssociation from "./NoteWikidataAssociation.vue";
 import type { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
+  setup() {
+    return {
+      submitChange: (() => {}) as () => void,
+    };
+  },
   props: {
     note: { type: Object as PropType<Generated.Note>, required: true },
     size: { type: String, default: "large" },
@@ -109,6 +114,11 @@ export default defineComponent({
   },
   methods: {
     onBlurTextField() {
+      this.submitChange();
+    },
+  },
+  mounted() {
+    this.submitChange = () => {
       this.storageAccessor
         .api(this.$router)
         .updateTextContent(
@@ -116,7 +126,7 @@ export default defineComponent({
           this.textContent,
           this.note.textContent
         );
-    },
+    };
   },
 });
 </script>
