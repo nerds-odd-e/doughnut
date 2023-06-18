@@ -67,11 +67,6 @@ export default defineComponent({
       }
     },
   },
-  beforeUnmount() {
-    if (this.hadFocus) {
-      this.sumitChange();
-    }
-  },
 });
 </script>
 
