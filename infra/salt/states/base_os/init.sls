@@ -30,6 +30,8 @@ doughnut-app-deps:
     - refresh: True
     - skip_verify: True
     - skip_suggestions: True
+    - allow_updates: False
+    - update_holds: True
     - pkgs:
         - ca-certificates
         - openssl
@@ -39,8 +41,6 @@ doughnut-app-deps:
         - jq
         - libmysqlclient21
         - mysql-community-client
-        - google-cloud-packages-archive-keyring
-        - google-cloud-sdk
     - require_in:
         - cmd: os-dist-upgrade
         - cmd: doughnut-jre
