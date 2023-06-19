@@ -93,8 +93,8 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   "mockChatCompletionWithContext",
   { prevSubject: true },
-  (serviceMocker: ServiceMocker, prompt: string, reply: string) => {
-    const body = { messages: [{ role: "user", content: prompt }] }
+  (serviceMocker: ServiceMocker, reply: string, context: string) => {
+    const body = { messages: [{ role: "assistant", content: context }] }
     const predicate = new FlexiPredicate()
       .withOperator(Operator.matches)
       .withPath(`/v1/chat/completions`)

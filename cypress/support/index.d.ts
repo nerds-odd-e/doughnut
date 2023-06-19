@@ -111,11 +111,7 @@ declare namespace Cypress {
       incomplete: string,
       reply: string,
     ): Chainable<Subject>
-    mockChatCompletionWithContext(
-      prompt: string,
-      reply: string,
-      context: string,
-    ): Chainable<Subject>
+    mockChatCompletionWithContext(reply: string, context: string): Chainable<Subject>
     restartImposter(): Chainable<Subject>
     restartImposterAndStubChatCompletion(
       reply: string,

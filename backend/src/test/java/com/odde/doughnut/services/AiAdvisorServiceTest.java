@@ -48,7 +48,7 @@ class AiAdvisorServiceTest {
   @Nested
   class GetSuggestion {
     Single<ChatCompletionResult> completionResultSingle =
-        Single.just(makeMe.openAiCompletionResult().choice("what goes up must come down").please());
+        Single.just(makeMe.openAiCompletionResult().choice(" must come down").please());
 
     Single<ChatCompletionResult> IncompleteCompletionResultSingle =
         Single.just(
@@ -61,7 +61,8 @@ class AiAdvisorServiceTest {
       assertEquals(
           "what goes up must come down",
           aiAdvisorService
-              .getAiSuggestion(new AiSuggestionRequest("suggestion_prompt", ""))
+              .getAiSuggestion(
+                  new AiSuggestionRequest("Complete this English phrase", "what goes up"))
               .getSuggestion());
     }
 

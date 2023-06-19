@@ -7,17 +7,16 @@ Feature: Note description completion
       | Taiwan  |             |               |
       | Taipei  |             | Taiwan        |
       | Weather | It rains a  | Taipei        |
+    Given OpenAI always returns text completion "Pardon?"
 
   @usingMockedOpenAiService
-    @focus
   Scenario: AI will complete the description of a note
-    Given OpenAI always returns text completion "Pardon?"
     But OpenAI completes with "It rains a lot." for incomplete assistant message "It rains a"
     When I ask to complete the description for note "Weather"
     Then I should see the note description on current page becomes "It rains a lot."
 
   @usingMockedOpenAiService
   Scenario: AI will complete the description of a note taking the context into consideration
-    Given OpenAI returns text completion "It rains a lot." for prompt containing "It rains a" and context containing "/Taiwan/Taipei"
+    Given OpenAI completes with "It rains a lot." for context containing "/Taiwan/Taipei"
     When I ask to complete the description for note "Weather"
     Then I should see the note description on current page becomes "It rains a lot."

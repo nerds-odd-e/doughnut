@@ -14,6 +14,7 @@ declare namespace Generated {
 
     interface AiSuggestionRequest {
         prompt: string;
+        incompleteAssistantMessage: string;
     }
 
     interface ApiError {

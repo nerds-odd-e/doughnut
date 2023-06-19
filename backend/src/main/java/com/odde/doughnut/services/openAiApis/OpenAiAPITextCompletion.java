@@ -34,10 +34,16 @@ public class OpenAiAPITextCompletion extends OpenAiApiHandlerBase {
           return choices.stream()
               .findFirst()
               .map(
-                  chatCompletionChoice ->
-                      new AiSuggestion(
-                          chatCompletionChoice.getMessage().getContent(),
-                          chatCompletionChoice.getFinishReason()))
+                  chatCompletionChoice -> {
+                    String content = chatCompletionChoice.getMessage().getContent();
+                    String incompleteAssistantMessage =
+                        aiSuggestionRequest.incompleteAssistantMessage == null
+                            ? ""
+                            : aiSuggestionRequest.incompleteAssistantMessage;
+                    return new AiSuggestion(
+                        incompleteAssistantMessage + content,
+                        chatCompletionChoice.getFinishReason());
+                  })
               .orElse(null);
         });
   }
