@@ -7,22 +7,8 @@ describe("AiAdvisor", () => {
 
   it("in case the description is null", () => {
     note.textContent.description = null as unknown as string;
-    expect(advicer.promptWithContext("")).toBe(
-      "Complete the description for the following note:\n" +
-        "context: \n" +
-        "title: Note1.1.1\n" +
-        "description:\n" +
-        "---\n"
-    );
-  });
-
-  it("in case there are no ancestors", () => {
-    expect(advicer.promptWithContext("")).toBe(
-      "Complete the description for the following note:\n" +
-        "context: \n" +
-        "title: Note1.1.1\n" +
-        "description:\n" +
-        "---\n"
+    expect(advicer.promptWithContext()).toBe(
+      "Describe the note with title: Note1.1.1\ndescription:\n---\n"
     );
   });
 

@@ -29,6 +29,7 @@ public class RestAiController {
       @PathVariable(name = "note") Note note,
       @RequestBody AiSuggestionRequest aiSuggestionRequest) {
     currentUser.assertLoggedIn();
+
     return aiAdvisorService.getAiSuggestion(aiSuggestionRequest);
   }
 

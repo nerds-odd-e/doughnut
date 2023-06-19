@@ -28,9 +28,7 @@ describe("AISuggestion", () => {
     await triggerSuggestion(note);
     expect(expectation.actualRequestJsonBody()).toMatchObject({
       prompt:
-        "Complete the description for the following note:\n" +
-        "context: \n" +
-        "title: Note1.1.1\n" +
+        "Describe the note with title: Note1.1.1\n" +
         "description:\n" +
         "---\n",
     });
