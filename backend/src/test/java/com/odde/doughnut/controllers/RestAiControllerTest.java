@@ -68,7 +68,7 @@ class RestAiControllerTest {
       when(openAiApi.createChatCompletion(
               argThat(
                   request -> {
-                    assertEquals("Earth", request.getMessages().get(0).getContent());
+                    assertEquals("Earth", request.getMessages().get(1).getContent());
                     return true;
                   })))
           .thenReturn(buildCompletionResult("blue planet"));

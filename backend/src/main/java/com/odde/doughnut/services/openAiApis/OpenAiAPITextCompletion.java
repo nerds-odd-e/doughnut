@@ -42,8 +42,9 @@ public class OpenAiAPITextCompletion extends OpenAiApiHandlerBase {
 
   private static ChatCompletionRequest getChatCompletionRequest(String prompt) {
     List<ChatMessage> messages = new ArrayList<>();
-    final ChatMessage systemMessage = new ChatMessage(ChatMessageRole.USER.value(), prompt);
-    messages.add(0, systemMessage);
+    final ChatMessage systemMessage = new ChatMessage(ChatMessageRole.ASSISTANT.value(), prompt);
+    messages.add(new ChatMessage(ChatMessageRole.USER.value(), "let's talk."));
+    messages.add(systemMessage);
 
     return ChatCompletionRequest.builder()
         .model(OPEN_AI_MODEL)

@@ -23,13 +23,6 @@ Given("OpenAI always returns text completion {string} from now", (description: s
 })
 
 Given(
-  "OpenAI returns text completion {string} for prompt containing {string}",
-  (returnMessage: string, requestMessage: string) => {
-    cy.openAiService().mockChatCompletion(`---\n${requestMessage}`, returnMessage)
-  },
-)
-
-Given(
   "OpenAI returns text completion {string} for prompt containing {string} and context containing {string}",
   (returnMessage: string, description: string, context: string) => {
     cy.openAiService().mockChatCompletionWithContext(`---\n${description}`, returnMessage, context)
