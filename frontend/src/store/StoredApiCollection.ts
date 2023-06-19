@@ -46,8 +46,6 @@ export interface StoredApi {
     data: Generated.WikidataAssociationCreation
   ): Promise<Generated.NoteRealm>;
 
-  getAllComments(noteId: Doughnut.ID): Promise<Generated.Comment[]>;
-
   undo(): Promise<Generated.NoteRealm>;
 
   deleteNote(noteId: Doughnut.ID): Promise<Generated.NoteRealm | undefined>;
@@ -71,11 +69,6 @@ export default class StoredApiCollection implements StoredApi {
     this.noteEditingHistory = undoHistory;
     this.storage = storage;
     this.router = router;
-  }
-
-  async getAllComments(noteId: number): Promise<Generated.Comment[]> {
-    const response = this.managedApi.restGet(`comment/${noteId}`);
-    return response as Promise<Generated.Comment[]>;
   }
 
   private routerReplace(focusOnNote?: Generated.NoteRealm) {

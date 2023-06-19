@@ -57,10 +57,6 @@ export default defineComponent({
       // Store in data.comments
     },
   },
-
-  mounted() {
-    this.storageAccessor.api(this.$router).getAllComments(this.noteId);
-  },
 });
 </script>
 
