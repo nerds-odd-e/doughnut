@@ -126,6 +126,20 @@ Cypress.Commands.add(
 )
 
 Cypress.Commands.add(
+  "restartImposterAndMockChatCompletionWithIncompleteAssistantMessage",
+  { prevSubject: true },
+  (serviceMocker: ServiceMocker, incomplete: string, reply: string) => {
+    const body = { messages: [{ role: "user" }, { role: "assistant", content: incomplete }] }
+    const predicate = new FlexiPredicate()
+      .withOperator(Operator.matches)
+      .withPath(`/v1/chat/completions`)
+      .withMethod(HttpMethod.POST)
+      .withBody(body)
+    restartImposterAndMockChatCompletion(predicate, serviceMocker, reply, "stop")
+  },
+)
+
+Cypress.Commands.add(
   "restartImposterAndMockChatCompletionWithContext",
   { prevSubject: true },
   (serviceMocker: ServiceMocker, prompt: string, reply: string) => {

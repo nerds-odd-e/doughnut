@@ -10,7 +10,9 @@ Feature: Note description completion
 
   @usingMockedOpenAiService
   Scenario: AI will complete the description of a note
-    Given OpenAI returns text completion "It rains a lot." for prompt containing "It rains a"
+    Given OpenAI always returns text completion "Pardon?"
+    But OpenAI returns text completion "It rains a lot." for prompt containing "It rains a"
+#    Given OpenAI completes with " lot." for incomplete assistant message "It rains a"
     When I ask to complete the description for note "Weather"
     Then I should see the note description on current page becomes "It rains a lot."
 

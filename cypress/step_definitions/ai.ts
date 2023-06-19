@@ -40,6 +40,16 @@ Given(
   },
 )
 
+Given(
+  "OpenAI completes with {string} for incomplete assistant message {string}",
+  (returnMessage: string, incompleteAssistantMessage: string) => {
+    cy.openAiService().restartImposterAndMockChatCompletionWithIncompleteAssistantMessage(
+      incompleteAssistantMessage,
+      returnMessage,
+    )
+  },
+)
+
 Given("OpenAI always return image of a moon", () => {
   cy.openAiService().stubCreateImage()
 })
