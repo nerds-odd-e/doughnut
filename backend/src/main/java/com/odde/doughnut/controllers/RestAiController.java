@@ -29,7 +29,7 @@ public class RestAiController {
   @PostMapping("/ask-suggestions")
   public AiSuggestion askSuggestion(@RequestBody AiSuggestionRequest aiSuggestionRequest) {
     currentUser.assertLoggedIn();
-    return aiAdvisorService.getAiSuggestion(aiSuggestionRequest.prompt);
+    return aiAdvisorService.getAiSuggestion(aiSuggestionRequest);
   }
 
   @PostMapping("/ask-engaging-stories")

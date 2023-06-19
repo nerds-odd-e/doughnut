@@ -1,6 +1,7 @@
 package com.odde.doughnut.services.openAiApis;
 
 import com.odde.doughnut.entities.json.AiSuggestion;
+import com.odde.doughnut.entities.json.AiSuggestionRequest;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
@@ -24,10 +25,11 @@ public class OpenAiAPITextCompletion extends OpenAiApiHandlerBase {
     return openAiApi.createChatCompletion(completionRequest).blockingGet().getChoices();
   }
 
-  public AiSuggestion getOpenAiCompletion(String prompt) {
+  public AiSuggestion getOpenAiCompletion(AiSuggestionRequest aiSuggestionRequest) {
     return withExceptionHandler(
         () -> {
-          ChatCompletionRequest completionRequest = getChatCompletionRequest(prompt);
+          ChatCompletionRequest completionRequest =
+              getChatCompletionRequest(aiSuggestionRequest.prompt);
           List<ChatCompletionChoice> choices = getChatCompletionChoices(completionRequest);
           return choices.stream()
               .findFirst()
