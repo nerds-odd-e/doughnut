@@ -39,10 +39,6 @@ declare namespace Generated {
         text: string;
     }
 
-    interface CommentInfo {
-        comment: Comment;
-    }
-
     interface CurrentUserInfo {
         user: User;
         externalIdentifier: string;
@@ -181,11 +177,6 @@ declare namespace Generated {
         id: string;
         label: string;
         description: string;
-    }
-
-    interface Comment {
-        text: string;
-        note_id: number;
     }
 
     interface User {

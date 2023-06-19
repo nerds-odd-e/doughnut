@@ -37,7 +37,6 @@ public class ModelFactoryService {
   @Autowired public NotebookRepository notebookRepository;
   @Autowired public EntityManager entityManager;
   @Autowired public FailureReportRepository failureReportRepository;
-  @Autowired public CommentRepository commentRepository;
 
   public NoteModel toNoteModel(Note note) {
     return new NoteModel(note, this);
@@ -105,9 +104,5 @@ public class ModelFactoryService {
 
   public AnswerModel toAnswerModel(Answer answer) {
     return new AnswerModel(answer, this);
-  }
-
-  public Optional<Comment> findCommentById(Integer id) {
-    return commentRepository.findById(id);
   }
 }
