@@ -267,6 +267,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     async askAiEngagingStories(prompt: string) {
       const request: Generated.AiSuggestionRequest = {
         prompt,
+        incompleteAssistantMessage: "",
       };
       return (await managedApi.restPost(
         `ai/ask-engaging-stories`,

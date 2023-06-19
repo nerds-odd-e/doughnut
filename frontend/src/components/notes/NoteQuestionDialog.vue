@@ -64,6 +64,7 @@ export default defineComponent({
       const prompt = aiAdvisor.questionPrompt();
       const res = await this.api.ai.askAiSuggestions({
         prompt,
+        incompleteAssistantMessage: "",
       });
       const parsed: AiQuestion = JSON.parse(res.suggestion);
 

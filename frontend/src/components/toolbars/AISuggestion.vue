@@ -45,6 +45,7 @@ export default defineComponent({
       const prompt = aiAdvisor.promptWithContext(context);
       const res = await this.api.ai.askAiSuggestions({
         prompt,
+        incompleteAssistantMessage: "",
       });
 
       await this.storageAccessor.api(this.$router).updateTextContent(
