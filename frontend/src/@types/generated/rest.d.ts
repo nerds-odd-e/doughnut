@@ -34,11 +34,6 @@ declare namespace Generated {
         invitationCode: string;
     }
 
-    interface CommentCreation {
-        note_id: number;
-        text: string;
-    }
-
     interface CurrentUserInfo {
         user: User;
         externalIdentifier: string;
