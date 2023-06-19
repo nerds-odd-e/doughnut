@@ -25,25 +25,21 @@ Given("OpenAI always returns text completion {string} from now", (description: s
 Given(
   "OpenAI returns text completion {string} for prompt containing {string}",
   (returnMessage: string, requestMessage: string) => {
-    cy.openAiService().restartImposterAndMockChatCompletion(`---\n${requestMessage}`, returnMessage)
+    cy.openAiService().mockChatCompletion(`---\n${requestMessage}`, returnMessage)
   },
 )
 
 Given(
   "OpenAI returns text completion {string} for prompt containing {string} and context containing {string}",
   (returnMessage: string, description: string, context: string) => {
-    cy.openAiService().restartImposterAndMockChatCompletionWithContext(
-      `---\n${description}`,
-      returnMessage,
-      context,
-    )
+    cy.openAiService().mockChatCompletionWithContext(`---\n${description}`, returnMessage, context)
   },
 )
 
 Given(
   "OpenAI completes with {string} for incomplete assistant message {string}",
   (returnMessage: string, incompleteAssistantMessage: string) => {
-    cy.openAiService().restartImposterAndMockChatCompletionWithIncompleteAssistantMessage(
+    cy.openAiService().mockChatCompletionWithIncompleteAssistantMessage(
       incompleteAssistantMessage,
       returnMessage,
     )

@@ -31,36 +31,7 @@ import "./string.extensions"
 import ServiceMocker from "./ServiceMocker"
 import { HttpMethod, Predicate } from "@anev/ts-mountebank"
 
-function restartImposterAndMockTextCompletion(
-  predicate: Predicate,
-  serviceMocker: ServiceMocker,
-  reply: string,
-  finishReason: "length" | "stop",
-) {
-  serviceMocker.install()
-
-  serviceMocker.mockWithPredicate(predicate, {
-    id: "cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7",
-    object: "text_completion",
-    created: 1589478378,
-    model: "text-davinci-003",
-    choices: [
-      {
-        text: reply,
-        index: 0,
-        logprobs: null,
-        finish_reason: finishReason,
-      },
-    ],
-    usage: {
-      prompt_tokens: 5,
-      completion_tokens: 7,
-      total_tokens: 12,
-    },
-  })
-}
-
-function restartImposterAndMockChatCompletion(
+function mockChatCompletion(
   predicate: Predicate,
   serviceMocker: ServiceMocker,
   reply: string,
@@ -90,29 +61,7 @@ function restartImposterAndMockChatCompletion(
 }
 
 Cypress.Commands.add(
-  "restartImposterAndMockTextCompletion",
-  { prevSubject: true },
-  (serviceMocker: ServiceMocker, prompt: string, reply: string) => {
-    const predicate = new FlexiPredicate()
-      .withOperator(Operator.matches)
-      .withPath(`/v1/completions`)
-      .withMethod(HttpMethod.POST)
-      .withBody({ prompt })
-    restartImposterAndMockTextCompletion(predicate, serviceMocker, reply, "stop")
-  },
-)
-
-Cypress.Commands.add(
-  "restartImposterAndStubTextCompletion",
-  { prevSubject: true },
-  (serviceMocker: ServiceMocker, reply: string, finishReason: "length" | "stop") => {
-    const predicate = new DefaultPredicate(`/v1/completions`, HttpMethod.POST)
-    restartImposterAndMockTextCompletion(predicate, serviceMocker, reply, finishReason)
-  },
-)
-
-Cypress.Commands.add(
-  "restartImposterAndMockChatCompletion",
+  "mockChatCompletion",
   { prevSubject: true },
   (serviceMocker: ServiceMocker, prompt: string, reply: string) => {
     const body = { messages: [{ role: "user", content: prompt }] }
@@ -121,26 +70,28 @@ Cypress.Commands.add(
       .withPath(`/v1/chat/completions`)
       .withMethod(HttpMethod.POST)
       .withBody(body)
-    restartImposterAndMockChatCompletion(predicate, serviceMocker, reply, "stop")
+    mockChatCompletion(predicate, serviceMocker, reply, "stop")
   },
 )
 
 Cypress.Commands.add(
-  "restartImposterAndMockChatCompletionWithIncompleteAssistantMessage",
+  "mockChatCompletionWithIncompleteAssistantMessage",
   { prevSubject: true },
   (serviceMocker: ServiceMocker, incomplete: string, reply: string) => {
-    const body = { messages: [{ role: "user" }, { role: "assistant", content: incomplete }] }
+    const body = {
+      messages: [{ role: "user" }, { role: "assistant", content: incomplete }],
+    }
     const predicate = new FlexiPredicate()
       .withOperator(Operator.matches)
       .withPath(`/v1/chat/completions`)
       .withMethod(HttpMethod.POST)
       .withBody(body)
-    restartImposterAndMockChatCompletion(predicate, serviceMocker, reply, "stop")
+    mockChatCompletion(predicate, serviceMocker, reply, "stop")
   },
 )
 
 Cypress.Commands.add(
-  "restartImposterAndMockChatCompletionWithContext",
+  "mockChatCompletionWithContext",
   { prevSubject: true },
   (serviceMocker: ServiceMocker, prompt: string, reply: string) => {
     const body = { messages: [{ role: "user", content: prompt }] }
@@ -149,7 +100,7 @@ Cypress.Commands.add(
       .withPath(`/v1/chat/completions`)
       .withMethod(HttpMethod.POST)
       .withBody(body)
-    restartImposterAndMockChatCompletion(predicate, serviceMocker, reply, "stop")
+    mockChatCompletion(predicate, serviceMocker, reply, "stop")
   },
 )
 
@@ -162,7 +113,7 @@ Cypress.Commands.add(
   { prevSubject: true },
   (serviceMocker: ServiceMocker, reply: string, finishReason: "length" | "stop") => {
     const predicate = new DefaultPredicate(`/v1/chat/completions`, HttpMethod.POST)
-    restartImposterAndMockChatCompletion(predicate, serviceMocker, reply, finishReason)
+    mockChatCompletion(predicate, serviceMocker, reply, finishReason)
   },
 )
 
