@@ -4,6 +4,8 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.entities.json.AiSuggestionRequest;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.NoteModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.theokanning.openai.OpenAiApi;
@@ -15,12 +17,16 @@ import org.springframework.web.context.annotation.SessionScope;
 @SessionScope
 @RequestMapping("/api/ai")
 public class RestAiController {
-  AiAdvisorService aiAdvisorService;
+  private final AiAdvisorService aiAdvisorService;
+  private final ModelFactoryService modelFactoryService;
   private UserModel currentUser;
 
   public RestAiController(
-      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi, UserModel currentUser) {
+      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
+      ModelFactoryService modelFactoryService,
+      UserModel currentUser) {
     aiAdvisorService = new AiAdvisorService(openAiApi);
+    this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
   }
 
@@ -29,8 +35,9 @@ public class RestAiController {
       @PathVariable(name = "note") Note note,
       @RequestBody AiSuggestionRequest aiSuggestionRequest) {
     currentUser.assertLoggedIn();
+    NoteModel noteModel = modelFactoryService.toNoteModel(note);
 
-    return aiAdvisorService.getAiSuggestion(aiSuggestionRequest);
+    return aiAdvisorService.getAiSuggestion(noteModel.getContext(), aiSuggestionRequest);
   }
 
   @PostMapping("/ask-engaging-stories")

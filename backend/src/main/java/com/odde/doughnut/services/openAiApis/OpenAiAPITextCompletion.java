@@ -25,11 +25,11 @@ public class OpenAiAPITextCompletion extends OpenAiApiHandlerBase {
     return openAiApi.createChatCompletion(completionRequest).blockingGet().getChoices();
   }
 
-  public AiSuggestion getOpenAiCompletion(AiSuggestionRequest aiSuggestionRequest) {
+  public AiSuggestion getOpenAiCompletion(String context, AiSuggestionRequest aiSuggestionRequest) {
     return withExceptionHandler(
         () -> {
           ChatCompletionRequest completionRequest =
-              getChatCompletionRequest(aiSuggestionRequest.prompt);
+              getChatCompletionRequest(context, aiSuggestionRequest.prompt);
           List<ChatCompletionChoice> choices = getChatCompletionChoices(completionRequest);
           return choices.stream()
               .findFirst()
@@ -48,10 +48,11 @@ public class OpenAiAPITextCompletion extends OpenAiApiHandlerBase {
         });
   }
 
-  private static ChatCompletionRequest getChatCompletionRequest(String prompt) {
+  private static ChatCompletionRequest getChatCompletionRequest(String context, String prompt) {
     List<ChatMessage> messages = new ArrayList<>();
     final ChatMessage systemMessage = new ChatMessage(ChatMessageRole.ASSISTANT.value(), prompt);
-    messages.add(new ChatMessage(ChatMessageRole.USER.value(), "let's talk."));
+    messages.add(new ChatMessage(ChatMessageRole.SYSTEM.value(), "context: " + context));
+    messages.add(new ChatMessage(ChatMessageRole.USER.value(), "Let's talk"));
     messages.add(systemMessage);
 
     return ChatCompletionRequest.builder()

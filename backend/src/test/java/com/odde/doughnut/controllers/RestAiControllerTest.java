@@ -54,7 +54,7 @@ class RestAiControllerTest {
   void Setup() {
     currentUser = makeMe.aUser().toModelPlease();
     note = makeMe.aNote().please();
-    controller = new RestAiController(openAiApi, currentUser);
+    controller = new RestAiController(openAiApi, makeMe.modelFactoryService, currentUser);
   }
 
   @Nested
@@ -64,19 +64,26 @@ class RestAiControllerTest {
       assertThrows(
           ResponseStatusException.class,
           () ->
-              new RestAiController(openAiApi, makeMe.aNullUserModel()).askSuggestion(note, params));
+              new RestAiController(openAiApi, makeMe.modelFactoryService, makeMe.aNullUserModel())
+                  .askSuggestion(note, params));
     }
 
     @Test
     void askSuggestionWithRightPrompt() {
+      Note cosmos = makeMe.aNote("cosmos").please();
+      Note solar = makeMe.aNote("solar system").under(cosmos).please();
+      Note earth = makeMe.aNote("Earth").under(solar).please();
       when(openAiApi.createChatCompletion(
               argThat(
                   request -> {
-                    assertEquals("Earth", request.getMessages().get(1).getContent());
+                    assertEquals("Earth", request.getMessages().get(2).getContent());
+                    assertEquals(
+                        "context: cosmos › solar system",
+                        request.getMessages().get(0).getContent());
                     return true;
                   })))
           .thenReturn(buildCompletionResult("blue planet"));
-      controller.askSuggestion(note, params);
+      controller.askSuggestion(earth, params);
     }
 
     @Test
@@ -101,7 +108,8 @@ class RestAiControllerTest {
       assertThrows(
           ResponseStatusException.class,
           () ->
-              new RestAiController(openAiApi, makeMe.aNullUserModel()).askEngagingStories(params));
+              new RestAiController(openAiApi, makeMe.modelFactoryService, makeMe.aNullUserModel())
+                  .askEngagingStories(params));
     }
 
     @Test

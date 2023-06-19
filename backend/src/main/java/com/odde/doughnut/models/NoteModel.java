@@ -4,6 +4,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
@@ -56,5 +57,9 @@ public class NoteModel {
       bindingResult.rejectValue(null, "error.error", "Duplicate Wikidata ID Detected.");
       throw new BindException(bindingResult);
     }
+  }
+
+  public String getContext() {
+    return entity.getAncestors().stream().map(Note::getTitle).collect(Collectors.joining(" › "));
   }
 }

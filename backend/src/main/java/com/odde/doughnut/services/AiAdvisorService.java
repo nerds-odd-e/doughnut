@@ -16,8 +16,8 @@ public class AiAdvisorService {
     openAiAPIImage = new OpenAiAPIImage(openAiApi);
   }
 
-  public AiSuggestion getAiSuggestion(AiSuggestionRequest aiSuggestionRequest) {
-    return openAiAPITextCompletion.getOpenAiCompletion(aiSuggestionRequest);
+  public AiSuggestion getAiSuggestion(String context, AiSuggestionRequest aiSuggestionRequest) {
+    return openAiAPITextCompletion.getOpenAiCompletion(context, aiSuggestionRequest);
   }
 
   public AiEngagingStory getEngagingStory(String prompt) {
