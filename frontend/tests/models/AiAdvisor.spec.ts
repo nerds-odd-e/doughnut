@@ -11,15 +11,4 @@ describe("AiAdvisor", () => {
       "Describe the note with title: Note1.1.1"
     );
   });
-
-  it("use the full text", () => {
-    expect(advisor.processResult("abc")).toBe("abc");
-  });
-
-  it("removes the prompt if any", () => {
-    expect(advisor.processResult("abc---\ndef")).toBe("def");
-  });
-  it("removes only the prompt", () => {
-    expect(advisor.processResult("abc---\ndef---\ng")).toBe("def---\ng");
-  });
 });

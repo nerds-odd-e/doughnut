@@ -35,21 +35,8 @@ export default class AiAdvisor {
       this.textContent.title
     }", "${
       this.textContent.description
-    }" ], generate a multiple-choice question with exactly 3 options and exactly 1 correct option. The response should be JSON-formatted as follows: ${JSON.stringify(
+    }" ], generate a multiple-choice question with exactly 3 options and exactly 1 correct option. Please vary the option text length, so that the correct answer isn't always the longest one. The response should be JSON-formatted as follows: ${JSON.stringify(
       questionResponseFormatExample
     )}`;
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  processResult(suggestion: string): string {
-    const separator = "---\n";
-    const parts = suggestion.split(separator);
-
-    if (parts.length > 1) {
-      parts.shift();
-      return parts.join(separator);
-    }
-
-    return suggestion;
   }
 }

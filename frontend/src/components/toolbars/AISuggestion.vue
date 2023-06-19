@@ -51,7 +51,7 @@ export default defineComponent({
         this.selectedNote.id,
         {
           title: this.selectedNote.title,
-          description: aiAdvisor.processResult(res.suggestion),
+          description: res.suggestion,
         },
         this.selectedNote.textContent
       );
