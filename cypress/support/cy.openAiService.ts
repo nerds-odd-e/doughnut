@@ -66,8 +66,6 @@ function restartImposterAndMockChatCompletion(
   reply: string,
   finishReason: "length" | "stop",
 ) {
-  serviceMocker.install()
-
   serviceMocker.mockWithPredicate(predicate, {
     id: "cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7",
     object: "chat.completion",

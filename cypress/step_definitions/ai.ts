@@ -17,6 +17,11 @@ Given("OpenAI always returns text completion {string}", (description: string) =>
   cy.openAiService().restartImposterAndStubChatCompletion(description, "stop")
 })
 
+Given("OpenAI always returns text completion {string} from now", (description: string) => {
+  cy.openAiService().restartImposter()
+  cy.openAiService().restartImposterAndStubChatCompletion(description, "stop")
+})
+
 Given(
   "OpenAI returns text completion {string} for prompt containing {string}",
   (returnMessage: string, requestMessage: string) => {
