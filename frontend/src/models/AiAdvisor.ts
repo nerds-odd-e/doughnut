@@ -27,9 +27,7 @@ export default class AiAdvisor {
   }
 
   promptWithContext(): string {
-    return `Describe the note with title: ${
-      this.textContent.title
-    }\ndescription:\n---\n${this.textContent.description || ""}`;
+    return `Describe the note with title: ${this.textContent.title}`;
   }
 
   questionPrompt(): string {

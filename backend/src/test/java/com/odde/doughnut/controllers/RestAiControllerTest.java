@@ -46,7 +46,7 @@ class RestAiControllerTest {
   AiSuggestionRequest params =
       new AiSuggestionRequest() {
         {
-          this.prompt = "Earth";
+          this.prompt = "describe Earth";
         }
       };
 
@@ -76,7 +76,7 @@ class RestAiControllerTest {
       when(openAiApi.createChatCompletion(
               argThat(
                   request -> {
-                    assertEquals("Earth", request.getMessages().get(2).getContent());
+                    assertEquals("describe Earth", request.getMessages().get(1).getContent());
                     assertEquals(
                         "context: cosmos › solar system",
                         request.getMessages().get(0).getContent());
@@ -113,11 +113,11 @@ class RestAiControllerTest {
     }
 
     @Test
-    void askEngagingStoryWithRightPrompt() throws UnexpectedNoAccessRightException {
+    void askEngagingStoryWithRightPrompt() {
       when(openAiApi.createImage(
               argThat(
                   request -> {
-                    assertEquals("Earth", request.getPrompt());
+                    assertEquals("describe Earth", request.getPrompt());
                     return true;
                   })))
           .thenReturn(buildImageResult("This is an engaging story."));

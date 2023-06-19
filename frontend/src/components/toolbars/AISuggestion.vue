@@ -42,7 +42,7 @@ export default defineComponent({
       const res = await this.api.ai.askAiSuggestions(
         {
           prompt,
-          incompleteAssistantMessage: "",
+          incompleteAssistantMessage: this.selectedNote.textContent.description,
         },
         this.selectedNote.id
       );
