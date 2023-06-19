@@ -116,12 +116,6 @@ class AiAdvisorServiceTest {
               OpenAiUnauthorizedException.class, () -> aiAdvisorService.getAiSuggestion(""));
       assertThat(exception.getMessage(), containsString("401"));
     }
-
-    @Test
-    @Disabled
-    void getAiAdvisor_getProvider_equals_chatGpt3_5() {
-      assertEquals(OpenAiAPITextCompletion.OPEN_AI_MODEL, "gpt-3.5-turbo");
-    }
   }
 
   @Nested
