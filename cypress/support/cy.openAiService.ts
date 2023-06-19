@@ -141,6 +141,10 @@ Cypress.Commands.add(
   },
 )
 
+Cypress.Commands.add("restartImposter", { prevSubject: true }, (serviceMocker: ServiceMocker) => {
+  serviceMocker.install()
+})
+
 Cypress.Commands.add(
   "restartImposterAndStubChatCompletion",
   { prevSubject: true },

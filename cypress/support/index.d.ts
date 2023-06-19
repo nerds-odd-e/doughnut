@@ -117,6 +117,7 @@ declare namespace Cypress {
       reply: string,
       context: string,
     ): Chainable<Subject>
+    restartImposter(): Chainable<Subject>
     restartImposterAndStubChatCompletion(
       reply: string,
       finishReason: "length" | "stop",

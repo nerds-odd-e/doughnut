@@ -51,7 +51,7 @@ Given("AI會返回{string}", (returnMessage: string) => {
   cy.openAiService().restartImposterAndStubChatCompletion(returnMessage, "stop")
 })
 
-Given("OpenAI returns a question", (questionTable: DataTable) => {
+Given("OpenAI always returns this question from now:", (questionTable: DataTable) => {
   const record = questionTable.hashes()[0]
   const reply = JSON.stringify({
     question: record.question,
@@ -73,5 +73,6 @@ Given("OpenAI returns a question", (questionTable: DataTable) => {
       },
     ],
   })
+  cy.openAiService().restartImposter()
   cy.openAiService().restartImposterAndStubChatCompletion(reply, "stop")
 })
