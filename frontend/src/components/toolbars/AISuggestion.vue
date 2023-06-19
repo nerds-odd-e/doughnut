@@ -43,10 +43,13 @@ export default defineComponent({
       });
       const aiAdvisor = new AiAdvisor(this.selectedNote.textContent);
       const prompt = aiAdvisor.promptWithContext(context);
-      const res = await this.api.ai.askAiSuggestions({
-        prompt,
-        incompleteAssistantMessage: "",
-      });
+      const res = await this.api.ai.askAiSuggestions(
+        {
+          prompt,
+          incompleteAssistantMessage: "",
+        },
+        this.selectedNote.id
+      );
 
       await this.storageAccessor.api(this.$router).updateTextContent(
         this.selectedNote.id,

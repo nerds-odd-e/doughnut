@@ -22,7 +22,7 @@ describe("AISuggestion", () => {
   it("ask api to generate suggested description when description is empty", async () => {
     const note = makeMe.aNote.description("").please();
     const expectation = helper.apiMock
-      .expectingPost(`/api/ai/ask-suggestions`)
+      .expectingPost(`/api/ai/${note.id}/ask-suggestions`)
       .andReturnOnce({ suggestion: "suggestion" });
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
     await triggerSuggestion(note);
@@ -39,7 +39,7 @@ describe("AISuggestion", () => {
   it("ask api be called once when clicking the suggest button", async () => {
     const note = makeMe.aNote.please();
     const expectation = helper.apiMock
-      .expectingPost(`/api/ai/ask-suggestions`)
+      .expectingPost(`/api/ai/${note.id}/ask-suggestions`)
       .andReturnOnce({ suggestion: "suggestion" });
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
     await triggerSuggestion(note);
@@ -52,11 +52,11 @@ describe("AISuggestion", () => {
     const note = makeMe.aNote.please();
 
     helper.apiMock
-      .expectingPost(`/api/ai/ask-suggestions`)
+      .expectingPost(`/api/ai/${note.id}/ask-suggestions`)
       .andReturnOnce({ suggestion: "suggestion", finishReason: "length" });
 
     helper.apiMock
-      .expectingPost(`/api/ai/ask-suggestions`)
+      .expectingPost(`/api/ai/${note.id}/ask-suggestions`)
       .andReturnOnce({ suggestion: "suggestion", finishReason: "stop" });
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);

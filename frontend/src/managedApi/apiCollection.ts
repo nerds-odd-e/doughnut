@@ -258,9 +258,12 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
   },
   ai: {
-    async askAiSuggestions(request: Generated.AiSuggestionRequest) {
+    async askAiSuggestions(
+      request: Generated.AiSuggestionRequest,
+      noteId: Doughnut.ID
+    ) {
       return (await managedApi.restPost(
-        `ai/ask-suggestions`,
+        `ai/${noteId}/ask-suggestions`,
         request
       )) as Generated.AiSuggestion;
     },

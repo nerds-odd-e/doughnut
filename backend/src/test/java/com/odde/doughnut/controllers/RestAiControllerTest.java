@@ -38,6 +38,8 @@ import org.springframework.web.server.ResponseStatusException;
 class RestAiControllerTest {
   RestAiController controller;
   UserModel currentUser;
+
+  Note note;
   @Mock OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
 
@@ -51,6 +53,7 @@ class RestAiControllerTest {
   @BeforeEach
   void Setup() {
     currentUser = makeMe.aUser().toModelPlease();
+    note = makeMe.aNote().please();
     controller = new RestAiController(openAiApi, currentUser);
   }
 
@@ -60,7 +63,8 @@ class RestAiControllerTest {
     void askWithNoteThatCannotAccess() {
       assertThrows(
           ResponseStatusException.class,
-          () -> new RestAiController(openAiApi, makeMe.aNullUserModel()).askSuggestion(params));
+          () ->
+              new RestAiController(openAiApi, makeMe.aNullUserModel()).askSuggestion(note, params));
     }
 
     @Test
@@ -72,13 +76,13 @@ class RestAiControllerTest {
                     return true;
                   })))
           .thenReturn(buildCompletionResult("blue planet"));
-      controller.askSuggestion(params);
+      controller.askSuggestion(note, params);
     }
 
     @Test
     void askSuggestionAndUseResponse() {
       when(openAiApi.createChatCompletion(any())).thenReturn(buildCompletionResult("blue planet"));
-      AiSuggestion aiSuggestion = controller.askSuggestion(params);
+      AiSuggestion aiSuggestion = controller.askSuggestion(note, params);
       assertEquals("blue planet", aiSuggestion.getSuggestion());
     }
   }
