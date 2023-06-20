@@ -109,7 +109,7 @@ Cypress.Commands.add("restartImposter", { prevSubject: true }, (serviceMocker: S
 })
 
 Cypress.Commands.add(
-  "restartImposterAndStubChatCompletion",
+  "stubChatCompletion",
   { prevSubject: true },
   (serviceMocker: ServiceMocker, reply: string, finishReason: "length" | "stop") => {
     const predicate = new DefaultPredicate(`/v1/chat/completions`, HttpMethod.POST)

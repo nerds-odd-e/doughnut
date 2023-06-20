@@ -14,12 +14,12 @@ Then("I should be prompted with an error message saying {string}", (errorMessage
 })
 
 Given("OpenAI always returns text completion {string}", (description: string) => {
-  cy.openAiService().restartImposterAndStubChatCompletion(description, "stop")
+  cy.openAiService().stubChatCompletion(description, "stop")
 })
 
 Given("OpenAI always returns text completion {string} from now", (description: string) => {
   cy.openAiService().restartImposter()
-  cy.openAiService().restartImposterAndStubChatCompletion(description, "stop")
+  cy.openAiService().stubChatCompletion(description, "stop")
 })
 
 Given(
@@ -44,7 +44,7 @@ Given("OpenAI always return image of a moon", () => {
 })
 
 Given("OpenAI returns an incomplete text completion {string}", (description: string) => {
-  cy.openAiService().restartImposterAndStubChatCompletion(description, "length")
+  cy.openAiService().stubChatCompletion(description, "length")
 })
 
 Given("An OpenAI response is unavailable", () => {
@@ -52,7 +52,7 @@ Given("An OpenAI response is unavailable", () => {
 })
 
 Given("AI會返回{string}", (returnMessage: string) => {
-  cy.openAiService().restartImposterAndStubChatCompletion(returnMessage, "stop")
+  cy.openAiService().stubChatCompletion(returnMessage, "stop")
 })
 
 Given("OpenAI always returns this question from now:", (questionTable: DataTable) => {
@@ -78,5 +78,5 @@ Given("OpenAI always returns this question from now:", (questionTable: DataTable
     ],
   })
   cy.openAiService().restartImposter()
-  cy.openAiService().restartImposterAndStubChatCompletion(reply, "stop")
+  cy.openAiService().stubChatCompletion(reply, "stop")
 })

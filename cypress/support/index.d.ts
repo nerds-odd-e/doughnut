@@ -113,10 +113,7 @@ declare namespace Cypress {
     ): Chainable<Subject>
     mockChatCompletionWithContext(reply: string, context: string): Chainable<Subject>
     restartImposter(): Chainable<Subject>
-    restartImposterAndStubChatCompletion(
-      reply: string,
-      finishReason: "length" | "stop",
-    ): Chainable<Subject>
+    stubChatCompletion(reply: string, finishReason: "length" | "stop"): Chainable<Subject>
     stubCreateImage(): Chainable<Subject>
     stubOpenAiCompletionWithErrorResponse(): Chainable<Subject>
     alwaysResponseAsUnauthorized(): Chainable<any>
