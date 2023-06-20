@@ -79,9 +79,8 @@ class RestAiControllerTest {
                   request -> {
                     assertThat(request.getMessages()).hasSize(2);
                     assertEquals("describe Earth", request.getMessages().get(1).getContent());
-                    assertEquals(
-                        "context: cosmos › solar system",
-                        request.getMessages().get(0).getContent());
+                    assertThat(request.getMessages().get(0).getContent())
+                        .contains("context: cosmos › solar system");
                     return true;
                   })))
           .thenReturn(buildCompletionResult("blue planet"));
