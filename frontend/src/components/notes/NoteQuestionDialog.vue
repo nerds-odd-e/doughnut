@@ -1,32 +1,30 @@
 <template>
-  <div id="note-question-dialog">
-    <h2>Generate a question</h2>
-    <form>
-      <div v-if="question">
-        {{ question }}
-      </div>
-      <ol v-if="options.length > 0" type="A">
-        <li
-          v-for="(option, index) in options"
-          :key="index"
-          @click="selectOption(index)"
-          :class="{
-            'selected-option': isSelectedOption(index),
-            'is-correct': isSelectedOption(index) && isCorrectOption(option),
-            'is-wrong': isSelectedOption(index) && !isCorrectOption(option),
-          }"
-        >
-          {{ option.option }}
-        </li>
-      </ol>
-    </form>
-    <button
-      class="btn btn-secondary"
-      @click="generateQuestionAndResetSelectedOption"
-    >
-      Ask again
-    </button>
-  </div>
+  <h2>Generate a question</h2>
+  <form>
+    <div v-if="question">
+      {{ question }}
+    </div>
+    <ol v-if="options.length > 0" type="A">
+      <li
+        v-for="(option, index) in options"
+        :key="index"
+        @click="selectOption(index)"
+        :class="{
+          'selected-option': isSelectedOption(index),
+          'is-correct': isSelectedOption(index) && isCorrectOption(option),
+          'is-wrong': isSelectedOption(index) && !isCorrectOption(option),
+        }"
+      >
+        {{ option.option }}
+      </li>
+    </ol>
+  </form>
+  <button
+    class="btn btn-secondary"
+    @click="generateQuestionAndResetSelectedOption"
+  >
+    Ask again
+  </button>
 </template>
 
 <script lang="ts">

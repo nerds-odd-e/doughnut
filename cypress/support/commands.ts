@@ -628,4 +628,3 @@ Cypress.Commands.add("askForQuestion", (noteTitle: string) => {
   cy.jumpToNotePage(noteTitle)
   cy.clickNotePageMoreOptionsButton(noteTitle, "generate question")
 })
-

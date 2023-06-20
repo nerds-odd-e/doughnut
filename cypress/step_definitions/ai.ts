@@ -82,6 +82,5 @@ Then("it should consider the context {string}", (path: string) => {
 })
 
 Then("I regenerate the question", () => {
-  cy.findByRole("button", {name: "Ask again"}).click()
+  cy.findByRole("button", { name: "Ask again" }).click()
 })
-

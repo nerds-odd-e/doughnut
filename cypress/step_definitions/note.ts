@@ -450,11 +450,11 @@ When("I ask to generate a question for note {string}", (noteTitle: string) => {
 })
 
 When("the option {string} should be correct", (option: string) => {
-  cy.findByText(option).click().invoke("attr", "class").should("contain", 'is-correct')
+  cy.findByText(option).click().invoke("attr", "class").should("contain", "is-correct")
 })
 
 When("the option {string} should be wrong", (option: string) => {
-  cy.findByText(option).click().invoke("attr", "class").should("contain", 'is-wrong')
+  cy.findByText(option).click().invoke("attr", "class").should("contain", "is-wrong")
 })
 
 Then("I should be asked {string}", (questionDescription: string) => {
