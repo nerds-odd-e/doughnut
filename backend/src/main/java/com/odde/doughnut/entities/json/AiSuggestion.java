@@ -1,15 +1,17 @@
 package com.odde.doughnut.entities.json;
 
-import lombok.AllArgsConstructor;
+import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public final class AiSuggestion {
   String suggestion;
   String finishReason;
+
+  public AiSuggestion(ChatCompletionChoice chatCompletionChoice) {
+    this.suggestion = chatCompletionChoice.getMessage().getContent();
+    this.finishReason = chatCompletionChoice.getFinishReason();
+  }
 
   public AiSuggestion prependPreviousIncompleteMessage(AiSuggestionRequest aiSuggestionRequest) {
     String incompleteAssistantMessage = aiSuggestionRequest.getIncompleteMessageOrEmptyString();

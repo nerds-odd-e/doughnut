@@ -2,11 +2,9 @@ package com.odde.doughnut.services.openAiApis;
 
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.theokanning.openai.OpenAiApi;
-import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import java.util.List;
-import java.util.Optional;
 
 public class OpenAiAPIChatCompletion extends OpenAiApiHandlerBase {
 
@@ -19,24 +17,14 @@ public class OpenAiAPIChatCompletion extends OpenAiApiHandlerBase {
   public AiSuggestion getOpenAiCompletion(List<ChatMessage> chatMessages) {
     return withExceptionHandler(
         () ->
-            getChatCompletionFirstChoice(chatMessages)
-                .map(choice -> buildAiSuggestion(choice))
+            openAiApi
+                .createChatCompletion(getChatCompletionRequest(chatMessages))
+                .blockingGet()
+                .getChoices()
+                .stream()
+                .findFirst()
+                .map(AiSuggestion::new)
                 .orElse(null));
-  }
-
-  private Optional<ChatCompletionChoice> getChatCompletionFirstChoice(
-      List<ChatMessage> chatMessages) {
-    return openAiApi
-        .createChatCompletion(getChatCompletionRequest(chatMessages))
-        .blockingGet()
-        .getChoices()
-        .stream()
-        .findFirst();
-  }
-
-  private static AiSuggestion buildAiSuggestion(ChatCompletionChoice chatCompletionChoice) {
-    String content = chatCompletionChoice.getMessage().getContent();
-    return new AiSuggestion(content, chatCompletionChoice.getFinishReason());
   }
 
   private static ChatCompletionRequest getChatCompletionRequest(List<ChatMessage> messages) {
