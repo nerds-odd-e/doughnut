@@ -3,7 +3,7 @@
     :title="'suggest description'"
     class="btn btn-sm"
     role="button"
-    @click="suggestDescription"
+    @click="suggestDescription(selectedNote.textContent.description)"
   >
     <SvgRobot />
   </a>
@@ -36,28 +36,42 @@ export default defineComponent({
     SvgRobot,
   },
   methods: {
-    async suggestDescription() {
+    async keepAskingAISuggestionUntilStop(
+      prev?: string,
+      earlyReturn?: (suggestion: string) => void
+    ): Promise<string> {
       const aiAdvisor = new AiAdvisor(this.selectedNote.textContent);
       const prompt = aiAdvisor.promptWithContext();
       const res = await this.api.ai.askAiSuggestions(
         {
           prompt,
-          incompleteAssistantMessage: this.selectedNote.textContent.description,
+          incompleteAssistantMessage: prev ?? "",
         },
         this.selectedNote.id
       );
-
-      await this.storageAccessor.api(this.$router).updateTextContent(
-        this.selectedNote.id,
-        {
-          title: this.selectedNote.title,
-          description: res.suggestion,
-        },
-        this.selectedNote.textContent
-      );
-      if (res.finishReason === "length") {
-        await this.suggestDescription();
+      if (earlyReturn) {
+        earlyReturn(res.suggestion);
       }
+      if (res.finishReason === "length") {
+        return this.keepAskingAISuggestionUntilStop(
+          res.suggestion,
+          earlyReturn
+        );
+      }
+      return res.suggestion;
+    },
+
+    async suggestDescription(prev?: string) {
+      await this.keepAskingAISuggestionUntilStop(prev, (suggestion) => {
+        this.storageAccessor.api(this.$router).updateTextContent(
+          this.selectedNote.id,
+          {
+            title: this.selectedNote.title,
+            description: suggestion,
+          },
+          this.selectedNote.textContent
+        );
+      });
     },
   },
 });

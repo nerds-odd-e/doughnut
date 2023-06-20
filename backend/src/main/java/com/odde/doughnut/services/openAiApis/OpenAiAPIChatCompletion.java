@@ -35,7 +35,7 @@ public class OpenAiAPIChatCompletion extends OpenAiApiHandlerBase {
         .n(1)
         // This can go higher (up to 4000 - prompt size), but openAI performance goes down
         // https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
-        .maxTokens(200)
+        .maxTokens(100)
         //
         // an effort has been made to make the api call more responsive by using stream(true)
         // however, due to the library limitation, we cannot do it yet.

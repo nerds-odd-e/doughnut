@@ -51,21 +51,22 @@ export default defineComponent({
     };
   },
   methods: {
-    async generateQuestion() {
+    async generateQuestion(prev?: string) {
       const aiAdvisor = new AiAdvisor(this.selectedNote.textContent);
       const prompt = aiAdvisor.questionPrompt();
       const res = await this.api.ai.askAiSuggestions(
         {
           prompt,
-          incompleteAssistantMessage: "",
+          incompleteAssistantMessage: prev ?? "",
         },
         this.selectedNote.id
       );
 
-      this.question = JSON.parse(res.suggestion);
-
+      if (res.finishReason !== "length") {
+        this.question = JSON.parse(res.suggestion);
+      }
       if (res.finishReason === "length") {
-        await this.generateQuestion();
+        await this.generateQuestion(res.suggestion);
       }
     },
     async generateQuestionAndResetSelectedOption() {
