@@ -29,7 +29,7 @@
     "test:open": "yarn run-p -clnr sut start:mb frontend:sut cy:open",
     "sound": "github_action_sound https://github.com/nerds-odd-e/doughnut/actions",
     "lint:all": "yarn && yarn backend:lint && yarn frontend:lint && yarn cy:lint",
-    "format:all": "yarn && yarn backend:format && yarn frontend:format && yarn cy:format",
+    "format:all": "yarn && yarn backend:format && yarn frontend:format && yarn cy:format"
   },
   "cypress-cucumber-preprocessor": {
     "stepDefinitions": "cypress/step_definitions/**/*.ts"
