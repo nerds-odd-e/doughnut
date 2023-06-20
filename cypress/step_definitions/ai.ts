@@ -51,10 +51,6 @@ Given("An OpenAI response is unavailable", () => {
   cy.openAiService().stubOpenAiCompletionWithErrorResponse()
 })
 
-Given("AI會返回{string}", (returnMessage: string) => {
-  cy.openAiService().stubChatCompletion(returnMessage, "stop")
-})
-
 Given("OpenAI by default returns this question from now:", (questionTable: DataTable) => {
   const record = questionTable.hashes()[0]
   const reply = JSON.stringify({
