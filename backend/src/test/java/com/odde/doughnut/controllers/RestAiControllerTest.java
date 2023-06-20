@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -76,6 +77,7 @@ class RestAiControllerTest {
       when(openAiApi.createChatCompletion(
               argThat(
                   request -> {
+                    assertThat(request.getMessages()).hasSize(2);
                     assertEquals("describe Earth", request.getMessages().get(1).getContent());
                     assertEquals(
                         "context: cosmos › solar system",
@@ -84,6 +86,19 @@ class RestAiControllerTest {
                   })))
           .thenReturn(buildCompletionResult("blue planet"));
       controller.askSuggestion(earth, params);
+    }
+
+    @Test
+    void askSuggestionWithIncompleteAssistantMessage() {
+      params.incompleteAssistantMessage = "What goes up,";
+      when(openAiApi.createChatCompletion(
+              argThat(
+                  request -> {
+                    assertThat(request.getMessages()).hasSize(3);
+                    return true;
+                  })))
+          .thenReturn(buildCompletionResult("blue planet"));
+      controller.askSuggestion(note, params);
     }
 
     @Test

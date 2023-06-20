@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.apache.logging.log4j.util.Strings;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,7 +18,9 @@ public class AiSuggestionRequest {
     List<ChatMessage> messages = new ArrayList<>();
     messages.add(new ChatMessage(ChatMessageRole.SYSTEM.value(), "context: " + context));
     messages.add(new ChatMessage(ChatMessageRole.USER.value(), prompt));
-    messages.add(new ChatMessage(ChatMessageRole.ASSISTANT.value(), incompleteAssistantMessage));
+    if (!Strings.isEmpty(incompleteAssistantMessage)) {
+      messages.add(new ChatMessage(ChatMessageRole.ASSISTANT.value(), incompleteAssistantMessage));
+    }
     return messages;
   }
 
