@@ -3,8 +3,8 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.entities.json.AiSuggestionRequest;
-import com.odde.doughnut.services.openAiApis.OpenAiAPIImage;
 import com.odde.doughnut.services.openAiApis.OpenAiAPIChatCompletion;
+import com.odde.doughnut.services.openAiApis.OpenAiAPIImage;
 import com.theokanning.openai.OpenAiApi;
 
 public class AiAdvisorService {

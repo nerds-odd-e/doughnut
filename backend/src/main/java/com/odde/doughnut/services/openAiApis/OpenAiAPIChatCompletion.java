@@ -9,42 +9,43 @@ import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class OpenAiAPIChatCompletion extends OpenAiApiHandlerBase {
 
   private final OpenAiApi openAiApi;
-  public static final String OPEN_AI_MODEL = "gpt-3.5-turbo";
 
   public OpenAiAPIChatCompletion(OpenAiApi openAiApi) {
     this.openAiApi = openAiApi;
   }
 
-  private List<ChatCompletionChoice> getChatCompletionChoices(
-      ChatCompletionRequest completionRequest) {
-    return openAiApi.createChatCompletion(completionRequest).blockingGet().getChoices();
-  }
-
   public AiSuggestion getOpenAiCompletion(String context, AiSuggestionRequest aiSuggestionRequest) {
     return withExceptionHandler(
-        () -> {
-          ChatCompletionRequest completionRequest =
-              getChatCompletionRequest(context, aiSuggestionRequest);
-          List<ChatCompletionChoice> choices = getChatCompletionChoices(completionRequest);
-          return choices.stream()
-              .findFirst()
-              .map(
-                  chatCompletionChoice -> {
-                    String content = chatCompletionChoice.getMessage().getContent();
-                    String incompleteAssistantMessage =
-                        aiSuggestionRequest.incompleteAssistantMessage == null
-                            ? ""
-                            : aiSuggestionRequest.incompleteAssistantMessage;
-                    return new AiSuggestion(
-                        incompleteAssistantMessage + content,
-                        chatCompletionChoice.getFinishReason());
-                  })
-              .orElse(null);
-        });
+        () ->
+            getChatCompletionFirstChoice(context, aiSuggestionRequest)
+                .map(choice -> buildAiSuggestion(aiSuggestionRequest, choice))
+                .orElse(null));
+  }
+
+  private Optional<ChatCompletionChoice> getChatCompletionFirstChoice(
+      String context, AiSuggestionRequest aiSuggestionRequest) {
+    return openAiApi
+        .createChatCompletion(getChatCompletionRequest(context, aiSuggestionRequest))
+        .blockingGet()
+        .getChoices()
+        .stream()
+        .findFirst();
+  }
+
+  private static AiSuggestion buildAiSuggestion(
+      AiSuggestionRequest aiSuggestionRequest, ChatCompletionChoice chatCompletionChoice) {
+    String content = chatCompletionChoice.getMessage().getContent();
+    String incompleteAssistantMessage =
+        aiSuggestionRequest.incompleteAssistantMessage == null
+            ? ""
+            : aiSuggestionRequest.incompleteAssistantMessage;
+    String suggestion = incompleteAssistantMessage + content;
+    return new AiSuggestion(suggestion, chatCompletionChoice.getFinishReason());
   }
 
   private static ChatCompletionRequest getChatCompletionRequest(
@@ -57,7 +58,7 @@ public class OpenAiAPIChatCompletion extends OpenAiApiHandlerBase {
             ChatMessageRole.ASSISTANT.value(), aiSuggestionRequest.incompleteAssistantMessage));
 
     return ChatCompletionRequest.builder()
-        .model(OPEN_AI_MODEL)
+        .model("gpt-3.5-turbo")
         .messages(messages)
         .n(1)
         // This can go higher (up to 4000 - prompt size), but openAI performance goes down
