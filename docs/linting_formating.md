@@ -57,6 +57,8 @@ dum cy:format
 
 ### 3. Linting
 
+Linting is mostly for the CI server to check for any leaked warnings or errors.
+Developers should use format instead of lint.
 From `doughnut` source root directory, run:
 
 ##### 3.1. Lint All code
