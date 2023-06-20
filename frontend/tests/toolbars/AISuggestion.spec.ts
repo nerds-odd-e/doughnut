@@ -35,7 +35,7 @@ describe("AISuggestion", () => {
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
     await triggerSuggestion(note);
     expect(expectation.actualRequestJsonBody()).toMatchObject({
-      prompt: "Describe the note with title: Note1.1.1",
+      prompt: "Please provide the description for the note titled: Note1.1.1",
     });
   });
 
@@ -47,7 +47,7 @@ describe("AISuggestion", () => {
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
     await triggerSuggestion(note);
     expect(expectation.actualRequestJsonBody()).toMatchObject({
-      prompt: expect.stringContaining("Desc"),
+      prompt: expect.stringContaining("Please"),
     });
   });
 
