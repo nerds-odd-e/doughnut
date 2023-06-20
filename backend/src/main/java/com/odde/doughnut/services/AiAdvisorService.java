@@ -4,20 +4,20 @@ import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.entities.json.AiSuggestionRequest;
 import com.odde.doughnut.services.openAiApis.OpenAiAPIImage;
-import com.odde.doughnut.services.openAiApis.OpenAiAPITextCompletion;
+import com.odde.doughnut.services.openAiApis.OpenAiAPIChatCompletion;
 import com.theokanning.openai.OpenAiApi;
 
 public class AiAdvisorService {
-  private final OpenAiAPITextCompletion openAiAPITextCompletion;
+  private final OpenAiAPIChatCompletion openAiAPIChatCompletion;
   private final OpenAiAPIImage openAiAPIImage;
 
   public AiAdvisorService(OpenAiApi openAiApi) {
-    openAiAPITextCompletion = new OpenAiAPITextCompletion(openAiApi);
+    openAiAPIChatCompletion = new OpenAiAPIChatCompletion(openAiApi);
     openAiAPIImage = new OpenAiAPIImage(openAiApi);
   }
 
   public AiSuggestion getAiSuggestion(String context, AiSuggestionRequest aiSuggestionRequest) {
-    return openAiAPITextCompletion.getOpenAiCompletion(context, aiSuggestionRequest);
+    return openAiAPIChatCompletion.getOpenAiCompletion(context, aiSuggestionRequest);
   }
 
   public AiEngagingStory getEngagingStory(String prompt) {

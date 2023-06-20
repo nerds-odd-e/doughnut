@@ -10,12 +10,12 @@ import com.theokanning.openai.completion.chat.ChatMessageRole;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OpenAiAPITextCompletion extends OpenAiApiHandlerBase {
+public class OpenAiAPIChatCompletion extends OpenAiApiHandlerBase {
 
   private final OpenAiApi openAiApi;
   public static final String OPEN_AI_MODEL = "gpt-3.5-turbo";
 
-  public OpenAiAPITextCompletion(OpenAiApi openAiApi) {
+  public OpenAiAPIChatCompletion(OpenAiApi openAiApi) {
     this.openAiApi = openAiApi;
   }
 
