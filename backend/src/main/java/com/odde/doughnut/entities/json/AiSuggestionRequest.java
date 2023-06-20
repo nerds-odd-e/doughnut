@@ -14,8 +14,10 @@ public class AiSuggestionRequest {
   public String prompt;
   public String incompleteAssistantMessage;
 
-  static String contextTemplate = "This is a personal knowledge management system, consists of notes with a title and a description, which should represent atomic concepts.\n" +
-    "context: ";
+  static String contextTemplate =
+      "This is a personal knowledge management system, consists of notes with a title and a description, which should represent atomic concepts.\n"
+          + "context: ";
+
   public List<ChatMessage> getChatMessages(String context) {
     List<ChatMessage> messages = new ArrayList<>();
     messages.add(new ChatMessage(ChatMessageRole.SYSTEM.value(), contextTemplate + context));
