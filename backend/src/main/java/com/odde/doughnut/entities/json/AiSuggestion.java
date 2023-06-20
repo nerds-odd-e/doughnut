@@ -10,4 +10,10 @@ import lombok.NoArgsConstructor;
 public final class AiSuggestion {
   String suggestion;
   String finishReason;
+
+  public AiSuggestion prependPreviousIncompleteMessage(AiSuggestionRequest aiSuggestionRequest) {
+    String incompleteAssistantMessage = aiSuggestionRequest.getIncompleteMessageOrEmptyString();
+    setSuggestion(incompleteAssistantMessage + getSuggestion());
+    return this;
+  }
 }

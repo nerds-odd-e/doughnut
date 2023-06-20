@@ -20,4 +20,8 @@ public class AiSuggestionRequest {
     messages.add(new ChatMessage(ChatMessageRole.ASSISTANT.value(), incompleteAssistantMessage));
     return messages;
   }
+
+  String getIncompleteMessageOrEmptyString() {
+    return incompleteAssistantMessage == null ? "" : incompleteAssistantMessage;
+  }
 }
