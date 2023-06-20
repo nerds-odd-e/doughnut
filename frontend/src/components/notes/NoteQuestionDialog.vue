@@ -48,27 +48,23 @@ export default defineComponent({
     return {
       question: undefined as AiQuestion | undefined,
       selectedOptionIndex: undefined as number | undefined,
+      isUnmounted: false,
     };
   },
   methods: {
     async generateQuestion(prev?: string) {
       const aiAdvisor = new AiAdvisor(this.selectedNote.textContent);
       const prompt = aiAdvisor.questionPrompt();
-      const res = await this.api.ai.askAiSuggestions(
-        {
-          prompt,
-          incompleteAssistantMessage: prev ?? "",
-        },
-        this.selectedNote.id
+      const res = await this.api.ai.keepAskingAISuggestionUntilStop(
+        prompt,
+        this.selectedNote.id,
+        prev,
+        (_) => !this.isUnmounted
       );
 
-      if (res.finishReason !== "length") {
-        this.question = JSON.parse(res.suggestion);
-      }
-      if (res.finishReason === "length") {
-        await this.generateQuestion(res.suggestion);
-      }
+      this.question = JSON.parse(res);
     },
+
     async generateQuestionAndResetSelectedOption() {
       this.selectedOptionIndex = undefined;
       this.generateQuestion();
@@ -83,15 +79,13 @@ export default defineComponent({
   mounted() {
     this.generateQuestionAndResetSelectedOption();
   },
+  unmounted() {
+    this.isUnmounted = true;
+  },
 });
 </script>
 
 <style lang="scss" scoped>
-.ai-art {
-  width: 100%;
-  height: 100%;
-}
-
 .is-correct {
   font-weight: bold;
   background-color: #00ff00;
