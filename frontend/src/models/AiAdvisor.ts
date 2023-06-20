@@ -27,15 +27,17 @@ export default class AiAdvisor {
   }
 
   promptWithContext(): string {
-    return `Describe the note with title: ${this.textContent.title}`;
+    return `Please provide the description for the note titled: ${this.textContent.title}`;
   }
 
   questionPrompt(): string {
-    return `Given the following text fragments: [ "${
-      this.textContent.title
-    }", "${
-      this.textContent.description
-    }" ], generate a multiple-choice question with exactly 3 options and exactly 1 correct option. Please vary the option text length, so that the correct answer isn't always the longest one. The response should be JSON-formatted as follows: ${JSON.stringify(
+    return `Given the note with title: ${this.textContent.title}
+and description:
+${this.textContent.description}
+
+please generate a multiple-choice question with 3 options and 1 correct option.
+Please vary the option text length, so that the correct answer isn't always the longest one.
+The response should be JSON-formatted as follows: ${JSON.stringify(
       questionResponseFormatExample
     )}`;
   }
