@@ -13,11 +13,11 @@ Then("I should be prompted with an error message saying {string}", (errorMessage
   cy.expectFieldErrorMessage("Engaging Story", errorMessage)
 })
 
-Given("OpenAI always returns text completion {string}", (description: string) => {
+Given("OpenAI by default returns text completion {string}", (description: string) => {
   cy.openAiService().stubChatCompletion(description, "stop")
 })
 
-Given("OpenAI always returns text completion {string} from now", (description: string) => {
+Given("OpenAI by default returns text completion {string} from now", (description: string) => {
   cy.openAiService().restartImposter()
   cy.openAiService().stubChatCompletion(description, "stop")
 })
@@ -55,7 +55,7 @@ Given("AI會返回{string}", (returnMessage: string) => {
   cy.openAiService().stubChatCompletion(returnMessage, "stop")
 })
 
-Given("OpenAI always returns this question from now:", (questionTable: DataTable) => {
+Given("OpenAI by default returns this question from now:", (questionTable: DataTable) => {
   const record = questionTable.hashes()[0]
   const reply = JSON.stringify({
     question: record.question,

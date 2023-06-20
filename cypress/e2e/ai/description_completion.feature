@@ -7,7 +7,7 @@ Feature: Note description completion
       | Taiwan  |             |               |
       | Taipei  |             | Taiwan        |
       | Weather | It rains a  | Taipei        |
-    Given OpenAI always returns text completion "Pardon?"
+    Given OpenAI by default returns text completion "Pardon?"
 
   @usingMockedOpenAiService
   Scenario: AI will complete the description of a note
