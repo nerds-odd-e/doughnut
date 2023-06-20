@@ -7,7 +7,6 @@
       </div>
       <ol v-if="options.length > 0" type="A">
         <li
-          :id="'question-option-' + index"
           v-for="(option, index) in options"
           :key="index"
           @click="selectOption(index)"
