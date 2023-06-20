@@ -35,44 +35,62 @@ export default defineComponent({
   components: {
     SvgRobot,
   },
+  data() {
+    return {
+      isUnmounted: false,
+    };
+  },
   methods: {
     async keepAskingAISuggestionUntilStop(
+      prompt: string,
+      noteId: Doughnut.ID,
       prev?: string,
-      earlyReturn?: (suggestion: string) => void
+      interimResultShouldContinue?: (suggestion: string) => boolean
     ): Promise<string> {
-      const aiAdvisor = new AiAdvisor(this.selectedNote.textContent);
-      const prompt = aiAdvisor.promptWithContext();
       const res = await this.api.ai.askAiSuggestions(
         {
           prompt,
           incompleteAssistantMessage: prev ?? "",
         },
-        this.selectedNote.id
+        noteId
       );
-      if (earlyReturn) {
-        earlyReturn(res.suggestion);
+      if (interimResultShouldContinue) {
+        if (!interimResultShouldContinue(res.suggestion)) return res.suggestion;
       }
       if (res.finishReason === "length") {
         return this.keepAskingAISuggestionUntilStop(
+          prompt,
+          noteId,
           res.suggestion,
-          earlyReturn
+          interimResultShouldContinue
         );
       }
       return res.suggestion;
     },
 
     async suggestDescription(prev?: string) {
-      await this.keepAskingAISuggestionUntilStop(prev, (suggestion) => {
-        this.storageAccessor.api(this.$router).updateTextContent(
-          this.selectedNote.id,
-          {
-            title: this.selectedNote.title,
-            description: suggestion,
-          },
-          this.selectedNote.textContent
-        );
-      });
+      const aiAdvisor = new AiAdvisor(this.selectedNote.textContent);
+      const prompt = aiAdvisor.promptWithContext();
+      await this.keepAskingAISuggestionUntilStop(
+        prompt,
+        this.selectedNote.id,
+        prev,
+        (suggestion) => {
+          this.storageAccessor.api(this.$router).updateTextContent(
+            this.selectedNote.id,
+            {
+              title: this.selectedNote.title,
+              description: suggestion,
+            },
+            this.selectedNote.textContent
+          );
+          return !this.isUnmounted;
+        }
+      );
     },
+  },
+  unmounted() {
+    this.isUnmounted = true;
   },
 });
 </script>

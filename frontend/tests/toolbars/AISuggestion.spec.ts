@@ -8,7 +8,9 @@ helper.resetWithApiMock(beforeEach, afterEach);
 describe("AISuggestion", () => {
   helper.resetWithApiMock(beforeEach, afterEach);
 
-  const triggerSuggestion = async (note: Generated.Note) => {
+  const triggerSuggestionwithoutFlushPromises = async (
+    note: Generated.Note
+  ) => {
     const wrapper = helper
       .component(AISuggestion)
       .withStorageProps({
@@ -16,7 +18,13 @@ describe("AISuggestion", () => {
       })
       .mount();
     await wrapper.find(".btn").trigger("click");
+    return wrapper;
+  };
+
+  const triggerSuggestion = async (note: Generated.Note) => {
+    const wrapper = triggerSuggestionwithoutFlushPromises(note);
     await flushPromises();
+    return wrapper;
   };
 
   it("ask api to generate suggested description when description is empty", async () => {
@@ -57,5 +65,21 @@ describe("AISuggestion", () => {
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
 
     await triggerSuggestion(note);
+  });
+
+  it("stop calling if the component is unmounted", async () => {
+    const note = makeMe.aNote.please();
+
+    helper.apiMock
+      .expectingPost(`/api/ai/${note.id}/ask-suggestions`)
+      .andReturnOnce({ suggestion: "suggestion", finishReason: "length" });
+
+    helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
+
+    const wrapper = await triggerSuggestionwithoutFlushPromises(note);
+    wrapper.unmount();
+    await flushPromises();
+    // AI suggestion API should be called only once, although the finishReaon is "length."
+    // Because the component is unmounted.
   });
 });
