@@ -6,8 +6,6 @@ import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
-import com.theokanning.openai.completion.chat.ChatMessageRole;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,18 +17,19 @@ public class OpenAiAPIChatCompletion extends OpenAiApiHandlerBase {
     this.openAiApi = openAiApi;
   }
 
-  public AiSuggestion getOpenAiCompletion(String context, AiSuggestionRequest aiSuggestionRequest) {
+  public AiSuggestion getOpenAiCompletion(
+      AiSuggestionRequest aiSuggestionRequest, List<ChatMessage> chatMessages) {
     return withExceptionHandler(
         () ->
-            getChatCompletionFirstChoice(context, aiSuggestionRequest)
+            getChatCompletionFirstChoice(chatMessages)
                 .map(choice -> buildAiSuggestion(aiSuggestionRequest, choice))
                 .orElse(null));
   }
 
   private Optional<ChatCompletionChoice> getChatCompletionFirstChoice(
-      String context, AiSuggestionRequest aiSuggestionRequest) {
+      List<ChatMessage> chatMessages) {
     return openAiApi
-        .createChatCompletion(getChatCompletionRequest(context, aiSuggestionRequest))
+        .createChatCompletion(getChatCompletionRequest(chatMessages))
         .blockingGet()
         .getChoices()
         .stream()
@@ -48,14 +47,7 @@ public class OpenAiAPIChatCompletion extends OpenAiApiHandlerBase {
     return new AiSuggestion(suggestion, chatCompletionChoice.getFinishReason());
   }
 
-  private static ChatCompletionRequest getChatCompletionRequest(
-      String context, AiSuggestionRequest aiSuggestionRequest) {
-    List<ChatMessage> messages = new ArrayList<>();
-    messages.add(new ChatMessage(ChatMessageRole.SYSTEM.value(), "context: " + context));
-    messages.add(new ChatMessage(ChatMessageRole.USER.value(), aiSuggestionRequest.prompt));
-    messages.add(
-        new ChatMessage(
-            ChatMessageRole.ASSISTANT.value(), aiSuggestionRequest.incompleteAssistantMessage));
+  private static ChatCompletionRequest getChatCompletionRequest(List<ChatMessage> messages) {
 
     return ChatCompletionRequest.builder()
         .model("gpt-3.5-turbo")

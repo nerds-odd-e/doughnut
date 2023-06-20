@@ -17,7 +17,8 @@ public class AiAdvisorService {
   }
 
   public AiSuggestion getAiSuggestion(String context, AiSuggestionRequest aiSuggestionRequest) {
-    return openAiAPIChatCompletion.getOpenAiCompletion(context, aiSuggestionRequest);
+    return openAiAPIChatCompletion.getOpenAiCompletion(
+        aiSuggestionRequest, aiSuggestionRequest.getChatMessages(context));
   }
 
   public AiEngagingStory getEngagingStory(String prompt) {
