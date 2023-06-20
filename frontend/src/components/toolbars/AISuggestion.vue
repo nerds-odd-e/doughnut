@@ -41,37 +41,10 @@ export default defineComponent({
     };
   },
   methods: {
-    async keepAskingAISuggestionUntilStop(
-      prompt: string,
-      noteId: Doughnut.ID,
-      prev?: string,
-      interimResultShouldContinue?: (suggestion: string) => boolean
-    ): Promise<string> {
-      const res = await this.api.ai.askAiSuggestions(
-        {
-          prompt,
-          incompleteAssistantMessage: prev ?? "",
-        },
-        noteId
-      );
-      if (interimResultShouldContinue) {
-        if (!interimResultShouldContinue(res.suggestion)) return res.suggestion;
-      }
-      if (res.finishReason === "length") {
-        return this.keepAskingAISuggestionUntilStop(
-          prompt,
-          noteId,
-          res.suggestion,
-          interimResultShouldContinue
-        );
-      }
-      return res.suggestion;
-    },
-
     async suggestDescription(prev?: string) {
       const aiAdvisor = new AiAdvisor(this.selectedNote.textContent);
       const prompt = aiAdvisor.promptWithContext();
-      await this.keepAskingAISuggestionUntilStop(
+      await this.api.ai.keepAskingAISuggestionUntilStop(
         prompt,
         this.selectedNote.id,
         prev,

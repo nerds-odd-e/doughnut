@@ -258,6 +258,33 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
   },
   ai: {
+    async keepAskingAISuggestionUntilStop(
+      prompt: string,
+      noteId: Doughnut.ID,
+      prev?: string,
+      interimResultShouldContinue?: (suggestion: string) => boolean
+    ): Promise<string> {
+      const res = await this.askAiSuggestions(
+        {
+          prompt,
+          incompleteAssistantMessage: prev ?? "",
+        },
+        noteId
+      );
+      if (interimResultShouldContinue) {
+        if (!interimResultShouldContinue(res.suggestion)) return res.suggestion;
+      }
+      if (res.finishReason === "length") {
+        return this.keepAskingAISuggestionUntilStop(
+          prompt,
+          noteId,
+          res.suggestion,
+          interimResultShouldContinue
+        );
+      }
+      return res.suggestion;
+    },
+
     async askAiSuggestions(
       request: Generated.AiSuggestionRequest,
       noteId: Doughnut.ID
