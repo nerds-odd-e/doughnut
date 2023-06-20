@@ -8,7 +8,6 @@ import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class OpenAiAPITextCompletion extends OpenAiApiHandlerBase {
@@ -61,8 +60,15 @@ public class OpenAiAPITextCompletion extends OpenAiApiHandlerBase {
         .model(OPEN_AI_MODEL)
         .messages(messages)
         .n(1)
+        // This can go higher (up to 4000 - prompt size), but openAI performance goes down
+        // https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
         .maxTokens(200)
-        .logitBias(new HashMap<>())
+        //
+        // an effort has been made to make the api call more responsive by using stream(true)
+        // however, due to the library limitation, we cannot do it yet.
+        // find more details here:
+        //    https://github.com/TheoKanning/openai-java/issues/83
+        .stream(false)
         .build();
   }
 }
