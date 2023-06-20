@@ -59,7 +59,7 @@ public class NoteModel {
     }
   }
 
-  public String getContext() {
+  public String getPath() {
     return entity.getAncestors().stream().map(Note::getTitle).collect(Collectors.joining(" › "));
   }
 }

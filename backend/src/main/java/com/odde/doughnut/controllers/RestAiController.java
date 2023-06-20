@@ -37,7 +37,7 @@ public class RestAiController {
     currentUser.assertLoggedIn();
     NoteModel noteModel = modelFactoryService.toNoteModel(note);
 
-    return aiAdvisorService.getAiSuggestion(noteModel.getContext(), aiSuggestionRequest);
+    return aiAdvisorService.getAiSuggestion(noteModel.getPath(), aiSuggestionRequest);
   }
 
   @PostMapping("/ask-engaging-stories")
