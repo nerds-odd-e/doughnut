@@ -48,7 +48,7 @@ class AiAdvisorServiceTest {
   @Nested
   class GetSuggestion {
     Single<ChatCompletionResult> completionResultSingle =
-        Single.just(makeMe.openAiCompletionResult().choice(" must come down").please());
+        Single.just(makeMe.openAiCompletionResult().choice("must come down").please());
 
     Single<ChatCompletionResult> IncompleteCompletionResultSingle =
         Single.just(

@@ -2,6 +2,7 @@ package com.odde.doughnut.entities.json;
 
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import lombok.Data;
+import org.apache.logging.log4j.util.Strings;
 
 @Data
 public final class AiSuggestion {
@@ -15,6 +16,9 @@ public final class AiSuggestion {
 
   public AiSuggestion prependPreviousIncompleteMessage(AiSuggestionRequest aiSuggestionRequest) {
     String incompleteAssistantMessage = aiSuggestionRequest.getIncompleteMessageOrEmptyString();
+    if (!Strings.isBlank(incompleteAssistantMessage)) {
+      incompleteAssistantMessage += " ";
+    }
     setSuggestion(incompleteAssistantMessage + getSuggestion());
     return this;
   }
