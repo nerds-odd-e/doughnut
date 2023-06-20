@@ -21,10 +21,10 @@ Feature: Question generation by AI
       | Rescue Diver | correct        |
       | Divemaster   | wrong          |
 
-  Scenario: I should see a new question when I click 'Ask again'
+  Scenario: I should be able to regenerate the question
     Given I ask to generate a question for note "Scuba Diving"
     And OpenAI by default returns this question from now:
       | question                | option_a | option_b | option_c  |
       | How often scuba diving? | daily    | weekly   | never     |
-    When I click "Ask again"
+    When I regenerate the question
     Then I should be asked "How often scuba diving?"

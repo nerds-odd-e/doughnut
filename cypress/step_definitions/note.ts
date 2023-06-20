@@ -20,75 +20,6 @@ defineParameterType({
   },
 })
 
-class QuestionOption {
-  private option: string = ""
-  private static optionToIndex: Map<string, number> = this.initOptionToIndex()
-
-  constructor(option: string) {
-    this.option = option
-  }
-
-  private static initOptionToIndex(): Map<string, number> {
-    const map = new Map<string, number>()
-    map.set("a", 0)
-    map.set("b", 1)
-    map.set("c", 2)
-    return map
-  }
-
-  public toIndex(): number | undefined {
-    return QuestionOption.optionToIndex.get(this.option.toLowerCase())
-  }
-
-  public toSelector(): string {
-    return `#question-option-${this.toIndex()}`
-  }
-
-  private elementShouldHaveClass(className: string): void {
-    cy.get(this.toSelector()).invoke("attr", "class").should("contain", className)
-  }
-
-  private elementShouldNotHaveClass(className: string): void {
-    cy.get(this.toSelector()).invoke("attr", "class").should("not.contain", className)
-  }
-
-  public shouldBeSelected(): void {
-    this.elementShouldHaveClass("selected-option")
-  }
-
-  public shouldNotBeSelected(): void {
-    this.elementShouldNotHaveClass("selected-option")
-  }
-
-  public shouldBeCorrect(): void {
-    this.elementShouldHaveClass("is-correct")
-  }
-
-  public shouldBeWrong(): void {
-    this.elementShouldHaveClass("is-wrong")
-  }
-
-  public static A(): QuestionOption {
-    return new QuestionOption("a")
-  }
-
-  public static B(): QuestionOption {
-    return new QuestionOption("b")
-  }
-
-  public static C(): QuestionOption {
-    return new QuestionOption("c")
-  }
-}
-
-defineParameterType({
-  name: "questionoption",
-  regexp: /.*/,
-  transformer(option: string) {
-    return new QuestionOption(option)
-  },
-})
-
 Given("I visit note {string}", (noteTitle) => {
   cy.jumpToNotePage(noteTitle)
 })
@@ -526,44 +457,6 @@ When("the option {string} should be wrong", (option: string) => {
   cy.findByText(option).click().invoke("attr", "class").should("contain", 'is-wrong')
 })
 
-When("I select the correct option {questionoption}", (option: QuestionOption) => {
-  cy.get(option.toSelector()).click()
-})
-
-When("I select the wrong option {questionoption}", (option: QuestionOption) => {
-  cy.get(option.toSelector()).click()
-})
-
-Then("I should see a question on current page", (question: DataTable) => {
-  const q = question.hashes()[0]
-  cy.findByText(q.question)
-  cy.findByText(q.option_a)
-  cy.findByText(q.option_b)
-  cy.findByText(q.option_c)
-})
-
 Then("I should be asked {string}", (questionDescription: string) => {
   cy.findByText(questionDescription)
-})
-
-Then("it should consider the context {string}", (path: string) => {
-  cy.openAiService().thePreviousRequestShouldHaveIncludedPathInfo(path)
-})
-
-Then("I should see option {questionoption} turn green", (option: QuestionOption) => {
-  option.shouldBeCorrect()
-})
-
-Then("I should see option {questionoption} turn red", (option: QuestionOption) => {
-  option.shouldBeWrong()
-})
-
-When("I click {string}", (buttonText: string) => {
-  cy.findByText(buttonText).click()
-})
-
-Then("none of the options should be selected", () => {
-  QuestionOption.A().shouldNotBeSelected()
-  QuestionOption.B().shouldNotBeSelected()
-  QuestionOption.C().shouldNotBeSelected()
 })

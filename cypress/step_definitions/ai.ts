@@ -76,3 +76,12 @@ Given("OpenAI by default returns this question from now:", (questionTable: DataT
   cy.openAiService().restartImposter()
   cy.openAiService().stubChatCompletion(reply, "stop")
 })
+
+Then("it should consider the context {string}", (path: string) => {
+  cy.openAiService().thePreviousRequestShouldHaveIncludedPathInfo(path)
+})
+
+Then("I regenerate the question", () => {
+  cy.findByRole("button", {name: "Ask again"}).click()
+})
+
