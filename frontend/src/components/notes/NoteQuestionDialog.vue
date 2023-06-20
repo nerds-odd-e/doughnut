@@ -10,7 +10,6 @@
         :key="index"
         @click="selectOption(index)"
         :class="{
-          'selected-option': isSelectedOption(index),
           'is-correct': isSelectedOption(index) && option.correct,
           'is-wrong': isSelectedOption(index) && !option.correct,
         }"
@@ -48,7 +47,7 @@ export default defineComponent({
   data() {
     return {
       question: undefined as AiQuestion | undefined,
-      selectedOptionIndex: -1 as number,
+      selectedOptionIndex: undefined as number | undefined,
     };
   },
   methods: {
@@ -70,11 +69,8 @@ export default defineComponent({
       }
     },
     async generateQuestionAndResetSelectedOption() {
-      this.resetSelectedOption();
+      this.selectedOptionIndex = undefined;
       this.generateQuestion();
-    },
-    resetSelectedOption() {
-      this.selectOption(-1);
     },
     selectOption(optionIndex: number) {
       this.selectedOptionIndex = optionIndex;
@@ -95,15 +91,13 @@ export default defineComponent({
   height: 100%;
 }
 
-.selected-option {
-  font-weight: bold;
-}
-
 .is-correct {
+  font-weight: bold;
   background-color: #00ff00;
 }
 
 .is-wrong {
+  font-weight: bold;
   background-color: #ff0000;
 }
 </style>
