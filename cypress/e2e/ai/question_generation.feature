@@ -18,12 +18,11 @@ Feature: Question generation
 
   Scenario Outline: I should see feedback on selecting options
     Then I should be asked "What is the most common scuba diving certification?"
-    When I select the <CorrectOrWrong> option <Option>
-    Then I should see option <Option> turn <RedOrGreen>
+    And the option "<option>" should be <expectedResult>
     Examples:
-      | Option | CorrectOrWrong | RedOrGreen |
-      | a      | correct        | green      |
-      | b      | wrong          | red        |
+      | option       | expectedResult |
+      | Rescue Diver | correct        |
+      | Divemaster   | wrong          |
 
   Scenario: I should see a new question when I click 'Ask again'
     Given OpenAI by default returns this question from now:
