@@ -1,5 +1,7 @@
 @usingMockedOpenAiService
-Feature: Question generation
+Feature: Question generation by AI
+  As a learner, I want to use AI to generate review questions based on my note and its context.
+  So that I can remember my note better and potentially get new inspiration.
 
   Background:
     Given I've logged in as an existing user
@@ -9,9 +11,9 @@ Feature: Question generation
     And OpenAI by default returns this question from now:
       | question                                            | option_a     | option_b   | option_c         |
       | What is the most common scuba diving certification? | Rescue Diver | Divemaster | Open Water Diver |
-    When I ask to generate a question for note "Scuba Diving"
 
   Scenario Outline: testing myself with generated question for a note
+    When I ask to generate a question for note "Scuba Diving"
     Then I should be asked "What is the most common scuba diving certification?"
     And the option "<option>" should be <expectedResult>
     Examples:
@@ -20,7 +22,8 @@ Feature: Question generation
       | Divemaster   | wrong          |
 
   Scenario: I should see a new question when I click 'Ask again'
-    Given OpenAI by default returns this question from now:
+    Given I ask to generate a question for note "Scuba Diving"
+    And OpenAI by default returns this question from now:
       | question                | option_a | option_b | option_c  |
       | How often scuba diving? | daily    | weekly   | never     |
     When I click "Ask again"
