@@ -534,6 +534,10 @@ Then("I should see a question on current page", (question: DataTable) => {
   cy.findByText(q.option_c)
 })
 
+Then("I should be asked {string}", (questionDescription: string) => {
+  cy.findByText(questionDescription)
+})
+
 Then("it should consider the context {string}", (path: string) => {
   cy.openAiService().thePreviousRequestShouldHaveIncludedPathInfo(path)
 })

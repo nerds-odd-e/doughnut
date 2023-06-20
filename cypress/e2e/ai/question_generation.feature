@@ -17,6 +17,7 @@ Feature: Question generation
       | What is the most common scuba diving certification? | Rescue Diver | Divemaster | Open Water Diver |
 
   Scenario Outline: I should see feedback on selecting options
+    Then I should be asked "What is the most common scuba diving certification?"
     When I select the <CorrectOrWrong> option <Option>
     Then I should see option <Option> turn <RedOrGreen>
     Examples:
