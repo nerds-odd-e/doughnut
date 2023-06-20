@@ -1,24 +1,24 @@
 <template>
   <h2>Generate a question</h2>
-  <form>
-    <div v-if="question">
-      {{ question }}
-    </div>
-    <ol v-if="options.length > 0" type="A">
+  <div v-if="question">
+    <h3>
+      {{ question.question }}
+    </h3>
+    <ol v-if="question.options" type="A">
       <li
-        v-for="(option, index) in options"
+        v-for="(option, index) in question.options"
         :key="index"
         @click="selectOption(index)"
         :class="{
           'selected-option': isSelectedOption(index),
-          'is-correct': isSelectedOption(index) && isCorrectOption(option),
-          'is-wrong': isSelectedOption(index) && !isCorrectOption(option),
+          'is-correct': isSelectedOption(index) && option.correct,
+          'is-wrong': isSelectedOption(index) && !option.correct,
         }"
       >
         {{ option.option }}
       </li>
     </ol>
-  </form>
+  </div>
   <button
     class="btn btn-secondary"
     @click="generateQuestionAndResetSelectedOption"
@@ -30,10 +30,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import type { StorageAccessor } from "@/store/createNoteStorage";
-import AiAdvisor, {
-  AiQuestionOptionType as AiQuestionOption,
-  AiQuestionType as AiQuestion,
-} from "@/models/AiAdvisor";
+import AiAdvisor, { AiQuestion } from "@/models/AiAdvisor";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default defineComponent({
@@ -50,8 +47,7 @@ export default defineComponent({
   components: {},
   data() {
     return {
-      question: "",
-      options: [] as AiQuestionOption[],
+      question: undefined as AiQuestion | undefined,
       selectedOptionIndex: -1 as number,
     };
   },
@@ -66,10 +62,8 @@ export default defineComponent({
         },
         this.selectedNote.id
       );
-      const parsed: AiQuestion = JSON.parse(res.suggestion);
 
-      this.question = parsed.question;
-      this.options = parsed.options;
+      this.question = JSON.parse(res.suggestion);
 
       if (res.finishReason === "length") {
         await this.generateQuestion();
@@ -87,9 +81,6 @@ export default defineComponent({
     },
     isSelectedOption(optionIndex: number) {
       return this.selectedOptionIndex === optionIndex;
-    },
-    isCorrectOption(optionObject: AiQuestionOption) {
-      return optionObject.correct;
     },
   },
   mounted() {

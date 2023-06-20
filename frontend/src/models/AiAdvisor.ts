@@ -1,9 +1,9 @@
-export type AiQuestionType = {
+export type AiQuestion = {
   question: string;
-  options: AiQuestionOptionType[];
+  options: AiQuestionOption[];
 };
 
-export type AiQuestionOptionType = {
+type AiQuestionOption = {
   option: string;
   correct: boolean;
   explanation: string;
