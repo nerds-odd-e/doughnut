@@ -25,9 +25,16 @@ describe("in place edit on title", () => {
     expect(wrapper.findAll('[role="title"] h2')).toHaveLength(0);
   });
 
+  it("should not save change when not unmount", async () => {
+    await wrapper.find('[role="title"]').trigger("click");
+    await wrapper.find('[role="title"] input').setValue("updated");
+    // no api calls expected. Test will fail if there is any.
+  });
+
   it("should save change when unmount", async () => {
     await wrapper.find('[role="title"]').trigger("click");
     await wrapper.find('[role="title"] input').setValue("updated");
+    helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
     wrapper.unmount();
   });
 
