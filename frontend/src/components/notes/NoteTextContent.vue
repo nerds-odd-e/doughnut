@@ -64,9 +64,14 @@ export default defineComponent({
     EditableText,
     DescriptionEditor,
   },
-  computed: {
-    textContent() {
-      return { ...this.textContent1 };
+  data() {
+    return {
+      textContent: { ...this.textContent1 } as Generated.TextContent,
+    };
+  },
+  watch: {
+    textContent1(newValue) {
+      this.textContent = { ...newValue };
     },
   },
   methods: {
