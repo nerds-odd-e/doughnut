@@ -5,8 +5,10 @@ class BadRequestError extends Error {
     Object.keys(data).forEach((key) => {
       if (key.includes(".")) {
         const [namespace, subkey] = key.split(".");
-        if (!this[Number(namespace)]) this[Number(namespace)] = {};
-        this[Number(namespace)][Number(subkey)] = data[key];
+        if (namespace !== undefined) {
+          if (!this[namespace]) this[namespace] = {};
+          this[namespace][subkey] = data[key];
+        }
       } else {
         this[key] = data[key];
       }
