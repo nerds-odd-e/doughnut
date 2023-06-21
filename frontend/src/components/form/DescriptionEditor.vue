@@ -52,9 +52,7 @@ export default defineComponent({
   },
   watch: {
     modelValue() {
-      if (this.localValue !== this.modelValue) {
-        this.localValue = this.modelValue || ("" as string);
-      }
+      this.localValue = this.modelValue || ("" as string);
     },
   },
   methods: {
