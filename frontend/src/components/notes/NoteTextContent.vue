@@ -43,7 +43,9 @@ import type { StorageAccessor } from "../../store/createNoteStorage";
 export default defineComponent({
   setup() {
     return {
-      submitChange: null as DebouncedFunc<() => void> | null,
+      submitChange: null as DebouncedFunc<
+        (newValue: Generated.TextContent) => void
+      > | null,
     };
   },
   props: {
@@ -70,8 +72,20 @@ export default defineComponent({
     };
   },
   watch: {
-    textContent(newValue) {
-      this.localTextContent = { ...newValue };
+    textContent: {
+      handler(newValue) {
+        this.localTextContent = { ...newValue };
+      },
+      deep: true,
+    },
+    localTextContent: {
+      handler(newValue) {
+        if (!this.submitChange) {
+          return;
+        }
+        this.submitChange(newValue);
+      },
+      deep: true,
     },
   },
   methods: {
@@ -79,23 +93,24 @@ export default defineComponent({
       if (!this.submitChange) {
         return;
       }
-      this.submitChange();
       this.submitChange.flush();
     },
   },
   mounted() {
-    this.submitChange = debounce(() => {
+    this.submitChange = debounce((newValue: Generated.TextContent) => {
       if (isEqual(this.localTextContent, this.textContent)) {
         return;
       }
       this.storageAccessor
         .api(this.$router)
-        .updateTextContent(
-          this.noteId,
-          this.localTextContent,
-          this.textContent
-        );
+        .updateTextContent(this.noteId, newValue, this.textContent);
     }, 1000);
+  },
+  unmounted() {
+    if (this.submitChange) {
+      this.submitChange.flush();
+      this.submitChange.cancel();
+    }
   },
 });
 </script>
