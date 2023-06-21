@@ -70,7 +70,7 @@ export default defineComponent({
     };
   },
   watch: {
-    textContent1(newValue) {
+    textContent(newValue) {
       this.localTextContent = { ...newValue };
     },
   },
