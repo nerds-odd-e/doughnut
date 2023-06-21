@@ -33,7 +33,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { debounce, DebouncedFunc } from "lodash";
+import { debounce, DebouncedFunc, isEqual } from "lodash";
 import NoteShortDescription from "./NoteShortDescription.vue";
 import SvgDescriptionIndicator from "../svgs/SvgDescriptionIndicator.vue";
 import EditableText from "../form/EditableText.vue";
@@ -85,6 +85,9 @@ export default defineComponent({
   },
   mounted() {
     this.submitChange = debounce(() => {
+      if (isEqual(this.localTextContent, this.textContent)) {
+        return;
+      }
       this.storageAccessor
         .api(this.$router)
         .updateTextContent(
