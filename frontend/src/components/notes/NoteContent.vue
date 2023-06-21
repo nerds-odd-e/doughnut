@@ -2,10 +2,7 @@
   <div class="alert alert-warning" v-if="note.deletedAt">
     This note has been deleted
   </div>
-  <h5 v-if="titleAsLink" class="header note-card-title">
-    <NoteTitleWithLink :note="note" class="card-title" />
-  </h5>
-  <div v-else style="display: flex">
+  <div style="display: flex">
     <EditableText
       role="title"
       class="note-title"
@@ -71,7 +68,6 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { debounce, DebouncedFunc } from "lodash";
-import NoteTitleWithLink from "./NoteTitleWithLink.vue";
 import NoteShortDescription from "./NoteShortDescription.vue";
 import ShowPicture from "./ShowPicture.vue";
 import SvgDescriptionIndicator from "../svgs/SvgDescriptionIndicator.vue";
@@ -91,7 +87,6 @@ export default defineComponent({
   props: {
     note: { type: Object as PropType<Generated.Note>, required: true },
     size: { type: String, default: "large" },
-    titleAsLink: Boolean,
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,
@@ -105,7 +100,6 @@ export default defineComponent({
     SvgUrlIndicator,
     EditableText,
     DescriptionEditor,
-    NoteTitleWithLink,
     NoteWikidataAssociation,
   },
   computed: {
