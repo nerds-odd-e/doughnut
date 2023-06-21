@@ -51,7 +51,7 @@ const request = async (
   if (res.status === 200 || res.status === 204 || res.status === 400) {
     return res;
   }
-  if (res.status === 401 && method === "GET") {
+  if (res.status === 401) {
     await loginOrRegisterAndHaltThisThread();
   }
   throw new HttpResponseError(res.status);
