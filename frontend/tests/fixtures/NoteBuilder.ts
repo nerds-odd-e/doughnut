@@ -22,7 +22,7 @@ class NoteBuilder extends Builder<Generated.Note> {
       },
       textContent: {
         title: "Note1.1.1",
-        description: "<p>Desc</p>",
+        description: "Desc",
         updatedAt: "2021-08-24T08:46:44.000+00:00",
       },
     };
