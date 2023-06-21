@@ -1,7 +1,7 @@
 import { VueWrapper, flushPromises } from "@vue/test-utils";
+import { ComponentPublicInstance } from "vue";
 import NoteContent from "@/components/notes/NoteContent.vue";
 import ManagedApi from "@/managedApi/ManagedApi";
-import { ComponentPublicInstance } from "vue";
 import createNoteStorage from "../../src/store/createNoteStorage";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";

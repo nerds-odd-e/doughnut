@@ -1,5 +1,5 @@
-import BreadcrumbAsync from "@/components/toolbars/BreadcrumbAsync.vue";
 import { flushPromises } from "@vue/test-utils";
+import BreadcrumbAsync from "@/components/toolbars/BreadcrumbAsync.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 

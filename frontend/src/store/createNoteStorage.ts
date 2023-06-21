@@ -1,6 +1,6 @@
-import ManagedApi from "@/managedApi/ManagedApi";
 import { Ref } from "vue";
 import { Router } from "vue-router";
+import ManagedApi from "@/managedApi/ManagedApi";
 import NoteEditingHistory, { HistoryRecord } from "./NoteEditingHistory";
 import NoteStorage, { StorageImplementation } from "./NoteStorage";
 import StoredApiCollection, { StoredApi } from "./StoredApiCollection";
@@ -30,7 +30,7 @@ class AccessorImplementation
   }
 
   peekUndo(): HistoryRecord | null {
-    return this.noteEditingHistory.peekUndo();
+    return this.noteEditingHistory.peekUndo() as HistoryRecord;
   }
 
   api(router: Router): StoredApi {

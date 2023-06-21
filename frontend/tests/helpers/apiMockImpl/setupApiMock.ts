@@ -1,4 +1,4 @@
-import { HttpMethod } from "../../../src/managedApi/window/RestfulFetch";
+import { HttpMethod } from "@/managedApi/window/RestfulFetch";
 import { ApiMock } from "../ApiMock";
 import ApiMockBuilderImpl from "./ApiMockBuilderImpl";
 import ApiMockExpectation from "./ApiMockExpectation";
@@ -72,13 +72,15 @@ class ApiMockImpl implements ApiMock {
 
     return rejectFromArray(
       this.remainingExpectations(calls.slice(0, calls.length - 1)),
-      (exp) => exp.matchExpectation(calls[calls.length - 1])
+      (exp) => exp.matchExpectation(calls[calls.length - 1] as Request)
     );
   }
 
   private expecting(url: string, method: HttpMethod) {
     const newLength = this.expected.push(new ApiMockExpectation(url, method));
-    return new ApiMockBuilderImpl(this.expected[newLength - 1]);
+    return new ApiMockBuilderImpl(
+      this.expected[newLength - 1] as ApiMockExpectation
+    );
   }
 
   expectingGet(url: string) {

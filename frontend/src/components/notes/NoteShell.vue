@@ -28,7 +28,7 @@ export default defineComponent({
       const index = Math.min(max, Math.sqrt(ageInMillisecond / 1000 / 60 / 60));
       return `rgb(${colorOld
         .map((oc, i) =>
-          Math.round((oc * index + newColor[i] * (max - index)) / max)
+          Math.round((oc * index + newColor[i]! * (max - index)) / max)
         )
         .join(",")})`;
     },

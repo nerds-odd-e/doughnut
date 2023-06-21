@@ -140,7 +140,7 @@ export default defineComponent({
       }
       this.currentQuizQuestion =
         await this.api.reviewMethods.getRandomQuestionForReviewPoint(
-          this.toRepeat[0]
+          this.toRepeat[0] as number
         );
       this.selectPosition();
     },

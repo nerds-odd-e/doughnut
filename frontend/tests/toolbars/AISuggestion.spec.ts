@@ -1,5 +1,5 @@
-import AISuggestion from "@/components/toolbars/AISuggestion.vue";
 import { flushPromises } from "@vue/test-utils";
+import AISuggestion from "@/components/toolbars/AISuggestion.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 

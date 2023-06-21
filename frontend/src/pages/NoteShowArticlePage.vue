@@ -46,7 +46,7 @@ export default defineComponent({
       const noteWithDescendents =
         await this.api.noteMethods.getNoteWithDescendents(this.noteId);
       this.storageAccessor.selectPosition(
-        noteWithDescendents.notes[0].note,
+        noteWithDescendents.notes[0]?.note,
         noteWithDescendents.notePosition
       );
       this.noteRealmCache = new NoteRealmCache(noteWithDescendents);

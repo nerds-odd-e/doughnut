@@ -107,15 +107,21 @@ class Gesture {
     if (pointer2) {
       const distance = (pos1: Position, pos2: Position): number =>
         ((pos1.x - pos2.x) ** 2 + (pos1.y - pos2.y) ** 2) ** 0.5;
-      newScale *= distance(pointer1.current, pointer2.current);
-      newScale /= distance(pointer1.start, pointer2.start);
+      newScale *= distance(
+        pointer1?.current as Position,
+        pointer2?.current as Position
+      );
+      newScale /= distance(
+        pointer1?.start as Position,
+        pointer2?.start as Position
+      );
 
       const atan2 = (pos1: Position, pos2: Position): number =>
         Math.atan2(pos1.y - pos2.y, pos1.x - pos2.x);
 
       newRotate +=
-        atan2(pointer1.current, pointer2.current) -
-        atan2(pointer1.start, pointer2.start);
+        atan2(pointer1?.current as Position, pointer2?.current as Position) -
+        atan2(pointer1?.start as Position, pointer2?.start as Position);
     }
 
     const beforeScale = {

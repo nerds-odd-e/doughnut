@@ -28,7 +28,7 @@ describe("note mindmap", () => {
 
   it("should render one note", async () => {
     notes.push(makeMe.aNoteRealm.title("single note").please());
-    const wrapper = getMountedElement(notes[0].id);
+    const wrapper = getMountedElement(notes[0]?.id as number);
     expect(wrapper.find("[role='card']").text()).toContain("single note");
   });
 
@@ -41,12 +41,12 @@ describe("note mindmap", () => {
     });
 
     it("should render the two notes", async () => {
-      const wrapper = getMountedElement(notes[0].id);
+      const wrapper = getMountedElement(notes[0]?.id as number);
       expect(wrapper.findAll("[role='card']")).toHaveLength(2);
     });
 
     it("should connect the two notes", async () => {
-      const wrapper = getMountedElement(notes[0].id);
+      const wrapper = getMountedElement(notes[0]?.id as number);
       const connection = wrapper.find("svg.mindmap-canvas");
       const line = connection.find("line");
       expect(parseFloat(line.attributes("x2") as string)).toBeCloseTo(0);
@@ -55,24 +55,24 @@ describe("note mindmap", () => {
 
     describe("with two grandchildren notes", () => {
       beforeEach(() => {
-        const childNote = notes[1];
+        const childNote = notes[1] as Generated.NoteRealm;
         notes.push(makeMe.aNoteRealm.title("grand1").under(childNote).please());
         notes.push(makeMe.aNoteRealm.title("grand2").under(childNote).please());
       });
 
       it("should connect the two notes", async () => {
-        const wrapper = getMountedElement(notes[0].id);
+        const wrapper = getMountedElement(notes[0]?.id as number);
         const connection = await wrapper.find("svg.mindmap-canvas");
         const lines = connection.findAll("line");
         expect(lines).toHaveLength(3);
         const lastLine = lines[2];
-        expect(parseFloat(lastLine.attributes("x1") as string)).toBeCloseTo(
+        expect(parseFloat(lastLine?.attributes("x1") as string)).toBeCloseTo(
           -75
         );
-        expect(parseFloat(lastLine.attributes("y1") as string)).toBeCloseTo(
+        expect(parseFloat(lastLine?.attributes("y1") as string)).toBeCloseTo(
           198.1212
         );
-        expect(parseFloat(lastLine.attributes("y2") as string)).toBeCloseTo(
+        expect(parseFloat(lastLine?.attributes("y2") as string)).toBeCloseTo(
           189.0275953
         );
       });
@@ -82,21 +82,21 @@ describe("note mindmap", () => {
         const [top, child1] = notes;
         const child2 = makeMe.aNoteRealm
           .title("child2")
-          .under(top)
-          .linkTo(child1)
+          .under(top as Generated.NoteRealm)
+          .linkTo(child1 as Generated.NoteRealm)
           .please();
         notes.push(child2);
       });
 
       it("should link the two linked notes", async () => {
-        const wrapper = getMountedElement(notes[0].id);
+        const wrapper = getMountedElement(notes[0]?.id as number);
         const connection = wrapper.find("svg.mindmap-canvas");
         const linkStart = connection.findAll(".link-start");
         expect(linkStart).toHaveLength(2);
-        expect(linkStart[0].attributes("transform")).toEqual(
+        expect(linkStart[0]?.attributes("transform")).toEqual(
           "translate(285, 0) rotate(0)"
         );
-        expect(linkStart[1].attributes("transform")).toEqual(
+        expect(linkStart[1]?.attributes("transform")).toEqual(
           "translate(-135, 0) rotate(360)"
         );
       });
@@ -110,12 +110,12 @@ describe("note mindmap", () => {
           .please();
         const child2 = makeMe.aNoteRealm
           .title("child2")
-          .under(top)
+          .under(top as Generated.NoteRealm)
           .linkTo(noteThatIsNotOnTheMap)
           .please();
         notes.push(noteThatIsNotOnTheMap);
         notes.push(child2);
-        const wrapper = getMountedElement(notes[0].id);
+        const wrapper = getMountedElement(notes[0]?.id as number);
         const connection = wrapper.find("svg.mindmap-canvas");
         const lines = connection.findAll("g.notes-link line");
         expect(lines).toHaveLength(0);
@@ -131,7 +131,7 @@ describe("note mindmap", () => {
     });
 
     it("small size by default", async () => {
-      const wrapper = getMountedElement(notes[0].id, {
+      const wrapper = getMountedElement(notes[0]?.id as number, {
         offset: { scale: 1, rotate: 0 },
       });
       const descriptionIndicators = wrapper.findAll(".description-indicator");
@@ -145,7 +145,7 @@ describe("note mindmap", () => {
     });
 
     it("medium", async () => {
-      const wrapper = getMountedElement(notes[0].id, {
+      const wrapper = getMountedElement(notes[0]?.id as number, {
         offset: { scale: 1.5, rotat: 0 },
       });
       const descriptionIndicators = wrapper.findAll(".description-indicator");
@@ -157,7 +157,7 @@ describe("note mindmap", () => {
     });
 
     it("large", async () => {
-      const wrapper = getMountedElement(notes[0].id, {
+      const wrapper = getMountedElement(notes[0]?.id as number, {
         offset: { scale: 2.1, rotate: 0 },
       });
       const descriptionIndicators = wrapper.findAll(".description-indicator");

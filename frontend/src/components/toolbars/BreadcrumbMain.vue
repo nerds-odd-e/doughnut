@@ -57,7 +57,7 @@ export default defineComponent({
       if (!this.storageAccessor.selectedNote) return undefined;
       const { ancestors } = this.notePosition;
       if (ancestors.length > 0) {
-        return ancestors[ancestors.length - 1].id;
+        return ancestors[ancestors.length - 1]?.id;
       }
       return undefined;
     },

@@ -1,6 +1,6 @@
 import { flushPromises } from "@vue/test-utils";
-import NoteEngagingStoryDialog from "@/components/notes/NoteEngagingStoryDialog.vue";
 import { beforeEach, expect } from "vitest";
+import NoteEngagingStoryDialog from "@/components/notes/NoteEngagingStoryDialog.vue";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 

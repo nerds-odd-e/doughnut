@@ -1,6 +1,6 @@
-import LinkNoteDialog from "@/components/links/LinkNoteDialog.vue";
 import { screen } from "@testing-library/vue";
 import { flushPromises } from "@vue/test-utils";
+import LinkNoteDialog from "@/components/links/LinkNoteDialog.vue";
 import MakeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 

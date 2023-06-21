@@ -1,5 +1,5 @@
-import AnswerShowPage from "@/pages/AnswerShowPage.vue";
 import { flushPromises } from "@vue/test-utils";
+import AnswerShowPage from "@/pages/AnswerShowPage.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
@@ -36,8 +36,9 @@ describe("repetition page", () => {
         .mount();
       await flushPromises();
       expect(
-        JSON.parse(wrapper.find(".link-target .router-link").attributes().to)
-          .name
+        JSON.parse(
+          wrapper.find(".link-target .router-link").attributes().to as string
+        ).name
       ).toEqual("notebooks");
     });
 
@@ -49,7 +50,9 @@ describe("repetition page", () => {
         .mount();
       await flushPromises();
       expect(
-        JSON.parse(wrapper.find(".link-target .router-link").attributes().to)
+        JSON.parse(
+          wrapper.find(".link-target .router-link").attributes().to as string
+        )
       ).toEqual({ name: "notebooks" });
     });
   });

@@ -224,7 +224,9 @@ export default class StoredApiCollection implements StoredApi {
       this.routerReplace();
       return undefined;
     }
-    const noteRealm = this.storage.refreshNoteRealm(res[0]);
+    const noteRealm = this.storage.refreshNoteRealm(
+      res[0] as Generated.NoteRealm
+    );
     this.routerReplace(noteRealm);
     return noteRealm;
   }
