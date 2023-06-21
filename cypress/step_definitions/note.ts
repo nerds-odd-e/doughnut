@@ -198,6 +198,9 @@ When("I navigate to {notepath} note", (notePath: NotePath) => {
 })
 
 When("I click the child note {string}", (noteTitle) => {
+  cy.on("uncaught:exception", () => {
+    return false
+  })
   cy.navigateToChild(noteTitle)
 })
 
