@@ -393,7 +393,9 @@ Cypress.Commands.add("findNoteDescriptionOnCurrentPage", (expected: string) => {
   expected.split("\\n").forEach((line) => cy.get("[role=description]").should("contain", line))
 })
 
-Cypress.Commands.add("findCardTitle", (title) => cy.findByText(title))
+Cypress.Commands.add("findCardTitle", (title) => cy.findByText(title, { selector: "a.card-title" }))
+
+Cypress.Commands.add("findMindmapCardTitle", (title) => cy.findByText(title))
 
 Cypress.Commands.add("yesIRemember", () => {
   cy.tick(10 * 1000)

@@ -37,6 +37,7 @@ declare namespace Cypress {
     findNoteTitle(title: string): Chainable<any>
     findNoteDescriptionOnCurrentPage(title: string): Chainable<any>
     findCardTitle(title: string): Chainable<any>
+    findMindmapCardTitle(title: string): Chainable<any>
     findWikiAssociationButton(): Chainable<any>
     expectALinkThatOpensANewWindowWithURL(url: string): Chainable<any>
     expectAMapTo(latitude: string, longitude: string): Chainable<any>

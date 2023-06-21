@@ -336,7 +336,7 @@ When(
   "I should see the notes {string} are around note {string} and apart from each other",
   (noteTitles: string, parentNoteTitle: string) => {
     const titles = noteTitles.commonSenseSplit(",")
-    cy.findCardTitle(titles[titles.length - 1])
+    cy.findMindmapCardTitle(titles[titles.length - 1])
     cy.withinMindmap().then((cards) => {
       titles.forEach((noteTitle: string) => {
         cy.distanceBetweenCardsGreaterThan(cards, parentNoteTitle, noteTitle, 100)
