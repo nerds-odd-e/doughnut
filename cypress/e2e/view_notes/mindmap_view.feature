@@ -37,8 +37,8 @@ Feature: Mindmap view
     Then I should see the note "Singapore" is "highlighted"
     And I should see the note "History" is "not highlighted"
 
-  Scenario: view parents
-    When I click note card title "History"
+  Scenario: view sub notes
+    When I open the "mindmap" view of note "History"
     Then I should see the note "History" is 0px * 0px offset the center of the map
     And I should see the note "History" is "highlighted"
     And I should see "Singapore" in breadcrumb with add sibling button

@@ -279,10 +279,6 @@ When("I click note {string} avoiding the title", (noteTitle: string) => {
   })
 })
 
-When("I click note card title {string}", (noteTitle: string) => {
-  cy.findCardTitle(noteTitle).click()
-})
-
 When(
   "The note {string} {string} have the description indicator",
   (noteTitle: string, shouldOrNot: string) => {
