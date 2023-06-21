@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 public class ClozePatternCreator {
   final boolean suffix;
+  public static String regexForCJK = "\\p{IsHan}|\\p{IsKatakana}|\\p{IsHiragana}";
 
   public ClozePatternCreator(boolean suffix) {
     this.suffix = suffix;
@@ -32,7 +33,7 @@ public class ClozePatternCreator {
     if (suffix) {
       return "(?U)(?<=[^\\s])" + pattern;
     }
-    return "(?<=\\b|\\p{IsHan}|\\p{IsKatakana}|\\p{IsHiragana})" + pattern;
+    return "(?<=\\b|" + regexForCJK + ")" + pattern;
   }
 
   Pattern getPattern(String toMatch) {

@@ -23,7 +23,7 @@ public class OpenAiAPIChatCompletion extends OpenAiApiHandlerBase {
                 .getChoices()
                 .stream()
                 .findFirst()
-                .map(AiSuggestion::new)
+                .map(AiSuggestion::from)
                 .orElse(null));
   }
 
