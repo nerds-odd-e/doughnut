@@ -21,7 +21,7 @@
     />
     <NoteShortDescription
       v-if="size === 'medium'"
-      :description="note.textContent.description"
+      :description="textContent.description"
     />
     <SvgDescriptionIndicator
       v-if="size === 'small' && !!textContent.description"
@@ -47,7 +47,11 @@ export default defineComponent({
     };
   },
   props: {
-    note: { type: Object as PropType<Generated.Note>, required: true },
+    noteId: { type: Number, required: true },
+    textContent1: {
+      type: Object as PropType<Generated.TextContent>,
+      required: true,
+    },
     size: { type: String, default: "large" },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
@@ -62,7 +66,7 @@ export default defineComponent({
   },
   computed: {
     textContent() {
-      return { ...this.note.textContent };
+      return { ...this.textContent1 };
     },
   },
   methods: {
@@ -78,11 +82,7 @@ export default defineComponent({
     this.submitChange = debounce(() => {
       this.storageAccessor
         .api(this.$router)
-        .updateTextContent(
-          this.note.id,
-          this.textContent,
-          this.note.textContent
-        );
+        .updateTextContent(this.noteId, this.textContent, this.textContent1);
     }, 1000);
   },
 });

@@ -3,7 +3,8 @@
     This note has been deleted
   </div>
   <NoteTextContent
-    :note="note"
+    :note-id="note.id"
+    :text-content1="note.textContent"
     :size="size"
     :storage-accessor="storageAccessor"
   >
@@ -71,11 +72,6 @@ export default defineComponent({
     SvgUrlIndicator,
     NoteWikidataAssociation,
     NoteTextContent,
-  },
-  computed: {
-    textContent() {
-      return { ...this.note.textContent };
-    },
   },
 });
 </script>
