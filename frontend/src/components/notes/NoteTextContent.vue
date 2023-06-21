@@ -4,7 +4,7 @@
       role="title"
       class="note-title"
       scope-name="note"
-      v-model="textContent.title"
+      v-model="localTextContent.title"
       @blur="onBlurTextField"
     />
     <slot name="title-additional" />
@@ -16,15 +16,15 @@
       v-if="size === 'large'"
       class="note-description"
       scope-name="note"
-      v-model="textContent.description"
+      v-model="localTextContent.description"
       @blur="onBlurTextField"
     />
     <NoteShortDescription
       v-if="size === 'medium'"
-      :description="textContent.description"
+      :description="localTextContent.description"
     />
     <SvgDescriptionIndicator
-      v-if="size === 'small' && !!textContent.description"
+      v-if="size === 'small' && !!localTextContent.description"
       class="description-indicator"
     />
     <slot name="note-content-other" />
@@ -48,7 +48,7 @@ export default defineComponent({
   },
   props: {
     noteId: { type: Number, required: true },
-    textContent1: {
+    textContent: {
       type: Object as PropType<Generated.TextContent>,
       required: true,
     },
@@ -66,12 +66,12 @@ export default defineComponent({
   },
   data() {
     return {
-      textContent: { ...this.textContent1 } as Generated.TextContent,
+      localTextContent: { ...this.textContent } as Generated.TextContent,
     };
   },
   watch: {
     textContent1(newValue) {
-      this.textContent = { ...newValue };
+      this.localTextContent = { ...newValue };
     },
   },
   methods: {
@@ -87,7 +87,11 @@ export default defineComponent({
     this.submitChange = debounce(() => {
       this.storageAccessor
         .api(this.$router)
-        .updateTextContent(this.noteId, this.textContent, this.textContent1);
+        .updateTextContent(
+          this.noteId,
+          this.localTextContent,
+          this.textContent
+        );
     }, 1000);
   },
 });

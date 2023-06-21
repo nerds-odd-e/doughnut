@@ -4,7 +4,7 @@
   </div>
   <NoteTextContent
     :note-id="note.id"
-    :text-content1="note.textContent"
+    :text-content="note.textContent"
     :size="size"
     :storage-accessor="storageAccessor"
   >
