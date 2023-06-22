@@ -8,15 +8,17 @@ helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("in place edit on title", () => {
   const note = makeMe.aNote.title("Dummy Title").please();
-  let wrapper: VueWrapper<ComponentPublicInstance>;
-  beforeEach(() => {
-    wrapper = helper
+  const mountComponent = (
+    n: Generated.Note
+  ): VueWrapper<ComponentPublicInstance> => {
+    return helper
       .component(NoteTextContent)
-      .withStorageProps({ noteId: note.id, textContent: note.textContent })
+      .withStorageProps({ noteId: n.id, textContent: n.textContent })
       .mount();
-  });
+  };
 
   it("should display text field when one single click on title", async () => {
+    const wrapper = mountComponent(note);
     expect(wrapper.findAll('[role="title"] input')).toHaveLength(0);
     await wrapper.find('[role="title"] h2').trigger("click");
 
@@ -27,12 +29,14 @@ describe("in place edit on title", () => {
   });
 
   it("should not save change when not unmount", async () => {
+    const wrapper = mountComponent(note);
     await wrapper.find('[role="title"]').trigger("click");
     await wrapper.find('[role="title"] input').setValue("updated");
     // no api calls expected. Test will fail if there is any.
   });
 
   it("should save change when unmount", async () => {
+    const wrapper = mountComponent(note);
     await wrapper.find('[role="title"]').trigger("click");
     await wrapper.find('[role="title"] input').setValue("updated");
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
@@ -40,10 +44,20 @@ describe("in place edit on title", () => {
   });
 
   it("should save content when blur text field title", async () => {
+    const wrapper = mountComponent(note);
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
 
     await wrapper.find('[role="title"]').trigger("click");
     await wrapper.find('[role="title"] input').setValue("updated");
     await wrapper.find('[role="title"] input').trigger("blur");
+  });
+
+  it("should not trigger changes for initial description content", async () => {
+    note.textContent.description = "initial\n\ndescription";
+    const wrapper = mountComponent(note);
+    await flushPromises();
+    wrapper.unmount();
+    // no api calls expected. Test will fail if there is any.
+    // because the initial description is not changed.
   });
 });

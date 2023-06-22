@@ -33,7 +33,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { debounce, DebouncedFunc, isEqual } from "lodash";
+import { debounce, DebouncedFunc } from "lodash";
 import NoteShortDescription from "./NoteShortDescription.vue";
 import SvgDescriptionIndicator from "../svgs/SvgDescriptionIndicator.vue";
 import EditableText from "../form/EditableText.vue";
@@ -95,10 +95,19 @@ export default defineComponent({
       }
       this.submitChange.flush();
     },
+    isMeaningfulChange(newValue: Generated.TextContent) {
+      return (
+        newValue.title !== this.textContent.title ||
+        !(
+          newValue.description === this.textContent.description ||
+          newValue.description === `<p>${this.textContent.description}</p>`
+        )
+      );
+    },
   },
   mounted() {
     this.submitChange = debounce((newValue: Generated.TextContent) => {
-      if (isEqual(this.localTextContent, this.textContent)) {
+      if (!this.isMeaningfulChange(newValue)) {
         return;
       }
       this.storageAccessor
