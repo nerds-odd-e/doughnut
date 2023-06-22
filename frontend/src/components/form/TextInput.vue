@@ -3,23 +3,23 @@
     <template #input_prepend v-if="$slots.input_prepend">
       <slot name="input_prepend" />
     </template>
-    <input
-      :class="`text-input-control form-control ${!!errors ? 'is-invalid' : ''}`"
-      :id="`${scopeName}-${field}`"
-      :name="field"
-      :value="modelValue"
-      @input="$emit('update:modelValue', $event.target.value)"
+    <TextInputWithoutErrorMessage
+      :model-value="modelValue"
+      :scope-name="scopeName"
+      :field="field"
+      :title="title"
+      :errors="errors"
       :placeholder="placeholder"
       :autofocus="autofocus"
-      autocomplete="off"
-      autocapitalize="off"
       @blur="$emit('blur', $event)"
+      @update:model-value="$emit('update:modelValue', $event)"
     />
   </InputWithType>
 </template>
 
 <script>
 import InputWithType from "./InputWithType.vue";
+import TextInputWithoutErrorMessage from "./TextInputWithoutErrorMessage.vue";
 
 export default {
   props: {
@@ -34,6 +34,7 @@ export default {
   },
   components: {
     InputWithType,
+    TextInputWithoutErrorMessage,
   },
   emits: ["update:modelValue", "blur"],
 };
