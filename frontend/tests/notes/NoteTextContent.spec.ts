@@ -1,6 +1,6 @@
 import { VueWrapper, flushPromises } from "@vue/test-utils";
 import { ComponentPublicInstance } from "vue";
-import NoteContent from "@/components/notes/NoteContent.vue";
+import NoteTextContent from "@/components/notes/NoteTextContent.vue";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
@@ -10,7 +10,10 @@ describe("in place edit on title", () => {
   const note = makeMe.aNote.title("Dummy Title").please();
   let wrapper: VueWrapper<ComponentPublicInstance>;
   beforeEach(() => {
-    wrapper = helper.component(NoteContent).withStorageProps({ note }).mount();
+    wrapper = helper
+      .component(NoteTextContent)
+      .withStorageProps({ noteId: note.id, textContent: note.textContent })
+      .mount();
   });
 
   it("should display text field when one single click on title", async () => {
