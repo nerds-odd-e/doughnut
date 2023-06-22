@@ -82,6 +82,7 @@ export default defineComponent({
     },
     localTextContent: {
       handler(newValue) {
+        this.errors = {};
         if (!this.submitChange) {
           return;
         }

@@ -80,9 +80,24 @@ describe("in place edit on title", () => {
       });
     await editTitle(wrapper);
     await flushPromises();
+    const { errors } = wrapper.vm.$data as { errors: { title: string } };
+    expect(errors.title).toBe("size must be between 1 and 100");
     expect(wrapper.find(".error-msg").text()).toBe(
       "size must be between 1 and 100"
     );
+  });
+
+  it("should clean up errors when editing", async () => {
+    const wrapper = mountComponent(note);
+    const { errors } = wrapper.vm.$data as { errors: { title: string } };
+    errors.title = "size must be between 1 and 100";
+    helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
+    await editTitle(wrapper);
+    await flushPromises();
+    const { errors: expectedErrors } = wrapper.vm.$data as {
+      errors: { title: string };
+    };
+    expect(expectedErrors.title).toBeUndefined();
   });
 
   it("should not trigger changes for initial description content", async () => {
