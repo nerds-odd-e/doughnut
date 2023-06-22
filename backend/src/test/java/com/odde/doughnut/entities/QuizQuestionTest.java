@@ -128,9 +128,17 @@ class QuizQuestionTest {
     }
 
     @Test
+    void shouldAlwaysChooseAIQuestionIfConfigured() {
+      userModel.getEntity().setAiQuestionTypeOnlyForReview(true);
+      ReviewPointModel reviewPoint = getReviewPointModel(note);
+      QuizQuestion randomQuizQuestion = reviewPoint.generateAQuizQuestion(new RealRandomizer(), userModel.getEntity());
+      assertThat(randomQuizQuestion.getQuestionType(), equalTo(QuizQuestion.QuestionType.AI_QUESTION));
+    }
+
+    @Test
     void shouldReturnTheSameType() {
       ReviewPointModel reviewPoint = getReviewPointModel(note);
-      QuizQuestion randomQuizQuestion = reviewPoint.generateAQuizQuestion(new RealRandomizer());
+      QuizQuestion randomQuizQuestion = reviewPoint.generateAQuizQuestion(new RealRandomizer(), userModel.getEntity());
       Set<QuizQuestion.QuestionType> types = new HashSet<>();
       for (int i = 0; i < 3; i++) {
         types.add(randomQuizQuestion.getQuestionType());
@@ -143,7 +151,7 @@ class QuizQuestionTest {
       Set<QuizQuestion.QuestionType> types = new HashSet<>();
       ReviewPointModel reviewPoint = getReviewPointModel(note);
       for (int i = 0; i < 10; i++) {
-        QuizQuestion randomQuizQuestion = reviewPoint.generateAQuizQuestion(new RealRandomizer());
+        QuizQuestion randomQuizQuestion = reviewPoint.generateAQuizQuestion(new RealRandomizer(), userModel.getEntity());
         types.add(randomQuizQuestion.getQuestionType());
       }
       assertThat(
@@ -155,7 +163,7 @@ class QuizQuestionTest {
 
   private QuizQuestionViewedByUser getQuizQuestion(Note note) {
     return new QuizQuestionViewedByUser(
-        getReviewPointModel(note).generateAQuizQuestion(randomizer),
+        getReviewPointModel(note).generateAQuizQuestion(randomizer, userModel.getEntity()),
         makeMe.modelFactoryService,
         userModel.getEntity());
   }
