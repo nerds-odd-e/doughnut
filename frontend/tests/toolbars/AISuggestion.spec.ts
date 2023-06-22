@@ -3,8 +3,6 @@ import AISuggestion from "@/components/toolbars/AISuggestion.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
-helper.resetWithApiMock(beforeEach, afterEach);
-
 describe("AISuggestion", () => {
   helper.resetWithApiMock(beforeEach, afterEach);
 

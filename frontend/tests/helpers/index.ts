@@ -1,4 +1,5 @@
 import { defineComponent } from "vue";
+import { enableAutoUnmount } from "@vue/test-utils";
 import RenderingHelper from "./RenderingHelper";
 import setupApiMock from "./apiMockImpl/setupApiMock";
 import { ApiMock } from "./ApiMock";
@@ -18,6 +19,7 @@ class StoredComponentTestHelper {
   }
 
   resetWithApiMock(beforeEach, afterEach) {
+    enableAutoUnmount(afterEach);
     beforeEach(() => {
       this.reset();
       this.mockedApi = setupApiMock();

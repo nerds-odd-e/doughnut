@@ -29,10 +29,19 @@ describe("in place edit on title", () => {
   });
 
   it("should not save change when not unmount", async () => {
+    // because the components always get unmounted after each test
+    // we simulate the before unmount siutation by replacing the unmounted method
+    // with an empty function.
+
+    const mockUnmounted = vitest
+      .spyOn(NoteTextContent, "unmounted")
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      .mockImplementation(() => {});
     const wrapper = mountComponent(note);
     await wrapper.find('[role="title"]').trigger("click");
     await wrapper.find('[role="title"] input').setValue("updated");
-    // no api calls expected. Test will fail if there is any.
+    wrapper.unmount();
+    mockUnmounted.mockRestore();
   });
 
   it("should save change when unmount", async () => {
