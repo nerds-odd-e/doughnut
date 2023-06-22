@@ -12,8 +12,6 @@ describe("A child card of a note", () => {
     helper.component(Card).withStorageProps({ note }).render();
     await screen.findByText("this is a note");
     await screen.findByText("the description");
-    // eslint-disable-next-line no-console
-    console.log("done");
   });
 
   it("truncate the description", async () => {
