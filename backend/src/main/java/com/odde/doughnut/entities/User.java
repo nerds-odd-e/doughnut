@@ -54,7 +54,10 @@ public class User {
   @Setter
   private String spaceIntervals = "0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55";
 
-  @Getter @Setter @Transient private Boolean aiQuestionTypeOnlyForReview = false;
+  @Column(name = "ai_question_only")
+  @Getter
+  @Setter
+  private Boolean aiQuestionTypeOnlyForReview = false;
 
   @JoinTable(
       name = "circle_user",
