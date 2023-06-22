@@ -7,19 +7,22 @@ const fetchMock = createFetchMock(vi);
 
 fetchMock.enableMocks();
 
-// Throw errors when a `console.error` or `console.warn` happens
-// by overriding the functions
-const CONSOLE_FAIL_TYPES = ["error", "warn"];
+if(process.env.FRONTEND_UT_CONSOLE_OUTPUT_AS_FAILURE) {
 
-CONSOLE_FAIL_TYPES.forEach((type) => {
-  const originalConsole = console[type];
-  console[type] = (message) => {
-    originalConsole(message);
-    throw new Error(
-      `Failing due to console.${type} while running test!`
-    );
-  };
-});
+  // Throw errors when a `console.error` or `console.warn` happens
+  // by overriding the functions
+  const CONSOLE_FAIL_TYPES = ["error", "warn"];
+
+  CONSOLE_FAIL_TYPES.forEach((type) => {
+    const originalConsole = console[type];
+    console[type] = (message) => {
+      originalConsole(message);
+      throw new Error(
+        `Failing due to console.${type} while running test!`
+      );
+    };
+  });
+}
 
 // Mock FormData to make it easier to test
 global.FormData = function () {

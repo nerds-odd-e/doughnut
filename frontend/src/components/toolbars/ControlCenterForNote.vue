@@ -25,7 +25,7 @@
     />
   </PopButton>
   <AISuggestion v-bind="{ selectedNote, storageAccessor }" />
-  <PopButton title="generate question">
+  <PopButton title="test me">
     <template #button_face>
       <SvgClipboard />
     </template>

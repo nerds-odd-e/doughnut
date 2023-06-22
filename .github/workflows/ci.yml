@@ -54,6 +54,8 @@ jobs:
   Frontend-unit-tests:
     name: Frontend Unit tests
     runs-on: ubuntu-22.04
+    env:
+      FRONTEND_UT_CONSOLE_OUTPUT_AS_FAILURE: true
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/setup_nodejs_with_cache

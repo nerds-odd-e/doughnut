@@ -1,6 +1,6 @@
 <template>
-  <h2>Generate a question</h2>
-  <div v-if="question">
+  <h2 v-if="!question">Generating question...</h2>
+  <div v-else>
     <h3>
       {{ question.question }}
     </h3>

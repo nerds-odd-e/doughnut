@@ -628,5 +628,5 @@ Cypress.Commands.add("aiSuggestDescriptionForNote", (noteTitle: string) => {
 
 Cypress.Commands.add("askForQuestion", (noteTitle: string) => {
   cy.jumpToNotePage(noteTitle)
-  cy.clickNotePageMoreOptionsButton(noteTitle, "generate question")
+  cy.clickNotePageMoreOptionsButton(noteTitle, "test me")
 })
