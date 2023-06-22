@@ -116,8 +116,14 @@ export default defineComponent({
       this.storageAccessor
         .api(this.$router)
         .updateTextContent(this.noteId, newValue, this.textContent)
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
         .catch((errors) => {
+          if (errors.status === 401) {
+            this.errors = {
+              title:
+                "You are not authorized to edit this note. Perhaps you are not logged in?",
+            };
+            return;
+          }
           this.errors = errors;
         });
     }, 1000);

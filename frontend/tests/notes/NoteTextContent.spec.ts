@@ -100,6 +100,21 @@ describe("in place edit on title", () => {
     expect(expectedErrors.title).toBeUndefined();
   });
 
+  it("should display error when no authorization to save", async () => {
+    const wrapper = mountComponent(note);
+    helper.apiMock
+      .expectingPatch(`/api/text_content/${note.id}`)
+      .andRespondOnce({
+        status: 401,
+      });
+    await editTitle(wrapper);
+    await flushPromises();
+    const { errors } = wrapper.vm.$data as { errors: { title: string } };
+    expect(errors.title).toBe(
+      "You are not authorized to edit this note. Perhaps you are not logged in?"
+    );
+  });
+
   it("should not trigger changes for initial description content", async () => {
     note.textContent.description = "initial\n\ndescription";
     const wrapper = mountComponent(note);
