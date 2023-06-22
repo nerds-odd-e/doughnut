@@ -834,7 +834,7 @@
     estree-walker "^2.0.2"
     source-map-js "^1.0.2"
 
-"@vue/compiler-dom@3.3.4", "@vue/compiler-dom@^3.0.1", "@vue/compiler-dom@^3.2.0":
+"@vue/compiler-dom@3.3.4", "@vue/compiler-dom@^3.2.0":
   version "3.3.4"
   resolved "https://registry.yarnpkg.com/@vue/compiler-dom/-/compiler-dom-3.3.4.tgz#f56e09b5f4d7dc350f981784de9713d823341151"
   integrity sha512-wyM+OjOVpuUukIq6p5+nwHYtj9cFroz9cwkfmP9O1nzH68BenTTv0u7/ndggT8cIQlnBeOo6sUT/gvHcIkLA5w==
@@ -923,7 +923,7 @@
     "@vue/shared" "3.3.4"
     csstype "^3.1.1"
 
-"@vue/server-renderer@3.3.4", "@vue/server-renderer@^3.0.1":
+"@vue/server-renderer@3.3.4":
   version "3.3.4"
   resolved "https://registry.yarnpkg.com/@vue/server-renderer/-/server-renderer-3.3.4.tgz#ea46594b795d1536f29bc592dd0f6655f7ea4c4c"
   integrity sha512-Q6jDDzR23ViIb67v+vM1Dqntu+HUexQcsWKhhQa4ARVzxOY2HbC7QRW/ggkDBd5BU+uM1sV6XOAP0b216o34JQ==
@@ -936,20 +936,10 @@
   resolved "https://registry.yarnpkg.com/@vue/shared/-/shared-3.3.4.tgz#06e83c5027f464eef861c329be81454bc8b70780"
   integrity sha512-7OjdcV8vQ74eiz1TZLzZP4JwqM5fA94K6yntPS5Z25r9HDuGNzaGdgvwKYq6S+MxwF0TFRwe50fIR/MYnakdkQ==
 
-"@vue/test-utils@^2.3.1":
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/@vue/test-utils/-/test-utils-2.3.2.tgz#b47ce6d7be7bf9700e0bb4322410e4cd8724d277"
-  integrity sha512-hJnVaYhbrIm0yBS0+e1Y0Sj85cMyAi+PAbK4JHqMRUZ6S622Goa+G7QzkRSyvCteG8wop7tipuEbHoZo26wsSA==
-  dependencies:
-    js-beautify "1.14.6"
-  optionalDependencies:
-    "@vue/compiler-dom" "^3.0.1"
-    "@vue/server-renderer" "^3.0.1"
-
-"@vue/test-utils@^2.4.0-alpha.2":
-  version "2.4.0-alpha.2"
-  resolved "https://registry.yarnpkg.com/@vue/test-utils/-/test-utils-2.4.0-alpha.2.tgz#cc30998bf5544787bf0c49c893173adbf7e91509"
-  integrity sha512-P1XgbB8sEIZvzG+9hJGL25fhjO+P4TXTZC9ApM7NAUqqzLEP1tIa7hMtp6XFfi+M6Taw5xa2/Fwt3OG2gk80Xg==
+"@vue/test-utils@^2.3.1", "@vue/test-utils@^2.4.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@vue/test-utils/-/test-utils-2.4.0.tgz#7bc7fb2d0af1ad88e4e9ebd04b09545ce0eaceec"
+  integrity sha512-BKB9aj1yky63/I3IwSr1FjUeHYsKXI7D6S9F378AHt7a5vC0dLkOBtSsFXoRGC/7BfHmiB9HRhT+i9xrUHoAKw==
   dependencies:
     js-beautify "1.14.6"
     vue-component-type-helpers "1.6.5"
@@ -1233,9 +1223,9 @@ camelcase@^6.0.0:
   integrity sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==
 
 caniuse-lite@^1.0.30001464, caniuse-lite@^1.0.30001503:
-  version "1.0.30001505"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001505.tgz#10a343e49d31cbbfdae298ef73cb0a9f46670dc5"
-  integrity sha512-jaAOR5zVtxHfL0NjZyflVTtXm3D3J9P15zSJ7HmQF8dSKGA6tqzQq+0ZI3xkjyQj46I4/M0K2GbMpcAFOcbr3A==
+  version "1.0.30001506"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001506.tgz#35bd814b310a487970c585430e9e80ee23faf14b"
+  integrity sha512-6XNEcpygZMCKaufIcgpQNZNf00GEqc7VQON+9Rd0K1bMYo8xhMZRAo5zpbnbMNizi4YNgIDAFrdykWsvY3H4Hw==
 
 chai@^4.3.7:
   version "4.3.7"
@@ -1610,9 +1600,9 @@ editorconfig@^0.15.3:
     sigmund "^1.0.1"
 
 electron-to-chromium@^1.4.431:
-  version "1.4.435"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.435.tgz#761c34300603b9f1234f0b6155870d3002435db6"
-  integrity sha512-B0CBWVFhvoQCW/XtjRzgrmqcgVWg6RXOEM/dK59+wFV93BFGR6AeNKc4OyhM+T3IhJaOOG8o/V+33Y2mwJWtzw==
+  version "1.4.437"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.437.tgz#d0e73a431a9ade4467f73d48a59d752d91909316"
+  integrity sha512-ZFekRuBOHUXp21wrR5lshT6pZa/KmjkhKBAtmZz4NN5sCWlHOk3kdhiwFINrDBsRLX6FjyBAb1TRN+KBeNlyzQ==
 
 enhanced-resolve@^5.12.0:
   version "5.15.0"
