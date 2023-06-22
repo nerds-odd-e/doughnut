@@ -90,6 +90,9 @@ The Cypress+Cucumber tests are in JavaScript/TypeScript.
 
 - [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor)
 
+- We use [mountebank](http://www.mbtest.org/) to mock external backend services.
+  - To run mountebank in debug mode, run `dum mb --loglevel debug`.
+ 
 #### Commands
 
 For MS Windows WSL2 users:
