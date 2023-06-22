@@ -1,10 +1,12 @@
 <template>
   <div class="text" @click="startEditing">
     <template v-if="!isEditing">
-      <h2 v-if="!!modelValue">
-        {{ modelValue }}
-      </h2>
-      <SvgEditText v-else />
+      <InputWithType v-bind="{ scopeName, field, title, errors }">
+        <h2 v-if="!!modelValue">
+          {{ modelValue }}
+        </h2>
+        <SvgEditText v-else />
+      </InputWithType>
     </template>
     <TextInput
       v-else

@@ -79,6 +79,10 @@ describe("in place edit on title", () => {
         }),
       });
     await editTitle(wrapper);
+    await flushPromises();
+    expect(wrapper.find(".error-msg").text()).toBe(
+      "size must be between 1 and 100"
+    );
   });
 
   it("should not trigger changes for initial description content", async () => {

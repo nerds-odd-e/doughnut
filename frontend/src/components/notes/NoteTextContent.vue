@@ -6,6 +6,7 @@
       scope-name="note"
       v-model="localTextContent.title"
       @blur="onBlurTextField"
+      :errors="errors.title"
     />
     <slot name="title-additional" />
   </div>
@@ -69,6 +70,7 @@ export default defineComponent({
   data() {
     return {
       localTextContent: { ...this.textContent } as Generated.TextContent,
+      errors: {} as Record<string, string>,
     };
   },
   watch: {
@@ -114,7 +116,9 @@ export default defineComponent({
         .api(this.$router)
         .updateTextContent(this.noteId, newValue, this.textContent)
         // eslint-disable-next-line @typescript-eslint/no-empty-function
-        .catch((_) => {});
+        .catch((errors) => {
+          this.errors = errors;
+        });
     }, 1000);
   },
   unmounted() {
