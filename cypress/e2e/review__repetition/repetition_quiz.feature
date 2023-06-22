@@ -10,7 +10,7 @@ Feature: Repetition Quiz
       | sedation | Put to sleep is sedation       | false      | English       |
       | medical  |                                | true       | English       |
 
-  Scenario: Auto generate cloze deletion
+  Scenario: Cloze deletion question
     Given I learned one note "sedition" on day 1
     And there is "tagged by" link between note "sedition" and "medical"
     When I am repeat-reviewing my old note on day 2
@@ -28,6 +28,25 @@ Feature: Repetition Quiz
       | answer   | result              | should see finish |
       | sedation | "sedation" is wrong | no                |
       | sedition | is correct          | yes               |
+
+  @usingMockedOpenAiService
+  @ignore
+  Scenario Outline: AI generated question
+    Given I opt to do only AI generated questions
+    And OpenAI by default returns this question from now:
+      | question                         | option_a  | option_b           |
+      | What is the meaning of sedition? | to sleep  | to incite violence |
+    And I learned one note "sedition" on day 1
+    When I am repeat-reviewing my old note on day 2
+    Then I should be asked "What is the meaning of sedition?"
+    When I choose answer "<answer>"
+    Then I should see that my answer <result>
+
+    Examples:
+      | answer             | result              |
+      | to sleep           | "to sleep" is wrong |
+      | to incite violence | is correct          |
+
 
   Scenario Outline: Spelling quiz
     Given I am learning new note on day 1
