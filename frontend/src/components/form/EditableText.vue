@@ -34,7 +34,7 @@ export default defineComponent({
     scopeName: String,
     field: String,
     title: String,
-    errors: Object,
+    errors: String,
   },
   emits: ["update:modelValue", "blur"],
   components: {

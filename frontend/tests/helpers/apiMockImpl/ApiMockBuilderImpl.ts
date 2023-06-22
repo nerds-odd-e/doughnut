@@ -1,4 +1,4 @@
-import { MockParams } from "vitest-fetch-mock";
+import { MockResponseInit } from "vitest-fetch-mock";
 import { ApiMockBuilder } from "../ApiMock";
 import ApiMockExpectation from "./ApiMockExpectation";
 
@@ -13,7 +13,7 @@ class ApiMockBuilderImpl implements ApiMockBuilder {
     this.andRespondOnce({ status: 404 });
   }
 
-  andRespondOnce(response: MockParams): void {
+  andRespondOnce(response: MockResponseInit): void {
     this.expectation.response = response;
   }
 

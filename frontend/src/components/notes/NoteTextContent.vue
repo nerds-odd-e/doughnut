@@ -112,7 +112,9 @@ export default defineComponent({
       }
       this.storageAccessor
         .api(this.$router)
-        .updateTextContent(this.noteId, newValue, this.textContent);
+        .updateTextContent(this.noteId, newValue, this.textContent)
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        .catch((_) => {});
     }, 1000);
   },
   unmounted() {

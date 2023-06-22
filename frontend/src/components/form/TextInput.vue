@@ -30,7 +30,7 @@ export default {
     hint: String,
     placeholder: { type: String, default: null },
     autofocus: { type: Boolean, default: false },
-    errors: Object,
+    errors: String,
   },
   components: {
     InputWithType,

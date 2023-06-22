@@ -26,7 +26,7 @@ export default {
     field: String,
     title: String,
     hint: String,
-    errors: Object,
+    errors: String,
     beforeLabel: { type: Boolean, default: false },
   },
   computed: {

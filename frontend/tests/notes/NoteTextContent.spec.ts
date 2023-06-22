@@ -52,13 +52,33 @@ describe("in place edit on title", () => {
     wrapper.unmount();
   });
 
-  it("should save content when blur text field title", async () => {
-    const wrapper = mountComponent(note);
-    helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
-
+  const editTitle = async (wrapper: VueWrapper<ComponentPublicInstance>) => {
     await wrapper.find('[role="title"]').trigger("click");
     await wrapper.find('[role="title"] input').setValue("updated");
     await wrapper.find('[role="title"] input').trigger("blur");
+  };
+
+  it("should save content when blur text field title", async () => {
+    const wrapper = mountComponent(note);
+    helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
+    await editTitle(wrapper);
+  });
+
+  it("should display error when saving failed", async () => {
+    const wrapper = mountComponent(note);
+    helper.apiMock
+      .expectingPatch(`/api/text_content/${note.id}`)
+      .andRespondOnce({
+        status: 400,
+        body: JSON.stringify({
+          message: "binding error",
+          errors: {
+            title: "size must be between 1 and 100",
+          },
+          errorType: "BINDING_ERROR",
+        }),
+      });
+    await editTitle(wrapper);
   });
 
   it("should not trigger changes for initial description content", async () => {
