@@ -112,10 +112,10 @@ public class ReviewPoint {
     if (getLink() != null) {
       Collections.addAll(questionTypes, getLink().getLinkType().getQuestionTypes());
     } else {
-      questionTypes.add(QuizQuestion.QuestionType.SPELLING);
-      questionTypes.add(QuizQuestion.QuestionType.CLOZE_SELECTION);
-      questionTypes.add(QuizQuestion.QuestionType.PICTURE_TITLE);
-      questionTypes.add(QuizQuestion.QuestionType.PICTURE_SELECTION);
+      questionTypes.add(QuestionType.SPELLING);
+      questionTypes.add(QuestionType.CLOZE_SELECTION);
+      questionTypes.add(QuestionType.PICTURE_TITLE);
+      questionTypes.add(QuestionType.PICTURE_SELECTION);
     }
     return questionTypes;
   }

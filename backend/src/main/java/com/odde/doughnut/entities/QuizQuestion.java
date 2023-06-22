@@ -67,7 +67,8 @@ public class QuizQuestion {
         9, WhichSpecHasInstanceQuizFactory::new, WhichSpecHasInstanceQuizPresenter::new),
     FROM_SAME_PART_AS(10, FromSamePartAsQuizFactory::new, FromSamePartAsQuizPresenter::new),
     FROM_DIFFERENT_PART_AS(
-        11, FromDifferentPartAsQuizFactory::new, FromDifferentPartAsQuizPresenter::new);
+        11, FromDifferentPartAsQuizFactory::new, FromDifferentPartAsQuizPresenter::new),
+    AI_QUESTION(12, AiQuizFactory::new, JustReviewQuizPresenter::new);
 
     public final Integer id;
     public final BiFunction<ReviewPoint, QuizQuestionServant, QuizQuestionFactory> factory;
