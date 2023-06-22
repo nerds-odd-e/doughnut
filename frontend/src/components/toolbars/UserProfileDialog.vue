@@ -23,6 +23,12 @@
           v-model="formData.spaceIntervals"
           :errors="errors.spaceIntervals"
         />
+        <CheckInput
+          scope-name="user"
+          field="aiQuestionTypeOnlyForReview"
+          v-model="formData.aiQuestionTypeOnlyForReview"
+          :errors="errors.aiQuestionTypeOnlyForReview"
+        />
         <input type="submit" value="Submit" class="btn btn-primary" />
       </form>
     </div>
@@ -31,6 +37,7 @@
 
 <script>
 import ContainerPage from "../../pages/commons/ContainerPage.vue";
+import CheckInput from "../form/CheckInput.vue";
 import TextInput from "../form/TextInput.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import asPopup from "../commons/Popups/asPopup";
@@ -39,7 +46,7 @@ export default {
   setup() {
     return { ...useLoadingApi(), ...asPopup() };
   },
-  components: { ContainerPage, TextInput },
+  components: { ContainerPage, TextInput, CheckInput },
   emits: ["user-updated"],
   data() {
     return {

@@ -13,6 +13,7 @@ class UserBuilder extends Builder<Generated.User> {
       ownership: { id: 0 },
       dailyNewNotesCount: 5,
       spaceIntervals: "",
+      aiQuestionTypeOnlyForReview: false,
     };
   }
 

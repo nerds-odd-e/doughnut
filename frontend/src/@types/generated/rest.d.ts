@@ -182,6 +182,7 @@ declare namespace Generated {
         ownership: Ownership;
         dailyNewNotesCount: number;
         spaceIntervals: string;
+        aiQuestionTypeOnlyForReview: boolean;
     }
 
     interface AnswerViewedByUser {
