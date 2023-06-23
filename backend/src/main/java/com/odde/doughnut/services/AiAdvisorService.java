@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiQuestionTemporary;
 import com.odde.doughnut.entities.json.AiSuggestion;
@@ -28,7 +29,10 @@ public class AiAdvisorService {
 
   public AiQuestionTemporary generateQuestion(List<ChatMessage> messages) {
     AiSuggestion openAiCompletion = openAiAPIChatCompletion.getOpenAiCompletion(messages, 1100);
-    QuizQuestionViewedByUser quizQuestionViewedByUser = null;
+    QuizQuestion quizQuestion = new QuizQuestion();
+    quizQuestion.setQuestionType(QuizQuestion.QuestionType.AI_QUESTION);
+    QuizQuestionViewedByUser quizQuestionViewedByUser =
+        new QuizQuestionViewedByUser(quizQuestion, null, null);
     return new AiQuestionTemporary(openAiCompletion.getSuggestion(), quizQuestionViewedByUser);
   }
 

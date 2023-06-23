@@ -36,11 +36,17 @@ public class QuizQuestionViewedByUser {
 
   public static QuizQuestionViewedByUser create(
       QuizQuestion quizQuestion, ModelFactoryService modelFactoryService, User user) {
-    return new QuizQuestionViewedByUser(quizQuestion, modelFactoryService, user);
+    QuizQuestionPresenter presenter = quizQuestion.buildPresenter();
+    return new QuizQuestionViewedByUser(
+        quizQuestion,
+        presenter.optionCreator().getOptions(modelFactoryService, quizQuestion.getOptionThingIds()),
+        new NoteViewer(user, quizQuestion.getReviewPoint().getHeadNote()).jsonNotePosition(true));
   }
 
-  private QuizQuestionViewedByUser(
-      QuizQuestion quizQuestion, ModelFactoryService modelFactoryService, User user) {
+  public QuizQuestionViewedByUser(
+      QuizQuestion quizQuestion,
+      List<Option> options1,
+      NotePositionViewedByUser notebookPosition1) {
     QuizQuestionPresenter presenter = quizQuestion.buildPresenter();
     this.quizQuestion = quizQuestion;
     this.questionType = quizQuestion.getQuestionType();
@@ -48,28 +54,10 @@ public class QuizQuestionViewedByUser {
     this.mainTopic = presenter.mainTopic();
     this.hintLinks = presenter.hintLinks();
     this.pictureWithMask = presenter.pictureWithMask();
-    this.options =
-        getOptions(
-            presenter.optionCreator(), modelFactoryService, quizQuestion.getOptionThingIds());
+    this.options = options1;
     this.viceReviewPointIdList = quizQuestion.getViceReviewPointIdList();
     if (questionType == QuizQuestion.QuestionType.JUST_REVIEW) return;
-    this.notebookPosition =
-        new NoteViewer(user, quizQuestion.getReviewPoint().getHeadNote()).jsonNotePosition(true);
-  }
-
-  static List<Option> getOptions(
-      OptionCreator optionCreator, ModelFactoryService modelFactoryService, String optionThingIds) {
-    if (Strings.isBlank(optionThingIds)) return List.of();
-    List<Integer> idList =
-        Arrays.stream(optionThingIds.split(","))
-            .map(Integer::parseInt)
-            .collect(Collectors.toList());
-    Stream<Thing> noteStream =
-        modelFactoryService
-            .thingRepository
-            .findAllByIds(idList)
-            .sorted(Comparator.comparing(v -> idList.indexOf(v.getId())));
-    return noteStream.map(optionCreator::optionFromThing).toList();
+    this.notebookPosition = notebookPosition1;
   }
 
   public static class Option {
@@ -83,6 +71,21 @@ public class QuizQuestionViewedByUser {
 
   public interface OptionCreator {
     Option optionFromThing(Thing thing);
+
+    default List<Option> getOptions(
+        ModelFactoryService modelFactoryService, String optionThingIds) {
+      if (Strings.isBlank(optionThingIds)) return List.of();
+      List<Integer> idList =
+          Arrays.stream(optionThingIds.split(","))
+              .map(Integer::parseInt)
+              .collect(Collectors.toList());
+      Stream<Thing> noteStream =
+          modelFactoryService
+              .thingRepository
+              .findAllByIds(idList)
+              .sorted(Comparator.comparing(v -> idList.indexOf(v.getId())));
+      return noteStream.map(this::optionFromThing).toList();
+    }
   }
 
   public static class TitleOptionCreator implements OptionCreator {

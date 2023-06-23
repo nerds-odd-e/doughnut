@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AiEngagingStory;
+import com.odde.doughnut.entities.json.AiQuestionTemporary;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.entities.json.AiSuggestionRequest;
 import com.odde.doughnut.models.UserModel;
@@ -156,6 +157,14 @@ class RestAiControllerTest {
           () ->
               new RestAiController(openAiApi, makeMe.modelFactoryService, makeMe.aNullUserModel())
                   .generateQuestion(note));
+    }
+
+    @Test
+    void createQuizQuestion() {
+      when(openAiApi.createChatCompletion(any())).thenReturn(buildCompletionResult("blue planet"));
+      AiQuestionTemporary aiQuestionTemporary = controller.generateQuestion(note);
+      //      assertThat(aiQuestionTemporary.getQuizQuestion().description).contains("What goes
+      // up,");
     }
 
     @Test
