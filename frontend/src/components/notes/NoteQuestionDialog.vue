@@ -55,7 +55,7 @@ export default defineComponent({
     async generateQuestion(prev?: string) {
       const aiAdvisor = new AiAdvisor(this.selectedNote.textContent);
       const prompt = aiAdvisor.questionPrompt();
-      const res = await this.api.ai.keepAskingAISuggestionUntilStop(
+      const res = await this.api.ai.keepAskingAIToGenerateQuestionUntilStop(
         prompt,
         this.selectedNote.id,
         prev,

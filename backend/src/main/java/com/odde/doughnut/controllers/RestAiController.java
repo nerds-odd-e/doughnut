@@ -36,7 +36,15 @@ public class RestAiController {
       @RequestBody AiSuggestionRequest aiSuggestionRequest) {
     currentUser.assertLoggedIn();
     NoteModel noteModel = modelFactoryService.toNoteModel(note);
+    return aiAdvisorService.getAiSuggestion(noteModel.getPath(), aiSuggestionRequest);
+  }
 
+  @PostMapping("/generate-question")
+  public AiSuggestion askSuggestion1(
+      @RequestParam(value = "note") Note note,
+      @RequestBody AiSuggestionRequest aiSuggestionRequest) {
+    currentUser.assertLoggedIn();
+    NoteModel noteModel = modelFactoryService.toNoteModel(note);
     return aiAdvisorService.getAiSuggestion(noteModel.getPath(), aiSuggestionRequest);
   }
 

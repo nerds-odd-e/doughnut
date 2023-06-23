@@ -294,6 +294,44 @@ const apiCollection = (managedApi: ManagedApi) => ({
         request
       )) as Generated.AiSuggestion;
     },
+
+    async keepAskingAIToGenerateQuestionUntilStop(
+      prompt: string,
+      noteId: Doughnut.ID,
+      prev?: string,
+      interimResultShouldContinue?: (suggestion: string) => boolean
+    ): Promise<string> {
+      const res = await this.askAiToGenerateQuestion(
+        {
+          prompt,
+          incompleteAssistantMessage: prev ?? "",
+        },
+        noteId
+      );
+      if (interimResultShouldContinue) {
+        if (!interimResultShouldContinue(res.suggestion)) return res.suggestion;
+      }
+      if (res.finishReason === "length") {
+        return this.keepAskingAIToGenerateQuestionUntilStop(
+          prompt,
+          noteId,
+          res.suggestion,
+          interimResultShouldContinue
+        );
+      }
+      return res.suggestion;
+    },
+
+    async askAiToGenerateQuestion(
+      request: Generated.AiSuggestionRequest,
+      noteId: Doughnut.ID
+    ) {
+      return (await managedApi.restPost(
+        `ai/generate-question?note=${noteId}`,
+        request
+      )) as Generated.AiSuggestion;
+    },
+
     async askAiEngagingStories(prompt: string) {
       const request: Generated.AiSuggestionRequest = {
         prompt,
