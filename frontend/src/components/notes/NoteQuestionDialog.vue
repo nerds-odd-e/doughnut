@@ -52,11 +52,9 @@ export default defineComponent({
     };
   },
   methods: {
-    async generateQuestion(prev?: string) {
-      const res = await this.api.ai.keepAskingAIToGenerateQuestionUntilStop(
-        this.selectedNote.id,
-        prev,
-        (_) => !this.isUnmounted
+    async generateQuestion() {
+      const res = await this.api.ai.askAIToGenerateQuestion(
+        this.selectedNote.id
       );
 
       this.question = JSON.parse(res);
