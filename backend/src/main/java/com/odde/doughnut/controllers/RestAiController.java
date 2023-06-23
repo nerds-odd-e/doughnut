@@ -39,14 +39,11 @@ public class RestAiController {
     return aiAdvisorService.getAiSuggestion(noteModel.getPath(), aiSuggestionRequest);
   }
 
-  @PostMapping("/generate-question")
-  public AiSuggestion generateQuestion(
-      @RequestParam(value = "note") Note note,
-      @RequestBody AiSuggestionRequest aiSuggestionRequest) {
+  @GetMapping("/generate-question")
+  public AiSuggestion generateQuestion(@RequestParam(value = "note") Note note) {
     currentUser.assertLoggedIn();
     NoteModel noteModel = modelFactoryService.toNoteModel(note);
-    aiSuggestionRequest.prompt = questionPrompt(note);
-    return aiAdvisorService.generateQuestion(noteModel.getPath(), aiSuggestionRequest);
+    return aiAdvisorService.generateQuestion(noteModel.getPath(), questionPrompt(note));
   }
 
   private String questionPrompt(Note note) {

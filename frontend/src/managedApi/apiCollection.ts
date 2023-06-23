@@ -296,14 +296,9 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
 
     async askAIToGenerateQuestion(noteId: Doughnut.ID): Promise<string> {
-      const request = {
-        prompt: "",
-        incompleteAssistantMessage: "",
-      };
       return (
-        (await managedApi.restPost(
-          `ai/generate-question?note=${noteId}`,
-          request
+        (await managedApi.restGet(
+          `ai/generate-question?note=${noteId}`
         )) as Generated.AiSuggestion
       ).suggestion;
     },

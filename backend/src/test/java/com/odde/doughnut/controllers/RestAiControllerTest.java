@@ -155,7 +155,7 @@ class RestAiControllerTest {
           ResponseStatusException.class,
           () ->
               new RestAiController(openAiApi, makeMe.modelFactoryService, makeMe.aNullUserModel())
-                  .generateQuestion(note, params));
+                  .generateQuestion(note));
     }
 
     @Test
@@ -167,7 +167,7 @@ class RestAiControllerTest {
                     return true;
                   })))
           .thenReturn(buildCompletionResult("blue planet"));
-      controller.generateQuestion(note, params);
+      controller.generateQuestion(note);
     }
   }
 

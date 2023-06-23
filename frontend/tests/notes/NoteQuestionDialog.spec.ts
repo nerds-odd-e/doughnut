@@ -18,7 +18,7 @@ const goodQuestion = {
 const createWrapper = async () => {
   const note = makeMe.aNoteRealm.please();
   helper.apiMock
-    .expectingPost(`/api/ai/generate-question?note=${note.id}`)
+    .expectingGet(`/api/ai/generate-question?note=${note.id}`)
     .andReturnOnce({
       suggestion: JSON.stringify(goodQuestion),
       finishReason: "stop",
