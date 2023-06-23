@@ -139,11 +139,23 @@ class RestAiControllerTest {
     }
 
     @Test
-    void askEngagingStoryReturnsEngagingStory() throws UnexpectedNoAccessRightException {
+    void askEngagingStoryReturnsEngagingStory() {
       when(openAiApi.createImage(Mockito.any()))
           .thenReturn(buildImageResult("This is an engaging story."));
       final AiEngagingStory aiEngagingStory = controller.askEngagingStories(params);
       assertEquals("This is an engaging story.", aiEngagingStory.engagingStory());
+    }
+  }
+
+  @Nested
+  class GenerateQuestion {
+    @Test
+    void askWithNoteThatCannotAccess() {
+      assertThrows(
+          ResponseStatusException.class,
+          () ->
+              new RestAiController(openAiApi, makeMe.modelFactoryService, makeMe.aNullUserModel())
+                  .generateQuestion(note, params));
     }
   }
 

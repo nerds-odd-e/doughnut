@@ -40,7 +40,7 @@ public class RestAiController {
   }
 
   @PostMapping("/generate-question")
-  public AiSuggestion askSuggestion1(
+  public AiSuggestion generateQuestion(
       @RequestParam(value = "note") Note note,
       @RequestBody AiSuggestionRequest aiSuggestionRequest) {
     currentUser.assertLoggedIn();
