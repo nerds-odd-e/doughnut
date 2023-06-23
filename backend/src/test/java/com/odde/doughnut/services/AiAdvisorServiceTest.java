@@ -9,7 +9,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.entities.json.AiSuggestion;
-import com.odde.doughnut.entities.json.AiSuggestionRequest;
 import com.odde.doughnut.entities.json.ApiError;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.OpenAITimeoutException;
@@ -60,19 +59,13 @@ class AiAdvisorServiceTest {
           .thenReturn(completionResultSingle);
       assertEquals(
           "what goes up must come down",
-          aiAdvisorService
-              .getAiSuggestion(
-                  "/cosmos/solar system",
-                  new AiSuggestionRequest("Complete this English phrase", "what goes up"))
-              .getSuggestion());
+          aiAdvisorService.getAiSuggestion1(List.of(), "what goes up").getSuggestion());
     }
 
     @Test
     void the_data_returned_is_incomplete() {
       when(openAiApi.createChatCompletion(any())).thenReturn(IncompleteCompletionResultSingle);
-      AiSuggestion suggestion =
-          aiAdvisorService.getAiSuggestion(
-              "/cosmos/solar system", new AiSuggestionRequest("what", ""));
+      AiSuggestion suggestion = aiAdvisorService.getAiSuggestion1(List.of(), "");
       assertEquals("length", suggestion.getFinishReason());
     }
 
@@ -81,11 +74,7 @@ class AiAdvisorServiceTest {
       HttpException httpException = buildHttpException(400);
       Mockito.when(openAiApi.createChatCompletion(ArgumentMatchers.any()))
           .thenReturn(Single.error(httpException));
-      assertThrows(
-          HttpException.class,
-          () ->
-              aiAdvisorService.getAiSuggestion(
-                  "/cosmos/solar system", new AiSuggestionRequest("suggestion_prompt", "")));
+      assertThrows(HttpException.class, () -> aiAdvisorService.getAiSuggestion1(List.of(), ""));
     }
 
     @Test
@@ -95,10 +84,7 @@ class AiAdvisorServiceTest {
           .thenReturn(Single.error(exception));
       OpenAITimeoutException result =
           assertThrows(
-              OpenAITimeoutException.class,
-              () ->
-                  aiAdvisorService.getAiSuggestion(
-                      "/cosmos/solar system", new AiSuggestionRequest("suggestion_prompt", "")));
+              OpenAITimeoutException.class, () -> aiAdvisorService.getAiSuggestion1(List.of(), ""));
       assertThat(result.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.OPENAI_TIMEOUT));
     }
 
@@ -110,9 +96,7 @@ class AiAdvisorServiceTest {
       OpenAIServiceErrorException result =
           assertThrows(
               OpenAIServiceErrorException.class,
-              () ->
-                  aiAdvisorService.getAiSuggestion(
-                      "/cosmos/solar system", new AiSuggestionRequest("suggestion_prompt", "")));
+              () -> aiAdvisorService.getAiSuggestion1(List.of(), ""));
       assertThat(
           result.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.OPENAI_SERVICE_ERROR));
       assertThat(result.getMessage(), containsString("502"));
@@ -126,9 +110,7 @@ class AiAdvisorServiceTest {
       OpenAiUnauthorizedException exception =
           assertThrows(
               OpenAiUnauthorizedException.class,
-              () ->
-                  aiAdvisorService.getAiSuggestion(
-                      "/cosmos/solar system", new AiSuggestionRequest("", "")));
+              () -> aiAdvisorService.getAiSuggestion1(List.of(), ""));
       assertThat(exception.getMessage(), containsString("401"));
     }
   }

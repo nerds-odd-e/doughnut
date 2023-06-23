@@ -43,7 +43,8 @@ public class RestAiController {
   public AiSuggestion generateQuestion(@RequestParam(value = "note") Note note) {
     currentUser.assertLoggedIn();
     NoteModel noteModel = modelFactoryService.toNoteModel(note);
-    return aiAdvisorService.generateQuestion(noteModel.getPath(), noteModel.questionPrompt());
+    return aiAdvisorService.generateQuestion(
+        AiAdvisorService.getChatMessages(noteModel.getPath(), noteModel.questionPrompt(), null));
   }
 
   @PostMapping("/ask-engaging-stories")

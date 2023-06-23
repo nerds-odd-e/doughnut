@@ -26,15 +26,20 @@ public class AiAdvisorService {
   }
 
   public AiSuggestion getAiSuggestion(String context, AiSuggestionRequest aiSuggestionRequest) {
-    String prompt = aiSuggestionRequest.prompt;
-    String incompleteAssistantMessage = aiSuggestionRequest.incompleteAssistantMessage;
-    List<ChatMessage> messages = getChatMessages(context, prompt, incompleteAssistantMessage);
+    List<ChatMessage> messages =
+        getChatMessages(
+            context, aiSuggestionRequest.prompt, aiSuggestionRequest.incompleteAssistantMessage);
+    return getAiSuggestion1(messages, aiSuggestionRequest.incompleteAssistantMessage);
+  }
+
+  public AiSuggestion getAiSuggestion1(
+      List<ChatMessage> messages, String incompleteAssistantMessage) {
     return openAiAPIChatCompletion
         .getOpenAiCompletion(messages, 100)
         .prependPreviousIncompleteMessage(incompleteAssistantMessage);
   }
 
-  private static List<ChatMessage> getChatMessages(
+  public static List<ChatMessage> getChatMessages(
       String context, String prompt, String incompleteAssistantMessage) {
     List<ChatMessage> messages = new ArrayList<>();
     String content = contextTemplate + context;
@@ -46,8 +51,7 @@ public class AiAdvisorService {
     return messages;
   }
 
-  public AiSuggestion generateQuestion(String context, String prompt) {
-    List<ChatMessage> messages = getChatMessages(context, prompt, null);
+  public AiSuggestion generateQuestion(List<ChatMessage> messages) {
     return openAiAPIChatCompletion.getOpenAiCompletion(messages, 1100);
   }
 
