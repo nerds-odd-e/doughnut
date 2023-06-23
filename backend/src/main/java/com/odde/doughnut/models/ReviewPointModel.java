@@ -27,9 +27,7 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
   }
 
   public QuizQuestion generateAQuizQuestion(Randomizer randomizer, User user) {
-    if (user.getAiQuestionTypeOnlyForReview())
-      return entity.createAQuizQuestionOfType(QuizQuestion.QuestionType.AI_QUESTION);
-    return randomizer.shuffle(entity.availableQuestionTypes()).stream()
+    return randomizer.shuffle(entity.availableQuestionTypes(user)).stream()
         .map(type -> new QuizQuestionDirector(entity, type, randomizer, modelFactoryService))
         .map(QuizQuestionDirector::buildQuizQuestion)
         .flatMap(Optional::stream)

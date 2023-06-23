@@ -61,6 +61,6 @@ class QuizQuestionGeneratorTest {
   }
 
   private List<QuizQuestion.QuestionType> getQuestionTypes(ReviewPoint reviewPoint) {
-    return reviewPoint.availableQuestionTypes();
+    return reviewPoint.availableQuestionTypes(makeMe.aUser().inMemoryPlease());
   }
 }

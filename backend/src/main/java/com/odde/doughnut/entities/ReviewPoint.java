@@ -107,15 +107,19 @@ public class ReviewPoint {
         == TimestampOperations.getDayId(currentTime, timeZone);
   }
 
-  public List<QuizQuestion.QuestionType> availableQuestionTypes() {
+  public List<QuizQuestion.QuestionType> availableQuestionTypes(User user) {
     List<QuizQuestion.QuestionType> questionTypes = new ArrayList<>();
     if (getLink() != null) {
       Collections.addAll(questionTypes, getLink().getLinkType().getQuestionTypes());
     } else {
-      questionTypes.add(QuestionType.SPELLING);
-      questionTypes.add(QuestionType.CLOZE_SELECTION);
-      questionTypes.add(QuestionType.PICTURE_TITLE);
-      questionTypes.add(QuestionType.PICTURE_SELECTION);
+      if (user.getAiQuestionTypeOnlyForReview()) {
+        questionTypes.add(QuestionType.AI_QUESTION);
+      } else {
+        questionTypes.add(QuestionType.SPELLING);
+        questionTypes.add(QuestionType.CLOZE_SELECTION);
+        questionTypes.add(QuestionType.PICTURE_TITLE);
+        questionTypes.add(QuestionType.PICTURE_SELECTION);
+      }
     }
     return questionTypes;
   }
