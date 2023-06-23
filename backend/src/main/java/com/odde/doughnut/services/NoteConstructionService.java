@@ -20,13 +20,13 @@ public record NoteConstructionService(
       TextContent textContent,
       Link.LinkType linkTypeToParent) {
     Note note = parentNote.buildChildNote(user, currentUTCTimestamp, textContent);
-    wikidataIdWithApi.associateNoteToWikidata(note, modelFactoryService);
     note.buildLinkToParent(user, linkTypeToParent, currentUTCTimestamp);
     modelFactoryService.noteRepository.save(note);
-
-    wikidataIdWithApi.getCountryOfOrigin().ifPresent(wwa -> createSubNote(note, wwa));
-    wikidataIdWithApi.getAuthors().forEach(wwa -> createSubNote(note, wwa));
-
+    if (wikidataIdWithApi != null) {
+      wikidataIdWithApi.associateNoteToWikidata(note, modelFactoryService);
+      wikidataIdWithApi.getCountryOfOrigin().ifPresent(wwa -> createSubNote(note, wwa));
+      wikidataIdWithApi.getAuthors().forEach(wwa -> createSubNote(note, wwa));
+    }
     return note;
   }
 

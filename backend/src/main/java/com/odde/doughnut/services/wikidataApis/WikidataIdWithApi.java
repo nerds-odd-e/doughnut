@@ -5,11 +5,26 @@ import com.odde.doughnut.entities.json.WikidataEntityData;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.wikidataApis.thirdPartyEntities.WikidataEntityHash;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.validation.BindException;
 
-public record WikidataIdWithApi(String wikidataId, WikidataApi wikidataApi) {
+public final class WikidataIdWithApi {
+  private final String wikidataId;
+  private final WikidataApi wikidataApi;
+
+  public static WikidataIdWithApi create(String wikidataId, WikidataApi wikidataApi) {
+    if (Strings.isBlank(wikidataId)) return null;
+    return new WikidataIdWithApi(wikidataId, wikidataApi);
+  }
+
+  private WikidataIdWithApi(String wikidataId, WikidataApi wikidataApi) {
+    this.wikidataId = wikidataId;
+    this.wikidataApi = wikidataApi;
+  }
+
   public Optional<String> fetchEnglishTitleFromApi() {
     return wikidataApi.getWikidataEntityData(wikidataId()).map(e -> e.WikidataTitleInEnglish);
   }
@@ -48,5 +63,38 @@ public record WikidataIdWithApi(String wikidataId, WikidataApi wikidataApi) {
     note.setWikidataId(this.wikidataId);
     modelFactoryService.toNoteModel(note).checkDuplicateWikidataId();
     extractWikidataInfoToNote(note);
+  }
+
+  public String wikidataId() {
+    return wikidataId;
+  }
+
+  public WikidataApi wikidataApi() {
+    return wikidataApi;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) return true;
+    if (obj == null || obj.getClass() != this.getClass()) return false;
+    var that = (WikidataIdWithApi) obj;
+    return Objects.equals(this.wikidataId, that.wikidataId)
+        && Objects.equals(this.wikidataApi, that.wikidataApi);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(wikidataId, wikidataApi);
+  }
+
+  @Override
+  public String toString() {
+    return "WikidataIdWithApi["
+        + "wikidataId="
+        + wikidataId
+        + ", "
+        + "wikidataApi="
+        + wikidataApi
+        + ']';
   }
 }

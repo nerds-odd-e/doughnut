@@ -6,6 +6,6 @@ public record WikidataId(String wikidataId) {
   }
 
   public WikidataIdWithApi withApi(WikidataApi wikidataApi) {
-    return new WikidataIdWithApi(wikidataId, wikidataApi);
+    return WikidataIdWithApi.create(wikidataId, wikidataApi);
   }
 }
