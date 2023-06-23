@@ -9,6 +9,7 @@ declare namespace Generated {
 
     interface AiQuestionTemporary {
         suggestion: string;
+        quizQuestion: QuizQuestionViewedByUser;
     }
 
     interface AiSuggestion {

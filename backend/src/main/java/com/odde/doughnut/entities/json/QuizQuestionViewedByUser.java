@@ -34,21 +34,26 @@ public class QuizQuestionViewedByUser {
 
   public Optional<PictureWithMask> pictureWithMask;
 
-  public QuizQuestionViewedByUser(
+  public static QuizQuestionViewedByUser create(
+      QuizQuestion quizQuestion, ModelFactoryService modelFactoryService, User user) {
+    return new QuizQuestionViewedByUser(quizQuestion, modelFactoryService, user);
+  }
+
+  private QuizQuestionViewedByUser(
       QuizQuestion quizQuestion, ModelFactoryService modelFactoryService, User user) {
     QuizQuestionPresenter presenter = quizQuestion.buildPresenter();
     this.quizQuestion = quizQuestion;
-    questionType = quizQuestion.getQuestionType();
-    description = presenter.instruction();
-    mainTopic = presenter.mainTopic();
-    hintLinks = presenter.hintLinks();
-    pictureWithMask = presenter.pictureWithMask();
-    options =
+    this.questionType = quizQuestion.getQuestionType();
+    this.description = presenter.instruction();
+    this.mainTopic = presenter.mainTopic();
+    this.hintLinks = presenter.hintLinks();
+    this.pictureWithMask = presenter.pictureWithMask();
+    this.options =
         getOptions(
             presenter.optionCreator(), modelFactoryService, quizQuestion.getOptionThingIds());
-    viceReviewPointIdList = quizQuestion.getViceReviewPointIdList();
+    this.viceReviewPointIdList = quizQuestion.getViceReviewPointIdList();
     if (questionType == QuizQuestion.QuestionType.JUST_REVIEW) return;
-    notebookPosition =
+    this.notebookPosition =
         new NoteViewer(user, quizQuestion.getReviewPoint().getHeadNote()).jsonNotePosition(true);
   }
 

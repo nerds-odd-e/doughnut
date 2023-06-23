@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFactoryService) {
   public QuizQuestionViewedByUser getRandomQuizQuestion(Randomizer randomizer, User user) {
-    return new QuizQuestionViewedByUser(
+    return QuizQuestionViewedByUser.create(
         generateAQuizQuestion(randomizer, user), modelFactoryService, user);
   }
 

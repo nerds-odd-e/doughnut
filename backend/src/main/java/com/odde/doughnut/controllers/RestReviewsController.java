@@ -102,7 +102,7 @@ class RestReviewsController {
     AnswerViewedByUser answerResult = answerModel.getAnswerViewedByUser();
     answerResult.reviewPoint = answer.getQuestion().getReviewPoint();
     answerResult.quizQuestion =
-        new QuizQuestionViewedByUser(
+        QuizQuestionViewedByUser.create(
             answer.getQuestion(), modelFactoryService, currentUser.getEntity());
     return answerResult;
   }

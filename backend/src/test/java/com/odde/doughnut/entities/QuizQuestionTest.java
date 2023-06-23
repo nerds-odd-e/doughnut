@@ -166,7 +166,7 @@ class QuizQuestionTest {
   }
 
   private QuizQuestionViewedByUser getQuizQuestion(Note note) {
-    return new QuizQuestionViewedByUser(
+    return QuizQuestionViewedByUser.create(
         getReviewPointModel(note).generateAQuizQuestion(randomizer, userModel.getEntity()),
         makeMe.modelFactoryService,
         userModel.getEntity());

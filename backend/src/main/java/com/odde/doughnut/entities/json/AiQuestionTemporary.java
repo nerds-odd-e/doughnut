@@ -7,4 +7,5 @@ import lombok.Data;
 @AllArgsConstructor
 public final class AiQuestionTemporary {
   String suggestion;
+  QuizQuestionViewedByUser quizQuestion;
 }
