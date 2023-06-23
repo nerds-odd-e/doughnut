@@ -36,7 +36,8 @@ class RestReviewPointControllerTest {
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    controller = new RestReviewPointController(modelFactoryService, userModel, testabilitySettings);
+    controller =
+        new RestReviewPointController(null, modelFactoryService, userModel, testabilitySettings);
   }
 
   @Nested

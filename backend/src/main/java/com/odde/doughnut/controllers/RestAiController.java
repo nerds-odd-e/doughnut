@@ -28,7 +28,7 @@ public class RestAiController {
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService,
       UserModel currentUser) {
-    aiAdvisorService = new AiAdvisorService(openAiApi);
+    this.aiAdvisorService = new AiAdvisorService(openAiApi);
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
   }
