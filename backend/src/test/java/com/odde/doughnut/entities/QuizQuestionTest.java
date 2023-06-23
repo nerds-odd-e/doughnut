@@ -2,12 +2,16 @@ package com.odde.doughnut.entities;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.models.randomizers.RealRandomizer;
+import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.HashSet;
 import java.util.List;
@@ -131,8 +135,14 @@ class QuizQuestionTest {
     void shouldAlwaysChooseAIQuestionIfConfigured() {
       userModel.getEntity().setAiQuestionTypeOnlyForReview(true);
       ReviewPointModel reviewPoint = getReviewPointModel(note);
+      AiAdvisorService aiAdvisorService = mock(AiAdvisorService.class);
+//      QuizQuestion quizQuestion = new QuizQuestion();
+//      QuizQuestionViewedByUser quizQuestionViewedByUser = new QuizQuestionViewedByUser(quizQuestion, null, null);
+//      quizQuestionViewedByUser.quizQuestion.setRawJsonQuestion("what is the meaning of life?");
+//      when(aiAdvisorService.generateQuestion(any()))
+//        .thenReturn(quizQuestionViewedByUser);
       QuizQuestion randomQuizQuestion =
-          reviewPoint.generateAQuizQuestion(new RealRandomizer(), userModel.getEntity());
+          reviewPoint.generateAQuizQuestion(new RealRandomizer(), userModel.getEntity(), aiAdvisorService);
       assertThat(
           randomQuizQuestion.getQuestionType(), equalTo(QuizQuestion.QuestionType.AI_QUESTION));
       assertThat(randomQuizQuestion.getRawJsonQuestion(), containsString("what"));
@@ -142,7 +152,7 @@ class QuizQuestionTest {
     void shouldReturnTheSameType() {
       ReviewPointModel reviewPoint = getReviewPointModel(note);
       QuizQuestion randomQuizQuestion =
-          reviewPoint.generateAQuizQuestion(new RealRandomizer(), userModel.getEntity());
+          reviewPoint.generateAQuizQuestion(new RealRandomizer(), userModel.getEntity(), null);
       Set<QuizQuestion.QuestionType> types = new HashSet<>();
       for (int i = 0; i < 3; i++) {
         types.add(randomQuizQuestion.getQuestionType());
@@ -156,7 +166,7 @@ class QuizQuestionTest {
       ReviewPointModel reviewPoint = getReviewPointModel(note);
       for (int i = 0; i < 10; i++) {
         QuizQuestion randomQuizQuestion =
-            reviewPoint.generateAQuizQuestion(new RealRandomizer(), userModel.getEntity());
+            reviewPoint.generateAQuizQuestion(new RealRandomizer(), userModel.getEntity(), null);
         types.add(randomQuizQuestion.getQuestionType());
       }
       assertThat(
@@ -168,7 +178,7 @@ class QuizQuestionTest {
 
   private QuizQuestionViewedByUser getQuizQuestion(Note note) {
     return QuizQuestionViewedByUser.create(
-        getReviewPointModel(note).generateAQuizQuestion(randomizer, userModel.getEntity()),
+        getReviewPointModel(note).generateAQuizQuestion(randomizer, userModel.getEntity(), null),
         makeMe.modelFactoryService,
         userModel.getEntity());
   }

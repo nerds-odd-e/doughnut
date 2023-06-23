@@ -52,7 +52,7 @@ class RestReviewPointController {
     currentUser.assertLoggedIn();
     ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPoint);
     return reviewPointModel.getRandomQuizQuestion(
-        testabilitySettings.getRandomizer(), currentUser.getEntity());
+        testabilitySettings.getRandomizer(), currentUser.getEntity(), aiAdvisorService);
   }
 
   @PostMapping(path = "/{reviewPoint}/remove")
