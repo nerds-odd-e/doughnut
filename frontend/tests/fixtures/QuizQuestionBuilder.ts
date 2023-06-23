@@ -28,8 +28,12 @@ class QuizQuestionBuilder extends Builder<Generated.QuizQuestionViewedByUser> {
     },
   };
 
-  withQuestion() {
-    this.quizQuestion.questionType = "CLOZE_SELECTION";
+  withClozeSelectionQuestion() {
+    return this.withQuestionType("CLOZE_SELECTION");
+  }
+
+  withQuestionType(questionType: Generated.QuestionType) {
+    this.quizQuestion.questionType = questionType;
     return this;
   }
 
