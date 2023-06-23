@@ -24,6 +24,8 @@ public record QuizQuestionDirector(
 
     QuizQuestion quizQuestion = reviewPoint.createAQuizQuestionOfType(questionType);
 
+    quizQuestionFactory.fillQuizQuestion(quizQuestion);
+
     if (quizQuestionFactory instanceof QuestionOptionsFactory optionsFactory) {
       List<Thingy> optionsEntities = optionsFactory.getOptionEntities();
       if (optionsEntities.size() < optionsFactory.minimumOptionCount()) {

@@ -135,6 +135,7 @@ class QuizQuestionTest {
           reviewPoint.generateAQuizQuestion(new RealRandomizer(), userModel.getEntity());
       assertThat(
           randomQuizQuestion.getQuestionType(), equalTo(QuizQuestion.QuestionType.AI_QUESTION));
+      assertThat(randomQuizQuestion.getRawJsonQuestion(), containsString("what"));
     }
 
     @Test
