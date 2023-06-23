@@ -295,12 +295,14 @@ const apiCollection = (managedApi: ManagedApi) => ({
       )) as Generated.AiSuggestion;
     },
 
-    async askAIToGenerateQuestion(noteId: Doughnut.ID): Promise<string> {
+    async askAIToGenerateQuestion(
+      noteId: Doughnut.ID
+    ): Promise<Generated.QuizQuestionViewedByUser> {
       return (
         (await managedApi.restGet(
           `ai/generate-question?note=${noteId}`
-        )) as Generated.AiSuggestion
-      ).suggestion;
+        )) as Generated.AiQuestionTemporary
+      ).quizQuestion;
     },
 
     async askAiEngagingStories(prompt: string) {

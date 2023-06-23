@@ -11,6 +11,7 @@ class QuizQuestionBuilder extends Builder<Generated.QuizQuestionViewedByUser> {
       viceReviewPointIds: "",
       createdAt: "",
       optionThingIds: "",
+      rawJsonQuestion: "",
     },
     questionType: "JUST_REVIEW",
     options: [
@@ -39,6 +40,11 @@ class QuizQuestionBuilder extends Builder<Generated.QuizQuestionViewedByUser> {
 
   withReviewPointId(id: Doughnut.ID) {
     this.quizQuestion.quizQuestion.reviewPoint = id;
+    return this;
+  }
+
+  withRawJsonQuestion(json: string) {
+    this.quizQuestion.quizQuestion.rawJsonQuestion = json;
     return this;
   }
 

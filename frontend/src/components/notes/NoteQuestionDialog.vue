@@ -57,7 +57,7 @@ export default defineComponent({
         this.selectedNote.id
       );
 
-      this.question = JSON.parse(res);
+      this.question = JSON.parse(res.quizQuestion.rawJsonQuestion);
     },
 
     async generateQuestionAndResetSelectedOption() {
