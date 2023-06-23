@@ -1,8 +1,12 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.json.AiSuggestionRequest;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.theokanning.openai.completion.chat.ChatMessage;
+import com.theokanning.openai.completion.chat.ChatMessageRole;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.util.Strings;
@@ -59,12 +63,13 @@ public class NoteModel {
     }
   }
 
-  public String getPath() {
+  private String getPath() {
     return entity.getAncestors().stream().map(Note::getTitle).collect(Collectors.joining(" › "));
   }
 
-  public String questionPrompt() {
-    return """
+  public List<ChatMessage> getChatMessagesForGenerateQuestion() {
+    return getChatMessages(
+        """
       Given the note with title: %s
       and description:
       %s
@@ -83,6 +88,29 @@ public class NoteModel {
           ],
         }
       )}"""
-        .formatted(entity.getTitle(), entity.getTextContent().getDescription());
+            .formatted(entity.getTitle(), entity.getTextContent().getDescription()));
+  }
+
+  public List<ChatMessage> getChatMessagesForNoteDescriptionCompletion(
+      AiSuggestionRequest aiSuggestionRequest) {
+    List<ChatMessage> messages = getChatMessages(aiSuggestionRequest.prompt);
+    if (!Strings.isEmpty(aiSuggestionRequest.incompleteAssistantMessage)) {
+      messages.add(
+          new ChatMessage(
+              ChatMessageRole.ASSISTANT.value(), aiSuggestionRequest.incompleteAssistantMessage));
+    }
+    return messages;
+  }
+
+  private List<ChatMessage> getChatMessages(String prompt) {
+    String context = getPath();
+    List<ChatMessage> messages = new ArrayList<>();
+    String content =
+        ("This is a personal knowledge management system, consists of notes with a title and a description, which should represent atomic concepts.\n"
+                + "context: ")
+            + context;
+    messages.add(new ChatMessage(ChatMessageRole.SYSTEM.value(), content));
+    messages.add(new ChatMessage(ChatMessageRole.USER.value(), prompt));
+    return messages;
   }
 }

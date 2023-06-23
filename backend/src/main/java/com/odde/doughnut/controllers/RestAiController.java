@@ -9,6 +9,8 @@ import com.odde.doughnut.models.NoteModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.theokanning.openai.OpenAiApi;
+import com.theokanning.openai.completion.chat.ChatMessage;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
@@ -36,15 +38,17 @@ public class RestAiController {
       @RequestBody AiSuggestionRequest aiSuggestionRequest) {
     currentUser.assertLoggedIn();
     NoteModel noteModel = modelFactoryService.toNoteModel(note);
-    return aiAdvisorService.getAiSuggestion(noteModel.getPath(), aiSuggestionRequest);
+    List<ChatMessage> messages =
+        noteModel.getChatMessagesForNoteDescriptionCompletion(aiSuggestionRequest);
+    return aiAdvisorService.getAiSuggestion(
+        messages, aiSuggestionRequest.incompleteAssistantMessage);
   }
 
   @GetMapping("/generate-question")
   public AiSuggestion generateQuestion(@RequestParam(value = "note") Note note) {
     currentUser.assertLoggedIn();
     NoteModel noteModel = modelFactoryService.toNoteModel(note);
-    return aiAdvisorService.generateQuestion(
-        AiAdvisorService.getChatMessages(noteModel.getPath(), noteModel.questionPrompt(), null));
+    return aiAdvisorService.generateQuestion(noteModel.getChatMessagesForGenerateQuestion());
   }
 
   @PostMapping("/ask-engaging-stories")
