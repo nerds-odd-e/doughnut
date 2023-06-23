@@ -29,7 +29,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import type { StorageAccessor } from "@/store/createNoteStorage";
-import AiAdvisor, { AiQuestion } from "@/models/AiAdvisor";
+import { AiQuestion } from "@/models/AiAdvisor";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default defineComponent({
@@ -53,10 +53,7 @@ export default defineComponent({
   },
   methods: {
     async generateQuestion(prev?: string) {
-      const aiAdvisor = new AiAdvisor(this.selectedNote.textContent);
-      const prompt = aiAdvisor.questionPrompt();
       const res = await this.api.ai.keepAskingAIToGenerateQuestionUntilStop(
-        prompt,
         this.selectedNote.id,
         prev,
         (_) => !this.isUnmounted

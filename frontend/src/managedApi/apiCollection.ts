@@ -296,14 +296,13 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
 
     async keepAskingAIToGenerateQuestionUntilStop(
-      prompt: string,
       noteId: Doughnut.ID,
       prev?: string,
       interimResultShouldContinue?: (suggestion: string) => boolean
     ): Promise<string> {
       const res = await this.askAiToGenerateQuestion(
         {
-          prompt,
+          prompt: "",
           incompleteAssistantMessage: prev ?? "",
         },
         noteId
@@ -313,7 +312,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
       }
       if (res.finishReason === "length") {
         return this.keepAskingAIToGenerateQuestionUntilStop(
-          prompt,
           noteId,
           res.suggestion,
           interimResultShouldContinue
