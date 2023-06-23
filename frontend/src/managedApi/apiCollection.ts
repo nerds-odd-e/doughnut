@@ -298,11 +298,9 @@ const apiCollection = (managedApi: ManagedApi) => ({
     async askAIToGenerateQuestion(
       noteId: Doughnut.ID
     ): Promise<Generated.QuizQuestionViewedByUser> {
-      return (
-        (await managedApi.restGet(
-          `ai/generate-question?note=${noteId}`
-        )) as Generated.AiQuestionTemporary
-      ).quizQuestion;
+      return (await managedApi.restGet(
+        `ai/generate-question?note=${noteId}`
+      )) as Generated.QuizQuestionViewedByUser;
     },
 
     async askAiEngagingStories(prompt: string) {

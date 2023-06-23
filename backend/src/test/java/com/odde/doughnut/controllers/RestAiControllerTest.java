@@ -9,9 +9,9 @@ import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AiEngagingStory;
-import com.odde.doughnut.entities.json.AiQuestionTemporary;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.entities.json.AiSuggestionRequest;
+import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
@@ -167,8 +167,8 @@ class RestAiControllerTest {
                   """
       {"question": "What is the first color in the rainbow?"}
       """));
-      AiQuestionTemporary aiQuestionTemporary = controller.generateQuestion(note);
-      assertThat(aiQuestionTemporary.getQuizQuestion().quizQuestion.getRawJsonQuestion())
+      QuizQuestionViewedByUser quizQuestionViewedByUser = controller.generateQuestion(note);
+      assertThat(quizQuestionViewedByUser.quizQuestion.getRawJsonQuestion())
           .contains("What is the first color in the rainbow?");
     }
 

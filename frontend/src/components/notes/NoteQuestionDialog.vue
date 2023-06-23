@@ -1,36 +1,16 @@
 <template>
-  <h2 v-if="!question">Generating question...</h2>
+  <h2 v-if="rawJsonQuestion === undefined">Generating question...</h2>
   <div v-else>
-    <h3>
-      {{ question.question }}
-    </h3>
-    <ol v-if="question.options" type="A">
-      <li
-        v-for="(option, index) in question.options"
-        :key="index"
-        @click="selectOption(index)"
-        :class="{
-          'is-correct': isSelectedOption(index) && option.correct,
-          'is-wrong': isSelectedOption(index) && !option.correct,
-        }"
-      >
-        {{ option.option }}
-      </li>
-    </ol>
+    <AIQuestion :raw-json-question="rawJsonQuestion" :key="numberOfTries" />
   </div>
-  <button
-    class="btn btn-secondary"
-    @click="generateQuestionAndResetSelectedOption"
-  >
-    Ask again
-  </button>
+  <button class="btn btn-secondary" @click="generateQuestion">Ask again</button>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import type { StorageAccessor } from "@/store/createNoteStorage";
-import { AiQuestion } from "@/models/AiAdvisor";
 import useLoadingApi from "../../managedApi/useLoadingApi";
+import AIQuestion from "../review/AIQuestion.vue";
 
 export default defineComponent({
   setup() {
@@ -43,36 +23,31 @@ export default defineComponent({
       required: false,
     },
   },
-  components: {},
+  components: { AIQuestion },
   data() {
     return {
-      question: undefined as AiQuestion | undefined,
-      selectedOptionIndex: undefined as number | undefined,
+      QuizQuestionViewedByUser: undefined as
+        | Generated.QuizQuestionViewedByUser
+        | undefined,
+      numberOfTries: 0,
       isUnmounted: false,
     };
   },
+  computed: {
+    rawJsonQuestion() {
+      return this.QuizQuestionViewedByUser?.quizQuestion?.rawJsonQuestion;
+    },
+  },
   methods: {
     async generateQuestion() {
-      const res = await this.api.ai.askAIToGenerateQuestion(
+      this.QuizQuestionViewedByUser = await this.api.ai.askAIToGenerateQuestion(
         this.selectedNote.id
       );
-
-      this.question = JSON.parse(res.quizQuestion.rawJsonQuestion);
-    },
-
-    async generateQuestionAndResetSelectedOption() {
-      this.selectedOptionIndex = undefined;
-      this.generateQuestion();
-    },
-    selectOption(optionIndex: number) {
-      this.selectedOptionIndex = optionIndex;
-    },
-    isSelectedOption(optionIndex: number) {
-      return this.selectedOptionIndex === optionIndex;
+      this.numberOfTries += 1;
     },
   },
   mounted() {
-    this.generateQuestionAndResetSelectedOption();
+    this.generateQuestion();
   },
   unmounted() {
     this.isUnmounted = true;

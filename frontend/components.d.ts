@@ -7,6 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AIQuestion: typeof import('./src/components/review/AIQuestion.vue')['default']
     AISuggestion: typeof import('./src/components/toolbars/AISuggestion.vue')['default']
     AnswerResult: typeof import('./src/components/review/AnswerResult.vue')['default']
     ApiStatus: typeof import('./src/components/toolbars/ApiStatus.vue')['default']
@@ -26,6 +27,7 @@ declare module 'vue' {
     ContentLoader: typeof import('./src/components/commons/ContentLoader.vue')['default']
     ControlCenter: typeof import('./src/components/toolbars/ControlCenter.vue')['default']
     ControlCenterForNote: typeof import('./src/components/toolbars/ControlCenterForNote.vue')['default']
+    copy: typeof import('./src/components/notes/NoteQuestionDialog copy.vue')['default']
     DescriptionEditor: typeof import('./src/components/form/DescriptionEditor.vue')['default']
     DragListner: typeof import('./src/components/commons/DragListner.vue')['default']
     EditableText: typeof import('./src/components/form/EditableText.vue')['default']

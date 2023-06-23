@@ -23,10 +23,7 @@ const createWrapper = async () => {
     .please();
   helper.apiMock
     .expectingGet(`/api/ai/generate-question?note=${note.id}`)
-    .andReturnOnce({
-      quizQuestion,
-      finishReason: "stop",
-    });
+    .andReturnOnce(quizQuestion);
   const wrapper = helper
     .component(NoteQuestionDialog)
     .withStorageProps({ selectedNote: note.note })

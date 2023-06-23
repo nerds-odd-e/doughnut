@@ -1,4 +1,4 @@
-export type AiQuestion = {
+export type AiQuestionModel = {
   question: string;
   options: AiQuestionOption[];
 };

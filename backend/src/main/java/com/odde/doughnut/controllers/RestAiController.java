@@ -2,9 +2,9 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AiEngagingStory;
-import com.odde.doughnut.entities.json.AiQuestionTemporary;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.entities.json.AiSuggestionRequest;
+import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteModel;
 import com.odde.doughnut.models.UserModel;
@@ -46,7 +46,7 @@ public class RestAiController {
   }
 
   @GetMapping("/generate-question")
-  public AiQuestionTemporary generateQuestion(@RequestParam(value = "note") Note note) {
+  public QuizQuestionViewedByUser generateQuestion(@RequestParam(value = "note") Note note) {
     currentUser.assertLoggedIn();
     NoteModel noteModel = modelFactoryService.toNoteModel(note);
     return aiAdvisorService.generateQuestion(noteModel.getChatMessagesForGenerateQuestion());
