@@ -17,12 +17,13 @@ public final class AiSuggestion {
         chatCompletionChoice.getMessage().getContent(), chatCompletionChoice.getFinishReason());
   }
 
-  public AiSuggestion prependPreviousIncompleteMessage(AiSuggestionRequest aiSuggestionRequest) {
-    String incompleteAssistantMessage = aiSuggestionRequest.getIncompleteMessageOrEmptyString();
+  public AiSuggestion prependPreviousIncompleteMessage(String incompleteAssistantMessage) {
     if (!Strings.isBlank(incompleteAssistantMessage)) {
       if (startWithCharacterFromSpaceDelimitedLanguage(suggestion)) {
         incompleteAssistantMessage += " ";
       }
+    } else {
+      incompleteAssistantMessage = "";
     }
     setSuggestion(incompleteAssistantMessage + suggestion);
     return this;
