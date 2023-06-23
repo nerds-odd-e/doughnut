@@ -45,7 +45,31 @@ public class RestAiController {
       @RequestBody AiSuggestionRequest aiSuggestionRequest) {
     currentUser.assertLoggedIn();
     NoteModel noteModel = modelFactoryService.toNoteModel(note);
+    aiSuggestionRequest.prompt = questionPrompt(note);
     return aiAdvisorService.getAiSuggestion(noteModel.getPath(), aiSuggestionRequest);
+  }
+
+  private String questionPrompt(Note note) {
+    return """
+      Given the note with title: %s
+      and description:
+      %s
+
+      please generate a multiple-choice question with 3 options and 1 correct option.
+      Please vary the option text length, so that the correct answer isn't always the longest one.
+      The response should be JSON-formatted as follows:
+        {
+          question: "",
+          options: [
+            {
+              option: "",
+              correct: true,
+              explanation: "",
+            },
+          ],
+        }
+      )}"""
+        .formatted(note.getTitle(), note.getTextContent().getDescription());
   }
 
   @PostMapping("/ask-engaging-stories")
