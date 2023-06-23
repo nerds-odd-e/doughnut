@@ -7,14 +7,14 @@ import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
 import com.odde.doughnut.services.AiAdvisorService;
-
 import java.sql.Timestamp;
 import java.util.Optional;
 
 public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFactoryService) {
-  public QuizQuestionViewedByUser getRandomQuizQuestion(Randomizer randomizer, User user, AiAdvisorService aiAdvisorService) {
+  public QuizQuestionViewedByUser getRandomQuizQuestion(
+      Randomizer randomizer, User user, AiAdvisorService aiAdvisorService) {
     return QuizQuestionViewedByUser.create(
-        generateAQuizQuestion(randomizer, user, aiAdvisorService), modelFactoryService, user );
+        generateAQuizQuestion(randomizer, user, aiAdvisorService), modelFactoryService, user);
   }
 
   public ReviewPoint getEntity() {
@@ -28,10 +28,11 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
     updateForgettingCurve(0);
   }
 
-  public QuizQuestion generateAQuizQuestion(Randomizer randomizer, User user, AiAdvisorService aiAdvisorService) {
+  public QuizQuestion generateAQuizQuestion(
+      Randomizer randomizer, User user, AiAdvisorService aiAdvisorService) {
     return randomizer.shuffle(entity.availableQuestionTypes(user)).stream()
         .map(type -> new QuizQuestionDirector(entity, type, randomizer, modelFactoryService))
-        .map(QuizQuestionDirector::buildQuizQuestion)
+        .map(quizQuestionDirector -> quizQuestionDirector.buildQuizQuestion(aiAdvisorService))
         .flatMap(Optional::stream)
         .findFirst()
         .orElseGet(() -> entity.createAQuizQuestionOfType(QuizQuestion.QuestionType.JUST_REVIEW));

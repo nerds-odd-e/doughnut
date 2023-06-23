@@ -7,6 +7,7 @@ import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.entities.Thingy;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Randomizer;
+import com.odde.doughnut.services.AiAdvisorService;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -17,14 +18,14 @@ public record QuizQuestionDirector(
     Randomizer randomizer,
     ModelFactoryService modelFactoryService) {
 
-  public Optional<QuizQuestion> buildQuizQuestion() {
+  public Optional<QuizQuestion> buildQuizQuestion(AiAdvisorService aiAdvisorService) {
     QuizQuestionFactory quizQuestionFactory = buildQuizQuestionFactory();
 
     if (!quizQuestionFactory.isValidQuestion()) return Optional.empty();
 
     QuizQuestion quizQuestion = reviewPoint.createAQuizQuestionOfType(questionType);
 
-    quizQuestionFactory.fillQuizQuestion(quizQuestion);
+    quizQuestionFactory.fillQuizQuestion(quizQuestion, aiAdvisorService);
 
     if (quizQuestionFactory instanceof QuestionOptionsFactory optionsFactory) {
       List<Thingy> optionsEntities = optionsFactory.getOptionEntities();

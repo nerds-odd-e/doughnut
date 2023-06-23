@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.entities.json.AiSuggestionRequest;
@@ -49,7 +50,12 @@ public class RestAiController {
   public QuizQuestionViewedByUser generateQuestion(@RequestParam(value = "note") Note note) {
     currentUser.assertLoggedIn();
     NoteModel noteModel = modelFactoryService.toNoteModel(note);
-    return aiAdvisorService.generateQuestion(noteModel.getChatMessagesForGenerateQuestion());
+    String suggestion =
+        aiAdvisorService.generateQuestion(noteModel.getChatMessagesForGenerateQuestion());
+    QuizQuestion quizQuestion = new QuizQuestion();
+    quizQuestion.setQuestionType(QuizQuestion.QuestionType.AI_QUESTION);
+    quizQuestion.setRawJsonQuestion(suggestion);
+    return new QuizQuestionViewedByUser(quizQuestion, null, null);
   }
 
   @PostMapping("/ask-engaging-stories")

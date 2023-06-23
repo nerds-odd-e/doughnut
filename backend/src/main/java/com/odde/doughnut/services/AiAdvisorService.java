@@ -1,9 +1,7 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
-import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.services.openAiApis.OpenAiAPIChatCompletion;
 import com.odde.doughnut.services.openAiApis.OpenAiAPIImage;
 import com.theokanning.openai.OpenAiApi;
@@ -26,14 +24,9 @@ public class AiAdvisorService {
         .prependPreviousIncompleteMessage(incompleteAssistantMessage);
   }
 
-  public QuizQuestionViewedByUser generateQuestion(List<ChatMessage> messages) {
+  public String generateQuestion(List<ChatMessage> messages) {
     AiSuggestion openAiCompletion = openAiAPIChatCompletion.getOpenAiCompletion(messages, 1100);
-    QuizQuestion quizQuestion = new QuizQuestion();
-    quizQuestion.setQuestionType(QuizQuestion.QuestionType.AI_QUESTION);
-    quizQuestion.setRawJsonQuestion(openAiCompletion.getSuggestion());
-    QuizQuestionViewedByUser quizQuestionViewedByUser =
-        new QuizQuestionViewedByUser(quizQuestion, null, null);
-    return quizQuestionViewedByUser;
+    return openAiCompletion.getSuggestion();
   }
 
   public AiEngagingStory getEngagingStory(String prompt) {

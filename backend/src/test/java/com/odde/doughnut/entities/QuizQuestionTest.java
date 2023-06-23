@@ -136,16 +136,14 @@ class QuizQuestionTest {
       userModel.getEntity().setAiQuestionTypeOnlyForReview(true);
       ReviewPointModel reviewPoint = getReviewPointModel(note);
       AiAdvisorService aiAdvisorService = mock(AiAdvisorService.class);
-//      QuizQuestion quizQuestion = new QuizQuestion();
-//      QuizQuestionViewedByUser quizQuestionViewedByUser = new QuizQuestionViewedByUser(quizQuestion, null, null);
-//      quizQuestionViewedByUser.quizQuestion.setRawJsonQuestion("what is the meaning of life?");
-//      when(aiAdvisorService.generateQuestion(any()))
-//        .thenReturn(quizQuestionViewedByUser);
+      when(aiAdvisorService.generateQuestion(any()))
+          .thenReturn("{\"question\": \"wat is the meaning of life?\"}");
       QuizQuestion randomQuizQuestion =
-          reviewPoint.generateAQuizQuestion(new RealRandomizer(), userModel.getEntity(), aiAdvisorService);
+          reviewPoint.generateAQuizQuestion(
+              new RealRandomizer(), userModel.getEntity(), aiAdvisorService);
       assertThat(
           randomQuizQuestion.getQuestionType(), equalTo(QuizQuestion.QuestionType.AI_QUESTION));
-      assertThat(randomQuizQuestion.getRawJsonQuestion(), containsString("what"));
+      assertThat(randomQuizQuestion.getRawJsonQuestion(), containsString("wat"));
     }
 
     @Test
