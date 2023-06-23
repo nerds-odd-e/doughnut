@@ -31,6 +31,7 @@ public class AiAdvisorService {
     AiSuggestion openAiCompletion = openAiAPIChatCompletion.getOpenAiCompletion(messages, 1100);
     QuizQuestion quizQuestion = new QuizQuestion();
     quizQuestion.setQuestionType(QuizQuestion.QuestionType.AI_QUESTION);
+    quizQuestion.setRawJsonQuestion(openAiCompletion.getSuggestion());
     QuizQuestionViewedByUser quizQuestionViewedByUser =
         new QuizQuestionViewedByUser(quizQuestion, null, null);
     return new AiQuestionTemporary(openAiCompletion.getSuggestion(), quizQuestionViewedByUser);

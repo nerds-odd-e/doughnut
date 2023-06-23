@@ -161,10 +161,15 @@ class RestAiControllerTest {
 
     @Test
     void createQuizQuestion() {
-      when(openAiApi.createChatCompletion(any())).thenReturn(buildCompletionResult("blue planet"));
+      when(openAiApi.createChatCompletion(any()))
+          .thenReturn(
+              buildCompletionResult(
+                  """
+      {"question": "What is the first color in the rainbow?"}
+      """));
       AiQuestionTemporary aiQuestionTemporary = controller.generateQuestion(note);
-      //      assertThat(aiQuestionTemporary.getQuizQuestion().description).contains("What goes
-      // up,");
+      assertThat(aiQuestionTemporary.getQuizQuestion().quizQuestion.getRawJsonQuestion())
+          .contains("What is the first color in the rainbow?");
     }
 
     @Test

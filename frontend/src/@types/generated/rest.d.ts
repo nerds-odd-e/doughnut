@@ -267,6 +267,7 @@ declare namespace Generated {
         id: number;
         reviewPoint: number;
         questionTypeId: number;
+        rawJsonQuestion: string;
         categoryLink: number;
         optionThingIds: string;
         viceReviewPointIds: string;
