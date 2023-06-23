@@ -22,7 +22,8 @@ import org.apache.logging.log4j.util.Strings;
 public class QuizQuestion {
 
   public Boolean isAnswerCorrect(Note answerNote, String spellingAnswer) {
-    if (getQuestionType() == QuestionType.JUST_REVIEW) {
+    if (getQuestionType() == QuestionType.JUST_REVIEW
+        || getQuestionType() == QuestionType.AI_QUESTION) {
       return spellingAnswer.equals("yes");
     }
     return buildPresenter().knownRightAnswers().stream()

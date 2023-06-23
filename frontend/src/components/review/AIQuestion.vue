@@ -5,6 +5,7 @@
   <ol v-if="question.options" type="A">
     <li
       v-for="(option, index) in question.options"
+      role="button"
       :key="index"
       @click="selectOption(index)"
       :class="{
@@ -25,6 +26,7 @@ export default defineComponent({
   props: {
     rawJsonQuestion: { type: String, required: true },
   },
+  emits: ["selfEvaluatedMemoryState"],
   components: {},
   data() {
     return {
@@ -35,6 +37,10 @@ export default defineComponent({
   methods: {
     selectOption(optionIndex: number) {
       this.selectedOptionIndex = optionIndex;
+      this.$emit(
+        "selfEvaluatedMemoryState",
+        this.question.options[optionIndex]?.correct ? "yes" : "no"
+      );
     },
     isSelectedOption(optionIndex: number) {
       return this.selectedOptionIndex === optionIndex;

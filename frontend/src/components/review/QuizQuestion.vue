@@ -23,6 +23,7 @@
     <AIQuestion
       v-if="quizQuestion?.questionType === 'AI_QUESTION'"
       :raw-json-question="quizQuestion.quizQuestion.rawJsonQuestion"
+      @self-evaluated-memory-state="submitAnswer({ spellingAnswer: $event })"
     />
     <div v-if="quizQuestion?.questionType === 'JUST_REVIEW'">
       <ReviewPointAsync
