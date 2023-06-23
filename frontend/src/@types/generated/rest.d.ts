@@ -7,6 +7,10 @@ declare namespace Generated {
         engagingStory: string;
     }
 
+    interface AiQuestionTemporary {
+        suggestion: string;
+    }
+
     interface AiSuggestion {
         suggestion: string;
         finishReason: string;
