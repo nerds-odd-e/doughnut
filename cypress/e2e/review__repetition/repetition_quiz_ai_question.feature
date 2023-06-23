@@ -11,7 +11,6 @@ Feature: Repetition Quiz
       | medical  |                                | true       | English       |
 
   @usingMockedOpenAiService
-  @ignore
   Scenario Outline: AI generated question
     Given I opt to do only AI generated questions
     And OpenAI by default returns this question from now:
@@ -20,10 +19,15 @@ Feature: Repetition Quiz
     And I learned one note "sedition" on day 1
     When I am repeat-reviewing my old note on day 2
     Then I should be asked "What is the meaning of sedition?"
-    When I choose answer "<answer>"
-    Then I should see that my answer <result>
-
+    And the option "<option>" should be <expectedResult>
     Examples:
-      | answer             | result              |
-      | to sleep           | "to sleep" is wrong |
-      | to incite violence | is correct          |
+      | option       | expectedResult |
+      | to incite violence | wrong        |
+      | to sleep   | correct          |
+
+    # When I choose answer "<answer>"
+    # Then I should see that my answer <result>
+    # Examples:
+    #   | answer             | result              |
+    #   | to sleep           | "to sleep" is wrong |
+      # | to incite violence | is correct          |

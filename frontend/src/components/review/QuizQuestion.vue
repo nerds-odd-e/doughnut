@@ -20,6 +20,10 @@
   </div>
 
   <div class="quiz-answering">
+    <AIQuestion
+      v-if="quizQuestion?.questionType === 'AI_QUESTION'"
+      :raw-json-question="quizQuestion.quizQuestion.rawJsonQuestion"
+    />
     <div v-if="quizQuestion?.questionType === 'JUST_REVIEW'">
       <ReviewPointAsync
         v-bind="{
@@ -122,6 +126,7 @@ import { defineComponent, PropType } from "vue";
 import ShowPicture from "../notes/ShowPicture.vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import TextInput from "../form/TextInput.vue";
+import AIQuestion from "./AIQuestion.vue";
 import ReviewPointAsync from "./ReviewPointAsync.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopups";
@@ -148,6 +153,7 @@ export default defineComponent({
     TextInput,
     ReviewPointAsync,
     SelfEvaluateButtons,
+    AIQuestion,
   },
   emits: ["answered"],
   data() {
