@@ -424,11 +424,6 @@ Then("I should find an art created by the ai", () => {
   cy.get("img.ai-art").should("be.visible")
 })
 
-Then("I try to submit again immediately", () => {
-  cy.get("form").submit()
-  cy.pageIsNotLoading()
-})
-
 Given("I ask to complete the description for note {string}", (noteTitle: string) => {
   cy.aiSuggestDescriptionForNote(noteTitle)
 })

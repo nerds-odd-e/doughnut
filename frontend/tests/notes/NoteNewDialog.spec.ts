@@ -32,6 +32,30 @@ describe("adding new note", () => {
     expect(wrapper.text()).toContain("mythical");
   });
 
+  describe("submit form", () => {
+    let wrapper: VueWrapper<ComponentPublicInstance>;
+
+    beforeEach(async () => {
+      wrapper = helper
+        .component(NoteNewDialog)
+        .withStorageProps({ parentId: 123 })
+        .mount({ attachTo: document.body });
+      await wrapper.find("input#note-title").setValue("note title");
+      vi.clearAllTimers();
+    });
+
+    it("call the api", async () => {
+      helper.apiMock.expectingPost(`/api/notes/123/create`);
+      await wrapper.find("form").trigger("submit");
+    });
+
+    it("call the api once only", async () => {
+      helper.apiMock.expectingPost(`/api/notes/123/create`);
+      await wrapper.find("form").trigger("submit");
+      await wrapper.find("form").trigger("submit");
+    });
+  });
+
   describe("search wikidata entry", () => {
     let wrapper: VueWrapper<ComponentPublicInstance>;
 
