@@ -76,6 +76,7 @@ class RestAiControllerTest {
       when(openAiApi.createChatCompletion(
               argThat(
                   request -> {
+                    assertThat(request.getMaxTokens()).isLessThan(200);
                     assertThat(request.getMessages()).hasSize(2);
                     assertEquals("describe Earth", request.getMessages().get(1).getContent());
                     assertThat(request.getMessages().get(0).getContent())
@@ -155,6 +156,18 @@ class RestAiControllerTest {
           () ->
               new RestAiController(openAiApi, makeMe.modelFactoryService, makeMe.aNullUserModel())
                   .generateQuestion(note, params));
+    }
+
+    @Test
+    void usingABiggerMaxToken() {
+      when(openAiApi.createChatCompletion(
+              argThat(
+                  request -> {
+                    assertThat(request.getMaxTokens()).isGreaterThan(1000);
+                    return true;
+                  })))
+          .thenReturn(buildCompletionResult("blue planet"));
+      controller.generateQuestion(note, params);
     }
   }
 

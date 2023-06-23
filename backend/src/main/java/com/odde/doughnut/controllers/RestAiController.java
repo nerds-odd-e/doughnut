@@ -46,7 +46,7 @@ public class RestAiController {
     currentUser.assertLoggedIn();
     NoteModel noteModel = modelFactoryService.toNoteModel(note);
     aiSuggestionRequest.prompt = questionPrompt(note);
-    return aiAdvisorService.getAiSuggestion(noteModel.getPath(), aiSuggestionRequest);
+    return aiAdvisorService.generateQuestion(noteModel.getPath(), aiSuggestionRequest);
   }
 
   private String questionPrompt(Note note) {

@@ -18,7 +18,13 @@ public class AiAdvisorService {
 
   public AiSuggestion getAiSuggestion(String context, AiSuggestionRequest aiSuggestionRequest) {
     return openAiAPIChatCompletion
-        .getOpenAiCompletion(aiSuggestionRequest.getChatMessages(context))
+        .getOpenAiCompletion(aiSuggestionRequest.getChatMessages(context), 100)
+        .prependPreviousIncompleteMessage(aiSuggestionRequest);
+  }
+
+  public AiSuggestion generateQuestion(String context, AiSuggestionRequest aiSuggestionRequest) {
+    return openAiAPIChatCompletion
+        .getOpenAiCompletion(aiSuggestionRequest.getChatMessages(context), 1100)
         .prependPreviousIncompleteMessage(aiSuggestionRequest);
   }
 

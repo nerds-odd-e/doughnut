@@ -14,11 +14,11 @@ public class OpenAiAPIChatCompletion extends OpenAiApiHandlerBase {
     this.openAiApi = openAiApi;
   }
 
-  public AiSuggestion getOpenAiCompletion(List<ChatMessage> chatMessages) {
+  public AiSuggestion getOpenAiCompletion(List<ChatMessage> chatMessages, int maxTokens) {
     return withExceptionHandler(
         () ->
             openAiApi
-                .createChatCompletion(getChatCompletionRequest(chatMessages))
+                .createChatCompletion(getChatCompletionRequest(chatMessages, maxTokens))
                 .blockingGet()
                 .getChoices()
                 .stream()
@@ -27,7 +27,8 @@ public class OpenAiAPIChatCompletion extends OpenAiApiHandlerBase {
                 .orElse(null));
   }
 
-  private static ChatCompletionRequest getChatCompletionRequest(List<ChatMessage> messages) {
+  private static ChatCompletionRequest getChatCompletionRequest(
+      List<ChatMessage> messages, int maxTokens) {
 
     return ChatCompletionRequest.builder()
         .model("gpt-3.5-turbo")
@@ -35,7 +36,7 @@ public class OpenAiAPIChatCompletion extends OpenAiApiHandlerBase {
         .n(1)
         // This can go higher (up to 4000 - prompt size), but openAI performance goes down
         // https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
-        .maxTokens(100)
+        .maxTokens(maxTokens)
         //
         // an effort has been made to make the api call more responsive by using stream(true)
         // however, due to the library limitation, we cannot do it yet.
