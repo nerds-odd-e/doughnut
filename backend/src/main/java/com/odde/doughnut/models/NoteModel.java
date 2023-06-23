@@ -62,4 +62,27 @@ public class NoteModel {
   public String getPath() {
     return entity.getAncestors().stream().map(Note::getTitle).collect(Collectors.joining(" › "));
   }
+
+  public String questionPrompt() {
+    return """
+      Given the note with title: %s
+      and description:
+      %s
+
+      please generate a multiple-choice question with 3 options and 1 correct option.
+      Please vary the option text length, so that the correct answer isn't always the longest one.
+      The response should be JSON-formatted as follows:
+        {
+          question: "",
+          options: [
+            {
+              option: "",
+              correct: true,
+              explanation: "",
+            },
+          ],
+        }
+      )}"""
+        .formatted(entity.getTitle(), entity.getTextContent().getDescription());
+  }
 }

@@ -20,7 +20,8 @@ public class AiSuggestionRequest {
 
   public List<ChatMessage> getChatMessages(String context) {
     List<ChatMessage> messages = new ArrayList<>();
-    messages.add(new ChatMessage(ChatMessageRole.SYSTEM.value(), contextTemplate + context));
+    String content = contextTemplate + context;
+    messages.add(new ChatMessage(ChatMessageRole.SYSTEM.value(), content));
     messages.add(new ChatMessage(ChatMessageRole.USER.value(), prompt));
     if (!Strings.isEmpty(incompleteAssistantMessage)) {
       messages.add(new ChatMessage(ChatMessageRole.ASSISTANT.value(), incompleteAssistantMessage));

@@ -24,9 +24,8 @@ public class AiAdvisorService {
 
   public AiSuggestion generateQuestion(String context, String prompt) {
     AiSuggestionRequest aiSuggestionRequest = new AiSuggestionRequest(prompt, "");
-    return openAiAPIChatCompletion
-        .getOpenAiCompletion(aiSuggestionRequest.getChatMessages(context), 1100)
-        .prependPreviousIncompleteMessage(aiSuggestionRequest);
+    return openAiAPIChatCompletion.getOpenAiCompletion(
+        aiSuggestionRequest.getChatMessages(context), 1100);
   }
 
   public AiEngagingStory getEngagingStory(String prompt) {
