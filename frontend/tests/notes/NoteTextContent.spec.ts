@@ -123,4 +123,16 @@ describe("in place edit on title", () => {
     // no api calls expected. Test will fail if there is any.
     // because the initial description is not changed.
   });
+
+  it("when there is pending changes not saved but the previous change trigger refresh", async () => {
+    note.textContent.description = "initial\n\ndescription";
+    const wrapper = mountComponent(note);
+    await wrapper.find('[role="title"]').trigger("click");
+    await wrapper.find('[role="title"] input').setValue("updated");
+    await wrapper.setProps({ textContent: { title: "change from outside." } });
+    expect(
+      wrapper.find<HTMLInputElement>('[role="title"] input').element.value
+    ).toBe("updated");
+    helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
+  });
 });

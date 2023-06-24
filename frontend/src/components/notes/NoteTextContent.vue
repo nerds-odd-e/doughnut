@@ -71,17 +71,20 @@ export default defineComponent({
     return {
       localTextContent: { ...this.textContent } as Generated.TextContent,
       errors: {} as Record<string, string>,
+      rivision: 0,
     };
   },
   watch: {
     textContent: {
       handler(newValue) {
+        if (this.rivision !== 0) return;
         this.localTextContent = { ...newValue };
       },
       deep: true,
     },
     localTextContent: {
       handler(newValue) {
+        this.rivision += 1;
         this.errors = {};
         if (!this.submitChange) {
           return;
@@ -113,6 +116,7 @@ export default defineComponent({
       if (!this.isMeaningfulChange(newValue)) {
         return;
       }
+      const currentRivision = this.rivision;
       this.storageAccessor
         .api(this.$router)
         .updateTextContent(this.noteId, newValue, this.textContent)
@@ -125,6 +129,10 @@ export default defineComponent({
             return;
           }
           this.errors = errors;
+        })
+        .finally(() => {
+          if (this.rivision !== currentRivision) return;
+          this.rivision = 0;
         });
     }, 1000);
   },
