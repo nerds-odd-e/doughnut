@@ -12,7 +12,8 @@
       v-else
       v-focus
       class="editor"
-      v-model="localValue"
+      :model-value="modelValue"
+      @update:model-value="$emit('update:modelValue', $event)"
       :scope-name="scopeName"
       :field="field"
       :title="title"
@@ -45,19 +46,12 @@ export default defineComponent({
   },
   data() {
     return {
-      localValue: this.modelValue as string | undefined,
       isEditing: false,
     };
-  },
-  watch: {
-    localValue() {
-      this.$emit("update:modelValue", this.localValue);
-    },
   },
   methods: {
     startEditing() {
       if (this.isEditing) return;
-      this.localValue = this.modelValue;
       this.isEditing = true;
     },
     onEnterKey(event) {
