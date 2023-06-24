@@ -2,12 +2,13 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.TextContent;
+import com.odde.doughnut.entities.json.NoteRealm;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
-import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +39,7 @@ class RestTextContentController {
 
   @PatchMapping(path = "/{note}")
   @Transactional
-  public List<Integer> updateNote(
+  public NoteRealm updateNote(
       @PathVariable(name = "note") Note note, @Valid @ModelAttribute TextContent textContent)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
@@ -47,6 +48,6 @@ class RestTextContentController {
     note.getTextContent().updateTextContent(textContent, currentUTCTimestamp);
 
     modelFactoryService.noteRepository.save(note);
-    return List.of(note.getId());
+    return new NoteViewer(currentUser.getEntity(), note).toJsonObject();
   }
 }
