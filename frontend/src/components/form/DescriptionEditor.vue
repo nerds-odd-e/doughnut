@@ -5,7 +5,7 @@
     :options="editorOptions"
     :content-type="'html'"
     @blur="onBlurTextField"
-    @text-change="onTextChange"
+    @update:content="onTextChange"
     @focus="hadFocus = true"
   />
 </template>

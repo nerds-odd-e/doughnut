@@ -4,7 +4,8 @@
       role="title"
       class="note-title"
       scope-name="note"
-      v-model="localTextContent.title"
+      :model-value="localTextContent.title"
+      @update:model-value="onUpdateTitle"
       @blur="onBlurTextField"
       :errors="errors.title"
     />
@@ -17,7 +18,8 @@
       v-if="size === 'large'"
       class="note-description"
       scope-name="note"
-      v-model="localTextContent.description"
+      :model-value="localTextContent.description"
+      @update:model-value="onUpdateDescription"
       @blur="onBlurTextField"
     />
     <NoteShortDescription
@@ -71,30 +73,35 @@ export default defineComponent({
     return {
       localTextContent: { ...this.textContent } as Generated.TextContent,
       errors: {} as Record<string, string>,
-      rivision: 0,
+      revision: 0,
     };
   },
   watch: {
     textContent: {
       handler(newValue) {
-        if (this.rivision !== 0) return;
+        if (this.revision !== 0) return;
         this.localTextContent = { ...newValue };
-      },
-      deep: true,
-    },
-    localTextContent: {
-      handler(newValue) {
-        this.rivision += 1;
-        this.errors = {};
-        if (!this.submitChange) {
-          return;
-        }
-        this.submitChange(newValue);
       },
       deep: true,
     },
   },
   methods: {
+    onUpdateTitle(newValue: string) {
+      this.localTextContent.title = newValue;
+      this.saveChange();
+    },
+    onUpdateDescription(newValue: string) {
+      this.localTextContent.description = newValue;
+      this.saveChange();
+    },
+    saveChange() {
+      this.revision += 1;
+      this.errors = {};
+      if (!this.submitChange) {
+        return;
+      }
+      this.submitChange(this.localTextContent);
+    },
     onBlurTextField() {
       if (!this.submitChange) {
         return;
@@ -116,7 +123,7 @@ export default defineComponent({
       if (!this.isMeaningfulChange(newValue)) {
         return;
       }
-      const currentRivision = this.rivision;
+      const currentRivision = this.revision;
       this.storageAccessor
         .api(this.$router)
         .updateTextContent(this.noteId, newValue, this.textContent)
@@ -131,8 +138,8 @@ export default defineComponent({
           this.errors = errors;
         })
         .finally(() => {
-          if (this.rivision !== currentRivision) return;
-          this.rivision = 0;
+          if (this.revision !== currentRivision) return;
+          this.revision = 0;
         });
     }, 1000);
   },
