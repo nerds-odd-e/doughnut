@@ -39,7 +39,7 @@ export interface StoredApi {
     noteId: Doughnut.ID,
     noteContentData: Omit<Generated.TextContent, "updatedAt">,
     oldContent: Generated.TextContent
-  ): Promise<Generated.NoteRealm>;
+  ): Promise<void>;
 
   updateWikidataId(
     noteId: Doughnut.ID,
@@ -186,9 +186,7 @@ export default class StoredApiCollection implements StoredApi {
     oldContent: Generated.TextContent
   ) {
     this.noteEditingHistory.addEditingToUndoHistory(noteId, oldContent);
-    return this.storage.refreshNoteRealm(
-      await this.updateTextContentWithoutUndo(noteId, noteContentData)
-    );
+    await this.updateTextContentWithoutUndo(noteId, noteContentData);
   }
 
   private async undoInner() {
