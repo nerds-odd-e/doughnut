@@ -10,7 +10,7 @@
     >
     </RepeatProgressBar>
   </div>
-  <template v-if="!minimized && toRepeat != undefined">
+  <template v-if="toRepeat != undefined">
     <Quiz
       v-if="toRepeatCount !== 0"
       :minimized="minimized"
@@ -18,7 +18,7 @@
       :storage-accessor="storageAccessor"
       @answered="onAnswered($event)"
     />
-    <template v-else>
+    <template v-else-if="!minimized">
       <div class="alert alert-success">
         You have finished all repetitions for this half a day!
       </div>

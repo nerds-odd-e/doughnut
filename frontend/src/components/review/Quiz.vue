@@ -1,5 +1,5 @@
 <template>
-  <div class="content">
+  <div v-if="!minimized" class="content">
     <div class="inner-box">
       <template v-if="currentQuizQuestion">
         <QuizQuestion
