@@ -60,6 +60,6 @@
     "typescript": "5.0.4"
   },
   "dependencies": {
-    "@cucumber/cucumber": "^9.1"
+    "@cucumber/cucumber": "^9.2"
   }
 }
