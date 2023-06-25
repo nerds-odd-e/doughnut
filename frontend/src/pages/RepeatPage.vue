@@ -10,60 +10,37 @@
     >
     </RepeatProgressBar>
   </div>
-  <template v-if="!minimized">
-    <div class="content">
-      <div class="inner-box">
-        <template v-if="currentQuizQuestion">
-          <QuizQuestion
-            v-bind="{
-              quizQuestion: currentQuizQuestion,
-              storageAccessor,
-            }"
-            @answered="onAnswered($event)"
-            :key="currentQuizQuestion.quizQuestion.reviewPoint"
-          />
-        </template>
-        <template
-          v-else-if="
-            toRepeat !== undefined && toRepeat.length === currentQuestionIndex
-          "
-        >
-          <div class="alert alert-success">
-            You have finished all repetitions for this half a day!
-          </div>
-          <div>
-            <button
-              role="button"
-              class="btn btn-secondary"
-              @click="loadMore(3)"
-            >
-              Load more from next 3 days
-            </button>
-            <button
-              role="button"
-              class="btn btn-secondary"
-              @click="loadMore(7)"
-            >
-              Load more from next 7 days
-            </button>
-            <button
-              role="button"
-              class="btn btn-secondary"
-              @click="loadMore(14)"
-            >
-              Load more from next 14 days
-            </button>
-          </div>
-        </template>
+  <template v-if="!minimized && toRepeat != undefined">
+    <Quiz
+      v-if="toRepeatCount !== 0"
+      :minimized="minimized"
+      :to-repeat="toRepeat"
+      :storage-accessor="storageAccessor"
+      @answered="onAnswered($event)"
+    />
+    <template v-else>
+      <div class="alert alert-success">
+        You have finished all repetitions for this half a day!
       </div>
-    </div>
+      <div>
+        <button role="button" class="btn btn-secondary" @click="loadMore(3)">
+          Load more from next 3 days
+        </button>
+        <button role="button" class="btn btn-secondary" @click="loadMore(7)">
+          Load more from next 7 days
+        </button>
+        <button role="button" class="btn btn-secondary" @click="loadMore(14)">
+          Load more from next 14 days
+        </button>
+      </div>
+    </template>
   </template>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import _ from "lodash";
-import QuizQuestion from "../components/review/QuizQuestion.vue";
+import Quiz from "../components/review/Quiz.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
 import { StorageAccessor } from "../store/createNoteStorage";
@@ -81,16 +58,13 @@ export default defineComponent({
     },
   },
   components: {
-    QuizQuestion,
+    Quiz,
     RepeatProgressBar,
   },
   data() {
     return {
       toRepeat: undefined as number[] | undefined,
-      currentQuestionIndex: 0,
-      currentQuizQuestion: undefined as
-        | Generated.QuizQuestionViewedByUser
-        | undefined,
+      toRepeatCount: 0,
       previousResults: [] as Generated.AnswerResult[],
       previousResultCursor: undefined as number | undefined,
     };
@@ -102,9 +76,6 @@ export default defineComponent({
     },
     finished() {
       return this.previousResults.length;
-    },
-    toRepeatCount() {
-      return (this.toRepeat?.length || 0) - this.currentQuestionIndex;
     },
   },
   methods: {
@@ -118,59 +89,27 @@ export default defineComponent({
       this.$router.push({ name: "repeat" });
     },
 
-    selectPosition() {
-      this.storageAccessor.selectPosition(
-        undefined,
-        this.currentQuizQuestion?.notebookPosition
-      );
-    },
-
     async loadMore(dueInDays?: number) {
       this.toRepeat = (
         await this.api.reviewMethods.getDueReviewPoints(dueInDays)
       ).toRepeat;
-      this.currentQuestionIndex = 0;
+      this.toRepeatCount = this.toRepeat.length;
       if (this.toRepeat?.length === 0) {
         return;
       }
       if (this.api.testability.getEnvironment() !== "testing") {
         this.toRepeat = _.shuffle(this.toRepeat);
       }
-      await this.fetchQuestion();
-    },
-
-    async fetchQuestion() {
-      if (
-        !this.toRepeat ||
-        this.toRepeat.length === this.currentQuestionIndex
-      ) {
-        this.currentQuizQuestion = undefined;
-        return;
-      }
-      this.currentQuizQuestion =
-        await this.api.reviewMethods.getRandomQuestionForReviewPoint(
-          this.toRepeat[this.currentQuestionIndex] as number
-        );
-      this.selectPosition();
     },
 
     onAnswered(answerResult: Generated.AnswerResult) {
       this.previousResults.push(answerResult);
-      this.currentQuestionIndex += 1;
+      this.toRepeatCount -= 1;
       if (!answerResult.correct) {
         this.viewLastResult(this.previousResults.length - 1);
       }
-      this.fetchQuestion();
     },
   },
-  watch: {
-    minimized() {
-      if (!this.minimized) {
-        this.selectPosition();
-      }
-    },
-  },
-
   async mounted() {
     this.loadMore(0);
   },

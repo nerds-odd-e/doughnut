@@ -97,6 +97,7 @@ declare module 'vue' {
     PopButton: typeof import('./src/components/commons/Popups/PopButton.vue')['default']
     Popups: typeof import('./src/components/commons/Popups/Popups.vue')['default']
     ProgressBar: typeof import('./src/components/commons/ProgressBar.vue')['default']
+    Quiz: typeof import('./src/components/review/Quiz.vue')['default']
     QuizQuestion: typeof import('./src/components/review/QuizQuestion.vue')['default']
     RadioButtons: typeof import('./src/components/form/RadioButtons.vue')['default']
     RepeatProgressBar: typeof import('./src/components/review/RepeatProgressBar.vue')['default']
