@@ -76,6 +76,7 @@ export default defineConfig({
   base: "/",
   build: {
     outDir: "../backend/src/main/resources/static",
+    chunkSizeWarningLimit: 1000,
     sourcemap: true,
     rollupOptions: {
       input: {

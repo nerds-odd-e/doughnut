@@ -13,7 +13,7 @@
           <a title="Go back to review">
             <SvgResume width="30" height="30" />
           </a>
-          <ReviewPointAbbr v-bind="{ reviewPoint }" />
+          <ReviewPointAbbr v-if="reviewPoint" v-bind="{ reviewPoint }" />
         </div>
       </template>
     </ProgressBar>

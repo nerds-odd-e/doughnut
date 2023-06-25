@@ -42,7 +42,11 @@
       @close_request="resolve(null)"
     >
       <template #body>
-        <component :is="popupInfo.slot" v-bind="{ doneHandler: resolve }" />
+        <component
+          v-if="popupInfo.slot"
+          :is="popupInfo.slot"
+          v-bind="{ doneHandler: resolve }"
+        />
       </template>
     </Modal>
   </template>
