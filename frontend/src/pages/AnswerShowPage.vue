@@ -11,7 +11,7 @@
         ]"
       />
       <QuizQuestion
-        v-if="showQuiz === 'quiz'"
+        v-if="showQuiz === 'quiz' && answerResult?.quizQuestion"
         v-bind="{ quizQuestion: answerResult?.quizQuestion, storageAccessor }"
       />
       <div v-else-if="reviewPoint">
