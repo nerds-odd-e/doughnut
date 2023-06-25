@@ -111,10 +111,7 @@ export default defineComponent({
     isMeaningfulChange(newValue: Generated.TextContent) {
       return (
         newValue.title !== this.textContent.title ||
-        !(
-          newValue.description === this.textContent.description ||
-          newValue.description === `<p>${this.textContent.description}</p>`
-        )
+        newValue.description !== this.textContent.description
       );
     },
   },

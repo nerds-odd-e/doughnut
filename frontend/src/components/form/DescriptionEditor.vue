@@ -5,7 +5,7 @@
     :options="editorOptions"
     :content-type="'html'"
     @blur="onBlurTextField"
-    @update:content="onTextChange"
+    @update:content="onUpdateContent"
     @focus="hadFocus = true"
   />
 </template>
@@ -56,7 +56,10 @@ export default defineComponent({
     },
   },
   methods: {
-    onTextChange() {
+    onUpdateContent() {
+      if (this.localValue === `<p>${this.modelValue}</p>`) {
+        return;
+      }
       this.$emit("update:modelValue", this.localValue);
     },
     onBlurTextField() {
