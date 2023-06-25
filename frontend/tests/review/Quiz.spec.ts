@@ -17,23 +17,17 @@ describe("repeat page", () => {
   };
 
   describe('repeat page with "just review" quiz', () => {
-    let quizQuestion: Generated.QuizQuestionViewedByUser;
-
     beforeEach(() => {
       vi.useFakeTimers();
-      const reviewPoint = makeMe.aReviewPoint.please();
-      quizQuestion = makeMe.aQuizQuestion
-        .withReviewPointId(reviewPoint.id)
+    });
+
+    it("fetch the first question when mount", async () => {
+      const quizQuestion = makeMe.aQuizQuestion
+        .withClozeSelectionQuestion()
         .please();
       helper.apiMock
         .expectingGet(`/api/review-points/${1}/random-question`)
         .andReturnOnce(quizQuestion);
-      helper.apiMock
-        .expectingGet(`/api/review-points/${reviewPoint.id}`)
-        .andReturnOnce(reviewPoint);
-    });
-
-    it("renders", async () => {
       await mountPage();
     });
   });
