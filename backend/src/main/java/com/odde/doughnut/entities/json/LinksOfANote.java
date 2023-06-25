@@ -10,6 +10,7 @@ import lombok.Getter;
 
 public class LinksOfANote {
   @Getter private Map<Link.LinkType, LinkViewed> links;
+
   //  @Getter @Setter private List<Link> directHierarchyLinks;
 
   public static LinksOfANote getLinksOfANote(NoteViewer noteViewer) {
