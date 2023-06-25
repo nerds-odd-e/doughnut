@@ -23,7 +23,11 @@
             :key="currentQuizQuestion.quizQuestion.reviewPoint"
           />
         </template>
-        <template v-else-if="toRepeat !== undefined && toRepeat.length === 0">
+        <template
+          v-else-if="
+            toRepeat !== undefined && toRepeat.length === currentQuestionIndex
+          "
+        >
           <div class="alert alert-success">
             You have finished all repetitions for this half a day!
           </div>
@@ -83,6 +87,7 @@ export default defineComponent({
   data() {
     return {
       toRepeat: undefined as number[] | undefined,
+      currentQuestionIndex: 0,
       currentQuizQuestion: undefined as
         | Generated.QuizQuestionViewedByUser
         | undefined,
@@ -99,7 +104,7 @@ export default defineComponent({
       return this.previousResults.length;
     },
     toRepeatCount() {
-      return this.toRepeat?.length || 0;
+      return (this.toRepeat?.length || 0) - this.currentQuestionIndex;
     },
   },
   methods: {
@@ -124,6 +129,7 @@ export default defineComponent({
       this.toRepeat = (
         await this.api.reviewMethods.getDueReviewPoints(dueInDays)
       ).toRepeat;
+      this.currentQuestionIndex = 0;
       if (this.toRepeat?.length === 0) {
         return;
       }
@@ -134,20 +140,23 @@ export default defineComponent({
     },
 
     async fetchQuestion() {
-      if (!this.toRepeat || this.toRepeat.length === 0) {
+      if (
+        !this.toRepeat ||
+        this.toRepeat.length === this.currentQuestionIndex
+      ) {
         this.currentQuizQuestion = undefined;
         return;
       }
       this.currentQuizQuestion =
         await this.api.reviewMethods.getRandomQuestionForReviewPoint(
-          this.toRepeat[0] as number
+          this.toRepeat[this.currentQuestionIndex] as number
         );
       this.selectPosition();
     },
 
     onAnswered(answerResult: Generated.AnswerResult) {
       this.previousResults.push(answerResult);
-      this.toRepeat?.shift();
+      this.currentQuestionIndex += 1;
       if (!answerResult.correct) {
         this.viewLastResult(this.previousResults.length - 1);
       }
