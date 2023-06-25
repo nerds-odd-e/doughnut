@@ -1,62 +1,66 @@
 <template>
   <div class="quiz-instruction inner-box">
     <ShowPicture
-      v-if="quizQuestion?.pictureWithMask"
-      v-bind="quizQuestion?.pictureWithMask"
+      v-if="quizQuestion.pictureWithMask"
+      v-bind="quizQuestion.pictureWithMask"
       :opacity="1"
     />
     <NoteFrameOfLinks
-      v-bind="{ links: quizQuestion?.hintLinks, storageAccessor }"
+      v-bind="{ links: quizQuestion.hintLinks, storageAccessor }"
     >
+      <h2 v-if="!!quizQuestion.mainTopic" class="text-center">
+        {{ quizQuestion.mainTopic }}
+      </h2>
       <div
         class="quiz-description"
-        v-if="quizQuestion?.questionType !== 'PICTURE_TITLE'"
-        v-html="quizQuestion?.description"
+        v-if="quizQuestion.questionType !== 'PICTURE_TITLE'"
+        v-html="quizQuestion.description"
       />
-      <h2 v-if="!!quizQuestion?.mainTopic" class="text-center">
-        {{ quizQuestion?.mainTopic }}
-      </h2>
+      <AIQuestion
+        v-if="quizQuestion.questionType === 'AI_QUESTION'"
+        :raw-json-question="quizQuestion.quizQuestion.rawJsonQuestion"
+        @self-evaluated-memory-state="submitAnswer({ spellingAnswer: $event })"
+      />
+      <div v-if="quizQuestion.questionType === 'JUST_REVIEW'">
+        <ReviewPointAsync
+          v-bind="{
+            reviewPointId: quizQuestion.quizQuestion.reviewPoint,
+            storageAccessor,
+          }"
+        />
+        <SelfEvaluateButtons
+          @self-evaluated-memory-state="
+            submitAnswer({ spellingAnswer: $event })
+          "
+          :key="quizQuestion.quizQuestion.reviewPoint"
+        />
+      </div>
+      <div v-else-if="quizQuestion.questionType === 'SPELLING'">
+        <form @submit.prevent.once="submitAnswer({ spellingAnswer: answer })">
+          <TextInput
+            scope-name="review_point"
+            field="answer"
+            v-model="answer"
+            placeholder="put your answer here"
+            v-focus
+          />
+          <input
+            type="submit"
+            value="OK"
+            class="btn btn-primary btn-lg btn-block"
+          />
+        </form>
+      </div>
     </NoteFrameOfLinks>
   </div>
-
   <div class="quiz-answering">
-    <AIQuestion
-      v-if="quizQuestion?.questionType === 'AI_QUESTION'"
-      :raw-json-question="quizQuestion.quizQuestion.rawJsonQuestion"
-      @self-evaluated-memory-state="submitAnswer({ spellingAnswer: $event })"
-    />
-    <div v-if="quizQuestion?.questionType === 'JUST_REVIEW'">
-      <ReviewPointAsync
-        v-bind="{
-          reviewPointId: quizQuestion?.quizQuestion.reviewPoint,
-          storageAccessor,
-        }"
-      />
-      <SelfEvaluateButtons
-        @self-evaluated-memory-state="submitAnswer({ spellingAnswer: $event })"
-        :key="quizQuestion?.quizQuestion.reviewPoint"
-      />
-    </div>
-    <div v-else-if="quizQuestion?.questionType === 'SPELLING'">
-      <form @submit.prevent.once="submitAnswer({ spellingAnswer: answer })">
-        <TextInput
-          scope-name="review_point"
-          field="answer"
-          v-model="answer"
-          placeholder="put your answer here"
-          v-focus
-        />
-        <input
-          type="submit"
-          value="OK"
-          class="btn btn-primary btn-lg btn-block"
-        />
-      </form>
-    </div>
-    <div class="options" v-else>
+    <div
+      class="options"
+      v-if="quizQuestion.options && quizQuestion.options.length > 0"
+    >
       <div
         class="option"
-        v-for="option in quizQuestion?.options"
+        v-for="option in quizQuestion.options"
         :key="option.noteId"
       >
         <button
@@ -140,7 +144,7 @@ export default defineComponent({
   },
   props: {
     quizQuestion: {
-      type: Object as PropType<Generated.QuizQuestionViewedByUser | undefined>,
+      type: Object as PropType<Generated.QuizQuestionViewedByUser>,
       required: true,
     },
     storageAccessor: {
@@ -166,7 +170,7 @@ export default defineComponent({
     async submitAnswer(answerData: Partial<Generated.Answer>) {
       try {
         const answerResult = await this.api.reviewMethods.processAnswer({
-          question: this.quizQuestion?.quizQuestion,
+          question: this.quizQuestion.quizQuestion,
           ...answerData,
         });
         this.$emit("answered", answerResult);
