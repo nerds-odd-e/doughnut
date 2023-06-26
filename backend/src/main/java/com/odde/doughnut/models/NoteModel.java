@@ -83,7 +83,6 @@ public class NoteModel {
             {
               option: "",
               correct: true,
-              explanation: "",
             },
           ],
         }

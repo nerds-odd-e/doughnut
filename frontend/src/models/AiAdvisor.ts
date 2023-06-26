@@ -6,7 +6,6 @@ export type AiQuestionModel = {
 type AiQuestionOption = {
   option: string;
   correct: boolean;
-  explanation: string;
 };
 
 export default class AiAdvisor {
