@@ -38,14 +38,14 @@ public record QuizQuestionDirector(
         quizQuestion.setOptionThingIds(toThingIdsString(optionsEntities));
       }
 
-      if (quizQuestionFactory instanceof SecondaryReviewPointsFactory secondaryReviewPointsFactory) {
+      if (quizQuestionFactory
+          instanceof SecondaryReviewPointsFactory secondaryReviewPointsFactory) {
         quizQuestion.setViceReviewPoints(secondaryReviewPointsFactory.getViceReviewPoints());
         quizQuestion.setCategoryLink(secondaryReviewPointsFactory.getCategoryLink());
       }
 
       return Optional.of(quizQuestion);
-    }
-    catch (QuizQuestionNotPossibleException e) {
+    } catch (QuizQuestionNotPossibleException e) {
       return Optional.empty();
     }
   }
