@@ -136,7 +136,7 @@ class QuizQuestionTest {
       userModel.getEntity().setAiQuestionTypeOnlyForReview(true);
       ReviewPointModel reviewPoint = getReviewPointModel(note);
       AiAdvisorService aiAdvisorService = mock(AiAdvisorService.class);
-      when(aiAdvisorService.generateQuestion(any()))
+      when(aiAdvisorService.generateQuestionJsonString(any(), any()))
           .thenReturn("{\"question\": \"wat is the meaning of life?\"}");
       QuizQuestion randomQuizQuestion =
           reviewPoint.generateAQuizQuestion(

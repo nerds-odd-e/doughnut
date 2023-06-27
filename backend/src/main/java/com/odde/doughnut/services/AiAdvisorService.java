@@ -27,17 +27,15 @@ public class AiAdvisorService {
         .prependPreviousIncompleteMessage(incompleteAssistantMessage);
   }
 
-  public String generateQuestion(List<ChatMessage> messages) {
-    AiSuggestion openAiCompletion = openAiAPIChatCompletion.getOpenAiCompletion(messages, 1100);
-    return openAiCompletion.getSuggestion();
-  }
-
   public AiEngagingStory getEngagingStory(String prompt) {
     return new AiEngagingStory(openAiAPIImage.getOpenAiImage(prompt));
   }
 
   public String generateQuestionJsonString(Note note, ModelFactoryService modelFactoryService) {
     NoteModel noteModel = modelFactoryService.toNoteModel(note);
-    return generateQuestion(noteModel.getChatMessagesForGenerateQuestion());
+    AiSuggestion openAiCompletion =
+        openAiAPIChatCompletion.getOpenAiCompletion(
+            noteModel.getChatMessagesForGenerateQuestion(), 1100);
+    return openAiCompletion.getSuggestion();
   }
 }
