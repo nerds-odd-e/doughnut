@@ -21,26 +21,33 @@ public record QuizQuestionDirector(
   public Optional<QuizQuestion> buildQuizQuestion(AiAdvisorService aiAdvisorService) {
     QuizQuestionFactory quizQuestionFactory = buildQuizQuestionFactory();
 
-    if (!quizQuestionFactory.isValidQuestion()) return Optional.empty();
-
-    QuizQuestion quizQuestion = reviewPoint.createAQuizQuestionOfType(questionType);
-
-    quizQuestionFactory.fillQuizQuestion(quizQuestion, aiAdvisorService);
-
-    if (quizQuestionFactory instanceof QuestionOptionsFactory optionsFactory) {
-      List<Thingy> optionsEntities = optionsFactory.getOptionEntities();
-      if (optionsEntities.size() < optionsFactory.minimumOptionCount()) {
-        return Optional.empty();
+    try {
+      if (!quizQuestionFactory.isValidQuestion()) {
+        throw new QuizQuestionNotPossibleException();
       }
-      quizQuestion.setOptionThingIds(toThingIdsString(optionsEntities));
-    }
 
-    if (quizQuestionFactory instanceof SecondaryReviewPointsFactory secondaryReviewPointsFactory) {
-      quizQuestion.setViceReviewPoints(secondaryReviewPointsFactory.getViceReviewPoints());
-      quizQuestion.setCategoryLink(secondaryReviewPointsFactory.getCategoryLink());
-    }
+      QuizQuestion quizQuestion = reviewPoint.createAQuizQuestionOfType(questionType);
 
-    return Optional.of(quizQuestion);
+      quizQuestionFactory.fillQuizQuestion(quizQuestion, aiAdvisorService);
+
+      if (quizQuestionFactory instanceof QuestionOptionsFactory optionsFactory) {
+        List<Thingy> optionsEntities = optionsFactory.getOptionEntities();
+        if (optionsEntities.size() < optionsFactory.minimumOptionCount()) {
+          return Optional.empty();
+        }
+        quizQuestion.setOptionThingIds(toThingIdsString(optionsEntities));
+      }
+
+      if (quizQuestionFactory instanceof SecondaryReviewPointsFactory secondaryReviewPointsFactory) {
+        quizQuestion.setViceReviewPoints(secondaryReviewPointsFactory.getViceReviewPoints());
+        quizQuestion.setCategoryLink(secondaryReviewPointsFactory.getCategoryLink());
+      }
+
+      return Optional.of(quizQuestion);
+    }
+    catch (QuizQuestionNotPossibleException e) {
+      return Optional.empty();
+    }
   }
 
   private QuizQuestionFactory buildQuizQuestionFactory() {
