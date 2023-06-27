@@ -1,7 +1,10 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.NoteModel;
 import com.odde.doughnut.services.openAiApis.OpenAiAPIChatCompletion;
 import com.odde.doughnut.services.openAiApis.OpenAiAPIImage;
 import com.theokanning.openai.OpenAiApi;
@@ -31,5 +34,10 @@ public class AiAdvisorService {
 
   public AiEngagingStory getEngagingStory(String prompt) {
     return new AiEngagingStory(openAiAPIImage.getOpenAiImage(prompt));
+  }
+
+  public String generateQuestionJsonString(Note note, ModelFactoryService modelFactoryService) {
+    NoteModel noteModel = modelFactoryService.toNoteModel(note);
+    return generateQuestion(noteModel.getChatMessagesForGenerateQuestion());
   }
 }

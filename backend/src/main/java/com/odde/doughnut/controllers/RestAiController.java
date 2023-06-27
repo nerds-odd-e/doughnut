@@ -49,12 +49,10 @@ public class RestAiController {
   @GetMapping("/generate-question")
   public QuizQuestionViewedByUser generateQuestion(@RequestParam(value = "note") Note note) {
     currentUser.assertLoggedIn();
-    NoteModel noteModel = modelFactoryService.toNoteModel(note);
-    String suggestion =
-        aiAdvisorService.generateQuestion(noteModel.getChatMessagesForGenerateQuestion());
+    String rawJsonQuestion = aiAdvisorService.generateQuestionJsonString(note, modelFactoryService);
     QuizQuestion quizQuestion = new QuizQuestion();
     quizQuestion.setQuestionType(QuizQuestion.QuestionType.AI_QUESTION);
-    quizQuestion.setRawJsonQuestion(suggestion);
+    quizQuestion.setRawJsonQuestion(rawJsonQuestion);
     return new QuizQuestionViewedByUser(quizQuestion, null, null);
   }
 
