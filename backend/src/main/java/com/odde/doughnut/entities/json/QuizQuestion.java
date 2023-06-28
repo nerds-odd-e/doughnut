@@ -3,9 +3,7 @@ package com.odde.doughnut.entities.json;
 import com.odde.doughnut.entities.PictureWithMask;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.Thing;
-import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionPresenter;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -13,10 +11,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.lang.Nullable;
 
+@AllArgsConstructor
 public class QuizQuestion {
 
   public QuizQuestionEntity quizQuestion;
@@ -41,20 +41,12 @@ public class QuizQuestion {
 
   public Optional<PictureWithMask> pictureWithMask;
 
-  public static QuizQuestion create(
-      QuizQuestionEntity quizQuestion, ModelFactoryService modelFactoryService, User user) {
-    QuizQuestionPresenter presenter = quizQuestion.buildPresenter();
-    return new QuizQuestion(
-        quizQuestion,
-        presenter.optionCreator().getOptions(modelFactoryService, quizQuestion.getOptionThingIds()),
-        new NoteViewer(user, quizQuestion.getReviewPoint().getHeadNote()).jsonNotePosition(true));
-  }
-
   public QuizQuestion(
       QuizQuestionEntity quizQuestion,
       List<Option> options,
       @Nullable NotePositionViewedByUser notebookPosition) {
     QuizQuestionPresenter presenter = quizQuestion.buildPresenter();
+
     this.quizQuestion = quizQuestion;
     this.questionType = quizQuestion.getQuestionType();
     this.description = presenter.instruction();

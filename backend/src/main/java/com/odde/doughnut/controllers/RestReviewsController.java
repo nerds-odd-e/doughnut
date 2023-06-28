@@ -1,19 +1,14 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.entities.Answer;
-import com.odde.doughnut.entities.AnswerResult;
-import com.odde.doughnut.entities.AnswerViewedByUser;
-import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.json.DueReviewPoints;
 import com.odde.doughnut.entities.json.InitialInfo;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.entities.json.ReviewStatus;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.AnswerModel;
-import com.odde.doughnut.models.ReviewPointModel;
-import com.odde.doughnut.models.Reviewing;
-import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.models.*;
+import com.odde.doughnut.models.quizFacotries.QuizQuestionPresenter;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -101,8 +96,16 @@ class RestReviewsController {
     AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
     AnswerViewedByUser answerResult = answerModel.getAnswerViewedByUser();
     answerResult.reviewPoint = answer.getQuestion().getReviewPoint();
+    QuizQuestionEntity quizQuestion = answer.getQuestion();
+    QuizQuestionPresenter presenter = quizQuestion.buildPresenter();
     answerResult.quizQuestion =
-        QuizQuestion.create(answer.getQuestion(), modelFactoryService, currentUser.getEntity());
+        new QuizQuestion(
+            quizQuestion,
+            presenter
+                .optionCreator()
+                .getOptions(modelFactoryService, quizQuestion.getOptionThingIds()),
+            new NoteViewer(currentUser.getEntity(), quizQuestion.getReviewPoint().getHeadNote())
+                .jsonNotePosition(true));
     return answerResult;
   }
 }

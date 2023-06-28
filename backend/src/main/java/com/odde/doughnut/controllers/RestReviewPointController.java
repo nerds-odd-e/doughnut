@@ -55,10 +55,10 @@ class RestReviewPointController {
     ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPoint);
     Randomizer randomizer = testabilitySettings.getRandomizer();
     User user = currentUser.getEntity();
-    QuizQuestionEntity quizQuestion =
+    QuizQuestionEntity quizQuestionEntity =
         reviewPointModel.generateAQuizQuestion(randomizer, user, aiAdvisorService);
-    modelFactoryService.quizQuestionRepository.save(quizQuestion);
-    return QuizQuestion.create(quizQuestion, modelFactoryService, user);
+    modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
+    return modelFactoryService.toQuizQuestion(quizQuestionEntity, user);
   }
 
   @PostMapping(path = "/{reviewPoint}/remove")

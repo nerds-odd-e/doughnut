@@ -7,8 +7,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.entities.json.QuizQuestion;
+import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.models.quizFacotries.QuizQuestionPresenter;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.models.randomizers.RealRandomizer;
 import com.odde.doughnut.services.AiAdvisorService;
@@ -178,10 +180,16 @@ class QuizQuestionTest {
   }
 
   private QuizQuestion getQuizQuestion(Note note) {
-    return QuizQuestion.create(
-        getReviewPointModel(note).generateAQuizQuestion(randomizer, userModel.getEntity(), null),
-        makeMe.modelFactoryService,
-        userModel.getEntity());
+    QuizQuestionEntity quizQuestion =
+        getReviewPointModel(note).generateAQuizQuestion(randomizer, userModel.getEntity(), null);
+    QuizQuestionPresenter presenter = quizQuestion.buildPresenter();
+    return new QuizQuestion(
+        quizQuestion,
+        presenter
+            .optionCreator()
+            .getOptions(makeMe.modelFactoryService, quizQuestion.getOptionThingIds()),
+        new NoteViewer(userModel.getEntity(), quizQuestion.getReviewPoint().getHeadNote())
+            .jsonNotePosition(true));
   }
 
   private ReviewPointModel getReviewPointModel(Note note) {

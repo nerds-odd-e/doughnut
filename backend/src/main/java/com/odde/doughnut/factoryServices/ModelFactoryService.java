@@ -1,19 +1,11 @@
 package com.odde.doughnut.factoryServices;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.entities.json.SearchTerm;
 import com.odde.doughnut.entities.repositories.*;
-import com.odde.doughnut.models.AnswerModel;
-import com.odde.doughnut.models.Authorization;
-import com.odde.doughnut.models.BazaarModel;
-import com.odde.doughnut.models.CircleModel;
-import com.odde.doughnut.models.LinkModel;
-import com.odde.doughnut.models.NoteModel;
-import com.odde.doughnut.models.NoteMotionModel;
-import com.odde.doughnut.models.ReviewPointModel;
-import com.odde.doughnut.models.SearchTermModel;
-import com.odde.doughnut.models.SubscriptionModel;
-import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.models.*;
+import com.odde.doughnut.models.quizFacotries.QuizQuestionPresenter;
 import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
@@ -104,5 +96,14 @@ public class ModelFactoryService {
 
   public AnswerModel toAnswerModel(Answer answer) {
     return new AnswerModel(answer, this);
+  }
+
+  public QuizQuestion toQuizQuestion(QuizQuestionEntity quizQuestionEntity, User user) {
+    QuizQuestionPresenter presenter = quizQuestionEntity.buildPresenter();
+    return new QuizQuestion(
+        quizQuestionEntity,
+        presenter.optionCreator().getOptions(this, quizQuestionEntity.getOptionThingIds()),
+        new NoteViewer(user, quizQuestionEntity.getReviewPoint().getHeadNote())
+            .jsonNotePosition(true));
   }
 }
