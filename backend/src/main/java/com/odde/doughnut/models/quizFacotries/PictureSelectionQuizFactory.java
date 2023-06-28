@@ -20,10 +20,12 @@ public class PictureSelectionQuizFactory implements QuizQuestionFactory, Questio
   }
 
   @Override
-  public Note generateAnswer() throws QuizQuestionNotPossibleException {
-    if (answerNote.getPictureWithMask().isEmpty()) {
-      throw new QuizQuestionNotPossibleException();
-    }
+  public Note generateAnswer() {
     return answerNote;
+  }
+
+  @Override
+  public boolean isValidQuestion() {
+    return answerNote.getPictureWithMask().isPresent();
   }
 }

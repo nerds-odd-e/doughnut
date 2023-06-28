@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface QuestionOptionsFactory {
-  Thingy generateAnswer() throws QuizQuestionNotPossibleException;
+  Thingy generateAnswer();
 
   List<? extends Thingy> generateFillingOptions() throws QuizQuestionNotPossibleException;
 
