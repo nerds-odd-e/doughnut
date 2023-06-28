@@ -17,7 +17,7 @@ public class ClozeTitleSelectionQuizFactory implements QuestionOptionsFactory, Q
   }
 
   @Override
-  public Note generateAnswer() {
+  public Note generateAnswer() throws QuizQuestionNotPossibleException {
     return answerNote;
   }
 
