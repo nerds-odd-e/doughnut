@@ -17,7 +17,14 @@ public class SpellingQuizFactory implements QuizQuestionFactory {
   }
 
   @Override
-  public boolean isValidQuestion() {
+  public boolean isValidQuestion() throws QuizQuestionNotPossibleException {
+    if (!needSpellingQuiz()) {
+      throw new QuizQuestionNotPossibleException();
+    }
+    return true;
+  }
+
+  private boolean needSpellingQuiz() {
     Note note = reviewPoint.getNote();
     if (note.isDescriptionBlankHtml()) {
       return false;
