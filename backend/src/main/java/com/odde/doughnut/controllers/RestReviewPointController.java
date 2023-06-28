@@ -1,10 +1,13 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.entities.json.SelfEvaluation;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
@@ -47,11 +50,15 @@ class RestReviewPointController {
 
   @GetMapping("/{reviewPoint}/random-question")
   @Transactional
-  public QuizQuestion repeatReview(@PathVariable("reviewPoint") ReviewPoint reviewPoint) {
+  public QuizQuestion generateRandomQuestion(@PathVariable("reviewPoint") ReviewPoint reviewPoint) {
     currentUser.assertLoggedIn();
     ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPoint);
-    return reviewPointModel.getRandomQuizQuestion(
-        testabilitySettings.getRandomizer(), currentUser.getEntity(), aiAdvisorService);
+    Randomizer randomizer = testabilitySettings.getRandomizer();
+    User user = currentUser.getEntity();
+    QuizQuestionEntity quizQuestion =
+        reviewPointModel.generateAQuizQuestion(randomizer, user, aiAdvisorService);
+    modelFactoryService.quizQuestionRepository.save(quizQuestion);
+    return QuizQuestion.create(quizQuestion, modelFactoryService, user);
   }
 
   @PostMapping(path = "/{reviewPoint}/remove")

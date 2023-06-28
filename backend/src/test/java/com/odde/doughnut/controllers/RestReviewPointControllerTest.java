@@ -5,7 +5,9 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.entities.json.SelfEvaluation;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -41,35 +43,42 @@ class RestReviewPointControllerTest {
   }
 
   @Nested
-  class WhenThereIsAReviewPoint {
-    ReviewPoint rp;
+  class Show {
+    @Nested
+    class WhenThereIsAReviewPoint {
+      ReviewPoint rp;
 
-    @BeforeEach
-    void setup() {
-      rp = makeMe.aReviewPointFor(makeMe.aHeadNote().please()).by(userModel).please();
-    }
+      @BeforeEach
+      void setup() {
+        rp = makeMe.aReviewPointFor(makeMe.aHeadNote().please()).by(userModel).please();
+      }
 
-    @Test
-    void shouldBeAbleToSeeOwn() throws UnexpectedNoAccessRightException {
-      ReviewPoint reviewPoint = controller.show(rp);
-      assertThat(reviewPoint, equalTo(rp));
-    }
+      @Test
+      void shouldBeAbleToSeeOwn() throws UnexpectedNoAccessRightException {
+        ReviewPoint reviewPoint = controller.show(rp);
+        assertThat(reviewPoint, equalTo(rp));
+      }
 
-    @Test
-    void shouldNotBeAbleToSeeOthers() {
-      rp = makeMe.aReviewPointFor(makeMe.aHeadNote().please()).by(makeMe.aUser().please()).please();
-      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.show(rp));
-    }
+      @Test
+      void shouldNotBeAbleToSeeOthers() {
+        rp =
+            makeMe
+                .aReviewPointFor(makeMe.aHeadNote().please())
+                .by(makeMe.aUser().please())
+                .please();
+        assertThrows(UnexpectedNoAccessRightException.class, () -> controller.show(rp));
+      }
 
-    @Test
-    void remove() {
-      controller.removeFromRepeating(rp);
-      assertThat(rp.getRemovedFromReview(), is(true));
+      @Test
+      void remove() {
+        controller.removeFromRepeating(rp);
+        assertThat(rp.getRemovedFromReview(), is(true));
+      }
     }
   }
 
   @Nested
-  class evaluate {
+  class Evaluate {
 
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
@@ -123,6 +132,17 @@ class RestReviewPointControllerTest {
             };
         controller.selfEvaluate(rp, selfEvaluation);
       }
+    }
+  }
+
+  @Nested
+  class GenerateRandomQuestion {
+    @Test
+    void itMustPersistTheQuestionGenerated() {
+      Note note = makeMe.aNote().asHeadNoteOfANotebook().please();
+      ReviewPoint rp = makeMe.aReviewPointFor(note).by(userModel).please();
+      QuizQuestion quizQuestion = controller.generateRandomQuestion(rp);
+      assertThat(quizQuestion.quizQuestion.getId(), notNullValue());
     }
   }
 }
