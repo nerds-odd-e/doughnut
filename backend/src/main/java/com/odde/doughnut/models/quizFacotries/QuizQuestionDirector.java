@@ -22,9 +22,7 @@ public record QuizQuestionDirector(
     QuizQuestionFactory quizQuestionFactory = buildQuizQuestionFactory();
 
     try {
-      if (!quizQuestionFactory.isValidQuestion()) {
-        throw new QuizQuestionNotPossibleException();
-      }
+      quizQuestionFactory.validatePossibility();
 
       QuizQuestion quizQuestion = reviewPoint.createAQuizQuestionOfType(questionType);
 

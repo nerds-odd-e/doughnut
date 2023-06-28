@@ -20,8 +20,11 @@ public class DescriptionLinkTargetQuizFactory extends LinkTargetQuizFactory
   }
 
   @Override
-  public boolean isValidQuestion() throws QuizQuestionNotPossibleException {
-    return super.isValidQuestion() && link.getSourceNote().getClozeDescription().isPresent();
+  public void validatePossibility() throws QuizQuestionNotPossibleException {
+    super.validatePossibility();
+    if (!link.getSourceNote().getClozeDescription().isPresent()) {
+      throw new QuizQuestionNotPossibleException();
+    }
   }
 
   @Override

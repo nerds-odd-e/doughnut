@@ -17,11 +17,10 @@ public class SpellingQuizFactory implements QuizQuestionFactory {
   }
 
   @Override
-  public boolean isValidQuestion() throws QuizQuestionNotPossibleException {
+  public void validatePossibility() throws QuizQuestionNotPossibleException {
     if (!needSpellingQuiz()) {
       throw new QuizQuestionNotPossibleException();
     }
-    return true;
   }
 
   private boolean needSpellingQuiz() {

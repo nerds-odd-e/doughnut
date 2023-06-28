@@ -27,10 +27,9 @@ public class ClozeTitleSelectionQuizFactory implements QuestionOptionsFactory, Q
   }
 
   @Override
-  public boolean isValidQuestion() throws QuizQuestionNotPossibleException {
+  public void validatePossibility() throws QuizQuestionNotPossibleException {
     if (reviewPoint.isDescriptionBlankHtml()) {
       throw new QuizQuestionNotPossibleException();
     }
-    return true;
   }
 }
