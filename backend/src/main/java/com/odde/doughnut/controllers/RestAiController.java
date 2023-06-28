@@ -50,10 +50,10 @@ public class RestAiController {
   public QuizQuestion generateQuestion(@RequestParam(value = "note") Note note) {
     currentUser.assertLoggedIn();
     String rawJsonQuestion = aiAdvisorService.generateQuestionJsonString(note, modelFactoryService);
-    QuizQuestionEntity quizQuestion = new QuizQuestionEntity();
-    quizQuestion.setQuestionType(QuizQuestionEntity.QuestionType.AI_QUESTION);
-    quizQuestion.setRawJsonQuestion(rawJsonQuestion);
-    return QuizQuestion.create(quizQuestion, null, modelFactoryService);
+    QuizQuestionEntity quizQuestionEntity = new QuizQuestionEntity();
+    quizQuestionEntity.setQuestionType(QuizQuestionEntity.QuestionType.AI_QUESTION);
+    quizQuestionEntity.setRawJsonQuestion(rawJsonQuestion);
+    return modelFactoryService.toQuizQuestion(quizQuestionEntity, currentUser.getEntity());
   }
 
   @PostMapping("/ask-engaging-stories")

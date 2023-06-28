@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.PictureWithMask;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.quizFacotries.QuizQuestionPresenter;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -37,30 +36,6 @@ public class QuizQuestion {
   @Getter public List<Option> options;
 
   @Getter public Optional<PictureWithMask> pictureWithMask;
-
-  public static QuizQuestion create(
-      QuizQuestionEntity quizQuestion,
-      @Nullable NotePositionViewedByUser notebookPosition,
-      ModelFactoryService modelFactoryService) {
-    QuizQuestionPresenter presenter = quizQuestion.buildPresenter();
-    List<Option> options =
-        presenter.optionCreator().getOptions(modelFactoryService, quizQuestion.getOptionThingIds());
-    NotePositionViewedByUser notePosition =
-        ((quizQuestion.getQuestionType() == QuizQuestionEntity.QuestionType.JUST_REVIEW)
-            ? null
-            : notebookPosition);
-    return new QuizQuestion(
-        quizQuestion.getId(),
-        quizQuestion.getRawJsonQuestion(),
-        quizQuestion.getQuestionType(),
-        presenter.instruction(),
-        presenter.mainTopic(),
-        presenter.hintLinks(),
-        quizQuestion.getViceReviewPointIdList(),
-        notePosition,
-        options,
-        presenter.pictureWithMask());
-  }
 
   public static class Option {
     @Getter private Integer noteId;

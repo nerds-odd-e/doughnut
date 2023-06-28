@@ -1,10 +1,12 @@
 package com.odde.doughnut.factoryServices;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.json.NotePositionViewedByUser;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.entities.json.SearchTerm;
 import com.odde.doughnut.entities.repositories.*;
 import com.odde.doughnut.models.*;
+import com.odde.doughnut.models.quizFacotries.QuizQuestionPresenter;
 import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
@@ -98,10 +100,24 @@ public class ModelFactoryService {
   }
 
   public QuizQuestion toQuizQuestion(QuizQuestionEntity quizQuestionEntity, User user) {
-    return QuizQuestion.create(
-        quizQuestionEntity,
-        new NoteViewer(user, quizQuestionEntity.getReviewPoint().getHeadNote())
-            .jsonNotePosition(true),
-        this);
+    QuizQuestionPresenter presenter = quizQuestionEntity.buildPresenter();
+    List<QuizQuestion.Option> options =
+        presenter.optionCreator().getOptions(this, quizQuestionEntity.getOptionThingIds());
+    NotePositionViewedByUser notePosition =
+        (quizQuestionEntity.getQuestionType() == QuizQuestionEntity.QuestionType.JUST_REVIEW)
+            ? null
+            : new NoteViewer(user, quizQuestionEntity.getReviewPoint().getHeadNote())
+                .jsonNotePosition(true);
+    return new QuizQuestion(
+        quizQuestionEntity.getId(),
+        quizQuestionEntity.getRawJsonQuestion(),
+        quizQuestionEntity.getQuestionType(),
+        presenter.instruction(),
+        presenter.mainTopic(),
+        presenter.hintLinks(),
+        quizQuestionEntity.getViceReviewPointIdList(),
+        notePosition,
+        options,
+        presenter.pictureWithMask());
   }
 }
