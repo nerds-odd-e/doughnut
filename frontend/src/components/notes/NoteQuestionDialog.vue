@@ -33,7 +33,7 @@ export default defineComponent({
   },
   computed: {
     rawJsonQuestion() {
-      return this.quizQuestion?.quizQuestion?.rawJsonQuestion;
+      return this.quizQuestion?.rawJsonQuestion;
     },
   },
   methods: {

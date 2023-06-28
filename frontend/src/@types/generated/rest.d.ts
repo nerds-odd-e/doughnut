@@ -123,7 +123,7 @@ declare namespace Generated {
     }
 
     interface QuizQuestion {
-        quizQuestion: QuizQuestionEntity;
+        quizQuestionId: number;
         reviewPointId: number;
         rawJsonQuestion: string;
         questionType: QuestionType;
@@ -260,17 +260,6 @@ declare namespace Generated {
         notebook: Notebook;
     }
 
-    interface QuizQuestionEntity {
-        id: number;
-        reviewPoint: number;
-        questionTypeId: number;
-        rawJsonQuestion: string;
-        categoryLink: number;
-        optionThingIds: string;
-        viceReviewPointIds: string;
-        createdAt: string;
-    }
-
     interface Option {
         noteId: number;
         display: string;
@@ -281,6 +270,17 @@ declare namespace Generated {
     interface PictureWithMask {
         notePicture: string;
         pictureMask: string;
+    }
+
+    interface QuizQuestionEntity {
+        id: number;
+        reviewPoint: number;
+        questionTypeId: number;
+        rawJsonQuestion: string;
+        categoryLink: number;
+        optionThingIds: string;
+        viceReviewPointIds: string;
+        createdAt: string;
     }
 
     interface Thingy {

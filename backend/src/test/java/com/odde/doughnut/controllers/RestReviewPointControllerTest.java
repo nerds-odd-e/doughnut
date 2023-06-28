@@ -142,7 +142,7 @@ class RestReviewPointControllerTest {
       Note note = makeMe.aNote().asHeadNoteOfANotebook().please();
       ReviewPoint rp = makeMe.aReviewPointFor(note).by(userModel).please();
       QuizQuestion quizQuestion = controller.generateRandomQuestion(rp);
-      assertThat(quizQuestion.quizQuestion.getId(), notNullValue());
+      assertThat(quizQuestion.quizQuestionId, notNullValue());
     }
   }
 }

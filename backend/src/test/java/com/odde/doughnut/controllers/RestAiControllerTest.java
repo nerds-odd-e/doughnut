@@ -168,7 +168,7 @@ class RestAiControllerTest {
       {"question": "What is the first color in the rainbow?"}
       """));
       QuizQuestion quizQuestion = controller.generateQuestion(note);
-      assertThat(quizQuestion.quizQuestion.getRawJsonQuestion())
+      assertThat(quizQuestion.getRawJsonQuestion())
           .contains("What is the first color in the rainbow?");
     }
 

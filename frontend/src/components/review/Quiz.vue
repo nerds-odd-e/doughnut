@@ -8,7 +8,7 @@
             storageAccessor,
           }"
           @answered="onAnswered($event)"
-          :key="currentQuizQuestion.quizQuestion.reviewPoint"
+          :key="currentQuizQuestion.reviewPointId"
         />
       </template>
       <template

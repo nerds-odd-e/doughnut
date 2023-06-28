@@ -18,13 +18,13 @@
       />
       <AIQuestion
         v-if="quizQuestion.questionType === 'AI_QUESTION'"
-        :raw-json-question="quizQuestion.quizQuestion.rawJsonQuestion"
+        :raw-json-question="quizQuestion.rawJsonQuestion"
         @self-evaluated-memory-state="submitAnswer({ spellingAnswer: $event })"
       />
       <div v-if="quizQuestion.questionType === 'JUST_REVIEW'">
         <ReviewPointAsync
           v-bind="{
-            reviewPointId: quizQuestion.quizQuestion.reviewPoint,
+            reviewPointId: quizQuestion.reviewPointId,
             storageAccessor,
           }"
         />
@@ -32,7 +32,7 @@
           @self-evaluated-memory-state="
             submitAnswer({ spellingAnswer: $event })
           "
-          :key="quizQuestion.quizQuestion.reviewPoint"
+          :key="quizQuestion.reviewPointId"
         />
       </div>
       <div v-else-if="quizQuestion.questionType === 'SPELLING'">
@@ -170,7 +170,7 @@ export default defineComponent({
     async submitAnswer(answerData: Partial<Generated.Answer>) {
       try {
         const answerResult = await this.api.reviewMethods.processAnswer(
-          this.quizQuestion.quizQuestion.id,
+          this.quizQuestion.quizQuestionId,
           answerData
         );
         this.$emit("answered", answerResult);

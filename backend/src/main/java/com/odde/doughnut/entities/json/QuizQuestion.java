@@ -18,8 +18,7 @@ import org.springframework.lang.Nullable;
 
 @AllArgsConstructor
 public class QuizQuestion {
-
-  public QuizQuestionEntity quizQuestion;
+  @Getter public Integer quizQuestionId;
 
   @Getter public Integer reviewPointId;
 
@@ -39,25 +38,29 @@ public class QuizQuestion {
 
   @Getter public List<Option> options;
 
-  public Optional<PictureWithMask> pictureWithMask;
+  @Getter public Optional<PictureWithMask> pictureWithMask;
 
   public static QuizQuestion create(
       QuizQuestionEntity quizQuestion,
       List<Option> options,
       @Nullable NotePositionViewedByUser notebookPosition) {
     QuizQuestionPresenter presenter = quizQuestion.buildPresenter();
+    NotePositionViewedByUser notePosition =
+        ((quizQuestion.getQuestionType() == QuizQuestionEntity.QuestionType.JUST_REVIEW)
+            ? null
+            : notebookPosition);
+    Integer reviewPointId =
+        quizQuestion.getReviewPoint() == null ? null : quizQuestion.getReviewPoint().getId();
     return new QuizQuestion(
-        quizQuestion,
-        null,
-        null,
+        quizQuestion.getId(),
+        reviewPointId,
+        quizQuestion.getRawJsonQuestion(),
         quizQuestion.getQuestionType(),
         presenter.instruction(),
         presenter.mainTopic(),
         presenter.hintLinks(),
         quizQuestion.getViceReviewPointIdList(),
-        ((quizQuestion.getQuestionType() == QuizQuestionEntity.QuestionType.JUST_REVIEW)
-            ? null
-            : notebookPosition),
+        notePosition,
         options,
         presenter.pictureWithMask());
   }

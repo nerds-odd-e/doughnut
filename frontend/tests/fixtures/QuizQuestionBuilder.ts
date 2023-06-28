@@ -3,18 +3,9 @@ import generateId from "./generateId";
 
 class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
   quizQuestion: Generated.QuizQuestion = {
+    quizQuestionId: generateId(),
     reviewPointId: 0,
     rawJsonQuestion: "",
-    quizQuestion: {
-      id: generateId(),
-      reviewPoint: 0,
-      questionTypeId: 0,
-      categoryLink: 0,
-      viceReviewPointIds: "",
-      createdAt: "",
-      optionThingIds: "",
-      rawJsonQuestion: "",
-    },
     questionType: "JUST_REVIEW",
     options: [
       {
@@ -41,12 +32,12 @@ class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
   }
 
   withReviewPointId(id: Doughnut.ID) {
-    this.quizQuestion.quizQuestion.reviewPoint = id;
+    this.quizQuestion.reviewPointId = id;
     return this;
   }
 
   withRawJsonQuestion(json: string) {
-    this.quizQuestion.quizQuestion.rawJsonQuestion = json;
+    this.quizQuestion.rawJsonQuestion = json;
     return this;
   }
 
