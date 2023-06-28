@@ -204,8 +204,8 @@ class FromDifferentPartAsQuizFactoryTest {
           void correct() {
             AnswerViewedByUser answerResult =
                 makeMe
-                    .anAnswerViewedByUserFor(uglySubjectiveRp)
-                    .validQuestionOfType(FROM_DIFFERENT_PART_AS)
+                    .anAnswerViewedByUser()
+                    .validQuestionOfType(FROM_DIFFERENT_PART_AS, uglySubjectiveRp)
                     .answerWithSpelling(tall.getTitle())
                     .inMemoryPlease();
             assertTrue(answerResult.correct);
@@ -215,8 +215,8 @@ class FromDifferentPartAsQuizFactoryTest {
           void wrongWhenChooseCousin() {
             AnswerViewedByUser answerResult =
                 makeMe
-                    .anAnswerViewedByUserFor(uglySubjectiveRp)
-                    .validQuestionOfType(FROM_DIFFERENT_PART_AS)
+                    .anAnswerViewedByUser()
+                    .validQuestionOfType(FROM_DIFFERENT_PART_AS, uglySubjectiveRp)
                     .answerWithSpelling(pretty.getTitle())
                     .inMemoryPlease();
             assertFalse(answerResult.correct);

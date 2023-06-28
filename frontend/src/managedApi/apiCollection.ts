@@ -72,9 +72,9 @@ const apiCollection = (managedApi: ManagedApi) => ({
       )) as Generated.ReviewPoint;
     },
 
-    async processAnswer(data: Generated.Answer) {
+    async processAnswer(quizQuestionId: Doughnut.ID, data: Generated.Answer) {
       const res = (await managedApi.restPost(
-        `reviews/answer`,
+        `reviews/${quizQuestionId}/answer`,
         data
       )) as Generated.AnswerResult;
       return res;

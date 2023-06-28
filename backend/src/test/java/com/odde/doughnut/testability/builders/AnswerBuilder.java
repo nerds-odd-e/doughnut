@@ -5,21 +5,15 @@ import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
 public class AnswerBuilder extends EntityBuilder<Answer> {
-  private QuizQuestionEntity.QuestionType questionType = QuizQuestionEntity.QuestionType.SPELLING;
-  private ReviewPoint reviewPoint;
-
   public AnswerBuilder(MakeMe makeMe) {
     super(makeMe, new Answer());
   }
 
   @Override
-  protected void beforeCreate(boolean needPersist) {
-    if (entity.getQuestion() == null) {
-      entity.setQuestion(makeMe.aQuestion().of(questionType, reviewPoint).inMemoryPlease());
-    }
-  }
+  protected void beforeCreate(boolean needPersist) {}
 
-  public AnswerBuilder withValidQuestion() {
+  public AnswerBuilder withValidQuestion(
+      QuizQuestionEntity.QuestionType questionType, ReviewPoint reviewPoint) {
     entity.setQuestion(makeMe.aQuestion().buildValid(questionType, reviewPoint).inMemoryPlease());
     if (entity.getQuestion() == null)
       throw new RuntimeException(
@@ -29,13 +23,9 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
     return this;
   }
 
-  public AnswerBuilder forReviewPoint(ReviewPoint reviewPoint) {
-    this.reviewPoint = reviewPoint;
-    return this;
-  }
-
-  public AnswerBuilder type(QuizQuestionEntity.QuestionType questionType) {
-    this.questionType = questionType;
+  public AnswerBuilder ofQuestion(
+      QuizQuestionEntity.QuestionType questionType, ReviewPoint reviewPoint) {
+    entity.setQuestion(makeMe.aQuestion().of(questionType, reviewPoint).inMemoryPlease());
     return this;
   }
 

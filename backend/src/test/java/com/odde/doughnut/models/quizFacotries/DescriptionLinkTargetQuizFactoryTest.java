@@ -103,8 +103,8 @@ class DescriptionLinkTargetQuizFactoryTest {
     void correct() {
       AnswerViewedByUser answerResult =
           makeMe
-              .anAnswerViewedByUserFor(reviewPoint)
-              .validQuestionOfType(DESCRIPTION_LINK_TARGET)
+              .anAnswerViewedByUser()
+              .validQuestionOfType(DESCRIPTION_LINK_TARGET, reviewPoint)
               .answerWithSpelling(target.getTitle())
               .inMemoryPlease();
       assertTrue(answerResult.correct);

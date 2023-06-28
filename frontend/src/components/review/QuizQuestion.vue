@@ -169,10 +169,10 @@ export default defineComponent({
   methods: {
     async submitAnswer(answerData: Partial<Generated.Answer>) {
       try {
-        const answerResult = await this.api.reviewMethods.processAnswer({
-          question: this.quizQuestion.quizQuestion,
-          ...answerData,
-        });
+        const answerResult = await this.api.reviewMethods.processAnswer(
+          this.quizQuestion.quizQuestion.id,
+          answerData
+        );
         this.$emit("answered", answerResult);
       } catch (_e) {
         await this.popups.alert(

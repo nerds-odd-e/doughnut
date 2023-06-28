@@ -24,15 +24,9 @@ public class AnswerViewedByUserBuilder extends EntityBuilder<AnswerViewedByUser>
             .getAnswerViewedByUser();
   }
 
-  public AnswerViewedByUserBuilder forReviewPoint(ReviewPoint reviewPoint) {
-    answerBuilder.forReviewPoint(reviewPoint);
-    return this;
-  }
-
   public AnswerViewedByUserBuilder validQuestionOfType(
-      QuizQuestionEntity.QuestionType questionType) {
-    answerBuilder.type(questionType);
-    answerBuilder.withValidQuestion();
+      QuizQuestionEntity.QuestionType questionType, ReviewPoint reviewPoint) {
+    answerBuilder.withValidQuestion(questionType, reviewPoint);
     return this;
   }
 

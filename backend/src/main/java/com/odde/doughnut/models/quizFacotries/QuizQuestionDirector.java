@@ -26,7 +26,7 @@ public record QuizQuestionDirector(
     }
   }
 
-  private QuizQuestionEntity buildAQuestionOfType(QuestionType questionType)
+  public QuizQuestionEntity buildAQuestionOfType(QuestionType questionType)
       throws QuizQuestionNotPossibleException {
     QuizQuestionFactory quizQuestionFactory = buildQuizQuestionFactory(questionType);
 

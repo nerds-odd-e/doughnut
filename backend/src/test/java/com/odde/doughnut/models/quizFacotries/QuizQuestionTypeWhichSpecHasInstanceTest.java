@@ -106,8 +106,8 @@ class WhichSpecHasInstanceQuizFactoryTest {
           void correct() {
             AnswerViewedByUser answerResult =
                 makeMe
-                    .anAnswerViewedByUserFor(reviewPoint)
-                    .validQuestionOfType(WHICH_SPEC_HAS_INSTANCE)
+                    .anAnswerViewedByUser()
+                    .validQuestionOfType(WHICH_SPEC_HAS_INSTANCE, reviewPoint)
                     .answerWithSpelling(source.getTitle())
                     .inMemoryPlease();
             assertTrue(answerResult.correct);
@@ -117,8 +117,8 @@ class WhichSpecHasInstanceQuizFactoryTest {
           void wrong() {
             AnswerViewedByUser answerResult =
                 makeMe
-                    .anAnswerViewedByUserFor(reviewPoint)
-                    .validQuestionOfType(WHICH_SPEC_HAS_INSTANCE)
+                    .anAnswerViewedByUser()
+                    .validQuestionOfType(WHICH_SPEC_HAS_INSTANCE, reviewPoint)
                     .answerWithSpelling("metal")
                     .inMemoryPlease();
             assertFalse(answerResult.correct);

@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -93,6 +94,7 @@ class RestReviewsControllerTests {
   @Nested
   class answer {
     ReviewPoint reviewPoint;
+    QuizQuestionEntity quizQuestionEntity;
     Answer answer;
 
     @BeforeEach
@@ -104,18 +106,18 @@ class RestReviewsControllerTests {
               .by(currentUser)
               .forgettingCurveAndNextReviewAt(200)
               .please();
-      answer =
+      answer = makeMe.anAnswer().answerWithId(answerNote).inMemoryPlease();
+      quizQuestionEntity =
           makeMe
-              .anAnswerFor(reviewPoint)
-              .type(QuizQuestionEntity.QuestionType.CLOZE_SELECTION)
-              .answerWithId(answerNote)
-              .inMemoryPlease();
+              .aQuestion()
+              .of(QuizQuestionEntity.QuestionType.CLOZE_SELECTION, reviewPoint)
+              .please();
     }
 
     @Test
     void shouldValidateTheAnswerAndUpdateReviewPoint() {
       Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
-      AnswerResult answerResult = controller.answerQuiz(answer);
+      AnswerResult answerResult = controller.answerQuiz(quizQuestionEntity, answer);
       assertTrue(answerResult.correct);
       assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
     }
@@ -124,7 +126,7 @@ class RestReviewsControllerTests {
     void shouldNoteIncreaseIndexIfRepeatImmediately() {
       testabilitySettings.timeTravelTo(reviewPoint.getLastReviewedAt());
       Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
-      controller.answerQuiz(answer);
+      controller.answerQuiz(quizQuestionEntity, answer);
       assertThat(reviewPoint.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
     }
 
@@ -132,7 +134,7 @@ class RestReviewsControllerTests {
     void shouldIncreaseTheIndex() {
       testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
       Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
-      controller.answerQuiz(answer);
+      controller.answerQuiz(quizQuestionEntity, answer);
       assertThat(reviewPoint.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
       assertThat(
           reviewPoint.getLastReviewedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
@@ -142,13 +144,13 @@ class RestReviewsControllerTests {
     void shouldIncreaseTheViceReviewPointToo() {
       Note note2 = makeMe.aNote().please();
       ReviewPoint anotherReviewPoint = makeMe.aReviewPointFor(note2).by(currentUser).please();
-      answer.getQuestion().setViceReviewPoints(List.of(anotherReviewPoint));
+      quizQuestionEntity.setViceReviewPoints(List.of(anotherReviewPoint));
       makeMe.refresh(anotherReviewPoint);
       makeMe.refresh(note2);
 
       Integer oldForgettingCurveIndex = anotherReviewPoint.getForgettingCurveIndex();
       Integer oldRepetitionCount = anotherReviewPoint.getRepetitionCount();
-      AnswerResult answerResult = controller.answerQuiz(answer);
+      AnswerResult answerResult = controller.answerQuiz(quizQuestionEntity, answer);
       assertTrue(answerResult.correct);
       assertThat(
           anotherReviewPoint.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
@@ -158,26 +160,25 @@ class RestReviewsControllerTests {
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       Answer answer = new Answer();
-      assertThrows(ResponseStatusException.class, () -> nullUserController().answerQuiz(answer));
+      assertThrows(
+          ResponseStatusException.class,
+          () -> nullUserController().answerQuiz(quizQuestionEntity, answer));
     }
 
     @Nested
     class WrongAnswer {
       @BeforeEach
       void setup() {
-        answer =
-            makeMe
-                .anAnswerFor(reviewPoint)
-                .type(QuizQuestionEntity.QuestionType.SPELLING)
-                .answerWithSpelling("wrong")
-                .inMemoryPlease();
+        quizQuestionEntity =
+            makeMe.aQuestion().of(QuizQuestionEntity.QuestionType.SPELLING, reviewPoint).please();
+        answer = makeMe.anAnswer().answerWithSpelling("wrong").inMemoryPlease();
       }
 
       @Test
       void shouldValidateTheWrongAnswer() {
         testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
         Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
-        AnswerResult answerResult = controller.answerQuiz(answer);
+        AnswerResult answerResult = controller.answerQuiz(quizQuestionEntity, answer);
         assertFalse(answerResult.correct);
         assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
       }
@@ -187,14 +188,14 @@ class RestReviewsControllerTests {
         testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
         Timestamp lastReviewedAt = reviewPoint.getLastReviewedAt();
         Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
-        controller.answerQuiz(answer);
+        controller.answerQuiz(quizQuestionEntity, answer);
         assertThat(reviewPoint.getForgettingCurveIndex(), lessThan(oldForgettingCurveIndex));
         assertThat(reviewPoint.getLastReviewedAt(), equalTo(lastReviewedAt));
       }
 
       @Test
       void shouldRepeatTheNextDay() {
-        controller.answerQuiz(answer);
+        controller.answerQuiz(quizQuestionEntity, answer);
         assertThat(
             reviewPoint.getNextReviewAt(),
             lessThan(
@@ -216,20 +217,22 @@ class RestReviewsControllerTests {
       @BeforeEach
       void setup() {
         anotherUser = makeMe.aUser().please();
-        noteByAnotherUser = makeMe.aNote().creatorAndOwner(anotherUser).please();
+        noteByAnotherUser =
+            makeMe.aNote("title").creatorAndOwner(anotherUser).description("description").please();
       }
 
       @Test
       void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
         reviewPoint = makeMe.aReviewPointFor(noteByAnotherUser).by(anotherUser).please();
-        answer = makeMe.anAnswerFor(reviewPoint).please();
+        answer = makeMe.anAnswer().ofQuestion(SPELLING, reviewPoint).please();
         assertThrows(UnexpectedNoAccessRightException.class, () -> controller.showAnswer(answer));
       }
 
       @Test
       void canSeeNoteThatHasReadAccess() throws UnexpectedNoAccessRightException {
         reviewPoint = makeMe.aReviewPointFor(noteByAnotherUser).by(currentUser).please();
-        answer = makeMe.anAnswerFor(reviewPoint).answerWithSpelling("xx").please();
+        answer =
+            makeMe.anAnswer().ofQuestion(SPELLING, reviewPoint).answerWithSpelling("xx").please();
         makeMe
             .aSubscription()
             .forUser(currentUser.getEntity())

@@ -143,8 +143,8 @@ class FromSamePartAsQuizFactoryTest {
           void correct() {
             AnswerViewedByUser answerResult =
                 makeMe
-                    .anAnswerViewedByUserFor(reviewPoint)
-                    .validQuestionOfType(FROM_SAME_PART_AS)
+                    .anAnswerViewedByUser()
+                    .validQuestionOfType(FROM_SAME_PART_AS, reviewPoint)
                     .answerWithSpelling(pretty.getTitle())
                     .inMemoryPlease();
             assertTrue(answerResult.correct);
@@ -154,8 +154,8 @@ class FromSamePartAsQuizFactoryTest {
           void wrong() {
             AnswerViewedByUser answerResult =
                 makeMe
-                    .anAnswerViewedByUserFor(reviewPoint)
-                    .validQuestionOfType(FROM_SAME_PART_AS)
+                    .anAnswerViewedByUser()
+                    .validQuestionOfType(FROM_SAME_PART_AS, reviewPoint)
                     .answerWithSpelling("metal")
                     .inMemoryPlease();
             assertFalse(answerResult.correct);

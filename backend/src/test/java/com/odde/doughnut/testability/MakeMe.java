@@ -82,12 +82,12 @@ public class MakeMe extends MakeMeWithoutDB {
     return new ImageBuilder(new Image(), this);
   }
 
-  public AnswerViewedByUserBuilder anAnswerViewedByUserFor(ReviewPoint reviewPoint) {
-    return new AnswerViewedByUserBuilder(this).forReviewPoint(reviewPoint);
+  public AnswerViewedByUserBuilder anAnswerViewedByUser() {
+    return new AnswerViewedByUserBuilder(this);
   }
 
-  public AnswerBuilder anAnswerFor(ReviewPoint reviewPoint) {
-    return new AnswerBuilder(this).forReviewPoint(reviewPoint);
+  public AnswerBuilder anAnswer() {
+    return new AnswerBuilder(this);
   }
 
   public SubscriptionBuilder aSubscription() {

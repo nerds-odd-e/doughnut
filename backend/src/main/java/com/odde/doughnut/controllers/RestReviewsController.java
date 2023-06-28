@@ -78,10 +78,13 @@ class RestReviewsController {
     return reviewing.getDueReviewPoints(dueInDays, testabilitySettings.getRandomizer());
   }
 
-  @PostMapping("/answer")
+  @PostMapping("/{quizQuestion}/answer")
   @Transactional
-  public AnswerResult answerQuiz(@Valid @RequestBody Answer answer) {
+  public AnswerResult answerQuiz(
+      @PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity,
+      @Valid @RequestBody Answer answer) {
     currentUser.assertLoggedIn();
+    answer.setQuestion(quizQuestionEntity);
     AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
     answerModel.updateReviewPoints(testabilitySettings.getCurrentUTCTimestamp());
     answerModel.save();

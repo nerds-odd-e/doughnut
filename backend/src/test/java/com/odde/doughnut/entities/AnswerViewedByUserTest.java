@@ -38,8 +38,8 @@ class AnswerViewedByUserTest {
     void correct() {
       AnswerViewedByUser answer =
           makeMe
-              .anAnswerViewedByUserFor(reviewPoint)
-              .validQuestionOfType(CLOZE_SELECTION)
+              .anAnswerViewedByUser()
+              .validQuestionOfType(CLOZE_SELECTION, reviewPoint)
               .answerWithSpelling("this")
               .inMemoryPlease();
       assertTrue(answer.correct);
@@ -49,8 +49,8 @@ class AnswerViewedByUserTest {
     void correctWhenThereAreExtraSpace() {
       AnswerViewedByUser answer =
           makeMe
-              .anAnswerViewedByUserFor(reviewPoint)
-              .validQuestionOfType(CLOZE_SELECTION)
+              .anAnswerViewedByUser()
+              .validQuestionOfType(CLOZE_SELECTION, reviewPoint)
               .answerWithSpelling("this ")
               .inMemoryPlease();
       assertTrue(answer.correct);
@@ -60,8 +60,8 @@ class AnswerViewedByUserTest {
     void literalAnswer() {
       AnswerViewedByUser answerResult =
           makeMe
-              .anAnswerViewedByUserFor(reviewPoint)
-              .validQuestionOfType(CLOZE_SELECTION)
+              .anAnswerViewedByUser()
+              .validQuestionOfType(CLOZE_SELECTION, reviewPoint)
               .answerWithSpelling("this / that")
               .inMemoryPlease();
       assertTrue(answerResult.correct);
