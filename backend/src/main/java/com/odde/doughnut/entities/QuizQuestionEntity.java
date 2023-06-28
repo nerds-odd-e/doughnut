@@ -25,25 +25,6 @@ import org.apache.logging.log4j.util.Strings;
 @Table(name = "quiz_question")
 public class QuizQuestionEntity {
 
-  public Boolean isAnswerCorrect(Note answerNote, String spellingAnswer) {
-    if (getQuestionType() == QuestionType.JUST_REVIEW
-        || getQuestionType() == QuestionType.AI_QUESTION) {
-      return spellingAnswer.equals("yes");
-    }
-    return buildPresenter().knownRightAnswers().stream()
-        .anyMatch(
-            correctAnswerNote -> {
-              if (answerNote != null) {
-                return correctAnswerNote.equals(answerNote);
-              }
-              return correctAnswerNote.getNoteTitle().matches(spellingAnswer);
-            });
-  }
-
-  public QuizQuestionPresenter buildPresenter() {
-    return getQuestionType().presenter.apply(this);
-  }
-
   public enum QuestionType {
     JUST_REVIEW(0, null, JustReviewQuizPresenter::new),
     CLOZE_SELECTION(1, ClozeTitleSelectionQuizFactory::new, ClozeTitleSelectionQuizPresenter::new),
@@ -157,5 +138,24 @@ public class QuizQuestionEntity {
     return Arrays.stream(viceReviewPointIds.split(","))
         .map(Integer::valueOf)
         .collect(Collectors.toList());
+  }
+
+  public QuizQuestionPresenter buildPresenter() {
+    return getQuestionType().presenter.apply(this);
+  }
+
+  public Boolean isAnswerCorrect(Note answerNote, String spellingAnswer) {
+    if (getQuestionType() == QuestionType.JUST_REVIEW
+        || getQuestionType() == QuestionType.AI_QUESTION) {
+      return spellingAnswer.equals("yes");
+    }
+    return buildPresenter().knownRightAnswers().stream()
+        .anyMatch(
+            correctAnswerNote -> {
+              if (answerNote != null) {
+                return correctAnswerNote.equals(answerNote);
+              }
+              return correctAnswerNote.getNoteTitle().matches(spellingAnswer);
+            });
   }
 }

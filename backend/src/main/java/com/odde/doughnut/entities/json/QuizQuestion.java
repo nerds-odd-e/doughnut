@@ -1,6 +1,9 @@
 package com.odde.doughnut.entities.json;
 
-import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.PictureWithMask;
+import com.odde.doughnut.entities.QuizQuestionEntity;
+import com.odde.doughnut.entities.Thing;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionPresenter;
@@ -17,6 +20,10 @@ import org.springframework.lang.Nullable;
 public class QuizQuestion {
 
   public QuizQuestionEntity quizQuestion;
+
+  @Getter public Integer reviewPointId;
+
+  @Getter public String rawJsonQuestion;
 
   @Getter public QuizQuestionEntity.QuestionType questionType;
 

@@ -3,6 +3,8 @@ import generateId from "./generateId";
 
 class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
   quizQuestion: Generated.QuizQuestion = {
+    reviewPointId: 0,
+    rawJsonQuestion: "",
     quizQuestion: {
       id: generateId(),
       reviewPoint: 0,
