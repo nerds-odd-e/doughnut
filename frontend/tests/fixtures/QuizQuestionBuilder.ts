@@ -1,8 +1,8 @@
 import Builder from "./Builder";
 import generateId from "./generateId";
 
-class QuizQuestionBuilder extends Builder<Generated.QuizQuestionViewedByUser> {
-  quizQuestion: Generated.QuizQuestionViewedByUser = {
+class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
+  quizQuestion: Generated.QuizQuestion = {
     quizQuestion: {
       id: generateId(),
       reviewPoint: 0,
@@ -48,7 +48,7 @@ class QuizQuestionBuilder extends Builder<Generated.QuizQuestionViewedByUser> {
     return this;
   }
 
-  do(): Generated.QuizQuestionViewedByUser {
+  do(): Generated.QuizQuestion {
     return this.quizQuestion;
   }
 }

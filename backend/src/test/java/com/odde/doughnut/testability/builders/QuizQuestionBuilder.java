@@ -2,7 +2,7 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
+import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.EntityBuilder;
@@ -32,10 +32,10 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
   @Override
   protected void beforeCreate(boolean needPersist) {}
 
-  public QuizQuestionViewedByUser ViewedByUserPlease() {
+  public QuizQuestion ViewedByUserPlease() {
     QuizQuestionEntity quizQuestion = inMemoryPlease();
     if (quizQuestion == null) return null;
-    return QuizQuestionViewedByUser.create(
+    return QuizQuestion.create(
         quizQuestion, makeMe.modelFactoryService, makeMe.aNullUserModel().getEntity());
   }
 }

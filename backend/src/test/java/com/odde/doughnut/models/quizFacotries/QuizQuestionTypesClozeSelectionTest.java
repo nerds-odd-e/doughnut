@@ -8,7 +8,7 @@ import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.LinksOfANote;
-import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
+import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,14 +45,14 @@ class QuizQuestionTypesClozeSelectionTest {
     void NotForNoteWithoutVisibleDescription() {
       makeMe.theNote(note1).description("<p>  <br>  <br/>  </p>  <br>").please();
       makeMe.refresh(top);
-      QuizQuestionViewedByUser quizQuestion = buildClozeQuizQuestion();
+      QuizQuestion quizQuestion = buildClozeQuizQuestion();
       assertThat(quizQuestion, nullValue());
     }
 
     @Test
     void shouldIncludeRightAnswers() {
       makeMe.refresh(top);
-      QuizQuestionViewedByUser quizQuestion = buildClozeQuizQuestion();
+      QuizQuestion quizQuestion = buildClozeQuizQuestion();
       assertThat(quizQuestion.getDescription(), equalTo("descrption"));
       assertThat(quizQuestion.getMainTopic(), equalTo(""));
       List<String> options = toOptionStrings(quizQuestion);
@@ -65,20 +65,18 @@ class QuizQuestionTypesClozeSelectionTest {
       makeMe.theNote(note1).linkTo(note2, Link.LinkType.TAGGED_BY).please();
       makeMe.theNote(note1).linkTo(note2, Link.LinkType.SPECIALIZE).please();
       makeMe.refresh(top);
-      QuizQuestionViewedByUser quizQuestion = buildClozeQuizQuestion();
+      QuizQuestion quizQuestion = buildClozeQuizQuestion();
       LinksOfANote hintLinks = quizQuestion.getHintLinks();
       assertThat(Link.LinkType.TAGGED_BY, in(hintLinks.getLinks().keySet()));
       assertThat(Link.LinkType.SPECIALIZE, not(in(hintLinks.getLinks().keySet())));
     }
 
-    private QuizQuestionViewedByUser buildClozeQuizQuestion() {
+    private QuizQuestion buildClozeQuizQuestion() {
       return makeMe.buildAQuestion(CLOZE_SELECTION, reviewPoint);
     }
 
-    private List<String> toOptionStrings(QuizQuestionViewedByUser quizQuestion) {
-      return quizQuestion.getOptions().stream()
-          .map(QuizQuestionViewedByUser.Option::getDisplay)
-          .toList();
+    private List<String> toOptionStrings(QuizQuestion quizQuestion) {
+      return quizQuestion.getOptions().stream().map(QuizQuestion.Option::getDisplay).toList();
     }
   }
 }

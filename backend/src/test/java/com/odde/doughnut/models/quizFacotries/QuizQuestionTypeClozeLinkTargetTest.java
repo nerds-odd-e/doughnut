@@ -6,7 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
+import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,7 +52,7 @@ class ClozeLinkTargetQuizFactoryTest {
     }
   }
 
-  private QuizQuestionViewedByUser buildQuestion() {
+  private QuizQuestion buildQuestion() {
     return makeMe.buildAQuestion(CLOZE_LINK_TARGET, reviewPoint);
   }
 }

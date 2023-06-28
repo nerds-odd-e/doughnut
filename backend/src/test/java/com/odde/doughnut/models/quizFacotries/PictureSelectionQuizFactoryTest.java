@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.odde.doughnut.entities.AnswerViewedByUser;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
+import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -76,7 +76,7 @@ class PictureSelectionQuizFactoryTest {
 
       @Test
       void shouldIncludeRightAnswers() {
-        QuizQuestionViewedByUser quizQuestion = buildQuestion();
+        QuizQuestion quizQuestion = buildQuestion();
         assertThat(quizQuestion.getDescription(), equalTo(""));
         assertThat(quizQuestion.getMainTopic(), equalTo("source"));
         List<String> options = toOptionStrings(quizQuestion);
@@ -93,7 +93,7 @@ class PictureSelectionQuizFactoryTest {
 
       @Test
       void shouldIncludeUncle() {
-        QuizQuestionViewedByUser quizQuestion = buildQuestion();
+        QuizQuestion quizQuestion = buildQuestion();
         List<String> options = toOptionStrings(quizQuestion);
         assertThat(uncle.getTitle(), in(options));
       }
@@ -114,13 +114,11 @@ class PictureSelectionQuizFactoryTest {
     }
   }
 
-  private QuizQuestionViewedByUser buildQuestion() {
+  private QuizQuestion buildQuestion() {
     return makeMe.buildAQuestion(PICTURE_SELECTION, reviewPoint);
   }
 
-  private List<String> toOptionStrings(QuizQuestionViewedByUser quizQuestion) {
-    return quizQuestion.getOptions().stream()
-        .map(QuizQuestionViewedByUser.Option::getDisplay)
-        .toList();
+  private List<String> toOptionStrings(QuizQuestion quizQuestion) {
+    return quizQuestion.getOptions().stream().map(QuizQuestion.Option::getDisplay).toList();
   }
 }

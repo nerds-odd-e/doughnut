@@ -11,7 +11,7 @@ import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Link.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
+import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -111,7 +111,7 @@ class FromDifferentPartAsQuizFactoryTest {
 
         @Test
         void shouldIncludeRightAnswersAndFillingOptions() {
-          QuizQuestionViewedByUser quizQuestion = buildQuestion();
+          QuizQuestion quizQuestion = buildQuestion();
           assertThat(
               quizQuestion.getDescription(),
               containsString(
@@ -191,7 +191,7 @@ class FromDifferentPartAsQuizFactoryTest {
 
           @Test
           void shouldInclude2ViceReviewPoints() {
-            QuizQuestionViewedByUser quizQuestion = buildQuestion();
+            QuizQuestion quizQuestion = buildQuestion();
             assertThat(
                 quizQuestion.getViceReviewPointIdList(), contains(additionalReviewPoint.getId()));
           }
@@ -226,12 +226,12 @@ class FromDifferentPartAsQuizFactoryTest {
     }
   }
 
-  private QuizQuestionViewedByUser buildQuestion() {
+  private QuizQuestion buildQuestion() {
     return makeMe.buildAQuestion(FROM_DIFFERENT_PART_AS, uglySubjectiveRp);
   }
 
-  private List<String> toOptionStrings(QuizQuestionViewedByUser quizQuestion) {
-    List<QuizQuestionViewedByUser.Option> options = quizQuestion.getOptions();
-    return options.stream().map(QuizQuestionViewedByUser.Option::getDisplay).toList();
+  private List<String> toOptionStrings(QuizQuestion quizQuestion) {
+    List<QuizQuestion.Option> options = quizQuestion.getOptions();
+    return options.stream().map(QuizQuestion.Option::getDisplay).toList();
   }
 }

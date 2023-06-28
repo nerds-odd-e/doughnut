@@ -122,7 +122,7 @@ declare namespace Generated {
         subscriptions: Subscription[];
     }
 
-    interface QuizQuestionViewedByUser {
+    interface QuizQuestion {
         quizQuestion: QuizQuestionEntity;
         questionType: QuestionType;
         description: string;
@@ -190,7 +190,7 @@ declare namespace Generated {
         answerDisplay: string;
         correct: boolean;
         reviewPoint: ReviewPoint;
-        quizQuestion: QuizQuestionViewedByUser;
+        quizQuestion: QuizQuestion;
     }
 
     interface AnswerResult {

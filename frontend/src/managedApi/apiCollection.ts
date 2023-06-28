@@ -107,7 +107,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     async getRandomQuestionForReviewPoint(reviewPointId: Doughnut.ID) {
       const res = (await managedApi.restGet(
         `review-points/${reviewPointId}/random-question`
-      )) as Generated.QuizQuestionViewedByUser;
+      )) as Generated.QuizQuestion;
       return res;
     },
   },
@@ -297,10 +297,10 @@ const apiCollection = (managedApi: ManagedApi) => ({
 
     async askAIToGenerateQuestion(
       noteId: Doughnut.ID
-    ): Promise<Generated.QuizQuestionViewedByUser> {
+    ): Promise<Generated.QuizQuestion> {
       return (await managedApi.restGet(
         `ai/generate-question?note=${noteId}`
-      )) as Generated.QuizQuestionViewedByUser;
+      )) as Generated.QuizQuestion;
     },
 
     async askAiEngagingStories(prompt: string) {

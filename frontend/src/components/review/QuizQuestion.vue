@@ -144,7 +144,7 @@ export default defineComponent({
   },
   props: {
     quizQuestion: {
-      type: Object as PropType<Generated.QuizQuestionViewedByUser>,
+      type: Object as PropType<Generated.QuizQuestion>,
       required: true,
     },
     storageAccessor: {

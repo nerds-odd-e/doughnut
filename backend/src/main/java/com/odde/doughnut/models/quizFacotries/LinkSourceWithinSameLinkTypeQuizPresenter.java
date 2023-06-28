@@ -3,7 +3,7 @@ package com.odde.doughnut.models.quizFacotries;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
-import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
+import com.odde.doughnut.entities.json.QuizQuestion;
 import java.util.List;
 
 public class LinkSourceWithinSameLinkTypeQuizPresenter implements QuizQuestionPresenter {
@@ -24,8 +24,8 @@ public class LinkSourceWithinSameLinkTypeQuizPresenter implements QuizQuestionPr
   }
 
   @Override
-  public QuizQuestionViewedByUser.OptionCreator optionCreator() {
-    return new QuizQuestionViewedByUser.ClozeLinkOptionCreator();
+  public QuizQuestion.OptionCreator optionCreator() {
+    return new QuizQuestion.ClozeLinkOptionCreator();
   }
 
   @Override

@@ -53,9 +53,7 @@ export default defineComponent({
   data() {
     return {
       currentQuestionIndex: 0,
-      currentQuizQuestion: undefined as
-        | Generated.QuizQuestionViewedByUser
-        | undefined,
+      currentQuizQuestion: undefined as Generated.QuizQuestion | undefined,
     };
   },
   watch: {

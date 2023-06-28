@@ -6,7 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
+import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
@@ -52,7 +52,7 @@ class QuizQuestionTest {
     makeMe.aNote().under(top).please();
     Note note = makeMe.aNote().under(top).title("abc").description("abc has 3 letters").please();
     makeMe.refresh(top);
-    QuizQuestionViewedByUser quizQuestion = getQuizQuestion(note);
+    QuizQuestion quizQuestion = getQuizQuestion(note);
     assertThat(
         quizQuestion.getDescription(),
         equalTo(
@@ -62,16 +62,14 @@ class QuizQuestionTest {
   @Nested
   class ClozeSelectionQuiz {
     private List<String> getOptions(Note note) {
-      QuizQuestionViewedByUser quizQuestion = getQuizQuestion(note);
-      return quizQuestion.getOptions().stream()
-          .map(QuizQuestionViewedByUser.Option::getDisplay)
-          .toList();
+      QuizQuestion quizQuestion = getQuizQuestion(note);
+      return quizQuestion.getOptions().stream().map(QuizQuestion.Option::getDisplay).toList();
     }
 
     @Test
     void aNoteWithNoSiblingsShouldDoJustReview() {
       Note note = makeMe.aHeadNote().please();
-      QuizQuestionViewedByUser quizQuestion = getQuizQuestion(note);
+      QuizQuestion quizQuestion = getQuizQuestion(note);
       assertThat(
           quizQuestion.getQuestionType(), equalTo(QuizQuestionEntity.QuestionType.JUST_REVIEW));
     }
@@ -179,8 +177,8 @@ class QuizQuestionTest {
     }
   }
 
-  private QuizQuestionViewedByUser getQuizQuestion(Note note) {
-    return QuizQuestionViewedByUser.create(
+  private QuizQuestion getQuizQuestion(Note note) {
+    return QuizQuestion.create(
         getReviewPointModel(note).generateAQuizQuestion(randomizer, userModel.getEntity(), null),
         makeMe.modelFactoryService,
         userModel.getEntity());

@@ -11,7 +11,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.entities.json.AiSuggestionRequest;
-import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
+import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
@@ -167,8 +167,8 @@ class RestAiControllerTest {
                   """
       {"question": "What is the first color in the rainbow?"}
       """));
-      QuizQuestionViewedByUser quizQuestionViewedByUser = controller.generateQuestion(note);
-      assertThat(quizQuestionViewedByUser.quizQuestion.getRawJsonQuestion())
+      QuizQuestion quizQuestion = controller.generateQuestion(note);
+      assertThat(quizQuestion.quizQuestion.getRawJsonQuestion())
           .contains("What is the first color in the rainbow?");
     }
 

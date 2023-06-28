@@ -6,7 +6,7 @@ import com.odde.doughnut.entities.AnswerViewedByUser;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.DueReviewPoints;
 import com.odde.doughnut.entities.json.InitialInfo;
-import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
+import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.entities.json.ReviewStatus;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -102,8 +102,7 @@ class RestReviewsController {
     AnswerViewedByUser answerResult = answerModel.getAnswerViewedByUser();
     answerResult.reviewPoint = answer.getQuestion().getReviewPoint();
     answerResult.quizQuestion =
-        QuizQuestionViewedByUser.create(
-            answer.getQuestion(), modelFactoryService, currentUser.getEntity());
+        QuizQuestion.create(answer.getQuestion(), modelFactoryService, currentUser.getEntity());
     return answerResult;
   }
 }

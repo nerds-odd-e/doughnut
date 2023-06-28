@@ -5,7 +5,7 @@ import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.entities.json.AiSuggestionRequest;
-import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
+import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteModel;
 import com.odde.doughnut.models.UserModel;
@@ -47,13 +47,13 @@ public class RestAiController {
   }
 
   @GetMapping("/generate-question")
-  public QuizQuestionViewedByUser generateQuestion(@RequestParam(value = "note") Note note) {
+  public QuizQuestion generateQuestion(@RequestParam(value = "note") Note note) {
     currentUser.assertLoggedIn();
     String rawJsonQuestion = aiAdvisorService.generateQuestionJsonString(note, modelFactoryService);
     QuizQuestionEntity quizQuestion = new QuizQuestionEntity();
     quizQuestion.setQuestionType(QuizQuestionEntity.QuestionType.AI_QUESTION);
     quizQuestion.setRawJsonQuestion(rawJsonQuestion);
-    return new QuizQuestionViewedByUser(quizQuestion, null, null);
+    return new QuizQuestion(quizQuestion, null, null);
   }
 
   @PostMapping("/ask-engaging-stories")

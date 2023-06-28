@@ -1,7 +1,7 @@
 package com.odde.doughnut.testability;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
+import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
@@ -110,7 +110,7 @@ public class MakeMe extends MakeMeWithoutDB {
     return new QuizQuestionBuilder(this);
   }
 
-  public QuizQuestionViewedByUser buildAQuestion(
+  public QuizQuestion buildAQuestion(
       QuizQuestionEntity.QuestionType questionType, ReviewPoint reviewPoint) {
     return aQuestion().buildValid(questionType, reviewPoint).ViewedByUserPlease();
   }

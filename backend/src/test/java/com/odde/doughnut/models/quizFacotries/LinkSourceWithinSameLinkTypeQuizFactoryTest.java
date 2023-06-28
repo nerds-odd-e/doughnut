@@ -12,7 +12,7 @@ import com.odde.doughnut.entities.AnswerViewedByUser;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
+import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -67,7 +67,7 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
 
     @Test
     void shouldIncludeRightAnswers() {
-      QuizQuestionViewedByUser quizQuestion = buildLinkTargetQuizQuestion();
+      QuizQuestion quizQuestion = buildLinkTargetQuizQuestion();
       assertThat(
           quizQuestion.getDescription(),
           equalTo("Which one <em>is immediately a specialization of</em>:"));
@@ -93,13 +93,11 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
     }
   }
 
-  private QuizQuestionViewedByUser buildLinkTargetQuizQuestion() {
+  private QuizQuestion buildLinkTargetQuizQuestion() {
     return makeMe.buildAQuestion(LINK_SOURCE_WITHIN_SAME_LINK_TYPE, reviewPoint);
   }
 
-  private List<String> toOptionStrings(QuizQuestionViewedByUser quizQuestion) {
-    return quizQuestion.getOptions().stream()
-        .map(QuizQuestionViewedByUser.Option::getDisplay)
-        .toList();
+  private List<String> toOptionStrings(QuizQuestion quizQuestion) {
+    return quizQuestion.getOptions().stream().map(QuizQuestion.Option::getDisplay).toList();
   }
 }

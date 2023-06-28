@@ -26,9 +26,7 @@ export default defineComponent({
   components: { AIQuestion },
   data() {
     return {
-      QuizQuestionViewedByUser: undefined as
-        | Generated.QuizQuestionViewedByUser
-        | undefined,
+      QuizQuestionViewedByUser: undefined as Generated.QuizQuestion | undefined,
       numberOfTries: 0,
       isUnmounted: false,
     };

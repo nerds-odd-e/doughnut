@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
+import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.entities.json.SelfEvaluation;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -47,8 +47,7 @@ class RestReviewPointController {
 
   @GetMapping("/{reviewPoint}/random-question")
   @Transactional
-  public QuizQuestionViewedByUser repeatReview(
-      @PathVariable("reviewPoint") ReviewPoint reviewPoint) {
+  public QuizQuestion repeatReview(@PathVariable("reviewPoint") ReviewPoint reviewPoint) {
     currentUser.assertLoggedIn();
     ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPoint);
     return reviewPointModel.getRandomQuizQuestion(

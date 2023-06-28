@@ -18,8 +18,9 @@ const goodQuestion = {
 describe("QuizQuestion", () => {
   describe("AiQuestion", () => {
     it.skip("shows the progress", async () => {
-      const quizQuestion: Generated.QuizQuestionViewedByUser =
-        makeMe.aQuizQuestion.withQuestionType("AI_QUESTION").please();
+      const quizQuestion: Generated.QuizQuestion = makeMe.aQuizQuestion
+        .withQuestionType("AI_QUESTION")
+        .please();
       helper.apiMock
         .expectingPost(
           `/api/ai/${quizQuestion.notebookPosition?.noteId}/ask-suggestions`

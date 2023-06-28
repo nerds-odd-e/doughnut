@@ -57,7 +57,7 @@ describe("repeat page", () => {
 
   describe('repeat page with "just review" quiz', () => {
     let repetition: Generated.DueReviewPoints;
-    let quizQuestion: Generated.QuizQuestionViewedByUser;
+    let quizQuestion: Generated.QuizQuestion;
 
     beforeEach(() => {
       vi.useFakeTimers();

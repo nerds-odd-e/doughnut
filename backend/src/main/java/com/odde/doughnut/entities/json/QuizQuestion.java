@@ -14,7 +14,7 @@ import lombok.Getter;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.lang.Nullable;
 
-public class QuizQuestionViewedByUser {
+public class QuizQuestion {
 
   public QuizQuestionEntity quizQuestion;
 
@@ -34,16 +34,16 @@ public class QuizQuestionViewedByUser {
 
   public Optional<PictureWithMask> pictureWithMask;
 
-  public static QuizQuestionViewedByUser create(
+  public static QuizQuestion create(
       QuizQuestionEntity quizQuestion, ModelFactoryService modelFactoryService, User user) {
     QuizQuestionPresenter presenter = quizQuestion.buildPresenter();
-    return new QuizQuestionViewedByUser(
+    return new QuizQuestion(
         quizQuestion,
         presenter.optionCreator().getOptions(modelFactoryService, quizQuestion.getOptionThingIds()),
         new NoteViewer(user, quizQuestion.getReviewPoint().getHeadNote()).jsonNotePosition(true));
   }
 
-  public QuizQuestionViewedByUser(
+  public QuizQuestion(
       QuizQuestionEntity quizQuestion,
       List<Option> options,
       @Nullable NotePositionViewedByUser notebookPosition) {
