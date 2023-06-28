@@ -27,7 +27,7 @@ public record QuizQuestionDirector(
 
       QuizQuestion quizQuestion = reviewPoint.createAQuizQuestionOfType(questionType);
 
-      quizQuestionFactory.fillQuizQuestion(quizQuestion, aiAdvisorService);
+      quizQuestionFactory.fillQuizQuestion(quizQuestion);
 
       if (quizQuestionFactory instanceof QuestionOptionsFactory optionsFactory) {
         List<Thingy> optionsEntities = optionsFactory.getOptionEntities();
@@ -51,7 +51,7 @@ public record QuizQuestionDirector(
 
   private QuizQuestionFactory buildQuizQuestionFactory() {
     return questionType.factory.apply(
-        reviewPoint, new QuizQuestionServant(randomizer, modelFactoryService));
+        reviewPoint, new QuizQuestionServant(randomizer, modelFactoryService, aiAdvisorService));
   }
 
   private String toThingIdsString(List<Thingy> options) {

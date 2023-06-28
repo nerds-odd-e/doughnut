@@ -2,7 +2,6 @@ package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.services.AiAdvisorService;
 
 public class AiQuestionFactory implements QuizQuestionFactory {
   private ReviewPoint reviewPoint;
@@ -14,9 +13,9 @@ public class AiQuestionFactory implements QuizQuestionFactory {
   }
 
   @Override
-  public void fillQuizQuestion(QuizQuestion quizQuestion, AiAdvisorService aiAdvisorService) {
+  public void fillQuizQuestion(QuizQuestion quizQuestion) {
     String suggestion =
-        aiAdvisorService.generateQuestionJsonString(
+        servant.aiAdvisorService.generateQuestionJsonString(
             reviewPoint.getNote(), servant.modelFactoryService);
     quizQuestion.setRawJsonQuestion(suggestion);
   }

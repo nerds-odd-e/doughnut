@@ -9,6 +9,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AiAdvisorService;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -18,6 +19,7 @@ import java.util.stream.Stream;
 public class QuizQuestionServant {
   final Randomizer randomizer;
   final ModelFactoryService modelFactoryService;
+  final AiAdvisorService aiAdvisorService;
   final int maxFillingOptionCount = 2;
   private final List<LinkType> candidateQuestionLinkTypes =
       List.of(
@@ -29,9 +31,13 @@ public class QuizQuestionServant {
           LinkType.USES,
           LinkType.RELATED_TO);
 
-  public QuizQuestionServant(Randomizer randomizer, ModelFactoryService modelFactoryService) {
+  public QuizQuestionServant(
+      Randomizer randomizer,
+      ModelFactoryService modelFactoryService,
+      AiAdvisorService aiAdvisorService) {
     this.randomizer = randomizer;
     this.modelFactoryService = modelFactoryService;
+    this.aiAdvisorService = aiAdvisorService;
   }
 
   List<Note> chooseFromCohort(Note answerNote, Predicate<Note> notePredicate) {
