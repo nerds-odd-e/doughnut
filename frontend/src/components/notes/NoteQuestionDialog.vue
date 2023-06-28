@@ -26,19 +26,19 @@ export default defineComponent({
   components: { AIQuestion },
   data() {
     return {
-      QuizQuestionViewedByUser: undefined as Generated.QuizQuestion | undefined,
+      quizQuestion: undefined as Generated.QuizQuestion | undefined,
       numberOfTries: 0,
       isUnmounted: false,
     };
   },
   computed: {
     rawJsonQuestion() {
-      return this.QuizQuestionViewedByUser?.quizQuestion?.rawJsonQuestion;
+      return this.quizQuestion?.quizQuestion?.rawJsonQuestion;
     },
   },
   methods: {
     async generateQuestion() {
-      this.QuizQuestionViewedByUser = await this.api.ai.askAIToGenerateQuestion(
+      this.quizQuestion = await this.api.ai.askAIToGenerateQuestion(
         this.selectedNote.id
       );
       this.numberOfTries += 1;
