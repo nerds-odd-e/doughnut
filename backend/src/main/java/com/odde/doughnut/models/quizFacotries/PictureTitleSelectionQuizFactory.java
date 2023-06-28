@@ -1,6 +1,5 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 
 public class PictureTitleSelectionQuizFactory extends ClozeTitleSelectionQuizFactory {
@@ -9,10 +8,7 @@ public class PictureTitleSelectionQuizFactory extends ClozeTitleSelectionQuizFac
   }
 
   @Override
-  public Note generateAnswer() throws QuizQuestionNotPossibleException {
-    if (reviewPoint.getNote().getPictureWithMask().isEmpty()) {
-      throw new QuizQuestionNotPossibleException();
-    }
-    return super.generateAnswer();
+  public boolean isValidQuestion() {
+    return reviewPoint.getNote().getPictureWithMask().isPresent();
   }
 }
