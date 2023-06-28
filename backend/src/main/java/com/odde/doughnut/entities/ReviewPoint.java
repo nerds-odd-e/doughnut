@@ -107,12 +107,13 @@ public class ReviewPoint {
         == TimestampOperations.getDayId(currentTime, timeZone);
   }
 
-  public List<QuizQuestion.QuestionType> availableQuestionTypes(User user) {
+  public List<QuizQuestion.QuestionType> availableQuestionTypes(
+      Boolean aiQuestionTypeOnlyForReview) {
     List<QuizQuestion.QuestionType> questionTypes = new ArrayList<>();
     if (getLink() != null) {
       Collections.addAll(questionTypes, getLink().getLinkType().getQuestionTypes());
     } else {
-      if (user.getAiQuestionTypeOnlyForReview()) {
+      if (aiQuestionTypeOnlyForReview) {
         questionTypes.add(QuestionType.AI_QUESTION);
       } else {
         questionTypes.add(QuestionType.SPELLING);

@@ -14,21 +14,24 @@ import java.util.stream.Collectors;
 
 public record QuizQuestionDirector(
     ReviewPoint reviewPoint,
-    QuestionType questionType,
     Randomizer randomizer,
     ModelFactoryService modelFactoryService,
     AiAdvisorService aiAdvisorService) {
 
-  public Optional<QuizQuestion> buildQuizQuestion() {
+  public Optional<QuizQuestion> buildQuizQuestion(QuestionType questionType) {
     try {
-      return Optional.of(getQuizQuestion());
+      return Optional.of(buildRandomQuestion(questionType));
     } catch (QuizQuestionNotPossibleException e) {
       return Optional.empty();
     }
   }
 
-  private QuizQuestion getQuizQuestion() throws QuizQuestionNotPossibleException {
-    QuizQuestionFactory quizQuestionFactory = buildQuizQuestionFactory();
+  private QuizQuestion buildRandomQuestion(QuestionType questionType)
+      throws QuizQuestionNotPossibleException {
+    QuizQuestionFactory quizQuestionFactory =
+        questionType.factory.apply(
+            reviewPoint,
+            new QuizQuestionServant(randomizer, modelFactoryService, aiAdvisorService));
     quizQuestionFactory.validatePossibility();
 
     QuizQuestion quizQuestion = reviewPoint.createAQuizQuestionOfType(questionType);
@@ -52,16 +55,21 @@ public record QuizQuestionDirector(
     return quizQuestion;
   }
 
-  private QuizQuestionFactory buildQuizQuestionFactory() {
-    return questionType.factory.apply(
-        reviewPoint, new QuizQuestionServant(randomizer, modelFactoryService, aiAdvisorService));
-  }
-
   private String toThingIdsString(List<Thingy> options) {
     return randomizer.shuffle(options).stream()
         .map(Thingy::getThing)
         .map(Thing::getId)
         .map(Object::toString)
         .collect(Collectors.joining(","));
+  }
+
+  public QuizQuestion buildRandomQuestion(Boolean aiQuestionTypeOnlyForReview) {
+    return this.randomizer
+        .shuffle(reviewPoint.availableQuestionTypes(aiQuestionTypeOnlyForReview))
+        .stream()
+        .map(type -> buildQuizQuestion(type))
+        .flatMap(Optional::stream)
+        .findFirst()
+        .orElseGet(() -> reviewPoint.createAQuizQuestionOfType(QuestionType.JUST_REVIEW));
   }
 }

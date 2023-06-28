@@ -8,7 +8,6 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
 import com.odde.doughnut.services.AiAdvisorService;
 import java.sql.Timestamp;
-import java.util.Optional;
 
 public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFactoryService) {
   public QuizQuestionViewedByUser getRandomQuizQuestion(
@@ -30,17 +29,9 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
 
   public QuizQuestion generateAQuizQuestion(
       Randomizer randomizer, User user, AiAdvisorService aiAdvisorService) {
-    return randomizer.shuffle(entity.availableQuestionTypes(user)).stream()
-        .map(type -> buildQuizQuestion(randomizer, aiAdvisorService, type))
-        .flatMap(Optional::stream)
-        .findFirst()
-        .orElseGet(() -> entity.createAQuizQuestionOfType(QuizQuestion.QuestionType.JUST_REVIEW));
-  }
-
-  private Optional<QuizQuestion> buildQuizQuestion(
-      Randomizer randomizer, AiAdvisorService aiAdvisorService, QuizQuestion.QuestionType type) {
-    return new QuizQuestionDirector(entity, type, randomizer, modelFactoryService, aiAdvisorService)
-        .buildQuizQuestion();
+    QuizQuestionDirector quizQuestionDirector =
+        new QuizQuestionDirector(entity, randomizer, modelFactoryService, aiAdvisorService);
+    return quizQuestionDirector.buildRandomQuestion(user.getAiQuestionTypeOnlyForReview());
   }
 
   public void updateAfterRepetition(Timestamp currentUTCTimestamp, boolean successful) {
