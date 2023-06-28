@@ -16,9 +16,10 @@ public record QuizQuestionDirector(
     ReviewPoint reviewPoint,
     QuestionType questionType,
     Randomizer randomizer,
-    ModelFactoryService modelFactoryService) {
+    ModelFactoryService modelFactoryService,
+    AiAdvisorService aiAdvisorService) {
 
-  public Optional<QuizQuestion> buildQuizQuestion(AiAdvisorService aiAdvisorService) {
+  public Optional<QuizQuestion> buildQuizQuestion() {
     QuizQuestionFactory quizQuestionFactory = buildQuizQuestionFactory();
 
     try {

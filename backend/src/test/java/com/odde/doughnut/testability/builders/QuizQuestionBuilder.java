@@ -23,8 +23,8 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestion> {
       QuizQuestion.QuestionType questionType, ReviewPoint reviewPoint) {
     QuizQuestionDirector builder =
         new QuizQuestionDirector(
-            reviewPoint, questionType, new NonRandomizer(), makeMe.modelFactoryService);
-    this.entity = builder.buildQuizQuestion(null).orElse(null);
+            reviewPoint, questionType, new NonRandomizer(), makeMe.modelFactoryService, null);
+    this.entity = builder.buildQuizQuestion().orElse(null);
     return this;
   }
 

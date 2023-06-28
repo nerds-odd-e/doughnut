@@ -31,8 +31,11 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
   public QuizQuestion generateAQuizQuestion(
       Randomizer randomizer, User user, AiAdvisorService aiAdvisorService) {
     return randomizer.shuffle(entity.availableQuestionTypes(user)).stream()
-        .map(type -> new QuizQuestionDirector(entity, type, randomizer, modelFactoryService))
-        .map(quizQuestionDirector -> quizQuestionDirector.buildQuizQuestion(aiAdvisorService))
+        .map(
+            type ->
+                new QuizQuestionDirector(
+                    entity, type, randomizer, modelFactoryService, aiAdvisorService))
+        .map(QuizQuestionDirector::buildQuizQuestion)
         .flatMap(Optional::stream)
         .findFirst()
         .orElseGet(() -> entity.createAQuizQuestionOfType(QuizQuestion.QuestionType.JUST_REVIEW));
