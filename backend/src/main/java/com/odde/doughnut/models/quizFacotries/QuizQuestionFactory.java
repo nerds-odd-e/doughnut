@@ -4,7 +4,7 @@ import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.services.AiAdvisorService;
 
 public interface QuizQuestionFactory {
-  default boolean isValidQuestion() {
+  default boolean isValidQuestion() throws QuizQuestionNotPossibleException {
     return true;
   }
 
