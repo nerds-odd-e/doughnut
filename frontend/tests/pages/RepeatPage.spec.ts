@@ -87,7 +87,7 @@ describe("repeat page", () => {
         correct: false,
       };
       helper.apiMock
-        .expectingPost(`/api/reviews/answer`)
+        .expectingPost(`/api/reviews/${quizQuestion.quizQuestion.id}/answer`)
         .andReturnOnce(answerResult);
       vi.runOnlyPendingTimers();
       await flushPromises();
