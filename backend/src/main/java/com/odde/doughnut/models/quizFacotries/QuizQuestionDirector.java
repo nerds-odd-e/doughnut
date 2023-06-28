@@ -28,10 +28,8 @@ public record QuizQuestionDirector(
 
   private QuizQuestion buildAQuestionOfType(QuestionType questionType)
       throws QuizQuestionNotPossibleException {
-    QuizQuestionFactory quizQuestionFactory =
-        questionType.factory.apply(
-            reviewPoint,
-            new QuizQuestionServant(randomizer, modelFactoryService, aiAdvisorService));
+    QuizQuestionFactory quizQuestionFactory = buildQuizQuestionFactory(questionType);
+
     quizQuestionFactory.validatePossibility();
 
     QuizQuestion quizQuestion = reviewPoint.createAQuizQuestionOfType(questionType);
@@ -53,6 +51,11 @@ public record QuizQuestionDirector(
       quizQuestion.setCategoryLink(secondaryReviewPointsFactory.getCategoryLink());
     }
     return quizQuestion;
+  }
+
+  private QuizQuestionFactory buildQuizQuestionFactory(QuestionType questionType) {
+    QuizQuestionServant servant = new QuizQuestionServant(randomizer, modelFactoryService, aiAdvisorService);
+    return questionType.factory.apply(reviewPoint, servant);
   }
 
   private String toThingIdsString(List<Thingy> options) {

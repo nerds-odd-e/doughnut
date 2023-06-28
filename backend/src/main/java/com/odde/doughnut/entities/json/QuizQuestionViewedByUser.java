@@ -44,9 +44,9 @@ public class QuizQuestionViewedByUser {
   }
 
   public QuizQuestionViewedByUser(
-      QuizQuestion quizQuestion,
-      List<Option> options1,
-      NotePositionViewedByUser notebookPosition1) {
+    QuizQuestion quizQuestion,
+    List<Option> options,
+    @Nullable NotePositionViewedByUser notebookPosition) {
     QuizQuestionPresenter presenter = quizQuestion.buildPresenter();
     this.quizQuestion = quizQuestion;
     this.questionType = quizQuestion.getQuestionType();
@@ -54,10 +54,10 @@ public class QuizQuestionViewedByUser {
     this.mainTopic = presenter.mainTopic();
     this.hintLinks = presenter.hintLinks();
     this.pictureWithMask = presenter.pictureWithMask();
-    this.options = options1;
+    this.options = options;
     this.viceReviewPointIdList = quizQuestion.getViceReviewPointIdList();
     if (questionType == QuizQuestion.QuestionType.JUST_REVIEW) return;
-    this.notebookPosition = notebookPosition1;
+    this.notebookPosition = notebookPosition;
   }
 
   public static class Option {
