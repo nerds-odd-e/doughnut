@@ -20,13 +20,13 @@ public record QuizQuestionDirector(
 
   public Optional<QuizQuestion> buildQuizQuestion(QuestionType questionType) {
     try {
-      return Optional.of(buildRandomQuestion(questionType));
+      return Optional.of(buildAQuestionOfType(questionType));
     } catch (QuizQuestionNotPossibleException e) {
       return Optional.empty();
     }
   }
 
-  private QuizQuestion buildRandomQuestion(QuestionType questionType)
+  private QuizQuestion buildAQuestionOfType(QuestionType questionType)
       throws QuizQuestionNotPossibleException {
     QuizQuestionFactory quizQuestionFactory =
         questionType.factory.apply(
@@ -67,7 +67,7 @@ public record QuizQuestionDirector(
     return this.randomizer
         .shuffle(reviewPoint.availableQuestionTypes(aiQuestionTypeOnlyForReview))
         .stream()
-        .map(type -> buildQuizQuestion(type))
+        .map(this::buildQuizQuestion)
         .flatMap(Optional::stream)
         .findFirst()
         .orElseGet(() -> reviewPoint.createAQuizQuestionOfType(QuestionType.JUST_REVIEW));
