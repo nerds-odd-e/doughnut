@@ -22,7 +22,10 @@ public class ClozeTitleSelectionQuizFactory implements QuestionOptionsFactory, Q
   }
 
   @Override
-  public List<Note> generateFillingOptions() {
+  public List<Note> generateFillingOptions() throws QuizQuestionNotPossibleException {
+    if (reviewPoint.isDescriptionBlankHtml()) {
+      throw new QuizQuestionNotPossibleException();
+    }
     return servant.chooseFromCohort(answerNote, n -> !n.equals(answerNote));
   }
 

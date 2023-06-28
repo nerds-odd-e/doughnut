@@ -7,9 +7,9 @@ import java.util.List;
 public interface QuestionOptionsFactory {
   Thingy generateAnswer();
 
-  List<? extends Thingy> generateFillingOptions();
+  List<? extends Thingy> generateFillingOptions() throws QuizQuestionNotPossibleException;
 
-  default List<Thingy> getOptionEntities() {
+  default List<Thingy> getOptionEntities() throws QuizQuestionNotPossibleException {
     Thingy answerNote = generateAnswer();
     if (answerNote == null) return List.of();
     List<Thingy> options = new ArrayList<>(generateFillingOptions());
