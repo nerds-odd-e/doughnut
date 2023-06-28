@@ -53,7 +53,7 @@ public class RestAiController {
     QuizQuestionEntity quizQuestion = new QuizQuestionEntity();
     quizQuestion.setQuestionType(QuizQuestionEntity.QuestionType.AI_QUESTION);
     quizQuestion.setRawJsonQuestion(rawJsonQuestion);
-    return QuizQuestion.create(quizQuestion, null, null);
+    return QuizQuestion.create(quizQuestion, null, modelFactoryService);
   }
 
   @PostMapping("/ask-engaging-stories")

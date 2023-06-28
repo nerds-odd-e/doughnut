@@ -40,9 +40,11 @@ public class QuizQuestion {
 
   public static QuizQuestion create(
       QuizQuestionEntity quizQuestion,
-      List<Option> options,
-      @Nullable NotePositionViewedByUser notebookPosition) {
+      @Nullable NotePositionViewedByUser notebookPosition,
+      ModelFactoryService modelFactoryService) {
     QuizQuestionPresenter presenter = quizQuestion.buildPresenter();
+    List<Option> options =
+        presenter.optionCreator().getOptions(modelFactoryService, quizQuestion.getOptionThingIds());
     NotePositionViewedByUser notePosition =
         ((quizQuestion.getQuestionType() == QuizQuestionEntity.QuestionType.JUST_REVIEW)
             ? null

@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.entities.json.SearchTerm;
 import com.odde.doughnut.entities.repositories.*;
 import com.odde.doughnut.models.*;
-import com.odde.doughnut.models.quizFacotries.QuizQuestionPresenter;
 import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
@@ -99,11 +98,10 @@ public class ModelFactoryService {
   }
 
   public QuizQuestion toQuizQuestion(QuizQuestionEntity quizQuestionEntity, User user) {
-    QuizQuestionPresenter presenter = quizQuestionEntity.buildPresenter();
     return QuizQuestion.create(
         quizQuestionEntity,
-        presenter.optionCreator().getOptions(this, quizQuestionEntity.getOptionThingIds()),
         new NoteViewer(user, quizQuestionEntity.getReviewPoint().getHeadNote())
-            .jsonNotePosition(true));
+            .jsonNotePosition(true),
+        this);
   }
 }
