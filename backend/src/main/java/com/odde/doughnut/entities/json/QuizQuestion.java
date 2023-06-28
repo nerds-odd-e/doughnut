@@ -20,8 +20,6 @@ import org.springframework.lang.Nullable;
 public class QuizQuestion {
   @Getter public Integer quizQuestionId;
 
-  @Getter public Integer reviewPointId;
-
   @Getter public String rawJsonQuestion;
 
   @Getter public QuizQuestionEntity.QuestionType questionType;
@@ -49,11 +47,8 @@ public class QuizQuestion {
         ((quizQuestion.getQuestionType() == QuizQuestionEntity.QuestionType.JUST_REVIEW)
             ? null
             : notebookPosition);
-    Integer reviewPointId =
-        quizQuestion.getReviewPoint() == null ? null : quizQuestion.getReviewPoint().getId();
     return new QuizQuestion(
         quizQuestion.getId(),
-        reviewPointId,
         quizQuestion.getRawJsonQuestion(),
         quizQuestion.getQuestionType(),
         presenter.instruction(),

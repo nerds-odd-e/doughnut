@@ -124,7 +124,6 @@ declare namespace Generated {
 
     interface QuizQuestion {
         quizQuestionId: number;
-        reviewPointId: number;
         rawJsonQuestion: string;
         questionType: QuestionType;
         description: string;

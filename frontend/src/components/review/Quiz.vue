@@ -5,10 +5,11 @@
         <QuizQuestion
           v-bind="{
             quizQuestion: currentQuizQuestion,
+            reviewPointId: currentReviewPointId,
             storageAccessor,
           }"
           @answered="onAnswered($event)"
-          :key="currentQuizQuestion.reviewPointId"
+          :key="currentQuizQuestion.quizQuestionId"
         />
       </template>
       <template
@@ -56,6 +57,11 @@ export default defineComponent({
       currentQuizQuestion: undefined as Generated.QuizQuestion | undefined,
     };
   },
+  computed: {
+    currentReviewPointId() {
+      return this.toRepeat[this.currentQuestionIndex] as number;
+    },
+  },
   watch: {
     minimized() {
       if (!this.minimized) {
@@ -85,7 +91,7 @@ export default defineComponent({
       }
       this.currentQuizQuestion =
         await this.api.reviewMethods.getRandomQuestionForReviewPoint(
-          this.toRepeat[this.currentQuestionIndex] as number
+          this.currentReviewPointId
         );
       this.selectPosition();
     },

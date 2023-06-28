@@ -58,20 +58,20 @@ describe("repeat page", () => {
   describe('repeat page with "just review" quiz', () => {
     let repetition: Generated.DueReviewPoints;
     let quizQuestion: Generated.QuizQuestion;
+    const reviewPointId = 123;
+    const secondReviewPointId = 456;
 
     beforeEach(() => {
       vi.useFakeTimers();
       const reviewPoint = makeMe.aReviewPoint.please();
       repetition = makeMe.aDueReviewPointsList.please();
-      quizQuestion = makeMe.aQuizQuestion
-        .withReviewPointId(reviewPoint.id)
-        .please();
-      repetition.toRepeat = [1, 2, 3];
+      quizQuestion = makeMe.aQuizQuestion.please();
+      repetition.toRepeat = [reviewPointId, secondReviewPointId, 3];
       helper.apiMock
-        .expectingGet(`/api/review-points/${1}/random-question`)
+        .expectingGet(`/api/review-points/${reviewPointId}/random-question`)
         .andReturnOnce(quizQuestion);
       helper.apiMock
-        .expectingGet(`/api/review-points/${reviewPoint.id}`)
+        .expectingGet(`/api/review-points/${reviewPointId}`)
         .andReturnOnce(reviewPoint);
     });
 
@@ -93,8 +93,11 @@ describe("repeat page", () => {
       await flushPromises();
       await wrapper.find("button.btn-primary").trigger("click");
       helper.apiMock
-        .expectingGet(`/api/review-points/${2}/random-question`)
+        .expectingGet(
+          `/api/review-points/${secondReviewPointId}/random-question`
+        )
         .andReturnOnce(quizQuestion);
+      helper.apiMock.expectingGet(`/api/review-points/${secondReviewPointId}`);
 
       for (let i = 0; i < 10; i += 1) {
         // eslint-disable-next-line no-await-in-loop

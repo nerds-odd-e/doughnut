@@ -4,7 +4,6 @@ import generateId from "./generateId";
 class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
   quizQuestion: Generated.QuizQuestion = {
     quizQuestionId: generateId(),
-    reviewPointId: 0,
     rawJsonQuestion: "",
     questionType: "JUST_REVIEW",
     options: [
@@ -28,11 +27,6 @@ class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
 
   withQuestionType(questionType: Generated.QuestionType) {
     this.quizQuestion.questionType = questionType;
-    return this;
-  }
-
-  withReviewPointId(id: Doughnut.ID) {
-    this.quizQuestion.reviewPointId = id;
     return this;
   }
 

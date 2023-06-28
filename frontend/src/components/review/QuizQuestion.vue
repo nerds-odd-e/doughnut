@@ -24,7 +24,7 @@
       <div v-if="quizQuestion.questionType === 'JUST_REVIEW'">
         <ReviewPointAsync
           v-bind="{
-            reviewPointId: quizQuestion.reviewPointId,
+            reviewPointId: reviewPointId,
             storageAccessor,
           }"
         />
@@ -32,7 +32,7 @@
           @self-evaluated-memory-state="
             submitAnswer({ spellingAnswer: $event })
           "
-          :key="quizQuestion.reviewPointId"
+          :key="reviewPointId"
         />
       </div>
       <div v-else-if="quizQuestion.questionType === 'SPELLING'">
@@ -145,6 +145,10 @@ export default defineComponent({
   props: {
     quizQuestion: {
       type: Object as PropType<Generated.QuizQuestion>,
+      required: true,
+    },
+    reviewPointId: {
+      type: Number,
       required: true,
     },
     storageAccessor: {
