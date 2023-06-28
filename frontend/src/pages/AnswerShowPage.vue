@@ -12,7 +12,11 @@
       />
       <QuizQuestion
         v-if="showQuiz === 'quiz' && answerResult?.quizQuestion"
-        v-bind="{ quizQuestion: answerResult?.quizQuestion, storageAccessor }"
+        v-bind="{
+          quizQuestion: answerResult?.quizQuestion,
+          reviewPointId: reviewPoint?.id,
+          storageAccessor,
+        }"
       />
       <div v-else-if="reviewPoint">
         <ShowReviewPoint v-bind="{ reviewPoint, storageAccessor }" />

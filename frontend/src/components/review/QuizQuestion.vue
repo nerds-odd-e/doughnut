@@ -23,8 +23,9 @@
       />
       <div v-if="quizQuestion.questionType === 'JUST_REVIEW'">
         <ReviewPointAsync
+          v-if="reviewPointId"
           v-bind="{
-            reviewPointId: reviewPointId,
+            reviewPointId,
             storageAccessor,
           }"
         />
@@ -149,7 +150,7 @@ export default defineComponent({
     },
     reviewPointId: {
       type: Number,
-      required: true,
+      required: false,
     },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
