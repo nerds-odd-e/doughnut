@@ -202,7 +202,6 @@ declare namespace Generated {
     interface Answer {
         spellingAnswer?: string;
         answerNoteId?: number;
-        question?: QuizQuestionEntity;
     }
 
     interface Link extends Thingy {
@@ -269,17 +268,6 @@ declare namespace Generated {
     interface PictureWithMask {
         notePicture: string;
         pictureMask: string;
-    }
-
-    interface QuizQuestionEntity {
-        id: number;
-        reviewPoint: number;
-        questionTypeId: number;
-        rawJsonQuestion: string;
-        categoryLink: number;
-        optionThingIds: string;
-        viceReviewPointIds: string;
-        createdAt: string;
     }
 
     interface Thingy {

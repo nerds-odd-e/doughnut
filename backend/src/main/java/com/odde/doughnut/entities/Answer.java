@@ -41,6 +41,7 @@ public class Answer {
   @Getter
   @Setter
   @Nullable
+  @JsonIgnore
   QuizQuestionEntity question;
 
   @Column(name = "created_at")
