@@ -28,9 +28,4 @@ public class ClozeTitleSelectionQuizFactory implements QuestionOptionsFactory, Q
     }
     return servant.chooseFromCohort(answerNote, n -> !n.equals(answerNote));
   }
-
-  @Override
-  public boolean isValidQuestion() {
-    return !reviewPoint.isDescriptionBlankHtml();
-  }
 }
