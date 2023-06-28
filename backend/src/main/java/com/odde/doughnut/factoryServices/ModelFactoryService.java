@@ -1,7 +1,6 @@
 package com.odde.doughnut.factoryServices;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.json.NotePositionViewedByUser;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.entities.json.SearchTerm;
 import com.odde.doughnut.entities.repositories.*;
@@ -103,11 +102,6 @@ public class ModelFactoryService {
     QuizQuestionPresenter presenter = quizQuestionEntity.buildPresenter();
     List<QuizQuestion.Option> options =
         presenter.optionCreator().getOptions(this, quizQuestionEntity.getOptionThingIds());
-    NotePositionViewedByUser notePosition =
-        (quizQuestionEntity.getQuestionType() == QuizQuestionEntity.QuestionType.JUST_REVIEW)
-            ? null
-            : new NoteViewer(user, quizQuestionEntity.getReviewPoint().getHeadNote())
-                .jsonNotePosition(true);
     return new QuizQuestion(
         quizQuestionEntity.getId(),
         quizQuestionEntity.getRawJsonQuestion(),
@@ -116,7 +110,7 @@ public class ModelFactoryService {
         presenter.mainTopic(),
         presenter.hintLinks(),
         quizQuestionEntity.getViceReviewPointIdList(),
-        notePosition,
+        quizQuestionEntity.getNotebookPosition(user),
         options,
         presenter.pictureWithMask());
   }

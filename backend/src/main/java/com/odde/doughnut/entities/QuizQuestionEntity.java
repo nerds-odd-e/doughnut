@@ -3,6 +3,8 @@ package com.odde.doughnut.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.entities.annotations.JsonUseIdInsteadOfLink;
 import com.odde.doughnut.entities.annotations.JsonUseIdInsteadOfReviewPoint;
+import com.odde.doughnut.entities.json.NotePositionViewedByUser;
+import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.quizFacotries.*;
 import java.sql.Timestamp;
 import java.util.Arrays;
@@ -24,6 +26,13 @@ import org.apache.logging.log4j.util.Strings;
 @Entity
 @Table(name = "quiz_question")
 public class QuizQuestionEntity {
+
+  public NotePositionViewedByUser getNotebookPosition(User user) {
+    if (getQuestionType() == QuestionType.JUST_REVIEW || getReviewPoint() == null) {
+      return null;
+    }
+    return new NoteViewer(user, getReviewPoint().getHeadNote()).jsonNotePosition(true);
+  }
 
   public enum QuestionType {
     JUST_REVIEW(0, null, JustReviewQuizPresenter::new),
