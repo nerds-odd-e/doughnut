@@ -183,7 +183,7 @@ class QuizQuestionTest {
     QuizQuestionEntity quizQuestion =
         getReviewPointModel(note).generateAQuizQuestion(randomizer, userModel.getEntity(), null);
     QuizQuestionPresenter presenter = quizQuestion.buildPresenter();
-    return new QuizQuestion(
+    return QuizQuestion.create(
         quizQuestion,
         presenter
             .optionCreator()

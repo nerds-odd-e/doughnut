@@ -41,22 +41,25 @@ public class QuizQuestion {
 
   public Optional<PictureWithMask> pictureWithMask;
 
-  public QuizQuestion(
+  public static QuizQuestion create(
       QuizQuestionEntity quizQuestion,
       List<Option> options,
       @Nullable NotePositionViewedByUser notebookPosition) {
     QuizQuestionPresenter presenter = quizQuestion.buildPresenter();
-
-    this.quizQuestion = quizQuestion;
-    this.questionType = quizQuestion.getQuestionType();
-    this.description = presenter.instruction();
-    this.mainTopic = presenter.mainTopic();
-    this.hintLinks = presenter.hintLinks();
-    this.pictureWithMask = presenter.pictureWithMask();
-    this.options = options;
-    this.viceReviewPointIdList = quizQuestion.getViceReviewPointIdList();
-    if (questionType == QuizQuestionEntity.QuestionType.JUST_REVIEW) return;
-    this.notebookPosition = notebookPosition;
+    return new QuizQuestion(
+        quizQuestion,
+        null,
+        null,
+        quizQuestion.getQuestionType(),
+        presenter.instruction(),
+        presenter.mainTopic(),
+        presenter.hintLinks(),
+        quizQuestion.getViceReviewPointIdList(),
+        ((quizQuestion.getQuestionType() == QuizQuestionEntity.QuestionType.JUST_REVIEW)
+            ? null
+            : notebookPosition),
+        options,
+        presenter.pictureWithMask());
   }
 
   public static class Option {

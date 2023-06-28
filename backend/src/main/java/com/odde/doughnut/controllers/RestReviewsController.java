@@ -99,7 +99,7 @@ class RestReviewsController {
     QuizQuestionEntity quizQuestion = answer.getQuestion();
     QuizQuestionPresenter presenter = quizQuestion.buildPresenter();
     answerResult.quizQuestion =
-        new QuizQuestion(
+        QuizQuestion.create(
             quizQuestion,
             presenter
                 .optionCreator()

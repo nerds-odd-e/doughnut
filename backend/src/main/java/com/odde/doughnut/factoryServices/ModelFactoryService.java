@@ -100,7 +100,7 @@ public class ModelFactoryService {
 
   public QuizQuestion toQuizQuestion(QuizQuestionEntity quizQuestionEntity, User user) {
     QuizQuestionPresenter presenter = quizQuestionEntity.buildPresenter();
-    return new QuizQuestion(
+    return QuizQuestion.create(
         quizQuestionEntity,
         presenter.optionCreator().getOptions(this, quizQuestionEntity.getOptionThingIds()),
         new NoteViewer(user, quizQuestionEntity.getReviewPoint().getHeadNote())

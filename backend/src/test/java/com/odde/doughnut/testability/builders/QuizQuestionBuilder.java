@@ -38,7 +38,7 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
     QuizQuestionEntity quizQuestion = inMemoryPlease();
     if (quizQuestion == null) return null;
     QuizQuestionPresenter presenter = quizQuestion.buildPresenter();
-    return new QuizQuestion(
+    return QuizQuestion.create(
         quizQuestion,
         presenter
             .optionCreator()
