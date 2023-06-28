@@ -3,7 +3,7 @@ package com.odde.doughnut.models.quizFacotries;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 
-public class AiQuestionFactory implements QuizQuestionFactory {
+public class AiQuestionFactory implements QuizQuestionFactory, QuestionRawJsonFactory {
   private ReviewPoint reviewPoint;
   private QuizQuestionServant servant;
 

@@ -27,7 +27,9 @@ public record QuizQuestionDirector(
 
       QuizQuestion quizQuestion = reviewPoint.createAQuizQuestionOfType(questionType);
 
-      quizQuestionFactory.fillQuizQuestion(quizQuestion);
+      if (quizQuestionFactory instanceof QuestionRawJsonFactory rawJsonFactory) {
+        rawJsonFactory.fillQuizQuestion(quizQuestion);
+      }
 
       if (quizQuestionFactory instanceof QuestionOptionsFactory optionsFactory) {
         List<Thingy> optionsEntities = optionsFactory.getOptionEntities();
