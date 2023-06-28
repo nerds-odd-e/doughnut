@@ -31,14 +31,16 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
   public QuizQuestion generateAQuizQuestion(
       Randomizer randomizer, User user, AiAdvisorService aiAdvisorService) {
     return randomizer.shuffle(entity.availableQuestionTypes(user)).stream()
-        .map(
-            type ->
-                new QuizQuestionDirector(
-                    entity, type, randomizer, modelFactoryService, aiAdvisorService))
-        .map(QuizQuestionDirector::buildQuizQuestion)
+        .map(type -> buildQuizQuestion(randomizer, aiAdvisorService, type))
         .flatMap(Optional::stream)
         .findFirst()
         .orElseGet(() -> entity.createAQuizQuestionOfType(QuizQuestion.QuestionType.JUST_REVIEW));
+  }
+
+  private Optional<QuizQuestion> buildQuizQuestion(
+      Randomizer randomizer, AiAdvisorService aiAdvisorService, QuizQuestion.QuestionType type) {
+    return new QuizQuestionDirector(entity, type, randomizer, modelFactoryService, aiAdvisorService)
+        .buildQuizQuestion();
   }
 
   public void updateAfterRepetition(Timestamp currentUTCTimestamp, boolean successful) {

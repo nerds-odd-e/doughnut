@@ -20,35 +20,36 @@ public record QuizQuestionDirector(
     AiAdvisorService aiAdvisorService) {
 
   public Optional<QuizQuestion> buildQuizQuestion() {
-    QuizQuestionFactory quizQuestionFactory = buildQuizQuestionFactory();
-
     try {
-      quizQuestionFactory.validatePossibility();
-
-      QuizQuestion quizQuestion = reviewPoint.createAQuizQuestionOfType(questionType);
-
-      if (quizQuestionFactory instanceof QuestionRawJsonFactory rawJsonFactory) {
-        rawJsonFactory.fillQuizQuestion(quizQuestion);
-      }
-
-      if (quizQuestionFactory instanceof QuestionOptionsFactory optionsFactory) {
-        List<Thingy> optionsEntities = optionsFactory.getOptionEntities();
-        if (optionsEntities.size() < optionsFactory.minimumOptionCount()) {
-          return Optional.empty();
-        }
-        quizQuestion.setOptionThingIds(toThingIdsString(optionsEntities));
-      }
-
-      if (quizQuestionFactory
-          instanceof SecondaryReviewPointsFactory secondaryReviewPointsFactory) {
-        quizQuestion.setViceReviewPoints(secondaryReviewPointsFactory.getViceReviewPoints());
-        quizQuestion.setCategoryLink(secondaryReviewPointsFactory.getCategoryLink());
-      }
-
-      return Optional.of(quizQuestion);
+      return Optional.of(getQuizQuestion());
     } catch (QuizQuestionNotPossibleException e) {
       return Optional.empty();
     }
+  }
+
+  private QuizQuestion getQuizQuestion() throws QuizQuestionNotPossibleException {
+    QuizQuestionFactory quizQuestionFactory = buildQuizQuestionFactory();
+    quizQuestionFactory.validatePossibility();
+
+    QuizQuestion quizQuestion = reviewPoint.createAQuizQuestionOfType(questionType);
+
+    if (quizQuestionFactory instanceof QuestionRawJsonFactory rawJsonFactory) {
+      quizQuestion.setRawJsonQuestion(rawJsonFactory.generateRawJsonQuestion());
+    }
+
+    if (quizQuestionFactory instanceof QuestionOptionsFactory optionsFactory) {
+      List<Thingy> optionsEntities = optionsFactory.getOptionEntities();
+      if (optionsEntities.size() < optionsFactory.minimumOptionCount()) {
+        throw new QuizQuestionNotPossibleException();
+      }
+      quizQuestion.setOptionThingIds(toThingIdsString(optionsEntities));
+    }
+
+    if (quizQuestionFactory instanceof SecondaryReviewPointsFactory secondaryReviewPointsFactory) {
+      quizQuestion.setViceReviewPoints(secondaryReviewPointsFactory.getViceReviewPoints());
+      quizQuestion.setCategoryLink(secondaryReviewPointsFactory.getCategoryLink());
+    }
+    return quizQuestion;
   }
 
   private QuizQuestionFactory buildQuizQuestionFactory() {
