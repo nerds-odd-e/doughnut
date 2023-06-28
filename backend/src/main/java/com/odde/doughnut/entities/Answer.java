@@ -41,7 +41,7 @@ public class Answer {
   @Getter
   @Setter
   @Nullable
-  QuizQuestion question;
+  QuizQuestionEntity question;
 
   @Column(name = "created_at")
   @Getter

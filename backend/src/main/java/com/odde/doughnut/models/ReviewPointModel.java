@@ -1,6 +1,6 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
@@ -27,7 +27,7 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
     updateForgettingCurve(0);
   }
 
-  public QuizQuestion generateAQuizQuestion(
+  public QuizQuestionEntity generateAQuizQuestion(
       Randomizer randomizer, User user, AiAdvisorService aiAdvisorService) {
     QuizQuestionDirector quizQuestionDirector =
         new QuizQuestionDirector(entity, randomizer, modelFactoryService, aiAdvisorService);

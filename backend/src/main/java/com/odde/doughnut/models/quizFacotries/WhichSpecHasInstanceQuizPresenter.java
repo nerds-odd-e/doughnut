@@ -2,14 +2,14 @@ package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.QuizQuestionEntity;
 import java.util.List;
 
 public class WhichSpecHasInstanceQuizPresenter implements QuizQuestionPresenter {
   private Link instanceLink;
   private final Link link;
 
-  public WhichSpecHasInstanceQuizPresenter(QuizQuestion quizQuestion) {
+  public WhichSpecHasInstanceQuizPresenter(QuizQuestionEntity quizQuestion) {
     this.link = quizQuestion.getReviewPoint().getLink();
     this.instanceLink = quizQuestion.getCategoryLink();
   }

@@ -1,6 +1,6 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.PICTURE_SELECTION;
+import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.PICTURE_SELECTION;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.in;

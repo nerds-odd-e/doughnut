@@ -16,9 +16,9 @@ import org.springframework.lang.Nullable;
 
 public class QuizQuestionViewedByUser {
 
-  public QuizQuestion quizQuestion;
+  public QuizQuestionEntity quizQuestion;
 
-  @Getter public QuizQuestion.QuestionType questionType;
+  @Getter public QuizQuestionEntity.QuestionType questionType;
 
   @Getter public String description;
 
@@ -35,7 +35,7 @@ public class QuizQuestionViewedByUser {
   public Optional<PictureWithMask> pictureWithMask;
 
   public static QuizQuestionViewedByUser create(
-      QuizQuestion quizQuestion, ModelFactoryService modelFactoryService, User user) {
+      QuizQuestionEntity quizQuestion, ModelFactoryService modelFactoryService, User user) {
     QuizQuestionPresenter presenter = quizQuestion.buildPresenter();
     return new QuizQuestionViewedByUser(
         quizQuestion,
@@ -44,9 +44,9 @@ public class QuizQuestionViewedByUser {
   }
 
   public QuizQuestionViewedByUser(
-    QuizQuestion quizQuestion,
-    List<Option> options,
-    @Nullable NotePositionViewedByUser notebookPosition) {
+      QuizQuestionEntity quizQuestion,
+      List<Option> options,
+      @Nullable NotePositionViewedByUser notebookPosition) {
     QuizQuestionPresenter presenter = quizQuestion.buildPresenter();
     this.quizQuestion = quizQuestion;
     this.questionType = quizQuestion.getQuestionType();
@@ -56,7 +56,7 @@ public class QuizQuestionViewedByUser {
     this.pictureWithMask = presenter.pictureWithMask();
     this.options = options;
     this.viceReviewPointIdList = quizQuestion.getViceReviewPointIdList();
-    if (questionType == QuizQuestion.QuestionType.JUST_REVIEW) return;
+    if (questionType == QuizQuestionEntity.QuestionType.JUST_REVIEW) return;
     this.notebookPosition = notebookPosition;
   }
 

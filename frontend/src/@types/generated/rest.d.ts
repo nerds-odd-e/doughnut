@@ -123,7 +123,7 @@ declare namespace Generated {
     }
 
     interface QuizQuestionViewedByUser {
-        quizQuestion: QuizQuestion;
+        quizQuestion: QuizQuestionEntity;
         questionType: QuestionType;
         description: string;
         mainTopic: string;
@@ -201,7 +201,7 @@ declare namespace Generated {
     interface Answer {
         spellingAnswer?: string;
         answerNoteId?: number;
-        question?: QuizQuestion;
+        question?: QuizQuestionEntity;
     }
 
     interface Link extends Thingy {
@@ -258,7 +258,7 @@ declare namespace Generated {
         notebook: Notebook;
     }
 
-    interface QuizQuestion {
+    interface QuizQuestionEntity {
         id: number;
         reviewPoint: number;
         questionTypeId: number;

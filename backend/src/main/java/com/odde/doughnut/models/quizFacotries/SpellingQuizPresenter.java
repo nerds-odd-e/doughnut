@@ -1,9 +1,9 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.QuizQuestionEntity;
 
 public class SpellingQuizPresenter extends ClozeDescriptonQuizPresenter {
-  public SpellingQuizPresenter(QuizQuestion quizQuestion) {
+  public SpellingQuizPresenter(QuizQuestionEntity quizQuestion) {
     super(quizQuestion);
   }
 }

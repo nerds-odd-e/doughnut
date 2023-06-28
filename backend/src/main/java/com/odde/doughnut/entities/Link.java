@@ -1,19 +1,19 @@
 package com.odde.doughnut.entities;
 
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.CLOZE_LINK_TARGET;
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.DESCRIPTION_LINK_TARGET;
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.FROM_DIFFERENT_PART_AS;
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.FROM_SAME_PART_AS;
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_SOURCE;
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_SOURCE_WITHIN_SAME_LINK_TYPE;
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_TARGET;
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.WHICH_SPEC_HAS_INSTANCE;
+import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.CLOZE_LINK_TARGET;
+import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.DESCRIPTION_LINK_TARGET;
+import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.FROM_DIFFERENT_PART_AS;
+import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.FROM_SAME_PART_AS;
+import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.LINK_SOURCE;
+import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.LINK_SOURCE_WITHIN_SAME_LINK_TYPE;
+import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.LINK_TARGET;
+import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.WHICH_SPEC_HAS_INSTANCE;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.odde.doughnut.algorithms.ClozedString;
-import com.odde.doughnut.entities.QuizQuestion.QuestionType;
+import com.odde.doughnut.entities.QuizQuestionEntity.QuestionType;
 import com.odde.doughnut.entities.validators.ValidateLinkType;
 import com.odde.doughnut.models.NoteViewer;
 import java.sql.Timestamp;

@@ -2,7 +2,7 @@ package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.User;
 import java.util.List;
 
@@ -11,7 +11,7 @@ public class FromSamePartAsQuizPresenter implements QuizQuestionPresenter {
   private final Link categoryLink;
   private final User user;
 
-  public FromSamePartAsQuizPresenter(QuizQuestion quizQuestion) {
+  public FromSamePartAsQuizPresenter(QuizQuestionEntity quizQuestion) {
     this.user = quizQuestion.getReviewPoint().getUser();
     this.link = quizQuestion.getReviewPoint().getLink();
     this.categoryLink = quizQuestion.getCategoryLink();

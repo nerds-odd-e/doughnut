@@ -39,8 +39,8 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
       assertReadAuthorizationLink((Link) object);
     } else if (object instanceof Answer) {
       assertReadAuthorizationAnswer((Answer) object);
-    } else if (object instanceof QuizQuestion) {
-      assertReadAuthorizationQuizQuestion((QuizQuestion) object);
+    } else if (object instanceof QuizQuestionEntity) {
+      assertReadAuthorizationQuizQuestion((QuizQuestionEntity) object);
     } else if (object instanceof ReviewPoint) {
       assertReadAuthorizationReviewPoint((ReviewPoint) object);
     } else if (object instanceof Thing) {
@@ -70,7 +70,7 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
     assertReadAuthorizationQuizQuestion(object.getQuestion());
   }
 
-  private void assertReadAuthorizationQuizQuestion(QuizQuestion question)
+  private void assertReadAuthorizationQuizQuestion(QuizQuestionEntity question)
       throws UnexpectedNoAccessRightException {
     assertReadAuthorizationReviewPoint(question.getReviewPoint());
   }

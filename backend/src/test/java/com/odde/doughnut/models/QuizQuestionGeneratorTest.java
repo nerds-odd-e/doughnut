@@ -1,15 +1,15 @@
 package com.odde.doughnut.models;
 
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.CLOZE_SELECTION;
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.DESCRIPTION_LINK_TARGET;
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.FROM_DIFFERENT_PART_AS;
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.FROM_SAME_PART_AS;
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_SOURCE;
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_TARGET;
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.PICTURE_SELECTION;
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.PICTURE_TITLE;
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.SPELLING;
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.WHICH_SPEC_HAS_INSTANCE;
+import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.CLOZE_SELECTION;
+import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.DESCRIPTION_LINK_TARGET;
+import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.FROM_DIFFERENT_PART_AS;
+import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.FROM_SAME_PART_AS;
+import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.LINK_SOURCE;
+import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.LINK_TARGET;
+import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.PICTURE_SELECTION;
+import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.PICTURE_TITLE;
+import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.SPELLING;
+import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.WHICH_SPEC_HAS_INSTANCE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -31,7 +31,7 @@ class QuizQuestionGeneratorTest {
   void note() {
     makeMe.theNote(note).rememberSpelling();
     ReviewPoint reviewPoint = makeMe.aReviewPointFor(note).inMemoryPlease();
-    List<QuizQuestion.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
+    List<QuizQuestionEntity.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
     assertThat(
         questionTypes, contains(SPELLING, CLOZE_SELECTION, PICTURE_TITLE, PICTURE_SELECTION));
   }
@@ -40,7 +40,7 @@ class QuizQuestionGeneratorTest {
   void linkExclusive() {
     Note note2 = makeMe.aNote().linkTo(note).inMemoryPlease();
     ReviewPoint reviewPoint = makeMe.aReviewPointFor(note2.getLinks().get(0)).inMemoryPlease();
-    List<QuizQuestion.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
+    List<QuizQuestionEntity.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
     assertThat(
         questionTypes,
         containsInAnyOrder(
@@ -56,11 +56,11 @@ class QuizQuestionGeneratorTest {
   void notAllLinkQuestionAreAvailableToAllLinkTypes() {
     Note note2 = makeMe.aNote().linkTo(note, Link.LinkType.RELATED_TO).inMemoryPlease();
     ReviewPoint reviewPoint = makeMe.aReviewPointFor(note2.getLinks().get(0)).inMemoryPlease();
-    List<QuizQuestion.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
+    List<QuizQuestionEntity.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
     assertTrue(questionTypes.isEmpty());
   }
 
-  private List<QuizQuestion.QuestionType> getQuestionTypes(ReviewPoint reviewPoint) {
+  private List<QuizQuestionEntity.QuestionType> getQuestionTypes(ReviewPoint reviewPoint) {
     return reviewPoint.availableQuestionTypes(false);
   }
 }

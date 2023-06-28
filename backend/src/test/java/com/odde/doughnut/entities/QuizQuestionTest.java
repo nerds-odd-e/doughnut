@@ -42,7 +42,8 @@ class QuizQuestionTest {
   void aNoteWithNoDescriptionHasNoQuiz() {
     Note note = makeMe.aNote().withNoDescription().creatorAndOwner(userModel).please();
     assertThat(
-        getQuizQuestion(note).getQuestionType(), equalTo(QuizQuestion.QuestionType.JUST_REVIEW));
+        getQuizQuestion(note).getQuestionType(),
+        equalTo(QuizQuestionEntity.QuestionType.JUST_REVIEW));
   }
 
   @Test
@@ -71,7 +72,8 @@ class QuizQuestionTest {
     void aNoteWithNoSiblingsShouldDoJustReview() {
       Note note = makeMe.aHeadNote().please();
       QuizQuestionViewedByUser quizQuestion = getQuizQuestion(note);
-      assertThat(quizQuestion.getQuestionType(), equalTo(QuizQuestion.QuestionType.JUST_REVIEW));
+      assertThat(
+          quizQuestion.getQuestionType(), equalTo(QuizQuestionEntity.QuestionType.JUST_REVIEW));
     }
 
     @Nested
@@ -128,7 +130,8 @@ class QuizQuestionTest {
     @Test
     void typeShouldBeSpellingQuiz() {
       assertThat(
-          getQuizQuestion(note).getQuestionType(), equalTo(QuizQuestion.QuestionType.SPELLING));
+          getQuizQuestion(note).getQuestionType(),
+          equalTo(QuizQuestionEntity.QuestionType.SPELLING));
     }
 
     @Test
@@ -138,20 +141,21 @@ class QuizQuestionTest {
       AiAdvisorService aiAdvisorService = mock(AiAdvisorService.class);
       when(aiAdvisorService.generateQuestionJsonString(any(), any()))
           .thenReturn("{\"question\": \"wat is the meaning of life?\"}");
-      QuizQuestion randomQuizQuestion =
+      QuizQuestionEntity randomQuizQuestion =
           reviewPoint.generateAQuizQuestion(
               new RealRandomizer(), userModel.getEntity(), aiAdvisorService);
       assertThat(
-          randomQuizQuestion.getQuestionType(), equalTo(QuizQuestion.QuestionType.AI_QUESTION));
+          randomQuizQuestion.getQuestionType(),
+          equalTo(QuizQuestionEntity.QuestionType.AI_QUESTION));
       assertThat(randomQuizQuestion.getRawJsonQuestion(), containsString("wat"));
     }
 
     @Test
     void shouldReturnTheSameType() {
       ReviewPointModel reviewPoint = getReviewPointModel(note);
-      QuizQuestion randomQuizQuestion =
+      QuizQuestionEntity randomQuizQuestion =
           reviewPoint.generateAQuizQuestion(new RealRandomizer(), userModel.getEntity(), null);
-      Set<QuizQuestion.QuestionType> types = new HashSet<>();
+      Set<QuizQuestionEntity.QuestionType> types = new HashSet<>();
       for (int i = 0; i < 3; i++) {
         types.add(randomQuizQuestion.getQuestionType());
       }
@@ -160,17 +164,18 @@ class QuizQuestionTest {
 
     @Test
     void shouldChooseTypeRandomly() {
-      Set<QuizQuestion.QuestionType> types = new HashSet<>();
+      Set<QuizQuestionEntity.QuestionType> types = new HashSet<>();
       ReviewPointModel reviewPoint = getReviewPointModel(note);
       for (int i = 0; i < 10; i++) {
-        QuizQuestion randomQuizQuestion =
+        QuizQuestionEntity randomQuizQuestion =
             reviewPoint.generateAQuizQuestion(new RealRandomizer(), userModel.getEntity(), null);
         types.add(randomQuizQuestion.getQuestionType());
       }
       assertThat(
           types,
           containsInAnyOrder(
-              QuizQuestion.QuestionType.SPELLING, QuizQuestion.QuestionType.CLOZE_SELECTION));
+              QuizQuestionEntity.QuestionType.SPELLING,
+              QuizQuestionEntity.QuestionType.CLOZE_SELECTION));
     }
   }
 

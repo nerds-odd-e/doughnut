@@ -17,9 +17,13 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
 
+//
+// The class name has Entity suffix so that it can be distinguished from the QuizQuestion class,
+// which is used in the frontend from the data consumer's perspective.
+//
 @Entity
 @Table(name = "quiz_question")
-public class QuizQuestion {
+public class QuizQuestionEntity {
 
   public Boolean isAnswerCorrect(Note answerNote, String spellingAnswer) {
     if (getQuestionType() == QuestionType.JUST_REVIEW
@@ -65,12 +69,12 @@ public class QuizQuestion {
 
     public final Integer id;
     public final BiFunction<ReviewPoint, QuizQuestionServant, QuizQuestionFactory> factory;
-    public final Function<QuizQuestion, QuizQuestionPresenter> presenter;
+    public final Function<QuizQuestionEntity, QuizQuestionPresenter> presenter;
 
     QuestionType(
         Integer id,
         BiFunction<ReviewPoint, QuizQuestionServant, QuizQuestionFactory> factory,
-        Function<QuizQuestion, QuizQuestionPresenter> presenter) {
+        Function<QuizQuestionEntity, QuizQuestionPresenter> presenter) {
       this.id = id;
       this.factory = factory;
       this.presenter = presenter;

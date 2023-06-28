@@ -1,6 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
-import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
@@ -8,19 +8,20 @@ import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
-public class QuizQuestionBuilder extends EntityBuilder<QuizQuestion> {
+public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
   public QuizQuestionBuilder(MakeMe makeMe) {
-    super(makeMe, new QuizQuestion());
+    super(makeMe, new QuizQuestionEntity());
   }
 
-  public QuizQuestionBuilder of(QuizQuestion.QuestionType questionType, ReviewPoint reviewPoint) {
+  public QuizQuestionBuilder of(
+      QuizQuestionEntity.QuestionType questionType, ReviewPoint reviewPoint) {
     entity.setReviewPoint(reviewPoint);
     entity.setQuestionType(questionType);
     return this;
   }
 
   public QuizQuestionBuilder buildValid(
-      QuizQuestion.QuestionType questionType, ReviewPoint reviewPoint) {
+      QuizQuestionEntity.QuestionType questionType, ReviewPoint reviewPoint) {
     QuizQuestionDirector builder =
         new QuizQuestionDirector(
             reviewPoint, new NonRandomizer(), makeMe.modelFactoryService, null);
@@ -32,7 +33,7 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestion> {
   protected void beforeCreate(boolean needPersist) {}
 
   public QuizQuestionViewedByUser ViewedByUserPlease() {
-    QuizQuestion quizQuestion = inMemoryPlease();
+    QuizQuestionEntity quizQuestion = inMemoryPlease();
     if (quizQuestion == null) return null;
     return QuizQuestionViewedByUser.create(
         quizQuestion, makeMe.modelFactoryService, makeMe.aNullUserModel().getEntity());

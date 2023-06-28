@@ -1,6 +1,6 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_TARGET;
+import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.LINK_TARGET;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.in;

@@ -107,7 +107,7 @@ class RestReviewsControllerTests {
       answer =
           makeMe
               .anAnswerFor(reviewPoint)
-              .type(QuizQuestion.QuestionType.CLOZE_SELECTION)
+              .type(QuizQuestionEntity.QuestionType.CLOZE_SELECTION)
               .answerWithId(answerNote)
               .inMemoryPlease();
     }
@@ -168,7 +168,7 @@ class RestReviewsControllerTests {
         answer =
             makeMe
                 .anAnswerFor(reviewPoint)
-                .type(QuizQuestion.QuestionType.SPELLING)
+                .type(QuizQuestionEntity.QuestionType.SPELLING)
                 .answerWithSpelling("wrong")
                 .inMemoryPlease();
       }

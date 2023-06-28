@@ -1,7 +1,7 @@
 package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.LinksOfANote;
 import com.odde.doughnut.models.NoteViewer;
@@ -10,7 +10,7 @@ import java.util.List;
 public abstract class ClozeDescriptonQuizPresenter implements QuizQuestionPresenter {
   private final ReviewPoint reviewPoint;
 
-  public ClozeDescriptonQuizPresenter(QuizQuestion quizQuestion) {
+  public ClozeDescriptonQuizPresenter(QuizQuestionEntity quizQuestion) {
     this.reviewPoint = quizQuestion.getReviewPoint();
   }
 

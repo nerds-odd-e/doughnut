@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.entities.json.AiSuggestionRequest;
@@ -50,8 +50,8 @@ public class RestAiController {
   public QuizQuestionViewedByUser generateQuestion(@RequestParam(value = "note") Note note) {
     currentUser.assertLoggedIn();
     String rawJsonQuestion = aiAdvisorService.generateQuestionJsonString(note, modelFactoryService);
-    QuizQuestion quizQuestion = new QuizQuestion();
-    quizQuestion.setQuestionType(QuizQuestion.QuestionType.AI_QUESTION);
+    QuizQuestionEntity quizQuestion = new QuizQuestionEntity();
+    quizQuestion.setQuestionType(QuizQuestionEntity.QuestionType.AI_QUESTION);
     quizQuestion.setRawJsonQuestion(rawJsonQuestion);
     return new QuizQuestionViewedByUser(quizQuestion, null, null);
   }

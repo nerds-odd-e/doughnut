@@ -1,12 +1,12 @@
 package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.QuizQuestionEntity;
 import java.util.List;
 
 public class NullQuizQuestionPresenter implements QuizQuestionPresenter {
 
-  public NullQuizQuestionPresenter(QuizQuestion quizQuestion) {}
+  public NullQuizQuestionPresenter(QuizQuestionEntity quizQuestion) {}
 
   @Override
   public String mainTopic() {

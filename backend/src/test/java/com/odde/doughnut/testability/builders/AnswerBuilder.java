@@ -5,7 +5,7 @@ import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
 public class AnswerBuilder extends EntityBuilder<Answer> {
-  private QuizQuestion.QuestionType questionType = QuizQuestion.QuestionType.SPELLING;
+  private QuizQuestionEntity.QuestionType questionType = QuizQuestionEntity.QuestionType.SPELLING;
   private ReviewPoint reviewPoint;
 
   public AnswerBuilder(MakeMe makeMe) {
@@ -34,7 +34,7 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
     return this;
   }
 
-  public AnswerBuilder type(QuizQuestion.QuestionType questionType) {
+  public AnswerBuilder type(QuizQuestionEntity.QuestionType questionType) {
     this.questionType = questionType;
     return this;
   }

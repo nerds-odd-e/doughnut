@@ -2,14 +2,14 @@ package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import java.util.List;
 
 public class LinkSourceWithinSameLinkTypeQuizPresenter implements QuizQuestionPresenter {
   protected final Link link;
 
-  public LinkSourceWithinSameLinkTypeQuizPresenter(QuizQuestion quizQuestion) {
+  public LinkSourceWithinSameLinkTypeQuizPresenter(QuizQuestionEntity quizQuestion) {
     this.link = quizQuestion.getReviewPoint().getLink();
   }
 

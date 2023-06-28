@@ -1,9 +1,9 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.QuizQuestionEntity;
 
 public class ClozeTitleSelectionQuizPresenter extends ClozeDescriptonQuizPresenter {
-  public ClozeTitleSelectionQuizPresenter(QuizQuestion quizQuestion) {
+  public ClozeTitleSelectionQuizPresenter(QuizQuestionEntity quizQuestion) {
     super(quizQuestion);
   }
 }

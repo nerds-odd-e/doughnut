@@ -111,7 +111,7 @@ public class MakeMe extends MakeMeWithoutDB {
   }
 
   public QuizQuestionViewedByUser buildAQuestion(
-      QuizQuestion.QuestionType questionType, ReviewPoint reviewPoint) {
+      QuizQuestionEntity.QuestionType questionType, ReviewPoint reviewPoint) {
     return aQuestion().buildValid(questionType, reviewPoint).ViewedByUserPlease();
   }
 

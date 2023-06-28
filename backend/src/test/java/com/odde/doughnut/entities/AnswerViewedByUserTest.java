@@ -1,6 +1,6 @@
 package com.odde.doughnut.entities;
 
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.CLOZE_SELECTION;
+import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.CLOZE_SELECTION;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.testability.MakeMe;

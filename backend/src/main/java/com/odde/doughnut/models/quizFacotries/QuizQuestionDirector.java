@@ -1,7 +1,7 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.QuizQuestion;
-import com.odde.doughnut.entities.QuizQuestion.QuestionType;
+import com.odde.doughnut.entities.QuizQuestionEntity;
+import com.odde.doughnut.entities.QuizQuestionEntity.QuestionType;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.entities.Thingy;
@@ -18,7 +18,7 @@ public record QuizQuestionDirector(
     ModelFactoryService modelFactoryService,
     AiAdvisorService aiAdvisorService) {
 
-  public Optional<QuizQuestion> buildQuizQuestion(QuestionType questionType) {
+  public Optional<QuizQuestionEntity> buildQuizQuestion(QuestionType questionType) {
     try {
       return Optional.of(buildAQuestionOfType(questionType));
     } catch (QuizQuestionNotPossibleException e) {
@@ -26,13 +26,13 @@ public record QuizQuestionDirector(
     }
   }
 
-  private QuizQuestion buildAQuestionOfType(QuestionType questionType)
+  private QuizQuestionEntity buildAQuestionOfType(QuestionType questionType)
       throws QuizQuestionNotPossibleException {
     QuizQuestionFactory quizQuestionFactory = buildQuizQuestionFactory(questionType);
 
     quizQuestionFactory.validatePossibility();
 
-    QuizQuestion quizQuestion = reviewPoint.createAQuizQuestionOfType(questionType);
+    QuizQuestionEntity quizQuestion = reviewPoint.createAQuizQuestionOfType(questionType);
 
     if (quizQuestionFactory instanceof QuestionRawJsonFactory rawJsonFactory) {
       quizQuestion.setRawJsonQuestion(rawJsonFactory.generateRawJsonQuestion());
@@ -54,7 +54,8 @@ public record QuizQuestionDirector(
   }
 
   private QuizQuestionFactory buildQuizQuestionFactory(QuestionType questionType) {
-    QuizQuestionServant servant = new QuizQuestionServant(randomizer, modelFactoryService, aiAdvisorService);
+    QuizQuestionServant servant =
+        new QuizQuestionServant(randomizer, modelFactoryService, aiAdvisorService);
     return questionType.factory.apply(reviewPoint, servant);
   }
 
@@ -66,7 +67,7 @@ public record QuizQuestionDirector(
         .collect(Collectors.joining(","));
   }
 
-  public QuizQuestion buildRandomQuestion(Boolean aiQuestionTypeOnlyForReview) {
+  public QuizQuestionEntity buildRandomQuestion(Boolean aiQuestionTypeOnlyForReview) {
     return this.randomizer
         .shuffle(reviewPoint.availableQuestionTypes(aiQuestionTypeOnlyForReview))
         .stream()

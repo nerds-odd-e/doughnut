@@ -1,7 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.entities.QuizQuestion.QuestionType;
+import com.odde.doughnut.entities.QuizQuestionEntity.QuestionType;
 import com.odde.doughnut.models.TimestampOperations;
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -35,8 +35,8 @@ public class ReviewPoint {
     return entity;
   }
 
-  public QuizQuestion createAQuizQuestionOfType(QuestionType questionType) {
-    QuizQuestion quizQuestion = new QuizQuestion();
+  public QuizQuestionEntity createAQuizQuestionOfType(QuestionType questionType) {
+    QuizQuestionEntity quizQuestion = new QuizQuestionEntity();
     quizQuestion.setReviewPoint(this);
     quizQuestion.setQuestionType(questionType);
     return quizQuestion;
@@ -107,9 +107,9 @@ public class ReviewPoint {
         == TimestampOperations.getDayId(currentTime, timeZone);
   }
 
-  public List<QuizQuestion.QuestionType> availableQuestionTypes(
+  public List<QuizQuestionEntity.QuestionType> availableQuestionTypes(
       Boolean aiQuestionTypeOnlyForReview) {
-    List<QuizQuestion.QuestionType> questionTypes = new ArrayList<>();
+    List<QuizQuestionEntity.QuestionType> questionTypes = new ArrayList<>();
     if (getLink() != null) {
       Collections.addAll(questionTypes, getLink().getLinkType().getQuestionTypes());
     } else {
