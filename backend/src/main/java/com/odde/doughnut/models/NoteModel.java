@@ -70,29 +70,32 @@ public class NoteModel {
   public List<ChatMessage> getChatMessagesForGenerateQuestion() {
     return getChatMessages(
         """
-      Given the note with title: %s
-      and description:
-      %s
-
-      please generate a multiple-choice question with 3 options and 1 correct option.
-      Please vary the option text length, so that the correct answer isn't always the longest one.
-      The response should be JSON-formatted as follows:
-        {
-          question: "",
-          options: [
-            {
-              option: "",
-              correct: true,
-            },
-          ],
-        }
-      )}"""
-            .formatted(entity.getTitle(), entity.getTextContent().getDescription()));
+The note of current focus:
+title: %s
+description (until the end of this message)::
+%s
+      """
+            .formatted(entity.getTitle(), entity.getTextContent().getDescription()),
+        """
+To help me refresh my memory about the note of current focus,
+Please generate a multiple-choice question with 2 to 4 options and only 1 correct option.
+Vary the option text length, so that the correct answer isn't always the longest one.
+The response should be JSON-formatted as follows:
+  {
+    question: "",
+    options: [
+      {
+        option: "",
+        correct: true,
+      },
+    ],
+  }
+)}""");
   }
 
   public List<ChatMessage> getChatMessagesForNoteDescriptionCompletion(
       AiSuggestionRequest aiSuggestionRequest) {
-    List<ChatMessage> messages = getChatMessages(aiSuggestionRequest.prompt);
+    List<ChatMessage> messages = getChatMessages(null, aiSuggestionRequest.prompt);
     if (!Strings.isEmpty(aiSuggestionRequest.incompleteAssistantMessage)) {
       messages.add(
           new ChatMessage(
@@ -101,14 +104,17 @@ public class NoteModel {
     return messages;
   }
 
-  private List<ChatMessage> getChatMessages(String prompt) {
+  private List<ChatMessage> getChatMessages(String additionalContext, String prompt) {
     String context = getPath();
     List<ChatMessage> messages = new ArrayList<>();
     String content =
         ("This is a personal knowledge management system, consists of notes with a title and a description, which should represent atomic concepts.\n"
-                + "context: ")
+                + "Current context of the note: ")
             + context;
     messages.add(new ChatMessage(ChatMessageRole.SYSTEM.value(), content));
+    if (!Strings.isBlank(additionalContext)) {
+      messages.add(new ChatMessage(ChatMessageRole.SYSTEM.value(), additionalContext));
+    }
     messages.add(new ChatMessage(ChatMessageRole.USER.value(), prompt));
     return messages;
   }
