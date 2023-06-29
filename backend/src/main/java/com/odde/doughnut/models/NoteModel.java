@@ -80,7 +80,10 @@ public class NoteModel {
     The note of current focus is something I learned in the last but is not revealed to me now.
     To help me refresh my memory about it,
     please generate a multiple-choice question with 2 to 4 options and only 1 correct option.
-    Vary the option text length, so that the correct answer isn't always the longest one.""");
+    Vary the option text length, so that the correct answer isn't always the longest one.
+    The question should be about the note of current focus in its context.
+    Leave the 'question' field empty if you find there's too little information to generate a question.
+    """);
   }
 
   public List<ChatMessage> getChatMessagesForNoteDescriptionCompletion(

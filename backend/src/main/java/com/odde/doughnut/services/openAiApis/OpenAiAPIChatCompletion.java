@@ -43,9 +43,6 @@ public class OpenAiAPIChatCompletion extends OpenAiApiHandlerBase {
 
     return defaultChatCompletionRequestBuilder(chatMessages)
         .functions(List.of(askSingleAnswerMultipleChoiceQuestion))
-        .functionCall(
-            new ChatCompletionRequest.ChatCompletionRequestFunctionCall(
-                "ask_single_answer_multiple_choice_question"))
         .maxTokens(1100)
         .build();
   }
