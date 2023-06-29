@@ -93,6 +93,7 @@ public class NoteModel {
             ],
           }
         )}""");
+
     return chatMessages;
   }
 
