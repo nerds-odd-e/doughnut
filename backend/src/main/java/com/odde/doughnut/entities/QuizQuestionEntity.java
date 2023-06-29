@@ -96,7 +96,10 @@ public class QuizQuestionEntity {
   @Setter
   private Integer questionTypeId;
 
-  @Transient @Getter @Setter private String rawJsonQuestion;
+  @Column(name = "raw_json_question")
+  @Getter
+  @Setter
+  private String rawJsonQuestion;
 
   @JsonUseIdInsteadOfLink
   @ManyToOne(cascade = CascadeType.DETACH)
