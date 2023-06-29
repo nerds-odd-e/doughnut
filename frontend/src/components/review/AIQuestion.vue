@@ -62,6 +62,12 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+ol {
+  li {
+    padding: 15px;
+  }
+}
+
 .is-correct {
   font-weight: bold;
   background-color: #00ff00;

@@ -23,5 +23,5 @@ Feature: Suggest a description based on note title
     Given OpenAI returns an incomplete text completion "Living organism,"
     When I ask for a description suggestion for note "Animals"
     Then I should see the note description on current page becomes "Living organism,"
-    When OpenAI by default returns text completion "Living organism, not plant or fungi." from now
+    When OpenAI by default returns text completion "not plant or fungi." from now
     Then I should see the note description on current page becomes "Living organism, not plant or fungi."
