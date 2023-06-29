@@ -25,7 +25,7 @@ export default defineComponent({
   data() {
     return {
       loadingWidth: "100%",
-      ready: true,
+      ready: false,
     };
   },
   methods: {

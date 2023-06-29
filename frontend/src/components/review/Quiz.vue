@@ -86,7 +86,6 @@ export default defineComponent({
         !this.toRepeat ||
         this.toRepeat.length === this.currentQuestionIndex
       ) {
-        this.currentQuizQuestion = undefined;
         return;
       }
       this.currentQuizQuestion =
@@ -99,6 +98,7 @@ export default defineComponent({
     onAnswered(answerResult: Generated.AnswerResult) {
       this.$emit("answered", answerResult);
       this.currentQuestionIndex += 1;
+      this.currentQuizQuestion = undefined;
       this.fetchQuestion();
     },
   },

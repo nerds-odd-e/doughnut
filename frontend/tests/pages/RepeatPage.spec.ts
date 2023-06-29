@@ -97,7 +97,6 @@ describe("repeat page", () => {
           `/api/review-points/${secondReviewPointId}/random-question`
         )
         .andReturnOnce(quizQuestion);
-      helper.apiMock.expectingGet(`/api/review-points/${secondReviewPointId}`);
 
       for (let i = 0; i < 10; i += 1) {
         // eslint-disable-next-line no-await-in-loop
