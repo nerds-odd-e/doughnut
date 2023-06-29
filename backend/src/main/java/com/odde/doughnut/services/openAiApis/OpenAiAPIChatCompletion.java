@@ -4,10 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.theokanning.openai.OpenAiApi;
+import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatFunction;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import java.util.List;
+import java.util.Optional;
 
 public class OpenAiAPIChatCompletion extends OpenAiApiHandlerBase {
 
@@ -17,9 +19,10 @@ public class OpenAiAPIChatCompletion extends OpenAiApiHandlerBase {
     this.openAiApi = openAiApi;
   }
 
-  public AiSuggestion getOpenAiCompletion(List<ChatMessage> chatMessages, int maxTokens) {
-    return getAiSuggestion(
-        defaultChatCompletionRequestBuilder(chatMessages).maxTokens(maxTokens).build());
+  public AiSuggestion getOpenAiCompletion(List<ChatMessage> chatMessages) {
+    return chatCompletion(defaultChatCompletionRequestBuilder(chatMessages).maxTokens(100).build())
+        .map(AiSuggestion::from)
+        .orElse(null);
   }
 
   public class AIQuestionOption {
@@ -41,7 +44,7 @@ public class OpenAiAPIChatCompletion extends OpenAiApiHandlerBase {
     public List<AIQuestionOption> options;
   }
 
-  public AiSuggestion getOpenAiCompletion1(List<ChatMessage> chatMessages, int maxTokens) {
+  public String getOpenAiGenerateQuestion(List<ChatMessage> chatMessages) {
     ChatFunction build =
         ChatFunction.builder()
             .name("ask_single_answer_multiple_choice_question")
@@ -49,21 +52,22 @@ public class OpenAiAPIChatCompletion extends OpenAiApiHandlerBase {
             .executor(AIGeneratedQuestion.class, null)
             .build();
 
-    return getAiSuggestion(
-        defaultChatCompletionRequestBuilder(chatMessages)
-            .functions(List.of(build))
-            .functionCall(new ChatCompletionRequest.ChatCompletionRequestFunctionCall("none"))
-            .maxTokens(maxTokens)
-            .build());
+    return chatCompletion(
+            defaultChatCompletionRequestBuilder(chatMessages)
+                .functions(List.of(build))
+                .functionCall(new ChatCompletionRequest.ChatCompletionRequestFunctionCall("none"))
+                .maxTokens(1100)
+                .build())
+        .map(AiSuggestion::from)
+        .map(AiSuggestion::getSuggestion)
+        .orElse(null);
   }
 
-  private AiSuggestion getAiSuggestion(ChatCompletionRequest request) {
+  private Optional<ChatCompletionChoice> chatCompletion(ChatCompletionRequest request) {
     return withExceptionHandler(
         () ->
             openAiApi.createChatCompletion(request).blockingGet().getChoices().stream()
-                .findFirst()
-                .map(AiSuggestion::from)
-                .orElse(null));
+                .findFirst());
   }
 
   private static ChatCompletionRequest.ChatCompletionRequestBuilder

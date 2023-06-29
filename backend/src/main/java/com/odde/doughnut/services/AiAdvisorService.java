@@ -23,7 +23,7 @@ public class AiAdvisorService {
   public AiSuggestion getAiSuggestion(
       List<ChatMessage> messages, String incompleteAssistantMessage) {
     return openAiAPIChatCompletion
-        .getOpenAiCompletion(messages, 100)
+        .getOpenAiCompletion(messages)
         .prependPreviousIncompleteMessage(incompleteAssistantMessage);
   }
 
@@ -34,7 +34,6 @@ public class AiAdvisorService {
   public String generateQuestionJsonString(Note note, ModelFactoryService modelFactoryService) {
     NoteModel noteModel = modelFactoryService.toNoteModel(note);
     List<ChatMessage> messages = noteModel.getChatMessagesForGenerateQuestion();
-    AiSuggestion openAiCompletion = openAiAPIChatCompletion.getOpenAiCompletion1(messages, 1100);
-    return openAiCompletion.getSuggestion();
+    return openAiAPIChatCompletion.getOpenAiGenerateQuestion(messages);
   }
 }
