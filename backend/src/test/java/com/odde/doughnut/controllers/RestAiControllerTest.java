@@ -7,6 +7,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
@@ -160,10 +162,10 @@ class RestAiControllerTest {
     }
 
     @Test
-    void createQuizQuestion() {
+    void createQuizQuestion() throws JsonProcessingException {
       when(openAiApi.createChatCompletion(any()))
           .thenReturn(
-              buildCompletionResult(
+              buildCompletionResultForAIQuestion(
                   """
       {"question": "What is the first color in the rainbow?"}
       """));
@@ -196,5 +198,15 @@ class RestAiControllerTest {
   @NotNull
   private Single<ChatCompletionResult> buildCompletionResult(String text) {
     return Single.just(makeMe.openAiCompletionResult().choice(text).please());
+  }
+
+  @NotNull
+  private Single<ChatCompletionResult> buildCompletionResultForAIQuestion(String jsonString)
+      throws JsonProcessingException {
+    return Single.just(
+        makeMe
+            .openAiCompletionResult()
+            .functionCall("", new ObjectMapper().readTree(jsonString))
+            .please());
   }
 }

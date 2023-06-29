@@ -74,7 +74,10 @@ Given("OpenAI by default returns this question from now:", (questionTable: DataT
     ],
   })
   cy.openAiService().restartImposter()
-  cy.openAiService().stubChatCompletion(reply, "stop")
+  cy.openAiService().stubChatCompletionFunctionCall(
+    "ask_single_answer_multiple_choice_question",
+    reply,
+  )
 })
 
 Then("it should consider the context {string}", (path: string) => {

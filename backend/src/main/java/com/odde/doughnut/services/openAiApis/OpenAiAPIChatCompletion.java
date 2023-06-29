@@ -2,12 +2,10 @@ package com.odde.doughnut.services.openAiApis;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.theokanning.openai.OpenAiApi;
-import com.theokanning.openai.completion.chat.ChatCompletionChoice;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
-import com.theokanning.openai.completion.chat.ChatFunction;
-import com.theokanning.openai.completion.chat.ChatMessage;
+import com.theokanning.openai.completion.chat.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,22 +43,31 @@ public class OpenAiAPIChatCompletion extends OpenAiApiHandlerBase {
   }
 
   public String getOpenAiGenerateQuestion(List<ChatMessage> chatMessages) {
-    ChatFunction build =
+    ChatCompletionRequest chatRequest = getChatRequestForGeneratingQuestion(chatMessages);
+    return chatCompletion(chatRequest)
+        .map(ChatCompletionChoice::getMessage)
+        .map(ChatMessage::getFunctionCall)
+        .map(ChatFunctionCall::getArguments)
+        .map(JsonNode::toString)
+        .orElse(null);
+  }
+
+  private ChatCompletionRequest getChatRequestForGeneratingQuestion(
+      List<ChatMessage> chatMessages) {
+    ChatFunction askSingleAnswerMultipleChoiceQuestion =
         ChatFunction.builder()
             .name("ask_single_answer_multiple_choice_question")
             .description("Ask a single-answer multiple-choice question to the user")
             .executor(AIGeneratedQuestion.class, null)
             .build();
 
-    return chatCompletion(
-            defaultChatCompletionRequestBuilder(chatMessages)
-                .functions(List.of(build))
-                .functionCall(new ChatCompletionRequest.ChatCompletionRequestFunctionCall("none"))
-                .maxTokens(1100)
-                .build())
-        .map(AiSuggestion::from)
-        .map(AiSuggestion::getSuggestion)
-        .orElse(null);
+    return defaultChatCompletionRequestBuilder(chatMessages)
+        .functions(List.of(askSingleAnswerMultipleChoiceQuestion))
+        .functionCall(
+            new ChatCompletionRequest.ChatCompletionRequestFunctionCall(
+                "ask_single_answer_multiple_choice_question"))
+        .maxTokens(1100)
+        .build();
   }
 
   private Optional<ChatCompletionChoice> chatCompletion(ChatCompletionRequest request) {

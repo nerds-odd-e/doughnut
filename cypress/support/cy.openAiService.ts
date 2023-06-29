@@ -117,6 +117,32 @@ Cypress.Commands.add(
   },
 )
 
+Cypress.Commands.add(
+  "stubChatCompletionFunctionCall",
+  { prevSubject: true },
+  (serviceMocker: ServiceMocker, functionName: string, argumentsString: string) => {
+    const predicate = new DefaultPredicate(`/v1/chat/completions`, HttpMethod.POST)
+    serviceMocker.mockWithPredicate(predicate, {
+      id: "cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7",
+      object: "chat.completion",
+      model: "gpt-3.5-turbo",
+      choices: [
+        {
+          message: {
+            role: "function",
+            function_call: {
+              name: functionName,
+              arguments: argumentsString,
+            },
+          },
+          index: 0,
+          finish_reason: "function_call",
+        },
+      ],
+    })
+  },
+)
+
 Cypress.Commands.add("stubCreateImage", { prevSubject: true }, (serviceMocker: ServiceMocker) => {
   serviceMocker.stubPoster(`/v1/images/generations`, {
     id: "cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7",
