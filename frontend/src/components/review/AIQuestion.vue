@@ -20,7 +20,6 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { AiQuestionModel } from "@/models/AiAdvisor";
 
 export default defineComponent({
   props: {
@@ -30,7 +29,9 @@ export default defineComponent({
   components: {},
   data() {
     return {
-      question: JSON.parse(this.rawJsonQuestion) as AiQuestionModel,
+      question: JSON.parse(
+        this.rawJsonQuestion
+      ) as Generated.AIGeneratedQuestion,
       selectedOptionIndex: undefined as number | undefined,
     };
   },

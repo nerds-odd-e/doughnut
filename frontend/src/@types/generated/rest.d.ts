@@ -3,6 +3,17 @@
 
 declare namespace Generated {
 
+    interface AIGeneratedQuestion {
+        /**
+         * The question to ask the user
+         */
+        question: string;
+        /**
+         * The options to ask the user to choose from
+         */
+        options: AIQuestionOption[];
+    }
+
     interface AiEngagingStory {
         engagingStory: string;
     }
@@ -174,6 +185,17 @@ declare namespace Generated {
         id: string;
         label: string;
         description: string;
+    }
+
+    interface AIQuestionOption {
+        /**
+         * The option to ask the user
+         */
+        option: string;
+        /**
+         * Whether the option is correct or not
+         */
+        correct: boolean;
     }
 
     interface User {

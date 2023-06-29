@@ -1,8 +1,7 @@
 package com.odde.doughnut.services.openAiApis;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.odde.doughnut.entities.json.AIGeneratedQuestion;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.*;
@@ -21,25 +20,6 @@ public class OpenAiAPIChatCompletion extends OpenAiApiHandlerBase {
     return chatCompletion(defaultChatCompletionRequestBuilder(chatMessages).maxTokens(100).build())
         .map(AiSuggestion::from)
         .orElse(null);
-  }
-
-  public class AIQuestionOption {
-    @JsonPropertyDescription("The option to ask the user")
-    public String option;
-
-    @JsonPropertyDescription("Whether the option is correct or not")
-    @JsonProperty(required = true)
-    public Boolean correct;
-  }
-
-  public class AIGeneratedQuestion {
-    @JsonPropertyDescription("The question to ask the user")
-    @JsonProperty(required = true)
-    public String question;
-
-    @JsonPropertyDescription("The options to ask the user to choose from")
-    @JsonProperty(required = true)
-    public List<AIQuestionOption> options;
   }
 
   public String getOpenAiGenerateQuestion(List<ChatMessage> chatMessages) {

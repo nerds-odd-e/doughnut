@@ -1,13 +1,3 @@
-export type AiQuestionModel = {
-  question: string;
-  options: AiQuestionOption[];
-};
-
-type AiQuestionOption = {
-  option: string;
-  correct: boolean;
-};
-
 export default class AiAdvisor {
   textContent: Generated.TextContent;
 
