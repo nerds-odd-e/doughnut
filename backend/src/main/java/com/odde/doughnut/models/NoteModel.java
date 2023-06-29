@@ -77,8 +77,8 @@ public class NoteModel {
           """
             .formatted(entity.getTitle(), entity.getTextContent().getDescription()),
         """
-    The note of current focus is something I learned in the last but is not revealed to me now.
-    To help me refresh my memory about it,
+    Please note that I don't know which note is of current focus.
+    To help me recall and refresh my memory about it,
     please generate a multiple-choice question with 2 to 4 options and only 1 correct option.
     Vary the option text length, so that the correct answer isn't always the longest one.
     The question should be about the note of current focus in its context.
