@@ -1,15 +1,19 @@
 package com.odde.doughnut.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.json.AIGeneratedQuestion;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteModel;
+import com.odde.doughnut.models.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.services.openAiApis.OpenAiAPIChatCompletion;
 import com.odde.doughnut.services.openAiApis.OpenAiAPIImage;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import java.util.List;
+import org.apache.logging.log4j.util.Strings;
 
 public class AiAdvisorService {
   private final OpenAiAPIChatCompletion openAiAPIChatCompletion;
@@ -31,9 +35,15 @@ public class AiAdvisorService {
     return new AiEngagingStory(openAiAPIImage.getOpenAiImage(prompt));
   }
 
-  public String generateQuestionJsonString(Note note, ModelFactoryService modelFactoryService) {
+  public String generateQuestionJsonString(Note note, ModelFactoryService modelFactoryService)
+      throws QuizQuestionNotPossibleException {
     NoteModel noteModel = modelFactoryService.toNoteModel(note);
     List<ChatMessage> messages = noteModel.getChatMessagesForGenerateQuestion();
-    return openAiAPIChatCompletion.getOpenAiGenerateQuestion(messages);
+    AIGeneratedQuestion openAiGenerateQuestion =
+        openAiAPIChatCompletion.getOpenAiGenerateQuestion(messages);
+    if (openAiGenerateQuestion == null || Strings.isBlank(openAiGenerateQuestion.question)) {
+      throw new QuizQuestionNotPossibleException();
+    }
+    return new ObjectMapper().valueToTree(openAiGenerateQuestion).toString();
   }
 }

@@ -1,5 +1,5 @@
 package com.odde.doughnut.models.quizFacotries;
 
 public interface QuestionRawJsonFactory {
-  String generateRawJsonQuestion();
+  String generateRawJsonQuestion() throws QuizQuestionNotPossibleException;
 }

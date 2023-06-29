@@ -15,6 +15,7 @@ import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.entities.json.AiSuggestionRequest;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.models.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
@@ -162,7 +163,7 @@ class RestAiControllerTest {
     }
 
     @Test
-    void createQuizQuestion() throws JsonProcessingException {
+    void createQuizQuestion() throws JsonProcessingException, QuizQuestionNotPossibleException {
       when(openAiApi.createChatCompletion(any()))
           .thenReturn(
               buildCompletionResultForAIQuestion(
@@ -175,14 +176,26 @@ class RestAiControllerTest {
     }
 
     @Test
-    void usingABiggerMaxToken() {
+    void createQuizQuestionFailed() throws JsonProcessingException {
+      when(openAiApi.createChatCompletion(any()))
+          .thenReturn(buildCompletionResultForAIQuestion("""
+{"question": ""}
+"""));
+      assertThrows(QuizQuestionNotPossibleException.class, () -> controller.generateQuestion(note));
+    }
+
+    @Test
+    void usingABiggerMaxToken() throws QuizQuestionNotPossibleException, JsonProcessingException {
       when(openAiApi.createChatCompletion(
               argThat(
                   request -> {
                     assertThat(request.getMaxTokens()).isGreaterThan(1000);
                     return true;
                   })))
-          .thenReturn(buildCompletionResult("blue planet"));
+          .thenReturn(
+              buildCompletionResultForAIQuestion("""
+{"question": "what is it?"}
+            """));
       controller.generateQuestion(note);
     }
   }

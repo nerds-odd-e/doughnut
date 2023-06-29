@@ -1,6 +1,7 @@
 package com.odde.doughnut.services.openAiApis;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.json.AIGeneratedQuestion;
 import com.odde.doughnut.entities.json.AiSuggestion;
 import com.theokanning.openai.OpenAiApi;
@@ -22,13 +23,20 @@ public class OpenAiAPIChatCompletion extends OpenAiApiHandlerBase {
         .orElse(null);
   }
 
-  public String getOpenAiGenerateQuestion(List<ChatMessage> chatMessages) {
+  public AIGeneratedQuestion getOpenAiGenerateQuestion(List<ChatMessage> chatMessages) {
     ChatCompletionRequest chatRequest = getChatRequestForGeneratingQuestion(chatMessages);
     return chatCompletion(chatRequest)
         .map(ChatCompletionChoice::getMessage)
         .map(ChatMessage::getFunctionCall)
         .map(ChatFunctionCall::getArguments)
-        .map(JsonNode::toString)
+        .map(
+            arguments -> {
+              try {
+                return new ObjectMapper().treeToValue(arguments, AIGeneratedQuestion.class);
+              } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+              }
+            })
         .orElse(null);
   }
 
@@ -43,7 +51,7 @@ public class OpenAiAPIChatCompletion extends OpenAiApiHandlerBase {
 
     return defaultChatCompletionRequestBuilder(chatMessages)
         .functions(List.of(askSingleAnswerMultipleChoiceQuestion))
-        .maxTokens(1100)
+        .maxTokens(1500)
         .build();
   }
 

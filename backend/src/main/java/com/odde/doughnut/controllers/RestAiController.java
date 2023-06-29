@@ -9,6 +9,7 @@ import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteModel;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.models.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatMessage;
@@ -47,7 +48,8 @@ public class RestAiController {
   }
 
   @GetMapping("/generate-question")
-  public QuizQuestion generateQuestion(@RequestParam(value = "note") Note note) {
+  public QuizQuestion generateQuestion(@RequestParam(value = "note") Note note)
+      throws QuizQuestionNotPossibleException {
     currentUser.assertLoggedIn();
     String rawJsonQuestion = aiAdvisorService.generateQuestionJsonString(note, modelFactoryService);
     QuizQuestionEntity quizQuestionEntity = new QuizQuestionEntity();
