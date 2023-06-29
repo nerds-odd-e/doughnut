@@ -77,8 +77,9 @@ description (until the end of this message)::
       """
             .formatted(entity.getTitle(), entity.getTextContent().getDescription()),
         """
-To help me refresh my memory about the note of current focus,
-Please generate a multiple-choice question with 2 to 4 options and only 1 correct option.
+The note of current focus is something I learned in the last but is not revealed to me now.
+To help me refresh my memory about it,
+please generate a multiple-choice question with 2 to 4 options and only 1 correct option.
 Vary the option text length, so that the correct answer isn't always the longest one.
 The response should be JSON-formatted as follows:
   {
