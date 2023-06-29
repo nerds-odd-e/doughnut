@@ -100,8 +100,6 @@ public class ModelFactoryService {
 
   public QuizQuestion toQuizQuestion(QuizQuestionEntity quizQuestionEntity, User user) {
     QuizQuestionPresenter presenter = quizQuestionEntity.buildPresenter();
-    List<QuizQuestion.Option> options =
-        presenter.optionCreator().getOptions(this, quizQuestionEntity.getOptionThingIds());
     return new QuizQuestion(
         quizQuestionEntity.getId(),
         quizQuestionEntity.getRawJsonQuestion(),
@@ -111,7 +109,7 @@ public class ModelFactoryService {
         presenter.hintLinks(),
         quizQuestionEntity.getViceReviewPointIdList(),
         quizQuestionEntity.getNotebookPosition(user),
-        options,
+        presenter.optionCreator().getOptions(this, quizQuestionEntity.getOptionThingIds()),
         presenter.pictureWithMask());
   }
 }

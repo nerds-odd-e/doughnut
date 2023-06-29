@@ -33,9 +33,8 @@ public class AiAdvisorService {
 
   public String generateQuestionJsonString(Note note, ModelFactoryService modelFactoryService) {
     NoteModel noteModel = modelFactoryService.toNoteModel(note);
-    AiSuggestion openAiCompletion =
-        openAiAPIChatCompletion.getOpenAiCompletion(
-            noteModel.getChatMessagesForGenerateQuestion(), 1100);
+    List<ChatMessage> messages = noteModel.getChatMessagesForGenerateQuestion();
+    AiSuggestion openAiCompletion = openAiAPIChatCompletion.getOpenAiCompletion(messages, 1100);
     return openAiCompletion.getSuggestion();
   }
 }

@@ -15,34 +15,30 @@ public class OpenAiAPIChatCompletion extends OpenAiApiHandlerBase {
   }
 
   public AiSuggestion getOpenAiCompletion(List<ChatMessage> chatMessages, int maxTokens) {
+    return getAiSuggestion(
+        defaultChatCompletionRequestBuilder(chatMessages, maxTokens).maxTokens(maxTokens).build());
+  }
+
+  private AiSuggestion getAiSuggestion(ChatCompletionRequest request) {
     return withExceptionHandler(
         () ->
-            openAiApi
-                .createChatCompletion(getChatCompletionRequest(chatMessages, maxTokens))
-                .blockingGet()
-                .getChoices()
-                .stream()
+            openAiApi.createChatCompletion(request).blockingGet().getChoices().stream()
                 .findFirst()
                 .map(AiSuggestion::from)
                 .orElse(null));
   }
 
-  private static ChatCompletionRequest getChatCompletionRequest(
-      List<ChatMessage> messages, int maxTokens) {
-
+  private static ChatCompletionRequest.ChatCompletionRequestBuilder
+      defaultChatCompletionRequestBuilder(List<ChatMessage> messages, int maxTokens) {
     return ChatCompletionRequest.builder()
         .model("gpt-3.5-turbo")
         .messages(messages)
-        .n(1)
-        // This can go higher (up to 4000 - prompt size), but openAI performance goes down
-        // https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
-        .maxTokens(maxTokens)
         //
         // an effort has been made to make the api call more responsive by using stream(true)
         // however, due to the library limitation, we cannot do it yet.
         // find more details here:
         //    https://github.com/TheoKanning/openai-java/issues/83
         .stream(false)
-        .build();
+        .n(1);
   }
 }

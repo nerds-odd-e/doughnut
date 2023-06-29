@@ -68,30 +68,32 @@ public class NoteModel {
   }
 
   public List<ChatMessage> getChatMessagesForGenerateQuestion() {
-    return getChatMessages(
-        """
-The note of current focus:
-title: %s
-description (until the end of this message)::
-%s
-      """
-            .formatted(entity.getTitle(), entity.getTextContent().getDescription()),
-        """
-The note of current focus is something I learned in the last but is not revealed to me now.
-To help me refresh my memory about it,
-please generate a multiple-choice question with 2 to 4 options and only 1 correct option.
-Vary the option text length, so that the correct answer isn't always the longest one.
-The response should be JSON-formatted as follows:
-  {
-    question: "",
-    options: [
-      {
-        option: "",
-        correct: true,
-      },
-    ],
-  }
-)}""");
+    List<ChatMessage> chatMessages =
+        getChatMessages(
+            """
+        The note of current focus:
+        title: %s
+        description (until the end of this message)::
+        %s
+              """
+                .formatted(entity.getTitle(), entity.getTextContent().getDescription()),
+            """
+        The note of current focus is something I learned in the last but is not revealed to me now.
+        To help me refresh my memory about it,
+        please generate a multiple-choice question with 2 to 4 options and only 1 correct option.
+        Vary the option text length, so that the correct answer isn't always the longest one.
+        The response should be JSON-formatted as follows:
+          {
+            question: "",
+            options: [
+              {
+                option: "",
+                correct: true,
+              },
+            ],
+          }
+        )}""");
+    return chatMessages;
   }
 
   public List<ChatMessage> getChatMessagesForNoteDescriptionCompletion(
