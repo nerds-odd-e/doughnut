@@ -398,11 +398,9 @@ Cypress.Commands.add("findCardTitle", (title) => cy.findByText(title, { selector
 Cypress.Commands.add("findMindmapCardTitle", (title) => cy.findByText(title))
 
 Cypress.Commands.add("yesIRemember", () => {
-  cy.tick(11 * 1000)
-  // force: true is needed because the test become flaky without it
-  // this seems to happen since the recent Cypress upgrade.
-  // Need to investigate more after the next Cypress upgrade.
-  cy.findByRole("button", { name: "Yes, I remember" }).click({ force: true })
+  cy.tick(11 * 1000).then(() => {
+    cy.findByRole("button", { name: "Yes, I remember" }).click()
+  })
 })
 
 Cypress.Commands.add("openCirclesSelector", () => {
