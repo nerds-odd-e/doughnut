@@ -13,7 +13,6 @@
 import { defineComponent, PropType } from "vue";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import { StorageAccessor } from "@/store/createNoteStorage";
-import AiAdvisor from "@/models/AiAdvisor";
 import SvgRobot from "../svgs/SvgRobot.vue";
 
 export default defineComponent({
@@ -42,8 +41,7 @@ export default defineComponent({
   },
   methods: {
     async suggestDescription(prev?: string) {
-      const aiAdvisor = new AiAdvisor(this.selectedNote.textContent);
-      const prompt = aiAdvisor.promptWithContext();
+      const prompt = `Please provide the description for the note titled: ${this.selectedNote.textContent.title}`;
       await this.api.ai.keepAskingAISuggestionUntilStop(
         prompt,
         this.selectedNote.id,
