@@ -1,24 +1,25 @@
 <template>
   <h3>
-    {{ question.question }}
+    {{ questionDescription }}
   </h3>
-  <ol v-if="question.options" type="A">
+  <ol v-if="options" type="A">
     <li
-      v-for="(option, index) in question.options"
+      v-for="(option, index) in options"
       role="button"
       :key="index"
       @click="selectOption(index)"
       :class="{
-        'is-correct': isSelectedOption(index) && option.correct,
-        'is-wrong': isSelectedOption(index) && !option.correct,
+        'is-correct': isSelectedOption(index) && isOptionCorrect(option),
+        'is-wrong': isSelectedOption(index) && !isOptionCorrect(option),
       }"
     >
-      {{ option.option }}
+      {{ option }}
     </li>
   </ol>
 </template>
 
 <script lang="ts">
+import _ from "lodash";
 import { defineComponent } from "vue";
 
 export default defineComponent({
@@ -28,10 +29,17 @@ export default defineComponent({
   emits: ["selfEvaluatedMemoryState"],
   components: {},
   data() {
+    const aiQuestion = JSON.parse(
+      this.rawJsonQuestion
+    ) as Generated.AIGeneratedQuestion;
     return {
-      question: JSON.parse(
-        this.rawJsonQuestion
-      ) as Generated.AIGeneratedQuestion,
+      question: aiQuestion,
+      questionDescription: aiQuestion.question,
+      correctOption: aiQuestion.correctOption,
+      options: _.shuffle([
+        ...aiQuestion.wrongOptions,
+        aiQuestion.correctOption,
+      ]),
       selectedOptionIndex: undefined as number | undefined,
     };
   },
@@ -40,11 +48,14 @@ export default defineComponent({
       this.selectedOptionIndex = optionIndex;
       this.$emit(
         "selfEvaluatedMemoryState",
-        this.question.options[optionIndex]?.correct ? "yes" : "no"
+        this.isOptionCorrect(this.options[optionIndex]) ? "yes" : "no"
       );
     },
     isSelectedOption(optionIndex: number) {
       return this.selectedOptionIndex === optionIndex;
+    },
+    isOptionCorrect(option?: string) {
+      return option === this.correctOption;
     },
   },
 });

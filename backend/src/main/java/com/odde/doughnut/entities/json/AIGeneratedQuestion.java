@@ -5,20 +5,15 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.util.List;
 
 public class AIGeneratedQuestion {
-  public static class AIQuestionOption {
-    @JsonPropertyDescription("The option to ask the user")
-    public String option;
-
-    @JsonPropertyDescription("Whether the option is correct or not")
-    @JsonProperty(required = true)
-    public Boolean correct;
-  }
-
   @JsonPropertyDescription("The question to ask the user")
   @JsonProperty(required = true)
   public String question;
 
-  @JsonPropertyDescription("The options to ask the user to choose from")
+  @JsonPropertyDescription("The only correct option")
   @JsonProperty(required = true)
-  public List<AIQuestionOption> options;
+  public String correctOption;
+
+  @JsonPropertyDescription("Some wrong options.")
+  @JsonProperty(required = true)
+  public List<String> wrongOptions;
 }
