@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.util.List;
 
 public class AIGeneratedQuestion {
-  public class AIQuestionOption {
+  public static class AIQuestionOption {
     @JsonPropertyDescription("The option to ask the user")
     public String option;
 
