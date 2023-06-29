@@ -398,7 +398,7 @@ Cypress.Commands.add("findCardTitle", (title) => cy.findByText(title, { selector
 Cypress.Commands.add("findMindmapCardTitle", (title) => cy.findByText(title))
 
 Cypress.Commands.add("yesIRemember", () => {
-  cy.tick(10 * 1000)
+  cy.tick(11 * 1000)
   cy.findByRole("button", { name: "Yes, I remember" }).click()
 })
 
