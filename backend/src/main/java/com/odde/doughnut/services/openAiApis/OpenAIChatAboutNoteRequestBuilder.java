@@ -11,11 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.logging.log4j.util.Strings;
 
-public class OpenAIChatAboutNoteMessageBuilder {
+public class OpenAIChatAboutNoteRequestBuilder {
   public List<ChatMessage> messages = new ArrayList<>();
   private String path;
+  private int maxTokens;
 
-  public OpenAIChatAboutNoteMessageBuilder(String notePath) {
+  private ChatFunction askSingleAnswerMultipleChoiceQuestion = null;
+
+  public OpenAIChatAboutNoteRequestBuilder(String notePath) {
     this.path = notePath;
     String content =
         ("This is a personal knowledge management system, consists of notes with a title and a description, which should represent atomic concepts.\n"
@@ -38,7 +41,7 @@ public class OpenAIChatAboutNoteMessageBuilder {
         .n(1);
   }
 
-  public OpenAIChatAboutNoteMessageBuilder detailsOfNoteOfCurrentFocus(Note note) {
+  public OpenAIChatAboutNoteRequestBuilder detailsOfNoteOfCurrentFocus(Note note) {
     String noteOfCurrentFocus =
         """
 The note of current focus:
@@ -51,7 +54,15 @@ description (until the end of this message):
     return this;
   }
 
-  public OpenAIChatAboutNoteMessageBuilder userInstructionToGenerateQuestion() {
+  public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestion() {
+
+    askSingleAnswerMultipleChoiceQuestion =
+        ChatFunction.builder()
+            .name("ask_single_answer_multiple_choice_question")
+            .description("Ask a single-answer multiple-choice question to the user")
+            .executor(AIGeneratedQuestion.class, null)
+            .build();
+
     messages.add(
         new ChatMessage(
             ChatMessageRole.USER.value(),
@@ -66,7 +77,7 @@ Leave the 'question' field empty if you find there's too little information to g
     return this;
   }
 
-  public OpenAIChatAboutNoteMessageBuilder instructionForCompletion(
+  public OpenAIChatAboutNoteRequestBuilder instructionForCompletion(
       AiCompletionRequest aiCompletionRequest) {
     messages.add(new ChatMessage(ChatMessageRole.USER.value(), aiCompletionRequest.prompt));
     if (!Strings.isEmpty(aiCompletionRequest.incompleteContent)) {
@@ -77,21 +88,17 @@ Leave the 'question' field empty if you find there's too little information to g
     return this;
   }
 
-  public ChatCompletionRequest buildChatCompletionRequest() {
-    return defaultChatCompletionRequestBuilder(messages).maxTokens(100).build();
+  public OpenAIChatAboutNoteRequestBuilder maxTokens(int maxTokens) {
+    this.maxTokens = maxTokens;
+    return this;
   }
 
-  public ChatCompletionRequest buildChatCompletionRequestForGQ() {
-    ChatFunction askSingleAnswerMultipleChoiceQuestion =
-        ChatFunction.builder()
-            .name("ask_single_answer_multiple_choice_question")
-            .description("Ask a single-answer multiple-choice question to the user")
-            .executor(AIGeneratedQuestion.class, null)
-            .build();
-
-    return defaultChatCompletionRequestBuilder(messages)
-        .functions(List.of(askSingleAnswerMultipleChoiceQuestion))
-        .maxTokens(1500)
-        .build();
+  public ChatCompletionRequest build() {
+    ChatCompletionRequest.ChatCompletionRequestBuilder requestBuilder =
+        defaultChatCompletionRequestBuilder(messages);
+    if (askSingleAnswerMultipleChoiceQuestion != null) {
+      requestBuilder.functions(List.of(askSingleAnswerMultipleChoiceQuestion));
+    }
+    return requestBuilder.maxTokens(maxTokens).build();
   }
 }
