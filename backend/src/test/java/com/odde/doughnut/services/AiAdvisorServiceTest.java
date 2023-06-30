@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.entities.json.AiCompletion;
+import com.odde.doughnut.entities.json.AiCompletionRequest;
 import com.odde.doughnut.entities.json.ApiError;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.OpenAITimeoutException;
@@ -57,13 +58,13 @@ class AiAdvisorServiceTest {
           .thenReturn(completionResultSingle);
       assertEquals(
           "what goes up must come down",
-          aiAdvisorService.getCompletion(List.of(), "what goes up").getMoreCompleteContent());
+          getAiCompletionFromAdvisor("what goes up").getMoreCompleteContent());
     }
 
     @Test
     void the_data_returned_is_incomplete() {
       when(openAiApi.createChatCompletion(any())).thenReturn(IncompleteCompletionResultSingle);
-      AiCompletion suggestion = aiAdvisorService.getCompletion(List.of(), "");
+      AiCompletion suggestion = getAiCompletionFromAdvisor("");
       assertEquals("length", suggestion.getFinishReason());
     }
 
@@ -72,7 +73,7 @@ class AiAdvisorServiceTest {
       HttpException httpException = buildHttpException(400);
       Mockito.when(openAiApi.createChatCompletion(ArgumentMatchers.any()))
           .thenReturn(Single.error(httpException));
-      assertThrows(HttpException.class, () -> aiAdvisorService.getCompletion(List.of(), ""));
+      assertThrows(HttpException.class, () -> getAiCompletionFromAdvisor(""));
     }
 
     @Test
@@ -81,8 +82,7 @@ class AiAdvisorServiceTest {
       Mockito.when(openAiApi.createChatCompletion(ArgumentMatchers.any()))
           .thenReturn(Single.error(exception));
       OpenAITimeoutException result =
-          assertThrows(
-              OpenAITimeoutException.class, () -> aiAdvisorService.getCompletion(List.of(), ""));
+          assertThrows(OpenAITimeoutException.class, () -> getAiCompletionFromAdvisor(""));
       assertThat(result.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.OPENAI_TIMEOUT));
     }
 
@@ -92,9 +92,7 @@ class AiAdvisorServiceTest {
       Mockito.when(openAiApi.createChatCompletion(ArgumentMatchers.any()))
           .thenReturn(Single.error(exception));
       OpenAIServiceErrorException result =
-          assertThrows(
-              OpenAIServiceErrorException.class,
-              () -> aiAdvisorService.getCompletion(List.of(), ""));
+          assertThrows(OpenAIServiceErrorException.class, () -> getAiCompletionFromAdvisor(""));
       assertThat(
           result.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.OPENAI_SERVICE_ERROR));
       assertThat(result.getMessage(), containsString("502"));
@@ -106,11 +104,13 @@ class AiAdvisorServiceTest {
       Mockito.when(openAiApi.createChatCompletion(ArgumentMatchers.any()))
           .thenReturn(Single.error(httpException));
       OpenAiUnauthorizedException exception =
-          assertThrows(
-              OpenAiUnauthorizedException.class,
-              () -> aiAdvisorService.getCompletion(List.of(), ""));
+          assertThrows(OpenAiUnauthorizedException.class, () -> getAiCompletionFromAdvisor(""));
       assertThat(exception.getMessage(), containsString("401"));
     }
+  }
+
+  private AiCompletion getAiCompletionFromAdvisor(String incompleteContent) {
+    return aiAdvisorService.getAiCompletion(new AiCompletionRequest("", incompleteContent), "");
   }
 
   @Nested

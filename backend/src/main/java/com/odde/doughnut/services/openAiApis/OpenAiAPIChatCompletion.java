@@ -3,7 +3,6 @@ package com.odde.doughnut.services.openAiApis;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.json.AIGeneratedQuestion;
-import com.odde.doughnut.entities.json.AiCompletion;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.*;
 import java.util.List;
@@ -15,12 +14,6 @@ public class OpenAiAPIChatCompletion extends OpenAiApiHandlerBase {
 
   public OpenAiAPIChatCompletion(OpenAiApi openAiApi) {
     this.openAiApi = openAiApi;
-  }
-
-  public AiCompletion getOpenAiCompletion(List<ChatMessage> chatMessages) {
-    return chatCompletion(defaultChatCompletionRequestBuilder(chatMessages).maxTokens(100).build())
-        .map(AiCompletion::from)
-        .orElse(null);
   }
 
   public AIGeneratedQuestion getOpenAiGenerateQuestion(List<ChatMessage> chatMessages) {
@@ -49,30 +42,16 @@ public class OpenAiAPIChatCompletion extends OpenAiApiHandlerBase {
             .executor(AIGeneratedQuestion.class, null)
             .build();
 
-    return defaultChatCompletionRequestBuilder(chatMessages)
+    return OpenAIChatAboutNoteMessageBuilder.defaultChatCompletionRequestBuilder(chatMessages)
         .functions(List.of(askSingleAnswerMultipleChoiceQuestion))
         .maxTokens(1500)
         .build();
   }
 
-  private Optional<ChatCompletionChoice> chatCompletion(ChatCompletionRequest request) {
+  public Optional<ChatCompletionChoice> chatCompletion(ChatCompletionRequest request) {
     return withExceptionHandler(
         () ->
             openAiApi.createChatCompletion(request).blockingGet().getChoices().stream()
                 .findFirst());
-  }
-
-  private static ChatCompletionRequest.ChatCompletionRequestBuilder
-      defaultChatCompletionRequestBuilder(List<ChatMessage> messages) {
-    return ChatCompletionRequest.builder()
-        .model("gpt-3.5-turbo")
-        .messages(messages)
-        //
-        // an effort has been made to make the api call more responsive by using stream(true)
-        // however, due to the library limitation, we cannot do it yet.
-        // find more details here:
-        //    https://github.com/TheoKanning/openai-java/issues/83
-        .stream(false)
-        .n(1);
   }
 }

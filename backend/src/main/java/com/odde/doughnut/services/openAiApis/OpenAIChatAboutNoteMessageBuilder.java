@@ -2,6 +2,7 @@ package com.odde.doughnut.services.openAiApis;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AiCompletionRequest;
+import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import java.util.ArrayList;
@@ -14,6 +15,20 @@ public class OpenAIChatAboutNoteMessageBuilder {
 
   public OpenAIChatAboutNoteMessageBuilder(String notePath) {
     this.path = notePath;
+  }
+
+  public static ChatCompletionRequest.ChatCompletionRequestBuilder
+      defaultChatCompletionRequestBuilder(List<ChatMessage> messages) {
+    return ChatCompletionRequest.builder()
+        .model("gpt-3.5-turbo")
+        .messages(messages)
+        //
+        // an effort has been made to make the api call more responsive by using stream(true)
+        // however, due to the library limitation, we cannot do it yet.
+        // find more details here:
+        //    https://github.com/TheoKanning/openai-java/issues/83
+        .stream(false)
+        .n(1);
   }
 
   public List<ChatMessage> build() {
@@ -62,5 +77,9 @@ Leave the 'question' field empty if you find there's too little information to g
               ChatMessageRole.ASSISTANT.value(), aiCompletionRequest.incompleteContent));
     }
     return this;
+  }
+
+  public ChatCompletionRequest buildChatCompletionRequest() {
+    return defaultChatCompletionRequestBuilder(messages).maxTokens(100).build();
   }
 }

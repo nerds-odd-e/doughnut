@@ -11,6 +11,7 @@ import com.odde.doughnut.services.openAiApis.OpenAIChatAboutNoteMessageBuilder;
 import com.odde.doughnut.services.openAiApis.OpenAiAPIChatCompletion;
 import com.odde.doughnut.services.openAiApis.OpenAiAPIImage;
 import com.theokanning.openai.OpenAiApi;
+import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import java.util.List;
 import org.apache.logging.log4j.util.Strings;
@@ -22,12 +23,6 @@ public class AiAdvisorService {
   public AiAdvisorService(OpenAiApi openAiApi) {
     openAiAPIChatCompletion = new OpenAiAPIChatCompletion(openAiApi);
     openAiAPIImage = new OpenAiAPIImage(openAiApi);
-  }
-
-  public AiCompletion getCompletion(List<ChatMessage> messages, String incompleteContent) {
-    return openAiAPIChatCompletion
-        .getOpenAiCompletion(messages)
-        .prependPreviousIncompleteContent(incompleteContent);
   }
 
   public AiEngagingStory getEngagingStory(String prompt) {
@@ -49,10 +44,17 @@ public class AiAdvisorService {
   }
 
   public AiCompletion getAiCompletion(AiCompletionRequest aiCompletionRequest, String notePath) {
-    List<ChatMessage> messages =
+    ChatCompletionRequest chatCompletionRequest =
         new OpenAIChatAboutNoteMessageBuilder(notePath)
             .instructionForCompletion(aiCompletionRequest)
-            .build();
-    return getCompletion(messages, aiCompletionRequest.incompleteContent);
+            .buildChatCompletionRequest();
+    return openAiAPIChatCompletion
+        .chatCompletion(chatCompletionRequest)
+        .map(AiCompletion::from)
+        .map(
+            aiCompletion ->
+                aiCompletion.prependPreviousIncompleteContent(
+                    aiCompletionRequest.incompleteContent))
+        .orElse(null);
   }
 }
