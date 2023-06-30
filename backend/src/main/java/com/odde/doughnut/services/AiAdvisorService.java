@@ -5,9 +5,8 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AIGeneratedQuestion;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.NoteModel;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionNotPossibleException;
+import com.odde.doughnut.services.openAiApis.OpenAIChatAboutNoteMessageBuilder;
 import com.odde.doughnut.services.openAiApis.OpenAiAPIChatCompletion;
 import com.odde.doughnut.services.openAiApis.OpenAiAPIImage;
 import com.theokanning.openai.OpenAiApi;
@@ -35,10 +34,12 @@ public class AiAdvisorService {
     return new AiEngagingStory(openAiAPIImage.getOpenAiImage(prompt));
   }
 
-  public String generateQuestionJsonString(Note note, ModelFactoryService modelFactoryService)
-      throws QuizQuestionNotPossibleException {
-    NoteModel noteModel = modelFactoryService.toNoteModel(note);
-    List<ChatMessage> messages = noteModel.getChatMessagesForGenerateQuestion();
+  public String generateQuestionJsonString(Note note) throws QuizQuestionNotPossibleException {
+    List<ChatMessage> messages =
+        new OpenAIChatAboutNoteMessageBuilder(note)
+            .detailsOfNoteOfCurrentFocus()
+            .userInstructionToGenerateQuestion()
+            .build();
     AIGeneratedQuestion openAiGenerateQuestion =
         openAiAPIChatCompletion.getOpenAiGenerateQuestion(messages);
     if (openAiGenerateQuestion == null || Strings.isBlank(openAiGenerateQuestion.question)) {

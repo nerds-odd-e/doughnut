@@ -1,10 +1,7 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.json.AiSuggestionRequest;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.services.openAiApis.OpenAIChatAboutNoteMessageBuilder;
-import com.theokanning.openai.completion.chat.ChatMessage;
 import java.sql.Timestamp;
 import java.util.List;
 import org.apache.logging.log4j.util.Strings;
@@ -59,19 +56,5 @@ public class NoteModel {
       bindingResult.rejectValue(null, "error.error", "Duplicate Wikidata ID Detected.");
       throw new BindException(bindingResult);
     }
-  }
-
-  public List<ChatMessage> getChatMessagesForGenerateQuestion() {
-    return new OpenAIChatAboutNoteMessageBuilder(entity)
-        .detailsOfNoteOfCurrentFocus()
-        .userInstructionToGenerateQuestion()
-        .build();
-  }
-
-  public List<ChatMessage> getChatMessagesForNoteDescriptionCompletion(
-      AiSuggestionRequest aiSuggestionRequest) {
-    return new OpenAIChatAboutNoteMessageBuilder(entity)
-        .instructionForCompletion(aiSuggestionRequest)
-        .build();
   }
 }

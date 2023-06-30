@@ -69,7 +69,7 @@ class RestAiControllerTest {
           ResponseStatusException.class,
           () ->
               new RestAiController(openAiApi, makeMe.modelFactoryService, makeMe.aNullUserModel())
-                  .askSuggestion(note, params));
+                  .getCompletion(note, params));
     }
 
     @Test
@@ -88,7 +88,7 @@ class RestAiControllerTest {
                     return true;
                   })))
           .thenReturn(buildCompletionResult("blue planet"));
-      controller.askSuggestion(earth, params);
+      controller.getCompletion(earth, params);
     }
 
     @Test
@@ -101,13 +101,13 @@ class RestAiControllerTest {
                     return true;
                   })))
           .thenReturn(buildCompletionResult("blue planet"));
-      controller.askSuggestion(note, params);
+      controller.getCompletion(note, params);
     }
 
     @Test
     void askSuggestionAndUseResponse() {
       when(openAiApi.createChatCompletion(any())).thenReturn(buildCompletionResult("blue planet"));
-      AiSuggestion aiSuggestion = controller.askSuggestion(note, params);
+      AiSuggestion aiSuggestion = controller.getCompletion(note, params);
       assertEquals("blue planet", aiSuggestion.getSuggestion());
     }
   }

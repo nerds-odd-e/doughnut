@@ -11,6 +11,7 @@ import com.odde.doughnut.models.NoteModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.services.AiAdvisorService;
+import com.odde.doughnut.services.openAiApis.OpenAIChatAboutNoteMessageBuilder;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import java.util.List;
@@ -35,14 +36,16 @@ public class RestAiController {
     this.currentUser = currentUser;
   }
 
-  @PostMapping("/{note}/ask-suggestions")
-  public AiSuggestion askSuggestion(
+  @PostMapping("/{note}/completion")
+  public AiSuggestion getCompletion(
       @PathVariable(name = "note") Note note,
       @RequestBody AiSuggestionRequest aiSuggestionRequest) {
     currentUser.assertLoggedIn();
     NoteModel noteModel = modelFactoryService.toNoteModel(note);
     List<ChatMessage> messages =
-        noteModel.getChatMessagesForNoteDescriptionCompletion(aiSuggestionRequest);
+        new OpenAIChatAboutNoteMessageBuilder(noteModel.entity)
+            .instructionForCompletion(aiSuggestionRequest)
+            .build();
     return aiAdvisorService.getAiSuggestion(
         messages, aiSuggestionRequest.incompleteAssistantMessage);
   }
@@ -51,7 +54,7 @@ public class RestAiController {
   public QuizQuestion generateQuestion(@RequestParam(value = "note") Note note)
       throws QuizQuestionNotPossibleException {
     currentUser.assertLoggedIn();
-    String rawJsonQuestion = aiAdvisorService.generateQuestionJsonString(note, modelFactoryService);
+    String rawJsonQuestion = aiAdvisorService.generateQuestionJsonString(note);
     QuizQuestionEntity quizQuestionEntity = new QuizQuestionEntity();
     quizQuestionEntity.setQuestionType(QuizQuestionEntity.QuestionType.AI_QUESTION);
     quizQuestionEntity.setRawJsonQuestion(rawJsonQuestion);
