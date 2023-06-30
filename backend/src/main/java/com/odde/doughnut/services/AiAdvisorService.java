@@ -8,8 +8,7 @@ import com.odde.doughnut.entities.json.AiCompletionRequest;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.services.openAiApis.OpenAIChatAboutNoteRequestBuilder;
-import com.odde.doughnut.services.openAiApis.OpenAiAPIImage;
-import com.odde.doughnut.services.openAiApis.OpenAiApiHandlerBase;
+import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
@@ -18,16 +17,14 @@ import com.theokanning.openai.completion.chat.ChatMessage;
 import org.apache.logging.log4j.util.Strings;
 
 public class AiAdvisorService {
-  private final OpenAiApiHandlerBase openAiAPIChatCompletion;
-  private final OpenAiAPIImage openAiAPIImage;
+  private final OpenAiApiHandler openAiApiHandler;
 
   public AiAdvisorService(OpenAiApi openAiApi) {
-    openAiAPIChatCompletion = new OpenAiApiHandlerBase(openAiApi);
-    openAiAPIImage = new OpenAiAPIImage(openAiApi);
+    openAiApiHandler = new OpenAiApiHandler(openAiApi);
   }
 
   public AiEngagingStory getEngagingStory(String prompt) {
-    return new AiEngagingStory(openAiAPIImage.getOpenAiImage(prompt));
+    return new AiEngagingStory(openAiApiHandler.getOpenAiImage(prompt));
   }
 
   public String generateQuestionJsonString(Note note) throws QuizQuestionNotPossibleException {
@@ -45,7 +42,7 @@ public class AiAdvisorService {
             .userInstructionToGenerateQuestion()
             .maxTokens(1500)
             .build();
-    return openAiAPIChatCompletion
+    return openAiApiHandler
         .chatCompletion(chatRequest)
         .map(ChatCompletionChoice::getMessage)
         .map(ChatMessage::getFunctionCall)
@@ -59,7 +56,7 @@ public class AiAdvisorService {
             .instructionForCompletion(aiCompletionRequest)
             .maxTokens(100)
             .build();
-    return openAiAPIChatCompletion
+    return openAiApiHandler
         .chatCompletion(chatCompletionRequest)
         .map(aiCompletionRequest::getAiCompletion)
         .orElse(null);

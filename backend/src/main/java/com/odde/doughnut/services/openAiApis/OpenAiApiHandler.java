@@ -10,6 +10,8 @@ import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import com.theokanning.openai.image.CreateImageRequest;
+import com.theokanning.openai.image.ImageResult;
 import java.net.SocketTimeoutException;
 import java.time.Duration;
 import java.util.Optional;
@@ -21,10 +23,10 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
-public class OpenAiApiHandlerBase {
+public class OpenAiApiHandler {
   protected final OpenAiApi openAiApi;
 
-  public OpenAiApiHandlerBase(OpenAiApi openAiApi) {
+  public OpenAiApiHandler(OpenAiApi openAiApi) {
     this.openAiApi = openAiApi;
   }
 
@@ -71,5 +73,15 @@ public class OpenAiApiHandlerBase {
       System.out.println(e.getMessage());
       throw new RuntimeException(e);
     }
+  }
+
+  public String getOpenAiImage(String prompt) {
+    return withExceptionHandler(
+        () -> {
+          CreateImageRequest completionRequest =
+              CreateImageRequest.builder().prompt(prompt).responseFormat("b64_json").build();
+          ImageResult choices = openAiApi.createImage(completionRequest).blockingGet();
+          return choices.getData().get(0).getB64Json();
+        });
   }
 }
