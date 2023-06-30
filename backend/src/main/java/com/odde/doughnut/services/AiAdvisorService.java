@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AIGeneratedQuestion;
@@ -11,9 +12,10 @@ import com.odde.doughnut.services.openAiApis.OpenAIChatAboutNoteMessageBuilder;
 import com.odde.doughnut.services.openAiApis.OpenAiAPIChatCompletion;
 import com.odde.doughnut.services.openAiApis.OpenAiAPIImage;
 import com.theokanning.openai.OpenAiApi;
+import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import com.theokanning.openai.completion.chat.ChatFunctionCall;
 import com.theokanning.openai.completion.chat.ChatMessage;
-import java.util.List;
 import org.apache.logging.log4j.util.Strings;
 
 public class AiAdvisorService {
@@ -30,13 +32,26 @@ public class AiAdvisorService {
   }
 
   public String generateQuestionJsonString(Note note) throws QuizQuestionNotPossibleException {
-    List<ChatMessage> messages =
+    ChatCompletionRequest chatRequest =
         new OpenAIChatAboutNoteMessageBuilder(note.getPath())
             .detailsOfNoteOfCurrentFocus(note)
             .userInstructionToGenerateQuestion()
-            .build();
+            .buildChatCompletionRequestForGQ();
     AIGeneratedQuestion openAiGenerateQuestion =
-        openAiAPIChatCompletion.getOpenAiGenerateQuestion(messages);
+        openAiAPIChatCompletion
+            .chatCompletion(chatRequest)
+            .map(ChatCompletionChoice::getMessage)
+            .map(ChatMessage::getFunctionCall)
+            .map(ChatFunctionCall::getArguments)
+            .map(
+                arguments -> {
+                  try {
+                    return new ObjectMapper().treeToValue(arguments, AIGeneratedQuestion.class);
+                  } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                  }
+                })
+            .orElse(null);
     if (openAiGenerateQuestion == null || Strings.isBlank(openAiGenerateQuestion.question)) {
       throw new QuizQuestionNotPossibleException();
     }

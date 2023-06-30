@@ -1,8 +1,10 @@
 package com.odde.doughnut.services.openAiApis;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.json.AIGeneratedQuestion;
 import com.odde.doughnut.entities.json.AiCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import com.theokanning.openai.completion.chat.ChatFunction;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import java.util.ArrayList;
@@ -34,10 +36,6 @@ public class OpenAIChatAboutNoteMessageBuilder {
         //    https://github.com/TheoKanning/openai-java/issues/83
         .stream(false)
         .n(1);
-  }
-
-  public List<ChatMessage> build() {
-    return messages;
   }
 
   public OpenAIChatAboutNoteMessageBuilder detailsOfNoteOfCurrentFocus(Note note) {
@@ -81,5 +79,19 @@ Leave the 'question' field empty if you find there's too little information to g
 
   public ChatCompletionRequest buildChatCompletionRequest() {
     return defaultChatCompletionRequestBuilder(messages).maxTokens(100).build();
+  }
+
+  public ChatCompletionRequest buildChatCompletionRequestForGQ() {
+    ChatFunction askSingleAnswerMultipleChoiceQuestion =
+        ChatFunction.builder()
+            .name("ask_single_answer_multiple_choice_question")
+            .description("Ask a single-answer multiple-choice question to the user")
+            .executor(AIGeneratedQuestion.class, null)
+            .build();
+
+    return defaultChatCompletionRequestBuilder(messages)
+        .functions(List.of(askSingleAnswerMultipleChoiceQuestion))
+        .maxTokens(1500)
+        .build();
   }
 }
