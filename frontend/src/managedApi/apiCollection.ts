@@ -262,27 +262,28 @@ const apiCollection = (managedApi: ManagedApi) => ({
       prompt: string,
       noteId: Doughnut.ID,
       prev?: string,
-      interimResultShouldContinue?: (suggestion: string) => boolean
+      interimResultShouldContinue?: (moreCompleteContent: string) => boolean
     ): Promise<string> {
       const res = await this.askAiCompletion(
         {
           prompt,
-          incompleteAssistantMessage: prev ?? "",
+          incompleteContent: prev ?? "",
         },
         noteId
       );
       if (interimResultShouldContinue) {
-        if (!interimResultShouldContinue(res.suggestion)) return res.suggestion;
+        if (!interimResultShouldContinue(res.moreCompleteContent))
+          return res.moreCompleteContent;
       }
       if (res.finishReason === "length") {
         return this.keepAskingAICompletionUntilStop(
           prompt,
           noteId,
-          res.suggestion,
+          res.moreCompleteContent,
           interimResultShouldContinue
         );
       }
-      return res.suggestion;
+      return res.moreCompleteContent;
     },
 
     async askAiCompletion(
@@ -307,7 +308,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     async askAiEngagingStories(prompt: string) {
       const request: Generated.AiCompletionRequest = {
         prompt,
-        incompleteAssistantMessage: "",
+        incompleteContent: "",
       };
       return (await managedApi.restPost(
         `ai/ask-engaging-stories`,

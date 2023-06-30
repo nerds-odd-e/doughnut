@@ -29,7 +29,7 @@ describe("AISuggestDescriptionButton", () => {
     const note = makeMe.aNote.description("").please();
     const expectation = helper.apiMock
       .expectingPost(`/api/ai/${note.id}/completion`)
-      .andReturnOnce({ suggestion: "suggestion" });
+      .andReturnOnce({ moreCompleteContent: "suggestion" });
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
     await triggerSuggestion(note);
     expect(expectation.actualRequestJsonBody()).toMatchObject({
@@ -41,7 +41,7 @@ describe("AISuggestDescriptionButton", () => {
     const note = makeMe.aNote.please();
     const expectation = helper.apiMock
       .expectingPost(`/api/ai/${note.id}/completion`)
-      .andReturnOnce({ suggestion: "suggestion" });
+      .andReturnOnce({ moreCompleteContent: "suggestion" });
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
     await triggerSuggestion(note);
     expect(expectation.actualRequestJsonBody()).toMatchObject({
@@ -54,11 +54,17 @@ describe("AISuggestDescriptionButton", () => {
 
     helper.apiMock
       .expectingPost(`/api/ai/${note.id}/completion`)
-      .andReturnOnce({ suggestion: "suggestion", finishReason: "length" });
+      .andReturnOnce({
+        moreCompleteContent: "suggestion",
+        finishReason: "length",
+      });
 
     helper.apiMock
       .expectingPost(`/api/ai/${note.id}/completion`)
-      .andReturnOnce({ suggestion: "suggestion", finishReason: "stop" });
+      .andReturnOnce({
+        moreCompleteContent: "suggestion",
+        finishReason: "stop",
+      });
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
 
@@ -70,14 +76,17 @@ describe("AISuggestDescriptionButton", () => {
 
     helper.apiMock
       .expectingPost(`/api/ai/${note.id}/completion`)
-      .andReturnOnce({ suggestion: "suggestion", finishReason: "length" });
+      .andReturnOnce({
+        moreCompleteContent: "suggestion",
+        finishReason: "length",
+      });
 
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
 
     const wrapper = await triggerSuggestionwithoutFlushPromises(note);
     wrapper.unmount();
     await flushPromises();
-    // AI suggestion API should be called only once, although the finishReaon is "length."
+    // AI completion API should be called only once, although the finishReaon is "length."
     // Because the component is unmounted.
   });
 });

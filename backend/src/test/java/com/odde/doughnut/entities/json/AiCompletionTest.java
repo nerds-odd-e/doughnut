@@ -19,7 +19,7 @@ class AiCompletionTest {
   void prependPreviousIncompleteMessageWithLeadingCharacter(
       String incompleteMessage, String completeSuggestion, String expectedSuggestion) {
     AiCompletion aiCompletion = new AiCompletion(completeSuggestion, "stop");
-    aiCompletion.prependPreviousIncompleteMessage(incompleteMessage);
-    assertEquals(expectedSuggestion, aiCompletion.getSuggestion());
+    aiCompletion.prependPreviousIncompleteContent(incompleteMessage);
+    assertEquals(expectedSuggestion, aiCompletion.getMoreCompleteContent());
   }
 }

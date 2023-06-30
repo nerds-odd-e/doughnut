@@ -18,18 +18,18 @@ declare namespace Generated {
         wrongOptions: string[];
     }
 
-    interface AiCompetionRequest {
+    interface AiCompletion {
+        moreCompleteContent: string;
+        finishReason: string;
+    }
+
+    interface AiCompletionRequest {
         prompt: string;
-        incompleteAssistantMessage: string;
+        incompleteContent: string;
     }
 
     interface AiEngagingStory {
         engagingStory: string;
-    }
-
-    interface AiCompletion {
-        suggestion: string;
-        finishReason: string;
     }
 
     interface ApiError {

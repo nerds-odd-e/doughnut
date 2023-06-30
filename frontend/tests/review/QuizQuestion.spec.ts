@@ -26,7 +26,7 @@ describe("QuizQuestion", () => {
           `/api/ai/${quizQuestion.notebookPosition?.noteId}/completion`
         )
         .andReturnOnce({
-          suggestion: JSON.stringify(goodQuestion),
+          moreCompleteContent: JSON.stringify(goodQuestion),
           finishReason: "stop",
         });
       const wrapper = helper

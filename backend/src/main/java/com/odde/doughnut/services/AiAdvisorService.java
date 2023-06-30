@@ -23,10 +23,10 @@ public class AiAdvisorService {
     openAiAPIImage = new OpenAiAPIImage(openAiApi);
   }
 
-  public AiCompletion getCompletion(List<ChatMessage> messages, String incompleteAssistantMessage) {
+  public AiCompletion getCompletion(List<ChatMessage> messages, String incompleteContent) {
     return openAiAPIChatCompletion
         .getOpenAiCompletion(messages)
-        .prependPreviousIncompleteMessage(incompleteAssistantMessage);
+        .prependPreviousIncompleteContent(incompleteContent);
   }
 
   public AiEngagingStory getEngagingStory(String prompt) {

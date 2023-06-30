@@ -59,7 +59,7 @@ class AiAdvisorServiceTest {
           .thenReturn(completionResultSingle);
       assertEquals(
           "what goes up must come down",
-          aiAdvisorService.getCompletion(List.of(), "what goes up").getSuggestion());
+          aiAdvisorService.getCompletion(List.of(), "what goes up").getMoreCompleteContent());
     }
 
     @Test

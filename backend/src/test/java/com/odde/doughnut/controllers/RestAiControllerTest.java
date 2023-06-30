@@ -10,8 +10,8 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.json.AiCompetionRequest;
 import com.odde.doughnut.entities.json.AiCompletion;
+import com.odde.doughnut.entities.json.AiCompletionRequest;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.models.UserModel;
@@ -47,8 +47,8 @@ class RestAiControllerTest {
   @Mock OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
 
-  AiCompetionRequest params =
-      new AiCompetionRequest() {
+  AiCompletionRequest params =
+      new AiCompletionRequest() {
         {
           this.prompt = "describe Earth";
         }
@@ -93,7 +93,7 @@ class RestAiControllerTest {
 
     @Test
     void askSuggestionWithIncompleteAssistantMessage() {
-      params.incompleteAssistantMessage = "What goes up,";
+      params.incompleteContent = "What goes up,";
       when(openAiApi.createChatCompletion(
               argThat(
                   request -> {
@@ -108,7 +108,7 @@ class RestAiControllerTest {
     void askSuggestionAndUseResponse() {
       when(openAiApi.createChatCompletion(any())).thenReturn(buildCompletionResult("blue planet"));
       AiCompletion aiCompletion = controller.getCompletion(note, params);
-      assertEquals("blue planet", aiCompletion.getSuggestion());
+      assertEquals("blue planet", aiCompletion.getMoreCompleteContent());
     }
   }
 

@@ -9,7 +9,7 @@ import org.apache.logging.log4j.util.Strings;
 @Data
 @AllArgsConstructor
 public final class AiCompletion {
-  String suggestion;
+  String moreCompleteContent;
   String finishReason;
 
   public static AiCompletion from(ChatCompletionChoice chatCompletionChoice) {
@@ -17,15 +17,15 @@ public final class AiCompletion {
         chatCompletionChoice.getMessage().getContent(), chatCompletionChoice.getFinishReason());
   }
 
-  public AiCompletion prependPreviousIncompleteMessage(String incompleteAssistantMessage) {
-    if (!Strings.isBlank(incompleteAssistantMessage)) {
-      if (startWithCharacterFromSpaceDelimitedLanguage(suggestion)) {
-        incompleteAssistantMessage += " ";
+  public AiCompletion prependPreviousIncompleteContent(String incompleteContent) {
+    if (!Strings.isBlank(incompleteContent)) {
+      if (startWithCharacterFromSpaceDelimitedLanguage(moreCompleteContent)) {
+        incompleteContent += " ";
       }
     } else {
-      incompleteAssistantMessage = "";
+      incompleteContent = "";
     }
-    setSuggestion(incompleteAssistantMessage + suggestion);
+    setMoreCompleteContent(incompleteContent + moreCompleteContent);
     return this;
   }
 
