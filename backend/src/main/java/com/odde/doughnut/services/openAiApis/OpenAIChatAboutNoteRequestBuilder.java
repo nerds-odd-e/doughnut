@@ -27,20 +27,6 @@ public class OpenAIChatAboutNoteRequestBuilder {
     messages.add(0, new ChatMessage(ChatMessageRole.SYSTEM.value(), content));
   }
 
-  public static ChatCompletionRequest.ChatCompletionRequestBuilder
-      defaultChatCompletionRequestBuilder(List<ChatMessage> messages) {
-    return ChatCompletionRequest.builder()
-        .model("gpt-3.5-turbo")
-        .messages(messages)
-        //
-        // an effort has been made to make the api call more responsive by using stream(true)
-        // however, due to the library limitation, we cannot do it yet.
-        // find more details here:
-        //    https://github.com/TheoKanning/openai-java/issues/83
-        .stream(false)
-        .n(1);
-  }
-
   public OpenAIChatAboutNoteRequestBuilder detailsOfNoteOfCurrentFocus(Note note) {
     String noteOfCurrentFocus =
         """
@@ -67,12 +53,14 @@ description (until the end of this message):
         new ChatMessage(
             ChatMessageRole.USER.value(),
             """
-Please note that I don't know which note is of current focus.
-To help me recall and refresh my memory about it,
-please generate a multiple-choice question with 2 to 4 options and only 1 correct option.
-Vary the option text length, so that the correct answer isn't always the longest one.
-The question should be about the note of current focus in its context.
-Leave the 'question' field empty if you find there's too little information to generate a question.
+Please assume the role of a Memory Assistant, which involves helping me review, recall, and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following guidelines:
+
+1. Generate a multiple-choice question based on the note in the current context, where only the top-level context is visible.
+2. Provide 2 to 4 options with only 1 correct answer.
+3. Vary the lengths of the option texts so that the correct answer isn't consistently the longest.
+4. If there's insufficient information in the note to create a question, leave the 'question' field empty.
+
+Note: Only the top-level context is visible. The specific note of focus and its more detailed contexts are not known. Focus on memory reinforcement and recall across various subjects.
 """));
     return this;
   }
@@ -95,7 +83,16 @@ Leave the 'question' field empty if you find there's too little information to g
 
   public ChatCompletionRequest build() {
     ChatCompletionRequest.ChatCompletionRequestBuilder requestBuilder =
-        defaultChatCompletionRequestBuilder(messages);
+        ChatCompletionRequest.builder()
+            .model("gpt-3.5-turbo-16k")
+            .messages(messages)
+            //
+            // an effort has been made to make the api call more responsive by using stream(true)
+            // however, due to the library limitation, we cannot do it yet.
+            // find more details here:
+            //    https://github.com/TheoKanning/openai-java/issues/83
+            .stream(false)
+            .n(1);
     if (askSingleAnswerMultipleChoiceQuestion != null) {
       requestBuilder.functions(List.of(askSingleAnswerMultipleChoiceQuestion));
     }
