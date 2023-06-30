@@ -412,10 +412,6 @@ Then(
   },
 )
 
-When("I ask for a description suggestion for note {string}", (noteTitle: string) => {
-  cy.aiSuggestDescriptionForNote(noteTitle)
-})
-
 When("I generate an image for {string}", (noteTitle: string) => {
   cy.aiGenerateImage(noteTitle)
 })

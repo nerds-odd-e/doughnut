@@ -17,14 +17,6 @@ Given("OpenAI by default returns text completion {string}", (description: string
   cy.openAiService().stubChatCompletion(description, "stop")
 })
 
-Given("OpenAI by default returns text completion {string} from now", (description: string) => {
-  cy.openAiService()
-    .restartImposter()
-    .then(() => {
-      cy.openAiService().stubChatCompletion(description, "stop")
-    })
-})
-
 Given(
   "OpenAI completes with {string} for context containing {string}",
   (returnMessage: string, context: string) => {
