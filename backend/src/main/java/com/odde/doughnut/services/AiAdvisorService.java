@@ -36,8 +36,8 @@ public class AiAdvisorService {
 
   public String generateQuestionJsonString(Note note) throws QuizQuestionNotPossibleException {
     List<ChatMessage> messages =
-        new OpenAIChatAboutNoteMessageBuilder(note)
-            .detailsOfNoteOfCurrentFocus()
+        new OpenAIChatAboutNoteMessageBuilder(note.getPath())
+            .detailsOfNoteOfCurrentFocus(note)
             .userInstructionToGenerateQuestion()
             .build();
     AIGeneratedQuestion openAiGenerateQuestion =
@@ -48,9 +48,9 @@ public class AiAdvisorService {
     return new ObjectMapper().valueToTree(openAiGenerateQuestion).toString();
   }
 
-  public AiCompletion getAiCompletion(Note note, AiCompletionRequest aiCompletionRequest) {
+  public AiCompletion getAiCompletion(AiCompletionRequest aiCompletionRequest, String notePath) {
     List<ChatMessage> messages =
-        new OpenAIChatAboutNoteMessageBuilder(note)
+        new OpenAIChatAboutNoteMessageBuilder(notePath)
             .instructionForCompletion(aiCompletionRequest)
             .build();
     return getCompletion(messages, aiCompletionRequest.incompleteContent);

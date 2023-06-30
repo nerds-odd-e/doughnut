@@ -37,7 +37,7 @@ public class RestAiController {
       @PathVariable(name = "note") Note note,
       @RequestBody AiCompletionRequest aiCompletionRequest) {
     currentUser.assertLoggedIn();
-    return aiAdvisorService.getAiCompletion(note, aiCompletionRequest);
+    return aiAdvisorService.getAiCompletion(aiCompletionRequest, note.getPath());
   }
 
   @PostMapping("/generate-question")

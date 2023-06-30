@@ -10,22 +10,22 @@ import org.apache.logging.log4j.util.Strings;
 
 public class OpenAIChatAboutNoteMessageBuilder {
   public List<ChatMessage> messages = new ArrayList<>();
-  private Note note;
+  private String path;
 
-  public OpenAIChatAboutNoteMessageBuilder(Note note) {
-    this.note = note;
+  public OpenAIChatAboutNoteMessageBuilder(String notePath) {
+    this.path = notePath;
   }
 
   public List<ChatMessage> build() {
     String content =
         ("This is a personal knowledge management system, consists of notes with a title and a description, which should represent atomic concepts.\n"
                 + "Current context of the note: ")
-            + this.note.getPath();
+            + this.path;
     messages.add(0, new ChatMessage(ChatMessageRole.SYSTEM.value(), content));
     return messages;
   }
 
-  public OpenAIChatAboutNoteMessageBuilder detailsOfNoteOfCurrentFocus() {
+  public OpenAIChatAboutNoteMessageBuilder detailsOfNoteOfCurrentFocus(Note note) {
     String noteOfCurrentFocus =
         """
 The note of current focus:
