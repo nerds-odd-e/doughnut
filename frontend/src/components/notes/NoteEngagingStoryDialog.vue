@@ -49,16 +49,14 @@ export default defineComponent({
     },
   },
   methods: {
-    askForImage() {
-      const request = this.api.ai.askAiEngagingStories(this.engagingStory);
-
-      request
-        .then((res) => {
-          this.b64Json = res.engagingStory;
-        })
-        .catch(() => {
-          this.engagingStoryInError = "There is a problem";
-        });
+    async askForImage() {
+      try {
+        this.b64Json = await this.api.ai.askAiEngagingStories(
+          this.engagingStory
+        );
+      } catch (_) {
+        this.engagingStoryInError = "There is a problem";
+      }
     },
   },
   mounted() {

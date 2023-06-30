@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AiCompletion;
 import com.odde.doughnut.entities.json.AiCompletionRequest;
-import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.services.openAiApis.OpenAIChatAboutNoteRequestBuilder;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
@@ -23,8 +22,8 @@ public class AiAdvisorService {
     openAiApiHandler = new OpenAiApiHandler(openAiApi);
   }
 
-  public AiEngagingStory getEngagingStory(String prompt) {
-    return new AiEngagingStory(openAiApiHandler.getOpenAiImage(prompt));
+  public String getImage(String prompt) {
+    return openAiApiHandler.getOpenAiImage(prompt);
   }
 
   public String generateQuestionJsonString(Note note) throws QuizQuestionNotPossibleException {

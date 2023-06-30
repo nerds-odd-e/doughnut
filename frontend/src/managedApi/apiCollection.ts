@@ -311,9 +311,9 @@ const apiCollection = (managedApi: ManagedApi) => ({
         incompleteContent: "",
       };
       return (await managedApi.restPost(
-        `ai/ask-engaging-stories`,
+        `ai/generate-image`,
         request
-      )) as Generated.AiEngagingStory;
+      )) as string;
     },
   },
   testability: {

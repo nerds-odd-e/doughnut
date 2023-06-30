@@ -9,7 +9,7 @@ helper.resetWithApiMock(beforeEach, afterEach);
 const createWrapper = async () => {
   const note = makeMe.aNoteRealm.please();
   helper.apiMock
-    .expectingPost(`/api/ai/ask-engaging-stories`)
+    .expectingPost(`/api/ai/generate-image`)
     .andReturnOnce({ engagingStory: "This is an engaging story." });
   const wrapper = helper
     .component(NoteEngagingStoryDialog)

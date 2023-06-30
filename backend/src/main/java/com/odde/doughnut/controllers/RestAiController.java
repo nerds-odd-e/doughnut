@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.json.AiCompletion;
 import com.odde.doughnut.entities.json.AiCompletionRequest;
-import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -51,9 +50,9 @@ public class RestAiController {
     return modelFactoryService.toQuizQuestion(quizQuestionEntity, currentUser.getEntity());
   }
 
-  @PostMapping("/ask-engaging-stories")
-  public AiEngagingStory askEngagingStories(@RequestBody AiCompletionRequest aiCompletionRequest) {
+  @PostMapping("/generate-image")
+  public String generateImage(@RequestBody AiCompletionRequest aiCompletionRequest) {
     currentUser.assertLoggedIn();
-    return aiAdvisorService.getEngagingStory(aiCompletionRequest.prompt);
+    return aiAdvisorService.getImage(aiCompletionRequest.prompt);
   }
 }

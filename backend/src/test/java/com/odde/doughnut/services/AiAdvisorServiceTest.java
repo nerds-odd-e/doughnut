@@ -114,16 +114,15 @@ class AiAdvisorServiceTest {
   }
 
   @Nested
-  class GetEngagingStory {
+  class GetImage {
     @Test
-    void getAiEngagingStory_givenAlistOfStrings_returnsAStory() {
+    void getImageBasedOnPrompt() {
       ImageResult result = new ImageResult();
       Image image = new Image();
       image.setB64Json("https://image.com");
       result.setData(List.of(image));
       Mockito.when(openAiApi.createImage(Mockito.any())).thenReturn(Single.just(result));
-      assertEquals(
-          "https://image.com", aiAdvisorService.getEngagingStory("prompt").engagingStory());
+      assertEquals("https://image.com", aiAdvisorService.getImage("prompt"));
     }
   }
 

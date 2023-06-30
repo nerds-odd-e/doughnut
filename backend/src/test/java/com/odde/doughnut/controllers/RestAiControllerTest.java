@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AiCompletion;
 import com.odde.doughnut.entities.json.AiCompletionRequest;
-import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionNotPossibleException;
@@ -127,7 +126,7 @@ class RestAiControllerTest {
           ResponseStatusException.class,
           () ->
               new RestAiController(openAiApi, makeMe.modelFactoryService, makeMe.aNullUserModel())
-                  .askEngagingStories(params));
+                  .generateImage(params));
     }
 
     @Test
@@ -139,15 +138,15 @@ class RestAiControllerTest {
                     return true;
                   })))
           .thenReturn(buildImageResult("This is an engaging story."));
-      controller.askEngagingStories(params);
+      controller.generateImage(params);
     }
 
     @Test
-    void askEngagingStoryReturnsEngagingStory() {
+    void generateImage() {
       when(openAiApi.createImage(Mockito.any()))
-          .thenReturn(buildImageResult("This is an engaging story."));
-      final AiEngagingStory aiEngagingStory = controller.askEngagingStories(params);
-      assertEquals("This is an engaging story.", aiEngagingStory.engagingStory());
+          .thenReturn(buildImageResult("this is supposed to be a base64 image"));
+      final String aiImage = controller.generateImage(params);
+      assertEquals("this is supposed to be a base64 image", aiImage);
     }
   }
 
