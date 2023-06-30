@@ -8,8 +8,11 @@ import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.theokanning.openai.OpenAiApi;
+import com.theokanning.openai.completion.chat.ChatCompletionChoice;
+import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import java.net.SocketTimeoutException;
 import java.time.Duration;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import okhttp3.OkHttpClient;
 import org.springframework.http.HttpStatus;
@@ -19,6 +22,19 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 public class OpenAiApiHandlerBase {
+  protected final OpenAiApi openAiApi;
+
+  public OpenAiApiHandlerBase(OpenAiApi openAiApi) {
+    this.openAiApi = openAiApi;
+  }
+
+  public Optional<ChatCompletionChoice> chatCompletion(ChatCompletionRequest request) {
+    return withExceptionHandler(
+        () ->
+            openAiApi.createChatCompletion(request).blockingGet().getChoices().stream()
+                .findFirst());
+  }
+
   public static OpenAiApi getOpenAiApi(String openAiToken, String baseUrl) {
     ObjectMapper mapper = defaultObjectMapper();
     OkHttpClient client = defaultClient(openAiToken, Duration.ofSeconds(60));
@@ -40,10 +56,9 @@ public class OpenAiApiHandlerBase {
       if (HttpStatus.UNAUTHORIZED.value() == e.code()) {
         throw new OpenAiUnauthorizedException(e.getMessage());
       }
-      if (5 == e.code() / 100) {
+      if (e.code() / 100 == 5) {
         throw new OpenAIServiceErrorException(e.getMessage(), HttpStatus.valueOf(e.code()));
       }
-      System.out.println(e);
       System.out.println(e.message());
       throw e;
     } catch (RuntimeException e) {

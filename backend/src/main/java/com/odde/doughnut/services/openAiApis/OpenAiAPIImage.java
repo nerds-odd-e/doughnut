@@ -6,10 +6,8 @@ import com.theokanning.openai.image.ImageResult;
 
 public class OpenAiAPIImage extends OpenAiApiHandlerBase {
 
-  private OpenAiApi openAiApi;
-
   public OpenAiAPIImage(OpenAiApi openAiApi) {
-    this.openAiApi = openAiApi;
+    super(openAiApi);
   }
 
   public String getOpenAiImage(String prompt) {
