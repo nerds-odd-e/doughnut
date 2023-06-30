@@ -23,7 +23,7 @@ public class AiAdvisorService {
     openAiAPIImage = new OpenAiAPIImage(openAiApi);
   }
 
-  public AiSuggestion getAiSuggestion(
+  public AiSuggestion getCompletion(
       List<ChatMessage> messages, String incompleteAssistantMessage) {
     return openAiAPIChatCompletion
         .getOpenAiCompletion(messages)

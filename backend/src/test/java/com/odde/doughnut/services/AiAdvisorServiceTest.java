@@ -59,13 +59,13 @@ class AiAdvisorServiceTest {
           .thenReturn(completionResultSingle);
       assertEquals(
           "what goes up must come down",
-          aiAdvisorService.getAiSuggestion(List.of(), "what goes up").getSuggestion());
+          aiAdvisorService.getCompletion(List.of(), "what goes up").getSuggestion());
     }
 
     @Test
     void the_data_returned_is_incomplete() {
       when(openAiApi.createChatCompletion(any())).thenReturn(IncompleteCompletionResultSingle);
-      AiSuggestion suggestion = aiAdvisorService.getAiSuggestion(List.of(), "");
+      AiSuggestion suggestion = aiAdvisorService.getCompletion(List.of(), "");
       assertEquals("length", suggestion.getFinishReason());
     }
 
@@ -74,7 +74,7 @@ class AiAdvisorServiceTest {
       HttpException httpException = buildHttpException(400);
       Mockito.when(openAiApi.createChatCompletion(ArgumentMatchers.any()))
           .thenReturn(Single.error(httpException));
-      assertThrows(HttpException.class, () -> aiAdvisorService.getAiSuggestion(List.of(), ""));
+      assertThrows(HttpException.class, () -> aiAdvisorService.getCompletion(List.of(), ""));
     }
 
     @Test
@@ -84,7 +84,7 @@ class AiAdvisorServiceTest {
           .thenReturn(Single.error(exception));
       OpenAITimeoutException result =
           assertThrows(
-              OpenAITimeoutException.class, () -> aiAdvisorService.getAiSuggestion(List.of(), ""));
+              OpenAITimeoutException.class, () -> aiAdvisorService.getCompletion(List.of(), ""));
       assertThat(result.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.OPENAI_TIMEOUT));
     }
 
@@ -96,7 +96,7 @@ class AiAdvisorServiceTest {
       OpenAIServiceErrorException result =
           assertThrows(
               OpenAIServiceErrorException.class,
-              () -> aiAdvisorService.getAiSuggestion(List.of(), ""));
+              () -> aiAdvisorService.getCompletion(List.of(), ""));
       assertThat(
           result.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.OPENAI_SERVICE_ERROR));
       assertThat(result.getMessage(), containsString("502"));
@@ -110,7 +110,7 @@ class AiAdvisorServiceTest {
       OpenAiUnauthorizedException exception =
           assertThrows(
               OpenAiUnauthorizedException.class,
-              () -> aiAdvisorService.getAiSuggestion(List.of(), ""));
+              () -> aiAdvisorService.getCompletion(List.of(), ""));
       assertThat(exception.getMessage(), containsString("401"));
     }
   }

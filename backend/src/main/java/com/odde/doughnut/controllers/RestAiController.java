@@ -41,12 +41,11 @@ public class RestAiController {
       @PathVariable(name = "note") Note note,
       @RequestBody AiCompetionRequest aiCompetionRequest) {
     currentUser.assertLoggedIn();
-    NoteModel noteModel = modelFactoryService.toNoteModel(note);
     List<ChatMessage> messages =
-        new OpenAIChatAboutNoteMessageBuilder(noteModel.entity)
+        new OpenAIChatAboutNoteMessageBuilder(note)
             .instructionForCompletion(aiCompetionRequest)
             .build();
-    return aiAdvisorService.getAiSuggestion(
+    return aiAdvisorService.getCompletion(
         messages, aiCompetionRequest.incompleteAssistantMessage);
   }
 
