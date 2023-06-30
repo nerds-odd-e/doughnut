@@ -10,10 +10,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.services.AiAdvisorService;
-import com.odde.doughnut.services.openAiApis.OpenAIChatAboutNoteMessageBuilder;
 import com.theokanning.openai.OpenAiApi;
-import com.theokanning.openai.completion.chat.ChatMessage;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
@@ -40,11 +37,7 @@ public class RestAiController {
       @PathVariable(name = "note") Note note,
       @RequestBody AiCompletionRequest aiCompletionRequest) {
     currentUser.assertLoggedIn();
-    List<ChatMessage> messages =
-        new OpenAIChatAboutNoteMessageBuilder(note)
-            .instructionForCompletion(aiCompletionRequest)
-            .build();
-    return aiAdvisorService.getCompletion(messages, aiCompletionRequest.incompleteContent);
+    return aiAdvisorService.getAiCompletion(note, aiCompletionRequest);
   }
 
   @PostMapping("/generate-question")

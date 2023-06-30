@@ -15,7 +15,6 @@ import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.theokanning.openai.OpenAiApi;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.image.Image;
 import com.theokanning.openai.image.ImageResult;
@@ -35,7 +34,6 @@ class AiAdvisorServiceTest {
 
   private AiAdvisorService aiAdvisorService;
   @Mock private OpenAiApi openAiApi;
-  @Captor ArgumentCaptor<ChatCompletionRequest> completionRequestArgumentCaptor;
   MakeMeWithoutDB makeMe = new MakeMeWithoutDB();
 
   @BeforeEach

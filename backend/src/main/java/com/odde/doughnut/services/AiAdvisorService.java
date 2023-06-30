@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AIGeneratedQuestion;
 import com.odde.doughnut.entities.json.AiCompletion;
+import com.odde.doughnut.entities.json.AiCompletionRequest;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.services.openAiApis.OpenAIChatAboutNoteMessageBuilder;
@@ -45,5 +46,13 @@ public class AiAdvisorService {
       throw new QuizQuestionNotPossibleException();
     }
     return new ObjectMapper().valueToTree(openAiGenerateQuestion).toString();
+  }
+
+  public AiCompletion getAiCompletion(Note note, AiCompletionRequest aiCompletionRequest) {
+    List<ChatMessage> messages =
+        new OpenAIChatAboutNoteMessageBuilder(note)
+            .instructionForCompletion(aiCompletionRequest)
+            .build();
+    return getCompletion(messages, aiCompletionRequest.incompleteContent);
   }
 }
