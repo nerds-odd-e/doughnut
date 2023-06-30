@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.persistence.*;
 import javax.validation.Valid;
 import lombok.Getter;
@@ -370,5 +371,10 @@ public class Note extends Thingy {
   @JsonIgnore
   public boolean isDescriptionBlankHtml() {
     return getTextContent().isDescriptionBlankHtml();
+  }
+
+  @JsonIgnore
+  public String getPath() {
+    return getAncestors().stream().map(Note::getTitle).collect(Collectors.joining(" › "));
   }
 }
