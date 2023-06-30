@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.AiSuggestion;
-import com.odde.doughnut.entities.json.AiSuggestionRequest;
+import com.odde.doughnut.entities.json.AiCompetionRequest;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionNotPossibleException;
@@ -47,8 +47,8 @@ class RestAiControllerTest {
   @Mock OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
 
-  AiSuggestionRequest params =
-      new AiSuggestionRequest() {
+  AiCompetionRequest params =
+      new AiCompetionRequest() {
         {
           this.prompt = "describe Earth";
         }

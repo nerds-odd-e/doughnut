@@ -18,6 +18,11 @@ declare namespace Generated {
         wrongOptions: string[];
     }
 
+    interface AiCompetionRequest {
+        prompt: string;
+        incompleteAssistantMessage: string;
+    }
+
     interface AiEngagingStory {
         engagingStory: string;
     }
@@ -25,11 +30,6 @@ declare namespace Generated {
     interface AiSuggestion {
         suggestion: string;
         finishReason: string;
-    }
-
-    interface AiSuggestionRequest {
-        prompt: string;
-        incompleteAssistantMessage: string;
     }
 
     interface ApiError {

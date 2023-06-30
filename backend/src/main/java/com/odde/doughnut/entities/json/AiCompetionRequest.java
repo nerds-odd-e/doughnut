@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @AllArgsConstructor
-public class AiSuggestionRequest {
+public class AiCompetionRequest {
   public String prompt;
   public String incompleteAssistantMessage;
 }

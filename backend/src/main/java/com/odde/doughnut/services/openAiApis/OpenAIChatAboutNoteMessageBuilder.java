@@ -1,7 +1,7 @@
 package com.odde.doughnut.services.openAiApis;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.json.AiSuggestionRequest;
+import com.odde.doughnut.entities.json.AiCompetionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import java.util.ArrayList;
@@ -54,12 +54,12 @@ Leave the 'question' field empty if you find there's too little information to g
   }
 
   public OpenAIChatAboutNoteMessageBuilder instructionForCompletion(
-      AiSuggestionRequest aiSuggestionRequest) {
-    messages.add(new ChatMessage(ChatMessageRole.USER.value(), aiSuggestionRequest.prompt));
-    if (!Strings.isEmpty(aiSuggestionRequest.incompleteAssistantMessage)) {
+      AiCompetionRequest aiCompetionRequest) {
+    messages.add(new ChatMessage(ChatMessageRole.USER.value(), aiCompetionRequest.prompt));
+    if (!Strings.isEmpty(aiCompetionRequest.incompleteAssistantMessage)) {
       messages.add(
           new ChatMessage(
-              ChatMessageRole.ASSISTANT.value(), aiSuggestionRequest.incompleteAssistantMessage));
+              ChatMessageRole.ASSISTANT.value(), aiCompetionRequest.incompleteAssistantMessage));
     }
     return this;
   }

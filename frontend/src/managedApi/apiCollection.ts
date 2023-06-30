@@ -286,7 +286,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
 
     async askAiSuggestions(
-      request: Generated.AiSuggestionRequest,
+      request: Generated.AiCompletionRequest,
       noteId: Doughnut.ID
     ) {
       return (await managedApi.restPost(
@@ -305,7 +305,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
 
     async askAiEngagingStories(prompt: string) {
-      const request: Generated.AiSuggestionRequest = {
+      const request: Generated.AiCompletionRequest = {
         prompt,
         incompleteAssistantMessage: "",
       };
