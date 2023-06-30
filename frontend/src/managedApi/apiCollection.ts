@@ -313,7 +313,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return (await managedApi.restPost(
         `ai/generate-image`,
         request
-      )) as string;
+      )) as Generated.AiGeneratedImage;
     },
   },
   testability: {

@@ -4,6 +4,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.json.AiCompletion;
 import com.odde.doughnut.entities.json.AiCompletionRequest;
+import com.odde.doughnut.entities.json.AiGeneratedImage;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -51,8 +52,8 @@ public class RestAiController {
   }
 
   @PostMapping("/generate-image")
-  public String generateImage(@RequestBody AiCompletionRequest aiCompletionRequest) {
+  public AiGeneratedImage generateImage(@RequestBody AiCompletionRequest aiCompletionRequest) {
     currentUser.assertLoggedIn();
-    return aiAdvisorService.getImage(aiCompletionRequest.prompt);
+    return new AiGeneratedImage(aiAdvisorService.getImage(aiCompletionRequest.prompt));
   }
 }

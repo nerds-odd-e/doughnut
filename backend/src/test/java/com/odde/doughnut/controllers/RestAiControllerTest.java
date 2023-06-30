@@ -145,7 +145,7 @@ class RestAiControllerTest {
     void generateImage() {
       when(openAiApi.createImage(Mockito.any()))
           .thenReturn(buildImageResult("this is supposed to be a base64 image"));
-      final String aiImage = controller.generateImage(params);
+      final String aiImage = controller.generateImage(params).b64encoded();
       assertEquals("this is supposed to be a base64 image", aiImage);
     }
   }

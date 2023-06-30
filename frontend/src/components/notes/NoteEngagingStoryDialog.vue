@@ -51,9 +51,9 @@ export default defineComponent({
   methods: {
     async askForImage() {
       try {
-        this.b64Json = await this.api.ai.askAiEngagingStories(
-          this.engagingStory
-        );
+        this.b64Json = (
+          await this.api.ai.askAiEngagingStories(this.engagingStory)
+        ).b64encoded;
       } catch (_) {
         this.engagingStoryInError = "There is a problem";
       }

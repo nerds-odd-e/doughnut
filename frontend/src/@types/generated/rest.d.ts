@@ -28,8 +28,8 @@ declare namespace Generated {
         incompleteContent: string;
     }
 
-    interface AiEngagingStory {
-        engagingStory: string;
+    interface AiGeneratedImage {
+        b64encoded: string;
     }
 
     interface ApiError {
