@@ -19,7 +19,7 @@ const createWrapper = async () => {
     .withRawJsonQuestion(JSON.stringify(goodQuestion))
     .please();
   helper.apiMock
-    .expectingGet(`/api/ai/generate-question?note=${note.id}`)
+    .expectingPost(`/api/ai/generate-question?note=${note.id}`)
     .andReturnOnce(quizQuestion);
   const wrapper = helper
     .component(NoteQuestionDialog)

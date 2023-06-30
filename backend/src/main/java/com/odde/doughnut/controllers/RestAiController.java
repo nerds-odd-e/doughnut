@@ -50,7 +50,7 @@ public class RestAiController {
         messages, aiSuggestionRequest.incompleteAssistantMessage);
   }
 
-  @GetMapping("/generate-question")
+  @PostMapping("/generate-question")
   public QuizQuestion generateQuestion(@RequestParam(value = "note") Note note)
       throws QuizQuestionNotPossibleException {
     currentUser.assertLoggedIn();
