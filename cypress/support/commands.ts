@@ -610,9 +610,9 @@ Cypress.Commands.add("expectAMapTo", (latitude: string, longitude: string) => {
   cy.findByText(`Location: ${latitude}'N, ${longitude}'E`)
 })
 
-Cypress.Commands.add("askForEngagingStory", (noteTitle: string) => {
+Cypress.Commands.add("aiGenerateImage", (noteTitle: string) => {
   cy.jumpToNotePage(noteTitle)
-  cy.clickNotePageMoreOptionsButton(noteTitle, "Engaging Story")
+  cy.clickNotePageMoreOptionsButton(noteTitle, "Generate Image with DALL-E")
 })
 
 Cypress.Commands.add("dismissLastErrorMessage", () => {

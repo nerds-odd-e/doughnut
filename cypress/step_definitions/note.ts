@@ -416,8 +416,8 @@ When("I ask for a description suggestion for note {string}", (noteTitle: string)
   cy.aiSuggestDescriptionForNote(noteTitle)
 })
 
-When("I ask for an engaging story for {string}", (noteTitle: string) => {
-  cy.askForEngagingStory(noteTitle)
+When("I generate an image for {string}", (noteTitle: string) => {
+  cy.aiGenerateImage(noteTitle)
 })
 
 Then("I should find an art created by the ai", () => {

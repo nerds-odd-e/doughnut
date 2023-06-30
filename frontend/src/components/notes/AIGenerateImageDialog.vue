@@ -1,11 +1,7 @@
 <template>
-  <h2>Have fun reading this engaging story</h2>
+  <h2>How do you like this image from DALL-E?</h2>
   <form>
-    <TextInput
-      v-model="engagingStory"
-      field="engagingStory"
-      :errors="engagingStoryInError"
-    />
+    <TextInput v-model="prompt" field="prompt" :errors="promptError" />
     <div>
       <img class="ai-art" v-if="imageSrc" :src="imageSrc" />
     </div>
@@ -35,9 +31,9 @@ export default defineComponent({
   },
   data() {
     return {
-      engagingStory: this.selectedNote.title,
+      prompt: this.selectedNote.title,
       b64Json: undefined as string | undefined,
-      engagingStoryInError: undefined as string | undefined,
+      promptError: undefined as string | undefined,
     };
   },
   computed: {
@@ -52,10 +48,10 @@ export default defineComponent({
     async askForImage() {
       try {
         this.b64Json = (
-          await this.api.ai.generateImage(this.engagingStory)
+          await this.api.ai.generateImage(this.prompt)
         ).b64encoded;
       } catch (_) {
-        this.engagingStoryInError = "There is a problem";
+        this.promptError = "There is a problem";
       }
     },
   },

@@ -10,7 +10,7 @@ Given("open AI service always think the system token is invalid", () => {
 })
 
 Then("I should be prompted with an error message saying {string}", (errorMessage: string) => {
-  cy.expectFieldErrorMessage("Engaging Story", errorMessage)
+  cy.expectFieldErrorMessage("Prompt", errorMessage)
 })
 
 Given("OpenAI by default returns text completion {string}", (description: string) => {
