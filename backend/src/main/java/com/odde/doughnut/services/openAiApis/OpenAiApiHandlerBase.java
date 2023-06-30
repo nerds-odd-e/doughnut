@@ -43,6 +43,7 @@ public class OpenAiApiHandlerBase {
       if (5 == e.code() / 100) {
         throw new OpenAIServiceErrorException(e.getMessage(), HttpStatus.valueOf(e.code()));
       }
+      System.out.println(e);
       System.out.println(e.message());
       throw e;
     } catch (RuntimeException e) {

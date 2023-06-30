@@ -68,27 +68,34 @@ public class NoteModel {
   }
 
   public List<ChatMessage> getChatMessagesForGenerateQuestion() {
-    return getChatMessages(
+    List<ChatMessage> messages = createChatMessages();
+    String noteOfCurrentFocus =
         """
-    The note of current focus:
-    title: %s
-    description (until the end of this message)::
-    %s
-          """
-            .formatted(entity.getTitle(), entity.getTextContent().getDescription()),
-        """
-    Please note that I don't know which note is of current focus.
-    To help me recall and refresh my memory about it,
-    please generate a multiple-choice question with 2 to 4 options and only 1 correct option.
-    Vary the option text length, so that the correct answer isn't always the longest one.
-    The question should be about the note of current focus in its context.
-    Leave the 'question' field empty if you find there's too little information to generate a question.
-    """);
+The note of current focus:
+title: %s
+description (until the end of this message):
+%s
+      """
+            .formatted(entity.getTitle(), entity.getTextContent().getDescription());
+    messages.add(new ChatMessage(ChatMessageRole.SYSTEM.value(), noteOfCurrentFocus));
+    messages.add(
+        new ChatMessage(
+            ChatMessageRole.USER.value(),
+            """
+Please note that I don't know which note is of current focus.
+To help me recall and refresh my memory about it,
+please generate a multiple-choice question with 2 to 4 options and only 1 correct option.
+Vary the option text length, so that the correct answer isn't always the longest one.
+The question should be about the note of current focus in its context.
+Leave the 'question' field empty if you find there's too little information to generate a question.
+"""));
+    return messages;
   }
 
   public List<ChatMessage> getChatMessagesForNoteDescriptionCompletion(
       AiSuggestionRequest aiSuggestionRequest) {
-    List<ChatMessage> messages = getChatMessages(null, aiSuggestionRequest.prompt);
+    List<ChatMessage> messages = createChatMessages();
+    messages.add(new ChatMessage(ChatMessageRole.USER.value(), aiSuggestionRequest.prompt));
     if (!Strings.isEmpty(aiSuggestionRequest.incompleteAssistantMessage)) {
       messages.add(
           new ChatMessage(
@@ -97,18 +104,14 @@ public class NoteModel {
     return messages;
   }
 
-  private List<ChatMessage> getChatMessages(String additionalContext, String prompt) {
-    String context = getPath();
+  private List<ChatMessage> createChatMessages() {
     List<ChatMessage> messages = new ArrayList<>();
+    String context = getPath();
     String content =
         ("This is a personal knowledge management system, consists of notes with a title and a description, which should represent atomic concepts.\n"
                 + "Current context of the note: ")
             + context;
     messages.add(new ChatMessage(ChatMessageRole.SYSTEM.value(), content));
-    if (!Strings.isBlank(additionalContext)) {
-      messages.add(new ChatMessage(ChatMessageRole.SYSTEM.value(), additionalContext));
-    }
-    messages.add(new ChatMessage(ChatMessageRole.USER.value(), prompt));
     return messages;
   }
 }
