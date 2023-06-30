@@ -52,7 +52,7 @@ export default defineComponent({
     async askForImage() {
       try {
         this.b64Json = (
-          await this.api.ai.askAiEngagingStories(this.engagingStory)
+          await this.api.ai.generateImage(this.engagingStory)
         ).b64encoded;
       } catch (_) {
         this.engagingStoryInError = "There is a problem";

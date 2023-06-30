@@ -50,8 +50,11 @@
       <SvgCog />
     </button>
     <div class="dropdown-menu dropdown-menu-end">
-      <PopButton class="dropdown-item btn-primary" title="Engaging Story">
-        <NoteEngagingStoryDialog v-bind="{ selectedNote, storageAccessor }" />
+      <PopButton
+        class="dropdown-item btn-primary"
+        title="Generate Image with DALL-E"
+      >
+        <AIGenerateImageDialog v-bind="{ selectedNote, storageAccessor }" />
       </PopButton>
       <NoteDeleteButton
         class="dropdown-item"
@@ -77,7 +80,7 @@ import { sanitizeViewTypeName } from "../../models/viewTypes";
 import SvgCog from "../svgs/SvgCog.vue";
 import NoteDeleteButton from "./NoteDeleteButton.vue";
 import PopButton from "../commons/Popups/PopButton.vue";
-import NoteEngagingStoryDialog from "../notes/NoteEngagingStoryDialog.vue";
+import AIGenerateImageDialog from "../notes/AIGenerateImageDialog.vue";
 import AISuggestDescriptionButton from "./AISuggestDescriptionButton.vue";
 import NoteQuestionDialog from "../notes/NoteQuestionDialog.vue";
 import SvgClipboard from "../svgs/SvgClipboard.vue";
@@ -106,7 +109,7 @@ export default defineComponent({
     SvgCog,
     NoteDeleteButton,
     PopButton,
-    NoteEngagingStoryDialog,
+    AIGenerateImageDialog,
     AISuggestDescriptionButton,
     NoteQuestionDialog,
     SvgClipboard,

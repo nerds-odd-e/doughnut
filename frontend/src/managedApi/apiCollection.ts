@@ -305,7 +305,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
       )) as Generated.QuizQuestion;
     },
 
-    async askAiEngagingStories(prompt: string) {
+    async generateImage(prompt: string) {
       const request: Generated.AiCompletionRequest = {
         prompt,
         incompleteContent: "",

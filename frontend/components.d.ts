@@ -7,6 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AIGenerateImageDialog: typeof import('./src/components/notes/AIGenerateImageDialog.vue')['default']
     AIQuestion: typeof import('./src/components/review/AIQuestion.vue')['default']
     AISuggestDescriptionButton: typeof import('./src/components/toolbars/AISuggestDescriptionButton.vue')['default']
     AISuggestion: typeof import('./src/components/toolbars/AISuggestion.vue')['default']
@@ -66,7 +67,6 @@ declare module 'vue' {
     NoteContent: typeof import('./src/components/notes/NoteContent.vue')['default']
     NoteDeleteButton: typeof import('./src/components/toolbars/NoteDeleteButton.vue')['default']
     NoteEditAccessoriesDialog: typeof import('./src/components/notes/NoteEditAccessoriesDialog.vue')['default']
-    NoteEngagingStoryDialog: typeof import('./src/components/notes/NoteEngagingStoryDialog.vue')['default']
     NoteFormBody: typeof import('./src/components/notes/NoteFormBody.vue')['default']
     NoteFormTitleOnly: typeof import('./src/components/notes/NoteFormTitleOnly.vue')['default']
     NoteFrameOfLinks: typeof import('./src/components/links/NoteFrameOfLinks.vue')['default']
