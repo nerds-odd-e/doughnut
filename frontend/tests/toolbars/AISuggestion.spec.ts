@@ -1,16 +1,16 @@
 import { flushPromises } from "@vue/test-utils";
-import AISuggestion from "@/components/toolbars/AISuggestion.vue";
+import AISuggestDescriptionButton from "@/components/toolbars/AISuggestDescriptionButton.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
-describe("AISuggestion", () => {
+describe("AISuggestDescriptionButton", () => {
   helper.resetWithApiMock(beforeEach, afterEach);
 
   const triggerSuggestionwithoutFlushPromises = async (
     note: Generated.Note
   ) => {
     const wrapper = helper
-      .component(AISuggestion)
+      .component(AISuggestDescriptionButton)
       .withStorageProps({
         selectedNote: note,
       })

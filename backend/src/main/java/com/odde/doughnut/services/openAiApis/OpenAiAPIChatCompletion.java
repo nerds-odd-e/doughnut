@@ -3,7 +3,7 @@ package com.odde.doughnut.services.openAiApis;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.json.AIGeneratedQuestion;
-import com.odde.doughnut.entities.json.AiSuggestion;
+import com.odde.doughnut.entities.json.AiCompletion;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.*;
 import java.util.List;
@@ -17,9 +17,9 @@ public class OpenAiAPIChatCompletion extends OpenAiApiHandlerBase {
     this.openAiApi = openAiApi;
   }
 
-  public AiSuggestion getOpenAiCompletion(List<ChatMessage> chatMessages) {
+  public AiCompletion getOpenAiCompletion(List<ChatMessage> chatMessages) {
     return chatCompletion(defaultChatCompletionRequestBuilder(chatMessages).maxTokens(100).build())
-        .map(AiSuggestion::from)
+        .map(AiCompletion::from)
         .orElse(null);
   }
 

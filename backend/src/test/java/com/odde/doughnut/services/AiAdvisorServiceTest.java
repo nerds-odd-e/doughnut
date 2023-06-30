@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.odde.doughnut.entities.json.AiSuggestion;
+import com.odde.doughnut.entities.json.AiCompletion;
 import com.odde.doughnut.entities.json.ApiError;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.OpenAITimeoutException;
@@ -65,7 +65,7 @@ class AiAdvisorServiceTest {
     @Test
     void the_data_returned_is_incomplete() {
       when(openAiApi.createChatCompletion(any())).thenReturn(IncompleteCompletionResultSingle);
-      AiSuggestion suggestion = aiAdvisorService.getCompletion(List.of(), "");
+      AiCompletion suggestion = aiAdvisorService.getCompletion(List.of(), "");
       assertEquals("length", suggestion.getFinishReason());
     }
 

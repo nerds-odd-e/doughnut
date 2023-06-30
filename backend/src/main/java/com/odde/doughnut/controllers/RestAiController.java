@@ -2,12 +2,11 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
-import com.odde.doughnut.entities.json.AiEngagingStory;
-import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.entities.json.AiCompetionRequest;
+import com.odde.doughnut.entities.json.AiCompletion;
+import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.NoteModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.services.AiAdvisorService;
@@ -37,16 +36,14 @@ public class RestAiController {
   }
 
   @PostMapping("/{note}/completion")
-  public AiSuggestion getCompletion(
-      @PathVariable(name = "note") Note note,
-      @RequestBody AiCompetionRequest aiCompetionRequest) {
+  public AiCompletion getCompletion(
+      @PathVariable(name = "note") Note note, @RequestBody AiCompetionRequest aiCompetionRequest) {
     currentUser.assertLoggedIn();
     List<ChatMessage> messages =
         new OpenAIChatAboutNoteMessageBuilder(note)
             .instructionForCompletion(aiCompetionRequest)
             .build();
-    return aiAdvisorService.getCompletion(
-        messages, aiCompetionRequest.incompleteAssistantMessage);
+    return aiAdvisorService.getCompletion(messages, aiCompetionRequest.incompleteAssistantMessage);
   }
 
   @PostMapping("/generate-question")

@@ -3,8 +3,8 @@ package com.odde.doughnut.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AIGeneratedQuestion;
+import com.odde.doughnut.entities.json.AiCompletion;
 import com.odde.doughnut.entities.json.AiEngagingStory;
-import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.services.openAiApis.OpenAIChatAboutNoteMessageBuilder;
 import com.odde.doughnut.services.openAiApis.OpenAiAPIChatCompletion;
@@ -23,8 +23,7 @@ public class AiAdvisorService {
     openAiAPIImage = new OpenAiAPIImage(openAiApi);
   }
 
-  public AiSuggestion getCompletion(
-      List<ChatMessage> messages, String incompleteAssistantMessage) {
+  public AiCompletion getCompletion(List<ChatMessage> messages, String incompleteAssistantMessage) {
     return openAiAPIChatCompletion
         .getOpenAiCompletion(messages)
         .prependPreviousIncompleteMessage(incompleteAssistantMessage);

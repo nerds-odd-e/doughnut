@@ -27,7 +27,7 @@ declare namespace Generated {
         engagingStory: string;
     }
 
-    interface AiSuggestion {
+    interface AiCompletion {
         suggestion: string;
         finishReason: string;
     }

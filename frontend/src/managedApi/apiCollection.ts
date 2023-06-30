@@ -258,13 +258,13 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
   },
   ai: {
-    async keepAskingAISuggestionUntilStop(
+    async keepAskingAICompletionUntilStop(
       prompt: string,
       noteId: Doughnut.ID,
       prev?: string,
       interimResultShouldContinue?: (suggestion: string) => boolean
     ): Promise<string> {
-      const res = await this.askAiSuggestions(
+      const res = await this.askAiCompletion(
         {
           prompt,
           incompleteAssistantMessage: prev ?? "",
@@ -275,7 +275,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
         if (!interimResultShouldContinue(res.suggestion)) return res.suggestion;
       }
       if (res.finishReason === "length") {
-        return this.keepAskingAISuggestionUntilStop(
+        return this.keepAskingAICompletionUntilStop(
           prompt,
           noteId,
           res.suggestion,
@@ -285,14 +285,14 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return res.suggestion;
     },
 
-    async askAiSuggestions(
+    async askAiCompletion(
       request: Generated.AiCompletionRequest,
       noteId: Doughnut.ID
     ) {
       return (await managedApi.restPost(
         `ai/${noteId}/completion`,
         request
-      )) as Generated.AiSuggestion;
+      )) as Generated.AiCompletion;
     },
 
     async askAIToGenerateQuestion(

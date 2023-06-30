@@ -10,9 +10,9 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.json.AiEngagingStory;
-import com.odde.doughnut.entities.json.AiSuggestion;
 import com.odde.doughnut.entities.json.AiCompetionRequest;
+import com.odde.doughnut.entities.json.AiCompletion;
+import com.odde.doughnut.entities.json.AiEngagingStory;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionNotPossibleException;
@@ -107,8 +107,8 @@ class RestAiControllerTest {
     @Test
     void askSuggestionAndUseResponse() {
       when(openAiApi.createChatCompletion(any())).thenReturn(buildCompletionResult("blue planet"));
-      AiSuggestion aiSuggestion = controller.getCompletion(note, params);
-      assertEquals("blue planet", aiSuggestion.getSuggestion());
+      AiCompletion aiCompletion = controller.getCompletion(note, params);
+      assertEquals("blue planet", aiCompletion.getSuggestion());
     }
   }
 

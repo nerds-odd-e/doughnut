@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-class AiSuggestionTest {
+class AiCompletionTest {
   @ParameterizedTest
   @CsvSource(
       quoteCharacter = '"',
@@ -18,8 +18,8 @@ class AiSuggestionTest {
   """)
   void prependPreviousIncompleteMessageWithLeadingCharacter(
       String incompleteMessage, String completeSuggestion, String expectedSuggestion) {
-    AiSuggestion aiSuggestion = new AiSuggestion(completeSuggestion, "stop");
-    aiSuggestion.prependPreviousIncompleteMessage(incompleteMessage);
-    assertEquals(expectedSuggestion, aiSuggestion.getSuggestion());
+    AiCompletion aiCompletion = new AiCompletion(completeSuggestion, "stop");
+    aiCompletion.prependPreviousIncompleteMessage(incompleteMessage);
+    assertEquals(expectedSuggestion, aiCompletion.getSuggestion());
   }
 }

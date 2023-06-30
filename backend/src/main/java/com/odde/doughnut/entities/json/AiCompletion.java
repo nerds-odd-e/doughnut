@@ -8,16 +8,16 @@ import org.apache.logging.log4j.util.Strings;
 
 @Data
 @AllArgsConstructor
-public final class AiSuggestion {
+public final class AiCompletion {
   String suggestion;
   String finishReason;
 
-  public static AiSuggestion from(ChatCompletionChoice chatCompletionChoice) {
-    return new AiSuggestion(
+  public static AiCompletion from(ChatCompletionChoice chatCompletionChoice) {
+    return new AiCompletion(
         chatCompletionChoice.getMessage().getContent(), chatCompletionChoice.getFinishReason());
   }
 
-  public AiSuggestion prependPreviousIncompleteMessage(String incompleteAssistantMessage) {
+  public AiCompletion prependPreviousIncompleteMessage(String incompleteAssistantMessage) {
     if (!Strings.isBlank(incompleteAssistantMessage)) {
       if (startWithCharacterFromSpaceDelimitedLanguage(suggestion)) {
         incompleteAssistantMessage += " ";
