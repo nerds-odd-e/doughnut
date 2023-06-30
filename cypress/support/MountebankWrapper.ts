@@ -33,8 +33,8 @@ class MountebankWrapper {
   }
 
   public async createImposter(): Promise<void> {
+    await this.tryDeleteImposter()
     const imposter = new Imposter().withPort(this.port)
-    this.tryDeleteImposter()
     const response = await request
       .post(`${this.mountebank.mountebankUrl}/imposters`)
       .send(JSON.stringify(imposter))

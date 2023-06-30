@@ -17,7 +17,7 @@ class ServiceMocker {
   }
 
   install() {
-    this.mountebank.createImposter()
+    return this.mountebank.createImposter()
   }
 
   get serviceUrl() {

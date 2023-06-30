@@ -105,7 +105,7 @@ Cypress.Commands.add(
 )
 
 Cypress.Commands.add("restartImposter", { prevSubject: true }, (serviceMocker: ServiceMocker) => {
-  serviceMocker.install()
+  return serviceMocker.install()
 })
 
 Cypress.Commands.add(
@@ -168,9 +168,9 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   "alwaysResponseAsUnauthorized",
   { prevSubject: true },
-  (serviceMocker: ServiceMocker) => {
-    serviceMocker.install()
-    serviceMocker.stubPosterUnauthorized(`/*`, {
+  async (serviceMocker: ServiceMocker) => {
+    await serviceMocker.install()
+    await serviceMocker.stubPosterUnauthorized(`/*`, {
       status: "BAD_REQUEST",
       message: "nah nah nah, you need a valid token",
       errors: {
