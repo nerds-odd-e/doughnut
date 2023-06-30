@@ -3,10 +3,10 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AiSuggestionRequest;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.services.openAiApis.OpenAIChatAboutNoteMessageBuilder;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.util.Strings;
@@ -63,12 +63,13 @@ public class NoteModel {
     }
   }
 
-  private String getPath() {
+  public String getPath() {
     return entity.getAncestors().stream().map(Note::getTitle).collect(Collectors.joining(" › "));
   }
 
   public List<ChatMessage> getChatMessagesForGenerateQuestion() {
-    List<ChatMessage> messages = createChatMessages();
+    OpenAIChatAboutNoteMessageBuilder builder = new OpenAIChatAboutNoteMessageBuilder(this);
+    List<ChatMessage> messages = builder.build();
     String noteOfCurrentFocus =
         """
 The note of current focus:
@@ -94,24 +95,14 @@ Leave the 'question' field empty if you find there's too little information to g
 
   public List<ChatMessage> getChatMessagesForNoteDescriptionCompletion(
       AiSuggestionRequest aiSuggestionRequest) {
-    List<ChatMessage> messages = createChatMessages();
+    OpenAIChatAboutNoteMessageBuilder builder = new OpenAIChatAboutNoteMessageBuilder(this);
+    List<ChatMessage> messages = builder.build();
     messages.add(new ChatMessage(ChatMessageRole.USER.value(), aiSuggestionRequest.prompt));
     if (!Strings.isEmpty(aiSuggestionRequest.incompleteAssistantMessage)) {
       messages.add(
           new ChatMessage(
               ChatMessageRole.ASSISTANT.value(), aiSuggestionRequest.incompleteAssistantMessage));
     }
-    return messages;
-  }
-
-  private List<ChatMessage> createChatMessages() {
-    List<ChatMessage> messages = new ArrayList<>();
-    String context = getPath();
-    String content =
-        ("This is a personal knowledge management system, consists of notes with a title and a description, which should represent atomic concepts.\n"
-                + "Current context of the note: ")
-            + context;
-    messages.add(new ChatMessage(ChatMessageRole.SYSTEM.value(), content));
     return messages;
   }
 }
