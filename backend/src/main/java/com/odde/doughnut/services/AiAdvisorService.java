@@ -50,11 +50,7 @@ public class AiAdvisorService {
             .buildChatCompletionRequest();
     return openAiAPIChatCompletion
         .chatCompletion(chatCompletionRequest)
-        .map(AiCompletion::from)
-        .map(
-            aiCompletion ->
-                aiCompletion.prependPreviousIncompleteContent(
-                    aiCompletionRequest.incompleteContent))
+        .map(aiCompletionRequest::getAiCompletion)
         .orElse(null);
   }
 }

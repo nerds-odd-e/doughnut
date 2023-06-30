@@ -16,9 +16,9 @@ public class OpenAIChatAboutNoteMessageBuilder {
   public OpenAIChatAboutNoteMessageBuilder(String notePath) {
     this.path = notePath;
     String content =
-      ("This is a personal knowledge management system, consists of notes with a title and a description, which should represent atomic concepts.\n"
-        + "Current context of the note: ")
-        + this.path;
+        ("This is a personal knowledge management system, consists of notes with a title and a description, which should represent atomic concepts.\n"
+                + "Current context of the note: ")
+            + this.path;
     messages.add(0, new ChatMessage(ChatMessageRole.SYSTEM.value(), content));
   }
 
