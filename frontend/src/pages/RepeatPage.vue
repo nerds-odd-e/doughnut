@@ -16,6 +16,7 @@
       :minimized="minimized"
       :quiz-questions="toRepeat"
       :current-index="currentIndex"
+      :eager-fetch-count="1"
       :storage-accessor="storageAccessor"
       @answered="onAnswered($event)"
     />

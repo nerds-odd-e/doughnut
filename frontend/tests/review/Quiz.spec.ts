@@ -6,11 +6,20 @@ import makeMe from "../fixtures/makeMe";
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
+const quizQuestion = makeMe.aQuizQuestion.withClozeSelectionQuestion().please();
+
 describe("repeat page", () => {
-  const mountPage = async () => {
+  const mountPage = async (
+    quizQuestions: number[],
+    eagerFetchCount: number
+  ) => {
     const wrapper = helper
       .component(Quiz)
-      .withStorageProps({ quizQuestions: [1, 2, 3], currentIndex: 0 })
+      .withStorageProps({
+        quizQuestions,
+        currentIndex: 0,
+        eagerFetchCount,
+      })
       .mount();
     await flushPromises();
     return wrapper;
@@ -21,14 +30,21 @@ describe("repeat page", () => {
       vi.useFakeTimers();
     });
 
-    it("fetch the first question when mount", async () => {
-      const quizQuestion = makeMe.aQuizQuestion
-        .withClozeSelectionQuestion()
-        .please();
+    it("fetch the first 3 question when mount", async () => {
       helper.apiMock
-        .expectingGet(`/api/review-points/${1}/random-question`)
+        .expectingGet(`/api/review-points/1/random-question`)
         .andReturnOnce(quizQuestion);
-      await mountPage();
+      await mountPage([1, 2, 3], 1);
+    });
+
+    it("fetch the first 3 question when mount", async () => {
+      helper.apiMock
+        .expectingGet(`/api/review-points/1/random-question`)
+        .andReturnOnce(quizQuestion);
+      helper.apiMock
+        .expectingGet(`/api/review-points/2/random-question`)
+        .andReturnOnce(quizQuestion);
+      await mountPage([1, 2, 3], 2);
     });
   });
 });

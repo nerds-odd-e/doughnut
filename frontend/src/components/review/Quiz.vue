@@ -37,6 +37,10 @@ export default defineComponent({
       type: Number,
       required: true,
     },
+    eagerFetchCount: {
+      type: Number,
+      required: true,
+    },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,
@@ -86,6 +90,13 @@ export default defineComponent({
           this.currentReviewPointId
         );
       this.selectPosition();
+      if (this.eagerFetchCount > 1) {
+        if (this.currentIndex + 1 < this.quizQuestions.length) {
+          await this.api.reviewMethods.getRandomQuestionForReviewPoint(
+            this.quizQuestions[this.currentIndex + 1] as number
+          );
+        }
+      }
     },
 
     onAnswered(answerResult: Generated.AnswerResult) {
