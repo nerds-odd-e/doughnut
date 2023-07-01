@@ -64,7 +64,7 @@ export default defineComponent({
   data() {
     return {
       toRepeat: undefined as number[] | undefined,
-      toRepeatCount: 0,
+      currentIndex: 0,
       previousResults: [] as Generated.AnswerResult[],
       previousResultCursor: undefined as number | undefined,
     };
@@ -76,6 +76,9 @@ export default defineComponent({
     },
     finished() {
       return this.previousResults.length;
+    },
+    toRepeatCount() {
+      return (this.toRepeat?.length ?? 0) - this.currentIndex;
     },
   },
   methods: {
@@ -93,7 +96,7 @@ export default defineComponent({
       this.toRepeat = (
         await this.api.reviewMethods.getDueReviewPoints(dueInDays)
       ).toRepeat;
-      this.toRepeatCount = this.toRepeat.length;
+      this.currentIndex = 0;
       if (this.toRepeat?.length === 0) {
         return;
       }
@@ -104,7 +107,7 @@ export default defineComponent({
 
     onAnswered(answerResult: Generated.AnswerResult) {
       this.previousResults.push(answerResult);
-      this.toRepeatCount -= 1;
+      this.currentIndex += 1;
       if (!answerResult.correct) {
         this.viewLastResult(this.previousResults.length - 1);
       }
