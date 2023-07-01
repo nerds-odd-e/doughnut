@@ -64,29 +64,29 @@ Cypress.Commands.add(
   "mockChatCompletion",
   { prevSubject: true },
   (serviceMocker: ServiceMocker, prompt: string, reply: string) => {
-    const body = { messages: [{ role: "user", content: prompt }] }
+    const body = { messages: [{ role: "user", content: new RegExp("^" + Cypress._.escapeRegExp(prompt) + "$") }] }
     const predicate = new FlexiPredicate()
       .withOperator(Operator.matches)
       .withPath(`/v1/chat/completions`)
       .withMethod(HttpMethod.POST)
       .withBody(body)
-    mockChatCompletion(predicate, serviceMocker, reply, "stop")
+    return mockChatCompletion(predicate, serviceMocker, reply, "stop")
   },
 )
 
 Cypress.Commands.add(
   "mockChatCompletionWithIncompleteAssistantMessage",
   { prevSubject: true },
-  (serviceMocker: ServiceMocker, incomplete: string, reply: string) => {
+  (serviceMocker: ServiceMocker, incomplete: string, reply: string, finishReason: "stop" | "length") => {
     const body = {
-      messages: [{ role: "user" }, { role: "assistant", content: incomplete }],
+      messages: [{ content: "^" + Cypress._.escapeRegExp(incomplete) + "$" }],
     }
     const predicate = new FlexiPredicate()
       .withOperator(Operator.matches)
       .withPath(`/v1/chat/completions`)
       .withMethod(HttpMethod.POST)
       .withBody(body)
-    mockChatCompletion(predicate, serviceMocker, reply, "stop")
+    return mockChatCompletion(predicate, serviceMocker, reply, finishReason)
   },
 )
 
@@ -100,7 +100,7 @@ Cypress.Commands.add(
       .withPath(`/v1/chat/completions`)
       .withMethod(HttpMethod.POST)
       .withBody(body)
-    mockChatCompletion(predicate, serviceMocker, reply, "stop")
+    return mockChatCompletion(predicate, serviceMocker, reply, "stop")
   },
 )
 
@@ -144,7 +144,7 @@ Cypress.Commands.add(
 )
 
 Cypress.Commands.add("stubCreateImage", { prevSubject: true }, (serviceMocker: ServiceMocker) => {
-  serviceMocker.stubPoster(`/v1/images/generations`, {
+  return serviceMocker.stubPoster(`/v1/images/generations`, {
     id: "cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7",
     created: 1589478378,
     data: [
@@ -161,7 +161,7 @@ Cypress.Commands.add(
   "stubOpenAiCompletionWithErrorResponse",
   { prevSubject: true },
   (serviceMocker: ServiceMocker) => {
-    serviceMocker.stubGetterWithError500Response(`/*`, {})
+    return serviceMocker.stubGetterWithError500Response(`/*`, {})
   },
 )
 

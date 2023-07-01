@@ -25,11 +25,12 @@ Given(
 )
 
 Given(
-  "OpenAI completes with {string} for incomplete assistant message {string}",
+  "OpenAI completes with {string} for assistant message {string}",
   (returnMessage: string, incompleteAssistantMessage: string) => {
     cy.openAiService().mockChatCompletionWithIncompleteAssistantMessage(
       incompleteAssistantMessage,
       returnMessage,
+      "stop",
     )
   },
 )
@@ -38,8 +39,12 @@ Given("OpenAI always return image of a moon", () => {
   cy.openAiService().stubCreateImage()
 })
 
-Given("otherwise OpenAI returns an incomplete text completion {string}", (description: string) => {
-  cy.openAiService().stubChatCompletion(description, "length")
+Given("OpenAI returns an incomplete text completion {string} for assistant message {string}", (description: string, assistantMessage: string) => {
+  cy.openAiService().mockChatCompletionWithIncompleteAssistantMessage(
+    assistantMessage,
+    description,
+    "length",
+  )
 })
 
 Given("An OpenAI response is unavailable", () => {

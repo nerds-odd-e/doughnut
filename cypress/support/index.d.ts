@@ -111,6 +111,7 @@ declare namespace Cypress {
     mockChatCompletionWithIncompleteAssistantMessage(
       incomplete: string,
       reply: string,
+      finishReason: "length" | "stop",
     ): Chainable<Subject>
     mockChatCompletionWithContext(reply: string, context: string): Chainable<Subject>
     restartImposter(): Chainable<Subject>
