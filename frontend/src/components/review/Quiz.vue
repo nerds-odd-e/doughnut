@@ -67,7 +67,7 @@ export default defineComponent({
     minimized() {
       this.selectPosition();
     },
-    toRepeat() {
+    QuizQuestion() {
       this.currentQuestionIndex = 0;
       this.fetchQuestion();
     },
