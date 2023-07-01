@@ -12,16 +12,6 @@
           :key="currentQuizQuestion.quizQuestionId"
         />
       </template>
-      <template
-        v-else-if="
-          quizQuestions !== undefined &&
-          quizQuestions.length === currentQuestionIndex
-        "
-      >
-        <div class="alert alert-success">
-          You have finished all repetitions for this half a day!
-        </div>
-      </template>
     </div>
   </div>
 </template>
@@ -43,6 +33,10 @@ export default defineComponent({
       type: Object as PropType<number[]>,
       required: true,
     },
+    currentIndex: {
+      type: Number,
+      required: true,
+    },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,
@@ -54,21 +48,22 @@ export default defineComponent({
   },
   data() {
     return {
-      currentQuestionIndex: 0,
       currentQuizQuestion: undefined as Generated.QuizQuestion | undefined,
     };
   },
   computed: {
     currentReviewPointId() {
-      return this.quizQuestions[this.currentQuestionIndex] as number;
+      return this.quizQuestions[this.currentIndex] as number;
     },
   },
   watch: {
     minimized() {
       this.selectPosition();
     },
-    QuizQuestion() {
-      this.currentQuestionIndex = 0;
+    QuizQuestions() {
+      this.fetchQuestion();
+    },
+    currentIndex() {
       this.fetchQuestion();
     },
   },
@@ -82,10 +77,8 @@ export default defineComponent({
     },
 
     async fetchQuestion() {
-      if (
-        !this.quizQuestions ||
-        this.quizQuestions.length === this.currentQuestionIndex
-      ) {
+      this.currentQuizQuestion = undefined;
+      if (!this.quizQuestions) {
         return;
       }
       this.currentQuizQuestion =
@@ -97,9 +90,6 @@ export default defineComponent({
 
     onAnswered(answerResult: Generated.AnswerResult) {
       this.$emit("answered", answerResult);
-      this.currentQuestionIndex += 1;
-      this.currentQuizQuestion = undefined;
-      this.fetchQuestion();
     },
   },
   async mounted() {

@@ -15,6 +15,7 @@
       v-if="toRepeatCount !== 0"
       :minimized="minimized"
       :quiz-questions="toRepeat"
+      :current-index="currentIndex"
       :storage-accessor="storageAccessor"
       @answered="onAnswered($event)"
     />
