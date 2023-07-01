@@ -1,34 +1,40 @@
 <template>
-  <div class="quiz-instruction inner-box">
-    <ShowPicture
-      v-if="quizQuestion.pictureWithMask"
-      v-bind="quizQuestion.pictureWithMask"
-      :opacity="1"
-    />
-    <NoteFrameOfLinks
-      v-bind="{ links: quizQuestion.hintLinks, storageAccessor }"
-    >
-      <h2 v-if="!!quizQuestion.mainTopic" class="text-center">
-        {{ quizQuestion.mainTopic }}
-      </h2>
-      <div
-        class="quiz-description"
-        v-if="quizQuestion.questionType !== 'PICTURE_TITLE'"
-        v-html="quizQuestion.description"
+  <AIQuestion
+    v-if="quizQuestion.questionType === 'AI_QUESTION'"
+    :raw-json-question="quizQuestion.rawJsonQuestion"
+    @self-evaluated-memory-state="submitAnswer({ spellingAnswer: $event })"
+  />
+  <template v-else>
+    <div class="quiz-instruction inner-box">
+      <ShowPicture
+        v-if="quizQuestion.pictureWithMask"
+        v-bind="quizQuestion.pictureWithMask"
+        :opacity="1"
       />
-      <AIQuestion
-        v-if="quizQuestion.questionType === 'AI_QUESTION'"
-        :raw-json-question="quizQuestion.rawJsonQuestion"
-        @self-evaluated-memory-state="submitAnswer({ spellingAnswer: $event })"
-      />
-      <div v-if="quizQuestion.questionType === 'JUST_REVIEW'">
-        <ReviewPointAsync
-          v-if="reviewPointId"
-          v-bind="{
-            reviewPointId,
-            storageAccessor,
-          }"
+      <NoteFrameOfLinks
+        v-bind="{ links: quizQuestion.hintLinks, storageAccessor }"
+      >
+        <h2 v-if="!!quizQuestion.mainTopic" class="text-center">
+          {{ quizQuestion.mainTopic }}
+        </h2>
+        <div
+          class="quiz-description"
+          v-if="quizQuestion.questionType !== 'PICTURE_TITLE'"
+          v-html="quizQuestion.description"
         />
+        <div v-if="quizQuestion.questionType === 'JUST_REVIEW'">
+          <ReviewPointAsync
+            v-if="reviewPointId"
+            v-bind="{
+              reviewPointId,
+              storageAccessor,
+            }"
+          />
+        </div>
+      </NoteFrameOfLinks>
+    </div>
+    <div class="quiz-answering">
+      <div v-if="quizQuestion.questionType === 'JUST_REVIEW'">
         <SelfEvaluateButtons
           @self-evaluated-memory-state="
             submitAnswer({ spellingAnswer: $event })
@@ -52,30 +58,28 @@
           />
         </form>
       </div>
-    </NoteFrameOfLinks>
-  </div>
-  <div class="quiz-answering">
-    <div
-      class="options"
-      v-if="quizQuestion.options && quizQuestion.options.length > 0"
-    >
       <div
-        class="option"
-        v-for="option in quizQuestion.options"
-        :key="option.noteId"
+        class="options"
+        v-if="quizQuestion.options && quizQuestion.options.length > 0"
       >
-        <button
-          class="btn btn-secondary btn-lg"
-          @click.once="submitAnswer({ answerNoteId: option.noteId })"
+        <div
+          class="option"
+          v-for="option in quizQuestion.options"
+          :key="option.noteId"
         >
-          <div v-if="!option.picture" v-html="option.display" />
-          <div v-else>
-            <ShowPicture v-bind="option.pictureWithMask" :opacity="1" />
-          </div>
-        </button>
+          <button
+            class="btn btn-secondary btn-lg"
+            @click.once="submitAnswer({ answerNoteId: option.noteId })"
+          >
+            <div v-if="!option.picture" v-html="option.display" />
+            <div v-else>
+              <ShowPicture v-bind="option.pictureWithMask" :opacity="1" />
+            </div>
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+  </template>
 </template>
 
 <style scoped lang="sass">
