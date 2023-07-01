@@ -30,7 +30,7 @@ describe("repeat page", () => {
       vi.useFakeTimers();
     });
 
-    it("fetch the first 3 question when mount", async () => {
+    it("fetch the first 1 question when mount", async () => {
       helper.apiMock
         .expectingGet(`/api/review-points/1/random-question`)
         .andReturnOnce(quizQuestion);
@@ -44,7 +44,10 @@ describe("repeat page", () => {
       helper.apiMock
         .expectingGet(`/api/review-points/2/random-question`)
         .andReturnOnce(quizQuestion);
-      await mountPage([1, 2, 3], 2);
+      helper.apiMock
+        .expectingGet(`/api/review-points/3/random-question`)
+        .andReturnOnce(quizQuestion);
+      await mountPage([1, 2, 3, 4], 3);
     });
   });
 });

@@ -96,8 +96,13 @@ export default defineComponent({
       }
       this.currentQuizQuestion = await this.fetchNextQuestion(0);
       this.selectPosition();
-      if (this.eagerFetchCount > 1) {
-        await this.fetchNextQuestion(1);
+      await this.eagerFetch(1);
+    },
+
+    async eagerFetch(index: number) {
+      if (index < this.eagerFetchCount) {
+        await this.fetchNextQuestion(index);
+        await this.eagerFetch(index + 1);
       }
     },
 
