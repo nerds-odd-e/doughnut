@@ -8,9 +8,9 @@ Feature: Note description completion
       | Taiwan  |             |               |
       | Taipei  |             | Taiwan        |
       | Weather | It rains a  | Taipei        |
-    Given OpenAI by default returns text completion "Pardon?"
 
   Scenario: Generate Description
+    Given OpenAI by default returns text completion "Pardon?"
     When I ask to complete the description for note "Taiwan"
     Then I should see the note description on current page becomes "Pardon?"
 
@@ -20,8 +20,8 @@ Feature: Note description completion
     Then I should see that the open AI service is not available in controller bar
 
   Scenario: Complete parts are displayed as soon as they are available
-    Given OpenAI returns an incomplete text completion "A vigorous city,"
-    And OpenAI completes with "in the pacific ocean." for incomplete assistant message "A vigorous city,"
+    Given OpenAI completes with "in the pacific ocean." for incomplete assistant message "A vigorous city,"
+    And otherwise OpenAI returns an incomplete text completion "A vigorous city,"
     When I ask to complete the description for note "Taipei"
     Then I should see the note description on current page becomes "A vigorous city, in the pacific ocean."
 

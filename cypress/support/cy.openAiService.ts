@@ -37,7 +37,7 @@ function mockChatCompletion(
   reply: string,
   finishReason: "length" | "stop",
 ) {
-  serviceMocker.mockWithPredicate(predicate, {
+  return serviceMocker.mockWithPredicate(predicate, {
     id: "cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7",
     object: "chat.completion",
     created: 1589478378,
@@ -113,7 +113,7 @@ Cypress.Commands.add(
   { prevSubject: true },
   (serviceMocker: ServiceMocker, reply: string, finishReason: "length" | "stop") => {
     const predicate = new DefaultPredicate(`/v1/chat/completions`, HttpMethod.POST)
-    mockChatCompletion(predicate, serviceMocker, reply, finishReason)
+    return mockChatCompletion(predicate, serviceMocker, reply, finishReason)
   },
 )
 
@@ -122,7 +122,7 @@ Cypress.Commands.add(
   { prevSubject: true },
   (serviceMocker: ServiceMocker, functionName: string, argumentsString: string) => {
     const predicate = new DefaultPredicate(`/v1/chat/completions`, HttpMethod.POST)
-    serviceMocker.mockWithPredicate(predicate, {
+    return serviceMocker.mockWithPredicate(predicate, {
       id: "cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7",
       object: "chat.completion",
       model: "gpt-3.5-turbo",
