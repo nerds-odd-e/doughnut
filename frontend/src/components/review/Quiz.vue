@@ -57,7 +57,7 @@ export default defineComponent({
   },
   computed: {
     currentReviewPointId() {
-      return this.quizQuestions[this.currentIndex] as number;
+      return this.nextReviewPointId(0) as number;
     },
   },
   watch: {
@@ -72,6 +72,15 @@ export default defineComponent({
     },
   },
   methods: {
+    nextReviewPointId(index: number): number | undefined {
+      if (
+        this.quizQuestions &&
+        index + this.currentIndex < this.quizQuestions.length
+      ) {
+        return this.quizQuestions[this.currentIndex + index] as number;
+      }
+      return undefined;
+    },
     selectPosition() {
       if (this.minimized) return;
       this.storageAccessor.selectPosition(
@@ -85,18 +94,19 @@ export default defineComponent({
       if (!this.quizQuestions) {
         return;
       }
-      this.currentQuizQuestion =
-        await this.api.reviewMethods.getRandomQuestionForReviewPoint(
-          this.currentReviewPointId
-        );
+      this.currentQuizQuestion = await this.fetchNextQuestion(0);
       this.selectPosition();
       if (this.eagerFetchCount > 1) {
-        if (this.currentIndex + 1 < this.quizQuestions.length) {
-          await this.api.reviewMethods.getRandomQuestionForReviewPoint(
-            this.quizQuestions[this.currentIndex + 1] as number
-          );
-        }
+        await this.fetchNextQuestion(1);
       }
+    },
+
+    async fetchNextQuestion(index: number) {
+      const next = this.nextReviewPointId(index);
+      if (next) {
+        return this.api.reviewMethods.getRandomQuestionForReviewPoint(next);
+      }
+      return undefined;
     },
 
     onAnswered(answerResult: Generated.AnswerResult) {
