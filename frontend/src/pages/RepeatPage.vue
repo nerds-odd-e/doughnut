@@ -14,7 +14,7 @@
     <Quiz
       v-if="toRepeatCount !== 0"
       :minimized="minimized"
-      :to-repeat="toRepeat"
+      :quiz-questions="toRepeat"
       :storage-accessor="storageAccessor"
       @answered="onAnswered($event)"
     />

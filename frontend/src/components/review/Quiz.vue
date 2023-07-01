@@ -14,7 +14,8 @@
       </template>
       <template
         v-else-if="
-          toRepeat !== undefined && toRepeat.length === currentQuestionIndex
+          quizQuestions !== undefined &&
+          quizQuestions.length === currentQuestionIndex
         "
       >
         <div class="alert alert-success">
@@ -38,7 +39,7 @@ export default defineComponent({
   },
   props: {
     minimized: Boolean,
-    toRepeat: {
+    quizQuestions: {
       type: Object as PropType<number[]>,
       required: true,
     },
@@ -59,7 +60,7 @@ export default defineComponent({
   },
   computed: {
     currentReviewPointId() {
-      return this.toRepeat[this.currentQuestionIndex] as number;
+      return this.quizQuestions[this.currentQuestionIndex] as number;
     },
   },
   watch: {
@@ -83,8 +84,8 @@ export default defineComponent({
 
     async fetchQuestion() {
       if (
-        !this.toRepeat ||
-        this.toRepeat.length === this.currentQuestionIndex
+        !this.quizQuestions ||
+        this.quizQuestions.length === this.currentQuestionIndex
       ) {
         return;
       }

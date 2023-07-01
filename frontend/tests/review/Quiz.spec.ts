@@ -10,7 +10,7 @@ describe("repeat page", () => {
   const mountPage = async () => {
     const wrapper = helper
       .component(Quiz)
-      .withStorageProps({ toRepeat: [1, 2, 3] })
+      .withStorageProps({ quizQuestions: [1, 2, 3] })
       .mount();
     await flushPromises();
     return wrapper;
