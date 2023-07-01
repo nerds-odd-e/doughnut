@@ -94,7 +94,6 @@ export default defineComponent({
     },
 
     async fetchQuestion() {
-      this.currentQuizQuestion = undefined;
       if (!this.quizQuestions) {
         return;
       }
