@@ -49,5 +49,19 @@ describe("repeat page", () => {
         .andReturnOnce(quizQuestion);
       await mountPage([1, 2, 3, 4], 3);
     });
+
+    it("does not fetch question 2 again after prefetched", async () => {
+      helper.apiMock
+        .expectingGet(`/api/review-points/1/random-question`)
+        .andReturnOnce(quizQuestion);
+      helper.apiMock
+        .expectingGet(`/api/review-points/2/random-question`)
+        .andReturnOnce(quizQuestion);
+      const wrapper = await mountPage([1, 2, 3, 4], 2);
+      helper.apiMock
+        .expectingGet(`/api/review-points/3/random-question`)
+        .andReturnOnce(quizQuestion);
+      await wrapper.setProps({ currentIndex: 1 });
+    });
   });
 });

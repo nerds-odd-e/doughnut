@@ -52,12 +52,15 @@ export default defineComponent({
   },
   data() {
     return {
-      currentQuizQuestion: undefined as Generated.QuizQuestion | undefined,
+      quizQuestionCache: new Map<number, Generated.QuizQuestion | undefined>(),
     };
   },
   computed: {
     currentReviewPointId() {
       return this.nextReviewPointId(0) as number;
+    },
+    currentQuizQuestion() {
+      return this.quizQuestionCache.get(this.currentReviewPointId);
     },
   },
   watch: {
@@ -65,6 +68,7 @@ export default defineComponent({
       this.selectPosition();
     },
     QuizQuestions() {
+      this.quizQuestionCache.clear();
       this.fetchQuestion();
     },
     currentIndex() {
@@ -94,7 +98,7 @@ export default defineComponent({
       if (!this.quizQuestions) {
         return;
       }
-      this.currentQuizQuestion = await this.fetchNextQuestion(0);
+      await this.fetchNextQuestion(0);
       this.selectPosition();
       await this.eagerFetch(1);
     },
@@ -109,9 +113,15 @@ export default defineComponent({
     async fetchNextQuestion(index: number) {
       const next = this.nextReviewPointId(index);
       if (next) {
-        return this.api.reviewMethods.getRandomQuestionForReviewPoint(next);
+        if (this.quizQuestionCache.has(next)) {
+          return;
+        }
+        this.quizQuestionCache.set(next, undefined);
+        this.quizQuestionCache.set(
+          next,
+          await this.api.reviewMethods.getRandomQuestionForReviewPoint(next)
+        );
       }
-      return undefined;
     },
 
     onAnswered(answerResult: Generated.AnswerResult) {
