@@ -65,9 +65,7 @@ export default defineComponent({
   },
   watch: {
     minimized() {
-      if (!this.minimized) {
-        this.selectPosition();
-      }
+      this.selectPosition();
     },
     toRepeat() {
       this.currentQuestionIndex = 0;
@@ -76,6 +74,7 @@ export default defineComponent({
   },
   methods: {
     selectPosition() {
+      if (this.minimized) return;
       this.storageAccessor.selectPosition(
         undefined,
         this.currentQuizQuestion?.notebookPosition
