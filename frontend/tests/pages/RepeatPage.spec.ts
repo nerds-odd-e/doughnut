@@ -33,7 +33,7 @@ beforeEach(() => {
   renderer = helper
     .component(RepeatPage)
     .withMockRouterPush(mockRouterPush)
-    .withStorageProps({});
+    .withStorageProps({ eagerFetchCount: 1 });
 });
 
 describe("repeat page", () => {

@@ -16,7 +16,7 @@
       :minimized="minimized"
       :quiz-questions="toRepeat"
       :current-index="currentIndex"
-      :eager-fetch-count="1"
+      :eager-fetch-count="eagerFetchCount ?? 5"
       :storage-accessor="storageAccessor"
       @answered="onAnswered($event)"
     />
@@ -54,6 +54,7 @@ export default defineComponent({
   name: "RepeatPage",
   props: {
     minimized: Boolean,
+    eagerFetchCount: Number,
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,
