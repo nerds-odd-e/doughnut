@@ -5,17 +5,21 @@ declare namespace Generated {
 
     interface AIGeneratedQuestion {
         /**
-         * The question to ask the user
+         * The stem of the multiple-choice question
          */
-        question: string;
+        stem: string;
         /**
-         * The only correct option
+         * The only correct choice
          */
-        correctOption: string;
+        correctChoice: string;
         /**
-         * Some wrong options.
+         * The incorrect choices.
          */
-        wrongOptions: string[];
+        incorrectChoices: string[];
+        /**
+         * Background information or disclosure necessary to clarify the question. Use only if the stem would be unclear or ambiguous without this information. Will be put before stem.
+         */
+        background?: string;
     }
 
     interface AiCompletion {

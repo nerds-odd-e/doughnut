@@ -64,7 +64,9 @@ Cypress.Commands.add(
   "mockChatCompletion",
   { prevSubject: true },
   (serviceMocker: ServiceMocker, prompt: string, reply: string) => {
-    const body = { messages: [{ role: "user", content: new RegExp("^" + Cypress._.escapeRegExp(prompt) + "$") }] }
+    const body = {
+      messages: [{ role: "user", content: new RegExp("^" + Cypress._.escapeRegExp(prompt) + "$") }],
+    }
     const predicate = new FlexiPredicate()
       .withOperator(Operator.matches)
       .withPath(`/v1/chat/completions`)
@@ -77,7 +79,12 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   "mockChatCompletionWithIncompleteAssistantMessage",
   { prevSubject: true },
-  (serviceMocker: ServiceMocker, incomplete: string, reply: string, finishReason: "stop" | "length") => {
+  (
+    serviceMocker: ServiceMocker,
+    incomplete: string,
+    reply: string,
+    finishReason: "stop" | "length",
+  ) => {
     const body = {
       messages: [{ content: "^" + Cypress._.escapeRegExp(incomplete) + "$" }],
     }

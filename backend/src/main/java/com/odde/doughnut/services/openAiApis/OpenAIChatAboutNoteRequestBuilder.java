@@ -31,11 +31,12 @@ public class OpenAIChatAboutNoteRequestBuilder {
     String noteOfCurrentFocus =
         """
 The note of current focus:
+context: %s
 title: %s
 description (until the end of this message):
 %s
       """
-            .formatted(note.getTitle(), note.getTextContent().getDescription());
+            .formatted(this.path, note.getTitle(), note.getTextContent().getDescription());
     messages.add(new ChatMessage(ChatMessageRole.SYSTEM.value(), noteOfCurrentFocus));
     return this;
   }
@@ -56,9 +57,9 @@ description (until the end of this message):
 Please assume the role of a Memory Assistant, which involves helping me review, recall, and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following guidelines:
 
 1. Generate a multiple-choice question based on the note in the current context, where only the top-level context is visible.
-2. Provide 2 to 4 options with only 1 correct answer.
-3. Vary the lengths of the option texts so that the correct answer isn't consistently the longest.
-4. If there's insufficient information in the note to create a question, leave the 'question' field empty.
+2. Provide 2 to 4 choices with only 1 correct answer.
+3. Vary the lengths of the choice texts so that the correct answer isn't consistently the longest.
+4. If there's insufficient information in the note to create a question, leave the 'stem' field empty.
 
 Note: Only the top-level context is visible. The specific note of focus and its more detailed contexts are not known. Focus on memory reinforcement and recall across various subjects.
 """));

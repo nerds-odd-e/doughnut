@@ -28,10 +28,13 @@ public class AiAdvisorService {
 
   public String generateQuestionJsonString(Note note) throws QuizQuestionNotPossibleException {
     JsonNode question = getAiGeneratedQuestion(note);
-    if (question == null || Strings.isBlank(question.get("question").asText(""))) {
-      throw new QuizQuestionNotPossibleException();
+    if (question != null) {
+      JsonNode stem = question.get("stem");
+      if (stem != null && !Strings.isBlank(stem.asText(""))) {
+        return new ObjectMapper().valueToTree(question).toString();
+      }
     }
-    return new ObjectMapper().valueToTree(question).toString();
+    throw new QuizQuestionNotPossibleException();
   }
 
   private JsonNode getAiGeneratedQuestion(Note note) {

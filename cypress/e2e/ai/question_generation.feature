@@ -9,8 +9,8 @@ Feature: Question generation by AI
       | title        | description                                   |
       | Scuba Diving | The most common certification is Rescue Diver.|
     And OpenAI by default returns this question from now:
-      | question                                            | correct_option | wrong_option_1 | wrong_option_2   |
-      | What is the most common scuba diving certification? | Rescue Diver   | Divemaster     | Open Water Diver |
+      | question                                            | correct_choice | incorrect_choice_1 | incorrect_choice_2 |
+      | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
 
   Scenario Outline: testing myself with generated question for a note
     When I ask to generate a question for note "Scuba Diving"
@@ -24,7 +24,7 @@ Feature: Question generation by AI
   Scenario: I should be able to regenerate the question
     Given I ask to generate a question for note "Scuba Diving"
     And OpenAI by default returns this question from now:
-      | question                | correct_option | wrong_option_1 | wrong_option_2   |
-      | How often scuba diving? | daily          | weekly         | never            |
+      | question                | correct_choice | incorrect_choice_1 | incorrect_choice_2 |
+      | How often scuba diving? | daily          | weekly             | never              |
     When I regenerate the question
     Then I should be asked "How often scuba diving?"

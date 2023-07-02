@@ -167,7 +167,7 @@ class RestAiControllerTest {
           .thenReturn(
               buildCompletionResultForAIQuestion(
                   """
-      {"question": "What is the first color in the rainbow?"}
+      {"stem": "What is the first color in the rainbow?"}
       """));
       QuizQuestion quizQuestion = controller.generateQuestion(note);
       assertThat(quizQuestion.getRawJsonQuestion())
@@ -178,7 +178,7 @@ class RestAiControllerTest {
     void createQuizQuestionFailed() throws JsonProcessingException {
       when(openAiApi.createChatCompletion(any()))
           .thenReturn(buildCompletionResultForAIQuestion("""
-{"question": ""}
+{"stem": ""}
 """));
       assertThrows(QuizQuestionNotPossibleException.class, () -> controller.generateQuestion(note));
     }
@@ -193,7 +193,7 @@ class RestAiControllerTest {
                   })))
           .thenReturn(
               buildCompletionResultForAIQuestion("""
-{"question": "what is it?"}
+{"stem": "what is it?"}
             """));
       controller.generateQuestion(note);
     }

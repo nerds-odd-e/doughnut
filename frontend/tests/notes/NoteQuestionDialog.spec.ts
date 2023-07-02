@@ -7,9 +7,9 @@ import helper from "../helpers";
 helper.resetWithApiMock(beforeEach, afterEach);
 
 const goodQuestion: Generated.AIGeneratedQuestion = {
-  question: "any question?",
-  correctOption: "option A",
-  wrongOptions: ["option B", "option C"],
+  stem: "any question?",
+  correctChoice: "option A",
+  incorrectChoices: ["option B", "option C"],
 };
 
 const createWrapper = async () => {

@@ -39,13 +39,16 @@ Given("OpenAI always return image of a moon", () => {
   cy.openAiService().stubCreateImage()
 })
 
-Given("OpenAI returns an incomplete text completion {string} for assistant message {string}", (description: string, assistantMessage: string) => {
-  cy.openAiService().mockChatCompletionWithIncompleteAssistantMessage(
-    assistantMessage,
-    description,
-    "length",
-  )
-})
+Given(
+  "OpenAI returns an incomplete text completion {string} for assistant message {string}",
+  (description: string, assistantMessage: string) => {
+    cy.openAiService().mockChatCompletionWithIncompleteAssistantMessage(
+      assistantMessage,
+      description,
+      "length",
+    )
+  },
+)
 
 Given("An OpenAI response is unavailable", () => {
   cy.openAiService().stubOpenAiCompletionWithErrorResponse()
@@ -54,9 +57,9 @@ Given("An OpenAI response is unavailable", () => {
 Given("OpenAI by default returns this question from now:", (questionTable: DataTable) => {
   const record = questionTable.hashes()[0]
   const reply = JSON.stringify({
-    question: record.question,
-    correctOption: record.correct_option,
-    wrongOptions: [record.wrong_option_1, record.wrong_option_2],
+    stem: record.question,
+    correctChoice: record.correct_choice,
+    incorrectChoices: [record.incorrect_choice_1, record.incorrect_choice_2],
   })
   cy.openAiService().restartImposter()
   cy.openAiService().stubChatCompletionFunctionCall(

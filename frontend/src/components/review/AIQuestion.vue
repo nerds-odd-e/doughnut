@@ -1,4 +1,7 @@
 <template>
+  <p v-if="background">
+    {{ background }}
+  </p>
   <h3>
     {{ questionDescription }}
   </h3>
@@ -33,12 +36,12 @@ export default defineComponent({
       this.rawJsonQuestion
     ) as Generated.AIGeneratedQuestion;
     return {
-      question: aiQuestion,
-      questionDescription: aiQuestion.question,
-      correctOption: aiQuestion.correctOption,
+      background: aiQuestion.background,
+      questionDescription: aiQuestion.stem,
+      correctOption: aiQuestion.correctChoice,
       options: _.shuffle([
-        ...aiQuestion.wrongOptions,
-        aiQuestion.correctOption,
+        ...aiQuestion.incorrectChoices,
+        aiQuestion.correctChoice,
       ]),
       selectedOptionIndex: undefined as number | undefined,
     };
