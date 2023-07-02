@@ -6,6 +6,8 @@ interface ApiMockBuilder {
   andReturnOnce(value: any): ApiMockExpectation;
   andRespondOnceWith404(): void;
   andRespondOnce(response: MockResponseInit): void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  andRespondWithPromiseResolve(resolve: () => any): void;
 }
 
 interface ApiMock {

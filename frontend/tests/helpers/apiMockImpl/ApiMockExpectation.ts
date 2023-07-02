@@ -6,6 +6,8 @@ class ApiMockExpectation {
 
   response?: MockParams | string;
 
+  resolve?: (request: Request) => MockParams | undefined;
+
   method: HttpMethod;
 
   actual?: Request;
@@ -13,6 +15,21 @@ class ApiMockExpectation {
   constructor(url: string, method: HttpMethod) {
     this.url = url;
     this.method = method;
+  }
+
+  getResponse(
+    request: Request
+  ): MockParams | string | Promise<MockParams | string> {
+    if (this.resolve) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          if (this.resolve) {
+            resolve(this.resolve(request) ?? "{}");
+          }
+        }, 0);
+      });
+    }
+    return this.response ?? "{}";
   }
 
   matchExpectation(request: Request): boolean {

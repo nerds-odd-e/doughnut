@@ -29,7 +29,7 @@ class ApiMockImpl implements ApiMock {
       );
       this.actualApiCalls.push(request);
       if (matched) {
-        return matched.response ?? "{}";
+        return matched.getResponse(request);
       }
       this.previousError = new Error(
         `Unexpected API call: '${requestDescription(request)}'`
