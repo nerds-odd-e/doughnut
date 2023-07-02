@@ -23,8 +23,8 @@ class ApiMockBuilderImpl implements ApiMockBuilder {
     return this.expectation;
   }
 
-  andRespondWithPromiseResolve(
-    resolve: (request: Request) => MockResponseInit | undefined
+  andRespondWithAsyncPromiseResolve(
+    resolve: (request: Request) => MockResponseInit | void
   ): ApiMockExpectation {
     this.expectation.resolve = resolve;
     return this.expectation;

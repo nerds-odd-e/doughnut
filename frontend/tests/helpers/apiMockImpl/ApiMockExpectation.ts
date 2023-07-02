@@ -6,7 +6,7 @@ class ApiMockExpectation {
 
   response?: MockParams | string;
 
-  resolve?: (request: Request) => MockParams | undefined;
+  resolve?: (request: Request) => MockParams | void;
 
   method: HttpMethod;
 
