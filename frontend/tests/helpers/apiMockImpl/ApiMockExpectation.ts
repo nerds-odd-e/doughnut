@@ -4,10 +4,7 @@ import { HttpMethod } from "../../../src/managedApi/window/RestfulFetch";
 class ApiMockExpectation {
   url: string;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  value: any;
-
-  response?: MockParams;
+  response?: MockParams | string;
 
   method: HttpMethod;
 
@@ -15,7 +12,6 @@ class ApiMockExpectation {
 
   constructor(url: string, method: HttpMethod) {
     this.url = url;
-    this.value = {};
     this.method = method;
   }
 

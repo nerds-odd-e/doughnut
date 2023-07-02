@@ -3,7 +3,7 @@ import { ApiMockBuilder } from "../ApiMock";
 import ApiMockExpectation from "./ApiMockExpectation";
 
 class ApiMockBuilderImpl implements ApiMockBuilder {
-  expectation;
+  expectation: ApiMockExpectation;
 
   constructor(expectation: ApiMockExpectation) {
     this.expectation = expectation;
@@ -19,7 +19,7 @@ class ApiMockBuilderImpl implements ApiMockBuilder {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   andReturnOnce(value: any): ApiMockExpectation {
-    this.expectation.value = value;
+    this.expectation.response = JSON.stringify(value);
     return this.expectation;
   }
 }
