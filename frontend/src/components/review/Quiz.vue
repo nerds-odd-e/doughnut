@@ -118,7 +118,9 @@ export default defineComponent({
         this.quizQuestionCache.set(next, undefined);
         this.quizQuestionCache.set(
           next,
-          await this.api.reviewMethods.getRandomQuestionForReviewPoint(next)
+          await this.silentApi.reviewMethods.getRandomQuestionForReviewPoint(
+            next
+          )
         );
       }
     },

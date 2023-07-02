@@ -19,6 +19,17 @@ describe("managdApi", () => {
       expect(interimStateLength).toBeGreaterThan(0);
       expect(apiStatus.states.length).toBe(0);
     });
+
+    it("should not set the loading status in silent mode", async () => {
+      let interimStateLength = 0;
+      helper.apiMock
+        .expectingGet(`/api/call`)
+        .andRespondWithPromiseResolve(() => {
+          interimStateLength = apiStatus.states.length;
+        });
+      await managedApi.silent.restGet(`/api/call`);
+      expect(interimStateLength).toBe(0);
+    });
   });
 
   describe("collect error msg", () => {

@@ -16,12 +16,20 @@ class ManagedApi {
 
   api: Api;
 
-  constructor(apiStatus: ApiStatus) {
+  private silentMode?: boolean;
+
+  constructor(apiStatus: ApiStatus, silent?: boolean) {
     this.apiStatus = apiStatus;
     this.api = new Api("/api/");
+    this.silentMode = silent;
+  }
+
+  get silent(): ManagedApi {
+    return new ManagedApi(this.apiStatus, true);
   }
 
   private assignLoading(value: boolean) {
+    if (this.silentMode) return;
     if (value) {
       this.apiStatus.states.push(true);
     } else {

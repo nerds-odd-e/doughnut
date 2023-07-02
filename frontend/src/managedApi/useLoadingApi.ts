@@ -10,6 +10,9 @@ export function withLoadingApi(managedApi: ManagedApi) {
     get api(): ReturnType<typeof apiCollection> {
       return apiCollection(this.managedApi);
     },
+    get silentApi(): ReturnType<typeof apiCollection> {
+      return apiCollection(this.managedApi.silent);
+    },
   };
 }
 
