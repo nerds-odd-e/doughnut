@@ -61,7 +61,7 @@
     "vite-plugin-compression": "^0.5",
     "vite-plugin-eslint": "^1.8",
     "vite-tsconfig-paths": "^4.2.0",
-    "vitest": "0.32.2",
+    "vitest": "0.32.3",
     "vitest-dom": "^0.1",
     "vitest-fetch-mock": "^0.2.2",
     "vue-tsc": "1.8.3"
