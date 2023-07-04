@@ -64,6 +64,15 @@
       $emit('update:modelValue', { ...modelValue, skipReview: $event })
     "
   />
+  <TextInput
+    scope-name="note"
+    field="instruction"
+    :model-value="modelValue.instruction"
+    :errors="errors.url"
+    @update:model-value="
+      $emit('update:modelValue', { ...modelValue, instruction: $event })
+    "
+  />
 </template>
 
 <script lang="ts">

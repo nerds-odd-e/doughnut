@@ -59,6 +59,11 @@ public class NoteAccessories {
   @Setter
   private Boolean skipReview = false;
 
+  @Column(name = "instruction")
+  @Getter
+  @Setter
+  private String instruction;
+
   @JsonIgnore @Transient @Getter @Setter private MultipartFile uploadPictureProxy;
 
   @Column(name = "updated_at")
