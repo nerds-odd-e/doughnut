@@ -49,6 +49,10 @@ export default defineComponent({
   methods: {
     selectOption(optionIndex: number) {
       this.selectedOptionIndex = optionIndex;
+      const btn = document.getElementById("generateBtn");
+      if (btn != null) {
+        btn.style.display = "none";
+      }
       this.$emit(
         "selfEvaluatedMemoryState",
         this.isOptionCorrect(this.options[optionIndex]) ? "yes" : "no"
