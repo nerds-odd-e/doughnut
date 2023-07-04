@@ -6,8 +6,8 @@ Feature: Question generation by AI
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user
-      | title        | description                                   |
-      | Scuba Diving | The most common certification is Rescue Diver.|
+      | title        | description                                    |
+      | Scuba Diving | The most common certification is Rescue Diver. |
     And OpenAI by default returns this question from now:
       | question                                            | correct_choice | incorrect_choice_1 | incorrect_choice_2 |
       | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
@@ -22,6 +22,15 @@ Feature: Question generation by AI
       | Divemaster   | wrong          |
 
   Scenario: I should be able to regenerate the question
+    Given I ask to generate a question for note "Scuba Diving"
+    And OpenAI by default returns this question from now:
+      | question                | correct_choice | incorrect_choice_1 | incorrect_choice_2 |
+      | How often scuba diving? | daily          | weekly             | never              |
+    When I regenerate the question
+    Then I should be asked "How often scuba diving?"
+
+  @ignore
+  Scenario:  I should be able to regenerate the question when the question and choices do not make sense
     Given I ask to generate a question for note "Scuba Diving"
     And OpenAI by default returns this question from now:
       | question                | correct_choice | incorrect_choice_1 | incorrect_choice_2 |
