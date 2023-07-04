@@ -28,3 +28,8 @@ Feature: Question generation by AI
       | How often scuba diving? | daily          | weekly             | never              |
     When I regenerate the question
     Then I should be asked "How often scuba diving?"
+
+  @ignore
+  Scenario: I should be able to affect the question using note instruction
+    When Note "Scuba Diving" has instruction "Location is Singapore, amongst the ships off the East Coast Park."
+    Then Question generated from the note "Scuba Diving" is "Is the water clean for Scuba Diving in Singapore?"
