@@ -3,7 +3,9 @@
   <div v-else>
     <AIQuestion :raw-json-question="rawJsonQuestion" :key="numberOfTries" />
   </div>
-  <button class="btn btn-secondary" @click="generateQuestion">Ask again</button>
+  <button class="btn btn-secondary" @click="generateQuestion">
+    Doesn't make sense?
+  </button>
 </template>
 
 <script lang="ts">
