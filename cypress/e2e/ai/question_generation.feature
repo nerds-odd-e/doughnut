@@ -21,13 +21,15 @@ Feature: Question generation by AI
       | Rescue Diver | correct        |
       | Divemaster   | wrong          |
 
-  Scenario: I should be able to regenerate the question
-    Given I ask to generate a question for note "Scuba Diving"
+  @ignore
+  Scenario: I should be able to regenerate the question when the question and choices do not make sense
+    Given I have a note with title "Mike likes elephants and tigers, hates dogs."
     And OpenAI by default returns this question from now:
       | question                | correct_choice | incorrect_choice_1 | incorrect_choice_2 |
       | How often scuba diving? | daily          | weekly             | never              |
-    When I regenerate the question
-    Then I should be asked "How often scuba diving?"
+    And openAI thinks its question doesn't make sense
+    When I ask it to regenerete the question while testing myself
+    Then I should be asked with a new question "what does Mike like" with choices "Elephants", "Dogs", "Tigers"
 
   @ignore
   Scenario: I should be able to affect the question using note instruction
@@ -42,3 +44,12 @@ Feature: Question generation by AI
       | How often scuba diving? | daily          | weekly             | never              |
     When I regenerate the question
     Then I should be asked "How often scuba diving?"
+  @ignore
+  Scenario: I should be able to regenerate the question when I think the question and choices do not make sense
+    Given I have a note with title "Mike likes elephants and tigers, hates dogs."
+    And openAI provide question as:
+      | question            | correct_choice | incorrect_choice_1 | incorrect_choice_2 |
+      | what does Mike hate | dogs           | elephants          | tigers             |
+    And openAI insist its question makes sense
+    When I ask it to regenerete the question while testing myself
+    Then I should be asked with the same question

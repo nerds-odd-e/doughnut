@@ -85,6 +85,6 @@ Then("it should consider the context {string}", (path: string) => {
   cy.openAiService().thePreviousRequestShouldHaveIncludedPathInfo(path);
 });
 
-Then("I regenerate the question", () => {
+Then("I ask it to regenerete the question while testing myself", () => {
   cy.findByRole("button", { name: "Doesn't make sense?" }).click();
 });
