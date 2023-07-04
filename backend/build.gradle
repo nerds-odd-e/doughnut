@@ -19,8 +19,10 @@ apply plugin: 'cz.habarta.typescript-generator'
 
 group = 'com.odde'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = 17
-targetCompatibility = 17
+java {
+  sourceCompatibility = 17
+  targetCompatibility = 17
+}
 
 configurations {
   compileOnly {
