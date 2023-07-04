@@ -12,7 +12,7 @@ describe("managdApi", () => {
       let interimStateLength = 0;
       helper.apiMock
         .expectingGet(`/api/call`)
-        .andRespondWithAsyncPromiseResolve((_) => {
+        .andRespondWithAsyncPromiseResolve(() => {
           interimStateLength = apiStatus.states.length;
         });
       await managedApi.restGet(`/api/call`);
