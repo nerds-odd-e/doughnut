@@ -307,6 +307,7 @@ declare namespace Generated {
         pictureMask: string;
         useParentPicture: boolean;
         skipReview: boolean;
+        instruction: string;
         updatedAt: string;
     }
 
