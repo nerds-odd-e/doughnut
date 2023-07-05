@@ -19,7 +19,7 @@ class NoteBuilder extends Builder<Generated.Note> {
         useParentPicture: false,
         skipReview: false,
         updatedAt: "",
-        instruction: "",
+        questionGenerationInstruction: "",
       },
       textContent: {
         title: "Note1.1.1",

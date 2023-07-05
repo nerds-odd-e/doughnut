@@ -62,7 +62,7 @@ public class NoteAccessories {
   @Column(name = "instruction")
   @Getter
   @Setter
-  private String instruction;
+  private String questionGenerationInstruction;
 
   @JsonIgnore @Transient @Getter @Setter private MultipartFile uploadPictureProxy;
 

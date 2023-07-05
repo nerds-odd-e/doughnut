@@ -110,7 +110,7 @@ class TestabilityRestController {
       content.setUrl(url);
       content.setPictureMask(pictureMask);
       content.setPictureUrl(pictureUrl);
-      content.setInstruction(instruction);
+      content.setQuestionGenerationInstruction(instruction);
 
       note.setWikidataId(wikidataId);
       note.setNoteAccessoriesUpdatedAt(currentUTCTimestamp);
