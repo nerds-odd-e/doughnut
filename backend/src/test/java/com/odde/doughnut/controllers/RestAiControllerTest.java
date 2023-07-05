@@ -1,6 +1,8 @@
 package com.odde.doughnut.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.not;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -10,6 +12,7 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.json.AiCompletion;
 import com.odde.doughnut.entities.json.AiCompletionRequest;
 import com.odde.doughnut.entities.json.QuizQuestion;
@@ -160,7 +163,18 @@ class RestAiControllerTest {
               new RestAiController(openAiApi, makeMe.modelFactoryService, makeMe.aNullUserModel())
                   .generateQuestion(note));
     }
-
+    @Test
+    void regenerateQuizQuestion() throws JsonProcessingException, QuizQuestionNotPossibleException {
+      when(openAiApi.createChatCompletion(any()))
+        .thenReturn(
+          buildCompletionResultForAIQuestion(
+            """
+{"stem": "What is the first color in the rainbow?", "correctChoice": "white", "incorrectChoices": ["black", "green"]}
+"""));
+      QuizQuestion question = controller.generateQuestion(note);
+      QuizQuestion quizQuestion = controller.regenerateQuestion(note, question);
+      assertThat(quizQuestion.getRawJsonQuestion()).isEqualTo(question.getRawJsonQuestion());
+    }
     @Test
     void createQuizQuestion() throws JsonProcessingException, QuizQuestionNotPossibleException {
       when(openAiApi.createChatCompletion(any()))

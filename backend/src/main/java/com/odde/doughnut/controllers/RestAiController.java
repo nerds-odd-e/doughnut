@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.json.AiCompletion;
@@ -51,6 +52,23 @@ public class RestAiController {
     return modelFactoryService.toQuizQuestion(quizQuestionEntity, currentUser.getEntity());
   }
 
+  public String combineNoteAndQuestion(@RequestParam(value = "note") Note note, @RequestParam(value = "question") QuizQuestion question)
+    throws QuizQuestionNotPossibleException {
+    currentUser.assertLoggedIn();
+    // TODO
+    return question.toString();
+  }
+
+  @PostMapping("/regenerate-question")
+  public QuizQuestion regenerateQuestion(@RequestParam(value = "note") Note note,@RequestParam(value = "question") QuizQuestion question)
+    throws QuizQuestionNotPossibleException {
+    currentUser.assertLoggedIn();
+    String rawJsonQuestion = aiAdvisorService.regenerateQuestionJsonString(note, question);
+    QuizQuestionEntity quizQuestionEntity = new QuizQuestionEntity();
+    quizQuestionEntity.setQuestionType(QuizQuestionEntity.QuestionType.AI_QUESTION);
+    quizQuestionEntity.setRawJsonQuestion(rawJsonQuestion);
+    return modelFactoryService.toQuizQuestion(quizQuestionEntity, currentUser.getEntity());
+  }
   @PostMapping("/generate-image")
   public AiGeneratedImage generateImage(@RequestBody AiCompletionRequest aiCompletionRequest) {
     currentUser.assertLoggedIn();

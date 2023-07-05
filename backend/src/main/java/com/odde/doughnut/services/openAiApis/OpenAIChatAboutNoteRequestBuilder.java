@@ -3,6 +3,7 @@ package com.odde.doughnut.services.openAiApis;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AIGeneratedQuestion;
 import com.odde.doughnut.entities.json.AiCompletionRequest;
+import com.odde.doughnut.entities.json.QuizQuestion;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatFunction;
 import com.theokanning.openai.completion.chat.ChatMessage;
@@ -73,6 +74,32 @@ Note: Only the top-level context is visible. The specific note of focus and its 
 """
                 .formatted(point6)));
 
+    return this;
+  }
+
+  public OpenAIChatAboutNoteRequestBuilder questionTheQuestion(QuizQuestion question) {
+
+    askSingleAnswerMultipleChoiceQuestion =
+      ChatFunction.builder()
+        .name("ask_single_answer_multiple_choice_question")
+        .description(question.getRawJsonQuestion() + " Does the above question make sense?")
+        .executor(AIGeneratedQuestion.class, null)
+        .build();
+
+    messages.add(
+      new ChatMessage(
+        ChatMessageRole.USER.value(),
+        """
+Please assume the role of a Memory Assistant, which involves helping me review, recall, and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following guidelines:
+
+1. Generate a multiple-choice question if the previous question does not make sense in the current context of the note
+2. Only the top-level context is visible to the user, use background if more information is needed to make the question stem clear.
+3. Provide 2 to 4 choices with only 1 correct answer.
+4. Vary the lengths of the choice texts so that the correct answer isn't consistently the longest.
+5. If there's insufficient information in the note to create a question, leave the 'stem' field empty.
+
+Note: Only the top-level context is visible. The specific note of focus and its more detailed contexts are not known. Focus on memory reinforcement and recall across various subjects.
+"""));
     return this;
   }
 

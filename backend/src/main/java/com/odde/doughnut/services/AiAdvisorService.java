@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AiCompletion;
 import com.odde.doughnut.entities.json.AiCompletionRequest;
+import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.services.openAiApis.OpenAIChatAboutNoteRequestBuilder;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
@@ -37,6 +38,17 @@ public class AiAdvisorService {
     throw new QuizQuestionNotPossibleException();
   }
 
+  public String regenerateQuestionJsonString(Note note, QuizQuestion prevQuestion) throws QuizQuestionNotPossibleException {
+    JsonNode question = getAiGeneratedQuestion(note, prevQuestion);
+    if (question != null) {
+      JsonNode stem = question.get("stem");
+      if (stem != null && !Strings.isBlank(stem.asText(""))) {
+        return new ObjectMapper().valueToTree(question).toString();
+      }
+    }
+    throw new QuizQuestionNotPossibleException();
+  }
+
   private JsonNode getAiGeneratedQuestion(Note note) {
     ChatCompletionRequest chatRequest =
         new OpenAIChatAboutNoteRequestBuilder(note.getPath())
@@ -50,6 +62,21 @@ public class AiAdvisorService {
         .map(ChatMessage::getFunctionCall)
         .map(ChatFunctionCall::getArguments)
         .orElse(null);
+  }
+
+  private JsonNode getAiGeneratedQuestion(Note note, QuizQuestion question) {
+    ChatCompletionRequest chatRequest =
+      new OpenAIChatAboutNoteRequestBuilder(note.getPath())
+        .detailsOfNoteOfCurrentFocus(note)
+        .questionTheQuestion(question)
+        .maxTokens(1500)
+        .build();
+    return openAiApiHandler
+      .chatCompletion(chatRequest)
+      .map(ChatCompletionChoice::getMessage)
+      .map(ChatMessage::getFunctionCall)
+      .map(ChatFunctionCall::getArguments)
+      .orElse(null);
   }
 
   public AiCompletion getAiCompletion(AiCompletionRequest aiCompletionRequest, String notePath) {
