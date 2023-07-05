@@ -66,11 +66,14 @@
   />
   <TextInput
     scope-name="note"
-    field="instruction"
-    :model-value="modelValue.instruction"
-    :errors="errors.url"
+    field="questionGenerationInstruction"
+    :model-value="modelValue.questionGenerationInstruction"
+    :errors="errors.questionGenerationInstruction"
     @update:model-value="
-      $emit('update:modelValue', { ...modelValue, instruction: $event })
+      $emit('update:modelValue', {
+        ...modelValue,
+        questionGenerationInstruction: $event,
+      })
     "
   />
 </template>
