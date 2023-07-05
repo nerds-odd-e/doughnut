@@ -41,7 +41,7 @@ description (until the end of this message):
     return this;
   }
 
-  public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestion() {
+  public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestion(Note note) {
 
     askSingleAnswerMultipleChoiceQuestion =
         ChatFunction.builder()
@@ -49,6 +49,8 @@ description (until the end of this message):
             .description("Ask a single-answer multiple-choice question to the user")
             .executor(AIGeneratedQuestion.class, null)
             .build();
+
+    String point6 = Strings.isBlank(note.getNoteAccessories().getQuestionGenerationInstruction()) ? "" : "6. Generate the question that is related to "+note.getNoteAccessories().getQuestionGenerationInstruction();
 
     messages.add(
         new ChatMessage(
@@ -61,9 +63,11 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
 3. Provide 2 to 4 choices with only 1 correct answer.
 4. Vary the lengths of the choice texts so that the correct answer isn't consistently the longest.
 5. If there's insufficient information in the note to create a question, leave the 'stem' field empty.
+%s
 
 Note: Only the top-level context is visible. The specific note of focus and its more detailed contexts are not known. Focus on memory reinforcement and recall across various subjects.
-"""));
+""".formatted(point6)));
+
     return this;
   }
 
