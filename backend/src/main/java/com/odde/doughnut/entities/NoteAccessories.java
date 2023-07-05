@@ -59,7 +59,7 @@ public class NoteAccessories {
   @Setter
   private Boolean skipReview = false;
 
-  @Column(name = "instruction")
+  @Column(name = "question_generation_instruction")
   @Getter
   @Setter
   private String questionGenerationInstruction;
