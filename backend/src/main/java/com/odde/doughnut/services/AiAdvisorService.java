@@ -38,7 +38,8 @@ public class AiAdvisorService {
     throw new QuizQuestionNotPossibleException();
   }
 
-  public String regenerateQuestionJsonString(Note note, QuizQuestion prevQuestion) throws QuizQuestionNotPossibleException {
+  public String regenerateQuestionJsonString(Note note, QuizQuestion prevQuestion)
+      throws QuizQuestionNotPossibleException {
     JsonNode question = getAiGeneratedQuestion(note, prevQuestion);
     if (question != null) {
       JsonNode stem = question.get("stem");
@@ -66,17 +67,17 @@ public class AiAdvisorService {
 
   private JsonNode getAiGeneratedQuestion(Note note, QuizQuestion question) {
     ChatCompletionRequest chatRequest =
-      new OpenAIChatAboutNoteRequestBuilder(note.getPath())
-        .detailsOfNoteOfCurrentFocus(note)
-        .questionTheQuestion(question)
-        .maxTokens(1500)
-        .build();
+        new OpenAIChatAboutNoteRequestBuilder(note.getPath())
+            .detailsOfNoteOfCurrentFocus(note)
+            .questionTheQuestion(question)
+            .maxTokens(1500)
+            .build();
     return openAiApiHandler
-      .chatCompletion(chatRequest)
-      .map(ChatCompletionChoice::getMessage)
-      .map(ChatMessage::getFunctionCall)
-      .map(ChatFunctionCall::getArguments)
-      .orElse(null);
+        .chatCompletion(chatRequest)
+        .map(ChatCompletionChoice::getMessage)
+        .map(ChatMessage::getFunctionCall)
+        .map(ChatFunctionCall::getArguments)
+        .orElse(null);
   }
 
   public AiCompletion getAiCompletion(AiCompletionRequest aiCompletionRequest, String notePath) {

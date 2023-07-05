@@ -80,16 +80,16 @@ Note: Only the top-level context is visible. The specific note of focus and its 
   public OpenAIChatAboutNoteRequestBuilder questionTheQuestion(QuizQuestion question) {
 
     askSingleAnswerMultipleChoiceQuestion =
-      ChatFunction.builder()
-        .name("ask_single_answer_multiple_choice_question")
-        .description(question.getRawJsonQuestion() + " Does the above question make sense?")
-        .executor(AIGeneratedQuestion.class, null)
-        .build();
+        ChatFunction.builder()
+            .name("ask_single_answer_multiple_choice_question")
+            .description(question.getRawJsonQuestion() + " Does the above question make sense?")
+            .executor(AIGeneratedQuestion.class, null)
+            .build();
 
     messages.add(
-      new ChatMessage(
-        ChatMessageRole.USER.value(),
-        """
+        new ChatMessage(
+            ChatMessageRole.USER.value(),
+            """
 Please assume the role of a Memory Assistant, which involves helping me review, recall, and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following guidelines:
 
 1. Generate a multiple-choice question if the previous question does not make sense in the current context of the note
