@@ -50,7 +50,11 @@ description (until the end of this message):
             .executor(AIGeneratedQuestion.class, null)
             .build();
 
-    String point6 = Strings.isBlank(note.getNoteAccessories().getQuestionGenerationInstruction()) ? "" : "6. Generate the question that is related to "+note.getNoteAccessories().getQuestionGenerationInstruction();
+    String point6 =
+        Strings.isBlank(note.getNoteAccessories().getQuestionGenerationInstruction())
+            ? ""
+            : "6. Generate the question that is related to "
+                + note.getNoteAccessories().getQuestionGenerationInstruction();
 
     messages.add(
         new ChatMessage(
@@ -66,7 +70,8 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
 %s
 
 Note: Only the top-level context is visible. The specific note of focus and its more detailed contexts are not known. Focus on memory reinforcement and recall across various subjects.
-""".formatted(point6)));
+"""
+                .formatted(point6)));
 
     return this;
   }
