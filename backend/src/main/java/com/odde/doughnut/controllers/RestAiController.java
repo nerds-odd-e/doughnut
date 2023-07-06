@@ -43,30 +43,20 @@ public class RestAiController {
   @PostMapping("/generate-question")
   public QuizQuestion generateQuestion(@RequestParam(value = "note") Note note)
       throws QuizQuestionNotPossibleException {
-    currentUser.assertLoggedIn();
-    String rawJsonQuestion = aiAdvisorService.generateQuestionJsonString(note);
-    QuizQuestionEntity quizQuestionEntity = new QuizQuestionEntity();
-    quizQuestionEntity.setQuestionType(QuizQuestionEntity.QuestionType.AI_QUESTION);
-    quizQuestionEntity.setRawJsonQuestion(rawJsonQuestion);
-    return modelFactoryService.toQuizQuestion(quizQuestionEntity, currentUser.getEntity());
-  }
-
-  public String combineNoteAndQuestion(
-      @RequestParam(value = "note") Note note,
-      @RequestParam(value = "question") QuizQuestion question)
-      throws QuizQuestionNotPossibleException {
-    currentUser.assertLoggedIn();
-    // TODO
-    return question.toString();
+    return getQuizQuestion(note, null);
   }
 
   @PostMapping("/regenerate-question")
   public QuizQuestion regenerateQuestion(
-      @RequestParam(value = "note") Note note,
-      @RequestParam(value = "question") QuizQuestion question)
-      throws QuizQuestionNotPossibleException {
+    @RequestParam(value = "note") Note note,
+    @RequestParam(value = "question") QuizQuestion question)
+    throws QuizQuestionNotPossibleException {
+    return getQuizQuestion(note, question);
+  }
+
+  private QuizQuestion getQuizQuestion(Note note, QuizQuestion question) throws QuizQuestionNotPossibleException {
     currentUser.assertLoggedIn();
-    String rawJsonQuestion = aiAdvisorService.regenerateQuestionJsonString(note, question);
+    String rawJsonQuestion = aiAdvisorService.generateQuestionJsonString(note, question);
     QuizQuestionEntity quizQuestionEntity = new QuizQuestionEntity();
     quizQuestionEntity.setQuestionType(QuizQuestionEntity.QuestionType.AI_QUESTION);
     quizQuestionEntity.setRawJsonQuestion(rawJsonQuestion);

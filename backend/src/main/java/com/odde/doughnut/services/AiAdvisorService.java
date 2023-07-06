@@ -28,17 +28,10 @@ public class AiAdvisorService {
   }
 
   public String generateQuestionJsonString(Note note) throws QuizQuestionNotPossibleException {
-    JsonNode question = getAiGeneratedQuestion(note);
-    if (question != null) {
-      JsonNode stem = question.get("stem");
-      if (stem != null && !Strings.isBlank(stem.asText(""))) {
-        return new ObjectMapper().valueToTree(question).toString();
-      }
-    }
-    throw new QuizQuestionNotPossibleException();
+    return generateQuestionJsonString(note, null);
   }
 
-  public String regenerateQuestionJsonString(Note note, QuizQuestion prevQuestion)
+  public String generateQuestionJsonString(Note note, QuizQuestion prevQuestion)
       throws QuizQuestionNotPossibleException {
     JsonNode question = getAiGeneratedQuestion(note, prevQuestion);
     if (question != null) {
@@ -50,28 +43,16 @@ public class AiAdvisorService {
     throw new QuizQuestionNotPossibleException();
   }
 
-  private JsonNode getAiGeneratedQuestion(Note note) {
-    ChatCompletionRequest chatRequest =
-        new OpenAIChatAboutNoteRequestBuilder(note.getPath())
-            .detailsOfNoteOfCurrentFocus(note)
-            .userInstructionToGenerateQuestion(note)
-            .maxTokens(1500)
-            .build();
-    return openAiApiHandler
-        .chatCompletion(chatRequest)
-        .map(ChatCompletionChoice::getMessage)
-        .map(ChatMessage::getFunctionCall)
-        .map(ChatFunctionCall::getArguments)
-        .orElse(null);
-  }
-
   private JsonNode getAiGeneratedQuestion(Note note, QuizQuestion question) {
-    ChatCompletionRequest chatRequest =
-        new OpenAIChatAboutNoteRequestBuilder(note.getPath())
-            .detailsOfNoteOfCurrentFocus(note)
-            .questionTheQuestion(question)
-            .maxTokens(1500)
-            .build();
+    ChatCompletionRequest chatRequest;
+
+    chatRequest =
+      new OpenAIChatAboutNoteRequestBuilder(note.getPath())
+        .detailsOfNoteOfCurrentFocus(note)
+        .userInstructionToGenerateQuestion(note,question)
+        .maxTokens(1500)
+        .build();
+
     return openAiApiHandler
         .chatCompletion(chatRequest)
         .map(ChatCompletionChoice::getMessage)
