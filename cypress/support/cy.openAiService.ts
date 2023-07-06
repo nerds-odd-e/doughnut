@@ -127,17 +127,21 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   "stubChatCompletionFunctionCall",
   { prevSubject: true },
-  (serviceMocker: ServiceMocker, functionName: string, argumentsString: string, bodyContains: string | null = null) => {
-    
-    let predicate;
+  (
+    serviceMocker: ServiceMocker,
+    functionName: string,
+    argumentsString: string,
+    bodyContains: string | null = null,
+  ) => {
+    let predicate
     if (bodyContains === null) {
       predicate = new DefaultPredicate(`/v1/chat/completions`, HttpMethod.POST)
     } else {
       predicate = new FlexiPredicate()
         .withMethod(HttpMethod.POST)
-        .withPath('v1/chat/completions')
+        .withPath("v1/chat/completions")
         .withOperator(Operator.contains)
-        .withBody(bodyContains);
+        .withBody(bodyContains)
     }
 
     return serviceMocker.mockWithPredicate(predicate, {
