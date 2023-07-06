@@ -3,7 +3,11 @@
   <div v-else>
     <AIQuestion :raw-json-question="rawJsonQuestion" :key="numberOfTries" />
   </div>
-  <button id="generateBtn" class="btn btn-secondary" @click="generateQuestion">
+  <button
+    id="generateBtn"
+    class="btn btn-secondary"
+    @click="regenerateQuestion"
+  >
     Doesn't make sense?
   </button>
 </template>
@@ -43,6 +47,15 @@ export default defineComponent({
       this.quizQuestion = await this.api.ai.askAIToGenerateQuestion(
         this.selectedNote.id
       );
+      this.numberOfTries += 1;
+    },
+    async regenerateQuestion() {
+      if (this.quizQuestion !== undefined) {
+        this.quizQuestion = await this.api.ai.askAIToRegenerateQuestion(
+          this.selectedNote.id,
+          this.quizQuestion
+        );
+      }
       this.numberOfTries += 1;
     },
   },

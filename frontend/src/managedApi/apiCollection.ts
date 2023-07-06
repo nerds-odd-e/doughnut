@@ -304,7 +304,15 @@ const apiCollection = (managedApi: ManagedApi) => ({
         {}
       )) as Generated.QuizQuestion;
     },
-
+    async askAIToRegenerateQuestion(
+      noteId: Doughnut.ID,
+      question: Generated.QuizQuestion
+    ): Promise<Generated.QuizQuestion> {
+      return (await managedApi.restPost(
+        `ai/regenerate-question?note=${noteId}`,
+        question
+      )) as Generated.QuizQuestion;
+    },
     async generateImage(prompt: string) {
       const request: Generated.AiCompletionRequest = {
         prompt,

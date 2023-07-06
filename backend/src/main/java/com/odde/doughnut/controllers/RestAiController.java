@@ -49,7 +49,7 @@ public class RestAiController {
   @PostMapping("/regenerate-question")
   public QuizQuestion regenerateQuestion(
       @RequestParam(value = "note") Note note,
-      @RequestParam(value = "question") QuizQuestion question)
+      @RequestBody QuizQuestion question)
       throws QuizQuestionNotPossibleException {
     return getQuizQuestion(note, question);
   }

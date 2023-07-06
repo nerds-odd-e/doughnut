@@ -44,15 +44,11 @@ description (until the end of this message):
 
   public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestion(
       Note note, QuizQuestion question) {
-    String description = "Ask a single-answer multiple-choice question to the user";
-    if (question != null) {
-      description = question.getRawJsonQuestion() + " Does the above question make sense?";
-    }
 
     askSingleAnswerMultipleChoiceQuestion =
         ChatFunction.builder()
             .name("ask_single_answer_multiple_choice_question")
-            .description(description)
+            .description("Ask a single-answer multiple-choice question to the user")
             .executor(AIGeneratedQuestion.class, null)
             .build();
 
