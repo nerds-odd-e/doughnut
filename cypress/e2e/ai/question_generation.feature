@@ -21,7 +21,7 @@ Feature: Question generation by AI
       | Rescue Diver | correct        |
       | Divemaster   | wrong          |
 
-  @Ignore
+  @ignore
   Scenario: I should be able to regenerate the question when the question and choices do not make sense
     Given OpenAI by default returns this question that does not make sense:
       | question             | correct_choice | incorrect_choice_1 | incorrect_choice_2 |
