@@ -107,9 +107,7 @@ Then("I ask it to regenerete another question", () => {
 Given("AI question responses for instructions mapping is:", (questionTable: DataTable) => {
   cy.openAiService().restartImposter()
 
-  const records = questionTable.hashes()
-
-  for (const mapping of records) {
+  for (const mapping of questionTable.hashes()) {
 
     const reply = JSON.stringify({
       stem: mapping.expected_question_stem,
@@ -117,11 +115,7 @@ Given("AI question responses for instructions mapping is:", (questionTable: Data
       incorrectChoices: ["B", "C"],
     })
 
-    cy.openAiService().stubChatCompletionFunctionCall(
-      "ask_single_answer_multiple_choice_question",
-      reply,
-      mapping.instruction
-    )
+    cy.openAiService().stubChatCompletionFunctionCall("ask_single_answer_multiple_choice_question", reply, mapping.instruction)
   }
 })
 
