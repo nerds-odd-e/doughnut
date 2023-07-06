@@ -32,11 +32,6 @@ Feature: Question generation by AI
       | Divemaster   | wrong          |
 
   @ignore
-  Scenario: I should be able to affect the question using note instruction
-    When Note "Scuba Diving" has instruction "Location is Singapore, amongst the ships off the East Coast Park."
-    Then Question generated from the note "Scuba Diving" is "Is the water clean for Scuba Diving in Singapore?"
-
-  @ignore
   Scenario: I should be able to regenerate the question when I think the question and choices do not make sense
     Given I have a note with title "Mike likes elephants and tigers, hates dogs."
     And openAI provide question as:
