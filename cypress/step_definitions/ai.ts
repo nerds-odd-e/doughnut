@@ -102,6 +102,6 @@ Given(
   }
 );
 
-Then("I ask it to regenerete the question while testing myself", () => {
+Then("I ask it to regenerete another question", () => {
   cy.findByRole("button", { name: "Doesn't make sense?" }).click();
 });

@@ -21,13 +21,9 @@ Feature: Question generation by AI
       | Rescue Diver | correct        |
       | Divemaster   | wrong          |
 
-  @ignore
-  Scenario: I should be able to regenerate the question when the question and choices do not make sense
-    Given OpenAI by default returns this question that does not make sense:
-      | question             | correct_choice | incorrect_choice_1 | incorrect_choice_2 |
-      | What does Mike like? | Elephants      | Tigers             | Dogs               |
+  Scenario: I should be able to regenerate the question when the question and choices do not make sense relating to the note
     When I ask to generate a question for note "Scuba Diving"
-    Then I ask it to regenerete the question while testing myself
+    Then I ask it to regenerete another question
     And I should be asked "What is the most common scuba diving certification?"
     And the option "<option>" should be <expectedResult>
     Examples:
