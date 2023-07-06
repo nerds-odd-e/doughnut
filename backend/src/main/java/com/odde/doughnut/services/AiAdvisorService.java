@@ -47,11 +47,11 @@ public class AiAdvisorService {
     ChatCompletionRequest chatRequest;
 
     chatRequest =
-      new OpenAIChatAboutNoteRequestBuilder(note.getPath())
-        .detailsOfNoteOfCurrentFocus(note)
-        .userInstructionToGenerateQuestion(note,question)
-        .maxTokens(1500)
-        .build();
+        new OpenAIChatAboutNoteRequestBuilder(note.getPath())
+            .detailsOfNoteOfCurrentFocus(note)
+            .userInstructionToGenerateQuestion(note, question)
+            .maxTokens(1500)
+            .build();
 
     return openAiApiHandler
         .chatCompletion(chatRequest)

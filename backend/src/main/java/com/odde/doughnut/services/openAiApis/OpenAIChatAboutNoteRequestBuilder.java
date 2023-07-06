@@ -42,10 +42,11 @@ description (until the end of this message):
     return this;
   }
 
-  public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestion(Note note,QuizQuestion question) {
+  public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestion(
+      Note note, QuizQuestion question) {
     String description = "Ask a single-answer multiple-choice question to the user";
-    if(question!=null) {
-      description =question.getRawJsonQuestion() + " Does the above question make sense?";
+    if (question != null) {
+      description = question.getRawJsonQuestion() + " Does the above question make sense?";
     }
 
     askSingleAnswerMultipleChoiceQuestion =
@@ -80,8 +81,6 @@ Note: Only the top-level context is visible. The specific note of focus and its 
 
     return this;
   }
-
-
 
   public OpenAIChatAboutNoteRequestBuilder instructionForCompletion(
       AiCompletionRequest aiCompletionRequest) {
