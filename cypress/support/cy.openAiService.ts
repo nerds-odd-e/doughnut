@@ -129,7 +129,7 @@ Cypress.Commands.add(
   { prevSubject: true },
   (serviceMocker: ServiceMocker, functionName: string, argumentsString: string, bodyContains: string | null = null) => {
     
-    var predicate;
+    let predicate;
     if (bodyContains === null) {
       predicate = new DefaultPredicate(`/v1/chat/completions`, HttpMethod.POST)
     } else {
