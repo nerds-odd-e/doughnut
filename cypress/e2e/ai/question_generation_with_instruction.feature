@@ -5,18 +5,19 @@ Feature: Question generation by AI
 
   Background:
     Given I've logged in as an existing user
-    And the AI question stem is "What is scuba diving?" when no instruction
-    And the AI question stem is " What is a good scuba diving place in Singapore?" when the instruct is "Relate to Singapore"
+    And AI question responses for instructions mapping is:
+      | instruction            | expected_question_stem                          |
+      | general question       | What is scuba diving?                           |
+      | Relate to Singapore    | What is a good scuba diving place in Singapore? |
 
-  @ignore
   Scenario Outline: I should be able to affect the question using note instruction
     When there are some notes for the current user
       | title        | instruction   | 
       | Scuba Diving | <instruction> |
-    Then Question stem generated from the note "Scuba Diving" should be "<expected question stem>"
-    And it does <this action>
+    And I ask to generate a question for note "Scuba Diving"
+    Then Question stem generated from the note "Scuba Diving" should be "<expected_question_stem>"
 
     Examples:
-      | instruction            | expected question stem                          |
-      |                        | What is scuba diving?                           |
+      | instruction            | expected_question_stem                          |
+      | general question       | What is scuba diving?                           |
       | Relate to Singapore    | What is a good scuba diving place in Singapore? |

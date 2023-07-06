@@ -61,12 +61,10 @@ Given(
 );
 
 Given("An OpenAI response is unavailable", () => {
-  cy.openAiService().stubOpenAiCompletionWithErrorResponse();
+  cy.openAiService().stubOpenAiCompletionWithErrorResponse()
 });
 
-Given(
-  "OpenAI by default returns this question from now:",
-  (questionTable: DataTable) => {
+Given("OpenAI by default returns this question from now:",(questionTable: DataTable) => {
     const record = questionTable.hashes()[0];
     const reply = JSON.stringify({
       stem: record.question,
@@ -82,8 +80,8 @@ Given(
 );
 
 Then("it should consider the context {string}", (path: string) => {
-  cy.openAiService().thePreviousRequestShouldHaveIncludedPathInfo(path);
-});
+  cy.openAiService().thePreviousRequestShouldHaveIncludedPathInfo(path)
+})
 
 Given(
   "OpenAI by default returns this question that does not make sense:",
@@ -105,3 +103,28 @@ Given(
 Then("I ask it to regenerete another question", () => {
   cy.findByRole("button", { name: "Doesn't make sense?" }).click();
 });
+
+Given("AI question responses for instructions mapping is:", (questionTable: DataTable) => {
+  cy.openAiService().restartImposter()
+
+  const records = questionTable.hashes()
+
+  for (const mapping of records) {
+
+    const reply = JSON.stringify({
+      stem: mapping.expected_question_stem,
+      correctChoice: "A",
+      incorrectChoices: ["B", "C"],
+    })
+
+    cy.openAiService().stubChatCompletionFunctionCall(
+      "ask_single_answer_multiple_choice_question",
+      reply,
+      mapping.instruction
+    )
+  }
+})
+
+Then("Question stem generated from the note {string} should be {string}" , (note: string, stem: string) => {
+  cy.findByText(stem)
+})
