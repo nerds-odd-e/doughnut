@@ -8,7 +8,11 @@
         :key="numberOfTries"
       />
     </div>
-    <AIQuestion :raw-json-question="rawJsonQuestion" :key="numberOfTries" />
+    <AIQuestion
+      :raw-json-question="rawJsonQuestion"
+      :key="numberOfTries"
+      @is-question-answered="getIsQuestionAnswered"
+    />
   </div>
   <button
     id="generateBtn"
@@ -18,7 +22,7 @@
     Doesn't make sense?
   </button>
 
-  <div id="chatContainer">
+  <div id="chatContainer" v-show="isQuestionAnswered">
     <MessageDisplayContainer v-bind:messages="messages" />
     <input v-model="userInputValue" type="text" />
     <button class="btn btn-secondary" @click="sendMessage">Send</button>
@@ -52,6 +56,7 @@ export default defineComponent({
       isUnmounted: false,
       userInputValue: "",
       messages: [] as Message[],
+      isQuestionAnswered: false,
     };
   },
   computed: {
@@ -84,6 +89,9 @@ export default defineComponent({
         const msg: Message = { role: "User", content: this.userInputValue };
         this.messages.push(msg);
       }
+    },
+    getIsQuestionAnswered(value: boolean) {
+      this.isQuestionAnswered = value;
     },
   },
   mounted() {
