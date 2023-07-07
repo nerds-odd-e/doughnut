@@ -1,8 +1,15 @@
 <template>
   <div id="messageDisplayContainer">
-    <li v-for="msg in messages" :key="msg.content">
+    <div
+      class="messageDiv"
+      :style="{
+        'text-align': setTextAlign(msg.role),
+      }"
+      v-for="msg in messages"
+      :key="msg.content"
+    >
       {{ msg.content }}
-    </li>
+    </div>
   </div>
 </template>
 
@@ -14,5 +21,27 @@ export default defineComponent({
   props: {
     messages: { type: Object as PropType<Message[]> },
   },
+  methods: {
+    setTextAlign(role: string) {
+      if (role === "User") {
+        return "right";
+      }
+
+      return "left";
+    },
+  },
 });
 </script>
+
+<style lang="scss" scoped>
+#messageDisplayContainer {
+  width: 100%;
+  height: 200px;
+  border-style: solid;
+  overflow-y: auto;
+  margin: 10px;
+}
+div.messageDiv {
+  padding: 2px;
+}
+</style>

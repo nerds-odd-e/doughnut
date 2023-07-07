@@ -24,8 +24,24 @@
 
   <div id="chatContainer" v-show="isQuestionAnswered">
     <MessageDisplayContainer v-bind:messages="messages" />
-    <input v-model="userInputValue" type="text" />
-    <button class="btn btn-secondary" @click="sendMessage">Send</button>
+    <div
+      style="
+         {
+          'width':100% ;
+        }
+      "
+    >
+      <button class="btn btn-secondary floatBtn" @click="sendMessage">
+        Send
+      </button>
+      <span>
+        <input
+          v-model="userInputValue"
+          class="autoExtendableInput"
+          type="text"
+        />
+      </span>
+    </div>
   </div>
 </template>
 
@@ -115,6 +131,19 @@ export default defineComponent({
   background-color: #ff0000;
 }
 
+span {
+  display: block;
+  overflow: hidden;
+  padding-right: 5px;
+}
+
+input.autoExtendableInput {
+  width: 100%;
+}
+
+.floatBtn {
+  float: right;
+}
 .disabled-div {
   pointer-events: none;
   color: #aaa7a7;
