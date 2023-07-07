@@ -15,7 +15,7 @@
     />
   </div>
   <button
-    v-show="!isQuestionAnswered"
+    v-show="!isQuestionAnswered && rawJsonQuestion !== undefined"
     class="btn btn-secondary"
     @click="regenerateQuestion"
   >
