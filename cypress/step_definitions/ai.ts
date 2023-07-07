@@ -117,3 +117,7 @@ Then(
     cy.findByText(stem)
   },
 )
+
+Then("I should see the question {string} is disabled", () => {
+  cy.get('[class="disabled-div"]')
+})
