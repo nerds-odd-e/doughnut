@@ -14,7 +14,7 @@
   <div id="chatContainer">
     <MessageDisplayContainer v-bind:messages="messages" />
     <input v-model="userInputValue" type="text" />
-    <button class="btn btn-secondary">Send</button>
+    <button class="btn btn-secondary" @click="sendMessage">Send</button>
   </div>
 </template>
 
@@ -66,6 +66,12 @@ export default defineComponent({
         );
       }
       this.numberOfTries += 1;
+    },
+    async sendMessage() {
+      if (this.userInputValue !== "") {
+        const msg: Message = { role: "User", content: this.userInputValue };
+        this.messages.push(msg);
+      }
     },
   },
   mounted() {
