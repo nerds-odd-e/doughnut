@@ -10,11 +10,18 @@
   >
     Doesn't make sense?
   </button>
+
+  <div id="chatContainer">
+    <MessageDisplayContainer v-bind:messages="messages" />
+    <input v-model="userInputValue" type="text" />
+    <button class="btn btn-secondary">Send</button>
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import type { StorageAccessor } from "@/store/createNoteStorage";
+import { Message } from "@/store/DialogMessage";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import AIQuestion from "../review/AIQuestion.vue";
 
@@ -35,6 +42,8 @@ export default defineComponent({
       quizQuestion: undefined as Generated.QuizQuestion | undefined,
       numberOfTries: 0,
       isUnmounted: false,
+      userInputValue: "",
+      messages: [] as Message[],
     };
   },
   computed: {
