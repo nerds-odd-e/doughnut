@@ -75,12 +75,13 @@ export default defineComponent({
       this.numberOfTries += 1;
     },
     async regenerateQuestion() {
-      this.prevQuizQuestion = this.quizQuestion;
       if (this.quizQuestion !== undefined) {
+        const tmpQuestion: Generated.QuizQuestion = this.quizQuestion;
         this.quizQuestion = await this.api.ai.askAIToRegenerateQuestion(
           this.selectedNote.id,
           this.quizQuestion.rawJsonQuestion
         );
+        this.prevQuizQuestion = tmpQuestion;
       }
       this.numberOfTries += 1;
     },
