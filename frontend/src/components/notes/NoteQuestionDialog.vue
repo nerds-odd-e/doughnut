@@ -62,7 +62,7 @@ export default defineComponent({
       if (this.quizQuestion !== undefined) {
         this.quizQuestion = await this.api.ai.askAIToRegenerateQuestion(
           this.selectedNote.id,
-          this.quizQuestion
+          this.quizQuestion.rawJsonQuestion
         );
       }
       this.numberOfTries += 1;

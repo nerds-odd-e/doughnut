@@ -170,7 +170,8 @@ class RestAiControllerTest {
 {"stem": "What is the first color in the rainbow?", "correctChoice": "white", "incorrectChoices": ["black", "green"]}
 """));
       QuizQuestion question = controller.generateQuestion(note);
-      QuizQuestion quizQuestion = controller.regenerateQuestion(note, question);
+      QuizQuestion quizQuestion =
+          controller.regenerateQuestion(note, question.getRawJsonQuestion());
       assertThat(quizQuestion.getRawJsonQuestion()).isEqualTo(question.getRawJsonQuestion());
     }
 

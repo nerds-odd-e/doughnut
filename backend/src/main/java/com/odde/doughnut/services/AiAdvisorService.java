@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AiCompletion;
 import com.odde.doughnut.entities.json.AiCompletionRequest;
-import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.services.openAiApis.OpenAIChatAboutNoteRequestBuilder;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
@@ -31,7 +30,7 @@ public class AiAdvisorService {
     return generateQuestionJsonString(note, null);
   }
 
-  public String generateQuestionJsonString(Note note, QuizQuestion prevQuestion)
+  public String generateQuestionJsonString(Note note, String prevQuestion)
       throws QuizQuestionNotPossibleException {
     JsonNode question = getAiGeneratedQuestion(note, prevQuestion);
     if (question != null) {
@@ -43,10 +42,8 @@ public class AiAdvisorService {
     throw new QuizQuestionNotPossibleException();
   }
 
-  private JsonNode getAiGeneratedQuestion(Note note, QuizQuestion question) {
-    ChatCompletionRequest chatRequest;
-
-    chatRequest =
+  private JsonNode getAiGeneratedQuestion(Note note, String question) {
+    ChatCompletionRequest chatRequest =
         new OpenAIChatAboutNoteRequestBuilder(note.getPath())
             .detailsOfNoteOfCurrentFocus(note)
             .userInstructionToGenerateQuestion(note, question)

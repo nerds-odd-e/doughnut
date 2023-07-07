@@ -306,7 +306,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
     async askAIToRegenerateQuestion(
       noteId: Doughnut.ID,
-      question: Generated.QuizQuestion
+      question: string
     ): Promise<Generated.QuizQuestion> {
       return (await managedApi.restPost(
         `ai/regenerate-question?note=${noteId}`,

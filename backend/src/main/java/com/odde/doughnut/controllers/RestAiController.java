@@ -48,12 +48,12 @@ public class RestAiController {
 
   @PostMapping("/regenerate-question")
   public QuizQuestion regenerateQuestion(
-      @RequestParam(value = "note") Note note, @RequestBody QuizQuestion question)
+      @RequestParam(value = "note") Note note, @RequestBody String question)
       throws QuizQuestionNotPossibleException {
     return getQuizQuestion(note, question);
   }
 
-  private QuizQuestion getQuizQuestion(Note note, QuizQuestion question)
+  private QuizQuestion getQuizQuestion(Note note, String question)
       throws QuizQuestionNotPossibleException {
     currentUser.assertLoggedIn();
     String rawJsonQuestion = aiAdvisorService.generateQuestionJsonString(note, question);

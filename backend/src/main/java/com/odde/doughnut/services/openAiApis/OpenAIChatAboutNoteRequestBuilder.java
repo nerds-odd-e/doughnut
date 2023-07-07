@@ -3,7 +3,6 @@ package com.odde.doughnut.services.openAiApis;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AIGeneratedQuestion;
 import com.odde.doughnut.entities.json.AiCompletionRequest;
-import com.odde.doughnut.entities.json.QuizQuestion;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatFunction;
 import com.theokanning.openai.completion.chat.ChatMessage;
@@ -43,7 +42,7 @@ description (until the end of this message):
   }
 
   public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestion(
-      Note note, QuizQuestion question) {
+      Note note, String question) {
 
     askSingleAnswerMultipleChoiceQuestion =
         ChatFunction.builder()
@@ -58,22 +57,29 @@ description (until the end of this message):
             : "6. Generate the question that is related to "
                 + note.getNoteAccessories().getQuestionGenerationInstruction();
 
-    messages.add(
-        new ChatMessage(
-            ChatMessageRole.USER.value(),
-            """
-Please assume the role of a Memory Assistant, which involves helping me review, recall, and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following guidelines:
+    String messageBody =
+        """
+  Please assume the role of a Memory Assistant, which involves helping me review, recall, and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following guidelines:
 
-1. Generate a multiple-choice question based on the note in the current context
-2. Only the top-level context is visible to the user, use background if more information is needed to make the question stem clear.
-3. Provide 2 to 4 choices with only 1 correct answer.
-4. Vary the lengths of the choice texts so that the correct answer isn't consistently the longest.
-5. If there's insufficient information in the note to create a question, leave the 'stem' field empty.
-%s
+  1. Generate a multiple-choice question based on the note in the current context
+  2. Only the top-level context is visible to the user, use background if more information is needed to make the question stem clear.
+  3. Provide 2 to 4 choices with only 1 correct answer.
+  4. Vary the lengths of the choice texts so that the correct answer isn't consistently the longest.
+  5. If there's insufficient information in the note to create a question, leave the 'stem' field empty.
+  %s
 
-Note: Only the top-level context is visible. The specific note of focus and its more detailed contexts are not known. Focus on memory reinforcement and recall across various subjects.
-"""
-                .formatted(point6)));
+  Note: Only the top-level context is visible. The specific note of focus and its more detailed contexts are not known. Focus on memory reinforcement and recall across various subjects.
+  """
+            .formatted(point6);
+
+    if (question != null) {
+      messageBody =
+          "Your previously generated question is: "
+              + question
+              + " Please generate another question.";
+    }
+
+    messages.add(new ChatMessage(ChatMessageRole.USER.value(), messageBody));
 
     return this;
   }
