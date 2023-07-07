@@ -1,6 +1,13 @@
 <template>
   <h2 v-if="rawJsonQuestion === undefined">Generating question...</h2>
   <div v-else>
+    <div v-if="rawJsonPrevQuestion !== undefined" :class="'disabled-div'">
+      <h3>Previous Question...</h3>
+      <AIQuestion
+        :raw-json-question="rawJsonPrevQuestion"
+        :key="numberOfTries"
+      />
+    </div>
     <AIQuestion :raw-json-question="rawJsonQuestion" :key="numberOfTries" />
   </div>
   <button
@@ -40,6 +47,7 @@ export default defineComponent({
   data() {
     return {
       quizQuestion: undefined as Generated.QuizQuestion | undefined,
+      prevQuizQuestion: undefined as Generated.QuizQuestion | undefined,
       numberOfTries: 0,
       isUnmounted: false,
       userInputValue: "",
@@ -50,6 +58,9 @@ export default defineComponent({
     rawJsonQuestion() {
       return this.quizQuestion?.rawJsonQuestion;
     },
+    rawJsonPrevQuestion() {
+      return this.prevQuizQuestion?.rawJsonQuestion;
+    },
   },
   methods: {
     async generateQuestion() {
@@ -59,6 +70,7 @@ export default defineComponent({
       this.numberOfTries += 1;
     },
     async regenerateQuestion() {
+      this.prevQuizQuestion = this.quizQuestion;
       if (this.quizQuestion !== undefined) {
         this.quizQuestion = await this.api.ai.askAIToRegenerateQuestion(
           this.selectedNote.id,
@@ -92,5 +104,10 @@ export default defineComponent({
 .is-wrong {
   font-weight: bold;
   background-color: #ff0000;
+}
+
+.disabled-div {
+  pointer-events: none;
+  color: #aaa7a7;
 }
 </style>
