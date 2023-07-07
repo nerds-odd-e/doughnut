@@ -15,7 +15,7 @@
     />
   </div>
   <button
-    id="generateBtn"
+    v-show="!isQuestionAnswered"
     class="btn btn-secondary"
     @click="regenerateQuestion"
   >
