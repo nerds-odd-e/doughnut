@@ -24,13 +24,7 @@
 
   <div id="chatContainer" v-show="isQuestionAnswered">
     <MessageDisplayContainer v-bind:messages="messages" />
-    <div
-      style="
-         {
-          'width':100% ;
-        }
-      "
-    >
+    <div class="chatInputContainer">
       <button class="btn btn-secondary floatBtn" @click="sendMessage">
         Send
       </button>
@@ -137,15 +131,15 @@ span {
   padding-right: 5px;
 }
 
+.chatInputContainer {
+  width: 100%;
+}
+
 input.autoExtendableInput {
   width: 100%;
 }
 
 .floatBtn {
   float: right;
-}
-.disabled-div {
-  pointer-events: none;
-  color: #aaa7a7;
 }
 </style>
