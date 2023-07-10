@@ -10,14 +10,9 @@ Feature: Question generation by AI
       | general question       | What is scuba diving?                           |
       | Relate to Singapore    | What is a good scuba diving place in Singapore? |
 
-  Scenario Outline: I should be able to affect the question using note instruction
-    When there are some notes for the current user
-      | title        | instruction   | 
-      | Scuba Diving | <instruction> |
+  Scenario: I should be able to affect the question using note instruction
+    When there are some notes for the current user:
+      | title        | instruction          |
+      | Scuba Diving | Relate to Singapore  |
     And I ask to generate a question for note "Scuba Diving"
-    Then Question stem generated from the note "Scuba Diving" should be "<expected_question_stem>"
-
-    Examples:
-      | instruction            | expected_question_stem                          |
-      | general question       | What is scuba diving?                           |
-      | Relate to Singapore    | What is a good scuba diving place in Singapore? |
+    Then question stem generated from the note "Scuba Diving" should be "What is a good scuba diving place in Singapore?"

@@ -6,7 +6,7 @@ Feature: Bazaar sharing
     Given I've logged in as an existing user
 
   Scenario: Contributing To Bazaar
-    Given there are some notes for the current user
+    Given there are some notes for the current user:
       | title    | description               | testingParent |
       | Shape    | The form of something     |               |
       | Square   | four equal straight sides | Shape         |

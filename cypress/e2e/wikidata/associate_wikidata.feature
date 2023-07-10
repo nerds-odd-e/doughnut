@@ -46,7 +46,7 @@ Feature: associate wikidata ID to note
 
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Associate a new note with exisitng wikidata id
-    Given there are some notes for the current user
+    Given there are some notes for the current user:
       | title   | wikidataId | testingParent |
       | Animals |            |               |
       | Dog     | Q123       | Animals       |

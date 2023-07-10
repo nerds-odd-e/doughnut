@@ -5,7 +5,7 @@ Feature: Question generation by AI
 
   Background:
     Given I've logged in as an existing user
-    And there are some notes for the current user
+    And there are some notes for the current user:
       | title        | description                                    |
       | Scuba Diving | The most common certification is Rescue Diver. |
     And OpenAI by default returns this question from now:

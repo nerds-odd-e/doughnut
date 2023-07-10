@@ -5,7 +5,7 @@ Feature: see recent note update
   Background:
     Given I've logged in as an existing user
     And I let the server to time travel to 100 hours ago
-    And there are some notes for the current user
+    And there are some notes for the current user:
       | title    | testingParent | description |
       | NoteBook |               |             |
       | Note1    | NoteBook      |             |

@@ -4,7 +4,7 @@ Feature: Nested Note Create with wikidata
 
   Background:
     Given I've logged in as an existing user
-    And there are some notes for the current user
+    And there are some notes for the current user:
       | title   | testingParent | description         |
       | Animals |               | An awesome training |
 
@@ -34,7 +34,7 @@ Feature: Nested Note Create with wikidata
 
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Create a new note with duplicate wikidata id within the same notebook
-    Given there are some notes for the current user
+    Given there are some notes for the current user:
       | title   | wikidataId | testingParent |
       | Star    |            |               |
       | Sun     | Q123       | Star          |

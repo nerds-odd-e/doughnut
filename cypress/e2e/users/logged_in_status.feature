@@ -9,7 +9,7 @@ Feature: Logged in status
     Then I should be on the welcome page and asked to login
 
   Scenario: User logout because of session timeout
-    Given there are some notes for the current user
+    Given there are some notes for the current user:
       | title                | testingParent |
       | Shape                |               |
       | Triangle             | Shape         |

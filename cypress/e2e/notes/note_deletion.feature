@@ -2,7 +2,7 @@ Feature: Note deletion
 
   Background:
     Given I've logged in as an existing user
-    And there are some notes for the current user
+    And there are some notes for the current user:
       | title          | testingParent  |
       | LeSS in Action |                |
       | team           | LeSS in Action |

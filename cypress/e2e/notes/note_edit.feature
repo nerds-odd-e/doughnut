@@ -4,7 +4,7 @@ Feature: Note Edit
 
   Background:
     Given I've logged in as an existing user
-    And there are some notes for the current user
+    And there are some notes for the current user:
       | title          | description         |
       | LeSS in Action | An awesome training |
 

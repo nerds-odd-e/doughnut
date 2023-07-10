@@ -5,7 +5,7 @@ Feature: link note
 
   Background:
     Given I've logged in as an existing user
-    And there are some notes for the current user
+    And there are some notes for the current user:
       | title    | description     |
       | Sedition | Incite violence |
       | Sedation | Put to sleep    |

@@ -112,7 +112,7 @@ Given("AI question responses for instructions mapping is:", (questionTable: Data
 })
 
 Then(
-  "Question stem generated from the note {string} should be {string}",
+  "question stem generated from the note {string} should be {string}",
   (note: string, stem: string) => {
     cy.findByText(stem)
   },

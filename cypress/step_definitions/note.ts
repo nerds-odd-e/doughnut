@@ -24,7 +24,7 @@ Given("I visit note {string}", (noteTitle) => {
   cy.jumpToNotePage(noteTitle)
 })
 
-Given("there are some notes for the current user", (data: DataTable) => {
+Given("there are some notes for the current user:", (data: DataTable) => {
   cy.testability().seedNotes(data.hashes())
 })
 
