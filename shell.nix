@@ -46,6 +46,7 @@ in mkShell {
     uutils-coreutils
     google-cloud-sdk
     yamllint
+    atuin
     nix-direnv
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp
