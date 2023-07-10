@@ -111,13 +111,6 @@ Given("AI question responses for instructions mapping is:", (questionTable: Data
   }
 })
 
-Then(
-  "question stem generated from the note {string} should be {string}",
-  (note: string, stem: string) => {
-    cy.findByText(stem)
-  },
-)
-
 Then("I should see the question {string} is disabled", () => {
   cy.get('[class="disabled-div"]')
 })

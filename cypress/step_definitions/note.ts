@@ -444,16 +444,14 @@ When("the option {string} should be wrong", (option: string) => {
   cy.findByText(option).click().invoke("attr", "class").should("contain", "is-wrong")
 })
 
-Then("I should be asked {string}", (questionDescription: string) => {
-  cy.findByText(questionDescription)
+Then("I should be asked {string}", (expectedtQuestionStem: string) => {
+  cy.expectQuestionStem(expectedtQuestionStem)
 })
 
 Then("I change the instruction of note {string} to {string}", (noteTitle: string, instruction: string) => {
   cy.jumpToNotePage(noteTitle)
   cy.openAndSubmitNoteAccessoriesFormWith(noteTitle, {"Question Generation Instruction": instruction})
 })
-
-
 
 Then("the question stem generated from the note {string} should be {string}", (noteTitle: string, expectedtQuestionStem: string) => {
   cy.askForQuestion(noteTitle)
