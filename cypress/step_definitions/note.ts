@@ -447,3 +447,8 @@ When("the option {string} should be wrong", (option: string) => {
 Then("I should be asked {string}", (questionDescription: string) => {
   cy.findByText(questionDescription)
 })
+
+Then("I change the instruction of note {string} to {string}", (noteTitle: string, instruction: string) => {
+  cy.jumpToNotePage(noteTitle)
+  cy.openAndSubmitNoteAccessoriesFormWith(noteTitle, {"Question Generation Instruction": instruction})
+})
