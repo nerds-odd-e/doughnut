@@ -452,3 +452,10 @@ Then("I change the instruction of note {string} to {string}", (noteTitle: string
   cy.jumpToNotePage(noteTitle)
   cy.openAndSubmitNoteAccessoriesFormWith(noteTitle, {"Question Generation Instruction": instruction})
 })
+
+
+
+Then("the question stem generated from the note {string} should be {string}", (noteTitle: string, expectedtQuestionStem: string) => {
+  cy.askForQuestion(noteTitle)
+  cy.findByText(expectedtQuestionStem)
+})

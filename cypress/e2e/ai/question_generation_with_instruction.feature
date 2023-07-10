@@ -10,7 +10,6 @@ Feature: Question generation by AI
       | general question       | What is scuba diving?                           |
       | Relate to Singapore    | What is a good scuba diving place in Singapore? |
 
-@ignore
   Scenario: I should be able to affect the question using note instruction
     Given I have a note with the title "Scuba Diving"
     When I change the instruction of note "Scuba Diving" to "Relate to Singapore"
