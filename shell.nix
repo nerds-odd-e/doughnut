@@ -44,19 +44,13 @@ in mkShell {
     mysql-client
     mysql_jdbc
     uutils-coreutils
-    jetbrains-mono
     google-cloud-sdk
     yamllint
     nix-direnv
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp
-    apple_sdk.ApplicationServices
     apple_sdk.CoreServices
-    apple_sdk.OpenGL
-    apple_sdk.QTKit
     apple_sdk.Security
-    apple_sdk.SystemConfiguration
-    xcodebuild
     pinentry_mac
     sequelpro
   ] ++ lib.optionals (!stdenv.isDarwin) [
