@@ -457,5 +457,5 @@ Then("I change the instruction of note {string} to {string}", (noteTitle: string
 
 Then("the question stem generated from the note {string} should be {string}", (noteTitle: string, expectedtQuestionStem: string) => {
   cy.askForQuestion(noteTitle)
-  cy.findByText(expectedtQuestionStem)
+  cy.expectQuestionStem(expectedtQuestionStem)
 })

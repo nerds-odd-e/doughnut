@@ -145,6 +145,7 @@ declare namespace Cypress {
     thePreviousRequestShouldHaveIncludedPathInfo(path: string): Chainable<any>
     aiSuggestDescriptionForNote(noteTitle: string): Chainable<any>
     askForQuestion(noteTitle: string): Chainable<any>
+    expectQuestionStem(stem: string): Chainable<any>
     addCommentToCurrentNote(commentText: string): Chainable<any>
   }
 }

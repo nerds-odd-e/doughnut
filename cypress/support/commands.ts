@@ -631,3 +631,7 @@ Cypress.Commands.add("askForQuestion", (noteTitle: string) => {
   cy.jumpToNotePage(noteTitle)
   cy.clickNotePageMoreOptionsButton(noteTitle, "test me")
 })
+
+Cypress.Commands.add("expectQuestionStem", (stem: string) => {
+  cy.findByText(stem)
+})
