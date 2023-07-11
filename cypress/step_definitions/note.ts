@@ -448,12 +448,20 @@ Then("I should be asked {string}", (expectedtQuestionStem: string) => {
   cy.expectQuestionStem(expectedtQuestionStem)
 })
 
-Then("I change the instruction of note {string} to {string}", (noteTitle: string, instruction: string) => {
-  cy.jumpToNotePage(noteTitle)
-  cy.openAndSubmitNoteAccessoriesFormWith(noteTitle, {"Question Generation Instruction": instruction})
-})
+Then(
+  "I change the instruction of note {string} to {string}",
+  (noteTitle: string, instruction: string) => {
+    cy.jumpToNotePage(noteTitle)
+    cy.openAndSubmitNoteAccessoriesFormWith(noteTitle, {
+      "Question Generation Instruction": instruction,
+    })
+  },
+)
 
-Then("the question stem generated from the note {string} should be {string}", (noteTitle: string, expectedtQuestionStem: string) => {
-  cy.askForQuestion(noteTitle)
-  cy.expectQuestionStem(expectedtQuestionStem)
-})
+Then(
+  "the question stem generated from the note {string} should be {string}",
+  (noteTitle: string, expectedtQuestionStem: string) => {
+    cy.askForQuestion(noteTitle)
+    cy.expectQuestionStem(expectedtQuestionStem)
+  },
+)
