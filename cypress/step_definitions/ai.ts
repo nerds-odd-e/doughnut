@@ -89,7 +89,7 @@ Given(
   },
 )
 
-Then("I ask it to regenerete another question", () => {
+Then("I complain the question doesn't make sense", () => {
   cy.findByRole("button", { name: "Doesn't make sense?" }).click()
 })
 

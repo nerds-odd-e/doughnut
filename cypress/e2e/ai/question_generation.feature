@@ -26,6 +26,6 @@ Feature: Question generation by AI
     And OpenAI by default returns this question from now:
       | question              | correct_choice | incorrect_choice_1 | incorrect_choice_2 |
       | What is scuba diving? | Rescue Diver   | Divemaster         | Open Water Diver   |
-    Then I ask it to regenerete another question
+    Then I complain the question doesn't make sense
     And I should see the question "What is the most common scuba diving certification?" is disabled
     And I should be asked "What is scuba diving?"
