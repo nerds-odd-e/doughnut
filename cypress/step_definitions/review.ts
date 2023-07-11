@@ -199,3 +199,27 @@ Then("I view the last result", () => {
 Then("I should see the review point is removed from review", () => {
   cy.findByText("This review point has been removed from reviewing.")
 })
+
+Then("the option {string} should be correct", (option: string) => {
+  cy.findByText(option).click().invoke("attr", "class").should("contain", "is-correct")
+})
+
+Then("the option {string} should be wrong", (option: string) => {
+  cy.findByText(option).click().invoke("attr", "class").should("contain", "is-wrong")
+})
+
+When("I ask to generate a question for note {string}", (noteTitle: string) => {
+  cy.askForQuestion(noteTitle)
+})
+
+Then(
+  "the question stem generated from the note {string} should be {string}",
+  (noteTitle: string, expectedtQuestionStem: string) => {
+    cy.askForQuestion(noteTitle)
+    cy.expectQuestionStem(expectedtQuestionStem)
+  },
+)
+
+function When(arg0: string, arg1: (noteTitle: string) => void) {
+throw new Error("Function not implemented.")
+}

@@ -432,14 +432,6 @@ Then("I should see that the open AI service is not available in controller bar",
     .click()
 })
 
-When("I ask to generate a question for note {string}", (noteTitle: string) => {
-  cy.askForQuestion(noteTitle)
-})
-
-When("the option {string} should be wrong", (option: string) => {
-  cy.findByText(option).click().invoke("attr", "class").should("contain", "is-wrong")
-})
-
 Then("I should be asked {string}", (expectedtQuestionStem: string) => {
   cy.expectQuestionStem(expectedtQuestionStem)
 })
@@ -451,13 +443,5 @@ Then(
     cy.openAndSubmitNoteAccessoriesFormWith(noteTitle, {
       "Question Generation Instruction": instruction,
     })
-  },
-)
-
-Then(
-  "the question stem generated from the note {string} should be {string}",
-  (noteTitle: string, expectedtQuestionStem: string) => {
-    cy.askForQuestion(noteTitle)
-    cy.expectQuestionStem(expectedtQuestionStem)
   },
 )
