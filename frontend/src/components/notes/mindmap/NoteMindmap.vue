@@ -86,7 +86,7 @@ export default defineComponent({
         0,
         0,
         this.offset.rotate - Math.PI / 2,
-        Math.PI * 2
+        Math.PI * 2,
       );
     },
     mindmap() {

@@ -64,7 +64,7 @@ class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
   linkTo(note: Generated.NoteRealm): NoteRealmBuilder {
     merge(
       this.data.links.links,
-      new LinkViewedBuilder("using", this.data, note).please()
+      new LinkViewedBuilder("using", this.data, note).please(),
     );
     return this;
   }

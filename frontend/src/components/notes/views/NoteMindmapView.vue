@@ -66,7 +66,7 @@ export default defineComponent({
     },
     offsetMsg() {
       return `offset: (${this.offset.x.toFixed(0)}, ${this.offset.y.toFixed(
-        0
+        0,
       )})`;
     },
     rotateMsg() {

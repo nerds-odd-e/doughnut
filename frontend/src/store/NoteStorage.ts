@@ -9,7 +9,7 @@ export default interface NoteStorage extends CurrentPosition {
   selectPosition(
     note?: Generated.Note,
     notePosition?: Generated.NotePositionViewedByUser,
-    circle?: Generated.Circle
+    circle?: Generated.Circle,
   ): void;
   refreshNoteRealm(data: Generated.NoteRealm): Generated.NoteRealm;
 }

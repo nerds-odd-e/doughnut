@@ -20,11 +20,11 @@ describe("repetition page", () => {
       });
       helper.apiMock
         .expectingGet(
-          `/api/notes/${reviewPoint.thing.link?.targetNote.id}/position`
+          `/api/notes/${reviewPoint.thing.link?.targetNote.id}/position`,
         )
         .andReturnOnce(notePosition);
       helper.apiMock.expectingGet(
-        `/api/notes/${reviewPoint.thing.link?.sourceNote.id}/position`
+        `/api/notes/${reviewPoint.thing.link?.sourceNote.id}/position`,
       );
     });
 
@@ -37,8 +37,8 @@ describe("repetition page", () => {
       await flushPromises();
       expect(
         JSON.parse(
-          wrapper.find(".link-target .router-link").attributes().to as string
-        ).name
+          wrapper.find(".link-target .router-link").attributes().to as string,
+        ).name,
       ).toEqual("notebooks");
     });
 
@@ -51,8 +51,8 @@ describe("repetition page", () => {
       await flushPromises();
       expect(
         JSON.parse(
-          wrapper.find(".link-target .router-link").attributes().to as string
-        )
+          wrapper.find(".link-target .router-link").attributes().to as string,
+        ),
       ).toEqual({ name: "notebooks" });
     });
   });

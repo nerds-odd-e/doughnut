@@ -10,7 +10,7 @@ helper.resetWithApiMock(beforeEach, afterEach);
 describe("undo editing", () => {
   it("should call addEditingToUndoHistory on submitChange", async () => {
     const histories = createNoteStorage(
-      new ManagedApi({ errors: [], states: [] })
+      new ManagedApi({ errors: [], states: [] }),
     );
 
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please();

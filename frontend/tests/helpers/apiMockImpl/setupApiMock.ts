@@ -25,14 +25,14 @@ class ApiMockImpl implements ApiMock {
   init() {
     this.fetchMock.doMock(async (request: Request) => {
       const matched = this.unmatchedExpectations.find((exp) =>
-        exp.matchExpectation(request)
+        exp.matchExpectation(request),
       );
       this.actualApiCalls.push(request);
       if (matched) {
         return matched.getResponse(request);
       }
       this.previousError = new Error(
-        `Unexpected API call: '${requestDescription(request)}'`
+        `Unexpected API call: '${requestDescription(request)}'`,
       );
       throw this.previousError;
     });
@@ -53,7 +53,7 @@ class ApiMockImpl implements ApiMock {
         throw new Error(
           `Expected but missed API calls: ${this.unmatchedExpectations
             .map((exp) => exp.url)
-            .join(", ")}`
+            .join(", ")}`,
         );
       }
     } finally {
@@ -72,14 +72,14 @@ class ApiMockImpl implements ApiMock {
 
     return rejectFromArray(
       this.remainingExpectations(calls.slice(0, calls.length - 1)),
-      (exp) => exp.matchExpectation(calls[calls.length - 1] as Request)
+      (exp) => exp.matchExpectation(calls[calls.length - 1] as Request),
     );
   }
 
   private expecting(url: string, method: HttpMethod) {
     const newLength = this.expected.push(new ApiMockExpectation(url, method));
     return new ApiMockBuilderImpl(
-      this.expected[newLength - 1] as ApiMockExpectation
+      this.expected[newLength - 1] as ApiMockExpectation,
     );
   }
 

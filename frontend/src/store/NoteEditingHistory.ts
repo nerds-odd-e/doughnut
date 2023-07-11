@@ -18,7 +18,7 @@ export default class NoteEditingHistory {
 
   addEditingToUndoHistory(
     noteId: Doughnut.ID,
-    textContent: Generated.TextContent
+    textContent: Generated.TextContent,
   ) {
     this.noteUndoHistories.push({
       type: "editing",

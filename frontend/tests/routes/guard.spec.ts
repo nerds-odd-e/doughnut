@@ -12,7 +12,7 @@ describe("router guards", () => {
   it("when in repeat, go to nested noteShow", async () => {
     await guard(
       { name: "noteShow", params: { noteId: 3, viewType: "cards" } },
-      next
+      next,
     );
     expect(next).toHaveBeenCalledWith({
       name: "repeat-noteShow",

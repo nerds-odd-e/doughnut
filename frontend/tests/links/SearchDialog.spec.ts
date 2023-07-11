@@ -9,7 +9,7 @@ describe("LinkNoteDialog", () => {
     helper.component(LinkNoteDialog).withStorageProps({ note: null }).render();
     await screen.findByText("Searching");
     expect(
-      await screen.findByLabelText("All My Notebooks And Subscriptions")
+      await screen.findByLabelText("All My Notebooks And Subscriptions"),
     ).toBeDisabled();
   });
 
@@ -24,7 +24,7 @@ describe("LinkNoteDialog", () => {
     helper.component(LinkNoteDialog).withStorageProps({ note }).render();
     (await screen.findByLabelText("All My Circles")).click();
     expect(
-      await screen.findByLabelText("All My Notebooks And Subscriptions")
+      await screen.findByLabelText("All My Notebooks And Subscriptions"),
     ).toBeChecked();
     flushPromises();
     (

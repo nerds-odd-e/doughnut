@@ -38,7 +38,7 @@ beforeEach(() => {
 
 describe("repeat page", () => {
   const mountPage = async (
-    repetition: Generated.DueReviewPoints | Record<string, never>
+    repetition: Generated.DueReviewPoints | Record<string, never>,
   ) => {
     helper.apiMock
       .expectingGet("/api/reviews/repeat?dueindays=0")
@@ -94,7 +94,7 @@ describe("repeat page", () => {
       await wrapper.find("button.btn-primary").trigger("click");
       helper.apiMock
         .expectingGet(
-          `/api/review-points/${secondReviewPointId}/random-question`
+          `/api/review-points/${secondReviewPointId}/random-question`,
         )
         .andReturnOnce(quizQuestion);
 
@@ -103,7 +103,7 @@ describe("repeat page", () => {
         await wrapper.vm.$nextTick();
         expect(wrapper.find(".progress-text").text()).toContainEither(
           "0/3",
-          "1/3"
+          "1/3",
         );
       }
     });

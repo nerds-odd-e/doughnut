@@ -6,44 +6,44 @@ import NoteStorage from "./NoteStorage";
 
 export interface StoredApi {
   getNoteRealmAndReloadPosition(
-    noteId: Doughnut.ID
+    noteId: Doughnut.ID,
   ): Promise<Generated.NoteRealm>;
 
   createNote(
     parentId: Doughnut.ID,
-    data: Generated.NoteCreation
+    data: Generated.NoteCreation,
   ): Promise<Generated.NoteRealm>;
 
   createLink(
     sourceId: Doughnut.ID,
     targetId: Doughnut.ID,
-    data: Generated.LinkCreation
+    data: Generated.LinkCreation,
   ): Promise<Generated.NoteRealm>;
 
   updateLink(
     linkId: Doughnut.ID,
-    data: Generated.LinkCreation
+    data: Generated.LinkCreation,
   ): Promise<Generated.NoteRealm>;
 
   deleteLink(
     linkId: Doughnut.ID,
-    fromTargetPerspective: boolean
+    fromTargetPerspective: boolean,
   ): Promise<Generated.NoteRealm>;
 
   updateNoteAccessories(
     noteId: Doughnut.ID,
-    noteAccessories: Generated.NoteAccessories
+    noteAccessories: Generated.NoteAccessories,
   ): Promise<Generated.NoteRealm>;
 
   updateTextContent(
     noteId: Doughnut.ID,
     noteContentData: Omit<Generated.TextContent, "updatedAt">,
-    oldContent: Generated.TextContent
+    oldContent: Generated.TextContent,
   ): Promise<Generated.NoteRealm>;
 
   updateWikidataId(
     noteId: Doughnut.ID,
-    data: Generated.WikidataAssociationCreation
+    data: Generated.WikidataAssociationCreation,
   ): Promise<Generated.NoteRealm>;
 
   undo(): Promise<Generated.NoteRealm>;
@@ -63,7 +63,7 @@ export default class StoredApiCollection implements StoredApi {
     managedApi: ManagedApi,
     undoHistory: NoteEditingHistory,
     router: Router,
-    storage: NoteStorage
+    storage: NoteStorage,
   ) {
     this.managedApi = managedApi;
     this.noteEditingHistory = undoHistory;
@@ -94,11 +94,11 @@ export default class StoredApiCollection implements StoredApi {
 
   private async updateTextContentWithoutUndo(
     noteId: Doughnut.ID,
-    noteContentData: Omit<Generated.TextContent, "updatedAt">
+    noteContentData: Omit<Generated.TextContent, "updatedAt">,
   ) {
     function excludeProperty<T, K extends string>(
       obj: T,
-      property: K
+      property: K,
     ): Omit<T, K> {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [property]: _, ...rest } = obj as T & Record<K, unknown>;
@@ -106,22 +106,22 @@ export default class StoredApiCollection implements StoredApi {
     }
     return (await this.managedApi.restPatchMultiplePartForm(
       `text_content/${noteId}`,
-      excludeProperty(noteContentData, "updatedAt")
+      excludeProperty(noteContentData, "updatedAt"),
     )) as Generated.NoteRealm;
   }
 
   async updateWikidataId(
     noteId: Doughnut.ID,
-    data: Generated.WikidataAssociationCreation
+    data: Generated.WikidataAssociationCreation,
   ): Promise<Generated.NoteRealm> {
     return this.storage.refreshNoteRealm(
-      await this.statelessApi.wikidata.updateWikidataId(noteId, data)
+      await this.statelessApi.wikidata.updateWikidataId(noteId, data),
     );
   }
 
   async getNoteRealmAndReloadPosition(noteId: Doughnut.ID) {
     const nrwp = await this.statelessApi.noteMethods.getNoteRealmWithPosition(
-      noteId
+      noteId,
     );
     this.storage.selectPosition(nrwp.noteRealm.note, nrwp.notePosition);
     return this.storage.refreshNoteRealm(nrwp.noteRealm);
@@ -138,13 +138,13 @@ export default class StoredApiCollection implements StoredApi {
   async createLink(
     sourceId: Doughnut.ID,
     targetId: Doughnut.ID,
-    data: Generated.LinkCreation
+    data: Generated.LinkCreation,
   ) {
     return this.storage.refreshNoteRealm(
       (await this.managedApi.restPost(
         `links/create/${sourceId}/${targetId}`,
-        data
-      )) as Generated.NoteRealm
+        data,
+      )) as Generated.NoteRealm,
     );
   }
 
@@ -152,8 +152,8 @@ export default class StoredApiCollection implements StoredApi {
     return this.storage.refreshNoteRealm(
       (await this.managedApi.restPost(
         `links/${linkId}`,
-        data
-      )) as Generated.NoteRealm
+        data,
+      )) as Generated.NoteRealm,
     );
   }
 
@@ -161,33 +161,33 @@ export default class StoredApiCollection implements StoredApi {
     return this.storage.refreshNoteRealm(
       (await this.managedApi.restPost(
         `links/${linkId}/${fromTargetPerspective ? "tview" : "sview"}/delete`,
-        {}
-      )) as Generated.NoteRealm
+        {},
+      )) as Generated.NoteRealm,
     );
   }
 
   async updateNoteAccessories(
     noteId: Doughnut.ID,
-    noteContentData: Generated.NoteAccessories
+    noteContentData: Generated.NoteAccessories,
   ) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { updatedAt, ...data } = noteContentData;
     return this.storage.refreshNoteRealm(
       (await this.managedApi.restPatchMultiplePartForm(
         `notes/${noteId}`,
-        data
-      )) as Generated.NoteRealm
+        data,
+      )) as Generated.NoteRealm,
     );
   }
 
   async updateTextContent(
     noteId: Doughnut.ID,
     noteContentData: Omit<Generated.TextContent, "updatedAt">,
-    oldContent: Generated.TextContent
+    oldContent: Generated.TextContent,
   ) {
     this.noteEditingHistory.addEditingToUndoHistory(noteId, oldContent);
     return this.storage.refreshNoteRealm(
-      await this.updateTextContentWithoutUndo(noteId, noteContentData)
+      await this.updateTextContentWithoutUndo(noteId, noteContentData),
     );
   }
 
@@ -198,12 +198,12 @@ export default class StoredApiCollection implements StoredApi {
     if (undone.type === "editing" && undone.textContent) {
       return this.updateTextContentWithoutUndo(
         undone.noteId,
-        undone.textContent
+        undone.textContent,
       );
     }
     return (await this.managedApi.restPatch(
       `notes/${undone.noteId}/undo-delete`,
-      {}
+      {},
     )) as Generated.NoteRealm;
   }
 
@@ -216,7 +216,7 @@ export default class StoredApiCollection implements StoredApi {
   async deleteNote(noteId: Doughnut.ID) {
     const res = (await this.managedApi.restPost(
       `notes/${noteId}/delete`,
-      {}
+      {},
     )) as Generated.NoteRealm[];
     this.noteEditingHistory.deleteNote(noteId);
     if (res.length === 0) {
@@ -225,7 +225,7 @@ export default class StoredApiCollection implements StoredApi {
       return undefined;
     }
     const noteRealm = this.storage.refreshNoteRealm(
-      res[0] as Generated.NoteRealm
+      res[0] as Generated.NoteRealm,
     );
     this.routerReplace(noteRealm);
     return noteRealm;

@@ -19,14 +19,14 @@ describe("apiMock", () => {
     mockedApi.close();
     await fetch("url");
     expect(() => mockedApi.assertNoUnexpectedOrMissedCalls()).toThrowError(
-      "Expected but missed API calls: url"
+      "Expected but missed API calls: url",
     );
   });
 
   it("should fail if expectation is not met", async () => {
     mockedApi.expectingGet("url");
     expect(() => mockedApi.assertNoUnexpectedOrMissedCalls()).toThrowError(
-      "Expected but missed API calls: url"
+      "Expected but missed API calls: url",
     );
     mockedApi.assertNoUnexpectedOrMissedCalls(); // should be cleared after assert once
   });
@@ -42,10 +42,10 @@ describe("apiMock", () => {
     mockedApi.expectingGet("url");
     mockedApi.expectingGet("url1");
     await expect(fetch("url", { method: "POST" })).rejects.toThrowError(
-      "Unexpected API call: 'POST url'"
+      "Unexpected API call: 'POST url'",
     );
     expect(() => mockedApi.assertNoUnexpectedOrMissedCalls()).toThrowError(
-      /Unexpected API call: 'POST url'/
+      /Unexpected API call: 'POST url'/,
     );
   });
 });

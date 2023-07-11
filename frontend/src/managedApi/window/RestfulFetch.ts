@@ -16,7 +16,7 @@ function objectToFormData(data: JsonData) {
       Object.keys(data[key]).forEach((subKey) => {
         formData.append(
           `${key}.${subKey}`,
-          data[key][subKey] === null ? "" : data[key][subKey]
+          data[key][subKey] === null ? "" : data[key][subKey],
         );
       });
     } else {
@@ -34,7 +34,7 @@ interface RequestOptions {
 const request = async (
   url: string,
   data: JsonData | undefined,
-  { method, contentType = "json" }: RequestOptions
+  { method, contentType = "json" }: RequestOptions,
 ): Promise<Response> => {
   const headers = new Headers();
   headers.set("Accept", "*/*");
@@ -79,7 +79,7 @@ class RestfulFetch {
   async restRequestWithHtmlResponse(
     url: string,
     data: JsonData,
-    params: RequestOptions
+    params: RequestOptions,
   ) {
     const response = await request(this.expandUrl(url), data, params);
     if (response.status === 400) throw Error("BadRequest");

@@ -40,12 +40,12 @@ export default defineComponent({
         return this.mindmap.inSlot(
           this.mindmapSector,
           this.totalLinkTypeCount,
-          this.index
+          this.index,
         );
       return this.mindmap.outSlot(
         this.mindmapSector,
         this.totalLinkTypeCount,
-        this.index
+        this.index,
       );
     },
   },

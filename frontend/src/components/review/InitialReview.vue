@@ -52,7 +52,7 @@ export default defineComponent({
       if (skipReview) {
         if (
           !(await this.popups.confirm(
-            "Confirm to hide this note from reviewing in the future?"
+            "Confirm to hide this note from reviewing in the future?",
           ))
         )
           return;

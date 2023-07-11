@@ -18,7 +18,7 @@ interface ApiMockBuilder {
    * on the data after the request is finished.
    */
   andRespondWithAsyncPromiseResolve(
-    resolve: (request: Request) => MockResponseInit | void
+    resolve: (request: Request) => MockResponseInit | void,
   ): void;
 }
 

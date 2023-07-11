@@ -23,7 +23,7 @@ describe("storedApiCollection", () => {
       expect(fetch).toHaveBeenCalledTimes(1);
       expect(fetch).toHaveBeenCalledWith(
         `/api/notes/${note.id}/delete`,
-        expect.anything()
+        expect.anything(),
       );
       expect(routerReplace).toHaveBeenCalledTimes(1);
     });

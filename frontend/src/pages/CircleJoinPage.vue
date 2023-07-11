@@ -22,11 +22,7 @@ export default {
       required: false,
     },
   },
-  beforeRouteEnter(
-    _to,
-    _from,
-    next
-  ) {
+  beforeRouteEnter(_to, _from, next) {
     next(async (vm) => {
       const x = await vm.api.userMethods.getCurrentUserInfo();
       if (!x?.user) {

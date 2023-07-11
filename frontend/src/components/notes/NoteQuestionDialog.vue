@@ -80,7 +80,7 @@ export default defineComponent({
   methods: {
     async generateQuestion() {
       this.quizQuestion = await this.api.ai.askAIToGenerateQuestion(
-        this.selectedNote.id
+        this.selectedNote.id,
       );
       this.numberOfTries += 1;
     },
@@ -89,7 +89,7 @@ export default defineComponent({
         const tmpQuestion: Generated.QuizQuestion = this.quizQuestion;
         this.quizQuestion = await this.api.ai.askAIToRegenerateQuestion(
           this.selectedNote.id,
-          this.quizQuestion.rawJsonQuestion
+          this.quizQuestion.rawJsonQuestion,
         );
         this.prevQuizQuestion = tmpQuestion;
       }

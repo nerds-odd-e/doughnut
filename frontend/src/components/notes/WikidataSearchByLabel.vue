@@ -81,7 +81,7 @@ export default defineComponent({
     },
     async fetchSearchResult() {
       this.wikiSearchSuggestions = await this.api.wikidata.getWikidatas(
-        this.title
+        this.title,
       );
       this.$nextTick(() => {
         const select = this.$refs.select as HTMLSelectElement | undefined;

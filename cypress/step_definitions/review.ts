@@ -2,7 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Given, Then } from "@badeball/cypress-cucumber-preprocessor"
+import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor"
 
 Then("I do these initial reviews in sequence:", (data) => {
   cy.initialReviewInSequence(data.hashes())
@@ -219,7 +219,3 @@ Then(
     cy.expectQuestionStem(expectedtQuestionStem)
   },
 )
-
-function When(arg0: string, arg1: (noteTitle: string) => void) {
-throw new Error("Function not implemented.")
-}

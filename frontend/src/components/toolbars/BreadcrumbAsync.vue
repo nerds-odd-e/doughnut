@@ -29,7 +29,7 @@ export default defineComponent({
   methods: {
     async fetchData() {
       this.notePosition = await this.api.noteMethods.getNotePosition(
-        this.noteId
+        this.noteId,
       );
     },
   },

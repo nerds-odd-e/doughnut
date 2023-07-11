@@ -9,7 +9,7 @@ helper.resetWithApiMock(beforeEach, afterEach);
 describe("in place edit on title", () => {
   const note = makeMe.aNote.title("Dummy Title").please();
   const mountComponent = (
-    n: Generated.Note
+    n: Generated.Note,
   ): VueWrapper<ComponentPublicInstance> => {
     return helper
       .component(NoteTextContent)
@@ -83,7 +83,7 @@ describe("in place edit on title", () => {
     const { errors } = wrapper.vm.$data as { errors: { title: string } };
     expect(errors.title).toBe("size must be between 1 and 100");
     expect(wrapper.find(".error-msg").text()).toBe(
-      "size must be between 1 and 100"
+      "size must be between 1 and 100",
     );
   });
 
@@ -111,7 +111,7 @@ describe("in place edit on title", () => {
     await flushPromises();
     const { errors } = wrapper.vm.$data as { errors: { title: string } };
     expect(errors.title).toBe(
-      "You are not authorized to edit this note. Perhaps you are not logged in?"
+      "You are not authorized to edit this note. Perhaps you are not logged in?",
     );
   });
 
@@ -131,7 +131,7 @@ describe("in place edit on title", () => {
     await wrapper.find('[role="title"] input').setValue("updated");
     await wrapper.setProps({ textContent: { title: "change from outside." } });
     expect(
-      wrapper.find<HTMLInputElement>('[role="title"] input').element.value
+      wrapper.find<HTMLInputElement>('[role="title"] input').element.value,
     ).toBe("updated");
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
   });

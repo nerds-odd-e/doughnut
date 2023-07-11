@@ -12,7 +12,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
 
     async getCurrentUserInfo() {
       const res = (await managedApi.restGet(
-        `user/current-user-info`
+        `user/current-user-info`,
       )) as Generated.CurrentUserInfo;
       return res;
     },
@@ -20,7 +20,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     async updateUser(userId: Doughnut.ID, data: Generated.User) {
       const res = (await managedApi.restPatchMultiplePartForm(
         `user/${userId}`,
-        data
+        data,
       )) as Generated.User;
       return res;
     },
@@ -28,7 +28,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     async createUser(data: Generated.User) {
       return (await managedApi.restPostMultiplePartForm(
         `user`,
-        data
+        data,
       )) as Generated.User;
     },
   },
@@ -36,77 +36,77 @@ const apiCollection = (managedApi: ManagedApi) => ({
     async removeFromReview(reviewPointId: Doughnut.ID) {
       return (await managedApi.restPost(
         `review-points/${reviewPointId}/remove`,
-        {}
+        {},
       )) as Generated.ReviewPoint;
     },
 
     async overview() {
       return (await managedApi.restGet(
-        `reviews/overview`
+        `reviews/overview`,
       )) as Generated.ReviewStatus;
     },
 
     updateReviewSetting(
       noteId: Doughnut.ID,
-      data: Omit<Generated.ReviewSetting, "id">
+      data: Omit<Generated.ReviewSetting, "id">,
     ) {
       return managedApi.restPost(`notes/${noteId}/review-setting`, data);
     },
 
     async getReviewPoint(reviewPointId: Doughnut.ID) {
       return (await managedApi.restGet(
-        `review-points/${reviewPointId}`
+        `review-points/${reviewPointId}`,
       )) as Generated.ReviewPoint;
     },
 
     async initialReview() {
       return (await managedApi.restGet(
-        `reviews/initial`
+        `reviews/initial`,
       )) as Generated.ReviewPoint[];
     },
 
     async doInitialReview(data: Generated.InitialInfo) {
       return (await managedApi.restPost(
         `reviews`,
-        data
+        data,
       )) as Generated.ReviewPoint;
     },
 
     async processAnswer(quizQuestionId: Doughnut.ID, data: Generated.Answer) {
       const res = (await managedApi.restPost(
         `reviews/${quizQuestionId}/answer`,
-        data
+        data,
       )) as Generated.AnswerResult;
       return res;
     },
 
     async getAnswer(answerId: Doughnut.ID) {
       return (await managedApi.restGet(
-        `reviews/answers/${answerId}`
+        `reviews/answers/${answerId}`,
       )) as Generated.AnswerViewedByUser;
     },
 
     async selfEvaluate(
       reviewPointId: Doughnut.ID,
-      data: Generated.SelfEvaluation
+      data: Generated.SelfEvaluation,
     ) {
       const res = (await managedApi.restPost(
         `review-points/${reviewPointId}/self-evaluate`,
-        data
+        data,
       )) as Generated.ReviewPoint;
       return res;
     },
 
     async getDueReviewPoints(dueInDays?: number) {
       const res = (await managedApi.restGet(
-        `reviews/repeat?dueindays=${dueInDays ?? ""}`
+        `reviews/repeat?dueindays=${dueInDays ?? ""}`,
       )) as Generated.DueReviewPoints;
       return res;
     },
 
     async getRandomQuestionForReviewPoint(reviewPointId: Doughnut.ID) {
       const res = (await managedApi.restGet(
-        `review-points/${reviewPointId}/random-question`
+        `review-points/${reviewPointId}/random-question`,
       )) as Generated.QuizQuestion;
       return res;
     },
@@ -114,13 +114,13 @@ const apiCollection = (managedApi: ManagedApi) => ({
   circleMethods: {
     async getCircle(circleId: Doughnut.ID) {
       return (await managedApi.restGet(
-        `circles/${circleId}`
+        `circles/${circleId}`,
       )) as Generated.CircleForUserView;
     },
     async createCircle(data: Generated.Circle) {
       return (await managedApi.restPostMultiplePartForm(
         "circles",
-        data
+        data,
       )) as Generated.Circle;
     },
     joinCircle(data: Generated.CircleJoiningByInvitation) {
@@ -134,13 +134,13 @@ const apiCollection = (managedApi: ManagedApi) => ({
   async relativeSearch(searchTerm: Generated.SearchTerm) {
     return (await managedApi.restPost(
       `notes/search`,
-      searchTerm
+      searchTerm,
     )) as Generated.Note[];
   },
 
   async getBazaar() {
     return (await managedApi.restGet(
-      "bazaar"
+      "bazaar",
     )) as Generated.NotebooksViewedByUser;
   },
   shareToBazaar(notebookId: Doughnut.ID) {
@@ -157,16 +157,16 @@ const apiCollection = (managedApi: ManagedApi) => ({
     subscribe(notebookId: Doughnut.ID, data: Generated.Subscription) {
       return managedApi.restPostMultiplePartForm(
         `subscriptions/notebooks/${notebookId}/subscribe`,
-        data
+        data,
       );
     },
     updateSubscription(
       subscriptionId: Doughnut.ID,
-      data: Generated.Subscription
+      data: Generated.Subscription,
     ) {
       return managedApi.restPostMultiplePartForm(
         `subscriptions/${subscriptionId}`,
-        data
+        data,
       );
     },
     deleteSubscription(subscriptionId: Doughnut.ID) {
@@ -175,14 +175,14 @@ const apiCollection = (managedApi: ManagedApi) => ({
   },
   async getNoteInfo(noteId: Doughnut.ID) {
     return (await managedApi.restGet(
-      `notes/${noteId}/note-info`
+      `notes/${noteId}/note-info`,
     )) as Generated.NoteInfo;
   },
 
   notebookMethods: {
     async createNotebook(
       circle: Generated.Circle | undefined,
-      data: Generated.Notebook
+      data: Generated.Notebook,
     ) {
       const url = (() => {
         if (circle) {
@@ -197,14 +197,14 @@ const apiCollection = (managedApi: ManagedApi) => ({
 
     async getNotebooks() {
       return (await managedApi.restGet(
-        `notebooks`
+        `notebooks`,
       )) as Generated.NotebooksViewedByUser;
     },
 
     updateNotebookSettings(notebookId: Doughnut.ID, data: Generated.Notebook) {
       return managedApi.restPostMultiplePartForm(
         `notebooks/${notebookId}`,
-        data
+        data,
       );
     },
   },
@@ -212,48 +212,48 @@ const apiCollection = (managedApi: ManagedApi) => ({
   noteMethods: {
     async getNoteWithDescendents(noteId: Doughnut.ID) {
       return (await managedApi.restGet(
-        `notes/${noteId}/overview`
+        `notes/${noteId}/overview`,
       )) as Generated.NoteRealmWithAllDescendants;
     },
 
     async createNote(parentId: Doughnut.ID, data: Generated.NoteCreation) {
       return (await managedApi.restPostMultiplePartForm(
         `notes/${parentId}/create`,
-        data
+        data,
       )) as Generated.NoteRealmWithPosition;
     },
     async getNoteRealmWithPosition(noteId: Doughnut.ID) {
       return (await managedApi.restGet(
-        `notes/${noteId}`
+        `notes/${noteId}`,
       )) as Generated.NoteRealmWithPosition;
     },
 
     async getNotePosition(noteId: Doughnut.ID) {
       return (await managedApi.restGet(
-        `notes/${noteId}/position`
+        `notes/${noteId}/position`,
       )) as Generated.NotePositionViewedByUser;
     },
   },
   wikidata: {
     async updateWikidataId(
       noteId: Doughnut.ID,
-      data: Generated.WikidataAssociationCreation
+      data: Generated.WikidataAssociationCreation,
     ) {
       return (await managedApi.restPost(
         `notes/${noteId}/updateWikidataId`,
-        data
+        data,
       )) as Generated.NoteRealm;
     },
 
     async getWikidataEntityById(wikidataId: string) {
       return (await managedApi.restGet(
-        `wikidata/entity-data/${wikidataId}`
+        `wikidata/entity-data/${wikidataId}`,
       )) as Generated.WikidataEntityData;
     },
 
     async getWikidatas(keyword: string) {
       return (await managedApi.restGet(
-        `wikidata/search/${keyword}`
+        `wikidata/search/${keyword}`,
       )) as Generated.WikidataSearchEntity[];
     },
   },
@@ -262,14 +262,14 @@ const apiCollection = (managedApi: ManagedApi) => ({
       prompt: string,
       noteId: Doughnut.ID,
       prev?: string,
-      interimResultShouldContinue?: (moreCompleteContent: string) => boolean
+      interimResultShouldContinue?: (moreCompleteContent: string) => boolean,
     ): Promise<string> {
       const res = await this.askAiCompletion(
         {
           prompt,
           incompleteContent: prev ?? "",
         },
-        noteId
+        noteId,
       );
       if (interimResultShouldContinue) {
         if (!interimResultShouldContinue(res.moreCompleteContent))
@@ -280,7 +280,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
           prompt,
           noteId,
           res.moreCompleteContent,
-          interimResultShouldContinue
+          interimResultShouldContinue,
         );
       }
       return res.moreCompleteContent;
@@ -288,29 +288,29 @@ const apiCollection = (managedApi: ManagedApi) => ({
 
     async askAiCompletion(
       request: Generated.AiCompletionRequest,
-      noteId: Doughnut.ID
+      noteId: Doughnut.ID,
     ) {
       return (await managedApi.restPost(
         `ai/${noteId}/completion`,
-        request
+        request,
       )) as Generated.AiCompletion;
     },
 
     async askAIToGenerateQuestion(
-      noteId: Doughnut.ID
+      noteId: Doughnut.ID,
     ): Promise<Generated.QuizQuestion> {
       return (await managedApi.restPost(
         `ai/generate-question?note=${noteId}`,
-        {}
+        {},
       )) as Generated.QuizQuestion;
     },
     async askAIToRegenerateQuestion(
       noteId: Doughnut.ID,
-      question: string
+      question: string,
     ): Promise<Generated.QuizQuestion> {
       return (await managedApi.restPost(
         `ai/regenerate-question?note=${noteId}`,
-        question
+        question,
       )) as Generated.QuizQuestion;
     },
     async generateImage(prompt: string) {
@@ -320,7 +320,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
       };
       return (await managedApi.restPost(
         `ai/generate-image`,
-        request
+        request,
       )) as Generated.AiGeneratedImage;
     },
   },

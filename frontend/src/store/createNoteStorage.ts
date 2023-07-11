@@ -38,14 +38,14 @@ class AccessorImplementation
       this.managedApi,
       this.noteEditingHistory,
       router,
-      this
+      this,
     );
   }
 }
 
 function createNoteStorage(
   managedApi: ManagedApi,
-  noteEditingHistory?: NoteEditingHistory
+  noteEditingHistory?: NoteEditingHistory,
 ): StorageAccessor {
   return new AccessorImplementation(managedApi, noteEditingHistory);
 }

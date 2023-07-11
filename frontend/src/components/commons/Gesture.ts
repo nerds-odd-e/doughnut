@@ -109,11 +109,11 @@ class Gesture {
         ((pos1.x - pos2.x) ** 2 + (pos1.y - pos2.y) ** 2) ** 0.5;
       newScale *= distance(
         pointer1?.current as Position,
-        pointer2?.current as Position
+        pointer2?.current as Position,
       );
       newScale /= distance(
         pointer1?.start as Position,
-        pointer2?.start as Position
+        pointer2?.start as Position,
       );
 
       const atan2 = (pos1: Position, pos2: Position): number =>

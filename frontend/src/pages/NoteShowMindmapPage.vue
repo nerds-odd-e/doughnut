@@ -50,19 +50,19 @@ export default defineComponent({
       this.selectedNoteId = id;
       this.storageAccessor.selectPosition(
         this.noteRealmCache?.getNoteRealmById(this.selectedNoteId)?.note,
-        this.noteRealmCache?.getNotePosition(this.selectedNoteId)
+        this.noteRealmCache?.getNotePosition(this.selectedNoteId),
       );
     },
     async fetchData() {
       this.noteRealmCache = new NoteRealmCache(
-        await this.api.noteMethods.getNoteWithDescendents(this.noteId)
+        await this.api.noteMethods.getNoteWithDescendents(this.noteId),
       );
     },
   },
   watch: {
     "storageAccessor.updatedNoteRealm": function updateAt() {
       this.noteRealmCache?.updateNoteRealm(
-        this.storageAccessor.updatedNoteRealm
+        this.storageAccessor.updatedNoteRealm,
       );
     },
     noteId() {

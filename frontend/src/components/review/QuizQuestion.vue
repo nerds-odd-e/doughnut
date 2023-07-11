@@ -180,12 +180,12 @@ export default defineComponent({
       try {
         const answerResult = await this.api.reviewMethods.processAnswer(
           this.quizQuestion.quizQuestionId,
-          answerData
+          answerData,
         );
         this.$emit("answered", answerResult);
       } catch (_e) {
         await this.popups.alert(
-          "This review point doesn't exist any more or is being skipped now. Moving on to the next review point..."
+          "This review point doesn't exist any more or is being skipped now. Moving on to the next review point...",
         );
       }
     },

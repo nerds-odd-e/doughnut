@@ -67,13 +67,13 @@ describe("note mindmap", () => {
         expect(lines).toHaveLength(3);
         const lastLine = lines[2];
         expect(parseFloat(lastLine?.attributes("x1") as string)).toBeCloseTo(
-          -75
+          -75,
         );
         expect(parseFloat(lastLine?.attributes("y1") as string)).toBeCloseTo(
-          198.1212
+          198.1212,
         );
         expect(parseFloat(lastLine?.attributes("y2") as string)).toBeCloseTo(
-          189.0275953
+          189.0275953,
         );
       });
     });
@@ -94,10 +94,10 @@ describe("note mindmap", () => {
         const linkStart = connection.findAll(".link-start");
         expect(linkStart).toHaveLength(2);
         expect(linkStart[0]?.attributes("transform")).toEqual(
-          "translate(285, 0) rotate(0)"
+          "translate(285, 0) rotate(0)",
         );
         expect(linkStart[1]?.attributes("transform")).toEqual(
-          "translate(-135, 0) rotate(360)"
+          "translate(-135, 0) rotate(360)",
         );
       });
     });
@@ -126,7 +126,7 @@ describe("note mindmap", () => {
   describe("size", () => {
     beforeEach(() => {
       notes.push(
-        makeMe.aNoteRealm.title("single note").picture("a.jpg").please()
+        makeMe.aNoteRealm.title("single note").picture("a.jpg").please(),
       );
     });
 

@@ -11,7 +11,7 @@ const quizQuestion = makeMe.aQuizQuestion.withClozeSelectionQuestion().please();
 describe("repeat page", () => {
   const mountPage = async (
     quizQuestions: number[],
-    eagerFetchCount: number
+    eagerFetchCount: number,
   ) => {
     const wrapper = helper
       .component(Quiz)

@@ -37,7 +37,7 @@ describe("storedApiCollection", () => {
       cache.deleteNoteAndDescendents(child.id);
       expect(cache.getNoteRealmById(note.id)?.children).toHaveLength(
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        childrenCount! - 1
+        childrenCount! - 1,
       );
     });
   });

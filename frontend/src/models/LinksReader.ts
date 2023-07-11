@@ -10,7 +10,9 @@ class LinksReader {
 
   private filterTypes(cond: (t: Generated.LinkType) => boolean) {
     return Object.fromEntries(
-      Object.entries(this.links).filter((t) => cond(t[0] as Generated.LinkType))
+      Object.entries(this.links).filter((t) =>
+        cond(t[0] as Generated.LinkType),
+      ),
     );
   }
 
@@ -40,16 +42,16 @@ class LinksReader {
   get directLinks() {
     return Object.fromEntries(
       Object.entries(this.links).filter(
-        (t) => t[1].direct && t[1].direct.length > 0
-      )
+        (t) => t[1].direct && t[1].direct.length > 0,
+      ),
     ) as LinksMap;
   }
 
   get reverseLinks() {
     return Object.fromEntries(
       Object.entries(this.links).filter(
-        (t) => t[1].reverse && t[1].reverse.length > 0
-      )
+        (t) => t[1].reverse && t[1].reverse.length > 0,
+      ),
     ) as LinksMap;
   }
 }

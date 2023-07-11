@@ -79,7 +79,7 @@ class RenderingHelper {
   }
 
   mount(
-    options: Record<string, unknown> = {}
+    options: Record<string, unknown> = {},
   ): VueWrapper<ComponentPublicInstance> {
     return mount(this.comp, { ...this.options, ...options });
   }

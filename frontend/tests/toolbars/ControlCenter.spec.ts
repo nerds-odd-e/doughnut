@@ -18,7 +18,7 @@ describe("Note Control Center", () => {
     noteEditingHistory = new NoteEditingHistory();
     histories = createNoteStorage(
       new ManagedApi({ states: [], errors: [] }),
-      noteEditingHistory
+      noteEditingHistory,
     );
   });
 

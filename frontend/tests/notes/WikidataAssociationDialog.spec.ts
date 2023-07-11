@@ -59,6 +59,6 @@ describe("Save wikidata id", () => {
       const wrapper = await putWikidataIdAndSubmit(note);
       userAction(wrapper);
       helper.apiMock.assertNoUnexpectedOrMissedCalls();
-    }
+    },
   );
 });

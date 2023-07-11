@@ -16,7 +16,7 @@ class LinkViewedBuilder extends Builder<LinksMap> {
   constructor(
     linkType: Generated.LinkType,
     from: Generated.NoteRealm,
-    to: Generated.NoteRealm
+    to: Generated.NoteRealm,
   ) {
     super();
     this.linkType = linkType;
@@ -49,7 +49,7 @@ class LinkViewedBuilder extends Builder<LinksMap> {
       [this.linkType]: {
         [this.isReverse ? "reverse" : "direct"]: Array.from(
           { length: this.cnt },
-          () => this.link()
+          () => this.link(),
         ),
         [this.isReverse ? "direct" : "reverse"]: [],
       },

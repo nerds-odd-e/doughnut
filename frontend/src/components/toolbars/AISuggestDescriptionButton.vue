@@ -53,10 +53,10 @@ export default defineComponent({
               title: this.selectedNote.title,
               description: moreCompleteContent,
             },
-            this.selectedNote.textContent
+            this.selectedNote.textContent,
           );
           return !this.isUnmounted;
-        }
+        },
       );
     },
   },

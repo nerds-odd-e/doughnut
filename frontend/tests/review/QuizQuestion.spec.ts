@@ -23,7 +23,7 @@ describe("QuizQuestion", () => {
         .please();
       helper.apiMock
         .expectingPost(
-          `/api/ai/${quizQuestion.notebookPosition?.noteId}/completion`
+          `/api/ai/${quizQuestion.notebookPosition?.noteId}/completion`,
         )
         .andReturnOnce({
           moreCompleteContent: JSON.stringify(goodQuestion),

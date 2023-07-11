@@ -7,7 +7,7 @@ describe("AISuggestDescriptionButton", () => {
   helper.resetWithApiMock(beforeEach, afterEach);
 
   const triggerSuggestionwithoutFlushPromises = async (
-    note: Generated.Note
+    note: Generated.Note,
   ) => {
     const wrapper = helper
       .component(AISuggestDescriptionButton)

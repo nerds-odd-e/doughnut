@@ -15,9 +15,9 @@ export default defineComponent({
       () => props.noteId,
       () => {
         throw new Error(
-          "NoteCardsView: noteId changed. Please make noteId the key in the parent component."
+          "NoteCardsView: noteId changed. Please make noteId the key in the parent component.",
         );
-      }
+      },
     );
     return { noteRealm: props.storageAccessor.refOfNoteRealm(props.noteId) };
   },

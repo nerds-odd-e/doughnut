@@ -45,7 +45,7 @@ export default {
           this.failureReports = res;
         })
         .catch(
-          () => (this.errorMessage = "It seems you cannot access this page.")
+          () => (this.errorMessage = "It seems you cannot access this page."),
         );
     },
   },

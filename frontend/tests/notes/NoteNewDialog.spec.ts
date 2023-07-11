@@ -137,9 +137,9 @@ describe("adding new note", () => {
         await flushPromises();
 
         expect((<HTMLInputElement>titleInput().element).value).toBe(
-          expectedTitle
+          expectedTitle,
         );
-      }
+      },
     );
   });
 });

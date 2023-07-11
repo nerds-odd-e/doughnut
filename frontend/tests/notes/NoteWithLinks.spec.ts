@@ -25,9 +25,9 @@ describe("new/updated pink banner", () => {
         .mount();
 
       expect(wrapper.find(".note-body").element).toHaveStyle(
-        `border-color: ${expectedColor};`
+        `border-color: ${expectedColor};`,
       );
-    }
+    },
   );
 });
 

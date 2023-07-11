@@ -33,7 +33,7 @@ export default defineComponent({
   components: {},
   data() {
     const aiQuestion = JSON.parse(
-      this.rawJsonQuestion
+      this.rawJsonQuestion,
     ) as Generated.AIGeneratedQuestion;
     return {
       background: aiQuestion.background,
@@ -51,7 +51,7 @@ export default defineComponent({
       this.selectedOptionIndex = optionIndex;
       this.$emit(
         "selfEvaluatedMemoryState",
-        this.isOptionCorrect(this.options[optionIndex]) ? "yes" : "no"
+        this.isOptionCorrect(this.options[optionIndex]) ? "yes" : "no",
       );
       this.$emit("is-question-answered", true);
     },

@@ -5,7 +5,7 @@ export default interface CurrentPosition {
   selectPosition(
     note?: Generated.Note,
     notePosition?: Generated.NotePositionViewedByUser,
-    circle?: Generated.Circle
+    circle?: Generated.Circle,
   ): void;
 }
 
@@ -19,7 +19,7 @@ export class CurrentPositionImplementation implements CurrentPosition {
   selectPosition(
     note?: Generated.Note,
     notePosition?: Generated.NotePositionViewedByUser,
-    circle?: Generated.Circle
+    circle?: Generated.Circle,
   ): void {
     this.selectedNote = note;
     this.notePosition = notePosition;

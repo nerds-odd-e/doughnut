@@ -12,7 +12,7 @@ class LinksMapBuilder extends Builder<Generated.LinksOfANote> {
     const child = new LinkViewedBuilder(
       linkType,
       this.from,
-      new NoteRealmBuilder().title(`target note ${generateId()}`).do()
+      new NoteRealmBuilder().title(`target note ${generateId()}`).do(),
     ).parent(this);
     this.childrenBuilders.push(child);
     return child;
@@ -22,7 +22,7 @@ class LinksMapBuilder extends Builder<Generated.LinksOfANote> {
     return {
       links: this.childrenBuilders.reduce(
         (prev, curr) => ({ ...prev, ...curr.do() }),
-        {}
+        {},
       ),
     };
   }

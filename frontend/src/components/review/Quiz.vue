@@ -89,7 +89,7 @@ export default defineComponent({
       if (this.minimized) return;
       this.storageAccessor.selectPosition(
         undefined,
-        this.currentQuizQuestion?.notebookPosition
+        this.currentQuizQuestion?.notebookPosition,
       );
     },
 
@@ -119,8 +119,8 @@ export default defineComponent({
         this.quizQuestionCache.set(
           next,
           await this.silentApi.reviewMethods.getRandomQuestionForReviewPoint(
-            next
-          )
+            next,
+          ),
         );
       }
     },

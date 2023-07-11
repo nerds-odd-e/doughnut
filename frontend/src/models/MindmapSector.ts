@@ -4,7 +4,7 @@ const splitAngle = (
   startAngle: number,
   angleRange: number,
   siblingCount: number,
-  index: number
+  index: number,
 ): number =>
   startAngle +
   (angleRange / siblingCount) * index +
@@ -53,7 +53,7 @@ class MindmapSector {
       this.startAngle,
       this.angleRange,
       siblingCount,
-      index
+      index,
     );
     const x = this.nx + radius * Math.cos(ang) * extraScale;
     const y = this.ny + radius * Math.sin(ang) * extraScale;
@@ -63,7 +63,7 @@ class MindmapSector {
       x,
       y,
       start,
-      this.angleRange / siblingCount + Math.PI / 5
+      this.angleRange / siblingCount + Math.PI / 5,
     );
     child.parentX = this.nx;
     child.parentY = this.ny;
@@ -86,7 +86,7 @@ class MindmapSector {
     start: number,
     range: number,
     connectorCount: number,
-    connectorIndex: number
+    connectorIndex: number,
   ): Vector {
     const angle = splitAngle(start, range, connectorCount, connectorIndex);
     return { angle, x: this.nx, y: this.ny };

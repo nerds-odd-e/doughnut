@@ -18,7 +18,7 @@ class ApiMockExpectation {
   }
 
   getResponse(
-    request: Request
+    request: Request,
   ): MockParams | string | Promise<MockParams | string> {
     if (this.resolve) {
       return new Promise((resolve) => {

@@ -47,7 +47,7 @@ export default defineComponent({
         await this.api.noteMethods.getNoteWithDescendents(this.noteId);
       this.storageAccessor.selectPosition(
         noteWithDescendents.notes[0]?.note,
-        noteWithDescendents.notePosition
+        noteWithDescendents.notePosition,
       );
       this.noteRealmCache = new NoteRealmCache(noteWithDescendents);
     },
@@ -55,7 +55,7 @@ export default defineComponent({
   watch: {
     "storageAccessor.updatedNoteRealm": function noteRealmUpdated() {
       this.noteRealmCache?.updateNoteRealm(
-        this.storageAccessor.updatedNoteRealm
+        this.storageAccessor.updatedNoteRealm,
       );
     },
 

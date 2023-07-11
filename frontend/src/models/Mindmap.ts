@@ -12,7 +12,7 @@ class Mindmap {
   constructor(
     scale: number,
     rootMindmapSector: MindmapSector,
-    rootNoteId: Doughnut.ID
+    rootNoteId: Doughnut.ID,
   ) {
     this.rootMindmapSector = rootMindmapSector;
     this.rootNoteId = rootNoteId;
@@ -36,20 +36,20 @@ class Mindmap {
   outSlot(
     from: MindmapSector,
     connectorCount: number,
-    connectorIndex: number
+    connectorIndex: number,
   ): Vector {
     return this.metrics.borderVector(
-      from.outSlot(connectorCount, connectorIndex)
+      from.outSlot(connectorCount, connectorIndex),
     );
   }
 
   inSlot(
     from: MindmapSector,
     connectorCount: number,
-    connectorIndex: number
+    connectorIndex: number,
   ): Vector {
     return this.metrics.borderVector(
-      from.inSlot(connectorCount, connectorIndex)
+      from.inSlot(connectorCount, connectorIndex),
     );
   }
 }

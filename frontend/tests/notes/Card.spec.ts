@@ -22,7 +22,7 @@ describe("A child card of a note", () => {
     helper.component(Card).withStorageProps({ note }).render();
     await screen.findByText("this is a note");
     await screen.findByText(
-      "nah nah nah nah nah nah nah nah nah nah nah nah..."
+      "nah nah nah nah nah nah nah nah nah nah nah nah...",
     );
   });
 
@@ -34,7 +34,7 @@ describe("A child card of a note", () => {
     helper.component(Card).withStorageProps({ note }).render();
     await screen.findByText("this is a note");
     await screen.findByText(
-      "nahnahnahnahnahnahnahnahnahnahnahnahnahnahnahna..."
+      "nahnahnahnahnahnahnahnahnahnahnahnahnahnahnahna...",
     );
   });
 });

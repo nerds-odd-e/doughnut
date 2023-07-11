@@ -32,7 +32,7 @@ export default {
           this.$router.push({
             name: "noteShow",
             params: { noteId: res.noteId },
-          })
+          }),
         )
         .catch((err) => (this.errors = err));
     },

@@ -42,7 +42,7 @@ export default {
         {
           x: event.clientX,
           y: event.clientY,
-        }
+        },
       );
       this.gesture.shiftDown(event.shiftKey);
       Object.assign(this.modelValue, this.gesture.offset);
@@ -59,8 +59,8 @@ export default {
         this.modelValue,
         this.gesture.zoom(
           e.currentTarget.getBoundingClientRect(),
-          this.modelValue.scale + e.deltaY * 0.01
-        )
+          this.modelValue.scale + e.deltaY * 0.01,
+        ),
       );
       this.gesture = null;
       this.$emit("update:modelValue", this.modelValue);

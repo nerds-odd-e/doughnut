@@ -42,7 +42,7 @@ export default defineComponent({
     },
     async fetchData() {
       this.reviewPoint = await this.api.reviewMethods.getReviewPoint(
-        this.reviewPointId
+        this.reviewPointId,
       );
     },
   },

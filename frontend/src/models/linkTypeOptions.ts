@@ -73,8 +73,8 @@ const taggingTypes = linkTypeOptions
 const groupedTypes = linkTypeOptions
   .filter((t) =>
     ["related to", "the opposite of", "similar to", "confused with"].includes(
-      t.label
-    )
+      t.label,
+    ),
   )
   .map((t) => t.label);
 

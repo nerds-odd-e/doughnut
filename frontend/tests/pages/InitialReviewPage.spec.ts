@@ -49,7 +49,7 @@ describe("repeat page", () => {
       expect(wrapper.findAll(".initial-review-paused")).toHaveLength(0);
       expect(wrapper.findAll(".pause-stop")).toHaveLength(1);
       expect(wrapper.find(".progress-text").text()).toContain(
-        "Initial Review: 0/2"
+        "Initial Review: 0/2",
       );
     });
 
@@ -77,7 +77,7 @@ describe("repeat page", () => {
     expect(mockRouterPush).toHaveBeenCalledTimes(0);
     expect(wrapper.findAll(".initial-review-paused")).toHaveLength(1);
     expect(wrapper.find(".review-point-abbr span").text()).toContain(
-      noteRealm.note.title
+      noteRealm.note.title,
     );
   });
 
@@ -95,10 +95,10 @@ describe("repeat page", () => {
     expect(mockRouterPush).toHaveBeenCalledTimes(0);
     expect(wrapper.findAll(".initial-review-paused")).toHaveLength(1);
     expect(wrapper.find(".review-point-abbr span").text()).toContain(
-      link.sourceNote.title
+      link.sourceNote.title,
     );
     expect(wrapper.find(".review-point-abbr span").text()).toContain(
-      link.targetNote.title
+      link.targetNote.title,
     );
   });
 });

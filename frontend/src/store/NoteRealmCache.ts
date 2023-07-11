@@ -10,7 +10,7 @@ class NoteRealmCache implements NoteRealmsReader {
   constructor(
     value:
       | Generated.NoteRealmWithAllDescendants
-      | Generated.NoteRealmWithPosition
+      | Generated.NoteRealmWithPosition,
   ) {
     this.notePosition = value.notePosition;
     if ("notes" in value) {
@@ -65,7 +65,7 @@ class NoteRealmCache implements NoteRealmsReader {
 
   private deleteNote(id: Doughnut.ID) {
     this.getChildrenByParentId(id)?.forEach((child) =>
-      this.deleteNote(child.id)
+      this.deleteNote(child.id),
     );
     delete this.noteRealms[id];
   }

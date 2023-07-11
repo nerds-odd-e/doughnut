@@ -6,7 +6,7 @@ import { StorageAccessor } from "../../store/createNoteStorage";
 
 function NestedPage(
   WrappedComponent: ReturnType<typeof defineComponent>,
-  scopeName: string
+  scopeName: string,
 ) {
   return defineComponent({
     name: "NestedPage",
