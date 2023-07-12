@@ -94,6 +94,6 @@ Given("AI will generate question for instruction:", (questionTable: DataTable) =
   }
 })
 
-Then("I should see the question {string} is disabled", () => {
-  cy.get('[class="disabled-div"]')
+Then("I should see the question {string} is disabled", (questionStem: string) => {
+  cy.findByText(questionStem).get('[class="disabled-div"]')
 })
