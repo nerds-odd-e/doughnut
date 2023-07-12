@@ -38,10 +38,8 @@ function mockChatCompletion(
   finishReason: "length" | "stop",
 ) {
   return serviceMocker.mockWithPredicate(predicate, {
-    id: "cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7",
     object: "chat.completion",
     created: 1589478378,
-    model: "gpt-3.5-turbo",
     choices: [
       {
         message: {
@@ -145,9 +143,7 @@ Cypress.Commands.add(
     }
 
     return serviceMocker.mockWithPredicate(predicate, {
-      id: "cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7",
       object: "chat.completion",
-      model: "gpt-3.5-turbo",
       choices: [
         {
           message: {
@@ -167,7 +163,6 @@ Cypress.Commands.add(
 
 Cypress.Commands.add("stubCreateImage", { prevSubject: true }, (serviceMocker: ServiceMocker) => {
   return serviceMocker.stubPoster(`/v1/images/generations`, {
-    id: "cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7",
     created: 1589478378,
     data: [
       {
