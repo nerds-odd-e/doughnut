@@ -15,7 +15,7 @@ Feature: Question generation by AI
   Scenario Outline: testing myself with generated question for a note
     When I ask to generate a question for note "Scuba Diving"
     Then I should be asked "What is the most common scuba diving certification?"
-    And the option "<option>" should be <expectedResult>
+    And the choice "<option>" should be <expectedResult>
     Examples:
       | option       | expectedResult |
       | Rescue Diver | correct        |

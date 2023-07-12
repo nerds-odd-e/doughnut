@@ -104,7 +104,7 @@ Then("I set the level of {string} to be {int}", (noteTitle: string, level: numbe
   })
 })
 
-Then("I have selected the option {string}", (option: string) => {
+Then("I have selected the choice {string}", (option: string) => {
   cy.formField(option).check()
   cy.findByRole("button", { name: "Keep for repetition" }).click()
 })
@@ -200,11 +200,11 @@ Then("I should see the review point is removed from review", () => {
   cy.findByText("This review point has been removed from reviewing.")
 })
 
-Then("the option {string} should be correct", (option: string) => {
+Then("the choice {string} should be correct", (option: string) => {
   cy.findByText(option).click().invoke("attr", "class").should("contain", "is-correct")
 })
 
-Then("the option {string} should be wrong", (option: string) => {
+Then("the choice {string} should be wrong", (option: string) => {
   cy.findByText(option).click().invoke("attr", "class").should("contain", "is-wrong")
 })
 

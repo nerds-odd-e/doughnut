@@ -31,7 +31,7 @@ Feature: Repetition Quiz
 
   Scenario Outline: Spelling quiz
     Given I am learning new note on day 1
-    And I have selected the option "Remember Spelling"
+    And I have selected the choice "Remember Spelling"
     When I am repeat-reviewing my old note on day 2
     Then I should be asked spelling question "means incite violence" from notebook "English"
     When I type my answer "<answer>"
