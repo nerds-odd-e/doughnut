@@ -31,21 +31,33 @@ import "./string.extensions"
 import ServiceMocker from "./ServiceMocker"
 import { HttpMethod, Predicate } from "@anev/ts-mountebank"
 
+type FunctionCall = {
+  role: "function"
+  function_call: {
+    name: string
+    arguments: string
+  }
+}
+
+type TextBasedMessage = {
+  role: "user" | "assistant"
+  content: string
+}
+
+type ChatMessage = TextBasedMessage | FunctionCall
+
 function mockChatCompletion(
   predicate: Predicate,
   serviceMocker: ServiceMocker,
-  reply: string,
-  finishReason: "length" | "stop",
+  message: ChatMessage,
+  finishReason: "length" | "stop" | "function_call",
 ) {
   return serviceMocker.mockWithPredicate(predicate, {
     object: "chat.completion",
     created: 1589478378,
     choices: [
       {
-        message: {
-          role: "assistant",
-          content: reply,
-        },
+        message,
         index: 0,
         finish_reason: finishReason,
       },
@@ -56,6 +68,20 @@ function mockChatCompletion(
       total_tokens: 12,
     },
   })
+}
+
+function mockChatCompletionAsAssistant(
+  predicate: Predicate,
+  serviceMocker: ServiceMocker,
+  reply: string,
+  finishReason: "length" | "stop",
+) {
+  return mockChatCompletion(
+    predicate,
+    serviceMocker,
+    { role: "assistant", content: reply },
+    finishReason,
+  )
 }
 
 Cypress.Commands.add(
@@ -70,7 +96,7 @@ Cypress.Commands.add(
       .withPath(`/v1/chat/completions`)
       .withMethod(HttpMethod.POST)
       .withBody(body)
-    return mockChatCompletion(predicate, serviceMocker, reply, "stop")
+    return mockChatCompletionAsAssistant(predicate, serviceMocker, reply, "stop")
   },
 )
 
@@ -91,7 +117,7 @@ Cypress.Commands.add(
       .withPath(`/v1/chat/completions`)
       .withMethod(HttpMethod.POST)
       .withBody(body)
-    return mockChatCompletion(predicate, serviceMocker, reply, finishReason)
+    return mockChatCompletionAsAssistant(predicate, serviceMocker, reply, finishReason)
   },
 )
 
@@ -105,7 +131,7 @@ Cypress.Commands.add(
       .withPath(`/v1/chat/completions`)
       .withMethod(HttpMethod.POST)
       .withBody(body)
-    return mockChatCompletion(predicate, serviceMocker, reply, "stop")
+    return mockChatCompletionAsAssistant(predicate, serviceMocker, reply, "stop")
   },
 )
 
@@ -118,7 +144,7 @@ Cypress.Commands.add(
   { prevSubject: true },
   (serviceMocker: ServiceMocker, reply: string, finishReason: "length" | "stop") => {
     const predicate = new DefaultPredicate(`/v1/chat/completions`, HttpMethod.POST)
-    return mockChatCompletion(predicate, serviceMocker, reply, finishReason)
+    return mockChatCompletionAsAssistant(predicate, serviceMocker, reply, finishReason)
   },
 )
 
@@ -142,22 +168,18 @@ Cypress.Commands.add(
         .withBody(bodyContains)
     }
 
-    return serviceMocker.mockWithPredicate(predicate, {
-      object: "chat.completion",
-      choices: [
-        {
-          message: {
-            role: "function",
-            function_call: {
-              name: functionName,
-              arguments: argumentsString,
-            },
-          },
-          index: 0,
-          finish_reason: "function_call",
+    return mockChatCompletion(
+      predicate,
+      serviceMocker,
+      {
+        role: "function",
+        function_call: {
+          name: functionName,
+          arguments: argumentsString,
         },
-      ],
-    })
+      },
+      "function_call",
+    )
   },
 )
 
