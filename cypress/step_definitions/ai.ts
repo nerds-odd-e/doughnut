@@ -72,35 +72,18 @@ Then("it should consider the context {string}", (path: string) => {
   cy.openAiService().thePreviousRequestShouldHaveIncludedPathInfo(path)
 })
 
-Given(
-  "OpenAI by default returns this question that does not make sense:",
-  (questionTable: DataTable) => {
-    const record = questionTable.hashes()[0]
-    const reply = JSON.stringify({
-      stem: record.question,
-      correctChoice: record.correct_choice,
-      incorrectChoices: [record.incorrect_choice_1, record.incorrect_choice_2],
-    })
-    cy.openAiService().restartImposter()
-    cy.openAiService().stubChatCompletionFunctionCall(
-      "ask_single_answer_multiple_choice_question",
-      reply,
-    )
-  },
-)
-
 Then("I complain the question doesn't make sense", () => {
   cy.findByRole("button", { name: "Doesn't make sense?" }).click()
 })
 
-Given("AI question responses for instructions mapping is:", (questionTable: DataTable) => {
+Given("AI will generate question for instruction:", (questionTable: DataTable) => {
   cy.openAiService().restartImposter()
 
   for (const mapping of questionTable.hashes()) {
     const reply = JSON.stringify({
-      stem: mapping.expected_question_stem,
+      stem: mapping.question_stem,
       correctChoice: "A",
-      incorrectChoices: ["B", "C"],
+      incorrectChoices: ["B"],
     })
 
     cy.openAiService().stubChatCompletionFunctionCall(

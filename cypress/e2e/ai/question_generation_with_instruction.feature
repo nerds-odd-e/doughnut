@@ -5,8 +5,8 @@ Feature: Question generation by AI
 
   Background:
     Given I've logged in as an existing user
-    And AI question responses for instructions mapping is:
-      | instruction            | expected_question_stem                          |
+    And AI will generate question for instruction:
+      | instruction            | question_stem                                   |
       | general question       | What is scuba diving?                           |
       | Relate to Singapore    | What is a good scuba diving place in Singapore? |
 
