@@ -104,8 +104,8 @@ Then("I set the level of {string} to be {int}", (noteTitle: string, level: numbe
   })
 })
 
-Then("I have selected the choice {string}", (option: string) => {
-  cy.formField(option).check()
+Then("I have selected the choice {string}", (choice: string) => {
+  cy.formField(choice).check()
   cy.findByRole("button", { name: "Keep for repetition" }).click()
 })
 
@@ -169,8 +169,8 @@ Then("I should see the information of note {string}", (noteTitle: string) => {
   cy.findNoteTitle(noteTitle)
 })
 
-Then("I should see that my answer {string} is wrong", (answer) => {
-  cy.findByText(`Your answer \`${answer}\` is wrong.`)
+Then("I should see that my answer {string} is incorrect", (answer) => {
+  cy.findByText(`Your answer \`${answer}\` is incorrect.`)
 })
 
 Then("I should see the repetition is finished: {string}", (yesNo) => {
@@ -200,12 +200,12 @@ Then("I should see the review point is removed from review", () => {
   cy.findByText("This review point has been removed from reviewing.")
 })
 
-Then("the choice {string} should be correct", (option: string) => {
-  cy.findByText(option).click().invoke("attr", "class").should("contain", "is-correct")
+Then("the choice {string} should be correct", (choice: string) => {
+  cy.expectQuestionChoiceToBe(choice, "correct")
 })
 
-Then("the choice {string} should be wrong", (option: string) => {
-  cy.findByText(option).click().invoke("attr", "class").should("contain", "is-wrong")
+Then("the choice {string} should be incorrect", (choice: string) => {
+  cy.expectQuestionChoiceToBe(choice, "incorrect")
 })
 
 When("I ask to generate a question for note {string}", (noteTitle: string) => {

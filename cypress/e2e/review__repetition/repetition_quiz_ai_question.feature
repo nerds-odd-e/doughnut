@@ -23,5 +23,5 @@ Feature: Repetition Quiz
     Then I should see that my answer <result>
     Examples:
       | answer             | result              |
-      | to sleep           | "no" is wrong |
+      | to sleep           | "no" is incorrect   |
       | to incite violence | is correct          |

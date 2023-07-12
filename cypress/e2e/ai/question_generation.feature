@@ -19,7 +19,7 @@ Feature: Question generation by AI
     Examples:
       | option       | expectedResult |
       | Rescue Diver | correct        |
-      | Divemaster   | wrong          |
+      | Divemaster   | incorrect          |
 
   Scenario: I should be able to regenerate the question when the question and choices do not make sense relating to the note
     When I ask to generate a question for note "Scuba Diving"

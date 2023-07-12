@@ -120,7 +120,7 @@ export default defineComponent({
   background-color: #00ff00;
 }
 
-.is-wrong {
+.is-incorrect {
   font-weight: bold;
   background-color: #ff0000;
 }

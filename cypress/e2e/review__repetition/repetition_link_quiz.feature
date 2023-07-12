@@ -22,7 +22,7 @@ Feature: Repetition Link Quiz
     Then I should see that my answer <result>
 
     Examples:
-      | answer | result          |
-      | Mars   | "Mars" is wrong |
-      | Earth  | is correct      |
+      | answer | result              |
+      | Mars   | "Mars" is incorrect |
+      | Earth  | is correct          |
 

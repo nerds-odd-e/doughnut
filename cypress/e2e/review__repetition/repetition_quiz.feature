@@ -25,9 +25,9 @@ Feature: Repetition Quiz
     And I should see the repetition is finished: "<should see finish>"
 
     Examples:
-      | answer   | result              | should see finish |
-      | sedation | "sedation" is wrong | no                |
-      | sedition | is correct          | yes               |
+      | answer   | result                  | should see finish |
+      | sedation | "sedation" is incorrect | no                |
+      | sedition | is correct              | yes               |
 
   Scenario Outline: Spelling quiz
     Given I am learning new note on day 1
@@ -38,6 +38,6 @@ Feature: Repetition Quiz
     Then I should see that my answer <result>
 
     Examples:
-      | answer   | result          |
-      | asdf     | "asdf" is wrong |
-      | Sedition | is correct      |
+      | answer   | result              |
+      | asdf     | "asdf" is incorrect |
+      | Sedition | is correct          |

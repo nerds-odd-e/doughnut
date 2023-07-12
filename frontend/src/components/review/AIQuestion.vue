@@ -13,7 +13,7 @@
       @click="selectOption(index)"
       :class="{
         'is-correct': isSelectedOption(index) && isOptionCorrect(option),
-        'is-wrong': isSelectedOption(index) && !isOptionCorrect(option),
+        'is-incorrect': isSelectedOption(index) && !isOptionCorrect(option),
       }"
     >
       {{ option }}
@@ -77,7 +77,7 @@ ol {
   background-color: #00ff00;
 }
 
-.is-wrong {
+.is-incorrect {
   font-weight: bold;
   background-color: #ff0000;
 }
