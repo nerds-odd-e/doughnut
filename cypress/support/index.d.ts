@@ -107,7 +107,6 @@ declare namespace Cypress {
       wikipediaLink: string | undefined,
     ): Chainable<Subject>
     stubWikidataSearchResult(wikidataLabel: string, wikidataId: string): Chainable<Subject>
-    mockChatCompletion(prompt: string, reply: string): Chainable<Subject>
     mockChatCompletionWithIncompleteAssistantMessage(
       incomplete: string,
       reply: string,

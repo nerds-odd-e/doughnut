@@ -47,8 +47,8 @@ type TextBasedMessage = {
 type ChatMessage = TextBasedMessage | FunctionCall
 
 type MessageToMatch = {
-  role: "user" | "assistant"
-  content: string | RegExp
+  role?: "user" | "assistant" | "system"
+  content?: string | RegExp
 }
 
 function mockChatCompletion(
@@ -105,17 +105,6 @@ function mockChatCompletionWithBody(
 }
 
 Cypress.Commands.add(
-  "mockChatCompletion",
-  { prevSubject: true },
-  (serviceMocker: ServiceMocker, prompt: string, reply: string) => {
-    const messages = [
-      { role: "user", content: new RegExp("^" + Cypress._.escapeRegExp(prompt) + "$") },
-    ]
-    return mockChatCompletionWithBody(serviceMocker, messages, reply, "stop")
-  },
-)
-
-Cypress.Commands.add(
   "mockChatCompletionWithIncompleteAssistantMessage",
   { prevSubject: true },
   (
@@ -124,15 +113,8 @@ Cypress.Commands.add(
     reply: string,
     finishReason: "stop" | "length",
   ) => {
-    const body = {
-      messages: [{ content: "^" + Cypress._.escapeRegExp(incomplete) + "$" }],
-    }
-    const predicate = new FlexiPredicate()
-      .withOperator(Operator.matches)
-      .withPath(`/v1/chat/completions`)
-      .withMethod(HttpMethod.POST)
-      .withBody(body)
-    return mockChatCompletionAsAssistant(predicate, serviceMocker, reply, finishReason)
+    const messages = [{ content: "^" + Cypress._.escapeRegExp(incomplete) + "$" }];
+    return mockChatCompletionWithBody(serviceMocker, messages, reply, finishReason)
   },
 )
 
@@ -140,13 +122,8 @@ Cypress.Commands.add(
   "mockChatCompletionWithContext",
   { prevSubject: true },
   (serviceMocker: ServiceMocker, reply: string, context: string) => {
-    const body = { messages: [{ role: "system", content: context }] }
-    const predicate = new FlexiPredicate()
-      .withOperator(Operator.matches)
-      .withPath(`/v1/chat/completions`)
-      .withMethod(HttpMethod.POST)
-      .withBody(body)
-    return mockChatCompletionAsAssistant(predicate, serviceMocker, reply, "stop")
+    const messages = [{ role: "system", content: context }];
+    return mockChatCompletionWithBody(serviceMocker, messages, reply, "stop")
   },
 )
 
@@ -158,8 +135,7 @@ Cypress.Commands.add(
   "stubChatCompletion",
   { prevSubject: true },
   (serviceMocker: ServiceMocker, reply: string, finishReason: "length" | "stop") => {
-    const predicate = new DefaultPredicate(`/v1/chat/completions`, HttpMethod.POST)
-    return mockChatCompletionAsAssistant(predicate, serviceMocker, reply, finishReason)
+    return mockChatCompletionWithBody(serviceMocker, [], reply, finishReason)
   },
 )
 
