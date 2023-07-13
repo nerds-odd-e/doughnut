@@ -46,6 +46,11 @@ type TextBasedMessage = {
 
 type ChatMessage = TextBasedMessage | FunctionCall
 
+type MessageToMatch = {
+  role: "user" | "assistant"
+  content: string | RegExp
+}
+
 function mockChatCompletion(
   predicate: Predicate,
   serviceMocker: ServiceMocker,
@@ -84,19 +89,29 @@ function mockChatCompletionAsAssistant(
   )
 }
 
+function mockChatCompletionWithBody(
+  serviceMocker: ServiceMocker,
+  messagesToMatch: MessageToMatch[],
+  reply: string,
+  finishReason: "length" | "stop",
+) {
+  const body = { messages: messagesToMatch }
+  const predicate = new FlexiPredicate()
+    .withOperator(Operator.matches)
+    .withPath(`/v1/chat/completions`)
+    .withMethod(HttpMethod.POST)
+    .withBody(body)
+  return mockChatCompletionAsAssistant(predicate, serviceMocker, reply, finishReason)
+}
+
 Cypress.Commands.add(
   "mockChatCompletion",
   { prevSubject: true },
   (serviceMocker: ServiceMocker, prompt: string, reply: string) => {
-    const body = {
-      messages: [{ role: "user", content: new RegExp("^" + Cypress._.escapeRegExp(prompt) + "$") }],
-    }
-    const predicate = new FlexiPredicate()
-      .withOperator(Operator.matches)
-      .withPath(`/v1/chat/completions`)
-      .withMethod(HttpMethod.POST)
-      .withBody(body)
-    return mockChatCompletionAsAssistant(predicate, serviceMocker, reply, "stop")
+    const messages = [
+      { role: "user", content: new RegExp("^" + Cypress._.escapeRegExp(prompt) + "$") },
+    ]
+    return mockChatCompletionWithBody(serviceMocker, messages, reply, "stop")
   },
 )
 
