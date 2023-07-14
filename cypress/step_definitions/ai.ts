@@ -62,7 +62,7 @@ Given("OpenAI by default returns this question from now:", (questionTable: DataT
     incorrectChoices: [record.incorrect_choice_1, record.incorrect_choice_2],
   })
   cy.openAiService().restartImposter()
-  cy.openAiService().stubChatCompletionFunctionCall(
+  cy.openAiService().stubAnyChatCompletionFunctionCall(
     "ask_single_answer_multiple_choice_question",
     reply,
   )

@@ -24,12 +24,12 @@
 
 /// <reference types="cypress" />
 // @ts-check
-import { DefaultPredicate, FlexiPredicate, Operator } from "@anev/ts-mountebank"
+import { FlexiPredicate, Operator } from "@anev/ts-mountebank"
 import "@testing-library/cypress/add-commands"
 import "cypress-file-upload"
 import "./string.extensions"
 import ServiceMocker from "./ServiceMocker"
-import { HttpMethod, Predicate } from "@anev/ts-mountebank"
+import { HttpMethod } from "@anev/ts-mountebank"
 
 type FunctionCall = {
   role: "function"
@@ -52,14 +52,19 @@ type MessageToMatch = {
 }
 
 function mockChatCompletion(
-  predicate: Predicate,
   serviceMocker: ServiceMocker,
+  messagesToMatch: MessageToMatch[],
   message: ChatMessageInResponse,
   finishReason: "length" | "stop" | "function_call",
 ) {
+  const body = { messages: messagesToMatch }
+  const predicate = new FlexiPredicate()
+    .withOperator(Operator.matches)
+    .withPath(`/v1/chat/completions`)
+    .withMethod(HttpMethod.POST)
+    .withBody(body)
   return serviceMocker.mockWithPredicate(predicate, {
     object: "chat.completion",
-    created: 1589478378,
     choices: [
       {
         message,
@@ -67,26 +72,7 @@ function mockChatCompletion(
         finish_reason: finishReason,
       },
     ],
-    usage: {
-      prompt_tokens: 5,
-      completion_tokens: 7,
-      total_tokens: 12,
-    },
   })
-}
-
-function mockChatCompletionAsAssistant(
-  predicate: Predicate,
-  serviceMocker: ServiceMocker,
-  reply: string,
-  finishReason: "length" | "stop",
-) {
-  return mockChatCompletion(
-    predicate,
-    serviceMocker,
-    { role: "assistant", content: reply },
-    finishReason,
-  )
 }
 
 function mockChatCompletionForMessageContaining(
@@ -95,13 +81,32 @@ function mockChatCompletionForMessageContaining(
   reply: string,
   finishReason: "length" | "stop",
 ) {
-  const body = { messages: messagesToMatch }
-  const predicate = new FlexiPredicate()
-    .withOperator(Operator.matches)
-    .withPath(`/v1/chat/completions`)
-    .withMethod(HttpMethod.POST)
-    .withBody(body)
-  return mockChatCompletionAsAssistant(predicate, serviceMocker, reply, finishReason)
+  return mockChatCompletion(
+    serviceMocker,
+    messagesToMatch,
+    { role: "assistant", content: reply },
+    finishReason,
+  )
+}
+
+function mockChatCompletionFunctionCallForMessageContaining(
+  serviceMocker: ServiceMocker,
+  messagesToMatch: MessageToMatch[],
+  functionName: string,
+  argumentsString: string,
+) {
+  return mockChatCompletion(
+    serviceMocker,
+    messagesToMatch,
+    {
+      role: "function",
+      function_call: {
+        name: functionName,
+        arguments: argumentsString,
+      },
+    },
+    "function_call",
+  )
 }
 
 Cypress.Commands.add("restartImposter", { prevSubject: true }, (serviceMocker: ServiceMocker) => {
@@ -147,30 +152,26 @@ Cypress.Commands.add(
     serviceMocker: ServiceMocker,
     functionName: string,
     argumentsString: string,
-    bodyContains: string | null = null,
+    bodyContains: string,
   ) => {
-    let predicate
-    if (bodyContains === null) {
-      predicate = new DefaultPredicate(`/v1/chat/completions`, HttpMethod.POST)
-    } else {
-      predicate = new FlexiPredicate()
-        .withMethod(HttpMethod.POST)
-        .withPath("v1/chat/completions")
-        .withOperator(Operator.contains)
-        .withBody({ messages: [{ content: bodyContains }] })
-    }
-
-    return mockChatCompletion(
-      predicate,
+    return mockChatCompletionFunctionCallForMessageContaining(
       serviceMocker,
-      {
-        role: "function",
-        function_call: {
-          name: functionName,
-          arguments: argumentsString,
-        },
-      },
-      "function_call",
+      [{ content: bodyContains }],
+      functionName,
+      argumentsString,
+    )
+  },
+)
+
+Cypress.Commands.add(
+  "stubAnyChatCompletionFunctionCall",
+  { prevSubject: true },
+  (serviceMocker: ServiceMocker, functionName: string, argumentsString: string) => {
+    return mockChatCompletionFunctionCallForMessageContaining(
+      serviceMocker,
+      [],
+      functionName,
+      argumentsString,
     )
   },
 )
