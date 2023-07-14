@@ -23,7 +23,6 @@
   </button>
 
   <div id="chatContainer" v-show="isQuestionAnswered">
-    <MessageDisplayContainer v-bind:messages="messages" />
     <div class="chatInputContainer">
       <button class="btn btn-secondary floatBtn" @click="sendMessage">
         Send
