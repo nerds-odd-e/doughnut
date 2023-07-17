@@ -51,6 +51,7 @@
     "eslint-plugin-chai-friendly": "^0.7.2",
     "eslint-plugin-cypress": "^2.13",
     "eslint-plugin-prettier": "^5.0",
+    "eslint-plugin-unused-imports": "^3.0.0",
     "github_action_sound": "^1.0.2",
     "got": "^13.0",
     "jsdom": "^22.1",

@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-interface String {
+interface _String {
   commonSenseSplit(separator: string): string[]
 }
 
