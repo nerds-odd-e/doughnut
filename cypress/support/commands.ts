@@ -639,6 +639,10 @@ Cypress.Commands.add("expectQuestionStem", (stem: string) => {
 Cypress.Commands.add(
   "expectQuestionChoiceToBe",
   (choice: string, correctness: "correct" | "incorrect") => {
-    cy.findByText(choice).click().invoke("attr", "class").should("contain", `is-${correctness}`)
+    cy.findByText(choice)
+      .click()
+      .parent()
+      .invoke("attr", "class")
+      .should("contain", `is-${correctness}`)
   },
 )

@@ -8,15 +8,15 @@
   <ol v-if="options" type="A">
     <li
       v-for="(option, index) in options"
-      role="button"
       :key="index"
-      @click="selectOption(index)"
       :class="{
         'is-correct': isSelectedOption(index) && isOptionCorrect(option),
         'is-incorrect': isSelectedOption(index) && !isOptionCorrect(option),
       }"
     >
-      {{ option }}
+      <button @click="selectOption(index)" :disabled="disabled">
+        {{ option }}
+      </button>
     </li>
   </ol>
 </template>
@@ -28,6 +28,7 @@ import { defineComponent } from "vue";
 export default defineComponent({
   props: {
     rawJsonQuestion: { type: String, required: true },
+    disabled: Boolean,
   },
   emits: ["selfEvaluatedMemoryState", "is-question-answered"],
   components: {},

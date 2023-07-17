@@ -1,11 +1,12 @@
 <template>
   <h2 v-if="rawJsonQuestion === undefined">Generating question...</h2>
   <div v-else>
-    <div v-if="rawJsonPrevQuestion !== undefined" :class="'disabled-div'">
+    <div v-if="rawJsonPrevQuestion">
       <h3>Previous Question...</h3>
       <AIQuestion
         :raw-json-question="rawJsonPrevQuestion"
         :key="numberOfTries"
+        :disabled="true"
       />
     </div>
     <AIQuestion
