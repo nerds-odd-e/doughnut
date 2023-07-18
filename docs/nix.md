@@ -31,8 +31,9 @@ Launch a new terminal in your favourite shell (I highly recommend zsh).
 Clone full all-in-one doughnut codebase from Github (Microsoft Windows OS users, please clone the repo to a non-Windows mount directory)
 
 ```bash
-git config --global core.autocrlf true
+git config --global core.autocrlf input
 git clone git@github.com:nerds-odd-e/doughnut.git
+git add --renormalize .
 ```
 
 Boot up your doughnut development environment.

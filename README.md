@@ -30,9 +30,10 @@ For more background info you can read::
 :checkered_flag: From the root of doughnut directory, in a terminal, run:
 
 Please ensure your git configuration is appropriate for your OS to respect the correct line endings:
-
-- macOS/Linux run `git config --global core.autocrlf input` then `git add --renormalize .`
-- Microsoft Windows `git config --global core.autocrlf true` then `git add --renormalize .`
+```bash
+git config --global core.autocrlf input
+git add --renormalize .
+```
 
 Install Nix package manager if you haven't already with
 
