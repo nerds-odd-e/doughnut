@@ -3,10 +3,6 @@
 /// <reference types="cypress" />
 // @ts-check
 declare namespace Cypress {
-  interface UserSetting {
-    daily_new_notes_count?: number
-    space_intervals?: number
-  }
   interface Chainable<Subject = any> {
     dismissLastErrorMessage(): Chainable<any>
     addSiblingNoteButton(): Chainable<any>
