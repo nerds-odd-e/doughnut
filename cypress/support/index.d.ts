@@ -142,7 +142,6 @@ declare namespace Cypress {
     aiSuggestDescriptionForNote(noteTitle: string): Chainable<any>
     askForQuestion(noteTitle: string): Chainable<any>
     expectQuestionChoiceToBe(choice: string, correctness: "correct" | "incorrect"): Chainable<any>
-    expectQuestionStem(stem: string): Chainable<any>
     addCommentToCurrentNote(commentText: string): Chainable<any>
   }
 }

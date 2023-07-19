@@ -3,6 +3,7 @@
 // @ts-check
 
 import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor"
+import PageObjects from "../support/page_objects"
 
 Then("I do these initial reviews in sequence:", (data) => {
   cy.initialReviewInSequence(data.hashes())
@@ -212,11 +213,15 @@ When("I ask to generate a question for note {string}", (noteTitle: string) => {
   cy.askForQuestion(noteTitle)
 })
 
+Then("I should be asked {string}", (expectedtQuestionStem: string) => {
+  PageObjects.questionWithStem(expectedtQuestionStem)
+})
+
 Then(
   "the question stem generated from the note {string} should be {string}",
   (noteTitle: string, expectedtQuestionStem: string) => {
     cy.askForQuestion(noteTitle)
-    cy.expectQuestionStem(expectedtQuestionStem)
+    PageObjects.questionWithStem(expectedtQuestionStem)
   },
 )
 

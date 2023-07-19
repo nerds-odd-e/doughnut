@@ -632,10 +632,6 @@ Cypress.Commands.add("askForQuestion", (noteTitle: string) => {
   cy.clickNotePageMoreOptionsButton(noteTitle, "test me")
 })
 
-Cypress.Commands.add("expectQuestionStem", (stem: string) => {
-  cy.findByText(stem)
-})
-
 Cypress.Commands.add(
   "expectQuestionChoiceToBe",
   (choice: string, correctness: "correct" | "incorrect") => {

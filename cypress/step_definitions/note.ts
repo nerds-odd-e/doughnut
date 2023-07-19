@@ -432,10 +432,6 @@ Then("I should see that the open AI service is not available in controller bar",
     .click()
 })
 
-Then("I should be asked {string}", (expectedtQuestionStem: string) => {
-  cy.expectQuestionStem(expectedtQuestionStem)
-})
-
 Then(
   "I change the instruction of note {string} to {string}",
   (noteTitle: string, instruction: string) => {
