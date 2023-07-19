@@ -1,11 +1,11 @@
-
 const questionWithStem = (stem: string) => {
-  const stemElm = cy.findByText(stem)
+  const findStem = () => cy.findByText(stem)
+  findStem()
 
   return {
     isDisabled() {
-      stemElm.siblings("ol").find("button").should("be.disabled")
-    }
+      findStem().siblings("ol").find("button").should("be.disabled")
+    },
   }
 }
 

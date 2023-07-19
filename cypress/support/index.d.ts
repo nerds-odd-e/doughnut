@@ -140,7 +140,6 @@ declare namespace Cypress {
     aiGenerateImage(noteTitle: string): Chainable<any>
     thePreviousRequestShouldHaveIncludedPathInfo(path: string): Chainable<any>
     aiSuggestDescriptionForNote(noteTitle: string): Chainable<any>
-    askForQuestion(noteTitle: string): Chainable<any>
     expectQuestionChoiceToBe(choice: string, correctness: "correct" | "incorrect"): Chainable<any>
     addCommentToCurrentNote(commentText: string): Chainable<any>
   }

@@ -210,7 +210,7 @@ Then("the choice {string} should be incorrect", (choice: string) => {
 })
 
 When("I ask to generate a question for note {string}", (noteTitle: string) => {
-  cy.askForQuestion(noteTitle)
+  PageObjects.askQuestionForNote(noteTitle)
 })
 
 Then("I should be asked {string}", (expectedtQuestionStem: string) => {
@@ -220,8 +220,7 @@ Then("I should be asked {string}", (expectedtQuestionStem: string) => {
 Then(
   "the question stem generated from the note {string} should be {string}",
   (noteTitle: string, expectedtQuestionStem: string) => {
-    cy.askForQuestion(noteTitle)
-    PageObjects.questionWithStem(expectedtQuestionStem)
+    PageObjects.askQuestionForNote(noteTitle).questionWithStem(expectedtQuestionStem)
   },
 )
 
