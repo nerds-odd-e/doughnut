@@ -226,5 +226,5 @@ Then(
 )
 
 Then("I should see the question {string} is disabled", (questionStem: string) => {
-  cy.findByText(questionStem).siblings("ol").find("button").should("be.disabled")
+  PageObjects.questionWithStem(questionStem).isDisabled()
 })
