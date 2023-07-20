@@ -30,6 +30,6 @@ const commonConfig = {
     specPattern: "e2e_test/features/**/*.feature",
     excludeSpecPattern: ["**/*.{js,ts}", "**/__snapshots__/*", "**/__image_snapshots__/*"],
   },
-};
+}
 
 export default commonConfig

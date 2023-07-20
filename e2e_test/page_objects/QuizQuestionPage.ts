@@ -1,12 +1,25 @@
-const questionWithStem = (stem: string) => {
-  const findStem = () => cy.findByText(stem)
-  findStem()
+const currentQuestion = () => {
+  const question = () => cy.get("@currentQuestion")
 
   return {
     isDisabled() {
-      findStem().siblings("ol").find("button").should("be.disabled")
+      question().find("ol button").should("be.disabled")
+    },
+
+    expectChoiceToBe(choice: string, correctness: "correct" | "incorrect") {
+      question()
+        .findByText(choice)
+        .click()
+        .parent()
+        .invoke("attr", "class")
+        .should("contain", `is-${correctness}`)
     },
   }
 }
 
-export { questionWithStem }
+const findQuestionWithStem = (stem: string) => {
+  cy.findByText(stem).parent().as("currentQuestion")
+  return currentQuestion()
+}
+
+export { findQuestionWithStem, currentQuestion }

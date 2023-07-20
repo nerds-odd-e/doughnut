@@ -202,11 +202,11 @@ Then("I should see the review point is removed from review", () => {
 })
 
 Then("the choice {string} should be correct", (choice: string) => {
-  cy.expectQuestionChoiceToBe(choice, "correct")
+  PageObjects.currentQuestion().expectChoiceToBe(choice, "correct")
 })
 
 Then("the choice {string} should be incorrect", (choice: string) => {
-  cy.expectQuestionChoiceToBe(choice, "incorrect")
+  PageObjects.currentQuestion().expectChoiceToBe(choice, "incorrect")
 })
 
 When("I ask to generate a question for note {string}", (noteTitle: string) => {
@@ -214,16 +214,16 @@ When("I ask to generate a question for note {string}", (noteTitle: string) => {
 })
 
 Then("I should be asked {string}", (expectedtQuestionStem: string) => {
-  PageObjects.questionWithStem(expectedtQuestionStem)
+  PageObjects.findQuestionWithStem(expectedtQuestionStem)
 })
 
 Then(
   "the question stem generated from the note {string} should be {string}",
   (noteTitle: string, expectedtQuestionStem: string) => {
-    PageObjects.askQuestionForNote(noteTitle).questionWithStem(expectedtQuestionStem)
+    PageObjects.askQuestionForNote(noteTitle).findQuestionWithStem(expectedtQuestionStem)
   },
 )
 
 Then("I should see the question {string} is disabled", (questionStem: string) => {
-  PageObjects.questionWithStem(questionStem).isDisabled()
+  PageObjects.findQuestionWithStem(questionStem).isDisabled()
 })

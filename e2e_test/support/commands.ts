@@ -626,14 +626,3 @@ Cypress.Commands.add("aiSuggestDescriptionForNote", (noteTitle: string) => {
   })
   cy.findByRole("button", { name: "suggest description" }).click()
 })
-
-Cypress.Commands.add(
-  "expectQuestionChoiceToBe",
-  (choice: string, correctness: "correct" | "incorrect") => {
-    cy.findByText(choice)
-      .click()
-      .parent()
-      .invoke("attr", "class")
-      .should("contain", `is-${correctness}`)
-  },
-)
