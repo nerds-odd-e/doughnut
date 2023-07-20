@@ -50,7 +50,6 @@ declare module 'vue' {
     Lnk: typeof import('./src/components/svgs/link_types/Lnk.vue')['default']
     LoadingThinBar: typeof import('./src/components/commons/LoadingThinBar.vue')['default']
     LoginButton: typeof import('./src/components/toolbars/LoginButton.vue')['default']
-    MessageDisplayContainer: typeof import('./src/components/dialog/MessageDisplayContainer.vue')['default']
     MindmapSvgDefs: typeof import('./src/components/notes/mindmap/MindmapSvgDefs.vue')['default']
     Modal: typeof import('./src/components/commons/Modal.vue')['default']
     NoteArticleView: typeof import('./src/components/notes/views/NoteArticleView.vue')['default']

@@ -1,5 +1,5 @@
 backend
-cypress/e2e
+e2e_test/e2e
 frontend
 gradle
 infra

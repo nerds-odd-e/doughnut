@@ -19,10 +19,10 @@
     "backend:build": "backend/gradlew -p backend build -x test --build-cache --parallel",
     "backend:prod_build": "backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel",
     "generateTypeScript": "backend/gradlew -p backend generateTypeScript",
-    "cy:format": "yarn --frozen-lockfile --silent install && yarn eslint cypress --fix",
-    "cy:lint": "yarn --frozen-lockfile --silent install && yarn eslint cypress",
-    "cy:open": "cypress open",
-    "cy:run": "cypress run --config-file cypress/config/ci.ts",
+    "cy:format": "yarn --frozen-lockfile --silent install && yarn eslint e2e_test --fix",
+    "cy:lint": "yarn --frozen-lockfile --silent install && yarn eslint e2e_test",
+    "cy:open": "cypress open --e2e",
+    "cy:run": "cypress run --config-file e2e_test/config/ci.ts",
     "sut": "backend/gradlew -p backend bootRunE2E --build-cache",
     "open": "yarn frontend:build && run-p -clnr sut cy:open",
     "test": "yarn frontend:build && run-p -clnr sut start:mb cy:run",
@@ -32,7 +32,7 @@
     "format:all": "yarn && yarn backend:format && yarn frontend:format && yarn cy:format"
   },
   "cypress-cucumber-preprocessor": {
-    "stepDefinitions": "cypress/step_definitions/**/*.ts"
+    "stepDefinitions": "e2e_test/step_definitions/**/*.ts"
   },
   "devDependencies": {
     "@anev/ts-mountebank": "1.6.1",

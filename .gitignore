@@ -11,9 +11,9 @@
 .bash_profile
 
 # cypress screenshots & videos
-cypress/downloads/
-cypress/screenshots/
-cypress/videos/
+e2e_test/downloads/
+e2e_test/screenshots/
+e2e_test/videos/
 cypress-visual-report/
 cypress-visual-screenshots/
 
