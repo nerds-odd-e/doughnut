@@ -3,10 +3,8 @@ import { defineConfig } from "cypress"
 import createBundler from "@bahmutov/cypress-esbuild-preprocessor"
 import { addCucumberPreprocessorPlugin } from "@badeball/cypress-cucumber-preprocessor"
 import createEsbuildPlugin from "@badeball/cypress-cucumber-preprocessor/esbuild"
-import commonConfig from "./common"
 
-export default defineConfig({
-  ...commonConfig,
+const commonConfig = {
   env: {
     TAGS: "not @ignore",
   },
@@ -36,4 +34,6 @@ export default defineConfig({
     excludeSpecPattern: ["**/*.{js,ts}", "**/__snapshots__/*", "**/__image_snapshots__/*"],
     baseUrl: "http://localhost:9081",
   },
-})
+};
+
+export default commonConfig

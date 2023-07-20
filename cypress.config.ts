@@ -2,8 +2,10 @@ import { defineConfig } from 'cypress'
 import createBundler from "@bahmutov/cypress-esbuild-preprocessor"
 import { addCucumberPreprocessorPlugin } from "@badeball/cypress-cucumber-preprocessor"
 import createEsbuildPlugin from "@badeball/cypress-cucumber-preprocessor/esbuild"
+import commonConfig from: 'cypress/config/common
 
 export default defineConfig({
+   ...commonConfig,
   env: {
     TAGS: 'not @ignore and not @requiresDeveloperSecret',
   },
