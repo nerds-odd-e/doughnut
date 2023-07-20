@@ -3,7 +3,7 @@
 // @ts-check
 
 import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor"
-import PageObjects from "../support/page_objects"
+import PageObjects from "../page_objects"
 
 Then("I do these initial reviews in sequence:", (data) => {
   cy.initialReviewInSequence(data.hashes())
