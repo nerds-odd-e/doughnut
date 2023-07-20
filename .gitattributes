@@ -3,16 +3,30 @@
 ###############################
 
 # Set default behaviour to automatically normalize line endings.
-* text=auto eol=lf
+*			text=auto eol=lf
 
 # Force batch scripts to always use CRLF line endings so that if a repo is accessed
 # in Windows via a file share from Linux, the scripts will work.
-*.{cmd,[cC][mM][dD]} text eol=crlf
-*.{bat,[bB][aA][tT]} text eol=crlf
+*.{cmd,[cC][mM][dD]}	text eol=crlf
+*.{bat,[bB][aA][tT]}	text eol=crlf
 
 # Force bash scripts to always use LF line endings so that if a repo is accessed
 # in Unix via a file share from Windows, the scripts will work.
-*.sh text eol=lf
-gradlew text eol=lf
-backend/gradlew text eol=lf
-install-nix text eol=lf
+gradlew			text eol=lf
+backend/gradlew		text eol=lf
+install-nix		text eol=lf
+sh_profile		text eol=lf
+*.sh			text eol=lf
+*.nix			text eol=lf
+*.gradle		text eol=lf
+*.java			text eol=lf
+*.{js,ts}		text eol=lf
+*.json			text eol=lf
+*.properties		text eol=lf
+*.sql			text eol=lf
+*.html			text eol=lf
+*.xml			text eol=lf
+*.yaml			text eol=lf
+*.yml			text eol=lf
+*.md			text eol=lf
+
