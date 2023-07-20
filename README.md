@@ -115,15 +115,15 @@ For MS Windows WSL2 users:
 
 #### Structure
 
-| Purpose          | Location                                  |
-| ---------------- | ----------------------------------------- |
-| feature files    | `cypress/e2e/*.feature`                   |
-| step definitions | `cypress/step_definitions/*.ts`           |
-| custom DSL       | `cypress/support/*.ts`                    |
-| cucumber hooks   | `cypress/step_definitions/common/hook.ts` |
-| test fixtures    | `cypress/fixtures/*.*`                    |
-| cypress config   | `cypress/config/*.json`                   |
-| cypress plugins  | `cypress/plugins/index.ts`                |
+| Purpose          | Location                                   |
+| ---------------- |--------------------------------------------|
+| feature files    | `e2e_test/features/*.feature`              |
+| step definitions | `e2e_test/step_definitions/*.ts`           |
+| custom DSL       | `e2e_test/support/*.ts`                    |
+| cucumber hooks   | `e2e_test/step_definitions/common/hook.ts` |
+| test fixtures    | `e2e_test/fixtures/*.*`                    |
+| cypress config   | `e2e_test/config/*.json`                   |
+| cypress plugins  | `e2e_test/plugins/index.ts`                |
 
 ### 5. Database migrations
 

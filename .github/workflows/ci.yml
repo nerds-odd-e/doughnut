@@ -84,22 +84,22 @@ jobs:
       matrix:
         spec:
           - |
-            e2e_test/e2e/a*/**
-            e2e_test/e2e/b*/**
+            e2e_test/features/a*/**
+            e2e_test/features/b*/**
           - |
-            e2e_test/e2e/c*/**
-            e2e_test/e2e/l*/**
+            e2e_test/features/c*/**
+            e2e_test/features/l*/**
           - |
-            e2e_test/e2e/n*/**
+            e2e_test/features/n*/**
           - |
-            e2e_test/e2e/r*/**
+            e2e_test/features/r*/**
           - |
-            e2e_test/e2e/t*/**
-            e2e_test/e2e/u*/**
+            e2e_test/features/t*/**
+            e2e_test/features/u*/**
           - |
-            e2e_test/e2e/v*/**
+            e2e_test/features/v*/**
           - |
-            e2e_test/e2e/w*/**
+            e2e_test/features/w*/**
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/mysql_db

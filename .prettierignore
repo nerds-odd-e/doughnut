@@ -1,5 +1,5 @@
 backend
-e2e_test/e2e
+e2e_test/features
 frontend
 gradle
 infra

@@ -27,7 +27,7 @@ const commonConfig = {
       return config
     },
     supportFile: "e2e_test/support/e2e.ts",
-    specPattern: "e2e_test/e2e/**/*.feature",
+    specPattern: "e2e_test/features/**/*.feature",
     excludeSpecPattern: ["**/*.{js,ts}", "**/__snapshots__/*", "**/__image_snapshots__/*"],
   },
 };
