@@ -6,6 +6,7 @@ import createEsbuildPlugin from "@badeball/cypress-cucumber-preprocessor/esbuild
 const commonConfig = {
   chromeWebSecurity: false,
   screenshotOnRunFailure: true,
+  fixturesFolder: "e2e_test/fixtures",
   screenshotsFolder: "e2e_test/screenshots",
   pageLoadTimeout: 100000,
   defaultCommandTimeout: 6000,

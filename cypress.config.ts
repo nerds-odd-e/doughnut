@@ -1,5 +1,5 @@
 import { defineConfig } from 'cypress'
-import commonConfig from: 'cypress/config/common
+import commonConfig from 'e2e_test/config/common'
 
 export default defineConfig({
    ...commonConfig,
