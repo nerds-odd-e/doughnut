@@ -33,19 +33,29 @@ export default defineComponent({
   emits: ["answer-to-ai-question"],
   components: {},
   data() {
-    const aiQuestion = JSON.parse(
-      this.rawJsonQuestion,
-    ) as Generated.AIGeneratedQuestion;
     return {
-      background: aiQuestion.background,
-      questionDescription: aiQuestion.stem,
-      correctOption: aiQuestion.correctChoice,
-      options: _.shuffle([
-        ...aiQuestion.incorrectChoices,
-        aiQuestion.correctChoice,
-      ]),
       selectedOptionIndex: undefined as number | undefined,
     };
+  },
+  computed: {
+    aiQuestion() {
+      return JSON.parse(this.rawJsonQuestion) as Generated.AIGeneratedQuestion;
+    },
+    background() {
+      return this.aiQuestion.background;
+    },
+    questionDescription() {
+      return this.aiQuestion.stem;
+    },
+    correctOption() {
+      return this.aiQuestion.correctChoice;
+    },
+    options() {
+      return _.shuffle([
+        ...this.aiQuestion.incorrectChoices,
+        this.aiQuestion.correctChoice,
+      ]);
+    },
   },
   methods: {
     selectOption(optionIndex: number) {
