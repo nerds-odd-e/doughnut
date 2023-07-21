@@ -47,6 +47,7 @@ public class RestAiController {
     QuizQuestionEntity quizQuestionEntity = new QuizQuestionEntity();
     quizQuestionEntity.setQuestionType(QuizQuestionEntity.QuestionType.AI_QUESTION);
     quizQuestionEntity.setRawJsonQuestion(rawJsonQuestion);
+    modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
     return modelFactoryService.toQuizQuestion(quizQuestionEntity, currentUser.getEntity());
   }
 
