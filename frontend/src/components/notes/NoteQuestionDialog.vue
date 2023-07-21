@@ -54,12 +54,13 @@ export default defineComponent({
     async generateQuestion() {
       this.quizQuestion = await this.api.ai.askAIToGenerateQuestion(
         this.selectedNote.id,
+        undefined,
       );
     },
     async regenerateQuestion() {
       if (this.quizQuestion !== undefined) {
         const tmpQuestion: Generated.QuizQuestion = this.quizQuestion;
-        this.quizQuestion = await this.api.ai.askAIToRegenerateQuestion(
+        this.quizQuestion = await this.api.ai.askAIToGenerateQuestion(
           this.selectedNote.id,
           this.quizQuestion.rawJsonQuestion,
         );

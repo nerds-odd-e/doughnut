@@ -40,12 +40,6 @@ public class RestAiController {
     return aiAdvisorService.getAiCompletion(aiCompletionRequest, note.getPath());
   }
 
-  @PostMapping("/generate-question")
-  public QuizQuestion generateQuestion(@RequestParam(value = "note") Note note)
-      throws QuizQuestionNotPossibleException {
-    return getQuizQuestion(note, null);
-  }
-
   @PostMapping("/regenerate-question")
   public QuizQuestion regenerateQuestion(
       @RequestParam(value = "note") Note note, @RequestBody String question)

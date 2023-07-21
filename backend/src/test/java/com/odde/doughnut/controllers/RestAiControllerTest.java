@@ -156,9 +156,12 @@ class RestAiControllerTest {
     void askWithNoteThatCannotAccess() {
       assertThrows(
           ResponseStatusException.class,
-          () ->
-              new RestAiController(openAiApi, makeMe.modelFactoryService, makeMe.aNullUserModel())
-                  .generateQuestion(note));
+          () -> {
+            RestAiController restAiController =
+                new RestAiController(
+                    openAiApi, makeMe.modelFactoryService, makeMe.aNullUserModel());
+            restAiController.regenerateQuestion(note, null);
+          });
     }
 
     @Test
@@ -169,7 +172,7 @@ class RestAiControllerTest {
                   """
 {"stem": "What is the first color in the rainbow?", "correctChoice": "white", "incorrectChoices": ["black", "green"]}
 """));
-      QuizQuestion question = controller.generateQuestion(note);
+      QuizQuestion question = controller.regenerateQuestion(note, null);
       QuizQuestion quizQuestion =
           controller.regenerateQuestion(note, question.getRawJsonQuestion());
       assertThat(quizQuestion.getRawJsonQuestion()).isEqualTo(question.getRawJsonQuestion());
@@ -183,7 +186,7 @@ class RestAiControllerTest {
                   """
       {"stem": "What is the first color in the rainbow?"}
       """));
-      QuizQuestion quizQuestion = controller.generateQuestion(note);
+      QuizQuestion quizQuestion = controller.regenerateQuestion(note, null);
       assertThat(quizQuestion.getRawJsonQuestion())
           .contains("What is the first color in the rainbow?");
     }
@@ -194,7 +197,8 @@ class RestAiControllerTest {
           .thenReturn(buildCompletionResultForAIQuestion("""
 {"stem": ""}
 """));
-      assertThrows(QuizQuestionNotPossibleException.class, () -> controller.generateQuestion(note));
+      assertThrows(
+          QuizQuestionNotPossibleException.class, () -> controller.regenerateQuestion(note, null));
     }
 
     @Test
@@ -209,7 +213,7 @@ class RestAiControllerTest {
               buildCompletionResultForAIQuestion("""
 {"stem": "what is it?"}
             """));
-      controller.generateQuestion(note);
+      controller.regenerateQuestion(note, null);
     }
   }
 
