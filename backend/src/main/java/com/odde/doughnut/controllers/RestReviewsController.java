@@ -11,7 +11,6 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
-import javax.validation.Valid;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -74,19 +73,6 @@ class RestReviewsController {
     currentUser.assertLoggedIn();
     Reviewing reviewing = currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
     return reviewing.getDueReviewPoints(dueInDays, testabilitySettings.getRandomizer());
-  }
-
-  @PostMapping("/{quizQuestion}/answer")
-  @Transactional
-  public AnswerResult answerQuiz(
-      @PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity,
-      @Valid @RequestBody Answer answer) {
-    currentUser.assertLoggedIn();
-    answer.setQuestion(quizQuestionEntity);
-    AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
-    answerModel.updateReviewPoints(testabilitySettings.getCurrentUTCTimestamp());
-    answerModel.save();
-    return answerModel.getAnswerResult();
   }
 
   @GetMapping(path = "/answers/{answer}")
