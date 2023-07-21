@@ -10,7 +10,7 @@
   <button
     v-show="rawJsonQuestion !== undefined"
     class="btn btn-secondary"
-    @click="regenerateQuestion"
+    @click="generateQuestion"
   >
     Doesn't make sense?
   </button>
@@ -38,7 +38,6 @@ export default defineComponent({
     return {
       quizQuestion: undefined as Generated.QuizQuestion | undefined,
       prevQuizQuestion: undefined as Generated.QuizQuestion | undefined,
-      isUnmounted: false,
       userInputValue: "",
     };
   },
@@ -52,27 +51,16 @@ export default defineComponent({
   },
   methods: {
     async generateQuestion() {
+      const tmpQuestion: Generated.QuizQuestion | undefined = this.quizQuestion;
       this.quizQuestion = await this.api.ai.askAIToGenerateQuestion(
         this.selectedNote.id,
-        undefined,
+        this.quizQuestion?.rawJsonQuestion,
       );
-    },
-    async regenerateQuestion() {
-      if (this.quizQuestion !== undefined) {
-        const tmpQuestion: Generated.QuizQuestion = this.quizQuestion;
-        this.quizQuestion = await this.api.ai.askAIToGenerateQuestion(
-          this.selectedNote.id,
-          this.quizQuestion.rawJsonQuestion,
-        );
-        this.prevQuizQuestion = tmpQuestion;
-      }
+      this.prevQuizQuestion = tmpQuestion;
     },
   },
   mounted() {
     this.generateQuestion();
-  },
-  unmounted() {
-    this.isUnmounted = true;
   },
 });
 </script>

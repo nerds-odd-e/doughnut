@@ -301,7 +301,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
       question?: string,
     ): Promise<Generated.QuizQuestion> {
       return (await managedApi.restPost(
-        `ai/regenerate-question?note=${noteId}`,
+        `ai/generate-question?note=${noteId}`,
         question ?? {},
       )) as Generated.QuizQuestion;
     },
