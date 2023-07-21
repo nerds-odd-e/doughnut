@@ -51,7 +51,7 @@ export default defineComponent({
       return this.aiQuestion.background;
     },
     questionDescription() {
-      return this.aiQuestion.stem;
+      return this.quizQuestion.description;
     },
     correctOption() {
       return this.aiQuestion.correctChoice;

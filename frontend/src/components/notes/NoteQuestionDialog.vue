@@ -3,7 +3,11 @@
   <div v-else>
     <div v-if="prevQuizQuestion">
       <h3>Previous Question...</h3>
-      <AIQuestion :quiz-question="prevQuizQuestion" :disabled="true" />
+      <QuizQuestion
+        :quiz-question="prevQuizQuestion"
+        :storage-accessor="storageAccessor"
+        :disabled="true"
+      />
     </div>
     <QuizQuestion
       :quiz-question="quizQuestion"
@@ -23,7 +27,6 @@
 import { defineComponent, PropType } from "vue";
 import type { StorageAccessor } from "@/store/createNoteStorage";
 import useLoadingApi from "../../managedApi/useLoadingApi";
-import AIQuestion from "../review/AIQuestion.vue";
 import QuizQuestion from "../review/QuizQuestion.vue";
 
 export default defineComponent({
@@ -37,7 +40,7 @@ export default defineComponent({
       required: true,
     },
   },
-  components: { AIQuestion, QuizQuestion },
+  components: { QuizQuestion },
   data() {
     return {
       quizQuestion: undefined as Generated.QuizQuestion | undefined,
