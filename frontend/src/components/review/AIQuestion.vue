@@ -30,7 +30,7 @@ export default defineComponent({
     rawJsonQuestion: { type: String, required: true },
     disabled: Boolean,
   },
-  emits: ["selfEvaluatedMemoryState", "is-question-answered"],
+  emits: ["answer-to-ai-question"],
   components: {},
   data() {
     const aiQuestion = JSON.parse(
@@ -51,10 +51,9 @@ export default defineComponent({
     selectOption(optionIndex: number) {
       this.selectedOptionIndex = optionIndex;
       this.$emit(
-        "selfEvaluatedMemoryState",
+        "answer-to-ai-question",
         this.isOptionCorrect(this.options[optionIndex]) ? "yes" : "no",
       );
-      this.$emit("is-question-answered", true);
     },
     isSelectedOption(optionIndex: number) {
       return this.selectedOptionIndex === optionIndex;

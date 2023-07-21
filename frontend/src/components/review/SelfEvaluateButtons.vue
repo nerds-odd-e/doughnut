@@ -2,14 +2,14 @@
   <div class="btn-group">
     <button
       class="btn btn-primary loading"
-      @click.once="$emit('selfEvaluatedMemoryState', 'yes')"
+      @click.once="$emit('self-evaluated-memory-state', 'yes')"
       :disabled="!ready"
     >
       Yes, I remember
     </button>
     <button
       class="btn btn-secondary"
-      @click.once="$emit('selfEvaluatedMemoryState', 'no')"
+      @click.once="$emit('self-evaluated-memory-state', 'no')"
     >
       No, I need more repetition
     </button>
@@ -21,7 +21,7 @@ import gsap from "gsap";
 import { defineComponent } from "vue";
 
 export default defineComponent({
-  emits: ["selfEvaluatedMemoryState"],
+  emits: ["self-evaluated-memory-state"],
   data() {
     return {
       loadingWidth: "100%",

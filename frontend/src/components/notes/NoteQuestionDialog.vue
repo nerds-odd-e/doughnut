@@ -22,27 +22,11 @@
   >
     Doesn't make sense?
   </button>
-
-  <div id="chatContainer" v-show="isQuestionAnswered">
-    <div class="chatInputContainer">
-      <button class="btn btn-secondary floatBtn" @click="sendMessage">
-        Send
-      </button>
-      <span>
-        <input
-          v-model="userInputValue"
-          class="autoExtendableInput"
-          type="text"
-        />
-      </span>
-    </div>
-  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import type { StorageAccessor } from "@/store/createNoteStorage";
-import { Message } from "@/store/DialogMessage";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import AIQuestion from "../review/AIQuestion.vue";
 
@@ -65,7 +49,6 @@ export default defineComponent({
       numberOfTries: 0,
       isUnmounted: false,
       userInputValue: "",
-      messages: [] as Message[],
       isQuestionAnswered: false,
     };
   },
@@ -94,12 +77,6 @@ export default defineComponent({
         this.prevQuizQuestion = tmpQuestion;
       }
       this.numberOfTries += 1;
-    },
-    async sendMessage() {
-      if (this.userInputValue !== "") {
-        const msg: Message = { role: "User", content: this.userInputValue };
-        this.messages.push(msg);
-      }
     },
     getIsQuestionAnswered(value: boolean) {
       this.isQuestionAnswered = value;
