@@ -1,11 +1,9 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.Answer;
-import com.odde.doughnut.entities.AnswerResult;
-import com.odde.doughnut.entities.AnswerViewedByUser;
-import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
+import java.util.stream.Stream;
 
 public class AnswerModel {
   private final Answer answer;
@@ -19,22 +17,22 @@ public class AnswerModel {
   }
 
   public void updateReviewPoints(Timestamp currentUTCTimestamp) {
-    answer
-        .getQuestion()
-        .getViceReviewPointIdList()
-        .forEach(
-            rPid ->
-                this.modelFactoryService
-                    .reviewPointRepository
-                    .findById(rPid)
-                    .ifPresent(
-                        vice ->
-                            this.modelFactoryService
-                                .toReviewPointModel(vice)
-                                .updateAfterRepetition(currentUTCTimestamp, isCorrect())));
-    ReviewPointModel reviewPointModel =
-        this.modelFactoryService.toReviewPointModel(answer.getQuestion().getReviewPoint());
-    reviewPointModel.updateAfterRepetition(currentUTCTimestamp, isCorrect());
+    boolean correct = isCorrect();
+    relatedReviewPoints()
+        .map(this.modelFactoryService::toReviewPointModel)
+        .forEach(model -> model.updateAfterRepetition(currentUTCTimestamp, correct));
+  }
+
+  private Stream<ReviewPoint> relatedReviewPoints() {
+    Stream<ReviewPoint> reviewPointStream =
+        answer.getQuestion().getViceReviewPointIdList().stream()
+            .flatMap(
+                rPid -> this.modelFactoryService.reviewPointRepository.findById(rPid).stream());
+    ReviewPoint reviewPoint = answer.getQuestion().getReviewPoint();
+    if (reviewPoint != null) {
+      return Stream.concat(reviewPointStream, Stream.of(reviewPoint));
+    }
+    return reviewPointStream;
   }
 
   public AnswerViewedByUser getAnswerViewedByUser() {

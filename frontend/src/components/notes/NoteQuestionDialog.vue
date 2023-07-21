@@ -5,7 +5,10 @@
       <h3>Previous Question...</h3>
       <AIQuestion :raw-json-question="rawJsonPrevQuestion" :disabled="true" />
     </div>
-    <AIQuestion :raw-json-question="rawJsonQuestion" />
+    <AIQuestion
+      :raw-json-question="rawJsonQuestion"
+      @answer-to-ai-question="submitAnswer({ spellingAnswer: $event })"
+    />
   </div>
   <button
     v-show="rawJsonQuestion !== undefined"
@@ -38,7 +41,7 @@ export default defineComponent({
     return {
       quizQuestion: undefined as Generated.QuizQuestion | undefined,
       prevQuizQuestion: undefined as Generated.QuizQuestion | undefined,
-      userInputValue: "",
+      answerResult: undefined as Generated.AnswerResult | undefined,
     };
   },
   computed: {
@@ -57,6 +60,15 @@ export default defineComponent({
         this.quizQuestion?.rawJsonQuestion,
       );
       this.prevQuizQuestion = tmpQuestion;
+    },
+    async submitAnswer(answerData: Partial<Generated.Answer>) {
+      if (this.quizQuestion === undefined) {
+        throw new Error("quizQuestion is undefined");
+      }
+      this.answerResult = await this.api.reviewMethods.processAnswer(
+        this.quizQuestion.quizQuestionId,
+        answerData,
+      );
     },
   },
   mounted() {
