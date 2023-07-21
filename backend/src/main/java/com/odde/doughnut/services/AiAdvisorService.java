@@ -27,21 +27,15 @@ public class AiAdvisorService {
     return openAiApiHandler.getOpenAiImage(prompt);
   }
 
-  public String generateQuestionJsonString(Note note) throws QuizQuestionNotPossibleException {
-    return generateQuestionJsonStringAvoidingPreviousQuestion(note, null);
+  public AIGeneratedQuestion generateQuestion(Note note) throws QuizQuestionNotPossibleException {
+    return generateQuestionAvoidingPreviousQuestion(note, null);
   }
 
-  public String generateQuestionJsonStringAvoidingPreviousQuestion(Note note, String prevQuestion)
-      throws QuizQuestionNotPossibleException {
-    AIGeneratedQuestion aiGeneratedQuestion = generateQuestion(note, prevQuestion);
-    return new ObjectMapper().valueToTree(aiGeneratedQuestion.validateQuestion()).toString();
-  }
-
-  private AIGeneratedQuestion generateQuestion(Note note, String prevQuestion)
-      throws QuizQuestionNotPossibleException {
+  public AIGeneratedQuestion generateQuestionAvoidingPreviousQuestion(
+      Note note, String prevQuestion) throws QuizQuestionNotPossibleException {
     JsonNode question = getAiGeneratedQuestionJson(note, prevQuestion);
     try {
-      return new ObjectMapper().treeToValue(question, AIGeneratedQuestion.class);
+      return new ObjectMapper().treeToValue(question, AIGeneratedQuestion.class).validateQuestion();
     } catch (JsonProcessingException e) {
       throw new QuizQuestionNotPossibleException();
     }

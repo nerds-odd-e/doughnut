@@ -2,6 +2,7 @@ package com.odde.doughnut.entities.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionNotPossibleException;
 import java.util.List;
 import org.apache.logging.log4j.util.Strings;
@@ -32,5 +33,9 @@ public class AIGeneratedQuestion {
       return this;
     }
     throw new QuizQuestionNotPossibleException();
+  }
+
+  public String toJsonString() {
+    return new ObjectMapper().valueToTree(this).toString();
   }
 }

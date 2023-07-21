@@ -13,6 +13,6 @@ public class AiQuestionFactory implements QuizQuestionFactory, QuestionRawJsonFa
 
   @Override
   public String generateRawJsonQuestion() throws QuizQuestionNotPossibleException {
-    return servant.aiAdvisorService.generateQuestionJsonString(reviewPoint.getNote());
+    return servant.aiAdvisorService.generateQuestion(reviewPoint.getNote()).toJsonString();
   }
 }

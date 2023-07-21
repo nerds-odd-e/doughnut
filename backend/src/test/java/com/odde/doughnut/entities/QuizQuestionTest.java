@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.odde.doughnut.entities.json.AIGeneratedQuestion;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.UserModel;
@@ -135,11 +136,12 @@ class QuizQuestionTest {
 
     @Test
     void shouldAlwaysChooseAIQuestionIfConfigured() throws QuizQuestionNotPossibleException {
+      AIGeneratedQuestion aiGeneratedQuestion = new AIGeneratedQuestion();
+      aiGeneratedQuestion.stem = "wat is the meaning of life?";
       userModel.getEntity().setAiQuestionTypeOnlyForReview(true);
       ReviewPointModel reviewPoint = getReviewPointModel(note);
       AiAdvisorService aiAdvisorService = mock(AiAdvisorService.class);
-      when(aiAdvisorService.generateQuestionJsonString(any()))
-          .thenReturn("{\"question\": \"wat is the meaning of life?\"}");
+      when(aiAdvisorService.generateQuestion(any())).thenReturn(aiGeneratedQuestion);
       QuizQuestionEntity randomQuizQuestion =
           reviewPoint.generateAQuizQuestion(
               new RealRandomizer(), userModel.getEntity(), aiAdvisorService);

@@ -2,10 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
-import com.odde.doughnut.entities.json.AiCompletion;
-import com.odde.doughnut.entities.json.AiCompletionRequest;
-import com.odde.doughnut.entities.json.AiGeneratedImage;
-import com.odde.doughnut.entities.json.QuizQuestion;
+import com.odde.doughnut.entities.json.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionNotPossibleException;
@@ -46,7 +43,7 @@ public class RestAiController {
       throws QuizQuestionNotPossibleException {
     currentUser.assertLoggedIn();
     String rawJsonQuestion =
-        aiAdvisorService.generateQuestionJsonStringAvoidingPreviousQuestion(note, question);
+        aiAdvisorService.generateQuestionAvoidingPreviousQuestion(note, question).toJsonString();
     QuizQuestionEntity quizQuestionEntity = new QuizQuestionEntity();
     quizQuestionEntity.setQuestionType(QuizQuestionEntity.QuestionType.AI_QUESTION);
     quizQuestionEntity.setRawJsonQuestion(rawJsonQuestion);
