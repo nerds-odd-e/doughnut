@@ -47,6 +47,7 @@ in mkShell {
     google-cloud-sdk
     yamllint
     atuin
+    chezmoi
     nix-direnv
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp
