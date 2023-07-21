@@ -6,7 +6,7 @@ import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.User;
 import java.util.List;
 
-public class FromSamePartAsQuizPresenter implements QuizQuestionPresenter {
+public class FromSamePartAsQuizPresenter extends QuizQuestionWithOptionsPresenter {
   protected final Link link;
   private final Link categoryLink;
   private final User user;

@@ -109,7 +109,7 @@ public class ModelFactoryService {
         presenter.hintLinks(),
         quizQuestionEntity.getViceReviewPointIdList(),
         quizQuestionEntity.getNotebookPosition(user),
-        presenter.optionCreator().getOptions(this, quizQuestionEntity.getOptionThingIds()),
+        presenter.getOptions(quizQuestionEntity, this),
         presenter.pictureWithMask());
   }
 }

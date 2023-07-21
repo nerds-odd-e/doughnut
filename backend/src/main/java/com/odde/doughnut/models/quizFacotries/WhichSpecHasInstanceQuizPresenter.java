@@ -3,7 +3,7 @@ package com.odde.doughnut.models.quizFacotries;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 
-public class WhichSpecHasInstanceQuizPresenter implements QuizQuestionPresenter {
+public class WhichSpecHasInstanceQuizPresenter extends QuizQuestionWithOptionsPresenter {
   private Link instanceLink;
   private final Link link;
 

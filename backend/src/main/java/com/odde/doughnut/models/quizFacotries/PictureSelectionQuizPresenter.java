@@ -4,7 +4,7 @@ import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.QuizQuestion;
 
-public class PictureSelectionQuizPresenter implements QuizQuestionPresenter {
+public class PictureSelectionQuizPresenter extends QuizQuestionWithOptionsPresenter {
 
   private ReviewPoint reviewPoint;
 

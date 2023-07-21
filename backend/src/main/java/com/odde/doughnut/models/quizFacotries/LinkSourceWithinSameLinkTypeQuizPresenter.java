@@ -4,7 +4,7 @@ import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.json.QuizQuestion;
 
-public class LinkSourceWithinSameLinkTypeQuizPresenter implements QuizQuestionPresenter {
+public class LinkSourceWithinSameLinkTypeQuizPresenter extends QuizQuestionWithOptionsPresenter {
   protected final Link link;
 
   public LinkSourceWithinSameLinkTypeQuizPresenter(QuizQuestionEntity quizQuestion) {

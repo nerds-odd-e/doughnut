@@ -5,7 +5,7 @@ import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.LinksOfANote;
 import com.odde.doughnut.models.NoteViewer;
 
-public abstract class ClozeDescriptonQuizPresenter implements QuizQuestionPresenter {
+public abstract class ClozeDescriptonQuizPresenter extends QuizQuestionWithOptionsPresenter {
   private final ReviewPoint reviewPoint;
 
   public ClozeDescriptonQuizPresenter(QuizQuestionEntity quizQuestion) {
