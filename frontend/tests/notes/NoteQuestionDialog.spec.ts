@@ -12,8 +12,14 @@ const goodQuestion: Generated.AIGeneratedQuestion = {
   incorrectChoices: ["option B", "option C"],
 };
 
+const betterQuestion: Generated.AIGeneratedQuestion = {
+  stem: "is it raining?",
+  correctChoice: "No",
+  incorrectChoices: ["yes"],
+};
+
+const note = makeMe.aNoteRealm.please();
 const createWrapper = async () => {
-  const note = makeMe.aNoteRealm.please();
   const quizQuestion = makeMe.aQuizQuestion
     .withQuestionType("AI_QUESTION")
     .withRawJsonQuestion(JSON.stringify(goodQuestion))
@@ -35,5 +41,21 @@ describe("NoteQuestionDialog", () => {
     expect(wrapper.text()).toContain("any question?");
     expect(wrapper.text()).toContain("option A");
     expect(wrapper.text()).toContain("option C");
+  });
+
+  it("regenerate question when asked", async () => {
+    const wrapper = await createWrapper();
+
+    const quizQuestion = makeMe.aQuizQuestion
+      .withQuestionType("AI_QUESTION")
+      .withRawJsonQuestion(JSON.stringify(betterQuestion))
+      .please();
+    helper.apiMock
+      .expectingPost(`/api/ai/generate-question?note=${note.id}`)
+      .andReturnOnce(quizQuestion);
+    wrapper.find("button").trigger("click");
+    await flushPromises();
+    expect(wrapper.text()).toContain("any question?");
+    expect(wrapper.text()).toContain("is it raining?");
   });
 });
