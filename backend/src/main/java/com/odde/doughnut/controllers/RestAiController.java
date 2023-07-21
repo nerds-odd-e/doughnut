@@ -45,7 +45,8 @@ public class RestAiController {
       @RequestParam(value = "note") Note note, @RequestBody(required = false) String question)
       throws QuizQuestionNotPossibleException {
     currentUser.assertLoggedIn();
-    String rawJsonQuestion = aiAdvisorService.generateQuestionJsonString(note, question);
+    String rawJsonQuestion =
+        aiAdvisorService.generateQuestionJsonStringAvoidingPreviousQuestion(note, question);
     QuizQuestionEntity quizQuestionEntity = new QuizQuestionEntity();
     quizQuestionEntity.setQuestionType(QuizQuestionEntity.QuestionType.AI_QUESTION);
     quizQuestionEntity.setRawJsonQuestion(rawJsonQuestion);
