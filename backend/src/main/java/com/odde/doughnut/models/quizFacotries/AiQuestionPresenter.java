@@ -2,10 +2,8 @@ package com.odde.doughnut.models.quizFacotries;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.json.AIGeneratedQuestion;
-import java.util.List;
 
 public class AiQuestionPresenter implements QuizQuestionPresenter {
   private final AIGeneratedQuestion aiQuestion;
@@ -27,11 +25,6 @@ public class AiQuestionPresenter implements QuizQuestionPresenter {
 
   @Override
   public String mainTopic() {
-    return null;
-  }
-
-  @Override
-  public List<Note> knownRightAnswers() {
     return null;
   }
 

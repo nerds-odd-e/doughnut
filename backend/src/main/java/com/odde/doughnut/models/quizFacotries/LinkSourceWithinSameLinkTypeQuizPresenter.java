@@ -1,10 +1,8 @@
 package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.json.QuizQuestion;
-import java.util.List;
 
 public class LinkSourceWithinSameLinkTypeQuizPresenter implements QuizQuestionPresenter {
   protected final Link link;
@@ -29,7 +27,7 @@ public class LinkSourceWithinSameLinkTypeQuizPresenter implements QuizQuestionPr
   }
 
   @Override
-  public List<Note> knownRightAnswers() {
-    return List.of(link.getSourceNote());
+  public boolean isAnswerCorrect(String spellingAnswer) {
+    return link.getSourceNote().matchAnswer(spellingAnswer);
   }
 }

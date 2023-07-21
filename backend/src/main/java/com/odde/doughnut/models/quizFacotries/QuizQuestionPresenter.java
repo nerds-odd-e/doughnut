@@ -1,10 +1,8 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PictureWithMask;
 import com.odde.doughnut.entities.json.LinksOfANote;
 import com.odde.doughnut.entities.json.QuizQuestion;
-import java.util.List;
 import java.util.Optional;
 
 public interface QuizQuestionPresenter {
@@ -12,7 +10,7 @@ public interface QuizQuestionPresenter {
 
   String mainTopic();
 
-  List<Note> knownRightAnswers();
+  boolean isAnswerCorrect(String spellingAnswer);
 
   default LinksOfANote hintLinks() {
     return null;
@@ -24,10 +22,5 @@ public interface QuizQuestionPresenter {
 
   default Optional<PictureWithMask> pictureWithMask() {
     return Optional.empty();
-  }
-
-  default boolean isAnswerCorrect(String spellingAnswer) {
-    return knownRightAnswers().stream()
-        .anyMatch(correctAnswerNote -> correctAnswerNote.getNoteTitle().matches(spellingAnswer));
   }
 }

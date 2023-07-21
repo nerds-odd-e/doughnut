@@ -3,11 +3,15 @@ package com.odde.doughnut.models.quizFacotries;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
-import java.util.List;
 
 public class LinkTargetQuizPresenter implements QuizQuestionPresenter {
   protected final Link link;
   protected final Note answerNote;
+
+  @Override
+  public boolean isAnswerCorrect(String spellingAnswer) {
+    return answerNote.matchAnswer(spellingAnswer);
+  }
 
   public LinkTargetQuizPresenter(QuizQuestionEntity quizQuestion) {
     this.link = quizQuestion.getReviewPoint().getLink();
@@ -26,10 +30,5 @@ public class LinkTargetQuizPresenter implements QuizQuestionPresenter {
         + "</mark> is "
         + link.getLinkTypeLabel()
         + ":";
-  }
-
-  @Override
-  public List<Note> knownRightAnswers() {
-    return List.of(answerNote);
   }
 }

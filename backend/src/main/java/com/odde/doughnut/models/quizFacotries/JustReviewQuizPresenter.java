@@ -1,8 +1,6 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
-import java.util.List;
 
 public class JustReviewQuizPresenter implements QuizQuestionPresenter {
   public JustReviewQuizPresenter(QuizQuestionEntity quizQuestion) {}
@@ -14,11 +12,6 @@ public class JustReviewQuizPresenter implements QuizQuestionPresenter {
 
   @Override
   public String mainTopic() {
-    return null;
-  }
-
-  @Override
-  public List<Note> knownRightAnswers() {
     return null;
   }
 
