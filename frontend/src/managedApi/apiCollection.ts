@@ -74,7 +74,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
 
     async processAnswer(quizQuestionId: Doughnut.ID, data: Generated.Answer) {
       const res = (await managedApi.restPost(
-        `reviews/${quizQuestionId}/answer`,
+        `quiz-questions/${quizQuestionId}/answer`,
         data,
       )) as Generated.AnswerResult;
       return res;

@@ -55,7 +55,7 @@ public class QuizQuestionEntity {
     FROM_SAME_PART_AS(10, FromSamePartAsQuizFactory::new, FromSamePartAsQuizPresenter::new),
     FROM_DIFFERENT_PART_AS(
         11, FromDifferentPartAsQuizFactory::new, FromDifferentPartAsQuizPresenter::new),
-    AI_QUESTION(12, AiQuestionFactory::new, JustReviewQuizPresenter::new);
+    AI_QUESTION(12, AiQuestionFactory::new, AiQuestionPresenter::new);
 
     public final Integer id;
     public final BiFunction<ReviewPoint, QuizQuestionServant, QuizQuestionFactory> factory;

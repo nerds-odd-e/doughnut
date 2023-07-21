@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/quiz-question")
+@RequestMapping("/api/quiz-questions")
 class RestQuizQuestionController {
   private final ModelFactoryService modelFactoryService;
 

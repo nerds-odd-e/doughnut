@@ -29,6 +29,11 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
     return this;
   }
 
+  public AnswerBuilder forQuestion(QuizQuestionEntity quizQuestion) {
+    entity.setQuestion(quizQuestion);
+    return this;
+  }
+
   public AnswerBuilder answerWithSpelling(String answer) {
     this.entity.setAnswerNoteId(null);
     this.entity.setSpellingAnswer(answer);

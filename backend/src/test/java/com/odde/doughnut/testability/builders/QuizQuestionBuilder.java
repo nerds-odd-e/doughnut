@@ -2,6 +2,7 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.json.AIGeneratedQuestion;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
@@ -36,5 +37,10 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
     QuizQuestionEntity quizQuestion = inMemoryPlease();
     if (quizQuestion == null) return null;
     return makeMe.modelFactoryService.toQuizQuestion(quizQuestion, makeMe.aUser().please());
+  }
+
+  public QuizQuestionBuilder aiQuestion(AIGeneratedQuestion aiGeneratedQuestion) {
+    entity.setRawJsonQuestion(aiGeneratedQuestion.toJsonString());
+    return this;
   }
 }

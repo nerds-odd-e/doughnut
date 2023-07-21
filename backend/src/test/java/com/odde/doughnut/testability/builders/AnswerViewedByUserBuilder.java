@@ -39,4 +39,9 @@ public class AnswerViewedByUserBuilder extends EntityBuilder<AnswerViewedByUser>
     this.answerBuilder.answerWithId(answerNote);
     return this;
   }
+
+  public AnswerViewedByUserBuilder forQuestion(QuizQuestionEntity quizQuestion) {
+    answerBuilder.forQuestion(quizQuestion);
+    return this;
+  }
 }
