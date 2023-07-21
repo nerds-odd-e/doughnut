@@ -32,10 +32,15 @@ public class AiAdvisorService {
   public String generateQuestionJsonStringAvoidingPreviousQuestion(Note note, String prevQuestion)
       throws QuizQuestionNotPossibleException {
     JsonNode question = getAiGeneratedQuestion(note, prevQuestion);
+    validateQuestion(question);
+    return question.toString();
+  }
+
+  private static void validateQuestion(JsonNode question) throws QuizQuestionNotPossibleException {
     if (question != null) {
       JsonNode stem = question.get("stem");
       if (stem != null && !Strings.isBlank(stem.asText(""))) {
-        return question.toString();
+        return;
       }
     }
     throw new QuizQuestionNotPossibleException();
