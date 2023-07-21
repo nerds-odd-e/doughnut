@@ -30,6 +30,6 @@ public class AiQuestionPresenter implements QuizQuestionPresenter {
 
   @Override
   public boolean isAnswerCorrect(String spellingAnswer) {
-    return "yes".equals(spellingAnswer);
+    return aiQuestion.correctChoice.equals(spellingAnswer);
   }
 }

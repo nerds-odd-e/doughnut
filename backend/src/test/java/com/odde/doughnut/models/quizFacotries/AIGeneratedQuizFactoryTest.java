@@ -3,6 +3,7 @@ package com.odde.doughnut.models.quizFacotries;
 import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.AI_QUESTION;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.entities.AnswerViewedByUser;
@@ -57,13 +58,25 @@ class AIGeneratedQuizFactoryTest {
 
   @Nested
   class Answer {
+
+    @Test
+    void wrong() {
+      AnswerViewedByUser answerResult =
+          makeMe
+              .anAnswerViewedByUser()
+              .forQuestion(questionBuilder().inMemoryPlease())
+              .answerWithSpelling("yes")
+              .inMemoryPlease();
+      assertFalse(answerResult.correct);
+    }
+
     @Test
     void correct() {
       AnswerViewedByUser answerResult =
           makeMe
               .anAnswerViewedByUser()
               .forQuestion(questionBuilder().inMemoryPlease())
-              .answerWithSpelling("yes")
+              .answerWithSpelling("more than 1 day")
               .inMemoryPlease();
       assertTrue(answerResult.correct);
     }

@@ -22,6 +22,6 @@ Feature: Repetition Quiz
     When I choose answer "<answer>"
     Then I should see that my answer <result>
     Examples:
-      | answer             | result              |
-      | to sleep           | "no" is incorrect   |
-      | to incite violence | is correct          |
+      | answer             | result                    |
+      | to sleep           | "to sleep" is incorrect   |
+      | to incite violence | is correct                |
