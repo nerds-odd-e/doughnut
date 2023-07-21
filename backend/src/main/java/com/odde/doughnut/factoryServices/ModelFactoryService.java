@@ -6,8 +6,10 @@ import com.odde.doughnut.entities.json.SearchTerm;
 import com.odde.doughnut.entities.repositories.*;
 import com.odde.doughnut.models.*;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionPresenter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import javax.persistence.EntityManager;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,7 +111,19 @@ public class ModelFactoryService {
         presenter.hintLinks(),
         quizQuestionEntity.getViceReviewPointIdList(),
         quizQuestionEntity.getNotebookPosition(user),
-        presenter.optionCreator().getOptions(this, quizQuestionEntity.getOptionThingIds()),
+        getOptions(presenter, getThingStream(quizQuestionEntity.getOptionThingIdList())),
         presenter.pictureWithMask());
+  }
+
+  private List<QuizQuestion.Option> getOptions(
+      QuizQuestionPresenter presenter, Stream<Thing> thingStream) {
+    QuizQuestion.OptionCreator optionCreator = presenter.optionCreator();
+    return thingStream.map(optionCreator::optionFromThing).toList();
+  }
+
+  private Stream<Thing> getThingStream(List<Integer> idList) {
+    return thingRepository
+        .findAllByIds(idList)
+        .sorted(Comparator.comparing(v -> idList.indexOf(v.getId())));
   }
 }
