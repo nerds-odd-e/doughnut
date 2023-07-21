@@ -302,7 +302,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     ): Promise<Generated.QuizQuestion> {
       return (await managedApi.restPost(
         `ai/generate-question?note=${noteId}`,
-        question ?? {},
+        question,
       )) as Generated.QuizQuestion;
     },
     async generateImage(prompt: string) {

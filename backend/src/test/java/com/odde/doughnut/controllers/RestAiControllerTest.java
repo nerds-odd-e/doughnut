@@ -160,7 +160,7 @@ class RestAiControllerTest {
             RestAiController restAiController =
                 new RestAiController(
                     openAiApi, makeMe.modelFactoryService, makeMe.aNullUserModel());
-            restAiController.regenerateQuestion(note, null);
+            restAiController.generateQuestion(note, null);
           });
     }
 
@@ -172,9 +172,9 @@ class RestAiControllerTest {
                   """
 {"stem": "What is the first color in the rainbow?", "correctChoice": "white", "incorrectChoices": ["black", "green"]}
 """));
-      QuizQuestion question = controller.regenerateQuestion(note, null);
+      QuizQuestion question = controller.generateQuestion(note, null);
       QuizQuestion quizQuestion =
-          controller.regenerateQuestion(note, question.getRawJsonQuestion());
+          controller.generateQuestion(note, question.getRawJsonQuestion());
       assertThat(quizQuestion.getRawJsonQuestion()).isEqualTo(question.getRawJsonQuestion());
     }
 
@@ -186,7 +186,7 @@ class RestAiControllerTest {
                   """
       {"stem": "What is the first color in the rainbow?"}
       """));
-      QuizQuestion quizQuestion = controller.regenerateQuestion(note, null);
+      QuizQuestion quizQuestion = controller.generateQuestion(note, null);
       assertThat(quizQuestion.getRawJsonQuestion())
           .contains("What is the first color in the rainbow?");
     }
@@ -198,7 +198,7 @@ class RestAiControllerTest {
 {"stem": ""}
 """));
       assertThrows(
-          QuizQuestionNotPossibleException.class, () -> controller.regenerateQuestion(note, null));
+          QuizQuestionNotPossibleException.class, () -> controller.generateQuestion(note, null));
     }
 
     @Test
@@ -213,7 +213,7 @@ class RestAiControllerTest {
               buildCompletionResultForAIQuestion("""
 {"stem": "what is it?"}
             """));
-      controller.regenerateQuestion(note, null);
+      controller.generateQuestion(note, null);
     }
   }
 
