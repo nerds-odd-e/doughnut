@@ -23,11 +23,14 @@
 
 <script lang="ts">
 import _ from "lodash";
-import { defineComponent } from "vue";
+import { PropType, defineComponent } from "vue";
 
 export default defineComponent({
   props: {
-    rawJsonQuestion: { type: String, required: true },
+    quizQuestion: {
+      type: Object as PropType<Generated.QuizQuestion>,
+      required: true,
+    },
     disabled: Boolean,
   },
   emits: ["answer-to-ai-question"],
@@ -38,6 +41,9 @@ export default defineComponent({
     };
   },
   computed: {
+    rawJsonQuestion() {
+      return this.quizQuestion.rawJsonQuestion;
+    },
     aiQuestion() {
       return JSON.parse(this.rawJsonQuestion) as Generated.AIGeneratedQuestion;
     },

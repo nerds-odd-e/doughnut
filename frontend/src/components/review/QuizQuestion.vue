@@ -1,7 +1,7 @@
 <template>
   <AIQuestion
     v-if="quizQuestion.questionType === 'AI_QUESTION'"
-    :raw-json-question="quizQuestion.rawJsonQuestion"
+    :quiz-question="quizQuestion"
     @answer-to-ai-question="submitAnswer({ spellingAnswer: $event })"
   />
   <template v-else>

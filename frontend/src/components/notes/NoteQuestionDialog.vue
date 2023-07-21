@@ -1,17 +1,17 @@
 <template>
-  <h2 v-if="rawJsonQuestion === undefined">Generating question...</h2>
+  <h2 v-if="quizQuestion === undefined">Generating question...</h2>
   <div v-else>
-    <div v-if="rawJsonPrevQuestion">
+    <div v-if="prevQuizQuestion">
       <h3>Previous Question...</h3>
-      <AIQuestion :raw-json-question="rawJsonPrevQuestion" :disabled="true" />
+      <AIQuestion :quiz-question="prevQuizQuestion" :disabled="true" />
     </div>
     <AIQuestion
-      :raw-json-question="rawJsonQuestion"
+      :quiz-question="quizQuestion"
       @answer-to-ai-question="submitAnswer({ spellingAnswer: $event })"
     />
   </div>
   <button
-    v-show="rawJsonQuestion !== undefined"
+    v-show="quizQuestion !== undefined"
     class="btn btn-secondary"
     @click="generateQuestion"
   >
@@ -43,14 +43,6 @@ export default defineComponent({
       prevQuizQuestion: undefined as Generated.QuizQuestion | undefined,
       answerResult: undefined as Generated.AnswerResult | undefined,
     };
-  },
-  computed: {
-    rawJsonQuestion() {
-      return this.quizQuestion?.rawJsonQuestion;
-    },
-    rawJsonPrevQuestion() {
-      return this.prevQuizQuestion?.rawJsonQuestion;
-    },
   },
   methods: {
     async generateQuestion() {
