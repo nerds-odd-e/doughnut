@@ -1,7 +1,10 @@
 package com.odde.doughnut.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.json.AIGeneratedQuestion;
 import com.odde.doughnut.entities.json.AiCompletion;
 import com.odde.doughnut.entities.json.AiCompletionRequest;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionNotPossibleException;
@@ -32,14 +35,20 @@ public class AiAdvisorService {
   public String generateQuestionJsonStringAvoidingPreviousQuestion(Note note, String prevQuestion)
       throws QuizQuestionNotPossibleException {
     JsonNode question = getAiGeneratedQuestion(note, prevQuestion);
-    validateQuestion(question);
+    try {
+      AIGeneratedQuestion aiGeneratedQuestion =
+          new ObjectMapper().treeToValue(question, AIGeneratedQuestion.class);
+      validateQuestion(aiGeneratedQuestion);
+    } catch (JsonProcessingException e) {
+      throw new QuizQuestionNotPossibleException();
+    }
     return question.toString();
   }
 
-  private static void validateQuestion(JsonNode question) throws QuizQuestionNotPossibleException {
+  private static void validateQuestion(AIGeneratedQuestion question)
+      throws QuizQuestionNotPossibleException {
     if (question != null) {
-      JsonNode stem = question.get("stem");
-      if (stem != null && !Strings.isBlank(stem.asText(""))) {
+      if (question.stem != null && !Strings.isBlank(question.stem)) {
         return;
       }
     }
