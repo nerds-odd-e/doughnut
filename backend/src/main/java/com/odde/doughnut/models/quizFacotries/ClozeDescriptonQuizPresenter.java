@@ -31,7 +31,12 @@ public abstract class ClozeDescriptonQuizPresenter implements QuizQuestionPresen
   }
 
   @Override
+  public boolean isAnswerCorrect(String spellingAnswer) {
+    return reviewPoint.getNote().matchAnswer(spellingAnswer);
+  }
+
+  @Override
   public List<Note> knownRightAnswers() {
-    return List.of(reviewPoint.getNote());
+    return null;
   }
 }

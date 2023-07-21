@@ -377,4 +377,9 @@ public class Note extends Thingy {
   public String getPath() {
     return getAncestors().stream().map(Note::getTitle).collect(Collectors.joining(" › "));
   }
+
+  @JsonIgnore
+  public boolean matchAnswer(String spellingAnswer) {
+    return getNoteTitle().matches(spellingAnswer);
+  }
 }

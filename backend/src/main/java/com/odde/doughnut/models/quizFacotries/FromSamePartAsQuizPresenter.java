@@ -33,8 +33,13 @@ public class FromSamePartAsQuizPresenter implements QuizQuestionPresenter {
         + "</mark> as:";
   }
 
-  @Override
   public List<Note> knownRightAnswers() {
     return link.getLinkedSiblingsOfSameLinkType(user);
+  }
+
+  @Override
+  public boolean isAnswerCorrect(String spellingAnswer) {
+    return knownRightAnswers().stream()
+        .anyMatch(correctAnswerNote -> correctAnswerNote.matchAnswer(spellingAnswer));
   }
 }

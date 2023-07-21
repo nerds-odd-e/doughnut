@@ -34,12 +34,17 @@ public class FromDifferentPartAsQuizPresenter implements QuizQuestionPresenter {
     return link.getSourceNote().getTitle();
   }
 
-  @Override
   public List<Note> knownRightAnswers() {
     ParentGrandLinkHelperImpl parentGrandLinkHelper =
         new ParentGrandLinkHelperImpl(user, link, categoryLink);
     return parentGrandLinkHelper.getCousinLinksAvoidingSiblings().stream()
         .map(Link::getSourceNote)
         .collect(Collectors.toList());
+  }
+
+  @Override
+  public boolean isAnswerCorrect(String spellingAnswer) {
+    return knownRightAnswers().stream()
+        .anyMatch(correctAnswerNote -> correctAnswerNote.matchAnswer(spellingAnswer));
   }
 }
