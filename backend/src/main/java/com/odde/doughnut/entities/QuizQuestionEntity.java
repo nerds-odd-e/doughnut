@@ -156,18 +156,11 @@ public class QuizQuestionEntity {
     return getQuestionType().presenter.apply(this);
   }
 
-  public Boolean isAnswerCorrect(Note answerNote, String spellingAnswer) {
+  public Boolean isAnswerCorrect(String spellingAnswer) {
     if (getQuestionType() == QuestionType.JUST_REVIEW
         || getQuestionType() == QuestionType.AI_QUESTION) {
       return spellingAnswer.equals("yes");
     }
-    return buildPresenter().knownRightAnswers().stream()
-        .anyMatch(
-            correctAnswerNote -> {
-              if (answerNote != null) {
-                return correctAnswerNote.equals(answerNote);
-              }
-              return correctAnswerNote.getNoteTitle().matches(spellingAnswer);
-            });
+    return buildPresenter().isAnswerCorrect(spellingAnswer);
   }
 }

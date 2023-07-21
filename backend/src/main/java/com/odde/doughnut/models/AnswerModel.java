@@ -63,8 +63,7 @@ public class AnswerModel {
 
   private boolean isCorrect() {
     if (cachedResult != null) return cachedResult;
-    cachedResult =
-        answer.getQuestion().isAnswerCorrect(getAnswerNote(), answer.getSpellingAnswer());
+    cachedResult = answer.getQuestion().isAnswerCorrect(getAnswerDisplay());
     return cachedResult;
   }
 

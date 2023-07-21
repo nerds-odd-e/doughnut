@@ -25,4 +25,9 @@ public interface QuizQuestionPresenter {
   default Optional<PictureWithMask> pictureWithMask() {
     return Optional.empty();
   }
+
+  default boolean isAnswerCorrect(String spellingAnswer) {
+    return knownRightAnswers().stream()
+        .anyMatch(correctAnswerNote -> correctAnswerNote.getNoteTitle().matches(spellingAnswer));
+  }
 }
