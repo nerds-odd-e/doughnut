@@ -22,6 +22,7 @@ const note = makeMe.aNoteRealm.please();
 const createWrapper = async () => {
   const quizQuestion = makeMe.aQuizQuestion
     .withQuestionType("AI_QUESTION")
+    .withQuestionStem("any question?")
     .withRawJsonQuestion(JSON.stringify(goodQuestion))
     .please();
   helper.apiMock
@@ -48,6 +49,7 @@ describe("NoteQuestionDialog", () => {
 
     const quizQuestion = makeMe.aQuizQuestion
       .withQuestionType("AI_QUESTION")
+      .withQuestionStem("is it raining?")
       .withRawJsonQuestion(JSON.stringify(betterQuestion))
       .please();
     helper.apiMock

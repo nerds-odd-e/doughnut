@@ -30,6 +30,11 @@ class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
     return this;
   }
 
+  withQuestionStem(stem: string) {
+    this.quizQuestion.description = stem;
+    return this;
+  }
+
   withRawJsonQuestion(json: string) {
     this.quizQuestion.rawJsonQuestion = json;
     return this;
