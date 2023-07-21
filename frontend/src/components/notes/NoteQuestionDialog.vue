@@ -9,14 +9,10 @@
         :disabled="true"
       />
     </div>
-    <AIQuestion
-      :raw-json-question="rawJsonQuestion"
-      :key="numberOfTries"
-      @is-question-answered="getIsQuestionAnswered"
-    />
+    <AIQuestion :raw-json-question="rawJsonQuestion" :key="numberOfTries" />
   </div>
   <button
-    v-show="!isQuestionAnswered && rawJsonQuestion !== undefined"
+    v-show="rawJsonQuestion !== undefined"
     class="btn btn-secondary"
     @click="regenerateQuestion"
   >
@@ -49,7 +45,6 @@ export default defineComponent({
       numberOfTries: 0,
       isUnmounted: false,
       userInputValue: "",
-      isQuestionAnswered: false,
     };
   },
   computed: {
@@ -77,9 +72,6 @@ export default defineComponent({
         this.prevQuizQuestion = tmpQuestion;
       }
       this.numberOfTries += 1;
-    },
-    getIsQuestionAnswered(value: boolean) {
-      this.isQuestionAnswered = value;
     },
   },
   mounted() {
