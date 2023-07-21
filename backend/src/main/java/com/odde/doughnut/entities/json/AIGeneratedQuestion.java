@@ -2,7 +2,9 @@ package com.odde.doughnut.entities.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.odde.doughnut.models.quizFacotries.QuizQuestionNotPossibleException;
 import java.util.List;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.lang.Nullable;
 
 public class AIGeneratedQuestion {
@@ -24,4 +26,11 @@ public class AIGeneratedQuestion {
   @JsonProperty(required = false)
   @Nullable
   public String background;
+
+  public AIGeneratedQuestion validateQuestion() throws QuizQuestionNotPossibleException {
+    if (stem != null && !Strings.isBlank(stem)) {
+      return this;
+    }
+    throw new QuizQuestionNotPossibleException();
+  }
 }

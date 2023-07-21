@@ -15,7 +15,6 @@ import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatFunctionCall;
 import com.theokanning.openai.completion.chat.ChatMessage;
-import org.apache.logging.log4j.util.Strings;
 
 public class AiAdvisorService {
   private final OpenAiApiHandler openAiApiHandler;
@@ -34,28 +33,22 @@ public class AiAdvisorService {
 
   public String generateQuestionJsonStringAvoidingPreviousQuestion(Note note, String prevQuestion)
       throws QuizQuestionNotPossibleException {
-    JsonNode question = getAiGeneratedQuestion(note, prevQuestion);
+    AIGeneratedQuestion aiGeneratedQuestion = generateQuestion(note, prevQuestion);
+    return new ObjectMapper().valueToTree(aiGeneratedQuestion.validateQuestion()).toString();
+  }
+
+  private AIGeneratedQuestion generateQuestion(Note note, String prevQuestion)
+      throws QuizQuestionNotPossibleException {
+    JsonNode question = getAiGeneratedQuestionJson(note, prevQuestion);
     try {
-      AIGeneratedQuestion aiGeneratedQuestion =
-          new ObjectMapper().treeToValue(question, AIGeneratedQuestion.class);
-      validateQuestion(aiGeneratedQuestion);
+      return new ObjectMapper().treeToValue(question, AIGeneratedQuestion.class);
     } catch (JsonProcessingException e) {
       throw new QuizQuestionNotPossibleException();
     }
-    return question.toString();
   }
 
-  private static void validateQuestion(AIGeneratedQuestion question)
+  private JsonNode getAiGeneratedQuestionJson(Note note, String question)
       throws QuizQuestionNotPossibleException {
-    if (question != null) {
-      if (question.stem != null && !Strings.isBlank(question.stem)) {
-        return;
-      }
-    }
-    throw new QuizQuestionNotPossibleException();
-  }
-
-  private JsonNode getAiGeneratedQuestion(Note note, String question) {
     ChatCompletionRequest chatRequest =
         new OpenAIChatAboutNoteRequestBuilder(note.getPath())
             .detailsOfNoteOfCurrentFocus(note)
@@ -68,7 +61,7 @@ public class AiAdvisorService {
         .map(ChatCompletionChoice::getMessage)
         .map(ChatMessage::getFunctionCall)
         .map(ChatFunctionCall::getArguments)
-        .orElse(null);
+        .orElseThrow(QuizQuestionNotPossibleException::new);
   }
 
   public AiCompletion getAiCompletion(AiCompletionRequest aiCompletionRequest, String notePath) {
