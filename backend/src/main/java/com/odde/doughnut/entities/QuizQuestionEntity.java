@@ -161,13 +161,4 @@ public class QuizQuestionEntity {
   public Boolean isAnswerCorrect(String spellingAnswer) {
     return buildPresenter().isAnswerCorrect(spellingAnswer);
   }
-
-  @JsonIgnore
-  public List<Integer> getOptionThingIdList() {
-    String optionThingIds = getOptionThingIds();
-    if (Strings.isBlank(optionThingIds)) return List.of();
-    return Arrays.stream(optionThingIds.split(","))
-        .map(Integer::parseInt)
-        .collect(Collectors.toList());
-  }
 }
