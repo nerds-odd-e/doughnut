@@ -34,4 +34,9 @@ public class AiQuestionPresenter implements QuizQuestionPresenter {
   public List<Note> knownRightAnswers() {
     return null;
   }
+
+  @Override
+  public boolean isAnswerCorrect(String spellingAnswer) {
+    return "yes".equals(spellingAnswer);
+  }
 }

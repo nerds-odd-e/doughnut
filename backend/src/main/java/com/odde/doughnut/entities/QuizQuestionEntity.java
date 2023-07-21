@@ -152,15 +152,13 @@ public class QuizQuestionEntity {
         .collect(Collectors.toList());
   }
 
+  @JsonIgnore
   public QuizQuestionPresenter buildPresenter() {
     return getQuestionType().presenter.apply(this);
   }
 
+  @JsonIgnore
   public Boolean isAnswerCorrect(String spellingAnswer) {
-    if (getQuestionType() == QuestionType.JUST_REVIEW
-        || getQuestionType() == QuestionType.AI_QUESTION) {
-      return spellingAnswer.equals("yes");
-    }
     return buildPresenter().isAnswerCorrect(spellingAnswer);
   }
 }
