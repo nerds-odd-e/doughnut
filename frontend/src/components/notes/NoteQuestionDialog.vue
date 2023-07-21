@@ -5,9 +5,9 @@
       <h3>Previous Question...</h3>
       <AIQuestion :quiz-question="prevQuizQuestion" :disabled="true" />
     </div>
-    <AIQuestion
+    <QuizQuestion
       :quiz-question="quizQuestion"
-      @answer-to-ai-question="submitAnswer({ spellingAnswer: $event })"
+      :storage-accessor="storageAccessor"
     />
   </div>
   <button
@@ -24,6 +24,7 @@ import { defineComponent, PropType } from "vue";
 import type { StorageAccessor } from "@/store/createNoteStorage";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import AIQuestion from "../review/AIQuestion.vue";
+import QuizQuestion from "../review/QuizQuestion.vue";
 
 export default defineComponent({
   setup() {
@@ -33,10 +34,10 @@ export default defineComponent({
     selectedNote: { type: Object as PropType<Generated.Note>, required: true },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
-      required: false,
+      required: true,
     },
   },
-  components: { AIQuestion },
+  components: { AIQuestion, QuizQuestion },
   data() {
     return {
       quizQuestion: undefined as Generated.QuizQuestion | undefined,
@@ -52,15 +53,6 @@ export default defineComponent({
         this.quizQuestion?.rawJsonQuestion,
       );
       this.prevQuizQuestion = tmpQuestion;
-    },
-    async submitAnswer(answerData: Partial<Generated.Answer>) {
-      if (this.quizQuestion === undefined) {
-        throw new Error("quizQuestion is undefined");
-      }
-      this.answerResult = await this.api.reviewMethods.processAnswer(
-        this.quizQuestion.quizQuestionId,
-        answerData,
-      );
     },
   },
   mounted() {
