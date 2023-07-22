@@ -29,14 +29,4 @@ public class FromSamePartAsQuizPresenter extends QuizQuestionWithOptionsPresente
         + categoryLink.getTargetNote().getTitle()
         + "</mark> as:";
   }
-
-  public List<Note> knownRightAnswers() {
-    return link.getLinkedSiblingsOfSameLinkType(user);
-  }
-
-  @Override
-  public boolean isAnswerCorrect(Answer answer) {
-    return knownRightAnswers().stream()
-        .anyMatch(correctAnswerNote -> correctAnswerNote.getId().equals(answer.getAnswerNoteId()));
-  }
 }

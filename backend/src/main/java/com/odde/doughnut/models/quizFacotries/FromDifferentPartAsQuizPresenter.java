@@ -31,17 +31,4 @@ public class FromDifferentPartAsQuizPresenter extends QuizQuestionWithOptionsPre
     return link.getSourceNote().getTitle();
   }
 
-  public List<Note> knownRightAnswers() {
-    ParentGrandLinkHelperImpl parentGrandLinkHelper =
-        new ParentGrandLinkHelperImpl(user, link, categoryLink);
-    return parentGrandLinkHelper.getCousinLinksAvoidingSiblings().stream()
-        .map(Link::getSourceNote)
-        .collect(Collectors.toList());
-  }
-
-  @Override
-  public boolean isAnswerCorrect(Answer answer) {
-    return knownRightAnswers().stream()
-        .anyMatch(correctAnswerNote -> correctAnswerNote.getId().equals(answer.getAnswerNoteId()));
-  }
 }
