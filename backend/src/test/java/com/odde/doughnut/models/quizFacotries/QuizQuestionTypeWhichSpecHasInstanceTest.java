@@ -108,7 +108,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
                 makeMe
                     .anAnswerViewedByUser()
                     .validQuestionOfType(WHICH_SPEC_HAS_INSTANCE, reviewPoint)
-                    .answerWithSpelling(source.getTitle())
+                    .answerWith(source)
                     .inMemoryPlease();
             assertTrue(answerResult.correct);
           }
@@ -119,7 +119,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
                 makeMe
                     .anAnswerViewedByUser()
                     .validQuestionOfType(WHICH_SPEC_HAS_INSTANCE, reviewPoint)
-                    .answerWithSpelling("metal")
+                    .answerWith(metal)
                     .inMemoryPlease();
             assertFalse(answerResult.correct);
           }

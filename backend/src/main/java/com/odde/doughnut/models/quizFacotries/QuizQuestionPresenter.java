@@ -1,5 +1,6 @@
 package com.odde.doughnut.models.quizFacotries;
 
+import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.PictureWithMask;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.json.LinksOfANote;
@@ -13,7 +14,7 @@ public interface QuizQuestionPresenter {
 
   String mainTopic();
 
-  boolean isAnswerCorrect(String spellingAnswer);
+  boolean isAnswerCorrect(Answer answer);
 
   default LinksOfANote hintLinks() {
     return null;

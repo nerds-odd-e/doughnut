@@ -1,5 +1,6 @@
 package com.odde.doughnut.models.quizFacotries;
 
+import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.Thing;
@@ -12,8 +13,8 @@ public class PictureSelectionQuizPresenter extends QuizQuestionWithOptionsPresen
   private ReviewPoint reviewPoint;
 
   @Override
-  public boolean isAnswerCorrect(String spellingAnswer) {
-    return reviewPoint.getNote().matchAnswer(spellingAnswer);
+  public boolean isAnswerCorrect(Answer answer) {
+    return reviewPoint.getNote().getId().equals(answer.getAnswerNoteId());
   }
 
   public PictureSelectionQuizPresenter(QuizQuestionEntity quizQuestion) {

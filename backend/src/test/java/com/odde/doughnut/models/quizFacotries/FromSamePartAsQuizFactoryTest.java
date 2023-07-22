@@ -145,7 +145,7 @@ class FromSamePartAsQuizFactoryTest {
                 makeMe
                     .anAnswerViewedByUser()
                     .validQuestionOfType(FROM_SAME_PART_AS, reviewPoint)
-                    .answerWithSpelling(pretty.getTitle())
+                    .answerWith(pretty)
                     .inMemoryPlease();
             assertTrue(answerResult.correct);
           }
@@ -156,7 +156,7 @@ class FromSamePartAsQuizFactoryTest {
                 makeMe
                     .anAnswerViewedByUser()
                     .validQuestionOfType(FROM_SAME_PART_AS, reviewPoint)
-                    .answerWithSpelling("metal")
+                    .answerWith(ugly)
                     .inMemoryPlease();
             assertFalse(answerResult.correct);
           }

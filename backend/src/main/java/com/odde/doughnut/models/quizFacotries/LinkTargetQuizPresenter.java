@@ -1,5 +1,6 @@
 package com.odde.doughnut.models.quizFacotries;
 
+import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
@@ -9,8 +10,8 @@ public class LinkTargetQuizPresenter extends QuizQuestionWithOptionsPresenter {
   protected final Note answerNote;
 
   @Override
-  public boolean isAnswerCorrect(String spellingAnswer) {
-    return answerNote.matchAnswer(spellingAnswer);
+  public boolean isAnswerCorrect(Answer answer) {
+    return answerNote.getId().equals(answer.getAnswerNoteId());
   }
 
   public LinkTargetQuizPresenter(QuizQuestionEntity quizQuestion) {

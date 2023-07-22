@@ -1,6 +1,6 @@
 package com.odde.doughnut.entities;
 
-import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.CLOZE_SELECTION;
+import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.SPELLING;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.testability.MakeMe;
@@ -28,7 +28,13 @@ class AnswerViewedByUserTest {
     void setup() {
       User user = makeMe.aUser().please();
       Note top = makeMe.aNote().creatorAndOwner(user).please();
-      note = makeMe.aNote("this / that").description("description").under(top).please();
+      note =
+          makeMe
+              .aNote("this / that")
+              .description("description")
+              .under(top)
+              .rememberSpelling()
+              .please();
       makeMe.aNote().under(top).please();
       reviewPoint = makeMe.aReviewPointFor(note).by(user).please();
       makeMe.refresh(top);
@@ -39,7 +45,7 @@ class AnswerViewedByUserTest {
       AnswerViewedByUser answer =
           makeMe
               .anAnswerViewedByUser()
-              .validQuestionOfType(CLOZE_SELECTION, reviewPoint)
+              .validQuestionOfType(SPELLING, reviewPoint)
               .answerWithSpelling("this")
               .inMemoryPlease();
       assertTrue(answer.correct);
@@ -50,7 +56,7 @@ class AnswerViewedByUserTest {
       AnswerViewedByUser answer =
           makeMe
               .anAnswerViewedByUser()
-              .validQuestionOfType(CLOZE_SELECTION, reviewPoint)
+              .validQuestionOfType(SPELLING, reviewPoint)
               .answerWithSpelling("this ")
               .inMemoryPlease();
       assertTrue(answer.correct);
@@ -61,7 +67,7 @@ class AnswerViewedByUserTest {
       AnswerViewedByUser answerResult =
           makeMe
               .anAnswerViewedByUser()
-              .validQuestionOfType(CLOZE_SELECTION, reviewPoint)
+              .validQuestionOfType(SPELLING, reviewPoint)
               .answerWithSpelling("this / that")
               .inMemoryPlease();
       assertTrue(answerResult.correct);

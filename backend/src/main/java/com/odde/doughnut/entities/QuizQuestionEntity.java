@@ -156,9 +156,4 @@ public class QuizQuestionEntity {
   public QuizQuestionPresenter buildPresenter() {
     return getQuestionType().presenter.apply(this);
   }
-
-  @JsonIgnore
-  public Boolean isAnswerCorrect(String spellingAnswer) {
-    return buildPresenter().isAnswerCorrect(spellingAnswer);
-  }
 }

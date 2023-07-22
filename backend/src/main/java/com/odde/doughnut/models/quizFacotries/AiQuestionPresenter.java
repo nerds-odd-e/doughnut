@@ -2,6 +2,7 @@ package com.odde.doughnut.models.quizFacotries;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.json.AIGeneratedQuestion;
 
@@ -29,7 +30,7 @@ public class AiQuestionPresenter implements QuizQuestionPresenter {
   }
 
   @Override
-  public boolean isAnswerCorrect(String spellingAnswer) {
-    return aiQuestion.correctChoice.equals(spellingAnswer);
+  public boolean isAnswerCorrect(Answer answer) {
+    return aiQuestion.correctChoice.equals(answer.getSpellingAnswer());
   }
 }

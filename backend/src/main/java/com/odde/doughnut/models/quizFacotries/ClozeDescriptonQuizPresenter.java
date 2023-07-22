@@ -1,12 +1,13 @@
 package com.odde.doughnut.models.quizFacotries;
 
+import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.LinksOfANote;
 import com.odde.doughnut.models.NoteViewer;
 
 public abstract class ClozeDescriptonQuizPresenter extends QuizQuestionWithOptionsPresenter {
-  private final ReviewPoint reviewPoint;
+  protected final ReviewPoint reviewPoint;
 
   public ClozeDescriptonQuizPresenter(QuizQuestionEntity quizQuestion) {
     this.reviewPoint = quizQuestion.getReviewPoint();
@@ -29,7 +30,7 @@ public abstract class ClozeDescriptonQuizPresenter extends QuizQuestionWithOptio
   }
 
   @Override
-  public boolean isAnswerCorrect(String spellingAnswer) {
-    return reviewPoint.getNote().matchAnswer(spellingAnswer);
+  public boolean isAnswerCorrect(Answer answer) {
+    return reviewPoint.getNote().getId().equals(answer.getAnswerNoteId());
   }
 }

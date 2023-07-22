@@ -206,7 +206,7 @@ class FromDifferentPartAsQuizFactoryTest {
                 makeMe
                     .anAnswerViewedByUser()
                     .validQuestionOfType(FROM_DIFFERENT_PART_AS, uglySubjectiveRp)
-                    .answerWithSpelling(tall.getTitle())
+                    .answerWith(tall)
                     .inMemoryPlease();
             assertTrue(answerResult.correct);
           }

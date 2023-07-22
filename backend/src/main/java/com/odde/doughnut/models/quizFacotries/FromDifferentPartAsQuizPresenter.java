@@ -1,9 +1,6 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestionEntity;
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,8 +40,8 @@ public class FromDifferentPartAsQuizPresenter extends QuizQuestionWithOptionsPre
   }
 
   @Override
-  public boolean isAnswerCorrect(String spellingAnswer) {
+  public boolean isAnswerCorrect(Answer answer) {
     return knownRightAnswers().stream()
-        .anyMatch(correctAnswerNote -> correctAnswerNote.matchAnswer(spellingAnswer));
+        .anyMatch(correctAnswerNote -> correctAnswerNote.getId().equals(answer.getAnswerNoteId()));
   }
 }

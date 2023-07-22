@@ -105,7 +105,7 @@ class DescriptionLinkTargetQuizFactoryTest {
           makeMe
               .anAnswerViewedByUser()
               .validQuestionOfType(DESCRIPTION_LINK_TARGET, reviewPoint)
-              .answerWithSpelling(target.getTitle())
+              .answerWith(target)
               .inMemoryPlease();
       assertTrue(answerResult.correct);
     }

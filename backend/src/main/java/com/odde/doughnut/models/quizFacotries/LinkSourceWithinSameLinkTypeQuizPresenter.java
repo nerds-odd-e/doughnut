@@ -1,5 +1,6 @@
 package com.odde.doughnut.models.quizFacotries;
 
+import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.Thing;
@@ -38,7 +39,7 @@ public class LinkSourceWithinSameLinkTypeQuizPresenter extends QuizQuestionWithO
   }
 
   @Override
-  public boolean isAnswerCorrect(String spellingAnswer) {
-    return link.getSourceNote().matchAnswer(spellingAnswer);
+  public boolean isAnswerCorrect(Answer answer) {
+    return link.getSourceNote().getId().equals(answer.getAnswerNoteId());
   }
 }

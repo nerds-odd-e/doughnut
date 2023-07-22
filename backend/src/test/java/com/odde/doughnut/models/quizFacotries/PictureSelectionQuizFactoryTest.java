@@ -106,7 +106,7 @@ class PictureSelectionQuizFactoryTest {
               makeMe
                   .anAnswerViewedByUser()
                   .validQuestionOfType(PICTURE_SELECTION, reviewPoint)
-                  .answerWithSpelling(source.getTitle())
+                  .answerWith(source)
                   .inMemoryPlease();
           assertTrue(answerResult.correct);
         }
