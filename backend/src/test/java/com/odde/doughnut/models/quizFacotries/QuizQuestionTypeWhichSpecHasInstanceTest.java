@@ -5,10 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.in;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.odde.doughnut.entities.AnswerViewedByUser;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
@@ -98,31 +95,6 @@ class WhichSpecHasInstanceQuizFactoryTest {
           List<String> strings = toOptionStrings(quizQuestion);
           assertThat("metal", in(strings));
           assertThat(source.getTitle(), in(strings));
-        }
-
-        @Nested
-        class Answer {
-          @Test
-          void correct() {
-            AnswerViewedByUser answerResult =
-                makeMe
-                    .anAnswerViewedByUser()
-                    .validQuestionOfType(WHICH_SPEC_HAS_INSTANCE, reviewPoint)
-                    .answerWith(source)
-                    .inMemoryPlease();
-            assertTrue(answerResult.correct);
-          }
-
-          @Test
-          void wrong() {
-            AnswerViewedByUser answerResult =
-                makeMe
-                    .anAnswerViewedByUser()
-                    .validQuestionOfType(WHICH_SPEC_HAS_INSTANCE, reviewPoint)
-                    .answerWith(metal)
-                    .inMemoryPlease();
-            assertFalse(answerResult.correct);
-          }
         }
 
         @Nested

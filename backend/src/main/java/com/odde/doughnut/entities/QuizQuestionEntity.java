@@ -182,4 +182,9 @@ public class QuizQuestionEntity {
         .map(Integer::parseInt)
         .collect(Collectors.toList());
   }
+
+  @JsonIgnore
+  public Integer getChoiceThingIdAt(Integer choiceIndex) {
+    return getChoiceThingIds().get(choiceIndex);
+  }
 }

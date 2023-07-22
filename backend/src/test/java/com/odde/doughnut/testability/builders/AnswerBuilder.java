@@ -45,4 +45,9 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
     this.entity.setAnswerNoteId(answerNote.getId());
     return this;
   }
+
+  public AnswerBuilder choiceIndex(int index) {
+    this.entity.setChoiceIndex(index);
+    return this;
+  }
 }

@@ -6,9 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.in;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.odde.doughnut.entities.AnswerViewedByUser;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
@@ -76,20 +74,6 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
       assertThat(
           "tomato <mark title='Hidden text that is matching the answer'>[...]</mark>", in(options));
       assertThat(anotherSource.getTitle(), in(options));
-    }
-
-    @Nested
-    class Answer {
-      @Test
-      void correct() {
-        AnswerViewedByUser answerResult =
-            makeMe
-                .anAnswerViewedByUser()
-                .validQuestionOfType(LINK_SOURCE_WITHIN_SAME_LINK_TYPE, reviewPoint)
-                .answerWith(source)
-                .inMemoryPlease();
-        assertTrue(answerResult.correct);
-      }
     }
   }
 

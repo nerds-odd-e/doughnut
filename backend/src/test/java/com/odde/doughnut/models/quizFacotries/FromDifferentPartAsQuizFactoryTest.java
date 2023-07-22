@@ -206,7 +206,7 @@ class FromDifferentPartAsQuizFactoryTest {
                 makeMe
                     .anAnswerViewedByUser()
                     .validQuestionOfType(FROM_DIFFERENT_PART_AS, uglySubjectiveRp)
-                    .answerWith(tall)
+                    .choiceIndex(2)
                     .inMemoryPlease();
             assertTrue(answerResult.correct);
           }
@@ -217,7 +217,7 @@ class FromDifferentPartAsQuizFactoryTest {
                 makeMe
                     .anAnswerViewedByUser()
                     .validQuestionOfType(FROM_DIFFERENT_PART_AS, uglySubjectiveRp)
-                    .answerWithSpelling(pretty.getTitle())
+                    .choiceIndex(1)
                     .inMemoryPlease();
             assertFalse(answerResult.correct);
           }

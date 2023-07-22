@@ -7,10 +7,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.in;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.odde.doughnut.entities.AnswerViewedByUser;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
@@ -134,31 +131,6 @@ class FromSamePartAsQuizFactoryTest {
             List<Integer> viceReviewPointIds = quizQuestion.getViceReviewPointIdList();
             assertThat(viceReviewPointIds, hasSize(2));
             assertThat(additionalReviewPoint.getId(), in(viceReviewPointIds));
-          }
-        }
-
-        @Nested
-        class Answer {
-          @Test
-          void correct() {
-            AnswerViewedByUser answerResult =
-                makeMe
-                    .anAnswerViewedByUser()
-                    .validQuestionOfType(FROM_SAME_PART_AS, reviewPoint)
-                    .answerWith(pretty)
-                    .inMemoryPlease();
-            assertTrue(answerResult.correct);
-          }
-
-          @Test
-          void wrong() {
-            AnswerViewedByUser answerResult =
-                makeMe
-                    .anAnswerViewedByUser()
-                    .validQuestionOfType(FROM_SAME_PART_AS, reviewPoint)
-                    .answerWith(ugly)
-                    .inMemoryPlease();
-            assertFalse(answerResult.correct);
           }
         }
       }

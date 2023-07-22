@@ -44,4 +44,9 @@ public class AnswerViewedByUserBuilder extends EntityBuilder<AnswerViewedByUser>
     answerBuilder.forQuestion(quizQuestion);
     return this;
   }
+
+  public AnswerViewedByUserBuilder choiceIndex(int index) {
+    this.answerBuilder.choiceIndex(index);
+    return this;
+  }
 }

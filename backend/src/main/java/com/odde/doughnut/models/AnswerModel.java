@@ -3,6 +3,7 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -67,20 +68,7 @@ public class AnswerModel {
     if (cachedResult != null) return cachedResult;
     QuizQuestionEntity question = answer.getQuestion();
     if (question.getCorrectAnswerIndex() != null) {
-      if (answer.getChoiceIndex() != null) {
-        cachedResult = answer.getChoiceIndex().equals(question.getCorrectAnswerIndex());
-      } else {
-        getChoiceThingAt(question, question.getCorrectAnswerIndex())
-            .ifPresent(
-                thing -> {
-                  if (thing.getLink() != null) {
-                    cachedResult =
-                        thing.getLink().getSourceNote().getId().equals(answer.getAnswerNoteId());
-                  } else {
-                    cachedResult = thing.getNote().getId().equals(answer.getAnswerNoteId());
-                  }
-                });
-      }
+      cachedResult = Objects.equals(answer.getChoiceIndex(), question.getCorrectAnswerIndex());
     } else {
       cachedResult = question.buildPresenter().isAnswerCorrect(answer);
     }
@@ -103,7 +91,7 @@ public class AnswerModel {
   }
 
   private Optional<Thing> getChoiceThingAt(QuizQuestionEntity question, Integer choiceIndex) {
-    Integer thingId = question.getChoiceThingIds().get(choiceIndex);
+    Integer thingId = question.getChoiceThingIdAt(choiceIndex);
 
     return modelFactoryService.thingRepository.findById(thingId);
   }

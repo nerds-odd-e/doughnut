@@ -6,9 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.in;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.odde.doughnut.entities.AnswerViewedByUser;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.QuizQuestion;
@@ -71,20 +69,6 @@ class LinkSourceQuizFactoryTest {
       List<String> options = toOptionStrings(quizQuestion);
       assertThat(anotherSource.getTitle(), in(options));
       assertThat("tomato sauce", in(options));
-    }
-
-    @Nested
-    class Answer {
-      @Test
-      void correct() {
-        AnswerViewedByUser answerResult =
-            makeMe
-                .anAnswerViewedByUser()
-                .validQuestionOfType(LINK_SOURCE, reviewPoint)
-                .answerWith(source)
-                .inMemoryPlease();
-        assertTrue(answerResult.correct);
-      }
     }
   }
 
