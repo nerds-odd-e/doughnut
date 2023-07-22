@@ -9,12 +9,16 @@ import java.util.stream.Stream;
 
 public abstract class QuizQuestionWithOptionsPresenter implements QuizQuestionPresenter {
 
+  protected final QuizQuestionEntity quizQuestion;
+
+  public QuizQuestionWithOptionsPresenter(QuizQuestionEntity quizQuestion) {
+    this.quizQuestion = quizQuestion;
+  }
+
   @Override
-  public List<QuizQuestion.Option> getOptions(
-      QuizQuestionEntity quizQuestionEntity, ModelFactoryService modelFactoryService) {
+  public List<QuizQuestion.Option> getOptions(ModelFactoryService modelFactoryService) {
     Stream<Thing> thingStream =
-        modelFactoryService.getThingStreamAndKeepOriginalOrder(
-            quizQuestionEntity.getChoiceThingIds());
+        modelFactoryService.getThingStreamAndKeepOriginalOrder(quizQuestion.getChoiceThingIds());
     return getOptionsFromThings(thingStream);
   }
 

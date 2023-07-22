@@ -9,6 +9,7 @@ public class LinkTargetQuizPresenter extends QuizQuestionWithOptionsPresenter {
   protected final Note answerNote;
 
   public LinkTargetQuizPresenter(QuizQuestionEntity quizQuestion) {
+    super(quizQuestion);
     this.link = quizQuestion.getReviewPoint().getLink();
     this.answerNote = link.getTargetNote();
   }

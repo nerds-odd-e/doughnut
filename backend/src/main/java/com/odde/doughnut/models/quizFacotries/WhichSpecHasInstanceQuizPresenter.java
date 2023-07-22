@@ -8,6 +8,7 @@ public class WhichSpecHasInstanceQuizPresenter extends QuizQuestionWithOptionsPr
   private final Link link;
 
   public WhichSpecHasInstanceQuizPresenter(QuizQuestionEntity quizQuestion) {
+    super(quizQuestion);
     this.link = quizQuestion.getReviewPoint().getLink();
     this.instanceLink = quizQuestion.getCategoryLink();
   }

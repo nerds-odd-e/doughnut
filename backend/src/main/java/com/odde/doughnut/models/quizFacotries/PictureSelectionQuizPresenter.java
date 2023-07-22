@@ -12,6 +12,7 @@ public class PictureSelectionQuizPresenter extends QuizQuestionWithOptionsPresen
   private ReviewPoint reviewPoint;
 
   public PictureSelectionQuizPresenter(QuizQuestionEntity quizQuestion) {
+    super(quizQuestion);
     this.reviewPoint = quizQuestion.getReviewPoint();
   }
 

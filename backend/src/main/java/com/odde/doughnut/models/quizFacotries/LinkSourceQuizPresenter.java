@@ -7,6 +7,7 @@ public class LinkSourceQuizPresenter extends QuizQuestionWithOptionsPresenter {
   protected final Link link;
 
   public LinkSourceQuizPresenter(QuizQuestionEntity quizQuestion) {
+    super(quizQuestion);
     this.link = quizQuestion.getReviewPoint().getLink();
   }
 

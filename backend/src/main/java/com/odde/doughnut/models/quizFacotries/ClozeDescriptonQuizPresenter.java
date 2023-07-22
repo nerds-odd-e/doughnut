@@ -9,6 +9,7 @@ public abstract class ClozeDescriptonQuizPresenter extends QuizQuestionWithOptio
   protected final ReviewPoint reviewPoint;
 
   public ClozeDescriptonQuizPresenter(QuizQuestionEntity quizQuestion) {
+    super(quizQuestion);
     this.reviewPoint = quizQuestion.getReviewPoint();
   }
 

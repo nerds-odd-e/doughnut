@@ -2,7 +2,6 @@ package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.PictureWithMask;
-import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.json.LinksOfANote;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -26,8 +25,7 @@ public interface QuizQuestionPresenter {
     return Optional.empty();
   }
 
-  default List<QuizQuestion.Option> getOptions(
-      QuizQuestionEntity quizQuestionEntity, ModelFactoryService modelFactoryService) {
+  default List<QuizQuestion.Option> getOptions(ModelFactoryService modelFactoryService) {
     return List.of();
   }
 }

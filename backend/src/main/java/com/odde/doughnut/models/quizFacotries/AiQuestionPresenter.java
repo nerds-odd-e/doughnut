@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.json.AIGeneratedQuestion;
+import com.odde.doughnut.entities.json.QuizQuestion;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
+import java.util.List;
 
 public class AiQuestionPresenter implements QuizQuestionPresenter {
   private final AIGeneratedQuestion aiQuestion;
@@ -27,6 +30,12 @@ public class AiQuestionPresenter implements QuizQuestionPresenter {
   @Override
   public String mainTopic() {
     return null;
+  }
+
+  @Override
+  public List<QuizQuestion.Option> getOptions(ModelFactoryService modelFactoryService) {
+
+    return List.of();
   }
 
   @Override

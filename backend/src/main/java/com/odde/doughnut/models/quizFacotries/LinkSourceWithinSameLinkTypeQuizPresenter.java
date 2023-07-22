@@ -11,6 +11,7 @@ public class LinkSourceWithinSameLinkTypeQuizPresenter extends QuizQuestionWithO
   protected final Link link;
 
   public LinkSourceWithinSameLinkTypeQuizPresenter(QuizQuestionEntity quizQuestion) {
+    super(quizQuestion);
     this.link = quizQuestion.getReviewPoint().getLink();
   }
 
