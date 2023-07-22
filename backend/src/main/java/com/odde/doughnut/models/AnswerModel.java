@@ -70,7 +70,7 @@ public class AnswerModel {
       if (answer.getChoiceIndex() != null) {
         cachedResult = answer.getChoiceIndex().equals(question.getCorrectAnswerIndex());
       } else {
-        getRightAnswerThing(question, question.getCorrectAnswerIndex())
+        getChoiceThingAt(question, question.getCorrectAnswerIndex())
             .ifPresent(
                 thing -> {
                   if (thing.getLink() != null) {
@@ -95,18 +95,16 @@ public class AnswerModel {
           .orElse(null);
     }
     if (answer.getChoiceIndex() != null) {
-      return getRightAnswerThing(answer.getQuestion(), answer.getChoiceIndex())
+      return getChoiceThingAt(answer.getQuestion(), answer.getChoiceIndex())
           .map(thing -> thing.getLink() != null ? thing.getLink().getSourceNote() : thing.getNote())
           .orElse(null);
     }
     return null;
   }
 
-  private Optional<Thing> getRightAnswerThing(
-      QuizQuestionEntity question, Integer correctAnswerIndex) {
-    return modelFactoryService
-        .getThingStreamAndKeepOriginalOrder(question.getOptionThingIds())
-        .skip(correctAnswerIndex)
-        .findFirst();
+  private Optional<Thing> getChoiceThingAt(QuizQuestionEntity question, Integer choiceIndex) {
+    Integer thingId = question.getChoiceThingIds().get(choiceIndex);
+
+    return modelFactoryService.thingRepository.findById(thingId);
   }
 }

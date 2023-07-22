@@ -14,7 +14,7 @@ public abstract class QuizQuestionWithOptionsPresenter implements QuizQuestionPr
       QuizQuestionEntity quizQuestionEntity, ModelFactoryService modelFactoryService) {
     Stream<Thing> thingStream =
         modelFactoryService.getThingStreamAndKeepOriginalOrder(
-            quizQuestionEntity.getOptionThingIds());
+            quizQuestionEntity.getChoiceThingIds());
     return getOptionsFromThings(thingStream);
   }
 

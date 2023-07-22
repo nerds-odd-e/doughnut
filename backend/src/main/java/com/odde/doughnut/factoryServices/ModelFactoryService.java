@@ -6,15 +6,12 @@ import com.odde.doughnut.entities.json.SearchTerm;
 import com.odde.doughnut.entities.repositories.*;
 import com.odde.doughnut.models.*;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionPresenter;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.persistence.EntityManager;
 import javax.validation.Valid;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -118,12 +115,7 @@ public class ModelFactoryService {
         presenter.pictureWithMask());
   }
 
-  public Stream<Thing> getThingStreamAndKeepOriginalOrder(String optionThingIds) {
-    if (Strings.isBlank(optionThingIds)) return Stream.empty();
-    List<Integer> idList =
-        Arrays.stream(optionThingIds.split(","))
-            .map(Integer::parseInt)
-            .collect(Collectors.toList());
+  public Stream<Thing> getThingStreamAndKeepOriginalOrder(List<Integer> idList) {
     return thingRepository
         .findAllByIds(idList)
         .sorted(Comparator.comparing(v -> idList.indexOf(v.getId())));

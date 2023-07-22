@@ -173,4 +173,13 @@ public class QuizQuestionEntity {
             .map(Object::toString)
             .collect(Collectors.joining(",")));
   }
+
+  @JsonIgnore
+  public List<Integer> getChoiceThingIds() {
+    String optionThingIds = getOptionThingIds();
+    if (Strings.isBlank(optionThingIds)) return List.of();
+    return Arrays.stream(optionThingIds.split(","))
+        .map(Integer::parseInt)
+        .collect(Collectors.toList());
+  }
 }
