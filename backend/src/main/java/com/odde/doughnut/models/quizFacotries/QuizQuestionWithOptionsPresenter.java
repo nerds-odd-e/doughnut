@@ -8,17 +8,25 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public abstract class QuizQuestionWithOptionsPresenter implements QuizQuestionPresenter {
-  public QuizQuestion.OptionCreator optionCreator() {
-    return new QuizQuestion.TitleOptionCreator();
-  }
 
   @Override
   public List<QuizQuestion.Option> getOptions(
       QuizQuestionEntity quizQuestionEntity, ModelFactoryService modelFactoryService) {
-    QuizQuestion.OptionCreator optionCreator = optionCreator();
-    Stream<Thing> noteStream =
+    Stream<Thing> thingStream =
         modelFactoryService.getThingStreamAndKeepOriginalOrder(
             quizQuestionEntity.getOptionThingIds());
-    return noteStream.map(optionCreator::optionFromThing).toList();
+    return getOptionsFromThings(thingStream);
+  }
+
+  protected List<QuizQuestion.Option> getOptionsFromThings(Stream<Thing> noteStream) {
+    return noteStream
+        .map(
+            thing -> {
+              QuizQuestion.Option option = new QuizQuestion.Option();
+              option.setNoteId(thing.getNote().getId());
+              option.setDisplay(thing.getNote().getTitle());
+              return option;
+            })
+        .toList();
   }
 }
