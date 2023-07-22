@@ -2,12 +2,10 @@ package com.odde.doughnut.models.quizFacotries;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.json.AIGeneratedQuestion;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import java.util.ArrayList;
 import java.util.List;
 
 public class AiQuestionPresenter implements QuizQuestionPresenter {
@@ -35,9 +33,7 @@ public class AiQuestionPresenter implements QuizQuestionPresenter {
 
   @Override
   public List<QuizQuestion.Option> getOptions(ModelFactoryService modelFactoryService) {
-    List<String> choices = new ArrayList<>(aiQuestion.incorrectChoices);
-    choices.add(aiQuestion.correctChoice);
-    return choices.stream()
+    return aiQuestion.choices.stream()
         .map(
             choice -> {
               QuizQuestion.Option option = new QuizQuestion.Option();
@@ -45,10 +41,5 @@ public class AiQuestionPresenter implements QuizQuestionPresenter {
               return option;
             })
         .toList();
-  }
-
-  @Override
-  public boolean isAnswerCorrect(Answer answer) {
-    return aiQuestion.correctChoice.equals(answer.getSpellingAnswer());
   }
 }

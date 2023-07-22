@@ -46,8 +46,8 @@ class AIGeneratedQuizFactoryTest {
             .please();
     reviewPoint = makeMe.aReviewPointFor(note).by(userModel).inMemoryPlease();
     aiGeneratedQuestion.stem = "How long did it take to build Rome?";
-    aiGeneratedQuestion.correctChoice = "more than 1 day";
-    aiGeneratedQuestion.incorrectChoices = List.of("1 day", "1/2 day");
+    aiGeneratedQuestion.choices = List.of("1 day", "1/2 day", "more than 1 day");
+    aiGeneratedQuestion.correctChoiceIndex = 2;
   }
 
   @Test
@@ -65,7 +65,7 @@ class AIGeneratedQuizFactoryTest {
           makeMe
               .anAnswerViewedByUser()
               .forQuestion(questionBuilder().inMemoryPlease())
-              .answerWithSpelling("yes")
+              .choiceIndex(0)
               .inMemoryPlease();
       assertFalse(answerResult.correct);
     }
@@ -76,7 +76,7 @@ class AIGeneratedQuizFactoryTest {
           makeMe
               .anAnswerViewedByUser()
               .forQuestion(questionBuilder().inMemoryPlease())
-              .answerWithSpelling("more than 1 day")
+              .choiceIndex(2)
               .inMemoryPlease();
       assertTrue(answerResult.correct);
     }

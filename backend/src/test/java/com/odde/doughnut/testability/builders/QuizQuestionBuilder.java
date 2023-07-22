@@ -41,6 +41,7 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
 
   public QuizQuestionBuilder aiQuestion(AIGeneratedQuestion aiGeneratedQuestion) {
     entity.setRawJsonQuestion(aiGeneratedQuestion.toJsonString());
+    entity.setCorrectAnswerIndex(aiGeneratedQuestion.correctChoiceIndex);
     return this;
   }
 

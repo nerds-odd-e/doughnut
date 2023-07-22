@@ -9,13 +9,13 @@ declare namespace Generated {
          */
         stem: string;
         /**
-         * The only correct choice
+         * All choices. Only one should be correct.
          */
-        correctChoice: string;
+        choices: string[];
         /**
-         * The incorrect choices.
+         * Index of the correct choice. 0-based.
          */
-        incorrectChoices: string[];
+        correctChoiceIndex: number;
         /**
          * Background information or disclosure necessary to clarify the question. Use only if the stem would be unclear or ambiguous without this information. Will be put before stem.
          */

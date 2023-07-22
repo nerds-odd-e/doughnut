@@ -154,7 +154,7 @@ class RestAiControllerTest {
   class GenerateQuestion {
     String jsonQuestion =
         """
-        {"stem": "What is the first color in the rainbow?", "correctChoice": "white", "incorrectChoices": ["black", "green"]}
+        {"stem": "What is the first color in the rainbow?", "correctChoiceIndex": 0, "choices": ["red", "black", "green"]}
         """;
 
     @Test

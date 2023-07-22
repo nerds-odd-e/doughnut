@@ -54,22 +54,16 @@ export default defineComponent({
       return this.quizQuestion.description;
     },
     correctOption() {
-      return this.aiQuestion.correctChoice;
+      return this.aiQuestion.choices[this.aiQuestion.correctChoiceIndex];
     },
     options() {
-      return _.shuffle([
-        ...this.aiQuestion.incorrectChoices,
-        this.aiQuestion.correctChoice,
-      ]);
+      return this.aiQuestion.choices;
     },
   },
   methods: {
     selectOption(optionIndex: number) {
       this.selectedOptionIndex = optionIndex;
-      this.$emit(
-        "answer-to-ai-question",
-        this.options[optionIndex] === this.correctOption ? 0 : 1,
-      );
+      this.$emit("answer-to-ai-question", optionIndex);
     },
     isSelectedOption(optionIndex: number) {
       return this.selectedOptionIndex === optionIndex;

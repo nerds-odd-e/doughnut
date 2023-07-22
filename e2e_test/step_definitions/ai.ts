@@ -58,8 +58,8 @@ Given("OpenAI by default returns this question from now:", (questionTable: DataT
   const record = questionTable.hashes()[0]
   const reply = JSON.stringify({
     stem: record.question,
-    correctChoice: record.correct_choice,
-    incorrectChoices: [record.incorrect_choice_1, record.incorrect_choice_2],
+    correctChoiceIndex: 0,
+    choices: [record.correct_choice, record.incorrect_choice_1, record.incorrect_choice_2],
   })
   cy.openAiService().restartImposter()
   cy.openAiService().stubAnyChatCompletionFunctionCall(

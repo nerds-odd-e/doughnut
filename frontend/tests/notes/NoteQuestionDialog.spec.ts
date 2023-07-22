@@ -8,14 +8,14 @@ helper.resetWithApiMock(beforeEach, afterEach);
 
 const goodQuestion: Generated.AIGeneratedQuestion = {
   stem: "any question?",
-  correctChoice: "option A",
-  incorrectChoices: ["option B", "option C"],
+  correctChoiceIndex: 0,
+  choices: ["option A", "option B", "option C"],
 };
 
 const betterQuestion: Generated.AIGeneratedQuestion = {
   stem: "is it raining?",
-  correctChoice: "No",
-  incorrectChoices: ["yes"],
+  correctChoiceIndex: 1,
+  choices: ["yes", "No"],
 };
 
 const note = makeMe.aNoteRealm.please();

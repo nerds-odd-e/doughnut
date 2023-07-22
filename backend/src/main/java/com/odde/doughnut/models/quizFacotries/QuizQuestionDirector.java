@@ -33,8 +33,7 @@ public record QuizQuestionDirector(
     QuizQuestionEntity quizQuestion = reviewPoint.createAQuizQuestionOfType(questionType);
 
     if (quizQuestionFactory instanceof QuestionRawJsonFactory rawJsonFactory) {
-      quizQuestion.setRawJsonQuestion(rawJsonFactory.generateRawJsonQuestion());
-      quizQuestion.setCorrectAnswerIndex(0);
+      rawJsonFactory.generateRawJsonQuestion(quizQuestion);
     }
 
     if (quizQuestionFactory instanceof QuestionOptionsFactory optionsFactory) {
