@@ -32,12 +32,6 @@ public class Answer {
 
   @Getter
   @Setter
-  @Column(name = "answer_note_id")
-  @Nullable
-  Integer answerNoteId;
-
-  @Getter
-  @Setter
   @Column(name = "choice_index")
   @Nullable
   Integer choiceIndex;
