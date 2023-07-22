@@ -63,8 +63,24 @@ public class AnswerModel {
 
   private boolean isCorrect() {
     if (cachedResult != null) return cachedResult;
-    String spellingAnswer = getAnswerDisplay();
-    cachedResult = answer.getQuestion().buildPresenter().isAnswerCorrect(answer);
+    QuizQuestionEntity question = answer.getQuestion();
+    if (question.getCorrectAnswerIndex() != null) {
+      modelFactoryService
+          .getThingStreamAndKeepOriginalOrder(question.getOptionThingIds())
+          .skip(question.getCorrectAnswerIndex())
+          .findFirst()
+          .ifPresent(
+              thing -> {
+                if (thing.getLink() != null) {
+                  cachedResult =
+                      thing.getLink().getSourceNote().getId().equals(answer.getAnswerNoteId());
+                } else {
+                  cachedResult = thing.getNote().getId().equals(answer.getAnswerNoteId());
+                }
+              });
+    } else {
+      cachedResult = question.buildPresenter().isAnswerCorrect(answer);
+    }
     return cachedResult;
   }
 

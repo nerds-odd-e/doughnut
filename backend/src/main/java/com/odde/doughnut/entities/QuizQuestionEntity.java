@@ -161,15 +161,16 @@ public class QuizQuestionEntity {
   }
 
   public void setChoicesAndRightAnswer(
-    Thingy answerNote, List<? extends Thingy> options, Randomizer randomizer1) {
+      Thingy answerNote, List<? extends Thingy> options, Randomizer randomizer) {
     List<Thingy> optionsEntities = new ArrayList<>(options);
     optionsEntities.add(answerNote);
+    List<Thingy> shuffled = randomizer.shuffle(optionsEntities);
+    setCorrectAnswerIndex(shuffled.indexOf(answerNote));
     setOptionThingIds(
-      randomizer1.shuffle(optionsEntities).stream()
-        .map(Thingy::getThing)
-        .map(Thing::getId)
-        .map(Object::toString)
-        .collect(Collectors.joining(",")));
+        shuffled.stream()
+            .map(Thingy::getThing)
+            .map(Thing::getId)
+            .map(Object::toString)
+            .collect(Collectors.joining(",")));
   }
-
 }
