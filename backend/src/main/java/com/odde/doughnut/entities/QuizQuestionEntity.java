@@ -5,12 +5,10 @@ import com.odde.doughnut.entities.annotations.JsonUseIdInsteadOfLink;
 import com.odde.doughnut.entities.annotations.JsonUseIdInsteadOfReviewPoint;
 import com.odde.doughnut.entities.json.NotePositionViewedByUser;
 import com.odde.doughnut.models.NoteViewer;
+import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.quizFacotries.*;
 import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -32,6 +30,18 @@ public class QuizQuestionEntity {
       return null;
     }
     return new NoteViewer(user, getReviewPoint().getHeadNote()).jsonNotePosition(true);
+  }
+
+  public void setChoicesAndRightAnswer(
+      Thingy answerNote, List<? extends Thingy> options, Randomizer randomizer1) {
+    List<Thingy> optionsEntities = new ArrayList<>(options);
+    optionsEntities.add(answerNote);
+    setOptionThingIds(
+        randomizer1.shuffle(optionsEntities).stream()
+            .map(Thingy::getThing)
+            .map(Thing::getId)
+            .map(Object::toString)
+            .collect(Collectors.joining(",")));
   }
 
   public enum QuestionType {

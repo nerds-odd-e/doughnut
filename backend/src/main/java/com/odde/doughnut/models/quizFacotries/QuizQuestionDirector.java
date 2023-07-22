@@ -3,14 +3,12 @@ package com.odde.doughnut.models.quizFacotries;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.QuizQuestionEntity.QuestionType;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.entities.Thingy;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.services.AiAdvisorService;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public record QuizQuestionDirector(
     ReviewPoint reviewPoint,
@@ -39,11 +37,15 @@ public record QuizQuestionDirector(
     }
 
     if (quizQuestionFactory instanceof QuestionOptionsFactory optionsFactory) {
-      List<Thingy> optionsEntities = optionsFactory.getOptionEntities();
-      if (optionsEntities.size() < optionsFactory.minimumOptionCount()) {
+      Thingy answerNote = optionsFactory.generateAnswer();
+      if (answerNote == null) {
         throw new QuizQuestionNotPossibleException();
       }
-      quizQuestion.setOptionThingIds(toShuffledThingIdListString(optionsEntities));
+      List<? extends Thingy> options = optionsFactory.generateFillingOptions();
+      if (options.size() < optionsFactory.minimumOptionCount() - 1) {
+        throw new QuizQuestionNotPossibleException();
+      }
+      quizQuestion.setChoicesAndRightAnswer(answerNote, options, randomizer);
     }
 
     if (quizQuestionFactory instanceof SecondaryReviewPointsFactory secondaryReviewPointsFactory) {
@@ -57,14 +59,6 @@ public record QuizQuestionDirector(
     QuizQuestionServant servant =
         new QuizQuestionServant(randomizer, modelFactoryService, aiAdvisorService);
     return questionType.factory.apply(reviewPoint, servant);
-  }
-
-  private String toShuffledThingIdListString(List<Thingy> options) {
-    return randomizer.shuffle(options).stream()
-        .map(Thingy::getThing)
-        .map(Thing::getId)
-        .map(Object::toString)
-        .collect(Collectors.joining(","));
   }
 
   public QuizQuestionEntity buildRandomQuestion(Boolean aiQuestionTypeOnlyForReview) {
