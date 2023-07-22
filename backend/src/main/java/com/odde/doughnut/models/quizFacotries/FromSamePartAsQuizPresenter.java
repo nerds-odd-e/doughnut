@@ -6,10 +6,8 @@ import java.util.List;
 public class FromSamePartAsQuizPresenter extends QuizQuestionWithOptionsPresenter {
   protected final Link link;
   private final Link categoryLink;
-  private final User user;
 
   public FromSamePartAsQuizPresenter(QuizQuestionEntity quizQuestion) {
-    this.user = quizQuestion.getReviewPoint().getUser();
     this.link = quizQuestion.getReviewPoint().getLink();
     this.categoryLink = quizQuestion.getCategoryLink();
   }

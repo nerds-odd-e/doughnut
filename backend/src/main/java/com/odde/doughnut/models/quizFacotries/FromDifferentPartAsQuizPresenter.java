@@ -6,11 +6,9 @@ import java.util.stream.Collectors;
 
 public class FromDifferentPartAsQuizPresenter extends QuizQuestionWithOptionsPresenter {
   protected final Link link;
-  private final User user;
   private Link categoryLink;
 
   public FromDifferentPartAsQuizPresenter(QuizQuestionEntity quizQuestion) {
-    this.user = quizQuestion.getReviewPoint().getUser();
     this.link = quizQuestion.getReviewPoint().getLink();
     this.categoryLink = quizQuestion.getCategoryLink();
   }

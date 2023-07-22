@@ -9,10 +9,6 @@ public class LinkTargetQuizPresenter extends QuizQuestionWithOptionsPresenter {
   protected final Link link;
   protected final Note answerNote;
 
-  @Override
-  public boolean isAnswerCorrect(Answer answer) {
-    return answerNote.getId().equals(answer.getAnswerNoteId());
-  }
 
   public LinkTargetQuizPresenter(QuizQuestionEntity quizQuestion) {
     this.link = quizQuestion.getReviewPoint().getLink();

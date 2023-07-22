@@ -20,9 +20,4 @@ public class LinkSourceQuizPresenter extends QuizQuestionWithOptionsPresenter {
   public String instruction() {
     return "Which one <em>is immediately " + link.getLinkTypeLabel() + "</em>:";
   }
-
-  @Override
-  public boolean isAnswerCorrect(Answer answer) {
-    return link.getSourceNote().getId().equals(answer.getAnswerNoteId());
-  }
 }

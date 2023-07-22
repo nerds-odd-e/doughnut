@@ -12,11 +12,6 @@ public class PictureSelectionQuizPresenter extends QuizQuestionWithOptionsPresen
 
   private ReviewPoint reviewPoint;
 
-  @Override
-  public boolean isAnswerCorrect(Answer answer) {
-    return reviewPoint.getNote().getId().equals(answer.getAnswerNoteId());
-  }
-
   public PictureSelectionQuizPresenter(QuizQuestionEntity quizQuestion) {
     this.reviewPoint = quizQuestion.getReviewPoint();
   }

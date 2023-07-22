@@ -37,9 +37,4 @@ public class LinkSourceWithinSameLinkTypeQuizPresenter extends QuizQuestionWithO
             })
         .toList();
   }
-
-  @Override
-  public boolean isAnswerCorrect(Answer answer) {
-    return link.getSourceNote().getId().equals(answer.getAnswerNoteId());
-  }
 }
