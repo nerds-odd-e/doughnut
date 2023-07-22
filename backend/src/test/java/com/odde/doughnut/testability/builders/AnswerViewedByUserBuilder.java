@@ -1,7 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.AnswerViewedByUser;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.testability.EntityBuilder;
@@ -32,11 +31,6 @@ public class AnswerViewedByUserBuilder extends EntityBuilder<AnswerViewedByUser>
 
   public AnswerViewedByUserBuilder answerWithSpelling(String answer) {
     this.answerBuilder.answerWithSpelling(answer);
-    return this;
-  }
-
-  public AnswerViewedByUserBuilder answerWith(Note answerNote) {
-    this.answerBuilder.answerWithId(answerNote);
     return this;
   }
 

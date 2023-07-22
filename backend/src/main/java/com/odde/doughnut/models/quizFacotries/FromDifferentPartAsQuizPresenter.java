@@ -1,8 +1,6 @@
 package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.*;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class FromDifferentPartAsQuizPresenter extends QuizQuestionWithOptionsPresenter {
   protected final Link link;
@@ -28,5 +26,4 @@ public class FromDifferentPartAsQuizPresenter extends QuizQuestionWithOptionsPre
   public String mainTopic() {
     return link.getSourceNote().getTitle();
   }
-
 }

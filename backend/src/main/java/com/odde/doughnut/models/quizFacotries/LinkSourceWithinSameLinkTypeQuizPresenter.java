@@ -1,6 +1,5 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.Thing;

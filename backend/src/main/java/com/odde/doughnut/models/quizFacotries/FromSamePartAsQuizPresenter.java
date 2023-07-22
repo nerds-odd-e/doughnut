@@ -1,7 +1,6 @@
 package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.*;
-import java.util.List;
 
 public class FromSamePartAsQuizPresenter extends QuizQuestionWithOptionsPresenter {
   protected final Link link;

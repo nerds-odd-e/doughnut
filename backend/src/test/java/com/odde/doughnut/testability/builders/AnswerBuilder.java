@@ -35,18 +35,13 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
   }
 
   public AnswerBuilder answerWithSpelling(String answer) {
-    this.entity.setAnswerNoteId(null);
+    this.entity.setChoiceIndex(null);
     this.entity.setSpellingAnswer(answer);
     return this;
   }
 
-  public AnswerBuilder answerWithId(Note answerNote) {
-    this.entity.setSpellingAnswer(null);
-    this.entity.setAnswerNoteId(answerNote.getId());
-    return this;
-  }
-
   public AnswerBuilder choiceIndex(int index) {
+    this.entity.setSpellingAnswer(null);
     this.entity.setChoiceIndex(index);
     return this;
   }
