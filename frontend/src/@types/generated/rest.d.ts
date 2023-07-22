@@ -220,7 +220,6 @@ declare namespace Generated {
 
     interface Answer {
         spellingAnswer?: string;
-        answerNoteId?: number;
         choiceIndex?: number;
     }
 
