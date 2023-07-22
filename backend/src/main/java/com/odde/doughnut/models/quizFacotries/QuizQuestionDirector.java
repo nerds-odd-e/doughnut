@@ -34,6 +34,7 @@ public record QuizQuestionDirector(
 
     if (quizQuestionFactory instanceof QuestionRawJsonFactory rawJsonFactory) {
       quizQuestion.setRawJsonQuestion(rawJsonFactory.generateRawJsonQuestion());
+      quizQuestion.setCorrectAnswerIndex(0);
     }
 
     if (quizQuestionFactory instanceof QuestionOptionsFactory optionsFactory) {

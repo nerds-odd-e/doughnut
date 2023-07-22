@@ -2,7 +2,7 @@
   <AIQuestion
     v-if="quizQuestion.questionType === 'AI_QUESTION'"
     :quiz-question="quizQuestion"
-    @answer-to-ai-question="submitAnswer({ spellingAnswer: $event })"
+    @answer-to-ai-question="submitAnswer({ choiceIndex: $event })"
   />
   <template v-else>
     <div class="quiz-instruction inner-box">

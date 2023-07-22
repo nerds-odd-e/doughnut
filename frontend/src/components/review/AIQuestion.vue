@@ -66,7 +66,10 @@ export default defineComponent({
   methods: {
     selectOption(optionIndex: number) {
       this.selectedOptionIndex = optionIndex;
-      this.$emit("answer-to-ai-question", this.options[optionIndex]);
+      this.$emit(
+        "answer-to-ai-question",
+        this.options[optionIndex] === this.correctOption ? 0 : 1,
+      );
     },
     isSelectedOption(optionIndex: number) {
       return this.selectedOptionIndex === optionIndex;

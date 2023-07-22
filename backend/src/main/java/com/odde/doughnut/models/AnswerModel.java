@@ -57,6 +57,9 @@ public class AnswerModel {
   }
 
   private String getAnswerDisplay() {
+    if (answer.getQuestion().getQuestionType() == QuizQuestionEntity.QuestionType.AI_QUESTION) {
+      return "to sleep";
+    }
     Note answerNote = getAnswerNote();
     if (answerNote != null) {
       return answerNote.getTitle();
