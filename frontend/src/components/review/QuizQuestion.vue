@@ -64,12 +64,12 @@
       >
         <div
           class="option"
-          v-for="option in quizQuestion.options"
+          v-for="(option, index) in quizQuestion.options"
           :key="option.noteId"
         >
           <button
             class="btn btn-secondary btn-lg"
-            @click.once="submitAnswer({ answerNoteId: option.noteId })"
+            @click.once="submitAnswer({ choiceIndex: index })"
           >
             <div v-if="!option.picture" v-html="option.display" />
             <div v-else>

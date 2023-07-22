@@ -3,6 +3,7 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class AnswerModel {
@@ -55,8 +56,9 @@ public class AnswerModel {
   }
 
   private String getAnswerDisplay() {
-    if (getAnswerNote() != null) {
-      return getAnswerNote().getTitle();
+    Note answerNote = getAnswerNote();
+    if (answerNote != null) {
+      return answerNote.getTitle();
     }
     return answer.getSpellingAnswer();
   }
@@ -65,19 +67,20 @@ public class AnswerModel {
     if (cachedResult != null) return cachedResult;
     QuizQuestionEntity question = answer.getQuestion();
     if (question.getCorrectAnswerIndex() != null) {
-      modelFactoryService
-          .getThingStreamAndKeepOriginalOrder(question.getOptionThingIds())
-          .skip(question.getCorrectAnswerIndex())
-          .findFirst()
-          .ifPresent(
-              thing -> {
-                if (thing.getLink() != null) {
-                  cachedResult =
-                      thing.getLink().getSourceNote().getId().equals(answer.getAnswerNoteId());
-                } else {
-                  cachedResult = thing.getNote().getId().equals(answer.getAnswerNoteId());
-                }
-              });
+      if (answer.getChoiceIndex() != null) {
+        cachedResult = answer.getChoiceIndex().equals(question.getCorrectAnswerIndex());
+      } else {
+        getRightAnswerThing(question, question.getCorrectAnswerIndex())
+            .ifPresent(
+                thing -> {
+                  if (thing.getLink() != null) {
+                    cachedResult =
+                        thing.getLink().getSourceNote().getId().equals(answer.getAnswerNoteId());
+                  } else {
+                    cachedResult = thing.getNote().getId().equals(answer.getAnswerNoteId());
+                  }
+                });
+      }
     } else {
       cachedResult = question.buildPresenter().isAnswerCorrect(answer);
     }
@@ -85,7 +88,25 @@ public class AnswerModel {
   }
 
   private Note getAnswerNote() {
-    if (answer.getAnswerNoteId() == null) return null;
-    return this.modelFactoryService.noteRepository.findById(answer.getAnswerNoteId()).orElse(null);
+    if (answer.getAnswerNoteId() != null) {
+      return this.modelFactoryService
+          .noteRepository
+          .findById(answer.getAnswerNoteId())
+          .orElse(null);
+    }
+    if (answer.getChoiceIndex() != null) {
+      return getRightAnswerThing(answer.getQuestion(), answer.getChoiceIndex())
+          .map(thing -> thing.getLink() != null ? thing.getLink().getSourceNote() : thing.getNote())
+          .orElse(null);
+    }
+    return null;
+  }
+
+  private Optional<Thing> getRightAnswerThing(
+      QuizQuestionEntity question, Integer correctAnswerIndex) {
+    return modelFactoryService
+        .getThingStreamAndKeepOriginalOrder(question.getOptionThingIds())
+        .skip(correctAnswerIndex)
+        .findFirst();
   }
 }
