@@ -32,18 +32,6 @@ public class QuizQuestionEntity {
     return new NoteViewer(user, getReviewPoint().getHeadNote()).jsonNotePosition(true);
   }
 
-  public void setChoicesAndRightAnswer(
-      Thingy answerNote, List<? extends Thingy> options, Randomizer randomizer1) {
-    List<Thingy> optionsEntities = new ArrayList<>(options);
-    optionsEntities.add(answerNote);
-    setOptionThingIds(
-        randomizer1.shuffle(optionsEntities).stream()
-            .map(Thingy::getThing)
-            .map(Thing::getId)
-            .map(Object::toString)
-            .collect(Collectors.joining(",")));
-  }
-
   public enum QuestionType {
     JUST_REVIEW(0, null, JustReviewQuizPresenter::new),
     CLOZE_SELECTION(1, ClozeTitleSelectionQuizFactory::new, ClozeTitleSelectionQuizPresenter::new),
@@ -123,6 +111,11 @@ public class QuizQuestionEntity {
   @Setter
   private String optionThingIds = "";
 
+  @Column(name = "correct_answer_index")
+  @Getter
+  @Setter
+  private Integer correctAnswerIndex;
+
   @Column(name = "vice_review_point_ids")
   @Getter
   private String viceReviewPointIds = "";
@@ -166,4 +159,17 @@ public class QuizQuestionEntity {
   public QuizQuestionPresenter buildPresenter() {
     return getQuestionType().presenter.apply(this);
   }
+
+  public void setChoicesAndRightAnswer(
+    Thingy answerNote, List<? extends Thingy> options, Randomizer randomizer1) {
+    List<Thingy> optionsEntities = new ArrayList<>(options);
+    optionsEntities.add(answerNote);
+    setOptionThingIds(
+      randomizer1.shuffle(optionsEntities).stream()
+        .map(Thingy::getThing)
+        .map(Thing::getId)
+        .map(Object::toString)
+        .collect(Collectors.joining(",")));
+  }
+
 }
