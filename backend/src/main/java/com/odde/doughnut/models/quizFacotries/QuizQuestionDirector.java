@@ -43,7 +43,7 @@ public record QuizQuestionDirector(
       if (optionsEntities.size() < optionsFactory.minimumOptionCount()) {
         throw new QuizQuestionNotPossibleException();
       }
-      quizQuestion.setOptionThingIds(toThingIdsString(optionsEntities));
+      quizQuestion.setOptionThingIds(toShuffledThingIdListString(optionsEntities));
     }
 
     if (quizQuestionFactory instanceof SecondaryReviewPointsFactory secondaryReviewPointsFactory) {
@@ -59,7 +59,7 @@ public record QuizQuestionDirector(
     return questionType.factory.apply(reviewPoint, servant);
   }
 
-  private String toThingIdsString(List<Thingy> options) {
+  private String toShuffledThingIdListString(List<Thingy> options) {
     return randomizer.shuffle(options).stream()
         .map(Thingy::getThing)
         .map(Thing::getId)
