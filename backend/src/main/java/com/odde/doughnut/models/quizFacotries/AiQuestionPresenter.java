@@ -7,6 +7,7 @@ import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.json.AIGeneratedQuestion;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AiQuestionPresenter implements QuizQuestionPresenter {
@@ -34,8 +35,16 @@ public class AiQuestionPresenter implements QuizQuestionPresenter {
 
   @Override
   public List<QuizQuestion.Option> getOptions(ModelFactoryService modelFactoryService) {
-
-    return List.of();
+    List<String> choices = new ArrayList<>(aiQuestion.incorrectChoices);
+    choices.add(aiQuestion.correctChoice);
+    return choices.stream()
+        .map(
+            choice -> {
+              QuizQuestion.Option option = new QuizQuestion.Option();
+              option.setDisplay(choice);
+              return option;
+            })
+        .toList();
   }
 
   @Override

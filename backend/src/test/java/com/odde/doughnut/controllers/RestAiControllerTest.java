@@ -152,6 +152,11 @@ class RestAiControllerTest {
 
   @Nested
   class GenerateQuestion {
+    String jsonQuestion =
+        """
+        {"stem": "What is the first color in the rainbow?", "correctChoice": "white", "incorrectChoices": ["black", "green"]}
+        """;
+
     @Test
     void askWithNoteThatCannotAccess() {
       assertThrows(
@@ -167,11 +172,7 @@ class RestAiControllerTest {
     @Test
     void regenerateQuizQuestion() throws JsonProcessingException, QuizQuestionNotPossibleException {
       when(openAiApi.createChatCompletion(any()))
-          .thenReturn(
-              buildCompletionResultForAIQuestion(
-                  """
-{"stem": "What is the first color in the rainbow?", "correctChoice": "white", "incorrectChoices": ["black", "green"]}
-"""));
+          .thenReturn(buildCompletionResultForAIQuestion(jsonQuestion));
       QuizQuestion question = controller.generateQuestion(note, null);
       QuizQuestion quizQuestion = controller.generateQuestion(note, question.getRawJsonQuestion());
       assertThat(quizQuestion.getRawJsonQuestion()).isEqualTo(question.getRawJsonQuestion());
@@ -180,11 +181,7 @@ class RestAiControllerTest {
     @Test
     void createQuizQuestion() throws JsonProcessingException, QuizQuestionNotPossibleException {
       when(openAiApi.createChatCompletion(any()))
-          .thenReturn(
-              buildCompletionResultForAIQuestion(
-                  """
-      {"stem": "What is the first color in the rainbow?"}
-      """));
+          .thenReturn(buildCompletionResultForAIQuestion(jsonQuestion));
       QuizQuestion quizQuestion = controller.generateQuestion(note, null);
       assertThat(quizQuestion.getRawJsonQuestion())
           .contains("What is the first color in the rainbow?");
@@ -208,10 +205,7 @@ class RestAiControllerTest {
                     assertThat(request.getMaxTokens()).isGreaterThan(1000);
                     return true;
                   })))
-          .thenReturn(
-              buildCompletionResultForAIQuestion("""
-{"stem": "what is it?"}
-            """));
+          .thenReturn(buildCompletionResultForAIQuestion(jsonQuestion));
       controller.generateQuestion(note, null);
     }
   }
