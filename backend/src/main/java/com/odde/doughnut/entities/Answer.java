@@ -36,6 +36,12 @@ public class Answer {
   @Nullable
   Integer answerNoteId;
 
+  @Getter
+  @Setter
+  @Column(name = "choice_index")
+  @Nullable
+  Integer choiceIndex;
+
   @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "quiz_question_id", referencedColumnName = "id")
   @Getter
