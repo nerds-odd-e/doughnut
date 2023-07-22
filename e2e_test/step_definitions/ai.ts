@@ -82,8 +82,8 @@ Given("AI will generate question for instruction:", (questionTable: DataTable) =
   for (const mapping of questionTable.hashes()) {
     const reply = JSON.stringify({
       stem: mapping.question_stem,
-      correctChoice: "A",
-      incorrectChoices: ["B"],
+      correctChoiceIndex: 1,
+      choices: ["B", "A"],
     })
 
     cy.openAiService().stubChatCompletionFunctionCall(
