@@ -60,12 +60,17 @@ class RestQuizQuestionControllerTests {
               .by(currentUser)
               .forgettingCurveAndNextReviewAt(200)
               .please();
-      answer = makeMe.anAnswer().answerWithId(answerNote).inMemoryPlease();
       quizQuestionEntity =
           makeMe
               .aQuestion()
               .of(QuizQuestionEntity.QuestionType.CLOZE_SELECTION, reviewPoint)
+              .correctAnswerIndex(0)
               .please();
+      answer =
+          makeMe
+              .anAnswer()
+              .choiceIndex(quizQuestionEntity.getCorrectAnswerIndex())
+              .inMemoryPlease();
     }
 
     @Test

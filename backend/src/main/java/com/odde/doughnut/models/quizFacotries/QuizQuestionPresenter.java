@@ -14,7 +14,9 @@ public interface QuizQuestionPresenter {
 
   String mainTopic();
 
-  boolean isAnswerCorrect(Answer answer);
+  default boolean isAnswerCorrect(Answer answer) {
+    return false;
+  }
 
   default LinksOfANote hintLinks() {
     return null;
