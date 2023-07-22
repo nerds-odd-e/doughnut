@@ -76,12 +76,6 @@ public class AnswerModel {
   }
 
   private Note getAnswerNote() {
-    if (answer.getAnswerNoteId() != null) {
-      return this.modelFactoryService
-          .noteRepository
-          .findById(answer.getAnswerNoteId())
-          .orElse(null);
-    }
     if (answer.getChoiceIndex() != null) {
       return getChoiceThingAt(answer.getQuestion(), answer.getChoiceIndex())
           .map(thing -> thing.getLink() != null ? thing.getLink().getSourceNote() : thing.getNote())
