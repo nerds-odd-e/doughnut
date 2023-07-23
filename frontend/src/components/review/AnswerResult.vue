@@ -11,7 +11,7 @@ import { defineComponent, PropType } from "vue";
 export default defineComponent({
   props: {
     answerResult: {
-      type: Object as PropType<Generated.AnswerViewedByUser>,
+      type: Object as PropType<Generated.AnsweredQuestion>,
       required: true,
     },
   },

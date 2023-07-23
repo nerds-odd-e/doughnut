@@ -65,7 +65,7 @@ declare namespace Generated {
     }
 
     interface DummyForGeneratingTypes {
-        answerViewedByUser: AnswerViewedByUser;
+        answeredQuestion: AnsweredQuestion;
         answer: Answer;
     }
 
@@ -204,7 +204,7 @@ declare namespace Generated {
         aiQuestionTypeOnlyForReview: boolean;
     }
 
-    interface AnswerViewedByUser {
+    interface AnsweredQuestion {
         answerId: number;
         correct: boolean;
         answerDisplay: string;

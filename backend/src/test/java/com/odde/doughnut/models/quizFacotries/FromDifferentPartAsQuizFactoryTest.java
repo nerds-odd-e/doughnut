@@ -6,7 +6,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.odde.doughnut.entities.AnswerViewedByUser;
+import com.odde.doughnut.entities.AnsweredQuestion;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Link.LinkType;
 import com.odde.doughnut.entities.Note;
@@ -202,7 +202,7 @@ class FromDifferentPartAsQuizFactoryTest {
 
           @Test
           void correct() {
-            AnswerViewedByUser answerResult =
+            AnsweredQuestion answerResult =
                 makeMe
                     .anAnswerViewedByUser()
                     .validQuestionOfType(FROM_DIFFERENT_PART_AS, uglySubjectiveRp)
@@ -213,7 +213,7 @@ class FromDifferentPartAsQuizFactoryTest {
 
           @Test
           void wrongWhenChooseCousin() {
-            AnswerViewedByUser answerResult =
+            AnsweredQuestion answerResult =
                 makeMe
                     .anAnswerViewedByUser()
                     .validQuestionOfType(FROM_DIFFERENT_PART_AS, uglySubjectiveRp)

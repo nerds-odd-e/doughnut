@@ -61,7 +61,7 @@ export default defineComponent({
   },
   data() {
     return {
-      answerResult: undefined as Generated.AnswerViewedByUser | undefined,
+      answerResult: undefined as Generated.AnsweredQuestion | undefined,
       showQuiz: "review point",
     };
   },

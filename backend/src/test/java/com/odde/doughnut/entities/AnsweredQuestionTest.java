@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-class AnswerViewedByUserTest {
+class AnsweredQuestionTest {
   @Autowired MakeMe makeMe;
 
   @Nested
@@ -42,7 +42,7 @@ class AnswerViewedByUserTest {
 
     @Test
     void correct() {
-      AnswerViewedByUser answer =
+      AnsweredQuestion answer =
           makeMe
               .anAnswerViewedByUser()
               .validQuestionOfType(SPELLING, reviewPoint)
@@ -53,7 +53,7 @@ class AnswerViewedByUserTest {
 
     @Test
     void correctWhenThereAreExtraSpace() {
-      AnswerViewedByUser answer =
+      AnsweredQuestion answer =
           makeMe
               .anAnswerViewedByUser()
               .validQuestionOfType(SPELLING, reviewPoint)
@@ -64,7 +64,7 @@ class AnswerViewedByUserTest {
 
     @Test
     void literalAnswer() {
-      AnswerViewedByUser answerResult =
+      AnsweredQuestion answerResult =
           makeMe
               .anAnswerViewedByUser()
               .validQuestionOfType(SPELLING, reviewPoint)

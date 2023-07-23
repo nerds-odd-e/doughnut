@@ -6,7 +6,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.odde.doughnut.entities.AnswerViewedByUser;
+import com.odde.doughnut.entities.AnsweredQuestion;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.AIGeneratedQuestion;
@@ -61,7 +61,7 @@ class AIGeneratedQuizFactoryTest {
 
     @Test
     void wrong() {
-      AnswerViewedByUser answerResult =
+      AnsweredQuestion answerResult =
           makeMe
               .anAnswerViewedByUser()
               .forQuestion(questionBuilder().inMemoryPlease())
@@ -72,7 +72,7 @@ class AIGeneratedQuizFactoryTest {
 
     @Test
     void correct() {
-      AnswerViewedByUser answerResult =
+      AnsweredQuestion answerResult =
           makeMe
               .anAnswerViewedByUser()
               .forQuestion(questionBuilder().inMemoryPlease())

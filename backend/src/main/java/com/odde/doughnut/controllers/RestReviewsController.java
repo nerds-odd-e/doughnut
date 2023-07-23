@@ -77,7 +77,7 @@ class RestReviewsController {
 
   @GetMapping(path = "/answers/{answer}")
   @Transactional
-  public AnswerViewedByUser showAnswer(@PathVariable("answer") Answer answer)
+  public AnsweredQuestion showAnswer(@PathVariable("answer") Answer answer)
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(answer);
     return modelFactoryService.toAnswerModel(answer).getAnswerViewedByUser(currentUser.getEntity());

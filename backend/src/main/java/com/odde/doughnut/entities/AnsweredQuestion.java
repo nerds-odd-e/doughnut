@@ -3,7 +3,7 @@ package com.odde.doughnut.entities;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import org.springframework.lang.Nullable;
 
-public class AnswerViewedByUser {
+public class AnsweredQuestion {
   public Integer answerId;
   public boolean correct;
   public String answerDisplay;

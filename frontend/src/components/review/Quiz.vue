@@ -125,7 +125,7 @@ export default defineComponent({
       }
     },
 
-    onAnswered(answerResult: Generated.AnswerViewedByUser) {
+    onAnswered(answerResult: Generated.AnsweredQuestion) {
       this.$emit("answered", answerResult);
     },
   },

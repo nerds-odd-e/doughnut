@@ -7,7 +7,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.odde.doughnut.entities.AnswerViewedByUser;
+import com.odde.doughnut.entities.AnsweredQuestion;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.QuizQuestion;
@@ -101,7 +101,7 @@ class DescriptionLinkTargetQuizFactoryTest {
   class Answer {
     @Test
     void correct() {
-      AnswerViewedByUser answerResult =
+      AnsweredQuestion answerResult =
           makeMe
               .anAnswerViewedByUser()
               .validQuestionOfType(DESCRIPTION_LINK_TARGET, reviewPoint)

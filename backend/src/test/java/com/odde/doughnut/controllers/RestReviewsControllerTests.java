@@ -120,8 +120,8 @@ class RestReviewsControllerTests {
             .forUser(currentUser.getEntity())
             .forNotebook(noteByAnotherUser.getNotebook())
             .please();
-        AnswerViewedByUser answerViewedByUser = controller.showAnswer(answer);
-        assertThat(answerViewedByUser.answerId, equalTo(answer.getId()));
+        AnsweredQuestion answeredQuestion = controller.showAnswer(answer);
+        assertThat(answeredQuestion.answerId, equalTo(answer.getId()));
       }
     }
   }

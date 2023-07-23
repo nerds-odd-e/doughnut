@@ -76,14 +76,14 @@ const apiCollection = (managedApi: ManagedApi) => ({
       const res = (await managedApi.restPost(
         `quiz-questions/${quizQuestionId}/answer`,
         data,
-      )) as Generated.AnswerViewedByUser;
+      )) as Generated.AnsweredQuestion;
       return res;
     },
 
     async getAnswer(answerId: Doughnut.ID) {
       return (await managedApi.restGet(
         `reviews/answers/${answerId}`,
-      )) as Generated.AnswerViewedByUser;
+      )) as Generated.AnsweredQuestion;
     },
 
     async selfEvaluate(

@@ -25,7 +25,7 @@ public class AnswerModel {
     modelFactoryService.answerRepository.save(answer);
   }
 
-  public AnswerViewedByUser getAnswerViewedByUser(User user) {
+  public AnsweredQuestion getAnswerViewedByUser(User user) {
     return answer.getViewedByUser(user, modelFactoryService);
   }
 }

@@ -53,8 +53,8 @@ public class Answer {
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
   @JsonIgnore
-  public AnswerViewedByUser getViewedByUser(User user, ModelFactoryService modelFactoryService) {
-    AnswerViewedByUser answerResult = new AnswerViewedByUser();
+  public AnsweredQuestion getViewedByUser(User user, ModelFactoryService modelFactoryService) {
+    AnsweredQuestion answerResult = new AnsweredQuestion();
     answerResult.answerId = getId();
     answerResult.correct = isCorrect();
     answerResult.answerDisplay = getAnswerDisplay(modelFactoryService);

@@ -82,7 +82,7 @@ describe("repeat page", () => {
 
     it("should show progress", async () => {
       const wrapper = await mountPage(repetition);
-      const answerResult: Generated.AnswerViewedByUser = {
+      const answerResult: Generated.AnsweredQuestion = {
         answerId: 1,
         correct: false,
         answerDisplay: "my answer",

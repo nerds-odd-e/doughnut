@@ -31,17 +31,17 @@ class RestQuizQuestionController {
 
   @PostMapping("/{quizQuestion}/answer")
   @Transactional
-  public AnswerViewedByUser answerQuiz(
+  public AnsweredQuestion answerQuiz(
       @PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity,
       @Valid @RequestBody Answer answer) {
     currentUser.assertLoggedIn();
     answer.setQuestion(quizQuestionEntity);
     AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
     answerModel.save();
-    AnswerViewedByUser answerViewedByUser =
+    AnsweredQuestion answeredQuestion =
         modelFactoryService.toAnswerModel(answer).getAnswerViewedByUser(currentUser.getEntity());
     answerModel.updateReviewPoints(
-        testabilitySettings.getCurrentUTCTimestamp(), answerViewedByUser.correct);
-    return answerViewedByUser;
+        testabilitySettings.getCurrentUTCTimestamp(), answeredQuestion.correct);
+    return answeredQuestion;
   }
 }
