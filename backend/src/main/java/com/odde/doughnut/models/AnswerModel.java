@@ -36,13 +36,6 @@ public class AnswerModel {
     return reviewPointStream;
   }
 
-  public AnswerViewedByUser getAnswerViewedByUser() {
-    AnswerViewedByUser answerResult = new AnswerViewedByUser();
-    answerResult.answerResult = getAnswerResult();
-    answerResult.answerDisplay = answer.getAnswerDisplay(modelFactoryService);
-    return answerResult;
-  }
-
   public AnswerResult getAnswerResult() {
     AnswerResult answerResult = new AnswerResult();
     answerResult.answerId = answer.getId();
@@ -63,5 +56,15 @@ public class AnswerModel {
       cachedResult = question.buildPresenter().isAnswerCorrect(answer);
     }
     return cachedResult;
+  }
+
+  public AnswerViewedByUser getAnswerViewedByUser(User user) {
+    AnswerViewedByUser answerResult = new AnswerViewedByUser();
+    answerResult.answerResult = getAnswerResult();
+    answerResult.answerDisplay = answer.getAnswerDisplay(modelFactoryService);
+    answerResult.reviewPoint = answer.getQuestion().getReviewPoint();
+    QuizQuestionEntity quizQuestion = answer.getQuestion();
+    answerResult.quizQuestion = modelFactoryService.toQuizQuestion(quizQuestion, user);
+    return answerResult;
   }
 }

@@ -20,7 +20,7 @@ public class AnswerViewedByUserBuilder extends EntityBuilder<AnswerViewedByUser>
         makeMe
             .modelFactoryService
             .toAnswerModel(answerBuilder.please(needPersist))
-            .getAnswerViewedByUser();
+            .getAnswerViewedByUser(null);
   }
 
   public AnswerViewedByUserBuilder validQuestionOfType(
