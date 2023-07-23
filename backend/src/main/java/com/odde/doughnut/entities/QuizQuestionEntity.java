@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -184,7 +185,12 @@ public class QuizQuestionEntity {
   }
 
   @JsonIgnore
-  public Integer getChoiceThingIdAt(Integer choiceIndex) {
-    return getChoiceThingIds().get(choiceIndex);
+  public Stream<Integer> getRelatedReviewPoints() {
+    Stream<Integer> reviewPointStream = getViceReviewPointIdList().stream();
+    ReviewPoint reviewPoint = getReviewPoint();
+    if (reviewPoint != null) {
+      return Stream.concat(reviewPointStream, Stream.of(reviewPoint.getId()));
+    }
+    return reviewPointStream;
   }
 }

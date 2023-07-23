@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.persistence.EntityManager;
-import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -64,8 +63,12 @@ public class ModelFactoryService {
     return new UserModel(user, this);
   }
 
-  public ReviewPointModel toReviewPointModel(@Valid ReviewPoint reviewPoint) {
+  public ReviewPointModel toReviewPointModel(ReviewPoint reviewPoint) {
     return new ReviewPointModel(reviewPoint, this);
+  }
+
+  public ReviewPointModel toReviewPointModel(Integer reviewPointId) {
+    return new ReviewPointModel(reviewPointRepository.findById(reviewPointId).get(), this);
   }
 
   public CircleModel toCircleModel(Circle circle) {

@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 public class AnswerModel {
   private final Answer answer;
@@ -15,23 +14,12 @@ public class AnswerModel {
     this.modelFactoryService = modelFactoryService;
   }
 
-  public void updateReviewPoints(Timestamp currentUTCTimestamp) {
-    boolean correct = isCorrect();
-    relatedReviewPoints()
+  public void updateReviewPoints(Timestamp currentUTCTimestamp, boolean correct) {
+    answer
+        .getQuestion()
+        .getRelatedReviewPoints()
         .map(this.modelFactoryService::toReviewPointModel)
         .forEach(model -> model.updateAfterRepetition(currentUTCTimestamp, correct));
-  }
-
-  private Stream<ReviewPoint> relatedReviewPoints() {
-    Stream<ReviewPoint> reviewPointStream =
-        answer.getQuestion().getViceReviewPointIdList().stream()
-            .flatMap(
-                rPid -> this.modelFactoryService.reviewPointRepository.findById(rPid).stream());
-    ReviewPoint reviewPoint = answer.getQuestion().getReviewPoint();
-    if (reviewPoint != null) {
-      return Stream.concat(reviewPointStream, Stream.of(reviewPoint));
-    }
-    return reviewPointStream;
   }
 
   public AnswerResult getAnswerResult() {
