@@ -37,6 +37,8 @@ describe("repetition page", () => {
         .currentRoute({ name: "repeat" })
         .mount();
       await flushPromises();
+      wrapper.find(".review-point-abbr").trigger("click");
+      await flushPromises();
       expect(
         JSON.parse(
           wrapper.find(".link-target .router-link").attributes().to as string,
@@ -50,6 +52,8 @@ describe("repetition page", () => {
         .withStorageProps({ answerId: 1 })
         .currentRoute({ name: "repeat-noteShow", params: { noteId: 123 } })
         .mount();
+      await flushPromises();
+      wrapper.find(".review-point-abbr").trigger("click");
       await flushPromises();
       expect(
         JSON.parse(

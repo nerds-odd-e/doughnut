@@ -1,11 +1,18 @@
 <template>
   <AnswerResult v-bind="{ answeredQuestion }" />
   <div v-if="reviewPoint">
-    <ShowReviewPoint v-bind="{ reviewPoint, storageAccessor }" />
-    <NoteInfoReviewPoint
+    <ReviewPointAbbr
+      v-if="!toggleReviewPoint"
       v-bind="{ reviewPoint }"
-      @self-evaluated="$emit('self-evaluated', $event)"
+      @click="toggleReviewPoint = true"
     />
+    <div v-else>
+      <ShowReviewPoint v-bind="{ reviewPoint, storageAccessor }" />
+      <NoteInfoReviewPoint
+        v-bind="{ reviewPoint }"
+        @self-evaluated="$emit('self-evaluated', $event)"
+      />
+    </div>
   </div>
   <QuizQuestion
     v-if="answeredQuestion?.quizQuestion"
@@ -23,6 +30,7 @@ import NoteInfoReviewPoint from "@/components/notes/NoteInfoReviewPoint.vue";
 import AnswerResult from "./AnswerResult.vue";
 import QuizQuestion from "./QuizQuestion.vue";
 import ShowReviewPoint from "./ShowReviewPoint.vue";
+import ReviewPointAbbr from "./ReviewPointAbbr.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
@@ -42,6 +50,12 @@ export default defineComponent({
     QuizQuestion,
     ShowReviewPoint,
     NoteInfoReviewPoint,
+    ReviewPointAbbr,
+  },
+  data() {
+    return {
+      toggleReviewPoint: false,
+    };
   },
   computed: {
     reviewPoint() {

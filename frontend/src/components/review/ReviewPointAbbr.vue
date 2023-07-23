@@ -1,5 +1,6 @@
 <template>
   <div class="review-point-abbr">
+    <label><strong>Review Point: </strong></label>
     <span v-if="note">
       {{ noteTitle }}
     </span>
@@ -48,6 +49,8 @@ export default defineComponent({
 
 <style lang="sass" scoped>
 .review-point-abbr
-    font-size: small
-    color: white
+  border: 1px solid #ccc
+  width: 100%
+  border-radius: 5px
+  padding: 2px
 </style>
