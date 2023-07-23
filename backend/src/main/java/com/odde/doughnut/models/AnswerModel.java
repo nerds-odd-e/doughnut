@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 public class AnswerModel {
@@ -41,7 +40,7 @@ public class AnswerModel {
     AnswerViewedByUser answerResult = new AnswerViewedByUser();
     answerResult.answerId = answer.getId();
     answerResult.correct = isCorrect();
-    answerResult.answerDisplay = getAnswerDisplay();
+    answerResult.answerDisplay = answer.getAnswerDisplay(modelFactoryService);
     return answerResult;
   }
 
@@ -56,17 +55,6 @@ public class AnswerModel {
     modelFactoryService.answerRepository.save(answer);
   }
 
-  private String getAnswerDisplay() {
-    if (answer.getQuestion().getQuestionType() == QuizQuestionEntity.QuestionType.AI_QUESTION) {
-      return "to sleep";
-    }
-    Note answerNote = getAnswerNote();
-    if (answerNote != null) {
-      return answerNote.getTitle();
-    }
-    return answer.getSpellingAnswer();
-  }
-
   private boolean isCorrect() {
     if (cachedResult != null) return cachedResult;
     QuizQuestionEntity question = answer.getQuestion();
@@ -76,20 +64,5 @@ public class AnswerModel {
       cachedResult = question.buildPresenter().isAnswerCorrect(answer);
     }
     return cachedResult;
-  }
-
-  private Note getAnswerNote() {
-    if (answer.getChoiceIndex() != null) {
-      return getChoiceThingAt(answer.getQuestion(), answer.getChoiceIndex())
-          .map(thing -> thing.getLink() != null ? thing.getLink().getSourceNote() : thing.getNote())
-          .orElse(null);
-    }
-    return null;
-  }
-
-  private Optional<Thing> getChoiceThingAt(QuizQuestionEntity question, Integer choiceIndex) {
-    Integer thingId = question.getChoiceThingIdAt(choiceIndex);
-
-    return modelFactoryService.thingRepository.findById(thingId);
   }
 }

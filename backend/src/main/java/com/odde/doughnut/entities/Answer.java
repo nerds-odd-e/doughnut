@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -49,4 +50,16 @@ public class Answer {
   @Setter
   @JsonIgnore
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
+
+  @JsonIgnore
+  public String getAnswerDisplay(ModelFactoryService modelFactoryService1) {
+    if (question != null && choiceIndex != null) {
+      return question
+          .buildPresenter()
+          .getOptions(modelFactoryService1)
+          .get(choiceIndex)
+          .getDisplay();
+    }
+    return getSpellingAnswer();
+  }
 }
