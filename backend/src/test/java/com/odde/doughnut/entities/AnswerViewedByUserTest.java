@@ -48,7 +48,7 @@ class AnswerViewedByUserTest {
               .validQuestionOfType(SPELLING, reviewPoint)
               .answerWithSpelling("this")
               .inMemoryPlease();
-      assertTrue(answer.correct);
+      assertTrue(answer.answerResult.correct);
     }
 
     @Test
@@ -59,7 +59,7 @@ class AnswerViewedByUserTest {
               .validQuestionOfType(SPELLING, reviewPoint)
               .answerWithSpelling("this ")
               .inMemoryPlease();
-      assertTrue(answer.correct);
+      assertTrue(answer.answerResult.correct);
     }
 
     @Test
@@ -70,7 +70,7 @@ class AnswerViewedByUserTest {
               .validQuestionOfType(SPELLING, reviewPoint)
               .answerWithSpelling("this / that")
               .inMemoryPlease();
-      assertTrue(answerResult.correct);
+      assertTrue(answerResult.answerResult.correct);
     }
   }
 }

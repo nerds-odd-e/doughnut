@@ -45,7 +45,6 @@ export default defineComponent({
     return {
       quizQuestion: undefined as Generated.QuizQuestion | undefined,
       prevQuizQuestion: undefined as Generated.QuizQuestion | undefined,
-      answerResult: undefined as Generated.AnswerResult | undefined,
     };
   },
   methods: {

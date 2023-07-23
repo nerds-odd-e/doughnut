@@ -13,9 +13,11 @@ describe("repetition page", () => {
 
     beforeEach(async () => {
       helper.apiMock.expectingGet("/api/reviews/answers/1").andReturnOnce({
-        answerId: 1,
+        answerResult: {
+          answerId: 1,
+          correct: true,
+        },
         answerDisplay: "",
-        correct: true,
         reviewPoint,
       });
       helper.apiMock

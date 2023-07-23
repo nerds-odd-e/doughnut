@@ -38,8 +38,7 @@ public class AnswerModel {
 
   public AnswerViewedByUser getAnswerViewedByUser() {
     AnswerViewedByUser answerResult = new AnswerViewedByUser();
-    answerResult.answerId = answer.getId();
-    answerResult.correct = isCorrect();
+    answerResult.answerResult = getAnswerResult();
     answerResult.answerDisplay = answer.getAnswerDisplay(modelFactoryService);
     return answerResult;
   }

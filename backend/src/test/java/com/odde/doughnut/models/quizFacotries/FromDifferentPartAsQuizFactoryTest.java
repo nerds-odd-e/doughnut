@@ -208,7 +208,7 @@ class FromDifferentPartAsQuizFactoryTest {
                     .validQuestionOfType(FROM_DIFFERENT_PART_AS, uglySubjectiveRp)
                     .choiceIndex(2)
                     .inMemoryPlease();
-            assertTrue(answerResult.correct);
+            assertTrue(answerResult.answerResult.correct);
           }
 
           @Test
@@ -219,7 +219,7 @@ class FromDifferentPartAsQuizFactoryTest {
                     .validQuestionOfType(FROM_DIFFERENT_PART_AS, uglySubjectiveRp)
                     .choiceIndex(1)
                     .inMemoryPlease();
-            assertFalse(answerResult.correct);
+            assertFalse(answerResult.answerResult.correct);
           }
         }
       }

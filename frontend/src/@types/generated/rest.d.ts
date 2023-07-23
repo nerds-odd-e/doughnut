@@ -206,9 +206,8 @@ declare namespace Generated {
     }
 
     interface AnswerViewedByUser {
-        answerId: number;
+        answerResult: AnswerResult;
         answerDisplay: string;
-        correct: boolean;
         reviewPoint: ReviewPoint;
         quizQuestion: QuizQuestion;
     }
