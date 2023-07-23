@@ -73,10 +73,13 @@ public class Answer {
 
   @JsonIgnore
   private boolean isCorrect() {
-    if (question.getCorrectAnswerIndex() != null) {
-      return Objects.equals(getChoiceIndex(), question.getCorrectAnswerIndex());
+    if (question.getQuestionType() == QuizQuestionEntity.QuestionType.SPELLING) {
+      return question.getReviewPoint().getNote().matchAnswer(getSpellingAnswer());
     }
-    return question.buildPresenter().isAnswerCorrect(this);
+    if (question.getQuestionType() == QuizQuestionEntity.QuestionType.JUST_REVIEW) {
+      return Objects.equals(getSpellingAnswer(), "yes");
+    }
+    return Objects.equals(getChoiceIndex(), question.getCorrectAnswerIndex());
   }
 
   @JsonIgnore
