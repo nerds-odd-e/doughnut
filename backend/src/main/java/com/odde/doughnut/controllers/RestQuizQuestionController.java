@@ -37,10 +37,10 @@ class RestQuizQuestionController {
     currentUser.assertLoggedIn();
     answer.setQuestion(quizQuestionEntity);
     AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
-    AnswerResult answerResult = answerModel.answer.getAnswerResult();
+    answerModel.save();
+    AnswerResult answerResult = answer.getAnswerResult();
     answerModel.updateReviewPoints(
         testabilitySettings.getCurrentUTCTimestamp(), answerResult.correct);
-    answerModel.save();
     return answerResult;
   }
 }
