@@ -82,9 +82,11 @@ describe("repeat page", () => {
 
     it("should show progress", async () => {
       const wrapper = await mountPage(repetition);
-      const answerResult: Generated.AnswerResult = {
+      const answerResult: Generated.AnswerViewedByUser = {
         answerId: 1,
         correct: false,
+        answerDisplay: "my answer",
+        quizQuestion: makeMe.aQuizQuestion.please(),
       };
       helper.apiMock
         .expectingPost(

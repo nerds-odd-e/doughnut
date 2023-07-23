@@ -1,7 +1,5 @@
 <template>
-  <div class="alert alert-success" v-if="answerResult.answerResult.correct">
-    Correct!
-  </div>
+  <div class="alert alert-success" v-if="answerResult.correct">Correct!</div>
   <div class="alert alert-danger" v-else>
     {{ "Your answer `" + answerResult.answerDisplay + "` is incorrect." }}
   </div>

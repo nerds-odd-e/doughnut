@@ -121,7 +121,7 @@ class RestReviewsControllerTests {
             .forNotebook(noteByAnotherUser.getNotebook())
             .please();
         AnswerViewedByUser answerViewedByUser = controller.showAnswer(answer);
-        assertThat(answerViewedByUser.answerResult.answerId, equalTo(answer.getId()));
+        assertThat(answerViewedByUser.answerId, equalTo(answer.getId()));
       }
     }
   }

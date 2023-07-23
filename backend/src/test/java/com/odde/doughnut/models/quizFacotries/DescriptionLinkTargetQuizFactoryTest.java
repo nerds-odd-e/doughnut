@@ -107,7 +107,7 @@ class DescriptionLinkTargetQuizFactoryTest {
               .validQuestionOfType(DESCRIPTION_LINK_TARGET, reviewPoint)
               .choiceIndex(1)
               .inMemoryPlease();
-      assertTrue(answerResult.answerResult.correct);
+      assertTrue(answerResult.correct);
     }
   }
 

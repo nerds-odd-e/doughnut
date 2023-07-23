@@ -53,17 +53,10 @@ public class Answer {
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
   @JsonIgnore
-  public AnswerResult getAnswerResult() {
-    AnswerResult answerResult = new AnswerResult();
-    answerResult.answerId = getId();
-    answerResult.correct = isCorrect();
-    return answerResult;
-  }
-
-  @JsonIgnore
   public AnswerViewedByUser getViewedByUser(User user, ModelFactoryService modelFactoryService) {
     AnswerViewedByUser answerResult = new AnswerViewedByUser();
-    answerResult.answerResult = getAnswerResult();
+    answerResult.answerId = getId();
+    answerResult.correct = isCorrect();
     answerResult.answerDisplay = getAnswerDisplay(modelFactoryService);
     answerResult.reviewPoint = getQuestion().getReviewPoint();
     QuizQuestionEntity quizQuestion = getQuestion();

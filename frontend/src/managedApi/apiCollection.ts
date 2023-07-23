@@ -76,7 +76,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
       const res = (await managedApi.restPost(
         `quiz-questions/${quizQuestionId}/answer`,
         data,
-      )) as Generated.AnswerResult;
+      )) as Generated.AnswerViewedByUser;
       return res;
     },
 

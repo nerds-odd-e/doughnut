@@ -1,10 +1,12 @@
 package com.odde.doughnut.entities;
 
 import com.odde.doughnut.entities.json.QuizQuestion;
+import org.springframework.lang.Nullable;
 
 public class AnswerViewedByUser {
-  public AnswerResult answerResult;
+  public Integer answerId;
+  public boolean correct;
   public String answerDisplay;
-  public ReviewPoint reviewPoint;
+  @Nullable public ReviewPoint reviewPoint;
   public QuizQuestion quizQuestion;
 }

@@ -53,7 +53,7 @@ class RestQuizQuestionControllerTests {
 
     @BeforeEach
     void setup() {
-      Note answerNote = makeMe.aNote().please();
+      Note answerNote = makeMe.aNote().asHeadNoteOfANotebook().rememberSpelling().please();
       reviewPoint =
           makeMe
               .aReviewPointFor(answerNote)
@@ -61,22 +61,14 @@ class RestQuizQuestionControllerTests {
               .forgettingCurveAndNextReviewAt(200)
               .please();
       quizQuestionEntity =
-          makeMe
-              .aQuestion()
-              .of(QuizQuestionEntity.QuestionType.CLOZE_SELECTION, reviewPoint)
-              .correctAnswerIndex(0)
-              .please();
-      answer =
-          makeMe
-              .anAnswer()
-              .choiceIndex(quizQuestionEntity.getCorrectAnswerIndex())
-              .inMemoryPlease();
+          makeMe.aQuestion().of(QuizQuestionEntity.QuestionType.SPELLING, reviewPoint).please();
+      answer = makeMe.anAnswer().answerWithSpelling(answerNote.getTitle()).inMemoryPlease();
     }
 
     @Test
     void shouldValidateTheAnswerAndUpdateReviewPoint() {
       Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
-      AnswerResult answerResult = controller.answerQuiz(quizQuestionEntity, answer);
+      AnswerViewedByUser answerResult = controller.answerQuiz(quizQuestionEntity, answer);
       assertTrue(answerResult.correct);
       assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
     }
@@ -109,7 +101,7 @@ class RestQuizQuestionControllerTests {
 
       Integer oldForgettingCurveIndex = anotherReviewPoint.getForgettingCurveIndex();
       Integer oldRepetitionCount = anotherReviewPoint.getRepetitionCount();
-      AnswerResult answerResult = controller.answerQuiz(quizQuestionEntity, answer);
+      AnswerViewedByUser answerResult = controller.answerQuiz(quizQuestionEntity, answer);
       assertTrue(answerResult.correct);
       assertThat(
           anotherReviewPoint.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
@@ -137,7 +129,7 @@ class RestQuizQuestionControllerTests {
       void shouldValidateTheWrongAnswer() {
         testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
         Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
-        AnswerResult answerResult = controller.answerQuiz(quizQuestionEntity, answer);
+        AnswerViewedByUser answerResult = controller.answerQuiz(quizQuestionEntity, answer);
         assertFalse(answerResult.correct);
         assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
       }

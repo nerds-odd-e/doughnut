@@ -66,7 +66,6 @@ declare namespace Generated {
 
     interface DummyForGeneratingTypes {
         answerViewedByUser: AnswerViewedByUser;
-        answerResult: AnswerResult;
         answer: Answer;
     }
 
@@ -206,15 +205,11 @@ declare namespace Generated {
     }
 
     interface AnswerViewedByUser {
-        answerResult: AnswerResult;
-        answerDisplay: string;
-        reviewPoint: ReviewPoint;
-        quizQuestion: QuizQuestion;
-    }
-
-    interface AnswerResult {
         answerId: number;
         correct: boolean;
+        answerDisplay: string;
+        reviewPoint?: ReviewPoint;
+        quizQuestion: QuizQuestion;
     }
 
     interface Answer {
