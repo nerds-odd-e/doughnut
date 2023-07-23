@@ -21,9 +21,6 @@ describe("repetition page", () => {
         reviewPoint,
       });
       helper.apiMock
-        .expectingGet(`/api/review-points/${reviewPoint.id}`)
-        .andReturnOnce(reviewPoint);
-      helper.apiMock
         .expectingGet(
           `/api/notes/${reviewPoint.thing.link?.targetNote.id}/position`,
         )

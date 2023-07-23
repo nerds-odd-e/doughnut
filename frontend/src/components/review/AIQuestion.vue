@@ -5,9 +5,9 @@
   <h3>
     {{ questionDescription }}
   </h3>
-  <ol v-if="choices" type="A">
+  <ol v-if="options" type="A">
     <li
-      v-for="(option, index) in choices"
+      v-for="(option, index) in options"
       :key="index"
       :class="{
         'is-correct': isSelectedOption(index) && isOptionCorrect(option),
@@ -31,7 +31,6 @@ export default defineComponent({
       type: Object as PropType<Generated.QuizQuestion>,
       required: true,
     },
-    correctChoiceIndex: Number,
     disabled: Boolean,
   },
   emits: ["answer-to-ai-question"],
@@ -57,7 +56,7 @@ export default defineComponent({
     correctOption() {
       return this.aiQuestion.choices[this.aiQuestion.correctChoiceIndex];
     },
-    choices() {
+    options() {
       return this.aiQuestion.choices;
     },
   },
