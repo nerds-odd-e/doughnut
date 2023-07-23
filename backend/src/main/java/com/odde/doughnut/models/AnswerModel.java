@@ -10,8 +10,6 @@ public class AnswerModel {
   private final Answer answer;
   private final ModelFactoryService modelFactoryService;
 
-  private Boolean cachedResult;
-
   public AnswerModel(Answer answer, ModelFactoryService modelFactoryService) {
     this.answer = answer;
     this.modelFactoryService = modelFactoryService;
@@ -48,14 +46,11 @@ public class AnswerModel {
   }
 
   private boolean isCorrect() {
-    if (cachedResult != null) return cachedResult;
     QuizQuestionEntity question = answer.getQuestion();
     if (question.getCorrectAnswerIndex() != null) {
-      cachedResult = Objects.equals(answer.getChoiceIndex(), question.getCorrectAnswerIndex());
-    } else {
-      cachedResult = question.buildPresenter().isAnswerCorrect(answer);
+      return Objects.equals(answer.getChoiceIndex(), question.getCorrectAnswerIndex());
     }
-    return cachedResult;
+    return question.buildPresenter().isAnswerCorrect(answer);
   }
 
   public AnswerViewedByUser getAnswerViewedByUser(User user) {
