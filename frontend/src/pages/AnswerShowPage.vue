@@ -19,7 +19,9 @@
         }"
       />
       <div v-else-if="reviewPoint">
-        <ShowReviewPoint v-bind="{ reviewPoint, storageAccessor }" />
+        <ReviewPointAsync
+          v-bind="{ reviewPointId: reviewPoint.id, storageAccessor }"
+        />
         <NoteInfoReviewPoint
           v-bind="{ reviewPoint }"
           @self-evaluated="onSelfEvaluated($event)"
@@ -37,7 +39,7 @@ import useLoadingApi from "../managedApi/useLoadingApi";
 import AnswerResult from "../components/review/AnswerResult.vue";
 import QuizQuestion from "../components/review/QuizQuestion.vue";
 import RadioButtons from "../components/form/RadioButtons.vue";
-import ShowReviewPoint from "../components/review/ShowReviewPoint.vue";
+import ReviewPointAsync from "../components/review/ReviewPointAsync.vue";
 import { StorageAccessor } from "../store/createNoteStorage";
 
 export default defineComponent({
@@ -56,8 +58,8 @@ export default defineComponent({
     AnswerResult,
     QuizQuestion,
     RadioButtons,
-    ShowReviewPoint,
     NoteInfoReviewPoint,
+    ReviewPointAsync,
   },
   data() {
     return {
