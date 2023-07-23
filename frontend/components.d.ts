@@ -10,6 +10,7 @@ declare module 'vue' {
     AIGenerateImageDialog: typeof import('./src/components/notes/AIGenerateImageDialog.vue')['default']
     AIQuestion: typeof import('./src/components/review/AIQuestion.vue')['default']
     AISuggestDescriptionButton: typeof import('./src/components/toolbars/AISuggestDescriptionButton.vue')['default']
+    AnsweredQuestion: typeof import('./src/components/review/AnsweredQuestion.vue')['default']
     AnswerResult: typeof import('./src/components/review/AnswerResult.vue')['default']
     ApiStatus: typeof import('./src/components/toolbars/ApiStatus.vue')['default']
     Arrow: typeof import('./src/components/svgs/link_types/Arrow.vue')['default']

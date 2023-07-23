@@ -1,22 +1,10 @@
 <template>
   <div class="container">
     <LoadingPage v-bind="{ contentExists: !!answeredQuestion }">
-      <AnswerResult v-if="answeredQuestion" v-bind="{ answeredQuestion }" />
-
-      <div v-if="reviewPoint">
-        <ShowReviewPoint v-bind="{ reviewPoint, storageAccessor }" />
-        <NoteInfoReviewPoint
-          v-bind="{ reviewPoint }"
-          @self-evaluated="onSelfEvaluated($event)"
-        />
-      </div>
-      <QuizQuestion
-        v-if="answeredQuestion?.quizQuestion"
-        v-bind="{
-          quizQuestion: answeredQuestion?.quizQuestion,
-          reviewPointId: reviewPoint?.id,
-          storageAccessor,
-        }"
+      <AnsweredQuestion
+        v-if="answeredQuestion"
+        v-bind="{ answeredQuestion, storageAccessor }"
+        @self-evaluated="onSelfEvaluated($event)"
       />
     </LoadingPage>
   </div>
@@ -24,12 +12,9 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import NoteInfoReviewPoint from "@/components/notes/NoteInfoReviewPoint.vue";
 import LoadingPage from "./commons/LoadingPage.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
-import AnswerResult from "../components/review/AnswerResult.vue";
-import QuizQuestion from "../components/review/QuizQuestion.vue";
-import ShowReviewPoint from "../components/review/ShowReviewPoint.vue";
+import AnsweredQuestion from "../components/review/AnsweredQuestion.vue";
 import { StorageAccessor } from "../store/createNoteStorage";
 
 export default defineComponent({
@@ -45,10 +30,7 @@ export default defineComponent({
   },
   components: {
     LoadingPage,
-    AnswerResult,
-    QuizQuestion,
-    ShowReviewPoint,
-    NoteInfoReviewPoint,
+    AnsweredQuestion,
   },
   data() {
     return {
