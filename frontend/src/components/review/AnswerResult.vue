@@ -1,7 +1,9 @@
 <template>
-  <div class="alert alert-success" v-if="answerResult.correct">Correct!</div>
+  <div class="alert alert-success" v-if="answeredQuestion.correct">
+    Correct!
+  </div>
   <div class="alert alert-danger" v-else>
-    {{ "Your answer `" + answerResult.answerDisplay + "` is incorrect." }}
+    {{ "Your answer `" + answeredQuestion.answerDisplay + "` is incorrect." }}
   </div>
 </template>
 
@@ -10,7 +12,7 @@ import { defineComponent, PropType } from "vue";
 
 export default defineComponent({
   props: {
-    answerResult: {
+    answeredQuestion: {
       type: Object as PropType<Generated.AnsweredQuestion>,
       required: true,
     },

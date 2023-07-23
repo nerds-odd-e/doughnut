@@ -1,7 +1,7 @@
 <template>
   <div class="container">
-    <LoadingPage v-bind="{ contentExists: !!answerResult }">
-      <AnswerResult v-if="answerResult" v-bind="{ answerResult }" />
+    <LoadingPage v-bind="{ contentExists: !!answeredQuestion }">
+      <AnswerResult v-if="answeredQuestion" v-bind="{ answeredQuestion }" />
 
       <RadioButtons
         v-model="showQuiz"
@@ -10,21 +10,21 @@
           { value: 'quiz', label: 'Quiz' },
         ]"
       />
-      <QuizQuestion
-        v-if="showQuiz === 'quiz' && answerResult?.quizQuestion"
-        v-bind="{
-          quizQuestion: answerResult?.quizQuestion,
-          reviewPointId: reviewPoint?.id,
-          storageAccessor,
-        }"
-      />
-      <div v-else-if="reviewPoint">
+      <div v-if="reviewPoint">
         <ShowReviewPoint v-bind="{ reviewPoint, storageAccessor }" />
         <NoteInfoReviewPoint
           v-bind="{ reviewPoint }"
           @self-evaluated="onSelfEvaluated($event)"
         />
       </div>
+      <QuizQuestion
+        v-if="answeredQuestion?.quizQuestion"
+        v-bind="{
+          quizQuestion: answeredQuestion?.quizQuestion,
+          reviewPointId: reviewPoint?.id,
+          storageAccessor,
+        }"
+      />
     </LoadingPage>
   </div>
 </template>
@@ -61,25 +61,27 @@ export default defineComponent({
   },
   data() {
     return {
-      answerResult: undefined as Generated.AnsweredQuestion | undefined,
+      answeredQuestion: undefined as Generated.AnsweredQuestion | undefined,
       showQuiz: "review point",
     };
   },
   computed: {
     reviewPoint() {
-      return this.answerResult?.reviewPoint;
+      return this.answeredQuestion?.reviewPoint;
     },
   },
   methods: {
     onSelfEvaluated(reviewPoint: Generated.ReviewPoint) {
-      if (!this.answerResult) return;
-      this.answerResult = {
-        ...this.answerResult,
+      if (!this.answeredQuestion) return;
+      this.answeredQuestion = {
+        ...this.answeredQuestion,
         reviewPoint,
       };
     },
     async fetchData() {
-      this.answerResult = await this.api.reviewMethods.getAnswer(this.answerId);
+      this.answeredQuestion = await this.api.reviewMethods.getAnswer(
+        this.answerId,
+      );
     },
   },
   watch: {
