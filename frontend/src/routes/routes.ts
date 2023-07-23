@@ -12,7 +12,7 @@ import CircleShowPage from "@/pages/CircleShowPage.vue";
 import CircleJoinPage from "@/pages/CircleJoinPage.vue";
 import FailureReportListPage from "@/pages/FailureReportListPage.vue";
 import FailureReportPage from "@/pages/FailureReportPage.vue";
-import AnswerShowPage from "@/pages/AnswerShowPage.vue";
+import AnsweredQuestionPage from "@/pages/AnsweredQuestionPage.vue";
 import NestedPage from "../pages/commons/NestedPage";
 
 const NestedInitialReviewPage = NestedPage(InitialReviewPage, "initial");
@@ -54,7 +54,7 @@ const noteAndLinkRoutes = [
   {
     path: `answers/:answerId`,
     name: "answer",
-    component: AnswerShowPage,
+    component: AnsweredQuestionPage,
     props: true,
     meta: { useNoteStorageAccessor: true },
   },

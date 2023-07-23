@@ -3,13 +3,6 @@
     <LoadingPage v-bind="{ contentExists: !!answeredQuestion }">
       <AnswerResult v-if="answeredQuestion" v-bind="{ answeredQuestion }" />
 
-      <RadioButtons
-        v-model="showQuiz"
-        :options="[
-          { value: 'review point', label: 'Review Point' },
-          { value: 'quiz', label: 'Quiz' },
-        ]"
-      />
       <div v-if="reviewPoint">
         <ShowReviewPoint v-bind="{ reviewPoint, storageAccessor }" />
         <NoteInfoReviewPoint
@@ -36,7 +29,6 @@ import LoadingPage from "./commons/LoadingPage.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
 import AnswerResult from "../components/review/AnswerResult.vue";
 import QuizQuestion from "../components/review/QuizQuestion.vue";
-import RadioButtons from "../components/form/RadioButtons.vue";
 import ShowReviewPoint from "../components/review/ShowReviewPoint.vue";
 import { StorageAccessor } from "../store/createNoteStorage";
 
@@ -55,14 +47,12 @@ export default defineComponent({
     LoadingPage,
     AnswerResult,
     QuizQuestion,
-    RadioButtons,
     ShowReviewPoint,
     NoteInfoReviewPoint,
   },
   data() {
     return {
       answeredQuestion: undefined as Generated.AnsweredQuestion | undefined,
-      showQuiz: "review point",
     };
   },
   computed: {

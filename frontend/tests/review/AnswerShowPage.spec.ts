@@ -1,5 +1,5 @@
 import { flushPromises } from "@vue/test-utils";
-import AnswerShowPage from "@/pages/AnswerShowPage.vue";
+import AnsweredQuestionPage from "@/pages/AnsweredQuestionPage.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
@@ -32,7 +32,7 @@ describe("repetition page", () => {
 
     it("click on note when doing review", async () => {
       const wrapper = helper
-        .component(AnswerShowPage)
+        .component(AnsweredQuestionPage)
         .withStorageProps({ answerId: 1 })
         .currentRoute({ name: "repeat" })
         .mount();
@@ -46,7 +46,7 @@ describe("repetition page", () => {
 
     it("click on note when doing review and in a nested page", async () => {
       const wrapper = helper
-        .component(AnswerShowPage)
+        .component(AnsweredQuestionPage)
         .withStorageProps({ answerId: 1 })
         .currentRoute({ name: "repeat-noteShow", params: { noteId: 123 } })
         .mount();
