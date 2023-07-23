@@ -33,7 +33,6 @@ public class QuizQuestion {
 
   @Data
   public static class Option {
-    private Integer noteId;
     private boolean isPicture = false;
     private String display;
     @Nullable private PictureWithMask pictureWithMask;

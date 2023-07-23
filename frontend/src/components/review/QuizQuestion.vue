@@ -65,7 +65,7 @@
         <div
           class="option"
           v-for="(option, index) in quizQuestion.options"
-          :key="option.noteId"
+          :key="index"
         >
           <button
             class="btn btn-secondary btn-lg"

@@ -32,7 +32,6 @@ public class PictureSelectionQuizPresenter extends QuizQuestionWithOptionsPresen
         .map(
             thing -> {
               QuizQuestion.Option option = new QuizQuestion.Option();
-              option.setNoteId(thing.getNote().getId());
               option.setDisplay(thing.getNote().getTitle());
               option.setPictureWithMask(thing.getNote().getPictureWithMask().orElse(null));
               option.setPicture(true);

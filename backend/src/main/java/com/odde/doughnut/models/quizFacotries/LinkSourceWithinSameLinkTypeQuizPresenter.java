@@ -31,7 +31,6 @@ public class LinkSourceWithinSameLinkTypeQuizPresenter extends QuizQuestionWithO
         .map(
             thing -> {
               QuizQuestion.Option option = new QuizQuestion.Option();
-              option.setNoteId(thing.getLink().getSourceNote().getId());
               option.setDisplay(thing.getLink().getClozeSource().cloze());
               return option;
             })

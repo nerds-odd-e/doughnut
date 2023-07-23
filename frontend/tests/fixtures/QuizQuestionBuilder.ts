@@ -8,7 +8,6 @@ class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
     questionType: "JUST_REVIEW",
     options: [
       {
-        noteId: 1,
         picture: false,
         display: "question",
       },

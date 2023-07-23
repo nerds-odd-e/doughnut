@@ -277,7 +277,6 @@ declare namespace Generated {
     }
 
     interface Option {
-        noteId: number;
         display: string;
         pictureWithMask?: PictureWithMask;
         picture: boolean;
