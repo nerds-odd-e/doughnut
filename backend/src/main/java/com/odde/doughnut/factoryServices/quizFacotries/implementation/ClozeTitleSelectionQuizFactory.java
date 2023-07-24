@@ -1,0 +1,39 @@
+package com.odde.doughnut.factoryServices.quizFacotries.implementation;
+
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.Thing;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
+import java.util.List;
+
+public class ClozeTitleSelectionQuizFactory implements QuestionOptionsFactory, QuizQuestionFactory {
+
+  protected final Thing thing;
+  protected final Note answerNote;
+  protected QuizQuestionServant servant;
+
+  public ClozeTitleSelectionQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
+    this.thing = reviewPoint.getThing();
+    this.servant = servant;
+    this.answerNote = this.thing.getNote();
+  }
+
+  @Override
+  public Note generateAnswer() {
+    return answerNote;
+  }
+
+  @Override
+  public List<Note> generateFillingOptions() {
+    return servant.chooseFromCohort(answerNote, n -> !n.equals(answerNote));
+  }
+
+  @Override
+  public void validatePossibility() throws QuizQuestionNotPossibleException {
+    if (thing.isDescriptionBlankHtml()) {
+      throw new QuizQuestionNotPossibleException();
+    }
+  }
+}

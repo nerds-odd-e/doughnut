@@ -3,7 +3,7 @@ package com.odde.doughnut.entities.json;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.models.quizFacotries.QuizQuestionNotPossibleException;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import java.util.List;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.lang.Nullable;

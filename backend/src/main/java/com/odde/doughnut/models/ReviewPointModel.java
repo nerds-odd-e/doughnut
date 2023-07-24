@@ -4,7 +4,7 @@ import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionDirector;
 import com.odde.doughnut.services.AiAdvisorService;
 import java.sql.Timestamp;
 
