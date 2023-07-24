@@ -119,10 +119,6 @@ public class QuizQuestionEntity {
   @Setter
   private Integer correctAnswerIndex;
 
-  @Column(name = "vice_review_point_ids")
-  @Getter
-  private String viceReviewPointIds = "";
-
   @Column(name = "created_at")
   @Getter
   @Setter
