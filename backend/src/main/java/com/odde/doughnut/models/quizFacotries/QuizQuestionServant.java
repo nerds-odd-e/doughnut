@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class QuizQuestionServant {
+  private final User user;
   final Randomizer randomizer;
   final ModelFactoryService modelFactoryService;
   final AiAdvisorService aiAdvisorService;
@@ -32,9 +33,11 @@ public class QuizQuestionServant {
           LinkType.RELATED_TO);
 
   public QuizQuestionServant(
+      User user,
       Randomizer randomizer,
       ModelFactoryService modelFactoryService,
       AiAdvisorService aiAdvisorService) {
+    this.user = user;
     this.randomizer = randomizer;
     this.modelFactoryService = modelFactoryService;
     this.aiAdvisorService = aiAdvisorService;
@@ -55,41 +58,41 @@ public class QuizQuestionServant {
         .collect(Collectors.toList());
   }
 
-  Optional<Link> chooseOneCategoryLink(User user, Link link) {
-    return randomizer.chooseOneRandomly(link.categoryLinksOfTarget(user));
+  private Optional<Link> chooseOneCategoryLink(Link link) {
+    return randomizer.chooseOneRandomly(link.categoryLinksOfTarget(this.user));
   }
 
   <T> List<T> chooseFillingOptionsRandomly(List<T> candidates) {
     return randomizer.randomlyChoose(maxFillingOptionCount, candidates);
   }
 
-  public Stream<Link> getSiblingLinksOfSameLinkTypeHavingReviewPoint(Link link, User user) {
-    Stream<Link> siblingLinksOfSameLinkType = link.getSiblingLinksOfSameLinkType(user);
-    return linksWithReviewPoint(siblingLinksOfSameLinkType, user);
+  public Stream<Link> getSiblingLinksOfSameLinkTypeHavingReviewPoint(Link link) {
+    Stream<Link> siblingLinksOfSameLinkType = link.getSiblingLinksOfSameLinkType(this.user);
+    return linksWithReviewPoint(siblingLinksOfSameLinkType);
   }
 
-  public Stream<Link> getLinksFromSameSourceHavingReviewPoint(User user, Link link) {
+  public Stream<Link> getLinksFromSameSourceHavingReviewPoint(Link link) {
     Stream<Link> stream =
-        new NoteViewer(user, link.getSourceNote())
+        new NoteViewer(this.user, link.getSourceNote())
             .linksOfTypeThroughDirect(candidateQuestionLinkTypes).stream();
-    return linksWithReviewPoint(stream, user).filter(l -> !link.equals(l));
+    return linksWithReviewPoint(stream).filter(l -> !link.equals(l));
   }
 
-  private Stream<Link> linksWithReviewPoint(Stream<Link> cousinLinksOfSameLinkType, User user) {
-    UserModel userModel = modelFactoryService.toUserModel(user);
+  private Stream<Link> linksWithReviewPoint(Stream<Link> cousinLinksOfSameLinkType) {
+    UserModel userModel = modelFactoryService.toUserModel(this.user);
     return cousinLinksOfSameLinkType.filter(l -> userModel.getReviewPointFor(l) != null);
   }
 
-  public List<ReviewPoint> getReviewPoints(Link link, User user) {
-    UserModel userModel = modelFactoryService.toUserModel(user);
+  public List<ReviewPoint> getReviewPoints(Link link) {
+    UserModel userModel = modelFactoryService.toUserModel(this.user);
     ReviewPoint reviewPointFor = userModel.getReviewPointFor(link);
     if (reviewPointFor == null) return List.of();
     return List.of(reviewPointFor);
   }
 
-  ParentGrandLinkHelper getParentGrandLinkHelper(User user, Link link) {
-    Link parentGrandLink = chooseOneCategoryLink(user, link).orElse(null);
+  ParentGrandLinkHelper getParentGrandLinkHelper(Link link) {
+    Link parentGrandLink = chooseOneCategoryLink(link).orElse(null);
     if (parentGrandLink == null) return new NullParentGrandLinkHelper();
-    return new ParentGrandLinkHelperImpl(user, link, parentGrandLink);
+    return new ParentGrandLinkHelperImpl(this.user, link, parentGrandLink);
   }
 }

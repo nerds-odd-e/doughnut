@@ -24,7 +24,7 @@ public class FromSamePartAsQuizFactory
     user = reviewPoint.getUser();
     link = reviewPoint.getLink();
     this.servant = servant;
-    parentGrandLinkHelper = servant.getParentGrandLinkHelper(user, link);
+    parentGrandLinkHelper = servant.getParentGrandLinkHelper(link);
   }
 
   @Override
@@ -55,7 +55,7 @@ public class FromSamePartAsQuizFactory
     ReviewPoint answerLinkReviewPoint = userModel.getReviewPointFor(answerLink);
     List<ReviewPoint> result = new ArrayList<>();
     result.add(answerLinkReviewPoint);
-    result.addAll(servant.getReviewPoints(parentGrandLinkHelper.getParentGrandLink(), user));
+    result.addAll(servant.getReviewPoints(parentGrandLinkHelper.getParentGrandLink()));
     return result;
   }
 
@@ -67,7 +67,7 @@ public class FromSamePartAsQuizFactory
   protected Link getAnswerLink() {
     if (cachedAnswerLink == null) {
       List<Link> backwardPeers =
-          servant.getSiblingLinksOfSameLinkTypeHavingReviewPoint(link, user).toList();
+          servant.getSiblingLinksOfSameLinkTypeHavingReviewPoint(link).toList();
       cachedAnswerLink = servant.randomizer.chooseOneRandomly(backwardPeers).orElse(null);
     }
     return cachedAnswerLink;

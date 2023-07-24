@@ -61,8 +61,7 @@ public class WhichSpecHasInstanceQuizFactory
 
   private Link getInstanceLink() {
     if (cachedInstanceLink == null) {
-      Stream<Link> candidates =
-          servant.getLinksFromSameSourceHavingReviewPoint(reviewPoint.getUser(), link);
+      Stream<Link> candidates = servant.getLinksFromSameSourceHavingReviewPoint(link);
       cachedInstanceLink =
           servant
               .randomizer

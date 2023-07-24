@@ -57,7 +57,8 @@ public record QuizQuestionDirector(
 
   private QuizQuestionFactory buildQuizQuestionFactory(QuestionType questionType) {
     QuizQuestionServant servant =
-        new QuizQuestionServant(randomizer, modelFactoryService, aiAdvisorService);
+        new QuizQuestionServant(
+            reviewPoint.getUser(), randomizer, modelFactoryService, aiAdvisorService);
     return questionType.factory.apply(reviewPoint, servant);
   }
 

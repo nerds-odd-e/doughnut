@@ -19,7 +19,7 @@ public class FromDifferentPartAsQuizFactory
     user = reviewPoint.getUser();
     link = reviewPoint.getLink();
     this.servant = servant;
-    parentGrandLinkHelper = servant.getParentGrandLinkHelper(user, link);
+    parentGrandLinkHelper = servant.getParentGrandLinkHelper(link);
   }
 
   @Override
@@ -33,9 +33,7 @@ public class FromDifferentPartAsQuizFactory
       return null;
     }
     List<Link> cousinLinks =
-        servant
-            .getSiblingLinksOfSameLinkTypeHavingReviewPoint(link, user)
-            .collect(Collectors.toList());
+        servant.getSiblingLinksOfSameLinkTypeHavingReviewPoint(link).collect(Collectors.toList());
     return servant.chooseFillingOptionsRandomly(cousinLinks).stream()
         .map(Link::getSourceNote)
         .collect(Collectors.toList());
@@ -57,6 +55,6 @@ public class FromDifferentPartAsQuizFactory
 
   @Override
   public List<ReviewPoint> getViceReviewPoints() {
-    return servant.getReviewPoints(getCategoryLink(), user);
+    return servant.getReviewPoints(getCategoryLink());
   }
 }
