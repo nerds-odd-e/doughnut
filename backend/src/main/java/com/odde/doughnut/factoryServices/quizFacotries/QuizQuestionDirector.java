@@ -1,9 +1,7 @@
 package com.odde.doughnut.factoryServices.quizFacotries;
 
-import com.odde.doughnut.entities.QuizQuestionEntity;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.QuizQuestionEntity.QuestionType;
-import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.Thingy;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.QuestionOptionsFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.QuestionRawJsonFactory;
@@ -21,19 +19,27 @@ public record QuizQuestionDirector(
 
   public Optional<QuizQuestionEntity> buildQuizQuestion(QuestionType questionType) {
     try {
-      return Optional.of(buildAQuestionOfType(questionType));
+      QuizQuestionServant servant =
+          new QuizQuestionServant(
+              reviewPoint.getUser(), randomizer, modelFactoryService, aiAdvisorService);
+      QuizQuestionEntity quizQuestion =
+          buildAQuestionOfType(questionType, reviewPoint.getThing(), servant);
+      quizQuestion.setReviewPoint(reviewPoint);
+      return Optional.of(quizQuestion);
     } catch (QuizQuestionNotPossibleException e) {
       return Optional.empty();
     }
   }
 
-  private QuizQuestionEntity buildAQuestionOfType(QuestionType questionType)
+  private QuizQuestionEntity buildAQuestionOfType(
+      QuestionType questionType, Thing thing, QuizQuestionServant servant)
       throws QuizQuestionNotPossibleException {
-    QuizQuestionFactory quizQuestionFactory = buildQuizQuestionFactory(questionType);
+    QuizQuestionFactory quizQuestionFactory = questionType.factory.apply(thing, servant);
 
     quizQuestionFactory.validatePossibility();
 
-    QuizQuestionEntity quizQuestion = createAQuizQuestionOfType(questionType, reviewPoint);
+    QuizQuestionEntity quizQuestion = new QuizQuestionEntity();
+    quizQuestion.setQuestionType(questionType);
 
     if (quizQuestionFactory instanceof QuestionRawJsonFactory rawJsonFactory) {
       rawJsonFactory.generateRawJsonQuestion(quizQuestion);
@@ -48,7 +54,7 @@ public record QuizQuestionDirector(
       if (options.size() < optionsFactory.minimumOptionCount() - 1) {
         throw new QuizQuestionNotPossibleException();
       }
-      quizQuestion.setChoicesAndRightAnswer(answerNote, options, randomizer);
+      quizQuestion.setChoicesAndRightAnswer(answerNote, options, servant.randomizer);
     }
 
     if (quizQuestionFactory instanceof SecondaryReviewPointsFactory secondaryReviewPointsFactory) {
@@ -58,13 +64,6 @@ public record QuizQuestionDirector(
     return quizQuestion;
   }
 
-  private QuizQuestionFactory buildQuizQuestionFactory(QuestionType questionType) {
-    QuizQuestionServant servant =
-        new QuizQuestionServant(
-            reviewPoint.getUser(), randomizer, modelFactoryService, aiAdvisorService);
-    return questionType.factory.apply(reviewPoint.getThing(), servant);
-  }
-
   public QuizQuestionEntity buildRandomQuestion(Boolean aiQuestionTypeOnlyForReview) {
     return this.randomizer
         .shuffle(reviewPoint.availableQuestionTypes(aiQuestionTypeOnlyForReview))
@@ -72,14 +71,12 @@ public record QuizQuestionDirector(
         .map(this::buildQuizQuestion)
         .flatMap(Optional::stream)
         .findFirst()
-        .orElseGet(() -> createAQuizQuestionOfType(QuestionType.JUST_REVIEW, reviewPoint));
-  }
-
-  private QuizQuestionEntity createAQuizQuestionOfType(
-      QuestionType questionType, ReviewPoint reviewPoint) {
-    QuizQuestionEntity quizQuestion = new QuizQuestionEntity();
-    quizQuestion.setReviewPoint(reviewPoint);
-    quizQuestion.setQuestionType(questionType);
-    return quizQuestion;
+        .orElseGet(
+            () -> {
+              QuizQuestionEntity quizQuestion = new QuizQuestionEntity();
+              quizQuestion.setQuestionType(QuestionType.JUST_REVIEW);
+              quizQuestion.setReviewPoint(reviewPoint);
+              return quizQuestion;
+            });
   }
 }
