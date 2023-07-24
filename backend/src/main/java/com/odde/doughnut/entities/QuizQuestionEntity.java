@@ -1,8 +1,6 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.entities.annotations.JsonUseIdInsteadOfLink;
-import com.odde.doughnut.entities.annotations.JsonUseIdInsteadOfReviewPoint;
 import com.odde.doughnut.entities.json.NotePositionViewedByUser;
 import com.odde.doughnut.factoryServices.quizFacotries.*;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.*;
@@ -85,12 +83,17 @@ public class QuizQuestionEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-  @JsonUseIdInsteadOfReviewPoint
   @ManyToOne(cascade = CascadeType.DETACH)
   @JoinColumn(name = "review_point_id", referencedColumnName = "id")
   @Getter
   @Setter
   private ReviewPoint reviewPoint;
+
+  @ManyToOne(cascade = CascadeType.DETACH)
+  @JoinColumn(name = "thing_id", referencedColumnName = "id")
+  @Getter
+  @Setter
+  private Thing thing;
 
   @Column(name = "question_type")
   @Getter
@@ -102,7 +105,6 @@ public class QuizQuestionEntity {
   @Setter
   private String rawJsonQuestion;
 
-  @JsonUseIdInsteadOfLink
   @ManyToOne(cascade = CascadeType.DETACH)
   @JoinColumn(name = "category_link_id", referencedColumnName = "id")
   @Getter
