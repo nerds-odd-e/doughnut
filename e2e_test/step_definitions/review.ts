@@ -169,10 +169,7 @@ Then("The randomizer always choose the last", () => {
 })
 
 Then("I should see that my last answer is correct", () => {
-  cy.findByRole("button", { name: "view last result" }).click()
-  // checking the css name isn't the best solution
-  // but the text changes
-  cy.get(".alert-success").should("exist")
+  PageObjects.goToLastResult().expectLastAnswerToBeCorrect()
 })
 
 Then("I should see the review point info of note {string}", (noteTitle: string, data) => {

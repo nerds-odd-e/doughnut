@@ -1,4 +1,5 @@
 import { findQuestionWithStem, currentQuestion } from "./QuizQuestionPage"
+import { goToLastResult } from "./AnsweredQuestionPage"
 
 const jumpToNotePage = (noteTitle: string) => {
   cy.jumpToNotePage(noteTitle)
@@ -16,6 +17,7 @@ const askQuestionForNote = (noteTitle: string) => {
 }
 
 const PageObjects = {
+  goToLastResult,
   findQuestionWithStem,
   currentQuestion,
   askQuestionForNote,
