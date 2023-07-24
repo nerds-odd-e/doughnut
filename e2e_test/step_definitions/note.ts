@@ -177,10 +177,6 @@ When("I should see that the note creation is not successful", () => {
   cy.dismissLastErrorMessage()
 })
 
-Then("I should see {string} in note title", (noteTitle: string) => {
-  cy.findNoteTitle(noteTitle)
-})
-
 Then("I should see the note {string} is marked as deleted", (noteTitle: string) => {
   cy.jumpToNotePage(noteTitle)
   cy.findNoteTitle(noteTitle)

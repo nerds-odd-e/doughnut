@@ -17,8 +17,7 @@ Feature: Repetition Quiz
     And I choose answer "sedition"
     Then I view the last result
     And I should see that my answer is correct
-    Then I should see "sedition" in note title
-    And I should see the info of note "sedition"
+    And I should see the review point info of note "sedition"
       | Repetition Count |
       | 1                |
 

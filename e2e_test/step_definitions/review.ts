@@ -63,6 +63,7 @@ Then(
 )
 
 Then("choose to remove it from reviews", () => {
+  cy.findByText("Review Point:").click()
   cy.findByRole("button", { name: "remove this note from review" }).click()
   cy.findByRole("button", { name: "OK" }).click()
 })
@@ -184,7 +185,8 @@ Then("The randomizer always choose the last", () => {
   cy.testability().randomizerAlwaysChooseLast()
 })
 
-Then("I should see the info of note {string}", (noteTitle: string, data) => {
+Then("I should see the review point info of note {string}", (noteTitle: string, data) => {
+  cy.findByText("Review Point:").click()
   cy.findNoteTitle(noteTitle)
   cy.findByRole("button", { name: "i..." }).click({ force: true })
   const attrs = data.hashes()[0]
