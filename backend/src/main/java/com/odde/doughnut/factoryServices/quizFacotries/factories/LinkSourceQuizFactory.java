@@ -25,14 +25,7 @@ public class LinkSourceQuizFactory implements QuizQuestionFactory, QuestionOptio
   @Override
   public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
-      List<Note> linkedSiblingsOfSameLinkType = link.getLinkedSiblingsOfSameLinkType(user);
-      cachedFillingOptions =
-          servant.chooseFromCohort(
-              answerNote,
-              n ->
-                  !n.equals(answerNote)
-                      && !n.equals(link.getTargetNote())
-                      && !linkedSiblingsOfSameLinkType.contains(n));
+      cachedFillingOptions = servant.chooseFromCohortAvoidSiblings(link, answerNote);
     }
     return cachedFillingOptions;
   }

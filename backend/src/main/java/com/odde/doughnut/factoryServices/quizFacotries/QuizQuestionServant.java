@@ -131,4 +131,14 @@ public class QuizQuestionServant {
         .map(n -> n.getLinks().get(0))
         .collect(Collectors.toList());
   }
+
+  public List<Note> chooseFromCohortAvoidSiblings(Link link1, Note answerNote1) {
+    List<Note> linkedSiblingsOfSameLinkType = link1.getLinkedSiblingsOfSameLinkType(user);
+    return chooseFromCohort(
+        answerNote1,
+        n ->
+            !n.equals(answerNote1)
+                && !n.equals(link1.getTargetNote())
+                && !linkedSiblingsOfSameLinkType.contains(n));
+  }
 }
