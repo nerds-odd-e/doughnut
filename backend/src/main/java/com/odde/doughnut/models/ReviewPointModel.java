@@ -4,7 +4,7 @@ import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionDirector;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionGenerator;
 import com.odde.doughnut.services.AiAdvisorService;
 import java.sql.Timestamp;
 
@@ -23,9 +23,9 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
 
   public QuizQuestionEntity generateAQuizQuestion(
       Randomizer randomizer, User user, AiAdvisorService aiAdvisorService) {
-    QuizQuestionDirector quizQuestionDirector =
-        new QuizQuestionDirector(entity, randomizer, modelFactoryService, aiAdvisorService);
-    return quizQuestionDirector.buildRandomQuestion(user.getAiQuestionTypeOnlyForReview());
+    QuizQuestionGenerator quizQuestionGenerator =
+        new QuizQuestionGenerator(entity, randomizer, modelFactoryService, aiAdvisorService);
+    return quizQuestionGenerator.buildRandomQuestion(user.getAiQuestionTypeOnlyForReview());
   }
 
   public void updateAfterRepetition(Timestamp currentUTCTimestamp, boolean successful) {

@@ -1,38 +1,22 @@
 package com.odde.doughnut.factoryServices.quizFacotries;
 
-import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.QuizQuestionEntity.QuestionType;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.entities.QuizQuestionEntity;
+import com.odde.doughnut.entities.Thing;
+import com.odde.doughnut.entities.Thingy;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.QuestionOptionsFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.QuestionRawJsonFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.SecondaryReviewPointsFactory;
-import com.odde.doughnut.models.Randomizer;
-import com.odde.doughnut.services.AiAdvisorService;
 import java.util.List;
-import java.util.Optional;
 
-public record QuizQuestionDirector(
-    ReviewPoint reviewPoint,
-    Randomizer randomizer,
-    ModelFactoryService modelFactoryService,
-    AiAdvisorService aiAdvisorService) {
+record QuizQuestionDirector(
+    QuizQuestionEntity.QuestionType questionType, QuizQuestionServant servant) {
 
-  public Optional<QuizQuestionEntity> buildQuizQuestion(QuestionType questionType) {
-    try {
-      QuizQuestionServant servant =
-          new QuizQuestionServant(
-              reviewPoint.getUser(), randomizer, modelFactoryService, aiAdvisorService);
-      QuizQuestionEntity quizQuestion =
-          buildAQuestionOfType(questionType, reviewPoint.getThing(), servant);
-      quizQuestion.setReviewPoint(reviewPoint);
-      return Optional.of(quizQuestion);
-    } catch (QuizQuestionNotPossibleException e) {
-      return Optional.empty();
-    }
+  public QuizQuestionEntity invoke(Thing thing) throws QuizQuestionNotPossibleException {
+    return buildAQuestionOfType(questionType, thing, servant);
   }
 
   private QuizQuestionEntity buildAQuestionOfType(
-      QuestionType questionType, Thing thing, QuizQuestionServant servant)
+      QuizQuestionEntity.QuestionType questionType, Thing thing, QuizQuestionServant servant)
       throws QuizQuestionNotPossibleException {
     QuizQuestionFactory quizQuestionFactory = questionType.factory.apply(thing, servant);
 
@@ -62,21 +46,5 @@ public record QuizQuestionDirector(
       quizQuestion.setCategoryLink(secondaryReviewPointsFactory.getCategoryLink());
     }
     return quizQuestion;
-  }
-
-  public QuizQuestionEntity buildRandomQuestion(Boolean aiQuestionTypeOnlyForReview) {
-    return this.randomizer
-        .shuffle(reviewPoint.availableQuestionTypes(aiQuestionTypeOnlyForReview))
-        .stream()
-        .map(this::buildQuizQuestion)
-        .flatMap(Optional::stream)
-        .findFirst()
-        .orElseGet(
-            () -> {
-              QuizQuestionEntity quizQuestion = new QuizQuestionEntity();
-              quizQuestion.setQuestionType(QuestionType.JUST_REVIEW);
-              quizQuestion.setReviewPoint(reviewPoint);
-              return quizQuestion;
-            });
   }
 }
