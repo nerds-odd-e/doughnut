@@ -95,4 +95,14 @@ public class QuizQuestionServant {
     if (parentGrandLink == null) return new NullParentGrandLinkHelper();
     return new ParentGrandLinkHelperImpl(this.user, link, parentGrandLink);
   }
+
+  List<Note> chooseBackwardPeers(Link instanceLink, Link link1) {
+    List<Note> instanceReverse = instanceLink.getLinkedSiblingsOfSameLinkType(user);
+    List<Note> specReverse = link1.getLinkedSiblingsOfSameLinkType(user);
+    List<Note> backwardPeers =
+        Stream.concat(instanceReverse.stream(), specReverse.stream())
+            .filter(n -> !(instanceReverse.contains(n) && specReverse.contains(n)))
+            .collect(Collectors.toList());
+    return chooseFillingOptionsRandomly(backwardPeers);
+  }
 }
