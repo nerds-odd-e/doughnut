@@ -8,7 +8,7 @@ public class FromDifferentPartAsQuizPresenter extends QuizQuestionWithOptionsPre
 
   public FromDifferentPartAsQuizPresenter(QuizQuestionEntity quizQuestion) {
     super(quizQuestion);
-    this.link = quizQuestion.getReviewPoint().getLink();
+    this.link = quizQuestion.getThing().getLink();
     this.categoryLink = quizQuestion.getCategoryLink();
   }
 

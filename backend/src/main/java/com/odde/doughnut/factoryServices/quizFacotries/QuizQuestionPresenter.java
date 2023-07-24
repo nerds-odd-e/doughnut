@@ -1,6 +1,7 @@
 package com.odde.doughnut.factoryServices.quizFacotries;
 
 import com.odde.doughnut.entities.PictureWithMask;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.LinksOfANote;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -12,7 +13,7 @@ public interface QuizQuestionPresenter {
 
   String mainTopic();
 
-  default LinksOfANote hintLinks() {
+  default LinksOfANote hintLinks(User user) {
     return null;
   }
 

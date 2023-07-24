@@ -1,16 +1,17 @@
 package com.odde.doughnut.factoryServices.quizFacotries.presenters;
 
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
-import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.LinksOfANote;
 import com.odde.doughnut.models.NoteViewer;
 
 public abstract class ClozeDescriptonQuizPresenter extends QuizQuestionWithOptionsPresenter {
-  protected final ReviewPoint reviewPoint;
+  protected final Note note;
 
   public ClozeDescriptonQuizPresenter(QuizQuestionEntity quizQuestion) {
     super(quizQuestion);
-    this.reviewPoint = quizQuestion.getReviewPoint();
+    this.note = quizQuestion.getThing().getNote();
   }
 
   @Override
@@ -20,12 +21,12 @@ public abstract class ClozeDescriptonQuizPresenter extends QuizQuestionWithOptio
 
   @Override
   public String instruction() {
-    return reviewPoint.getNote().getClozeDescription().cloze();
+    return note.getClozeDescription().cloze();
   }
 
   @Override
-  public LinksOfANote hintLinks() {
-    NoteViewer noteViewer = new NoteViewer(reviewPoint.getUser(), reviewPoint.getNote());
+  public LinksOfANote hintLinks(User user) {
+    NoteViewer noteViewer = new NoteViewer(user, note);
     return LinksOfANote.getOpenLinksOfANote(noteViewer);
   }
 }

@@ -13,7 +13,6 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -155,14 +154,6 @@ public class QuizQuestionEntity {
     return Arrays.stream(optionThingIds.split(","))
         .map(Integer::parseInt)
         .collect(Collectors.toList());
-  }
-
-  @JsonIgnore
-  public Stream<Integer> getRelatedReviewPoints() {
-    if (reviewPoint != null) {
-      return Stream.of(reviewPoint.getId());
-    }
-    return Stream.empty();
   }
 
   @JsonIgnore
