@@ -26,7 +26,8 @@ public class LinkSourceWithinSameLinkTypeQuizFactory
   @Override
   public List<Link> generateFillingOptions() {
     if (cachedFillingOptions == null) {
-      cachedFillingOptions = servant.chooseFromCohortAvoidSiblingsOfSameLinkType(link, answerNote);
+      cachedFillingOptions =
+          servant.chooseLinkFromCohortAvoidSiblingsOfSameLinkType(link, answerNote);
     }
     return cachedFillingOptions;
   }

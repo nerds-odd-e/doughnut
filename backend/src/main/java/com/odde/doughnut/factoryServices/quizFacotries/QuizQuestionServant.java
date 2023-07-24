@@ -111,34 +111,29 @@ public class QuizQuestionServant {
 
   public List<Note> chooseFromCohortAvoidUncles(Link link1, Note answerNote) {
     List<Note> uncles = link1.getPiblingOfTheSameLinkType(user);
-    return chooseFromCohort(
-        answerNote,
-        n -> !n.equals(answerNote) && !n.equals(link1.getSourceNote()) && !uncles.contains(n));
+    return chooseCohortAndAvoid(answerNote, link1.getSourceNote(), uncles);
   }
 
-  public List<Link> chooseFromCohortAvoidSiblingsOfSameLinkType(Link link1, Note answerNote1) {
-    List<Note> linkedSiblingsOfSameLinkType = link1.getLinkedSiblingsOfSameLinkType(user);
+  private List<Note> chooseCohortAndAvoid(
+      Note answerNote, Note noteToAvoid, List<Note> notesToAvoid) {
     return chooseFromCohort(
-            answerNote1,
-            n ->
-                !n.equals(answerNote1)
-                    && !n.equals(link1.getTargetNote())
-                    && !linkedSiblingsOfSameLinkType.contains(n)
-                    && !new NoteViewer(user, n)
-                        .linksOfTypeThroughDirect(List.of(link1.getLinkType()))
-                        .isEmpty())
-        .stream()
+        answerNote,
+        n -> !n.equals(answerNote) && !n.equals(noteToAvoid) && !notesToAvoid.contains(n));
+  }
+
+  public List<Link> chooseLinkFromCohortAvoidSiblingsOfSameLinkType(Link link1, Note answerNote1) {
+    return chooseFromCohortAvoidSiblings(link1, answerNote1).stream()
+        .filter(
+            n1 ->
+                !new NoteViewer(user, n1)
+                    .linksOfTypeThroughDirect(List.of(link1.getLinkType()))
+                    .isEmpty())
         .map(n -> n.getLinks().get(0))
         .collect(Collectors.toList());
   }
 
   public List<Note> chooseFromCohortAvoidSiblings(Link link1, Note answerNote1) {
     List<Note> linkedSiblingsOfSameLinkType = link1.getLinkedSiblingsOfSameLinkType(user);
-    return chooseFromCohort(
-        answerNote1,
-        n ->
-            !n.equals(answerNote1)
-                && !n.equals(link1.getTargetNote())
-                && !linkedSiblingsOfSameLinkType.contains(n));
+    return chooseCohortAndAvoid(answerNote1, link1.getTargetNote(), linkedSiblingsOfSameLinkType);
   }
 }
