@@ -4,6 +4,7 @@
 
 import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor"
 import PageObjects from "../page_objects"
+import { DataTable } from "@cucumber/cucumber"
 
 Then("I do these initial reviews in sequence:", (data) => {
   cy.initialReviewInSequence(data.hashes())
@@ -172,26 +173,17 @@ Then("I should see that my last answer is correct", () => {
   PageObjects.goToLastResult().expectLastAnswerToBeCorrect()
 })
 
-Then("I should see the review point info of note {string}", (noteTitle: string, data) => {
-  // PageObjects.answeredQuestionPage().findNoteTitle(noteTitle)
-  cy.findByText("Review Point:").click()
-  cy.findNoteTitle(noteTitle)
-  const attrs = data.hashes()[0]
-  for (const k in attrs) {
-    cy.contains(k).findByText(attrs[k]).should("be.visible")
-  }
-})
+Then(
+  "I should see the review point info of note {string}",
+  (noteTitle: string, data: DataTable) => {
+    PageObjects.answeredQuestionPage()
+      .showReviewPoint(noteTitle)
+      .expectReviewPointInfo(data.hashes()[0])
+  },
+)
 
 Then("choose to remove the last review point from reviews", () => {
-  cy.findByRole("button", { name: "view last result" }).click()
-  cy.findByText("Review Point:").click()
-  cy.findByRole("button", { name: "remove this note from review" }).click()
-  cy.findByRole("button", { name: "OK" }).click()
-})
-
-
-Then("I should see the review point is removed from review", () => {
-  cy.findByText("This review point has been removed from reviewing.")
+  PageObjects.goToLastResult().showReviewPoint().removeReviewPointFromReview()
 })
 
 Then("the choice {string} should be correct", (choice: string) => {
