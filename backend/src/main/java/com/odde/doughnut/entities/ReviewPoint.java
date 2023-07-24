@@ -118,11 +118,6 @@ public class ReviewPoint {
     return questionTypes;
   }
 
-  @JsonIgnore
-  public Note getHeadNote() {
-    return this.thing.getHeadNoteOfNotebook();
-  }
-
   public Timestamp calculateNextReviewAt() {
     return TimestampOperations.addHoursToTimestamp(
         getLastReviewedAt(), forgettingCurve().getRepeatInHours());

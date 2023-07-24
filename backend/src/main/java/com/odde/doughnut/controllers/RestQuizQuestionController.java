@@ -40,8 +40,10 @@ class RestQuizQuestionController {
     answerModel.save();
     AnsweredQuestion answeredQuestion =
         modelFactoryService.toAnswerModel(answer).getAnswerViewedByUser(currentUser.getEntity());
-    answerModel.updateReviewPoints(
-        testabilitySettings.getCurrentUTCTimestamp(), answeredQuestion.correct);
+    modelFactoryService
+        .toReviewPointModel(answeredQuestion.reviewPoint)
+        .updateAfterRepetition(
+            testabilitySettings.getCurrentUTCTimestamp(), answeredQuestion.correct);
     return answeredQuestion;
   }
 }

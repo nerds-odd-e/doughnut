@@ -27,13 +27,6 @@ import org.apache.logging.log4j.util.Strings;
 @Table(name = "quiz_question")
 public class QuizQuestionEntity {
 
-  public NotePositionViewedByUser getNotebookPosition(User user) {
-    if (getQuestionType() == QuestionType.JUST_REVIEW || reviewPoint == null) {
-      return null;
-    }
-    return new NoteViewer(user, getReviewPoint().getHeadNote()).jsonNotePosition(true);
-  }
-
   public enum QuestionType {
     JUST_REVIEW(0, null, JustReviewQuizPresenter::new),
     CLOZE_SELECTION(1, ClozeTitleSelectionQuizFactory::new, ClozeTitleSelectionQuizPresenter::new),
@@ -175,5 +168,13 @@ public class QuizQuestionEntity {
   @JsonIgnore
   ReviewPoint getReviewPointFor(UserModel userModel) {
     return userModel.getReviewPointFor(thing);
+  }
+
+  @JsonIgnore
+  public NotePositionViewedByUser getNotebookPosition(User user) {
+    if (getQuestionType() == QuestionType.JUST_REVIEW || thing == null) {
+      return null;
+    }
+    return new NoteViewer(user, thing.getHeadNoteOfNotebook()).jsonNotePosition(true);
   }
 }

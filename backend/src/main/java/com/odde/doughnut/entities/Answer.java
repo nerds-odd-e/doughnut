@@ -67,7 +67,7 @@ public class Answer {
   @JsonIgnore
   private boolean isCorrect() {
     if (question.getQuestionType() == QuizQuestionEntity.QuestionType.SPELLING) {
-      return question.getReviewPoint().getNote().matchAnswer(getSpellingAnswer());
+      return question.getThing().getNote().matchAnswer(getSpellingAnswer());
     }
     if (question.getQuestionType() == QuizQuestionEntity.QuestionType.JUST_REVIEW) {
       return Objects.equals(getSpellingAnswer(), "yes");
