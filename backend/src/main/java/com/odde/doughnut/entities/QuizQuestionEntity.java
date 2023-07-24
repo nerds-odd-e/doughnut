@@ -77,12 +77,6 @@ public class QuizQuestionEntity {
   private Integer id;
 
   @ManyToOne(cascade = CascadeType.DETACH)
-  @JoinColumn(name = "review_point_id", referencedColumnName = "id")
-  @Getter
-  @Setter
-  private ReviewPoint reviewPoint;
-
-  @ManyToOne(cascade = CascadeType.DETACH)
   @JoinColumn(name = "thing_id", referencedColumnName = "id")
   @Getter
   @Setter

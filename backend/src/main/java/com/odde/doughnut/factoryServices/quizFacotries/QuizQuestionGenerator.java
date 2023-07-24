@@ -20,7 +20,6 @@ public record QuizQuestionGenerator(
               reviewPoint.getUser(), randomizer, modelFactoryService, aiAdvisorService);
       QuizQuestionEntity quizQuestion =
           new QuizQuestionDirector(questionType, servant).invoke(reviewPoint.getThing());
-      quizQuestion.setReviewPoint(reviewPoint);
       return Optional.of(quizQuestion);
     } catch (QuizQuestionNotPossibleException e) {
       return Optional.empty();
@@ -39,7 +38,6 @@ public record QuizQuestionGenerator(
               QuizQuestionEntity quizQuestion = new QuizQuestionEntity();
               quizQuestion.setQuestionType(QuestionType.JUST_REVIEW);
               quizQuestion.setThing(reviewPoint.getThing());
-              quizQuestion.setReviewPoint(reviewPoint);
               return quizQuestion;
             });
   }

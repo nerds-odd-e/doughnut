@@ -8,7 +8,7 @@ public class LinkSourceQuizPresenter extends QuizQuestionWithOptionsPresenter {
 
   public LinkSourceQuizPresenter(QuizQuestionEntity quizQuestion) {
     super(quizQuestion);
-    this.link = quizQuestion.getReviewPoint().getLink();
+    this.link = quizQuestion.getThing().getLink();
   }
 
   @Override

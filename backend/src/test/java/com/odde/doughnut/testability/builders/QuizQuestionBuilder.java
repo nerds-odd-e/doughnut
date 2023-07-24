@@ -16,7 +16,6 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
 
   public QuizQuestionBuilder of(
       QuizQuestionEntity.QuestionType questionType, ReviewPoint reviewPoint) {
-    entity.setReviewPoint(reviewPoint);
     entity.setThing(reviewPoint.getThing());
     entity.setQuestionType(questionType);
     return this;

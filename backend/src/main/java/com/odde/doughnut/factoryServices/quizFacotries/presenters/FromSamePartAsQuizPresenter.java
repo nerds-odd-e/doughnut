@@ -8,7 +8,7 @@ public class FromSamePartAsQuizPresenter extends QuizQuestionWithOptionsPresente
 
   public FromSamePartAsQuizPresenter(QuizQuestionEntity quizQuestion) {
     super(quizQuestion);
-    this.link = quizQuestion.getReviewPoint().getLink();
+    this.link = quizQuestion.getThing().getLink();
     this.categoryLink = quizQuestion.getCategoryLink();
   }
 

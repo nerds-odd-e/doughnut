@@ -1,7 +1,7 @@
 package com.odde.doughnut.factoryServices.quizFacotries.presenters;
 
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
-import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import java.util.List;
@@ -9,16 +9,16 @@ import java.util.stream.Stream;
 
 public class PictureSelectionQuizPresenter extends QuizQuestionWithOptionsPresenter {
 
-  private ReviewPoint reviewPoint;
+  private Note note;
 
   public PictureSelectionQuizPresenter(QuizQuestionEntity quizQuestion) {
     super(quizQuestion);
-    this.reviewPoint = quizQuestion.getReviewPoint();
+    this.note = quizQuestion.getThing().getNote();
   }
 
   @Override
   public String mainTopic() {
-    return reviewPoint.getNote().getTitle();
+    return note.getTitle();
   }
 
   @Override
