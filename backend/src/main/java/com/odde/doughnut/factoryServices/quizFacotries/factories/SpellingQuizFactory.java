@@ -9,14 +9,12 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 
 public class SpellingQuizFactory implements QuizQuestionFactory {
 
-  protected final ReviewPoint reviewPoint;
   protected final Note answerNote;
   protected QuizQuestionServant servant;
 
   public SpellingQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
-    this.reviewPoint = reviewPoint;
     this.servant = servant;
-    this.answerNote = this.reviewPoint.getNote();
+    this.answerNote = reviewPoint.getNote();
   }
 
   @Override
@@ -27,11 +25,10 @@ public class SpellingQuizFactory implements QuizQuestionFactory {
   }
 
   private boolean needSpellingQuiz() {
-    Note note = reviewPoint.getNote();
-    if (note.isDescriptionBlankHtml()) {
+    if (answerNote.isDescriptionBlankHtml()) {
       return false;
     }
-    ReviewSetting reviewSetting = note.getMasterReviewSetting();
+    ReviewSetting reviewSetting = answerNote.getMasterReviewSetting();
     return reviewSetting != null && reviewSetting.getRememberSpelling();
   }
 }

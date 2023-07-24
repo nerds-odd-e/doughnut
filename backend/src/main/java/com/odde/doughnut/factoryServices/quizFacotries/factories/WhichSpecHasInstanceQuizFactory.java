@@ -14,12 +14,10 @@ public class WhichSpecHasInstanceQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
   private Link cachedInstanceLink = null;
   private List<Note> cachedFillingOptions = null;
-  private final ReviewPoint reviewPoint;
   private final Link link;
   private final QuizQuestionServant servant;
 
   public WhichSpecHasInstanceQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
-    this.reviewPoint = reviewPoint;
     this.link = reviewPoint.getLink();
     this.servant = servant;
   }

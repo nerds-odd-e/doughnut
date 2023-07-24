@@ -108,4 +108,11 @@ public class QuizQuestionServant {
     UserModel userModel = modelFactoryService.toUserModel(user);
     return userModel.getReviewPointFor(thing);
   }
+
+  public List<Note> chooseFromCohortAvoidUncles(Link link1, Note answerNote) {
+    List<Note> uncles = link1.getPiblingOfTheSameLinkType(user);
+    return chooseFromCohort(
+        answerNote,
+        n -> !n.equals(answerNote) && !n.equals(link1.getSourceNote()) && !uncles.contains(n));
+  }
 }
