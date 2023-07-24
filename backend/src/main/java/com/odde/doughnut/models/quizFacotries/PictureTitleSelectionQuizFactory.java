@@ -9,7 +9,7 @@ public class PictureTitleSelectionQuizFactory extends ClozeTitleSelectionQuizFac
 
   @Override
   public void validatePossibility() throws QuizQuestionNotPossibleException {
-    if (reviewPoint.getNote().getPictureWithMask().isEmpty()) {
+    if (thing.getNote().getPictureWithMask().isEmpty()) {
       throw new QuizQuestionNotPossibleException();
     }
   }

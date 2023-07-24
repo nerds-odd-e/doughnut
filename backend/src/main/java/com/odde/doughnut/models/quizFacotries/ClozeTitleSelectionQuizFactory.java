@@ -7,14 +7,14 @@ import java.util.List;
 
 public class ClozeTitleSelectionQuizFactory implements QuestionOptionsFactory, QuizQuestionFactory {
 
-  protected final Thing reviewPoint;
+  protected final Thing thing;
   protected final Note answerNote;
   protected QuizQuestionServant servant;
 
   public ClozeTitleSelectionQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
-    this.reviewPoint = reviewPoint.getThing();
+    this.thing = reviewPoint.getThing();
     this.servant = servant;
-    this.answerNote = this.reviewPoint.getNote();
+    this.answerNote = this.thing.getNote();
   }
 
   @Override
@@ -29,7 +29,7 @@ public class ClozeTitleSelectionQuizFactory implements QuestionOptionsFactory, Q
 
   @Override
   public void validatePossibility() throws QuizQuestionNotPossibleException {
-    if (reviewPoint.isDescriptionBlankHtml()) {
+    if (thing.isDescriptionBlankHtml()) {
       throw new QuizQuestionNotPossibleException();
     }
   }
