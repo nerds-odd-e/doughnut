@@ -35,13 +35,6 @@ public class ReviewPoint {
     return entity;
   }
 
-  public QuizQuestionEntity createAQuizQuestionOfType(QuestionType questionType) {
-    QuizQuestionEntity quizQuestion = new QuizQuestionEntity();
-    quizQuestion.setReviewPoint(this);
-    quizQuestion.setQuestionType(questionType);
-    return quizQuestion;
-  }
-
   @Override
   public String toString() {
     return "ReviewPoint{" + "id=" + id + '}';

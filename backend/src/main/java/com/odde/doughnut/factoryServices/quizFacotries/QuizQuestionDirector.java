@@ -27,13 +27,13 @@ public record QuizQuestionDirector(
     }
   }
 
-  public QuizQuestionEntity buildAQuestionOfType(QuestionType questionType)
+  private QuizQuestionEntity buildAQuestionOfType(QuestionType questionType)
       throws QuizQuestionNotPossibleException {
     QuizQuestionFactory quizQuestionFactory = buildQuizQuestionFactory(questionType);
 
     quizQuestionFactory.validatePossibility();
 
-    QuizQuestionEntity quizQuestion = reviewPoint.createAQuizQuestionOfType(questionType);
+    QuizQuestionEntity quizQuestion = createAQuizQuestionOfType(questionType, reviewPoint);
 
     if (quizQuestionFactory instanceof QuestionRawJsonFactory rawJsonFactory) {
       rawJsonFactory.generateRawJsonQuestion(quizQuestion);
@@ -72,6 +72,14 @@ public record QuizQuestionDirector(
         .map(this::buildQuizQuestion)
         .flatMap(Optional::stream)
         .findFirst()
-        .orElseGet(() -> reviewPoint.createAQuizQuestionOfType(QuestionType.JUST_REVIEW));
+        .orElseGet(() -> createAQuizQuestionOfType(QuestionType.JUST_REVIEW, reviewPoint));
+  }
+
+  private QuizQuestionEntity createAQuizQuestionOfType(
+      QuestionType questionType, ReviewPoint reviewPoint) {
+    QuizQuestionEntity quizQuestion = new QuizQuestionEntity();
+    quizQuestion.setReviewPoint(reviewPoint);
+    quizQuestion.setQuestionType(questionType);
+    return quizQuestion;
   }
 }
