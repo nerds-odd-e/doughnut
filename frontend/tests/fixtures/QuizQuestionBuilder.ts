@@ -12,7 +12,6 @@ class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
         display: "question",
       },
     ],
-    viceReviewPointIdList: [],
     description: "answer",
     mainTopic: "",
     hintLinks: {

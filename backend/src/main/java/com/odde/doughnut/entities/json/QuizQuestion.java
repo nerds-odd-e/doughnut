@@ -23,8 +23,6 @@ public class QuizQuestion {
 
   @Getter public LinksOfANote hintLinks;
 
-  @Getter public List<Integer> viceReviewPointIdList;
-
   @Getter @Nullable public NotePositionViewedByUser notebookPosition;
 
   @Getter public List<Option> options;

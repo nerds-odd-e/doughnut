@@ -11,7 +11,6 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -89,23 +88,6 @@ class RestQuizQuestionControllerTests {
       assertThat(reviewPoint.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
       assertThat(
           reviewPoint.getLastReviewedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
-    }
-
-    @Test
-    void shouldIncreaseTheViceReviewPointToo() {
-      Note note2 = makeMe.aNote().please();
-      ReviewPoint anotherReviewPoint = makeMe.aReviewPointFor(note2).by(currentUser).please();
-      quizQuestionEntity.setViceReviewPoints(List.of(anotherReviewPoint));
-      makeMe.refresh(anotherReviewPoint);
-      makeMe.refresh(note2);
-
-      Integer oldForgettingCurveIndex = anotherReviewPoint.getForgettingCurveIndex();
-      Integer oldRepetitionCount = anotherReviewPoint.getRepetitionCount();
-      AnsweredQuestion answerResult = controller.answerQuiz(quizQuestionEntity, answer);
-      assertTrue(answerResult.correct);
-      assertThat(
-          anotherReviewPoint.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
-      assertThat(anotherReviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
     }
 
     @Test

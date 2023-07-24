@@ -29,7 +29,7 @@ import org.apache.logging.log4j.util.Strings;
 public class QuizQuestionEntity {
 
   public NotePositionViewedByUser getNotebookPosition(User user) {
-    if (getQuestionType() == QuestionType.JUST_REVIEW || getReviewPoint() == null) {
+    if (getQuestionType() == QuestionType.JUST_REVIEW || reviewPoint == null) {
       return null;
     }
     return new NoteViewer(user, getReviewPoint().getHeadNote()).jsonNotePosition(true);
@@ -189,10 +189,9 @@ public class QuizQuestionEntity {
   @JsonIgnore
   public Stream<Integer> getRelatedReviewPoints() {
     Stream<Integer> reviewPointStream = getViceReviewPointIdList().stream();
-    ReviewPoint reviewPoint = getReviewPoint();
     if (reviewPoint != null) {
-      return Stream.concat(reviewPointStream, Stream.of(reviewPoint.getId()));
+      return Stream.of(reviewPoint.getId());
     }
-    return reviewPointStream;
+    return Stream.empty();
   }
 }

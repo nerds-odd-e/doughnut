@@ -112,7 +112,6 @@ public class ModelFactoryService {
         presenter.instruction(),
         presenter.mainTopic(),
         presenter.hintLinks(),
-        quizQuestionEntity.getViceReviewPointIdList(),
         quizQuestionEntity.getNotebookPosition(user),
         presenter.getOptions(this),
         presenter.pictureWithMask());

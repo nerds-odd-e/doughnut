@@ -147,7 +147,6 @@ declare namespace Generated {
         description: string;
         mainTopic: string;
         hintLinks: LinksOfANote;
-        viceReviewPointIdList: number[];
         notebookPosition?: NotePositionViewedByUser;
         options: Option[];
         pictureWithMask?: PictureWithMask;
