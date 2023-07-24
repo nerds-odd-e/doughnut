@@ -75,4 +75,9 @@ public class Thing {
 
     return result.getNotebook().getHeadNote();
   }
+
+  @JsonIgnore
+  public boolean isDescriptionBlankHtml() {
+    return getNote().isDescriptionBlankHtml();
+  }
 }
