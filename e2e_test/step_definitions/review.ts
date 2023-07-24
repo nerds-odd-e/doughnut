@@ -62,12 +62,6 @@ Then(
   },
 )
 
-Then("choose to remove it from reviews", () => {
-  cy.findByText("Review Point:").click()
-  cy.findByRole("button", { name: "remove this note from review" }).click()
-  cy.findByRole("button", { name: "OK" }).click()
-})
-
 Then("it should move to review page", () => {
   cy.url().should("eq", Cypress.config().baseUrl + "/reviews")
 })
@@ -109,11 +103,6 @@ Then("I set the level of {string} to be {int}", (noteTitle: string, level: numbe
 Then("I have selected the choice {string}", (choice: string) => {
   cy.formField(choice).check()
   cy.findByRole("button", { name: "Keep for repetition" }).click()
-})
-
-Then("choose to remove it fromm reviews", () => {
-  cy.get("#more-action-for-repeat").click()
-  cy.findByRole("button", { name: "Remove This Note from Review" }).click()
 })
 
 Then("I choose yes I remember", () => {
@@ -161,12 +150,6 @@ Then("I choose answer {string}", (noteTitle: string) => {
   cy.findByRole("button", { name: noteTitle }).click()
 })
 
-Then("I should see that my answer is correct", () => {
-  // checking the css name isn't the best solution
-  // but the text changes
-  cy.get(".alert-success").should("exist")
-})
-
 Then("I should see the information of note {string}", (noteTitle: string) => {
   cy.findNoteTitle(noteTitle)
 })
@@ -185,19 +168,30 @@ Then("The randomizer always choose the last", () => {
   cy.testability().randomizerAlwaysChooseLast()
 })
 
+Then("I should see that my last answer is correct", () => {
+  cy.findByRole("button", { name: "view last result" }).click()
+  // checking the css name isn't the best solution
+  // but the text changes
+  cy.get(".alert-success").should("exist")
+})
+
 Then("I should see the review point info of note {string}", (noteTitle: string, data) => {
+  // PageObjects.answeredQuestionPage().findNoteTitle(noteTitle)
   cy.findByText("Review Point:").click()
   cy.findNoteTitle(noteTitle)
-  cy.findByRole("button", { name: "i..." }).click({ force: true })
   const attrs = data.hashes()[0]
   for (const k in attrs) {
     cy.contains(k).findByText(attrs[k]).should("be.visible")
   }
 })
 
-Then("I view the last result", () => {
+Then("choose to remove the last review point from reviews", () => {
   cy.findByRole("button", { name: "view last result" }).click()
+  cy.findByText("Review Point:").click()
+  cy.findByRole("button", { name: "remove this note from review" }).click()
+  cy.findByRole("button", { name: "OK" }).click()
 })
+
 
 Then("I should see the review point is removed from review", () => {
   cy.findByText("This review point has been removed from reviewing.")
