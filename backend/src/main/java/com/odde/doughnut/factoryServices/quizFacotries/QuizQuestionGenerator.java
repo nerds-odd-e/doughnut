@@ -38,6 +38,7 @@ public record QuizQuestionGenerator(
             () -> {
               QuizQuestionEntity quizQuestion = new QuizQuestionEntity();
               quizQuestion.setQuestionType(QuestionType.JUST_REVIEW);
+              quizQuestion.setThing(reviewPoint.getThing());
               quizQuestion.setReviewPoint(reviewPoint);
               return quizQuestion;
             });

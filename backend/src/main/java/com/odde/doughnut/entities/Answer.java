@@ -58,7 +58,7 @@ public class Answer {
     answerResult.answerId = getId();
     answerResult.correct = isCorrect();
     answerResult.answerDisplay = getAnswerDisplay(modelFactoryService);
-    answerResult.reviewPoint = getQuestion().getReviewPoint();
+    answerResult.reviewPoint = question.getReviewPointFor(modelFactoryService.toUserModel(user));
     QuizQuestionEntity quizQuestion = getQuestion();
     answerResult.quizQuestion = modelFactoryService.toQuizQuestion(quizQuestion, user);
     return answerResult;

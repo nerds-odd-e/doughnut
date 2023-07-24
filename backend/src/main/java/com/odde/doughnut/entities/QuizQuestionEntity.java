@@ -7,6 +7,7 @@ import com.odde.doughnut.factoryServices.quizFacotries.factories.*;
 import com.odde.doughnut.factoryServices.quizFacotries.presenters.*;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.Randomizer;
+import com.odde.doughnut.models.UserModel;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.function.BiFunction;
@@ -169,5 +170,10 @@ public class QuizQuestionEntity {
       return Stream.of(reviewPoint.getId());
     }
     return Stream.empty();
+  }
+
+  @JsonIgnore
+  ReviewPoint getReviewPointFor(UserModel userModel) {
+    return userModel.getReviewPointFor(thing);
   }
 }
