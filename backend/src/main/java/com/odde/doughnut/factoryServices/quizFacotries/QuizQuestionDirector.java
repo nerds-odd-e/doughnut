@@ -62,7 +62,7 @@ public record QuizQuestionDirector(
     QuizQuestionServant servant =
         new QuizQuestionServant(
             reviewPoint.getUser(), randomizer, modelFactoryService, aiAdvisorService);
-    return questionType.factory.apply(reviewPoint, servant);
+    return questionType.factory.apply(reviewPoint.getThing(), servant);
   }
 
   public QuizQuestionEntity buildRandomQuestion(Boolean aiQuestionTypeOnlyForReview) {

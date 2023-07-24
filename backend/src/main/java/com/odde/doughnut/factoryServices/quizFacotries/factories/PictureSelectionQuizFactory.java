@@ -1,7 +1,7 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
@@ -11,8 +11,8 @@ public class PictureSelectionQuizFactory implements QuizQuestionFactory, Questio
   private final Note answerNote;
   private QuizQuestionServant servant;
 
-  public PictureSelectionQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
-    this.answerNote = reviewPoint.getNote();
+  public PictureSelectionQuizFactory(Thing thing, QuizQuestionServant servant) {
+    this.answerNote = thing.getNote();
     this.servant = servant;
   }
 

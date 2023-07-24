@@ -1,7 +1,6 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
@@ -14,8 +13,8 @@ public class ClozeTitleSelectionQuizFactory implements QuestionOptionsFactory, Q
   protected final Note answerNote;
   protected QuizQuestionServant servant;
 
-  public ClozeTitleSelectionQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
-    this.thing = reviewPoint.getThing();
+  public ClozeTitleSelectionQuizFactory(Thing thing, QuizQuestionServant servant) {
+    this.thing = thing;
     this.servant = servant;
     this.answerNote = this.thing.getNote();
   }

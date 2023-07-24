@@ -2,6 +2,7 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.Collections;
@@ -12,8 +13,8 @@ public class DescriptionLinkTargetQuizFactory extends LinkTargetQuizFactory
 
   private final QuizQuestionServant servant;
 
-  public DescriptionLinkTargetQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
-    super(reviewPoint, servant);
+  public DescriptionLinkTargetQuizFactory(Thing thing, QuizQuestionServant servant) {
+    super(thing, servant);
     this.servant = servant;
   }
 

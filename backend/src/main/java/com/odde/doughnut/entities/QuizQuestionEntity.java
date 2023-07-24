@@ -59,12 +59,12 @@ public class QuizQuestionEntity {
     AI_QUESTION(12, AiQuestionFactory::new, AiQuestionPresenter::new);
 
     public final Integer id;
-    public final BiFunction<ReviewPoint, QuizQuestionServant, QuizQuestionFactory> factory;
+    public final BiFunction<Thing, QuizQuestionServant, QuizQuestionFactory> factory;
     public final Function<QuizQuestionEntity, QuizQuestionPresenter> presenter;
 
     QuestionType(
         Integer id,
-        BiFunction<ReviewPoint, QuizQuestionServant, QuizQuestionFactory> factory,
+        BiFunction<Thing, QuizQuestionServant, QuizQuestionFactory> factory,
         Function<QuizQuestionEntity, QuizQuestionPresenter> presenter) {
       this.id = id;
       this.factory = factory;

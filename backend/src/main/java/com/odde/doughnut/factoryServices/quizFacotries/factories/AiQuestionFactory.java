@@ -1,7 +1,6 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.QuizQuestionEntity;
-import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.entities.json.AIGeneratedQuestion;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
@@ -12,8 +11,8 @@ public class AiQuestionFactory implements QuizQuestionFactory, QuestionRawJsonFa
   private Thing thing;
   private QuizQuestionServant servant;
 
-  public AiQuestionFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
-    this.thing = reviewPoint.getThing();
+  public AiQuestionFactory(Thing thing, QuizQuestionServant servant) {
+    this.thing = thing;
     this.servant = servant;
   }
 

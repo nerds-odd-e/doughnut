@@ -3,6 +3,7 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.Collections;
@@ -17,8 +18,8 @@ public class WhichSpecHasInstanceQuizFactory
   private final Link link;
   private final QuizQuestionServant servant;
 
-  public WhichSpecHasInstanceQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
-    this.link = reviewPoint.getLink();
+  public WhichSpecHasInstanceQuizFactory(Thing thing, QuizQuestionServant servant) {
+    this.link = thing.getLink();
     this.servant = servant;
   }
 
