@@ -169,6 +169,10 @@ Then("The randomizer always choose the last", () => {
   cy.testability().randomizerAlwaysChooseLast()
 })
 
+Then("I should see that my answer is correct", () => {
+  PageObjects.answeredQuestionPage().expectLastAnswerToBeCorrect()
+})
+
 Then("I should see that my last answer is correct", () => {
   PageObjects.goToLastResult().expectLastAnswerToBeCorrect()
 })
