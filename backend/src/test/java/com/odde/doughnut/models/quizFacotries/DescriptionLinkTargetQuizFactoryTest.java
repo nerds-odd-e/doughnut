@@ -2,7 +2,6 @@ package com.odde.doughnut.models.quizFacotries;
 
 import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.DESCRIPTION_LINK_TARGET;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -79,22 +78,6 @@ class DescriptionLinkTargetQuizFactoryTest {
     assertThat(
         buildQuestion().getDescription(),
         containsString("<mark title='Hidden text that is matching the answer'>[...]</mark> /."));
-  }
-
-  @Nested
-  class WhenThereIsReviewPointForTheSourceNote {
-    ReviewPoint sourceReviewPoint;
-
-    @BeforeEach
-    void setup() {
-      sourceReviewPoint = makeMe.aReviewPointFor(source).by(userModel).please();
-      makeMe.refresh(userModel.getEntity());
-    }
-
-    @Test
-    void shouldIncludeRightAnswers() {
-      assertThat(buildQuestion().getViceReviewPointIdList(), contains(sourceReviewPoint.getId()));
-    }
   }
 
   @Nested

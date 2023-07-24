@@ -2,11 +2,9 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,18 +35,6 @@ public class WhichSpecHasInstanceQuizFactory
     Link instanceLink = getInstanceLink();
     if (instanceLink == null) return null;
     return instanceLink.getSourceNote();
-  }
-
-  @Override
-  public List<ReviewPoint> getViceReviewPoints() {
-    Link instanceLink = getInstanceLink();
-    if (instanceLink != null) {
-      ReviewPoint reviewPointFor = servant.getReviewPoint(instanceLink.getThing());
-      if (reviewPointFor != null) {
-        return List.of(reviewPointFor);
-      }
-    }
-    return Collections.emptyList();
   }
 
   private Link getInstanceLink() {

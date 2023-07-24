@@ -128,19 +128,6 @@ public class QuizQuestionEntity {
   @Setter
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
-  @JsonIgnore
-  public void setViceReviewPoints(List<ReviewPoint> reviewPoints) {
-    if (reviewPoints == null) {
-      viceReviewPointIds = "";
-      return;
-    }
-    viceReviewPointIds =
-        reviewPoints.stream()
-            .map(ReviewPoint::getId)
-            .map(Object::toString)
-            .collect(Collectors.joining(","));
-  }
-
   public void setQuestionType(QuestionType questionType) {
     this.questionTypeId = questionType.id;
   }
@@ -148,14 +135,6 @@ public class QuizQuestionEntity {
   @JsonIgnore
   public QuestionType getQuestionType() {
     return QuestionType.fromId(questionTypeId);
-  }
-
-  @JsonIgnore
-  public List<Integer> getViceReviewPointIdList() {
-    if (Strings.isBlank(viceReviewPointIds)) return List.of();
-    return Arrays.stream(viceReviewPointIds.split(","))
-        .map(Integer::valueOf)
-        .collect(Collectors.toList());
   }
 
   @JsonIgnore
@@ -188,7 +167,6 @@ public class QuizQuestionEntity {
 
   @JsonIgnore
   public Stream<Integer> getRelatedReviewPoints() {
-    Stream<Integer> reviewPointStream = getViceReviewPointIdList().stream();
     if (reviewPoint != null) {
       return Stream.of(reviewPoint.getId());
     }

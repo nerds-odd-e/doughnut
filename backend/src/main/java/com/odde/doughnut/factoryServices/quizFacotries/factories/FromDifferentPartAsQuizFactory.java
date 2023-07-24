@@ -49,9 +49,4 @@ public class FromDifferentPartAsQuizFactory
         .map(Link::getSourceNote)
         .orElse(null);
   }
-
-  @Override
-  public List<ReviewPoint> getViceReviewPoints() {
-    return servant.getReviewPoints(getCategoryLink());
-  }
 }

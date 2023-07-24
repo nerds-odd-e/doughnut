@@ -180,24 +180,6 @@ class FromDifferentPartAsQuizFactoryTest {
         }
 
         @Nested
-        class WhenThereIsReviewPointOfTheCategory {
-          ReviewPoint additionalReviewPoint;
-
-          @BeforeEach
-          void setup() {
-            additionalReviewPoint =
-                makeMe.aReviewPointFor(subjectivePerspective).by(userModel).please();
-          }
-
-          @Test
-          void shouldInclude2ViceReviewPoints() {
-            QuizQuestion quizQuestion = buildQuestion();
-            assertThat(
-                quizQuestion.getViceReviewPointIdList(), contains(additionalReviewPoint.getId()));
-          }
-        }
-
-        @Nested
         class Answer {
 
           @Test

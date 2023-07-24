@@ -3,8 +3,6 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,19 +37,6 @@ public class FromSamePartAsQuizFactory
   public Note generateAnswer() {
     if (getAnswerLink() == null) return null;
     return getAnswerLink().getSourceNote();
-  }
-
-  @Override
-  public List<ReviewPoint> getViceReviewPoints() {
-    Link answerLink = this.getAnswerLink();
-    if (answerLink == null) {
-      return Collections.emptyList();
-    }
-    ReviewPoint answerLinkReviewPoint = servant.getReviewPoint(answerLink.getThing());
-    List<ReviewPoint> result = new ArrayList<>();
-    result.add(answerLinkReviewPoint);
-    result.addAll(servant.getReviewPoints(parentGrandLinkHelper.getParentGrandLink()));
-    return result;
   }
 
   @Override

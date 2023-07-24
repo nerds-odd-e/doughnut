@@ -3,7 +3,6 @@ package com.odde.doughnut.models.quizFacotries;
 import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.FROM_SAME_PART_AS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.in;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
@@ -113,25 +112,6 @@ class FromSamePartAsQuizFactoryTest {
           assertThat(pretty.getTitle(), in(strings));
           assertThat(tall.getTitle(), in(strings));
           assertThat(ugly.getTitle(), not(in(strings)));
-        }
-
-        @Nested
-        class WhenThereIsReviewPointOfTheCategory {
-          ReviewPoint additionalReviewPoint;
-
-          @BeforeEach
-          void setup() {
-            additionalReviewPoint =
-                makeMe.aReviewPointFor(subjectivePerspective).by(userModel).please();
-          }
-
-          @Test
-          void shouldInclude2ViceReviewPoints() {
-            QuizQuestion quizQuestion = buildQuestion();
-            List<Integer> viceReviewPointIds = quizQuestion.getViceReviewPointIdList();
-            assertThat(viceReviewPointIds, hasSize(2));
-            assertThat(additionalReviewPoint.getId(), in(viceReviewPointIds));
-          }
         }
       }
     }

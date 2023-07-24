@@ -42,7 +42,6 @@ record QuizQuestionDirector(
     }
 
     if (quizQuestionFactory instanceof SecondaryReviewPointsFactory secondaryReviewPointsFactory) {
-      quizQuestion.setViceReviewPoints(secondaryReviewPointsFactory.getViceReviewPoints());
       quizQuestion.setCategoryLink(secondaryReviewPointsFactory.getCategoryLink());
     }
     return quizQuestion;
