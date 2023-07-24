@@ -115,4 +115,20 @@ public class QuizQuestionServant {
         answerNote,
         n -> !n.equals(answerNote) && !n.equals(link1.getSourceNote()) && !uncles.contains(n));
   }
+
+  public List<Link> chooseFromCohortAvoidSiblingsOfSameLinkType(Link link1, Note answerNote1) {
+    List<Note> linkedSiblingsOfSameLinkType = link1.getLinkedSiblingsOfSameLinkType(user);
+    return chooseFromCohort(
+            answerNote1,
+            n ->
+                !n.equals(answerNote1)
+                    && !n.equals(link1.getTargetNote())
+                    && !linkedSiblingsOfSameLinkType.contains(n)
+                    && !new NoteViewer(user, n)
+                        .linksOfTypeThroughDirect(List.of(link1.getLinkType()))
+                        .isEmpty())
+        .stream()
+        .map(n -> n.getLinks().get(0))
+        .collect(Collectors.toList());
+  }
 }
