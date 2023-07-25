@@ -6,24 +6,11 @@ import helper from "../helpers";
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
-const goodQuestion: Generated.AIGeneratedQuestion = {
-  stem: "any question?",
-  correctChoiceIndex: 0,
-  choices: ["option A", "option B", "option C"],
-};
-
-const betterQuestion: Generated.AIGeneratedQuestion = {
-  stem: "is it raining?",
-  correctChoiceIndex: 1,
-  choices: ["yes", "No"],
-};
-
 const note = makeMe.aNoteRealm.please();
 const createWrapper = async () => {
   const quizQuestion = makeMe.aQuizQuestion
     .withQuestionType("AI_QUESTION")
     .withQuestionStem("any question?")
-    .withRawJsonQuestion(JSON.stringify(goodQuestion))
     .withChoices(["option A", "option B", "option C"])
     .please();
   helper.apiMock
@@ -51,7 +38,6 @@ describe("NoteQuestionDialog", () => {
     const quizQuestion = makeMe.aQuizQuestion
       .withQuestionType("AI_QUESTION")
       .withQuestionStem("is it raining?")
-      .withRawJsonQuestion(JSON.stringify(betterQuestion))
       .please();
     helper.apiMock
       .expectingPost(`/api/ai/generate-question?note=${note.id}`)

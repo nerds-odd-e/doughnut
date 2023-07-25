@@ -4,7 +4,6 @@ import generateId from "./generateId";
 class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
   quizQuestion: Generated.QuizQuestion = {
     quizQuestionId: generateId(),
-    rawJsonQuestion: "",
     questionType: "JUST_REVIEW",
     choices: [
       {
@@ -30,11 +29,6 @@ class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
 
   withQuestionStem(stem: string) {
     this.quizQuestion.description = stem;
-    return this;
-  }
-
-  withRawJsonQuestion(json: string) {
-    this.quizQuestion.rawJsonQuestion = json;
     return this;
   }
 
