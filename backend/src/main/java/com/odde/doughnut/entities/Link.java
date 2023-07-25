@@ -220,13 +220,6 @@ public class Link extends Thingy {
         Collections.unmodifiableMap(
             Arrays.stream(values()).collect(Collectors.toMap(x -> x.id, x -> x)));
 
-    public static Stream<LinkType> openTypes() {
-      final Link.LinkType[] openTypes = {
-        Link.LinkType.TAGGED_BY, Link.LinkType.INSTANCE, Link.LinkType.PART
-      };
-      return Arrays.stream(openTypes);
-    }
-
     public static LinkType fromLabel(String text) {
       for (LinkType b : LinkType.values()) {
         if (b.label.equalsIgnoreCase(text)) {

@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.LinkViewed;
-import com.odde.doughnut.entities.json.LinksOfANote;
 import com.odde.doughnut.entities.json.NotePositionViewedByUser;
 import com.odde.doughnut.entities.json.NoteRealm;
 import java.util.Arrays;
@@ -28,7 +27,7 @@ public class NoteViewer {
   public NoteRealm toJsonObject() {
     NoteRealm nvb = new NoteRealm();
     nvb.setId(note.getId());
-    nvb.setLinks(LinksOfANote.getLinksOfANote(this));
+    nvb.setLinks(getAllLinks());
     nvb.setChildren(note.getChildren());
     nvb.setNote(note);
 

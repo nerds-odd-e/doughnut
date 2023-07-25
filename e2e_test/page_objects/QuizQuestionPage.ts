@@ -1,5 +1,5 @@
 const currentQuestion = (stem?: string) => {
-  const question = () => (stem ? cy.findByText(stem).parent().parent() : cy)
+  const question = () => (stem ? cy.findByText(stem).parent() : cy)
   const getChoice = (choice: string) => question().findByText(choice)
   return {
     isDisabled() {

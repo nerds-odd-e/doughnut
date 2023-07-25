@@ -82,10 +82,6 @@ declare namespace Generated {
         reverse: Link[];
     }
 
-    interface LinksOfANote {
-        links: { [P in LinkType]?: LinkViewed };
-    }
-
     interface NoteCreation {
         linkTypeToParent: LinkType;
         textContent: TextContent;
@@ -141,7 +137,6 @@ declare namespace Generated {
         questionType: QuestionType;
         description: string;
         mainTopic: string;
-        hintLinks: { [P in LinkType]?: LinkViewed };
         notebookPosition?: NotePositionViewedByUser;
         choices: Choice[];
         pictureWithMask?: PictureWithMask;

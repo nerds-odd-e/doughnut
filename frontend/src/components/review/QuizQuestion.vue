@@ -5,27 +5,23 @@
       v-bind="quizQuestion.pictureWithMask"
       :opacity="1"
     />
-    <NoteFrameOfLinks
-      v-bind="{ links: quizQuestion.hintLinks, storageAccessor }"
-    >
-      <h2 v-if="!!quizQuestion.mainTopic" class="text-center">
-        {{ quizQuestion.mainTopic }}
-      </h2>
-      <div
-        class="quiz-description"
-        v-if="quizQuestion.questionType !== 'PICTURE_TITLE'"
-        v-html="quizQuestion.description"
+    <h2 v-if="!!quizQuestion.mainTopic" class="text-center">
+      {{ quizQuestion.mainTopic }}
+    </h2>
+    <div
+      class="quiz-description"
+      v-if="quizQuestion.questionType !== 'PICTURE_TITLE'"
+      v-html="quizQuestion.description"
+    />
+    <div v-if="quizQuestion.questionType === 'JUST_REVIEW'">
+      <ReviewPointAsync
+        v-if="reviewPointId"
+        v-bind="{
+          reviewPointId,
+          storageAccessor,
+        }"
       />
-      <div v-if="quizQuestion.questionType === 'JUST_REVIEW'">
-        <ReviewPointAsync
-          v-if="reviewPointId"
-          v-bind="{
-            reviewPointId,
-            storageAccessor,
-          }"
-        />
-      </div>
-    </NoteFrameOfLinks>
+    </div>
     <div class="quiz-answering">
       <div v-if="quizQuestion.questionType === 'JUST_REVIEW'">
         <SelfEvaluateButtons
@@ -75,7 +71,6 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import ShowPicture from "../notes/ShowPicture.vue";
-import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import TextInput from "../form/TextInput.vue";
 import ReviewPointAsync from "./ReviewPointAsync.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
@@ -104,7 +99,6 @@ export default defineComponent({
   },
   components: {
     ShowPicture,
-    NoteFrameOfLinks,
     TextInput,
     ReviewPointAsync,
     SelfEvaluateButtons,

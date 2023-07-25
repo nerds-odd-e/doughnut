@@ -13,7 +13,6 @@ class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
     ],
     description: "answer",
     mainTopic: "",
-    hintLinks: {},
   };
 
   withClozeSelectionQuestion() {
