@@ -21,41 +21,35 @@
           storageAccessor,
         }"
       />
-    </div>
-    <div class="quiz-answering">
-      <div v-if="quizQuestion.questionType === 'JUST_REVIEW'">
-        <SelfEvaluateButtons
-          @self-evaluated-memory-state="
-            submitAnswer({ spellingAnswer: $event })
-          "
-          :key="reviewPointId"
-        />
-      </div>
-      <div v-else-if="quizQuestion.questionType === 'SPELLING'">
-        <form @submit.prevent.once="submitAnswer({ spellingAnswer: answer })">
-          <TextInput
-            scope-name="review_point"
-            field="answer"
-            v-model="answer"
-            placeholder="put your answer here"
-            v-focus
-          />
-          <input
-            type="submit"
-            value="OK"
-            class="btn btn-primary btn-lg btn-block"
-          />
-        </form>
-      </div>
-      <QuizQuestionChoices
-        v-if="quizQuestion.choices"
-        :choices="quizQuestion.choices"
-        :correct-choice-index="correctChoiceIndex"
-        :answer-choice-index="answerChoiceIndex"
-        :disabled="disabled"
-        @answer="submitAnswer($event)"
+      <SelfEvaluateButtons
+        @self-evaluated-memory-state="submitAnswer({ spellingAnswer: $event })"
+        :key="reviewPointId"
       />
     </div>
+    <div v-else-if="quizQuestion.questionType === 'SPELLING'">
+      <form @submit.prevent.once="submitAnswer({ spellingAnswer: answer })">
+        <TextInput
+          scope-name="review_point"
+          field="answer"
+          v-model="answer"
+          placeholder="put your answer here"
+          v-focus
+        />
+        <input
+          type="submit"
+          value="OK"
+          class="btn btn-primary btn-lg btn-block"
+        />
+      </form>
+    </div>
+    <QuizQuestionChoices
+      v-if="quizQuestion.choices"
+      :choices="quizQuestion.choices"
+      :correct-choice-index="correctChoiceIndex"
+      :answer-choice-index="answerChoiceIndex"
+      :disabled="disabled"
+      @answer="submitAnswer($event)"
+    />
   </div>
 </template>
 
@@ -64,8 +58,6 @@
   white-space: pre-wrap
   height: 100%
   overflow: auto
-.quiz-answering
-  height: 50%
 </style>
 
 <script lang="ts">
