@@ -19,7 +19,7 @@ public class WhichSpecHasInstanceQuizPresenter extends QuizQuestionWithOptionsPr
   }
 
   @Override
-  public String instruction() {
+  public String stem() {
     return "<p>Which one is "
         + link.getLinkTypeLabel()
         + " <mark>"

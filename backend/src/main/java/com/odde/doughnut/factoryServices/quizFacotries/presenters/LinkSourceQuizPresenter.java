@@ -17,7 +17,7 @@ public class LinkSourceQuizPresenter extends QuizQuestionWithOptionsPresenter {
   }
 
   @Override
-  public String instruction() {
+  public String stem() {
     return "Which one <em>is immediately " + link.getLinkTypeLabel() + "</em>:";
   }
 }

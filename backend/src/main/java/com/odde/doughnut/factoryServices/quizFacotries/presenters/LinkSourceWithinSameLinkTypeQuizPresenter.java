@@ -21,7 +21,7 @@ public class LinkSourceWithinSameLinkTypeQuizPresenter extends QuizQuestionWithO
   }
 
   @Override
-  public String instruction() {
+  public String stem() {
     return "Which one <em>is immediately " + link.getLinkTypeLabel() + "</em>:";
   }
 

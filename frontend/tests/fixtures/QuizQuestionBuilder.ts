@@ -11,7 +11,7 @@ class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
         display: "question",
       },
     ],
-    description: "answer",
+    stem: "answer",
     mainTopic: "",
   };
 
@@ -25,7 +25,7 @@ class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
   }
 
   withQuestionStem(stem: string) {
-    this.quizQuestion.description = stem;
+    this.quizQuestion.stem = stem;
     return this;
   }
 

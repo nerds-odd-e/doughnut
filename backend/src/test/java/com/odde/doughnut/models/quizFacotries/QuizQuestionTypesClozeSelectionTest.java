@@ -51,7 +51,7 @@ class QuizQuestionTypesClozeSelectionTest {
     void shouldIncludeRightAnswers() {
       makeMe.refresh(top);
       QuizQuestion quizQuestion = buildClozeQuizQuestion();
-      assertThat(quizQuestion.getDescription(), equalTo("descrption"));
+      assertThat(quizQuestion.getStem(), equalTo("descrption"));
       assertThat(quizQuestion.getMainTopic(), equalTo(""));
       List<String> options = toOptionStrings(quizQuestion);
       assertThat(note2.getTitle(), in(options));

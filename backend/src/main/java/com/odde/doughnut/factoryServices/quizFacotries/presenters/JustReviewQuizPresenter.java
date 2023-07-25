@@ -7,7 +7,7 @@ public class JustReviewQuizPresenter implements QuizQuestionPresenter {
   public JustReviewQuizPresenter(QuizQuestionEntity quizQuestion) {}
 
   @Override
-  public String instruction() {
+  public String stem() {
     return null;
   }
 

@@ -10,7 +10,7 @@ public class DescriptionLinkTargetQuizPresenter extends LinkTargetQuizPresenter 
   }
 
   @Override
-  public String instruction() {
+  public String stem() {
     ClozedString clozeDescription =
         link.getSourceNote().getClozeDescription().hide(answerNote.getNoteTitle());
     return "<p>The following descriptions is "

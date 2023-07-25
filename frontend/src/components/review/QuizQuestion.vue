@@ -11,7 +11,7 @@
     <div
       class="quiz-description"
       v-if="quizQuestion.questionType !== 'PICTURE_TITLE'"
-      v-html="quizQuestion.description"
+      v-html="quizQuestion.stem"
     />
     <div v-if="quizQuestion.questionType === 'JUST_REVIEW'">
       <ReviewPointAsync

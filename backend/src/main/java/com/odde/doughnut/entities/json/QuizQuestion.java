@@ -15,7 +15,7 @@ public class QuizQuestion {
 
   @Getter public QuizQuestionEntity.QuestionType questionType;
 
-  @Getter public String description;
+  @Getter public String stem;
 
   @Getter public String mainTopic;
 

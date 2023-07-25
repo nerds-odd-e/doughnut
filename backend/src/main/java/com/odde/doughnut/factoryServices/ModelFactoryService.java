@@ -108,7 +108,7 @@ public class ModelFactoryService {
     return new QuizQuestion(
         quizQuestionEntity.getId(),
         quizQuestionEntity.getQuestionType(),
-        presenter.instruction(),
+        presenter.stem(),
         presenter.mainTopic(),
         quizQuestionEntity.getNotebookPosition(user),
         presenter.getOptions(this),

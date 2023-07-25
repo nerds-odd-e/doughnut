@@ -23,7 +23,7 @@ public class AiQuestionPresenter implements QuizQuestionPresenter {
   }
 
   @Override
-  public String instruction() {
+  public String stem() {
     return aiQuestion.stem;
   }
 

@@ -135,7 +135,7 @@ declare namespace Generated {
     interface QuizQuestion {
         quizQuestionId: number;
         questionType: QuestionType;
-        description: string;
+        stem: string;
         mainTopic: string;
         notebookPosition?: NotePositionViewedByUser;
         choices: Choice[];

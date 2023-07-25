@@ -113,7 +113,7 @@ class FromDifferentPartAsQuizFactoryTest {
         void shouldIncludeRightAnswersAndFillingOptions() {
           QuizQuestion quizQuestion = buildQuestion();
           assertThat(
-              quizQuestion.getDescription(),
+              quizQuestion.getStem(),
               containsString(
                   "<p>Which one <mark>is tagged by</mark> a <em>DIFFERENT</em> part of <mark>perspective</mark> than:"));
           assertThat(quizQuestion.getMainTopic(), containsString(ugly.getTitle()));

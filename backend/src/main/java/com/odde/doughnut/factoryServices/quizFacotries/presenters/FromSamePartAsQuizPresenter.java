@@ -18,7 +18,7 @@ public class FromSamePartAsQuizPresenter extends QuizQuestionWithOptionsPresente
   }
 
   @Override
-  public String instruction() {
+  public String stem() {
     return "<p>Which one <mark>is "
         + link.getLinkTypeLabel()
         + "</mark> the same "

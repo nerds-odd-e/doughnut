@@ -13,7 +13,7 @@ public class FromDifferentPartAsQuizPresenter extends QuizQuestionWithOptionsPre
   }
 
   @Override
-  public String instruction() {
+  public String stem() {
     return "<p>Which one <mark>is "
         + link.getLinkTypeLabel()
         + "</mark> a <em>DIFFERENT</em> "

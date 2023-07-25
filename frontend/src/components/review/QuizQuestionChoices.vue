@@ -2,7 +2,6 @@
   <ol class="choices" v-if="choices.length > 0" type="A">
     <li class="choice" v-for="(choice, index) in choices" :key="index">
       <button
-        class="btn btn-secondary btn-lg"
         :class="{
           'is-correct': isOptionCorrect(index),
           'is-incorrect': !isOptionCorrect(index),
@@ -26,20 +25,18 @@
   flex-wrap: wrap
   flex-direction: row
   justify-content: flex-start
-  height: 100%
 .choice
   width: 46%
+  min-height: 80px
   margin: 2%
   @media(max-width: 500px)
     width: 100%
   button
     width: 100%
     height: 100%
-    padding: 0
     display: flex
     justify-content: center
     align-items: center
-    text-align: center
     border: 0
     border-radius: 0.5rem
     background-color: #e8e9ea

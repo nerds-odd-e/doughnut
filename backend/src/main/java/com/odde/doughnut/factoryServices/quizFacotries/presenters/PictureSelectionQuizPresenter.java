@@ -22,7 +22,7 @@ public class PictureSelectionQuizPresenter extends QuizQuestionWithOptionsPresen
   }
 
   @Override
-  public String instruction() {
+  public String stem() {
     return "";
   }
 

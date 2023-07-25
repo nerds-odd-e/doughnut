@@ -89,7 +89,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
         void shouldIncludeRightAnswers() {
           QuizQuestion quizQuestion = buildQuestion();
           assertThat(
-              quizQuestion.getDescription(),
+              quizQuestion.getStem(),
               containsString(
                   "<p>Which one is a specialization of <mark>element</mark> <em>and</em> is an instance of <mark>non-official name</mark>:"));
           List<String> strings = toOptionStrings(quizQuestion);

@@ -52,8 +52,7 @@ class AIGeneratedQuizFactoryTest {
 
   @Test
   void shouldIncludeQuestionStem() {
-    assertThat(
-        buildQuestion().getDescription(), containsString("How long did it take to build Rome?"));
+    assertThat(buildQuestion().getStem(), containsString("How long did it take to build Rome?"));
   }
 
   @Nested

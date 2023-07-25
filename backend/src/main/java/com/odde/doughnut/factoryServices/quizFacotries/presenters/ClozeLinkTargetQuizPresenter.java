@@ -10,7 +10,7 @@ public class ClozeLinkTargetQuizPresenter extends LinkTargetQuizPresenter {
   }
 
   @Override
-  public String instruction() {
+  public String stem() {
     ClozedString clozeTitle =
         ClozedString.htmlClosedString(link.getSourceNote().getTitle())
             .hide(answerNote.getNoteTitle());
