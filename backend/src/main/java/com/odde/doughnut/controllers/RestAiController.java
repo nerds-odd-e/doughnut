@@ -4,7 +4,9 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.json.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionDirector;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.theokanning.openai.OpenAiApi;
@@ -42,11 +44,12 @@ public class RestAiController {
       @RequestParam(value = "note") Note note, @RequestBody(required = false) String question)
       throws QuizQuestionNotPossibleException {
     currentUser.assertLoggedIn();
-    String rawJsonQuestion =
-        aiAdvisorService.generateQuestionAvoidingPreviousQuestion(note, question).toJsonString();
-    QuizQuestionEntity quizQuestionEntity = new QuizQuestionEntity();
-    quizQuestionEntity.setQuestionType(QuizQuestionEntity.QuestionType.AI_QUESTION);
-    quizQuestionEntity.setRawJsonQuestion(rawJsonQuestion);
+    QuizQuestionServant servant =
+        new QuizQuestionServant(
+            currentUser.getEntity(), null, modelFactoryService, aiAdvisorService);
+    QuizQuestionEntity quizQuestionEntity =
+        new QuizQuestionDirector(QuizQuestionEntity.QuestionType.AI_QUESTION, servant)
+            .invoke(note.getThing());
     modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
     return modelFactoryService.toQuizQuestion(quizQuestionEntity, currentUser.getEntity());
   }

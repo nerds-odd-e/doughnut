@@ -8,7 +8,7 @@ import com.odde.doughnut.factoryServices.quizFacotries.factories.QuestionRawJson
 import com.odde.doughnut.factoryServices.quizFacotries.factories.SecondaryReviewPointsFactory;
 import java.util.List;
 
-record QuizQuestionDirector(
+public record QuizQuestionDirector(
     QuizQuestionEntity.QuestionType questionType, QuizQuestionServant servant) {
 
   public QuizQuestionEntity invoke(Thing thing) throws QuizQuestionNotPossibleException {

@@ -56,7 +56,7 @@ class RestAiControllerTest {
   @BeforeEach
   void Setup() {
     currentUser = makeMe.aUser().toModelPlease();
-    note = makeMe.aNote().please();
+    note = makeMe.aNote().asHeadNoteOfANotebook().please();
     controller = new RestAiController(openAiApi, makeMe.modelFactoryService, currentUser);
   }
 
