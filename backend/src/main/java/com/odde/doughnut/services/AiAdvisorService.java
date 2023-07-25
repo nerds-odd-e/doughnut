@@ -28,12 +28,7 @@ public class AiAdvisorService {
   }
 
   public AIGeneratedQuestion generateQuestion(Note note) throws QuizQuestionNotPossibleException {
-    return generateQuestionAvoidingPreviousQuestion(note, null);
-  }
-
-  public AIGeneratedQuestion generateQuestionAvoidingPreviousQuestion(
-      Note note, String prevQuestion) throws QuizQuestionNotPossibleException {
-    JsonNode question = getAiGeneratedQuestionJson(note, prevQuestion);
+    JsonNode question = getAiGeneratedQuestionJson(note);
     try {
       return new ObjectMapper().treeToValue(question, AIGeneratedQuestion.class).validateQuestion();
     } catch (JsonProcessingException e) {
@@ -41,12 +36,11 @@ public class AiAdvisorService {
     }
   }
 
-  private JsonNode getAiGeneratedQuestionJson(Note note, String question)
-      throws QuizQuestionNotPossibleException {
+  private JsonNode getAiGeneratedQuestionJson(Note note) throws QuizQuestionNotPossibleException {
     ChatCompletionRequest chatRequest =
         new OpenAIChatAboutNoteRequestBuilder(note.getPath())
             .detailsOfNoteOfCurrentFocus(note)
-            .userInstructionToGenerateQuestion(note, question)
+            .userInstructionToGenerateQuestion(note)
             .maxTokens(1500)
             .build();
 

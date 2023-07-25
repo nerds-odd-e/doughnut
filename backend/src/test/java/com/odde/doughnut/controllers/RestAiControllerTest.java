@@ -165,24 +165,15 @@ class RestAiControllerTest {
             RestAiController restAiController =
                 new RestAiController(
                     openAiApi, makeMe.modelFactoryService, makeMe.aNullUserModel());
-            restAiController.generateQuestion(note, null);
+            restAiController.generateQuestion(note);
           });
-    }
-
-    @Test
-    void regenerateQuizQuestion() throws JsonProcessingException, QuizQuestionNotPossibleException {
-      when(openAiApi.createChatCompletion(any()))
-          .thenReturn(buildCompletionResultForAIQuestion(jsonQuestion));
-      QuizQuestion question = controller.generateQuestion(note, null);
-      QuizQuestion quizQuestion = controller.generateQuestion(note, question.getRawJsonQuestion());
-      assertThat(quizQuestion.getRawJsonQuestion()).isEqualTo(question.getRawJsonQuestion());
     }
 
     @Test
     void createQuizQuestion() throws JsonProcessingException, QuizQuestionNotPossibleException {
       when(openAiApi.createChatCompletion(any()))
           .thenReturn(buildCompletionResultForAIQuestion(jsonQuestion));
-      QuizQuestion quizQuestion = controller.generateQuestion(note, null);
+      QuizQuestion quizQuestion = controller.generateQuestion(note);
       assertThat(quizQuestion.getRawJsonQuestion())
           .contains("What is the first color in the rainbow?");
     }
@@ -193,8 +184,7 @@ class RestAiControllerTest {
           .thenReturn(buildCompletionResultForAIQuestion("""
 {"stem": ""}
 """));
-      assertThrows(
-          QuizQuestionNotPossibleException.class, () -> controller.generateQuestion(note, null));
+      assertThrows(QuizQuestionNotPossibleException.class, () -> controller.generateQuestion(note));
     }
 
     @Test
@@ -206,7 +196,7 @@ class RestAiControllerTest {
                     return true;
                   })))
           .thenReturn(buildCompletionResultForAIQuestion(jsonQuestion));
-      controller.generateQuestion(note, null);
+      controller.generateQuestion(note);
     }
   }
 

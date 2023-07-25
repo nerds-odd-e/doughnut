@@ -40,8 +40,7 @@ public class RestAiController {
   }
 
   @PostMapping("/generate-question")
-  public QuizQuestion generateQuestion(
-      @RequestParam(value = "note") Note note, @RequestBody(required = false) String question)
+  public QuizQuestion generateQuestion(@RequestParam(value = "note") Note note)
       throws QuizQuestionNotPossibleException {
     currentUser.assertLoggedIn();
     QuizQuestionServant servant =

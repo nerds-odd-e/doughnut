@@ -41,8 +41,7 @@ description (until the end of this message):
     return this;
   }
 
-  public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestion(
-      Note note, String question) {
+  public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestion(Note note) {
 
     askSingleAnswerMultipleChoiceQuestion =
         ChatFunction.builder()
@@ -71,14 +70,6 @@ description (until the end of this message):
   Note: The specific note of focus and its more detailed contexts are not known. Focus on memory reinforcement and recall across various subjects.
   """
             .formatted(point6);
-
-    if (question != null) {
-      messageBody =
-          "Your previously generated question is: "
-              + question
-              + " Please generate another question.";
-    }
-
     messages.add(new ChatMessage(ChatMessageRole.USER.value(), messageBody));
 
     return this;

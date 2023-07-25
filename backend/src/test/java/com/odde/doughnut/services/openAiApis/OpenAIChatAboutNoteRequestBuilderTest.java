@@ -13,7 +13,7 @@ class OpenAIChatAboutNoteRequestBuilderTest {
     var note = MakeMe.makeMeWithoutFactoryService().aNote("programming language").inMemoryPlease();
     note.getNoteAccessories().setQuestionGenerationInstruction("only about java");
 
-    var messages = builder.userInstructionToGenerateQuestion(note, null).build().getMessages();
+    var messages = builder.userInstructionToGenerateQuestion(note).build().getMessages();
     var lastMessage = messages.get(messages.size() - 1);
 
     assertTrue(lastMessage.getContent().contains("only about java"));
