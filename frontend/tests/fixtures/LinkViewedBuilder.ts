@@ -39,9 +39,9 @@ class LinkViewedBuilder extends Builder<LinksMap> {
   do(): LinksMap {
     if (!this.fromNote.links || !this.toNote.links)
       throw new Error("note does not have links");
-    if (!this.toNote.links.links[this.linkType])
-      this.toNote.links.links[this.linkType] = { direct: [], reverse: [] };
-    const linksOfType = this.toNote.links.links[this.linkType];
+    if (!this.toNote.links[this.linkType])
+      this.toNote.links[this.linkType] = { direct: [], reverse: [] };
+    const linksOfType = this.toNote.links[this.linkType];
     if (linksOfType && !linksOfType.reverse) linksOfType.reverse = [];
     linksOfType?.reverse.push(this.link());
 

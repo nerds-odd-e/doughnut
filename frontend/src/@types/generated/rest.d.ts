@@ -107,7 +107,7 @@ declare namespace Generated {
 
     interface NoteRealm {
         id: number;
-        links: LinksOfANote;
+        links: { [P in LinkType]?: LinkViewed };
         children: Note[];
         note: Note;
     }
@@ -141,7 +141,7 @@ declare namespace Generated {
         questionType: QuestionType;
         description: string;
         mainTopic: string;
-        hintLinks: LinksOfANote;
+        hintLinks: { [P in LinkType]?: LinkViewed };
         notebookPosition?: NotePositionViewedByUser;
         choices: Choice[];
         pictureWithMask?: PictureWithMask;

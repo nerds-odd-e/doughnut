@@ -74,10 +74,11 @@ import LinkOfNote from "./LinkOfNote.vue";
 import LinksReader from "../../models/LinksReader";
 import { reverseLabel } from "../../models/linkTypeOptions";
 import { StorageAccessor } from "../../store/createNoteStorage";
+import LinksMap from "../../models/LinksMap";
 
 export default defineComponent({
   props: {
-    links: Object as PropType<Generated.LinksOfANote>,
+    links: Object as PropType<LinksMap>,
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,
@@ -91,8 +92,8 @@ export default defineComponent({
   },
   computed: {
     linksReader() {
-      if (this.links && this.links.links) {
-        return new LinksReader(this.links.links);
+      if (this.links) {
+        return new LinksReader(this.links);
       }
       return undefined;
     },

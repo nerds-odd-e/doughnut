@@ -1,11 +1,13 @@
 package com.odde.doughnut.factoryServices.quizFacotries;
 
+import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.PictureWithMask;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.json.LinksOfANote;
+import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface QuizQuestionPresenter {
@@ -13,7 +15,7 @@ public interface QuizQuestionPresenter {
 
   String mainTopic();
 
-  default LinksOfANote hintLinks(User user) {
+  default Map<Link.LinkType, LinkViewed> hintLinks(User user) {
     return null;
   }
 

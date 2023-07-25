@@ -3,10 +3,7 @@
     v-if="note"
     v-bind="{ id: note.id, updatedAt: note.textContent?.updatedAt }"
   >
-    <NoteFrameOfLinks
-      v-if="links && links.links"
-      v-bind="{ links, storageAccessor }"
-    >
+    <NoteFrameOfLinks v-if="links" v-bind="{ links, storageAccessor }">
       <NoteContent v-bind="{ note, storageAccessor }" />
     </NoteFrameOfLinks>
     <template #footer>
@@ -21,12 +18,13 @@ import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteShell from "./NoteShell.vue";
 import NoteContent from "./NoteContent.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
+import LinksMap from "../../models/LinksMap";
 
 export default defineComponent({
   props: {
     note: { type: Object as PropType<Generated.Note>, required: true },
     links: {
-      type: Object as PropType<Generated.LinksOfANote>,
+      type: Object as PropType<LinksMap>,
     },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,

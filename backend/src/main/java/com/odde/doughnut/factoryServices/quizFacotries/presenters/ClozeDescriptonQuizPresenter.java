@@ -1,10 +1,13 @@
 package com.odde.doughnut.factoryServices.quizFacotries.presenters;
 
+import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.entities.json.LinksOfANote;
 import com.odde.doughnut.models.NoteViewer;
+import java.util.Map;
 
 public abstract class ClozeDescriptonQuizPresenter extends QuizQuestionWithOptionsPresenter {
   protected final Note note;
@@ -25,7 +28,7 @@ public abstract class ClozeDescriptonQuizPresenter extends QuizQuestionWithOptio
   }
 
   @Override
-  public LinksOfANote hintLinks(User user) {
+  public Map<Link.LinkType, LinkViewed> hintLinks(User user) {
     NoteViewer noteViewer = new NoteViewer(user, note);
     return LinksOfANote.getOpenLinksOfANote(noteViewer);
   }

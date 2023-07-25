@@ -7,10 +7,11 @@ import static org.hamcrest.Matchers.*;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.json.LinksOfANote;
+import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -66,9 +67,9 @@ class QuizQuestionTypesClozeSelectionTest {
       makeMe.theNote(note1).linkTo(note2, Link.LinkType.SPECIALIZE).please();
       makeMe.refresh(top);
       QuizQuestion quizQuestion = buildClozeQuizQuestion();
-      LinksOfANote hintLinks = quizQuestion.getHintLinks();
-      assertThat(Link.LinkType.TAGGED_BY, in(hintLinks.getLinks().keySet()));
-      assertThat(Link.LinkType.SPECIALIZE, not(in(hintLinks.getLinks().keySet())));
+      Map<Link.LinkType, LinkViewed> hintLinks = quizQuestion.getHintLinks();
+      assertThat(Link.LinkType.TAGGED_BY, in(hintLinks.keySet()));
+      assertThat(Link.LinkType.SPECIALIZE, not(in(hintLinks.keySet())));
     }
 
     private QuizQuestion buildClozeQuizQuestion() {

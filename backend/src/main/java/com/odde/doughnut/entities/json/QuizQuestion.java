@@ -1,8 +1,10 @@
 package com.odde.doughnut.entities.json;
 
+import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.PictureWithMask;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,7 +21,7 @@ public class QuizQuestion {
 
   @Getter public String mainTopic;
 
-  @Getter public LinksOfANote hintLinks;
+  @Getter public Map<Link.LinkType, LinkViewed> hintLinks;
 
   @Getter @Nullable public NotePositionViewedByUser notebookPosition;
 

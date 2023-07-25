@@ -15,7 +15,7 @@ class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
     this.data = {
       id: noteData.id,
       note: noteData,
-      links: { links: {} },
+      links: {},
       children: [],
     };
   }
@@ -63,7 +63,7 @@ class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
 
   linkTo(note: Generated.NoteRealm): NoteRealmBuilder {
     merge(
-      this.data.links.links,
+      this.data.links,
       new LinkViewedBuilder("using", this.data, note).please(),
     );
     return this;

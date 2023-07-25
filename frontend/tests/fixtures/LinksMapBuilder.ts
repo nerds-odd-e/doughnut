@@ -1,9 +1,9 @@
 import Builder from "./Builder";
 import generateId from "./generateId";
-import LinkViewedBuilder from "./LinkViewedBuilder";
+import LinkViewedBuilder, { LinksMap } from "./LinkViewedBuilder";
 import NoteRealmBuilder from "./NoteRealmBuilder";
 
-class LinksMapBuilder extends Builder<Generated.LinksOfANote> {
+class LinksMapBuilder extends Builder<LinksMap> {
   from = new NoteRealmBuilder().title("source note").do();
 
   protected childrenBuilders: Omit<LinkViewedBuilder, "please">[] = [];
@@ -18,13 +18,11 @@ class LinksMapBuilder extends Builder<Generated.LinksOfANote> {
     return child;
   }
 
-  do(): Generated.LinksOfANote {
-    return {
-      links: this.childrenBuilders.reduce(
-        (prev, curr) => ({ ...prev, ...curr.do() }),
-        {},
-      ),
-    };
+  do(): LinksMap {
+    return this.childrenBuilders.reduce(
+      (prev, curr) => ({ ...prev, ...curr.do() }),
+      {},
+    );
   }
 }
 

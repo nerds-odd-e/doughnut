@@ -30,20 +30,24 @@ import Mindmap from "../../../models/Mindmap";
 import MindmapSector from "../../../models/MindmapSector";
 import LinksReader from "../../../models/LinksReader";
 import LinkType from "./LinkType.vue";
+import LinksMap from "../../../models/LinksMap";
 
 export default defineComponent({
   props: {
-    links: { type: Object as PropType<Generated.LinksOfANote>, required: true },
+    links: {
+      type: Object as PropType<LinksMap>,
+      required: true,
+    },
     mindmapSector: { type: Object as PropType<MindmapSector>, required: true },
     mindmap: { type: Object as PropType<Mindmap>, required: true },
   },
   components: { LinkType },
   computed: {
     directLinks() {
-      return new LinksReader(this.links.links).directLinks;
+      return new LinksReader(this.links).directLinks;
     },
     reverseLinks() {
-      return new LinksReader(this.links.links).reverseLinks;
+      return new LinksReader(this.links).reverseLinks;
     },
     directLinkTypeCount() {
       return Object.keys(this.directLinks).length;
