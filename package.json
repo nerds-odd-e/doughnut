@@ -24,9 +24,9 @@
     "cy:open": "cypress open --e2e",
     "cy:run": "cypress run --config-file e2e_test/config/ci.ts",
     "sut": "backend/gradlew -p backend bootRunE2E --build-cache",
-    "open": "yarn frontend:build && run-p -clnr sut cy:open",
-    "test": "yarn frontend:build && run-p -clnr sut start:mb cy:run",
-    "test:open": "yarn run-p -clnr sut start:mb frontend:sut cy:open",
+    "open": "yarn --frozen-lockfile --silent && yarn frontend:build && run-p -clnr sut cy:open",
+    "test": "yarn --frozen-lockfile --silent && yarn frontend:build && run-p -clnr sut start:mb cy:run",
+    "test:open": "yarn --frozen-lockfile --silent && yarn run-p -clnr sut start:mb frontend:sut cy:open",
     "sound": "github_action_sound https://github.com/nerds-odd-e/doughnut/actions",
     "lint:all": "yarn && yarn backend:lint && yarn frontend:lint && yarn cy:lint",
     "format:all": "yarn && yarn backend:format && yarn frontend:format && yarn cy:format"

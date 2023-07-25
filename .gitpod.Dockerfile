@@ -40,6 +40,7 @@ RUN apt-get -y update \
     fasd \
     fzf \
     cargo \
+    direnv \
     && apt-get autoremove \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /var/cache/apt \
@@ -55,10 +56,6 @@ RUN apt-get -y update \
 # use bash over dash for /bin/sh
 RUN dpkg-reconfigure dash
 RUN cargo install dum
-
-# RUN addgroup --system nixbld \
-#  && adduser gitpod nixbld \
-#  && for i in $(seq 1 30); do useradd -ms /bin/bash nixbld$i && adduser nixbld$i nixbld; done
 
 RUN mkdir -m 0755 /nix && chown gitpod /nix \
     && mkdir -p /etc/nix && echo 'sandbox = false' > /etc/nix/nix.conf
@@ -97,6 +94,9 @@ RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
 # xclip & nix develop
 RUN echo "test -f ./sh_profile && source ./sh_profile" >> /home/gitpod/.bashrc \
     && echo "test -f ./sh_profile && source ./sh_profile" >> /home/gitpod/.zshrc
+
+# atuin shell history
+RUN curl https://raw.githubusercontent.com/ellie/atuin/main/install.sh | bash
 
 EXPOSE 5173
 EXPOSE 3309
