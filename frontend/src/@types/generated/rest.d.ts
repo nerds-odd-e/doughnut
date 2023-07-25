@@ -5,7 +5,7 @@ declare namespace Generated {
 
     interface AIGeneratedQuestion {
         /**
-         * The stem of the multiple-choice question
+         * The stem of the multiple-choice question. Provide background or disclosure necessary to clarify the question when needed.
          */
         stem: string;
         /**
@@ -16,10 +16,6 @@ declare namespace Generated {
          * Index of the correct choice. 0-based.
          */
         correctChoiceIndex: number;
-        /**
-         * Background information or disclosure necessary to clarify the question. Use only if the stem would be unclear or ambiguous without this information. Will be put before stem.
-         */
-        background?: string;
     }
 
     interface AiCompletion {

@@ -1,7 +1,4 @@
 <template>
-  <p v-if="background">
-    {{ background }}
-  </p>
   <h3>
     {{ questionDescription }}
   </h3>
@@ -44,9 +41,6 @@ export default defineComponent({
     },
     aiQuestion() {
       return JSON.parse(this.rawJsonQuestion) as Generated.AIGeneratedQuestion;
-    },
-    background() {
-      return this.aiQuestion.background;
     },
     questionDescription() {
       return this.quizQuestion.description;
