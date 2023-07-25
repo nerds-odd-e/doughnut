@@ -107,7 +107,6 @@ public class ModelFactoryService {
     QuizQuestionPresenter presenter = quizQuestionEntity.buildPresenter();
     return new QuizQuestion(
         quizQuestionEntity.getId(),
-        quizQuestionEntity.getRawJsonQuestion(),
         quizQuestionEntity.getQuestionType(),
         presenter.instruction(),
         presenter.mainTopic(),

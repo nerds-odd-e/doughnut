@@ -13,8 +13,6 @@ import org.springframework.lang.Nullable;
 public class QuizQuestion {
   @Getter public Integer quizQuestionId;
 
-  @Getter public String rawJsonQuestion;
-
   @Getter public QuizQuestionEntity.QuestionType questionType;
 
   @Getter public String description;
