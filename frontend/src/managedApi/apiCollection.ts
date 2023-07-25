@@ -298,11 +298,10 @@ const apiCollection = (managedApi: ManagedApi) => ({
 
     async askAIToGenerateQuestion(
       noteId: Doughnut.ID,
-      question?: string,
     ): Promise<Generated.QuizQuestion> {
       return (await managedApi.restPost(
         `ai/generate-question?note=${noteId}`,
-        question,
+        {},
       )) as Generated.QuizQuestion;
     },
     async generateImage(prompt: string) {

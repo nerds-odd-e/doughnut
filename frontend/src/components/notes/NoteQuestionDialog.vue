@@ -61,7 +61,6 @@ export default defineComponent({
       const tmpQuestion: Generated.QuizQuestion | undefined = this.quizQuestion;
       this.quizQuestion = await this.api.ai.askAIToGenerateQuestion(
         this.selectedNote.id,
-        this.quizQuestion?.rawJsonQuestion,
       );
       this.prevQuizQuestion = tmpQuestion;
     },
