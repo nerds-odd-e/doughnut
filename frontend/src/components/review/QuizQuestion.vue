@@ -9,8 +9,8 @@
       {{ quizQuestion.mainTopic }}
     </h2>
     <div
-      class="quiz-description"
-      v-if="quizQuestion.questionType !== 'PICTURE_TITLE'"
+      style="white-space: pre-wrap"
+      v-if="quizQuestion.stem"
       v-html="quizQuestion.stem"
     />
     <div v-if="quizQuestion.questionType === 'JUST_REVIEW'">
@@ -52,13 +52,6 @@
     />
   </div>
 </template>
-
-<style scoped lang="sass">
-.quiz-description
-  white-space: pre-wrap
-  height: 100%
-  overflow: auto
-</style>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";

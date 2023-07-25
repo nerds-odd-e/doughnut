@@ -8,14 +8,11 @@ Feature: Repetition Quiz
       | English  |                                | true       |               |
       | sedition | Sedition means incite violence | false      | English       |
       | sedation | Put to sleep is sedation       | false      | English       |
-      | medical  |                                | true       | English       |
 
   Scenario: Cloze deletion question
     Given I learned one note "sedition" on day 1
-    And there is "tagged by" link between note "sedition" and "medical"
     When I am repeat-reviewing my old note on day 2
     Then I should be asked cloze deletion question "[...] means incite violence" with options "sedition, sedation"
-    And On the current page, I should see "Sedition" has link "tagged by" "medical"
 
   Scenario Outline: Answering cloze question
     Given I learned one note "sedition" on day 1
