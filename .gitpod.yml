@@ -50,7 +50,7 @@ vscode:
     - Shelex.vscode-cy-helper
     - xyz.plsql-language
     - bajdzis.vscode-database
-    - cweijan.vscode-mysql-client2
+    - cweijan.vscode-redis-client
     - GulajavaMinistudio.mayukaithemevsc
     - GabrielBB.vscode-lombok
     - jnoortheen.nix-ide
