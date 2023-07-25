@@ -21,7 +21,7 @@ public interface QuizQuestionPresenter {
     return Optional.empty();
   }
 
-  default List<QuizQuestion.Option> getOptions(ModelFactoryService modelFactoryService) {
+  default List<QuizQuestion.Choice> getOptions(ModelFactoryService modelFactoryService) {
     return List.of();
   }
 }

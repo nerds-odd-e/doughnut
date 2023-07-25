@@ -103,6 +103,6 @@ class PictureSelectionQuizFactoryTest {
   }
 
   private List<String> toOptionStrings(QuizQuestion quizQuestion) {
-    return quizQuestion.getOptions().stream().map(QuizQuestion.Option::getDisplay).toList();
+    return quizQuestion.getChoices().stream().map(QuizQuestion.Choice::getDisplay).toList();
   }
 }

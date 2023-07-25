@@ -27,15 +27,15 @@ public class PictureSelectionQuizPresenter extends QuizQuestionWithOptionsPresen
   }
 
   @Override
-  protected List<QuizQuestion.Option> getOptionsFromThings(Stream<Thing> noteStream) {
+  protected List<QuizQuestion.Choice> getOptionsFromThings(Stream<Thing> noteStream) {
     return noteStream
         .map(
             thing -> {
-              QuizQuestion.Option option = new QuizQuestion.Option();
-              option.setDisplay(thing.getNote().getTitle());
-              option.setPictureWithMask(thing.getNote().getPictureWithMask().orElse(null));
-              option.setPicture(true);
-              return option;
+              QuizQuestion.Choice choice = new QuizQuestion.Choice();
+              choice.setDisplay(thing.getNote().getTitle());
+              choice.setPictureWithMask(thing.getNote().getPictureWithMask().orElse(null));
+              choice.setPicture(true);
+              return choice;
             })
         .toList();
   }

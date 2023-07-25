@@ -112,7 +112,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
         }
 
         @Nested
-        class OptionFromInstance {
+        class ChoiceFromInstance {
 
           @BeforeEach
           void setup() {
@@ -139,7 +139,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
   }
 
   private List<String> toOptionStrings(QuizQuestion quizQuestion) {
-    List<QuizQuestion.Option> options = quizQuestion.getOptions();
-    return options.stream().map(QuizQuestion.Option::getDisplay).toList();
+    List<QuizQuestion.Choice> choices = quizQuestion.getChoices();
+    return choices.stream().map(QuizQuestion.Choice::getDisplay).toList();
   }
 }

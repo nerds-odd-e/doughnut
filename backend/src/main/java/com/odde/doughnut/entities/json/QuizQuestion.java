@@ -23,12 +23,12 @@ public class QuizQuestion {
 
   @Getter @Nullable public NotePositionViewedByUser notebookPosition;
 
-  @Getter public List<Option> options;
+  @Getter public List<Choice> choices;
 
   @Getter public Optional<PictureWithMask> pictureWithMask;
 
   @Data
-  public static class Option {
+  public static class Choice {
     private boolean isPicture = false;
     private String display;
     @Nullable private PictureWithMask pictureWithMask;

@@ -17,19 +17,19 @@ public abstract class QuizQuestionWithOptionsPresenter implements QuizQuestionPr
   }
 
   @Override
-  public List<QuizQuestion.Option> getOptions(ModelFactoryService modelFactoryService) {
+  public List<QuizQuestion.Choice> getOptions(ModelFactoryService modelFactoryService) {
     Stream<Thing> thingStream =
         modelFactoryService.getThingStreamAndKeepOriginalOrder(quizQuestion.getChoiceThingIds());
     return getOptionsFromThings(thingStream);
   }
 
-  protected List<QuizQuestion.Option> getOptionsFromThings(Stream<Thing> noteStream) {
+  protected List<QuizQuestion.Choice> getOptionsFromThings(Stream<Thing> noteStream) {
     return noteStream
         .map(
             thing -> {
-              QuizQuestion.Option option = new QuizQuestion.Option();
-              option.setDisplay(thing.getNote().getTitle());
-              return option;
+              QuizQuestion.Choice choice = new QuizQuestion.Choice();
+              choice.setDisplay(thing.getNote().getTitle());
+              return choice;
             })
         .toList();
   }

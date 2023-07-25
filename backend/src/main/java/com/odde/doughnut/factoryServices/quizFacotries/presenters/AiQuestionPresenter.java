@@ -33,11 +33,11 @@ public class AiQuestionPresenter implements QuizQuestionPresenter {
   }
 
   @Override
-  public List<QuizQuestion.Option> getOptions(ModelFactoryService modelFactoryService) {
+  public List<QuizQuestion.Choice> getOptions(ModelFactoryService modelFactoryService) {
     return aiQuestion.choices.stream()
         .map(
             choice -> {
-              QuizQuestion.Option option = new QuizQuestion.Option();
+              QuizQuestion.Choice option = new QuizQuestion.Choice();
               option.setDisplay(choice);
               return option;
             })

@@ -52,8 +52,8 @@
         </form>
       </div>
       <QuizQuestionChoices
-        v-if="quizQuestion.options"
-        :choices="quizQuestion.options"
+        v-if="quizQuestion.choices"
+        :choices="quizQuestion.choices"
         :correct-choice-index="correctChoiceIndex"
         :answer-choice-index="answerChoiceIndex"
         :disabled="disabled"

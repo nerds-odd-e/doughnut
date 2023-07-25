@@ -75,7 +75,7 @@ import ShowPicture from "../notes/ShowPicture.vue";
 export default defineComponent({
   props: {
     choices: {
-      type: Object as PropType<Generated.Option[]>,
+      type: Object as PropType<Generated.Choice[]>,
       required: true,
     },
     correctChoiceIndex: Number,

@@ -26,13 +26,13 @@ public class LinkSourceWithinSameLinkTypeQuizPresenter extends QuizQuestionWithO
   }
 
   @Override
-  protected List<QuizQuestion.Option> getOptionsFromThings(Stream<Thing> noteStream) {
+  protected List<QuizQuestion.Choice> getOptionsFromThings(Stream<Thing> noteStream) {
     return noteStream
         .map(
             thing -> {
-              QuizQuestion.Option option = new QuizQuestion.Option();
-              option.setDisplay(thing.getLink().getClozeSource().cloze());
-              return option;
+              QuizQuestion.Choice choice = new QuizQuestion.Choice();
+              choice.setDisplay(thing.getLink().getClozeSource().cloze());
+              return choice;
             })
         .toList();
   }

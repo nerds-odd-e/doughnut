@@ -79,7 +79,7 @@ class FromSamePartAsQuizFactoryTest {
     }
 
     @Nested
-    class WhenThereIsFillingOption {
+    class WhenThereIsFillingChoice {
 
       @BeforeEach
       void setup() {
@@ -122,7 +122,7 @@ class FromSamePartAsQuizFactoryTest {
   }
 
   private List<String> toOptionStrings(QuizQuestion quizQuestion) {
-    List<QuizQuestion.Option> options = quizQuestion.getOptions();
-    return options.stream().map(QuizQuestion.Option::getDisplay).toList();
+    List<QuizQuestion.Choice> choices = quizQuestion.getChoices();
+    return choices.stream().map(QuizQuestion.Choice::getDisplay).toList();
   }
 }

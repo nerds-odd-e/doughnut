@@ -143,7 +143,7 @@ declare namespace Generated {
         mainTopic: string;
         hintLinks: LinksOfANote;
         notebookPosition?: NotePositionViewedByUser;
-        options: Option[];
+        choices: Choice[];
         pictureWithMask?: PictureWithMask;
     }
 
@@ -267,7 +267,7 @@ declare namespace Generated {
         notebook: Notebook;
     }
 
-    interface Option {
+    interface Choice {
         display: string;
         pictureWithMask?: PictureWithMask;
         picture: boolean;

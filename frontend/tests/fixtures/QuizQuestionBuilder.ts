@@ -6,7 +6,7 @@ class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
     quizQuestionId: generateId(),
     rawJsonQuestion: "",
     questionType: "JUST_REVIEW",
-    options: [
+    choices: [
       {
         picture: false,
         display: "question",
@@ -39,7 +39,7 @@ class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
   }
 
   withChoices(choices: string[]) {
-    this.quizQuestion.options = choices.map((choice) => ({
+    this.quizQuestion.choices = choices.map((choice) => ({
       picture: false,
       display: choice,
     }));

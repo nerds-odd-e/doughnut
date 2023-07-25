@@ -174,8 +174,7 @@ class RestAiControllerTest {
       when(openAiApi.createChatCompletion(any()))
           .thenReturn(buildCompletionResultForAIQuestion(jsonQuestion));
       QuizQuestion quizQuestion = controller.generateQuestion(note);
-      assertThat(quizQuestion.description)
-          .contains("What is the first color in the rainbow?");
+      assertThat(quizQuestion.description).contains("What is the first color in the rainbow?");
     }
 
     @Test
