@@ -1,5 +1,5 @@
 <template>
-  <h2 v-if="quizQuestion === undefined">Generating question...</h2>
+  <h2 v-if="!quizQuestion">Generating question...</h2>
   <div v-else>
     <div v-if="prevQuizQuestion">
       <h3>Previous Question...</h3>
@@ -9,9 +9,16 @@
         :disabled="true"
       />
     </div>
+    <AnsweredQuestion
+      v-if="answeredQuestion"
+      :answered-question="answeredQuestion"
+      :storage-accessor="storageAccessor"
+    />
     <QuizQuestion
+      v-else
       :quiz-question="quizQuestion"
       :storage-accessor="storageAccessor"
+      @answered="onAnswered($event)"
     />
   </div>
   <button
@@ -28,6 +35,7 @@ import { defineComponent, PropType } from "vue";
 import type { StorageAccessor } from "@/store/createNoteStorage";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import QuizQuestion from "../review/QuizQuestion.vue";
+import AnsweredQuestion from "../review/AnsweredQuestion.vue";
 
 export default defineComponent({
   setup() {
@@ -40,10 +48,11 @@ export default defineComponent({
       required: true,
     },
   },
-  components: { QuizQuestion },
+  components: { QuizQuestion, AnsweredQuestion },
   data() {
     return {
       quizQuestion: undefined as Generated.QuizQuestion | undefined,
+      answeredQuestion: undefined as Generated.AnsweredQuestion | undefined,
       prevQuizQuestion: undefined as Generated.QuizQuestion | undefined,
     };
   },
@@ -55,6 +64,9 @@ export default defineComponent({
         this.quizQuestion?.rawJsonQuestion,
       );
       this.prevQuizQuestion = tmpQuestion;
+    },
+    onAnswered(answeredQuestion: Generated.AnsweredQuestion) {
+      this.answeredQuestion = answeredQuestion;
     },
   },
   mounted() {
