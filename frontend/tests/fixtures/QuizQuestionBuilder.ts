@@ -38,6 +38,14 @@ class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
     return this;
   }
 
+  withChoices(choices: string[]) {
+    this.quizQuestion.options = choices.map((choice) => ({
+      picture: false,
+      display: choice,
+    }));
+    return this;
+  }
+
   do(): Generated.QuizQuestion {
     return this.quizQuestion;
   }

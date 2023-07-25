@@ -24,6 +24,7 @@ const createWrapper = async () => {
     .withQuestionType("AI_QUESTION")
     .withQuestionStem("any question?")
     .withRawJsonQuestion(JSON.stringify(goodQuestion))
+    .withChoices(["option A", "option B", "option C"])
     .please();
   helper.apiMock
     .expectingPost(`/api/ai/generate-question?note=${note.id}`)
