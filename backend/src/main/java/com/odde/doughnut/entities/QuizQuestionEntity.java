@@ -151,7 +151,7 @@ public class QuizQuestionEntity {
   }
 
   @JsonIgnore
-  ReviewPoint getReviewPointFor(UserModel userModel) {
+  public ReviewPoint getReviewPointFor(UserModel userModel) {
     return userModel.getReviewPointFor(thing);
   }
 

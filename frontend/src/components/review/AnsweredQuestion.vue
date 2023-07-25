@@ -15,11 +15,13 @@
     </div>
   </div>
   <QuizQuestion
-    v-if="answeredQuestion?.quizQuestion"
+    v-if="answeredQuestion.quizQuestion"
     v-bind="{
-      quizQuestion: answeredQuestion?.quizQuestion,
+      quizQuestion: answeredQuestion.quizQuestion,
       reviewPointId: reviewPoint?.id,
       storageAccessor,
+      correctChoiceIndex: answeredQuestion.correctChoiceIndex,
+      answerChoiceIndex: answeredQuestion.choiceIndex,
     }"
   />
 </template>

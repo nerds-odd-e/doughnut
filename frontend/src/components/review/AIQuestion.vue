@@ -5,13 +5,14 @@
   <h3>
     {{ questionDescription }}
   </h3>
-  <ol v-if="options" type="A">
+  <ol v-if="choices" type="A">
     <li
-      v-for="(option, index) in options"
+      v-for="(option, index) in choices"
       :key="index"
       :class="{
-        'is-correct': isSelectedOption(index) && isOptionCorrect(option),
-        'is-incorrect': isSelectedOption(index) && !isOptionCorrect(option),
+        'is-correct': isOptionCorrect(index),
+        'is-incorrect': !isOptionCorrect(index),
+        'is-selected': isSelectedOption(index),
       }"
     >
       <button @click="selectOption(index)" :disabled="disabled">
@@ -31,15 +32,12 @@ export default defineComponent({
       type: Object as PropType<Generated.QuizQuestion>,
       required: true,
     },
+    correctChoiceIndex: Number,
+    answerChoiceIndex: Number,
     disabled: Boolean,
   },
   emits: ["answer-to-ai-question"],
   components: {},
-  data() {
-    return {
-      selectedOptionIndex: undefined as number | undefined,
-    };
-  },
   computed: {
     rawJsonQuestion() {
       return this.quizQuestion.rawJsonQuestion;
@@ -53,23 +51,19 @@ export default defineComponent({
     questionDescription() {
       return this.quizQuestion.description;
     },
-    correctOption() {
-      return this.aiQuestion.choices[this.aiQuestion.correctChoiceIndex];
-    },
-    options() {
+    choices() {
       return this.aiQuestion.choices;
     },
   },
   methods: {
     selectOption(optionIndex: number) {
-      this.selectedOptionIndex = optionIndex;
       this.$emit("answer-to-ai-question", optionIndex);
     },
     isSelectedOption(optionIndex: number) {
-      return this.selectedOptionIndex === optionIndex;
+      return this.answerChoiceIndex === optionIndex;
     },
-    isOptionCorrect(option?: string) {
-      return option === this.correctOption;
+    isOptionCorrect(index: number) {
+      return index === this.correctChoiceIndex;
     },
   },
 });

@@ -206,6 +206,8 @@ declare namespace Generated {
     interface AnsweredQuestion {
         answerId: number;
         correct: boolean;
+        correctChoiceIndex?: number;
+        choiceIndex?: number;
         answerDisplay: string;
         reviewPoint?: ReviewPoint;
         quizQuestion: QuizQuestion;

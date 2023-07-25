@@ -2,6 +2,8 @@
   <AIQuestion
     v-if="quizQuestion.questionType === 'AI_QUESTION'"
     :quiz-question="quizQuestion"
+    :correct-choice-index="correctChoiceIndex"
+    :answer-choice-index="answerChoiceIndex"
     @answer-to-ai-question="submitAnswer({ choiceIndex: $event })"
   />
   <template v-else>
@@ -153,6 +155,14 @@ export default defineComponent({
       required: true,
     },
     reviewPointId: {
+      type: Number,
+      required: false,
+    },
+    correctChoiceIndex: {
+      type: Number,
+      required: false,
+    },
+    answerChoiceIndex: {
       type: Number,
       required: false,
     },

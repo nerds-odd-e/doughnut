@@ -53,19 +53,7 @@ public class Answer {
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
   @JsonIgnore
-  public AnsweredQuestion getViewedByUser(User user, ModelFactoryService modelFactoryService) {
-    AnsweredQuestion answerResult = new AnsweredQuestion();
-    answerResult.answerId = getId();
-    answerResult.correct = isCorrect();
-    answerResult.answerDisplay = getAnswerDisplay(modelFactoryService);
-    answerResult.reviewPoint = question.getReviewPointFor(modelFactoryService.toUserModel(user));
-    QuizQuestionEntity quizQuestion = getQuestion();
-    answerResult.quizQuestion = modelFactoryService.toQuizQuestion(quizQuestion, user);
-    return answerResult;
-  }
-
-  @JsonIgnore
-  private boolean isCorrect() {
+  public boolean isCorrect() {
     if (question.getQuestionType() == QuizQuestionEntity.QuestionType.SPELLING) {
       return question.getThing().getNote().matchAnswer(getSpellingAnswer());
     }
@@ -76,7 +64,7 @@ public class Answer {
   }
 
   @JsonIgnore
-  private String getAnswerDisplay(ModelFactoryService modelFactoryService) {
+  public String getAnswerDisplay(ModelFactoryService modelFactoryService) {
     if (question != null && choiceIndex != null) {
       return question
           .buildPresenter()
