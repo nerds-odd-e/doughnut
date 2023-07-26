@@ -4,10 +4,16 @@ image:
 tasks:
   - init: |
       git config --global init.defaultBranch main
+      rm -rf /home/gitpod/.nvm
       rm -rf /home/gitpod/.sdkman
+      rm -rf /home/gitpod/.bashrc.d/50-node
+      rm -rf /home/gitpod/.bashrc.d/99-java
       sed -i '/sdkman/d' /home/gitpod/.bashrc
       sed -i '/sdkman/d' /home/gitpod/.bash_profile
       sed -i '/sdkman/d' /home/gitpod/.profile
+      sed -i '/NVM_DIR/d' /home/gitpod/.bashrc
+      sed -i '/NVM_DIR/d' /home/gitpod/.bash_profile
+      sed -i '/NVM_DIR/d' /home/gitpod/.profile
       . /home/gitpod/.bashrc
       . /home/gitpod/.nix-profile/etc/profile.d/nix.sh
 
@@ -48,9 +54,7 @@ vscode:
     - Vue.volar
     - HansUXdev.bootstrap5-snippets
     - Shelex.vscode-cy-helper
-    - xyz.plsql-language
-    - bajdzis.vscode-database
-    - cweijan.vscode-redis-client
+    - mtxr.sqltools
     - GulajavaMinistudio.mayukaithemevsc
     - GabrielBB.vscode-lombok
     - jnoortheen.nix-ide
