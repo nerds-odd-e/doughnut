@@ -14,7 +14,7 @@
     "@popperjs/core": "^2.11",
     "@vue/runtime-core": "3.3.4",
     "@vueup/vue-quill": "^1.1.1",
-    "bootstrap": "5.3.0",
+    "bootstrap": "5.3.1",
     "gsap": "^3.11",
     "lodash": "^4.17",
     "mini-debounce": "^1.0.8",
