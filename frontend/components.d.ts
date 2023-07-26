@@ -8,7 +8,6 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AIGenerateImageDialog: typeof import('./src/components/notes/AIGenerateImageDialog.vue')['default']
-    AIQuestion: typeof import('./src/components/review/AIQuestion.vue')['default']
     AISuggestDescriptionButton: typeof import('./src/components/toolbars/AISuggestDescriptionButton.vue')['default']
     AnsweredQuestion: typeof import('./src/components/review/AnsweredQuestion.vue')['default']
     AnswerResult: typeof import('./src/components/review/AnswerResult.vue')['default']
@@ -29,7 +28,6 @@ declare module 'vue' {
     ContentLoader: typeof import('./src/components/commons/ContentLoader.vue')['default']
     ControlCenter: typeof import('./src/components/toolbars/ControlCenter.vue')['default']
     ControlCenterForNote: typeof import('./src/components/toolbars/ControlCenterForNote.vue')['default']
-    copy: typeof import('./src/components/review/QuizQuestion copy.vue')['default']
     DescriptionEditor: typeof import('./src/components/form/DescriptionEditor.vue')['default']
     DragListner: typeof import('./src/components/commons/DragListner.vue')['default']
     EditableText: typeof import('./src/components/form/EditableText.vue')['default']
