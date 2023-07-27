@@ -64,18 +64,6 @@
       $emit('update:modelValue', { ...modelValue, skipReview: $event })
     "
   />
-  <TextInput
-    scope-name="note"
-    field="questionGenerationInstruction"
-    :model-value="modelValue.questionGenerationInstruction"
-    :errors="errors.questionGenerationInstruction"
-    @update:model-value="
-      $emit('update:modelValue', {
-        ...modelValue,
-        questionGenerationInstruction: $event,
-      })
-    "
-  />
 </template>
 
 <script lang="ts">
