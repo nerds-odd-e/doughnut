@@ -94,7 +94,7 @@ description (until the end of this message):
   public ChatCompletionRequest build() {
     ChatCompletionRequest.ChatCompletionRequestBuilder requestBuilder =
         ChatCompletionRequest.builder()
-            .model("gpt-4")
+            .model("gpt-3.5-turbo-16k")
             .messages(messages)
             //
             // an effort has been made to make the api call more responsive by using stream(true)

@@ -1,5 +1,18 @@
 <template>
-  <div class="quiz-instruction">
+  <div v-if="quizQuestion.questionType === 'JUST_REVIEW'">
+    <ReviewPointAsync
+      v-if="reviewPointId"
+      v-bind="{
+        reviewPointId,
+        storageAccessor,
+      }"
+    />
+    <SelfEvaluateButtons
+      @self-evaluated-memory-state="submitAnswer({ spellingAnswer: $event })"
+      :key="reviewPointId"
+    />
+  </div>
+  <div v-else class="quiz-instruction">
     <ShowPicture
       v-if="quizQuestion.pictureWithMask"
       v-bind="quizQuestion.pictureWithMask"
@@ -13,20 +26,7 @@
       v-if="quizQuestion.stem"
       v-html="quizQuestion.stem"
     />
-    <div v-if="quizQuestion.questionType === 'JUST_REVIEW'">
-      <ReviewPointAsync
-        v-if="reviewPointId"
-        v-bind="{
-          reviewPointId,
-          storageAccessor,
-        }"
-      />
-      <SelfEvaluateButtons
-        @self-evaluated-memory-state="submitAnswer({ spellingAnswer: $event })"
-        :key="reviewPointId"
-      />
-    </div>
-    <div v-else-if="quizQuestion.questionType === 'SPELLING'">
+    <div v-if="quizQuestion.questionType === 'SPELLING'">
       <form @submit.prevent.once="submitAnswer({ spellingAnswer: answer })">
         <TextInput
           scope-name="review_point"
