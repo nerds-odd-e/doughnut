@@ -1,6 +1,4 @@
 import { FlexiPredicate, Operator } from "@anev/ts-mountebank"
-import "@testing-library/cypress/add-commands"
-import "cypress-file-upload"
 import ServiceMocker from "../../support/ServiceMocker"
 import { HttpMethod } from "@anev/ts-mountebank"
 
