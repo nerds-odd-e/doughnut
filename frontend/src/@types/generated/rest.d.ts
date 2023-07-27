@@ -291,7 +291,6 @@ declare namespace Generated {
         pictureMask: string;
         useParentPicture: boolean;
         skipReview: boolean;
-        questionGenerationInstruction: string;
         updatedAt: string;
     }
 
