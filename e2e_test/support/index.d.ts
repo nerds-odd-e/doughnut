@@ -116,8 +116,6 @@ declare namespace Cypress {
     unsubscribeFromNotebook(noteTitle: string): Chainable<any>
     updateCurrentUserSettingsWith(hash: Record<string, string>): Chainable<Subject>
     setServiceUrl(serviceName: string, serviceUrl: string): Chainable<any>
-    wikidataService(): Chainable<any>
-    openAiService(): Chainable<any>
     withinMindmap(): Chainable<any>
     yesIRemember(): Chainable<any>
     aiGenerateImage(noteTitle: string): Chainable<any>

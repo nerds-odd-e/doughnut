@@ -123,14 +123,6 @@ Cypress.Commands.add(
   },
 )
 
-Cypress.Commands.add("wikidataService", () => {
-  cy.wrap(new ServiceMocker("wikidata", 5001))
-})
-
-Cypress.Commands.add("openAiService", () => {
-  cy.wrap(new ServiceMocker("openAi", 5001))
-})
-
 Cypress.Commands.add("setServiceUrl", (serviceName: string, serviceUrl: string) => {
   return new TestabilityHelper()
     .postToTestabilityApi(cy, `replace_service_url`, {

@@ -52,11 +52,11 @@ Before({ tags: "@featureToggle" }, () => {
 })
 
 Before({ tags: "@usingMockedWikidataService" }, () => {
-  cy.wikidataService().mock()
+  services.wikidataService().mock()
 })
 
 After({ tags: "@usingMockedWikidataService" }, () => {
-  cy.wikidataService().restore()
+  services.wikidataService().restore()
 })
 
 Before({ tags: "@usingMockedOpenAiService" }, () => {

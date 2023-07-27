@@ -3,6 +3,7 @@
 // @ts-check
 
 import { DataTable, Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
+import { services } from "page_objects"
 
 When("I associate the note {string} with wikidata id {string}", (title, wikiID) => {
   cy.associateNoteWithWikidataId(title, wikiID)
@@ -21,28 +22,28 @@ Then("I don't need to confirm the association with different title {string}", ()
 Given(
   "Wikidata.org has an entity {string} with title {string} and link to wikipedia {string}",
   (wikidataId: string, wikidataTitle: string, wikipediaLink: string) => {
-    cy.wikidataService().stubWikidataEntityQuery(wikidataId, wikidataTitle, wikipediaLink)
+    services.wikidataService().stubWikidataEntityQuery(wikidataId, wikidataTitle, wikipediaLink)
   },
 )
 
 Given(
   "Wikidata.org has an entity {string} with title {string}",
   (wikidataId: string, wikidataTitle: string) => {
-    cy.wikidataService().stubWikidataEntityQuery(wikidataId, wikidataTitle, undefined)
+    services.wikidataService().stubWikidataEntityQuery(wikidataId, wikidataTitle, undefined)
   },
 )
 
 Given(
   "Wikidata.org entity {string} is a person from {string} and birthday is {string}",
   (wikidataId: string, countryId: string, birthday: string) => {
-    cy.wikidataService().stubWikidataEntityPerson(wikidataId, countryId, birthday)
+    services.wikidataService().stubWikidataEntityPerson(wikidataId, countryId, birthday)
   },
 )
 
 Given(
   "Wikidata.org entity {string} is a location at {float}, {float}",
   (wikidataId: string, lat: number, lng: number) => {
-    cy.wikidataService().stubWikidataEntityLocation(wikidataId, lat, lng)
+    services.wikidataService().stubWikidataEntityLocation(wikidataId, lat, lng)
   },
 )
 
@@ -65,7 +66,7 @@ Then(
 Given(
   "Wikidata search result always has {string} with ID {string}",
   (wikidataLabel: string, wikidataId: string) => {
-    cy.wikidataService().stubWikidataSearchResult(wikidataLabel, wikidataId)
+    services.wikidataService().stubWikidataSearchResult(wikidataLabel, wikidataId)
   },
 )
 
@@ -92,7 +93,7 @@ Then(
 Given(
   "the Wikidata.org entity {string} is written by authors with ID",
   (wikidataId: string, data: DataTable) => {
-    cy.wikidataService().stubWikidataEntityBook(
+    services.wikidataService().stubWikidataEntityBook(
       wikidataId,
       data.hashes().map((hash) => hash["Wikidata Id"]),
     )
