@@ -1,9 +1,9 @@
 import openAiService from "./openAiService"
 import wikidataService from "./wikidataService"
 
-const services = {
+const mock_services = {
   openAiService,
   wikidataService,
 }
 
-export default services
+export default mock_services

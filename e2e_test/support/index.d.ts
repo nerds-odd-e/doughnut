@@ -90,19 +90,6 @@ declare namespace Cypress {
     shouldSeeQuizWithOptions(questionParts: any, options: any): Chainable<any>
     startSearching(): Chainable<any>
     startSearchingAndLinkNote(noteTitle: string): Chainable<any>
-    stubWikidataEntityLocation(wikidataId: string, lat: number, lng: number): Chainable<Subject>
-    stubWikidataEntityBook(wikidataId: string, authorId: string[]): Chainable<Subject>
-    stubWikidataEntityPerson(
-      wikidataId: string,
-      countryId: string,
-      birthday: string,
-    ): Chainable<Subject>
-    stubWikidataEntityQuery(
-      wikidataId: string,
-      wikidataTitle: string,
-      wikipediaLink: string | undefined,
-    ): Chainable<Subject>
-    stubWikidataSearchResult(wikidataLabel: string, wikidataId: string): Chainable<Subject>
     subscribeToNotebook(notebookTitle: string, dailyLearningCount: string): Chinputainable<any>
     submitNoteFormWith(noteAttributes: any): Chainable<any>
     submitNoteFormsWith(notes: any): Chainable<any>

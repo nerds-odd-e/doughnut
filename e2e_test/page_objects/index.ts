@@ -1,6 +1,6 @@
 import { findQuestionWithStem, currentQuestion } from "./QuizQuestionPage"
 import { goToLastResult, answeredQuestionPage } from "./AnsweredQuestionPage"
-import services from "./services"
+import mock_services from "./mock_services"
 
 const jumpToNotePage = (noteTitle: string) => {
   cy.jumpToNotePage(noteTitle)
@@ -25,4 +25,4 @@ const pageObjects = {
   askQuestionForNote,
 }
 export default pageObjects
-export { services }
+export { mock_services }
