@@ -7,7 +7,7 @@ import "../support/string.extensions"
 import { mock_services } from "page_objects"
 
 Given("open AI service always think the system token is invalid", () => {
-  mock_services.openAiService().alwaysResponseAsUnauthorized()
+  mock_services.openAi().alwaysResponseAsUnauthorized()
 })
 
 Then("I should be prompted with an error message saying {string}", (errorMessage: string) => {
@@ -15,13 +15,13 @@ Then("I should be prompted with an error message saying {string}", (errorMessage
 })
 
 Given("OpenAI by default returns text completion {string}", (description: string) => {
-  mock_services.openAiService().stubChatCompletion(description, "stop")
+  mock_services.openAi().stubChatCompletion(description, "stop")
 })
 
 Given(
   "OpenAI completes with {string} for context containing {string}",
   (returnMessage: string, context: string) => {
-    mock_services.openAiService().mockChatCompletionWithContext(returnMessage, context)
+    mock_services.openAi().mockChatCompletionWithContext(returnMessage, context)
   },
 )
 
@@ -29,7 +29,7 @@ Given(
   "OpenAI completes with {string} for assistant message {string}",
   (returnMessage: string, incompleteAssistantMessage: string) => {
     mock_services
-      .openAiService()
+      .openAi()
       .mockChatCompletionWithIncompleteAssistantMessage(
         incompleteAssistantMessage,
         returnMessage,
@@ -39,20 +39,20 @@ Given(
 )
 
 Given("OpenAI always return image of a moon", () => {
-  mock_services.openAiService().stubCreateImage()
+  mock_services.openAi().stubCreateImage()
 })
 
 Given(
   "OpenAI returns an incomplete text completion {string} for assistant message {string}",
   (description: string, assistantMessage: string) => {
     mock_services
-      .openAiService()
+      .openAi()
       .mockChatCompletionWithIncompleteAssistantMessage(assistantMessage, description, "length")
   },
 )
 
 Given("An OpenAI response is unavailable", () => {
-  mock_services.openAiService().stubOpenAiCompletionWithErrorResponse()
+  mock_services.openAi().stubOpenAiCompletionWithErrorResponse()
 })
 
 Given("OpenAI by default returns this question from now:", (questionTable: DataTable) => {
@@ -63,11 +63,11 @@ Given("OpenAI by default returns this question from now:", (questionTable: DataT
     choices: [record.correct_choice, record.incorrect_choice_1, record.incorrect_choice_2],
   })
   mock_services
-    .openAiService()
+    .openAi()
     .restartImposter()
     .then(() =>
       mock_services
-        .openAiService()
+        .openAi()
         .stubAnyChatCompletionFunctionCall("ask_single_answer_multiple_choice_question", reply),
     )
 })

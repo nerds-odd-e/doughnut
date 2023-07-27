@@ -52,17 +52,17 @@ Before({ tags: "@featureToggle" }, () => {
 })
 
 Before({ tags: "@usingMockedWikidataService" }, () => {
-  mock_services.wikidataService().mock()
+  mock_services.wikidata().mock()
 })
 
 After({ tags: "@usingMockedWikidataService" }, () => {
-  mock_services.wikidataService().restore()
+  mock_services.wikidata().restore()
 })
 
 Before({ tags: "@usingMockedOpenAiService" }, () => {
-  mock_services.openAiService().mock()
+  mock_services.openAi().mock()
 })
 
 After({ tags: "@usingMockedOpenAiService" }, () => {
-  mock_services.openAiService().restore()
+  mock_services.openAi().restore()
 })

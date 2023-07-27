@@ -1,9 +1,9 @@
-import openAiService from "./openAiService"
-import wikidataService from "./wikidataService"
+import openAi from "./openAiService"
+import wikidata from "./wikidataService"
 
 const mock_services = {
-  openAiService,
-  wikidataService,
+  openAi,
+  wikidata,
 }
 
 export default mock_services

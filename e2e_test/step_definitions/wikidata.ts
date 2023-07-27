@@ -22,30 +22,28 @@ Then("I don't need to confirm the association with different title {string}", ()
 Given(
   "Wikidata.org has an entity {string} with title {string} and link to wikipedia {string}",
   (wikidataId: string, wikidataTitle: string, wikipediaLink: string) => {
-    mock_services
-      .wikidataService()
-      .stubWikidataEntityQuery(wikidataId, wikidataTitle, wikipediaLink)
+    mock_services.wikidata().stubWikidataEntityQuery(wikidataId, wikidataTitle, wikipediaLink)
   },
 )
 
 Given(
   "Wikidata.org has an entity {string} with title {string}",
   (wikidataId: string, wikidataTitle: string) => {
-    mock_services.wikidataService().stubWikidataEntityQuery(wikidataId, wikidataTitle, undefined)
+    mock_services.wikidata().stubWikidataEntityQuery(wikidataId, wikidataTitle, undefined)
   },
 )
 
 Given(
   "Wikidata.org entity {string} is a person from {string} and birthday is {string}",
   (wikidataId: string, countryId: string, birthday: string) => {
-    mock_services.wikidataService().stubWikidataEntityPerson(wikidataId, countryId, birthday)
+    mock_services.wikidata().stubWikidataEntityPerson(wikidataId, countryId, birthday)
   },
 )
 
 Given(
   "Wikidata.org entity {string} is a location at {float}, {float}",
   (wikidataId: string, lat: number, lng: number) => {
-    mock_services.wikidataService().stubWikidataEntityLocation(wikidataId, lat, lng)
+    mock_services.wikidata().stubWikidataEntityLocation(wikidataId, lat, lng)
   },
 )
 
@@ -68,7 +66,7 @@ Then(
 Given(
   "Wikidata search result always has {string} with ID {string}",
   (wikidataLabel: string, wikidataId: string) => {
-    mock_services.wikidataService().stubWikidataSearchResult(wikidataLabel, wikidataId)
+    mock_services.wikidata().stubWikidataSearchResult(wikidataLabel, wikidataId)
   },
 )
 
@@ -95,7 +93,7 @@ Then(
 Given(
   "the Wikidata.org entity {string} is written by authors with ID",
   (wikidataId: string, data: DataTable) => {
-    mock_services.wikidataService().stubWikidataEntityBook(
+    mock_services.wikidata().stubWikidataEntityBook(
       wikidataId,
       data.hashes().map((hash) => hash["Wikidata Id"]),
     )
