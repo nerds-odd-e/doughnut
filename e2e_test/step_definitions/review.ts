@@ -206,13 +206,6 @@ Then("I should be asked {string}", (expectedtQuestionStem: string) => {
   PageObjects.findQuestionWithStem(expectedtQuestionStem)
 })
 
-Then(
-  "the question stem generated from the note {string} should be {string}",
-  (noteTitle: string, expectedtQuestionStem: string) => {
-    PageObjects.askQuestionForNote(noteTitle).findQuestionWithStem(expectedtQuestionStem)
-  },
-)
-
 Then("I should see the question {string} is disabled", (questionStem: string) => {
   PageObjects.findQuestionWithStem(questionStem).isDisabled()
 })

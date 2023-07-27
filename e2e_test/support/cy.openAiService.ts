@@ -89,26 +89,6 @@ function mockChatCompletionForMessageContaining(
   )
 }
 
-function mockChatCompletionFunctionCallForMessageContaining(
-  serviceMocker: ServiceMocker,
-  messagesToMatch: MessageToMatch[],
-  functionName: string,
-  argumentsString: string,
-) {
-  return mockChatCompletion(
-    serviceMocker,
-    messagesToMatch,
-    {
-      role: "function",
-      function_call: {
-        name: functionName,
-        arguments: argumentsString,
-      },
-    },
-    "function_call",
-  )
-}
-
 Cypress.Commands.add("restartImposter", { prevSubject: true }, (serviceMocker: ServiceMocker) => {
   return serviceMocker.install()
 })
@@ -146,32 +126,20 @@ Cypress.Commands.add(
 )
 
 Cypress.Commands.add(
-  "stubChatCompletionFunctionCall",
-  { prevSubject: true },
-  (
-    serviceMocker: ServiceMocker,
-    functionName: string,
-    argumentsString: string,
-    bodyContains: string,
-  ) => {
-    return mockChatCompletionFunctionCallForMessageContaining(
-      serviceMocker,
-      [{ content: bodyContains }],
-      functionName,
-      argumentsString,
-    )
-  },
-)
-
-Cypress.Commands.add(
   "stubAnyChatCompletionFunctionCall",
   { prevSubject: true },
   (serviceMocker: ServiceMocker, functionName: string, argumentsString: string) => {
-    return mockChatCompletionFunctionCallForMessageContaining(
+    return mockChatCompletion(
       serviceMocker,
       [],
-      functionName,
-      argumentsString,
+      {
+        role: "function",
+        function_call: {
+          name: functionName,
+          arguments: argumentsString,
+        },
+      },
+      "function_call",
     )
   },
 )

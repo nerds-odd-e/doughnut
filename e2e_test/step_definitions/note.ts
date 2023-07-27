@@ -427,13 +427,3 @@ Then("I should see that the open AI service is not available in controller bar",
     })
     .click()
 })
-
-Then(
-  "I change the instruction of note {string} to {string}",
-  (noteTitle: string, instruction: string) => {
-    cy.jumpToNotePage(noteTitle)
-    cy.openAndSubmitNoteAccessoriesFormWith(noteTitle, {
-      "Question Generation Instruction": instruction,
-    })
-  },
-)

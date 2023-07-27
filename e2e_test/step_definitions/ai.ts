@@ -75,21 +75,3 @@ Then("it should consider the context {string}", (path: string) => {
 Then("I complain the question doesn't make sense", () => {
   cy.findByRole("button", { name: "Doesn't make sense?" }).click()
 })
-
-Given("AI will generate question for instruction:", (questionTable: DataTable) => {
-  cy.openAiService().restartImposter()
-
-  for (const mapping of questionTable.hashes()) {
-    const reply = JSON.stringify({
-      stem: mapping.question_stem,
-      correctChoiceIndex: 1,
-      choices: ["B", "A"],
-    })
-
-    cy.openAiService().stubChatCompletionFunctionCall(
-      "ask_single_answer_multiple_choice_question",
-      reply,
-      mapping.instruction,
-    )
-  }
-})
