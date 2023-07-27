@@ -4,9 +4,10 @@
 
 import { Given, Then, DataTable } from "@badeball/cypress-cucumber-preprocessor"
 import "../support/string.extensions"
+import { services } from "page_objects"
 
 Given("open AI service always think the system token is invalid", () => {
-  cy.openAiService().alwaysResponseAsUnauthorized()
+  services.openAiService().alwaysResponseAsUnauthorized()
 })
 
 Then("I should be prompted with an error message saying {string}", (errorMessage: string) => {
@@ -14,44 +15,44 @@ Then("I should be prompted with an error message saying {string}", (errorMessage
 })
 
 Given("OpenAI by default returns text completion {string}", (description: string) => {
-  cy.openAiService().stubChatCompletion(description, "stop")
+  services.openAiService().stubChatCompletion(description, "stop")
 })
 
 Given(
   "OpenAI completes with {string} for context containing {string}",
   (returnMessage: string, context: string) => {
-    cy.openAiService().mockChatCompletionWithContext(returnMessage, context)
+    services.openAiService().mockChatCompletionWithContext(returnMessage, context)
   },
 )
 
 Given(
   "OpenAI completes with {string} for assistant message {string}",
   (returnMessage: string, incompleteAssistantMessage: string) => {
-    cy.openAiService().mockChatCompletionWithIncompleteAssistantMessage(
-      incompleteAssistantMessage,
-      returnMessage,
-      "stop",
-    )
+    services
+      .openAiService()
+      .mockChatCompletionWithIncompleteAssistantMessage(
+        incompleteAssistantMessage,
+        returnMessage,
+        "stop",
+      )
   },
 )
 
 Given("OpenAI always return image of a moon", () => {
-  cy.openAiService().stubCreateImage()
+  services.openAiService().stubCreateImage()
 })
 
 Given(
   "OpenAI returns an incomplete text completion {string} for assistant message {string}",
   (description: string, assistantMessage: string) => {
-    cy.openAiService().mockChatCompletionWithIncompleteAssistantMessage(
-      assistantMessage,
-      description,
-      "length",
-    )
+    services
+      .openAiService()
+      .mockChatCompletionWithIncompleteAssistantMessage(assistantMessage, description, "length")
   },
 )
 
 Given("An OpenAI response is unavailable", () => {
-  cy.openAiService().stubOpenAiCompletionWithErrorResponse()
+  services.openAiService().stubOpenAiCompletionWithErrorResponse()
 })
 
 Given("OpenAI by default returns this question from now:", (questionTable: DataTable) => {
@@ -61,15 +62,14 @@ Given("OpenAI by default returns this question from now:", (questionTable: DataT
     correctChoiceIndex: 0,
     choices: [record.correct_choice, record.incorrect_choice_1, record.incorrect_choice_2],
   })
-  cy.openAiService().restartImposter()
-  cy.openAiService().stubAnyChatCompletionFunctionCall(
-    "ask_single_answer_multiple_choice_question",
-    reply,
-  )
-})
-
-Then("it should consider the context {string}", (path: string) => {
-  cy.openAiService().thePreviousRequestShouldHaveIncludedPathInfo(path)
+  services
+    .openAiService()
+    .restartImposter()
+    .then(() =>
+      services
+        .openAiService()
+        .stubAnyChatCompletionFunctionCall("ask_single_answer_multiple_choice_question", reply),
+    )
 })
 
 Then("I complain the question doesn't make sense", () => {
