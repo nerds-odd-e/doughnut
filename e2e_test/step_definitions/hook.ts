@@ -5,6 +5,7 @@
 
 import { Before, After } from "@badeball/cypress-cucumber-preprocessor"
 import TestabilityHelper from "../support/TestabilityHelper"
+import { services } from "page_objects"
 
 Before(() => {
   cy.testability().cleanDBAndResetTestabilitySettings()
@@ -59,9 +60,9 @@ After({ tags: "@usingMockedWikidataService" }, () => {
 })
 
 Before({ tags: "@usingMockedOpenAiService" }, () => {
-  cy.openAiService().mock()
+  services.openAiService().mock()
 })
 
 After({ tags: "@usingMockedOpenAiService" }, () => {
-  cy.openAiService().restore()
+  services.openAiService().restore()
 })

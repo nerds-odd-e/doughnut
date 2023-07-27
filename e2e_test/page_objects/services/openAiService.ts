@@ -69,6 +69,7 @@ const openAiService = () => {
     restore() {
       cy.wrap(serviceMocker).restore()
     },
+
     restartImposter() {
       return serviceMocker.install()
     },
