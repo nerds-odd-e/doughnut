@@ -65,6 +65,7 @@ description (until the end of this message):
   3. Provide 2 to 4 choices with only 1 correct answer.
   4. Vary the lengths of the choice texts so that the correct answer isn't consistently the longest.
   5. If there's insufficient information in the note to create a question, leave the 'stem' field empty.
+  %s
 
   Note: The specific note of focus and its more detailed contexts are not known. Focus on memory reinforcement and recall across various subjects.
   """
