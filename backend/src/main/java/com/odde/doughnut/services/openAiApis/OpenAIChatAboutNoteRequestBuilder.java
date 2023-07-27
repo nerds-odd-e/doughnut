@@ -50,12 +50,6 @@ description (until the end of this message):
             .executor(AIGeneratedQuestion.class, null)
             .build();
 
-    String point6 =
-        Strings.isBlank(note.getNoteAccessories().getQuestionGenerationInstruction())
-            ? ""
-            : "6. Generate the question that is related to "
-                + note.getNoteAccessories().getQuestionGenerationInstruction();
-
     String messageBody =
         """
   Please assume the role of a Memory Assistant, which involves helping me review, recall, and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following guidelines:
@@ -68,8 +62,7 @@ description (until the end of this message):
   %s
 
   Note: The specific note of focus and its more detailed contexts are not known. Focus on memory reinforcement and recall across various subjects.
-  """
-            .formatted(point6);
+  """;
     messages.add(new ChatMessage(ChatMessageRole.USER.value(), messageBody));
 
     return this;
