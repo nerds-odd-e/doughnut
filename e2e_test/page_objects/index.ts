@@ -16,11 +16,11 @@ const askQuestionForNote = (noteTitle: string) => {
   return jumpToNotePage(noteTitle).askQuestion()
 }
 
-const PageObjects = {
+const pageObjects = {
   answeredQuestionPage,
   goToLastResult,
   findQuestionWithStem,
   currentQuestion,
   askQuestionForNote,
 }
-export default PageObjects
+export default pageObjects

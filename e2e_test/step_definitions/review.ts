@@ -3,7 +3,7 @@
 // @ts-check
 
 import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor"
-import PageObjects from "../page_objects"
+import pageObjects from "../page_objects"
 import { DataTable } from "@cucumber/cucumber"
 
 Then("I do these initial reviews in sequence:", (data) => {
@@ -170,42 +170,43 @@ Then("The randomizer always choose the last", () => {
 })
 
 Then("I should see that my answer is correct", () => {
-  PageObjects.answeredQuestionPage().expectLastAnswerToBeCorrect()
+  pageObjects.answeredQuestionPage().expectLastAnswerToBeCorrect()
 })
 
 Then("I should see that my last answer is correct", () => {
-  PageObjects.goToLastResult().expectLastAnswerToBeCorrect()
+  pageObjects.goToLastResult().expectLastAnswerToBeCorrect()
 })
 
 Then(
   "I should see the review point info of note {string}",
   (noteTitle: string, data: DataTable) => {
-    PageObjects.answeredQuestionPage()
+    pageObjects
+      .answeredQuestionPage()
       .showReviewPoint(noteTitle)
       .expectReviewPointInfo(data.hashes()[0])
   },
 )
 
 Then("choose to remove the last review point from reviews", () => {
-  PageObjects.goToLastResult().showReviewPoint().removeReviewPointFromReview()
+  pageObjects.goToLastResult().showReviewPoint().removeReviewPointFromReview()
 })
 
 Then("the choice {string} should be correct", (choice: string) => {
-  PageObjects.currentQuestion().expectChoiceToBe(choice, "correct")
+  pageObjects.currentQuestion().expectChoiceToBe(choice, "correct")
 })
 
 Then("the choice {string} should be incorrect", (choice: string) => {
-  PageObjects.currentQuestion().expectChoiceToBe(choice, "incorrect")
+  pageObjects.currentQuestion().expectChoiceToBe(choice, "incorrect")
 })
 
 When("I ask to generate a question for note {string}", (noteTitle: string) => {
-  PageObjects.askQuestionForNote(noteTitle)
+  pageObjects.askQuestionForNote(noteTitle)
 })
 
 Then("I should be asked {string}", (expectedtQuestionStem: string) => {
-  PageObjects.findQuestionWithStem(expectedtQuestionStem)
+  pageObjects.findQuestionWithStem(expectedtQuestionStem)
 })
 
 Then("I should see the question {string} is disabled", (questionStem: string) => {
-  PageObjects.findQuestionWithStem(questionStem).isDisabled()
+  pageObjects.findQuestionWithStem(questionStem).isDisabled()
 })
