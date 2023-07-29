@@ -3,11 +3,7 @@
   <div v-else>
     <div v-if="prevQuizQuestion">
       <h3>Previous Question...</h3>
-      <QuizQuestion
-        :quiz-question="prevQuizQuestion"
-        :storage-accessor="storageAccessor"
-        :disabled="true"
-      />
+      <QuizQuestion :quiz-question="prevQuizQuestion" :disabled="true" />
     </div>
     <AnsweredQuestion
       v-if="answeredQuestion"
@@ -17,7 +13,6 @@
     <QuizQuestion
       v-else
       :quiz-question="quizQuestion"
-      :storage-accessor="storageAccessor"
       @answered="onAnswered($event)"
     />
   </div>

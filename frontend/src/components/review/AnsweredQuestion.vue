@@ -18,8 +18,6 @@
     v-if="answeredQuestion.quizQuestion"
     v-bind="{
       quizQuestion: answeredQuestion.quizQuestion,
-      reviewPointId: reviewPoint?.id,
-      storageAccessor,
       correctChoiceIndex: answeredQuestion.correctChoiceIndex,
       answerChoiceIndex: answeredQuestion.choiceIndex,
     }"

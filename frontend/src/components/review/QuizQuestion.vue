@@ -1,18 +1,5 @@
 <template>
-  <div v-if="quizQuestion.questionType === 'JUST_REVIEW'">
-    <ReviewPointAsync
-      v-if="reviewPointId"
-      v-bind="{
-        reviewPointId,
-        storageAccessor,
-      }"
-    />
-    <SelfEvaluateButtons
-      @self-evaluated-memory-state="justReivew($event)"
-      :key="reviewPointId"
-    />
-  </div>
-  <div v-else class="quiz-instruction">
+  <div class="quiz-instruction">
     <ShowPicture
       v-if="quizQuestion.pictureWithMask"
       v-bind="quizQuestion.pictureWithMask"
@@ -57,12 +44,9 @@
 import { defineComponent, PropType } from "vue";
 import ShowPicture from "../notes/ShowPicture.vue";
 import TextInput from "../form/TextInput.vue";
-import ReviewPointAsync from "./ReviewPointAsync.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopups";
-import SelfEvaluateButtons from "./SelfEvaluateButtons.vue";
 import QuizQuestionChoices from "./QuizQuestionChoices.vue";
-import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   setup() {
@@ -73,20 +57,13 @@ export default defineComponent({
       type: Object as PropType<Generated.QuizQuestion>,
       required: true,
     },
-    reviewPointId: Number,
     correctChoiceIndex: Number,
     answerChoiceIndex: Number,
     disabled: Boolean,
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
   },
   components: {
     ShowPicture,
     TextInput,
-    ReviewPointAsync,
-    SelfEvaluateButtons,
     QuizQuestionChoices,
   },
   emits: ["answered"],
@@ -96,16 +73,6 @@ export default defineComponent({
     };
   },
   methods: {
-    async justReivew(successful: boolean) {
-      if (this.reviewPointId === undefined) {
-        return;
-      }
-      await this.api.reviewMethods.markAsRepeated(
-        this.reviewPointId,
-        successful,
-      );
-      this.$emit("answered");
-    },
     async submitAnswer(answerData: Partial<Generated.Answer>) {
       try {
         const answerResult = await this.api.reviewMethods.processAnswer(

@@ -2,11 +2,19 @@
   <div v-if="!minimized" class="content">
     <div class="inner-box">
       <template v-if="currentQuizQuestion">
+        <div v-if="currentQuizQuestion.questionType === 'JUST_REVIEW'">
+          <JustReview
+            v-bind="{
+              reviewPointId: currentReviewPointId,
+              storageAccessor,
+            }"
+            @reviewed="onAnswered($event)"
+          />
+        </div>
         <QuizQuestion
+          v-else
           v-bind="{
             quizQuestion: currentQuizQuestion,
-            reviewPointId: currentReviewPointId,
-            storageAccessor,
           }"
           @answered="onAnswered($event)"
           :key="currentQuizQuestion.quizQuestionId"
@@ -22,6 +30,7 @@ import _ from "lodash";
 import QuizQuestion from "./QuizQuestion.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import { StorageAccessor } from "../../store/createNoteStorage";
+import JustReview from "./JustReview.vue";
 
 export default defineComponent({
   setup() {
@@ -49,6 +58,7 @@ export default defineComponent({
   emits: ["answered"],
   components: {
     QuizQuestion,
+    JustReview,
   },
   data() {
     return {
