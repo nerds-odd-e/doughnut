@@ -33,6 +33,13 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
   },
   reviewMethods: {
+    async markAsRepeated(reviewPointId: Doughnut.ID, successful: boolean) {
+      return (await managedApi.restPost(
+        `review-points/${reviewPointId}/mark-as-repeated?successful=${successful}`,
+        {},
+      )) as Generated.ReviewPoint;
+    },
+
     async removeFromReview(reviewPointId: Doughnut.ID) {
       return (await managedApi.restPost(
         `review-points/${reviewPointId}/remove`,

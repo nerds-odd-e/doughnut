@@ -8,7 +8,7 @@
       }"
     />
     <SelfEvaluateButtons
-      @self-evaluated-memory-state="submitAnswer({ spellingAnswer: $event })"
+      @self-evaluated-memory-state="justReivew($event)"
       :key="reviewPointId"
     />
   </div>
@@ -96,6 +96,16 @@ export default defineComponent({
     };
   },
   methods: {
+    async justReivew(successful: boolean) {
+      if (this.reviewPointId === undefined) {
+        return;
+      }
+      await this.api.reviewMethods.markAsRepeated(
+        this.reviewPointId,
+        successful,
+      );
+      this.$emit("answered");
+    },
     async submitAnswer(answerData: Partial<Generated.Answer>) {
       try {
         const answerResult = await this.api.reviewMethods.processAnswer(

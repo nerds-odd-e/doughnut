@@ -90,7 +90,7 @@ describe("repeat page", () => {
       };
       helper.apiMock
         .expectingPost(
-          `/api/quiz-questions/${quizQuestion.quizQuestionId}/answer`,
+          `/api/review-points/${reviewPointId}/mark-as-repeated?successful=true`,
         )
         .andReturnOnce(answerResult);
       vi.runOnlyPendingTimers();

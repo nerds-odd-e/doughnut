@@ -65,14 +65,14 @@ export default defineComponent({
   emits: ["selfEvaluated"],
   components: { SvgNoReview, SvgSad, SvgHappy },
   methods: {
-    selfEvaluate(adjustment: number) {
-      this.api.reviewMethods
-        .selfEvaluate(this.reviewPoint.id, {
+    async selfEvaluate(adjustment: number) {
+      const reviewPoint = await this.api.reviewMethods.selfEvaluate(
+        this.reviewPoint.id,
+        {
           adjustment,
-        })
-        .then((reviewPoint) => {
-          this.$emit("selfEvaluated", reviewPoint);
-        });
+        },
+      );
+      this.$emit("selfEvaluated", reviewPoint);
     },
 
     async removeFromReview() {

@@ -2,14 +2,14 @@
   <div class="btn-group">
     <button
       class="btn btn-primary loading"
-      @click.once="$emit('self-evaluated-memory-state', 'yes')"
+      @click.once="$emit('self-evaluated-memory-state', true)"
       :disabled="!ready"
     >
       Yes, I remember
     </button>
     <button
       class="btn btn-secondary"
-      @click.once="$emit('self-evaluated-memory-state', 'no')"
+      @click.once="$emit('self-evaluated-memory-state', false)"
     >
       No, I need more repetition
     </button>

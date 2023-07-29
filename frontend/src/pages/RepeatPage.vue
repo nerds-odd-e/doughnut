@@ -68,7 +68,7 @@ export default defineComponent({
     return {
       toRepeat: undefined as number[] | undefined,
       currentIndex: 0,
-      previousResults: [] as Generated.AnsweredQuestion[],
+      previousResults: [] as (Generated.AnsweredQuestion | undefined)[],
       previousResultCursor: undefined as number | undefined,
     };
   },
@@ -108,9 +108,10 @@ export default defineComponent({
       }
     },
 
-    onAnswered(answerResult: Generated.AnsweredQuestion) {
-      this.previousResults.push(answerResult);
+    onAnswered(answerResult?: Generated.AnsweredQuestion) {
       this.currentIndex += 1;
+      this.previousResults.push(answerResult);
+      if (!answerResult) return;
       if (!answerResult.correct) {
         this.viewLastResult(this.previousResults.length - 1);
       }
