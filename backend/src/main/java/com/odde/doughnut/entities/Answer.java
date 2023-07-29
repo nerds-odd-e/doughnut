@@ -57,9 +57,6 @@ public class Answer {
     if (question.getQuestionType() == QuizQuestionEntity.QuestionType.SPELLING) {
       return question.getThing().getNote().matchAnswer(getSpellingAnswer());
     }
-    if (question.getQuestionType() == QuizQuestionEntity.QuestionType.JUST_REVIEW) {
-      return Objects.equals(getSpellingAnswer(), "yes");
-    }
     return Objects.equals(getChoiceIndex(), question.getCorrectAnswerIndex());
   }
 
