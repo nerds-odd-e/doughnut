@@ -119,7 +119,7 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
                 .by(userModel)
                 .afterNthStrictRepetition(ntimes)
                 .toModelPlease();
-        reviewPoint.updateAfterRepetition(
+        reviewPoint.markAsRepeated(
             TimestampOperations.addHoursToTimestamp(
                 reviewPoint.getEntity().getNextReviewAt(), daysDelay * 24),
             true);

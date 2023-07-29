@@ -41,7 +41,7 @@ public class AnswerModel {
     if (reviewPoint == null) return;
     modelFactoryService
         .toReviewPointModel(reviewPoint)
-        .updateAfterRepetition(currentUTCTimestamp, answer.isCorrect());
+        .markAsRepeated(currentUTCTimestamp, answer.isCorrect());
   }
 
   private ReviewPoint getReviewPoint(User user) {

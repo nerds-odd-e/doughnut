@@ -28,7 +28,7 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
     return quizQuestionGenerator.buildRandomQuestion(user.getAiQuestionTypeOnlyForReview());
   }
 
-  public void updateAfterRepetition(Timestamp currentUTCTimestamp, boolean successful) {
+  public void markAsRepeated(Timestamp currentUTCTimestamp, boolean successful) {
     entity.setRepetitionCount(entity.getRepetitionCount() + 1);
     if (successful) {
       entity.reviewedSuccessfully(currentUTCTimestamp);

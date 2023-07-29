@@ -81,4 +81,15 @@ class RestReviewPointController {
         .updateForgettingCurve(selfEvaluation.adjustment);
     return reviewPoint;
   }
+
+  @PostMapping(path = "/{reviewPoint}/mark-as-repeated")
+  @Transactional
+  public ReviewPoint markAsRepeated(
+      ReviewPoint reviewPoint, @RequestParam("successful") boolean successful) {
+    currentUser.assertLoggedIn();
+    modelFactoryService
+        .toReviewPointModel(reviewPoint)
+        .markAsRepeated(testabilitySettings.getCurrentUTCTimestamp(), successful);
+    return reviewPoint;
+  }
 }

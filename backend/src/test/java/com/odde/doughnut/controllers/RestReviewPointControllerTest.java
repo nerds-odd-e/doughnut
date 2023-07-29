@@ -145,4 +145,16 @@ class RestReviewPointControllerTest {
       assertThat(quizQuestion.quizQuestionId, notNullValue());
     }
   }
+
+  @Nested
+  class MarkAsReviewed {
+    @Test
+    void itMustUpdateTheReviewPointRecord() {
+      Note note = makeMe.aNote().asHeadNoteOfANotebook().please();
+      ReviewPoint rp = makeMe.aReviewPointFor(note).by(userModel).please();
+      Integer oldRepeatitionCount = rp.getRepetitionCount();
+      controller.markAsRepeated(rp, true);
+      assertThat(rp.getRepetitionCount(), equalTo(oldRepeatitionCount + 1));
+    }
+  }
 }
