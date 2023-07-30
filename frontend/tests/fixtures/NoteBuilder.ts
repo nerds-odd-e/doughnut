@@ -13,7 +13,6 @@ class NoteBuilder extends Builder<Generated.Note> {
       deletedAt: "",
       noteAccessories: {
         url: "",
-        urlIsVideo: false,
         pictureUrl: "",
         pictureMask: "",
         useParentPicture: false,

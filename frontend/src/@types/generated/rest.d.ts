@@ -287,7 +287,6 @@ declare namespace Generated {
 
     interface NoteAccessories {
         url: string;
-        urlIsVideo: boolean;
         pictureUrl: string;
         pictureMask: string;
         useParentPicture: boolean;

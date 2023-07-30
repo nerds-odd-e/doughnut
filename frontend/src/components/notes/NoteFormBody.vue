@@ -46,15 +46,6 @@
       $emit('update:modelValue', { ...modelValue, url: $event })
     "
   />
-  <CheckInput
-    scope-name="note"
-    field="urlIsVideo"
-    :model-value="modelValue.urlIsVideo"
-    :errors="errors.urlIsVideo"
-    @update:model-value="
-      $emit('update:modelValue', { ...modelValue, urlIsVideo: $event })
-    "
-  />
 </template>
 
 <script lang="ts">

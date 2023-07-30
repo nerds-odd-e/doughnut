@@ -29,10 +29,7 @@
       </template>
       <template v-if="!!note.noteAccessories.url">
         <div v-if="size != 'small'">
-          <label
-            id="note-url"
-            v-text="note.noteAccessories.urlIsVideo ? 'Video Url:' : 'Url:'"
-          />
+          <label id="note-url" v-text="'Url:'" />
           <a
             aria-labelledby="note-url"
             :href="note.noteAccessories.url"
