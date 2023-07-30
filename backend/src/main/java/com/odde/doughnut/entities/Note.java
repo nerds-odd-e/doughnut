@@ -37,6 +37,7 @@ public class Note extends Thingy {
   @Getter
   @Setter
   @Nullable
+  @JsonIgnore
   private NoteLocation location = null;
 
   @OneToOne(mappedBy = "note", cascade = CascadeType.ALL)

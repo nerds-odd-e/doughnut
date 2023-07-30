@@ -52,11 +52,6 @@ class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
     return this;
   }
 
-  location(location: Generated.NoteLocation): NoteRealmBuilder {
-    this.data.note.location = location;
-    return this;
-  }
-
   linkToSomeNote(title: string): NoteRealmBuilder {
     return this.linkTo(new NoteRealmBuilder().title(title).do());
   }

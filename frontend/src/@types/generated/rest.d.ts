@@ -242,7 +242,6 @@ declare namespace Generated {
         title: string;
         parentId?: number;
         noteAccessories: NoteAccessories;
-        location?: NoteLocation;
         wikidataId: string;
         textContent: TextContent;
         deletedAt: string;
@@ -291,11 +290,6 @@ declare namespace Generated {
         pictureMask: string;
         useParentPicture: boolean;
         updatedAt: string;
-    }
-
-    interface NoteLocation {
-        latitude: number;
-        longitude: number;
     }
 
     interface Circle {
