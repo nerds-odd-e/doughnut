@@ -22,7 +22,6 @@ import lombok.Setter;
 import org.hibernate.annotations.Where;
 import org.hibernate.annotations.WhereJoinTable;
 import org.springframework.beans.BeanUtils;
-import org.springframework.lang.Nullable;
 
 @Entity
 @Table(name = "note")
@@ -31,14 +30,6 @@ public class Note extends Thingy {
   private Note() {}
 
   @Embedded @Valid @Getter private final NoteAccessories noteAccessories = new NoteAccessories();
-
-  @OneToOne(mappedBy = "note", cascade = CascadeType.ALL)
-  @Valid
-  @Getter
-  @Setter
-  @Nullable
-  @JsonIgnore
-  private NoteLocation location = null;
 
   @OneToOne(mappedBy = "note", cascade = CascadeType.ALL)
   @Getter
@@ -70,14 +61,6 @@ public class Note extends Thingy {
   @Getter
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private Timestamp deletedAt;
-
-  public void buildLocation(Coordinate coordinate) {
-    NoteLocation noteLocation = new NoteLocation();
-    noteLocation.setLatitude(coordinate.latitude());
-    noteLocation.setLongitude(coordinate.longitude());
-    noteLocation.setNote(this);
-    this.setLocation(noteLocation);
-  }
 
   public void setDeletedAt(Timestamp value) {
     this.deletedAt = value;

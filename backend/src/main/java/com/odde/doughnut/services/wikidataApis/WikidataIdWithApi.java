@@ -45,7 +45,6 @@ public final class WikidataIdWithApi {
     model
         .map(entity -> entity.wikidataDescription(wikidataApi))
         .ifPresent(note::prependDescription);
-    model.flatMap(WikidataEntityModel::getCoordinate).ifPresent(note::buildLocation);
   }
 
   public Optional<WikidataIdWithApi> getCountryOfOrigin() throws IOException, InterruptedException {
