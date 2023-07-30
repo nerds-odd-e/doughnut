@@ -111,9 +111,6 @@ export default defineComponent({
     },
 
     async fetchQuestion() {
-      if (!this.reviewPoints) {
-        return;
-      }
       this.eagerFetchUntil = _.max([
         this.eagerFetchUntil,
         this.currentIndex + this.eagerFetchCount,
@@ -123,17 +120,15 @@ export default defineComponent({
 
     async fetchNextQuestion() {
       const index = this.quizQuestionCache.length;
-      if (this.eagerFetchUntil > index) {
-        const reviewPointId = this.reviewPointIdAt(index);
-        if (reviewPointId) {
-          const question =
-            await this.silentApi.reviewMethods.getRandomQuestionForReviewPoint(
-              reviewPointId,
-            );
-          this.quizQuestionCache.push(question);
-          await this.fetchNextQuestion();
-        }
-      }
+      if (this.eagerFetchUntil <= index) return;
+      const reviewPointId = this.reviewPointIdAt(index);
+      if (reviewPointId === undefined) return;
+      const question =
+        await this.silentApi.reviewMethods.getRandomQuestionForReviewPoint(
+          reviewPointId,
+        );
+      this.quizQuestionCache.push(question);
+      await this.fetchNextQuestion();
     },
 
     onAnswered(answerResult: Generated.AnsweredQuestion) {
