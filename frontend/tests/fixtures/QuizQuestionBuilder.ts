@@ -4,13 +4,8 @@ import generateId from "./generateId";
 class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
   quizQuestion: Generated.QuizQuestion = {
     quizQuestionId: generateId(),
-    questionType: "JUST_REVIEW",
-    choices: [
-      {
-        picture: false,
-        display: "question",
-      },
-    ],
+    questionType: "SPELLING",
+    choices: [],
     stem: "answer",
     mainTopic: "",
   };

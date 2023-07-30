@@ -69,7 +69,7 @@ describe("repeat page", () => {
       repetition.toRepeat = [reviewPointId, secondReviewPointId, 3];
       helper.apiMock
         .expectingGet(`/api/review-points/${reviewPointId}/random-question`)
-        .andReturnOnce(quizQuestion);
+        .andRespondOnceWith404();
       helper.apiMock
         .expectingGet(`/api/review-points/${reviewPointId}`)
         .andReturnOnce(reviewPoint);
