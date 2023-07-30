@@ -5,7 +5,7 @@
       <h5 class="card-title">
         <NoteTitleWithLink :note="note" class="card-title" />
       </h5>
-      <NoteShortDescription :description="note.textContent.description" />
+      <NoteShortDescription :description="note.description" />
       <slot name="button" :note="note" />
     </div>
   </div>

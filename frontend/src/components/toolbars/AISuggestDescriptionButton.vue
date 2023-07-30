@@ -3,7 +3,7 @@
     :title="'suggest description'"
     class="btn btn-sm"
     role="button"
-    @click="suggestDescription(selectedNote.textContent.description)"
+    @click="suggestDescription(selectedNote.description)"
   >
     <SvgRobot />
   </a>

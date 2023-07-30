@@ -245,6 +245,7 @@ declare namespace Generated {
         wikidataId: string;
         textContent: TextContent;
         deletedAt: string;
+        description: string;
         pictureWithMask?: PictureWithMask;
     }
 

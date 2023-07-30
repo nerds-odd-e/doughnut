@@ -206,6 +206,10 @@ public class Note extends Thingy {
     return getTextContent().getTitle();
   }
 
+  public String getDescription() {
+    return getTextContent().getDescription();
+  }
+
   public void mergeMasterReviewSetting(ReviewSetting reviewSetting) {
     ReviewSetting current = getMasterReviewSetting();
     if (current == null) {
