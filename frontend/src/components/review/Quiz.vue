@@ -38,7 +38,7 @@ export default defineComponent({
   },
   props: {
     minimized: Boolean,
-    quizQuestions: {
+    reviewPoints: {
       type: Object as PropType<number[]>,
       required: true,
     },
@@ -63,6 +63,7 @@ export default defineComponent({
   data() {
     return {
       quizQuestionCache: new Map<number, Generated.QuizQuestion | undefined>(),
+      quizQuestionCache1: [] as (Generated.QuizQuestion | undefined)[],
       nextFetchingIndex: 0,
     };
   },
@@ -88,15 +89,17 @@ export default defineComponent({
     },
   },
   methods: {
-    nextReviewPointId(index: number): number | undefined {
-      if (
-        this.quizQuestions &&
-        index + this.currentIndex < this.quizQuestions.length
-      ) {
-        return this.quizQuestions[this.currentIndex + index] as number;
+    nextReviewPointId(offset: number): number | undefined {
+      return this.reviewPointIdAt(this.currentIndex + offset);
+    },
+
+    reviewPointIdAt(index: number): number | undefined {
+      if (this.reviewPoints && index < this.reviewPoints.length) {
+        return this.reviewPoints[index] as number;
       }
       return undefined;
     },
+
     selectPosition() {
       if (this.minimized) return;
       this.storageAccessor.selectPosition(
@@ -106,7 +109,7 @@ export default defineComponent({
     },
 
     async fetchQuestion() {
-      if (!this.quizQuestions) {
+      if (!this.reviewPoints) {
         return;
       }
       await this.fetchNextQuestion(0);

@@ -9,14 +9,11 @@ helper.resetWithApiMock(beforeEach, afterEach);
 const quizQuestion = makeMe.aQuizQuestion.withClozeSelectionQuestion().please();
 
 describe("repeat page", () => {
-  const mountPage = async (
-    quizQuestions: number[],
-    eagerFetchCount: number,
-  ) => {
+  const mountPage = async (reviewPoints: number[], eagerFetchCount: number) => {
     const wrapper = helper
       .component(Quiz)
       .withStorageProps({
-        quizQuestions,
+        reviewPoints,
         currentIndex: 0,
         eagerFetchCount,
       })

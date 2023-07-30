@@ -14,7 +14,7 @@
     <Quiz
       v-if="toRepeatCount !== 0"
       :minimized="minimized"
-      :quiz-questions="toRepeat"
+      :review-points="toRepeat"
       :current-index="currentIndex"
       :eager-fetch-count="eagerFetchCount ?? 5"
       :storage-accessor="storageAccessor"
