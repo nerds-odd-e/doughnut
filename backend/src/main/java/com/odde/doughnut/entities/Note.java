@@ -46,6 +46,7 @@ public class Note extends Thingy {
   @JoinColumn(name = "text_content_id", referencedColumnName = "id")
   @Getter
   @Setter
+  @JsonIgnore
   private TextContent textContent = new TextContent();
 
   @Column(name = "sibling_order")
@@ -200,6 +201,10 @@ public class Note extends Thingy {
       return new ArrayList<>();
     }
     return Collections.unmodifiableList(getParentNote().getChildren());
+  }
+
+  public Timestamp getUpdatedAt() {
+    return getTextContent().getUpdatedAt();
   }
 
   public String getTitle() {

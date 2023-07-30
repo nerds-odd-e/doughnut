@@ -11,7 +11,7 @@
       <label
         >Last Content Updated:
         <span class="statistics-value">{{
-          new Date(noteInfo.note.note.textContent.updatedAt).toLocaleString()
+          new Date(noteInfo.note.note.updatedAt).toLocaleString()
         }}</span></label
       >
     </li>

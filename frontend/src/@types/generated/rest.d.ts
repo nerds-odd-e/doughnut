@@ -243,10 +243,10 @@ declare namespace Generated {
         parentId?: number;
         noteAccessories: NoteAccessories;
         wikidataId: string;
-        textContent: TextContent;
         deletedAt: string;
         description: string;
         pictureWithMask?: PictureWithMask;
+        updatedAt: string;
     }
 
     interface Ownership {

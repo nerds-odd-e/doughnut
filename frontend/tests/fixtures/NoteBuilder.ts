@@ -19,11 +19,7 @@ class NoteBuilder extends Builder<Generated.Note> {
         useParentPicture: false,
         updatedAt: "",
       },
-      textContent: {
-        title: "Note1.1.1",
-        description: "<p>Desc</p>",
-        updatedAt: "2021-08-24T08:46:44.000+00:00",
-      },
+      updatedAt: "2021-08-24T08:46:44.000+00:00",
     };
   }
 
@@ -36,7 +32,6 @@ class NoteBuilder extends Builder<Generated.Note> {
 
   title(value: string): NoteBuilder {
     this.data.title = value;
-    this.data.textContent.title = value;
     return this;
   }
 
@@ -46,7 +41,6 @@ class NoteBuilder extends Builder<Generated.Note> {
   }
 
   description(value: string): NoteBuilder {
-    this.data.textContent.description = value;
     this.data.description = value;
     return this;
   }
@@ -67,8 +61,8 @@ class NoteBuilder extends Builder<Generated.Note> {
     return this;
   }
 
-  textContentUpdatedAt(value: Date): NoteBuilder {
-    this.data.textContent.updatedAt = value.toJSON();
+  updatedAt(value: Date): NoteBuilder {
+    this.data.updatedAt = value.toJSON();
     return this;
   }
 

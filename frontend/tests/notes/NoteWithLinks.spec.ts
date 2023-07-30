@@ -17,7 +17,7 @@ describe("new/updated pink banner", () => {
   ])(
     "should show fresher color if recently updated",
     (updatedAt, expectedColor) => {
-      const note = makeMe.aNoteRealm.textContentUpdatedAt(updatedAt).please();
+      const note = makeMe.aNoteRealm.updatedAt(updatedAt).please();
 
       const wrapper = helper
         .component(NoteWithLinks)

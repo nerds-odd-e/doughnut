@@ -1,8 +1,5 @@
 <template>
-  <NoteShell
-    v-if="note"
-    v-bind="{ id: note.id, updatedAt: note.textContent?.updatedAt }"
-  >
+  <NoteShell v-if="note" v-bind="{ id: note.id, updatedAt: note.updatedAt }">
     <NoteFrameOfLinks v-if="links" v-bind="{ links, storageAccessor }">
       <NoteContent v-bind="{ note, storageAccessor }" />
     </NoteFrameOfLinks>

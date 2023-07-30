@@ -47,8 +47,8 @@ class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
     return this;
   }
 
-  textContentUpdatedAt(value: Date): NoteRealmBuilder {
-    this.noteBuilder.textContentUpdatedAt(value);
+  updatedAt(value: Date): NoteRealmBuilder {
+    this.noteBuilder.updatedAt(value);
     return this;
   }
 

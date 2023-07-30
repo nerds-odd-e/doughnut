@@ -5,7 +5,7 @@
   <NoteTextContent
     :note-id="note.id"
     :text-content="{
-      ...note.textContent,
+      updatedAt: note.updatedAt,
       title: note.title,
       description: note.description,
     }"

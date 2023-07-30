@@ -13,7 +13,10 @@ describe("in place edit on title", () => {
   ): VueWrapper<ComponentPublicInstance> => {
     return helper
       .component(NoteTextContent)
-      .withStorageProps({ noteId: n.id, textContent: n.textContent })
+      .withStorageProps({
+        noteId: n.id,
+        textContent: { title: n.title, description: n.description },
+      })
       .mount();
   };
 
@@ -116,7 +119,7 @@ describe("in place edit on title", () => {
   });
 
   it("should not trigger changes for initial description content", async () => {
-    note.textContent.description = "initial\n\ndescription";
+    note.description = "initial\n\ndescription";
     const wrapper = mountComponent(note);
     await flushPromises();
     wrapper.unmount();
@@ -125,7 +128,7 @@ describe("in place edit on title", () => {
   });
 
   it("when there is pending changes not saved but the previous change trigger refresh", async () => {
-    note.textContent.description = "initial\n\ndescription";
+    note.description = "initial\n\ndescription";
     const wrapper = mountComponent(note);
     await wrapper.find('[role="title"]').trigger("click");
     await wrapper.find('[role="title"] input').setValue("updated");
