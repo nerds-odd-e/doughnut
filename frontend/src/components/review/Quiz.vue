@@ -63,6 +63,7 @@ export default defineComponent({
   data() {
     return {
       quizQuestionCache: new Map<number, Generated.QuizQuestion | undefined>(),
+      nextFetchingIndex: 0,
     };
   },
   computed: {
@@ -79,6 +80,7 @@ export default defineComponent({
     },
     QuizQuestions() {
       this.quizQuestionCache.clear();
+      this.nextFetchingIndex = 0;
       this.fetchQuestion();
     },
     currentIndex() {
@@ -120,6 +122,10 @@ export default defineComponent({
     },
 
     async fetchNextQuestion(index: number) {
+      if (this.nextFetchingIndex < this.currentIndex + index) {
+        return;
+      }
+      this.nextFetchingIndex += 1;
       const next = this.nextReviewPointId(index);
       if (next) {
         if (this.quizQuestionCache.has(next)) {
