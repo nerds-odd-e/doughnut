@@ -49,6 +49,8 @@ in mkShell {
     atuin
     chezmoi
     nix-direnv
+    qemu
+    podman
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp
     apple_sdk.CoreServices
