@@ -240,11 +240,11 @@ declare namespace Generated {
 
     interface Note extends Thingy {
         title: string;
+        description: string;
         parentId?: number;
         noteAccessories: NoteAccessories;
         wikidataId: string;
         deletedAt: string;
-        description: string;
         pictureWithMask?: PictureWithMask;
         updatedAt: string;
     }
