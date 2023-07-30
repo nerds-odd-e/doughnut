@@ -91,10 +91,6 @@ export default defineComponent({
     },
   },
   methods: {
-    nextReviewPointId(offset: number): number | undefined {
-      return this.reviewPointIdAt(this.currentIndex + offset);
-    },
-
     reviewPointIdAt(index: number): number | undefined {
       if (this.reviewPoints && index < this.reviewPoints.length) {
         return this.reviewPoints[index] as number;
