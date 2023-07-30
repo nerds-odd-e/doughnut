@@ -27,7 +27,6 @@ import org.apache.logging.log4j.util.Strings;
 public class QuizQuestionEntity {
 
   public enum QuestionType {
-    JUST_REVIEW(0, null, JustReviewQuizPresenter::new),
     CLOZE_SELECTION(1, ClozeTitleSelectionQuizFactory::new, ClozeTitleSelectionQuizPresenter::new),
     SPELLING(2, SpellingQuizFactory::new, SpellingQuizPresenter::new),
     PICTURE_TITLE(
@@ -157,7 +156,7 @@ public class QuizQuestionEntity {
 
   @JsonIgnore
   public NotePositionViewedByUser getNotebookPosition(User user) {
-    if (getQuestionType() == QuestionType.JUST_REVIEW || thing == null) {
+    if (thing == null) {
       return null;
     }
     return new NoteViewer(user, thing.getHeadNoteOfNotebook()).jsonNotePosition(true);
