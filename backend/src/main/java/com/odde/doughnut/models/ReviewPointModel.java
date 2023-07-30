@@ -7,6 +7,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionGenerator;
 import com.odde.doughnut.services.AiAdvisorService;
 import java.sql.Timestamp;
+import java.util.Optional;
 
 public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFactoryService) {
 
@@ -21,7 +22,7 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
     updateForgettingCurve(0);
   }
 
-  public QuizQuestionEntity generateAQuizQuestion(
+  public Optional<QuizQuestionEntity> generateAQuizQuestion(
       Randomizer randomizer, User user, AiAdvisorService aiAdvisorService) {
     QuizQuestionGenerator quizQuestionGenerator =
         new QuizQuestionGenerator(entity, randomizer, modelFactoryService, aiAdvisorService);

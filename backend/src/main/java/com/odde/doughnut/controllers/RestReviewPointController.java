@@ -7,8 +7,6 @@ import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.entities.json.SelfEvaluation;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.Randomizer;
-import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -52,11 +50,13 @@ class RestReviewPointController {
   @Transactional
   public QuizQuestion generateRandomQuestion(@PathVariable("reviewPoint") ReviewPoint reviewPoint) {
     currentUser.assertLoggedIn();
-    ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPoint);
-    Randomizer randomizer = testabilitySettings.getRandomizer();
     User user = currentUser.getEntity();
     QuizQuestionEntity quizQuestionEntity =
-        reviewPointModel.generateAQuizQuestion(randomizer, user, aiAdvisorService);
+        modelFactoryService
+            .toReviewPointModel(reviewPoint)
+            .generateAQuizQuestion(testabilitySettings.getRandomizer(), user, aiAdvisorService)
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
     modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
     return modelFactoryService.toQuizQuestion(quizQuestionEntity, user);
   }

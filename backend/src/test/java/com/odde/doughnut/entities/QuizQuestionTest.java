@@ -2,6 +2,7 @@ package com.odde.doughnut.entities;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -17,6 +18,7 @@ import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -43,9 +45,11 @@ class QuizQuestionTest {
   @Test
   void aNoteWithNoDescriptionHasNoQuiz() {
     Note note = makeMe.aNote().withNoDescription().creatorAndOwner(userModel).please();
-    assertThat(
-        getQuizQuestion(note).getQuestionType(),
-        equalTo(QuizQuestionEntity.QuestionType.JUST_REVIEW));
+
+    ReviewPointModel reviewPointModel = getReviewPointModel(note);
+    Optional<QuizQuestionEntity> quizQuestionEntity =
+        reviewPointModel.generateAQuizQuestion(randomizer, userModel.getEntity(), null);
+    assertTrue(quizQuestionEntity.isEmpty());
   }
 
   @Test
@@ -69,11 +73,12 @@ class QuizQuestionTest {
     }
 
     @Test
-    void aNoteWithNoSiblingsShouldDoJustReview() {
+    void aNoteWithNoSiblingsShouldNotGenerateAnyQuestion() {
       Note note = makeMe.aHeadNote().please();
-      QuizQuestion quizQuestion = getQuizQuestion(note);
-      assertThat(
-          quizQuestion.getQuestionType(), equalTo(QuizQuestionEntity.QuestionType.JUST_REVIEW));
+      ReviewPointModel reviewPointModel = getReviewPointModel(note);
+      Optional<QuizQuestionEntity> quizQuestionEntity =
+          reviewPointModel.generateAQuizQuestion(randomizer, userModel.getEntity(), null);
+      assertTrue(quizQuestionEntity.isEmpty());
     }
 
     @Nested
@@ -143,8 +148,9 @@ class QuizQuestionTest {
       AiAdvisorService aiAdvisorService = mock(AiAdvisorService.class);
       when(aiAdvisorService.generateQuestion(any())).thenReturn(aiGeneratedQuestion);
       QuizQuestionEntity randomQuizQuestion =
-          reviewPoint.generateAQuizQuestion(
-              new RealRandomizer(), userModel.getEntity(), aiAdvisorService);
+          reviewPoint
+              .generateAQuizQuestion(new RealRandomizer(), userModel.getEntity(), aiAdvisorService)
+              .orElse(null);
       assertThat(
           randomQuizQuestion.getQuestionType(),
           equalTo(QuizQuestionEntity.QuestionType.AI_QUESTION));
@@ -155,7 +161,9 @@ class QuizQuestionTest {
     void shouldReturnTheSameType() {
       ReviewPointModel reviewPoint = getReviewPointModel(note);
       QuizQuestionEntity randomQuizQuestion =
-          reviewPoint.generateAQuizQuestion(new RealRandomizer(), userModel.getEntity(), null);
+          reviewPoint
+              .generateAQuizQuestion(new RealRandomizer(), userModel.getEntity(), null)
+              .orElse(null);
       Set<QuizQuestionEntity.QuestionType> types = new HashSet<>();
       for (int i = 0; i < 3; i++) {
         types.add(randomQuizQuestion.getQuestionType());
@@ -169,7 +177,9 @@ class QuizQuestionTest {
       ReviewPointModel reviewPoint = getReviewPointModel(note);
       for (int i = 0; i < 10; i++) {
         QuizQuestionEntity randomQuizQuestion =
-            reviewPoint.generateAQuizQuestion(new RealRandomizer(), userModel.getEntity(), null);
+            reviewPoint
+                .generateAQuizQuestion(new RealRandomizer(), userModel.getEntity(), null)
+                .orElse(null);
         types.add(randomQuizQuestion.getQuestionType());
       }
       assertThat(
@@ -181,8 +191,11 @@ class QuizQuestionTest {
   }
 
   private QuizQuestion getQuizQuestion(Note note) {
+    ReviewPointModel reviewPointModel = getReviewPointModel(note);
     QuizQuestionEntity quizQuestion =
-        getReviewPointModel(note).generateAQuizQuestion(randomizer, userModel.getEntity(), null);
+        reviewPointModel
+            .generateAQuizQuestion(randomizer, userModel.getEntity(), null)
+            .orElse(null);
     return makeMe.modelFactoryService.toQuizQuestion(quizQuestion, userModel.getEntity());
   }
 

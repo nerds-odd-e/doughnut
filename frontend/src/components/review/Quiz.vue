@@ -1,8 +1,8 @@
 <template>
   <div v-if="!minimized" class="content">
     <div class="inner-box">
-      <template v-if="currentQuizQuestion">
-        <div v-if="currentQuizQuestion.questionType === 'JUST_REVIEW'">
+      <template v-if="currentQuestionFetched">
+        <div v-if="!currentQuizQuestion">
           <JustReview
             v-bind="{
               reviewPointId: currentReviewPointId,
@@ -70,6 +70,9 @@ export default defineComponent({
     currentReviewPointId() {
       return this.reviewPointIdAt(this.currentIndex);
     },
+    currentQuestionFetched() {
+      return this.quizQuestionCache.length > this.currentIndex;
+    },
     currentQuizQuestion() {
       return this.quizQuestionCache[this.currentIndex];
     },
@@ -119,11 +122,15 @@ export default defineComponent({
       if (this.eagerFetchUntil <= index) return;
       const reviewPointId = this.reviewPointIdAt(index);
       if (reviewPointId === undefined) return;
-      const question =
-        await this.silentApi.reviewMethods.getRandomQuestionForReviewPoint(
-          reviewPointId,
-        );
-      this.quizQuestionCache.push(question);
+      try {
+        const question =
+          await this.silentApi.reviewMethods.getRandomQuestionForReviewPoint(
+            reviewPointId,
+          );
+        this.quizQuestionCache.push(question);
+      } catch (e) {
+        this.quizQuestionCache.push(undefined);
+      }
       await this.fetchNextQuestion();
     },
 

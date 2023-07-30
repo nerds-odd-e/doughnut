@@ -26,19 +26,12 @@ public record QuizQuestionGenerator(
     }
   }
 
-  public QuizQuestionEntity buildRandomQuestion(Boolean aiQuestionTypeOnlyForReview) {
-    return this.randomizer
+  public Optional<QuizQuestionEntity> buildRandomQuestion(Boolean aiQuestionTypeOnlyForReview) {
+    return randomizer
         .shuffle(reviewPoint.availableQuestionTypes(aiQuestionTypeOnlyForReview))
         .stream()
         .map(this::buildQuizQuestion)
         .flatMap(Optional::stream)
-        .findFirst()
-        .orElseGet(
-            () -> {
-              QuizQuestionEntity quizQuestion = new QuizQuestionEntity();
-              quizQuestion.setQuestionType(QuestionType.JUST_REVIEW);
-              quizQuestion.setThing(reviewPoint.getThing());
-              return quizQuestion;
-            });
+        .findFirst();
   }
 }

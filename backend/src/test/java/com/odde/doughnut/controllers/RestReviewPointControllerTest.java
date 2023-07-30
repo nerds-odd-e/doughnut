@@ -139,8 +139,13 @@ class RestReviewPointControllerTest {
   class GenerateRandomQuestion {
     @Test
     void itMustPersistTheQuestionGenerated() {
-      Note note = makeMe.aNote().asHeadNoteOfANotebook().please();
+      Note note =
+          makeMe.aNote().description("description long enough.").asHeadNoteOfANotebook().please();
+      // another note is needed, otherwise the note will be the only note in the notebook, and the
+      // question cannot be generated.
+      makeMe.aNote().under(note).please();
       ReviewPoint rp = makeMe.aReviewPointFor(note).by(userModel).please();
+      makeMe.refresh(note);
       QuizQuestion quizQuestion = controller.generateRandomQuestion(rp);
       assertThat(quizQuestion.quizQuestionId, notNullValue());
     }
@@ -152,9 +157,9 @@ class RestReviewPointControllerTest {
     void itMustUpdateTheReviewPointRecord() {
       Note note = makeMe.aNote().asHeadNoteOfANotebook().please();
       ReviewPoint rp = makeMe.aReviewPointFor(note).by(userModel).please();
-      Integer oldRepeatitionCount = rp.getRepetitionCount();
+      Integer oldRepetitionCount = rp.getRepetitionCount();
       controller.markAsRepeated(rp, true);
-      assertThat(rp.getRepetitionCount(), equalTo(oldRepeatitionCount + 1));
+      assertThat(rp.getRepetitionCount(), equalTo(oldRepetitionCount + 1));
     }
   }
 }
