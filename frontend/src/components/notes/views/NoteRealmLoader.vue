@@ -5,22 +5,25 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, watch } from "vue";
+import { defineComponent, PropType, watch, toRefs, reactive } from "vue";
 import LoadingPage from "@/pages/commons/LoadingPage.vue";
 import { StorageAccessor } from "../../../store/createNoteStorage";
 
 export default defineComponent({
   setup(props) {
+    const { noteId, storageAccessor } = toRefs(props);
+    const noteRealmObj = reactive({
+      noteRealm: storageAccessor.value.refOfNoteRealm(noteId.value),
+    });
     watch(
-      () => props.noteId,
+      () => noteId,
       () => {
         throw new Error(
           "NoteCardsView: noteId changed. Please make noteId the key in the parent component.",
         );
       },
     );
-    // eslint-disable-next-line vue/no-setup-props-destructure
-    return { noteRealm: props.storageAccessor.refOfNoteRealm(props.noteId) };
+    return noteRealmObj;
   },
   props: {
     noteId: { type: Number, required: true },
