@@ -62,17 +62,16 @@ export default defineComponent({
   },
   data() {
     return {
-      quizQuestionCache: new Map<number, Generated.QuizQuestion | undefined>(),
-      quizQuestionCache1: [] as (Generated.QuizQuestion | undefined)[],
-      nextFetchingIndex: 0,
+      quizQuestionCache: [] as (Generated.QuizQuestion | undefined)[],
+      eagerFetchUntil: 0,
     };
   },
   computed: {
     currentReviewPointId() {
-      return this.nextReviewPointId(0) as number;
+      return this.reviewPointIdAt(this.currentIndex);
     },
     currentQuizQuestion() {
-      return this.quizQuestionCache.get(this.currentReviewPointId);
+      return this.quizQuestionCache[this.currentIndex];
     },
   },
   watch: {
@@ -80,12 +79,15 @@ export default defineComponent({
       this.selectPosition();
     },
     QuizQuestions() {
-      this.quizQuestionCache.clear();
-      this.nextFetchingIndex = 0;
+      this.quizQuestionCache = [];
+      this.eagerFetchUntil = 0;
       this.fetchQuestion();
     },
     currentIndex() {
       this.fetchQuestion();
+    },
+    currentQuizQuestion() {
+      this.selectPosition();
     },
   },
   methods: {
@@ -112,35 +114,25 @@ export default defineComponent({
       if (!this.reviewPoints) {
         return;
       }
-      await this.fetchNextQuestion(0);
-      this.selectPosition();
-      await this.eagerFetch(1);
+      this.eagerFetchUntil = _.max([
+        this.eagerFetchUntil,
+        this.currentIndex + this.eagerFetchCount,
+      ]) as number;
+      await this.fetchNextQuestion();
     },
 
-    async eagerFetch(index: number) {
-      if (index < this.eagerFetchCount) {
-        await this.fetchNextQuestion(index);
-        await this.eagerFetch(index + 1);
-      }
-    },
-
-    async fetchNextQuestion(index: number) {
-      if (this.nextFetchingIndex < this.currentIndex + index) {
-        return;
-      }
-      this.nextFetchingIndex += 1;
-      const next = this.nextReviewPointId(index);
-      if (next) {
-        if (this.quizQuestionCache.has(next)) {
-          return;
+    async fetchNextQuestion() {
+      const index = this.quizQuestionCache.length;
+      if (this.eagerFetchUntil > index) {
+        const reviewPointId = this.reviewPointIdAt(index);
+        if (reviewPointId) {
+          const question =
+            await this.silentApi.reviewMethods.getRandomQuestionForReviewPoint(
+              reviewPointId,
+            );
+          this.quizQuestionCache.push(question);
+          await this.fetchNextQuestion();
         }
-        this.quizQuestionCache.set(next, undefined);
-        this.quizQuestionCache.set(
-          next,
-          await this.silentApi.reviewMethods.getRandomQuestionForReviewPoint(
-            next,
-          ),
-        );
       }
     },
 
