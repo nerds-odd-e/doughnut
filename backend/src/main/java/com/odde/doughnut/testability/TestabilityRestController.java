@@ -1,14 +1,7 @@
 package com.odde.doughnut.testability;
 
-import com.odde.doughnut.entities.Circle;
-import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.Link.LinkType;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteAccessories;
-import com.odde.doughnut.entities.Ownership;
-import com.odde.doughnut.entities.TextContent;
-import com.odde.doughnut.entities.Thingy;
-import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.LinkRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
@@ -104,7 +97,9 @@ class TestabilityRestController {
       note.getTextContent().setDescription(description);
       note.getTextContent().setUpdatedAt(currentUTCTimestamp);
       if (skipReview != null) {
-        content.setSkipReview(skipReview);
+        ReviewSetting masterReviewSetting = new ReviewSetting();
+        masterReviewSetting.setSkipReview(skipReview);
+        note.setMasterReviewSetting(masterReviewSetting);
       }
       content.setUrl(url);
       content.setPictureMask(pictureMask);

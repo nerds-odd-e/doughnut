@@ -54,11 +54,6 @@ public class NoteAccessories {
   @Setter
   private Boolean useParentPicture = false;
 
-  @Column(name = "skip_review")
-  @Getter
-  @Setter
-  private Boolean skipReview = false;
-
   @JsonIgnore @Transient @Getter @Setter private MultipartFile uploadPictureProxy;
 
   @Column(name = "updated_at")

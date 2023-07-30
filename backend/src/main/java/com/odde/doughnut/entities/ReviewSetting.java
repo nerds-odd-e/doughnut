@@ -25,5 +25,10 @@ public class ReviewSetting {
   @Setter
   private Boolean rememberSpelling = false;
 
+  @Column(name = "skip_review")
+  @Getter
+  @Setter
+  private Boolean skipReview = false;
+
   @Getter @Setter private Integer level = defaultLevel;
 }

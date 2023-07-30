@@ -234,6 +234,7 @@ declare namespace Generated {
     interface ReviewSetting {
         id: number;
         rememberSpelling: boolean;
+        skipReview: boolean;
         level: number;
     }
 
@@ -290,7 +291,6 @@ declare namespace Generated {
         pictureUrl: string;
         pictureMask: string;
         useParentPicture: boolean;
-        skipReview: boolean;
         updatedAt: string;
     }
 

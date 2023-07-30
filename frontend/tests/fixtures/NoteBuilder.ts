@@ -17,7 +17,6 @@ class NoteBuilder extends Builder<Generated.Note> {
         pictureUrl: "",
         pictureMask: "",
         useParentPicture: false,
-        skipReview: false,
         updatedAt: "",
       },
       textContent: {

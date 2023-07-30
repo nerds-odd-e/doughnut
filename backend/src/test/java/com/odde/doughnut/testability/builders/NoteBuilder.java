@@ -101,7 +101,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder skipReview() {
-    entity.getNoteAccessories().setSkipReview(true);
+    ensureReviewSetting().setSkipReview(true);
     return this;
   }
 
@@ -127,11 +127,15 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder rememberSpelling() {
+    ensureReviewSetting().setRememberSpelling(true);
+    return this;
+  }
+
+  private ReviewSetting ensureReviewSetting() {
     if (entity.getMasterReviewSetting() == null) {
       entity.setMasterReviewSetting(new ReviewSetting());
     }
-    entity.getMasterReviewSetting().setRememberSpelling(true);
-    return this;
+    return entity.getMasterReviewSetting();
   }
 
   public NoteBuilder updatedAt(Timestamp timestamp) {
