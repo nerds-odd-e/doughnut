@@ -20,6 +20,13 @@
     :errors="errors.rememberSpelling"
     @update:model-value="updateModelValue({ rememberSpelling: $event })"
   />
+  <CheckInput
+    scope-name="review_setting"
+    field="skipReview"
+    :model-value="formData.skipReview"
+    :errors="errors.skipReview"
+    @update:model-value="updateModelValue({ skipReview: $event })"
+  />
 </template>
 
 <script lang="ts">

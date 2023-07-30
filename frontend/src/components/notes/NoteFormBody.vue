@@ -55,15 +55,6 @@
       $emit('update:modelValue', { ...modelValue, urlIsVideo: $event })
     "
   />
-  <CheckInput
-    scope-name="note"
-    field="skipReview"
-    :model-value="modelValue.skipReview"
-    :errors="errors.skipReview"
-    @update:model-value="
-      $emit('update:modelValue', { ...modelValue, skipReview: $event })
-    "
-  />
 </template>
 
 <script lang="ts">

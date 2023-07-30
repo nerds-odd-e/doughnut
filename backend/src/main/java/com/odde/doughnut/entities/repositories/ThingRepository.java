@@ -95,7 +95,7 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
   String whereNoteIsNotSkipped =
       " LEFT JOIN review_setting rs "
           + "   ON note.master_review_setting_id = rs.id "
-          + " WHERE rs.skip_review IS FALSE "
+          + " WHERE rs.skip_review IS NOT TRUE "
           + "   AND note.deleted_at IS NULL "
           + ") jnote ON jnote.id = thing.note_id ";
 
