@@ -156,7 +156,7 @@ public class Note extends Thingy {
 
   @Override
   public String toString() {
-    return "Note{" + "id=" + id + ", title='" + getTextContent().getTitle() + '\'' + '}';
+    return "Note{" + "id=" + id + ", title='" + getTitle() + '\'' + '}';
   }
 
   private void addAncestors(List<Note> ancestors) {
@@ -301,15 +301,14 @@ public class Note extends Thingy {
 
   @JsonIgnore
   public ClozedString getClozeDescription() {
-    String description = getTextContent().getDescription();
     if (isDescriptionBlankHtml()) return new ClozedString(null, "");
 
-    return ClozedString.htmlClosedString(description).hide(getNoteTitle());
+    return ClozedString.htmlClosedString(getDescription()).hide(getNoteTitle());
   }
 
   @JsonIgnore
   public NoteTitle getNoteTitle() {
-    return new NoteTitle(getTextContent().getTitle());
+    return new NoteTitle(getTitle());
   }
 
   public Optional<PictureWithMask> getPictureWithMask() {

@@ -234,7 +234,7 @@ class RestNoteControllerTests {
             "{\"latitude\":1.3,\"longitude\":103.8}", "globecoordinate");
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
         assertThat(
-            note.noteRealm.getNote().getTextContent().getDescription(),
+            note.noteRealm.getNote().getDescription(),
             stringContainsInOrder("Location: " + lnglat, singapore));
       }
 
@@ -247,7 +247,7 @@ class RestNoteControllerTests {
         mockApiResponseWithLocationInfo("\"center of the earth\"", "string");
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
         assertThat(
-            note.noteRealm.getNote().getTextContent().getDescription(),
+            note.noteRealm.getNote().getDescription(),
             stringContainsInOrder("Location: center of the earth"));
       }
     }
@@ -301,7 +301,7 @@ class RestNoteControllerTests {
         mockWikidataEntity(countryQid, countryName);
         noteCreation.setWikidataId(wikidataIdOfHuman);
         NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
-        String description = note.noteRealm.getNote().getTextContent().getDescription();
+        String description = note.noteRealm.getNote().getDescription();
         if (expectedBirthday != null) {
           assertThat(description, containsString(expectedBirthday));
         }
