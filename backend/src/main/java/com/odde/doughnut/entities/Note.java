@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.algorithms.ClozedString;
+import com.odde.doughnut.algorithms.HtmlOrText;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
 import java.io.IOException;
@@ -147,11 +148,18 @@ public class Note extends Thingy {
 
   public static Note createNote(User user, Timestamp currentUTCTimestamp, TextContent textContent) {
     final Note note = new Note();
-    note.getTextContent().updateTextContent(textContent, currentUTCTimestamp);
+    note.updateTextContent(currentUTCTimestamp, textContent);
     note.setNoteAccessoriesUpdatedAt(currentUTCTimestamp);
 
     Thing.createThing(user, note, currentUTCTimestamp);
     return note;
+  }
+
+  private void updateTextContent(Timestamp currentUTCTimestamp, TextContent textContent) {
+    TextContent textContent1 = getTextContent();
+    textContent1.setUpdatedAt(currentUTCTimestamp);
+    textContent1.setTitle(textContent.getTitle());
+    textContent1.setDescription(textContent.getDescription());
   }
 
   @Override
@@ -336,7 +344,9 @@ public class Note extends Thingy {
   }
 
   public void prependDescription(String addition) {
-    textContent.prependDescription(addition);
+    String prevDesc = textContent.getDescription() != null ? textContent.getDescription() : "";
+    String desc = prevDesc.isEmpty() ? addition : addition + "\n" + prevDesc;
+    textContent.setDescription(desc);
   }
 
   public void buildLinkToParent(
@@ -362,7 +372,7 @@ public class Note extends Thingy {
 
   @JsonIgnore
   public boolean isDescriptionBlankHtml() {
-    return getTextContent().isDescriptionBlankHtml();
+    return new HtmlOrText(getDescription()).isBlank();
   }
 
   @JsonIgnore

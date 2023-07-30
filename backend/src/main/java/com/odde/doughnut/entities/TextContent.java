@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.algorithms.HtmlOrText;
 import java.sql.Timestamp;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,21 +32,4 @@ public class TextContent {
   @Getter
   @Setter
   private Timestamp updatedAt;
-
-  public void updateTextContent(TextContent textContent, Timestamp currentUTCTimestamp) {
-    setUpdatedAt(currentUTCTimestamp);
-    setTitle(textContent.getTitle());
-    setDescription(textContent.getDescription());
-  }
-
-  void prependDescription(String addition) {
-    String prevDesc = getDescription() != null ? getDescription() : "";
-    String desc = prevDesc.isEmpty() ? addition : addition + "\n" + prevDesc;
-    setDescription(desc);
-  }
-
-  @JsonIgnore
-  boolean isDescriptionBlankHtml() {
-    return new HtmlOrText(description).isBlank();
-  }
 }
