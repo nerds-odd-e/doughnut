@@ -20,8 +20,7 @@ export default defineComponent({
       },
     );
     // eslint-disable-next-line vue/no-setup-props-destructure
-    const { noteId } = props;
-    return { noteRealm: props.storageAccessor.refOfNoteRealm(noteId) };
+    return { noteRealm: props.storageAccessor.refOfNoteRealm(props.noteId) };
   },
   props: {
     noteId: { type: Number, required: true },
