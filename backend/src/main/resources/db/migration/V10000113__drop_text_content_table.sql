@@ -1,3 +1,5 @@
-ALTER TABLE note DROP FOREIGN KEY note_ibfk_1;
-ALTER TABLE note DROP COLUMN text_content_id;
-DROP table text_content;
+UPDATE `note`
+INNER JOIN `text_content` ON `note`.`text_content_id` = `text_content`.`id`
+SET `note`.`title` = `text_content`.`title`, `note`.`description` = `text_content`.`description`,
+`note`.updated_at = `text_content`.updated_at;
+
