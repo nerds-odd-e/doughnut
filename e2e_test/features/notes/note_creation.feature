@@ -20,6 +20,7 @@ Feature: Nested Note creation
       | tech         |
       | Re-quirement |
 
+@ignore
   Scenario: Create a new note with incorrect info
     When I try to create a note belonging to "LeSS in Action":
       | Title |

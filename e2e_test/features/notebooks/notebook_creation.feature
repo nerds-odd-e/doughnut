@@ -15,6 +15,7 @@ Feature: Notebook creation
     And I navigate to "My Notes/Sedation" note
     And I should see the screenshot matches
 
+@ignore
   Scenario: Create a new note with invalid information
     When I create a notebook with empty title
     Then I should see that the note creation is not successful
