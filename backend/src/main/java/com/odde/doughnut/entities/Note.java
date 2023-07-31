@@ -28,7 +28,7 @@ import org.springframework.beans.BeanUtils;
 
 @Entity
 @Table(name = "note")
-@JsonPropertyOrder({"title", "description", "parentId"})
+@JsonPropertyOrder({"title", "description", "parentId", "updatedAt"})
 public class Note extends Thingy {
   private Note() {}
 

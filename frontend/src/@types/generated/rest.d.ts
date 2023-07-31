@@ -217,7 +217,6 @@ declare namespace Generated {
     interface TextContent {
         title: string;
         description: string;
-        updatedAt: string;
     }
 
     interface ReviewPoint {
@@ -242,11 +241,11 @@ declare namespace Generated {
         title: string;
         description: string;
         parentId?: number;
+        updatedAt: string;
         noteAccessories: NoteAccessories;
         wikidataId: string;
         deletedAt: string;
         pictureWithMask?: PictureWithMask;
-        updatedAt: string;
     }
 
     interface Ownership {
@@ -290,7 +289,6 @@ declare namespace Generated {
         pictureUrl: string;
         pictureMask: string;
         useParentPicture: boolean;
-        updatedAt: string;
     }
 
     interface Circle {

@@ -30,7 +30,7 @@ export default defineComponent({
     },
   },
   data() {
-    const { updatedAt, ...rest } = this.note.noteAccessories;
+    const { ...rest } = this.note.noteAccessories;
     return {
       /* eslint-disable  @typescript-eslint/no-explicit-any */
       formData: rest as any,

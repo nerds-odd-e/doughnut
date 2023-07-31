@@ -56,7 +56,6 @@ export default defineComponent({
             {
               title: this.selectedNote.title,
               description: this.selectedNote.description,
-              updatedAt: this.selectedNote.updatedAt,
             },
           );
           return !this.isUnmounted;
