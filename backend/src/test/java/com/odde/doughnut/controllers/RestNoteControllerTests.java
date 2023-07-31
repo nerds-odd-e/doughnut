@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.any;
 import com.odde.doughnut.entities.Link.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessories;
+import com.odde.doughnut.entities.TextContent;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -155,8 +156,9 @@ class RestNoteControllerTests {
     @BeforeEach
     void setup() {
       parent = makeMe.aNote().creatorAndOwner(userModel).please();
-      Note newNote = makeMe.aNote().inMemoryPlease();
-      noteCreation.setTextContent(newNote.getTextContent());
+      TextContent textContent = new TextContent();
+      textContent.setTitle("new title");
+      noteCreation.setTextContent(textContent);
       noteCreation.setLinkTypeToParent(LinkType.NO_LINK);
     }
 

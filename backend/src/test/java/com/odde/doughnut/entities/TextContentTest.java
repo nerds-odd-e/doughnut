@@ -30,10 +30,13 @@ public class TextContentTest {
   @Nested
   class ValidationTest {
     private Validator validator;
-    private final TextContent textContent = makeMe.aNote().inMemoryPlease().getTextContent();
+    private final TextContent textContent = new TextContent();
 
     @BeforeEach
     public void setUp() {
+      Note templateNote = makeMe.aNote().inMemoryPlease();
+      textContent.setTitle(templateNote.getTitle());
+      textContent.setDescription(templateNote.getDescription());
       ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
       validator = factory.getValidator();
     }

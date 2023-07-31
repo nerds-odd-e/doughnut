@@ -93,7 +93,7 @@ class TestabilityRestController {
       Note note = Note.createNote(user, currentUTCTimestamp, new TextContent());
       NoteAccessories content = note.getNoteAccessories();
 
-      note.getTextContent().setTitle(title);
+      note.setTitle(title);
       note.setDescription(description);
       note.setUpdatedAt(currentUTCTimestamp);
       if (skipReview != null) {

@@ -18,6 +18,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.persistence.*;
 import javax.validation.Valid;
+import javax.validation.constraints.Size;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Where;
@@ -40,6 +42,11 @@ public class Note extends Thingy {
 
   @Getter @Setter private String description;
 
+  @Size(min = 1, max = 100)
+  @Getter
+  @Setter
+  private String title = "";
+
   @Column(name = "updated_at")
   @Getter
   @Setter
@@ -49,13 +56,6 @@ public class Note extends Thingy {
   @Getter
   @Setter
   private String wikidataId;
-
-  @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "text_content_id", referencedColumnName = "id")
-  @Getter
-  @Setter
-  @JsonIgnore
-  private TextContent textContent = new TextContent();
 
   @Column(name = "sibling_order")
   private Long siblingOrder = SiblingOrder.getGoodEnoughOrderNumber();
@@ -163,9 +163,8 @@ public class Note extends Thingy {
   }
 
   public void updateTextContent(Timestamp currentUTCTimestamp, TextContent textContent) {
-    TextContent textContent1 = getTextContent();
     setUpdatedAt(currentUTCTimestamp);
-    textContent1.setTitle(textContent.getTitle());
+    setTitle(textContent.getTitle());
     setDescription(textContent.getDescription());
   }
 
@@ -216,10 +215,6 @@ public class Note extends Thingy {
       return new ArrayList<>();
     }
     return Collections.unmodifiableList(getParentNote().getChildren());
-  }
-
-  public String getTitle() {
-    return getTextContent().getTitle();
   }
 
   public void mergeMasterReviewSetting(ReviewSetting reviewSetting) {

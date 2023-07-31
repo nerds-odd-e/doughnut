@@ -109,7 +109,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder title(String text) {
-    entity.getTextContent().setTitle(text);
+    entity.setTitle(text);
     return this;
   }
 

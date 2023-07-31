@@ -13,13 +13,12 @@ import org.springframework.data.repository.query.Param;
 public interface NoteRepository extends CrudRepository<Note, Integer> {
 
   @Query(
-      value = selectFromNoteJoinTextContent + " where text_content.title = :noteTitle limit 1",
+      value = selectFromNote + " where title = :noteTitle limit 1",
       nativeQuery = true)
   Note findFirstByTitle(@Param("noteTitle") String noteTitle);
 
-  String selectFromNoteJoinTextContent =
-      "SELECT note.*  from note JOIN text_content"
-          + "   ON note.text_content_id = text_content.id ";
+  String selectFromNote =
+      "SELECT note.*  from note";
 
   @Query(value = inAllMyNotebooksAndSubscriptions + searchForLinkTarget, nativeQuery = true)
   List<Note> searchForUserInAllMyNotebooksAndSubscriptions(
@@ -31,7 +30,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
 
   @Query(
       value =
-          selectFromNoteJoinTextContent
+          selectFromNote
               + " WHERE note.notebook_id = :notebook "
               + searchForLinkTarget,
       nativeQuery = true)
@@ -40,7 +39,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
 
   @Query(
       value =
-          selectFromNoteJoinTextContent
+          selectFromNote
               + " WHERE note.notebook_id = :notebook "
               + " AND note.wikidata_id = :wikidataId AND note.wikidata_id IS NOT NULL AND note.deleted_at IS NULL ",
       nativeQuery = true)
@@ -48,7 +47,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
       @Param("notebook") Notebook notebook, @Param("wikidataId") String wikidataId);
 
   String joinNotebooksBegin =
-      selectFromNoteJoinTextContent + "  JOIN (" + "          SELECT notebook.id FROM notebook ";
+      selectFromNote + "  JOIN (" + "          SELECT notebook.id FROM notebook ";
 
   String joinNotebooksEnd =
       "          UNION "
@@ -72,7 +71,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
           + joinNotebooksEnd;
 
   String searchForLinkTarget =
-      " AND REGEXP_LIKE(text_content.title, :pattern) AND note.deleted_at IS NULL ";
+      " AND REGEXP_LIKE(title, :pattern) AND note.deleted_at IS NULL ";
 
   @Modifying
   @Query(

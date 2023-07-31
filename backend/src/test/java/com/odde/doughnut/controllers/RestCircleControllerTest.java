@@ -63,7 +63,8 @@ class RestCircleControllerTest {
     @Test
     void whenTheUserIsNotAMemberOfTheCircle() {
       Circle circle = makeMe.aCircle().please();
-      TextContent textContent = makeMe.aNote().inMemoryPlease().getTextContent();
+      TextContent textContent = new TextContent();
+      textContent.setTitle("new title");
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.createNotebook(circle, textContent));
