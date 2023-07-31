@@ -62,14 +62,18 @@ Given("OpenAI by default returns this question from now:", (questionTable: DataT
     correctChoiceIndex: 0,
     choices: [record.correct_choice, record.incorrect_choice_1, record.incorrect_choice_2],
   })
-  mock_services
-    .openAi()
-    .restartImposter()
-    .then(() =>
-      mock_services
-        .openAi()
-        .stubAnyChatCompletionFunctionCall("ask_single_answer_multiple_choice_question", reply),
-    )
+  cy.then(() => {
+    mock_services
+      .openAi()
+      .restartImposter()
+      .then(() =>
+        Cypress.Promise.all([
+          mock_services
+            .openAi()
+            .stubAnyChatCompletionFunctionCall("ask_single_answer_multiple_choice_question", reply),
+        ]),
+      )
+  })
 })
 
 Then("I complain the question doesn't make sense", () => {
