@@ -12,13 +12,10 @@ import org.springframework.data.repository.query.Param;
 
 public interface NoteRepository extends CrudRepository<Note, Integer> {
 
-  @Query(
-      value = selectFromNote + " where title = :noteTitle limit 1",
-      nativeQuery = true)
+  @Query(value = selectFromNote + " where title = :noteTitle limit 1", nativeQuery = true)
   Note findFirstByTitle(@Param("noteTitle") String noteTitle);
 
-  String selectFromNote =
-      "SELECT note.*  from note";
+  String selectFromNote = "SELECT note.*  from note";
 
   @Query(value = inAllMyNotebooksAndSubscriptions + searchForLinkTarget, nativeQuery = true)
   List<Note> searchForUserInAllMyNotebooksAndSubscriptions(
@@ -29,10 +26,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
       @Param("user") User user, @Param("pattern") String pattern);
 
   @Query(
-      value =
-          selectFromNote
-              + " WHERE note.notebook_id = :notebook "
-              + searchForLinkTarget,
+      value = selectFromNote + " WHERE note.notebook_id = :notebook " + searchForLinkTarget,
       nativeQuery = true)
   List<Note> searchInNotebook(
       @Param("notebook") Notebook notebook, @Param("pattern") String pattern);
@@ -70,8 +64,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
           + "             WHERE notebook.ownership_id = ownership.id "
           + joinNotebooksEnd;
 
-  String searchForLinkTarget =
-      " AND REGEXP_LIKE(title, :pattern) AND note.deleted_at IS NULL ";
+  String searchForLinkTarget = " AND REGEXP_LIKE(title, :pattern) AND note.deleted_at IS NULL ";
 
   @Modifying
   @Query(

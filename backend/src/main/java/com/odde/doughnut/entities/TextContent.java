@@ -1,8 +1,6 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.sql.Timestamp;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -27,5 +25,4 @@ public class TextContent {
   private String title = "";
 
   @Getter @Setter private String description;
-
 }

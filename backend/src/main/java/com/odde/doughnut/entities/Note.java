@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
-
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Where;

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.entities.validators.ValidateNotePicture;
 import com.odde.doughnut.models.ImageBuilder;
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.Optional;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
