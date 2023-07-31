@@ -106,7 +106,7 @@ class TestabilityRestController {
       content.setPictureUrl(pictureUrl);
 
       note.setWikidataId(wikidataId);
-      note.setNoteAccessoriesUpdatedAt(currentUTCTimestamp);
+      note.setUpdatedAt(currentUTCTimestamp);
       return note;
     }
   }

@@ -139,7 +139,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder updatedAt(Timestamp timestamp) {
-    entity.getNoteAccessories().setUpdatedAt(timestamp);
+    entity.setUpdatedAt(timestamp);
     return this;
   }
 

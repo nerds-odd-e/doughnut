@@ -38,6 +38,11 @@ public class Note extends Thingy {
   @JsonIgnore
   private Thing thing;
 
+  @Column(name = "updated_at")
+  @Getter
+  @Setter
+  private Timestamp updatedAt;
+
   @Column(name = "wikidata_id")
   @Getter
   @Setter
@@ -149,7 +154,7 @@ public class Note extends Thingy {
   public static Note createNote(User user, Timestamp currentUTCTimestamp, TextContent textContent) {
     final Note note = new Note();
     note.updateTextContent(currentUTCTimestamp, textContent);
-    note.setNoteAccessoriesUpdatedAt(currentUTCTimestamp);
+    note.setUpdatedAt(currentUTCTimestamp);
 
     Thing.createThing(user, note, currentUTCTimestamp);
     return note;
@@ -300,11 +305,6 @@ public class Note extends Thingy {
     Note grand = this;
     for (int i = 0; i < 2; i++) if (grand.getParentNote() != null) grand = grand.getParentNote();
     return grand;
-  }
-
-  @JsonIgnore
-  public void setNoteAccessoriesUpdatedAt(Timestamp currentUTCTimestamp) {
-    this.getNoteAccessories().setUpdatedAt(currentUTCTimestamp);
   }
 
   @JsonIgnore

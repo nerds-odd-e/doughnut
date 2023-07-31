@@ -51,11 +51,6 @@ public class NoteAccessories {
 
   @JsonIgnore @Transient @Getter @Setter private MultipartFile uploadPictureProxy;
 
-  @Column(name = "updated_at")
-  @Getter
-  @Setter
-  private Timestamp updatedAt;
-
   @JsonIgnore
   public Optional<String> getNotePicture() {
     if (uploadPicture != null) {

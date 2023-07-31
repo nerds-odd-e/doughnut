@@ -103,7 +103,7 @@ class RestNoteController {
     currentUser.assertAuthorization(note);
 
     final User user = currentUser.getEntity();
-    noteAccessories.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
+    note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     note.updateNoteContent(noteAccessories, user);
     modelFactoryService.noteRepository.save(note);
     return new NoteViewer(user, note).toJsonObject();
