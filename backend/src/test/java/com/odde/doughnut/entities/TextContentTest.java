@@ -30,13 +30,10 @@ public class TextContentTest {
   @Nested
   class ValidationTest {
     private Validator validator;
-    private final TextContent textContent = new TextContent();
+    private final Note newNote = makeMe.aNote().inMemoryPlease();
 
     @BeforeEach
     public void setUp() {
-      Note templateNote = makeMe.aNote().inMemoryPlease();
-      textContent.setTitle(templateNote.getTitle());
-      textContent.setDescription(templateNote.getDescription());
       ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
       validator = factory.getValidator();
     }
@@ -48,18 +45,18 @@ public class TextContentTest {
 
     @Test
     public void titleIsNotOptional() {
-      textContent.setTitle("");
+      newNote.setTitle("");
       assertThat(getViolations(), is(not(empty())));
     }
 
     @Test
     public void titleCannotBeTooLong() {
-      textContent.setTitle(makeMe.aStringOfLength(101));
+      newNote.setTitle(makeMe.aStringOfLength(101));
       assertThat(getViolations(), is(not(empty())));
     }
 
-    private Set<ConstraintViolation<TextContent>> getViolations() {
-      return validator.validate(textContent);
+    private Set<ConstraintViolation<Note>> getViolations() {
+      return validator.validate(newNote);
     }
   }
 }

@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ModelFactoryService {
-  @Autowired public TextContentRepository textContentRepository;
   @Autowired public ThingRepository thingRepository;
   @Autowired public NoteRepository noteRepository;
   @Autowired public UserRepository userRepository;
