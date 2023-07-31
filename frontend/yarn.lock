@@ -1856,9 +1856,9 @@ eslint-module-utils@^2.7.4, eslint-module-utils@^2.8.0:
     debug "^3.2.7"
 
 "eslint-plugin-import@npm:eslint-plugin-i":
-  version "2.28.0-1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-i/-/eslint-plugin-i-2.28.0-1.tgz#15803b87c269bf9692e5fa3602441dff848cff7e"
-  integrity sha512-dBtU5wkmFug0c9BWiRSU4mGaGsdWY7JpyvAFejs9dY6OUCgNV15o8w44yD+S2CbEYsm4FklSAnB9NDT85SCz9g==
+  version "2.28.0-2"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-i/-/eslint-plugin-i-2.28.0-2.tgz#c205d24aa6b28f4dfa35dfb72dc31c3089bd81af"
+  integrity sha512-z48kG4qmE4TmiLcxbmvxMT5ycwvPkXaWW0XpU1L768uZaTbiDbxsHMEdV24JHlOR1xDsPpKW39BfP/pRdYIwFA==
   dependencies:
     debug "^3.2.7"
     doctrine "^2.1.0"
