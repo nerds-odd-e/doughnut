@@ -115,7 +115,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder description(String text) {
-    entity.getTextContent().setDescription(text);
+    entity.setDescription(text);
     return this;
   }
 

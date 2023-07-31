@@ -45,10 +45,7 @@ class RestTextContentController {
     currentUser.assertAuthorization(note);
 
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    TextContent textContent1 = note.getTextContent();
-    textContent1.setUpdatedAt(currentUTCTimestamp);
-    textContent1.setTitle(textContent.getTitle());
-    textContent1.setDescription(textContent.getDescription());
+    note.updateTextContent(currentUTCTimestamp, textContent);
 
     modelFactoryService.noteRepository.save(note);
     return new NoteViewer(currentUser.getEntity(), note).toJsonObject();

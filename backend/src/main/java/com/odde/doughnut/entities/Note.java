@@ -38,6 +38,8 @@ public class Note extends Thingy {
   @JsonIgnore
   private Thing thing;
 
+  @Getter @Setter private String description;
+
   @Column(name = "updated_at")
   @Getter
   @Setter
@@ -160,11 +162,11 @@ public class Note extends Thingy {
     return note;
   }
 
-  private void updateTextContent(Timestamp currentUTCTimestamp, TextContent textContent) {
+  public void updateTextContent(Timestamp currentUTCTimestamp, TextContent textContent) {
     TextContent textContent1 = getTextContent();
     textContent1.setUpdatedAt(currentUTCTimestamp);
     textContent1.setTitle(textContent.getTitle());
-    textContent1.setDescription(textContent.getDescription());
+    setDescription(textContent.getDescription());
   }
 
   @Override
@@ -222,10 +224,6 @@ public class Note extends Thingy {
 
   public String getTitle() {
     return getTextContent().getTitle();
-  }
-
-  public String getDescription() {
-    return getTextContent().getDescription();
   }
 
   public void mergeMasterReviewSetting(ReviewSetting reviewSetting) {
@@ -344,9 +342,9 @@ public class Note extends Thingy {
   }
 
   public void prependDescription(String addition) {
-    String prevDesc = textContent.getDescription() != null ? textContent.getDescription() : "";
+    String prevDesc = getDescription() != null ? getDescription() : "";
     String desc = prevDesc.isEmpty() ? addition : addition + "\n" + prevDesc;
-    textContent.setDescription(desc);
+    setDescription(desc);
   }
 
   public void buildLinkToParent(
