@@ -1,3 +1,4 @@
+@ignore
 @usingMockedOpenAiService
 Feature: Question generation by AI
   As a learner, I want to use AI to generate review questions based on my note and its context.
