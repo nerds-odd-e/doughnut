@@ -28,8 +28,4 @@ public class TextContent {
 
   @Getter @Setter private String description;
 
-  @Column(name = "updated_at")
-  @Getter
-  @Setter
-  private Timestamp updatedAt;
 }

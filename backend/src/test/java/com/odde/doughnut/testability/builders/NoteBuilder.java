@@ -30,7 +30,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
     if (Strings.isEmpty(entity.getTitle())) title(titleCounter.generate());
     description("descrption");
     updatedAt(entity.getThing().getCreatedAt());
-    textContentUpdateAt(entity.getThing().getCreatedAt());
   }
 
   public NoteBuilder asHeadNoteOfANotebook() {
@@ -140,11 +139,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   public NoteBuilder updatedAt(Timestamp timestamp) {
     entity.setUpdatedAt(timestamp);
-    return this;
-  }
-
-  public NoteBuilder textContentUpdateAt(Timestamp timestamp) {
-    entity.getTextContent().setUpdatedAt(timestamp);
     return this;
   }
 

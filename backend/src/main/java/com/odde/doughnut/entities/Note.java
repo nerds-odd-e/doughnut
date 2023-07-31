@@ -164,7 +164,7 @@ public class Note extends Thingy {
 
   public void updateTextContent(Timestamp currentUTCTimestamp, TextContent textContent) {
     TextContent textContent1 = getTextContent();
-    textContent1.setUpdatedAt(currentUTCTimestamp);
+    setUpdatedAt(currentUTCTimestamp);
     textContent1.setTitle(textContent.getTitle());
     setDescription(textContent.getDescription());
   }
@@ -216,10 +216,6 @@ public class Note extends Thingy {
       return new ArrayList<>();
     }
     return Collections.unmodifiableList(getParentNote().getChildren());
-  }
-
-  public Timestamp getUpdatedAt() {
-    return getTextContent().getUpdatedAt();
   }
 
   public String getTitle() {

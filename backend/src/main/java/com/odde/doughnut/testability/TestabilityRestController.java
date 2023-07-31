@@ -94,8 +94,8 @@ class TestabilityRestController {
       NoteAccessories content = note.getNoteAccessories();
 
       note.getTextContent().setTitle(title);
-      note.getTextContent().setDescription(description);
-      note.getTextContent().setUpdatedAt(currentUTCTimestamp);
+      note.setDescription(description);
+      note.setUpdatedAt(currentUTCTimestamp);
       if (skipReview != null) {
         ReviewSetting masterReviewSetting = new ReviewSetting();
         masterReviewSetting.setSkipReview(skipReview);
