@@ -1856,15 +1856,15 @@ eslint-module-utils@^2.7.4, eslint-module-utils@^2.8.0:
     debug "^3.2.7"
 
 "eslint-plugin-import@npm:eslint-plugin-i":
-  version "2.27.5-4"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-i/-/eslint-plugin-i-2.27.5-4.tgz#cbfe16e8660c5f115cd78299f609e2cae846886d"
-  integrity sha512-X3Z+dp9nZw7d/y41EDO6JyFw4WVMOT91SFuoJvL0C0/4M1l6NxQ5mLTjXHuYhq0AazW75pAmj25yMk5wPMzjsw==
+  version "2.28.0-1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-i/-/eslint-plugin-i-2.28.0-1.tgz#15803b87c269bf9692e5fa3602441dff848cff7e"
+  integrity sha512-dBtU5wkmFug0c9BWiRSU4mGaGsdWY7JpyvAFejs9dY6OUCgNV15o8w44yD+S2CbEYsm4FklSAnB9NDT85SCz9g==
   dependencies:
     debug "^3.2.7"
     doctrine "^2.1.0"
     eslint-import-resolver-node "^0.3.7"
     eslint-module-utils "^2.8.0"
-    get-tsconfig "^4.6.0"
+    get-tsconfig "^4.6.2"
     is-glob "^4.0.3"
     minimatch "^3.1.2"
     resolve "^1.22.3"
@@ -2244,7 +2244,7 @@ get-symbol-description@^1.0.0:
     call-bind "^1.0.2"
     get-intrinsic "^1.1.1"
 
-get-tsconfig@^4.5.0, get-tsconfig@^4.6.0:
+get-tsconfig@^4.5.0, get-tsconfig@^4.6.2:
   version "4.6.2"
   resolved "https://registry.yarnpkg.com/get-tsconfig/-/get-tsconfig-4.6.2.tgz#831879a5e6c2aa24fe79b60340e2233a1e0f472e"
   integrity sha512-E5XrT4CbbXcXWy+1jChlZmrmCwd5KGx502kDCXJJ7y898TtWW9FwoG5HfOLVRKmlmDGkWN2HM9Ho+/Y8F0sJDg==
