@@ -29,6 +29,8 @@ import org.springframework.beans.BeanUtils;
 @Table(name = "note")
 @JsonPropertyOrder({"title", "description", "parentId", "updatedAt"})
 public class Note extends Thingy {
+  public static final int MAX_TITLE_LENGTH = 150;
+
   private Note() {}
 
   @Embedded @Valid @Getter private final NoteAccessories noteAccessories = new NoteAccessories();
@@ -41,7 +43,7 @@ public class Note extends Thingy {
 
   @Getter @Setter private String description;
 
-  @Size(min = 1, max = 100)
+  @Size(min = 1, max = Note.MAX_TITLE_LENGTH)
   @Getter
   @Setter
   private String title = "";

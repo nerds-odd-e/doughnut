@@ -51,7 +51,7 @@ public class TextContentTest {
 
     @Test
     public void titleCannotBeTooLong() {
-      newNote.setTitle(makeMe.aStringOfLength(101));
+      newNote.setTitle(makeMe.aStringOfLength(151));
       assertThat(getViolations(), is(not(empty())));
     }
 

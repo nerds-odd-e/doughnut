@@ -6,7 +6,7 @@ import lombok.Setter;
 
 public class TextContent {
 
-  @Size(min = 1, max = 100)
+  @Size(min = 1, max = Note.MAX_TITLE_LENGTH)
   @Getter
   @Setter
   private String title = "";
