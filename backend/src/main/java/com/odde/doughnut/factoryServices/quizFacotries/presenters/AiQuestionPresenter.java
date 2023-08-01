@@ -3,10 +3,10 @@ package com.odde.doughnut.factoryServices.quizFacotries.presenters;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.QuizQuestionEntity;
-import com.odde.doughnut.entities.json.AIGeneratedQuestion;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionPresenter;
+import com.odde.doughnut.services.AIGeneratedQuestion;
 import java.util.List;
 
 public class AiQuestionPresenter implements QuizQuestionPresenter {

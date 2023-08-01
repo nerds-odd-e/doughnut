@@ -1,4 +1,4 @@
-package com.odde.doughnut.entities.json;
+package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
@@ -23,6 +23,11 @@ public class AIGeneratedQuestion {
   @JsonPropertyDescription("Index of the correct choice. 0-based.")
   @JsonProperty(required = true)
   public int correctChoiceIndex;
+
+  @JsonPropertyDescription(
+      "Confidence of the AI in the correctness of the question. 0-100. 100 is the most confident.")
+  @JsonProperty(required = true)
+  public int confidence;
 
   public static AIGeneratedQuestion getValidQuestion(JsonNode question)
       throws QuizQuestionNotPossibleException {

@@ -3,21 +3,6 @@
 
 declare namespace Generated {
 
-    interface AIGeneratedQuestion {
-        /**
-         * The stem of the multiple-choice question. Provide background or disclosure necessary to clarify the question when needed.
-         */
-        stem: string;
-        /**
-         * All choices. Only one should be correct.
-         */
-        choices: string[];
-        /**
-         * Index of the correct choice. 0-based.
-         */
-        correctChoiceIndex: number;
-    }
-
     interface AiCompletion {
         moreCompleteContent: string;
         finishReason: string;

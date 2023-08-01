@@ -2,7 +2,6 @@ package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.json.AIGeneratedQuestion;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.services.openAiApis.OpenAIChatAboutNoteRequestBuilder;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;

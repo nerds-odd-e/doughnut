@@ -1,8 +1,8 @@
 package com.odde.doughnut.services.openAiApis;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.json.AIGeneratedQuestion;
 import com.odde.doughnut.entities.json.AiCompletionRequest;
+import com.odde.doughnut.services.AIGeneratedQuestion;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatFunction;
 import com.theokanning.openai.completion.chat.ChatMessage;
