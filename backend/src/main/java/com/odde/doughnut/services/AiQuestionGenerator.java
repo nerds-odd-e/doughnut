@@ -25,7 +25,7 @@ public class AiQuestionGenerator {
     ChatCompletionRequest chatRequest =
         new OpenAIChatAboutNoteRequestBuilder(note.getPath())
             .detailsOfNoteOfCurrentFocus(note)
-            .userInstructionToGenerateQuestion(note)
+            .userInstructionToGenerateQuestion()
             .maxTokens(1500)
             .build();
 

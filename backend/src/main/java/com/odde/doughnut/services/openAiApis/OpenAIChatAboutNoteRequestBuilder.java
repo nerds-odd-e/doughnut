@@ -12,11 +12,10 @@ import java.util.List;
 import org.apache.logging.log4j.util.Strings;
 
 public class OpenAIChatAboutNoteRequestBuilder {
-  public List<ChatMessage> messages = new ArrayList<>();
+  private List<ChatMessage> messages = new ArrayList<>();
+  private List<ChatFunction> functions = new ArrayList<>();
   private String path;
   private int maxTokens;
-
-  private ChatFunction askSingleAnswerMultipleChoiceQuestion = null;
 
   public OpenAIChatAboutNoteRequestBuilder(String notePath) {
     this.path = notePath;
@@ -41,14 +40,13 @@ description (until the end of this message):
     return this;
   }
 
-  public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestion(Note note) {
-
-    askSingleAnswerMultipleChoiceQuestion =
+  public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestion() {
+    functions.add(
         ChatFunction.builder()
             .name("ask_single_answer_multiple_choice_question")
             .description("Ask a single-answer multiple-choice question to the user")
             .executor(AIGeneratedQuestion.class, null)
-            .build();
+            .build());
 
     String messageBody =
         """
@@ -96,8 +94,8 @@ description (until the end of this message):
             //    https://github.com/TheoKanning/openai-java/issues/83
             .stream(false)
             .n(1);
-    if (askSingleAnswerMultipleChoiceQuestion != null) {
-      requestBuilder.functions(List.of(askSingleAnswerMultipleChoiceQuestion));
+    if (!functions.isEmpty()) {
+      requestBuilder.functions(functions);
     }
     return requestBuilder.maxTokens(maxTokens).build();
   }
