@@ -192,6 +192,21 @@ class RestAiControllerTest {
               argThat(
                   request -> {
                     assertThat(request.getMaxTokens()).isGreaterThan(1000);
+                    assertThat(request.getModel()).isEqualTo("gpt-4");
+                    return true;
+                  })))
+          .thenReturn(buildCompletionResultForAIQuestion(jsonQuestion));
+      controller.generateQuestion(note);
+    }
+
+    @Test
+    void usingGPT4IfNoteDescriptionIsNotTooLong()
+        throws QuizQuestionNotPossibleException, JsonProcessingException {
+      note.setDescription(makeMe.aStringOfLength(1000));
+      when(openAiApi.createChatCompletion(
+              argThat(
+                  request -> {
+                    assertThat(request.getModel()).isEqualTo("gpt-3.5-turbo-16k");
                     return true;
                   })))
           .thenReturn(buildCompletionResultForAIQuestion(jsonQuestion));

@@ -25,6 +25,7 @@ public class AiQuestionGenerator {
         new OpenAIChatAboutNoteRequestBuilder(note.getPath())
             .detailsOfNoteOfCurrentFocus(note)
             .userInstructionToGenerateQuestion()
+            .useGPT4IfNotTooLong()
             .maxTokens(1500)
             .build();
 
