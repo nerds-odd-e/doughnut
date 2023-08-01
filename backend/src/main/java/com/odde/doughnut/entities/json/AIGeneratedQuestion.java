@@ -2,6 +2,8 @@ package com.odde.doughnut.entities.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import java.util.List;
@@ -22,9 +24,15 @@ public class AIGeneratedQuestion {
   @JsonProperty(required = true)
   public int correctChoiceIndex;
 
-  public AIGeneratedQuestion validateQuestion() throws QuizQuestionNotPossibleException {
-    if (stem != null && !Strings.isBlank(stem)) {
-      return this;
+  public static AIGeneratedQuestion getValidQuestion(JsonNode question)
+      throws QuizQuestionNotPossibleException {
+    try {
+      AIGeneratedQuestion aiGeneratedQuestion =
+          new ObjectMapper().treeToValue(question, AIGeneratedQuestion.class);
+      if (aiGeneratedQuestion.stem != null && !Strings.isBlank(aiGeneratedQuestion.stem)) {
+        return aiGeneratedQuestion;
+      }
+    } catch (JsonProcessingException e) {
     }
     throw new QuizQuestionNotPossibleException();
   }

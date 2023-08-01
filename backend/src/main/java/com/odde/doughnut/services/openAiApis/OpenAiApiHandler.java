@@ -3,13 +3,18 @@ package com.odde.doughnut.services.openAiApis;
 import static com.theokanning.openai.service.OpenAiService.defaultClient;
 import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.entities.json.AiCompletion;
+import com.odde.doughnut.entities.json.AiCompletionRequest;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import com.theokanning.openai.completion.chat.ChatFunctionCall;
+import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.ImageResult;
 import java.net.SocketTimeoutException;
@@ -30,13 +35,6 @@ public class OpenAiApiHandler {
     this.openAiApi = openAiApi;
   }
 
-  public Optional<ChatCompletionChoice> chatCompletion(ChatCompletionRequest request) {
-    return withExceptionHandler(
-        () ->
-            openAiApi.createChatCompletion(request).blockingGet().getChoices().stream()
-                .findFirst());
-  }
-
   public static OpenAiApi getOpenAiApi(String openAiToken, String baseUrl) {
     ObjectMapper mapper = defaultObjectMapper();
     OkHttpClient client = defaultClient(openAiToken, Duration.ofSeconds(60));
@@ -51,7 +49,36 @@ public class OpenAiApiHandler {
     return retrofit.create(OpenAiApi.class);
   }
 
-  protected <T> T withExceptionHandler(Callable<T> callable) {
+  public String getOpenAiImage(String prompt) {
+    return withExceptionHandler(
+        () -> {
+          CreateImageRequest completionRequest =
+              CreateImageRequest.builder().prompt(prompt).responseFormat("b64_json").build();
+          ImageResult choices = openAiApi.createImage(completionRequest).blockingGet();
+          return choices.getData().get(0).getB64Json();
+        });
+  }
+
+  public Optional<JsonNode> getFunctionCallArguments(ChatCompletionRequest chatRequest) {
+    return chatCompletion(chatRequest)
+        .map(ChatCompletionChoice::getMessage)
+        .map(ChatMessage::getFunctionCall)
+        .map(ChatFunctionCall::getArguments);
+  }
+
+  public Optional<AiCompletion> getAiCompletion(
+      AiCompletionRequest aiCompletionRequest, ChatCompletionRequest chatCompletionRequest) {
+    return chatCompletion(chatCompletionRequest).map(aiCompletionRequest::getAiCompletion);
+  }
+
+  private Optional<ChatCompletionChoice> chatCompletion(ChatCompletionRequest request) {
+    return withExceptionHandler(
+        () ->
+            openAiApi.createChatCompletion(request).blockingGet().getChoices().stream()
+                .findFirst());
+  }
+
+  private <T> T withExceptionHandler(Callable<T> callable) {
     try {
       return callable.call();
     } catch (HttpException e) {
@@ -73,15 +100,5 @@ public class OpenAiApiHandler {
       System.out.println(e.getMessage());
       throw new RuntimeException(e);
     }
-  }
-
-  public String getOpenAiImage(String prompt) {
-    return withExceptionHandler(
-        () -> {
-          CreateImageRequest completionRequest =
-              CreateImageRequest.builder().prompt(prompt).responseFormat("b64_json").build();
-          ImageResult choices = openAiApi.createImage(completionRequest).blockingGet();
-          return choices.getData().get(0).getB64Json();
-        });
   }
 }
