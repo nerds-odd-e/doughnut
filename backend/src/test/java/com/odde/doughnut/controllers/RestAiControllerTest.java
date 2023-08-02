@@ -227,7 +227,7 @@ class RestAiControllerTest {
         @Test
         void askAiToEvaluateTheQuestionAgain() throws QuizQuestionNotPossibleException {
           controller.generateQuestion(note);
-          assertThat(request2.getModel()).isEqualTo("gpt-4");
+          assertThat(request1.getModel()).isEqualTo("gpt-3.5-turbo-16k");
         }
       }
     }

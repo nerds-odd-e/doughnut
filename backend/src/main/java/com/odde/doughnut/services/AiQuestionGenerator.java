@@ -28,7 +28,6 @@ public class AiQuestionGenerator {
               .detailsOfNoteOfCurrentFocus(note)
               .validateQuestionAgain(question)
               .maxTokens(1500)
-              .useGPT4()
               .build();
 
       Optional<JsonNode> makeSense = openAiApiHandler.getFunctionCallArguments(chatRequest);
