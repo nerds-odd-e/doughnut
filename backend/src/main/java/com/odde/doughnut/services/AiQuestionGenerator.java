@@ -7,6 +7,7 @@ import com.odde.doughnut.services.openAiApis.OpenAIChatAboutNoteRequestBuilder;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 public class AiQuestionGenerator {
   private final Note note;
@@ -18,16 +19,32 @@ public class AiQuestionGenerator {
   }
 
   public AIGeneratedQuestion getAiGeneratedQuestion() throws QuizQuestionNotPossibleException {
-    return AIGeneratedQuestion.getValidQuestion(getAiGeneratedQuestionJson());
+    boolean useGPT4 = shortContent();
+    AIGeneratedQuestion question =
+        AIGeneratedQuestion.getValidQuestion(getAiGeneratedQuestionJson(useGPT4));
+    if (!useGPT4) {
+      ChatCompletionRequest chatRequest =
+          new OpenAIChatAboutNoteRequestBuilder(note.getPath())
+              .detailsOfNoteOfCurrentFocus(note)
+              .validateQuestionAgain(question)
+              .maxTokens(1500)
+              .useGPT4()
+              .build();
+
+      Optional<JsonNode> makeSense = openAiApiHandler.getFunctionCallArguments(chatRequest);
+      makeSense.ifPresent(jsonNode -> question.stem += jsonNode);
+    }
+    return question;
   }
 
-  private JsonNode getAiGeneratedQuestionJson() throws QuizQuestionNotPossibleException {
+  private JsonNode getAiGeneratedQuestionJson(boolean shortContent)
+      throws QuizQuestionNotPossibleException {
     OpenAIChatAboutNoteRequestBuilder openAIChatAboutNoteRequestBuilder =
         new OpenAIChatAboutNoteRequestBuilder(note.getPath())
             .detailsOfNoteOfCurrentFocus(note)
             .userInstructionToGenerateQuestion()
             .maxTokens(1500);
-    if (longContent()) {
+    if (shortContent) {
       openAIChatAboutNoteRequestBuilder.useGPT4();
     }
     ChatCompletionRequest chatRequest = openAIChatAboutNoteRequestBuilder.build();
@@ -37,7 +54,7 @@ public class AiQuestionGenerator {
         .orElseThrow(QuizQuestionNotPossibleException::new);
   }
 
-  private boolean longContent() {
+  private boolean shortContent() {
     return note.getTitle().getBytes(StandardCharsets.UTF_8).length
             + note.getDescription().getBytes(StandardCharsets.UTF_8).length
         < 300;

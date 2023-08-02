@@ -17,11 +17,13 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleEx
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
+import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.image.Image;
 import com.theokanning.openai.image.ImageResult;
 import io.reactivex.Single;
 import java.util.List;
+import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -180,37 +182,72 @@ class RestAiControllerTest {
     @Test
     void createQuizQuestionFailed() throws JsonProcessingException {
       when(openAiApi.createChatCompletion(any()))
-          .thenReturn(buildCompletionResultForAIQuestion("""
-{"stem": ""}
-"""));
+          .thenReturn(buildCompletionResultForAIQuestion("{\"stem\": \"\"}"));
       assertThrows(QuizQuestionNotPossibleException.class, () -> controller.generateQuestion(note));
     }
 
-    @Test
-    void usingABiggerMaxToken() throws QuizQuestionNotPossibleException, JsonProcessingException {
-      when(openAiApi.createChatCompletion(
-              argThat(
-                  request -> {
-                    assertThat(request.getMaxTokens()).isGreaterThan(1000);
-                    assertThat(request.getModel()).isEqualTo("gpt-4");
-                    return true;
-                  })))
-          .thenReturn(buildCompletionResultForAIQuestion(jsonQuestion));
-      controller.generateQuestion(note);
+    @Nested
+    class WithMockedChatCompletion {
+      ChatCompletionRequest request1;
+
+      @BeforeEach
+      void setup() throws JsonProcessingException {
+        mockChatCompletionWithFunctionCall(
+            "ask_single_answer_multiple_choice_question",
+            (request) -> request1 = request,
+            buildCompletionResultForAIQuestion(jsonQuestion));
+      }
+
+      @Test
+      void usingABiggerMaxToken() throws QuizQuestionNotPossibleException {
+        controller.generateQuestion(note);
+        assertThat(request1.getMaxTokens()).isGreaterThan(1000);
+        assertThat(request1.getModel()).isEqualTo("gpt-4");
+      }
+
+      @Nested
+      class WhenTheContentIsLong {
+        ChatCompletionRequest request2;
+
+        @BeforeEach
+        void setup() throws JsonProcessingException {
+          note.setDescription(makeMe.aStringOfLength(1000));
+          mockChatCompletionWithFunctionCall(
+              "evaluate_question",
+              (request) -> request2 = request,
+              buildCompletionResultForAIQuestion(jsonQuestion));
+        }
+
+        @Test
+        void usingGPT3_5() throws QuizQuestionNotPossibleException {
+          controller.generateQuestion(note);
+          assertThat(request1.getModel()).isEqualTo("gpt-3.5-turbo-16k");
+        }
+
+        @Test
+        void askAiToEvaluateTheQuestionAgain() throws QuizQuestionNotPossibleException {
+          controller.generateQuestion(note);
+          assertThat(request2.getModel()).isEqualTo("gpt-4");
+        }
+      }
     }
 
-    @Test
-    void usingGPT4IfNoteDescriptionIsNotTooLong()
-        throws QuizQuestionNotPossibleException, JsonProcessingException {
-      note.setDescription(makeMe.aStringOfLength(1000));
+    private void mockChatCompletionWithFunctionCall(
+        String functionName,
+        Consumer<ChatCompletionRequest> consumer,
+        Single<ChatCompletionResult> resultSingle) {
       when(openAiApi.createChatCompletion(
               argThat(
                   request -> {
-                    assertThat(request.getModel()).isEqualTo("gpt-3.5-turbo-16k");
-                    return true;
+                    if (request == null) return false;
+                    boolean askSingleAnswerMultipleChoiceQuestion =
+                        request.getFunctions().get(0).getName().equals(functionName);
+                    if (askSingleAnswerMultipleChoiceQuestion) {
+                      consumer.accept(request);
+                    }
+                    return askSingleAnswerMultipleChoiceQuestion;
                   })))
-          .thenReturn(buildCompletionResultForAIQuestion(jsonQuestion));
-      controller.generateQuestion(note);
+          .thenReturn(resultSingle);
     }
   }
 

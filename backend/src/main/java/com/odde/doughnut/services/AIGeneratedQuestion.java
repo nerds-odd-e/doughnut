@@ -6,28 +6,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
-import java.util.List;
 import org.apache.logging.log4j.util.Strings;
 
-public class AIGeneratedQuestion {
-
-  @JsonPropertyDescription(
-      "The stem of the multiple-choice question. Provide background or disclosure necessary to clarify the question when needed.")
-  @JsonProperty(required = false)
-  public String stem;
-
-  @JsonPropertyDescription("All choices. Only one should be correct.")
-  @JsonProperty(required = true)
-  public List<String> choices;
+public class AIGeneratedQuestion extends AIGeneratedQuestionBody {
 
   @JsonPropertyDescription("Index of the correct choice. 0-based.")
   @JsonProperty(required = true)
   public int correctChoiceIndex;
-
-  @JsonPropertyDescription(
-      "Confidence of the AI in the correctness of the question. 0-100. 100 is the most confident.")
-  @JsonProperty(required = true)
-  public int confidence;
 
   public static AIGeneratedQuestion getValidQuestion(JsonNode question)
       throws QuizQuestionNotPossibleException {
@@ -40,9 +25,5 @@ public class AIGeneratedQuestion {
     } catch (JsonProcessingException e) {
     }
     throw new QuizQuestionNotPossibleException();
-  }
-
-  public String toJsonString() {
-    return new ObjectMapper().valueToTree(this).toString();
   }
 }

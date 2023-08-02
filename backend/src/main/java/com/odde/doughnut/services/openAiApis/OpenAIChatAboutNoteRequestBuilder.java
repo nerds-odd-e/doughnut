@@ -1,8 +1,11 @@
 package com.odde.doughnut.services.openAiApis;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AiCompletionRequest;
 import com.odde.doughnut.services.AIGeneratedQuestion;
+import com.odde.doughnut.services.AIGeneratedQuestionBody;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatFunction;
 import com.theokanning.openai.completion.chat.ChatMessage;
@@ -103,5 +106,39 @@ description (until the end of this message):
   public OpenAIChatAboutNoteRequestBuilder useGPT4() {
     model = "gpt-4";
     return this;
+  }
+
+  public OpenAIChatAboutNoteRequestBuilder validateQuestionAgain(AIGeneratedQuestion question) {
+    functions.add(
+        ChatFunction.builder()
+            .name("evaluate_question")
+            .description("answer and evaluate the feasibility of the question")
+            .executor(QuestionEvaluation.class, null)
+            .build());
+
+    AIGeneratedQuestionBody clone = new AIGeneratedQuestionBody();
+    clone.stem = question.stem;
+    clone.choices = question.choices;
+
+    String messageBody =
+        """
+Please assume the role of a learner, who has learned the note of focus as well as many other notes.
+Only the top-level context is visible to you.
+Without the specific note of focus and its more detailed contexts revealed to you,
+please critically check if the following question makes sense and is possible to you:
+
+%s
+
+"""
+            .formatted(clone.toJsonString());
+    messages.add(new ChatMessage(ChatMessageRole.USER.value(), messageBody));
+
+    return this;
+  }
+
+  private class QuestionEvaluation {
+    @JsonPropertyDescription("Indices of the correct choices. 0-based.")
+    @JsonProperty(required = true)
+    public int correctChoices[];
   }
 }
