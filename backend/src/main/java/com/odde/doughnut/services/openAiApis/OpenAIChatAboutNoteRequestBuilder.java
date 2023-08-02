@@ -2,6 +2,9 @@ package com.odde.doughnut.services.openAiApis;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AiCompletionRequest;
 import com.odde.doughnut.services.AIGeneratedQuestion;
@@ -12,6 +15,7 @@ import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.apache.logging.log4j.util.Strings;
 
 public class OpenAIChatAboutNoteRequestBuilder {
@@ -136,9 +140,23 @@ please critically check if the following question makes sense and is possible to
     return this;
   }
 
-  private class QuestionEvaluation {
+  public static class QuestionEvaluation {
     @JsonPropertyDescription("Indices of the correct choices. 0-based.")
     @JsonProperty(required = true)
     public int correctChoices[];
+
+    public static Optional<QuestionEvaluation> getQuestionEvaluation(JsonNode jsonNode) {
+      try {
+        return Optional.of(new ObjectMapper().treeToValue(jsonNode, QuestionEvaluation.class));
+      } catch (JsonProcessingException e) {
+        return Optional.empty();
+      }
+    }
+
+    public boolean makeSense(int correctChoiceIndex) {
+      return correctChoices != null
+          && correctChoices.length == 1
+          && correctChoices[0] == correctChoiceIndex;
+    }
   }
 }

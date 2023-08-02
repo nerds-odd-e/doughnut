@@ -15,6 +15,7 @@ import com.odde.doughnut.entities.json.AiCompletionRequest;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.openAiApis.OpenAIChatAboutNoteRequestBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
@@ -24,7 +25,6 @@ import com.theokanning.openai.image.ImageResult;
 import io.reactivex.Single;
 import java.util.List;
 import java.util.function.Consumer;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -174,7 +174,7 @@ class RestAiControllerTest {
     @Test
     void createQuizQuestion() throws JsonProcessingException, QuizQuestionNotPossibleException {
       when(openAiApi.createChatCompletion(any()))
-          .thenReturn(buildCompletionResultForAIQuestion(jsonQuestion));
+          .thenReturn(buildCompletionResultForFunctionCall(jsonQuestion));
       QuizQuestion quizQuestion = controller.generateQuestion(note);
       assertThat(quizQuestion.stem).contains("What is the first color in the rainbow?");
     }
@@ -182,72 +182,85 @@ class RestAiControllerTest {
     @Test
     void createQuizQuestionFailed() throws JsonProcessingException {
       when(openAiApi.createChatCompletion(any()))
-          .thenReturn(buildCompletionResultForAIQuestion("{\"stem\": \"\"}"));
+          .thenReturn(buildCompletionResultForFunctionCall("{\"stem\": \"\"}"));
       assertThrows(QuizQuestionNotPossibleException.class, () -> controller.generateQuestion(note));
     }
 
     @Nested
     class WithMockedChatCompletion {
-      ChatCompletionRequest request1;
+      ChatCompletionRequest requestForQuestion;
 
       @BeforeEach
       void setup() throws JsonProcessingException {
         mockChatCompletionWithFunctionCall(
             "ask_single_answer_multiple_choice_question",
-            (request) -> request1 = request,
-            buildCompletionResultForAIQuestion(jsonQuestion));
+            (request) -> requestForQuestion = request,
+            jsonQuestion);
       }
 
       @Test
       void usingABiggerMaxToken() throws QuizQuestionNotPossibleException {
         controller.generateQuestion(note);
-        assertThat(request1.getMaxTokens()).isGreaterThan(1000);
-        assertThat(request1.getModel()).isEqualTo("gpt-4");
+        assertThat(requestForQuestion.getMaxTokens()).isGreaterThan(1000);
+        assertThat(requestForQuestion.getModel()).isEqualTo("gpt-4");
       }
 
       @Nested
       class WhenTheContentIsLong {
-        ChatCompletionRequest request2;
+        OpenAIChatAboutNoteRequestBuilder.QuestionEvaluation questionEvaluation =
+            new OpenAIChatAboutNoteRequestBuilder.QuestionEvaluation();
 
         @BeforeEach
         void setup() throws JsonProcessingException {
+          questionEvaluation.correctChoices = new int[] {0};
           note.setDescription(makeMe.aStringOfLength(1000));
+        }
+
+        @Test
+        void usingGPT3_5() throws QuizQuestionNotPossibleException, JsonProcessingException {
+          mockChatCompletionWithFunctionCall(
+              "evaluate_question", null, new ObjectMapper().writeValueAsString(questionEvaluation));
+          controller.generateQuestion(note);
+          assertThat(requestForQuestion.getModel()).isEqualTo("gpt-3.5-turbo-16k");
+        }
+
+        @Test
+        void askAiToEvaluateTheQuestionAgain()
+            throws QuizQuestionNotPossibleException, JsonProcessingException {
           mockChatCompletionWithFunctionCall(
               "evaluate_question",
-              (request) -> request2 = request,
-              buildCompletionResultForAIQuestion(jsonQuestion));
+              (request) -> assertThat(request.getModel()).isEqualTo("gpt-3.5-turbo-16k"),
+              new ObjectMapper().writeValueAsString(questionEvaluation));
+          controller.generateQuestion(note);
         }
 
         @Test
-        void usingGPT3_5() throws QuizQuestionNotPossibleException {
+        void tryWithGPT4IfTheEvaluationIsIncorrect()
+            throws QuizQuestionNotPossibleException, JsonProcessingException {
+          questionEvaluation.correctChoices = new int[] {0, 1};
+          mockChatCompletionWithFunctionCall(
+              "evaluate_question", null, new ObjectMapper().writeValueAsString(questionEvaluation));
           controller.generateQuestion(note);
-          assertThat(request1.getModel()).isEqualTo("gpt-3.5-turbo-16k");
-        }
-
-        @Test
-        void askAiToEvaluateTheQuestionAgain() throws QuizQuestionNotPossibleException {
-          controller.generateQuestion(note);
-          assertThat(request1.getModel()).isEqualTo("gpt-3.5-turbo-16k");
+          assertThat(requestForQuestion.getModel()).isEqualTo("gpt-4");
         }
       }
     }
 
     private void mockChatCompletionWithFunctionCall(
-        String functionName,
-        Consumer<ChatCompletionRequest> consumer,
-        Single<ChatCompletionResult> resultSingle) {
+        String functionName, Consumer<ChatCompletionRequest> consumer, String result)
+        throws JsonProcessingException {
       when(openAiApi.createChatCompletion(
               argThat(
                   request -> {
                     if (request == null) return false;
                     boolean askSingleAnswerMultipleChoiceQuestion =
                         request.getFunctions().get(0).getName().equals(functionName);
-                    if (askSingleAnswerMultipleChoiceQuestion) {
+                    if (askSingleAnswerMultipleChoiceQuestion && consumer != null) {
                       consumer.accept(request);
                     }
                     return askSingleAnswerMultipleChoiceQuestion;
                   })))
-          .thenReturn(resultSingle);
+          .thenReturn(buildCompletionResultForFunctionCall(result));
     }
   }
 
@@ -259,13 +272,11 @@ class RestAiControllerTest {
     return Single.just(result);
   }
 
-  @NotNull
   private Single<ChatCompletionResult> buildCompletionResult(String text) {
     return Single.just(makeMe.openAiCompletionResult().choice(text).please());
   }
 
-  @NotNull
-  private Single<ChatCompletionResult> buildCompletionResultForAIQuestion(String jsonString)
+  private Single<ChatCompletionResult> buildCompletionResultForFunctionCall(String jsonString)
       throws JsonProcessingException {
     return Single.just(
         makeMe
