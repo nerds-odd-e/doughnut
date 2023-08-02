@@ -100,12 +100,8 @@ description (until the end of this message):
     return requestBuilder.maxTokens(maxTokens).build();
   }
 
-  public OpenAIChatAboutNoteRequestBuilder useGPT4IfNotTooLong() {
-    long totalLength =
-        messages.stream().map(ChatMessage::getContent).map(String::length).reduce(0, Integer::sum);
-    if (totalLength < 1300) {
-      model = "gpt-4";
-    }
+  public OpenAIChatAboutNoteRequestBuilder useGPT4() {
+    model = "gpt-4";
     return this;
   }
 }
