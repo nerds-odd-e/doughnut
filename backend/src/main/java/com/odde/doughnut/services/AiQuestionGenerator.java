@@ -80,7 +80,7 @@ public class AiQuestionGenerator {
   private boolean shortContent() {
     int length = 0;
     length += note.getTitle().getBytes(StandardCharsets.UTF_8).length;
-    if (!note.isDescriptionBlankHtml()) {
+    if (note.getDescription() != null) {
       length += note.getDescription().getBytes(StandardCharsets.UTF_8).length;
     }
     return length < 300;
