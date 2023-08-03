@@ -64,6 +64,7 @@ export default defineComponent({
     return {
       quizQuestionCache: [] as (Generated.QuizQuestion | undefined)[],
       eagerFetchUntil: 0,
+      fetching: false,
     };
   },
   computed: {
@@ -114,7 +115,11 @@ export default defineComponent({
         this.eagerFetchUntil,
         this.currentIndex + this.eagerFetchCount,
       ]) as number;
-      await this.fetchNextQuestion();
+      if (!this.fetching) {
+        this.fetching = true;
+        await this.fetchNextQuestion();
+        this.fetching = false;
+      }
     },
 
     async fetchNextQuestion() {
