@@ -11,8 +11,10 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.theokanning.openai.OpenAiApi;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @SessionScope
@@ -40,17 +42,20 @@ public class RestAiController {
   }
 
   @PostMapping("/generate-question")
-  public QuizQuestion generateQuestion(@RequestParam(value = "note") Note note)
-      throws QuizQuestionNotPossibleException {
+  public QuizQuestion generateQuestion(@RequestParam(value = "note") Note note) {
     currentUser.assertLoggedIn();
     QuizQuestionServant servant =
         new QuizQuestionServant(
             currentUser.getEntity(), null, modelFactoryService, aiAdvisorService);
-    QuizQuestionEntity quizQuestionEntity =
-        new QuizQuestionDirector(QuizQuestionEntity.QuestionType.AI_QUESTION, servant)
-            .invoke(note.getThing());
-    modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
-    return modelFactoryService.toQuizQuestion(quizQuestionEntity, currentUser.getEntity());
+    try {
+      QuizQuestionEntity quizQuestionEntity =
+          new QuizQuestionDirector(QuizQuestionEntity.QuestionType.AI_QUESTION, servant)
+              .invoke(note.getThing());
+      modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
+      return modelFactoryService.toQuizQuestion(quizQuestionEntity, currentUser.getEntity());
+    } catch (QuizQuestionNotPossibleException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated");
+    }
   }
 
   @PostMapping("/generate-image")
