@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -184,6 +185,16 @@ class RestAiControllerTest {
       when(openAiApi.createChatCompletion(any()))
           .thenReturn(buildCompletionResultForFunctionCall("{\"stem\": \"\"}"));
       assertThrows(ResponseStatusException.class, () -> controller.generateQuestion(note));
+      verify(openAiApi, Mockito.times(1)).createChatCompletion(any());
+    }
+
+    @Test
+    void createQuizQuestionFailedWith35WillTryAgain() throws JsonProcessingException {
+      note.setDescription(makeMe.aStringOfLength(1000));
+      when(openAiApi.createChatCompletion(any()))
+          .thenReturn(buildCompletionResultForFunctionCall("{\"stem\": \"\"}"));
+      assertThrows(ResponseStatusException.class, () -> controller.generateQuestion(note));
+      verify(openAiApi, Mockito.times(2)).createChatCompletion(any());
     }
 
     @Nested
@@ -199,7 +210,7 @@ class RestAiControllerTest {
       }
 
       @Test
-      void usingABiggerMaxToken() throws QuizQuestionNotPossibleException {
+      void usingABiggerMaxToken() {
         controller.generateQuestion(note);
         assertThat(requestForQuestion.getMaxTokens()).isGreaterThan(1000);
         assertThat(requestForQuestion.getModel()).isEqualTo("gpt-4");
@@ -217,7 +228,7 @@ class RestAiControllerTest {
         }
 
         @Test
-        void usingGPT3_5() throws QuizQuestionNotPossibleException, JsonProcessingException {
+        void usingGPT3_5() throws JsonProcessingException {
           mockChatCompletionWithFunctionCall(
               "evaluate_question", null, new ObjectMapper().writeValueAsString(questionEvaluation));
           controller.generateQuestion(note);
@@ -225,8 +236,7 @@ class RestAiControllerTest {
         }
 
         @Test
-        void askAiToEvaluateTheQuestionAgain()
-            throws QuizQuestionNotPossibleException, JsonProcessingException {
+        void askAiToEvaluateTheQuestionAgain() throws JsonProcessingException {
           mockChatCompletionWithFunctionCall(
               "evaluate_question",
               (request) -> assertThat(request.getModel()).isEqualTo("gpt-3.5-turbo-16k"),
@@ -235,8 +245,7 @@ class RestAiControllerTest {
         }
 
         @Test
-        void tryWithGPT4IfTheEvaluationIsIncorrect()
-            throws QuizQuestionNotPossibleException, JsonProcessingException {
+        void tryWithGPT4IfTheEvaluationIsIncorrect() throws JsonProcessingException {
           questionEvaluation.correctChoices = new int[] {0, 1};
           mockChatCompletionWithFunctionCall(
               "evaluate_question", null, new ObjectMapper().writeValueAsString(questionEvaluation));
