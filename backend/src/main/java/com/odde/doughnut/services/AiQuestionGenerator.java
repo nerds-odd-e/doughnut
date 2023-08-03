@@ -67,8 +67,11 @@ public class AiQuestionGenerator {
   }
 
   private boolean shortContent() {
-    return note.getTitle().getBytes(StandardCharsets.UTF_8).length
-            + note.getDescription().getBytes(StandardCharsets.UTF_8).length
-        < 300;
+    int length = 0;
+    length += note.getTitle().getBytes(StandardCharsets.UTF_8).length;
+    if (!note.isDescriptionBlankHtml()) {
+      length += note.getDescription().getBytes(StandardCharsets.UTF_8).length;
+    }
+    return length < 300;
   }
 }
