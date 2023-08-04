@@ -27,7 +27,7 @@ function mockChatCompletion(
   messagesToMatch: MessageToMatch[],
   message: ChatMessageInResponse,
   finishReason: "length" | "stop" | "function_call",
-) {
+): Promise<void> {
   const body = { messages: messagesToMatch }
   const predicate = new FlexiPredicate()
     .withOperator(Operator.matches)

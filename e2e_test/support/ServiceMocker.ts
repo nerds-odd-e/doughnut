@@ -39,7 +39,7 @@ class ServiceMocker {
     return this.mockWithPredicate(new DefaultPredicate(path, HttpMethod.POST), response)
   }
 
-  public mockWithPredicate(predicate: Predicate, response: unknown) {
+  public mockWithPredicate(predicate: Predicate, response: unknown): Promise<void> {
     return this.mountebank.stubWithPredicate(predicate, response)
   }
 
