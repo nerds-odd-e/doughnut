@@ -28,6 +28,7 @@ class RenderingHelper {
       managedApi: this.managedApi,
     },
     stubs: {
+      DescriptionEditor: { template: "<div></div>" },
       "router-view": true,
       "router-link": {
         props: ["to"],
