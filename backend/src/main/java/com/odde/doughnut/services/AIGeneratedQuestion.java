@@ -14,6 +14,10 @@ public class AIGeneratedQuestion extends AIGeneratedQuestionBody {
   @JsonProperty(required = true)
   public int correctChoiceIndex;
 
+  @JsonPropertyDescription("Confidence of the correctness of the question. 0 to 10.")
+  @JsonProperty(required = true)
+  public int confidence;
+
   public static AIGeneratedQuestion getValidQuestion(JsonNode question)
       throws QuizQuestionNotPossibleException {
     try {

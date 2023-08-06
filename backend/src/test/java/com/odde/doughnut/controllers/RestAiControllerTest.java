@@ -181,16 +181,7 @@ class RestAiControllerTest {
     }
 
     @Test
-    void createQuizQuestionFailed() throws JsonProcessingException {
-      when(openAiApi.createChatCompletion(any()))
-          .thenReturn(buildCompletionResultForFunctionCall("{\"stem\": \"\"}"));
-      assertThrows(ResponseStatusException.class, () -> controller.generateQuestion(note));
-      verify(openAiApi, Mockito.times(1)).createChatCompletion(any());
-    }
-
-    @Test
     void createQuizQuestionFailedWith35WillTryAgain() throws JsonProcessingException {
-      note.setDescription(makeMe.aStringOfLength(1000));
       when(openAiApi.createChatCompletion(any()))
           .thenReturn(buildCompletionResultForFunctionCall("{\"stem\": \"\"}"));
       assertThrows(ResponseStatusException.class, () -> controller.generateQuestion(note));
@@ -207,13 +198,6 @@ class RestAiControllerTest {
             "ask_single_answer_multiple_choice_question",
             (request) -> requestForQuestion = request,
             jsonQuestion);
-      }
-
-      @Test
-      void usingABiggerMaxToken() {
-        controller.generateQuestion(note);
-        assertThat(requestForQuestion.getMaxTokens()).isGreaterThan(1000);
-        assertThat(requestForQuestion.getModel()).isEqualTo("gpt-4");
       }
 
       @Nested

@@ -61,6 +61,7 @@ Given("OpenAI by default returns this question from now:", (questionTable: DataT
     stem: record.question,
     correctChoiceIndex: 0,
     choices: [record.correct_choice, record.incorrect_choice_1, record.incorrect_choice_2],
+    confidence: 10,
   })
   cy.then(async () => {
     await mock_services.openAi().restartImposter()
