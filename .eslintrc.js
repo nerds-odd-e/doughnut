@@ -5,7 +5,8 @@ module.exports = {
     "cypress",
     "chai-friendly",
     "prettier",
-    "unused-imports"
+    "unused-imports",
+    "testing-library"
   ],
   settings: {
     "import/resolver": {
