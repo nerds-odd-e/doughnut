@@ -45,7 +45,7 @@
     "eslint-import-resolver-typescript": "^3.5",
     "eslint-plugin-import": "npm:eslint-plugin-i",
     "eslint-plugin-prettier": "^5.0.0",
-    "eslint-plugin-testing-library": "^5.11",
+    "eslint-plugin-testing-library": "^5.11.1",
     "eslint-plugin-vitest": "^0.2.8",
     "eslint-plugin-vue": "^9.16",
     "jsdom": "^22.1",
