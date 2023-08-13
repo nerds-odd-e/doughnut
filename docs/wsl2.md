@@ -1,6 +1,6 @@
 # WSL2 development environment setup
 
-### 1. Ensure you install WSL2g with Ubuntu-22.04 from official Microsoft Store
+### 1. Ensure you install WSL2g with Ubuntu-23.04 from official Microsoft Store
 
 Follow this [youtube video tutorial on how to install WSL2 with WSLg](https://www.youtube.com/watch?v=FQ6ahcJOVz0) (Linux GUI enabled in WSL2) so you can run cypress in `cypress:open` mode.
 Make sure you do not run WSL2g as `root` user for doughnut development enviroment. `nix` tool setup with `root` user will fail!
