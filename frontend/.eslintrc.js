@@ -41,7 +41,7 @@ module.exports = {
     "import/resolver": {
       alias: {
         map: [["@", "./src"]],
-        extensions: ['.js', '.ts', '.vue'],
+        extensions: [".js", ".ts", ".vue"],
       },
     },
   },
@@ -57,8 +57,8 @@ module.exports = {
     "import/extensions": "off",
     "import/no-self-import": "error",
     "import/no-cycle": ["error", { maxDepth: 1, ignoreExternal: true }],
-    "testing-library/await-async-query": "error",
-    "testing-library/no-await-sync-query": "error",
+    "testing-library/await-async-queries": "error",
+    "testing-library/no-await-sync-queries": "error",
     "testing-library/no-debugging-utils": "warn",
     "testing-library/no-dom-import": "off",
     "vue/multi-word-component-names": 0,
