@@ -7,7 +7,7 @@
     }"
   >
     <template #head>
-      <PopButton title="choose a circle" :sidebar="true">
+      <PopButton title="choose a circle" :sidebar="'left'">
         <template #button_face>
           <SvgForward />
         </template>

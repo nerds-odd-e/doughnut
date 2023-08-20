@@ -8,14 +8,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { PropType, defineComponent } from "vue";
 import usePopups from "./usePopups";
 
 export default defineComponent({
   setup() {
     return usePopups();
   },
-  props: { title: String, sidebar: Boolean },
+  props: { title: String, sidebar: String as PropType<"left" | "right"> },
   methods: {
     showDialog() {
       this.popups.dialog(this.$slots.default, this.sidebar);

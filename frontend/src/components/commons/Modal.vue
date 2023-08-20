@@ -2,7 +2,7 @@
   <transition name="modal">
     <div class="modal-mask">
       <div class="modal-wrapper" @mousedown.self="$emit('close_request')">
-        <div :class="sidebar ? 'modal-sidebar' : 'modal-container'">
+        <div :class="sidebarStyle">
           <button class="close-button" @click="$emit('close_request')">
             <SvgClose />
           </button>
@@ -21,15 +21,22 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { PropType, defineComponent } from "vue";
 import SvgClose from "../svgs/SvgClose.vue";
 
 export default defineComponent({
   props: {
-    sidebar: Boolean,
+    sidebar: String as PropType<"left" | "right">,
   },
   emits: ["close_request"],
   components: { SvgClose },
+  computed: {
+    sidebarStyle() {
+      if (this.sidebar === "left") return "modal-sidebar modal-left";
+      if (this.sidebar === "right") return "modal-sidebar modal-right";
+      return "modal-container";
+    },
+  },
 });
 </script>
 
@@ -66,10 +73,8 @@ export default defineComponent({
 
 .modal-sidebar {
   position: relative;
-  max-width: 300px;
   height: 100vh;
   overflow: auto;
-  margin-left: 0px;
   padding: 0px 0px;
   background-color: #fff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
@@ -78,6 +83,17 @@ export default defineComponent({
     margin: 0;
     padding: 0;
   }
+}
+
+.modal-left {
+  max-width: 300px;
+  margin-left: 0px;
+}
+
+.modal-right {
+  max-width: calc(100% - 50px);
+  margin-right: 0px;
+  margin-left: auto;
 }
 
 .modal-header h3 {

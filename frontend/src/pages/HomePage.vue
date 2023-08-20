@@ -58,7 +58,7 @@
           <PopButton
             class="btn btn-light"
             title="choose a circle"
-            :sidebar="true"
+            :sidebar="'left'"
           >
             <template #button_face> Go To Circles </template>
             <CircleSelector />
