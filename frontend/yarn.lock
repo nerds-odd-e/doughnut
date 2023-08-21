@@ -809,9 +809,9 @@
     "@vue/babel-plugin-jsx" "^1.1.5"
 
 "@vitejs/plugin-vue@^4.3":
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/@vitejs/plugin-vue/-/plugin-vue-4.3.1.tgz#635cf512dd1d5c78adf9e24615696e4918cd9d88"
-  integrity sha512-tUBEtWcF7wFtII7ayNiLNDTCE1X1afySEo+XNVMNkFXaThENyCowIEX095QqbJZGTgoOcSVDJGlnde2NG4jtbQ==
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@vitejs/plugin-vue/-/plugin-vue-4.3.2.tgz#9f1b693d56370c5c01c3a2a09858bb5afd9d154d"
+  integrity sha512-iDDhGruwhKkwNwT5qgtGaeTxF4ULs52xpQbsC27F01kf3aQBHtrDP738pmHw4oclVAUA3m+Vk8gxhDV5KbfM+A==
 
 "@vitest/expect@0.34.2":
   version "0.34.2"
@@ -2876,9 +2876,9 @@ lz-string@^1.5.0:
   integrity sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==
 
 magic-string@^0.30.0, magic-string@^0.30.1, magic-string@^0.30.2:
-  version "0.30.2"
-  resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-0.30.2.tgz#dcf04aad3d0d1314bc743d076c50feb29b3c7aca"
-  integrity sha512-lNZdu7pewtq/ZvWUp9Wpf/x7WzMTsR26TWV03BRZrXFsv+BI6dy8RAiKgm1uM/kyR0rCfUcqvOlXKG66KhIGug==
+  version "0.30.3"
+  resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-0.30.3.tgz#403755dfd9d6b398dfa40635d52e96c5ac095b85"
+  integrity sha512-B7xGbll2fG/VjP+SWg4sX3JynwIU0mjoTc6MPpKNuIvftk6u6vqhDnk1R80b8C2GBR6ywqy+1DcKBrevBg+bmw==
   dependencies:
     "@jridgewell/sourcemap-codec" "^1.4.15"
 
@@ -3599,9 +3599,9 @@ stackback@0.0.2:
   integrity sha512-1XMJE5fQo1jGH6Y/7ebnwPOBEkIEnT4QF32d5R1+VXdXveM0IBMJt8zfaxX1P3QhVwrYe+576+jkANtSS2mBbw==
 
 std-env@^3.3.3:
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/std-env/-/std-env-3.4.0.tgz#d7dc7e088016f4c22b12a699479ce6c6da31b274"
-  integrity sha512-YqHeQIIQ8r1VtUZOTOyjsAXAsjr369SplZ5rlQaiJTBsvodvPSCME7vuz8pnQltbQ0Cw0lyFo5Q8uyNwYQ58Xw==
+  version "3.4.1"
+  resolved "https://registry.yarnpkg.com/std-env/-/std-env-3.4.1.tgz#f4cc1eb27c621bf17f476b822f9cbd40a5ea7456"
+  integrity sha512-8ff1ZsX3NZMNEmDZmINWcFb7CIhPGKZO+TSVytJxJmFzZjAHtAHOR2GuIur7QXlgwY9Md7wNlu4Q7TtSvbu/SA==
 
 stop-iteration-iterator@^1.0.0:
   version "1.0.0"
