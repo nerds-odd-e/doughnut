@@ -110,7 +110,7 @@ jobs:
       - name: Setup JDK with cache
         uses: ./.github/setup_jdk_with_cache
       - uses: ./.github/setup_nodejs
-      - uses: cypress-io/github-action@v5
+      - uses: cypress-io/github-action@v6
         with:
           browser: chrome
           config-file: e2e_test/config/ci.ts
