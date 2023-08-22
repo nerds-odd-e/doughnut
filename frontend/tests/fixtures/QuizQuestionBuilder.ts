@@ -28,6 +28,7 @@ class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
     this.quizQuestion.choices = choices.map((choice) => ({
       picture: false,
       display: choice,
+      reason: "The quick brown fox jumps over the lazy dog",
     }));
     return this;
   }
