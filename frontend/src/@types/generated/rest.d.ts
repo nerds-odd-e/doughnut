@@ -250,7 +250,6 @@ declare namespace Generated {
     interface Choice {
         display: string;
         pictureWithMask?: PictureWithMask;
-        reason: string;
         picture: boolean;
     }
 
