@@ -30,6 +30,7 @@ public class QuizQuestion {
     private boolean isPicture = false;
     private String display;
     @Nullable private PictureWithMask pictureWithMask;
-    private String reason = "The quick brown fox jumps over the lazy dog.\nThe quick brown fox jumps over the lazy dog\nThe quick brown fox jumps over the lazy dog";
+    private String reason =
+        "The quick brown fox jumps over the lazy dog.\nThe quick brown fox jumps over the lazy dog\nThe quick brown fox jumps over the lazy dog";
   }
 }
