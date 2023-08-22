@@ -8,9 +8,11 @@ Feature: Ask Statement
       | Taiwan  |             |               |
       | Taipei  | A           | Taiwan        |
       | Weather | It rains a  | Taipei        |
+    And goto test me view of note "Taiwan"
 
   @ignore
   Scenario: The users can conmunicate with AI
+
   
   @ignore
   Scenario: The users can continue to conmunication with AI
