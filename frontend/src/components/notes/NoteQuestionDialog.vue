@@ -24,10 +24,15 @@
     Doesn't make sense?
   </button>
   <div v-show="quizQuestion !== undefined" class="ask-container">
-    <div class="ask-input-container">
+    <form class="ask-input-container" @submit.prevent="generateAskAnswer">
       <input id="ask-input" class="ask-input-text" v-model="askInput" />
-      <button id="ask-button" class="float-btn">ASK</button>
-    </div>
+      <input
+        type="submit"
+        value="ASK"
+        id="ask-button"
+        class="btn float-btn btn-secondary"
+      />
+    </form>
     <div class="ask-answer-container">
       <img src="/user-icon.svg" class="ask-answer-icon" />
       <div class="ask-answer-text">
@@ -75,6 +80,10 @@ export default defineComponent({
     },
     onAnswered(answeredQuestion: Generated.AnsweredQuestion) {
       this.answeredQuestion = answeredQuestion;
+    },
+    generateAskAnswer() {
+      // TODO: implement
+      return "I'm ChatGPT";
     },
   },
   mounted() {
