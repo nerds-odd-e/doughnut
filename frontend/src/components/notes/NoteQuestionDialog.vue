@@ -23,14 +23,14 @@
   >
     Doesn't make sense?
   </button>
-  <div v-show="quizQuestion !== undefined" class="askContainer">
-    <div class="askInputContainer">
-      <input id="ask-input" class="askInputText" v-model="askInput" />
-      <button id="ask-button" class="floatBtn">ASK</button>
+  <div v-show="quizQuestion !== undefined" class="ask-container">
+    <div class="ask-input-container">
+      <input id="ask-input" class="ask-input-text" v-model="askInput" />
+      <button id="ask-button" class="float-btn">ASK</button>
     </div>
-    <div class="askAnswerContainer">
-      <img src="/user-icon.svg" class="askAnswerIcon" />
-      <div class="askAnswerText">
+    <div class="ask-answer-container">
+      <img src="/user-icon.svg" class="ask-answer-icon" />
+      <div class="ask-answer-text">
         <p id="ask-answer">{{ askAnswer }}</p>
       </div>
     </div>
@@ -100,7 +100,7 @@ span {
   padding-right: 5px;
 }
 
-.askInputContainer {
+.ask-input-container {
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -108,30 +108,30 @@ span {
   padding-bottom: 5px;
 }
 
-.askInputText {
+.ask-input-text {
   width: 100%;
   margin-right: 5px;
   flex-grow: 1;
 }
-input.autoExtendableInput {
+input.auto-extendable-input {
   width: 100%;
 }
 
-.floatBtn {
+.float-btn {
   float: right;
 }
 
-.askAnswerContainer {
+.ask-answer-container {
   display: flex;
   margin: 2% 0;
 }
 
-.askAnswerIcon {
+.ask-answer-icon {
   width: 6%;
   height: 6%;
 }
 
-.askAnswerText {
+.ask-answer-text {
   position: relative;
   display: inline-block;
   margin-left: 15px;
@@ -141,7 +141,7 @@ input.autoExtendableInput {
   box-sizing: border-box;
 }
 
-.askAnswerText:before {
+.ask-answer-text:before {
   content: "";
   position: absolute;
   top: 50%;
@@ -152,7 +152,7 @@ input.autoExtendableInput {
   z-index: 2;
 }
 
-.askAnswerText:after {
+.ask-answer-text:after {
   content: "";
   position: absolute;
   top: 50%;
@@ -162,7 +162,7 @@ input.autoExtendableInput {
   border-right: 14px solid #555;
 }
 
-.askAnswerText p {
+.ask-answer-text p {
   margin: 0;
   word-break: break-word;
 }
