@@ -10,19 +10,19 @@
       class="accordion-button"
       type="button"
       data-bs-toggle="collapse"
-      data-bs-target="#collapseOne"
+      data-bs-target="#incorrectReasonArea"
       aria-expanded="true"
-      aria-controls="collapseOne"
+      aria-controls="incorrectReasonArea"
     >
       why my answer is wrong?
     </a>
     <div
-      id="collapseOne"
+      id="incorrectReasonArea"
       class="accordion-collapse collapse"
       aria-labelledby="headingOne"
       data-bs-parent="#accordionExample"
     >
-      <div class="accordion-body">test message.</div>
+      <div class="accordion-body" id="incorrectReason">test message.</div>
     </div>
   </div>
 </template>
