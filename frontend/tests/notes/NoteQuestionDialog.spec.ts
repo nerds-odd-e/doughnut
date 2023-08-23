@@ -47,4 +47,21 @@ describe("NoteQuestionDialog", () => {
     expect(wrapper.text()).toContain("any question?");
     expect(wrapper.text()).toContain("is it raining?");
   });
+
+  it("When the ask button is clicked, the anwser from AI will be displayed", async () => {
+    // Given
+    const expected = "I'm ChatGPT";
+
+    // When
+    const wrapper = await createWrapper();
+
+    wrapper.find("#ask-input").setValue("What's your name?");
+    wrapper.find("#ask-button").trigger("submit");
+    await flushPromises();
+
+    // Then
+    wrapper.find(".ask-answer-container").isVisible();
+    const actual = wrapper.find("#ask-answer").text();
+    expect(actual).toBe(expected);
+  });
 });
