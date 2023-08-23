@@ -1,5 +1,4 @@
 <template>
-  <AnswerResult v-bind="{ answeredQuestion }" />
   <div v-if="reviewPoint">
     <ReviewPointAbbr
       v-if="!toggleReviewPoint"
@@ -22,6 +21,7 @@
       answerChoiceIndex: answeredQuestion.choiceIndex,
     }"
   />
+  <AnswerResult v-bind="{ answeredQuestion }" />
 </template>
 
 <script lang="ts">
