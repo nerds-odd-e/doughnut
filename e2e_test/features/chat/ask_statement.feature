@@ -14,6 +14,7 @@ Feature: Ask Statement
 
 
   Scenario: The users can conmunicate with AI
+    Given OpenAI completes with "I'm ChatGPT" for assistant message "What's your name?"
     When I ask to OpenAI "What's your name?"
     Then I can confirm the answer "I'm ChatGPT"
 
