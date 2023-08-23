@@ -23,6 +23,10 @@
   >
     Doesn't make sense?
   </button>
+  <div v-show="quizQuestion !== undefined" class="askInputContainer">
+    <TextInput id="askInputText" class="askInputText" v-model="askInput" />
+    <button id="askBtn" class="floatBtn">ASK</button>
+  </div>
 </template>
 
 <script lang="ts">
@@ -49,6 +53,7 @@ export default defineComponent({
       quizQuestion: undefined as Generated.QuizQuestion | undefined,
       answeredQuestion: undefined as Generated.AnsweredQuestion | undefined,
       prevQuizQuestion: undefined as Generated.QuizQuestion | undefined,
+      askInput: "",
     };
   },
   methods: {
@@ -86,10 +91,19 @@ span {
   padding-right: 5px;
 }
 
-.chatInputContainer {
+.askInputContainer {
   width: 100%;
+  display: flex;
+  flex-direction: row;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
+.askInputText {
+  width: 100%;
+  margin-right: 5px;
+  flex-grow: 1;
+}
 input.autoExtendableInput {
   width: 100%;
 }
