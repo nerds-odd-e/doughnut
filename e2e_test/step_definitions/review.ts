@@ -211,8 +211,20 @@ Then("I should see the question {string} is disabled", (questionStem: string) =>
   pageObjects.findQuestionWithStem(questionStem).isDisabled()
 })
 
-Given("I chose the wrong answer", () => {})
+Given("I chose {string}", (choice: string) => {
+  const stem = "What is the most common scuba diving certification?"
+  const question = () => (stem ? cy.findByText(stem).parent() : cy)
+  const getChoice = (choice: string) => question().findByText(choice)
+  getChoice(choice).click()
+})
 
-When('I ask "why is my answer wrong"', () => {})
+When('I ask "why is my answer wrong?"', () => {
+  const text = "why is my answer wrong?"
+  cy.findByText(text).click()
+})
 
-Then("I should see the reason for the wrong answer", () => {})
+Then('I should see "test message." as the reason for the wrong answer', () => {
+  pageObjects
+    .findQuestionWithStem("What is the most common scuba diving certification?")
+    .expectReasonToBe("test message.")
+})

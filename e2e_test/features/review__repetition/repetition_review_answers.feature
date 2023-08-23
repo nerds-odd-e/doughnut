@@ -27,8 +27,3 @@ Feature: Repetition Quiz
     And I choose answer "sedition"
     When choose to remove the last review point from reviews
     Then On day 100 I should have "1/1" note for initial review and "0/0" for repeat
-
- Scenario: I can view the reason for the wrong answer when the quiz answer was not correct
-    Given I chose the wrong answer
-    When I ask "why is my answer wrong"
-    Then I should see the reason for the wrong answer
