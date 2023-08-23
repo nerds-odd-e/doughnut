@@ -24,8 +24,8 @@
     Doesn't make sense?
   </button>
   <div v-show="quizQuestion !== undefined" class="askInputContainer">
-    <TextInput id="askInputText" class="askInputText" v-model="askInput" />
-    <button id="askBtn" class="floatBtn">ASK</button>
+    <input id="ask-input" class="askInputText" v-model="askInput" />
+    <button id="ask-button" class="floatBtn">ASK</button>
   </div>
 </template>
 
