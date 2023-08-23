@@ -210,3 +210,12 @@ Then("I should be asked {string}", (expectedtQuestionStem: string) => {
 Then("I should see the question {string} is disabled", (questionStem: string) => {
   pageObjects.findQuestionWithStem(questionStem).isDisabled()
 })
+
+Given("I chose the wrong answer", () => {
+})
+
+When('I ask "why is my answer wrong"', () => {
+})
+
+Then("I should see the reason for the wrong answer", () => {
+})
