@@ -9,6 +9,6 @@ When("I ask to OpenAI {string}", (askStatement: string) => {
   cy.get("#ask-button").click()
 })
 
-Then("I can confirm the answer {}", (answer: string) => {
-  cy.get("#hoge").should("be.visible").contains(answer)
+Then("I can confirm the answer {string}", (answer: string) => {
+  cy.findByText(answer)
 })

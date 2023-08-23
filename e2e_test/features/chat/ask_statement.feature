@@ -15,7 +15,7 @@ Feature: Ask Statement
 
   Scenario: The users can conmunicate with AI
     When I ask to OpenAI "What's your name?"
-  # Then I can confirm the answer "I'm ChatGPT"
+    Then I can confirm the answer "I'm ChatGPT"
 
 
   @ignore
