@@ -1,3 +1,4 @@
+@usingMockedOpenAiService
 Feature: Ask Statement
 
 
