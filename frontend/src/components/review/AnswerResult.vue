@@ -22,9 +22,7 @@
       aria-labelledby="headingOne"
       data-bs-parent="#accordionExample"
     >
-      <div class="accordion-body" id="incorrectReason">
-        {{ answeredQuestion.quizQuestion.choices[0]?.reason }}
-      </div>
+      <div class="accordion-body" id="incorrectReason">test message.</div>
     </div>
   </div>
 </template>
