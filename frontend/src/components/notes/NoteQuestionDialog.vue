@@ -23,9 +23,17 @@
   >
     Doesn't make sense?
   </button>
-  <div v-show="quizQuestion !== undefined" class="askInputContainer">
-    <input id="ask-input" class="askInputText" v-model="askInput" />
-    <button id="ask-button" class="floatBtn">ASK</button>
+  <div v-show="quizQuestion !== undefined" class="askContainer">
+    <div class="askInputContainer">
+      <input id="ask-input" class="askInputText" v-model="askInput" />
+      <button id="ask-button" class="floatBtn">ASK</button>
+    </div>
+    <div class="askAnswerContainer">
+      <img src="/user-icon.svg" class="askAnswerIcon" />
+      <div class="askAnswerText">
+        <p id="ask-answer">{{ askAnswer }}</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -54,6 +62,7 @@ export default defineComponent({
       answeredQuestion: undefined as Generated.AnsweredQuestion | undefined,
       prevQuizQuestion: undefined as Generated.QuizQuestion | undefined,
       askInput: "",
+      askAnswer: "I'm ChatGPT",
     };
   },
   methods: {
@@ -110,5 +119,51 @@ input.autoExtendableInput {
 
 .floatBtn {
   float: right;
+}
+
+.askAnswerContainer {
+  display: flex;
+  margin: 2% 0;
+}
+
+.askAnswerIcon {
+  width: 6%;
+  height: 6%;
+}
+
+.askAnswerText {
+  position: relative;
+  display: inline-block;
+  margin-left: 15px;
+  padding: 7px 10px;
+  width: 100%;
+  border: solid 3px #555;
+  box-sizing: border-box;
+}
+
+.askAnswerText:before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -24px;
+  margin-top: -12px;
+  border: 12px solid transparent;
+  border-right: 12px solid #fff;
+  z-index: 2;
+}
+
+.askAnswerText:after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -30px;
+  margin-top: -14px;
+  border: 14px solid transparent;
+  border-right: 14px solid #555;
+}
+
+.askAnswerText p {
+  margin: 0;
+  word-break: break-word;
 }
 </style>
