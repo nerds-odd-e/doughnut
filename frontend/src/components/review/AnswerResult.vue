@@ -3,7 +3,27 @@
     Correct!
   </div>
   <div class="alert alert-danger" v-else>
-    {{ "Your answer `" + answeredQuestion.answerDisplay + "` is incorrect." }}
+    <strong>
+      {{ "Your answer `" + answeredQuestion.answerDisplay + "` is incorrect." }}
+    </strong>
+    <a
+      class="accordion-button"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#collapseOne"
+      aria-expanded="true"
+      aria-controls="collapseOne"
+    >
+      why my answer is wrong?
+    </a>
+    <div
+      id="collapseOne"
+      class="accordion-collapse collapse"
+      aria-labelledby="headingOne"
+      data-bs-parent="#accordionExample"
+    >
+      <div class="accordion-body">test message.</div>
+    </div>
   </div>
 </template>
 
