@@ -33,7 +33,7 @@
         class="btn float-btn btn-secondary"
       />
     </form>
-    <div class="ask-answer-container">
+    <div v-show="answered" class="ask-answer-container">
       <img src="/user-icon.svg" class="ask-answer-icon" />
       <div class="ask-answer-text">
         <p id="ask-answer">{{ askAnswer }}</p>
@@ -67,7 +67,8 @@ export default defineComponent({
       answeredQuestion: undefined as Generated.AnsweredQuestion | undefined,
       prevQuizQuestion: undefined as Generated.QuizQuestion | undefined,
       askInput: "",
-      askAnswer: "I'm ChatGPT",
+      askAnswer: "",
+      answered: false,
     };
   },
   methods: {
@@ -82,8 +83,8 @@ export default defineComponent({
       this.answeredQuestion = answeredQuestion;
     },
     generateAskAnswer() {
-      // TODO: implement
-      return "I'm ChatGPT";
+      this.answered = true;
+      this.askAnswer = "I'm ChatGPT";
     },
   },
   mounted() {
