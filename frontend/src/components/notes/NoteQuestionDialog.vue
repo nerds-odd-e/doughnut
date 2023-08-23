@@ -23,10 +23,6 @@
   >
     Doesn't make sense?
   </button>
-  <div v-show="quizQuestion !== undefined" class="askInputContainer">
-    <TextInput id="askInputText" class="askInputText" v-model="askInput" />
-    <button id="askBtn" class="floatBtn">ASK</button>
-  </div>
 </template>
 
 <script lang="ts">
@@ -53,7 +49,6 @@ export default defineComponent({
       quizQuestion: undefined as Generated.QuizQuestion | undefined,
       answeredQuestion: undefined as Generated.AnsweredQuestion | undefined,
       prevQuizQuestion: undefined as Generated.QuizQuestion | undefined,
-      askInput: "",
     };
   },
   methods: {
