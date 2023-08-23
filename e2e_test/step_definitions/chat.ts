@@ -5,7 +5,8 @@
 import { When, Then } from "@badeball/cypress-cucumber-preprocessor"
 
 When("I ask to OpenAI {string}", (askStatement: string) => {
-  cy.get("#ask-input").should("be.visible").type(askStatement)
+  cy.get("#ask-input").should("be.visible").clear()
+  cy.get("#ask-input").type(askStatement)
   cy.get("#ask-button").click()
 })
 

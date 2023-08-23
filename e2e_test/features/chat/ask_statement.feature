@@ -12,7 +12,6 @@ Feature: Ask Statement
       | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
     And I ask to generate a question for note "Scuba Diving"
 
-
   Scenario: The users can conmunicate with AI
     Given OpenAI completes with "I'm ChatGPT" for assistant message "What's your name?"
     When I ask to OpenAI "What's your name?"
@@ -21,9 +20,9 @@ Feature: Ask Statement
 
   @ignore
   Scenario: The users can continue to conmunication with AI
-    When I input the ask statement "What's your name?"
-    And I clicked the ask button
-    Then I can confirm the answer include "I'm ChatGPT"
-    When I input the ask statement "How many days are there in the year 2023?"
-    And I clicked the ask button
-    Then I can confirm the answer include "365"
+    Given OpenAI completes with "I'm ChatGPT" for assistant message "What's your name?"
+    And OpenAI completes with "365" for assistant message "How many days are there in the year 2023?"
+    When I ask to OpenAI "What's your name?"
+    Then I can confirm the answer "I'm ChatGPT"
+    When I ask to OpenAI "How many days are there in the year 2023?"
+    Then I can confirm the answer "365"
