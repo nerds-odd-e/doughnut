@@ -34,5 +34,5 @@ Feature: Question generation by AI
     Given I ask to generate a question for note "Scuba Diving"
     And I should be asked "What is the most common scuba diving certification?"
     And I chose "Divemaster"
-    When I ask "why my answer is wrong?"
+    When I ask "why is my answer wrong?"
     Then I should see "test message." as the reason for the wrong answer

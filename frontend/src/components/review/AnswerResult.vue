@@ -14,7 +14,7 @@
       aria-expanded="true"
       aria-controls="incorrectReasonArea"
     >
-      why my answer is wrong?
+      why is my answer wrong?
     </a>
     <div
       id="incorrectReasonArea"
