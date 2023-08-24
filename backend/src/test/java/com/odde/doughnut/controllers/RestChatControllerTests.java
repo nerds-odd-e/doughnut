@@ -28,7 +28,7 @@ public class RestChatControllerTests {
 
   @BeforeEach
   void setUp() {
-    target = new RestChatController();
+    target = new RestChatController(openAiApi);
   }
 
   @Test
