@@ -264,6 +264,22 @@ const apiCollection = (managedApi: ManagedApi) => ({
       )) as Generated.WikidataSearchEntity[];
     },
   },
+  chat: {
+    async playChat(askContent: string): Promise<string> {
+      const request: Generated.ChatRequest = {
+        ask: askContent,
+      };
+      const res = await this.requestStartChat(request);
+      return res.answer;
+    },
+
+    async requestStartChat(body: Generated.ChatRequest) {
+      return (await managedApi.restPost(
+        "v1/chat",
+        body,
+      )) as Generated.ChatResponse;
+    },
+  },
   ai: {
     async keepAskingAICompletionUntilStop(
       prompt: string,

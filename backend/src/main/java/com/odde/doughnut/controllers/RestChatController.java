@@ -14,6 +14,6 @@ public class RestChatController {
   @PostMapping("/chat")
   public ChatResponse chat(ChatRequest request) {
 
-    return new ChatResponse("I'm chatGPT");
+    return new ChatResponse("I'm ChatGPT");
   }
 }

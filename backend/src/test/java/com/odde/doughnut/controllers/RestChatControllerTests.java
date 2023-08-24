@@ -28,7 +28,7 @@ public class RestChatControllerTests {
     // then: I want to get json response from openai
     ChatRequest request = new ChatRequest("What's your name?");
     ChatResponse res = controller.chat(request);
-    ChatResponse expect = new ChatResponse("I'm chatGPT");
+    ChatResponse expect = new ChatResponse("I'm ChatGPT");
     assertEquals(expect.getAnswer(), res.getAnswer());
   }
 }

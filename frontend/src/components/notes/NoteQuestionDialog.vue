@@ -82,9 +82,9 @@ export default defineComponent({
     onAnswered(answeredQuestion: Generated.AnsweredQuestion) {
       this.answeredQuestion = answeredQuestion;
     },
-    generateAskAnswer() {
+    async generateAskAnswer() {
       this.answered = true;
-      this.askAnswer = "I'm ChatGPT";
+      this.askAnswer = await this.api.chat.playChat(this.askInput);
     },
   },
   mounted() {

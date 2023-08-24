@@ -51,6 +51,10 @@ describe("NoteQuestionDialog", () => {
   it("When the ask button is clicked, the anwser from AI will be displayed", async () => {
     // Given
     const expected = "I'm ChatGPT";
+    // setUp
+    helper.apiMock
+      .expectingPost("/api/v1/chat")
+      .andReturnOnce({ answer: expected });
 
     // When
     const wrapper = await createWrapper();
