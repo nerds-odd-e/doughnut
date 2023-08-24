@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.entities.json.ChatRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +24,8 @@ public class RestChatControllerTests {
   @Test
   void chatWithAI() {
     // then: I want to get json response from openai
-    String res = controller.chat("What your name?");
+    ChatRequest request = new ChatRequest();
+    String res = controller.chat(request);
     assertEquals("I'm chatGPT", res);
   }
 }
