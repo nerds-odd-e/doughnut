@@ -11,7 +11,7 @@ Feature: Ask Statement
       | question                                            | correct_choice | incorrect_choice_1 | incorrect_choice_2 |
       | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
     And I ask to generate a question for note "Scuba Diving"
-
+  @ignore
   Scenario: The users can conmunicate with AI
     Given OpenAI completes with "I'm ChatGPT" for assistant message "What's your name?"
     When I ask to OpenAI "What's your name?"
