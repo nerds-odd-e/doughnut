@@ -9,8 +9,8 @@ Feature: Question generation by AI
       | title        | description                                    |
       | Scuba Diving | The most common certification is Rescue Diver. |
     And OpenAI by default returns this question from now:
-      | question                                            | correct_choice | incorrect_choice_1 | incorrect_reason_1                | incorrect_choice_2 | incorrect_reason_2                      |
-      | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Divemaster is not the most common | Open Water Diver   | Open Water Diver is not the most common |
+      | question                                            | correct_choice | correct_reason | incorrect_choice_1 | incorrect_reason_1                | incorrect_choice_2 | incorrect_reason_2                      |
+      | What is the most common scuba diving certification? | Rescue Diver   | Correct!       | Divemaster         | Divemaster is not the most common | Open Water Diver   | Open Water Diver is not the most common |
 
   Scenario Outline: testing myself with generated question for a note
     When I ask to generate a question for note "Scuba Diving"
@@ -35,4 +35,4 @@ Feature: Question generation by AI
     And I should be asked "What is the most common scuba diving certification?"
     And I chose "Divemaster"
     When I ask "why is my answer wrong?"
-    Then I should see "test message." as the reason for the wrong answer
+    Then I should see "Divemaster is not the most common" as the reason for the wrong answer
