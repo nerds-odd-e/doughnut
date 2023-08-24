@@ -23,8 +23,9 @@ public class RestChatController {
 
   @PostMapping("/chat")
   public ChatResponse chat(ChatRequest request) {
-    String question = request.getAsk();
-    String answer = this.chatService.askChatGPT(question);
-    return new ChatResponse(answer);
+    return new ChatResponse("I'm ChatGPT");
+//    String question = request.getAsk();
+//    String answer = this.chatService.askChatGPT(question);
+//    return new ChatResponse(answer);
   }
 }
