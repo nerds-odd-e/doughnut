@@ -109,13 +109,13 @@ public class OpenAiApiHandler {
     messages.add(message2);
 
     ChatCompletionRequest request =
-      ChatCompletionRequest.builder().model("gpt-4").messages(messages).stream(false)
-        .n(1)
-        .maxTokens(100)
-        .build();
+        ChatCompletionRequest.builder().model("gpt-4").messages(messages).stream(false)
+            .n(1)
+            .maxTokens(100)
+            .build();
 
     Optional<ChatCompletionChoice> result =
-      openAiApi.createChatCompletion(request).blockingGet().getChoices().stream().findFirst();
+        openAiApi.createChatCompletion(request).blockingGet().getChoices().stream().findFirst();
     return result.get().getMessage().getContent();
   }
 }
