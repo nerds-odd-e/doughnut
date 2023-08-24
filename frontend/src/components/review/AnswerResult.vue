@@ -23,7 +23,13 @@
       data-bs-parent="#accordionExample"
     >
       <div class="accordion-body" id="incorrectReason">
-        {{ answeredQuestion.quizQuestion.choices[0]?.reason }}
+        {{
+          answeredQuestion.choiceIndex !== undefined
+            ? answeredQuestion.quizQuestion.choices[
+                answeredQuestion.choiceIndex
+              ]?.reason
+            : ""
+        }}
       </div>
     </div>
   </div>
