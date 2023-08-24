@@ -18,7 +18,7 @@ public class ChatService {
   public String askChatGPT(String askStatement) {
     List messages = new ArrayList<ChatMessage>();
     ChatMessage message1 = new ChatMessage(ChatMessageRole.USER.value(), "");
-    ChatMessage message2 = new ChatMessage(ChatMessageRole.ASSISTANT.value(), "What's your name?");
+    ChatMessage message2 = new ChatMessage(ChatMessageRole.ASSISTANT.value(), askStatement);
     messages.add(message1);
     messages.add(message2);
 
