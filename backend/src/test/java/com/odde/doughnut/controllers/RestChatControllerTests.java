@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
 public class RestChatControllerTests {
+
   RestChatController controller;
 
   @BeforeEach
