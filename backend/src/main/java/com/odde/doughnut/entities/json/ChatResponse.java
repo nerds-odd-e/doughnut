@@ -1,12 +1,10 @@
 package com.odde.doughnut.entities.json;
 
-import lombok.Getter;
+import lombok.*;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class ChatResponse {
-
-  @Getter private final String answer;
-
-  public ChatResponse(String answer) {
-    this.answer = answer;
-  }
+  public String answer;
 }

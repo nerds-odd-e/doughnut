@@ -6,6 +6,7 @@ import com.odde.doughnut.services.ChatService;
 import com.theokanning.openai.OpenAiApi;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.annotation.SessionScope;
@@ -22,10 +23,9 @@ public class RestChatController {
   }
 
   @PostMapping("/chat")
-  public ChatResponse chat(ChatRequest request) {
-    return new ChatResponse("I'm ChatGPT");
-    //    String question = request.getAsk();
-    //    String answer = this.chatService.askChatGPT(question);
-    //    return new ChatResponse(answer);
+  public ChatResponse chat(@RequestBody ChatRequest request) {
+    String question = request.getAsk();
+    String answer = this.chatService.askChatGPT(question);
+    return new ChatResponse(answer);
   }
 }
