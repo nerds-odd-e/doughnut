@@ -4,9 +4,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.odde.doughnut.entities.json.ChatRequest;
 import com.odde.doughnut.entities.json.ChatResponse;
+import com.odde.doughnut.testability.MakeMeWithoutDB;
+import com.theokanning.openai.OpenAiApi;
+import com.theokanning.openai.completion.chat.ChatCompletionResult;
+import io.reactivex.Single;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,20 +21,29 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
 public class RestChatControllerTests {
+  RestChatController target;
 
-  RestChatController controller;
+  @Mock private OpenAiApi openAiApi;
+  MakeMeWithoutDB makeMe = new MakeMeWithoutDB();
 
   @BeforeEach
   void setUp() {
-    controller = new RestChatController();
+    target = new RestChatController();
   }
 
   @Test
   void chatWithAI() {
-    // then: I want to get json response from openai
+    // Arrange
+    String expected = "I'm ChatGPT";
+    Single<ChatCompletionResult> completionResultSingle =
+        Single.just(makeMe.openAiCompletionResult().choice(expected).please());
+    Mockito.when(openAiApi.createChatCompletion(Mockito.any())).thenReturn(completionResultSingle);
+
+    // Act
     ChatRequest request = new ChatRequest("What's your name?");
-    ChatResponse res = controller.chat(request);
-    ChatResponse expect = new ChatResponse("I'm ChatGPT");
-    assertEquals(expect.getAnswer(), res.getAnswer());
+    ChatResponse res = target.chat(request);
+
+    // Assert
+    assertEquals(new ChatResponse(expected).getAnswer(), res.getAnswer());
   }
 }
