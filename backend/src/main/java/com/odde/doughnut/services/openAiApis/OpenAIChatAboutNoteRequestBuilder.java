@@ -123,6 +123,7 @@ description (until the end of this message):
     AIGeneratedQuestionBody clone = new AIGeneratedQuestionBody();
     clone.stem = question.stem;
     clone.choices = question.choices;
+    clone.reasons = question.reasons;
 
     String messageBody =
         """

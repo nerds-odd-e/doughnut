@@ -39,6 +39,7 @@ public class AiQuestionPresenter implements QuizQuestionPresenter {
             choice -> {
               QuizQuestion.Choice option = new QuizQuestion.Choice();
               option.setDisplay(choice);
+              option.setReason(aiQuestion.reasons.get(aiQuestion.choices.indexOf(choice)));
               return option;
             })
         .toList();

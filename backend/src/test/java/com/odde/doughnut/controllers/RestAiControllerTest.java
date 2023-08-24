@@ -157,7 +157,7 @@ class RestAiControllerTest {
   class GenerateQuestion {
     String jsonQuestion =
         """
-        {"stem": "What is the first color in the rainbow?", "correctChoiceIndex": 0, "choices": ["red", "black", "green"]}
+        {"stem": "What is the first color in the rainbow?", "correctChoiceIndex": 0, "choices": ["red", "black", "green"], "reasons": ["red reason", "black reason", "green reason"]}
         """;
 
     @Test
@@ -177,7 +177,9 @@ class RestAiControllerTest {
       when(openAiApi.createChatCompletion(any()))
           .thenReturn(buildCompletionResultForFunctionCall(jsonQuestion));
       QuizQuestion quizQuestion = controller.generateQuestion(note);
+
       assertThat(quizQuestion.stem).contains("What is the first color in the rainbow?");
+      assertThat(quizQuestion.choices.get(0).getReason()).contains("red reason");
     }
 
     @Test

@@ -54,7 +54,7 @@ public class RestAiController {
       modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
       return modelFactoryService.toQuizQuestion(quizQuestionEntity, currentUser.getEntity());
     } catch (QuizQuestionNotPossibleException e) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated");
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated", e);
     }
   }
 
