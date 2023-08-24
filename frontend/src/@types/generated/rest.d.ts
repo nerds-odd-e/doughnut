@@ -23,6 +23,9 @@ declare namespace Generated {
         errorType: ErrorType;
     }
 
+    interface ChatRequest {
+    }
+
     interface CircleForUserView {
         id: number;
         name: string;
