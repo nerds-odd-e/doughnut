@@ -6,17 +6,16 @@ import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.*;
 import io.reactivex.Single;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 public class ChatServiceTest {
 
+  @InjectMocks private ChatService target = new ChatService();
   @Mock private OpenAiApi openAiApi;
 
   MakeMeWithoutDB makeMe = new MakeMeWithoutDB();
@@ -35,22 +34,10 @@ public class ChatServiceTest {
     Mockito.when(openAiApi.createChatCompletion(Mockito.any())).thenReturn(completionResultSingle);
 
     // Act
-    List messages = new ArrayList<ChatMessage>();
-    ChatMessage message1 = new ChatMessage(ChatMessageRole.USER.value(), "");
-    ChatMessage message2 = new ChatMessage(ChatMessageRole.ASSISTANT.value(), "What's your name?");
-    messages.add(message1);
-    messages.add(message2);
-
-    ChatCompletionRequest request =
-        ChatCompletionRequest.builder().model("gpt-4").messages(messages).stream(false)
-            .n(1)
-            .maxTokens(100)
-            .build();
-
-    Optional<ChatCompletionChoice> result =
-        openAiApi.createChatCompletion(request).blockingGet().getChoices().stream().findFirst();
+    String askStatement = "What's your name?";
+    String actual = target.askChatGPT(askStatement);
 
     // Assert
-    assertEquals(expected, result.get().getMessage().getContent());
+    assertEquals(expected, actual);
   }
 }
