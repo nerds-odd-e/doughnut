@@ -115,7 +115,10 @@ public class OpenAiApiHandler {
             .build();
 
     Optional<ChatCompletionChoice> result =
-        openAiApi.createChatCompletion(request).blockingGet().getChoices().stream().findFirst();
+        withExceptionHandler(
+            () ->
+                openAiApi.createChatCompletion(request).blockingGet().getChoices().stream()
+                    .findFirst());
     return result.get().getMessage().getContent();
   }
 }
