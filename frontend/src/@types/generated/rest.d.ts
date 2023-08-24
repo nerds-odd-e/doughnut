@@ -26,6 +26,10 @@ declare namespace Generated {
     interface ChatRequest {
     }
 
+    interface ChatResponse {
+        answer: string;
+    }
+
     interface CircleForUserView {
         id: number;
         name: string;
