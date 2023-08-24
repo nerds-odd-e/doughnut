@@ -2,36 +2,31 @@ package com.odde.doughnut.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.*;
 import io.reactivex.Single;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+@ExtendWith(MockitoExtension.class)
 public class ChatServiceTest {
 
   @InjectMocks private ChatService target = new ChatService();
-  @Mock private OpenAiApi openAiApi;
-
-  MakeMeWithoutDB makeMe = new MakeMeWithoutDB();
-
-  @BeforeEach
-  void Setup() {
-    MockitoAnnotations.openMocks(this);
-  }
+  @Mock private OpenAiApiHandler openAiApiHandler;
 
   @Test
   void getAnwserFromOpenApi() {
     // Arrange
     String expected = "I'm ChatGPT";
-    Single<ChatCompletionResult> completionResultSingle =
-        Single.just(makeMe.openAiCompletionResult().choice(expected).please());
-    Mockito.when(openAiApi.createChatCompletion(Mockito.any())).thenReturn(completionResultSingle);
+    Mockito.when(openAiApiHandler.getOpenAiAnswer("What's your name?")).thenReturn("I'm ChatGPT");
 
     // Act
     String askStatement = "What's your name?";
