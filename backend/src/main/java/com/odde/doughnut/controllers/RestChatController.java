@@ -10,7 +10,7 @@ import org.springframework.web.context.annotation.SessionScope;
 @RequestMapping("/api/v1")
 public class RestChatController {
   @PostMapping("/chat")
-  public String getChat(String askStatement) {
+  public String chat(String askStatement) {
     return "I'm chatGPT";
   }
 }
