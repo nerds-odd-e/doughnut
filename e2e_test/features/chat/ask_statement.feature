@@ -17,12 +17,10 @@ Feature: Ask Statement
     When I ask to OpenAI "What's your name?"
     Then I can confirm the answer "I'm ChatGPT"
 
-
-  @ignore
   Scenario: The users can continue to conmunication with AI
-    Given OpenAI completes with "I'm ChatGPT" for assistant message "What's your name?"
-    And OpenAI completes with "365" for assistant message "How many days are there in the year 2023?"
+    Given OpenAI by default returns text completion "I'm ChatGPT"
     When I ask to OpenAI "What's your name?"
     Then I can confirm the answer "I'm ChatGPT"
+    Given OpenAI by default returns text completion "365"
     When I ask to OpenAI "How many days are there in the year 2023?"
     Then I can confirm the answer "365"
