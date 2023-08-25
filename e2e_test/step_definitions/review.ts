@@ -214,8 +214,8 @@ Then("I should see the question {string} is disabled", (questionStem: string) =>
 
 Given("I chose {string}", (choice: string) => {
   const stem = "What is the most common scuba diving certification?"
-  const question = () => (stem ? cy.findByText(stem).parent() : cy)
-  const getChoice = (choice: string) => question().findByText(choice)
+  const question = cy.findByText(stem).parent()
+  const getChoice = (choice: string) => question.findByText(choice)
   getChoice(choice).click()
 })
 
