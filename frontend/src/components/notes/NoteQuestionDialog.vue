@@ -23,21 +23,21 @@
   >
     Doesn't make sense?
   </button>
-  <div v-show="quizQuestion !== undefined" class="ask-container">
-    <form class="ask-input-container" @submit.prevent="generateAskAnswer">
-      <input id="ask-input" class="ask-input-text" v-model="askInput" />
+  <div v-show="quizQuestion !== undefined" class="chat-container">
+    <form class="chat-input-container" @submit.prevent="generateChatAnswer">
+      <input id="chat-input" class="chat-input-text" v-model="chatInput" />
       <input
         :disabled="isButtonDisabled"
         type="submit"
-        value="ASK"
-        id="ask-button"
+        value="Chat"
+        id="chat-button"
         class="btn float-btn btn-secondary"
       />
     </form>
-    <div v-show="answered" class="ask-answer-container">
-      <img src="/user-icon.svg" class="ask-answer-icon" />
-      <div class="ask-answer-text">
-        <p id="ask-answer">{{ askAnswer }}</p>
+    <div v-show="answered" class="chat-answer-container">
+      <img src="/user-icon.svg" class="chat-answer-icon" />
+      <div class="chat-answer-text">
+        <p id="chat-answer">{{ chatAnswer }}</p>
       </div>
     </div>
   </div>
@@ -67,14 +67,14 @@ export default defineComponent({
       quizQuestion: undefined as Generated.QuizQuestion | undefined,
       answeredQuestion: undefined as Generated.AnsweredQuestion | undefined,
       prevQuizQuestion: undefined as Generated.QuizQuestion | undefined,
-      askInput: "",
-      askAnswer: "",
+      chatInput: "",
+      chatAnswer: "",
       answered: false,
     };
   },
   computed: {
     isButtonDisabled() {
-      return this.askInput === "";
+      return this.chatInput === "";
     },
   },
   methods: {
@@ -88,9 +88,9 @@ export default defineComponent({
     onAnswered(answeredQuestion: Generated.AnsweredQuestion) {
       this.answeredQuestion = answeredQuestion;
     },
-    async generateAskAnswer() {
+    async generateChatAnswer() {
       this.answered = true;
-      this.askAnswer = await this.api.chat.playChat(this.askInput);
+      this.chatAnswer = await this.api.chat.playChat(this.chatInput);
     },
   },
   mounted() {
@@ -116,7 +116,7 @@ span {
   padding-right: 5px;
 }
 
-.ask-input-container {
+.chat-input-container {
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -124,7 +124,7 @@ span {
   padding-bottom: 5px;
 }
 
-.ask-input-text {
+.chat-input-text {
   width: 100%;
   margin-right: 5px;
   flex-grow: 1;
@@ -137,17 +137,17 @@ input.auto-extendable-input {
   float: right;
 }
 
-.ask-answer-container {
+.chat-answer-container {
   display: flex;
   margin: 2% 0;
 }
 
-.ask-answer-icon {
+.chat-answer-icon {
   width: 6%;
   height: 6%;
 }
 
-.ask-answer-text {
+.chat-answer-text {
   position: relative;
   display: inline-block;
   margin-left: 15px;
@@ -157,7 +157,7 @@ input.auto-extendable-input {
   box-sizing: border-box;
 }
 
-.ask-answer-text:before {
+.chat-answer-text:before {
   content: "";
   position: absolute;
   top: 50%;
@@ -168,7 +168,7 @@ input.auto-extendable-input {
   z-index: 2;
 }
 
-.ask-answer-text:after {
+.chat-answer-text:after {
   content: "";
   position: absolute;
   top: 50%;
@@ -178,7 +178,7 @@ input.auto-extendable-input {
   border-right: 14px solid #555;
 }
 
-.ask-answer-text p {
+.chat-answer-text p {
   margin: 0;
   word-break: break-word;
 }

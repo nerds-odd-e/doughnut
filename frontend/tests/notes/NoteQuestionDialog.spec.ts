@@ -52,7 +52,7 @@ describe("NoteQuestionDialog", () => {
     expect(wrapper.text()).toContain("is it raining?");
   });
 
-  it("When the ask button is clicked, the anwser from AI will be displayed", async () => {
+  it("When the chat button is clicked, the anwser from AI will be displayed", async () => {
     // Given
     const expected = "I'm ChatGPT";
     // setUp
@@ -63,13 +63,13 @@ describe("NoteQuestionDialog", () => {
     // When
     const wrapper = await createWrapper();
 
-    await wrapper.find("#ask-input").setValue("What's your name?");
-    await wrapper.find("#ask-button").trigger("submit");
+    await wrapper.find("#chat-input").setValue("What's your name?");
+    await wrapper.find("#chat-button").trigger("submit");
     await flushPromises();
 
     // Then
-    wrapper.find(".ask-answer-container").isVisible();
-    const actual = wrapper.find("#ask-answer").text();
+    wrapper.find(".chat-answer-container").isVisible();
+    const actual = wrapper.find("#chat-answer").text();
     expect(actual).toBe(expected);
   });
 });
