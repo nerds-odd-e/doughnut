@@ -24,11 +24,11 @@ class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
     return this;
   }
 
-  withChoices(choices: string[]) {
+  withChoices(choices: { display: string; reason: string }[]) {
     this.quizQuestion.choices = choices.map((choice) => ({
       picture: false,
-      display: choice,
-      reason: "The quick brown fox jumps over the lazy dog",
+      display: choice.display,
+      reason: choice.reason,
     }));
     return this;
   }
