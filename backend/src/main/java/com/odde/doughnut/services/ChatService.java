@@ -8,6 +8,10 @@ import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import java.util.List;
 import java.util.Optional;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -42,15 +46,9 @@ public class ChatService {
         .build();
   }
 
+  @AllArgsConstructor
+  @Data
   private static class ChatMessages {
-    List<ChatMessage> messages;
-
-    public ChatMessages(List<ChatMessage> messages) {
-      this.messages = messages;
-    }
-
-    public List<ChatMessage> getMessages() {
-      return messages;
-    }
+    private List<ChatMessage> messages;
   }
 }
