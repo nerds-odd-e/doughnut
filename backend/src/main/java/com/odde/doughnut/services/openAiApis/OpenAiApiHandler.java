@@ -16,8 +16,6 @@ import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.ImageResult;
 import java.net.SocketTimeoutException;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import okhttp3.OkHttpClient;
@@ -101,19 +99,7 @@ public class OpenAiApiHandler {
     }
   }
 
-  public String getOpenAiAnswer(String askStatement) {
-    List messages = new ArrayList<ChatMessage>();
-    ChatMessage message1 = new ChatMessage(ChatMessageRole.USER.value(), "");
-    ChatMessage message2 = new ChatMessage(ChatMessageRole.ASSISTANT.value(), askStatement);
-    messages.add(message1);
-    messages.add(message2);
-
-    ChatCompletionRequest request =
-        ChatCompletionRequest.builder().model("gpt-4").messages(messages).stream(false)
-            .n(1)
-            .maxTokens(100)
-            .build();
-
+  public String getOpenAiAnswer(ChatCompletionRequest request) {
     Optional<ChatCompletionChoice> result =
         withExceptionHandler(
             () ->
