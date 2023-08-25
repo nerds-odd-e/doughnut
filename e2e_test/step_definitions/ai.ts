@@ -15,7 +15,10 @@ Then("I should be prompted with an error message saying {string}", (errorMessage
 })
 
 Given("OpenAI by default returns text completion {string}", (description: string) => {
-  mock_services.openAi().stubChatCompletion(description, "stop")
+  cy.then(async () => {
+    await mock_services.openAi().restartImposter()
+    mock_services.openAi().stubChatCompletion(description, "stop")
+  })
 })
 
 Given(
