@@ -21,10 +21,10 @@ public class ChatService {
 
   public String chatToAi(String question) {
     ChatMessages chatMessages =
-        new ChatMessages(
-            List.of(
-                new ChatMessage(ChatMessageRole.USER.value(), ""),
-                new ChatMessage(ChatMessageRole.ASSISTANT.value(), question)));
+      new ChatMessages(
+        List.of(
+          new ChatMessage(ChatMessageRole.USER.value(), ""),
+          new ChatMessage(ChatMessageRole.ASSISTANT.value(), question)));
     ChatCompletionRequest request = generateChatCompletionRequest(chatMessages);
 
     Optional<ChatCompletionChoice> response = openAiApiHandler.chatCompletion(request);
@@ -42,7 +42,7 @@ public class ChatService {
         .build();
   }
 
-  private class ChatMessages {
+  private static class ChatMessages {
     List<ChatMessage> messages;
 
     public ChatMessages(List<ChatMessage> messages) {
