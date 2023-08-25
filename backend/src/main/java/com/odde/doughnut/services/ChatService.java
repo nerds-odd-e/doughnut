@@ -8,10 +8,8 @@ import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,10 +23,10 @@ public class ChatService {
 
   public String chatToAi(String question) {
     ChatMessages chatMessages =
-      new ChatMessages(
-        List.of(
-          new ChatMessage(ChatMessageRole.USER.value(), ""),
-          new ChatMessage(ChatMessageRole.ASSISTANT.value(), question)));
+        new ChatMessages(
+            List.of(
+                new ChatMessage(ChatMessageRole.USER.value(), ""),
+                new ChatMessage(ChatMessageRole.ASSISTANT.value(), question)));
     ChatCompletionRequest request = generateChatCompletionRequest(chatMessages);
 
     Optional<ChatCompletionChoice> response = openAiApiHandler.chatCompletion(request);
