@@ -25,16 +25,19 @@ public class ChatService {
             new ChatMessage(ChatMessageRole.USER.value(), ""),
             new ChatMessage(ChatMessageRole.ASSISTANT.value(), askStatement));
 
-    ChatCompletionRequest request =
-        ChatCompletionRequest.builder().model("gpt-4").messages(messages).stream(false)
-            .n(1)
-            .maxTokens(100)
-            .build();
+    ChatCompletionRequest request = generateChatCompletionRequest(messages);
 
     Optional<ChatCompletionChoice> response = openAiApiHandler.chatCompletion(request);
     if (response.isPresent()) {
       return response.get().getMessage().getContent();
     }
     return "";
+  }
+
+  private static ChatCompletionRequest generateChatCompletionRequest(List<ChatMessage> messages) {
+    return ChatCompletionRequest.builder().model("gpt-4").messages(messages).stream(false)
+        .n(1)
+        .maxTokens(100)
+        .build();
   }
 }
