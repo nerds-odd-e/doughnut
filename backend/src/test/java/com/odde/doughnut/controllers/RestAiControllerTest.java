@@ -16,6 +16,7 @@ import com.odde.doughnut.entities.json.AiCompletionRequest;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AIGeneratedQuestion;
 import com.odde.doughnut.services.openAiApis.OpenAIChatAboutNoteRequestBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
@@ -155,10 +156,17 @@ class RestAiControllerTest {
 
   @Nested
   class GenerateQuestion {
-    String jsonQuestion =
-        """
-        {"stem": "What is the first color in the rainbow?", "correctChoiceIndex": 0, "choices": ["red", "black", "green"], "reasons": ["red reason", "black reason", "green reason"]}
-        """;
+    String jsonQuestion;
+
+    @BeforeEach
+    void setUp() {
+      var aiGeneratedQuestion = new AIGeneratedQuestion();
+      aiGeneratedQuestion.stem = "What is the first color in the rainbow?";
+      aiGeneratedQuestion.correctChoiceIndex = 0;
+      aiGeneratedQuestion.choices = List.of("red", "black", "green");
+      aiGeneratedQuestion.reasons = List.of("red reason", "black reason", "green reason");
+      jsonQuestion = aiGeneratedQuestion.toJsonString();
+    }
 
     @Test
     void askWithNoteThatCannotAccess() {
