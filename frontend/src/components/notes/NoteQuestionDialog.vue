@@ -27,6 +27,7 @@
     <form class="ask-input-container" @submit.prevent="generateAskAnswer">
       <input id="ask-input" class="ask-input-text" v-model="askInput" />
       <input
+        :disabled="isButtonDisabled"
         type="submit"
         value="ASK"
         id="ask-button"
@@ -70,6 +71,11 @@ export default defineComponent({
       askAnswer: "",
       answered: false,
     };
+  },
+  computed: {
+    isButtonDisabled() {
+      return this.askInput === "";
+    },
   },
   methods: {
     async generateQuestion() {
