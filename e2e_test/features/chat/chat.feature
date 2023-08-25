@@ -15,14 +15,14 @@ Feature: Ask Statement
 
   Scenario: The users can conmunicate with AI
     Given OpenAI by default returns text completion "I'm ChatGPT"
-    When I ask to OpenAI "What's your name?"
+    When I chat to OpenAI "What's your name?"
     Then I can confirm the answer "I'm ChatGPT"
 
  
   Scenario: The users can continue to conmunication with AI
     Given OpenAI by default returns text completion "I'm ChatGPT"
-    When I ask to OpenAI "What's your name?"
+    When I chat to OpenAI "What's your name?"
     Then I can confirm the answer "I'm ChatGPT"
     Given OpenAI by default returns text completion "365"
-    When I ask to OpenAI "How many days are there in the year 2023?"
+    When I chat to OpenAI "How many days are there in the year 2023?"
     Then I can confirm the answer "365"
