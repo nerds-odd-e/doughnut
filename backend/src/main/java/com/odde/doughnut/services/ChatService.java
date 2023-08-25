@@ -20,12 +20,12 @@ public class ChatService {
   }
 
   public String chatToAi(String question) {
-    List<ChatMessage> messages =
-        List.of(
-            new ChatMessage(ChatMessageRole.USER.value(), ""),
-            new ChatMessage(ChatMessageRole.ASSISTANT.value(), question));
-
-    ChatCompletionRequest request = generateChatCompletionRequest(messages);
+    ChatMessages chatMessages =
+        new ChatMessages(
+            List.of(
+                new ChatMessage(ChatMessageRole.USER.value(), ""),
+                new ChatMessage(ChatMessageRole.ASSISTANT.value(), question)));
+    ChatCompletionRequest request = generateChatCompletionRequest(chatMessages);
 
     Optional<ChatCompletionChoice> response = openAiApiHandler.chatCompletion(request);
     if (response.isPresent()) {
@@ -34,10 +34,23 @@ public class ChatService {
     return "";
   }
 
-  private static ChatCompletionRequest generateChatCompletionRequest(List<ChatMessage> messages) {
-    return ChatCompletionRequest.builder().model("gpt-4").messages(messages).stream(false)
+  private static ChatCompletionRequest generateChatCompletionRequest(ChatMessages messages) {
+    return ChatCompletionRequest.builder().model("gpt-4").messages(messages.getMessages()).stream(
+            false)
         .n(1)
         .maxTokens(100)
         .build();
+  }
+
+  private class ChatMessages {
+    List<ChatMessage> messages;
+
+    public ChatMessages(List<ChatMessage> messages) {
+      this.messages = messages;
+    }
+
+    public List<ChatMessage> getMessages() {
+      return messages;
+    }
   }
 }
