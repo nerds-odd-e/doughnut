@@ -12,13 +12,13 @@ Feature: Ask Statement
       | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
     And I ask to generate a question for note "Scuba Diving"
 
-  @ignore
+
   Scenario: The users can conmunicate with AI
     Given OpenAI by default returns text completion "I'm ChatGPT"
     When I ask to OpenAI "What's your name?"
     Then I can confirm the answer "I'm ChatGPT"
 
-  @ignore
+ 
   Scenario: The users can continue to conmunication with AI
     Given OpenAI by default returns text completion "I'm ChatGPT"
     When I ask to OpenAI "What's your name?"
