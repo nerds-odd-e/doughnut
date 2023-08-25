@@ -19,11 +19,11 @@ public class ChatService {
     openAiApiHandler = new OpenAiApiHandler(openAiApi);
   }
 
-  public String askChatGPT(String askStatement) {
+  public String chatToAi(String question) {
     List<ChatMessage> messages =
         List.of(
             new ChatMessage(ChatMessageRole.USER.value(), ""),
-            new ChatMessage(ChatMessageRole.ASSISTANT.value(), askStatement));
+            new ChatMessage(ChatMessageRole.ASSISTANT.value(), question));
 
     ChatCompletionRequest request = generateChatCompletionRequest(messages);
 
