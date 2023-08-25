@@ -224,8 +224,8 @@ When('I ask "why is my answer wrong?"', () => {
   cy.findByText(text).click()
 })
 
-Then('I should see "Divemaster is not the most common" as the reason for the wrong answer', () => {
+Then("I should see {string} as the reason for the wrong answer", (reason: string) => {
   pageObjects
     .findQuestionWithStem("What is the most common scuba diving certification?")
-    .expectReasonToBe("Divemaster is not the most common")
+    .expectReasonToBe(reason)
 })
