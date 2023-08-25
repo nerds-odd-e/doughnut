@@ -59,8 +59,8 @@ describe("NoteQuestionDialog", () => {
     // When
     const wrapper = await createWrapper();
 
-    wrapper.find("#ask-input").setValue("What's your name?");
-    wrapper.find("#ask-button").trigger("submit");
+    await wrapper.find("#ask-input").setValue("What's your name?");
+    await wrapper.find("#ask-button").trigger("submit");
     await flushPromises();
 
     // Then
