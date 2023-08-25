@@ -184,7 +184,7 @@ class RestAiControllerTest {
     }
 
     @Test
-    void createQuizQuestionFailedWith35WillTryAgain() throws JsonProcessingException {
+    void createQuizQuestionFailedWithGpt35WillTryAgain() throws JsonProcessingException {
       when(openAiApi.createChatCompletion(any()))
           .thenReturn(buildCompletionResultForFunctionCall("{\"stem\": \"\"}"));
       assertThrows(ResponseStatusException.class, () -> controller.generateQuestion(note));
