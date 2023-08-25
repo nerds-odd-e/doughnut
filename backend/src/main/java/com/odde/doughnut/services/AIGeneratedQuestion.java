@@ -7,6 +7,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.data.util.Pair;
+
+import java.util.List;
 
 public class AIGeneratedQuestion extends AIGeneratedQuestionBody {
 
@@ -19,15 +22,20 @@ public class AIGeneratedQuestion extends AIGeneratedQuestionBody {
   public int confidence;
 
   public static AIGeneratedQuestion getValidQuestion(JsonNode question)
-      throws QuizQuestionNotPossibleException {
+    throws QuizQuestionNotPossibleException {
     try {
       AIGeneratedQuestion aiGeneratedQuestion =
-          new ObjectMapper().treeToValue(question, AIGeneratedQuestion.class);
+        new ObjectMapper().treeToValue(question, AIGeneratedQuestion.class);
       if (aiGeneratedQuestion.stem != null && !Strings.isBlank(aiGeneratedQuestion.stem)) {
         return aiGeneratedQuestion;
       }
     } catch (JsonProcessingException e) {
     }
     throw new QuizQuestionNotPossibleException();
+  }
+
+  public List<Pair<String, String>> makeChoiceReasonPair() {
+    return this.choices.stream().map(
+      choice -> Pair.of(choice, reasons.get(choices.indexOf(choice)))).toList();
   }
 }

@@ -7,6 +7,7 @@ import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionPresenter;
 import com.odde.doughnut.services.AIGeneratedQuestion;
+
 import java.util.List;
 
 public class AiQuestionPresenter implements QuizQuestionPresenter {
@@ -15,8 +16,8 @@ public class AiQuestionPresenter implements QuizQuestionPresenter {
   public AiQuestionPresenter(QuizQuestionEntity quizQuestion) {
     try {
       this.aiQuestion =
-          new ObjectMapper()
-              .readValue(quizQuestion.getRawJsonQuestion(), AIGeneratedQuestion.class);
+        new ObjectMapper()
+          .readValue(quizQuestion.getRawJsonQuestion(), AIGeneratedQuestion.class);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
@@ -34,14 +35,11 @@ public class AiQuestionPresenter implements QuizQuestionPresenter {
 
   @Override
   public List<QuizQuestion.Choice> getOptions(ModelFactoryService modelFactoryService) {
-    return aiQuestion.choices.stream()
-        .map(
-            choice -> {
-              QuizQuestion.Choice option = new QuizQuestion.Choice();
-              option.setDisplay(choice);
-              option.setReason(aiQuestion.reasons.get(aiQuestion.choices.indexOf(choice)));
-              return option;
-            })
-        .toList();
+    return aiQuestion.makeChoiceReasonPair().stream().map(pair -> {
+      QuizQuestion.Choice option = new QuizQuestion.Choice();
+      option.setDisplay(pair.getFirst());
+      option.setReason(pair.getSecond());
+      return option;
+    }).toList();
   }
 }
