@@ -68,7 +68,7 @@ public class OpenAiApiHandler {
     return chatCompletion(chatCompletionRequest).map(aiCompletionRequest::getAiCompletion);
   }
 
-  private Optional<ChatCompletionChoice> chatCompletion(ChatCompletionRequest request) {
+  public Optional<ChatCompletionChoice> chatCompletion(ChatCompletionRequest request) {
     return withExceptionHandler(
         () ->
             openAiApi.createChatCompletion(request).blockingGet().getChoices().stream()
@@ -97,14 +97,5 @@ public class OpenAiApiHandler {
       System.out.println(e.getMessage());
       throw new RuntimeException(e);
     }
-  }
-
-  public String getOpenAiAnswer(ChatCompletionRequest request) {
-    Optional<ChatCompletionChoice> result =
-        withExceptionHandler(
-            () ->
-                openAiApi.createChatCompletion(request).blockingGet().getChoices().stream()
-                    .findFirst());
-    return result.get().getMessage().getContent();
   }
 }

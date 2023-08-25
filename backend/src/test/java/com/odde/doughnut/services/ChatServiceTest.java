@@ -21,7 +21,7 @@ public class ChatServiceTest {
   @InjectMocks private ChatService target;
 
   @Test
-  void getAnwserFromOpenApi() {
+  void getAnswerFromOpenApi() {
     // Arrange
     String expected = "I'm ChatGPT";
     Single<ChatCompletionResult> completionResultSingle =
