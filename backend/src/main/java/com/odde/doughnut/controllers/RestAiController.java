@@ -63,4 +63,11 @@ public class RestAiController {
     currentUser.assertLoggedIn();
     return new AiGeneratedImage(aiAdvisorService.getImage(aiCompletionRequest.prompt));
   }
+
+  @PostMapping("/chat")
+  public ChatResponse chat(@RequestBody ChatRequest request) {
+    String question = request.getQuestion();
+    String answer = this.aiAdvisorService.chatToAi(question);
+    return new ChatResponse(answer);
+  }
 }

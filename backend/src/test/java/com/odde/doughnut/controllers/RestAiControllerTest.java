@@ -14,7 +14,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AiCompletion;
 import com.odde.doughnut.entities.json.AiCompletionRequest;
 import com.odde.doughnut.entities.json.QuizQuestion;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ai.AIGeneratedQuestion;
 import com.odde.doughnut.services.openAiApis.OpenAIChatAboutNoteRequestBuilder;
@@ -181,7 +180,7 @@ class RestAiControllerTest {
     }
 
     @Test
-    void createQuizQuestion() throws JsonProcessingException, QuizQuestionNotPossibleException {
+    void createQuizQuestion() throws JsonProcessingException {
       when(openAiApi.createChatCompletion(any()))
           .thenReturn(buildCompletionResultForFunctionCall(jsonQuestion));
       QuizQuestion quizQuestion = controller.generateQuestion(note);

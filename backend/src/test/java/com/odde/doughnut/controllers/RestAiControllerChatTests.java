@@ -4,7 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.odde.doughnut.entities.json.ChatRequest;
 import com.odde.doughnut.entities.json.ChatResponse;
-import com.odde.doughnut.testability.MakeMeWithoutDB;
+import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import io.reactivex.Single;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,15 +22,18 @@ import org.springframework.transaction.annotation.Transactional;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-public class RestChatControllerTests {
-  RestChatController target;
+public class RestAiControllerChatTests {
 
   @Mock private OpenAiApi openAiApi;
-  MakeMeWithoutDB makeMe = new MakeMeWithoutDB();
+
+  @Autowired MakeMe makeMe;
+  RestAiController controller;
+  UserModel currentUser;
 
   @BeforeEach
   void setUp() {
-    target = new RestChatController(openAiApi);
+    currentUser = makeMe.aUser().toModelPlease();
+    controller = new RestAiController(openAiApi, makeMe.modelFactoryService, currentUser);
   }
 
   @Test
@@ -41,7 +46,7 @@ public class RestChatControllerTests {
 
     // Act
     ChatRequest request = new ChatRequest("What's your name?");
-    ChatResponse res = target.chat(request);
+    ChatResponse res = controller.chat(request);
 
     // Assert
     assertEquals(new ChatResponse(expected).getAnswer(), res.getAnswer());
