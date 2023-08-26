@@ -1,6 +1,7 @@
 import { FlexiPredicate, Operator } from "@anev/ts-mountebank"
 import ServiceMocker from "../../support/ServiceMocker"
 import { HttpMethod } from "@anev/ts-mountebank"
+import { MessageToMatch } from "./MessageToMatch"
 
 type FunctionCall = {
   role: "function"
@@ -16,11 +17,6 @@ type TextBasedMessage = {
 }
 
 type ChatMessageInResponse = TextBasedMessage | FunctionCall
-
-type MessageToMatch = {
-  role?: "user" | "assistant" | "system"
-  content: string | RegExp
-}
 
 function mockChatCompletion(
   serviceMocker: ServiceMocker,
@@ -86,6 +82,10 @@ const openAiService = () => {
     mockChatCompletionWithContext(reply: string, context: string) {
       const messageToMatch: MessageToMatch = { role: "system", content: context }
       const messages = [messageToMatch]
+      return mockChatCompletionForMessageContaining(serviceMocker, messages, reply, "stop")
+    },
+
+    mockChatCompletionWithMessages(reply: string, messages: MessageToMatch[]) {
       return mockChatCompletionForMessageContaining(serviceMocker, messages, reply, "stop")
     },
 

@@ -45,7 +45,7 @@ public class AiAdvisorService {
 
   public String chatToAi(String userMessage) {
     List<ChatMessage> chatMessages =
-        List.of(new ChatMessage(ChatMessageRole.ASSISTANT.value(), userMessage));
+        List.of(new ChatMessage(ChatMessageRole.USER.value(), userMessage));
     ChatCompletionRequest request =
         ChatCompletionRequest.builder().model("gpt-4").messages(chatMessages).stream(false)
             .n(1)

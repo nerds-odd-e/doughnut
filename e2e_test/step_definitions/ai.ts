@@ -5,6 +5,7 @@
 import { Given, Then, DataTable } from "@badeball/cypress-cucumber-preprocessor"
 import "../support/string.extensions"
 import { mock_services } from "page_objects"
+import { MessageToMatch } from "page_objects/mock_services/MessageToMatch"
 
 Given("open AI service always think the system token is invalid", () => {
   mock_services.openAi().alwaysResponseAsUnauthorized()
@@ -25,6 +26,19 @@ Given(
   "OpenAI completes with {string} for context containing {string}",
   (returnMessage: string, context: string) => {
     mock_services.openAi().mockChatCompletionWithContext(returnMessage, context)
+  },
+)
+
+Given(
+  "OpenAI completes with {string} for messages containing:",
+  (returnMessage: string, data: DataTable) => {
+    const messages: MessageToMatch[] = data.hashes().map((row) => {
+      return {
+        role: row["role"],
+        content: row["content"],
+      } as MessageToMatch
+    })
+    mock_services.openAi().mockChatCompletionWithMessages(returnMessage, messages)
   },
 )
 

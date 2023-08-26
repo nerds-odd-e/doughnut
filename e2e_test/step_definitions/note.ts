@@ -429,6 +429,6 @@ Then("I should see that the open AI service is not available in controller bar",
     .click()
 })
 
-When("I start to chat about note {string}", (noteTitle: string) => {
+When("I start to chat about the note {string}", (noteTitle: string) => {
   pageObjects.chatAboutNote(noteTitle)
 })
