@@ -7,8 +7,6 @@ import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.data.util.Pair;
 import org.springframework.lang.Nullable;
 
 @AllArgsConstructor
@@ -33,12 +31,5 @@ public class QuizQuestion {
     private String display;
     @Nullable private PictureWithMask pictureWithMask;
     private String reason;
-
-    @NotNull
-    public Choice getChoice(Pair<String, String> pair) {
-      setDisplay(pair.getFirst());
-      setReason(pair.getSecond());
-      return this;
-    }
   }
 }

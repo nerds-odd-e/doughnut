@@ -6,9 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
-import java.util.List;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.data.util.Pair;
 
 public class AIGeneratedQuestion extends AIGeneratedQuestionBody {
 
@@ -31,11 +29,5 @@ public class AIGeneratedQuestion extends AIGeneratedQuestionBody {
     } catch (JsonProcessingException e) {
     }
     throw new QuizQuestionNotPossibleException();
-  }
-
-  public List<Pair<String, String>> makeChoiceReasonPair() {
-    return this.choices.stream()
-        .map(choice -> Pair.of(choice, reasons.get(choices.indexOf(choice))))
-        .toList();
   }
 }

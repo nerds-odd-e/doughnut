@@ -8,6 +8,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionPresenter;
 import com.odde.doughnut.services.ai.AIGeneratedQuestion;
 import java.util.List;
+import org.springframework.data.util.Pair;
 
 public class AiQuestionPresenter implements QuizQuestionPresenter {
   private final AIGeneratedQuestion aiQuestion;
@@ -34,11 +35,16 @@ public class AiQuestionPresenter implements QuizQuestionPresenter {
 
   @Override
   public List<QuizQuestion.Choice> getOptions(ModelFactoryService modelFactoryService) {
-    return aiQuestion.makeChoiceReasonPair().stream()
+    return aiQuestion.choices.stream()
+        .map(choice -> Pair.of(choice, aiQuestion.reasons.get(aiQuestion.choices.indexOf(choice))))
+        .toList()
+        .stream()
         .map(
             pair -> {
               QuizQuestion.Choice option = new QuizQuestion.Choice();
-              return option.getChoice(pair);
+              option.setDisplay(pair.getFirst());
+              option.setReason(pair.getSecond());
+              return option;
             })
         .toList();
   }
