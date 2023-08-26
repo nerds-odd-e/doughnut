@@ -1,6 +1,6 @@
 import { flushPromises } from "@vue/test-utils";
 import { beforeEach, expect } from "vitest";
-import NoteQuestionDialog from "@/components/notes/NoteQuestionDialog.vue";
+import NoteChatDialog from "@/components/notes/NoteChatDialog.vue";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
@@ -17,14 +17,14 @@ const createWrapper = async () => {
     .expectingPost(`/api/ai/generate-question?note=${note.id}`)
     .andReturnOnce(quizQuestion);
   const wrapper = helper
-    .component(NoteQuestionDialog)
+    .component(NoteChatDialog)
     .withStorageProps({ selectedNote: note.note })
     .mount();
   await flushPromises();
   return wrapper;
 };
 
-describe("NoteQuestionDialog", () => {
+describe("NoteChatDialog", () => {
   it("render the question returned", async () => {
     const wrapper = await createWrapper();
     expect(wrapper.text()).toContain("any question?");

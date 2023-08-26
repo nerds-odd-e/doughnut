@@ -29,7 +29,7 @@
     <template #button_face>
       <SvgClipboard />
     </template>
-    <NoteQuestionDialog v-bind="{ selectedNote, storageAccessor }" />
+    <NoteChatDialog v-bind="{ selectedNote, storageAccessor }" />
   </PopButton>
   <PopButton title="search and link note">
     <template #button_face>
@@ -82,7 +82,7 @@ import NoteDeleteButton from "./NoteDeleteButton.vue";
 import PopButton from "../commons/Popups/PopButton.vue";
 import AIGenerateImageDialog from "../notes/AIGenerateImageDialog.vue";
 import AISuggestDescriptionButton from "./AISuggestDescriptionButton.vue";
-import NoteQuestionDialog from "../notes/NoteQuestionDialog.vue";
+import NoteChatDialog from "../notes/NoteChatDialog.vue";
 import SvgClipboard from "../svgs/SvgClipboard.vue";
 
 export default defineComponent({
@@ -111,7 +111,7 @@ export default defineComponent({
     PopButton,
     AIGenerateImageDialog,
     AISuggestDescriptionButton,
-    NoteQuestionDialog,
+    NoteChatDialog,
     SvgClipboard,
   },
   computed: {
