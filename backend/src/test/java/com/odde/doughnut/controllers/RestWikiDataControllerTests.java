@@ -7,7 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 
 import com.odde.doughnut.entities.json.WikidataEntityData;
 import com.odde.doughnut.entities.json.WikidataSearchEntity;
-import com.odde.doughnut.services.HttpClientAdapter;
+import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;

@@ -5,7 +5,7 @@ import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
-import com.odde.doughnut.services.AIGeneratedQuestion;
+import com.odde.doughnut.services.ai.AIGeneratedQuestion;
 
 public class AiQuestionFactory implements QuizQuestionFactory, QuestionRawJsonFactory {
   private Thing thing;

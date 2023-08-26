@@ -1,4 +1,4 @@
-package com.odde.doughnut.services;
+package com.odde.doughnut.services.ai;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.entities.Note;

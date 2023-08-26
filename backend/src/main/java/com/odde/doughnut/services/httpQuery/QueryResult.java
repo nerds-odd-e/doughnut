@@ -1,4 +1,4 @@
-package com.odde.doughnut.services;
+package com.odde.doughnut.services.httpQuery;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;

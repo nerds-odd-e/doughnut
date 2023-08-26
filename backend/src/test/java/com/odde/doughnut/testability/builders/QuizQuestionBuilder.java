@@ -5,7 +5,7 @@ import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionGenerator;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
-import com.odde.doughnut.services.AIGeneratedQuestion;
+import com.odde.doughnut.services.ai.AIGeneratedQuestion;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 

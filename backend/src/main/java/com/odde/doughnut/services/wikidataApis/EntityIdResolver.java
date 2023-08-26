@@ -1,4 +1,4 @@
-package com.odde.doughnut.services;
+package com.odde.doughnut.services.wikidataApis;
 
 import com.fasterxml.jackson.annotation.ObjectIdGenerator;
 import com.fasterxml.jackson.annotation.ObjectIdResolver;

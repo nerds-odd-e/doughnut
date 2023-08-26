@@ -2,8 +2,8 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.json.WikidataEntityData;
 import com.odde.doughnut.entities.json.WikidataSearchEntity;
-import com.odde.doughnut.services.HttpClientAdapter;
 import com.odde.doughnut.services.WikidataService;
+import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.util.List;

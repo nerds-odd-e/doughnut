@@ -10,9 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.stereotype.Service;
 
-@Service
 public class ChatService {
 
   private final OpenAiApiHandler openAiApiHandler;

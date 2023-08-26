@@ -1,4 +1,4 @@
-package com.odde.doughnut.services;
+package com.odde.doughnut.services.httpQuery;
 
 import java.io.IOException;
 import org.springframework.web.util.UriComponentsBuilder;

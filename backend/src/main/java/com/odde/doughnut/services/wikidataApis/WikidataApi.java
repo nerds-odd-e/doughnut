@@ -2,7 +2,7 @@ package com.odde.doughnut.services.wikidataApis;
 
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.odde.doughnut.entities.json.WikidataEntityData;
-import com.odde.doughnut.services.QueryBuilder;
+import com.odde.doughnut.services.httpQuery.QueryBuilder;
 import com.odde.doughnut.services.wikidataApis.thirdPartyEntities.WikidataEntityDataHash;
 import com.odde.doughnut.services.wikidataApis.thirdPartyEntities.WikidataEntityHash;
 import com.odde.doughnut.services.wikidataApis.thirdPartyEntities.WikidataSearchResult;

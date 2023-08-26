@@ -6,7 +6,7 @@ import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionPresenter;
-import com.odde.doughnut.services.AIGeneratedQuestion;
+import com.odde.doughnut.services.ai.AIGeneratedQuestion;
 import java.util.List;
 
 public class AiQuestionPresenter implements QuizQuestionPresenter {

@@ -11,7 +11,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.AIGeneratedQuestion;
+import com.odde.doughnut.services.ai.AIGeneratedQuestion;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.builders.QuizQuestionBuilder;
 import java.util.List;
