@@ -10,10 +10,6 @@ const currentQuestion = (stem?: string) => {
       getChoice(choice).click()
       getChoice(choice).parent().invoke("attr", "class").should("contain", `is-${correctness}`)
     },
-
-    expectReasonToBe(reason: string) {
-      cy.findByText(reason).should("exist")
-    },
   }
 }
 

@@ -211,21 +211,3 @@ Then("I should be asked {string}", (expectedtQuestionStem: string) => {
 Then("I should see the question {string} is disabled", (questionStem: string) => {
   pageObjects.findQuestionWithStem(questionStem).isDisabled()
 })
-
-Given("I chose {string}", (choice: string) => {
-  const stem = "What is the most common scuba diving certification?"
-  const question = () => cy.findByText(stem).parent()
-  const getChoice = (choice: string) => question().findByText(choice)
-  getChoice(choice).click()
-})
-
-When('I ask "why is my answer wrong?"', () => {
-  const text = "why is my answer wrong?"
-  cy.findByText(text).click()
-})
-
-Then("I should see {string} as the reason for the wrong answer", (reason: string) => {
-  pageObjects
-    .findQuestionWithStem("What is the most common scuba diving certification?")
-    .expectReasonToBe(reason)
-})

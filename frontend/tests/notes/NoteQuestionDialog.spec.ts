@@ -11,11 +11,7 @@ const createWrapper = async () => {
   const quizQuestion = makeMe.aQuizQuestion
     .withQuestionType("AI_QUESTION")
     .withQuestionStem("any question?")
-    .withChoices([
-      { display: "option A", reason: "reason A" },
-      { display: "option B", reason: "reason B" },
-      { display: "option C", reason: "reason C" },
-    ])
+    .withChoices(["option A", "option B", "option C"])
     .please();
   helper.apiMock
     .expectingPost(`/api/ai/generate-question?note=${note.id}`)

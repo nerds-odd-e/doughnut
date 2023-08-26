@@ -11,26 +11,7 @@ describe("AnswerResult", () => {
     correct: false,
     choiceIndex: 1,
     answerDisplay: "answerDisplay",
-    quizQuestion: makeMe.aQuizQuestion
-      .withChoices([
-        {
-          display: "",
-          reason: "The quick brown fox jumps over the lazy dog.",
-        },
-        {
-          display: "",
-          reason: "The quick brown fox jumps over the lazy dog (2).",
-        },
-        {
-          display: "",
-          reason: "The quick brown fox jumps over the lazy dog (3).",
-        },
-        {
-          display: "",
-          reason: "The quick brown fox jumps over the lazy dog (4).",
-        },
-      ])
-      .please(),
+    quizQuestion: makeMe.aQuizQuestion.please(),
   };
   const wrapper = helper
     .component(AnswerResult)
@@ -40,12 +21,5 @@ describe("AnswerResult", () => {
   it("reason exists when my answer is wrong", async () => {
     await flushPromises();
     expect(wrapper.find("#incorrectReason")).toBeDefined();
-  });
-
-  it("get reason from backend when my selected answer is wrong", async () => {
-    await flushPromises();
-    expect(wrapper.find("#incorrectReason").text()).toEqual(
-      "The quick brown fox jumps over the lazy dog (2).",
-    );
   });
 });

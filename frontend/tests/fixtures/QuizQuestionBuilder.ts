@@ -24,11 +24,10 @@ class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
     return this;
   }
 
-  withChoices(choices: { display: string; reason: string }[]) {
+  withChoices(choices: string[]) {
     this.quizQuestion.choices = choices.map((choice) => ({
       picture: false,
-      display: choice.display,
-      theReasonThatShouldBeRemoved: choice.reason,
+      display: choice,
     }));
     return this;
   }

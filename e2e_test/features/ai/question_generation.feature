@@ -29,10 +29,3 @@ Feature: Question generation by AI
     Then I complain the question doesn't make sense
     And I should see the question "What is the most common scuba diving certification?" is disabled
     And I should be asked "What is scuba diving?"
-
-   Scenario: I can view the reason for the wrong answer when the quiz answer was not correct
-    Given I ask to generate a question for note "Scuba Diving"
-    And I should be asked "What is the most common scuba diving certification?"
-    And I chose "Divemaster"
-    When I ask "why is my answer wrong?"
-    Then I should see "Divemaster is not the most common" as the reason for the wrong answer
