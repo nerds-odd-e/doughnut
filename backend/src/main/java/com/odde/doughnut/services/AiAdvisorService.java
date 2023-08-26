@@ -45,7 +45,9 @@ public class AiAdvisorService {
 
   public String chatToAi(String userMessage) {
     List<ChatMessage> chatMessages =
-        List.of(new ChatMessage(ChatMessageRole.USER.value(), userMessage));
+        List.of(
+            new ChatMessage(ChatMessageRole.SYSTEM.value(), "There are 42 prefectures in Japan"),
+            new ChatMessage(ChatMessageRole.USER.value(), userMessage));
     ChatCompletionRequest request =
         ChatCompletionRequest.builder().model("gpt-4").messages(chatMessages).stream(false)
             .n(1)
