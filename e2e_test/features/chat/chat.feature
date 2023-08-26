@@ -8,8 +8,8 @@ Feature: Ask Statement
       | title        | description                                    |
       | Scuba Diving | The most common certification is Rescue Diver. |
     And OpenAI by default returns this question from now:
-      | question                                            | correct_choice | correct_reason | incorrect_choice_1 | incorrect_reason_1                | incorrect_choice_2 | incorrect_reason_2                      |
-      | What is the most common scuba diving certification? | Rescue Diver   | Correct!       | Divemaster         | Divemaster is not the most common | Open Water Diver   | Open Water Diver is not the most common |
+      | question                                            | correct_choice | incorrect_choice_1 | incorrect_choice_2 |
+      | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
     And I ask to generate a question for note "Scuba Diving"
 
 
@@ -18,7 +18,7 @@ Feature: Ask Statement
     When I chat to OpenAI "What's your name?"
     Then I can confirm the answer "I'm ChatGPT"
 
- 
+
   Scenario: The users can continue to conmunication with AI
     Given OpenAI by default returns text completion "I'm ChatGPT"
     When I chat to OpenAI "What's your name?"

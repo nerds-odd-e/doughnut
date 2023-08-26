@@ -14,8 +14,8 @@ Feature: Repetition Quiz
   Scenario Outline: AI generated question
     Given I opt to do only AI generated questions
     And OpenAI by default returns this question from now:
-      | question                         | correct_choice        | correct_reason | incorrect_choice_1 | incorrect_reason_1                | incorrect_choice_2 | incorrect_reason_2                      |
-      | What is the meaning of sedition? |  to incite violence   | Correct!       | to sleep           | Divemaster is not the most common | Open Water Diver   | Open Water Diver is not the most common |
+      | question                         | correct_choice        | incorrect_choice_1 | incorrect_choice_2 |
+      | What is the meaning of sedition? |  to incite violence   | to sleep           | Open Water Diver   |
     And I learned one note "sedition" on day 1
     When I am repeat-reviewing my old note on day 2
     Then I should be asked "What is the meaning of sedition?"

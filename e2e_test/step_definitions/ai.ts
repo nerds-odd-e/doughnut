@@ -64,7 +64,6 @@ Given("OpenAI by default returns this question from now:", (questionTable: DataT
     stem: record.question,
     correctChoiceIndex: 0,
     choices: [record.correct_choice, record.incorrect_choice_1, record.incorrect_choice_2],
-    reasons: [record.correct_reason, record.incorrect_reason_1, record.incorrect_reason_2],
     confidence: 10,
   })
   cy.then(async () => {

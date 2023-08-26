@@ -9,8 +9,8 @@ Feature: Question generation by AI
       | title        | description                                    |
       | Scuba Diving | The most common certification is Rescue Diver. |
     And OpenAI by default returns this question from now:
-      | question                                            | correct_choice | correct_reason | incorrect_choice_1 | incorrect_reason_1                | incorrect_choice_2 | incorrect_reason_2                      |
-      | What is the most common scuba diving certification? | Rescue Diver   | Correct!       | Divemaster         | Divemaster is not the most common | Open Water Diver   | Open Water Diver is not the most common |
+      | question                                            | correct_choice | incorrect_choice_1 | incorrect_choice_2 |
+      | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
 
   Scenario Outline: testing myself with generated question for a note
     When I ask to generate a question for note "Scuba Diving"
@@ -24,8 +24,8 @@ Feature: Question generation by AI
   Scenario: I should be able to regenerate the question when the question and choices do not make sense relating to the note
     When I ask to generate a question for note "Scuba Diving"
     And OpenAI by default returns this question from now:
-      | question              | correct_choice | correct_reason | incorrect_choice_1 | incorrect_reason_1                | incorrect_choice_2 | incorrect_reason_2                      |
-      | What is scuba diving? | Rescue Diver   | Correct!       | Divemaster         | Divemaster is not the most common | Open Water Diver   | Open Water Diver is not the most common |
+      | question              | correct_choice | incorrect_choice_1 | incorrect_choice_2 |
+      | What is scuba diving? | Rescue Diver   | Divemaster         | Open Water Diver   |
     Then I complain the question doesn't make sense
     And I should see the question "What is the most common scuba diving certification?" is disabled
     And I should be asked "What is scuba diving?"
