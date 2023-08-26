@@ -43,7 +43,7 @@ public class AiQuestionPresenter implements QuizQuestionPresenter {
             pair -> {
               QuizQuestion.Choice option = new QuizQuestion.Choice();
               option.setDisplay(pair.getFirst());
-              option.setReason(pair.getSecond());
+              option.setTheReasonThatShouldBeRemoved(pair.getSecond());
               return option;
             })
         .toList();

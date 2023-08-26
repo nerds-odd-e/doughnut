@@ -28,7 +28,7 @@ class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
     this.quizQuestion.choices = choices.map((choice) => ({
       picture: false,
       display: choice.display,
-      reason: choice.reason,
+      theReasonThatShouldBeRemoved: choice.reason,
     }));
     return this;
   }

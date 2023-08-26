@@ -186,7 +186,10 @@ class RestAiControllerTest {
       QuizQuestion quizQuestion = controller.generateQuestion(note);
 
       assertThat(quizQuestion.stem).contains("What is the first color in the rainbow?");
-      assertThat(quizQuestion.choices.stream().map(QuizQuestion.Choice::getReason).toList())
+      assertThat(
+              quizQuestion.choices.stream()
+                  .map(QuizQuestion.Choice::getTheReasonThatShouldBeRemoved)
+                  .toList())
           .isEqualTo(List.of("red reason", "black reason", "green reason"));
     }
 

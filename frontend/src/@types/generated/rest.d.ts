@@ -258,7 +258,7 @@ declare namespace Generated {
     interface Choice {
         display: string;
         pictureWithMask?: PictureWithMask;
-        reason: string;
+        theReasonThatShouldBeRemoved: string;
         picture: boolean;
     }
 

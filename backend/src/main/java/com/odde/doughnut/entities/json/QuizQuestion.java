@@ -30,6 +30,6 @@ public class QuizQuestion {
     private boolean isPicture = false;
     private String display;
     @Nullable private PictureWithMask pictureWithMask;
-    private String reason;
+    private String theReasonThatShouldBeRemoved;
   }
 }

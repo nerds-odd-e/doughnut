@@ -27,7 +27,7 @@
           answeredQuestion.choiceIndex !== undefined
             ? answeredQuestion.quizQuestion.choices[
                 answeredQuestion.choiceIndex
-              ]?.reason
+              ]?.theReasonThatShouldBeRemoved
             : ""
         }}
       </div>
