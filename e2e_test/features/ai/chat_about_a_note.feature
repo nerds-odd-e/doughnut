@@ -14,14 +14,14 @@ Feature: Chat about a note with AI
     Given OpenAI completes with "No. It is not." for messages containing:
       | role | content                    |
       | user | Is Naba one of them?       |
-    When I chat to OpenAI "Is Naba one of them?"
-    Then I can confirm the answer "No. It is not."
+    When I send the message "Is Naba one of them?" to AI
+    Then I should receive the response "No. It is not."
 
 
   Scenario: The users can continue to conmunication with AI
     Given OpenAI by default returns text completion "I'm ChatGPT"
-    When I chat to OpenAI "What's your name?"
-    Then I can confirm the answer "I'm ChatGPT"
+    When I send the message "What's your name?" to AI
+    Then I should receive the response "I'm ChatGPT"
     Given OpenAI by default returns text completion "365"
-    When I chat to OpenAI "How many days are there in the year 2023?"
-    Then I can confirm the answer "365"
+    When I send the message "How many days are there in the year 2023?" to AI
+    Then I should receive the response "365"
