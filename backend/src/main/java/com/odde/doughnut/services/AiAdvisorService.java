@@ -15,22 +15,12 @@ import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import java.util.List;
 import java.util.Optional;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 
 public class AiAdvisorService {
   private final OpenAiApiHandler openAiApiHandler;
 
   public AiAdvisorService(OpenAiApi openAiApi) {
     openAiApiHandler = new OpenAiApiHandler(openAiApi);
-  }
-
-  private static ChatCompletionRequest generateChatCompletionRequest(ChatMessages messages) {
-    return ChatCompletionRequest.builder().model("gpt-4").messages(messages.getMessages()).stream(
-            false)
-        .n(1)
-        .maxTokens(100)
-        .build();
   }
 
   public String getImage(String prompt) {
@@ -54,23 +44,18 @@ public class AiAdvisorService {
   }
 
   public String chatToAi(String userMessage) {
-    ChatMessages chatMessages =
-        new ChatMessages(
-            List.of(
-                new ChatMessage(ChatMessageRole.USER.value(), ""),
-                new ChatMessage(ChatMessageRole.ASSISTANT.value(), userMessage)));
-    ChatCompletionRequest request = generateChatCompletionRequest(chatMessages);
+    List<ChatMessage> chatMessages =
+        List.of(new ChatMessage(ChatMessageRole.ASSISTANT.value(), userMessage));
+    ChatCompletionRequest request =
+        ChatCompletionRequest.builder().model("gpt-4").messages(chatMessages).stream(false)
+            .n(1)
+            .maxTokens(100)
+            .build();
 
     Optional<ChatCompletionChoice> response = openAiApiHandler.chatCompletion(request);
     if (response.isPresent()) {
       return response.get().getMessage().getContent();
     }
     return "";
-  }
-
-  @AllArgsConstructor
-  @Data
-  private static class ChatMessages {
-    private List<ChatMessage> messages;
   }
 }
