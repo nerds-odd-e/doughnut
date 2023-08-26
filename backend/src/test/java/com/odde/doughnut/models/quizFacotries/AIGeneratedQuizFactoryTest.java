@@ -47,8 +47,6 @@ class AIGeneratedQuizFactoryTest {
     reviewPoint = makeMe.aReviewPointFor(note).by(userModel).inMemoryPlease();
     aiGeneratedQuestion.stem = "How long did it take to build Rome?";
     aiGeneratedQuestion.choices = List.of("1 day", "1/2 day", "more than 1 day");
-    aiGeneratedQuestion.reasons =
-        List.of("1 day is incorrect", "1/2 day is incorrect", "more than 1 day is correct");
     aiGeneratedQuestion.correctChoiceIndex = 2;
   }
 

@@ -163,7 +163,6 @@ class RestAiControllerTest {
       aiGeneratedQuestion.stem = "What is the first color in the rainbow?";
       aiGeneratedQuestion.correctChoiceIndex = 0;
       aiGeneratedQuestion.choices = List.of("red", "black", "green");
-      aiGeneratedQuestion.reasons = List.of("red reason", "black reason", "green reason");
       jsonQuestion = aiGeneratedQuestion.toJsonString();
     }
 

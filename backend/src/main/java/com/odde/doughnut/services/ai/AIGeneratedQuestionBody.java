@@ -15,10 +15,6 @@ public class AIGeneratedQuestionBody {
   @JsonProperty(required = true)
   public List<String> choices;
 
-  @JsonPropertyDescription("All choices' reason.")
-  @JsonProperty(required = true)
-  public List<String> reasons;
-
   public String toJsonString() {
     return new ObjectMapper().valueToTree(this).toString();
   }
