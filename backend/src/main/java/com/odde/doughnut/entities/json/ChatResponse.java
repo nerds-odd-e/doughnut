@@ -6,5 +6,5 @@ import lombok.*;
 @AllArgsConstructor
 @Data
 public class ChatResponse {
-  public String answer;
+  public String assistantMessage;
 }

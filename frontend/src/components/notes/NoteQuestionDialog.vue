@@ -37,7 +37,7 @@
     <div v-show="answered" class="chat-answer-container">
       <img src="/user-icon.svg" class="chat-answer-icon" />
       <div class="chat-answer-text">
-        <p id="chat-answer">{{ chatAnswer }}</p>
+        <p id="chat-answer">{{ assistantMessage }}</p>
       </div>
     </div>
   </div>
@@ -68,7 +68,7 @@ export default defineComponent({
       answeredQuestion: undefined as Generated.AnsweredQuestion | undefined,
       prevQuizQuestion: undefined as Generated.QuizQuestion | undefined,
       chatInput: "",
-      chatAnswer: "",
+      assistantMessage: "",
       answered: false,
     };
   },
@@ -90,7 +90,7 @@ export default defineComponent({
     },
     async generateChatAnswer() {
       this.answered = true;
-      this.chatAnswer = await this.api.chat.playChat(this.chatInput);
+      this.assistantMessage = await this.api.chat.playChat(this.chatInput);
     },
   },
   mounted() {

@@ -28,7 +28,7 @@ declare namespace Generated {
     }
 
     interface ChatResponse {
-        answer: string;
+        assistantMessage: string;
     }
 
     interface CircleForUserView {

@@ -58,7 +58,7 @@ describe("NoteQuestionDialog", () => {
     // setUp
     helper.apiMock
       .expectingPost("/api/ai/chat")
-      .andReturnOnce({ answer: expected });
+      .andReturnOnce({ assistantMessage: expected });
 
     // When
     const wrapper = await createWrapper();

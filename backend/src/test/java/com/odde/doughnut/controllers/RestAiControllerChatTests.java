@@ -49,6 +49,6 @@ public class RestAiControllerChatTests {
     ChatResponse res = controller.chat(request);
 
     // Assert
-    assertEquals(new ChatResponse(expected).getAnswer(), res.getAnswer());
+    assertEquals(new ChatResponse(expected).getAssistantMessage(), res.getAssistantMessage());
   }
 }

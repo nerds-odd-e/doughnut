@@ -67,7 +67,7 @@ public class RestAiController {
   @PostMapping("/chat")
   public ChatResponse chat(@RequestBody ChatRequest request) {
     String userMessage = request.getUserMessage();
-    String answer = this.aiAdvisorService.chatToAi(userMessage);
-    return new ChatResponse(answer);
+    String assistantMessage = this.aiAdvisorService.chatToAi(userMessage);
+    return new ChatResponse(assistantMessage);
   }
 }
