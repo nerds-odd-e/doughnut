@@ -17,13 +17,13 @@
     />
   </div>
   <button
-    v-show="quizQuestion !== undefined"
+    v-show="quizQuestion"
     class="btn btn-secondary"
     @click="generateQuestion"
   >
     Doesn't make sense?
   </button>
-  <div v-show="quizQuestion !== undefined" class="chat-container">
+  <div v-show="quizQuestion" class="chat-container">
     <form class="chat-input-container" @submit.prevent="generateChatAnswer">
       <input id="chat-input" class="chat-input-text" v-model="chatInput" />
       <input
@@ -89,8 +89,8 @@ export default defineComponent({
       this.answeredQuestion = answeredQuestion;
     },
     async generateChatAnswer() {
+      this.assistantMessage = await this.api.ai.chat(this.chatInput);
       this.answered = true;
-      this.assistantMessage = await this.api.chat.playChat(this.chatInput);
     },
   },
   mounted() {
