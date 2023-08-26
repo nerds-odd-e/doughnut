@@ -24,7 +24,7 @@ declare namespace Generated {
     }
 
     interface ChatRequest {
-        question: string;
+        userMessage: string;
     }
 
     interface ChatResponse {

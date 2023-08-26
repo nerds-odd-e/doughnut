@@ -53,12 +53,12 @@ public class AiAdvisorService {
         .orElse(null);
   }
 
-  public String chatToAi(String question) {
+  public String chatToAi(String userMessage) {
     ChatMessages chatMessages =
         new ChatMessages(
             List.of(
                 new ChatMessage(ChatMessageRole.USER.value(), ""),
-                new ChatMessage(ChatMessageRole.ASSISTANT.value(), question)));
+                new ChatMessage(ChatMessageRole.ASSISTANT.value(), userMessage)));
     ChatCompletionRequest request = generateChatCompletionRequest(chatMessages);
 
     Optional<ChatCompletionChoice> response = openAiApiHandler.chatCompletion(request);

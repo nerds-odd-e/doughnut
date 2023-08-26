@@ -265,10 +265,8 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
   },
   chat: {
-    async playChat(questionContent: string): Promise<string> {
-      const request: Generated.ChatRequest = {
-        question: questionContent,
-      };
+    async playChat(userMessage: string): Promise<string> {
+      const request: Generated.ChatRequest = { userMessage };
       const res = await this.requestStartChat(request);
       return res.answer;
     },
