@@ -13,7 +13,7 @@ import org.springframework.web.context.annotation.SessionScope;
 
 @RestController
 @SessionScope
-@RequestMapping("/api/v1")
+@RequestMapping("/api/ai")
 public class RestChatController {
 
   private final AiAdvisorService aiAdvisorService;

@@ -275,7 +275,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
 
     async requestStartChat(body: Generated.ChatRequest) {
       return (await managedApi.restPost(
-        "v1/chat",
+        "ai/chat",
         body,
       )) as Generated.ChatResponse;
     },

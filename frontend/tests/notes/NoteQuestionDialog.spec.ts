@@ -57,7 +57,7 @@ describe("NoteQuestionDialog", () => {
     const expected = "I'm ChatGPT";
     // setUp
     helper.apiMock
-      .expectingPost("/api/v1/chat")
+      .expectingPost("/api/ai/chat")
       .andReturnOnce({ answer: expected });
 
     // When
