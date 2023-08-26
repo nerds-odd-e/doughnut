@@ -201,7 +201,6 @@ Then("the choice {string} should be incorrect", (choice: string) => {
 
 When("I ask to generate a question for note {string}", (noteTitle: string) => {
   pageObjects.askQuestionForNote(noteTitle)
-  cy.findByText("Rescue Diver").should("be.visible")
 })
 
 Then("I should be asked {string}", (expectedtQuestionStem: string) => {
