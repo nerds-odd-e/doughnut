@@ -38,17 +38,10 @@ public class RestAiControllerChatTests {
 
   @Test
   void chatWithAI() {
-    // Arrange
-    String expected = "I'm ChatGPT";
     Single<ChatCompletionResult> completionResultSingle =
-        Single.just(makeMe.openAiCompletionResult().choice(expected).please());
+        Single.just(makeMe.openAiCompletionResult().choice("I'm ChatGPT").please());
     Mockito.when(openAiApi.createChatCompletion(Mockito.any())).thenReturn(completionResultSingle);
-
-    // Act
-    ChatRequest request = new ChatRequest("What's your name?");
-    ChatResponse res = controller.chat(request);
-
-    // Assert
-    assertEquals(new ChatResponse(expected).getAssistantMessage(), res.getAssistantMessage());
+    ChatResponse res = controller.chat(new ChatRequest("What's your name?"));
+    assertEquals("I'm ChatGPT", res.getAssistantMessage());
   }
 }

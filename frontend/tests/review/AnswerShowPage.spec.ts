@@ -19,13 +19,6 @@ describe("repetition page", () => {
         },
         answerDisplay: "",
         reviewPoint,
-        quizQuestion: {
-          choices: [
-            {
-              reason: "",
-            },
-          ],
-        },
       });
       helper.apiMock
         .expectingGet(
