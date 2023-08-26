@@ -7,10 +7,7 @@ Feature: Chat about a note with AI
   Background:
     Given I've logged in as an existing user
     And I have a note with the title "There are 42 prefectures in Japan"
-    And OpenAI by default returns this question from now:
-      | question                                 | correct_choice | incorrect_choice_1 |
-      | How many prefectures are there in Japan? | 42             | 41                 |
-    And I ask to generate a question for note "There are 42 prefectures in Japan"
+    And I start to chat about note "There are 42 prefectures in Japan"
 
 
   Scenario: The users can conmunicate with AI

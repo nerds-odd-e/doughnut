@@ -25,7 +25,7 @@
     />
   </PopButton>
   <AISuggestDescriptionButton v-bind="{ selectedNote, storageAccessor }" />
-  <PopButton title="test me" :sidebar="'right'">
+  <PopButton title="chat about this note" :sidebar="'right'">
     <template #button_face>
       <SvgClipboard />
     </template>

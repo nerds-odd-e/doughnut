@@ -1,6 +1,6 @@
 <template>
-  <h2 v-if="!quizQuestion">Generating question...</h2>
-  <div v-else>
+  <p>Let's talk about this note.</p>
+  <div v-if="quizQuestion">
     <div v-if="prevQuizQuestion">
       <h3>Previous Question...</h3>
       <QuizQuestion :quiz-question="prevQuizQuestion" :disabled="true" />
@@ -16,6 +16,20 @@
       @answered="onAnswered($event)"
     />
   </div>
+  <div v-show="answered" class="chat-answer-container">
+    <img src="/user-icon.svg" class="chat-answer-icon" />
+    <div class="chat-answer-text">
+      <p id="chat-answer">{{ assistantMessage }}</p>
+    </div>
+  </div>
+
+  <button
+    v-show="!quizQuestion"
+    class="btn btn-secondary"
+    @click="generateQuestion"
+  >
+    Test me
+  </button>
   <button
     v-show="quizQuestion"
     class="btn btn-secondary"
@@ -23,7 +37,7 @@
   >
     Doesn't make sense?
   </button>
-  <div v-show="quizQuestion" class="chat-container">
+  <div class="chat-container">
     <form class="chat-input-container" @submit.prevent="generateChatAnswer">
       <input id="chat-input" class="chat-input-text" v-model="chatInput" />
       <input
@@ -34,12 +48,6 @@
         class="btn float-btn btn-secondary"
       />
     </form>
-    <div v-show="answered" class="chat-answer-container">
-      <img src="/user-icon.svg" class="chat-answer-icon" />
-      <div class="chat-answer-text">
-        <p id="chat-answer">{{ assistantMessage }}</p>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -92,9 +100,6 @@ export default defineComponent({
       this.assistantMessage = await this.api.ai.chat(this.chatInput);
       this.answered = true;
     },
-  },
-  mounted() {
-    this.generateQuestion();
   },
 });
 </script>

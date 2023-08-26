@@ -8,14 +8,6 @@ helper.resetWithApiMock(beforeEach, afterEach);
 
 const note = makeMe.aNoteRealm.please();
 const createWrapper = async () => {
-  const quizQuestion = makeMe.aQuizQuestion
-    .withQuestionType("AI_QUESTION")
-    .withQuestionStem("any question?")
-    .withChoices(["option A", "option B", "option C"])
-    .please();
-  helper.apiMock
-    .expectingPost(`/api/ai/generate-question?note=${note.id}`)
-    .andReturnOnce(quizQuestion);
   const wrapper = helper
     .component(NoteChatDialog)
     .withStorageProps({ selectedNote: note.note })
@@ -24,9 +16,23 @@ const createWrapper = async () => {
   return wrapper;
 };
 
-describe("NoteChatDialog", () => {
+describe("NoteChatDialog TestMe", () => {
+  beforeEach(() => {
+    const quizQuestion = makeMe.aQuizQuestion
+      .withQuestionType("AI_QUESTION")
+      .withQuestionStem("any question?")
+      .withChoices(["option A", "option B", "option C"])
+      .please();
+
+    helper.apiMock
+      .expectingPost(`/api/ai/generate-question?note=${note.id}`)
+      .andReturnOnce(quizQuestion);
+  });
+
   it("render the question returned", async () => {
     const wrapper = await createWrapper();
+    wrapper.find("button").trigger("click");
+    await flushPromises();
     expect(wrapper.text()).toContain("any question?");
     expect(wrapper.text()).toContain("option A");
     expect(wrapper.text()).toContain("option C");
@@ -34,6 +40,8 @@ describe("NoteChatDialog", () => {
 
   it("regenerate question when asked", async () => {
     const wrapper = await createWrapper();
+    wrapper.find("button").trigger("click");
+    await flushPromises();
 
     const quizQuestion = makeMe.aQuizQuestion
       .withQuestionType("AI_QUESTION")
@@ -47,7 +55,9 @@ describe("NoteChatDialog", () => {
     expect(wrapper.text()).toContain("any question?");
     expect(wrapper.text()).toContain("is it raining?");
   });
+});
 
+describe("NoteChatDialog Conversation", () => {
   it("When the chat button is clicked, the anwser from AI will be displayed", async () => {
     // Given
     const expected = "I'm ChatGPT";

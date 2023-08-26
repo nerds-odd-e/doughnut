@@ -11,6 +11,7 @@ import {
 } from "@badeball/cypress-cucumber-preprocessor"
 import NotePath from "../support/NotePath"
 import "../support/string.extensions"
+import pageObjects from "page_objects"
 
 defineParameterType({
   name: "notepath",
@@ -426,4 +427,8 @@ Then("I should see that the open AI service is not available in controller bar",
       expect(elem.text()).to.equal("The OpenAI request was not Authorized.")
     })
     .click()
+})
+
+When("I start to chat about note {string}", (noteTitle: string) => {
+  pageObjects.chatAboutNote(noteTitle)
 })
