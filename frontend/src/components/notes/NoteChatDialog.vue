@@ -97,7 +97,10 @@ export default defineComponent({
       this.answeredQuestion = answeredQuestion;
     },
     async generateChatAnswer() {
-      this.assistantMessage = await this.api.ai.chat(this.chatInput);
+      this.assistantMessage = await this.api.ai.chat(
+        this.selectedNote.id,
+        this.chatInput,
+      );
       this.answered = true;
     },
   },

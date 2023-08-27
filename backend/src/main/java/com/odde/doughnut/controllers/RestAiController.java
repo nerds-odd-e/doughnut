@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.json.*;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionDirector;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
@@ -41,6 +42,16 @@ public class RestAiController {
     return aiAdvisorService.getAiCompletion(aiCompletionRequest, note.getPath());
   }
 
+  @PostMapping("/chat")
+  public ChatResponse chat(
+      @RequestParam(value = "note") Note note, @RequestBody ChatRequest request)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertReadAuthorization(note);
+    String userMessage = request.getUserMessage();
+    String assistantMessage = this.aiAdvisorService.chatToAi(note, userMessage);
+    return new ChatResponse(assistantMessage);
+  }
+
   @PostMapping("/generate-question")
   public QuizQuestion generateQuestion(@RequestParam(value = "note") Note note) {
     currentUser.assertLoggedIn();
@@ -62,12 +73,5 @@ public class RestAiController {
   public AiGeneratedImage generateImage(@RequestBody AiCompletionRequest aiCompletionRequest) {
     currentUser.assertLoggedIn();
     return new AiGeneratedImage(aiAdvisorService.getImage(aiCompletionRequest.prompt));
-  }
-
-  @PostMapping("/chat")
-  public ChatResponse chat(@RequestBody ChatRequest request) {
-    String userMessage = request.getUserMessage();
-    String assistantMessage = this.aiAdvisorService.chatToAi(userMessage);
-    return new ChatResponse(assistantMessage);
   }
 }

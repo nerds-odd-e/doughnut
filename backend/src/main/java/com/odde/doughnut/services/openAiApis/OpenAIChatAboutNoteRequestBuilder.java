@@ -31,7 +31,7 @@ public class OpenAIChatAboutNoteRequestBuilder {
         ("This is a personal knowledge management system, consists of notes with a title and a description, which should represent atomic concepts.\n"
                 + "Current context of the note: ")
             + this.path;
-    messages.add(0, new ChatMessage(ChatMessageRole.SYSTEM.value(), content));
+    addMessage(content, ChatMessageRole.SYSTEM);
   }
 
   public OpenAIChatAboutNoteRequestBuilder detailsOfNoteOfCurrentFocus(Note note) {
@@ -44,8 +44,7 @@ description (until the end of this message):
 %s
       """
             .formatted(this.path, note.getTitle(), note.getDescription());
-    messages.add(new ChatMessage(ChatMessageRole.SYSTEM.value(), noteOfCurrentFocus));
-    return this;
+    return addMessage(noteOfCurrentFocus, ChatMessageRole.SYSTEM);
   }
 
   public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestion() {
@@ -68,18 +67,14 @@ description (until the end of this message):
 
   Note: The specific note of focus and its more detailed contexts are not known. Focus on memory reinforcement and recall across various subjects.
   """;
-    messages.add(new ChatMessage(ChatMessageRole.USER.value(), messageBody));
-
-    return this;
+    return addMessage(messageBody, ChatMessageRole.USER);
   }
 
   public OpenAIChatAboutNoteRequestBuilder instructionForCompletion(
       AiCompletionRequest aiCompletionRequest) {
-    messages.add(new ChatMessage(ChatMessageRole.USER.value(), aiCompletionRequest.prompt));
+    addMessage(aiCompletionRequest.prompt, ChatMessageRole.USER);
     if (!Strings.isEmpty(aiCompletionRequest.incompleteContent)) {
-      messages.add(
-          new ChatMessage(
-              ChatMessageRole.ASSISTANT.value(), aiCompletionRequest.incompleteContent));
+      addMessage(aiCompletionRequest.incompleteContent, ChatMessageRole.ASSISTANT);
     }
     return this;
   }
@@ -135,8 +130,16 @@ please critically check if the following question makes sense and is possible to
 
 """
             .formatted(clone.toJsonString());
-    messages.add(new ChatMessage(ChatMessageRole.USER.value(), messageBody));
+    return addMessage(messageBody, ChatMessageRole.USER);
+  }
 
+  public OpenAIChatAboutNoteRequestBuilder chatMessage(String userMessage) {
+    ChatMessageRole role = ChatMessageRole.USER;
+    return addMessage(userMessage, role);
+  }
+
+  private OpenAIChatAboutNoteRequestBuilder addMessage(String userMessage, ChatMessageRole role) {
+    messages.add(new ChatMessage(role.value(), userMessage));
     return this;
   }
 

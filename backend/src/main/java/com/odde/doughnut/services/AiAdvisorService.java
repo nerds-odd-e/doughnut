@@ -11,9 +11,6 @@ import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
-import com.theokanning.openai.completion.chat.ChatMessage;
-import com.theokanning.openai.completion.chat.ChatMessageRole;
-import java.util.List;
 import java.util.Optional;
 
 public class AiAdvisorService {
@@ -43,18 +40,16 @@ public class AiAdvisorService {
         .orElse(null);
   }
 
-  public String chatToAi(String userMessage) {
-    List<ChatMessage> chatMessages =
-        List.of(
-            new ChatMessage(ChatMessageRole.SYSTEM.value(), "There are 42 prefectures in Japan"),
-            new ChatMessage(ChatMessageRole.USER.value(), userMessage));
-    ChatCompletionRequest request =
-        ChatCompletionRequest.builder().model("gpt-4").messages(chatMessages).stream(false)
-            .n(1)
-            .maxTokens(100)
+  public String chatToAi(Note note, String userMessage) {
+    ChatCompletionRequest chatCompletionRequest =
+        new OpenAIChatAboutNoteRequestBuilder(note.getPath())
+            .detailsOfNoteOfCurrentFocus(note)
+            .chatMessage(userMessage)
+            .maxTokens(150)
             .build();
 
-    Optional<ChatCompletionChoice> response = openAiApiHandler.chatCompletion(request);
+    Optional<ChatCompletionChoice> response =
+        openAiApiHandler.chatCompletion(chatCompletionRequest);
     if (response.isPresent()) {
       return response.get().getMessage().getContent();
     }

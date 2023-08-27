@@ -63,7 +63,9 @@ describe("NoteChatDialog Conversation", () => {
     const expected = "I'm ChatGPT";
     const response: Generated.ChatResponse = { assistantMessage: expected };
     // setUp
-    helper.apiMock.expectingPost("/api/ai/chat").andReturnOnce(response);
+    helper.apiMock
+      .expectingPost(`/api/ai/chat?note=${note.id}`)
+      .andReturnOnce(response);
 
     // When
     const wrapper = await createWrapper();

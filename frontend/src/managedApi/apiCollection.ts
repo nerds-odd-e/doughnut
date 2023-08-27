@@ -265,10 +265,10 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
   },
   ai: {
-    async chat(userMessage: string): Promise<string> {
+    async chat(noteId: Doughnut.ID, userMessage: string): Promise<string> {
       const request: Generated.ChatRequest = { userMessage };
       const res = (await managedApi.restPost(
-        "ai/chat",
+        `ai/chat?note=${noteId}`,
         request,
       )) as Generated.ChatResponse;
       return res.assistantMessage;
