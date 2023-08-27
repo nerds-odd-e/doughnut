@@ -6,7 +6,7 @@ import com.odde.doughnut.entities.json.AiCompletionRequest;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.services.ai.AIGeneratedQuestion;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
-import com.odde.doughnut.services.openAiApis.OpenAIChatAboutNoteRequestBuilder;
+import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;

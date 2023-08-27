@@ -1,21 +1,13 @@
-package com.odde.doughnut.services.openAiApis;
+package com.odde.doughnut.services.ai;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AiCompletionRequest;
-import com.odde.doughnut.services.ai.AIGeneratedQuestion;
-import com.odde.doughnut.services.ai.AIGeneratedQuestionBody;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatFunction;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.apache.logging.log4j.util.Strings;
 
 public class OpenAIChatAboutNoteRequestBuilder {
@@ -141,25 +133,5 @@ please critically check if the following question makes sense and is possible to
   private OpenAIChatAboutNoteRequestBuilder addMessage(String userMessage, ChatMessageRole role) {
     messages.add(new ChatMessage(role.value(), userMessage));
     return this;
-  }
-
-  public static class QuestionEvaluation {
-    @JsonPropertyDescription("Indices of the correct choices. 0-based.")
-    @JsonProperty(required = true)
-    public int correctChoices[];
-
-    public static Optional<QuestionEvaluation> getQuestionEvaluation(JsonNode jsonNode) {
-      try {
-        return Optional.of(new ObjectMapper().treeToValue(jsonNode, QuestionEvaluation.class));
-      } catch (JsonProcessingException e) {
-        return Optional.empty();
-      }
-    }
-
-    public boolean makeSense(int correctChoiceIndex) {
-      return correctChoices != null
-          && correctChoices.length == 1
-          && correctChoices[0] == correctChoiceIndex;
-    }
   }
 }

@@ -16,7 +16,7 @@ import com.odde.doughnut.entities.json.AiCompletionRequest;
 import com.odde.doughnut.entities.json.QuizQuestion;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ai.AIGeneratedQuestion;
-import com.odde.doughnut.services.openAiApis.OpenAIChatAboutNoteRequestBuilder;
+import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
@@ -209,8 +209,7 @@ class RestAiControllerTest {
 
       @Nested
       class WhenTheContentIsLong {
-        OpenAIChatAboutNoteRequestBuilder.QuestionEvaluation questionEvaluation =
-            new OpenAIChatAboutNoteRequestBuilder.QuestionEvaluation();
+        QuestionEvaluation questionEvaluation = new QuestionEvaluation();
 
         @BeforeEach
         void setup() throws JsonProcessingException {

@@ -3,7 +3,6 @@ package com.odde.doughnut.services.ai;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
-import com.odde.doughnut.services.openAiApis.OpenAIChatAboutNoteRequestBuilder;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 
@@ -41,10 +40,7 @@ public class AiQuestionGenerator {
 
     return openAiApiHandler
         .getFunctionCallArguments(chatRequest)
-        .flatMap(
-            jsonNode ->
-                OpenAIChatAboutNoteRequestBuilder.QuestionEvaluation.getQuestionEvaluation(
-                    jsonNode))
+        .flatMap(jsonNode -> QuestionEvaluation.getQuestionEvaluation(jsonNode))
         .map(eq -> eq.makeSense(question.correctChoiceIndex))
         .orElse(false);
   }
