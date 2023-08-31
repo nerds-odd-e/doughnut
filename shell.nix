@@ -8,6 +8,8 @@ in mkShell {
   MYSQL_HOME = builtins.getEnv "MYSQL_HOME";
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
+    python311
+    pipenv
     nodejs_20
     zsh
     dum
