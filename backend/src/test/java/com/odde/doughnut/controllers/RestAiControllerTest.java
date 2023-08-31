@@ -196,45 +196,48 @@ class RestAiControllerTest {
     }
 
     @Nested
-    class WithMockedChatCompletion {
+    class WithMockedChatCompletionWhenTheContentIsLong {
       @Captor private ArgumentCaptor<ChatCompletionRequest> captor;
+      QuestionEvaluation questionEvaluation = new QuestionEvaluation();
 
       @BeforeEach
       void setup() throws JsonProcessingException {
+        mockChatCompletionForGPT3_5MessageOnly(jsonQuestion);
+        questionEvaluation.correctChoices = new int[] {0};
+        note.setDescription(makeMe.aStringOfLength(1000));
+      }
+
+      @Test
+      void usingGPT3_5_WillCallAPIAgainToReEvaluateTheQuestion() throws JsonProcessingException {
+        mockChatCompletionForFunctionCall(
+            "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
+        controller.generateQuestion(note);
+        verify(openAiApi, times(2)).createChatCompletion(captor.capture());
+        assertThat(captor.getAllValues().get(0).getModel()).isEqualTo("gpt-3.5-turbo-16k");
+        assertThat(captor.getAllValues().get(1).getModel()).isEqualTo("gpt-3.5-turbo-16k");
+      }
+
+      @Test
+      void tryWithGPT4IfTheEvaluationIsIncorrect() throws JsonProcessingException {
+        questionEvaluation.correctChoices = new int[] {0, 1};
+        mockChatCompletionForFunctionCall(
+            "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
         mockChatCompletionForFunctionCall(
             "ask_single_answer_multiple_choice_question", jsonQuestion);
+        controller.generateQuestion(note);
+        verify(openAiApi, times(3)).createChatCompletion(captor.capture());
+        assertThat(captor.getAllValues().get(2).getModel()).isEqualTo("gpt-4");
       }
+    }
 
-      @Nested
-      class WhenTheContentIsLong {
-        QuestionEvaluation questionEvaluation = new QuestionEvaluation();
+    private void mockChatCompletionForGPT3_5MessageOnly(String result) {
 
-        @BeforeEach
-        void setup() throws JsonProcessingException {
-          questionEvaluation.correctChoices = new int[] {0};
-          note.setDescription(makeMe.aStringOfLength(1000));
-        }
+      Single<ChatCompletionResult> just =
+          Single.just(makeMe.openAiCompletionResult().choice(result).please());
 
-        @Test
-        void usingGPT3_5_WillCallAPIAgainToReEvaluateTheQuestion() throws JsonProcessingException {
-          mockChatCompletionForFunctionCall(
-              "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
-          controller.generateQuestion(note);
-          verify(openAiApi, times(2)).createChatCompletion(captor.capture());
-          assertThat(captor.getAllValues().get(0).getModel()).isEqualTo("gpt-3.5-turbo-16k");
-          assertThat(captor.getAllValues().get(1).getModel()).isEqualTo("gpt-3.5-turbo-16k");
-        }
-
-        @Test
-        void tryWithGPT4IfTheEvaluationIsIncorrect() throws JsonProcessingException {
-          questionEvaluation.correctChoices = new int[] {0, 1};
-          mockChatCompletionForFunctionCall(
-              "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
-          controller.generateQuestion(note);
-          verify(openAiApi, times(3)).createChatCompletion(captor.capture());
-          assertThat(captor.getAllValues().get(2).getModel()).isEqualTo("gpt-4");
-        }
-      }
+      doReturn(just)
+          .when(openAiApi)
+          .createChatCompletion(argThat(request -> request.getFunctions() == null));
     }
 
     private void mockChatCompletionForFunctionCall(String functionName, String result)
@@ -242,7 +245,10 @@ class RestAiControllerTest {
       doReturn(buildCompletionResultForFunctionCall(result))
           .when(openAiApi)
           .createChatCompletion(
-              argThat(request -> request.getFunctions().get(0).getName().equals(functionName)));
+              argThat(
+                  request ->
+                      request.getFunctions() != null
+                          && request.getFunctions().get(0).getName().equals(functionName)));
     }
   }
 

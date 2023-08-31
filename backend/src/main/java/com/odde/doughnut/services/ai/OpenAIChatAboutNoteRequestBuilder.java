@@ -1,5 +1,9 @@
 package com.odde.doughnut.services.ai;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
+import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AiCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
@@ -23,7 +27,7 @@ public class OpenAIChatAboutNoteRequestBuilder {
         ("This is a personal knowledge management system, consists of notes with a title and a description, which should represent atomic concepts.\n"
                 + "Current context of the note: ")
             + this.path;
-    addMessage(content, ChatMessageRole.SYSTEM);
+    addMessage(ChatMessageRole.SYSTEM, content);
   }
 
   public OpenAIChatAboutNoteRequestBuilder detailsOfNoteOfCurrentFocus(Note note) {
@@ -36,10 +40,10 @@ description (until the end of this message):
 %s
       """
             .formatted(this.path, note.getTitle(), note.getDescription());
-    return addMessage(noteOfCurrentFocus, ChatMessageRole.SYSTEM);
+    return addMessage(ChatMessageRole.SYSTEM, noteOfCurrentFocus);
   }
 
-  public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestion() {
+  public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestionWithGPT4() {
     functions.add(
         ChatFunction.builder()
             .name("ask_single_answer_multiple_choice_question")
@@ -59,14 +63,14 @@ description (until the end of this message):
 
   Note: The specific note of focus and its more detailed contexts are not known. Focus on memory reinforcement and recall across various subjects.
   """;
-    return addMessage(messageBody, ChatMessageRole.USER);
+    return addMessage(ChatMessageRole.USER, messageBody);
   }
 
   public OpenAIChatAboutNoteRequestBuilder instructionForCompletion(
       AiCompletionRequest aiCompletionRequest) {
-    addMessage(aiCompletionRequest.prompt, ChatMessageRole.USER);
+    addMessage(ChatMessageRole.USER, aiCompletionRequest.prompt);
     if (!Strings.isEmpty(aiCompletionRequest.incompleteContent)) {
-      addMessage(aiCompletionRequest.incompleteContent, ChatMessageRole.ASSISTANT);
+      addMessage(ChatMessageRole.ASSISTANT, aiCompletionRequest.incompleteContent);
     }
     return this;
   }
@@ -122,16 +126,45 @@ please critically check if the following question makes sense and is possible to
 
 """
             .formatted(clone.toJsonString());
-    return addMessage(messageBody, ChatMessageRole.USER);
+    return addMessage(ChatMessageRole.USER, messageBody);
   }
 
   public OpenAIChatAboutNoteRequestBuilder chatMessage(String userMessage) {
     ChatMessageRole role = ChatMessageRole.USER;
-    return addMessage(userMessage, role);
+    return addMessage(role, userMessage);
   }
 
-  private OpenAIChatAboutNoteRequestBuilder addMessage(String userMessage, ChatMessageRole role) {
+  private OpenAIChatAboutNoteRequestBuilder addMessage(ChatMessageRole role, String userMessage) {
     messages.add(new ChatMessage(role.value(), userMessage));
     return this;
+  }
+
+  public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestionWithGPT35() {
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonSchemaGenerator jsonSchemaGenerator = new JsonSchemaGenerator(objectMapper);
+    String schemaString;
+    try {
+      JsonSchema schema = jsonSchemaGenerator.generateSchema(AIGeneratedQuestion.class);
+      schemaString = objectMapper.writeValueAsString(schema);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
+
+    addMessage(
+        ChatMessageRole.SYSTEM,
+        "When generating a question, please use this json structure:\n" + schemaString);
+    String messageBody =
+        """
+Please assume the role of a Memory Assistant, which involves helping me review, recall, and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following guidelines:
+
+1. Generate a multiple-choice question based on the note in the current context
+2. Only the top-level context is visible to the user.
+3. Provide 2 to 4 choices with only 1 correct answer.
+4. Vary the lengths of the choice texts so that the correct answer isn't consistently the longest.
+5. If there's insufficient information in the note to create a question, leave the 'stem' field empty.
+
+Note: The specific note of focus and its more detailed contexts are not known. Focus on memory reinforcement and recall across various subjects.
+""";
+    return addMessage(ChatMessageRole.USER, messageBody);
   }
 }

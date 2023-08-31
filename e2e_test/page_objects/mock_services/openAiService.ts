@@ -8,6 +8,7 @@ type FunctionCall = {
   function_call: {
     name: string
     arguments: string
+    content: string // this is temporary, until chat-gpt 3.5 fine tuning support function_call
   }
 }
 
@@ -103,6 +104,7 @@ const openAiService = () => {
             name: functionName,
             arguments: argumentsString,
           },
+          content: argumentsString,
         },
         "function_call",
       )
