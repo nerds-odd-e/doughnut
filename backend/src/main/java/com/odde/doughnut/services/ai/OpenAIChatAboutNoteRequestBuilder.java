@@ -43,7 +43,7 @@ description (until the end of this message):
     return addMessage(ChatMessageRole.SYSTEM, noteOfCurrentFocus);
   }
 
-  public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestionWithGPT4() {
+  public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestionWithFunctionCall() {
     functions.add(
         ChatFunction.builder()
             .name("ask_single_answer_multiple_choice_question")

@@ -51,41 +51,44 @@ public class AiQuestionGenerator {
 
   private AIGeneratedQuestion getValidQuestion(boolean useGPT4)
       throws QuizQuestionNotPossibleException {
-    return AIGeneratedQuestion.getValidQuestion(getAiGeneratedQuestionJson(useGPT4));
+    JsonNode question = useGPT4 ? generateQuestionByGPT4() : generateQuestionByGPT3_5();
+    return AIGeneratedQuestion.getValidQuestion(question);
   }
 
-  private JsonNode getAiGeneratedQuestionJson(boolean useGPT4)
-      throws QuizQuestionNotPossibleException {
-    OpenAIChatAboutNoteRequestBuilder openAIChatAboutNoteRequestBuilder =
+  private JsonNode generateQuestionByGPT3_5() throws QuizQuestionNotPossibleException {
+    ChatCompletionRequest chatRequest =
         new OpenAIChatAboutNoteRequestBuilder(note.getPath())
             .detailsOfNoteOfCurrentFocus(note)
-            .maxTokens(1500);
-    if (useGPT4) {
-      ChatCompletionRequest chatRequest =
-          openAIChatAboutNoteRequestBuilder
-              .userInstructionToGenerateQuestionWithGPT4()
-              .useGPT4()
-              .build();
-      return openAiApiHandler
-          .getFunctionCallArguments(chatRequest)
-          .orElseThrow(QuizQuestionNotPossibleException::new);
-    }
-
-    ChatCompletionRequest chatRequest =
-        openAIChatAboutNoteRequestBuilder.userInstructionToGenerateQuestionWithGPT35().build();
+            .maxTokens(1500)
+            .userInstructionToGenerateQuestionWithGPT35()
+            .build();
 
     return openAiApiHandler
         .chatCompletion(chatRequest)
         .map(ChatCompletionChoice::getMessage)
         .map(ChatMessage::getContent)
-        .map(
-            content -> {
-              try {
-                return new ObjectMapper().readTree(content);
-              } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-              }
-            })
-        .orElse(null);
+        .map(AiQuestionGenerator::getJsonNode)
+        .orElseThrow(QuizQuestionNotPossibleException::new);
+  }
+
+  private JsonNode generateQuestionByGPT4() throws QuizQuestionNotPossibleException {
+    ChatCompletionRequest chatRequest =
+        new OpenAIChatAboutNoteRequestBuilder(note.getPath())
+            .detailsOfNoteOfCurrentFocus(note)
+            .maxTokens(1500)
+            .userInstructionToGenerateQuestionWithFunctionCall()
+            .useGPT4()
+            .build();
+    return openAiApiHandler
+        .getFunctionCallArguments(chatRequest)
+        .orElseThrow(QuizQuestionNotPossibleException::new);
+  }
+
+  private static JsonNode getJsonNode(String content) {
+    try {
+      return new ObjectMapper().readTree(content);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
   }
 }
