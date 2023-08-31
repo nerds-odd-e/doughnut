@@ -5,8 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,11 +24,12 @@ import com.theokanning.openai.image.Image;
 import com.theokanning.openai.image.ImageResult;
 import io.reactivex.Single;
 import java.util.List;
-import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -197,14 +197,12 @@ class RestAiControllerTest {
 
     @Nested
     class WithMockedChatCompletion {
-      ChatCompletionRequest requestForQuestion;
+      @Captor private ArgumentCaptor<ChatCompletionRequest> captor;
 
       @BeforeEach
       void setup() throws JsonProcessingException {
-        mockChatCompletionWithFunctionCall(
-            "ask_single_answer_multiple_choice_question",
-            (request) -> requestForQuestion = request,
-            jsonQuestion);
+        mockChatCompletionForFunctionCall(
+            "ask_single_answer_multiple_choice_question", jsonQuestion);
       }
 
       @Nested
@@ -218,48 +216,33 @@ class RestAiControllerTest {
         }
 
         @Test
-        void usingGPT3_5() throws JsonProcessingException {
-          mockChatCompletionWithFunctionCall(
-              "evaluate_question", null, new ObjectMapper().writeValueAsString(questionEvaluation));
+        void usingGPT3_5_WillCallAPIAgainToReEvaluateTheQuestion() throws JsonProcessingException {
+          mockChatCompletionForFunctionCall(
+              "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
           controller.generateQuestion(note);
-          assertThat(requestForQuestion.getModel()).isEqualTo("gpt-3.5-turbo-16k");
-        }
-
-        @Test
-        void askAiToEvaluateTheQuestionAgain() throws JsonProcessingException {
-          mockChatCompletionWithFunctionCall(
-              "evaluate_question",
-              (request) -> assertThat(request.getModel()).isEqualTo("gpt-3.5-turbo-16k"),
-              new ObjectMapper().writeValueAsString(questionEvaluation));
-          controller.generateQuestion(note);
+          verify(openAiApi, times(2)).createChatCompletion(captor.capture());
+          assertThat(captor.getAllValues().get(0).getModel()).isEqualTo("gpt-3.5-turbo-16k");
+          assertThat(captor.getAllValues().get(1).getModel()).isEqualTo("gpt-3.5-turbo-16k");
         }
 
         @Test
         void tryWithGPT4IfTheEvaluationIsIncorrect() throws JsonProcessingException {
           questionEvaluation.correctChoices = new int[] {0, 1};
-          mockChatCompletionWithFunctionCall(
-              "evaluate_question", null, new ObjectMapper().writeValueAsString(questionEvaluation));
+          mockChatCompletionForFunctionCall(
+              "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
           controller.generateQuestion(note);
-          assertThat(requestForQuestion.getModel()).isEqualTo("gpt-4");
+          verify(openAiApi, times(3)).createChatCompletion(captor.capture());
+          assertThat(captor.getAllValues().get(2).getModel()).isEqualTo("gpt-4");
         }
       }
     }
 
-    private void mockChatCompletionWithFunctionCall(
-        String functionName, Consumer<ChatCompletionRequest> consumer, String result)
+    private void mockChatCompletionForFunctionCall(String functionName, String result)
         throws JsonProcessingException {
-      when(openAiApi.createChatCompletion(
-              argThat(
-                  request -> {
-                    if (request == null) return false;
-                    boolean askSingleAnswerMultipleChoiceQuestion =
-                        request.getFunctions().get(0).getName().equals(functionName);
-                    if (askSingleAnswerMultipleChoiceQuestion && consumer != null) {
-                      consumer.accept(request);
-                    }
-                    return askSingleAnswerMultipleChoiceQuestion;
-                  })))
-          .thenReturn(buildCompletionResultForFunctionCall(result));
+      doReturn(buildCompletionResultForFunctionCall(result))
+          .when(openAiApi)
+          .createChatCompletion(
+              argThat(request -> request.getFunctions().get(0).getName().equals(functionName)));
     }
   }
 
