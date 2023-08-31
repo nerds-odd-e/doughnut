@@ -19,7 +19,7 @@
     "lodash": "^4.17",
     "mini-debounce": "^1.0.8",
     "quill": "2.0.0-dev.4",
-    "unplugin-vue-components": "0.25.1",
+    "unplugin-vue-components": "0.25.2",
     "vue": "3.3.4",
     "vue-content-loader": "2.0.1",
     "vue-router": "4.2.4"
