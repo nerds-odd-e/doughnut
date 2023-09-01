@@ -2,6 +2,7 @@ import { merge } from "lodash";
 import Builder from "./Builder";
 import LinkViewedBuilder from "./LinkViewedBuilder";
 import NoteBuilder from "./NoteBuilder";
+import NotePositionBuilder from "./NotePositionBuilder";
 
 class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
   data: Generated.NoteRealm;
@@ -17,6 +18,7 @@ class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
       note: noteData,
       links: {},
       children: [],
+      notePosition: new NotePositionBuilder().for(noteData).please(),
     };
   }
 

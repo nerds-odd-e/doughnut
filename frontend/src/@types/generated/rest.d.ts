@@ -99,6 +99,7 @@ declare namespace Generated {
         links: { [P in LinkType]?: LinkViewed };
         children: Note[];
         note: Note;
+        notePosition: NotePositionViewedByUser;
     }
 
     interface NoteRealmWithPosition {

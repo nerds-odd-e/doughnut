@@ -30,6 +30,7 @@ public class NoteViewer {
     nvb.setLinks(getAllLinks());
     nvb.setChildren(note.getChildren());
     nvb.setNote(note);
+    nvb.setNotePosition(jsonNotePosition(false));
 
     return nvb;
   }

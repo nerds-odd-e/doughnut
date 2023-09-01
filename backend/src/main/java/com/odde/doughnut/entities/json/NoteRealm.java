@@ -15,4 +15,6 @@ public class NoteRealm {
   @Getter @Setter private List<Note> children;
 
   @Getter @Setter private Note note;
+
+  @Getter @Setter private NotePositionViewedByUser notePosition;
 }
