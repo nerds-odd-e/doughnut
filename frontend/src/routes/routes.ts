@@ -30,7 +30,7 @@ const noteAndLinkRoutes = [
     name: "noteShow",
     component: NoteShowPage,
     props: (route: RouteLocation) => ({ noteId: Number(route.params.noteId) }),
-    meta: { useNoteStorageAccessor: true, viewType: "card" },
+    meta: { useNoteStorageAccessor: true },
   },
 
   {

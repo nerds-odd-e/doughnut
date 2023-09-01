@@ -1,5 +1,4 @@
 <template>
-  <ViewTypeButtons v-bind="{ viewType, noteId: selectedNote.id }" />
   <NoteNewButton
     button-title="Add Child Note"
     v-bind="{ parentId: selectedNote.id, storageAccessor }"
@@ -75,8 +74,6 @@ import SvgWikidata from "../svgs/SvgWikidata.vue";
 import WikidataAssociationDialog from "../notes/WikidataAssociationDialog.vue";
 import SvgSearch from "../svgs/SvgSearch.vue";
 import LinkNoteDialog from "../links/LinkNoteDialog.vue";
-import ViewTypeButtons from "./ViewTypeButtons.vue";
-import { sanitizeViewTypeName } from "../../models/viewTypes";
 import SvgCog from "../svgs/SvgCog.vue";
 import NoteDeleteButton from "./NoteDeleteButton.vue";
 import PopButton from "../commons/Popups/PopButton.vue";
@@ -105,7 +102,6 @@ export default defineComponent({
     WikidataAssociationDialog,
     SvgSearch,
     LinkNoteDialog,
-    ViewTypeButtons,
     SvgCog,
     NoteDeleteButton,
     PopButton,
@@ -113,11 +109,6 @@ export default defineComponent({
     AISuggestDescriptionButton,
     NoteChatDialog,
     SvgClipboard,
-  },
-  computed: {
-    viewType() {
-      return sanitizeViewTypeName(this.$route.meta?.viewType as string);
-    },
   },
 });
 </script>

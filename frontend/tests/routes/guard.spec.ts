@@ -10,13 +10,10 @@ describe("router guards", () => {
     next = vi.fn();
   });
   it("when in repeat, go to nested noteShow", async () => {
-    await guard(
-      { name: "noteShow", params: { noteId: 3, viewType: "cards" } },
-      next,
-    );
+    await guard({ name: "noteShow", params: { noteId: 3 } }, next);
     expect(next).toHaveBeenCalledWith({
       name: "repeat-noteShow",
-      params: { noteId: 3, viewType: "cards" },
+      params: { noteId: 3 },
     });
   });
 
