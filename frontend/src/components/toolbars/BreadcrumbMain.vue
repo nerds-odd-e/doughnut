@@ -6,15 +6,6 @@
       circle: storageAccessor.circle,
     }"
   >
-    <template #head>
-      <PopButton title="choose a circle" :sidebar="'left'">
-        <template #button_face>
-          <SvgForward />
-        </template>
-        <CircleSelector />
-      </PopButton>
-    </template>
-
     <NoteNewButton
       v-if="parentId && !readonly"
       v-bind="{ parentId, storageAccessor }"
@@ -47,9 +38,6 @@ export default defineComponent({
     NoteNewButton,
     Breadcrumb,
     SvgAddSibling,
-    PopButton,
-    SvgForward,
-    CircleSelector,
   },
   computed: {
     parentId() {

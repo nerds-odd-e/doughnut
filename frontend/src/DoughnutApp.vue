@@ -8,6 +8,7 @@ import usePopups from "./components/commons/Popups/usePopups";
 import ControlCenter from "./components/toolbars/ControlCenter.vue";
 import createNoteStorage from "./store/createNoteStorage";
 import ManagedApi, { ApiStatus } from "./managedApi/ManagedApi";
+import GlobalBar from "./components/toolbars/GlobalBar.vue";
 
 export default defineComponent({
   setup() {
@@ -41,8 +42,8 @@ export default defineComponent({
     TestMenu,
     UserNewRegisterPage,
     ControlCenter,
+    GlobalBar,
   },
-
   watch: {
     $route() {
       this.popups.done(false);
@@ -90,6 +91,7 @@ export default defineComponent({
     <template v-else>
       <template v-if="userLoaded">
         <div class="header">
+          <GlobalBar />
           <ControlCenter
             v-bind="{ storageAccessor, user, apiStatus }"
             @update-user="user = $event"
