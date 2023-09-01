@@ -213,7 +213,8 @@ class RestAiControllerTest {
             "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
         controller.generateQuestion(note);
         verify(openAiApi, times(2)).createChatCompletion(captor.capture());
-        assertThat(captor.getAllValues().get(0).getModel()).isEqualTo("gpt-3.5-turbo-16k");
+        assertThat(captor.getAllValues().get(0).getModel())
+            .isEqualTo("ft:gpt-3.5-turbo-0613:odd-e::7tXeDEiJ");
         assertThat(captor.getAllValues().get(1).getModel()).isEqualTo("gpt-3.5-turbo-16k");
       }
 

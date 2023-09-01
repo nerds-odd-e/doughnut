@@ -140,6 +140,7 @@ please critically check if the following question makes sense and is possible to
   }
 
   public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestionWithGPT35() {
+    this.model = "ft:gpt-3.5-turbo-0613:odd-e::7tXeDEiJ";
     ObjectMapper objectMapper = new ObjectMapper();
     JsonSchemaGenerator jsonSchemaGenerator = new JsonSchemaGenerator(objectMapper);
     String schemaString;
@@ -154,17 +155,8 @@ please critically check if the following question makes sense and is possible to
         ChatMessageRole.SYSTEM,
         "When generating a question, please use this json structure:\n" + schemaString);
     String messageBody =
-        """
-Please assume the role of a Memory Assistant, which involves helping me review, recall, and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following guidelines:
+        "Please assume the role of a Memory Assistant, which involves helping me review, recall, and reinforce information from my notes. Generate a multiple-choice question based on the note in the current context\n";
 
-1. Generate a multiple-choice question based on the note in the current context
-2. Only the top-level context is visible to the user.
-3. Provide 2 to 4 choices with only 1 correct answer.
-4. Vary the lengths of the choice texts so that the correct answer isn't consistently the longest.
-5. If there's insufficient information in the note to create a question, leave the 'stem' field empty.
-
-Note: The specific note of focus and its more detailed contexts are not known. Focus on memory reinforcement and recall across various subjects.
-""";
     return addMessage(ChatMessageRole.USER, messageBody);
   }
 }
