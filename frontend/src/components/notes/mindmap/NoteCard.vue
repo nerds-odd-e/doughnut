@@ -6,14 +6,12 @@
     :aria-label="note.title"
     :style="`top:${coord.y}px; left:${coord.x}px`"
   >
-    <NoteContent v-bind="{ note, size, storageAccessor }" />
   </NoteShell>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import NoteShell from "../NoteShell.vue";
-import NoteContent from "../NoteContent.vue";
 import MindmapSector from "../../../models/MindmapSector";
 import Mindmap from "../../../models/Mindmap";
 import { StorageAccessor } from "../../../store/createNoteStorage";
@@ -30,7 +28,6 @@ export default defineComponent({
   },
   components: {
     NoteShell,
-    NoteContent,
   },
   computed: {
     coord() {

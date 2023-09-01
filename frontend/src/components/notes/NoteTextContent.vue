@@ -15,20 +15,11 @@
     <DescriptionEditor
       :multiple-line="true"
       role="description"
-      v-if="size === 'large'"
       class="note-description"
       scope-name="note"
       :model-value="localTextContent.description"
       @update:model-value="onUpdateDescription"
       @blur="onBlurTextField"
-    />
-    <NoteShortDescription
-      v-if="size === 'medium'"
-      :description="localTextContent.description"
-    />
-    <SvgDescriptionIndicator
-      v-if="size === 'small' && !!localTextContent.description"
-      class="description-indicator"
     />
     <slot name="note-content-other" />
   </div>
@@ -37,8 +28,6 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { debounce, DebouncedFunc } from "lodash";
-import NoteShortDescription from "./NoteShortDescription.vue";
-import SvgDescriptionIndicator from "../svgs/SvgDescriptionIndicator.vue";
 import EditableText from "../form/EditableText.vue";
 import DescriptionEditor from "../form/DescriptionEditor.vue";
 import type { StorageAccessor } from "../../store/createNoteStorage";
@@ -57,15 +46,12 @@ export default defineComponent({
       type: Object as PropType<Generated.TextContent>,
       required: true,
     },
-    size: { type: String, default: "large" },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,
     },
   },
   components: {
-    NoteShortDescription,
-    SvgDescriptionIndicator,
     EditableText,
     DescriptionEditor,
   },
