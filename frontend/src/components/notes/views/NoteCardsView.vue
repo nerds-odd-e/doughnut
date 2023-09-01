@@ -37,6 +37,7 @@ export default defineComponent({
     noteId: { type: Number, required: true },
     expandChildren: { type: Boolean, required: true },
     expandInfo: { type: Boolean, default: false },
+    readonly: { type: Boolean, default: true },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,
