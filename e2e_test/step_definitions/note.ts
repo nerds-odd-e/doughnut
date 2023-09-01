@@ -249,69 +249,6 @@ When("I open the {string} view of note {string}", (viewType: string, noteTitle: 
   cy.selectViewOfNote(noteTitle, viewType)
 })
 
-When("I click note {string} avoiding the title", (noteTitle: string) => {
-  cy.findByRole("card", { name: noteTitle }).click("bottomRight", {
-    force: true,
-  })
-})
-
-When(
-  "The note {string} {string} have the description indicator",
-  (noteTitle: string, shouldOrNot: string) => {
-    cy.findByRole("card", { name: noteTitle }).within(() =>
-      cy.get(".description-indicator").should(shouldOrNot === "should" ? "exist" : "not.exist"),
-    )
-  },
-)
-
-When("I drag the map by {int}px * {int}px", (dx: number, dy: number) => {
-  cy.get(".mindmap-event-receiver")
-    .trigger("pointerdown", "topLeft")
-    .trigger("pointermove", "topLeft", { clientX: dx, clientY: dy })
-    .trigger("pointerup", { force: true })
-})
-
-When("I drag the map by {int}px * {int}px when holding the shift button", (dx, dy) => {
-  cy.get(".mindmap-event-receiver")
-    .trigger("pointerdown", "topLeft")
-    .trigger("pointermove", "topLeft", {
-      shiftKey: true,
-      clientX: dx,
-      clientY: dy,
-    })
-    .trigger("pointerup", { force: true })
-})
-
-When("I zoom in at the {string}", (position: string) => {
-  cy.get(".mindmap-event-receiver").trigger("wheel", Number(position), {
-    clientX: 0,
-    clientY: 0,
-    deltaY: 50,
-  })
-})
-
-When("I should see the zoom scale is {string}", (scale: string) => {
-  cy.get(".mindmap-info").findByText(scale)
-})
-
-When("I click the zoom indicator", () => {
-  cy.get(".mindmap-info").click()
-})
-
-When(
-  "I should see the notes {string} are around note {string} and apart from each other",
-  (noteTitles: string, parentNoteTitle: string) => {
-    const titles = noteTitles.commonSenseSplit(",")
-    cy.findMindmapCardTitle(titles[titles.length - 1])
-    cy.withinMindmap().then((cards) => {
-      titles.forEach((noteTitle: string) => {
-        cy.distanceBetweenCardsGreaterThan(cards, parentNoteTitle, noteTitle, 100)
-      })
-      cy.distanceBetweenCardsGreaterThan(cards, titles[0], titles[1], 100)
-    })
-  },
-)
-
 Then("I should see the title {string} of the notebook", (noteTitle: string) => {
   cy.findNoteTitle(noteTitle)
 })

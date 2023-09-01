@@ -395,8 +395,6 @@ Cypress.Commands.add("findNoteDescriptionOnCurrentPage", (expected: string) => {
 
 Cypress.Commands.add("findCardTitle", (title) => cy.findByText(title, { selector: "a.card-title" }))
 
-Cypress.Commands.add("findMindmapCardTitle", (title) => cy.findByText(title))
-
 Cypress.Commands.add("yesIRemember", () => {
   cy.tick(11 * 1000).then(() => {
     cy.findByRole("button", { name: "Yes, I remember" }).click()
@@ -517,32 +515,6 @@ Cypress.Commands.add("assertBlogPostInWebsiteByTitle", (article) => {
 
 Cypress.Commands.add("failure", () => {
   throw new Error("Deliberate CYPRESS test Failure!!!")
-})
-
-Cypress.Commands.add("withinMindmap", () => {
-  cy.pageIsNotLoading()
-  cy.wrap(
-    new Promise((resolve) => {
-      cy.get(`.box .inner-box .content`).then((mindmap) => {
-        const rect = mindmap[0].getBoundingClientRect()
-        cy.get("[role='card']").then(($elms) => {
-          const cards = Object.fromEntries(
-            Cypress.$.makeArray($elms).map((el) => [el.innerText, el.getBoundingClientRect()]),
-          )
-          cards.mindmapRect = rect
-          resolve(cards)
-        })
-      })
-    }),
-  )
-})
-
-Cypress.Commands.add("distanceBetweenCardsGreaterThan", (cards, note1, note2, min) => {
-  const rect1 = cards[note1]
-  const rect2 = cards[note2]
-  const xd = (rect1.right + rect1.left) / 2 - (rect2.right + rect2.left) / 2
-  const yd = (rect1.top + rect1.bottom) / 2 - (rect2.top + rect2.bottom) / 2
-  expect(Math.sqrt(xd * xd + yd * yd)).greaterThan(min)
 })
 
 Cypress.Commands.add("notePageButtonOnCurrentPage", (btnTextOrTitle) => {

@@ -25,7 +25,6 @@ declare namespace Cypress {
     clickRadioByLabel(labelText: any): Chainable<any>
     deleteNoteViaAPI(): Chainable<Subject>
     dialogDisappeared(): Chainable<any>
-    distanceBetweenCardsGreaterThan(cards: any, note1: any, note2: any, min: any): Chainable<any>
     expectBreadcrumb(item: string, addChildButton: boolean = true): Chainable<any>
     expectExactLinkTargets(targets: any): Chainable<any>
     expectFieldErrorMessage(field: string, message: string): Chainable<any>
@@ -33,7 +32,6 @@ declare namespace Cypress {
     findNoteTitle(title: string): Chainable<any>
     findNoteDescriptionOnCurrentPage(title: string): Chainable<any>
     findCardTitle(title: string): Chainable<any>
-    findMindmapCardTitle(title: string): Chainable<any>
     findWikiAssociationButton(): Chainable<any>
     expectALinkThatOpensANewWindowWithURL(url: string): Chainable<any>
     expectAMapTo(latitude: string, longitude: string): Chainable<any>
@@ -103,7 +101,6 @@ declare namespace Cypress {
     unsubscribeFromNotebook(noteTitle: string): Chainable<any>
     updateCurrentUserSettingsWith(hash: Record<string, string>): Chainable<Subject>
     setServiceUrl(serviceName: string, serviceUrl: string): Chainable<any>
-    withinMindmap(): Chainable<any>
     yesIRemember(): Chainable<any>
     aiGenerateImage(noteTitle: string): Chainable<any>
     aiSuggestDescriptionForNote(noteTitle: string): Chainable<any>
