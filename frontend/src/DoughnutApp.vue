@@ -91,13 +91,12 @@ export default defineComponent({
     <template v-else>
       <template v-if="userLoaded">
         <div class="header">
-          <GlobalBar v-bind="{ storageAccessor, user, apiStatus }" />
-          <ControlCenter
-            v-if="user"
-            v-bind="{ storageAccessor }"
+          <GlobalBar
+            v-bind="{ storageAccessor, user, apiStatus }"
             @update-user="user = $event"
             @clear-error-message="clearErrorMessage($event)"
           />
+          <ControlCenter v-if="user" v-bind="{ storageAccessor }" />
         </div>
         <router-view v-bind="routeViewProps" />
       </template>
