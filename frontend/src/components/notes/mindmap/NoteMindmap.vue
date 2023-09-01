@@ -37,7 +37,6 @@
           mindmap,
           storageAccessor,
         }"
-        @highlight="$emit('selectNote', $event)"
       />
     </template>
   </NoteMindmapScaffold>
@@ -77,7 +76,6 @@ export default defineComponent({
     NoteParentChildConnection,
     NoteLinks,
   },
-  emits: ["selectNote"],
   computed: {
     mindmapSector() {
       return new MindmapSector(

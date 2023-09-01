@@ -5,7 +5,6 @@
     role="card"
     :aria-label="note.title"
     :style="`top:${coord.y}px; left:${coord.x}px`"
-    @click="$emit('highlight', note.id)"
   >
     <NoteContent v-bind="{ note, size, storageAccessor }" />
   </NoteShell>
@@ -29,7 +28,6 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["highlight"],
   components: {
     NoteShell,
     NoteContent,

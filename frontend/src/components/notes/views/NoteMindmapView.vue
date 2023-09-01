@@ -8,7 +8,6 @@
           offset,
           storageAccessor,
         }"
-        @select-note="$emit('selectNote', $event)"
       />
     </div>
     <div class="mindmap-info" @click.prevent="reset">
@@ -40,7 +39,6 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["selectNote"],
   data() {
     return {
       offset: { ...defaultOffset },
