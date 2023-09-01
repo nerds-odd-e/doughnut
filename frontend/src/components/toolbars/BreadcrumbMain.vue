@@ -22,9 +22,6 @@ import NoteNewButton from "./NoteNewButton.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import Breadcrumb from "./Breadcrumb.vue";
 import SvgAddSibling from "../svgs/SvgAddSibling.vue";
-import PopButton from "../commons/Popups/PopButton.vue";
-import SvgForward from "../svgs/SvgForward.vue";
-import CircleSelector from "../circles/CircleSelector.vue";
 
 export default defineComponent({
   props: {
