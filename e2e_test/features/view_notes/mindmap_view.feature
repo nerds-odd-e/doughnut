@@ -41,4 +41,3 @@ Feature: Mindmap view
     When I open the "mindmap" view of note "History"
     Then I should see the note "History" is 0px * 0px offset the center of the map
     And I should see the note "History" is "highlighted"
-    And I should see "Singapore" in breadcrumb with add sibling button

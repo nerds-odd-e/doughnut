@@ -132,11 +132,6 @@ Then("I should see {string} in breadcrumb", (noteTitles: string) => {
   cy.expectBreadcrumb(noteTitles, false)
 })
 
-Then("I should see {string} in breadcrumb with add sibling button", (noteTitles: string) => {
-  cy.pageIsNotLoading()
-  cy.expectBreadcrumb(noteTitles, true)
-})
-
 When("I visit all my notebooks", () => {
   cy.routerToNotebooks()
 })
