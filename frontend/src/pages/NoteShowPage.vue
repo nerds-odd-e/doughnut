@@ -24,7 +24,7 @@ export default defineComponent({
       type: Object as PropType<StorageAccessor>,
       required: true,
     },
-    user: { type: Object as PropType<Generated.User>, required: true },
+    user: { type: Object as PropType<Generated.User> },
   },
   components: { NoteCardsView },
 });
