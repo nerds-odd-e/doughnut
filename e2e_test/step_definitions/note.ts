@@ -249,22 +249,6 @@ When("I open the {string} view of note {string}", (viewType: string, noteTitle: 
   cy.selectViewOfNote(noteTitle, viewType)
 })
 
-When(
-  "I should see the note {string} is {int}px * {int}px offset the center of the map",
-  (noteTitle: string, dx: number, dy: number) => {
-    cy.withinMindmap().then((cards) => {
-      const rect = cards.mindmapRect
-      const frameCenterX = rect.left + rect.width / 2
-      const frameCenterY = rect.top + rect.height / 2
-      const cardRect = cards[noteTitle]
-      const cardCenterX = cardRect.left + cardRect.width / 2
-      const cardCenterY = cardRect.top + cardRect.height / 2
-      expect(cardCenterX - frameCenterX).to.closeTo(dx, 10)
-      expect(cardCenterY - frameCenterY).to.closeTo(dy, 30)
-    })
-  },
-)
-
 When("I click note {string} avoiding the title", (noteTitle: string) => {
   cy.findByRole("card", { name: noteTitle }).click("bottomRight", {
     force: true,

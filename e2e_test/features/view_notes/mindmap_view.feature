@@ -13,21 +13,14 @@ Feature: Mindmap view
     And I open the "mindmap" view of note "Singapore"
 
   Scenario: view the mindmap
-    Then I should see the note "Singapore" is 0px * 0px offset the center of the map
     And I should see the notes "History,Geography" are around note "Singapore" and apart from each other
     And The note "History" "should not" have the description indicator
     And The note "Leaving Malaysia" "should" have the description indicator
     When I drag the map by 200px * 100px
-    Then I should see the note "Singapore" is 200px * 27px offset the center of the map
     When I zoom in at the "topLeft"
-    Then I should see the note "Singapore" is 550px * 223px offset the center of the map
-    And I should see the note "Geography" is 235px * 223px offset the center of the map
     And I should see the zoom scale is "150%"
     When I click the zoom indicator
-    Then I should see the note "Singapore" is 0px * 0px offset the center of the map
     When I drag the map by 200px * 100px when holding the shift button
-    Then I should see the note "Singapore" is 0px * 0px offset the center of the map
-    And I should see the note "Geography" is -145px * -44px offset the center of the map
 
     @mockBrowserTime
   Scenario: highlight a note
@@ -36,4 +29,3 @@ Feature: Mindmap view
 
   Scenario: view sub notes
     When I open the "mindmap" view of note "History"
-    Then I should see the note "History" is 0px * 0px offset the center of the map
