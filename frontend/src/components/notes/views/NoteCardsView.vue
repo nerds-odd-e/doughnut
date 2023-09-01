@@ -11,6 +11,9 @@
             <SvgAddSibling />
           </NoteNewButton>
         </Breadcrumb>
+        <ControlCenterForNote
+          v-bind="{ selectedNote: noteRealm.note, storageAccessor }"
+        />
         <NoteWithLinks
           v-bind="{
             note: noteRealm.note,
@@ -40,6 +43,7 @@ import NoteWithLinks from "../NoteWithLinks.vue";
 import Cards from "../Cards.vue";
 import NoteInfoButton from "../NoteInfoButton.vue";
 import Breadcrumb from "../../toolbars/Breadcrumb.vue";
+import ControlCenterForNote from "../../toolbars/ControlCenterForNote.vue";
 import { StorageAccessor } from "../../../store/createNoteStorage";
 
 export default defineComponent({
@@ -59,6 +63,7 @@ export default defineComponent({
     Cards,
     NoteInfoButton,
     Breadcrumb,
+    ControlCenterForNote,
   },
 });
 </script>

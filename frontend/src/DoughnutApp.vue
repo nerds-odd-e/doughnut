@@ -5,7 +5,6 @@ import TestMenu from "./components/commons/TestMenu.vue";
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
 import { withLoadingApi } from "./managedApi/useLoadingApi";
 import usePopups from "./components/commons/Popups/usePopups";
-import ControlCenter from "./components/toolbars/ControlCenter.vue";
 import createNoteStorage from "./store/createNoteStorage";
 import ManagedApi, { ApiStatus } from "./managedApi/ManagedApi";
 import GlobalBar from "./components/toolbars/GlobalBar.vue";
@@ -41,7 +40,6 @@ export default defineComponent({
     Popups,
     TestMenu,
     UserNewRegisterPage,
-    ControlCenter,
     GlobalBar,
   },
   watch: {
@@ -96,7 +94,6 @@ export default defineComponent({
             @update-user="user = $event"
             @clear-error-message="clearErrorMessage($event)"
           />
-          <ControlCenter v-if="user" v-bind="{ storageAccessor }" />
         </div>
         <router-view v-bind="routeViewProps" />
       </template>

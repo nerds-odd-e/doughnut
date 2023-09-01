@@ -1,66 +1,70 @@
 <template>
-  <NoteNewButton
-    button-title="Add Child Note"
-    v-bind="{ parentId: selectedNote.id, storageAccessor }"
-  >
-    <SvgAddChild />
-  </NoteNewButton>
-
-  <PopButton title="edit note">
-    <template #button_face>
-      <SvgEdit />
-    </template>
-    <NoteEditAccessoriesDialog
-      v-bind="{ note: selectedNote, storageAccessor }"
-    />
-  </PopButton>
-
-  <PopButton title="associate wikidata">
-    <template #button_face>
-      <SvgWikidata />
-    </template>
-    <WikidataAssociationDialog
-      v-bind="{ note: selectedNote, storageAccessor }"
-    />
-  </PopButton>
-  <AISuggestDescriptionButton v-bind="{ selectedNote, storageAccessor }" />
-  <PopButton title="chat about this note" :sidebar="'right'">
-    <template #button_face>
-      <SvgClipboard />
-    </template>
-    <NoteChatDialog v-bind="{ selectedNote, storageAccessor }" />
-  </PopButton>
-  <PopButton title="search and link note">
-    <template #button_face>
-      <SvgSearch />
-    </template>
-    <LinkNoteDialog v-bind="{ note: selectedNote, storageAccessor }" />
-  </PopButton>
-  <div class="dropdown">
-    <button
-      id="dropdownMenuButton"
-      aria-expanded="false"
-      aria-haspopup="true"
-      class="btn dropdown-toggle"
-      data-bs-toggle="dropdown"
-      role="button"
-      title="more options"
-    >
-      <SvgCog />
-    </button>
-    <div class="dropdown-menu dropdown-menu-end">
-      <PopButton
-        class="dropdown-item btn-primary"
-        title="Generate Image with DALL-E"
+  <ToolbarFrame>
+    <div class="btn-group btn-group-sm">
+      <NoteNewButton
+        button-title="Add Child Note"
+        v-bind="{ parentId: selectedNote.id, storageAccessor }"
       >
-        <AIGenerateImageDialog v-bind="{ selectedNote, storageAccessor }" />
+        <SvgAddChild />
+      </NoteNewButton>
+
+      <PopButton title="edit note">
+        <template #button_face>
+          <SvgEdit />
+        </template>
+        <NoteEditAccessoriesDialog
+          v-bind="{ note: selectedNote, storageAccessor }"
+        />
       </PopButton>
-      <NoteDeleteButton
-        class="dropdown-item"
-        v-bind="{ noteId: selectedNote.id, storageAccessor }"
-      />
+
+      <PopButton title="associate wikidata">
+        <template #button_face>
+          <SvgWikidata />
+        </template>
+        <WikidataAssociationDialog
+          v-bind="{ note: selectedNote, storageAccessor }"
+        />
+      </PopButton>
+      <AISuggestDescriptionButton v-bind="{ selectedNote, storageAccessor }" />
+      <PopButton title="chat about this note" :sidebar="'right'">
+        <template #button_face>
+          <SvgClipboard />
+        </template>
+        <NoteChatDialog v-bind="{ selectedNote, storageAccessor }" />
+      </PopButton>
+      <PopButton title="search and link note">
+        <template #button_face>
+          <SvgSearch />
+        </template>
+        <LinkNoteDialog v-bind="{ note: selectedNote, storageAccessor }" />
+      </PopButton>
+      <div class="dropdown">
+        <button
+          id="dropdownMenuButton"
+          aria-expanded="false"
+          aria-haspopup="true"
+          class="btn dropdown-toggle"
+          data-bs-toggle="dropdown"
+          role="button"
+          title="more options"
+        >
+          <SvgCog />
+        </button>
+        <div class="dropdown-menu dropdown-menu-end">
+          <PopButton
+            class="dropdown-item btn-primary"
+            title="Generate Image with DALL-E"
+          >
+            <AIGenerateImageDialog v-bind="{ selectedNote, storageAccessor }" />
+          </PopButton>
+          <NoteDeleteButton
+            class="dropdown-item"
+            v-bind="{ noteId: selectedNote.id, storageAccessor }"
+          />
+        </div>
+      </div>
     </div>
-  </div>
+  </ToolbarFrame>
 </template>
 
 <script lang="ts">
@@ -79,8 +83,8 @@ import NoteDeleteButton from "./NoteDeleteButton.vue";
 import PopButton from "../commons/Popups/PopButton.vue";
 import AIGenerateImageDialog from "../notes/AIGenerateImageDialog.vue";
 import AISuggestDescriptionButton from "./AISuggestDescriptionButton.vue";
-import NoteChatDialog from "../notes/NoteChatDialog.vue";
 import SvgClipboard from "../svgs/SvgClipboard.vue";
+import NoteChatDialog from "../notes/NoteChatDialog.vue";
 
 export default defineComponent({
   props: {

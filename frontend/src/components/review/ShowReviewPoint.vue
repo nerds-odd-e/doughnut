@@ -27,7 +27,6 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import LinkShow from "../links/LinkShow.vue";
-import NoteCardsView from "../notes/views/NoteCardsView.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
@@ -43,7 +42,7 @@ export default defineComponent({
     },
   },
   emits: ["levelChanged", "selfEvaluated"],
-  components: { LinkShow, NoteCardsView },
+  components: { LinkShow },
   computed: {
     noteId() {
       return this.reviewPoint.thing?.note?.id;
