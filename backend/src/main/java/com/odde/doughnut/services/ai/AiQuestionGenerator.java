@@ -59,8 +59,8 @@ public class AiQuestionGenerator {
     ChatCompletionRequest chatRequest =
         new OpenAIChatAboutNoteRequestBuilder(note.getPath())
             .detailsOfNoteOfCurrentFocus(note)
+            .userInstructionToGenerateQuestionWithGPT35FineTunedModel()
             .maxTokens(1500)
-            .userInstructionToGenerateQuestionWithGPT35()
             .build();
 
     return openAiApiHandler
@@ -75,8 +75,8 @@ public class AiQuestionGenerator {
     ChatCompletionRequest chatRequest =
         new OpenAIChatAboutNoteRequestBuilder(note.getPath())
             .detailsOfNoteOfCurrentFocus(note)
-            .maxTokens(1500)
             .userInstructionToGenerateQuestionWithFunctionCall()
+            .maxTokens(1500)
             .useGPT4()
             .build();
     return openAiApiHandler

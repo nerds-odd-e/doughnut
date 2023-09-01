@@ -139,7 +139,8 @@ please critically check if the following question makes sense and is possible to
     return this;
   }
 
-  public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestionWithGPT35() {
+  public OpenAIChatAboutNoteRequestBuilder
+      userInstructionToGenerateQuestionWithGPT35FineTunedModel() {
     this.model = "ft:gpt-3.5-turbo-0613:odd-e::7tXeDEiJ";
     ObjectMapper objectMapper = new ObjectMapper();
     JsonSchemaGenerator jsonSchemaGenerator = new JsonSchemaGenerator(objectMapper);
