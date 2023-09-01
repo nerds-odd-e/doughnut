@@ -16,7 +16,7 @@
     </template>
 
     <NoteNewButton
-      v-if="parentId && user"
+      v-if="parentId && !readonly"
       v-bind="{ parentId, storageAccessor }"
       button-title="Add Sibling Note"
     >
@@ -41,7 +41,7 @@ export default defineComponent({
       type: Object as PropType<StorageAccessor>,
       required: true,
     },
-    user: { type: Object as PropType<Generated.User> },
+    readonly: { type: Boolean },
   },
   components: {
     NoteNewButton,

@@ -92,7 +92,7 @@ export default defineComponent({
     <template v-else>
       <template v-if="userLoaded">
         <div class="header">
-          <BreadcrumbMain v-bind="{ storageAccessor, user }" />
+          <BreadcrumbMain v-bind="{ storageAccessor, readonly: !user }" />
           <ControlCenter
             v-bind="{ storageAccessor, user, apiStatus }"
             @update-user="user = $event"
