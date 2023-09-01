@@ -1,20 +1,14 @@
 <template>
   <div class="inner-box" :key="noteId">
-    <div class="content" v-if="noteRealm && noteRealmCache">
-      <div class="container">
-        <NoteArticleView
-          v-bind="{ noteId, noteRealms: noteRealmCache, storageAccessor }"
-        />
-      </div>
+    <div class="content">
+      <div class="container">aaa</div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import NoteArticleView from "../components/notes/views/NoteArticleView.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
-import NoteRealmCache from "../store/NoteRealmCache";
 import { StorageAccessor } from "../store/createNoteStorage";
 
 export default defineComponent({
@@ -28,19 +22,6 @@ export default defineComponent({
       required: true,
     },
   },
-  components: {
-    NoteArticleView,
-  },
-  data() {
-    return {
-      noteRealmCache: undefined as NoteRealmCache | undefined,
-    };
-  },
-  computed: {
-    noteRealm() {
-      return this.noteRealmCache?.getNoteRealmById(this.noteId);
-    },
-  },
   methods: {
     async fetchData() {
       const noteWithDescendents =
@@ -49,16 +30,9 @@ export default defineComponent({
         noteWithDescendents.notes[0]?.note,
         noteWithDescendents.notePosition,
       );
-      this.noteRealmCache = new NoteRealmCache(noteWithDescendents);
     },
   },
   watch: {
-    "storageAccessor.updatedNoteRealm": function noteRealmUpdated() {
-      this.noteRealmCache?.updateNoteRealm(
-        this.storageAccessor.updatedNoteRealm,
-      );
-    },
-
     noteId() {
       this.fetchData();
     },
