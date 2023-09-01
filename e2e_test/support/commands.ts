@@ -508,7 +508,7 @@ Cypress.Commands.add("failure", () => {
 })
 
 Cypress.Commands.add("notePageButtonOnCurrentPage", (btnTextOrTitle) => {
-  cy.get(".toolbar").findByRole("button", { name: btnTextOrTitle })
+  cy.findByRole("button", { name: btnTextOrTitle })
 })
 
 Cypress.Commands.add("notePageButtonOnCurrentPageEditNote", () => {
