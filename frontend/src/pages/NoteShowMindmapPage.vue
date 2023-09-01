@@ -1,16 +1,13 @@
 <template>
   <div class="inner-box" :key="noteId">
     <div class="content" v-if="noteRealm && noteRealmCache">
-      <NoteMindmapView
-        v-bind="{ noteId, noteRealms: noteRealmCache, storageAccessor }"
-      />
+      <div v-bind="{ noteId, noteRealms: noteRealmCache, storageAccessor }" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import NoteMindmapView from "../components/notes/views/NoteMindmapView.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
 import NoteRealmCache from "../store/NoteRealmCache";
 import { StorageAccessor } from "../store/createNoteStorage";
@@ -25,9 +22,6 @@ export default defineComponent({
       type: Object as PropType<StorageAccessor>,
       required: true,
     },
-  },
-  components: {
-    NoteMindmapView,
   },
   data() {
     return {
