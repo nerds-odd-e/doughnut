@@ -1,27 +1,24 @@
 <template>
-  <DragListner class="mindmap-event-receiver" v-model="offset">
-    <div class="mindmap">
-      <NoteMindmap
-        v-bind="{
-          noteId,
-          noteRealms,
-          offset,
-          storageAccessor,
-        }"
-      />
-    </div>
-    <div class="mindmap-info" @click.prevent="reset">
-      <span class="scale">{{ scalePercentage }}</span>
-      <span class="offset">{{ offsetMsg }}</span>
-      <span class="offset">{{ rotateMsg }}&deg;</span>
-    </div>
-  </DragListner>
+  <div class="mindmap">
+    <NoteMindmap
+      v-bind="{
+        noteId,
+        noteRealms,
+        offset,
+        storageAccessor,
+      }"
+    />
+  </div>
+  <div class="mindmap-info" @click.prevent="reset">
+    <span class="scale">{{ scalePercentage }}</span>
+    <span class="offset">{{ offsetMsg }}</span>
+    <span class="offset">{{ rotateMsg }}&deg;</span>
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import NoteMindmap from "../mindmap/NoteMindmap.vue";
-import DragListner from "../../commons/DragListner.vue";
 import { NoteRealmsReader } from "../../../store/NoteRealmCache";
 import { StorageAccessor } from "../../../store/createNoteStorage";
 
@@ -44,7 +41,7 @@ export default defineComponent({
       offset: { ...defaultOffset },
     };
   },
-  components: { NoteMindmap, DragListner },
+  components: { NoteMindmap },
   methods: {
     reset() {
       this.offset = { ...defaultOffset };
