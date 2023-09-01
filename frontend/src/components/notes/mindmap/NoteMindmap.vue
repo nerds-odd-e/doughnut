@@ -1,25 +1,4 @@
 <template>
-  <svg class="mindmap-canvas" v-if="noteRealms">
-    <NoteMindmapScaffold v-bind="{ noteId, noteRealms, mindmapSector }">
-      <template #default="{ note, links, mindmapSector }">
-        <NoteParentChildConnection
-          v-bind="{
-            note,
-            mindmap,
-            mindmapSector,
-          }"
-        />
-        <NoteLinks
-          v-bind="{
-            links,
-            mindmap,
-            mindmapSector,
-          }"
-        />
-      </template>
-    </NoteMindmapScaffold>
-  </svg>
-
   <NoteMindmapScaffold v-bind="{ noteId, noteRealms, mindmapSector }">
     <template #default="{ note, mindmapSector }">
       <NoteCard
@@ -38,8 +17,6 @@
 import { defineComponent, PropType } from "vue";
 import NoteMindmapScaffold from "./NoteMindmapScaffold.vue";
 import NoteCard from "./NoteCard.vue";
-import NoteParentChildConnection from "./NoteParentChildConnection.vue";
-import NoteLinks from "./NoteLinks.vue";
 import MindmapSector from "../../../models/MindmapSector";
 import Mindmap from "../../../models/Mindmap";
 import MindmapOffset from "../../../models/MindmapOffset";
@@ -63,8 +40,6 @@ export default defineComponent({
   components: {
     NoteMindmapScaffold,
     NoteCard,
-    NoteParentChildConnection,
-    NoteLinks,
   },
   computed: {
     mindmapSector() {
