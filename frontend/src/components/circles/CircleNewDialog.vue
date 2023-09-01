@@ -21,7 +21,6 @@ export default defineComponent({
   setup() {
     return { ...useLoadingApi(), ...asPopup() };
   },
-  props: { notebook: Object, user: Object },
   components: { TextInput },
   data() {
     return {
