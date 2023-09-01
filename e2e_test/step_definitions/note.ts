@@ -199,14 +199,6 @@ When("I move note {string} left", (noteTitle) => {
   cy.findByRole("button", { name: "Move Left" }).click()
 })
 
-When(
-  "I double click {string} and edit the description to {string}",
-  (oldDescription: string, newDescription: string) => {
-    cy.findByText(oldDescription).click()
-    cy.replaceFocusedTextAndEnter(newDescription)
-  },
-)
-
 When("I should see the screenshot matches", () => {
   // cy.get('.content').compareSnapshot('page-snapshot', 0.001);
 })
@@ -243,25 +235,6 @@ When("I should be asked to log in again when I click the link {string}", (noteTi
   })
   cy.findCardTitle(noteTitle).click()
   cy.get("#username").should("exist")
-})
-
-When("I open the {string} view of note {string}", (viewType: string, noteTitle: string) => {
-  cy.selectViewOfNote(noteTitle, viewType)
-})
-
-Then("I should see the title {string} of the notebook", (noteTitle: string) => {
-  cy.findNoteTitle(noteTitle)
-})
-
-Then("I should see the child notes {string} in order", (notesStr: string) => {
-  const notes = notesStr.split(",")
-  notes.forEach((n) => cy.findByText(n))
-  cy.findAllByRole("title").then((elms) => {
-    let actual: string[] = []
-    elms.map((i, actualNote) => actual.push(actualNote.innerText))
-    actual = actual.filter((c) => notes.includes(c))
-    expect(actual.join(",")).to.equal(notes.join(","))
-  })
 })
 
 Then(

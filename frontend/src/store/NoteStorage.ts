@@ -17,7 +17,6 @@ export class StorageImplementation
   extends CurrentPositionImplementation
   implements NoteStorage
 {
-
   cache: Map<Doughnut.ID, Ref<Generated.NoteRealm | undefined>> = new Map();
 
   focusOnNotebooks(): void {

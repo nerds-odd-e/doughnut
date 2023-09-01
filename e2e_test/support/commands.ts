@@ -75,11 +75,6 @@ Cypress.Commands.add("expectBreadcrumb", (items: string, addChildButton: boolean
   )
 })
 
-Cypress.Commands.add("selectViewOfNote", (noteTitle: string, viewType: string) => {
-  cy.clickNotePageButton(noteTitle, `view type`, true)
-  cy.notePageButtonOnCurrentPage(`${viewType} view`).click()
-})
-
 Cypress.Commands.add("submitNoteCreationFormSuccessfully", (noteAttributes) => {
   cy.submitNoteCreationFormWith(noteAttributes)
   cy.dialogDisappeared()
