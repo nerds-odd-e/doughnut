@@ -104,10 +104,6 @@ export default defineComponent({
 
     selectPosition() {
       if (this.minimized) return;
-      this.storageAccessor.selectPosition(
-        undefined,
-        this.currentQuizQuestion?.notebookPosition,
-      );
     },
 
     async fetchQuestion() {

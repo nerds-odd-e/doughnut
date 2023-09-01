@@ -77,14 +77,11 @@ export default defineComponent({
   },
 
   methods: {
-    fetchData() {
+    async fetchData() {
       this.timer = setTimeout(() => {
         this.fetchData();
       }, 5000);
-      this.api.circleMethods.getCircle(this.circleId).then((res) => {
-        this.circle = res;
-        this.storageAccessor.selectPosition(undefined, undefined, res);
-      });
+      this.circle = await this.api.circleMethods.getCircle(this.circleId);
     },
   },
 

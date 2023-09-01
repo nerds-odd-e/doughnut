@@ -2,7 +2,7 @@
   <NoteRealmLoader v-bind="{ noteId, storageAccessor }">
     <template #default="{ noteRealm }">
       <div class="inner-box" v-if="noteRealm" :key="noteId">
-        <Breadcrumb v-bind="noteRealm.notePosition">
+        <BreadcrumbAsync v-bind="{ noteId }">
           <NoteNewButton
             v-if="noteRealm.note.parentId && !readonly"
             v-bind="{ parentId: noteRealm.note.parentId, storageAccessor }"
@@ -10,7 +10,7 @@
           >
             <SvgAddSibling />
           </NoteNewButton>
-        </Breadcrumb>
+        </BreadcrumbAsync>
         <NoteWithLinks
           v-bind="{
             note: noteRealm.note,
@@ -39,7 +39,7 @@ import { defineComponent, PropType } from "vue";
 import NoteWithLinks from "../NoteWithLinks.vue";
 import Cards from "../Cards.vue";
 import NoteInfoButton from "../NoteInfoButton.vue";
-import Breadcrumb from "../../toolbars/Breadcrumb.vue";
+import BreadcrumbAsync from "../../toolbars/BreadcrumbAsync.vue";
 import { StorageAccessor } from "../../../store/createNoteStorage";
 
 export default defineComponent({
@@ -58,7 +58,7 @@ export default defineComponent({
     NoteWithLinks,
     Cards,
     NoteInfoButton,
-    Breadcrumb,
+    BreadcrumbAsync,
   },
 });
 </script>

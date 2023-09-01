@@ -5,11 +5,7 @@ import CurrentPosition, {
 
 export default interface NoteStorage extends CurrentPosition {
   focusOnNotebooks(): void;
-  selectPosition(
-    note?: Generated.Note,
-    notePosition?: Generated.NotePositionViewedByUser,
-    circle?: Generated.Circle,
-  ): void;
+  selectPosition(note?: Generated.Note): void;
   refreshNoteRealm(data: Generated.NoteRealm): Generated.NoteRealm;
 }
 
