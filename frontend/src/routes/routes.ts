@@ -3,7 +3,6 @@ import HomePage from "@/pages/HomePage.vue";
 import BazaarPage from "@/pages/BazaarPage.vue";
 import NotebooksPage from "@/pages/NotebooksPage.vue";
 import NoteShowPage from "@/pages/NoteShowPage.vue";
-import NoteShowMindmapPage from "@/pages/NoteShowMindmapPage.vue";
 import NoteShowArticlePage from "@/pages/NoteShowArticlePage.vue";
 import ReviewHome from "@/pages/ReviewHome.vue";
 import RepeatPage from "@/pages/RepeatPage.vue";
@@ -33,14 +32,6 @@ const noteAndLinkRoutes = [
     component: NoteShowPage,
     props: (route: RouteLocation) => ({ noteId: Number(route.params.noteId) }),
     meta: { useNoteStorageAccessor: true, viewType: "card" },
-  },
-
-  {
-    path: `notes/mindmap/:noteId`,
-    name: "noteShowMindmap",
-    component: NoteShowMindmapPage,
-    props: (route: RouteLocation) => ({ noteId: Number(route.params.noteId) }),
-    meta: { useNoteStorageAccessor: true, viewType: "mindmap" },
   },
 
   {
