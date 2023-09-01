@@ -32,12 +32,8 @@ Feature: Mindmap view
     @mockBrowserTime
   Scenario: highlight a note
     When I click note "History" avoiding the title
-    Then I should see the note "History" is "highlighted"
     When I click note "Singapore" avoiding the title
-    Then I should see the note "Singapore" is "highlighted"
-    And I should see the note "History" is "not highlighted"
 
   Scenario: view sub notes
     When I open the "mindmap" view of note "History"
     Then I should see the note "History" is 0px * 0px offset the center of the map
-    And I should see the note "History" is "highlighted"

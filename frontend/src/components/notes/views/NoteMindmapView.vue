@@ -3,7 +3,6 @@
     <div class="mindmap">
       <NoteMindmap
         v-bind="{
-          highlightNoteId,
           noteId,
           noteRealms,
           offset,
@@ -40,7 +39,6 @@ export default defineComponent({
       type: Object as PropType<StorageAccessor>,
       required: true,
     },
-    highlightNoteId: Number,
   },
   emits: ["selectNote"],
   data() {

@@ -280,16 +280,6 @@ When(
   },
 )
 
-When(
-  "I should see the note {string} is {string}",
-  (noteTitle: string, highlightedOrNot: string) => {
-    cy.findByRole("card", { name: noteTitle }).should(
-      `${highlightedOrNot === "highlighted" ? "" : "not."}have.class`,
-      "highlighted",
-    )
-  },
-)
-
 When("I drag the map by {int}px * {int}px", (dx: number, dy: number) => {
   cy.get(".mindmap-event-receiver")
     .trigger("pointerdown", "topLeft")

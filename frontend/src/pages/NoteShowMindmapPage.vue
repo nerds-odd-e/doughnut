@@ -3,8 +3,6 @@
     <div class="content" v-if="noteRealm && noteRealmCache">
       <NoteMindmapView
         v-bind="{ noteId, noteRealms: noteRealmCache, storageAccessor }"
-        :highlight-note-id="selectedNoteId"
-        @select-note="highlight($event)"
       />
     </div>
   </div>
@@ -34,7 +32,6 @@ export default defineComponent({
   data() {
     return {
       noteRealmCache: undefined as NoteRealmCache | undefined,
-      selectedNoteId: undefined as Doughnut.ID | undefined,
     };
   },
   computed: {
@@ -45,9 +42,6 @@ export default defineComponent({
   methods: {
     onNoteDeleted(deletedNoteId: Doughnut.ID) {
       this.noteRealmCache?.deleteNoteAndDescendents(deletedNoteId);
-    },
-    highlight(id: Doughnut.ID) {
-      this.selectedNoteId = id;
     },
     async fetchData() {
       this.noteRealmCache = new NoteRealmCache(
@@ -67,7 +61,6 @@ export default defineComponent({
   },
   async mounted() {
     await this.fetchData();
-    this.highlight(this.noteId);
   },
 });
 </script>

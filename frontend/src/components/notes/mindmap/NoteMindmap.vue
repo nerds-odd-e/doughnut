@@ -35,7 +35,6 @@
           note,
           mindmapSector,
           mindmap,
-          highlightNoteId,
           storageAccessor,
         }"
         @highlight="$emit('selectNote', $event)"
@@ -60,7 +59,6 @@ import { StorageAccessor } from "../../../store/createNoteStorage";
 export default defineComponent({
   name: "NoteMindmap",
   props: {
-    highlightNoteId: Number,
     noteId: { type: Number, required: true },
     noteRealms: {
       type: Object as PropType<NoteRealmsReader>,
