@@ -1,14 +1,6 @@
 <template>
   <ToolbarFrame>
     <div class="btn-group btn-group-sm">
-      <template v-if="!selectedNote">
-        <PopButton title="search note">
-          <template #button_face>
-            <SvgSearch />
-          </template>
-          <LinkNoteDialog v-bind="{ storageAccessor }" />
-        </PopButton>
-      </template>
       <ControlCenterForNote
         v-if="selectedNote"
         v-bind="{ selectedNote, storageAccessor }"

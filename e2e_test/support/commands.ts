@@ -400,6 +400,7 @@ Cypress.Commands.add("openCirclesSelector", () => {
 
 Cypress.Commands.add("navigateToCircle", (circleName) => {
   cy.routerToRoot()
+  cy.pageIsNotLoading()
   cy.openCirclesSelector()
   cy.findByText(circleName, { selector: ".modal-body a" }).click()
 })

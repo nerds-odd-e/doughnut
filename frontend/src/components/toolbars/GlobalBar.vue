@@ -10,6 +10,12 @@
       <BrandBar />
     </div>
     <div class="btn-group btn-group-sm">
+      <PopButton v-if="user" title="search note">
+        <template #button_face>
+          <SvgSearch />
+        </template>
+        <LinkNoteDialog v-bind="{ storageAccessor }" />
+      </PopButton>
       <ReviewButton class="btn" v-if="user" />
       <NoteUndoButton v-bind="{ storageAccessor }" />
       <UserActionsButton
