@@ -4,7 +4,7 @@
       v-bind="{
         noteId,
         expandChildren: true,
-        readonly: !!user,
+        readonly: !user,
         storageAccessor,
       }"
       :key="noteId"
