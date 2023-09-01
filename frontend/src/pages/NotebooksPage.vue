@@ -13,13 +13,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+import { defineComponent } from "vue";
 import NotebookViewCards from "../components/notebook/NotebookViewCards.vue";
 import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
 import NotebookSubscriptionCards from "../components/subscriptions/NotebookSubscriptionCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
-import { StorageAccessor } from "../store/createNoteStorage";
 
 export default defineComponent({
   setup() {
@@ -27,10 +26,6 @@ export default defineComponent({
   },
   props: {
     selectedNoteId: Number,
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
   },
   name: "NotebooksPage",
   components: {
@@ -47,7 +42,6 @@ export default defineComponent({
   },
   methods: {
     fetchData() {
-      this.storageAccessor.selectPosition();
       this.api.notebookMethods.getNotebooks().then((res) => {
         this.notebooks = res.notebooks;
         this.subscriptions = res.subscriptions;

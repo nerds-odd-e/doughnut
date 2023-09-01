@@ -22,7 +22,6 @@ const noteAndLinkRoutes = [
     path: "notebooks",
     name: "notebooks",
     component: NotebooksPage,
-    meta: { useNoteStorageAccessor: true },
   },
 
   {

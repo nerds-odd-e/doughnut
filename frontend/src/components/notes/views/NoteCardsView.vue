@@ -12,6 +12,7 @@
           </NoteNewButton>
         </Breadcrumb>
         <ControlCenterForNote
+          v-if="!readonly"
           v-bind="{ selectedNote: noteRealm.note, storageAccessor }"
         />
         <NoteWithLinks
