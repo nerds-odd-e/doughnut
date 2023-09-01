@@ -7,6 +7,9 @@
       <CircleSelector />
     </PopButton>
     <div class="btn-group btn-group-sm">
+      <BrandBar />
+    </div>
+    <div class="btn-group btn-group-sm">
       <ReviewButton class="btn" v-if="user" />
       <NoteUndoButton v-bind="{ storageAccessor }" />
       <UserActionsButton
@@ -29,6 +32,7 @@ import CircleSelector from "../circles/CircleSelector.vue";
 import ToolbarFrame from "./ToolbarFrame.vue";
 import { ApiStatus } from "../../managedApi/ManagedApi";
 import { StorageAccessor } from "../../store/createNoteStorage";
+import BrandBar from "./BrandBar.vue";
 
 export default defineComponent({
   props: {
@@ -44,6 +48,7 @@ export default defineComponent({
     SvgForward,
     CircleSelector,
     ToolbarFrame,
+    BrandBar,
   },
   emits: ["updateUser", "clearErrorMessage"],
 });

@@ -93,7 +93,8 @@ export default defineComponent({
         <div class="header">
           <GlobalBar v-bind="{ storageAccessor, user, apiStatus }" />
           <ControlCenter
-            v-bind="{ storageAccessor, user, apiStatus }"
+            v-if="user"
+            v-bind="{ storageAccessor }"
             @update-user="user = $event"
             @clear-error-message="clearErrorMessage($event)"
           />

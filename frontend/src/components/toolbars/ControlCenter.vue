@@ -1,11 +1,6 @@
 <template>
   <ToolbarFrame>
-    <template v-if="!user">
-      <div class="btn-group btn-group-sm">
-        <BrandBar />
-      </div>
-    </template>
-    <div v-else class="btn-group btn-group-sm">
+    <div class="btn-group btn-group-sm">
       <template v-if="!selectedNote">
         <PopButton title="search note">
           <template #button_face>
@@ -26,7 +21,6 @@
 import { defineComponent, PropType } from "vue";
 import ToolbarFrame from "./ToolbarFrame.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
-import BrandBar from "./BrandBar.vue";
 import ControlCenterForNote from "./ControlCenterForNote.vue";
 
 export default defineComponent({
@@ -35,11 +29,9 @@ export default defineComponent({
       type: Object as PropType<StorageAccessor>,
       required: true,
     },
-    user: { type: Object as PropType<Generated.User> },
   },
   components: {
     ToolbarFrame,
-    BrandBar,
     ControlCenterForNote,
   },
   computed: {
