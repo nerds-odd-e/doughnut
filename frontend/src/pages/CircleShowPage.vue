@@ -1,11 +1,12 @@
 <template>
   <ContainerPage v-bind="{ contentExists: !!circle }">
     <div v-if="circle">
-      <Breadcrumb v-bind="{ circle }">
+      <h1>{{ circle.name }}</h1>
+      <p>
         <NotebookNewButton :circle="circle">
           Add New Notebook In This Circle
         </NotebookNewButton>
-      </Breadcrumb>
+      </p>
 
       <NotebookCardsWithButtons :notebooks="circle.notebooks.notebooks">
         <template #default="{ notebook }">

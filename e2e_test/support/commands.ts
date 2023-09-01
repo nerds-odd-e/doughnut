@@ -64,12 +64,7 @@ Cypress.Commands.add("findUserSettingsButton", (userName: string) => {
   cy.findByRole("button", { name: `Settings for ${userName}` })
 })
 
-Cypress.Commands.add("expectBreadcrumb", (items: string, addChildButton: boolean = true) => {
-  if (addChildButton) {
-    cy.addSiblingNoteButton()
-  } else {
-    cy.addSiblingNoteButton().should("not.exist")
-  }
+Cypress.Commands.add("expectBreadcrumb", (items: string) => {
   cy.get(".breadcrumb").within(() =>
     items.commonSenseSplit(", ").forEach((noteTitle: string) => cy.findByText(noteTitle)),
   )

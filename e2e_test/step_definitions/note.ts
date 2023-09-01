@@ -129,7 +129,7 @@ When("I am creating a note under {notepath}", (notePath: NotePath) => {
 
 Then("I should see {string} in breadcrumb", (noteTitles: string) => {
   cy.pageIsNotLoading()
-  cy.expectBreadcrumb(noteTitles, false)
+  cy.expectBreadcrumb(noteTitles)
 })
 
 When("I visit all my notebooks", () => {
