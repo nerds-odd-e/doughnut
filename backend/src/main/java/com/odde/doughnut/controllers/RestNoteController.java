@@ -87,13 +87,6 @@ class RestNoteController {
     return NoteRealmWithPosition.fromNote(note, currentUser.getEntity());
   }
 
-  @GetMapping("/{note}/overview")
-  public NoteRealmWithAllDescendants showOverview(@PathVariable("note") Note note)
-      throws UnexpectedNoAccessRightException {
-    currentUser.assertReadAuthorization(note);
-    return NoteRealmWithAllDescendants.fromNote(note, currentUser.getEntity());
-  }
-
   @PatchMapping(path = "/{note}")
   @Transactional
   public NoteRealm updateNote(

@@ -101,11 +101,6 @@ declare namespace Generated {
         note: Note;
     }
 
-    interface NoteRealmWithAllDescendants {
-        notePosition: NotePositionViewedByUser;
-        notes: NoteRealm[];
-    }
-
     interface NoteRealmWithPosition {
         notePosition: NotePositionViewedByUser;
         noteRealm: NoteRealm;

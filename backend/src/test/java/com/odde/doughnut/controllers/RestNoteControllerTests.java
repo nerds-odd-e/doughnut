@@ -110,19 +110,6 @@ class RestNoteControllerTests {
       assertThat(show.noteRealm.getId(), equalTo(note.getId()));
       assertThat(show.notePosition.getNotebook().getFromBazaar(), is(false));
     }
-
-    @Test
-    void shouldBeAbleToSeeOwnNoteOverview() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().creatorAndOwner(userModel).please();
-      Note childNote = makeMe.aNote().creatorAndOwner(userModel).under(note).please();
-      makeMe.theNote(childNote).with10Children().please();
-      makeMe.refresh(note);
-      makeMe.refresh(childNote);
-      final NoteRealmWithAllDescendants showOverview = controller.showOverview(note);
-      assertThat(showOverview.notes, hasSize(12));
-      assertThat(showOverview.notePosition.getNotebook().getFromBazaar(), equalTo(false));
-      assertThat(showOverview.notes.get(0).getChildren(), hasSize(1));
-    }
   }
 
   @Nested
