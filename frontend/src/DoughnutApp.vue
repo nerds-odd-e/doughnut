@@ -91,7 +91,7 @@ export default defineComponent({
     <template v-else>
       <template v-if="userLoaded">
         <div class="header">
-          <GlobalBar />
+          <GlobalBar v-bind="{ storageAccessor, user, apiStatus }" />
           <ControlCenter
             v-bind="{ storageAccessor, user, apiStatus }"
             @update-user="user = $event"
