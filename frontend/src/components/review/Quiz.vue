@@ -2,7 +2,6 @@
   <div v-if="!minimized" class="content">
     <div class="inner-box">
       <template v-if="currentQuestionFetched">
-        <BreadcrumbMain v-bind="{ storageAccessor }" />
         <div v-if="!currentQuizQuestion">
           <JustReview
             v-bind="{
@@ -32,7 +31,6 @@ import QuizQuestion from "./QuizQuestion.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import JustReview from "./JustReview.vue";
-import BreadcrumbMain from "../toolbars/BreadcrumbMain.vue";
 
 export default defineComponent({
   setup() {
@@ -61,7 +59,6 @@ export default defineComponent({
   components: {
     QuizQuestion,
     JustReview,
-    BreadcrumbMain,
   },
   data() {
     return {

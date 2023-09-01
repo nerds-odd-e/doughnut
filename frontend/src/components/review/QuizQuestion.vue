@@ -1,4 +1,5 @@
 <template>
+  <Breadcrumb v-bind="quizQuestion.notebookPosition" />
   <div class="quiz-instruction">
     <ShowPicture
       v-if="quizQuestion.pictureWithMask"
@@ -47,6 +48,7 @@ import TextInput from "../form/TextInput.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopups";
 import QuizQuestionChoices from "./QuizQuestionChoices.vue";
+import Breadcrumb from "../toolbars/Breadcrumb.vue";
 
 export default defineComponent({
   setup() {
@@ -65,6 +67,7 @@ export default defineComponent({
     ShowPicture,
     TextInput,
     QuizQuestionChoices,
+    Breadcrumb,
   },
   emits: ["answered"],
   data() {
