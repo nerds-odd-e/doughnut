@@ -1,6 +1,5 @@
 <template>
   <div>
-    <SvgArticle v-if="viewType === 'article'" />
     <SvgCards v-if="viewType === 'cards'" />
   </div>
 </template>

@@ -1,6 +1,6 @@
-type ViewTypeName = "cards" | "article";
+type ViewTypeName = "cards";
 
-const viewTypeNamesRaw = ["cards", "article"];
+const viewTypeNamesRaw = ["cards"];
 const viewTypeNames = viewTypeNamesRaw as ViewTypeName[];
 
 const sanitizeViewTypeName = (
@@ -13,10 +13,7 @@ const sanitizeViewTypeName = (
   return "cards";
 };
 
-const routeNameForViewType = (viewType: string) => {
-  if (viewType === "article") {
-    return "noteShowArticle";
-  }
+const routeNameForViewType = () => {
   return "noteShow";
 };
 
