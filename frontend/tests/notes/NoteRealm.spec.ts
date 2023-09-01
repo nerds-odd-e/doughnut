@@ -11,13 +11,9 @@ describe("NoteRealm", () => {
 
   beforeEach(() => {
     noteRealm = makeMe.aNoteRealm.please();
-    const noteRealmWithPosition: Generated.NoteRealmWithPosition = {
-      notePosition: makeMe.aNotePosition.please(),
-      noteRealm,
-    };
     helper.apiMock
       .expectingGet(`/api/notes/${noteRealm.id}`)
-      .andReturnOnce(noteRealmWithPosition);
+      .andReturnOnce(noteRealm);
   });
 
   describe("rendering a note realm", () => {

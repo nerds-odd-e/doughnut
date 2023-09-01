@@ -7,16 +7,12 @@ helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("all in note show page", () => {
   describe("note show", () => {
-    const noteRealm = makeMe.aNoteRealm.please();
-    const notePosition = makeMe.aNotePosition
-      .for(noteRealm.note)
-      .inCircle("a circle")
-      .please();
+    const noteRealm = makeMe.aNoteRealm.inCircle("a circle").please();
 
     it(" should fetch API", async () => {
       helper.apiMock
         .expectingGet(`/api/notes/${noteRealm.id}`)
-        .andReturnOnce({ notePosition, noteRealm });
+        .andReturnOnce(noteRealm);
       helper
         .component(NoteShowPage)
         .withStorageProps({ noteId: noteRealm.id })

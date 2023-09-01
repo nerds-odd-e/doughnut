@@ -9,21 +9,29 @@ class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
 
   noteBuilder;
 
+  notePositionBuilder;
+
   constructor() {
     super();
     this.noteBuilder = new NoteBuilder();
     const noteData = this.noteBuilder.data;
+    this.notePositionBuilder = new NotePositionBuilder().for(noteData);
     this.data = {
       id: noteData.id,
       note: noteData,
       links: {},
       children: [],
-      notePosition: new NotePositionBuilder().for(noteData).please(),
+      notePosition: this.notePositionBuilder.data,
     };
   }
 
   title(value: string): NoteRealmBuilder {
     this.noteBuilder.title(value);
+    return this;
+  }
+
+  inCircle(circleName: string) {
+    this.notePositionBuilder.inCircle(circleName);
     return this;
   }
 
@@ -68,6 +76,7 @@ class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
 
   do(): Generated.NoteRealm {
     this.data.note = this.noteBuilder.do();
+    this.data.notePosition = this.notePositionBuilder.do();
     return this.data;
   }
 }

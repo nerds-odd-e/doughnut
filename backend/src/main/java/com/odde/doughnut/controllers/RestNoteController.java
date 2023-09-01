@@ -57,7 +57,7 @@ class RestNoteController {
 
   @PostMapping(value = "/{parentNote}/create")
   @Transactional
-  public NoteRealmWithPosition createNote(
+  public NoteRealm createNote(
       @PathVariable(name = "parentNote") Note parentNote,
       @Valid @ModelAttribute NoteCreation noteCreation)
       throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
@@ -72,7 +72,7 @@ class RestNoteController {
                 noteCreation.textContent,
                 noteCreation.getLinkTypeToParent());
 
-    return NoteRealmWithPosition.fromNote(note, user);
+    return new NoteViewer(user, note).toJsonObject();
   }
 
   private NoteConstructionService getNoteConstructionService(User user) {
@@ -81,10 +81,10 @@ class RestNoteController {
   }
 
   @GetMapping("/{note}")
-  public NoteRealmWithPosition show(@PathVariable("note") Note note)
-      throws UnexpectedNoAccessRightException {
+  public NoteRealm show(@PathVariable("note") Note note) throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
-    return NoteRealmWithPosition.fromNote(note, currentUser.getEntity());
+    User user = currentUser.getEntity();
+    return new NoteViewer(user, note).toJsonObject();
   }
 
   @PatchMapping(path = "/{note}")

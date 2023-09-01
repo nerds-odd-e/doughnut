@@ -102,11 +102,6 @@ declare namespace Generated {
         notePosition: NotePositionViewedByUser;
     }
 
-    interface NoteRealmWithPosition {
-        notePosition: NotePositionViewedByUser;
-        noteRealm: NoteRealm;
-    }
-
     interface NotebookViewedByUser {
         id: number;
         headNoteId: number;

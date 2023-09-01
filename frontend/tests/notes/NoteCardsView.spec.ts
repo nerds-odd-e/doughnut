@@ -11,7 +11,7 @@ describe("note wth child cards", () => {
     makeMe.aNoteRealm.title("child").under(noteParent).please();
     helper.apiMock
       .expectingGet(`/api/notes/${noteParent.id}`)
-      .andReturnOnce({ noteRealm: noteParent });
+      .andReturnOnce(noteParent);
     helper
       .component(NoteCardsView)
       .withStorageProps({

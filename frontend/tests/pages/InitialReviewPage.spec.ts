@@ -36,10 +36,9 @@ describe("repeat page", () => {
         .expectingGet("/api/reviews/initial")
         .andReturnOnce([reviewPoint, reviewPoint]);
       helper.apiMock.expectingGet(`/api/notes/${noteRealm.id}/note-info`);
-      helper.apiMock.expectingGet(`/api/notes/${noteRealm.id}`).andReturnOnce({
-        notePosition: makeMe.aNotePosition.please(),
-        noteRealm,
-      });
+      helper.apiMock
+        .expectingGet(`/api/notes/${noteRealm.id}`)
+        .andReturnOnce(noteRealm);
     });
 
     it("normal view", async () => {

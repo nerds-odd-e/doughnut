@@ -221,12 +221,12 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return (await managedApi.restPostMultiplePartForm(
         `notes/${parentId}/create`,
         data,
-      )) as Generated.NoteRealmWithPosition;
+      )) as Generated.NoteRealm;
     },
-    async getNoteRealmWithPosition(noteId: Doughnut.ID) {
+    async getNoteRealm(noteId: Doughnut.ID) {
       return (await managedApi.restGet(
         `notes/${noteId}`,
-      )) as Generated.NoteRealmWithPosition;
+      )) as Generated.NoteRealm;
     },
 
     async getNotePosition(noteId: Doughnut.ID) {

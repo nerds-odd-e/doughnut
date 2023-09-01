@@ -97,18 +97,18 @@ class RestNoteControllerTests {
       Note note = makeMe.aNote().creatorAndOwner(otherUser).please();
       makeMe.aBazaarNodebook(note.getNotebook()).please();
       makeMe.refresh(userModel.getEntity());
-      final NoteRealmWithPosition show = controller.show(note);
-      assertThat(show.noteRealm.getNote().getTitle(), equalTo(note.getTitle()));
-      assertThat(show.notePosition.getNotebook().getFromBazaar(), is(true));
+      final NoteRealm noteRealm = controller.show(note);
+      assertThat(noteRealm.getNote().getTitle(), equalTo(note.getTitle()));
+      assertThat(noteRealm.getNotePosition().getNotebook().getFromBazaar(), is(true));
     }
 
     @Test
     void shouldBeAbleToSeeOwnNote() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(userModel).please();
       makeMe.refresh(userModel.getEntity());
-      final NoteRealmWithPosition show = controller.show(note);
-      assertThat(show.noteRealm.getId(), equalTo(note.getId()));
-      assertThat(show.notePosition.getNotebook().getFromBazaar(), is(false));
+      final NoteRealm noteRealm = controller.show(note);
+      assertThat(noteRealm.getId(), equalTo(note.getId()));
+      assertThat(noteRealm.getNotePosition().getNotebook().getFromBazaar(), is(false));
     }
   }
 
@@ -152,8 +152,8 @@ class RestNoteControllerTests {
     @Test
     void shouldBeAbleToSaveNoteWhenValid()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      NoteRealmWithPosition response = controller.createNote(parent, noteCreation);
-      assertThat(response.noteRealm.getId(), not(nullValue()));
+      NoteRealm response = controller.createNote(parent, noteCreation);
+      assertThat(response.getId(), not(nullValue()));
     }
 
     @Test
@@ -171,16 +171,16 @@ class RestNoteControllerTests {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(new MakeMeWithoutDB().wikidataEntityJson().entityId("Q12345").please());
       noteCreation.setWikidataId("Q12345");
-      NoteRealmWithPosition response = controller.createNote(parent, noteCreation);
-      assertThat(response.noteRealm.getNote().getWikidataId(), equalTo("Q12345"));
+      NoteRealm response = controller.createNote(parent, noteCreation);
+      assertThat(response.getNote().getWikidataId(), equalTo("Q12345"));
     }
 
     @Test
     void shouldBeAbleToSaveNoteWithoutWikidataIdWhenValid()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      NoteRealmWithPosition response = controller.createNote(parent, noteCreation);
+      NoteRealm response = controller.createNote(parent, noteCreation);
 
-      assertThat(response.noteRealm.getNote().getWikidataId(), equalTo(null));
+      assertThat(response.getNote().getWikidataId(), equalTo(null));
     }
 
     @Test
@@ -221,9 +221,9 @@ class RestNoteControllerTests {
               IOException {
         mockApiResponseWithLocationInfo(
             "{\"latitude\":1.3,\"longitude\":103.8}", "globecoordinate");
-        NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
+        NoteRealm note = controller.createNote(parent, noteCreation);
         assertThat(
-            note.noteRealm.getNote().getDescription(),
+            note.getNote().getDescription(),
             stringContainsInOrder("Location: " + lnglat, singapore));
       }
 
@@ -234,9 +234,9 @@ class RestNoteControllerTests {
               UnexpectedNoAccessRightException,
               IOException {
         mockApiResponseWithLocationInfo("\"center of the earth\"", "string");
-        NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
+        NoteRealm note = controller.createNote(parent, noteCreation);
         assertThat(
-            note.noteRealm.getNote().getDescription(),
+            note.getNote().getDescription(),
             stringContainsInOrder("Location: center of the earth"));
       }
     }
@@ -289,8 +289,8 @@ class RestNoteControllerTests {
         mockWikidataHumanEntity(wikidataIdOfHuman, birthdayByISO, countryQid);
         mockWikidataEntity(countryQid, countryName);
         noteCreation.setWikidataId(wikidataIdOfHuman);
-        NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
-        String description = note.noteRealm.getNote().getDescription();
+        NoteRealm note = controller.createNote(parent, noteCreation);
+        String description = note.getNote().getDescription();
         if (expectedBirthday != null) {
           assertThat(description, containsString(expectedBirthday));
         }
@@ -310,12 +310,12 @@ class RestNoteControllerTests {
         mockWikidataEntity("Q34660", "Canada");
         noteCreation.setWikidataId("Q8337");
         noteCreation.getTextContent().setTitle("Johnny boy");
-        NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
-        makeMe.refresh(note.noteRealm.getNote());
+        NoteRealm note = controller.createNote(parent, noteCreation);
+        makeMe.refresh(note.getNote());
 
-        assertEquals("Johnny boy", note.noteRealm.getNote().getTitle());
-        assertEquals("Q8337", note.noteRealm.getNote().getWikidataId());
-        assertEquals("Canada", note.noteRealm.getNote().getChildren().get(0).getTitle());
+        assertEquals("Johnny boy", note.getNote().getTitle());
+        assertEquals("Q8337", note.getNote().getWikidataId());
+        assertEquals("Canada", note.getNote().getChildren().get(0).getTitle());
       }
     }
 
@@ -337,12 +337,12 @@ class RestNoteControllerTests {
               IOException {
         mockWikidataWBGetEntity(
             "Q8337", makeMe.wikidataClaimsJson("Q8337").asABookWithSingleAuthor("Q34660").please());
-        NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
-        makeMe.refresh(note.noteRealm.getNote());
+        NoteRealm note = controller.createNote(parent, noteCreation);
+        makeMe.refresh(note.getNote());
 
-        assertEquals("Harry Potter", note.noteRealm.getNote().getTitle());
-        assertEquals("Q8337", note.noteRealm.getNote().getWikidataId());
-        assertEquals("J. K. Rowling", note.noteRealm.getNote().getChildren().get(0).getTitle());
+        assertEquals("Harry Potter", note.getNote().getTitle());
+        assertEquals("Q8337", note.getNote().getWikidataId());
+        assertEquals("J. K. Rowling", note.getNote().getChildren().get(0).getTitle());
       }
 
       @Test
@@ -357,12 +357,11 @@ class RestNoteControllerTests {
                 .wikidataClaimsJson("Q8337")
                 .asABookWithMultipleAuthors(List.of("Q34660", "Q12345"))
                 .please());
-        NoteRealmWithPosition note = controller.createNote(parent, noteCreation);
-        makeMe.refresh(note.noteRealm.getNote());
+        NoteRealm note = controller.createNote(parent, noteCreation);
+        makeMe.refresh(note.getNote());
 
         assertEquals(
-            "The girl sat next to the window",
-            note.noteRealm.getNote().getChildren().get(1).getTitle());
+            "The girl sat next to the window", note.getNote().getChildren().get(1).getTitle());
       }
     }
   }
