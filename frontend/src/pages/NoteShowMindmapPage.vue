@@ -1,7 +1,7 @@
 <template>
   <div class="inner-box" :key="noteId">
-    <div class="content" v-if="noteRealm && noteRealmCache">
-      <div v-bind="{ noteId, noteRealms: noteRealmCache, storageAccessor }" />
+    <div class="content" v-if="noteRealmCache">
+      <div v-bind="{ noteId, storageAccessor }" />
     </div>
   </div>
 </template>
@@ -28,15 +28,7 @@ export default defineComponent({
       noteRealmCache: undefined as NoteRealmCache | undefined,
     };
   },
-  computed: {
-    noteRealm() {
-      return this.noteRealmCache?.getNoteRealmById(this.noteId);
-    },
-  },
   methods: {
-    onNoteDeleted(deletedNoteId: Doughnut.ID) {
-      this.noteRealmCache?.deleteNoteAndDescendents(deletedNoteId);
-    },
     async fetchData() {
       this.noteRealmCache = new NoteRealmCache(
         await this.api.noteMethods.getNoteWithDescendents(this.noteId),
