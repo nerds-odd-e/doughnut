@@ -5,14 +5,14 @@
         <router-link :to="{ name: 'bazaar' }">Bazaar</router-link>
       </li>
       <template v-else>
-        <li class="breadcrumb-item" v-if="!cCircle">
+        <li class="breadcrumb-item" v-if="!circle">
           <router-link :to="{ name: 'notebooks' }">My Notes</router-link>
         </li>
         <template v-else>
           <li class="breadcrumb-item">
             <router-link
-              :to="{ name: 'circleShow', params: { circleId: cCircle.id } }"
-              >{{ cCircle.name }}</router-link
+              :to="{ name: 'circleShow', params: { circleId: circle.id } }"
+              >{{ circle.name }}</router-link
             >
           </li>
         </template>
@@ -31,7 +31,6 @@ import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue";
 export default defineComponent({
   props: {
     ancestors: Array,
-    circle: Object as PropType<Generated.Circle>,
     notebook: Object as PropType<Generated.NotebookViewedByUser>,
   },
   components: {
@@ -41,8 +40,7 @@ export default defineComponent({
     fromBazaar() {
       return this.notebook?.fromBazaar;
     },
-    cCircle() {
-      if (this.circle) return this.circle;
+    circle() {
       return this.notebook ? this.notebook.ownership.circle : undefined;
     },
   },
