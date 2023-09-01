@@ -7,7 +7,6 @@ import { withLoadingApi } from "./managedApi/useLoadingApi";
 import usePopups from "./components/commons/Popups/usePopups";
 import ControlCenter from "./components/toolbars/ControlCenter.vue";
 import createNoteStorage from "./store/createNoteStorage";
-import BreadcrumbMain from "./components/toolbars/BreadcrumbMain.vue";
 import ManagedApi, { ApiStatus } from "./managedApi/ManagedApi";
 
 export default defineComponent({
@@ -42,7 +41,6 @@ export default defineComponent({
     TestMenu,
     UserNewRegisterPage,
     ControlCenter,
-    BreadcrumbMain,
   },
 
   watch: {
@@ -92,7 +90,6 @@ export default defineComponent({
     <template v-else>
       <template v-if="userLoaded">
         <div class="header">
-          <BreadcrumbMain v-bind="{ storageAccessor, readonly: !user }" />
           <ControlCenter
             v-bind="{ storageAccessor, user, apiStatus }"
             @update-user="user = $event"
