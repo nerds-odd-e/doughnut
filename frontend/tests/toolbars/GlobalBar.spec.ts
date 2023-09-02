@@ -14,8 +14,10 @@ helper.resetWithApiMock(beforeEach, afterEach);
 describe("global bar", () => {
   let noteEditingHistory: NoteEditingHistory;
   let histories: StorageAccessor;
+  let user: Generated.User;
 
   beforeEach(() => {
+    user = makeMe.aUser().please();
     noteEditingHistory = new NoteEditingHistory();
     histories = createNoteStorage(
       new ManagedApi({ states: [], errors: [] }),
@@ -31,7 +33,11 @@ describe("global bar", () => {
   it("opens the circles selection", async () => {
     const wrapper = helper
       .component(GlobalBar)
-      .withProps({ storageAccessor: histories, apiStatus: { states: [] } })
+      .withProps({
+        storageAccessor: histories,
+        user,
+        apiStatus: { states: [] },
+      })
       .mount();
     wrapper.find("[role='button']").trigger("click");
     expect(popupInfo).toHaveLength(1);
@@ -40,7 +46,11 @@ describe("global bar", () => {
   it("fetch API to be called ONCE", async () => {
     helper
       .component(GlobalBar)
-      .withProps({ storageAccessor: histories, apiStatus: { states: [] } })
+      .withProps({
+        storageAccessor: histories,
+        user,
+        apiStatus: { states: [] },
+      })
       .render();
 
     expect(screen.queryByTitle("undo")).toBeNull();
@@ -51,7 +61,11 @@ describe("global bar", () => {
     noteEditingHistory.deleteNote(notebook.headNote.id);
     helper
       .component(GlobalBar)
-      .withProps({ storageAccessor: histories, apiStatus: { states: [] } })
+      .withProps({
+        storageAccessor: histories,
+        user,
+        apiStatus: { states: [] },
+      })
       .render();
 
     expect(await screen.findByTitle("undo delete note")).not.toBeDisabled();
