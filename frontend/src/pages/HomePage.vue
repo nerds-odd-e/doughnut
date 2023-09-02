@@ -61,7 +61,7 @@
             :sidebar="'left'"
           >
             <template #button_face> Go To Circles </template>
-            <CircleSelector />
+            <GlobalSidebar />
           </PopButton>
         </div>
       </div>
@@ -72,7 +72,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import PopButton from "@/components/commons/Popups/PopButton.vue";
-import CircleSelector from "@/components/circles/CircleSelector.vue";
+import GlobalSidebar from "@/components/toolbars/GlobalSidebar.vue";
 
 export default defineComponent({
   props: {
@@ -81,6 +81,6 @@ export default defineComponent({
       required: false,
     },
   },
-  components: { PopButton, CircleSelector },
+  components: { PopButton, GlobalSidebar },
 });
 </script>

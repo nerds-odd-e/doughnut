@@ -1,31 +1,33 @@
 <template>
-  <UserIconMenu
-    role="button"
-    aria-label="User actions"
-    class="user-icon-menu"
-    data-bs-toggle="dropdown"
-    data-toggle="dropdown"
-    aria-haspopup="true"
-    aria-expanded="false"
-  />
+  <ToolbarFrame>
+    <UserIconMenu
+      role="button"
+      aria-label="User actions"
+      class="user-icon-menu"
+      data-bs-toggle="dropdown"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    />
 
-  <div
-    v-if="user"
-    class="dropdown-menu dropdown-menu-end"
-    aria-labelledby="dropdownMenuButton"
-  >
-    <PopButton class="dropdown-item" title="choose a circle">
-      <template #button_face> Settings for {{ user.name }}</template>
-      <UserProfileDialog
-        @user-updated="
-          if ($event) {
-            $emit('updateUser', $event);
-          }
-        "
-      />
-    </PopButton>
-    <a href="#" class="dropdown-item" role="button" @click="logout">Logout</a>
-  </div>
+    <div
+      v-if="user"
+      class="dropdown-menu dropdown-menu-end"
+      aria-labelledby="dropdownMenuButton"
+    >
+      <PopButton class="dropdown-item" title="choose a circle">
+        <template #button_face> Settings for {{ user.name }}</template>
+        <UserProfileDialog
+          @user-updated="
+            if ($event) {
+              $emit('updateUser', $event);
+            }
+          "
+        />
+      </PopButton>
+      <a href="#" class="dropdown-item" role="button" @click="logout">Logout</a>
+    </div>
+  </ToolbarFrame>
 </template>
 
 <script lang="ts">
@@ -34,6 +36,7 @@ import UserIconMenu from "./UserIconMenu.vue";
 import PopButton from "../commons/Popups/PopButton.vue";
 import UserProfileDialog from "./UserProfileDialog.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
+import ToolbarFrame from "./ToolbarFrame.vue";
 
 export default defineComponent({
   setup() {
@@ -47,6 +50,7 @@ export default defineComponent({
     UserIconMenu,
     PopButton,
     UserProfileDialog,
+    ToolbarFrame,
   },
   methods: {
     async logout() {

@@ -64,7 +64,7 @@ declare namespace Cypress {
       noteTitle: string,
       NoteAccessoriesAttributes: Record<string, string>,
     ): Chainable<any>
-    openCirclesSelector(): Chainable<any>
+    openSidebar(): Chainable<any>
     pageIsNotLoading(): Chainable<any>
     randomizerAlwaysChooseLast(): Chainable<Subject>
     clearFocusedText(): Chainable<any>

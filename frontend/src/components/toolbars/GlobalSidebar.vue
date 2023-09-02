@@ -2,6 +2,10 @@
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <BrandBar />
   </nav>
+  <UserActionsButton
+    v-bind="{ user }"
+    @update-user="$emit('updateUser', $event)"
+  />
   <LoadingPage v-bind="{ contentExists: circles, title: 'My Circles' }">
     <div v-if="!!circles">
       <ul class="list-group">
@@ -32,22 +36,26 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { PropType, defineComponent } from "vue";
 import LoadingPage from "@/pages/commons/LoadingPage.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import PopButton from "../commons/Popups/PopButton.vue";
-import CircleNewDialog from "./CircleNewDialog.vue";
-import BrandBar from "../toolbars/BrandBar.vue";
+import CircleNewDialog from "../circles/CircleNewDialog.vue";
+import BrandBar from "./BrandBar.vue";
 
 export default defineComponent({
   setup() {
     return useLoadingApi();
+  },
+  props: {
+    user: { type: Object as PropType<Generated.User> },
   },
   data() {
     return {
       circles: null as Generated.Circle[] | null,
     };
   },
+  emits: ["updateUser"],
   methods: {
     fetchData() {
       this.api.circleMethods.getCirclesOfCurrentUser().then((res) => {

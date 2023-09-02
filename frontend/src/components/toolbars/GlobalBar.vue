@@ -4,7 +4,7 @@
       <template #button_face>
         <SvgSidebar />
       </template>
-      <CircleSelector />
+      <GlobalSidebar :user="user" @update-user="$emit('updateUser', $event)" />
     </PopButton>
     <LoginButton v-else />
     <div class="btn-group btn-group-sm">
@@ -19,10 +19,6 @@
       </PopButton>
       <ReviewButton class="btn" v-if="user" />
       <NoteUndoButton v-bind="{ storageAccessor }" />
-      <UserActionsButton
-        v-bind="{ user }"
-        @update-user="$emit('updateUser', $event)"
-      />
     </div>
     <ApiStatus
       :api-status="apiStatus"
@@ -35,7 +31,7 @@
 import { PropType, defineComponent } from "vue";
 import PopButton from "../commons/Popups/PopButton.vue";
 import SvgSidebar from "../svgs/SvgSidebar.vue";
-import CircleSelector from "../circles/CircleSelector.vue";
+import GlobalSidebar from "./GlobalSidebar.vue";
 import ToolbarFrame from "./ToolbarFrame.vue";
 import { ApiStatus } from "../../managedApi/ManagedApi";
 import { StorageAccessor } from "../../store/createNoteStorage";
@@ -53,7 +49,7 @@ export default defineComponent({
   components: {
     PopButton,
     SvgSidebar,
-    CircleSelector,
+    GlobalSidebar,
     ToolbarFrame,
     BrandBar,
   },

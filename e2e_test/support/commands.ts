@@ -60,6 +60,7 @@ Cypress.Commands.add("dialogDisappeared", () => {
 })
 
 Cypress.Commands.add("findUserSettingsButton", (userName: string) => {
+  cy.openSidebar()
   cy.findByRole("button", { name: "User actions" }).click()
   cy.findByRole("button", { name: `Settings for ${userName}` })
 })
@@ -391,7 +392,7 @@ Cypress.Commands.add("yesIRemember", () => {
   })
 })
 
-Cypress.Commands.add("openCirclesSelector", () => {
+Cypress.Commands.add("openSidebar", () => {
   cy.routerToNotebooks().then(() => {
     cy.pageIsNotLoading()
     cy.findByRole("button", { name: "open sidebar" }).click({ force: true })
@@ -401,7 +402,7 @@ Cypress.Commands.add("openCirclesSelector", () => {
 Cypress.Commands.add("navigateToCircle", (circleName) => {
   cy.routerToRoot()
   cy.pageIsNotLoading()
-  cy.openCirclesSelector()
+  cy.openSidebar()
   cy.findByText(circleName, { selector: ".modal-body a" }).click()
 })
 
