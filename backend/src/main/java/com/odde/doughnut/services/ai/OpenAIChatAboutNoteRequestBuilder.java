@@ -24,7 +24,7 @@ public class OpenAIChatAboutNoteRequestBuilder {
   public OpenAIChatAboutNoteRequestBuilder(String notePath) {
     this.path = notePath;
     String content =
-        ("This is a personal knowledge management system, consists of notes with a title and a description, which should represent atomic concepts.\n"
+        ("This is a personal knowledge management system, consists of notes with a topic and a description, which should represent atomic concepts.\n"
                 + "Current context of the note: ")
             + this.path;
     addMessage(ChatMessageRole.SYSTEM, content);
@@ -34,13 +34,21 @@ public class OpenAIChatAboutNoteRequestBuilder {
     String noteOfCurrentFocus =
         """
 The note of current focus:
-context: %s
-title: %s
-description (until the end of this message):
+Context: %s
+Topic: %s
 %s
       """
-            .formatted(this.path, note.getTopic(), note.getDescription());
+            .formatted(this.path, note.getTopic(), getDescription(note));
     return addMessage(ChatMessageRole.SYSTEM, noteOfCurrentFocus);
+  }
+
+  private static String getDescription(Note note) {
+    if (note.isDescriptionBlankHtml()) return "";
+    return """
+Description (until the end of this message):
+%s
+  """
+        .formatted(note.getDescription());
   }
 
   public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestionWithFunctionCall() {

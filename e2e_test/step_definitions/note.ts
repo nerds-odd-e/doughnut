@@ -54,7 +54,7 @@ When("I create notebooks with:", (notes: DataTable) => {
 })
 
 When("I create a notebook with empty topic", () => {
-  cy.createNotebookWith({ Title: "" })
+  cy.createNotebookWith({ Topic: "" })
 })
 
 When("I update note {string} to become:", (noteTopic: string, data: DataTable) => {
