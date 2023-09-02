@@ -2,7 +2,7 @@
   <ToolbarFrame>
     <PopButton title="choose a circle" :sidebar="'left'">
       <template #button_face>
-        <SvgForward />
+        <SvgSidebar />
       </template>
       <CircleSelector />
     </PopButton>
@@ -33,7 +33,7 @@
 <script lang="ts">
 import { PropType, defineComponent } from "vue";
 import PopButton from "../commons/Popups/PopButton.vue";
-import SvgForward from "../svgs/SvgForward.vue";
+import SvgSidebar from "../svgs/SvgSidebar.vue";
 import CircleSelector from "../circles/CircleSelector.vue";
 import ToolbarFrame from "./ToolbarFrame.vue";
 import { ApiStatus } from "../../managedApi/ManagedApi";
@@ -51,7 +51,7 @@ export default defineComponent({
   },
   components: {
     PopButton,
-    SvgForward,
+    SvgSidebar,
     CircleSelector,
     ToolbarFrame,
     BrandBar,

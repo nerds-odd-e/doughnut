@@ -34,7 +34,7 @@
       </PopButton>
       <PopButton title="search and link note">
         <template #button_face>
-          <SvgSearch />
+          <SvgSearchForLink />
         </template>
         <LinkNoteDialog v-bind="{ note: selectedNote, storageAccessor }" />
       </PopButton>
@@ -76,7 +76,7 @@ import SvgEdit from "../svgs/SvgEdit.vue";
 import NoteEditAccessoriesDialog from "../notes/NoteEditAccessoriesDialog.vue";
 import SvgWikidata from "../svgs/SvgWikidata.vue";
 import WikidataAssociationDialog from "../notes/WikidataAssociationDialog.vue";
-import SvgSearch from "../svgs/SvgSearch.vue";
+import SvgSearchForLink from "../svgs/SvgSearchForLink.vue";
 import LinkNoteDialog from "../links/LinkNoteDialog.vue";
 import SvgCog from "../svgs/SvgCog.vue";
 import NoteDeleteButton from "./NoteDeleteButton.vue";
@@ -104,7 +104,7 @@ export default defineComponent({
     NoteEditAccessoriesDialog,
     SvgWikidata,
     WikidataAssociationDialog,
-    SvgSearch,
+    SvgSearchForLink,
     LinkNoteDialog,
     SvgCog,
     NoteDeleteButton,
