@@ -1,11 +1,12 @@
 <template>
   <ToolbarFrame>
-    <PopButton title="choose a circle" :sidebar="'left'">
+    <PopButton v-if="user" title="open sidebar" :sidebar="'left'">
       <template #button_face>
         <SvgSidebar />
       </template>
       <CircleSelector />
     </PopButton>
+    <LoginButton v-else />
     <div class="btn-group btn-group-sm">
       <BrandBar />
     </div>

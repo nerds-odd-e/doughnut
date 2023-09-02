@@ -394,7 +394,7 @@ Cypress.Commands.add("yesIRemember", () => {
 Cypress.Commands.add("openCirclesSelector", () => {
   cy.routerToNotebooks().then(() => {
     cy.pageIsNotLoading()
-    cy.findByRole("button", { name: "choose a circle" }).click({ force: true })
+    cy.findByRole("button", { name: "open sidebar" }).click({ force: true })
   })
 })
 
