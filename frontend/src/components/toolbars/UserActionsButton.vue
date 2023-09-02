@@ -1,21 +1,18 @@
 <template>
-  <ToolbarFrame>
-    <UserIconMenu
-      role="button"
+  <div class="dropup w-100">
+    <button
       aria-label="User actions"
-      class="user-icon-menu"
+      class="user-icon-menu btn d-block w-100 text-start"
       data-bs-toggle="dropdown"
       data-toggle="dropdown"
       aria-haspopup="true"
       aria-expanded="false"
-    />
-
-    <div
-      v-if="user"
-      class="dropdown-menu dropdown-menu-end"
-      aria-labelledby="dropdownMenuButton"
     >
-      <PopButton class="dropdown-item" title="choose a circle">
+      <SvgMissingAvatar :x="-13" :y="-20" :height="40" />
+      {{ user.name }}
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <PopButton class="dropdown-item" title="user settings">
         <template #button_face> Settings for {{ user.name }}</template>
         <UserProfileDialog
           @user-updated="
@@ -27,30 +24,28 @@
       </PopButton>
       <a href="#" class="dropdown-item" role="button" @click="logout">Logout</a>
     </div>
-  </ToolbarFrame>
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import UserIconMenu from "./UserIconMenu.vue";
 import PopButton from "../commons/Popups/PopButton.vue";
 import UserProfileDialog from "./UserProfileDialog.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
-import ToolbarFrame from "./ToolbarFrame.vue";
+import SvgMissingAvatar from "../svgs/SvgMissingAvatar.vue";
 
 export default defineComponent({
   setup() {
     return useLoadingApi();
   },
   props: {
-    user: { type: Object as PropType<Generated.User> },
+    user: { type: Object as PropType<Generated.User>, required: true },
   },
   emits: ["updateUser"],
   components: {
-    UserIconMenu,
     PopButton,
     UserProfileDialog,
-    ToolbarFrame,
+    SvgMissingAvatar,
   },
   methods: {
     async logout() {
@@ -60,14 +55,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.doughnut-ring {
-  pointer-events: none;
-  font-size: 0.8rem;
-  font-weight: bold;
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-}
-</style>

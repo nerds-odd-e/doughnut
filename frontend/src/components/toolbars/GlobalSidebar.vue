@@ -2,10 +2,12 @@
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <BrandBar />
   </nav>
-  <UserActionsButton
-    v-bind="{ user }"
-    @update-user="$emit('updateUser', $event)"
-  />
+  <ToolbarFrame class="fixed-bottom-within-sidebar">
+    <UserActionsButton
+      v-bind="{ user }"
+      @update-user="$emit('updateUser', $event)"
+    />
+  </ToolbarFrame>
   <LoadingPage v-bind="{ contentExists: circles, title: 'My Circles' }">
     <div v-if="!!circles">
       <ul class="list-group">
@@ -42,6 +44,7 @@ import useLoadingApi from "../../managedApi/useLoadingApi";
 import PopButton from "../commons/Popups/PopButton.vue";
 import CircleNewDialog from "../circles/CircleNewDialog.vue";
 import BrandBar from "./BrandBar.vue";
+import ToolbarFrame from "./ToolbarFrame.vue";
 
 export default defineComponent({
   setup() {
@@ -71,6 +74,16 @@ export default defineComponent({
     CircleNewDialog,
     LoadingPage,
     BrandBar,
+    ToolbarFrame,
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.fixed-bottom-within-sidebar {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  z-index: 1000;
+}
+</style>
