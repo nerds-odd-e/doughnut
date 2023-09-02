@@ -1,22 +1,32 @@
-# Internal quality
+# Definition of Done
 
-- No “code smells” or lint  errors
-- Treat warnings as errors
-- Unit tested (all types of code)
+## External Quality
+
+- Zero downtime during deployment
+- Guaranteed user data integrity and security, at all times
+- No outstanding defects; all bugs fixed with highest priority
+- User manual updated, and users notified
+- Approved by the Product Owner (does not block deployment)
+
+## Internal Quality
+
+- No lint errors
+- Treat compiler or runtime warnings as errors
+- All code smells either resolved or justified
+  - Eliminate code duplication
+  - Minimize code elements for functionality
+  - Use domain-specific names to reveal intent
+  - No dead code, even if accompanied by unit tests
+  - Comment where necessary
 - End-to-end tested with all services integrated
-- No dead code (code that is not useful “yet,” even if it comes with UT)
-- use English in code, test, and documents (translation can be kept, but the original need to be in English)
+- Complete unit testing for all code
+- All external dependencies up-to-date and tested against latest stable versions
+- Use English for code, tests, and documentation
 
-# CI/CD
+## CI/CD System
 
-- Any local changes need to be checked-in to “main” (“trunk”) within an hour, or as frequently as possible
-- Running and passing in CI System
-- Deployed to production
-- A successful build should be deployed to production in less than 10 mins
-
-# External quality
-
-- No downtime during deployment
-- No known defects (Bugs should be fixed with the highest priority)
-- User manual updated and users are informed
-- Accepted by the Product Owner (this doesn't block deployment)
+- All changes checked into the mono-repo on the `main` (or `trunk`) branch
+- Successful in CI system
+- Automatic production deployment on every successful CI build
+- CI build completion within 10 minutes
+- Any existing automation must have accompanying 'autonomation' to halt the CI system if assumptions for the automation are invalidated
