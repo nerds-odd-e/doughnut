@@ -65,9 +65,9 @@ class LinkSourceQuizFactoryTest {
       assertThat(
           quizQuestion.getStem(),
           equalTo("Which one <em>is immediately a specialization of</em>:"));
-      assertThat(quizQuestion.getMainTopic(), equalTo(target.getTitle()));
+      assertThat(quizQuestion.getMainTopic(), equalTo(target.getTopic()));
       List<String> options = toOptionStrings(quizQuestion);
-      assertThat(anotherSource.getTitle(), in(options));
+      assertThat(anotherSource.getTopic(), in(options));
       assertThat("tomato sauce", in(options));
     }
   }

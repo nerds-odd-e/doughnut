@@ -35,13 +35,13 @@ export default defineComponent({
       return this.reviewPoint?.thing.link;
     },
     noteTitle() {
-      return this.note?.title;
+      return this.note?.topic;
     },
     sourceNoteTitle() {
-      return this.link?.sourceNote.title;
+      return this.link?.sourceNote.topic;
     },
     targetNoteTitle() {
-      return this.link?.targetNote.title;
+      return this.link?.targetNote.topic;
     },
   },
 });

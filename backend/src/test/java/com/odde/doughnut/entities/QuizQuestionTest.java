@@ -97,14 +97,14 @@ class QuizQuestionTest {
       @Test
       void descendingRandomizer() {
         List<String> options = getOptions(note1);
-        assertThat(options, containsInRelativeOrder(note2.getTitle(), note1.getTitle()));
+        assertThat(options, containsInRelativeOrder(note2.getTopic(), note1.getTopic()));
       }
 
       @Test
       void ascendingRandomizer() {
         randomizer.alwaysChoose = "last";
         List<String> options = getOptions(note1);
-        assertThat(options, containsInRelativeOrder(note1.getTitle(), note2.getTitle()));
+        assertThat(options, containsInRelativeOrder(note1.getTopic(), note2.getTopic()));
       }
     }
 
@@ -116,7 +116,7 @@ class QuizQuestionTest {
       makeMe.refresh(top);
       List<String> options = getOptions(note);
       assertThat(options.size(), equalTo(3));
-      assertThat(options.contains(note.getTitle()), is(true));
+      assertThat(options.contains(note.getTopic()), is(true));
     }
   }
 

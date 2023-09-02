@@ -61,7 +61,7 @@ class RestQuizQuestionControllerTests {
               .please();
       quizQuestionEntity =
           makeMe.aQuestion().of(QuizQuestionEntity.QuestionType.SPELLING, reviewPoint).please();
-      answer = makeMe.anAnswer().answerWithSpelling(answerNote.getTitle()).inMemoryPlease();
+      answer = makeMe.anAnswer().answerWithSpelling(answerNote.getTopic()).inMemoryPlease();
     }
 
     @Test

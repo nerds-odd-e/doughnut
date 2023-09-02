@@ -4,7 +4,7 @@ Feature: Note description completion
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user:
-      | title   | description | testingParent |
+      | topic   | description | testingParent |
       | Taiwan  |             |               |
       | Taipei  | A           | Taiwan        |
       | Weather | It rains a  | Taipei        |

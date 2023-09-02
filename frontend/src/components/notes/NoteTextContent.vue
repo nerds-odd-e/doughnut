@@ -1,15 +1,15 @@
 <template>
   <div style="display: flex">
     <EditableText
-      role="title"
-      class="note-title"
+      role="topic"
+      class="note-topic"
       scope-name="note"
-      :model-value="localTextContent.title"
+      :model-value="localTextContent.topic"
       @update:model-value="onUpdateTitle"
       @blur="onBlurTextField"
-      :errors="errors.title"
+      :errors="errors.topic"
     />
-    <slot name="title-additional" />
+    <slot name="topic-additional" />
   </div>
   <div class="note-content">
     <DescriptionEditor
@@ -73,7 +73,7 @@ export default defineComponent({
   },
   methods: {
     onUpdateTitle(newValue: string) {
-      this.localTextContent.title = newValue;
+      this.localTextContent.topic = newValue;
       this.saveChange();
     },
     onUpdateDescription(newValue: string) {
@@ -96,7 +96,7 @@ export default defineComponent({
     },
     isMeaningfulChange(newValue: Generated.TextContent) {
       return (
-        newValue.title !== this.textContent.title ||
+        newValue.topic !== this.textContent.topic ||
         newValue.description !== this.textContent.description
       );
     },
@@ -113,7 +113,7 @@ export default defineComponent({
         .catch((errors) => {
           if (errors.status === 401) {
             this.errors = {
-              title:
+              topic:
                 "You are not authorized to edit this note. Perhaps you are not logged in?",
             };
             return;

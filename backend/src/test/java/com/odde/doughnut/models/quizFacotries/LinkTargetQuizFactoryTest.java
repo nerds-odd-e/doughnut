@@ -66,8 +66,8 @@ class LinkTargetQuizFactoryTest {
       assertThat(quizQuestion.getStem(), equalTo("<mark>source</mark> is a specialization of:"));
       assertThat(quizQuestion.getMainTopic(), equalTo(""));
       List<String> options = toOptionStrings(quizQuestion);
-      assertThat(anotherTarget.getTitle(), in(options));
-      assertThat(target.getTitle(), in(options));
+      assertThat(anotherTarget.getTopic(), in(options));
+      assertThat(target.getTopic(), in(options));
     }
   }
 

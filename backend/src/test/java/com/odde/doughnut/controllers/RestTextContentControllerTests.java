@@ -47,7 +47,7 @@ class RestTextContentControllerTests {
     @BeforeEach
     void setup() {
       note = makeMe.aNote("new").creatorAndOwner(userModel).please();
-      textContent.setTitle("new title");
+      textContent.setTopic("new title");
       textContent.setDescription("new description");
     }
 

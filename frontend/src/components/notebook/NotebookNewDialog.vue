@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import NoteFormTitleOnly from "../notes/NoteFormTitleOnly.vue";
+import NoteFormTitleOnly from "../notes/NoteFormTopicOnly.vue";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 

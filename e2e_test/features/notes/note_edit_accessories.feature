@@ -3,7 +3,7 @@ Feature: Note Edit Accessories
 
   Background:
     Given I've logged in as an existing user
-    And I have a note with the title "lunar"
+    And I have a note with the topic "lunar"
 
   Scenario: Edit a note
     When I update note accessories of "lunar" to become:

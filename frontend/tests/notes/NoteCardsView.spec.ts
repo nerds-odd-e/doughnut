@@ -7,8 +7,8 @@ helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("note wth child cards", () => {
   it("should render note with one child", async () => {
-    const noteParent = makeMe.aNoteRealm.title("parent").please();
-    makeMe.aNoteRealm.title("child").under(noteParent).please();
+    const noteParent = makeMe.aNoteRealm.topic("parent").please();
+    makeMe.aNoteRealm.topic("child").under(noteParent).please();
     helper.apiMock
       .expectingGet(`/api/notes/${noteParent.id}`)
       .andReturnOnce(noteParent);
@@ -21,6 +21,6 @@ describe("note wth child cards", () => {
       .render();
     await screen.findByText("parent");
     await screen.findByText("child");
-    expect(screen.getAllByRole("title")).toHaveLength(1);
+    expect(screen.getAllByRole("topic")).toHaveLength(1);
   });
 });

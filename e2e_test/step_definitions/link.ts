@@ -10,29 +10,29 @@ When("I start searching", () => {
   cy.startSearching()
 })
 
-When("I am creating link for note {string}", (noteTitle: string) => {
-  cy.startSearchingAndLinkNote(noteTitle)
+When("I am creating link for note {string}", (noteTopic: string) => {
+  cy.startSearchingAndLinkNote(noteTopic)
 })
 
-function makingLink(cy, fromNoteTitle: string, linkType: string, toNoteTitle: string) {
-  cy.startSearchingAndLinkNote(fromNoteTitle)
-  cy.searchNote(toNoteTitle, ["All My Notebooks And Subscriptions"])
-  cy.clickButtonOnCardBody(toNoteTitle, "Select")
+function makingLink(cy, fromNoteTopic: string, linkType: string, toNoteTopic: string) {
+  cy.startSearchingAndLinkNote(fromNoteTopic)
+  cy.searchNote(toNoteTopic, ["All My Notebooks And Subscriptions"])
+  cy.clickButtonOnCardBody(toNoteTopic, "Select")
   cy.clickRadioByLabel(linkType)
 }
 
 When(
   "I link note {string} as {string} note {string}",
-  (fromNoteTitle: string, linkType: string, toNoteTitle: string) => {
-    makingLink(cy, fromNoteTitle, linkType, toNoteTitle)
+  (fromNoteTopic: string, linkType: string, toNoteTopic: string) => {
+    makingLink(cy, fromNoteTopic, linkType, toNoteTopic)
     cy.findByRole("button", { name: "Create Link" }).click()
   },
 )
 
 When(
   "I link note {string} as {string} note {string} and move under it",
-  (fromNoteTitle: string, linkType: string, toNoteTitle: string) => {
-    makingLink(cy, fromNoteTitle, linkType, toNoteTitle)
+  (fromNoteTopic: string, linkType: string, toNoteTopic: string) => {
+    makingLink(cy, fromNoteTopic, linkType, toNoteTopic)
     cy.formField("Also Move To Under Target Note").check()
     cy.findByRole("button", { name: "Create Link" }).click()
     cy.findByRole("button", { name: "OK" }).click()
@@ -41,33 +41,33 @@ When(
 
 When(
   "there is {string} link between note {string} and {string}",
-  (linkType: string, fromNoteTitle: string, toNoteTitle: string) => {
-    cy.testability().seedLink(linkType, fromNoteTitle, toNoteTitle)
+  (linkType: string, fromNoteTopic: string, toNoteTopic: string) => {
+    cy.testability().seedLink(linkType, fromNoteTopic, toNoteTopic)
   },
 )
 
-When("I should see the source note as {string}", (noteTitle: string) => {
-  cy.findByText(noteTitle, { selector: "strong" }).should("be.visible")
+When("I should see the source note as {string}", (noteTopic: string) => {
+  cy.findByText(noteTopic, { selector: "strong" }).should("be.visible")
 })
 
-When("I should see {string} as the possible duplicate", (noteTitlesAsString: string) => {
+When("I should see {string} as the possible duplicate", (noteTopicsAsString: string) => {
   cy.tick(500)
-  cy.expectExactLinkTargets(noteTitlesAsString.commonSenseSplit(",").map((i: string) => i.trim()))
+  cy.expectExactLinkTargets(noteTopicsAsString.commonSenseSplit(",").map((i: string) => i.trim()))
 })
 
 When(
   "I should see {string} as targets only when searching {string}",
-  (noteTitlesAsString: string, searchKey: string) => {
+  (noteTopicsAsString: string, searchKey: string) => {
     cy.searchNote(searchKey, [])
-    cy.expectExactLinkTargets(noteTitlesAsString.commonSenseSplit(",").map((i: string) => i.trim()))
+    cy.expectExactLinkTargets(noteTopicsAsString.commonSenseSplit(",").map((i: string) => i.trim()))
   },
 )
 
 When(
   "I should see {string} as targets only when searching in all my notebooks {string}",
-  (noteTitlesAsString: string, searchKey: string) => {
+  (noteTopicsAsString: string, searchKey: string) => {
     cy.searchNote(searchKey, ["All My Notebooks And Subscriptions"])
-    cy.expectExactLinkTargets(noteTitlesAsString.commonSenseSplit(",").map((i: string) => i.trim()))
+    cy.expectExactLinkTargets(noteTopicsAsString.commonSenseSplit(",").map((i: string) => i.trim()))
   },
 )
 
@@ -81,9 +81,9 @@ When(
 
 Then(
   "On the current page, I should see {string} has link {string} {string}",
-  (noteTitle: string, linkType: string, targetNoteTitles: string) => {
-    const targetNoteTitlesList = targetNoteTitles.commonSenseSplit(",")
-    cy.findByText(targetNoteTitles.commonSenseSplit(",").pop(), {
+  (noteTopic: string, linkType: string, targetNoteTopics: string) => {
+    const targetNoteTopicsList = targetNoteTopics.commonSenseSplit(",")
+    cy.findByText(targetNoteTopics.commonSenseSplit(",").pop(), {
       selector: ".link-title",
     })
     const linksForNoteFound: string[] = []
@@ -96,21 +96,21 @@ Then(
         })
       })
       .then(() => {
-        expect(targetNoteTitlesList.every((linkItem) => linksForNoteFound.includes(linkItem))).to.be
+        expect(targetNoteTopicsList.every((linkItem) => linksForNoteFound.includes(linkItem))).to.be
           .true
       })
   },
 )
 
-Then("I should see {string} has no link to {string}", (noteTitle: string, targetTitle: string) => {
-  cy.jumpToNotePage(noteTitle)
+Then("I should see {string} has no link to {string}", (noteTopic: string, targetTitle: string) => {
+  cy.jumpToNotePage(noteTopic)
   cy.findByText(targetTitle).should("not.exist")
 })
 
 Then(
   "I change the link from {string} to {string} to {string}",
-  (noteTitle: string, targetTitle: string, linkType: string) => {
-    cy.jumpToNotePage(noteTitle)
+  (noteTopic: string, targetTitle: string, linkType: string) => {
+    cy.jumpToNotePage(noteTopic)
     cy.changeLinkType(targetTitle, linkType)
   },
 )
@@ -119,9 +119,9 @@ Then("I should be able to delete the link", () => {
   cy.findByRole("button", { name: "Delete" }).click()
 })
 
-Then("I delete the link from {string} to {string}", (noteTitle: string, targetTitle: string) => {
+Then("I delete the link from {string} to {string}", (noteTopic: string, targetTitle: string) => {
   cy.pageIsNotLoading()
-  cy.jumpToNotePage(noteTitle)
+  cy.jumpToNotePage(noteTopic)
   cy.clickLinkNob(targetTitle)
   cy.findByRole("button", { name: "Delete" }).click()
   cy.findByRole("button", { name: "Cancel" }).click()
@@ -129,5 +129,5 @@ Then("I delete the link from {string} to {string}", (noteTitle: string, targetTi
   cy.findByRole("button", { name: "Delete" }).click()
   cy.findByRole("button", { name: "OK" }).click()
   cy.contains(targetTitle).should("not.exist")
-  cy.findNoteTitle(noteTitle) // remain on the same note page
+  cy.findNoteTopic(noteTopic) // remain on the same note page
 })

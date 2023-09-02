@@ -67,7 +67,7 @@ Cypress.Commands.add("findUserSettingsButton", (userName: string) => {
 
 Cypress.Commands.add("expectBreadcrumb", (items: string) => {
   cy.get(".breadcrumb").within(() =>
-    items.commonSenseSplit(", ").forEach((noteTitle: string) => cy.findByText(noteTitle)),
+    items.commonSenseSplit(", ").forEach((noteTopic: string) => cy.findByText(noteTopic)),
   )
 })
 
@@ -79,30 +79,30 @@ Cypress.Commands.add("submitNoteCreationFormSuccessfully", (noteAttributes) => {
 Cypress.Commands.add("submitNoteCreationFormWith", (noteAttributes) => {
   const linkTypeToParent = noteAttributes["Link Type To Parent"]
   delete noteAttributes["Link Type To Parent"]
-  const { Title, Description, ["Wikidata Id"]: wikidataId, ...remainingAttrs } = noteAttributes
+  const { Topic, Description, ["Wikidata Id"]: wikidataId, ...remainingAttrs } = noteAttributes
 
   cy.submitNoteFormWith({
-    Title,
+    Topic,
     "Link Type To Parent": linkTypeToParent,
     "Wikidata Id": wikidataId,
   })
 
   if (!!Description) {
-    if (!!Title) {
-      cy.findByText(Title) // the creation has to be successful before continuing to edit the description
+    if (!!Topic) {
+      cy.findByText(Topic) // the creation has to be successful before continuing to edit the description
     }
     cy.inPlaceEdit({ Description })
   }
 
   if (Object.keys(remainingAttrs).length > 0) {
-    cy.openAndSubmitNoteAccessoriesFormWith(Title, remainingAttrs)
+    cy.openAndSubmitNoteAccessoriesFormWith(Topic, remainingAttrs)
   }
 })
 
 Cypress.Commands.add(
   "openAndSubmitNoteAccessoriesFormWith",
-  (noteTitle: string, noteAccessoriesAttributes: Record<string, string>) => {
-    cy.findNoteTitle(noteTitle)
+  (noteTopic: string, noteAccessoriesAttributes: Record<string, string>) => {
+    cy.findNoteTopic(noteTopic)
     cy.notePageButtonOnCurrentPageEditNote().click()
     cy.submitNoteFormWith(noteAccessoriesAttributes)
   },
@@ -197,7 +197,7 @@ Cypress.Commands.add("expectNoteCards", (expectedCards: string[]) => {
   cy.get("a.card-title").should("have.length", expectedCards.length)
   expectedCards.forEach((elem) => {
     for (const propName in elem) {
-      if (propName === "note-title") {
+      if (propName === "note-topic") {
         cy.findCardTitle(elem[propName])
       } else {
         cy.findByText(elem[propName])
@@ -206,27 +206,27 @@ Cypress.Commands.add("expectNoteCards", (expectedCards: string[]) => {
   })
 })
 
-Cypress.Commands.add("navigateToChild", (noteTitle) => {
-  cy.findCardTitle(noteTitle).click()
-  cy.findNoteTitle(noteTitle)
+Cypress.Commands.add("navigateToChild", (noteTopic) => {
+  cy.findCardTitle(noteTopic).click()
+  cy.findNoteTopic(noteTopic)
 })
 
 Cypress.Commands.add("navigateToNotePage", (notePath: NotePath) => {
   cy.routerToNotebooks()
-  notePath.path.forEach((noteTitle) => cy.navigateToChild(noteTitle))
+  notePath.path.forEach((noteTopic) => cy.navigateToChild(noteTopic))
 })
 
 // jumptoNotePage is faster than navigateToNotePage
 //    it uses the note id memorized when creating them with testability api
-Cypress.Commands.add("jumpToNotePage", (noteTitle: string, forceLoadPage = false) => {
+Cypress.Commands.add("jumpToNotePage", (noteTopic: string, forceLoadPage = false) => {
   cy.testability()
-    .getSeededNoteIdByTitle(noteTitle)
+    .getSeededNoteIdByTitle(noteTopic)
     .then((noteId) => {
       const url = `/notes/${noteId}`
       if (forceLoadPage) cy.visit(url)
       else cy.routerPush(url, "noteShow", { noteId: noteId })
     })
-  cy.findNoteTitle(noteTitle)
+  cy.findNoteTopic(noteTopic)
 })
 
 Cypress.Commands.add("routerPush", (fallback, name, params) => {
@@ -251,8 +251,8 @@ Cypress.Commands.add("routerPush", (fallback, name, params) => {
   })
 })
 
-Cypress.Commands.add("clickButtonOnCardBody", (noteTitle, buttonTitle) => {
-  cy.findCardTitle(noteTitle).then(($card) => {
+Cypress.Commands.add("clickButtonOnCardBody", (noteTopic, buttonTitle) => {
+  cy.findCardTitle(noteTopic).then(($card) => {
     cy.wrap($card)
       .parent()
       .parent()
@@ -271,20 +271,20 @@ Cypress.Commands.add("startSearching", () => {
   cy.notePageButtonOnCurrentPage("search note").click()
 })
 
-Cypress.Commands.add("startSearchingAndLinkNote", (noteTitle: string) => {
-  cy.jumpToNotePage(noteTitle)
+Cypress.Commands.add("startSearchingAndLinkNote", (noteTopic: string) => {
+  cy.jumpToNotePage(noteTopic)
   cy.notePageButtonOnCurrentPage("search and link note").click()
 })
 
-Cypress.Commands.add("clickNotePageButton", (noteTitle, btnTextOrTitle, forceLoadPage) => {
-  cy.jumpToNotePage(noteTitle, forceLoadPage)
+Cypress.Commands.add("clickNotePageButton", (noteTopic, btnTextOrTitle, forceLoadPage) => {
+  cy.jumpToNotePage(noteTopic, forceLoadPage)
   cy.notePageButtonOnCurrentPage(btnTextOrTitle).click()
 })
 
 Cypress.Commands.add(
   "clickNotePageMoreOptionsButton",
-  (noteTitle: string, btnTextOrTitle: string) => {
-    cy.jumpToNotePage(noteTitle)
+  (noteTopic: string, btnTextOrTitle: string) => {
+    cy.jumpToNotePage(noteTopic)
     cy.clickNotePageMoreOptionsButtonOnCurrentPage(btnTextOrTitle)
   },
 )
@@ -294,8 +294,8 @@ Cypress.Commands.add("clickNotePageMoreOptionsButtonOnCurrentPage", (btnTextOrTi
   cy.notePageButtonOnCurrentPage(btnTextOrTitle).click()
 })
 
-Cypress.Commands.add("deleteNote", (noteTitle: string) => {
-  cy.clickNotePageMoreOptionsButton(noteTitle, "Delete note")
+Cypress.Commands.add("deleteNote", (noteTopic: string) => {
+  cy.clickNotePageMoreOptionsButton(noteTopic, "Delete note")
   cy.findByRole("button", { name: "OK" }).click()
   cy.pageIsNotLoading()
 })
@@ -317,9 +317,9 @@ Cypress.Commands.add("changeLinkType", (targetTitle: string, linkType: string) =
   cy.findAllByRole("button", { name: linkType }).should("be.visible")
 })
 
-Cypress.Commands.add("findNoteCardButton", (noteTitle, btnTextOrTitle) => {
+Cypress.Commands.add("findNoteCardButton", (noteTopic, btnTextOrTitle) => {
   return cy
-    .findCardTitle(noteTitle)
+    .findCardTitle(noteTopic)
     .parent()
     .parent()
     .parent()
@@ -329,11 +329,11 @@ Cypress.Commands.add("findNoteCardButton", (noteTitle, btnTextOrTitle) => {
 
 Cypress.Commands.add(
   "initialReviewOneNoteIfThereIs",
-  ({ review_type, title, additional_info, skip }) => {
+  ({ review_type, topic, additional_info, skip }) => {
     if (review_type == "initial done") {
       cy.findByText("You have achieved your daily new notes goal.").should("be.visible")
     } else {
-      cy.findByText(title)
+      cy.findByText(topic)
       switch (review_type) {
         case "single note": {
           if (additional_info) {
@@ -357,7 +357,7 @@ Cypress.Commands.add(
         case "link": {
           if (additional_info) {
             const [linkType, targetNote] = additional_info.commonSenseSplit("; ")
-            cy.findByText(title)
+            cy.findByText(topic)
             cy.findByText(targetNote)
             cy.get(".badge").contains(linkType)
           }
@@ -377,14 +377,14 @@ Cypress.Commands.add(
   },
 )
 
-Cypress.Commands.add("findNoteTitle", (title) =>
-  cy.findByText(title, { selector: "[role=title] *" }),
+Cypress.Commands.add("findNoteTopic", (topic) =>
+  cy.findByText(topic, { selector: "[role=topic] *" }),
 )
 Cypress.Commands.add("findNoteDescriptionOnCurrentPage", (expected: string) => {
   expected.split("\\n").forEach((line) => cy.get("[role=description]").should("contain", line))
 })
 
-Cypress.Commands.add("findCardTitle", (title) => cy.findByText(title, { selector: "a.card-title" }))
+Cypress.Commands.add("findCardTitle", (topic) => cy.findByText(topic, { selector: "a.card-title" }))
 
 Cypress.Commands.add("yesIRemember", () => {
   cy.tick(11 * 1000).then(() => {
@@ -430,32 +430,32 @@ Cypress.Commands.add("initialReviewInSequence", (reviews) => {
   })
 })
 
-Cypress.Commands.add("initialReviewNotes", (noteTitles: string) => {
+Cypress.Commands.add("initialReviewNotes", (noteTopics: string) => {
   cy.initialReviewInSequence(
-    noteTitles.commonSenseSplit(", ").map((title: string) => {
+    noteTopics.commonSenseSplit(", ").map((topic: string) => {
       return {
-        review_type: title === "end" ? "initial done" : "single note",
-        title,
+        review_type: topic === "end" ? "initial done" : "single note",
+        topic,
       }
     }),
   )
 })
 
-Cypress.Commands.add("repeatReviewNotes", (noteTitles: string) => {
-  noteTitles.commonSenseSplit(",").forEach((title) => {
-    if (title == "end") {
+Cypress.Commands.add("repeatReviewNotes", (noteTopics: string) => {
+  noteTopics.commonSenseSplit(",").forEach((topic) => {
+    if (topic == "end") {
       cy.findByText("You have finished all repetitions for this half a day!").should("be.visible")
     } else {
-      cy.findByText(title, { selector: "h2" })
+      cy.findByText(topic, { selector: "h2" })
       cy.yesIRemember()
     }
   })
 })
 
-Cypress.Commands.add("goAndRepeatReviewNotes", (noteTitles: string) => {
-  if (noteTitles.trim() === "") return
+Cypress.Commands.add("goAndRepeatReviewNotes", (noteTopics: string) => {
+  if (noteTopics.trim() === "") return
   cy.routerToRepeatReview()
-  cy.repeatReviewNotes(noteTitles)
+  cy.repeatReviewNotes(noteTopics)
 })
 
 Cypress.Commands.add("repeatMore", () => {
@@ -482,28 +482,15 @@ Cypress.Commands.add("subscribeToNotebook", (notebookTitle: string, dailyLearnin
   cy.findByRole("button", { name: "Submit" }).click()
 })
 
-Cypress.Commands.add("unsubscribeFromNotebook", (noteTitle) => {
+Cypress.Commands.add("unsubscribeFromNotebook", (noteTopic) => {
   cy.routerToNotebooks()
-  cy.findNoteCardButton(noteTitle, "Unsubscribe").click()
+  cy.findNoteCardButton(noteTopic, "Unsubscribe").click()
 })
 
 Cypress.Commands.add("searchNote", (searchKey: string, options: string[]) => {
   options?.forEach((option: string) => cy.formField(option).check())
   cy.findByPlaceholderText("Search").clear().type(searchKey)
   cy.tick(500)
-})
-
-Cypress.Commands.add("assertBlogPostInWebsiteByTitle", (article) => {
-  cy.get("#article-container").within(() => {
-    cy.get(".article")
-      .first()
-      .within(() => {
-        cy.get(".title").first().should("have.text", article.title)
-        cy.get(".content").first().should("have.text", article.description)
-        cy.get(".authorName").first().should("have.text", article.authorName)
-        cy.get(".createdAt").first().should("have.text", article.createdAt)
-      })
-  })
 })
 
 Cypress.Commands.add("failure", () => {
@@ -532,15 +519,15 @@ Cypress.Commands.add("deleteNoteViaAPI", { prevSubject: true }, (subject) => {
   })
 })
 
-Cypress.Commands.add("noteByTitle", (noteTitle: string) => {
+Cypress.Commands.add("noteByTitle", (noteTopic: string) => {
   return cy
-    .findCardTitle(noteTitle)
+    .findCardTitle(noteTopic)
     .invoke("attr", "href")
     .then(($attr) => /notes\/(\d+)/g.exec($attr)[1])
 })
 
-Cypress.Commands.add("associateNoteWithWikidataId", (title, wikiID) => {
-  cy.clickNotePageButton(title, "associate wikidata", true)
+Cypress.Commands.add("associateNoteWithWikidataId", (topic, wikiID) => {
+  cy.clickNotePageButton(topic, "associate wikidata", true)
   cy.replaceFocusedTextAndEnter(wikiID)
 })
 
@@ -575,17 +562,17 @@ Cypress.Commands.add("expectAMapTo", (latitude: string, longitude: string) => {
   cy.findByText(`Location: ${latitude}'N, ${longitude}'E`)
 })
 
-Cypress.Commands.add("aiGenerateImage", (noteTitle: string) => {
-  cy.jumpToNotePage(noteTitle)
-  cy.clickNotePageMoreOptionsButton(noteTitle, "Generate Image with DALL-E")
+Cypress.Commands.add("aiGenerateImage", (noteTopic: string) => {
+  cy.jumpToNotePage(noteTopic)
+  cy.clickNotePageMoreOptionsButton(noteTopic, "Generate Image with DALL-E")
 })
 
 Cypress.Commands.add("dismissLastErrorMessage", () => {
   cy.get(".last-error-message").click()
 })
 
-Cypress.Commands.add("aiSuggestDescriptionForNote", (noteTitle: string) => {
-  cy.jumpToNotePage(noteTitle)
+Cypress.Commands.add("aiSuggestDescriptionForNote", (noteTopic: string) => {
+  cy.jumpToNotePage(noteTopic)
   cy.on("uncaught:exception", () => {
     return false
   })

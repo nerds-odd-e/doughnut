@@ -3,10 +3,10 @@ Feature: Generate image
 
   Background:
     Given I've logged in as an existing user
-    And I have a note with the title "Animals"
+    And I have a note with the topic "Animals"
 
   @usingMockedOpenAiService
-  Scenario: get an image for a note based on its title
+  Scenario: get an image for a note based on its topic
     Given OpenAI always return image of a moon
     When I generate an image for "Animals"
     Then I should find an art created by the ai

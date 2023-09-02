@@ -45,13 +45,13 @@ public class TextContentTest {
 
     @Test
     public void titleIsNotOptional() {
-      newNote.setTitle("");
+      newNote.setTopic("");
       assertThat(getViolations(), is(not(empty())));
     }
 
     @Test
     public void titleCannotBeTooLong() {
-      newNote.setTitle(makeMe.aStringOfLength(151));
+      newNote.setTopic(makeMe.aStringOfLength(151));
       assertThat(getViolations(), is(not(empty())));
     }
 

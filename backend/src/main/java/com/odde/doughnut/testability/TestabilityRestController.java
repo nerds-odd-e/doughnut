@@ -80,7 +80,7 @@ class TestabilityRestController {
   }
 
   static class SeedNote {
-    public String title;
+    public String topic;
     @Setter private String description;
     @Setter private String testingParent;
     @Setter private Boolean skipReview;
@@ -93,7 +93,7 @@ class TestabilityRestController {
       Note note = Note.createNote(user, currentUTCTimestamp, new TextContent());
       NoteAccessories content = note.getNoteAccessories();
 
-      note.setTitle(title);
+      note.setTopic(topic);
       note.setDescription(description);
       note.setUpdatedAt(currentUTCTimestamp);
       if (skipReview != null) {
@@ -119,7 +119,7 @@ class TestabilityRestController {
     private Map<String, Note> buildIndividualNotes(User user, Timestamp currentUTCTimestamp) {
       return seedNotes.stream()
           .map(seedNote -> seedNote.buildNote(user, currentUTCTimestamp))
-          .collect(Collectors.toMap(Note::getTitle, n -> n));
+          .collect(Collectors.toMap(Note::getTopic, n -> n));
     }
 
     private void buildNoteTree(
@@ -129,7 +129,7 @@ class TestabilityRestController {
         NoteRepository noteRepository) {
       seedNotes.forEach(
           seed -> {
-            Note note = titleNoteMap.get(seed.title);
+            Note note = titleNoteMap.get(seed.topic);
 
             if (Strings.isBlank(seed.testingParent)) {
               note.buildNotebookForHeadNote(ownership, user);
@@ -148,7 +148,7 @@ class TestabilityRestController {
 
     private void saveByOriginalOrder(
         Map<String, Note> titleNoteMap, NoteRepository noteRepository1) {
-      seedNotes.forEach((seed -> noteRepository1.save(titleNoteMap.get(seed.title))));
+      seedNotes.forEach((seed -> noteRepository1.save(titleNoteMap.get(seed.topic))));
     }
   }
 
@@ -162,7 +162,7 @@ class TestabilityRestController {
     Map<String, Note> titleNoteMap = seedInfo.buildIndividualNotes(user, currentUTCTimestamp);
     seedInfo.buildNoteTree(user, ownership, titleNoteMap, this.noteRepository);
     seedInfo.saveByOriginalOrder(titleNoteMap, this.noteRepository);
-    return titleNoteMap.values().stream().collect(Collectors.toMap(Note::getTitle, Thingy::getId));
+    return titleNoteMap.values().stream().collect(Collectors.toMap(Note::getTopic, Thingy::getId));
   }
 
   private Ownership getOwnership(SeedInfo seedInfo, User user) {
@@ -202,7 +202,7 @@ class TestabilityRestController {
   @PostMapping("/share_to_bazaar")
   @Transactional
   public String shareToBazaar(@RequestBody HashMap<String, String> map) {
-    Note note = noteRepository.findFirstByTitle(map.get("noteTitle"));
+    Note note = noteRepository.findFirstByTitle(map.get("noteTopic"));
     modelFactoryService.toBazaarModel().shareNote(note.getNotebook());
     return "OK";
   }

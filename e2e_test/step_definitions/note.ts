@@ -21,16 +21,16 @@ defineParameterType({
   },
 })
 
-Given("I visit note {string}", (noteTitle) => {
-  cy.jumpToNotePage(noteTitle)
+Given("I visit note {string}", (noteTopic) => {
+  cy.jumpToNotePage(noteTopic)
 })
 
 Given("there are some notes for the current user:", (data: DataTable) => {
   cy.testability().seedNotes(data.hashes())
 })
 
-Given("I have a note with the title {string}", (noteTitle: string) => {
-  cy.testability().seedNotes([{ title: noteTitle }])
+Given("I have a note with the topic {string}", (noteTopic: string) => {
+  cy.testability().seedNotes([{ topic: noteTopic }])
 })
 
 Given("there are some notes for existing user {string}", (externalIdentifier, data: DataTable) => {
@@ -41,7 +41,7 @@ Given("there are notes from Note {int} to Note {int}", (from: number, to: number
   const notes = Array(to - from + 1)
     .fill(0)
     .map((_, i) => {
-      return { title: `Note ${i + from}` }
+      return { topic: `Note ${i + from}` }
     })
   cy.testability().seedNotes(notes)
 })
@@ -53,47 +53,47 @@ When("I create notebooks with:", (notes: DataTable) => {
   })
 })
 
-When("I create a notebook with empty title", () => {
+When("I create a notebook with empty topic", () => {
   cy.createNotebookWith({ Title: "" })
 })
 
-When("I update note {string} to become:", (noteTitle: string, data: DataTable) => {
-  cy.jumpToNotePage(noteTitle)
+When("I update note {string} to become:", (noteTopic: string, data: DataTable) => {
+  cy.jumpToNotePage(noteTopic)
   cy.inPlaceEdit(data.hashes()[0])
 })
 
-When("I update note accessories of {string} to become:", (noteTitle: string, data: DataTable) => {
-  cy.jumpToNotePage(noteTitle)
-  cy.openAndSubmitNoteAccessoriesFormWith(noteTitle, data.hashes()[0])
+When("I update note accessories of {string} to become:", (noteTopic: string, data: DataTable) => {
+  cy.jumpToNotePage(noteTopic)
+  cy.openAndSubmitNoteAccessoriesFormWith(noteTopic, data.hashes()[0])
 })
 
 When(
   "I should see note {string} has a picture and a url {string}",
-  (noteTitle: string, expectedUrl: string) => {
-    cy.jumpToNotePage(noteTitle)
+  (noteTopic: string, expectedUrl: string) => {
+    cy.jumpToNotePage(noteTopic)
     cy.get("#note-picture").should("exist")
     cy.findByLabelText("Url:").should("have.attr", "href", expectedUrl)
   },
 )
 
-When("I can change the title {string} to {string}", (noteTitle: string, newNoteTitle: string) => {
-  cy.findNoteTitle(noteTitle)
-  cy.inPlaceEdit({ title: newNoteTitle })
-  cy.findNoteTitle(newNoteTitle)
+When("I can change the topic {string} to {string}", (noteTopic: string, newNoteTopic: string) => {
+  cy.findNoteTopic(noteTopic)
+  cy.inPlaceEdit({ topic: newNoteTopic })
+  cy.findNoteTopic(newNoteTopic)
 })
 
 Given(
-  "I update note title {string} to become {string}",
-  (noteTitle: string, newNoteTitle: string) => {
-    cy.jumpToNotePage(noteTitle)
-    cy.findNoteTitle(noteTitle).click()
-    cy.replaceFocusedTextAndEnter(newNoteTitle)
+  "I update note topic {string} to become {string}",
+  (noteTopic: string, newNoteTopic: string) => {
+    cy.jumpToNotePage(noteTopic)
+    cy.findNoteTopic(noteTopic).click()
+    cy.replaceFocusedTextAndEnter(newNoteTopic)
   },
 )
 
 Given(
   "I update note {string} description from {string} to become {string}",
-  (noteTitle: string, noteDescription: string, newNoteDescription: string) => {
+  (noteTopic: string, noteDescription: string, newNoteDescription: string) => {
     cy.findByText(noteDescription).click({ force: true })
     cy.replaceFocusedTextAndEnter(newNoteDescription)
   },
@@ -101,23 +101,23 @@ Given(
 
 When(
   "I update note {string} with description {string}",
-  (noteTitle: string, newDescription: string) => {
-    cy.jumpToNotePage(noteTitle)
+  (noteTopic: string, newDescription: string) => {
+    cy.jumpToNotePage(noteTopic)
     cy.inPlaceEdit({ Description: newDescription })
     cy.findNoteDescriptionOnCurrentPage(newDescription)
   },
 )
 
-When("I create a note belonging to {string}:", (noteTitle: string, data: DataTable) => {
+When("I create a note belonging to {string}:", (noteTopic: string, data: DataTable) => {
   expect(data.hashes().length).to.equal(1)
-  cy.jumpToNotePage(noteTitle)
+  cy.jumpToNotePage(noteTopic)
   cy.clickAddChildNoteButton()
   cy.submitNoteCreationFormSuccessfully(data.hashes()[0])
 })
 
-When("I try to create a note belonging to {string}:", (noteTitle: string, data: DataTable) => {
+When("I try to create a note belonging to {string}:", (noteTopic: string, data: DataTable) => {
   expect(data.hashes().length).to.equal(1)
-  cy.jumpToNotePage(noteTitle)
+  cy.jumpToNotePage(noteTopic)
   cy.clickAddChildNoteButton()
   cy.submitNoteCreationFormWith(data.hashes()[0])
 })
@@ -127,9 +127,9 @@ When("I am creating a note under {notepath}", (notePath: NotePath) => {
   cy.clickAddChildNoteButton()
 })
 
-Then("I should see {string} in breadcrumb", (noteTitles: string) => {
+Then("I should see {string} in breadcrumb", (noteTopics: string) => {
   cy.pageIsNotLoading()
-  cy.expectBreadcrumb(noteTitles)
+  cy.expectBreadcrumb(noteTopics)
 })
 
 When("I visit all my notebooks", () => {
@@ -148,53 +148,53 @@ Then("I should see {notepath} with these children", (notePath: NotePath, data: D
   cy.navigateToNotePage(notePath).then(() => cy.expectNoteCards(data.hashes()))
 })
 
-When("I delete notebook {string}", (noteTitle: string) => {
-  cy.deleteNote(noteTitle)
+When("I delete notebook {string}", (noteTopic: string) => {
+  cy.deleteNote(noteTopic)
 })
 
-When("I delete note {string} at {int}:00", (noteTitle: string, hour: number) => {
+When("I delete note {string} at {int}:00", (noteTopic: string, hour: number) => {
   cy.testability().backendTimeTravelTo(0, hour)
-  cy.deleteNote(noteTitle)
+  cy.deleteNote(noteTopic)
 })
 
-When("I delete note {string}", (noteTitle: string) => {
-  cy.deleteNote(noteTitle)
+When("I delete note {string}", (noteTopic: string) => {
+  cy.deleteNote(noteTopic)
 })
 
-When("I create a sibling note of {string}:", (noteTitle: string, data: DataTable) => {
+When("I create a sibling note of {string}:", (noteTopic: string, data: DataTable) => {
   expect(data.hashes().length).to.equal(1)
-  cy.findNoteTitle(noteTitle)
+  cy.findNoteTopic(noteTopic)
   cy.addSiblingNoteButton().click()
   cy.submitNoteCreationFormSuccessfully(data.hashes()[0])
 })
 
 When("I should see that the note creation is not successful", () => {
-  cy.expectFieldErrorMessage("Title", "size must be between 1 and 150")
+  cy.expectFieldErrorMessage("Topic", "size must be between 1 and 150")
   cy.dismissLastErrorMessage()
 })
 
-Then("I should see the note {string} is marked as deleted", (noteTitle: string) => {
-  cy.jumpToNotePage(noteTitle)
-  cy.findNoteTitle(noteTitle)
+Then("I should see the note {string} is marked as deleted", (noteTopic: string) => {
+  cy.jumpToNotePage(noteTopic)
+  cy.findNoteTopic(noteTopic)
   cy.findByText("This note has been deleted")
 })
 
-Then("I should not see note {string} at the top level of all my notes", (noteTitle: string) => {
+Then("I should not see note {string} at the top level of all my notes", (noteTopic: string) => {
   cy.pageIsNotLoading()
   cy.findByText("Notebooks")
-  cy.findCardTitle(noteTitle).should("not.exist")
+  cy.findCardTitle(noteTopic).should("not.exist")
 })
 
 When("I navigate to {notepath} note", (notePath: NotePath) => {
   cy.navigateToNotePage(notePath)
 })
 
-When("I click the child note {string}", (noteTitle) => {
-  cy.navigateToChild(noteTitle)
+When("I click the child note {string}", (noteTopic) => {
+  cy.navigateToChild(noteTopic)
 })
 
-When("I move note {string} left", (noteTitle) => {
-  cy.jumpToNotePage(noteTitle)
+When("I move note {string} left", (noteTopic) => {
+  cy.jumpToNotePage(noteTopic)
   cy.findByText("Move This Note").click()
   cy.findByRole("button", { name: "Move Left" }).click()
 })
@@ -203,17 +203,17 @@ When("I should see the screenshot matches", () => {
   // cy.get('.content').compareSnapshot('page-snapshot', 0.001);
 })
 
-When("I move note {string} right", (noteTitle: string) => {
-  cy.jumpToNotePage(noteTitle)
+When("I move note {string} right", (noteTopic: string) => {
+  cy.jumpToNotePage(noteTopic)
   cy.findByText("Move This Note").click()
   cy.findByRole("button", { name: "Move Right" }).click()
 })
 
 When(
   "I should see {string} is before {string} in {string}",
-  (noteTitle1: string, noteTitle2: string, parentNoteTitle: string) => {
-    cy.jumpToNotePage(parentNoteTitle)
-    const matcher = new RegExp(noteTitle1 + ".*" + noteTitle2, "g")
+  (noteTopic1: string, noteTopic2: string, parentNoteTopic: string) => {
+    cy.jumpToNotePage(parentNoteTopic)
+    const matcher = new RegExp(noteTopic1 + ".*" + noteTopic2, "g")
 
     cy.get(".card-title").then(($els) => {
       const texts = Array.from($els, (el) => el.innerText)
@@ -229,11 +229,11 @@ Then("*for demo* I should see there are {int} descendants", (numberOfDescendants
   })
 })
 
-When("I should be asked to log in again when I click the link {string}", (noteTitle: string) => {
+When("I should be asked to log in again when I click the link {string}", (noteTopic: string) => {
   cy.on("uncaught:exception", () => {
     return false
   })
-  cy.findCardTitle(noteTitle).click()
+  cy.findCardTitle(noteTopic).click()
   cy.get("#username").should("exist")
 })
 
@@ -269,15 +269,15 @@ When("I undo {string} again", (undoType: string) => {
   cy.undoLast(undoType)
 })
 
-Then("the deleted notebook with title {string} should be restored", (title: string) => {
-  cy.findNoteTitle(title)
+Then("the deleted notebook with topic {string} should be restored", (topic: string) => {
+  cy.findNoteTopic(topic)
 })
 
 Then("there should be no more undo to do", () => {
   cy.get('.btn[title="undo"]').should("not.exist")
 })
 
-Then("I type {string} in the title", (content: string) => {
+Then("I type {string} in the topic", (content: string) => {
   cy.focused().clear().type(content)
 })
 
@@ -288,16 +288,16 @@ Then(
   },
 )
 
-When("I generate an image for {string}", (noteTitle: string) => {
-  cy.aiGenerateImage(noteTitle)
+When("I generate an image for {string}", (noteTopic: string) => {
+  cy.aiGenerateImage(noteTopic)
 })
 
 Then("I should find an art created by the ai", () => {
   cy.get("img.ai-art").should("be.visible")
 })
 
-Given("I ask to complete the description for note {string}", (noteTitle: string) => {
-  cy.aiSuggestDescriptionForNote(noteTitle)
+Given("I ask to complete the description for note {string}", (noteTopic: string) => {
+  cy.aiSuggestDescriptionForNote(noteTopic)
 })
 
 Then("I should see that the open AI service is not available in controller bar", () => {
@@ -308,6 +308,6 @@ Then("I should see that the open AI service is not available in controller bar",
     .click()
 })
 
-When("I start to chat about the note {string}", (noteTitle: string) => {
-  pageObjects.chatAboutNote(noteTitle)
+When("I start to chat about the note {string}", (noteTopic: string) => {
+  pageObjects.chatAboutNote(noteTopic)
 })

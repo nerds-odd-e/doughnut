@@ -50,7 +50,7 @@ public record NoteConstructionService(
                     },
                     () -> {
                       TextContent textContent = new TextContent();
-                      textContent.setTitle(subNoteTitle);
+                      textContent.setTopic(subNoteTitle);
                       createNoteWithWikidataInfo(
                           parentNote, subWikidataIdWithApi, textContent, Link.LinkType.RELATED_TO);
                     }));

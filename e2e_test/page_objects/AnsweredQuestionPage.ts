@@ -5,10 +5,10 @@ const answeredQuestionPage = () => {
       // but the text changes
       cy.get(".alert-success").should("exist")
     },
-    showReviewPoint(noteTitle?: string) {
+    showReviewPoint(noteTopic?: string) {
       cy.findByText("Review Point:").click()
-      if (noteTitle) {
-        cy.findNoteTitle(noteTitle)
+      if (noteTopic) {
+        cy.findNoteTopic(noteTopic)
       }
       return {
         expectReviewPointInfo(attrs: { [key: string]: string }) {

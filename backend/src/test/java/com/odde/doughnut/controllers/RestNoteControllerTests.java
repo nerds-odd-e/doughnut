@@ -98,7 +98,7 @@ class RestNoteControllerTests {
       makeMe.aBazaarNodebook(note.getNotebook()).please();
       makeMe.refresh(userModel.getEntity());
       final NoteRealm noteRealm = controller.show(note);
-      assertThat(noteRealm.getNote().getTitle(), equalTo(note.getTitle()));
+      assertThat(noteRealm.getNote().getTopic(), equalTo(note.getTopic()));
       assertThat(noteRealm.getNotePosition().getNotebook().getFromBazaar(), is(true));
     }
 
@@ -144,7 +144,7 @@ class RestNoteControllerTests {
     void setup() {
       parent = makeMe.aNote().creatorAndOwner(userModel).please();
       TextContent textContent = new TextContent();
-      textContent.setTitle("new title");
+      textContent.setTopic("new title");
       noteCreation.setTextContent(textContent);
       noteCreation.setLinkTypeToParent(LinkType.NO_LINK);
     }
@@ -309,13 +309,13 @@ class RestNoteControllerTests {
         mockWikidataHumanEntity("Q8337", null, "Q34660");
         mockWikidataEntity("Q34660", "Canada");
         noteCreation.setWikidataId("Q8337");
-        noteCreation.getTextContent().setTitle("Johnny boy");
+        noteCreation.getTextContent().setTopic("Johnny boy");
         NoteRealm note = controller.createNote(parent, noteCreation);
         makeMe.refresh(note.getNote());
 
-        assertEquals("Johnny boy", note.getNote().getTitle());
+        assertEquals("Johnny boy", note.getNote().getTopic());
         assertEquals("Q8337", note.getNote().getWikidataId());
-        assertEquals("Canada", note.getNote().getChildren().get(0).getTitle());
+        assertEquals("Canada", note.getNote().getChildren().get(0).getTopic());
       }
     }
 
@@ -326,7 +326,7 @@ class RestNoteControllerTests {
         mockWikidataEntity("Q34660", "J. K. Rowling");
         mockWikidataEntity("Q12345", "The girl sat next to the window");
         noteCreation.setWikidataId("Q8337");
-        noteCreation.getTextContent().setTitle("Harry Potter");
+        noteCreation.getTextContent().setTopic("Harry Potter");
       }
 
       @Test
@@ -340,9 +340,9 @@ class RestNoteControllerTests {
         NoteRealm note = controller.createNote(parent, noteCreation);
         makeMe.refresh(note.getNote());
 
-        assertEquals("Harry Potter", note.getNote().getTitle());
+        assertEquals("Harry Potter", note.getNote().getTopic());
         assertEquals("Q8337", note.getNote().getWikidataId());
-        assertEquals("J. K. Rowling", note.getNote().getChildren().get(0).getTitle());
+        assertEquals("J. K. Rowling", note.getNote().getChildren().get(0).getTopic());
       }
 
       @Test
@@ -361,7 +361,7 @@ class RestNoteControllerTests {
         makeMe.refresh(note.getNote());
 
         assertEquals(
-            "The girl sat next to the window", note.getNote().getChildren().get(1).getTitle());
+            "The girl sat next to the window", note.getNote().getChildren().get(1).getTopic());
       }
     }
   }

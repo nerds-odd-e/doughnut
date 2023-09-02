@@ -259,7 +259,7 @@ public class Link extends Thingy {
 
   @JsonIgnore
   public ClozedString getClozeSource() {
-    return ClozedString.htmlClosedString(getSourceNote().getTitle())
+    return ClozedString.htmlClosedString(getSourceNote().getTopic())
         .hide(getTargetNote().getNoteTitle());
   }
 

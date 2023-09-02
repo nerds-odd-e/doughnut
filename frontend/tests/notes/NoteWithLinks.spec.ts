@@ -34,7 +34,7 @@ describe("new/updated pink banner", () => {
 describe("note associated with wikidata", () => {
   it("should display icon besides title when note is linked", async () => {
     const noteRealm = makeMe.aNoteRealm
-      .title("Dummy Title")
+      .topic("Dummy Title")
       .wikidataId("DummyId")
       .please();
 

@@ -40,7 +40,7 @@ public class Subscription {
   private Notebook notebook;
 
   public String getTitle() {
-    return notebook.getHeadNote().getTitle();
+    return notebook.getHeadNote().getTopic();
   }
 
   public Note getHeadNote() {

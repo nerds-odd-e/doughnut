@@ -1,12 +1,12 @@
 <template>
   <TextInput
     scope-name="note"
-    field="title"
-    :model-value="modelValue.title"
-    :errors="errors.title"
+    field="topic"
+    :model-value="modelValue.topic"
+    :errors="errors.topic"
     v-focus
     @update:model-value="
-      $emit('update:modelValue', { ...modelValue, title: $event })
+      $emit('update:modelValue', { ...modelValue, topic: $event })
     "
   />
 </template>

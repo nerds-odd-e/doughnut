@@ -12,7 +12,7 @@ public class ClozeLinkTargetQuizPresenter extends LinkTargetQuizPresenter {
   @Override
   public String stem() {
     ClozedString clozeTitle =
-        ClozedString.htmlClosedString(link.getSourceNote().getTitle())
+        ClozedString.htmlClosedString(link.getSourceNote().getTopic())
             .hide(answerNote.getNoteTitle());
     return "<mark>" + clozeTitle.cloze() + "</mark> is " + link.getLinkTypeLabel() + ":";
   }

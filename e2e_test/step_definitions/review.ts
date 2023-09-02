@@ -67,19 +67,19 @@ Then("it should move to review page", () => {
   cy.url().should("eq", Cypress.config().baseUrl + "/reviews")
 })
 
-Then("I initial review {string}", (noteTitle) => {
-  cy.initialReviewNotes(noteTitle)
+Then("I initial review {string}", (noteTopic) => {
+  cy.initialReviewNotes(noteTopic)
 })
 
-Then("I added and learned one note {string} on day {int}", (noteTitle: string, day: number) => {
-  cy.testability().seedNotes([{ title: noteTitle }])
+Then("I added and learned one note {string} on day {int}", (noteTopic: string, day: number) => {
+  cy.testability().seedNotes([{ topic: noteTopic }])
   cy.testability().backendTimeTravelTo(day, 8)
-  cy.initialReviewNotes(noteTitle)
+  cy.initialReviewNotes(noteTopic)
 })
 
-Then("I learned one note {string} on day {int}", (noteTitle: string, day: number) => {
+Then("I learned one note {string} on day {int}", (noteTopic: string, day: number) => {
   cy.testability().backendTimeTravelTo(day, 8)
-  cy.initialReviewNotes(noteTitle)
+  cy.initialReviewNotes(noteTopic)
 })
 
 Then("I am repeat-reviewing my old note on day {int}", (day: number) => {
@@ -92,8 +92,8 @@ Then("I am learning new note on day {int}", (day: number) => {
   cy.routerToInitialReview()
 })
 
-Then("I set the level of {string} to be {int}", (noteTitle: string, level: number) => {
-  cy.findNoteTitle(noteTitle)
+Then("I set the level of {string} to be {int}", (noteTopic: string, level: number) => {
+  cy.findNoteTopic(noteTopic)
   cy.formField("Level").then(($control) => {
     cy.wrap($control).within(() => {
       cy.findByRole("button", { name: "" + level }).click()
@@ -138,8 +138,8 @@ Then(
 
 Then(
   "I should be asked link question {string} {string} with options {string}",
-  (noteTitle: string, linkType: string, options: string) => {
-    cy.shouldSeeQuizWithOptions([noteTitle, linkType], options)
+  (noteTopic: string, linkType: string, options: string) => {
+    cy.shouldSeeQuizWithOptions([noteTopic, linkType], options)
   },
 )
 
@@ -147,12 +147,12 @@ Then("I type my answer {string}", (answer: string) => {
   cy.replaceFocusedTextAndEnter(answer)
 })
 
-Then("I choose answer {string}", (noteTitle: string) => {
-  cy.findByRole("button", { name: noteTitle }).click()
+Then("I choose answer {string}", (noteTopic: string) => {
+  cy.findByRole("button", { name: noteTopic }).click()
 })
 
-Then("I should see the information of note {string}", (noteTitle: string) => {
-  cy.findNoteTitle(noteTitle)
+Then("I should see the information of note {string}", (noteTopic: string) => {
+  cy.findNoteTopic(noteTopic)
 })
 
 Then("I should see that my answer {string} is incorrect", (answer) => {
@@ -179,10 +179,10 @@ Then("I should see that my last answer is correct", () => {
 
 Then(
   "I should see the review point info of note {string}",
-  (noteTitle: string, data: DataTable) => {
+  (noteTopic: string, data: DataTable) => {
     pageObjects
       .answeredQuestionPage()
-      .showReviewPoint(noteTitle)
+      .showReviewPoint(noteTopic)
       .expectReviewPointInfo(data.hashes()[0])
   },
 )
@@ -199,8 +199,8 @@ Then("the choice {string} should be incorrect", (choice: string) => {
   pageObjects.currentQuestion().expectChoiceToBe(choice, "incorrect")
 })
 
-When("I ask to generate a question for note {string}", (noteTitle: string) => {
-  pageObjects.chatAboutNote(noteTitle).testMe()
+When("I ask to generate a question for note {string}", (noteTopic: string) => {
+  pageObjects.chatAboutNote(noteTopic).testMe()
 })
 
 Then("I should be asked {string}", (expectedtQuestionStem: string) => {

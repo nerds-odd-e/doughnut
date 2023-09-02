@@ -27,7 +27,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
     super(
         makeMe,
         Note.createNote(null, new Timestamp(System.currentTimeMillis()), new TextContent()));
-    if (Strings.isEmpty(entity.getTitle())) title(titleCounter.generate());
+    if (Strings.isEmpty(entity.getTopic())) title(titleCounter.generate());
     description("descrption");
     updatedAt(entity.getThing().getCreatedAt());
   }
@@ -109,7 +109,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder title(String text) {
-    entity.setTitle(text);
+    entity.setTopic(text);
     return this;
   }
 

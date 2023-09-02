@@ -11,30 +11,30 @@ Feature: Initial Review
   Scenario: First day of review
       Given It's day 1, 8 hour
       Then I do these initial reviews in sequence:
-          | review_type   | title      |
+          | review_type   | topic      |
           | single note   | Note 1     |
           | single note   | Note 2     |
           | initial done  |            |
       Given It's day 1, 9 hour
       Then I do these initial reviews in sequence:
-          | review_type   | title      |
+          | review_type   | topic      |
           | initial done  |            |
 
   Scenario: First day review only part of the daily number
       Given It's day 1, 8 hour
       Then I do these initial reviews in sequence:
-          | review_type   | title      |
+          | review_type   | topic      |
           | single note   | Note 1     |
       Given It's day 1, 9 hour
       Then I do these initial reviews in sequence:
-          | review_type   | title      |
+          | review_type   | topic      |
           | single note   | Note 2     |
           | initial done  |            |
 
   Scenario: Skip review
       Given It's day 1, 8 hour
       When I do these initial reviews in sequence:
-          | review_type   | title      | skip  |
+          | review_type   | topic      | skip  |
           | single note   | Note 1     | yes   |
           | single note   | Note 2     | no    |
           | single note   | Note 3     | no    |

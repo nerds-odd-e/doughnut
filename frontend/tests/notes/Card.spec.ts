@@ -6,7 +6,7 @@ import makeMe from "../fixtures/makeMe";
 describe("A child card of a note", () => {
   it("render the card", async () => {
     const note = makeMe.aNote
-      .title("this is a note")
+      .topic("this is a note")
       .description("the description")
       .please();
     helper.component(Card).withStorageProps({ note }).render();
@@ -16,7 +16,7 @@ describe("A child card of a note", () => {
 
   it("truncate the description", async () => {
     const note = makeMe.aNote
-      .title("this is a note")
+      .topic("this is a note")
       .description("nah ".repeat(20))
       .please();
     helper.component(Card).withStorageProps({ note }).render();
@@ -28,7 +28,7 @@ describe("A child card of a note", () => {
 
   it("removes the html tags", async () => {
     const note = makeMe.aNote
-      .title("this is a note")
+      .topic("this is a note")
       .description("<p>nah</p>".repeat(20))
       .please();
     helper.component(Card).withStorageProps({ note }).render();

@@ -4,21 +4,21 @@ Feature: Note creation should have description if wikidata is a person
 
   Background:
     Given I've logged in as an existing user
-    And Wikidata.org has an entity "Q22502" with title "Taiwan"
-    And Wikidata.org has an entity "Q736936" with title "Lu"
-    And Wikidata.org has an entity "Q706446" with title "Wang Chien-ming"
-    And Wikidata.org has an entity "Q4604" with title "Confucius"
+    And Wikidata.org has an entity "Q22502" with label "Taiwan"
+    And Wikidata.org has an entity "Q736936" with label "Lu"
+    And Wikidata.org has an entity "Q706446" with label "Wang Chien-ming"
+    And Wikidata.org has an entity "Q4604" with label "Confucius"
     And Wikidata.org entity "Q706446" is a person from "Q22502" and birthday is "+1980-03-31T00:00:00Z"
     And Wikidata.org entity "Q4604" is a person from "Q736936" and birthday is "-0552-10-09T00:00:00Z"
     And there are some notes for the current user:
-      | title  | testingParent | wikidataId |
+      | topic  | testingParent | wikidataId |
       | People |               |            |
       | Taiwan | People        | Q22502     |
 
   @usingMockedWikidataService
   Scenario Outline: Create a note for a person with wikidata should auto fill the description
     When I create a note belonging to "People":
-      | Title         | Wikidata Id  |
+      | Topic         | Wikidata Id  |
       | <person name> | <wikidataId> |
     Then I should see the note description on current page becomes "<expected description>"
 
@@ -31,17 +31,17 @@ Feature: Note creation should have description if wikidata is a person
   @usingMockedWikidataService
   Scenario: Create a note for the country of origin when the person is created
     When I create a note belonging to "People":
-      | Title     | Wikidata Id  |
+      | Topic     | Wikidata Id  |
       | Confucius | Q4604        |
     Then On the current page, I should see "Confucius" has link "related to" "Lu"
     And I should see "My Notes/People/Confucius" with these children
-      | note-title |
+      | note-topic |
       | Lu         |
 
   @usingMockedWikidataService
   Scenario: link to the country of orgin note if it already exists
     When I create a note belonging to "People":
-      | Title           | Wikidata Id  |
+      | Topic           | Wikidata Id  |
       | Wang Chien-ming | Q706446      |
     Then On the current page, I should see "Wang Chien-ming" has link "related to" "Taiwan"
     # this check is not sufficient, should check new note is not create for taiwan

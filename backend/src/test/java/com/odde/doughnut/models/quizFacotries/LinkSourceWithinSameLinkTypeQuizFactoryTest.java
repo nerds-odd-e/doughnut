@@ -69,11 +69,11 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
       assertThat(
           quizQuestion.getStem(),
           equalTo("Which one <em>is immediately a specialization of</em>:"));
-      assertThat(quizQuestion.getMainTopic(), equalTo(target.getTitle()));
+      assertThat(quizQuestion.getMainTopic(), equalTo(target.getTopic()));
       List<String> options = toOptionStrings(quizQuestion);
       assertThat(
           "tomato <mark title='Hidden text that is matching the answer'>[...]</mark>", in(options));
-      assertThat(anotherSource.getTitle(), in(options));
+      assertThat(anotherSource.getTopic(), in(options));
     }
   }
 

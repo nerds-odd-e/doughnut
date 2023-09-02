@@ -5,29 +5,29 @@
 import { DataTable, Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 import { mock_services } from "page_objects"
 
-When("I associate the note {string} with wikidata id {string}", (title, wikiID) => {
-  cy.associateNoteWithWikidataId(title, wikiID)
+When("I associate the note {string} with wikidata id {string}", (topic, wikiID) => {
+  cy.associateNoteWithWikidataId(topic, wikiID)
 })
 
-When("I need to confirm the association with different title {string}", (wikidataTitle: string) => {
+When("I need to confirm the association with different label {string}", (wikidataTitle: string) => {
   cy.findAllByText(wikidataTitle).should("exist")
   cy.findByRole("button", { name: "Confirm" }).click()
   cy.findWikiAssociationButton()
 })
 
-Then("I don't need to confirm the association with different title {string}", () => {
+Then("I don't need to confirm the association with different label {string}", () => {
   cy.findWikiAssociationButton()
 })
 
 Given(
-  "Wikidata.org has an entity {string} with title {string} and link to wikipedia {string}",
+  "Wikidata.org has an entity {string} with label {string} and link to wikipedia {string}",
   (wikidataId: string, wikidataTitle: string, wikipediaLink: string) => {
     mock_services.wikidata().stubWikidataEntityQuery(wikidataId, wikidataTitle, wikipediaLink)
   },
 )
 
 Given(
-  "Wikidata.org has an entity {string} with title {string}",
+  "Wikidata.org has an entity {string} with label {string}",
   (wikidataId: string, wikidataTitle: string) => {
     mock_services.wikidata().stubWikidataEntityQuery(wikidataId, wikidataTitle, undefined)
   },
@@ -57,8 +57,8 @@ Then("I should see an error {string} on {string}", (message: string, field: stri
 
 Then(
   "the Wiki association of note {string} should link to {string}",
-  (title: string, associationUrl: string) => {
-    cy.findNoteTitle(title)
+  (topic: string, associationUrl: string) => {
+    cy.findNoteTopic(topic)
     cy.findWikiAssociationButton().expectALinkThatOpensANewWindowWithURL(associationUrl)
   },
 )
@@ -70,8 +70,8 @@ Given(
   },
 )
 
-When("I search with title {string} on Wikidata", (title: string) => {
-  cy.focused().clear().type(title)
+When("I search with topic {string} on Wikidata", (topic: string) => {
+  cy.focused().clear().type(topic)
   cy.findByRole("button", { name: "Wikidata Id" }).click()
 })
 

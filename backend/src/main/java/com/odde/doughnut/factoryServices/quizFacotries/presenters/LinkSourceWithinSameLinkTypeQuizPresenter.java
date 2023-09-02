@@ -17,7 +17,7 @@ public class LinkSourceWithinSameLinkTypeQuizPresenter extends QuizQuestionWithO
 
   @Override
   public String mainTopic() {
-    return link.getTargetNote().getTitle();
+    return link.getTargetNote().getTopic();
   }
 
   @Override

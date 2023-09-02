@@ -41,7 +41,7 @@ export default defineComponent({
   },
   methods: {
     async suggestDescription(prev?: string) {
-      const prompt = `Please provide the description for the note titled: ${this.selectedNote.title}`;
+      const prompt = `Please provide the description for the note titled: ${this.selectedNote.topic}`;
       await this.api.ai.keepAskingAICompletionUntilStop(
         prompt,
         this.selectedNote.id,
@@ -50,11 +50,11 @@ export default defineComponent({
           this.storageAccessor.api(this.$router).updateTextContent(
             this.selectedNote.id,
             {
-              title: this.selectedNote.title,
+              topic: this.selectedNote.topic,
               description: moreCompleteContent,
             },
             {
-              title: this.selectedNote.title,
+              topic: this.selectedNote.topic,
               description: this.selectedNote.description,
             },
           );

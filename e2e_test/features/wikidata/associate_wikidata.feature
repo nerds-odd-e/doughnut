@@ -6,7 +6,7 @@ Feature: associate wikidata ID to note
 
   Background:
     Given I've logged in as an existing user
-    And I have a note with the title "TDD"
+    And I have a note with the topic "TDD"
 
   @usingMockedWikidataService
   Scenario: Associate note to wikidata when the service is not available
@@ -17,18 +17,18 @@ Feature: associate wikidata ID to note
 
   @usingMockedWikidataService
   Scenario Outline: Associate note to wikidata with validation
-    Given Wikidata.org has an entity "<id>" with title "<wikidata title>"
+    Given Wikidata.org has an entity "<id>" with label "<wikidata label>"
     When I associate the note "TDD" with wikidata id "<id>"
-    Then I <need to confirm> the association with different title "<wikidata title>"
+    Then I <need to confirm> the association with different label "<wikidata label>"
 
     Examples:
-      | id      | wikidata title  | need to confirm       |
+      | id      | wikidata label  | need to confirm       |
       | Q423392 | TDD             | don't need to confirm |
       | Q12345  | Count von Count | need to confirm       |
 
   @usingMockedWikidataService
   Scenario Outline: Associate note to wikipedia via wikidata
-    Given Wikidata.org has an entity "<id>" with title "TDD" and link to wikipedia "<wikipedia link>"
+    Given Wikidata.org has an entity "<id>" with label "TDD" and link to wikipedia "<wikipedia link>"
     When I associate the note "TDD" with wikidata id "<id>"
     Then the Wiki association of note "TDD" should link to "<expected url>"
 
@@ -40,17 +40,17 @@ Feature: associate wikidata ID to note
   @usingRealWikidataService
   Scenario: Associate note to wikipedia via wikidata using real service
     When I associate the note "TDD" with wikidata id "Q12345"
-    Then I need to confirm the association with different title "Count von Count"
+    Then I need to confirm the association with different label "Count von Count"
     And the Wiki association of note "TDD" should link to "https://en.wikipedia.org/wiki/Count_von_Count"
 
 
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Associate a new note with exisitng wikidata id
     Given there are some notes for the current user:
-      | title   | wikidataId | testingParent |
+      | topic   | wikidataId | testingParent |
       | Animals |            |               |
       | Dog     | Q123       | Animals       |
       | Canine  | Q456       | Animals       |
-    And Wikidata.org has an entity "Q123" with title "Canine"
+    And Wikidata.org has an entity "Q123" with label "Canine"
     And I associate the note "Canine" with wikidata id "Q123"
     Then I should see an error "Duplicate Wikidata ID Detected." on "Wikidata Id"

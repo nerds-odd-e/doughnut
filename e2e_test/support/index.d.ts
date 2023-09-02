@@ -6,20 +6,19 @@ declare namespace Cypress {
   interface Chainable<Subject = any> {
     dismissLastErrorMessage(): Chainable<any>
     addSiblingNoteButton(): Chainable<any>
-    assertBlogPostInWebsiteByTitle(article: any): Chainable<any>
-    associateNoteWithWikidataId(title: any, wikiID: any): Chainable<any>
+    associateNoteWithWikidataId(topic: any, wikiID: any): Chainable<any>
     backendTimeTravelTo(day: number, hour: number): Chainable<Subject>
     backendTimeTravelRelativeToNow(hours: number): Chainable<Subject>
     cleanDBAndResetTestabilitySettings(): Chainable<Subject>
     cleanDownloadFolder(): Chainable<any>
     clickAddChildNoteButton(): Chainable<any>
-    clickButtonOnCardBody(noteTitle: any, buttonTitle: any): Chainable<any>
-    clickNotePageButton(noteTitle: any, btnTextOrTitle: any, forceLoadPage: any): Chainable<any>
+    clickButtonOnCardBody(noteTopic: any, buttonTitle: any): Chainable<any>
+    clickNotePageButton(noteTopic: any, btnTextOrTitle: any, forceLoadPage: any): Chainable<any>
     notePageButtonOnCurrentPage(btnTextOrTitle: any): Chainable<any>
     notePageButtonOnCurrentPageEditNote(): Chainable<any>
-    clickNotePageMoreOptionsButton(noteTitle: string, btnTextOrTitle: string): Chainable<any>
+    clickNotePageMoreOptionsButton(noteTopic: string, btnTextOrTitle: string): Chainable<any>
     clickNotePageMoreOptionsButtonOnCurrentPage(btnTextOrTitle: string): Chainable<any>
-    deleteNote(noteTitle: string): Chainable<any>
+    deleteNote(noteTopic: string): Chainable<any>
     clickLinkNob(target: string): Chainable<any>
     changeLinkType(targetNote: string, linkType: string): Chainable<any>
     clickRadioByLabel(labelText: any): Chainable<any>
@@ -29,39 +28,39 @@ declare namespace Cypress {
     expectExactLinkTargets(targets: any): Chainable<any>
     expectFieldErrorMessage(field: string, message: string): Chainable<any>
     expectNoteCards(expectedCards: any): Chainable<any>
-    findNoteTitle(title: string): Chainable<any>
-    findNoteDescriptionOnCurrentPage(title: string): Chainable<any>
-    findCardTitle(title: string): Chainable<any>
+    findNoteTopic(topic: string): Chainable<any>
+    findNoteDescriptionOnCurrentPage(topic: string): Chainable<any>
+    findCardTitle(topic: string): Chainable<any>
     findWikiAssociationButton(): Chainable<any>
     expectALinkThatOpensANewWindowWithURL(url: string): Chainable<any>
     expectAMapTo(latitude: string, longitude: string): Chainable<any>
     findUserSettingsButton(userName: string): Chainable<any>
     failure(): Chainable<any>
     featureToggle(enabled: boolean): Chainable<Subject>
-    findNoteCardButton(noteTitle: string, btnTextOrTitle: string): Chainable<any>
+    findNoteCardButton(noteTopic: string, btnTextOrTitle: string): Chainable<any>
     formField(label: string): Chainable<any>
     assignFieldValue(value: string): Chainable<any>
     fieldShouldHaveValue(value: string): Chainable<any>
-    getSeededNoteIdByTitle(noteTitle: string): Chainable<Subject>
+    getSeededNoteIdByTitle(noteTopic: string): Chainable<Subject>
     initialReviewInSequence(reviews: any): Chainable<any>
-    initialReviewNotes(noteTitles: any): Chainable<any>
+    initialReviewNotes(noteTopics: any): Chainable<any>
     initialReviewOneNoteIfThereIs({
       review_type,
-      title,
+      topic,
       additional_info,
       skip,
     }: any): Chainable<any>
     inPlaceEdit(noteAttributes: any): Chainable<any>
-    jumpToNotePage(noteTitle: any, forceLoadPage?: any): Chainable<any>
+    jumpToNotePage(noteTopic: any, forceLoadPage?: any): Chainable<any>
     loginAs(username: string): Chainable<any>
     logout(username?: string): Chainable<any>
     mock(): Chainable<Subject>
-    navigateToChild(noteTitle: any): Chainable<any>
+    navigateToChild(noteTopic: any): Chainable<any>
     navigateToCircle(circleName: any): Chainable<any>
     navigateToNotePage(notePath: NotePath): Chainable<any>
-    noteByTitle(noteTitle: string): Chainable<any>
+    noteByTitle(noteTopic: string): Chainable<any>
     openAndSubmitNoteAccessoriesFormWith(
-      noteTitle: string,
+      noteTopic: string,
       NoteAccessoriesAttributes: Record<string, string>,
     ): Chainable<any>
     openSidebar(): Chainable<any>
@@ -69,8 +68,8 @@ declare namespace Cypress {
     randomizerAlwaysChooseLast(): Chainable<Subject>
     clearFocusedText(): Chainable<any>
     replaceFocusedTextAndEnter(test: any): Chainable<any>
-    repeatReviewNotes(noteTitles: string): Chainable<any>
-    goAndRepeatReviewNotes(noteTitles: string): Chainable<any>
+    repeatReviewNotes(noteTopics: string): Chainable<any>
+    goAndRepeatReviewNotes(noteTopics: string): Chainable<any>
     repeatMore(): Chainable<any>
     restore(): Chainable<Subject>
     routerPush(fallback: any, name: any, params: any): Chainable<any>
@@ -78,15 +77,15 @@ declare namespace Cypress {
     routerToRoot(): Chainable<any>
     routerToInitialReview(): Chainable<any>
     routerToRepeatReview(): Chainable<any>
-    routerToNotebooks(noteTitle?: string): Chainable<any>
+    routerToNotebooks(noteTopic?: string): Chainable<any>
     searchNote(searchKey: any, options: any): Chainable<any>
     seedNotes(seedNotes: unknown[], externalIdentifier?: any, circleName?: any): Chainable<Subject>
-    seedLink(type: string, fromNoteTitle: string, toNoteTitle: string): Chainable<Subject>
+    seedLink(type: string, fromNoteTopic: string, toNoteTopic: string): Chainable<Subject>
     seedCircle(circleInfo: Record<string, string>): Chainable<Subject>
-    shareToBazaar(noteTitle: string): Chainable<Subject>
+    shareToBazaar(noteTopic: string): Chainable<Subject>
     shouldSeeQuizWithOptions(questionParts: any, options: any): Chainable<any>
     startSearching(): Chainable<any>
-    startSearchingAndLinkNote(noteTitle: string): Chainable<any>
+    startSearchingAndLinkNote(noteTopic: string): Chainable<any>
     subscribeToNotebook(notebookTitle: string, dailyLearningCount: string): Chinputainable<any>
     submitNoteFormWith(noteAttributes: any): Chainable<any>
     submitNoteFormsWith(notes: any): Chainable<any>
@@ -97,12 +96,12 @@ declare namespace Cypress {
     timeTravelTo(day: number, hour: number): Chainable<Subject>
     triggerException(): Chainable<Subject>
     undoLast(undoThpe: string): Chainable<any>
-    unsubscribeFromNotebook(noteTitle: string): Chainable<any>
+    unsubscribeFromNotebook(noteTopic: string): Chainable<any>
     updateCurrentUserSettingsWith(hash: Record<string, string>): Chainable<Subject>
     setServiceUrl(serviceName: string, serviceUrl: string): Chainable<any>
     yesIRemember(): Chainable<any>
-    aiGenerateImage(noteTitle: string): Chainable<any>
-    aiSuggestDescriptionForNote(noteTitle: string): Chainable<any>
+    aiGenerateImage(noteTopic: string): Chainable<any>
+    aiSuggestDescriptionForNote(noteTopic: string): Chainable<any>
     addCommentToCurrentNote(commentText: string): Chainable<any>
   }
 }

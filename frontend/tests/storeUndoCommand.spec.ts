@@ -2,9 +2,9 @@ import NoteEditingHistory from "../src/store/NoteEditingHistory";
 import makeMe from "./fixtures/makeMe";
 
 describe("storeUndoCommand", () => {
-  const note = makeMe.aNoteRealm.title("Dummy Title").please();
+  const note = makeMe.aNoteRealm.topic("Dummy Title").please();
   const textContent = {
-    title: note.note.title,
+    topic: note.note.topic,
     description: note.note.description,
     updatedAt: note.note.updatedAt,
   };

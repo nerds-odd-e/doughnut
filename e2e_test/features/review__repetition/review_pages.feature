@@ -4,7 +4,7 @@ Feature: Review Pages
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user:
-      | title    | description     | pictureUrl  |
+      | topic    | description     | pictureUrl  |
       | Sedition | Incite violence |             |
       | Sedation | Put to sleep    |             |
       | Sedative | Sleep medicine  | a_slide.jpg |
@@ -12,7 +12,7 @@ Feature: Review Pages
 
   Scenario: Different review pages for different notes
     * I do these initial reviews in sequence:
-      | review_type  | title    | additional_info             |
+      | review_type  | topic    | additional_info             |
       | single note  | Sedition | Incite violence             |
       | single note  | Sedation | Put to sleep                |
       | picture note | Sedative | Sleep medicine; a_slide.jpg |
@@ -22,7 +22,7 @@ Feature: Review Pages
   Scenario: Index page
     Given It's day 1, 8 hour
     And I do these initial reviews in sequence:
-      | review_type | title    |
+      | review_type | topic    |
       | single note | Sedition |
     When It's day 2, 9 hour
     And I go to the reviews page

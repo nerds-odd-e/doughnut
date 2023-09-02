@@ -18,7 +18,7 @@ public class PictureSelectionQuizPresenter extends QuizQuestionWithOptionsPresen
 
   @Override
   public String mainTopic() {
-    return note.getTitle();
+    return note.getTopic();
   }
 
   @Override
@@ -32,7 +32,7 @@ public class PictureSelectionQuizPresenter extends QuizQuestionWithOptionsPresen
         .map(
             thing -> {
               QuizQuestion.Choice choice = new QuizQuestion.Choice();
-              choice.setDisplay(thing.getNote().getTitle());
+              choice.setDisplay(thing.getNote().getTopic());
               choice.setPictureWithMask(thing.getNote().getPictureWithMask().orElse(null));
               choice.setPicture(true);
               return choice;

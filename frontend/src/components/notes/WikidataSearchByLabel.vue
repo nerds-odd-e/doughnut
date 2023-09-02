@@ -51,7 +51,7 @@ export default defineComponent({
     return useLoadingApi();
   },
   props: {
-    title: { type: String, required: true },
+    searchKey: { type: String, required: true },
     modelValue: String,
     errors: String,
   },
@@ -81,7 +81,7 @@ export default defineComponent({
     },
     async fetchSearchResult() {
       this.wikiSearchSuggestions = await this.api.wikidata.getWikidatas(
-        this.title,
+        this.searchKey,
       );
       this.$nextTick(() => {
         const select = this.$refs.select as HTMLSelectElement | undefined;

@@ -5,12 +5,12 @@
   <NoteTextContent
     :note-id="note.id"
     :text-content="{
-      title: note.title,
+      topic: note.topic,
       description: note.description,
     }"
     :storage-accessor="storageAccessor"
   >
-    <template #title-additional>
+    <template #topic-additional>
       <div class="header-options">
         <NoteWikidataAssociation
           v-if="note.wikidataId"

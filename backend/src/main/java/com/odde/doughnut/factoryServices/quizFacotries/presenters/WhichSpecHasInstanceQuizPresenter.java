@@ -23,11 +23,11 @@ public class WhichSpecHasInstanceQuizPresenter extends QuizQuestionWithOptionsPr
     return "<p>Which one is "
         + link.getLinkTypeLabel()
         + " <mark>"
-        + link.getTargetNote().getTitle()
+        + link.getTargetNote().getTopic()
         + "</mark> <em>and</em> is "
         + instanceLink.getLinkTypeLabel()
         + " <mark>"
-        + instanceLink.getTargetNote().getTitle()
+        + instanceLink.getTargetNote().getTopic()
         + "</mark>:";
   }
 }

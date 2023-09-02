@@ -54,8 +54,8 @@ class QuizQuestionTypesClozeSelectionTest {
       assertThat(quizQuestion.getStem(), equalTo("descrption"));
       assertThat(quizQuestion.getMainTopic(), equalTo(""));
       List<String> options = toOptionStrings(quizQuestion);
-      assertThat(note2.getTitle(), in(options));
-      assertThat(note1.getTitle(), in(options));
+      assertThat(note2.getTopic(), in(options));
+      assertThat(note1.getTopic(), in(options));
     }
 
     private QuizQuestion buildClozeQuizQuestion() {

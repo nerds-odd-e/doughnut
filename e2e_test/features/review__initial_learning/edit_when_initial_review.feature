@@ -3,13 +3,13 @@ Feature: Editing when initial review
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user:
-      | title    |
+      | topic    |
       | hard     |
       | easy     |
 
   Scenario: Update note
     When I am learning new note on day 1
-    Then I can change the title "hard" to "harder"
+    Then I can change the topic "hard" to "harder"
 
   Scenario: Update review setting
     Given I am learning new note on day 1

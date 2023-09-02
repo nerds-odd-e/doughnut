@@ -26,7 +26,7 @@ describe("NoteRealm", () => {
         })
         .render();
       await flushPromises();
-      expect(screen.getAllByRole("title")).toHaveLength(1);
+      expect(screen.getAllByRole("topic")).toHaveLength(1);
     });
   });
 });

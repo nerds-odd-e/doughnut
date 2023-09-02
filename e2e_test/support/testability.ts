@@ -39,16 +39,16 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   "seedLink",
   { prevSubject: true },
-  (testability: TestabilityHelper, type: string, fromNoteTitle: string, toNoteTitle: string) => {
-    testability.seedLink(cy, type, fromNoteTitle, toNoteTitle)
+  (testability: TestabilityHelper, type: string, fromNoteTopic: string, toNoteTopic: string) => {
+    testability.seedLink(cy, type, fromNoteTopic, toNoteTopic)
   },
 )
 
 Cypress.Commands.add(
   "getSeededNoteIdByTitle",
   { prevSubject: true },
-  (testability: TestabilityHelper, noteTitle: string) => {
-    testability.getSeededNoteIdByTitle(cy, noteTitle)
+  (testability: TestabilityHelper, noteTopic: string) => {
+    testability.getSeededNoteIdByTitle(cy, noteTopic)
   },
 )
 
@@ -102,8 +102,8 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   "shareToBazaar",
   { prevSubject: true },
-  (testability: TestabilityHelper, noteTitle: string) => {
-    testability.postToTestabilityApiSuccessfully(cy, "share_to_bazaar", { body: { noteTitle } })
+  (testability: TestabilityHelper, noteTopic: string) => {
+    testability.postToTestabilityApiSuccessfully(cy, "share_to_bazaar", { body: { noteTopic } })
   },
 )
 

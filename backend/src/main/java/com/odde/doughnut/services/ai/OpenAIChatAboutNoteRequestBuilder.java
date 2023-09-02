@@ -39,7 +39,7 @@ title: %s
 description (until the end of this message):
 %s
       """
-            .formatted(this.path, note.getTitle(), note.getDescription());
+            .formatted(this.path, note.getTopic(), note.getDescription());
     return addMessage(ChatMessageRole.SYSTEM, noteOfCurrentFocus);
   }
 

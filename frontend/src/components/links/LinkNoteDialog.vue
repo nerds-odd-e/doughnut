@@ -1,6 +1,6 @@
 <template>
   <h3 v-if="note">
-    Link <strong>{{ note.title }}</strong> to
+    Link <strong>{{ note.topic }}</strong> to
   </h3>
   <h3 v-else>Searching</h3>
   <SearchNote

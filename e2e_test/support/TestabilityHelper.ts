@@ -9,14 +9,14 @@ class TestabilityHelper {
   seedLink(
     cy: Cypress.cy & CyEventEmitter,
     type: string,
-    fromNoteTitle: string,
-    toNoteTitle: string,
+    fromNoteTopic: string,
+    toNoteTopic: string,
   ) {
     return cy.get(`@${this.seededNoteIdMapAliasName}`).then((seededNoteIdMap) => {
-      expect(seededNoteIdMap).haveOwnPropertyDescriptor(fromNoteTitle)
-      expect(seededNoteIdMap).haveOwnPropertyDescriptor(toNoteTitle)
-      const fromNoteId = seededNoteIdMap[fromNoteTitle]
-      const toNoteId = seededNoteIdMap[toNoteTitle]
+      expect(seededNoteIdMap).haveOwnPropertyDescriptor(fromNoteTopic)
+      expect(seededNoteIdMap).haveOwnPropertyDescriptor(toNoteTopic)
+      const fromNoteId = seededNoteIdMap[fromNoteTopic]
+      const toNoteId = seededNoteIdMap[toNoteTopic]
       this.postToTestabilityApiSuccessfully(cy, "link_notes", {
         body: {
           type,
@@ -26,10 +26,10 @@ class TestabilityHelper {
       })
     })
   }
-  getSeededNoteIdByTitle(cy: Cypress.cy & CyEventEmitter, noteTitle: string) {
+  getSeededNoteIdByTitle(cy: Cypress.cy & CyEventEmitter, noteTopic: string) {
     return cy.get(`@${this.seededNoteIdMapAliasName}`).then((seededNoteIdMap) => {
-      expect(seededNoteIdMap).haveOwnPropertyDescriptor(noteTitle)
-      return seededNoteIdMap[noteTitle]
+      expect(seededNoteIdMap).haveOwnPropertyDescriptor(noteTopic)
+      return seededNoteIdMap[noteTopic]
     })
   }
   seedNotes(

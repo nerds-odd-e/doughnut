@@ -3,7 +3,7 @@
     :to="{ name: 'noteShow', params: { noteId: note.id } }"
     class="text-decoration-none"
   >
-    {{ note.title }}
+    {{ note.topic }}
   </router-link>
 </template>
 

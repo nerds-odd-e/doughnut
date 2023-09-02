@@ -37,7 +37,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.note-title {
+.note-topic {
   margin-top: 0px;
   padding-top: 10px;
   color: black;

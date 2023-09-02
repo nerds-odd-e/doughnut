@@ -16,7 +16,7 @@ describe("adding new note", () => {
     vi.useRealTimers();
   });
 
-  const note = makeMe.aNote.title("mythical").please();
+  const note = makeMe.aNote.topic("mythical").please();
 
   it("search for duplicate", async () => {
     helper.apiMock.expectingPost(`/api/notes/search`).andReturnOnce([note]);
@@ -24,7 +24,7 @@ describe("adding new note", () => {
       .component(NoteNewDialog)
       .withStorageProps({ parentId: 123 })
       .mount();
-    await wrapper.find("input#note-title").setValue("myth");
+    await wrapper.find("input#note-topic").setValue("myth");
 
     vi.runOnlyPendingTimers();
     await flushPromises();
@@ -40,7 +40,7 @@ describe("adding new note", () => {
         .component(NoteNewDialog)
         .withStorageProps({ parentId: 123 })
         .mount({ attachTo: document.body });
-      await wrapper.find("input#note-title").setValue("note title");
+      await wrapper.find("input#note-topic").setValue("note title");
       vi.clearAllTimers();
     });
 
@@ -68,7 +68,7 @@ describe("adding new note", () => {
     });
 
     const titleInput = () => {
-      return wrapper.find("input#note-title");
+      return wrapper.find("input#note-topic");
     };
 
     const searchWikidata = async (key: string) => {
@@ -86,10 +86,10 @@ describe("adding new note", () => {
     };
 
     const replaceTitle = async () => {
-      await wrapper.find("[id='titleRadio-Replace']").setValue();
+      await wrapper.find("[id='topicRadio-Replace']").setValue();
     };
     const appendTitle = async () => {
-      await wrapper.find("[id='titleRadio-Append']").setValue();
+      await wrapper.find("[id='topicRadio-Append']").setValue();
     };
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     const doNothing = () => {};

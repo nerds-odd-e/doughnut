@@ -9,7 +9,7 @@ public class TextContent {
   @Size(min = 1, max = Note.MAX_TITLE_LENGTH)
   @Getter
   @Setter
-  private String title = "";
+  private String topic = "";
 
   @Getter @Setter private String description;
 }

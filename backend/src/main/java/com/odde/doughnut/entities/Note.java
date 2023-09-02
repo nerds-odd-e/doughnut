@@ -46,7 +46,8 @@ public class Note extends Thingy {
   @Size(min = 1, max = Note.MAX_TITLE_LENGTH)
   @Getter
   @Setter
-  private String title = "";
+  @Column(name = "title")
+  private String topic = "";
 
   @Column(name = "updated_at")
   @Getter
@@ -165,13 +166,13 @@ public class Note extends Thingy {
 
   public void updateTextContent(Timestamp currentUTCTimestamp, TextContent textContent) {
     setUpdatedAt(currentUTCTimestamp);
-    setTitle(textContent.getTitle());
+    setTopic(textContent.getTopic());
     setDescription(textContent.getDescription());
   }
 
   @Override
   public String toString() {
-    return "Note{" + "id=" + id + ", title='" + getTitle() + '\'' + '}';
+    return "Note{" + "id=" + id + ", title='" + getTopic() + '\'' + '}';
   }
 
   private void addAncestors(List<Note> ancestors) {
@@ -306,7 +307,7 @@ public class Note extends Thingy {
 
   @JsonIgnore
   public NoteTitle getNoteTitle() {
-    return new NoteTitle(getTitle());
+    return new NoteTitle(getTopic());
   }
 
   public Optional<PictureWithMask> getPictureWithMask() {
@@ -367,7 +368,7 @@ public class Note extends Thingy {
 
   @JsonIgnore
   public String getPath() {
-    return getAncestors().stream().map(Note::getTitle).collect(Collectors.joining(" › "));
+    return getAncestors().stream().map(Note::getTopic).collect(Collectors.joining(" › "));
   }
 
   @JsonIgnore

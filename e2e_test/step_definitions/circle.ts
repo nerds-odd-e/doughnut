@@ -36,21 +36,21 @@ Given("There is a circle {string} with {string} members", (circleName: string, m
   cy.testability().seedCircle({ circleName: circleName, members: members })
 })
 
-When("I create a notebook {string} in circle {string}", (noteTitle, circleName) => {
+When("I create a notebook {string} in circle {string}", (noteTopic, circleName) => {
   cy.navigateToCircle(circleName)
   cy.findByText("Add New Notebook In This Circle").click()
-  cy.submitNoteCreationFormSuccessfully({ Title: noteTitle })
+  cy.submitNoteCreationFormSuccessfully({ Title: noteTopic })
 })
 
-When("I should see the notebook {string} in circle {string}", (noteTitle: string, circleName) => {
+When("I should see the notebook {string} in circle {string}", (noteTopic: string, circleName) => {
   cy.navigateToCircle(circleName)
-  cy.findCardTitle(noteTitle)
+  cy.findCardTitle(noteTopic)
 })
 
-When("I add a note {string} under {string}", (noteTitle: string, parentNoteTitle: string) => {
-  cy.findByText(parentNoteTitle).click()
+When("I add a note {string} under {string}", (noteTopic: string, parentNoteTopic: string) => {
+  cy.findByText(parentNoteTopic).click()
   cy.clickAddChildNoteButton()
-  cy.submitNoteCreationFormSuccessfully({ Title: noteTitle })
+  cy.submitNoteCreationFormSuccessfully({ Title: noteTopic })
 })
 
 When(
@@ -65,26 +65,26 @@ When("I am on {string} circle page", (circleName) => {
   cy.navigateToCircle(circleName)
 })
 
-When("There is a notebook {string} in circle {string}", (title, circleName) => {
-  cy.testability().seedNotes([{ title }], "", circleName)
+When("There is a notebook {string} in circle {string}", (topic, circleName) => {
+  cy.testability().seedNotes([{ topic }], "", circleName)
 })
 
-When("someone of my circle deletes the {string} notebook", (noteTitle: string) => {
-  cy.noteByTitle(noteTitle).deleteNoteViaAPI()
+When("someone of my circle deletes the {string} notebook", (noteTopic: string) => {
+  cy.noteByTitle(noteTopic).deleteNoteViaAPI()
 })
 
 Then(
   "I should see {string} in the circle page within {int} seconds",
-  (noteTitle: string, seconds: number) => {
+  (noteTopic: string, seconds: number) => {
     cy.tick(seconds * 1000)
-    cy.findCardTitle(noteTitle)
+    cy.findCardTitle(noteTopic)
   },
 )
 
 Then(
   "I should not see {string} in the circle page within {int} seconds",
-  (noteTitle: string, seconds: number) => {
+  (noteTopic: string, seconds: number) => {
     cy.tick(seconds * 1000)
-    cy.findCardTitle(noteTitle).should("not.exist")
+    cy.findCardTitle(noteTopic).should("not.exist")
   },
 )

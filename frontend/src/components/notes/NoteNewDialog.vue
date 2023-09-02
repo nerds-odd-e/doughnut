@@ -8,17 +8,17 @@
         v-model="creationData.linkTypeToParent"
         :errors="noteFormErrors.linkTypeToParent"
       />
-      <NoteFormTitleOnly
+      <NoteFormTopicOnly
         v-model="creationData.textContent"
         :errors="noteFormErrors.textContent"
       />
-      <SuggestTitle
-        :original-title="creationData.textContent.title"
-        :suggested-title="suggestedTitle"
-        @suggested-title-selected="takeSuggestedTitle"
+      <SuggestTopic
+        :original-topic="creationData.textContent.topic"
+        :suggested-topic="suggestedTopic"
+        @suggested-topic-selected="takeSuggestedTopic"
       />
       <WikidataSearchByLabel
-        :title="creationData.textContent.title"
+        :search-key="creationData.textContent.topic"
         v-model="creationData.wikidataId"
         :errors="noteFormErrors.wikidataId"
         @selected="onSelectWikidataEntry"
@@ -29,7 +29,7 @@
         <SearchResults
           v-bind="{
             noteId: parentId,
-            inputSearchKey: creationData.textContent.title,
+            inputSearchKey: creationData.textContent.topic,
           }"
         />
       </fieldset>
@@ -39,12 +39,12 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import NoteFormTitleOnly from "./NoteFormTitleOnly.vue";
+import NoteFormTopicOnly from "./NoteFormTopicOnly.vue";
 import SearchResults from "../search/SearchResults.vue";
 import LinkTypeSelectCompact from "../links/LinkTypeSelectCompact.vue";
 import WikidataSearchByLabel from "./WikidataSearchByLabel.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
-import SuggestTitle from "./SuggestTitle.vue";
+import SuggestTopic from "./SuggestTopic.vue";
 import asPopup from "../commons/Popups/asPopup";
 
 export default defineComponent({
@@ -52,11 +52,11 @@ export default defineComponent({
     return asPopup();
   },
   components: {
-    NoteFormTitleOnly,
+    NoteFormTopicOnly,
     SearchResults,
     LinkTypeSelectCompact,
     WikidataSearchByLabel,
-    SuggestTitle,
+    SuggestTopic,
   },
   props: {
     parentId: { type: Number, required: true },
@@ -69,7 +69,7 @@ export default defineComponent({
     return {
       creationData: {
         linkTypeToParent: "no link",
-        textContent: { title: "" },
+        textContent: { topic: "" },
         wikidataId: "",
       } as Generated.NoteCreation,
       noteFormErrors: {
@@ -77,7 +77,7 @@ export default defineComponent({
         textContent: {},
         wikidataId: undefined as undefined | string,
       },
-      suggestedTitle: "",
+      suggestedTopic: "",
       processing: false,
     };
   },
@@ -99,21 +99,21 @@ export default defineComponent({
         });
     },
     onSelectWikidataEntry(selectedSuggestion: Generated.WikidataSearchEntity) {
-      const currentLabel = this.creationData.textContent.title.toUpperCase();
+      const currentLabel = this.creationData.textContent.topic.toUpperCase();
       const newLabel = selectedSuggestion.label.toUpperCase();
 
       if (currentLabel === newLabel) {
-        this.creationData.textContent.title = selectedSuggestion.label;
-        this.suggestedTitle = "";
+        this.creationData.textContent.topic = selectedSuggestion.label;
+        this.suggestedTopic = "";
       } else {
-        this.suggestedTitle = selectedSuggestion.label;
+        this.suggestedTopic = selectedSuggestion.label;
       }
 
       this.creationData.wikidataId = selectedSuggestion.id;
     },
-    takeSuggestedTitle(title: string) {
-      this.creationData.textContent.title = title;
-      this.suggestedTitle = "";
+    takeSuggestedTopic(topic: string) {
+      this.creationData.textContent.topic = topic;
+      this.suggestedTopic = "";
     },
   },
 });

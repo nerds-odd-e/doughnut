@@ -22,7 +22,7 @@ public class LinkTargetQuizPresenter extends QuizQuestionWithOptionsPresenter {
   @Override
   public String stem() {
     return "<mark>"
-        + link.getSourceNote().getTitle()
+        + link.getSourceNote().getTopic()
         + "</mark> is "
         + link.getLinkTypeLabel()
         + ":";

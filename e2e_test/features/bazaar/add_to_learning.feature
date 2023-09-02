@@ -4,7 +4,7 @@ Feature: Bazaar subscription
 
   Background:
     Given there are some notes for existing user "another_old_learner"
-      | title      | testingParent |
+      | topic      | testingParent |
       | Shape      |               |
       | Square     | Shape         |
       | Triangle   | Shape         |
@@ -23,7 +23,7 @@ Feature: Bazaar subscription
   @mockBrowserTime
   Scenario: subscribe to a note and review
     Given I've logged in as an existing user
-    And I have a note with the title "My memo"
+    And I have a note with the topic "My memo"
     And my daily new notes to review is set to 2
     When I subscribe to notebook "Shape" in the bazaar, with target of learning 1 notes per day
     Then On day 1 I should have "2/4" note for initial review and "0/0" for repeat

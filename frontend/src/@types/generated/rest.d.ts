@@ -199,7 +199,7 @@ declare namespace Generated {
     }
 
     interface TextContent {
-        title: string;
+        topic: string;
         description: string;
     }
 
@@ -222,11 +222,11 @@ declare namespace Generated {
     }
 
     interface Note extends Thingy {
-        title: string;
         description: string;
         parentId?: number;
         updatedAt: string;
         noteAccessories: NoteAccessories;
+        topic: string;
         wikidataId: string;
         deletedAt: string;
         pictureWithMask?: PictureWithMask;
