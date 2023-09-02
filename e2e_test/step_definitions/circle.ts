@@ -50,7 +50,7 @@ When("I should see the notebook {string} in circle {string}", (noteTopic: string
 When("I add a note {string} under {string}", (noteTopic: string, parentNoteTopic: string) => {
   cy.findByText(parentNoteTopic).click()
   cy.clickAddChildNoteButton()
-  cy.submitNoteCreationFormSuccessfully({ Title: noteTopic })
+  cy.submitNoteCreationFormSuccessfully({ Topic: noteTopic })
 })
 
 When(
