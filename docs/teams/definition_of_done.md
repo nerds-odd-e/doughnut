@@ -4,7 +4,7 @@
 
 - Zero downtime during deployment
 - Guaranteed user data integrity and security, at all times
-- No outstanding defects; all bugs fixed with highest priority
+- No known defects; all bugs fixed with highest priority
 - User manual updated, and users notified
 - Approved by the Product Owner (does not block deployment)
 
@@ -26,7 +26,7 @@
 ## CI/CD System
 
 - All changes checked into the mono-repo on the `main` (or `trunk`) branch
-- Successful in CI system
+- Pass CI system
 - Automatic production deployment on every successful CI build
 - CI build completion within 10 minutes
 - Any existing automation must have accompanying 'autonomation' to halt the CI system if assumptions for the automation are invalidated

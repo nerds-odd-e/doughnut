@@ -6,4 +6,3 @@
 - We continuously integrate our code on the trunk
 - We share ownership of all code
 - We test-drive all our code
-  within an hour, or as frequently as possible
