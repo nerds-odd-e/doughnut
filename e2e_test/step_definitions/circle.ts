@@ -39,7 +39,7 @@ Given("There is a circle {string} with {string} members", (circleName: string, m
 When("I create a notebook {string} in circle {string}", (noteTopic, circleName) => {
   cy.navigateToCircle(circleName)
   cy.findByText("Add New Notebook In This Circle").click()
-  cy.submitNoteCreationFormSuccessfully({ Title: noteTopic })
+  cy.submitNoteCreationFormSuccessfully({ Topic: noteTopic })
 })
 
 When("I should see the notebook {string} in circle {string}", (noteTopic: string, circleName) => {
