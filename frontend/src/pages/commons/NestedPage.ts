@@ -18,6 +18,10 @@ function NestedPage(
         type: Object as PropType<StorageAccessor>,
         required: true,
       },
+      user: {
+        type: Object as PropType<Generated.User>,
+        required: true,
+      },
     },
     computed: {
       isNested() {
