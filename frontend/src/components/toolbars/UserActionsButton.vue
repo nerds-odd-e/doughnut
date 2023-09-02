@@ -1,6 +1,5 @@
 <template>
   <UserIconMenu
-    v-if="user"
     role="button"
     aria-label="User actions"
     class="user-icon-menu"
@@ -9,7 +8,6 @@
     aria-haspopup="true"
     aria-expanded="false"
   />
-  <LoginButton v-else />
 
   <div
     v-if="user"
@@ -35,7 +33,6 @@ import { defineComponent, PropType } from "vue";
 import UserIconMenu from "./UserIconMenu.vue";
 import PopButton from "../commons/Popups/PopButton.vue";
 import UserProfileDialog from "./UserProfileDialog.vue";
-import LoginButton from "./LoginButton.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default defineComponent({
@@ -50,7 +47,6 @@ export default defineComponent({
     UserIconMenu,
     PopButton,
     UserProfileDialog,
-    LoginButton,
   },
   methods: {
     async logout() {
