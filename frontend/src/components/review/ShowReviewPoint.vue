@@ -8,6 +8,7 @@
       v-bind="{
         noteId,
         expandChildren: false,
+        readonly: false,
         expandInfo,
         storageAccessor,
       }"

@@ -1,23 +1,11 @@
 import { Ref, ref } from "vue";
-import CurrentPosition, {
-  CurrentPositionImplementation,
-} from "./CurrentPosition";
 
-export default interface NoteStorage extends CurrentPosition {
-  focusOnNotebooks(): void;
-  selectPosition(note?: Generated.Note): void;
+export default interface NoteStorage {
   refreshNoteRealm(data: Generated.NoteRealm): Generated.NoteRealm;
 }
 
-export class StorageImplementation
-  extends CurrentPositionImplementation
-  implements NoteStorage
-{
+export class StorageImplementation implements NoteStorage {
   cache: Map<Doughnut.ID, Ref<Generated.NoteRealm | undefined>> = new Map();
-
-  focusOnNotebooks(): void {
-    this.selectPosition();
-  }
 
   refreshNoteRealm(noteRealm: Generated.NoteRealm): Generated.NoteRealm {
     this.refOfNoteRealm(noteRealm?.id).value = noteRealm;
