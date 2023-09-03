@@ -214,7 +214,7 @@ class RestAiControllerTest {
         controller.generateQuestion(note);
         verify(openAiApi, times(2)).createChatCompletion(captor.capture());
         assertThat(captor.getAllValues().get(0).getModel())
-            .isEqualTo("ft:gpt-3.5-turbo-0613:odd-e::7tXeDEiJ");
+            .isEqualTo("ft:gpt-3.5-turbo-0613:odd-e::7uWJuLEw");
         assertThat(captor.getAllValues().get(1).getModel()).isEqualTo("gpt-3.5-turbo-16k");
       }
 

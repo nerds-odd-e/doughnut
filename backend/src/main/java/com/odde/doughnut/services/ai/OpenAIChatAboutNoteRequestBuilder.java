@@ -145,7 +145,7 @@ please critically check if the following question makes sense and is possible to
 
   public OpenAIChatAboutNoteRequestBuilder
       userInstructionToGenerateQuestionWithGPT35FineTunedModel() {
-    this.model = "ft:gpt-3.5-turbo-0613:odd-e::7tXeDEiJ";
+    this.model = "ft:gpt-3.5-turbo-0613:odd-e::7uWJuLEw";
     ObjectMapper objectMapper = new ObjectMapper();
     JsonSchemaGenerator jsonSchemaGenerator = new JsonSchemaGenerator(objectMapper);
     String schemaString;
