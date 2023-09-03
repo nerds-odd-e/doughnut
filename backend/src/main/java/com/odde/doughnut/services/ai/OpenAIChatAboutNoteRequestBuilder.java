@@ -26,7 +26,7 @@ public class OpenAIChatAboutNoteRequestBuilder {
         "This is a PKM system using hierarchical notes, each with a topic and description, to capture atomic concepts.");
   }
 
-  public OpenAIChatAboutNoteRequestBuilder detailsOfNoteOfCurrentFocus(Note note) {
+  public OpenAIChatAboutNoteRequestBuilder contentOfNoteOfCurrentFocus(Note note) {
     String noteOfCurrentFocus =
         """
 The note of current focus:

@@ -43,7 +43,7 @@ public class AiAdvisorService {
   public String chatToAi(Note note, String userMessage) {
     ChatCompletionRequest chatCompletionRequest =
         new OpenAIChatAboutNoteRequestBuilder()
-            .detailsOfNoteOfCurrentFocus(note)
+            .contentOfNoteOfCurrentFocus(note)
             .chatMessage(userMessage)
             .maxTokens(150)
             .build();
