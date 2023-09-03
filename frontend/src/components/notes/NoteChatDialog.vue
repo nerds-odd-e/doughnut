@@ -25,14 +25,15 @@
 
   <div class="fixed-bottom chat-control">
     <button
-      v-show="!quizQuestion"
+      v-if="!quizQuestion"
       class="btn btn-secondary"
       @click="generateQuestion"
     >
       Test me
     </button>
     <button
-      v-show="quizQuestion"
+      id="try-again"
+      v-if="quizQuestion"
       class="btn btn-secondary"
       @click="generateQuestion"
     >
