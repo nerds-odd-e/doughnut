@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     AIGenerateImageDialog: typeof import('./src/components/notes/AIGenerateImageDialog.vue')['default']
     AISuggestDescriptionButton: typeof import('./src/components/toolbars/AISuggestDescriptionButton.vue')['default']
+    AISuggestDetailsButton: typeof import('./src/components/toolbars/AISuggestDetailsButton.vue')['default']
     AnsweredQuestion: typeof import('./src/components/review/AnsweredQuestion.vue')['default']
     AnswerResult: typeof import('./src/components/review/AnswerResult.vue')['default']
     ApiStatus: typeof import('./src/components/toolbars/ApiStatus.vue')['default']
@@ -26,6 +27,7 @@ declare module 'vue' {
     ContentLoader: typeof import('./src/components/commons/ContentLoader.vue')['default']
     ControlCenterForNote: typeof import('./src/components/toolbars/ControlCenterForNote.vue')['default']
     DescriptionEditor: typeof import('./src/components/form/DescriptionEditor.vue')['default']
+    DetailsEditor: typeof import('./src/components/form/DetailsEditor.vue')['default']
     EditableText: typeof import('./src/components/form/EditableText.vue')['default']
     Feather: typeof import('./src/components/svgs/link_types/Feather.vue')['default']
     GlobalBar: typeof import('./src/components/toolbars/GlobalBar.vue')['default']
@@ -73,6 +75,7 @@ declare module 'vue' {
     NoteRealmLoader: typeof import('./src/components/notes/views/NoteRealmLoader.vue')['default']
     NoteShell: typeof import('./src/components/notes/NoteShell.vue')['default']
     NoteShortDescription: typeof import('./src/components/notes/NoteShortDescription.vue')['default']
+    NoteShortDetails: typeof import('./src/components/notes/NoteShortDetails.vue')['default']
     NoteTextContent: typeof import('./src/components/notes/NoteTextContent.vue')['default']
     NoteTitleWithLink: typeof import('./src/components/notes/NoteTitleWithLink.vue')['default']
     NoteUndoButton: typeof import('./src/components/toolbars/NoteUndoButton.vue')['default']

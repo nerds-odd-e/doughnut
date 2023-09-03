@@ -200,7 +200,7 @@ declare namespace Generated {
 
     interface TextContent {
         topic: string;
-        description: string;
+        details: string;
     }
 
     interface ReviewPoint {
@@ -222,7 +222,7 @@ declare namespace Generated {
     }
 
     interface Note extends Thingy {
-        description: string;
+        details: string;
         parentId?: number;
         updatedAt: string;
         noteAccessories: NoteAccessories;

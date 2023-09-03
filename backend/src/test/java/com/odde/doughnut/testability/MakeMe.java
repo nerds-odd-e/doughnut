@@ -43,8 +43,8 @@ public class MakeMe extends MakeMeWithoutDB {
     return aHeadNote().title(title);
   }
 
-  public NoteBuilder aNote(String title, String description) {
-    return aNote().title(title).description(description);
+  public NoteBuilder aNote(String title, String details) {
+    return aNote().title(title).details(details);
   }
 
   public NoteBuilder theNote(Note note) {

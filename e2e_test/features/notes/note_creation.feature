@@ -5,14 +5,14 @@ Feature: Nested Note creation
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user:
-      | topic          | testingParent  | description         |
+      | topic          | testingParent  | details               |
       | LeSS in Action |                | An awesome training |
       | team           | LeSS in Action |                     |
       | tech           | LeSS in Action |                     |
 
   Scenario: Create a new note belonging to another note
     When I create a note belonging to "LeSS in Action":
-      | Topic        | Description                        |
+      | Topic        | Details                              |
       | Re-quirement | Re-think the way we do requirement |
     And I should see "My Notes/LeSS in Action" with these children
       | note-topic   |
@@ -28,10 +28,10 @@ Feature: Nested Note creation
 
   Scenario: Create a new sibling note
     Given I create a note belonging to "LeSS in Action":
-      | Topic        | Description                        |
+      | Topic        | Details                              |
       | Re-quirement | Re-think the way we do requirement |
     When I create a sibling note of "Re-quirement":
-      | Topic     | Description                   | Link Type To Parent |
+      | Topic     | Details                         | Link Type To Parent |
       | Re-Design | Re-think the way we do design | a specialization of |
     And I should see "My Notes/LeSS in Action" with these children
       | note-topic   |

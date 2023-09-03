@@ -25,7 +25,7 @@
           v-bind="{ note: selectedNote, storageAccessor }"
         />
       </PopButton>
-      <AISuggestDescriptionButton v-bind="{ selectedNote, storageAccessor }" />
+      <AISuggestDetailsButton v-bind="{ selectedNote, storageAccessor }" />
       <PopButton title="chat about this note" :sidebar="'right'">
         <template #button_face>
           <SvgClipboard />
@@ -82,7 +82,7 @@ import SvgCog from "../svgs/SvgCog.vue";
 import NoteDeleteButton from "./NoteDeleteButton.vue";
 import PopButton from "../commons/Popups/PopButton.vue";
 import AIGenerateImageDialog from "../notes/AIGenerateImageDialog.vue";
-import AISuggestDescriptionButton from "./AISuggestDescriptionButton.vue";
+import AISuggestDetailsButton from "./AISuggestDetailsButton.vue";
 import SvgClipboard from "../svgs/SvgClipboard.vue";
 import NoteChatDialog from "../notes/NoteChatDialog.vue";
 
@@ -110,7 +110,7 @@ export default defineComponent({
     NoteDeleteButton,
     PopButton,
     AIGenerateImageDialog,
-    AISuggestDescriptionButton,
+    AISuggestDetailsButton,
     NoteChatDialog,
     SvgClipboard,
   },

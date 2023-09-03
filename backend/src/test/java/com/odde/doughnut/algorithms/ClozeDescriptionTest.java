@@ -61,9 +61,9 @@ public class ClozeDescriptionTest {
     "6,               6year,                              [...]year",
     "cat,             <p class='cat'>a cat</p>,           <p class='cat'>a [...]</p>",
   })
-  void clozeDescription(String title, String description, String expectedClozeDescription) {
+  void clozeDescription(String title, String details, String expectedClozeDescription) {
     assertThat(
-        new ClozedString(clozeReplacement, description).hide(new NoteTitle(title)).cloze(),
+        new ClozedString(clozeReplacement, details).hide(new NoteTitle(title)).cloze(),
         equalTo(expectedClozeDescription));
   }
 

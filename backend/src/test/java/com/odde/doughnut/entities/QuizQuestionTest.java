@@ -56,7 +56,7 @@ class QuizQuestionTest {
   void useClozeDescription() {
     Note top = makeMe.aHeadNote().please();
     makeMe.aNote().under(top).please();
-    Note note = makeMe.aNote().under(top).title("abc").description("abc has 3 letters").please();
+    Note note = makeMe.aNote().under(top).title("abc").details("abc has 3 letters").please();
     makeMe.refresh(top);
     QuizQuestion quizQuestion = getQuizQuestion(note);
     assertThat(

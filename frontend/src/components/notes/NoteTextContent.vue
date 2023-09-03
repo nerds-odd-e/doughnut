@@ -12,13 +12,13 @@
     <slot name="topic-additional" />
   </div>
   <div class="note-content">
-    <DescriptionEditor
+    <DetailsEditor
       :multiple-line="true"
-      role="description"
-      class="note-description"
+      role="details"
+      class="note-details"
       scope-name="note"
-      :model-value="localTextContent.description"
-      @update:model-value="onUpdateDescription"
+      :model-value="localTextContent.details"
+      @update:model-value="onUpdateDetails"
       @blur="onBlurTextField"
     />
     <slot name="note-content-other" />
@@ -29,7 +29,7 @@
 import { defineComponent, PropType } from "vue";
 import { debounce, DebouncedFunc } from "lodash";
 import EditableText from "../form/EditableText.vue";
-import DescriptionEditor from "../form/DescriptionEditor.vue";
+import DetailsEditor from "../form/DetailsEditor.vue";
 import type { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
@@ -53,7 +53,7 @@ export default defineComponent({
   },
   components: {
     EditableText,
-    DescriptionEditor,
+    DetailsEditor,
   },
   data() {
     return {
@@ -76,8 +76,8 @@ export default defineComponent({
       this.localTextContent.topic = newValue;
       this.saveChange();
     },
-    onUpdateDescription(newValue: string) {
-      this.localTextContent.description = newValue;
+    onUpdateDetails(newValue: string) {
+      this.localTextContent.details = newValue;
       this.saveChange();
     },
     saveChange() {
@@ -97,7 +97,7 @@ export default defineComponent({
     isMeaningfulChange(newValue: Generated.TextContent) {
       return (
         newValue.topic !== this.textContent.topic ||
-        newValue.description !== this.textContent.description
+        newValue.details !== this.textContent.details
       );
     },
   },

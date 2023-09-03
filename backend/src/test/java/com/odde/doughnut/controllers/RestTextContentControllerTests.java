@@ -48,14 +48,14 @@ class RestTextContentControllerTests {
     void setup() {
       note = makeMe.aNote("new").creatorAndOwner(userModel).please();
       textContent.setTopic("new title");
-      textContent.setDescription("new description");
+      textContent.setDetails("new description");
     }
 
     @Test
     void shouldBeAbleToSaveNoteWhenValid() throws UnexpectedNoAccessRightException, IOException {
       NoteRealm response = controller.updateNote(note, textContent);
       assertThat(response.getId(), equalTo(note.getId()));
-      assertThat(response.getNote().getDescription(), equalTo("new description"));
+      assertThat(response.getNote().getDetails(), equalTo("new description"));
     }
 
     @Test

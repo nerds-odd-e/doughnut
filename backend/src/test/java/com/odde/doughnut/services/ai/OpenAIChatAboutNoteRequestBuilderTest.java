@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 class OpenAIChatAboutNoteRequestBuilderTest {
   MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
+  String DETAILS = "Details";
 
   @Test
   void messageShouldContainTopic() {
@@ -21,19 +22,19 @@ class OpenAIChatAboutNoteRequestBuilderTest {
   }
 
   @Test
-  void messageShouldContainDescription() {
-    Note note = makeMe.aNote().description("description").inMemoryPlease();
+  void messageShouldContainDetails() {
+    Note note = makeMe.aNote().details("description").inMemoryPlease();
     ChatCompletionRequest request =
         new OpenAIChatAboutNoteRequestBuilder().contentOfNoteOfCurrentFocus(note).build();
-    assertThat(request.getMessages().get(1).getContent(), containsString("Description"));
-    assertThat(request.getMessages().get(1).getContent(), containsString(note.getDescription()));
+    assertThat(request.getMessages().get(1).getContent(), containsString(DETAILS));
+    assertThat(request.getMessages().get(1).getContent(), containsString(note.getDetails()));
   }
 
   @Test
-  void messageShouldNotContainDescriptionIfEmpty() {
+  void messageShouldNotContainDetailsIfEmpty() {
     Note note = makeMe.aNote().withNoDescription().inMemoryPlease();
     ChatCompletionRequest request =
         new OpenAIChatAboutNoteRequestBuilder().contentOfNoteOfCurrentFocus(note).build();
-    assertThat(request.getMessages().get(1).getContent(), not(containsString("Description")));
+    assertThat(request.getMessages().get(1).getContent(), not(containsString(DETAILS)));
   }
 }

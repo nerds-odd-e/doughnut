@@ -15,7 +15,7 @@ describe("in place edit on title", () => {
       .component(NoteTextContent)
       .withStorageProps({
         noteId: n.id,
-        textContent: { topic: n.topic, description: n.description },
+        textContent: { topic: n.topic, details: n.details },
       })
       .mount();
   };
@@ -118,17 +118,17 @@ describe("in place edit on title", () => {
     );
   });
 
-  it("should not trigger changes for initial description content", async () => {
-    note.description = "initial\n\ndescription";
+  it("should not trigger changes for initial details content", async () => {
+    note.details = "initial\n\ndescription";
     const wrapper = mountComponent(note);
     await flushPromises();
     wrapper.unmount();
     // no api calls expected. Test will fail if there is any.
-    // because the initial description is not changed.
+    // because the initial details is not changed.
   });
 
   it("when there is pending changes not saved but the previous change trigger refresh", async () => {
-    note.description = "initial\n\ndescription";
+    note.details = "initial\n\ndescription";
     const wrapper = mountComponent(note);
     await wrapper.find('[role="topic"]').trigger("click");
     await wrapper.find('[role="topic"] input').setValue("updated");

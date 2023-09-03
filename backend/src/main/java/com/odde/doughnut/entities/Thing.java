@@ -78,6 +78,6 @@ public class Thing {
 
   @JsonIgnore
   public boolean isDescriptionBlankHtml() {
-    return getNote().isDescriptionBlankHtml();
+    return getNote().isDetailsBlankHtml();
   }
 }

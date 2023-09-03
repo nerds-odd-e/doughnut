@@ -21,9 +21,9 @@ record TitleFragment(boolean suffix, String stem) {
     return stem.equalsIgnoreCase(answer.strip());
   }
 
-  public String replaceLiteralWords(String description, final String replacement) {
+  public String replaceLiteralWords(String details, final String replacement) {
     Pattern pattern = getClozePatternCreator().getPattern(stem);
-    return pattern.matcher(description).replaceAll(replacement);
+    return pattern.matcher(details).replaceAll(replacement);
   }
 
   public String replaceSimilar(String literal, String replacement) {

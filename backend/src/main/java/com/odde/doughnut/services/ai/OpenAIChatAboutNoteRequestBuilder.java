@@ -23,7 +23,7 @@ public class OpenAIChatAboutNoteRequestBuilder {
   public OpenAIChatAboutNoteRequestBuilder() {
     addMessage(
         ChatMessageRole.SYSTEM,
-        "This is a PKM system using hierarchical notes, each with a topic and description, to capture atomic concepts.");
+        "This is a PKM system using hierarchical notes, each with a topic and details, to capture atomic concepts.");
   }
 
   public OpenAIChatAboutNoteRequestBuilder contentOfNoteOfCurrentFocus(Note note) {
@@ -34,13 +34,13 @@ Context path: %s
 Topic: %s
 %s
       """
-            .formatted(note.getContextPathString(), note.getTopic(), getDescription(note));
+            .formatted(note.getContextPathString(), note.getTopic(), getDetails(note));
     return addMessage(ChatMessageRole.SYSTEM, noteOfCurrentFocus);
   }
 
-  private static String getDescription(Note note) {
-    if (note.isDescriptionBlankHtml()) return "";
-    return "Description (until the end of this message):\n%s".formatted(note.getDescription());
+  private static String getDetails(Note note) {
+    if (note.isDetailsBlankHtml()) return "";
+    return "Details (until the end of this message):\n%s".formatted(note.getDetails());
   }
 
   public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestionWithFunctionCall() {

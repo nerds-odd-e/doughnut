@@ -42,7 +42,7 @@ class DescriptionLinkTargetQuizFactoryTest {
     source =
         makeMe
             .aNote("saying")
-            .description("Rome is not built in a day")
+            .details("Rome is not built in a day")
             .under(top)
             .linkTo(target)
             .please();
@@ -55,7 +55,7 @@ class DescriptionLinkTargetQuizFactoryTest {
   class WhenTheNoteDoesnotHaveDescription {
     @BeforeEach
     void setup() {
-      makeMe.theNote(source).description("").please();
+      makeMe.theNote(source).details("").please();
     }
 
     @Test
@@ -74,7 +74,7 @@ class DescriptionLinkTargetQuizFactoryTest {
 
   @Test
   void shouldIncludeMasks() {
-    makeMe.theNote(source).title("token").description("token /.").please();
+    makeMe.theNote(source).title("token").details("token /.").please();
     assertThat(
         buildQuestion().getStem(),
         containsString("<mark title='Hidden text that is matching the answer'>[...]</mark> /."));

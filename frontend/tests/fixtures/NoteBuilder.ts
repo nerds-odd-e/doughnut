@@ -9,7 +9,7 @@ class NoteBuilder extends Builder<Generated.Note> {
     this.data = {
       id: generateId(),
       topic: "Note1.1.1",
-      description: "<p>Desc</p>",
+      details: "<p>Desc</p>",
       wikidataId: "",
       deletedAt: "",
       noteAccessories: {
@@ -39,8 +39,8 @@ class NoteBuilder extends Builder<Generated.Note> {
     return this;
   }
 
-  description(value: string): NoteBuilder {
-    this.data.description = value;
+  details(value: string): NoteBuilder {
+    this.data.details = value;
     return this;
   }
 

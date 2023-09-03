@@ -203,7 +203,7 @@ class RestNoteControllerTests {
       @BeforeEach
       void thereIsAWikidataEntryOfALocation() {
         noteCreation.setWikidataId(wikidataIdOfALocation);
-        noteCreation.getTextContent().setDescription(singapore);
+        noteCreation.getTextContent().setDetails(singapore);
       }
 
       private void mockApiResponseWithLocationInfo(String locationInfo, String type)
@@ -223,8 +223,7 @@ class RestNoteControllerTests {
             "{\"latitude\":1.3,\"longitude\":103.8}", "globecoordinate");
         NoteRealm note = controller.createNote(parent, noteCreation);
         assertThat(
-            note.getNote().getDescription(),
-            stringContainsInOrder("Location: " + lnglat, singapore));
+            note.getNote().getDetails(), stringContainsInOrder("Location: " + lnglat, singapore));
       }
 
       @Test
@@ -236,8 +235,7 @@ class RestNoteControllerTests {
         mockApiResponseWithLocationInfo("\"center of the earth\"", "string");
         NoteRealm note = controller.createNote(parent, noteCreation);
         assertThat(
-            note.getNote().getDescription(),
-            stringContainsInOrder("Location: center of the earth"));
+            note.getNote().getDetails(), stringContainsInOrder("Location: center of the earth"));
       }
     }
 
@@ -246,7 +244,7 @@ class RestNoteControllerTests {
       @BeforeEach
       void thereIsAWikidataEntryOfAHuman() {
         noteCreation.setWikidataId("");
-        noteCreation.getTextContent().setDescription("");
+        noteCreation.getTextContent().setDetails("");
       }
 
       private void mockWikidataHumanEntity(
@@ -290,7 +288,7 @@ class RestNoteControllerTests {
         mockWikidataEntity(countryQid, countryName);
         noteCreation.setWikidataId(wikidataIdOfHuman);
         NoteRealm note = controller.createNote(parent, noteCreation);
-        String description = note.getNote().getDescription();
+        String description = note.getNote().getDetails();
         if (expectedBirthday != null) {
           assertThat(description, containsString(expectedBirthday));
         }

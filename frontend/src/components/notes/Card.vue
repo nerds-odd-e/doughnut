@@ -5,7 +5,7 @@
       <h5 class="card-title">
         <NoteTitleWithLink :note="note" class="card-title" />
       </h5>
-      <NoteShortDescription :description="note.description" />
+      <NoteShortDetails :details="note.details" />
       <slot name="button" :note="note" />
     </div>
   </div>
@@ -14,7 +14,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import NoteTitleWithLink from "./NoteTitleWithLink.vue";
-import NoteShortDescription from "./NoteShortDescription.vue";
+import NoteShortDetails from "./NoteShortDetails.vue";
 
 export default defineComponent({
   props: {
@@ -22,7 +22,7 @@ export default defineComponent({
   },
   components: {
     NoteTitleWithLink,
-    NoteShortDescription,
+    NoteShortDetails,
   },
 });
 </script>

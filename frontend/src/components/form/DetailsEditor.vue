@@ -44,7 +44,7 @@ export default defineComponent({
             },
           },
         },
-        placeholder: "Enter note description here...",
+        placeholder: "Enter note details here...",
       },
       localValue: this.modelValue || ("" as string),
       hadFocus: false as boolean,

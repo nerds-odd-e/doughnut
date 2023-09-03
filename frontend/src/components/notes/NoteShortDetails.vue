@@ -1,5 +1,5 @@
 <template>
-  <p class="note-short-description">{{ shortDescription }}</p>
+  <p class="note-short-details">{{ shortDetails }}</p>
 </template>
 
 <script lang="ts">
@@ -20,10 +20,10 @@ function truncateString(str: string, maxLength = 50): string {
 }
 
 export default defineComponent({
-  props: { description: String },
+  props: { details: String },
   computed: {
-    shortDescription() {
-      return truncateString(this.description || "");
+    shortDetails() {
+      return truncateString(this.details || "");
     },
   },
 });

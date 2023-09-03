@@ -140,7 +140,7 @@ class RestReviewPointControllerTest {
     @Test
     void itMustPersistTheQuestionGenerated() {
       Note note =
-          makeMe.aNote().description("description long enough.").asHeadNoteOfANotebook().please();
+          makeMe.aNote().details("description long enough.").asHeadNoteOfANotebook().please();
       // another note is needed, otherwise the note will be the only note in the notebook, and the
       // question cannot be generated.
       makeMe.aNote().under(note).please();

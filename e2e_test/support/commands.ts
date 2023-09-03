@@ -79,7 +79,7 @@ Cypress.Commands.add("submitNoteCreationFormSuccessfully", (noteAttributes) => {
 Cypress.Commands.add("submitNoteCreationFormWith", (noteAttributes) => {
   const linkTypeToParent = noteAttributes["Link Type To Parent"]
   delete noteAttributes["Link Type To Parent"]
-  const { Topic, Description, ["Wikidata Id"]: wikidataId, ...remainingAttrs } = noteAttributes
+  const { Topic, Details, ["Wikidata Id"]: wikidataId, ...remainingAttrs } = noteAttributes
 
   cy.submitNoteFormWith({
     Topic,
@@ -87,11 +87,11 @@ Cypress.Commands.add("submitNoteCreationFormWith", (noteAttributes) => {
     "Wikidata Id": wikidataId,
   })
 
-  if (!!Description) {
+  if (!!Details) {
     if (!!Topic) {
-      cy.findByText(Topic) // the creation has to be successful before continuing to edit the description
+      cy.findByText(Topic) // the creation has to be successful before continuing to edit the details
     }
-    cy.inPlaceEdit({ Description })
+    cy.inPlaceEdit({ Details })
   }
 
   if (Object.keys(remainingAttrs).length > 0) {
@@ -344,8 +344,8 @@ Cypress.Commands.add(
 
         case "picture note": {
           if (additional_info) {
-            const [expectedDescription, expectedPicture] = additional_info.commonSenseSplit("; ")
-            cy.get(".note-body").should("contain", expectedDescription)
+            const [expectedDetails, expectedPicture] = additional_info.commonSenseSplit("; ")
+            cy.get(".note-body").should("contain", expectedDetails)
             cy.get("#note-picture")
               .find("img")
               .should("have.attr", "src")
@@ -380,8 +380,8 @@ Cypress.Commands.add(
 Cypress.Commands.add("findNoteTopic", (topic) =>
   cy.findByText(topic, { selector: "[role=topic] *" }),
 )
-Cypress.Commands.add("findNoteDescriptionOnCurrentPage", (expected: string) => {
-  expected.split("\\n").forEach((line) => cy.get("[role=description]").should("contain", line))
+Cypress.Commands.add("findNoteDetailsOnCurrentPage", (expected: string) => {
+  expected.split("\\n").forEach((line) => cy.get("[role=details]").should("contain", line))
 })
 
 Cypress.Commands.add("findCardTitle", (topic) => cy.findByText(topic, { selector: "a.card-title" }))
@@ -571,10 +571,10 @@ Cypress.Commands.add("dismissLastErrorMessage", () => {
   cy.get(".last-error-message").click()
 })
 
-Cypress.Commands.add("aiSuggestDescriptionForNote", (noteTopic: string) => {
+Cypress.Commands.add("aiSuggestDetailsForNote", (noteTopic: string) => {
   cy.jumpToNotePage(noteTopic)
   cy.on("uncaught:exception", () => {
     return false
   })
-  cy.findByRole("button", { name: "suggest description" }).click()
+  cy.findByRole("button", { name: "suggest details" }).click()
 })

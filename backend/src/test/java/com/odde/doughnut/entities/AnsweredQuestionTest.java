@@ -29,12 +29,7 @@ class AnsweredQuestionTest {
       User user = makeMe.aUser().please();
       Note top = makeMe.aNote().creatorAndOwner(user).please();
       note =
-          makeMe
-              .aNote("this / that")
-              .description("description")
-              .under(top)
-              .rememberSpelling()
-              .please();
+          makeMe.aNote("this / that").details("description").under(top).rememberSpelling().please();
       makeMe.aNote().under(top).please();
       reviewPoint = makeMe.aReviewPointFor(note).by(user).please();
       makeMe.refresh(top);

@@ -6,7 +6,7 @@
     :note-id="note.id"
     :text-content="{
       topic: note.topic,
-      description: note.description,
+      details: note.details,
     }"
     :storage-accessor="storageAccessor"
   >

@@ -25,7 +25,7 @@ public class SpellingQuizFactory implements QuizQuestionFactory {
   }
 
   private boolean needSpellingQuiz() {
-    if (answerNote.isDescriptionBlankHtml()) {
+    if (answerNote.isDetailsBlankHtml()) {
       return false;
     }
     ReviewSetting reviewSetting = answerNote.getMasterReviewSetting();

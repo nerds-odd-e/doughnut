@@ -1,9 +1,9 @@
 <template>
   <a
-    :title="'suggest description'"
+    :title="'suggest details'"
     class="btn btn-sm"
     role="button"
-    @click="suggestDescription(selectedNote.description)"
+    @click="suggestDetails(selectedNote.details)"
   >
     <SvgRobot />
   </a>
@@ -40,8 +40,8 @@ export default defineComponent({
     };
   },
   methods: {
-    async suggestDescription(prev?: string) {
-      const prompt = `Please provide the description for the note titled: ${this.selectedNote.topic}`;
+    async suggestDetails(prev?: string) {
+      const prompt = `Please provide the details for the note titled: ${this.selectedNote.topic}`;
       await this.api.ai.keepAskingAICompletionUntilStop(
         prompt,
         this.selectedNote.id,
@@ -51,11 +51,11 @@ export default defineComponent({
             this.selectedNote.id,
             {
               topic: this.selectedNote.topic,
-              description: moreCompleteContent,
+              details: moreCompleteContent,
             },
             {
               topic: this.selectedNote.topic,
-              description: this.selectedNote.description,
+              details: this.selectedNote.details,
             },
           );
           return !this.isUnmounted;

@@ -29,7 +29,7 @@ declare namespace Cypress {
     expectFieldErrorMessage(field: string, message: string): Chainable<any>
     expectNoteCards(expectedCards: any): Chainable<any>
     findNoteTopic(topic: string): Chainable<any>
-    findNoteDescriptionOnCurrentPage(topic: string): Chainable<any>
+    findNoteDetailsOnCurrentPage(topic: string): Chainable<any>
     findCardTitle(topic: string): Chainable<any>
     findWikiAssociationButton(): Chainable<any>
     expectALinkThatOpensANewWindowWithURL(url: string): Chainable<any>
@@ -101,7 +101,7 @@ declare namespace Cypress {
     setServiceUrl(serviceName: string, serviceUrl: string): Chainable<any>
     yesIRemember(): Chainable<any>
     aiGenerateImage(noteTopic: string): Chainable<any>
-    aiSuggestDescriptionForNote(noteTopic: string): Chainable<any>
+    aiSuggestDetailsForNote(noteTopic: string): Chainable<any>
     addCommentToCurrentNote(commentText: string): Chainable<any>
   }
 }

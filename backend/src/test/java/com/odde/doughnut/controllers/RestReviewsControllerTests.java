@@ -100,7 +100,7 @@ class RestReviewsControllerTests {
       void setup() {
         anotherUser = makeMe.aUser().please();
         noteByAnotherUser =
-            makeMe.aNote("title").creatorAndOwner(anotherUser).description("description").please();
+            makeMe.aNote("title").creatorAndOwner(anotherUser).details("description").please();
       }
 
       @Test

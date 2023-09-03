@@ -27,7 +27,7 @@ import org.springframework.beans.BeanUtils;
 
 @Entity
 @Table(name = "note")
-@JsonPropertyOrder({"title", "description", "parentId", "updatedAt"})
+@JsonPropertyOrder({"title", "details", "parentId", "updatedAt"})
 public class Note extends Thingy {
   public static final int MAX_TITLE_LENGTH = 150;
 
@@ -41,7 +41,10 @@ public class Note extends Thingy {
   @JsonIgnore
   private Thing thing;
 
-  @Getter @Setter private String description;
+  @Column(name = "description")
+  @Getter
+  @Setter
+  private String details;
 
   @Size(min = 1, max = Note.MAX_TITLE_LENGTH)
   @Getter
@@ -167,7 +170,7 @@ public class Note extends Thingy {
   public void updateTextContent(Timestamp currentUTCTimestamp, TextContent textContent) {
     setUpdatedAt(currentUTCTimestamp);
     setTopic(textContent.getTopic());
-    setDescription(textContent.getDescription());
+    setDetails(textContent.getDetails());
   }
 
   @Override
@@ -300,9 +303,9 @@ public class Note extends Thingy {
 
   @JsonIgnore
   public ClozedString getClozeDescription() {
-    if (isDescriptionBlankHtml()) return new ClozedString(null, "");
+    if (isDetailsBlankHtml()) return new ClozedString(null, "");
 
-    return ClozedString.htmlClosedString(getDescription()).hide(getNoteTitle());
+    return ClozedString.htmlClosedString(getDetails()).hide(getNoteTitle());
   }
 
   @JsonIgnore
@@ -335,9 +338,9 @@ public class Note extends Thingy {
   }
 
   public void prependDescription(String addition) {
-    String prevDesc = getDescription() != null ? getDescription() : "";
+    String prevDesc = getDetails() != null ? getDetails() : "";
     String desc = prevDesc.isEmpty() ? addition : addition + "\n" + prevDesc;
-    setDescription(desc);
+    setDetails(desc);
   }
 
   public void buildLinkToParent(
@@ -362,8 +365,8 @@ public class Note extends Thingy {
   }
 
   @JsonIgnore
-  public boolean isDescriptionBlankHtml() {
-    return new HtmlOrText(getDescription()).isBlank();
+  public boolean isDetailsBlankHtml() {
+    return new HtmlOrText(getDetails()).isBlank();
   }
 
   @JsonIgnore

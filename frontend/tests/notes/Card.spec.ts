@@ -7,17 +7,17 @@ describe("A child card of a note", () => {
   it("render the card", async () => {
     const note = makeMe.aNote
       .topic("this is a note")
-      .description("the description")
+      .details("the details")
       .please();
     helper.component(Card).withStorageProps({ note }).render();
     await screen.findByText("this is a note");
-    await screen.findByText("the description");
+    await screen.findByText("the details");
   });
 
-  it("truncate the description", async () => {
+  it("truncate the details", async () => {
     const note = makeMe.aNote
       .topic("this is a note")
-      .description("nah ".repeat(20))
+      .details("nah ".repeat(20))
       .please();
     helper.component(Card).withStorageProps({ note }).render();
     await screen.findByText("this is a note");
@@ -29,7 +29,7 @@ describe("A child card of a note", () => {
   it("removes the html tags", async () => {
     const note = makeMe.aNote
       .topic("this is a note")
-      .description("<p>nah</p>".repeat(20))
+      .details("<p>nah</p>".repeat(20))
       .please();
     helper.component(Card).withStorageProps({ note }).render();
     await screen.findByText("this is a note");

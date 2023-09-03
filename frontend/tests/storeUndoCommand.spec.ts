@@ -5,7 +5,7 @@ describe("storeUndoCommand", () => {
   const note = makeMe.aNoteRealm.topic("Dummy Title").please();
   const textContent = {
     topic: note.note.topic,
-    description: note.note.description,
+    details: note.note.details,
     updatedAt: note.note.updatedAt,
   };
 

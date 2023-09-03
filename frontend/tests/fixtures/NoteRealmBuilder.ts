@@ -40,8 +40,8 @@ class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
     return this;
   }
 
-  description(value: string): NoteRealmBuilder {
-    this.noteBuilder.description(value);
+  details(value: string): NoteRealmBuilder {
+    this.noteBuilder.details(value);
     return this;
   }
 

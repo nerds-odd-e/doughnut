@@ -6,7 +6,7 @@ Feature: see recent note update
     Given I've logged in as an existing user
     And I let the server to time travel to 100 hours ago
     And there are some notes for the current user:
-      | topic    | testingParent | description |
+      | topic    | testingParent | details       |
       | NoteBook |               |             |
       | Note1    | NoteBook      |             |
       | Note2    | NoteBook      |             |
@@ -16,10 +16,10 @@ Feature: see recent note update
     And I let the server to time travel to 24 hours ago
 
   Scenario Outline: I should see the color of a newer note is fresher
-    And I update note "Note1.1" with description "<new description>"
+    And I update note "Note1.1" with details "<new details>"
     Then I should see "Note1.1" is "<aging>" than "Note2"
 
     Examples:
-      | new description | aging     |
+      | new details       | aging     |
       | updated note1.1 | newer     |
       | note1.1         | not newer |

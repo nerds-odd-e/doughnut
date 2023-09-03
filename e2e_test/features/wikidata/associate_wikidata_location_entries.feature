@@ -1,7 +1,7 @@
 Feature: Note creation/edit for a location
   As a learner
   I want to to create a note for a location
-  So that a note can be created with a description, location(longitude and latitude), map and picture
+  So that a note can be created with a details, location(longitude and latitude), map and picture
 
   Background:
     Given I've logged in as an existing user
@@ -14,15 +14,15 @@ Feature: Note creation/edit for a location
     When I create a note belonging to "places":
       | Topic     | Wikidata Id  |
       | Singapore | Q334         |
-    Then I should see the note description on current page becomes "Location: 1.3'N, 103.8'E"
+    Then I should see the note details on current page becomes "Location: 1.3'N, 103.8'E"
 
   @usingMockedWikidataService
   Scenario: Existing Note wikidata edited by user
     When there are some notes for the current user:
-      | topic      | description  | testingParent |
+      | topic      | details        | testingParent |
       | Singapore  | The red dot  | places        |
     And I associate the note "Singapore" with wikidata id "Q334"
-    Then I should see the note description on current page becomes "Location: 1.3'N, 103.8'E\nThe red dot"
+    Then I should see the note details on current page becomes "Location: 1.3'N, 103.8'E\nThe red dot"
 
   @usingMockedWikidataService
   Scenario: A note can be created for a location with a map and identifying picture

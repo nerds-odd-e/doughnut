@@ -1,13 +1,13 @@
 import { flushPromises } from "@vue/test-utils";
-import DescriptionEditor from "@/components/form/DescriptionEditor.vue";
+import DetailsEditor from "@/components/form/DetailsEditor.vue";
 import helper from "../helpers";
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
-describe("DescriptionEditor", () => {
+describe("DetailsEditor", () => {
   it("not emit update when the change is from initial value", async () => {
     const wrapper = helper
-      .component(DescriptionEditor)
+      .component(DetailsEditor)
       .withProps({
         modelValue: "initial value",
       })

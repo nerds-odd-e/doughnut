@@ -15,10 +15,10 @@ Then("I should be prompted with an error message saying {string}", (errorMessage
   cy.expectFieldErrorMessage("Prompt", errorMessage)
 })
 
-Given("OpenAI by default returns text completion {string}", (description: string) => {
+Given("OpenAI by default returns text completion {string}", (details: string) => {
   cy.then(async () => {
     await mock_services.openAi().restartImposter()
-    mock_services.openAi().stubChatCompletion(description, "stop")
+    mock_services.openAi().stubChatCompletion(details, "stop")
   })
 })
 
@@ -61,10 +61,10 @@ Given("OpenAI always return image of a moon", () => {
 
 Given(
   "OpenAI returns an incomplete text completion {string} for assistant message {string}",
-  (description: string, assistantMessage: string) => {
+  (details: string, assistantMessage: string) => {
     mock_services
       .openAi()
-      .mockChatCompletionWithIncompleteAssistantMessage(assistantMessage, description, "length")
+      .mockChatCompletionWithIncompleteAssistantMessage(assistantMessage, details, "length")
   },
 )
 

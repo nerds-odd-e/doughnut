@@ -92,21 +92,18 @@ Given(
 )
 
 Given(
-  "I update note {string} description from {string} to become {string}",
-  (noteTopic: string, noteDescription: string, newNoteDescription: string) => {
-    cy.findByText(noteDescription).click({ force: true })
-    cy.replaceFocusedTextAndEnter(newNoteDescription)
+  "I update note {string} details from {string} to become {string}",
+  (noteTopic: string, noteDetails: string, newNoteDetails: string) => {
+    cy.findByText(noteDetails).click({ force: true })
+    cy.replaceFocusedTextAndEnter(newNoteDetails)
   },
 )
 
-When(
-  "I update note {string} with description {string}",
-  (noteTopic: string, newDescription: string) => {
-    cy.jumpToNotePage(noteTopic)
-    cy.inPlaceEdit({ Description: newDescription })
-    cy.findNoteDescriptionOnCurrentPage(newDescription)
-  },
-)
+When("I update note {string} with details {string}", (noteTopic: string, newDetails: string) => {
+  cy.jumpToNotePage(noteTopic)
+  cy.inPlaceEdit({ Details: newDetails })
+  cy.findNoteDetailsOnCurrentPage(newDetails)
+})
 
 When("I create a note belonging to {string}:", (noteTopic: string, data: DataTable) => {
   expect(data.hashes().length).to.equal(1)
@@ -281,12 +278,9 @@ Then("I type {string} in the topic", (content: string) => {
   cy.focused().clear().type(content)
 })
 
-Then(
-  "I should see the note description on current page becomes {string}",
-  (descriptionText: string) => {
-    cy.findNoteDescriptionOnCurrentPage(descriptionText)
-  },
-)
+Then("I should see the note details on current page becomes {string}", (detailsText: string) => {
+  cy.findNoteDetailsOnCurrentPage(detailsText)
+})
 
 When("I generate an image for {string}", (noteTopic: string) => {
   cy.aiGenerateImage(noteTopic)
@@ -296,8 +290,8 @@ Then("I should find an art created by the ai", () => {
   cy.get("img.ai-art").should("be.visible")
 })
 
-Given("I ask to complete the description for note {string}", (noteTopic: string) => {
-  cy.aiSuggestDescriptionForNote(noteTopic)
+Given("I ask to complete the details for note {string}", (noteTopic: string) => {
+  cy.aiSuggestDetailsForNote(noteTopic)
 })
 
 Then("I should see that the open AI service is not available in controller bar", () => {

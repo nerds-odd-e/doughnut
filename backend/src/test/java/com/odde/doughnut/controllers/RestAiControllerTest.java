@@ -204,7 +204,7 @@ class RestAiControllerTest {
       void setup() throws JsonProcessingException {
         mockChatCompletionForGPT3_5MessageOnly(jsonQuestion);
         questionEvaluation.correctChoices = new int[] {0};
-        note.setDescription(makeMe.aStringOfLength(1000));
+        note.setDetails(makeMe.aStringOfLength(1000));
       }
 
       @Test

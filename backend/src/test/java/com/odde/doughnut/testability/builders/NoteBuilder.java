@@ -28,7 +28,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
         makeMe,
         Note.createNote(null, new Timestamp(System.currentTimeMillis()), new TextContent()));
     if (Strings.isEmpty(entity.getTopic())) title(titleCounter.generate());
-    description("descrption");
+    details("descrption");
     updatedAt(entity.getThing().getCreatedAt());
   }
 
@@ -105,7 +105,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder withNoDescription() {
-    return description("");
+    return details("");
   }
 
   public NoteBuilder title(String text) {
@@ -113,8 +113,8 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
-  public NoteBuilder description(String text) {
-    entity.setDescription(text);
+  public NoteBuilder details(String text) {
+    entity.setDetails(text);
     return this;
   }
 

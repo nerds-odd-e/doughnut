@@ -1,6 +1,6 @@
-Feature: Note creation should have description if wikidata is a person
+Feature: Note creation should have details if wikidata is a person
   As a learner, I want to to create a note. If the note is a person I want the birthday and country
-  to be included in the description of the new note.
+  to be included in the details of the new note.
 
   Background:
     Given I've logged in as an existing user
@@ -16,14 +16,14 @@ Feature: Note creation should have description if wikidata is a person
       | Taiwan | People        | Q22502     |
 
   @usingMockedWikidataService
-  Scenario Outline: Create a note for a person with wikidata should auto fill the description
+  Scenario Outline: Create a note for a person with wikidata should auto fill the details
     When I create a note belonging to "People":
       | Topic         | Wikidata Id  |
       | <person name> | <wikidataId> |
-    Then I should see the note description on current page becomes "<expected description>"
+    Then I should see the note details on current page becomes "<expected details>"
 
     Examples:
-      | person name     | wikidataId | expected description     |
+      | person name     | wikidataId | expected details           |
       | Wang Chien-ming | Q706446    | Taiwan, 31 March 1980    |
       | Confucius       | Q4604      | Lu, 09 October 0552 B.C. |
 

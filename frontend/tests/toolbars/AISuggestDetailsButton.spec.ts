@@ -1,16 +1,16 @@
 import { flushPromises } from "@vue/test-utils";
-import AISuggestDescriptionButton from "@/components/toolbars/AISuggestDescriptionButton.vue";
+import AISuggestDetailsButton from "@/components/toolbars/AISuggestDetailsButton.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
-describe("AISuggestDescriptionButton", () => {
+describe("AISuggestDetailsButton", () => {
   helper.resetWithApiMock(beforeEach, afterEach);
 
   const triggerSuggestionwithoutFlushPromises = async (
     note: Generated.Note,
   ) => {
     const wrapper = helper
-      .component(AISuggestDescriptionButton)
+      .component(AISuggestDetailsButton)
       .withStorageProps({
         selectedNote: note,
       })
@@ -25,15 +25,15 @@ describe("AISuggestDescriptionButton", () => {
     return wrapper;
   };
 
-  it("ask api to generate suggested description when description is empty", async () => {
-    const note = makeMe.aNote.description("").please();
+  it("ask api to generate suggested details when details is empty", async () => {
+    const note = makeMe.aNote.details("").please();
     const expectation = helper.apiMock
       .expectingPost(`/api/ai/${note.id}/completion`)
       .andReturnOnce({ moreCompleteContent: "suggestion" });
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
     await triggerSuggestion(note);
     expect(expectation.actualRequestJsonBody()).toMatchObject({
-      prompt: "Please provide the description for the note titled: Note1.1.1",
+      prompt: "Please provide the details for the note titled: Note1.1.1",
     });
   });
 

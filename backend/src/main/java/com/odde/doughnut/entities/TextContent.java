@@ -11,5 +11,5 @@ public class TextContent {
   @Setter
   private String topic = "";
 
-  @Getter @Setter private String description;
+  @Getter @Setter private String details;
 }

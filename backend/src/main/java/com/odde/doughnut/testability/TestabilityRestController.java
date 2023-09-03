@@ -81,7 +81,7 @@ class TestabilityRestController {
 
   static class SeedNote {
     public String topic;
-    @Setter private String description;
+    @Setter private String details;
     @Setter private String testingParent;
     @Setter private Boolean skipReview;
     @Setter private String url;
@@ -94,7 +94,7 @@ class TestabilityRestController {
       NoteAccessories content = note.getNoteAccessories();
 
       note.setTopic(topic);
-      note.setDescription(description);
+      note.setDetails(details);
       note.setUpdatedAt(currentUTCTimestamp);
       if (skipReview != null) {
         ReviewSetting masterReviewSetting = new ReviewSetting();

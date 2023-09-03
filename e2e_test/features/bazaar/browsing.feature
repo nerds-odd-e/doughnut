@@ -3,7 +3,7 @@ Feature: Bazaar browsing
 
   Background:
     Given there are some notes for existing user "old_learner"
-      | topic           | description                      | testingParent | hideTitleInArticle | showAsBulletInArticle |
+      | topic           | details                            | testingParent | hideTitleInArticle | showAsBulletInArticle |
       | Shape           | The form of something            |               | false              | false                 |
       | Rectangle       | four equal straight sides        | Shape         | false              | false                 |
       | Triangle        | three sides shape                | Shape         | false              | false                 |

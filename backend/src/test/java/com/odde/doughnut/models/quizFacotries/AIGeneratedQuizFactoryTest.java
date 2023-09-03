@@ -41,7 +41,7 @@ class AIGeneratedQuizFactoryTest {
     note =
         makeMe
             .aNote("saying")
-            .description("Rome is not built in a day")
+            .details("Rome is not built in a day")
             .asHeadNoteOfANotebook()
             .please();
     reviewPoint = makeMe.aReviewPointFor(note).by(userModel).inMemoryPlease();
