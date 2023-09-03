@@ -23,31 +23,39 @@
     </div>
   </div>
 
-  <button
-    v-show="!quizQuestion"
-    class="btn btn-secondary"
-    @click="generateQuestion"
-  >
-    Test me
-  </button>
-  <button
-    v-show="quizQuestion"
-    class="btn btn-secondary"
-    @click="generateQuestion"
-  >
-    Doesn't make sense?
-  </button>
-  <div class="chat-container">
-    <form class="chat-input-container" @submit.prevent="generateChatAnswer">
-      <input id="chat-input" class="chat-input-text" v-model="chatInput" />
-      <input
-        :disabled="isButtonDisabled"
-        type="submit"
-        value="Chat"
-        id="chat-button"
-        class="btn float-btn btn-secondary"
-      />
-    </form>
+  <div class="fixed-bottom chat-control">
+    <button
+      v-show="!quizQuestion"
+      class="btn btn-secondary"
+      @click="generateQuestion"
+    >
+      Test me
+    </button>
+    <button
+      v-show="quizQuestion"
+      class="btn btn-secondary"
+      @click="generateQuestion"
+    >
+      Doesn't make sense?
+    </button>
+    <div class="chat-container">
+      <form class="chat-input-container" @submit.prevent="generateChatAnswer">
+        <input id="chat-input" class="chat-input-text" v-model="chatInput" />
+        <input
+          :disabled="isButtonDisabled"
+          type="submit"
+          value="Chat"
+          id="chat-button"
+          class="btn float-btn btn-secondary"
+        />
+      </form>
+    </div>
+    <p class="text-center">
+      <i
+        >Ask question to AI about this note. Each question ignores the chat
+        history, unlike ChatGPT.</i
+      >
+    </p>
   </div>
 </template>
 
@@ -189,5 +197,11 @@ input.auto-extendable-input {
 .chat-answer-text p {
   margin: 0;
   word-break: break-word;
+}
+
+.chat-control {
+  width: calc(100% - 140px);
+  margin-left: auto;
+  margin-right: 40px;
 }
 </style>
