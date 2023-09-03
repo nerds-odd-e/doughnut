@@ -367,7 +367,7 @@ public class Note extends Thingy {
   }
 
   @JsonIgnore
-  public String getPath() {
+  public String getContextPathString() {
     return getAncestors().stream().map(Note::getTopic).collect(Collectors.joining(" › "));
   }
 

@@ -83,10 +83,10 @@ class RestAiControllerTest {
               argThat(
                   request -> {
                     assertThat(request.getMaxTokens()).isLessThan(200);
-                    assertThat(request.getMessages()).hasSize(2);
-                    assertEquals("describe Earth", request.getMessages().get(1).getContent());
-                    assertThat(request.getMessages().get(0).getContent())
-                        .contains("Current context of the note: cosmos › solar system");
+                    assertThat(request.getMessages()).hasSize(3);
+                    assertEquals("describe Earth", request.getMessages().get(2).getContent());
+                    assertThat(request.getMessages().get(1).getContent())
+                        .contains("Current context path of the note: cosmos › solar system");
                     return true;
                   })))
           .thenReturn(buildCompletionResult("blue planet"));
@@ -99,7 +99,7 @@ class RestAiControllerTest {
       when(openAiApi.createChatCompletion(
               argThat(
                   request -> {
-                    assertThat(request.getMessages()).hasSize(3);
+                    assertThat(request.getMessages()).hasSize(4);
                     return true;
                   })))
           .thenReturn(buildCompletionResult("blue planet"));

@@ -36,7 +36,7 @@ public class AiQuestionGenerator {
 
   private Boolean questionMakeSense(AIGeneratedQuestion question) {
     ChatCompletionRequest chatRequest =
-        new OpenAIChatAboutNoteRequestBuilder(note.getPath())
+        new OpenAIChatAboutNoteRequestBuilder()
             .detailsOfNoteOfCurrentFocus(note)
             .validateQuestionAgain(question)
             .maxTokens(1500)
@@ -57,7 +57,7 @@ public class AiQuestionGenerator {
 
   private JsonNode generateQuestionByGPT3_5() throws QuizQuestionNotPossibleException {
     ChatCompletionRequest chatRequest =
-        new OpenAIChatAboutNoteRequestBuilder(note.getPath())
+        new OpenAIChatAboutNoteRequestBuilder()
             .detailsOfNoteOfCurrentFocus(note)
             .userInstructionToGenerateQuestionWithGPT35FineTunedModel()
             .maxTokens(1500)
@@ -73,7 +73,7 @@ public class AiQuestionGenerator {
 
   private JsonNode generateQuestionByGPT4() throws QuizQuestionNotPossibleException {
     ChatCompletionRequest chatRequest =
-        new OpenAIChatAboutNoteRequestBuilder(note.getPath())
+        new OpenAIChatAboutNoteRequestBuilder()
             .detailsOfNoteOfCurrentFocus(note)
             .userInstructionToGenerateQuestionWithFunctionCall()
             .maxTokens(1500)

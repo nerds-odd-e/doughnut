@@ -18,37 +18,29 @@ public class OpenAIChatAboutNoteRequestBuilder {
   String model = "gpt-3.5-turbo-16k";
   private List<ChatMessage> messages = new ArrayList<>();
   private List<ChatFunction> functions = new ArrayList<>();
-  private String path;
   private int maxTokens;
 
-  public OpenAIChatAboutNoteRequestBuilder(String notePath) {
-    this.path = notePath;
-    String content =
-        ("This is a personal knowledge management system, consists of notes with a topic and a description, which should represent atomic concepts.\n"
-                + "Current context of the note: ")
-            + this.path;
-    addMessage(ChatMessageRole.SYSTEM, content);
+  public OpenAIChatAboutNoteRequestBuilder() {
+    addMessage(
+        ChatMessageRole.SYSTEM,
+        "This is a PKM system using hierarchical notes, each with a topic and description, to capture atomic concepts.");
   }
 
   public OpenAIChatAboutNoteRequestBuilder detailsOfNoteOfCurrentFocus(Note note) {
     String noteOfCurrentFocus =
         """
 The note of current focus:
-Context: %s
+Context path: %s
 Topic: %s
 %s
       """
-            .formatted(this.path, note.getTopic(), getDescription(note));
+            .formatted(note.getContextPathString(), note.getTopic(), getDescription(note));
     return addMessage(ChatMessageRole.SYSTEM, noteOfCurrentFocus);
   }
 
   private static String getDescription(Note note) {
     if (note.isDescriptionBlankHtml()) return "";
-    return """
-Description (until the end of this message):
-%s
-  """
-        .formatted(note.getDescription());
+    return "Description (until the end of this message):\n%s".formatted(note.getDescription());
   }
 
   public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestionWithFunctionCall() {
@@ -63,8 +55,8 @@ Description (until the end of this message):
         """
   Please assume the role of a Memory Assistant, which involves helping me review, recall, and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following guidelines:
 
-  1. Generate a multiple-choice question based on the note in the current context
-  2. Only the top-level context is visible to the user.
+  1. Generate a multiple-choice question based on the note in the current context path
+  2. Only the top-level of the context path is visible to the user.
   3. Provide 2 to 4 choices with only 1 correct answer.
   4. Vary the lengths of the choice texts so that the correct answer isn't consistently the longest.
   5. If there's insufficient information in the note to create a question, leave the 'stem' field empty.
@@ -75,7 +67,11 @@ Description (until the end of this message):
   }
 
   public OpenAIChatAboutNoteRequestBuilder instructionForCompletion(
-      AiCompletionRequest aiCompletionRequest) {
+      String contextPath, AiCompletionRequest aiCompletionRequest) {
+    addMessage(
+        ChatMessageRole.SYSTEM,
+        "Please behave like a text completion service and keep the content concise.\nCurrent context path of the note: %s"
+            .formatted(contextPath));
     addMessage(ChatMessageRole.USER, aiCompletionRequest.prompt);
     if (!Strings.isEmpty(aiCompletionRequest.incompleteContent)) {
       addMessage(ChatMessageRole.ASSISTANT, aiCompletionRequest.incompleteContent);
@@ -126,7 +122,7 @@ Description (until the end of this message):
     String messageBody =
         """
 Please assume the role of a learner, who has learned the note of focus as well as many other notes.
-Only the top-level context is visible to you.
+Only the top-level of the context path is visible to you.
 Without the specific note of focus and its more detailed contexts revealed to you,
 please critically check if the following question makes sense and is possible to you:
 
@@ -164,7 +160,7 @@ please critically check if the following question makes sense and is possible to
         ChatMessageRole.SYSTEM,
         "When generating a question, please use this json structure:\n" + schemaString);
     String messageBody =
-        "Please assume the role of a Memory Assistant, which involves helping me review, recall, and reinforce information from my notes. Generate a multiple-choice question based on the note in the current context\n";
+        "Please assume the role of a Memory Assistant, which involves helping me review, recall, and reinforce information from my notes. Generate a multiple-choice question based on the note in the current context path\n";
 
     return addMessage(ChatMessageRole.USER, messageBody);
   }
