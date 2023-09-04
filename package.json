@@ -62,6 +62,6 @@
     "typescript": "5.2.2"
   },
   "dependencies": {
-    "@cucumber/cucumber": "^9.4"
+    "@cucumber/cucumber": "^9.5"
   }
 }
