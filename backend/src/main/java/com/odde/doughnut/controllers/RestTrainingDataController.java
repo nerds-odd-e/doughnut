@@ -58,7 +58,6 @@ class RestTrainingDataController {
     } catch (JsonProcessingException e) {
       return e.getMessage();
     }
-    System.out.println(jsonStrBuilder.toString());
     return jsonStrBuilder.toString();
   }
 
