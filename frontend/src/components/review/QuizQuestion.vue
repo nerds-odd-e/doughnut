@@ -63,6 +63,7 @@ import QuizQuestionChoices from "./QuizQuestionChoices.vue";
 import Breadcrumb from "../toolbars/Breadcrumb.vue";
 
 export default defineComponent({
+  inheritAttrs: false,
   setup() {
     return { ...useLoadingApi(), ...usePopups() };
   },
