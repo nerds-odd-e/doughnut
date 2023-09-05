@@ -46,7 +46,13 @@ const apiCollection = (managedApi: ManagedApi) => ({
         {},
       )) as Generated.ReviewPoint;
     },
-
+    async markAsGood(questionId: number, noteId?: number) {
+      return managedApi.restPost(`review/mark_good_question`, {
+        questionId,
+        noteId,
+        isGood: true,
+      });
+    },
     async overview() {
       return (await managedApi.restGet(
         `reviews/overview`,

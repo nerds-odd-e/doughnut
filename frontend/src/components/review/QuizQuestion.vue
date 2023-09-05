@@ -102,7 +102,10 @@ export default defineComponent({
       }
     },
     async markAsGood() {
-      // TODO: trigger API to mark question as good
+      return this.api.reviewMethods.markAsGood(
+        this.quizQuestion.quizQuestionId,
+        this.quizQuestion.notebookPosition?.noteId,
+      );
     },
   },
 });

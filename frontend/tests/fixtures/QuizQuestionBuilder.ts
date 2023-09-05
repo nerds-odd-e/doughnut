@@ -19,6 +19,11 @@ class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
     return this;
   }
 
+  withNotebookPosition(notebookPosition: Generated.NotePositionViewedByUser) {
+    this.quizQuestion.notebookPosition = notebookPosition;
+    return this;
+  }
+
   withQuestionStem(stem: string) {
     this.quizQuestion.stem = stem;
     return this;

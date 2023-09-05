@@ -36,5 +36,37 @@ describe("QuizQuestion", () => {
       await flushPromises();
       expect(wrapper.text()).toContain("1/2");
     });
+
+    it("should be able to mark a question as good", async () => {
+      const notebook: Generated.NotePositionViewedByUser =
+        makeMe.aNotePosition.please();
+      const quizQuestion: Generated.QuizQuestion = makeMe.aQuizQuestion
+        .withQuestionType("AI_QUESTION")
+        .withNotebookPosition(notebook)
+        .please();
+      const expectation = helper.apiMock
+        .expectingPost(`/api/review/mark_good_question`)
+        .andReturnOnce({});
+
+      const wrapper = helper
+        .component(QuizQuestion)
+        .withStorageProps({ quizQuestion })
+        .mount();
+
+      await wrapper.find("#good-question-checkbox").setValue(true);
+
+      await flushPromises();
+
+      expect(expectation.actualRequestJsonBody()).toMatchObject({
+        questionId: quizQuestion.quizQuestionId,
+        noteId: notebook.noteId,
+        isGood: true,
+      });
+
+      expect(
+        (wrapper.find("#good-question-checkbox").element as HTMLInputElement)
+          .checked,
+      ).toBe(true);
+    });
   });
 });
