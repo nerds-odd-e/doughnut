@@ -3,10 +3,12 @@ package com.odde.doughnut.controllers;
 import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.json.InitialInfo;
+import com.odde.doughnut.entities.json.MarkedQuestionRequest;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -124,6 +126,28 @@ class RestReviewsControllerTests {
         AnsweredQuestion answeredQuestion = controller.showAnswer(answer);
         assertThat(answeredQuestion.answerId, equalTo(answer.getId()));
       }
+    }
+  }
+  @Nested
+  class MarkGoodQuestion {
+
+    MarkedQuestionRequest markedQuestionRequest =
+      new MarkedQuestionRequest() {
+        {
+          this.userId = 0;
+          this.quizQuestionId = 1;
+          this.noteId = 2;
+          this.isGood = true;
+        }
+      };
+
+    @Test
+    void createMarkedQuestion() {
+      MarkedQuestion markedQuestion = controller.markGoodQuestion(markedQuestionRequest);
+      assertEquals(0, markedQuestion.getUserId());
+      assertEquals(1, markedQuestion.getQuizQuestionId());
+      assertEquals(2, markedQuestion.getNoteId());
+      assertEquals(true, markedQuestion.getIsGood());
     }
   }
 }

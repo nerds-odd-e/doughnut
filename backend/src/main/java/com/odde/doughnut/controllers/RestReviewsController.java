@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.json.DueReviewPoints;
 import com.odde.doughnut.entities.json.InitialInfo;
+import com.odde.doughnut.entities.json.MarkedQuestionRequest;
 import com.odde.doughnut.entities.json.ReviewStatus;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -81,5 +82,16 @@ class RestReviewsController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(answer);
     return modelFactoryService.toAnswerModel(answer).getAnswerViewedByUser(currentUser.getEntity());
+  }
+
+  @PostMapping(path = "/mark-good-question")
+  @Transactional
+  public MarkedQuestion markGoodQuestion(MarkedQuestionRequest markedQuestionRequest) {
+    MarkedQuestion markedQuestion = new MarkedQuestion();
+    markedQuestion.setUserId(markedQuestionRequest.userId);
+    markedQuestion.setQuizQuestionId(markedQuestionRequest.quizQuestionId);
+    markedQuestion.setNoteId(markedQuestionRequest.noteId);
+    markedQuestion.setIsGood(markedQuestionRequest.isGood);
+    return markedQuestion;
   }
 }
