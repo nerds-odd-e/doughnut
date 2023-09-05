@@ -11,6 +11,7 @@ import CircleJoinPage from "@/pages/CircleJoinPage.vue";
 import FailureReportListPage from "@/pages/FailureReportListPage.vue";
 import FailureReportPage from "@/pages/FailureReportPage.vue";
 import AnsweredQuestionPage from "@/pages/AnsweredQuestionPage.vue";
+import DevTrainingData from "@/pages/DevTrainingData.vue";
 import NestedPage from "../pages/commons/NestedPage";
 
 const NestedInitialReviewPage = NestedPage(InitialReviewPage, "initial");
@@ -23,7 +24,6 @@ const noteAndLinkRoutes = [
     name: "notebooks",
     component: NotebooksPage,
   },
-
   {
     path: `notes/:noteId`,
     name: "noteShow",
@@ -58,6 +58,12 @@ const routes = [
     path: "/bazaar",
     name: "bazaar",
     component: BazaarPage,
+    meta: { userProp: true },
+  },
+  {
+    path: "/dev-training-data",
+    name: "devTrainingData",
+    component: DevTrainingData,
     meta: { userProp: true },
   },
   {
