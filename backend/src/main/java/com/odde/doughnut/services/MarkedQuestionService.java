@@ -10,7 +10,6 @@ public class MarkedQuestionService {
 
   public MarkedQuestion markQuestion(MarkedQuestionRequest markedQuestionRequest) {
     MarkedQuestion markedQuestion = new MarkedQuestion();
-    markedQuestion.setUserId(markedQuestionRequest.userId);
     markedQuestion.setQuizQuestionId(markedQuestionRequest.quizQuestionId);
     markedQuestion.setNoteId(markedQuestionRequest.noteId);
     markedQuestion.setIsGood(markedQuestionRequest.isGood);

@@ -134,7 +134,6 @@ class RestReviewsControllerTests {
     MarkedQuestionRequest markedQuestionRequest =
       new MarkedQuestionRequest() {
         {
-          this.userId = 0;
           this.quizQuestionId = 1;
           this.noteId = 2;
           this.isGood = true;
@@ -144,7 +143,6 @@ class RestReviewsControllerTests {
     @Test
     void createMarkedQuestion() {
       MarkedQuestion markedQuestion = controller.markGoodQuestion(markedQuestionRequest);
-      assertEquals(0, markedQuestion.getUserId());
       assertEquals(1, markedQuestion.getQuizQuestionId());
       assertEquals(2, markedQuestion.getNoteId());
       assertEquals(true, markedQuestion.getIsGood());

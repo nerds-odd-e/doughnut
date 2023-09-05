@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MarkedQuestionRequest {
-  public Integer userId;
   public Integer noteId;
   public Integer quizQuestionId;
   public String comment;
