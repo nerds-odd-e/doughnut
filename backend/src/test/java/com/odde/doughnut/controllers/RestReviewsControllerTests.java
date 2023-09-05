@@ -128,17 +128,18 @@ class RestReviewsControllerTests {
       }
     }
   }
+
   @Nested
   class MarkGoodQuestion {
 
     MarkedQuestionRequest markedQuestionRequest =
-      new MarkedQuestionRequest() {
-        {
-          this.quizQuestionId = 1;
-          this.noteId = 2;
-          this.isGood = true;
-        }
-      };
+        new MarkedQuestionRequest() {
+          {
+            this.quizQuestionId = 1;
+            this.noteId = 2;
+            this.isGood = true;
+          }
+        };
 
     @Test
     void createMarkedQuestion() {

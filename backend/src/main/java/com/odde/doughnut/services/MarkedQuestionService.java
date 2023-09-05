@@ -9,8 +9,7 @@ import java.sql.Timestamp;
 public class MarkedQuestionService {
 
   public MarkedQuestionService(
-    User user, Timestamp currentUTCTimestamp, ModelFactoryService modelFactoryService) {
-  }
+      User user, Timestamp currentUTCTimestamp, ModelFactoryService modelFactoryService) {}
 
   public MarkedQuestion markQuestion(MarkedQuestionRequest markedQuestionRequest) {
     MarkedQuestion markedQuestion = new MarkedQuestion();

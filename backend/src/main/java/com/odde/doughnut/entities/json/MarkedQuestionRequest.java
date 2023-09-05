@@ -10,5 +10,4 @@ public class MarkedQuestionRequest {
   public Integer quizQuestionId;
   public String comment;
   public Boolean isGood;
-
 }
