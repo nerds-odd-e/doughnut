@@ -58,6 +58,10 @@ declare namespace Generated {
         answer: Answer;
     }
 
+    interface GoodTrainingData {
+        messages: TrainingDataMessage[];
+    }
+
     interface InitialInfo {
         thingId: number;
         skipReview: boolean;
@@ -146,6 +150,11 @@ declare namespace Generated {
 
     interface SelfEvaluation {
         adjustment: number;
+    }
+
+    interface TrainingDataMessage {
+        role: string;
+        content: string;
     }
 
     interface UserForOtherUserView {
