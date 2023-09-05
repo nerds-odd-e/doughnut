@@ -79,6 +79,13 @@ declare namespace Generated {
         reverse: Link[];
     }
 
+    interface MarkedQuestionRequest {
+        noteId: number;
+        quizQuestionId: number;
+        comment: string;
+        isGood: boolean;
+    }
+
     interface NoteCreation {
         linkTypeToParent: LinkType;
         textContent: TextContent;
