@@ -30,7 +30,6 @@ Feature: Question generation by AI
     And I should see the question "What is the most common scuba diving certification?" is disabled
     And I should be asked "What is scuba diving?"
 
-  @ignore
   Scenario: I should be able to mark the question as good 
     When I ask to generate a question for note "Scuba Diving"
     And OpenAI by default returns this question from now:

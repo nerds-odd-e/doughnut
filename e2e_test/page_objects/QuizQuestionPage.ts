@@ -10,6 +10,14 @@ const currentQuestion = (stem?: string) => {
       getChoice(choice).click()
       getChoice(choice).parent().invoke("attr", "class").should("contain", `is-${correctness}`)
     },
+
+    markAsGood() {
+      question().find(".good-question input").click()
+    },
+
+    isMarkedAsGood() {
+      question().find(".good-question input").should("be.checked")
+    },
   }
 }
 

@@ -13,7 +13,19 @@
       style="white-space: pre-wrap"
       v-if="quizQuestion.stem"
       v-html="quizQuestion.stem"
-    />
+    ></div>
+    <span class="good-question"
+      >Good question?
+      <input
+        type="checkbox"
+        name="good question"
+        id="good-question-checkbox"
+        @change="
+          (event) =>
+            (event.target as HTMLInputElement).checked ? markAsGood() : null
+        "
+      />
+    </span>
     <div v-if="quizQuestion.questionType === 'SPELLING'">
       <form @submit.prevent.once="submitAnswer({ spellingAnswer: answer })">
         <TextInput
@@ -89,6 +101,21 @@ export default defineComponent({
         );
       }
     },
+    async markAsGood() {
+      // TODO: trigger API to mark question as good
+    },
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.quiz-instruction {
+  position: relative;
+}
+
+.good-question {
+  position: absolute;
+  top: 0.3em;
+  right: 0.7em;
+}
+</style>

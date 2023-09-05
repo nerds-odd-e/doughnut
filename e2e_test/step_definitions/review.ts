@@ -210,3 +210,11 @@ Then("I should be asked {string}", (expectedtQuestionStem: string) => {
 Then("I should see the question {string} is disabled", (questionStem: string) => {
   pageObjects.findQuestionWithStem(questionStem).isDisabled()
 })
+
+Then("I mark the question {string} as good", (questionStem: string) => {
+  pageObjects.findQuestionWithStem(questionStem).markAsGood()
+})
+
+Then("I should see the question {string} is marked as good", (questionStem: string) => {
+  pageObjects.findQuestionWithStem(questionStem).isMarkedAsGood()
+})
