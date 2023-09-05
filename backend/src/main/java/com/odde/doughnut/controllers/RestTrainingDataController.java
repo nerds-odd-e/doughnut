@@ -1,13 +1,15 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.json.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
-import javax.annotation.Resource;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.annotation.SessionScope;
+
+import javax.annotation.Resource;
 
 @RestController
 @SessionScope
@@ -31,8 +33,8 @@ class RestTrainingDataController {
   @GetMapping("/goodtrainingdata")
   public String getGoodTrainingData() {
     currentUser.assertLoggedIn();
-    // currentUser.assertReadAuthorization(note);
     User user = currentUser.getEntity();
     return user.getName();
   }
+
 }
