@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS `marked_questions`;
 CREATE TABLE `marked_questions` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int unsigned NOT NULL,
