@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.json.ReviewStatus;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.*;
+import com.odde.doughnut.services.MarkedQuestionService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/reviews")
 class RestReviewsController {
   private final ModelFactoryService modelFactoryService;
+  private final MarkedQuestionService markedQuestionService = new MarkedQuestionService();
 
   private UserModel currentUser;
 
@@ -87,11 +89,8 @@ class RestReviewsController {
   @PostMapping(path = "/mark-good-question")
   @Transactional
   public MarkedQuestion markGoodQuestion(MarkedQuestionRequest markedQuestionRequest) {
-    MarkedQuestion markedQuestion = new MarkedQuestion();
-    markedQuestion.setUserId(markedQuestionRequest.userId);
-    markedQuestion.setQuizQuestionId(markedQuestionRequest.quizQuestionId);
-    markedQuestion.setNoteId(markedQuestionRequest.noteId);
-    markedQuestion.setIsGood(markedQuestionRequest.isGood);
+    MarkedQuestion markedQuestion = markedQuestionService.markQuestion(markedQuestionRequest);
     return markedQuestion;
   }
+
 }
