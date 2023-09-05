@@ -20,10 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/reviews")
 class RestReviewsController {
   private final ModelFactoryService modelFactoryService;
-  private final MarkedQuestionService markedQuestionService = new MarkedQuestionService();
-
   private UserModel currentUser;
-
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
@@ -86,10 +83,15 @@ class RestReviewsController {
     return modelFactoryService.toAnswerModel(answer).getAnswerViewedByUser(currentUser.getEntity());
   }
 
-  @PostMapping(path = "/mark-good-question")
+  private MarkedQuestionService getMarkedQuestionService(User user) {
+    return new MarkedQuestionService(
+      user, testabilitySettings.getCurrentUTCTimestamp(), modelFactoryService);
+  }
+  @PostMapping(path = "/mark-question")
   @Transactional
-  public MarkedQuestion markGoodQuestion(MarkedQuestionRequest markedQuestionRequest) {
-    MarkedQuestion markedQuestion = markedQuestionService.markQuestion(markedQuestionRequest);
+  public MarkedQuestion markQuestion(MarkedQuestionRequest markedQuestionRequest) {
+    MarkedQuestion markedQuestion = getMarkedQuestionService(currentUser.getEntity())
+      .markQuestion(markedQuestionRequest);
     return markedQuestion;
   }
 

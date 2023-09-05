@@ -142,7 +142,7 @@ class RestReviewsControllerTests {
 
     @Test
     void createMarkedQuestion() {
-      MarkedQuestion markedQuestion = controller.markGoodQuestion(markedQuestionRequest);
+      MarkedQuestion markedQuestion = controller.markQuestion(markedQuestionRequest);
       assertEquals(1, markedQuestion.getQuizQuestionId());
       assertEquals(2, markedQuestion.getNoteId());
       assertEquals(true, markedQuestion.getIsGood());
