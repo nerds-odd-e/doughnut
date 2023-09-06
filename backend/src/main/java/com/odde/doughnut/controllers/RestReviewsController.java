@@ -96,4 +96,10 @@ class RestReviewsController {
         getMarkedQuestionService(currentUser.getEntity()).markQuestion(markedQuestionRequest);
     return markedQuestion;
   }
+
+  @DeleteMapping(path = "/mark_question")
+  public Object deleteMarkQuestion(MarkedQuestionRequest markedQuestionRequest) {
+    // TODO: actually implement it
+    return markedQuestionRequest;
+  }
 }

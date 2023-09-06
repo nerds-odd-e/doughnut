@@ -75,6 +75,10 @@ class ManagedApi {
     return this.around(this.api.restPatch(url, data));
   }
 
+  restDelete(url: string, data: JsonData) {
+    return this.around(this.api.restDelete(url, data));
+  }
+
   restPostMultiplePartForm(url: string, data: JsonData) {
     return this.around(this.api.restPostMultiplePartForm(url, data));
   }

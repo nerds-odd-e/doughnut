@@ -95,6 +95,10 @@ class ApiMockImpl implements ApiMock {
     return this.expecting(url, "POST");
   }
 
+  expectingDelete(url: string) {
+    return this.expecting(url, "DELETE");
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   verifyCall(url: string, matcher: any = expect.anything()) {
     expect(this.fetchMock).toHaveBeenCalledWith(url, matcher);

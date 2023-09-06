@@ -112,14 +112,18 @@ export default defineComponent({
       }
     },
     async markAsGood() {
-      this.markedAsGood = true;
-      return this.api.reviewMethods.markAsGood(
+      await this.api.reviewMethods.markAsGood(
         this.quizQuestion.quizQuestionId,
         this.quizQuestion.notebookPosition?.noteId,
       );
+      this.markedAsGood = true;
     },
 
-    unmarkAsGood() {
+    async unmarkAsGood() {
+      await this.api.reviewMethods.unmarkAsGood(
+        this.quizQuestion.quizQuestionId,
+        this.quizQuestion.notebookPosition?.noteId,
+      );
       this.markedAsGood = false;
     },
   },

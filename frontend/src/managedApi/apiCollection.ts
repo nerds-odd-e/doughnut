@@ -53,6 +53,13 @@ const apiCollection = (managedApi: ManagedApi) => ({
         isGood: true,
       });
     },
+    async unmarkAsGood(quizQuestionId: number, noteId?: number) {
+      return managedApi.restDelete(`reviews/mark_question`, {
+        quizQuestionId,
+        noteId,
+        isGood: true,
+      });
+    },
     async overview() {
       return (await managedApi.restGet(
         `reviews/overview`,

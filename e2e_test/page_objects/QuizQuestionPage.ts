@@ -15,8 +15,16 @@ const currentQuestion = (stem?: string) => {
       question().find(".good-question .thumb-up-hollow").click()
     },
 
+    unmarkAsGood() {
+      question().find(".good-question .thumb-up-filled").click()
+    },
+
     isMarkedAsGood() {
       question().find(".good-question .thumb-up-filled").should("be.visible")
+    },
+
+    isNotMarkedAsGood() {
+      question().find(".good-question .thumb-up-hollow").should("be.visible")
     },
   }
 }

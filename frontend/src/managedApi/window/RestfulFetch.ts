@@ -5,7 +5,7 @@ import loginOrRegisterAndHaltThisThread from "./loginOrRegisterAndHaltThisThread
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type JsonData = any;
 
-type HttpMethod = "GET" | "POST" | "PATCH";
+type HttpMethod = "GET" | "POST" | "PATCH" | "DELETE";
 
 function objectToFormData(data: JsonData) {
   const formData = new FormData();

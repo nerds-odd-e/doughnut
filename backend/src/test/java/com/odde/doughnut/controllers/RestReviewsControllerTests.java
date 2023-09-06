@@ -3,8 +3,7 @@ package com.odde.doughnut.controllers;
 import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.json.InitialInfo;
@@ -172,6 +171,13 @@ class RestReviewsControllerTests {
       long oldCount = modelFactoryService.markedQuestionRepository.count();
       controller.markQuestion(markedQuestionRequest);
       assertThat(modelFactoryService.markedQuestionRepository.count(), equalTo(oldCount + 1));
+    }
+
+    @Test
+    void deleteMarkedQuestion () {
+      assertDoesNotThrow(() ->
+        controller.deleteMarkQuestion(markedQuestionRequest)
+      );
     }
   }
 }

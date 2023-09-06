@@ -19,6 +19,10 @@ class Api {
     return this.fetch.restRequest(url, data, { method: "PATCH" });
   }
 
+  restDelete(url: string, data: JsonData) {
+    return this.fetch.restRequest(url, data, { method: "DELETE" });
+  }
+
   restPostMultiplePartForm(url: string, data: JsonData) {
     return this.fetch.restRequest(url, data, {
       method: "POST",
