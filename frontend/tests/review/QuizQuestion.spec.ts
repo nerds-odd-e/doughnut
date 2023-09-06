@@ -45,7 +45,7 @@ describe("QuizQuestion", () => {
         .withNotebookPosition(notebook)
         .please();
       const expectation = helper.apiMock
-        .expectingPost(`/api/review/mark_question`)
+        .expectingPost(`/api/reviews/mark_question`)
         .andReturnOnce({});
 
       const wrapper = helper
@@ -59,7 +59,7 @@ describe("QuizQuestion", () => {
       await flushPromises();
 
       expect(expectation.actualRequestJsonBody()).toMatchObject({
-        questionId: quizQuestion.quizQuestionId,
+        quizQuestionId: quizQuestion.quizQuestionId,
         noteId: notebook.noteId,
         isGood: true,
       });

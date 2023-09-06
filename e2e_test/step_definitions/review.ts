@@ -212,14 +212,6 @@ Then("I should see the question {string} is disabled", (questionStem: string) =>
 })
 
 Then("I mark the question {string} as good", (questionStem: string) => {
-  // TODO: Move to serviceMocker
-  cy.intercept(
-    {
-      method: "POST",
-      url: "/api/review/mark_question",
-    },
-    { success: true },
-  )
   pageObjects.findQuestionWithStem(questionStem).markAsGood()
 })
 
