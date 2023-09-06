@@ -177,5 +177,13 @@ class RestReviewsControllerTests {
     void deleteMarkedQuestion() {
       assertDoesNotThrow(() -> controller.deleteMarkQuestion(markedQuestionRequest));
     }
+
+    @Test
+    void downloadMarkedQuestion() {
+      controller.markQuestion(markedQuestionRequest);
+      List<MarkedQuestion> questions = controller.getAllMarkedQuestions();
+      assertThat(questions, hasSize(1));
+      assertThat(questions.get(0).getUserId(), equalTo(user.getId()));
+    }
   }
 }

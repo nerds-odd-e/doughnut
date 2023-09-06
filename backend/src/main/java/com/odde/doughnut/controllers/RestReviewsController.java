@@ -10,6 +10,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.*;
 import com.odde.doughnut.services.MarkedQuestionService;
 import com.odde.doughnut.testability.TestabilitySettings;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/reviews")
 class RestReviewsController {
   private final ModelFactoryService modelFactoryService;
-  private UserModel currentUser;
+  private final UserModel currentUser;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
@@ -92,14 +93,22 @@ class RestReviewsController {
   @PostMapping(path = "/mark_question")
   @Transactional
   public MarkedQuestion markQuestion(@RequestBody MarkedQuestionRequest markedQuestionRequest) {
-    MarkedQuestion markedQuestion =
-        getMarkedQuestionService(currentUser.getEntity()).markQuestion(markedQuestionRequest);
-    return markedQuestion;
+    return getMarkedQuestionService(currentUser.getEntity()).markQuestion(markedQuestionRequest);
   }
 
   @DeleteMapping(path = "/mark_question")
   public Object deleteMarkQuestion(MarkedQuestionRequest markedQuestionRequest) {
     // TODO: actually implement it
     return markedQuestionRequest;
+  }
+
+  @GetMapping(path = "/all_marked_questions")
+  public List<MarkedQuestion> getAllMarkedQuestions() {
+    Iterable<MarkedQuestion> questions = modelFactoryService.markedQuestionRepository.findAll();
+    List<MarkedQuestion> result = new ArrayList<>();
+    for (MarkedQuestion markedQuestion : questions) {
+      result.add(markedQuestion);
+    }
+    return result;
   }
 }
