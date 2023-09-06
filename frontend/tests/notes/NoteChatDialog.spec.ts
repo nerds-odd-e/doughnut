@@ -17,6 +17,7 @@ const createWrapper = async () => {
 };
 
 describe("NoteChatDialog TestMe", () => {
+  let expectation;
   beforeEach(() => {
     const quizQuestion = makeMe.aQuizQuestion
       .withQuestionType("AI_QUESTION")
@@ -24,7 +25,7 @@ describe("NoteChatDialog TestMe", () => {
       .withChoices(["option A", "option B", "option C"])
       .please();
 
-    helper.apiMock
+    expectation = helper.apiMock
       .expectingPost(`/api/ai/generate-question?note=${note.id}`)
       .andReturnOnce(quizQuestion);
   });
@@ -36,6 +37,40 @@ describe("NoteChatDialog TestMe", () => {
     expect(wrapper.text()).toContain("any question?");
     expect(wrapper.text()).toContain("option A");
     expect(wrapper.text()).toContain("option C");
+  });
+
+  it("should allow user to enter a custom model in test environment", async () => {
+    const wrapper = await createWrapper();
+    await wrapper.find(".custom-model-input input").setValue("my-custom-model");
+    await wrapper.find("button").trigger("click");
+    await flushPromises();
+    expect(expectation.actualRequestJsonBody()).toMatchObject({
+      model: "my-custom-model",
+    });
+  });
+
+  describe("when it is in production environment", () => {
+    let original;
+
+    beforeEach(() => {
+      original = window.location;
+      Object.defineProperty(window, "location", {
+        value: {
+          href: "www.odd-e.com",
+        },
+      });
+    });
+
+    afterEach(() => {
+      Object.defineProperty(window, "location", original);
+    });
+
+    it("should hide custom model input in production environment until feature is fully developed", async () => {
+      const wrapper = await createWrapper();
+      expect(wrapper.find(".custom-model-input input").exists()).toBe(false);
+      wrapper.find("button").trigger("click");
+      await flushPromises();
+    });
   });
 
   it("regenerate question when asked", async () => {

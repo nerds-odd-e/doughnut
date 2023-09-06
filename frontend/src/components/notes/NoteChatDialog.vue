@@ -24,21 +24,30 @@
   </div>
 
   <div class="fixed-bottom chat-control">
-    <button
-      v-if="!quizQuestion"
-      class="btn btn-secondary"
-      @click="generateQuestion"
-    >
-      Test me
-    </button>
-    <button
-      id="try-again"
-      v-if="quizQuestion"
-      class="btn btn-secondary"
-      @click="generateQuestion"
-    >
-      Doesn't make sense?
-    </button>
+    <div>
+      <button
+        v-if="!quizQuestion"
+        class="btn btn-secondary"
+        @click="generateQuestion"
+      >
+        Test me
+      </button>
+      <button
+        id="try-again"
+        v-if="quizQuestion"
+        class="btn btn-secondary"
+        @click="generateQuestion"
+      >
+        Doesn't make sense?
+      </button>
+      <TextInput
+        v-if="!isProduction"
+        type="text"
+        class="custom-model-input"
+        placeholder="openai model name"
+        @change="(event) => setCustomModel(event.target.value)"
+      />
+    </div>
     <div class="chat-container">
       <form class="chat-input-container" @submit.prevent="generateChatAnswer">
         <input id="chat-input" class="chat-input-text" v-model="chatInput" />
@@ -63,6 +72,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import type { StorageAccessor } from "@/store/createNoteStorage";
+import TextInput from "@/components/form/TextInput.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import QuizQuestion from "../review/QuizQuestion.vue";
 import AnsweredQuestion from "../review/AnsweredQuestion.vue";
@@ -78,7 +88,7 @@ export default defineComponent({
       required: true,
     },
   },
-  components: { QuizQuestion, AnsweredQuestion },
+  components: { QuizQuestion, AnsweredQuestion, TextInput },
   data() {
     return {
       quizQuestion: undefined as Generated.QuizQuestion | undefined,
@@ -87,11 +97,15 @@ export default defineComponent({
       chatInput: "",
       assistantMessage: "",
       answered: false,
+      customModel: undefined as string | undefined,
     };
   },
   computed: {
     isButtonDisabled() {
       return this.chatInput === "";
+    },
+    isProduction() {
+      return this.api.testability.getEnvironment() === "production";
     },
   },
   methods: {
@@ -99,6 +113,7 @@ export default defineComponent({
       const tmpQuestion: Generated.QuizQuestion | undefined = this.quizQuestion;
       this.quizQuestion = await this.api.ai.askAIToGenerateQuestion(
         this.selectedNote.id,
+        this.customModel,
       );
       this.prevQuizQuestion = tmpQuestion;
     },
@@ -111,6 +126,9 @@ export default defineComponent({
         this.chatInput,
       );
       this.answered = true;
+    },
+    setCustomModel(model: string) {
+      this.customModel = model;
     },
   },
 });
@@ -204,5 +222,10 @@ input.auto-extendable-input {
   width: calc(100% - 140px);
   margin-left: auto;
   margin-right: 40px;
+
+  > div:first-child {
+    display: flex;
+    gap: 1rem;
+  }
 }
 </style>
