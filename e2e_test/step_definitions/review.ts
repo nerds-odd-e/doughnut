@@ -216,7 +216,7 @@ Then("I mark the question {string} as good", (questionStem: string) => {
   cy.intercept(
     {
       method: "POST",
-      url: "/api/review/mark_good_question",
+      url: "/api/review/mark_question",
     },
     { success: true },
   )

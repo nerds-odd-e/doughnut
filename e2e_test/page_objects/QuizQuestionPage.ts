@@ -12,11 +12,11 @@ const currentQuestion = (stem?: string) => {
     },
 
     markAsGood() {
-      question().find(".good-question input").click()
+      question().find(".good-question .thumb-up-hollow").click()
     },
 
     isMarkedAsGood() {
-      question().find(".good-question input").should("be.checked")
+      question().find(".good-question .thumb-up-filled").should("be.visible")
     },
   }
 }

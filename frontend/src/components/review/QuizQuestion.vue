@@ -10,21 +10,25 @@
       {{ quizQuestion.mainTopic }}
     </h2>
     <div
-      style="white-space: pre-wrap"
+      style="white-space: pre-wrap; margin-right: 60px"
       v-if="quizQuestion.stem"
       v-html="quizQuestion.stem"
     ></div>
-    <span class="good-question"
-      >Good question?
-      <input
-        type="checkbox"
-        name="good question"
-        id="good-question-checkbox"
-        @change="
-          (event) =>
-            (event.target as HTMLInputElement).checked ? markAsGood() : null
-        "
-      />
+    <span class="good-question">
+      <button
+        v-if="!markedAsGood"
+        class="thumb-up-hollow"
+        @click="() => markAsGood()"
+      >
+        <SvgThumbUpHollow />
+      </button>
+      <button
+        v-if="markedAsGood"
+        class="thumb-up-filled"
+        @click="() => unmarkAsGood()"
+      >
+        <SvgThumbUpFilled />
+      </button>
     </span>
     <div v-if="quizQuestion.questionType === 'SPELLING'">
       <form @submit.prevent.once="submitAnswer({ spellingAnswer: answer })">
@@ -61,6 +65,8 @@ import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopups";
 import QuizQuestionChoices from "./QuizQuestionChoices.vue";
 import Breadcrumb from "../toolbars/Breadcrumb.vue";
+import SvgThumbUpHollow from "../svgs/SvgThumbUpHollow.vue";
+import SvgThumbUpFilled from "../svgs/SvgThumbUpFilled.vue";
 
 export default defineComponent({
   inheritAttrs: false,
@@ -81,11 +87,14 @@ export default defineComponent({
     TextInput,
     QuizQuestionChoices,
     Breadcrumb,
+    SvgThumbUpHollow,
+    SvgThumbUpFilled,
   },
   emits: ["answered"],
   data() {
     return {
       answer: "" as string,
+      markedAsGood: false,
     };
   },
   methods: {
@@ -103,10 +112,15 @@ export default defineComponent({
       }
     },
     async markAsGood() {
+      this.markedAsGood = true;
       return this.api.reviewMethods.markAsGood(
         this.quizQuestion.quizQuestionId,
         this.quizQuestion.notebookPosition?.noteId,
       );
+    },
+
+    unmarkAsGood() {
+      this.markedAsGood = false;
     },
   },
 });
@@ -115,11 +129,17 @@ export default defineComponent({
 <style lang="scss" scoped>
 .quiz-instruction {
   position: relative;
+  margin-top: 20px;
 }
 
 .good-question {
   position: absolute;
-  top: 0.3em;
+  top: -0.3em;
   right: 0.7em;
+
+  button {
+    border: none;
+    background: none;
+  }
 }
 </style>

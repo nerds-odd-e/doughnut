@@ -165,6 +165,8 @@ declare module 'vue' {
     SvgSearchWikidata: typeof import('./src/components/svgs/SvgSearchWikidata.vue')['default']
     SvgSidebar: typeof import('./src/components/svgs/SvgSidebar.vue')['default']
     SvgStop: typeof import('./src/components/svgs/SvgStop.vue')['default']
+    SvgThumbUpFilled: typeof import('./src/components/svgs/SvgThumbUpFilled.vue')['default']
+    SvgThumbUpHollow: typeof import('./src/components/svgs/SvgThumbUpHollow.vue')['default']
     SvgTranslationEdit: typeof import('./src/components/svgs/SvgTranslationEdit.vue')['default']
     SvgUndo: typeof import('./src/components/svgs/SvgUndo.vue')['default']
     SvgUnsubscribe: typeof import('./src/components/svgs/SvgUnsubscribe.vue')['default']

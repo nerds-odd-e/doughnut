@@ -45,7 +45,7 @@ describe("QuizQuestion", () => {
         .withNotebookPosition(notebook)
         .please();
       const expectation = helper.apiMock
-        .expectingPost(`/api/review/mark_good_question`)
+        .expectingPost(`/api/review/mark_question`)
         .andReturnOnce({});
 
       const wrapper = helper
@@ -53,7 +53,8 @@ describe("QuizQuestion", () => {
         .withStorageProps({ quizQuestion })
         .mount();
 
-      await wrapper.find("#good-question-checkbox").setValue(true);
+      expect(wrapper.find(".thumb-up-filled").exists()).toBe(false);
+      await wrapper.find(".thumb-up-hollow").trigger("click");
 
       await flushPromises();
 
@@ -63,10 +64,8 @@ describe("QuizQuestion", () => {
         isGood: true,
       });
 
-      expect(
-        (wrapper.find("#good-question-checkbox").element as HTMLInputElement)
-          .checked,
-      ).toBe(true);
+      expect(wrapper.find(".thumb-up-filled").exists()).toBe(true);
+      expect(wrapper.find(".thumb-up-hollow").exists()).toBe(false);
     });
   });
 });
