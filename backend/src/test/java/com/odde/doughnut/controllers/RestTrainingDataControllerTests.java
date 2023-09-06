@@ -1,13 +1,18 @@
 package com.odde.doughnut.controllers;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.odde.doughnut.entities.MarkedQuestion;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.json.GoodTrainingData;
+import com.odde.doughnut.entities.json.TrainingDataMessage;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -47,14 +52,39 @@ public class RestTrainingDataControllerTests {
     }
 
     @Test
-    void shouldSeeMockTrainingData() {
-      assertThat(controller.getGoodTrainingData()).contains("messages");
+    void shouldReturnNoTrainingDataIfNoMarkedQuestion() {
+      List<GoodTrainingData> goodTrainingData = controller.getGoodTrainingData();
+      assertTrue(goodTrainingData.isEmpty());
     }
 
     @Test
     void shouldReturnTrainingDataIfHavingReadingAuth() {
-      String goodTrainingData = controller.getGoodTrainingData();
-      assertTrue(goodTrainingData.length() > 0);
+      MarkedQuestion markedQuestion = new MarkedQuestion();
+      Note note = makeMe.aNote().please();
+      User learner = makeMe.aUser().please();
+      markedQuestion.setNoteId(note.getId());
+      markedQuestion.setUserId(learner.getId());
+      modelFactoryService.markedQuestionRepository.save(markedQuestion);
+
+      List<GoodTrainingData> goodTrainingData = controller.getGoodTrainingData();
+      assertTrue(goodTrainingData.size() > 0);
+    }
+
+    private static GoodTrainingData getTrainingData() {
+      GoodTrainingData goodTrainingData = new GoodTrainingData();
+      goodTrainingData.addTrainingDataMessage(getTrainingDataMessage("system", "System Content"));
+      goodTrainingData.addTrainingDataMessage(
+          getTrainingDataMessage("user", "Please assume the role of a Memory Assistant."));
+      goodTrainingData.addTrainingDataMessage(
+          getTrainingDataMessage("assistant", "Test question and answers."));
+      return goodTrainingData;
+    }
+
+    private static TrainingDataMessage getTrainingDataMessage(String role, String content) {
+      TrainingDataMessage tdMsg = new TrainingDataMessage();
+      tdMsg.setRole(role);
+      tdMsg.setContent(content);
+      return tdMsg;
     }
   }
 }
