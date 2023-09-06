@@ -11,6 +11,7 @@ import com.odde.doughnut.entities.json.InitialInfo;
 import com.odde.doughnut.entities.json.MarkedQuestionRequest;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -131,22 +132,46 @@ class RestReviewsControllerTests {
 
   @Nested
   class MarkGoodQuestion {
+    User user;
+    QuizQuestionEntity quizQuestionEntity;
+    Note note;
+    ReviewPoint reviewPoint;
+    MarkedQuestionRequest markedQuestionRequest;
 
-    MarkedQuestionRequest markedQuestionRequest =
-        new MarkedQuestionRequest() {
-          {
-            this.quizQuestionId = 1;
-            this.noteId = 2;
-            this.isGood = true;
-          }
-        };
+    @BeforeEach
+    void setup() throws QuizQuestionNotPossibleException {
+      note = makeMe.aNote("new").creatorAndOwner(currentUser).please();
+
+      user = currentUser.getEntity();
+      reviewPoint =
+          makeMe.aReviewPointFor(note).by(currentUser).forgettingCurveAndNextReviewAt(200).please();
+      quizQuestionEntity =
+          makeMe.aQuestion().of(QuizQuestionEntity.QuestionType.SPELLING, reviewPoint).please();
+      modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
+      modelFactoryService.noteRepository.save(note);
+      markedQuestionRequest =
+          new MarkedQuestionRequest() {
+            {
+              this.quizQuestionId = quizQuestionEntity.getId();
+              this.noteId = note.getId();
+              this.isGood = true;
+            }
+          };
+    }
 
     @Test
     void createMarkedQuestion() {
       MarkedQuestion markedQuestion = controller.markQuestion(markedQuestionRequest);
-      assertEquals(1, markedQuestion.getQuizQuestionId());
-      assertEquals(2, markedQuestion.getNoteId());
+      assertEquals(markedQuestionRequest.quizQuestionId, markedQuestion.getQuizQuestionId());
+      assertEquals(markedQuestionRequest.noteId, markedQuestion.getNoteId());
       assertEquals(true, markedQuestion.getIsGood());
+    }
+
+    @Test
+    void createMarkedQuestionInDatabase() {
+      long oldCount = modelFactoryService.markedQuestionRepository.count();
+      controller.markQuestion(markedQuestionRequest);
+      assertThat(modelFactoryService.markedQuestionRepository.count(), equalTo(oldCount + 1));
     }
   }
 }

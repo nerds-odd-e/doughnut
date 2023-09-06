@@ -17,6 +17,7 @@ public record MarkedQuestionService(
     markedQuestion.setNoteId(markedQuestionRequest.noteId);
     markedQuestion.setIsGood(markedQuestionRequest.isGood);
     markedQuestion.setComment(markedQuestionRequest.comment);
+    modelFactoryService.markedQuestionRepository.save(markedQuestion);
     return markedQuestion;
   }
 }
