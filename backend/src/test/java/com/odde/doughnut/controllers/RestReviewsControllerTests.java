@@ -174,10 +174,8 @@ class RestReviewsControllerTests {
     }
 
     @Test
-    void deleteMarkedQuestion () {
-      assertDoesNotThrow(() ->
-        controller.deleteMarkQuestion(markedQuestionRequest)
-      );
+    void deleteMarkedQuestion() {
+      assertDoesNotThrow(() -> controller.deleteMarkQuestion(markedQuestionRequest));
     }
   }
 }
