@@ -22,11 +22,9 @@ import org.springframework.web.server.ResponseStatusException;
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
 public class RestTrainingDataControllerTests {
-  @Autowired
-  ModelFactoryService modelFactoryService;
+  @Autowired ModelFactoryService modelFactoryService;
 
-  @Autowired
-  MakeMe makeMe;
+  @Autowired MakeMe makeMe;
   RestTrainingDataController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
@@ -35,7 +33,7 @@ public class RestTrainingDataControllerTests {
     UserModel userModel = makeMe.aUser().toModelPlease();
 
     controller =
-      new RestTrainingDataController(modelFactoryService, userModel, testabilitySettings);
+        new RestTrainingDataController(modelFactoryService, userModel, testabilitySettings);
   }
 
   @Nested
@@ -43,8 +41,8 @@ public class RestTrainingDataControllerTests {
     @Test
     void itShouldNotAllowNonMemberToSeeTrainingData() {
       controller =
-        new RestTrainingDataController(
-          modelFactoryService, makeMe.aNullUserModel(), testabilitySettings);
+          new RestTrainingDataController(
+              modelFactoryService, makeMe.aNullUserModel(), testabilitySettings);
       assertThrows(ResponseStatusException.class, () -> controller.getGoodTrainingData());
     }
 
