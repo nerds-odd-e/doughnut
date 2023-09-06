@@ -89,7 +89,7 @@ class RestReviewsController {
         user, testabilitySettings.getCurrentUTCTimestamp(), modelFactoryService);
   }
 
-  @PostMapping(path = "/mark-question")
+  @PostMapping(path = "/mark_question")
   @Transactional
   public MarkedQuestion markQuestion(MarkedQuestionRequest markedQuestionRequest) {
     MarkedQuestion markedQuestion =
