@@ -91,7 +91,7 @@ class RestReviewsController {
 
   @PostMapping(path = "/mark_question")
   @Transactional
-  public MarkedQuestion markQuestion(MarkedQuestionRequest markedQuestionRequest) {
+  public MarkedQuestion markQuestion(@RequestBody MarkedQuestionRequest markedQuestionRequest) {
     MarkedQuestion markedQuestion =
         getMarkedQuestionService(currentUser.getEntity()).markQuestion(markedQuestionRequest);
     return markedQuestion;
