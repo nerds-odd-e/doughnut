@@ -1,9 +1,9 @@
 package com.odde.doughnut.controllers;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
@@ -21,19 +21,21 @@ import org.springframework.web.server.ResponseStatusException;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-class RestTrainingDataControllerTest {
-  @Autowired ModelFactoryService modelFactoryService;
+public class RestTrainingDataControllerTests {
+  @Autowired
+  ModelFactoryService modelFactoryService;
 
-  @Autowired MakeMe makeMe;
-  private UserModel userModel;
+  @Autowired
+  MakeMe makeMe;
   RestTrainingDataController controller;
-  private TestabilitySettings testabilitySettings = new TestabilitySettings();
+  private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().toModelPlease();
+    UserModel userModel = makeMe.aUser().toModelPlease();
+
     controller =
-        new RestTrainingDataController(modelFactoryService, userModel, testabilitySettings);
+      new RestTrainingDataController(modelFactoryService, userModel, testabilitySettings);
   }
 
   @Nested
@@ -41,17 +43,18 @@ class RestTrainingDataControllerTest {
     @Test
     void itShouldNotAllowNonMemberToSeeTrainingData() {
       controller =
-          new RestTrainingDataController(
-              modelFactoryService, makeMe.aNullUserModel(), testabilitySettings);
-      assertThrows(
-          ResponseStatusException.class,
-          () -> {
-            controller.getGoodTrainingData();
-          });
+        new RestTrainingDataController(
+          modelFactoryService, makeMe.aNullUserModel(), testabilitySettings);
+      assertThrows(ResponseStatusException.class, () -> controller.getGoodTrainingData());
     }
 
     @Test
-    void shouldReturnTrainingDataIfHavingReadingAuth() throws UnexpectedNoAccessRightException {
+    void shouldSeeMockTrainingData() {
+      assertThat(controller.getGoodTrainingData()).contains("messages");
+    }
+
+    @Test
+    void shouldReturnTrainingDataIfHavingReadingAuth() {
       String goodTrainingData = controller.getGoodTrainingData();
       assertTrue(goodTrainingData.length() > 0);
     }
