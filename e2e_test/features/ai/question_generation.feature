@@ -39,3 +39,11 @@ Feature: Question generation by AI
     Then I should see the question "What is the most common scuba diving certification?" is marked as good
     When I unmark the question "What is the most common scuba diving certification?" as good
     Then I should see the question "What is the most common scuba diving certification?" is not marked as good
+
+  @ignore
+  Scenario: I should be able to use a custom model to generate question
+    When I use a custom model "gpt-4"
+    And I generate a question for note "Scuba Diving"
+    Then OpenAI uses custom model and returns this question from now:
+      | question                                 | correct_choice | incorrect_choice_1 | incorrect_choice_2 |
+      | Which country has the most scuba divers? | USA            | Singapore          | Australia          |
