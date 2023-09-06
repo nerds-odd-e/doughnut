@@ -64,7 +64,7 @@ const routes = [
     path: "/dev-training-data",
     name: "devTrainingData",
     component: DevTrainingData,
-    meta: { userProp: true },
+    props: true,
   },
   {
     path: "/circles/join/:invitationCode?",

@@ -10,5 +10,7 @@ Feature: Generate Training Data from marked questions
 
 
   Scenario: 1 or more good questions
+    # Given There is a marked question
+    Given I've logged in as "developer"
     When I attempt to export
     Then a file with training data is produced

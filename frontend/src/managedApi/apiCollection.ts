@@ -32,6 +32,9 @@ const apiCollection = (managedApi: ManagedApi) => ({
       )) as Generated.User;
     },
   },
+  async getTrainingData() {
+    return managedApi.restGet("gettrainingdata/goodtrainingdata");
+  },
   reviewMethods: {
     async markAsRepeated(reviewPointId: Doughnut.ID, successful: boolean) {
       return (await managedApi.restPost(
@@ -65,7 +68,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
         `reviews/overview`,
       )) as Generated.ReviewStatus;
     },
-
     updateReviewSetting(
       noteId: Doughnut.ID,
       data: Omit<Generated.ReviewSetting, "id">,
