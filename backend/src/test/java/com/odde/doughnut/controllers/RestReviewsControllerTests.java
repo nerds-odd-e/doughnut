@@ -160,10 +160,17 @@ class RestReviewsControllerTests {
 
     @Test
     void createMarkedQuestion() {
-      MarkedQuestion markedQuestion = controller.markQuestion(markedQuestionRequest);
-      assertEquals(markedQuestionRequest.quizQuestionId, markedQuestion.getQuizQuestionId());
-      assertEquals(markedQuestionRequest.noteId, markedQuestion.getNoteId());
-      assertEquals(true, markedQuestion.getIsGood());
+      Integer markedQuestionId = controller.markQuestion(markedQuestionRequest);
+      modelFactoryService
+          .markedQuestionRepository
+          .findById(markedQuestionId)
+          .ifPresent(
+              markedQuestion -> {
+                assertEquals(
+                    markedQuestionRequest.quizQuestionId, markedQuestion.getQuizQuestionId());
+                assertEquals(markedQuestionRequest.noteId, markedQuestion.getNoteId());
+                assertEquals(true, markedQuestion.getIsGood());
+              });
     }
 
     @Test
@@ -175,7 +182,10 @@ class RestReviewsControllerTests {
 
     @Test
     void deleteMarkedQuestion() {
-      assertDoesNotThrow(() -> controller.deleteMarkQuestion(markedQuestionRequest));
+      Integer markedQuestionId = controller.markQuestion(markedQuestionRequest);
+      long oldCount = modelFactoryService.markedQuestionRepository.count();
+      controller.deleteMarkQuestion(markedQuestionId);
+      assertThat(modelFactoryService.markedQuestionRepository.count(), equalTo(oldCount - 1));
     }
 
     @Test

@@ -46,15 +46,15 @@ describe("QuizQuestion", () => {
         .please();
 
       let wrapper;
-
+      const markedQuestionId: string = "1";
       const stubMarkQuestionCall = () =>
         helper.apiMock
           .expectingPost(`/api/reviews/mark_question`)
-          .andReturnOnce({});
+          .andReturnOnce(markedQuestionId);
 
-      const stubUnmarkQuestionCall = () =>
+      const stubUnmarkQuestionCall = (id: string) =>
         helper.apiMock
-          .expectingDelete(`/api/reviews/mark_question`)
+          .expectingDelete(`/api/reviews/mark_question/${id}`)
           .andReturnOnce({});
 
       beforeEach(() => {
@@ -80,20 +80,17 @@ describe("QuizQuestion", () => {
         expect(wrapper.find(".thumb-up-filled").exists()).toBe(true);
         expect(wrapper.find(".thumb-up-hollow").exists()).toBe(false);
       });
-
       it("should be able to undo marking a question as good", async () => {
-        stubMarkQuestionCall();
-        const unmarkExpectation = stubUnmarkQuestionCall();
+        const markExpectation = stubMarkQuestionCall();
+        const unmarkExpectation = stubUnmarkQuestionCall(
+          markExpectation.response?.toString().replace(/['"]+/g, "") || "",
+        );
         await wrapper.find(".thumb-up-hollow").trigger("click");
         await flushPromises();
         await wrapper.find(".thumb-up-filled").trigger("click");
         await flushPromises();
 
-        expect(unmarkExpectation.actualRequestJsonBody()).toMatchObject({
-          quizQuestionId: quizQuestion.quizQuestionId,
-          noteId: notebook.noteId,
-          isGood: true,
-        });
+        expect(unmarkExpectation.actualRequestJsonBody()).toMatchObject({});
 
         expect(wrapper.find(".thumb-up-filled").exists()).toBe(false);
         expect(wrapper.find(".thumb-up-hollow").exists()).toBe(true);

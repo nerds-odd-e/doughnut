@@ -95,6 +95,7 @@ export default defineComponent({
     return {
       answer: "" as string,
       markedAsGood: false,
+      markedGoodQuestionId: "" as string,
     };
   },
   methods: {
@@ -112,7 +113,7 @@ export default defineComponent({
       }
     },
     async markAsGood() {
-      await this.api.reviewMethods.markAsGood(
+      this.markedGoodQuestionId = await this.api.reviewMethods.markAsGood(
         this.quizQuestion.quizQuestionId,
         this.quizQuestion.notebookPosition?.noteId,
       );
@@ -120,10 +121,8 @@ export default defineComponent({
     },
 
     async unmarkAsGood() {
-      await this.api.reviewMethods.unmarkAsGood(
-        this.quizQuestion.quizQuestionId,
-        this.quizQuestion.notebookPosition?.noteId,
-      );
+      await this.api.reviewMethods.unmarkAsGood(this.markedGoodQuestionId);
+      this.markedGoodQuestionId = "";
       this.markedAsGood = false;
     },
   },
