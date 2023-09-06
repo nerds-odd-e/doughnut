@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.entities.MarkedQuestion;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.GoodTrainingData;
 import com.odde.doughnut.entities.json.TrainingDataMessage;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -59,11 +57,7 @@ public class RestTrainingDataControllerTests {
 
     @Test
     void shouldReturnTrainingDataIfHavingReadingAuth() {
-      MarkedQuestion markedQuestion = new MarkedQuestion();
-      Note note = makeMe.aNote().please();
-      User learner = makeMe.aUser().please();
-      markedQuestion.setNoteId(note.getId());
-      markedQuestion.setUserId(learner.getId());
+      MarkedQuestion markedQuestion = makeMe.aMarkedQuestion().please();
       modelFactoryService.markedQuestionRepository.save(markedQuestion);
 
       List<GoodTrainingData> goodTrainingData = controller.getGoodTrainingData();

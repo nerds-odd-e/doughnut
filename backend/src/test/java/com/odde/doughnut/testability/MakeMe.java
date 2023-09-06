@@ -118,4 +118,8 @@ public class MakeMe extends MakeMeWithoutDB {
   public FailureReportBuilder aFailureReport() {
     return new FailureReportBuilder(this);
   }
+
+  public MarkedQuestionBuilder aMarkedQuestion() {
+    return new MarkedQuestionBuilder(this);
+  }
 }
