@@ -202,7 +202,7 @@ class RestAiControllerTest {
       @Test
       void createQuizQuestionWithGivenModelName() {
         String model = "customisedModel";
-        QuizQuestion quizQuestion = controller.generateQuestionWithCustomModel(note, model);
+        controller.generateQuestionWithCustomModel(note, model);
         verify(openAiApi, times(2)).createChatCompletion(captor.capture());
         assertThat(captor.getAllValues().get(0).getModel()).isEqualTo(model);
       }
@@ -211,7 +211,6 @@ class RestAiControllerTest {
       void createQuizQuestionWithCustomModelShouldReturnQuestion() {
         String model = "ft:gpt-3.5-turbo-0613:odd-e::7uWJuLEw";
         QuizQuestion quizQuestion = controller.generateQuestionWithCustomModel(note, model);
-
         assertThat(quizQuestion.stem).contains("What is the first color in the rainbow?");
       }
     }
