@@ -9,6 +9,7 @@ public class MarkedQuestionBuilder extends EntityBuilder<MarkedQuestion> {
   public MarkedQuestionBuilder(MakeMe makeMe) {
     super(makeMe, new MarkedQuestion());
     ofNote(makeMe.aNote().please());
+    entity.setIsGood(true);
     entity.setUserId(makeMe.aUser().please().getId());
     entity.setQuizQuestionId(makeMe.aQuestion().please().getId());
   }
