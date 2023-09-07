@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.odde.doughnut.entities.MarkedQuestion;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.GoodTrainingData;
-import com.odde.doughnut.entities.json.TrainingDataMessage;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
@@ -35,17 +34,14 @@ public class RestTrainingDataControllerTests {
   void setup() {
     UserModel userModel = makeMe.aUser().toModelPlease();
 
-    controller =
-        new RestTrainingDataController(modelFactoryService, userModel, testabilitySettings);
+    controller = new RestTrainingDataController(modelFactoryService, userModel);
   }
 
   @Nested
   class getGoodTrainingData {
     @Test
     void itShouldNotAllowNonMemberToSeeTrainingData() {
-      controller =
-          new RestTrainingDataController(
-              modelFactoryService, makeMe.aNullUserModel(), testabilitySettings);
+      controller = new RestTrainingDataController(modelFactoryService, makeMe.aNullUserModel());
       assertThrows(ResponseStatusException.class, () -> controller.getGoodTrainingData());
     }
 
@@ -72,23 +68,6 @@ public class RestTrainingDataControllerTests {
               .getContent()
               .contains(
                   " assume the role of a Memory Assistant, which involves helping me review"));
-    }
-
-    private static GoodTrainingData getTrainingData() {
-      GoodTrainingData goodTrainingData = new GoodTrainingData();
-      goodTrainingData.addTrainingDataMessage(getTrainingDataMessage("system", "System Content"));
-      goodTrainingData.addTrainingDataMessage(
-          getTrainingDataMessage("user", "Please assume the role of a Memory Assistant."));
-      goodTrainingData.addTrainingDataMessage(
-          getTrainingDataMessage("assistant", "Test question and answers."));
-      return goodTrainingData;
-    }
-
-    private static TrainingDataMessage getTrainingDataMessage(String role, String content) {
-      TrainingDataMessage tdMsg = new TrainingDataMessage(role, content);
-      tdMsg.setRole(role);
-      tdMsg.setContent(content);
-      return tdMsg;
     }
   }
 }

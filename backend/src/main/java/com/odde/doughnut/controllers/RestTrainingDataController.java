@@ -7,14 +7,12 @@ import com.odde.doughnut.entities.json.TrainingDataMessage;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
-import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,16 +25,10 @@ class RestTrainingDataController {
   private final ModelFactoryService modelFactoryService;
   private UserModel currentUser;
 
-  @Resource(name = "testabilitySettings")
-  private final TestabilitySettings testabilitySettings;
-
   public RestTrainingDataController(
-      ModelFactoryService modelFactoryService,
-      UserModel currentUser,
-      TestabilitySettings testabilitySettings) {
+      ModelFactoryService modelFactoryService, UserModel currentUser) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
-    this.testabilitySettings = testabilitySettings;
   }
 
   @GetMapping("/goodtrainingdata")
