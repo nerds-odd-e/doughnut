@@ -18,7 +18,6 @@ Feature: Generate Training Data from marked questions
     Then I should return an empty JSONL file
 
   Scenario: 1 or more good questions
-    # Given There is a marked question
     When I ask to generate a question for note "Scuba Diving"
     And OpenAI by default returns this question from now:
       | question              | correct_choice | incorrect_choice_1 | incorrect_choice_2 |
