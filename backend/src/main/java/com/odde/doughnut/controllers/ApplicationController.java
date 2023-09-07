@@ -29,7 +29,8 @@ public class ApplicationController {
         "/answers/**",
         "/users/**",
         "/failure-report-list/**",
-        "/links/**"
+        "/links/**",
+        "/dev-training-data/**"
       },
       method = RequestMethod.GET)
   public String home() {
