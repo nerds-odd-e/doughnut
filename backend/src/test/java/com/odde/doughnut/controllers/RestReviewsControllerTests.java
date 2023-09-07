@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
@@ -159,7 +160,7 @@ class RestReviewsControllerTests {
     }
 
     @Test
-    void createMarkedQuestion() {
+    void createMarkedGoodQuestion() {
       Integer markedQuestionId = controller.markQuestion(markedQuestionRequest);
       modelFactoryService
           .markedQuestionRepository
@@ -171,6 +172,40 @@ class RestReviewsControllerTests {
                 assertEquals(markedQuestionRequest.noteId, markedQuestion.getNoteId());
                 assertEquals(true, markedQuestion.getIsGood());
               });
+    }
+
+    @Test
+    void testCreateMarkedBadQuestionWithComment() {
+      String badComment = "This is a bad question!";
+      markedQuestionRequest.setIsGood(false);
+      markedQuestionRequest.setComment(badComment);
+      Integer markedQuestionId = controller.markQuestion(markedQuestionRequest);
+      modelFactoryService
+          .markedQuestionRepository
+          .findById(markedQuestionId)
+          .ifPresent(
+              markedQuestion -> {
+                assertEquals(
+                    markedQuestionRequest.quizQuestionId, markedQuestion.getQuizQuestionId());
+                assertEquals(markedQuestionRequest.noteId, markedQuestion.getNoteId());
+                assertEquals(false, markedQuestion.getIsGood());
+                assertEquals(badComment, markedQuestion.getComment());
+              });
+    }
+
+    @Test
+    void testCreateMarkedBadQuestionWithoutComment() {
+      String badComment = "";
+      markedQuestionRequest.setIsGood(false);
+      markedQuestionRequest.setComment(badComment);
+      ResponseStatusException thrown =
+          assertThrows(
+              ResponseStatusException.class,
+              () -> {
+                controller.markQuestion(markedQuestionRequest);
+              });
+      assertEquals(HttpStatus.BAD_REQUEST, thrown.getStatus());
+      assertEquals("Comments can not be empty to mark a bad question.", thrown.getReason());
     }
 
     @Test
