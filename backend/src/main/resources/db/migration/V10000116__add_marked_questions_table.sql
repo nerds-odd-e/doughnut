@@ -5,7 +5,7 @@ CREATE TABLE `marked_questions` (
   `note_id` int unsigned NOT NULL,
   `quiz_question_id` int unsigned DEFAULT NULL,
   `comment` text,
-  `is_good` bit,
+  `is_good` bit NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_quiz_answer_id_2` FOREIGN KEY (`quiz_question_id`) REFERENCES `quiz_question` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
