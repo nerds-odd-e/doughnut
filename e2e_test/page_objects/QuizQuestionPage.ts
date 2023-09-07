@@ -12,23 +12,27 @@ const currentQuestion = (stem?: string) => {
     },
 
     markAsGood() {
-      question().find(".good-question .thumb-up-hollow").click()
+      question().find(".mark-question .thumb-up-hollow").click()
     },
 
     unmarkAsGood() {
-      question().find(".good-question .thumb-up-filled").click()
+      question().find(".mark-question .thumb-up-filled").click()
     },
 
     isMarkedAsGood() {
-      question().find(".good-question .thumb-up-filled").should("be.visible")
+      question().find(".mark-question .thumb-up-filled").should("be.visible")
     },
 
     isNotMarkedAsGood() {
-      question().find(".good-question .thumb-up-hollow").should("be.visible")
+      question().find(".mark-question .thumb-up-hollow").should("be.visible")
     },
 
     markAsBad() {
-      question().find(".bad-question .thumb-down-hollow").click()
+      question().find(".mark-question .thumb-down-hollow").click()
+    },
+
+    isMarkedAsBad() {
+      question().find(".mark-question .thumb-down-filled").should("be.visible")
     },
   }
 }

@@ -241,3 +241,7 @@ Then("I should see the question {string} is not marked as good", (questionStem: 
 Then("I mark the question {string} as bad", (questionStem: string) => {
   pageObjects.findQuestionWithStem(questionStem).markAsBad()
 })
+
+Then("I should see the question {string} is marked as bad", (questionStem: string) => {
+  pageObjects.findQuestionWithStem(questionStem).isMarkedAsBad()
+})

@@ -14,7 +14,7 @@
       v-if="quizQuestion.stem"
       v-html="quizQuestion.stem"
     ></div>
-    <span class="good-question">
+    <span class="mark-question">
       <button
         v-if="!markedAsGood"
         class="thumb-up-hollow"
@@ -28,6 +28,20 @@
         @click="() => unmarkAsGood()"
       >
         <SvgThumbUpFilled />
+      </button>
+      <button
+        v-if="!markedAsBad"
+        class="thumb-down-hollow"
+        @click="() => markAsBad()"
+      >
+        <SvgThumbDownHollow />
+      </button>
+      <button
+        v-if="markedAsBad"
+        class="thumb-down-filled"
+        @click="() => unmarkAsBad()"
+      >
+        <SvgThumbDownFilled />
       </button>
     </span>
     <div v-if="quizQuestion.questionType === 'SPELLING'">
@@ -67,6 +81,8 @@ import QuizQuestionChoices from "./QuizQuestionChoices.vue";
 import Breadcrumb from "../toolbars/Breadcrumb.vue";
 import SvgThumbUpHollow from "../svgs/SvgThumbUpHollow.vue";
 import SvgThumbUpFilled from "../svgs/SvgThumbUpFilled.vue";
+import SvgThumbDownHollow from "../svgs/SvgThumbDownHollow.vue";
+import SvgThumbDownFilled from "../svgs/SvgThumbDownFilled.vue";
 
 export default defineComponent({
   inheritAttrs: false,
@@ -89,13 +105,17 @@ export default defineComponent({
     Breadcrumb,
     SvgThumbUpHollow,
     SvgThumbUpFilled,
+    SvgThumbDownHollow,
+    SvgThumbDownFilled,
   },
   emits: ["answered"],
   data() {
     return {
       answer: "" as string,
       markedAsGood: false,
+      markedAsBad: false,
       markedGoodQuestionId: "" as string,
+      markedBadQuestionId: "" as string,
     };
   },
   methods: {
@@ -125,6 +145,20 @@ export default defineComponent({
       this.markedGoodQuestionId = "";
       this.markedAsGood = false;
     },
+
+    async markAsBad() {
+      this.markedBadQuestionId = await this.api.reviewMethods.markAsBad(
+        this.quizQuestion.quizQuestionId,
+        this.quizQuestion.notebookPosition?.noteId,
+      );
+      this.markedAsBad = true;
+    },
+
+    async unmarkAsBad() {
+      await this.api.reviewMethods.unmarkAsBad(this.markedBadQuestionId);
+      this.markedBadQuestionId = "";
+      this.markedAsBad = false;
+    },
   },
 });
 </script>
@@ -135,7 +169,7 @@ export default defineComponent({
   margin-top: 20px;
 }
 
-.good-question {
+.mark-question {
   position: absolute;
   top: -0.3em;
   right: 0.7em;
