@@ -59,7 +59,7 @@ public class RestAiController {
 
   @PostMapping("/generate-question-with-custom-model")
   public QuizQuestion generateQuestionWithCustomModel(
-      @RequestParam(value = "note") Note note, String model) {
+      @RequestParam(value = "note") Note note, @RequestParam(value = "note") String model) {
     return getQuizQuestion(note, model);
   }
 
