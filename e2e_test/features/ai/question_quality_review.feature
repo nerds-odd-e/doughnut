@@ -16,7 +16,6 @@ Feature: Question generation by AI using custom model
     When I ask to generate a question for note "Scuba Diving" using custom model "gpt-4"
     Then I should be asked "What is the most common scuba diving certification?"
 
-  @ignore
   Scenario: I should not be able to use a custom model to generate question as a learner
     Given I've logged in as an existing user
     And there are some notes for the current user:

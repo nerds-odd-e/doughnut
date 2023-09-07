@@ -1,7 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import static com.odde.doughnut.entities.json.Role.DEVELOPER;
-import static com.odde.doughnut.entities.json.Role.LEARNER;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
@@ -41,7 +39,7 @@ class RestCurrentUserInfoControllerTest {
 
     assertThat(currentUserInfo.externalIdentifier, equalTo(externalId));
     assertThat(currentUserInfo.user, equalTo(userModel.getEntity()));
-    assertThat(currentUserInfo.role, equalTo(LEARNER));
+    assertFalse(currentUserInfo.user.isDeveloper());
   }
 
   @Test
@@ -54,6 +52,6 @@ class RestCurrentUserInfoControllerTest {
 
     assertThat(currentUserInfo.externalIdentifier, equalTo(externalId));
     assertThat(currentUserInfo.user, equalTo(userModel.getEntity()));
-    assertThat(currentUserInfo.role, equalTo(DEVELOPER));
+    assertTrue(currentUserInfo.user.isDeveloper());
   }
 }

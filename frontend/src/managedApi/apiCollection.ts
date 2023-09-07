@@ -320,9 +320,16 @@ const apiCollection = (managedApi: ManagedApi) => ({
       noteId: Doughnut.ID,
       customModel?: string,
     ): Promise<Generated.QuizQuestion> {
-      return (await managedApi.restPost(`ai/generate-question?note=${noteId}`, {
-        model: customModel,
-      })) as Generated.QuizQuestion;
+      if (customModel) {
+        return (await managedApi.restPost(
+          `ai/generate-question-with-custom-model?note=${noteId}&model=${customModel}`,
+          {},
+        )) as Generated.QuizQuestion;
+      }
+      return (await managedApi.restPost(
+        `ai/generate-question?note=${noteId}`,
+        {},
+      )) as Generated.QuizQuestion;
     },
     async generateImage(prompt: string) {
       const request: Generated.AiCompletionRequest = {

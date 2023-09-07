@@ -30,7 +30,7 @@
         <template #button_face>
           <SvgClipboard />
         </template>
-        <NoteChatDialog v-bind="{ selectedNote, storageAccessor }" />
+        <NoteChatDialog v-bind="{ selectedNote, storageAccessor, user }" />
       </PopButton>
       <PopButton title="search and link note">
         <template #button_face>
@@ -95,6 +95,9 @@ export default defineComponent({
     selectedNote: {
       type: Object as PropType<Generated.Note>,
       required: true,
+    },
+    user: {
+      type: Object as PropType<Generated.User>,
     },
   },
   components: {

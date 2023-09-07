@@ -21,6 +21,14 @@ const chatAboutNote = (noteTopic: string, customModel?: string) => {
   return jumpToNotePage(noteTopic, customModel).startChat()
 }
 
+const findCustomModelInput = () => {
+  return {
+    isNotPresent() {
+      cy.get(".custom-model-input input").should("not.exist")
+    },
+  }
+}
+
 const pageObjects = {
   answeredQuestionPage,
   goToLastResult,
@@ -28,6 +36,7 @@ const pageObjects = {
   currentQuestion,
   chatAboutNote,
   chatAboutNotePage,
+  findCustomModelInput,
 }
 export default pageObjects
 export { mock_services }

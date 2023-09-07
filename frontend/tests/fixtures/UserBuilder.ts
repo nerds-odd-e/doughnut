@@ -14,7 +14,13 @@ class UserBuilder extends Builder<Generated.User> {
       dailyNewNotesCount: 5,
       spaceIntervals: "",
       aiQuestionTypeOnlyForReview: false,
+      developer: false,
     };
+  }
+
+  setIsDeveloper(isDeveloper: boolean) {
+    this.data.developer = isDeveloper;
+    return this;
   }
 
   do(): Generated.User {

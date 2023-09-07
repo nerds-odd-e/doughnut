@@ -12,7 +12,6 @@ record RestCurrentUserInfoController(CurrentUserFetcher currentUserFetcher) {
     CurrentUserInfo currentUserInfo = new CurrentUserInfo();
     currentUserInfo.user = currentUserFetcher.getUser().getEntity();
     currentUserInfo.externalIdentifier = currentUserFetcher.getExternalIdentifier();
-    currentUserInfo.role = currentUserFetcher.getUser().getRole();
     return currentUserInfo;
   }
 }

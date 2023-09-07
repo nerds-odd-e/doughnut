@@ -41,7 +41,7 @@
         Doesn't make sense?
       </button>
       <TextInput
-        v-if="!isProduction"
+        v-if="allowCustomModel"
         type="text"
         class="custom-model-input"
         placeholder="openai model name"
@@ -87,6 +87,9 @@ export default defineComponent({
       type: Object as PropType<StorageAccessor>,
       required: true,
     },
+    user: {
+      type: Object as PropType<Generated.User>,
+    },
   },
   components: { QuizQuestion, AnsweredQuestion, TextInput },
   data() {
@@ -104,8 +107,8 @@ export default defineComponent({
     isButtonDisabled() {
       return this.chatInput === "";
     },
-    isProduction() {
-      return this.api.testability.getEnvironment() === "production";
+    allowCustomModel() {
+      return this.user?.developer;
     },
   },
   methods: {

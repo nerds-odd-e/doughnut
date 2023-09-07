@@ -7,30 +7,31 @@ import helper from "../helpers";
 helper.resetWithApiMock(beforeEach, afterEach);
 
 const note = makeMe.aNoteRealm.please();
-const createWrapper = async () => {
+const developer = makeMe.aUser().setIsDeveloper(true).please();
+const learner = makeMe.aUser().setIsDeveloper(false).please();
+const createWrapper = async (isDeveloper = false) => {
   const wrapper = helper
     .component(NoteChatDialog)
-    .withStorageProps({ selectedNote: note.note })
+    .withStorageProps({
+      selectedNote: note.note,
+      user: isDeveloper ? developer : learner,
+    })
     .mount();
   await flushPromises();
   return wrapper;
 };
 
 describe("NoteChatDialog TestMe", () => {
-  let expectation;
-  beforeEach(() => {
-    const quizQuestion = makeMe.aQuizQuestion
-      .withQuestionType("AI_QUESTION")
-      .withQuestionStem("any question?")
-      .withChoices(["option A", "option B", "option C"])
-      .please();
-
-    expectation = helper.apiMock
-      .expectingPost(`/api/ai/generate-question?note=${note.id}`)
-      .andReturnOnce(quizQuestion);
-  });
+  const quizQuestion = makeMe.aQuizQuestion
+    .withQuestionType("AI_QUESTION")
+    .withQuestionStem("any question?")
+    .withChoices(["option A", "option B", "option C"])
+    .please();
 
   it("render the question returned", async () => {
+    helper.apiMock
+      .expectingPost(`/api/ai/generate-question?note=${note.id}`)
+      .andReturnOnce(quizQuestion);
     const wrapper = await createWrapper();
     wrapper.find("button").trigger("click");
     await flushPromises();
@@ -39,52 +40,39 @@ describe("NoteChatDialog TestMe", () => {
     expect(wrapper.text()).toContain("option C");
   });
 
-  it("should allow user to enter a custom model in test environment", async () => {
-    const wrapper = await createWrapper();
-    await wrapper.find(".custom-model-input input").setValue("my-custom-model");
+  it("should allow developer to enter a custom model", async () => {
+    const customModel = "my-custom-model";
+    helper.apiMock
+      .expectingPost(
+        `/api/ai/generate-question-with-custom-model?note=${note.id}&model=${customModel}`,
+      )
+      .andReturnOnce(quizQuestion);
+    const wrapper = await createWrapper(true);
+    await wrapper.find(".custom-model-input input").setValue(customModel);
     await wrapper.find("button").trigger("click");
     await flushPromises();
-    expect(expectation.actualRequestJsonBody()).toMatchObject({
-      model: "my-custom-model",
-    });
   });
 
-  describe("when it is in production environment", () => {
-    let original;
-
-    beforeEach(() => {
-      original = window.location;
-      Object.defineProperty(window, "location", {
-        value: {
-          href: "www.odd-e.com",
-        },
-      });
-    });
-
-    afterEach(() => {
-      Object.defineProperty(window, "location", original);
-    });
-
-    it("should hide custom model input in production environment until feature is fully developed", async () => {
-      const wrapper = await createWrapper();
-      expect(wrapper.find(".custom-model-input input").exists()).toBe(false);
-      wrapper.find("button").trigger("click");
-      await flushPromises();
-    });
+  it("should not show custom model input to learner", async () => {
+    const wrapper = await createWrapper();
+    expect(wrapper.find(".custom-model-input input").exists()).toBe(false);
   });
 
   it("regenerate question when asked", async () => {
+    helper.apiMock
+      .expectingPost(`/api/ai/generate-question?note=${note.id}`)
+      .andReturnOnce(quizQuestion);
     const wrapper = await createWrapper();
     wrapper.find("button").trigger("click");
     await flushPromises();
 
-    const quizQuestion = makeMe.aQuizQuestion
+    const newQuestion = makeMe.aQuizQuestion
       .withQuestionType("AI_QUESTION")
       .withQuestionStem("is it raining?")
       .please();
     helper.apiMock
       .expectingPost(`/api/ai/generate-question?note=${note.id}`)
-      .andReturnOnce(quizQuestion);
+      .andReturnOnce(newQuestion);
     wrapper.find("button#try-again").trigger("click");
     await flushPromises();
     expect(wrapper.text()).toContain("any question?");

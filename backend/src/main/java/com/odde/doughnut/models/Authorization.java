@@ -149,12 +149,8 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
     }
   }
 
-  private static final List<String> allowUsers =
-      Arrays.asList("Terry", "t-machu", "Developer", "Yeong Sheng", "Old Learner");
-
   public boolean isDeveloper() {
-    if (user == null) return false;
-    return allowUsers.contains(user.getName());
+    return user != null && user.isDeveloper();
   }
 
   public void assertLoggedIn() {
