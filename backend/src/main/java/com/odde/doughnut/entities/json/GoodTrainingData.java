@@ -12,4 +12,9 @@ public class GoodTrainingData {
     if (messages == null) messages = new ArrayList<>();
     messages.add(message);
   }
+
+  public void addTrainingDataMessages(List<TrainingDataMessage> trainingDataMessageLIst) {
+    if (messages == null) messages = new ArrayList<>();
+    messages.addAll(trainingDataMessageLIst);
+  }
 }

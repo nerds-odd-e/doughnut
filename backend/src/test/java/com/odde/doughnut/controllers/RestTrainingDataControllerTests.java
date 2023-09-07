@@ -1,9 +1,9 @@
 package com.odde.doughnut.controllers;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.entities.MarkedQuestion;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.GoodTrainingData;
 import com.odde.doughnut.entities.json.TrainingDataMessage;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -57,11 +57,21 @@ public class RestTrainingDataControllerTests {
 
     @Test
     void shouldReturnTrainingDataIfHavingReadingAuth() {
-      MarkedQuestion markedQuestion = makeMe.aMarkedQuestion().please();
+      Note note = makeMe.aNote().please();
+      note.setTopic("Test Topic");
+      MarkedQuestion markedQuestion = makeMe.aMarkedQuestion().ofNote(note).please();
       modelFactoryService.markedQuestionRepository.save(markedQuestion);
 
-      List<GoodTrainingData> goodTrainingData = controller.getGoodTrainingData();
-      assertTrue(goodTrainingData.size() > 0);
+      List<GoodTrainingData> goodTrainingDataList = controller.getGoodTrainingData();
+      assertEquals(1, goodTrainingDataList.size());
+      GoodTrainingData GoodTrainingData = goodTrainingDataList.get(0);
+      assertTrue(GoodTrainingData.getMessages().get(0).getContent().contains(note.getTopic()));
+      assertTrue(
+          GoodTrainingData.getMessages()
+              .get(1)
+              .getContent()
+              .contains(
+                  " assume the role of a Memory Assistant, which involves helping me review"));
     }
 
     private static GoodTrainingData getTrainingData() {
@@ -75,7 +85,7 @@ public class RestTrainingDataControllerTests {
     }
 
     private static TrainingDataMessage getTrainingDataMessage(String role, String content) {
-      TrainingDataMessage tdMsg = new TrainingDataMessage();
+      TrainingDataMessage tdMsg = new TrainingDataMessage(role, content);
       tdMsg.setRole(role);
       tdMsg.setContent(content);
       return tdMsg;
