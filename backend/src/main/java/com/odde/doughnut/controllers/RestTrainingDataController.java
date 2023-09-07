@@ -40,20 +40,22 @@ class RestTrainingDataController {
         .findAll()
         .forEach(
             markedQuestion -> {
-              Note note =
-                  modelFactoryService.noteRepository.findById(markedQuestion.getNoteId()).get();
-              QuizQuestionEntity quizQuestion =
-                  modelFactoryService
-                      .quizQuestionRepository
-                      .findById(markedQuestion.getQuizQuestionId())
-                      .get();
-              ChatCompletionRequest chatRequest =
-                  new OpenAIChatAboutNoteRequestBuilder()
-                      .contentOfNoteOfCurrentFocus(note)
-                      .userInstructionToGenerateQuestionWithGPT35FineTunedModel(null)
-                      .build();
-              goodTrainingDataList.add(
-                  generateGoodTrainingData(chatRequest.getMessages(), quizQuestion));
+              if (markedQuestion != null && markedQuestion.getIsGood()) {
+                Note note =
+                    modelFactoryService.noteRepository.findById(markedQuestion.getNoteId()).get();
+                QuizQuestionEntity quizQuestion =
+                    modelFactoryService
+                        .quizQuestionRepository
+                        .findById(markedQuestion.getQuizQuestionId())
+                        .get();
+                ChatCompletionRequest chatRequest =
+                    new OpenAIChatAboutNoteRequestBuilder()
+                        .contentOfNoteOfCurrentFocus(note)
+                        .userInstructionToGenerateQuestionWithGPT35FineTunedModel(null)
+                        .build();
+                goodTrainingDataList.add(
+                    generateGoodTrainingData(chatRequest.getMessages(), quizQuestion));
+              }
             });
     return goodTrainingDataList;
   }

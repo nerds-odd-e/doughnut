@@ -52,12 +52,12 @@ public class RestTrainingDataControllerTests {
     }
 
     @Test
-    void shouldReturnTrainingDataIfHavingReadingAuth() {
+    void shouldReturnGoodTrainingDataIfHavingReadingAuth() {
       Note note = makeMe.aNote().please();
       note.setTopic("Test Topic");
       MarkedQuestion markedQuestion = makeMe.aMarkedQuestion().ofNote(note).please();
+      markedQuestion.setIsGood(true);
       modelFactoryService.markedQuestionRepository.save(markedQuestion);
-
       List<GoodTrainingData> goodTrainingDataList = controller.getGoodTrainingData();
       assertEquals(1, goodTrainingDataList.size());
       GoodTrainingData GoodTrainingData = goodTrainingDataList.get(0);
@@ -68,6 +68,18 @@ public class RestTrainingDataControllerTests {
               .getContent()
               .contains(
                   " assume the role of a Memory Assistant, which involves helping me review"));
+    }
+
+    @Test
+    void shouldNotReturnBadTrainingDataIfHavingReadingAuth() {
+      Note note = makeMe.aNote().please();
+      note.setTopic("Test Topic");
+      MarkedQuestion markedQuestion = makeMe.aMarkedQuestion().ofNote(note).please();
+      markedQuestion.setIsGood(false);
+      markedQuestion.setComment("This is a bad comment!");
+      modelFactoryService.markedQuestionRepository.save(markedQuestion);
+      List<GoodTrainingData> goodTrainingDataList = controller.getGoodTrainingData();
+      assertEquals(0, goodTrainingDataList.size());
     }
   }
 }
