@@ -4,9 +4,9 @@ Feature: Generate Training Data from marked questions
   So that I can provide in a format for OpenAI training data format for model trainer
 
   Background:
-    Given I've logged in as "developer"
+    And I've logged in as an existing user
     And there are some notes for the current user:
-      | topic        | details                                          |
+      | topic        | details                                        |
       | Scuba Diving | The most common certification is Rescue Diver. |
     And OpenAI by default returns this question from now:
       | question                                            | correct_choice | incorrect_choice_1 | incorrect_choice_2 |

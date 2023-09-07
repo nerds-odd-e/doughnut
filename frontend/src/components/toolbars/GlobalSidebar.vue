@@ -17,6 +17,11 @@
         <li class="list-group-item">
           <router-link :to="{ name: 'bazaar' }"> Bazaar </router-link>
         </li>
+        <li class="list-group-item">
+          <router-link :to="{ name: 'devTrainingData' }">
+            Dev File List
+          </router-link>
+        </li>
         <li class="list-group-item" v-for="circle in circles" :key="circle.id">
           <router-link
             :to="{ name: 'circleShow', params: { circleId: circle.id } }"
