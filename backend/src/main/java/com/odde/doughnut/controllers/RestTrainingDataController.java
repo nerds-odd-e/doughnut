@@ -50,7 +50,7 @@ class RestTrainingDataController {
               ChatCompletionRequest chatRequest =
                   new OpenAIChatAboutNoteRequestBuilder()
                       .contentOfNoteOfCurrentFocus(note)
-                      .userInstructionToGenerateQuestionWithGPT35FineTunedModel()
+                      .userInstructionToGenerateQuestionWithGPT35FineTunedModel(null)
                       .build();
               goodTrainingDataList.add(
                   generateGoodTrainingData(chatRequest.getMessages(), quizQuestion));

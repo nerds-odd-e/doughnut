@@ -24,8 +24,10 @@ public class AiAdvisorService {
     return openAiApiHandler.getOpenAiImage(prompt);
   }
 
-  public AIGeneratedQuestion generateQuestion(Note note) throws QuizQuestionNotPossibleException {
-    AiQuestionGenerator aiQuestionGenerator = new AiQuestionGenerator(note, openAiApiHandler);
+  public AIGeneratedQuestion generateQuestion(Note note, String model)
+      throws QuizQuestionNotPossibleException {
+    AiQuestionGenerator aiQuestionGenerator =
+        new AiQuestionGenerator(note, openAiApiHandler, model);
     return aiQuestionGenerator.getAiGeneratedQuestion();
   }
 

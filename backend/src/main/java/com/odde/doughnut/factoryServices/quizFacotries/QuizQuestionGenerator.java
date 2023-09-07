@@ -19,7 +19,7 @@ public record QuizQuestionGenerator(
           new QuizQuestionServant(
               reviewPoint.getUser(), randomizer, modelFactoryService, aiAdvisorService);
       QuizQuestionEntity quizQuestion =
-          new QuizQuestionDirector(questionType, servant).invoke(reviewPoint.getThing());
+          new QuizQuestionDirector(questionType, servant).invoke(reviewPoint.getThing(), null);
       return Optional.of(quizQuestion);
     } catch (QuizQuestionNotPossibleException e) {
       return Optional.empty();

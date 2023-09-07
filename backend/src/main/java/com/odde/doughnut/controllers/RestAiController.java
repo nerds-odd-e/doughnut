@@ -54,13 +54,13 @@ public class RestAiController {
 
   @PostMapping("/generate-question")
   public QuizQuestion generateQuestion(@RequestParam(value = "note") Note note) {
-    return getQuizQuestion(note);
+    return getQuizQuestion(note, null);
   }
 
   @PostMapping("/generate-question-with-custom-model")
   public QuizQuestion generateQuestionWithCustomModel(
       @RequestParam(value = "note") Note note, String model) {
-    return getQuizQuestion(note);
+    return getQuizQuestion(note, model);
   }
 
   @PostMapping("/generate-image")
@@ -69,15 +69,16 @@ public class RestAiController {
     return new AiGeneratedImage(aiAdvisorService.getImage(aiCompletionRequest.prompt));
   }
 
-  private QuizQuestion getQuizQuestion(Note note) {
+  private QuizQuestion getQuizQuestion(Note note, String model) {
     currentUser.assertLoggedIn();
     QuizQuestionServant servant =
         new QuizQuestionServant(
             currentUser.getEntity(), null, modelFactoryService, aiAdvisorService);
     try {
-      QuizQuestionEntity quizQuestionEntity =
+      QuizQuestionEntity quizQuestionEntity;
+      quizQuestionEntity =
           new QuizQuestionDirector(QuizQuestionEntity.QuestionType.AI_QUESTION, servant)
-              .invoke(note.getThing());
+              .invoke(note.getThing(), model);
       modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
       return modelFactoryService.toQuizQuestion(quizQuestionEntity, currentUser.getEntity());
     } catch (QuizQuestionNotPossibleException e) {

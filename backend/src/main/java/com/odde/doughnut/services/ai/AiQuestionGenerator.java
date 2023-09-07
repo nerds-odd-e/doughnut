@@ -12,11 +12,14 @@ import com.theokanning.openai.completion.chat.ChatMessage;
 
 public class AiQuestionGenerator {
   private final Note note;
-  private final OpenAiApiHandler openAiApiHandler;
 
-  public AiQuestionGenerator(Note note, OpenAiApiHandler openAiApiHandler) {
+  private final OpenAiApiHandler openAiApiHandler;
+  private final String model;
+
+  public AiQuestionGenerator(Note note, OpenAiApiHandler openAiApiHandler, String model) {
     this.note = note;
     this.openAiApiHandler = openAiApiHandler;
+    this.model = model;
   }
 
   public AIGeneratedQuestion getAiGeneratedQuestion() throws QuizQuestionNotPossibleException {
@@ -59,7 +62,7 @@ public class AiQuestionGenerator {
     ChatCompletionRequest chatRequest =
         new OpenAIChatAboutNoteRequestBuilder()
             .contentOfNoteOfCurrentFocus(note)
-            .userInstructionToGenerateQuestionWithGPT35FineTunedModel()
+            .userInstructionToGenerateQuestionWithGPT35FineTunedModel(model)
             .maxTokens(1500)
             .build();
 

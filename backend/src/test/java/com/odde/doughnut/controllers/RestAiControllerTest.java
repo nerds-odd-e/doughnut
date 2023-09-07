@@ -189,14 +189,31 @@ class RestAiControllerTest {
       assertThat(quizQuestion.stem).contains("What is the first color in the rainbow?");
     }
 
-    @Test
-    void createQuizQuestionWithFineTunedGPT35() throws JsonProcessingException {
-      String model = "ft:gpt-3.5-turbo-0613:odd-e::7uWJuLEw";
-      when(openAiApi.createChatCompletion(any()))
-          .thenReturn(buildCompletionResultForFunctionCall(jsonQuestion));
-      QuizQuestion quizQuestion = controller.generateQuestionWithCustomModel(note, model);
+    @Nested
+    class GenerateQuestionWithCustomModel {
+      @Captor private ArgumentCaptor<ChatCompletionRequest> captor;
 
-      assertThat(quizQuestion.stem).contains("What is the first color in the rainbow?");
+      @BeforeEach
+      void setup() throws JsonProcessingException {
+        when(openAiApi.createChatCompletion(any()))
+            .thenReturn(buildCompletionResultForFunctionCall(jsonQuestion));
+      }
+
+      @Test
+      void createQuizQuestionWithGivenModelName() {
+        String model = "customisedModel";
+        QuizQuestion quizQuestion = controller.generateQuestionWithCustomModel(note, model);
+        verify(openAiApi, times(2)).createChatCompletion(captor.capture());
+        assertThat(captor.getAllValues().get(0).getModel()).isEqualTo(model);
+      }
+
+      @Test
+      void createQuizQuestionWithCustomModelShouldReturnQuestion() {
+        String model = "ft:gpt-3.5-turbo-0613:odd-e::7uWJuLEw";
+        QuizQuestion quizQuestion = controller.generateQuestionWithCustomModel(note, model);
+
+        assertThat(quizQuestion.stem).contains("What is the first color in the rainbow?");
+      }
     }
 
     @Test
