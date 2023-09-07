@@ -2,6 +2,9 @@ import { findQuestionWithStem } from "./QuizQuestionPage"
 
 export function chatAboutNotePage() {
   return {
+    setCustomModel(customModel: string) {
+      cy.get(".custom-model-input input").type(customModel)
+    },
     testMe() {
       cy.findByRole("button", { name: "Test me" }).click()
     },

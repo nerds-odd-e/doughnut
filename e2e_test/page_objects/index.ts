@@ -3,18 +3,22 @@ import { goToLastResult, answeredQuestionPage } from "./AnsweredQuestionPage"
 import mock_services from "./mock_services"
 import { chatAboutNotePage } from "./chatAboutNotePage"
 
-const jumpToNotePage = (noteTopic: string) => {
+const jumpToNotePage = (noteTopic: string, customModel?: string) => {
   cy.jumpToNotePage(noteTopic)
   return {
     startChat() {
       cy.clickNotePageMoreOptionsButton(noteTopic, "chat about this note")
-      return chatAboutNotePage()
+      const page = chatAboutNotePage()
+      if (customModel) {
+        page.setCustomModel(customModel)
+      }
+      return page
     },
   }
 }
 
-const chatAboutNote = (noteTopic: string) => {
-  return jumpToNotePage(noteTopic).startChat()
+const chatAboutNote = (noteTopic: string, customModel?: string) => {
+  return jumpToNotePage(noteTopic, customModel).startChat()
 }
 
 const pageObjects = {
