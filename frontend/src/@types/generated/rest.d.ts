@@ -46,6 +46,7 @@ declare namespace Generated {
     interface CurrentUserInfo {
         user: User;
         externalIdentifier: string;
+        role: Role;
     }
 
     interface DueReviewPoints {
@@ -303,6 +304,8 @@ declare namespace Generated {
         skipReviewEntirely: boolean;
         deletedAt: string;
     }
+
+    type Role = "LEARNER" | "DEVELOPER";
 
     type ErrorType = "OPENAI_UNAUTHORIZED" | "BINDING_ERROR" | "OPENAI_TIMEOUT" | "OPENAI_SERVICE_ERROR";
 
