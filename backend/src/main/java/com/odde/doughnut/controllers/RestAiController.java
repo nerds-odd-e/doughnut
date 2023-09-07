@@ -54,6 +54,22 @@ public class RestAiController {
 
   @PostMapping("/generate-question")
   public QuizQuestion generateQuestion(@RequestParam(value = "note") Note note) {
+    return getQuizQuestion(note);
+  }
+
+  @PostMapping("/generate-question-with-custom-model")
+  public QuizQuestion generateQuestionWithCustomModel(
+      @RequestParam(value = "note") Note note, String model) {
+    return getQuizQuestion(note);
+  }
+
+  @PostMapping("/generate-image")
+  public AiGeneratedImage generateImage(@RequestBody AiCompletionRequest aiCompletionRequest) {
+    currentUser.assertLoggedIn();
+    return new AiGeneratedImage(aiAdvisorService.getImage(aiCompletionRequest.prompt));
+  }
+
+  private QuizQuestion getQuizQuestion(Note note) {
     currentUser.assertLoggedIn();
     QuizQuestionServant servant =
         new QuizQuestionServant(
@@ -67,11 +83,5 @@ public class RestAiController {
     } catch (QuizQuestionNotPossibleException e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated", e);
     }
-  }
-
-  @PostMapping("/generate-image")
-  public AiGeneratedImage generateImage(@RequestBody AiCompletionRequest aiCompletionRequest) {
-    currentUser.assertLoggedIn();
-    return new AiGeneratedImage(aiAdvisorService.getImage(aiCompletionRequest.prompt));
   }
 }
