@@ -10,7 +10,6 @@ public record MarkedQuestionService(
     User user, Timestamp currentUTCTimestamp, ModelFactoryService modelFactoryService) {
 
   public MarkedQuestion markQuestion(MarkedQuestionRequest markedQuestionRequest) {
-    // TODO: Refactor into a builder
     MarkedQuestion markedQuestion = new MarkedQuestion();
     markedQuestion.setUserId(user.getId());
     markedQuestion.setQuizQuestionId(markedQuestionRequest.quizQuestionId);
