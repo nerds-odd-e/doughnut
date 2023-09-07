@@ -1,27 +1,13 @@
 <!-- eslint-disable no-console -->
+<!-- eslint-disable no-console -->
 <template>
   <p v-if="!!errorMessage" v-text="errorMessage"></p>
-  <ContainerPage v-else v-bind="{ contentExists: !!failureReports }">
-    <div v-if="!!failureReports">
-      <h2>Failure report list</h2>
-      <button @click="downloadTrainingData">Download</button>
-      <div
-        class="failure-report"
-        v-for="element in failureReports"
-        :key="element.id"
-      >
-        {{ element.createDatetime }} :
-        <router-link
-          :to="{
-            name: 'failureReport',
-            params: { failureReportId: element.id },
-          }"
-        >
-          {{ element.errorName }}
-        </router-link>
-      </div>
-    </div>
-  </ContainerPage>
+  <div v-if="!!failureReports">
+    <h2>Dev file list</h2>
+    <button class="download-button" @click="downloadTrainingData()">
+      Download
+    </button>
+  </div>
 </template>
 
 <script>
@@ -33,7 +19,6 @@ export default {
   setup() {
     return useLoadingApi();
   },
-  components: { ContainerPage },
   data() {
     return {
       failureReports: null,
@@ -52,45 +37,25 @@ export default {
         );
     },
     async downloadTrainingData() {
-      // const apiUrl = "http://localhost:9081/api/gettrainingdata/goodtrainingdata";
-
       try {
-        // const response = await fetch(apiUrl);
         const response = await this.api.getTrainingData();
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
 
-        // to remove later
-        // Create an object or array with dummy data
-        const dummyData = [{ name: "1" }, { name: "2" }, { name: "3" }];
+        // Create a Blob with the file content
+        const blob = new Blob(
+          [response.map((x) => JSON.stringify(x)).join("\n")],
+          {
+            type: "text/plain",
+          },
+        );
 
-        // Convert the dummy data to a string
-        const dummyDataString = JSON.stringify(dummyData);
+        const url = URL.createObjectURL(blob);
 
-        // Read the response text
-        const data = await response.text();
-
-        // Merge the response data and dummy data
-        const finalData = `${data}\n${dummyDataString}`;
-
-        // Create a Blob with the data
-        const blob = new Blob([finalData], { type: "text/plain" });
-
-        // Create a URL for the Blob
-        const url = window.URL.createObjectURL(blob);
-
-        // Create a link element and trigger the download
         const a = document.createElement("a");
         a.href = url;
-        a.download = "trainingdata.txt"; // Specify the desired file name
-        a.style.display = "none";
-        document.body.appendChild(a);
+        a.download = "trainingdata.txt";
         a.click();
-        document.body.removeChild(a);
 
-        // Clean up the URL object
-        window.URL.revokeObjectURL(url);
+        URL.revokeObjectURL(url);
       } catch (error) {
         return;
       }
