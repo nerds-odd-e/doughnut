@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.json.Role;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
@@ -115,5 +116,12 @@ public class UserModel implements ReviewScope {
 
   public void assertLoggedIn() {
     getAuthorization().assertLoggedIn();
+  }
+
+  public Role getRole() {
+    if (getAuthorization().isDeveloper()) {
+      return Role.DEVELOPER;
+    }
+    return Role.LEARNER;
   }
 }

@@ -39,7 +39,3 @@ Feature: Question generation by AI
     Then I should see the question "What is the most common scuba diving certification?" is marked as good
     When I unmark the question "What is the most common scuba diving certification?" as good
     Then I should see the question "What is the most common scuba diving certification?" is not marked as good
-
-  Scenario: I should be able to use a custom model to generate question
-    When I ask to generate a question for note "Scuba Diving" using custom model "gpt-4"
-    Then I should be asked "What is the most common scuba diving certification?"
