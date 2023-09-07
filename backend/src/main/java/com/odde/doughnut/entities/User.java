@@ -9,8 +9,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-
-import com.odde.doughnut.models.Authorization;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -101,7 +99,7 @@ public class User {
   }
 
   private static final List<String> allowUsers =
-    Arrays.asList("Terry", "t-machu", "Developer", "Yeong Sheng");
+      Arrays.asList("Terry", "t-machu", "Developer", "Yeong Sheng");
 
   public boolean isDeveloper() {
     return allowUsers.contains(getName());
