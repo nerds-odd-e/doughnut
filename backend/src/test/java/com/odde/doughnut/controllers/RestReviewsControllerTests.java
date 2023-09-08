@@ -5,8 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.AnsweredQuestion;
@@ -24,6 +23,7 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -171,8 +171,10 @@ class RestReviewsControllerTests {
     @Test
     void createMarkedGoodQuestion() {
       Integer markedQuestionId = controller.markQuestion(markedQuestionRequest);
-      MarkedQuestion markedQuestion =
-          modelFactoryService.markedQuestionRepository.findById(markedQuestionId).get();
+      Optional<MarkedQuestion> markedQuestionRepositoryById =
+          modelFactoryService.markedQuestionRepository.findById(markedQuestionId);
+      assertFalse(markedQuestionRepositoryById.isEmpty());
+      MarkedQuestion markedQuestion = markedQuestionRepositoryById.get();
       assertEquals(markedQuestionRequest.quizQuestionId, markedQuestion.getQuizQuestionId());
       assertEquals(markedQuestionRequest.noteId, markedQuestion.getNoteId());
       assertEquals(true, markedQuestion.getIsGood());
@@ -184,9 +186,10 @@ class RestReviewsControllerTests {
       markedQuestionRequest.setIsGood(false);
       markedQuestionRequest.setComment(badComment);
       Integer markedQuestionId = controller.markQuestion(markedQuestionRequest);
-      MarkedQuestion markedQuestion =
-          modelFactoryService.markedQuestionRepository.findById(markedQuestionId).get();
-
+      Optional<MarkedQuestion> markedQuestionRepositoryById =
+          modelFactoryService.markedQuestionRepository.findById(markedQuestionId);
+      assertFalse(markedQuestionRepositoryById.isEmpty());
+      MarkedQuestion markedQuestion = markedQuestionRepositoryById.get();
       assertEquals(markedQuestionRequest.quizQuestionId, markedQuestion.getQuizQuestionId());
       assertEquals(markedQuestionRequest.noteId, markedQuestion.getNoteId());
       assertEquals(false, markedQuestion.getIsGood());
