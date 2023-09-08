@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.QuizQuestionEntity.QuestionType;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.services.AiAdvisorService;
+import com.odde.doughnut.services.ai.OpenAIConfig;
 import java.util.Optional;
 
 public record QuizQuestionGenerator(
@@ -19,7 +20,8 @@ public record QuizQuestionGenerator(
           new QuizQuestionServant(
               reviewPoint.getUser(), randomizer, modelFactoryService, aiAdvisorService);
       QuizQuestionEntity quizQuestion =
-          new QuizQuestionDirector(questionType, servant).invoke(reviewPoint.getThing(), null, 1.0);
+          new QuizQuestionDirector(questionType, servant)
+              .invoke(reviewPoint.getThing(), new OpenAIConfig.OpenAIConfigBuilder().build());
       return Optional.of(quizQuestion);
     } catch (QuizQuestionNotPossibleException e) {
       return Optional.empty();

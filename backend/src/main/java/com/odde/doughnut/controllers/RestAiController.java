@@ -10,6 +10,7 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleEx
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
+import com.odde.doughnut.services.ai.OpenAIConfig;
 import com.theokanning.openai.OpenAiApi;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -54,7 +55,7 @@ public class RestAiController {
 
   @PostMapping("/generate-question")
   public QuizQuestion generateQuestion(@RequestParam(value = "note") Note note) {
-    return getQuizQuestion(note, null, 1.0);
+    return getQuizQuestion(note, new OpenAIConfig.OpenAIConfigBuilder().build());
   }
 
   @PostMapping("/generate-question-with-custom-config")
@@ -62,7 +63,9 @@ public class RestAiController {
       @RequestParam(value = "note") Note note,
       @RequestParam(value = "model") String model,
       @RequestParam(value = "temperature") Double temperature) {
-    return getQuizQuestion(note, model, temperature);
+    OpenAIConfig config =
+        new OpenAIConfig.OpenAIConfigBuilder().setModel(model).setTemperature(temperature).build();
+    return getQuizQuestion(note, config);
   }
 
   @PostMapping("/generate-image")
@@ -71,7 +74,7 @@ public class RestAiController {
     return new AiGeneratedImage(aiAdvisorService.getImage(aiCompletionRequest.prompt));
   }
 
-  private QuizQuestion getQuizQuestion(Note note, String model, Double temperature) {
+  private QuizQuestion getQuizQuestion(Note note, OpenAIConfig config) {
     currentUser.assertLoggedIn();
     QuizQuestionServant servant =
         new QuizQuestionServant(
@@ -80,7 +83,7 @@ public class RestAiController {
       QuizQuestionEntity quizQuestionEntity;
       quizQuestionEntity =
           new QuizQuestionDirector(QuizQuestionEntity.QuestionType.AI_QUESTION, servant)
-              .invoke(note.getThing(), model, temperature);
+              .invoke(note.getThing(), config);
       modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
       return modelFactoryService.toQuizQuestion(quizQuestionEntity, currentUser.getEntity());
     } catch (QuizQuestionNotPossibleException e) {

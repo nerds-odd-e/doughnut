@@ -17,12 +17,11 @@ public class AiQuestionGenerator {
   private final String model;
   private final Double temperature;
 
-  public AiQuestionGenerator(
-      Note note, OpenAiApiHandler openAiApiHandler, String model, Double temperature) {
+  public AiQuestionGenerator(Note note, OpenAiApiHandler openAiApiHandler, OpenAIConfig config) {
     this.note = note;
     this.openAiApiHandler = openAiApiHandler;
-    this.model = model;
-    this.temperature = temperature;
+    this.model = config.getModel();
+    this.temperature = config.getTemperature();
   }
 
   public AIGeneratedQuestion getAiGeneratedQuestion() throws QuizQuestionNotPossibleException {

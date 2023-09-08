@@ -7,6 +7,7 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleEx
 import com.odde.doughnut.services.ai.AIGeneratedQuestion;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
+import com.odde.doughnut.services.ai.OpenAIConfig;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
@@ -24,10 +25,10 @@ public class AiAdvisorService {
     return openAiApiHandler.getOpenAiImage(prompt);
   }
 
-  public AIGeneratedQuestion generateQuestion(Note note, String model, Double temperature)
+  public AIGeneratedQuestion generateQuestion(Note note, OpenAIConfig config)
       throws QuizQuestionNotPossibleException {
     AiQuestionGenerator aiQuestionGenerator =
-        new AiQuestionGenerator(note, openAiApiHandler, model, temperature);
+        new AiQuestionGenerator(note, openAiApiHandler, config);
     return aiQuestionGenerator.getAiGeneratedQuestion();
   }
 

@@ -6,22 +6,22 @@ import com.odde.doughnut.entities.Thingy;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.QuestionOptionsFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.QuestionRawJsonFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.SecondaryReviewPointsFactory;
+import com.odde.doughnut.services.ai.OpenAIConfig;
 import java.util.List;
 
 public record QuizQuestionDirector(
     QuizQuestionEntity.QuestionType questionType, QuizQuestionServant servant) {
 
-  public QuizQuestionEntity invoke(Thing thing, String model, Double temperature)
+  public QuizQuestionEntity invoke(Thing thing, OpenAIConfig config)
       throws QuizQuestionNotPossibleException {
-    return buildAQuestionOfType(questionType, thing, servant, model, temperature);
+    return buildAQuestionOfType(questionType, thing, servant, config);
   }
 
   private QuizQuestionEntity buildAQuestionOfType(
       QuizQuestionEntity.QuestionType questionType,
       Thing thing,
       QuizQuestionServant servant,
-      String model,
-      Double temperature)
+      OpenAIConfig config)
       throws QuizQuestionNotPossibleException {
     QuizQuestionFactory quizQuestionFactory = questionType.factory.apply(thing, servant);
 
@@ -32,7 +32,7 @@ public record QuizQuestionDirector(
     quizQuestion.setQuestionType(questionType);
 
     if (quizQuestionFactory instanceof QuestionRawJsonFactory rawJsonFactory) {
-      rawJsonFactory.generateRawJsonQuestion(quizQuestion, model, temperature);
+      rawJsonFactory.generateRawJsonQuestion(quizQuestion, config);
     }
 
     if (quizQuestionFactory instanceof QuestionOptionsFactory optionsFactory) {
