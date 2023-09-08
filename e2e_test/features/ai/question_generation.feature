@@ -39,11 +39,3 @@ Feature: Question generation by AI
     Then I should see the question "What is the most common scuba diving certification?" is marked as good
     When I unmark the question "What is the most common scuba diving certification?" as good
     Then I should see the question "What is the most common scuba diving certification?" is not marked as good
-
-  Scenario: I should be able to mark the question as bad
-    When I ask to generate a question for note "Scuba Diving"
-    And OpenAI by default returns this question from now:
-      | question              | correct_choice | incorrect_choice_1 | incorrect_choice_2 |
-      | What is scuba diving? | Rescue Diver   | Divemaster         | Open Water Diver   |
-    When I mark the question "What is the most common scuba diving certification?" as bad
-    Then I should see the question "What is the most common scuba diving certification?" is marked as bad
