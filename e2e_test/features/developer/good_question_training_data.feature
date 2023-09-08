@@ -19,9 +19,6 @@ Feature: Generate Training Data from marked questions
 
   Scenario: 1 or more good questions
     When I ask to generate a question for note "Scuba Diving"
-    And OpenAI by default returns this question from now:
-      | question              | correct_choice | incorrect_choice_1 | incorrect_choice_2 |
-      | What is scuba diving? | Rescue Diver   | Divemaster         | Open Water Diver   |
     When I mark the question "What is the most common scuba diving certification?" as good
     Then I should see the question "What is the most common scuba diving certification?" is marked as good
     When I attempt to export
