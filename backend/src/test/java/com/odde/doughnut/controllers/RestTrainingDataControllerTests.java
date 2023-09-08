@@ -9,7 +9,9 @@ import com.odde.doughnut.entities.json.TrainingDataMessage;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
+
 import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -24,9 +26,11 @@ import org.springframework.web.server.ResponseStatusException;
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
 public class RestTrainingDataControllerTests {
-  @Autowired ModelFactoryService modelFactoryService;
+  @Autowired
+  ModelFactoryService modelFactoryService;
 
-  @Autowired MakeMe makeMe;
+  @Autowired
+  MakeMe makeMe;
   RestTrainingDataController controller;
   private UserModel userModel;
 
@@ -51,7 +55,7 @@ public class RestTrainingDataControllerTests {
     }
 
     @Test
-    void shouldReturnGoodTrainingDataIfHavingReadingAuth() {
+    void shouldReturnGoodTrainingDataIfHavingReadingAuth_whenCallGetGoodTrainingData() {
       Note note = makeMe.aNote().please();
       note.setTopic("Test Topic");
       MarkedQuestion markedQuestion = makeMe.aMarkedQuestion().ofNote(note).please();
@@ -59,17 +63,17 @@ public class RestTrainingDataControllerTests {
       modelFactoryService.markedQuestionRepository.save(markedQuestion);
       List<TrainingData> goodTrainingDataList = controller.getGoodTrainingData();
       assertEquals(1, goodTrainingDataList.size());
-      List<TrainingDataMessage> GoodTrainingData = goodTrainingDataList.get(0).getMessages();
-      assertTrue(GoodTrainingData.get(0).getContent().contains(note.getTopic()));
+      List<TrainingDataMessage> goodTrainingData = goodTrainingDataList.get(0).getMessages();
+      assertTrue(goodTrainingData.get(0).getContent().contains(note.getTopic()));
       assertTrue(
-          GoodTrainingData.get(1)
-              .getContent()
-              .contains(
-                  " assume the role of a Memory Assistant, which involves helping me review"));
+        goodTrainingData.get(1)
+          .getContent()
+          .contains(
+            " assume the role of a Memory Assistant, which involves helping me review"));
     }
 
     @Test
-    void shouldNotReturnBadTrainingDataIfHavingReadingAuth() {
+    void shouldNotReturnBadTrainingDataIfHavingReadingAuth_whenCallGetGoodTrainingData() {
       Note note = makeMe.aNote().please();
       note.setTopic("Test Topic");
       MarkedQuestion markedQuestion = makeMe.aMarkedQuestion().ofNote(note).please();
@@ -82,9 +86,45 @@ public class RestTrainingDataControllerTests {
   }
 
   @Test
-  void shouldThrowExceptionIfUserDoesNotHaveReadingAuth() {
+  void shouldThrowExceptionIfUserDoesNotHaveReadingAuth_whenCallGetGoodTrainingData() {
     userModel = modelFactoryService.toUserModel(null);
     controller = new RestTrainingDataController(modelFactoryService, userModel);
     assertThrows(ResponseStatusException.class, () -> controller.getGoodTrainingData());
+  }
+
+  @Test
+  void shouldThrowExceptionIfUserDoesNotHaveReadingAuth_whenCallGetBadTrainingData() {
+    userModel = modelFactoryService.toUserModel(null);
+    controller = new RestTrainingDataController(modelFactoryService, userModel);
+    assertThrows(ResponseStatusException.class, () -> controller.getBadTrainingData());
+  }
+
+  @Test
+  void shouldReturnBadTrainingDataIfHavingReadingAuth_whenCallGetBadTrainingDat() {
+    Note note = makeMe.aNote().please();
+    note.setTopic("Test Topic");
+    MarkedQuestion markedQuestion = makeMe.aMarkedQuestion().ofNote(note).please();
+    markedQuestion.setIsGood(false);
+    markedQuestion.setComment("This is a bad question!");
+    modelFactoryService.markedQuestionRepository.save(markedQuestion);
+    List<TrainingData> badTrainingDataList = controller.getBadTrainingData();
+    assertEquals(1, badTrainingDataList.size());
+    List<TrainingDataMessage> badTrainingData = badTrainingDataList.get(0).getMessages();
+    assertTrue(badTrainingData.get(0).getContent().contains(note.getTopic()));
+    assertTrue(
+      badTrainingData.get(1)
+        .getContent()
+        .contains(" assume the role of a Memory Assistant, which involves helping me review"));
+  }
+
+  @Test
+  void shouldNotReturnGoodTrainingDataIfHavingReadingAuth_whenCallGetBadTrainingDat() {
+    Note note = makeMe.aNote().please();
+    note.setTopic("Test Topic");
+    MarkedQuestion markedQuestion = makeMe.aMarkedQuestion().ofNote(note).please();
+    markedQuestion.setIsGood(true);
+    modelFactoryService.markedQuestionRepository.save(markedQuestion);
+    List<TrainingData> badTrainingDataList = controller.getBadTrainingData();
+    assertEquals(0, badTrainingDataList.size());
   }
 }
