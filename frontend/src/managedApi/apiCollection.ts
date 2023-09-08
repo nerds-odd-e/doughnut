@@ -333,7 +333,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     ): Promise<Generated.QuizQuestion> {
       if (customModel) {
         return (await managedApi.restPost(
-          `ai/generate-question-with-custom-model?note=${noteId}&model=${customModel}`,
+          `ai/generate-question-with-custom-model?note=${noteId}&model=${customModel}&temperature=1`,
           {},
         )) as Generated.QuizQuestion;
       }

@@ -44,7 +44,7 @@ describe("NoteChatDialog TestMe", () => {
     const customModel = "my-custom-model";
     helper.apiMock
       .expectingPost(
-        `/api/ai/generate-question-with-custom-model?note=${note.id}&model=${customModel}`,
+        `/api/ai/generate-question-with-custom-model?note=${note.id}&model=${customModel}&temperature=1`,
       )
       .andReturnOnce(quizQuestion);
     const wrapper = await createWrapper(true);
