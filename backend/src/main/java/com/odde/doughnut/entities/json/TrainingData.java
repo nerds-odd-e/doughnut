@@ -5,7 +5,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
-public class GoodTrainingData {
+public class TrainingData {
   @Setter @Getter List<TrainingDataMessage> messages;
 
   public void addTrainingDataMessage(TrainingDataMessage message) {

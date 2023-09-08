@@ -1,18 +1,18 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.MarkedQuestion;
 import com.odde.doughnut.entities.QuizQuestionEntity;
-import com.odde.doughnut.entities.json.GoodTrainingData;
+import com.odde.doughnut.entities.json.TrainingData;
 import com.odde.doughnut.entities.json.TrainingDataMessage;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,56 +32,85 @@ class RestTrainingDataController {
   }
 
   @GetMapping("/goodtrainingdata")
-  public List<GoodTrainingData> getGoodTrainingData() {
+  public List<TrainingData> getGoodTrainingData() {
     currentUser.assertLoggedIn();
-    List<GoodTrainingData> goodTrainingDataList = new ArrayList<>();
+    List<TrainingData> goodTrainingDataList = new ArrayList<>();
     modelFactoryService
         .markedQuestionRepository
         .findAll()
         .forEach(
             markedQuestion -> {
-              if (markedQuestion != null && markedQuestion.getIsGood()) {
-                Note note =
-                    modelFactoryService.noteRepository.findById(markedQuestion.getNoteId()).get();
-                QuizQuestionEntity quizQuestion =
-                    modelFactoryService
-                        .quizQuestionRepository
-                        .findById(markedQuestion.getQuizQuestionId())
-                        .get();
-                ChatCompletionRequest chatRequest =
-                    new OpenAIChatAboutNoteRequestBuilder()
-                        .contentOfNoteOfCurrentFocus(note)
-                        .userInstructionToGenerateQuestionWithGPT35FineTunedModel(null)
-                        .build();
-                goodTrainingDataList.add(
-                    generateGoodTrainingData(chatRequest.getMessages(), quizQuestion));
-              }
+              if (markedQuestion != null && markedQuestion.getIsGood())
+                addTrainingDataMessage(markedQuestion, goodTrainingDataList);
             });
     return goodTrainingDataList;
   }
 
-  public GoodTrainingData generateGoodTrainingData(
-      List<ChatMessage> messages, QuizQuestionEntity quizQuestion) {
-    GoodTrainingData goodTrainingData = new GoodTrainingData();
-    List<TrainingDataMessage> trainingDataMessageList =
-        messages.stream()
-            .filter(
-                chatMessage ->
-                    (chatMessage.getRole().equalsIgnoreCase(ChatMessageRole.SYSTEM.value())
-                            && chatMessage.getContent().contains("The note of current focus"))
-                        || (chatMessage.getRole().equalsIgnoreCase(ChatMessageRole.USER.value())))
+  @GetMapping("/badtrainingdata")
+  public List<TrainingData> getBadTrainingData() {
+    currentUser.assertLoggedIn();
+    List<TrainingData> badTrainingDataList = new ArrayList<>();
+    modelFactoryService
+        .markedQuestionRepository
+        .findAll()
+        .forEach(
+            markedQuestion -> {
+              if (markedQuestion != null && !markedQuestion.getIsGood())
+                addTrainingDataMessage(markedQuestion, badTrainingDataList);
+            });
+    return badTrainingDataList;
+  }
+
+  private void addTrainingDataMessage(
+      MarkedQuestion markedQuestion, List<TrainingData> goodTrainingDataList) {
+    var possibleChatRequest =
+        modelFactoryService
+            .noteRepository
+            .findById(markedQuestion.getNoteId())
             .map(
-                chatMessage -> {
-                  TrainingDataMessage trainingDataMessage = new TrainingDataMessage();
-                  trainingDataMessage.setRole(chatMessage.getRole());
-                  trainingDataMessage.setContent(chatMessage.getContent());
-                  return trainingDataMessage;
-                })
+                note ->
+                    new OpenAIChatAboutNoteRequestBuilder()
+                        .contentOfNoteOfCurrentFocus(note)
+                        .userInstructionToGenerateQuestionWithGPT35FineTunedModel(null)
+                        .build());
+    var possibleQuizQuestion =
+        modelFactoryService.quizQuestionRepository.findById(markedQuestion.getQuizQuestionId());
+    possibleChatRequest
+        .flatMap(
+            chatRequest ->
+                possibleQuizQuestion.map(
+                    questionEntity ->
+                        generateTrainingData(chatRequest.getMessages(), questionEntity)))
+        .ifPresent(goodTrainingDataList::add);
+  }
+
+  public TrainingData generateTrainingData(
+      List<ChatMessage> messages, QuizQuestionEntity quizQuestion) {
+    TrainingData goodTrainingData = new TrainingData();
+    List<TrainingDataMessage> trainingDataMessages =
+        messages.stream()
+            .filter(this::isValidChatMessage)
+            .map(this::createNewTrainingDataMessage)
             .collect(Collectors.toList());
-    trainingDataMessageList.add(
+    var tdm =
         new TrainingDataMessage(
-            ChatMessageRole.ASSISTANT.value(), quizQuestion.getRawJsonQuestion()));
-    goodTrainingData.addTrainingDataMessages(trainingDataMessageList);
+            ChatMessageRole.ASSISTANT.value(), quizQuestion.getRawJsonQuestion());
+    trainingDataMessages.add(tdm);
+    goodTrainingData.addTrainingDataMessages(trainingDataMessages);
     return goodTrainingData;
+  }
+
+  private boolean isValidChatMessage(ChatMessage chatMessage) {
+    return (chatMessage.getRole().equalsIgnoreCase(ChatMessageRole.SYSTEM.value())
+            && chatMessage.getContent().contains("The note of current focus"))
+        || (chatMessage.getRole().equalsIgnoreCase(ChatMessageRole.USER.value()));
+  }
+
+  @NotNull
+  private TrainingDataMessage createNewTrainingDataMessage(ChatMessage chatMessage) {
+    TrainingDataMessage trainingDataMessage = new TrainingDataMessage();
+    trainingDataMessage.setRole(chatMessage.getRole());
+    trainingDataMessage.setContent(chatMessage.getContent());
+    return trainingDataMessage;
   }
 }

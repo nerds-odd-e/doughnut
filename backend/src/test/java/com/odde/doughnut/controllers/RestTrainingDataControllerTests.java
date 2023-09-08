@@ -4,11 +4,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.entities.MarkedQuestion;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.json.GoodTrainingData;
+import com.odde.doughnut.entities.json.TrainingData;
+import com.odde.doughnut.entities.json.TrainingDataMessage;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.TestabilitySettings;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -28,12 +28,11 @@ public class RestTrainingDataControllerTests {
 
   @Autowired MakeMe makeMe;
   RestTrainingDataController controller;
-  private final TestabilitySettings testabilitySettings = new TestabilitySettings();
+  private UserModel userModel;
 
   @BeforeEach
   void setup() {
-    UserModel userModel = makeMe.aUser().toModelPlease();
-
+    userModel = makeMe.aUser().toModelPlease();
     controller = new RestTrainingDataController(modelFactoryService, userModel);
   }
 
@@ -47,7 +46,7 @@ public class RestTrainingDataControllerTests {
 
     @Test
     void shouldReturnNoTrainingDataIfNoMarkedQuestion() {
-      List<GoodTrainingData> goodTrainingData = controller.getGoodTrainingData();
+      List<TrainingData> goodTrainingData = controller.getGoodTrainingData();
       assertTrue(goodTrainingData.isEmpty());
     }
 
@@ -58,13 +57,12 @@ public class RestTrainingDataControllerTests {
       MarkedQuestion markedQuestion = makeMe.aMarkedQuestion().ofNote(note).please();
       markedQuestion.setIsGood(true);
       modelFactoryService.markedQuestionRepository.save(markedQuestion);
-      List<GoodTrainingData> goodTrainingDataList = controller.getGoodTrainingData();
+      List<TrainingData> goodTrainingDataList = controller.getGoodTrainingData();
       assertEquals(1, goodTrainingDataList.size());
-      GoodTrainingData GoodTrainingData = goodTrainingDataList.get(0);
-      assertTrue(GoodTrainingData.getMessages().get(0).getContent().contains(note.getTopic()));
+      List<TrainingDataMessage> GoodTrainingData = goodTrainingDataList.get(0).getMessages();
+      assertTrue(GoodTrainingData.get(0).getContent().contains(note.getTopic()));
       assertTrue(
-          GoodTrainingData.getMessages()
-              .get(1)
+          GoodTrainingData.get(1)
               .getContent()
               .contains(
                   " assume the role of a Memory Assistant, which involves helping me review"));
@@ -78,8 +76,15 @@ public class RestTrainingDataControllerTests {
       markedQuestion.setIsGood(false);
       markedQuestion.setComment("This is a bad comment!");
       modelFactoryService.markedQuestionRepository.save(markedQuestion);
-      List<GoodTrainingData> goodTrainingDataList = controller.getGoodTrainingData();
+      List<TrainingData> goodTrainingDataList = controller.getGoodTrainingData();
       assertEquals(0, goodTrainingDataList.size());
     }
+  }
+
+  @Test
+  void shouldThrowExceptionIfUserDoesNotHaveReadingAuth() {
+    userModel = modelFactoryService.toUserModel(null);
+    controller = new RestTrainingDataController(modelFactoryService, userModel);
+    assertThrows(ResponseStatusException.class, () -> controller.getGoodTrainingData());
   }
 }

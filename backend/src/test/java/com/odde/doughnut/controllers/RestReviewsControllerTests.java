@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.SPELLING;
+import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -39,7 +39,6 @@ import org.springframework.web.server.ResponseStatusException;
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
 class RestReviewsControllerTests {
-
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
   private UserModel currentUser;
@@ -60,7 +59,6 @@ class RestReviewsControllerTests {
 
   @Nested
   class overall {
-
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       assertThrows(ResponseStatusException.class, () -> nullUserController().overview());
@@ -69,7 +67,6 @@ class RestReviewsControllerTests {
 
   @Nested
   class initalReview {
-
     @Test
     void initialReview() {
       Note n = makeMe.aNote().creatorAndOwner(currentUser).please();
@@ -87,7 +84,6 @@ class RestReviewsControllerTests {
 
   @Nested
   class createInitialReviewPoiint {
-
     @Test
     void create() {
       InitialInfo info = new InitialInfo();
@@ -97,7 +93,6 @@ class RestReviewsControllerTests {
 
   @Nested
   class repeat {
-
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       assertThrows(ResponseStatusException.class, () -> nullUserController().repeatReview(null));
@@ -106,7 +101,6 @@ class RestReviewsControllerTests {
 
   @Nested
   class showAnswer {
-
     Answer answer;
     Note noteByAnotherUser;
     ReviewPoint reviewPoint;
@@ -114,7 +108,6 @@ class RestReviewsControllerTests {
 
     @Nested
     class ANoteFromOtherUser {
-
       @BeforeEach
       void setup() {
         anotherUser = makeMe.aUser().please();
@@ -148,7 +141,6 @@ class RestReviewsControllerTests {
 
   @Nested
   class MarkGoodQuestion {
-
     User user;
     QuizQuestionEntity quizQuestionEntity;
     Note note;
