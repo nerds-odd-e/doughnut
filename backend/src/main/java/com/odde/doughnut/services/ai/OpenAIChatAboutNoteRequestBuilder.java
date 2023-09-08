@@ -147,7 +147,8 @@ please critically check if the following question makes sense and is possible to
 
   public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestionWithGPT35FineTunedModel(
       String model) {
-    this.model = model != null ? model : "ft:gpt-3.5-turbo-0613:odd-e::7uWJuLEw";
+    this.model =
+        model != null && !model.isEmpty() ? model : "ft:gpt-3.5-turbo-0613:odd-e::7uWJuLEw";
     ObjectMapper objectMapper = new ObjectMapper();
     JsonSchemaGenerator jsonSchemaGenerator = new JsonSchemaGenerator(objectMapper);
     String schemaString;

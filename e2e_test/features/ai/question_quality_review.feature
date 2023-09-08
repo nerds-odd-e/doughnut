@@ -13,7 +13,7 @@ Feature: Question generation by AI using custom model
     And there are some notes for the current user:
       | topic        | details                                          |
       | Scuba Diving | The most common certification is Rescue Diver.   |
-    When I ask to generate a question for note "Scuba Diving" using custom model "gpt-4"
+    When I ask to generate a question for note "Scuba Diving" using custom model "gpt-4" and temperature 0.9
     Then I should be asked "What is the most common scuba diving certification?"
 
   Scenario: I should not be able to use a custom model to generate question as a learner

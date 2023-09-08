@@ -3,7 +3,7 @@ import { goToLastResult, answeredQuestionPage } from "./AnsweredQuestionPage"
 import mock_services from "./mock_services"
 import { chatAboutNotePage } from "./chatAboutNotePage"
 
-const jumpToNotePage = (noteTopic: string, customModel?: string) => {
+const jumpToNotePage = (noteTopic: string, customModel?: string, temperature?: number) => {
   cy.jumpToNotePage(noteTopic)
   return {
     startChat() {
@@ -12,13 +12,16 @@ const jumpToNotePage = (noteTopic: string, customModel?: string) => {
       if (customModel) {
         page.setCustomModel(customModel)
       }
+      if (temperature !== undefined) {
+        page.setTemperature(temperature)
+      }
       return page
     },
   }
 }
 
-const chatAboutNote = (noteTopic: string, customModel?: string) => {
-  return jumpToNotePage(noteTopic, customModel).startChat()
+const chatAboutNote = (noteTopic: string, customModel?: string, temperature?: number) => {
+  return jumpToNotePage(noteTopic, customModel, temperature).startChat()
 }
 
 const findCustomModelInput = () => {

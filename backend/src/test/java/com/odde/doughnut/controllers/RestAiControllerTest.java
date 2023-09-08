@@ -42,6 +42,7 @@ import org.springframework.web.server.ResponseStatusException;
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
 class RestAiControllerTest {
+  public static final String DEFAULT_MODEL = "ft:gpt-3.5-turbo-0613:odd-e::7uWJuLEw";
   RestAiController controller;
   UserModel currentUser;
 
@@ -188,7 +189,7 @@ class RestAiControllerTest {
     }
 
     @Nested
-    class GenerateQuestionWithCustomModel {
+    class GenerateQuestionWithCustomConfig {
       @Captor private ArgumentCaptor<ChatCompletionRequest> captor;
 
       @BeforeEach
@@ -201,26 +202,31 @@ class RestAiControllerTest {
       void createQuizQuestionWithGivenModelName() {
         String model = "customisedModel";
         Double temperature = 1.0;
-        controller.generateQuestionWithCustomModel(note, model, temperature);
+        controller.generateQuestionWithCustomConfig(note, model, temperature);
         verify(openAiApi, times(2)).createChatCompletion(captor.capture());
         assertThat(captor.getAllValues().get(0).getModel()).isEqualTo(model);
       }
 
       @Test
-      void createQuizQuestionWithCustomModelShouldReturnQuestion() {
-        String model = "ft:gpt-3.5-turbo-0613:odd-e::7uWJuLEw";
+      void createQuizQuestionWithCustomConfigShouldReturnQuestion() {
         Double temperature = 1.0;
         QuizQuestion quizQuestion =
-            controller.generateQuestionWithCustomModel(note, model, temperature);
+            controller.generateQuestionWithCustomConfig(note, DEFAULT_MODEL, temperature);
         assertThat(quizQuestion.stem).contains("What is the first color in the rainbow?");
       }
 
       @Test
-      void createQuizQuestionWithCustomTemperature() {
-        String model = "ft:gpt-3.5-turbo-0613:odd-e::7uWJuLEw";
+      void createQuizQuestionWithCustomConfigWithoutCustomModel() {
         Double temperature = 0.8;
-        QuizQuestion quizQuestion =
-            controller.generateQuestionWithCustomModel(note, model, temperature);
+        controller.generateQuestionWithCustomConfig(note, "", temperature);
+        verify(openAiApi, times(2)).createChatCompletion(captor.capture());
+        assertThat(captor.getAllValues().get(0).getModel()).isEqualTo(DEFAULT_MODEL);
+      }
+
+      @Test
+      void createQuizQuestionWithCustomTemperature() {
+        Double temperature = 0.8;
+        controller.generateQuestionWithCustomConfig(note, DEFAULT_MODEL, temperature);
         verify(openAiApi, times(2)).createChatCompletion(captor.capture());
         assertThat(captor.getAllValues().get(0).getTemperature()).isEqualTo(temperature);
       }
@@ -252,8 +258,7 @@ class RestAiControllerTest {
             "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
         controller.generateQuestion(note);
         verify(openAiApi, times(2)).createChatCompletion(captor.capture());
-        assertThat(captor.getAllValues().get(0).getModel())
-            .isEqualTo("ft:gpt-3.5-turbo-0613:odd-e::7uWJuLEw");
+        assertThat(captor.getAllValues().get(0).getModel()).isEqualTo(DEFAULT_MODEL);
         assertThat(captor.getAllValues().get(1).getModel()).isEqualTo("gpt-3.5-turbo-16k");
       }
 

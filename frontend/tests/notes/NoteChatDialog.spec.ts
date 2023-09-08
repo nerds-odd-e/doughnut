@@ -40,11 +40,11 @@ describe("NoteChatDialog TestMe", () => {
     expect(wrapper.text()).toContain("option C");
   });
 
-  it("should allow developer to enter a custom model", async () => {
+  it("should allow developer to enter a custom model without specifying temperature", async () => {
     const customModel = "my-custom-model";
     helper.apiMock
       .expectingPost(
-        `/api/ai/generate-question-with-custom-model?note=${note.id}&model=${customModel}&temperature=1`,
+        `/api/ai/generate-question-with-custom-config?note=${note.id}&model=${customModel}&temperature=1`,
       )
       .andReturnOnce(quizQuestion);
     const wrapper = await createWrapper(true);
@@ -53,9 +53,42 @@ describe("NoteChatDialog TestMe", () => {
     await flushPromises();
   });
 
+  it("should allow developer to change temperature without specifying model", async () => {
+    const temperature = 0.9;
+    helper.apiMock
+      .expectingPost(
+        `/api/ai/generate-question-with-custom-config?note=${note.id}&model=&temperature=${temperature}`,
+      )
+      .andReturnOnce(quizQuestion);
+    const wrapper = await createWrapper(true);
+    await wrapper.find("input[type=range]").setValue(temperature);
+    await wrapper.find("button").trigger("click");
+    await flushPromises();
+  });
+
+  it("should allow developer to change temperature and model", async () => {
+    const temperature = 0.9;
+    const customModel = "my-custom-model";
+    helper.apiMock
+      .expectingPost(
+        `/api/ai/generate-question-with-custom-config?note=${note.id}&model=${customModel}&temperature=${temperature}`,
+      )
+      .andReturnOnce(quizQuestion);
+    const wrapper = await createWrapper(true);
+    await wrapper.find(".custom-model-input input").setValue(customModel);
+    await wrapper.find("input[type=range]").setValue(temperature);
+    await wrapper.find("button").trigger("click");
+    await flushPromises();
+  });
+
   it("should not show custom model input to learner", async () => {
     const wrapper = await createWrapper();
     expect(wrapper.find(".custom-model-input input").exists()).toBe(false);
+  });
+
+  it("should not show temperature range input to learner", async () => {
+    const wrapper = await createWrapper();
+    expect(wrapper.find("input[type=range]").exists()).toBe(false);
   });
 
   it("regenerate question when asked", async () => {

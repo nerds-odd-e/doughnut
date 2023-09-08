@@ -57,8 +57,8 @@ public class RestAiController {
     return getQuizQuestion(note, null, 1.0);
   }
 
-  @PostMapping("/generate-question-with-custom-model")
-  public QuizQuestion generateQuestionWithCustomModel(
+  @PostMapping("/generate-question-with-custom-config")
+  public QuizQuestion generateQuestionWithCustomConfig(
       @RequestParam(value = "note") Note note,
       @RequestParam(value = "model") String model,
       @RequestParam(value = "temperature") Double temperature) {

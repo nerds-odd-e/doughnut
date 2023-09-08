@@ -41,12 +41,24 @@
         Doesn't make sense?
       </button>
       <TextInput
-        v-if="allowCustomModel"
+        v-if="allowCustomConfig"
         type="text"
         class="custom-model-input"
         placeholder="openai model name"
         @change="(event) => setCustomModel(event.target.value)"
       />
+      <div class="temp-control" v-if="allowCustomConfig">
+        <input
+          type="range"
+          id="temperature"
+          name="temperature"
+          min="0"
+          max="2"
+          step="0.1"
+          v-model="temperature"
+        />
+        <label for="temperature">Temp: {{ temperature }}</label>
+      </div>
     </div>
     <div class="chat-container">
       <form class="chat-input-container" @submit.prevent="generateChatAnswer">
@@ -101,13 +113,14 @@ export default defineComponent({
       assistantMessage: "",
       answered: false,
       customModel: undefined as string | undefined,
+      temperature: 1,
     };
   },
   computed: {
     isButtonDisabled() {
       return this.chatInput === "";
     },
-    allowCustomModel() {
+    allowCustomConfig() {
       return this.user?.developer;
     },
   },
@@ -115,7 +128,9 @@ export default defineComponent({
     async generateQuestion() {
       const tmpQuestion: Generated.QuizQuestion | undefined = this.quizQuestion;
       this.quizQuestion = await this.api.ai.askAIToGenerateQuestion(
+        !!this.user?.developer,
         this.selectedNote.id,
+        this.temperature,
         this.customModel,
       );
       this.prevQuizQuestion = tmpQuestion;
@@ -229,6 +244,13 @@ input.auto-extendable-input {
   > div:first-child {
     display: flex;
     gap: 1rem;
+  }
+
+  .temp-control {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
+    gap: 10px;
   }
 }
 </style>
