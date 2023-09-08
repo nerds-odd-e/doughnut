@@ -1,11 +1,20 @@
 package com.odde.doughnut.controllers;
 
-import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.*;
+import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.SPELLING;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.Answer;
+import com.odde.doughnut.entities.AnsweredQuestion;
+import com.odde.doughnut.entities.MarkedQuestion;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.QuizQuestionEntity;
+import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.InitialInfo;
 import com.odde.doughnut.entities.json.MarkedQuestionRequest;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -30,6 +39,7 @@ import org.springframework.web.server.ResponseStatusException;
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
 class RestReviewsControllerTests {
+
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
   private UserModel currentUser;
@@ -50,6 +60,7 @@ class RestReviewsControllerTests {
 
   @Nested
   class overall {
+
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       assertThrows(ResponseStatusException.class, () -> nullUserController().overview());
@@ -58,6 +69,7 @@ class RestReviewsControllerTests {
 
   @Nested
   class initalReview {
+
     @Test
     void initialReview() {
       Note n = makeMe.aNote().creatorAndOwner(currentUser).please();
@@ -75,6 +87,7 @@ class RestReviewsControllerTests {
 
   @Nested
   class createInitialReviewPoiint {
+
     @Test
     void create() {
       InitialInfo info = new InitialInfo();
@@ -84,6 +97,7 @@ class RestReviewsControllerTests {
 
   @Nested
   class repeat {
+
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       assertThrows(ResponseStatusException.class, () -> nullUserController().repeatReview(null));
@@ -92,6 +106,7 @@ class RestReviewsControllerTests {
 
   @Nested
   class showAnswer {
+
     Answer answer;
     Note noteByAnotherUser;
     ReviewPoint reviewPoint;
@@ -99,6 +114,7 @@ class RestReviewsControllerTests {
 
     @Nested
     class ANoteFromOtherUser {
+
       @BeforeEach
       void setup() {
         anotherUser = makeMe.aUser().please();
@@ -132,6 +148,7 @@ class RestReviewsControllerTests {
 
   @Nested
   class MarkGoodQuestion {
+
     User user;
     QuizQuestionEntity quizQuestionEntity;
     Note note;
@@ -162,16 +179,11 @@ class RestReviewsControllerTests {
     @Test
     void createMarkedGoodQuestion() {
       Integer markedQuestionId = controller.markQuestion(markedQuestionRequest);
-      modelFactoryService
-          .markedQuestionRepository
-          .findById(markedQuestionId)
-          .ifPresent(
-              markedQuestion -> {
-                assertEquals(
-                    markedQuestionRequest.quizQuestionId, markedQuestion.getQuizQuestionId());
-                assertEquals(markedQuestionRequest.noteId, markedQuestion.getNoteId());
-                assertEquals(true, markedQuestion.getIsGood());
-              });
+      MarkedQuestion markedQuestion =
+          modelFactoryService.markedQuestionRepository.findById(markedQuestionId).get();
+      assertEquals(markedQuestionRequest.quizQuestionId, markedQuestion.getQuizQuestionId());
+      assertEquals(markedQuestionRequest.noteId, markedQuestion.getNoteId());
+      assertEquals(true, markedQuestion.getIsGood());
     }
 
     @Test
@@ -180,17 +192,13 @@ class RestReviewsControllerTests {
       markedQuestionRequest.setIsGood(false);
       markedQuestionRequest.setComment(badComment);
       Integer markedQuestionId = controller.markQuestion(markedQuestionRequest);
-      modelFactoryService
-          .markedQuestionRepository
-          .findById(markedQuestionId)
-          .ifPresent(
-              markedQuestion -> {
-                assertEquals(
-                    markedQuestionRequest.quizQuestionId, markedQuestion.getQuizQuestionId());
-                assertEquals(markedQuestionRequest.noteId, markedQuestion.getNoteId());
-                assertEquals(false, markedQuestion.getIsGood());
-                assertEquals(badComment, markedQuestion.getComment());
-              });
+      MarkedQuestion markedQuestion =
+          modelFactoryService.markedQuestionRepository.findById(markedQuestionId).get();
+
+      assertEquals(markedQuestionRequest.quizQuestionId, markedQuestion.getQuizQuestionId());
+      assertEquals(markedQuestionRequest.noteId, markedQuestion.getNoteId());
+      assertEquals(false, markedQuestion.getIsGood());
+      assertEquals(badComment, markedQuestion.getComment());
     }
 
     @Test
