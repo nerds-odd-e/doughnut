@@ -16,6 +16,7 @@ import org.apache.logging.log4j.util.Strings;
 
 public class OpenAIChatAboutNoteRequestBuilder {
   String model = "gpt-3.5-turbo-16k";
+  Double temperature = 1.0;
   private List<ChatMessage> messages = new ArrayList<>();
   private List<ChatFunction> functions = new ArrayList<>();
   private int maxTokens;
@@ -88,6 +89,7 @@ Topic: %s
     ChatCompletionRequest.ChatCompletionRequestBuilder requestBuilder =
         ChatCompletionRequest.builder()
             .model(model)
+            .temperature(temperature)
             .messages(messages)
             //
             // an effort has been made to make the api call more responsive by using stream(true)
@@ -163,5 +165,10 @@ please critically check if the following question makes sense and is possible to
         "Please assume the role of a Memory Assistant, which involves helping me review, recall, and reinforce information from my notes. Generate a multiple-choice question based on the note in the current context path\n";
 
     return addMessage(ChatMessageRole.USER, messageBody);
+  }
+
+  public OpenAIChatAboutNoteRequestBuilder setTemperature(Double temperature) {
+    this.temperature = temperature;
+    return this;
   }
 }

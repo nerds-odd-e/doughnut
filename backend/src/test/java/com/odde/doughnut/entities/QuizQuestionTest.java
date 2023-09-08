@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -146,7 +147,8 @@ class QuizQuestionTest {
       userModel.getEntity().setAiQuestionTypeOnlyForReview(true);
       ReviewPointModel reviewPoint = getReviewPointModel(note);
       AiAdvisorService aiAdvisorService = mock(AiAdvisorService.class);
-      when(aiAdvisorService.generateQuestion(any(), any())).thenReturn(aiGeneratedQuestion);
+      when(aiAdvisorService.generateQuestion(any(), any(), anyDouble()))
+          .thenReturn(aiGeneratedQuestion);
       QuizQuestionEntity randomQuizQuestion =
           reviewPoint
               .generateAQuizQuestion(new RealRandomizer(), userModel.getEntity(), aiAdvisorService)

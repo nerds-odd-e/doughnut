@@ -47,8 +47,6 @@ class RestAiControllerTest {
 
   Note note;
   @Mock OpenAiApi openAiApi;
-  //  @Mock
-  //  QuizQuestionDirector quizQuestionDirector;
   @Autowired MakeMe makeMe;
 
   AiCompletionRequest params =
@@ -202,7 +200,8 @@ class RestAiControllerTest {
       @Test
       void createQuizQuestionWithGivenModelName() {
         String model = "customisedModel";
-        controller.generateQuestionWithCustomModel(note, model);
+        Double temperature = 1.0;
+        controller.generateQuestionWithCustomModel(note, model, temperature);
         verify(openAiApi, times(2)).createChatCompletion(captor.capture());
         assertThat(captor.getAllValues().get(0).getModel()).isEqualTo(model);
       }
@@ -210,8 +209,20 @@ class RestAiControllerTest {
       @Test
       void createQuizQuestionWithCustomModelShouldReturnQuestion() {
         String model = "ft:gpt-3.5-turbo-0613:odd-e::7uWJuLEw";
-        QuizQuestion quizQuestion = controller.generateQuestionWithCustomModel(note, model);
+        Double temperature = 1.0;
+        QuizQuestion quizQuestion =
+            controller.generateQuestionWithCustomModel(note, model, temperature);
         assertThat(quizQuestion.stem).contains("What is the first color in the rainbow?");
+      }
+
+      @Test
+      void createQuizQuestionWithCustomTemperature() {
+        String model = "ft:gpt-3.5-turbo-0613:odd-e::7uWJuLEw";
+        Double temperature = 0.8;
+        QuizQuestion quizQuestion =
+            controller.generateQuestionWithCustomModel(note, model, temperature);
+        verify(openAiApi, times(2)).createChatCompletion(captor.capture());
+        assertThat(captor.getAllValues().get(0).getTemperature()).isEqualTo(temperature);
       }
     }
 

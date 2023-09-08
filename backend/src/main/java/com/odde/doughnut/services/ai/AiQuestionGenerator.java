@@ -15,11 +15,14 @@ public class AiQuestionGenerator {
 
   private final OpenAiApiHandler openAiApiHandler;
   private final String model;
+  private final Double temperature;
 
-  public AiQuestionGenerator(Note note, OpenAiApiHandler openAiApiHandler, String model) {
+  public AiQuestionGenerator(
+      Note note, OpenAiApiHandler openAiApiHandler, String model, Double temperature) {
     this.note = note;
     this.openAiApiHandler = openAiApiHandler;
     this.model = model;
+    this.temperature = temperature;
   }
 
   public AIGeneratedQuestion getAiGeneratedQuestion() throws QuizQuestionNotPossibleException {
@@ -63,6 +66,7 @@ public class AiQuestionGenerator {
         new OpenAIChatAboutNoteRequestBuilder()
             .contentOfNoteOfCurrentFocus(note)
             .userInstructionToGenerateQuestionWithGPT35FineTunedModel(model)
+            .setTemperature(temperature)
             .maxTokens(1500)
             .build();
 

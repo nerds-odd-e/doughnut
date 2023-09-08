@@ -11,16 +11,17 @@ import java.util.List;
 public record QuizQuestionDirector(
     QuizQuestionEntity.QuestionType questionType, QuizQuestionServant servant) {
 
-  public QuizQuestionEntity invoke(Thing thing, String model)
+  public QuizQuestionEntity invoke(Thing thing, String model, Double temperature)
       throws QuizQuestionNotPossibleException {
-    return buildAQuestionOfType(questionType, thing, servant, model);
+    return buildAQuestionOfType(questionType, thing, servant, model, temperature);
   }
 
   private QuizQuestionEntity buildAQuestionOfType(
       QuizQuestionEntity.QuestionType questionType,
       Thing thing,
       QuizQuestionServant servant,
-      String model)
+      String model,
+      Double temperature)
       throws QuizQuestionNotPossibleException {
     QuizQuestionFactory quizQuestionFactory = questionType.factory.apply(thing, servant);
 
@@ -31,7 +32,7 @@ public record QuizQuestionDirector(
     quizQuestion.setQuestionType(questionType);
 
     if (quizQuestionFactory instanceof QuestionRawJsonFactory rawJsonFactory) {
-      rawJsonFactory.generateRawJsonQuestion(quizQuestion, model);
+      rawJsonFactory.generateRawJsonQuestion(quizQuestion, model, temperature);
     }
 
     if (quizQuestionFactory instanceof QuestionOptionsFactory optionsFactory) {

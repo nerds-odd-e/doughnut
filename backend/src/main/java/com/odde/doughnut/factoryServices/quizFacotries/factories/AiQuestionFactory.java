@@ -17,10 +17,11 @@ public class AiQuestionFactory implements QuizQuestionFactory, QuestionRawJsonFa
   }
 
   @Override
-  public void generateRawJsonQuestion(QuizQuestionEntity quizQuestion, String model)
+  public void generateRawJsonQuestion(
+      QuizQuestionEntity quizQuestion, String model, Double temperature)
       throws QuizQuestionNotPossibleException {
     AIGeneratedQuestion aiGeneratedQuestion =
-        servant.aiAdvisorService.generateQuestion(thing.getNote(), model);
+        servant.aiAdvisorService.generateQuestion(thing.getNote(), model, temperature);
     quizQuestion.setRawJsonQuestion(aiGeneratedQuestion.toJsonString());
     quizQuestion.setCorrectAnswerIndex(aiGeneratedQuestion.correctChoiceIndex);
   }
