@@ -4,6 +4,7 @@
 
 import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor"
 import pageObjects from "../page_objects"
+import { mock_services } from "page_objects"
 import { DataTable } from "@cucumber/cucumber"
 
 Then("I do these initial reviews in sequence:", (data) => {
@@ -210,12 +211,20 @@ When(
   },
 )
 
+When(
+  "I ask to generate a question for note {string} using invalid custom model {string}",
+  (noteTopic: string, customModel: string) => {
+    pageObjects.chatAboutNote(noteTopic, customModel).testMe()
+    mock_services.openAi().stubOpenAiCompletionWithErrorResponse()
+  },
+)
+
 Then("I should not be able to see any input for custom model", () => {
   pageObjects.findCustomModelInput().isNotPresent()
 })
 
-Then("I should be asked {string}", (expectedtQuestionStem: string) => {
-  pageObjects.findQuestionWithStem(expectedtQuestionStem)
+Then("I should be asked {string}", (expectedQuestionStem: string) => {
+  pageObjects.findQuestionWithStem(expectedQuestionStem)
 })
 
 Then("I should see the question {string} is disabled", (questionStem: string) => {
@@ -244,4 +253,8 @@ Then("I mark the question {string} as bad", (questionStem: string) => {
 
 Then("I should see the question {string} is marked as bad", (questionStem: string) => {
   pageObjects.findQuestionWithStem(questionStem).isMarkedAsBad()
+})
+
+Then("I should see an error message {string}", (errorMessage: string) => {
+  pageObjects.findErrorMessage(errorMessage)
 })

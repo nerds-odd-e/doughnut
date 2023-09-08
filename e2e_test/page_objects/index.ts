@@ -32,6 +32,10 @@ const findCustomModelInput = () => {
   }
 }
 
+const findErrorMessage = (errorMessage: string) => {
+  return cy.findByText(errorMessage).should("be.visible")
+}
+
 const pageObjects = {
   answeredQuestionPage,
   goToLastResult,
@@ -40,6 +44,7 @@ const pageObjects = {
   chatAboutNote,
   chatAboutNotePage,
   findCustomModelInput,
+  findErrorMessage,
 }
 export default pageObjects
 export { mock_services }

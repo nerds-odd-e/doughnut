@@ -41,7 +41,7 @@ describe("NoteChatDialog TestMe", () => {
   });
 
   it("should allow developer to enter a custom model without specifying temperature", async () => {
-    const customModel = "my-custom-model";
+    const customModel = "gpt-4";
     helper.apiMock
       .expectingPost(
         `/api/ai/generate-question-with-custom-config?note=${note.id}&model=${customModel}&temperature=1`,
@@ -79,6 +79,64 @@ describe("NoteChatDialog TestMe", () => {
     await wrapper.find("input[type=range]").setValue(temperature);
     await wrapper.find("button").trigger("click");
     await flushPromises();
+  });
+
+  it("should show error to developer when invalid custom model is used", async () => {
+    const customModel = "my-custom-model";
+    helper.apiMock
+      .expectingPost(
+        `/api/ai/generate-question-with-custom-config?note=${note.id}&model=${customModel}&temperature=1`,
+      )
+      .andRespondOnce({ status: 500 });
+    const wrapper = await createWrapper(true);
+    await wrapper.find(".custom-model-input input").setValue(customModel);
+    await wrapper.find("button").trigger("click");
+    await flushPromises();
+    expect(wrapper.find(".custom-model-error").exists()).toBe(true);
+    expect(wrapper.text()).toContain("Invalid custom model input");
+  });
+
+  it("should not show error to developer when valid custom model is used", async () => {
+    const customModel = "gpt-4";
+    helper.apiMock
+      .expectingPost(
+        `/api/ai/generate-question-with-custom-config?note=${note.id}&model=${customModel}&temperature=1`,
+      )
+      .andReturnOnce(quizQuestion);
+    const wrapper = await createWrapper(true);
+    await wrapper.find(".custom-model-input input").setValue(customModel);
+    await wrapper.find("button").trigger("click");
+    await flushPromises();
+    expect(wrapper.find(".custom-model-error").exists()).toBe(false);
+    expect(wrapper.text()).not.toContain("Invalid custom model input");
+  });
+
+  it("should not show error to developer after retrying with valid custom model", async () => {
+    const customModelInvalid = "my-custom-model";
+    helper.apiMock
+      .expectingPost(
+        `/api/ai/generate-question-with-custom-config?note=${note.id}&model=${customModelInvalid}&temperature=1`,
+      )
+      .andRespondOnce({ status: 500 });
+    const wrapper = await createWrapper(true);
+    await wrapper
+      .find(".custom-model-input input")
+      .setValue(customModelInvalid);
+    await wrapper.find("button").trigger("click");
+    await flushPromises();
+    expect(wrapper.find(".custom-model-error").exists()).toBe(true);
+    expect(wrapper.text()).toContain("Invalid custom model input");
+    const customModelValid = "gpt-4";
+    helper.apiMock
+      .expectingPost(
+        `/api/ai/generate-question-with-custom-config?note=${note.id}&model=${customModelValid}&temperature=1`,
+      )
+      .andReturnOnce(quizQuestion);
+    await wrapper.find(".custom-model-input input").setValue(customModelValid);
+    await wrapper.find("button").trigger("click");
+    await flushPromises();
+    expect(wrapper.find(".custom-model-error").exists()).toBe(false);
+    expect(wrapper.text()).not.toContain("Invalid custom model input");
   });
 
   it("should not show custom model input to learner", async () => {

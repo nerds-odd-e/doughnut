@@ -59,6 +59,9 @@
         />
         <label for="temperature">Temp: {{ temperature }}</label>
       </div>
+      <p v-if="errorCustomModel" class="custom-model-error">
+        Invalid custom model input
+      </p>
     </div>
     <div class="chat-container">
       <form class="chat-input-container" @submit.prevent="generateChatAnswer">
@@ -114,6 +117,7 @@ export default defineComponent({
       answered: false,
       customModel: undefined as string | undefined,
       temperature: 1,
+      errorCustomModel: false,
     };
   },
   computed: {
@@ -126,14 +130,20 @@ export default defineComponent({
   },
   methods: {
     async generateQuestion() {
-      const tmpQuestion: Generated.QuizQuestion | undefined = this.quizQuestion;
-      this.quizQuestion = await this.api.ai.askAIToGenerateQuestion(
-        !!this.user?.developer,
-        this.selectedNote.id,
-        this.temperature,
-        this.customModel,
-      );
-      this.prevQuizQuestion = tmpQuestion;
+      try {
+        this.errorCustomModel = false;
+        const tmpQuestion: Generated.QuizQuestion | undefined =
+          this.quizQuestion;
+        this.quizQuestion = await this.api.ai.askAIToGenerateQuestion(
+          !!this.user?.developer,
+          this.selectedNote.id,
+          this.temperature,
+          this.customModel,
+        );
+        this.prevQuizQuestion = tmpQuestion;
+      } catch (error) {
+        this.errorCustomModel = true;
+      }
     },
     onAnswered(answeredQuestion: Generated.AnsweredQuestion) {
       this.answeredQuestion = answeredQuestion;
@@ -182,6 +192,7 @@ span {
   margin-right: 5px;
   flex-grow: 1;
 }
+
 input.auto-extendable-input {
   width: 100%;
 }
@@ -252,5 +263,9 @@ input.auto-extendable-input {
     align-content: center;
     gap: 10px;
   }
+}
+
+.custom-model-error {
+  color: red;
 }
 </style>
