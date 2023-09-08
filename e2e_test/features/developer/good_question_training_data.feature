@@ -4,7 +4,7 @@ Feature: Generate Training Data from marked questions
   So that I can provide in a format for OpenAI training data format for model trainer
 
   Background:
-    And I've logged in as an existing user
+    Given I've logged in as "developer"
     And there are some notes for the current user:
       | topic        | details                                        |
       | Scuba Diving | The most common certification is Rescue Diver. |
