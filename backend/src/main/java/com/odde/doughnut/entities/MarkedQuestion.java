@@ -47,7 +47,7 @@ public class MarkedQuestion {
   @Getter
   @Setter
   @NonNull
-  private Boolean isGood;
+  private Boolean isGood = true;
 
   @Column(name = "created_at")
   @Getter

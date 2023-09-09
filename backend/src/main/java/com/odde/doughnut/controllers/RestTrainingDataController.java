@@ -40,25 +40,10 @@ class RestTrainingDataController {
         .findAll()
         .forEach(
             markedQuestion -> {
-              if (markedQuestion != null && markedQuestion.getIsGood())
+              if (markedQuestion != null)
                 addTrainingDataMessage(markedQuestion, goodTrainingDataList);
             });
     return goodTrainingDataList;
-  }
-
-  @GetMapping("/badtrainingdata")
-  public List<TrainingData> getBadTrainingData() {
-    currentUser.assertLoggedIn();
-    List<TrainingData> badTrainingDataList = new ArrayList<>();
-    modelFactoryService
-        .markedQuestionRepository
-        .findAll()
-        .forEach(
-            markedQuestion -> {
-              if (markedQuestion != null && !markedQuestion.getIsGood())
-                addTrainingDataMessage(markedQuestion, badTrainingDataList);
-            });
-    return badTrainingDataList;
   }
 
   private void addTrainingDataMessage(

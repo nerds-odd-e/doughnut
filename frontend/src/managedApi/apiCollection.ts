@@ -53,7 +53,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return managedApi.restPost(`reviews/mark_question`, {
         quizQuestionId,
         noteId,
-        isGood: true,
       }) as Promise<string>;
     },
     async unmarkAsGood(id: string) {

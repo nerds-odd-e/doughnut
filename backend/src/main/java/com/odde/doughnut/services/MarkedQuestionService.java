@@ -14,7 +14,6 @@ public record MarkedQuestionService(
     markedQuestion.setUserId(user.getId());
     markedQuestion.setQuizQuestionId(markedQuestionRequest.quizQuestionId);
     markedQuestion.setNoteId(markedQuestionRequest.noteId);
-    markedQuestion.setIsGood(markedQuestionRequest.isGood);
     markedQuestion.setComment(markedQuestionRequest.comment);
     return modelFactoryService.markedQuestionRepository.save(markedQuestion);
   }

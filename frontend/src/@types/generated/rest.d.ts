@@ -79,7 +79,6 @@ declare namespace Generated {
         noteId: number;
         quizQuestionId: number;
         comment: string;
-        isGood: boolean;
     }
 
     interface NoteCreation {

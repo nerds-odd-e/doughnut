@@ -20,9 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
-import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/reviews")
@@ -111,10 +108,6 @@ class RestReviewsController {
   public Integer markQuestion(@RequestBody MarkedQuestionRequest markedQuestionRequest) {
     MarkedQuestion markedQuestion =
         getMarkedQuestionService(currentUser.getEntity()).markQuestion(markedQuestionRequest);
-    if (!markedQuestionRequest.isGood && !StringUtils.hasText(markedQuestionRequest.comment)) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "Comments can not be empty to mark a bad question.");
-    }
     return markedQuestion.getId();
   }
 
