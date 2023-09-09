@@ -12,6 +12,7 @@
 
 # cypress screenshots & videos
 e2e_test/downloads/
+cypress/downloads/
 e2e_test/screenshots/
 e2e_test/videos/
 cypress-visual-report/
