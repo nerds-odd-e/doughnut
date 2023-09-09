@@ -26,14 +26,6 @@ const currentQuestion = (stem?: string) => {
     isNotMarkedAsGood() {
       question().find(".mark-question .thumb-up-hollow").should("be.visible")
     },
-
-    markAsBad() {
-      question().find(".mark-question .thumb-down-hollow").click()
-    },
-
-    isMarkedAsBad() {
-      question().find(".mark-question .thumb-down-filled").should("be.visible")
-    },
   }
 }
 

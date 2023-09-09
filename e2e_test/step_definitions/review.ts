@@ -247,14 +247,6 @@ Then("I should see the question {string} is not marked as good", (questionStem: 
   pageObjects.findQuestionWithStem(questionStem).isNotMarkedAsGood()
 })
 
-Then("I mark the question {string} as bad", (questionStem: string) => {
-  pageObjects.findQuestionWithStem(questionStem).markAsBad()
-})
-
-Then("I should see the question {string} is marked as bad", (questionStem: string) => {
-  pageObjects.findQuestionWithStem(questionStem).isMarkedAsBad()
-})
-
 Then("I should see an error message {string}", (errorMessage: string) => {
   pageObjects.findErrorMessage(errorMessage)
 })

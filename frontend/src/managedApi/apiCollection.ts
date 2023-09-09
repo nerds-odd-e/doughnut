@@ -59,17 +59,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
     async unmarkAsGood(id: string) {
       return managedApi.restDelete(`reviews/mark_question/${id}`, {});
     },
-    async markAsBad(quizQuestionId: number, noteId?: number): Promise<string> {
-      return managedApi.restPost(`reviews/mark_question`, {
-        quizQuestionId,
-        noteId,
-        isGood: false,
-        comment: "test",
-      }) as Promise<string>;
-    },
-    async unmarkAsBad(id: string) {
-      return managedApi.restDelete(`reviews/mark_question/${id}`, {});
-    },
     async overview() {
       return (await managedApi.restGet(
         `reviews/overview`,

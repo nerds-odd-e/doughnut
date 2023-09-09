@@ -29,20 +29,6 @@
       >
         <SvgThumbUpFilled />
       </button>
-      <button
-        v-if="!markedAsBad"
-        class="thumb-down-hollow"
-        @click="() => markAsBad()"
-      >
-        <SvgThumbDownHollow />
-      </button>
-      <button
-        v-if="markedAsBad"
-        class="thumb-down-filled"
-        @click="() => unmarkAsBad()"
-      >
-        <SvgThumbDownFilled />
-      </button>
     </span>
     <div v-if="quizQuestion.questionType === 'SPELLING'">
       <form @submit.prevent.once="submitAnswer({ spellingAnswer: answer })">
@@ -81,8 +67,6 @@ import QuizQuestionChoices from "./QuizQuestionChoices.vue";
 import Breadcrumb from "../toolbars/Breadcrumb.vue";
 import SvgThumbUpHollow from "../svgs/SvgThumbUpHollow.vue";
 import SvgThumbUpFilled from "../svgs/SvgThumbUpFilled.vue";
-import SvgThumbDownHollow from "../svgs/SvgThumbDownHollow.vue";
-import SvgThumbDownFilled from "../svgs/SvgThumbDownFilled.vue";
 
 export default defineComponent({
   inheritAttrs: false,
@@ -105,8 +89,6 @@ export default defineComponent({
     Breadcrumb,
     SvgThumbUpHollow,
     SvgThumbUpFilled,
-    SvgThumbDownHollow,
-    SvgThumbDownFilled,
   },
   emits: ["answered"],
   data() {
@@ -144,20 +126,6 @@ export default defineComponent({
       await this.api.reviewMethods.unmarkAsGood(this.markedGoodQuestionId);
       this.markedGoodQuestionId = "";
       this.markedAsGood = false;
-    },
-
-    async markAsBad() {
-      this.markedBadQuestionId = await this.api.reviewMethods.markAsBad(
-        this.quizQuestion.quizQuestionId,
-        this.quizQuestion.notebookPosition?.noteId,
-      );
-      this.markedAsBad = true;
-    },
-
-    async unmarkAsBad() {
-      await this.api.reviewMethods.unmarkAsBad(this.markedBadQuestionId);
-      this.markedBadQuestionId = "";
-      this.markedAsBad = false;
     },
   },
 });
