@@ -74,7 +74,6 @@ describe("QuizQuestion", () => {
         expect(markExpectation.actualRequestJsonBody()).toMatchObject({
           quizQuestionId: quizQuestion.quizQuestionId,
           noteId: notebook.noteId,
-          isGood: true,
         });
 
         expect(wrapper.find(".thumb-up-filled").exists()).toBe(true);

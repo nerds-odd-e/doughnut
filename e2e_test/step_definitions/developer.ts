@@ -13,5 +13,3 @@ Given("a file with training data is produced", () => {
   cy.findByRole("button", { name: "Download" }).click()
   cy.readFile("cypress/downloads/trainingdata.txt").should("contain", "messages")
 })
-
-Given("that there are no questions marked good at all", () => {})
