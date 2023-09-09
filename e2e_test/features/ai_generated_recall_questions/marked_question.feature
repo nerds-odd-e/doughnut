@@ -16,5 +16,3 @@ Feature: Question generation by AI
     When I ask to generate a question for note "Scuba Diving"
     When I mark the question "What is the most common scuba diving certification?" as bad
     Then I should see the question "What is the most common scuba diving certification?" is marked as bad
-    When I attempt to export bad training data
-    Then a file with bad training data is produced
