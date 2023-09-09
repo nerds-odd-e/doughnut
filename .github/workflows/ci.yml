@@ -88,7 +88,6 @@ jobs:
             e2e_test/features/b*/**
           - |
             e2e_test/features/c*/**
-            e2e_test/features/d*/**
             e2e_test/features/l*/**
           - |
             e2e_test/features/n*/**
@@ -97,8 +96,6 @@ jobs:
           - |
             e2e_test/features/t*/**
             e2e_test/features/u*/**
-          - |
-            e2e_test/features/v*/**
           - |
             e2e_test/features/w*/**
     steps:
