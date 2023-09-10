@@ -99,7 +99,7 @@ public class User {
   }
 
   private static final List<String> allowUserIdentifiers =
-      Arrays.asList("terryyin", "admin", "YeongSheng");
+      Arrays.asList("788834", "admin", "YeongSheng");
 
   public boolean isAdmin() {
     return allowUserIdentifiers.contains(getExternalIdentifier());
