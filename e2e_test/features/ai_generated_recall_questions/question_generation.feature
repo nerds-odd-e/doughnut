@@ -13,7 +13,7 @@ Feature: Question generation by AI
       | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
 
   Scenario Outline: testing myself with generated question for a note
-    When 1I ask to generate a question for note "Scuba Diving"
+    When I ask to generate a question for note "Scuba Diving"
     Then I should be asked "What is the most common scuba diving certification?"
     And the choice "<option>" should be <expectedResult>
     Examples:

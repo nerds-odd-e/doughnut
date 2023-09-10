@@ -10,6 +10,7 @@ export function chatAboutNotePage() {
     },
     testMe() {
       cy.findByRole("button", { name: "Test me" }).click()
+      cy.pageIsNotLoading() // wait for the response
     },
     sendMessage(msg: string) {
       cy.get("#chat-input").clear().type(msg)
