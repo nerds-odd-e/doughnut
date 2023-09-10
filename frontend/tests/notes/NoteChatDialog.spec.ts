@@ -7,14 +7,11 @@ import helper from "../helpers";
 helper.resetWithApiMock(beforeEach, afterEach);
 
 const note = makeMe.aNoteRealm.please();
-const admin = makeMe.aUser().admin(true).please();
-const learner = makeMe.aUser().admin(false).please();
-const createWrapper = async (isAdmin = false) => {
+const createWrapper = async () => {
   const wrapper = helper
     .component(NoteChatDialog)
     .withStorageProps({
       selectedNote: note.note,
-      user: isAdmin ? admin : learner,
     })
     .mount();
   await flushPromises();

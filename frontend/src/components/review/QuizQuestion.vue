@@ -10,7 +10,7 @@
       {{ quizQuestion.mainTopic }}
     </h2>
     <div
-      style="white-space: pre-wrap; margin-right: 80px"
+      style="white-space: pre-wrap"
       v-if="quizQuestion.stem"
       v-html="quizQuestion.stem"
     ></div>
