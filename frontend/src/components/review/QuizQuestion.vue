@@ -39,7 +39,7 @@
       :disabled="disabled"
       @answer="submitAnswer($event)"
     />
-    <div class="mark-question float-end">
+    <div class="mark-question">
       <button
         title="send this question for fine tuning the question generation model"
         @click="markAsGood"
