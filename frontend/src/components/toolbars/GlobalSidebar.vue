@@ -11,16 +11,16 @@
   <LoadingPage v-bind="{ contentExists: circles, title: 'My Circles' }">
     <div v-if="!!circles">
       <ul class="list-group">
+        <li v-if="user?.admin" class="list-group-item">
+          <router-link :to="{ name: 'devTrainingData' }">
+            Admin Dashboard
+          </router-link>
+        </li>
         <li class="list-group-item">
           <router-link :to="{ name: 'notebooks' }"> My Notebooks </router-link>
         </li>
         <li class="list-group-item">
           <router-link :to="{ name: 'bazaar' }"> Bazaar </router-link>
-        </li>
-        <li class="list-group-item">
-          <router-link :to="{ name: 'devTrainingData' }">
-            Dev File List
-          </router-link>
         </li>
         <li class="list-group-item" v-for="circle in circles" :key="circle.id">
           <router-link

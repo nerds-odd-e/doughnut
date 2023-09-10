@@ -12,7 +12,9 @@ const chatAboutNote = (noteTopic: string) => {
 
 const loginAsAdminAndGoToAdminDashboard = () => {
   cy.loginAs("admin")
-  cy.visit("/admin-dashboard")
+  cy.reload()
+  cy.openSidebar()
+  cy.findByText("Admin Dashboard").click()
   return adminDashboardPage()
 }
 
