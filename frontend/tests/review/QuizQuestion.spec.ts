@@ -61,14 +61,19 @@ describe("QuizQuestion", () => {
 
       it("should be able to mark a question as good", async () => {
         const markExpectation = stubMarkQuestionCall();
+        wrapper.vm.popups.confirm = vitest.fn(() => Promise.resolve(true));
         await wrapper.find(".thumb-up-hollow").trigger("click");
-
         await flushPromises();
-
         expect(markExpectation.actualRequestJsonBody()).toMatchObject({
           quizQuestionId: quizQuestion.quizQuestionId,
           noteId: notebook.noteId,
         });
+      });
+
+      it("should be able to skip marking a question as good", async () => {
+        wrapper.vm.popups.confirm = vitest.fn(() => Promise.resolve(false));
+        await wrapper.find(".thumb-up-hollow").trigger("click");
+        await flushPromises();
       });
     });
   });

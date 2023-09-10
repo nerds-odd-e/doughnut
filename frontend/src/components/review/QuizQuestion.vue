@@ -106,6 +106,14 @@ export default defineComponent({
       }
     },
     async markAsGood() {
+      if (
+        !(await this.popups.confirm(
+          `Sending this question for fine tuning the question generation model
+           will make this note and question visible to admin. Are you sure?`,
+        ))
+      ) {
+        return;
+      }
       this.markedGoodQuestionId = await this.api.reviewMethods.markAsGood(
         this.quizQuestion.quizQuestionId,
         this.quizQuestion.notebookPosition?.noteId,
