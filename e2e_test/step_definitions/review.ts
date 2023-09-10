@@ -204,6 +204,11 @@ When("I ask to generate a question for note {string}", (noteTopic: string) => {
   pageObjects.chatAboutNote(noteTopic).testMe()
 })
 
+When("1I ask to generate a question for note {string}", (noteTopic: string) => {
+  pageObjects.chatAboutNote(noteTopic)
+  expect(true).to.be.false
+})
+
 When(
   "I ask to generate a question for note {string} using custom model {string} and temperature {float}",
   (noteTopic: string, customModel: string, temperature: number) => {
