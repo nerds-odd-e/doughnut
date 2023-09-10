@@ -7,14 +7,14 @@ import helper from "../helpers";
 helper.resetWithApiMock(beforeEach, afterEach);
 
 const note = makeMe.aNoteRealm.please();
-const developer = makeMe.aUser().setIsDeveloper(true).please();
-const learner = makeMe.aUser().setIsDeveloper(false).please();
-const createWrapper = async (isDeveloper = false) => {
+const admin = makeMe.aUser().admin(true).please();
+const learner = makeMe.aUser().admin(false).please();
+const createWrapper = async (isAdmin = false) => {
   const wrapper = helper
     .component(NoteChatDialog)
     .withStorageProps({
       selectedNote: note.note,
-      user: isDeveloper ? developer : learner,
+      user: isAdmin ? admin : learner,
     })
     .mount();
   await flushPromises();
@@ -40,7 +40,7 @@ describe("NoteChatDialog TestMe", () => {
     expect(wrapper.text()).toContain("option C");
   });
 
-  it("should allow developer to enter a custom model without specifying temperature", async () => {
+  it("should allow admin to enter a custom model without specifying temperature", async () => {
     const customModel = "gpt-4";
     helper.apiMock
       .expectingPost(
@@ -53,7 +53,7 @@ describe("NoteChatDialog TestMe", () => {
     await flushPromises();
   });
 
-  it("should allow developer to change temperature without specifying model", async () => {
+  it("should allow admin to change temperature without specifying model", async () => {
     const temperature = 0.9;
     helper.apiMock
       .expectingPost(
@@ -66,7 +66,7 @@ describe("NoteChatDialog TestMe", () => {
     await flushPromises();
   });
 
-  it("should allow developer to change temperature and model", async () => {
+  it("should allow admin to change temperature and model", async () => {
     const temperature = 0.9;
     const customModel = "my-custom-model";
     helper.apiMock
@@ -81,7 +81,7 @@ describe("NoteChatDialog TestMe", () => {
     await flushPromises();
   });
 
-  it("should show error to developer when invalid custom model is used", async () => {
+  it("should show error to admin when invalid custom model is used", async () => {
     const customModel = "my-custom-model";
     helper.apiMock
       .expectingPost(
@@ -96,7 +96,7 @@ describe("NoteChatDialog TestMe", () => {
     expect(wrapper.text()).toContain("Invalid custom model input");
   });
 
-  it("should not show error to developer when valid custom model is used", async () => {
+  it("should not show error to admin when valid custom model is used", async () => {
     const customModel = "gpt-4";
     helper.apiMock
       .expectingPost(
@@ -111,7 +111,7 @@ describe("NoteChatDialog TestMe", () => {
     expect(wrapper.text()).not.toContain("Invalid custom model input");
   });
 
-  it("should not show error to developer after retrying with valid custom model", async () => {
+  it("should not show error to admin after retrying with valid custom model", async () => {
     const customModelInvalid = "my-custom-model";
     helper.apiMock
       .expectingPost(

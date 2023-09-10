@@ -100,7 +100,7 @@ public class User {
 
   private static final List<String> allowUsers = Arrays.asList("Terry", "Admin", "Yeong Sheng");
 
-  public boolean isDeveloper() {
+  public boolean isAdmin() {
     return allowUsers.contains(getName());
   }
 }

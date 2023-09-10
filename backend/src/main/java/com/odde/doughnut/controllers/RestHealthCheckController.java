@@ -25,7 +25,7 @@ class RestHealthCheckController {
   @GetMapping("/data_upgrade")
   @Transactional(timeout = 200)
   public List dataUpgrade() throws UnexpectedNoAccessRightException {
-    currentUser.assertDeveloperAuthorization();
+    currentUser.assertAdminAuthorization();
     return List.of();
   }
 }

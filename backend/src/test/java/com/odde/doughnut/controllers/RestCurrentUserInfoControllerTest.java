@@ -39,12 +39,12 @@ class RestCurrentUserInfoControllerTest {
 
     assertThat(currentUserInfo.externalIdentifier, equalTo(externalId));
     assertThat(currentUserInfo.user, equalTo(userModel.getEntity()));
-    assertFalse(currentUserInfo.user.isDeveloper());
+    assertFalse(currentUserInfo.user.isAdmin());
   }
 
   @Test
-  void shouldReturnUserInfoIncludingRoleForDeveloper() {
-    UserModel userModel = makeMe.aDeveloper().toModelPlease();
+  void shouldReturnUserInfoIncludingRoleForAdmin() {
+    UserModel userModel = makeMe.anAdmin().toModelPlease();
     String externalId = userModel.getEntity().getExternalIdentifier();
     when(currentUserFetcher.getExternalIdentifier()).thenReturn(externalId);
     when(currentUserFetcher.getUser()).thenReturn(userModel);
@@ -52,6 +52,6 @@ class RestCurrentUserInfoControllerTest {
 
     assertThat(currentUserInfo.externalIdentifier, equalTo(externalId));
     assertThat(currentUserInfo.user, equalTo(userModel.getEntity()));
-    assertTrue(currentUserInfo.user.isDeveloper());
+    assertTrue(currentUserInfo.user.isAdmin());
   }
 }

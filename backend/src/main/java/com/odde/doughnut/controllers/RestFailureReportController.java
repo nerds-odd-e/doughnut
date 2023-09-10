@@ -27,7 +27,7 @@ class RestFailureReportController {
 
   @GetMapping("")
   public Iterable<FailureReport> failureReports() throws UnexpectedNoAccessRightException {
-    currentUser.assertDeveloperAuthorization();
+    currentUser.assertAdminAuthorization();
     return modelFactoryService.failureReportRepository.findAll();
   }
 
@@ -39,7 +39,7 @@ class RestFailureReportController {
   @GetMapping("/{failureReport}")
   public FailureReportForView show(FailureReport failureReport)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertDeveloperAuthorization();
+    currentUser.assertAdminAuthorization();
     FailureReportForView failureReportForView = new FailureReportForView();
     failureReportForView.failureReport = failureReport;
     failureReportForView.githubIssueUrl =

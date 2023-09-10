@@ -141,14 +141,14 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
     }
   }
 
-  public void assertDeveloperAuthorization() throws UnexpectedNoAccessRightException {
-    if (!isDeveloper()) {
+  public void assertAdminAuthorization() throws UnexpectedNoAccessRightException {
+    if (!isAdmin()) {
       throw new UnexpectedNoAccessRightException();
     }
   }
 
-  public boolean isDeveloper() {
-    return user != null && user.isDeveloper();
+  public boolean isAdmin() {
+    return user != null && user.isAdmin();
   }
 
   public void assertLoggedIn() {

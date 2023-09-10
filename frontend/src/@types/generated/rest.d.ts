@@ -190,7 +190,7 @@ declare namespace Generated {
         dailyNewNotesCount: number;
         spaceIntervals: string;
         aiQuestionTypeOnlyForReview: boolean;
-        developer: boolean;
+        admin: boolean;
     }
 
     interface AnsweredQuestion {

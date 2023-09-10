@@ -27,10 +27,10 @@ class RestFailureReportControllerTest {
   }
 
   @Test
-  void whenNonDeveloperAccessTheFailureReport() {
-    UserModel nonDeveloper = makeMe.aUser().toModelPlease();
+  void whenNonAdminAccessTheFailureReport() {
+    UserModel nonAdmin = makeMe.aUser().toModelPlease();
     FailureReport failureReport = makeMe.aFailureReport().please();
     assertThrows(
-        UnexpectedNoAccessRightException.class, () -> controller(nonDeveloper).show(failureReport));
+        UnexpectedNoAccessRightException.class, () -> controller(nonAdmin).show(failureReport));
   }
 }

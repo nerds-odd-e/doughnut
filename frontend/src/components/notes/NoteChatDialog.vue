@@ -125,7 +125,7 @@ export default defineComponent({
       return this.chatInput === "";
     },
     allowCustomConfig() {
-      return this.user?.developer;
+      return this.user?.admin;
     },
   },
   methods: {
@@ -135,7 +135,7 @@ export default defineComponent({
         const tmpQuestion: Generated.QuizQuestion | undefined =
           this.quizQuestion;
         this.quizQuestion = await this.api.ai.askAIToGenerateQuestion(
-          !!this.user?.developer,
+          !!this.user?.admin,
           this.selectedNote.id,
           this.temperature,
           this.customModel,

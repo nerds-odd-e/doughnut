@@ -23,7 +23,7 @@ public class MakeMe extends MakeMeWithoutDB {
     return new UserBuilder(this);
   }
 
-  public UserBuilder aDeveloper() {
+  public UserBuilder anAdmin() {
     return new UserBuilder(this, "Admin");
   }
 

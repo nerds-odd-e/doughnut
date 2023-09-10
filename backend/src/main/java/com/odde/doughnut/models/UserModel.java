@@ -109,8 +109,8 @@ public class UserModel implements ReviewScope {
     }
   }
 
-  public void assertDeveloperAuthorization() throws UnexpectedNoAccessRightException {
-    getAuthorization().assertDeveloperAuthorization();
+  public void assertAdminAuthorization() throws UnexpectedNoAccessRightException {
+    getAuthorization().assertAdminAuthorization();
   }
 
   public void assertLoggedIn() {
