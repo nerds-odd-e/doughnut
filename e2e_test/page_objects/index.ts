@@ -4,25 +4,10 @@ import mock_services from "./mock_services"
 import { chatAboutNotePage } from "./chatAboutNotePage"
 import { adminDashboardPage } from "./adminDashboardPage"
 
-const jumpToNotePage = (noteTopic: string, customModel?: string, temperature?: number) => {
+const chatAboutNote = (noteTopic: string) => {
   cy.jumpToNotePage(noteTopic)
-  return {
-    startChat() {
-      cy.clickNotePageMoreOptionsButton(noteTopic, "chat about this note")
-      const page = chatAboutNotePage()
-      if (customModel) {
-        page.setCustomModel(customModel)
-      }
-      if (temperature !== undefined) {
-        page.setTemperature(temperature)
-      }
-      return page
-    },
-  }
-}
-
-const chatAboutNote = (noteTopic: string, customModel?: string, temperature?: number) => {
-  return jumpToNotePage(noteTopic, customModel, temperature).startChat()
+  cy.clickNotePageMoreOptionsButton(noteTopic, "chat about this note")
+  return chatAboutNotePage()
 }
 
 const loginAsAdminAndGoToAdminDashboard = () => {

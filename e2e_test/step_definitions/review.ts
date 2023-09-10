@@ -4,7 +4,6 @@
 
 import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor"
 import pageObjects from "../page_objects"
-import { mock_services } from "page_objects"
 import { DataTable } from "@cucumber/cucumber"
 
 Then("I do these initial reviews in sequence:", (data) => {
@@ -203,13 +202,6 @@ Then("the choice {string} should be incorrect", (choice: string) => {
 When("I ask to generate a question for note {string}", (noteTopic: string) => {
   pageObjects.chatAboutNote(noteTopic).testMe()
 })
-
-When(
-  "I ask to generate a question for note {string} using custom model {string} and temperature {float}",
-  (noteTopic: string, customModel: string, temperature: number) => {
-    pageObjects.chatAboutNote(noteTopic, customModel, temperature).testMe()
-  },
-)
 
 Then("I should be asked {string}", (expectedQuestionStem: string) => {
   pageObjects.findQuestionWithStem(expectedQuestionStem)

@@ -2,12 +2,6 @@ import { findQuestionWithStem } from "./QuizQuestionPage"
 
 export function chatAboutNotePage() {
   return {
-    setCustomModel(customModel: string) {
-      cy.get(".custom-model-input input").type(customModel)
-    },
-    setTemperature(temperature: number) {
-      cy.get("input[type=range]").invoke("val", temperature).trigger("change")
-    },
     testMe() {
       cy.findByRole("button", { name: "Test me" }).click()
       cy.pageIsNotLoading() // wait for the response
