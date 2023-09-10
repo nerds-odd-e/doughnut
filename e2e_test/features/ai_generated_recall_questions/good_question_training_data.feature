@@ -10,12 +10,12 @@ Feature: Generate Training Data from marked questions
       | question                          | correct_choice | incorrect_choice_1 |
       | Who wrote 'Who Let the Dogs Out'? | Anslem Douglas | Baha Men           |
 
-  Scenario: 1 or more good questions
+  Scenario: Developer should be able to generate training data from marked questions
     Given I ask to generate a question for note "Who Let the Dogs Out"
     When I mark the question "Who wrote 'Who Let the Dogs Out'?" as good
     Then a file with training data is produced
 
-  Scenario: I should be able to undo the marking
+  Scenario: User should be able to undo the marking
     Given I ask to generate a question for note "Who Let the Dogs Out"
     When I mark the question "Who wrote 'Who Let the Dogs Out'?" as good
     And I unmark the question "Who wrote 'Who Let the Dogs Out'?" as good
