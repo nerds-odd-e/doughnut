@@ -56,7 +56,7 @@ class RestTrainingDataController {
                 note ->
                     new OpenAIChatAboutNoteRequestBuilder()
                         .contentOfNoteOfCurrentFocus(note)
-                        .userInstructionToGenerateQuestionWithGPT35FineTunedModel(null)
+                        .userInstructionToGenerateQuestionWithGPT35FineTunedModel()
                         .build());
     var possibleQuizQuestion =
         modelFactoryService.quizQuestionRepository.findById(markedQuestion.getQuizQuestionId());
@@ -91,7 +91,6 @@ class RestTrainingDataController {
         || (chatMessage.getRole().equalsIgnoreCase(ChatMessageRole.USER.value()));
   }
 
-  @NotNull
   private TrainingDataMessage createNewTrainingDataMessage(ChatMessage chatMessage) {
     TrainingDataMessage trainingDataMessage = new TrainingDataMessage();
     trainingDataMessage.setRole(chatMessage.getRole());

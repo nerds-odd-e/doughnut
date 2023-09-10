@@ -14,12 +14,10 @@ public class AiQuestionGenerator {
   private final Note note;
 
   private final OpenAiApiHandler openAiApiHandler;
-  private final String model;
 
   public AiQuestionGenerator(Note note, OpenAiApiHandler openAiApiHandler) {
     this.note = note;
     this.openAiApiHandler = openAiApiHandler;
-    this.model = "ft:gpt-3.5-turbo-0613:odd-e::7uWJuLEw";
   }
 
   public AIGeneratedQuestion getAiGeneratedQuestion() throws QuizQuestionNotPossibleException {
@@ -62,7 +60,7 @@ public class AiQuestionGenerator {
     ChatCompletionRequest chatRequest =
         new OpenAIChatAboutNoteRequestBuilder()
             .contentOfNoteOfCurrentFocus(note)
-            .userInstructionToGenerateQuestionWithGPT35FineTunedModel(model)
+            .userInstructionToGenerateQuestionWithGPT35FineTunedModel()
             .maxTokens(1500)
             .build();
 
