@@ -24,45 +24,21 @@
   </div>
 
   <div class="fixed-bottom chat-control">
-    <div>
-      <button
-        v-if="!quizQuestion"
-        class="btn btn-secondary"
-        @click="generateQuestion"
-      >
-        Test me
-      </button>
-      <button
-        id="try-again"
-        v-if="quizQuestion"
-        class="btn btn-secondary"
-        @click="generateQuestion"
-      >
-        Doesn't make sense?
-      </button>
-      <TextInput
-        v-if="allowCustomConfig"
-        type="text"
-        class="custom-model-input"
-        placeholder="openai model name"
-        @change="(event) => setCustomModel(event.target.value)"
-      />
-      <div class="temp-control" v-if="allowCustomConfig">
-        <input
-          type="range"
-          id="temperature"
-          name="temperature"
-          min="0"
-          max="2"
-          step="0.1"
-          v-model="temperature"
-        />
-        <label for="temperature">Temp: {{ temperature }}</label>
-      </div>
-      <p v-if="errorCustomModel" class="custom-model-error">
-        Invalid custom model input
-      </p>
-    </div>
+    <button
+      v-if="!quizQuestion"
+      class="btn btn-secondary"
+      @click="generateQuestion"
+    >
+      Test me
+    </button>
+    <button
+      id="try-again"
+      v-if="quizQuestion"
+      class="btn btn-secondary"
+      @click="generateQuestion"
+    >
+      Doesn't make sense?
+    </button>
     <div class="chat-container">
       <form class="chat-input-container" @submit.prevent="generateChatAnswer">
         <input id="chat-input" class="chat-input-text" v-model="chatInput" />
@@ -87,7 +63,6 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import type { StorageAccessor } from "@/store/createNoteStorage";
-import TextInput from "@/components/form/TextInput.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import QuizQuestion from "../review/QuizQuestion.vue";
 import AnsweredQuestion from "../review/AnsweredQuestion.vue";
@@ -102,11 +77,8 @@ export default defineComponent({
       type: Object as PropType<StorageAccessor>,
       required: true,
     },
-    user: {
-      type: Object as PropType<Generated.User>,
-    },
   },
-  components: { QuizQuestion, AnsweredQuestion, TextInput },
+  components: { QuizQuestion, AnsweredQuestion },
   data() {
     return {
       quizQuestion: undefined as Generated.QuizQuestion | undefined,
@@ -115,35 +87,20 @@ export default defineComponent({
       chatInput: "",
       assistantMessage: "",
       answered: false,
-      customModel: undefined as string | undefined,
-      temperature: 1,
-      errorCustomModel: false,
     };
   },
   computed: {
     isButtonDisabled() {
       return this.chatInput === "";
     },
-    allowCustomConfig() {
-      return this.user?.admin;
-    },
   },
   methods: {
     async generateQuestion() {
-      try {
-        this.errorCustomModel = false;
-        const tmpQuestion: Generated.QuizQuestion | undefined =
-          this.quizQuestion;
-        this.quizQuestion = await this.api.ai.askAIToGenerateQuestion(
-          !!this.user?.admin,
-          this.selectedNote.id,
-          this.temperature,
-          this.customModel,
-        );
-        this.prevQuizQuestion = tmpQuestion;
-      } catch (error) {
-        this.errorCustomModel = true;
-      }
+      const tmpQuestion: Generated.QuizQuestion | undefined = this.quizQuestion;
+      this.quizQuestion = await this.api.ai.askAIToGenerateQuestion(
+        this.selectedNote.id,
+      );
+      this.prevQuizQuestion = tmpQuestion;
     },
     onAnswered(answeredQuestion: Generated.AnsweredQuestion) {
       this.answeredQuestion = answeredQuestion;
@@ -154,9 +111,6 @@ export default defineComponent({
         this.chatInput,
       );
       this.answered = true;
-    },
-    setCustomModel(model: string) {
-      this.customModel = model;
     },
   },
 });
@@ -192,7 +146,6 @@ span {
   margin-right: 5px;
   flex-grow: 1;
 }
-
 input.auto-extendable-input {
   width: 100%;
 }
@@ -251,21 +204,5 @@ input.auto-extendable-input {
   width: calc(100% - 140px);
   margin-left: auto;
   margin-right: 40px;
-
-  > div:first-child {
-    display: flex;
-    gap: 1rem;
-  }
-
-  .temp-control {
-    display: flex;
-    flex-wrap: wrap;
-    align-content: center;
-    gap: 10px;
-  }
-}
-
-.custom-model-error {
-  color: red;
 }
 </style>

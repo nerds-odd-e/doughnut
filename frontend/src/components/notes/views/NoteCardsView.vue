@@ -13,7 +13,7 @@
         </Breadcrumb>
         <ControlCenterForNote
           v-if="!readonly"
-          v-bind="{ selectedNote: noteRealm.note, storageAccessor, user }"
+          v-bind="{ selectedNote: noteRealm.note, storageAccessor }"
         />
         <NoteWithLinks
           v-bind="{
@@ -53,7 +53,6 @@ export default defineComponent({
     expandChildren: { type: Boolean, required: true },
     expandInfo: { type: Boolean, default: false },
     readonly: { type: Boolean, default: true },
-    user: { type: Object as PropType<Generated.User> },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,

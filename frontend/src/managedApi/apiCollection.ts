@@ -316,18 +316,9 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
 
     async askAIToGenerateQuestion(
-      shouldUseCustomOpenaiConfig: boolean,
       noteId: Doughnut.ID,
-      temperature: number,
-      customModel?: string,
     ): Promise<Generated.QuizQuestion> {
-      const customConfigUrl = `ai/generate-question-with-custom-config?note=${noteId}&model=${
-        customModel ?? ""
-      }&temperature=${temperature}`;
-      const defaultConfigUrl = `ai/generate-question?note=${noteId}`;
-      const url = shouldUseCustomOpenaiConfig
-        ? customConfigUrl
-        : defaultConfigUrl;
+      const url = `ai/generate-question?note=${noteId}`;
       return (await managedApi.restPost(url, {})) as Generated.QuizQuestion;
     },
     async generateImage(prompt: string) {

@@ -6,7 +6,6 @@
         expandChildren: true,
         readonly: !user,
         storageAccessor,
-        user,
       }"
       :key="noteId"
     />
