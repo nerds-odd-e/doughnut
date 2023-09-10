@@ -36,6 +36,10 @@ const findErrorMessage = (errorMessage: string) => {
   return cy.findByText(errorMessage).should("be.visible")
 }
 
+const loginAsAdminAndGoToAdminDashboard = () => {
+  cy.visit("/dev-training-data")
+}
+
 const pageObjects = {
   answeredQuestionPage,
   goToLastResult,
@@ -45,6 +49,7 @@ const pageObjects = {
   chatAboutNotePage,
   findCustomModelInput,
   findErrorMessage,
+  loginAsAdminAndGoToAdminDashboard,
 }
 export default pageObjects
 export { mock_services }

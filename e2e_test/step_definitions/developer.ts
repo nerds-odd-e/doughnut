@@ -3,11 +3,12 @@
 // @ts-check
 
 import { Given } from "@badeball/cypress-cucumber-preprocessor"
+import pageObjects from 'page_objects';
 
 Given(
   "a developer should be able to download the training data with {int} record",
   (count: number) => {
-    cy.visit("/dev-training-data")
+    pageObjects.loginAsAdminAndGoToAdminDashboard()
     cy.findByRole("button", { name: "Download" }).click()
     const downloadsFolder = Cypress.config("downloadsFolder")
     cy.readFile(`${downloadsFolder}/trainingdata.txt`)
