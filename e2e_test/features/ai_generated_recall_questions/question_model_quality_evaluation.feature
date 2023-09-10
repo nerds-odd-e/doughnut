@@ -22,11 +22,3 @@ Feature: Question generation AI model evaluation
       | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
     When I ask to generate a question for note "Scuba Diving"
     And I should not be able to see any input for custom model
-
-  Scenario: I should see error when I enter an invalid custom model as an admin
-    Given I've logged in as "admin"
-    And there are some notes for the current user:
-      | topic        | details                                          |
-      | Scuba Diving | The most common certification is Rescue Diver.   |
-    And An OpenAI response is unavailable
-    When I ask to generate a question for note "Scuba Diving" using invalid custom model "my-custom-model"

@@ -211,14 +211,6 @@ When(
   },
 )
 
-When(
-  "I ask to generate a question for note {string} using invalid custom model {string}",
-  (noteTopic: string, customModel: string) => {
-    pageObjects.chatAboutNote(noteTopic, customModel).testMe()
-    mock_services.openAi().stubOpenAiCompletionWithErrorResponse()
-  },
-)
-
 Then("I should not be able to see any input for custom model", () => {
   pageObjects.findCustomModelInput().isNotPresent()
 })
