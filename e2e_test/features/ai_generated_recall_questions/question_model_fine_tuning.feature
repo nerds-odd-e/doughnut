@@ -5,7 +5,7 @@ Feature: Generate Training Data from marked questions
   So that I can provide in a format for OpenAI training data format for model trainer
 
   Background:
-    Given I've logged in as "developer"
+    Given I've logged in as an existing user
     And I have a note with the topic "Who Let the Dogs Out"
 
   Scenario: Developer should be able to generate training data from marked questions
