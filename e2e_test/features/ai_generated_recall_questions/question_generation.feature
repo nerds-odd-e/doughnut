@@ -5,9 +5,7 @@ Feature: Question generation by AI
 
   Background:
     Given I've logged in as an existing user
-    And there are some notes for the current user:
-      | topic        | details                                        |
-      | Scuba Diving | The most common certification is Rescue Diver. |
+    And I have a note with the topic "Scuba Diving"
     And OpenAI by default returns this question from now:
       | question                                            | correct_choice | incorrect_choice_1 | incorrect_choice_2 |
       | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |

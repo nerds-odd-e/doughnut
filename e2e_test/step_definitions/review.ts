@@ -240,7 +240,3 @@ Then("I unmark the question {string} as good", (questionStem: string) => {
   pageObjects.findQuestionWithStem(questionStem).unmarkAsGood()
   pageObjects.findQuestionWithStem(questionStem).isNotMarkedAsGood()
 })
-
-Then("I should see an error message {string}", (errorMessage: string) => {
-  pageObjects.findErrorMessage(errorMessage)
-})
