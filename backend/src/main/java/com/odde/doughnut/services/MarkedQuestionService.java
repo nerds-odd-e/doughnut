@@ -13,7 +13,7 @@ public record MarkedQuestionService(
     MarkedQuestion markedQuestion = new MarkedQuestion();
     markedQuestion.setUserId(user.getId());
     markedQuestion.setQuizQuestionId(quizQuestionEntity.getId());
-    markedQuestion.setNoteId(quizQuestionEntity.getThing().getNote().getId());
+    markedQuestion.setNote(quizQuestionEntity.getThing().getNote());
     return modelFactoryService.markedQuestionRepository.save(markedQuestion);
   }
 }

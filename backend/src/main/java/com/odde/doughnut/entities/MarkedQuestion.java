@@ -1,12 +1,7 @@
 package com.odde.doughnut.entities;
 
 import java.sql.Timestamp;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -26,11 +21,12 @@ public class MarkedQuestion {
   @NonNull
   private Integer userId;
 
-  @Column(name = "note_id")
+  @ManyToOne
+  @JoinColumn(name = "note_id")
   @Getter
   @Setter
   @NonNull
-  private Integer noteId;
+  private Note note;
 
   @Column(name = "quiz_question_id")
   @Getter

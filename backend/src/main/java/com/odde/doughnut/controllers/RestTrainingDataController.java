@@ -46,7 +46,7 @@ class RestTrainingDataController {
     var possibleChatRequest =
         modelFactoryService
             .noteRepository
-            .findById(markedQuestion.getNoteId())
+            .findById(markedQuestion.getNote().getId())
             .map(
                 note ->
                     new OpenAIChatAboutNoteRequestBuilder()

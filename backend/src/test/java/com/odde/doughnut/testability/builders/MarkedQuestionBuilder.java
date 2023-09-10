@@ -17,7 +17,7 @@ public class MarkedQuestionBuilder extends EntityBuilder<MarkedQuestion> {
   protected void beforeCreate(boolean needPersist) {}
 
   public MarkedQuestionBuilder ofNote(Note note) {
-    entity.setNoteId(note.getId());
+    entity.setNote(note);
     return this;
   }
 }
