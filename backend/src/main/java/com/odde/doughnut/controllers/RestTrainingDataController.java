@@ -43,24 +43,16 @@ class RestTrainingDataController {
   }
 
   private Stream<TrainingData> getTrainingData(MarkedQuestion markedQuestion) {
-    var possibleChatRequest =
-        modelFactoryService
-            .noteRepository
-            .findById(markedQuestion.getNote().getId())
-            .map(
-                note ->
-                    new OpenAIChatAboutNoteRequestBuilder()
-                        .contentOfNoteOfCurrentFocus(note)
-                        .userInstructionToGenerateQuestionWithGPT35FineTunedModel()
-                        .build());
+    var chatRequest =
+        new OpenAIChatAboutNoteRequestBuilder()
+            .contentOfNoteOfCurrentFocus(markedQuestion.getNote())
+            .userInstructionToGenerateQuestionWithGPT35FineTunedModel()
+            .build();
     var possibleQuizQuestion =
         modelFactoryService.quizQuestionRepository.findById(markedQuestion.getQuizQuestionId());
     Optional<TrainingData> trainingData =
-        possibleChatRequest.flatMap(
-            chatRequest ->
-                possibleQuizQuestion.map(
-                    questionEntity ->
-                        generateTrainingData(chatRequest.getMessages(), questionEntity)));
+        possibleQuizQuestion.map(
+            questionEntity -> generateTrainingData(chatRequest.getMessages(), questionEntity));
     return trainingData.stream();
   }
 
