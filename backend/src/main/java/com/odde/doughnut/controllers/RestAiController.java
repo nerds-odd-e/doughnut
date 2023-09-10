@@ -10,7 +10,6 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleEx
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
-import com.odde.doughnut.services.ai.OpenAIConfig;
 import com.theokanning.openai.OpenAiApi;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -55,7 +54,6 @@ public class RestAiController {
 
   @PostMapping("/generate-question")
   public QuizQuestion generateQuestion(@RequestParam(value = "note") Note note) {
-    OpenAIConfig config = new OpenAIConfig.OpenAIConfigBuilder().build();
     currentUser.assertLoggedIn();
     QuizQuestionServant servant =
         new QuizQuestionServant(
@@ -63,7 +61,7 @@ public class RestAiController {
     try {
       QuizQuestionEntity quizQuestionEntity =
           new QuizQuestionDirector(QuizQuestionEntity.QuestionType.AI_QUESTION, servant)
-              .invoke(note.getThing(), config);
+              .invoke(note.getThing());
       modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
       return modelFactoryService.toQuizQuestion(quizQuestionEntity, currentUser.getEntity());
     } catch (QuizQuestionNotPossibleException e) {
