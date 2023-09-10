@@ -8,6 +8,7 @@ const commonConfig = {
   screenshotOnRunFailure: true,
   fixturesFolder: "e2e_test/fixtures",
   screenshotsFolder: "e2e_test/screenshots",
+  downloadsFolder: "e2e_test/downloads",
   pageLoadTimeout: 100000,
   defaultCommandTimeout: 6000,
   trashAssetsBeforeRuns: true,
