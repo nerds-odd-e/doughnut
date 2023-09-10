@@ -18,7 +18,7 @@ class OpenAIChatAboutNoteRequestBuilderTest {
     Note note = makeMe.aNote().inMemoryPlease();
     ChatCompletionRequest request =
         new OpenAIChatAboutNoteRequestBuilder().contentOfNoteOfCurrentFocus(note).build();
-    assertThat(request.getMessages().get(1).getContent(), containsString(note.getTopic()));
+    assertThat(request.getMessages().get(0).getContent(), containsString(note.getTopic()));
   }
 
   @Test
@@ -26,8 +26,8 @@ class OpenAIChatAboutNoteRequestBuilderTest {
     Note note = makeMe.aNote().details("description").inMemoryPlease();
     ChatCompletionRequest request =
         new OpenAIChatAboutNoteRequestBuilder().contentOfNoteOfCurrentFocus(note).build();
-    assertThat(request.getMessages().get(1).getContent(), containsString(DETAILS));
-    assertThat(request.getMessages().get(1).getContent(), containsString(note.getDetails()));
+    assertThat(request.getMessages().get(0).getContent(), containsString(DETAILS));
+    assertThat(request.getMessages().get(0).getContent(), containsString(note.getDetails()));
   }
 
   @Test
@@ -35,6 +35,6 @@ class OpenAIChatAboutNoteRequestBuilderTest {
     Note note = makeMe.aNote().withNoDescription().inMemoryPlease();
     ChatCompletionRequest request =
         new OpenAIChatAboutNoteRequestBuilder().contentOfNoteOfCurrentFocus(note).build();
-    assertThat(request.getMessages().get(1).getContent(), not(containsString(DETAILS)));
+    assertThat(request.getMessages().get(0).getContent(), not(containsString(DETAILS)));
   }
 }

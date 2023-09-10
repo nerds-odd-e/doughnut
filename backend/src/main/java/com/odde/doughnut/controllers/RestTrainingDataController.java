@@ -54,22 +54,13 @@ class RestTrainingDataController {
       List<ChatMessage> messages, QuizQuestionEntity quizQuestion) {
     TrainingData goodTrainingData = new TrainingData();
     List<TrainingDataMessage> trainingDataMessages =
-        messages.stream()
-            .filter(this::isValidChatMessage)
-            .map(this::createNewTrainingDataMessage)
-            .collect(Collectors.toList());
+        messages.stream().map(this::createNewTrainingDataMessage).collect(Collectors.toList());
     var tdm =
         new TrainingDataMessage(
             ChatMessageRole.ASSISTANT.value(), quizQuestion.getRawJsonQuestion());
     trainingDataMessages.add(tdm);
     goodTrainingData.addTrainingDataMessages(trainingDataMessages);
     return goodTrainingData;
-  }
-
-  private boolean isValidChatMessage(ChatMessage chatMessage) {
-    return (chatMessage.getRole().equalsIgnoreCase(ChatMessageRole.SYSTEM.value())
-            && chatMessage.getContent().contains("The note of current focus"))
-        || (chatMessage.getRole().equalsIgnoreCase(ChatMessageRole.USER.value()));
   }
 
   private TrainingDataMessage createNewTrainingDataMessage(ChatMessage chatMessage) {

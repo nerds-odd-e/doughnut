@@ -20,8 +20,10 @@ public class OpenAIChatAboutNoteRequestBuilder {
   private List<ChatFunction> functions = new ArrayList<>();
   private int maxTokens;
 
-  public OpenAIChatAboutNoteRequestBuilder() {
-    addMessage(
+  public OpenAIChatAboutNoteRequestBuilder() {}
+
+  public OpenAIChatAboutNoteRequestBuilder systemBrief() {
+    return addMessage(
         ChatMessageRole.SYSTEM,
         "This is a PKM system using hierarchical notes, each with a topic and details, to capture atomic concepts.");
   }
@@ -143,9 +145,7 @@ please critically check if the following question makes sense and is possible to
     return this;
   }
 
-  public OpenAIChatAboutNoteRequestBuilder
-      userInstructionToGenerateQuestionWithGPT35FineTunedModel() {
-    this.model = "ft:gpt-3.5-turbo-0613:odd-e::7uWJuLEw";
+  public OpenAIChatAboutNoteRequestBuilder questionSchemaInPlainChat() {
     ObjectMapper objectMapper = new ObjectMapper();
     JsonSchemaGenerator jsonSchemaGenerator = new JsonSchemaGenerator(objectMapper);
     String schemaString;
@@ -156,9 +156,15 @@ please critically check if the following question makes sense and is possible to
       throw new RuntimeException(e);
     }
 
-    addMessage(
+    return addMessage(
         ChatMessageRole.SYSTEM,
         "When generating a question, please use this json structure:\n" + schemaString);
+  }
+
+  public OpenAIChatAboutNoteRequestBuilder
+      userInstructionToGenerateQuestionWithGPT35FineTunedModel() {
+    this.model = "ft:gpt-3.5-turbo-0613:odd-e::7uWJuLEw";
+
     String messageBody =
         "Please assume the role of a Memory Assistant, which involves helping me review, recall, and reinforce information from my notes. Generate a multiple-choice question based on the note in the current context path\n";
 

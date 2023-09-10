@@ -32,6 +32,7 @@ public class AiAdvisorService {
   public AiCompletion getAiCompletion(AiCompletionRequest aiCompletionRequest, String notePath) {
     ChatCompletionRequest chatCompletionRequest =
         new OpenAIChatAboutNoteRequestBuilder()
+            .systemBrief()
             .instructionForCompletion(notePath, aiCompletionRequest)
             .maxTokens(100)
             .build();
@@ -43,6 +44,7 @@ public class AiAdvisorService {
   public String chatToAi(Note note, String userMessage) {
     ChatCompletionRequest chatCompletionRequest =
         new OpenAIChatAboutNoteRequestBuilder()
+            .systemBrief()
             .contentOfNoteOfCurrentFocus(note)
             .chatMessage(userMessage)
             .maxTokens(150)

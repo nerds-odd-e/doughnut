@@ -1,5 +1,7 @@
 package com.odde.doughnut.controllers;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.entities.MarkedQuestion;
@@ -59,13 +61,11 @@ public class RestTrainingDataControllerTests {
       List<TrainingData> goodTrainingDataList = controller.getGoodTrainingData();
       assertEquals(1, goodTrainingDataList.size());
       List<TrainingDataMessage> goodTrainingData = goodTrainingDataList.get(0).getMessages();
-      assertTrue(goodTrainingData.get(0).getContent().contains(note.getTopic()));
-      assertTrue(
-          goodTrainingData
-              .get(1)
-              .getContent()
-              .contains(
-                  " assume the role of a Memory Assistant, which involves helping me review"));
+      assertThat(goodTrainingData.get(0).getContent(), containsString(note.getTopic()));
+      assertThat(
+          goodTrainingData.get(1).getContent(),
+          containsString(
+              " assume the role of a Memory Assistant, which involves helping me review"));
     }
   }
 
