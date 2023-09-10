@@ -11,8 +11,9 @@ import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
-import org.jetbrains.annotations.NotNull;
+import java.util.stream.Stream;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,20 +35,14 @@ class RestTrainingDataController {
   @GetMapping("/goodtrainingdata")
   public List<TrainingData> getGoodTrainingData() {
     currentUser.assertLoggedIn();
-    List<TrainingData> goodTrainingDataList = new ArrayList<>();
-    modelFactoryService
-        .markedQuestionRepository
-        .findAll()
-        .forEach(
-            markedQuestion -> {
-              if (markedQuestion != null)
-                addTrainingDataMessage(markedQuestion, goodTrainingDataList);
-            });
-    return goodTrainingDataList;
+    List<MarkedQuestion> markedQuestions = new ArrayList<>();
+
+    modelFactoryService.markedQuestionRepository.findAll().forEach(markedQuestions::add);
+
+    return markedQuestions.stream().flatMap(this::getTrainingData).toList();
   }
 
-  private void addTrainingDataMessage(
-      MarkedQuestion markedQuestion, List<TrainingData> goodTrainingDataList) {
+  private Stream<TrainingData> getTrainingData(MarkedQuestion markedQuestion) {
     var possibleChatRequest =
         modelFactoryService
             .noteRepository
@@ -60,13 +55,13 @@ class RestTrainingDataController {
                         .build());
     var possibleQuizQuestion =
         modelFactoryService.quizQuestionRepository.findById(markedQuestion.getQuizQuestionId());
-    possibleChatRequest
-        .flatMap(
+    Optional<TrainingData> trainingData =
+        possibleChatRequest.flatMap(
             chatRequest ->
                 possibleQuizQuestion.map(
                     questionEntity ->
-                        generateTrainingData(chatRequest.getMessages(), questionEntity)))
-        .ifPresent(goodTrainingDataList::add);
+                        generateTrainingData(chatRequest.getMessages(), questionEntity)));
+    return trainingData.stream();
   }
 
   public TrainingData generateTrainingData(
