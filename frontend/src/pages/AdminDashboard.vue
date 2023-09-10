@@ -1,41 +1,19 @@
-<!-- eslint-disable no-console -->
-<!-- eslint-disable no-console -->
 <template>
-  <p v-if="!!errorMessage" v-text="errorMessage"></p>
-  <div v-if="!!failureReports">
-    <h2>Download questions marked as "good"</h2>
-    <button class="download-button" @click="downloadTrainingData()">
-      Download
-    </button>
-  </div>
+  <h2>Download questions marked by users</h2>
+  <button class="download-button" @click="downloadTrainingData()">
+    Download
+  </button>
 </template>
 
 <script>
 import useLoadingApi from "../managedApi/useLoadingApi";
-import ContainerPage from "./commons/ContainerPage.vue";
 import ManagedApi from "../managedApi/ManagedApi";
 
 export default {
   setup() {
     return useLoadingApi();
   },
-  data() {
-    return {
-      failureReports: null,
-      errorMessage: null,
-    };
-  },
   methods: {
-    fetchData() {
-      this.api
-        .getFailureReports()
-        .then((res) => {
-          this.failureReports = res;
-        })
-        .catch(
-          () => (this.errorMessage = "It seems you cannot access this page."),
-        );
-    },
     async downloadTrainingData() {
       try {
         const response = await this.api.getTrainingData();
@@ -60,9 +38,6 @@ export default {
         return;
       }
     },
-  },
-  mounted() {
-    this.fetchData();
   },
 };
 </script>

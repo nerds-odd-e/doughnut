@@ -12,7 +12,7 @@
     <div v-if="!!circles">
       <ul class="list-group">
         <li v-if="user?.admin" class="list-group-item">
-          <router-link :to="{ name: 'devTrainingData' }">
+          <router-link :to="{ name: 'adminDashboard' }">
             Admin Dashboard
           </router-link>
         </li>

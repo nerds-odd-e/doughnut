@@ -11,7 +11,7 @@ import CircleJoinPage from "@/pages/CircleJoinPage.vue";
 import FailureReportListPage from "@/pages/FailureReportListPage.vue";
 import FailureReportPage from "@/pages/FailureReportPage.vue";
 import AnsweredQuestionPage from "@/pages/AnsweredQuestionPage.vue";
-import DevTrainingData from "@/pages/DevTrainingData.vue";
+import AdminDashboard from "@/pages/AdminDashboard.vue";
 import NestedPage from "../pages/commons/NestedPage";
 
 const NestedInitialReviewPage = NestedPage(InitialReviewPage, "initial");
@@ -62,8 +62,8 @@ const routes = [
   },
   {
     path: "/admin-dashboard",
-    name: "devTrainingData",
-    component: DevTrainingData,
+    name: "adminDashboard",
+    component: AdminDashboard,
     props: true,
   },
   {
