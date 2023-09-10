@@ -52,11 +52,6 @@ describe("QuizQuestion", () => {
           .expectingPost(`/api/reviews/mark_question`)
           .andReturnOnce(markedQuestionId);
 
-      const stubUnmarkQuestionCall = (id: string) =>
-        helper.apiMock
-          .expectingDelete(`/api/reviews/mark_question/${id}`)
-          .andReturnOnce({});
-
       beforeEach(() => {
         wrapper = helper
           .component(QuizQuestion)
@@ -66,7 +61,6 @@ describe("QuizQuestion", () => {
 
       it("should be able to mark a question as good", async () => {
         const markExpectation = stubMarkQuestionCall();
-        expect(wrapper.find(".thumb-up-filled").exists()).toBe(false);
         await wrapper.find(".thumb-up-hollow").trigger("click");
 
         await flushPromises();
@@ -75,24 +69,6 @@ describe("QuizQuestion", () => {
           quizQuestionId: quizQuestion.quizQuestionId,
           noteId: notebook.noteId,
         });
-
-        expect(wrapper.find(".thumb-up-filled").exists()).toBe(true);
-        expect(wrapper.find(".thumb-up-hollow").exists()).toBe(false);
-      });
-      it("should be able to undo marking a question as good", async () => {
-        const markExpectation = stubMarkQuestionCall();
-        const unmarkExpectation = stubUnmarkQuestionCall(
-          markExpectation.response?.toString().replace(/['"]+/g, "") || "",
-        );
-        await wrapper.find(".thumb-up-hollow").trigger("click");
-        await flushPromises();
-        await wrapper.find(".thumb-up-filled").trigger("click");
-        await flushPromises();
-
-        expect(unmarkExpectation.actualRequestJsonBody()).toMatchObject({});
-
-        expect(wrapper.find(".thumb-up-filled").exists()).toBe(false);
-        expect(wrapper.find(".thumb-up-hollow").exists()).toBe(true);
       });
     });
   });

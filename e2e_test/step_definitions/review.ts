@@ -213,10 +213,4 @@ Then("I should see the question {string} is disabled", (questionStem: string) =>
 
 Then("I mark the question {string} as good", (questionStem: string) => {
   pageObjects.findQuestionWithStem(questionStem).markAsGood()
-  pageObjects.findQuestionWithStem(questionStem).isMarkedAsGood()
-})
-
-Then("I unmark the question {string} as good", (questionStem: string) => {
-  pageObjects.findQuestionWithStem(questionStem).unmarkAsGood()
-  pageObjects.findQuestionWithStem(questionStem).isNotMarkedAsGood()
 })

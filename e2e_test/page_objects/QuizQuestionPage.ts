@@ -13,18 +13,7 @@ const currentQuestion = (stem?: string) => {
 
     markAsGood() {
       question().find(".mark-question .thumb-up-hollow").click()
-    },
-
-    unmarkAsGood() {
-      question().find(".mark-question .thumb-up-filled").click()
-    },
-
-    isMarkedAsGood() {
-      question().find(".mark-question .thumb-up-filled").should("be.visible")
-    },
-
-    isNotMarkedAsGood() {
-      question().find(".mark-question .thumb-up-hollow").should("be.visible")
+      cy.pageIsNotLoading()
     },
   }
 }

@@ -154,6 +154,7 @@ declare module 'vue' {
     SvgNoReview: typeof import('./src/components/svgs/SvgNoReview.vue')['default']
     SvgPause: typeof import('./src/components/svgs/SvgPause.vue')['default']
     SvgPictureIndicator: typeof import('./src/components/svgs/SvgPictureIndicator.vue')['default']
+    SvgRaiseHand: typeof import('./src/components/svgs/SvgRaiseHand.vue')['default']
     SvgRemove: typeof import('./src/components/svgs/SvgRemove.vue')['default']
     SvgResume: typeof import('./src/components/svgs/SvgResume.vue')['default']
     SvgReviewSetting: typeof import('./src/components/svgs/SvgReviewSetting.vue')['default']

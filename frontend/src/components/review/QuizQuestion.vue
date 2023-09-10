@@ -14,22 +14,7 @@
       v-if="quizQuestion.stem"
       v-html="quizQuestion.stem"
     ></div>
-    <span class="mark-question">
-      <button
-        v-if="!markedAsGood"
-        class="thumb-up-hollow"
-        @click="() => markAsGood()"
-      >
-        <SvgThumbUpHollow />
-      </button>
-      <button
-        v-if="markedAsGood"
-        class="thumb-up-filled"
-        @click="() => unmarkAsGood()"
-      >
-        <SvgThumbUpFilled />
-      </button>
-    </span>
+
     <div v-if="quizQuestion.questionType === 'SPELLING'">
       <form @submit.prevent.once="submitAnswer({ spellingAnswer: answer })">
         <TextInput
@@ -54,6 +39,15 @@
       :disabled="disabled"
       @answer="submitAnswer($event)"
     />
+    <div class="mark-question float-end">
+      <button
+        v-if="!markedAsGood"
+        class="thumb-up-hollow"
+        @click="() => markAsGood()"
+      >
+        <SvgRaiseHand />
+      </button>
+    </div>
   </div>
 </template>
 
@@ -65,8 +59,7 @@ import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopups";
 import QuizQuestionChoices from "./QuizQuestionChoices.vue";
 import Breadcrumb from "../toolbars/Breadcrumb.vue";
-import SvgThumbUpHollow from "../svgs/SvgThumbUpHollow.vue";
-import SvgThumbUpFilled from "../svgs/SvgThumbUpFilled.vue";
+import SvgRaiseHand from "../svgs/SvgRaiseHand.vue";
 
 export default defineComponent({
   inheritAttrs: false,
@@ -87,8 +80,7 @@ export default defineComponent({
     TextInput,
     QuizQuestionChoices,
     Breadcrumb,
-    SvgThumbUpHollow,
-    SvgThumbUpFilled,
+    SvgRaiseHand,
   },
   emits: ["answered"],
   data() {
@@ -120,12 +112,6 @@ export default defineComponent({
       );
       this.markedAsGood = true;
     },
-
-    async unmarkAsGood() {
-      await this.api.reviewMethods.unmarkAsGood(this.markedGoodQuestionId);
-      this.markedGoodQuestionId = "";
-      this.markedAsGood = false;
-    },
   },
 });
 </script>
@@ -137,10 +123,6 @@ export default defineComponent({
 }
 
 .mark-question {
-  position: absolute;
-  top: -0.3em;
-  right: 0.7em;
-
   button {
     border: none;
     background: none;

@@ -16,8 +16,6 @@ Feature: Generate Training Data from marked questions
     When I mark the question "Who wrote 'Who Let the Dogs Out'?" as good
     Then an admin should be able to download the training data with 1 record
 
-  Scenario: User should be able to undo the marking
-    Given I ask to generate a question for note "Who Let the Dogs Out"
-    When I mark the question "Who wrote 'Who Let the Dogs Out'?" as good
-    And I unmark the question "Who wrote 'Who Let the Dogs Out'?" as good
+  Scenario: User haven't marked any question as good
+    When I ask to generate a question for note "Who Let the Dogs Out"
     Then an admin should be able to download the training data with 0 record

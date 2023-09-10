@@ -55,9 +55,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
         noteId,
       }) as Promise<string>;
     },
-    async unmarkAsGood(id: string) {
-      return managedApi.restDelete(`reviews/mark_question/${id}`, {});
-    },
     async overview() {
       return (await managedApi.restGet(
         `reviews/overview`,
