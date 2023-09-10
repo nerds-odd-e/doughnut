@@ -17,9 +17,8 @@ export function adminDashboardPage() {
       return {
         shouldContain(content: string) {
           cy.get("body").should("contain", content)
-        }
-
+        },
       }
-    }
+    },
   }
 }

@@ -23,21 +23,5 @@ public class OpenAIConfig {
     public OpenAIConfig build() {
       return config;
     }
-
-    public OpenAIConfigBuilder setModel(String customModel) {
-      if (customModel != null && !customModel.isEmpty()) {
-        config.setModel(customModel);
-      }
-      return this;
-    }
-
-    public OpenAIConfigBuilder setTemperature(Double temp) {
-      // Temperature is between 0 and 2, with default being 1
-      // see: https://platform.openai.com/docs/api-reference/chat/create#temperature
-      if (temp != null && temp >= 0 && temp <= 2.0) {
-        config.setTemperature(temp);
-      }
-      return this;
-    }
   }
 }

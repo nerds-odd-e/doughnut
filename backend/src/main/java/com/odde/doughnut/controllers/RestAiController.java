@@ -55,33 +55,13 @@ public class RestAiController {
 
   @PostMapping("/generate-question")
   public QuizQuestion generateQuestion(@RequestParam(value = "note") Note note) {
-    return getQuizQuestion(note, new OpenAIConfig.OpenAIConfigBuilder().build());
-  }
-
-  @PostMapping("/generate-question-with-custom-config")
-  public QuizQuestion generateQuestionWithCustomConfig(
-      @RequestParam(value = "note") Note note,
-      @RequestParam(value = "model") String model,
-      @RequestParam(value = "temperature") Double temperature) {
-    OpenAIConfig config =
-        new OpenAIConfig.OpenAIConfigBuilder().setModel(model).setTemperature(temperature).build();
-    return getQuizQuestion(note, config);
-  }
-
-  @PostMapping("/generate-image")
-  public AiGeneratedImage generateImage(@RequestBody AiCompletionRequest aiCompletionRequest) {
-    currentUser.assertLoggedIn();
-    return new AiGeneratedImage(aiAdvisorService.getImage(aiCompletionRequest.prompt));
-  }
-
-  private QuizQuestion getQuizQuestion(Note note, OpenAIConfig config) {
+    OpenAIConfig config = new OpenAIConfig.OpenAIConfigBuilder().build();
     currentUser.assertLoggedIn();
     QuizQuestionServant servant =
         new QuizQuestionServant(
             currentUser.getEntity(), null, modelFactoryService, aiAdvisorService);
     try {
-      QuizQuestionEntity quizQuestionEntity;
-      quizQuestionEntity =
+      QuizQuestionEntity quizQuestionEntity =
           new QuizQuestionDirector(QuizQuestionEntity.QuestionType.AI_QUESTION, servant)
               .invoke(note.getThing(), config);
       modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
@@ -89,5 +69,11 @@ public class RestAiController {
     } catch (QuizQuestionNotPossibleException e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated", e);
     }
+  }
+
+  @PostMapping("/generate-image")
+  public AiGeneratedImage generateImage(@RequestBody AiCompletionRequest aiCompletionRequest) {
+    currentUser.assertLoggedIn();
+    return new AiGeneratedImage(aiAdvisorService.getImage(aiCompletionRequest.prompt));
   }
 }

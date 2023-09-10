@@ -188,50 +188,6 @@ class RestAiControllerTest {
       assertThat(quizQuestion.stem).contains("What is the first color in the rainbow?");
     }
 
-    @Nested
-    class GenerateQuestionWithCustomConfig {
-      @Captor private ArgumentCaptor<ChatCompletionRequest> captor;
-
-      @BeforeEach
-      void setup() throws JsonProcessingException {
-        when(openAiApi.createChatCompletion(any()))
-            .thenReturn(buildCompletionResultForFunctionCall(jsonQuestion));
-      }
-
-      @Test
-      void createQuizQuestionWithGivenModelName() {
-        String model = "customisedModel";
-        Double temperature = 1.0;
-        controller.generateQuestionWithCustomConfig(note, model, temperature);
-        verify(openAiApi, times(2)).createChatCompletion(captor.capture());
-        assertThat(captor.getAllValues().get(0).getModel()).isEqualTo(model);
-      }
-
-      @Test
-      void createQuizQuestionWithCustomConfigShouldReturnQuestion() {
-        Double temperature = 1.0;
-        QuizQuestion quizQuestion =
-            controller.generateQuestionWithCustomConfig(note, DEFAULT_MODEL, temperature);
-        assertThat(quizQuestion.stem).contains("What is the first color in the rainbow?");
-      }
-
-      @Test
-      void createQuizQuestionWithCustomConfigWithoutCustomModel() {
-        Double temperature = 0.8;
-        controller.generateQuestionWithCustomConfig(note, "", temperature);
-        verify(openAiApi, times(2)).createChatCompletion(captor.capture());
-        assertThat(captor.getAllValues().get(0).getModel()).isEqualTo(DEFAULT_MODEL);
-      }
-
-      @Test
-      void createQuizQuestionWithCustomTemperature() {
-        Double temperature = 0.8;
-        controller.generateQuestionWithCustomConfig(note, DEFAULT_MODEL, temperature);
-        verify(openAiApi, times(2)).createChatCompletion(captor.capture());
-        assertThat(captor.getAllValues().get(0).getTemperature()).isEqualTo(temperature);
-      }
-    }
-
     @Test
     void createQuizQuestionFailedWithGpt35WillTryAgain() throws JsonProcessingException {
       when(openAiApi.createChatCompletion(any()))
