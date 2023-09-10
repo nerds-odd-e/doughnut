@@ -61,7 +61,7 @@ const routes = [
     meta: { userProp: true },
   },
   {
-    path: "/dev-training-data",
+    path: "/admin-dashboard",
     name: "devTrainingData",
     component: DevTrainingData,
     props: true,

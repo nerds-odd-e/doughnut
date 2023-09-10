@@ -30,7 +30,7 @@ public class ApplicationController {
         "/users/**",
         "/failure-report-list/**",
         "/links/**",
-        "/dev-training-data/**"
+        "/admin-dashboard/**"
       },
       method = RequestMethod.GET)
   public String home() {
