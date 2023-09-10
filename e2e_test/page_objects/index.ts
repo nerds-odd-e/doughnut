@@ -38,7 +38,7 @@ const findErrorMessage = (errorMessage: string) => {
 }
 
 const loginAsAdminAndGoToAdminDashboard = () => {
-  cy.loginAs("developer")
+  cy.loginAs("admin")
   cy.visit("/dev-training-data")
   return adminDashboardPage()
 }

@@ -1,10 +1,10 @@
 @usingMockedOpenAiService
 Feature: Question generation by AI using custom model
-  As a developer, I want to use AI and specify a custom model to generate review questions based on my note and its context.
+  As an admin, I want to use AI and specify a custom model to generate review questions based on my note and its context.
   So that I can review the quality of the custom model by viewing the generated questions.
 
   Scenario: I should be able to use a custom model to generate question
-    Given I've logged in as "developer"
+    Given I've logged in as "admin"
     And there are some notes for the current user:
       | topic        | details                                          |
       | Scuba Diving | The most common certification is Rescue Diver.   |
@@ -25,8 +25,8 @@ Feature: Question generation by AI using custom model
     When I ask to generate a question for note "Scuba Diving"
     And I should not be able to see any input for custom model
 
-  Scenario: I should see error when I enter an invalid custom model as a developer
-    Given I've logged in as "developer"
+  Scenario: I should see error when I enter an invalid custom model as an admin
+    Given I've logged in as "admin"
     And there are some notes for the current user:
       | topic        | details                                          |
       | Scuba Diving | The most common certification is Rescue Diver.   |

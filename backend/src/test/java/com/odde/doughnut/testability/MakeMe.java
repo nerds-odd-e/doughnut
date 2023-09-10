@@ -24,7 +24,7 @@ public class MakeMe extends MakeMeWithoutDB {
   }
 
   public UserBuilder aDeveloper() {
-    return new UserBuilder(this, "Developer");
+    return new UserBuilder(this, "Admin");
   }
 
   public NoteBuilder aNote() {

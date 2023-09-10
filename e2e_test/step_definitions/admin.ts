@@ -6,7 +6,7 @@ import { Given } from "@badeball/cypress-cucumber-preprocessor"
 import pageObjects from "page_objects"
 
 Given(
-  "a developer should be able to download the training data with {int} record",
+  "an admin should be able to download the training data with {int} record",
   (count: number) => {
     pageObjects
       .loginAsAdminAndGoToAdminDashboard()
