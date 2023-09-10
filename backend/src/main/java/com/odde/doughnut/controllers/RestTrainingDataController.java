@@ -11,9 +11,7 @@ import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,22 +37,17 @@ class RestTrainingDataController {
 
     modelFactoryService.markedQuestionRepository.findAll().forEach(markedQuestions::add);
 
-    return markedQuestions.stream().flatMap(this::getTrainingData).toList();
+    return markedQuestions.stream().map(this::getTrainingData).toList();
   }
 
-  private Stream<TrainingData> getTrainingData(MarkedQuestion markedQuestion) {
+  private TrainingData getTrainingData(MarkedQuestion markedQuestion) {
     var chatRequest =
         new OpenAIChatAboutNoteRequestBuilder()
             .contentOfNoteOfCurrentFocus(markedQuestion.getNote())
             .userInstructionToGenerateQuestionWithGPT35FineTunedModel()
             .build();
-    var possibleQuizQuestion =
-        modelFactoryService.quizQuestionRepository.findById(
-            markedQuestion.getQuizQuestion().getId());
-    Optional<TrainingData> trainingData =
-        possibleQuizQuestion.map(
-            questionEntity -> generateTrainingData(chatRequest.getMessages(), questionEntity));
-    return trainingData.stream();
+    var questionEntity = markedQuestion.getQuizQuestion();
+    return generateTrainingData(chatRequest.getMessages(), questionEntity);
   }
 
   public TrainingData generateTrainingData(
