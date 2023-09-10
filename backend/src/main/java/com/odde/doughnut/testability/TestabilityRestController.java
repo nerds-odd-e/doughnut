@@ -53,7 +53,7 @@ class TestabilityRestController {
     new DBCleanerWorker(emf).truncateAllTables();
     createUser("old_learner", "Old Learner");
     createUser("another_old_learner", "Another Old Learner");
-    createUser("admin", "Admin");
+    createUser("admin", "admin");
     createUser("non_admin", "Non Admin");
     testabilitySettings.setUseRealGithub(false);
     testabilitySettings.enableFeatureToggle(false);

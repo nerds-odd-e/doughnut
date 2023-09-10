@@ -98,9 +98,10 @@ public class User {
     return new SpacedRepetitionAlgorithm(getSpaceIntervals());
   }
 
-  private static final List<String> allowUsers = Arrays.asList("Terry", "Admin", "Yeong Sheng");
+  private static final List<String> allowUserIdentifiers =
+      Arrays.asList("terryyin", "admin", "YeongSheng");
 
   public boolean isAdmin() {
-    return allowUsers.contains(getName());
+    return allowUserIdentifiers.contains(getExternalIdentifier());
   }
 }

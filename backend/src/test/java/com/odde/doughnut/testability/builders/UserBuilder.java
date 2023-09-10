@@ -6,7 +6,6 @@ import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
 public class UserBuilder extends EntityBuilder<User> {
-  static final TestObjectCounter exIdCounter = new TestObjectCounter(n -> "exid" + n);
   static final TestObjectCounter nameCounter = new TestObjectCounter(n -> "user" + n);
 
   public UserBuilder(MakeMe makeMe) {
@@ -20,7 +19,7 @@ public class UserBuilder extends EntityBuilder<User> {
   }
 
   private void setInfo(String userName) {
-    entity.setExternalIdentifier(exIdCounter.generate());
+    entity.setExternalIdentifier(userName);
     entity.setName(userName);
   }
 
