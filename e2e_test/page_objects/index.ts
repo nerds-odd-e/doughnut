@@ -2,6 +2,7 @@ import { findQuestionWithStem, currentQuestion } from "./QuizQuestionPage"
 import { goToLastResult, answeredQuestionPage } from "./AnsweredQuestionPage"
 import mock_services from "./mock_services"
 import { chatAboutNotePage } from "./chatAboutNotePage"
+import { adminDashboardPage } from "./adminDashboardPage"
 
 const jumpToNotePage = (noteTopic: string, customModel?: string, temperature?: number) => {
   cy.jumpToNotePage(noteTopic)
@@ -38,6 +39,7 @@ const findErrorMessage = (errorMessage: string) => {
 
 const loginAsAdminAndGoToAdminDashboard = () => {
   cy.visit("/dev-training-data")
+  return adminDashboardPage()
 }
 
 const pageObjects = {

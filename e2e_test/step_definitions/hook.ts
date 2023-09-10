@@ -47,7 +47,6 @@ After({ tags: "@mockBrowserTime" }, () => {
   })
 })
 
-
 Before({ tags: "@startWithEmptyDownloadsFolder" }, () => {
   const downloadsFolder = Cypress.config("downloadsFolder")
   cy.task("deleteFolder", downloadsFolder)
