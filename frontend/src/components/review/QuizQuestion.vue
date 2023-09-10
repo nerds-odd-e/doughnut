@@ -95,7 +95,6 @@ export default defineComponent({
     return {
       answer: "" as string,
       markedAsGood: false,
-      markedAsBad: false,
       markedGoodQuestionId: "" as string,
       markedBadQuestionId: "" as string,
     };

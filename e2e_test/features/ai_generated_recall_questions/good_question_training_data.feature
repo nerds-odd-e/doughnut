@@ -13,9 +13,10 @@ Feature: Generate Training Data from marked questions
   Scenario: Developer should be able to generate training data from marked questions
     Given I ask to generate a question for note "Who Let the Dogs Out"
     When I mark the question "Who wrote 'Who Let the Dogs Out'?" as good
-    Then a file with training data is produced
+    Then a developer should be able to download the training data with 1 record
 
   Scenario: User should be able to undo the marking
     Given I ask to generate a question for note "Who Let the Dogs Out"
     When I mark the question "Who wrote 'Who Let the Dogs Out'?" as good
     And I unmark the question "Who wrote 'Who Let the Dogs Out'?" as good
+    Then a developer should be able to download the training data with 0 record
