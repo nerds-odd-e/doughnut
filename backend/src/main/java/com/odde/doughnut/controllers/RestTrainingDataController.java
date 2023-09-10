@@ -49,7 +49,8 @@ class RestTrainingDataController {
             .userInstructionToGenerateQuestionWithGPT35FineTunedModel()
             .build();
     var possibleQuizQuestion =
-        modelFactoryService.quizQuestionRepository.findById(markedQuestion.getQuizQuestionId());
+        modelFactoryService.quizQuestionRepository.findById(
+            markedQuestion.getQuizQuestion().getId());
     Optional<TrainingData> trainingData =
         possibleQuizQuestion.map(
             questionEntity -> generateTrainingData(chatRequest.getMessages(), questionEntity));

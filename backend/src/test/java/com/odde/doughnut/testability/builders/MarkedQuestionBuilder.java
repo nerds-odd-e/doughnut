@@ -10,7 +10,7 @@ public class MarkedQuestionBuilder extends EntityBuilder<MarkedQuestion> {
     super(makeMe, new MarkedQuestion());
     ofNote(makeMe.aNote().please());
     entity.setUserId(makeMe.aUser().please().getId());
-    entity.setQuizQuestionId(makeMe.aQuestion().please().getId());
+    entity.setQuizQuestion(makeMe.aQuestion().please());
   }
 
   @Override

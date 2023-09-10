@@ -167,7 +167,7 @@ class RestQuizQuestionControllerTests {
           modelFactoryService.markedQuestionRepository.findById(markedQuestionId);
       assertFalse(markedQuestionRepositoryById.isEmpty());
       MarkedQuestion markedQuestion = markedQuestionRepositoryById.get();
-      assertEquals(quizQuestionEntity.getId(), markedQuestion.getQuizQuestionId());
+      assertEquals(quizQuestionEntity.getId(), markedQuestion.getQuizQuestion().getId());
       assertEquals(note.getId(), markedQuestion.getNote().getId());
     }
 

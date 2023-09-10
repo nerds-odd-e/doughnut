@@ -28,11 +28,12 @@ public class MarkedQuestion {
   @NonNull
   private Note note;
 
-  @Column(name = "quiz_question_id")
+  @ManyToOne
+  @JoinColumn(name = "quiz_question_id")
   @Getter
   @Setter
   @NonNull
-  private Integer quizQuestionId;
+  private QuizQuestionEntity quizQuestion;
 
   @Column(name = "comment")
   @Getter
