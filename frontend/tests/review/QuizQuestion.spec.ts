@@ -52,6 +52,13 @@ describe("QuizQuestion", () => {
           .expectingPost(`/api/reviews/mark_question`)
           .andReturnOnce(markedQuestionId);
 
+      const clickSendQuestion = () =>
+        wrapper
+          .find(
+            "button[title='send this question for fine tuning the question generation model']",
+          )
+          .trigger("click");
+
       beforeEach(() => {
         wrapper = helper
           .component(QuizQuestion)
@@ -62,7 +69,7 @@ describe("QuizQuestion", () => {
       it("should be able to mark a question as good", async () => {
         const markExpectation = stubMarkQuestionCall();
         wrapper.vm.popups.confirm = vitest.fn(() => Promise.resolve(true));
-        await wrapper.find(".thumb-up-hollow").trigger("click");
+        await clickSendQuestion();
         await flushPromises();
         expect(markExpectation.actualRequestJsonBody()).toMatchObject({
           quizQuestionId: quizQuestion.quizQuestionId,
@@ -72,7 +79,7 @@ describe("QuizQuestion", () => {
 
       it("should be able to skip marking a question as good", async () => {
         wrapper.vm.popups.confirm = vitest.fn(() => Promise.resolve(false));
-        await wrapper.find(".thumb-up-hollow").trigger("click");
+        await clickSendQuestion();
         await flushPromises();
       });
     });

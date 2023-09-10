@@ -41,9 +41,8 @@
     />
     <div class="mark-question float-end">
       <button
-        v-if="!markedAsGood"
-        class="thumb-up-hollow"
-        @click="() => markAsGood()"
+        title="send this question for fine tuning the question generation model"
+        @click="markAsGood"
       >
         <SvgRaiseHand />
       </button>
@@ -86,9 +85,6 @@ export default defineComponent({
   data() {
     return {
       answer: "" as string,
-      markedAsGood: false,
-      markedGoodQuestionId: "" as string,
-      markedBadQuestionId: "" as string,
     };
   },
   methods: {
@@ -114,11 +110,10 @@ export default defineComponent({
       ) {
         return;
       }
-      this.markedGoodQuestionId = await this.api.reviewMethods.markAsGood(
+      await this.api.reviewMethods.markAsGood(
         this.quizQuestion.quizQuestionId,
         this.quizQuestion.notebookPosition?.noteId,
       );
-      this.markedAsGood = true;
     },
   },
 });

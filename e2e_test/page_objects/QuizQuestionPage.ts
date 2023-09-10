@@ -12,7 +12,11 @@ const currentQuestion = (stem?: string) => {
     },
 
     markAsGood() {
-      question().find(".mark-question .thumb-up-hollow").click()
+      question()
+        .findByRole("button", {
+          name: "send this question for fine tuning the question generation model",
+        })
+        .click()
       cy.findByRole("button", { name: "OK" }).click()
       cy.pageIsNotLoading()
     },
