@@ -47,11 +47,12 @@ class RestQuizQuestionController {
   @Transactional
   public Integer markQuestion(@PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity) {
     MarkedQuestion markedQuestion =
-        new MarkedQuestionService(
+        new MarkedQuestionService()
+            .markQuestion(
+                quizQuestionEntity,
                 currentUser.getEntity(),
                 testabilitySettings.getCurrentUTCTimestamp(),
-                modelFactoryService)
-            .markQuestion(quizQuestionEntity);
+                modelFactoryService);
     return markedQuestion.getId();
   }
 }

@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.MarkedQuestion;
 import com.odde.doughnut.entities.json.TrainingData;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,20 +28,7 @@ class RestTrainingDataController {
   public List<TrainingData> getGoodTrainingData() {
     currentUser.assertLoggedIn();
     List<MarkedQuestion> markedQuestions = new ArrayList<>();
-
     modelFactoryService.markedQuestionRepository.findAll().forEach(markedQuestions::add);
-
-    return markedQuestions.stream().map(this::getTrainingData).toList();
-  }
-
-  private TrainingData getTrainingData(MarkedQuestion markedQuestion) {
-    var chatRequest =
-        new OpenAIChatAboutNoteRequestBuilder()
-            .contentOfNoteOfCurrentFocus(markedQuestion.getNote())
-            .userInstructionToGenerateQuestionWithGPT35FineTunedModel()
-            .build();
-    var questionEntity = markedQuestion.getQuizQuestion();
-    return TrainingData.generateTrainingData(
-        chatRequest.getMessages(), questionEntity.getRawJsonQuestion());
+    return markedQuestions.stream().map(MarkedQuestion::getTrainingData).toList();
   }
 }

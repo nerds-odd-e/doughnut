@@ -1,5 +1,8 @@
 package com.odde.doughnut.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.entities.json.TrainingData;
+import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
 import java.sql.Timestamp;
 import javax.persistence.*;
 import lombok.Getter;
@@ -51,4 +54,16 @@ public class MarkedQuestion {
   @Setter
   @NonNull
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
+
+  @JsonIgnore
+  public TrainingData getTrainingData() {
+    var chatRequest =
+        new OpenAIChatAboutNoteRequestBuilder()
+            .contentOfNoteOfCurrentFocus(getNote())
+            .userInstructionToGenerateQuestionWithGPT35FineTunedModel()
+            .build();
+    var questionEntity = getQuizQuestion();
+    return TrainingData.generateTrainingData(
+        chatRequest.getMessages(), questionEntity.getRawJsonQuestion());
+  }
 }
