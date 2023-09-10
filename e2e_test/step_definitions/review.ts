@@ -211,10 +211,6 @@ When(
   },
 )
 
-Then("I should not be able to see any input for custom model", () => {
-  pageObjects.findCustomModelInput().isNotPresent()
-})
-
 Then("I should be asked {string}", (expectedQuestionStem: string) => {
   pageObjects.findQuestionWithStem(expectedQuestionStem)
 })

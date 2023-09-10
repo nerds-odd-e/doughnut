@@ -25,18 +25,6 @@ const chatAboutNote = (noteTopic: string, customModel?: string, temperature?: nu
   return jumpToNotePage(noteTopic, customModel, temperature).startChat()
 }
 
-const findCustomModelInput = () => {
-  return {
-    isNotPresent() {
-      cy.get(".custom-model-input input").should("not.exist")
-    },
-  }
-}
-
-const findErrorMessage = (errorMessage: string) => {
-  return cy.findByText(errorMessage).should("be.visible")
-}
-
 const loginAsAdminAndGoToAdminDashboard = () => {
   cy.loginAs("admin")
   cy.visit("/admin-dashboard")
@@ -50,8 +38,6 @@ const pageObjects = {
   currentQuestion,
   chatAboutNote,
   chatAboutNotePage,
-  findCustomModelInput,
-  findErrorMessage,
   loginAsAdminAndGoToAdminDashboard,
 }
 export default pageObjects
