@@ -9,21 +9,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.AnsweredQuestion;
-import com.odde.doughnut.entities.MarkedQuestion;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.InitialInfo;
-import com.odde.doughnut.entities.json.MarkedQuestionRequest;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -135,83 +130,6 @@ class RestReviewsControllerTests {
         AnsweredQuestion answeredQuestion = controller.showAnswer(answer);
         assertThat(answeredQuestion.answerId, equalTo(answer.getId()));
       }
-    }
-  }
-
-  @Nested
-  class MarkGoodQuestion {
-    User user;
-    QuizQuestionEntity quizQuestionEntity;
-    Note note;
-    ReviewPoint reviewPoint;
-    MarkedQuestionRequest markedQuestionRequest;
-
-    @BeforeEach
-    void setup() throws QuizQuestionNotPossibleException {
-      note = makeMe.aNote("new").creatorAndOwner(currentUser).please();
-
-      user = currentUser.getEntity();
-      reviewPoint =
-          makeMe.aReviewPointFor(note).by(currentUser).forgettingCurveAndNextReviewAt(200).please();
-      quizQuestionEntity =
-          makeMe.aQuestion().of(QuizQuestionEntity.QuestionType.SPELLING, reviewPoint).please();
-      modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
-      modelFactoryService.noteRepository.save(note);
-      markedQuestionRequest =
-          new MarkedQuestionRequest() {
-            {
-              this.quizQuestionId = quizQuestionEntity.getId();
-              this.noteId = note.getId();
-            }
-          };
-    }
-
-    @Test
-    void createMarkedGoodQuestion() {
-      Integer markedQuestionId = controller.markQuestion(markedQuestionRequest);
-      Optional<MarkedQuestion> markedQuestionRepositoryById =
-          modelFactoryService.markedQuestionRepository.findById(markedQuestionId);
-      assertFalse(markedQuestionRepositoryById.isEmpty());
-      MarkedQuestion markedQuestion = markedQuestionRepositoryById.get();
-      assertEquals(markedQuestionRequest.quizQuestionId, markedQuestion.getQuizQuestionId());
-      assertEquals(markedQuestionRequest.noteId, markedQuestion.getNoteId());
-    }
-
-    @Test
-    void testCreateMarkedBadQuestionWithComment() {
-      String badComment = "This is a bad question!";
-      markedQuestionRequest.setComment(badComment);
-      Integer markedQuestionId = controller.markQuestion(markedQuestionRequest);
-      Optional<MarkedQuestion> markedQuestionRepositoryById =
-          modelFactoryService.markedQuestionRepository.findById(markedQuestionId);
-      assertFalse(markedQuestionRepositoryById.isEmpty());
-      MarkedQuestion markedQuestion = markedQuestionRepositoryById.get();
-      assertEquals(markedQuestionRequest.quizQuestionId, markedQuestion.getQuizQuestionId());
-      assertEquals(markedQuestionRequest.noteId, markedQuestion.getNoteId());
-      assertEquals(badComment, markedQuestion.getComment());
-    }
-
-    @Test
-    void createMarkedQuestionInDatabase() {
-      long oldCount = modelFactoryService.markedQuestionRepository.count();
-      controller.markQuestion(markedQuestionRequest);
-      assertThat(modelFactoryService.markedQuestionRepository.count(), equalTo(oldCount + 1));
-    }
-
-    @Test
-    void deleteMarkedQuestion() {
-      Integer markedQuestionId = controller.markQuestion(markedQuestionRequest);
-      long oldCount = modelFactoryService.markedQuestionRepository.count();
-      controller.deleteMarkQuestion(markedQuestionId);
-      assertThat(modelFactoryService.markedQuestionRepository.count(), equalTo(oldCount - 1));
-    }
-
-    @Test
-    void downloadMarkedQuestion() {
-      controller.markQuestion(markedQuestionRequest);
-      List<MarkedQuestion> questions = controller.getAllMarkedQuestions();
-      assertThat(questions, hasSize(1));
-      assertThat(questions.get(0).getUserId(), equalTo(user.getId()));
     }
   }
 }

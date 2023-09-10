@@ -46,11 +46,6 @@ describe("QuizQuestion", () => {
         .please();
 
       let wrapper;
-      const markedQuestionId: string = "1";
-      const stubMarkQuestionCall = () =>
-        helper.apiMock
-          .expectingPost(`/api/reviews/mark_question`)
-          .andReturnOnce(markedQuestionId);
 
       const clickSendQuestion = () =>
         wrapper
@@ -67,14 +62,12 @@ describe("QuizQuestion", () => {
       });
 
       it("should be able to mark a question as good", async () => {
-        const markExpectation = stubMarkQuestionCall();
+        helper.apiMock.expectingPost(
+          `/api/quiz-questions/${quizQuestion.quizQuestionId}/mark-question`,
+        );
         wrapper.vm.popups.confirm = vitest.fn(() => Promise.resolve(true));
         await clickSendQuestion();
         await flushPromises();
-        expect(markExpectation.actualRequestJsonBody()).toMatchObject({
-          quizQuestionId: quizQuestion.quizQuestionId,
-          noteId: notebook.noteId,
-        });
       });
 
       it("should be able to skip marking a question as good", async () => {

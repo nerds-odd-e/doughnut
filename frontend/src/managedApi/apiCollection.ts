@@ -49,11 +49,11 @@ const apiCollection = (managedApi: ManagedApi) => ({
         {},
       )) as Generated.ReviewPoint;
     },
-    async markAsGood(quizQuestionId: number, noteId?: number): Promise<string> {
-      return managedApi.restPost(`reviews/mark_question`, {
-        quizQuestionId,
-        noteId,
-      }) as Promise<string>;
+    async markAsGood(quizQuestionId: number): Promise<string> {
+      return managedApi.restPost(
+        `quiz-questions/${quizQuestionId}/mark-question`,
+        {},
+      ) as Promise<string>;
     },
     async overview() {
       return (await managedApi.restGet(

@@ -110,10 +110,7 @@ export default defineComponent({
       ) {
         return;
       }
-      await this.api.reviewMethods.markAsGood(
-        this.quizQuestion.quizQuestionId,
-        this.quizQuestion.notebookPosition?.noteId,
-      );
+      await this.api.reviewMethods.markAsGood(this.quizQuestion.quizQuestionId);
     },
   },
 });

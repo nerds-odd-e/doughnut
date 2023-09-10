@@ -2,26 +2,20 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.AnsweredQuestion;
-import com.odde.doughnut.entities.MarkedQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.DueReviewPoints;
 import com.odde.doughnut.entities.json.InitialInfo;
-import com.odde.doughnut.entities.json.MarkedQuestionRequest;
 import com.odde.doughnut.entities.json.ReviewStatus;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.Reviewing;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.MarkedQuestionService;
 import com.odde.doughnut.testability.TestabilitySettings;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -96,34 +90,5 @@ class RestReviewsController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(answer);
     return modelFactoryService.toAnswerModel(answer).getAnswerViewedByUser(currentUser.getEntity());
-  }
-
-  private MarkedQuestionService getMarkedQuestionService(User user) {
-    return new MarkedQuestionService(
-        user, testabilitySettings.getCurrentUTCTimestamp(), modelFactoryService);
-  }
-
-  @PostMapping(path = "/mark_question")
-  @Transactional
-  public Integer markQuestion(@RequestBody MarkedQuestionRequest markedQuestionRequest) {
-    MarkedQuestion markedQuestion =
-        getMarkedQuestionService(currentUser.getEntity()).markQuestion(markedQuestionRequest);
-    return markedQuestion.getId();
-  }
-
-  @DeleteMapping(value = "/mark_question/{id}")
-  public Integer deleteMarkQuestion(@PathVariable Integer id) {
-    modelFactoryService.markedQuestionRepository.deleteById(id);
-    return id;
-  }
-
-  @GetMapping(path = "/all_marked_questions")
-  public List<MarkedQuestion> getAllMarkedQuestions() {
-    Iterable<MarkedQuestion> questions = modelFactoryService.markedQuestionRepository.findAll();
-    List<MarkedQuestion> result = new ArrayList<>();
-    for (MarkedQuestion markedQuestion : questions) {
-      result.add(markedQuestion);
-    }
-    return result;
   }
 }

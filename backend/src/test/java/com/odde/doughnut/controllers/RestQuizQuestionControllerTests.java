@@ -6,11 +6,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -135,6 +137,45 @@ class RestQuizQuestionControllerTests {
                 TimestampOperations.addHoursToTimestamp(
                     testabilitySettings.getCurrentUTCTimestamp(), 25)));
       }
+    }
+  }
+
+  @Nested
+  class MarkGoodQuestion {
+    User user;
+    QuizQuestionEntity quizQuestionEntity;
+    Note note;
+    ReviewPoint reviewPoint;
+
+    @BeforeEach
+    void setup() throws QuizQuestionNotPossibleException {
+      note = makeMe.aNote("new").creatorAndOwner(currentUser).please();
+
+      user = currentUser.getEntity();
+      reviewPoint =
+          makeMe.aReviewPointFor(note).by(currentUser).forgettingCurveAndNextReviewAt(200).please();
+      quizQuestionEntity =
+          makeMe.aQuestion().of(QuizQuestionEntity.QuestionType.SPELLING, reviewPoint).please();
+      modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
+      modelFactoryService.noteRepository.save(note);
+    }
+
+    @Test
+    void createMarkedGoodQuestion() {
+      Integer markedQuestionId = controller.markQuestion(quizQuestionEntity);
+      Optional<MarkedQuestion> markedQuestionRepositoryById =
+          modelFactoryService.markedQuestionRepository.findById(markedQuestionId);
+      assertFalse(markedQuestionRepositoryById.isEmpty());
+      MarkedQuestion markedQuestion = markedQuestionRepositoryById.get();
+      assertEquals(quizQuestionEntity.getId(), markedQuestion.getQuizQuestionId());
+      assertEquals(note.getId(), markedQuestion.getNoteId());
+    }
+
+    @Test
+    void createMarkedQuestionInDatabase() {
+      long oldCount = modelFactoryService.markedQuestionRepository.count();
+      controller.markQuestion(quizQuestionEntity);
+      assertThat(modelFactoryService.markedQuestionRepository.count(), equalTo(oldCount + 1));
     }
   }
 }

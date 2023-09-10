@@ -4,6 +4,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.MarkedQuestionService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -40,5 +41,17 @@ class RestQuizQuestionController {
     answerModel.makeAnswerToQuestion(
         testabilitySettings.getCurrentUTCTimestamp(), currentUser.getEntity());
     return answerModel.getAnswerViewedByUser(currentUser.getEntity());
+  }
+
+  @PostMapping("/{quizQuestion}/mark-question")
+  @Transactional
+  public Integer markQuestion(@PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity) {
+    MarkedQuestion markedQuestion =
+        new MarkedQuestionService(
+                currentUser.getEntity(),
+                testabilitySettings.getCurrentUTCTimestamp(),
+                modelFactoryService)
+            .markQuestion(quizQuestionEntity);
+    return markedQuestion.getId();
   }
 }
