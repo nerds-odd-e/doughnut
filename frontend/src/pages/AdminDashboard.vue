@@ -3,6 +3,11 @@
   <button class="download-button" @click="downloadTrainingData()">
     Download
   </button>
+  <p>
+    <router-link :to="{ name: 'failureReportList' }"
+      >Failure Reports</router-link
+    >
+  </p>
 </template>
 
 <script>

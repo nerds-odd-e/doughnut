@@ -12,5 +12,14 @@ export function adminDashboardPage() {
         },
       }
     },
+    goToFailureReportList() {
+      cy.findByText("Failure Reports").click()
+      return {
+        shouldContain(content: string) {
+          cy.get("body").should("contain", content)
+        }
+
+      }
+    }
   }
 }

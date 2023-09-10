@@ -5,14 +5,17 @@
 
 import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 import TestabilityHelper from "../support/TestabilityHelper"
+import pageObjects from 'page_objects';
 
 When("Someone triggered an exception", () => {
   cy.testability().triggerException()
 })
 
-Then("I should see {string} in the failure report", (content) => {
-  cy.visit("/failure-report-list")
-  cy.get("body").should("contain", content)
+Then("an admin should see {string} in the failure report", (content: string) => {
+  pageObjects
+  .loginAsAdminAndGoToAdminDashboard()
+  .goToFailureReportList()
+  .shouldContain(content)
 })
 
 When("I should see a new open issue on github", () => {
