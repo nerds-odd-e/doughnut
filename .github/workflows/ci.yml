@@ -32,7 +32,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: ./.github/setup_jdk_with_cache
       - uses: actions/checkout@v3
-      - uses: ./.github/setup_nodejs_with_cache
+      - uses: ./.github/setup_nodejs
       - run: yarn lint:all
 
   Backend-unit-tests:
@@ -58,7 +58,7 @@ jobs:
       FRONTEND_UT_CONSOLE_OUTPUT_AS_FAILURE: true
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/setup_nodejs_with_cache
+      - uses: ./.github/setup_nodejs
       - run: yarn frontend:test
 
   Package-artifacts:
@@ -67,7 +67,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/setup_jdk_with_cache
-      - uses: ./.github/setup_nodejs_with_cache
+      - uses: ./.github/setup_nodejs
       - name: Compile & transform frontend assets for bundling with Backend
         run: yarn frontend:build
       - name: Build application jar artifact
