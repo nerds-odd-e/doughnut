@@ -1,6 +1,6 @@
 import openai
 import os
-openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = os.getenv("OPENAI_API_TOKEN")
 
 response = openai.File.create(
   file=open("training_data.jsonl", "rb"),

@@ -12,6 +12,10 @@ data_path = "./training_data.jsonl"
 
 # Load dataset
 with open(data_path) as f:
+    for line in f:
+      print(line)
+      json.loads(line)
+with open(data_path) as f:
     dataset = [json.loads(line) for line in f]
 
 # We can inspect the data quickly by checking the number of examples and the first item
