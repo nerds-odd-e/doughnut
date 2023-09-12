@@ -18,6 +18,14 @@ public class AIGeneratedQuestion extends AIGeneratedQuestionBody {
   @JsonProperty(required = true)
   public int confidence;
 
+  @JsonPropertyDescription("How much of the content is covered by the question. 0 to 10.")
+  @JsonProperty(required = true)
+  public int content_coverage_by_question;
+
+  @JsonPropertyDescription("How good the quality of the content is in terms of generating question. 0 to 10.")
+  @JsonProperty(required = true)
+  public int content_quality_for_question_generation;
+
   public static AIGeneratedQuestion getValidQuestion(JsonNode question)
       throws QuizQuestionNotPossibleException {
     try {
