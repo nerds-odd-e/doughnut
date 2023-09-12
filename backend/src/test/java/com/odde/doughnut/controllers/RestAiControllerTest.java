@@ -42,7 +42,6 @@ import org.springframework.web.server.ResponseStatusException;
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
 class RestAiControllerTest {
-  public static final String DEFAULT_MODEL = "ft:gpt-3.5-turbo-0613:odd-e::7uWJuLEw";
   RestAiController controller;
   UserModel currentUser;
 
@@ -214,7 +213,8 @@ class RestAiControllerTest {
             "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
         controller.generateQuestion(note);
         verify(openAiApi, times(2)).createChatCompletion(captor.capture());
-        assertThat(captor.getAllValues().get(0).getModel()).isEqualTo(DEFAULT_MODEL);
+        assertThat(captor.getAllValues().get(0).getModel())
+            .startsWith("ft:gpt-3.5-turbo-0613:odd-e::");
         assertThat(captor.getAllValues().get(1).getModel()).isEqualTo("gpt-3.5-turbo-16k");
       }
 

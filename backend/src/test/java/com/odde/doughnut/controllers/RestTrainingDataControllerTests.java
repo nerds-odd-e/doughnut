@@ -64,8 +64,7 @@ public class RestTrainingDataControllerTests {
       assertThat(goodTrainingData.get(0).getContent(), containsString(note.getTopic()));
       assertThat(
           goodTrainingData.get(1).getContent(),
-          containsString(
-              " assume the role of a Memory Assistant, which involves helping me review"));
+          containsString("assume the role of a Memory Assistant"));
     }
   }
 

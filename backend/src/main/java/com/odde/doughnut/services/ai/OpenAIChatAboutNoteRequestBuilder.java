@@ -163,10 +163,10 @@ please critically check if the following question makes sense and is possible to
 
   public OpenAIChatAboutNoteRequestBuilder
       userInstructionToGenerateQuestionWithGPT35FineTunedModel() {
-    this.model = "ft:gpt-3.5-turbo-0613:odd-e::7uWJuLEw";
+    this.model = "ft:gpt-3.5-turbo-0613:odd-e::7xspi2uf";
 
     String messageBody =
-        "Please assume the role of a Memory Assistant, which involves helping me review, recall, and reinforce information from my notes. Generate a multiple-choice question based on the note in the current context path\n";
+        "Please assume the role of a Memory Assistant. Generate a MCQ based on the note of current focus in its context path.";
 
     return addMessage(ChatMessageRole.USER, messageBody);
   }

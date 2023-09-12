@@ -23,9 +23,9 @@ public class AIGeneratedQuestion extends AIGeneratedQuestionBody {
   public int content_coverage_by_question;
 
   @JsonPropertyDescription(
-      "How good the quality of the content is in terms of generating question. 0 to 10.")
+      "How good is the note content in terms of helping AI to generate question. 0 to 10.")
   @JsonProperty(required = true)
-  public int content_quality_for_question_generation;
+  public int note_content_quality_for_question_generation;
 
   public static AIGeneratedQuestion getValidQuestion(JsonNode question)
       throws QuizQuestionNotPossibleException {
