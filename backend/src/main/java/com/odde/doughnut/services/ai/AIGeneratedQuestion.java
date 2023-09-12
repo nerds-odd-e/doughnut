@@ -28,4 +28,6 @@ public class AIGeneratedQuestion extends AIGeneratedQuestionBody {
       }
     } catch (JsonProcessingException e) {
     }
-    throw new QuizQuestionNotPossibleException(); } }
+    throw new QuizQuestionNotPossibleException();
+  }
+}
