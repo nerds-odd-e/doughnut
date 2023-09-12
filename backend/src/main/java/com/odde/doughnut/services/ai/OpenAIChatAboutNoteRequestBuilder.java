@@ -156,7 +156,10 @@ please critically check if the following question makes sense and is possible to
       throw new RuntimeException(e);
     }
 
-    return addMessage( ChatMessageRole.SYSTEM, "When generating a question, please use this json structure:\n" + schemaString); }
+    return addMessage(
+        ChatMessageRole.SYSTEM,
+        "When generating a question, please use this json structure:\n" + schemaString);
+  }
 
   public OpenAIChatAboutNoteRequestBuilder
       userInstructionToGenerateQuestionWithGPT35FineTunedModel() {
