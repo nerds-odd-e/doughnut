@@ -9,6 +9,7 @@ import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.algorithms.HtmlOrText;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
+import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -377,5 +378,15 @@ public class Note extends Thingy {
   @JsonIgnore
   public boolean matchAnswer(String spellingAnswer) {
     return getNoteTitle().matches(spellingAnswer);
+  }
+
+  @JsonIgnore
+  public String getMarkdownDetails() {
+    if (isDetailsBlankHtml()) return "";
+    String detailsPerhapsHTML = getDetails();
+    FlexmarkHtmlConverter converter = FlexmarkHtmlConverter.builder().build();
+    String converted = converter.convert(detailsPerhapsHTML);
+
+    return "Details (until the end of this message):\n%s".formatted(converted);
   }
 }

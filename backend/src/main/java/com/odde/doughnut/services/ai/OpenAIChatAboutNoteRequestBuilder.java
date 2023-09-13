@@ -36,13 +36,8 @@ Context path: %s
 Topic: %s
 %s
       """
-            .formatted(note.getContextPathString(), note.getTopic(), getDetails(note));
+            .formatted(note.getContextPathString(), note.getTopic(), note.getMarkdownDetails());
     return addMessage(ChatMessageRole.SYSTEM, noteOfCurrentFocus);
-  }
-
-  private static String getDetails(Note note) {
-    if (note.isDetailsBlankHtml()) return "";
-    return "Details (until the end of this message):\n%s".formatted(note.getDetails());
   }
 
   public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestionWithFunctionCall() {
