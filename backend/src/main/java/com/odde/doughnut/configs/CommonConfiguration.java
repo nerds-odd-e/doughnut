@@ -25,6 +25,7 @@ public class CommonConfiguration {
             "/bazaar",
             "/bazaar/**",
             "/api/**",
+            "/failure-report-list/**",
             "/circles/join")
         .permitAll()
         .anyRequest()
