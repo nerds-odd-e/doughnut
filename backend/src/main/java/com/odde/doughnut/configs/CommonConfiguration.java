@@ -1,10 +1,9 @@
 package com.odde.doughnut.configs;
 
+import java.util.stream.Stream;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.stereotype.Component;
-
-import java.util.stream.Stream;
 
 @Component
 public class CommonConfiguration {
@@ -13,14 +12,16 @@ public class CommonConfiguration {
       HttpSecurity http, AbstractAuthenticationFilterConfigurer authenticationFilterConfigurer)
       throws Exception {
 
-    String[] backendRoutes = {"/login",
+    String[] backendRoutes = {
+      "/login",
       "/error",
       "/odd-e.png",
       "/odd-e.ico",
       "/webjars/**",
       "/images/**",
       "/assets/**",
-      "/api/**"};
+      "/api/**"
+    };
 
     // the following array has to be in sync with the frontend routes in ApplicationController.java
     // Because java annotation does not allow variable, we have to repeat the routes here.
@@ -35,15 +36,16 @@ public class CommonConfiguration {
       "/users/**",
       "/links/**",
       "/failure-report-list/**",
-      "/admin-dashboard/**"};
+      "/admin-dashboard/**"
+    };
 
-    String[] allRoutes = Stream.concat(Stream.of(backendRoutes), Stream.of(frontendRoutes))
-      .toArray(String[]::new);
+    String[] allRoutes =
+        Stream.concat(Stream.of(backendRoutes), Stream.of(frontendRoutes)).toArray(String[]::new);
 
     http.authorizeRequests()
-      .mvcMatchers("/robots.txt")
-      .permitAll()
-      .antMatchers(allRoutes)
+        .mvcMatchers("/robots.txt")
+        .permitAll()
+        .antMatchers(allRoutes)
         .permitAll()
         .anyRequest()
         .authenticated()
