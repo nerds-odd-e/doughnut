@@ -30,7 +30,6 @@ public class ApplicationController {
         "/notes/**",
         "/reviews/**",
         "/answers/**",
-        "/users/**",
         "/links/**",
         "/failure-report-list/**",
         "/admin-dashboard/**"
