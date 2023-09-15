@@ -35,11 +35,13 @@ Cypress.Commands.add("pageIsNotLoading", () => {
 
 Cypress.Commands.add("loginAs", (username) => {
   const password = "password"
+  const token = btoa(`${username}:${password}`);
   cy.request({
-    method: "POST",
-    url: "/login",
-    form: true,
-    body: { username, password },
+    method: "GET",
+    url: "/api/healthcheck",
+    headers: {
+      'Authorization': `Basic ${token}`
+    },
   }).then((response) => {
     expect(response.status).to.equal(200)
   })

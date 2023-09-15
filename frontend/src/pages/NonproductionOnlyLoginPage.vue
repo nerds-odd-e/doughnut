@@ -1,5 +1,6 @@
 <template>
   <h2>This login page is for test and development only</h2>
+  <h3>Please sign in</h3>
   <p>
     It will redirect to the following url after login
     <br />
