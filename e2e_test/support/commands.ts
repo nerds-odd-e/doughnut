@@ -387,8 +387,9 @@ Cypress.Commands.add("findNoteDetailsOnCurrentPage", (expected: string) => {
 Cypress.Commands.add("findCardTitle", (topic) => cy.findByText(topic, { selector: "a.card-title" }))
 
 Cypress.Commands.add("yesIRemember", () => {
+  cy.findByRole("button", { name: "Yes, I remember" })
   cy.tick(11 * 1000).then(() => {
-    cy.findByRole("button", { name: "Yes, I remember" }).click()
+    cy.findByRole("button", { name: "Yes, I remember" }).click({})
   })
 })
 

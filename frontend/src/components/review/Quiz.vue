@@ -1,25 +1,27 @@
 <template>
   <div v-if="!minimized" class="content">
     <div class="inner-box">
-      <template v-if="currentQuestionFetched">
-        <div v-if="!currentQuizQuestion">
-          <JustReview
+      <LoadingPage :content-exists="currentQuestionFetched">
+        <template v-if="currentQuestionFetched">
+          <div v-if="!currentQuizQuestion">
+            <JustReview
+              v-bind="{
+                reviewPointId: currentReviewPointId,
+                storageAccessor,
+              }"
+              @reviewed="onAnswered($event)"
+            />
+          </div>
+          <QuizQuestion
+            v-else
             v-bind="{
-              reviewPointId: currentReviewPointId,
-              storageAccessor,
+              quizQuestion: currentQuizQuestion,
             }"
-            @reviewed="onAnswered($event)"
+            @answered="onAnswered($event)"
+            :key="currentQuizQuestion.quizQuestionId"
           />
-        </div>
-        <QuizQuestion
-          v-else
-          v-bind="{
-            quizQuestion: currentQuizQuestion,
-          }"
-          @answered="onAnswered($event)"
-          :key="currentQuizQuestion.quizQuestionId"
-        />
-      </template>
+        </template>
+      </LoadingPage>
     </div>
   </div>
 </template>
@@ -31,6 +33,7 @@ import QuizQuestion from "./QuizQuestion.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import JustReview from "./JustReview.vue";
+import LoadingPage from "../../pages/commons/LoadingPage.vue";
 
 export default defineComponent({
   setup() {
@@ -59,6 +62,7 @@ export default defineComponent({
   components: {
     QuizQuestion,
     JustReview,
+    LoadingPage,
   },
   data() {
     return {
