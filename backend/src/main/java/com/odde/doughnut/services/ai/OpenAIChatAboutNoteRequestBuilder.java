@@ -158,7 +158,7 @@ please critically check if the following question makes sense and is possible to
 
   public OpenAIChatAboutNoteRequestBuilder
       userInstructionToGenerateQuestionWithGPT35FineTunedModel() {
-    this.model = "ft:gpt-3.5-turbo-0613:odd-e::7yuGEXGk";
+    this.model = "ft:gpt-3.5-turbo-0613:odd-e::7zG0iC8t";
 
     String messageBody =
         "Please assume the role of a Memory Assistant. Generate a MCQ based on the note of current focus in its context path.";
