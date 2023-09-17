@@ -67,4 +67,9 @@ public class ReviewPointBuilder extends EntityBuilder<ReviewPoint> {
     entity.setRemovedFromReview(true);
     return this;
   }
+
+  public ReviewPointBuilder nextReviewAt(Timestamp timestamp) {
+    entity.setNextReviewAt(timestamp);
+    return this;
+  }
 }

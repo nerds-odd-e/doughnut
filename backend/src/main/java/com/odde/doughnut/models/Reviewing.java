@@ -89,9 +89,9 @@ public class Reviewing {
         .map(modelFactoryService::toSubscriptionModel);
   }
 
-  public DueReviewPoints getDueReviewPoints(Integer dueInDays) {
+  public DueReviewPoints getDueReviewPoints(Integer dueInDays, ZoneId timeZone) {
     List<Integer> toRepeat =
-        getReviewPointsNeedToRepeat(dueInDays == null ? 0 : dueInDays, userModel.getTimeZone())
+        getReviewPointsNeedToRepeat(dueInDays == null ? 0 : dueInDays, timeZone)
             .map(ReviewPoint::getId)
             .toList();
     DueReviewPoints dueReviewPoints = new DueReviewPoints();

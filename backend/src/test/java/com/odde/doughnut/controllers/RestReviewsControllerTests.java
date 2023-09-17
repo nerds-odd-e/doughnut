@@ -12,12 +12,14 @@ import com.odde.doughnut.entities.AnsweredQuestion;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.json.DueReviewPoints;
 import com.odde.doughnut.entities.json.InitialInfo;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
+import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -90,6 +92,16 @@ class RestReviewsControllerTests {
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       assertThrows(ResponseStatusException.class, () -> nullUserController().repeatReview(null));
+    }
+
+    @Test
+    void shouldGetTheDueReviewPointsBasedOnTimezone() {
+      Note note = makeMe.aNote().please();
+      Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
+      makeMe.aReviewPointFor(note).nextReviewAt(currentTime).by(currentUser).please();
+      testabilitySettings.timeTravelTo(currentTime);
+      DueReviewPoints dueReviewPoints = controller.repeatReview(null);
+      assertThat(dueReviewPoints.getToRepeat(), hasSize(1));
     }
   }
 

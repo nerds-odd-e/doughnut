@@ -81,7 +81,7 @@ class RestReviewsController {
       @RequestParam(value = "dueindays", required = false) Integer dueInDays) {
     currentUser.assertLoggedIn();
     Reviewing reviewing = currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
-    return reviewing.getDueReviewPoints(dueInDays);
+    return reviewing.getDueReviewPoints(dueInDays, currentUser.getTimeZone());
   }
 
   @GetMapping(path = "/answers/{answer}")
