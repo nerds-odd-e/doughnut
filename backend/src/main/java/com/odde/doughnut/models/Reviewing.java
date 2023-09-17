@@ -13,25 +13,27 @@ import java.util.stream.Stream;
 public class Reviewing {
   private final UserModel userModel;
   private final Timestamp currentUTCTimestamp;
+  private final ZoneId timeZone;
   private final ModelFactoryService modelFactoryService;
 
   public Reviewing(
-      UserModel user, Timestamp currentUTCTimestamp, ModelFactoryService modelFactoryService) {
+      UserModel user,
+      Timestamp currentUTCTimestamp,
+      ZoneId timeZone,
+      ModelFactoryService modelFactoryService) {
     userModel = user;
     this.currentUTCTimestamp = currentUTCTimestamp;
+    this.timeZone = timeZone;
     this.modelFactoryService = modelFactoryService;
   }
 
-  public Stream<ReviewPoint> getDueInitialReviewPoints(ZoneId timeZone) {
-    int count = remainingDailyNewNotesCount(timeZone);
+  public Stream<ReviewPoint> getDueInitialReviewPoints() {
+    int count = remainingDailyNewNotesCount();
     if (count == 0) {
       return Stream.empty();
     }
     List<Integer> alreadyInitialReviewed =
-        getNewReviewPointsOfToday(timeZone).stream()
-            .map(ReviewPoint::getThing)
-            .map(Thing::getId)
-            .toList();
+        getNewReviewPointsOfToday().stream().map(ReviewPoint::getThing).map(Thing::getId).toList();
     return Stream.concat(
             getSubscriptionModelStream()
                 .flatMap(
@@ -49,7 +51,7 @@ public class Reviewing {
         .map(ReviewPoint::buildReviewPointForThing);
   }
 
-  private Stream<ReviewPoint> getReviewPointsNeedToRepeat(int dueInDays, ZoneId timeZone) {
+  private Stream<ReviewPoint> getReviewPointsNeedToRepeat(int dueInDays) {
     return userModel.getReviewPointsNeedToRepeat(
         TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, dueInDays * 24), timeZone);
   }
@@ -67,19 +69,19 @@ public class Reviewing {
     return reviewScope.getThingsHaveNotBeenReviewedAtAllCount();
   }
 
-  private int toInitialReviewCount(ZoneId timeZone) {
-    if (getDueInitialReviewPoints(timeZone).findFirst().isEmpty()) {
+  private int toInitialReviewCount() {
+    if (getDueInitialReviewPoints().findFirst().isEmpty()) {
       return 0;
     }
-    return Math.min(remainingDailyNewNotesCount(timeZone), notLearntCount());
+    return Math.min(remainingDailyNewNotesCount(), notLearntCount());
   }
 
-  private int remainingDailyNewNotesCount(ZoneId timeZone) {
-    long sameDayCount = getNewReviewPointsOfToday(timeZone).size();
+  private int remainingDailyNewNotesCount() {
+    long sameDayCount = getNewReviewPointsOfToday().size();
     return (int) (userModel.entity.getDailyNewNotesCount() - sameDayCount);
   }
 
-  private List<ReviewPoint> getNewReviewPointsOfToday(ZoneId timeZone) {
+  private List<ReviewPoint> getNewReviewPointsOfToday() {
     Timestamp oneDayAgo = TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, -24);
     return userModel.getRecentReviewPoints(oneDayAgo).stream()
         .filter(p -> userModel.isInitialReviewOnSameDay(p, currentUTCTimestamp, timeZone))
@@ -92,9 +94,9 @@ public class Reviewing {
         .map(modelFactoryService::toSubscriptionModel);
   }
 
-  public DueReviewPoints getDueReviewPoints(Integer dueInDays, ZoneId timeZone) {
+  public DueReviewPoints getDueReviewPoints(Integer dueInDays) {
     List<Integer> toRepeat =
-        getReviewPointsNeedToRepeat(dueInDays == null ? 0 : dueInDays, timeZone)
+        getReviewPointsNeedToRepeat(dueInDays == null ? 0 : dueInDays)
             .map(ReviewPoint::getId)
             .toList();
     DueReviewPoints dueReviewPoints = new DueReviewPoints();
@@ -103,12 +105,12 @@ public class Reviewing {
     return dueReviewPoints;
   }
 
-  public ReviewStatus getReviewStatus(ZoneId timeZone) {
+  public ReviewStatus getReviewStatus() {
     ReviewStatus reviewStatus = new ReviewStatus();
-    reviewStatus.toRepeatCount = (int) getReviewPointsNeedToRepeat(0, timeZone).count();
+    reviewStatus.toRepeatCount = (int) getReviewPointsNeedToRepeat(0).count();
     reviewStatus.learntCount = userModel.learntCount();
     reviewStatus.notLearntCount = notLearntCount();
-    reviewStatus.toInitialReviewCount = toInitialReviewCount(timeZone);
+    reviewStatus.toInitialReviewCount = toInitialReviewCount();
 
     return reviewStatus;
   }

@@ -30,7 +30,7 @@ public class ReviewingInitialReviewTest {
   Reviewing reviewingOnDay1;
 
   public ReviewPoint getOneInitialReviewPoint(Reviewing reviewing) {
-    return reviewing.getDueInitialReviewPoints(ZoneId.of("Asia/Shanghai")).findFirst().orElse(null);
+    return reviewing.getDueInitialReviewPoints().findFirst().orElse(null);
   }
 
   @BeforeEach
@@ -39,16 +39,14 @@ public class ReviewingInitialReviewTest {
     anotherUser = makeMe.aUser().toModelPlease();
     day1 = makeMe.aTimestamp().of(1, 8).forWhereTheUserIs(userModel).please();
     day0 = makeMe.aTimestamp().of(0, 8).forWhereTheUserIs(userModel).please();
-    reviewingOnDay1 = userModel.createReviewing(day1);
+    reviewingOnDay1 = userModel.createReviewing(day1, ZoneId.of("Asia/Shanghai"));
   }
 
   @Test
   void whenThereIsNoNotesForUser() {
     makeMe.aNote().creatorAndOwner(anotherUser).please();
     assertThat(getOneInitialReviewPoint(reviewingOnDay1), is(nullValue()));
-    assertThat(
-        reviewingOnDay1.getReviewStatus(ZoneId.of("Asia/Shanghai")).toInitialReviewCount,
-        equalTo(0));
+    assertThat(reviewingOnDay1.getReviewStatus().toInitialReviewCount, equalTo(0));
   }
 
   @Nested
@@ -65,14 +63,10 @@ public class ReviewingInitialReviewTest {
 
     @Test
     void shouldReturnTheFirstNoteAndThenTheSecondWhenThereAreTwo() {
-      assertThat(
-          reviewingOnDay1.getReviewStatus(ZoneId.of("Asia/Shanghai")).toInitialReviewCount,
-          equalTo(2));
+      assertThat(reviewingOnDay1.getReviewStatus().toInitialReviewCount, equalTo(2));
       assertThat(getOneInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note1));
       makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
-      assertThat(
-          reviewingOnDay1.getReviewStatus(ZoneId.of("Asia/Shanghai")).toInitialReviewCount,
-          equalTo(1));
+      assertThat(reviewingOnDay1.getReviewStatus().toInitialReviewCount, equalTo(1));
       assertThat(getOneInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note2));
     }
 
@@ -102,9 +96,7 @@ public class ReviewingInitialReviewTest {
       }
 
       private List<ReviewPoint> getAllDueReviewPoints() {
-        return reviewingOnDay1
-            .getDueInitialReviewPoints(ZoneId.of("Asia/Shanghai"))
-            .collect(Collectors.toList());
+        return reviewingOnDay1.getDueInitialReviewPoints().collect(Collectors.toList());
       }
 
       @Test
@@ -199,7 +191,7 @@ public class ReviewingInitialReviewTest {
       void theDailyCountShouldNotBeResetOnSameDayDifferentHour() {
         makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
         Timestamp day1_23 = makeMe.aTimestamp().of(1, 23).forWhereTheUserIs(userModel).please();
-        Reviewing reviewing = userModel.createReviewing(day1_23);
+        Reviewing reviewing = userModel.createReviewing(day1_23, ZoneId.of("Asia/Shanghai"));
         assertThat(getOneInitialReviewPoint(reviewing), is(nullValue()));
       }
 
@@ -207,7 +199,7 @@ public class ReviewingInitialReviewTest {
       void theDailyCountShouldBeResetOnNextDay() {
         makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
         Timestamp day2 = makeMe.aTimestamp().of(2, 1).forWhereTheUserIs(userModel).please();
-        Reviewing reviewing = userModel.createReviewing(day2);
+        Reviewing reviewing = userModel.createReviewing(day2, ZoneId.of("Asia/Shanghai"));
         assertThat(getOneInitialReviewPoint(reviewing).getNote(), equalTo(note2));
       }
     }

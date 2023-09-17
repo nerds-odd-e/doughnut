@@ -48,19 +48,19 @@ class RestReviewsController {
   public ReviewStatus overview() {
     currentUser.assertLoggedIn();
     return currentUser
-        .createReviewing(testabilitySettings.getCurrentUTCTimestamp())
-        .getReviewStatus(currentUser.getTimeZone());
+        .createReviewing(testabilitySettings.getCurrentUTCTimestamp(), currentUser.getTimeZone())
+        .getReviewStatus();
   }
 
   @GetMapping("/initial")
   @Transactional(readOnly = true)
   public List<ReviewPoint> initialReview() {
     currentUser.assertLoggedIn();
-    Reviewing reviewing = currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
+    Reviewing reviewing =
+        currentUser.createReviewing(
+            testabilitySettings.getCurrentUTCTimestamp(), currentUser.getTimeZone());
 
-    return reviewing
-        .getDueInitialReviewPoints(currentUser.getTimeZone())
-        .collect(Collectors.toList());
+    return reviewing.getDueInitialReviewPoints().collect(Collectors.toList());
   }
 
   @PostMapping(path = "")
@@ -84,9 +84,10 @@ class RestReviewsController {
       @RequestParam(value = "timezone") String timezone,
       @RequestParam(value = "dueindays", required = false) Integer dueInDays) {
     currentUser.assertLoggedIn();
-    Reviewing reviewing = currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
     ZoneId timeZone = ZoneId.of(timezone);
-    return reviewing.getDueReviewPoints(dueInDays, timeZone);
+    Reviewing reviewing =
+        currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp(), timeZone);
+    return reviewing.getDueReviewPoints(dueInDays);
   }
 
   @GetMapping(path = "/answers/{answer}")

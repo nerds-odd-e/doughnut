@@ -66,8 +66,8 @@ public class UserModel implements ReviewScope {
     return modelFactoryService.reviewPointRepository.countByUserNotRemoved(entity);
   }
 
-  public Reviewing createReviewing(Timestamp currentUTCTimestamp) {
-    return new Reviewing(this, currentUTCTimestamp, modelFactoryService);
+  public Reviewing createReviewing(Timestamp currentUTCTimestamp, ZoneId timeZone) {
+    return new Reviewing(this, currentUTCTimestamp, timeZone, modelFactoryService);
   }
 
   private void save() {
