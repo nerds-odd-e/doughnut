@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +30,7 @@ public class ReviewingInitialReviewTest {
   Reviewing reviewingOnDay1;
 
   public ReviewPoint getOneInitialReviewPoint(Reviewing reviewing) {
-    return reviewing.getDueInitialReviewPoints().findFirst().orElse(null);
+    return reviewing.getDueInitialReviewPoints(ZoneId.of("Asia/Shanghai")).findFirst().orElse(null);
   }
 
   @BeforeEach
@@ -45,7 +46,9 @@ public class ReviewingInitialReviewTest {
   void whenThereIsNoNotesForUser() {
     makeMe.aNote().creatorAndOwner(anotherUser).please();
     assertThat(getOneInitialReviewPoint(reviewingOnDay1), is(nullValue()));
-    assertThat(reviewingOnDay1.getReviewStatus().toInitialReviewCount, equalTo(0));
+    assertThat(
+        reviewingOnDay1.getReviewStatus(ZoneId.of("Asia/Shanghai")).toInitialReviewCount,
+        equalTo(0));
   }
 
   @Nested
@@ -62,10 +65,14 @@ public class ReviewingInitialReviewTest {
 
     @Test
     void shouldReturnTheFirstNoteAndThenTheSecondWhenThereAreTwo() {
-      assertThat(reviewingOnDay1.getReviewStatus().toInitialReviewCount, equalTo(2));
+      assertThat(
+          reviewingOnDay1.getReviewStatus(ZoneId.of("Asia/Shanghai")).toInitialReviewCount,
+          equalTo(2));
       assertThat(getOneInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note1));
       makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
-      assertThat(reviewingOnDay1.getReviewStatus().toInitialReviewCount, equalTo(1));
+      assertThat(
+          reviewingOnDay1.getReviewStatus(ZoneId.of("Asia/Shanghai")).toInitialReviewCount,
+          equalTo(1));
       assertThat(getOneInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note2));
     }
 
@@ -95,7 +102,9 @@ public class ReviewingInitialReviewTest {
       }
 
       private List<ReviewPoint> getAllDueReviewPoints() {
-        return reviewingOnDay1.getDueInitialReviewPoints().collect(Collectors.toList());
+        return reviewingOnDay1
+            .getDueInitialReviewPoints(ZoneId.of("Asia/Shanghai"))
+            .collect(Collectors.toList());
       }
 
       @Test

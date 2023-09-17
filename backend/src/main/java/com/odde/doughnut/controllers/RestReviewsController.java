@@ -49,7 +49,7 @@ class RestReviewsController {
     currentUser.assertLoggedIn();
     return currentUser
         .createReviewing(testabilitySettings.getCurrentUTCTimestamp())
-        .getReviewStatus();
+        .getReviewStatus(currentUser.getTimeZone());
   }
 
   @GetMapping("/initial")
@@ -58,7 +58,9 @@ class RestReviewsController {
     currentUser.assertLoggedIn();
     Reviewing reviewing = currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
 
-    return reviewing.getDueInitialReviewPoints().collect(Collectors.toList());
+    return reviewing
+        .getDueInitialReviewPoints(currentUser.getTimeZone())
+        .collect(Collectors.toList());
   }
 
   @PostMapping(path = "")

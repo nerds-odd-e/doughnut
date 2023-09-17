@@ -74,8 +74,9 @@ public class UserModel implements ReviewScope {
     modelFactoryService.entityManager.persist(entity);
   }
 
-  boolean isInitialReviewOnSameDay(ReviewPoint reviewPoint, Timestamp currentUTCTimestamp) {
-    return reviewPoint.isInitialReviewOnSameDay(currentUTCTimestamp, getTimeZone());
+  boolean isInitialReviewOnSameDay(
+      ReviewPoint reviewPoint, Timestamp currentUTCTimestamp, ZoneId timeZone) {
+    return reviewPoint.isInitialReviewOnSameDay(currentUTCTimestamp, timeZone);
   }
 
   public ZoneId getTimeZone() {
