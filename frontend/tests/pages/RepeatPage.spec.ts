@@ -48,6 +48,25 @@ describe("repeat page", () => {
     return wrapper;
   };
 
+  beforeAll(() => {
+    const resolvedOptionsOriginal =
+      Intl.DateTimeFormat.prototype.resolvedOptions;
+
+    vitest
+      .spyOn(Intl.DateTimeFormat.prototype, "resolvedOptions")
+      .mockImplementation(function mockResolvedOptions(
+        this: Intl.DateTimeFormat,
+      ) {
+        const options = resolvedOptionsOriginal.call(this);
+        options.timeZone = "Asia/Shanghai";
+        return options;
+      });
+  });
+
+  afterAll(() => {
+    vitest.restoreAllMocks();
+  });
+
   it("redirect to review page if nothing to repeat", async () => {
     const repetition = makeMe.aDueReviewPointsList.please();
     const wrapper = await mountPage(repetition);
