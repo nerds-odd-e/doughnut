@@ -10,6 +10,7 @@ import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
+import java.time.ZoneId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -92,9 +93,8 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
           Integer lastRepeatHour, Integer currentHour, Boolean expectedToRepeat) {
         ReviewPoint reviewPoint = makeMe.aReviewPointFor(note).by(userModel).please();
         reviewPoint.setNextReviewAt(
-            makeMe.aTimestamp().of(2, lastRepeatHour).forWhereTheUserIs(userModel).please());
-        final Timestamp timestamp =
-            makeMe.aTimestamp().of(2, currentHour).forWhereTheUserIs(userModel).please();
+            makeMe.aTimestamp().of(2, lastRepeatHour).fromShanghai().please());
+        final Timestamp timestamp = makeMe.aTimestamp().of(2, currentHour).fromShanghai().please();
         ReviewPoint mostUrgentReviewPoint = getOneReviewPointNeedToRepeat(timestamp);
         assertThat(mostUrgentReviewPoint != null, is(expectedToRepeat));
       }
@@ -132,7 +132,7 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
 
   private ReviewPoint getOneReviewPointNeedToRepeat(Timestamp timestamp) {
     return userModel
-        .getReviewPointsNeedToRepeat(timestamp, userModel.getTimeZone())
+        .getReviewPointsNeedToRepeat(timestamp, ZoneId.of("Asia/Shanghai"))
         .findFirst()
         .orElse(null);
   }

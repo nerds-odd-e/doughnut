@@ -26,7 +26,7 @@ public class ReviewPointModelTest {
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    day1 = makeMe.aTimestamp().of(1, 8).forWhereTheUserIs(userModel).please();
+    day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
   }
 
   @Nested
