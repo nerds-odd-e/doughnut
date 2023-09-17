@@ -1,6 +1,5 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.Thing;
@@ -56,8 +55,8 @@ public class UserModel implements ReviewScope {
         entity, since);
   }
 
-  public Stream<ReviewPoint> getReviewPointsNeedToRepeat(Timestamp currentUTCTimestamp) {
-    final ZoneId timeZone = getTimeZone();
+  public Stream<ReviewPoint> getReviewPointsNeedToRepeat(
+      Timestamp currentUTCTimestamp, ZoneId timeZone) {
     final Timestamp timestamp = TimestampOperations.alignByHalfADay(currentUTCTimestamp, timeZone);
     return modelFactoryService.reviewPointRepository
         .findAllByUserAndNextReviewAtLessThanEqualOrderByNextReviewAt(getEntity(), timestamp);
@@ -83,10 +82,6 @@ public class UserModel implements ReviewScope {
     return ZoneId.of("Asia/Shanghai");
   }
 
-  public ReviewPoint getReviewPointFor(Link link) {
-    return getReviewPointFor(link.getThing());
-  }
-
   public ReviewPoint getReviewPointFor(Note note) {
     return getReviewPointFor(note.getThing());
   }
@@ -101,12 +96,6 @@ public class UserModel implements ReviewScope {
 
   public <T> void assertReadAuthorization(T object) throws UnexpectedNoAccessRightException {
     getAuthorization().assertReadAuthorization(object);
-  }
-
-  public <T> void assertReadAuthorization(List<T> objects) throws UnexpectedNoAccessRightException {
-    for (var object : objects) {
-      getAuthorization().assertReadAuthorization(object);
-    }
   }
 
   public void assertAdminAuthorization() throws UnexpectedNoAccessRightException {

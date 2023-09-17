@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.json.DueReviewPoints;
 import com.odde.doughnut.entities.json.ReviewStatus;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -45,9 +46,9 @@ public class Reviewing {
         .map(ReviewPoint::buildReviewPointForThing);
   }
 
-  private Stream<ReviewPoint> getReviewPointsNeedToRepeat(int dueInDays) {
+  private Stream<ReviewPoint> getReviewPointsNeedToRepeat(int dueInDays, ZoneId timeZone) {
     return userModel.getReviewPointsNeedToRepeat(
-        TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, dueInDays * 24));
+        TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, dueInDays * 24), timeZone);
   }
 
   private int notLearntCount() {
@@ -88,9 +89,9 @@ public class Reviewing {
         .map(modelFactoryService::toSubscriptionModel);
   }
 
-  public DueReviewPoints getDueReviewPoints(Integer dueInDays, Randomizer randomizer) {
+  public DueReviewPoints getDueReviewPoints(Integer dueInDays) {
     List<Integer> toRepeat =
-        getReviewPointsNeedToRepeat(dueInDays == null ? 0 : dueInDays)
+        getReviewPointsNeedToRepeat(dueInDays == null ? 0 : dueInDays, userModel.getTimeZone())
             .map(ReviewPoint::getId)
             .toList();
     DueReviewPoints dueReviewPoints = new DueReviewPoints();
@@ -101,7 +102,8 @@ public class Reviewing {
 
   public ReviewStatus getReviewStatus() {
     ReviewStatus reviewStatus = new ReviewStatus();
-    reviewStatus.toRepeatCount = (int) getReviewPointsNeedToRepeat(0).count();
+    reviewStatus.toRepeatCount =
+        (int) getReviewPointsNeedToRepeat(0, userModel.getTimeZone()).count();
     reviewStatus.learntCount = userModel.learntCount();
     reviewStatus.notLearntCount = notLearntCount();
     reviewStatus.toInitialReviewCount = toInitialReviewCount();
