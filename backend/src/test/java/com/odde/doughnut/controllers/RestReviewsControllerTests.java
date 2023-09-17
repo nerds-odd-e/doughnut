@@ -16,6 +16,7 @@ import com.odde.doughnut.entities.json.DueReviewPoints;
 import com.odde.doughnut.entities.json.InitialInfo;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -25,6 +26,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -91,17 +94,35 @@ class RestReviewsControllerTests {
   class repeat {
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-      assertThrows(ResponseStatusException.class, () -> nullUserController().repeatReview(null));
+      assertThrows(
+          ResponseStatusException.class,
+          () -> nullUserController().repeatReview("Asia/Shanghai", null));
     }
 
-    @Test
-    void shouldGetTheDueReviewPointsBasedOnTimezone() {
-      Note note = makeMe.aNote().please();
+    @ParameterizedTest
+    @CsvSource(
+        useHeadersInDisplayName = true,
+        delimiter = '|',
+        textBlock =
+            """
+       next review at (in hours) | timezone     | expected count
+      #------------------------------------------------------------
+       -1                        | Asia/Tokyo   | 1
+       0                         | Asia/Tokyo   | 1
+       4                         | Asia/Tokyo   | 0
+       4                         | Europe/Paris | 1
+       12                        | Europe/Paris | 0
+       """)
+    void shouldGetReviewPointsBasedOnTimezone(
+        int nextReviewAtHours, String timezone, int expectedCount) {
       Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
-      makeMe.aReviewPointFor(note).nextReviewAt(currentTime).by(currentUser).please();
       testabilitySettings.timeTravelTo(currentTime);
-      DueReviewPoints dueReviewPoints = controller.repeatReview(null);
-      assertThat(dueReviewPoints.getToRepeat(), hasSize(1));
+      makeMe
+          .aReviewPointBy(currentUser)
+          .nextReviewAt(TimestampOperations.addHoursToTimestamp(currentTime, nextReviewAtHours))
+          .please();
+      DueReviewPoints dueReviewPoints = controller.repeatReview(timezone, null);
+      assertThat(dueReviewPoints.getToRepeat(), hasSize(expectedCount));
     }
   }
 

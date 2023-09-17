@@ -70,6 +70,11 @@ public class MakeMe extends MakeMeWithoutDB {
     return new ReviewPointBuilder(reviewPoint, this).forLink(link);
   }
 
+  public ReviewPointBuilder aReviewPointBy(UserModel user) {
+    Note note = aNote().please();
+    return aReviewPointFor(note).by(user);
+  }
+
   public CircleBuilder aCircle() {
     return new CircleBuilder(null, this);
   }

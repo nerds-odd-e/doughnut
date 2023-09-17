@@ -61,11 +61,7 @@ class RestReviewPointControllerTest {
 
       @Test
       void shouldNotBeAbleToSeeOthers() {
-        rp =
-            makeMe
-                .aReviewPointFor(makeMe.aHeadNote().please())
-                .by(makeMe.aUser().please())
-                .please();
+        rp = makeMe.aReviewPointBy(makeMe.aUser().toModelPlease()).please();
         assertThrows(UnexpectedNoAccessRightException.class, () -> controller.show(rp));
       }
 

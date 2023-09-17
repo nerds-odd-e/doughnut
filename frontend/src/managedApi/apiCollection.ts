@@ -113,7 +113,9 @@ const apiCollection = (managedApi: ManagedApi) => ({
 
     async getDueReviewPoints(dueInDays?: number) {
       const res = (await managedApi.restGet(
-        `reviews/repeat?dueindays=${dueInDays ?? ""}`,
+        `reviews/repeat?timezone=${encodeURIComponent(
+          "Asia/Shanghai",
+        )}&dueindays=${dueInDays ?? ""}`,
       )) as Generated.DueReviewPoints;
       return res;
     },

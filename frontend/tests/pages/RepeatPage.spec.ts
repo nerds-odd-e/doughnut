@@ -41,7 +41,7 @@ describe("repeat page", () => {
     repetition: Generated.DueReviewPoints | Record<string, never>,
   ) => {
     helper.apiMock
-      .expectingGet("/api/reviews/repeat?dueindays=0")
+      .expectingGet("/api/reviews/repeat?timezone=Asia%2FShanghai&dueindays=0")
       .andReturnOnce(repetition);
     const wrapper = renderer.currentRoute({ name: "repeat" }).mount();
     await flushPromises();

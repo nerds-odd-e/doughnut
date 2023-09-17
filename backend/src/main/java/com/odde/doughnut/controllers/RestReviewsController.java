@@ -12,6 +12,7 @@ import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.Reviewing;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
@@ -78,10 +79,12 @@ class RestReviewsController {
   @GetMapping(value = {"/repeat"})
   @Transactional
   public DueReviewPoints repeatReview(
+      @RequestParam(value = "timezone") String timezone,
       @RequestParam(value = "dueindays", required = false) Integer dueInDays) {
     currentUser.assertLoggedIn();
     Reviewing reviewing = currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
-    return reviewing.getDueReviewPoints(dueInDays, currentUser.getTimeZone());
+    ZoneId timeZone = ZoneId.of(timezone);
+    return reviewing.getDueReviewPoints(dueInDays, timeZone);
   }
 
   @GetMapping(path = "/answers/{answer}")
