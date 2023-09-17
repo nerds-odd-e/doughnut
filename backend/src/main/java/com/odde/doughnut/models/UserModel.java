@@ -79,10 +79,6 @@ public class UserModel implements ReviewScope {
     return reviewPoint.isInitialReviewOnSameDay(currentUTCTimestamp, timeZone);
   }
 
-  public ZoneId getTimeZone() {
-    return ZoneId.of("Asia/Shanghai");
-  }
-
   public ReviewPoint getReviewPointFor(Note note) {
     return getReviewPointFor(note.getThing());
   }

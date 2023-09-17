@@ -94,11 +94,9 @@ public class Reviewing {
         .map(modelFactoryService::toSubscriptionModel);
   }
 
-  public DueReviewPoints getDueReviewPoints(Integer dueInDays) {
+  public DueReviewPoints getDueReviewPoints(int dueInDays) {
     List<Integer> toRepeat =
-        getReviewPointsNeedToRepeat(dueInDays == null ? 0 : dueInDays)
-            .map(ReviewPoint::getId)
-            .toList();
+        getReviewPointsNeedToRepeat(dueInDays).map(ReviewPoint::getId).toList();
     DueReviewPoints dueReviewPoints = new DueReviewPoints();
     dueReviewPoints.setDueInDays(dueInDays);
     dueReviewPoints.setToRepeat(toRepeat);

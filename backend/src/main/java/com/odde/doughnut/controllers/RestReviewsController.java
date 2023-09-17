@@ -45,20 +45,21 @@ class RestReviewsController {
 
   @GetMapping("/overview")
   @Transactional(readOnly = true)
-  public ReviewStatus overview() {
+  public ReviewStatus overview(@RequestParam(value = "timezone") String timezone) {
     currentUser.assertLoggedIn();
+    ZoneId timeZone = ZoneId.of(timezone);
     return currentUser
-        .createReviewing(testabilitySettings.getCurrentUTCTimestamp(), currentUser.getTimeZone())
+        .createReviewing(testabilitySettings.getCurrentUTCTimestamp(), timeZone)
         .getReviewStatus();
   }
 
   @GetMapping("/initial")
   @Transactional(readOnly = true)
-  public List<ReviewPoint> initialReview() {
+  public List<ReviewPoint> initialReview(@RequestParam(value = "timezone") String timezone) {
     currentUser.assertLoggedIn();
+    ZoneId timeZone = ZoneId.of(timezone);
     Reviewing reviewing =
-        currentUser.createReviewing(
-            testabilitySettings.getCurrentUTCTimestamp(), currentUser.getTimeZone());
+        currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp(), timeZone);
 
     return reviewing.getDueInitialReviewPoints().collect(Collectors.toList());
   }
@@ -87,7 +88,7 @@ class RestReviewsController {
     ZoneId timeZone = ZoneId.of(timezone);
     Reviewing reviewing =
         currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp(), timeZone);
-    return reviewing.getDueReviewPoints(dueInDays);
+    return reviewing.getDueReviewPoints(dueInDays == null ? 0 : dueInDays);
   }
 
   @GetMapping(path = "/answers/{answer}")

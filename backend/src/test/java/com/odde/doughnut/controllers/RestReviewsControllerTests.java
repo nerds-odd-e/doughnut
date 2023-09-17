@@ -60,7 +60,8 @@ class RestReviewsControllerTests {
   class overall {
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-      assertThrows(ResponseStatusException.class, () -> nullUserController().overview());
+      assertThrows(
+          ResponseStatusException.class, () -> nullUserController().overview("Asia/Shanghai"));
     }
   }
 
@@ -71,13 +72,14 @@ class RestReviewsControllerTests {
       Note n = makeMe.aNote().creatorAndOwner(currentUser).please();
       makeMe.refresh(n);
       assertThat(n.getThing().getId(), notNullValue());
-      List<ReviewPoint> reviewPointWithReviewSettings = controller.initialReview();
+      List<ReviewPoint> reviewPointWithReviewSettings = controller.initialReview("Asia/Shanghai");
       assertThat(reviewPointWithReviewSettings, hasSize(1));
     }
 
     @Test
     void notLoggedIn() {
-      assertThrows(ResponseStatusException.class, () -> nullUserController().initialReview());
+      assertThrows(
+          ResponseStatusException.class, () -> nullUserController().initialReview("Asia/Shanghai"));
     }
   }
 

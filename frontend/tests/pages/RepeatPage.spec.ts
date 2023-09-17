@@ -1,6 +1,7 @@
 import { describe, it, vi, expect, beforeEach, afterEach } from "vitest";
 import { flushPromises } from "@vue/test-utils";
 import RepeatPage from "@/pages/RepeatPage.vue";
+import mockBrowserTimeZone from "../helpers/mockBrowserTimeZone";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 import RenderingHelper from "../helpers/RenderingHelper";
@@ -48,24 +49,7 @@ describe("repeat page", () => {
     return wrapper;
   };
 
-  beforeAll(() => {
-    const resolvedOptionsOriginal =
-      Intl.DateTimeFormat.prototype.resolvedOptions;
-
-    vitest
-      .spyOn(Intl.DateTimeFormat.prototype, "resolvedOptions")
-      .mockImplementation(function mockResolvedOptions(
-        this: Intl.DateTimeFormat,
-      ) {
-        const options = resolvedOptionsOriginal.call(this);
-        options.timeZone = "Asia/Shanghai";
-        return options;
-      });
-  });
-
-  afterAll(() => {
-    vitest.restoreAllMocks();
-  });
+  mockBrowserTimeZone("Asia/Shanghai", beforeEach, afterEach);
 
   it("redirect to review page if nothing to repeat", async () => {
     const repetition = makeMe.aDueReviewPointsList.please();
