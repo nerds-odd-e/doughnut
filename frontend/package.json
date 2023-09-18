@@ -14,7 +14,7 @@
     "@popperjs/core": "^2.11",
     "@vue/runtime-core": "3.3.4",
     "@vueup/vue-quill": "1.2.0",
-    "bootstrap": "5.3.1",
+    "bootstrap": "5.3.2",
     "gsap": "^3.11",
     "lodash": "^4.17",
     "mini-debounce": "^1.0.8",
@@ -65,6 +65,6 @@
     "vitest": "0.34.4",
     "vitest-dom": "^0.1",
     "vitest-fetch-mock": "^0.2.2",
-    "vue-tsc": "1.8.10"
+    "vue-tsc": "1.8.11"
   }
 }
