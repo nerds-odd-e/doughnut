@@ -39,7 +39,7 @@ public class RestAiController {
       @PathVariable(name = "note") Note note,
       @RequestBody AiCompletionRequest aiCompletionRequest) {
     currentUser.assertLoggedIn();
-    return aiAdvisorService.getAiCompletion(aiCompletionRequest, note.getContextPathString());
+    return aiAdvisorService.getAiCompletion(aiCompletionRequest, note.getContextPathString(), note);
   }
 
   @PostMapping("/chat")

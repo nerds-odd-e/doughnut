@@ -8,13 +8,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.AiCompletion;
 import com.odde.doughnut.entities.json.AiCompletionRequest;
 import com.odde.doughnut.entities.json.ApiError;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
-import com.odde.doughnut.testability.MakeMeWithoutDB;
+import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.image.Image;
@@ -35,7 +36,7 @@ class AiAdvisorServiceTest {
 
   private AiAdvisorService aiAdvisorService;
   @Mock private OpenAiApi openAiApi;
-  MakeMeWithoutDB makeMe = new MakeMeWithoutDB();
+  MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
 
   @BeforeEach
   void Setup() {
@@ -110,7 +111,9 @@ class AiAdvisorServiceTest {
   }
 
   private AiCompletion getAiCompletionFromAdvisor(String incompleteContent) {
-    return aiAdvisorService.getAiCompletion(new AiCompletionRequest("", incompleteContent), "");
+    Note note = makeMe.aNote().inMemoryPlease();
+    return aiAdvisorService.getAiCompletion(
+        new AiCompletionRequest("", incompleteContent), "", note);
   }
 
   @Nested
