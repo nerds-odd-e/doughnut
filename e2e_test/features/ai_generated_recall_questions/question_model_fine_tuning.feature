@@ -19,3 +19,9 @@ Feature: Generate Training Data from marked questions
   Scenario: User haven't marked any question as good
     When I ask to generate a question for note "Who Let the Dogs Out"
     Then an admin should be able to download the training data with 0 record
+
+  @ignore
+  Scenario: User gave an suggestion for the stem part of the question
+    When I ask to generate a question for note "Who Let the Dogs Out"
+    And I suggest an improved question "Who wrote 'Who Let the Cats Out'?"
+    Then an admin should be able to download the training data with improved question "Who wrote 'Who Let the Cats Out'?" 
