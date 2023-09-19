@@ -38,7 +38,7 @@ const currentQuestion = (stem?: string) => {
           name: "send this question for fine tuning the question generation model",
         })
         .click()
-      cy.findByRole("textbox", { name: "suggestedquestion" }).type(suggestedQuestion)
+      //cy.findByRole("textbox", { name: "suggestedquestion" }).type(suggestedQuestion)
       cy.findByRole("button", { name: "OK" }).click()
       cy.pageIsNotLoading()
     },

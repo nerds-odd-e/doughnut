@@ -17,5 +17,10 @@ Given(
 
 Given(
   "an admin should be able to download the training data with improved question {string}",
-  (suggestedQuestion: string) => {}
+  (suggestedQuestion: string) => {
+    pageObjects
+    .loginAsAdminAndGoToAdminDashboard()
+    .downloadAIQuestionTrainingData()
+    .expectSuggestedQuestion(suggestedQuestion)   
+  }
 )
