@@ -21,7 +21,13 @@ Feature: Generate Training Data from marked questions
     Then an admin should be able to download the training data with 0 record
 
   @ignore
-  Scenario: User gave an suggestion for the stem part of the question
+  Scenario: User gives a suggestion for the stem part of the question
     When I ask to generate a question for note "Who Let the Dogs Out"
     And I suggest an improved question "Who wrote 'Who Let the Cats Out'?"
     Then an admin should be able to download the training data with improved question "Who wrote 'Who Let the Cats Out'?" 
+
+  @ignore
+  Scenario: User gives a suggestion for the choices part of the question
+    When I ask to generate a question for note "Who Let the Dogs Out"
+    And I suggest to replace one choice with "John Douglas"
+    Then an admin should be able to download the training data with improved choice with "John Douglas" 
