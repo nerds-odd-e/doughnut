@@ -1,6 +1,7 @@
 import { describe, it, vi, expect, beforeEach, afterEach } from "vitest";
 import { flushPromises } from "@vue/test-utils";
 import RepeatPage from "@/pages/RepeatPage.vue";
+import mockBrowserTimeZone from "../helpers/mockBrowserTimeZone";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 import RenderingHelper from "../helpers/RenderingHelper";
@@ -41,12 +42,14 @@ describe("repeat page", () => {
     repetition: Generated.DueReviewPoints | Record<string, never>,
   ) => {
     helper.apiMock
-      .expectingGet("/api/reviews/repeat?dueindays=0")
+      .expectingGet("/api/reviews/repeat?timezone=Asia%2FShanghai&dueindays=0")
       .andReturnOnce(repetition);
     const wrapper = renderer.currentRoute({ name: "repeat" }).mount();
     await flushPromises();
     return wrapper;
   };
+
+  mockBrowserTimeZone("Asia/Shanghai", beforeEach, afterEach);
 
   it("redirect to review page if nothing to repeat", async () => {
     const repetition = makeMe.aDueReviewPointsList.please();

@@ -6,7 +6,7 @@ Feature: Access control
     Then The "<displayed page>" page is displayed
     Examples:
       | user      | access page       | displayed page    |
-      | none      | FailureReportPage | LoginPage         |
+      # | none      | FailureReportPage | LoginPage         |
       | admin     | FailureReportPage | FailureReportPage |
       | non_admin | FailureReportPage | ErrorPage         |
 

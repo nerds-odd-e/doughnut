@@ -35,11 +35,13 @@ Cypress.Commands.add("pageIsNotLoading", () => {
 
 Cypress.Commands.add("loginAs", (username) => {
   const password = "password"
+  const token = btoa(`${username}:${password}`)
   cy.request({
-    method: "POST",
-    url: "/login",
-    form: true,
-    body: { username, password },
+    method: "GET",
+    url: "/api/healthcheck",
+    headers: {
+      Authorization: `Basic ${token}`,
+    },
   }).then((response) => {
     expect(response.status).to.equal(200)
   })
@@ -387,8 +389,9 @@ Cypress.Commands.add("findNoteDetailsOnCurrentPage", (expected: string) => {
 Cypress.Commands.add("findCardTitle", (topic) => cy.findByText(topic, { selector: "a.card-title" }))
 
 Cypress.Commands.add("yesIRemember", () => {
+  cy.findByRole("button", { name: "Yes, I remember" })
   cy.tick(11 * 1000).then(() => {
-    cy.findByRole("button", { name: "Yes, I remember" }).click()
+    cy.findByRole("button", { name: "Yes, I remember" }).click({})
   })
 })
 

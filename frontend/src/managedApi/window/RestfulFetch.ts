@@ -51,8 +51,18 @@ const request = async (
   if (res.status === 200 || res.status === 204 || res.status === 400) {
     return res;
   }
-  if (res.status === 401 && method === "GET") {
-    await loginOrRegisterAndHaltThisThread();
+  if (res.status === 401) {
+    if (method === "GET") {
+      await loginOrRegisterAndHaltThisThread();
+    }
+    if (
+      // eslint-disable-next-line no-alert
+      window.confirm(
+        "You are logged out. Do you want to log in (and lose the current changes)?",
+      )
+    ) {
+      await loginOrRegisterAndHaltThisThread();
+    }
   }
   throw new HttpResponseError(res.status);
 };

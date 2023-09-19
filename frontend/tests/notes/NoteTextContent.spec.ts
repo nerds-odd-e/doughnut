@@ -103,21 +103,6 @@ describe("in place edit on title", () => {
     expect(expectedErrors.topic).toBeUndefined();
   });
 
-  it("should display error when no authorization to save", async () => {
-    const wrapper = mountComponent(note);
-    helper.apiMock
-      .expectingPatch(`/api/text_content/${note.id}`)
-      .andRespondOnce({
-        status: 401,
-      });
-    await editTitle(wrapper);
-    await flushPromises();
-    const { errors } = wrapper.vm.$data as { errors: { topic: string } };
-    expect(errors.topic).toBe(
-      "You are not authorized to edit this note. Perhaps you are not logged in?",
-    );
-  });
-
   it("should not trigger changes for initial details content", async () => {
     note.details = "initial\n\ndescription";
     const wrapper = mountComponent(note);
@@ -137,5 +122,34 @@ describe("in place edit on title", () => {
       wrapper.find<HTMLInputElement>('[role="topic"] input').element.value,
     ).toBe("updated");
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
+  });
+
+  describe("with mocked window.confirm", () => {
+    // eslint-disable-next-line no-alert
+    const jsdomConfirm = window.confirm;
+    beforeEach(() => {
+      // eslint-disable-next-line no-alert
+      window.confirm = () => false;
+    });
+
+    afterEach(() => {
+      // eslint-disable-next-line no-alert
+      window.confirm = jsdomConfirm;
+    });
+
+    it("should display error when no authorization to save", async () => {
+      const wrapper = mountComponent(note);
+      helper.apiMock
+        .expectingPatch(`/api/text_content/${note.id}`)
+        .andRespondOnce({
+          status: 401,
+        });
+      await editTitle(wrapper);
+      await flushPromises();
+      const { errors } = wrapper.vm.$data as { errors: { topic: string } };
+      expect(errors.topic).toBe(
+        "You are not authorized to edit this note. Perhaps you are not logged in?",
+      );
+    });
   });
 });

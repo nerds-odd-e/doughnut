@@ -4,5 +4,6 @@ Use this file to track the flaky tests in the e2e test.
 notes/note_edit_accessories.feature/Edit a note
   * 2023 09 10: Timeout finding the "Upload Picture"
   * 2023 09 10: Timeout finding the "Upload Picture"
+  * 2023 09 18: Timeout finding the "Upload Picture"
 
 

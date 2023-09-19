@@ -12,6 +12,7 @@ import FailureReportListPage from "@/pages/FailureReportListPage.vue";
 import FailureReportPage from "@/pages/FailureReportPage.vue";
 import AnsweredQuestionPage from "@/pages/AnsweredQuestionPage.vue";
 import AdminDashboard from "@/pages/AdminDashboard.vue";
+import NonproductionOnlyLoginPage from "@/pages/NonproductionOnlyLoginPage.vue";
 import NestedPage from "../pages/commons/NestedPage";
 
 const NestedInitialReviewPage = NestedPage(InitialReviewPage, "initial");
@@ -104,6 +105,11 @@ const routes = [
     name: "failureReport",
     component: FailureReportPage,
     props: true,
+  },
+  {
+    path: "/users/identify",
+    name: "nonproductionOnlyLogin",
+    component: NonproductionOnlyLoginPage,
   },
 ] as RouteRecordRaw[];
 

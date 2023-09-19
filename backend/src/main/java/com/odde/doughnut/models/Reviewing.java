@@ -6,18 +6,24 @@ import com.odde.doughnut.entities.json.DueReviewPoints;
 import com.odde.doughnut.entities.json.ReviewStatus;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Stream;
 
 public class Reviewing {
   private final UserModel userModel;
   private final Timestamp currentUTCTimestamp;
+  private final ZoneId timeZone;
   private final ModelFactoryService modelFactoryService;
 
   public Reviewing(
-      UserModel user, Timestamp currentUTCTimestamp, ModelFactoryService modelFactoryService) {
+      UserModel user,
+      Timestamp currentUTCTimestamp,
+      ZoneId timeZone,
+      ModelFactoryService modelFactoryService) {
     userModel = user;
     this.currentUTCTimestamp = currentUTCTimestamp;
+    this.timeZone = timeZone;
     this.modelFactoryService = modelFactoryService;
   }
 
@@ -47,7 +53,7 @@ public class Reviewing {
 
   private Stream<ReviewPoint> getReviewPointsNeedToRepeat(int dueInDays) {
     return userModel.getReviewPointsNeedToRepeat(
-        TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, dueInDays * 24));
+        TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, dueInDays * 24), timeZone);
   }
 
   private int notLearntCount() {
@@ -78,7 +84,7 @@ public class Reviewing {
   private List<ReviewPoint> getNewReviewPointsOfToday() {
     Timestamp oneDayAgo = TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, -24);
     return userModel.getRecentReviewPoints(oneDayAgo).stream()
-        .filter(p -> userModel.isInitialReviewOnSameDay(p, currentUTCTimestamp))
+        .filter(p -> userModel.isInitialReviewOnSameDay(p, currentUTCTimestamp, timeZone))
         .filter(p -> !p.getRemovedFromReview())
         .toList();
   }
@@ -88,11 +94,9 @@ public class Reviewing {
         .map(modelFactoryService::toSubscriptionModel);
   }
 
-  public DueReviewPoints getDueReviewPoints(Integer dueInDays, Randomizer randomizer) {
+  public DueReviewPoints getDueReviewPoints(int dueInDays) {
     List<Integer> toRepeat =
-        getReviewPointsNeedToRepeat(dueInDays == null ? 0 : dueInDays)
-            .map(ReviewPoint::getId)
-            .toList();
+        getReviewPointsNeedToRepeat(dueInDays).map(ReviewPoint::getId).toList();
     DueReviewPoints dueReviewPoints = new DueReviewPoints();
     dueReviewPoints.setDueInDays(dueInDays);
     dueReviewPoints.setToRepeat(toRepeat);

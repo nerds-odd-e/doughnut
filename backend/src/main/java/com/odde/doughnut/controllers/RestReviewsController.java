@@ -12,6 +12,7 @@ import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.Reviewing;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
@@ -44,18 +45,21 @@ class RestReviewsController {
 
   @GetMapping("/overview")
   @Transactional(readOnly = true)
-  public ReviewStatus overview() {
+  public ReviewStatus overview(@RequestParam(value = "timezone") String timezone) {
     currentUser.assertLoggedIn();
+    ZoneId timeZone = ZoneId.of(timezone);
     return currentUser
-        .createReviewing(testabilitySettings.getCurrentUTCTimestamp())
+        .createReviewing(testabilitySettings.getCurrentUTCTimestamp(), timeZone)
         .getReviewStatus();
   }
 
   @GetMapping("/initial")
   @Transactional(readOnly = true)
-  public List<ReviewPoint> initialReview() {
+  public List<ReviewPoint> initialReview(@RequestParam(value = "timezone") String timezone) {
     currentUser.assertLoggedIn();
-    Reviewing reviewing = currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
+    ZoneId timeZone = ZoneId.of(timezone);
+    Reviewing reviewing =
+        currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp(), timeZone);
 
     return reviewing.getDueInitialReviewPoints().collect(Collectors.toList());
   }
@@ -78,10 +82,13 @@ class RestReviewsController {
   @GetMapping(value = {"/repeat"})
   @Transactional
   public DueReviewPoints repeatReview(
+      @RequestParam(value = "timezone") String timezone,
       @RequestParam(value = "dueindays", required = false) Integer dueInDays) {
     currentUser.assertLoggedIn();
-    Reviewing reviewing = currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
-    return reviewing.getDueReviewPoints(dueInDays, testabilitySettings.getRandomizer());
+    ZoneId timeZone = ZoneId.of(timezone);
+    Reviewing reviewing =
+        currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp(), timeZone);
+    return reviewing.getDueReviewPoints(dueInDays == null ? 0 : dueInDays);
   }
 
   @GetMapping(path = "/answers/{answer}")

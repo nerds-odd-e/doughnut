@@ -23,7 +23,7 @@ public class AiQuestionGenerator {
   public AIGeneratedQuestion getAiGeneratedQuestion() throws QuizQuestionNotPossibleException {
     try {
       final AIGeneratedQuestion question = getValidQuestion(false);
-      if (question.confidence > 9) return question;
+      if (question.confidence > 1) return question;
       if (questionMakeSense(question)) {
         question.stem += " (confidence: " + question.confidence + ". Reevaluated.)";
         return question;

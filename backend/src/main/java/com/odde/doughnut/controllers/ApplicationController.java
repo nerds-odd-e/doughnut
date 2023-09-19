@@ -20,6 +20,9 @@ public class ApplicationController {
 
   @RequestMapping(
       value = {
+        // the following array has to be in sync with the frontend routes in
+        // CommonConfiguration.java
+        // Because java annotation does not allow variable, we have to repeat the routes here.
         "/",
         "/bazaar/**",
         "/circles/**",
@@ -27,9 +30,8 @@ public class ApplicationController {
         "/notes/**",
         "/reviews/**",
         "/answers/**",
-        "/users/**",
-        "/failure-report-list/**",
         "/links/**",
+        "/failure-report-list/**",
         "/admin-dashboard/**"
       },
       method = RequestMethod.GET)

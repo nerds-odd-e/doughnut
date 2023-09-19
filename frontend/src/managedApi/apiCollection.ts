@@ -1,5 +1,10 @@
 import ManagedApi from "./ManagedApi";
 
+const timezoneParam = () => {
+  const { timeZone } = Intl.DateTimeFormat().resolvedOptions();
+  return `timezone=${encodeURIComponent(timeZone)}`;
+};
+
 const apiCollection = (managedApi: ManagedApi) => ({
   userMethods: {
     logout() {
@@ -57,7 +62,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
     async overview() {
       return (await managedApi.restGet(
-        `reviews/overview`,
+        `reviews/overview?${timezoneParam()}`,
       )) as Generated.ReviewStatus;
     },
     updateReviewSetting(
@@ -75,7 +80,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
 
     async initialReview() {
       return (await managedApi.restGet(
-        `reviews/initial`,
+        `reviews/initial?${timezoneParam()}`,
       )) as Generated.ReviewPoint[];
     },
 
@@ -113,7 +118,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
 
     async getDueReviewPoints(dueInDays?: number) {
       const res = (await managedApi.restGet(
-        `reviews/repeat?dueindays=${dueInDays ?? ""}`,
+        `reviews/repeat?${timezoneParam()}&dueindays=${dueInDays ?? ""}`,
       )) as Generated.DueReviewPoints;
       return res;
     },

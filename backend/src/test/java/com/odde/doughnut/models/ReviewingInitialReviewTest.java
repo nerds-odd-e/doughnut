@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,9 +37,9 @@ public class ReviewingInitialReviewTest {
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
     anotherUser = makeMe.aUser().toModelPlease();
-    day1 = makeMe.aTimestamp().of(1, 8).forWhereTheUserIs(userModel).please();
-    day0 = makeMe.aTimestamp().of(0, 8).forWhereTheUserIs(userModel).please();
-    reviewingOnDay1 = userModel.createReviewing(day1);
+    day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
+    day0 = makeMe.aTimestamp().of(0, 8).fromShanghai().please();
+    reviewingOnDay1 = userModel.createReviewing(day1, ZoneId.of("Asia/Shanghai"));
   }
 
   @Test
@@ -189,16 +190,16 @@ public class ReviewingInitialReviewTest {
       @Test
       void theDailyCountShouldNotBeResetOnSameDayDifferentHour() {
         makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
-        Timestamp day1_23 = makeMe.aTimestamp().of(1, 23).forWhereTheUserIs(userModel).please();
-        Reviewing reviewing = userModel.createReviewing(day1_23);
+        Timestamp day1_23 = makeMe.aTimestamp().of(1, 23).fromShanghai().please();
+        Reviewing reviewing = userModel.createReviewing(day1_23, ZoneId.of("Asia/Shanghai"));
         assertThat(getOneInitialReviewPoint(reviewing), is(nullValue()));
       }
 
       @Test
       void theDailyCountShouldBeResetOnNextDay() {
         makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
-        Timestamp day2 = makeMe.aTimestamp().of(2, 1).forWhereTheUserIs(userModel).please();
-        Reviewing reviewing = userModel.createReviewing(day2);
+        Timestamp day2 = makeMe.aTimestamp().of(2, 1).fromShanghai().please();
+        Reviewing reviewing = userModel.createReviewing(day2, ZoneId.of("Asia/Shanghai"));
         assertThat(getOneInitialReviewPoint(reviewing).getNote(), equalTo(note2));
       }
     }
