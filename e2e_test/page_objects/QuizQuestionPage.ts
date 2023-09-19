@@ -21,6 +21,17 @@ const currentQuestion = (stem?: string) => {
       cy.pageIsNotLoading()
     },
 
+    enterComment(comment: string) {
+      question()
+        .findByRole("button", {
+          name: "send this question for fine tuning the question generation model",
+        })
+        .click()
+        cy.findByText("commentField").type(comment)
+      cy.findByRole("button", { name: "OK" }).click()
+      cy.pageIsNotLoading()
+    },
+
     suggestedQuestion(suggestedQuestion: string) {
       question()
         .findByRole("button", {
