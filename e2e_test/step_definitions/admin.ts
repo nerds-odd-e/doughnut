@@ -14,3 +14,8 @@ Given(
       .expectNumberOfRecords(count)
   },
 )
+
+Given(
+  "an admin should be able to download the training data with improved question {string}",
+  (suggestedQuestion: string) => {}
+)
