@@ -20,6 +20,17 @@ const currentQuestion = (stem?: string) => {
       cy.findByRole("button", { name: "OK" }).click()
       cy.pageIsNotLoading()
     },
+
+    suggestedQuestion(suggestedQuestion: string) {
+      question()
+        .findByRole("button", {
+          name: "send this question for fine tuning the question generation model",
+        })
+        .click()
+      cy.findByRole("textbox", { name: "suggestedquestion" }).type(suggestedQuestion)
+      cy.findByRole("button", { name: "OK" }).click()
+      cy.pageIsNotLoading()
+    },
   }
 }
 

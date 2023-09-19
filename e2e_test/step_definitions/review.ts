@@ -215,5 +215,6 @@ Then("I mark the question {string} as good", (questionStem: string) => {
   pageObjects.findQuestionWithStem(questionStem).markAsGood()
 })
 
-When("I suggest an improved question {string}", (suggestedQuestion: string) => {  
+When("I suggest an improved question {string}", (suggestedQuestion: string) => {
+  pageObjects.currentQuestion().suggestedQuestion(suggestedQuestion)
 })
