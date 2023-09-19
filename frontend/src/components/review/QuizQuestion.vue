@@ -59,6 +59,8 @@ import usePopups from "../commons/Popups/usePopups";
 import QuizQuestionChoices from "./QuizQuestionChoices.vue";
 import Breadcrumb from "../toolbars/Breadcrumb.vue";
 import SvgRaiseHand from "../svgs/SvgRaiseHand.vue";
+// import { INewRuntimeOptions } from "@cucumber/cucumber";
+// import { Input } from "postcss";
 
 export default defineComponent({
   inheritAttrs: false,
@@ -105,7 +107,7 @@ export default defineComponent({
       if (
         !(await this.popups.confirm(
           `Sending this question for fine tuning the question generation model
-           will make this note and question visible to admin. Are you sure?`,
+           will make this note and question visible to admin. Are you sure?'`,
         ))
       ) {
         return;

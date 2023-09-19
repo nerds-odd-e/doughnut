@@ -23,6 +23,7 @@ declare module 'vue' {
     CheckInput: typeof import('./src/components/form/CheckInput.vue')['default']
     CircleJoinForm: typeof import('./src/components/circles/CircleJoinForm.vue')['default']
     CircleNewDialog: typeof import('./src/components/circles/CircleNewDialog.vue')['default']
+    CommentPopUp: typeof import('./src/components/review/CommentPopUp.vue')['default']
     ContentLoader: typeof import('./src/components/commons/ContentLoader.vue')['default']
     ControlCenterForNote: typeof import('./src/components/toolbars/ControlCenterForNote.vue')['default']
     DetailsEditor: typeof import('./src/components/form/DetailsEditor.vue')['default']
