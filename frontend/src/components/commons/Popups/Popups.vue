@@ -28,7 +28,10 @@
         <div>
           <span>{{ popupInfo.message }}</span>
         </div>
-        <textarea placeholder="Add a suggested question"></textarea>
+        <textarea
+          name="suggestionField"
+          placeholder="Add a suggested question"
+        ></textarea>
         <textarea
           name="commentField"
           placeholder="Add a comment about the question"
