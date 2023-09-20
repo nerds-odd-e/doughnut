@@ -41,8 +41,8 @@
     />
     <div class="mark-question">
       <button
-        title="send this question for fine tuning the question generation model"
-        @click="CommentFieldforNQS"
+        title="send a comment for fine tuning the question generation model"
+        @click="markAsGood"
       >
         <SvgRaiseHand />
       </button>
@@ -83,6 +83,7 @@ export default defineComponent({
     QuizQuestionChoices,
     Breadcrumb,
     SvgRaiseHand,
+    CommentFieldforNQS,
   },
   emits: ["answered"],
   data() {
