@@ -1,4 +1,4 @@
-<template v-if="ShowCommentField">
+<template>
   <h3>Add comment</h3>
   <div>
     <span>
