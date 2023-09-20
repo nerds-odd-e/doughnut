@@ -48,6 +48,7 @@
       </button>
     </div>
   </div>
+  <div v-if="showcomment"></div>
 </template>
 
 <script lang="ts">
