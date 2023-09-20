@@ -83,7 +83,7 @@ export default defineComponent({
     QuizQuestionChoices,
     Breadcrumb,
     SvgRaiseHand,
-    CommentFieldforNQS,
+    //    CommentFieldforNQS,
   },
   emits: ["answered"],
   data() {

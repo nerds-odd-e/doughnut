@@ -15,7 +15,6 @@ export function adminDashboardPage() {
           const downloadsFolder = Cypress.config("downloadsFolder")
           cy.readFile(`${downloadsFolder}/trainingdata.txt`).should("contain.text", inputText)
         },
-       
       }
     },
     goToFailureReportList() {
