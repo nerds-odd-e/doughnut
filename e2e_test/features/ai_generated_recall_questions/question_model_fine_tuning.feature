@@ -27,6 +27,6 @@ Feature: Generate Training Data from marked questions
     Then an admin should be able to download the training data with "<suggestion>" as an improved "<option>" 
     Examples:
       | option         | suggestion                                 |
-      | question       | Who wrote 'Who Let the Cats Out'?        |
-      | choice         | John Douglas                             |
-      | correct choice | Baha Men                                 |
+      | question       | Who wrote 'Who Let the Cats Out'?          |
+      | choice         | John Douglas                               |
+      | correct_choice | Baha Women                                 |

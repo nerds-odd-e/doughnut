@@ -29,13 +29,25 @@
           <span>{{ popupInfo.message }}</span>
         </div>
         <textarea
-          name="suggestionField"
-          placeholder="Add a suggested question"
-        ></textarea>
-        <textarea
           name="commentField"
           placeholder="Add a comment about the question"
-        ></textarea>
+        ></textarea
+        ><br />
+        <textarea
+          name="suggestedquestion"
+          placeholder="Add a suggested question"
+        ></textarea
+        ><br />
+        <textarea
+          name="suggestedchoice"
+          placeholder="Add a suggested choice"
+        ></textarea
+        ><br />
+        <textarea
+          name="suggestedcorrect_choice"
+          placeholder="Add a suggested correct choice"
+        ></textarea
+        ><br />
         <button class="btn btn-success" @click="resolve(true)">OK</button>
         <button class="btn btn-secondary" @click="resolve(false)">
           Cancel

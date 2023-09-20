@@ -27,18 +27,18 @@ const currentQuestion = (stem?: string) => {
           name: "send this question for fine tuning the question generation model",
         })
         .click()
-      cy.findByPlaceholderText('Add a comment about the question').type(comment)
+      cy.findByPlaceholderText("Add a comment about the question").type(comment)
       cy.findByRole("button", { name: "OK" }).click()
       cy.pageIsNotLoading()
     },
 
-    suggestedQuestion(option: string, suggestedQuestion: string) {
+    suggestedQuestion(option: string, suggestion: string) {
       question()
         .findByRole("button", {
           name: "send this question for fine tuning the question generation model",
         })
         .click()
-      cy.get("textarea[placeholder='Add a suggested question']").type(suggestedQuestion)
+      cy.get(`textarea[name='suggested${option}'`).type(suggestion)
       cy.findByRole("button", { name: "OK" }).click()
       cy.pageIsNotLoading()
     },
