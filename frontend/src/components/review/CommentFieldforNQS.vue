@@ -14,6 +14,7 @@
 
 <script>
 export default defineComponent({
+  name: CommentFieldforNQS,
   props: {
     id: String,
     type: String,
