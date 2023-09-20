@@ -16,21 +16,12 @@ Given(
 )
 
 Given(
-  "an admin should be able to download the training data with improved question {string}",
-  (suggestedQuestion: string) => {
+  "an admin should be able to download the training data with {string} as an improved {string}",
+  (suggestion: string, option: string) => {
     pageObjects
       .loginAsAdminAndGoToAdminDashboard()
       .downloadAIQuestionTrainingData()
-      .expectTxtInDownload(suggestedQuestion)
+      .expectTxtInDownload(suggestion)
   },
 )
 
-Given(
-  "an admin should be able to download the training data with improved choice with {string}",
-  (choice: string) => {
-    pageObjects
-      .loginAsAdminAndGoToAdminDashboard()
-      .downloadAIQuestionTrainingData()
-      .expectTxtInDownload(choice)
-  },
-)
