@@ -107,6 +107,7 @@ export default defineComponent({
       }
     },
     async markAsGood() {
+      this.showcomment = true;
       if (
         !(await this.popups.confirm(
           `Sending this question for fine tuning the question generation model
