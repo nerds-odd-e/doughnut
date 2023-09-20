@@ -1,4 +1,3 @@
-<!-- use modal instead of confirmation window-->
 <template>
   <h3>Add comment</h3>
   <div>
