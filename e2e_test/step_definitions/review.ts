@@ -222,3 +222,7 @@ Then("I mark the question {string} as good", (questionStem: string) => {
 When("I suggest an improved question {string}", (suggestedQuestion: string) => {
   pageObjects.currentQuestion().suggestedQuestion(suggestedQuestion)
 })
+
+When("I suggest to replace one choice with {string}", (suggestedChoice: string) => {
+  pageObjects.currentQuestion().suggestedQuestion(suggestedChoice)
+})

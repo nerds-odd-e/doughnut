@@ -11,10 +11,11 @@ export function adminDashboardPage() {
             .should("eq", count)
         },
 
-        expectSuggestedQuestion(suggestedQuestion: string) {
+        expectTxtInDownload(inputText: string) {
           const downloadsFolder = Cypress.config("downloadsFolder")
-          cy.readFile(`${downloadsFolder}/trainingdata.txt`).should("contain.text", suggestedQuestion)
+          cy.readFile(`${downloadsFolder}/trainingdata.txt`).should("contain.text", inputText)
         },
+       
       }
     },
     goToFailureReportList() {
