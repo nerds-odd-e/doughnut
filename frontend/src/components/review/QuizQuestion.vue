@@ -87,7 +87,6 @@ export default defineComponent({
   data() {
     return {
       answer: "" as string,
-      showcomment: false,
     };
   },
   methods: {
