@@ -2781,10 +2781,10 @@ getpass@^0.1.1:
   dependencies:
     assert-plus "^1.0.0"
 
-github_action_sound@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/github_action_sound/-/github_action_sound-1.0.2.tgz#35116db95740e66c90a4058e27169e691149c086"
-  integrity sha512-O/SWtH8aSzgqJtY/siq3l3AZC+PhQs7N8lGeDfXRAYHjR5AxbgDXuFzjMMjbW+b31HHPvrErGGPY74HoiC1hgQ==
+github_action_sound@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/github_action_sound/-/github_action_sound-1.0.3.tgz#585204df94faeb6465bb85628b957084ef39b2b9"
+  integrity sha512-s9mk8crGtr6LWLEfC8zWfUSuJMPlV5SgyElCpVeAF3FYtRJpLq0fRbL99tKyKn0qCp2eAVqOzPaHoNuj2SzmUw==
   dependencies:
     got "11.8.6"
     jsdom "21.1.0"
@@ -5680,6 +5680,7 @@ workerpool@6.2.1:
   integrity sha512-ILEIE97kDZvF9Wb9f6h5aXK4swSlKGUcOEGiIYb2OOu/IrDU9iwj0fD//SsA6E5ibwJxpEvhullJY4Sl4GcpAw==
 
 "wrap-ansi-cjs@npm:wrap-ansi@^7.0.0", wrap-ansi@^7.0.0:
+  name wrap-ansi-cjs
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
   integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==

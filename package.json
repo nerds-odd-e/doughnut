@@ -53,7 +53,7 @@
     "eslint-plugin-prettier": "^5.0",
     "eslint-plugin-testing-library": "^6.0",
     "eslint-plugin-unused-imports": "^3.0",
-    "github_action_sound": "^1.0.2",
+    "github_action_sound": "^1.0.3",
     "got": "^13.0",
     "jsdom": "^22.1",
     "mountebank": "^2.8",
