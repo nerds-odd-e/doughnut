@@ -48,7 +48,6 @@
       </button>
     </div>
   </div>
-  <div v-if="showcomment"></div>
 </template>
 
 <script lang="ts">
@@ -60,7 +59,6 @@ import usePopups from "../commons/Popups/usePopups";
 import QuizQuestionChoices from "./QuizQuestionChoices.vue";
 import Breadcrumb from "../toolbars/Breadcrumb.vue";
 import SvgRaiseHand from "../svgs/SvgRaiseHand.vue";
-// import CommentFieldforNQS from "./CommentFieldforNQS.vue";
 // import { INewRuntimeOptions } from "@cucumber/cucumber";
 // import { Input } from "postcss";
 
@@ -84,7 +82,6 @@ export default defineComponent({
     QuizQuestionChoices,
     Breadcrumb,
     SvgRaiseHand,
-    // CommentFieldforNQS,
   },
   emits: ["answered"],
   data() {
@@ -108,7 +105,6 @@ export default defineComponent({
       }
     },
     async markAsGood() {
-      this.showcomment = true;
       if (
         !(await this.popups.confirm(
           `Sending this question for fine tuning the question generation model
