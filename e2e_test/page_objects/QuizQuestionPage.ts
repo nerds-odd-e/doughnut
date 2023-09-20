@@ -27,7 +27,7 @@ const currentQuestion = (stem?: string) => {
           name: "send this question for fine tuning the question generation model",
         })
         .click()
-      cy.findByText("commentField").type(comment)
+      cy.get("textarea[placeholder='Add a comment about the question']").type(comment)
       cy.findByRole("button", { name: "OK" }).click()
       cy.pageIsNotLoading()
     },
