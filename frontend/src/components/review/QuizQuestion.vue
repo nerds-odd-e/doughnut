@@ -42,7 +42,7 @@
     <div class="mark-question">
       <button
         title="send this question for fine tuning the question generation model"
-        @click="markAsGood"
+        @click="CommentFieldforNQS"
       >
         <SvgRaiseHand />
       </button>
@@ -59,6 +59,7 @@ import usePopups from "../commons/Popups/usePopups";
 import QuizQuestionChoices from "./QuizQuestionChoices.vue";
 import Breadcrumb from "../toolbars/Breadcrumb.vue";
 import SvgRaiseHand from "../svgs/SvgRaiseHand.vue";
+import CommentFieldforNQS from "./CommentFieldforNQS.vue";
 // import { INewRuntimeOptions } from "@cucumber/cucumber";
 // import { Input } from "postcss";
 
