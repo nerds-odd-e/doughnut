@@ -66,6 +66,16 @@ public class RestTrainingDataControllerTests {
           goodTrainingData.get(1).getContent(),
           containsString("assume the role of a Memory Assistant"));
     }
+
+    @Test
+    void shouldIncludeTheQuestion_whenCallGetGoodTrainingData() {
+      MarkedQuestion markedQuestion = makeMe.aMarkedQuestion().please();
+      modelFactoryService.markedQuestionRepository.save(markedQuestion);
+      List<TrainingData> goodTrainingDataList = controller.getGoodTrainingData();
+      List<TrainingDataMessage> goodTrainingData = goodTrainingDataList.get(0).getMessages();
+      assertThat(
+          goodTrainingData.get(2).getContent(), containsString("This is the raw Json question"));
+    }
   }
 
   @Test
