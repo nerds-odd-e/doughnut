@@ -13,7 +13,7 @@ export function adminDashboardPage() {
 
         expectTxtInDownload(inputText: string) {
           const downloadsFolder = Cypress.config("downloadsFolder")
-          cy.readFile(`${downloadsFolder}/trainingdata.txt`).should("contain.text", inputText)
+          cy.readFile(`${downloadsFolder}/trainingdata.txt`).should("contain", inputText)
         },
       }
     },
