@@ -41,7 +41,7 @@
     />
     <div class="mark-question">
       <button
-        title="send this question for fine tuning the question generation model"
+        title="send this question  for fine tuning the question generation model"
         @click="markAsGood"
       >
         <SvgRaiseHand />
