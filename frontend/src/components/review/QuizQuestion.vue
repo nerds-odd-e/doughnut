@@ -59,7 +59,7 @@ import usePopups from "../commons/Popups/usePopups";
 import QuizQuestionChoices from "./QuizQuestionChoices.vue";
 import Breadcrumb from "../toolbars/Breadcrumb.vue";
 import SvgRaiseHand from "../svgs/SvgRaiseHand.vue";
-import CommentFieldforNQS from "./CommentFieldforNQS.vue";
+// import CommentFieldforNQS from "./CommentFieldforNQS.vue";
 // import { INewRuntimeOptions } from "@cucumber/cucumber";
 // import { Input } from "postcss";
 
