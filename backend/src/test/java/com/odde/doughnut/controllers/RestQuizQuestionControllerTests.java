@@ -11,8 +11,10 @@ import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
+
 import java.sql.Timestamp;
 import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,8 +29,10 @@ import org.springframework.web.server.ResponseStatusException;
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
 class RestQuizQuestionControllerTests {
-  @Autowired ModelFactoryService modelFactoryService;
-  @Autowired MakeMe makeMe;
+  @Autowired
+  ModelFactoryService modelFactoryService;
+  @Autowired
+  MakeMe makeMe;
   private UserModel currentUser;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
@@ -38,12 +42,12 @@ class RestQuizQuestionControllerTests {
   void setup() {
     currentUser = makeMe.aUser().toModelPlease();
     controller =
-        new RestQuizQuestionController(modelFactoryService, currentUser, testabilitySettings);
+      new RestQuizQuestionController(modelFactoryService, currentUser, testabilitySettings);
   }
 
   RestQuizQuestionController nullUserController() {
     return new RestQuizQuestionController(
-        modelFactoryService, makeMe.aNullUserModel(), testabilitySettings);
+      modelFactoryService, makeMe.aNullUserModel(), testabilitySettings);
   }
 
   @Nested
@@ -56,13 +60,13 @@ class RestQuizQuestionControllerTests {
     void setup() {
       Note answerNote = makeMe.aNote().asHeadNoteOfANotebook().rememberSpelling().please();
       reviewPoint =
-          makeMe
-              .aReviewPointFor(answerNote)
-              .by(currentUser)
-              .forgettingCurveAndNextReviewAt(200)
-              .please();
+        makeMe
+          .aReviewPointFor(answerNote)
+          .by(currentUser)
+          .forgettingCurveAndNextReviewAt(200)
+          .please();
       quizQuestionEntity =
-          makeMe.aQuestion().of(QuizQuestionEntity.QuestionType.SPELLING, reviewPoint).please();
+        makeMe.aQuestion().of(QuizQuestionEntity.QuestionType.SPELLING, reviewPoint).please();
       answer = makeMe.anAnswer().answerWithSpelling(answerNote.getTopic()).inMemoryPlease();
     }
 
@@ -89,15 +93,15 @@ class RestQuizQuestionControllerTests {
       controller.answerQuiz(quizQuestionEntity, answer);
       assertThat(reviewPoint.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
       assertThat(
-          reviewPoint.getLastReviewedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
+        reviewPoint.getLastReviewedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
     }
 
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       Answer answer = new Answer();
       assertThrows(
-          ResponseStatusException.class,
-          () -> nullUserController().answerQuiz(quizQuestionEntity, answer));
+        ResponseStatusException.class,
+        () -> nullUserController().answerQuiz(quizQuestionEntity, answer));
     }
 
     @Nested
@@ -105,7 +109,7 @@ class RestQuizQuestionControllerTests {
       @BeforeEach
       void setup() {
         quizQuestionEntity =
-            makeMe.aQuestion().of(QuizQuestionEntity.QuestionType.SPELLING, reviewPoint).please();
+          makeMe.aQuestion().of(QuizQuestionEntity.QuestionType.SPELLING, reviewPoint).please();
         answer = makeMe.anAnswer().answerWithSpelling("wrong").inMemoryPlease();
       }
 
@@ -132,10 +136,10 @@ class RestQuizQuestionControllerTests {
       void shouldRepeatTheNextDay() {
         controller.answerQuiz(quizQuestionEntity, answer);
         assertThat(
-            reviewPoint.getNextReviewAt(),
-            lessThan(
-                TimestampOperations.addHoursToTimestamp(
-                    testabilitySettings.getCurrentUTCTimestamp(), 25)));
+          reviewPoint.getNextReviewAt(),
+          lessThan(
+            TimestampOperations.addHoursToTimestamp(
+              testabilitySettings.getCurrentUTCTimestamp(), 25)));
       }
     }
   }
@@ -153,9 +157,9 @@ class RestQuizQuestionControllerTests {
 
       user = currentUser.getEntity();
       reviewPoint =
-          makeMe.aReviewPointFor(note).by(currentUser).forgettingCurveAndNextReviewAt(200).please();
+        makeMe.aReviewPointFor(note).by(currentUser).forgettingCurveAndNextReviewAt(200).please();
       quizQuestionEntity =
-          makeMe.aQuestion().of(QuizQuestionEntity.QuestionType.SPELLING, reviewPoint).please();
+        makeMe.aQuestion().of(QuizQuestionEntity.QuestionType.SPELLING, reviewPoint).please();
       modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
       modelFactoryService.noteRepository.save(note);
     }
@@ -164,12 +168,24 @@ class RestQuizQuestionControllerTests {
     void createMarkedGoodQuestion() {
       Integer markedQuestionId = controller.markQuestion(quizQuestionEntity);
       Optional<MarkedQuestion> markedQuestionRepositoryById =
-          modelFactoryService.markedQuestionRepository.findById(markedQuestionId);
+        modelFactoryService.markedQuestionRepository.findById(markedQuestionId);
       assertFalse(markedQuestionRepositoryById.isEmpty());
       MarkedQuestion markedQuestion = markedQuestionRepositoryById.get();
       assertEquals(quizQuestionEntity.getId(), markedQuestion.getQuizQuestion().getId());
       assertEquals(note.getId(), markedQuestion.getNote().getId());
     }
+
+//    @Test
+//    void AddCommentToNoteQuestionSuggestion() {
+//      Integer markedQuestionId = controller.markQuestion(quizQuestionEntity);
+//      Optional<MarkedQuestion> markedQuestionRepositoryById =
+//        modelFactoryService.markedQuestionRepository.findById(markedQuestionId);
+//      assertFalse(markedQuestionRepositoryById.isEmpty());
+//      MarkedQuestion markedQuestion = markedQuestionRepositoryById.get();
+//      assertEquals(quizQuestionEntity.getId(), markedQuestion.getQuizQuestion().getId());
+//      assertEquals(note.getId(), markedQuestion.getNote().getId());
+//      // assertEquals(note.getId(), markedQuestion.getComment());
+//    }
 
     @Test
     void createMarkedQuestionInDatabase() {
