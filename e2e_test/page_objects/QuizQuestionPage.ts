@@ -32,7 +32,7 @@ const currentQuestion = (stem?: string) => {
       cy.pageIsNotLoading()
     },
 
-    suggestedQuestion(_suggestedQuestion: string) {
+    suggestedQuestion(option: string, suggestedQuestion: string) {
       question()
         .findByRole("button", {
           name: "send this question for fine tuning the question generation model",

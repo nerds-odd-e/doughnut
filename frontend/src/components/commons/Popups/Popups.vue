@@ -28,7 +28,8 @@
         <div>
           <span>{{ popupInfo.message }}</span>
         </div>
-        <button class="btn btn-success" @click="resolve(true)">OK</button>
+        <textarea placeholder="Add a suggested question"></textarea>
+        <button class="btn btn-success" @click="resolve(true)" id="buttonsucces" >OK</button>
         <button class="btn btn-secondary" @click="resolve(false)">
           Cancel
         </button>
