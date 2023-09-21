@@ -14,7 +14,7 @@ Feature: Generate Training Data from marked questions
   Scenario: Admin should be able to generate training data from marked questions
     Given I ask to generate a question for note "Who Let the Dogs Out"
     When I mark the question "Who wrote 'Who Let the Dogs Out'?" as good
-    Then an admin should be able to download the training data with 1 record
+    Then an admin should be able to download the training data with 1 record containing "Who wrote 'Who Let the Dogs Out'?"
   
   Scenario: User haven't marked any question as good
     When I ask to generate a question for note "Who Let the Dogs Out"

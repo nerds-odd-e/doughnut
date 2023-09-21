@@ -9,6 +9,7 @@ export function adminDashboardPage() {
           cy.readFile(`${downloadsFolder}/trainingdata.txt`)
             .then((content) => (content.match(/messages/g) || []).length)
             .should("eq", count)
+          return this
         },
 
         expectTxtInDownload(inputText: string) {
