@@ -46,6 +46,14 @@
       >
         <SvgRaiseHand />
       </button>
+      <PopButton
+        title="send this question for fine tuning the question generation model1"
+      >
+        <template #button_face>
+          <SvgRaiseHand />
+        </template>
+        <button class="btn btn-success" @click="suggestQuestion">OK</button>
+      </PopButton>
     </div>
   </div>
 </template>
@@ -112,6 +120,10 @@ export default defineComponent({
       ) {
         return;
       }
+      this.suggestQuestion();
+    },
+
+    async suggestQuestion() {
       await this.api.reviewMethods.markQuestion(
         this.quizQuestion.quizQuestionId,
       );
