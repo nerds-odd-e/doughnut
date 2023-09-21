@@ -40,18 +40,31 @@
       @answer="submitAnswer($event)"
     />
     <div class="mark-question">
-      <button
-        title="send this question for fine tuning the question generation model"
-        @click="markQuestion"
-      >
-        <SvgRaiseHand />
-      </button>
       <PopButton
-        title="send this question for fine tuning the question generation model1"
+        title="send this question for fine tuning the question generation model"
       >
         <template #button_face>
           <SvgRaiseHand />
         </template>
+        <textarea
+          name="commentField"
+          placeholder="Add a comment about the question"
+        ></textarea
+        ><br />
+        <textarea
+          name="suggestedquestion"
+          placeholder="Add a suggested question"
+        ></textarea
+        ><br />
+        <textarea
+          name="suggestedchoice"
+          placeholder="Add a suggested choice"
+        ></textarea
+        ><br />
+        <textarea
+          name="suggestedcorrect_choice"
+          placeholder="Add a suggested correct choice"
+        ></textarea>
         <button class="btn btn-success" @click="suggestQuestion">OK</button>
       </PopButton>
     </div>
@@ -67,13 +80,14 @@ import usePopups from "../commons/Popups/usePopups";
 import QuizQuestionChoices from "./QuizQuestionChoices.vue";
 import Breadcrumb from "../toolbars/Breadcrumb.vue";
 import SvgRaiseHand from "../svgs/SvgRaiseHand.vue";
+import asPopup from "../commons/Popups/asPopup";
 // import { INewRuntimeOptions } from "@cucumber/cucumber";
 // import { Input } from "postcss";
 
 export default defineComponent({
   inheritAttrs: false,
   setup() {
-    return { ...useLoadingApi(), ...usePopups() };
+    return { ...useLoadingApi(), ...usePopups(), ...asPopup() };
   },
   props: {
     quizQuestion: {
@@ -111,22 +125,12 @@ export default defineComponent({
         );
       }
     },
-    async markQuestion() {
-      if (
-        !(await this.popups.confirm(
-          `Sending this question for fine tuning the question generation model
-           will make this note and question visible to admin. Are you sure?'`,
-        ))
-      ) {
-        return;
-      }
-      this.suggestQuestion();
-    },
 
     async suggestQuestion() {
       await this.api.reviewMethods.markQuestion(
         this.quizQuestion.quizQuestionId,
       );
+      this.popup.done(null);
     },
   },
 });
