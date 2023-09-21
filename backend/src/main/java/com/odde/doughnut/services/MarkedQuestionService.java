@@ -17,7 +17,6 @@ public record MarkedQuestionService() {
     markedQuestion.setUserId(user.getId());
     markedQuestion.setQuizQuestion(quizQuestionEntity);
     markedQuestion.setNote(quizQuestionEntity.getThing().getNote());
-    //    markedQuestion.setComment(quizQuestionEntity.getThing().getComment());
     markedQuestion.setCreatedAt(currentUTCTimestamp);
     return modelFactoryService.markedQuestionRepository.save(markedQuestion);
   }

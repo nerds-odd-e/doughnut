@@ -171,18 +171,6 @@ class RestQuizQuestionControllerTests {
       assertEquals(note.getId(), markedQuestion.getNote().getId());
     }
 
-    //    @Test
-    //    void AddCommentToNoteQuestionSuggestion() {
-    //      Integer markedQuestionId = controller.markQuestion(quizQuestionEntity);
-    //      Optional<MarkedQuestion> markedQuestionRepositoryById =
-    //        modelFactoryService.markedQuestionRepository.findById(markedQuestionId);
-    //      assertFalse(markedQuestionRepositoryById.isEmpty());
-    //      MarkedQuestion markedQuestion = markedQuestionRepositoryById.get();
-    //      assertEquals(quizQuestionEntity.getId(), markedQuestion.getQuizQuestion().getId());
-    //      assertEquals(note.getId(), markedQuestion.getNote().getId());
-    //      // assertEquals(note.getId(), markedQuestion.getComment());
-    //    }
-
     @Test
     void createMarkedQuestionInDatabase() {
       long oldCount = modelFactoryService.markedQuestionRepository.count();
