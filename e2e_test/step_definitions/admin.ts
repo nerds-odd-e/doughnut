@@ -24,3 +24,14 @@ Given(
       .expectTxtInDownload(suggestion)
   },
 )
+
+
+Given(
+  "the admin should see {string} in the downloaded file",
+  (expectedComment: string) => {
+    pageObjects
+      .loginAsAdminAndGoToAdminDashboard()
+      .downloadAIQuestionTrainingData()
+      .expectTxtInDownload(expectedComment)
+  },
+)
