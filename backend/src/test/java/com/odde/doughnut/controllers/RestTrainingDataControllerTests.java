@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.odde.doughnut.entities.MarkedQuestion;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.TrainingData;
 import com.odde.doughnut.entities.json.TrainingDataMessage;
@@ -54,14 +53,12 @@ public class RestTrainingDataControllerTests {
 
     @Test
     void shouldReturnGoodTrainingDataIfHavingReadingAuth_whenCallGetGoodTrainingData() {
-      Note note = makeMe.aNote().please();
-      note.setTopic("Test Topic");
-      MarkedQuestion markedQuestion = makeMe.aMarkedQuestion().ofNote(note).please();
-      modelFactoryService.markedQuestionRepository.save(markedQuestion);
+      Note note = makeMe.aNote().title("Test Topic").please();
+      makeMe.aMarkedQuestion().ofNote(note).please();
       List<TrainingData> goodTrainingDataList = controller.getGoodTrainingData();
       assertEquals(1, goodTrainingDataList.size());
       List<TrainingDataMessage> goodTrainingData = goodTrainingDataList.get(0).getMessages();
-      assertThat(goodTrainingData.get(0).getContent(), containsString(note.getTopic()));
+      assertThat(goodTrainingData.get(0).getContent(), containsString("Test Topic"));
       assertThat(
           goodTrainingData.get(1).getContent(),
           containsString("assume the role of a Memory Assistant"));
@@ -69,8 +66,7 @@ public class RestTrainingDataControllerTests {
 
     @Test
     void shouldIncludeTheQuestion_whenCallGetGoodTrainingData() {
-      MarkedQuestion markedQuestion = makeMe.aMarkedQuestion().please();
-      modelFactoryService.markedQuestionRepository.save(markedQuestion);
+      makeMe.aMarkedQuestion().withRawQuestion("This is the raw Json question").please();
       List<TrainingData> goodTrainingDataList = controller.getGoodTrainingData();
       List<TrainingDataMessage> goodTrainingData = goodTrainingDataList.get(0).getMessages();
       assertThat(

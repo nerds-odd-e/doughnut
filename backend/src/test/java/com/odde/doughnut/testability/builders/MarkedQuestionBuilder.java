@@ -11,7 +11,6 @@ public class MarkedQuestionBuilder extends EntityBuilder<MarkedQuestion> {
     ofNote(makeMe.aNote().please());
     entity.setUserId(makeMe.aUser().please().getId());
     entity.setQuizQuestion(makeMe.aQuestion().please());
-    entity.getQuizQuestion().setRawJsonQuestion("This is the raw Json question");
   }
 
   @Override
@@ -19,6 +18,11 @@ public class MarkedQuestionBuilder extends EntityBuilder<MarkedQuestion> {
 
   public MarkedQuestionBuilder ofNote(Note note) {
     entity.setNote(note);
+    return this;
+  }
+
+  public MarkedQuestionBuilder withRawQuestion(String question) {
+    entity.getQuizQuestion().setRawJsonQuestion(question);
     return this;
   }
 }
