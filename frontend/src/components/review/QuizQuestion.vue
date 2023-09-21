@@ -42,7 +42,7 @@
     <div class="mark-question">
       <button
         title="send this question for fine tuning the question generation model"
-        @click="markAsGood"
+        @click="markQuestion"
       >
         <SvgRaiseHand />
       </button>
@@ -103,7 +103,7 @@ export default defineComponent({
         );
       }
     },
-    async markAsGood() {
+    async markQuestion() {
       if (
         !(await this.popups.confirm(
           `Sending this question for fine tuning the question generation model
@@ -112,7 +112,9 @@ export default defineComponent({
       ) {
         return;
       }
-      await this.api.reviewMethods.markAsGood(this.quizQuestion.quizQuestionId);
+      await this.api.reviewMethods.markQuestion(
+        this.quizQuestion.quizQuestionId,
+      );
     },
   },
 });

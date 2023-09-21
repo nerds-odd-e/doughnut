@@ -54,7 +54,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
         {},
       )) as Generated.ReviewPoint;
     },
-    async markAsGood(quizQuestionId: number): Promise<string> {
+    async markQuestion(quizQuestionId: number): Promise<string> {
       return managedApi.restPost(
         `quiz-questions/${quizQuestionId}/mark-question`,
         {},
