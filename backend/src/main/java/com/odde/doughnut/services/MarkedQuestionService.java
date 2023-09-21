@@ -26,7 +26,8 @@ public record MarkedQuestionService() {
 
   private static void updateQuestionStemWithSuggestion(
       QuizQuestionEntity quizQuestionEntity, ModelFactoryService modelFactoryService) {
-    if (quizQuestionEntity.getRawJsonQuestion().contains("Blah blah blah")) {
+    if (quizQuestionEntity.getRawJsonQuestion() != null
+        && quizQuestionEntity.getRawJsonQuestion().contains("Blah blah blah")) {
       quizQuestionEntity.setRawJsonQuestion("Who wrote 'Who Let the Cats Out'?");
       modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
     }
