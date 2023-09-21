@@ -10,6 +10,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class TrainingData {
   private @Getter List<TrainingDataMessage> messages;
+  private @Getter String comment;
 
   public static TrainingData generateTrainingData(
       List<ChatMessage> messages, String rawJsonQuestion) {
@@ -21,6 +22,6 @@ public class TrainingData {
             .collect(Collectors.toList());
     trainingDataMessages.add(
         new TrainingDataMessage(ChatMessageRole.ASSISTANT.value(), rawJsonQuestion));
-    return new TrainingData(trainingDataMessages);
+    return new TrainingData(trainingDataMessages, "this is a comment on a question we don't like");
   }
 }

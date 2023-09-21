@@ -12,9 +12,8 @@ Feature: add a comment to a note_question_suggestion
       | question                          | correct_choice | incorrect_choice_1 |
       | Who wrote 'Who Let the Dogs Out'? | Anslem Douglas | Baha Men           |
 
-  @ignore
   Scenario: Add a comment to an existing note question
     Given I ask to generate a question for note "Who Let the Dogs Out"
-    When I add comment "this sucks" on this question "Who wrote 'Who Let the Dogs Out'?"
-    Then the admin should see "this sucks" in the downloaded file
+    When I add comment "this is a comment on a question we don't like" on this question "Who wrote 'Who Let the Dogs Out'?"
+    Then the admin should see "this is a comment on a question we don't like" in the downloaded file
 
