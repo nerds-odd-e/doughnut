@@ -150,6 +150,7 @@ declare namespace Generated {
 
     interface TrainingData {
         messages: TrainingDataMessage[];
+        comment: string;
     }
 
     interface TrainingDataMessage {
