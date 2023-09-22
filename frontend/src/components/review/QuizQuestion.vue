@@ -52,7 +52,8 @@
         ></textarea
         ><br />
         <textarea
-          name="suggestedquestion"
+          name="suggestedQuestionText"
+          v-model="suggestedQuestionText"
           placeholder="Add a suggested question"
         ></textarea
         ><br />
@@ -109,6 +110,7 @@ export default defineComponent({
   data() {
     return {
       answer: "" as string,
+      suggestedQuestionText: "" as string,
     };
   },
   methods: {
@@ -127,18 +129,12 @@ export default defineComponent({
     },
 
     async suggestQuestion() {
-      if (this.quizQuestion.stem === "Blah blah blah")
-        await this.api.reviewMethods.markQuestion(
-          this.quizQuestion.quizQuestionId,
-          "Who wrote 'Who Let the Cats Out'?",
-        );
-      else
-        await this.api.reviewMethods.markQuestion(
-          this.quizQuestion.quizQuestionId,
-          "",
-        );
+      await this.api.reviewMethods.markQuestion(
+        this.quizQuestion.quizQuestionId,
+        this.suggestedQuestionText,
+      );
       this.popup.done(null);
-    },
+    }
   },
 });
 </script>
