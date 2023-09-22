@@ -52,6 +52,7 @@ class RestQuizQuestionController {
         new MarkedQuestionService()
             .markQuestion(
                 quizQuestionEntity,
+                suggestion,
                 currentUser.getEntity(),
                 testabilitySettings.getCurrentUTCTimestamp(),
                 modelFactoryService);

@@ -162,7 +162,7 @@ class RestQuizQuestionControllerTests {
 
     @Test
     void createMarkedGoodQuestion() {
-      Integer markedQuestionId = controller.markQuestion(quizQuestionEntity);
+      Integer markedQuestionId = controller.markQuestion(quizQuestionEntity, "");
       Optional<MarkedQuestion> markedQuestionRepositoryById =
           modelFactoryService.markedQuestionRepository.findById(markedQuestionId);
       assertFalse(markedQuestionRepositoryById.isEmpty());
@@ -174,7 +174,7 @@ class RestQuizQuestionControllerTests {
     @Test
     void createMarkedQuestionInDatabase() {
       long oldCount = modelFactoryService.markedQuestionRepository.count();
-      controller.markQuestion(quizQuestionEntity);
+      controller.markQuestion(quizQuestionEntity, "");
       assertThat(modelFactoryService.markedQuestionRepository.count(), equalTo(oldCount + 1));
     }
   }

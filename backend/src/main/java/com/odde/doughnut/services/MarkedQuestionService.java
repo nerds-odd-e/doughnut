@@ -10,6 +10,7 @@ public record MarkedQuestionService() {
 
   public MarkedQuestion markQuestion(
       QuizQuestionEntity quizQuestionEntity,
+      String suggestion,
       User user,
       Timestamp currentUTCTimestamp,
       ModelFactoryService modelFactoryService) {
@@ -19,16 +20,17 @@ public record MarkedQuestionService() {
     markedQuestion.setNote(quizQuestionEntity.getThing().getNote());
     markedQuestion.setCreatedAt(currentUTCTimestamp);
 
-    updateQuestionStemWithSuggestion(quizQuestionEntity, modelFactoryService);
+    updateQuestionStemWithSuggestion(suggestion, quizQuestionEntity, modelFactoryService);
 
     return modelFactoryService.markedQuestionRepository.save(markedQuestion);
   }
 
   private static void updateQuestionStemWithSuggestion(
-      QuizQuestionEntity quizQuestionEntity, ModelFactoryService modelFactoryService) {
-    if (quizQuestionEntity.getRawJsonQuestion() != null
-        && quizQuestionEntity.getRawJsonQuestion().contains("Blah blah blah")) {
-      quizQuestionEntity.setRawJsonQuestion("Who wrote 'Who Let the Cats Out'?");
+      String suggestion,
+      QuizQuestionEntity quizQuestionEntity,
+      ModelFactoryService modelFactoryService) {
+    if (suggestion != null && !suggestion.isEmpty()) {
+      quizQuestionEntity.setRawJsonQuestion(suggestion);
       modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
     }
   }

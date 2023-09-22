@@ -127,10 +127,16 @@ export default defineComponent({
     },
 
     async suggestQuestion() {
-      await this.api.reviewMethods.markQuestion(
-        this.quizQuestion.quizQuestionId,
-        {},
-      );
+      if (this.quizQuestion.stem === "Blah blah blah")
+        await this.api.reviewMethods.markQuestion(
+          this.quizQuestion.quizQuestionId,
+          "Who wrote 'Who Let the Cats Out'?",
+        );
+      else
+        await this.api.reviewMethods.markQuestion(
+          this.quizQuestion.quizQuestionId,
+          "",
+        );
       this.popup.done(null);
     },
   },
