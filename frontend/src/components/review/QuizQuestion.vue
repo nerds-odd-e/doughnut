@@ -129,6 +129,7 @@ export default defineComponent({
     async suggestQuestion() {
       await this.api.reviewMethods.markQuestion(
         this.quizQuestion.quizQuestionId,
+        {},
       );
       this.popup.done(null);
     },

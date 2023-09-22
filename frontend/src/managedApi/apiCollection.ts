@@ -1,4 +1,5 @@
 import ManagedApi from "./ManagedApi";
+import { JsonData } from "./window/RestfulFetch";
 
 const timezoneParam = () => {
   const { timeZone } = Intl.DateTimeFormat().resolvedOptions();
@@ -54,10 +55,13 @@ const apiCollection = (managedApi: ManagedApi) => ({
         {},
       )) as Generated.ReviewPoint;
     },
-    async markQuestion(quizQuestionId: number): Promise<string> {
+    async markQuestion(
+      quizQuestionId: number,
+      suggestedQuestion: JsonData,
+    ): Promise<string> {
       return managedApi.restPost(
         `quiz-questions/${quizQuestionId}/mark-question`,
-        {},
+        suggestedQuestion,
       ) as Promise<string>;
     },
     async overview() {
