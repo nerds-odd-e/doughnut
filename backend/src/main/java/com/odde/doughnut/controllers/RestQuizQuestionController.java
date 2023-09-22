@@ -45,7 +45,9 @@ class RestQuizQuestionController {
 
   @PostMapping("/{quizQuestion}/mark-question")
   @Transactional
-  public Integer markQuestion(@PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity) {
+  public Integer markQuestion(
+      @PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity,
+      @RequestBody(required = false) String suggestion) {
     MarkedQuestion markedQuestion =
         new MarkedQuestionService()
             .markQuestion(
