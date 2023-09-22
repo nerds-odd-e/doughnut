@@ -1,9 +1,12 @@
 package com.odde.doughnut.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.MarkedQuestion;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.services.ai.AIGeneratedQuestion;
 import java.sql.Timestamp;
 
 public record MarkedQuestionService() {
@@ -30,7 +33,18 @@ public record MarkedQuestionService() {
       QuizQuestionEntity quizQuestionEntity,
       ModelFactoryService modelFactoryService) {
     if (suggestion != null && !suggestion.isEmpty()) {
-      quizQuestionEntity.setRawJsonQuestion(suggestion);
+
+      AIGeneratedQuestion aiGeneratedQuestion = null;
+      try {
+        aiGeneratedQuestion =
+            new ObjectMapper()
+                .readValue(quizQuestionEntity.getRawJsonQuestion(), AIGeneratedQuestion.class);
+      } catch (JsonProcessingException e) {
+        throw new RuntimeException(e);
+      }
+      aiGeneratedQuestion.stem = suggestion;
+      quizQuestionEntity.setRawJsonQuestion(aiGeneratedQuestion.toJsonString());
+
       modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
     }
   }
