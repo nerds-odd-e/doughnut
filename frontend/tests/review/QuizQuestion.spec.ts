@@ -50,7 +50,7 @@ describe("QuizQuestion", () => {
       const clickSendQuestion = () =>
         wrapper
           .find(
-            "button[title='send this question for fine tuning the question generation model']",
+            "a[title='send this question for fine tuning the question generation model']",
           )
           .trigger("click");
 
@@ -65,13 +65,12 @@ describe("QuizQuestion", () => {
         helper.apiMock.expectingPost(
           `/api/quiz-questions/${quizQuestion.quizQuestionId}/mark-question`,
         );
-        wrapper.vm.popups.confirm = vitest.fn(() => Promise.resolve(true));
         await clickSendQuestion();
+        wrapper.vm.suggestQuestion();
         await flushPromises();
       });
 
       it("should be able to skip marking a question as good", async () => {
-        wrapper.vm.popups.confirm = vitest.fn(() => Promise.resolve(false));
         await clickSendQuestion();
         await flushPromises();
       });
