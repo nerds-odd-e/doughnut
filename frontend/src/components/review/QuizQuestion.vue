@@ -134,7 +134,7 @@ export default defineComponent({
         this.suggestedQuestionText,
       );
       this.popup.done(null);
-    }
+    },
   },
 });
 </script>
