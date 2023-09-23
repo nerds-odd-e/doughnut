@@ -36,7 +36,9 @@ Given(
   },
 )
 
-Given("the admin should see {string} in the suggested questions", (_expectedComment: string) => {
-  pageObjects.loginAsAdminAndGoToAdminDashboard().suggestedQuestionsForFineTuning()
-  // .expectComment(expectedComment)
+Given("the admin should see {string} in the suggested questions", (expectedComment: string) => {
+  pageObjects
+    .loginAsAdminAndGoToAdminDashboard()
+    .suggestedQuestionsForFineTuning()
+    .expectComment(expectedComment)
 })

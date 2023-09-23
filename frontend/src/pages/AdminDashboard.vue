@@ -23,10 +23,26 @@
     <button class="download-button" @click="downloadTrainingData()">
       Download
     </button>
+    <ContentLoader v-if="false" />
+    <div v-else>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>this is a comment on a question we don't like</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
+import { ContentLoader } from "vue-content-loader";
 import useLoadingApi from "../managedApi/useLoadingApi";
 
 export default {
@@ -39,30 +55,25 @@ export default {
     };
   },
   methods: {
+    async fetchSuggestedQuestions() {
+      // this.suggestedQuestions = await this.api.getTrainingData();
+    },
     async downloadTrainingData() {
-      try {
-        const response = await this.api.getTrainingData();
-
-        // Create a Blob with the file content
-        const blob = new Blob(
-          [response.map((x) => JSON.stringify(x)).join("\n")],
-          {
-            type: "text/plain",
-          },
-        );
-
-        const url = URL.createObjectURL(blob);
-
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "trainingdata.txt";
-        a.click();
-
-        URL.revokeObjectURL(url);
-      } catch (error) {
-        return;
-      }
+      const trainingData = await this.api.getTrainingData();
+      const blob = new Blob(
+        [trainingData.map((x) => JSON.stringify(x)).join("\n")],
+        {
+          type: "text/plain",
+        },
+      );
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "trainingdata.txt";
+      a.click();
+      URL.revokeObjectURL(url);
     },
   },
+  components: { ContentLoader },
 };
 </script>
