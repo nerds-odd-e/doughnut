@@ -48,7 +48,7 @@ class RestQuizQuestionController {
   public Integer suggestQuestionForFineTunng(
       @PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity,
       @RequestBody(required = false) String suggestion) {
-    MarkedQuestion markedQuestion =
+    SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
         new MarkedQuestionService()
             .markQuestion(
                 quizQuestionEntity,
@@ -56,6 +56,6 @@ class RestQuizQuestionController {
                 currentUser.getEntity(),
                 testabilitySettings.getCurrentUTCTimestamp(),
                 modelFactoryService);
-    return markedQuestion.getId();
+    return suggestedQuestionForFineTuning.getId();
   }
 }

@@ -1,13 +1,13 @@
 package com.odde.doughnut.testability.builders;
 
-import com.odde.doughnut.entities.MarkedQuestion;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
-public class MarkedQuestionBuilder extends EntityBuilder<MarkedQuestion> {
+public class MarkedQuestionBuilder extends EntityBuilder<SuggestedQuestionForFineTuning> {
   public MarkedQuestionBuilder(MakeMe makeMe) {
-    super(makeMe, new MarkedQuestion());
+    super(makeMe, new SuggestedQuestionForFineTuning());
     ofNote(makeMe.aNote().please());
     entity.setUserId(makeMe.aUser().please().getId());
     entity.setQuizQuestion(makeMe.aQuestion().please());

@@ -11,7 +11,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "marked_questions")
-public class MarkedQuestion {
+public class SuggestedQuestionForFineTuning {
 
   @Id
   @Getter

@@ -2,8 +2,8 @@ package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.entities.MarkedQuestion;
 import com.odde.doughnut.entities.QuizQuestionEntity;
+import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.AIGeneratedQuestion;
@@ -11,21 +11,22 @@ import java.sql.Timestamp;
 
 public record MarkedQuestionService() {
 
-  public MarkedQuestion markQuestion(
+  public SuggestedQuestionForFineTuning markQuestion(
       QuizQuestionEntity quizQuestionEntity,
       String suggestion,
       User user,
       Timestamp currentUTCTimestamp,
       ModelFactoryService modelFactoryService) {
-    MarkedQuestion markedQuestion = new MarkedQuestion();
-    markedQuestion.setUserId(user.getId());
-    markedQuestion.setQuizQuestion(quizQuestionEntity);
-    markedQuestion.setNote(quizQuestionEntity.getThing().getNote());
-    markedQuestion.setCreatedAt(currentUTCTimestamp);
+    SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
+        new SuggestedQuestionForFineTuning();
+    suggestedQuestionForFineTuning.setUserId(user.getId());
+    suggestedQuestionForFineTuning.setQuizQuestion(quizQuestionEntity);
+    suggestedQuestionForFineTuning.setNote(quizQuestionEntity.getThing().getNote());
+    suggestedQuestionForFineTuning.setCreatedAt(currentUTCTimestamp);
 
     updateQuestionStemWithSuggestion(suggestion, quizQuestionEntity, modelFactoryService);
 
-    return modelFactoryService.markedQuestionRepository.save(markedQuestion);
+    return modelFactoryService.markedQuestionRepository.save(suggestedQuestionForFineTuning);
   }
 
   private static void updateQuestionStemWithSuggestion(

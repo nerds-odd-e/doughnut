@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.entities.MarkedQuestion;
+import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.entities.json.TrainingData;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -27,8 +27,13 @@ class RestTrainingDataController {
   @GetMapping("/goodtrainingdata")
   public List<TrainingData> getGoodTrainingData() {
     currentUser.assertLoggedIn();
-    List<MarkedQuestion> markedQuestions = new ArrayList<>();
-    modelFactoryService.markedQuestionRepository.findAll().forEach(markedQuestions::add);
-    return markedQuestions.stream().map(MarkedQuestion::getTrainingData).toList();
+    List<SuggestedQuestionForFineTuning> suggestedQuestionForFineTunings = new ArrayList<>();
+    modelFactoryService
+        .markedQuestionRepository
+        .findAll()
+        .forEach(suggestedQuestionForFineTunings::add);
+    return suggestedQuestionForFineTunings.stream()
+        .map(SuggestedQuestionForFineTuning::getTrainingData)
+        .toList();
   }
 }
