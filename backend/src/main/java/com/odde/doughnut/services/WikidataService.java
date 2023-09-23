@@ -1,6 +1,6 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.entities.json.WikidataSearchEntity;
+import com.odde.doughnut.controllers.json.WikidataSearchEntity;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.httpQuery.QueryBuilder;
 import com.odde.doughnut.services.wikidataApis.*;

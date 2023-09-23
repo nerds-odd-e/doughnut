@@ -9,9 +9,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.json.AiCompletion;
-import com.odde.doughnut.entities.json.AiCompletionRequest;
-import com.odde.doughnut.entities.json.ApiError;
+import com.odde.doughnut.controllers.json.AiCompletion;
+import com.odde.doughnut.controllers.json.AiCompletionRequest;
+import com.odde.doughnut.controllers.json.ApiError;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;

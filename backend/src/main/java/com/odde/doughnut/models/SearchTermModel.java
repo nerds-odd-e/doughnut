@@ -3,7 +3,7 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.json.SearchTerm;
+import com.odde.doughnut.controllers.json.SearchTerm;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import java.util.List;
 import java.util.regex.Pattern;

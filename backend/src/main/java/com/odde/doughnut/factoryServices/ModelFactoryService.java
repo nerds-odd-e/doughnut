@@ -1,8 +1,8 @@
 package com.odde.doughnut.factoryServices;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.json.QuizQuestion;
-import com.odde.doughnut.entities.json.SearchTerm;
+import com.odde.doughnut.controllers.json.QuizQuestion;
+import com.odde.doughnut.controllers.json.SearchTerm;
 import com.odde.doughnut.entities.repositories.*;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionPresenter;
 import com.odde.doughnut.models.*;

@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.entities.json.NotebooksViewedByUser;
+import com.odde.doughnut.controllers.json.NotebooksViewedByUser;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.models.JsonViewer;

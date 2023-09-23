@@ -1,7 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.entities.json.TrainingData;
+import com.odde.doughnut.controllers.json.TrainingData;
 import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
 import java.sql.Timestamp;
 import javax.persistence.*;

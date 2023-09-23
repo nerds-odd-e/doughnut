@@ -1,6 +1,6 @@
 package com.odde.doughnut.services.wikidataApis.thirdPartyEntities;
 
-import com.odde.doughnut.entities.json.WikidataEntityData;
+import com.odde.doughnut.controllers.json.WikidataEntityData;
 import java.util.Map;
 
 public class WikidataEntityDataHash {

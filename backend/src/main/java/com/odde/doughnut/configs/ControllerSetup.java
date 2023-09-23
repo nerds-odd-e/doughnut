@@ -1,7 +1,7 @@
 package com.odde.doughnut.configs;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
-import com.odde.doughnut.entities.json.ApiError;
+import com.odde.doughnut.controllers.json.ApiError;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.factoryServices.FailureReportFactory;
 import com.odde.doughnut.factoryServices.ModelFactoryService;

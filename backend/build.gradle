@@ -104,7 +104,7 @@ generateTypeScript {
   noFileComment = true
   jsonLibrary = 'jackson2'
   classPatterns = [
-    'com.odde.doughnut.entities.json.*',
+    'com.odde.doughnut.controllers.json.*',
   ]
   optionalAnnotations = ['org.springframework.lang.Nullable']
   customTypeMappings = [

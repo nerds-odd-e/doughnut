@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.entities.json.WikidataEntityData;
-import com.odde.doughnut.entities.json.WikidataSearchEntity;
+import com.odde.doughnut.controllers.json.WikidataEntityData;
+import com.odde.doughnut.controllers.json.WikidataSearchEntity;
 import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.testability.TestabilitySettings;

@@ -1,7 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.entities.json.NotePositionViewedByUser;
+import com.odde.doughnut.controllers.json.NotePositionViewedByUser;
 import com.odde.doughnut.factoryServices.quizFacotries.*;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.*;
 import com.odde.doughnut.factoryServices.quizFacotries.presenters.*;

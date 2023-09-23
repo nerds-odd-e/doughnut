@@ -1,6 +1,6 @@
 package com.odde.doughnut.exceptions;
 
-import com.odde.doughnut.entities.json.ApiError;
+import com.odde.doughnut.controllers.json.ApiError;
 import org.springframework.http.HttpStatus;
 
 public class OpenAIServiceErrorException extends ApiException {

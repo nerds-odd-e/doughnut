@@ -5,8 +5,8 @@ import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.entities.json.AiCompletion;
-import com.odde.doughnut.entities.json.AiCompletionRequest;
+import com.odde.doughnut.controllers.json.AiCompletion;
+import com.odde.doughnut.controllers.json.AiCompletionRequest;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;

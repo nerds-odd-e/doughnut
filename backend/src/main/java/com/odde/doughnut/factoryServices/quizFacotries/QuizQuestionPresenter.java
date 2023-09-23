@@ -1,7 +1,7 @@
 package com.odde.doughnut.factoryServices.quizFacotries;
 
 import com.odde.doughnut.entities.PictureWithMask;
-import com.odde.doughnut.entities.json.QuizQuestion;
+import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.util.List;
 import java.util.Optional;

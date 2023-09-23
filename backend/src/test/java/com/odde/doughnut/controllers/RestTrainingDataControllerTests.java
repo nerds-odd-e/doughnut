@@ -5,8 +5,8 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.json.TrainingData;
-import com.odde.doughnut.entities.json.TrainingDataMessage;
+import com.odde.doughnut.controllers.json.TrainingData;
+import com.odde.doughnut.controllers.json.TrainingDataMessage;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;

@@ -13,7 +13,7 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.odde.doughnut.entities.json.LinkViewed;
+import com.odde.doughnut.controllers.json.LinkViewed;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;

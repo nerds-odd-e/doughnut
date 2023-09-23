@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.json.SearchTerm;
+import com.odde.doughnut.controllers.json.SearchTerm;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.ArrayList;
 import java.util.List;

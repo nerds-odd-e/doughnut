@@ -1,6 +1,6 @@
 package com.odde.doughnut.services.wikidataApis.thirdPartyEntities;
 
-import com.odde.doughnut.entities.json.WikidataSearchEntity;
+import com.odde.doughnut.controllers.json.WikidataSearchEntity;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;

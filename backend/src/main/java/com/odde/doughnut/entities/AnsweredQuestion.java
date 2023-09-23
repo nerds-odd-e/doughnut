@@ -1,6 +1,6 @@
 package com.odde.doughnut.entities;
 
-import com.odde.doughnut.entities.json.QuizQuestion;
+import com.odde.doughnut.controllers.json.QuizQuestion;
 import org.springframework.lang.Nullable;
 
 public class AnsweredQuestion {

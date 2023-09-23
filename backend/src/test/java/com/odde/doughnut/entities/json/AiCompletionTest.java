@@ -2,6 +2,7 @@ package com.odde.doughnut.entities.json;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.odde.doughnut.controllers.json.AiCompletionRequest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 

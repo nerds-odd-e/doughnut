@@ -5,8 +5,8 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 
-import com.odde.doughnut.entities.json.WikidataEntityData;
-import com.odde.doughnut.entities.json.WikidataSearchEntity;
+import com.odde.doughnut.controllers.json.WikidataEntityData;
+import com.odde.doughnut.controllers.json.WikidataSearchEntity;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.odde.doughnut.testability.TestabilitySettings;

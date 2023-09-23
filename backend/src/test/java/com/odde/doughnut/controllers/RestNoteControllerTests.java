@@ -5,12 +5,14 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 
+import com.odde.doughnut.controllers.json.NoteCreation;
+import com.odde.doughnut.controllers.json.NoteRealm;
+import com.odde.doughnut.controllers.json.WikidataAssociationCreation;
 import com.odde.doughnut.entities.Link.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessories;
 import com.odde.doughnut.entities.TextContent;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.json.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.TimestampOperations;

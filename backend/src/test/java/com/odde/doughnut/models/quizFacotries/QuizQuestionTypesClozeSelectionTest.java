@@ -6,7 +6,7 @@ import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.json.QuizQuestion;
+import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;

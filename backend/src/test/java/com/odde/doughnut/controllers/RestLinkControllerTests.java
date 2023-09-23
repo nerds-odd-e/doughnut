@@ -8,7 +8,7 @@ import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Link.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.json.LinkCreation;
+import com.odde.doughnut.controllers.json.LinkCreation;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
