@@ -24,7 +24,7 @@ Feature: Generate Training Data for fine-tuning OpenAI
       | Who wrote 'Who Let the Dogs Out'? | Anslem Douglas | Baha Men           |
     Given I ask to generate a question for the note "Who Let the Dogs Out"
     And I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as an example but with comment "this is a comment on a question we don't like"
-    Then the admin should see "this is a comment on a question we don't like" in the downloaded file
+    Then the admin should see "this is a comment on a question we don't like" in the suggested questions
 
   Scenario Outline: User gives a suggestion for the question
     And OpenAI by default returns this question:

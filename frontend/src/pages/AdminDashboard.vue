@@ -1,22 +1,42 @@
 <template>
-  <h2>Download questions marked by users</h2>
-  <button class="download-button" @click="downloadTrainingData()">
-    Download
-  </button>
-  <p>
-    <router-link :to="{ name: 'failureReportList' }"
-      >Failure Reports</router-link
-    >
-  </p>
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a
+        :class="`nav-link ${
+          activePage === 'trainingQuestions' ? 'active' : ''
+        }`"
+        aria-current="page"
+        role="button"
+        href="#"
+        @click="activePage = 'trainingQuestions'"
+        >Training Questions</a
+      >
+    </li>
+    <li class="nav-item">
+      <router-link :to="{ name: 'failureReportList' }"
+        >Failure Reports</router-link
+      >
+    </li>
+  </ul>
+  <div v-if="activePage === 'trainingQuestions'">
+    <h2>Fine Tuning Questions Suggested by Users</h2>
+    <button class="download-button" @click="downloadTrainingData()">
+      Download
+    </button>
+  </div>
 </template>
 
-<script>
+<script lang="ts">
 import useLoadingApi from "../managedApi/useLoadingApi";
-import ManagedApi from "../managedApi/ManagedApi";
 
 export default {
   setup() {
     return useLoadingApi();
+  },
+  data() {
+    return {
+      activePage: undefined as string | undefined,
+    };
   },
   methods: {
     async downloadTrainingData() {

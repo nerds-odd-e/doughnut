@@ -39,7 +39,9 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
   },
   async getTrainingData() {
-    return managedApi.restGet("gettrainingdata/goodtrainingdata");
+    return (await managedApi.restGet(
+      "gettrainingdata/goodtrainingdata",
+    )) as Generated.TrainingData[];
   },
   reviewMethods: {
     async markAsRepeated(reviewPointId: Doughnut.ID, successful: boolean) {

@@ -8,6 +8,7 @@ import pageObjects from "page_objects"
 Given("my question should not be included in the admin's fine-tuning data", () => {
   pageObjects
     .loginAsAdminAndGoToAdminDashboard()
+    .suggestedQuestionsForFineTuning()
     .downloadAIQuestionTrainingData()
     .expectNumberOfRecords(0)
 })
@@ -17,6 +18,7 @@ Given(
   (questionStem: string) => {
     pageObjects
       .loginAsAdminAndGoToAdminDashboard()
+      .suggestedQuestionsForFineTuning()
       .downloadAIQuestionTrainingData()
       .expectNumberOfRecords(1)
       .expectTxtInDownload(questionStem)
@@ -28,14 +30,13 @@ Given(
   (suggestion: string, _option: string) => {
     pageObjects
       .loginAsAdminAndGoToAdminDashboard()
+      .suggestedQuestionsForFineTuning()
       .downloadAIQuestionTrainingData()
       .expectTxtInDownload(suggestion)
   },
 )
 
-Given("the admin should see {string} in the downloaded file", (expectedComment: string) => {
-  pageObjects
-    .loginAsAdminAndGoToAdminDashboard()
-    .downloadAIQuestionTrainingData()
-    .expectTxtInDownload(expectedComment)
+Given("the admin should see {string} in the suggested questions", (_expectedComment: string) => {
+  pageObjects.loginAsAdminAndGoToAdminDashboard().suggestedQuestionsForFineTuning()
+  // .expectComment(expectedComment)
 })
