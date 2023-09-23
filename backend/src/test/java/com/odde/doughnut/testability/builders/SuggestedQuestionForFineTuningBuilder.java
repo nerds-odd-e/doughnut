@@ -10,7 +10,7 @@ public class SuggestedQuestionForFineTuningBuilder
   public SuggestedQuestionForFineTuningBuilder(MakeMe makeMe) {
     super(makeMe, new SuggestedQuestionForFineTuning());
     ofNote(makeMe.aNote().please());
-    entity.setUserId(makeMe.aUser().please().getId());
+    entity.setUser(makeMe.aUser().please());
     entity.setQuizQuestion(makeMe.aQuestion().please());
   }
 

@@ -19,7 +19,7 @@ public record QuestionSuggestionForFineTuningService() {
       ModelFactoryService modelFactoryService) {
     SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
         new SuggestedQuestionForFineTuning();
-    suggestedQuestionForFineTuning.setUserId(user.getId());
+    suggestedQuestionForFineTuning.setUser(user);
     suggestedQuestionForFineTuning.setQuizQuestion(quizQuestionEntity);
     suggestedQuestionForFineTuning.setNote(quizQuestionEntity.getThing().getNote());
     suggestedQuestionForFineTuning.setCreatedAt(currentUTCTimestamp);

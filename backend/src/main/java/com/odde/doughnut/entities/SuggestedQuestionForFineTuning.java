@@ -8,6 +8,7 @@ import javax.persistence.*;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import org.springframework.lang.Nullable;
 
 @Entity
 @Table(name = "marked_questions")
@@ -18,17 +19,20 @@ public class SuggestedQuestionForFineTuning {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-  @Column(name = "user_id")
+  @ManyToOne
+  @JoinColumn(name = "user_id")
   @Getter
   @Setter
   @NonNull
-  private Integer userId;
+  @JsonIgnore
+  private User user;
 
   @ManyToOne
   @JoinColumn(name = "note_id")
   @Getter
   @Setter
   @NonNull
+  @JsonIgnore
   private Note note;
 
   @ManyToOne
@@ -53,7 +57,7 @@ public class SuggestedQuestionForFineTuning {
   @Column(name = "created_at")
   @Getter
   @Setter
-  @NonNull
+  @Nullable
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
   @JsonIgnore

@@ -206,11 +206,9 @@ declare namespace Generated {
 
     interface SuggestedQuestionForFineTuning {
         id: number;
-        userId: number;
-        note: Note;
         comment: string;
         isGood: boolean;
-        createdAt: string;
+        createdAt?: string;
     }
 
     interface Link extends Thingy {
