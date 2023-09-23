@@ -32,7 +32,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
+          <tr v-for="(question, index) in suggestedQuestions" :key="index">
+            <td>{{ question.comment }}</td>
             <td>this is a comment on a question we don't like</td>
           </tr>
         </tbody>
