@@ -203,8 +203,8 @@ When("I ask to generate a question for the note {string}", (noteTopic: string) =
   pageObjects.chatAboutNote(noteTopic).testMe()
 })
 
-When("I add comment {string} on the question {string}", (comment: string, noteTopic: string) => {
-  pageObjects.findQuestionWithStem(noteTopic).enterComment(comment)
+When("I suggest the displayed question {string} as an example but with comment {string}", (questionStem: string, comment: string) => {
+  pageObjects.findQuestionWithStem(questionStem).enterComment(comment)
 })
 
 Then("I should be asked {string}", (expectedQuestionStem: string) => {
