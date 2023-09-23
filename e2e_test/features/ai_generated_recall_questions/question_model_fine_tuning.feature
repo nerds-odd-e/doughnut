@@ -16,6 +16,14 @@ Feature: Generate Training Data from marked questions
     When I mark the question "Who wrote 'Who Let the Dogs Out'?" as good
     Then an admin should be able to download the training data with 1 record containing "Who wrote 'Who Let the Dogs Out'?"
 
+  Scenario: Add a comment to an existing note question
+    And OpenAI by default returns this question from now:
+      | question                          | correct_choice | incorrect_choice_1 |
+      | Who wrote 'Who Let the Dogs Out'? | Anslem Douglas | Baha Men           |
+    Given I ask to generate a question for note "Who Let the Dogs Out"
+    When I add comment "this is a comment on a question we don't like" on this question "Who wrote 'Who Let the Dogs Out'?"
+    Then the admin should see "this is a comment on a question we don't like" in the downloaded file
+
   Scenario Outline: User gives a suggestion for the question
     And OpenAI by default returns this question from now:
       | question                          | correct_choice | incorrect_choice_1 |
