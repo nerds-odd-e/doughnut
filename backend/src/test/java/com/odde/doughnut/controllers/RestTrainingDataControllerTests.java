@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.odde.doughnut.controllers.json.TrainingData;
 import com.odde.doughnut.controllers.json.TrainingDataMessage;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
@@ -19,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -33,7 +33,7 @@ public class RestTrainingDataControllerTests {
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().toModelPlease();
+    userModel = makeMe.anAdmin().toModelPlease();
     controller = new RestTrainingDataController(modelFactoryService, userModel);
   }
 
@@ -42,17 +42,18 @@ public class RestTrainingDataControllerTests {
     @Test
     void itShouldNotAllowNonMemberToSeeTrainingData() {
       controller = new RestTrainingDataController(modelFactoryService, makeMe.aNullUserModel());
-      assertThrows(ResponseStatusException.class, () -> controller.getGoodTrainingData());
+      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.getGoodTrainingData());
     }
 
     @Test
-    void shouldReturnNoTrainingDataIfNoMarkedQuestion() {
+    void shouldReturnNoTrainingDataIfNoMarkedQuestion() throws UnexpectedNoAccessRightException {
       List<TrainingData> goodTrainingData = controller.getGoodTrainingData();
       assertTrue(goodTrainingData.isEmpty());
     }
 
     @Test
-    void shouldReturnGoodTrainingDataIfHavingReadingAuth_whenCallGetGoodTrainingData() {
+    void shouldReturnGoodTrainingDataIfHavingReadingAuth_whenCallGetGoodTrainingData()
+        throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().title("Test Topic").please();
       makeMe.aQuestionSuggestionForFineTunining().ofNote(note).please();
       List<TrainingData> goodTrainingDataList = controller.getGoodTrainingData();
@@ -65,7 +66,8 @@ public class RestTrainingDataControllerTests {
     }
 
     @Test
-    void shouldIncludeTheQuestion_whenCallGetGoodTrainingData() {
+    void shouldIncludeTheQuestion_whenCallGetGoodTrainingData()
+        throws UnexpectedNoAccessRightException {
       makeMe
           .aQuestionSuggestionForFineTunining()
           .withRawQuestion("This is the raw Json question")
@@ -77,10 +79,13 @@ public class RestTrainingDataControllerTests {
     }
   }
 
-  @Test
-  void shouldThrowExceptionIfUserDoesNotHaveReadingAuth_whenCallGetGoodTrainingData() {
-    userModel = modelFactoryService.toUserModel(null);
-    controller = new RestTrainingDataController(modelFactoryService, userModel);
-    assertThrows(ResponseStatusException.class, () -> controller.getGoodTrainingData());
+  @Nested
+  class SuggestedQuestions {
+    @Test
+    void shouldThrowExceptionIfUserDoesNotHaveReadingAuth_whenCallGetGoodTrainingData() {
+      controller = new RestTrainingDataController(modelFactoryService, makeMe.aNullUserModel());
+      assertThrows(
+          UnexpectedNoAccessRightException.class, () -> controller.getAllSuggestedQuestions());
+    }
   }
 }

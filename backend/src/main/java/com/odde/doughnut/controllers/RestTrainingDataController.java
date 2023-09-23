@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.json.TrainingData;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import java.util.ArrayList;
@@ -25,8 +26,8 @@ class RestTrainingDataController {
   }
 
   @GetMapping("/goodtrainingdata")
-  public List<TrainingData> getGoodTrainingData() {
-    currentUser.assertLoggedIn();
+  public List<TrainingData> getGoodTrainingData() throws UnexpectedNoAccessRightException {
+    currentUser.assertAdminAuthorization();
     List<SuggestedQuestionForFineTuning> suggestedQuestionForFineTunings = new ArrayList<>();
     modelFactoryService
         .questionSuggestionForFineTuningRepository
@@ -35,5 +36,12 @@ class RestTrainingDataController {
     return suggestedQuestionForFineTunings.stream()
         .map(SuggestedQuestionForFineTuning::getTrainingData)
         .toList();
+  }
+
+  @GetMapping("/all-suggested-questions-for-fine-tuning")
+  public List<SuggestedQuestionForFineTuning> getAllSuggestedQuestions()
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAdminAuthorization();
+    return null;
   }
 }
