@@ -11,7 +11,7 @@ const currentQuestion = (stem?: string) => {
       getChoice(choice).parent().invoke("attr", "class").should("contain", `is-${correctness}`)
     },
 
-    markQuestion() {
+    suggestThisQuestionForFineTuning() {
       question()
         .findByRole("button", {
           name: "send this question for fine tuning the question generation model",

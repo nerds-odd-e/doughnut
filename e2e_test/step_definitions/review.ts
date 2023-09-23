@@ -219,7 +219,7 @@ Then("I should see the question {string} is disabled", (questionStem: string) =>
 })
 
 Then("I suggest the displayed question {string} as a good example", (questionStem: string) => {
-  pageObjects.findQuestionWithStem(questionStem).markQuestion()
+  pageObjects.findQuestionWithStem(questionStem).suggestThisQuestionForFineTuning()
 })
 
 When("I suggest an improved {string} with {string}", (option: string, suggestion: string) => {

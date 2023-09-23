@@ -9,7 +9,7 @@ Feature: Generate Training Data for fine-tuning OpenAI
     Given I am logged in as an existing user
     And I have a note with the topic "Who Let the Dogs Out"
 
-  Scenario: Admin should be able to generate training data from marked questions
+  Scenario: Admin should be able to generate training data from suggested questions
     And OpenAI by default returns this question:
       | Question Stem                     | Correct Choice | Incorrect Choice 1 |
       | Who wrote 'Who Let the Dogs Out'? | Anslem Douglas | Baha Men           |
