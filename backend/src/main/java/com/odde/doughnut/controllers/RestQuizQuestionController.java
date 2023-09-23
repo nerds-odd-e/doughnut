@@ -43,9 +43,9 @@ class RestQuizQuestionController {
     return answerModel.getAnswerViewedByUser(currentUser.getEntity());
   }
 
-  @PostMapping("/{quizQuestion}/mark-question")
+  @PostMapping("/{quizQuestion}/suggest-fine-tuning")
   @Transactional
-  public Integer markQuestion(
+  public Integer suggestQuestionForFineTunng(
       @PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity,
       @RequestBody(required = false) String suggestion) {
     MarkedQuestion markedQuestion =

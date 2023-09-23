@@ -73,7 +73,9 @@
           name="suggestedcorrect_choice"
           placeholder="Add a suggested correct choice"
         ></textarea>
-        <button class="btn btn-success" @click="suggestQuestion">OK</button>
+        <button class="btn btn-success" @click="suggestQuestionForFineTuning">
+          OK
+        </button>
       </PopButton>
     </div>
   </div>
@@ -135,8 +137,8 @@ export default defineComponent({
       }
     },
 
-    async suggestQuestion() {
-      await this.api.reviewMethods.markQuestion(
+    async suggestQuestionForFineTuning() {
+      await this.api.reviewMethods.suggestQuestionForFineTuning(
         this.quizQuestion.quizQuestionId,
         this.suggestedQuestionText,
       );

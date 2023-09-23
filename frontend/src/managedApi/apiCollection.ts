@@ -55,12 +55,12 @@ const apiCollection = (managedApi: ManagedApi) => ({
         {},
       )) as Generated.ReviewPoint;
     },
-    async markQuestion(
+    async suggestQuestionForFineTuning(
       quizQuestionId: number,
       suggestedQuestion: JsonData,
     ): Promise<string> {
       return managedApi.restPost(
-        `quiz-questions/${quizQuestionId}/mark-question`,
+        `quiz-questions/${quizQuestionId}/suggest-fine-tuning`,
         suggestedQuestion,
       ) as Promise<string>;
     },
