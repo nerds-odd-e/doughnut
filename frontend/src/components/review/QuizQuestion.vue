@@ -46,6 +46,13 @@
         <template #button_face>
           <SvgRaiseHand />
         </template>
+        <h2>Suggest This Question For AI Fine Tuning</h2>
+        <p>
+          <i
+            >Sending this question for fine tuning the question generation model
+            will make this note and question visible to admin. Are you sure?</i
+          >
+        </p>
         <textarea
           name="commentField"
           placeholder="Add a comment about the question"
