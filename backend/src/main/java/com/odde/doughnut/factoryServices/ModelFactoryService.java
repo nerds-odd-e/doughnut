@@ -29,7 +29,9 @@ public class ModelFactoryService {
   @Autowired public NotebookRepository notebookRepository;
   @Autowired public EntityManager entityManager;
   @Autowired public FailureReportRepository failureReportRepository;
-  @Autowired public MarkedQuestionRepository markedQuestionRepository;
+
+  @Autowired
+  public QuestionSuggestionForFineTuningRepository questionSuggestionForFineTuningRepository;
 
   public NoteModel toNoteModel(Note note) {
     return new NoteModel(note, this);

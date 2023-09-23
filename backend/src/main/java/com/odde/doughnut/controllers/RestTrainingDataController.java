@@ -29,7 +29,7 @@ class RestTrainingDataController {
     currentUser.assertLoggedIn();
     List<SuggestedQuestionForFineTuning> suggestedQuestionForFineTunings = new ArrayList<>();
     modelFactoryService
-        .markedQuestionRepository
+        .questionSuggestionForFineTuningRepository
         .findAll()
         .forEach(suggestedQuestionForFineTunings::add);
     return suggestedQuestionForFineTunings.stream()

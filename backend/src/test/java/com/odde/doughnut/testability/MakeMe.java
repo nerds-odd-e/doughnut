@@ -124,7 +124,7 @@ public class MakeMe extends MakeMeWithoutDB {
     return new FailureReportBuilder(this);
   }
 
-  public MarkedQuestionBuilder aMarkedQuestion() {
-    return new MarkedQuestionBuilder(this);
+  public SuggestedQuestionForFineTuningBuilder aQuestionSuggestionForFineTunining() {
+    return new SuggestedQuestionForFineTuningBuilder(this);
   }
 }

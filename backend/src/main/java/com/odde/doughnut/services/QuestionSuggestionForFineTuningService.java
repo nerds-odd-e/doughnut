@@ -9,9 +9,9 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.AIGeneratedQuestion;
 import java.sql.Timestamp;
 
-public record MarkedQuestionService() {
+public record QuestionSuggestionForFineTuningService() {
 
-  public SuggestedQuestionForFineTuning markQuestion(
+  public SuggestedQuestionForFineTuning suggestQuestion(
       QuizQuestionEntity quizQuestionEntity,
       String suggestion,
       User user,
@@ -26,7 +26,8 @@ public record MarkedQuestionService() {
 
     updateQuestionStemWithSuggestion(suggestion, quizQuestionEntity, modelFactoryService);
 
-    return modelFactoryService.markedQuestionRepository.save(suggestedQuestionForFineTuning);
+    return modelFactoryService.questionSuggestionForFineTuningRepository.save(
+        suggestedQuestionForFineTuning);
   }
 
   private static void updateQuestionStemWithSuggestion(

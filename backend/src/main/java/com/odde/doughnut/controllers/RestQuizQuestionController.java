@@ -4,7 +4,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.MarkedQuestionService;
+import com.odde.doughnut.services.QuestionSuggestionForFineTuningService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -49,8 +49,8 @@ class RestQuizQuestionController {
       @PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity,
       @RequestBody(required = false) String suggestion) {
     SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
-        new MarkedQuestionService()
-            .markQuestion(
+        new QuestionSuggestionForFineTuningService()
+            .suggestQuestion(
                 quizQuestionEntity,
                 suggestion,
                 currentUser.getEntity(),

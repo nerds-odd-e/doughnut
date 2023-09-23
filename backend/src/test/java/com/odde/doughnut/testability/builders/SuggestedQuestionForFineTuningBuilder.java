@@ -5,8 +5,9 @@ import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
-public class MarkedQuestionBuilder extends EntityBuilder<SuggestedQuestionForFineTuning> {
-  public MarkedQuestionBuilder(MakeMe makeMe) {
+public class SuggestedQuestionForFineTuningBuilder
+    extends EntityBuilder<SuggestedQuestionForFineTuning> {
+  public SuggestedQuestionForFineTuningBuilder(MakeMe makeMe) {
     super(makeMe, new SuggestedQuestionForFineTuning());
     ofNote(makeMe.aNote().please());
     entity.setUserId(makeMe.aUser().please().getId());
@@ -16,12 +17,12 @@ public class MarkedQuestionBuilder extends EntityBuilder<SuggestedQuestionForFin
   @Override
   protected void beforeCreate(boolean needPersist) {}
 
-  public MarkedQuestionBuilder ofNote(Note note) {
+  public SuggestedQuestionForFineTuningBuilder ofNote(Note note) {
     entity.setNote(note);
     return this;
   }
 
-  public MarkedQuestionBuilder withRawQuestion(String question) {
+  public SuggestedQuestionForFineTuningBuilder withRawQuestion(String question) {
     entity.getQuizQuestion().setRawJsonQuestion(question);
     return this;
   }

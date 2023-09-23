@@ -54,7 +54,7 @@ public class RestTrainingDataControllerTests {
     @Test
     void shouldReturnGoodTrainingDataIfHavingReadingAuth_whenCallGetGoodTrainingData() {
       Note note = makeMe.aNote().title("Test Topic").please();
-      makeMe.aMarkedQuestion().ofNote(note).please();
+      makeMe.aQuestionSuggestionForFineTunining().ofNote(note).please();
       List<TrainingData> goodTrainingDataList = controller.getGoodTrainingData();
       assertEquals(1, goodTrainingDataList.size());
       List<TrainingDataMessage> goodTrainingData = goodTrainingDataList.get(0).getMessages();
@@ -66,7 +66,10 @@ public class RestTrainingDataControllerTests {
 
     @Test
     void shouldIncludeTheQuestion_whenCallGetGoodTrainingData() {
-      makeMe.aMarkedQuestion().withRawQuestion("This is the raw Json question").please();
+      makeMe
+          .aQuestionSuggestionForFineTunining()
+          .withRawQuestion("This is the raw Json question")
+          .please();
       List<TrainingData> goodTrainingDataList = controller.getGoodTrainingData();
       List<TrainingDataMessage> goodTrainingData = goodTrainingDataList.get(0).getMessages();
       assertThat(
