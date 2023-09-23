@@ -14,6 +14,7 @@ Feature: Question generation by AI
     When I ask to generate a question for note "Scuba Diving"
     Then I should be asked "What is the most common scuba diving certification?"
     And the choice "<option>" should be <expectedResult>
+    And my question should not be included in the admin's fine-tuning data
     Examples:
       | option       | expectedResult |
       | Rescue Diver | correct        |

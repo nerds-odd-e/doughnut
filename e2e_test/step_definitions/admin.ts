@@ -5,7 +5,7 @@
 import { Given } from "@badeball/cypress-cucumber-preprocessor"
 import pageObjects from "page_objects"
 
-Given("an admin should be able to download the training data with 0 record", () => {
+Given("my question should not be included in the admin's fine-tuning data", () => {
   pageObjects
     .loginAsAdminAndGoToAdminDashboard()
     .downloadAIQuestionTrainingData()
