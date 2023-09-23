@@ -63,10 +63,10 @@ describe("QuizQuestion", () => {
 
       it("should be able to mark a question as good", async () => {
         helper.apiMock.expectingPost(
-          `/api/quiz-questions/${quizQuestion.quizQuestionId}/mark-question`,
+          `/api/quiz-questions/${quizQuestion.quizQuestionId}/suggest-fine-tuning`,
         );
         await clickSendQuestion();
-        wrapper.vm.suggestQuestion();
+        wrapper.vm.suggestQuestionForFineTuning();
         await flushPromises();
       });
 
