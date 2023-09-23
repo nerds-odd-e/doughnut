@@ -37,7 +37,7 @@ describe("QuizQuestion", () => {
       expect(wrapper.text()).toContain("1/2");
     });
 
-    describe("marking question as good", () => {
+    describe("suggest question for fine tuning AI", () => {
       const notebook: Generated.NotePositionViewedByUser =
         makeMe.aNotePosition.please();
       const quizQuestion: Generated.QuizQuestion = makeMe.aQuizQuestion
@@ -61,7 +61,7 @@ describe("QuizQuestion", () => {
           .mount();
       });
 
-      it("should be able to mark a question as good", async () => {
+      it("should be able to suggest a question as good example", async () => {
         helper.apiMock.expectingPost(
           `/api/quiz-questions/${quizQuestion.quizQuestionId}/suggest-fine-tuning`,
         );
@@ -73,6 +73,7 @@ describe("QuizQuestion", () => {
       it("should be able to skip marking a question as good", async () => {
         await clickSendQuestion();
         await flushPromises();
+        // no api call should be made
       });
     });
   });
