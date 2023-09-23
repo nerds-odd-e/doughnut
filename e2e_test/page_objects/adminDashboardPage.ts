@@ -1,5 +1,14 @@
 export function adminDashboardPage() {
   return {
+    goToFailureReportList() {
+      cy.findByText("Failure Reports").click()
+      return {
+        shouldContain(content: string) {
+          cy.get("body").should("contain", content)
+        },
+      }
+    },
+
     suggestedQuestionsForFineTuning() {
       cy.findByRole("button", { name: "Training Questions" }).click()
       return {
@@ -21,14 +30,6 @@ export function adminDashboardPage() {
             expectTxtInDownload(inputText: string) {
               const downloadsFolder = Cypress.config("downloadsFolder")
               cy.readFile(`${downloadsFolder}/trainingdata.txt`).should("contain", inputText)
-            },
-          }
-        },
-        goToFailureReportList() {
-          cy.findByText("Failure Reports").click()
-          return {
-            shouldContain(content: string) {
-              cy.get("body").should("contain", content)
             },
           }
         },
