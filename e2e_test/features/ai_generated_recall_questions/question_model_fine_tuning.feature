@@ -11,15 +11,16 @@ Feature: Generate Training Data for fine-tuning OpenAI
 
   Scenario: Admin should be able to generate training data from marked questions
     And OpenAI by default returns this question:
-      | question                          | correct_choice | incorrect_choice_1 |
-      | Who wrote 'Who Let the Dogs Out'? | Anslem Douglas | Baha Men          |
+      | Question Stem                     | Correct Choice | Incorrect Choice 1 |
+      | Who wrote 'Who Let the Dogs Out'? | Anslem Douglas | Baha Men           |
+
     When I ask to generate a question for the note "Who Let the Dogs Out"
     And I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a good example
     Then an admin should be able to download the training data containing 1 record with the question "Who wrote 'Who Let the Dogs Out'?"
 
   Scenario: Add a comment when suggesting note question
     And OpenAI by default returns this question:
-      | question                          | correct_choice | incorrect_choice_1 |
+      | Question Stem                     | Correct Choice | Incorrect Choice 1 |
       | Who wrote 'Who Let the Dogs Out'? | Anslem Douglas | Baha Men           |
     Given I ask to generate a question for the note "Who Let the Dogs Out"
     And I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as an example but with comment "this is a comment on a question we don't like"
@@ -27,7 +28,7 @@ Feature: Generate Training Data for fine-tuning OpenAI
 
   Scenario Outline: User gives a suggestion for the question
     And OpenAI by default returns this question:
-      | question                          | correct_choice | incorrect_choice_1 |
+      | Question Stem                     | Correct Choice | Incorrect Choice 1 |
       | Blah blah blah                    | Anslem Douglas | Baha Men           |
     When I ask to generate a question for the note "Who Let the Dogs Out"
     And I suggest an improved "<option>" with "<suggestion>"
@@ -36,4 +37,4 @@ Feature: Generate Training Data for fine-tuning OpenAI
       | option         | suggestion                                 |
       | Question       | Who wrote 'Who Let the Cats Out'?          |
       #| choice         | John Douglas                               |
-      #| correct_choice | Baha Women                                 |
+      #| Correct Choice | Baha Women                                 |

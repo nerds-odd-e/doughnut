@@ -75,9 +75,9 @@ Given("An OpenAI response is unavailable", () => {
 Given("OpenAI by default returns this question:", (questionTable: DataTable) => {
   const record = questionTable.hashes()[0]
   const reply = JSON.stringify({
-    stem: record.question,
+    stem: record["Question Stem"],
     correctChoiceIndex: 0,
-    choices: [record.correct_choice, record.incorrect_choice_1, record.incorrect_choice_2],
+    choices: [record["Correct Choice"], record["Incorrect Choice 1"], record["Incorrect Choice 2"]],
     confidence: 10,
   })
   cy.then(async () => {
