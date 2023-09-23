@@ -28,12 +28,7 @@ class RestTrainingDataController {
   @GetMapping("/goodtrainingdata")
   public List<TrainingData> getGoodTrainingData() throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
-    List<SuggestedQuestionForFineTuning> suggestedQuestionForFineTunings = new ArrayList<>();
-    modelFactoryService
-        .questionSuggestionForFineTuningRepository
-        .findAll()
-        .forEach(suggestedQuestionForFineTunings::add);
-    return suggestedQuestionForFineTunings.stream()
+    return getSuggestedQuestionForFineTunings().stream()
         .map(SuggestedQuestionForFineTuning::getTrainingData)
         .toList();
   }
@@ -42,6 +37,15 @@ class RestTrainingDataController {
   public List<SuggestedQuestionForFineTuning> getAllSuggestedQuestions()
       throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
-    return null;
+    return getSuggestedQuestionForFineTunings();
+  }
+
+  private List<SuggestedQuestionForFineTuning> getSuggestedQuestionForFineTunings() {
+    List<SuggestedQuestionForFineTuning> suggestedQuestionForFineTunings = new ArrayList<>();
+    modelFactoryService
+        .questionSuggestionForFineTuningRepository
+        .findAll()
+        .forEach(suggestedQuestionForFineTunings::add);
+    return suggestedQuestionForFineTunings;
   }
 }

@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.odde.doughnut.controllers.json.TrainingData;
 import com.odde.doughnut.controllers.json.TrainingDataMessage;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -86,6 +87,13 @@ public class RestTrainingDataControllerTests {
       controller = new RestTrainingDataController(modelFactoryService, makeMe.aNullUserModel());
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.getAllSuggestedQuestions());
+    }
+
+    @Test
+    void shouldReturnAllSuggestedQuestions() throws UnexpectedNoAccessRightException {
+      makeMe.aQuestionSuggestionForFineTunining().please();
+      List<SuggestedQuestionForFineTuning> suggestions = controller.getAllSuggestedQuestions();
+      assertEquals(1, suggestions.size());
     }
   }
 }
