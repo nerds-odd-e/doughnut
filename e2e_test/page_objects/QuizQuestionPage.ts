@@ -1,3 +1,5 @@
+import { SuggestQuestionForFineTuningPage } from "./SuggestQuestionForFineTuningPage"
+
 const currentQuestion = (stem?: string) => {
   const question = () => (stem ? cy.findByText(stem).parent() : cy)
   const getChoice = (choice: string) => question().findByText(choice)
@@ -11,36 +13,14 @@ const currentQuestion = (stem?: string) => {
       getChoice(choice).parent().invoke("attr", "class").should("contain", `is-${correctness}`)
     },
 
-    suggestThisQuestionForFineTuning() {
+    suggestingThisQuestionForFineTuning() {
       question()
         .findByRole("button", {
           name: "send this question for fine tuning the question generation model",
         })
         .click()
-      cy.findByRole("button", { name: "OK" }).click()
-      cy.pageIsNotLoading()
-    },
 
-    enterComment(comment: string) {
-      question()
-        .findByRole("button", {
-          name: "send this question for fine tuning the question generation model",
-        })
-        .click()
-      cy.findByPlaceholderText("Add a comment about the question").type(comment)
-      cy.findByRole("button", { name: "OK" }).click()
-      cy.pageIsNotLoading()
-    },
-
-    suggestedQuestion(option: string, suggestion: string) {
-      question()
-        .findByRole("button", {
-          name: "send this question for fine tuning the question generation model",
-        })
-        .click()
-      cy.get(`textarea[name='suggested${option}Text'`).type(suggestion)
-      cy.findByRole("button", { name: "OK" }).click()
-      cy.pageIsNotLoading()
+      return SuggestQuestionForFineTuningPage()
     },
   }
 }

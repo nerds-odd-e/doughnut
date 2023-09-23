@@ -203,13 +203,6 @@ When("I ask to generate a question for the note {string}", (noteTopic: string) =
   pageObjects.chatAboutNote(noteTopic).testMe()
 })
 
-When(
-  "I suggest the displayed question {string} as an example but with comment {string}",
-  (questionStem: string, comment: string) => {
-    pageObjects.findQuestionWithStem(questionStem).enterComment(comment)
-  },
-)
-
 Then("I should be asked {string}", (expectedQuestionStem: string) => {
   pageObjects.findQuestionWithStem(expectedQuestionStem)
 })
@@ -219,9 +212,24 @@ Then("I should see the question {string} is disabled", (questionStem: string) =>
 })
 
 Then("I suggest the displayed question {string} as a good example", (questionStem: string) => {
-  pageObjects.findQuestionWithStem(questionStem).suggestThisQuestionForFineTuning()
+  pageObjects.findQuestionWithStem(questionStem).suggestingThisQuestionForFineTuning().confirm()
 })
 
+When(
+  "I suggest the displayed question {string} as an example but with comment {string}",
+  (questionStem: string, comment: string) => {
+    pageObjects
+      .findQuestionWithStem(questionStem)
+      .suggestingThisQuestionForFineTuning()
+      .comment(comment)
+      .confirm()
+  },
+)
+
 When("I suggest an improved {string} with {string}", (option: string, suggestion: string) => {
-  pageObjects.currentQuestion().suggestedQuestion(option, suggestion)
+  pageObjects
+    .currentQuestion()
+    .suggestingThisQuestionForFineTuning()
+    .changeQuestion(option, suggestion)
+    .confirm()
 })
