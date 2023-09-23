@@ -35,6 +35,7 @@ public class SuggestedQuestionForFineTuning {
   @JoinColumn(name = "quiz_question_id")
   @Getter
   @Setter
+  @JsonIgnore
   @NonNull
   private QuizQuestionEntity quizQuestion;
 

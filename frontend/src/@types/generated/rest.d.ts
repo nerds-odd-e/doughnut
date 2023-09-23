@@ -56,6 +56,7 @@ declare namespace Generated {
     interface DummyForGeneratingTypes {
         answeredQuestion: AnsweredQuestion;
         answer: Answer;
+        suggestedQuestionForFineTuning: SuggestedQuestionForFineTuning;
     }
 
     interface InitialInfo {
@@ -201,6 +202,15 @@ declare namespace Generated {
     interface Answer {
         spellingAnswer?: string;
         choiceIndex?: number;
+    }
+
+    interface SuggestedQuestionForFineTuning {
+        id: number;
+        userId: number;
+        note: Note;
+        comment: string;
+        isGood: boolean;
+        createdAt: string;
     }
 
     interface Link extends Thingy {
