@@ -4,7 +4,7 @@ Feature: search note
   future.
 
   Background:
-    Given I've logged in as an existing user
+    Given I am logged in as an existing user
     And there are some notes for the current user:
       | topic    | details          | testingParent |
       | Sedation | Put to sleep   |               |

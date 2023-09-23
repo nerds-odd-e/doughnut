@@ -1,7 +1,7 @@
 Feature: user profile
 
   Background:
-    Given I've logged in as an existing user
+    Given I am logged in as an existing user
 
   Scenario: Edit user profile
     When I edit user profile

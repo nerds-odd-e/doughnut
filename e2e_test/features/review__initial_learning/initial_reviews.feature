@@ -4,7 +4,7 @@ Feature: Initial Review
     of the note, and/or choose to skip it for any further reviews.
 
   Background:
-      Given I've logged in as an existing user
+      Given I am logged in as an existing user
       And my daily new notes to review is set to 2
       And there are notes from Note 1 to Note 5
 

@@ -5,18 +5,18 @@
 
 import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 
-Given("I've logged in as {string}", (externalIdentifier: string) => {
+Given("I am logged in as {string}", (externalIdentifier: string) => {
   if (externalIdentifier === "none") {
     return
   }
   cy.loginAs(externalIdentifier)
 })
 
-Given("I've logged in as an existing user", () => {
+Given("I am logged in as an existing user", () => {
   cy.loginAs("old_learner")
 })
 
-Given("I've logged in as another existing user", () => {
+Given("I am logged in as another existing user", () => {
   cy.loginAs("another_old_learner")
 })
 

@@ -2,7 +2,7 @@ Feature: Generate image
   To play with the Open AI DALL-E API, I want to generate an image from text.
 
   Background:
-    Given I've logged in as an existing user
+    Given I am logged in as an existing user
     And I have a note with the topic "Animals"
 
   @usingMockedOpenAiService

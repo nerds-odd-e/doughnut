@@ -5,7 +5,7 @@ Feature: associate wikidata ID to note
     * Identify the duplicate note in my own notebooks and the circles I'm in
 
   Background:
-    Given I've logged in as an existing user
+    Given I am logged in as an existing user
     And I have a note with the topic "TDD"
 
   @usingMockedWikidataService

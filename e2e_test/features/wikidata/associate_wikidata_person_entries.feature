@@ -3,7 +3,7 @@ Feature: Note creation should have details if wikidata is a person
   to be included in the details of the new note.
 
   Background:
-    Given I've logged in as an existing user
+    Given I am logged in as an existing user
     And Wikidata.org has an entity "Q22502" with label "Taiwan"
     And Wikidata.org has an entity "Q736936" with label "Lu"
     And Wikidata.org has an entity "Q706446" with label "Wang Chien-ming"

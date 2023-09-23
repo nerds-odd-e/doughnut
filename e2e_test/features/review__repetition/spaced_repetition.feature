@@ -2,7 +2,7 @@ Feature: Spaced-repetition
     As a learner, I want to review my notes in the most optimized way
 
     Background:
-        Given I've logged in as an existing user
+        Given I am logged in as an existing user
         And my daily new notes to review is set to 1
         And my space setting is "1, 2, 4, 8"
         Given there are notes from Note 1 to Note 3

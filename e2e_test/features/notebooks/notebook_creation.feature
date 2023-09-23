@@ -1,7 +1,7 @@
 Feature: Notebook creation
 
   Background:
-    Given I've logged in as an existing user
+    Given I am logged in as an existing user
 
   Scenario: Create two new notebooks
     When I create notebooks with:

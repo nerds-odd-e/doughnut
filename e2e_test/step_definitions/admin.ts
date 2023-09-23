@@ -13,7 +13,7 @@ Given("my question should not be included in the admin's fine-tuning data", () =
 })
 
 Given(
-  "an admin should be able to download the training data with 1 record containing {string}",
+  "an admin should be able to download the training data containing 1 record with the question {string}",
   (questionStem: string) => {
     pageObjects
       .loginAsAdminAndGoToAdminDashboard()

@@ -1,7 +1,7 @@
 Feature: Access control
 
   Scenario Outline: Only Admins can see failure report page
-    Given I've logged in as "<user>"
+    Given I am logged in as "<user>"
     When I visit "<access page>" page
     Then The "<displayed page>" page is displayed
     Examples:

@@ -3,7 +3,7 @@ Feature: see recent note update
   so that I can focus on only reviewing the newly updated notes.
 
   Background:
-    Given I've logged in as an existing user
+    Given I am logged in as an existing user
     And I let the server to time travel to 100 hours ago
     And there are some notes for the current user:
       | topic    | testingParent | details       |

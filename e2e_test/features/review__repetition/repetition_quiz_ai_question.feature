@@ -2,7 +2,7 @@ Feature: Repetition Quiz
   As a learner, I want to use quizzes in my repetition to help and gamify my learning.
 
   Background:
-    Given I've logged in as an existing user
+    Given I am logged in as an existing user
     And there are some notes for the current user:
       | topic    | details                          | skipReview | testingParent |
       | English  |                                | true       |               |
@@ -13,7 +13,7 @@ Feature: Repetition Quiz
   @usingMockedOpenAiService
   Scenario Outline: AI generated question
     Given I opt to do only AI generated questions
-    And OpenAI by default returns this question from now:
+    And OpenAI by default returns this question:
       | question                         | correct_choice        | incorrect_choice_1 | incorrect_choice_2 |
       | What is the meaning of sedition? |  to incite violence   | to sleep           | Open Water Diver   |
     And I learned one note "sedition" on day 1

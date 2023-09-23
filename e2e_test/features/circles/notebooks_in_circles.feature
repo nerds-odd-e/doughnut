@@ -3,12 +3,12 @@ Feature: Notes in circles
 
   Background:
     Given There is a circle "Odd-e SG Team" with "old_learner, another_old_learner" members
-    And I've logged in as "old_learner"
+    And I am logged in as "old_learner"
 
   Scenario: Creating note that belongs to the circle
     When I create a notebook "Team agreement" in circle "Odd-e SG Team"
     Then I should see "Odd-e SG Team" in breadcrumb
-    When I've logged in as "another_old_learner"
+    When I am logged in as "another_old_learner"
     Then I should see the notebook "Team agreement" in circle "Odd-e SG Team"
     When I add a note "Keep it complex" under "Team agreement"
 

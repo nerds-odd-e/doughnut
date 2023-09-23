@@ -3,7 +3,7 @@ Feature: Nested Note creation
   notes, so that I can review them in the future.
 
   Background:
-    Given I've logged in as an existing user
+    Given I am logged in as an existing user
     And there are some notes for the current user:
       | topic          | testingParent  | details             |
       | LeSS in Action |                | An awesome training |

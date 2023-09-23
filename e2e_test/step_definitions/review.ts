@@ -199,11 +199,11 @@ Then("the choice {string} should be incorrect", (choice: string) => {
   pageObjects.currentQuestion().expectChoiceToBe(choice, "incorrect")
 })
 
-When("I ask to generate a question for note {string}", (noteTopic: string) => {
+When("I ask to generate a question for the note {string}", (noteTopic: string) => {
   pageObjects.chatAboutNote(noteTopic).testMe()
 })
 
-When("I add comment {string} on this question {string}", (comment: string, noteTopic: string) => {
+When("I add comment {string} on the question {string}", (comment: string, noteTopic: string) => {
   pageObjects.findQuestionWithStem(noteTopic).enterComment(comment)
 })
 
@@ -215,7 +215,7 @@ Then("I should see the question {string} is disabled", (questionStem: string) =>
   pageObjects.findQuestionWithStem(questionStem).isDisabled()
 })
 
-Then("I mark the question {string} as good", (questionStem: string) => {
+Then("I suggest the displayed question {string} as a good example", (questionStem: string) => {
   pageObjects.findQuestionWithStem(questionStem).markQuestion()
 })
 

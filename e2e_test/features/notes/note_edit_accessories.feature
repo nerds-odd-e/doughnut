@@ -2,7 +2,7 @@ Feature: Note Edit Accessories
   As a learner, I want to be able to edit the Accessories of a note
 
   Background:
-    Given I've logged in as an existing user
+    Given I am logged in as an existing user
     And I have a note with the topic "lunar"
 
   @ignore

@@ -13,7 +13,7 @@ Feature: Bazaar subscription
 
   @ignore
   Scenario: subscribe to a note and browse
-    Given I've logged in as an existing user
+    Given I am logged in as an existing user
     When I subscribe to notebook "Shape" in the bazaar, with target of learning 1 notes per day
     Then I should see I've subscribed to "Shape"
     And I should see readonly notebook "Shape" in my notes
@@ -22,7 +22,7 @@ Feature: Bazaar subscription
 
   @mockBrowserTime
   Scenario: subscribe to a note and review
-    Given I've logged in as an existing user
+    Given I am logged in as an existing user
     And I have a note with the topic "My memo"
     And my daily new notes to review is set to 2
     When I subscribe to notebook "Shape" in the bazaar, with target of learning 1 notes per day
@@ -32,7 +32,7 @@ Feature: Bazaar subscription
     And  I should be able to edit the subscription to notebook "Shape"
 
   Scenario: No "add to learning" button for skip-review notebook
-    Given I've logged in as "another_old_learner"
+    Given I am logged in as "another_old_learner"
     When I change notebook "Shape" to skip review
     Then I go to the bazaar
     And I should not see the "Add to my learning" button on notebook "Shape"

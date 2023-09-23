@@ -72,7 +72,7 @@ Given("An OpenAI response is unavailable", () => {
   mock_services.openAi().stubOpenAiCompletionWithErrorResponse()
 })
 
-Given("OpenAI by default returns this question from now:", (questionTable: DataTable) => {
+Given("OpenAI by default returns this question:", (questionTable: DataTable) => {
   const record = questionTable.hashes()[0]
   const reply = JSON.stringify({
     stem: record.question,

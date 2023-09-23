@@ -4,7 +4,7 @@ Feature: Note creation/edit for a location
   So that a note can be created with a details, location(longitude and latitude), map and picture
 
   Background:
-    Given I've logged in as an existing user
+    Given I am logged in as an existing user
     And I have a note with the topic "places"
     And Wikidata.org has an entity "Q334" with label "Singapore"
     And Wikidata.org entity "Q334" is a location at 1.3, 103.8

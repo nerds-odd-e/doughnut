@@ -3,7 +3,7 @@ Feature: Bazaar sharing
   and others can subscribe to their notes.
 
   Background:
-    Given I've logged in as an existing user
+    Given I am logged in as an existing user
 
   Scenario: Contributing To Bazaar
     Given there are some notes for the current user:
