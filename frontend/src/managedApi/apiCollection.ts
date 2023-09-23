@@ -38,11 +38,17 @@ const apiCollection = (managedApi: ManagedApi) => ({
       )) as Generated.User;
     },
   },
+  async getSuggestedQuestionsForFineTuning() {
+    return (await managedApi.restGet(
+      "fine-tuning/all-suggested-questions-for-fine-tuning",
+    )) as Generated.SuggestedQuestionForFineTuning[];
+  },
   async getTrainingData() {
     return (await managedApi.restGet(
-      "gettrainingdata/goodtrainingdata",
+      "fine-tuning/question-training-data",
     )) as Generated.TrainingData[];
   },
+
   reviewMethods: {
     async markAsRepeated(reviewPointId: Doughnut.ID, successful: boolean) {
       return (await managedApi.restPost(

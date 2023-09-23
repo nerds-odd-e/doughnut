@@ -23,7 +23,7 @@
     <button class="download-button" @click="downloadTrainingData()">
       Download
     </button>
-    <ContentLoader v-if="false" />
+    <ContentLoader v-if="suggestedQuestions === undefined" />
     <div v-else>
       <table class="table">
         <thead>
@@ -51,13 +51,21 @@ export default {
   },
   data() {
     return {
-      activePage: undefined as string | undefined,
+      activePage: undefined as "trainingQuestions" | undefined,
+      suggestedQuestions: undefined as
+        | Generated.SuggestedQuestionForFineTuning[]
+        | undefined,
     };
   },
-  methods: {
-    async fetchSuggestedQuestions() {
-      // this.suggestedQuestions = await this.api.getTrainingData();
+  watch: {
+    async activePage() {
+      if (this.activePage === "trainingQuestions") {
+        this.suggestedQuestions =
+          await this.api.getSuggestedQuestionsForFineTuning();
+      }
     },
+  },
+  methods: {
     async downloadTrainingData() {
       const trainingData = await this.api.getTrainingData();
       const blob = new Blob(

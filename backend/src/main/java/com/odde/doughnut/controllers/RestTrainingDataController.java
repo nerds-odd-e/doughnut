@@ -14,7 +14,7 @@ import org.springframework.web.context.annotation.SessionScope;
 
 @RestController
 @SessionScope
-@RequestMapping("/api/gettrainingdata")
+@RequestMapping("/api/fine-tuning")
 class RestTrainingDataController {
   private final ModelFactoryService modelFactoryService;
   private UserModel currentUser;
@@ -25,7 +25,7 @@ class RestTrainingDataController {
     this.currentUser = currentUser;
   }
 
-  @GetMapping("/goodtrainingdata")
+  @GetMapping("/question-training-data")
   public List<TrainingData> getGoodTrainingData() throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
     return getSuggestedQuestionForFineTunings().stream()
