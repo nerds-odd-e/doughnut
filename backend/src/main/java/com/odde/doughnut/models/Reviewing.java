@@ -1,9 +1,9 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.controllers.json.DueReviewPoints;
 import com.odde.doughnut.controllers.json.ReviewStatus;
+import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
 import java.time.ZoneId;

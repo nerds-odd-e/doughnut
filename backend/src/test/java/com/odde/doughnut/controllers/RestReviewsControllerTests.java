@@ -7,13 +7,13 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.odde.doughnut.controllers.json.DueReviewPoints;
+import com.odde.doughnut.controllers.json.InitialInfo;
 import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.AnsweredQuestion;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.controllers.json.DueReviewPoints;
-import com.odde.doughnut.controllers.json.InitialInfo;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.TimestampOperations;

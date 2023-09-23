@@ -1,11 +1,11 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.User;
 import com.odde.doughnut.controllers.json.LinkViewed;
 import com.odde.doughnut.controllers.json.NotePositionViewedByUser;
 import com.odde.doughnut.controllers.json.NoteRealm;
+import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.User;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;

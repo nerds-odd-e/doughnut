@@ -1,8 +1,8 @@
 package com.odde.doughnut.testability.builders;
 
+import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionGenerator;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.services.ai.AIGeneratedQuestion;

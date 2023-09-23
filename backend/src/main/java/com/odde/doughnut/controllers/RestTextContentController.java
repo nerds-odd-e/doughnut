@@ -1,8 +1,8 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.json.NoteRealm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.TextContent;
-import com.odde.doughnut.controllers.json.NoteRealm;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteViewer;

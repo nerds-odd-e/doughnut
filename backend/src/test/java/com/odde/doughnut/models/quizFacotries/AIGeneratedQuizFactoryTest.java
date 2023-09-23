@@ -6,10 +6,10 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.AnsweredQuestion;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ai.AIGeneratedQuestion;
 import com.odde.doughnut.testability.MakeMe;

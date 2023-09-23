@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.controllers.json.TrainingData;
+import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import java.util.ArrayList;

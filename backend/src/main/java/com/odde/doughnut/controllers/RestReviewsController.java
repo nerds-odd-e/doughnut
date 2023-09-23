@@ -1,11 +1,11 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.entities.Answer;
-import com.odde.doughnut.entities.AnsweredQuestion;
-import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.controllers.json.DueReviewPoints;
 import com.odde.doughnut.controllers.json.InitialInfo;
 import com.odde.doughnut.controllers.json.ReviewStatus;
+import com.odde.doughnut.entities.Answer;
+import com.odde.doughnut.entities.AnsweredQuestion;
+import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.ReviewPointModel;

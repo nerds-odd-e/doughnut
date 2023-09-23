@@ -1,8 +1,8 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.controllers.json.AiCompletion;
 import com.odde.doughnut.controllers.json.AiCompletionRequest;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.services.ai.AIGeneratedQuestion;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;

@@ -4,9 +4,9 @@ import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.CLOZE_S
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
+import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;

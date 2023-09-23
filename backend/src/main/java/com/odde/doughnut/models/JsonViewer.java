@@ -1,12 +1,12 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.Circle;
-import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.User;
 import com.odde.doughnut.controllers.json.CircleForUserView;
 import com.odde.doughnut.controllers.json.NotebookViewedByUser;
 import com.odde.doughnut.controllers.json.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.json.UserForOtherUserView;
+import com.odde.doughnut.entities.Circle;
+import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.User;
 import java.util.List;
 import java.util.stream.Collectors;
 

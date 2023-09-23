@@ -1,7 +1,7 @@
 package com.odde.doughnut.services.wikidataApis;
 
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.controllers.json.WikidataEntityData;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.wikidataApis.thirdPartyEntities.WikidataEntityHash;
 import java.io.IOException;

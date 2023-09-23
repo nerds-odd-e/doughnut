@@ -1,12 +1,12 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.json.CircleForUserView;
+import com.odde.doughnut.controllers.json.CircleJoiningByInvitation;
+import com.odde.doughnut.controllers.json.RedirectToNoteResponse;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.TextContent;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.controllers.json.CircleForUserView;
-import com.odde.doughnut.controllers.json.CircleJoiningByInvitation;
-import com.odde.doughnut.controllers.json.RedirectToNoteResponse;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.CircleModel;
