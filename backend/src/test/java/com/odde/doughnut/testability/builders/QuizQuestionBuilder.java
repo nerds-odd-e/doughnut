@@ -1,6 +1,7 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.controllers.json.QuizQuestion;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionGenerator;
@@ -45,8 +46,10 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
     return this;
   }
 
-  public QuizQuestionBuilder correctAnswerIndex(int index) {
-    entity.setCorrectAnswerIndex(index);
-    return this;
+  public QuizQuestionBuilder ofNote(Note note) {
+
+    var reviewPoint =
+        makeMe.aReviewPointFor(note).by(note.getNotebook().getCreatorEntity()).please();
+    return of(QuizQuestionEntity.QuestionType.SPELLING, reviewPoint);
   }
 }

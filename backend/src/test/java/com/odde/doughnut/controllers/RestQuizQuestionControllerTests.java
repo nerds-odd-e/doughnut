@@ -141,21 +141,15 @@ class RestQuizQuestionControllerTests {
   }
 
   @Nested
-  class MarkGoodQuestion {
+  class SuggestQuestionForFineTuning {
     QuizQuestionEntity quizQuestionEntity;
     Note note;
     ReviewPoint reviewPoint;
 
     @BeforeEach
     void setup() throws QuizQuestionNotPossibleException {
-      note = makeMe.aNote("new").creatorAndOwner(currentUser).please();
-
-      reviewPoint =
-          makeMe.aReviewPointFor(note).by(currentUser).forgettingCurveAndNextReviewAt(200).please();
-      quizQuestionEntity =
-          makeMe.aQuestion().of(QuizQuestionEntity.QuestionType.SPELLING, reviewPoint).please();
-      modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
-      modelFactoryService.noteRepository.save(note);
+      note = makeMe.aNote().creatorAndOwner(currentUser).please();
+      quizQuestionEntity = makeMe.aQuestion().ofNote(note).please();
     }
 
     @Test
