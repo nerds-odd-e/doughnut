@@ -13,7 +13,6 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -143,7 +142,6 @@ class RestQuizQuestionControllerTests {
 
   @Nested
   class MarkGoodQuestion {
-    User user;
     QuizQuestionEntity quizQuestionEntity;
     Note note;
     ReviewPoint reviewPoint;
@@ -152,7 +150,6 @@ class RestQuizQuestionControllerTests {
     void setup() throws QuizQuestionNotPossibleException {
       note = makeMe.aNote("new").creatorAndOwner(currentUser).please();
 
-      user = currentUser.getEntity();
       reviewPoint =
           makeMe.aReviewPointFor(note).by(currentUser).forgettingCurveAndNextReviewAt(200).please();
       quizQuestionEntity =
@@ -163,16 +160,17 @@ class RestQuizQuestionControllerTests {
 
     @Test
     void createMarkedGoodQuestion() {
-      QuestionSuggestion suggestion = new QuestionSuggestion();
+      QuestionSuggestion suggestion = new QuestionSuggestion("this is a comment", null);
       Integer markedQuestionId =
           controller.suggestQuestionForFineTunng(quizQuestionEntity, suggestion);
-      Optional<SuggestedQuestionForFineTuning> questionSuggestion =
-          modelFactoryService.questionSuggestionForFineTuningRepository.findById(markedQuestionId);
-      assertFalse(questionSuggestion.isEmpty());
-      SuggestedQuestionForFineTuning suggestedQuestionForFineTuning = questionSuggestion.get();
-      assertEquals(
-          quizQuestionEntity.getId(), suggestedQuestionForFineTuning.getQuizQuestion().getId());
-      assertEquals(note.getId(), suggestedQuestionForFineTuning.getNote().getId());
+      SuggestedQuestionForFineTuning questionSuggestion =
+          modelFactoryService
+              .questionSuggestionForFineTuningRepository
+              .findById(markedQuestionId)
+              .orElseThrow();
+      assertEquals(quizQuestionEntity.getId(), questionSuggestion.getQuizQuestion().getId());
+      assertEquals(note.getId(), questionSuggestion.getNote().getId());
+      assertEquals("this is a comment", questionSuggestion.getComment());
     }
 
     @Test

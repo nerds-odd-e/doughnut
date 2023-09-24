@@ -23,6 +23,7 @@ public record QuestionSuggestionForFineTuningService() {
     suggestedQuestionForFineTuning.setUser(user);
     suggestedQuestionForFineTuning.setQuizQuestion(quizQuestionEntity);
     suggestedQuestionForFineTuning.setNote(quizQuestionEntity.getThing().getNote());
+    suggestedQuestionForFineTuning.setComment(suggestion.comment);
     suggestedQuestionForFineTuning.setCreatedAt(currentUTCTimestamp);
 
     updateQuestionStemWithSuggestion(

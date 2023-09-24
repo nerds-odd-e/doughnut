@@ -23,8 +23,8 @@ Feature: Generate Training Data for fine-tuning OpenAI
       | Question Stem                     | Correct Choice | Incorrect Choice 1 |
       | Who wrote 'Who Let the Dogs Out'? | Anslem Douglas | Baha Men           |
     Given I ask to generate a question for the note "Who Let the Dogs Out"
-    And I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as an example but with comment "this is a comment on a question we don't like"
-    Then the admin should see "this is a comment on a question we don't like" in the suggested questions
+    And I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as an example but with comment "I want deeper questions."
+    Then the admin should see "I want deeper questions." in the suggested questions
 
   Scenario Outline: User gives a suggestion for the question
     And OpenAI by default returns this question:

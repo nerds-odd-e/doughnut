@@ -55,6 +55,7 @@
         </p>
         <textarea
           name="commentField"
+          v-model="comment"
           placeholder="Add a comment about the question"
         ></textarea
         ><br />
@@ -120,6 +121,7 @@ export default defineComponent({
     return {
       answer: "" as string,
       suggestedQuestionText: "" as string,
+      comment: "" as string,
     };
   },
   methods: {
@@ -141,7 +143,7 @@ export default defineComponent({
       await this.api.reviewMethods.suggestQuestionForFineTuning(
         this.quizQuestion.quizQuestionId,
         {
-          comment: "",
+          comment: this.comment,
           suggestion: this.suggestedQuestionText,
         },
       );
