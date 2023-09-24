@@ -226,10 +226,13 @@ When(
   },
 )
 
-When("I suggest an improved {string} with {string}", (option: string, suggestion: string) => {
-  pageObjects
-    .currentQuestion()
-    .suggestingThisQuestionForFineTuning()
-    .changeQuestion(option, suggestion)
-    .confirm()
-})
+When(
+  "I suggest the displayed question {string} with a different question:",
+  (oldQuestionStem: string, newQuestion: DataTable) => {
+    pageObjects
+      .findQuestionWithStem(oldQuestionStem)
+      .suggestingThisQuestionForFineTuning()
+      .changeQuestion("question", newQuestion.hashes()[0]["Question Stem"])
+      .confirm()
+  },
+)
