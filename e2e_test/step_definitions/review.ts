@@ -232,7 +232,7 @@ When(
     pageObjects
       .findQuestionWithStem(oldQuestionStem)
       .suggestingThisQuestionForFineTuning()
-      .changeQuestion("question", newQuestion.hashes()[0]["Question Stem"])
+      .changeQuestion(newQuestion.hashes()[0])
       .confirm()
   },
 )

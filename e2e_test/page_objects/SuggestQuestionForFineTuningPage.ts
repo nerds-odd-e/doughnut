@@ -9,8 +9,8 @@ export const SuggestQuestionForFineTuningPage = () => {
       cy.findByPlaceholderText("Add a comment about the question").type(comment)
       return this
     },
-    changeQuestion(option: string, suggestion: string) {
-      cy.get(`textarea[name='suggested${option}Text'`).type(suggestion)
+    changeQuestion(newQuestion: Record<string, string>) {
+      cy.get(`textarea[name='suggestedQuestionText'`).type(newQuestion["Question Stem"])
       return this
     },
   }

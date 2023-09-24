@@ -26,7 +26,5 @@ Feature: Generate Training Data for fine-tuning OpenAI
     When I ask to generate a question for the note "Who Let the Dogs Out"
     And I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" with a different question:
       | Question Stem                              |
-      | Did Baha Men write 'Who Let the Cats Out'? |
-    And I suggest an improved "<option>" with "<suggestion>"
-    Then an admin should be able to download the training data with "<suggestion>" as an improved "<option>"
-    Examples:
+      | Did Baha Men write 'Who Let the Dogs Out'? |
+    Then an admin should be able to download the training data containing 1 record with the question "Did Baha Men write 'Who Let the Dogs Out'?"
