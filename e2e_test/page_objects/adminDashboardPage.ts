@@ -17,10 +17,10 @@ export function adminDashboardPage() {
         },
         downloadAIQuestionTrainingData() {
           cy.findByRole("button", { name: "Download" }).click()
+          const downloadsFolder = Cypress.config("downloadsFolder")
 
           return {
             expectNumberOfRecords(count: number) {
-              const downloadsFolder = Cypress.config("downloadsFolder")
               cy.readFile(`${downloadsFolder}/trainingdata.txt`)
                 .then((content) => (content.match(/messages/g) || []).length)
                 .should("eq", count)
@@ -28,7 +28,6 @@ export function adminDashboardPage() {
             },
 
             expectTxtInDownload(inputText: string) {
-              const downloadsFolder = Cypress.config("downloadsFolder")
               cy.readFile(`${downloadsFolder}/trainingdata.txt`).should("contain", inputText)
             },
           }

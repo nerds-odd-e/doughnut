@@ -36,45 +36,5 @@ describe("QuizQuestion", () => {
       await flushPromises();
       expect(wrapper.text()).toContain("1/2");
     });
-
-    describe("suggest question for fine tuning AI", () => {
-      const notebook: Generated.NotePositionViewedByUser =
-        makeMe.aNotePosition.please();
-      const quizQuestion: Generated.QuizQuestion = makeMe.aQuizQuestion
-        .withQuestionType("AI_QUESTION")
-        .withNotebookPosition(notebook)
-        .please();
-
-      let wrapper;
-
-      const clickSendQuestion = () =>
-        wrapper
-          .find(
-            "a[title='send this question for fine tuning the question generation model']",
-          )
-          .trigger("click");
-
-      beforeEach(() => {
-        wrapper = helper
-          .component(QuizQuestion)
-          .withStorageProps({ quizQuestion })
-          .mount();
-      });
-
-      it("should be able to suggest a question as good example", async () => {
-        helper.apiMock.expectingPost(
-          `/api/quiz-questions/${quizQuestion.quizQuestionId}/suggest-fine-tuning`,
-        );
-        await clickSendQuestion();
-        wrapper.vm.suggestQuestionForFineTuning();
-        await flushPromises();
-      });
-
-      it("should be able to skip marking a question as good", async () => {
-        await clickSendQuestion();
-        await flushPromises();
-        // no api call should be made
-      });
-    });
   });
 });

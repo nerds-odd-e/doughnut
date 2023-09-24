@@ -46,37 +46,7 @@
         <template #button_face>
           <SvgRaiseHand />
         </template>
-        <h2>Suggest This Question For AI Fine Tuning</h2>
-        <p>
-          <i
-            >Sending this question for fine tuning the question generation model
-            will make this note and question visible to admin. Are you sure?</i
-          >
-        </p>
-        <textarea
-          name="commentField"
-          v-model="comment"
-          placeholder="Add a comment about the question"
-        ></textarea
-        ><br />
-        <textarea
-          name="suggestedQuestionText"
-          v-model="suggestedQuestionText"
-          placeholder="Add a suggested question"
-        ></textarea
-        ><br />
-        <textarea
-          name="suggestedchoice"
-          placeholder="Add a suggested choice"
-        ></textarea
-        ><br />
-        <textarea
-          name="suggestedcorrect_choice"
-          placeholder="Add a suggested correct choice"
-        ></textarea>
-        <button class="btn btn-success" @click="suggestQuestionForFineTuning">
-          OK
-        </button>
+        <SuggestQuestionForFineTuning :quiz-question="quizQuestion" />
       </PopButton>
     </div>
   </div>
@@ -89,16 +59,14 @@ import TextInput from "../form/TextInput.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopups";
 import QuizQuestionChoices from "./QuizQuestionChoices.vue";
+import SuggestQuestionForFineTuning from "./SuggestQuestionForFineTuning.vue";
 import Breadcrumb from "../toolbars/Breadcrumb.vue";
 import SvgRaiseHand from "../svgs/SvgRaiseHand.vue";
-import asPopup from "../commons/Popups/asPopup";
-// import { INewRuntimeOptions } from "@cucumber/cucumber";
-// import { Input } from "postcss";
 
 export default defineComponent({
   inheritAttrs: false,
   setup() {
-    return { ...useLoadingApi(), ...usePopups(), ...asPopup() };
+    return { ...useLoadingApi(), ...usePopups() };
   },
   props: {
     quizQuestion: {
@@ -115,13 +83,12 @@ export default defineComponent({
     QuizQuestionChoices,
     Breadcrumb,
     SvgRaiseHand,
+    SuggestQuestionForFineTuning,
   },
   emits: ["answered"],
   data() {
     return {
       answer: "" as string,
-      suggestedQuestionText: "" as string,
-      comment: "" as string,
     };
   },
   methods: {
@@ -137,17 +104,6 @@ export default defineComponent({
           "This review point doesn't exist any more or is being skipped now. Moving on to the next review point...",
         );
       }
-    },
-
-    async suggestQuestionForFineTuning() {
-      await this.api.reviewMethods.suggestQuestionForFineTuning(
-        this.quizQuestion.quizQuestionId,
-        {
-          comment: this.comment,
-          suggestion: this.suggestedQuestionText,
-        },
-      );
-      this.popup.done(null);
     },
   },
 });
