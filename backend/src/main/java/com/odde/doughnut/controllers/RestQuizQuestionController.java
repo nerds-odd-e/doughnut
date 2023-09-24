@@ -46,17 +46,15 @@ class RestQuizQuestionController {
 
   @PostMapping("/{quizQuestion}/suggest-fine-tuning")
   @Transactional
-  public Integer suggestQuestionForFineTunng(
+  public SuggestedQuestionForFineTuning suggestQuestionForFineTunng(
       @PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity,
       @RequestBody(required = false) QuestionSuggestion suggestion) {
-    SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
-        new QuestionSuggestionForFineTuningService()
-            .suggestQuestion(
-                quizQuestionEntity,
-                suggestion,
-                currentUser.getEntity(),
-                testabilitySettings.getCurrentUTCTimestamp(),
-                modelFactoryService);
-    return suggestedQuestionForFineTuning.getId();
+    return new QuestionSuggestionForFineTuningService()
+        .suggestQuestion(
+            quizQuestionEntity,
+            suggestion,
+            currentUser.getEntity(),
+            testabilitySettings.getCurrentUTCTimestamp(),
+            modelFactoryService);
   }
 }

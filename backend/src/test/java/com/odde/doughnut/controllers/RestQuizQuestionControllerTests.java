@@ -152,16 +152,12 @@ class RestQuizQuestionControllerTests {
     @Test
     void createMarkedGoodQuestion() {
       QuestionSuggestion suggestion = new QuestionSuggestion("this is a comment", null);
-      Integer markedQuestionId =
+      SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
           controller.suggestQuestionForFineTunng(quizQuestionEntity, suggestion);
-      SuggestedQuestionForFineTuning questionSuggestion =
-          modelFactoryService
-              .questionSuggestionForFineTuningRepository
-              .findById(markedQuestionId)
-              .orElseThrow();
-      assertEquals(quizQuestionEntity.getId(), questionSuggestion.getQuizQuestion().getId());
-      assertEquals(note.getId(), questionSuggestion.getNote().getId());
-      assertEquals("this is a comment", questionSuggestion.getComment());
+      assertEquals(
+          quizQuestionEntity.getId(), suggestedQuestionForFineTuning.getQuizQuestion().getId());
+      assertEquals(note.getId(), suggestedQuestionForFineTuning.getNote().getId());
+      assertEquals("this is a comment", suggestedQuestionForFineTuning.getComment());
     }
 
     @Test
