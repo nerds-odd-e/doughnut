@@ -140,7 +140,10 @@ export default defineComponent({
     async suggestQuestionForFineTuning() {
       await this.api.reviewMethods.suggestQuestionForFineTuning(
         this.quizQuestion.quizQuestionId,
-        this.suggestedQuestionText,
+        {
+          comment: "",
+          suggestion: this.suggestedQuestionText,
+        },
       );
       this.popup.done(null);
     },

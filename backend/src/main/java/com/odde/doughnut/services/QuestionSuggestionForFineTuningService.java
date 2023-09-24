@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.controllers.json.QuestionSuggestion;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.entities.User;
@@ -13,7 +14,7 @@ public record QuestionSuggestionForFineTuningService() {
 
   public SuggestedQuestionForFineTuning suggestQuestion(
       QuizQuestionEntity quizQuestionEntity,
-      String suggestion,
+      QuestionSuggestion suggestion,
       User user,
       Timestamp currentUTCTimestamp,
       ModelFactoryService modelFactoryService) {
@@ -24,7 +25,8 @@ public record QuestionSuggestionForFineTuningService() {
     suggestedQuestionForFineTuning.setNote(quizQuestionEntity.getThing().getNote());
     suggestedQuestionForFineTuning.setCreatedAt(currentUTCTimestamp);
 
-    updateQuestionStemWithSuggestion(suggestion, quizQuestionEntity, modelFactoryService);
+    updateQuestionStemWithSuggestion(
+        suggestion.suggestion, quizQuestionEntity, modelFactoryService);
 
     return modelFactoryService.questionSuggestionForFineTuningRepository.save(
         suggestedQuestionForFineTuning);

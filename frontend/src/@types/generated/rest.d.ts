@@ -117,6 +117,11 @@ declare namespace Generated {
         subscriptions: Subscription[];
     }
 
+    interface QuestionSuggestion {
+        comment: string;
+        suggestion: string;
+    }
+
     interface QuizQuestion {
         quizQuestionId: number;
         questionType: QuestionType;

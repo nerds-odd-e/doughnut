@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.odde.doughnut.controllers.json.QuestionSuggestion;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
@@ -162,7 +163,9 @@ class RestQuizQuestionControllerTests {
 
     @Test
     void createMarkedGoodQuestion() {
-      Integer markedQuestionId = controller.suggestQuestionForFineTunng(quizQuestionEntity, "");
+      QuestionSuggestion suggestion = new QuestionSuggestion();
+      Integer markedQuestionId =
+          controller.suggestQuestionForFineTunng(quizQuestionEntity, suggestion);
       Optional<SuggestedQuestionForFineTuning> questionSuggestion =
           modelFactoryService.questionSuggestionForFineTuningRepository.findById(markedQuestionId);
       assertFalse(questionSuggestion.isEmpty());
@@ -174,8 +177,9 @@ class RestQuizQuestionControllerTests {
 
     @Test
     void createMarkedQuestionInDatabase() {
+      QuestionSuggestion suggestion = new QuestionSuggestion();
       long oldCount = modelFactoryService.questionSuggestionForFineTuningRepository.count();
-      controller.suggestQuestionForFineTunng(quizQuestionEntity, "");
+      controller.suggestQuestionForFineTunng(quizQuestionEntity, suggestion);
       assertThat(
           modelFactoryService.questionSuggestionForFineTuningRepository.count(),
           equalTo(oldCount + 1));

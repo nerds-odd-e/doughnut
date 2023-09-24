@@ -1,5 +1,4 @@
 import ManagedApi from "./ManagedApi";
-import { JsonData } from "./window/RestfulFetch";
 
 const timezoneParam = () => {
   const { timeZone } = Intl.DateTimeFormat().resolvedOptions();
@@ -65,7 +64,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
     async suggestQuestionForFineTuning(
       quizQuestionId: number,
-      suggestedQuestion: JsonData,
+      suggestedQuestion: Generated.QuestionSuggestion,
     ): Promise<string> {
       return managedApi.restPost(
         `quiz-questions/${quizQuestionId}/suggest-fine-tuning`,

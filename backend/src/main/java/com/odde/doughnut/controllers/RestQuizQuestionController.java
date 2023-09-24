@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.json.QuestionSuggestion;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.AnswerModel;
@@ -47,7 +48,7 @@ class RestQuizQuestionController {
   @Transactional
   public Integer suggestQuestionForFineTunng(
       @PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity,
-      @RequestBody(required = false) String suggestion) {
+      @RequestBody(required = false) QuestionSuggestion suggestion) {
     SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
         new QuestionSuggestionForFineTuningService()
             .suggestQuestion(
