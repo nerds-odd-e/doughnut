@@ -22,7 +22,7 @@
     "unplugin-vue-components": "0.25.2",
     "vue": "3.3.4",
     "vue-content-loader": "2.0.1",
-    "vue-router": "4.2.4"
+    "vue-router": "4.2.5"
   },
   "devDependencies": {
     "@testing-library/vue": "^7.0",
@@ -37,7 +37,7 @@
     "@vue/test-utils": "2.4.1",
     "autoprefixer": "^10.4",
     "css-loader": "^6.8",
-    "eslint": "^8.49",
+    "eslint": "^8.50",
     "eslint-config-airbnb-base": "^15.0",
     "eslint-config-airbnb-typescript": "^17.1",
     "eslint-config-prettier": "^9.0",
