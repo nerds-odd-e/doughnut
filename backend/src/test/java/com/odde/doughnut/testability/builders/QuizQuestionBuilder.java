@@ -47,9 +47,11 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
   }
 
   public QuizQuestionBuilder ofNote(Note note) {
+    return ofReviewPoint(
+        makeMe.aReviewPointFor(note).by(note.getNotebook().getCreatorEntity()).please());
+  }
 
-    var reviewPoint =
-        makeMe.aReviewPointFor(note).by(note.getNotebook().getCreatorEntity()).please();
+  public QuizQuestionBuilder ofReviewPoint(ReviewPoint reviewPoint) {
     return of(QuizQuestionEntity.QuestionType.SPELLING, reviewPoint);
   }
 }

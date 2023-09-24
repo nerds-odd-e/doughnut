@@ -61,8 +61,7 @@ class RestQuizQuestionControllerTests {
               .by(currentUser)
               .forgettingCurveAndNextReviewAt(200)
               .please();
-      quizQuestionEntity =
-          makeMe.aQuestion().of(QuizQuestionEntity.QuestionType.SPELLING, reviewPoint).please();
+      quizQuestionEntity = makeMe.aQuestion().ofReviewPoint(reviewPoint).please();
       answer = makeMe.anAnswer().answerWithSpelling(answerNote.getTopic()).inMemoryPlease();
     }
 
@@ -104,8 +103,7 @@ class RestQuizQuestionControllerTests {
     class WrongAnswer {
       @BeforeEach
       void setup() {
-        quizQuestionEntity =
-            makeMe.aQuestion().of(QuizQuestionEntity.QuestionType.SPELLING, reviewPoint).please();
+        quizQuestionEntity = makeMe.aQuestion().ofReviewPoint(reviewPoint).please();
         answer = makeMe.anAnswer().answerWithSpelling("wrong").inMemoryPlease();
       }
 
@@ -144,7 +142,6 @@ class RestQuizQuestionControllerTests {
   class SuggestQuestionForFineTuning {
     QuizQuestionEntity quizQuestionEntity;
     Note note;
-    ReviewPoint reviewPoint;
 
     @BeforeEach
     void setup() throws QuizQuestionNotPossibleException {
