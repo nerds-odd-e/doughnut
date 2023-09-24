@@ -8,13 +8,15 @@ in mkShell {
   MYSQL_HOME = builtins.getEnv "MYSQL_HOME";
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
-    python311
+    python312
     pipenv
     nodejs_20
     zsh
     dum
     yarn
     jdk17
+    kotlin
+    flutter
     libiconv
     git
     git-secret
@@ -59,6 +61,8 @@ in mkShell {
     apple_sdk.Security
     pinentry_mac
     sequelpro
+    cocoapods
+    xcbuild
   ] ++ lib.optionals (!stdenv.isDarwin) [
     sequeler
     ungoogled-chromium
@@ -75,8 +79,12 @@ in mkShell {
             export PS1="(nix)$PS1"
             export GPG_TTY=$(tty)
             export JAVA_HOME="$(readlink -e $(type -p javac) | sed  -e 's/\/bin\/javac//g')"
+            export KOTLIN_HOME="$(readlink -e $(type -p kotlinc) | sed -e 's/\/bin\/kotlinc//g')"
             export NODE_PATH="$(readlink -e $(type -p node) | sed  -e 's/\/bin\/node//g')"
             export DUM_PATH="$(readlink -e $(type -p dum) | sed  -e 's/\/bin\/dum//g')"
+            export FLUTTER_PATH="$(readlink -e $(type -p flutter) | sed  -e 's/\/bin\/flutter//g')"
+            export DART_PATH="$(readlink -e $(type -p dart) | sed  -e 's/\/bin\/dart//g')"
+            export PUB_CACHE="''${PUB_CACHE:-$PWD/.pub-cache}"
 
             export MYSQL_BASEDIR=${pkgs.mysql80}
             export MYSQL_HOME="''${MYSQL_HOME:-$PWD/mysql}"
@@ -86,7 +94,7 @@ in mkShell {
             export MYSQL_PID_FILE=$MYSQL_HOME/mysql.pid
             export MYSQL_TCP_PORT=3309
             export MYSQLX_TCP_PORT=33090
-            export PATH=$JAVA_HOME/bin:$DUM_PATH/bin:$NODE_PATH/bin:$MYSQL_BASEDIR/bin:$PATH
+            export PATH=$JAVA_HOME/bin:$KOTLIN_HOME/bin:$DUM_PATH/bin:$NODE_PATH/bin:$MYSQL_BASEDIR/bin:$FLUTTER_PATH/bin:$DART_PATH/bin:$PATH
             export LANG="en_US.UTF-8"
             #export LC_ALL="en_US.UTF-8"
 
@@ -96,15 +104,19 @@ in mkShell {
 
             echo "###################################################################################################################"
             echo "                                                                                "
-            echo "##   !! DOUGHNUT NIX DEVELOPMENT ENVIRONMENT ;) !!  "
-            echo "##   NIX VERSION: `nix --version`                   "
-            echo "##   JAVA_HOME: $JAVA_HOME                          "
-            echo "##   NODE_PATH: $NODE_PATH                          "
-            echo "##   MYSQL_BASEDIR: $MYSQL_BASEDIR                  "
-            echo "##   MYSQL_HOME: $MYSQL_HOME                        "
-            echo "##   MYSQL_DATADIR: $MYSQL_DATADIR                  "
-            echo "##   JAVA VERSION: `javac --version`                "
-            echo "##   NODE VERSION: `node --version`                 "
+            echo "##   !! DOUGHNUT NIX DEVELOPMENT ENVIRONMENT ;) !!    "
+            echo "##   NIX VERSION: `nix --version`                     "
+            echo "##   JAVA_HOME: $JAVA_HOME                            "
+            echo "##   KOTLIN_HOME: $KOTLIN_HOME                        "
+            echo "##   NODE_PATH: $NODE_PATH                            "
+            echo "##   FLUTTER_PATH: $FLUTTER_PATH                      "
+            echo "##   MYSQL_BASEDIR: $MYSQL_BASEDIR                    "
+            echo "##   MYSQL_HOME: $MYSQL_HOME                          "
+            echo "##   MYSQL_DATADIR: $MYSQL_DATADIR                    "
+            echo "##   JAVA VERSION: `javac --version`                  "
+	    echo "##   KOTLIN VERSION: `kotlin -version`                "
+            echo "##   NODE VERSION: `node --version`                   "
+            echo "##   FLUTTER VERSION: `flutter --version | head -n 1` "
             echo "                                                                                "
             echo "###################################################################################################################"
             mkdir -p $MYSQL_HOME

@@ -26,41 +26,43 @@ apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
-    compileSdkVersion 30
+  namespace "com.odde.doughnut.mobile"
+  compileSdk 34
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_17
+    targetCompatibility JavaVersion.VERSION_17
+  }
 
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
+  kotlinOptions {
+    jvmTarget = '17'
+  }
 
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-    }
+  sourceSets {
+    main.java.srcDirs += 'src/main/kotlin'
+  }
 
-    defaultConfig {
-        applicationId "com.odde.doughnut_mobile"
-        minSdkVersion 16
-        targetSdkVersion 30
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
-    }
+  defaultConfig {
+    applicationId "com.odde.doughnut_mobile"
+    minSdkVersion 25
+    targetSdkVersion 34
+    versionCode flutterVersionCode.toInteger()
+    versionName flutterVersionName
+  }
 
-    buildTypes {
-        release {
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.debug
-        }
+  buildTypes {
+    release {
+      // Signing with the debug keys for now, so `flutter run --release` works.
+      signingConfig signingConfigs.debug
     }
+  }
 }
 
 flutter {
-    source '../..'
+  source '../..'
 }
 
+tasks.register("prepareKotlinBuildScriptModel"){}
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version"
 }
