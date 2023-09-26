@@ -25,7 +25,6 @@ declare module 'vue' {
     CircleNewDialog: typeof import('./src/components/circles/CircleNewDialog.vue')['default']
     ContentLoader: typeof import('./src/components/commons/ContentLoader.vue')['default']
     ControlCenterForNote: typeof import('./src/components/toolbars/ControlCenterForNote.vue')['default']
-    copy: typeof import('./src/components/review/QuizQuestion copy.vue')['default']
     DetailsEditor: typeof import('./src/components/form/DetailsEditor.vue')['default']
     EditableText: typeof import('./src/components/form/EditableText.vue')['default']
     Feather: typeof import('./src/components/svgs/link_types/Feather.vue')['default']

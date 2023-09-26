@@ -8,7 +8,7 @@ in mkShell {
   MYSQL_HOME = builtins.getEnv "MYSQL_HOME";
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
-    python312
+    python311
     pipenv
     nodejs_20
     zsh
@@ -114,7 +114,7 @@ in mkShell {
             echo "##   MYSQL_HOME: $MYSQL_HOME                          "
             echo "##   MYSQL_DATADIR: $MYSQL_DATADIR                    "
             echo "##   JAVA VERSION: `javac --version`                  "
-	    echo "##   KOTLIN VERSION: `kotlin -version`                "
+            echo "##   KOTLIN VERSION: `kotlin -version`                "
             echo "##   NODE VERSION: `node --version`                   "
             echo "##   FLUTTER VERSION: `flutter --version | head -n 1` "
             echo "                                                                                "
@@ -148,7 +148,7 @@ in mkShell {
 
             export NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
             if [[ "$OSTYPE" == "darwin"* ]]; then
-               export NIX_SSL_CERT_FILE=/etc/ssl/cert.pem
+              export NIX_SSL_CERT_FILE=/etc/ssl/cert.pem
             fi
 
             cleanup()
