@@ -53,7 +53,6 @@ zulu{{ pillar['doughnut_app']['jre_version'] }}-linux_amd64.deb:
     - require_in:
         - cmd: install-jre
 
-
 install-jre:
   cmd.run:
     - name: apt-get install -y /tmp/zulu{{ pillar['doughnut_app']['jre_version'] }}-linux_amd64.deb
