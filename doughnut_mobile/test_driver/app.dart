@@ -7,5 +7,5 @@ void main() {
 
   // Call the `main()` function of your app or call `runApp` with any widget you
   // are interested in testing.
-  runApp(MyApp());
+  runApp(const MyApp());
 }

@@ -63,14 +63,14 @@ class _MyHomePageState extends State<MyHomePage> {
             BazaarWidget(futureTitle),
             Text(
               '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
-        key: Key('xxx'),
+        key: const Key('xxx'),
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
