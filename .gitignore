@@ -71,7 +71,7 @@ public_keys/
 **/.vscode/
 **/*.code-workspace
 
-# asdf
+# asdf/rtx
 .tool-versions
 
 # nohup.out
@@ -115,3 +115,7 @@ mysql/
 mb.log
 mb1.log
 mb.pid
+
+# flutter/dart/android/ios/mobile
+.pub-cache
+doughnut_mobile/android/app/local.properties
