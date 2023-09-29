@@ -212,7 +212,6 @@ declare namespace Generated {
     interface SuggestedQuestionForFineTuning {
         id: number;
         comment: string;
-        isGood: boolean;
         createdAt?: string;
     }
 
