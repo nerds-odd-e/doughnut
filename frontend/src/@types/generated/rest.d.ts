@@ -57,7 +57,6 @@ declare namespace Generated {
         answeredQuestion: AnsweredQuestion;
         answer: Answer;
         suggestedQuestionForFineTuning: SuggestedQuestionForFineTuning;
-        aiGeneratedQuestion: AIGeneratedQuestion;
     }
 
     interface InitialInfo {
@@ -121,6 +120,7 @@ declare namespace Generated {
     interface QuestionSuggestion {
         comment: string;
         suggestion: string;
+        aiGeneratedQuestion: AIGeneratedQuestion;
     }
 
     interface QuizQuestion {
@@ -216,17 +216,6 @@ declare namespace Generated {
         createdAt?: string;
     }
 
-    interface AIGeneratedQuestion extends AIGeneratedQuestionBody {
-        /**
-         * Index of the correct choice. 0-based.
-         */
-        correctChoiceIndex: number;
-        /**
-         * Confidence of the correctness of the question. 0 to 10.
-         */
-        confidence: number;
-    }
-
     interface Link extends Thingy {
         sourceNote: Note;
         targetNote: Note;
@@ -281,6 +270,17 @@ declare namespace Generated {
         notebook: Notebook;
     }
 
+    interface AIGeneratedQuestion extends AIGeneratedQuestionBody {
+        /**
+         * Index of the correct choice. 0-based.
+         */
+        correctChoiceIndex: number;
+        /**
+         * Confidence of the correctness of the question. 0 to 10.
+         */
+        confidence: number;
+    }
+
     interface Choice {
         display: string;
         pictureWithMask?: PictureWithMask;
@@ -290,17 +290,6 @@ declare namespace Generated {
     interface PictureWithMask {
         notePicture: string;
         pictureMask: string;
-    }
-
-    interface AIGeneratedQuestionBody {
-        /**
-         * The stem of the multiple-choice question. Provide background or disclosure necessary to clarify the question when needed.
-         */
-        stem: string;
-        /**
-         * All choices. Only one should be correct.
-         */
-        choices: string[];
     }
 
     interface Thingy {
@@ -332,6 +321,17 @@ declare namespace Generated {
         headNote: Note;
         skipReviewEntirely: boolean;
         deletedAt: string;
+    }
+
+    interface AIGeneratedQuestionBody {
+        /**
+         * The stem of the multiple-choice question. Provide background or disclosure necessary to clarify the question when needed.
+         */
+        stem: string;
+        /**
+         * All choices. Only one should be correct.
+         */
+        choices: string[];
     }
 
     type ErrorType = "OPENAI_UNAUTHORIZED" | "BINDING_ERROR" | "OPENAI_TIMEOUT" | "OPENAI_SERVICE_ERROR";

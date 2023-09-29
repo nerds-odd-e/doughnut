@@ -61,6 +61,12 @@ export default defineComponent({
         {
           comment: this.comment,
           suggestion: this.suggestedQuestionText,
+          aiGeneratedQuestion: {
+            stem: this.suggestedQuestionText,
+            correctChoiceIndex: 0,
+            choices: ["1"],
+            confidence: 9,
+          },
         },
       );
       this.popup.done(null);

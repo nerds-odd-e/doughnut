@@ -151,7 +151,7 @@ class RestQuizQuestionControllerTests {
 
     @Test
     void createMarkedGoodQuestion() {
-      QuestionSuggestion suggestion = new QuestionSuggestion("this is a comment", null);
+      QuestionSuggestion suggestion = new QuestionSuggestion("this is a comment", null, null);
       SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
           controller.suggestQuestionForFineTunng(quizQuestionEntity, suggestion);
       assertEquals(
