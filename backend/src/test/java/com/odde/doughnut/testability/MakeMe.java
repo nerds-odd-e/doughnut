@@ -35,12 +35,8 @@ public class MakeMe extends MakeMeWithoutDB {
     return aNote().title(title);
   }
 
-  public NoteBuilder aHeadNote() {
-    return aNote().asHeadNoteOfANotebook();
-  }
-
   public NoteBuilder aHeadNote(String title) {
-    return aHeadNote().title(title);
+    return aNote().title(title);
   }
 
   public NoteBuilder aNote(String title, String details) {

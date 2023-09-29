@@ -54,7 +54,7 @@ class QuizQuestionTest {
 
   @Test
   void useClozeDescription() {
-    Note top = makeMe.aHeadNote().please();
+    Note top = makeMe.aNote().please();
     makeMe.aNote().under(top).please();
     Note note = makeMe.aNote().under(top).title("abc").details("abc has 3 letters").please();
     makeMe.refresh(top);
@@ -74,7 +74,7 @@ class QuizQuestionTest {
 
     @Test
     void aNoteWithNoSiblingsShouldNotGenerateAnyQuestion() {
-      Note note = makeMe.aHeadNote().please();
+      Note note = makeMe.aNote().please();
       ReviewPointModel reviewPointModel = getReviewPointModel(note);
       Optional<QuizQuestionEntity> quizQuestionEntity =
           reviewPointModel.generateAQuizQuestion(randomizer, userModel.getEntity(), null);
@@ -88,7 +88,7 @@ class QuizQuestionTest {
 
       @BeforeEach
       void setup() {
-        Note top = makeMe.aHeadNote().please();
+        Note top = makeMe.aNote().please();
         note1 = makeMe.aNote().under(top).please();
         note2 = makeMe.aNote().under(top).please();
         makeMe.refresh(top);
@@ -110,7 +110,7 @@ class QuizQuestionTest {
 
     @Test
     void aNoteWithManySiblings() {
-      Note top = makeMe.aHeadNote().please();
+      Note top = makeMe.aNote().please();
       makeMe.theNote(top).with10Children().please();
       Note note = makeMe.aNote().under(top).please();
       makeMe.refresh(top);
@@ -126,7 +126,7 @@ class QuizQuestionTest {
 
     @BeforeEach
     void setup() {
-      Note top = makeMe.aHeadNote().please();
+      Note top = makeMe.aNote().please();
       note = makeMe.aNote().under(top).rememberSpelling().please();
       makeMe.aNote("a necessary sibling as filling option").under(top).please();
       makeMe.refresh(top);

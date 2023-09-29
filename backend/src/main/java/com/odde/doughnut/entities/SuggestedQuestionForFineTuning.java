@@ -11,7 +11,7 @@ import lombok.Setter;
 import org.springframework.lang.Nullable;
 
 @Entity
-@Table(name = "marked_questions")
+@Table(name = "suggested_question_for_fine_tuning")
 public class SuggestedQuestionForFineTuning {
 
   @Id
@@ -28,14 +28,6 @@ public class SuggestedQuestionForFineTuning {
   private User user;
 
   @ManyToOne
-  @JoinColumn(name = "note_id")
-  @Getter
-  @Setter
-  @NonNull
-  @JsonIgnore
-  private Note note;
-
-  @ManyToOne
   @JoinColumn(name = "quiz_question_id")
   @Getter
   @Setter
@@ -48,17 +40,16 @@ public class SuggestedQuestionForFineTuning {
   @Setter
   private String comment;
 
-  @Column(name = "is_good")
-  @Getter
-  @Setter
-  @NonNull
-  private Boolean isGood = true;
-
   @Column(name = "created_at")
   @Getter
   @Setter
   @Nullable
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
+
+  @JsonIgnore
+  private Note getNote() {
+    return quizQuestion.getThing().getNote();
+  }
 
   @JsonIgnore
   public TrainingData getTrainingData() {

@@ -59,7 +59,7 @@ public class UserModelAuthorityTest {
 
     @BeforeEach
     void setup() {
-      note = makeMe.aHeadNote().please();
+      note = makeMe.aNote().please();
     }
 
     @Test

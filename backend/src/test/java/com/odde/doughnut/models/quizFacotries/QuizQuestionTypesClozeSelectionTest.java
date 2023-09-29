@@ -33,7 +33,7 @@ class QuizQuestionTypesClozeSelectionTest {
 
     @BeforeEach
     void setup() {
-      top = makeMe.aHeadNote().please();
+      top = makeMe.aNote().please();
       note1 = makeMe.aNote("target").under(top).please();
       note2 = makeMe.aNote("source").under(top).please();
       reviewPoint = makeMe.aReviewPointFor(note1).inMemoryPlease();

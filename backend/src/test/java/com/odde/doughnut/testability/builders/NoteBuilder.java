@@ -32,11 +32,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
     updatedAt(entity.getThing().getCreatedAt());
   }
 
-  public NoteBuilder asHeadNoteOfANotebook() {
-    buildCreatorIfNotExist();
-    return asHeadNoteOfANotebook(entity.getThing().getCreator().getOwnership());
-  }
-
   private void buildCreatorIfNotExist() {
     if (entity.getThing().getCreator() == null) {
       creatorBuilder = makeMe.aUser();
@@ -54,7 +49,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder creatorAndOwner(User user) {
-    return creator(user).asHeadNoteOfANotebook();
+    return creator(user);
   }
 
   public NoteBuilder creator(User user) {
@@ -93,6 +88,10 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   @Override
   protected void beforeCreate(boolean needPersist) {
+    if (entity.getNotebook() == null) {
+      buildCreatorIfNotExist();
+      asHeadNoteOfANotebook(entity.getThing().getCreator().getOwnership());
+    }
     if (entity.getThing().getCreator() == null) {
       creator(makeMe.aUser().please(needPersist));
     }

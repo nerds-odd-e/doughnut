@@ -54,7 +54,7 @@ class RestQuizQuestionControllerTests {
 
     @BeforeEach
     void setup() {
-      Note answerNote = makeMe.aNote().asHeadNoteOfANotebook().rememberSpelling().please();
+      Note answerNote = makeMe.aNote().rememberSpelling().please();
       reviewPoint =
           makeMe
               .aReviewPointFor(answerNote)
@@ -156,7 +156,6 @@ class RestQuizQuestionControllerTests {
           controller.suggestQuestionForFineTunng(quizQuestionEntity, suggestion);
       assertEquals(
           quizQuestionEntity.getId(), suggestedQuestionForFineTuning.getQuizQuestion().getId());
-      assertEquals(note.getId(), suggestedQuestionForFineTuning.getNote().getId());
       assertEquals("this is a comment", suggestedQuestionForFineTuning.getComment());
     }
 

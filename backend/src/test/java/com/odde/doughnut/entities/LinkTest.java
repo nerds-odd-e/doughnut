@@ -45,7 +45,7 @@ public class LinkTest {
 
     @BeforeEach
     void setup() {
-      Note top = makeMe.aHeadNote().please();
+      Note top = makeMe.aNote().please();
       noteA = makeMe.aNote("noteA").under(top).please();
       noteB = makeMe.aNote("noteB").under(top).please();
     }

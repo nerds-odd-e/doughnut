@@ -50,7 +50,7 @@ class RestReviewPointControllerTest {
 
       @BeforeEach
       void setup() {
-        rp = makeMe.aReviewPointFor(makeMe.aHeadNote().please()).by(userModel).please();
+        rp = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
       }
 
       @Test
@@ -135,8 +135,7 @@ class RestReviewPointControllerTest {
   class GenerateRandomQuestion {
     @Test
     void itMustPersistTheQuestionGenerated() {
-      Note note =
-          makeMe.aNote().details("description long enough.").asHeadNoteOfANotebook().please();
+      Note note = makeMe.aNote().details("description long enough.").please();
       // another note is needed, otherwise the note will be the only note in the notebook, and the
       // question cannot be generated.
       makeMe.aNote().under(note).please();
@@ -151,7 +150,7 @@ class RestReviewPointControllerTest {
   class MarkAsReviewed {
     @Test
     void itMustUpdateTheReviewPointRecord() {
-      Note note = makeMe.aNote().asHeadNoteOfANotebook().please();
+      Note note = makeMe.aNote().please();
       ReviewPoint rp = makeMe.aReviewPointFor(note).by(userModel).please();
       Integer oldRepetitionCount = rp.getRepetitionCount();
       controller.markAsRepeated(rp, true);

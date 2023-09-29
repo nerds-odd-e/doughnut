@@ -38,12 +38,7 @@ class AIGeneratedQuizFactoryTest {
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    note =
-        makeMe
-            .aNote("saying")
-            .details("Rome is not built in a day")
-            .asHeadNoteOfANotebook()
-            .please();
+    note = makeMe.aNote("saying").details("Rome is not built in a day").please();
     reviewPoint = makeMe.aReviewPointFor(note).by(userModel).inMemoryPlease();
     aiGeneratedQuestion.stem = "How long did it take to build Rome?";
     aiGeneratedQuestion.choices = List.of("1 day", "1/2 day", "more than 1 day");
