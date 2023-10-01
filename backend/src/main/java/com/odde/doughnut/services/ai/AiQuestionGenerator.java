@@ -20,9 +20,9 @@ public class AiQuestionGenerator {
     this.openAiApiHandler = openAiApiHandler;
   }
 
-  public AIGeneratedQuestion getAiGeneratedQuestion() throws QuizQuestionNotPossibleException {
+  public MCQWithAnswer getAiGeneratedQuestion() throws QuizQuestionNotPossibleException {
     try {
-      final AIGeneratedQuestion question = getValidQuestion(false);
+      final MCQWithAnswer question = getValidQuestion(false);
       if (question.confidence > 1) return question;
       if (questionMakeSense(question)) {
         question.stem += " (confidence: " + question.confidence + ". Reevaluated.)";
@@ -30,12 +30,12 @@ public class AiQuestionGenerator {
       }
     } catch (QuizQuestionNotPossibleException e) {
     }
-    final AIGeneratedQuestion gpt4question = getValidQuestion(true);
+    final MCQWithAnswer gpt4question = getValidQuestion(true);
     gpt4question.stem += " (GPT-4)";
     return gpt4question;
   }
 
-  private Boolean questionMakeSense(AIGeneratedQuestion question) {
+  private Boolean questionMakeSense(MCQWithAnswer question) {
     ChatCompletionRequest chatRequest =
         new OpenAIChatAboutNoteRequestBuilder()
             .systemBrief()
@@ -51,10 +51,9 @@ public class AiQuestionGenerator {
         .orElse(false);
   }
 
-  private AIGeneratedQuestion getValidQuestion(boolean useGPT4)
-      throws QuizQuestionNotPossibleException {
+  private MCQWithAnswer getValidQuestion(boolean useGPT4) throws QuizQuestionNotPossibleException {
     JsonNode question = useGPT4 ? generateQuestionByGPT4() : generateQuestionByGPT3_5();
-    return AIGeneratedQuestion.getValidQuestion(question);
+    return MCQWithAnswer.getValidQuestion(question);
   }
 
   private JsonNode generateQuestionByGPT3_5() throws QuizQuestionNotPossibleException {

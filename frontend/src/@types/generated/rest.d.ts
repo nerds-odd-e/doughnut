@@ -120,7 +120,7 @@ declare namespace Generated {
     interface QuestionSuggestion {
         comment: string;
         suggestion: string;
-        aiGeneratedQuestion: AIGeneratedQuestion;
+        MCQWithAnswer: MCQWithAnswer;
     }
 
     interface QuizQuestion {
@@ -270,7 +270,7 @@ declare namespace Generated {
         notebook: Notebook;
     }
 
-    interface AIGeneratedQuestion extends MultipleChoicesQuestion {
+    interface MCQWithAnswer extends MultipleChoicesQuestion {
         /**
          * Index of the correct choice. 0-based.
          */

@@ -45,7 +45,7 @@ Topic: %s
         ChatFunction.builder()
             .name("ask_single_answer_multiple_choice_question")
             .description("Ask a single-answer multiple-choice question to the user")
-            .executor(AIGeneratedQuestion.class, null)
+            .executor(MCQWithAnswer.class, null)
             .build());
 
     String messageBody =
@@ -104,7 +104,7 @@ Topic: %s
     return this;
   }
 
-  public OpenAIChatAboutNoteRequestBuilder validateQuestionAgain(AIGeneratedQuestion question) {
+  public OpenAIChatAboutNoteRequestBuilder validateQuestionAgain(MCQWithAnswer question) {
     functions.add(
         ChatFunction.builder()
             .name("evaluate_question")
@@ -145,7 +145,7 @@ please critically check if the following question makes sense and is possible to
     JsonSchemaGenerator jsonSchemaGenerator = new JsonSchemaGenerator(objectMapper);
     String schemaString;
     try {
-      JsonSchema schema = jsonSchemaGenerator.generateSchema(AIGeneratedQuestion.class);
+      JsonSchema schema = jsonSchemaGenerator.generateSchema(MCQWithAnswer.class);
       schemaString = objectMapper.writeValueAsString(schema);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);

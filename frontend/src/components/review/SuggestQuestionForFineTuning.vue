@@ -61,7 +61,7 @@ export default defineComponent({
         {
           comment: this.comment,
           suggestion: this.suggestedQuestionText,
-          aiGeneratedQuestion: {
+          MCQWithAnswer: {
             stem: this.suggestedQuestionText,
             correctChoiceIndex: 0,
             choices: ["1"],

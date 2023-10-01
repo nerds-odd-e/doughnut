@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import org.apache.logging.log4j.util.Strings;
 
-public class AIGeneratedQuestion extends MultipleChoicesQuestion {
+public class MCQWithAnswer extends MultipleChoicesQuestion {
 
   @JsonPropertyDescription("Index of the correct choice. 0-based.")
   @JsonProperty(required = true)
@@ -18,13 +18,12 @@ public class AIGeneratedQuestion extends MultipleChoicesQuestion {
   @JsonProperty(required = true)
   public int confidence;
 
-  public static AIGeneratedQuestion getValidQuestion(JsonNode question)
+  public static MCQWithAnswer getValidQuestion(JsonNode question)
       throws QuizQuestionNotPossibleException {
     try {
-      AIGeneratedQuestion aiGeneratedQuestion =
-          new ObjectMapper().treeToValue(question, AIGeneratedQuestion.class);
-      if (aiGeneratedQuestion.stem != null && !Strings.isBlank(aiGeneratedQuestion.stem)) {
-        return aiGeneratedQuestion;
+      MCQWithAnswer MCQWithAnswer = new ObjectMapper().treeToValue(question, MCQWithAnswer.class);
+      if (MCQWithAnswer.stem != null && !Strings.isBlank(MCQWithAnswer.stem)) {
+        return MCQWithAnswer;
       }
     } catch (JsonProcessingException e) {
     }

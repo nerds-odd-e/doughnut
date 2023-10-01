@@ -6,17 +6,16 @@ import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionPresenter;
-import com.odde.doughnut.services.ai.AIGeneratedQuestion;
+import com.odde.doughnut.services.ai.MCQWithAnswer;
 import java.util.List;
 
 public class AiQuestionPresenter implements QuizQuestionPresenter {
-  private final AIGeneratedQuestion aiQuestion;
+  private final MCQWithAnswer aiQuestion;
 
   public AiQuestionPresenter(QuizQuestionEntity quizQuestion) {
     try {
       this.aiQuestion =
-          new ObjectMapper()
-              .readValue(quizQuestion.getRawJsonQuestion(), AIGeneratedQuestion.class);
+          new ObjectMapper().readValue(quizQuestion.getRawJsonQuestion(), MCQWithAnswer.class);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }

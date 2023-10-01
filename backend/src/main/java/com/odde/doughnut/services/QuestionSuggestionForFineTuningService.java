@@ -7,7 +7,7 @@ import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.services.ai.AIGeneratedQuestion;
+import com.odde.doughnut.services.ai.MCQWithAnswer;
 import java.sql.Timestamp;
 
 public record QuestionSuggestionForFineTuningService() {
@@ -38,16 +38,16 @@ public record QuestionSuggestionForFineTuningService() {
       ModelFactoryService modelFactoryService) {
     if (suggestion != null && !suggestion.isEmpty()) {
 
-      AIGeneratedQuestion aiGeneratedQuestion = null;
+      MCQWithAnswer MCQWithAnswer = null;
       try {
-        aiGeneratedQuestion =
+        MCQWithAnswer =
             new ObjectMapper()
-                .readValue(quizQuestionEntity.getRawJsonQuestion(), AIGeneratedQuestion.class);
+                .readValue(quizQuestionEntity.getRawJsonQuestion(), MCQWithAnswer.class);
       } catch (JsonProcessingException e) {
         throw new RuntimeException(e);
       }
-      aiGeneratedQuestion.stem = suggestion;
-      quizQuestionEntity.setRawJsonQuestion(aiGeneratedQuestion.toJsonString());
+      MCQWithAnswer.stem = suggestion;
+      quizQuestionEntity.setRawJsonQuestion(MCQWithAnswer.toJsonString());
 
       modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
     }

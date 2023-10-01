@@ -6,7 +6,7 @@ import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionGenerator;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
-import com.odde.doughnut.services.ai.AIGeneratedQuestion;
+import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
@@ -40,9 +40,9 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
     return makeMe.modelFactoryService.toQuizQuestion(quizQuestion, makeMe.aUser().please());
   }
 
-  public QuizQuestionBuilder aiQuestion(AIGeneratedQuestion aiGeneratedQuestion) {
-    entity.setRawJsonQuestion(aiGeneratedQuestion.toJsonString());
-    entity.setCorrectAnswerIndex(aiGeneratedQuestion.correctChoiceIndex);
+  public QuizQuestionBuilder aiQuestion(MCQWithAnswer MCQWithAnswer) {
+    entity.setRawJsonQuestion(MCQWithAnswer.toJsonString());
+    entity.setCorrectAnswerIndex(MCQWithAnswer.correctChoiceIndex);
     return this;
   }
 

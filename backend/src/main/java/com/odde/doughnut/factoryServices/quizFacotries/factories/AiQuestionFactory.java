@@ -5,7 +5,7 @@ import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
-import com.odde.doughnut.services.ai.AIGeneratedQuestion;
+import com.odde.doughnut.services.ai.MCQWithAnswer;
 
 public class AiQuestionFactory implements QuizQuestionFactory, QuestionRawJsonFactory {
   private Thing thing;
@@ -19,9 +19,8 @@ public class AiQuestionFactory implements QuizQuestionFactory, QuestionRawJsonFa
   @Override
   public void generateRawJsonQuestion(QuizQuestionEntity quizQuestion)
       throws QuizQuestionNotPossibleException {
-    AIGeneratedQuestion aiGeneratedQuestion =
-        servant.aiAdvisorService.generateQuestion(thing.getNote());
-    quizQuestion.setRawJsonQuestion(aiGeneratedQuestion.toJsonString());
-    quizQuestion.setCorrectAnswerIndex(aiGeneratedQuestion.correctChoiceIndex);
+    MCQWithAnswer MCQWithAnswer = servant.aiAdvisorService.generateQuestion(thing.getNote());
+    quizQuestion.setRawJsonQuestion(MCQWithAnswer.toJsonString());
+    quizQuestion.setCorrectAnswerIndex(MCQWithAnswer.correctChoiceIndex);
   }
 }

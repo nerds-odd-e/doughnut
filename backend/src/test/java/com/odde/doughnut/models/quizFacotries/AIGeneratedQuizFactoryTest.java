@@ -11,7 +11,7 @@ import com.odde.doughnut.entities.AnsweredQuestion;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.ai.AIGeneratedQuestion;
+import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.builders.QuizQuestionBuilder;
 import java.util.List;
@@ -33,16 +33,16 @@ class AIGeneratedQuizFactoryTest {
   UserModel userModel;
   Note note;
   ReviewPoint reviewPoint;
-  AIGeneratedQuestion aiGeneratedQuestion = new AIGeneratedQuestion();
+  MCQWithAnswer MCQWithAnswer = new MCQWithAnswer();
 
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
     note = makeMe.aNote("saying").details("Rome is not built in a day").please();
     reviewPoint = makeMe.aReviewPointFor(note).by(userModel).inMemoryPlease();
-    aiGeneratedQuestion.stem = "How long did it take to build Rome?";
-    aiGeneratedQuestion.choices = List.of("1 day", "1/2 day", "more than 1 day");
-    aiGeneratedQuestion.correctChoiceIndex = 2;
+    MCQWithAnswer.stem = "How long did it take to build Rome?";
+    MCQWithAnswer.choices = List.of("1 day", "1/2 day", "more than 1 day");
+    MCQWithAnswer.correctChoiceIndex = 2;
   }
 
   @Test
@@ -77,7 +77,7 @@ class AIGeneratedQuizFactoryTest {
   }
 
   private QuizQuestionBuilder questionBuilder() {
-    return makeMe.aQuestion().of(AI_QUESTION, reviewPoint).aiQuestion(aiGeneratedQuestion);
+    return makeMe.aQuestion().of(AI_QUESTION, reviewPoint).aiQuestion(MCQWithAnswer);
   }
 
   private QuizQuestion buildQuestion() {

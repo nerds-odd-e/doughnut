@@ -4,8 +4,8 @@ import com.odde.doughnut.controllers.json.AiCompletion;
 import com.odde.doughnut.controllers.json.AiCompletionRequest;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
-import com.odde.doughnut.services.ai.AIGeneratedQuestion;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
+import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.OpenAiApi;
@@ -24,7 +24,7 @@ public class AiAdvisorService {
     return openAiApiHandler.getOpenAiImage(prompt);
   }
 
-  public AIGeneratedQuestion generateQuestion(Note note) throws QuizQuestionNotPossibleException {
+  public MCQWithAnswer generateQuestion(Note note) throws QuizQuestionNotPossibleException {
     AiQuestionGenerator aiQuestionGenerator = new AiQuestionGenerator(note, openAiApiHandler);
     return aiQuestionGenerator.getAiGeneratedQuestion();
   }

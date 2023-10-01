@@ -14,7 +14,7 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.models.randomizers.RealRandomizer;
 import com.odde.doughnut.services.AiAdvisorService;
-import com.odde.doughnut.services.ai.AIGeneratedQuestion;
+import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.HashSet;
 import java.util.List;
@@ -141,12 +141,12 @@ class QuizQuestionTest {
 
     @Test
     void shouldAlwaysChooseAIQuestionIfConfigured() throws QuizQuestionNotPossibleException {
-      AIGeneratedQuestion aiGeneratedQuestion = new AIGeneratedQuestion();
-      aiGeneratedQuestion.stem = "wat is the meaning of life?";
+      MCQWithAnswer MCQWithAnswer = new MCQWithAnswer();
+      MCQWithAnswer.stem = "wat is the meaning of life?";
       userModel.getEntity().setAiQuestionTypeOnlyForReview(true);
       ReviewPointModel reviewPoint = getReviewPointModel(note);
       AiAdvisorService aiAdvisorService = mock(AiAdvisorService.class);
-      when(aiAdvisorService.generateQuestion(any())).thenReturn(aiGeneratedQuestion);
+      when(aiAdvisorService.generateQuestion(any())).thenReturn(MCQWithAnswer);
       QuizQuestionEntity randomQuizQuestion =
           reviewPoint
               .generateAQuizQuestion(new RealRandomizer(), userModel.getEntity(), aiAdvisorService)
