@@ -112,7 +112,7 @@ Topic: %s
             .executor(QuestionEvaluation.class, null)
             .build());
 
-    AIGeneratedQuestionBody clone = new AIGeneratedQuestionBody();
+    MultipleChoicesQuestion clone = new MultipleChoicesQuestion();
     clone.stem = question.stem;
     clone.choices = question.choices;
 
