@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.AnsweredQuestion;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.MakeMe;
@@ -30,14 +29,12 @@ class AIGeneratedQuizFactoryTest {
   @Autowired MakeMe makeMe;
   UserModel userModel;
   Note note;
-  ReviewPoint reviewPoint;
   MCQWithAnswer mcqWithAnswer;
 
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
     note = makeMe.aNote("saying").details("Rome is not built in a day").please();
-    reviewPoint = makeMe.aReviewPointFor(note).by(userModel).inMemoryPlease();
     mcqWithAnswer =
         makeMe
             .aMCQWithAnswer()
@@ -79,7 +76,7 @@ class AIGeneratedQuizFactoryTest {
   }
 
   private QuizQuestionBuilder questionBuilder() {
-    return makeMe.aQuestion().ofAIGeneratedQuestion(reviewPoint, mcqWithAnswer);
+    return makeMe.aQuestion().ofAIGeneratedQuestion(mcqWithAnswer, note.getThing());
   }
 
   private QuizQuestion buildQuestion() {

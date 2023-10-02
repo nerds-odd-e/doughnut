@@ -146,7 +146,7 @@ class RestReviewsControllerTests {
       @Test
       void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
         reviewPoint = makeMe.aReviewPointFor(noteByAnotherUser).by(anotherUser).please();
-        answer = makeMe.anAnswer().ofSpellingQuestion(reviewPoint).please();
+        answer = makeMe.anAnswer().ofSpellingQuestion(reviewPoint.getThing()).please();
         assertThrows(UnexpectedNoAccessRightException.class, () -> controller.showAnswer(answer));
       }
 
@@ -154,7 +154,11 @@ class RestReviewsControllerTests {
       void canSeeNoteThatHasReadAccess() throws UnexpectedNoAccessRightException {
         reviewPoint = makeMe.aReviewPointFor(noteByAnotherUser).by(currentUser).please();
         answer =
-            makeMe.anAnswer().ofSpellingQuestion(reviewPoint).answerWithSpelling("xx").please();
+            makeMe
+                .anAnswer()
+                .ofSpellingQuestion(reviewPoint.getThing())
+                .answerWithSpelling("xx")
+                .please();
         makeMe
             .aSubscription()
             .forUser(currentUser.getEntity())

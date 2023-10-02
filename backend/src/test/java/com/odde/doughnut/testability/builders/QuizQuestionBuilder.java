@@ -6,6 +6,7 @@ import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionGenerator;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -17,8 +18,8 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
     super(makeMe, new QuizQuestionEntity());
   }
 
-  private void ofReviewPoint(ReviewPoint reviewPoint) {
-    entity.setThing(reviewPoint.getThing());
+  private void ofThing(Thing thing) {
+    entity.setThing(thing);
   }
 
   public QuizQuestionBuilder buildValid(
@@ -40,22 +41,20 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
   }
 
   public QuizQuestionBuilder ofNote(Note note) {
-    return spellingQuestionOfReviewPoint(
-        makeMe.aReviewPointFor(note).by(note.getNotebook().getCreatorEntity()).please());
+    return spellingQuestionOfReviewPoint(note.getThing());
   }
 
-  public QuizQuestionBuilder spellingQuestionOfReviewPoint(ReviewPoint reviewPoint) {
-    ofReviewPoint(reviewPoint);
+  public QuizQuestionBuilder spellingQuestionOfReviewPoint(Thing thing) {
+    ofThing(thing);
     entity.setQuestionType(QuizQuestionEntity.QuestionType.SPELLING);
     return this;
   }
 
-  public QuizQuestionBuilder ofAIGeneratedQuestion(
-      ReviewPoint reviewPoint1, MCQWithAnswer mcqWithAnswer1) {
-    ofReviewPoint(reviewPoint1);
+  public QuizQuestionBuilder ofAIGeneratedQuestion(MCQWithAnswer mcqWithAnswer, Thing thing) {
+    ofThing(thing);
     entity.setQuestionType(AI_QUESTION);
-    entity.setRawJsonQuestion(mcqWithAnswer1.toJsonString());
-    entity.setCorrectAnswerIndex(mcqWithAnswer1.correctChoiceIndex);
+    entity.setRawJsonQuestion(mcqWithAnswer.toJsonString());
+    entity.setCorrectAnswerIndex(mcqWithAnswer.correctChoiceIndex);
     return this;
   }
 }

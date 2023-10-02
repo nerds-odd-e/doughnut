@@ -23,9 +23,8 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
     return this;
   }
 
-  public AnswerBuilder ofSpellingQuestion(ReviewPoint reviewPoint) {
-    entity.setQuestion(
-        makeMe.aQuestion().spellingQuestionOfReviewPoint(reviewPoint).inMemoryPlease());
+  public AnswerBuilder ofSpellingQuestion(Thing thing) {
+    entity.setQuestion(makeMe.aQuestion().spellingQuestionOfReviewPoint(thing).inMemoryPlease());
     return this;
   }
 
