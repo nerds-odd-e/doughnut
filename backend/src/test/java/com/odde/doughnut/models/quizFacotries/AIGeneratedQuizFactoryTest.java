@@ -14,7 +14,6 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.builders.QuizQuestionBuilder;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -33,16 +32,20 @@ class AIGeneratedQuizFactoryTest {
   UserModel userModel;
   Note note;
   ReviewPoint reviewPoint;
-  MCQWithAnswer MCQWithAnswer = new MCQWithAnswer();
+  MCQWithAnswer mcqWithAnswer;
 
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
     note = makeMe.aNote("saying").details("Rome is not built in a day").please();
     reviewPoint = makeMe.aReviewPointFor(note).by(userModel).inMemoryPlease();
-    MCQWithAnswer.stem = "How long did it take to build Rome?";
-    MCQWithAnswer.choices = List.of("1 day", "1/2 day", "more than 1 day");
-    MCQWithAnswer.correctChoiceIndex = 2;
+    mcqWithAnswer =
+        makeMe
+            .aMCQWithAnswer()
+            .stem("How long did it take to build Rome?")
+            .choices("1/2 day", "1 day", "more than 1 day")
+            .correctChoiceIndex(2)
+            .please();
   }
 
   @Test
@@ -70,14 +73,14 @@ class AIGeneratedQuizFactoryTest {
           makeMe
               .anAnswerViewedByUser()
               .forQuestion(questionBuilder().inMemoryPlease())
-              .choiceIndex(2)
+              .choiceIndex(mcqWithAnswer.correctChoiceIndex)
               .inMemoryPlease();
       assertTrue(answerResult.correct);
     }
   }
 
   private QuizQuestionBuilder questionBuilder() {
-    return makeMe.aQuestion().of(AI_QUESTION, reviewPoint).aiQuestion(MCQWithAnswer);
+    return makeMe.aQuestion().of(AI_QUESTION, reviewPoint).aiQuestion(mcqWithAnswer);
   }
 
   private QuizQuestion buildQuestion() {

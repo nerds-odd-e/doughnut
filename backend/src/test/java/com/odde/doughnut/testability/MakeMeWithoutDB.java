@@ -42,4 +42,8 @@ public class MakeMeWithoutDB {
   public OpenAICompletionResultBuilder openAiCompletionResult() {
     return new OpenAICompletionResultBuilder();
   }
+
+  public MCQWithAnswerBuilder aMCQWithAnswer() {
+    return new MCQWithAnswerBuilder();
+  }
 }
