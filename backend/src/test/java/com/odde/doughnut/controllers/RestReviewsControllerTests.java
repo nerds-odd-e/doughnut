@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -147,7 +146,7 @@ class RestReviewsControllerTests {
       @Test
       void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
         reviewPoint = makeMe.aReviewPointFor(noteByAnotherUser).by(anotherUser).please();
-        answer = makeMe.anAnswer().ofQuestion(SPELLING, reviewPoint).please();
+        answer = makeMe.anAnswer().ofSpellingQuestion(reviewPoint).please();
         assertThrows(UnexpectedNoAccessRightException.class, () -> controller.showAnswer(answer));
       }
 
@@ -155,7 +154,7 @@ class RestReviewsControllerTests {
       void canSeeNoteThatHasReadAccess() throws UnexpectedNoAccessRightException {
         reviewPoint = makeMe.aReviewPointFor(noteByAnotherUser).by(currentUser).please();
         answer =
-            makeMe.anAnswer().ofQuestion(SPELLING, reviewPoint).answerWithSpelling("xx").please();
+            makeMe.anAnswer().ofSpellingQuestion(reviewPoint).answerWithSpelling("xx").please();
         makeMe
             .aSubscription()
             .forUser(currentUser.getEntity())
