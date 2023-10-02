@@ -24,6 +24,7 @@ public record QuestionSuggestionForFineTuningService() {
     suggestedQuestionForFineTuning.setQuizQuestion(quizQuestionEntity);
     suggestedQuestionForFineTuning.setComment(suggestion.comment);
     suggestedQuestionForFineTuning.setCreatedAt(currentUTCTimestamp);
+    suggestedQuestionForFineTuning.setPreservedQuestion(suggestion.mcqWithAnswer.toJsonString());
 
     updateQuestionStemWithSuggestion(
         suggestion.suggestion, quizQuestionEntity, modelFactoryService);

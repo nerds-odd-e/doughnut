@@ -120,7 +120,7 @@ declare namespace Generated {
     interface QuestionSuggestion {
         comment: string;
         suggestion: string;
-        MCQWithAnswer: MCQWithAnswer;
+        mcqWithAnswer: MCQWithAnswer;
     }
 
     interface QuizQuestion {
@@ -213,6 +213,7 @@ declare namespace Generated {
     interface SuggestedQuestionForFineTuning {
         id: number;
         comment: string;
+        preservedQuestion: string;
         createdAt?: string;
     }
 

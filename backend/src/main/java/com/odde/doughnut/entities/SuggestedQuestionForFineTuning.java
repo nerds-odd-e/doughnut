@@ -40,6 +40,11 @@ public class SuggestedQuestionForFineTuning {
   @Setter
   private String comment;
 
+  @Column(name = "preserved_question")
+  @Getter
+  @Setter
+  private String preservedQuestion;
+
   @Column(name = "created_at")
   @Getter
   @Setter

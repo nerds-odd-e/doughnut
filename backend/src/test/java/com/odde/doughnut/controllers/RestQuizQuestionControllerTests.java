@@ -10,6 +10,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
@@ -143,17 +144,20 @@ class RestQuizQuestionControllerTests {
   @Nested
   class SuggestQuestionForFineTuning {
     QuizQuestionEntity quizQuestionEntity;
+    MCQWithAnswer mcqWithAnswer;
     Note note;
 
     @BeforeEach
     void setup() throws QuizQuestionNotPossibleException {
       note = makeMe.aNote().creatorAndOwner(currentUser).please();
+      mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       quizQuestionEntity = makeMe.aQuestion().ofNote(note).please();
     }
 
     @Test
-    void createMarkedGoodQuestion() {
-      QuestionSuggestion suggestion = new QuestionSuggestion("this is a comment", null, null);
+    void suggestQuestionWithAComment() {
+      QuestionSuggestion suggestion =
+          new QuestionSuggestion("this is a comment", null, mcqWithAnswer);
       SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
           controller.suggestQuestionForFineTunng(quizQuestionEntity, suggestion);
       assertEquals(
@@ -162,8 +166,21 @@ class RestQuizQuestionControllerTests {
     }
 
     @Test
+    void suggestQuestionWithNewQuestionStem() {
+      mcqWithAnswer.stem = "this is a new stem, correct?";
+      QuestionSuggestion suggestion =
+          new QuestionSuggestion("this is a comment", null, mcqWithAnswer);
+      SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
+          controller.suggestQuestionForFineTunng(quizQuestionEntity, suggestion);
+      assertThat(
+          suggestedQuestionForFineTuning.getPreservedQuestion(),
+          containsString(mcqWithAnswer.stem));
+    }
+
+    @Test
     void createMarkedQuestionInDatabase() {
-      QuestionSuggestion suggestion = new QuestionSuggestion();
+      QuestionSuggestion suggestion =
+          new QuestionSuggestion("this is a comment", null, mcqWithAnswer);
       long oldCount = modelFactoryService.questionSuggestionForFineTuningRepository.count();
       controller.suggestQuestionForFineTunng(quizQuestionEntity, suggestion);
       assertThat(
