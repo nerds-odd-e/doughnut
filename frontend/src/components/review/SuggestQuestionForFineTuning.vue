@@ -50,7 +50,7 @@ export default defineComponent({
   },
   data() {
     return {
-      suggestedQuestionText: "" as string,
+      suggestedQuestionText: this.quizQuestion.stem as string,
       comment: "" as string,
     };
   },

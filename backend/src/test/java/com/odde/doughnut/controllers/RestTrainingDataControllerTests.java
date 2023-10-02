@@ -71,7 +71,7 @@ public class RestTrainingDataControllerTests {
         throws UnexpectedNoAccessRightException {
       makeMe
           .aQuestionSuggestionForFineTunining()
-          .withRawQuestion("This is the raw Json question")
+          .withPreservedQuestion("This is the raw Json question")
           .please();
       List<TrainingData> goodTrainingDataList = controller.getGoodTrainingData();
       List<TrainingDataMessage> goodTrainingData = goodTrainingDataList.get(0).getMessages();

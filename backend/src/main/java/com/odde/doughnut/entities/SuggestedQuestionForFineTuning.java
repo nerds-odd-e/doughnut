@@ -63,8 +63,6 @@ public class SuggestedQuestionForFineTuning {
             .contentOfNoteOfCurrentFocus(getNote())
             .userInstructionToGenerateQuestionWithGPT35FineTunedModel()
             .build();
-    var questionEntity = getQuizQuestion();
-    return TrainingData.generateTrainingData(
-        chatRequest.getMessages(), questionEntity.getRawJsonQuestion());
+    return TrainingData.generateTrainingData(chatRequest.getMessages(), preservedQuestion);
   }
 }

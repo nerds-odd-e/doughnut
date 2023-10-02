@@ -9,7 +9,7 @@ import com.odde.doughnut.testability.MakeMe;
 public class SuggestedQuestionForFineTuningBuilder
     extends EntityBuilder<SuggestedQuestionForFineTuning> {
   private Note note = null;
-  private String rawQuestion = null;
+  private String preservedQuestion = null;
 
   public SuggestedQuestionForFineTuningBuilder(MakeMe makeMe) {
     super(makeMe, new SuggestedQuestionForFineTuning());
@@ -21,7 +21,11 @@ public class SuggestedQuestionForFineTuningBuilder
     Note note = this.note == null ? makeMe.aNote().please() : this.note;
     QuizQuestionEntity quizQuestion = makeMe.aQuestion().ofNote(note).please();
     entity.setQuizQuestion(quizQuestion);
-    if (this.rawQuestion != null) entity.getQuizQuestion().setRawJsonQuestion(rawQuestion);
+    if (this.preservedQuestion != null) {
+      entity.setPreservedQuestion(this.preservedQuestion);
+    } else {
+      entity.setPreservedQuestion(makeMe.aMCQWithAnswer().please().toJsonString());
+    }
   }
 
   public SuggestedQuestionForFineTuningBuilder ofNote(Note note) {
@@ -29,8 +33,8 @@ public class SuggestedQuestionForFineTuningBuilder
     return this;
   }
 
-  public SuggestedQuestionForFineTuningBuilder withRawQuestion(String question) {
-    this.rawQuestion = question;
+  public SuggestedQuestionForFineTuningBuilder withPreservedQuestion(String question) {
+    this.preservedQuestion = question;
     return this;
   }
 }
