@@ -141,12 +141,11 @@ class QuizQuestionTest {
 
     @Test
     void shouldAlwaysChooseAIQuestionIfConfigured() throws QuizQuestionNotPossibleException {
-      MCQWithAnswer MCQWithAnswer = new MCQWithAnswer();
-      MCQWithAnswer.stem = "wat is the meaning of life?";
+      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       userModel.getEntity().setAiQuestionTypeOnlyForReview(true);
       ReviewPointModel reviewPoint = getReviewPointModel(note);
       AiAdvisorService aiAdvisorService = mock(AiAdvisorService.class);
-      when(aiAdvisorService.generateQuestion(any())).thenReturn(MCQWithAnswer);
+      when(aiAdvisorService.generateQuestion(any())).thenReturn(mcqWithAnswer);
       QuizQuestionEntity randomQuizQuestion =
           reviewPoint
               .generateAQuizQuestion(new RealRandomizer(), userModel.getEntity(), aiAdvisorService)
@@ -154,7 +153,7 @@ class QuizQuestionTest {
       assertThat(
           randomQuizQuestion.getQuestionType(),
           equalTo(QuizQuestionEntity.QuestionType.AI_QUESTION));
-      assertThat(randomQuizQuestion.getRawJsonQuestion(), containsString("wat"));
+      assertThat(randomQuizQuestion.getRawJsonQuestion(), containsString(mcqWithAnswer.stem));
     }
 
     @Test

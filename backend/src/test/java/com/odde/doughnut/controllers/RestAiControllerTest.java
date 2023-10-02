@@ -14,7 +14,6 @@ import com.odde.doughnut.controllers.json.AiCompletionRequest;
 import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
@@ -159,10 +158,13 @@ class RestAiControllerTest {
 
     @BeforeEach
     void setUp() {
-      var aiGeneratedQuestion = new MCQWithAnswer();
-      aiGeneratedQuestion.stem = "What is the first color in the rainbow?";
-      aiGeneratedQuestion.correctChoiceIndex = 0;
-      aiGeneratedQuestion.choices = List.of("red", "black", "green");
+      var aiGeneratedQuestion =
+          makeMe
+              .aMCQWithAnswer()
+              .stem("What is the first color in the rainbow?")
+              .choices("red", "black", "green")
+              .correctChoiceIndex(0)
+              .please();
       jsonQuestion = aiGeneratedQuestion.toJsonString();
     }
 
