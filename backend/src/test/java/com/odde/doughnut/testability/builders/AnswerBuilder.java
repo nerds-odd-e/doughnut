@@ -25,10 +25,7 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
 
   public AnswerBuilder ofSpellingQuestion(ReviewPoint reviewPoint) {
     entity.setQuestion(
-        makeMe
-            .aQuestion()
-            .of(QuizQuestionEntity.QuestionType.SPELLING, reviewPoint)
-            .inMemoryPlease());
+        makeMe.aQuestion().spellingQuestionOfReviewPoint(reviewPoint).inMemoryPlease());
     return this;
   }
 

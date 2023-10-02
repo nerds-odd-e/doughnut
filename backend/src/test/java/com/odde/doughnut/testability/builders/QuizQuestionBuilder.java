@@ -1,5 +1,7 @@
 package com.odde.doughnut.testability.builders;
 
+import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.AI_QUESTION;
+
 import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
@@ -15,11 +17,8 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
     super(makeMe, new QuizQuestionEntity());
   }
 
-  public QuizQuestionBuilder of(
-      QuizQuestionEntity.QuestionType questionType, ReviewPoint reviewPoint) {
+  private void ofReviewPoint(ReviewPoint reviewPoint) {
     entity.setThing(reviewPoint.getThing());
-    entity.setQuestionType(questionType);
-    return this;
   }
 
   public QuizQuestionBuilder buildValid(
@@ -40,18 +39,23 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
     return makeMe.modelFactoryService.toQuizQuestion(quizQuestion, makeMe.aUser().please());
   }
 
-  public QuizQuestionBuilder aiQuestion(MCQWithAnswer MCQWithAnswer) {
-    entity.setRawJsonQuestion(MCQWithAnswer.toJsonString());
-    entity.setCorrectAnswerIndex(MCQWithAnswer.correctChoiceIndex);
-    return this;
-  }
-
   public QuizQuestionBuilder ofNote(Note note) {
-    return ofReviewPoint(
+    return spellingQuestionOfReviewPoint(
         makeMe.aReviewPointFor(note).by(note.getNotebook().getCreatorEntity()).please());
   }
 
-  public QuizQuestionBuilder ofReviewPoint(ReviewPoint reviewPoint) {
-    return of(QuizQuestionEntity.QuestionType.SPELLING, reviewPoint);
+  public QuizQuestionBuilder spellingQuestionOfReviewPoint(ReviewPoint reviewPoint) {
+    ofReviewPoint(reviewPoint);
+    entity.setQuestionType(QuizQuestionEntity.QuestionType.SPELLING);
+    return this;
+  }
+
+  public QuizQuestionBuilder ofAIGeneratedQuestion(
+      ReviewPoint reviewPoint1, MCQWithAnswer mcqWithAnswer1) {
+    ofReviewPoint(reviewPoint1);
+    entity.setQuestionType(AI_QUESTION);
+    entity.setRawJsonQuestion(mcqWithAnswer1.toJsonString());
+    entity.setCorrectAnswerIndex(mcqWithAnswer1.correctChoiceIndex);
+    return this;
   }
 }

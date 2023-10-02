@@ -1,6 +1,5 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.AI_QUESTION;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -80,7 +79,7 @@ class AIGeneratedQuizFactoryTest {
   }
 
   private QuizQuestionBuilder questionBuilder() {
-    return makeMe.aQuestion().of(AI_QUESTION, reviewPoint).aiQuestion(mcqWithAnswer);
+    return makeMe.aQuestion().ofAIGeneratedQuestion(reviewPoint, mcqWithAnswer);
   }
 
   private QuizQuestion buildQuestion() {
