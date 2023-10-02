@@ -13,7 +13,6 @@ public class MCQWithAnswerBuilder {
     if (mcqWithAnswer.choices == null) {
       mcqWithAnswer.choices = List.of("choice1", "choice2", "choice3");
     }
-    mcqWithAnswer.correctChoiceIndex = 2;
     return mcqWithAnswer;
   }
 

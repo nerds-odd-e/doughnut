@@ -14,6 +14,7 @@ import com.odde.doughnut.controllers.json.AiCompletionRequest;
 import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
@@ -158,7 +159,7 @@ class RestAiControllerTest {
 
     @BeforeEach
     void setUp() {
-      var aiGeneratedQuestion =
+      MCQWithAnswer aiGeneratedQuestion =
           makeMe
               .aMCQWithAnswer()
               .stem("What is the first color in the rainbow?")
