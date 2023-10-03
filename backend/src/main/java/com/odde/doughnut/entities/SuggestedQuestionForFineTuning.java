@@ -1,7 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.controllers.json.TrainingData;
+import com.odde.doughnut.controllers.json.FineTuningRecordForQuestionGeneration;
 import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
 import java.sql.Timestamp;
 import javax.persistence.*;
@@ -57,12 +57,13 @@ public class SuggestedQuestionForFineTuning {
   }
 
   @JsonIgnore
-  public TrainingData getTrainingData() {
+  public FineTuningRecordForQuestionGeneration getTrainingData() {
     var chatRequest =
         new OpenAIChatAboutNoteRequestBuilder()
             .contentOfNoteOfCurrentFocus(getNote())
             .userInstructionToGenerateQuestionWithGPT35FineTunedModel()
             .build();
-    return TrainingData.generateTrainingData(chatRequest.getMessages(), preservedQuestion);
+    return FineTuningRecordForQuestionGeneration.generateTrainingData(
+        chatRequest.getMessages(), preservedQuestion);
   }
 }

@@ -4,7 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.odde.doughnut.controllers.json.TrainingData;
+import com.odde.doughnut.controllers.json.FineTuningRecordForQuestionGeneration;
 import com.odde.doughnut.controllers.json.TrainingDataMessage;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-public class RestTrainingDataControllerTests {
+public class RestFineTuningRecordForQuestionGenerationControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
 
   @Autowired MakeMe makeMe;
@@ -39,7 +39,7 @@ public class RestTrainingDataControllerTests {
   }
 
   @Nested
-  class getGoodTrainingData {
+  class getGoodFineTuningRecordForQuestionGeneration {
     @Test
     void itShouldNotAllowNonMemberToSeeTrainingData() {
       controller = new RestTrainingDataController(modelFactoryService, makeMe.aNullUserModel());
@@ -48,7 +48,8 @@ public class RestTrainingDataControllerTests {
 
     @Test
     void shouldReturnNoTrainingDataIfNoMarkedQuestion() throws UnexpectedNoAccessRightException {
-      List<TrainingData> goodTrainingData = controller.getGoodTrainingData();
+      List<FineTuningRecordForQuestionGeneration> goodTrainingData =
+          controller.getGoodTrainingData();
       assertTrue(goodTrainingData.isEmpty());
     }
 
@@ -57,9 +58,11 @@ public class RestTrainingDataControllerTests {
         throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().title("Test Topic").please();
       makeMe.aQuestionSuggestionForFineTunining().ofNote(note).please();
-      List<TrainingData> goodTrainingDataList = controller.getGoodTrainingData();
-      assertEquals(1, goodTrainingDataList.size());
-      List<TrainingDataMessage> goodTrainingData = goodTrainingDataList.get(0).getMessages();
+      List<FineTuningRecordForQuestionGeneration> goodFineTuningRecordForQuestionGenerationList =
+          controller.getGoodTrainingData();
+      assertEquals(1, goodFineTuningRecordForQuestionGenerationList.size());
+      List<TrainingDataMessage> goodTrainingData =
+          goodFineTuningRecordForQuestionGenerationList.get(0).getMessages();
       assertThat(goodTrainingData.get(0).getContent(), containsString("Test Topic"));
       assertThat(
           goodTrainingData.get(1).getContent(),
@@ -73,8 +76,10 @@ public class RestTrainingDataControllerTests {
           .aQuestionSuggestionForFineTunining()
           .withPreservedQuestion("This is the raw Json question")
           .please();
-      List<TrainingData> goodTrainingDataList = controller.getGoodTrainingData();
-      List<TrainingDataMessage> goodTrainingData = goodTrainingDataList.get(0).getMessages();
+      List<FineTuningRecordForQuestionGeneration> goodFineTuningRecordForQuestionGenerationList =
+          controller.getGoodTrainingData();
+      List<TrainingDataMessage> goodTrainingData =
+          goodFineTuningRecordForQuestionGenerationList.get(0).getMessages();
       assertThat(
           goodTrainingData.get(2).getContent(), containsString("This is the raw Json question"));
     }

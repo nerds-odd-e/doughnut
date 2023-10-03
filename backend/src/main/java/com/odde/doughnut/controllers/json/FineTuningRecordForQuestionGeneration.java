@@ -8,11 +8,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
-public class TrainingData {
+public class FineTuningRecordForQuestionGeneration {
   private @Getter List<TrainingDataMessage> messages;
   private @Getter String comment;
 
-  public static TrainingData generateTrainingData(
+  public static FineTuningRecordForQuestionGeneration generateTrainingData(
       List<ChatMessage> messages, String rawJsonQuestion) {
     List<TrainingDataMessage> trainingDataMessages =
         messages.stream()
@@ -22,6 +22,7 @@ public class TrainingData {
             .collect(Collectors.toList());
     trainingDataMessages.add(
         new TrainingDataMessage(ChatMessageRole.ASSISTANT.value(), rawJsonQuestion));
-    return new TrainingData(trainingDataMessages, "this is a comment on a question we don't like");
+    return new FineTuningRecordForQuestionGeneration(
+        trainingDataMessages, "this is a comment on a question we don't like");
   }
 }

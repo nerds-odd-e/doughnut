@@ -45,7 +45,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
   async getTrainingData() {
     return (await managedApi.restGet(
       "fine-tuning/question-training-data",
-    )) as Generated.TrainingData[];
+    )) as Generated.FineTuningRecordForQuestionGeneration[];
   },
 
   reviewMethods: {

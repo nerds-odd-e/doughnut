@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.json.TrainingData;
+import com.odde.doughnut.controllers.json.FineTuningRecordForQuestionGeneration;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -26,7 +26,8 @@ class RestTrainingDataController {
   }
 
   @GetMapping("/question-training-data")
-  public List<TrainingData> getGoodTrainingData() throws UnexpectedNoAccessRightException {
+  public List<FineTuningRecordForQuestionGeneration> getGoodTrainingData()
+      throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
     return getSuggestedQuestionForFineTunings().stream()
         .map(SuggestedQuestionForFineTuning::getTrainingData)

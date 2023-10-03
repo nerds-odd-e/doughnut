@@ -59,6 +59,11 @@ declare namespace Generated {
         suggestedQuestionForFineTuning: SuggestedQuestionForFineTuning;
     }
 
+    interface FineTuningRecordForQuestionGeneration {
+        messages: TrainingDataMessage[];
+        comment: string;
+    }
+
     interface InitialInfo {
         thingId: number;
         skipReview: boolean;
@@ -152,11 +157,6 @@ declare namespace Generated {
 
     interface SelfEvaluation {
         adjustment: number;
-    }
-
-    interface TrainingData {
-        messages: TrainingDataMessage[];
-        comment: string;
     }
 
     interface TrainingDataMessage {
