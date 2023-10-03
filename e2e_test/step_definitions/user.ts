@@ -71,9 +71,8 @@ Then("I haven't login", () => {
 When("I visit {string} page", (pageName) => {
   switch (pageName) {
     case "FailureReportPage":
-      cy.visit("/failure-report-list", {
-        failOnStatusCode: false,
-      })
+      cy.visit("/admin-dashboard")
+      cy.findByRole("button", { name: "Failure Reports" }).click()
       break
     default:
       cy.failure()
