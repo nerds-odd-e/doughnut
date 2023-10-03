@@ -16,7 +16,7 @@ export function adminDashboardPage() {
           cy.findByText(comment)
         },
         downloadAIQuestionTrainingData() {
-          cy.findByRole("button", { name: "Download" }).click()
+          cy.findByRole("button", { name: "Download All Examples" }).click()
           const downloadFilename = `${Cypress.config("downloadsFolder")}/fineTuningData.jsonl`
 
           return {

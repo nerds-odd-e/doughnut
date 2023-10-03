@@ -135,7 +135,7 @@ please critically check if the following question makes sense and is possible to
     return addMessage(role, userMessage);
   }
 
-  private OpenAIChatAboutNoteRequestBuilder addMessage(ChatMessageRole role, String userMessage) {
+  public OpenAIChatAboutNoteRequestBuilder addMessage(ChatMessageRole role, String userMessage) {
     messages.add(new ChatMessage(role.value(), userMessage));
     return this;
   }

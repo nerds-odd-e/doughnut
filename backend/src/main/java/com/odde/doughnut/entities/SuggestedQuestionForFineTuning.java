@@ -3,7 +3,10 @@ package com.odde.doughnut.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.controllers.json.FineTuningExampleForQuestionGeneration;
 import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
+import com.theokanning.openai.completion.chat.ChatMessage;
+import com.theokanning.openai.completion.chat.ChatMessageRole;
 import java.sql.Timestamp;
+import java.util.List;
 import javax.persistence.*;
 import lombok.Getter;
 import lombok.NonNull;
@@ -58,12 +61,13 @@ public class SuggestedQuestionForFineTuning {
 
   @JsonIgnore
   public FineTuningExampleForQuestionGeneration toFineTuningExample() {
-    var chatRequest =
+    List<ChatMessage> messages =
         new OpenAIChatAboutNoteRequestBuilder()
             .contentOfNoteOfCurrentFocus(getNote())
             .userInstructionToGenerateQuestionWithGPT35FineTunedModel()
-            .build();
-    return FineTuningExampleForQuestionGeneration.generateTrainingData(
-        chatRequest.getMessages(), preservedQuestion);
+            .addMessage(ChatMessageRole.ASSISTANT, preservedQuestion)
+            .build()
+            .getMessages();
+    return FineTuningExampleForQuestionGeneration.fromChatMessages(messages);
   }
 }
