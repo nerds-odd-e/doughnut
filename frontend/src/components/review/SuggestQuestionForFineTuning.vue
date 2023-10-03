@@ -6,27 +6,28 @@
       make this note and question visible to admin. Are you sure?</i
     >
   </p>
-  <textarea
-    name="commentField"
-    v-model="comment"
-    placeholder="Add a comment about the question"
-  ></textarea
-  ><br />
-  <textarea
-    name="suggestedQuestionText"
-    v-model="suggestedQuestionText"
-    placeholder="Add a suggested question"
-  ></textarea
-  ><br />
-  <textarea
-    name="suggestedchoice"
-    placeholder="Add a suggested choice"
-  ></textarea
-  ><br />
-  <textarea
-    name="suggestedcorrect_choice"
-    placeholder="Add a suggested correct choice"
-  ></textarea>
+  <div>
+    <textarea
+      name="suggestedQuestionText"
+      v-model="suggestedQuestionText"
+      placeholder="Add a suggested question"
+    ></textarea
+    ><br />
+    <textarea
+      name="suggestedchoice"
+      placeholder="Add a suggested choice"
+    ></textarea
+    ><br />
+    <textarea
+      name="suggestedcorrect_choice"
+      placeholder="Add a suggested correct choice"
+    ></textarea>
+    <TextInput
+      name="commentField"
+      v-model="comment"
+      placeholder="Add a comment about the question"
+    />
+  </div>
   <button class="btn btn-success" @click="suggestQuestionForFineTuning">
     OK
   </button>
@@ -36,6 +37,7 @@
 import { defineComponent, PropType } from "vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import asPopup from "../commons/Popups/asPopup";
+import TextInput from "../form/TextInput.vue";
 
 export default defineComponent({
   inheritAttrs: false,
@@ -72,5 +74,6 @@ export default defineComponent({
       this.popup.done(null);
     },
   },
+  components: { TextInput },
 });
 </script>
