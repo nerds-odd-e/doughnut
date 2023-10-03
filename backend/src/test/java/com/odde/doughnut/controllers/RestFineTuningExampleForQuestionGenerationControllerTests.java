@@ -4,7 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.odde.doughnut.controllers.json.FineTuningRecordForQuestionGeneration;
+import com.odde.doughnut.controllers.json.FineTuningExampleForQuestionGeneration;
 import com.odde.doughnut.controllers.json.SimplifiedOpenAIChatMessage;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
@@ -25,31 +25,33 @@ import org.springframework.transaction.annotation.Transactional;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-public class RestFineTuningRecordForQuestionGenerationControllerTests {
+public class RestFineTuningExampleForQuestionGenerationControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
 
   @Autowired MakeMe makeMe;
-  RestTrainingDataController controller;
+  RestFineTuningDataController controller;
   private UserModel userModel;
 
   @BeforeEach
   void setup() {
     userModel = makeMe.anAdmin().toModelPlease();
-    controller = new RestTrainingDataController(modelFactoryService, userModel);
+    controller = new RestFineTuningDataController(modelFactoryService, userModel);
   }
 
   @Nested
-  class getGoodFineTuningRecordForQuestionGeneration {
+  class getGoodFineTuningExampleForQuestionGeneration {
     @Test
     void itShouldNotAllowNonMemberToSeeTrainingData() {
-      controller = new RestTrainingDataController(modelFactoryService, makeMe.aNullUserModel());
-      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.getGoodTrainingData());
+      controller = new RestFineTuningDataController(modelFactoryService, makeMe.aNullUserModel());
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.getAllQuestionGenerationFineTuningExamples());
     }
 
     @Test
     void shouldReturnNoTrainingDataIfNoMarkedQuestion() throws UnexpectedNoAccessRightException {
-      List<FineTuningRecordForQuestionGeneration> goodTrainingData =
-          controller.getGoodTrainingData();
+      List<FineTuningExampleForQuestionGeneration> goodTrainingData =
+          controller.getAllQuestionGenerationFineTuningExamples();
       assertTrue(goodTrainingData.isEmpty());
     }
 
@@ -58,11 +60,11 @@ public class RestFineTuningRecordForQuestionGenerationControllerTests {
         throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().title("Test Topic").please();
       makeMe.aQuestionSuggestionForFineTunining().ofNote(note).please();
-      List<FineTuningRecordForQuestionGeneration> goodFineTuningRecordForQuestionGenerationList =
-          controller.getGoodTrainingData();
-      assertEquals(1, goodFineTuningRecordForQuestionGenerationList.size());
+      List<FineTuningExampleForQuestionGeneration> goodFineTuningExampleForQuestionGenerationList =
+          controller.getAllQuestionGenerationFineTuningExamples();
+      assertEquals(1, goodFineTuningExampleForQuestionGenerationList.size());
       List<SimplifiedOpenAIChatMessage> goodTrainingData =
-          goodFineTuningRecordForQuestionGenerationList.get(0).getMessages();
+          goodFineTuningExampleForQuestionGenerationList.get(0).getMessages();
       assertThat(goodTrainingData.get(0).getContent(), containsString("Test Topic"));
       assertThat(
           goodTrainingData.get(1).getContent(),
@@ -76,10 +78,10 @@ public class RestFineTuningRecordForQuestionGenerationControllerTests {
           .aQuestionSuggestionForFineTunining()
           .withPreservedQuestion("This is the raw Json question")
           .please();
-      List<FineTuningRecordForQuestionGeneration> goodFineTuningRecordForQuestionGenerationList =
-          controller.getGoodTrainingData();
+      List<FineTuningExampleForQuestionGeneration> goodFineTuningExampleForQuestionGenerationList =
+          controller.getAllQuestionGenerationFineTuningExamples();
       List<SimplifiedOpenAIChatMessage> goodTrainingData =
-          goodFineTuningRecordForQuestionGenerationList.get(0).getMessages();
+          goodFineTuningExampleForQuestionGenerationList.get(0).getMessages();
       assertThat(
           goodTrainingData.get(2).getContent(), containsString("This is the raw Json question"));
     }
@@ -89,7 +91,7 @@ public class RestFineTuningRecordForQuestionGenerationControllerTests {
   class SuggestedQuestions {
     @Test
     void shouldThrowExceptionIfUserDoesNotHaveReadingAuth_whenCallGetGoodTrainingData() {
-      controller = new RestTrainingDataController(modelFactoryService, makeMe.aNullUserModel());
+      controller = new RestFineTuningDataController(modelFactoryService, makeMe.aNullUserModel());
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.getAllSuggestedQuestions());
     }

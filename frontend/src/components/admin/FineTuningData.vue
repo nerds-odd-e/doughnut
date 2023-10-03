@@ -35,7 +35,7 @@ export default {
   },
   methods: {
     async downloadFineTuningJSONL() {
-      const fineTuningData = await this.api.getTrainingData();
+      const fineTuningData = await this.api.getFineTuningExamples();
       const blob = new Blob(
         [fineTuningData.map((x) => JSON.stringify(x)).join("\n")],
         {

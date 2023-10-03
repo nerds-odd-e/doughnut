@@ -8,10 +8,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
-public class FineTuningRecordForQuestionGeneration {
+public class FineTuningExampleForQuestionGeneration {
   private @Getter List<SimplifiedOpenAIChatMessage> messages;
 
-  public static FineTuningRecordForQuestionGeneration generateTrainingData(
+  public static FineTuningExampleForQuestionGeneration generateTrainingData(
       List<ChatMessage> messages, String rawJsonQuestion) {
     List<SimplifiedOpenAIChatMessage> simplifiedOpenAIChatMessages =
         messages.stream()
@@ -22,6 +22,6 @@ public class FineTuningRecordForQuestionGeneration {
             .collect(Collectors.toList());
     simplifiedOpenAIChatMessages.add(
         new SimplifiedOpenAIChatMessage(ChatMessageRole.ASSISTANT.value(), rawJsonQuestion));
-    return new FineTuningRecordForQuestionGeneration(simplifiedOpenAIChatMessages);
+    return new FineTuningExampleForQuestionGeneration(simplifiedOpenAIChatMessages);
   }
 }

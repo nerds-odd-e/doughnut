@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.json.FineTuningRecordForQuestionGeneration;
+import com.odde.doughnut.controllers.json.FineTuningExampleForQuestionGeneration;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -15,22 +15,22 @@ import org.springframework.web.context.annotation.SessionScope;
 @RestController
 @SessionScope
 @RequestMapping("/api/fine-tuning")
-class RestTrainingDataController {
+class RestFineTuningDataController {
   private final ModelFactoryService modelFactoryService;
   private UserModel currentUser;
 
-  public RestTrainingDataController(
+  public RestFineTuningDataController(
       ModelFactoryService modelFactoryService, UserModel currentUser) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
   }
 
-  @GetMapping("/question-training-data")
-  public List<FineTuningRecordForQuestionGeneration> getGoodTrainingData()
+  @GetMapping("/question-generation-examples")
+  public List<FineTuningExampleForQuestionGeneration> getAllQuestionGenerationFineTuningExamples()
       throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
     return getSuggestedQuestionForFineTunings().stream()
-        .map(SuggestedQuestionForFineTuning::getTrainingData)
+        .map(SuggestedQuestionForFineTuning::toFineTuningExample)
         .toList();
   }
 

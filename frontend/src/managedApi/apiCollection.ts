@@ -42,10 +42,10 @@ const apiCollection = (managedApi: ManagedApi) => ({
       "fine-tuning/all-suggested-questions-for-fine-tuning",
     )) as Generated.SuggestedQuestionForFineTuning[];
   },
-  async getTrainingData() {
+  async getFineTuningExamples() {
     return (await managedApi.restGet(
-      "fine-tuning/question-training-data",
-    )) as Generated.FineTuningRecordForQuestionGeneration[];
+      "fine-tuning/question-generation-examples",
+    )) as Generated.FineTuningExampleForQuestionGeneration[];
   },
 
   reviewMethods: {
