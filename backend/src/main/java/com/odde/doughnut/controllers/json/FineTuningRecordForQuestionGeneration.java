@@ -10,7 +10,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class FineTuningRecordForQuestionGeneration {
   private @Getter List<SimplifiedOpenAIChatMessage> messages;
-  private @Getter String comment;
 
   public static FineTuningRecordForQuestionGeneration generateTrainingData(
       List<ChatMessage> messages, String rawJsonQuestion) {
@@ -24,6 +23,6 @@ public class FineTuningRecordForQuestionGeneration {
     simplifiedOpenAIChatMessages.add(
         new SimplifiedOpenAIChatMessage(ChatMessageRole.ASSISTANT.value(), rawJsonQuestion));
     return new FineTuningRecordForQuestionGeneration(
-        simplifiedOpenAIChatMessages, "this is a comment on a question we don't like");
+        simplifiedOpenAIChatMessages);
   }
 }
