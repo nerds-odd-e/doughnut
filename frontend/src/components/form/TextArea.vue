@@ -10,7 +10,7 @@
       :autofocus="autofocus"
       autocomplete="off"
       autocapitalize="off"
-      rows="8"
+      :rows="rows"
       @blur="$emit('blur', $event)"
     />
   </InputWithType>
@@ -26,6 +26,7 @@ export default {
     field: String,
     placeholder: { type: String, default: null },
     autofocus: { type: Boolean, default: false },
+    rows: { type: Number, default: 8 },
     errors: Object,
   },
   emits: ["update:modelValue", "blur"],

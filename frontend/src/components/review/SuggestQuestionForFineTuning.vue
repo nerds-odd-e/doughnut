@@ -7,12 +7,12 @@
     >
   </p>
   <div>
-    <textarea
-      name="suggestedQuestionText"
+    <TextArea
+      :field="`stem`"
       v-model="suggestedQuestionText"
       placeholder="Add a suggested question"
-    ></textarea
-    ><br />
+      :rows="2"
+    /><br />
     <textarea
       name="suggestedchoice"
       placeholder="Add a suggested choice"
@@ -23,7 +23,7 @@
       placeholder="Add a suggested correct choice"
     ></textarea>
     <TextInput
-      name="commentField"
+      field="comment"
       v-model="comment"
       placeholder="Add a comment about the question"
     />
@@ -38,6 +38,7 @@ import { defineComponent, PropType } from "vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import asPopup from "../commons/Popups/asPopup";
 import TextInput from "../form/TextInput.vue";
+import TextArea from "../form/TextArea.vue";
 
 export default defineComponent({
   inheritAttrs: false,
@@ -74,6 +75,6 @@ export default defineComponent({
       this.popup.done(null);
     },
   },
-  components: { TextInput },
+  components: { TextInput, TextArea },
 });
 </script>

@@ -6,11 +6,11 @@ export const SuggestQuestionForFineTuningPage = () => {
       cy.pageIsNotLoading()
     },
     comment(comment: string) {
-      cy.findByPlaceholderText("Add a comment about the question").type(comment)
+      cy.formField("Comment").type(comment)
       return this
     },
     changeQuestion(newQuestion: Record<string, string>) {
-      cy.get(`textarea[name='suggestedQuestionText'`).type(newQuestion["Question Stem"])
+      cy.formField("Stem").clear().type(newQuestion["Question Stem"])
       return this
     },
   }
