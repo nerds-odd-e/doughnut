@@ -61,7 +61,6 @@ declare namespace Generated {
 
     interface FineTuningRecordForQuestionGeneration {
         messages: SimplifiedOpenAIChatMessage[];
-        comment: string;
     }
 
     interface InitialInfo {
