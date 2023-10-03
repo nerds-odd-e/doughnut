@@ -15,7 +15,8 @@ Feature: Generate Training Data for fine-tuning OpenAI
   Scenario: Admin should be able to generate training data from suggested questions
     When I ask to generate a question for the note "Who Let the Dogs Out"
     And I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a good example
-    Then an admin should be able to download the training data containing 1 record with the question "Who wrote 'Who Let the Dogs Out'?"
+    Then an admin should be able to download the training data containing 1 record containing "Who wrote 'Who Let the Dogs Out'?"
+    Then an admin should be able to download the training data containing 1 record containing "Baha Men"
 
   Scenario: Add a comment when suggesting note question
     Given I ask to generate a question for the note "Who Let the Dogs Out"
@@ -27,4 +28,4 @@ Feature: Generate Training Data for fine-tuning OpenAI
     And I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" with a different question:
       | Question Stem                              |
       | Did Baha Men write 'Who Let the Dogs Out'? |
-    Then an admin should be able to download the training data containing 1 record with the question "Did Baha Men write 'Who Let the Dogs Out'?"
+    Then an admin should be able to download the training data containing 1 record containing "Did Baha Men write 'Who Let the Dogs Out'?"

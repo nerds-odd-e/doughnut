@@ -9,7 +9,7 @@
   <div>
     <TextArea
       :field="`stem`"
-      v-model="suggestedQuestionText"
+      v-model="suggestedQuestionStem"
       placeholder="Add a suggested question"
       :rows="2"
     /><br />
@@ -53,9 +53,14 @@ export default defineComponent({
   },
   data() {
     return {
-      suggestedQuestionText: this.quizQuestion.stem as string,
+      suggestedQuestionStem: this.quizQuestion.stem as string,
       comment: "" as string,
     };
+  },
+  computed: {
+    originalChoices(): string[] {
+      return this.quizQuestion.choices.map((c) => c.display);
+    },
   },
   methods: {
     async suggestQuestionForFineTuning() {
@@ -63,11 +68,11 @@ export default defineComponent({
         this.quizQuestion.quizQuestionId,
         {
           comment: this.comment,
-          suggestion: this.suggestedQuestionText,
+          suggestion: this.suggestedQuestionStem,
           mcqWithAnswer: {
-            stem: this.suggestedQuestionText,
+            stem: this.suggestedQuestionStem,
             correctChoiceIndex: 0,
-            choices: ["1"],
+            choices: this.originalChoices,
             confidence: 9,
           },
         },
