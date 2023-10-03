@@ -22,7 +22,6 @@ public class FineTuningRecordForQuestionGeneration {
             .collect(Collectors.toList());
     simplifiedOpenAIChatMessages.add(
         new SimplifiedOpenAIChatMessage(ChatMessageRole.ASSISTANT.value(), rawJsonQuestion));
-    return new FineTuningRecordForQuestionGeneration(
-        simplifiedOpenAIChatMessages);
+    return new FineTuningRecordForQuestionGeneration(simplifiedOpenAIChatMessages);
   }
 }
