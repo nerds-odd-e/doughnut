@@ -27,6 +27,8 @@ declare module 'vue' {
     ControlCenterForNote: typeof import('./src/components/toolbars/ControlCenterForNote.vue')['default']
     DetailsEditor: typeof import('./src/components/form/DetailsEditor.vue')['default']
     EditableText: typeof import('./src/components/form/EditableText.vue')['default']
+    FailureReportList: typeof import('./src/components/admin/FailureReportList.vue')['default']
+    FailureReportListPage: typeof import('./src/components/admin/FailureReportListPage.vue')['default']
     Feather: typeof import('./src/components/svgs/link_types/Feather.vue')['default']
     GlobalBar: typeof import('./src/components/toolbars/GlobalBar.vue')['default']
     GlobalSidebar: typeof import('./src/components/toolbars/GlobalSidebar.vue')['default']

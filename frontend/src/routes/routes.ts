@@ -8,7 +8,6 @@ import RepeatPage from "@/pages/RepeatPage.vue";
 import InitialReviewPage from "@/pages/InitialReviewPage.vue";
 import CircleShowPage from "@/pages/CircleShowPage.vue";
 import CircleJoinPage from "@/pages/CircleJoinPage.vue";
-import FailureReportListPage from "@/pages/FailureReportListPage.vue";
 import FailureReportPage from "@/pages/FailureReportPage.vue";
 import AnsweredQuestionPage from "@/pages/AnsweredQuestionPage.vue";
 import AdminDashboard from "@/pages/AdminDashboard.vue";
@@ -94,11 +93,6 @@ const routes = [
     component: NestedRepeatPage,
     children: [...nestedNoteAndLinkRoutes("repeat-")],
     meta: { useNoteStorageAccessor: true },
-  },
-  {
-    path: "/failure-report-list",
-    name: "failureReportList",
-    component: FailureReportListPage,
   },
   {
     path: "/failure-report-list/show/:failureReportId",

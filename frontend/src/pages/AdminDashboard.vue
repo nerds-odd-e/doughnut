@@ -1,11 +1,11 @@
 <template>
+  <h1>Admin Dashboard</h1>
   <ul class="nav nav-tabs">
     <li class="nav-item">
       <a
         :class="`nav-link ${
           activePage === 'trainingQuestions' ? 'active' : ''
         }`"
-        aria-current="page"
         role="button"
         href="#"
         @click="activePage = 'trainingQuestions'"
@@ -13,8 +13,13 @@
       >
     </li>
     <li class="nav-item">
-      <router-link :to="{ name: 'failureReportList' }"
-        >Failure Reports</router-link
+      <a
+        :class="`nav-link ${activePage === 'failureReport' ? 'active' : ''}`"
+        role="button"
+        href="#"
+        @click="activePage = 'failureReport'"
+      >
+        Failure Reports</a
       >
     </li>
   </ul>
@@ -39,11 +44,13 @@
       </table>
     </div>
   </div>
+  <FailureReportList v-if="activePage === 'failureReport'" />
 </template>
 
 <script lang="ts">
 import { ContentLoader } from "vue-content-loader";
 import useLoadingApi from "../managedApi/useLoadingApi";
+import FailureReportList from "../components/admin/FailureReportList.vue";
 
 export default {
   setup() {
@@ -51,7 +58,10 @@ export default {
   },
   data() {
     return {
-      activePage: undefined as "trainingQuestions" | undefined,
+      activePage: undefined as
+        | "trainingQuestions"
+        | "failureReport"
+        | undefined,
       suggestedQuestions: undefined as
         | Generated.SuggestedQuestionForFineTuning[]
         | undefined,
@@ -82,6 +92,6 @@ export default {
       URL.revokeObjectURL(url);
     },
   },
-  components: { ContentLoader },
+  components: { ContentLoader, FailureReportList },
 };
 </script>

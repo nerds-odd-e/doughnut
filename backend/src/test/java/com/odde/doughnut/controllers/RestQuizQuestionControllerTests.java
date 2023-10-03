@@ -156,8 +156,7 @@ class RestQuizQuestionControllerTests {
 
     @Test
     void suggestQuestionWithAComment() {
-      QuestionSuggestion suggestion =
-          new QuestionSuggestion("this is a comment", null, mcqWithAnswer);
+      QuestionSuggestion suggestion = new QuestionSuggestion("this is a comment", mcqWithAnswer);
       SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
           controller.suggestQuestionForFineTunng(quizQuestionEntity, suggestion);
       assertEquals(
@@ -168,8 +167,7 @@ class RestQuizQuestionControllerTests {
     @Test
     void suggestQuestionWithNewQuestionStem() {
       mcqWithAnswer.stem = "this is a new stem, correct?";
-      QuestionSuggestion suggestion =
-          new QuestionSuggestion("this is a comment", null, mcqWithAnswer);
+      QuestionSuggestion suggestion = new QuestionSuggestion("this is a comment", mcqWithAnswer);
       SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
           controller.suggestQuestionForFineTunng(quizQuestionEntity, suggestion);
       assertThat(
@@ -179,8 +177,7 @@ class RestQuizQuestionControllerTests {
 
     @Test
     void createMarkedQuestionInDatabase() {
-      QuestionSuggestion suggestion =
-          new QuestionSuggestion("this is a comment", null, mcqWithAnswer);
+      QuestionSuggestion suggestion = new QuestionSuggestion("this is a comment", mcqWithAnswer);
       long oldCount = modelFactoryService.questionSuggestionForFineTuningRepository.count();
       controller.suggestQuestionForFineTunng(quizQuestionEntity, suggestion);
       assertThat(

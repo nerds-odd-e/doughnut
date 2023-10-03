@@ -23,8 +23,8 @@
 </template>
 
 <script>
-import useLoadingApi from "../managedApi/useLoadingApi";
-import ContainerPage from "./commons/ContainerPage.vue";
+import useLoadingApi from "../../managedApi/useLoadingApi";
+import ContainerPage from "../../pages/commons/ContainerPage.vue";
 
 export default {
   setup() {

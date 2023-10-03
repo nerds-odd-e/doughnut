@@ -64,7 +64,6 @@ export default defineComponent({
         this.quizQuestion.quizQuestionId,
         {
           comment: this.comment,
-          suggestion: this.suggestedQuestionStem,
           mcqWithAnswer: {
             stem: this.suggestedQuestionStem,
             correctChoiceIndex: 0,

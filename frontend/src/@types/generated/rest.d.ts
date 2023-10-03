@@ -119,7 +119,6 @@ declare namespace Generated {
 
     interface QuestionSuggestion {
         comment: string;
-        suggestion: string;
         mcqWithAnswer: MCQWithAnswer;
     }
 

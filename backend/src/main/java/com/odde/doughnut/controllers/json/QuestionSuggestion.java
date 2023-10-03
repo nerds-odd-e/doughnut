@@ -8,6 +8,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class QuestionSuggestion {
   public String comment;
-  public String suggestion;
   public MCQWithAnswer mcqWithAnswer;
 }
