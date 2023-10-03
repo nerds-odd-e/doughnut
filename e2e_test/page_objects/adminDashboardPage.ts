@@ -10,7 +10,7 @@ export function adminDashboardPage() {
     },
 
     suggestedQuestionsForFineTuning() {
-      cy.findByRole("button", { name: "Training Questions" }).click()
+      cy.findByRole("button", { name: "Fine Tuning Data" }).click()
       return {
         expectComment(comment: string) {
           cy.findByText(comment)

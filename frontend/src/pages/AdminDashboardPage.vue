@@ -9,7 +9,7 @@
         role="button"
         href="#"
         @click="activePage = 'trainingQuestions'"
-        >Training Questions</a
+        >Fine Tuning Data</a
       >
     </li>
     <li class="nav-item">
