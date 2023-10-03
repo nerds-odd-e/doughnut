@@ -60,7 +60,7 @@ declare namespace Generated {
     }
 
     interface FineTuningRecordForQuestionGeneration {
-        messages: TrainingDataMessage[];
+        messages: SimplifiedOpenAIChatMessage[];
         comment: string;
     }
 
@@ -159,7 +159,7 @@ declare namespace Generated {
         adjustment: number;
     }
 
-    interface TrainingDataMessage {
+    interface SimplifiedOpenAIChatMessage {
         role: string;
         content: string;
     }

@@ -82,7 +82,7 @@ When("I visit {string} page", (pageName) => {
 Then("The {string} page is displayed", (pageName) => {
   switch (pageName) {
     case "LoginPage":
-      cy.findByText("Please sign in")
+      cy.contains("Please sign in")
       break
     case "FailureReportPage":
       cy.findAllByText("Failure report list")

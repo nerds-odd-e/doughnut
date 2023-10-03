@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.json.FineTuningRecordForQuestionGeneration;
-import com.odde.doughnut.controllers.json.TrainingDataMessage;
+import com.odde.doughnut.controllers.json.SimplifiedOpenAIChatMessage;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -61,7 +61,7 @@ public class RestFineTuningRecordForQuestionGenerationControllerTests {
       List<FineTuningRecordForQuestionGeneration> goodFineTuningRecordForQuestionGenerationList =
           controller.getGoodTrainingData();
       assertEquals(1, goodFineTuningRecordForQuestionGenerationList.size());
-      List<TrainingDataMessage> goodTrainingData =
+      List<SimplifiedOpenAIChatMessage> goodTrainingData =
           goodFineTuningRecordForQuestionGenerationList.get(0).getMessages();
       assertThat(goodTrainingData.get(0).getContent(), containsString("Test Topic"));
       assertThat(
@@ -78,7 +78,7 @@ public class RestFineTuningRecordForQuestionGenerationControllerTests {
           .please();
       List<FineTuningRecordForQuestionGeneration> goodFineTuningRecordForQuestionGenerationList =
           controller.getGoodTrainingData();
-      List<TrainingDataMessage> goodTrainingData =
+      List<SimplifiedOpenAIChatMessage> goodTrainingData =
           goodFineTuningRecordForQuestionGenerationList.get(0).getMessages();
       assertThat(
           goodTrainingData.get(2).getContent(), containsString("This is the raw Json question"));

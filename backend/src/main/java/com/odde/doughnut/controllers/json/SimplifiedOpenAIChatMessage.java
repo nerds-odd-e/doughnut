@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class TrainingDataMessage {
+public class SimplifiedOpenAIChatMessage {
   private String role;
   private String content;
 }

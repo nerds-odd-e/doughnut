@@ -9,20 +9,21 @@ import lombok.Getter;
 
 @AllArgsConstructor
 public class FineTuningRecordForQuestionGeneration {
-  private @Getter List<TrainingDataMessage> messages;
+  private @Getter List<SimplifiedOpenAIChatMessage> messages;
   private @Getter String comment;
 
   public static FineTuningRecordForQuestionGeneration generateTrainingData(
       List<ChatMessage> messages, String rawJsonQuestion) {
-    List<TrainingDataMessage> trainingDataMessages =
+    List<SimplifiedOpenAIChatMessage> simplifiedOpenAIChatMessages =
         messages.stream()
             .map(
                 chatMessage ->
-                    new TrainingDataMessage(chatMessage.getRole(), chatMessage.getContent()))
+                    new SimplifiedOpenAIChatMessage(
+                        chatMessage.getRole(), chatMessage.getContent()))
             .collect(Collectors.toList());
-    trainingDataMessages.add(
-        new TrainingDataMessage(ChatMessageRole.ASSISTANT.value(), rawJsonQuestion));
+    simplifiedOpenAIChatMessages.add(
+        new SimplifiedOpenAIChatMessage(ChatMessageRole.ASSISTANT.value(), rawJsonQuestion));
     return new FineTuningRecordForQuestionGeneration(
-        trainingDataMessages, "this is a comment on a question we don't like");
+        simplifiedOpenAIChatMessages, "this is a comment on a question we don't like");
   }
 }
