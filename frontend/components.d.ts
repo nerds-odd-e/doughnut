@@ -7,6 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AdminDashboardPage: typeof import('./src/components/admin/AdminDashboardPage.vue')['default']
     AIGenerateImageDialog: typeof import('./src/components/notes/AIGenerateImageDialog.vue')['default']
     AISuggestDetailsButton: typeof import('./src/components/toolbars/AISuggestDetailsButton.vue')['default']
     AnsweredQuestion: typeof import('./src/components/review/AnsweredQuestion.vue')['default']
@@ -30,6 +31,8 @@ declare module 'vue' {
     FailureReportList: typeof import('./src/components/admin/FailureReportList.vue')['default']
     FailureReportListPage: typeof import('./src/components/admin/FailureReportListPage.vue')['default']
     Feather: typeof import('./src/components/svgs/link_types/Feather.vue')['default']
+    FineTuningData: typeof import('./src/components/admin/FineTuningData.vue')['default']
+    Fun: typeof import('./src/components/admin/Fun.vue')['default']
     GlobalBar: typeof import('./src/components/toolbars/GlobalBar.vue')['default']
     GlobalSidebar: typeof import('./src/components/toolbars/GlobalSidebar.vue')['default']
     ImageInput: typeof import('./src/components/form/ImageInput.vue')['default']

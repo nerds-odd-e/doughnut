@@ -10,7 +10,7 @@ import CircleShowPage from "@/pages/CircleShowPage.vue";
 import CircleJoinPage from "@/pages/CircleJoinPage.vue";
 import FailureReportPage from "@/pages/FailureReportPage.vue";
 import AnsweredQuestionPage from "@/pages/AnsweredQuestionPage.vue";
-import AdminDashboard from "@/pages/AdminDashboard.vue";
+import AdminDashboardPage from "@/pages/AdminDashboardPage.vue";
 import NonproductionOnlyLoginPage from "@/pages/NonproductionOnlyLoginPage.vue";
 import NestedPage from "../pages/commons/NestedPage";
 
@@ -63,7 +63,7 @@ const routes = [
   {
     path: "/admin-dashboard",
     name: "adminDashboard",
-    component: AdminDashboard,
+    component: AdminDashboardPage,
     props: true,
   },
   {
