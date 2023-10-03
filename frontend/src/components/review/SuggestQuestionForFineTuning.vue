@@ -13,15 +13,11 @@
       placeholder="Add a suggested question"
       :rows="2"
     /><br />
-    <textarea
-      name="suggestedchoice"
-      placeholder="Add a suggested choice"
-    ></textarea
-    ><br />
-    <textarea
-      name="suggestedcorrect_choice"
-      placeholder="Add a suggested correct choice"
-    ></textarea>
+    <ol type="A">
+      <li v-for="choice in originalChoices" :key="choice">
+        {{ choice }}
+      </li>
+    </ol>
     <TextInput
       field="comment"
       v-model="comment"
