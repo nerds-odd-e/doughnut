@@ -1,8 +1,6 @@
 <template>
   <h2>Fine Tuning Questions Suggested by Users</h2>
-  <button class="download-button" @click="downloadTrainingData()">
-    Download
-  </button>
+  <button @click="downloadFineTuningJSONL()">Download</button>
   <ContentLoader v-if="suggestedQuestions === undefined" />
   <div v-else>
     <table class="table">
@@ -36,10 +34,10 @@ export default {
     };
   },
   methods: {
-    async downloadTrainingData() {
-      const trainingData = await this.api.getTrainingData();
+    async downloadFineTuningJSONL() {
+      const fineTuningData = await this.api.getTrainingData();
       const blob = new Blob(
-        [trainingData.map((x) => JSON.stringify(x)).join("\n")],
+        [fineTuningData.map((x) => JSON.stringify(x)).join("\n")],
         {
           type: "text/plain",
         },
@@ -47,7 +45,7 @@ export default {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "trainingdata.txt";
+      a.download = "fineTuningData.jsonl";
       a.click();
       URL.revokeObjectURL(url);
     },

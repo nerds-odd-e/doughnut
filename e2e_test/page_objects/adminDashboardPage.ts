@@ -17,18 +17,18 @@ export function adminDashboardPage() {
         },
         downloadAIQuestionTrainingData() {
           cy.findByRole("button", { name: "Download" }).click()
-          const downloadsFolder = Cypress.config("downloadsFolder")
+          const downloadFilename = `${Cypress.config("downloadsFolder")}/fineTuningData.jsonl`
 
           return {
             expectNumberOfRecords(count: number) {
-              cy.readFile(`${downloadsFolder}/trainingdata.txt`)
+              cy.readFile(downloadFilename)
                 .then((content) => (content.match(/messages/g) || []).length)
                 .should("eq", count)
               return this
             },
 
             expectTxtInDownload(inputText: string) {
-              cy.readFile(`${downloadsFolder}/trainingdata.txt`).should("contain", inputText)
+              cy.readFile(downloadFilename).should("contain", inputText)
             },
           }
         },
