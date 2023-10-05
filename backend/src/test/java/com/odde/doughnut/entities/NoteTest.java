@@ -6,6 +6,8 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.testability.MakeMe;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
@@ -36,8 +38,10 @@ public class NoteTest {
     Note parent = makeMe.aNote().please();
     Note note1 = makeMe.aNote().under(parent).please();
     Note note2 = makeMe.aNote().under(parent).please();
+    makeMe.modelFactoryService.entityManager.flush();
     makeMe.refresh(parent);
-    assertThat(parent.getChildren(), hasSize(2));
+    Note x = makeMe.modelFactoryService.noteRepository.findById(parent.id).get();
+    assertThat(x.getChildren(), containsInRelativeOrder(note1, note2));
     assertThat(parent.getChildren(), containsInRelativeOrder(note1, note2));
   }
 

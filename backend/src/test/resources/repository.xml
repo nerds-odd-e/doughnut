@@ -32,7 +32,7 @@
       <props>
         <prop key="hibernate.show_sql">false</prop>
         <prop key="hibernate.dialect">
-        org.hibernate.dialect.MySQL8Dialect</prop>
+        org.hibernate.dialect.MySQLDialect</prop>
       </props>
     </property>
     <property name="persistenceProvider">
