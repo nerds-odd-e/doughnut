@@ -78,7 +78,7 @@ Given("OpenAI by default returns this question:", (questionTable: DataTable) => 
     stem: record["Question Stem"],
     correctChoiceIndex: 0,
     choices: [record["Correct Choice"], record["Incorrect Choice 1"], record["Incorrect Choice 2"]],
-    confidence: 10,
+    confidence: 1000, // so that it will skip the vaiidation by AI again.
   })
   cy.then(async () => {
     await mock_services.openAi().restartImposter()
