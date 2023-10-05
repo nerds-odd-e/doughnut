@@ -12,7 +12,7 @@ import com.odde.doughnut.models.LinkModel;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import javax.validation.Valid;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;

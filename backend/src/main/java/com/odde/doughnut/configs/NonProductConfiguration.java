@@ -26,8 +26,8 @@ public class NonProductConfiguration {
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.csrf()
         .disable()
-        .authorizeRequests()
-        .antMatchers("/api/healthcheck", "/api/testability/**")
+        .authorizeHttpRequests()
+        .requestMatchers("/api/healthcheck", "/api/testability/**")
         .permitAll();
 
     commonConfiguration.commonConfig(http, http.httpBasic().and().formLogin());

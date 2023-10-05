@@ -41,10 +41,10 @@ public class CommonConfiguration {
     String[] allRoutes =
         Stream.concat(Stream.of(backendRoutes), Stream.of(frontendRoutes)).toArray(String[]::new);
 
-    http.authorizeRequests()
-        .mvcMatchers("/robots.txt")
+    http.authorizeHttpRequests()
+        .requestMatchers("/robots.txt")
         .permitAll()
-        .antMatchers(allRoutes)
+        .requestMatchers(allRoutes)
         .permitAll()
         .anyRequest()
         .authenticated()

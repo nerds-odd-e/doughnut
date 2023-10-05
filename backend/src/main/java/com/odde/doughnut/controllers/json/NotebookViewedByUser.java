@@ -2,7 +2,7 @@ package com.odde.doughnut.controllers.json;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Ownership;
-import javax.persistence.Id;
+import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 

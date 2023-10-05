@@ -17,7 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.persistence.*;
+import jakarta.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
 import lombok.Getter;
@@ -129,7 +129,7 @@ public class Note extends Thingy {
       })
   @OneToMany(cascade = CascadeType.DETACH)
   @Where(clause = "deleted_at is null")
-  @OrderBy("`notes_closure`.depth, sibling_order")
+  @OrderBy("`notes_closure.depth`, sibling_order")
   @JsonIgnore
   @Getter
   private List<Note> descendantsInBreathFirstOrder = new ArrayList<>();

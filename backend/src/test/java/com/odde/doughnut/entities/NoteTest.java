@@ -2,12 +2,7 @@ package com.odde.doughnut.entities;
 
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsInRelativeOrder;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.testability.MakeMe;
@@ -23,6 +18,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,11 +32,12 @@ public class NoteTest {
   User user;
 
   @Test
+  @Commit
   void timeOrder() {
     Note parent = makeMe.aNote().please();
     Note note1 = makeMe.aNote().under(parent).please();
     Note note2 = makeMe.aNote().under(parent).please();
-    makeMe.refresh(parent);
+    assertThat(parent.getChildren(), hasSize(2));
     assertThat(parent.getChildren(), containsInRelativeOrder(note1, note2));
   }
 
