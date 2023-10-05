@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -22,6 +23,22 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
       final HttpHeaders headers,
       final HttpStatus status,
       final WebRequest request) {
+    final ApiError apiError = new ApiError("binding error", ApiError.ErrorType.BINDING_ERROR);
+    for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
+      apiError.add(error.getField(), error.getDefaultMessage());
+    }
+    for (final ObjectError error : ex.getBindingResult().getGlobalErrors()) {
+      apiError.add(error.getObjectName(), error.getDefaultMessage());
+    }
+    return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+  }
+
+  @Override
+  protected ResponseEntity<Object> handleMethodArgumentNotValid(
+      MethodArgumentNotValidException ex,
+      HttpHeaders headers,
+      HttpStatus status,
+      WebRequest request) {
     final ApiError apiError = new ApiError("binding error", ApiError.ErrorType.BINDING_ERROR);
     for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
       apiError.add(error.getField(), error.getDefaultMessage());
