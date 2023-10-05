@@ -32,11 +32,11 @@ public class NoteTest {
   User user;
 
   @Test
-  @Commit
   void timeOrder() {
     Note parent = makeMe.aNote().please();
     Note note1 = makeMe.aNote().under(parent).please();
     Note note2 = makeMe.aNote().under(parent).please();
+    makeMe.refresh(parent);
     assertThat(parent.getChildren(), hasSize(2));
     assertThat(parent.getChildren(), containsInRelativeOrder(note1, note2));
   }
