@@ -539,9 +539,9 @@
     picomatch "^2.2.2"
 
 "@rollup/pluginutils@^5.0.2", "@rollup/pluginutils@^5.0.4":
-  version "5.0.4"
-  resolved "https://registry.yarnpkg.com/@rollup/pluginutils/-/pluginutils-5.0.4.tgz#74f808f9053d33bafec0cc98e7b835c9667d32ba"
-  integrity sha512-0KJnIoRI8A+a1dqOYLxH8vBf8bphDmty5QvIm2hqm7oFCFYKCAZWWd2hXgMibaPsNDhI0AtpYfQZJG47pt/k4g==
+  version "5.0.5"
+  resolved "https://registry.yarnpkg.com/@rollup/pluginutils/-/pluginutils-5.0.5.tgz#bbb4c175e19ebfeeb8c132c2eea0ecb89941a66c"
+  integrity sha512-6aEYR910NyP73oHiJglti74iRyOwgFU4x3meH/H8OJx6Ry0j6cOVZ5X/wTvub7G7Ao6qaHBEaNsV3GLJkSsF+Q==
   dependencies:
     "@types/estree" "^1.0.0"
     estree-walker "^2.0.2"
@@ -1627,9 +1627,9 @@ editorconfig@^1.0.3:
     semver "^7.5.3"
 
 electron-to-chromium@^1.4.535:
-  version "1.4.542"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.542.tgz#9bfe19d8ddafc2591e4a17d04e60a5f5acc54965"
-  integrity sha512-6+cpa00G09N3sfh2joln4VUXHquWrOFx3FLZqiVQvl45+zS9DskDBTPvob+BhvFRmTBkyDSk0vvLMMRo/qc6mQ==
+  version "1.4.543"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.543.tgz#51116ffc9fba1ee93514d6a40d34676aa6d7d1c4"
+  integrity sha512-t2ZP4AcGE0iKCCQCBx/K2426crYdxD3YU6l0uK2EO3FZH0pbC4pFz/sZm2ruZsND6hQBTcDWWlo/MLpiOdif5g==
 
 enhanced-resolve@^5.12.0:
   version "5.15.0"
@@ -2269,9 +2269,9 @@ globals@^11.1.0:
   integrity sha512-WOBp/EEGUiIsJSp7wcv/y6MO+lV9UoncWqxuFfm8eBwzWNgyfBd6Gz+IeKQ9jCmyhoH99g15M3T+QaVHFjizVA==
 
 globals@^13.19.0:
-  version "13.22.0"
-  resolved "https://registry.yarnpkg.com/globals/-/globals-13.22.0.tgz#0c9fcb9c48a2494fbb5edbfee644285543eba9d8"
-  integrity sha512-H1Ddc/PbZHTDVJSnj8kWptIRSD6AM3pK+mKytuIVF4uoBV7rshFlhhvA58ceJ5wp3Er58w6zj7bykMpYXt3ETw==
+  version "13.23.0"
+  resolved "https://registry.yarnpkg.com/globals/-/globals-13.23.0.tgz#ef31673c926a0976e1f61dab4dca57e0c0a8af02"
+  integrity sha512-XAmF0RjlrjY23MA51q3HltdlGxUpXPvg0GioKiD9X6HD28iMjo2dKC8Vqwm7lne4GNr78+RHTfliktR6ZH09wA==
   dependencies:
     type-fest "^0.20.2"
 
@@ -3526,9 +3526,9 @@ sass-loader@13.3.2:
     neo-async "^2.6.2"
 
 sass@^1.68:
-  version "1.68.0"
-  resolved "https://registry.yarnpkg.com/sass/-/sass-1.68.0.tgz#0034b0cc9a50248b7d1702ac166fd25990023669"
-  integrity sha512-Lmj9lM/fef0nQswm1J2HJcEsBUba4wgNx2fea6yJHODREoMFnwRpZydBnX/RjyXw2REIwdkbqE4hrTo4qfDBUA==
+  version "1.69.0"
+  resolved "https://registry.yarnpkg.com/sass/-/sass-1.69.0.tgz#5195075371c239ed556280cf2f5944d234f42679"
+  integrity sha512-l3bbFpfTOGgQZCLU/gvm1lbsQ5mC/WnLz3djL2v4WCJBDrWm58PO+jgngcGRNnKUh6wSsdm50YaovTqskZ0xDQ==
   dependencies:
     chokidar ">=3.0.0 <4.0.0"
     immutable "^4.0.0"
@@ -4169,9 +4169,9 @@ vscode-languageserver@^7.0.0:
     vscode-languageserver-protocol "3.16.0"
 
 vscode-uri@^3.0.2:
-  version "3.0.7"
-  resolved "https://registry.yarnpkg.com/vscode-uri/-/vscode-uri-3.0.7.tgz#6d19fef387ee6b46c479e5fb00870e15e58c1eb8"
-  integrity sha512-eOpPHogvorZRobNqJGhapa0JdwaxpjVvyBp0QIUMRMSf8ZAlqOdEquKuRmw9Qwu0qXtJIWqFtMkmvJjUZmMjVA==
+  version "3.0.8"
+  resolved "https://registry.yarnpkg.com/vscode-uri/-/vscode-uri-3.0.8.tgz#1770938d3e72588659a172d0fd4642780083ff9f"
+  integrity sha512-AyFQ0EVmsOZOlAnxoFOGOq1SQDWAB7C6aqMGS23svWAllfOaxbuFvcT8D1i8z3Gyn8fraVeZNNmN6e9bxxXkKw==
 
 vue-component-type-helpers@1.8.4:
   version "1.8.4"
