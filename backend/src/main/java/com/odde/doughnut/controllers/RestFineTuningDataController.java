@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.json.FineTuningExampleForQuestionGeneration;
+import com.odde.doughnut.controllers.json.QuestionSuggestionParams;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -24,13 +25,16 @@ class RestFineTuningDataController {
     this.currentUser = currentUser;
   }
 
-  @PatchMapping("/update-suggested-question-for-fine-tuning")
+  @PatchMapping("/{suggestedQuestion}/update-suggested-question-for-fine-tuning")
   @Transactional
   public SuggestedQuestionForFineTuning updateSuggestedQuestionForFineTuning(
-      @RequestBody SuggestedQuestionForFineTuning suggestion)
+      @PathVariable("suggestedQuestion") SuggestedQuestionForFineTuning suggestedQuestion,
+      @RequestBody QuestionSuggestionParams suggestion)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
-    return modelFactoryService.toSuggestedQuestionForFineTuningService(suggestion).update();
+    return modelFactoryService
+        .toSuggestedQuestionForFineTuningService(suggestedQuestion)
+        .update(suggestion);
   }
 
   @GetMapping("/question-generation-examples")

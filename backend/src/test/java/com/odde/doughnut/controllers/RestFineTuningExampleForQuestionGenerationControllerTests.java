@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.json.FineTuningExampleForQuestionGeneration;
+import com.odde.doughnut.controllers.json.QuestionSuggestionParams;
 import com.odde.doughnut.controllers.json.SimplifiedOpenAIChatMessage;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
@@ -108,11 +109,13 @@ public class RestFineTuningExampleForQuestionGenerationControllerTests {
 
   @Nested
   class UpdateSuggestedQuestionForFineTuning {
-    SuggestedQuestionForFineTuning suggestion;
+    SuggestedQuestionForFineTuning suggested;
+    private QuestionSuggestionParams suggest;
 
     @BeforeEach
     void setup() {
-      suggestion = makeMe.aQuestionSuggestionForFineTunining().please();
+      suggested = makeMe.aQuestionSuggestionForFineTunining().please();
+      suggest = new QuestionSuggestionParams("new comment", makeMe.aMCQWithAnswer().please());
     }
 
     @Test
@@ -121,13 +124,13 @@ public class RestFineTuningExampleForQuestionGenerationControllerTests {
           new RestFineTuningDataController(modelFactoryService, makeMe.aUser().toModelPlease());
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.updateSuggestedQuestionForFineTuning(suggestion));
+          () -> controller.updateSuggestedQuestionForFineTuning(suggested, suggest));
     }
 
     @Test
     void onlyUpdate() throws UnexpectedNoAccessRightException {
       long oldCount = modelFactoryService.questionSuggestionForFineTuningRepository.count();
-      controller.updateSuggestedQuestionForFineTuning(suggestion);
+      controller.updateSuggestedQuestionForFineTuning(suggested, suggest);
       assertThat(
           modelFactoryService.questionSuggestionForFineTuningRepository.count(), equalTo(oldCount));
     }

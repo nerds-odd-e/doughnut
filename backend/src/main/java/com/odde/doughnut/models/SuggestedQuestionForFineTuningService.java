@@ -15,12 +15,12 @@ public class SuggestedQuestionForFineTuningService {
   }
 
   public SuggestedQuestionForFineTuning create(QuestionSuggestionParams params) {
-    entity.setPreservedQuestion(params.preservedQuestion);
-    entity.setComment(params.comment);
-    return save();
+    return update(params);
   }
 
-  public SuggestedQuestionForFineTuning update() {
+  public SuggestedQuestionForFineTuning update(QuestionSuggestionParams params) {
+    entity.setPreservedQuestion(params.preservedQuestion);
+    entity.setComment(params.comment);
     return save();
   }
 
