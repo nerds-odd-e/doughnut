@@ -1,21 +1,19 @@
 import { flushPromises } from "@vue/test-utils";
 import { afterEach, beforeEach, describe, it } from "vitest";
 import SuggestedQuestionEdit from "@/components/ai/SuggestedQuestionEdit.vue";
-import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
-describe("QuizQuestion", () => {
+describe("Edit Suggested Question", () => {
   describe("suggest question for fine tuning AI", () => {
-    const notebook: Generated.NotePositionViewedByUser =
-      makeMe.aNotePosition.please();
-    const quizQuestion: Generated.QuizQuestion = makeMe.aQuizQuestion
-      .withQuestionType("AI_QUESTION")
-      .withNotebookPosition(notebook)
-      .please();
     const suggestedQuestion: Generated.SuggestedQuestionForFineTuning = {
-      preservedQuestion: quizQuestion,
+      preservedQuestion: {
+        stem: "What is the capital of France?",
+        choices: ["Paris", "London", "Berlin", "Madrid"],
+        correctChoiceIndex: 0,
+        confidence: 9,
+      },
       comment: "",
     };
 
