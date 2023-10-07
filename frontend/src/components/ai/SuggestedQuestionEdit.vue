@@ -46,25 +46,28 @@ export default defineComponent({
     return { ...useLoadingApi(), ...asPopup() };
   },
   props: {
-    suggestedQuestion: {
+    modelValue: {
       type: Object as PropType<Generated.SuggestedQuestionForFineTuning>,
       required: true,
     },
   },
+  emits: ["update:modelValue"],
   data() {
     return {
       suggestionParams: _.cloneDeep(
-        this.suggestedQuestion,
+        this.modelValue,
       ) as Generated.QuestionSuggestionParams,
     };
   },
   methods: {
     async suggestQuestionForFineTuning() {
-      await this.api.reviewMethods.suggestedQuestionForFineTuningUpdate(
-        this.suggestedQuestion.id,
-        this.suggestionParams,
-      );
-      this.popup.done(null);
+      const updated =
+        await this.api.reviewMethods.suggestedQuestionForFineTuningUpdate(
+          this.modelValue.id,
+          this.suggestionParams,
+        );
+      this.$emit("update:modelValue", updated);
+      this.popup.done(updated);
     },
   },
   components: { TextInput, TextArea },

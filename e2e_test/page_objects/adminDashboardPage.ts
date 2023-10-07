@@ -40,6 +40,7 @@ export function adminDashboardPage() {
           cy.formField("Stem").clear().type(newQuestion["Question Stem"])
           cy.findByRole("button", { name: "OK" }).click()
           cy.pageIsNotLoading()
+          cy.findByText(newQuestion["Question Stem"])
         },
       }
     },

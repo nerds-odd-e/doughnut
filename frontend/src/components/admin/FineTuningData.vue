@@ -13,7 +13,7 @@
         <tr
           v-for="(suggested, index) in suggestedQuestions"
           :key="index"
-          @dblclick="editSuggestedQuestion(suggested)"
+          @dblclick="editSuggestedQuestion(index)"
         >
           <td>{{ suggested.preservedQuestion.stem }}</td>
           <td>{{ suggested.comment }}</td>
@@ -22,9 +22,9 @@
     </table>
     <Popup v-model="showEditDialog">
       <SuggestedQuestionEdit
-        v-if="currentSuggestedQuestion"
-        :suggested-question="currentSuggestedQuestion"
-        :key="currentSuggestedQuestion.id"
+        v-if="currentIndex !== undefined"
+        v-model="suggestedQuestions[currentIndex]"
+        :key="currentIndex"
       />
     </Popup>
   </div>
@@ -44,15 +44,13 @@ export default {
       suggestedQuestions: undefined as
         | Generated.SuggestedQuestionForFineTuning[]
         | undefined,
-      currentSuggestedQuestion: undefined as
-        | Generated.SuggestedQuestionForFineTuning
-        | undefined,
+      currentIndex: undefined as number | undefined,
       showEditDialog: false,
     };
   },
   methods: {
-    async editSuggestedQuestion(suggested) {
-      this.currentSuggestedQuestion = suggested;
+    async editSuggestedQuestion(index: number) {
+      this.currentIndex = index;
       this.showEditDialog = true;
     },
     async downloadFineTuningJSONL() {
