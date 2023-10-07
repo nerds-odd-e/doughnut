@@ -1,5 +1,5 @@
 <template>
-  <h2>Suggest This Question For AI Fine Tuning</h2>
+  <h2>Suggested Question For AI Fine Tuning</h2>
   <p>
     <i
       >Sending this question for fine tuning the question generation model will
@@ -9,18 +9,18 @@
   <div>
     <TextArea
       :field="`stem`"
-      v-model="suggestedQuestionStem"
+      v-model="localValue.preservedQuestion.stem"
       placeholder="Add a suggested question"
       :rows="2"
     /><br />
     <ol type="A">
-      <li v-for="choice in originalChoices" :key="choice">
+      <li v-for="choice in localValue.preservedQuestion.choices" :key="choice">
         {{ choice }}
       </li>
     </ol>
     <TextInput
       field="comment"
-      v-model="comment"
+      v-model="localValue.comment"
       placeholder="Add a comment about the question"
     />
   </div>
@@ -31,6 +31,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import _ from "lodash";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import asPopup from "../commons/Popups/asPopup";
 import TextInput from "../form/TextInput.vue";
@@ -42,35 +43,22 @@ export default defineComponent({
     return { ...useLoadingApi(), ...asPopup() };
   },
   props: {
-    quizQuestion: {
-      type: Object as PropType<Generated.QuizQuestion>,
+    suggestedQuestion: {
+      type: Object as PropType<Generated.SuggestedQuestionForFineTuning>,
       required: true,
     },
   },
   data() {
     return {
-      suggestedQuestionStem: this.quizQuestion.stem as string,
-      comment: "" as string,
+      localValue: _.cloneDeep(
+        this.suggestedQuestion,
+      ) as Generated.SuggestedQuestionForFineTuning,
     };
-  },
-  computed: {
-    originalChoices(): string[] {
-      return this.quizQuestion.choices.map((c) => c.display);
-    },
   },
   methods: {
     async suggestQuestionForFineTuning() {
-      await this.api.reviewMethods.suggestQuestionForFineTuning(
-        this.quizQuestion.quizQuestionId,
-        {
-          comment: this.comment,
-          preservedQuestion: {
-            stem: this.suggestedQuestionStem,
-            correctChoiceIndex: 0,
-            choices: this.originalChoices,
-            confidence: 9,
-          },
-        },
+      await this.api.reviewMethods.suggestedQuestionForFineTuningUpdate(
+        this.suggestedQuestion,
       );
       this.popup.done(null);
     },

@@ -10,18 +10,30 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(suggested, index) in suggestedQuestions" :key="index">
+        <tr
+          v-for="(suggested, index) in suggestedQuestions"
+          :key="index"
+          @dblclick="editSuggestedQuestion(suggested)"
+        >
           <td>{{ suggested.preservedQuestion.stem }}</td>
           <td>{{ suggested.comment }}</td>
         </tr>
       </tbody>
     </table>
+    <Popup v-model="showEditDialog">
+      <SuggestedQuestionEdit
+        v-if="currentSuggestedQuestion"
+        :suggested-question="currentSuggestedQuestion"
+        :key="currentSuggestedQuestion.id"
+      />
+    </Popup>
   </div>
 </template>
 
 <script lang="ts">
 import { ContentLoader } from "vue-content-loader";
 import useLoadingApi from "../../managedApi/useLoadingApi";
+import Popup from "../commons/Popups/Popup.vue";
 
 export default {
   setup() {
@@ -32,9 +44,17 @@ export default {
       suggestedQuestions: undefined as
         | Generated.SuggestedQuestionForFineTuning[]
         | undefined,
+      currentSuggestedQuestion: undefined as
+        | Generated.SuggestedQuestionForFineTuning
+        | undefined,
+      showEditDialog: false,
     };
   },
   methods: {
+    async editSuggestedQuestion(suggested) {
+      this.currentSuggestedQuestion = suggested;
+      this.showEditDialog = true;
+    },
     async downloadFineTuningJSONL() {
       const fineTuningData = await this.api.getFineTuningExamples();
       const blob = new Blob(
@@ -51,7 +71,7 @@ export default {
       URL.revokeObjectURL(url);
     },
   },
-  components: { ContentLoader },
+  components: { ContentLoader, Popup },
   async mounted() {
     this.suggestedQuestions =
       await this.api.getSuggestedQuestionsForFineTuning();

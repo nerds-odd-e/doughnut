@@ -14,19 +14,23 @@ describe("QuizQuestion", () => {
       .withQuestionType("AI_QUESTION")
       .withNotebookPosition(notebook)
       .please();
+    const suggestedQuestion: Generated.SuggestedQuestionForFineTuning = {
+      preservedQuestion: quizQuestion,
+      comment: "",
+    };
 
     let wrapper;
 
     beforeEach(() => {
       wrapper = helper
         .component(SuggestedQuestionEdit)
-        .withStorageProps({ quizQuestion })
+        .withStorageProps({ suggestedQuestion })
         .mount();
     });
 
     it("should be able to suggest a question as good example", async () => {
-      helper.apiMock.expectingPost(
-        `/api/quiz-questions/${quizQuestion.quizQuestionId}/suggest-fine-tuning`,
+      helper.apiMock.expectingPatch(
+        `/api/fine-tuning/update-suggested-question-for-fine-tuning`,
       );
       wrapper.get("button.btn-success").trigger("click");
       await flushPromises();
