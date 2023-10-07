@@ -1,25 +1,24 @@
 <template>
-  <a class="btn btn-sm" role="button" @click="showDialog" :title="title">
+  <a class="btn btn-sm" role="button" @click="show = true" :title="title">
     <slot name="button_face" />
     <template v-if="!$slots.button_face">
       {{ title }}
     </template>
+    <Popup v-model="show" :sidebar="sidebar">
+      <slot />
+    </Popup>
   </a>
 </template>
 
 <script lang="ts">
 import { PropType, defineComponent } from "vue";
-import usePopups from "./usePopups";
+import Popup from "./Popup.vue";
 
 export default defineComponent({
-  setup() {
-    return usePopups();
-  },
   props: { title: String, sidebar: String as PropType<"left" | "right"> },
-  methods: {
-    showDialog() {
-      this.popups.dialog(this.$slots.default, this.sidebar);
-    },
+  data() {
+    return { show: false };
   },
+  components: { Popup },
 });
 </script>

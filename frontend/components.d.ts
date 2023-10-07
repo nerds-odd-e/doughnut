@@ -88,6 +88,7 @@ declare module 'vue' {
     ObjectRight: typeof import('./src/components/svgs/link_types/ObjectRight.vue')['default']
     Person: typeof import('./src/components/svgs/link_types/Person.vue')['default']
     PopButton: typeof import('./src/components/commons/Popups/PopButton.vue')['default']
+    Popup: typeof import('./src/components/commons/Popups/Popup.vue')['default']
     Popups: typeof import('./src/components/commons/Popups/Popups.vue')['default']
     ProgressBar: typeof import('./src/components/commons/ProgressBar.vue')['default']
     Quiz: typeof import('./src/components/review/Quiz.vue')['default']

@@ -1,3 +1,4 @@
+import { flushPromises } from '@vue/test-utils';
 import { screen } from "@testing-library/vue";
 import ManagedApi from "@/managedApi/ManagedApi";
 import GlobalBar from "@/components/toolbars/GlobalBar.vue";
@@ -40,6 +41,7 @@ describe("global bar", () => {
       })
       .mount();
     wrapper.find("[role='button']").trigger("click");
+    await flushPromises();
     expect(popupInfo).toHaveLength(1);
   });
 
