@@ -1,4 +1,4 @@
-import { flushPromises } from '@vue/test-utils';
+import { flushPromises } from "@vue/test-utils";
 import { screen } from "@testing-library/vue";
 import ManagedApi from "@/managedApi/ManagedApi";
 import GlobalBar from "@/components/toolbars/GlobalBar.vue";
