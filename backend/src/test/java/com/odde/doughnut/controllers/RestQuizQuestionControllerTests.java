@@ -171,8 +171,7 @@ class RestQuizQuestionControllerTests {
       SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
           controller.suggestQuestionForFineTunng(quizQuestionEntity, suggestion);
       assertThat(
-          suggestedQuestionForFineTuning.getPreservedQuestion(),
-          containsString(mcqWithAnswer.stem));
+          suggestedQuestionForFineTuning.getPreservedQuestion().stem, equalTo(mcqWithAnswer.stem));
     }
 
     @Test

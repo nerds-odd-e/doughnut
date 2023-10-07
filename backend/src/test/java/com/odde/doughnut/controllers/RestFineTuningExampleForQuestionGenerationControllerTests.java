@@ -76,7 +76,8 @@ public class RestFineTuningExampleForQuestionGenerationControllerTests {
         throws UnexpectedNoAccessRightException {
       makeMe
           .aQuestionSuggestionForFineTunining()
-          .withPreservedQuestion("This is the raw Json question")
+          .withPreservedQuestion(
+              makeMe.aMCQWithAnswer().stem("This is the raw Json question").please())
           .please();
       List<FineTuningExampleForQuestionGeneration> goodFineTuningExampleForQuestionGenerationList =
           controller.getAllQuestionGenerationFineTuningExamples();

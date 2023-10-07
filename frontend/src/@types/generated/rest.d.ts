@@ -211,7 +211,7 @@ declare namespace Generated {
     interface SuggestedQuestionForFineTuning {
         id: number;
         comment: string;
-        preservedQuestion: string;
+        preservedQuestion: MCQWithAnswer;
         createdAt?: string;
     }
 

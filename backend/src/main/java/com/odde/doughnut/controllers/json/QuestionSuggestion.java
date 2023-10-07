@@ -26,7 +26,7 @@ public class QuestionSuggestion {
     suggestedQuestionForFineTuning.setQuizQuestion(quizQuestionEntity);
     suggestedQuestionForFineTuning.setComment(comment);
     suggestedQuestionForFineTuning.setCreatedAt(currentUTCTimestamp);
-    suggestedQuestionForFineTuning.setPreservedQuestion(mcqWithAnswer.toJsonString());
+    suggestedQuestionForFineTuning.setPreservedQuestion(mcqWithAnswer);
 
     return questionSuggestionForFineTuningRepository.save(suggestedQuestionForFineTuning);
   }

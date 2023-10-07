@@ -1,7 +1,10 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.json.FineTuningExampleForQuestionGeneration;
+import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
@@ -44,8 +47,6 @@ public class SuggestedQuestionForFineTuning {
   private String comment;
 
   @Column(name = "preserved_question")
-  @Getter
-  @Setter
   private String preservedQuestion;
 
   @Column(name = "created_at")
@@ -53,6 +54,18 @@ public class SuggestedQuestionForFineTuning {
   @Setter
   @Nullable
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
+
+  public MCQWithAnswer getPreservedQuestion() {
+    try {
+      return new ObjectMapper().readValue(preservedQuestion, MCQWithAnswer.class);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void setPreservedQuestion(MCQWithAnswer mcqWithAnswer) {
+    this.preservedQuestion = mcqWithAnswer.toJsonString();
+  }
 
   @JsonIgnore
   private Note getNote() {
