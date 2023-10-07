@@ -121,6 +121,11 @@ declare namespace Generated {
         subscriptions: Subscription[];
     }
 
+    interface QuestionSuggestion {
+        comment: string;
+        mcqWithAnswer: MCQWithAnswer;
+    }
+
     interface QuizQuestion {
         quizQuestionId: number;
         questionType: QuestionType;
@@ -264,17 +269,6 @@ declare namespace Generated {
         notebook: Notebook;
     }
 
-    interface Choice {
-        display: string;
-        pictureWithMask?: PictureWithMask;
-        picture: boolean;
-    }
-
-    interface PictureWithMask {
-        notePicture: string;
-        pictureMask: string;
-    }
-
     interface MCQWithAnswer extends MultipleChoicesQuestion {
         /**
          * Index of the correct choice. 0-based.
@@ -284,6 +278,17 @@ declare namespace Generated {
          * Confidence of the correctness of the question. 0 to 10.
          */
         confidence: number;
+    }
+
+    interface Choice {
+        display: string;
+        pictureWithMask?: PictureWithMask;
+        picture: boolean;
+    }
+
+    interface PictureWithMask {
+        notePicture: string;
+        pictureMask: string;
     }
 
     interface Thingy {
