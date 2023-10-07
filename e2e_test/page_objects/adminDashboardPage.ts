@@ -38,7 +38,7 @@ export function adminDashboardPage() {
         ) {
           cy.findByText(originalQuestionStem).parent().dblclick()
           cy.formField("Stem").clear().type(newQuestion["Question Stem"])
-          // cy.findByRole("button", { name: "OK" }).click()
+          cy.findByRole("button", { name: "OK" }).click()
           cy.pageIsNotLoading()
         },
       }

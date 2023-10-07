@@ -9,18 +9,21 @@
   <div>
     <TextArea
       :field="`stem`"
-      v-model="localValue.preservedQuestion.stem"
+      v-model="suggestionParams.preservedQuestion.stem"
       placeholder="Add a suggested question"
       :rows="2"
     /><br />
     <ol type="A">
-      <li v-for="choice in localValue.preservedQuestion.choices" :key="choice">
+      <li
+        v-for="choice in suggestionParams.preservedQuestion.choices"
+        :key="choice"
+      >
         {{ choice }}
       </li>
     </ol>
     <TextInput
       field="comment"
-      v-model="localValue.comment"
+      v-model="suggestionParams.comment"
       placeholder="Add a comment about the question"
     />
   </div>
@@ -50,15 +53,16 @@ export default defineComponent({
   },
   data() {
     return {
-      localValue: _.cloneDeep(
+      suggestionParams: _.cloneDeep(
         this.suggestedQuestion,
-      ) as Generated.SuggestedQuestionForFineTuning,
+      ) as Generated.QuestionSuggestionParams,
     };
   },
   methods: {
     async suggestQuestionForFineTuning() {
       await this.api.reviewMethods.suggestedQuestionForFineTuningUpdate(
-        this.suggestedQuestion,
+        this.suggestedQuestion.id,
+        this.suggestionParams,
       );
       this.popup.done(null);
     },

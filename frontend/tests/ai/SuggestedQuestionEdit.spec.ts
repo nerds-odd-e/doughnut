@@ -8,6 +8,7 @@ helper.resetWithApiMock(beforeEach, afterEach);
 describe("Edit Suggested Question", () => {
   describe("suggest question for fine tuning AI", () => {
     const suggestedQuestion: Generated.SuggestedQuestionForFineTuning = {
+      id: 1357,
       preservedQuestion: {
         stem: "What is the capital of France?",
         choices: ["Paris", "London", "Berlin", "Madrid"],
@@ -28,7 +29,7 @@ describe("Edit Suggested Question", () => {
 
     it("should be able to suggest a question as good example", async () => {
       helper.apiMock.expectingPatch(
-        `/api/fine-tuning/update-suggested-question-for-fine-tuning`,
+        `/api/fine-tuning/1357/update-suggested-question-for-fine-tuning`,
       );
       wrapper.get("button.btn-success").trigger("click");
       await flushPromises();

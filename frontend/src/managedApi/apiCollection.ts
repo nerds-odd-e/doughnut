@@ -73,10 +73,11 @@ const apiCollection = (managedApi: ManagedApi) => ({
       ) as Promise<string>;
     },
     async suggestedQuestionForFineTuningUpdate(
+      suggestedId: Doughnut.ID,
       suggestedQuestion: Generated.QuestionSuggestionParams,
     ): Promise<string> {
       return managedApi.restPatch(
-        `fine-tuning/update-suggested-question-for-fine-tuning`,
+        `fine-tuning/${suggestedId}/update-suggested-question-for-fine-tuning`,
         suggestedQuestion,
       ) as Promise<string>;
     },
