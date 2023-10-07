@@ -23,6 +23,7 @@ public class SuggestedQuestionForFineTuning {
   @Id
   @Getter
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Nullable
   private Integer id;
 
   @ManyToOne

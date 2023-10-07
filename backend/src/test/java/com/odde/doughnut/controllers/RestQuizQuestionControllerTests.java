@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.odde.doughnut.controllers.json.QuestionSuggestion;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
@@ -156,7 +155,8 @@ class RestQuizQuestionControllerTests {
 
     @Test
     void suggestQuestionWithAComment() {
-      QuestionSuggestion suggestion = new QuestionSuggestion("this is a comment", mcqWithAnswer);
+      SuggestedQuestionForFineTuning suggestion =
+          makeMe.aQuestionSuggestionForFineTunining().comment("this is a comment").inMemoryPlease();
       SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
           controller.suggestQuestionForFineTunng(quizQuestionEntity, suggestion);
       assertEquals(
@@ -167,7 +167,11 @@ class RestQuizQuestionControllerTests {
     @Test
     void suggestQuestionWithNewQuestionStem() {
       mcqWithAnswer.stem = "this is a new stem, correct?";
-      QuestionSuggestion suggestion = new QuestionSuggestion("this is a comment", mcqWithAnswer);
+      SuggestedQuestionForFineTuning suggestion =
+          makeMe
+              .aQuestionSuggestionForFineTunining()
+              .withPreservedQuestion(mcqWithAnswer)
+              .inMemoryPlease();
       SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
           controller.suggestQuestionForFineTunng(quizQuestionEntity, suggestion);
       assertThat(
@@ -176,7 +180,8 @@ class RestQuizQuestionControllerTests {
 
     @Test
     void createMarkedQuestionInDatabase() {
-      QuestionSuggestion suggestion = new QuestionSuggestion("this is a comment", mcqWithAnswer);
+      SuggestedQuestionForFineTuning suggestion =
+          makeMe.aQuestionSuggestionForFineTunining().inMemoryPlease();
       long oldCount = modelFactoryService.questionSuggestionForFineTuningRepository.count();
       controller.suggestQuestionForFineTunng(quizQuestionEntity, suggestion);
       assertThat(

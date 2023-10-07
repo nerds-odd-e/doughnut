@@ -38,4 +38,9 @@ public class SuggestedQuestionForFineTuningBuilder
     this.preservedQuestion = question;
     return this;
   }
+
+  public SuggestedQuestionForFineTuningBuilder comment(String comment) {
+    entity.setComment(comment);
+    return this;
+  }
 }

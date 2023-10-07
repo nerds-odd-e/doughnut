@@ -209,7 +209,7 @@ declare namespace Generated {
     }
 
     interface SuggestedQuestionForFineTuning {
-        id: number;
+        id?: number;
         comment: string;
         preservedQuestion: MCQWithAnswer;
         createdAt?: string;

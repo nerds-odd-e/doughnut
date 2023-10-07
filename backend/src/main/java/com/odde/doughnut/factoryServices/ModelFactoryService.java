@@ -122,4 +122,9 @@ public class ModelFactoryService {
         .findAllByIds(idList)
         .sorted(Comparator.comparing(v -> idList.indexOf(v.getId())));
   }
+
+  public SuggestedQuestionForFineTuningService toSuggestedQuestionForFineTuningService(
+      SuggestedQuestionForFineTuning suggestion) {
+    return new SuggestedQuestionForFineTuningService(suggestion, this);
+  }
 }
