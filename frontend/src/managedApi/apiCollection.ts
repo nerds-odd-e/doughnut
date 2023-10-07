@@ -65,7 +65,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
 
     async suggestQuestionForFineTuning(
       quizQuestionId: number,
-      suggestedQuestion: Generated.SuggestedQuestionForFineTuning,
+      suggestedQuestion: Generated.QuestionSuggestionParams,
     ): Promise<string> {
       return managedApi.restPost(
         `quiz-questions/${quizQuestionId}/suggest-fine-tuning`,
@@ -73,7 +73,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
       ) as Promise<string>;
     },
     async suggestedQuestionForFineTuningUpdate(
-      suggestedQuestion: Generated.SuggestedQuestionForFineTuning,
+      suggestedQuestion: Generated.QuestionSuggestionParams,
     ): Promise<string> {
       return managedApi.restPatch(
         `fine-tuning/update-suggested-question-for-fine-tuning`,

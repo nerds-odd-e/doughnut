@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.odde.doughnut.controllers.json.QuestionSuggestionParams;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
@@ -155,10 +156,10 @@ class RestQuizQuestionControllerTests {
 
     @Test
     void suggestQuestionWithAComment() {
-      SuggestedQuestionForFineTuning suggestion =
-          makeMe.aQuestionSuggestionForFineTunining().comment("this is a comment").inMemoryPlease();
+      QuestionSuggestionParams suggestion =
+          new QuestionSuggestionParams("this is a comment", mcqWithAnswer);
       SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
-          controller.suggestQuestionForFineTunng(quizQuestionEntity, suggestion);
+          controller.suggestQuestionForFineTuning(quizQuestionEntity, suggestion);
       assertEquals(
           quizQuestionEntity.getId(), suggestedQuestionForFineTuning.getQuizQuestion().getId());
       assertEquals("this is a comment", suggestedQuestionForFineTuning.getComment());
@@ -167,23 +168,19 @@ class RestQuizQuestionControllerTests {
     @Test
     void suggestQuestionWithNewQuestionStem() {
       mcqWithAnswer.stem = "this is a new stem, correct?";
-      SuggestedQuestionForFineTuning suggestion =
-          makeMe
-              .aQuestionSuggestionForFineTunining()
-              .withPreservedQuestion(mcqWithAnswer)
-              .inMemoryPlease();
+      QuestionSuggestionParams suggestion =
+          new QuestionSuggestionParams("this is a comment", mcqWithAnswer);
       SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
-          controller.suggestQuestionForFineTunng(quizQuestionEntity, suggestion);
+          controller.suggestQuestionForFineTuning(quizQuestionEntity, suggestion);
       assertThat(
           suggestedQuestionForFineTuning.getPreservedQuestion().stem, equalTo(mcqWithAnswer.stem));
     }
 
     @Test
     void createMarkedQuestionInDatabase() {
-      SuggestedQuestionForFineTuning suggestion =
-          makeMe.aQuestionSuggestionForFineTunining().inMemoryPlease();
+      QuestionSuggestionParams suggestion = new QuestionSuggestionParams("", mcqWithAnswer);
       long oldCount = modelFactoryService.questionSuggestionForFineTuningRepository.count();
-      controller.suggestQuestionForFineTunng(quizQuestionEntity, suggestion);
+      controller.suggestQuestionForFineTuning(quizQuestionEntity, suggestion);
       assertThat(
           modelFactoryService.questionSuggestionForFineTuningRepository.count(),
           equalTo(oldCount + 1));

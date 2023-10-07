@@ -1,10 +1,8 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.QuizQuestionEntity;
+import com.odde.doughnut.controllers.json.QuestionSuggestionParams;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
-import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import java.sql.Timestamp;
 
 public class SuggestedQuestionForFineTuningService {
   private final SuggestedQuestionForFineTuning entity;
@@ -16,11 +14,9 @@ public class SuggestedQuestionForFineTuningService {
     this.modelFactoryService = modelFactoryService;
   }
 
-  public SuggestedQuestionForFineTuning create(
-      QuizQuestionEntity quizQuestionEntity, User user, Timestamp currentUTCTimestamp) {
-    entity.setUser(user);
-    entity.setQuizQuestion(quizQuestionEntity);
-    entity.setCreatedAt(currentUTCTimestamp);
+  public SuggestedQuestionForFineTuning create(QuestionSuggestionParams params) {
+    entity.setPreservedQuestion(params.preservedQuestion);
+    entity.setComment(params.comment);
     return save();
   }
 
