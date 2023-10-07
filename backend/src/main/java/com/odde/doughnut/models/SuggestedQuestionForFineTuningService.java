@@ -21,6 +21,14 @@ public class SuggestedQuestionForFineTuningService {
     entity.setUser(user);
     entity.setQuizQuestion(quizQuestionEntity);
     entity.setCreatedAt(currentUTCTimestamp);
+    return save();
+  }
+
+  public SuggestedQuestionForFineTuning update() {
+    return save();
+  }
+
+  private SuggestedQuestionForFineTuning save() {
     return modelFactoryService.questionSuggestionForFineTuningRepository.save(entity);
   }
 }

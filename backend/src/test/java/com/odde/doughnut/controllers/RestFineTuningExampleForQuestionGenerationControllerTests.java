@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.json.FineTuningExampleForQuestionGeneration;
@@ -102,6 +103,33 @@ public class RestFineTuningExampleForQuestionGenerationControllerTests {
       makeMe.aQuestionSuggestionForFineTunining().please();
       List<SuggestedQuestionForFineTuning> suggestions = controller.getAllSuggestedQuestions();
       assertEquals(1, suggestions.size());
+    }
+  }
+
+  @Nested
+  class UpdateSuggestedQuestionForFineTuning {
+    SuggestedQuestionForFineTuning suggestion;
+
+    @BeforeEach
+    void setup() {
+      suggestion = makeMe.aQuestionSuggestionForFineTunining().please();
+    }
+
+    @Test
+    void itShouldNotAllowNonAdmin() {
+      controller =
+          new RestFineTuningDataController(modelFactoryService, makeMe.aUser().toModelPlease());
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.updateSuggestedQuestionForFineTuning(suggestion));
+    }
+
+    @Test
+    void onlyUpdate() throws UnexpectedNoAccessRightException {
+      long oldCount = modelFactoryService.questionSuggestionForFineTuningRepository.count();
+      controller.updateSuggestedQuestionForFineTuning(suggestion);
+      assertThat(
+          modelFactoryService.questionSuggestionForFineTuningRepository.count(), equalTo(oldCount));
     }
   }
 }

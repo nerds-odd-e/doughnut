@@ -7,9 +7,8 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
 
 @RestController
@@ -23,6 +22,15 @@ class RestFineTuningDataController {
       ModelFactoryService modelFactoryService, UserModel currentUser) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
+  }
+
+  @PatchMapping("/update-suggested-question-for-fine-tuning")
+  @Transactional
+  public SuggestedQuestionForFineTuning updateSuggestedQuestionForFineTuning(
+      @RequestBody SuggestedQuestionForFineTuning suggestion)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAdminAuthorization();
+    return modelFactoryService.toSuggestedQuestionForFineTuningService(suggestion).update();
   }
 
   @GetMapping("/question-generation-examples")
