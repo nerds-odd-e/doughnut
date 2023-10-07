@@ -59,7 +59,7 @@ import TextInput from "../form/TextInput.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopups";
 import QuizQuestionChoices from "./QuizQuestionChoices.vue";
-import SuggestQuestionForFineTuning from "./SuggestQuestionForFineTuning.vue";
+import SuggestQuestionForFineTuning from "../ai/SuggestQuestionForFineTuning.vue";
 import Breadcrumb from "../toolbars/Breadcrumb.vue";
 import SvgRaiseHand from "../svgs/SvgRaiseHand.vue";
 

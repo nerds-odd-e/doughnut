@@ -1,6 +1,6 @@
 import { flushPromises } from "@vue/test-utils";
 import { afterEach, beforeEach, describe, it } from "vitest";
-import SuggestQuestionForFineTuning from "@/components/review/SuggestQuestionForFineTuning.vue";
+import SuggestQuestionForFineTuning from "@/components/ai/SuggestQuestionForFineTuning.vue";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
