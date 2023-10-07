@@ -10,8 +10,9 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(question, index) in suggestedQuestions" :key="index">
-          <td>{{ question.comment }}</td>
+        <tr v-for="(suggested, index) in suggestedQuestions" :key="index">
+          <td>{{ suggested.preservedQuestion.stem }}</td>
+          <td>{{ suggested.comment }}</td>
         </tr>
       </tbody>
     </table>

@@ -32,6 +32,12 @@ export function adminDashboardPage() {
             },
           }
         },
+        updateQuestionSuggestion(
+          originalQuestionStem: string,
+          newQuestion: Record<string, string>,
+        ) {
+          cy.findByText(originalQuestionStem).parent().dblclick()
+        },
       }
     },
   }
