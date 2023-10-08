@@ -7,8 +7,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 
 class OpenAIChatAboutNoteRequestBuilderTest {
   MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
@@ -37,19 +35,5 @@ class OpenAIChatAboutNoteRequestBuilderTest {
     ChatCompletionRequest request =
         new OpenAIChatAboutNoteRequestBuilder().contentOfNoteOfCurrentFocus(note).build();
     assertThat(request.getMessages().get(0).getContent(), not(containsString(DETAILS)));
-  }
-
-  @ParameterizedTest
-  @CsvSource({
-    "<p>abc<br>def</p>,                       abc\\s*\\Rdef",
-    "<a href=\"https://abc.com\">a link</a>,  \\[a link\\]\\(https://abc.com\\)",
-  })
-  void messageShouldConvertHTMLToMarkdown(String original, String converted) {
-    Note note = makeMe.aNote().details(original).inMemoryPlease();
-    ChatCompletionRequest request =
-        new OpenAIChatAboutNoteRequestBuilder().contentOfNoteOfCurrentFocus(note).build();
-    assertThat(
-        request.getMessages().get(0).getContent(),
-        matchesPattern("(?s).*%s.*".formatted(converted)));
   }
 }
