@@ -125,7 +125,8 @@ declare namespace Generated {
         comment: string;
     }
 
-    interface QuestionSuggestionParams extends QuestionSuggestionCreationParams {
+    interface QuestionSuggestionParams {
+        comment: string;
         preservedQuestion: MCQWithAnswer;
     }
 

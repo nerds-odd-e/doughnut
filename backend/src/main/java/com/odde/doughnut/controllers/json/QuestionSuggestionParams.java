@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor
-public class QuestionSuggestionParams extends QuestionSuggestionCreationParams {
+public class QuestionSuggestionParams {
+  public String comment;
   public MCQWithAnswer preservedQuestion;
 }
