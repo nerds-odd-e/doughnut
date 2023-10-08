@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.algorithms.HtmlOrText;
@@ -44,6 +45,7 @@ public class Note extends Thingy {
   @Column(name = "description")
   @Getter
   @Setter
+  @JsonPropertyDescription("The details of the note is in markdown format.")
   private String details;
 
   @Size(min = 1, max = Note.MAX_TITLE_LENGTH)

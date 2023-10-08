@@ -249,6 +249,9 @@ declare namespace Generated {
     }
 
     interface Note extends Thingy {
+        /**
+         * The details of the note is in markdown format.
+         */
         details: string;
         parentId?: number;
         updatedAt: string;
