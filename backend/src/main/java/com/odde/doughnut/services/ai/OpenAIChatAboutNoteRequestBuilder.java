@@ -64,11 +64,10 @@ Topic: %s
   }
 
   public OpenAIChatAboutNoteRequestBuilder instructionForCompletion(
-      String contextPath, AiCompletionParams aiCompletionParams) {
+      AiCompletionParams aiCompletionParams) {
     addMessage(
         ChatMessageRole.SYSTEM,
-        "Please behave like a text completion service and keep the content concise.\nCurrent context path of the note: %s"
-            .formatted(contextPath));
+        "Please behave like a text completion service and keep the content concise. The content is in markdown format.");
     addMessage(ChatMessageRole.USER, aiCompletionParams.prompt);
     if (!Strings.isEmpty(aiCompletionParams.incompleteContent)) {
       addMessage(ChatMessageRole.ASSISTANT, aiCompletionParams.incompleteContent);

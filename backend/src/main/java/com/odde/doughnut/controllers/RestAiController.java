@@ -38,7 +38,7 @@ public class RestAiController {
   public AiCompletion getCompletion(
       @PathVariable(name = "note") Note note, @RequestBody AiCompletionParams aiCompletionParams) {
     currentUser.assertLoggedIn();
-    return aiAdvisorService.getAiCompletion(aiCompletionParams, note.getContextPathString(), note);
+    return aiAdvisorService.getAiCompletion(aiCompletionParams, note);
   }
 
   @PostMapping("/chat")

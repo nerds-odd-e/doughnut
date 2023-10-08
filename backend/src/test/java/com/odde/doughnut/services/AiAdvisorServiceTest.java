@@ -112,8 +112,7 @@ class AiAdvisorServiceTest {
 
   private AiCompletion getAiCompletionFromAdvisor(String incompleteContent) {
     Note note = makeMe.aNote().inMemoryPlease();
-    return aiAdvisorService.getAiCompletion(
-        new AiCompletionParams("", incompleteContent), "", note);
+    return aiAdvisorService.getAiCompletion(new AiCompletionParams("", incompleteContent), note);
   }
 
   @Nested

@@ -85,8 +85,8 @@ class RestAiControllerTest {
                     assertThat(request.getMaxTokens()).isLessThan(200);
                     assertThat(request.getMessages()).hasSize(4);
                     assertEquals("describe Earth", request.getMessages().get(3).getContent());
-                    assertThat(request.getMessages().get(2).getContent())
-                        .contains("Current context path of the note: cosmos › solar system");
+                    assertThat(request.getMessages().get(1).getContent())
+                        .contains("Context path: cosmos › solar system");
                     return true;
                   })))
           .thenReturn(buildCompletionResult("blue planet"));

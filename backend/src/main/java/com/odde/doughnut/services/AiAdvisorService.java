@@ -29,13 +29,12 @@ public class AiAdvisorService {
     return aiQuestionGenerator.getAiGeneratedQuestion();
   }
 
-  public AiCompletion getAiCompletion(
-      AiCompletionParams aiCompletionParams, String notePath, Note note) {
+  public AiCompletion getAiCompletion(AiCompletionParams aiCompletionParams, Note note) {
     ChatCompletionRequest chatCompletionRequest =
         new OpenAIChatAboutNoteRequestBuilder()
             .systemBrief()
             .contentOfNoteOfCurrentFocus(note)
-            .instructionForCompletion(notePath, aiCompletionParams)
+            .instructionForCompletion(aiCompletionParams)
             .maxTokens(100)
             .build();
     return openAiApiHandler.getAiCompletion(aiCompletionParams, chatCompletionRequest).orElse(null);
