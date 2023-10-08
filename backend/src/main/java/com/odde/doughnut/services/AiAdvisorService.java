@@ -30,7 +30,7 @@ public class AiAdvisorService {
   }
 
   public AiCompletion getAiCompletion(
-    AiCompletionParams aiCompletionParams, String notePath, Note note) {
+      AiCompletionParams aiCompletionParams, String notePath, Note note) {
     ChatCompletionRequest chatCompletionRequest =
         new OpenAIChatAboutNoteRequestBuilder()
             .systemBrief()
@@ -38,9 +38,7 @@ public class AiAdvisorService {
             .instructionForCompletion(notePath, aiCompletionParams)
             .maxTokens(100)
             .build();
-    return openAiApiHandler
-        .getAiCompletion(aiCompletionParams, chatCompletionRequest)
-        .orElse(null);
+    return openAiApiHandler.getAiCompletion(aiCompletionParams, chatCompletionRequest).orElse(null);
   }
 
   public String chatToAi(Note note, String userMessage) {

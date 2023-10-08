@@ -76,6 +76,8 @@ export default defineComponent({
   &::before
     left: 0 !important
     right:0 !important
+  li
+    list-style-type: inherit
 .ql-container.ql-snow
   border: none
   font-size: inherit !important

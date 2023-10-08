@@ -1,13 +1,13 @@
 import { flushPromises } from "@vue/test-utils";
-import DetailsEditor from "@/components/form/DetailsEditor.vue";
+import RichMarkdownEditor from "@/components/form/RichMarkdownEditor.vue";
 import helper from "../helpers";
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
-describe("DetailsEditor", () => {
+describe("RichMarkdownEditor", () => {
   it("not emit update when the change is from initial value", async () => {
     const wrapper = helper
-      .component(DetailsEditor)
+      .component(RichMarkdownEditor)
       .withProps({
         modelValue: "initial value",
       })

@@ -64,7 +64,7 @@ public class OpenAiApiHandler {
   }
 
   public Optional<AiCompletion> getAiCompletion(
-    AiCompletionParams aiCompletionParams, ChatCompletionRequest chatCompletionRequest) {
+      AiCompletionParams aiCompletionParams, ChatCompletionRequest chatCompletionRequest) {
     return chatCompletion(chatCompletionRequest).map(aiCompletionParams::getAiCompletion);
   }
 

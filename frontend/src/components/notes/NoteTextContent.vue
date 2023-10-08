@@ -12,7 +12,7 @@
     <slot name="topic-additional" />
   </div>
   <div class="note-content">
-    <DetailsEditor
+    <RichMarkdownEditor
       :multiple-line="true"
       role="details"
       class="note-details"
@@ -29,7 +29,7 @@
 import { defineComponent, PropType } from "vue";
 import { debounce, DebouncedFunc } from "lodash";
 import EditableText from "../form/EditableText.vue";
-import DetailsEditor from "../form/DetailsEditor.vue";
+import RichMarkdownEditor from "../form/RichMarkdownEditor.vue";
 import type { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
@@ -53,7 +53,7 @@ export default defineComponent({
   },
   components: {
     EditableText,
-    DetailsEditor,
+    RichMarkdownEditor,
   },
   data() {
     return {
