@@ -1,7 +1,7 @@
 <template>
   <QuillEditor
     ref="quillEditor"
-    v-model:content="localValue"
+    v-model:content="localHtmlValue"
     :options="editorOptions"
     :content-type="'html'"
     @blur="onBlurTextField"
@@ -12,9 +12,13 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { marked } from "marked";
 import { QuillEditor } from "@vueup/vue-quill";
 
 import "quill/dist/quill.snow.css";
+import TurndownService from "turndown";
+
+const turndownService = new TurndownService();
 
 export default defineComponent({
   props: {
@@ -46,21 +50,30 @@ export default defineComponent({
         },
         placeholder: "Enter note details here...",
       },
-      localValue: this.modelValue || ("" as string),
+      localHtmlValue: marked(this.modelValue || "")
+        .trim()
+        .replace(/>\s+</g, "><"),
       hadFocus: false as boolean,
     };
   },
   watch: {
     modelValue() {
-      this.localValue = this.modelValue || ("" as string);
+      this.localHtmlValue = marked(this.modelValue || "")
+        .trim()
+        .replace(/>\s+</g, "><");
+    },
+  },
+  computed: {
+    localMarkdownValue() {
+      return turndownService.turndown(this.localHtmlValue);
     },
   },
   methods: {
     onUpdateContent() {
-      if (this.localValue === `<p>${this.modelValue}</p>`) {
+      if (this.localMarkdownValue === this.modelValue) {
         return;
       }
-      this.$emit("update:modelValue", this.localValue);
+      this.$emit("update:modelValue", this.localMarkdownValue);
     },
     onBlurTextField() {
       this.$emit("blur");

@@ -11,10 +11,9 @@
     />
     <slot name="topic-additional" />
   </div>
-  <div class="note-content">
+  <div role="details" class="note-content">
     <RichMarkdownEditor
       :multiple-line="true"
-      role="details"
       scope-name="note"
       :model-value="localTextContent.details"
       @update:model-value="onUpdateDetails"
