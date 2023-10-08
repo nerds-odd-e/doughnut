@@ -9,7 +9,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.controllers.json.AiCompletion;
-import com.odde.doughnut.controllers.json.AiCompletionRequest;
+import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.controllers.json.ApiError;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
@@ -113,7 +113,7 @@ class AiAdvisorServiceTest {
   private AiCompletion getAiCompletionFromAdvisor(String incompleteContent) {
     Note note = makeMe.aNote().inMemoryPlease();
     return aiAdvisorService.getAiCompletion(
-        new AiCompletionRequest("", incompleteContent), "", note);
+        new AiCompletionParams("", incompleteContent), "", note);
   }
 
   @Nested

@@ -329,7 +329,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
 
     async askAiCompletion(
-      request: Generated.AiCompletionRequest,
+      request: Generated.AiCompletionParams,
       noteId: Doughnut.ID,
     ) {
       return (await managedApi.restPost(
@@ -345,7 +345,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return (await managedApi.restPost(url, {})) as Generated.QuizQuestion;
     },
     async generateImage(prompt: string) {
-      const request: Generated.AiCompletionRequest = {
+      const request: Generated.AiCompletionParams = {
         prompt,
         incompleteContent: "",
       };

@@ -8,7 +8,7 @@ import org.apache.logging.log4j.util.Strings;
 
 @NoArgsConstructor
 @AllArgsConstructor
-public class AiCompletionRequest {
+public class AiCompletionParams {
   public String prompt;
   public String incompleteContent;
 

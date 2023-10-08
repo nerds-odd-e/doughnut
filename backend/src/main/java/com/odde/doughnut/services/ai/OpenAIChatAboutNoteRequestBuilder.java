@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator;
-import com.odde.doughnut.controllers.json.AiCompletionRequest;
+import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.entities.Note;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatFunction;
@@ -64,14 +64,14 @@ Topic: %s
   }
 
   public OpenAIChatAboutNoteRequestBuilder instructionForCompletion(
-      String contextPath, AiCompletionRequest aiCompletionRequest) {
+      String contextPath, AiCompletionParams aiCompletionParams) {
     addMessage(
         ChatMessageRole.SYSTEM,
         "Please behave like a text completion service and keep the content concise.\nCurrent context path of the note: %s"
             .formatted(contextPath));
-    addMessage(ChatMessageRole.USER, aiCompletionRequest.prompt);
-    if (!Strings.isEmpty(aiCompletionRequest.incompleteContent)) {
-      addMessage(ChatMessageRole.ASSISTANT, aiCompletionRequest.incompleteContent);
+    addMessage(ChatMessageRole.USER, aiCompletionParams.prompt);
+    if (!Strings.isEmpty(aiCompletionParams.incompleteContent)) {
+      addMessage(ChatMessageRole.ASSISTANT, aiCompletionParams.incompleteContent);
     }
     return this;
   }

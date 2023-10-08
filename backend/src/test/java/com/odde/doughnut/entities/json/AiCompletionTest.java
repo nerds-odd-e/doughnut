@@ -2,7 +2,7 @@ package com.odde.doughnut.entities.json;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.odde.doughnut.controllers.json.AiCompletionRequest;
+import com.odde.doughnut.controllers.json.AiCompletionParams;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -19,7 +19,7 @@ class AiCompletionTest {
   """)
   void prependPreviousIncompleteMessageWithLeadingCharacter(
       String incompleteMessage, String completeSuggestion, String expectedSuggestion) {
-    String moreCompleteContent2 = AiCompletionRequest.concat(incompleteMessage, completeSuggestion);
+    String moreCompleteContent2 = AiCompletionParams.concat(incompleteMessage, completeSuggestion);
     assertEquals(expectedSuggestion, moreCompleteContent2);
   }
 }

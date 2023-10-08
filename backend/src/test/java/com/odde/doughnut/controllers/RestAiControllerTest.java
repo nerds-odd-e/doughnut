@@ -10,7 +10,7 @@ import static org.mockito.Mockito.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.json.AiCompletion;
-import com.odde.doughnut.controllers.json.AiCompletionRequest;
+import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.UserModel;
@@ -49,8 +49,8 @@ class RestAiControllerTest {
   @Mock OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
 
-  AiCompletionRequest params =
-      new AiCompletionRequest() {
+  AiCompletionParams params =
+      new AiCompletionParams() {
         {
           this.prompt = "describe Earth";
         }

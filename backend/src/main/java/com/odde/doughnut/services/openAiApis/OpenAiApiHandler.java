@@ -6,7 +6,7 @@ import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.json.AiCompletion;
-import com.odde.doughnut.controllers.json.AiCompletionRequest;
+import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
@@ -64,8 +64,8 @@ public class OpenAiApiHandler {
   }
 
   public Optional<AiCompletion> getAiCompletion(
-      AiCompletionRequest aiCompletionRequest, ChatCompletionRequest chatCompletionRequest) {
-    return chatCompletion(chatCompletionRequest).map(aiCompletionRequest::getAiCompletion);
+    AiCompletionParams aiCompletionParams, ChatCompletionRequest chatCompletionRequest) {
+    return chatCompletion(chatCompletionRequest).map(aiCompletionParams::getAiCompletion);
   }
 
   public Optional<ChatCompletionChoice> chatCompletion(ChatCompletionRequest request) {

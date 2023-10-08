@@ -8,7 +8,7 @@ declare namespace Generated {
         finishReason: string;
     }
 
-    interface AiCompletionRequest {
+    interface AiCompletionParams {
         prompt: string;
         incompleteContent: string;
     }

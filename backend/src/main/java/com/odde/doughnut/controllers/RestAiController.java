@@ -37,9 +37,9 @@ public class RestAiController {
   @PostMapping("/{note}/completion")
   public AiCompletion getCompletion(
       @PathVariable(name = "note") Note note,
-      @RequestBody AiCompletionRequest aiCompletionRequest) {
+      @RequestBody AiCompletionParams aiCompletionParams) {
     currentUser.assertLoggedIn();
-    return aiAdvisorService.getAiCompletion(aiCompletionRequest, note.getContextPathString(), note);
+    return aiAdvisorService.getAiCompletion(aiCompletionParams, note.getContextPathString(), note);
   }
 
   @PostMapping("/chat")
@@ -70,8 +70,8 @@ public class RestAiController {
   }
 
   @PostMapping("/generate-image")
-  public AiGeneratedImage generateImage(@RequestBody AiCompletionRequest aiCompletionRequest) {
+  public AiGeneratedImage generateImage(@RequestBody AiCompletionParams aiCompletionParams) {
     currentUser.assertLoggedIn();
-    return new AiGeneratedImage(aiAdvisorService.getImage(aiCompletionRequest.prompt));
+    return new AiGeneratedImage(aiAdvisorService.getImage(aiCompletionParams.prompt));
   }
 }
