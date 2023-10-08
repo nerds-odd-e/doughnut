@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.algorithms.ClozedString;
-import com.odde.doughnut.algorithms.HtmlOrText;
+import com.odde.doughnut.algorithms.HtmlOrMarkdown;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
 import java.io.IOException;
@@ -307,7 +307,7 @@ public class Note extends Thingy {
   public ClozedString getClozeDescription() {
     if (isDetailsBlankHtml()) return new ClozedString(null, "");
 
-    return ClozedString.htmlClosedString(getDetails()).hide(getNoteTitle());
+    return ClozedString.htmlClozedString(getDetails()).hide(getNoteTitle());
   }
 
   @JsonIgnore
@@ -368,7 +368,7 @@ public class Note extends Thingy {
 
   @JsonIgnore
   public boolean isDetailsBlankHtml() {
-    return new HtmlOrText(getDetails()).isBlank();
+    return new HtmlOrMarkdown(getDetails()).isBlank();
   }
 
   @JsonIgnore

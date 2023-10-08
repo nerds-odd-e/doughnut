@@ -18,6 +18,6 @@ public abstract class ClozeDescriptonQuizPresenter extends QuizQuestionWithOptio
 
   @Override
   public String stem() {
-    return note.getClozeDescription().cloze();
+    return note.getClozeDescription().clozeDetails();
   }
 }

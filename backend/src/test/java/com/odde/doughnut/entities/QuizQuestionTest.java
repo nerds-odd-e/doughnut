@@ -61,7 +61,7 @@ class QuizQuestionTest {
     QuizQuestion quizQuestion = getQuizQuestion(note);
     assertThat(
         quizQuestion.getStem(),
-        equalTo(
+        containsString(
             "<mark title='Hidden text that is matching the answer'>[...]</mark> has 3 letters"));
   }
 

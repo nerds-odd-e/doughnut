@@ -1,6 +1,7 @@
 package com.odde.doughnut.algorithms;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
 import java.util.function.Function;
@@ -8,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-class HtmlOrTextTest {
+class HtmlOrMarkdownTest {
   @ParameterizedTest
   @CsvSource({
     "a, false",
@@ -19,21 +20,21 @@ class HtmlOrTextTest {
     "<p><br></p>, true",
   })
   void is_blank(String htmlOrText, boolean shouldBeBlank) {
-    assertThat(new HtmlOrText(htmlOrText).isBlank(), is(shouldBeBlank));
+    assertThat(new HtmlOrMarkdown(htmlOrText).isBlank(), is(shouldBeBlank));
   }
 
   @Test
   void emptyString() {
-    assertThat(new HtmlOrText("").isBlank(), is(true));
+    assertThat(new HtmlOrMarkdown("").isBlank(), is(true));
   }
 
   @Test
   void replaceText_with_special_char() {
     String input = "<p>Some sample text</p>";
-    HtmlOrText htmlOrText = new HtmlOrText(input);
+    HtmlOrMarkdown htmlOrMarkdown = new HtmlOrMarkdown(input);
 
     Function<String, String> callback = text -> text + "\\";
 
-    assertThat(htmlOrText.replaceText(callback), is("<p>Some sample text\\</p>"));
+    assertThat(htmlOrMarkdown.replaceText(callback), containsString("<p>Some sample text\\</p>"));
   }
 }

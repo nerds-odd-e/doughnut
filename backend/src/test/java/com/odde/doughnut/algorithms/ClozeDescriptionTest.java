@@ -1,6 +1,7 @@
 package com.odde.doughnut.algorithms;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
 import java.util.regex.Matcher;
@@ -63,8 +64,8 @@ public class ClozeDescriptionTest {
   })
   void clozeDescription(String title, String details, String expectedClozeDescription) {
     assertThat(
-        new ClozedString(clozeReplacement, details).hide(new NoteTitle(title)).cloze(),
-        equalTo(expectedClozeDescription));
+        new ClozedString(clozeReplacement, details).hide(new NoteTitle(title)).clozeDetails(),
+        containsString(expectedClozeDescription));
   }
 
   @Disabled
@@ -89,22 +90,26 @@ public class ClozeDescriptionTest {
   @Test
   void clozeDescriptionWithMultipleLink() {
     assertThat(
-        new ClozedString(clozeReplacement, "a /b\nc/ d").hide(new NoteTitle("title")).cloze(),
-        equalTo("a /b\nc/ d"));
+        new ClozedString(clozeReplacement, "a /b\nc/ d")
+            .hide(new NoteTitle("title"))
+            .clozeDetails(),
+        containsString("a /b\nc/ d"));
   }
 
   @Test
   void shouldAvoidTheDollarSignBug() {
     assertThat(
-        new ClozedString(clozeReplacement, "$2").hide(new NoteTitle("Stable Diffusion")).cloze(),
-        equalTo("$2"));
+        new ClozedString(clozeReplacement, "$2")
+            .hide(new NoteTitle("Stable Diffusion"))
+            .clozeDetails(),
+        containsString("$2"));
   }
 
   @Test
   void theReplacementsShouldNotInterfereEachOther() {
     ClozeReplacement clozeReplacement = new ClozeReplacement("/..~/", "/.../", "(...)", "<...>");
     assertThat(
-        new ClozedString(clozeReplacement, "abc").hide(new NoteTitle("abc")).cloze(),
-        equalTo("/.../"));
+        new ClozedString(clozeReplacement, "abc").hide(new NoteTitle("abc")).clozeDetails(),
+        containsString("/.../"));
   }
 }

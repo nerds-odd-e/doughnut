@@ -16,8 +16,6 @@ public class DescriptionLinkTargetQuizPresenter extends LinkTargetQuizPresenter 
     return "<p>The following descriptions is "
         + link.getLinkTypeLabel()
         + ":</p>"
-        + "<pre style='white-space: pre-wrap;'>"
-        + clozeDescription.cloze()
-        + "</pre> ";
+        + clozeDescription.clozeDetails();
   }
 }

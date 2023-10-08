@@ -31,7 +31,7 @@ public class LinkSourceWithinSameLinkTypeQuizPresenter extends QuizQuestionWithO
         .map(
             thing -> {
               QuizQuestion.Choice choice = new QuizQuestion.Choice();
-              choice.setDisplay(thing.getLink().getClozeSource().cloze());
+              choice.setDisplay(thing.getLink().getClozeSource().clozeTitle());
               return choice;
             })
         .toList();
