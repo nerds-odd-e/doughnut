@@ -14,6 +14,7 @@
   <div class="note-content">
     <RichMarkdownEditor
       :multiple-line="true"
+      role="details"
       scope-name="note"
       :model-value="localTextContent.details"
       @update:model-value="onUpdateDetails"
