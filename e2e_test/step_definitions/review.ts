@@ -225,14 +225,3 @@ When(
       .confirm()
   },
 )
-
-When(
-  "I suggest the displayed question {string} with a different question:",
-  (oldQuestionStem: string, newQuestion: DataTable) => {
-    pageObjects
-      .findQuestionWithStem(oldQuestionStem)
-      .suggestingThisQuestionForFineTuning()
-      .changeQuestion(newQuestion.hashes()[0])
-      .confirm()
-  },
-)

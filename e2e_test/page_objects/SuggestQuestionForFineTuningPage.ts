@@ -9,9 +9,5 @@ export const SuggestQuestionForFineTuningPage = () => {
       cy.formField("Comment").type(comment)
       return this
     },
-    changeQuestion(newQuestion: Record<string, string>) {
-      cy.formField("Stem").clear().type(newQuestion["Question Stem"])
-      return this
-    },
   }
 }
