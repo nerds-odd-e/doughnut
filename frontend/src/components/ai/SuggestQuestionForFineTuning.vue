@@ -7,17 +7,6 @@
     >
   </p>
   <div>
-    <TextArea
-      :field="`stem`"
-      v-model="suggestedQuestionStem"
-      placeholder="Add a suggested question"
-      :rows="2"
-    /><br />
-    <ol type="A">
-      <li v-for="choice in originalChoices" :key="choice">
-        {{ choice }}
-      </li>
-    </ol>
     <TextInput
       field="comment"
       v-model="comment"
@@ -34,7 +23,6 @@ import { defineComponent, PropType } from "vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import asPopup from "../commons/Popups/asPopup";
 import TextInput from "../form/TextInput.vue";
-import TextArea from "../form/TextArea.vue";
 
 export default defineComponent({
   inheritAttrs: false,
@@ -49,14 +37,8 @@ export default defineComponent({
   },
   data() {
     return {
-      suggestedQuestionStem: this.quizQuestion.stem as string,
       comment: "" as string,
     };
-  },
-  computed: {
-    originalChoices(): string[] {
-      return this.quizQuestion.choices.map((c) => c.display);
-    },
   },
   methods: {
     async suggestQuestionForFineTuning() {
@@ -64,17 +46,11 @@ export default defineComponent({
         this.quizQuestion.quizQuestionId,
         {
           comment: this.comment,
-          preservedQuestion: {
-            stem: this.suggestedQuestionStem,
-            correctChoiceIndex: 0,
-            choices: this.originalChoices,
-            confidence: 9,
-          },
         },
       );
       this.popup.done(null);
     },
   },
-  components: { TextInput, TextArea },
+  components: { TextInput },
 });
 </script>

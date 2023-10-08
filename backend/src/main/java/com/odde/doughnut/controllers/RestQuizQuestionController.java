@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.json.QuestionSuggestionParams;
+import com.odde.doughnut.controllers.json.QuestionSuggestionCreationParams;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.AnswerModel;
@@ -47,11 +47,12 @@ class RestQuizQuestionController {
   @Transactional
   public SuggestedQuestionForFineTuning suggestQuestionForFineTuning(
       @PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity,
-      @RequestBody QuestionSuggestionParams suggestion) {
+      @RequestBody QuestionSuggestionCreationParams suggestion) {
     SuggestedQuestionForFineTuning sqft = new SuggestedQuestionForFineTuning();
     sqft.setUser(currentUser.getEntity());
     sqft.setCreatedAt(testabilitySettings.getCurrentUTCTimestamp());
-    sqft.setQuizQuestion(quizQuestionEntity);
-    return modelFactoryService.toSuggestedQuestionForFineTuningService(sqft).create(suggestion);
+    return modelFactoryService
+        .toSuggestedQuestionForFineTuningService(sqft)
+        .create(quizQuestionEntity, suggestion);
   }
 }

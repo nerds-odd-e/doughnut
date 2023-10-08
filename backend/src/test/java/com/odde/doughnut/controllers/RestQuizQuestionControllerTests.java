@@ -4,7 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.odde.doughnut.controllers.json.QuestionSuggestionParams;
+import com.odde.doughnut.controllers.json.QuestionSuggestionCreationParams;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
@@ -146,18 +146,19 @@ class RestQuizQuestionControllerTests {
     QuizQuestionEntity quizQuestionEntity;
     MCQWithAnswer mcqWithAnswer;
     Note note;
+    QuestionSuggestionCreationParams suggestion =
+        new QuestionSuggestionCreationParams("this is a comment");
 
     @BeforeEach
     void setup() throws QuizQuestionNotPossibleException {
       note = makeMe.aNote().creatorAndOwner(currentUser).please();
       mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      quizQuestionEntity = makeMe.aQuestion().ofNote(note).please();
+      quizQuestionEntity =
+          makeMe.aQuestion().ofAIGeneratedQuestion(mcqWithAnswer, note.getThing()).please();
     }
 
     @Test
     void suggestQuestionWithAComment() {
-      QuestionSuggestionParams suggestion =
-          new QuestionSuggestionParams("this is a comment", mcqWithAnswer);
       SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
           controller.suggestQuestionForFineTuning(quizQuestionEntity, suggestion);
       assertEquals(
@@ -166,10 +167,7 @@ class RestQuizQuestionControllerTests {
     }
 
     @Test
-    void suggestQuestionWithNewQuestionStem() {
-      mcqWithAnswer.stem = "this is a new stem, correct?";
-      QuestionSuggestionParams suggestion =
-          new QuestionSuggestionParams("this is a comment", mcqWithAnswer);
+    void suggestQuestionWithSnapshotQuestionStem() {
       SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
           controller.suggestQuestionForFineTuning(quizQuestionEntity, suggestion);
       assertThat(
@@ -178,7 +176,6 @@ class RestQuizQuestionControllerTests {
 
     @Test
     void createMarkedQuestionInDatabase() {
-      QuestionSuggestionParams suggestion = new QuestionSuggestionParams("", mcqWithAnswer);
       long oldCount = modelFactoryService.questionSuggestionForFineTuningRepository.count();
       controller.suggestQuestionForFineTuning(quizQuestionEntity, suggestion);
       assertThat(

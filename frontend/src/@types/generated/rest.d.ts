@@ -121,8 +121,11 @@ declare namespace Generated {
         subscriptions: Subscription[];
     }
 
-    interface QuestionSuggestionParams {
+    interface QuestionSuggestionCreationParams {
         comment: string;
+    }
+
+    interface QuestionSuggestionParams extends QuestionSuggestionCreationParams {
         preservedQuestion: MCQWithAnswer;
     }
 

@@ -29,6 +29,7 @@ Feature: Generate Training examples for fine-tuning OpenAI
       | Did Baha Men write 'Who Let the Dogs Out'? |
     Then an admin should be able to download the training data containing 1 example containing "Did Baha Men write 'Who Let the Dogs Out'?"
 
+  @ignore
   Scenario: User suggests a different question
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" with a different question:
       | Question Stem                              |

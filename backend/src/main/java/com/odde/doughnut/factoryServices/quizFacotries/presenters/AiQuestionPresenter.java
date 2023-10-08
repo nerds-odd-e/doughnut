@@ -1,7 +1,5 @@
 package com.odde.doughnut.factoryServices.quizFacotries.presenters;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -13,12 +11,7 @@ public class AiQuestionPresenter implements QuizQuestionPresenter {
   private final MCQWithAnswer aiQuestion;
 
   public AiQuestionPresenter(QuizQuestionEntity quizQuestion) {
-    try {
-      this.aiQuestion =
-          new ObjectMapper().readValue(quizQuestion.getRawJsonQuestion(), MCQWithAnswer.class);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
+    aiQuestion = quizQuestion.getMcqWithAnswer();
   }
 
   @Override

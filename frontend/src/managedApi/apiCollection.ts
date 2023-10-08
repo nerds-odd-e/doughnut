@@ -65,7 +65,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
 
     async suggestQuestionForFineTuning(
       quizQuestionId: number,
-      suggestedQuestion: Generated.QuestionSuggestionParams,
+      suggestedQuestion: Generated.QuestionSuggestionCreationParams,
     ): Promise<string> {
       return managedApi.restPost(
         `quiz-questions/${quizQuestionId}/suggest-fine-tuning`,

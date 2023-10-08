@@ -1,6 +1,8 @@
 package com.odde.doughnut.models;
 
+import com.odde.doughnut.controllers.json.QuestionSuggestionCreationParams;
 import com.odde.doughnut.controllers.json.QuestionSuggestionParams;
+import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 
@@ -14,8 +16,12 @@ public class SuggestedQuestionForFineTuningService {
     this.modelFactoryService = modelFactoryService;
   }
 
-  public SuggestedQuestionForFineTuning create(QuestionSuggestionParams params) {
-    return update(params);
+  public SuggestedQuestionForFineTuning create(
+      QuizQuestionEntity quizQuestionEntity, QuestionSuggestionCreationParams params) {
+    entity.setQuizQuestion(quizQuestionEntity);
+    entity.setPreservedQuestion(quizQuestionEntity.getMcqWithAnswer());
+    entity.setComment(params.comment);
+    return save();
   }
 
   public SuggestedQuestionForFineTuning update(QuestionSuggestionParams params) {

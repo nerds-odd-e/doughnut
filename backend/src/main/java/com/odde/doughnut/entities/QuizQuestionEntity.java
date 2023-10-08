@@ -1,6 +1,8 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.json.NotePositionViewedByUser;
 import com.odde.doughnut.factoryServices.quizFacotries.*;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.*;
@@ -8,6 +10,7 @@ import com.odde.doughnut.factoryServices.quizFacotries.presenters.*;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.ai.MCQWithAnswer;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.function.BiFunction;
@@ -160,5 +163,13 @@ public class QuizQuestionEntity {
       return null;
     }
     return new NoteViewer(user, thing.getHeadNoteOfNotebook()).jsonNotePosition(true);
+  }
+
+  public MCQWithAnswer getMcqWithAnswer() {
+    try {
+      return new ObjectMapper().readValue(getRawJsonQuestion(), MCQWithAnswer.class);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
   }
 }
