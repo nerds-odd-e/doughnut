@@ -20,6 +20,11 @@ import TurndownService from "turndown";
 
 const turndownService = new TurndownService();
 
+const markdownToQillHtml = (markdown: string | undefined) =>
+  marked(markdown || "")
+    .trim()
+    .replace(/>\s+</g, "><");
+
 export default defineComponent({
   props: {
     multipleLine: Boolean,
@@ -50,17 +55,13 @@ export default defineComponent({
         },
         placeholder: "Enter note details here...",
       },
-      localHtmlValue: marked(this.modelValue || "")
-        .trim()
-        .replace(/>\s+</g, "><"),
+      localHtmlValue: markdownToQillHtml(this.modelValue),
       hadFocus: false as boolean,
     };
   },
   watch: {
     modelValue() {
-      this.localHtmlValue = marked(this.modelValue || "")
-        .trim()
-        .replace(/>\s+</g, "><");
+      this.localHtmlValue = markdownToQillHtml(this.modelValue);
     },
   },
   computed: {
