@@ -16,6 +16,7 @@ describe("Edit Suggested Question", () => {
         confidence: 9,
       },
       comment: "",
+      positiveFeedback: false,
     };
 
     let wrapper;
