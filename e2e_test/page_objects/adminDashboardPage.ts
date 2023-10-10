@@ -32,12 +32,14 @@ export function adminDashboardPage() {
             },
           }
         },
-        updateQuestionSuggestion(
+
+        updateQuestionSuggestionAndChoice(
           originalQuestionStem: string,
           newQuestion: Record<string, string>,
         ) {
           cy.findByText(originalQuestionStem).parent().dblclick()
           cy.formField("Stem").clear().type(newQuestion["Question Stem"])
+          cy.get("#choice-0").clear().type(newQuestion["Choice A"])
           cy.findByRole("button", { name: "OK" }).click()
           cy.pageIsNotLoading()
           cy.findByText(newQuestion["Question Stem"])

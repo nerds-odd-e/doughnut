@@ -15,10 +15,14 @@
     /><br />
     <ol type="A">
       <li
-        v-for="choice in suggestionParams.preservedQuestion.choices"
-        :key="choice"
+        v-for="(_, index) in suggestionParams.preservedQuestion.choices"
+        :key="index"
       >
-        {{ choice }}
+        <input
+          type="text"
+          :id="`choice-${index}`"
+          v-model="suggestionParams.preservedQuestion.choices[index]"
+        />
       </li>
     </ol>
     <TextInput

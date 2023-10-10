@@ -15,12 +15,12 @@ Given("my question should not be included in the admin's fine-tuning data", () =
 })
 
 Given(
-  "an admin edit the question {string} with a different question:",
+  "an admin edit the question and choices {string} with a different question:",
   (originalQuestionStem: string, newQuestion: DataTable) => {
     pageObjects
       .loginAsAdminAndGoToAdminDashboard()
       .suggestedQuestionsForFineTuning()
-      .updateQuestionSuggestion(originalQuestionStem, newQuestion.hashes()[0])
+      .updateQuestionSuggestionAndChoice(originalQuestionStem, newQuestion.hashes()[0])
   },
 )
 
