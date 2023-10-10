@@ -167,6 +167,30 @@ class RestQuizQuestionControllerTests {
     }
 
     @Test
+    void suggestQuestionWithAPositiveFeedback() {
+      QuestionSuggestionCreationParams suggestion =
+          new QuestionSuggestionCreationParams("this is a comment", true);
+      SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
+          controller.suggestQuestionForFineTuning(quizQuestionEntity, suggestion);
+      assertEquals(
+          quizQuestionEntity.getId(), suggestedQuestionForFineTuning.getQuizQuestion().getId());
+      assertEquals("this is a comment", suggestedQuestionForFineTuning.getComment());
+      assertTrue(suggestedQuestionForFineTuning.isPositiveFeedback(), "Incorrect Feedback");
+    }
+
+    @Test
+    void suggestQuestionWithANegativeFeedback() {
+      QuestionSuggestionCreationParams suggestion =
+          new QuestionSuggestionCreationParams("this is a comment", false);
+      SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
+          controller.suggestQuestionForFineTuning(quizQuestionEntity, suggestion);
+      assertEquals(
+          quizQuestionEntity.getId(), suggestedQuestionForFineTuning.getQuizQuestion().getId());
+      assertEquals("this is a comment", suggestedQuestionForFineTuning.getComment());
+      assertFalse(suggestedQuestionForFineTuning.isPositiveFeedback(), "Incorrect Feedback");
+    }
+
+    @Test
     void suggestQuestionWithSnapshotQuestionStem() {
       SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
           controller.suggestQuestionForFineTuning(quizQuestionEntity, suggestion);

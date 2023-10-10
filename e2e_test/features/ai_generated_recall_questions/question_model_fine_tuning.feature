@@ -22,11 +22,13 @@ Feature: Generate Training examples for fine-tuning OpenAI
   Scenario: User should be able to mark the suggested question as a good example
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a good example
     Then then I should see a message saying the feedback was sent successfully
+    And an admin should be able to download the training data containing 1 example containing "Who wrote 'Who Let the Dogs Out'?"
 
   @ignore
   Scenario: User should be able to mark the suggested question as a bad example
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a bad example
     Then then I should see a message saying the feedback was sent successfully
+    And an admin should be able to download the training data containing 0 examples
 
   @ignore
   Scenario: User should be able to mark the suggested question as a bad example
@@ -47,4 +49,3 @@ Feature: Generate Training examples for fine-tuning OpenAI
       | Did Baha Men write 'Who Let the Dogs Out'? |Yes     |
     Then an admin should be able to download the training data containing 1 example containing "Did Baha Men write 'Who Let the Dogs Out'?"
     And an admin should be able to download the training data containing 1 example containing "Yes"
-    
