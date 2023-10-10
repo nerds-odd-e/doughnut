@@ -1,6 +1,8 @@
 <template>
   <h2>Fine Tuning Questions Suggested by Users</h2>
-  <button @click="downloadFineTuningJSONL()">Download Question Generation Training Data</button>
+  <button @click="downloadFineTuningJSONL()">
+    Download Question Generation Training Data
+  </button>
   <ContentLoader v-if="suggestedQuestions === undefined" />
   <div v-else>
     <table class="table">
