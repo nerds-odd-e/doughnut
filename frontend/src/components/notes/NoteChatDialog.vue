@@ -15,6 +15,41 @@
       :quiz-question="quizQuestion"
       @answered="onAnswered($event)"
     />
+    <div>
+      <h2>Suggest This Question For AI Fine Tuning</h2>
+      <p>
+        <i
+          >Sending this question for fine tuning the question generation model
+          will make this note and question visible to admin. Are you sure?</i
+        >
+      </p>
+      <div>
+        <button
+          class="positive-feedback-btn feedback-btn"
+          :class="{ selected: isPositive }"
+          @click="markQuestionAsPositive"
+        >
+          <font-awesome-icon icon="fa-solid fa-face-smile" />
+        </button>
+        <button
+          class="negative-feedback-btn feedback-btn"
+          :class="{ selected: !isPositive }"
+          @click="markQuestionAsNegative"
+        >
+          <font-awesome-icon icon="fa-solid fa-face-frown" />
+        </button>
+      </div>
+      <TextInput
+        field="comment"
+        placeholder="Add a comment about the question"
+      />
+      <button
+        class="suggest-fine-tuning-ok-btn btn btn-success"
+        @click="suggestQuestionForFineTuning"
+      >
+        OK
+      </button>
+    </div>
   </div>
   <div v-show="answered" class="chat-answer-container">
     <img src="/user-icon.svg" class="chat-answer-icon" />
@@ -87,6 +122,8 @@ export default defineComponent({
       chatInput: "",
       assistantMessage: "",
       answered: false,
+      comment: "",
+      isPositive: null as boolean | null,
     };
   },
   computed: {
@@ -111,6 +148,21 @@ export default defineComponent({
         this.chatInput,
       );
       this.answered = true;
+    },
+    markQuestionAsPositive() {
+      this.isPositive = true;
+    },
+    markQuestionAsNegative() {
+      this.isPositive = false;
+    },
+    async suggestQuestionForFineTuning() {
+      await this.api.reviewMethods.suggestQuestionForFineTuning(
+        this.quizQuestion!.quizQuestionId,
+        {
+          isPositive: this.isPositive ?? false,
+          comment: this.comment,
+        },
+      );
     },
   },
 });
@@ -204,5 +256,9 @@ input.auto-extendable-input {
   width: calc(100% - 140px);
   margin-left: auto;
   margin-right: 40px;
+}
+
+.feedback-btn.selected {
+  color: red;
 }
 </style>

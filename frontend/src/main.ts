@@ -1,5 +1,8 @@
 import { createApp } from "vue";
 import { createRouter, createWebHistory } from "vue-router";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { faFaceSmile, faFaceFrown } from "@fortawesome/free-solid-svg-icons";
 
 import routes from "./routes/routes";
 import "bootstrap/scss/bootstrap.scss";
@@ -14,7 +17,12 @@ const router = createRouter({
 // to accelerate e2e test
 Object.assign(window, { router });
 
-const app = createApp(DoughnutAppVue);
+library.add(faFaceSmile, faFaceFrown);
+
+const app = createApp(DoughnutAppVue).component(
+  "font-awesome-icon",
+  FontAwesomeIcon,
+);
 
 app.use(router);
 
