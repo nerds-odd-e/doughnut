@@ -46,6 +46,11 @@ public class SuggestedQuestionForFineTuning {
   @Setter
   private String comment;
 
+  @Column(name = "is_positive_feedback")
+  @Getter
+  @Setter
+  private boolean isPositiveFeedback;
+
   @Column(name = "preserved_question")
   private String preservedQuestion;
 
