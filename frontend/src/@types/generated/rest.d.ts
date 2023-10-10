@@ -217,6 +217,7 @@ declare namespace Generated {
         comment: string;
         preservedQuestion: MCQWithAnswer;
         createdAt?: string;
+        positiveFeedback: boolean;
     }
 
     interface Link extends Thingy {
