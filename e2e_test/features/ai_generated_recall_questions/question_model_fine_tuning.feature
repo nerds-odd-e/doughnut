@@ -48,3 +48,13 @@ Feature: Generate Training examples for fine-tuning OpenAI
       | Question Stem                              |
       | Did Baha Men write 'Who Let the Dogs Out'? |
     Then an admin should be able to download the training data containing 1 example containing "Did Baha Men write 'Who Let the Dogs Out'?"
+
+  @ignore
+  Scenario: Admin edit the first question and choice suggested
+    Given I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a good example
+    When an admin edit the question "Who wrote 'Who Let the Dogs Out'?" with a different question:
+      | Question Stem                              |Choice A|
+      | Did Baha Men write 'Who Let the Dogs Out'? |Yes     |
+    Then an admin should be able to download the training data containing 1 example containing "Did Baha Men write 'Who Let the Dogs Out'?"
+    And an admin should be able to download the training data containing 1 example containing "Yes"
+    
