@@ -32,15 +32,13 @@ Feature: Generate Training examples for fine-tuning OpenAI
   Scenario: User should be able to mark the suggested question as a bad example
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a good example with comment "This is awesome!"
     Then then I should see a message saying the feedback was sent successfully
+    Then the admin should see "This is awesome!" in the suggested questions
 
   @ignore
   Scenario: User should be able to mark the suggested question as a bad example
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a bad example with comment "This is terrible!"
     Then then I should see a message saying the feedback was sent successfully
-
-  Scenario: Add a comment when suggesting note question
-    When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as an example but with comment "I want deeper questions."
-    Then the admin should see "I want deeper questions." in the suggested questions
+    Then the admin should see "This is terrible!" in the suggested questions
 
   Scenario: Admin edit the question example suggested
     Given I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a good example

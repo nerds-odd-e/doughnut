@@ -45,6 +45,7 @@ export default defineComponent({
       await this.api.reviewMethods.suggestQuestionForFineTuning(
         this.quizQuestion.quizQuestionId,
         {
+          isPositive: false,
           comment: this.comment,
         },
       );

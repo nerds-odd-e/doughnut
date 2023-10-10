@@ -39,16 +39,6 @@
       :disabled="disabled"
       @answer="submitAnswer($event)"
     />
-    <div class="mark-question">
-      <PopButton
-        title="send this question for fine tuning the question generation model"
-      >
-        <template #button_face>
-          <SvgRaiseHand />
-        </template>
-        <SuggestQuestionForFineTuning :quiz-question="quizQuestion" />
-      </PopButton>
-    </div>
   </div>
 </template>
 
@@ -59,9 +49,7 @@ import TextInput from "../form/TextInput.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopups";
 import QuizQuestionChoices from "./QuizQuestionChoices.vue";
-import SuggestQuestionForFineTuning from "../ai/SuggestQuestionForFineTuning.vue";
 import Breadcrumb from "../toolbars/Breadcrumb.vue";
-import SvgRaiseHand from "../svgs/SvgRaiseHand.vue";
 
 export default defineComponent({
   inheritAttrs: false,
@@ -82,8 +70,6 @@ export default defineComponent({
     TextInput,
     QuizQuestionChoices,
     Breadcrumb,
-    SvgRaiseHand,
-    SuggestQuestionForFineTuning,
   },
   emits: ["answered"],
   data() {
