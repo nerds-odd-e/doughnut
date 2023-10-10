@@ -11,9 +11,6 @@
     "lint": "eslint src tests"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^6.4.2",
-    "@fortawesome/free-solid-svg-icons": "^6.4.2",
-    "@fortawesome/vue-fontawesome": "^3.0.3",
     "@popperjs/core": "^2.11",
     "@types/turndown": "^5.0.2",
     "@vue/runtime-core": "3.3.4",

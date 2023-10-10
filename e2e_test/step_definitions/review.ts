@@ -212,5 +212,16 @@ Then("I should see the question {string} is disabled", (questionStem: string) =>
 })
 
 Then("I suggest the displayed question {string} as a good example", (questionStem: string) => {
-  pageObjects.findQuestionWithStem(questionStem).suggestingThisQuestionForFineTuning(true)
+  pageObjects.findQuestionWithStem(questionStem).suggestingThisQuestionForFineTuning().confirm()
 })
+
+When(
+  "I suggest the displayed question {string} as an example but with comment {string}",
+  (questionStem: string, comment: string) => {
+    pageObjects
+      .findQuestionWithStem(questionStem)
+      .suggestingThisQuestionForFineTuning()
+      .comment(comment)
+      .confirm()
+  },
+)
