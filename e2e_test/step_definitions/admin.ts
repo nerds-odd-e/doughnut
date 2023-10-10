@@ -36,6 +36,17 @@ Given(
   },
 )
 
+Given(
+  "an admin should be able to download the training data containing 0 examples",
+  (questionStem: string) => {
+    pageObjects
+      .loginAsAdminAndGoToAdminDashboard()
+      .suggestedQuestionsForFineTuning()
+      .downloadAIQuestionTrainingData()
+      .expectNumberOfRecords(0)
+  },
+)
+
 Given("the admin should see {string} in the suggested questions", (expectedComment: string) => {
   pageObjects
     .loginAsAdminAndGoToAdminDashboard()

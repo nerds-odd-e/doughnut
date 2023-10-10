@@ -13,10 +13,14 @@ Feature: Generate Training examples for fine-tuning OpenAI
       | Who wrote 'Who Let the Dogs Out'? | Anslem Douglas | Baha Men           |
     And I ask to generate a question for the note "Who Let the Dogs Out"
 
-  Scenario: Admin should be able to generate training data from suggested questions
+  Scenario: Admin should be able to generate training data from good suggested questions
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a good example
     Then an admin should be able to download the training data containing 1 example containing "Who wrote 'Who Let the Dogs Out'?"
     Then an admin should be able to download the training data containing 1 example containing "Baha Men"
+
+  Scenario: Admin should not be able to generate training data from bad suggested questions
+    When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a bad example
+    Then an admin should be able to download the training data containing 0 examples
 
   @ignore
   Scenario: User should be able to mark the suggested question as a good example
