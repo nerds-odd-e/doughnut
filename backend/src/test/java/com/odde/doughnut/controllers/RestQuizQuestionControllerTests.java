@@ -147,7 +147,7 @@ class RestQuizQuestionControllerTests {
     MCQWithAnswer mcqWithAnswer;
     Note note;
     QuestionSuggestionCreationParams suggestion =
-        new QuestionSuggestionCreationParams("this is a comment");
+        new QuestionSuggestionCreationParams("this is a comment", true);
 
     @BeforeEach
     void setup() throws QuizQuestionNotPossibleException {
