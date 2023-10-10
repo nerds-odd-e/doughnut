@@ -40,7 +40,7 @@ export function adminDashboardPage() {
           cy.findByText(originalQuestionStem).parent().dblclick()
           cy.formField("Stem").clear().type(newQuestion["Question Stem"])
           cy.get("#choice-0").clear().type(newQuestion["Choice A"])
-          cy.findByRole("button", { name: "OK" }).click()
+          cy.findByRole("button", { name: "Save" }).click()
           cy.pageIsNotLoading()
           cy.findByText(newQuestion["Question Stem"])
         },

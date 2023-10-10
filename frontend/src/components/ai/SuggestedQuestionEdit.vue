@@ -32,7 +32,7 @@
     />
   </div>
   <button class="btn btn-success" @click="suggestQuestionForFineTuning">
-    OK
+    Save
   </button>
 </template>
 
