@@ -37,13 +37,13 @@ Given(
 )
 
 Given(
-  "an admin should be able to download the training data containing 0 examples",
-  () => {
+  "an admin should be able to download the training data containing {int} examples",
+  (numOfDownload: number) => {
     pageObjects
       .loginAsAdminAndGoToAdminDashboard()
       .suggestedQuestionsForFineTuning()
       .downloadAIQuestionTrainingData()
-      .expectNumberOfRecords(0)
+      .expectNumberOfRecords(numOfDownload)
   },
 )
 
