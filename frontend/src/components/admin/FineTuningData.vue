@@ -8,6 +8,8 @@
     <table class="table">
       <thead>
         <tr>
+          <th scope="col">Stem</th>
+          <th scope="col">Feedback</th>
           <th scope="col">Comment</th>
         </tr>
       </thead>
@@ -18,6 +20,7 @@
           @dblclick="editSuggestedQuestion(index)"
         >
           <td>{{ suggested.preservedQuestion.stem }}</td>
+          <td>{{ suggested.positiveFeedback ? "Positive" : "Negative" }}</td>
           <td>{{ suggested.comment }}</td>
         </tr>
       </tbody>
