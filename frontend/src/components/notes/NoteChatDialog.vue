@@ -43,17 +43,19 @@
         field="comment"
         placeholder="Add a comment about the question"
       />
-      <button
-        class="suggest-fine-tuning-ok-btn btn btn-success"
-        @click="suggestQuestionForFineTuning"
-      >
-        OK
-      </button>
-      <div
-        class="suggestion-sent-successfully-message"
-        v-if="suggestionSubmittedSuccessfully"
-      >
-        Feedback sent successfully!
+      <div class="feedback-actions-container">
+        <button
+          class="suggest-fine-tuning-ok-btn btn btn-success"
+          @click="suggestQuestionForFineTuning"
+        >
+          OK
+        </button>
+        <div
+          class="suggestion-sent-successfully-message"
+          v-if="suggestionSubmittedSuccessfully"
+        >
+          Feedback sent successfully!
+        </div>
       </div>
     </div>
   </div>
@@ -273,5 +275,9 @@ input.auto-extendable-input {
 .feedback-btn.selected {
   background-color: red;
   color: white;
+}
+
+.feedback-actions-container {
+  display: flex;
 }
 </style>
