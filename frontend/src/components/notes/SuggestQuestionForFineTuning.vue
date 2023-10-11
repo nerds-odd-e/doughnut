@@ -13,14 +13,14 @@
         :class="{ selected: isPositive }"
         @click="markQuestionAsPositive"
       >
-        Positive
+        👍 Positive
       </button>
       <button
         class="negative-feedback-btn feedback-btn"
         :class="{ selected: isPositive === false }"
         @click="markQuestionAsNegative"
       >
-        Negative
+        👎 Negative
       </button>
     </div>
     <TextInput
