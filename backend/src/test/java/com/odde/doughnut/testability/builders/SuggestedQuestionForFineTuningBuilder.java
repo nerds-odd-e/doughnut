@@ -43,4 +43,14 @@ public class SuggestedQuestionForFineTuningBuilder
     entity.setComment(comment);
     return this;
   }
+
+  public SuggestedQuestionForFineTuningBuilder positive() {
+    entity.setPositiveFeedback(true);
+    return this;
+  }
+
+  public SuggestedQuestionForFineTuningBuilder negative() {
+    entity.setPositiveFeedback(false);
+    return this;
+  }
 }
