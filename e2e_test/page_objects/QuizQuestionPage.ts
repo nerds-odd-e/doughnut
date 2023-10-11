@@ -16,7 +16,7 @@ const currentQuestion = (stem?: string) => {
       cy.get(".suggest-fine-tuning-ok-btn").click()
     },
 
-    suggestingBadQuestionForFineTuning() {
+    suggestingBadQuestionFineTuningExclusion() {
       cy.get(".negative-feedback-btn").click()
       cy.get(".suggest-fine-tuning-ok-btn").click()
     },
