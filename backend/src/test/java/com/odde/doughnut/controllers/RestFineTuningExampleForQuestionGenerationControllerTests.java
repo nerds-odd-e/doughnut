@@ -1,10 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.*;
-
 import com.odde.doughnut.controllers.json.FineTuningExampleForQuestionGeneration;
 import com.odde.doughnut.controllers.json.QuestionSuggestionParams;
 import com.odde.doughnut.controllers.json.SimplifiedOpenAIChatMessage;
@@ -14,7 +9,6 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,6 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -47,13 +48,13 @@ public class RestFineTuningExampleForQuestionGenerationControllerTests {
       controller = new RestFineTuningDataController(modelFactoryService, makeMe.aNullUserModel());
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.getAllQuestionGenerationFineTuningExamples());
+          () -> controller.getAllPositiveQuestionGenerationFineTuningExamples());
     }
 
     @Test
     void shouldReturnNoTrainingDataIfNoMarkedQuestion() throws UnexpectedNoAccessRightException {
       List<FineTuningExampleForQuestionGeneration> goodTrainingData =
-          controller.getAllQuestionGenerationFineTuningExamples();
+          controller.getAllPositiveQuestionGenerationFineTuningExamples();
       assertTrue(goodTrainingData.isEmpty());
     }
 
@@ -63,7 +64,7 @@ public class RestFineTuningExampleForQuestionGenerationControllerTests {
       Note note = makeMe.aNote().title("Test Topic").please();
       makeMe.aQuestionSuggestionForFineTunining().ofNote(note).please();
       List<FineTuningExampleForQuestionGeneration> goodFineTuningExampleForQuestionGenerationList =
-          controller.getAllQuestionGenerationFineTuningExamples();
+          controller.getAllPositiveQuestionGenerationFineTuningExamples();
       assertEquals(1, goodFineTuningExampleForQuestionGenerationList.size());
       List<SimplifiedOpenAIChatMessage> goodTrainingData =
           goodFineTuningExampleForQuestionGenerationList.get(0).getMessages();
@@ -82,7 +83,7 @@ public class RestFineTuningExampleForQuestionGenerationControllerTests {
               makeMe.aMCQWithAnswer().stem("This is the raw Json question").please())
           .please();
       List<FineTuningExampleForQuestionGeneration> goodFineTuningExampleForQuestionGenerationList =
-          controller.getAllQuestionGenerationFineTuningExamples();
+          controller.getAllPositiveQuestionGenerationFineTuningExamples();
       List<SimplifiedOpenAIChatMessage> goodTrainingData =
           goodFineTuningExampleForQuestionGenerationList.get(0).getMessages();
       assertThat(
