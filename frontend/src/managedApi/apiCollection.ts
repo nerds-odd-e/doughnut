@@ -44,7 +44,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
   },
   async getFineTuningExamples() {
     return (await managedApi.restGet(
-      "fine-tuning/question-generation-examples",
+      "fine-tuning/positive-question-generation-examples",
     )) as Generated.FineTuningExampleForQuestionGeneration[];
   },
 

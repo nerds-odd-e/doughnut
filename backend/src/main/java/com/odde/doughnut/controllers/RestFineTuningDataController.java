@@ -37,7 +37,7 @@ class RestFineTuningDataController {
         .update(suggestion);
   }
 
-  @GetMapping("/question-generation-examples")
+  @GetMapping("/positive-question-generation-examples")
   public List<FineTuningExampleForQuestionGeneration>
       getAllPositiveQuestionGenerationFineTuningExamples() throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
