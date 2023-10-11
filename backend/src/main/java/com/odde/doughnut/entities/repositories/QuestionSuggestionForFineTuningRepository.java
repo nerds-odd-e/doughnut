@@ -1,9 +1,8 @@
 package com.odde.doughnut.entities.repositories;
 
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
-import com.odde.doughnut.entities.Thing;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
