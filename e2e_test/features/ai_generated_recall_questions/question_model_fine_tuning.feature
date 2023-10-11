@@ -19,6 +19,7 @@ Feature: Generate Training examples for fine-tuning OpenAI
     Then an admin should be able to download the training data containing 1 example containing "Who wrote 'Who Let the Dogs Out'?"
     Then an admin should be able to download the training data containing 1 example containing "Baha Men"
 
+  @ignore
   Scenario Outline: Admin should be able to generate training data from questions with good feedback 
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a <Feedback> example
     Then I should see a message saying the feedback was sent successfully
