@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <h2>Suggest This Question For AI Fine Tuning</h2>
     <p>
       <i
@@ -91,12 +91,19 @@ export default {
   customOptions: {},
 };
 </script>
-<style>
+<style scoped>
+.container {
+  padding: 20px;
+}
 .feedback-btn.selected {
-  background-color: green;
   color: white;
 }
-
+.positive-feedback-btn.feedback-btn.selected {
+  background-color: green;
+}
+.negative-feedback-btn.feedback-btn.selected {
+  background-color: red;
+}
 .feedback-actions-container {
   display: flex;
 }
