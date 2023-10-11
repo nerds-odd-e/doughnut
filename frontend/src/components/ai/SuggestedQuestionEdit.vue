@@ -34,6 +34,7 @@
   <button class="btn btn-success" @click="suggestQuestionForFineTuning">
     Save
   </button>
+  <button class="btn btn-secondary" @click="popup.done">Cancel</button>
 </template>
 
 <script lang="ts">
