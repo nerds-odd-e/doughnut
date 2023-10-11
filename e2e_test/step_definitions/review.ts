@@ -222,3 +222,12 @@ Then("I suggest the displayed question {string} as a bad example", (questionStem
 Then("I should see a message saying the feedback was sent successfully", () => {
   pageObjects.expectSuccessMessageToBeShown()
 })
+
+Then(
+  "I suggest the displayed question {string} as a good example with comment {string}",
+  (questionStem: string, comment: string) => {
+    const question = pageObjects.findQuestionWithStem(questionStem)
+    question.inputComment(comment)
+    question.suggestingGoodQuestionForFineTuning()
+  },
+)

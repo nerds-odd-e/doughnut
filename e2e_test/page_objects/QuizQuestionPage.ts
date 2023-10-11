@@ -20,6 +20,9 @@ const currentQuestion = (stem?: string) => {
       cy.get(".negative-feedback-btn").click()
       cy.get(".suggest-fine-tuning-ok-btn").click()
     },
+    inputComment(comment: string) {
+      cy.get("#feedback-comment").type(comment)
+    },
   }
 }
 
