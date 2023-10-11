@@ -6,12 +6,11 @@ import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @SessionScope
