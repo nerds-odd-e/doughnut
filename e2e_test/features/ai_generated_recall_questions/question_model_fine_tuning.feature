@@ -28,8 +28,8 @@ Feature: Generate Training examples for fine-tuning OpenAI
     Examples:
 
     |Feedback| Number_of_example_download|
-    |Good    | 1                         |
-    |Bad     | 0                         |
+    |good    | 1                         |
+    |bad     | 0                         |
 
   @ignore
   Scenario: Admin should be able to generate training data from questions with good feedback and comment
