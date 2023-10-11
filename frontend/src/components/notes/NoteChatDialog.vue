@@ -67,7 +67,7 @@ import type { StorageAccessor } from "@/store/createNoteStorage";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import QuizQuestion from "../review/QuizQuestion.vue";
 import AnsweredQuestion from "../review/AnsweredQuestion.vue";
-import SuggestQuestionForFineTuningIntegrated from "./SuggestQuestionForFineTuning.vue";
+import SuggestQuestionForFineTuningIntegrated from "./SuggestQuestionForFineTuningIntegrated.vue";
 
 export default defineComponent({
   setup() {

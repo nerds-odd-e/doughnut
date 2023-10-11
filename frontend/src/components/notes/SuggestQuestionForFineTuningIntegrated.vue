@@ -46,7 +46,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, defineProps } from "vue";
+import { ref } from "vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
 const isPositive = ref<boolean | null>(null);
