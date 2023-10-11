@@ -1,6 +1,6 @@
 <template>
   <p>Let's talk about this note.</p>
-  <div v-if="quizQuestion">
+  <div class="quiz-question" v-if="quizQuestion">
     <div v-if="prevQuizQuestion">
       <h3>Previous Question...</h3>
       <QuizQuestion :quiz-question="prevQuizQuestion" :disabled="true" />
@@ -15,51 +15,7 @@
       :quiz-question="quizQuestion"
       @answered="onAnswered($event)"
     />
-    <div>
-      <h2>Suggest This Question For AI Fine Tuning</h2>
-      <p>
-        <i
-          >Sending this question for fine tuning the question generation model
-          will make this note and question visible to admin. Are you sure?</i
-        >
-      </p>
-      <div>
-        <button
-          class="positive-feedback-btn feedback-btn"
-          :class="{ selected: isPositive }"
-          @click="markQuestionAsPositive"
-        >
-          Positive
-        </button>
-        <button
-          class="negative-feedback-btn feedback-btn"
-          :class="{ selected: isPositive === false }"
-          @click="markQuestionAsNegative"
-        >
-          Negative
-        </button>
-      </div>
-      <TextInput
-        id="feedback-comment"
-        field="comment"
-        v-model="comment"
-        placeholder="Add a comment about the question"
-      />
-      <div class="feedback-actions-container">
-        <button
-          class="suggest-fine-tuning-ok-btn btn btn-success"
-          @click="suggestQuestionForFineTuning"
-        >
-          OK
-        </button>
-        <div
-          class="suggestion-sent-successfully-message"
-          v-if="suggestionSubmittedSuccessfully"
-        >
-          Feedback sent successfully!
-        </div>
-      </div>
-    </div>
+    <SuggestQuestionForFineTuningIntegrated :quiz-question="quizQuestion" />
   </div>
   <div v-show="answered" class="chat-answer-container">
     <img src="/user-icon.svg" class="chat-answer-icon" />
@@ -111,6 +67,7 @@ import type { StorageAccessor } from "@/store/createNoteStorage";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import QuizQuestion from "../review/QuizQuestion.vue";
 import AnsweredQuestion from "../review/AnsweredQuestion.vue";
+import SuggestQuestionForFineTuningIntegrated from "./SuggestQuestionForFineTuning.vue";
 
 export default defineComponent({
   setup() {
@@ -123,7 +80,11 @@ export default defineComponent({
       required: true,
     },
   },
-  components: { QuizQuestion, AnsweredQuestion },
+  components: {
+    QuizQuestion,
+    AnsweredQuestion,
+    SuggestQuestionForFineTuningIntegrated,
+  },
   data() {
     return {
       quizQuestion: undefined as Generated.QuizQuestion | undefined,
@@ -273,13 +234,7 @@ input.auto-extendable-input {
   margin-left: auto;
   margin-right: 40px;
 }
-
-.feedback-btn.selected {
-  background-color: red;
-  color: white;
-}
-
-.feedback-actions-container {
-  display: flex;
+.quiz-question {
+  overflow-y: auto;
 }
 </style>
