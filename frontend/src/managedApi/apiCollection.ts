@@ -39,7 +39,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
   },
   async getSuggestedQuestionsForFineTuning() {
     return (await managedApi.restGet(
-      "fine-tuning/all-positive-suggested-questions-for-fine-tuning",
+      "fine-tuning/all-suggested-questions-for-fine-tuning",
     )) as Generated.SuggestedQuestionForFineTuning[];
   },
   async getFineTuningExamples() {
