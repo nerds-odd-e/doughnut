@@ -33,7 +33,7 @@
         </button>
         <button
           class="negative-feedback-btn feedback-btn"
-          :class="{ selected: !isPositive }"
+          :class="{ selected: isPositive === false }"
           @click="markQuestionAsNegative"
         >
           Negative
