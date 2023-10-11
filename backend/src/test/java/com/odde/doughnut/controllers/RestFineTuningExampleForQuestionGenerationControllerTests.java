@@ -96,13 +96,13 @@ public class RestFineTuningExampleForQuestionGenerationControllerTests {
     void shouldThrowExceptionIfUserDoesNotHaveReadingAuth_whenCallGetGoodTrainingData() {
       controller = new RestFineTuningDataController(modelFactoryService, makeMe.aNullUserModel());
       assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.getAllSuggestedQuestions());
+          UnexpectedNoAccessRightException.class, () -> controller.getAllPositiveSuggestedQuestions());
     }
 
     @Test
     void shouldReturnAllSuggestedQuestions() throws UnexpectedNoAccessRightException {
       makeMe.aQuestionSuggestionForFineTunining().please();
-      List<SuggestedQuestionForFineTuning> suggestions = controller.getAllSuggestedQuestions();
+      List<SuggestedQuestionForFineTuning> suggestions = controller.getAllPositiveSuggestedQuestions();
       assertEquals(1, suggestions.size());
     }
 
@@ -110,7 +110,7 @@ public class RestFineTuningExampleForQuestionGenerationControllerTests {
     void shouldReturnAllPositiveSuggestedQuestions() throws UnexpectedNoAccessRightException {
       makeMe.aQuestionSuggestionForFineTunining().positive().please();
       makeMe.aQuestionSuggestionForFineTunining().negative().please();
-      List<SuggestedQuestionForFineTuning> suggestions = controller.getAllSuggestedQuestions();
+      List<SuggestedQuestionForFineTuning> suggestions = controller.getAllPositiveSuggestedQuestions();
       assertEquals(2, suggestions.size());
     }
   }

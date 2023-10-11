@@ -41,19 +41,19 @@ class RestFineTuningDataController {
   public List<FineTuningExampleForQuestionGeneration>
       getAllPositiveQuestionGenerationFineTuningExamples() throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
-    return getSuggestedQuestionForFineTunings().stream()
+    return getPositiveSuggestedQuestionForFineTunings().stream()
         .map(SuggestedQuestionForFineTuning::toFineTuningExample)
         .toList();
   }
 
   @GetMapping("/all-positive-suggested-questions-for-fine-tuning")
-  public List<SuggestedQuestionForFineTuning> getAllSuggestedQuestions()
+  public List<SuggestedQuestionForFineTuning> getAllPositiveSuggestedQuestions()
       throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
-    return getSuggestedQuestionForFineTunings();
+    return getPositiveSuggestedQuestionForFineTunings();
   }
 
-  private List<SuggestedQuestionForFineTuning> getSuggestedQuestionForFineTunings() {
+  private List<SuggestedQuestionForFineTuning> getPositiveSuggestedQuestionForFineTunings() {
     List<SuggestedQuestionForFineTuning> suggestedQuestionForFineTunings = new ArrayList<>();
     modelFactoryService
         .questionSuggestionForFineTuningRepository
