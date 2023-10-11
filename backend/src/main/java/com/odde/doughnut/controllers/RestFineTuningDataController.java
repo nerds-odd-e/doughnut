@@ -46,7 +46,7 @@ class RestFineTuningDataController {
         .toList();
   }
 
-  @GetMapping("/all-suggested-questions-for-fine-tuning")
+  @GetMapping("/all-positive-suggested-questions-for-fine-tuning")
   public List<SuggestedQuestionForFineTuning> getAllSuggestedQuestions()
       throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
