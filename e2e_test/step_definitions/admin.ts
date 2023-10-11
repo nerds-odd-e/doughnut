@@ -38,7 +38,7 @@ Given(
 
 Given(
   "an admin should be able to download the training data containing 0 examples",
-  (questionStem: string) => {
+  () => {
     pageObjects
       .loginAsAdminAndGoToAdminDashboard()
       .suggestedQuestionsForFineTuning()
