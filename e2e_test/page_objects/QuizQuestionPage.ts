@@ -28,4 +28,8 @@ const findQuestionWithStem = (stem: string) => {
   return currentQuestion(stem)
 }
 
-export { findQuestionWithStem, currentQuestion }
+const expectSuccessMessageToBeShown = () => {
+  cy.get(".suggestion-sent-successfully-message").should("be.visible")
+}
+
+export { findQuestionWithStem, currentQuestion, expectSuccessMessageToBeShown }

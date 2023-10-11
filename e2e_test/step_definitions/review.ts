@@ -219,3 +219,6 @@ Then("I suggest the displayed question {string} as a bad example", (questionStem
   pageObjects.findQuestionWithStem(questionStem).suggestingBadQuestionFineTuningExclusion()
 })
 
+Then("I should see a message saying the feedback was sent successfully", () => {
+  pageObjects.expectSuccessMessageToBeShown()
+})
