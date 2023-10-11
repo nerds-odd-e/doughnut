@@ -13,34 +13,47 @@ Feature: Generate Training examples for fine-tuning OpenAI
       | Who wrote 'Who Let the Dogs Out'? | Anslem Douglas | Baha Men           |
     And I ask to generate a question for the note "Who Let the Dogs Out"
 
+
   Scenario: Admin should be able to generate training data from suggested questions
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a good example
     Then an admin should be able to download the training data containing 1 example containing "Who wrote 'Who Let the Dogs Out'?"
     Then an admin should be able to download the training data containing 1 example containing "Baha Men"
 
   @ignore
-  Scenario: User should be able to mark the suggested question as a good example
-    When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a good example
-    Then then I should see a message saying the feedback was sent successfully
-    And an admin should be able to download the training data containing 1 example containing "Who wrote 'Who Let the Dogs Out'?"
+  Scenario Outline: Admin should be able to generate training data from questions with good feedback 
+    When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a <Feedback> example
+    Then I should see a message saying the feedback was sent successfully
+    And an admin should be able to download the training data containing <Number_of_example_download> example
+
+    Examples:
+
+    |Feedback| Number_of_example_download|
+    |Good    | 1                         |
+    |Bad     | 0                         |
 
   @ignore
-  Scenario: User should be able to mark the suggested question as a bad example
-    When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a bad example
-    Then then I should see a message saying the feedback was sent successfully
-    And an admin should be able to download the training data containing 0 examples
-
-  @ignore
-  Scenario: User should be able to mark the suggested question as a bad example
+  Scenario: Admin should be able to generate training data from questions with good feedback and comment
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a good example with comment "This is awesome!"
-    Then then I should see a message saying the feedback was sent successfully
-    Then the admin should see "This is awesome!" in the suggested questions
+    Then I should see a message saying the feedback was sent successfully
+    And the admin should see "This is awesome!" in the generated training data
 
   @ignore
-  Scenario: User should be able to mark the suggested question as a bad example
+  Scenario: Admin should not be see questions with bad feedback and comment in generated training data 
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a bad example with comment "This is terrible!"
-    Then then I should see a message saying the feedback was sent successfully
-    Then the admin should see "This is terrible!" in the suggested questions
+    Then I should see a message saying the feedback was sent successfully
+    And the admin should not see "This is terrible!" in the generated training data
+
+  @ignore
+  Scenario: User should not be able to submit response without a specific feedback
+    When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" without feedback
+    Then I should see a message saying the feedback was rejected
+    And the admin should not see empty feedback in the generated training data
+
+  @ignore
+  Scenario: User should not be able to submit response again for the same question
+    When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" with an existing feedback
+    Then I should see a message saying the feedback was rejected
+    And the admin should not see duplicate feedback in the generated training data
 
   Scenario: Admin edit the first question and choice suggested
     Given I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a good example
