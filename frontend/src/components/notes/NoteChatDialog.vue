@@ -40,7 +40,9 @@
         </button>
       </div>
       <TextInput
+        id="feedback-comment"
         field="comment"
+        v-model="comment"
         placeholder="Add a comment about the question"
       />
       <div class="feedback-actions-container">
