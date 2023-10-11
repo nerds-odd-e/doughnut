@@ -44,6 +44,11 @@ export function adminDashboardPage() {
           cy.pageIsNotLoading()
           cy.findByText(newQuestion["Question Stem"])
         },
+
+        duplicateNegativeQuestion(originalQuestionStem: string) {
+          cy.get("#duplicate-0").click()
+          cy.findByText(`${originalQuestionStem} - duplicated`)
+        },
       }
     },
   }

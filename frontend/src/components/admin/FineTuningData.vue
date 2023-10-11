@@ -11,6 +11,7 @@
           <th scope="col">Stem</th>
           <th scope="col">Feedback</th>
           <th scope="col">Comment</th>
+          <th scope="col">Operation</th>
         </tr>
       </thead>
       <tbody>
@@ -22,6 +23,16 @@
           <td>{{ suggested.preservedQuestion.stem }}</td>
           <td>{{ suggested.positiveFeedback ? "Positive" : "Negative" }}</td>
           <td>{{ suggested.comment }}</td>
+          <td>
+            <!-- TODO: only display duplicate button for negative question -->
+            <button
+              :id="`duplicate-${index}`"
+              class="btn btn-primary"
+              @click="duplicateQuestion(suggested)"
+            >
+              Duplicate
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -73,7 +84,22 @@ export default {
       a.click();
       URL.revokeObjectURL(url);
     },
+    async duplicateQuestion(
+      suggested: Generated.SuggestedQuestionForFineTuning,
+    ) {
+      const duplicatedQuestion = {
+        ...suggested,
+        preservedQuestion: {
+          ...suggested.preservedQuestion,
+          stem: `${suggested.preservedQuestion.stem} - duplicated`,
+        },
+        positiveFeedback: true,
+      };
+
+      this.suggestedQuestions?.push(duplicatedQuestion);
+    },
   },
+
   components: { ContentLoader, Popup },
   async mounted() {
     this.suggestedQuestions =

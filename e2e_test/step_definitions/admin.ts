@@ -24,6 +24,13 @@ Given(
   },
 )
 
+Given("an admin can duplicate the question {string}", (originalQuestionStem: string) => {
+  pageObjects
+    .loginAsAdminAndGoToAdminDashboard()
+    .suggestedQuestionsForFineTuning()
+    .duplicateNegativeQuestion(originalQuestionStem)
+})
+
 Given(
   "an admin should be able to download the training data containing 1 example containing {string}",
   (questionStem: string) => {
