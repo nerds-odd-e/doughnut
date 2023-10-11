@@ -22,10 +22,10 @@ module.exports = {
     "prettier",
   ],
   parserOptions: {
-    ecmaVersion: 12, // Allows for the parsing of modern ECMAScript features
+    ecmaVersion: 2024, // Allows for the parsing of modern ECMAScript features
     sourceType: "module", // Allows for the use of imports
     tsconfigRootDir: "./e2e_test",
-    project: "./tsconfig.json",
+    project: ["./tsconfig.json"],
   },
   ignorePatterns: ["tsconfig.json"],
   rules: {

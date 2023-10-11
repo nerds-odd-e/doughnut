@@ -5,7 +5,7 @@ module.exports = {
     parser: {
       ts: "@typescript-eslint/parser",
     },
-    ecmaVersion: 2021,
+    ecmaVersion: 2024,
     sourceType: "module",
     createDefaultProgram: true,
     project: ["./tsconfig.json"],
@@ -19,7 +19,7 @@ module.exports = {
   env: {
     "vue/setup-compiler-macros": true,
     browser: true,
-    es2021: true,
+    es2024: true,
     node: true,
   },
   extends: [
