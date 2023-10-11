@@ -49,6 +49,12 @@
       >
         OK
       </button>
+      <div
+        class="suggestion-sent-successfully-message"
+        v-if="suggestionSubmittedSuccessfully"
+      >
+        Feedback sent successfully!
+      </div>
     </div>
   </div>
   <div v-show="answered" class="chat-answer-container">
@@ -124,6 +130,7 @@ export default defineComponent({
       answered: false,
       comment: "",
       isPositive: null as boolean | null,
+      suggestionSubmittedSuccessfully: false,
     };
   },
   computed: {
@@ -156,13 +163,18 @@ export default defineComponent({
       this.isPositive = false;
     },
     async suggestQuestionForFineTuning() {
-      await this.api.reviewMethods.suggestQuestionForFineTuning(
-        this.quizQuestion!.quizQuestionId,
-        {
-          isPositive: this.isPositive ?? false,
-          comment: this.comment,
-        },
-      );
+      try {
+        await this.api.reviewMethods.suggestQuestionForFineTuning(
+          this.quizQuestion!.quizQuestionId,
+          {
+            isPositive: this.isPositive ?? false,
+            comment: this.comment,
+          },
+        );
+        this.suggestionSubmittedSuccessfully = true;
+      } catch (err) {
+        this.suggestionSubmittedSuccessfully = false;
+      }
     },
   },
 });
