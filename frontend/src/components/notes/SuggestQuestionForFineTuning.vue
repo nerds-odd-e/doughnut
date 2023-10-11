@@ -95,8 +95,12 @@ export default {
 .container {
   padding: 20px;
 }
-.feedback-btn.selected {
+.feedback-btn {
+  background-color: #007bff;
   color: white;
+  padding: 5px;
+  margin: 5px;
+  border-radius: 5px;
 }
 .positive-feedback-btn.feedback-btn.selected {
   background-color: green;
@@ -106,5 +110,13 @@ export default {
 }
 .feedback-actions-container {
   display: flex;
+  align-items: center;
+}
+.suggestion-sent-successfully-message {
+  margin-left: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: green;
+  color: white;
 }
 </style>
