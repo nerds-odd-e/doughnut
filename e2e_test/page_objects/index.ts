@@ -1,4 +1,8 @@
-import { findQuestionWithStem, expectSuccessMessageToBeShown, currentQuestion } from "./QuizQuestionPage"
+import {
+  findQuestionWithStem,
+  expectSuccessMessageToBeShown,
+  currentQuestion,
+} from "./QuizQuestionPage"
 import { goToLastResult, answeredQuestionPage } from "./AnsweredQuestionPage"
 import mock_services from "./mock_services"
 import { chatAboutNotePage } from "./chatAboutNotePage"
