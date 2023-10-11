@@ -6,11 +6,12 @@ import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
-import java.util.ArrayList;
-import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @SessionScope
@@ -41,19 +42,19 @@ class RestFineTuningDataController {
   public List<FineTuningExampleForQuestionGeneration>
       getAllPositiveQuestionGenerationFineTuningExamples() throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
-    return getPositiveSuggestedQuestionForFineTunings().stream()
+    return getSuggestedQuestionForFineTunings().stream()
         .map(SuggestedQuestionForFineTuning::toFineTuningExample)
         .toList();
   }
 
   @GetMapping("/all-positive-suggested-questions-for-fine-tuning")
-  public List<SuggestedQuestionForFineTuning> getAllPositiveSuggestedQuestions()
+  public List<SuggestedQuestionForFineTuning> getAllSuggestedQuestions()
       throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
-    return getPositiveSuggestedQuestionForFineTunings();
+    return getSuggestedQuestionForFineTunings();
   }
 
-  private List<SuggestedQuestionForFineTuning> getPositiveSuggestedQuestionForFineTunings() {
+  private List<SuggestedQuestionForFineTuning> getSuggestedQuestionForFineTunings() {
     List<SuggestedQuestionForFineTuning> suggestedQuestionForFineTunings = new ArrayList<>();
     modelFactoryService
         .questionSuggestionForFineTuningRepository
