@@ -212,5 +212,5 @@ Then("I should see the question {string} is disabled", (questionStem: string) =>
 })
 
 Then("I suggest the displayed question {string} as a good example", (questionStem: string) => {
-  pageObjects.findQuestionWithStem(questionStem).suggestingThisQuestionForFineTuning(true)
+  pageObjects.findQuestionWithStem(questionStem).suggestingGoodQuestionForFineTuning()
 })

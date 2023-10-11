@@ -11,9 +11,13 @@ const currentQuestion = (stem?: string) => {
       getChoice(choice).parent().invoke("attr", "class").should("contain", `is-${correctness}`)
     },
 
-    suggestingThisQuestionForFineTuning(feedback: boolean) {
-      if (feedback) cy.get(".positive-feedback-btn").click()
-      else cy.get(".negative-feedback-btn").click()
+    suggestingGoodQuestionForFineTuning() {
+      cy.get(".positive-feedback-btn").click()
+      cy.get(".suggest-fine-tuning-ok-btn").click()
+    },
+
+    suggestingBadQuestionForFineTuning() {
+      cy.get(".negative-feedback-btn").click()
       cy.get(".suggest-fine-tuning-ok-btn").click()
     },
   }
