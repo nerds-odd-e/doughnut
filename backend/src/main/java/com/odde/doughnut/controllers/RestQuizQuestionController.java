@@ -8,6 +8,8 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,14 +47,20 @@ class RestQuizQuestionController {
 
   @PostMapping("/{quizQuestion}/suggest-fine-tuning")
   @Transactional
-  public SuggestedQuestionForFineTuning suggestQuestionForFineTuning(
+  public ResponseEntity<?> suggestQuestionForFineTuning(
       @PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity,
       @RequestBody QuestionSuggestionCreationParams suggestion) {
     SuggestedQuestionForFineTuning sqft = new SuggestedQuestionForFineTuning();
     sqft.setUser(currentUser.getEntity());
     sqft.setCreatedAt(testabilitySettings.getCurrentUTCTimestamp());
-    return modelFactoryService
-        .toSuggestedQuestionForFineTuningService(sqft)
-        .create(quizQuestionEntity, suggestion);
+    try {
+      return new ResponseEntity<>(
+          modelFactoryService
+              .toSuggestedQuestionForFineTuningService(sqft)
+              .create(quizQuestionEntity, suggestion),
+          HttpStatus.OK);
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No Feedback was provided");
+    }
   }
 }
