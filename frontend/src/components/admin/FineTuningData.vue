@@ -89,22 +89,8 @@ export default {
       URL.revokeObjectURL(url);
     },
     async downloadEvaluationJSONL() {
-      const fineTuningData = [
-        {
-          id: 1,
-          comment: "",
-          preservedQuestion: "",
-          createdAt: "",
-          positiveFeedback: true,
-        },
-        {
-          id: 2,
-          comment: "",
-          preservedQuestion: "",
-          createdAt: "",
-          positiveFeedback: false,
-        },
-      ];
+      const fineTuningData = await this.api.getAllEvaluationModelExamples();
+
       const blob = new Blob(
         [fineTuningData.map((x) => JSON.stringify(x)).join("\n")],
         {

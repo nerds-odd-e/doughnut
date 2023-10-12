@@ -59,7 +59,7 @@ declare namespace Generated {
         suggestedQuestionForFineTuning: SuggestedQuestionForFineTuning;
     }
 
-    interface FineTuningExampleForQuestionGeneration {
+    interface FineTuningExample {
         messages: SimplifiedOpenAIChatMessage[];
     }
 
