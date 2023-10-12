@@ -1,13 +1,14 @@
 {
   "compilerOptions": {
     "sourceMap": true,
-    "target": "esnext",
+    "target": "es2022",
     "module": "CommonJS",
     "strict": true,
     "allowJs": true,
     "lib": [
-      "esnext",
-      "dom"
+      "es2022",
+      "dom",
+      "dom.iterable"
     ],
     "esModuleInterop": true,
     "typeRoots": [

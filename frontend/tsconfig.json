@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
+    "target": "es2022",
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "types": [
       "vite/client",
       "vitest/globals",
@@ -13,7 +14,6 @@
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "jsx": "preserve",
-    "moduleResolution": "node",
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -33,8 +33,9 @@
       ]
     },
     "lib": [
-      "esnext",
-      "dom"
+      "es2022",
+      "dom",
+      "dom.iterable"
     ]
   },
   "compileOnSave": true,
