@@ -11,12 +11,12 @@ const currentQuestion = (stem?: string) => {
       getChoice(choice).parent().invoke("attr", "class").should("contain", `is-${correctness}`)
     },
 
-    suggestingGoodQuestionForFineTuning() {
+    suggestingPositiveFeedbackForFineTuning() {
       cy.get(".positive-feedback-btn").click()
       cy.get(".suggest-fine-tuning-ok-btn").click()
     },
 
-    suggestingBadQuestionFineTuningExclusion() {
+    suggestingNegativeFeedbackFineTuningExclusion() {
       cy.get(".negative-feedback-btn").click()
       cy.get(".suggest-fine-tuning-ok-btn").click()
     },

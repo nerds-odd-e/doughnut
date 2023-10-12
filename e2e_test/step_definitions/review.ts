@@ -212,11 +212,11 @@ Then("I should see the question {string} is disabled", (questionStem: string) =>
 })
 
 Then("I suggest the displayed question {string} as a good example", (questionStem: string) => {
-  pageObjects.findQuestionWithStem(questionStem).suggestingGoodQuestionForFineTuning()
+  pageObjects.findQuestionWithStem(questionStem).suggestingPositiveFeedbackForFineTuning()
 })
 
 Then("I suggest the displayed question {string} as a bad example", (questionStem: string) => {
-  pageObjects.findQuestionWithStem(questionStem).suggestingBadQuestionFineTuningExclusion()
+  pageObjects.findQuestionWithStem(questionStem).suggestingNegativeFeedbackFineTuningExclusion()
 })
 
 Then("I should see a message saying the feedback was sent successfully", () => {
@@ -228,6 +228,6 @@ Then(
   (questionStem: string, comment: string) => {
     const question = pageObjects.findQuestionWithStem(questionStem)
     question.inputComment(comment)
-    question.suggestingGoodQuestionForFineTuning()
+    question.suggestingPositiveFeedbackForFineTuning()
   },
 )
