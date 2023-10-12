@@ -47,13 +47,13 @@ public class RestFineTuningExampleForQuestionGenerationControllerTests {
       controller = new RestFineTuningDataController(modelFactoryService, makeMe.aNullUserModel());
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.getAllPositiveQuestionGenerationFineTuningExamples());
+          () -> controller.getAllPositiveFeedbackQuestionGenerationFineTuningExamples());
     }
 
     @Test
     void shouldReturnNoTrainingDataIfNoMarkedQuestion() throws UnexpectedNoAccessRightException {
       List<FineTuningExampleForQuestionGeneration> goodTrainingData =
-          controller.getAllPositiveQuestionGenerationFineTuningExamples();
+          controller.getAllPositiveFeedbackQuestionGenerationFineTuningExamples();
       assertTrue(goodTrainingData.isEmpty());
     }
 
@@ -63,7 +63,7 @@ public class RestFineTuningExampleForQuestionGenerationControllerTests {
       Note note = makeMe.aNote().title("Test Topic").please();
       makeMe.aQuestionSuggestionForFineTunining().ofNote(note).please();
       List<FineTuningExampleForQuestionGeneration> goodFineTuningExampleForQuestionGenerationList =
-          controller.getAllPositiveQuestionGenerationFineTuningExamples();
+          controller.getAllPositiveFeedbackQuestionGenerationFineTuningExamples();
       assertEquals(1, goodFineTuningExampleForQuestionGenerationList.size());
       List<SimplifiedOpenAIChatMessage> goodTrainingData =
           goodFineTuningExampleForQuestionGenerationList.get(0).getMessages();
@@ -82,7 +82,7 @@ public class RestFineTuningExampleForQuestionGenerationControllerTests {
               makeMe.aMCQWithAnswer().stem("This is the raw Json question").please())
           .please();
       List<FineTuningExampleForQuestionGeneration> goodFineTuningExampleForQuestionGenerationList =
-          controller.getAllPositiveQuestionGenerationFineTuningExamples();
+          controller.getAllPositiveFeedbackQuestionGenerationFineTuningExamples();
       List<SimplifiedOpenAIChatMessage> goodTrainingData =
           goodFineTuningExampleForQuestionGenerationList.get(0).getMessages();
       assertThat(

@@ -37,9 +37,10 @@ class RestFineTuningDataController {
         .update(suggestion);
   }
 
-  @GetMapping("/positive-question-generation-examples")
+  @GetMapping("/positive-feedback-generation-examples")
   public List<FineTuningExampleForQuestionGeneration>
-      getAllPositiveQuestionGenerationFineTuningExamples() throws UnexpectedNoAccessRightException {
+      getAllPositiveFeedbackQuestionGenerationFineTuningExamples()
+          throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
     return getSuggestedQuestionForFineTunings().stream()
         .map(SuggestedQuestionForFineTuning::toFineTuningExample)
