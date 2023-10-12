@@ -40,6 +40,8 @@ Feature: Generate Training examples for fine-tuning OpenAI
     And I ask to generate a question for the note "ChatGPT"
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a good example
     And I suggest the displayed question "In which year is ChatGPT launched?" as a bad example
+
+
     Then an admin should be able to download the training data containing 2 examples
 
   @ignore

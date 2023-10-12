@@ -42,6 +42,9 @@
       >
         Feedback sent successfully!
       </div>
+      <div class="feedback-required-message" v-if="suggestionIsRequired">
+        Feedback is required!
+      </div>
     </div>
   </div>
 </template>
@@ -52,6 +55,7 @@ import useLoadingApi from "../../managedApi/useLoadingApi";
 const isPositiveFeedback = ref<boolean | null>(null);
 const comment = ref<string>("");
 const suggestionSubmittedSuccessfully = ref<boolean>(false);
+const suggestionIsRequired = ref<boolean>(false);
 
 const { api } = useLoadingApi();
 
@@ -63,14 +67,19 @@ const { quizQuestion } = props;
 
 async function suggestQuestionForFineTuning() {
   try {
-    await api.reviewMethods.suggestQuestionForFineTuning(
-      quizQuestion!.quizQuestionId,
-      {
-        isPositiveFeedback: isPositiveFeedback.value ?? false,
-        comment: comment.value,
-      },
-    );
-    suggestionSubmittedSuccessfully.value = true;
+    if (isPositiveFeedback.value != null) {
+      await api.reviewMethods.suggestQuestionForFineTuning(
+        quizQuestion!.quizQuestionId,
+        {
+          isPositiveFeedback: isPositiveFeedback.value ?? false,
+          comment: comment.value,
+        },
+      );
+
+      suggestionSubmittedSuccessfully.value = true;
+    } else {
+      suggestionIsRequired.value = true;
+    }
   } catch (err) {
     suggestionSubmittedSuccessfully.value = false;
   }
