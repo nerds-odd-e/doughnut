@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.json.FineTuningExample;
+import com.odde.doughnut.controllers.json.FeedbackData;
 import com.odde.doughnut.controllers.json.QuestionSuggestionParams;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -38,7 +38,7 @@ class RestFineTuningDataController {
   }
 
   @GetMapping("/positive-feedback-generation-examples")
-  public List<FineTuningExample> getAllPositiveFeedbackQuestionGenerationFineTuningExamples()
+  public List<FeedbackData> getAllPositiveFeedbackQuestionGenerationFineTuningExamples()
       throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
     return getSuggestedQuestionForFineTunings().stream()
@@ -48,8 +48,7 @@ class RestFineTuningDataController {
   }
 
   @GetMapping("/feedback-evaluation-examples")
-  public List<FineTuningExample> getAllEvaluationExamples()
-      throws UnexpectedNoAccessRightException {
+  public List<FeedbackData> getAllEvaluationExamples() throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
     return getSuggestedQuestionForFineTunings().stream()
         .map(SuggestedQuestionForFineTuning::toFineTuningExample)

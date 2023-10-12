@@ -3,7 +3,7 @@ package com.odde.doughnut.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.controllers.json.FineTuningExample;
+import com.odde.doughnut.controllers.json.FeedbackData;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
 import com.theokanning.openai.completion.chat.ChatMessage;
@@ -78,7 +78,7 @@ public class SuggestedQuestionForFineTuning {
   }
 
   @JsonIgnore
-  public FineTuningExample toFineTuningExample() {
+  public FeedbackData toFineTuningExample() {
     List<ChatMessage> messages =
         new OpenAIChatAboutNoteRequestBuilder()
             .contentOfNoteOfCurrentFocus(getNote())
@@ -86,6 +86,6 @@ public class SuggestedQuestionForFineTuning {
             .addMessage(ChatMessageRole.ASSISTANT, preservedQuestion)
             .build()
             .getMessages();
-    return FineTuningExample.fromChatMessages(messages);
+    return FeedbackData.fromChatMessages(messages);
   }
 }
