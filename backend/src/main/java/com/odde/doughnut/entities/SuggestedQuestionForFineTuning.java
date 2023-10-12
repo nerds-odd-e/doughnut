@@ -60,6 +60,11 @@ public class SuggestedQuestionForFineTuning {
   @Nullable
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
+  @Nullable
+  public int getQuizQuestionId() {
+    return quizQuestion.getId();
+  }
+
   public MCQWithAnswer getPreservedQuestion() {
     try {
       return new ObjectMapper().readValue(preservedQuestion, MCQWithAnswer.class);
