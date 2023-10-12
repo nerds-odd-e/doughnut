@@ -67,6 +67,9 @@ const { quizQuestion } = props;
 
 async function suggestQuestionForFineTuning() {
   try {
+    suggestionIsRequired.value = false;
+    suggestionSubmittedSuccessfully.value = false;
+
     if (isPositiveFeedback.value != null) {
       await api.reviewMethods.suggestQuestionForFineTuning(
         quizQuestion!.quizQuestionId,
@@ -86,10 +89,12 @@ async function suggestQuestionForFineTuning() {
 }
 
 function markQuestionAsPositive() {
+  suggestionIsRequired.value = false;
   isPositiveFeedback.value = true;
 }
 
 function markQuestionAsNegative() {
+  suggestionIsRequired.value = false;
   isPositiveFeedback.value = false;
 }
 </script>
