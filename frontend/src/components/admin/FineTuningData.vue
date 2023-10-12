@@ -70,7 +70,8 @@ export default {
       this.showEditDialog = true;
     },
     async downloadFineTuningJSONL() {
-      const fineTuningData = await this.api.getFineTuningExamples();
+      const fineTuningData =
+        await this.api.getPositiveFeedbackFineTuningExamples();
       const blob = new Blob(
         [fineTuningData.map((x) => JSON.stringify(x)).join("\n")],
         {
