@@ -122,23 +122,21 @@ public class RestFineTuningExampleControllerTests {
   class getAllFeedbackData {
     @Test
     void shouldIncludeAllFeedbackData_whenCallGetGoodTrainingData()
-      throws UnexpectedNoAccessRightException {
+        throws UnexpectedNoAccessRightException {
       makeMe
-        .aQuestionSuggestionForFineTunining()
-        .positive()
-        .withPreservedQuestion(
-          makeMe.aMCQWithAnswer().stem("This is the raw Json question").please())
-        .please();
+          .aQuestionSuggestionForFineTunining()
+          .positive()
+          .withPreservedQuestion(
+              makeMe.aMCQWithAnswer().stem("This is the raw Json question").please())
+          .please();
       List<FineTuningExample> goodFineTuningExampleList =
-        controller.getAllPositiveFeedbackQuestionGenerationFineTuningExamples();
+          controller.getAllPositiveFeedbackQuestionGenerationFineTuningExamples();
       List<SimplifiedOpenAIChatMessage> goodTrainingData =
-        goodFineTuningExampleList.get(0).getMessages();
+          goodFineTuningExampleList.get(0).getMessages();
       assertThat(
-        goodTrainingData.get(2).getContent(), containsString("This is the raw Json question"));
+          goodTrainingData.get(2).getContent(), containsString("This is the raw Json question"));
     }
-
   }
-
 
   @Nested
   class SuggestedQuestions {
