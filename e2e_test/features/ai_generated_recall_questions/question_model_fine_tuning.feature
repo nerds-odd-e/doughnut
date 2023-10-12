@@ -16,13 +16,13 @@ Feature: Generate Training examples for fine-tuning OpenAI
 
   Scenario: Admin should be able to generate training data from suggested questions
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a good example
-    Then an admin should be able to download the training data containing 1 example containing "Who wrote 'Who Let the Dogs Out'?"
-    Then an admin should be able to download the training data containing 1 example containing "Baha Men"
+    Then an admin should be able to download the question generation training data containing 1 example containing "Who wrote 'Who Let the Dogs Out'?"
+    Then an admin should be able to download the question generation training data containing 1 example containing "Baha Men"
 
   Scenario Outline: Admin should be able to generate training data from questions with good feedback
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a <Feedback> example
     Then I should see a message saying the feedback was sent successfully
-    And an admin should be able to download the training data containing <Number_of_example_download> examples
+    And an admin should be able to download the question generation training data containing <Number_of_example_download> examples
 
     Examples:
 
@@ -38,7 +38,7 @@ Feature: Generate Training examples for fine-tuning OpenAI
       | In which year is ChatGPT launched? | 2002           | 2001               |
     And I ask to generate a question for the note "ChatGPT"
     And I suggest the displayed question "In which year is ChatGPT launched?" as a bad example
-    Then an admin should be able to download the training data for evaluation containing 2 examples
+    Then an admin should be able to download the question generation training data for evaluation containing 2 examples
 
   @ignore
   Scenario: Admin should be able to generate training data from questions with good feedback and comment
@@ -69,8 +69,8 @@ Feature: Generate Training examples for fine-tuning OpenAI
     When an admin edit the question and choices "Who wrote 'Who Let the Dogs Out'?" with a different question:
       | Question Stem                              | Choice A |
       | Did Baha Men write 'Who Let the Dogs Out'? | Yes      |
-    Then an admin should be able to download the training data containing 1 example containing "Did Baha Men write 'Who Let the Dogs Out'?"
-    And an admin should be able to download the training data containing 1 example containing "Yes"
+    Then an admin should be able to download the question generation training data containing 1 example containing "Did Baha Men write 'Who Let the Dogs Out'?"
+    And an admin should be able to download the question generation training data containing 1 example containing "Yes"
 
   @ignore
   Scenario: Admin should be able to duplicate negative feedback question

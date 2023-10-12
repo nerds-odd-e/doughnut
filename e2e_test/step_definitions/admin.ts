@@ -32,7 +32,7 @@ Given("an admin can duplicate the question {string}", (originalQuestionStem: str
 })
 
 Given(
-  "an admin should be able to download the training data containing 1 example containing {string}",
+  "an admin should be able to download the question generation training data containing 1 example containing {string}",
   (questionStem: string) => {
     pageObjects
       .loginAsAdminAndGoToAdminDashboard()
@@ -44,7 +44,7 @@ Given(
 )
 
 Given(
-  "an admin should be able to download the training data containing {int} examples",
+  "an admin should be able to download the question generation training data containing {int} examples",
   (numOfDownload: number) => {
     pageObjects
       .loginAsAdminAndGoToAdminDashboard()
@@ -55,7 +55,7 @@ Given(
 )
 
 Given(
-  "an admin should be able to download the training data for evaluation containing {int} examples",
+  "an admin should be able to download the question generation training data for evaluation containing {int} examples",
   (numOfDownload: number) => {
     pageObjects
       .loginAsAdminAndGoToAdminDashboard()
