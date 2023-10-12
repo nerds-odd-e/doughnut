@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.json.ApiError;
 import com.odde.doughnut.controllers.json.QuestionSuggestionCreationParams;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -66,6 +67,11 @@ class RestQuizQuestionController {
               .create(quizQuestionEntity, suggestion),
           HttpStatus.OK);
     }
-    return new ResponseEntity<>("You have already submitted a feedback", HttpStatus.BAD_REQUEST);
+    var apiError =
+        new ApiError(
+            "You have already submitted a feedback", ApiError.ErrorType.EXISTING_FEEDBACK_ERROR);
+    apiError.add("errorType", ApiError.ErrorType.EXISTING_FEEDBACK_ERROR.toString());
+
+    return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
   }
 }

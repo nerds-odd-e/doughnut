@@ -61,7 +61,7 @@ Feature: Generate Training examples for fine-tuning OpenAI
   @ignore
   Scenario: User should not be able to submit response again for the same question
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" with an existing feedback
-    Then I should see a message saying the feedback was rejected
+    Then I should see a message saying the feedback already exist
     And the admin should not see duplicate feedback in the generated training data
 
   Scenario: Admin should be able to edit the first question and choice suggested
