@@ -216,8 +216,7 @@ class RestQuizQuestionControllerTests {
 
     @Test
     void givenAQuestionWithExistingFeedbackShouldReturnBadRequest() {
-      controller.suggestQuestionForFineTuning(
-              quizQuestionEntity, suggestionWithPositiveFeedback);
+      controller.suggestQuestionForFineTuning(quizQuestionEntity, suggestionWithPositiveFeedback);
 
       var response =
           controller.suggestQuestionForFineTuning(
