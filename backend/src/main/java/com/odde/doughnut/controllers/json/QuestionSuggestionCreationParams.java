@@ -7,5 +7,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class QuestionSuggestionCreationParams {
   public String comment;
-  public Boolean isPositive;
+  public Boolean isPositiveFeedback;
 }
