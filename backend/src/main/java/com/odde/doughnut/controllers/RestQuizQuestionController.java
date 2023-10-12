@@ -49,18 +49,14 @@ class RestQuizQuestionController {
   @Transactional
   public ResponseEntity<?> suggestQuestionForFineTuning(
       @PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity,
-      @RequestBody QuestionSuggestionCreationParams suggestion) {
+      @Valid @RequestBody QuestionSuggestionCreationParams suggestion) {
     SuggestedQuestionForFineTuning sqft = new SuggestedQuestionForFineTuning();
     sqft.setUser(currentUser.getEntity());
     sqft.setCreatedAt(testabilitySettings.getCurrentUTCTimestamp());
-    try {
-      return new ResponseEntity<>(
-          modelFactoryService
-              .toSuggestedQuestionForFineTuningService(sqft)
-              .create(quizQuestionEntity, suggestion),
-          HttpStatus.OK);
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No Feedback was provided");
-    }
+    return new ResponseEntity<>(
+        modelFactoryService
+            .toSuggestedQuestionForFineTuningService(sqft)
+            .create(quizQuestionEntity, suggestion),
+        HttpStatus.OK);
   }
 }

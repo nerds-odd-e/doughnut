@@ -1,7 +1,5 @@
 package com.odde.doughnut.models;
 
-import static java.util.Objects.isNull;
-
 import com.odde.doughnut.controllers.json.QuestionSuggestionCreationParams;
 import com.odde.doughnut.controllers.json.QuestionSuggestionParams;
 import com.odde.doughnut.entities.QuizQuestionEntity;
@@ -19,12 +17,10 @@ public class SuggestedQuestionForFineTuningService {
   }
 
   public SuggestedQuestionForFineTuning create(
-      QuizQuestionEntity quizQuestionEntity, QuestionSuggestionCreationParams params)
-      throws Exception {
+      QuizQuestionEntity quizQuestionEntity, QuestionSuggestionCreationParams params) {
     entity.setQuizQuestion(quizQuestionEntity);
     entity.setPreservedQuestion(quizQuestionEntity.getMcqWithAnswer());
     entity.setComment(params.comment);
-    if (isNull(params.isPositiveFeedback)) throw new Exception("Feedback cannot be null.");
     entity.setPositiveFeedback(params.isPositiveFeedback);
     return save();
   }

@@ -147,8 +147,6 @@ class RestQuizQuestionControllerTests {
     QuizQuestionEntity quizQuestionEntity;
     MCQWithAnswer mcqWithAnswer;
     Note note;
-    QuestionSuggestionCreationParams suggestionWithoutFeedback =
-        new QuestionSuggestionCreationParams("this is a comment", null);
 
     QuestionSuggestionCreationParams suggestionWithPositiveFeedback =
         new QuestionSuggestionCreationParams("this is a comment", true);
@@ -162,13 +160,6 @@ class RestQuizQuestionControllerTests {
       mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       quizQuestionEntity =
           makeMe.aQuestion().ofAIGeneratedQuestion(mcqWithAnswer, note.getThing()).please();
-    }
-
-    @Test
-    void suggestQuestionWithoutFeedback() {
-      var suggestedQuestionForFineTuning =
-          controller.suggestQuestionForFineTuning(quizQuestionEntity, suggestionWithoutFeedback);
-      assertEquals(suggestedQuestionForFineTuning.getStatusCode(), HttpStatus.BAD_REQUEST);
     }
 
     @Test
