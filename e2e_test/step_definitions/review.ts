@@ -240,3 +240,9 @@ Then("I suggest the displayed question {string} without feedback", (questionStem
 Then("I should see a message saying the feedback was rejected", () => {
   pageObjects.expectFeedbackRequiredMessage()
 })
+
+Then("I suggest the displayed question {string} with an existing feedback", (questionStem: string) => {
+  const question = pageObjects.findQuestionWithStem(questionStem);
+  question.suggestingPositiveFeedbackForFineTuning()
+  question.suggestingPositiveFeedbackForFineTuning()
+})
