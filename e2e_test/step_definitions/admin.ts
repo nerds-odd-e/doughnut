@@ -54,6 +54,17 @@ Given(
   },
 )
 
+Given(
+  "an admin should be able to download the training data for evaluation containing {int} examples",
+  (numOfDownload: number) => {
+    pageObjects
+      .loginAsAdminAndGoToAdminDashboard()
+      .suggestedQuestionsForFineTuning()
+      .downloadFeedbackForEvaluationModel()
+      .expectNumberOfRecords(numOfDownload)
+  },
+)
+
 Given("the admin should see {string} in the suggested questions", (expectedComment: string) => {
   pageObjects
     .loginAsAdminAndGoToAdminDashboard()

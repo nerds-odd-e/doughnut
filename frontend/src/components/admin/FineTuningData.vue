@@ -3,6 +3,9 @@
   <button @click="downloadFineTuningJSONL()">
     Download Positive Feedback Question Generation Training Data
   </button>
+  <button @click="downloadEvaluationJSONL()">
+    Download Evaluation Training Data
+  </button>
   <ContentLoader v-if="suggestedQuestions === undefined" />
   <div v-else>
     <table class="table">
@@ -82,6 +85,36 @@ export default {
       const a = document.createElement("a");
       a.href = url;
       a.download = "fineTuningData.jsonl";
+      a.click();
+      URL.revokeObjectURL(url);
+    },
+    async downloadEvaluationJSONL() {
+      const fineTuningData = [
+        {
+          id: 1,
+          comment: "",
+          preservedQuestion: "",
+          createdAt: "",
+          positiveFeedback: true,
+        },
+        {
+          id: 2,
+          comment: "",
+          preservedQuestion: "",
+          createdAt: "",
+          positiveFeedback: false,
+        },
+      ];
+      const blob = new Blob(
+        [fineTuningData.map((x) => JSON.stringify(x)).join("\n")],
+        {
+          type: "text/plain",
+        },
+      );
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "evaluationData.jsonl";
       a.click();
       URL.revokeObjectURL(url);
     },

@@ -34,6 +34,23 @@ export function adminDashboardPage() {
             },
           }
         },
+        downloadFeedbackForEvaluationModel() {
+          cy.findByRole("button", { name: "Download Evaluation Training Data" }).click()
+          const downloadFilename = `${Cypress.config("downloadsFolder")}/evaluationData.jsonl`
+
+          return {
+            expectNumberOfRecords(count: number) {
+              cy.readFile(downloadFilename)
+                .then((content) => (content.match(/id/g) || []).length)
+                .should("eq", count)
+              return this
+            },
+
+            expectTxtInDownload(inputText: string) {
+              cy.readFile(downloadFilename).should("contain", inputText)
+            },
+          }
+        },
 
         updateQuestionSuggestionAndChoice(
           originalQuestionStem: string,

@@ -30,18 +30,15 @@ Feature: Generate Training examples for fine-tuning OpenAI
       | good     | 1                          |
       | bad      | 0                          |
 
-  @ignore
   Scenario: Admin should be able to download both positive and negative feedbacks for training evaluation model
-    Given I have a note with the topic "ChatGPT"
+    Given I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a good example
+    And I have a note with the topic "ChatGPT"
     And OpenAI by default returns this question:
       | Question Stem                      | Correct Choice | Incorrect Choice 1 |
       | In which year is ChatGPT launched? | 2002           | 2001               |
     And I ask to generate a question for the note "ChatGPT"
-    When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a good example
     And I suggest the displayed question "In which year is ChatGPT launched?" as a bad example
-
-
-    Then an admin should be able to download the training data containing 2 examples
+    Then an admin should be able to download the training data for evaluation containing 2 examples
 
   @ignore
   Scenario: Admin should be able to generate training data from questions with good feedback and comment
