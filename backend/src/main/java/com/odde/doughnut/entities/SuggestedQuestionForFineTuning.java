@@ -93,4 +93,17 @@ public class SuggestedQuestionForFineTuning {
             .getMessages();
     return FeedbackData.fromChatMessages(messages);
   }
+
+  @JsonIgnore
+  public FeedbackData toEvaluationData() {
+    List<ChatMessage> messages =
+        new OpenAIChatAboutNoteRequestBuilder()
+            .contentOfNoteOfCurrentFocus(getNote())
+            .userInstructionToGenerateQuestionWithGPT35FineTunedModel()
+            .addMessage(ChatMessageRole.ASSISTANT, preservedQuestion)
+            .addFeedback(isPositiveFeedback)
+            .build()
+            .getMessages();
+    return FeedbackData.fromChatMessages(messages);
+  }
 }

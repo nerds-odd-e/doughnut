@@ -51,7 +51,7 @@ class RestFineTuningDataController {
   public List<FeedbackData> getAllEvaluationExamples() throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
     return getSuggestedQuestionForFineTunings().stream()
-        .map(SuggestedQuestionForFineTuning::toFineTuningExample)
+        .map(SuggestedQuestionForFineTuning::toEvaluationData)
         .toList();
   }
 

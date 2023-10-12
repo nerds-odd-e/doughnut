@@ -139,6 +139,13 @@ please critically check if the following question makes sense and is possible to
     return this;
   }
 
+  public OpenAIChatAboutNoteRequestBuilder addFeedback(boolean isPositiveFeedback) {
+    messages.add(new ChatMessage(ChatMessageRole.USER.value(), "Is this a good question?"));
+    messages.add(
+        new ChatMessage(ChatMessageRole.ASSISTANT.value(), isPositiveFeedback ? "Yes" : "No"));
+    return this;
+  }
+
   public OpenAIChatAboutNoteRequestBuilder questionSchemaInPlainChat() {
     ObjectMapper objectMapper = new ObjectMapper();
     JsonSchemaGenerator jsonSchemaGenerator = new JsonSchemaGenerator(objectMapper);

@@ -129,12 +129,13 @@ public class RestFeedbackDataControllerTests {
           .withPreservedQuestion(
               makeMe.aMCQWithAnswer().stem("This is the raw Json question").please())
           .please();
-      List<FeedbackData> goodFeedbackDataList =
-          controller.getAllPositiveFeedbackQuestionGenerationFineTuningExamples();
+      List<FeedbackData> goodFeedbackDataList = controller.getAllEvaluationExamples();
       List<SimplifiedOpenAIChatMessage> goodTrainingData =
           goodFeedbackDataList.get(0).getMessages();
       assertThat(
           goodTrainingData.get(2).getContent(), containsString("This is the raw Json question"));
+      assertThat(goodTrainingData.get(3).getContent(), containsString("Is this a good question"));
+      assertThat(goodTrainingData.get(4).getContent(), containsString("Yes"));
     }
   }
 
