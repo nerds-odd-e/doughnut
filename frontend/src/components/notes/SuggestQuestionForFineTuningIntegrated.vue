@@ -51,7 +51,7 @@ import useLoadingApi from "../../managedApi/useLoadingApi";
 
 const isPositiveFeedback = ref<boolean | null>(null);
 const comment = ref<string>("");
-const suggestionSubmittedSuccessfully = ref<boolean>(true);
+const suggestionSubmittedSuccessfully = ref<boolean>(false);
 
 const { api } = useLoadingApi();
 
