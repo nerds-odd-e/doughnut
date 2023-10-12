@@ -10,14 +10,14 @@
     <div>
       <button
         class="positive-feedback-btn feedback-btn"
-        :class="{ selected: isPositive }"
+        :class="{ selected: isPositiveFeedback }"
         @click="markQuestionAsPositive"
       >
         👍 Positive
       </button>
       <button
         class="negative-feedback-btn feedback-btn"
-        :class="{ selected: isPositive === false }"
+        :class="{ selected: isPositiveFeedback === false }"
         @click="markQuestionAsNegative"
       >
         👎 Negative
@@ -49,7 +49,7 @@
 import { ref } from "vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
-const isPositive = ref<boolean | null>(null);
+const isPositiveFeedback = ref<boolean | null>(null);
 const comment = ref<string>("");
 const suggestionSubmittedSuccessfully = ref<boolean>(true);
 
@@ -66,7 +66,7 @@ async function suggestQuestionForFineTuning() {
     await api.reviewMethods.suggestQuestionForFineTuning(
       quizQuestion!.quizQuestionId,
       {
-        isPositive: isPositive.value ?? false,
+        isPositiveFeedback: isPositiveFeedback.value ?? false,
         comment: comment.value,
       },
     );
@@ -77,11 +77,11 @@ async function suggestQuestionForFineTuning() {
 }
 
 function markQuestionAsPositive() {
-  isPositive.value = true;
+  isPositiveFeedback.value = true;
 }
 
 function markQuestionAsNegative() {
-  isPositive.value = false;
+  isPositiveFeedback.value = false;
 }
 </script>
 <script lang="ts">
