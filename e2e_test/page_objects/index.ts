@@ -1,5 +1,6 @@
 import {
   findQuestionWithStem,
+  expectFeedbackRequiredMessage,
   expectSuccessMessageToBeShown,
   currentQuestion,
 } from "./QuizQuestionPage"
@@ -28,6 +29,7 @@ const pageObjects = {
   findQuestionWithStem,
   currentQuestion,
   expectSuccessMessageToBeShown,
+  expectFeedbackRequiredMessage,
   chatAboutNote,
   chatAboutNotePage,
   loginAsAdminAndGoToAdminDashboard,

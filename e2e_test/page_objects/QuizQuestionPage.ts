@@ -20,6 +20,11 @@ const currentQuestion = (stem?: string) => {
       cy.get(".negative-feedback-btn").click()
       cy.get(".suggest-fine-tuning-ok-btn").click()
     },
+
+    submittingNoFeedback() {
+      cy.get(".suggest-fine-tuning-ok-btn").click()
+    },
+
     inputComment(comment: string) {
       cy.get("#feedback-comment").type(comment)
     },
@@ -35,4 +40,8 @@ const expectSuccessMessageToBeShown = () => {
   cy.get(".suggestion-sent-successfully-message")
 }
 
-export { findQuestionWithStem, currentQuestion, expectSuccessMessageToBeShown }
+const expectFeedbackRequiredMessage = () => {
+  cy.get(".feedback-required-message")
+}
+
+export { findQuestionWithStem, currentQuestion, expectFeedbackRequiredMessage, expectSuccessMessageToBeShown }
