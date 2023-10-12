@@ -93,9 +93,6 @@ export default defineComponent({
       chatInput: "",
       assistantMessage: "",
       answered: false,
-      comment: "",
-      isPositive: null as boolean | null,
-      suggestionSubmittedSuccessfully: false,
     };
   },
   computed: {
@@ -120,26 +117,6 @@ export default defineComponent({
         this.chatInput,
       );
       this.answered = true;
-    },
-    markQuestionAsPositive() {
-      this.isPositive = true;
-    },
-    markQuestionAsNegative() {
-      this.isPositive = false;
-    },
-    async suggestQuestionForFineTuning() {
-      try {
-        await this.api.reviewMethods.suggestQuestionForFineTuning(
-          this.quizQuestion!.quizQuestionId,
-          {
-            isPositiveFeedback: this.isPositive ?? false,
-            comment: this.comment,
-          },
-        );
-        this.suggestionSubmittedSuccessfully = true;
-      } catch (err) {
-        this.suggestionSubmittedSuccessfully = false;
-      }
     },
   },
 });
