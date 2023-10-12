@@ -2,6 +2,7 @@ import {
   findQuestionWithStem,
   expectFeedbackRequiredMessage,
   expectSuccessMessageToBeShown,
+  expectFeedbackAlreadyExistMessage,
   currentQuestion,
 } from "./QuizQuestionPage"
 import { goToLastResult, answeredQuestionPage } from "./AnsweredQuestionPage"
@@ -29,6 +30,7 @@ const pageObjects = {
   findQuestionWithStem,
   currentQuestion,
   expectSuccessMessageToBeShown,
+  expectFeedbackAlreadyExistMessage,
   expectFeedbackRequiredMessage,
   chatAboutNote,
   chatAboutNotePage,

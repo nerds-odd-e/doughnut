@@ -44,9 +44,14 @@ const expectFeedbackRequiredMessage = () => {
   cy.get(".feedback-required-message")
 }
 
+const expectFeedbackAlreadyExistMessage = () => {
+  cy.get(".feedback-exist-message")
+}
+
 export {
   findQuestionWithStem,
   currentQuestion,
   expectFeedbackRequiredMessage,
   expectSuccessMessageToBeShown,
+  expectFeedbackAlreadyExistMessage,
 }

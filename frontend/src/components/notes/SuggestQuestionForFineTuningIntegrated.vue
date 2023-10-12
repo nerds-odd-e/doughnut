@@ -45,6 +45,9 @@
       <div class="feedback-required-message" v-if="suggestionIsRequired">
         Feedback is required!
       </div>
+      <div class="feedback-exist-message" v-if="existingFeedbackErrorMessage">
+        Feedback already exist for this question!
+      </div>
     </div>
   </div>
 </template>
@@ -56,7 +59,7 @@ const isPositiveFeedback = ref<boolean | null>(null);
 const comment = ref<string>("");
 const suggestionSubmittedSuccessfully = ref<boolean>(false);
 const suggestionIsRequired = ref<boolean>(false);
-
+const existingFeedbackErrorMessage = ref<boolean>(false);
 const { api } = useLoadingApi();
 
 const props = defineProps<{
@@ -69,6 +72,7 @@ async function suggestQuestionForFineTuning() {
   try {
     suggestionIsRequired.value = false;
     suggestionSubmittedSuccessfully.value = false;
+    existingFeedbackErrorMessage.value = false;
 
     if (isPositiveFeedback.value != null) {
       await api.reviewMethods.suggestQuestionForFineTuning(
@@ -84,6 +88,11 @@ async function suggestQuestionForFineTuning() {
       suggestionIsRequired.value = true;
     }
   } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((err as any).errorType === "EXISTING_FEEDBACK_ERROR") {
+      existingFeedbackErrorMessage.value = true;
+    }
+
     suggestionSubmittedSuccessfully.value = false;
   }
 }
