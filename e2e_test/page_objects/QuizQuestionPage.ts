@@ -44,4 +44,9 @@ const expectFeedbackRequiredMessage = () => {
   cy.get(".feedback-required-message")
 }
 
-export { findQuestionWithStem, currentQuestion, expectFeedbackRequiredMessage, expectSuccessMessageToBeShown }
+export {
+  findQuestionWithStem,
+  currentQuestion,
+  expectFeedbackRequiredMessage,
+  expectSuccessMessageToBeShown,
+}

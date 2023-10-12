@@ -234,7 +234,7 @@ Then(
 
 Then("I suggest the displayed question {string} without feedback", (questionStem: string) => {
   const question = pageObjects.findQuestionWithStem(questionStem)
-  question.submittingNoFeedback();
+  question.submittingNoFeedback()
 })
 
 Then("I should see a message saying the feedback was rejected", () => {
