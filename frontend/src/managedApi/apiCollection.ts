@@ -45,12 +45,12 @@ const apiCollection = (managedApi: ManagedApi) => ({
   async getPositiveFeedbackFineTuningExamples() {
     return (await managedApi.restGet(
       "fine-tuning/positive-feedback-generation-examples",
-    )) as Generated.FineTuningExample[];
+    )) as Generated.FeedbackData[];
   },
   async getAllEvaluationModelExamples() {
     return (await managedApi.restGet(
       "fine-tuning/feedback-evaluation-examples",
-    )) as Generated.FineTuningExample[];
+    )) as Generated.FeedbackData[];
   },
 
   reviewMethods: {
