@@ -50,13 +50,22 @@ class RestQuizQuestionController {
   public ResponseEntity<?> suggestQuestionForFineTuning(
       @PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity,
       @Valid @RequestBody QuestionSuggestionCreationParams suggestion) {
-    SuggestedQuestionForFineTuning sqft = new SuggestedQuestionForFineTuning();
-    sqft.setUser(currentUser.getEntity());
-    sqft.setCreatedAt(testabilitySettings.getCurrentUTCTimestamp());
-    return new ResponseEntity<>(
-        modelFactoryService
-            .toSuggestedQuestionForFineTuningService(sqft)
-            .create(quizQuestionEntity, suggestion),
-        HttpStatus.OK);
+
+    User user = currentUser.getEntity();
+    Integer countByIdAndUserId =
+        modelFactoryService.questionSuggestionForFineTuningRepository.countByIdAndUserId(
+            quizQuestionEntity.getId(), user.getId());
+
+    if (countByIdAndUserId == 0) {
+      SuggestedQuestionForFineTuning sqft = new SuggestedQuestionForFineTuning();
+      sqft.setUser(currentUser.getEntity());
+      sqft.setCreatedAt(testabilitySettings.getCurrentUTCTimestamp());
+      return new ResponseEntity<>(
+          modelFactoryService
+              .toSuggestedQuestionForFineTuningService(sqft)
+              .create(quizQuestionEntity, suggestion),
+          HttpStatus.OK);
+    }
+    return new ResponseEntity<>("You have already submitted a feedback", HttpStatus.BAD_REQUEST);
   }
 }

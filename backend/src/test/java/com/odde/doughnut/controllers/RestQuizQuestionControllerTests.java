@@ -213,5 +213,16 @@ class RestQuizQuestionControllerTests {
           modelFactoryService.questionSuggestionForFineTuningRepository.count(),
           equalTo(oldCount + 1));
     }
+
+    @Test
+    void givenAQuestionWithExistingFeedbackShouldReturnBadRequest() {
+      controller.suggestQuestionForFineTuning(
+              quizQuestionEntity, suggestionWithPositiveFeedback);
+
+      var response =
+          controller.suggestQuestionForFineTuning(
+              quizQuestionEntity, suggestionWithPositiveFeedback);
+      assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+    }
   }
 }
