@@ -107,16 +107,13 @@ export default {
     async duplicateQuestion(
       suggested: Generated.SuggestedQuestionForFineTuning,
     ) {
-      const duplicatedQuestion = {
-        ...suggested,
-        preservedQuestion: {
-          ...suggested.preservedQuestion,
-          stem: `${suggested.preservedQuestion.stem} - duplicated`,
+      await this.api.reviewMethods.suggestQuestionForFineTuning(
+        suggested.quizQuestionId ?? -1,
+        {
+          isPositiveFeedback: true,
+          comment: suggested.comment,
         },
-        positiveFeedback: true,
-      };
-
-      this.suggestedQuestions?.push(duplicatedQuestion);
+      );
     },
   },
 

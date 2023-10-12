@@ -38,7 +38,7 @@ Feature: Generate Training examples for fine-tuning OpenAI
       | In which year is ChatGPT launched? | 2002           | 2001               |
     And I ask to generate a question for the note "ChatGPT"
     And I suggest the displayed question "In which year is ChatGPT launched?" as a bad example
-    Then an admin should be able to download the question generation training data for evaluation containing 2 examples
+    Then an admin should be able to download the training data for evaluation containing 2 examples
 
   @ignore
   Scenario: Admin should be able to generate training data from questions with good feedback and comment
@@ -72,8 +72,7 @@ Feature: Generate Training examples for fine-tuning OpenAI
     Then an admin should be able to download the question generation training data containing 1 example containing "Did Baha Men write 'Who Let the Dogs Out'?"
     And an admin should be able to download the question generation training data containing 1 example containing "Yes"
 
-  @ignore
   Scenario: Admin should be able to duplicate negative feedback question
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a bad example
     Then an admin can duplicate the question "Who wrote 'Who Let the Dogs Out'?"
-
+    And an admin should be able to download the question generation training data containing 1 example containing "Who wrote 'Who Let the Dogs Out'?"

@@ -35,7 +35,9 @@ export function adminDashboardPage() {
           }
         },
         downloadFeedbackForEvaluationModel() {
-          cy.findByRole("button", { name: "Download Evaluation Training Data" }).click()
+          cy.findByRole("button", {
+            name: "Download Evaluation Training Data",
+          }).click()
           const downloadFilename = `${Cypress.config("downloadsFolder")}/evaluationData.jsonl`
 
           return {
@@ -66,7 +68,7 @@ export function adminDashboardPage() {
 
         duplicateNegativeQuestion(originalQuestionStem: string) {
           cy.get("#duplicate-0").click()
-          cy.findByText(`${originalQuestionStem} - duplicated`)
+          cy.findByText(originalQuestionStem)
         },
       }
     },
