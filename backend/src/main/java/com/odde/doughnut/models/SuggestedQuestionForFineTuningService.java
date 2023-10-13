@@ -4,7 +4,10 @@ import com.odde.doughnut.controllers.json.QuestionSuggestionCreationParams;
 import com.odde.doughnut.controllers.json.QuestionSuggestionParams;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
+import com.odde.doughnut.entities.User;
+import com.odde.doughnut.exceptions.FeedbackExistingException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import java.sql.Timestamp;
 
 public class SuggestedQuestionForFineTuningService {
   private final SuggestedQuestionForFineTuning entity;
@@ -34,5 +37,24 @@ public class SuggestedQuestionForFineTuningService {
 
   private SuggestedQuestionForFineTuning save() {
     return modelFactoryService.questionSuggestionForFineTuningRepository.save(entity);
+  }
+
+  public SuggestedQuestionForFineTuning suggestQuestionForFineTuning(
+      QuizQuestionEntity quizQuestion,
+      QuestionSuggestionCreationParams suggestionCreationParams,
+      User user,
+      Timestamp currentUTCTimestamp) {
+    Integer countByIdAndUserId =
+        modelFactoryService.questionSuggestionForFineTuningRepository.countByIdAndUserId(
+            quizQuestion.getId(), user.getId());
+    entity.setUser(user);
+    entity.setCreatedAt(currentUTCTimestamp);
+
+    if (countByIdAndUserId != 0) {
+      throw new FeedbackExistingException();
+    }
+    create(quizQuestion, suggestionCreationParams);
+
+    return entity;
   }
 }
