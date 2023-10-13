@@ -24,11 +24,11 @@ Given(
   },
 )
 
-Given("an admin can duplicate the question {string}", (originalQuestionStem: string) => {
+Given("an admin can duplicate the question {string}", () => {
   pageObjects
     .loginAsAdminAndGoToAdminDashboard()
     .suggestedQuestionsForFineTuning()
-    .duplicateNegativeQuestion(originalQuestionStem)
+    .duplicateNegativeQuestion()
 })
 
 Given(
@@ -69,12 +69,15 @@ Given("the admin should see {string} in the suggested questions", (expectedComme
   pageObjects
     .loginAsAdminAndGoToAdminDashboard()
     .suggestedQuestionsForFineTuning()
-    .expectComment(expectedComment)
+    .expectString(1, expectedComment)
 })
 
-Given("an admin should be able to see 2 examples containing {string}", (expectedString: string) => {
-  pageObjects
-    .loginAsAdminAndGoToAdminDashboard()
-    .suggestedQuestionsForFineTuning()
-    .expectString(expectedString)
-})
+Given(
+  "an admin should be able to see {int} examples containing {string}",
+  (numOfOccurrence: number, expectedString: string) => {
+    pageObjects
+      .loginAsAdminAndGoToAdminDashboard()
+      .suggestedQuestionsForFineTuning()
+      .expectString(numOfOccurrence, expectedString)
+  },
+)

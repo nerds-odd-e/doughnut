@@ -12,9 +12,6 @@ export function adminDashboardPage() {
     suggestedQuestionsForFineTuning() {
       cy.findByRole("button", { name: "Fine Tuning Data" }).click()
       return {
-        expectComment(comment: string) {
-          cy.findByText(comment)
-        },
         downloadAIQuestionTrainingData() {
           cy.findByRole("button", {
             name: "Download Positive Feedback Question Generation Training Data",
@@ -66,12 +63,12 @@ export function adminDashboardPage() {
           cy.findByText(newQuestion["Question Stem"])
         },
 
-        duplicateNegativeQuestion(originalQuestionStem: string) {
+        duplicateNegativeQuestion() {
           cy.get("#duplicate-0").click()
         },
 
-        expectString(expectedString: string) {
-          cy.findAllByText(expectedString).should("have.length", 2)
+        expectString(numOfOccurrence: number, expectedString: string) {
+          cy.findAllByText(expectedString).should("have.length", numOfOccurrence)
         },
       }
     },
