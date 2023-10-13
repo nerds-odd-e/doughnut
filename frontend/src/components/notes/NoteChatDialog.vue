@@ -24,7 +24,7 @@
     </div>
   </div>
 
-  <div class="fixed-bottom chat-control">
+  <div class="chat-control">
     <button
       v-if="!quizQuestion"
       class="btn btn-secondary"
