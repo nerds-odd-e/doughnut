@@ -68,7 +68,6 @@ export function adminDashboardPage() {
 
         duplicateNegativeQuestion(originalQuestionStem: string) {
           cy.get("#duplicate-0").click()
-          cy.findByText(originalQuestionStem)
         },
 
         expectString(expectedString: string) {

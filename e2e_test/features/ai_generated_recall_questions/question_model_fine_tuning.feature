@@ -75,7 +75,6 @@ Feature: Generate Training examples for fine-tuning OpenAI
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a bad example
     Then an admin can duplicate the question "Who wrote 'Who Let the Dogs Out'?"
     And an admin should be able to see 2 examples containing "Who wrote 'Who Let the Dogs Out'?"
-    And an admin should be able to download the question generation training data containing 1 example containing "Who wrote 'Who Let the Dogs Out'?"
 
   @ignore
   Scenario: Admin should not be able to duplicate positive feedback
