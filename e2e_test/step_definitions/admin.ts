@@ -71,3 +71,10 @@ Given("the admin should see {string} in the suggested questions", (expectedComme
     .suggestedQuestionsForFineTuning()
     .expectComment(expectedComment)
 })
+
+Given("an admin should be able to see 2 examples containing {string}", (expectedString: string) => {
+  pageObjects
+    .loginAsAdminAndGoToAdminDashboard()
+    .suggestedQuestionsForFineTuning()
+    .expectString(expectedString)
+})

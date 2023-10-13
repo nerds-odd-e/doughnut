@@ -114,6 +114,9 @@ export default {
           comment: suggested.comment,
         },
       );
+
+      this.suggestedQuestions =
+        await this.api.getSuggestedQuestionsForFineTuning();
     },
   },
 
