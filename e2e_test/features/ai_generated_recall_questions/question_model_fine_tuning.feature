@@ -72,7 +72,7 @@ Feature: Generate Training examples for fine-tuning OpenAI
     Then an admin should be able to download the question generation training data containing 1 example containing "Did Baha Men write 'Who Let the Dogs Out'?"
     And an admin should be able to download the question generation training data containing 1 example containing "Yes"
 
-  Scenario: Admin should be able to duplicate negative feedback question
+  Scenario: Admin should be able to duplicate negative feedback
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a bad example
     Then an admin can duplicate the question "Who wrote 'Who Let the Dogs Out'?"
     And an admin should be able to download the question generation training data containing 1 example containing "Who wrote 'Who Let the Dogs Out'?"
