@@ -71,7 +71,12 @@ export function adminDashboardPage() {
           cy.findAllByText(expectedString).should("have.length", numOfOccurrence)
         },
 
-        expectUnableToDuplicate(_originalQuestionStem: string) {},
+        expectUnableToDuplicate(_originalQuestionStem: string) {
+          cy.findByText(_originalQuestionStem)
+            .parent("tr")
+            .contains("button", "Duplicate")
+            .should("not.exist")
+        },
       }
     },
   }
