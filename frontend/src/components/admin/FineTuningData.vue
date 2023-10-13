@@ -3,7 +3,9 @@
   <button @click="downloadFineTuningJSONL()">
     Download Positive Feedback Question Generation Training Data
   </button>
-  <button @click="downloadEvaluationJSONL()">Download Evaluation Training Data</button>
+  <button @click="downloadEvaluationJSONL()">
+    Download Evaluation Training Data
+  </button>
   <ContentLoader v-if="suggestedQuestions === undefined" />
   <div v-else>
     <table class="table">
@@ -75,10 +77,14 @@ export default {
       this.showEditDialog = true;
     },
     async downloadFineTuningJSONL() {
-      const fineTuningData = await this.api.getPositiveFeedbackFineTuningExamples();
-      const blob = new Blob([fineTuningData.map((x) => JSON.stringify(x)).join("\n")], {
-        type: "text/plain",
-      });
+      const fineTuningData =
+        await this.api.getPositiveFeedbackFineTuningExamples();
+      const blob = new Blob(
+        [fineTuningData.map((x) => JSON.stringify(x)).join("\n")],
+        {
+          type: "text/plain",
+        },
+      );
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -89,9 +95,12 @@ export default {
     async downloadEvaluationJSONL() {
       const fineTuningData = await this.api.getAllEvaluationModelExamples();
 
-      const blob = new Blob([fineTuningData.map((x) => JSON.stringify(x)).join("\n")], {
-        type: "text/plain",
-      });
+      const blob = new Blob(
+        [fineTuningData.map((x) => JSON.stringify(x)).join("\n")],
+        {
+          type: "text/plain",
+        },
+      );
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -99,23 +108,27 @@ export default {
       a.click();
       URL.revokeObjectURL(url);
     },
-    async duplicateQuestion(suggested: Generated.SuggestedQuestionForFineTuning) {
+    async duplicateQuestion(
+      suggested: Generated.SuggestedQuestionForFineTuning,
+    ) {
       await this.api.reviewMethods.suggestQuestionForFineTuning(
         suggested.quizQuestionId ?? -1,
         {
           isPositiveFeedback: true,
           comment: suggested.comment,
           isDuplicated: true,
-        }
+        },
       );
 
-      this.suggestedQuestions = await this.api.getSuggestedQuestionsForFineTuning();
+      this.suggestedQuestions =
+        await this.api.getSuggestedQuestionsForFineTuning();
     },
   },
 
   components: { ContentLoader, Popup },
   async mounted() {
-    this.suggestedQuestions = await this.api.getSuggestedQuestionsForFineTuning();
+    this.suggestedQuestions =
+      await this.api.getSuggestedQuestionsForFineTuning();
   },
 };
 </script>
