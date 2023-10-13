@@ -63,7 +63,6 @@ Feature: Generate Training examples for fine-tuning OpenAI
     Then an admin can duplicate the question "Who wrote 'Who Let the Dogs Out'?"
     And an admin should be able to see 2 examples containing "Who wrote 'Who Let the Dogs Out'?"
 
-  @ignore
   Scenario: Admin should not be able to duplicate positive feedback
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a good example
     Then an admin should not be able to duplicate this feedback to the question "Who wrote 'Who Let the Dogs Out'?"

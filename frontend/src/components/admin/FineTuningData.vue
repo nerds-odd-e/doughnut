@@ -29,6 +29,7 @@
           <td>
             <!-- TODO: only display duplicate button for negative question -->
             <button
+              v-if="suggested.positiveFeedback == false"
               :id="`duplicate-${index}`"
               class="btn btn-primary"
               @click="duplicateQuestion(suggested)"
