@@ -15,6 +15,7 @@
           <th scope="col">Feedback</th>
           <th scope="col">Comment</th>
           <th scope="col">Operation</th>
+          <th scope="col">Is Duplicated</th>
         </tr>
       </thead>
       <tbody>
@@ -36,6 +37,9 @@
             >
               Duplicate
             </button>
+          </td>
+          <td :id="`is-duplicated-${index}`">
+            {{ suggested.duplicated ? "Yes" : "No" }}
           </td>
         </tr>
       </tbody>
@@ -113,6 +117,7 @@ export default {
         {
           isPositiveFeedback: true,
           comment: suggested.comment,
+          isDuplicated: true,
         },
       );
 

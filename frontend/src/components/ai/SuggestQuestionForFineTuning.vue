@@ -47,6 +47,7 @@ export default defineComponent({
         {
           isPositiveFeedback: false,
           comment: this.comment,
+          isDuplicated: false,
         },
       );
       this.popup.done(null);

@@ -124,6 +124,7 @@ declare namespace Generated {
     interface QuestionSuggestionCreationParams {
         comment: string;
         isPositiveFeedback: boolean;
+        isDuplicated: boolean;
     }
 
     interface QuestionSuggestionParams {
@@ -219,6 +220,7 @@ declare namespace Generated {
         preservedQuestion: MCQWithAnswer;
         createdAt?: string;
         positiveFeedback: boolean;
+        duplicated: boolean;
         quizQuestionId?: number;
     }
 

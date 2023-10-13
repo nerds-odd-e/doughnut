@@ -60,6 +60,11 @@ public class SuggestedQuestionForFineTuning {
   @Nullable
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
+  @Column(name = "is_duplicated")
+  @Getter
+  @Setter
+  private boolean isDuplicated;
+
   @Nullable
   public int getQuizQuestionId() {
     return quizQuestion.getId();

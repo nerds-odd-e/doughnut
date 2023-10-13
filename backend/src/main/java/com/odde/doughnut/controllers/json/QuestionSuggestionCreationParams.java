@@ -8,4 +8,5 @@ import lombok.NoArgsConstructor;
 public class QuestionSuggestionCreationParams {
   public String comment;
   public boolean isPositiveFeedback;
+  public boolean isDuplicated;
 }

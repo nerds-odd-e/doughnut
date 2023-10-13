@@ -17,6 +17,7 @@ describe("Edit Suggested Question", () => {
       },
       comment: "",
       positiveFeedback: false,
+      duplicated: false,
     };
 
     let wrapper;

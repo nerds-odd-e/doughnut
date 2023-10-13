@@ -149,10 +149,10 @@ class RestQuizQuestionControllerTests {
     Note note;
 
     QuestionSuggestionCreationParams suggestionWithPositiveFeedback =
-        new QuestionSuggestionCreationParams("this is a comment", true);
+        new QuestionSuggestionCreationParams("this is a comment", true, false);
 
     QuestionSuggestionCreationParams suggestionWithNegativeFeedback =
-        new QuestionSuggestionCreationParams("this is a comment", false);
+        new QuestionSuggestionCreationParams("this is a comment", false, false);
 
     @BeforeEach
     void setup() throws QuizQuestionNotPossibleException {
@@ -177,6 +177,7 @@ class RestQuizQuestionControllerTests {
           quizQuestionEntity.getId(), suggestedQuestionForFineTuning.getQuizQuestion().getId());
       assertEquals("this is a comment", suggestedQuestionForFineTuning.getComment());
       assertTrue(suggestedQuestionForFineTuning.isPositiveFeedback(), "Incorrect Feedback");
+      assertFalse(suggestedQuestionForFineTuning.isDuplicated());
     }
 
     @Test

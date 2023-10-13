@@ -77,6 +77,11 @@ export function adminDashboardPage() {
             .contains("button", "Duplicate")
             .should("not.exist")
         },
+
+        identifyDuplicatedRecord() {
+          cy.get("#is-duplicated-0").contains("No")
+          cy.get("#is-duplicated-1").contains("Yes")
+        },
       }
     },
   }

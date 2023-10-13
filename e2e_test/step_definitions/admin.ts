@@ -91,3 +91,10 @@ Given(
       .expectString(numOfOccurrence, expectedString)
   },
 )
+
+Given("an admin should be able to identify the duplicated record", () => {
+  pageObjects
+    .loginAsAdminAndGoToAdminDashboard()
+    .suggestedQuestionsForFineTuning()
+    .identifyDuplicatedRecord()
+})

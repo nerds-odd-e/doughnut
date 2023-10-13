@@ -22,6 +22,7 @@ public class SuggestedQuestionForFineTuningService {
     entity.setPreservedQuestion(quizQuestionEntity.getMcqWithAnswer());
     entity.setComment(params.comment);
     entity.setPositiveFeedback(params.isPositiveFeedback);
+    entity.setDuplicated(params.isDuplicated);
     return save();
   }
 

@@ -80,6 +80,7 @@ async function suggestQuestionForFineTuning() {
         {
           isPositiveFeedback: isPositiveFeedback.value ?? false,
           comment: comment.value,
+          isDuplicated: false,
         },
       );
 
