@@ -70,6 +70,8 @@ export function adminDashboardPage() {
         expectString(numOfOccurrence: number, expectedString: string) {
           cy.findAllByText(expectedString).should("have.length", numOfOccurrence)
         },
+
+        expectUnableToDuplicate(_originalQuestionStem: string) {},
       }
     },
   }

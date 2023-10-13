@@ -73,6 +73,16 @@ Given("the admin should see {string} in the suggested questions", (expectedComme
 })
 
 Given(
+  "an admin should not be able to duplicate this feedback to the question {string}",
+  (originalQuestionStem: string) => {
+    pageObjects
+      .loginAsAdminAndGoToAdminDashboard()
+      .suggestedQuestionsForFineTuning()
+      .expectUnableToDuplicate(originalQuestionStem)
+  },
+)
+
+Given(
   "an admin should be able to see {int} examples containing {string}",
   (numOfOccurrence: number, expectedString: string) => {
     pageObjects
