@@ -22,7 +22,7 @@ Feature: Generate Training examples for fine-tuning OpenAI
   Scenario Outline: Admin should be able to generate training data from questions with good feedback
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a <Feedback> example
     Then I should see a message saying the feedback was sent successfully
-    And an admin should be able to download the question generation training data containing <Number_of_example_download> example(s)
+    And an admin should be able to download the question generation training data containing <Number_of_example_download> examples
 
     Examples:
 
@@ -58,7 +58,6 @@ Feature: Generate Training examples for fine-tuning OpenAI
     Then I should see a message saying the feedback was rejected
     And the admin should not see empty feedback in the generated training data
 
-  
   Scenario: User should not be able to submit response again for the same question
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" with an existing feedback
     Then I should see a message saying the feedback already exist
