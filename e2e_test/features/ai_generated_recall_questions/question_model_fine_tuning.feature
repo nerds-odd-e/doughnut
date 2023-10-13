@@ -40,23 +40,10 @@ Feature: Generate Training examples for fine-tuning OpenAI
     And I suggest the displayed question "In which year is ChatGPT launched?" as a bad example
     Then an admin should be able to download the training data for evaluation containing 2 examples
 
-  @ignore
-  Scenario: Admin should be able to generate training data from questions with good feedback and comment
-    When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a good example with comment "This is awesome!"
-    Then I should see a message saying the feedback was sent successfully
-    And the admin should see "This is awesome!" in the generated training data
-
-  @ignore
-  Scenario: Admin should not be see questions with bad feedback and comment in generated training data
-    When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a bad example with comment "This is terrible!"
-    Then I should see a message saying the feedback was sent successfully
-    And the admin should not see "This is terrible!" in the generated training data
-
-  @ignore
   Scenario: User should not be able to submit response without a specific feedback
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" without feedback
     Then I should see a message saying the feedback was rejected
-    And the admin should not see empty feedback in the generated training data
+    And an admin should be able to download the training data for evaluation containing 0 examples
 
   Scenario: User should not be able to submit response again for the same question
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" with an existing feedback
