@@ -16,8 +16,9 @@ Feature: Generate Training examples for fine-tuning OpenAI
 
   Scenario: Admin should be able to generate training data from suggested questions
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a good example
-    Then an admin can download the question generation training data having "Who wrote 'Who Let the Dogs Out'?"
-    Then an admin can download the question generation training data having "Baha Men"
+    Then an admin can download the question generation training data having:
+      | Question Stem                     | Choices                  |
+      | Who wrote 'Who Let the Dogs Out'? | Anslem Douglas, Baha Men |
 
   Scenario Outline: Admin should be able to generate training data from questions with good feedback
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a <Feedback> example
@@ -55,8 +56,9 @@ Feature: Generate Training examples for fine-tuning OpenAI
     When an admin edit the question and choices "Who wrote 'Who Let the Dogs Out'?" with a different question:
       | Question Stem                              | Choice A |
       | Did Baha Men write 'Who Let the Dogs Out'? | Yes      |
-    Then an admin can download the question generation training data having "Did Baha Men write 'Who Let the Dogs Out'?"
-    And an admin can download the question generation training data having "Yes"
+    Then an admin can download the question generation training data having:
+      | Question Stem                              | Choices  |
+      | Did Baha Men write 'Who Let the Dogs Out'? | Yes      |
 
   Scenario: Admin should be able to duplicate negative feedback
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a bad example

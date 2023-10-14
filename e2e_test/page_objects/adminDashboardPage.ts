@@ -26,8 +26,17 @@ export function adminDashboardPage() {
               return this
             },
 
-            expectTxtInDownload(inputText: string) {
-              cy.readFile(downloadFilename).should("contain", inputText)
+            expectExampleQuestions(questions: Record<string, string>[]) {
+              questions.forEach((question: Record<string, string>) => {
+                if (question["Question Stem"] !== undefined) {
+                  cy.readFile(downloadFilename).should("contain", question["Question Stem"])
+                }
+                if (question["Choices"] !== undefined) {
+                  question["Choices"].commonSenseSplit(",").forEach((choice: string) => {
+                    cy.readFile(downloadFilename).should("contain", choice)
+                  })
+                }
+              })
             },
           }
         },

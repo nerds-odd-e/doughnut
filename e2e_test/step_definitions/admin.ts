@@ -32,13 +32,13 @@ Given("an admin can duplicate the question {string}", () => {
 })
 
 Given(
-  "an admin can download the question generation training data having {string}",
-  (questionStem: string) => {
+  "an admin can download the question generation training data having:",
+  (question: DataTable) => {
     pageObjects
       .loginAsAdminAndGoToAdminDashboard()
       .suggestedQuestionsForFineTuning()
       .downloadAIQuestionTrainingData()
-      .expectTxtInDownload(questionStem)
+      .expectExampleQuestions(question.hashes())
   },
 )
 
