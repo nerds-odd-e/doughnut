@@ -203,6 +203,17 @@ When("I ask to generate a question for the note {string}", (noteTopic: string) =
   pageObjects.chatAboutNote(noteTopic).testMe()
 })
 
+When(
+  "I've got the following question for a note with topic {string}:",
+  (noteTopic: string, question: DataTable) => {
+    cy.testability().seedNotes([{ topic: noteTopic }])
+    pageObjects
+      .questionGenerationService()
+      .stubAskSingleAnswerMultipleChoiceQuestion(question.hashes()[0])
+    pageObjects.chatAboutNote(noteTopic).testMe()
+  },
+)
+
 Then("I should be asked {string}", (expectedQuestionStem: string) => {
   pageObjects.findQuestionWithStem(expectedQuestionStem)
 })

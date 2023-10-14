@@ -8,8 +8,8 @@ import {
 import { goToLastResult, answeredQuestionPage } from "./AnsweredQuestionPage"
 import { chatAboutNotePage } from "./chatAboutNotePage"
 import { adminDashboardPage } from "./adminPages/adminDashboardPage"
-import { openAiService } from "./openAiService"
 import mock_services from "./mock_services"
+import { questionGenerationService } from "./questionGenerationService"
 
 const chatAboutNote = (noteTopic: string) => {
   cy.jumpToNotePage(noteTopic)
@@ -26,7 +26,7 @@ const loginAsAdminAndGoToAdminDashboard = () => {
 }
 
 const pageObjects = {
-  openAiService,
+  questionGenerationService,
   answeredQuestionPage,
   goToLastResult,
   findQuestionWithStem,

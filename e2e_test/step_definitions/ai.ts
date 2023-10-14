@@ -73,7 +73,9 @@ Given("An OpenAI response is unavailable", () => {
 })
 
 Given("OpenAI by default returns this question:", (questionTable: DataTable) => {
-  pageObjects.openAiService().stubAskSingleAnswerMultipleChoiceQuestion(questionTable.hashes()[0])
+  pageObjects
+    .questionGenerationService()
+    .stubAskSingleAnswerMultipleChoiceQuestion(questionTable.hashes()[0])
 })
 
 Then("I complain the question doesn't make sense", () => {

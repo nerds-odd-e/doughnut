@@ -7,11 +7,9 @@ Feature: Generate Training examples for fine-tuning OpenAI
 
   Background:
     Given I am logged in as an existing user
-    And I have a note with the topic "Who Let the Dogs Out"
-    And OpenAI by default returns this question:
+    And I've got the following question for a note with topic "Who Let the Dogs Out":
       | Question Stem                     | Correct Choice | Incorrect Choice 1 |
       | Who wrote 'Who Let the Dogs Out'? | Anslem Douglas | Baha Men           |
-    And I ask to generate a question for the note "Who Let the Dogs Out"
 
 
   Scenario: Admin should be able to generate training data from suggested questions

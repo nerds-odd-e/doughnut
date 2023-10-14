@@ -1,6 +1,6 @@
 import mock_services from "./mock_services"
 
-export const openAiService = () => ({
+export const questionGenerationService = () => ({
   stubAskSingleAnswerMultipleChoiceQuestion: (record: Record<string, string>) => {
     const reply = JSON.stringify({
       stem: record["Question Stem"],
