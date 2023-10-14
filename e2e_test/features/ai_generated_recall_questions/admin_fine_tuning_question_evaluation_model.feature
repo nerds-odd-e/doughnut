@@ -1,9 +1,10 @@
 @usingMockedOpenAiService
 @startWithEmptyDownloadsFolder
-Feature: Generate Training examples for fine-tuning OpenAI Question Generation
+Feature: Improve OpenAI Question Generation using User Feedback
+
   As an admin,
-  I want to use the good examples suggested by users for OpenAI fine-tuning
-  to improve question generation.
+  I want to collect and utilize good examples suggested by users for OpenAI fine-tuning
+  to enhance the quality of question generation.
 
   Background:
     Given I am logged in as an existing user
@@ -12,13 +13,13 @@ Feature: Generate Training examples for fine-tuning OpenAI Question Generation
       | Who wrote 'Who Let the Dogs Out'? | Anslem Douglas | Baha Men           |
 
 
-  Scenario: Admin should be able to generate training data from suggested questions
+  Scenario: Admin can obtain training data from positively reviewed questions
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a good example
     Then an admin can download the question generation training data containing:
       | Question Stem                     | Choices                  |
       | Who wrote 'Who Let the Dogs Out'? | Anslem Douglas, Baha Men |
 
-  Scenario Outline: Training data should contain only the good examples
+  Scenario Outline: Training data inclusion is based on user feedback
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a <Feedback> example
     Then an admin can download the question generation training data containing <Expected Number of Examples> examples
 
