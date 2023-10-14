@@ -30,10 +30,7 @@
       placeholder="Add a comment about the question"
     />
     <div class="feedback-actions-container">
-      <button
-        class="suggest-fine-tuning-ok-btn btn btn-success"
-        @click="suggestQuestionForFineTuning"
-      >
+      <button class="btn btn-success" @click="suggestQuestionForFineTuning">
         OK
       </button>
       <div
