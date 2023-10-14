@@ -10,19 +10,21 @@ const currentQuestion = (stem?: string) => {
       getChoice(choice).click()
       getChoice(choice).parent().invoke("attr", "class").should("contain", `is-${correctness}`)
     },
-
+    submit() {
+      cy.findByRole("button", { name: "OK" }).click()
+    },
     suggestingPositiveFeedbackForFineTuning() {
-      cy.get(".positive-feedback-btn").click()
-      cy.get(".suggest-fine-tuning-ok-btn").click()
+      cy.findByRole("button", { name: "👍 Good" }).click()
+      this.submit()
     },
 
     suggestingNegativeFeedbackFineTuningExclusion() {
-      cy.get(".negative-feedback-btn").click()
-      cy.get(".suggest-fine-tuning-ok-btn").click()
+      cy.findByRole("button", { name: "👎 Bad" }).click()
+      this.submit()
     },
 
     submittingNoFeedback() {
-      cy.get(".suggest-fine-tuning-ok-btn").click()
+      this.submit()
     },
 
     inputComment(comment: string) {
