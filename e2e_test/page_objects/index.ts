@@ -8,7 +8,7 @@ import {
 import { goToLastResult, answeredQuestionPage } from "./AnsweredQuestionPage"
 import mock_services from "./mock_services"
 import { chatAboutNotePage } from "./chatAboutNotePage"
-import { adminDashboardPage } from "./adminDashboardPage"
+import { adminDashboardPage } from "./adminPages/adminDashboardPage"
 
 const chatAboutNote = (noteTopic: string) => {
   cy.jumpToNotePage(noteTopic)
