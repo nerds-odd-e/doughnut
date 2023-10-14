@@ -4,7 +4,7 @@ export function adminFineTuningPage() {
   return {
     downloadAIQuestionTrainingData() {
       cy.findByRole("button", {
-        name: "Download Positive Feedback Question Generation Training Data",
+        name: "Download Positive Feedback training data for question generation ",
       }).click()
 
       return quesionGenerationTrainingData()

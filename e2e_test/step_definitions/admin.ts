@@ -32,7 +32,7 @@ Given("an admin can duplicate the question {string}", () => {
 })
 
 Given(
-  "an admin can download the question generation training data containing:",
+  "an admin can retrieve the training data for question generation containing:",
   (question: DataTable) => {
     pageObjects
       .loginAsAdminAndGoToAdminDashboard()
@@ -43,7 +43,7 @@ Given(
 )
 
 Given(
-  "an admin can download the question generation training data containing {int} examples",
+  "an admin can retrieve the training data for question generation containing {int} examples",
   (numOfDownload: number) => {
     pageObjects
       .loginAsAdminAndGoToAdminDashboard()

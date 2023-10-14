@@ -15,13 +15,13 @@ Feature: Improve OpenAI Question Generation using User Feedback
 
   Scenario: Admin can obtain training data from positively reviewed questions
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a good example
-    Then an admin can download the question generation training data containing:
+    Then an admin can retrieve the training data for question generation containing:
       | Question Stem                     | Choices                  |
       | Who wrote 'Who Let the Dogs Out'? | Anslem Douglas, Baha Men |
 
   Scenario Outline: Training data inclusion is based on user feedback
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a <Feedback> example
-    Then an admin can download the question generation training data containing <Expected Number of Examples> examples
+    Then an admin can retrieve the training data for question generation containing <Expected Number of Examples> examples
 
     Examples:
       | Feedback | Expected Number of Examples |
