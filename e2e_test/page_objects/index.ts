@@ -9,6 +9,7 @@ import { goToLastResult, answeredQuestionPage } from "./AnsweredQuestionPage"
 import { chatAboutNotePage } from "./chatAboutNotePage"
 import { adminDashboardPage } from "./adminPages/adminDashboardPage"
 import { openAiService } from "./openAiService"
+import mock_services from "./mock_services"
 
 const chatAboutNote = (noteTopic: string) => {
   cy.jumpToNotePage(noteTopic)
@@ -38,3 +39,4 @@ const pageObjects = {
   loginAsAdminAndGoToAdminDashboard,
 }
 export default pageObjects
+export { mock_services }
