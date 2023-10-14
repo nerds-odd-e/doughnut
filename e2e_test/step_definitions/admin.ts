@@ -32,19 +32,18 @@ Given("an admin can duplicate the question {string}", () => {
 })
 
 Given(
-  "an admin should be able to download the question generation training data containing {int} example containing {string}",
-  (numOfDownload: number, questionStem: string) => {
+  "an admin can download the question generation training data having {string}",
+  (questionStem: string) => {
     pageObjects
       .loginAsAdminAndGoToAdminDashboard()
       .suggestedQuestionsForFineTuning()
       .downloadAIQuestionTrainingData()
-      .expectNumberOfRecords(numOfDownload)
       .expectTxtInDownload(questionStem)
   },
 )
 
 Given(
-  "an admin should be able to download the question generation training data containing {int} examples",
+  "an admin can download the question generation training data containing {int} examples",
   (numOfDownload: number) => {
     pageObjects
       .loginAsAdminAndGoToAdminDashboard()
