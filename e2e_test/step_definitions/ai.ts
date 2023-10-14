@@ -4,7 +4,7 @@
 
 import { Given, Then, DataTable } from "@badeball/cypress-cucumber-preprocessor"
 import "../support/string.extensions"
-import { mock_services } from "page_objects"
+import pageObjects, { mock_services } from "page_objects"
 import { MessageToMatch } from "page_objects/mock_services/MessageToMatch"
 
 Given("open AI service always think the system token is invalid", () => {
@@ -74,18 +74,7 @@ Given("An OpenAI response is unavailable", () => {
 
 Given("OpenAI by default returns this question:", (questionTable: DataTable) => {
   const record = questionTable.hashes()[0]
-  const reply = JSON.stringify({
-    stem: record["Question Stem"],
-    correctChoiceIndex: 0,
-    choices: [record["Correct Choice"], record["Incorrect Choice 1"], record["Incorrect Choice 2"]],
-    confidence: 1000, // so that it will skip the vaiidation by AI again.
-  })
-  cy.then(async () => {
-    await mock_services.openAi().restartImposter()
-    await mock_services
-      .openAi()
-      .stubAnyChatCompletionFunctionCall("ask_single_answer_multiple_choice_question", reply)
-  })
+  pageObjects.openAiService().stubAskSingleAnswerMultipleChoiceQuestion(record)
 })
 
 Then("I complain the question doesn't make sense", () => {
