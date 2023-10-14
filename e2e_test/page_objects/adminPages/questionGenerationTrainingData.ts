@@ -10,16 +10,15 @@ export function quesionGenerationTrainingData() {
     },
 
     expectExampleQuestions(questions: Record<string, string>[]) {
-      questions.forEach((question: Record<string, string>) => {
-        cy.readFile(downloadFilename).then((content) => {
-          if (question["Question Stem"] !== undefined) {
-            expect(content).contain(question["Question Stem"])
-          }
-          if (question["Choices"] !== undefined) {
-            question["Choices"].commonSenseSplit(",").forEach((choice: string) => {
-              expect(content).contain(choice)
-            })
-          }
+      cy.readFile(downloadFilename).then((content) => {
+        const jsonStrings: string[] = content.split("\n")
+        expect(jsonStrings.length).eq(questions.length)
+        jsonStrings.forEach((line: string, index: number) => {
+          const question: Record<string, string> = questions[index]
+          expect(line).to.contain(question["Question Stem"])
+          question["Choices"].split(", ").forEach((choice: string) => {
+            expect(line).to.contain(choice)
+          })
         })
       })
     },
