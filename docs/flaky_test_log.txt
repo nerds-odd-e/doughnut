@@ -7,3 +7,5 @@ notes/note_edit_accessories.feature/Edit a note
   * 2023 09 18: Timeout finding the "Upload Picture"
 
 
+circles/notebooks_in_circles.feature/subscribe to a note and review
+  * 2023 10 14: Unable to find an element with the text: Team agreement
