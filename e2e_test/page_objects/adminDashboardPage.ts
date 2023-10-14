@@ -44,10 +44,6 @@ export function adminDashboardPage() {
                 .should("eq", count)
               return this
             },
-
-            expectTxtInDownload(inputText: string) {
-              cy.readFile(downloadFilename).should("contain", inputText)
-            },
           }
         },
 
