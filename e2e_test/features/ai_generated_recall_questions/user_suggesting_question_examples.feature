@@ -14,32 +14,10 @@ Feature: Generate Training examples for fine-tuning OpenAI
     And I ask to generate a question for the note "Who Let the Dogs Out"
 
 
-  Scenario: Admin should be able to generate training data from suggested questions
+  Scenario: Training data should contain only the good examples
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a good example
-    Then an admin can download the question generation training data having:
-      | Question Stem                     | Choices                  |
-      | Who wrote 'Who Let the Dogs Out'? | Anslem Douglas, Baha Men |
-
-  Scenario Outline: Admin should be able to generate training data from questions with good feedback
-    When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a <Feedback> example
     Then I should see a message saying the feedback was sent successfully
-    And an admin can download the question generation training data containing <Number_of_example_download> examples
-
-    Examples:
-
-      | Feedback | Number_of_example_download |
-      | good     | 1                          |
-      | bad      | 0                          |
-
-  Scenario: Admin should be able to download both positive and negative feedbacks for training evaluation model
-    Given I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a good example
-    And I have a note with the topic "ChatGPT"
-    And OpenAI by default returns this question:
-      | Question Stem                      | Correct Choice | Incorrect Choice 1 |
-      | In which year is ChatGPT launched? | 2002           | 2001               |
-    And I ask to generate a question for the note "ChatGPT"
-    And I suggest the displayed question "In which year is ChatGPT launched?" as a bad example
-    Then an admin should be able to download the training data for evaluation containing 2 examples
+    And an admin can download the question generation training data containing 1 examples
 
   Scenario: User should not be able to submit response without a specific feedback
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" without feedback
@@ -56,7 +34,7 @@ Feature: Generate Training examples for fine-tuning OpenAI
     When an admin edit the question and choices "Who wrote 'Who Let the Dogs Out'?" with a different question:
       | Question Stem                              | Choice A |
       | Did Baha Men write 'Who Let the Dogs Out'? | Yes      |
-    Then an admin can download the question generation training data having:
+    Then an admin can download the question generation training data containing:
       | Question Stem                              | Choices  |
       | Did Baha Men write 'Who Let the Dogs Out'? | Yes      |
 

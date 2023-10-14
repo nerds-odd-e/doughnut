@@ -32,7 +32,7 @@ Given("an admin can duplicate the question {string}", () => {
 })
 
 Given(
-  "an admin can download the question generation training data having:",
+  "an admin can download the question generation training data containing:",
   (question: DataTable) => {
     pageObjects
       .loginAsAdminAndGoToAdminDashboard()
