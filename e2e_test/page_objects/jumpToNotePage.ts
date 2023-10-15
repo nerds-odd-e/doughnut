@@ -29,5 +29,11 @@ export const jumpToNotePage = (noteTopic: string, forceLoadPage = false) => {
       cy.notePageButtonOnCurrentPage("associate wikidata").click()
       cy.replaceFocusedTextAndEnter(wikiID)
     },
+    aiSuggestDetailsForNote: () => {
+      cy.on("uncaught:exception", () => {
+        return false
+      })
+      cy.findByRole("button", { name: "suggest details" }).click()
+    },
   }
 }

@@ -22,7 +22,7 @@ defineParameterType({
 })
 
 Given("I visit note {string}", (noteTopic) => {
-  cy.jumpToNotePage(noteTopic)
+  pageObjects.jumpToNotePage(noteTopic)
 })
 
 Given("there are some notes for the current user:", (data: DataTable) => {
@@ -58,19 +58,19 @@ When("I create a notebook with empty topic", () => {
 })
 
 When("I update note {string} to become:", (noteTopic: string, data: DataTable) => {
-  cy.jumpToNotePage(noteTopic)
+  pageObjects.jumpToNotePage(noteTopic)
   cy.inPlaceEdit(data.hashes()[0])
 })
 
 When("I update note accessories of {string} to become:", (noteTopic: string, data: DataTable) => {
-  cy.jumpToNotePage(noteTopic)
+  pageObjects.jumpToNotePage(noteTopic)
   cy.openAndSubmitNoteAccessoriesFormWith(noteTopic, data.hashes()[0])
 })
 
 When(
   "I should see note {string} has a picture and a url {string}",
   (noteTopic: string, expectedUrl: string) => {
-    cy.jumpToNotePage(noteTopic)
+    pageObjects.jumpToNotePage(noteTopic)
     cy.get("#note-picture").should("exist")
     cy.findByLabelText("Url:").should("have.attr", "href", expectedUrl)
   },
@@ -85,7 +85,7 @@ When("I can change the topic {string} to {string}", (noteTopic: string, newNoteT
 Given(
   "I update note topic {string} to become {string}",
   (noteTopic: string, newNoteTopic: string) => {
-    cy.jumpToNotePage(noteTopic)
+    pageObjects.jumpToNotePage(noteTopic)
     cy.findNoteTopic(noteTopic).click()
     cy.replaceFocusedTextAndEnter(newNoteTopic)
   },
@@ -100,21 +100,21 @@ Given(
 )
 
 When("I update note {string} with details {string}", (noteTopic: string, newDetails: string) => {
-  cy.jumpToNotePage(noteTopic)
+  pageObjects.jumpToNotePage(noteTopic)
   cy.inPlaceEdit({ Details: newDetails })
   cy.findNoteDetailsOnCurrentPage(newDetails)
 })
 
 When("I create a note belonging to {string}:", (noteTopic: string, data: DataTable) => {
   expect(data.hashes().length).to.equal(1)
-  cy.jumpToNotePage(noteTopic)
+  pageObjects.jumpToNotePage(noteTopic)
   cy.clickAddChildNoteButton()
   cy.submitNoteCreationFormSuccessfully(data.hashes()[0])
 })
 
 When("I try to create a note belonging to {string}:", (noteTopic: string, data: DataTable) => {
   expect(data.hashes().length).to.equal(1)
-  cy.jumpToNotePage(noteTopic)
+  pageObjects.jumpToNotePage(noteTopic)
   cy.clickAddChildNoteButton()
   cy.submitNoteCreationFormWith(data.hashes()[0])
 })
@@ -171,7 +171,7 @@ When("I should see that the note creation is not successful", () => {
 })
 
 Then("I should see the note {string} is marked as deleted", (noteTopic: string) => {
-  cy.jumpToNotePage(noteTopic)
+  pageObjects.jumpToNotePage(noteTopic)
   cy.findNoteTopic(noteTopic)
   cy.findByText("This note has been deleted")
 })
@@ -191,7 +191,7 @@ When("I click the child note {string}", (noteTopic) => {
 })
 
 When("I move note {string} left", (noteTopic) => {
-  cy.jumpToNotePage(noteTopic)
+  pageObjects.jumpToNotePage(noteTopic)
   cy.findByText("Move This Note").click()
   cy.findByRole("button", { name: "Move Left" }).click()
 })
@@ -201,7 +201,7 @@ When("I should see the screenshot matches", () => {
 })
 
 When("I move note {string} right", (noteTopic: string) => {
-  cy.jumpToNotePage(noteTopic)
+  pageObjects.jumpToNotePage(noteTopic)
   cy.findByText("Move This Note").click()
   cy.findByRole("button", { name: "Move Right" }).click()
 })
@@ -209,7 +209,7 @@ When("I move note {string} right", (noteTopic: string) => {
 When(
   "I should see {string} is before {string} in {string}",
   (noteTopic1: string, noteTopic2: string, parentNoteTopic: string) => {
-    cy.jumpToNotePage(parentNoteTopic)
+    pageObjects.jumpToNotePage(parentNoteTopic)
     const matcher = new RegExp(noteTopic1 + ".*" + noteTopic2, "g")
 
     cy.get(".card-title").then(($els) => {
@@ -239,11 +239,11 @@ Then(
   (left: string, aging: string, right: string) => {
     let leftColor: string
     cy.pageIsNotLoading()
-    cy.jumpToNotePage(left)
+    pageObjects.jumpToNotePage(left)
     cy.get(".note-body")
       .invoke("css", "border-color")
       .then((val) => (leftColor = val))
-    cy.jumpToNotePage(right)
+    pageObjects.jumpToNotePage(right)
     cy.get(".note-body")
       .invoke("css", "border-color")
       .then((val) => {
@@ -291,7 +291,7 @@ Then("I should find an art created by the ai", () => {
 })
 
 Given("I ask to complete the details for note {string}", (noteTopic: string) => {
-  cy.aiSuggestDetailsForNote(noteTopic)
+  pageObjects.jumpToNotePage(noteTopic).aiSuggestDetailsForNote()
 })
 
 Then("I should see that the open AI service is not available in controller bar", () => {

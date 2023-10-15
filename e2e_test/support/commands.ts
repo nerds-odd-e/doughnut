@@ -539,11 +539,3 @@ Cypress.Commands.add("expectAMapTo", (latitude: string, longitude: string) => {
 Cypress.Commands.add("dismissLastErrorMessage", () => {
   cy.get(".last-error-message").click()
 })
-
-Cypress.Commands.add("aiSuggestDetailsForNote", (noteTopic: string) => {
-  cy.jumpToNotePage(noteTopic)
-  cy.on("uncaught:exception", () => {
-    return false
-  })
-  cy.findByRole("button", { name: "suggest details" }).click()
-})

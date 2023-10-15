@@ -104,14 +104,14 @@ Then(
 )
 
 Then("I should see {string} has no link to {string}", (noteTopic: string, targetTitle: string) => {
-  cy.jumpToNotePage(noteTopic)
+  pageObjects.jumpToNotePage(noteTopic)
   cy.findByText(targetTitle).should("not.exist")
 })
 
 Then(
   "I change the link from {string} to {string} to {string}",
   (noteTopic: string, targetTitle: string, linkType: string) => {
-    cy.jumpToNotePage(noteTopic)
+    pageObjects.jumpToNotePage(noteTopic)
     cy.changeLinkType(targetTitle, linkType)
   },
 )
@@ -122,7 +122,7 @@ Then("I should be able to delete the link", () => {
 
 Then("I delete the link from {string} to {string}", (noteTopic: string, targetTitle: string) => {
   cy.pageIsNotLoading()
-  cy.jumpToNotePage(noteTopic)
+  pageObjects.jumpToNotePage(noteTopic)
   cy.clickLinkNob(targetTitle)
   cy.findByRole("button", { name: "Delete" }).click()
   cy.findByRole("button", { name: "Cancel" }).click()
