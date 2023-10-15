@@ -7,52 +7,139 @@
     >
   </p>
   <div>
-    <TextInput
-      field="comment"
-      v-model="comment"
-      placeholder="Add a comment about the question"
-    />
+    <label> This question is: </label>
+    <button
+      class="positive-feedback-btn feedback-btn"
+      :class="{ selected: isPositiveFeedback }"
+      @click="markQuestionAsPositive"
+    >
+      👍 Good
+    </button>
+    <button
+      class="negative-feedback-btn feedback-btn"
+      :class="{ selected: isPositiveFeedback === false }"
+      @click="markQuestionAsNegative"
+    >
+      👎 Bad
+    </button>
   </div>
-  <button class="btn btn-success" @click="suggestQuestionForFineTuning">
-    OK
-  </button>
+  <TextInput
+    id="feedback-comment"
+    field="comment"
+    v-model="comment"
+    placeholder="Add a comment about the question"
+  />
+  <div class="feedback-actions-container">
+    <button
+      class="suggest-fine-tuning-ok-btn btn btn-success"
+      @click="suggestQuestionForFineTuning"
+    >
+      OK
+    </button>
+    <div
+      class="suggestion-sent-successfully-message"
+      v-if="suggestionSubmittedSuccessfully"
+    >
+      Feedback sent successfully!
+    </div>
+    <div class="feedback-required-message" v-if="suggestionIsRequired">
+      Feedback is required!
+    </div>
+    <div class="feedback-exist-message" v-if="existingFeedbackErrorMessage">
+      Feedback already exist for this question!
+    </div>
+  </div>
 </template>
-
-<script lang="ts">
-import { defineComponent, PropType } from "vue";
+<script setup lang="ts">
+import { ref } from "vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
-import asPopup from "../commons/Popups/asPopup";
-import TextInput from "../form/TextInput.vue";
 
-export default defineComponent({
-  inheritAttrs: false,
-  setup() {
-    return { ...useLoadingApi(), ...asPopup() };
-  },
-  props: {
-    quizQuestion: {
-      type: Object as PropType<Generated.QuizQuestion>,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      comment: "" as string,
-    };
-  },
-  methods: {
-    async suggestQuestionForFineTuning() {
-      await this.api.reviewMethods.suggestQuestionForFineTuning(
-        this.quizQuestion.quizQuestionId,
+const isPositiveFeedback = ref<boolean | null>(null);
+const comment = ref<string>("");
+const suggestionSubmittedSuccessfully = ref<boolean>(false);
+const suggestionIsRequired = ref<boolean>(false);
+const existingFeedbackErrorMessage = ref<boolean>(false);
+const { api } = useLoadingApi();
+
+const props = defineProps<{
+  quizQuestion: Generated.QuizQuestion | undefined;
+}>();
+
+const { quizQuestion } = props;
+
+async function suggestQuestionForFineTuning() {
+  try {
+    suggestionIsRequired.value = false;
+    suggestionSubmittedSuccessfully.value = false;
+    existingFeedbackErrorMessage.value = false;
+
+    if (isPositiveFeedback.value != null) {
+      await api.reviewMethods.suggestQuestionForFineTuning(
+        quizQuestion!.quizQuestionId,
         {
-          isPositiveFeedback: false,
-          comment: this.comment,
+          isPositiveFeedback: isPositiveFeedback.value ?? false,
+          comment: comment.value,
           isDuplicated: false,
         },
       );
-      this.popup.done(null);
-    },
-  },
-  components: { TextInput },
-});
+
+      suggestionSubmittedSuccessfully.value = true;
+    } else {
+      suggestionIsRequired.value = true;
+    }
+  } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((err as any).errorType === "EXISTING_FEEDBACK_ERROR") {
+      existingFeedbackErrorMessage.value = true;
+    }
+
+    suggestionSubmittedSuccessfully.value = false;
+  }
+}
+
+function markQuestionAsPositive() {
+  suggestionIsRequired.value = false;
+  isPositiveFeedback.value = true;
+}
+
+function markQuestionAsNegative() {
+  suggestionIsRequired.value = false;
+  isPositiveFeedback.value = false;
+}
 </script>
+<script lang="ts">
+export default {
+  name: "SuggestQuestionForFineTuningIntegrated",
+  inheritAttrs: false,
+  customOptions: {},
+};
+</script>
+<style scoped>
+.container {
+  padding: 20px;
+}
+.feedback-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 5px;
+  margin: 5px;
+  border-radius: 5px;
+}
+.positive-feedback-btn.feedback-btn.selected {
+  background-color: green;
+}
+.negative-feedback-btn.feedback-btn.selected {
+  background-color: red;
+}
+.feedback-actions-container {
+  display: flex;
+  align-items: center;
+}
+.suggestion-sent-successfully-message {
+  margin-left: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: green;
+  color: white;
+}
+</style>

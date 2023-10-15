@@ -28,6 +28,7 @@ describe("QuizQuestion", () => {
       helper.apiMock.expectingPost(
         `/api/quiz-questions/${quizQuestion.quizQuestionId}/suggest-fine-tuning`,
       );
+      wrapper.get(".negative-feedback-btn").trigger("click");
       wrapper.get("button.btn-success").trigger("click");
       await flushPromises();
     });
