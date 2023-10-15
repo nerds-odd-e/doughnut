@@ -5,17 +5,18 @@
 
 import { Then, When } from "@badeball/cypress-cucumber-preprocessor"
 import "../support/string.extensions"
+import pageObjects from "page_objects"
 
 When("I start searching", () => {
   cy.startSearching()
 })
 
 When("I am creating link for note {string}", (noteTopic: string) => {
-  cy.startSearchingAndLinkNote(noteTopic)
+  pageObjects.jumpToNotePage(noteTopic).startSearchingAndLinkNote()
 })
 
 function makingLink(cy, fromNoteTopic: string, linkType: string, toNoteTopic: string) {
-  cy.startSearchingAndLinkNote(fromNoteTopic)
+  pageObjects.jumpToNotePage(fromNoteTopic).startSearchingAndLinkNote()
   cy.searchNote(toNoteTopic, ["All My Notebooks And Subscriptions"])
   cy.clickButtonOnCardBody(toNoteTopic, "Select")
   cy.clickRadioByLabel(linkType)
