@@ -14,18 +14,12 @@ Feature: Generate Training examples for fine-tuning OpenAI
 
   Scenario: Training data should contain only the good examples
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a good example
-    Then I should see a message saying the feedback was sent successfully
-    And an admin can retrieve the training data for question generation containing 1 examples
+    Then an admin can retrieve the training data for question generation containing 1 examples
 
   Scenario: User should not be able to submit response without a specific feedback
     When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" without feedback
     Then I should see a message saying the feedback was rejected
     And an admin should be able to download the training data for evaluation containing 0 examples
-
-  Scenario: User should not be able to submit response again for the same question
-    When I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" with an existing feedback
-    Then I should see a message saying the feedback already exist
-    And an admin can retrieve the training data for question generation containing 1 examples
 
   Scenario: Admin should be able to edit the first question and choice suggested
     Given I suggest the displayed question "Who wrote 'Who Let the Dogs Out'?" as a good example

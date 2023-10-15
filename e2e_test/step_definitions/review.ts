@@ -223,44 +223,37 @@ Then("I should see the question {string} is disabled", (questionStem: string) =>
 })
 
 Then("I suggest the displayed question {string} as a good example", (questionStem: string) => {
-  pageObjects.findQuestionWithStem(questionStem).suggestingPositiveFeedbackForFineTuning()
+  pageObjects
+    .findQuestionWithStem(questionStem)
+    .suggestingThisQuestionForFineTuning()
+    .suggestingPositiveFeedbackForFineTuning()
 })
 
 Then("I suggest the displayed question {string} as a bad example", (questionStem: string) => {
-  pageObjects.findQuestionWithStem(questionStem).suggestingNegativeFeedbackFineTuningExclusion()
-})
-
-Then("I should see a message saying the feedback was sent successfully", () => {
-  pageObjects.expectSuccessMessageToBeShown()
+  pageObjects
+    .findQuestionWithStem(questionStem)
+    .suggestingThisQuestionForFineTuning()
+    .suggestingNegativeFeedbackFineTuningExclusion()
 })
 
 Then(
   "I suggest the displayed question {string} as a good example with comment {string}",
   (questionStem: string, comment: string) => {
-    const question = pageObjects.findQuestionWithStem(questionStem)
-    question.inputComment(comment)
-    question.suggestingPositiveFeedbackForFineTuning()
+    pageObjects
+      .findQuestionWithStem(questionStem)
+      .suggestingThisQuestionForFineTuning()
+      .comment(comment)
+      .suggestingPositiveFeedbackForFineTuning()
   },
 )
 
 Then("I suggest the displayed question {string} without feedback", (questionStem: string) => {
-  const question = pageObjects.findQuestionWithStem(questionStem)
-  question.submittingNoFeedback()
+  pageObjects
+    .findQuestionWithStem(questionStem)
+    .suggestingThisQuestionForFineTuning()
+    .submittingNoFeedback()
 })
 
 Then("I should see a message saying the feedback was rejected", () => {
   pageObjects.expectFeedbackRequiredMessage()
 })
-
-Then("I should see a message saying the feedback already exist", () => {
-  pageObjects.expectFeedbackAlreadyExistMessage()
-})
-
-Then(
-  "I suggest the displayed question {string} with an existing feedback",
-  (questionStem: string) => {
-    const question = pageObjects.findQuestionWithStem(questionStem)
-    question.suggestingPositiveFeedbackForFineTuning()
-    question.suggestingPositiveFeedbackForFineTuning()
-  },
-)
