@@ -26,6 +26,9 @@ const jumpToNotePage = (noteTopic: string, forceLoadPage = false) => {
     startSearchingAndLinkNote() {
       cy.notePageButtonOnCurrentPage("search and link note").click()
     },
+    aiGenerateImage: () => {
+      cy.clickNotePageMoreOptionsButton(noteTopic, "Generate Image with DALL-E")
+    },
   }
 }
 

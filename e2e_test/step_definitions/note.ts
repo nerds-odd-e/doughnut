@@ -283,7 +283,7 @@ Then("I should see the note details on current page becomes {string}", (detailsT
 })
 
 When("I generate an image for {string}", (noteTopic: string) => {
-  cy.aiGenerateImage(noteTopic)
+  pageObjects.jumpToNotePage(noteTopic).aiGenerateImage()
 })
 
 Then("I should find an art created by the ai", () => {
