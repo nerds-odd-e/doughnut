@@ -25,5 +25,9 @@ export const jumpToNotePage = (noteTopic: string, forceLoadPage = false) => {
     clickNotePageMoreOptionsButton: (btnTextOrTitle: string) => {
       cy.clickNotePageMoreOptionsButtonOnCurrentPage(btnTextOrTitle)
     },
+    associateNoteWithWikidataId(wikiID: string) {
+      cy.notePageButtonOnCurrentPage("associate wikidata").click()
+      cy.replaceFocusedTextAndEnter(wikiID)
+    },
   }
 }

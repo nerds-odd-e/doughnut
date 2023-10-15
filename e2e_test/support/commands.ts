@@ -505,12 +505,6 @@ Cypress.Commands.add("noteByTitle", (noteTopic: string) => {
     .then(($attr) => /notes\/(\d+)/g.exec($attr)[1])
 })
 
-Cypress.Commands.add("associateNoteWithWikidataId", (topic, wikiID) => {
-  cy.jumpToNotePage(topic, true)
-  cy.notePageButtonOnCurrentPage("associate wikidata").click()
-  cy.replaceFocusedTextAndEnter(wikiID)
-})
-
 Cypress.Commands.add("expectFieldErrorMessage", (field: string, message: string) => {
   cy.formField(field).siblings(".error-msg").findByText(message)
 })

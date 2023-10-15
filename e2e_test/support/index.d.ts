@@ -6,7 +6,6 @@ declare namespace Cypress {
   interface Chainable<Subject = any> {
     dismissLastErrorMessage(): Chainable<any>
     addSiblingNoteButton(): Chainable<any>
-    associateNoteWithWikidataId(topic: any, wikiID: any): Chainable<any>
     backendTimeTravelTo(day: number, hour: number): Chainable<Subject>
     backendTimeTravelRelativeToNow(hours: number): Chainable<Subject>
     cleanDBAndResetTestabilitySettings(): Chainable<Subject>
