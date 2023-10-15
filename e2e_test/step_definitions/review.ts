@@ -6,7 +6,7 @@ import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor"
 import pageObjects from "../page_objects"
 import { DataTable } from "@cucumber/cucumber"
 
-Then("I do these initial reviews in sequence:", (data) => {
+Then("I do these initial reviews in sequence:", (data: DataTable) => {
   cy.initialReviewInSequence(data.hashes())
 })
 
@@ -213,6 +213,40 @@ When(
     pageObjects.chatAboutNote(noteTopic).testMe()
   },
 )
+
+When("I have the true false question {string} rated as a good example", (questionStem: string) => {
+  const noteTopic = `A note discussing "${questionStem}"`
+  cy.testability().seedNotes([{ topic: noteTopic }])
+  pageObjects.questionGenerationService().stubAskSingleAnswerMultipleChoiceQuestion({
+    "Question Stem": questionStem,
+    "Correct Choice": "True",
+    "Incorrect Choice 1": "False",
+  })
+  pageObjects.chatAboutNote(noteTopic).testMe()
+
+  pageObjects
+    .findQuestionWithStem(questionStem)
+    .suggestingThisQuestionForFineTuning()
+    .comment("This question is good")
+    .suggestingPositiveFeedbackForFineTuning()
+})
+
+When("I have the true false question {string} rated as a bad example", (questionStem: string) => {
+  const noteTopic = `A note discussing "${questionStem}"`
+  cy.testability().seedNotes([{ topic: noteTopic }])
+  pageObjects.questionGenerationService().stubAskSingleAnswerMultipleChoiceQuestion({
+    "Question Stem": questionStem,
+    "Correct Choice": "True",
+    "Incorrect Choice 1": "False",
+  })
+  pageObjects.chatAboutNote(noteTopic).testMe()
+
+  pageObjects
+    .findQuestionWithStem(questionStem)
+    .suggestingThisQuestionForFineTuning()
+    .comment("This question is not good")
+    .suggestingNegativeFeedbackFineTuningExclusion()
+})
 
 Then("I should be asked {string}", (expectedQuestionStem: string) => {
   pageObjects.findQuestionWithStem(expectedQuestionStem)
