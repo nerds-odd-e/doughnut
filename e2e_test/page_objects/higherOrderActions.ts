@@ -1,9 +1,9 @@
 import { questionGenerationService } from "./questionGenerationService"
 import { chatAboutNotePage } from "./chatAboutNotePage"
+import { jumpToNotePage } from "./jumpToNotePage"
 
 const chatAboutNote = (noteTopic: string) => {
-  cy.jumpToNotePage(noteTopic)
-  cy.clickNotePageMoreOptionsButton(noteTopic, "chat about this note")
+  jumpToNotePage(noteTopic).clickNotePageMoreOptionsButton("chat about this note")
   return chatAboutNotePage()
 }
 

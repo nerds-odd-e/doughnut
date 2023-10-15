@@ -273,14 +273,6 @@ Cypress.Commands.add("startSearching", () => {
   cy.notePageButtonOnCurrentPage("search note").click()
 })
 
-Cypress.Commands.add(
-  "clickNotePageMoreOptionsButton",
-  (noteTopic: string, btnTextOrTitle: string) => {
-    cy.jumpToNotePage(noteTopic)
-    cy.clickNotePageMoreOptionsButtonOnCurrentPage(btnTextOrTitle)
-  },
-)
-
 Cypress.Commands.add("clickNotePageMoreOptionsButtonOnCurrentPage", (btnTextOrTitle: string) => {
   cy.notePageButtonOnCurrentPage("more options").click()
   cy.notePageButtonOnCurrentPage(btnTextOrTitle).click()

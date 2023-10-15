@@ -9,37 +9,10 @@ import { adminDashboardPage } from "./adminPages/adminDashboardPage"
 import mock_services from "./mock_services"
 import { questionGenerationService } from "./questionGenerationService"
 import { higherOrderActions } from "./higherOrderActions"
-
-// jumptoNotePage is faster than navigateToNotePage
-//    it uses the note id memorized when creating them with testability api
-const jumpToNotePage = (noteTopic: string, forceLoadPage = false) => {
-  cy.testability()
-    .getSeededNoteIdByTitle(noteTopic)
-    .then((noteId) => {
-      const url = `/notes/${noteId}`
-      if (forceLoadPage) cy.visit(url)
-      else cy.routerPush(url, "noteShow", { noteId: noteId })
-    })
-  cy.findNoteTopic(noteTopic)
-
-  return {
-    startSearchingAndLinkNote() {
-      cy.notePageButtonOnCurrentPage("search and link note").click()
-    },
-    aiGenerateImage: () => {
-      cy.clickNotePageMoreOptionsButton(noteTopic, "Generate Image with DALL-E")
-    },
-    deleteNote: () => {
-      cy.clickNotePageMoreOptionsButton(noteTopic, "Delete note")
-      cy.findByRole("button", { name: "OK" }).click()
-      cy.pageIsNotLoading()
-    },
-  }
-}
+import { jumpToNotePage } from "./jumpToNotePage"
 
 const chatAboutNote = (noteTopic: string) => {
-  jumpToNotePage(noteTopic)
-  cy.clickNotePageMoreOptionsButton(noteTopic, "chat about this note")
+  jumpToNotePage(noteTopic).clickNotePageMoreOptionsButton("chat about this note")
   return chatAboutNotePage()
 }
 
