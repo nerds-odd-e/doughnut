@@ -273,11 +273,6 @@ Cypress.Commands.add("startSearching", () => {
   cy.notePageButtonOnCurrentPage("search note").click()
 })
 
-Cypress.Commands.add("clickNotePageButton", (noteTopic, btnTextOrTitle, forceLoadPage) => {
-  cy.jumpToNotePage(noteTopic, forceLoadPage)
-  cy.notePageButtonOnCurrentPage(btnTextOrTitle).click()
-})
-
 Cypress.Commands.add(
   "clickNotePageMoreOptionsButton",
   (noteTopic: string, btnTextOrTitle: string) => {
@@ -525,7 +520,8 @@ Cypress.Commands.add("noteByTitle", (noteTopic: string) => {
 })
 
 Cypress.Commands.add("associateNoteWithWikidataId", (topic, wikiID) => {
-  cy.clickNotePageButton(topic, "associate wikidata", true)
+  cy.jumpToNotePage(topic, true)
+  cy.notePageButtonOnCurrentPage("associate wikidata").click()
   cy.replaceFocusedTextAndEnter(wikiID)
 })
 
