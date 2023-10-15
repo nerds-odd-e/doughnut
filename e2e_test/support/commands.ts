@@ -241,14 +241,14 @@ Cypress.Commands.add("routerPush", (fallback, name, params) => {
           query: { time: Date.now() }, // make sure the route re-render
         })
         if (!failed) {
-          await cy.get(".modal-body").should("not.exist")
+          cy.dialogDisappeared()
           return
         }
         cy.log("router push failed")
         cy.log(failed)
       }
-      await cy.wrap("yes").as("firstVisited")
-      await cy.visit(fallback)
+      cy.wrap("yes").as("firstVisited")
+      cy.visit(fallback)
     })
   })
 })
