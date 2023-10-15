@@ -15,7 +15,7 @@
       :quiz-question="quizQuestion"
       @answered="onAnswered($event)"
     />
-    <SuggestQuestionForFineTuningIntegrated :quiz-question="quizQuestion" />
+    <SuggestQuestionForFineTuning :quiz-question="quizQuestion" />
   </div>
   <div v-show="answered" class="chat-answer-container">
     <img src="/user-icon.svg" class="chat-answer-icon" />
@@ -67,7 +67,7 @@ import type { StorageAccessor } from "@/store/createNoteStorage";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import QuizQuestion from "../review/QuizQuestion.vue";
 import AnsweredQuestion from "../review/AnsweredQuestion.vue";
-import SuggestQuestionForFineTuningIntegrated from "./SuggestQuestionForFineTuningIntegrated.vue";
+import SuggestQuestionForFineTuning from "../ai/SuggestQuestionForFineTuning.vue";
 
 export default defineComponent({
   setup() {
@@ -83,7 +83,7 @@ export default defineComponent({
   components: {
     QuizQuestion,
     AnsweredQuestion,
-    SuggestQuestionForFineTuningIntegrated,
+    SuggestQuestionForFineTuning,
   },
   data() {
     return {

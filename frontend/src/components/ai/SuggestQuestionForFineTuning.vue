@@ -53,6 +53,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
+import asPopup from "../commons/Popups/asPopup";
 
 const isPositiveFeedback = ref<boolean | null>(null);
 const comment = ref<string>("");
@@ -60,6 +61,7 @@ const suggestionSubmittedSuccessfully = ref<boolean>(false);
 const suggestionIsRequired = ref<boolean>(false);
 const existingFeedbackErrorMessage = ref<boolean>(false);
 const { api } = useLoadingApi();
+const { popup } = asPopup();
 
 const props = defineProps<{
   quizQuestion: Generated.QuizQuestion | undefined;
@@ -84,6 +86,7 @@ async function suggestQuestionForFineTuning() {
       );
 
       suggestionSubmittedSuccessfully.value = true;
+      popup.done(null);
     } else {
       suggestionIsRequired.value = true;
     }
