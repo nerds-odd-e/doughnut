@@ -29,6 +29,11 @@ const jumpToNotePage = (noteTopic: string, forceLoadPage = false) => {
     aiGenerateImage: () => {
       cy.clickNotePageMoreOptionsButton(noteTopic, "Generate Image with DALL-E")
     },
+    deleteNote: () => {
+      cy.clickNotePageMoreOptionsButton(noteTopic, "Delete note")
+      cy.findByRole("button", { name: "OK" }).click()
+      cy.pageIsNotLoading()
+    },
   }
 }
 

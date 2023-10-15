@@ -146,16 +146,16 @@ Then("I should see {notepath} with these children", (notePath: NotePath, data: D
 })
 
 When("I delete notebook {string}", (noteTopic: string) => {
-  cy.deleteNote(noteTopic)
+  pageObjects.jumpToNotePage(noteTopic).deleteNote()
 })
 
 When("I delete note {string} at {int}:00", (noteTopic: string, hour: number) => {
   cy.testability().backendTimeTravelTo(0, hour)
-  cy.deleteNote(noteTopic)
+  pageObjects.jumpToNotePage(noteTopic).deleteNote()
 })
 
 When("I delete note {string}", (noteTopic: string) => {
-  cy.deleteNote(noteTopic)
+  pageObjects.jumpToNotePage(noteTopic).deleteNote()
 })
 
 When("I create a sibling note of {string}:", (noteTopic: string, data: DataTable) => {
