@@ -200,7 +200,7 @@ Then("the choice {string} should be incorrect", (choice: string) => {
 })
 
 When("I ask to generate a question for the note {string}", (noteTopic: string) => {
-  pageObjects.chatAboutNote(noteTopic).testMe()
+  pageObjects.jumpToNotePage(noteTopic).chatAboutNote().testMe()
 })
 
 When(

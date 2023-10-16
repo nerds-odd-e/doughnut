@@ -11,10 +11,6 @@ import { questionGenerationService } from "./questionGenerationService"
 import { higherOrderActions } from "./higherOrderActions"
 import { jumpToNotePage } from "./jumpToNotePage"
 
-const chatAboutNote = (noteTopic: string) => {
-  jumpToNotePage(noteTopic).chatAboutNote()
-}
-
 const loginAsAdminAndGoToAdminDashboard = () => {
   cy.loginAs("admin")
   cy.reload()
@@ -32,7 +28,6 @@ const pageObjects = {
   findQuestionWithStem,
   currentQuestion,
   expectFeedbackRequiredMessage,
-  chatAboutNote,
   chatAboutNotePage,
   loginAsAdminAndGoToAdminDashboard,
 }

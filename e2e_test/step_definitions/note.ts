@@ -303,5 +303,5 @@ Then("I should see that the open AI service is not available in controller bar",
 })
 
 When("I start to chat about the note {string}", (noteTopic: string) => {
-  pageObjects.chatAboutNote(noteTopic)
+  pageObjects.jumpToNotePage(noteTopic).chatAboutNote()
 })

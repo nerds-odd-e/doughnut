@@ -95,6 +95,5 @@ declare namespace Cypress {
     updateCurrentUserSettingsWith(hash: Record<string, string>): Chainable<Subject>
     setServiceUrl(serviceName: string, serviceUrl: string): Chainable<any>
     yesIRemember(): Chainable<any>
-    addCommentToCurrentNote(commentText: string): Chainable<any>
   }
 }
