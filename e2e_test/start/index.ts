@@ -1,4 +1,3 @@
-import { expectFeedbackRequiredMessage } from "./pageObjects/QuizQuestionPage"
 import mock_services from "./mock_services"
 import { questionGenerationService } from "./questionGenerationService"
 import { higherOrderActions } from "./higherOrderActions"
@@ -8,7 +7,6 @@ const start = {
   ...basicActions,
   higherOrderActions,
   questionGenerationService,
-  expectFeedbackRequiredMessage,
 }
 export default start
 export { mock_services }

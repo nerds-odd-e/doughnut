@@ -234,6 +234,17 @@ When("I have the true false question {string} rated as a bad example", (question
     .suggestingNegativeFeedbackFineTuningExclusion()
 })
 
+Then(
+  "I suggest the displayed question {string} as a good example with comment {string}",
+  (questionStem: string, comment: string) => {
+    start
+      .assumeQuestionPage(questionStem)
+      .suggestingThisQuestionForFineTuning()
+      .comment(comment)
+      .suggestingPositiveFeedbackForFineTuning()
+  },
+)
+
 Then("I should be asked {string}", (expectedQuestionStem: string) => {
   start.assumeQuestionPage(expectedQuestionStem)
 })
@@ -256,17 +267,6 @@ Then("I suggest the displayed question {string} as a bad example", (questionStem
     .suggestingNegativeFeedbackFineTuningExclusion()
 })
 
-Then(
-  "I suggest the displayed question {string} as a good example with comment {string}",
-  (questionStem: string, comment: string) => {
-    start
-      .assumeQuestionPage(questionStem)
-      .suggestingThisQuestionForFineTuning()
-      .comment(comment)
-      .suggestingPositiveFeedbackForFineTuning()
-  },
-)
-
 Then("I suggest the displayed question {string} without feedback", (questionStem: string) => {
   start
     .assumeQuestionPage(questionStem)
@@ -275,5 +275,5 @@ Then("I suggest the displayed question {string} without feedback", (questionStem
 })
 
 Then("I should see a message saying the feedback was rejected", () => {
-  start.expectFeedbackRequiredMessage()
+  start.assumeQuestionPage().expectFeedbackRequiredMessage()
 })

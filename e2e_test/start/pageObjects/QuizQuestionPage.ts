@@ -25,11 +25,10 @@ const assumeQuestionPage = (stem?: string) => {
 
       return SuggestQuestionForFineTuningPage()
     },
+    expectFeedbackRequiredMessage: () => {
+      cy.get(".feedback-required-message")
+    },
   }
 }
 
-const expectFeedbackRequiredMessage = () => {
-  cy.get(".feedback-required-message")
-}
-
-export { assumeQuestionPage, expectFeedbackRequiredMessage }
+export { assumeQuestionPage }
