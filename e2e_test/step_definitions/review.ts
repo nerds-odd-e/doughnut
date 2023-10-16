@@ -170,22 +170,29 @@ Then("The randomizer always choose the last", () => {
 })
 
 Then("I should see that my answer is correct", () => {
-  start.answeredQuestionPage().expectLastAnswerToBeCorrect()
+  start.assumeAnsweredQuestionPage().expectLastAnswerToBeCorrect()
 })
 
 Then("I should see that my last answer is correct", () => {
-  start.goToLastResult().expectLastAnswerToBeCorrect()
+  start.assumeAnsweredQuestionPage().goToLastResult().expectLastAnswerToBeCorrect()
 })
 
 Then(
   "I should see the review point info of note {string}",
   (noteTopic: string, data: DataTable) => {
-    start.answeredQuestionPage().showReviewPoint(noteTopic).expectReviewPointInfo(data.hashes()[0])
+    start
+      .assumeAnsweredQuestionPage()
+      .showReviewPoint(noteTopic)
+      .expectReviewPointInfo(data.hashes()[0])
   },
 )
 
 Then("choose to remove the last review point from reviews", () => {
-  start.goToLastResult().showReviewPoint().removeReviewPointFromReview()
+  start
+    .assumeAnsweredQuestionPage()
+    .goToLastResult()
+    .showReviewPoint()
+    .removeReviewPointFromReview()
 })
 
 Then("the choice {string} should be correct", (choice: string) => {

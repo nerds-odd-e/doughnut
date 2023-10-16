@@ -1,4 +1,4 @@
-const answeredQuestionPage = () => {
+const assumeAnsweredQuestionPage = () => {
   return {
     expectLastAnswerToBeCorrect() {
       // checking the css name isn't the best solution
@@ -23,12 +23,11 @@ const answeredQuestionPage = () => {
         },
       }
     },
+    goToLastResult: () => {
+      cy.findByRole("button", { name: "view last result" }).click()
+      return assumeAnsweredQuestionPage()
+    },
   }
 }
 
-const goToLastResult = () => {
-  cy.findByRole("button", { name: "view last result" }).click()
-  return answeredQuestionPage()
-}
-
-export { goToLastResult, answeredQuestionPage }
+export { assumeAnsweredQuestionPage }

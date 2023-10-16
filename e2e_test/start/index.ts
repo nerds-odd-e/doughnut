@@ -3,7 +3,6 @@ import {
   expectFeedbackRequiredMessage,
   currentQuestion,
 } from "./pageObjects/QuizQuestionPage"
-import { goToLastResult, answeredQuestionPage } from "./pageObjects/AnsweredQuestionPage"
 import mock_services from "./mock_services"
 import { questionGenerationService } from "./questionGenerationService"
 import { higherOrderActions } from "./higherOrderActions"
@@ -13,8 +12,6 @@ const start = {
   ...basicActions,
   higherOrderActions,
   questionGenerationService,
-  answeredQuestionPage,
-  goToLastResult,
   findQuestionWithStem,
   currentQuestion,
   expectFeedbackRequiredMessage,
