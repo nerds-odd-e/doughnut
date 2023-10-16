@@ -1,6 +1,6 @@
 import { adminFineTuningPage } from "./adminFineTuningPage"
 
-export function adminDashboardPage() {
+export function assumeAdminDashboardPage() {
   return {
     goToFailureReportList() {
       cy.findByText("Failure Reports").click()

@@ -1,7 +1,9 @@
+import { assumeAdminDashboardPage } from "./pageObjects/adminPages/adminDashboardPage"
 import { assumeChatAboutNotePage } from "./pageObjects/chatAboutNotePage"
 import { assumeNotePage } from "./pageObjects/notePage"
 
 export default {
+  assumeChatAboutNotePage,
   // jumptoNotePage is faster than navigateToNotePage
   //    it uses the note id memorized when creating them with testability api
   jumpToNotePage: (noteTopic: string, forceLoadPage = false) => {
@@ -16,5 +18,11 @@ export default {
 
     return assumeNotePage()
   },
-  assumeChatAboutNotePage,
+  loginAsAdminAndGoToAdminDashboard: () => {
+    cy.loginAs("admin")
+    cy.reload()
+    cy.openSidebar()
+    cy.findByText("Admin Dashboard").click()
+    return assumeAdminDashboardPage()
+  },
 }
