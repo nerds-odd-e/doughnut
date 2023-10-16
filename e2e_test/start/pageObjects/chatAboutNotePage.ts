@@ -1,6 +1,6 @@
 import { findQuestionWithStem } from "./QuizQuestionPage"
 
-export function chatAboutNotePage() {
+export function assumeChatAboutNotePage() {
   return {
     testMe() {
       cy.findByRole("button", { name: "Test me" }).click()

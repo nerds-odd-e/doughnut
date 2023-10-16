@@ -1,4 +1,5 @@
-import { notePage } from "./pageObjects/notePage"
+import { assumeChatAboutNotePage } from "./pageObjects/chatAboutNotePage"
+import { assumeNotePage } from "./pageObjects/notePage"
 
 export default {
   // jumptoNotePage is faster than navigateToNotePage
@@ -13,6 +14,7 @@ export default {
       })
     cy.findNoteTopic(noteTopic)
 
-    return notePage()
+    return assumeNotePage()
   },
+  assumeChatAboutNotePage,
 }

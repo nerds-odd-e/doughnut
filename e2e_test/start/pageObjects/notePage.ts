@@ -1,6 +1,6 @@
-import { chatAboutNotePage } from "./chatAboutNotePage"
+import { assumeChatAboutNotePage } from "./chatAboutNotePage"
 
-export const notePage = () => {
+export const assumeNotePage = () => {
   const clickNotePageMoreOptionsButton = (btnTextOrTitle: string) => {
     cy.clickNotePageMoreOptionsButtonOnCurrentPage(btnTextOrTitle)
   }
@@ -29,7 +29,7 @@ export const notePage = () => {
     },
     chatAboutNote() {
       clickNotePageMoreOptionsButton("chat about this note")
-      return chatAboutNotePage()
+      return assumeChatAboutNotePage()
     },
   }
 }

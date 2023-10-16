@@ -4,7 +4,6 @@ import {
   currentQuestion,
 } from "./pageObjects/QuizQuestionPage"
 import { goToLastResult, answeredQuestionPage } from "./pageObjects/AnsweredQuestionPage"
-import { chatAboutNotePage } from "./pageObjects/chatAboutNotePage"
 import { adminDashboardPage } from "./pageObjects/adminPages/adminDashboardPage"
 import mock_services from "./mock_services"
 import { questionGenerationService } from "./questionGenerationService"
@@ -28,7 +27,6 @@ const start = {
   findQuestionWithStem,
   currentQuestion,
   expectFeedbackRequiredMessage,
-  chatAboutNotePage,
   loginAsAdminAndGoToAdminDashboard,
 }
 export default start
