@@ -1,4 +1,4 @@
-import { notePage } from "./notePage"
+import { notePage } from "./pageObjects/notePage"
 
 export default {
   // jumptoNotePage is faster than navigateToNotePage
