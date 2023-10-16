@@ -7,9 +7,9 @@ import start from "../start"
 import { When, Then } from "@badeball/cypress-cucumber-preprocessor"
 
 When("I send the message {string} to AI", (question: string) => {
-  start.chatAboutNotePage().sendMessage(question)
+  start.assumeChatAboutNotePage().sendMessage(question)
 })
 
 Then("I should receive the response {string}", (answer: string) => {
-  start.chatAboutNotePage().expectResponse(answer)
+  start.assumeChatAboutNotePage().expectResponse(answer)
 })
