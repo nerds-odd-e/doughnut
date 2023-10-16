@@ -1,4 +1,7 @@
 // jumptoNotePage is faster than navigateToNotePage
+
+import { chatAboutNotePage } from "./chatAboutNotePage"
+
 //    it uses the note id memorized when creating them with testability api
 export const jumpToNotePage = (noteTopic: string, forceLoadPage = false) => {
   cy.testability()
@@ -10,20 +13,21 @@ export const jumpToNotePage = (noteTopic: string, forceLoadPage = false) => {
     })
   cy.findNoteTopic(noteTopic)
 
+  const clickNotePageMoreOptionsButton = (btnTextOrTitle: string) => {
+    cy.clickNotePageMoreOptionsButtonOnCurrentPage(btnTextOrTitle)
+  }
+
   return {
     startSearchingAndLinkNote() {
       cy.notePageButtonOnCurrentPage("search and link note").click()
     },
     aiGenerateImage() {
-      this.clickNotePageMoreOptionsButton("Generate Image with DALL-E")
+      clickNotePageMoreOptionsButton("Generate Image with DALL-E")
     },
     deleteNote() {
-      this.clickNotePageMoreOptionsButton("Delete note")
+      clickNotePageMoreOptionsButton("Delete note")
       cy.findByRole("button", { name: "OK" }).click()
       cy.pageIsNotLoading()
-    },
-    clickNotePageMoreOptionsButton: (btnTextOrTitle: string) => {
-      cy.clickNotePageMoreOptionsButtonOnCurrentPage(btnTextOrTitle)
     },
     associateNoteWithWikidataId(wikiID: string) {
       cy.notePageButtonOnCurrentPage("associate wikidata").click()
@@ -34,6 +38,10 @@ export const jumpToNotePage = (noteTopic: string, forceLoadPage = false) => {
         return false
       })
       cy.findByRole("button", { name: "suggest details" }).click()
+    },
+    chatAboutNote() {
+      clickNotePageMoreOptionsButton("chat about this note")
+      return chatAboutNotePage()
     },
   }
 }

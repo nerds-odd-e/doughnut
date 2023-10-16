@@ -12,8 +12,7 @@ import { higherOrderActions } from "./higherOrderActions"
 import { jumpToNotePage } from "./jumpToNotePage"
 
 const chatAboutNote = (noteTopic: string) => {
-  jumpToNotePage(noteTopic).clickNotePageMoreOptionsButton("chat about this note")
-  return chatAboutNotePage()
+  jumpToNotePage(noteTopic).chatAboutNote()
 }
 
 const loginAsAdminAndGoToAdminDashboard = () => {

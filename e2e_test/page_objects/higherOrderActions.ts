@@ -1,11 +1,5 @@
 import { questionGenerationService } from "./questionGenerationService"
-import { chatAboutNotePage } from "./chatAboutNotePage"
 import { jumpToNotePage } from "./jumpToNotePage"
-
-const chatAboutNote = (noteTopic: string) => {
-  jumpToNotePage(noteTopic).clickNotePageMoreOptionsButton("chat about this note")
-  return chatAboutNotePage()
-}
 
 export const higherOrderActions = () => {
   return {
@@ -24,7 +18,7 @@ export const higherOrderActions = () => {
     ) => {
       cy.testability().seedNotes([{ topic: noteTopic }])
       questionGenerationService().stubAskSingleAnswerMultipleChoiceQuestion(question)
-      chatAboutNote(noteTopic).testMe()
+      jumpToNotePage(noteTopic).chatAboutNote().testMe()
     },
   }
 }
