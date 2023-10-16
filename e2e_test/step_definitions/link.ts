@@ -5,18 +5,18 @@
 
 import { Then, When } from "@badeball/cypress-cucumber-preprocessor"
 import "../support/string.extensions"
-import pageObjects from "page_objects"
+import start from "start"
 
 When("I start searching", () => {
   cy.startSearching()
 })
 
 When("I am creating link for note {string}", (noteTopic: string) => {
-  pageObjects.jumpToNotePage(noteTopic).startSearchingAndLinkNote()
+  start.jumpToNotePage(noteTopic).startSearchingAndLinkNote()
 })
 
 function makingLink(cy, fromNoteTopic: string, linkType: string, toNoteTopic: string) {
-  pageObjects.jumpToNotePage(fromNoteTopic).startSearchingAndLinkNote()
+  start.jumpToNotePage(fromNoteTopic).startSearchingAndLinkNote()
   cy.searchNote(toNoteTopic, ["All My Notebooks And Subscriptions"])
   cy.clickButtonOnCardBody(toNoteTopic, "Select")
   cy.clickRadioByLabel(linkType)
@@ -104,14 +104,14 @@ Then(
 )
 
 Then("I should see {string} has no link to {string}", (noteTopic: string, targetTitle: string) => {
-  pageObjects.jumpToNotePage(noteTopic)
+  start.jumpToNotePage(noteTopic)
   cy.findByText(targetTitle).should("not.exist")
 })
 
 Then(
   "I change the link from {string} to {string} to {string}",
   (noteTopic: string, targetTitle: string, linkType: string) => {
-    pageObjects.jumpToNotePage(noteTopic)
+    start.jumpToNotePage(noteTopic)
     cy.changeLinkType(targetTitle, linkType)
   },
 )
@@ -122,7 +122,7 @@ Then("I should be able to delete the link", () => {
 
 Then("I delete the link from {string} to {string}", (noteTopic: string, targetTitle: string) => {
   cy.pageIsNotLoading()
-  pageObjects.jumpToNotePage(noteTopic)
+  start.jumpToNotePage(noteTopic)
   cy.clickLinkNob(targetTitle)
   cy.findByRole("button", { name: "Delete" }).click()
   cy.findByRole("button", { name: "Cancel" }).click()

@@ -3,11 +3,11 @@
 // @ts-check
 
 import { DataTable, Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
-import { mock_services } from "page_objects"
-import pageObjects from "page_objects"
+import { mock_services } from "start"
+import start from "start"
 
 When("I associate the note {string} with wikidata id {string}", (topic: string, wikiID: string) => {
-  pageObjects.jumpToNotePage(topic).associateNoteWithWikidataId(wikiID)
+  start.jumpToNotePage(topic).associateNoteWithWikidataId(wikiID)
 })
 
 When("I need to confirm the association with different label {string}", (wikidataTitle: string) => {

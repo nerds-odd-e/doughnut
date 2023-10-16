@@ -19,7 +19,7 @@ const loginAsAdminAndGoToAdminDashboard = () => {
   return adminDashboardPage()
 }
 
-const pageObjects = {
+const start = {
   higherOrderActions,
   jumpToNotePage,
   questionGenerationService,
@@ -31,5 +31,5 @@ const pageObjects = {
   chatAboutNotePage,
   loginAsAdminAndGoToAdminDashboard,
 }
-export default pageObjects
+export default start
 export { mock_services }

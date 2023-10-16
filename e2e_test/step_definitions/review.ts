@@ -3,7 +3,7 @@
 // @ts-check
 
 import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor"
-import pageObjects from "../page_objects"
+import start from "../start"
 import { DataTable } from "@cucumber/cucumber"
 
 Then("I do these initial reviews in sequence:", (data: DataTable) => {
@@ -170,52 +170,49 @@ Then("The randomizer always choose the last", () => {
 })
 
 Then("I should see that my answer is correct", () => {
-  pageObjects.answeredQuestionPage().expectLastAnswerToBeCorrect()
+  start.answeredQuestionPage().expectLastAnswerToBeCorrect()
 })
 
 Then("I should see that my last answer is correct", () => {
-  pageObjects.goToLastResult().expectLastAnswerToBeCorrect()
+  start.goToLastResult().expectLastAnswerToBeCorrect()
 })
 
 Then(
   "I should see the review point info of note {string}",
   (noteTopic: string, data: DataTable) => {
-    pageObjects
-      .answeredQuestionPage()
-      .showReviewPoint(noteTopic)
-      .expectReviewPointInfo(data.hashes()[0])
+    start.answeredQuestionPage().showReviewPoint(noteTopic).expectReviewPointInfo(data.hashes()[0])
   },
 )
 
 Then("choose to remove the last review point from reviews", () => {
-  pageObjects.goToLastResult().showReviewPoint().removeReviewPointFromReview()
+  start.goToLastResult().showReviewPoint().removeReviewPointFromReview()
 })
 
 Then("the choice {string} should be correct", (choice: string) => {
-  pageObjects.currentQuestion().expectChoiceToBe(choice, "correct")
+  start.currentQuestion().expectChoiceToBe(choice, "correct")
 })
 
 Then("the choice {string} should be incorrect", (choice: string) => {
-  pageObjects.currentQuestion().expectChoiceToBe(choice, "incorrect")
+  start.currentQuestion().expectChoiceToBe(choice, "incorrect")
 })
 
 When("I ask to generate a question for the note {string}", (noteTopic: string) => {
-  pageObjects.jumpToNotePage(noteTopic).chatAboutNote().testMe()
+  start.jumpToNotePage(noteTopic).chatAboutNote().testMe()
 })
 
 When(
   "I've got the following question for a note with topic {string}:",
   (noteTopic: string, question: DataTable) => {
-    pageObjects
+    start
       .higherOrderActions()
       .stubOpenAIQuestionGenerationAndSeeTheQuestion(noteTopic, question.hashes()[0])
   },
 )
 
 When("I have the true false question {string} rated as a good example", (questionStem: string) => {
-  pageObjects.higherOrderActions().stubOpenAIQuestionGenerationAndSeeTheQuestionSimple(questionStem)
+  start.higherOrderActions().stubOpenAIQuestionGenerationAndSeeTheQuestionSimple(questionStem)
 
-  pageObjects
+  start
     .findQuestionWithStem(questionStem)
     .suggestingThisQuestionForFineTuning()
     .comment("This question is good")
@@ -223,9 +220,9 @@ When("I have the true false question {string} rated as a good example", (questio
 })
 
 When("I have the true false question {string} rated as a bad example", (questionStem: string) => {
-  pageObjects.higherOrderActions().stubOpenAIQuestionGenerationAndSeeTheQuestionSimple(questionStem)
+  start.higherOrderActions().stubOpenAIQuestionGenerationAndSeeTheQuestionSimple(questionStem)
 
-  pageObjects
+  start
     .findQuestionWithStem(questionStem)
     .suggestingThisQuestionForFineTuning()
     .comment("This question is not good")
@@ -233,22 +230,22 @@ When("I have the true false question {string} rated as a bad example", (question
 })
 
 Then("I should be asked {string}", (expectedQuestionStem: string) => {
-  pageObjects.findQuestionWithStem(expectedQuestionStem)
+  start.findQuestionWithStem(expectedQuestionStem)
 })
 
 Then("I should see the question {string} is disabled", (questionStem: string) => {
-  pageObjects.findQuestionWithStem(questionStem).isDisabled()
+  start.findQuestionWithStem(questionStem).isDisabled()
 })
 
 Then("I suggest the displayed question {string} as a good example", (questionStem: string) => {
-  pageObjects
+  start
     .findQuestionWithStem(questionStem)
     .suggestingThisQuestionForFineTuning()
     .suggestingPositiveFeedbackForFineTuning()
 })
 
 Then("I suggest the displayed question {string} as a bad example", (questionStem: string) => {
-  pageObjects
+  start
     .findQuestionWithStem(questionStem)
     .suggestingThisQuestionForFineTuning()
     .suggestingNegativeFeedbackFineTuningExclusion()
@@ -257,7 +254,7 @@ Then("I suggest the displayed question {string} as a bad example", (questionStem
 Then(
   "I suggest the displayed question {string} as a good example with comment {string}",
   (questionStem: string, comment: string) => {
-    pageObjects
+    start
       .findQuestionWithStem(questionStem)
       .suggestingThisQuestionForFineTuning()
       .comment(comment)
@@ -266,12 +263,12 @@ Then(
 )
 
 Then("I suggest the displayed question {string} without feedback", (questionStem: string) => {
-  pageObjects
+  start
     .findQuestionWithStem(questionStem)
     .suggestingThisQuestionForFineTuning()
     .submittingNoFeedback()
 })
 
 Then("I should see a message saying the feedback was rejected", () => {
-  pageObjects.expectFeedbackRequiredMessage()
+  start.expectFeedbackRequiredMessage()
 })

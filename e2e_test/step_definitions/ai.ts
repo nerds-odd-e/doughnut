@@ -4,8 +4,8 @@
 
 import { Given, Then, DataTable } from "@badeball/cypress-cucumber-preprocessor"
 import "../support/string.extensions"
-import pageObjects, { mock_services } from "page_objects"
-import { MessageToMatch } from "page_objects/mock_services/MessageToMatch"
+import start, { mock_services } from "start"
+import { MessageToMatch } from "start/mock_services/MessageToMatch"
 
 Given("open AI service always think the system token is invalid", () => {
   mock_services.openAi().alwaysResponseAsUnauthorized()
@@ -73,7 +73,7 @@ Given("An OpenAI response is unavailable", () => {
 })
 
 Given("OpenAI by default returns this question:", (questionTable: DataTable) => {
-  pageObjects
+  start
     .questionGenerationService()
     .stubAskSingleAnswerMultipleChoiceQuestion(questionTable.hashes()[0])
 })

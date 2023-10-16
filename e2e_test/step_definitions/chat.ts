@@ -2,14 +2,14 @@
 /// <reference types="../support" />
 // @ts-check
 
-import pageObjects from "../page_objects"
+import start from "../start"
 
 import { When, Then } from "@badeball/cypress-cucumber-preprocessor"
 
 When("I send the message {string} to AI", (question: string) => {
-  pageObjects.chatAboutNotePage().sendMessage(question)
+  start.chatAboutNotePage().sendMessage(question)
 })
 
 Then("I should receive the response {string}", (answer: string) => {
-  pageObjects.chatAboutNotePage().expectResponse(answer)
+  start.chatAboutNotePage().expectResponse(answer)
 })
