@@ -196,11 +196,11 @@ Then("choose to remove the last review point from reviews", () => {
 })
 
 Then("the choice {string} should be correct", (choice: string) => {
-  start.currentQuestion().expectChoiceToBe(choice, "correct")
+  start.assumeQuestionPage().expectChoiceToBe(choice, "correct")
 })
 
 Then("the choice {string} should be incorrect", (choice: string) => {
-  start.currentQuestion().expectChoiceToBe(choice, "incorrect")
+  start.assumeQuestionPage().expectChoiceToBe(choice, "incorrect")
 })
 
 When("I ask to generate a question for the note {string}", (noteTopic: string) => {
@@ -217,43 +217,41 @@ When(
 )
 
 When("I have the true false question {string} rated as a good example", (questionStem: string) => {
-  start.higherOrderActions().stubOpenAIQuestionGenerationAndSeeTheQuestionSimple(questionStem)
-
   start
-    .findQuestionWithStem(questionStem)
+    .higherOrderActions()
+    .stubOpenAIQuestionGenerationAndSeeTheQuestionSimple(questionStem)
     .suggestingThisQuestionForFineTuning()
     .comment("This question is good")
     .suggestingPositiveFeedbackForFineTuning()
 })
 
 When("I have the true false question {string} rated as a bad example", (questionStem: string) => {
-  start.higherOrderActions().stubOpenAIQuestionGenerationAndSeeTheQuestionSimple(questionStem)
-
   start
-    .findQuestionWithStem(questionStem)
+    .higherOrderActions()
+    .stubOpenAIQuestionGenerationAndSeeTheQuestionSimple(questionStem)
     .suggestingThisQuestionForFineTuning()
     .comment("This question is not good")
     .suggestingNegativeFeedbackFineTuningExclusion()
 })
 
 Then("I should be asked {string}", (expectedQuestionStem: string) => {
-  start.findQuestionWithStem(expectedQuestionStem)
+  start.assumeQuestionPage(expectedQuestionStem)
 })
 
 Then("I should see the question {string} is disabled", (questionStem: string) => {
-  start.findQuestionWithStem(questionStem).isDisabled()
+  start.assumeQuestionPage(questionStem).isDisabled()
 })
 
 Then("I suggest the displayed question {string} as a good example", (questionStem: string) => {
   start
-    .findQuestionWithStem(questionStem)
+    .assumeQuestionPage(questionStem)
     .suggestingThisQuestionForFineTuning()
     .suggestingPositiveFeedbackForFineTuning()
 })
 
 Then("I suggest the displayed question {string} as a bad example", (questionStem: string) => {
   start
-    .findQuestionWithStem(questionStem)
+    .assumeQuestionPage(questionStem)
     .suggestingThisQuestionForFineTuning()
     .suggestingNegativeFeedbackFineTuningExclusion()
 })
@@ -262,7 +260,7 @@ Then(
   "I suggest the displayed question {string} as a good example with comment {string}",
   (questionStem: string, comment: string) => {
     start
-      .findQuestionWithStem(questionStem)
+      .assumeQuestionPage(questionStem)
       .suggestingThisQuestionForFineTuning()
       .comment(comment)
       .suggestingPositiveFeedbackForFineTuning()
@@ -271,7 +269,7 @@ Then(
 
 Then("I suggest the displayed question {string} without feedback", (questionStem: string) => {
   start
-    .findQuestionWithStem(questionStem)
+    .assumeQuestionPage(questionStem)
     .suggestingThisQuestionForFineTuning()
     .submittingNoFeedback()
 })

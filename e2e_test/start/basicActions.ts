@@ -2,10 +2,12 @@ import { assumeAdminDashboardPage } from "./pageObjects/adminPages/adminDashboar
 import { assumeChatAboutNotePage } from "./pageObjects/chatAboutNotePage"
 import { assumeNotePage } from "./pageObjects/notePage"
 import { assumeAnsweredQuestionPage } from "./pageObjects/AnsweredQuestionPage"
+import { assumeQuestionPage } from "./pageObjects/QuizQuestionPage"
 
 export default {
   assumeAnsweredQuestionPage,
   assumeChatAboutNotePage,
+  assumeQuestionPage,
   // jumptoNotePage is faster than navigateToNotePage
   //    it uses the note id memorized when creating them with testability api
   jumpToNotePage: (noteTopic: string, forceLoadPage = false) => {

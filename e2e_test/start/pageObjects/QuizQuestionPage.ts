@@ -1,6 +1,9 @@
 import { SuggestQuestionForFineTuningPage } from "./SuggestQuestionForFineTuningPage"
 
-const currentQuestion = (stem?: string) => {
+const assumeQuestionPage = (stem?: string) => {
+  if (stem) {
+    cy.findByText(stem)
+  }
   const question = () => (stem ? cy.findByText(stem).parent() : cy)
   const getChoice = (choice: string) => question().findByText(choice)
   return {
@@ -25,13 +28,8 @@ const currentQuestion = (stem?: string) => {
   }
 }
 
-const findQuestionWithStem = (stem: string) => {
-  cy.findByText(stem)
-  return currentQuestion(stem)
-}
-
 const expectFeedbackRequiredMessage = () => {
   cy.get(".feedback-required-message")
 }
 
-export { findQuestionWithStem, currentQuestion, expectFeedbackRequiredMessage }
+export { assumeQuestionPage, expectFeedbackRequiredMessage }
