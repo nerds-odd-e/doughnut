@@ -64,6 +64,17 @@ Given(
   },
 )
 
+Given(
+  "an admin should be able to download the training data for evaluation containing:",
+  (trainingExamples: DataTable) => {
+    start
+      .loginAsAdminAndGoToAdminDashboard()
+      .suggestedQuestionsForFineTuning()
+      .downloadFeedbackForEvaluationModel()
+      .expectExampleQuestions(trainingExamples.hashes())
+  },
+)
+
 Given("the admin should see {string} in the suggested questions", (expectedComment: string) => {
   start
     .loginAsAdminAndGoToAdminDashboard()

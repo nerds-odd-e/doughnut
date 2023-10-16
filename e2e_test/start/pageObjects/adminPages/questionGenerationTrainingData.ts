@@ -1,5 +1,5 @@
-export function quesionGenerationTrainingData() {
-  const downloadFilename = `${Cypress.config("downloadsFolder")}/fineTuningData.jsonl`
+export function assumeDownloadedJSONL(filename: string) {
+  const downloadFilename = `${Cypress.config("downloadsFolder")}/${filename}`
 
   return {
     expectNumberOfRecords(count: number) {
@@ -16,9 +16,14 @@ export function quesionGenerationTrainingData() {
         jsonStrings.forEach((line: string, index: number) => {
           const question: Record<string, string> = questions[index]
           expect(line).to.contain(question["Question Stem"])
-          question["Choices"].split(", ").forEach((choice: string) => {
-            expect(line).to.contain(choice)
-          })
+          if (question["Choices"]) {
+            question["Choices"].split(", ").forEach((choice: string) => {
+              expect(line).to.contain(choice)
+            })
+          }
+          if (question["Good Question?"]) {
+            expect(line).to.contain(question["Good Question?"])
+          }
         })
       })
     },

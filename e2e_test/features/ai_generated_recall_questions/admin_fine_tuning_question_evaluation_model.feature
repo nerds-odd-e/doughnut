@@ -14,4 +14,7 @@ Feature: Refine Training Examples for OpenAI's Question Evaluation Model
   Scenario: Admin can retrieve feedback-based training examples
     When I have the true false question "Fire is hot" rated as a good example
     And I have the true false question "What is hot?" rated as a bad example
-    Then an admin should be able to download the training data for evaluation containing 2 examples
+    Then an admin should be able to download the training data for evaluation containing:
+      | Question Stem                          | Good Question? |
+      | Fire is hot                            | Yes            |
+      | What is hot?                           | No             |

@@ -1,4 +1,4 @@
-import { quesionGenerationTrainingData } from "./questionGenerationTrainingData"
+import { assumeDownloadedJSONL } from "./questionGenerationTrainingData"
 
 export function adminFineTuningPage() {
   return {
@@ -7,22 +7,14 @@ export function adminFineTuningPage() {
         name: "Download Positive Feedback Question Generation Training Data",
       }).click()
 
-      return quesionGenerationTrainingData()
+      return assumeDownloadedJSONL("fineTuningData.jsonl")
     },
+
     downloadFeedbackForEvaluationModel() {
       cy.findByRole("button", {
         name: "Download Evaluation Training Data",
       }).click()
-      const downloadFilename = `${Cypress.config("downloadsFolder")}/evaluationData.jsonl`
-
-      return {
-        expectNumberOfRecords(count: number) {
-          cy.readFile(downloadFilename)
-            .then((content) => (content.match(/id/g) || []).length)
-            .should("eq", count)
-          return this
-        },
-      }
+      return assumeDownloadedJSONL("evaluationData.jsonl")
     },
 
     updateQuestionSuggestionAndChoice(
