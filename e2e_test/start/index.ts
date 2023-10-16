@@ -9,7 +9,7 @@ import { adminDashboardPage } from "./adminPages/adminDashboardPage"
 import mock_services from "./mock_services"
 import { questionGenerationService } from "./questionGenerationService"
 import { higherOrderActions } from "./higherOrderActions"
-import { jumpToNotePage } from "./jumpToNotePage"
+import basicActions from "./basicActions"
 
 const loginAsAdminAndGoToAdminDashboard = () => {
   cy.loginAs("admin")
@@ -20,8 +20,8 @@ const loginAsAdminAndGoToAdminDashboard = () => {
 }
 
 const start = {
+  ...basicActions,
   higherOrderActions,
-  jumpToNotePage,
   questionGenerationService,
   answeredQuestionPage,
   goToLastResult,

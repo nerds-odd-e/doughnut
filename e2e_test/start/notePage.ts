@@ -1,18 +1,6 @@
-// jumptoNotePage is faster than navigateToNotePage
-
 import { chatAboutNotePage } from "./chatAboutNotePage"
 
-//    it uses the note id memorized when creating them with testability api
-export const jumpToNotePage = (noteTopic: string, forceLoadPage = false) => {
-  cy.testability()
-    .getSeededNoteIdByTitle(noteTopic)
-    .then((noteId) => {
-      const url = `/notes/${noteId}`
-      if (forceLoadPage) cy.visit(url)
-      else cy.routerPush(url, "noteShow", { noteId: noteId })
-    })
-  cy.findNoteTopic(noteTopic)
-
+export const notePage = () => {
   const clickNotePageMoreOptionsButton = (btnTextOrTitle: string) => {
     cy.clickNotePageMoreOptionsButtonOnCurrentPage(btnTextOrTitle)
   }

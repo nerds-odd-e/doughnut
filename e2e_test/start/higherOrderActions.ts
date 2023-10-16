@@ -1,5 +1,5 @@
 import { questionGenerationService } from "./questionGenerationService"
-import { jumpToNotePage } from "./jumpToNotePage"
+import basicActions from "./basicActions"
 
 export const higherOrderActions = () => {
   return {
@@ -18,7 +18,7 @@ export const higherOrderActions = () => {
     ) => {
       cy.testability().seedNotes([{ topic: noteTopic }])
       questionGenerationService().stubAskSingleAnswerMultipleChoiceQuestion(question)
-      jumpToNotePage(noteTopic).chatAboutNote().testMe()
+      basicActions.jumpToNotePage(noteTopic).chatAboutNote().testMe()
     },
   }
 }
