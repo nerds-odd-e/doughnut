@@ -273,7 +273,3 @@ Then("I suggest the displayed question {string} without feedback", (questionStem
     .suggestingThisQuestionForFineTuning()
     .submittingNoFeedback()
 })
-
-Then("I should see a message saying the feedback was rejected", () => {
-  start.assumeQuestionPage().expectFeedbackRequiredMessage()
-})
