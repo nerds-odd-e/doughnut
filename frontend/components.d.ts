@@ -114,7 +114,6 @@ declare module 'vue' {
     SubscriptionNoteButtons: typeof import('./src/components/subscriptions/SubscriptionNoteButtons.vue')['default']
     SuggestedQuestionEdit: typeof import('./src/components/ai/SuggestedQuestionEdit.vue')['default']
     SuggestQuestionForFineTuning: typeof import('./src/components/ai/SuggestQuestionForFineTuning.vue')['default']
-    SuggestQuestionForFineTuningIntegrated: typeof import('./src/components/notes/SuggestQuestionForFineTuningIntegrated.vue')['default']
     SuggestTopic: typeof import('./src/components/notes/SuggestTopic.vue')['default']
     SvgAdd: typeof import('./src/components/svgs/SvgAdd.vue')['default']
     SvgAddChild: typeof import('./src/components/svgs/SvgAddChild.vue')['default']
