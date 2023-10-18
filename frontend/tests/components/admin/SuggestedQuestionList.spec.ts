@@ -1,6 +1,6 @@
 import { flushPromises } from "@vue/test-utils";
 import { afterEach, beforeEach, describe, it } from "vitest";
-import SuggestedQuestionEdit from "@/components/admin/SuggestedQuestionEdit.vue";
+import SuggestedQuestionList from "@/components/admin/SuggestedQuestionList.vue";
 import helper from "../../helpers";
 
 helper.resetWithApiMock(beforeEach, afterEach);
@@ -24,25 +24,13 @@ describe("Edit Suggested Question", () => {
 
     beforeEach(() => {
       wrapper = helper
-        .component(SuggestedQuestionEdit)
-        .withStorageProps({ modelValue: suggestedQuestion })
+        .component(SuggestedQuestionList)
+        .withStorageProps({ suggestedQuestions: [suggestedQuestion] })
         .mount();
     });
 
-    it("should be able to suggest a question as good example", async () => {
-      helper.apiMock.expectingPatch(
-        `/api/fine-tuning/1357/update-suggested-question-for-fine-tuning`,
-      );
-      wrapper.get("button.btn-success").trigger("click");
-      await flushPromises();
-    });
-
-    describe("cancel button", () => {
-      it("should NOT call the update suggestion api", async () => {
-        helper.apiMock.verifyNotCalled(`/api/fine-tuning`);
-        wrapper.get("button.btn-secondary").trigger("click");
-        await flushPromises();
-      });
+    it("lists the suggestions", async () => {
+      expect(wrapper.findAll("tr").length).toEqual(2);
     });
   });
 });

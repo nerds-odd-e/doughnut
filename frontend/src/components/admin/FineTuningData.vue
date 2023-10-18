@@ -7,42 +7,17 @@
     Download Evaluation Training Data
   </button>
   <ContentLoader v-if="suggestedQuestions === undefined" />
-  <div v-else>
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">Stem</th>
-          <th scope="col">Feedback</th>
-          <th scope="col">Comment</th>
-          <th scope="col">Operation</th>
-          <th scope="col">Is Duplicated</th>
-        </tr>
-      </thead>
-      <tbody>
-        <SuggestedQuestionRow
-          v-for="(suggestedQuestion, index) in suggestedQuestions"
-          v-bind="{ suggestedQuestion, index }"
-          :key="index"
-          @dblclick="editSuggestedQuestion(index)"
-        />
-      </tbody>
-    </table>
-    <Popup :show="showEditDialog" @popup-done="showEditDialog = false">
-      <SuggestedQuestionEdit
-        v-if="currentIndex !== undefined"
-        v-model="suggestedQuestions[currentIndex]"
-        :key="currentIndex"
-        @duplicated="duplicated"
-      />
-    </Popup>
-  </div>
+  <SuggestedQuestionList
+    v-else
+    :suggested-questions="suggestedQuestions"
+    @duplicated="duplicated"
+  />
 </template>
 
 <script lang="ts">
 import { ContentLoader } from "vue-content-loader";
 import useLoadingApi from "../../managedApi/useLoadingApi";
-import SuggestedQuestionRow from "./SuggestedQuestionRow.vue";
-import Popup from "../commons/Popups/Popup.vue";
+import SuggestedQuestionList from "./SuggestedQuestionList.vue";
 
 export default {
   setup() {
@@ -53,15 +28,9 @@ export default {
       suggestedQuestions: undefined as
         | Generated.SuggestedQuestionForFineTuning[]
         | undefined,
-      currentIndex: undefined as number | undefined,
-      showEditDialog: false,
     };
   },
   methods: {
-    async editSuggestedQuestion(index: number) {
-      this.currentIndex = index;
-      this.showEditDialog = true;
-    },
     async downloadFineTuningJSONL() {
       const fineTuningData =
         await this.api.getPositiveFeedbackFineTuningExamples();
@@ -99,7 +68,7 @@ export default {
     },
   },
 
-  components: { ContentLoader, Popup, SuggestedQuestionRow },
+  components: { ContentLoader, SuggestedQuestionList },
   async mounted() {
     this.suggestedQuestions =
       await this.api.getSuggestedQuestionsForFineTuning();
