@@ -19,28 +19,12 @@
         </tr>
       </thead>
       <tbody>
-        <tr
-          v-for="(suggested, index) in suggestedQuestions"
+        <SuggestedQuestionRow
+          v-for="(suggestedQuestion, index) in suggestedQuestions"
+          v-bind="{ suggestedQuestion, index }"
           :key="index"
           @dblclick="editSuggestedQuestion(index)"
-        >
-          <td>{{ suggested.preservedQuestion.stem }}</td>
-          <td>{{ suggested.positiveFeedback ? "Positive" : "Negative" }}</td>
-          <td>{{ suggested.comment }}</td>
-          <td>
-            <button
-              v-if="suggested.positiveFeedback == false"
-              :id="`duplicate-${index}`"
-              class="btn btn-primary"
-              @click="duplicateQuestion(suggested)"
-            >
-              Duplicate
-            </button>
-          </td>
-          <td :id="`is-duplicated-${index}`">
-            {{ suggested.duplicated ? "Yes" : "No" }}
-          </td>
-        </tr>
+        />
       </tbody>
     </table>
     <Popup v-model="showEditDialog">
@@ -48,6 +32,7 @@
         v-if="currentIndex !== undefined"
         v-model="suggestedQuestions[currentIndex]"
         :key="currentIndex"
+        @duplicated="duplicated"
       />
     </Popup>
   </div>
@@ -56,6 +41,7 @@
 <script lang="ts">
 import { ContentLoader } from "vue-content-loader";
 import useLoadingApi from "../../managedApi/useLoadingApi";
+import SuggestedQuestionRow from "./SuggestedQuestionRow.vue";
 import Popup from "../commons/Popups/Popup.vue";
 
 export default {
@@ -108,24 +94,12 @@ export default {
       a.click();
       URL.revokeObjectURL(url);
     },
-    async duplicateQuestion(
-      suggested: Generated.SuggestedQuestionForFineTuning,
-    ) {
-      await this.api.reviewMethods.suggestQuestionForFineTuning(
-        suggested.quizQuestionId ?? -1,
-        {
-          isPositiveFeedback: true,
-          comment: suggested.comment,
-          isDuplicated: true,
-        },
-      );
-
-      this.suggestedQuestions =
-        await this.api.getSuggestedQuestionsForFineTuning();
+    async duplicated(duplicated: Generated.SuggestedQuestionForFineTuning) {
+      this.suggestedQuestions = [...this.suggestedQuestions!, duplicated];
     },
   },
 
-  components: { ContentLoader, Popup },
+  components: { ContentLoader, Popup, SuggestedQuestionRow },
   async mounted() {
     this.suggestedQuestions =
       await this.api.getSuggestedQuestionsForFineTuning();
