@@ -67,7 +67,7 @@ export default defineComponent({
   methods: {
     async suggestQuestionForFineTuning() {
       const updated =
-        await this.api.reviewMethods.suggestedQuestionForFineTuningUpdate(
+        await this.api.fineTuning.suggestedQuestionForFineTuningUpdate(
           this.modelValue.id,
           this.suggestionParams,
         );

@@ -37,21 +37,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
       )) as Generated.User;
     },
   },
-  async getSuggestedQuestionsForFineTuning() {
-    return (await managedApi.restGet(
-      "fine-tuning/all-suggested-questions-for-fine-tuning",
-    )) as Generated.SuggestedQuestionForFineTuning[];
-  },
-  async getPositiveFeedbackFineTuningExamples() {
-    return (await managedApi.restGet(
-      "fine-tuning/positive-feedback-generation-examples",
-    )) as Generated.FeedbackData[];
-  },
-  async getAllEvaluationModelExamples() {
-    return (await managedApi.restGet(
-      "fine-tuning/feedback-evaluation-examples",
-    )) as Generated.FeedbackData[];
-  },
 
   reviewMethods: {
     async markAsRepeated(reviewPointId: Doughnut.ID, successful: boolean) {
@@ -77,15 +62,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
         suggestedQuestion,
       ) as Promise<string>;
     },
-    async suggestedQuestionForFineTuningUpdate(
-      suggestedId: Doughnut.ID,
-      suggestedQuestion: Generated.QuestionSuggestionParams,
-    ): Promise<string> {
-      return managedApi.restPatch(
-        `fine-tuning/${suggestedId}/update-suggested-question-for-fine-tuning`,
-        suggestedQuestion,
-      ) as Promise<string>;
-    },
+
     async overview() {
       return (await managedApi.restGet(
         `reviews/overview?${timezoneParam()}`,
@@ -154,6 +131,38 @@ const apiCollection = (managedApi: ManagedApi) => ({
         `review-points/${reviewPointId}/random-question`,
       )) as Generated.QuizQuestion;
       return res;
+    },
+  },
+  fineTuning: {
+    async getSuggestedQuestionsForFineTuning() {
+      return (await managedApi.restGet(
+        "fine-tuning/all-suggested-questions-for-fine-tuning",
+      )) as Generated.SuggestedQuestionForFineTuning[];
+    },
+    async getPositiveFeedbackFineTuningExamples() {
+      return (await managedApi.restGet(
+        "fine-tuning/positive-feedback-generation-examples",
+      )) as Generated.FeedbackData[];
+    },
+    async getAllEvaluationModelExamples() {
+      return (await managedApi.restGet(
+        "fine-tuning/feedback-evaluation-examples",
+      )) as Generated.FeedbackData[];
+    },
+    async suggestedQuestionForFineTuningUpdate(
+      suggestedId: Doughnut.ID,
+      suggestedQuestion: Generated.QuestionSuggestionParams,
+    ): Promise<string> {
+      return managedApi.restPatch(
+        `fine-tuning/${suggestedId}/update-suggested-question-for-fine-tuning`,
+        suggestedQuestion,
+      ) as Promise<string>;
+    },
+    async duplicateSuggestedQuestionForFineTuning(id: Doughnut.ID) {
+      return (await managedApi.restPost(
+        `fine-tuning/${id}/duplicate`,
+        {},
+      )) as Generated.SuggestedQuestionForFineTuning;
     },
   },
   circleMethods: {

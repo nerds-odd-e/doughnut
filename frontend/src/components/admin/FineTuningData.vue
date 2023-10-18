@@ -33,7 +33,7 @@ export default {
   methods: {
     async downloadFineTuningJSONL() {
       const fineTuningData =
-        await this.api.getPositiveFeedbackFineTuningExamples();
+        await this.api.fineTuning.getPositiveFeedbackFineTuningExamples();
       const blob = new Blob(
         [fineTuningData.map((x) => JSON.stringify(x)).join("\n")],
         {
@@ -48,7 +48,8 @@ export default {
       URL.revokeObjectURL(url);
     },
     async downloadEvaluationJSONL() {
-      const fineTuningData = await this.api.getAllEvaluationModelExamples();
+      const fineTuningData =
+        await this.api.fineTuning.getAllEvaluationModelExamples();
 
       const blob = new Blob(
         [fineTuningData.map((x) => JSON.stringify(x)).join("\n")],
@@ -71,7 +72,7 @@ export default {
   components: { ContentLoader, SuggestedQuestionList },
   async mounted() {
     this.suggestedQuestions =
-      await this.api.getSuggestedQuestionsForFineTuning();
+      await this.api.fineTuning.getSuggestedQuestionsForFineTuning();
   },
 };
 </script>
