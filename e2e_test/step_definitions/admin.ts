@@ -54,17 +54,6 @@ Given(
 )
 
 Given(
-  "an admin should be able to download the training data for evaluation containing {int} examples",
-  (numOfDownload: number) => {
-    start
-      .loginAsAdminAndGoToAdminDashboard()
-      .suggestedQuestionsForFineTuning()
-      .downloadFeedbackForEvaluationModel()
-      .expectNumberOfRecords(numOfDownload)
-  },
-)
-
-Given(
   "an admin should be able to download the training data for evaluation containing:",
   (trainingExamples: DataTable) => {
     start
@@ -74,13 +63,6 @@ Given(
       .expectExampleQuestions(trainingExamples.hashes())
   },
 )
-
-Given("the admin should see {string} in the suggested questions", (expectedComment: string) => {
-  start
-    .assumeAdminDashboardPage()
-    .suggestedQuestionsForFineTuning()
-    .expectString(1, expectedComment)
-})
 
 Given(
   "there should be {int} examples containing {string}",
