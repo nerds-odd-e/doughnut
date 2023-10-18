@@ -6,7 +6,6 @@
     <td>
       <button
         v-if="!suggestedQuestion.positiveFeedback"
-        :id="`duplicate-${index}`"
         class="btn btn-primary"
         @click="duplicateQuestion(suggestedQuestion)"
       >
@@ -27,10 +26,6 @@ export default {
   props: {
     suggestedQuestion: {
       type: Object as PropType<Generated.SuggestedQuestionForFineTuning>,
-      required: true,
-    },
-    index: {
-      type: Number,
       required: true,
     },
   },

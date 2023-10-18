@@ -12,7 +12,7 @@
     <tbody>
       <SuggestedQuestionRow
         v-for="(suggestedQuestion, index) in suggestedQuestions"
-        v-bind="{ suggestedQuestion, index }"
+        v-bind="{ suggestedQuestion }"
         :key="index"
         @dblclick="editingIndex = index"
         @duplicated="$emit('duplicated', $event)"

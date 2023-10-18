@@ -20,7 +20,6 @@
       >
         <input
           type="text"
-          :id="`choice-${index}`"
           v-model="suggestionParams.preservedQuestion.choices[index]"
         />
       </li>

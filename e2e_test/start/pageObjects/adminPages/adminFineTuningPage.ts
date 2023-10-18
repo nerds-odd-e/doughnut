@@ -23,14 +23,14 @@ export function adminFineTuningPage() {
     ) {
       cy.findByText(originalQuestionStem).parent().dblclick()
       cy.formField("Stem").clear().type(newQuestion["Question Stem"])
-      cy.get("#choice-0").clear().type(newQuestion["Choice A"])
+      cy.get("li input").first().clear().type(newQuestion["Choice A"])
       cy.findByRole("button", { name: "Save" }).click()
       cy.pageIsNotLoading()
       cy.findByText(newQuestion["Question Stem"])
     },
 
-    duplicateNegativeQuestion() {
-      cy.get("#duplicate-0").click()
+    duplicateNegativeQuestion(questionStem: string) {
+      cy.findByText(questionStem).parent().findByRole("button", { name: "Duplicate" }).click()
     },
 
     expectString(numOfOccurrence: number, expectedString: string) {

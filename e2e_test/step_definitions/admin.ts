@@ -24,11 +24,11 @@ Given(
   },
 )
 
-Given("an admin duplicates the question {string}", () => {
+Given("an admin duplicates the question {string}", (questionStem: string) => {
   start
     .loginAsAdminAndGoToAdminDashboard()
     .suggestedQuestionsForFineTuning()
-    .duplicateNegativeQuestion()
+    .duplicateNegativeQuestion(questionStem)
 })
 
 Given(
