@@ -43,6 +43,14 @@ export default {
     },
   },
   emits: ["duplicated"],
+  watch: {
+    suggestedQuestions: {
+      handler() {
+        this.localSuggestedQuestions = this.suggestedQuestions;
+      },
+      deep: true,
+    },
+  },
   data() {
     return {
       localSuggestedQuestions: this.suggestedQuestions,

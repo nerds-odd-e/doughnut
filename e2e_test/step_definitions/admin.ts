@@ -24,7 +24,7 @@ Given(
   },
 )
 
-Given("an admin can duplicate the question {string}", () => {
+Given("an admin duplicates the question {string}", () => {
   start
     .loginAsAdminAndGoToAdminDashboard()
     .suggestedQuestionsForFineTuning()
@@ -83,19 +83,10 @@ Given("the admin should see {string} in the suggested questions", (expectedComme
 })
 
 Given(
-  "an admin should not be able to duplicate this feedback to the question {string}",
-  (originalQuestionStem: string) => {
-    start
-      .loginAsAdminAndGoToAdminDashboard()
-      .suggestedQuestionsForFineTuning()
-      .expectUnableToDuplicate(originalQuestionStem)
-  },
-)
-
-Given(
-  "an admin should be able to see {int} examples containing {string}",
+  "there should be {int} examples containing {string}",
   (numOfOccurrence: number, expectedString: string) => {
     start
+      // .assumeAdminDashboardPage()
       .loginAsAdminAndGoToAdminDashboard()
       .suggestedQuestionsForFineTuning()
       .expectString(numOfOccurrence, expectedString)

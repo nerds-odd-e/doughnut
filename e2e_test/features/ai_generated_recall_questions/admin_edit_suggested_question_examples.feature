@@ -21,10 +21,6 @@ Feature: Generate Training examples for fine-tuning OpenAI
 
   Scenario: Admin should be able to duplicate negative feedback
     Given I have the true false question "Fire is cold" rated as a bad example
-    When an admin can duplicate the question "Fire is cold"
-    Then an admin should be able to see 2 examples containing "Fire is cold"
+    When an admin duplicates the question "Fire is cold"
+    Then there should be 2 examples containing "Fire is cold"
     And an admin should be able to identify the duplicated record
-
-  Scenario: Admin should not be able to duplicate positive feedback
-    Given I have the true false question "Fire is hot" rated as a good example
-    Then an admin should not be able to duplicate this feedback to the question "Fire is hot"

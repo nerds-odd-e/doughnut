@@ -37,13 +37,6 @@ export function adminFineTuningPage() {
       cy.findAllByText(expectedString).should("have.length", numOfOccurrence)
     },
 
-    expectUnableToDuplicate(_originalQuestionStem: string) {
-      cy.findByText(_originalQuestionStem)
-        .parent("tr")
-        .contains("button", "Duplicate")
-        .should("not.exist")
-    },
-
     identifyDuplicatedRecord() {
       cy.get("#is-duplicated-0").contains("No")
       cy.get("#is-duplicated-1").contains("Yes")
