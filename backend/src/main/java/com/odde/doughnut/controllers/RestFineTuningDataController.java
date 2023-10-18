@@ -37,6 +37,16 @@ class RestFineTuningDataController {
         .update(suggestion);
   }
 
+  @PostMapping("/{suggestedQuestion}/duplicate")
+  public SuggestedQuestionForFineTuning duplicate(
+      @PathVariable("suggestedQuestion") SuggestedQuestionForFineTuning suggestedQuestion)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAdminAuthorization();
+    return modelFactoryService
+        .toSuggestedQuestionForFineTuningService(suggestedQuestion)
+        .duplicate();
+  }
+
   @GetMapping("/positive-feedback-generation-examples")
   public List<FeedbackData> getAllPositiveFeedbackQuestionGenerationFineTuningExamples()
       throws UnexpectedNoAccessRightException {

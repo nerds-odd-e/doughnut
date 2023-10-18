@@ -1,8 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.json.FeedbackData;
@@ -190,6 +189,30 @@ public class RestFeedbackDataControllerTests {
       controller.updateSuggestedQuestionForFineTuning(suggested, suggest);
       assertThat(
           modelFactoryService.questionSuggestionForFineTuningRepository.count(), equalTo(oldCount));
+    }
+  }
+
+  @Nested
+  class dupplicate {
+    SuggestedQuestionForFineTuning suggested;
+
+    @BeforeEach
+    void setup() {
+      suggested = makeMe.aQuestionSuggestionForFineTunining().please();
+    }
+
+    @Test
+    void itShouldNotAllowNonAdmin() {
+      controller =
+          new RestFineTuningDataController(modelFactoryService, makeMe.aUser().toModelPlease());
+      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.duplicate(suggested));
+    }
+
+    @Test
+    void createANewIdenticalSuggestion() throws UnexpectedNoAccessRightException {
+      var newSuggestion = controller.duplicate(suggested);
+      assertThat(newSuggestion.getId(), notNullValue());
+      assertThat(newSuggestion.getId(), not(equalTo(suggested.getId())));
     }
   }
 }

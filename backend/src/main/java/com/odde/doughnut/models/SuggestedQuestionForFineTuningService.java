@@ -57,4 +57,16 @@ public class SuggestedQuestionForFineTuningService {
 
     return entity;
   }
+
+  public SuggestedQuestionForFineTuning duplicate() {
+    SuggestedQuestionForFineTuning newObject = new SuggestedQuestionForFineTuning();
+    newObject.setUser(entity.getUser());
+    newObject.setQuizQuestion(entity.getQuizQuestion());
+    newObject.setPreservedQuestion(entity.getPreservedQuestion());
+    newObject.setComment(entity.getComment());
+    newObject.setPositiveFeedback(entity.isPositiveFeedback());
+    newObject.setDuplicated(true);
+    modelFactoryService.questionSuggestionForFineTuningRepository.save(newObject);
+    return newObject;
+  }
 }
