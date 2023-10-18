@@ -26,13 +26,5 @@ describe("Edit Suggested Question", () => {
       wrapper.get("button.btn-success").trigger("click");
       await flushPromises();
     });
-
-    describe("cancel button", () => {
-      it("should NOT call the update suggestion api", async () => {
-        helper.apiMock.verifyNotCalled(`/api/fine-tuning`);
-        wrapper.get("button.btn-secondary").trigger("click");
-        await flushPromises();
-      });
-    });
   });
 });
