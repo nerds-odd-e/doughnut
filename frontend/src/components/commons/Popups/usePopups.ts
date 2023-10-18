@@ -18,9 +18,6 @@ function usePopups() {
   const push = (info: PopupInfo) => {
     Popup.popupDataWrap.popupData.popupInfo?.push(info);
   };
-  const pop = () => {
-    return Popup.popupDataWrap.popupData.popupInfo?.pop();
-  };
   return {
     popups: {
       register(data: { popupInfo: PopupInfo[] }) {
@@ -46,7 +43,7 @@ function usePopups() {
       },
 
       done(result: unknown) {
-        const popupInfo = pop();
+        const popupInfo = Popup.popupDataWrap.popupData.popupInfo?.pop();
         if (!popupInfo) return;
         if (popupInfo.doneResolve) popupInfo.doneResolve(result as boolean);
       },
