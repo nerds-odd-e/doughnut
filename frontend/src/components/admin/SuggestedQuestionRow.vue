@@ -40,13 +40,8 @@ export default {
       suggested: Generated.SuggestedQuestionForFineTuning,
     ) {
       const duplicated =
-        await this.api.reviewMethods.suggestQuestionForFineTuning(
-          suggested.quizQuestionId ?? -1,
-          {
-            isPositiveFeedback: true,
-            comment: suggested.comment,
-            isDuplicated: true,
-          },
+        await this.api.fineTuning.duplicateSuggestedQuestionForFineTuning(
+          suggested.id,
         );
       this.$emit("duplicated", duplicated);
     },

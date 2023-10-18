@@ -15,6 +15,7 @@
         v-bind="{ suggestedQuestion, index }"
         :key="index"
         @dblclick="editingIndex = index"
+        @duplicated="$emit('duplicated', $event)"
       />
     </tbody>
   </table>
@@ -25,7 +26,6 @@
     <SuggestedQuestionEdit
       v-if="editingIndex !== undefined"
       v-model="localSuggestedQuestions[editingIndex]"
-      @duplicated="$emit('duplicated', $event)"
     />
   </Popup>
 </template>

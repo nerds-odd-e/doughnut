@@ -77,7 +77,7 @@ Given(
 
 Given("the admin should see {string} in the suggested questions", (expectedComment: string) => {
   start
-    .loginAsAdminAndGoToAdminDashboard()
+    .assumeAdminDashboardPage()
     .suggestedQuestionsForFineTuning()
     .expectString(1, expectedComment)
 })
@@ -86,8 +86,7 @@ Given(
   "there should be {int} examples containing {string}",
   (numOfOccurrence: number, expectedString: string) => {
     start
-      // .assumeAdminDashboardPage()
-      .loginAsAdminAndGoToAdminDashboard()
+      .assumeAdminDashboardPage()
       .suggestedQuestionsForFineTuning()
       .expectString(numOfOccurrence, expectedString)
   },
