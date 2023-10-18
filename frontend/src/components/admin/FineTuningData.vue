@@ -19,6 +19,24 @@ import { ContentLoader } from "vue-content-loader";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import SuggestedQuestionList from "./SuggestedQuestionList.vue";
 
+const downloadJSONL = (
+  fineTuningData: Generated.FeedbackData[],
+  filename: string,
+) => {
+  const blob = new Blob(
+    [fineTuningData.map((x) => JSON.stringify(x)).join("\n")],
+    {
+      type: "text/plain",
+    },
+  );
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
 export default {
   setup() {
     return useLoadingApi();
@@ -34,35 +52,12 @@ export default {
     async downloadFineTuningJSONL() {
       const fineTuningData =
         await this.api.fineTuning.getPositiveFeedbackFineTuningExamples();
-      const blob = new Blob(
-        [fineTuningData.map((x) => JSON.stringify(x)).join("\n")],
-        {
-          type: "text/plain",
-        },
-      );
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "fineTuningData.jsonl";
-      a.click();
-      URL.revokeObjectURL(url);
+      downloadJSONL(fineTuningData, "fineTuningData.jsonl");
     },
     async downloadEvaluationJSONL() {
       const fineTuningData =
         await this.api.fineTuning.getAllEvaluationModelExamples();
-
-      const blob = new Blob(
-        [fineTuningData.map((x) => JSON.stringify(x)).join("\n")],
-        {
-          type: "text/plain",
-        },
-      );
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "evaluationData.jsonl";
-      a.click();
-      URL.revokeObjectURL(url);
+      downloadJSONL(fineTuningData, "evaluationData.jsonl");
     },
     async duplicated(duplicated: Generated.SuggestedQuestionForFineTuning) {
       this.suggestedQuestions = [...this.suggestedQuestions!, duplicated];
