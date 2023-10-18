@@ -5,7 +5,7 @@
     <td>{{ suggestedQuestion.comment }}</td>
     <td>
       <button
-        v-if="suggestedQuestion.positiveFeedback == false"
+        v-if="!suggestedQuestion.positiveFeedback"
         :id="`duplicate-${index}`"
         class="btn btn-primary"
         @click="duplicateQuestion(suggestedQuestion)"

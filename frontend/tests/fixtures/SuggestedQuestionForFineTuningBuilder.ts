@@ -19,6 +19,11 @@ class SuggestQuestionForFineTuningBuilder extends Builder<Generated.SuggestedQue
     };
   }
 
+  positive() {
+    this.data.positiveFeedback = true;
+    return this;
+  }
+
   do() {
     return this.data;
   }
