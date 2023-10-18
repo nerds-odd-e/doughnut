@@ -1,25 +1,25 @@
 @usingMockedOpenAiService
 @startWithEmptyDownloadsFolder
-Feature: Generate Training examples for fine-tuning OpenAI
+Feature: Refine Training Examples for OpenAI Fine-Tuning
+
   As an admin,
-  I want to edit the example questions suggested by the users,
-  So that I can fix the questions or create good example by modifying bad ones,
-  so that I can use these data for OpenAI fine-tuning to improve question generation and question generation vevaluation.
+  I want to edit or duplicate example questions suggested by users
+  So that I can correct or enhance these examples for OpenAI's fine-tuning process,
+  Ultimately improving question generation and evaluation accuracy.
 
   Background:
     Given I am logged in as an existing user
 
-
-  Scenario: Admin should be able to edit the suggested question and its choices
+  Scenario: Admin modifies a positively rated question
     Given I have the true false question "Fire is hot" rated as a good example
-    When an admin edit the question and choices "Fire is hot" with a different question:
+    When the admin modifies the question suggested "Fire is hot" to:
       | Question Stem | Choice A                                    |
       | Is fire hot?  | The coldest fire is still too hot for human |
     Then an admin can retrieve the training data for question generation containing:
       | Question Stem | Choices                                     |
       | Is fire hot?  | The coldest fire is still too hot for human |
 
-  Scenario: Admin should be able to duplicate negative feedback
+  Scenario: Admin duplicates a negatively rated question
     Given I have the true false question "Fire is cold" rated as a bad example
     When an admin duplicates the question "Fire is cold"
     Then there should be 2 examples containing "Fire is cold"

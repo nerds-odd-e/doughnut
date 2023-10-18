@@ -15,7 +15,7 @@ Given("my question should not be included in the admin's fine-tuning data", () =
 })
 
 Given(
-  "an admin edit the question and choices {string} with a different question:",
+  "the admin modifies the question suggested {string} to:",
   (originalQuestionStem: string, newQuestion: DataTable) => {
     start
       .loginAsAdminAndGoToAdminDashboard()
