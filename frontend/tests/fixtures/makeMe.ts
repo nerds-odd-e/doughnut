@@ -12,6 +12,7 @@ import UserBuilder from "./UserBuilder";
 import WikidataEntityBuilder from "./WikidataEntityBuilder";
 import WikidataSearchEntityBuilder from "./WikidataSearchEntityBuilder";
 import QuizQuestionBuilder from "./QuizQuestionBuilder";
+import SuggestedQuestionForFineTuningBuilder from "./SuggestedQuestionForFineTuningBuilder";
 
 class MakeMe {
   static aUser() {
@@ -68,6 +69,10 @@ class MakeMe {
 
   static get aWikidataSearchEntity(): WikidataSearchEntityBuilder {
     return new WikidataSearchEntityBuilder();
+  }
+
+  static get aSuggestedQuestionForFineTuning(): SuggestedQuestionForFineTuningBuilder {
+    return new SuggestedQuestionForFineTuningBuilder();
   }
 }
 
