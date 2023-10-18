@@ -27,7 +27,7 @@
         />
       </tbody>
     </table>
-    <Popup v-model="showEditDialog">
+    <Popup :show="showEditDialog" @popup-done="showEditDialog = false">
       <SuggestedQuestionEdit
         v-if="currentIndex !== undefined"
         v-model="suggestedQuestions[currentIndex]"

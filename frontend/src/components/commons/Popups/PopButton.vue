@@ -4,7 +4,7 @@
     <template v-if="!$slots.button_face">
       {{ title }}
     </template>
-    <Popup v-model="show" :sidebar="sidebar">
+    <Popup :show="show" :sidebar="sidebar" @popup-done="show = false">
       <slot />
     </Popup>
   </a>

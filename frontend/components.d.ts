@@ -114,6 +114,7 @@ declare module 'vue' {
     SubscriptionEditDialog: typeof import('./src/components/subscriptions/SubscriptionEditDialog.vue')['default']
     SubscriptionNoteButtons: typeof import('./src/components/subscriptions/SubscriptionNoteButtons.vue')['default']
     SuggestedQuestionEdit: typeof import('./src/components/ai/SuggestedQuestionEdit.vue')['default']
+    SuggestedQuestionList: typeof import('./src/components/admin/SuggestedQuestionList.vue')['default']
     SuggestedQuestionRow: typeof import('./src/components/admin/SuggestedQuestionRow.vue')['default']
     SuggestQuestionForFineTuning: typeof import('./src/components/ai/SuggestQuestionForFineTuning.vue')['default']
     SuggestTopic: typeof import('./src/components/notes/SuggestTopic.vue')['default']
