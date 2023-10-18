@@ -1,7 +1,7 @@
 import { flushPromises } from "@vue/test-utils";
 import { afterEach, beforeEach, describe, it } from "vitest";
 import SuggestedQuestionEdit from "@/components/ai/SuggestedQuestionEdit.vue";
-import helper from "../helpers";
+import helper from "../../helpers";
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
