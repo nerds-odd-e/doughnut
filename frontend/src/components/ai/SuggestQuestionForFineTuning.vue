@@ -42,9 +42,6 @@
     >
       Feedback sent successfully!
     </div>
-    <div class="feedback-required-message" v-if="suggestionIsRequired">
-      Feedback is required!
-    </div>
     <div class="feedback-exist-message" v-if="existingFeedbackErrorMessage">
       Feedback already exist for this question!
     </div>
@@ -58,7 +55,6 @@ import asPopup from "../commons/Popups/asPopup";
 const isPositiveFeedback = ref<boolean | null>(null);
 const comment = ref<string>("");
 const suggestionSubmittedSuccessfully = ref<boolean>(false);
-const suggestionIsRequired = ref<boolean>(false);
 const existingFeedbackErrorMessage = ref<boolean>(false);
 const { api } = useLoadingApi();
 const { popup } = asPopup();
@@ -71,25 +67,20 @@ const { quizQuestion } = props;
 
 async function suggestQuestionForFineTuning() {
   try {
-    suggestionIsRequired.value = false;
     suggestionSubmittedSuccessfully.value = false;
     existingFeedbackErrorMessage.value = false;
 
-    if (isPositiveFeedback.value != null) {
-      await api.reviewMethods.suggestQuestionForFineTuning(
-        quizQuestion!.quizQuestionId,
-        {
-          isPositiveFeedback: isPositiveFeedback.value ?? false,
-          comment: comment.value,
-          isDuplicated: false,
-        },
-      );
+    await api.reviewMethods.suggestQuestionForFineTuning(
+      quizQuestion!.quizQuestionId,
+      {
+        isPositiveFeedback: isPositiveFeedback.value ?? false,
+        comment: comment.value,
+        isDuplicated: false,
+      },
+    );
 
-      suggestionSubmittedSuccessfully.value = true;
-      popup.done(null);
-    } else {
-      suggestionIsRequired.value = true;
-    }
+    suggestionSubmittedSuccessfully.value = true;
+    popup.done(null);
   } catch (err) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ((err as any).errorType === "EXISTING_FEEDBACK_ERROR") {
@@ -101,12 +92,10 @@ async function suggestQuestionForFineTuning() {
 }
 
 function markQuestionAsPositive() {
-  suggestionIsRequired.value = false;
   isPositiveFeedback.value = true;
 }
 
 function markQuestionAsNegative() {
-  suggestionIsRequired.value = false;
   isPositiveFeedback.value = false;
 }
 </script>

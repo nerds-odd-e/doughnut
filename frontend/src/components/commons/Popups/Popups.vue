@@ -39,7 +39,7 @@
       v-if="popupInfo.type === 'dialog'"
       class="popups"
       :sidebar="popupInfo.sidebar"
-      @close_request="resolve(null)"
+      @close_request="resolve($event)"
     >
       <template #body>
         <component
