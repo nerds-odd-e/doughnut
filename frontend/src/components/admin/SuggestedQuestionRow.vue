@@ -13,9 +13,6 @@
         Duplicate
       </button>
     </td>
-    <td :id="`is-duplicated-${index}`">
-      {{ suggestedQuestion.duplicated ? "Yes" : "No" }}
-    </td>
   </tr>
 </template>
 

@@ -36,10 +36,5 @@ export function adminFineTuningPage() {
     expectString(numOfOccurrence: number, expectedString: string) {
       cy.findAllByText(expectedString).should("have.length", numOfOccurrence)
     },
-
-    identifyDuplicatedRecord() {
-      cy.get("#is-duplicated-0").contains("No")
-      cy.get("#is-duplicated-1").contains("Yes")
-    },
   }
 }

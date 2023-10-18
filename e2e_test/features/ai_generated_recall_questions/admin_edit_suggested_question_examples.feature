@@ -23,4 +23,3 @@ Feature: Generate Training examples for fine-tuning OpenAI
     Given I have the true false question "Fire is cold" rated as a bad example
     When an admin duplicates the question "Fire is cold"
     Then there should be 2 examples containing "Fire is cold"
-    And an admin should be able to identify the duplicated record
