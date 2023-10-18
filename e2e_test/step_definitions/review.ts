@@ -210,15 +210,12 @@ When("I ask to generate a question for the note {string}", (noteTopic: string) =
 When(
   "I've got the following question for a note with topic {string}:",
   (noteTopic: string, question: DataTable) => {
-    start
-      .higherOrderActions()
-      .stubOpenAIQuestionGenerationAndSeeTheQuestion(noteTopic, question.hashes()[0])
+    start.stubOpenAIQuestionGenerationAndSeeTheQuestion(noteTopic, question.hashes()[0])
   },
 )
 
 When("I have the true false question {string} rated as a good example", (questionStem: string) => {
   start
-    .higherOrderActions()
     .stubOpenAIQuestionGenerationAndSeeTheQuestionSimple(questionStem)
     .suggestingThisQuestionForFineTuning()
     .comment("This question is good")
@@ -227,7 +224,6 @@ When("I have the true false question {string} rated as a good example", (questio
 
 When("I have the true false question {string} rated as a bad example", (questionStem: string) => {
   start
-    .higherOrderActions()
     .stubOpenAIQuestionGenerationAndSeeTheQuestionSimple(questionStem)
     .suggestingThisQuestionForFineTuning()
     .comment("This question is not good")

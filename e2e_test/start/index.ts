@@ -5,7 +5,7 @@ import basicActions from "./basicActions"
 
 const start = {
   ...basicActions,
-  higherOrderActions,
+  ...higherOrderActions,
   questionGenerationService,
 }
 export default start
