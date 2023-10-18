@@ -36,15 +36,6 @@
     >
       OK
     </button>
-    <div
-      class="suggestion-sent-successfully-message"
-      v-if="suggestionSubmittedSuccessfully"
-    >
-      Feedback sent successfully!
-    </div>
-    <div class="feedback-exist-message" v-if="existingFeedbackErrorMessage">
-      Feedback already exist for this question!
-    </div>
   </div>
 </template>
 <script setup lang="ts">
@@ -54,8 +45,6 @@ import asPopup from "../commons/Popups/asPopup";
 
 const isPositiveFeedback = ref<boolean | null>(null);
 const comment = ref<string>("");
-const suggestionSubmittedSuccessfully = ref<boolean>(false);
-const existingFeedbackErrorMessage = ref<boolean>(false);
 const { api } = useLoadingApi();
 const { popup } = asPopup();
 
@@ -66,29 +55,15 @@ const props = defineProps<{
 const { quizQuestion } = props;
 
 async function suggestQuestionForFineTuning() {
-  try {
-    suggestionSubmittedSuccessfully.value = false;
-    existingFeedbackErrorMessage.value = false;
-
-    await api.reviewMethods.suggestQuestionForFineTuning(
-      quizQuestion!.quizQuestionId,
-      {
-        isPositiveFeedback: isPositiveFeedback.value ?? false,
-        comment: comment.value,
-        isDuplicated: false,
-      },
-    );
-
-    suggestionSubmittedSuccessfully.value = true;
-    popup.done(null);
-  } catch (err) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((err as any).errorType === "EXISTING_FEEDBACK_ERROR") {
-      existingFeedbackErrorMessage.value = true;
-    }
-
-    suggestionSubmittedSuccessfully.value = false;
-  }
+  await api.reviewMethods.suggestQuestionForFineTuning(
+    quizQuestion!.quizQuestionId,
+    {
+      isPositiveFeedback: isPositiveFeedback.value ?? false,
+      comment: comment.value,
+      isDuplicated: false,
+    },
+  );
+  popup.done(null);
 }
 
 function markQuestionAsPositive() {
@@ -126,12 +101,5 @@ export default {
 .feedback-actions-container {
   display: flex;
   align-items: center;
-}
-.suggestion-sent-successfully-message {
-  margin-left: 10px;
-  padding: 10px;
-  border-radius: 5px;
-  background-color: green;
-  color: white;
 }
 </style>
