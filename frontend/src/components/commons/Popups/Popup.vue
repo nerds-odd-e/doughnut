@@ -19,7 +19,7 @@ export default defineComponent({
   props: { show: Boolean, sidebar: String as PropType<"left" | "right"> },
   emits: ["popupDone"],
   watch: {
-    modelValue() {
+    show() {
       if (!this.show) return;
       this.popups
         .dialog(this.$slots.default, this.sidebar)
