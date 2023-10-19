@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
@@ -164,13 +163,10 @@ class RestQuizQuestionControllerTests {
 
     @Test
     void suggestQuestionWithAPositiveFeedback() {
-      var responseEntity =
-          controller.suggestQuestionForFineTuning(
-              quizQuestionEntity, suggestionWithPositiveFeedback);
-      assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
 
       SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
-          (SuggestedQuestionForFineTuning) responseEntity.getBody();
+          controller.suggestQuestionForFineTuning(
+              quizQuestionEntity, suggestionWithPositiveFeedback);
       assert suggestedQuestionForFineTuning != null;
       assertEquals(quizQuestionEntity.getId(), suggestedQuestionForFineTuning.getQuizQuestionId());
       assertEquals(
@@ -182,13 +178,10 @@ class RestQuizQuestionControllerTests {
 
     @Test
     void suggestQuestionWithANegativeFeedback() {
-      var responseEntity =
-          controller.suggestQuestionForFineTuning(
-              quizQuestionEntity, suggestionWithNegativeFeedback);
-      assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
 
       SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
-          (SuggestedQuestionForFineTuning) responseEntity.getBody();
+          controller.suggestQuestionForFineTuning(
+              quizQuestionEntity, suggestionWithNegativeFeedback);
       assert suggestedQuestionForFineTuning != null;
       assertEquals(
           quizQuestionEntity.getId(), suggestedQuestionForFineTuning.getQuizQuestion().getId());
@@ -198,10 +191,9 @@ class RestQuizQuestionControllerTests {
 
     @Test
     void suggestQuestionWithSnapshotQuestionStem() {
-      var response =
+      var suggestedQuestionForFineTuning =
           controller.suggestQuestionForFineTuning(
               quizQuestionEntity, suggestionWithPositiveFeedback);
-      var suggestedQuestionForFineTuning = (SuggestedQuestionForFineTuning) response.getBody();
       assert suggestedQuestionForFineTuning != null;
       assertThat(
           suggestedQuestionForFineTuning.getPreservedQuestion().stem, equalTo(mcqWithAnswer.stem));

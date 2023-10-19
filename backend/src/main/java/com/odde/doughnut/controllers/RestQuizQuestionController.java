@@ -8,8 +8,6 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,18 +45,16 @@ class RestQuizQuestionController {
 
   @PostMapping("/{quizQuestion}/suggest-fine-tuning")
   @Transactional
-  public ResponseEntity<?> suggestQuestionForFineTuning(
+  public SuggestedQuestionForFineTuning suggestQuestionForFineTuning(
       @PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity,
       @Valid @RequestBody QuestionSuggestionCreationParams suggestion) {
     SuggestedQuestionForFineTuning sqft = new SuggestedQuestionForFineTuning();
     var suggestedQuestionForFineTuningService =
         modelFactoryService.toSuggestedQuestionForFineTuningService(sqft);
-    return new ResponseEntity<>(
-        suggestedQuestionForFineTuningService.suggestQuestionForFineTuning(
-            quizQuestionEntity,
-            suggestion,
-            currentUser.getEntity(),
-            testabilitySettings.getCurrentUTCTimestamp()),
-        HttpStatus.OK);
+    return suggestedQuestionForFineTuningService.suggestQuestionForFineTuning(
+        quizQuestionEntity,
+        suggestion,
+        currentUser.getEntity(),
+        testabilitySettings.getCurrentUTCTimestamp());
   }
 }
