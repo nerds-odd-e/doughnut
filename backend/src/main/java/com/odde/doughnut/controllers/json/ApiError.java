@@ -16,7 +16,6 @@ public class ApiError {
     BINDING_ERROR,
     OPENAI_TIMEOUT,
     OPENAI_SERVICE_ERROR,
-    EXISTING_FEEDBACK_ERROR,
   };
 
   public ApiError(String message, ErrorType type) {

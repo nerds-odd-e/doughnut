@@ -5,7 +5,6 @@ import com.odde.doughnut.controllers.json.QuestionSuggestionParams;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.exceptions.FeedbackExistingException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
 
@@ -17,16 +16,6 @@ public class SuggestedQuestionForFineTuningService {
       SuggestedQuestionForFineTuning suggestion, ModelFactoryService modelFactoryService) {
     this.entity = suggestion;
     this.modelFactoryService = modelFactoryService;
-  }
-
-  public SuggestedQuestionForFineTuning create(
-      QuizQuestionEntity quizQuestionEntity, QuestionSuggestionCreationParams params) {
-    entity.setQuizQuestion(quizQuestionEntity);
-    entity.setPreservedQuestion(quizQuestionEntity.getMcqWithAnswer());
-    entity.setComment(params.comment);
-    entity.setPositiveFeedback(params.isPositiveFeedback);
-    entity.setDuplicated(params.isDuplicated);
-    return save();
   }
 
   public SuggestedQuestionForFineTuning update(QuestionSuggestionParams params) {
@@ -44,16 +33,14 @@ public class SuggestedQuestionForFineTuningService {
       QuestionSuggestionCreationParams suggestionCreationParams,
       User user,
       Timestamp currentUTCTimestamp) {
-    Integer countByIdAndUserId =
-        modelFactoryService.questionSuggestionForFineTuningRepository.countByIdAndUserId(
-            quizQuestion.getId(), user.getId());
     entity.setUser(user);
     entity.setCreatedAt(currentUTCTimestamp);
-
-    if (countByIdAndUserId != 0) {
-      throw new FeedbackExistingException();
-    }
-    create(quizQuestion, suggestionCreationParams);
+    entity.setQuizQuestion(quizQuestion);
+    entity.setPreservedQuestion(quizQuestion.getMcqWithAnswer());
+    entity.setComment(suggestionCreationParams.comment);
+    entity.setPositiveFeedback(suggestionCreationParams.isPositiveFeedback);
+    entity.setDuplicated(suggestionCreationParams.isDuplicated);
+    save();
 
     return entity;
   }

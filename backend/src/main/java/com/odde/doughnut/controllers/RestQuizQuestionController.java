@@ -1,9 +1,7 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.json.ApiError;
 import com.odde.doughnut.controllers.json.QuestionSuggestionCreationParams;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.exceptions.FeedbackExistingException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.UserModel;
@@ -52,23 +50,15 @@ class RestQuizQuestionController {
   public ResponseEntity<?> suggestQuestionForFineTuning(
       @PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity,
       @Valid @RequestBody QuestionSuggestionCreationParams suggestion) {
-    try {
-      SuggestedQuestionForFineTuning sqft = new SuggestedQuestionForFineTuning();
-      var suggestedQuestionForFineTuningService =
-          modelFactoryService.toSuggestedQuestionForFineTuningService(sqft);
-      return new ResponseEntity<>(
-          suggestedQuestionForFineTuningService.suggestQuestionForFineTuning(
-              quizQuestionEntity,
-              suggestion,
-              currentUser.getEntity(),
-              testabilitySettings.getCurrentUTCTimestamp()),
-          HttpStatus.OK);
-    } catch (FeedbackExistingException e) {
-      var apiError =
-          new ApiError(
-              "You have already submitted a feedback", ApiError.ErrorType.EXISTING_FEEDBACK_ERROR);
-      apiError.add("errorType", ApiError.ErrorType.EXISTING_FEEDBACK_ERROR.toString());
-      return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
-    }
+    SuggestedQuestionForFineTuning sqft = new SuggestedQuestionForFineTuning();
+    var suggestedQuestionForFineTuningService =
+        modelFactoryService.toSuggestedQuestionForFineTuningService(sqft);
+    return new ResponseEntity<>(
+        suggestedQuestionForFineTuningService.suggestQuestionForFineTuning(
+            quizQuestionEntity,
+            suggestion,
+            currentUser.getEntity(),
+            testabilitySettings.getCurrentUTCTimestamp()),
+        HttpStatus.OK);
   }
 }
