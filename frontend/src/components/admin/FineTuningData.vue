@@ -20,7 +20,7 @@ import useLoadingApi from "../../managedApi/useLoadingApi";
 import SuggestedQuestionList from "./SuggestedQuestionList.vue";
 
 const downloadJSONL = (
-  fineTuningData: Generated.FeedbackData[],
+  fineTuningData: Generated.OpenAIChatGPTFineTuningExample[],
   filename: string,
 ) => {
   const blob = new Blob(

@@ -142,12 +142,12 @@ const apiCollection = (managedApi: ManagedApi) => ({
     async getPositiveFeedbackFineTuningExamples() {
       return (await managedApi.restGet(
         "fine-tuning/positive-feedback-generation-examples",
-      )) as Generated.FeedbackData[];
+      )) as Generated.OpenAIChatGPTFineTuningExample[];
     },
     async getAllEvaluationModelExamples() {
       return (await managedApi.restGet(
         "fine-tuning/feedback-evaluation-examples",
-      )) as Generated.FeedbackData[];
+      )) as Generated.OpenAIChatGPTFineTuningExample[];
     },
     async suggestedQuestionForFineTuningUpdate(
       suggestedId: Doughnut.ID,

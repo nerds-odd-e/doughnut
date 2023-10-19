@@ -4,7 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.odde.doughnut.controllers.json.FeedbackData;
+import com.odde.doughnut.controllers.json.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.controllers.json.QuestionSuggestionParams;
 import com.odde.doughnut.controllers.json.SimplifiedOpenAIChatMessage;
 import com.odde.doughnut.entities.Note;
@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-public class RestFeedbackDataControllerTests {
+public class RestOpenAIChatGPTFineTuningExampleControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
 
   @Autowired MakeMe makeMe;
@@ -40,7 +40,7 @@ public class RestFeedbackDataControllerTests {
   }
 
   @Nested
-  class getGoodFeedbackData {
+  class getGoodOpenAIChatGPTFineTuningExample {
     @Test
     void itShouldNotAllowNonMemberToSeeTrainingData() {
       controller = new RestFineTuningDataController(modelFactoryService, makeMe.aNullUserModel());
@@ -51,7 +51,7 @@ public class RestFeedbackDataControllerTests {
 
     @Test
     void shouldReturnNoTrainingDataIfNoMarkedQuestion() throws UnexpectedNoAccessRightException {
-      List<FeedbackData> goodTrainingData =
+      List<OpenAIChatGPTFineTuningExample> goodTrainingData =
           controller.getAllPositiveFeedbackQuestionGenerationFineTuningExamples();
       assertTrue(goodTrainingData.isEmpty());
     }
@@ -61,11 +61,11 @@ public class RestFeedbackDataControllerTests {
         throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().title("Test Topic").please();
       makeMe.aQuestionSuggestionForFineTunining().ofNote(note).positive().please();
-      List<FeedbackData> goodFeedbackDataList =
+      List<OpenAIChatGPTFineTuningExample> goodOpenAIChatGPTFineTuningExampleList =
           controller.getAllPositiveFeedbackQuestionGenerationFineTuningExamples();
-      assertEquals(1, goodFeedbackDataList.size());
+      assertEquals(1, goodOpenAIChatGPTFineTuningExampleList.size());
       List<SimplifiedOpenAIChatMessage> goodTrainingData =
-          goodFeedbackDataList.get(0).getMessages();
+          goodOpenAIChatGPTFineTuningExampleList.get(0).getMessages();
       assertThat(goodTrainingData.get(0).getContent(), containsString("Test Topic"));
       assertThat(
           goodTrainingData.get(1).getContent(),
@@ -81,10 +81,10 @@ public class RestFeedbackDataControllerTests {
           .withPreservedQuestion(
               makeMe.aMCQWithAnswer().stem("This is the raw Json question").please())
           .please();
-      List<FeedbackData> goodFeedbackDataList =
+      List<OpenAIChatGPTFineTuningExample> goodOpenAIChatGPTFineTuningExampleList =
           controller.getAllPositiveFeedbackQuestionGenerationFineTuningExamples();
       List<SimplifiedOpenAIChatMessage> goodTrainingData =
-          goodFeedbackDataList.get(0).getMessages();
+          goodOpenAIChatGPTFineTuningExampleList.get(0).getMessages();
       assertThat(
           goodTrainingData.get(2).getContent(), containsString("This is the raw Json question"));
     }
@@ -105,12 +105,12 @@ public class RestFeedbackDataControllerTests {
               makeMe.aMCQWithAnswer().stem("This is the negative raw Json question").please())
           .please();
 
-      List<FeedbackData> goodFeedbackDataList =
+      List<OpenAIChatGPTFineTuningExample> goodOpenAIChatGPTFineTuningExampleList =
           controller.getAllPositiveFeedbackQuestionGenerationFineTuningExamples();
 
       List<SimplifiedOpenAIChatMessage> goodTrainingData =
-          goodFeedbackDataList.get(0).getMessages();
-      assertEquals(1, goodFeedbackDataList.size());
+          goodOpenAIChatGPTFineTuningExampleList.get(0).getMessages();
+      assertEquals(1, goodOpenAIChatGPTFineTuningExampleList.size());
       assertThat(
           goodTrainingData.get(2).getContent(),
           containsString("This is the positive raw Json question"));
@@ -118,7 +118,7 @@ public class RestFeedbackDataControllerTests {
   }
 
   @Nested
-  class getAllFeedbackData {
+  class getAllOpenAIChatGPTFineTuningExample {
     @Test
     void shouldIncludeAllFeedbackData_whenCallGetGoodTrainingData()
         throws UnexpectedNoAccessRightException {
@@ -128,9 +128,10 @@ public class RestFeedbackDataControllerTests {
           .withPreservedQuestion(
               makeMe.aMCQWithAnswer().stem("This is the raw Json question").please())
           .please();
-      List<FeedbackData> goodFeedbackDataList = controller.getAllEvaluationExamples();
+      List<OpenAIChatGPTFineTuningExample> goodOpenAIChatGPTFineTuningExampleList =
+          controller.getAllEvaluationExamples();
       List<SimplifiedOpenAIChatMessage> goodTrainingData =
-          goodFeedbackDataList.get(0).getMessages();
+          goodOpenAIChatGPTFineTuningExampleList.get(0).getMessages();
       assertThat(
           goodTrainingData.get(2).getContent(), containsString("This is the raw Json question"));
       assertThat(goodTrainingData.get(3).getContent(), containsString("Is this a good question"));

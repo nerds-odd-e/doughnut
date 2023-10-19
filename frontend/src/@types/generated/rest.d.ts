@@ -59,10 +59,6 @@ declare namespace Generated {
         suggestedQuestionForFineTuning: SuggestedQuestionForFineTuning;
     }
 
-    interface FeedbackData {
-        messages: SimplifiedOpenAIChatMessage[];
-    }
-
     interface InitialInfo {
         thingId: number;
         skipReview: boolean;
@@ -119,6 +115,10 @@ declare namespace Generated {
     interface NotebooksViewedByUser {
         notebooks: NotebookViewedByUser[];
         subscriptions: Subscription[];
+    }
+
+    interface OpenAIChatGPTFineTuningExample {
+        messages: SimplifiedOpenAIChatMessage[];
     }
 
     interface QuestionSuggestionCreationParams {
@@ -219,8 +219,8 @@ declare namespace Generated {
         comment: string;
         preservedQuestion: MCQWithAnswer;
         createdAt?: string;
-        positiveFeedback: boolean;
         duplicated: boolean;
+        positiveFeedback: boolean;
         quizQuestionId?: number;
     }
 
@@ -345,7 +345,7 @@ declare namespace Generated {
         choices: string[];
     }
 
-    type ErrorType = "OPENAI_UNAUTHORIZED" | "BINDING_ERROR" | "OPENAI_TIMEOUT" | "OPENAI_SERVICE_ERROR" | "EXISTING_FEEDBACK_ERROR";
+    type ErrorType = "OPENAI_UNAUTHORIZED" | "BINDING_ERROR" | "OPENAI_TIMEOUT" | "OPENAI_SERVICE_ERROR";
 
     type LinkType = "no link" | "related to" | "a specialization of" | "an application of" | "an instance of" | "a part of" | "tagged by" | "an attribute of" | "the opposite of" | "author of" | "using" | "an example of" | "before" | "similar to" | "confused with";
 

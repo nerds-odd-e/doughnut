@@ -6,12 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
-public class FeedbackData {
+public class OpenAIChatGPTFineTuningExample {
   private @Getter List<SimplifiedOpenAIChatMessage> messages;
 
-  public static FeedbackData fromChatMessages(List<ChatMessage> messages1) {
+  public static OpenAIChatGPTFineTuningExample fromChatMessages(List<ChatMessage> messages1) {
     List<SimplifiedOpenAIChatMessage> simplifiedOpenAIChatMessages =
         messages1.stream().map(SimplifiedOpenAIChatMessage::fromOpenAIChatMessage).toList();
-    return new FeedbackData(simplifiedOpenAIChatMessages);
+    return new OpenAIChatGPTFineTuningExample(simplifiedOpenAIChatMessages);
   }
 }
