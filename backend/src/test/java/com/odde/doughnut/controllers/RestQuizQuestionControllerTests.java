@@ -148,10 +148,10 @@ class RestQuizQuestionControllerTests {
     Note note;
 
     QuestionSuggestionCreationParams suggestionWithPositiveFeedback =
-        new QuestionSuggestionCreationParams("this is a comment", true, false);
+        new QuestionSuggestionCreationParams("this is a comment", true);
 
     QuestionSuggestionCreationParams suggestionWithNegativeFeedback =
-        new QuestionSuggestionCreationParams("this is a comment", false, false);
+        new QuestionSuggestionCreationParams("this is a comment", false);
 
     @BeforeEach
     void setup() throws QuizQuestionNotPossibleException {

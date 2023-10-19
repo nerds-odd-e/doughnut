@@ -123,8 +123,8 @@ public class ModelFactoryService {
         .sorted(Comparator.comparing(v -> idList.indexOf(v.getId())));
   }
 
-  public SuggestedQuestionForFineTuningService toSuggestedQuestionForFineTuningService(
+  public SuggestedQuestionForFineTuningModel toSuggestedQuestionForFineTuningService(
       SuggestedQuestionForFineTuning suggestion) {
-    return new SuggestedQuestionForFineTuningService(suggestion, this);
+    return new SuggestedQuestionForFineTuningModel(suggestion, this);
   }
 }

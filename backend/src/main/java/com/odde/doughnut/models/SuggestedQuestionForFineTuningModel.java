@@ -8,11 +8,11 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
 
-public class SuggestedQuestionForFineTuningService {
+public class SuggestedQuestionForFineTuningModel {
   private final SuggestedQuestionForFineTuning entity;
   private final ModelFactoryService modelFactoryService;
 
-  public SuggestedQuestionForFineTuningService(
+  public SuggestedQuestionForFineTuningModel(
       SuggestedQuestionForFineTuning suggestion, ModelFactoryService modelFactoryService) {
     this.entity = suggestion;
     this.modelFactoryService = modelFactoryService;

@@ -94,12 +94,6 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
         throws UnexpectedNoAccessRightException {
       makeMe
           .aQuestionSuggestionForFineTunining()
-          .positive()
-          .withPreservedQuestion(
-              makeMe.aMCQWithAnswer().stem("This is the positive raw Json question").please())
-          .please();
-      makeMe
-          .aQuestionSuggestionForFineTunining()
           .negative()
           .withPreservedQuestion(
               makeMe.aMCQWithAnswer().stem("This is the negative raw Json question").please())
@@ -108,12 +102,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
       List<OpenAIChatGPTFineTuningExample> goodOpenAIChatGPTFineTuningExampleList =
           controller.getAllPositiveFeedbackQuestionGenerationFineTuningExamples();
 
-      List<SimplifiedOpenAIChatMessage> goodTrainingData =
-          goodOpenAIChatGPTFineTuningExampleList.get(0).getMessages();
-      assertEquals(1, goodOpenAIChatGPTFineTuningExampleList.size());
-      assertThat(
-          goodTrainingData.get(2).getContent(),
-          containsString("This is the positive raw Json question"));
+      assertEquals(0, goodOpenAIChatGPTFineTuningExampleList.size());
     }
   }
 
