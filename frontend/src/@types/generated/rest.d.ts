@@ -124,7 +124,6 @@ declare namespace Generated {
     interface QuestionSuggestionCreationParams {
         comment: string;
         isPositiveFeedback: boolean;
-        isDuplicated: boolean;
     }
 
     interface QuestionSuggestionParams {

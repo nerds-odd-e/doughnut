@@ -46,7 +46,6 @@ import asPopup from "../commons/Popups/asPopup";
 const params = ref<Generated.QuestionSuggestionCreationParams>({
   isPositiveFeedback: false,
   comment: "",
-  isDuplicated: false,
 });
 const { api } = useLoadingApi();
 const { popup } = asPopup();

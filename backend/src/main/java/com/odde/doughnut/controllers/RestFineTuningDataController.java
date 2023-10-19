@@ -6,7 +6,7 @@ import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
-import java.util.ArrayList;
+import com.odde.doughnut.services.FineTuningService;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -18,11 +18,13 @@ import org.springframework.web.context.annotation.SessionScope;
 class RestFineTuningDataController {
   private final ModelFactoryService modelFactoryService;
   private UserModel currentUser;
+  private FineTuningService fineTuningService;
 
   public RestFineTuningDataController(
       ModelFactoryService modelFactoryService, UserModel currentUser) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
+    this.fineTuningService = new FineTuningService(this.modelFactoryService);
   }
 
   @PatchMapping("/{suggestedQuestion}/update-suggested-question-for-fine-tuning")
@@ -52,34 +54,20 @@ class RestFineTuningDataController {
       getAllPositiveFeedbackQuestionGenerationFineTuningExamples()
           throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
-    return getSuggestedQuestionForFineTunings().stream()
-        .filter(question -> question.isPositiveFeedback())
-        .map(SuggestedQuestionForFineTuning::toFineTuningExample)
-        .toList();
+    return fineTuningService.getQuestionGenerationTrainingExamples();
   }
 
   @GetMapping("/feedback-evaluation-examples")
   public List<OpenAIChatGPTFineTuningExample> getAllEvaluationExamples()
       throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
-    return getSuggestedQuestionForFineTunings().stream()
-        .map(SuggestedQuestionForFineTuning::toEvaluationData)
-        .toList();
+    return fineTuningService.getQuestionEvaluationTrainingExamples();
   }
 
   @GetMapping("/all-suggested-questions-for-fine-tuning")
   public List<SuggestedQuestionForFineTuning> getAllSuggestedQuestions()
       throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
-    return getSuggestedQuestionForFineTunings();
-  }
-
-  private List<SuggestedQuestionForFineTuning> getSuggestedQuestionForFineTunings() {
-    List<SuggestedQuestionForFineTuning> suggestedQuestionForFineTunings = new ArrayList<>();
-    modelFactoryService
-        .questionSuggestionForFineTuningRepository
-        .findAll()
-        .forEach(suggestedQuestionForFineTunings::add);
-    return suggestedQuestionForFineTunings;
+    return fineTuningService.getSuggestedQuestionForFineTunings();
   }
 }

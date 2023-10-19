@@ -39,7 +39,7 @@ public class SuggestedQuestionForFineTuningService {
     entity.setPreservedQuestion(quizQuestion.getMcqWithAnswer());
     entity.setComment(suggestionCreationParams.comment);
     entity.setPositiveFeedback(suggestionCreationParams.isPositiveFeedback);
-    entity.setDuplicated(suggestionCreationParams.isDuplicated);
+    entity.setDuplicated(false);
     save();
 
     return entity;

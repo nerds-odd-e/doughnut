@@ -88,7 +88,7 @@ public class SuggestedQuestionForFineTuning {
   }
 
   @JsonIgnore
-  public OpenAIChatGPTFineTuningExample toFineTuningExample() {
+  public OpenAIChatGPTFineTuningExample toQuestionGenerationFineTuningExample() {
     List<ChatMessage> messages =
         new OpenAIChatAboutNoteRequestBuilder()
             .contentOfNoteOfCurrentFocus(getNote())
@@ -100,7 +100,7 @@ public class SuggestedQuestionForFineTuning {
   }
 
   @JsonIgnore
-  public OpenAIChatGPTFineTuningExample toEvaluationData() {
+  public OpenAIChatGPTFineTuningExample toQuestionEvaluationFineTuningData() {
     List<ChatMessage> messages =
         new OpenAIChatAboutNoteRequestBuilder()
             .contentOfNoteOfCurrentFocus(getNote())
