@@ -103,10 +103,6 @@ class ApiMockImpl implements ApiMock {
   verifyCall(url: string, matcher: any = expect.anything()) {
     expect(this.fetchMock).toHaveBeenCalledWith(url, matcher);
   }
-
-  verifyNotCalled(url: string) {
-    expect(this.fetchMock).not.toHaveBeenCalledWith(url);
-  }
 }
 
 const setupApiMock = () => new ApiMockImpl().init() as ApiMock;
