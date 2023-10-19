@@ -10,15 +10,15 @@
     <label> This question is: </label>
     <button
       class="positive-feedback-btn feedback-btn"
-      :class="{ selected: isPositiveFeedback }"
-      @click="markQuestionAsPositive"
+      :class="{ selected: params.isPositiveFeedback }"
+      @click="params.isPositiveFeedback = true"
     >
       👍 Good
     </button>
     <button
       class="negative-feedback-btn feedback-btn"
-      :class="{ selected: isPositiveFeedback === false }"
-      @click="markQuestionAsNegative"
+      :class="{ selected: !params.isPositiveFeedback }"
+      @click="params.isPositiveFeedback = false"
     >
       👎 Bad
     </button>
@@ -26,7 +26,7 @@
   <TextInput
     id="feedback-comment"
     field="comment"
-    v-model="comment"
+    v-model="params.comment"
     placeholder="Add a comment about the question"
   />
   <div class="feedback-actions-container">
@@ -43,48 +43,29 @@ import { ref } from "vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import asPopup from "../commons/Popups/asPopup";
 
-const isPositiveFeedback = ref<boolean | null>(null);
-const comment = ref<string>("");
+const params = ref<Generated.QuestionSuggestionCreationParams>({
+  isPositiveFeedback: false,
+  comment: "",
+  isDuplicated: false,
+});
 const { api } = useLoadingApi();
 const { popup } = asPopup();
 
 const props = defineProps<{
-  quizQuestion: Generated.QuizQuestion | undefined;
+  quizQuestion: Generated.QuizQuestion;
 }>();
 
 const { quizQuestion } = props;
 
 async function suggestQuestionForFineTuning() {
   await api.reviewMethods.suggestQuestionForFineTuning(
-    quizQuestion!.quizQuestionId,
-    {
-      isPositiveFeedback: isPositiveFeedback.value ?? false,
-      comment: comment.value,
-      isDuplicated: false,
-    },
+    quizQuestion.quizQuestionId,
+    params.value,
   );
   popup.done(null);
 }
-
-function markQuestionAsPositive() {
-  isPositiveFeedback.value = true;
-}
-
-function markQuestionAsNegative() {
-  isPositiveFeedback.value = false;
-}
-</script>
-<script lang="ts">
-export default {
-  name: "SuggestQuestionForFineTuningIntegrated",
-  inheritAttrs: false,
-  customOptions: {},
-};
 </script>
 <style scoped>
-.container {
-  padding: 20px;
-}
 .feedback-btn {
   background-color: #007bff;
   color: white;
