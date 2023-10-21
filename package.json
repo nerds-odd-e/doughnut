@@ -46,7 +46,7 @@
     "cypress": "13.3.2",
     "cypress-file-upload": "^5.0",
     "esbuild": "^0.19",
-    "eslint": "^8.51",
+    "eslint": "^8.52",
     "eslint-config-prettier": "^9.0",
     "eslint-plugin-chai-friendly": "^0.7",
     "eslint-plugin-cypress": "^2.15",

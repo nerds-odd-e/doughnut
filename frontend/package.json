@@ -13,7 +13,7 @@
   "dependencies": {
     "@popperjs/core": "^2.11",
     "@types/turndown": "^5.0.2",
-    "@vue/runtime-core": "3.3.5",
+    "@vue/runtime-core": "3.3.6",
     "@vueup/vue-quill": "1.2.0",
     "bootstrap": "5.3.2",
     "gsap": "^3.12",
@@ -23,7 +23,7 @@
     "quill": "2.0.0-dev.4",
     "turndown": "^7.1.2",
     "unplugin-vue-components": "0.25.2",
-    "vue": "3.3.5",
+    "vue": "3.3.6",
     "vue-content-loader": "2.0.1",
     "vue-router": "4.2.5"
   },
@@ -40,7 +40,7 @@
     "@vue/test-utils": "2.4.1",
     "autoprefixer": "^10.4",
     "css-loader": "^6.8",
-    "eslint": "^8.50",
+    "eslint": "^8.52",
     "eslint-config-airbnb-base": "^15.0",
     "eslint-config-airbnb-typescript": "^17.1",
     "eslint-config-prettier": "^9.0",
