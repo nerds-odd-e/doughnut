@@ -13,7 +13,7 @@
   "dependencies": {
     "@popperjs/core": "^2.11",
     "@types/turndown": "^5.0.2",
-    "@vue/runtime-core": "3.3.6",
+    "@vue/runtime-core": "3.3.7",
     "@vueup/vue-quill": "1.2.0",
     "bootstrap": "5.3.2",
     "gsap": "^3.12",
@@ -23,7 +23,7 @@
     "quill": "2.0.0-dev.4",
     "turndown": "^7.1.2",
     "unplugin-vue-components": "0.25.2",
-    "vue": "3.3.6",
+    "vue": "3.3.7",
     "vue-content-loader": "2.0.1",
     "vue-router": "4.2.5"
   },
