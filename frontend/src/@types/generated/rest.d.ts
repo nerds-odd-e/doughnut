@@ -219,7 +219,6 @@ declare namespace Generated {
         preservedQuestion: MCQWithAnswer;
         createdAt?: string;
         positiveFeedback: boolean;
-        quizQuestionId?: number;
         duplicated: boolean;
     }
 

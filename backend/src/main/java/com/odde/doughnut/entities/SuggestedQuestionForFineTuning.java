@@ -65,11 +65,6 @@ public class SuggestedQuestionForFineTuning {
   @Setter
   private boolean isDuplicated;
 
-  @Nullable
-  public int getQuizQuestionId() {
-    return quizQuestion.getId();
-  }
-
   public MCQWithAnswer getPreservedQuestion() {
     try {
       return new ObjectMapper().readValue(preservedQuestion, MCQWithAnswer.class);
