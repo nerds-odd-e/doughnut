@@ -11,7 +11,7 @@ public interface BazaarNotebookRepository extends CrudRepository<BazaarNotebook,
 
   @Query(
       value =
-          "SELECT * from bazaar_notebook JOIN notebook on notebook.id = bazaar_notebook.notebook_id WHERE notebook.deleted_at IS NULL ",
+          "SELECT bazaar_notebook.* from bazaar_notebook JOIN notebook on notebook.id = bazaar_notebook.notebook_id WHERE notebook.deleted_at IS NULL ",
       nativeQuery = true)
   List<BazaarNotebook> findAllNonDeleted();
 }
