@@ -20,7 +20,7 @@ describe("QuizQuestion", () => {
     beforeEach(() => {
       wrapper = helper
         .component(SuggestQuestionForFineTuning)
-        .withStorageProps({ quizQuestion })
+        .withProps({ quizQuestion })
         .mount();
     });
 
