@@ -29,14 +29,7 @@ public class OpenAIChatAboutNoteRequestBuilder {
   }
 
   public OpenAIChatAboutNoteRequestBuilder contentOfNoteOfCurrentFocus(Note note) {
-    String noteOfCurrentFocus =
-        """
-The note of current focus:
-Context path: %s
-Topic: %s
-%s
-      """
-            .formatted(note.getContextPathString(), note.getTopic(), getMarkdownDetails(note));
+    String noteOfCurrentFocus = note.getNoteDescription();
     return addMessage(ChatMessageRole.SYSTEM, noteOfCurrentFocus);
   }
 
@@ -170,10 +163,5 @@ please critically check if the following question makes sense and is possible to
         "Please assume the role of a Memory Assistant. Generate a MCQ based on the note of current focus in its context path.";
 
     return addMessage(ChatMessageRole.USER, messageBody);
-  }
-
-  private String getMarkdownDetails(Note note) {
-    if (note.isDetailsBlankHtml()) return "";
-    return "Details (until the end of this message):\n%s".formatted(note.getDetails());
   }
 }

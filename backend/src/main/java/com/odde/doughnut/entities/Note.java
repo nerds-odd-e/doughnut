@@ -380,4 +380,23 @@ public class Note extends Thingy {
   public boolean matchAnswer(String spellingAnswer) {
     return getNoteTitle().matches(spellingAnswer);
   }
+
+  @JsonIgnore
+  public String getNoteDescription() {
+    return """
+The note of current focus:
+Context path: %s
+Topic: %s
+%s"""
+        .formatted(getContextPathString(), getTopic(), getDetailsIfNotEmpty());
+  }
+
+  @JsonIgnore
+  private String getDetailsIfNotEmpty() {
+    String result = "";
+    if (!isDetailsBlankHtml()) {
+      result = "Details (until the end of this message):\n%s".formatted(getDetails());
+    }
+    return result;
+  }
 }
