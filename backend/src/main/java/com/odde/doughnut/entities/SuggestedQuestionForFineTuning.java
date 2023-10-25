@@ -33,14 +33,6 @@ public class SuggestedQuestionForFineTuning {
   @JsonIgnore
   private User user;
 
-  @ManyToOne
-  @JoinColumn(name = "quiz_question_id")
-  @Getter
-  @Setter
-  @JsonIgnore
-  @NonNull
-  private QuizQuestionEntity quizQuestion;
-
   @Column(name = "comment")
   @Getter
   @Setter
@@ -53,6 +45,11 @@ public class SuggestedQuestionForFineTuning {
 
   @Column(name = "preserved_question")
   private String preservedQuestion;
+
+  @Column(name = "preserved_note_content")
+  @Getter
+  @Setter
+  private String preservedNoteContent;
 
   @Column(name = "created_at")
   @Getter
@@ -73,20 +70,19 @@ public class SuggestedQuestionForFineTuning {
     }
   }
 
-  public void setPreservedQuestion(MCQWithAnswer mcqWithAnswer) {
+  public void preserveQuestion(MCQWithAnswer mcqWithAnswer) {
     this.preservedQuestion = mcqWithAnswer.toJsonString();
   }
 
-  @JsonIgnore
-  private Note getNote() {
-    return quizQuestion.getThing().getNote();
+  public void preserveNoteContent(Note note) {
+    this.preservedNoteContent = note.getNoteDescription();
   }
 
   @JsonIgnore
   public OpenAIChatGPTFineTuningExample toQuestionGenerationFineTuningExample() {
     List<ChatMessage> messages =
         new OpenAIChatAboutNoteRequestBuilder()
-            .contentOfNoteOfCurrentFocus(getNote())
+            .addMessage(ChatMessageRole.SYSTEM, preservedNoteContent)
             .userInstructionToGenerateQuestionWithGPT35FineTunedModel()
             .addMessage(ChatMessageRole.ASSISTANT, preservedQuestion)
             .build()
@@ -98,7 +94,7 @@ public class SuggestedQuestionForFineTuning {
   public OpenAIChatGPTFineTuningExample toQuestionEvaluationFineTuningData() {
     List<ChatMessage> messages =
         new OpenAIChatAboutNoteRequestBuilder()
-            .contentOfNoteOfCurrentFocus(getNote())
+            .addMessage(ChatMessageRole.SYSTEM, preservedNoteContent)
             .userInstructionToGenerateQuestionWithGPT35FineTunedModel()
             .addMessage(ChatMessageRole.ASSISTANT, preservedQuestion)
             .addFeedback(isPositiveFeedback)

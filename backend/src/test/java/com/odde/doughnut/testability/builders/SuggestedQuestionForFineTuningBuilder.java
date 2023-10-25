@@ -1,7 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.EntityBuilder;
@@ -20,12 +19,11 @@ public class SuggestedQuestionForFineTuningBuilder
   @Override
   protected void beforeCreate(boolean needPersist) {
     Note note = this.note == null ? makeMe.aNote().please() : this.note;
-    QuizQuestionEntity quizQuestion = makeMe.aQuestion().ofNote(note).please();
-    entity.setQuizQuestion(quizQuestion);
+    entity.preserveNoteContent(note);
     if (this.preservedQuestion != null) {
-      entity.setPreservedQuestion(this.preservedQuestion);
+      entity.preserveQuestion(this.preservedQuestion);
     } else {
-      entity.setPreservedQuestion(makeMe.aMCQWithAnswer().please());
+      entity.preserveQuestion(makeMe.aMCQWithAnswer().please());
     }
   }
 
@@ -36,11 +34,6 @@ public class SuggestedQuestionForFineTuningBuilder
 
   public SuggestedQuestionForFineTuningBuilder withPreservedQuestion(MCQWithAnswer question) {
     this.preservedQuestion = question;
-    return this;
-  }
-
-  public SuggestedQuestionForFineTuningBuilder comment(String comment) {
-    entity.setComment(comment);
     return this;
   }
 

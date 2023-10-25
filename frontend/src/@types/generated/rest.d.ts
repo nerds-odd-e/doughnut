@@ -217,6 +217,7 @@ declare namespace Generated {
         id: number;
         comment: string;
         preservedQuestion: MCQWithAnswer;
+        preservedNoteContent: string;
         createdAt?: string;
         positiveFeedback: boolean;
         duplicated: boolean;

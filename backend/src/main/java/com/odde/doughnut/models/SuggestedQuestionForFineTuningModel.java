@@ -19,7 +19,7 @@ public class SuggestedQuestionForFineTuningModel {
   }
 
   public SuggestedQuestionForFineTuning update(QuestionSuggestionParams params) {
-    entity.setPreservedQuestion(params.preservedQuestion);
+    entity.preserveQuestion(params.preservedQuestion);
     entity.setComment(params.comment);
     return save();
   }
@@ -35,8 +35,8 @@ public class SuggestedQuestionForFineTuningModel {
       Timestamp currentUTCTimestamp) {
     entity.setUser(user);
     entity.setCreatedAt(currentUTCTimestamp);
-    entity.setQuizQuestion(quizQuestion);
-    entity.setPreservedQuestion(quizQuestion.getMcqWithAnswer());
+    entity.preserveNoteContent(quizQuestion.getThing().getNote());
+    entity.preserveQuestion(quizQuestion.getMcqWithAnswer());
     entity.setComment(suggestionCreationParams.comment);
     entity.setPositiveFeedback(suggestionCreationParams.isPositiveFeedback);
     entity.setDuplicated(false);
@@ -48,8 +48,8 @@ public class SuggestedQuestionForFineTuningModel {
   public SuggestedQuestionForFineTuning duplicate() {
     SuggestedQuestionForFineTuning newObject = new SuggestedQuestionForFineTuning();
     newObject.setUser(entity.getUser());
-    newObject.setQuizQuestion(entity.getQuizQuestion());
-    newObject.setPreservedQuestion(entity.getPreservedQuestion());
+    newObject.preserveQuestion(entity.getPreservedQuestion());
+    newObject.setPreservedNoteContent(entity.getPreservedNoteContent());
     newObject.setComment(entity.getComment());
     newObject.setPositiveFeedback(entity.isPositiveFeedback());
     newObject.setDuplicated(true);

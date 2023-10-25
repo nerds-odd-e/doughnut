@@ -169,7 +169,8 @@ class RestQuizQuestionControllerTests {
               quizQuestionEntity, suggestionWithPositiveFeedback);
       assert suggestedQuestionForFineTuning != null;
       assertEquals(
-          quizQuestionEntity.getId(), suggestedQuestionForFineTuning.getQuizQuestion().getId());
+          quizQuestionEntity.getMcqWithAnswer().toJsonString(),
+          suggestedQuestionForFineTuning.getPreservedQuestion().toJsonString());
       assertEquals("this is a comment", suggestedQuestionForFineTuning.getComment());
       assertTrue(suggestedQuestionForFineTuning.isPositiveFeedback(), "Incorrect Feedback");
       assertFalse(suggestedQuestionForFineTuning.isDuplicated());
@@ -183,7 +184,8 @@ class RestQuizQuestionControllerTests {
               quizQuestionEntity, suggestionWithNegativeFeedback);
       assert suggestedQuestionForFineTuning != null;
       assertEquals(
-          quizQuestionEntity.getId(), suggestedQuestionForFineTuning.getQuizQuestion().getId());
+          quizQuestionEntity.getMcqWithAnswer().toJsonString(),
+          suggestedQuestionForFineTuning.getPreservedQuestion().toJsonString());
       assertEquals("this is a comment", suggestedQuestionForFineTuning.getComment());
       assertFalse(suggestedQuestionForFineTuning.isPositiveFeedback(), "Incorrect Feedback");
     }
