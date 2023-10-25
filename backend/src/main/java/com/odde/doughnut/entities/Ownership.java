@@ -48,7 +48,7 @@ public class Ownership {
 
   public boolean ownsBy(User user) {
     if (this.user != null) {
-      return this.user.equals(user);
+      return this.user.getId().equals(user.getId());
     }
     if (this.circle == null) return false;
     return this.circle.getMembers().contains(user);
