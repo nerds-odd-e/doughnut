@@ -13,6 +13,7 @@ class SuggestQuestionForFineTuningBuilder extends Builder<Generated.SuggestedQue
         correctChoiceIndex: 0,
         confidence: 9,
       },
+      preservedNoteContent: "this is the note content",
       comment: "",
       positiveFeedback: false,
       duplicated: false,
