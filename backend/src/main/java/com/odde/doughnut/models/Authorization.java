@@ -89,15 +89,10 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
     return user.owns(notebook);
   }
 
-  private boolean hasReferenceAuthority(Note note) {
-    if (user == null) return false;
-    return user.canReferTo(note.getNotebook());
-  }
-
   private void assertReadAuthorizationNotebook(Notebook notebook)
       throws UnexpectedNoAccessRightException {
     if (notebook != null) {
-      if (hasReferenceAuthority(notebook.getHeadNote())) {
+      if (user != null && user.canReferTo(notebook)) {
         return;
       }
       if (modelFactoryService.bazaarNotebookRepository.findByNotebook(notebook) != null) {
