@@ -168,7 +168,6 @@ class RestQuizQuestionControllerTests {
           controller.suggestQuestionForFineTuning(
               quizQuestionEntity, suggestionWithPositiveFeedback);
       assert suggestedQuestionForFineTuning != null;
-      assertEquals(quizQuestionEntity.getId(), suggestedQuestionForFineTuning.getQuizQuestionId());
       assertEquals(
           quizQuestionEntity.getId(), suggestedQuestionForFineTuning.getQuizQuestion().getId());
       assertEquals("this is a comment", suggestedQuestionForFineTuning.getComment());
