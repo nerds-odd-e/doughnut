@@ -28,7 +28,7 @@ public class NonProductConfiguration {
         .disable()
         .authorizeHttpRequests()
         .requestMatchers("/api/healthcheck", "/api/testability/**")
-        .permitAll();
+        .permitAll().and().rememberMe().alwaysRemember(true);
 
     commonConfiguration.commonConfig(http, http.httpBasic().and().formLogin());
     return http.build();
