@@ -1,0 +1,1 @@
+DELETE FROM `suggested_question_for_fine_tuning`
