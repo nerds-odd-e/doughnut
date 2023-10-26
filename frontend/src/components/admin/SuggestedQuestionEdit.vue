@@ -2,6 +2,11 @@
   <h2>Edit Suggested Question For AI Fine Tuning</h2>
   <div>
     <TextArea
+      :field="`preservedNoteContent`"
+      v-model="suggestionParams.preservedNoteContent"
+      :rows="2"
+    />
+    <TextArea
       :field="`stem`"
       v-model="suggestionParams.preservedQuestion.stem"
       placeholder="Add a suggested question"
@@ -27,6 +32,10 @@
       v-model="suggestionParams.comment"
       placeholder="Add a comment about the question"
     />
+    <CheckInput
+      scope-name="positiveFeedback"
+      v-model="suggestionParams.positiveFeedback"
+    />
   </div>
   <button class="btn btn-success" @click="suggestQuestionForFineTuning">
     Save
@@ -40,6 +49,7 @@ import useLoadingApi from "../../managedApi/useLoadingApi";
 import asPopup from "../commons/Popups/asPopup";
 import TextInput from "../form/TextInput.vue";
 import TextArea from "../form/TextArea.vue";
+import CheckInput from "../form/CheckInput.vue";
 
 export default defineComponent({
   inheritAttrs: false,
@@ -55,9 +65,9 @@ export default defineComponent({
   emits: ["update:modelValue"],
   data() {
     return {
-      suggestionParams: _.cloneDeep(
-        this.modelValue,
-      ) as Generated.QuestionSuggestionParams,
+      suggestionParams: <Generated.QuestionSuggestionParams>(
+        _.cloneDeep(this.modelValue)
+      ),
       errors: {
         preservedQuestion: {
           stem: "",
@@ -102,6 +112,6 @@ export default defineComponent({
       return validated;
     },
   },
-  components: { TextInput, TextArea },
+  components: { TextInput, TextArea, CheckInput },
 });
 </script>

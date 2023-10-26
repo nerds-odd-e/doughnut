@@ -23,7 +23,7 @@ import InputWithType from "./InputWithType.vue";
 
 export default {
   props: {
-    modelValue: String,
+    modelValue: [String, Number],
     scopeName: String,
     field: String,
     title: String,

@@ -129,6 +129,8 @@ declare namespace Generated {
     interface QuestionSuggestionParams {
         comment: string;
         preservedQuestion: MCQWithAnswer;
+        preservedNoteContent: string;
+        positiveFeedback: boolean;
     }
 
     interface QuizQuestion {

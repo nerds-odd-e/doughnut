@@ -9,4 +9,6 @@ import lombok.NoArgsConstructor;
 public class QuestionSuggestionParams {
   public String comment;
   public MCQWithAnswer preservedQuestion;
+  public String preservedNoteContent;
+  public boolean positiveFeedback;
 }
