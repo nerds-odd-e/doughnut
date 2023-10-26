@@ -57,11 +57,6 @@ public class SuggestedQuestionForFineTuning {
   @Nullable
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
-  @Column(name = "is_duplicated")
-  @Getter
-  @Setter
-  private boolean isDuplicated;
-
   public MCQWithAnswer getPreservedQuestion() {
     try {
       return new ObjectMapper().readValue(preservedQuestion, MCQWithAnswer.class);

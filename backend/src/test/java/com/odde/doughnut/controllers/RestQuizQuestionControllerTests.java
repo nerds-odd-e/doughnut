@@ -173,7 +173,6 @@ class RestQuizQuestionControllerTests {
           suggestedQuestionForFineTuning.getPreservedQuestion().toJsonString());
       assertEquals("this is a comment", suggestedQuestionForFineTuning.getComment());
       assertTrue(suggestedQuestionForFineTuning.isPositiveFeedback(), "Incorrect Feedback");
-      assertFalse(suggestedQuestionForFineTuning.isDuplicated());
     }
 
     @Test
