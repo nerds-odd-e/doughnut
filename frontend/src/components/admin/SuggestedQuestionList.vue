@@ -6,7 +6,6 @@
         <th scope="col">Feedback</th>
         <th scope="col">Comment</th>
         <th scope="col">Operation</th>
-        <th scope="col">Is Duplicated</th>
       </tr>
     </thead>
     <tbody>

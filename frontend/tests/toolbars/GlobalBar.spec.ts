@@ -5,9 +5,7 @@ import GlobalBar from "@/components/toolbars/GlobalBar.vue";
 import NoteEditingHistory from "@/store/NoteEditingHistory";
 import createNoteStorage, { StorageAccessor } from "@/store/createNoteStorage";
 import makeMe from "../fixtures/makeMe";
-import usePopups, {
-  PopupInfo,
-} from "../../src/components/commons/Popups/usePopups";
+import usePopups from "../../src/components/commons/Popups/usePopups";
 import helper from "../helpers";
 
 helper.resetWithApiMock(beforeEach, afterEach);
@@ -26,11 +24,6 @@ describe("global bar", () => {
     );
   });
 
-  const popupInfo = [] as PopupInfo[];
-  beforeEach(() => {
-    usePopups().popups.register({ popupInfo });
-  });
-
   it("opens the circles selection", async () => {
     const wrapper = helper
       .component(GlobalBar)
@@ -42,7 +35,7 @@ describe("global bar", () => {
       .mount();
     wrapper.find("[role='button']").trigger("click");
     await flushPromises();
-    expect(popupInfo).toHaveLength(1);
+    expect(usePopups().popups.peek()).toHaveLength(1);
   });
 
   it("fetch API to be called ONCE", async () => {

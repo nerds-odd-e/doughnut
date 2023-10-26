@@ -1,14 +1,10 @@
 import { merge } from "lodash";
 import { mount, VueWrapper } from "@vue/test-utils";
 import { render } from "@testing-library/vue";
-import { App, ComponentPublicInstance, DefineComponent } from "vue";
+import { ComponentPublicInstance, DefineComponent } from "vue";
 import { RouteLocationRaw } from "vue-router";
 import ManagedApi from "@/managedApi/ManagedApi";
 import createNoteStorage from "../../src/store/createNoteStorage";
-
-interface VuePlugin {
-  install: (app: App) => void;
-}
 
 class RenderingHelper {
   private comp;
@@ -56,11 +52,6 @@ class RenderingHelper {
 
   withMockRouterPush(push) {
     this.withGlobalMock({ $router: { push } });
-    return this;
-  }
-
-  withGlobalPlugin(plugin: VuePlugin) {
-    this.global = merge(this.global, { plugins: [plugin] });
     return this;
   }
 
