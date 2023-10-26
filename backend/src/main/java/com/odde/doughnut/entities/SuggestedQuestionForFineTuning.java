@@ -51,6 +51,11 @@ public class SuggestedQuestionForFineTuning {
   @Setter
   private String preservedNoteContent;
 
+  @Column(name = "real_correct_answers")
+  @Getter
+  @Setter
+  private String realCorrectAnswers = "";
+
   @Column(name = "created_at")
   @Getter
   @Setter
