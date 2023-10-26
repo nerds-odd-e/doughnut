@@ -207,4 +207,30 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
       assertThat(newSuggestion.getId(), not(equalTo(suggested.getId())));
     }
   }
+
+  @Nested
+  class delete {
+    SuggestedQuestionForFineTuning suggested;
+
+    @BeforeEach
+    void setup() {
+      suggested = makeMe.aQuestionSuggestionForFineTunining().please();
+    }
+
+    @Test
+    void itShouldNotAllowNonAdmin() {
+      controller =
+          new RestFineTuningDataController(modelFactoryService, makeMe.aUser().toModelPlease());
+      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.delete(suggested));
+    }
+
+    @Test
+    void createANewIdenticalSuggestion() throws UnexpectedNoAccessRightException {
+      var beforeCount = modelFactoryService.questionSuggestionForFineTuningRepository.count();
+      controller.delete(suggested);
+      assertThat(
+          modelFactoryService.questionSuggestionForFineTuningRepository.count(),
+          equalTo(beforeCount - 1));
+    }
+  }
 }

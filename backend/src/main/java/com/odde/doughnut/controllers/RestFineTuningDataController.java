@@ -49,6 +49,14 @@ class RestFineTuningDataController {
         .duplicate();
   }
 
+  @PostMapping("/{suggestedQuestion}/delete")
+  public SuggestedQuestionForFineTuning delete(
+      @PathVariable("suggestedQuestion") SuggestedQuestionForFineTuning suggestedQuestion)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAdminAuthorization();
+    return modelFactoryService.toSuggestedQuestionForFineTuningService(suggestedQuestion).delete();
+  }
+
   @GetMapping("/positive-feedback-generation-examples")
   public List<OpenAIChatGPTFineTuningExample>
       getAllPositiveFeedbackQuestionGenerationFineTuningExamples()
