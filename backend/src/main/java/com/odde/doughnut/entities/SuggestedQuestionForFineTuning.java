@@ -95,8 +95,7 @@ public class SuggestedQuestionForFineTuning {
     List<ChatMessage> messages =
         new OpenAIChatAboutNoteRequestBuilder()
             .addMessage(ChatMessageRole.SYSTEM, preservedNoteContent)
-            .userInstructionToGenerateQuestionWithGPT35FineTunedModel()
-            .addMessage(ChatMessageRole.ASSISTANT, preservedQuestion)
+            .evaluateQuestion(getPreservedQuestion())
             .addFeedback(isPositiveFeedback)
             .build()
             .getMessages();
