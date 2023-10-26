@@ -20,7 +20,9 @@ public class SuggestedQuestionForFineTuningModel {
 
   public SuggestedQuestionForFineTuning update(QuestionSuggestionParams params) {
     entity.preserveQuestion(params.preservedQuestion);
+    entity.setPreservedNoteContent(params.preservedNoteContent);
     entity.setComment(params.comment);
+    entity.setPositiveFeedback(params.positiveFeedback);
     return save();
   }
 
