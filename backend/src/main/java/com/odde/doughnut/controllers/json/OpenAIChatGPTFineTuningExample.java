@@ -7,11 +7,9 @@ import lombok.Getter;
 
 @AllArgsConstructor
 public class OpenAIChatGPTFineTuningExample {
-  private @Getter List<SimplifiedOpenAIChatMessage> messages;
+  private @Getter List<ChatMessage> messages;
 
   public static OpenAIChatGPTFineTuningExample fromChatMessages(List<ChatMessage> messages1) {
-    List<SimplifiedOpenAIChatMessage> simplifiedOpenAIChatMessages =
-        messages1.stream().map(SimplifiedOpenAIChatMessage::fromOpenAIChatMessage).toList();
-    return new OpenAIChatGPTFineTuningExample(simplifiedOpenAIChatMessages);
+    return new OpenAIChatGPTFineTuningExample(messages1);
   }
 }

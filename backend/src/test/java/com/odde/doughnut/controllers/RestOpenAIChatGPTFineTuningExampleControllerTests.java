@@ -6,13 +6,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.json.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.controllers.json.QuestionSuggestionParams;
-import com.odde.doughnut.controllers.json.SimplifiedOpenAIChatMessage;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
+import com.theokanning.openai.completion.chat.ChatMessage;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -64,7 +64,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
       List<OpenAIChatGPTFineTuningExample> goodOpenAIChatGPTFineTuningExampleList =
           controller.getAllPositiveFeedbackQuestionGenerationFineTuningExamples();
       assertEquals(1, goodOpenAIChatGPTFineTuningExampleList.size());
-      List<SimplifiedOpenAIChatMessage> goodTrainingData =
+      List<ChatMessage> goodTrainingData =
           goodOpenAIChatGPTFineTuningExampleList.get(0).getMessages();
       assertThat(goodTrainingData.get(0).getContent(), containsString("Test Topic"));
       assertThat(
@@ -83,7 +83,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
           .please();
       List<OpenAIChatGPTFineTuningExample> goodOpenAIChatGPTFineTuningExampleList =
           controller.getAllPositiveFeedbackQuestionGenerationFineTuningExamples();
-      List<SimplifiedOpenAIChatMessage> goodTrainingData =
+      List<ChatMessage> goodTrainingData =
           goodOpenAIChatGPTFineTuningExampleList.get(0).getMessages();
       assertThat(
           goodTrainingData.get(2).getContent(), containsString("This is the raw Json question"));
