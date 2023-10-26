@@ -17,6 +17,12 @@
       </li>
     </ul>
     <TextInput
+      field="correctChoiceIndex"
+      v-model="suggestionParams.preservedQuestion.correctChoiceIndex"
+      placeholder="correct choice index"
+      :errors="errors.preservedQuestion.correctChoiceIndex"
+    />
+    <TextInput
       field="comment"
       v-model="suggestionParams.comment"
       placeholder="Add a comment about the question"
@@ -56,6 +62,7 @@ export default defineComponent({
         preservedQuestion: {
           stem: "",
           choices: ["", "", "", ""] as string[],
+          correctChoiceIndex: "",
         },
       },
     };
@@ -77,11 +84,19 @@ export default defineComponent({
     ): Generated.QuestionSuggestionParams | undefined {
       const validated = _.cloneDeep(params);
       validated.preservedQuestion.choices = validated.preservedQuestion.choices
-        .map((choice) => choice.trim())
-        .filter((choice) => choice.length > 0);
+        .map((choice) => choice?.trim())
+        .filter((choice) => choice?.length > 0);
       if (validated.preservedQuestion.choices.length < 2) {
         this.errors.preservedQuestion.choices[1] =
           "At least 2 choices are required";
+        return undefined;
+      }
+      if (
+        validated.preservedQuestion.choices.length <=
+        validated.preservedQuestion.correctChoiceIndex
+      ) {
+        this.errors.preservedQuestion.correctChoiceIndex =
+          "Correct choice index is out of range";
         return undefined;
       }
       return validated;
