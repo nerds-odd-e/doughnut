@@ -13,6 +13,7 @@
           Duplicate
         </button>
         <button class="btn btn-sm" @click="chatStarter">Chat</button>
+        <button class="btn btn-sm" @click="chatStarter">Del</button>
       </div>
     </td>
   </tr>

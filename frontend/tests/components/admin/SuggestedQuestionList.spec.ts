@@ -1,3 +1,4 @@
+import { VueWrapper } from "@vue/test-utils";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import SuggestedQuestionList from "@/components/admin/SuggestedQuestionList.vue";
 import usePopups from "../../../src/components/commons/Popups/usePopups";
@@ -7,6 +8,12 @@ import makeMe from "../../fixtures/makeMe";
 helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("Edit Suggested Question", () => {
+  const matchByText = (wrapper: VueWrapper, reg: RegExp, selector: string) => {
+    const btns = wrapper
+      .findAll(selector)
+      .filter((node) => node.text().match(reg));
+    return btns.length === 1 ? btns[0] : undefined;
+  };
   describe("suggest question for fine tuning AI", () => {
     it("lists the suggestions", async () => {
       const suggestedQuestion = makeMe.aSuggestedQuestionForFineTuning.please();
@@ -15,41 +22,42 @@ describe("Edit Suggested Question", () => {
         .withProps({ suggestedQuestions: [suggestedQuestion] })
         .mount();
       expect(wrapper.findAll("tr").length).toEqual(2);
-      const btn = wrapper
-        .findAll("button")
-        .filter((node) => node.text().match(/Duplicate/));
-      expect(btn.length).toBe(1);
+      expect(matchByText(wrapper, /Duplicate/, "button")).not.toBeUndefined();
     });
 
-    it("cannot duplicate good suggestion", async () => {
+    describe("with a positive feedback", () => {
       const suggestedQuestion = makeMe.aSuggestedQuestionForFineTuning
         .positive()
         .please();
-      const wrapper = helper
-        .component(SuggestedQuestionList)
-        .withProps({ suggestedQuestions: [suggestedQuestion] })
-        .mount();
-      const btn = wrapper
-        .findAll("button")
-        .filter((node) => node.text().match(/Duplicate/));
-      expect(btn.length).toBe(0);
-    });
 
-    it("can download chat gpt conversation starter", async () => {
-      const suggestedQuestion = makeMe.aSuggestedQuestionForFineTuning
-        .positive()
-        .please();
-      const wrapper = helper
-        .component(SuggestedQuestionList)
-        .withProps({ suggestedQuestions: [suggestedQuestion] })
-        .mount();
-      const btn = wrapper
-        .findAll("button")
-        .filter((node) => node.text().match(/Chat/))[0];
-      btn!.trigger("click");
-      const alertMsg = usePopups().popups.peek()[0]!.message;
-      expect(alertMsg).toContain(suggestedQuestion.preservedQuestion.stem);
-      expect(alertMsg).toContain(suggestedQuestion.preservedNoteContent);
+      it("cannot duplicate good suggestion", async () => {
+        const wrapper = helper
+          .component(SuggestedQuestionList)
+          .withProps({ suggestedQuestions: [suggestedQuestion] })
+          .mount();
+        expect(matchByText(wrapper, /Duplicate/, "button")).toBeUndefined();
+      });
+
+      it("can download chat gpt conversation starter", async () => {
+        const wrapper = helper
+          .component(SuggestedQuestionList)
+          .withProps({ suggestedQuestions: [suggestedQuestion] })
+          .mount();
+        matchByText(wrapper, /Chat/, "button")!.trigger("click");
+        const alertMsg = usePopups().popups.peek()[0]!.message;
+        expect(alertMsg).toContain(suggestedQuestion.preservedQuestion.stem);
+        expect(alertMsg).toContain(suggestedQuestion.preservedNoteContent);
+      });
+
+      it("can delete", async () => {
+        const wrapper = helper
+          .component(SuggestedQuestionList)
+          .withProps({ suggestedQuestions: [suggestedQuestion] })
+          .mount();
+        matchByText(wrapper, /Del/, "button")!.trigger("click");
+        const confirm = usePopups().popups.peek()[0]!;
+        confirm.doneResolve(true);
+      });
     });
   });
 });
