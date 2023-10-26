@@ -173,11 +173,11 @@ class RestQuizQuestionControllerTests {
           suggestedQuestionForFineTuning.getPreservedQuestion().toJsonString());
       assertEquals("this is a comment", suggestedQuestionForFineTuning.getComment());
       assertTrue(suggestedQuestionForFineTuning.isPositiveFeedback(), "Incorrect Feedback");
+      assertEquals("0", suggestedQuestionForFineTuning.getRealCorrectAnswers());
     }
 
     @Test
     void suggestQuestionWithANegativeFeedback() {
-
       SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
           controller.suggestQuestionForFineTuning(
               quizQuestionEntity, suggestionWithNegativeFeedback);
@@ -187,6 +187,7 @@ class RestQuizQuestionControllerTests {
           suggestedQuestionForFineTuning.getPreservedQuestion().toJsonString());
       assertEquals("this is a comment", suggestedQuestionForFineTuning.getComment());
       assertFalse(suggestedQuestionForFineTuning.isPositiveFeedback(), "Incorrect Feedback");
+      assertEquals("", suggestedQuestionForFineTuning.getRealCorrectAnswers());
     }
 
     @Test

@@ -23,6 +23,7 @@ public class SuggestedQuestionForFineTuningModel {
     entity.setPreservedNoteContent(params.preservedNoteContent);
     entity.setComment(params.comment);
     entity.setPositiveFeedback(params.positiveFeedback);
+    entity.setRealCorrectAnswers(params.realCorrectAnswers);
     return save();
   }
 
@@ -41,9 +42,11 @@ public class SuggestedQuestionForFineTuningModel {
     entity.preserveQuestion(quizQuestion.getMcqWithAnswer());
     entity.setComment(suggestionCreationParams.comment);
     entity.setPositiveFeedback(suggestionCreationParams.isPositiveFeedback);
-    save();
-
-    return entity;
+    if (suggestionCreationParams.isPositiveFeedback) {
+      entity.setRealCorrectAnswers(
+          "%d".formatted(quizQuestion.getMcqWithAnswer().correctChoiceIndex));
+    }
+    return save();
   }
 
   public SuggestedQuestionForFineTuning duplicate() {

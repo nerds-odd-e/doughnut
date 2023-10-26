@@ -11,4 +11,5 @@ public class QuestionSuggestionParams {
   public MCQWithAnswer preservedQuestion;
   public String preservedNoteContent;
   public boolean positiveFeedback;
+  public String realCorrectAnswers;
 }
