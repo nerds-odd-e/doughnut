@@ -6,14 +6,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.json.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
+import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.List;
 import javax.persistence.*;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.lang.Nullable;
 
 @Entity
@@ -87,18 +90,42 @@ public class SuggestedQuestionForFineTuning {
             .addMessage(ChatMessageRole.ASSISTANT, preservedQuestion)
             .build()
             .getMessages();
-    return OpenAIChatGPTFineTuningExample.fromChatMessages(messages);
+    return new OpenAIChatGPTFineTuningExample(messages);
   }
 
   @JsonIgnore
   public OpenAIChatGPTFineTuningExample toQuestionEvaluationFineTuningData() {
-    List<ChatMessage> messages =
+    QuestionEvaluation questionEvaluation = getQuestionEvaluation();
+    var messages =
         new OpenAIChatAboutNoteRequestBuilder()
             .addMessage(ChatMessageRole.SYSTEM, preservedNoteContent)
             .evaluateQuestion(getPreservedQuestion())
-            .addFeedback(isPositiveFeedback)
+            .evaluationResult(questionEvaluation)
             .build()
             .getMessages();
-    return OpenAIChatGPTFineTuningExample.fromChatMessages(messages);
+    return new OpenAIChatGPTFineTuningExample(messages);
+  }
+
+  @JsonIgnore
+  private QuestionEvaluation getQuestionEvaluation() {
+    QuestionEvaluation questionEvaluation = new QuestionEvaluation();
+    questionEvaluation.comment = comment;
+    questionEvaluation.feasibleQuestion = isPositiveFeedback;
+    questionEvaluation.correctChoices = getRealCorrectAnswerIndice();
+    return questionEvaluation;
+  }
+
+  @JsonIgnore
+  private int[] getRealCorrectAnswerIndice() {
+    if (isPositiveFeedback) {
+      return new int[] {getPreservedQuestion().correctChoiceIndex};
+    }
+    if (!Strings.isBlank(realCorrectAnswers)) {
+      return Arrays.stream(realCorrectAnswers.split(","))
+          .map(String::trim)
+          .mapToInt(Integer::parseInt)
+          .toArray();
+    }
+    return null;
   }
 }
