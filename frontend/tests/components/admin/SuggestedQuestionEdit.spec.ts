@@ -37,5 +37,14 @@ describe("Edit Suggested Question", () => {
         "At least 2 choices are required",
       );
     });
+
+    it("validates the index", async () => {
+      wrapper.get("#undefined-correctChoiceIndex").setValue("4");
+      wrapper.get("button.btn-success").trigger("click");
+      await flushPromises();
+      expect(wrapper.get(".error-msg").text()).toContain(
+        "Correct choice index is out of range",
+      );
+    });
   });
 });
