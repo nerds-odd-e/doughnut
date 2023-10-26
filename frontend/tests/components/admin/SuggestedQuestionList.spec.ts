@@ -54,9 +54,11 @@ describe("Edit Suggested Question", () => {
           .component(SuggestedQuestionList)
           .withProps({ suggestedQuestions: [suggestedQuestion] })
           .mount();
+        helper.apiMock.expectingPost(
+          `/api/fine-tuning/${suggestedQuestion.id}/delete`,
+        );
         matchByText(wrapper, /Del/, "button")!.trigger("click");
-        const confirm = usePopups().popups.peek()[0]!;
-        confirm.doneResolve(true);
+        usePopups().popups.done(true);
       });
     });
   });

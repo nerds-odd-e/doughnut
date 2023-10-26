@@ -164,6 +164,12 @@ const apiCollection = (managedApi: ManagedApi) => ({
         {},
       )) as Generated.SuggestedQuestionForFineTuning;
     },
+    async deleteSuggestedQuestionForFineTuning(id: Doughnut.ID) {
+      return (await managedApi.restPost(
+        `fine-tuning/${id}/delete`,
+        {},
+      )) as Generated.SuggestedQuestionForFineTuning;
+    },
   },
   circleMethods: {
     async getCircle(circleId: Doughnut.ID) {

@@ -13,7 +13,12 @@
           Duplicate
         </button>
         <button class="btn btn-sm" @click="chatStarter">Chat</button>
-        <button class="btn btn-sm" @click="chatStarter">Del</button>
+        <button
+          class="btn btn-sm"
+          @click="deleteSuggestedQuestion(suggestedQuestion)"
+        >
+          Del
+        </button>
       </div>
     </td>
   </tr>
@@ -67,6 +72,19 @@ export default {
     },
     chatStarter() {
       this.popups.alert(this.chatStarterMessage);
+    },
+    async deleteSuggestedQuestion(
+      suggested: Generated.SuggestedQuestionForFineTuning,
+    ) {
+      if (
+        await this.popups.confirm(
+          `Are you sure to delete this suggestion (${suggested.preservedQuestion.stem})?`,
+        )
+      ) {
+        await this.api.fineTuning.deleteSuggestedQuestionForFineTuning(
+          suggested.id,
+        );
+      }
     },
   },
 };
