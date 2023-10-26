@@ -8,8 +8,4 @@ import lombok.Getter;
 @AllArgsConstructor
 public class OpenAIChatGPTFineTuningExample {
   private @Getter List<ChatMessage> messages;
-
-  public static OpenAIChatGPTFineTuningExample fromChatMessages(List<ChatMessage> messages1) {
-    return new OpenAIChatGPTFineTuningExample(messages1);
-  }
 }

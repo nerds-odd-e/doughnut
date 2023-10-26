@@ -6,10 +6,7 @@ import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.entities.Note;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
-import com.theokanning.openai.completion.chat.ChatFunction;
-import com.theokanning.openai.completion.chat.ChatMessage;
-import com.theokanning.openai.completion.chat.ChatMessageRole;
+import com.theokanning.openai.completion.chat.*;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.logging.log4j.util.Strings;
@@ -132,13 +129,6 @@ please critically check if the following question makes sense and is possible to
     return this;
   }
 
-  public OpenAIChatAboutNoteRequestBuilder addFeedback(boolean isPositiveFeedback) {
-    messages.add(new ChatMessage(ChatMessageRole.USER.value(), "Is this a good question?"));
-    messages.add(
-        new ChatMessage(ChatMessageRole.ASSISTANT.value(), isPositiveFeedback ? "Yes" : "No"));
-    return this;
-  }
-
   public OpenAIChatAboutNoteRequestBuilder questionSchemaInPlainChat() {
     ObjectMapper objectMapper = new ObjectMapper();
     JsonSchemaGenerator jsonSchemaGenerator = new JsonSchemaGenerator(objectMapper);
@@ -163,5 +153,14 @@ please critically check if the following question makes sense and is possible to
         "Please assume the role of a Memory Assistant. Generate a MCQ based on the note of current focus in its context path.";
 
     return addMessage(ChatMessageRole.USER, messageBody);
+  }
+
+  public OpenAIChatAboutNoteRequestBuilder evaluationResult(QuestionEvaluation questionEvaluation) {
+    ChatMessage msg = new ChatMessage(ChatMessageRole.ASSISTANT.value(), null);
+    msg.setFunctionCall(
+        new ChatFunctionCall(
+            "evaluate_question", new ObjectMapper().valueToTree(questionEvaluation)));
+    messages.add(msg);
+    return this;
   }
 }
