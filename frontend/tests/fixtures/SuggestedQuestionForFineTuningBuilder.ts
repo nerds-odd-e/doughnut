@@ -9,7 +9,7 @@ class SuggestQuestionForFineTuningBuilder extends Builder<Generated.SuggestedQue
       id: 1357,
       preservedQuestion: {
         stem: "What is the capital of France?",
-        choices: ["Paris", "London", "Berlin", "Madrid"],
+        choices: ["Paris", "London", "Berlin"],
         correctChoiceIndex: 0,
         confidence: 9,
       },
