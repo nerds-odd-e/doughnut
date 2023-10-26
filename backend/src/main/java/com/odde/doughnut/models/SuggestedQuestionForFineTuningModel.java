@@ -58,4 +58,9 @@ public class SuggestedQuestionForFineTuningModel {
     modelFactoryService.questionSuggestionForFineTuningRepository.save(newObject);
     return newObject;
   }
+
+  public SuggestedQuestionForFineTuning delete() {
+    modelFactoryService.questionSuggestionForFineTuningRepository.delete(entity);
+    return entity;
+  }
 }
