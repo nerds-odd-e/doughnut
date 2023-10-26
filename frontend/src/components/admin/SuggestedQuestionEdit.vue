@@ -7,17 +7,18 @@
       placeholder="Add a suggested question"
       :rows="2"
     /><br />
-    <ol type="A">
+    <ul>
       <li
         v-for="(_, index) in suggestionParams.preservedQuestion.choices"
         :key="index"
       >
-        <input
-          type="text"
+        <TextInput
+          :field="`choice-${index}`"
           v-model="suggestionParams.preservedQuestion.choices[index]"
+          :errors="errors.preservedQuestion.choices[index]"
         />
       </li>
-    </ol>
+    </ul>
     <TextInput
       field="comment"
       v-model="suggestionParams.comment"
@@ -54,17 +55,39 @@ export default defineComponent({
       suggestionParams: _.cloneDeep(
         this.modelValue,
       ) as Generated.QuestionSuggestionParams,
+      errors: {
+        preservedQuestion: {
+          stem: "",
+          choices: ["", "", "", ""] as string[],
+        },
+      },
     };
   },
   methods: {
     async suggestQuestionForFineTuning() {
+      const validated = this.validateSuggestedQuestion(this.suggestionParams);
+      if (!validated) return;
       const updated =
         await this.api.fineTuning.suggestedQuestionForFineTuningUpdate(
           this.modelValue.id,
-          this.suggestionParams,
+          validated,
         );
       this.$emit("update:modelValue", updated);
       this.popup.done(updated);
+    },
+    validateSuggestedQuestion(
+      params: Generated.QuestionSuggestionParams,
+    ): Generated.QuestionSuggestionParams | undefined {
+      const validated = _.cloneDeep(params);
+      validated.preservedQuestion.choices = validated.preservedQuestion.choices
+        .map((choice) => choice.trim())
+        .filter((choice) => choice.length > 0);
+      if (validated.preservedQuestion.choices.length < 2) {
+        this.errors.preservedQuestion.choices[1] =
+          "At least 2 choices are required";
+        return undefined;
+      }
+      return validated;
     },
   },
   components: { TextInput, TextArea },
