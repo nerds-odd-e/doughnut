@@ -118,7 +118,7 @@ declare namespace Generated {
     }
 
     interface OpenAIChatGPTFineTuningExample {
-        messages: SimplifiedOpenAIChatMessage[];
+        messages: ChatMessage[];
     }
 
     interface QuestionSuggestionCreationParams {
@@ -164,11 +164,6 @@ declare namespace Generated {
 
     interface SelfEvaluation {
         adjustment: number;
-    }
-
-    interface SimplifiedOpenAIChatMessage {
-        role: string;
-        content: string;
     }
 
     interface UserForOtherUserView {
@@ -283,6 +278,13 @@ declare namespace Generated {
         notebook: Notebook;
     }
 
+    interface ChatMessage {
+        role: string;
+        content: string;
+        name: string;
+        function_call: ChatFunctionCall;
+    }
+
     interface MCQWithAnswer extends MultipleChoicesQuestion {
         /**
          * Index of the correct choice. 0-based.
@@ -334,6 +336,11 @@ declare namespace Generated {
         headNote: Note;
         skipReviewEntirely: boolean;
         deletedAt: string;
+    }
+
+    interface ChatFunctionCall {
+        name: string;
+        arguments: any;
     }
 
     interface MultipleChoicesQuestion {
