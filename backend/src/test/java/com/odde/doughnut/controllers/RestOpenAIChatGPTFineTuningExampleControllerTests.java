@@ -161,7 +161,9 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
     @BeforeEach
     void setup() {
       suggested = makeMe.aQuestionSuggestionForFineTunining().please();
-      suggest = new QuestionSuggestionParams("new comment", makeMe.aMCQWithAnswer().please());
+      suggest =
+          new QuestionSuggestionParams(
+              "new comment", makeMe.aMCQWithAnswer().please(), "note content", false);
     }
 
     @Test
