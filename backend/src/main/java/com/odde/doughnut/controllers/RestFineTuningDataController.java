@@ -27,6 +27,15 @@ class RestFineTuningDataController {
     this.fineTuningService = new FineTuningService(this.modelFactoryService);
   }
 
+  @PostMapping("/create")
+  @Transactional
+  public SuggestedQuestionForFineTuning create(
+      @RequestBody SuggestedQuestionForFineTuning suggestedQuestion)
+      throws UnexpectedNoAccessRightException {
+    suggestedQuestion.setUser(currentUser.getEntity());
+    return modelFactoryService.questionSuggestionForFineTuningRepository.save(suggestedQuestion);
+  }
+
   @PatchMapping("/{suggestedQuestion}/update-suggested-question-for-fine-tuning")
   @Transactional
   public SuggestedQuestionForFineTuning updateSuggestedQuestionForFineTuning(

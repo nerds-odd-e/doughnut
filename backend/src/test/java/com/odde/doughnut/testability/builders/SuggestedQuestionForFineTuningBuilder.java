@@ -21,9 +21,9 @@ public class SuggestedQuestionForFineTuningBuilder
     Note note = this.note == null ? makeMe.aNote().please() : this.note;
     entity.preserveNoteContent(note);
     if (this.preservedQuestion != null) {
-      entity.preserveQuestion(this.preservedQuestion);
+      entity.setPreservedQuestion(this.preservedQuestion);
     } else {
-      entity.preserveQuestion(makeMe.aMCQWithAnswer().please());
+      entity.setPreservedQuestion(makeMe.aMCQWithAnswer().please());
     }
   }
 
