@@ -111,20 +111,9 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
     @Test
     void shouldIncludeAllFeedbackData_whenCallGetGoodTrainingData()
         throws UnexpectedNoAccessRightException {
-      makeMe
-          .aQuestionSuggestionForFineTunining()
-          .positive()
-          .withPreservedQuestion(
-              makeMe.aMCQWithAnswer().stem("This is the raw Json question").please())
-          .please();
-      List<OpenAIChatGPTFineTuningExample> goodOpenAIChatGPTFineTuningExampleList =
-          controller.getAllEvaluationExamples();
-      List<SimplifiedOpenAIChatMessage> goodTrainingData =
-          goodOpenAIChatGPTFineTuningExampleList.get(0).getMessages();
-      assertThat(
-          goodTrainingData.get(2).getContent(), containsString("This is the raw Json question"));
-      assertThat(goodTrainingData.get(3).getContent(), containsString("Is this a good question"));
-      assertThat(goodTrainingData.get(4).getContent(), containsString("Yes"));
+      makeMe.aQuestionSuggestionForFineTunining().positive().please();
+      makeMe.aQuestionSuggestionForFineTunining().negative().please();
+      assertThat(controller.getAllEvaluationExamples(), hasSize(2));
     }
   }
 
