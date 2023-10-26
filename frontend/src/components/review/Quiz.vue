@@ -1,28 +1,26 @@
 <template>
   <div v-if="!minimized" class="content">
-    <div class="inner-box">
-      <LoadingPage :content-exists="currentQuestionFetched">
-        <template v-if="currentQuestionFetched">
-          <div v-if="!currentQuizQuestion">
-            <JustReview
-              v-bind="{
-                reviewPointId: currentReviewPointId,
-                storageAccessor,
-              }"
-              @reviewed="onAnswered($event)"
-            />
-          </div>
-          <QuizQuestion
-            v-else
+    <LoadingPage :content-exists="currentQuestionFetched">
+      <template v-if="currentQuestionFetched">
+        <div v-if="!currentQuizQuestion">
+          <JustReview
             v-bind="{
-              quizQuestion: currentQuizQuestion,
+              reviewPointId: currentReviewPointId,
+              storageAccessor,
             }"
-            @answered="onAnswered($event)"
-            :key="currentQuizQuestion.quizQuestionId"
+            @reviewed="onAnswered($event)"
           />
-        </template>
-      </LoadingPage>
-    </div>
+        </div>
+        <QuizQuestion
+          v-else
+          v-bind="{
+            quizQuestion: currentQuizQuestion,
+          }"
+          @answered="onAnswered($event)"
+          :key="currentQuizQuestion.quizQuestionId"
+        />
+      </template>
+    </LoadingPage>
   </div>
 </template>
 

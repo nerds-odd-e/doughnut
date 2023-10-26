@@ -1,7 +1,7 @@
 <template>
   <NoteRealmLoader v-bind="{ noteId, storageAccessor }">
     <template #default="{ noteRealm }">
-      <div class="inner-box" v-if="noteRealm" :key="noteId">
+      <div v-if="noteRealm" :key="noteId">
         <Breadcrumb v-bind="noteRealm.notePosition">
           <NoteNewButton
             v-if="noteRealm.note.parentId && !readonly"
