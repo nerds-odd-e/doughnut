@@ -41,7 +41,6 @@ public class SuggestedQuestionForFineTuningModel {
     entity.preserveQuestion(quizQuestion.getMcqWithAnswer());
     entity.setComment(suggestionCreationParams.comment);
     entity.setPositiveFeedback(suggestionCreationParams.isPositiveFeedback);
-    entity.setDuplicated(false);
     save();
 
     return entity;
@@ -54,7 +53,6 @@ public class SuggestedQuestionForFineTuningModel {
     newObject.setPreservedNoteContent(entity.getPreservedNoteContent());
     newObject.setComment(entity.getComment());
     newObject.setPositiveFeedback(entity.isPositiveFeedback());
-    newObject.setDuplicated(true);
     modelFactoryService.questionSuggestionForFineTuningRepository.save(newObject);
     return newObject;
   }
