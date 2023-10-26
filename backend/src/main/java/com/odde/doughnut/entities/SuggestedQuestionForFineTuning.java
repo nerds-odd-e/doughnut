@@ -70,7 +70,7 @@ public class SuggestedQuestionForFineTuning {
     }
   }
 
-  public void preserveQuestion(MCQWithAnswer mcqWithAnswer) {
+  public void setPreservedQuestion(MCQWithAnswer mcqWithAnswer) {
     this.preservedQuestion = mcqWithAnswer.toJsonString();
   }
 
