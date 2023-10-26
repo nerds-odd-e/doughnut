@@ -27,14 +27,14 @@
       placeholder="correct choice index"
       :errors="errors.preservedQuestion.correctChoiceIndex"
     />
+    <CheckInput
+      field="positiveFeedback"
+      v-model="suggestionParams.positiveFeedback"
+    />
     <TextInput
       field="comment"
       v-model="suggestionParams.comment"
       placeholder="Add a comment about the question"
-    />
-    <CheckInput
-      scope-name="positiveFeedback"
-      v-model="suggestionParams.positiveFeedback"
     />
   </div>
   <button class="btn btn-success" @click="suggestQuestionForFineTuning">
