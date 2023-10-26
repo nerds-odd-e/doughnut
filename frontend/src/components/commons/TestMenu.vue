@@ -73,6 +73,7 @@ export default defineComponent({
   height: 100%;
   width: 60px;
   font-size: x-small;
+  top: 0px;
 
   .menu {
     pointer-events: initial;
