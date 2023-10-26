@@ -18,24 +18,7 @@
 import { ContentLoader } from "vue-content-loader";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import SuggestedQuestionList from "./SuggestedQuestionList.vue";
-
-const downloadJSONL = (
-  fineTuningData: Generated.OpenAIChatGPTFineTuningExample[],
-  filename: string,
-) => {
-  const blob = new Blob(
-    [fineTuningData.map((x) => JSON.stringify(x)).join("\n")],
-    {
-      type: "text/plain",
-    },
-  );
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-};
+import downloadJSONL from "./downloadJSONL";
 
 export default {
   setup() {
