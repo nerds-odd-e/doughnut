@@ -40,7 +40,7 @@ public class AiQuestionGenerator {
         new OpenAIChatAboutNoteRequestBuilder()
             .systemBrief()
             .contentOfNoteOfCurrentFocus(note)
-            .validateQuestionAgain(question)
+            .evaluateQuestion(question)
             .maxTokens(1500)
             .build();
 

@@ -96,7 +96,7 @@ public class OpenAIChatAboutNoteRequestBuilder {
     return this;
   }
 
-  public OpenAIChatAboutNoteRequestBuilder validateQuestionAgain(MCQWithAnswer question) {
+  public OpenAIChatAboutNoteRequestBuilder evaluateQuestion(MCQWithAnswer question) {
     functions.add(
         ChatFunction.builder()
             .name("evaluate_question")

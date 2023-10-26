@@ -12,6 +12,13 @@ public class QuestionEvaluation {
   @JsonProperty(required = true)
   public int correctChoices[];
 
+  @JsonPropertyDescription("Whether the question is feasible.")
+  @JsonProperty(required = true)
+  public boolean feasibleQuestion;
+
+  @JsonPropertyDescription("Explains why the question is not feasible.")
+  public String comment;
+
   public static Optional<QuestionEvaluation> getQuestionEvaluation(JsonNode jsonNode) {
     try {
       return Optional.of(new ObjectMapper().treeToValue(jsonNode, QuestionEvaluation.class));
@@ -21,7 +28,8 @@ public class QuestionEvaluation {
   }
 
   public boolean makeSense(int correctChoiceIndex) {
-    return correctChoices != null
+    return feasibleQuestion
+        && correctChoices != null
         && correctChoices.length == 1
         && correctChoices[0] == correctChoiceIndex;
   }
