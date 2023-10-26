@@ -10,13 +10,13 @@ class SuggestQuestionForFineTuningBuilder extends Builder<Generated.SuggestedQue
       preservedQuestion: {
         stem: "What is the capital of France?",
         choices: ["Paris", "London", "Berlin"],
-        correctChoiceIndex: 0,
+        correctChoiceIndex: 1,
         confidence: 9,
       },
       preservedNoteContent: "this is the note content",
       comment: "",
       positiveFeedback: false,
-      duplicated: false,
+      realCorrectAnswers: "0",
     };
   }
 
