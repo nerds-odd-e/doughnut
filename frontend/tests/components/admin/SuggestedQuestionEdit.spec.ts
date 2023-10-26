@@ -38,12 +38,21 @@ describe("Edit Suggested Question", () => {
       );
     });
 
-    it("validates the index", async () => {
+    it("validates the correct answer index", async () => {
       wrapper.get("#undefined-correctChoiceIndex").setValue("4");
       wrapper.get("button.btn-success").trigger("click");
       await flushPromises();
       expect(wrapper.get(".error-msg").text()).toContain(
         "Correct choice index is out of range",
+      );
+    });
+
+    it("real correct answers has to be number lists", async () => {
+      wrapper.get("#undefined-realCorrectAnswers").setValue("a,b");
+      wrapper.get("button.btn-success").trigger("click");
+      await flushPromises();
+      expect(wrapper.get(".error-msg").text()).toContain(
+        "must be a number list",
       );
     });
   });

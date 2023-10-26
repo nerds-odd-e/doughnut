@@ -27,6 +27,13 @@
       placeholder="correct choice index"
       :errors="errors.preservedQuestion.correctChoiceIndex"
     />
+    <TextInput
+      field="realCorrectAnswers"
+      v-if="!suggestionParams.positiveFeedback"
+      v-model="suggestionParams.realCorrectAnswers"
+      hint="The real correct answers, separated by comma. Leave empty if there's no real correct answer."
+      :errors="errors.realCorrectAnswers"
+    />
     <CheckInput
       field="positiveFeedback"
       v-model="suggestionParams.positiveFeedback"
@@ -51,6 +58,12 @@ import TextInput from "../form/TextInput.vue";
 import TextArea from "../form/TextArea.vue";
 import CheckInput from "../form/CheckInput.vue";
 
+const validateRealCorrectAnswers = (answers: string) => {
+  if (answers.length === 0) return true;
+  const numbers = answers.split(",");
+  return numbers.every((number) => Number.isInteger(Number(number)));
+};
+
 export default defineComponent({
   inheritAttrs: false,
   setup() {
@@ -74,6 +87,7 @@ export default defineComponent({
           choices: ["", "", "", ""] as string[],
           correctChoiceIndex: "",
         },
+        realCorrectAnswers: "",
       },
     };
   },
@@ -107,6 +121,10 @@ export default defineComponent({
       ) {
         this.errors.preservedQuestion.correctChoiceIndex =
           "Correct choice index is out of range";
+        return undefined;
+      }
+      if (!validateRealCorrectAnswers(validated.realCorrectAnswers)) {
+        this.errors.realCorrectAnswers = "must be a number list";
         return undefined;
       }
       return validated;
