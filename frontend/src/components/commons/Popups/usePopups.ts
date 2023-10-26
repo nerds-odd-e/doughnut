@@ -10,7 +10,11 @@ interface PopupInfo {
 
 class Popup {
   static popupDataWrap = {
-    popupData: {} as { popupInfo: PopupInfo[] },
+    popupData: {
+      // this is the default data storage for unit tests
+      // in full app, this value is replaced by usePopups().popups.register()
+      popupInfo: [] as PopupInfo[],
+    },
   };
 }
 
@@ -46,6 +50,9 @@ function usePopups() {
         const popupInfo = Popup.popupDataWrap.popupData.popupInfo?.pop();
         if (!popupInfo) return;
         if (popupInfo.doneResolve) popupInfo.doneResolve(result as boolean);
+      },
+      peek() {
+        return Popup.popupDataWrap.popupData.popupInfo;
       },
     },
   };

@@ -1,5 +1,6 @@
-import { afterEach, beforeEach, describe, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import SuggestedQuestionList from "@/components/admin/SuggestedQuestionList.vue";
+import usePopups from "../../../src/components/commons/Popups/usePopups";
 import helper from "../../helpers";
 import makeMe from "../../fixtures/makeMe";
 
@@ -32,6 +33,23 @@ describe("Edit Suggested Question", () => {
         .findAll("button")
         .filter((node) => node.text().match(/Duplicate/));
       expect(btn.length).toBe(0);
+    });
+
+    it("can download chat gpt conversation starter", async () => {
+      const suggestedQuestion = makeMe.aSuggestedQuestionForFineTuning
+        .positive()
+        .please();
+      const wrapper = helper
+        .component(SuggestedQuestionList)
+        .withProps({ suggestedQuestions: [suggestedQuestion] })
+        .mount();
+      const btn = wrapper
+        .findAll("button")
+        .filter((node) => node.text().match(/Chat/))[0];
+      btn!.trigger("click");
+      const alertMsg = usePopups().popups.peek()[0]!.message;
+      expect(alertMsg).toContain(suggestedQuestion.preservedQuestion.stem);
+      expect(alertMsg).toContain(suggestedQuestion.preservedNoteContent);
     });
   });
 });

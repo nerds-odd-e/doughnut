@@ -10,7 +10,7 @@
       </template>
       <template #body>
         <div>
-          <span>{{ popupInfo.message }}</span>
+          <pre style="white-space: pre-wrap">{{ popupInfo.message }}</pre>
         </div>
         <button class="btn btn-success" @click="resolve(true)">OK</button>
       </template>
