@@ -163,7 +163,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
       suggested = makeMe.aQuestionSuggestionForFineTunining().please();
       suggest =
           new QuestionSuggestionParams(
-              "new comment", makeMe.aMCQWithAnswer().please(), "note content", false);
+              "new comment", makeMe.aMCQWithAnswer().please(), "note content", false, "0,1");
     }
 
     @Test
@@ -181,6 +181,14 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
       controller.updateSuggestedQuestionForFineTuning(suggested, suggest);
       assertThat(
           modelFactoryService.questionSuggestionForFineTuningRepository.count(), equalTo(oldCount));
+    }
+
+    @Test
+    void updateTheFields() throws UnexpectedNoAccessRightException {
+      SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
+          controller.updateSuggestedQuestionForFineTuning(suggested, suggest);
+      assertThat(suggestedQuestionForFineTuning.getComment(), equalTo("new comment"));
+      assertThat(suggestedQuestionForFineTuning.getRealCorrectAnswers(), equalTo("0,1"));
     }
   }
 

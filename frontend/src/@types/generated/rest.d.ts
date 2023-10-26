@@ -131,6 +131,7 @@ declare namespace Generated {
         preservedQuestion: MCQWithAnswer;
         preservedNoteContent: string;
         positiveFeedback: boolean;
+        realCorrectAnswers: string;
     }
 
     interface QuizQuestion {
