@@ -207,6 +207,7 @@ class RestAiControllerTest {
       void setup() throws JsonProcessingException {
         mockChatCompletionForGPT3_5MessageOnly(jsonQuestion);
         questionEvaluation.correctChoices = new int[] {0};
+        questionEvaluation.feasibleQuestion = true;
         note.setDetails(makeMe.aStringOfLength(1000));
       }
 
@@ -232,10 +233,21 @@ class RestAiControllerTest {
         verify(openAiApi, times(3)).createChatCompletion(captor.capture());
         assertThat(captor.getAllValues().get(2).getModel()).isEqualTo("gpt-4");
       }
+
+      @Test
+      void tryWithGPT4IfTheEvaluationIsNotFeasible() throws JsonProcessingException {
+        questionEvaluation.feasibleQuestion = false;
+        mockChatCompletionForFunctionCall(
+            "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
+        mockChatCompletionForFunctionCall(
+            "ask_single_answer_multiple_choice_question", jsonQuestion);
+        controller.generateQuestion(note);
+        verify(openAiApi, times(3)).createChatCompletion(captor.capture());
+        assertThat(captor.getAllValues().get(2).getModel()).isEqualTo("gpt-4");
+      }
     }
 
     private void mockChatCompletionForGPT3_5MessageOnly(String result) {
-
       Single<ChatCompletionResult> just =
           Single.just(makeMe.openAiCompletionResult().choice(result).please());
 
