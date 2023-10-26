@@ -6,10 +6,6 @@
   <button @click="downloadEvaluationJSONL()">
     Download Evaluation Training Data
   </button>
-  <div width="100%">
-    <textarea v-model="importingData" height="100px" />
-  </div>
-  <button @click="importData">Import</button>
   <ContentLoader v-if="suggestedQuestions === undefined" />
   <SuggestedQuestionList
     v-else
@@ -50,26 +46,9 @@ export default {
       suggestedQuestions: undefined as
         | Generated.SuggestedQuestionForFineTuning[]
         | undefined,
-      importingData: "",
     };
   },
   methods: {
-    importData() {
-      const lines = this.importingData.split("\n");
-      lines
-        .map((x) => JSON.parse(x))
-        .map(
-          (x: Generated.OpenAIChatGPTFineTuningExample) =>
-            <Generated.SuggestedQuestionForFineTuning>{
-              preservedQuestion: JSON.parse(x.messages[2]!.content),
-              comment: "imported",
-              preservedNoteContent: x.messages[0]!.content,
-            },
-        )
-        .forEach((x) => {
-          this.api.fineTuning.createFeedback(x);
-        });
-    },
     async downloadFineTuningJSONL() {
       const fineTuningData =
         await this.api.fineTuning.getPositiveFeedbackFineTuningExamples();

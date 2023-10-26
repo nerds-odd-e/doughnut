@@ -144,12 +144,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
         "fine-tuning/positive-feedback-generation-examples",
       )) as Generated.OpenAIChatGPTFineTuningExample[];
     },
-    async createFeedback(x: Generated.SuggestedQuestionForFineTuning) {
-      return (await managedApi.restPost(
-        `fine-tuning/create`,
-        x,
-      )) as Generated.SuggestedQuestionForFineTuning;
-    },
     async getAllEvaluationModelExamples() {
       return (await managedApi.restGet(
         "fine-tuning/feedback-evaluation-examples",
