@@ -1,11 +1,5 @@
 <template>
-  <h2>Suggested Question For AI Fine Tuning</h2>
-  <p>
-    <i
-      >Sending this question for fine tuning the question generation model will
-      make this note and question visible to admin. Are you sure?</i
-    >
-  </p>
+  <h2>Edit Suggested Question For AI Fine Tuning</h2>
   <div>
     <TextArea
       :field="`stem`"

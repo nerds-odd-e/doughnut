@@ -19,7 +19,7 @@ describe("Edit Suggested Question", () => {
         .mount();
     });
 
-    it("should be able to suggest a question as good example", async () => {
+    it("call the api to make update", async () => {
       helper.apiMock.expectingPatch(
         `/api/fine-tuning/1357/update-suggested-question-for-fine-tuning`,
       );
