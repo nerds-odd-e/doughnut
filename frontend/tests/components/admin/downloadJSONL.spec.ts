@@ -4,9 +4,10 @@ import downloadJSONL, {
 } from "../../../src/components/admin/downloadJSONL";
 
 describe("downloadJSONL", () => {
-  // Mock data to be passed to the function
-  const examples: Generated.OpenAIChatGPTFineTuningExample[] = [
-    { messages: [{ role: "user", content: "cnt", function_call: null }] },
+  const examples = [
+    {
+      messages: [{ role: "user", content: "cnt", function_call: null }],
+    } as unknown as Generated.OpenAIChatGPTFineTuningExample,
   ];
 
   const element = {
