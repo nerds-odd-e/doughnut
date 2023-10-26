@@ -8,10 +8,7 @@
       :rows="2"
     /><br />
     <ul>
-      <li
-        v-for="(_, index) in suggestionParams.preservedQuestion.choices"
-        :key="index"
-      >
+      <li v-for="index in [0, 1, 2, 3]" :key="index">
         <TextInput
           :field="`choice-${index}`"
           v-model="suggestionParams.preservedQuestion.choices[index]"
