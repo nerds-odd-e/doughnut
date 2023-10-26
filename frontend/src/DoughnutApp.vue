@@ -83,62 +83,22 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="box">
-    <Popups />
-    <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
-    <template v-else>
-      <template v-if="userLoaded">
-        <div class="header">
-          <GlobalBar
-            v-bind="{ storageAccessor, user, apiStatus }"
-            @update-user="user = $event"
-            @clear-error-message="clearErrorMessage($event)"
-          />
-        </div>
-        <router-view v-bind="routeViewProps" />
-      </template>
-      <TestMenu
-        v-if="environment === 'testing'"
-        :feature-toggle="featureToggle"
-        :user="user"
-        @feature-toggle="featureToggle = $event"
+  <Popups />
+  <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
+  <template v-else>
+    <template v-if="userLoaded">
+      <GlobalBar
+        v-bind="{ storageAccessor, user, apiStatus }"
+        @update-user="user = $event"
+        @clear-error-message="clearErrorMessage($event)"
       />
+      <router-view v-bind="routeViewProps" />
     </template>
-  </div>
+    <TestMenu
+      v-if="environment === 'testing'"
+      :feature-toggle="featureToggle"
+      :user="user"
+      @feature-toggle="featureToggle = $event"
+    />
+  </template>
 </template>
-
-<style lang="sass" scoped>
-.box
-  display: flex
-  flex-direction: column
-  height: 100vh
-  max-height: -webkit-fill-available
-
-.box .header
-  flex: 0 0 auto
-
-.box .content
-  flex: 1
-  -ms-flex: 1 1 auto
-  overflow-y: auto
-
-.box .footer
-  flex: 0 1 40px
-</style>
-
-<style lang="sass">
-.inner-box
-  display: flex
-  flex-direction: column
-  height: 100%
-
-.inner-box .header
-  flex: 0 1 auto
-
-.inner-box .content
-  flex: 1
-  overflow-y: auto
-
-.inner-box .footer
-  flex: 0 1 40px
-</style>
