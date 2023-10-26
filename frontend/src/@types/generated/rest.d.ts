@@ -220,9 +220,9 @@ declare namespace Generated {
         comment: string;
         preservedQuestion: MCQWithAnswer;
         preservedNoteContent: string;
+        realCorrectAnswers: string;
         createdAt?: string;
         positiveFeedback: boolean;
-        duplicated: boolean;
     }
 
     interface Link extends Thingy {

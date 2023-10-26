@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,8 @@ class RestHealthCheckController {
 
   @Autowired private UserModel currentUser;
 
+  @Autowired private ModelFactoryService modelFactoryService;
+
   @GetMapping("/healthcheck")
   public String ping() {
     return "OK. Active Profile: " + String.join(", ", environment.getActiveProfiles());
@@ -26,6 +29,16 @@ class RestHealthCheckController {
   @Transactional(timeout = 200)
   public List dataUpgrade() throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
+    modelFactoryService
+        .questionSuggestionForFineTuningRepository
+        .findAll()
+        .forEach(
+            suggestion -> {
+              suggestion.setRealCorrectAnswers(
+                  "%d".formatted(suggestion.getPreservedQuestion().correctChoiceIndex));
+              modelFactoryService.questionSuggestionForFineTuningRepository.save(suggestion);
+            });
+
     return List.of();
   }
 }
