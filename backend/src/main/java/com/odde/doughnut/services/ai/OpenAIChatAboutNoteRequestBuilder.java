@@ -1,6 +1,7 @@
 package com.odde.doughnut.services.ai;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator;
@@ -157,9 +158,10 @@ please critically check if the following question makes sense and is possible to
 
   public OpenAIChatAboutNoteRequestBuilder evaluationResult(QuestionEvaluation questionEvaluation) {
     ChatMessage msg = new ChatMessage(ChatMessageRole.ASSISTANT.value(), null);
-    msg.setFunctionCall(
-        new ChatFunctionCall(
-            "evaluate_question", new ObjectMapper().valueToTree(questionEvaluation)));
+    JsonNode arguments =
+        new ObjectMapper()
+            .valueToTree(new ObjectMapper().valueToTree(questionEvaluation).toString());
+    msg.setFunctionCall(new ChatFunctionCall("evaluate_question", arguments));
     messages.add(msg);
     return this;
   }
