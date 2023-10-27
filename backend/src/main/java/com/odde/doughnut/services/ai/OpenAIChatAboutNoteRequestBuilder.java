@@ -95,6 +95,7 @@ public class OpenAIChatAboutNoteRequestBuilder {
   }
 
   public OpenAIChatAboutNoteRequestBuilder evaluateQuestion(MCQWithAnswer question) {
+    model = "gpt-3.5-turbo-0613:odd-e::8E7utoRD";
     functions.add(
         ChatFunction.builder()
             .name("evaluate_question")
