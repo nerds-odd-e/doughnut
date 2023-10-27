@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.odde.doughnut.controllers.json.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
@@ -44,10 +45,7 @@ class SuggestedQuestionForFineTuningTest {
     OpenAIChatGPTFineTuningExample questionEvaluationFineTuningData =
         suggestedQuestionForFineTuning.toQuestionEvaluationFineTuningData();
     List<ChatMessage> goodTrainingData = questionEvaluationFineTuningData.getMessages();
-    QuestionEvaluation questionEvaluation =
-        new ObjectMapper()
-            .treeToValue(
-                goodTrainingData.get(2).getFunctionCall().getArguments(), QuestionEvaluation.class);
+    QuestionEvaluation questionEvaluation = getQuestionEvaluation(goodTrainingData);
     assertThat(questionEvaluation.comment, equalTo("a comment"));
     assertThat(questionEvaluation.feasibleQuestion, equalTo(false));
     assertThat(questionEvaluation.correctChoices, equalTo(new int[] {1, 2}));
@@ -59,13 +57,22 @@ class SuggestedQuestionForFineTuningTest {
     OpenAIChatGPTFineTuningExample questionEvaluationFineTuningData =
         suggestedQuestionForFineTuning.toQuestionEvaluationFineTuningData();
     List<ChatMessage> goodTrainingData = questionEvaluationFineTuningData.getMessages();
-    QuestionEvaluation questionEvaluation =
-        new ObjectMapper()
-            .treeToValue(
-                goodTrainingData.get(2).getFunctionCall().getArguments(), QuestionEvaluation.class);
+    QuestionEvaluation questionEvaluation = getQuestionEvaluation(goodTrainingData);
     assertThat(questionEvaluation.comment, equalTo("a comment"));
     assertThat(questionEvaluation.feasibleQuestion, equalTo(true));
     assertThat(
         questionEvaluation.correctChoices, equalTo(new int[] {mcqWithAnswer.correctChoiceIndex}));
+  }
+
+  private QuestionEvaluation getQuestionEvaluation(List<ChatMessage> goodTrainingData)
+      throws JsonProcessingException {
+    // strangely, the fine-tuning requires the arguments to be a string, not a json object
+    assertThat(
+        goodTrainingData.get(2).getFunctionCall().getArguments().getNodeType(),
+        equalTo(JsonNodeType.STRING));
+    return new ObjectMapper()
+        .readValue(
+            goodTrainingData.get(2).getFunctionCall().getArguments().asText(),
+            QuestionEvaluation.class);
   }
 }

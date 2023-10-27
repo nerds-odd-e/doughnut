@@ -22,7 +22,9 @@ export function assumeDownloadedJSONL(filename: string) {
             })
           }
           if (question["Good Question?"]) {
-            expect(line).to.contain(`"feasibleQuestion":${question["Good Question?"] === "Yes"}`)
+            expect(line).to.contain(
+              `\\"feasibleQuestion\\":${question["Good Question?"] === "Yes"}`,
+            )
           }
         })
       })
