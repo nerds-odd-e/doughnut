@@ -49,7 +49,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["need-scroll"],
+  emits: ["need-scroll", "answered"],
   components: {
     QuizQuestion,
     AnsweredQuestion,
@@ -86,6 +86,7 @@ export default defineComponent({
     },
     onAnswered(answeredQuestion: Generated.AnsweredQuestion) {
       this.answeredQuestion = answeredQuestion;
+      this.$emit("answered", answeredQuestion);
     },
   },
 });

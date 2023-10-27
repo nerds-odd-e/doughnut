@@ -11,10 +11,11 @@
             @reviewed="onAnswered($event)"
           />
         </div>
-        <QuizQuestion
+        <ContestableQuestion
           v-else
           v-bind="{
             quizQuestion: currentQuizQuestion,
+            storageAccessor,
           }"
           @answered="onAnswered($event)"
           :key="currentQuizQuestion.quizQuestionId"
@@ -27,11 +28,11 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import _ from "lodash";
-import QuizQuestion from "./QuizQuestion.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import JustReview from "./JustReview.vue";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
+import ContestableQuestion from "./ContestableQuestion.vue";
 
 export default defineComponent({
   setup() {
@@ -58,9 +59,9 @@ export default defineComponent({
   },
   emits: ["answered"],
   components: {
-    QuizQuestion,
     JustReview,
     LoadingPage,
+    ContestableQuestion,
   },
   data() {
     return {
