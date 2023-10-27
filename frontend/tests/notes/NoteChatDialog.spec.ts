@@ -30,7 +30,7 @@ describe("NoteChatDialog TestMe", () => {
 
   it("render the question returned", async () => {
     helper.apiMock
-      .expectingPost(`/api/ai/generate-question?note=${note.id}`)
+      .expectingPost(`/api/quiz-questions/generate-question?note=${note.id}`)
       .andReturnOnce(quizQuestion);
     const wrapper = await createWrapper();
     wrapper.find("button").trigger("click");
@@ -42,7 +42,7 @@ describe("NoteChatDialog TestMe", () => {
 
   it("scroll to bottom", async () => {
     helper.apiMock
-      .expectingPost(`/api/ai/generate-question?note=${note.id}`)
+      .expectingPost(`/api/quiz-questions/generate-question?note=${note.id}`)
       .andReturnOnce(quizQuestion);
     const wrapper = await createWrapper();
     wrapper.find("button").trigger("click");
@@ -52,7 +52,7 @@ describe("NoteChatDialog TestMe", () => {
 
   it("regenerate question when asked", async () => {
     helper.apiMock
-      .expectingPost(`/api/ai/generate-question?note=${note.id}`)
+      .expectingPost(`/api/quiz-questions/generate-question?note=${note.id}`)
       .andReturnOnce(quizQuestion);
     const wrapper = await createWrapper();
     wrapper.find("button").trigger("click");
@@ -63,7 +63,7 @@ describe("NoteChatDialog TestMe", () => {
       .withQuestionStem("is it raining?")
       .please();
     helper.apiMock
-      .expectingPost(`/api/ai/generate-question?note=${note.id}`)
+      .expectingPost(`/api/quiz-questions/generate-question?note=${note.id}`)
       .andReturnOnce(newQuestion);
     wrapper.find("a#try-again").trigger("click");
     await flushPromises();

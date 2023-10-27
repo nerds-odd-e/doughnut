@@ -53,6 +53,13 @@ const apiCollection = (managedApi: ManagedApi) => ({
       )) as Generated.ReviewPoint;
     },
 
+    async generateQuestion(
+      noteId: Doughnut.ID,
+    ): Promise<Generated.QuizQuestion> {
+      const url = `quiz-questions/generate-question?note=${noteId}`;
+      return (await managedApi.restPost(url, {})) as Generated.QuizQuestion;
+    },
+
     async suggestQuestionForFineTuning(
       quizQuestionId: number,
       suggestedQuestion: Generated.QuestionSuggestionCreationParams,
@@ -358,12 +365,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
       )) as Generated.AiCompletion;
     },
 
-    async askAIToGenerateQuestion(
-      noteId: Doughnut.ID,
-    ): Promise<Generated.QuizQuestion> {
-      const url = `ai/generate-question?note=${noteId}`;
-      return (await managedApi.restPost(url, {})) as Generated.QuizQuestion;
-    },
     async generateImage(prompt: string) {
       const request: Generated.AiCompletionParams = {
         prompt,
