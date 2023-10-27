@@ -8,13 +8,13 @@ in mkShell {
   MYSQL_HOME = builtins.getEnv "MYSQL_HOME";
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
-    python311
+    python312
     pipenv
     nodejs_20
     zsh
     dum
     yarn
-    jdk17
+    jdk21
     kotlin
     flutter
     libiconv
