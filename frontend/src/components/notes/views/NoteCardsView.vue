@@ -33,6 +33,9 @@
           </template>
         </NoteWithLinks>
         <Cards v-if="expandChildren" :notes="noteRealm.children" />
+        <NoteChatDialog
+          v-bind="{ selectedNote: noteRealm.note, storageAccessor }"
+        />
       </div>
     </template>
   </NoteRealmLoader>
@@ -46,6 +49,7 @@ import NoteInfoButton from "../NoteInfoButton.vue";
 import Breadcrumb from "../../toolbars/Breadcrumb.vue";
 import ControlCenterForNote from "../../toolbars/ControlCenterForNote.vue";
 import { StorageAccessor } from "../../../store/createNoteStorage";
+import NoteChatDialog from "../NoteChatDialog.vue";
 
 export default defineComponent({
   props: {
@@ -65,6 +69,7 @@ export default defineComponent({
     NoteInfoButton,
     Breadcrumb,
     ControlCenterForNote,
+    NoteChatDialog,
   },
 });
 </script>
