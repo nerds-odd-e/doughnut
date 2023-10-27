@@ -77,7 +77,9 @@ export default defineComponent({
       const tmpQuestion: Generated.QuizQuestion | undefined =
         this.currentQuestion;
       this.currentQuestion = (
-        await this.api.quizQuestions.contest(this.quizQuestion.quizQuestionId)
+        await this.api.quizQuestions.contest(
+          this.currentQuestion.quizQuestionId,
+        )
       ).newQuizQuestion!;
       this.prevQuizQuestions.push(tmpQuestion);
       this.scrollToBottom();

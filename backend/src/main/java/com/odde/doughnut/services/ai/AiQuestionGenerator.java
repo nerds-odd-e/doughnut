@@ -9,6 +9,7 @@ import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
+import java.util.Optional;
 
 public class AiQuestionGenerator {
   private final Note note;
@@ -36,6 +37,11 @@ public class AiQuestionGenerator {
   }
 
   private Boolean questionMakeSense(MCQWithAnswer question) {
+    Optional<QuestionEvaluation> questionEvaluation = evaluateQuestion(question);
+    return questionEvaluation.map(eq -> eq.makeSense(question.correctChoiceIndex)).orElse(false);
+  }
+
+  public Optional<QuestionEvaluation> evaluateQuestion(MCQWithAnswer question) {
     ChatCompletionRequest chatRequest =
         new OpenAIChatAboutNoteRequestBuilder()
             .systemBrief()
@@ -46,9 +52,7 @@ public class AiQuestionGenerator {
 
     return openAiApiHandler
         .getFunctionCallArguments(chatRequest)
-        .flatMap(QuestionEvaluation::getQuestionEvaluation)
-        .map(eq -> eq.makeSense(question.correctChoiceIndex))
-        .orElse(false);
+        .flatMap(QuestionEvaluation::getQuestionEvaluation);
   }
 
   private MCQWithAnswer getValidQuestion(boolean useGPT4) throws QuizQuestionNotPossibleException {
