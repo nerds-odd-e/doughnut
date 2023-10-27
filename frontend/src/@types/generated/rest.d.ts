@@ -144,6 +144,11 @@ declare namespace Generated {
         pictureWithMask?: PictureWithMask;
     }
 
+    interface QuizQuestionContestResult {
+        newQuizQuestion?: QuizQuestion;
+        reason: string;
+    }
+
     interface RedirectToNoteResponse {
         noteId: number;
     }

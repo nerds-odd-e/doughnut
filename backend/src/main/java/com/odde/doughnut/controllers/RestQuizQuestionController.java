@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.json.QuestionSuggestionCreationParams;
 import com.odde.doughnut.controllers.json.QuizQuestion;
+import com.odde.doughnut.controllers.json.QuizQuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionGenerator;
@@ -47,9 +48,13 @@ class RestQuizQuestionController {
 
   @PostMapping("/{quizQuestion}/contest")
   @Transactional
-  public QuizQuestion contest(@PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity) {
+  public QuizQuestionContestResult contest(
+      @PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity) {
     currentUser.assertLoggedIn();
-    return generateAIQuestion(quizQuestionEntity.getThing());
+    QuizQuestionContestResult result = new QuizQuestionContestResult();
+    result.reason = "Not implemented yet";
+    result.newQuizQuestion = generateAIQuestion(quizQuestionEntity.getThing());
+    return result;
   }
 
   private QuizQuestion generateAIQuestion(Thing thing) {
