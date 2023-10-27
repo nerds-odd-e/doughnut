@@ -1,20 +1,8 @@
 <template>
-  <div class="quiz-question" v-if="quizQuestion">
-    <div v-if="prevQuizQuestion">
-      <h3>Previous Question...</h3>
-      <QuizQuestion :quiz-question="prevQuizQuestion" :disabled="true" />
-    </div>
-    <AnsweredQuestion
-      v-if="answeredQuestion"
-      :answered-question="answeredQuestion"
-      :storage-accessor="storageAccessor"
-    />
-    <QuizQuestion
-      v-else
-      :quiz-question="quizQuestion"
-      @answered="onAnswered($event)"
-    />
-  </div>
+  <ContestableQuestion
+    v-if="quizQuestion"
+    v-bind="{ selectedNote, quizQuestion, storageAccessor }"
+  />
   <div v-show="answered" class="chat-answer-container">
     <img src="/user-icon.svg" class="chat-answer-icon" />
     <div class="chat-answer-text">
@@ -32,16 +20,6 @@
       >
         Test me
       </button>
-      <a
-        role="button"
-        title="Doesn't make sense?"
-        id="try-again"
-        v-if="quizQuestion"
-        class="btn btn-secondary"
-        @click="generateQuestion"
-      >
-        <SvgContest />
-      </a>
       <form class="chat-input-container" @submit.prevent="generateChatAnswer">
         <input id="chat-input" class="chat-input-text" v-model="chatInput" />
         <input
@@ -66,8 +44,7 @@
 import { defineComponent, PropType } from "vue";
 import type { StorageAccessor } from "@/store/createNoteStorage";
 import useLoadingApi from "../../managedApi/useLoadingApi";
-import QuizQuestion from "../review/QuizQuestion.vue";
-import AnsweredQuestion from "../review/AnsweredQuestion.vue";
+import ContestableQuestion from "../review/ContestableQuestion.vue";
 import scrollToElement from "../commons/scrollToElement";
 
 export default defineComponent({
@@ -82,14 +59,11 @@ export default defineComponent({
     },
   },
   components: {
-    QuizQuestion,
-    AnsweredQuestion,
+    ContestableQuestion,
   },
   data() {
     return {
       quizQuestion: undefined as Generated.QuizQuestion | undefined,
-      answeredQuestion: undefined as Generated.AnsweredQuestion | undefined,
-      prevQuizQuestion: undefined as Generated.QuizQuestion | undefined,
       chatInput: "",
       assistantMessage: "",
       answered: false,
@@ -108,15 +82,10 @@ export default defineComponent({
       }
     },
     async generateQuestion() {
-      const tmpQuestion: Generated.QuizQuestion | undefined = this.quizQuestion;
       this.quizQuestion = await this.api.ai.askAIToGenerateQuestion(
         this.selectedNote.id,
       );
-      this.prevQuizQuestion = tmpQuestion;
       this.scrollToBottom();
-    },
-    onAnswered(answeredQuestion: Generated.AnsweredQuestion) {
-      this.answeredQuestion = answeredQuestion;
     },
     async generateChatAnswer() {
       this.assistantMessage = await this.api.ai.chat(
@@ -138,16 +107,6 @@ export default defineComponent({
   bottom: 10px;
   right: 0;
   z-index: 1000;
-}
-
-.is-correct {
-  font-weight: bold;
-  background-color: #00ff00;
-}
-
-.is-incorrect {
-  font-weight: bold;
-  background-color: #ff0000;
 }
 
 span {
@@ -221,9 +180,5 @@ input.auto-extendable-input {
 .chat-answer-text p {
   margin: 0;
   word-break: break-word;
-}
-
-.quiz-question {
-  overflow-y: auto;
 }
 </style>
