@@ -10,6 +10,7 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.OpenAiApi;
+import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -48,7 +49,8 @@ class RestQuizQuestionController {
             currentUser.getEntity(), note.getThing(), null, modelFactoryService, aiAdvisorService);
     QuizQuestionEntity quizQuestionEntity =
         quizQuestionGenerator
-            .buildQuizQuestion(QuizQuestionEntity.QuestionType.AI_QUESTION)
+            .generateAQuestionOfFirstPossibleType(
+                List.of(QuizQuestionEntity.QuestionType.AI_QUESTION))
             .orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
     modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
