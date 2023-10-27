@@ -1,9 +1,11 @@
 <template>
   <div class="quiz-question" v-if="currentQuestion">
     <div v-for="(q, index) in prevQuizQuestions" :key="index">
-      <h3>Previous Question...</h3>
-      <QuizQuestion :quiz-question="q" :disabled="true" />
+      <h3>Previous Question Contested ...</h3>
+      <p>{{ q.badQuestionReason }}</p>
+      <QuizQuestion :quiz-question="q.quizeQuestion" :disabled="true" />
     </div>
+    <p v-if="currentQuestionLegitMessage">{{ currentQuestionLegitMessage }}</p>
     <AnsweredQuestion
       v-if="answeredQuestion"
       :answered-question="answeredQuestion"
@@ -20,7 +22,7 @@
         id="try-again"
         v-if="currentQuestion"
         class="btn"
-        @click="generateQuestion"
+        @click="contest"
       >
         <SvgContest />
       </a>
@@ -56,9 +58,13 @@ export default defineComponent({
   },
   data() {
     return {
+      currentQuestionLegitMessage: "",
       currentQuestion: this.quizQuestion,
       answeredQuestion: undefined as Generated.AnsweredQuestion | undefined,
-      prevQuizQuestions: [] as Generated.QuizQuestion[],
+      prevQuizQuestions: [] as {
+        quizeQuestion: Generated.QuizQuestion;
+        badQuestionReason: string;
+      }[],
       chatInput: "",
       assistantMessage: "",
       answered: false,
@@ -73,15 +79,23 @@ export default defineComponent({
     scrollToBottom() {
       this.$emit("need-scroll");
     },
-    async generateQuestion() {
+    async contest() {
+      this.currentQuestionLegitMessage = "";
       const tmpQuestion: Generated.QuizQuestion | undefined =
         this.currentQuestion;
-      this.currentQuestion = (
-        await this.api.quizQuestions.contest(
-          this.currentQuestion.quizQuestionId,
-        )
-      ).newQuizQuestion!;
-      this.prevQuizQuestions.push(tmpQuestion);
+      const contestResult = await this.api.quizQuestions.contest(
+        this.currentQuestion.quizQuestionId,
+      );
+
+      if (contestResult.newQuizQuestion) {
+        this.currentQuestion = contestResult.newQuizQuestion;
+        this.prevQuizQuestions.push({
+          quizeQuestion: tmpQuestion,
+          badQuestionReason: contestResult.reason,
+        });
+      } else {
+        this.currentQuestionLegitMessage = contestResult.reason;
+      }
       this.scrollToBottom();
     },
     onAnswered(answeredQuestion: Generated.AnsweredQuestion) {
