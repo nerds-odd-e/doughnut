@@ -3,6 +3,7 @@ import { enableAutoUnmount } from "@vue/test-utils";
 import RenderingHelper from "./RenderingHelper";
 import setupApiMock from "./apiMockImpl/setupApiMock";
 import { ApiMock } from "./ApiMock";
+import matchByText from "./matchByText";
 
 class StoredComponentTestHelper {
   private mockedApi?: ApiMock;
@@ -37,4 +38,4 @@ class StoredComponentTestHelper {
 }
 
 export default new StoredComponentTestHelper();
-export { setupApiMock };
+export { setupApiMock, matchByText };
