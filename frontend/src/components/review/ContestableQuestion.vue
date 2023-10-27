@@ -41,7 +41,6 @@ export default defineComponent({
     return useLoadingApi();
   },
   props: {
-    selectedNote: { type: Object as PropType<Generated.Note>, required: true },
     quizQuestion: {
       type: Object as PropType<Generated.QuizQuestion>,
       required: true,
