@@ -94,7 +94,7 @@ export default defineComponent({
   methods: {
     async submitAnswer(answerData: Partial<Generated.Answer>) {
       try {
-        const answerResult = await this.api.reviewMethods.processAnswer(
+        const answerResult = await this.api.quizQuestions.processAnswer(
           this.quizQuestion.quizQuestionId,
           answerData,
         );

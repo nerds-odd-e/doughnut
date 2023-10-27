@@ -1,3 +1,4 @@
+import { QuizQuestion } from '@/components/review/QuizQuestion.vue';
 import ManagedApi from "./ManagedApi";
 
 const timezoneParam = () => {
@@ -38,21 +39,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
   },
 
-  reviewMethods: {
-    async markAsRepeated(reviewPointId: Doughnut.ID, successful: boolean) {
-      return (await managedApi.restPost(
-        `review-points/${reviewPointId}/mark-as-repeated?successful=${successful}`,
-        {},
-      )) as Generated.ReviewPoint;
-    },
-
-    async removeFromReview(reviewPointId: Doughnut.ID) {
-      return (await managedApi.restPost(
-        `review-points/${reviewPointId}/remove`,
-        {},
-      )) as Generated.ReviewPoint;
-    },
-
+  quizQuestions: {
     async generateQuestion(
       noteId: Doughnut.ID,
     ): Promise<Generated.QuizQuestion> {
@@ -68,6 +55,30 @@ const apiCollection = (managedApi: ManagedApi) => ({
         `quiz-questions/${quizQuestionId}/suggest-fine-tuning`,
         suggestedQuestion,
       ) as Promise<string>;
+    },
+
+    async processAnswer(quizQuestionId: Doughnut.ID, data: Generated.Answer) {
+      const res = (await managedApi.restPost(
+        `quiz-questions/${quizQuestionId}/answer`,
+        data,
+      )) as Generated.AnsweredQuestion;
+      return res;
+    },
+  },
+
+  reviewMethods: {
+    async markAsRepeated(reviewPointId: Doughnut.ID, successful: boolean) {
+      return (await managedApi.restPost(
+        `review-points/${reviewPointId}/mark-as-repeated?successful=${successful}`,
+        {},
+      )) as Generated.ReviewPoint;
+    },
+
+    async removeFromReview(reviewPointId: Doughnut.ID) {
+      return (await managedApi.restPost(
+        `review-points/${reviewPointId}/remove`,
+        {},
+      )) as Generated.ReviewPoint;
     },
 
     async overview() {
@@ -99,14 +110,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
         `reviews`,
         data,
       )) as Generated.ReviewPoint;
-    },
-
-    async processAnswer(quizQuestionId: Doughnut.ID, data: Generated.Answer) {
-      const res = (await managedApi.restPost(
-        `quiz-questions/${quizQuestionId}/answer`,
-        data,
-      )) as Generated.AnsweredQuestion;
-      return res;
     },
 
     async getAnswer(answerId: Doughnut.ID) {
