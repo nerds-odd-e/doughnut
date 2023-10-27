@@ -1,4 +1,4 @@
-import { flushPromises } from "@vue/test-utils";
+import { VueWrapper, flushPromises } from "@vue/test-utils";
 import { beforeEach, expect } from "vitest";
 import NoteChatDialog from "@/components/notes/NoteChatDialog.vue";
 import scrollToElement from "@/components/commons/scrollToElement";
@@ -50,27 +50,41 @@ describe("NoteChatDialog TestMe", () => {
     expect(scrollToElement).toHaveBeenCalled();
   });
 
-  it("regenerate question when asked", async () => {
-    helper.apiMock
-      .expectingPost(`/api/quiz-questions/generate-question?note=${note.id}`)
-      .andReturnOnce(quizQuestion);
-    const wrapper = await createWrapper();
-    wrapper.find("button").trigger("click");
-    await flushPromises();
+  describe("NoteChatDialog Conversation", () => {
+    let wrapper: VueWrapper;
 
     const newQuestion = makeMe.aQuizQuestion
       .withQuestionType("AI_QUESTION")
       .withQuestionStem("is it raining?")
       .please();
-    helper.apiMock
-      .expectingPost(
-        `/api/quiz-questions/${quizQuestion.quizQuestionId}/contest`,
-      )
-      .andReturnOnce(newQuestion);
-    wrapper.find("a#try-again").trigger("click");
-    await flushPromises();
-    expect(wrapper.text()).toContain("any question?");
-    expect(wrapper.text()).toContain("is it raining?");
+
+    beforeEach(async () => {
+      helper.apiMock
+        .expectingPost(`/api/quiz-questions/generate-question?note=${note.id}`)
+        .andReturnOnce(quizQuestion);
+      wrapper = await createWrapper();
+      wrapper.find("button").trigger("click");
+      await flushPromises();
+      helper.apiMock
+        .expectingPost(
+          `/api/quiz-questions/${quizQuestion.quizQuestionId}/contest`,
+        )
+        .andReturnOnce(newQuestion);
+      vitest.clearAllMocks();
+    });
+
+    it("regenerate question when asked", async () => {
+      wrapper.find("a#try-again").trigger("click");
+      await flushPromises();
+      expect(wrapper.text()).toContain("any question?");
+      expect(wrapper.text()).toContain("is it raining?");
+    });
+
+    it("should scroll to the end", async () => {
+      wrapper.find("a#try-again").trigger("click");
+      await flushPromises();
+      expect(scrollToElement).toHaveBeenCalled();
+    });
   });
 });
 
