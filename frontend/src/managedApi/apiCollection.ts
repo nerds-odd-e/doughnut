@@ -1,4 +1,3 @@
-import { QuizQuestion } from '@/components/review/QuizQuestion.vue';
 import ManagedApi from "./ManagedApi";
 
 const timezoneParam = () => {
