@@ -9,19 +9,19 @@
     />
   </ToolbarFrame>
   <LoadingPage v-bind="{ contentExists: circles, title: 'My Circles' }">
-    <div v-if="!!circles">
-      <ul class="list-group">
-        <li v-if="user?.admin" class="list-group-item">
-          <router-link :to="{ name: 'adminDashboard' }">
-            Admin Dashboard
-          </router-link>
-        </li>
-        <li class="list-group-item">
-          <router-link :to="{ name: 'notebooks' }"> My Notebooks </router-link>
-        </li>
-        <li class="list-group-item">
-          <router-link :to="{ name: 'bazaar' }"> Bazaar </router-link>
-        </li>
+    <ul class="list-group">
+      <li v-if="user?.admin" class="list-group-item">
+        <router-link :to="{ name: 'adminDashboard' }">
+          Admin Dashboard
+        </router-link>
+      </li>
+      <li class="list-group-item">
+        <router-link :to="{ name: 'notebooks' }"> My Notebooks </router-link>
+      </li>
+      <li class="list-group-item">
+        <router-link :to="{ name: 'bazaar' }"> Bazaar </router-link>
+      </li>
+      <template v-if="circles">
         <li class="list-group-item" v-for="circle in circles" :key="circle.id">
           <router-link
             :to="{ name: 'circleShow', params: { circleId: circle.id } }"
@@ -29,8 +29,8 @@
             {{ circle.name }}
           </router-link>
         </li>
-      </ul>
-    </div>
+      </template>
+    </ul>
     <div class="btn-group">
       <PopButton class="btn btn-secondary" title="Create a new circle">
         <CircleNewDialog />
@@ -60,7 +60,7 @@ export default defineComponent({
   },
   data() {
     return {
-      circles: null as Generated.Circle[] | null,
+      circles: undefined as Generated.Circle[] | undefined,
     };
   },
   emits: ["updateUser"],
