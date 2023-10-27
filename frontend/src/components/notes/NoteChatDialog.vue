@@ -1,5 +1,4 @@
 <template>
-  <p>Let's talk about this note.</p>
   <div class="quiz-question" v-if="quizQuestion">
     <div v-if="prevQuizQuestion">
       <h3>Previous Question...</h3>
@@ -33,14 +32,16 @@
       >
         Test me
       </button>
-      <button
+      <a
+        role="button"
+        title="Doesn't make sense?"
         id="try-again"
         v-if="quizQuestion"
         class="btn btn-secondary"
         @click="generateQuestion"
       >
-        Doesn't make sense?
-      </button>
+        <SvgContest />
+      </a>
       <form class="chat-input-container" @submit.prevent="generateChatAnswer">
         <input id="chat-input" class="chat-input-text" v-model="chatInput" />
         <input
