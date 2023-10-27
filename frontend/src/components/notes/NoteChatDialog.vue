@@ -22,6 +22,7 @@
       <p id="chat-answer">{{ assistantMessage }}</p>
     </div>
   </div>
+  <div ref="bottomOfTheChat" style="height: 140px; display: block"></div>
 
   <div class="chat-container">
     <div class="container">
@@ -98,12 +99,18 @@ export default defineComponent({
     },
   },
   methods: {
+    scrollToBottom() {
+      (this.$refs.bottomOfTheChat as HTMLElement)?.scrollIntoView({
+        behavior: "smooth" as const,
+      });
+    },
     async generateQuestion() {
       const tmpQuestion: Generated.QuizQuestion | undefined = this.quizQuestion;
       this.quizQuestion = await this.api.ai.askAIToGenerateQuestion(
         this.selectedNote.id,
       );
       this.prevQuizQuestion = tmpQuestion;
+      this.scrollToBottom();
     },
     onAnswered(answeredQuestion: Generated.AnsweredQuestion) {
       this.answeredQuestion = answeredQuestion;
