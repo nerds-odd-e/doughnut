@@ -42,9 +42,20 @@ class RestQuizQuestionController {
   @PostMapping("/generate-question")
   public QuizQuestion generateQuestion(@RequestParam(value = "note") Note note) {
     currentUser.assertLoggedIn();
+    return generateAIQuestion(note.getThing());
+  }
+
+  @PostMapping("/{quizQuestion}/contest")
+  @Transactional
+  public QuizQuestion contest(@PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity) {
+    currentUser.assertLoggedIn();
+    return generateAIQuestion(quizQuestionEntity.getThing());
+  }
+
+  private QuizQuestion generateAIQuestion(Thing thing) {
     QuizQuestionGenerator quizQuestionGenerator =
         new QuizQuestionGenerator(
-            currentUser.getEntity(), note.getThing(), null, modelFactoryService, aiAdvisorService);
+            currentUser.getEntity(), thing, null, modelFactoryService, aiAdvisorService);
     return quizQuestionGenerator.generateAQuestionOfFirstPossibleType(
         List.of(QuizQuestionEntity.QuestionType.AI_QUESTION));
   }
