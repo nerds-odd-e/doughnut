@@ -7,6 +7,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionGenerator;
 import com.odde.doughnut.services.AiAdvisorService;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Optional;
 
 public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFactoryService) {
@@ -24,15 +25,21 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
 
   public Optional<QuizQuestionEntity> generateAQuizQuestion(
       Randomizer randomizer, User user, AiAdvisorService aiAdvisorService) {
+    return getQuizQuestionGenerator(randomizer, aiAdvisorService)
+        .generateAQuestionOfFirstPossibleType(shuffleAvailableQuestionTypes(randomizer, user));
+  }
+
+  private List<QuizQuestionEntity.QuestionType> shuffleAvailableQuestionTypes(
+      Randomizer randomizer, User user) {
+    return randomizer.shuffle(entity.availableQuestionTypes(user.getAiQuestionTypeOnlyForReview()));
+  }
+
+  private QuizQuestionGenerator getQuizQuestionGenerator(
+      Randomizer randomizer, AiAdvisorService aiAdvisorService) {
     QuizQuestionGenerator quizQuestionGenerator =
         new QuizQuestionGenerator(
             entity.getUser(), entity.getThing(), randomizer, modelFactoryService, aiAdvisorService);
-    return randomizer
-        .shuffle(entity.availableQuestionTypes(user.getAiQuestionTypeOnlyForReview()))
-        .stream()
-        .map(quizQuestionGenerator::buildQuizQuestion)
-        .flatMap(Optional::stream)
-        .findFirst();
+    return quizQuestionGenerator;
   }
 
   public void markAsRepeated(Timestamp currentUTCTimestamp, boolean successful) {
