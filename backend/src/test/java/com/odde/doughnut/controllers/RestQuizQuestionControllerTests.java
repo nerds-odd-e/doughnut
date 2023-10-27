@@ -23,7 +23,6 @@ import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.OpenAiApi;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import io.reactivex.Single;
 import java.sql.Timestamp;
@@ -32,8 +31,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -264,70 +261,19 @@ class RestQuizQuestionControllerTests {
     }
 
     @Test
-    void createQuizQuestion() throws JsonProcessingException {
-      when(openAiApi.createChatCompletion(any()))
-          .thenReturn(buildCompletionResultForFunctionCall(jsonQuestion));
+    void createQuizQuestion() {
+      mockChatCompletionForGPT3_5MessageOnly(jsonQuestion);
       QuizQuestion quizQuestion = controller.generateQuestion(note);
 
       Assertions.assertThat(quizQuestion.stem).contains("What is the first color in the rainbow?");
     }
 
     @Test
-    void createQuizQuestionFailedWithGpt35WillTryAgain() throws JsonProcessingException {
+    void createQuizQuestionFailedWithGpt35WillNotTryAgain() throws JsonProcessingException {
       when(openAiApi.createChatCompletion(any()))
           .thenReturn(buildCompletionResultForFunctionCall("{\"stem\": \"\"}"));
       assertThrows(ResponseStatusException.class, () -> controller.generateQuestion(note));
-      verify(openAiApi, Mockito.times(2)).createChatCompletion(any());
-    }
-
-    @Nested
-    class WithMockedChatCompletionWhenTheContentIsLong {
-      @Captor private ArgumentCaptor<ChatCompletionRequest> captor;
-      QuestionEvaluation questionEvaluation = new QuestionEvaluation();
-
-      @BeforeEach
-      void setup() throws JsonProcessingException {
-        mockChatCompletionForGPT3_5MessageOnly(jsonQuestion);
-        questionEvaluation.correctChoices = new int[] {0};
-        questionEvaluation.feasibleQuestion = true;
-        note.setDetails(makeMe.aStringOfLength(1000));
-      }
-
-      @Test
-      void usingGPT3_5_WillCallAPIAgainToReEvaluateTheQuestion() throws JsonProcessingException {
-        mockChatCompletionForFunctionCall(
-            "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
-        controller.generateQuestion(note);
-        verify(openAiApi, times(2)).createChatCompletion(captor.capture());
-        Assertions.assertThat(captor.getAllValues().get(0).getModel())
-            .startsWith("ft:gpt-3.5-turbo-0613:odd-e::");
-        Assertions.assertThat(captor.getAllValues().get(1).getModel())
-            .isEqualTo("gpt-3.5-turbo-16k");
-      }
-
-      @Test
-      void tryWithGPT4IfTheEvaluationIsIncorrect() throws JsonProcessingException {
-        questionEvaluation.correctChoices = new int[] {0, 1};
-        mockChatCompletionForFunctionCall(
-            "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
-        mockChatCompletionForFunctionCall(
-            "ask_single_answer_multiple_choice_question", jsonQuestion);
-        controller.generateQuestion(note);
-        verify(openAiApi, times(3)).createChatCompletion(captor.capture());
-        Assertions.assertThat(captor.getAllValues().get(2).getModel()).isEqualTo("gpt-4");
-      }
-
-      @Test
-      void tryWithGPT4IfTheEvaluationIsNotFeasible() throws JsonProcessingException {
-        questionEvaluation.feasibleQuestion = false;
-        mockChatCompletionForFunctionCall(
-            "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
-        mockChatCompletionForFunctionCall(
-            "ask_single_answer_multiple_choice_question", jsonQuestion);
-        controller.generateQuestion(note);
-        verify(openAiApi, times(3)).createChatCompletion(captor.capture());
-        Assertions.assertThat(captor.getAllValues().get(2).getModel()).isEqualTo("gpt-4");
-      }
+      verify(openAiApi, Mockito.times(1)).createChatCompletion(any());
     }
   }
 
