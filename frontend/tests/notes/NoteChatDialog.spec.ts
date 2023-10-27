@@ -1,6 +1,7 @@
 import { flushPromises } from "@vue/test-utils";
 import { beforeEach, expect } from "vitest";
 import NoteChatDialog from "@/components/notes/NoteChatDialog.vue";
+import scrollToElement from "@/components/commons/scrollToElement";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
@@ -37,6 +38,16 @@ describe("NoteChatDialog TestMe", () => {
     expect(wrapper.text()).toContain("any question?");
     expect(wrapper.text()).toContain("option A");
     expect(wrapper.text()).toContain("option C");
+  });
+
+  it("scroll to bottom", async () => {
+    helper.apiMock
+      .expectingPost(`/api/ai/generate-question?note=${note.id}`)
+      .andReturnOnce(quizQuestion);
+    const wrapper = await createWrapper();
+    wrapper.find("button").trigger("click");
+    await flushPromises();
+    expect(scrollToElement).toHaveBeenCalled();
   });
 
   it("regenerate question when asked", async () => {

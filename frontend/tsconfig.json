@@ -43,7 +43,7 @@
     "enable": true
   },
   "files": [
-    "./vite.config.ts", "./src/components/admin/downloadJSONL.ts", "./src/components/notes/scrollToElement.ts"
+    "./vite.config.ts"
   ],
   "include": [
     "src/**/*.ts",
