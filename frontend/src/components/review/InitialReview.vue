@@ -3,11 +3,12 @@
     <ShowReviewPoint
       v-bind="{ reviewPoint, expandInfo: true, storageAccessor }"
       @level-changed="$emit('reloadNeeded', $event)"
-    />
-    <InitialReviewButtons
-      :key="buttonKey"
-      @do-initial-review="processForm($event)"
-    />
+    >
+      <InitialReviewButtons
+        :key="buttonKey"
+        @do-initial-review="processForm($event)"
+      />
+    </ShowReviewPoint>
   </ContainerPage>
 </template>
 
