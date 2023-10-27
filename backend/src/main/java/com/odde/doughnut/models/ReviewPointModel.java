@@ -9,8 +9,6 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionGenerator;
 import com.odde.doughnut.services.AiAdvisorService;
 import java.sql.Timestamp;
 import java.util.List;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFactoryService) {
 
@@ -27,13 +25,8 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
 
   public QuizQuestion generateAQuizQuestion(
       Randomizer randomizer, User user, AiAdvisorService aiAdvisorService) {
-    QuizQuestionEntity quizQuestionEntity =
-        getQuizQuestionGenerator(randomizer, aiAdvisorService)
-            .generateAQuestionOfFirstPossibleType(shuffleAvailableQuestionTypes(randomizer, user))
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
-    modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
-    return modelFactoryService.toQuizQuestion(quizQuestionEntity, user);
+    return getQuizQuestionGenerator(randomizer, aiAdvisorService)
+        .generateAQuestionOfFirstPossibleType(shuffleAvailableQuestionTypes(randomizer, user));
   }
 
   private List<QuizQuestionEntity.QuestionType> shuffleAvailableQuestionTypes(

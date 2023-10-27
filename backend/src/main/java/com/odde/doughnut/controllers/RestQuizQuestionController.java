@@ -14,10 +14,8 @@ import java.util.List;
 import jakarta.annotation.Resource;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/quiz-questions")
@@ -47,14 +45,8 @@ class RestQuizQuestionController {
     QuizQuestionGenerator quizQuestionGenerator =
         new QuizQuestionGenerator(
             currentUser.getEntity(), note.getThing(), null, modelFactoryService, aiAdvisorService);
-    QuizQuestionEntity quizQuestionEntity =
-        quizQuestionGenerator
-            .generateAQuestionOfFirstPossibleType(
-                List.of(QuizQuestionEntity.QuestionType.AI_QUESTION))
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
-    modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
-    return modelFactoryService.toQuizQuestion(quizQuestionEntity, currentUser.getEntity());
+    return quizQuestionGenerator.generateAQuestionOfFirstPossibleType(
+        List.of(QuizQuestionEntity.QuestionType.AI_QUESTION));
   }
 
   @PostMapping("/{quizQuestion}/answer")

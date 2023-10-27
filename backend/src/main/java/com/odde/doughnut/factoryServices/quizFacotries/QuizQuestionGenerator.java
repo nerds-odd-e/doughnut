@@ -1,5 +1,6 @@
 package com.odde.doughnut.factoryServices.quizFacotries;
 
+import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.QuizQuestionEntity.QuestionType;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -7,6 +8,8 @@ import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.services.AiAdvisorService;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 public record QuizQuestionGenerator(
     User user,
@@ -27,8 +30,15 @@ public record QuizQuestionGenerator(
     }
   }
 
-  public Optional<QuizQuestionEntity> generateAQuestionOfFirstPossibleType(
-      List<QuestionType> shuffled) {
-    return shuffled.stream().map(this::buildQuizQuestion).flatMap(Optional::stream).findFirst();
+  public QuizQuestion generateAQuestionOfFirstPossibleType(List<QuestionType> shuffled) {
+    var quizQuestionEntity =
+        shuffled.stream()
+            .map(this::buildQuizQuestion)
+            .flatMap(Optional::stream)
+            .findFirst()
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
+    modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
+    return modelFactoryService.toQuizQuestion(quizQuestionEntity, user);
   }
 }
