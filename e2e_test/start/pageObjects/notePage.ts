@@ -28,7 +28,6 @@ export const assumeNotePage = () => {
       cy.findByRole("button", { name: "suggest details" }).click()
     },
     chatAboutNote() {
-      clickNotePageMoreOptionsButton("chat about this note")
       return assumeChatAboutNotePage()
     },
   }
