@@ -25,8 +25,14 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
   public Optional<QuizQuestionEntity> generateAQuizQuestion(
       Randomizer randomizer, User user, AiAdvisorService aiAdvisorService) {
     QuizQuestionGenerator quizQuestionGenerator =
-        new QuizQuestionGenerator(entity, randomizer, modelFactoryService, aiAdvisorService);
-    return quizQuestionGenerator.buildRandomQuestion(user.getAiQuestionTypeOnlyForReview());
+        new QuizQuestionGenerator(
+            entity.getUser(), entity.getThing(), randomizer, modelFactoryService, aiAdvisorService);
+    return randomizer
+        .shuffle(entity.availableQuestionTypes(user.getAiQuestionTypeOnlyForReview()))
+        .stream()
+        .map(quizQuestionGenerator::buildQuizQuestion)
+        .flatMap(Optional::stream)
+        .findFirst();
   }
 
   public void markAsRepeated(Timestamp currentUTCTimestamp, boolean successful) {
