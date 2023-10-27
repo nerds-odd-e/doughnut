@@ -76,9 +76,9 @@ export default defineComponent({
     async generateQuestion() {
       const tmpQuestion: Generated.QuizQuestion | undefined =
         this.currentQuestion;
-      this.currentQuestion = await this.api.quizQuestions.contest(
-        this.quizQuestion.quizQuestionId,
-      );
+      this.currentQuestion = (
+        await this.api.quizQuestions.contest(this.quizQuestion.quizQuestionId)
+      ).newQuizQuestion!;
       this.prevQuizQuestions.push(tmpQuestion);
       this.scrollToBottom();
     },

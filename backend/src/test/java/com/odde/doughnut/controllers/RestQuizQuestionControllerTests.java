@@ -387,7 +387,7 @@ class RestQuizQuestionControllerTests {
     void acceptTheContest() throws JsonProcessingException {
       when(openAiApi.createChatCompletion(any()))
           .thenReturn(buildCompletionResultForFunctionCall(jsonQuestion));
-      QuizQuestion quizQuestion = controller.contest(quizQuestionEntity);
+      QuizQuestion quizQuestion = controller.contest(quizQuestionEntity).newQuizQuestion;
 
       Assertions.assertThat(quizQuestion.stem).contains("What is the first color in the rainbow?");
     }
