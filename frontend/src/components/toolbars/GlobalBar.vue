@@ -17,7 +17,6 @@
         </template>
         <LinkNoteDialog v-bind="{ storageAccessor }" />
       </PopButton>
-      <ReviewButton class="btn" v-if="user" />
       <NoteUndoButton v-bind="{ storageAccessor }" />
     </div>
     <ApiStatus
