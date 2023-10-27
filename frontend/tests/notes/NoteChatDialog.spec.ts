@@ -65,7 +65,7 @@ describe("NoteChatDialog TestMe", () => {
     helper.apiMock
       .expectingPost(`/api/ai/generate-question?note=${note.id}`)
       .andReturnOnce(newQuestion);
-    wrapper.find("button#try-again").trigger("click");
+    wrapper.find("a#try-again").trigger("click");
     await flushPromises();
     expect(wrapper.text()).toContain("any question?");
     expect(wrapper.text()).toContain("is it raining?");
