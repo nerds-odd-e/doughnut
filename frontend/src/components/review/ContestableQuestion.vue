@@ -80,7 +80,7 @@ export default defineComponent({
     async generateQuestion() {
       const tmpQuestion: Generated.QuizQuestion | undefined =
         this.quizQuestion1;
-      this.quizQuestion1 = await this.api.ai.askAIToGenerateQuestion(
+      this.quizQuestion1 = await this.api.reviewMethods.generateQuestion(
         this.selectedNote.id,
       );
       this.prevQuizQuestion = tmpQuestion;

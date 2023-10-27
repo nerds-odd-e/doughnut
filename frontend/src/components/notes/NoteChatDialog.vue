@@ -82,7 +82,7 @@ export default defineComponent({
       }
     },
     async generateQuestion() {
-      this.quizQuestion = await this.api.ai.askAIToGenerateQuestion(
+      this.quizQuestion = await this.api.reviewMethods.generateQuestion(
         this.selectedNote.id,
       );
       this.scrollToBottom();
