@@ -13,19 +13,19 @@
       v-else
       :quiz-question="currentQuestion"
       @answered="onAnswered($event)"
-    />
+    >
+      <a
+        role="button"
+        title="Doesn't make sense?"
+        id="try-again"
+        v-if="currentQuestion"
+        class="btn"
+        @click="generateQuestion"
+      >
+        <SvgContest />
+      </a>
+    </QuizQuestion>
   </div>
-
-  <a
-    role="button"
-    title="Doesn't make sense?"
-    id="try-again"
-    v-if="currentQuestion"
-    class="btn btn-secondary"
-    @click="generateQuestion"
-  >
-    <SvgContest />
-  </a>
 </template>
 
 <script lang="ts">
