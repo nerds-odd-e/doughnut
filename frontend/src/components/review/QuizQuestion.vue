@@ -48,6 +48,7 @@
         </template>
         <SuggestQuestionForFineTuning :quiz-question="quizQuestion" />
       </PopButton>
+      <slot />
     </div>
   </div>
 </template>
