@@ -4,9 +4,7 @@ import com.odde.doughnut.controllers.json.QuestionSuggestionCreationParams;
 import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionDirector;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionGenerator;
 import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
@@ -45,18 +43,16 @@ class RestQuizQuestionController {
   @PostMapping("/generate-question")
   public QuizQuestion generateQuestion(@RequestParam(value = "note") Note note) {
     currentUser.assertLoggedIn();
-    QuizQuestionServant servant =
-        new QuizQuestionServant(
-            currentUser.getEntity(), null, modelFactoryService, aiAdvisorService);
-    try {
-      QuizQuestionEntity quizQuestionEntity =
-          new QuizQuestionDirector(QuizQuestionEntity.QuestionType.AI_QUESTION, servant)
-              .invoke(note.getThing());
-      modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
-      return modelFactoryService.toQuizQuestion(quizQuestionEntity, currentUser.getEntity());
-    } catch (QuizQuestionNotPossibleException e) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated", e);
-    }
+    QuizQuestionGenerator quizQuestionGenerator =
+        new QuizQuestionGenerator(
+            currentUser.getEntity(), note.getThing(), null, modelFactoryService, aiAdvisorService);
+    QuizQuestionEntity quizQuestionEntity =
+        quizQuestionGenerator
+            .buildQuizQuestion(QuizQuestionEntity.QuestionType.AI_QUESTION)
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
+    modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
+    return modelFactoryService.toQuizQuestion(quizQuestionEntity, currentUser.getEntity());
   }
 
   @PostMapping("/{quizQuestion}/answer")
