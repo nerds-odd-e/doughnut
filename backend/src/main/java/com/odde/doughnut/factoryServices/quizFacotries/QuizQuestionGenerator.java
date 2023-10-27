@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.QuizQuestionEntity.QuestionType;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.services.AiAdvisorService;
+import java.util.List;
 import java.util.Optional;
 
 public record QuizQuestionGenerator(
@@ -24,5 +25,10 @@ public record QuizQuestionGenerator(
     } catch (QuizQuestionNotPossibleException e) {
       return Optional.empty();
     }
+  }
+
+  public Optional<QuizQuestionEntity> generateAQuestionOfFirstPossibleType(
+      List<QuestionType> shuffled) {
+    return shuffled.stream().map(this::buildQuizQuestion).flatMap(Optional::stream).findFirst();
   }
 }
