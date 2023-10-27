@@ -348,14 +348,57 @@ class RestQuizQuestionControllerTests {
                       request.getFunctions() != null
                           && request.getFunctions().get(0).getName().equals(functionName)));
     }
+  }
 
-    private Single<ChatCompletionResult> buildCompletionResultForFunctionCall(String jsonString)
-        throws JsonProcessingException {
-      return Single.just(
+  @Nested
+  class Contest {
+    String jsonQuestion;
+    QuizQuestionEntity quizQuestionEntity;
+
+    @BeforeEach
+    void setUp() {
+      quizQuestionEntity = makeMe.aQuestion().ofNote(makeMe.aNote().please()).please();
+      MCQWithAnswer aiGeneratedQuestion =
           makeMe
-              .openAiCompletionResult()
-              .functionCall("", new ObjectMapper().readTree(jsonString))
-              .please());
+              .aMCQWithAnswer()
+              .stem("What is the first color in the rainbow?")
+              .choices("red", "black", "green")
+              .correctChoiceIndex(0)
+              .please();
+      jsonQuestion = aiGeneratedQuestion.toJsonString();
     }
+
+    @Test
+    void askWithNoteThatCannotAccess() {
+      assertThrows(
+          ResponseStatusException.class,
+          () -> {
+            RestQuizQuestionController restAiController =
+                new RestQuizQuestionController(
+                    openAiApi,
+                    makeMe.modelFactoryService,
+                    makeMe.aNullUserModel(),
+                    testabilitySettings);
+            restAiController.contest(quizQuestionEntity);
+          });
+    }
+
+    @Test
+    void acceptTheContest() throws JsonProcessingException {
+      when(openAiApi.createChatCompletion(any()))
+          .thenReturn(buildCompletionResultForFunctionCall(jsonQuestion));
+      QuizQuestion quizQuestion = controller.contest(quizQuestionEntity);
+
+      Assertions.assertThat(quizQuestion.stem).contains("What is the first color in the rainbow?");
+    }
+  }
+
+  private Single<ChatCompletionResult> buildCompletionResultForFunctionCall(String jsonString)
+      throws JsonProcessingException {
+    return Single.just(
+        makeMe
+            .openAiCompletionResult()
+            .functionCall("", new ObjectMapper().readTree(jsonString))
+            .please());
   }
 }
