@@ -16,6 +16,9 @@
         </router-link>
       </li>
       <li class="list-group-item">
+        <ReviewButton class="btn" />
+      </li>
+      <li class="list-group-item">
         <router-link :to="{ name: 'notebooks' }"> My Notebooks </router-link>
       </li>
       <li class="list-group-item">
@@ -50,6 +53,7 @@ import PopButton from "../commons/Popups/PopButton.vue";
 import CircleNewDialog from "../circles/CircleNewDialog.vue";
 import BrandBar from "./BrandBar.vue";
 import ToolbarFrame from "./ToolbarFrame.vue";
+import ReviewButton from "./ReviewButton.vue";
 
 export default defineComponent({
   setup() {
@@ -80,6 +84,7 @@ export default defineComponent({
     LoadingPage,
     BrandBar,
     ToolbarFrame,
+    ReviewButton,
   },
 });
 </script>

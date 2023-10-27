@@ -14,5 +14,6 @@
         stroke="#3bafda"
       />
     </svg>
+    Daily Review
   </router-link>
 </template>
