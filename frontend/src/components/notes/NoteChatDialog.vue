@@ -1,7 +1,7 @@
 <template>
   <ContestableQuestion
     v-if="quizQuestion"
-    v-bind="{ selectedNote, quizQuestion, storageAccessor }"
+    v-bind="{ quizQuestion, storageAccessor }"
   />
   <div v-show="answered" class="chat-answer-container">
     <img src="/user-icon.svg" class="chat-answer-icon" />
