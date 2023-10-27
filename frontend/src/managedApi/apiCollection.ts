@@ -46,6 +46,13 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return (await managedApi.restPost(url, {})) as Generated.QuizQuestion;
     },
 
+    async contest(quizQuestionId: number): Promise<Generated.QuizQuestion> {
+      return managedApi.restPost(
+        `quiz-questions/${quizQuestionId}/contest`,
+        {},
+      ) as Promise<Generated.QuizQuestion>;
+    },
+
     async suggestQuestionForFineTuning(
       quizQuestionId: number,
       suggestedQuestion: Generated.QuestionSuggestionCreationParams,

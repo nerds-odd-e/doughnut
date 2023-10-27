@@ -63,7 +63,9 @@ describe("NoteChatDialog TestMe", () => {
       .withQuestionStem("is it raining?")
       .please();
     helper.apiMock
-      .expectingPost(`/api/quiz-questions/generate-question?note=${note.id}`)
+      .expectingPost(
+        `/api/quiz-questions/${quizQuestion.quizQuestionId}/contest`,
+      )
       .andReturnOnce(newQuestion);
     wrapper.find("a#try-again").trigger("click");
     await flushPromises();
