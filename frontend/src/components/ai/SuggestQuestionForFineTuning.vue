@@ -57,7 +57,7 @@ const props = defineProps<{
 const { quizQuestion } = props;
 
 async function suggestQuestionForFineTuning() {
-  await api.reviewMethods.suggestQuestionForFineTuning(
+  await api.quizQuestions.suggestQuestionForFineTuning(
     quizQuestion.quizQuestionId,
     params.value,
   );
