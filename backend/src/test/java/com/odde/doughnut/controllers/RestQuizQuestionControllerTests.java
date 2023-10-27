@@ -12,6 +12,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.json.QuestionSuggestionCreationParams;
 import com.odde.doughnut.controllers.json.QuizQuestion;
+import com.odde.doughnut.controllers.json.QuizQuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
@@ -328,36 +329,20 @@ class RestQuizQuestionControllerTests {
         Assertions.assertThat(captor.getAllValues().get(2).getModel()).isEqualTo("gpt-4");
       }
     }
-
-    private void mockChatCompletionForGPT3_5MessageOnly(String result) {
-      Single<ChatCompletionResult> just =
-          Single.just(makeMe.openAiCompletionResult().choice(result).please());
-
-      doReturn(just)
-          .when(openAiApi)
-          .createChatCompletion(argThat(request -> request.getFunctions() == null));
-    }
-
-    private void mockChatCompletionForFunctionCall(String functionName, String result)
-        throws JsonProcessingException {
-      doReturn(buildCompletionResultForFunctionCall(result))
-          .when(openAiApi)
-          .createChatCompletion(
-              argThat(
-                  request ->
-                      request.getFunctions() != null
-                          && request.getFunctions().get(0).getName().equals(functionName)));
-    }
   }
 
   @Nested
   class Contest {
     String jsonQuestion;
     QuizQuestionEntity quizQuestionEntity;
+    QuestionEvaluation questionEvaluation = new QuestionEvaluation();
 
     @BeforeEach
     void setUp() {
-      quizQuestionEntity = makeMe.aQuestion().ofNote(makeMe.aNote().please()).please();
+      questionEvaluation.correctChoices = new int[] {0};
+      questionEvaluation.feasibleQuestion = true;
+      questionEvaluation.comment = "what a horrible question!";
+
       MCQWithAnswer aiGeneratedQuestion =
           makeMe
               .aMCQWithAnswer()
@@ -365,7 +350,11 @@ class RestQuizQuestionControllerTests {
               .choices("red", "black", "green")
               .correctChoiceIndex(0)
               .please();
+      aiGeneratedQuestion.confidence = 11;
       jsonQuestion = aiGeneratedQuestion.toJsonString();
+      Note note = makeMe.aNote().please();
+      quizQuestionEntity =
+          makeMe.aQuestion().ofAIGeneratedQuestion(aiGeneratedQuestion, note.getThing()).please();
     }
 
     @Test
@@ -384,12 +373,24 @@ class RestQuizQuestionControllerTests {
     }
 
     @Test
-    void acceptTheContest() throws JsonProcessingException {
-      when(openAiApi.createChatCompletion(any()))
-          .thenReturn(buildCompletionResultForFunctionCall(jsonQuestion));
-      QuizQuestion quizQuestion = controller.contest(quizQuestionEntity).newQuizQuestion;
+    void rejected() throws JsonProcessingException {
+      mockChatCompletionForFunctionCall(
+          "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
+      QuizQuestionContestResult contest = controller.contest(quizQuestionEntity);
+      Assertions.assertThat(contest.newQuizQuestion).isNull();
+      Assertions.assertThat(contest.reason)
+          .isEqualTo("This seems to be a legitimate question. Please answer it.");
+    }
 
-      Assertions.assertThat(quizQuestion.stem).contains("What is the first color in the rainbow?");
+    @Test
+    void acceptTheContest() throws JsonProcessingException {
+      questionEvaluation.feasibleQuestion = false;
+      mockChatCompletionForFunctionCall(
+          "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
+      mockChatCompletionForGPT3_5MessageOnly(jsonQuestion);
+      QuizQuestionContestResult contest = controller.contest(quizQuestionEntity);
+      Assertions.assertThat(contest.newQuizQuestion).isNotNull();
+      Assertions.assertThat(contest.reason).isEqualTo("what a horrible question!");
     }
   }
 
@@ -400,5 +401,25 @@ class RestQuizQuestionControllerTests {
             .openAiCompletionResult()
             .functionCall("", new ObjectMapper().readTree(jsonString))
             .please());
+  }
+
+  private void mockChatCompletionForGPT3_5MessageOnly(String result) {
+    Single<ChatCompletionResult> just =
+        Single.just(makeMe.openAiCompletionResult().choice(result).please());
+
+    doReturn(just)
+        .when(openAiApi)
+        .createChatCompletion(argThat(request -> request.getFunctions() == null));
+  }
+
+  private void mockChatCompletionForFunctionCall(String functionName, String result)
+      throws JsonProcessingException {
+    doReturn(buildCompletionResultForFunctionCall(result))
+        .when(openAiApi)
+        .createChatCompletion(
+            argThat(
+                request ->
+                    request.getFunctions() != null
+                        && request.getFunctions().get(0).getName().equals(functionName)));
   }
 }

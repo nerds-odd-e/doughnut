@@ -3,10 +3,12 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.controllers.json.AiCompletion;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
+import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
@@ -25,8 +27,13 @@ public class AiAdvisorService {
   }
 
   public MCQWithAnswer generateQuestion(Note note) throws QuizQuestionNotPossibleException {
-    AiQuestionGenerator aiQuestionGenerator = new AiQuestionGenerator(note, openAiApiHandler);
-    return aiQuestionGenerator.getAiGeneratedQuestion();
+    return getAiQuestionGenerator(note).getAiGeneratedQuestion();
+  }
+
+  public QuestionEvaluation contestMCQ(QuizQuestionEntity quizQuestionEntity) {
+    return getAiQuestionGenerator(quizQuestionEntity.getThing().getNote())
+        .evaluateQuestion(quizQuestionEntity.getMcqWithAnswer())
+        .orElse(null);
   }
 
   public AiCompletion getAiCompletion(AiCompletionParams aiCompletionParams, Note note) {
@@ -55,5 +62,9 @@ public class AiAdvisorService {
       return response.get().getMessage().getContent();
     }
     return "";
+  }
+
+  private AiQuestionGenerator getAiQuestionGenerator(Note note) {
+    return new AiQuestionGenerator(note, openAiApiHandler);
   }
 }
