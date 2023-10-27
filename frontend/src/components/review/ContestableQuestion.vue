@@ -1,8 +1,8 @@
 <template>
-  <div class="quiz-question" v-if="quizQuestion1">
-    <div v-if="prevQuizQuestion">
+  <div class="quiz-question" v-if="currentQuestion">
+    <div v-for="(q, index) in prevQuizQuestions" :key="index">
       <h3>Previous Question...</h3>
-      <QuizQuestion :quiz-question="prevQuizQuestion" :disabled="true" />
+      <QuizQuestion :quiz-question="q" :disabled="true" />
     </div>
     <AnsweredQuestion
       v-if="answeredQuestion"
@@ -11,7 +11,7 @@
     />
     <QuizQuestion
       v-else
-      :quiz-question="quizQuestion1"
+      :quiz-question="currentQuestion"
       @answered="onAnswered($event)"
     />
   </div>
@@ -20,7 +20,7 @@
     role="button"
     title="Doesn't make sense?"
     id="try-again"
-    v-if="quizQuestion1"
+    v-if="currentQuestion"
     class="btn btn-secondary"
     @click="generateQuestion"
   >
@@ -34,7 +34,6 @@ import type { StorageAccessor } from "@/store/createNoteStorage";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import QuizQuestion from "./QuizQuestion.vue";
 import AnsweredQuestion from "./AnsweredQuestion.vue";
-import scrollToElement from "../commons/scrollToElement";
 
 export default defineComponent({
   setup() {
@@ -50,15 +49,16 @@ export default defineComponent({
       required: true,
     },
   },
+  emits: ["need-scroll"],
   components: {
     QuizQuestion,
     AnsweredQuestion,
   },
   data() {
     return {
-      quizQuestion1: this.quizQuestion,
+      currentQuestion: this.quizQuestion,
       answeredQuestion: undefined as Generated.AnsweredQuestion | undefined,
-      prevQuizQuestion: undefined as Generated.QuizQuestion | undefined,
+      prevQuizQuestions: [] as Generated.QuizQuestion[],
       chatInput: "",
       assistantMessage: "",
       answered: false,
@@ -71,18 +71,15 @@ export default defineComponent({
   },
   methods: {
     scrollToBottom() {
-      const elm = this.$refs.bottomOfTheChat as HTMLElement;
-      if (elm) {
-        scrollToElement(elm);
-      }
+      this.$emit("need-scroll");
     },
     async generateQuestion() {
       const tmpQuestion: Generated.QuizQuestion | undefined =
-        this.quizQuestion1;
-      this.quizQuestion1 = await this.api.quizQuestions.contest(
+        this.currentQuestion;
+      this.currentQuestion = await this.api.quizQuestions.contest(
         this.quizQuestion.quizQuestionId,
       );
-      this.prevQuizQuestion = tmpQuestion;
+      this.prevQuizQuestions.push(tmpQuestion);
       this.scrollToBottom();
     },
     onAnswered(answeredQuestion: Generated.AnsweredQuestion) {

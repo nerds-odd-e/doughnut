@@ -2,6 +2,7 @@
   <ContestableQuestion
     v-if="quizQuestion"
     v-bind="{ quizQuestion, storageAccessor }"
+    @need-scroll="scrollToBottom"
   />
   <div v-show="answered" class="chat-answer-container">
     <img src="/user-icon.svg" class="chat-answer-icon" />
