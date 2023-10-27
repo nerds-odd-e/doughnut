@@ -67,6 +67,7 @@ import type { StorageAccessor } from "@/store/createNoteStorage";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import QuizQuestion from "../review/QuizQuestion.vue";
 import AnsweredQuestion from "../review/AnsweredQuestion.vue";
+import scrollToElement from "../commons/scrollToElement";
 
 export default defineComponent({
   setup() {
@@ -100,9 +101,10 @@ export default defineComponent({
   },
   methods: {
     scrollToBottom() {
-      (this.$refs.bottomOfTheChat as HTMLElement)?.scrollIntoView({
-        behavior: "smooth" as const,
-      });
+      const elm = this.$refs.bottomOfTheChat as HTMLElement;
+      if (elm) {
+        scrollToElement(elm);
+      }
     },
     async generateQuestion() {
       const tmpQuestion: Generated.QuizQuestion | undefined = this.quizQuestion;

@@ -4,6 +4,8 @@ import NoteChatDialog from "@/components/notes/NoteChatDialog.vue";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
+vitest.mock("@/components/commons/scrollToElement");
+
 helper.resetWithApiMock(beforeEach, afterEach);
 
 const note = makeMe.aNoteRealm.please();
