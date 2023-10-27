@@ -15,13 +15,16 @@
       :key="noteId"
       @level-changed="$emit('levelChanged', $event)"
       @self-evaluated="$emit('selfEvaluated', $event)"
-    />
+    >
+      <slot />
+    </NoteCardsView>
   </div>
 
   <div v-if="link">
     <div class="jumbotron py-4 mb-2">
       <LinkShow v-bind="{ link, storageAccessor }" />
     </div>
+    <slot />
   </div>
 </template>
 
