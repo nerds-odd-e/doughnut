@@ -203,10 +203,6 @@ Then("the choice {string} should be incorrect", (choice: string) => {
   start.assumeQuestionPage().expectChoiceToBe(choice, "incorrect")
 })
 
-When("I ask to generate a question for the note {string}", (noteTopic: string) => {
-  start.jumpToNotePage(noteTopic).chatAboutNote().testMe()
-})
-
 When(
   "I've got the following question for a note with topic {string}:",
   (noteTopic: string, question: DataTable) => {

@@ -72,7 +72,7 @@ Given("An OpenAI response is unavailable", () => {
   mock_services.openAi().stubOpenAiCompletionWithErrorResponse()
 })
 
-Given("OpenAI by default returns this question:", (questionTable: DataTable) => {
+Given("OpenAI by default returns this question from now on:", (questionTable: DataTable) => {
   start
     .questionGenerationService()
     .stubAskSingleAnswerMultipleChoiceQuestion(questionTable.hashes()[0])
