@@ -296,7 +296,6 @@ class RestQuizQuestionControllerTests {
               .choices("red", "black", "green")
               .correctChoiceIndex(0)
               .please();
-      aiGeneratedQuestion.confidence = 11;
       jsonQuestion = aiGeneratedQuestion.toJsonString();
       Note note = makeMe.aNote().please();
       quizQuestionEntity =

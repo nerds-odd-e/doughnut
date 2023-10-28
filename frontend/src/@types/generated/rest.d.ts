@@ -295,10 +295,6 @@ declare namespace Generated {
          * Index of the correct choice. 0-based.
          */
         correctChoiceIndex: number;
-        /**
-         * Confidence of the correctness of the question. 0 to 10.
-         */
-        confidence: number;
     }
 
     interface Choice {
