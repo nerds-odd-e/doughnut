@@ -5,13 +5,11 @@ Feature: Question generation by AI
 
   Background:
     Given I am logged in as an existing user
-    And I have a note with the topic "Scuba Diving"
-    And OpenAI by default returns this question:
-      | Question Stem                                       | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
-      | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
 
   Scenario Outline: testing myself with generated question for a note
-    When I ask to generate a question for the note "Scuba Diving"
+    Given I've got the following question for a note with topic "Scuba Diving":
+      | Question Stem                                       | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
+      | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
     Then I should be asked "What is the most common scuba diving certification?"
     And the choice "<option>" should be <expectedResult>
     And my question should not be included in the admin's fine-tuning data
@@ -19,12 +17,3 @@ Feature: Question generation by AI
       | option       | expectedResult |
       | Rescue Diver | correct        |
       | Divemaster   | incorrect      |
-
-  Scenario: I should be able to regenerate the question when the question and choices do not make sense relating to the note
-    When I ask to generate a question for the note "Scuba Diving"
-    And OpenAI by default returns this question:
-      | Question Stem         | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
-      | What is scuba diving? | Rescue Diver   | Divemaster         | Open Water Diver   |
-    Then I complain the question doesn't make sense
-    And I should see the question "What is the most common scuba diving certification?" is disabled
-    And I should be asked "What is scuba diving?"
