@@ -11,7 +11,6 @@ class SuggestQuestionForFineTuningBuilder extends Builder<Generated.SuggestedQue
         stem: "What is the capital of France?",
         choices: ["Paris", "London", "Berlin"],
         correctChoiceIndex: 1,
-        confidence: 9,
       },
       preservedNoteContent: "this is the note content",
       comment: "",

@@ -14,10 +14,6 @@ public class MCQWithAnswer extends MultipleChoicesQuestion {
   @JsonProperty(required = true)
   public int correctChoiceIndex;
 
-  @JsonPropertyDescription("Confidence of the correctness of the question. 0 to 10.")
-  @JsonProperty(required = true)
-  public int confidence;
-
   public static MCQWithAnswer getValidQuestion(JsonNode question)
       throws QuizQuestionNotPossibleException {
     try {

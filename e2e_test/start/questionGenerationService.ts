@@ -10,7 +10,6 @@ export const questionGenerationService = () => ({
         record["Incorrect Choice 1"],
         record["Incorrect Choice 2"],
       ],
-      confidence: 1000, // so that it will skip the vaiidation by AI again.
     })
     cy.then(async () => {
       await mock_services.openAi().restartImposter()
