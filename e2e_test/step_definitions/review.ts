@@ -234,6 +234,10 @@ Then("I should see the question {string} is disabled", (questionStem: string) =>
   start.assumeQuestionPage(questionStem).isDisabled()
 })
 
+Then("I should see the question {string} is enabled", (questionStem: string) => {
+  start.assumeQuestionPage(questionStem).isNotDisabled()
+})
+
 Then("I suggest the displayed question {string} as a good example", (questionStem: string) => {
   start
     .assumeQuestionPage(questionStem)

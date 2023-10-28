@@ -60,6 +60,8 @@ class RestQuizQuestionController {
         return result;
       }
       result.reason = questionEvaluation.comment;
+    } else {
+      result.reason = "Failed to evaluate the question.";
     }
     result.newQuizQuestion = generateAIQuestion(quizQuestionEntity.getThing());
     return result;

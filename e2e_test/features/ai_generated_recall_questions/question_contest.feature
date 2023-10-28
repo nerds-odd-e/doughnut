@@ -7,16 +7,17 @@ Feature: User Contests Question generation by AI
     And I've got the following question for a note with topic "Scuba Diving":
       | Question Stem                                       | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
-    Given OpenAI by default returns this question from now on:
+    Given OpenAI now generates this question:
       | Question Stem         | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is scuba diving? | Rescue Diver   | Divemaster         | Open Water Diver   |
 
   Scenario Outline: I should be able to regenerate the question when the question and choices do not make sense relating to the note
-    Then I complain the question doesn't make sense
-    And I should see the question "What is the most common scuba diving certification?" is disabled
-    And I should be asked "What is scuba diving?"
+    Given OpenAI evaluates the question as <Legitimate Question>
+    When I contest the question
+    Then I should see the question "What is the most common scuba diving certification?" is <Old Question Status>
+    And I should be asked "<Current Question>"
 
     Examples:
-    | Accepted  | Reason        | Old Question Disabled? | New Question Asked? |
-    | Yes       |               | should                 | should              |
-    | No        |               | should not             | should not          |
+    | Legitimate Question | Old Question Status | Current Question                                    |
+    | legitamate          | enabled             | What is the most common scuba diving certification? |
+    | not legitamate      | disabled            | What is scuba diving?                               |
