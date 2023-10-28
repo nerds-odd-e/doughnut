@@ -72,12 +72,24 @@ Given("An OpenAI response is unavailable", () => {
   mock_services.openAi().stubOpenAiCompletionWithErrorResponse()
 })
 
-Given("OpenAI by default returns this question from now on:", (questionTable: DataTable) => {
-  start
-    .questionGenerationService()
-    .stubAskSingleAnswerMultipleChoiceQuestion(questionTable.hashes()[0])
+Given("OpenAI now generates this question:", (questionTable: DataTable) => {
+  start.questionGenerationService().resetAndStubAskingMCQ(questionTable.hashes()[0])
 })
 
-Then("I complain the question doesn't make sense", () => {
+Given("OpenAI evaluates the question as legitamate", () => {
+  start
+    .questionGenerationService()
+    .stubEvaluationQuestion({ feasibleQuestion: true, correctChoices: [0] })
+})
+
+Given("OpenAI evaluates the question as not legitamate", () => {
+  start.questionGenerationService().stubEvaluationQuestion({
+    feasibleQuestion: false,
+    correctChoices: [0],
+    comment: "AI plainly doesn't like it.",
+  })
+})
+
+Then("I contest the question", () => {
   cy.findByRole("button", { name: "Doesn't make sense?" }).click()
 })

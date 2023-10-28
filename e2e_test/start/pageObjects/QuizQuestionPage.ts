@@ -11,6 +11,10 @@ const assumeQuestionPage = (stem?: string) => {
       question().find("ol button").should("be.disabled")
     },
 
+    isNotDisabled() {
+      question().find("ol button").should("not.be.disabled")
+    },
+
     expectChoiceToBe(choice: string, correctness: "correct" | "incorrect") {
       getChoice(choice).click()
       getChoice(choice).parent().invoke("attr", "class").should("contain", `is-${correctness}`)

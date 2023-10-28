@@ -1,3 +1,4 @@
+import { MessageToMatch } from "start/mock_services/MessageToMatch"
 import { FlexiPredicate, Operator } from "@anev/ts-mountebank"
 import ServiceMocker from "../../support/ServiceMocker"
 import { HttpMethod } from "@anev/ts-mountebank"
@@ -94,10 +95,14 @@ const openAiService = () => {
       return mockChatCompletionForMessageContaining(serviceMocker, [], reply, finishReason)
     },
 
-    stubAnyChatCompletionFunctionCall(functionName: string, argumentsString: string) {
+    stubChatCompletionFunctionCallForMessageContaining(
+      messages: MessageToMatch[],
+      functionName: string,
+      argumentsString: string,
+    ) {
       return mockChatCompletion(
         serviceMocker,
-        [],
+        messages,
         {
           role: "function",
           function_call: {
