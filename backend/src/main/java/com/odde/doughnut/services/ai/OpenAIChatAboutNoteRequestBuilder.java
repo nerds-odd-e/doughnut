@@ -13,7 +13,12 @@ import java.util.List;
 import org.apache.logging.log4j.util.Strings;
 
 public class OpenAIChatAboutNoteRequestBuilder {
-  String model = "gpt-3.5-turbo-16k";
+  public static final String GPT_4 = "gpt-4";
+  public static final String GPT_MODEL_DEFAULT = "gpt-3.5-turbo-16k";
+  public static final String GPT_MODEL_FOR_EVALUATION = "ft:gpt-3.5-turbo-0613:odd-e::8E7utoRD";
+  public static final String GPT_MODEL_FOR_QUESTION_GENERATION =
+      "ft:gpt-3.5-turbo-0613:odd-e::8DpeUKBy";
+  String model = GPT_MODEL_DEFAULT;
   private List<ChatMessage> messages = new ArrayList<>();
   private List<ChatFunction> functions = new ArrayList<>();
   private int maxTokens;
@@ -90,12 +95,12 @@ public class OpenAIChatAboutNoteRequestBuilder {
   }
 
   public OpenAIChatAboutNoteRequestBuilder useGPT4() {
-    model = "gpt-4";
+    model = GPT_4;
     return this;
   }
 
   public OpenAIChatAboutNoteRequestBuilder evaluateQuestion(MCQWithAnswer question) {
-    model = "ft:gpt-3.5-turbo-0613:odd-e::8E7utoRD";
+    model = GPT_MODEL_FOR_EVALUATION;
     functions.add(
         ChatFunction.builder()
             .name("evaluate_question")
@@ -149,7 +154,7 @@ please critically check if the following question makes sense and is possible to
 
   public OpenAIChatAboutNoteRequestBuilder
       userInstructionToGenerateQuestionWithGPT35FineTunedModel() {
-    this.model = "ft:gpt-3.5-turbo-0613:odd-e::8DpeUKBy";
+    this.model = GPT_MODEL_FOR_QUESTION_GENERATION;
 
     String messageBody =
         "Please assume the role of a Memory Assistant. Generate a MCQ based on the note of current focus in its context path.";
