@@ -1,6 +1,8 @@
 @usingMockedOpenAiService
 Feature: Upload fine tuning data
 
+# TODO: download first?
+
   @ignore
   Scenario Outline: Block upload fine tuning data
     Given I have <positive_count> positive feedbacks and <negative_count> negative feedbacks
@@ -22,11 +24,12 @@ Feature: Upload fine tuning data
     Then I should see the error message "Something wrong with Open AI service."
 
   @ignore
-  Scenario: Upload fine tuning data to Open AI service
-    Given I have 10 positive feedbacks and 1 negative feedbacks
+  Scenario Outline: Upload fine tuning data to Open AI service
+    Given I have <positive_count> positive feedbacks and <negative_count> negative feedbacks
     When I upload the feedbacks
     Then I should see the success message "Upload successfully."
 
-
-
-
+    Examples:
+      | positive_count | negative_count |
+      | 10             | 0              |
+      | 11             | 10             |
