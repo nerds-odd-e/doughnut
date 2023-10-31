@@ -1,14 +1,28 @@
 <template>
-  <p>Hello I am manage model</p>
+  <div>
+    <div>Question Generation</div>
+    <div>
+      <DropdownList
+        :options="selectionList"
+        scope-name="modelmgmt"
+        field=""
+      ></DropdownList>
+    </div>
+  </div>
 </template>
-<script>
-export default {
-  setup() {},
-  components: {},
-  data() {},
-  methods: {
-    fetchData() {},
+<script setup lang="ts">
+import DropdownList from "../form/Select.vue";
+
+const selectionList = [
+  {
+    key: "test_key",
+    value: "test_value",
+    label: "model 777",
   },
-  mounted() {},
-};
+  {
+    key: "test_key2",
+    value: "test_value2",
+    label: "model888",
+  },
+];
 </script>
