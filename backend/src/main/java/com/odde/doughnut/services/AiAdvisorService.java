@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.json.AiCompletion;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
+import com.odde.doughnut.controllers.json.AiTrainingFile;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
@@ -13,6 +14,8 @@ import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 
 public class AiAdvisorService {
@@ -67,4 +70,12 @@ public class AiAdvisorService {
   private AiQuestionGenerator getAiQuestionGenerator(Note note) {
     return new AiQuestionGenerator(note, openAiApiHandler);
   }
+
+  public List<AiTrainingFile> listTrainingFiles() {
+    List<AiTrainingFile> trainingFileList = openAiApiHandler.getTrainingFileList();
+    trainingFileList
+      .sort(Comparator.comparing(AiTrainingFile::getCreatedAt));
+    return trainingFileList;
+  }
+
 }
