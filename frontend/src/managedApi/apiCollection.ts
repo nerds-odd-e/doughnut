@@ -386,6 +386,19 @@ const apiCollection = (managedApi: ManagedApi) => ({
         request,
       )) as Generated.AiGeneratedImage;
     },
+
+    async getTrainingFiles() {
+      // return (await managedApi.restGet(
+      //   `ai/training-files`,
+      // )) as Generated.TrainingFile[];
+      return [
+        {
+          id: 1,
+          filename: "1",
+          createdAt: 1,
+        },
+      ] as Generated.TrainingFile[];
+    },
   },
   testability: {
     getEnvironment() {

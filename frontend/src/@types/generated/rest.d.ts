@@ -226,6 +226,12 @@ declare namespace Generated {
         positiveFeedback: boolean;
     }
 
+    interface TrainingFile {
+        id: number;
+        filename: string;
+        createdAt: number;
+    }
+
     interface Link extends Thingy {
         sourceNote: Note;
         targetNote: Note;

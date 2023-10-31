@@ -8,8 +8,12 @@
   </button>
   <button>Upload Fine Tuning Training Data</button>
   <select>
-    <option v-for="file in files" :key="file.id" :value="file.value">
-      {{ file.text }}
+    <option
+      v-for="trainingFile in trainingFiles"
+      :key="trainingFile.id"
+      :value="trainingFile.id"
+    >
+      {{ trainingFile.filename }}
     </option>
   </select>
   <button onclick="alert('Not implemented')">Trigger Fine Tuning</button>
@@ -36,18 +40,7 @@ export default {
       suggestedQuestions: undefined as
         | Generated.SuggestedQuestionForFineTuning[]
         | undefined,
-      files: [
-        {
-          id: 1,
-          text: 1,
-          value: 1,
-        },
-        {
-          id: 1,
-          text: 2,
-          value: 3,
-        },
-      ],
+      trainingFiles: undefined as Generated.TrainingFile[] | undefined,
     };
   },
   methods: {
@@ -68,6 +61,7 @@ export default {
 
   components: { ContentLoader, SuggestedQuestionList },
   async mounted() {
+    this.trainingFiles = await this.api.ai.getTrainingFiles();
     this.suggestedQuestions =
       await this.api.fineTuning.getSuggestedQuestionsForFineTuning();
   },
