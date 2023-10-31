@@ -17,6 +17,7 @@
     </option>
   </select>
   <button onclick="alert('Not implemented')">Trigger Fine Tuning</button>
+  <button onclick="alert('Not implemented')">Upload</button>
   <ContentLoader v-if="suggestedQuestions === undefined" />
   <SuggestedQuestionList
     v-else
