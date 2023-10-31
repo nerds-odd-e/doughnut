@@ -3,7 +3,7 @@ import { DataTable } from "@badeball/cypress-cucumber-preprocessor"
 /// <reference types="../support" />
 // @ts-check
 
-import { Given, When } from "@badeball/cypress-cucumber-preprocessor"
+import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor"
 import start from "start"
 
 Given("my question should not be included in the admin's fine-tuning data", () => {
@@ -90,14 +90,20 @@ Given(
   },
 )
 
-Given(
+When(
   "I choose {string} for {string} use",
   (modelName : string, generationCategory: string) => {
   },
 )
 
-Given(
+Then(
   "I should be using for {string} for {string}",
   (modelName : string, generationCategory: string) => {
+  },
+)
+
+Then(
+  "I can choose the model from GPT in {string} dropdown list",
+  (generationCategory: string) => {
   },
 )
