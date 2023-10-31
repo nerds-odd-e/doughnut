@@ -393,9 +393,9 @@ const apiCollection = (managedApi: ManagedApi) => ({
       // )) as Generated.TrainingFile[];
       return [
         {
-          id: 1,
+          id: "1",
           filename: "1",
-          createdAt: 1,
+          created_at: 1,
         },
       ] as Generated.AiTrainingFile[];
     },
