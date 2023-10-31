@@ -89,3 +89,15 @@ Given(
       .goToModelManagementTab(tabName)
   },
 )
+
+Given(
+  "I choose {string} for {string} use",
+  (modelName : string, generationCategory: string) => {
+  },
+)
+
+Given(
+  "I should be using for {string} for {string}",
+  (modelName : string, generationCategory: string) => {
+  },
+)
