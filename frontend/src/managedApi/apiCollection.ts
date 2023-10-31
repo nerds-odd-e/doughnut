@@ -397,7 +397,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
           filename: "1",
           createdAt: 1,
         },
-      ] as Generated.TrainingFile[];
+      ] as Generated.AiTrainingFile[];
     },
   },
   testability: {
