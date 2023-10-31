@@ -57,6 +57,13 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
     }
 
     @Test
+    void shouldThrowExceptionWhenUploadFile() {
+      assertThrows(
+        UnexpectedNoAccessRightException.class,
+        () -> controller.uploadFineTuningExamples());
+    }
+
+    @Test
     void shouldReturnGoodTrainingDataIfHavingReadingAuth_whenCallGetGoodTrainingData()
         throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().title("Test Topic").please();

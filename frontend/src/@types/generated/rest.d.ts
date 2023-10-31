@@ -177,6 +177,10 @@ declare namespace Generated {
         adjustment: number;
     }
 
+    interface UploadFineTuningExamplesResponse {
+        fileName: string;
+    }
+
     interface UserForOtherUserView {
         name: string;
     }
