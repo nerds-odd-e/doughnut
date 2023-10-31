@@ -44,7 +44,7 @@ import ManageModel from "../components/admin/ManageModel.vue";
 export default {
   data() {
     return {
-      activePage: undefined as
+      activePage: "fineTuningData" as
         | "fineTuningData"
         | "failureReport"
         | "manageModel"

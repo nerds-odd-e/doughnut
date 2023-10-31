@@ -10,7 +10,7 @@
       <option
         class="options"
         v-for="option in options"
-        :key="option.value"
+        :key="option.key"
         :value="option.value"
       >
         {{ option.label }}
@@ -29,5 +29,6 @@ const props = defineProps({
   options: Array,
   errors: Object,
 });
+
 const emit = defineEmits(["update:modelValue"]);
 </script>
