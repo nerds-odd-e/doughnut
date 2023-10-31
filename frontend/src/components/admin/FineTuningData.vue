@@ -6,6 +6,10 @@
   <button @click="downloadEvaluationJSONL()">
     Download Evaluation Training Data
   </button>
+  <select>
+    <option>temp.jsonl</option>
+  </select>
+  <button onclick="alert('Not implemented')">Trigger Fine Tuning</button>
   <ContentLoader v-if="suggestedQuestions === undefined" />
   <SuggestedQuestionList
     v-else
