@@ -8,11 +8,12 @@ Feature: admin see latest models list
   So that admin can choose AI models from openAI manually.
 
   Background:
-    Given I am logged in as an admin,
+    Given I am logged in as an admin
+    Then admin click AdminDashboard models management tab.
 
 
   Scenario: Admin on AdminDashboard models management tab
-    Given admin click AdminDashboard models management tab
+    Given admin on AdminDashboard and clicks models management tab
     When see 3 rows to be choose:
       | Questions  Generation | Questions Generation models management |
       | Evaluation            | Evaluation models  management          |
