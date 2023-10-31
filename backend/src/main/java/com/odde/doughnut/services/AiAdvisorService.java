@@ -1,9 +1,5 @@
 package com.odde.doughnut.services;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import com.odde.doughnut.controllers.json.AiCompletion;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.controllers.json.AiTrainingFile;
@@ -18,6 +14,8 @@ import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import java.util.List;
+import java.util.Optional;
 
 public class AiAdvisorService {
   private final OpenAiApiHandler openAiApiHandler;
@@ -75,5 +73,4 @@ public class AiAdvisorService {
   public List<AiTrainingFile> listTrainingFiles() {
     return openAiApiHandler.getTrainingFileList();
   }
-
 }
