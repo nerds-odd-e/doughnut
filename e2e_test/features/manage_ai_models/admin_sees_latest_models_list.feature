@@ -9,7 +9,7 @@ Feature: admin see latest models list
 
   Background:
     Given I am logged in as an admin
-    Then admin click AdminDashboard models management tab.
+    Then admin click AdminDashboard models management tab
 
 
   Scenario: Admin on AdminDashboard models management tab
@@ -18,7 +18,18 @@ Feature: admin see latest models list
       | Questions  Generation | Questions Generation models management |
       | Evaluation            | Evaluation models  management          |
       | Others                | Others  models  management             |
-    Then will see all all models versions and default 3.5 and 4.
+    Then will see all all models versions and default 3.5 and 4
+    
+  Scenario: Admin selects models for each category and click submit button
+    Given I select models for each management tab
+    When I click submit button
+    Then selected models will be used
+
+  Scenario: Admin doesn't selects model for all of categories
+    Given I select models for question generation and evalutation category but I don't select model for others category
+    When I click submit button
+    Then submit button should be disabled
+
 
 
 
