@@ -10,6 +10,12 @@ export function adminFineTuningPage() {
       return assumeDownloadedJSONL("fineTuningData.jsonl")
     },
 
+    uploadFineTuningTrainingData() {
+      cy.findByRole("button", {
+        name: "Upload Fine Tuning Training Data",
+      }).click()
+    },
+
     downloadFeedbackForEvaluationModel() {
       cy.findByRole("button", {
         name: "Download Evaluation Training Data",

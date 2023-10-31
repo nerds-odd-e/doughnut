@@ -6,6 +6,7 @@
   <button @click="downloadEvaluationJSONL()">
     Download Evaluation Training Data
   </button>
+  <button>Upload Fine Tuning Training Data</button>
   <select>
     <option v-for="file in files" :key="file.id" :value="file.value">
       {{ file.text }}
