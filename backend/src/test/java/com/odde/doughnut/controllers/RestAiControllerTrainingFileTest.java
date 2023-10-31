@@ -1,37 +1,35 @@
 package com.odde.doughnut.controllers;
 
-import java.util.List;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.odde.doughnut.controllers.json.AiTrainingFile;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.OpenAiResponse;
 import com.theokanning.openai.file.File;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import io.reactivex.Single;
+import java.util.List;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
-import io.reactivex.Single;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(locations = { "classpath:repository.xml" })
+@ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
 class RestAiControllerTrainingFileTest {
 
-  @Autowired
-  MakeMe makeMe;
+  @Autowired MakeMe makeMe;
   RestAiController controller;
   UserModel currentUser;
-  @Mock
-  private OpenAiApi openAiApi;
+  @Mock private OpenAiApi openAiApi;
 
   @BeforeEach
   void setUp() {
