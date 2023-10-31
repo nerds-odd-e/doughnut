@@ -17,6 +17,12 @@ declare namespace Generated {
         b64encoded: string;
     }
 
+    interface AiTrainingFile {
+        id: string;
+        filename: string;
+        created_at: number;
+    }
+
     interface ApiError {
         message: string;
         errors: { [index: string]: string };
@@ -224,12 +230,6 @@ declare namespace Generated {
         realCorrectAnswers: string;
         createdAt?: string;
         positiveFeedback: boolean;
-    }
-
-    interface TrainingFile {
-        id: number;
-        filename: string;
-        createdAt: number;
     }
 
     interface Link extends Thingy {
