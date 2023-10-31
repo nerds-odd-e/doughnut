@@ -12,6 +12,7 @@ Feature: Upload fine tuning data
       | 9              | 0              |
       | 9              | 1              |
       | 0              | 10             |
+      | 9              | 10             |
 
   @ignore
   Scenario: Open AI fail
