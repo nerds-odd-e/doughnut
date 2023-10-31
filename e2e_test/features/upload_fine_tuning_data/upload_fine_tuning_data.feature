@@ -28,6 +28,7 @@ Feature: Upload fine tuning data
     Given I have <positive_count> positive feedbacks and <negative_count> negative feedbacks
     When I upload the feedbacks
     Then I should see the success message "Upload successfully."
+    Then Open AI service should receive the uploaded file.
 
     Examples:
       | positive_count | negative_count |
