@@ -3,7 +3,7 @@ import { DataTable } from "@badeball/cypress-cucumber-preprocessor"
 /// <reference types="../support" />
 // @ts-check
 
-import { Given } from "@badeball/cypress-cucumber-preprocessor"
+import { Given, When } from "@badeball/cypress-cucumber-preprocessor"
 import start from "start"
 
 Given("my question should not be included in the admin's fine-tuning data", () => {
@@ -12,6 +12,13 @@ Given("my question should not be included in the admin's fine-tuning data", () =
     .suggestedQuestionsForFineTuning()
     .downloadAIQuestionTrainingData()
     .expectNumberOfRecords(0)
+})
+
+When("I upload the feedbacks", () => {
+  start
+    .loginAsAdminAndGoToAdminDashboard()
+    .suggestedQuestionsForFineTuning()
+    .uploadFineTuningTrainingData()
 })
 
 Given(
