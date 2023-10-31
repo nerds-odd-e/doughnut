@@ -15,5 +15,11 @@ export function assumeAdminDashboardPage() {
       cy.findByRole("button", { name: "Fine Tuning Data" }).click()
       return adminFineTuningPage()
     },
+
+    goToModelManagementTab(tabName: string) {
+      cy.findByText(tabName).click()
+      return {
+      }
+    }
   }
 }

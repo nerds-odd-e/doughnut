@@ -80,3 +80,12 @@ Given(
       .expectString(numOfOccurrence, expectedString)
   },
 )
+
+Given(
+  "I am logged in as an admin and click AdminDashboard and go to tab {string}",
+  (tabName : string) => {
+    start
+      .loginAsAdminAndGoToAdminDashboard()
+      .goToModelManagementTab(tabName)
+  },
+)
