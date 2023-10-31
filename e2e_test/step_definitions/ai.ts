@@ -93,3 +93,7 @@ Given("OpenAI evaluates the question as not legitamate", () => {
 Then("I contest the question", () => {
   cy.findByRole("button", { name: "Doesn't make sense?" }).click()
 })
+
+Given("Having uploaded training data already with filename 'temp.jsonl' on OpenAI website", () => {
+  mock_services.openAi().stubListFiles()
+})
