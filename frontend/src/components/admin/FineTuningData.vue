@@ -6,8 +6,11 @@
   <button @click="downloadEvaluationJSONL()">
     Download Evaluation Training Data
   </button>
+  <button>Upload Fine Tuning Training Data</button>
   <select>
-    <option>temp.jsonl</option>
+    <option v-for="file in files" :key="file.id" :value="file.value">
+      {{ file.text }}
+    </option>
   </select>
   <button onclick="alert('Not implemented')">Trigger Fine Tuning</button>
   <ContentLoader v-if="suggestedQuestions === undefined" />
@@ -33,6 +36,18 @@ export default {
       suggestedQuestions: undefined as
         | Generated.SuggestedQuestionForFineTuning[]
         | undefined,
+      files: [
+        {
+          id: 1,
+          text: 1,
+          value: 1,
+        },
+        {
+          id: 1,
+          text: 2,
+          value: 3,
+        },
+      ],
     };
   },
   methods: {
