@@ -10,7 +10,7 @@ Feature: Upload fine tuning data
       | Question Stem                     | Correct Choice | Incorrect Choice 1 |
       | Who wrote 'Who Let the Dogs Out'? | Anslem Douglas | Baha Men           |
 
-  @ignore
+#  @ignore
   Scenario Outline: Block upload fine tuning data
     Given I have <positive_count> positive feedbacks and <negative_count> negative feedbacks
     When I upload the feedbacks
@@ -19,9 +19,9 @@ Feature: Upload fine tuning data
     Examples:
       | positive_count | negative_count |
       | 9              | 0              |
-      | 9              | 1              |
-      | 0              | 10             |
-      | 9              | 10             |
+#      | 9              | 1              |
+#      | 0              | 10             |
+#      | 9              | 10             |
 
   @ignore
   Scenario: Open AI fail
