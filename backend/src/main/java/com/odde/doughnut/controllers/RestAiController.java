@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import java.util.List;
 import com.odde.doughnut.controllers.json.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -49,5 +50,11 @@ public class RestAiController {
   public AiGeneratedImage generateImage(@RequestBody AiCompletionParams aiCompletionParams) {
     currentUser.assertLoggedIn();
     return new AiGeneratedImage(aiAdvisorService.getImage(aiCompletionParams.prompt));
+  }
+
+  @GetMapping("/training-files")
+  public List<AiTrainingFile> retrieveTrainingFiles() {
+    currentUser.assertLoggedIn();
+    return aiAdvisorService.listTrainingFiles();
   }
 }

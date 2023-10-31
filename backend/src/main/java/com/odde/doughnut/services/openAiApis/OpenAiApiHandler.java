@@ -1,29 +1,35 @@
 package com.odde.doughnut.services.openAiApis;
 
-import static com.theokanning.openai.service.OpenAiService.defaultClient;
-import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
-
+import java.net.SocketTimeoutException;
+import java.time.Duration;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
+import org.springframework.http.HttpStatus;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.json.AiCompletion;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
+import com.odde.doughnut.controllers.json.AiTrainingFile;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.theokanning.openai.OpenAiApi;
-import com.theokanning.openai.completion.chat.*;
+import com.theokanning.openai.completion.chat.ChatCompletionChoice;
+import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import com.theokanning.openai.completion.chat.ChatFunctionCall;
+import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.ImageResult;
-import java.net.SocketTimeoutException;
-import java.time.Duration;
-import java.util.Optional;
-import java.util.concurrent.Callable;
+
 import okhttp3.OkHttpClient;
-import org.springframework.http.HttpStatus;
 import retrofit2.HttpException;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
+import static com.theokanning.openai.service.OpenAiService.defaultClient;
+import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 
 public class OpenAiApiHandler {
   protected final OpenAiApi openAiApi;
@@ -58,14 +64,22 @@ public class OpenAiApiHandler {
 
   public Optional<JsonNode> getFunctionCallArguments(ChatCompletionRequest chatRequest) {
     return chatCompletion(chatRequest)
-        .map(ChatCompletionChoice::getMessage)
-        .map(ChatMessage::getFunctionCall)
-        .map(ChatFunctionCall::getArguments);
+      .map(ChatCompletionChoice::getMessage)
+      .map(ChatMessage::getFunctionCall)
+      .map(ChatFunctionCall::getArguments);
   }
 
   public Optional<AiCompletion> getAiCompletion(
-      AiCompletionParams aiCompletionParams, ChatCompletionRequest chatCompletionRequest) {
+    AiCompletionParams aiCompletionParams, ChatCompletionRequest chatCompletionRequest) {
     return chatCompletion(chatCompletionRequest).map(aiCompletionParams::getAiCompletion);
+  }
+
+  public List<AiTrainingFile> getTrainingFileList() {
+    return withExceptionHandler(
+      () ->
+        openAiApi.listFiles().blockingGet().getData()).stream()
+      .map(AiTrainingFile::getAiTrainingFile)
+      .collect(Collectors.toList());
   }
 
   public Optional<ChatCompletionChoice> chatCompletion(ChatCompletionRequest request) {
