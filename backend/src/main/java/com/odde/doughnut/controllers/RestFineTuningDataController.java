@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.json.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.controllers.json.QuestionSuggestionParams;
+import com.odde.doughnut.controllers.json.UploadFineTuningExamplesResponse;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -63,6 +64,15 @@ class RestFineTuningDataController {
           throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
     return fineTuningService.getQuestionGenerationTrainingExamples();
+  }
+
+  @GetMapping("/upload-fine-tuning-examples")
+  public UploadFineTuningExamplesResponse
+  uploadFineTuningExamples()
+    throws UnexpectedNoAccessRightException {
+    throw new UnexpectedNoAccessRightException();
+//    currentUser.assertAdminAuthorization();
+//    return fineTuningService.getQuestionGenerationTrainingExamples();
   }
 
   @GetMapping("/feedback-evaluation-examples")
