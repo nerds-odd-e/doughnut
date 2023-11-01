@@ -166,7 +166,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return (await managedApi.restPost(
         "fine-tuning/upload-fine-tuning-examples",
         {},
-      )) as Generated.UploadFineTuningExamplesResponse[];
+      )) as Generated.UploadFineTuningExamplesResponse;
     },
     async getAllEvaluationModelExamples() {
       return (await managedApi.restGet(
