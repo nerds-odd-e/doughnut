@@ -1,27 +1,24 @@
 package com.odde.doughnut.services;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import com.odde.doughnut.controllers.json.AiCompletion;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.controllers.json.AiTrainingFile;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
-import com.odde.doughnut.models.VersionOption;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.OpenAiApi;
-import com.theokanning.openai.OpenAiResponse;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.fine_tuning.FineTuningJobRequest;
-import com.theokanning.openai.model.Model;
-import io.reactivex.Single;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 public class AiAdvisorService {
   private final OpenAiApiHandler openAiApiHandler;
@@ -77,7 +74,9 @@ public class AiAdvisorService {
   }
 
   public List<AiTrainingFile> listTrainingFiles() {
-    return openAiApiHandler.getTrainingFileList();
+    return openAiApiHandler.getTrainingFileList().stream()
+        .sorted(Comparator.comparing(AiTrainingFile::getCreatedAt).reversed())
+        .collect(Collectors.toList());
   }
 
   public void triggerFineTune(String fileId) {
