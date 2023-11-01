@@ -1,8 +1,6 @@
 @usingMockedOpenAiService
 Feature: Upload fine tuning data
 
-# TODO: download first?
-# TODO: login first
 
   Background:
     Given I am logged in as an existing user
@@ -22,9 +20,9 @@ Feature: Upload fine tuning data
       | 0              | 10             |
       | 9              | 10             |
 
-  @ignore
+    @ignore
   Scenario: Open AI fail
-    Given Open AI is not ready
+    Given An OpenAI response is unavailable
     Given I have 10 positive feedbacks and 1 negative feedbacks
     When I upload the feedbacks
     Then I should see the error message "Something wrong with Open AI service."
