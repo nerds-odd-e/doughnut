@@ -69,10 +69,12 @@ export default {
       this.fineTuningResult = "successful";
     },
     async uploadFineTuningData() {
-      // const result = await this.api.fineTuning.postUploadFineTuningExamples();
-
-      this.fineTuningDataResultMsg =
-        "Positive feedback cannot be less than 10.";
+      const result = await this.api.fineTuning.postUploadFineTuningExamples();
+      if (!result.success) {
+        this.fineTuningDataResultMsg = result.message;
+      } else {
+        this.fineTuningDataResultMsg = "Upload successfully.";
+      }
       this.showAlert = true;
     },
   },
