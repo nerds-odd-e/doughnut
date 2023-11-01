@@ -49,6 +49,7 @@ class RestAiControllerTrainingFileTest {
 
     List<AiTrainingFile> aiTrainingFiles = controller.retrieveTrainingFiles();
     assertEquals(2, aiTrainingFiles.size());
+    assertEquals("id1", aiTrainingFiles.get(0).getId());
   }
 
   @Test
@@ -80,12 +81,12 @@ class RestAiControllerTrainingFileTest {
     file.setPurpose("purpose");
 
     File file1 = new File();
-    file.setId("id1");
-    file.setObject("obj");
-    file.setBytes(1L);
-    file.setCreatedAt(2L);
-    file.setFilename("filename1");
-    file.setPurpose("purpose");
+    file1.setId("id1");
+    file1.setObject("obj");
+    file1.setBytes(1L);
+    file1.setCreatedAt(2L);
+    file1.setFilename("filename1");
+    file1.setPurpose("purpose");
 
     OpenAiResponse<File> openAiResponse = new OpenAiResponse<>();
     openAiResponse.setData(List.of(file, file1));
