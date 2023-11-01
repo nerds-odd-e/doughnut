@@ -16,6 +16,7 @@ import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatFunctionCall;
 import com.theokanning.openai.completion.chat.ChatMessage;
+import com.theokanning.openai.file.File;
 import com.theokanning.openai.fine_tuning.FineTuningJob;
 import com.theokanning.openai.fine_tuning.FineTuningJobRequest;
 import com.theokanning.openai.image.CreateImageRequest;
@@ -87,6 +88,10 @@ public class OpenAiApiHandler {
         () ->
             openAiApi.createChatCompletion(request).blockingGet().getChoices().stream()
                 .findFirst());
+  }
+
+  public String uploadFineTuningExamples(File request) {
+    return withExceptionHandler(() -> openAiApi.uploadFile(null, null).blockingGet().getFilename());
   }
 
   public FineTuningJob triggerFineTune(FineTuningJobRequest fineTuningJobRequest) {
