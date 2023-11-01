@@ -20,10 +20,8 @@ import com.theokanning.openai.image.Image;
 import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.model.Model;
 import io.reactivex.Single;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -44,17 +42,15 @@ class RestAiControllerTest {
   UserModel currentUser;
 
   Note note;
-  @Mock
-  OpenAiApi openAiApi;
-  @Autowired
-  MakeMe makeMe;
+  @Mock OpenAiApi openAiApi;
+  @Autowired MakeMe makeMe;
 
   AiCompletionParams params =
-    new AiCompletionParams() {
-      {
-        this.prompt = "describe Earth";
-      }
-    };
+      new AiCompletionParams() {
+        {
+          this.prompt = "describe Earth";
+        }
+      };
 
   @BeforeEach
   void Setup() {
@@ -68,10 +64,10 @@ class RestAiControllerTest {
     @Test
     void askWithNoteThatCannotAccess() {
       assertThrows(
-        ResponseStatusException.class,
-        () ->
-          new RestAiController(openAiApi, makeMe.modelFactoryService, makeMe.aNullUserModel())
-            .getCompletion(note, params));
+          ResponseStatusException.class,
+          () ->
+              new RestAiController(openAiApi, makeMe.modelFactoryService, makeMe.aNullUserModel())
+                  .getCompletion(note, params));
     }
 
     @Test
@@ -80,16 +76,16 @@ class RestAiControllerTest {
       Note solar = makeMe.aNote("solar system").under(cosmos).please();
       Note earth = makeMe.aNote("Earth").under(solar).please();
       when(openAiApi.createChatCompletion(
-        argThat(
-          request -> {
-            assertThat(request.getMaxTokens()).isLessThan(200);
-            assertThat(request.getMessages()).hasSize(4);
-            assertEquals("describe Earth", request.getMessages().get(3).getContent());
-            assertThat(request.getMessages().get(1).getContent())
-              .contains("Context path: cosmos › solar system");
-            return true;
-          })))
-        .thenReturn(buildCompletionResult("blue planet"));
+              argThat(
+                  request -> {
+                    assertThat(request.getMaxTokens()).isLessThan(200);
+                    assertThat(request.getMessages()).hasSize(4);
+                    assertEquals("describe Earth", request.getMessages().get(3).getContent());
+                    assertThat(request.getMessages().get(1).getContent())
+                        .contains("Context path: cosmos › solar system");
+                    return true;
+                  })))
+          .thenReturn(buildCompletionResult("blue planet"));
       controller.getCompletion(earth, params);
     }
 
@@ -97,12 +93,12 @@ class RestAiControllerTest {
     void askSuggestionWithIncompleteAssistantMessage() {
       params.incompleteContent = "What goes up,";
       when(openAiApi.createChatCompletion(
-        argThat(
-          request -> {
-            assertThat(request.getMessages()).hasSize(5);
-            return true;
-          })))
-        .thenReturn(buildCompletionResult("blue planet"));
+              argThat(
+                  request -> {
+                    assertThat(request.getMessages()).hasSize(5);
+                    return true;
+                  })))
+          .thenReturn(buildCompletionResult("blue planet"));
       controller.getCompletion(note, params);
     }
 
@@ -126,28 +122,28 @@ class RestAiControllerTest {
     @Test
     void askWithNoteThatCannotAccess() {
       assertThrows(
-        ResponseStatusException.class,
-        () ->
-          new RestAiController(openAiApi, makeMe.modelFactoryService, makeMe.aNullUserModel())
-            .generateImage(params));
+          ResponseStatusException.class,
+          () ->
+              new RestAiController(openAiApi, makeMe.modelFactoryService, makeMe.aNullUserModel())
+                  .generateImage(params));
     }
 
     @Test
     void askEngagingStoryWithRightPrompt() {
       when(openAiApi.createImage(
-        argThat(
-          request -> {
-            assertEquals("describe Earth", request.getPrompt());
-            return true;
-          })))
-        .thenReturn(buildImageResult("This is an engaging story."));
+              argThat(
+                  request -> {
+                    assertEquals("describe Earth", request.getPrompt());
+                    return true;
+                  })))
+          .thenReturn(buildImageResult("This is an engaging story."));
       controller.generateImage(params);
     }
 
     @Test
     void generateImage() {
       when(openAiApi.createImage(Mockito.any()))
-        .thenReturn(buildImageResult("this is supposed to be a base64 image"));
+          .thenReturn(buildImageResult("this is supposed to be a base64 image"));
       final String aiImage = controller.generateImage(params).b64encoded();
       assertEquals("this is supposed to be a base64 image", aiImage);
     }
