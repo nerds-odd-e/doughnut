@@ -1,25 +1,28 @@
 package com.odde.doughnut.controllers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import java.util.List;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 import com.odde.doughnut.controllers.json.AiTrainingFile;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.OpenAiResponse;
 import com.theokanning.openai.file.File;
-import io.reactivex.Single;
-import java.util.List;
-import org.jetbrains.annotations.NotNull;
+import com.theokanning.openai.fine_tuning.FineTuningJob;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
+
+import io.reactivex.Single;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -46,6 +49,20 @@ class RestAiControllerTrainingFileTest {
 
     List<AiTrainingFile> aiTrainingFiles = controller.retrieveTrainingFiles();
     assertEquals(2, aiTrainingFiles.size());
+  }
+
+  @Test
+  void triggerAiModelFineTuning() {
+
+    Mockito.when(openAiApi.createFineTuningJob(any()))
+      .thenReturn(Single.just(new FineTuningJob() {{
+      setStatus("queued");
+    }}));
+
+    controller.triggerFineTune("test");
+
+    Mockito.verify(openAiApi).createFineTuningJob(argThat(argument -> argument.getTrainingFile().equals("test")));
+
   }
 
   @NotNull
