@@ -58,7 +58,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
 
     @Test
     void shouldThrowExceptionWhenUploadFile() {
-      assertEquals(controller.uploadFineTuningExamples().isSuccess(),true);
+      assertEquals(controller.uploadFineTuningExamples().isSuccess(), true);
     }
 
     @Test

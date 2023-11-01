@@ -4,7 +4,5 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class UploadFineTuningExamplesResponse {
-  @Getter
-  @Setter
-  private boolean isSuccess;
+  @Getter @Setter private boolean isSuccess;
 }

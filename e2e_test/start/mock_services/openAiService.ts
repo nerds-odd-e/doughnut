@@ -147,9 +147,9 @@ const openAiService = () => {
       return {
         id: 1,
         filename: "temp.jsonl",
-        created_at: 1698722281
+        created_at: 1698722281,
       }
-    }
+    },
   }
 }
 
