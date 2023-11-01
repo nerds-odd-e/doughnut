@@ -10,9 +10,12 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.models.VersionOption;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.theokanning.openai.OpenAiApi;
+
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,9 +35,9 @@ public class RestAiController {
   private UserModel currentUser;
 
   public RestAiController(
-      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
-      ModelFactoryService modelFactoryService,
-      UserModel currentUser) {
+    @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
+    ModelFactoryService modelFactoryService,
+    UserModel currentUser) {
     this.aiAdvisorService = new AiAdvisorService(openAiApi);
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
@@ -42,15 +45,15 @@ public class RestAiController {
 
   @PostMapping("/{note}/completion")
   public AiCompletion getCompletion(
-      @PathVariable(name = "note") Note note, @RequestBody AiCompletionParams aiCompletionParams) {
+    @PathVariable(name = "note") Note note, @RequestBody AiCompletionParams aiCompletionParams) {
     currentUser.assertLoggedIn();
     return aiAdvisorService.getAiCompletion(aiCompletionParams, note);
   }
 
   @PostMapping("/chat")
   public ChatResponse chat(
-      @RequestParam(value = "note") Note note, @RequestBody ChatRequest request)
-      throws UnexpectedNoAccessRightException {
+    @RequestParam(value = "note") Note note, @RequestBody ChatRequest request)
+    throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
     String userMessage = request.getUserMessage();
     String assistantMessage = this.aiAdvisorService.chatToAi(note, userMessage);
@@ -73,5 +76,10 @@ public class RestAiController {
   public void triggerFineTune(@PathVariable(name = "fileId") String fileId) {
     currentUser.assertLoggedIn();
     aiAdvisorService.triggerFineTune(fileId);
+  }
+
+  @GetMapping("/model-versions")
+  public List<VersionOption> getVersions() {
+    return aiAdvisorService.getModelVersions();
   }
 }
