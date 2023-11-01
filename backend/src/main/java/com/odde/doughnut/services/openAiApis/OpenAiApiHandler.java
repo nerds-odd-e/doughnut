@@ -16,6 +16,8 @@ import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatFunctionCall;
 import com.theokanning.openai.completion.chat.ChatMessage;
+import com.theokanning.openai.fine_tuning.FineTuningJob;
+import com.theokanning.openai.fine_tuning.FineTuningJobRequest;
 import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.ImageResult;
 import java.net.SocketTimeoutException;
@@ -85,6 +87,21 @@ public class OpenAiApiHandler {
         () ->
             openAiApi.createChatCompletion(request).blockingGet().getChoices().stream()
                 .findFirst());
+  }
+
+  public FineTuningJob triggerFineTune(FineTuningJobRequest fineTuningJobRequest) {
+    return withExceptionHandler(() -> {
+      FineTuningJob fineTuningJob1 = openAiApi.createFineTuningJob(fineTuningJobRequest
+      ).blockingGet();
+      List<String> failed = List.of("failed", "cancelled");
+      if (failed.contains(fineTuningJob1.getStatus() )) {
+        throw new OpenAIServiceErrorException("Trigger Failed: " + defaultObjectMapper().writeValueAsString(fineTuningJob1),
+          HttpStatus.valueOf(500));
+      }
+
+      return fineTuningJob1;
+    });
+
   }
 
   private <T> T withExceptionHandler(Callable<T> callable) {

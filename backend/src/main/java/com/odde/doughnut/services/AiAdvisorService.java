@@ -14,6 +14,7 @@ import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import com.theokanning.openai.fine_tuning.FineTuningJobRequest;
 import java.util.List;
 import java.util.Optional;
 
@@ -72,5 +73,13 @@ public class AiAdvisorService {
 
   public List<AiTrainingFile> listTrainingFiles() {
     return openAiApiHandler.getTrainingFileList();
+  }
+
+  public void triggerFineTune(String fileId) {
+    FineTuningJobRequest fineTuningJobRequest = new FineTuningJobRequest();
+    fineTuningJobRequest.setTrainingFile(fileId);
+    fineTuningJobRequest.setModel("gpt-3.5-turbo");
+
+    openAiApiHandler.triggerFineTune(fineTuningJobRequest);
   }
 }
