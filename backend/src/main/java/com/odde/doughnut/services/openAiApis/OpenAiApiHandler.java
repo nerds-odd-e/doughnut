@@ -90,18 +90,19 @@ public class OpenAiApiHandler {
   }
 
   public FineTuningJob triggerFineTune(FineTuningJobRequest fineTuningJobRequest) {
-    return withExceptionHandler(() -> {
-      FineTuningJob fineTuningJob1 = openAiApi.createFineTuningJob(fineTuningJobRequest
-      ).blockingGet();
-      List<String> failed = List.of("failed", "cancelled");
-      if (failed.contains(fineTuningJob1.getStatus() )) {
-        throw new OpenAIServiceErrorException("Trigger Failed: " + defaultObjectMapper().writeValueAsString(fineTuningJob1),
-          HttpStatus.valueOf(500));
-      }
+    return withExceptionHandler(
+        () -> {
+          FineTuningJob fineTuningJob =
+              openAiApi.createFineTuningJob(fineTuningJobRequest).blockingGet();
+          List<String> failed = List.of("failed", "cancelled");
+          if (failed.contains(fineTuningJob.getStatus())) {
+            throw new OpenAIServiceErrorException(
+                "Trigger Failed: " + defaultObjectMapper().writeValueAsString(fineTuningJob),
+                HttpStatus.valueOf(500));
+          }
 
-      return fineTuningJob1;
-    });
-
+          return fineTuningJob;
+        });
   }
 
   private <T> T withExceptionHandler(Callable<T> callable) {
