@@ -59,6 +59,16 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
     @Test
     void shouldSuccessWhen10FeedbackAndUploadFile() {
       makeMe.aQuestionSuggestionForFineTunining().positive().please();
+      makeMe.aQuestionSuggestionForFineTunining().positive().please();
+      makeMe.aQuestionSuggestionForFineTunining().positive().please();
+      makeMe.aQuestionSuggestionForFineTunining().positive().please();
+      makeMe.aQuestionSuggestionForFineTunining().positive().please();
+      makeMe.aQuestionSuggestionForFineTunining().positive().please();
+      makeMe.aQuestionSuggestionForFineTunining().positive().please();
+      makeMe.aQuestionSuggestionForFineTunining().positive().please();
+      makeMe.aQuestionSuggestionForFineTunining().positive().please();
+      makeMe.aQuestionSuggestionForFineTunining().positive().please();
+      makeMe.aQuestionSuggestionForFineTunining().positive().please();
       assertEquals(controller.uploadFineTuningExamples().isSuccess(), true);
     }
 
