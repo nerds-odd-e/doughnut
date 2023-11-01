@@ -68,11 +68,18 @@ Then("I haven't login", () => {
   cy.log("I haven't login!!!")
 })
 
-When("I visit {string} page", (pageName) => {
+When("I visit {string} page with {string}", (pageName, role) => {
   switch (pageName) {
     case "FailureReportPage":
       cy.visit("/admin-dashboard")
       cy.findByRole("button", { name: "Failure Reports" }).click()
+
+      if(role !== 'admin') {
+        cy.on('uncaught:exception', (err, runnable, pre) => {
+          expect(err.message).to.include('500')
+          return false;
+        });
+      }
       break
     default:
       cy.failure()
@@ -89,7 +96,6 @@ Then("The {string} page is displayed", (pageName) => {
       break
     case "ErrorPage":
       cy.findAllByText("It seems you cannot access this page.")
-      cy.dismissLastErrorMessage()
       break
     default:
       cy.failure()
