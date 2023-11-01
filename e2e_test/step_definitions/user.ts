@@ -74,11 +74,11 @@ When("I visit {string} page with {string}", (pageName, role) => {
       cy.visit("/admin-dashboard")
       cy.findByRole("button", { name: "Failure Reports" }).click()
 
-      if(role !== 'admin') {
-        cy.on('uncaught:exception', (err, runnable, pre) => {
-          expect(err.message).to.include('500')
-          return false;
-        });
+      if (role !== "admin") {
+        cy.on("uncaught:exception", (err, runnable, pre) => {
+          expect(err.message).to.include("500")
+          return false
+        })
       }
       break
     default:

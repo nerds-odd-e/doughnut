@@ -83,29 +83,22 @@ Given(
 
 Given(
   "I am logged in as an admin and click AdminDashboard and go to tab {string}",
-  (tabName : string) => {
-    start
-      .loginAsAdminAndGoToAdminDashboard()
-      .goToModelManagementTab(tabName)
+  (tabName: string) => {
+    start.loginAsAdminAndGoToAdminDashboard().goToModelManagementTab(tabName)
   },
 )
 
-When(
-  "I choose {string} for {string} use",
-  (modelName : string, generationCategory: string) => {
-    cy.get("select[name=" + generationCategory +"]").select(modelName);
-    cy.get(".button").click();
-  },
-)
+When("I choose {string} for {string} use", (modelName: string, generationCategory: string) => {
+  cy.get("select[name=" + generationCategory + "]").select(modelName)
+  cy.get(".button").click()
+})
 
 Then(
   "I should be using for {string} for {string}",
-  (modelName : string, generationCategory: string) => {
-  },
+  (modelName: string, generationCategory: string) => {},
 )
 
 Then(
   "I can choose the model from GPT in {string} dropdown list",
-  (generationCategory: string) => {
-  },
+  (generationCategory: string) => {},
 )

@@ -18,8 +18,7 @@ export function assumeAdminDashboardPage() {
 
     goToModelManagementTab(tabName: string) {
       cy.findByText(tabName).click()
-      return {
-      }
-    }
+      return {}
+    },
   }
 }

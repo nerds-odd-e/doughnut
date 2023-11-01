@@ -67,8 +67,7 @@ class RestFineTuningDataController {
   }
 
   @GetMapping("/upload-fine-tuning-examples")
-  public UploadFineTuningExamplesResponse
-  uploadFineTuningExamples(){
+  public UploadFineTuningExamplesResponse uploadFineTuningExamples() {
     var result = new UploadFineTuningExamplesResponse();
     result.setSuccess(true);
     return result;
