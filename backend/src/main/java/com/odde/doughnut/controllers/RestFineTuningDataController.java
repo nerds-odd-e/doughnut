@@ -67,10 +67,10 @@ class RestFineTuningDataController {
   }
 
   @PostMapping("/upload-fine-tuning-examples")
-  public UploadFineTuningExamplesResponse
-  uploadFineTuningExamples(){
+  public UploadFineTuningExamplesResponse uploadFineTuningExamples() {
     var result = new UploadFineTuningExamplesResponse();
-    result.setSuccess(true);
+    var feedbackCount = fineTuningService.getQuestionGenerationTrainingExamples().size();
+    result.setSuccess(feedbackCount > 0);
     return result;
   }
 
