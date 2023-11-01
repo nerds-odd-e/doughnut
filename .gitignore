@@ -119,3 +119,5 @@ mb.pid
 # flutter/dart/android/ios/mobile
 .pub-cache
 doughnut_mobile/android/app/local.properties
+
+*.jsonl
