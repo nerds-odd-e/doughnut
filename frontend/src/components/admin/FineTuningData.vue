@@ -6,7 +6,9 @@
   <button @click="downloadEvaluationJSONL()">
     Download Evaluation Training Data
   </button>
-  <button>Upload Fine Tuning Training Data</button>
+  <button @click="toggleAlertVisible">Upload Fine Tuning Training Data</button>
+  <span v-if="showAlert">Positive feedback cannot be less than 10.</span>
+
   <select>
     <option
       v-for="aiTrainingFile in aiTrainingFiles"
@@ -17,7 +19,6 @@
     </option>
   </select>
   <button onclick="alert('Not implemented')">Trigger Fine Tuning</button>
-  <button onclick="alert('Not implemented')">Upload</button>
   <ContentLoader v-if="suggestedQuestions === undefined" />
   <SuggestedQuestionList
     v-else
@@ -42,6 +43,7 @@ export default {
         | Generated.SuggestedQuestionForFineTuning[]
         | undefined,
       aiTrainingFiles: undefined as Generated.AiTrainingFile[] | undefined,
+      showAlert: false,
     };
   },
   methods: {
@@ -57,6 +59,9 @@ export default {
     },
     async duplicated(duplicated: Generated.SuggestedQuestionForFineTuning) {
       this.suggestedQuestions = [...this.suggestedQuestions!, duplicated];
+    },
+    toggleAlertVisible() {
+      this.showAlert = true;
     },
   },
 
