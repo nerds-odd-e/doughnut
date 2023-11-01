@@ -43,6 +43,25 @@ function mockChatCompletion(
     ],
   })
 }
+async function mockListFiles(serviceMocker: ServiceMocker): Promise<void> {
+  const predicate = new FlexiPredicate()
+    .withOperator(Operator.matches)
+    .withPath(`/v1/files`)
+    .withMethod(HttpMethod.GET)
+  return await serviceMocker.mockWithPredicate(predicate, {
+    data: [
+      {
+        id: "file-abc123",
+        object: "file",
+        bytes: 175,
+        created_at: 1613677385,
+        filename: "question_gerenation_examples",
+        purpose: "fine-tune",
+      },
+    ],
+    object: "list",
+  })
+}
 
 function mockChatCompletionForMessageContaining(
   serviceMocker: ServiceMocker,
@@ -143,12 +162,8 @@ const openAiService = () => {
       })
     },
 
-    stubListFiles() {
-      return {
-        id: 1,
-        filename: "temp.jsonl",
-        created_at: 1698722281,
-      }
+    async stubListFiles() {
+      return await mockListFiles(serviceMocker)
     },
   }
 }

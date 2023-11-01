@@ -94,15 +94,26 @@ Then("I contest the question", () => {
   cy.findByRole("button", { name: "Doesn't make sense?" }).click()
 })
 
-Given('there is a fine-tuning file "question_gerenation_examples" on my OpenAI account', () => {})
+Given('there is a fine-tuning file "question_gerenation_examples" on my OpenAI account', () => {
+  mock_services.openAi().stubListFiles()
+})
 
 Given(
   'the finetuning for the file "question_generation_examples" will be successful',
   (API_Response: string) => {},
 )
 
+When('I retrieve file list from my openAI account', () => {
+  cy.findByText('Retrieve').click()
+})
+
+Then('I will see a list of files', () => {
+  cy.get('#list > option').should('have.length', 1);
+})
+
 When('I choose the file "question generation examples" based on GPT3.5 model', () => {})
 
 Then("I will see success message {string}", (expectedMessage: string) => {
   cy.findByText(expectedMessage)
 })
+
