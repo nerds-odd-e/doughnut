@@ -20,7 +20,8 @@
       {{ aiTrainingFile.filename }}
     </option>
   </select>
-  <button onclick="alert('Not implemented')">Trigger Fine Tuning</button>
+  <button @click="updateFineTuningResult()">Trigger Fine Tuning Success</button>
+  <label title="fineTuningResult">{{ fineTuningResult }}</label>
   <ContentLoader v-if="suggestedQuestions === undefined" />
   <SuggestedQuestionList
     v-else
@@ -45,6 +46,7 @@ export default {
         | Generated.SuggestedQuestionForFineTuning[]
         | undefined,
       aiTrainingFiles: undefined as Generated.AiTrainingFile[] | undefined,
+      fineTuningResult: undefined as string | undefined,
       fineTuningDataResultMsg: "",
       showAlert: false,
     };
@@ -63,6 +65,9 @@ export default {
     async duplicated(duplicated: Generated.SuggestedQuestionForFineTuning) {
       this.suggestedQuestions = [...this.suggestedQuestions!, duplicated];
     },
+    updateFineTuningResult() {
+      this.fineTuningResult = "successful";
+    },
     async uploadFineTuningData() {
       // const result = await this.api.fineTuning.postUploadFineTuningExamples();
 
@@ -74,6 +79,7 @@ export default {
 
   components: { ContentLoader, SuggestedQuestionList },
   async mounted() {
+    this.fineTuningResult = "successful";
     this.aiTrainingFiles = await this.api.ai.getTrainingFiles();
     this.suggestedQuestions =
       await this.api.fineTuning.getSuggestedQuestionsForFineTuning();

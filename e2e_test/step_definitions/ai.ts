@@ -2,10 +2,11 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Given, Then, DataTable } from "@badeball/cypress-cucumber-preprocessor"
+import {Given, Then, DataTable, When} from "@badeball/cypress-cucumber-preprocessor"
 import "../support/string.extensions"
-import start, { mock_services } from "start"
-import { MessageToMatch } from "start/mock_services/MessageToMatch"
+import start, {mock_services} from "start"
+import {MessageToMatch} from "start/mock_services/MessageToMatch"
+import * as stream from "stream";
 
 Given("open AI service always think the system token is invalid", () => {
   mock_services.openAi().alwaysResponseAsUnauthorized()
@@ -79,7 +80,7 @@ Given("OpenAI now generates this question:", (questionTable: DataTable) => {
 Given("OpenAI evaluates the question as legitamate", () => {
   start
     .questionGenerationService()
-    .stubEvaluationQuestion({ feasibleQuestion: true, correctChoices: [0] })
+    .stubEvaluationQuestion({feasibleQuestion: true, correctChoices: [0]})
 })
 
 Given("OpenAI evaluates the question as not legitamate", () => {
@@ -91,9 +92,23 @@ Given("OpenAI evaluates the question as not legitamate", () => {
 })
 
 Then("I contest the question", () => {
-  cy.findByRole("button", { name: "Doesn't make sense?" }).click()
+  cy.findByRole("button", {name: "Doesn't make sense?"}).click()
 })
 
-Given("Having uploaded training data already with filename 'temp.jsonl' on OpenAI website", () => {
-  mock_services.openAi().stubListFiles()
+Given("there is a fine-tuning file \"question_gerenation_examples\" on my OpenAI account", () => {
+
+})
+
+Given("the finetuning for the file \"question_generation_examples\" will be successful",
+  (API_Response: string) => {
+
+})
+
+When("I choose the file \"question generation examples\" based on GPT3.5 model", () => {
+
+})
+
+Then("I will see success message {string}",
+  (expectedMessage: string) => {
+  cy.findByText(expectedMessage);
 })
