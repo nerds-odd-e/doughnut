@@ -178,6 +178,7 @@ declare namespace Generated {
     }
 
     interface UploadFineTuningExamplesResponse {
+        message: string;
         success: boolean;
     }
 

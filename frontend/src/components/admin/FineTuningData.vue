@@ -6,8 +6,10 @@
   <button @click="downloadEvaluationJSONL()">
     Download Evaluation Training Data
   </button>
-  <button @click="toggleAlertVisible">Upload Fine Tuning Training Data</button>
-  <span v-if="showAlert">Positive feedback cannot be less than 10.</span>
+  <button @click="uploadFineTuningData">
+    Upload Fine Tuning Training Data
+  </button>
+  <span v-if="showAlert">{{ fineTuningDataResultMsg }}</span>
 
   <select>
     <option
@@ -43,6 +45,7 @@ export default {
         | Generated.SuggestedQuestionForFineTuning[]
         | undefined,
       aiTrainingFiles: undefined as Generated.AiTrainingFile[] | undefined,
+      fineTuningDataResultMsg: "",
       showAlert: false,
     };
   },
@@ -60,7 +63,11 @@ export default {
     async duplicated(duplicated: Generated.SuggestedQuestionForFineTuning) {
       this.suggestedQuestions = [...this.suggestedQuestions!, duplicated];
     },
-    toggleAlertVisible() {
+    async uploadFineTuningData() {
+      // const result = await this.api.fineTuning.postUploadFineTuningExamples();
+
+      this.fineTuningDataResultMsg =
+        "Positive feedback cannot be less than 10.";
       this.showAlert = true;
     },
   },

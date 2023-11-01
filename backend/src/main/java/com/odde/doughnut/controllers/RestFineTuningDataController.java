@@ -18,8 +18,8 @@ import org.springframework.web.context.annotation.SessionScope;
 @RequestMapping("/api/fine-tuning")
 class RestFineTuningDataController {
   private final ModelFactoryService modelFactoryService;
-  private UserModel currentUser;
-  private FineTuningService fineTuningService;
+  private final UserModel currentUser;
+  private final FineTuningService fineTuningService;
 
   public RestFineTuningDataController(
       ModelFactoryService modelFactoryService, UserModel currentUser) {
@@ -66,8 +66,9 @@ class RestFineTuningDataController {
     return fineTuningService.getQuestionGenerationTrainingExamples();
   }
 
-  @GetMapping("/upload-fine-tuning-examples")
-  public UploadFineTuningExamplesResponse uploadFineTuningExamples() {
+  @PostMapping("/upload-fine-tuning-examples")
+  public UploadFineTuningExamplesResponse
+  uploadFineTuningExamples(){
     var result = new UploadFineTuningExamplesResponse();
     result.setSuccess(true);
     return result;
