@@ -93,6 +93,8 @@ Given(
 When(
   "I choose {string} for {string} use",
   (modelName : string, generationCategory: string) => {
+    cy.get("select[name=" + generationCategory +"]").select(modelName);
+    cy.get(".button").click();
   },
 )
 
