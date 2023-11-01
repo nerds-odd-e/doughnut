@@ -6,7 +6,6 @@ import {Given, Then, DataTable, When} from "@badeball/cypress-cucumber-preproces
 import "../support/string.extensions"
 import start, {mock_services} from "start"
 import {MessageToMatch} from "start/mock_services/MessageToMatch"
-import * as stream from "stream";
 
 Given("open AI service always think the system token is invalid", () => {
   mock_services.openAi().alwaysResponseAsUnauthorized()
