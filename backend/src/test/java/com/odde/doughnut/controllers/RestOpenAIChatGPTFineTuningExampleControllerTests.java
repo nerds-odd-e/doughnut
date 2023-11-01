@@ -13,7 +13,6 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.completion.chat.ChatMessage;
-import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -58,7 +57,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
     }
 
     @Test
-    void shouldSuccessWhen10FeedbackAndUploadFile() throws IOException {
+    void shouldSuccessWhen10FeedbackAndUploadFile() {
       makeMe.aQuestionSuggestionForFineTunining().positive().please();
       makeMe.aQuestionSuggestionForFineTunining().positive().please();
       makeMe.aQuestionSuggestionForFineTunining().positive().please();
@@ -70,12 +69,16 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
       makeMe.aQuestionSuggestionForFineTunining().positive().please();
       makeMe.aQuestionSuggestionForFineTunining().positive().please();
       makeMe.aQuestionSuggestionForFineTunining().positive().please();
-      assertEquals(controller.uploadFineTuningExamples().isSuccess(), true);
+      assertEquals(true, controller.uploadFineTuningExamples().isSuccess());
+      assertEquals(null, controller.uploadFineTuningExamples().getMessage());
     }
 
     @Test
-    void shouldFailWhenNoFeedback() throws IOException {
-      assertEquals(controller.uploadFineTuningExamples().isSuccess(), false);
+    void shouldFailWhenNoFeedback() {
+      assertEquals(false, controller.uploadFineTuningExamples().isSuccess());
+      assertEquals(
+          "Positive feedback cannot be less than 10.",
+          controller.uploadFineTuningExamples().getMessage());
     }
 
     @Test
