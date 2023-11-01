@@ -68,11 +68,10 @@ class RestFineTuningDataController {
 
   @GetMapping("/upload-fine-tuning-examples")
   public UploadFineTuningExamplesResponse
-  uploadFineTuningExamples()
-    throws UnexpectedNoAccessRightException {
-    throw new UnexpectedNoAccessRightException();
-//    currentUser.assertAdminAuthorization();
-//    return fineTuningService.getQuestionGenerationTrainingExamples();
+  uploadFineTuningExamples(){
+    var result = new UploadFineTuningExamplesResponse();
+    result.setSuccess(true);
+    return result;
   }
 
   @GetMapping("/feedback-evaluation-examples")

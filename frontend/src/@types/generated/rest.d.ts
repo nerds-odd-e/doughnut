@@ -178,7 +178,7 @@ declare namespace Generated {
     }
 
     interface UploadFineTuningExamplesResponse {
-        fileName: string;
+        success: boolean;
     }
 
     interface UserForOtherUserView {

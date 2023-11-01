@@ -58,9 +58,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
 
     @Test
     void shouldThrowExceptionWhenUploadFile() {
-      assertThrows(
-        UnexpectedNoAccessRightException.class,
-        () -> controller.uploadFineTuningExamples());
+      assertEquals(controller.uploadFineTuningExamples().isSuccess(),true);
     }
 
     @Test
