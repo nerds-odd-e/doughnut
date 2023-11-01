@@ -394,9 +394,16 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
 
     async getTrainingFiles() {
-      return (await managedApi.restGet(
-        `ai/training-files`,
-      )) as Generated.AiTrainingFile[];
+      // return (await managedApi.restGet(
+      //   `ai/training-files`,
+      // )) as Generated.TrainingFile[];
+      return [
+        {
+          id: "1",
+          filename: "1",
+          created_at: 1,
+        },
+      ] as Generated.AiTrainingFile[];
     },
   },
   testability: {
