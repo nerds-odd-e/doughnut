@@ -70,7 +70,8 @@ class RestFineTuningDataController {
   public UploadFineTuningExamplesResponse uploadFineTuningExamples() {
     var result = new UploadFineTuningExamplesResponse();
     var feedbackCount = fineTuningService.getQuestionGenerationTrainingExamples().size();
-    result.setSuccess(feedbackCount > 0);
+    result.setSuccess(feedbackCount >= 10);
+    result.setMessage("Positive feedback cannot be less than 10.");
     return result;
   }
 
