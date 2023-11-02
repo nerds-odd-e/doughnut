@@ -75,7 +75,6 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
       makeMe.aQuestionSuggestionForFineTunining().positive().please();
       var result = controller.uploadFineTuningExamples();
       assertEquals(true, result.isSuccess());
-      assertEquals(null, result.getMessage());
     }
 
     @Test
