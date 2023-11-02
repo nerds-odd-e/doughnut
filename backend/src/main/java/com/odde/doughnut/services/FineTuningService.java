@@ -60,8 +60,7 @@ public class FineTuningService {
   }
 
   private void uploadFineTuningExamples(
-      List<OpenAIChatGPTFineTuningExample> feedbacks, String subFileName)
-      throws IOException {
+      List<OpenAIChatGPTFineTuningExample> feedbacks, String subFileName) throws IOException {
     if (feedbacks.size() < 10) {
       throw new OpenAIServiceErrorException(
           "Positive feedback cannot be less than 10.", HttpStatus.BAD_REQUEST);
