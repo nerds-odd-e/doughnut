@@ -13,12 +13,9 @@ import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.OpenAiApi;
-import com.theokanning.openai.OpenAiResponse;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.fine_tuning.FineTuningJobRequest;
-import com.theokanning.openai.model.Model;
-import io.reactivex.Single;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -93,12 +90,10 @@ public class AiAdvisorService {
   }
 
   public List<VersionOption> getModelVersions() {
-    Single<OpenAiResponse<Model>> models = openAiApiHandler.getModels();
     List<VersionOption> versionOptions = new ArrayList<>();
 
-    models
-        .blockingGet()
-        .data
+    openAiApiHandler
+        .getModels()
         .forEach(
             (e) -> {
               if (e.id.startsWith("ft:gpt-3.5-turbo-0613:odd-e::")
