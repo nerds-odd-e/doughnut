@@ -15,4 +15,12 @@ public class UploadFineTuningExamplesResponse {
       }
     };
   }
+
+  public static UploadFineTuningExamplesResponse success() {
+    return new UploadFineTuningExamplesResponse() {
+      {
+        setSuccess(true);
+      }
+    };
+  }
 }

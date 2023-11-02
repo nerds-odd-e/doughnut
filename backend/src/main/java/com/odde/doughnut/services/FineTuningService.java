@@ -49,24 +49,24 @@ public class FineTuningService {
   }
 
   public UploadFineTuningExamplesResponse getUploadFineTuningExamplesResponse() throws IOException {
-    var result = new UploadFineTuningExamplesResponse();
     var feedbacks = getQuestionGenerationTrainingExamples();
     if (feedbacks.size() < 10) {
-      result.setMessage("Positive feedback cannot be less than 10.");
-      result.setSuccess(false);
-      return result;
+      return UploadFineTuningExamplesResponse.fail("Positive feedback cannot be less than 10.");
     }
     String jsonString = getJsonString(feedbacks);
     var fileName = String.format("Question-%s.jsonl", System.currentTimeMillis());
     Path file = Path.of(fileName);
     Files.createFile(file);
     Files.write(file, jsonString.getBytes(), StandardOpenOption.WRITE);
-    openAiApiHandler.Upload(new File(fileName));
-    //    result.setSuccess(feedbackCount >= 10);
-    //    FIXME: for passing the test only
-    result.setMessage("Something wrong with Open AI service.");
-    result.setSuccess(true);
-    return result;
+    try {
+      openAiApiHandler.Upload(new File(fileName));
+    } catch (Exception e){
+      return UploadFineTuningExamplesResponse.fail("Something wrong with Open AI service.");
+    } finally {
+      Files.delete(file);
+    }
+
+    return UploadFineTuningExamplesResponse.success();
   }
 
   private String getJsonString(List<OpenAIChatGPTFineTuningExample> feedbacks)
