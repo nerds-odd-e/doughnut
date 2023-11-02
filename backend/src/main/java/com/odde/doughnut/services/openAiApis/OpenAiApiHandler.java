@@ -12,7 +12,6 @@ import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.theokanning.openai.OpenAiApi;
-import com.theokanning.openai.OpenAiResponse;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatFunctionCall;
@@ -23,7 +22,6 @@ import com.theokanning.openai.fine_tuning.FineTuningJobRequest;
 import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.model.Model;
-import io.reactivex.Single;
 import java.net.SocketTimeoutException;
 import java.time.Duration;
 import java.util.List;
@@ -137,7 +135,7 @@ public class OpenAiApiHandler {
     }
   }
 
-  public Single<OpenAiResponse<Model>> getModels() {
-    return openAiApi.listModels();
+  public List<Model> getModels() {
+    return openAiApi.listModels().blockingGet().data;
   }
 }
