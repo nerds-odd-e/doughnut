@@ -169,7 +169,7 @@ class RestAiControllerTest {
       expected.add(versionOption);
 
       when(openAiApi.listModels()).thenReturn(Single.just(fakeResponse));
-      List<VersionOption> actual = controller.getVersions();
+      List<VersionOption> actual = controller.getModelVersions();
       assertEquals(expected, actual);
     }
   }

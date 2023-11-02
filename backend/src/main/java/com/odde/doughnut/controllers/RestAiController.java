@@ -77,7 +77,7 @@ public class RestAiController {
   }
 
   @GetMapping("/model-versions")
-  public List<VersionOption> getVersions() {
+  public List<VersionOption> getModelVersions() {
     return aiAdvisorService.getModelVersions();
   }
 }
