@@ -1,11 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.json.AiCompletion;
-import com.odde.doughnut.controllers.json.AiCompletionParams;
-import com.odde.doughnut.controllers.json.AiGeneratedImage;
-import com.odde.doughnut.controllers.json.AiTrainingFile;
-import com.odde.doughnut.controllers.json.ChatRequest;
-import com.odde.doughnut.controllers.json.ChatResponse;
+import com.odde.doughnut.controllers.json.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -14,6 +9,7 @@ import com.odde.doughnut.models.VersionOption;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.theokanning.openai.OpenAiApi;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -71,9 +67,12 @@ public class RestAiController {
   }
 
   @PostMapping("/trigger-finetuning/{fileId}")
-  public void triggerFineTune(@PathVariable(name = "fileId") String fileId) {
+  public ApiResponse triggerFineTune(@PathVariable(name = "fileId") String fileId) {
     currentUser.assertLoggedIn();
     aiAdvisorService.triggerFineTune(fileId);
+
+    return new ApiResponse("Successful");
+
   }
 
   @GetMapping("/model-versions")

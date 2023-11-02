@@ -404,7 +404,10 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
 
     async triggerFineTuning(fileId: string) {
-      await managedApi.restPost(`ai/trigger-finetuning/${fileId}`, {});
+      return (await managedApi.restPost(
+        `ai/trigger-finetuning/${fileId}`,
+        {},
+      )) as Generated.ApiResponse;
     },
   },
   testability: {
