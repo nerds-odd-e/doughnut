@@ -70,7 +70,7 @@ class RestFineTuningDataController {
 
   @PostMapping("/upload-fine-tuning-examples")
   public UploadFineTuningExamplesResponse uploadFineTuningExamples() throws IOException {
-    return fineTuningService.getUploadFineTuningExamplesResponse();
+    return fineTuningService.uploadFineTuningExamples();
   }
 
   @GetMapping("/feedback-evaluation-examples")
