@@ -72,6 +72,7 @@ public class RestAiController {
     try {
       aiAdvisorService.triggerFineTune(fileId);
     } catch (Exception e) {
+      System.out.println(e.toString());
       return new ApiResponse("Failed");
     }
 
