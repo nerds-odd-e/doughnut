@@ -3,6 +3,7 @@
 // @ts-check
 import { DataTable, Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 import start from "start"
+import { goToModelManagementTab } from "start/pageObject/adminPages"
 
 Given("my question should not be included in the admin's fine-tuning data", () => {
   start
@@ -86,19 +87,28 @@ Given(
   },
 )
 
-When("I choose {string} for {string} use", (modelName: string, generationCategory: string) => {
-  cy.get("select[name=" + generationCategory + "]").select(modelName)
-  cy.get(".button").click()
-})
-
-Then(
-  "I should be using for {string} for {string}",
-  (modelName: string, generationCategory: string) => {},
+When(
+  "I choose {string} for {string} use",
+  (modelName : string, trainingEngine: string) => {
+    cy.get("select[name='" + trainingEngine +"']").select(modelName);
+    cy.get(".saveBtn").click();
+  },
 )
 
 Then(
-  "I can choose the model from GPT in {string} dropdown list",
-  (generationCategory: string) => {},
+  "I can choose model {string} from GPT in {string} dropdown list",
+  (modelName: string, trainingEngine: string) => {
+    cy.get("select[name='" + trainingEngine +"']").select(modelName);
+  },
+)
+
+Then (
+  "I should be using {string} for {string}",
+  (modelName: string, trainingEngine: string) => {
+    cy.findByText("Failure Reports").click()
+    cy.findByText("Manage Model").click()
+    cy.get("select[name='" + modelName +"']").find('option:selected').should('have.text', trainingEngine)
+  },
 )
 
 // Then("Open AI service should receive the uploaded file.", () => {});
