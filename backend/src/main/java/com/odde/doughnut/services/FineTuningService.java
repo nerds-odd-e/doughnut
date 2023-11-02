@@ -16,7 +16,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
-import org.jetbrains.annotations.Nullable;
 
 public class FineTuningService {
   private final ModelFactoryService modelFactoryService;
@@ -53,16 +52,12 @@ public class FineTuningService {
   public UploadFineTuningExamplesResponse getUploadFineTuningExamplesResponse() throws IOException {
     var QuestionFeedbacks = getQuestionGenerationTrainingExamples();
     var EvaluationFeedbacks = getQuestionGenerationTrainingExamples();
-    UploadFineTuningExamplesResponse fail =
+    UploadFineTuningExamplesResponse result =
         getUploadFineTuningExamplesResponse(QuestionFeedbacks, "Question");
-    if (fail != null) return fail;
-    UploadFineTuningExamplesResponse evaluationFail =
-        getUploadFineTuningExamplesResponse(EvaluationFeedbacks, "Evaluation");
-    if (evaluationFail != null) return evaluationFail;
-    return UploadFineTuningExamplesResponse.success();
+    if (!result.isSuccess()) return result;
+    return getUploadFineTuningExamplesResponse(EvaluationFeedbacks, "Evaluation");
   }
 
-  @Nullable
   private UploadFineTuningExamplesResponse getUploadFineTuningExamplesResponse(
       List<OpenAIChatGPTFineTuningExample> QuestionFeedbacks, String subFileName)
       throws IOException {
@@ -81,7 +76,7 @@ public class FineTuningService {
     } finally {
       Files.delete(file);
     }
-    return null;
+    return UploadFineTuningExamplesResponse.success();
   }
 
   private String getJsonString(List<OpenAIChatGPTFineTuningExample> feedbacks)

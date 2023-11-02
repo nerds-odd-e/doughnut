@@ -86,30 +86,26 @@ Given(
   },
 )
 
-When(
-  "I choose {string} for {string} use",
-  (modelName : string, trainingEngine: string) => {
-    cy.get("select[name='" + trainingEngine +"']").select(modelName);
-    cy.get(".saveBtn").click();
-  },
-)
+When("I choose {string} for {string} use", (modelName: string, trainingEngine: string) => {
+  cy.get("select[name='" + trainingEngine + "']").select(modelName)
+  cy.get(".saveBtn").click()
+})
 
 Then(
   "I can choose model {string} from GPT in {string} dropdown list",
   (modelName: string, trainingEngine: string) => {
-    cy.get("select[name='" + trainingEngine +"']").select(modelName);
+    cy.get("select[name='" + trainingEngine + "']").select(modelName)
   },
 )
 
-Then (
-  "I should be using {string} for {string}",
-  (modelName: string, trainingEngine: string) => {
-    cy.findByText("Failure Reports").click()
-    cy.findByText("Manage Model").click()
-    cy.get("select[name='" + modelName +"']").find('option:selected').should('have.text', trainingEngine)
-  },
-)
+Then("I should be using {string} for {string}", (modelName: string, trainingEngine: string) => {
+  cy.findByText("Failure Reports").click()
+  cy.findByText("Manage Model").click()
+  cy.get("select[name='" + modelName + "']")
+    .find("option:selected")
+    .should("have.text", trainingEngine)
+})
 
 Then("Open AI service should receive the uploaded file.", () => {
-  mock_services.openAi().stubOpenAiUploadResponse();
-});
+  mock_services.openAi().stubOpenAiUploadResponse()
+})
