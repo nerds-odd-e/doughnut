@@ -51,15 +51,15 @@ public class FineTuningService {
         .toList();
   }
 
-  public UploadFineTuningExamplesResponse getUploadFineTuningExamplesResponse() throws IOException {
+  public UploadFineTuningExamplesResponse uploadFineTuningExamples() throws IOException {
     var QuestionFeedbacks = getQuestionGenerationTrainingExamples();
     var EvaluationFeedbacks = getQuestionGenerationTrainingExamples();
-    getUploadFineTuningExamplesResponse(QuestionFeedbacks, "Question");
-    getUploadFineTuningExamplesResponse(EvaluationFeedbacks, "Evaluation");
+    uploadFineTuningExamples(QuestionFeedbacks, "Question");
+    uploadFineTuningExamples(EvaluationFeedbacks, "Evaluation");
     return new UploadFineTuningExamplesResponse().success();
   }
 
-  private void getUploadFineTuningExamplesResponse(
+  private void uploadFineTuningExamples(
       List<OpenAIChatGPTFineTuningExample> feedbacks, String subFileName)
       throws IOException {
     if (feedbacks.size() < 10) {
