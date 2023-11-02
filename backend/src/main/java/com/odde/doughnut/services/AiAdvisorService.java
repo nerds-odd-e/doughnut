@@ -3,10 +3,10 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.controllers.json.AiCompletion;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.controllers.json.AiTrainingFile;
+import com.odde.doughnut.controllers.json.ModelVersionOption;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
-import com.odde.doughnut.controllers.json.ModelVersionOption;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class AiAdvisorService {
+
   private final OpenAiApiHandler openAiApiHandler;
 
   public AiAdvisorService(OpenAiApi openAiApi) {
