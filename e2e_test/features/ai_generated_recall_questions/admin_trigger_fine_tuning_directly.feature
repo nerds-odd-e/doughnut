@@ -12,7 +12,8 @@ Feature: Trigger fine-tuning directly as admin
       Given the finetuning for the file "question_generation_examples" will be <API response>
       When I retrieve file list from my openAI account
       Then I will see a list of files
-      When I choose the file "question generation examples" based on GPT3.5 model
+      When I choose the file "question generation examples"
+      And I train model with "question generation examples" data based on GPT3.5 model
       Then I will see success message "<expected message>"
 
     Examples:
