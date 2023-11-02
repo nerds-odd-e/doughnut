@@ -93,10 +93,6 @@ public class OpenAiApiHandler {
                 .findFirst());
   }
 
-  public String uploadFineTuningExamples(File request) {
-    return withExceptionHandler(() -> openAiApi.uploadFile(null, null).blockingGet().getFilename());
-  }
-
   public FineTuningJob triggerFineTune(FineTuningJobRequest fineTuningJobRequest) {
     return withExceptionHandler(
         () -> {
