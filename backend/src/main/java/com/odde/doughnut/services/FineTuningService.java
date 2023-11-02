@@ -1,8 +1,13 @@
 package com.odde.doughnut.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.json.OpenAIChatGPTFineTuningExample;
+import com.odde.doughnut.controllers.json.UploadFineTuningExamplesResponse;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,5 +38,26 @@ public class FineTuningService {
     return getSuggestedQuestionForFineTunings().stream()
         .map(SuggestedQuestionForFineTuning::toQuestionEvaluationFineTuningData)
         .toList();
+  }
+
+  public UploadFineTuningExamplesResponse getUploadFineTuningExamplesResponse() {
+    var result = new UploadFineTuningExamplesResponse();
+    var feedbacks = getQuestionGenerationTrainingExamples();
+    ObjectMapper objectMapper = new ObjectMapper();
+    String jsonString;
+    try {
+      jsonString = objectMapper.writeValueAsString(feedbacks);
+      Path file = Path.of(String.format("Question-%s.jsonl", System.currentTimeMillis()));
+      Files.createFile(file);
+      Files.write(file, jsonString.getBytes(), StandardOpenOption.WRITE);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+    if (feedbacks.size() < 10) {
+      result.setMessage("Positive feedback cannot be less than 10.");
+    }
+
+    result.setSuccess(feedbacks.size() >= 10);
+    return result;
   }
 }

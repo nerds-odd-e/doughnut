@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.json.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.controllers.json.QuestionSuggestionParams;
 import com.odde.doughnut.controllers.json.UploadFineTuningExamplesResponse;
@@ -9,9 +8,6 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.FineTuningService;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -72,29 +68,7 @@ class RestFineTuningDataController {
 
   @PostMapping("/upload-fine-tuning-examples")
   public UploadFineTuningExamplesResponse uploadFineTuningExamples() {
-    var result = new UploadFineTuningExamplesResponse();
-    var feedbackCount = fineTuningService.getQuestionGenerationTrainingExamples().size();
-    var feedbacks = fineTuningService.getQuestionGenerationTrainingExamples();
-    ObjectMapper objectMapper = new ObjectMapper();
-    String jsonString;
-    try {
-      jsonString = objectMapper.writeValueAsString(feedbacks);
-      Path file = Path.of(String.format("Question-%s.jsonl", System.currentTimeMillis()));
-      Files.createFile(file);
-      Files.write(file, jsonString.getBytes(), StandardOpenOption.WRITE);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-    result.setSuccess(false);
-    if (feedbackCount < 10) {
-      result.setMessage("Positive feedback cannot be less than 10.");
-      return result;
-    }
-
-//    result.setSuccess(feedbackCount >= 10);
-//    FIXME: for passing the test only
-    result.setMessage("Something wrong with Open AI service.");
-    return result;
+    return fineTuningService.getUploadFineTuningExamplesResponse();
   }
 
   @GetMapping("/feedback-evaluation-examples")
