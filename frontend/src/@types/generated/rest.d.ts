@@ -369,6 +369,18 @@ declare namespace Generated {
          */
         choices: string[];
     }
+    
+    interface ModelManageSelection {
+        list: ModelManageOption[];
+        selected: string;
+        training_engine: string;
+    }
+
+    interface ModelManageOption {
+        key: string;
+        value: string;
+        label: string;
+    }
 
     type ErrorType = "OPENAI_UNAUTHORIZED" | "BINDING_ERROR" | "OPENAI_TIMEOUT" | "OPENAI_SERVICE_ERROR";
 

@@ -4,11 +4,11 @@
       <div class="model-title">Question Generation</div>
       <div>
         <DropdownList
-          :options="selectionList"
+          :options="getOptionList('Question Generation')"
           scope-name="Question Generation"
           field=""
           class="model-option"
-          :onclick-fun="selectOption"
+          :onchange="selectOption"
         ></DropdownList>
       </div>
     </div>
@@ -16,11 +16,11 @@
       <div class="model-title">Evaluation</div>
       <div>
         <DropdownList
-          :options="selectionList"
+          :options="getOptionList('Evaluation')"
           scope-name="Evaluation"
           field=""
           class="model-option"
-          :onclick-fun="selectOption"
+          :onchange="selectOption"
         ></DropdownList>
       </div>
     </div>
@@ -28,11 +28,11 @@
       <div class="model-title">Others</div>
       <div>
         <DropdownList
-          :options="selectionList"
+          :options="getOptionList('Others')"
           scope-name="Others"
           field=""
           class="model-option"
-          :onclick-fun="selectOption"
+          :onchange="selectOption"
         ></DropdownList>
       </div>
     </div>
@@ -41,28 +41,30 @@
     </div>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from "vue";
 import DropdownList from "../form/Select.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
 const { api } = useLoadingApi();
-const selectionList = ref([]);
+const selectionList = ref<Array<Generated.ModelManageSelection>>([]);
 
 onMounted(() => {
   api.ai.getManageModel().then((res) => (selectionList.value = res));
 });
 
-const selectedData = {
-  "Question Generation": "",
-  Evaluation: "",
-  Others: "",
-};
-
-function selectOption(k, v) {
-  selectedData[k] = v;
+function selectOption(k: string, v: string) {
+  selectionList.value.forEach((selectO) => {
+    if (selectO.training_engine === k) selectO.selected = v;
+  });
   // eslint-disable-next-line no-console
-  console.log(selectedData);
+  console.log(selectionList);
+}
+
+function getOptionList(trainingEngine: string) {
+  return selectionList.value.find(
+    (selectionO) => selectionO.training_engine === trainingEngine,
+  )?.list;
 }
 
 function save() {}
