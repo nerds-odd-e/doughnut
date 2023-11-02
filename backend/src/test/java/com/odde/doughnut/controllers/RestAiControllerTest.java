@@ -9,9 +9,9 @@ import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.controllers.json.AiCompletion;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
+import com.odde.doughnut.controllers.json.ModelVersionOption;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.controllers.json.ModelVersionOption;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.OpenAiResponse;

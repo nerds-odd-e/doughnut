@@ -1,12 +1,12 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.json.*;
+import com.odde.doughnut.controllers.json.CurrentModelVersionResponse;
+import com.odde.doughnut.controllers.json.ModelVersionOption;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.controllers.json.CurrentModelVersionResponse;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.controllers.json.ModelVersionOption;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.AiModelService;
 import com.theokanning.openai.OpenAiApi;
@@ -25,6 +25,7 @@ import org.springframework.web.context.annotation.SessionScope;
 @SessionScope
 @RequestMapping("/api/ai")
 public class RestAiController {
+
   private final AiAdvisorService aiAdvisorService;
   private final ModelFactoryService modelFactoryService;
   private UserModel currentUser;
