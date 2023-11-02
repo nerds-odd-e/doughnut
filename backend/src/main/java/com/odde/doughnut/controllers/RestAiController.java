@@ -68,7 +68,12 @@ public class RestAiController {
   @PostMapping("/trigger-finetuning/{fileId}")
   public ApiResponse triggerFineTune(@PathVariable(name = "fileId") String fileId) {
     currentUser.assertLoggedIn();
-    aiAdvisorService.triggerFineTune(fileId);
+
+    try {
+      aiAdvisorService.triggerFineTune(fileId);
+    } catch (Exception e) {
+      return new ApiResponse("Failed");
+    }
 
     return new ApiResponse("Successful");
   }

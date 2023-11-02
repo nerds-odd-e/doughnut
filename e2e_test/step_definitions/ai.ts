@@ -101,7 +101,7 @@ Given('there is a fine-tuning file "question_gerenation_examples" on my OpenAI a
 Given(
   'the finetuning for the file "question_generation_examples" will be {string}',
   (API_Response: string) => {
-    mock_services.openAi().stubFineTuningStatus()
+    mock_services.openAi().stubFineTuningStatus(API_Response)
   },
 )
 
