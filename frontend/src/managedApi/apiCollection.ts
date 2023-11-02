@@ -345,23 +345,14 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return res.assistantMessage;
     },
     async getManageModel() {
-      const modelList = await managedApi.restGet(`ai/model-versions`);
-      // const selectedModel = await managedApi.restGet(`ai/model-versions-selected`);
-      const selectedModel = {
-        "Question Generation": "gpt-4",
-        Evaluation: "gpt-3.5-turbo-0301",
-        Others: "gpt-3.5-turbo-16k-0613",
-      };
-
-      const selectionRes = Object.keys(selectedModel).map((trainingEngine) => {
-        return {
-          list: modelList,
-          selected: selectedModel[trainingEngine],
-          training_engine: trainingEngine,
-        };
-      });
-
-      return selectionRes;
+      return (await managedApi.restGet(
+        `ai/model-versions`,
+      )) as Generated.ModelVersionOption[];
+    },
+    async getManageModelSelected() {
+      return (await managedApi.restGet(
+        `ai/current-model-version`,
+      )) as Generated.CurrentModelVersionResponse;
     },
     async keepAskingAICompletionUntilStop(
       prompt: string,
