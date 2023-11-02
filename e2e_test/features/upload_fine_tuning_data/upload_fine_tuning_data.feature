@@ -19,7 +19,7 @@ Feature: Upload fine tuning data
       | 0              | 10             |
       | 9              | 10             |
 
-  @ignore
+#  @ignore
   @usingMockedOpenAiService
   Scenario: Open AI fail
     Given An OpenAI response is unavailable
