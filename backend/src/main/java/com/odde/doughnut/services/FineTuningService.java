@@ -60,7 +60,7 @@ public class FineTuningService {
     Files.write(file, jsonString.getBytes(), StandardOpenOption.WRITE);
     try {
       openAiApiHandler.Upload(new File(fileName));
-    } catch (Exception e){
+    } catch (Exception e) {
       return UploadFineTuningExamplesResponse.fail("Something wrong with Open AI service.");
     } finally {
       Files.delete(file);
