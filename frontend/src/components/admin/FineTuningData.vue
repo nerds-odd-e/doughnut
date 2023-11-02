@@ -72,11 +72,12 @@ export default {
       this.fineTuningResult = apiResponse.message;
     },
     async uploadFineTuningData() {
-      const result = await this.api.fineTuning.postUploadFineTuningExamples();
-      if (!result.success) {
-        this.fineTuningDataResultMsg = result.message;
-      } else {
+      try {
+        await this.api.fineTuning.postUploadFineTuningExamples();
         this.fineTuningDataResultMsg = "Upload successfully.";
+      } catch (error) {
+        const errorInstance = error as Error;
+        this.fineTuningDataResultMsg = errorInstance.message;
       }
       this.showAlert = true;
     },
