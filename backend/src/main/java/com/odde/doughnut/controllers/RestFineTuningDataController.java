@@ -8,6 +8,8 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.FineTuningService;
+
+import java.io.IOException;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -67,7 +69,7 @@ class RestFineTuningDataController {
   }
 
   @PostMapping("/upload-fine-tuning-examples")
-  public UploadFineTuningExamplesResponse uploadFineTuningExamples() {
+  public UploadFineTuningExamplesResponse uploadFineTuningExamples() throws IOException {
     return fineTuningService.getUploadFineTuningExamplesResponse();
   }
 
