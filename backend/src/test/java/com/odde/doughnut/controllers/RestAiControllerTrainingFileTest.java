@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 
@@ -90,7 +89,7 @@ class RestAiControllerTrainingFileTest {
             });
     Mockito.when(openAiApi.createFineTuningJob(any())).thenReturn(response);
 
-    assertThrows(RuntimeException.class, () -> controller.triggerFineTune("test"));
+    assertEquals("Failed", controller.triggerFineTune("test").message);
   }
 
   @NotNull
