@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.json.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.controllers.json.UploadFineTuningExamplesResponse;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
+import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.OpenAiApi;
@@ -16,6 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 
 public class FineTuningService {
   private final ModelFactoryService modelFactoryService;
@@ -52,17 +54,17 @@ public class FineTuningService {
   public UploadFineTuningExamplesResponse getUploadFineTuningExamplesResponse() throws IOException {
     var QuestionFeedbacks = getQuestionGenerationTrainingExamples();
     var EvaluationFeedbacks = getQuestionGenerationTrainingExamples();
-    UploadFineTuningExamplesResponse result =
-        getUploadFineTuningExamplesResponse(QuestionFeedbacks, "Question");
-    if (!result.isSuccess()) return result;
-    return getUploadFineTuningExamplesResponse(EvaluationFeedbacks, "Evaluation");
+    getUploadFineTuningExamplesResponse(QuestionFeedbacks, "Question");
+    getUploadFineTuningExamplesResponse(EvaluationFeedbacks, "Evaluation");
+    return new UploadFineTuningExamplesResponse().success();
   }
 
-  private UploadFineTuningExamplesResponse getUploadFineTuningExamplesResponse(
+  private void getUploadFineTuningExamplesResponse(
       List<OpenAIChatGPTFineTuningExample> QuestionFeedbacks, String subFileName)
       throws IOException {
     if (QuestionFeedbacks.size() < 10) {
-      return UploadFineTuningExamplesResponse.fail("Positive feedback cannot be less than 10.");
+      throw new OpenAIServiceErrorException(
+          "Positive feedback cannot be less than 10.", HttpStatus.BAD_REQUEST);
     }
     String jsonString = getJsonString(QuestionFeedbacks);
     var fileName = String.format("%s-%s.jsonl", subFileName, System.currentTimeMillis());
@@ -72,11 +74,11 @@ public class FineTuningService {
     try {
       openAiApiHandler.Upload(new File(fileName));
     } catch (Exception e) {
-      return UploadFineTuningExamplesResponse.fail("Something wrong with Open AI service.");
+      throw new OpenAIServiceErrorException(
+          "Something wrong with Open AI service.", HttpStatus.INTERNAL_SERVER_ERROR);
     } finally {
       Files.delete(file);
     }
-    return UploadFineTuningExamplesResponse.success();
   }
 
   private String getJsonString(List<OpenAIChatGPTFineTuningExample> feedbacks)
