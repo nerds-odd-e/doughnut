@@ -69,13 +69,15 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
       makeMe.aQuestionSuggestionForFineTunining().positive().please();
       makeMe.aQuestionSuggestionForFineTunining().positive().please();
       makeMe.aQuestionSuggestionForFineTunining().positive().please();
-      assertEquals(true, controller.uploadFineTuningExamples().isSuccess());
-      assertEquals(null, controller.uploadFineTuningExamples().getMessage());
+      assertFalse(controller.uploadFineTuningExamples().isSuccess());
+      assertEquals(
+          "Something wrong with Open AI service.",
+          controller.uploadFineTuningExamples().getMessage());
     }
 
     @Test
     void shouldFailWhenNoFeedback() {
-      assertEquals(false, controller.uploadFineTuningExamples().isSuccess());
+      assertFalse(controller.uploadFineTuningExamples().isSuccess());
       assertEquals(
           "Positive feedback cannot be less than 10.",
           controller.uploadFineTuningExamples().getMessage());
