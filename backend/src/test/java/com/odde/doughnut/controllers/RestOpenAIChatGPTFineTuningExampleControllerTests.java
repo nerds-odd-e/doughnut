@@ -94,7 +94,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
     void whenOpenAiServiceFailShouldGetFailMessage() throws IOException {
       mockFeedback(10);
       when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
-        .thenThrow(new RuntimeException());
+          .thenThrow(new RuntimeException());
       var result = controller.uploadFineTuningExamples();
       assertEquals(false, result.isSuccess());
       assertEquals("Something wrong with Open AI service.", result.getMessage());
