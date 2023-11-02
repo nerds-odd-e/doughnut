@@ -8,25 +8,15 @@ Feature: Automatic upload and training
   Background:
     Given I am logged in as an existing user
 
-  Scenario: Feedback less than 10
-    Given I have 9 feedbacks
+  Scenario Outline: make upload and training progress
+    Given I have <Feedback Count> feedbacks
+    And OpenAi Upload progress should <Upload result>
+    And OpenAi training progress should <Training result>
     When I click on the "Upload and Training" button
-    Then I should see the message "You need at least 10 feedbacks to train the AI model"
-
-  Scenario: Feedback more than 10 but upload progress failed
-    Given I have 10 feedbacks
-    When I click on the "Upload and Training" button
-    And the upload progress failed
-    Then I should see the message "Upload failed"
-
-  Scenario: Feedback more than 10 and upload progress success but training progress failed
-    Given I have 10 feedbacks
-    When I click on the "Upload and Training" button
-    And the upload progress success
-    And the training progress failed
-    Then I should see the message "Training failed"
-
-  Scenario: Feedback more than 10 and upload progress success and training progress success
-    Given I have 10 feedbacks
-    When I click on the "Upload and Training" button
-    Then I should see the message "Training is in progress"
+    Then I should see the message <Message>
+    Examples:
+      | Feedback Count | Message                                                | Upload result | Traning result |
+      | 9              | "You need at least 10 feedbacks to train the AI model" | success       | success        |
+      | 10             | "Upload failed"                                        | failed        | success        |
+      | 10             | "Training failed"                                      | success       | failed         |
+      | 10             | "Training is in progress"                              | success       | success        |
