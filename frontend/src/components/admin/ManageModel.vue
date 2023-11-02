@@ -5,9 +5,10 @@
       <div>
         <DropdownList
           :options="selectionList"
-          scope-name="modelmgmt"
+          scope-name="Question Generation"
           field=""
           class="model-option"
+          :onclick-fun="selectOption"
         ></DropdownList>
       </div>
     </div>
@@ -16,47 +17,64 @@
       <div>
         <DropdownList
           :options="selectionList"
-          scope-name="modelmgmt"
+          scope-name="Evaluation"
           field=""
           class="model-option"
+          :onclick-fun="selectOption"
         ></DropdownList>
       </div>
     </div>
     <div class="model-section">
-      <div class="model-title">Other</div>
+      <div class="model-title">Others</div>
       <div>
         <DropdownList
           :options="selectionList"
-          scope-name="modelmgmt"
+          scope-name="Others"
           field=""
           class="model-option"
+          :onclick-fun="selectOption"
         ></DropdownList>
       </div>
     </div>
+    <div class="btnContainer">
+      <button id="saveBtn" class="saveBtn" @click="save()">Save</button>
+    </div>
   </div>
 </template>
-<script setup lang="ts">
+<script setup>
+import { ref, onMounted } from "vue";
 import DropdownList from "../form/Select.vue";
+import useLoadingApi from "../../managedApi/useLoadingApi";
 
-const selectionList = [
-  {
-    key: "test_key",
-    value: "test_value",
-    label: "model1",
-  },
-  {
-    key: "test_key2",
-    value: "test_value2",
-    label: "model2",
-  },
-];
+const { api } = useLoadingApi();
+const selectionList = ref([]);
+
+onMounted(() => {
+  api.ai.getManageModel().then((res) => (selectionList.value = res));
+});
+
+const selectedData = {
+  "Question Generation": "",
+  Evaluation: "",
+  Others: "",
+};
+
+function selectOption(k, v) {
+  selectedData[k] = v;
+  // eslint-disable-next-line no-console
+  console.log(selectedData);
+}
+
+function save() {}
 </script>
+
 <style scoped>
 .manage-model {
   margin-top: 10px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  width: 500px;
 }
 .model-title {
   width: 200px;
@@ -70,5 +88,15 @@ const selectionList = [
 
 .model-option {
   min-width: 300px;
+}
+
+.btnContainer {
+  position: relative;
+  margin-top: 3px;
+}
+
+.saveBtn {
+  position: absolute;
+  right: 0;
 }
 </style>

@@ -3,9 +3,9 @@
     <select
       :class="`select-control form-control ${!!errors ? 'is-invalid' : ''}`"
       :id="`${scopeName}-${field}`"
-      :name="field"
-      :value="modelValue"
+      :name="scopeName"
       @input="$emit('update:modelValue', $event.target.value)"
+      @change="(e) => onclickFun(scopeName, e.target.value)"
     >
       <option
         class="options"
@@ -28,6 +28,7 @@ const props = defineProps({
   field: String,
   options: Array,
   errors: Object,
+  onclickFun: Function,
 });
 
 const emit = defineEmits(["update:modelValue"]);
