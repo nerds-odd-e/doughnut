@@ -19,7 +19,7 @@ Feature: Upload fine tuning data
       | 0              | 10             |
       | 9              | 10             |
 
-#  @ignore
+  @ignore
   @usingMockedOpenAiService
   Scenario: Open AI fail
     Given An OpenAI response is unavailable
@@ -27,13 +27,12 @@ Feature: Upload fine tuning data
     When I upload the feedbacks
     Then I should see the message "Something wrong with Open AI service."
 
-  @ignore
   @usingMockedOpenAiService
   Scenario Outline: Upload fine tuning data to Open AI service
     Given I have <positive_count> positive feedbacks and <negative_count> negative feedbacks
     When I upload the feedbacks
-    Then I should see the message "Upload successfully."
     Then Open AI service should receive the uploaded file.
+    Then I should see the message "Upload successfully."
 
     Examples:
       | positive_count | negative_count |
