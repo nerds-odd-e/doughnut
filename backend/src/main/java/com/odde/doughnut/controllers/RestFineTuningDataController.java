@@ -8,7 +8,6 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.FineTuningService;
-
 import java.io.IOException;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;

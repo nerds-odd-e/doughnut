@@ -6,7 +6,6 @@ import com.odde.doughnut.controllers.json.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.controllers.json.UploadFineTuningExamplesResponse;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -51,22 +50,22 @@ public class FineTuningService {
       result.setSuccess(false);
       return result;
     }
-      String jsonString = getJsonString(feedbacks);
-      var fileName = String.format("Question-%s.jsonl", System.currentTimeMillis());
-      Path file = Path.of(fileName);
-      Files.createFile(file);
-      Files.write(file, jsonString.getBytes(), StandardOpenOption.WRITE);
+    String jsonString = getJsonString(feedbacks);
+    var fileName = String.format("Question-%s.jsonl", System.currentTimeMillis());
+    Path file = Path.of(fileName);
+    Files.createFile(file);
+    Files.write(file, jsonString.getBytes(), StandardOpenOption.WRITE);
     result.setSuccess(true);
     return result;
   }
 
-  private String getJsonString(List<OpenAIChatGPTFineTuningExample> feedbacks) throws JsonProcessingException {
+  private String getJsonString(List<OpenAIChatGPTFineTuningExample> feedbacks)
+      throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
-    String jsonString="";
+    String jsonString = "";
     for (OpenAIChatGPTFineTuningExample feedback : feedbacks) {
-      jsonString +=  objectMapper.writeValueAsString(feedback)+"\n";
+      jsonString += objectMapper.writeValueAsString(feedback) + "\n";
     }
     return jsonString;
   }
-
 }
