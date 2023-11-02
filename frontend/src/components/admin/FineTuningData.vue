@@ -11,7 +11,7 @@
   </button>
   <span v-if="showAlert">{{ fineTuningDataResultMsg }}</span>
 
-  <select id="list">
+  <select id="list" v-model="fileId">
     <option
       v-for="aiTrainingFile in aiTrainingFiles"
       :key="aiTrainingFile.id"
@@ -21,7 +21,7 @@
     </option>
   </select>
   <button @click="getTrainingFiles()">Retrieve</button>
-  <button @click="updateFineTuningResult()">Trigger Fine Tuning</button>
+  <button @click="triggerFineTuning()">Trigger Fine Tuning</button>
   <label title="fineTuningResult">{{ fineTuningResult }}</label>
   <ContentLoader v-if="suggestedQuestions === undefined" />
   <SuggestedQuestionList
@@ -50,6 +50,7 @@ export default {
       fineTuningResult: undefined as string | undefined,
       fineTuningDataResultMsg: "",
       showAlert: false,
+      fileId: "",
     };
   },
   methods: {
@@ -66,8 +67,8 @@ export default {
     async duplicated(duplicated: Generated.SuggestedQuestionForFineTuning) {
       this.suggestedQuestions = [...this.suggestedQuestions!, duplicated];
     },
-    updateFineTuningResult() {
-      this.fineTuningResult = "successful";
+    async triggerFineTuning() {
+      await this.api.ai.triggerFineTuning(this.fileId);
     },
     async uploadFineTuningData() {
       const result = await this.api.fineTuning.postUploadFineTuningExamples();
@@ -80,6 +81,7 @@ export default {
     },
     async getTrainingFiles() {
       this.aiTrainingFiles = await this.api.ai.getTrainingFiles();
+      this.fileId = this.aiTrainingFiles[0] ? this.aiTrainingFiles[0].id : "";
     },
   },
 

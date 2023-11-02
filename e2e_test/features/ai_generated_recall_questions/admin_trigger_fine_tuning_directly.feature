@@ -9,7 +9,7 @@ Feature: Trigger fine-tuning directly as admin
     And I am logged in as an admin and click AdminDashboard and go to tab "Fine Tuning Data"
 
   Scenario Outline:
-      Given the finetuning for the file "question_generation_examples" will be <API response>
+      Given the finetuning for the file "question_generation_examples" will be "<API response>"
       When I retrieve file list from my openAI account
       Then I will see a list of files
       When I choose the file "question generation examples"

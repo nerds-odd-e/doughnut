@@ -402,6 +402,10 @@ const apiCollection = (managedApi: ManagedApi) => ({
         `ai/training-files`,
       )) as Generated.AiTrainingFile[];
     },
+
+    async triggerFineTuning(fileId: string) {
+      await managedApi.restPost(`ai/trigger-finetuning/${fileId}`, {});
+    },
   },
   testability: {
     getEnvironment() {
