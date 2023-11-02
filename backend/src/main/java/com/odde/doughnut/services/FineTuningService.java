@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
+import org.jetbrains.annotations.Nullable;
 
 public class FineTuningService {
   private final ModelFactoryService modelFactoryService;
@@ -50,12 +51,26 @@ public class FineTuningService {
   }
 
   public UploadFineTuningExamplesResponse getUploadFineTuningExamplesResponse() throws IOException {
-    var feedbacks = getQuestionGenerationTrainingExamples();
-    if (feedbacks.size() < 10) {
+    var QuestionFeedbacks = getQuestionGenerationTrainingExamples();
+    var EvaluationFeedbacks = getQuestionGenerationTrainingExamples();
+    UploadFineTuningExamplesResponse fail =
+        getUploadFineTuningExamplesResponse(QuestionFeedbacks, "Question");
+    if (fail != null) return fail;
+    UploadFineTuningExamplesResponse evaluationFail =
+        getUploadFineTuningExamplesResponse(EvaluationFeedbacks, "Evaluation");
+    if (evaluationFail != null) return evaluationFail;
+    return UploadFineTuningExamplesResponse.success();
+  }
+
+  @Nullable
+  private UploadFineTuningExamplesResponse getUploadFineTuningExamplesResponse(
+      List<OpenAIChatGPTFineTuningExample> QuestionFeedbacks, String subFileName)
+      throws IOException {
+    if (QuestionFeedbacks.size() < 10) {
       return UploadFineTuningExamplesResponse.fail("Positive feedback cannot be less than 10.");
     }
-    String jsonString = getJsonString(feedbacks);
-    var fileName = String.format("Question-%s.jsonl", System.currentTimeMillis());
+    String jsonString = getJsonString(QuestionFeedbacks);
+    var fileName = String.format("%s-%s.jsonl", subFileName, System.currentTimeMillis());
     Path file = Path.of(fileName);
     Files.createFile(file);
     Files.write(file, jsonString.getBytes(), StandardOpenOption.WRITE);
@@ -66,8 +81,7 @@ public class FineTuningService {
     } finally {
       Files.delete(file);
     }
-
-    return UploadFineTuningExamplesResponse.success();
+    return null;
   }
 
   private String getJsonString(List<OpenAIChatGPTFineTuningExample> feedbacks)
