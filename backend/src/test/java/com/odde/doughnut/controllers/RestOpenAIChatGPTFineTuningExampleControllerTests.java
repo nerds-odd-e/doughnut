@@ -12,16 +12,13 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
-import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatMessage;
-
 import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -81,9 +78,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
     void shouldFailWhenNoFeedback() throws IOException {
       var result = controller.uploadFineTuningExamples();
       assertEquals(false, result.isSuccess());
-      assertEquals(
-          "Positive feedback cannot be less than 10.",
-          result.getMessage());
+      assertEquals("Positive feedback cannot be less than 10.", result.getMessage());
     }
 
     @Test
