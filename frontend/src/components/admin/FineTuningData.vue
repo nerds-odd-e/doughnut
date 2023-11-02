@@ -21,7 +21,7 @@
     </option>
   </select>
   <button @click="getTrainingFiles()">Retrieve</button>
-  <button @click="updateFineTuningResult()">Trigger Fine Tuning Success</button>
+  <button @click="updateFineTuningResult()">Trigger Fine Tuning</button>
   <label title="fineTuningResult">{{ fineTuningResult }}</label>
   <ContentLoader v-if="suggestedQuestions === undefined" />
   <SuggestedQuestionList
