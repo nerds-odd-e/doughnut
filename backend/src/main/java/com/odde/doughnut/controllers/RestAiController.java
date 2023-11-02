@@ -8,6 +8,7 @@ import com.odde.doughnut.models.CurrentModelVersionResponse;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.VersionOption;
 import com.odde.doughnut.services.AiAdvisorService;
+import com.odde.doughnut.services.AiModelService;
 import com.theokanning.openai.OpenAiApi;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -87,6 +88,7 @@ public class RestAiController {
 
   @GetMapping("/current-model-version")
   public CurrentModelVersionResponse getCurrentModelVersions() {
-    return new CurrentModelVersionResponse("gpt-4", "gpt-3.5", null);
+    AiModelService aiModelService = new AiModelService();
+    return aiModelService.getCurrentModelVersions();
   }
 }
