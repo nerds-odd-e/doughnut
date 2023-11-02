@@ -111,7 +111,12 @@ Then('I will see a list of files', () => {
   cy.get('#list > option').should('have.length', 1);
 })
 
-When('I choose the file "question generation examples" based on GPT3.5 model', () => {})
+When('I choose the file "question generation examples"', () => {
+
+})
+When('I train model with "question generation examples" data based on GPT3.5 model', () => {
+
+})
 
 Then("I will see success message {string}", (expectedMessage: string) => {
   cy.findByText(expectedMessage)
