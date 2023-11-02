@@ -64,7 +64,15 @@ const request = async (
       await loginOrRegisterAndHaltThisThread();
     }
   }
-  throw new HttpResponseError(res.status);
+  let errorMsg = "";
+
+  try {
+    const resMsg = await res.json();
+    errorMsg = resMsg.message;
+  } catch (e) {
+    throw new HttpResponseError(res.status, res.statusText);
+  }
+  throw new HttpResponseError(res.status, errorMsg);
 };
 
 class RestfulFetch {
