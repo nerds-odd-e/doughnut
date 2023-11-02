@@ -344,6 +344,10 @@ const apiCollection = (managedApi: ManagedApi) => ({
       )) as Generated.ChatResponse;
       return res.assistantMessage;
     },
+    async getManageModel() {
+      const res = await managedApi.restGet(`ai/model-versions`);
+      return res;
+    },
     async keepAskingAICompletionUntilStop(
       prompt: string,
       noteId: Doughnut.ID,
