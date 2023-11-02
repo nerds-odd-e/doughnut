@@ -16,6 +16,7 @@ import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.fine_tuning.FineTuningJobRequest;
+import com.theokanning.openai.fine_tuning.Hyperparameters;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -85,6 +86,8 @@ public class AiAdvisorService {
     FineTuningJobRequest fineTuningJobRequest = new FineTuningJobRequest();
     fineTuningJobRequest.setTrainingFile(fileId);
     fineTuningJobRequest.setModel("gpt-3.5-turbo");
+    fineTuningJobRequest.setHyperparameters(
+        new Hyperparameters(3)); // not sure what should be the nEpochs value
 
     openAiApiHandler.triggerFineTune(fineTuningJobRequest);
   }
