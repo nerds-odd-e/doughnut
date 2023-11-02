@@ -41,19 +41,19 @@
     </div>
   </div>
 </template>
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted } from "vue";
 import DropdownList from "../form/Select.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
 const { api } = useLoadingApi();
-const selectionList = ref<Array<Generated.ModelManageSelection>>([]);
+const selectionList = ref([]);
 
 onMounted(() => {
   api.ai.getManageModel().then((res) => (selectionList.value = res));
 });
 
-function selectOption(k: string, v: string) {
+function selectOption(k, v) {
   selectionList.value.forEach((selectO) => {
     if (selectO.training_engine === k) selectO.selected = v;
   });
@@ -61,7 +61,7 @@ function selectOption(k: string, v: string) {
   console.log(selectionList);
 }
 
-function getOptionList(trainingEngine: string) {
+function getOptionList(trainingEngine) {
   return selectionList.value.find(
     (selectionO) => selectionO.training_engine === trainingEngine,
   )?.list;

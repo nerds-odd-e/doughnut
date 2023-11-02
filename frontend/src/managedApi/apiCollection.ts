@@ -358,7 +358,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
           list: modelList,
           selected: selectedModel[trainingEngine],
           training_engine: trainingEngine,
-        } as Generated.ModelManageSelection;
+        };
       });
 
       return selectionRes;
