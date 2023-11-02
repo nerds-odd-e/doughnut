@@ -1,4 +1,4 @@
-package com.odde.doughnut.models;
+package com.odde.doughnut.controllers.json;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -53,6 +53,12 @@ declare namespace Generated {
         invitationCode: string;
     }
 
+    interface CurrentModelVersionResponse {
+        currentQuestionGenerationModelVersion: string;
+        currentEvaluationModelVersion: string;
+        currentOthersModelVersion: string;
+    }
+
     interface CurrentUserInfo {
         user: User;
         externalIdentifier: string;
@@ -84,6 +90,12 @@ declare namespace Generated {
     interface LinkViewed {
         direct: Link[];
         reverse: Link[];
+    }
+
+    interface ModelVersionOption {
+        value: string;
+        key: string;
+        label: string;
     }
 
     interface NoteCreation {

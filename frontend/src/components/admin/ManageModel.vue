@@ -5,6 +5,7 @@
       <div>
         <DropdownList
           :options="getOptionList('Question Generation')"
+          :default-option="getDefaultSelected('Question Generation')"
           scope-name="Question Generation"
           field=""
           class="model-option"
@@ -17,6 +18,7 @@
       <div>
         <DropdownList
           :options="getOptionList('Evaluation')"
+          :default-option="getDefaultSelected('Evaluation')"
           scope-name="Evaluation"
           field=""
           class="model-option"
@@ -29,6 +31,7 @@
       <div>
         <DropdownList
           :options="getOptionList('Others')"
+          :default-option="getDefaultSelected('Others')"
           scope-name="Others"
           field=""
           class="model-option"
@@ -47,24 +50,49 @@ import DropdownList from "../form/Select.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
 const { api } = useLoadingApi();
-const selectionList = ref([]);
+const trainingList = ref([]);
 
 onMounted(() => {
-  api.ai.getManageModel().then((res) => (selectionList.value = res));
+  Promise.all([api.ai.getManageModel(), api.ai.getManageModelSelected()]).then(
+    (results) => {
+      const [modelListRes, selectedModelRes] = results;
+      const modelList = [{ label: "---" }, ...modelListRes];
+
+      const trainingListTmp = [];
+      trainingListTmp.push({
+        list: modelList,
+        selected: selectedModelRes.currentQuestionGenerationModelVersion,
+        training_engine: "Question Generation",
+      });
+      trainingListTmp.push({
+        list: modelList,
+        selected: selectedModelRes.currentEvaluationModelVersion,
+        training_engine: "Evaluation",
+      });
+      trainingListTmp.push({
+        list: modelList,
+        selected: selectedModelRes.currentOthersModelVersion,
+        training_engine: "Others",
+      });
+      trainingList.value = trainingListTmp;
+    },
+  );
 });
 
 function selectOption(k, v) {
-  selectionList.value.forEach((selectO) => {
-    if (selectO.training_engine === k) selectO.selected = v;
+  trainingList.value.forEach((t) => {
+    if (t.training_engine === k) t.selected = v;
   });
-  // eslint-disable-next-line no-console
-  console.log(selectionList);
 }
 
 function getOptionList(trainingEngine) {
-  return selectionList.value.find(
-    (selectionO) => selectionO.training_engine === trainingEngine,
-  )?.list;
+  return trainingList.value.find((t) => t.training_engine === trainingEngine)
+    ?.list;
+}
+
+function getDefaultSelected(trainingEngine) {
+  return trainingList.value.find((t) => t.training_engine === trainingEngine)
+    ?.selected;
 }
 
 function save() {}
@@ -76,7 +104,7 @@ function save() {}
   display: flex;
   flex-direction: column;
   gap: 8px;
-  width: 500px;
+  width: 540px;
 }
 .model-title {
   width: 200px;
@@ -86,6 +114,7 @@ function save() {}
   display: flex;
   align-items: center;
   gap: 18px;
+  width: 600px;
 }
 
 .model-option {

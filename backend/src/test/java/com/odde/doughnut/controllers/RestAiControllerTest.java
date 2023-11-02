@@ -11,7 +11,7 @@ import com.odde.doughnut.controllers.json.AiCompletion;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.models.VersionOption;
+import com.odde.doughnut.controllers.json.ModelVersionOption;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.OpenAiResponse;
@@ -164,12 +164,12 @@ class RestAiControllerTest {
       OpenAiResponse<Model> fakeResponse = new OpenAiResponse<>();
       fakeResponse.setData(fakeModels);
 
-      List<VersionOption> expected = new ArrayList<>();
-      VersionOption versionOption = new VersionOption("gpt-4", "gpt-4", "gpt-4");
-      expected.add(versionOption);
+      List<ModelVersionOption> expected = new ArrayList<>();
+      ModelVersionOption modelVersionOption = new ModelVersionOption("gpt-4", "gpt-4", "gpt-4");
+      expected.add(modelVersionOption);
 
       when(openAiApi.listModels()).thenReturn(Single.just(fakeResponse));
-      List<VersionOption> actual = controller.getModelVersions();
+      List<ModelVersionOption> actual = controller.getModelVersions();
       assertEquals(expected, actual);
     }
   }

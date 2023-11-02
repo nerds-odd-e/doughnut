@@ -6,7 +6,7 @@ import com.odde.doughnut.controllers.json.AiTrainingFile;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
-import com.odde.doughnut.models.VersionOption;
+import com.odde.doughnut.controllers.json.ModelVersionOption;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
@@ -92,8 +92,8 @@ public class AiAdvisorService {
     openAiApiHandler.triggerFineTune(fineTuningJobRequest);
   }
 
-  public List<VersionOption> getModelVersions() {
-    List<VersionOption> versionOptions = new ArrayList<>();
+  public List<ModelVersionOption> getModelVersions() {
+    List<ModelVersionOption> modelVersionOptions = new ArrayList<>();
 
     openAiApiHandler
         .getModels()
@@ -102,11 +102,11 @@ public class AiAdvisorService {
               if (e.id.startsWith("ft:gpt-3.5-turbo-0613:odd-e::")
                   || e.id.startsWith("gpt-3.5")
                   || e.id.startsWith("gpt-4")) {
-                VersionOption versionOption = new VersionOption(e.id, e.id, e.id);
-                versionOptions.add(versionOption);
+                ModelVersionOption modelVersionOption = new ModelVersionOption(e.id, e.id, e.id);
+                modelVersionOptions.add(modelVersionOption);
               }
             });
 
-    return versionOptions;
+    return modelVersionOptions;
   }
 }

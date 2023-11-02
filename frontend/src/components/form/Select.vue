@@ -12,6 +12,7 @@
         v-for="option in options"
         :key="option.key"
         :value="option.value"
+        :selected="option.value === defaultOption"
       >
         {{ option.label }}
       </option>
@@ -27,6 +28,7 @@ const props = defineProps({
   scopeName: String,
   field: String,
   options: Array,
+  defaultOption: String,
   errors: Object,
   onchange: Function,
 });

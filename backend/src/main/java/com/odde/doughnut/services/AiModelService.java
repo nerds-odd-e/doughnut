@@ -1,6 +1,6 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.models.CurrentModelVersionResponse;
+import com.odde.doughnut.controllers.json.CurrentModelVersionResponse;
 
 public class AiModelService {
   public CurrentModelVersionResponse getCurrentModelVersions() {
