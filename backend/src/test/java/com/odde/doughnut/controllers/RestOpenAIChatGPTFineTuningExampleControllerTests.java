@@ -3,6 +3,8 @@ package com.odde.doughnut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.controllers.json.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.controllers.json.QuestionSuggestionParams;
@@ -14,13 +16,18 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatMessage;
+import com.theokanning.openai.file.File;
+import io.reactivex.Single;
 import java.io.IOException;
 import java.util.List;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -73,6 +80,9 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
       makeMe.aQuestionSuggestionForFineTunining().positive().please();
       makeMe.aQuestionSuggestionForFineTunining().positive().please();
       makeMe.aQuestionSuggestionForFineTunining().positive().please();
+      File fakeResponse = Mockito.mock(File.class);
+      when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
+          .thenReturn(Single.just(fakeResponse));
       var result = controller.uploadFineTuningExamples();
       assertEquals(true, result.isSuccess());
     }

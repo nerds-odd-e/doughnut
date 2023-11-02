@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.OpenAiApi;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -60,6 +61,7 @@ public class FineTuningService {
     Path file = Path.of(fileName);
     Files.createFile(file);
     Files.write(file, jsonString.getBytes(), StandardOpenOption.WRITE);
+    openAiApiHandler.Upload(new File(fileName));
     //    result.setSuccess(feedbackCount >= 10);
     //    FIXME: for passing the test only
     result.setMessage("Something wrong with Open AI service.");

@@ -1,7 +1,6 @@
 package com.odde.doughnut.services.openAiApis;
 
-import static com.theokanning.openai.service.OpenAiService.defaultClient;
-import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
+import static com.theokanning.openai.service.OpenAiService.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,19 +15,22 @@ import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatFunctionCall;
 import com.theokanning.openai.completion.chat.ChatMessage;
-import com.theokanning.openai.file.File;
 import com.theokanning.openai.fine_tuning.FineTuningJob;
 import com.theokanning.openai.fine_tuning.FineTuningJobRequest;
 import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.model.Model;
+import java.io.File;
 import java.net.SocketTimeoutException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
 import org.springframework.http.HttpStatus;
 import retrofit2.HttpException;
 import retrofit2.Retrofit;
@@ -137,5 +139,14 @@ public class OpenAiApiHandler {
 
   public List<Model> getModels() {
     return openAiApi.listModels().blockingGet().data;
+  }
+
+  public void Upload(File file) {
+    RequestBody purpose = RequestBody.create("fine-tune", MediaType.parse("text/plain"));
+    RequestBody fileRequestBody =
+        RequestBody.create(file, MediaType.parse("application/octet-stream"));
+    MultipartBody.Part filePart =
+        MultipartBody.Part.createFormData("file", file.getName(), fileRequestBody);
+    execute(openAiApi.uploadFile(purpose, filePart));
   }
 }
