@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 
@@ -17,6 +18,8 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +70,27 @@ class RestAiControllerTrainingFileTest {
     controller.triggerFineTune("test");
 
     Mockito.verify(openAiApi)
-        .createFineTuningJob(argThat(argument -> argument.getTrainingFile().equals("test")));
+        .createFineTuningJob(
+            argThat(
+                argument ->
+                    argument.getTrainingFile().equals("test")
+                        && argument.getModel().equals("gpt-3.5-turbo")));
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"failed", "cancelled"})
+  void throwExceptionWhenTuningStatusIsFailOrCancelled(String status) {
+
+    Single<FineTuningJob> response =
+        Single.just(
+            new FineTuningJob() {
+              {
+                setStatus(status);
+              }
+            });
+    Mockito.when(openAiApi.createFineTuningJob(any())).thenReturn(response);
+
+    assertThrows(RuntimeException.class, () -> controller.triggerFineTune("test"));
   }
 
   @NotNull
