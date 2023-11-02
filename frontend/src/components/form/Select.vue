@@ -5,7 +5,7 @@
       :id="`${scopeName}-${field}`"
       :name="scopeName"
       @input="$emit('update:modelValue', $event.target.value)"
-      @change="(e) => onclickFun(scopeName, e.target.value)"
+      @change="(e) => onchange(scopeName, e.target.value)"
     >
       <option
         class="options"
@@ -28,7 +28,7 @@ const props = defineProps({
   field: String,
   options: Array,
   errors: Object,
-  onclickFun: Function,
+  onchange: Function,
 });
 
 const emit = defineEmits(["update:modelValue"]);
