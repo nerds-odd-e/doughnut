@@ -12,12 +12,16 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
+import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatMessage;
+
+import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -28,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class RestOpenAIChatGPTFineTuningExampleControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
-
   @Autowired MakeMe makeMe;
   RestFineTuningDataController controller;
   private UserModel userModel;
@@ -57,7 +60,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
     }
 
     @Test
-    void shouldSuccessWhen10FeedbackAndUploadFile() {
+    void shouldSuccessWhen10FeedbackAndUploadFile() throws IOException {
       makeMe.aQuestionSuggestionForFineTunining().positive().please();
       makeMe.aQuestionSuggestionForFineTunining().positive().please();
       makeMe.aQuestionSuggestionForFineTunining().positive().please();
@@ -69,18 +72,18 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
       makeMe.aQuestionSuggestionForFineTunining().positive().please();
       makeMe.aQuestionSuggestionForFineTunining().positive().please();
       makeMe.aQuestionSuggestionForFineTunining().positive().please();
-      assertFalse(controller.uploadFineTuningExamples().isSuccess());
-      assertEquals(
-          "Something wrong with Open AI service.",
-          controller.uploadFineTuningExamples().getMessage());
+      var result = controller.uploadFineTuningExamples();
+      assertEquals(true, result.isSuccess());
+      assertEquals(null, result.getMessage());
     }
 
     @Test
-    void shouldFailWhenNoFeedback() {
-      assertFalse(controller.uploadFineTuningExamples().isSuccess());
+    void shouldFailWhenNoFeedback() throws IOException {
+      var result = controller.uploadFineTuningExamples();
+      assertEquals(false, result.isSuccess());
       assertEquals(
           "Positive feedback cannot be less than 10.",
-          controller.uploadFineTuningExamples().getMessage());
+          result.getMessage());
     }
 
     @Test

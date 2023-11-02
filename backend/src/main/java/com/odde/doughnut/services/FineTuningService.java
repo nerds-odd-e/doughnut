@@ -1,10 +1,13 @@
 package com.odde.doughnut.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.json.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.controllers.json.UploadFineTuningExamplesResponse;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -40,22 +43,30 @@ public class FineTuningService {
         .toList();
   }
 
-  public UploadFineTuningExamplesResponse getUploadFineTuningExamplesResponse() {
+  public UploadFineTuningExamplesResponse getUploadFineTuningExamplesResponse() throws IOException {
+    var result = new UploadFineTuningExamplesResponse();
     var feedbacks = getQuestionGenerationTrainingExamples();
-    ObjectMapper objectMapper = new ObjectMapper();
-    String jsonString;
-    try {
-      jsonString = objectMapper.writeValueAsString(feedbacks);
-      Path file = Path.of(String.format("Question-%s.jsonl", System.currentTimeMillis()));
+    if (feedbacks.size() < 10) {
+      result.setMessage("Positive feedback cannot be less than 10.");
+      result.setSuccess(false);
+      return result;
+    }
+      String jsonString = getJsonString(feedbacks);
+      var fileName = String.format("Question-%s.jsonl", System.currentTimeMillis());
+      Path file = Path.of(fileName);
       Files.createFile(file);
       Files.write(file, jsonString.getBytes(), StandardOpenOption.WRITE);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-    if (feedbacks.size() < 10) {
-      return UploadFineTuningExamplesResponse.fail("Positive feedback cannot be less than 10.");
-    }
-
-    return UploadFineTuningExamplesResponse.fail("Something wrong with Open AI service.");
+    result.setSuccess(true);
+    return result;
   }
+
+  private String getJsonString(List<OpenAIChatGPTFineTuningExample> feedbacks) throws JsonProcessingException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    String jsonString="";
+    for (OpenAIChatGPTFineTuningExample feedback : feedbacks) {
+      jsonString +=  objectMapper.writeValueAsString(feedback)+"\n";
+    }
+    return jsonString;
+  }
+
 }
