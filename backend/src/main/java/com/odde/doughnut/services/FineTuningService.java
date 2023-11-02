@@ -60,13 +60,13 @@ public class FineTuningService {
   }
 
   private void getUploadFineTuningExamplesResponse(
-      List<OpenAIChatGPTFineTuningExample> QuestionFeedbacks, String subFileName)
+      List<OpenAIChatGPTFineTuningExample> feedbacks, String subFileName)
       throws IOException {
-    if (QuestionFeedbacks.size() < 10) {
+    if (feedbacks.size() < 10) {
       throw new OpenAIServiceErrorException(
           "Positive feedback cannot be less than 10.", HttpStatus.BAD_REQUEST);
     }
-    String jsonString = getJsonString(QuestionFeedbacks);
+    String jsonString = getJsonString(feedbacks);
     var fileName = String.format("%s-%s.jsonl", subFileName, System.currentTimeMillis());
     Path file = Path.of(fileName);
     Files.createFile(file);
