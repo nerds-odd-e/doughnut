@@ -75,10 +75,10 @@ export default {
       const result = await this.api.fineTuning.postUploadFineTuningExamples();
       if (!result.success) {
         this.fineTuningDataResultMsg = result.message;
-        this.showAlert = true;
       } else {
         this.fineTuningDataResultMsg = "Upload successfully.";
       }
+      this.showAlert = true;
     },
     async getTrainingFiles() {
       this.aiTrainingFiles = await this.api.ai.getTrainingFiles();
