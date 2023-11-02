@@ -12,6 +12,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
+import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import java.io.IOException;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -32,18 +34,20 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
   @Autowired MakeMe makeMe;
   RestFineTuningDataController controller;
   private UserModel userModel;
+  @Mock private OpenAiApi openAiApi;
 
   @BeforeEach
   void setup() {
     userModel = makeMe.anAdmin().toModelPlease();
-    controller = new RestFineTuningDataController(modelFactoryService, userModel);
+    controller = new RestFineTuningDataController(modelFactoryService, userModel, openAiApi);
   }
 
   @Nested
   class getGoodOpenAIChatGPTFineTuningExample {
     @Test
     void itShouldNotAllowNonMemberToSeeTrainingData() {
-      controller = new RestFineTuningDataController(modelFactoryService, makeMe.aNullUserModel());
+      controller =
+          new RestFineTuningDataController(modelFactoryService, makeMe.aNullUserModel(), openAiApi);
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.getAllPositiveFeedbackQuestionGenerationFineTuningExamples());
@@ -146,7 +150,8 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
   class SuggestedQuestions {
     @Test
     void shouldThrowExceptionIfUserDoesNotHaveReadingAuth_whenCallGetGoodTrainingData() {
-      controller = new RestFineTuningDataController(modelFactoryService, makeMe.aNullUserModel());
+      controller =
+          new RestFineTuningDataController(modelFactoryService, makeMe.aNullUserModel(), openAiApi);
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.getAllSuggestedQuestions());
     }
@@ -183,7 +188,8 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
     @Test
     void itShouldNotAllowNonAdmin() {
       controller =
-          new RestFineTuningDataController(modelFactoryService, makeMe.aUser().toModelPlease());
+          new RestFineTuningDataController(
+              modelFactoryService, makeMe.aUser().toModelPlease(), openAiApi);
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.updateSuggestedQuestionForFineTuning(suggested, suggest));
@@ -218,7 +224,8 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
     @Test
     void itShouldNotAllowNonAdmin() {
       controller =
-          new RestFineTuningDataController(modelFactoryService, makeMe.aUser().toModelPlease());
+          new RestFineTuningDataController(
+              modelFactoryService, makeMe.aUser().toModelPlease(), openAiApi);
       assertThrows(UnexpectedNoAccessRightException.class, () -> controller.duplicate(suggested));
     }
 
@@ -242,7 +249,8 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
     @Test
     void itShouldNotAllowNonAdmin() {
       controller =
-          new RestFineTuningDataController(modelFactoryService, makeMe.aUser().toModelPlease());
+          new RestFineTuningDataController(
+              modelFactoryService, makeMe.aUser().toModelPlease(), openAiApi);
       assertThrows(UnexpectedNoAccessRightException.class, () -> controller.delete(suggested));
     }
 
