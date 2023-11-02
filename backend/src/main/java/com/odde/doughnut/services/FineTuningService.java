@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.json.OpenAIChatGPTFineTuningExample;
@@ -72,6 +73,7 @@ public class FineTuningService {
   private String getJsonString(List<OpenAIChatGPTFineTuningExample> feedbacks)
       throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     String jsonString = "";
     for (OpenAIChatGPTFineTuningExample feedback : feedbacks) {
       jsonString += objectMapper.writeValueAsString(feedback) + "\n";
