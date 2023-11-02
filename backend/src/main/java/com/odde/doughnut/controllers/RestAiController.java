@@ -79,4 +79,9 @@ public class RestAiController {
   public List<VersionOption> getModelVersions() {
     return aiAdvisorService.getModelVersions();
   }
+
+  @GetMapping("/current-model-version")
+  public CurrentModelVersionResponse getCurrentModelVersions() {
+    return new CurrentModelVersionResponse("gpt-4", "gpt-3.5", null);
+  }
 }
