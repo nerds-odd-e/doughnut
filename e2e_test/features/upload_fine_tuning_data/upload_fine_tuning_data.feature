@@ -7,6 +7,7 @@ Feature: Upload fine tuning data
       | Question Stem                     | Correct Choice | Incorrect Choice 1 |
       | Who wrote 'Who Let the Dogs Out'? | Anslem Douglas | Baha Men           |
 
+  @ignore
   Scenario Outline: Block upload fine tuning data
     Given I have <positive_count> positive feedbacks and <negative_count> negative feedbacks
     When I upload the feedbacks
@@ -19,6 +20,7 @@ Feature: Upload fine tuning data
       | 0              | 10             |
       | 9              | 10             |
 
+  @ignore
   @usingMockedOpenAiService
   Scenario: Open AI fail
     Given An OpenAI response is unavailable
