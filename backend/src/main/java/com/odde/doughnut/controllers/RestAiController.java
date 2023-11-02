@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.json.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.CurrentModelVersionResponse;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.VersionOption;
 import com.odde.doughnut.services.AiAdvisorService;
