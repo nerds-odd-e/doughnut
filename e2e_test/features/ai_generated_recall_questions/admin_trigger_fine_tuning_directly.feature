@@ -19,4 +19,4 @@ Feature: Trigger fine-tuning directly as admin
     Examples:
     | API response | expected message |
     | Successful   | Successful       |
-#    | failed       | failed message   |
+    | Failed       | Failed           |
