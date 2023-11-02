@@ -9,7 +9,6 @@ import com.odde.doughnut.models.VersionOption;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.theokanning.openai.OpenAiApi;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -72,7 +71,6 @@ public class RestAiController {
     aiAdvisorService.triggerFineTune(fileId);
 
     return new ApiResponse("Successful");
-
   }
 
   @GetMapping("/model-versions")
