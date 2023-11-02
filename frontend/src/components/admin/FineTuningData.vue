@@ -68,7 +68,8 @@ export default {
       this.suggestedQuestions = [...this.suggestedQuestions!, duplicated];
     },
     async triggerFineTuning() {
-      await this.api.ai.triggerFineTuning(this.fileId);
+      const apiResponse = await this.api.ai.triggerFineTuning(this.fileId);
+      this.fineTuningResult = apiResponse.message;
     },
     async uploadFineTuningData() {
       const result = await this.api.fineTuning.postUploadFineTuningExamples();
@@ -87,7 +88,6 @@ export default {
 
   components: { ContentLoader, SuggestedQuestionList },
   async mounted() {
-    this.fineTuningResult = "successful";
     this.suggestedQuestions =
       await this.api.fineTuning.getSuggestedQuestionsForFineTuning();
   },

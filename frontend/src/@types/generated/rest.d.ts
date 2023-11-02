@@ -29,6 +29,10 @@ declare namespace Generated {
         errorType: ErrorType;
     }
 
+    interface ApiResponse {
+        message: string;
+    }
+
     interface ChatRequest {
         userMessage: string;
     }

@@ -18,5 +18,5 @@ Feature: Trigger fine-tuning directly as admin
 
     Examples:
     | API response | expected message |
-    | successful   | successful       |
+    | Successful   | Successful       |
 #    | failed       | failed message   |
