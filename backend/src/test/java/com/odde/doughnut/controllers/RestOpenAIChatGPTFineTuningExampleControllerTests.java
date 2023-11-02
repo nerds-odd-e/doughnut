@@ -69,17 +69,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
 
     @Test
     void shouldSuccessWhen10FeedbackAndUploadFile() throws IOException {
-      makeMe.aQuestionSuggestionForFineTunining().positive().please();
-      makeMe.aQuestionSuggestionForFineTunining().positive().please();
-      makeMe.aQuestionSuggestionForFineTunining().positive().please();
-      makeMe.aQuestionSuggestionForFineTunining().positive().please();
-      makeMe.aQuestionSuggestionForFineTunining().positive().please();
-      makeMe.aQuestionSuggestionForFineTunining().positive().please();
-      makeMe.aQuestionSuggestionForFineTunining().positive().please();
-      makeMe.aQuestionSuggestionForFineTunining().positive().please();
-      makeMe.aQuestionSuggestionForFineTunining().positive().please();
-      makeMe.aQuestionSuggestionForFineTunining().positive().please();
-      makeMe.aQuestionSuggestionForFineTunining().positive().please();
+      mockFeedback(10);
       File fakeResponse = Mockito.mock(File.class);
       when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
           .thenReturn(Single.just(fakeResponse));
@@ -87,11 +77,27 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
       assertEquals(true, result.isSuccess());
     }
 
+    private void mockFeedback(int count) {
+      for (int i = 0; i < count; i++) {
+        makeMe.aQuestionSuggestionForFineTunining().positive().please();
+      }
+    }
+
     @Test
     void shouldFailWhenNoFeedback() throws IOException {
       var result = controller.uploadFineTuningExamples();
       assertEquals(false, result.isSuccess());
       assertEquals("Positive feedback cannot be less than 10.", result.getMessage());
+    }
+
+    @Test
+    void whenOpenAiServiceFailShouldGetFailMessage() throws IOException {
+      mockFeedback(10);
+      when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
+        .thenThrow(new RuntimeException());
+      var result = controller.uploadFineTuningExamples();
+      assertEquals(false, result.isSuccess());
+      assertEquals("Something wrong with Open AI service.", result.getMessage());
     }
 
     @Test
