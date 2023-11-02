@@ -41,7 +41,6 @@ public class FineTuningService {
   }
 
   public UploadFineTuningExamplesResponse getUploadFineTuningExamplesResponse() {
-    var result = new UploadFineTuningExamplesResponse();
     var feedbacks = getQuestionGenerationTrainingExamples();
     ObjectMapper objectMapper = new ObjectMapper();
     String jsonString;
@@ -54,10 +53,9 @@ public class FineTuningService {
       throw new RuntimeException(e);
     }
     if (feedbacks.size() < 10) {
-      result.setMessage("Positive feedback cannot be less than 10.");
+      return UploadFineTuningExamplesResponse.fail("Positive feedback cannot be less than 10.");
     }
 
-    result.setSuccess(feedbacks.size() >= 10);
-    return result;
+    return UploadFineTuningExamplesResponse.fail("Something wrong with Open AI service.");
   }
 }
