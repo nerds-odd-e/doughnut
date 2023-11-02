@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers.json;
 
-
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
