@@ -10,6 +10,7 @@ import com.odde.doughnut.controllers.json.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.controllers.json.QuestionSuggestionParams;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
+import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -69,12 +70,12 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
 
     @Test
     void shouldSuccessWhen10FeedbackAndUploadFile() throws IOException {
-      mockFeedback(10);
+      mockFeedback(11);
       File fakeResponse = Mockito.mock(File.class);
       when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
           .thenReturn(Single.just(fakeResponse));
       var result = controller.uploadFineTuningExamples();
-      assertEquals(true, result.isSuccess());
+      assertTrue(result.isSuccess());
     }
 
     private void mockFeedback(int count) {
@@ -85,9 +86,10 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
 
     @Test
     void shouldFailWhenNoFeedback() throws IOException {
-      var result = controller.uploadFineTuningExamples();
-      assertEquals(false, result.isSuccess());
-      assertEquals("Positive feedback cannot be less than 10.", result.getMessage());
+      var result =
+          assertThrows(
+              OpenAIServiceErrorException.class, () -> controller.uploadFineTuningExamples());
+      assertEquals(result.getMessage(), "Positive feedback cannot be less than 10.");
     }
 
     @Test
@@ -95,9 +97,13 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
       mockFeedback(10);
       when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
           .thenThrow(new RuntimeException());
-      var result = controller.uploadFineTuningExamples();
-      assertEquals(false, result.isSuccess());
-      assertEquals("Something wrong with Open AI service.", result.getMessage());
+      var result =
+          assertThrows(
+              OpenAIServiceErrorException.class,
+              () -> {
+                controller.uploadFineTuningExamples();
+              });
+      assertEquals(result.getMessage(), "Something wrong with Open AI service.");
     }
 
     @Test
