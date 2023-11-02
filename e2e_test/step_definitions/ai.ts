@@ -99,8 +99,10 @@ Given('there is a fine-tuning file "question_gerenation_examples" on my OpenAI a
 })
 
 Given(
-  'the finetuning for the file "question_generation_examples" will be successful',
-  (API_Response: string) => {},
+  'the finetuning for the file "question_generation_examples" will be {string}',
+  (API_Response: string) => {
+    mock_services.openAi().stubFineTuningStatus()
+  },
 )
 
 When("I retrieve file list from my openAI account", () => {

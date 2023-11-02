@@ -177,6 +177,25 @@ const openAiService = () => {
         purpose: "fine-tune",
       })
     },
+    async stubFineTuningStatus() {
+      const predicate = new FlexiPredicate()
+        .withOperator(Operator.matches)
+        .withPath(`/v1/fine_tuning/jobs`)
+        .withMethod(HttpMethod.POST)
+      return await serviceMocker.mockWithPredicate(predicate, {
+          object: "fine_tuning.job",
+          id: "ftjob-abc123",
+          model: "gpt-3.5-turbo-0613",
+          created_at: 1614807352,
+          fine_tuned_model: null,
+          organization_id: "org-123",
+          result_files: [],
+          status: "queued",
+          validation_file: null,
+          training_file: "file-abc123",
+        }
+      )
+    },
   }
 }
 
