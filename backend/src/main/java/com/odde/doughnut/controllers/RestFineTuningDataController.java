@@ -8,6 +8,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.FineTuningService;
+import com.theokanning.openai.OpenAiApi;
 import java.io.IOException;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,10 +24,10 @@ class RestFineTuningDataController {
   private final FineTuningService fineTuningService;
 
   public RestFineTuningDataController(
-      ModelFactoryService modelFactoryService, UserModel currentUser) {
+      ModelFactoryService modelFactoryService, UserModel currentUser, OpenAiApi openAiApi) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
-    this.fineTuningService = new FineTuningService(this.modelFactoryService);
+    this.fineTuningService = new FineTuningService(this.modelFactoryService, openAiApi);
   }
 
   @PatchMapping("/{suggestedQuestion}/update-suggested-question-for-fine-tuning")

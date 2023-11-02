@@ -6,6 +6,8 @@ import com.odde.doughnut.controllers.json.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.controllers.json.UploadFineTuningExamplesResponse;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
+import com.theokanning.openai.OpenAiApi;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,8 +18,11 @@ import java.util.List;
 public class FineTuningService {
   private final ModelFactoryService modelFactoryService;
 
-  public FineTuningService(ModelFactoryService modelFactoryService) {
+  private final OpenAiApiHandler openAiApiHandler;
+
+  public FineTuningService(ModelFactoryService modelFactoryService, OpenAiApi openAiApi) {
     this.modelFactoryService = modelFactoryService;
+    this.openAiApiHandler = new OpenAiApiHandler(openAiApi);
   }
 
   public List<SuggestedQuestionForFineTuning> getSuggestedQuestionForFineTunings() {
