@@ -70,7 +70,7 @@ public class RestAiController {
     return aiAdvisorService.listTrainingFiles();
   }
 
-  @PostMapping("'/trigger-finetune/{fileId}")
+  @PostMapping("/trigger-finetuneing/{fileId}")
   public void triggerFineTune(@PathVariable(name = "fileId") String fileId) {
     currentUser.assertLoggedIn();
     aiAdvisorService.triggerFineTune(fileId);
