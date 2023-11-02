@@ -123,6 +123,6 @@ Then(
   },
 );
 
-Then("Open AI service should receive the uploaded file.", () => {
+Given("OpenAI response success when uploading fine tuning data", () => {
   mock_services.openAi().stubOpenAiUploadResponse();
 });
