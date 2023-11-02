@@ -2,8 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 import { DataTable, Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
-import start from "start"
-import { goToModelManagementTab } from "start/pageObject/adminPages"
+import start, { mock_services } from "start"
 
 Given("my question should not be included in the admin's fine-tuning data", () => {
   start
@@ -111,4 +110,6 @@ Then (
   },
 )
 
-// Then("Open AI service should receive the uploaded file.", () => {});
+Then("Open AI service should receive the uploaded file.", () => {
+  mock_services.openAi().stubOpenAiUploadResponse();
+});
