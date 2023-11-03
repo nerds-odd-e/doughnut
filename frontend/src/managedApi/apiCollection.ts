@@ -163,10 +163,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
       )) as Generated.OpenAIChatGPTFineTuningExample[];
     },
     async postUploadFineTuningExamples() {
-      return (await managedApi.restPost(
-        "fine-tuning/upload-fine-tuning-examples",
-        {},
-      )) as Generated.UploadFineTuningExamplesResponse;
+      await managedApi.restGet("fine-tuning/upload-fine-tuning-examples");
     },
     async getAllEvaluationModelExamples() {
       return (await managedApi.restGet(

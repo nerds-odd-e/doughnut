@@ -74,8 +74,10 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
       File fakeResponse = Mockito.mock(File.class);
       when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
           .thenReturn(Single.just(fakeResponse));
-      var result = controller.uploadFineTuningExamples();
-      assertTrue(result.isSuccess());
+      assertDoesNotThrow(
+          () -> {
+            controller.uploadFineTuningExamples();
+          });
     }
 
     private void mockFeedback(int count) {

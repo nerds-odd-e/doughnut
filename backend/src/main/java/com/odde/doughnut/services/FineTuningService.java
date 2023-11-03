@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.json.OpenAIChatGPTFineTuningExample;
-import com.odde.doughnut.controllers.json.UploadFineTuningExamplesResponse;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -51,12 +50,11 @@ public class FineTuningService {
         .toList();
   }
 
-  public UploadFineTuningExamplesResponse uploadFineTuningExamples() throws IOException {
+  public void uploadFineTuningExamples() throws IOException {
     var QuestionFeedbacks = getQuestionGenerationTrainingExamples();
     var EvaluationFeedbacks = getQuestionGenerationTrainingExamples();
     uploadFineTuningExamples(QuestionFeedbacks, "Question");
     uploadFineTuningExamples(EvaluationFeedbacks, "Evaluation");
-    return new UploadFineTuningExamplesResponse().success();
   }
 
   private void uploadFineTuningExamples(
