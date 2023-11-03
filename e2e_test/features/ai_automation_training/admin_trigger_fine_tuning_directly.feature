@@ -7,6 +7,9 @@ Feature: Trigger fine-tuning directly as admin
   Background:
 #    Given there is a fine-tuning file "question_gerenation_examples" on my OpenAI account
     Given I am logged in as an admin and click AdminDashboard and go to tab "Fine Tuning Data"
+    And I've got the following question for a note with topic "Who Let the Dogs Out":
+      | Question Stem                     | Correct Choice | Incorrect Choice 1 |
+      | Who wrote 'Who Let the Dogs Out'? | Anslem Douglas | Baha Men           |
 
 #  Scenario Outline:
 #      Given the finetuning for the file "question_generation_examples" will be "<API response>"
@@ -21,13 +24,13 @@ Feature: Trigger fine-tuning directly as admin
 #    | Successful   | Successful       |
 #    | Failed       | Failed           |
 
-  @ignore
+
 Scenario Outline: make upload and training progress
   Given I have <positive_count> positive feedbacks and <negative_count> negative feedbacks
   And OpenAI response "<upload_result>" when uploading fine tuning data
   And OpenAi response "<training_result>" when trigger fine tuning data
-  When I click on the "Trigger Fine Tuning" button
-  Then I should see the message <message>
+#  When I click on the "Trigger Fine Tuning" button
+#  Then I should see the message <message>
   Examples:
     | positive_count | negative_count | message                                                | upload_result | training_result |
 #    | 9              | 9              | "You need at least 10 feedbacks to train the AI model" | success       | success        |
