@@ -1,4 +1,3 @@
-@ignore
 @usingMockedOpenAiService
 Feature: Trigger evaluate question generation model with hardcoded notes as admin
 
