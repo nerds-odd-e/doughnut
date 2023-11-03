@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 
 public class FineTuningService {
@@ -50,14 +51,15 @@ public class FineTuningService {
         .toList();
   }
 
-  public void uploadFineTuningExamples() throws IOException {
+  public Map<String, String> uploadFineTuningExamples() throws IOException {
     var QuestionFeedbacks = getQuestionGenerationTrainingExamples();
     var EvaluationFeedbacks = getQuestionGenerationTrainingExamples();
-    uploadFineTuningExamples(QuestionFeedbacks, "Question");
-    uploadFineTuningExamples(EvaluationFeedbacks, "Evaluation");
+    return Map.of(
+        "Question", uploadFineTuningExamples(QuestionFeedbacks, "Question"),
+        "Evaluation", uploadFineTuningExamples(EvaluationFeedbacks, "Evaluation"));
   }
 
-  private void uploadFineTuningExamples(
+  private String uploadFineTuningExamples(
       List<OpenAIChatGPTFineTuningExample> feedbacks, String subFileName) throws IOException {
     if (feedbacks.size() < 10) {
       throw new OpenAIServiceErrorException(
@@ -69,7 +71,8 @@ public class FineTuningService {
     Files.createFile(file);
     Files.write(file, jsonString.getBytes(), StandardOpenOption.WRITE);
     try {
-      openAiApiHandler.Upload(new File(fileName));
+      var uploadResult = openAiApiHandler.Upload(new File(fileName));
+      return uploadResult.getId();
     } catch (Exception e) {
       throw new OpenAIServiceErrorException(
           "Something wrong with Open AI service.", HttpStatus.INTERNAL_SERVER_ERROR);

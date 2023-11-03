@@ -104,7 +104,6 @@ public class OpenAiApiHandler {
                 "Trigger Failed: " + defaultObjectMapper().writeValueAsString(fineTuningJob),
                 HttpStatus.valueOf(500));
           }
-
           return fineTuningJob;
         });
   }
@@ -137,12 +136,12 @@ public class OpenAiApiHandler {
     return openAiApi.listModels().blockingGet().data;
   }
 
-  public void Upload(File file) {
+  public com.theokanning.openai.file.File Upload(File file) {
     RequestBody purpose = RequestBody.create("fine-tune", MediaType.parse("text/plain"));
     RequestBody fileRequestBody =
         RequestBody.create(file, MediaType.parse("application/octet-stream"));
     MultipartBody.Part filePart =
         MultipartBody.Part.createFormData("file", file.getName(), fileRequestBody);
-    execute(openAiApi.uploadFile(purpose, filePart));
+    return execute(openAiApi.uploadFile(purpose, filePart));
   }
 }
