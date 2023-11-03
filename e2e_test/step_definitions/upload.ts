@@ -21,6 +21,3 @@ Given(
   },
 )
 
-Then("I should see the message {string}", (message: string) => {
-  cy.findByText(message).should("exist")
-})

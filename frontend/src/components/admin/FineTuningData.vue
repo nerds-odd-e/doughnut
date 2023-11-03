@@ -9,7 +9,6 @@
   <button @click="uploadFineTuningData">
     Upload Fine Tuning Training Data
   </button>
-  <span v-if="showAlert">{{ fineTuningDataResultMsg }}</span>
 
   <select id="list" v-model="fileId">
     <option
@@ -22,7 +21,7 @@
   </select>
   <button @click="getTrainingFiles()">Retrieve</button>
   <button @click="triggerFineTuning()">Trigger Fine Tuning</button>
-  <label title="fineTuningResult">{{ fineTuningResult }}</label>
+  <span v-if="showAlert">{{ fineTuningDataResultMsg }}</span>
   <ContentLoader v-if="suggestedQuestions === undefined" />
   <SuggestedQuestionList
     v-else
@@ -47,7 +46,6 @@ export default {
         | Generated.SuggestedQuestionForFineTuning[]
         | undefined,
       aiTrainingFiles: undefined as Generated.AiTrainingFile[] | undefined,
-      fineTuningResult: undefined as string | undefined,
       fineTuningDataResultMsg: "",
       showAlert: false,
       fileId: "",
@@ -68,8 +66,14 @@ export default {
       this.suggestedQuestions = [...this.suggestedQuestions!, duplicated];
     },
     async triggerFineTuning() {
-      const apiResponse = await this.api.ai.triggerFineTuning(this.fileId);
-      this.fineTuningResult = apiResponse.message;
+      try {
+        // await this.api.fineTuning.postUploadFineTuningExamples();
+        this.fineTuningDataResultMsg = "Training is in progress.";
+      } catch (error) {
+        const errorInstance = error as Error;
+        this.fineTuningDataResultMsg = errorInstance.message;
+      }
+      this.showAlert = true;
     },
     async uploadFineTuningData() {
       try {

@@ -16,6 +16,12 @@ export function adminFineTuningPage() {
       }).click()
     },
 
+    triggerFineTuning() {
+      cy.findByRole("button", {
+        name: "Trigger Fine Tuning",
+      }).click()
+    },
+
     downloadFeedbackForEvaluationModel() {
       cy.findByRole("button", {
         name: "Download Evaluation Training Data",
