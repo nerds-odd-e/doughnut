@@ -21,7 +21,7 @@ public class AiModelService {
 
     String currentQuestionGenerationModelVersion =
         globalSettings.stream()
-            .filter(g -> g.getKey().equals("current_question_generation_model_version"))
+            .filter(g -> g.getKeyName().equals("current_question_generation_model_version"))
             .findFirst()
             .map(GlobalSettings::getValue)
             .orElse("gpt-3.5-turbol");
