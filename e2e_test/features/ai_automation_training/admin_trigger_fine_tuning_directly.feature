@@ -5,24 +5,11 @@ Feature: Trigger fine-tuning directly as admin
   I want to trigger fine-tuning directly through 1 button click without manually uploading feedback examples.
 
   Background:
-#    Given there is a fine-tuning file "question_gerenation_examples" on my OpenAI account
+    Given there is a fine-tuning file "question_gerenation_examples" on my OpenAI account
     Given I am logged in as an admin and click AdminDashboard and go to tab "Fine Tuning Data"
     And I've got the following question for a note with topic "Who Let the Dogs Out":
       | Question Stem                     | Correct Choice | Incorrect Choice 1 |
       | Who wrote 'Who Let the Dogs Out'? | Anslem Douglas | Baha Men           |
-
-#  Scenario Outline:
-#      Given the finetuning for the file "question_generation_examples" will be "<API response>"
-#      When I retrieve file list from my openAI account
-#      Then I will see a list of files
-#      When I choose the file "question generation examples"
-#      And I train model with "question generation examples" data based on GPT3.5 model
-#      Then I will see success message "<expected message>"
-#
-#    Examples:
-#    | API response | expected message |
-#    | Successful   | Successful       |
-#    | Failed       | Failed           |
 
 
 Scenario Outline: Trigger fine tuning with feedbacks for Question model and Evaluation model
