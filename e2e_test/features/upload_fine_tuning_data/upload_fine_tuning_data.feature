@@ -24,7 +24,7 @@ Feature: Upload fine tuning data
     Given An OpenAI response is unavailable
     Given I have 10 positive feedbacks and 1 negative feedbacks
     When I upload the feedbacks
-    Then I should see the message "Something wrong with Open AI service."
+    Then I should see the message "Upload failed."
 
   @usingMockedOpenAiService
   Scenario Outline: Upload fine tuning data to Open AI service
