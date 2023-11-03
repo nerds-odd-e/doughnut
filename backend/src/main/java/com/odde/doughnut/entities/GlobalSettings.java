@@ -15,10 +15,10 @@ public class GlobalSettings {
   private Integer id;
 
   @NotNull
-  @Column(name = "key")
+  @Column(name = "keyName")
   @Getter
   @Setter
-  private String key;
+  private String keyName;
 
   @NotNull
   @Column(name = "value")

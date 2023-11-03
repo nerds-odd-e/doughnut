@@ -11,6 +11,7 @@ import com.odde.doughnut.controllers.json.AiCompletion;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.controllers.json.CurrentModelVersionResponse;
 import com.odde.doughnut.controllers.json.ModelVersionOption;
+import com.odde.doughnut.entities.GlobalSettings;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
@@ -186,9 +187,14 @@ class RestAiControllerTest {
 
     @Test
     void ShouldUseDbSettingsIfExists() {
+      GlobalSettings globalSettings = new GlobalSettings();
+      globalSettings.setKeyName("current_question_generation_model_version");
+      globalSettings.setValue("any-model-version");
+      makeMe.modelFactoryService.globalSettingRepository.save(globalSettings);
+      makeMe.refresh(globalSettings);
       CurrentModelVersionResponse currentModelVersions = controller.getCurrentModelVersions();
       assertEquals(
-          "gpt-3.5-turbol", currentModelVersions.getCurrentQuestionGenerationModelVersion());
+          "any-model-version", currentModelVersions.getCurrentQuestionGenerationModelVersion());
     }
   }
 
