@@ -89,13 +89,9 @@ class RestfulFetch {
 
   async restRequest(url: string, data: JsonData, params: RequestOptions) {
     const response = await request(this.expandUrl(url), data, params);
-    try {
-      const jsonResponse = await response.json();
-      if (response.status === 400) throw new BadRequestError(jsonResponse);
-      return jsonResponse;
-    } catch (e) {
-      return {};
-    }
+    const jsonResponse = await response.json();
+    if (response.status === 400) throw new BadRequestError(jsonResponse);
+    return jsonResponse;
   }
 
   async restRequestWithHtmlResponse(
