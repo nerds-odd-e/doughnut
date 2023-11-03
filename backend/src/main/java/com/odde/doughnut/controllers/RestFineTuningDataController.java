@@ -12,7 +12,6 @@ import com.odde.doughnut.services.FineTuningService;
 import com.theokanning.openai.OpenAiApi;
 import java.io.IOException;
 import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -84,9 +83,8 @@ class RestFineTuningDataController {
     try {
       aiAdvisorService.triggerFineTune(uploadResult.get("Question"));
       aiAdvisorService.triggerFineTune(uploadResult.get("Evaluation"));
-    } catch(Exception e) {
-      throw new OpenAIServiceErrorException(
-        "Training failed.", HttpStatus.BAD_REQUEST);
+    } catch (Exception e) {
+      throw new OpenAIServiceErrorException("Training failed.", HttpStatus.BAD_REQUEST);
     }
   }
 
