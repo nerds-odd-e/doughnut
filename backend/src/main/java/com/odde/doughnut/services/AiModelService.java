@@ -26,8 +26,13 @@ public class AiModelService {
     String currentEvaluationModelVersion =
         getModelVersion(globalSettings, "current_evaluation_model_version");
 
+    String currentOtherModelVersion =
+        getModelVersion(globalSettings, "current_other_model_version");
+
     return new CurrentModelVersionResponse(
-        currentQuestionGenerationModelVersion, currentEvaluationModelVersion, null);
+        currentQuestionGenerationModelVersion,
+        currentEvaluationModelVersion,
+        currentOtherModelVersion);
   }
 
   @NotNull

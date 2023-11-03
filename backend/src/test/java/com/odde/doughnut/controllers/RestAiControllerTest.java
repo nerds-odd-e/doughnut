@@ -184,6 +184,7 @@ class RestAiControllerTest {
       assertEquals(
           "gpt-3.5-turbol", currentModelVersions.getCurrentQuestionGenerationModelVersion());
       assertEquals("gpt-3.5-turbol", currentModelVersions.getCurrentEvaluationModelVersion());
+      assertEquals("gpt-3.5-turbol", currentModelVersions.getCurrentOthersModelVersion());
     }
 
     @Test
@@ -191,12 +192,14 @@ class RestAiControllerTest {
       SetUpGlobalSetting("current_evaluation_model_version", "any-evaluation-model-version");
       SetUpGlobalSetting(
           "current_question_generation_model_version", "any-question-generation-model-version");
+      SetUpGlobalSetting("current_other_model_version", "any-other-model-version");
       CurrentModelVersionResponse currentModelVersions = controller.getCurrentModelVersions();
       assertEquals(
           "any-question-generation-model-version",
           currentModelVersions.getCurrentQuestionGenerationModelVersion());
       assertEquals(
           "any-evaluation-model-version", currentModelVersions.getCurrentEvaluationModelVersion());
+      assertEquals("any-other-model-version", currentModelVersions.getCurrentOthersModelVersion());
     }
 
     private void SetUpGlobalSetting(String keyName, String value) {
