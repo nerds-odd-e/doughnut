@@ -106,5 +106,5 @@ Then("I should be using {string} for {string}", (modelName: string, trainingEngi
 })
 
 Given("OpenAI response {string} when uploading fine tuning data", (result) => {
-  mock_services.openAi().stubOpenAiUploadResponse(result === 'success')
+  mock_services.openAi().stubOpenAiUploadResponse(result === "success")
 })

@@ -178,7 +178,7 @@ const openAiService = () => {
           purpose: "fine-tune",
         })
       } else {
-        return serviceMocker.stubPosterWithError500Response('/v1/files', {})
+        return serviceMocker.stubPosterWithError500Response("/v1/files", {})
       }
     },
     async stubFineTuningStatus(API_Response) {
