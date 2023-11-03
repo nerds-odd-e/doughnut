@@ -40,6 +40,21 @@ class SuggestedQuestionForFineTuningTest {
     assertThat(goodTrainingData.get(2).getFunctionCall().getName(), equalTo("evaluate_question"));
   }
 
+  class LegacyMCQWithAnswer extends MCQWithAnswer {
+    public Integer confidence = 9;
+  }
+
+  @Test
+  void testMCQWithLegacyDataStructure() {
+    MCQWithAnswer legacyMcq = new LegacyMCQWithAnswer();
+    legacyMcq.stem = "stem";
+    suggestedQuestionForFineTuning.preserveQuestion(legacyMcq);
+    OpenAIChatGPTFineTuningExample questionEvaluationFineTuningData =
+        suggestedQuestionForFineTuning.toQuestionEvaluationFineTuningData();
+    List<ChatMessage> goodTrainingData = questionEvaluationFineTuningData.getMessages();
+    assertThat(goodTrainingData.get(1).getContent(), containsString(legacyMcq.stem));
+  }
+
   @Test
   void testFunctionCall() throws JsonProcessingException {
     OpenAIChatGPTFineTuningExample questionEvaluationFineTuningData =
