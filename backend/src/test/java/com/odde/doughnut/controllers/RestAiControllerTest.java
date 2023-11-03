@@ -183,18 +183,28 @@ class RestAiControllerTest {
       CurrentModelVersionResponse currentModelVersions = controller.getCurrentModelVersions();
       assertEquals(
           "gpt-3.5-turbol", currentModelVersions.getCurrentQuestionGenerationModelVersion());
+      assertEquals("gpt-3.5-turbol", currentModelVersions.getCurrentEvaluationModelVersion());
     }
 
     @Test
     void ShouldUseDbSettingsIfExists() {
-      GlobalSettings globalSettings = new GlobalSettings();
-      globalSettings.setKeyName("current_question_generation_model_version");
-      globalSettings.setValue("any-model-version");
-      makeMe.modelFactoryService.globalSettingRepository.save(globalSettings);
-      makeMe.refresh(globalSettings);
+      SetUpGlobalSetting("current_evaluation_model_version", "any-evaluation-model-version");
+      SetUpGlobalSetting(
+          "current_question_generation_model_version", "any-question-generation-model-version");
       CurrentModelVersionResponse currentModelVersions = controller.getCurrentModelVersions();
       assertEquals(
-          "any-model-version", currentModelVersions.getCurrentQuestionGenerationModelVersion());
+          "any-question-generation-model-version",
+          currentModelVersions.getCurrentQuestionGenerationModelVersion());
+      assertEquals(
+          "any-evaluation-model-version", currentModelVersions.getCurrentEvaluationModelVersion());
+    }
+
+    private void SetUpGlobalSetting(String keyName, String value) {
+      GlobalSettings globalSettings1 = new GlobalSettings();
+      globalSettings1.setKeyName(keyName);
+      globalSettings1.setValue(value);
+      makeMe.modelFactoryService.globalSettingRepository.save(globalSettings1);
+      makeMe.refresh(globalSettings1);
     }
   }
 
