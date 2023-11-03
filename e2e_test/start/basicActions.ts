@@ -3,7 +3,7 @@ import { assumeChatAboutNotePage } from "./pageObjects/chatAboutNotePage"
 import { assumeNotePage } from "./pageObjects/notePage"
 import { assumeAnsweredQuestionPage } from "./pageObjects/AnsweredQuestionPage"
 import { assumeQuestionPage } from "./pageObjects/QuizQuestionPage"
-import {assumeAdminEvaluateQuestionModelPage} from "./pageObjects/adminPages/evaluateQuestionModel";
+import { assumeAdminEvaluateQuestionModelPage } from "./pageObjects/adminPages/evaluateQuestionModel"
 
 export default {
   assumeAnsweredQuestionPage,
