@@ -178,7 +178,14 @@ class RestAiControllerTest {
   @Nested
   class GetCurrentModelVersions {
     @Test
-    void ShouldUseGPT35ByDefault() {
+    void ShouldUseGpt35ByDefault() {
+      CurrentModelVersionResponse currentModelVersions = controller.getCurrentModelVersions();
+      assertEquals(
+        "gpt-3.5-turbol", currentModelVersions.getCurrentQuestionGenerationModelVersion());
+    }
+
+    @Test
+    void ShouldUseDbSettingsIfExists() {
       CurrentModelVersionResponse currentModelVersions = controller.getCurrentModelVersions();
       assertEquals(
           "gpt-3.5-turbol", currentModelVersions.getCurrentQuestionGenerationModelVersion());
