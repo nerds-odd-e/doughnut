@@ -74,8 +74,7 @@ public class FineTuningService {
       var uploadResult = openAiApiHandler.Upload(new File(fileName));
       return uploadResult.getId();
     } catch (Exception e) {
-      throw new OpenAIServiceErrorException(
-          "Upload failed.", HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new OpenAIServiceErrorException("Upload failed.", HttpStatus.INTERNAL_SERVER_ERROR);
     } finally {
       Files.delete(file);
     }
