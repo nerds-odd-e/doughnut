@@ -121,3 +121,23 @@ When('I train model with "question generation examples" data based on GPT3.5 mod
 Then("I will see success message {string}", (expectedMessage: string) => {
   cy.findByText(expectedMessage)
 })
+
+Given("there is a question generation model \"question_generation_model\" on my OpenAI account", () => {
+
+})
+
+Given("there is a evaluation model \"evaluation_model\" on my OpenAI account", () => {
+
+})
+
+Given("there will be evaluation result returned from evaluation model", () => {
+
+})
+
+When("I evaluate a question model", () => {
+
+})
+
+Then("I can see evaluation score of the question model", () => {
+
+})
