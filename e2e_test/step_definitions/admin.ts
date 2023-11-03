@@ -112,3 +112,14 @@ Given("OpenAI response {string} when uploading fine tuning data", (result) => {
 Given("OpenAi response {string} when trigger fine tuning data", (result) => {
   mock_services.openAi().stubFineTuningStatus(result === "success")
 })
+
+When("I trigger fine tuning", () => {
+  start
+    .loginAsAdminAndGoToAdminDashboard()
+    .suggestedQuestionsForFineTuning()
+    .triggerFineTuning()
+})
+
+Then("I should see the message {string}", (message: string) => {
+  cy.findByText(message).should("exist")
+})

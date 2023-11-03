@@ -25,15 +25,15 @@ Feature: Trigger fine-tuning directly as admin
 #    | Failed       | Failed           |
 
 
-Scenario Outline: make upload and training progress
+Scenario Outline: Trigger fine tuning with feedbacks for Question model and Evaluation model
   Given I have <positive_count> positive feedbacks and <negative_count> negative feedbacks
   And OpenAI response "<upload_result>" when uploading fine tuning data
   And OpenAi response "<training_result>" when trigger fine tuning data
-#  When I click on the "Trigger Fine Tuning" button
-#  Then I should see the message <message>
+  When I trigger fine tuning
+  Then I should see the message <message>
   Examples:
     | positive_count | negative_count | message                                                | upload_result | training_result |
-#    | 9              | 9              | "You need at least 10 feedbacks to train the AI model" | success       | success        |
-#    | 10             | 10             | "Upload failed"                                        | failed        | success        |
-#    | 10             | 10             | "Training failed"                                      | success       | failed         |
-    | 10             | 10             | "Training is in progress"                              | success       | success        |
+#    | 9              | 9              | "Positive feedback cannot be less than 10." | success       | success        |
+#    | 10             | 10             | "Upload failed."                                        | failed        | success        |
+#    | 10             | 10             | "Training failed."                                      | success       | failed         |
+    | 10             | 10             | "Training is in progress."                              | success       | success        |
