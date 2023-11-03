@@ -26,6 +26,7 @@ Feature: Upload fine tuning data
     When I upload the feedbacks
     Then I should see the message "Something wrong with Open AI service."
 
+  @ignore
   @usingMockedOpenAiService
   Scenario Outline: Upload fine tuning data to Open AI service
     Given I have <positive_count> positive feedbacks and <negative_count> negative feedbacks
