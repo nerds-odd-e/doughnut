@@ -44,21 +44,38 @@
     </div>
   </div>
 </template>
-<script setup>
+<script lang="ts" setup>
 import { ref, onMounted } from "vue";
 import DropdownList from "../form/Select.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
+interface ModelData {
+  list: Generated.ModelVersionOption[];
+
+  selected: string;
+
+  training_engine: string;
+}
+
 const { api } = useLoadingApi();
-const trainingList = ref([]);
+const trainingList = ref<ModelData[]>([]);
 
 onMounted(() => {
   Promise.all([api.ai.getManageModel(), api.ai.getManageModelSelected()]).then(
     (results) => {
       const [modelListRes, selectedModelRes] = results;
-      const modelList = [{ label: "---" }, ...modelListRes];
+      const emptyOption: Generated.ModelVersionOption = {
+        label: "---",
+        key: "",
+        value: "",
+      };
+      const modelList: Generated.ModelVersionOption[] = [
+        emptyOption,
+        ...modelListRes,
+      ];
 
-      const trainingListTmp = [];
+      const trainingListTmp: ModelData[] = [];
+
       trainingListTmp.push({
         list: modelList,
         selected: selectedModelRes.currentQuestionGenerationModelVersion,
