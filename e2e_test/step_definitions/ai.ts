@@ -129,5 +129,5 @@ When("I evaluate a question model", () => {
 })
 
 Then("I can see evaluation score of the question model", () => {
-  start.assumeAdminEvaluateQuestionModelPage().newScoreWillBe("66%");
+  start.assumeAdminEvaluateQuestionModelPage().newScoreWillBe("66%")
 })

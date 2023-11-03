@@ -114,10 +114,7 @@ Given("OpenAi response {string} when trigger fine tuning data", (result) => {
 })
 
 When("I trigger fine tuning", () => {
-  start
-    .loginAsAdminAndGoToAdminDashboard()
-    .suggestedQuestionsForFineTuning()
-    .triggerFineTuning()
+  start.loginAsAdminAndGoToAdminDashboard().suggestedQuestionsForFineTuning().triggerFineTuning()
 })
 
 Then("I should see the message {string}", (message: string) => {
