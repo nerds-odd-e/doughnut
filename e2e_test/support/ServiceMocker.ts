@@ -49,6 +49,10 @@ class ServiceMocker {
   public stubGetterWithError500Response(pathMatcher: string, response: unknown) {
     return this.mountebank.stubWithErrorResponse(pathMatcher, HttpMethod.GET, 500, response)
   }
+
+  public stubPosterWithError500Response(pathMatcher: string, response: unknown) {
+    return this.mountebank.stubWithErrorResponse(pathMatcher, HttpMethod.POST, 500, response)
+  }
 }
 
 export default ServiceMocker

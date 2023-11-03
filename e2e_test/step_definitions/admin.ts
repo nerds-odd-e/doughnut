@@ -105,6 +105,6 @@ Then("I should be using {string} for {string}", (modelName: string, trainingEngi
     .assumeSelectionWithDefaultOption(modelName, trainingEngine)
 })
 
-Given("OpenAI response success when uploading fine tuning data", () => {
-  mock_services.openAi().stubOpenAiUploadResponse()
+Given("OpenAI response {string} when uploading fine tuning data", (result) => {
+  mock_services.openAi().stubOpenAiUploadResponse(result === 'success')
 })
