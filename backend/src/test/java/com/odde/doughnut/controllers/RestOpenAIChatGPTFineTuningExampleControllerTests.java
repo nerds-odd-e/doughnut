@@ -18,6 +18,7 @@ import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.file.File;
+import com.theokanning.openai.fine_tuning.FineTuningJob;
 import io.reactivex.Single;
 import java.io.IOException;
 import java.util.List;
@@ -28,7 +29,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -71,19 +71,14 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
     @Test
     void shouldSuccessWhen10FeedbackAndUploadFile() throws IOException {
       mockFeedback(11);
-      File fakeResponse = Mockito.mock(File.class);
+      File fakeResponse = new File();
+      fakeResponse.setId("TestFileId");
       when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
           .thenReturn(Single.just(fakeResponse));
       assertDoesNotThrow(
           () -> {
             controller.uploadFineTuningExamples();
           });
-    }
-
-    private void mockFeedback(int count) {
-      for (int i = 0; i < count; i++) {
-        makeMe.aQuestionSuggestionForFineTunining().positive().please();
-      }
     }
 
     @Test
@@ -104,6 +99,44 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
               OpenAIServiceErrorException.class,
               () -> {
                 controller.uploadFineTuningExamples();
+              });
+      assertEquals(result.getMessage(), "Something wrong with Open AI service.");
+    }
+
+    @Test
+    void shouldSuccessWhen10FeedbackAndUploadFileAndTriggerFineTune() throws IOException {
+      mockFeedback(11);
+      File fakeResponse = new File();
+      fakeResponse.setId("TestFileId");
+      FineTuningJob fakeFineTuningResponse = new FineTuningJob();
+      fakeFineTuningResponse.setStatus("success");
+      when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
+          .thenReturn(Single.just(fakeResponse));
+      when(openAiApi.createFineTuningJob(any())).thenReturn(Single.just(fakeFineTuningResponse));
+      assertDoesNotThrow(
+          () -> {
+            controller.uploadAndTriggerFineTuning();
+          });
+    }
+
+    @Test
+    void shouldFailWhenNoFeedbackAndTriggerFineTune() throws IOException {
+      var result =
+          assertThrows(
+              OpenAIServiceErrorException.class, () -> controller.uploadAndTriggerFineTuning());
+      assertEquals(result.getMessage(), "Positive feedback cannot be less than 10.");
+    }
+
+    @Test
+    void whenOpenAiServiceFailShouldGetFailMessageAndTriggerFineTune() throws IOException {
+      mockFeedback(10);
+      when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
+          .thenThrow(new RuntimeException());
+      var result =
+          assertThrows(
+              OpenAIServiceErrorException.class,
+              () -> {
+                controller.uploadAndTriggerFineTuning();
               });
       assertEquals(result.getMessage(), "Something wrong with Open AI service.");
     }
@@ -155,6 +188,12 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
           controller.getAllPositiveFeedbackQuestionGenerationFineTuningExamples();
 
       assertEquals(0, goodOpenAIChatGPTFineTuningExampleList.size());
+    }
+
+    private void mockFeedback(int count) {
+      for (int i = 0; i < count; i++) {
+        makeMe.aQuestionSuggestionForFineTunining().positive().please();
+      }
     }
   }
 

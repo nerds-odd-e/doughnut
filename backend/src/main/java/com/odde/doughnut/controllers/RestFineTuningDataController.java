@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.FineTuningService;
 import com.theokanning.openai.OpenAiApi;
 import java.io.IOException;
@@ -21,12 +22,14 @@ class RestFineTuningDataController {
   private final ModelFactoryService modelFactoryService;
   private final UserModel currentUser;
   private final FineTuningService fineTuningService;
+  private final AiAdvisorService aiAdvisorService;
 
   public RestFineTuningDataController(
       ModelFactoryService modelFactoryService, UserModel currentUser, OpenAiApi openAiApi) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.fineTuningService = new FineTuningService(this.modelFactoryService, openAiApi);
+    this.aiAdvisorService = new AiAdvisorService(openAiApi);
   }
 
   @PatchMapping("/{suggestedQuestion}/update-suggested-question-for-fine-tuning")
@@ -70,6 +73,13 @@ class RestFineTuningDataController {
   @GetMapping("/upload-fine-tuning-examples")
   public void uploadFineTuningExamples() throws IOException {
     fineTuningService.uploadFineTuningExamples();
+  }
+
+  @PostMapping("/upload-and-trigger-fine-tuning")
+  public void uploadAndTriggerFineTuning() throws IOException {
+    var uploadResult = fineTuningService.uploadFineTuningExamples();
+    aiAdvisorService.triggerFineTune(uploadResult.get("Question"));
+    aiAdvisorService.triggerFineTune(uploadResult.get("Evaluation"));
   }
 
   @GetMapping("/feedback-evaluation-examples")
