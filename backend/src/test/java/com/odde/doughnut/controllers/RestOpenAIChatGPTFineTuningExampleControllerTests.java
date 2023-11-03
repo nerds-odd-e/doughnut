@@ -100,7 +100,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
               () -> {
                 controller.uploadFineTuningExamples();
               });
-      assertEquals(result.getMessage(), "Something wrong with Open AI service.");
+      assertEquals(result.getMessage(), "Upload failed.");
     }
 
     @Test
@@ -138,7 +138,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
               () -> {
                 controller.uploadAndTriggerFineTuning();
               });
-      assertEquals(result.getMessage(), "Something wrong with Open AI service.");
+      assertEquals(result.getMessage(), "Upload failed.");
     }
 
     @Test

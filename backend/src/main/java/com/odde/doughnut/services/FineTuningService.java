@@ -75,7 +75,7 @@ public class FineTuningService {
       return uploadResult.getId();
     } catch (Exception e) {
       throw new OpenAIServiceErrorException(
-          "Something wrong with Open AI service.", HttpStatus.INTERNAL_SERVER_ERROR);
+          "Upload failed.", HttpStatus.INTERNAL_SERVER_ERROR);
     } finally {
       Files.delete(file);
     }
