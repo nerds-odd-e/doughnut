@@ -193,11 +193,6 @@ declare namespace Generated {
         adjustment: number;
     }
 
-    interface UploadFineTuningExamplesResponse {
-        message: string;
-        success: boolean;
-    }
-
     interface UserForOtherUserView {
         name: string;
     }
