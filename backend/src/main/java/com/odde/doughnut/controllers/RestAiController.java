@@ -28,6 +28,7 @@ public class RestAiController {
 
   private final AiAdvisorService aiAdvisorService;
   private final ModelFactoryService modelFactoryService;
+  private final AiModelService aiModelService;
   private UserModel currentUser;
 
   public RestAiController(
@@ -37,6 +38,7 @@ public class RestAiController {
     this.aiAdvisorService = new AiAdvisorService(openAiApi);
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
+    this.aiModelService = new AiModelService(modelFactoryService);
   }
 
   @PostMapping("/{note}/completion")
@@ -89,7 +91,6 @@ public class RestAiController {
 
   @GetMapping("/current-model-version")
   public CurrentModelVersionResponse getCurrentModelVersions() {
-    AiModelService aiModelService = new AiModelService();
     return aiModelService.getCurrentModelVersions();
   }
 }
