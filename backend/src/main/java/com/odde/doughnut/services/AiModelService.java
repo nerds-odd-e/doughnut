@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.GlobalSettings;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.util.ArrayList;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 public class AiModelService {
 
@@ -20,12 +21,23 @@ public class AiModelService {
     all.forEach(globalSettings::add);
 
     String currentQuestionGenerationModelVersion =
+        getModelVersion(globalSettings, "current_question_generation_model_version");
+
+    String currentEvaluationModelVersion =
+        getModelVersion(globalSettings, "current_evaluation_model_version");
+
+    return new CurrentModelVersionResponse(
+        currentQuestionGenerationModelVersion, currentEvaluationModelVersion, null);
+  }
+
+  @NotNull
+  private static String getModelVersion(List<GlobalSettings> globalSettings, String keyName) {
+    String currentEvaluationModelVersion =
         globalSettings.stream()
-            .filter(g -> g.getKeyName().equals("current_question_generation_model_version"))
+            .filter(g -> g.getKeyName().equals(keyName))
             .findFirst()
             .map(GlobalSettings::getValue)
             .orElse("gpt-3.5-turbol");
-
-    return new CurrentModelVersionResponse(currentQuestionGenerationModelVersion, "gpt-3.5", null);
+    return currentEvaluationModelVersion;
   }
 }
