@@ -82,28 +82,23 @@ Given(
 Given(
   "I am logged in as an admin and click AdminDashboard and go to tab {string}",
   (tabName: string) => {
-    start.loginAsAdminAndGoToAdminDashboard().goToModelManagementTab(tabName)
+    start.loginAsAdminAndGoToAdminDashboard().goToTabInAdminDashboard(tabName)
   },
 )
 
 When("I choose {string} for {string} use", (modelName: string, trainingEngine: string) => {
-  cy.get("select[name='" + trainingEngine + "']").select(modelName)
-  cy.get(".saveBtn").click()
+  start.assumeAdminDashboardPage().chooseModelNameInEngine(modelName, trainingEngine)
 })
 
 Then(
   "I can choose model {string} from GPT in {string} dropdown list",
   (modelName: string, trainingEngine: string) => {
-    cy.get("select[name='" + trainingEngine + "']").select(modelName)
+    start.assumeAdminDashboardPage().assumeAdminCanSeeModelOption(modelName, trainingEngine)
   },
 )
 
 Then("I should be using {string} for {string}", (modelName: string, trainingEngine: string) => {
-  cy.findByText("Failure Reports").click()
-  cy.findByText("Manage Model").click()
-  cy.get("select[name='" + modelName + "']")
-    .find("option:selected")
-    .should("have.text", trainingEngine)
+  start.assumeAdminDashboardPage().goToTabInAdminDashboard("Failure Reports").goToTabInAdminDashboard("Manage Model").assumeSelectionWithDefaultOption(modelName, trainingEngine)
 })
 
 Given("OpenAI response success when uploading fine tuning data", () => {
