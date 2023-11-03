@@ -181,13 +181,13 @@ const openAiService = () => {
         return serviceMocker.stubPosterWithError500Response("/v1/files", {})
       }
     },
-    async stubFineTuningStatus(API_Response) {
+    async stubFineTuningStatus(shouldSuccess: boolean) {
       const predicate = new FlexiPredicate()
         .withOperator(Operator.matches)
         .withPath(`/v1/fine_tuning/jobs`)
         .withMethod(HttpMethod.POST)
 
-      if (API_Response === "Successful") {
+      if (shouldSuccess) {
         return await serviceMocker.mockWithPredicate(predicate, {
           object: "fine_tuning.job",
           id: "ftjob-abc123",
