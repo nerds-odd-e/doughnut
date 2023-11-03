@@ -131,14 +131,8 @@ Given('there is a evaluation model "evaluation_model" on my OpenAI account', () 
 
 Given("there will be evaluation result returned from evaluation model", () => {})
 
-When("I evaluate a question model", () => {})
-
-Then("I can see evaluation score of the question model", () => {})
-
-})
-
 When("I evaluate a question model", () => {
-
+  cy.findAllByText("Trigger").first().click()
 })
 
 Then("I can see evaluation score of the question model", () => {
