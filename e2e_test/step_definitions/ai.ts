@@ -134,3 +134,13 @@ Given("there will be evaluation result returned from evaluation model", () => {}
 When("I evaluate a question model", () => {})
 
 Then("I can see evaluation score of the question model", () => {})
+
+})
+
+When("I evaluate a question model", () => {
+
+})
+
+Then("I can see evaluation score of the question model", () => {
+  cy.findByText("66%")
+})

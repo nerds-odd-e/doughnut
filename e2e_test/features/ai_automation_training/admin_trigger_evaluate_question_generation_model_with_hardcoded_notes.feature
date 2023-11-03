@@ -10,7 +10,7 @@ Feature: Trigger evaluate question generation model with hardcoded notes as admi
     And there is a evaluation model "evaluation_model" on my OpenAI account
     And I am logged in as an admin and click AdminDashboard and go to tab "Evaluate Question Model"
 
-  Scenario:
+  Scenario: Trigger evaluate question generation model with hardcoded notes as admin
       Given there will be evaluation result returned from evaluation model
       When I evaluate a question model
       Then I can see evaluation score of the question model
