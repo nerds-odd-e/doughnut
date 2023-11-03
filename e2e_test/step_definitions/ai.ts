@@ -122,7 +122,9 @@ Given(
 
 Given('there is a evaluation model "evaluation_model" on my OpenAI account', () => {})
 
-Given("there will be evaluation result returned from evaluation model", () => {})
+Given("there will be evaluation result returned from evaluation model", () => {
+
+})
 
 When("I evaluate a question model", () => {
   start.assumeAdminEvaluateQuestionModelPage().triggerEvaluate()

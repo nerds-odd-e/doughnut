@@ -9,20 +9,41 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>QM_1.8</td>
-          <td>66%</td>
-          <td><button>Trigger</button></td>
-        </tr>
-        <tr>
-          <td>QM_1.9</td>
-          <td>-</td>
-          <td><button>Trigger</button></td>
+        <tr v-for="questionModel in questionModels" :key="questionModel.id">
+          <td>{{ questionModel.name }}</td>
+          <td>{{ questionModel.score ? questionModel.score : "-" }}%</td>
+          <td>
+            <button @click="triggerEvaluation(questionModel)">Trigger</button>
+          </td>
         </tr>
       </tbody>
     </table>
   </div>
 </template>
-<script setup lang="ts"></script>
+<script lang="ts">
+import useLoadingApi from "../../managedApi/useLoadingApi";
+
+export default {
+  setup() {
+    return useLoadingApi();
+  },
+  data() {
+    return {
+      questionModels: [
+        {
+          id: "question_model_1",
+          name: "QM_1.8",
+          score: null,
+        },
+      ],
+    };
+  },
+  methods: {
+    async triggerEvaluation(model) {
+      model.score = await this.api.ai.evaluateQuestionModel();
+    },
+  },
+};
+</script>
 
 <style scoped></style>
