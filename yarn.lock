@@ -61,35 +61,35 @@
     minimatch "^3.0.4"
     node-hook "^1.0.0"
 
-"@badeball/cypress-cucumber-preprocessor@^18.0":
-  version "18.0.6"
-  resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-18.0.6.tgz#04cf988d4f46492d52923af251973e0ebd0fe990"
-  integrity sha512-YvFfvO8CQIn9J17Ff1eixm2tvwtjxVIiKpKwZ4MJsd089y6sDkMYn/jw7zMNXJQQPHKFlDCrBSCXxH8hMps+tQ==
+"@badeball/cypress-cucumber-preprocessor@^19.0":
+  version "19.0.0"
+  resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-19.0.0.tgz#8492394432ed0fcf6282e5db9ebeb54f4f844494"
+  integrity sha512-WyijT0oikPv+mv5v7v7IwBpxB9Pz7nK4Yj03i8IOQhkr4hA6ue/dnBzPFk+tqXM9u7Y4HwVLGDqy+O31rwQQow==
   dependencies:
     "@badeball/cypress-configuration" "^6.1.0"
-    "@cucumber/cucumber" "^9.1.0"
-    "@cucumber/cucumber-expressions" "^16.1.2"
-    "@cucumber/gherkin" "^26.2.0"
-    "@cucumber/html-formatter" "^20.3.0"
+    "@cucumber/cucumber" "^10.0.0"
+    "@cucumber/cucumber-expressions" "^17.0.0"
+    "@cucumber/gherkin" "^27.0.0"
+    "@cucumber/html-formatter" "^20.4.0"
     "@cucumber/message-streams" "^4.0.1"
     "@cucumber/messages" "^22.0.0"
     "@cucumber/pretty-formatter" "^1.0.0"
-    "@cucumber/tag-expressions" "^5.0.1"
+    "@cucumber/tag-expressions" "^6.0.0"
     base64-js "^1.5.1"
     chalk "^4.1.2"
     cli-table "^0.3.11"
     common-ancestor-path "^1.0.1"
-    cosmiconfig "^8.1.3"
+    cosmiconfig "^8.3.6"
     debug "^4.3.4"
     error-stack-parser "^2.1.4"
-    esbuild "^0.19.0"
-    glob "^10.2.2"
+    esbuild "^0.19.4"
+    glob "^10.3.10"
     is-path-inside "^3.0.3"
     mocha "^10.2.0"
     seedrandom "^3.0.5"
     source-map "^0.7.4"
     split "^1.0.1"
-    uuid "^9.0.0"
+    uuid "^9.0.1"
 
 "@bahmutov/cypress-esbuild-preprocessor@^2.2.0":
   version "2.2.0"
@@ -113,14 +113,21 @@
   resolved "https://registry.yarnpkg.com/@cucumber/ci-environment/-/ci-environment-9.2.0.tgz#3942f39d6a7595295256d97a88d39d02469ba50f"
   integrity sha512-jLzRtVwdtNt+uAmTwvXwW9iGYLEOJFpDSmnx/dgoMGKXUWRx1UHT86Q696CLdgXO8kyTwsgJY0c6n5SW9VitAA==
 
-"@cucumber/cucumber-expressions@16.1.2", "@cucumber/cucumber-expressions@^16.1.2":
+"@cucumber/cucumber-expressions@16.1.2":
   version "16.1.2"
   resolved "https://registry.yarnpkg.com/@cucumber/cucumber-expressions/-/cucumber-expressions-16.1.2.tgz#8c7200a4490b48a0309f5cc4e058cf6578b5b578"
   integrity sha512-CfHEbxJ5FqBwF6mJyLLz4B353gyHkoi6cCL4J0lfDZ+GorpcWw4n2OUAdxJmP7ZlREANWoTFlp4FhmkLKrCfUA==
   dependencies:
     regexp-match-indices "1.0.2"
 
-"@cucumber/cucumber@^10.0":
+"@cucumber/cucumber-expressions@^17.0.0":
+  version "17.0.0"
+  resolved "https://registry.yarnpkg.com/@cucumber/cucumber-expressions/-/cucumber-expressions-17.0.0.tgz#282d8468a4e4a196884d029776374d9ec2b74d63"
+  integrity sha512-0r4+dD52jRnIt6pET/LxQ4tunTGOW/rtjeykw6Wr6naBiPZRY0VA0bqF1AgSVLeNb0yhuZaCbXelTUe/T6riuw==
+  dependencies:
+    regexp-match-indices "1.0.2"
+
+"@cucumber/cucumber@^10.0", "@cucumber/cucumber@^10.0.0":
   version "10.0.1"
   resolved "https://registry.yarnpkg.com/@cucumber/cucumber/-/cucumber-10.0.1.tgz#b530c8da5b411d67daea58225fc48de38606f9d1"
   integrity sha512-g7W7SQnNMSNnMRQVGubjefCxdgNFyq4P3qxT2Ve7Xhh8ZLoNkoRDcWsyfKQVWnxNfgW3aGJmxbucWRoTi+ZUqg==
@@ -167,52 +174,6 @@
     yaml "^2.2.2"
     yup "1.2.0"
 
-"@cucumber/cucumber@^9.1.0":
-  version "9.6.0"
-  resolved "https://registry.yarnpkg.com/@cucumber/cucumber/-/cucumber-9.6.0.tgz#7653b6bb2dc417ac21bf81711f6c8c2f376b0cd0"
-  integrity sha512-bCw2uJdGHHLg4B3RoZpLzx0RXyXURmPe+swtdK1cGoA8rs+vv+/6osifcNwvFM2sv0nQ91+gDACSrXK7AHCylg==
-  dependencies:
-    "@cucumber/ci-environment" "9.2.0"
-    "@cucumber/cucumber-expressions" "16.1.2"
-    "@cucumber/gherkin" "26.2.0"
-    "@cucumber/gherkin-streams" "5.0.1"
-    "@cucumber/gherkin-utils" "8.0.2"
-    "@cucumber/html-formatter" "20.4.0"
-    "@cucumber/message-streams" "4.0.1"
-    "@cucumber/messages" "22.0.0"
-    "@cucumber/tag-expressions" "5.0.1"
-    assertion-error-formatter "^3.0.0"
-    capital-case "^1.0.4"
-    chalk "^4.1.2"
-    cli-table3 "0.6.3"
-    commander "^10.0.0"
-    debug "^4.3.4"
-    error-stack-parser "^2.1.4"
-    figures "^3.2.0"
-    glob "^7.1.6"
-    has-ansi "^4.0.1"
-    indent-string "^4.0.0"
-    is-installed-globally "^0.4.0"
-    is-stream "^2.0.0"
-    knuth-shuffle-seeded "^1.0.6"
-    lodash.merge "^4.6.2"
-    lodash.mergewith "^4.6.2"
-    luxon "3.2.1"
-    mkdirp "^2.1.5"
-    mz "^2.7.0"
-    progress "^2.0.3"
-    resolve-pkg "^2.0.0"
-    semver "7.5.3"
-    string-argv "^0.3.1"
-    strip-ansi "6.0.1"
-    supports-color "^8.1.1"
-    tmp "^0.2.1"
-    util-arity "^1.1.0"
-    verror "^1.10.0"
-    xmlbuilder "^15.1.1"
-    yaml "^2.2.2"
-    yup "1.2.0"
-
 "@cucumber/gherkin-streams@5.0.1":
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/@cucumber/gherkin-streams/-/gherkin-streams-5.0.1.tgz#8c2142d295cd05644456be7282b4bd756c95c4cd"
@@ -232,7 +193,7 @@
     commander "9.4.1"
     source-map-support "^0.5.21"
 
-"@cucumber/gherkin@26.2.0", "@cucumber/gherkin@^26.2.0":
+"@cucumber/gherkin@26.2.0":
   version "26.2.0"
   resolved "https://registry.yarnpkg.com/@cucumber/gherkin/-/gherkin-26.2.0.tgz#256129ef5e4d1cba87a673ce78d7296809d1e4c9"
   integrity sha512-iRSiK8YAIHAmLrn/mUfpAx7OXZ7LyNlh1zT89RoziSVCbqSVDxJS6ckEzW8loxs+EEXl0dKPQOXiDmbHV+C/fA==
@@ -246,7 +207,14 @@
   dependencies:
     "@cucumber/messages" "^19.1.4"
 
-"@cucumber/html-formatter@20.4.0", "@cucumber/html-formatter@^20.3.0":
+"@cucumber/gherkin@^27.0.0":
+  version "27.0.0"
+  resolved "https://registry.yarnpkg.com/@cucumber/gherkin/-/gherkin-27.0.0.tgz#792b7c1b9eb91dd6fba5aca889ac27a6ceaaf794"
+  integrity sha512-j5rCsjqzRiC3iVTier3sa0kzyNbkcAmF7xr7jKnyO7qDeK3Z8Ye1P3KSVpeQRMY+KCDJ3WbTDdyxH0FwfA/fIw==
+  dependencies:
+    "@cucumber/messages" ">=19.1.4 <=22"
+
+"@cucumber/html-formatter@20.4.0", "@cucumber/html-formatter@^20.4.0":
   version "20.4.0"
   resolved "https://registry.yarnpkg.com/@cucumber/html-formatter/-/html-formatter-20.4.0.tgz#ac3d24ed6c6127b07024f5bf869836e6ec7265db"
   integrity sha512-TnLSXC5eJd8AXHENo69f5z+SixEVtQIf7Q2dZuTpT/Y8AOkilGpGl1MQR1Vp59JIw+fF3EQSUKdf+DAThCxUNg==
@@ -291,10 +259,10 @@
   resolved "https://registry.yarnpkg.com/@cucumber/tag-expressions/-/tag-expressions-5.0.1.tgz#94ed2299eaa9085f113d71cb4da1186ad57b3de9"
   integrity sha512-N43uWud8ZXuVjza423T9ZCIJsaZhFekmakt7S9bvogTxqdVGbRobjR663s0+uW0Rz9e+Pa8I6jUuWtoBLQD2Mw==
 
-"@cucumber/tag-expressions@^5.0.1":
-  version "5.0.6"
-  resolved "https://registry.yarnpkg.com/@cucumber/tag-expressions/-/tag-expressions-5.0.6.tgz#da552ea3a66c67435e992aa9e5b39123fb39fa94"
-  integrity sha512-IWeUm73mJCv+Wv35nD+OX37C2U7ljRaRUWj1mSbZLAY8Zwgc+bwbS667y88WpBNhznxWwXyBd+k5sZk8O+aXJQ==
+"@cucumber/tag-expressions@^6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@cucumber/tag-expressions/-/tag-expressions-6.0.0.tgz#f17ece58c5a78c2aa65098f9905e63e2abd7895d"
+  integrity sha512-JbNb/254Wn6b8cfrIJoqR0NekHXvoB/eMvSY4RK11H8k+YZfm7mZesu/3yVX67nkW+Y+PGjZFcgTMcfjwFRsRw==
 
 "@cypress/request@^3.0.0":
   version "3.0.1"
@@ -655,16 +623,16 @@
     "@types/node" "*"
 
 "@types/node@*", "@types/node@^20":
-  version "20.8.9"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.8.9.tgz#646390b4fab269abce59c308fc286dcd818a2b08"
-  integrity sha512-UzykFsT3FhHb1h7yD4CA4YhBHq545JC0YnEz41xkipN88eKQtL6rSgocL5tbAP6Ola9Izm/Aw4Ora8He4x0BHg==
+  version "20.8.10"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.8.10.tgz#a5448b895c753ae929c26ce85cab557c6d4a365e"
+  integrity sha512-TlgT8JntpcbmKUFzjhsyhGfP2fsiz1Mv56im6enJ905xG1DAYesxJaeSbGqQmAw8OWPdhyJGhGSQGKRNJ45u9w==
   dependencies:
     undici-types "~5.26.4"
 
 "@types/node@^18.17.5":
-  version "18.18.7"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.18.7.tgz#bb3a7068dc4ba421b6968f2a259298b3a4e129e8"
-  integrity sha512-bw+lEsxis6eqJYW8Ql6+yTqkE6RuFtsQPSe5JxXbqYRFQEER5aJA9a5UH9igqDWm3X4iLHIKOHlnAXLM4mi7uQ==
+  version "18.18.8"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.18.8.tgz#2b285361f2357c8c8578ec86b5d097c7f464cfd6"
+  integrity sha512-OLGBaaK5V3VRBS1bAkMVP2/W9B+H8meUfl866OrMNQqt7wDgdpWPp5o6gmIc9pB+lIQHSq4ZL8ypeH1vPxcPaQ==
   dependencies:
     undici-types "~5.26.4"
 
@@ -1562,7 +1530,7 @@ cors@2.8.5:
     object-assign "^4"
     vary "^1"
 
-cosmiconfig@^8.1.3:
+cosmiconfig@^8.3.6:
   version "8.3.6"
   resolved "https://registry.yarnpkg.com/cosmiconfig/-/cosmiconfig-8.3.6.tgz#060a2b871d66dba6c8538ea1118ba1ac16f5fae3"
   integrity sha512-kcZ6+W5QzcJ3P1Mt+83OUv/oHFqZHIx8DuxG6eZ5RGMERoLqp4BuGjhHLYGK+Kf5XVkQvqBSmAy/nGWN3qDgEA==
@@ -2214,7 +2182,7 @@ esbuild@^0.14.23:
     esbuild-windows-64 "0.14.54"
     esbuild-windows-arm64 "0.14.54"
 
-esbuild@^0.19, esbuild@^0.19.0:
+esbuild@^0.19, esbuild@^0.19.4:
   version "0.19.5"
   resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.19.5.tgz#53a0e19dfbf61ba6c827d51a80813cf071239a8c"
   integrity sha512-bUxalY7b1g8vNhQKdB24QDmHeY4V4tw/s6Ak5z+jJX9laP5MoQseTOMemAr0gxssjNcH0MCViG8ONI2kksvfFQ==
@@ -2891,7 +2859,7 @@ glob@7.2.0:
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
-glob@^10.2.2, glob@^10.3.10:
+glob@^10.3.10:
   version "10.3.10"
   resolved "https://registry.yarnpkg.com/glob/-/glob-10.3.10.tgz#0351ebb809fd187fe421ab96af83d3a70715df4b"
   integrity sha512-fa46+tv1Ak0UPK1TOy/pZrIybNNt4HCv7SDzwyfiOZkvZLEbjsZkJBPtDHVshZjbecAoAGSC20MjLDG/qr679g==
@@ -5605,9 +5573,9 @@ universalify@^1.0.0:
   integrity sha512-rb6X1W158d7pRQBg5gkR8uPaSfiids68LTJQYOtEUhoJUWBdaQHsuT/EUduxXYxcrt4r5PJ4fuHW1MHT6p0qug==
 
 universalify@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/universalify/-/universalify-2.0.0.tgz#75a4984efedc4b08975c5aeb73f530d02df25717"
-  integrity sha512-hAZsKq7Yy11Zu1DE0OzWjw7nnLZmJZYTDZZyEFHZdUhV8FkH5MCfoU1XMaxXovpyW5nq5scPqq0ZDP9Zyl04oQ==
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/universalify/-/universalify-2.0.1.tgz#168efc2180964e6386d061e094df61afe239b18d"
+  integrity sha512-gptHNQghINnc/vTGIk0SOFGFNXw7JVrlRUtConJRlvaw6DuX0wO5Jeko9sWrMBhh+PsYAZ7oXAiOnf/UKogyiw==
 
 unpipe@1.0.0, unpipe@~1.0.0:
   version "1.0.0"
@@ -5666,7 +5634,7 @@ uuid@^8.3.2:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.3.2.tgz#80d5b5ced271bb9af6c445f21a1a04c606cefbe2"
   integrity sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==
 
-uuid@^9.0.0:
+uuid@^9.0.1:
   version "9.0.1"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-9.0.1.tgz#e188d4c8853cc722220392c424cd637f32293f30"
   integrity sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==
@@ -5887,9 +5855,9 @@ yallist@^4.0.0:
   integrity sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==
 
 yaml@^2.2.2:
-  version "2.3.3"
-  resolved "https://registry.yarnpkg.com/yaml/-/yaml-2.3.3.tgz#01f6d18ef036446340007db8e016810e5d64aad9"
-  integrity sha512-zw0VAJxgeZ6+++/su5AFoqBbZbrEakwu+X0M5HmcwUiBL7AzcuPKjj5we4xfQLp78LkEMpD0cOnUhmgOVy3KdQ==
+  version "2.3.4"
+  resolved "https://registry.yarnpkg.com/yaml/-/yaml-2.3.4.tgz#53fc1d514be80aabf386dc6001eb29bf3b7523b2"
+  integrity sha512-8aAvwVUSHpfEqTQ4w/KMlf3HcRdt50E5ODIQJBw1fQ5RL34xabzxtUlzTXVqc4rkZsPbvrXKWnABCD7kWSmocA==
 
 yargs-parser@20.2.4:
   version "20.2.4"
