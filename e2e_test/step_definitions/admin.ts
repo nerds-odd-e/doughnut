@@ -98,7 +98,11 @@ Then(
 )
 
 Then("I should be using {string} for {string}", (modelName: string, trainingEngine: string) => {
-  start.assumeAdminDashboardPage().goToTabInAdminDashboard("Failure Reports").goToTabInAdminDashboard("Manage Model").assumeSelectionWithDefaultOption(modelName, trainingEngine)
+  start
+    .assumeAdminDashboardPage()
+    .goToTabInAdminDashboard("Failure Reports")
+    .goToTabInAdminDashboard("Manage Model")
+    .assumeSelectionWithDefaultOption(modelName, trainingEngine)
 })
 
 Given("OpenAI response success when uploading fine tuning data", () => {
