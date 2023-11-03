@@ -9,10 +9,9 @@ Feature: admin see latest models list
 
   @ignore
   Scenario: change question generation model for GPT4
-    When I choose "gpt-4" for "Question Generation" use
-    Then I should be using "Question Generation" for "gpt-4"
+    When I choose "gpt-4-0314" for "Question Generation" use
+    Then I should be using "Question Generation" for "gpt-4-0314"
 
-  @ignore
   Scenario: load tab manage model
     Then I can choose model "gpt-3.5-turbo" from GPT in "Question Generation" dropdown list
 

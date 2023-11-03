@@ -16,9 +16,35 @@ export function assumeAdminDashboardPage() {
       return adminFineTuningPage()
     },
 
-    goToModelManagementTab(tabName: string) {
+    goToTabInAdminDashboard(tabName:string) {
       cy.findByText(tabName).click()
+
+      switch (tabName) {
+        case "Failure Reports":
+          cy.findByText("Failure report list")
+          break
+        case "Manage Model":
+          cy.get("select[name='Question Generation']").should('contains.text', '---');
+          break
+      }
+
+      return assumeAdminDashboardPage()
+    },
+
+    chooseModelNameInEngine(modelName:string, trainingEngine:string) {
+      cy.get("select[name='" + trainingEngine + "']").select(modelName)
+      cy.get(".saveBtn").click()
       return {}
     },
+
+    assumeAdminCanSeeModelOption(modelName:string, trainingEngine:string) {
+      cy.get("select[name='" + trainingEngine + "']").select(modelName)
+    },
+
+    assumeSelectionWithDefaultOption(modelName:string, trainingEngine:string) {
+      cy.get("select[name='" + modelName + "']")
+        .find("option:selected")
+        .should("have.text", trainingEngine)
+    }
   }
 }
