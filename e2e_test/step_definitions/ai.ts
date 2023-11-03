@@ -114,13 +114,7 @@ Then("I will see a list of files", () => {
 })
 
 When('I choose the file "question generation examples"', () => {})
-When('I train model with "question generation examples" data based on GPT3.5 model', () => {
-  cy.findByText("Trigger Fine Tuning").click()
-})
 
-Then("I will see success message {string}", (expectedMessage: string) => {
-  cy.findByText(expectedMessage)
-})
 
 Given(
   'there is a question generation model "question_generation_model" on my OpenAI account',
