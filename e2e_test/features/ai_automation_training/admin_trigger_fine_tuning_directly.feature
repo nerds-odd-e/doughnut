@@ -21,7 +21,7 @@ Feature: Trigger fine-tuning directly as admin
 #    | Successful   | Successful       |
 #    | Failed       | Failed           |
 
-@ignore
+  @ignore
 Scenario Outline: make upload and training progress
   Given I have <positive_count> positive feedbacks and <negative_count> negative feedbacks
   And OpenAi Upload progress should <upload_result>
