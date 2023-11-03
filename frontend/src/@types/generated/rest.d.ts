@@ -93,8 +93,8 @@ declare namespace Generated {
     }
 
     interface ModelVersionOption {
-        value: string;
         key: string;
+        value: string;
         label: string;
     }
 
