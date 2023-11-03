@@ -29,7 +29,7 @@ Feature: Upload fine tuning data
   @usingMockedOpenAiService
   Scenario Outline: Upload fine tuning data to Open AI service
     Given I have <positive_count> positive feedbacks and <negative_count> negative feedbacks
-    And OpenAI response success when uploading fine tuning data
+    And OpenAI response "success" when uploading fine tuning data
     When I upload the feedbacks
     Then I should see the message "Upload successfully."
 

@@ -167,15 +167,19 @@ const openAiService = () => {
     async stubListFiles() {
       return await mockListFiles(serviceMocker)
     },
-    stubOpenAiUploadResponse() {
-      return serviceMocker.stubPoster(`/v1/files`, {
-        id: "file-abc123",
-        object: "file",
-        bytes: 175,
-        created_at: 1613677385,
-        filename: "Question-%s.jsonl",
-        purpose: "fine-tune",
-      })
+    stubOpenAiUploadResponse(shouldSuccess: boolean) {
+      if (shouldSuccess) {
+        return serviceMocker.stubPoster(`/v1/files`, {
+          id: "file-abc123",
+          object: "file",
+          bytes: 175,
+          created_at: 1613677385,
+          filename: "Question-%s.jsonl",
+          purpose: "fine-tune",
+        })
+      } else {
+        return serviceMocker.stubPosterWithError500Response('/v1/files', {})
+      }
     },
     async stubFineTuningStatus(API_Response) {
       const predicate = new FlexiPredicate()
