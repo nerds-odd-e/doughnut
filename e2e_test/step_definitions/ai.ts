@@ -115,7 +115,6 @@ Then("I will see a list of files", () => {
 
 When('I choose the file "question generation examples"', () => {})
 
-
 Given(
   'there is a question generation model "question_generation_model" on my OpenAI account',
   () => {},
