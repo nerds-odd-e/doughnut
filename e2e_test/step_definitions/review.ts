@@ -211,19 +211,11 @@ When(
 )
 
 When("I have the true false question {string} rated as a good example", (questionStem: string) => {
-  start
-    .stubOpenAIQuestionGenerationAndSeeTheQuestionSimple(questionStem)
-    .suggestingThisQuestionForFineTuning()
-    .comment("This question is good")
-    .suggestingPositiveFeedbackForFineTuning()
+  start.testability().seedSuggestedQuestion(questionStem, true)
 })
 
 When("I have the true false question {string} rated as a bad example", (questionStem: string) => {
-  start
-    .stubOpenAIQuestionGenerationAndSeeTheQuestionSimple(questionStem)
-    .suggestingThisQuestionForFineTuning()
-    .comment("This question is not good")
-    .suggestingNegativeFeedbackFineTuningExclusion()
+  start.testability().seedSuggestedQuestion(questionStem, false)
 })
 
 Then("I should be asked {string}", (expectedQuestionStem: string) => {

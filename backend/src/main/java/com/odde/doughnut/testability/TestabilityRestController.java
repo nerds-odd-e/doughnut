@@ -1,5 +1,6 @@
 package com.odde.doughnut.testability;
 
+import com.odde.doughnut.controllers.json.QuestionSuggestionParams;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.Link.LinkType;
 import com.odde.doughnut.entities.repositories.LinkRepository;
@@ -232,6 +233,22 @@ class TestabilityRestController {
             s -> {
               circleModel.joinAndSave(getUserModelByExternalIdentifier(s));
             });
+    return "OK";
+  }
+
+  static class SeedSuggestedQuestions {
+    @Setter private List<QuestionSuggestionParams> examples;
+  }
+
+  @PostMapping("/seed_suggested_questions")
+  @Transactional
+  public String seedSuggestedQuestion(@RequestBody SeedSuggestedQuestions seed) {
+    seed.examples.forEach(
+        example -> {
+          SuggestedQuestionForFineTuning suggestion = new SuggestedQuestionForFineTuning();
+          suggestion.setUser(currentUser.getEntity());
+          modelFactoryService.toSuggestedQuestionForFineTuningService(suggestion).update(example);
+        });
     return "OK";
   }
 
