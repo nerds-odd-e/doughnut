@@ -80,7 +80,7 @@ Given(
 )
 
 Given(
-  "I am logged in as an admin and click AdminDashboard and go to tab {string}",
+  "I log in as an admin and go to {string} in admin dashboard",
   (tabName: string) => {
     start.loginAsAdminAndGoToAdminDashboard().goToTabInAdminDashboard(tabName)
   },
