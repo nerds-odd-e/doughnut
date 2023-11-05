@@ -94,10 +94,6 @@ Then("I contest the question", () => {
   cy.findByRole("button", { name: "Doesn't make sense?" }).click()
 })
 
-Given('there is a fine-tuning file "question_gerenation_examples" on my OpenAI account', () => {
-  mock_services.openAi().stubListFiles()
-})
-
 Given(
   'the finetuning for the file "question_generation_examples" will be {string}',
   (API_Response: string) => {

@@ -5,7 +5,6 @@ Feature: Trigger fine-tuning directly as admin
   I want to trigger fine-tuning directly through 1 button click without manually uploading feedback examples.
 
   Background:
-    Given there is a fine-tuning file "question_gerenation_examples" on my OpenAI account
     Given I log in as an admin and go to "Fine Tuning Data" in admin dashboard
     And I've got the following question for a note with topic "Who Let the Dogs Out":
       | Question Stem                     | Correct Choice | Incorrect Choice 1 |
