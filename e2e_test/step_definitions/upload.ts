@@ -3,20 +3,32 @@
 // @ts-check
 
 import { Given } from "@badeball/cypress-cucumber-preprocessor"
+import start from "start"
 
 Given(
   "I have {int} positive feedbacks and {int} negative feedbacks",
   (positive: number, negative: number) => {
-    for (let i = 0; i < positive; i++) {
-      cy.get('a[title="send this question for fine tuning the question generation model"]').click()
-      cy.findByRole("button", { name: "👍 Good" }).click()
-      cy.findByRole("button", { name: "OK" }).click()
-    }
+    const positives = Array.from({ length: positive }, (_, index) => ({
+      positiveFeedback: true,
+      preservedNoteContent: "note content",
+      realCorrectAnswers: "",
+      preservedQuestion: {
+        stem: `good question #${index}`,
+        choices: ["choice 1", "choice 2"],
+        correctChoiceIndex: 0,
+      },
+    }))
+    const negatives = Array.from({ length: negative }, (_, index) => ({
+      positiveFeedback: false,
+      preservedNoteContent: "note content",
+      realCorrectAnswers: "",
+      preservedQuestion: {
+        stem: `bad question #${index}`,
+        choices: ["choice 1", "choice 2"],
+        correctChoiceIndex: 0,
+      },
+    }))
 
-    for (let i = 0; i < negative; i++) {
-      cy.get('a[title="send this question for fine tuning the question generation model"]').click()
-      cy.findByRole("button", { name: "👎 Bad" }).click()
-      cy.findByRole("button", { name: "OK" }).click()
-    }
+    start.testability().seedSuggestedQuestions(positives.concat(negatives))
   },
 )
