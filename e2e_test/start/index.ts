@@ -82,6 +82,20 @@ const start = {
             cy.wrap(response.body[serviceName])
           })
       },
+      mockBrowserTime() {
+        //
+        // when using `cy.clock()` to set the time,
+        // for Vue component with v-if for a ref/react object that is changed during mount by async call
+        // the event, eg. click, will not work.
+        //
+        cy.clock(testability.hourOfDay(0, 0), [
+          "setTimeout",
+          "setInterval",
+          "clearInterval",
+          "clearTimeout",
+          "Date",
+        ])
+      },
     }
   },
 }
