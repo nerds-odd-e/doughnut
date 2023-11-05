@@ -2,6 +2,7 @@
 // @ts-check
 import TestabilityHelper from "./TestabilityHelper"
 import ServiceMocker from "./ServiceMocker"
+import start from "start"
 
 Cypress.Commands.add("testability", () => {
   cy.wrap(new TestabilityHelper())
@@ -136,9 +137,10 @@ Cypress.Commands.add("setServiceUrl", (serviceName: string, serviceUrl: string) 
 })
 
 Cypress.Commands.add("mock", { prevSubject: true }, (serviceMocker: ServiceMocker) => {
-  cy.setServiceUrl(serviceMocker.serviceName, serviceMocker.serviceUrl).as(
-    serviceMocker.savedServiceUrlName,
-  )
+  start
+    .testability()
+    .setServiceUrl(serviceMocker.serviceName, serviceMocker.serviceUrl)
+    .as(serviceMocker.savedServiceUrlName)
   serviceMocker.install()
 })
 
