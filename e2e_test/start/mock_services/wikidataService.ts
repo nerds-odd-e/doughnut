@@ -24,10 +24,10 @@ const wikidataService = () => {
   const serviceMocker = new ServiceMocker("wikidata", 5001)
   return {
     mock() {
-      testability().mock(serviceMocker)
+      testability().mockService(serviceMocker)
     },
     restore() {
-      testability().restore(serviceMocker)
+      testability().restoreMockedService(serviceMocker)
     },
 
     stubWikidataEntityQuery(wikidataId: string, wikidataTitle: string, wikipediaLink: string) {

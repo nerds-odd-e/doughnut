@@ -89,14 +89,14 @@ const testability = () => {
         "Date",
       ])
     },
-    mock(serviceMocker: ServiceMocker) {
+    mockService(serviceMocker: ServiceMocker) {
       this.setServiceUrl(serviceMocker.serviceName, serviceMocker.serviceUrl).as(
         serviceMocker.savedServiceUrlName,
       )
       serviceMocker.install()
     },
 
-    restore(serviceMocker: ServiceMocker) {
+    restoreMockedService(serviceMocker: ServiceMocker) {
       cy.get(`@${serviceMocker.savedServiceUrlName}`).then((saved) =>
         this.setServiceUrl(serviceMocker.serviceName, saved as unknown as string),
       )

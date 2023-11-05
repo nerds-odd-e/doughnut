@@ -61,10 +61,10 @@ const openAiService = () => {
   const serviceMocker = new ServiceMocker("openAi", 5001)
   return {
     mock() {
-      testability().mock(serviceMocker)
+      testability().mockService(serviceMocker)
     },
     restore() {
-      testability().restore(serviceMocker)
+      testability().restoreMockedService(serviceMocker)
     },
 
     restartImposter() {
