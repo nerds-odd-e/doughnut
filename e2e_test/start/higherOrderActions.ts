@@ -1,5 +1,6 @@
 import { questionGenerationService } from "./questionGenerationService"
 import basicActions from "./basicActions"
+import testability from "./testability"
 
 export const higherOrderActions = {
   stubOpenAIQuestionGenerationAndSeeTheQuestionSimple(questionStem: string) {
@@ -15,7 +16,7 @@ export const higherOrderActions = {
     noteTopic: string,
     question: Record<string, string>,
   ) => {
-    cy.testability().seedNotes([{ topic: noteTopic }])
+    testability().seedNotes([{ topic: noteTopic }])
     questionGenerationService().resetAndStubAskingMCQ(question)
     return basicActions.jumpToNotePage(noteTopic).chatAboutNote().testMe()
   },
