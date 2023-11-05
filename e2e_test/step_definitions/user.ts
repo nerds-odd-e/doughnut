@@ -57,11 +57,11 @@ Then("My name {string} is in the user action menu", (name: string) => {
 })
 
 Then("my daily new notes to review is set to {int}", (number: string) => {
-  cy.testability().updateCurrentUserSettingsWith({ daily_new_notes_count: number })
+  start.testability().updateCurrentUserSettingsWith({ daily_new_notes_count: number })
 })
 
 Then("my space setting is {string}", (number: string) => {
-  cy.testability().updateCurrentUserSettingsWith({ space_intervals: number })
+  start.testability().updateCurrentUserSettingsWith({ space_intervals: number })
 })
 
 Then("I haven't login", () => {

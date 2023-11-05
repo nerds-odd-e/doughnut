@@ -17,7 +17,7 @@ Then("I should see {string} is shared in the Bazaar", (noteTopic: string) => {
 })
 
 Then("notebook {string} is shared to the Bazaar", (noteTopic: string) => {
-  cy.testability().shareToBazaar(noteTopic)
+  start.testability().shareToBazaar(noteTopic)
 })
 
 Then("there shouldn't be any note edit button", () => {

@@ -7,6 +7,9 @@ const start = {
   ...basicActions,
   ...higherOrderActions,
   questionGenerationService,
+  testability() {
+    return cy.testability()
+  },
 }
 export default start
 export { mock_services }
