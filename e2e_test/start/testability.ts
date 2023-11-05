@@ -75,23 +75,27 @@ const testability = () => {
       })
     },
 
-    seedSuggestedQuestion(questionStem: string, positiveFeedback: boolean) {
+    seedSuggestedQuestions(examples: unknown[]) {
       postToTestabilityApiSuccessfully(cy, "seed_suggested_questions", {
         body: {
-          examples: [
-            {
-              positiveFeedback,
-              preservedNoteContent: "note content",
-              realCorrectAnswers: "",
-              preservedQuestion: {
-                stem: questionStem,
-                choices: ["choice 1", "choice 2"],
-                correctChoiceIndex: 0,
-              },
-            },
-          ],
+          examples,
         },
       })
+    },
+
+    seedSuggestedQuestion(questionStem: string, positiveFeedback: boolean) {
+      this.seedSuggestedQuestions([
+        {
+          positiveFeedback,
+          preservedNoteContent: "note content",
+          realCorrectAnswers: "",
+          preservedQuestion: {
+            stem: questionStem,
+            choices: ["choice 1", "choice 2"],
+            correctChoiceIndex: 0,
+          },
+        },
+      ])
     },
 
     getSeededNoteIdByTitle(noteTopic: string) {
