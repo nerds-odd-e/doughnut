@@ -45,7 +45,6 @@ declare namespace Cypress {
     jumpToNotePage(noteTopic: any, forceLoadPage?: any): Chainable<any>
     loginAs(username: string): Chainable<any>
     logout(username?: string): Chainable<any>
-    mock(): Chainable<Subject>
     navigateToChild(noteTopic: any): Chainable<any>
     navigateToCircle(circleName: any): Chainable<any>
     navigateToNotePage(notePath: NotePath): Chainable<any>
@@ -61,7 +60,6 @@ declare namespace Cypress {
     repeatReviewNotes(noteTopics: string): Chainable<any>
     goAndRepeatReviewNotes(noteTopics: string): Chainable<any>
     repeatMore(): Chainable<any>
-    restore(): Chainable<Subject>
     routerPush(fallback: any, name: any, params: any): Chainable<any>
     routerToReviews(): Chainable<any>
     routerToRoot(): Chainable<any>

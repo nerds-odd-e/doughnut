@@ -1,6 +1,7 @@
 import { FlexiPredicate, HttpMethod, Operator } from "@anev/ts-mountebank"
 import ServiceMocker from "../../support/ServiceMocker"
 import { MessageToMatch } from "./MessageToMatch"
+import testability from "start/testability"
 
 type FunctionCall = {
   role: "function"
@@ -60,10 +61,10 @@ const openAiService = () => {
   const serviceMocker = new ServiceMocker("openAi", 5001)
   return {
     mock() {
-      cy.wrap(serviceMocker).mock()
+      testability().mock(serviceMocker)
     },
     restore() {
-      cy.wrap(serviceMocker).restore()
+      testability().restore(serviceMocker)
     },
 
     restartImposter() {

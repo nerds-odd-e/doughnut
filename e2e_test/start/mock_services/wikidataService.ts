@@ -1,3 +1,4 @@
+import testability from "start/testability"
 import ServiceMocker from "../../support/ServiceMocker"
 import WikidataEntitiesBuilder, { Claim } from "../../support/json/WikidataEntitiesBuilder"
 
@@ -23,10 +24,10 @@ const wikidataService = () => {
   const serviceMocker = new ServiceMocker("wikidata", 5001)
   return {
     mock() {
-      cy.wrap(serviceMocker).mock()
+      testability().mock(serviceMocker)
     },
     restore() {
-      cy.wrap(serviceMocker).restore()
+      testability().restore(serviceMocker)
     },
 
     stubWikidataEntityQuery(wikidataId: string, wikidataTitle: string, wikipediaLink: string) {
