@@ -1,4 +1,3 @@
-import { MessageToMatch } from "start/mock_services/MessageToMatch"
 import { FlexiPredicate, HttpMethod, Operator } from "@anev/ts-mountebank"
 import ServiceMocker from "../../support/ServiceMocker"
 import { MessageToMatch } from "./MessageToMatch"
