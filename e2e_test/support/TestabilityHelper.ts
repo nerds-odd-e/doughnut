@@ -54,16 +54,6 @@ class TestabilityHelper {
     return "seededNoteIdMap"
   }
 
-  cleanAndReset(cy: Cypress.cy & CyEventEmitter, countdown: number) {
-    this.postToTestabilityApi(cy, "clean_db_and_reset_testability_settings", {
-      failOnStatusCode: countdown === 1,
-    }).then((response) => {
-      if (countdown > 0 && response.status !== 200) {
-        this.cleanAndReset(cy, countdown - 1)
-      }
-    })
-  }
-
   postToTestabilityApiSuccessfully(
     cy: Cypress.cy & CyEventEmitter,
     path: string,
@@ -83,6 +73,7 @@ class TestabilityHelper {
       ...options,
     })
   }
+
   getTestabilityApiSuccessfully(cy: Cypress.cy & CyEventEmitter, path: string) {
     return cy.request({
       method: "GET",
