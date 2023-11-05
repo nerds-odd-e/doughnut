@@ -33,7 +33,7 @@ const start = {
       },
 
       timeTravelTo(day: number, hour: number) {
-        cy.wrap(testability).backendTimeTravelTo(day, hour)
+        this.backendTimeTravelTo(day, hour)
         cy.window().then((window) => {
           cy.tick(testability.hourOfDay(day, hour).getTime() - new window.Date().getTime())
         })
