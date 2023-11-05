@@ -1,12 +1,34 @@
 import TestabilityHelper from "support/TestabilityHelper"
 import ServiceMocker from "support/ServiceMocker"
 
+const postToTestabilityApi = (
+  cy: Cypress.cy & CyEventEmitter,
+  path: string,
+  options: { body?: Record<string, unknown>; failOnStatusCode?: boolean },
+) => {
+  return cy.request({
+    method: "POST",
+    url: `/api/testability/${path}`,
+    ...options,
+  })
+}
+
+const cleanAndReset = (cy: Cypress.cy & CyEventEmitter, countdown: number) => {
+  postToTestabilityApi(cy, "clean_db_and_reset_testability_settings", {
+    failOnStatusCode: countdown === 1,
+  }).then((response) => {
+    if (countdown > 0 && response.status !== 200) {
+      cleanAndReset(cy, countdown - 1)
+    }
+  })
+}
+
 const testability = () => {
   const testability = new TestabilityHelper()
 
   return {
     cleanDBAndResetTestabilitySettings() {
-      testability.cleanAndReset(cy, 5)
+      cleanAndReset(cy, 5)
     },
 
     featureToggle(enabled: boolean) {
