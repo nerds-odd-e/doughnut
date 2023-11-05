@@ -6,5 +6,5 @@
 import { Given } from "@badeball/cypress-cucumber-preprocessor"
 
 Given("I let the server to time travel to {int} hours ago", (hours: number) => {
-  cy.testability().backendTimeTravelRelativeToNow(-hours)
+  start.testability().backendTimeTravelRelativeToNow(-hours)
 })

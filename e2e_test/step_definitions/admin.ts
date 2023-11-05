@@ -79,12 +79,9 @@ Given(
   },
 )
 
-Given(
-  "I log in as an admin and go to {string} in admin dashboard",
-  (tabName: string) => {
-    start.loginAsAdminAndGoToAdminDashboard().goToTabInAdminDashboard(tabName)
-  },
-)
+Given("I log in as an admin and go to {string} in admin dashboard", (tabName: string) => {
+  start.loginAsAdminAndGoToAdminDashboard().goToTabInAdminDashboard(tabName)
+})
 
 When("I choose {string} for {string} use", (modelName: string, trainingEngine: string) => {
   start.assumeAdminDashboardPage().chooseModelNameInEngine(modelName, trainingEngine)

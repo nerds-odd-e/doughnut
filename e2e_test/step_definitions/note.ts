@@ -26,15 +26,15 @@ Given("I visit note {string}", (noteTopic) => {
 })
 
 Given("there are some notes for the current user:", (data: DataTable) => {
-  cy.testability().seedNotes(data.hashes())
+  start.testability().seedNotes(data.hashes())
 })
 
 Given("I have a note with the topic {string}", (noteTopic: string) => {
-  cy.testability().seedNotes([{ topic: noteTopic }])
+  start.testability().seedNotes([{ topic: noteTopic }])
 })
 
 Given("there are some notes for existing user {string}", (externalIdentifier, data: DataTable) => {
-  cy.testability().seedNotes(data.hashes(), externalIdentifier)
+  start.testability().seedNotes(data.hashes(), externalIdentifier)
 })
 
 Given("there are notes from Note {int} to Note {int}", (from: number, to: number) => {
@@ -43,7 +43,7 @@ Given("there are notes from Note {int} to Note {int}", (from: number, to: number
     .map((_, i) => {
       return { topic: `Note ${i + from}` }
     })
-  cy.testability().seedNotes(notes)
+  start.testability().seedNotes(notes)
 })
 
 When("I create notebooks with:", (notes: DataTable) => {
@@ -150,7 +150,7 @@ When("I delete notebook {string}", (noteTopic: string) => {
 })
 
 When("I delete note {string} at {int}:00", (noteTopic: string, hour: number) => {
-  cy.testability().backendTimeTravelTo(0, hour)
+  start.testability().backendTimeTravelTo(0, hour)
   start.jumpToNotePage(noteTopic).deleteNote()
 })
 

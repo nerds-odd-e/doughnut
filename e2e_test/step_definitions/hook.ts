@@ -8,7 +8,7 @@ import TestabilityHelper from "../support/TestabilityHelper"
 import { mock_services } from "start"
 
 Before(() => {
-  cy.testability().cleanDBAndResetTestabilitySettings()
+  start.testability().cleanDBAndResetTestabilitySettings()
   cy.wrap("no").as("firstVisited")
 })
 
@@ -25,7 +25,7 @@ Before({ tags: "@mockBrowserTime" }, () => {
   // for Vue component with v-if for a ref/react object that is changed during mount by async call
   // the event, eg. click, will not work.
   //
-  cy.testability().then((testability: TestabilityHelper) => {
+  start.testability().then((testability: TestabilityHelper) => {
     cy.clock(testability.hourOfDay(0, 0), [
       "setTimeout",
       "setInterval",
@@ -53,7 +53,7 @@ Before({ tags: "@startWithEmptyDownloadsFolder" }, () => {
 })
 
 Before({ tags: "@featureToggle" }, () => {
-  cy.testability().featureToggle(true)
+  start.testability().featureToggle(true)
 })
 
 Before({ tags: "@usingMockedWikidataService" }, () => {

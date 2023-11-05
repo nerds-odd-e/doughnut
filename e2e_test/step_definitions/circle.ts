@@ -33,7 +33,7 @@ When("I should see the circle {string} and it has two members in it", (circleNam
 })
 
 Given("There is a circle {string} with {string} members", (circleName: string, members: string) => {
-  cy.testability().seedCircle({ circleName: circleName, members: members })
+  start.testability().seedCircle({ circleName: circleName, members: members })
 })
 
 When("I create a notebook {string} in circle {string}", (noteTopic, circleName) => {
@@ -66,7 +66,7 @@ When("I am on {string} circle page", (circleName) => {
 })
 
 When("There is a notebook {string} in circle {string}", (topic, circleName) => {
-  cy.testability().seedNotes([{ topic }], "", circleName)
+  start.testability().seedNotes([{ topic }], "", circleName)
 })
 
 When("someone of my circle deletes the {string} notebook", (noteTopic: string) => {

@@ -11,7 +11,7 @@ Then("I do these initial reviews in sequence:", (data: DataTable) => {
 })
 
 Given("It's day {int}, {int} hour", (day: number, hour: number) => {
-  cy.testability().backendTimeTravelTo(day, hour)
+  start.testability().backendTimeTravelTo(day, hour)
 })
 
 Given("I ask to do more repetition", () => {
@@ -29,7 +29,7 @@ Then("I repeat more old {string}", (repeatNotes: string) => {
 Then(
   "On day {int} I repeat old {string} and initial review new {string}",
   (day: number, repeatNotes: string, initialNotes: string) => {
-    cy.testability().backendTimeTravelTo(day, 8)
+    start.testability().backendTimeTravelTo(day, 8)
     cy.goAndRepeatReviewNotes(repeatNotes)
     cy.initialReviewNotes(initialNotes)
   },
@@ -50,7 +50,7 @@ Then("I should see that I have new notes to learn", () => {
 Then(
   "On day {int} I should have {string} note for initial review and {string} for repeat",
   (day: number, numberOfInitialReviews: string, numberOfRepeats: string) => {
-    cy.testability().timeTravelTo(day, 8)
+    start.testability().timeTravelTo(day, 8)
     cy.routerToReviews()
     cy.contains(numberOfInitialReviews, {
       selector: ".doughnut-ring .initial-review",
@@ -72,23 +72,23 @@ Then("I initial review {string}", (noteTopic) => {
 })
 
 Then("I added and learned one note {string} on day {int}", (noteTopic: string, day: number) => {
-  cy.testability().seedNotes([{ topic: noteTopic }])
-  cy.testability().backendTimeTravelTo(day, 8)
+  start.testability().seedNotes([{ topic: noteTopic }])
+  start.testability().backendTimeTravelTo(day, 8)
   cy.initialReviewNotes(noteTopic)
 })
 
 Then("I learned one note {string} on day {int}", (noteTopic: string, day: number) => {
-  cy.testability().backendTimeTravelTo(day, 8)
+  start.testability().backendTimeTravelTo(day, 8)
   cy.initialReviewNotes(noteTopic)
 })
 
 Then("I am repeat-reviewing my old note on day {int}", (day: number) => {
-  cy.testability().backendTimeTravelTo(day, 8)
+  start.testability().backendTimeTravelTo(day, 8)
   cy.routerToRepeatReview()
 })
 
 Then("I am learning new note on day {int}", (day: number) => {
-  cy.testability().backendTimeTravelTo(day, 8)
+  start.testability().backendTimeTravelTo(day, 8)
   cy.routerToInitialReview()
 })
 
@@ -166,7 +166,7 @@ Then("I should see the repetition is finished: {string}", (yesNo) => {
 })
 
 Then("The randomizer always choose the last", () => {
-  cy.testability().randomizerAlwaysChooseLast()
+  start.testability().randomizerAlwaysChooseLast()
 })
 
 Then("I should see that my answer is correct", () => {

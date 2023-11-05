@@ -221,7 +221,8 @@ Cypress.Commands.add("navigateToNotePage", (notePath: NotePath) => {
 // jumptoNotePage is faster than navigateToNotePage
 //    it uses the note id memorized when creating them with testability api
 Cypress.Commands.add("jumpToNotePage", (noteTopic: string, forceLoadPage = false) => {
-  cy.testability()
+  start
+    .testability()
     .getSeededNoteIdByTitle(noteTopic)
     .then((noteId) => {
       const url = `/notes/${noteId}`

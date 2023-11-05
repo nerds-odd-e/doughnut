@@ -8,7 +8,7 @@ import TestabilityHelper from "../support/TestabilityHelper"
 import start from "start"
 
 When("Someone triggered an exception", () => {
-  cy.testability().triggerException()
+  start.testability().triggerException()
 })
 
 Then("an admin should see {string} in the failure report", (content: string) => {
@@ -16,7 +16,7 @@ Then("an admin should see {string} in the failure report", (content: string) => 
 })
 
 When("I should see a new open issue on github", () => {
-  cy.testability().then((testability: TestabilityHelper) => {
+  start.testability().then((testability: TestabilityHelper) => {
     testability.getTestabilityApiSuccessfully(cy, "github_issues").then((response) => {
       expect(response.body.length).to.equal(1)
     })
@@ -24,13 +24,15 @@ When("I should see a new open issue on github", () => {
 })
 
 Given("Use real github sandbox and there are no open issues on github", () => {
-  cy.testability().then((testability: TestabilityHelper) =>
-    testability.postToTestabilityApiSuccessfully(
-      cy,
-      "use_real_sandbox_github_and_close_all_github_issues",
-      {},
-    ),
-  )
+  start
+    .testability()
+    .then((testability: TestabilityHelper) =>
+      testability.postToTestabilityApiSuccessfully(
+        cy,
+        "use_real_sandbox_github_and_close_all_github_issues",
+        {},
+      ),
+    )
 })
 
 Then("The {string} alert {string}", (expectedContent: string, shouldExistOrNot: string) => {
