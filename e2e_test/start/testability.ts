@@ -75,6 +75,25 @@ const testability = () => {
       })
     },
 
+    seedSuggestedQuestion(questionStem: string, positiveFeedback: boolean) {
+      postToTestabilityApiSuccessfully(cy, "seed_suggested_questions", {
+        body: {
+          examples: [
+            {
+              positiveFeedback,
+              preservedNoteContent: "note content",
+              realCorrectAnswers: "",
+              preservedQuestion: {
+                stem: questionStem,
+                choices: ["choice 1", "choice 2"],
+                correctChoiceIndex: 0,
+              },
+            },
+          ],
+        },
+      })
+    },
+
     getSeededNoteIdByTitle(noteTopic: string) {
       return cy.get(`@${seededNoteIdMapAliasName}`).then((seededNoteIdMap) => {
         expect(seededNoteIdMap).haveOwnPropertyDescriptor(noteTopic)
