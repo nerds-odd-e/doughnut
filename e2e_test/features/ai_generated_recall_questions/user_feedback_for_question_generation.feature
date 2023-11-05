@@ -2,9 +2,9 @@
 @startWithEmptyDownloadsFolder
 Feature: Improve OpenAI Question Generation using User Feedback
 
-  As an admin,
-  I want to collect and utilize good examples suggested by users for OpenAI fine-tuning
-  to enhance the quality of question generation.
+  As a learner,
+  I want to give feedback to the AI generated questions,
+  so that the AI can learn from my feedback and improve its question generation.
 
   Background:
     Given I am logged in as an existing user
