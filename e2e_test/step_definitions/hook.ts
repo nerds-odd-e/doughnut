@@ -4,7 +4,6 @@
 // @ts-check
 
 import { Before, After } from "@badeball/cypress-cucumber-preprocessor"
-import TestabilityHelper from "../support/TestabilityHelper"
 import start, { mock_services } from "start"
 
 Before(() => {
@@ -20,20 +19,7 @@ After(() => {
 })
 
 Before({ tags: "@mockBrowserTime" }, () => {
-  //
-  // when using `cy.clock()` to set the time,
-  // for Vue component with v-if for a ref/react object that is changed during mount by async call
-  // the event, eg. click, will not work.
-  //
-  start.testability().then((testability: TestabilityHelper) => {
-    cy.clock(testability.hourOfDay(0, 0), [
-      "setTimeout",
-      "setInterval",
-      "clearInterval",
-      "clearTimeout",
-      "Date",
-    ])
-  })
+  start.testability().mockBrowserTime()
 })
 
 // If a test needs to stop the timer, perhaps the tested
