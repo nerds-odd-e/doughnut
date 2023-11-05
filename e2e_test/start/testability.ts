@@ -13,6 +13,14 @@ const postToTestabilityApi = (
   })
 }
 
+const postToTestabilityApiSuccessfully = (
+  cy: Cypress.cy & CyEventEmitter,
+  path: string,
+  options: { body?: Record<string, unknown>; failOnStatusCode?: boolean },
+) => {
+  postToTestabilityApi(cy, path, options).its("status").should("equal", 200)
+}
+
 const cleanAndReset = (cy: Cypress.cy & CyEventEmitter, countdown: number) => {
   postToTestabilityApi(cy, "clean_db_and_reset_testability_settings", {
     failOnStatusCode: countdown === 1,
@@ -32,7 +40,7 @@ const testability = () => {
     },
 
     featureToggle(enabled: boolean) {
-      testability.postToTestabilityApiSuccessfully(cy, "feature_toggle", { body: { enabled } })
+      postToTestabilityApiSuccessfully(cy, "feature_toggle", { body: { enabled } })
     },
 
     seedNotes(seedNotes: unknown[], externalIdentifier = "", circleName = null) {
@@ -55,47 +63,45 @@ const testability = () => {
     },
 
     backendTimeTravelTo(day: number, hour: number) {
-      testability.postToTestabilityApiSuccessfully(cy, "time_travel", {
+      postToTestabilityApiSuccessfully(cy, "time_travel", {
         body: { travel_to: JSON.stringify(testability.hourOfDay(day, hour)) },
       })
     },
 
     backendTimeTravelRelativeToNow(hours: number) {
-      testability.postToTestabilityApiSuccessfully(cy, "time_travel_relative_to_now", {
+      postToTestabilityApiSuccessfully(cy, "time_travel_relative_to_now", {
         body: { hours: JSON.stringify(hours) },
       })
     },
 
     randomizerAlwaysChooseLast() {
-      testability.postToTestabilityApiSuccessfully(cy, "randomizer", { body: { choose: "last" } })
+      postToTestabilityApiSuccessfully(cy, "randomizer", { body: { choose: "last" } })
     },
 
     triggerException() {
-      testability.postToTestabilityApi(cy, "trigger_exception", { failOnStatusCode: false })
+      postToTestabilityApi(cy, "trigger_exception", { failOnStatusCode: false })
     },
 
     shareToBazaar(noteTopic: string) {
-      testability.postToTestabilityApiSuccessfully(cy, "share_to_bazaar", { body: { noteTopic } })
+      postToTestabilityApiSuccessfully(cy, "share_to_bazaar", { body: { noteTopic } })
     },
 
     seedCircle(circleInfo: Record<string, string>) {
-      testability.postToTestabilityApiSuccessfully(cy, "seed_circle", { body: circleInfo })
+      postToTestabilityApiSuccessfully(cy, "seed_circle", { body: circleInfo })
     },
 
     updateCurrentUserSettingsWith(hash: Record<string, string>) {
-      testability.postToTestabilityApiSuccessfully(cy, "update_current_user", { body: hash })
+      postToTestabilityApiSuccessfully(cy, "update_current_user", { body: hash })
     },
 
     setServiceUrl(serviceName: string, serviceUrl: string) {
-      return testability
-        .postToTestabilityApi(cy, `replace_service_url`, {
-          body: { [serviceName]: serviceUrl },
-        })
-        .then((response) => {
-          expect(response.body).to.haveOwnProperty(serviceName)
-          expect(response.body[serviceName]).to.include("http")
-          cy.wrap(response.body[serviceName])
-        })
+      return postToTestabilityApi(cy, `replace_service_url`, {
+        body: { [serviceName]: serviceUrl },
+      }).then((response) => {
+        expect(response.body).to.haveOwnProperty(serviceName)
+        expect(response.body[serviceName]).to.include("http")
+        cy.wrap(response.body[serviceName])
+      })
     },
     mockBrowserTime() {
       //
