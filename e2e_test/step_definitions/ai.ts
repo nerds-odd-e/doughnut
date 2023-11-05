@@ -114,22 +114,3 @@ Then("I will see a list of files", () => {
 })
 
 When('I choose the file "question generation examples"', () => {})
-
-Given(
-  'there is a question generation model "question_generation_model" on my OpenAI account',
-  () => {},
-)
-
-Given('there is a evaluation model "evaluation_model" on my OpenAI account', () => {})
-
-Given("there will be evaluation result returned from evaluation model", () => {
-
-})
-
-When("I evaluate a question model", () => {
-  start.assumeAdminEvaluateQuestionModelPage().triggerEvaluate()
-})
-
-Then("I can see evaluation score of the question model", () => {
-  start.assumeAdminEvaluateQuestionModelPage().newScoreWillBe("66%")
-})

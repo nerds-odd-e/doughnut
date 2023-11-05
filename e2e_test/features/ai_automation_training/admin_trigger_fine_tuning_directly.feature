@@ -6,7 +6,7 @@ Feature: Trigger fine-tuning directly as admin
 
   Background:
     Given there is a fine-tuning file "question_gerenation_examples" on my OpenAI account
-    Given I am logged in as an admin and click AdminDashboard and go to tab "Fine Tuning Data"
+    Given I log in as an admin and go to "Fine Tuning Data" in admin dashboard
     And I've got the following question for a note with topic "Who Let the Dogs Out":
       | Question Stem                     | Correct Choice | Incorrect Choice 1 |
       | Who wrote 'Who Let the Dogs Out'? | Anslem Douglas | Baha Men           |
