@@ -6,10 +6,6 @@ Feature: Trigger fine-tuning directly as admin
 
   Background:
     Given I log in as an admin and go to "Fine Tuning Data" in admin dashboard
-    And I've got the following question for a note with topic "Who Let the Dogs Out":
-      | Question Stem                     | Correct Choice | Incorrect Choice 1 |
-      | Who wrote 'Who Let the Dogs Out'? | Anslem Douglas | Baha Men           |
-
 
   Scenario Outline: Trigger fine tuning with feedbacks for Question model and Evaluation model
     Given I have <positive_count> positive feedbacks and <negative_count> negative feedbacks
