@@ -4,6 +4,7 @@
 // @ts-check
 
 import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
+import start from "start"
 
 When("I create a new circle {string} and copy the invitation code", (circleName: string) => {
   cy.openSidebar()

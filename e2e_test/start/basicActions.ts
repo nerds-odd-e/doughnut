@@ -12,8 +12,7 @@ export default {
   // jumptoNotePage is faster than navigateToNotePage
   //    it uses the note id memorized when creating them with testability api
   jumpToNotePage: (noteTopic: string, forceLoadPage = false) => {
-    start
-      .testability()
+    cy.testability()
       .getSeededNoteIdByTitle(noteTopic)
       .then((noteId) => {
         const url = `/notes/${noteId}`
