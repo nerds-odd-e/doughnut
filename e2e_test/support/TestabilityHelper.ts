@@ -6,47 +6,11 @@ class TestabilityHelper {
   hourOfDay(days: number, hours: number) {
     return new Date(1976, 5, 1 + days, hours)
   }
-  seedLink(
-    cy: Cypress.cy & CyEventEmitter,
-    type: string,
-    fromNoteTopic: string,
-    toNoteTopic: string,
-  ) {
-    return cy.get(`@${this.seededNoteIdMapAliasName}`).then((seededNoteIdMap) => {
-      expect(seededNoteIdMap).haveOwnPropertyDescriptor(fromNoteTopic)
-      expect(seededNoteIdMap).haveOwnPropertyDescriptor(toNoteTopic)
-      const fromNoteId = seededNoteIdMap[fromNoteTopic]
-      const toNoteId = seededNoteIdMap[toNoteTopic]
-      this.postToTestabilityApiSuccessfully(cy, "link_notes", {
-        body: {
-          type,
-          source_id: fromNoteId,
-          target_id: toNoteId,
-        },
-      })
-    })
-  }
+
   getSeededNoteIdByTitle(cy: Cypress.cy & CyEventEmitter, noteTopic: string) {
     return cy.get(`@${this.seededNoteIdMapAliasName}`).then((seededNoteIdMap) => {
       expect(seededNoteIdMap).haveOwnPropertyDescriptor(noteTopic)
       return seededNoteIdMap[noteTopic]
-    })
-  }
-  seedNotes(
-    cy: Cypress.cy & CyEventEmitter,
-    seedNotes: unknown[],
-    externalIdentifier: string,
-    circleName: string | null,
-  ) {
-    this.postToTestabilityApi(cy, "seed_notes", {
-      body: {
-        externalIdentifier,
-        circleName,
-        seedNotes,
-      },
-    }).then((response) => {
-      expect(Object.keys(response.body).length).to.equal(seedNotes.length)
-      cy.wrap(response.body).as(this.seededNoteIdMapAliasName)
     })
   }
 
