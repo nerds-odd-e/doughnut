@@ -1,5 +1,8 @@
-import TestabilityHelper from "support/TestabilityHelper"
 import ServiceMocker from "support/ServiceMocker"
+
+const hourOfDay = (days: number, hours: number) => {
+  return new Date(1976, 5, 1 + days, hours)
+}
 
 const postToTestabilityApi = (
   cy: Cypress.cy & CyEventEmitter,
@@ -34,8 +37,6 @@ const cleanAndReset = (cy: Cypress.cy & CyEventEmitter, countdown: number) => {
 const seededNoteIdMapAliasName = "seededNoteIdMap"
 
 const testability = () => {
-  const testability = new TestabilityHelper()
-
   return {
     cleanDBAndResetTestabilitySettings() {
       cleanAndReset(cy, 5)
@@ -75,19 +76,22 @@ const testability = () => {
     },
 
     getSeededNoteIdByTitle(noteTopic: string) {
-      return testability.getSeededNoteIdByTitle(cy, noteTopic)
+      return cy.get(`@${seededNoteIdMapAliasName}`).then((seededNoteIdMap) => {
+        expect(seededNoteIdMap).haveOwnPropertyDescriptor(noteTopic)
+        return seededNoteIdMap[noteTopic]
+      })
     },
 
     timeTravelTo(day: number, hour: number) {
       this.backendTimeTravelTo(day, hour)
       cy.window().then((window) => {
-        cy.tick(testability.hourOfDay(day, hour).getTime() - new window.Date().getTime())
+        cy.tick(hourOfDay(day, hour).getTime() - new window.Date().getTime())
       })
     },
 
     backendTimeTravelTo(day: number, hour: number) {
       postToTestabilityApiSuccessfully(cy, "time_travel", {
-        body: { travel_to: JSON.stringify(testability.hourOfDay(day, hour)) },
+        body: { travel_to: JSON.stringify(hourOfDay(day, hour)) },
       })
     },
 
@@ -132,7 +136,7 @@ const testability = () => {
       // for Vue component with v-if for a ref/react object that is changed during mount by async call
       // the event, eg. click, will not work.
       //
-      cy.clock(testability.hourOfDay(0, 0), [
+      cy.clock(hourOfDay(0, 0), [
         "setTimeout",
         "setInterval",
         "clearInterval",
