@@ -31,6 +31,8 @@ const cleanAndReset = (cy: Cypress.cy & CyEventEmitter, countdown: number) => {
   })
 }
 
+const seededNoteIdMapAliasName = "seededNoteIdMap"
+
 const testability = () => {
   const testability = new TestabilityHelper()
 
@@ -44,11 +46,32 @@ const testability = () => {
     },
 
     seedNotes(seedNotes: unknown[], externalIdentifier = "", circleName = null) {
-      testability.seedNotes(cy, seedNotes, externalIdentifier, circleName)
+      postToTestabilityApi(cy, "seed_notes", {
+        body: {
+          externalIdentifier,
+          circleName,
+          seedNotes,
+        },
+      }).then((response) => {
+        expect(Object.keys(response.body).length).to.equal(seedNotes.length)
+        cy.wrap(response.body).as(seededNoteIdMapAliasName)
+      })
     },
 
     seedLink(type: string, fromNoteTopic: string, toNoteTopic: string) {
-      testability.seedLink(cy, type, fromNoteTopic, toNoteTopic)
+      cy.get(`@${seededNoteIdMapAliasName}`).then((seededNoteIdMap) => {
+        expect(seededNoteIdMap).haveOwnPropertyDescriptor(fromNoteTopic)
+        expect(seededNoteIdMap).haveOwnPropertyDescriptor(toNoteTopic)
+        const fromNoteId = seededNoteIdMap[fromNoteTopic]
+        const toNoteId = seededNoteIdMap[toNoteTopic]
+        postToTestabilityApiSuccessfully(cy, "link_notes", {
+          body: {
+            type,
+            source_id: fromNoteId,
+            target_id: toNoteId,
+          },
+        })
+      })
     },
 
     getSeededNoteIdByTitle(noteTopic: string) {
