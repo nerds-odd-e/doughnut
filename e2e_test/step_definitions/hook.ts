@@ -5,7 +5,7 @@
 
 import { Before, After } from "@badeball/cypress-cucumber-preprocessor"
 import TestabilityHelper from "../support/TestabilityHelper"
-import { mock_services } from "start"
+import start, { mock_services } from "start"
 
 Before(() => {
   start.testability().cleanDBAndResetTestabilitySettings()

@@ -15,7 +15,7 @@ export const higherOrderActions = {
     noteTopic: string,
     question: Record<string, string>,
   ) => {
-    start.testability().seedNotes([{ topic: noteTopic }])
+    cy.testability().seedNotes([{ topic: noteTopic }])
     questionGenerationService().resetAndStubAskingMCQ(question)
     return basicActions.jumpToNotePage(noteTopic).chatAboutNote().testMe()
   },
