@@ -22,7 +22,7 @@ const testability = () => {
     },
 
     getSeededNoteIdByTitle(noteTopic: string) {
-      testability.getSeededNoteIdByTitle(cy, noteTopic)
+      return testability.getSeededNoteIdByTitle(cy, noteTopic)
     },
 
     timeTravelTo(day: number, hour: number) {

@@ -3,6 +3,7 @@ import { assumeChatAboutNotePage } from "./pageObjects/chatAboutNotePage"
 import { assumeNotePage } from "./pageObjects/notePage"
 import { assumeAnsweredQuestionPage } from "./pageObjects/AnsweredQuestionPage"
 import { assumeQuestionPage } from "./pageObjects/QuizQuestionPage"
+import testability from "./testability"
 
 export default {
   assumeAnsweredQuestionPage,
@@ -12,7 +13,7 @@ export default {
   // jumptoNotePage is faster than navigateToNotePage
   //    it uses the note id memorized when creating them with testability api
   jumpToNotePage: (noteTopic: string, forceLoadPage = false) => {
-    cy.testability()
+    testability()
       .getSeededNoteIdByTitle(noteTopic)
       .then((noteId) => {
         const url = `/notes/${noteId}`
