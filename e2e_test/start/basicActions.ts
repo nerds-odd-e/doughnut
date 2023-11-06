@@ -30,7 +30,6 @@ export default {
   },
 
   goToAdminDashboard: () => {
-    cy.loginAs("admin")
     cy.reload()
     cy.openSidebar()
     cy.findByText("Admin Dashboard").click()
