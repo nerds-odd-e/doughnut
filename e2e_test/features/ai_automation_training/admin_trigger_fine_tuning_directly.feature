@@ -10,9 +10,9 @@ Feature: Trigger fine-tuning directly as admin
 
   Scenario Outline: Trigger fine tuning with feedbacks for Question model and Evaluation model
     Given I have <positive_count> positive feedbacks and <negative_count> negative feedbacks
-    And OpenAI response "<upload_result>" when uploading fine tuning data
-    And OpenAi response "<training_result>" when trigger fine tuning data
-    When I trigger fine tuning
+    And OpenAI response with "<upload_result>" when uploading fine tuning data
+    And OpenAi response with "<training_result>" when trigger fine tuning data
+    When I attempt to trigger fine-tuning
     Then I should see the message <message>
     Examples:
       | positive_count | negative_count | message                                     | upload_result | training_result |

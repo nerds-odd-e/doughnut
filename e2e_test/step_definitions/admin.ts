@@ -106,15 +106,15 @@ Then("I should be using {string} for {string}", (modelName: string, trainingEngi
     .assumeSelectionWithDefaultOption(modelName, trainingEngine)
 })
 
-Given("OpenAI response {string} when uploading fine tuning data", (result) => {
+Given("OpenAI response with {string} when uploading fine tuning data", (result) => {
   mock_services.openAi().stubOpenAiUploadResponse(result === "success")
 })
 
-Given("OpenAi response {string} when trigger fine tuning data", (result) => {
+Given("OpenAi response with {string} when trigger fine tuning data", (result) => {
   mock_services.openAi().stubFineTuningStatus(result === "success")
 })
 
-When("I trigger fine tuning", () => {
+When("I attempt to trigger fine-tuning", () => {
   start.loginAsAdminAndGoToAdminDashboard().suggestedQuestionsForFineTuning().triggerFineTuning()
 })
 
