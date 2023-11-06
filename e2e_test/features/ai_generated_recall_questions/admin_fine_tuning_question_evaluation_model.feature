@@ -24,12 +24,12 @@ Feature: Refine Training Examples for OpenAI's Question Evaluation Model
     And OpenAI responds with "<upload_result>" when uploading fine-tuning data
     And OpenAI responds with "<training_result>" when triggering fine-tuning
     When I attempt to trigger fine-tuning
-    Then I should see the message <message>
+    Then I should see the message "<message>"
 
     Examples:
-      | positive_count | negative_count | upload_result | training_result | message                                     |
-      | 9              | 9              | success       | success         | "Positive feedback cannot be less than 10." |
-      | 10             | 10             | failed        | success         | "Upload failed."                            |
-      | 10             | 10             | success       | failed          | "Training failed."                          |
-      | 10             | 10             | success       | success         | "Training initiated."                       |
+      | positive_count | negative_count | upload_result | training_result | message                                   |
+      | 9              | 9              | success       | success         | Positive feedback cannot be less than 10. |
+      | 10             | 10             | failed        | success         | Upload failed.                            |
+      | 10             | 10             | success       | failed          | Training failed.                          |
+      | 10             | 10             | success       | success         | Training initiated.                       |
 
