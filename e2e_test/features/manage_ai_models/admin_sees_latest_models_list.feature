@@ -5,7 +5,8 @@ Feature: admin see latest models list
   So that admin can choose AI models from openAI manually.
 
   Background:
-    Given I log in as an admin and go to "Manage Model" in admin dashboard
+    Given I am logged in as an admin
+    And I navigate to the "Manage Model" section in the admin dashboard
 
   @ignore
   Scenario: change question generation model for GPT4

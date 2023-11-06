@@ -7,7 +7,8 @@ Feature: Refine Training Examples for OpenAI's Question Evaluation Model
   to enhance the accuracy of question generation evaluation.
 
   Background:
-    Given I log in as an admin and go to "Fine Tuning Data" in admin dashboard
+    Given I am logged in as an admin
+    And I navigate to the "Fine Tuning Data" section in the admin dashboard
 
 
   Scenario: Admin can retrieve feedback-based training examples

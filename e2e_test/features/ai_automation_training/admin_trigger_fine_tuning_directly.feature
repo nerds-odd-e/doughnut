@@ -5,7 +5,8 @@ Feature: Trigger fine-tuning directly as admin
   I want to trigger fine-tuning directly through 1 button click without manually uploading feedback examples.
 
   Background:
-    Given I log in as an admin and go to "Fine Tuning Data" in admin dashboard
+    Given I am logged in as an admin
+    And I navigate to the "Fine Tuning Data" section in the admin dashboard
 
   Scenario Outline: Trigger fine tuning with feedbacks for Question model and Evaluation model
     Given I have <positive_count> positive feedbacks and <negative_count> negative feedbacks
