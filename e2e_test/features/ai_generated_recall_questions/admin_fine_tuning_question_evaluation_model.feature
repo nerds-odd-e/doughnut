@@ -21,13 +21,15 @@ Feature: Refine Training Examples for OpenAI's Question Evaluation Model
 
   Scenario Outline: Trigger fine tuning with feedbacks for Question model and Evaluation model
     Given I have <positive_count> positive feedbacks and <negative_count> negative feedbacks
-    And OpenAI response "<upload_result>" when uploading fine tuning data
-    And OpenAi response "<training_result>" when trigger fine tuning data
-    When I trigger fine tuning
+    And OpenAI responds with "<upload_result>" when uploading fine-tuning data
+    And OpenAI responds with "<training_result>" when triggering fine-tuning
+    When I attempt to trigger fine-tuning
     Then I should see the message <message>
+
     Examples:
-      | positive_count | negative_count | message                                     | upload_result | training_result |
-      | 9              | 9              | "Positive feedback cannot be less than 10." | success       | success         |
-      | 10             | 10             | "Upload failed."                                        | failed        | success        |
-      | 10             | 10             | "Training failed."                                      | success       | failed         |
-      | 10             | 10             | "Training is in progress."                  | success       | success         |
+      | positive_count | negative_count | upload_result | training_result | message                                     |
+      | 9              | 9              | success       | success         | "Positive feedback cannot be less than 10." |
+      | 10             | 10             | failed        | success         | "Upload failed."                            |
+      | 10             | 10             | success       | failed          | "Training failed."                          |
+      | 10             | 10             | success       | success         | "Training initiated."                       |
+
