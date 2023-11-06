@@ -24,11 +24,21 @@ export default {
 
     return assumeNotePage()
   },
-  loginAsAdminAndGoToAdminDashboard: () => {
+
+  loginAsAdmin: () => {
+    cy.loginAs("admin")
+  },
+
+  goToAdminDashboard: () => {
     cy.loginAs("admin")
     cy.reload()
     cy.openSidebar()
     cy.findByText("Admin Dashboard").click()
     return assumeAdminDashboardPage()
+  },
+
+  loginAsAdminAndGoToAdminDashboard() {
+    this.loginAsAdmin()
+    return this.goToAdminDashboard()
   },
 }
