@@ -79,7 +79,7 @@ Given(
   },
 )
 
-Given("I am logged in as an admin", (tabName: string) => {
+Given("I am logged in as an admin", (_tabName: string) => {
   start.loginAsAdmin()
 })
 
