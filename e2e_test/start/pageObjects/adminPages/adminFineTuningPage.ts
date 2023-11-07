@@ -22,13 +22,6 @@ export function adminFineTuningPage() {
       }).click()
     },
 
-    downloadFeedbackForEvaluationModel() {
-      cy.findByRole("button", {
-        name: "Download Evaluation Training Data",
-      }).click()
-      return assumeDownloadedJSONL("evaluationData.jsonl")
-    },
-
     updateQuestionSuggestionAndChoice(
       originalQuestionStem: string,
       newQuestion: Record<string, string>,

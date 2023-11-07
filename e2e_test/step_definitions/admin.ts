@@ -59,17 +59,6 @@ Given(
 )
 
 Given(
-  "an admin should be able to download the training data for evaluation containing:",
-  (trainingExamples: DataTable) => {
-    start
-      .loginAsAdminAndGoToAdminDashboard()
-      .suggestedQuestionsForFineTuning()
-      .downloadFeedbackForEvaluationModel()
-      .expectExampleQuestions(trainingExamples.hashes())
-  },
-)
-
-Given(
   "there should be {int} examples containing {string}",
   (numOfOccurrence: number, expectedString: string) => {
     start
