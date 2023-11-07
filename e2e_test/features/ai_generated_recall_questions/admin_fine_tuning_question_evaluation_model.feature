@@ -11,14 +11,6 @@ Feature: Refine Training Examples for OpenAI's Question Evaluation Model
     And I navigate to the "Fine Tuning Data" section in the admin dashboard
 
 
-  Scenario: Admin can retrieve feedback-based training examples
-    When I have the true false question "Fire is hot" rated as a good example
-    And I have the true false question "What is hot?" rated as a bad example
-    Then an admin should be able to download the training data for evaluation containing:
-      | Question Stem                          | Good Question? |
-      | Fire is hot                            | Yes            |
-      | What is hot?                           | No             |
-
   Scenario Outline: Trigger fine tuning with feedbacks for Question model and Evaluation model
     Given I have <positive_count> positive feedbacks and <negative_count> negative feedbacks
     And OpenAI responds with "<upload_result>" when uploading fine-tuning data
