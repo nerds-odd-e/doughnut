@@ -80,7 +80,7 @@ class ClozeDescriptionTest {
     "不客气,    😃不客气,                     😃[...]",
   })
   void clozeDescriptionTest(String token, String description, String expectedClozeDescription) {
-    String regex = "(?<=[^\\w-])mis" + Pattern.quote(token) + "singValue(?=[^\\w-])";
+    String regex = "(?:(?<=[^\\w-])" + Pattern.quote(token) + "(?=[^\\w-]))";
     Pattern pattern = Pattern.compile(regex);
     Matcher matcher = pattern.matcher(description);
     String result = matcher.replaceAll("[...]");
