@@ -99,7 +99,7 @@ Given("OpenAI responds with {string} when uploading fine-tuning data", (result) 
   mock_services.openAi().stubOpenAiUploadResponse(result === "success")
 })
 
-Given("OpenAI responds with {string} when trigger fine-tuning", (result) => {
+Given("OpenAI responds with {string} when triggering fine-tuning", (result) => {
   mock_services.openAi().stubFineTuningStatus(result === "success")
 })
 

@@ -73,7 +73,7 @@ class RestAiControllerTrainingFileTest {
             argThat(
                 argument ->
                     argument.getTrainingFile().equals("test")
-                        && argument.getModel().equals("gpt-3.5-turbo")));
+                        && argument.getModel().equals("gpt-4")));
   }
 
   @ParameterizedTest
