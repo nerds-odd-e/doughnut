@@ -86,7 +86,7 @@ public class AiAdvisorService {
   public void triggerFineTune(String fileId) {
     FineTuningJobRequest fineTuningJobRequest = new FineTuningJobRequest();
     fineTuningJobRequest.setTrainingFile(fileId);
-    fineTuningJobRequest.setModel("gpt-4");
+    fineTuningJobRequest.setModel("gpt-3.5-turbo-1106");
     fineTuningJobRequest.setHyperparameters(
         new Hyperparameters(3)); // not sure what should be the nEpochs value
 
@@ -100,7 +100,7 @@ public class AiAdvisorService {
         .getModels()
         .forEach(
             (e) -> {
-              if (e.id.startsWith("ft:gpt-3.5-turbo-0613:odd-e::")
+              if (e.id.startsWith("ft:")
                   || e.id.startsWith("gpt-3.5")
                   || e.id.startsWith("gpt-4")) {
                 ModelVersionOption modelVersionOption = new ModelVersionOption(e.id, e.id, e.id);
