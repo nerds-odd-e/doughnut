@@ -16,7 +16,7 @@ public record HtmlOrMarkdown(String htmlOrMarkdown) {
     if (htmlOrMarkdown == null) return true;
 
     String regexBr = "(\\s*<br[^>]*/?>\\s*)";
-    String regex = "^(?:\\s*((<p[^>]*>)(\\s|" + regexBr + ")*</p>\\s*)|" + regexBr + ")*$";
+    String regex = "^(?:\\s*((<p[^>]*>){1,100}(\\s|" + regexBr + ")*</p>\\s*)|" + regexBr + ")*$";
 
     Pattern pattern = Pattern.compile(regex);
     Matcher matcher = pattern.matcher(htmlOrMarkdown);
