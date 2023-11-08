@@ -86,7 +86,7 @@ public class AiAdvisorService {
   public void triggerFineTune(String fileId) {
     FineTuningJobRequest fineTuningJobRequest = new FineTuningJobRequest();
     fineTuningJobRequest.setTrainingFile(fileId);
-    fineTuningJobRequest.setModel("gpt-3.5-turbo");
+    fineTuningJobRequest.setModel("gpt-4");
     fineTuningJobRequest.setHyperparameters(
         new Hyperparameters(3)); // not sure what should be the nEpochs value
 
