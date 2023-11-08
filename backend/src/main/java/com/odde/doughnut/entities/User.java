@@ -49,7 +49,7 @@ public class User {
   @Setter
   private Integer dailyNewNotesCount = 15;
 
-  @Pattern(regexp = "^\\d+(,\\s*\\d+)*$", message = "must be numbers separated by ','")
+  @Pattern(regexp = "^\\d+((,\\s*\\d+){1,1000})*$", message = "must be numbers separated by ','")
   @Column(name = "space_intervals")
   @Getter
   @Setter
