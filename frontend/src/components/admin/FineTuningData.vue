@@ -68,7 +68,7 @@ export default {
     async triggerFineTuning() {
       try {
         await this.api.fineTuning.postUploadAndTriggerFineTuning();
-        this.fineTuningDataResultMsg = "Training is in progress.";
+        this.fineTuningDataResultMsg = "Training initiated.";
       } catch (error) {
         const errorInstance = error as Error;
         this.fineTuningDataResultMsg = errorInstance.message;
