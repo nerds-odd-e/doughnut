@@ -15,9 +15,9 @@ import org.apache.logging.log4j.util.Strings;
 public class OpenAIChatAboutNoteRequestBuilder {
   public static final String GPT_4 = "gpt-4";
   public static final String GPT_MODEL_DEFAULT = "gpt-3.5-turbo-1106";
-  public static final String GPT_MODEL_FOR_EVALUATION = "ft:gpt-3.5-turbo-0613:odd-e::8E7utoRD";
+  public static final String GPT_MODEL_FOR_EVALUATION = "ft:gpt-3.5-turbo-1106:odd-e::8IYkbcnU";
   public static final String GPT_MODEL_FOR_QUESTION_GENERATION =
-      "ft:gpt-3.5-turbo-0613:odd-e::8DpeUKBy";
+      "ft:gpt-3.5-turbo-1106:odd-e::8IYk5377";
   String model = GPT_MODEL_DEFAULT;
   private List<ChatMessage> messages = new ArrayList<>();
   private List<ChatFunction> functions = new ArrayList<>();
