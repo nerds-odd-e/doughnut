@@ -5,7 +5,8 @@
     <QuizQuestion :quiz-question="q.quizeQuestion" :disabled="true" />
   </div>
   <p v-if="currentQuestionLegitMessage">{{ currentQuestionLegitMessage }}</p>
-  <div class="quiz-question" v-if="currentQuestion">
+  <ContentLoader v-if="!currentQuestion" />
+  <div class="quiz-question" v-else>
     <AnsweredQuestion
       v-if="answeredQuestion"
       :answered-question="answeredQuestion"

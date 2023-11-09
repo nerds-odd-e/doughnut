@@ -169,6 +169,7 @@ declare namespace Generated {
     interface QuizQuestionContestResult {
         newQuizQuestion?: QuizQuestion;
         reason: string;
+        legitimated: boolean;
     }
 
     interface RedirectToNoteResponse {
