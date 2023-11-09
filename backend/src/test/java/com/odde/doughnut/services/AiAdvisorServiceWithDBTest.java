@@ -17,7 +17,6 @@ import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import io.reactivex.Single;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -89,7 +88,6 @@ class AiAdvisorServiceWithDBTest {
     }
 
     @Test
-    @Disabled
     void noFunctionCallInvoked() throws JsonProcessingException {
       Single<ChatCompletionResult> toBeReturned =
           Single.just(
@@ -98,11 +96,9 @@ class AiAdvisorServiceWithDBTest {
                   .functionCall("", new ObjectMapper().readTree(""))
                   .please());
       mockChatCompletionAndMatchFunctionCall("evaluate_question", toBeReturned);
-      QuizQuestionContestResult contest =
-          aiAdvisorService.getQuizQuestionContestResult(quizQuestionEntity);
-      assertFalse(contest.rejected);
-      Assertions.assertThat(contest.reason)
-          .isEqualTo("This seems to be a legitimate question. Please answer it.");
+      assertThrows(
+          RuntimeException.class,
+          () -> aiAdvisorService.getQuizQuestionContestResult(quizQuestionEntity));
     }
 
     private Single<ChatCompletionResult> buildCompletionResultForFunctionCall(String jsonString)

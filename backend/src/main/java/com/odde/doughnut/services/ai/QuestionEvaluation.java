@@ -23,7 +23,7 @@ public class QuestionEvaluation {
     try {
       return Optional.of(new ObjectMapper().treeToValue(jsonNode, QuestionEvaluation.class));
     } catch (JsonProcessingException e) {
-      return Optional.empty();
+      throw new RuntimeException(e);
     }
   }
 
