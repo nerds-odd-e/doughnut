@@ -1,11 +1,11 @@
 <template>
+  <div v-for="(q, index) in prevQuizQuestions" :key="index">
+    <h3>Previous Question Contested ...</h3>
+    <p>{{ q.badQuestionReason }}</p>
+    <QuizQuestion :quiz-question="q.quizeQuestion" :disabled="true" />
+  </div>
+  <p v-if="currentQuestionLegitMessage">{{ currentQuestionLegitMessage }}</p>
   <div class="quiz-question" v-if="currentQuestion">
-    <div v-for="(q, index) in prevQuizQuestions" :key="index">
-      <h3>Previous Question Contested ...</h3>
-      <p>{{ q.badQuestionReason }}</p>
-      <QuizQuestion :quiz-question="q.quizeQuestion" :disabled="true" />
-    </div>
-    <p v-if="currentQuestionLegitMessage">{{ currentQuestionLegitMessage }}</p>
     <AnsweredQuestion
       v-if="answeredQuestion"
       :answered-question="answeredQuestion"
