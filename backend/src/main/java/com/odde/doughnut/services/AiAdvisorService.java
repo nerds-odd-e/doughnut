@@ -108,8 +108,7 @@ public class AiAdvisorService {
     return modelVersionOptions;
   }
 
-  public QuizQuestionContestResult getQuizQuestionContestResult(
-      QuizQuestionEntity quizQuestionEntity) {
+  public QuizQuestionContestResult contestQuestion(QuizQuestionEntity quizQuestionEntity) {
     QuestionEvaluation questionEvaluation = contestMCQ(quizQuestionEntity);
     if (questionEvaluation != null) {
       if (questionEvaluation.makeSense(quizQuestionEntity.getCorrectAnswerIndex())) {

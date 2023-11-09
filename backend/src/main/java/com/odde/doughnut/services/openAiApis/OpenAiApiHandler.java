@@ -71,11 +71,6 @@ public class OpenAiApiHandler {
   public Optional<JsonNode> getFunctionCallArguments(ChatCompletionRequest chatRequest) {
     return chatCompletion(chatRequest)
         .map(ChatCompletionChoice::getMessage)
-        .map(
-            (x) -> {
-              System.out.println(x);
-              return x;
-            })
         .map(ChatMessage::getFunctionCall)
         .map(ChatFunctionCall::getArguments);
   }

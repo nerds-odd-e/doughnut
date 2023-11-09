@@ -69,8 +69,7 @@ class AiAdvisorServiceWithDBTest {
     void rejected() throws JsonProcessingException {
       mockChatCompletionAndReturnFunctionCall(
           "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
-      QuizQuestionContestResult contest =
-          aiAdvisorService.getQuizQuestionContestResult(quizQuestionEntity);
+      QuizQuestionContestResult contest = aiAdvisorService.contestQuestion(quizQuestionEntity);
       assertTrue(contest.rejected);
       Assertions.assertThat(contest.reason)
           .isEqualTo("This seems to be a legitimate question. Please answer it.");
@@ -81,8 +80,7 @@ class AiAdvisorServiceWithDBTest {
       questionEvaluation.feasibleQuestion = false;
       mockChatCompletionAndReturnFunctionCall(
           "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
-      QuizQuestionContestResult contest =
-          aiAdvisorService.getQuizQuestionContestResult(quizQuestionEntity);
+      QuizQuestionContestResult contest = aiAdvisorService.contestQuestion(quizQuestionEntity);
       assertFalse(contest.rejected);
       Assertions.assertThat(contest.reason).isEqualTo("what a horrible question!");
     }
@@ -97,8 +95,7 @@ class AiAdvisorServiceWithDBTest {
                   .please());
       mockChatCompletionAndMatchFunctionCall("evaluate_question", toBeReturned);
       assertThrows(
-          RuntimeException.class,
-          () -> aiAdvisorService.getQuizQuestionContestResult(quizQuestionEntity));
+          RuntimeException.class, () -> aiAdvisorService.contestQuestion(quizQuestionEntity));
     }
 
     private Single<ChatCompletionResult> buildCompletionResultForFunctionCall(String jsonString)
