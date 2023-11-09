@@ -279,6 +279,49 @@ class RestQuizQuestionControllerTests {
   }
 
   @Nested
+  class RegenerateQuestion {
+    QuizQuestionEntity quizQuestionEntity;
+    Note note;
+
+    @BeforeEach
+    void setUp() {
+      note = makeMe.aNote().please();
+
+      quizQuestionEntity = makeMe.aQuestion().ofNote(note).please();
+    }
+
+    @Test
+    void askWithNoteThatCannotAccess() {
+      assertThrows(
+          ResponseStatusException.class,
+          () -> {
+            RestQuizQuestionController restAiController =
+                new RestQuizQuestionController(
+                    openAiApi,
+                    makeMe.modelFactoryService,
+                    makeMe.aNullUserModel(),
+                    testabilitySettings);
+            restAiController.regenerate(quizQuestionEntity);
+          });
+    }
+
+    @Test
+    void createQuizQuestion() {
+      String jsonQuestion =
+          makeMe
+              .aMCQWithAnswer()
+              .stem("What is the first color in the rainbow?")
+              .please()
+              .toJsonString();
+
+      mockChatCompletionForGPT3_5MessageOnly(jsonQuestion);
+      QuizQuestion quizQuestion = controller.regenerate(quizQuestionEntity);
+
+      Assertions.assertThat(quizQuestion.stem).contains("What is the first color in the rainbow?");
+    }
+  }
+
+  @Nested
   class Contest {
     String jsonQuestion;
     QuizQuestionEntity quizQuestionEntity;
