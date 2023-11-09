@@ -38,9 +38,9 @@
     js-tokens "^4.0.0"
 
 "@babel/parser@^7.18.8":
-  version "7.23.0"
-  resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.23.0.tgz#da950e622420bf96ca0d0f2909cdddac3acd8719"
-  integrity sha512-vvPKKdMemU85V9WE/l5wZEmImpCtLqbnTvqDS2U1fJ96KrxoW7KrXhNsNCblQlg8Ck4b85yxdTyelsMUgFUXiw==
+  version "7.23.3"
+  resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.23.3.tgz#0ce0be31a4ca4f1884b5786057cadcb6c3be58f9"
+  integrity sha512-uVsWNvlVsIninV2prNz/3lHCb+5CJ+e+IUBfbjToAHODtfGYLfCFuY4AU7TskI+dAKk+njsPiBjq1gKTvZOBaw==
 
 "@babel/runtime@^7.12.5", "@babel/runtime@^7.14.6":
   version "7.23.2"
@@ -62,9 +62,9 @@
     node-hook "^1.0.0"
 
 "@badeball/cypress-cucumber-preprocessor@^19.0":
-  version "19.0.1"
-  resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-19.0.1.tgz#e0d03f957f7d9a9e915026cd16acd664fec8b182"
-  integrity sha512-pv9dT6ZsWLOyo51Q55c7LFxaJI78br76BO69ysEw3+pkwTu4LgYvP+vzhhbMfBaKiF3Sn7diDv1YK/JeHMTq9Q==
+  version "19.1.0"
+  resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-19.1.0.tgz#48eb1021934654cf7880a641ab2dffbc9d529474"
+  integrity sha512-pymOmG8yzyUbuFyIieLgKBTPPvdPVUKf3e19F4BejBpm+JTJbqS2ZBRxfJQ1LyQoKi6c0NbFboz6SJS1vV/Qbw==
   dependencies:
     "@badeball/cypress-configuration" "^6.1.0"
     "@cucumber/cucumber" "^10.0.0"
@@ -1594,10 +1594,10 @@ cypress-file-upload@^5.0:
   resolved "https://registry.yarnpkg.com/cypress-file-upload/-/cypress-file-upload-5.0.8.tgz#d8824cbeaab798e44be8009769f9a6c9daa1b4a1"
   integrity sha512-+8VzNabRk3zG6x8f8BWArF/xA/W0VK4IZNx3MV0jFWrJS/qKn8eHfa5nU73P9fOQAgwHFJx7zjg4lwOnljMO8g==
 
-cypress@13.4.0:
-  version "13.4.0"
-  resolved "https://registry.yarnpkg.com/cypress/-/cypress-13.4.0.tgz#7d91069983ba7c664c505abde84d3e3e20484344"
-  integrity sha512-KeWNC9xSHG/ewZURVbaQsBQg2mOKw4XhjJZFKjWbEjgZCdxpPXLpJnfq5Jns1Gvnjp6AlnIfpZfWFlDgVKXdWQ==
+cypress@13.5.0:
+  version "13.5.0"
+  resolved "https://registry.yarnpkg.com/cypress/-/cypress-13.5.0.tgz#8c149074186130972f08b2cdce6ded41f014bacd"
+  integrity sha512-oh6U7h9w8wwHfzNDJQ6wVcAeXu31DlIYlNOBvfd6U4CcB8oe4akawQmH+QJVOMZlM42eBoCne015+svVqdwdRQ==
   dependencies:
     "@cypress/request" "^3.0.0"
     "@cypress/xvfb" "^1.2.4"
@@ -1712,14 +1712,14 @@ decompress-response@^6.0.0:
     mimic-response "^3.1.0"
 
 deep-equal@^2.0.5:
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/deep-equal/-/deep-equal-2.2.2.tgz#9b2635da569a13ba8e1cc159c2f744071b115daa"
-  integrity sha512-xjVyBf0w5vH0I42jdAZzOKVldmPgSulmiyPRywoyq7HXC9qdgo17kxJE+rdnif5Tz6+pIrpJI8dCpMNLIGkUiA==
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/deep-equal/-/deep-equal-2.2.3.tgz#af89dafb23a396c7da3e862abc0be27cf51d56e1"
+  integrity sha512-ZIwpnevOurS8bpT4192sqAowWM76JDKSHYzMLty3BZGSswgq6pBaH3DhCSW5xVAZICZyKdOBPjwww5wfgT/6PA==
   dependencies:
     array-buffer-byte-length "^1.0.0"
-    call-bind "^1.0.2"
+    call-bind "^1.0.5"
     es-get-iterator "^1.1.3"
-    get-intrinsic "^1.2.1"
+    get-intrinsic "^1.2.2"
     is-arguments "^1.1.1"
     is-array-buffer "^3.0.2"
     is-date-object "^1.0.5"
@@ -1729,11 +1729,11 @@ deep-equal@^2.0.5:
     object-is "^1.1.5"
     object-keys "^1.1.1"
     object.assign "^4.1.4"
-    regexp.prototype.flags "^1.5.0"
+    regexp.prototype.flags "^1.5.1"
     side-channel "^1.0.4"
     which-boxed-primitive "^1.0.2"
     which-collection "^1.0.1"
-    which-typed-array "^1.1.9"
+    which-typed-array "^1.1.13"
 
 deep-is@^0.1.3:
   version "0.1.4"
@@ -4704,7 +4704,7 @@ regexp-tree@^0.1.11, regexp-tree@~0.1.1:
   resolved "https://registry.yarnpkg.com/regexp-tree/-/regexp-tree-0.1.27.tgz#2198f0ef54518ffa743fe74d983b56ffd631b6cd"
   integrity sha512-iETxpjK6YoRWJG5o6hXLwvjYAoW+FEZn9os0PD/b6AP6xQwsa/Y7lCVgIixBbUPMfhu+i2LtdeAqVTgGlQarfA==
 
-regexp.prototype.flags@^1.5.0, regexp.prototype.flags@^1.5.1:
+regexp.prototype.flags@^1.5.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/regexp.prototype.flags/-/regexp.prototype.flags-1.5.1.tgz#90ce989138db209f81492edd734183ce99f9677e"
   integrity sha512-sy6TXMN+hnP/wMy+ISxg3krXx7BAtWVO4UouuCN/ziM9UEne0euamVNafDfvC83bRNr95y0V5iijeDQFUNpvrg==
@@ -5731,7 +5731,7 @@ which-collection@^1.0.1:
     is-weakmap "^2.0.1"
     is-weakset "^2.0.1"
 
-which-typed-array@^1.1.11, which-typed-array@^1.1.13, which-typed-array@^1.1.9:
+which-typed-array@^1.1.11, which-typed-array@^1.1.13:
   version "1.1.13"
   resolved "https://registry.yarnpkg.com/which-typed-array/-/which-typed-array-1.1.13.tgz#870cd5be06ddb616f504e7b039c4c24898184d36"
   integrity sha512-P5Nra0qjSncduVPEAr7xhoF5guty49ArDTwzJ/yNuPIbZppyRxFQsRCWrocxIY+CnMVG+qfbU2FmDKyvSGClow==
