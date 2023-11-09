@@ -1,9 +1,6 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.controllers.json.AiCompletion;
-import com.odde.doughnut.controllers.json.AiCompletionParams;
-import com.odde.doughnut.controllers.json.AiTrainingFile;
-import com.odde.doughnut.controllers.json.ModelVersionOption;
+import com.odde.doughnut.controllers.json.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
@@ -109,5 +106,24 @@ public class AiAdvisorService {
             });
 
     return modelVersionOptions;
+  }
+
+  public QuizQuestionContestResult getQuizQuestionContestResult(
+      QuizQuestionEntity quizQuestionEntity) {
+    QuestionEvaluation questionEvaluation = contestMCQ(quizQuestionEntity);
+    if (questionEvaluation != null) {
+      if (questionEvaluation.makeSense(quizQuestionEntity.getCorrectAnswerIndex())) {
+        QuizQuestionContestResult result = new QuizQuestionContestResult();
+        result.reason = "This seems to be a legitimate question. Please answer it.";
+        result.rejected = true;
+        return result;
+      }
+      QuizQuestionContestResult result = new QuizQuestionContestResult();
+      result.reason = questionEvaluation.comment;
+      return result;
+    }
+    QuizQuestionContestResult result = new QuizQuestionContestResult();
+    result.reason = "Failed to evaluate the question.";
+    return result;
   }
 }

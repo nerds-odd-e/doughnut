@@ -9,7 +9,6 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionGenerator;
 import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
-import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.OpenAiApi;
 import java.util.List;
@@ -52,19 +51,7 @@ class RestQuizQuestionController {
   public QuizQuestionContestResult contest(
       @PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity) {
     currentUser.assertLoggedIn();
-    QuestionEvaluation questionEvaluation = aiAdvisorService.contestMCQ(quizQuestionEntity);
-    QuizQuestionContestResult result = new QuizQuestionContestResult();
-    if (questionEvaluation != null) {
-      if (questionEvaluation.makeSense(quizQuestionEntity.getCorrectAnswerIndex())) {
-        result.reason = "This seems to be a legitimate question. Please answer it.";
-        result.rejected = true;
-        return result;
-      }
-      result.reason = questionEvaluation.comment;
-    } else {
-      result.reason = "Failed to evaluate the question.";
-    }
-    return result;
+    return aiAdvisorService.getQuizQuestionContestResult(quizQuestionEntity);
   }
 
   @PostMapping("/{quizQuestion}/regenerate")
