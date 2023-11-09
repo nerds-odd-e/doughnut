@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.controllers.json.QuizQuestionContestResult;
 import java.util.Optional;
 
 public class QuestionEvaluation {
@@ -27,10 +28,24 @@ public class QuestionEvaluation {
     }
   }
 
-  public boolean makeSense(int correctChoiceIndex) {
-    return feasibleQuestion
-        && correctChoices != null
+  private boolean disputableAnswer(int correctChoiceIndex) {
+    return correctChoices != null
         && correctChoices.length == 1
         && correctChoices[0] == correctChoiceIndex;
+  }
+
+  public QuizQuestionContestResult getQuizQuestionContestResult(Integer correctAnswerIndex) {
+    if (feasibleQuestion && disputableAnswer(correctAnswerIndex)) {
+      QuizQuestionContestResult result = new QuizQuestionContestResult();
+      result.reason = "This seems to be a legitimate question. Please answer it.";
+      result.rejected = true;
+      return result;
+    }
+    QuizQuestionContestResult result = new QuizQuestionContestResult();
+    result.reason = comment;
+    if (disputableAnswer(correctAnswerIndex)) {
+      result.reason += " Uncleared answer detected.";
+    }
+    return result;
   }
 }
