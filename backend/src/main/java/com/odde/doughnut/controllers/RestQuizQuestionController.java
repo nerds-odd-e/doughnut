@@ -57,7 +57,7 @@ class RestQuizQuestionController {
     if (questionEvaluation != null) {
       if (questionEvaluation.makeSense(quizQuestionEntity.getCorrectAnswerIndex())) {
         result.reason = "This seems to be a legitimate question. Please answer it.";
-        result.legitimated = true;
+        result.rejected = true;
         return result;
       }
       result.reason = questionEvaluation.comment;

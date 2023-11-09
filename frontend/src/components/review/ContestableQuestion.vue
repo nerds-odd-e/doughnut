@@ -87,7 +87,7 @@ export default defineComponent({
         this.currentQuestion.quizQuestionId,
       );
 
-      if (!contestResult.legitimated) {
+      if (!contestResult.rejected) {
         this.regenerating = true;
         this.prevQuizQuestions.push({
           quizeQuestion: this.currentQuestion,
