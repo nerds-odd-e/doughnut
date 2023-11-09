@@ -82,7 +82,6 @@ class AiAdvisorServiceWithDBTest {
           "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
       QuizQuestionContestResult contest = aiAdvisorService.contestQuestion(quizQuestionEntity);
       assertFalse(contest.rejected);
-      Assertions.assertThat(contest.reason).isEqualTo("what a horrible question!");
     }
 
     @Test

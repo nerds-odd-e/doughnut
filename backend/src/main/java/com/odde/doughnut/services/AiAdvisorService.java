@@ -7,7 +7,6 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleEx
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
-import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
@@ -34,12 +33,6 @@ public class AiAdvisorService {
 
   public MCQWithAnswer generateQuestion(Note note) throws QuizQuestionNotPossibleException {
     return getAiQuestionGenerator(note).getAiGeneratedQuestion();
-  }
-
-  public QuestionEvaluation contestMCQ(QuizQuestionEntity quizQuestionEntity) {
-    return getAiQuestionGenerator(quizQuestionEntity.getThing().getNote())
-        .evaluateQuestion(quizQuestionEntity.getMcqWithAnswer())
-        .orElse(null);
   }
 
   public AiCompletion getAiCompletion(AiCompletionParams aiCompletionParams, Note note) {
@@ -109,20 +102,9 @@ public class AiAdvisorService {
   }
 
   public QuizQuestionContestResult contestQuestion(QuizQuestionEntity quizQuestionEntity) {
-    QuestionEvaluation questionEvaluation = contestMCQ(quizQuestionEntity);
-    if (questionEvaluation != null) {
-      if (questionEvaluation.makeSense(quizQuestionEntity.getCorrectAnswerIndex())) {
-        QuizQuestionContestResult result = new QuizQuestionContestResult();
-        result.reason = "This seems to be a legitimate question. Please answer it.";
-        result.rejected = true;
-        return result;
-      }
-      QuizQuestionContestResult result = new QuizQuestionContestResult();
-      result.reason = questionEvaluation.comment;
-      return result;
-    }
-    QuizQuestionContestResult result = new QuizQuestionContestResult();
-    result.reason = "Failed to evaluate the question.";
-    return result;
+    return getAiQuestionGenerator(quizQuestionEntity.getThing().getNote())
+        .evaluateQuestion(quizQuestionEntity.getMcqWithAnswer())
+        .map(e -> e.getQuizQuestionContestResult(quizQuestionEntity.getCorrectAnswerIndex()))
+        .orElse(null);
   }
 }
