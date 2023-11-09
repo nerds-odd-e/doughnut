@@ -323,7 +323,7 @@ class RestQuizQuestionControllerTests {
       mockChatCompletionAndReturnFunctionCall(
           "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
       QuizQuestionContestResult contest = controller.contest(quizQuestionEntity);
-      Assertions.assertThat(contest.newQuizQuestion).isNull();
+      assertTrue(contest.legitimated);
       Assertions.assertThat(contest.reason)
           .isEqualTo("This seems to be a legitimate question. Please answer it.");
     }
@@ -335,7 +335,7 @@ class RestQuizQuestionControllerTests {
           "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
       mockChatCompletionForGPT3_5MessageOnly(jsonQuestion);
       QuizQuestionContestResult contest = controller.contest(quizQuestionEntity);
-      Assertions.assertThat(contest.newQuizQuestion).isNotNull();
+      assertFalse(contest.legitimated);
       Assertions.assertThat(contest.reason).isEqualTo("what a horrible question!");
     }
 

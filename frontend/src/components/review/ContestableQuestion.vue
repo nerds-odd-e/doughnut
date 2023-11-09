@@ -5,7 +5,7 @@
     <QuizQuestion :quiz-question="q.quizeQuestion" :disabled="true" />
   </div>
   <p v-if="currentQuestionLegitMessage">{{ currentQuestionLegitMessage }}</p>
-  <ContentLoader v-if="!currentQuestion" />
+  <ContentLoader v-if="regenerating" />
   <div class="quiz-question" v-else>
     <AnsweredQuestion
       v-if="answeredQuestion"
@@ -59,6 +59,7 @@ export default defineComponent({
   },
   data() {
     return {
+      regenerating: false,
       currentQuestionLegitMessage: "",
       currentQuestion: this.quizQuestion,
       answeredQuestion: undefined as Generated.AnsweredQuestion | undefined,
@@ -82,21 +83,23 @@ export default defineComponent({
     },
     async contest() {
       this.currentQuestionLegitMessage = "";
-      const tmpQuestion: Generated.QuizQuestion | undefined =
-        this.currentQuestion;
       const contestResult = await this.api.quizQuestions.contest(
         this.currentQuestion.quizQuestionId,
       );
 
-      if (contestResult.newQuizQuestion) {
-        this.currentQuestion = contestResult.newQuizQuestion;
+      if (!contestResult.legitimated) {
+        this.regenerating = true;
         this.prevQuizQuestions.push({
-          quizeQuestion: tmpQuestion,
+          quizeQuestion: this.currentQuestion,
           badQuestionReason: contestResult.reason,
         });
+        this.currentQuestion = await this.api.quizQuestions.regenerateQuestion(
+          this.currentQuestion.quizQuestionId,
+        );
       } else {
         this.currentQuestionLegitMessage = contestResult.reason;
       }
+      this.regenerating = false;
       this.scrollToBottom();
     },
     onAnswered(answeredQuestion: Generated.AnsweredQuestion) {
