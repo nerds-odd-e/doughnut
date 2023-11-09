@@ -28,6 +28,7 @@ import io.reactivex.Single;
 import java.sql.Timestamp;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -319,7 +320,7 @@ class RestQuizQuestionControllerTests {
 
     @Test
     void rejected() throws JsonProcessingException {
-      mockChatCompletionForFunctionCall(
+      mockChatCompletionAndReturnFunctionCall(
           "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
       QuizQuestionContestResult contest = controller.contest(quizQuestionEntity);
       Assertions.assertThat(contest.newQuizQuestion).isNull();
@@ -330,12 +331,28 @@ class RestQuizQuestionControllerTests {
     @Test
     void acceptTheContest() throws JsonProcessingException {
       questionEvaluation.feasibleQuestion = false;
-      mockChatCompletionForFunctionCall(
+      mockChatCompletionAndReturnFunctionCall(
           "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
       mockChatCompletionForGPT3_5MessageOnly(jsonQuestion);
       QuizQuestionContestResult contest = controller.contest(quizQuestionEntity);
       Assertions.assertThat(contest.newQuizQuestion).isNotNull();
       Assertions.assertThat(contest.reason).isEqualTo("what a horrible question!");
+    }
+
+    @Test
+    @Disabled
+    void noFunctionCallInvoked() throws JsonProcessingException {
+      Single<ChatCompletionResult> toBeReturned =
+          Single.just(
+              makeMe
+                  .openAiCompletionResult()
+                  .functionCall("", new ObjectMapper().readTree(""))
+                  .please());
+      mockChatCompletionAndMatchFunctionCall("evaluate_question", toBeReturned);
+      QuizQuestionContestResult contest = controller.contest(quizQuestionEntity);
+      Assertions.assertThat(contest.newQuizQuestion).isNull();
+      Assertions.assertThat(contest.reason)
+          .isEqualTo("This seems to be a legitimate question. Please answer it.");
     }
   }
 
@@ -357,9 +374,15 @@ class RestQuizQuestionControllerTests {
         .createChatCompletion(argThat(request -> request.getFunctions() == null));
   }
 
-  private void mockChatCompletionForFunctionCall(String functionName, String result)
+  private void mockChatCompletionAndReturnFunctionCall(String functionName, String result)
       throws JsonProcessingException {
-    doReturn(buildCompletionResultForFunctionCall(result))
+    mockChatCompletionAndMatchFunctionCall(
+        functionName, buildCompletionResultForFunctionCall(result));
+  }
+
+  private void mockChatCompletionAndMatchFunctionCall(
+      String functionName, Single<ChatCompletionResult> toBeReturned) {
+    doReturn(toBeReturned)
         .when(openAiApi)
         .createChatCompletion(
             argThat(
