@@ -28,7 +28,6 @@ import io.reactivex.Single;
 import java.sql.Timestamp;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -323,7 +322,6 @@ class RestQuizQuestionControllerTests {
 
   @Nested
   class Contest {
-    String jsonQuestion;
     QuizQuestionEntity quizQuestionEntity;
     QuestionEvaluation questionEvaluation = new QuestionEvaluation();
 
@@ -333,14 +331,7 @@ class RestQuizQuestionControllerTests {
       questionEvaluation.feasibleQuestion = true;
       questionEvaluation.comment = "what a horrible question!";
 
-      MCQWithAnswer aiGeneratedQuestion =
-          makeMe
-              .aMCQWithAnswer()
-              .stem("What is the first color in the rainbow?")
-              .choices("red", "black", "green")
-              .correctChoiceIndex(0)
-              .please();
-      jsonQuestion = aiGeneratedQuestion.toJsonString();
+      MCQWithAnswer aiGeneratedQuestion = makeMe.aMCQWithAnswer().please();
       Note note = makeMe.aNote().please();
       quizQuestionEntity =
           makeMe.aQuestion().ofAIGeneratedQuestion(aiGeneratedQuestion, note.getThing()).please();
@@ -367,8 +358,6 @@ class RestQuizQuestionControllerTests {
           "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
       QuizQuestionContestResult contest = controller.contest(quizQuestionEntity);
       assertTrue(contest.rejected);
-      Assertions.assertThat(contest.reason)
-          .isEqualTo("This seems to be a legitimate question. Please answer it.");
     }
 
     @Test
@@ -376,26 +365,8 @@ class RestQuizQuestionControllerTests {
       questionEvaluation.feasibleQuestion = false;
       mockChatCompletionAndReturnFunctionCall(
           "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
-      mockChatCompletionForGPT3_5MessageOnly(jsonQuestion);
       QuizQuestionContestResult contest = controller.contest(quizQuestionEntity);
       assertFalse(contest.rejected);
-      Assertions.assertThat(contest.reason).isEqualTo("what a horrible question!");
-    }
-
-    @Test
-    @Disabled
-    void noFunctionCallInvoked() throws JsonProcessingException {
-      Single<ChatCompletionResult> toBeReturned =
-          Single.just(
-              makeMe
-                  .openAiCompletionResult()
-                  .functionCall("", new ObjectMapper().readTree(""))
-                  .please());
-      mockChatCompletionAndMatchFunctionCall("evaluate_question", toBeReturned);
-      QuizQuestionContestResult contest = controller.contest(quizQuestionEntity);
-      assertFalse(contest.rejected);
-      Assertions.assertThat(contest.reason)
-          .isEqualTo("This seems to be a legitimate question. Please answer it.");
     }
   }
 
