@@ -350,7 +350,7 @@ class RestQuizQuestionControllerTests {
                   .please());
       mockChatCompletionAndMatchFunctionCall("evaluate_question", toBeReturned);
       QuizQuestionContestResult contest = controller.contest(quizQuestionEntity);
-      Assertions.assertThat(contest.newQuizQuestion).isNull();
+      assertFalse(contest.legitimated);
       Assertions.assertThat(contest.reason)
           .isEqualTo("This seems to be a legitimate question. Please answer it.");
     }
