@@ -168,7 +168,7 @@ declare namespace Generated {
 
     interface QuizQuestionContestResult {
         reason: string;
-        legitimated: boolean;
+        rejected: boolean;
     }
 
     interface RedirectToNoteResponse {

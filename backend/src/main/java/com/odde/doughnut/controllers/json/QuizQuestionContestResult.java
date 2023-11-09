@@ -4,5 +4,5 @@ import lombok.Getter;
 
 public class QuizQuestionContestResult {
   @Getter public String reason;
-  @Getter public Boolean legitimated = false;
+  @Getter public Boolean rejected = false;
 }
