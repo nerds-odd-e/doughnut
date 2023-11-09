@@ -51,7 +51,7 @@ class RestQuizQuestionController {
   public QuizQuestionContestResult contest(
       @PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity) {
     currentUser.assertLoggedIn();
-    return aiAdvisorService.getQuizQuestionContestResult(quizQuestionEntity);
+    return aiAdvisorService.contestQuestion(quizQuestionEntity);
   }
 
   @PostMapping("/{quizQuestion}/regenerate")
