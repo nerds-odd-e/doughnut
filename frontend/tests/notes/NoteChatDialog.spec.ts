@@ -65,9 +65,12 @@ describe("NoteChatDialog TestMe", () => {
       wrapper = await createWrapper();
       wrapper.find("button").trigger("click");
       await flushPromises();
+      helper.apiMock.expectingPost(
+        `/api/quiz-questions/${quizQuestion.quizQuestionId}/contest`,
+      );
       helper.apiMock
         .expectingPost(
-          `/api/quiz-questions/${quizQuestion.quizQuestionId}/contest`,
+          `/api/quiz-questions/${quizQuestion.quizQuestionId}/regenerate`,
         )
         .andReturnOnce(newQuestion);
       vitest.clearAllMocks();

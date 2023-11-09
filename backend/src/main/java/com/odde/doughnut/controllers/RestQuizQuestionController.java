@@ -64,8 +64,15 @@ class RestQuizQuestionController {
     } else {
       result.reason = "Failed to evaluate the question.";
     }
-    result.newQuizQuestion = generateAIQuestion(quizQuestionEntity.getThing());
     return result;
+  }
+
+  @PostMapping("/{quizQuestion}/regenerate")
+  @Transactional
+  public QuizQuestion regenerate(
+      @PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity) {
+    currentUser.assertLoggedIn();
+    return generateAIQuestion(quizQuestionEntity.getThing());
   }
 
   private QuizQuestion generateAIQuestion(Thing thing) {
