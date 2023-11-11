@@ -71,6 +71,15 @@ const openAiService = () => {
       return serviceMocker.install()
     },
 
+    mockChatCompletionWithModelName(
+      incomplete: string,
+      reply: string,
+      finishReason: "stop" | "length",
+    ) {
+      const messages = [{ content: "^" + Cypress._.escapeRegExp(incomplete) + "$" }]
+      return mockChatCompletionForMessageContaining(serviceMocker, messages, reply, finishReason)
+    },
+
     mockChatCompletionWithIncompleteAssistantMessage(
       incomplete: string,
       reply: string,
@@ -176,6 +185,24 @@ const openAiService = () => {
         status: successful ? "queued" : "failed",
         validation_file: null,
         training_file: "file-abc123",
+      })
+    },
+    async stubGetModels(modelNames: string) {
+      const predicate = new FlexiPredicate()
+        .withOperator(Operator.matches)
+        .withPath(`/v1/models`)
+        .withMethod(HttpMethod.GET)
+
+      return await serviceMocker.mockWithPredicate(predicate, {
+        object: "list",
+        data: modelNames.split(",").map((modelName) => {
+          return {
+            id: modelName,
+            object: "model",
+            created: 1614807352,
+            owned_by: "openai",
+          }
+        }),
       })
     },
   }

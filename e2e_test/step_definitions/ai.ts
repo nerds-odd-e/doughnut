@@ -22,6 +22,12 @@ Given("OpenAI by default returns text completion {string}", (details: string) =>
   })
 })
 
+Given("OpenAI has models {string} available", (modelNames: string) => {
+  cy.then(async () => {
+    mock_services.openAi().stubGetModels(modelNames)
+  })
+})
+
 Given(
   "OpenAI completes with {string} for context containing {string}",
   (returnMessage: string, context: string) => {
@@ -58,6 +64,13 @@ Given(
 Given("OpenAI always return image of a moon", () => {
   mock_services.openAi().stubCreateImage()
 })
+
+Given(
+  "OpenAI returns text completion {string} for model {string}",
+  (details: string, modelName: string) => {
+    mock_services.openAi().mockChatCompletionWithModelName(modelName, details, "length")
+  },
+)
 
 Given(
   "OpenAI returns an incomplete text completion {string} for assistant message {string}",
