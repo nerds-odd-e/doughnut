@@ -10,12 +10,6 @@ export function adminFineTuningPage() {
       return assumeDownloadedJSONL("fineTuningData.jsonl")
     },
 
-    uploadFineTuningTrainingData() {
-      cy.findByRole("button", {
-        name: "Upload Fine Tuning Training Data",
-      }).click()
-    },
-
     triggerFineTuning() {
       cy.findByRole("button", {
         name: "Trigger Fine Tuning",

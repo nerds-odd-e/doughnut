@@ -1,5 +1,4 @@
 @usingMockedOpenAiService
-@startWithEmptyDownloadsFolder
 Feature: Refine OpenAI's AI Model using user feedback
 
   As an admin,
