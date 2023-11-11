@@ -2,7 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Given, Then, DataTable, When } from "@badeball/cypress-cucumber-preprocessor"
+import { Given, Then, DataTable } from "@badeball/cypress-cucumber-preprocessor"
 import "../support/string.extensions"
 import start, { mock_services } from "start"
 import { MessageToMatch } from "start/mock_services/MessageToMatch"
