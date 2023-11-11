@@ -5,11 +5,7 @@ import { DataTable, Given, Then, When } from "@badeball/cypress-cucumber-preproc
 import start, { mock_services } from "start"
 
 Given("my question should not be included in the admin's fine-tuning data", () => {
-  start
-    .loginAsAdminAndGoToAdminDashboard()
-    .goToFineTuningData()
-    .downloadAIQuestionTrainingData()
-    .expectNumberOfRecords(0)
+  start.loginAsAdminAndGoToAdminDashboard().goToFineTuningData().expectFineTuningExamplesCount(0)
 })
 
 Given(
@@ -35,19 +31,17 @@ Given(
     start
       .loginAsAdminAndGoToAdminDashboard()
       .goToFineTuningData()
-      .downloadAIQuestionTrainingData()
       .expectExampleQuestions(question.hashes())
   },
 )
 
 Given(
   "an admin can retrieve the training data for question generation containing {int} examples",
-  (numOfDownload: number) => {
+  (numberOfRecords: number) => {
     start
       .loginAsAdminAndGoToAdminDashboard()
       .goToFineTuningData()
-      .downloadAIQuestionTrainingData()
-      .expectNumberOfRecords(numOfDownload)
+      .expectFineTuningExamplesCount(numberOfRecords)
   },
 )
 
