@@ -42,7 +42,7 @@ public class AiModelService {
             .filter(g -> g.getKeyName().equals(keyName))
             .findFirst()
             .map(GlobalSettings::getValue)
-            .orElse("gpt-3.5-turbol");
+            .orElse("gpt-3.5-turbo");
     return currentEvaluationModelVersion;
   }
 }
