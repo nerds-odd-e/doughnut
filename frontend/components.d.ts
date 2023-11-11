@@ -27,7 +27,6 @@ declare module 'vue' {
     ContestableQuestion: typeof import('./src/components/review/ContestableQuestion.vue')['default']
     ControlCenterForNote: typeof import('./src/components/toolbars/ControlCenterForNote.vue')['default']
     EditableText: typeof import('./src/components/form/EditableText.vue')['default']
-    EvaluateQuestionModel: typeof import('./src/components/admin/EvaluateQuestionModel.vue')['default']
     FailureReportList: typeof import('./src/components/admin/FailureReportList.vue')['default']
     Feather: typeof import('./src/components/svgs/link_types/Feather.vue')['default']
     FineTuningData: typeof import('./src/components/admin/FineTuningData.vue')['default']
