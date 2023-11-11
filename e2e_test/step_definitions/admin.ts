@@ -12,13 +12,6 @@ Given("my question should not be included in the admin's fine-tuning data", () =
     .expectNumberOfRecords(0)
 })
 
-When("I upload the feedbacks", () => {
-  start
-    .loginAsAdminAndGoToAdminDashboard()
-    .suggestedQuestionsForFineTuning()
-    .uploadFineTuningTrainingData()
-})
-
 Given(
   "the admin modifies the question suggested {string} to:",
   (originalQuestionStem: string, newQuestion: DataTable) => {
