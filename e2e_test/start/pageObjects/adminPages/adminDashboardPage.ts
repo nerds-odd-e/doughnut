@@ -28,7 +28,7 @@ export function assumeAdminDashboardPage() {
           break
       }
 
-      return assumeAdminDashboardPage()
+      return this;
     },
 
     chooseModelNameInEngine(modelName: string, trainingEngine: string) {
