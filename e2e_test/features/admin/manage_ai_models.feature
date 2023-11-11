@@ -12,8 +12,7 @@ Feature: Manage AI models
     And I have a note with the topic "Taiwan"
 
   Scenario: Admin choose a model for content completion
-    Given I navigate to the "Manage Models" section in the admin dashboard
-    # When I choose model "gpt-future" for "Question Generation"
+    When I choose model "gpt-future" for "Others"
     Then I ask to complete the details for note "Taiwan"
     And I should see the note details on current page becomes "A message from the future."
 

@@ -12,13 +12,22 @@ export function assumeAdminDashboardPage() {
       }
     },
 
+    goToTabInAdminDashboard(tabName: string) {
+      cy.findByRole("button", { name: tabName }).click()
+    },
+
     goToFineTuningData() {
       this.goToTabInAdminDashboard("Fine Tuning Data")
       return adminFineTuningPage()
     },
 
-    goToTabInAdminDashboard(tabName: string) {
-      cy.findByRole("button", { name: tabName }).click()
+    goToModelManagement() {
+      this.goToTabInAdminDashboard("Manage Models")
+      return {
+        chooseModel(model: string, task: string) {
+          cy.findByLabelText(task).select(model)
+        },
+      }
     },
   }
 }

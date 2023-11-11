@@ -106,3 +106,7 @@ Given(
     start.testability().seedSuggestedQuestions(positives.concat(negatives))
   },
 )
+
+Then("I choose model {string} for {string}", (model: string, task: string) => {
+  start.goToAdminDashboard().goToModelManagement().chooseModel(model, task)
+})
