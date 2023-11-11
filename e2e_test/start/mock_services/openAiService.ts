@@ -211,7 +211,7 @@ const openAiService = () => {
         object: "list",
         data: modelNames.split(",").map((modelName) => {
           return {
-            id: modelName,
+            id: modelName.trim(),
             object: "model",
             created: 1614807352,
             owned_by: "openai",

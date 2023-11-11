@@ -82,9 +82,7 @@ public class AiAdvisorService {
         .getModels()
         .forEach(
             (e) -> {
-              if (e.id.startsWith("ft:")
-                  || e.id.startsWith("gpt-3.5")
-                  || e.id.startsWith("gpt-4")) {
+              if (e.id.startsWith("ft:") || e.id.startsWith("gpt")) {
                 ModelVersionOption modelVersionOption = new ModelVersionOption(e.id, e.id, e.id);
                 modelVersionOptions.add(modelVersionOption);
               }
