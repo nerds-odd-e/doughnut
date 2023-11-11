@@ -3,7 +3,8 @@ import { adminFineTuningPage } from "./adminFineTuningPage"
 export function assumeAdminDashboardPage() {
   return {
     goToFailureReportList() {
-      cy.findByText("Failure Reports").click()
+      this.goToTabInAdminDashboard("Failure Reports")
+      cy.findByText("Failure report list")
       return {
         shouldContain(content: string) {
           cy.get("body").should("contain", content)
@@ -12,23 +13,13 @@ export function assumeAdminDashboardPage() {
     },
 
     suggestedQuestionsForFineTuning() {
-      cy.findByRole("button", { name: "Fine Tuning Data" }).click()
+      this.goToTabInAdminDashboard("Fine Tuning Data")
       return adminFineTuningPage()
     },
 
     goToTabInAdminDashboard(tabName: string) {
-      cy.findByText(tabName).click()
-
-      switch (tabName) {
-        case "Failure Reports":
-          cy.findByText("Failure report list")
-          break
-        case "Manage Model":
-          cy.get("select[name='Question Generation']").should("contains.text", "---")
-          break
-      }
-
-      return this;
+      cy.findByRole("button", { name: tabName }).click()
+      return this
     },
 
     chooseModelNameInEngine(modelName: string, trainingEngine: string) {
