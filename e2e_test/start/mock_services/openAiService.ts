@@ -17,20 +17,24 @@ type TextBasedMessage = {
   content: string
 }
 
+type BodyToMatch = {
+  messages?: MessageToMatch[]
+  model?: string
+}
+
 type ChatMessageInResponse = TextBasedMessage | FunctionCall
 
 function mockChatCompletion(
   serviceMocker: ServiceMocker,
-  messagesToMatch: MessageToMatch[],
+  bodyToMatch: BodyToMatch,
   message: ChatMessageInResponse,
   finishReason: "length" | "stop" | "function_call",
 ): Promise<void> {
-  const body = { messages: messagesToMatch }
   const predicate = new FlexiPredicate()
     .withOperator(Operator.matches)
     .withPath(`/v1/chat/completions`)
     .withMethod(HttpMethod.POST)
-    .withBody(body)
+    .withBody(bodyToMatch)
   return serviceMocker.mockWithPredicate(predicate, {
     object: "chat.completion",
     choices: [
@@ -45,13 +49,13 @@ function mockChatCompletion(
 
 function mockChatCompletionForMessageContaining(
   serviceMocker: ServiceMocker,
-  messagesToMatch: MessageToMatch[],
+  bodyToMatch: BodyToMatch,
   reply: string,
   finishReason: "length" | "stop",
 ) {
   return mockChatCompletion(
     serviceMocker,
-    messagesToMatch,
+    bodyToMatch,
     { role: "assistant", content: reply },
     finishReason,
   )
@@ -71,13 +75,13 @@ const openAiService = () => {
       return serviceMocker.install()
     },
 
-    mockChatCompletionWithModelName(
-      incomplete: string,
-      reply: string,
-      finishReason: "stop" | "length",
-    ) {
-      const messages = [{ content: "^" + Cypress._.escapeRegExp(incomplete) + "$" }]
-      return mockChatCompletionForMessageContaining(serviceMocker, messages, reply, finishReason)
+    mockChatCompletionWithModelName(modelName: string, reply: string) {
+      return mockChatCompletionForMessageContaining(
+        serviceMocker,
+        { model: modelName },
+        reply,
+        "stop",
+      )
     },
 
     mockChatCompletionWithIncompleteAssistantMessage(
@@ -86,7 +90,12 @@ const openAiService = () => {
       finishReason: "stop" | "length",
     ) {
       const messages = [{ content: "^" + Cypress._.escapeRegExp(incomplete) + "$" }]
-      return mockChatCompletionForMessageContaining(serviceMocker, messages, reply, finishReason)
+      return mockChatCompletionForMessageContaining(
+        serviceMocker,
+        { messages },
+        reply,
+        finishReason,
+      )
     },
 
     mockChatCompletionWithContext(reply: string, context: string) {
@@ -95,15 +104,20 @@ const openAiService = () => {
         content: context,
       }
       const messages = [messageToMatch]
-      return mockChatCompletionForMessageContaining(serviceMocker, messages, reply, "stop")
+      return mockChatCompletionForMessageContaining(serviceMocker, { messages }, reply, "stop")
     },
 
     mockChatCompletionWithMessages(reply: string, messages: MessageToMatch[]) {
-      return mockChatCompletionForMessageContaining(serviceMocker, messages, reply, "stop")
+      return mockChatCompletionForMessageContaining(serviceMocker, { messages }, reply, "stop")
     },
 
     stubChatCompletion(reply: string, finishReason: "length" | "stop") {
-      return mockChatCompletionForMessageContaining(serviceMocker, [], reply, finishReason)
+      return mockChatCompletionForMessageContaining(
+        serviceMocker,
+        { messages: [] },
+        reply,
+        finishReason,
+      )
     },
 
     stubChatCompletionFunctionCallForMessageContaining(
@@ -113,7 +127,7 @@ const openAiService = () => {
     ) {
       return mockChatCompletion(
         serviceMocker,
-        messages,
+        { messages },
         {
           role: "function",
           function_call: {
