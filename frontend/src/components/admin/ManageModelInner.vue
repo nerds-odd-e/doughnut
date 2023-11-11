@@ -3,34 +3,34 @@
     <div>
       <label
         >Question Generation
-        <DropdownList
+        <Select
           :options="modelList"
-          :default-option="selectedModels.currentQuestionGenerationModelVersion"
+          v-model="localSelectedModels.currentQuestionGenerationModelVersion"
           scope-name="Question Generation"
           field=""
-        ></DropdownList>
+        ></Select>
       </label>
     </div>
     <div>
       <label
         >Evaluation
-        <DropdownList
+        <Select
           :options="modelList"
-          :default-option="selectedModels.currentEvaluationModelVersion"
+          v-model="localSelectedModels.currentEvaluationModelVersion"
           scope-name="Evaluation"
           field=""
-        ></DropdownList
+        ></Select
       ></label>
     </div>
     <div>
       <label
         >Others
-        <DropdownList
+        <Select
           :options="modelList"
-          :default-option="selectedModels.currentOthersModelVersion"
+          v-model="localSelectedModels.currentOthersModelVersion"
           scope-name="Others"
           field=""
-        ></DropdownList
+        ></Select
       ></label>
     </div>
     <div>
@@ -39,10 +39,10 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { PropType } from "vue";
-import DropdownList from "../form/Select.vue";
+import { PropType, ref } from "vue";
+import Select from "../form/Select.vue";
 
-const { modelList, selectedModels } = defineProps({
+const props = defineProps({
   modelList: {
     type: Object as PropType<Generated.ModelVersionOption[]>,
     required: true,
@@ -52,6 +52,8 @@ const { modelList, selectedModels } = defineProps({
     required: true,
   },
 });
+
+const localSelectedModels = ref(props.selectedModels);
 
 function save() {}
 </script>

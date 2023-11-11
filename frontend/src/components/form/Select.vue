@@ -4,15 +4,13 @@
       :class="`select-control form-control ${!!errors ? 'is-invalid' : ''}`"
       :id="`${scopeName}-${field}`"
       :name="scopeName"
-      @input="$emit('update:modelValue', $event.target.value)"
-      @change="(e) => onchange(scopeName, e.target.value)"
+      v-model="localValue"
     >
       <option
         class="options"
         v-for="option in options"
         :key="option.key"
         :value="option.value"
-        :selected="option.value === defaultOption"
       >
         {{ option.label }}
       </option>
@@ -20,18 +18,23 @@
   </InputWithType>
 </template>
 
-<script setup>
+<script lang="ts" setup>
+import { PropType, ref, watch } from "vue";
 import InputWithType from "./InputWithType.vue";
 
 const props = defineProps({
   modelValue: String,
   scopeName: String,
   field: String,
-  options: Array,
-  defaultOption: String,
+  options: Array as PropType<{ key: string; value: string; label: string }[]>,
   errors: Object,
-  onchange: Function,
 });
 
 const emit = defineEmits(["update:modelValue"]);
+
+const localValue = ref(props.modelValue);
+
+watch(localValue, (newValue) => {
+  emit("update:modelValue", newValue);
+});
 </script>
