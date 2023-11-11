@@ -1,8 +1,5 @@
 <template>
   <h2>Fine Tuning Questions Suggested by Users</h2>
-  <button @click="downloadEvaluationJSONL()">
-    Download Evaluation Training Data
-  </button>
   <button @click="uploadFineTuningData">
     Upload Fine Tuning Training Data
   </button>
@@ -31,7 +28,6 @@
 import { ContentLoader } from "vue-content-loader";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import SuggestedQuestionList from "./SuggestedQuestionList.vue";
-import downloadJSONL from "./downloadJSONL";
 
 export default {
   setup() {
@@ -49,11 +45,6 @@ export default {
     };
   },
   methods: {
-    async downloadEvaluationJSONL() {
-      const fineTuningData =
-        await this.api.fineTuning.getAllEvaluationModelExamples();
-      downloadJSONL(fineTuningData, "evaluationData.jsonl");
-    },
     async duplicated(duplicated: Generated.SuggestedQuestionForFineTuning) {
       this.suggestedQuestions = [...this.suggestedQuestions!, duplicated];
     },
