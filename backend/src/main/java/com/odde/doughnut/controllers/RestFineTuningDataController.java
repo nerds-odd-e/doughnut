@@ -63,11 +63,6 @@ class RestFineTuningDataController {
     return modelFactoryService.toSuggestedQuestionForFineTuningService(suggestedQuestion).delete();
   }
 
-  @GetMapping("/upload-fine-tuning-examples")
-  public void uploadFineTuningExamples() throws IOException {
-    fineTuningService.uploadFineTuningExamples();
-  }
-
   @PostMapping("/upload-and-trigger-fine-tuning")
   public void uploadAndTriggerFineTuning() throws IOException {
     var uploadResult = fineTuningService.uploadFineTuningExamples();

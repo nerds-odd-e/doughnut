@@ -49,35 +49,6 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
   class getGoodOpenAIChatGPTFineTuningExample {
 
     @Test
-    void shouldSuccessWhen10FeedbackAndUploadFile() {
-      mockFeedback(11);
-      File fakeResponse = new File();
-      fakeResponse.setId("TestFileId");
-      when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
-          .thenReturn(Single.just(fakeResponse));
-      assertDoesNotThrow(() -> controller.uploadFineTuningExamples());
-    }
-
-    @Test
-    void shouldFailWhenNoFeedback() {
-      var result =
-          assertThrows(
-              OpenAIServiceErrorException.class, () -> controller.uploadFineTuningExamples());
-      assertEquals(result.getMessage(), "Positive feedback cannot be less than 10.");
-    }
-
-    @Test
-    void whenOpenAiServiceFailShouldGetFailMessage() {
-      mockFeedback(10);
-      when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
-          .thenThrow(new RuntimeException());
-      var result =
-          assertThrows(
-              OpenAIServiceErrorException.class, () -> controller.uploadFineTuningExamples());
-      assertEquals(result.getMessage(), "Upload failed.");
-    }
-
-    @Test
     void shouldSuccessWhen10FeedbackAndUploadFileAndTriggerFineTune() {
       mockFeedback(11);
       File fakeResponse = new File();
