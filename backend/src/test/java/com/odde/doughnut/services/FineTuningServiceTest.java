@@ -78,7 +78,7 @@ class FineTuningServiceTest {
     }
 
     @Test
-    void shouldFailWhenNoFeedback() throws IOException {
+    void shouldFailWhenNoFeedback() {
       var result =
           assertThrows(
               OpenAIServiceErrorException.class,
@@ -145,11 +145,46 @@ class FineTuningServiceTest {
 
       assertEquals(0, goodOpenAIChatGPTFineTuningExampleList.size());
     }
+  }
 
-    private void mockFeedback(int count) {
-      for (int i = 0; i < count; i++) {
-        makeMe.aQuestionSuggestionForFineTunining().positive().please();
-      }
+  @Nested
+  class getGoodOpenAIChatGPTFineTuningExample {
+
+    @Test
+    void shouldSuccessWhen10FeedbackAndUploadFile() {
+      mockFeedback(11);
+      File fakeResponse = new File();
+      fakeResponse.setId("TestFileId");
+      when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
+          .thenReturn(Single.just(fakeResponse));
+      assertDoesNotThrow(() -> fineTuningService.uploadFineTuningExamples());
+    }
+
+    @Test
+    void shouldFailWhenNoFeedback() {
+      var result =
+          assertThrows(
+              OpenAIServiceErrorException.class,
+              () -> fineTuningService.uploadFineTuningExamples());
+      assertEquals(result.getMessage(), "Positive feedback cannot be less than 10.");
+    }
+
+    @Test
+    void whenOpenAiServiceFailShouldGetFailMessage() {
+      mockFeedback(10);
+      when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
+          .thenThrow(new RuntimeException());
+      var result =
+          assertThrows(
+              OpenAIServiceErrorException.class,
+              () -> fineTuningService.uploadFineTuningExamples());
+      assertEquals(result.getMessage(), "Upload failed.");
+    }
+  }
+
+  private void mockFeedback(int count) {
+    for (int i = 0; i < count; i++) {
+      makeMe.aQuestionSuggestionForFineTunining().positive().please();
     }
   }
 }
