@@ -182,9 +182,9 @@ class RestAiControllerTest {
     void ShouldUseGpt35ByDefault() {
       CurrentModelVersionResponse currentModelVersions = controller.getCurrentModelVersions();
       assertEquals(
-          "gpt-3.5-turbol", currentModelVersions.getCurrentQuestionGenerationModelVersion());
-      assertEquals("gpt-3.5-turbol", currentModelVersions.getCurrentEvaluationModelVersion());
-      assertEquals("gpt-3.5-turbol", currentModelVersions.getCurrentOthersModelVersion());
+          "gpt-3.5-turbo", currentModelVersions.getCurrentQuestionGenerationModelVersion());
+      assertEquals("gpt-3.5-turbo", currentModelVersions.getCurrentEvaluationModelVersion());
+      assertEquals("gpt-3.5-turbo", currentModelVersions.getCurrentOthersModelVersion());
     }
 
     @Test
