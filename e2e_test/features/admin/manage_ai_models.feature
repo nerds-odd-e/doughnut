@@ -1,4 +1,4 @@
-Feature: admin see latest models list
+Feature: Admin manage AI models
 
   As an admin,
   I want to manage AI models on admin page
