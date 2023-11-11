@@ -27,7 +27,7 @@
         href="#"
         @click="activePage = 'manageModel'"
       >
-        Manage Model</a
+        Manage Models</a
       >
     </li>
   </ul>

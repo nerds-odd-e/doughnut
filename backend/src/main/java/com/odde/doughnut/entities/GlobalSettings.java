@@ -15,7 +15,7 @@ public class GlobalSettings {
   private Integer id;
 
   @NotNull
-  @Column(name = "keyName")
+  @Column(name = "key_name")
   @Getter
   @Setter
   private String keyName;
