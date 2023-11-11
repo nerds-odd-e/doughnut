@@ -166,9 +166,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
         "fine-tuning/all-suggested-questions-for-fine-tuning",
       )) as Generated.SuggestedQuestionForFineTuning[];
     },
-    async postUploadFineTuningExamples() {
-      await managedApi.restGet("fine-tuning/upload-fine-tuning-examples");
-    },
     async postUploadAndTriggerFineTuning() {
       await managedApi.restPost(
         "fine-tuning/upload-and-trigger-fine-tuning",

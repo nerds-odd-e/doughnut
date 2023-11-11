@@ -1,8 +1,5 @@
 <template>
   <h2>Fine Tuning Questions Suggested by Users</h2>
-  <button @click="uploadFineTuningData">
-    Upload Fine Tuning Training Data
-  </button>
 
   <select id="list" v-model="fileId">
     <option
@@ -52,16 +49,6 @@ export default {
       try {
         await this.api.fineTuning.postUploadAndTriggerFineTuning();
         this.fineTuningDataResultMsg = "Training initiated.";
-      } catch (error) {
-        const errorInstance = error as Error;
-        this.fineTuningDataResultMsg = errorInstance.message;
-      }
-      this.showAlert = true;
-    },
-    async uploadFineTuningData() {
-      try {
-        await this.api.fineTuning.postUploadFineTuningExamples();
-        this.fineTuningDataResultMsg = "Upload successfully.";
       } catch (error) {
         const errorInstance = error as Error;
         this.fineTuningDataResultMsg = errorInstance.message;
