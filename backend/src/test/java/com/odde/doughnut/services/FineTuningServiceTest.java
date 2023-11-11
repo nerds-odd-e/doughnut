@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -41,6 +42,16 @@ class FineTuningServiceTest {
   @BeforeEach
   void setup() {
     fineTuningService = new FineTuningService(this.modelFactoryService, openAiApi);
+  }
+
+  @Nested
+  class getAllOpenAIChatGPTFineTuningExample {
+    @Test
+    void shouldIncludeAllFeedbackData_whenCallGetGoodTrainingData() {
+      makeMe.aQuestionSuggestionForFineTunining().positive().please();
+      makeMe.aQuestionSuggestionForFineTunining().negative().please();
+      assertThat(fineTuningService.getQuestionEvaluationTrainingExamples(), hasSize(2));
+    }
   }
 
   @Nested

@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.json.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.controllers.json.QuestionSuggestionParams;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
@@ -78,13 +77,6 @@ class RestFineTuningDataController {
     } catch (Exception e) {
       throw new OpenAIServiceErrorException("Training failed.", HttpStatus.BAD_REQUEST);
     }
-  }
-
-  @GetMapping("/feedback-evaluation-examples")
-  public List<OpenAIChatGPTFineTuningExample> getAllEvaluationExamples()
-      throws UnexpectedNoAccessRightException {
-    currentUser.assertAdminAuthorization();
-    return fineTuningService.getQuestionEvaluationTrainingExamples();
   }
 
   @GetMapping("/all-suggested-questions-for-fine-tuning")

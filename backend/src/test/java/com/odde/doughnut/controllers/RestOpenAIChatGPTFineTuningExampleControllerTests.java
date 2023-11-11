@@ -117,17 +117,6 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
   }
 
   @Nested
-  class getAllOpenAIChatGPTFineTuningExample {
-    @Test
-    void shouldIncludeAllFeedbackData_whenCallGetGoodTrainingData()
-        throws UnexpectedNoAccessRightException {
-      makeMe.aQuestionSuggestionForFineTunining().positive().please();
-      makeMe.aQuestionSuggestionForFineTunining().negative().please();
-      assertThat(controller.getAllEvaluationExamples(), hasSize(2));
-    }
-  }
-
-  @Nested
   class SuggestedQuestions {
     @Test
     void shouldThrowExceptionIfUserDoesNotHaveReadingAuth_whenCallGetGoodTrainingData() {
