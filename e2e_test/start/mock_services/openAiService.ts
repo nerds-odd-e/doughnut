@@ -159,26 +159,11 @@ const openAiService = () => {
         return serviceMocker.stubPosterWithError500Response("/v1/files", {})
       }
     },
-    async stubFineTuningStatus(shouldSuccess: boolean) {
+    async stubFineTuningStatus(successful: boolean) {
       const predicate = new FlexiPredicate()
         .withOperator(Operator.matches)
         .withPath(`/v1/fine_tuning/jobs`)
         .withMethod(HttpMethod.POST)
-
-      if (shouldSuccess) {
-        return await serviceMocker.mockWithPredicate(predicate, {
-          object: "fine_tuning.job",
-          id: "ftjob-abc123",
-          model: "gpt-3.5-turbo-0613",
-          created_at: 1614807352,
-          fine_tuned_model: null,
-          organization_id: "org-123",
-          result_files: [],
-          status: "queued",
-          validation_file: null,
-          training_file: "file-abc123",
-        })
-      }
 
       return await serviceMocker.mockWithPredicate(predicate, {
         object: "fine_tuning.job",
@@ -188,7 +173,7 @@ const openAiService = () => {
         fine_tuned_model: null,
         organization_id: "org-123",
         result_files: [],
-        status: "failed",
+        status: successful ? "queued" : "failed",
         validation_file: null,
         training_file: "file-abc123",
       })

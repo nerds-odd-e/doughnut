@@ -93,20 +93,3 @@ Given("OpenAI evaluates the question as not legitamate", () => {
 Then("I contest the question", () => {
   cy.findByRole("button", { name: "Doesn't make sense?" }).click()
 })
-
-Given(
-  'the finetuning for the file "question_generation_examples" will be {string}',
-  (API_Response: string) => {
-    mock_services.openAi().stubFineTuningStatus(API_Response)
-  },
-)
-
-When("I retrieve file list from my openAI account", () => {
-  cy.findByText("Retrieve").click()
-})
-
-Then("I will see a list of files", () => {
-  cy.get("#list > option").should("have.length", 1)
-})
-
-When('I choose the file "question generation examples"', () => {})
