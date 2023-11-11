@@ -1,19 +1,14 @@
-import { assumeDownloadedJSONL } from "./questionGenerationTrainingData"
-
 export function adminFineTuningPage() {
   return {
-    downloadAIQuestionTrainingData() {
-      cy.findByRole("button", {
-        name: "Download Positive Feedback Question Generation Training Data",
-      }).click()
-
-      return assumeDownloadedJSONL("fineTuningData.jsonl")
-    },
-
     triggerFineTuning() {
       cy.findByRole("button", {
         name: "Trigger Fine Tuning",
       }).click()
+    },
+
+    expectFineTuningExamplesCount(count: number) {
+      cy.pageIsNotLoading()
+      cy.get("tbody").contains("tr td", "Positive").should("have.length", count)
     },
 
     updateQuestionSuggestionAndChoice(
@@ -28,6 +23,17 @@ export function adminFineTuningPage() {
       cy.findByText(newQuestion["Question Stem"])
     },
 
+    expectExampleQuestions(questions: Record<string, string>[]) {
+      this.expectFineTuningExamplesCount(questions.length)
+      questions.forEach((expectation) => {
+        cy.findByText(expectation["Question Stem"], { selector: "td" }).dblclick()
+        if (expectation["Choices"]) {
+          expectation["Choices"].split(", ").forEach((choice: string, index: number) => {
+            cy.findByLabelText(`Choice ${index}`).invoke("val").should("eq", choice)
+          })
+        }
+      })
+    },
     duplicateNegativeQuestion(questionStem: string) {
       cy.findByText(questionStem).parent().findByRole("button", { name: "Duplicate" }).click()
     },
