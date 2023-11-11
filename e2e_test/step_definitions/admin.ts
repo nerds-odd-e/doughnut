@@ -84,3 +84,31 @@ When("I attempt to trigger fine-tuning", () => {
 Then("I should see the message {string}", (message: string) => {
   cy.findByText(message).should("exist")
 })
+
+Given(
+  "I have {int} positive feedbacks and {int} negative feedbacks",
+  (positive: number, negative: number) => {
+    const positives = Array.from({ length: positive }, (_, index) => ({
+      positiveFeedback: true,
+      preservedNoteContent: "note content",
+      realCorrectAnswers: "",
+      preservedQuestion: {
+        stem: `good question #${index}`,
+        choices: ["choice 1", "choice 2"],
+        correctChoiceIndex: 0,
+      },
+    }))
+    const negatives = Array.from({ length: negative }, (_, index) => ({
+      positiveFeedback: false,
+      preservedNoteContent: "note content",
+      realCorrectAnswers: "",
+      preservedQuestion: {
+        stem: `bad question #${index}`,
+        choices: ["choice 1", "choice 2"],
+        correctChoiceIndex: 0,
+      },
+    }))
+
+    start.testability().seedSuggestedQuestions(positives.concat(negatives))
+  },
+)
