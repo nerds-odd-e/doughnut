@@ -3,9 +3,6 @@ Feature: Upload fine tuning data
 
   Background:
     Given I am logged in as an existing user
-    And I've got the following question for a note with topic "Who Let the Dogs Out":
-      | Question Stem                     | Correct Choice | Incorrect Choice 1 |
-      | Who wrote 'Who Let the Dogs Out'? | Anslem Douglas | Baha Men           |
 
   Scenario Outline: Block upload fine tuning data
     Given I have <positive_count> positive feedbacks and <negative_count> negative feedbacks
