@@ -7,8 +7,7 @@ Feature: Manage AI models
 
   Background:
     Given I am logged in as an admin
-    And OpenAI by default returns text completion "Pardon?"
-    And OpenAI returns text completion "A message from the future." for model "gpt-future"
+    And OpenAI returns text completion "A message from the future." for model "gpt-4"
     And OpenAI has models "gpt-future, gpt-3.5" available
     And I have a note with the topic "Taiwan"
 
@@ -16,7 +15,7 @@ Feature: Manage AI models
     Given I navigate to the "Manage Models" section in the admin dashboard
     # When I choose model "gpt-future" for "Question Generation"
     Then I ask to complete the details for note "Taiwan"
-    And I should see the note details on current page becomes "Pardon?"
+    And I should see the note details on current page becomes "A message from the future."
 
 
 

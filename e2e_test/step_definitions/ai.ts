@@ -68,7 +68,7 @@ Given("OpenAI always return image of a moon", () => {
 Given(
   "OpenAI returns text completion {string} for model {string}",
   (details: string, modelName: string) => {
-    mock_services.openAi().mockChatCompletionWithModelName(modelName, details, "length")
+    mock_services.openAi().mockChatCompletionWithModelName(modelName, details)
   },
 )
 
