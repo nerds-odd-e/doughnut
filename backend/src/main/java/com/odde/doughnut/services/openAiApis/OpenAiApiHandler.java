@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.json.AiCompletion;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
-import com.odde.doughnut.controllers.json.AiTrainingFile;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
@@ -26,7 +25,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -78,12 +76,6 @@ public class OpenAiApiHandler {
   public Optional<AiCompletion> getAiCompletion(
       AiCompletionParams aiCompletionParams, ChatCompletionRequest chatCompletionRequest) {
     return chatCompletion(chatCompletionRequest).map(aiCompletionParams::getAiCompletion);
-  }
-
-  public List<AiTrainingFile> getTrainingFileList() {
-    return withExceptionHandler(() -> openAiApi.listFiles().blockingGet().getData()).stream()
-        .map(AiTrainingFile::getAiTrainingFile)
-        .collect(Collectors.toList());
   }
 
   public Optional<ChatCompletionChoice> chatCompletion(ChatCompletionRequest request) {

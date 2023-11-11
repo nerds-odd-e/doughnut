@@ -14,10 +14,8 @@ import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.fine_tuning.FineTuningJobRequest;
 import com.theokanning.openai.fine_tuning.Hyperparameters;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class AiAdvisorService {
 
@@ -65,12 +63,6 @@ public class AiAdvisorService {
 
   private AiQuestionGenerator getAiQuestionGenerator(Note note) {
     return new AiQuestionGenerator(note, openAiApiHandler);
-  }
-
-  public List<AiTrainingFile> listTrainingFiles() {
-    return openAiApiHandler.getTrainingFileList().stream()
-        .sorted(Comparator.comparing(AiTrainingFile::getCreatedAt).reversed())
-        .collect(Collectors.toList());
   }
 
   public void triggerFineTune(String fileId) {

@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 
-import com.odde.doughnut.controllers.json.AiTrainingFile;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
@@ -40,18 +39,6 @@ class RestAiControllerTrainingFileTest {
   void setUp() {
     currentUser = makeMe.aUser().toModelPlease();
     controller = new RestAiController(openAiApi, makeMe.modelFactoryService, currentUser);
-  }
-
-  @Test
-  void retrieveTrainingFiles() {
-
-    OpenAiResponse<File> openAiResponse = getOpenAiFiles();
-
-    Mockito.when(openAiApi.listFiles()).thenReturn(Single.just(openAiResponse));
-
-    List<AiTrainingFile> aiTrainingFiles = controller.retrieveTrainingFiles();
-    assertEquals(2, aiTrainingFiles.size());
-    assertEquals("id1", aiTrainingFiles.get(0).getId());
   }
 
   @Test

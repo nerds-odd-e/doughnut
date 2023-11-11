@@ -1,4 +1,4 @@
-package com.odde.doughnut.controllers.json;
+package com.odde.doughnut.services.ai;
 
 import com.theokanning.openai.completion.chat.ChatMessage;
 import java.util.List;

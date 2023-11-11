@@ -58,12 +58,6 @@ public class RestAiController {
     return new AiGeneratedImage(aiAdvisorService.getImage(aiCompletionParams.prompt));
   }
 
-  @GetMapping("/training-files")
-  public List<AiTrainingFile> retrieveTrainingFiles() {
-    currentUser.assertLoggedIn();
-    return aiAdvisorService.listTrainingFiles();
-  }
-
   @PostMapping("/trigger-finetuning/{fileId}")
   public ApiResponse triggerFineTune(@PathVariable(name = "fileId") String fileId) {
     currentUser.assertLoggedIn();
