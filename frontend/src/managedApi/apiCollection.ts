@@ -402,12 +402,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
       )) as Generated.AiGeneratedImage;
     },
 
-    async getTrainingFiles() {
-      return (await managedApi.restGet(
-        `ai/training-files`,
-      )) as Generated.AiTrainingFile[];
-    },
-
     async triggerFineTuning(fileId: string) {
       return (await managedApi.restPost(
         `ai/trigger-finetuning/${fileId}`,

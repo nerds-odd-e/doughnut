@@ -1,16 +1,6 @@
 <template>
   <h2>Fine Tuning Questions Suggested by Users</h2>
 
-  <select id="list" v-model="fileId">
-    <option
-      v-for="aiTrainingFile in aiTrainingFiles"
-      :key="aiTrainingFile.id"
-      :value="aiTrainingFile.id"
-    >
-      {{ aiTrainingFile.filename }}
-    </option>
-  </select>
-  <button @click="getTrainingFiles()">Retrieve</button>
   <button @click="triggerFineTuning()">Trigger Fine Tuning</button>
   <span v-if="showAlert">{{ fineTuningDataResultMsg }}</span>
   <ContentLoader v-if="suggestedQuestions === undefined" />
@@ -35,7 +25,6 @@ export default {
       suggestedQuestions: undefined as
         | Generated.SuggestedQuestionForFineTuning[]
         | undefined,
-      aiTrainingFiles: undefined as Generated.AiTrainingFile[] | undefined,
       fineTuningDataResultMsg: "",
       showAlert: false,
       fileId: "",
@@ -54,10 +43,6 @@ export default {
         this.fineTuningDataResultMsg = errorInstance.message;
       }
       this.showAlert = true;
-    },
-    async getTrainingFiles() {
-      this.aiTrainingFiles = await this.api.ai.getTrainingFiles();
-      this.fileId = this.aiTrainingFiles[0] ? this.aiTrainingFiles[0].id : "";
     },
   },
 

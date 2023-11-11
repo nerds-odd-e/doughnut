@@ -7,10 +7,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.odde.doughnut.controllers.json.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatMessage;
