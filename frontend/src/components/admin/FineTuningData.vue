@@ -1,8 +1,5 @@
 <template>
   <h2>Fine Tuning Questions Suggested by Users</h2>
-  <button @click="downloadFineTuningJSONL()">
-    Download Positive Feedback Question Generation Training Data
-  </button>
   <button @click="downloadEvaluationJSONL()">
     Download Evaluation Training Data
   </button>
@@ -52,11 +49,6 @@ export default {
     };
   },
   methods: {
-    async downloadFineTuningJSONL() {
-      const fineTuningData =
-        await this.api.fineTuning.getPositiveFeedbackFineTuningExamples();
-      downloadJSONL(fineTuningData, "fineTuningData.jsonl");
-    },
     async downloadEvaluationJSONL() {
       const fineTuningData =
         await this.api.fineTuning.getAllEvaluationModelExamples();
