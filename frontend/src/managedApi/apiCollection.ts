@@ -175,11 +175,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
         {},
       );
     },
-    async getAllEvaluationModelExamples() {
-      return (await managedApi.restGet(
-        "fine-tuning/feedback-evaluation-examples",
-      )) as Generated.OpenAIChatGPTFineTuningExample[];
-    },
     async suggestedQuestionForFineTuningUpdate(
       suggestedId: Doughnut.ID,
       suggestedQuestion: Generated.QuestionSuggestionParams,
