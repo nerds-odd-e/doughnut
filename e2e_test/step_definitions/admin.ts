@@ -7,7 +7,7 @@ import start, { mock_services } from "start"
 Given("my question should not be included in the admin's fine-tuning data", () => {
   start
     .loginAsAdminAndGoToAdminDashboard()
-    .suggestedQuestionsForFineTuning()
+    .goToFineTuningData()
     .downloadAIQuestionTrainingData()
     .expectNumberOfRecords(0)
 })
@@ -17,7 +17,7 @@ Given(
   (originalQuestionStem: string, newQuestion: DataTable) => {
     start
       .loginAsAdminAndGoToAdminDashboard()
-      .suggestedQuestionsForFineTuning()
+      .goToFineTuningData()
       .updateQuestionSuggestionAndChoice(originalQuestionStem, newQuestion.hashes()[0])
   },
 )
@@ -25,7 +25,7 @@ Given(
 Given("an admin duplicates the question {string}", (questionStem: string) => {
   start
     .loginAsAdminAndGoToAdminDashboard()
-    .suggestedQuestionsForFineTuning()
+    .goToFineTuningData()
     .duplicateNegativeQuestion(questionStem)
 })
 
@@ -34,7 +34,7 @@ Given(
   (question: DataTable) => {
     start
       .loginAsAdminAndGoToAdminDashboard()
-      .suggestedQuestionsForFineTuning()
+      .goToFineTuningData()
       .downloadAIQuestionTrainingData()
       .expectExampleQuestions(question.hashes())
   },
@@ -45,7 +45,7 @@ Given(
   (numOfDownload: number) => {
     start
       .loginAsAdminAndGoToAdminDashboard()
-      .suggestedQuestionsForFineTuning()
+      .goToFineTuningData()
       .downloadAIQuestionTrainingData()
       .expectNumberOfRecords(numOfDownload)
   },
@@ -56,7 +56,7 @@ Given(
   (numOfOccurrence: number, expectedString: string) => {
     start
       .assumeAdminDashboardPage()
-      .suggestedQuestionsForFineTuning()
+      .goToFineTuningData()
       .expectString(numOfOccurrence, expectedString)
   },
 )
@@ -69,25 +69,6 @@ Given("I navigate to the {string} section in the admin dashboard", (tabName: str
   start.goToAdminDashboard().goToTabInAdminDashboard(tabName)
 })
 
-When("I choose {string} for {string} use", (modelName: string, trainingEngine: string) => {
-  start.assumeAdminDashboardPage().chooseModelNameInEngine(modelName, trainingEngine)
-})
-
-Then(
-  "I can choose model {string} from GPT in {string} dropdown list",
-  (modelName: string, trainingEngine: string) => {
-    start.assumeAdminDashboardPage().assumeAdminCanSeeModelOption(modelName, trainingEngine)
-  },
-)
-
-Then("I should be using {string} for {string}", (modelName: string, trainingEngine: string) => {
-  start
-    .assumeAdminDashboardPage()
-    .goToTabInAdminDashboard("Failure Reports")
-    .goToTabInAdminDashboard("Manage Model")
-    .assumeSelectionWithDefaultOption(modelName, trainingEngine)
-})
-
 Given("OpenAI responds with {string} when uploading fine-tuning data", (result) => {
   mock_services.openAi().stubOpenAiUploadResponse(result === "success")
 })
@@ -97,7 +78,7 @@ Given("OpenAI responds with {string} when triggering fine-tuning", (result) => {
 })
 
 When("I attempt to trigger fine-tuning", () => {
-  start.loginAsAdminAndGoToAdminDashboard().suggestedQuestionsForFineTuning().triggerFineTuning()
+  start.loginAsAdminAndGoToAdminDashboard().goToFineTuningData().triggerFineTuning()
 })
 
 Then("I should see the message {string}", (message: string) => {
