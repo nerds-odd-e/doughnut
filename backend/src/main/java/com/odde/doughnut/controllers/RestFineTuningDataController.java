@@ -64,14 +64,6 @@ class RestFineTuningDataController {
     return modelFactoryService.toSuggestedQuestionForFineTuningService(suggestedQuestion).delete();
   }
 
-  @GetMapping("/positive-feedback-generation-examples")
-  public List<OpenAIChatGPTFineTuningExample>
-      getAllPositiveFeedbackQuestionGenerationFineTuningExamples()
-          throws UnexpectedNoAccessRightException {
-    currentUser.assertAdminAuthorization();
-    return fineTuningService.getQuestionGenerationTrainingExamples();
-  }
-
   @GetMapping("/upload-fine-tuning-examples")
   public void uploadFineTuningExamples() throws IOException {
     fineTuningService.uploadFineTuningExamples();

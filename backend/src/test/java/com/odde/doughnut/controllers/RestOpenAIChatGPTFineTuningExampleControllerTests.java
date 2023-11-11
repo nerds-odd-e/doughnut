@@ -6,21 +6,16 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.odde.doughnut.controllers.json.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.controllers.json.QuestionSuggestionParams;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
-import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.file.File;
 import com.theokanning.openai.fine_tuning.FineTuningJob;
 import io.reactivex.Single;
-import java.io.IOException;
 import java.util.List;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -41,48 +36,30 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
   RestFineTuningDataController controller;
-  private UserModel userModel;
   @Mock private OpenAiApi openAiApi;
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.anAdmin().toModelPlease();
-    controller = new RestFineTuningDataController(modelFactoryService, userModel, openAiApi);
+    controller =
+        new RestFineTuningDataController(
+            modelFactoryService, makeMe.anAdmin().toModelPlease(), openAiApi);
   }
 
   @Nested
   class getGoodOpenAIChatGPTFineTuningExample {
-    @Test
-    void itShouldNotAllowNonMemberToSeeTrainingData() {
-      controller =
-          new RestFineTuningDataController(modelFactoryService, makeMe.aNullUserModel(), openAiApi);
-      assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.getAllPositiveFeedbackQuestionGenerationFineTuningExamples());
-    }
 
     @Test
-    void shouldReturnNoTrainingDataIfNoMarkedQuestion() throws UnexpectedNoAccessRightException {
-      List<OpenAIChatGPTFineTuningExample> goodTrainingData =
-          controller.getAllPositiveFeedbackQuestionGenerationFineTuningExamples();
-      assertTrue(goodTrainingData.isEmpty());
-    }
-
-    @Test
-    void shouldSuccessWhen10FeedbackAndUploadFile() throws IOException {
+    void shouldSuccessWhen10FeedbackAndUploadFile() {
       mockFeedback(11);
       File fakeResponse = new File();
       fakeResponse.setId("TestFileId");
       when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
           .thenReturn(Single.just(fakeResponse));
-      assertDoesNotThrow(
-          () -> {
-            controller.uploadFineTuningExamples();
-          });
+      assertDoesNotThrow(() -> controller.uploadFineTuningExamples());
     }
 
     @Test
-    void shouldFailWhenNoFeedback() throws IOException {
+    void shouldFailWhenNoFeedback() {
       var result =
           assertThrows(
               OpenAIServiceErrorException.class, () -> controller.uploadFineTuningExamples());
@@ -90,21 +67,18 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
     }
 
     @Test
-    void whenOpenAiServiceFailShouldGetFailMessage() throws IOException {
+    void whenOpenAiServiceFailShouldGetFailMessage() {
       mockFeedback(10);
       when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
           .thenThrow(new RuntimeException());
       var result =
           assertThrows(
-              OpenAIServiceErrorException.class,
-              () -> {
-                controller.uploadFineTuningExamples();
-              });
+              OpenAIServiceErrorException.class, () -> controller.uploadFineTuningExamples());
       assertEquals(result.getMessage(), "Upload failed.");
     }
 
     @Test
-    void shouldSuccessWhen10FeedbackAndUploadFileAndTriggerFineTune() throws IOException {
+    void shouldSuccessWhen10FeedbackAndUploadFileAndTriggerFineTune() {
       mockFeedback(11);
       File fakeResponse = new File();
       fakeResponse.setId("TestFileId");
@@ -113,14 +87,11 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
       when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
           .thenReturn(Single.just(fakeResponse));
       when(openAiApi.createFineTuningJob(any())).thenReturn(Single.just(fakeFineTuningResponse));
-      assertDoesNotThrow(
-          () -> {
-            controller.uploadAndTriggerFineTuning();
-          });
+      assertDoesNotThrow(() -> controller.uploadAndTriggerFineTuning());
     }
 
     @Test
-    void shouldFailWhenNoFeedbackAndTriggerFineTune() throws IOException {
+    void shouldFailWhenNoFeedbackAndTriggerFineTune() {
       var result =
           assertThrows(
               OpenAIServiceErrorException.class, () -> controller.uploadAndTriggerFineTuning());
@@ -128,66 +99,14 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
     }
 
     @Test
-    void whenOpenAiServiceFailShouldGetFailMessageAndTriggerFineTune() throws IOException {
+    void whenOpenAiServiceFailShouldGetFailMessageAndTriggerFineTune() {
       mockFeedback(10);
       when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
           .thenThrow(new RuntimeException());
       var result =
           assertThrows(
-              OpenAIServiceErrorException.class,
-              () -> {
-                controller.uploadAndTriggerFineTuning();
-              });
+              OpenAIServiceErrorException.class, () -> controller.uploadAndTriggerFineTuning());
       assertEquals(result.getMessage(), "Upload failed.");
-    }
-
-    @Test
-    void shouldReturnGoodTrainingDataIfHavingReadingAuth_whenCallGetGoodTrainingData()
-        throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().title("Test Topic").please();
-      makeMe.aQuestionSuggestionForFineTunining().ofNote(note).positive().please();
-      List<OpenAIChatGPTFineTuningExample> goodOpenAIChatGPTFineTuningExampleList =
-          controller.getAllPositiveFeedbackQuestionGenerationFineTuningExamples();
-      assertEquals(1, goodOpenAIChatGPTFineTuningExampleList.size());
-      List<ChatMessage> goodTrainingData =
-          goodOpenAIChatGPTFineTuningExampleList.get(0).getMessages();
-      assertThat(goodTrainingData.get(0).getContent(), containsString("Test Topic"));
-      assertThat(
-          goodTrainingData.get(1).getContent(),
-          containsString("assume the role of a Memory Assistant"));
-    }
-
-    @Test
-    void shouldIncludeTheQuestion_whenCallGetGoodTrainingData()
-        throws UnexpectedNoAccessRightException {
-      makeMe
-          .aQuestionSuggestionForFineTunining()
-          .positive()
-          .withPreservedQuestion(
-              makeMe.aMCQWithAnswer().stem("This is the raw Json question").please())
-          .please();
-      List<OpenAIChatGPTFineTuningExample> goodOpenAIChatGPTFineTuningExampleList =
-          controller.getAllPositiveFeedbackQuestionGenerationFineTuningExamples();
-      List<ChatMessage> goodTrainingData =
-          goodOpenAIChatGPTFineTuningExampleList.get(0).getMessages();
-      assertThat(
-          goodTrainingData.get(2).getContent(), containsString("This is the raw Json question"));
-    }
-
-    @Test
-    void shouldIncludeOnlyPositiveQuestion_whenCallGetGoodTrainingData()
-        throws UnexpectedNoAccessRightException {
-      makeMe
-          .aQuestionSuggestionForFineTunining()
-          .negative()
-          .withPreservedQuestion(
-              makeMe.aMCQWithAnswer().stem("This is the negative raw Json question").please())
-          .please();
-
-      List<OpenAIChatGPTFineTuningExample> goodOpenAIChatGPTFineTuningExampleList =
-          controller.getAllPositiveFeedbackQuestionGenerationFineTuningExamples();
-
-      assertEquals(0, goodOpenAIChatGPTFineTuningExampleList.size());
     }
 
     private void mockFeedback(int count) {
