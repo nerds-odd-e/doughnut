@@ -13,22 +13,7 @@ import java.util.List;
 import org.apache.logging.log4j.util.Strings;
 
 public class OpenAIChatAboutNoteRequestBuilder {
-  public class AiModelSettings {
-    public String getDefaultModel() {
-      return "gpt-4";
-    }
-
-    public String getQuestionEvaluationModel() {
-      return "gpt-4";
-    }
-
-    public String getQuestionGenerationModel() {
-      return "gpt-3.5-turbo-1106:odd-e::8IYk5377";
-    }
-  }
-
-  AiModelSettings settings = new AiModelSettings();
-  String model = settings.getDefaultModel();
+  String model = null;
   private List<ChatMessage> messages = new ArrayList<>();
   private List<ChatFunction> functions = new ArrayList<>();
   private int maxTokens;
@@ -41,13 +26,17 @@ public class OpenAIChatAboutNoteRequestBuilder {
         "This is a PKM system using hierarchical notes, each with a topic and details, to capture atomic concepts.");
   }
 
+  public OpenAIChatAboutNoteRequestBuilder model(String modelName) {
+    this.model = modelName;
+    return this;
+  }
+
   public OpenAIChatAboutNoteRequestBuilder contentOfNoteOfCurrentFocus(Note note) {
     String noteOfCurrentFocus = note.getNoteDescription();
     return addMessage(ChatMessageRole.SYSTEM, noteOfCurrentFocus);
   }
 
   public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestionWithFunctionCall() {
-    model = settings.getQuestionGenerationModel();
     functions.add(
         ChatFunction.builder()
             .name("ask_single_answer_multiple_choice_question")
@@ -88,6 +77,9 @@ public class OpenAIChatAboutNoteRequestBuilder {
   }
 
   public ChatCompletionRequest build() {
+    if (model == null) {
+      throw new RuntimeException("model is not set");
+    }
     ChatCompletionRequest.ChatCompletionRequestBuilder requestBuilder =
         ChatCompletionRequest.builder()
             .model(model)
@@ -106,7 +98,6 @@ public class OpenAIChatAboutNoteRequestBuilder {
   }
 
   public OpenAIChatAboutNoteRequestBuilder evaluateQuestion(MCQWithAnswer question) {
-    model = settings.getQuestionEvaluationModel();
     functions.add(
         ChatFunction.builder()
             .name("evaluate_question")
@@ -160,8 +151,6 @@ please critically check if the following question makes sense and is possible to
 
   public OpenAIChatAboutNoteRequestBuilder
       userInstructionToGenerateQuestionWithGPT35FineTunedModel() {
-    this.model = settings.getQuestionGenerationModel();
-
     String messageBody =
         "Please assume the role of a Memory Assistant. Generate a MCQ based on the note of current focus in its context path.";
 

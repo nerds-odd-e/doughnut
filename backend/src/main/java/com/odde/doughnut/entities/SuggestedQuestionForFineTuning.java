@@ -85,6 +85,7 @@ public class SuggestedQuestionForFineTuning {
   public OpenAIChatGPTFineTuningExample toQuestionGenerationFineTuningExample() {
     List<ChatMessage> messages =
         new OpenAIChatAboutNoteRequestBuilder()
+            .model("get-4")
             .addMessage(ChatMessageRole.SYSTEM, preservedNoteContent)
             .userInstructionToGenerateQuestionWithGPT35FineTunedModel()
             .addMessage(ChatMessageRole.ASSISTANT, preservedQuestion)
@@ -98,6 +99,7 @@ public class SuggestedQuestionForFineTuning {
     QuestionEvaluation questionEvaluation = getQuestionEvaluation();
     var messages =
         new OpenAIChatAboutNoteRequestBuilder()
+            .model("get-4")
             .addMessage(ChatMessageRole.SYSTEM, preservedNoteContent)
             .evaluateQuestion(getPreservedQuestion())
             .evaluationResult(questionEvaluation)
