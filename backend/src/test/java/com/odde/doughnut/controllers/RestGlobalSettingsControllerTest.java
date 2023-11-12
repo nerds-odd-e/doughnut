@@ -1,17 +1,17 @@
 package com.odde.doughnut.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.json.CurrentModelVersionResponse;
 import com.odde.doughnut.entities.GlobalSettings;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
-import com.theokanning.openai.OpenAiApi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -24,12 +24,11 @@ class RestGlobalSettingsControllerTest {
   RestGlobalSettingsController controller;
   UserModel currentUser;
 
-  @Mock OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
 
   @BeforeEach
   void Setup() {
-    currentUser = makeMe.aUser().toModelPlease();
+    currentUser = makeMe.anAdmin().toModelPlease();
     controller = new RestGlobalSettingsController(makeMe.modelFactoryService, currentUser);
   }
 
@@ -70,10 +69,21 @@ class RestGlobalSettingsControllerTest {
 
   @Nested
   class SetCurrentModelVersions {
+    CurrentModelVersionResponse settings =
+        new CurrentModelVersionResponse("gpt-3.5", "gpt-4", "gpt-5");
+
     @Test
-    void setValues() {
-      CurrentModelVersionResponse settings =
-          new CurrentModelVersionResponse("gpt-3.5", "gpt-4", "gpt-5");
+    void authentication() {
+      controller =
+          new RestGlobalSettingsController(
+              makeMe.modelFactoryService, makeMe.aUser().toModelPlease());
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.setCurrentModelVersions(settings));
+    }
+
+    @Test
+    void setValues() throws UnexpectedNoAccessRightException {
       controller.setCurrentModelVersions(settings);
       CurrentModelVersionResponse currentModelVersions = controller.getCurrentModelVersions();
       assertEquals("gpt-3.5", currentModelVersions.getCurrentQuestionGenerationModelVersion());

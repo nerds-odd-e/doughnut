@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.json.*;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
@@ -30,7 +31,8 @@ public class RestGlobalSettingsController {
 
   @PostMapping("/current-model-version")
   public CurrentModelVersionResponse setCurrentModelVersions(
-      @RequestBody CurrentModelVersionResponse models) {
+      @RequestBody CurrentModelVersionResponse models) throws UnexpectedNoAccessRightException {
+    currentUser.assertAdminAuthorization();
     return globalSettingsService.setCurrentModelVersions(models);
   }
 }
