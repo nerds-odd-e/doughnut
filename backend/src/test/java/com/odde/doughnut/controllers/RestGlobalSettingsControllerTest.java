@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.json.CurrentModelVersionResponse;
-import com.odde.doughnut.entities.GlobalSettings;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
@@ -31,12 +31,14 @@ class RestGlobalSettingsControllerTest {
   Timestamp currentTime;
 
   TestabilitySettings testabilitySettings = new TestabilitySettings();
+  GlobalSettingsService globalSettingsService;
 
   @BeforeEach
   void Setup() {
     currentTime = makeMe.aTimestamp().please();
     testabilitySettings.timeTravelTo(currentTime);
     currentUser = makeMe.anAdmin().toModelPlease();
+    globalSettingsService = new GlobalSettingsService(makeMe.modelFactoryService);
     controller =
         new RestGlobalSettingsController(
             makeMe.modelFactoryService, currentUser, testabilitySettings);
@@ -55,10 +57,15 @@ class RestGlobalSettingsControllerTest {
 
     @Test
     void ShouldUseDbSettingsIfExists() {
-      SetUpGlobalSetting("current_evaluation_model_version", "any-evaluation-model-version");
-      SetUpGlobalSetting(
-          "current_question_generation_model_version", "any-question-generation-model-version");
-      SetUpGlobalSetting("current_other_model_version", "any-other-model-version");
+      globalSettingsService
+          .getGlobalSettingEvaluation()
+          .setKeyValue(currentTime, "any-evaluation-model-version");
+      globalSettingsService
+          .getGlobalSettingQuestionQuestion()
+          .setKeyValue(currentTime, "any-question-generation-model-version");
+      globalSettingsService
+          .getGlobalSettingOthers()
+          .setKeyValue(currentTime, "any-other-model-version");
       CurrentModelVersionResponse currentModelVersions = controller.getCurrentModelVersions();
       assertEquals(
           "any-question-generation-model-version",
@@ -66,14 +73,6 @@ class RestGlobalSettingsControllerTest {
       assertEquals(
           "any-evaluation-model-version", currentModelVersions.getCurrentEvaluationModelVersion());
       assertEquals("any-other-model-version", currentModelVersions.getCurrentOthersModelVersion());
-    }
-
-    private void SetUpGlobalSetting(String keyName, String value) {
-      GlobalSettings globalSettings1 = new GlobalSettings();
-      globalSettings1.setKeyName(keyName);
-      globalSettings1.setValue(value);
-      makeMe.modelFactoryService.globalSettingRepository.save(globalSettings1);
-      makeMe.refresh(globalSettings1);
     }
   }
 
@@ -95,11 +94,10 @@ class RestGlobalSettingsControllerTest {
     @Test
     void setValues() throws UnexpectedNoAccessRightException {
       controller.setCurrentModelVersions(settings);
-      GlobalSettings currentQuestionGenerationModelVersion =
-          makeMe.modelFactoryService.globalSettingRepository.findByKeyName(
-              "current_question_generation_model_version");
-      assertEquals("gpt-3.5", currentQuestionGenerationModelVersion.getValue());
-      assertEquals(currentTime, currentQuestionGenerationModelVersion.getCreatedAt());
+      GlobalSettingsService.GlobalSettingsModel globalSettingQuestionQuestion =
+          globalSettingsService.getGlobalSettingQuestionQuestion();
+      assertEquals("gpt-3.5", globalSettingQuestionQuestion.getValue());
+      assertEquals(currentTime, globalSettingQuestionQuestion.getCreatedAt());
     }
 
     @Test

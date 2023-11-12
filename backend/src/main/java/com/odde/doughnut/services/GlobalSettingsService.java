@@ -26,16 +26,20 @@ public class GlobalSettingsService {
     return new GlobalSettingsModel("current_other_model_version", modelFactoryService);
   }
 
-  record GlobalSettingsModel(String keyName, ModelFactoryService modelFactoryService) {
+  public record GlobalSettingsModel(String keyName, ModelFactoryService modelFactoryService) {
     public String getValue() {
       return getGlobalSettings().getValue();
     }
 
     public void setKeyValue(Timestamp currentUTCTimestamp, String value) {
-      GlobalSettings currentQuestionGenerationModelVersion = getGlobalSettings();
-      currentQuestionGenerationModelVersion.setValue(value);
-      currentQuestionGenerationModelVersion.setCreatedAt(currentUTCTimestamp);
-      modelFactoryService.globalSettingRepository.save(currentQuestionGenerationModelVersion);
+      GlobalSettings settings = getGlobalSettings();
+      settings.setValue(value);
+      settings.setCreatedAt(currentUTCTimestamp);
+      modelFactoryService.globalSettingRepository.save(settings);
+    }
+
+    public Timestamp getCreatedAt() {
+      return getGlobalSettings().getCreatedAt();
     }
 
     private GlobalSettings getGlobalSettings() {
