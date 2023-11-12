@@ -60,19 +60,6 @@ public class RestAiController {
     return new AiGeneratedImage(aiAdvisorService.getImage(aiCompletionParams.prompt));
   }
 
-  @PostMapping("/trigger-finetuning/{fileId}")
-  public ApiResponse triggerFineTune(@PathVariable(name = "fileId") String fileId) {
-    currentUser.assertLoggedIn();
-
-    try {
-      aiAdvisorService.triggerFineTune(fileId);
-    } catch (Exception e) {
-      return new ApiResponse("Failed");
-    }
-
-    return new ApiResponse("Successful");
-  }
-
   @GetMapping("/model-versions")
   public List<ModelVersionOption> getModelVersions() {
     return aiAdvisorService.getModelVersions();

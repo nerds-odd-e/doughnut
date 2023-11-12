@@ -409,20 +409,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
         request,
       )) as Generated.AiGeneratedImage;
     },
-
-    async triggerFineTuning(fileId: string) {
-      return (await managedApi.restPost(
-        `ai/trigger-finetuning/${fileId}`,
-        {},
-      )) as Generated.ApiResponse;
-    },
-    async evaluateQuestionModel() {
-      return 66;
-      // return (await managedApi.restPost(
-      //   `ai/evaluate/question-model/${modelId}`,
-      //   {},
-      // )) as Generated.ApiResponse
-    },
   },
   testability: {
     getEnvironment() {
