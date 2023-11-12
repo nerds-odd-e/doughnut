@@ -110,5 +110,13 @@ class RestGlobalSettingsControllerTest {
       assertEquals("gpt-4", currentModelVersions.getCurrentEvaluationModelVersion());
       assertEquals("gpt-5", currentModelVersions.getCurrentOthersModelVersion());
     }
+
+    @Test
+    void avoidDuplicate() throws UnexpectedNoAccessRightException {
+      controller.setCurrentModelVersions(settings);
+      long count = makeMe.modelFactoryService.globalSettingRepository.count();
+      controller.setCurrentModelVersions(settings);
+      assertEquals(count, makeMe.modelFactoryService.globalSettingRepository.count());
+    }
   }
 }
