@@ -27,8 +27,8 @@ public class GlobalSettings {
   private String value;
 
   @NotNull
-  @Column(name = "created_at")
+  @Column(name = "updated_at")
   @Getter
   @Setter
-  private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
+  private Timestamp updatedAt = new Timestamp(System.currentTimeMillis());
 }
