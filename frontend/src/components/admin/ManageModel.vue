@@ -13,7 +13,7 @@ import LoadingPage from "../../pages/commons/LoadingPage.vue";
 
 const { api } = useLoadingApi();
 const modelList = ref<Generated.ModelVersionOption[] | undefined>(undefined);
-const selectedModels = ref<Generated.CurrentModelVersionResponse | undefined>(
+const selectedModels = ref<Generated.GlobalAiModelSettings | undefined>(
   undefined,
 );
 

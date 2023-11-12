@@ -3,7 +3,7 @@ package com.odde.doughnut.controllers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.odde.doughnut.controllers.json.CurrentModelVersionResponse;
+import com.odde.doughnut.controllers.json.GlobalAiModelSettings;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
@@ -48,11 +48,10 @@ class RestGlobalSettingsControllerTest {
   class GetCurrentModelVersions {
     @Test
     void ShouldUseGpt35ByDefault() {
-      CurrentModelVersionResponse currentModelVersions = controller.getCurrentModelVersions();
-      assertEquals(
-          "gpt-3.5-turbo", currentModelVersions.getCurrentQuestionGenerationModelVersion());
-      assertEquals("gpt-3.5-turbo", currentModelVersions.getCurrentEvaluationModelVersion());
-      assertEquals("gpt-3.5-turbo", currentModelVersions.getCurrentOthersModelVersion());
+      GlobalAiModelSettings currentModelVersions = controller.getCurrentModelVersions();
+      assertEquals("gpt-3.5-turbo", currentModelVersions.getQuestionGenerationModel());
+      assertEquals("gpt-3.5-turbo", currentModelVersions.getEvaluationModel());
+      assertEquals("gpt-3.5-turbo", currentModelVersions.getOthersModel());
     }
 
     @Test
@@ -66,20 +65,18 @@ class RestGlobalSettingsControllerTest {
       globalSettingsService
           .getGlobalSettingOthers()
           .setKeyValue(currentTime, "any-other-model-version");
-      CurrentModelVersionResponse currentModelVersions = controller.getCurrentModelVersions();
+      GlobalAiModelSettings currentModelVersions = controller.getCurrentModelVersions();
       assertEquals(
           "any-question-generation-model-version",
-          currentModelVersions.getCurrentQuestionGenerationModelVersion());
-      assertEquals(
-          "any-evaluation-model-version", currentModelVersions.getCurrentEvaluationModelVersion());
-      assertEquals("any-other-model-version", currentModelVersions.getCurrentOthersModelVersion());
+          currentModelVersions.getQuestionGenerationModel());
+      assertEquals("any-evaluation-model-version", currentModelVersions.getEvaluationModel());
+      assertEquals("any-other-model-version", currentModelVersions.getOthersModel());
     }
   }
 
   @Nested
   class SetCurrentModelVersions {
-    CurrentModelVersionResponse settings =
-        new CurrentModelVersionResponse("gpt-3.5", "gpt-4", "gpt-5");
+    GlobalAiModelSettings settings = new GlobalAiModelSettings("gpt-3.5", "gpt-4", "gpt-5");
 
     @Test
     void authentication() {
@@ -103,10 +100,10 @@ class RestGlobalSettingsControllerTest {
     @Test
     void allValues() throws UnexpectedNoAccessRightException {
       controller.setCurrentModelVersions(settings);
-      CurrentModelVersionResponse currentModelVersions = controller.getCurrentModelVersions();
-      assertEquals("gpt-3.5", currentModelVersions.getCurrentQuestionGenerationModelVersion());
-      assertEquals("gpt-4", currentModelVersions.getCurrentEvaluationModelVersion());
-      assertEquals("gpt-5", currentModelVersions.getCurrentOthersModelVersion());
+      GlobalAiModelSettings currentModelVersions = controller.getCurrentModelVersions();
+      assertEquals("gpt-3.5", currentModelVersions.getQuestionGenerationModel());
+      assertEquals("gpt-4", currentModelVersions.getEvaluationModel());
+      assertEquals("gpt-5", currentModelVersions.getOthersModel());
     }
 
     @Test

@@ -34,13 +34,13 @@ public class RestGlobalSettingsController {
   }
 
   @GetMapping("/current-model-version")
-  public CurrentModelVersionResponse getCurrentModelVersions() {
+  public GlobalAiModelSettings getCurrentModelVersions() {
     return globalSettingsService.getCurrentModelVersions();
   }
 
   @PostMapping("/current-model-version")
-  public CurrentModelVersionResponse setCurrentModelVersions(
-      @RequestBody CurrentModelVersionResponse models) throws UnexpectedNoAccessRightException {
+  public GlobalAiModelSettings setCurrentModelVersions(@RequestBody GlobalAiModelSettings models)
+      throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
     return globalSettingsService.setCurrentModelVersions(
         models, testabilitySettings.getCurrentUTCTimestamp());

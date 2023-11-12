@@ -338,7 +338,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     async getManageModelSelected() {
       return (await managedApi.restGet(
         `settings/current-model-version`,
-      )) as Generated.CurrentModelVersionResponse;
+      )) as Generated.GlobalAiModelSettings;
     },
   },
   ai: {

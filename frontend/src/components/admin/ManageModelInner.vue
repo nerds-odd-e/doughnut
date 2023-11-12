@@ -5,7 +5,7 @@
         >Question Generation
         <Select
           :options="modelList"
-          v-model="localSelectedModels.currentQuestionGenerationModelVersion"
+          v-model="localSelectedModels.questionGenerationModel"
           scope-name="Question Generation"
           field=""
         ></Select>
@@ -16,7 +16,7 @@
         >Evaluation
         <Select
           :options="modelList"
-          v-model="localSelectedModels.currentEvaluationModelVersion"
+          v-model="localSelectedModels.evaluationModel"
           scope-name="Evaluation"
           field=""
         ></Select
@@ -27,7 +27,7 @@
         >Others
         <Select
           :options="modelList"
-          v-model="localSelectedModels.currentOthersModelVersion"
+          v-model="localSelectedModels.othersModel"
           scope-name="Others"
           field=""
         ></Select
@@ -48,7 +48,7 @@ const props = defineProps({
     required: true,
   },
   selectedModels: {
-    type: Object as PropType<Generated.CurrentModelVersionResponse>,
+    type: Object as PropType<Generated.GlobalAiModelSettings>,
     required: true,
   },
 });
