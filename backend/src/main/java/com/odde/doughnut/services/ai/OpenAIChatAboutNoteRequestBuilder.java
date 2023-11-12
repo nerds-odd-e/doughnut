@@ -13,12 +13,22 @@ import java.util.List;
 import org.apache.logging.log4j.util.Strings;
 
 public class OpenAIChatAboutNoteRequestBuilder {
-  public static final String GPT_4 = "gpt-4";
-  public static final String GPT_MODEL_DEFAULT = "gpt-4";
-  public static final String GPT_MODEL_FOR_EVALUATION = "gpt-4";
-  public static final String GPT_MODEL_FOR_QUESTION_GENERATION =
-      "ft:gpt-3.5-turbo-1106:odd-e::8IYk5377";
-  String model = GPT_MODEL_DEFAULT;
+  public class AiModelSettings {
+    public String getDefaultModel() {
+      return "gpt-4";
+    }
+
+    public String getQuestionEvaluationModel() {
+      return "gpt-4";
+    }
+
+    public String getQuestionGenerationModel() {
+      return "gpt-3.5-turbo-1106:odd-e::8IYk5377";
+    }
+  }
+
+  AiModelSettings settings = new AiModelSettings();
+  String model = settings.getDefaultModel();
   private List<ChatMessage> messages = new ArrayList<>();
   private List<ChatFunction> functions = new ArrayList<>();
   private int maxTokens;
@@ -37,6 +47,7 @@ public class OpenAIChatAboutNoteRequestBuilder {
   }
 
   public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestionWithFunctionCall() {
+    model = settings.getQuestionGenerationModel();
     functions.add(
         ChatFunction.builder()
             .name("ask_single_answer_multiple_choice_question")
@@ -94,13 +105,8 @@ public class OpenAIChatAboutNoteRequestBuilder {
     return requestBuilder.maxTokens(maxTokens).build();
   }
 
-  public OpenAIChatAboutNoteRequestBuilder useGPT4() {
-    model = GPT_4;
-    return this;
-  }
-
   public OpenAIChatAboutNoteRequestBuilder evaluateQuestion(MCQWithAnswer question) {
-    model = GPT_MODEL_FOR_EVALUATION;
+    model = settings.getQuestionEvaluationModel();
     functions.add(
         ChatFunction.builder()
             .name("evaluate_question")
@@ -154,7 +160,7 @@ please critically check if the following question makes sense and is possible to
 
   public OpenAIChatAboutNoteRequestBuilder
       userInstructionToGenerateQuestionWithGPT35FineTunedModel() {
-    this.model = GPT_MODEL_FOR_QUESTION_GENERATION;
+    this.model = settings.getQuestionGenerationModel();
 
     String messageBody =
         "Please assume the role of a Memory Assistant. Generate a MCQ based on the note of current focus in its context path.";

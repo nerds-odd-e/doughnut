@@ -65,7 +65,6 @@ public class AiQuestionGenerator {
             .contentOfNoteOfCurrentFocus(note)
             .userInstructionToGenerateQuestionWithFunctionCall()
             .maxTokens(1500)
-            .useGPT4()
             .build();
     return openAiApiHandler
         .getFunctionCallArguments(chatRequest)
