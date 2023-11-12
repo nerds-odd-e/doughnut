@@ -14,7 +14,7 @@ public class GlobalSettingsService {
     this.modelFactoryService = modelFactoryService;
   }
 
-  public GlobalSettingsModel getGlobalSettingQuestionQuestion() {
+  public GlobalSettingsModel getGlobalSettingQuestionGeneration() {
     return new GlobalSettingsModel("question_generation_model", modelFactoryService);
   }
 
@@ -28,6 +28,15 @@ public class GlobalSettingsService {
 
   public OpenAIChatAboutNoteRequestBuilder getChatBuilderForQuestionEvaluation() {
     return new OpenAIChatAboutNoteRequestBuilder().model(getGlobalSettingEvaluation().getValue());
+  }
+
+  public OpenAIChatAboutNoteRequestBuilder getChatBuilderForQuestionGeneration() {
+    return new OpenAIChatAboutNoteRequestBuilder()
+        .model(getGlobalSettingQuestionGeneration().getValue());
+  }
+
+  public OpenAIChatAboutNoteRequestBuilder getChatBuilderForOthers() {
+    return new OpenAIChatAboutNoteRequestBuilder().model(getGlobalSettingOthers().getValue());
   }
 
   public record GlobalSettingsModel(String keyName, ModelFactoryService modelFactoryService) {
@@ -61,14 +70,14 @@ public class GlobalSettingsService {
 
   public GlobalAiModelSettings getCurrentModelVersions() {
     return new GlobalAiModelSettings(
-        getGlobalSettingQuestionQuestion().getValue(),
+        getGlobalSettingQuestionGeneration().getValue(),
         getGlobalSettingEvaluation().getValue(),
         getGlobalSettingOthers().getValue());
   }
 
   public GlobalAiModelSettings setCurrentModelVersions(
       GlobalAiModelSettings models, Timestamp currentUTCTimestamp) {
-    getGlobalSettingQuestionQuestion()
+    getGlobalSettingQuestionGeneration()
         .setKeyValue(currentUTCTimestamp, models.getQuestionGenerationModel());
     getGlobalSettingEvaluation().setKeyValue(currentUTCTimestamp, models.getEvaluationModel());
     getGlobalSettingOthers().setKeyValue(currentUTCTimestamp, models.getOthersModel());

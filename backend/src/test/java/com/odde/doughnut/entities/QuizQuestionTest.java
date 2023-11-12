@@ -145,7 +145,7 @@ class QuizQuestionTest {
       userModel.getEntity().setAiQuestionTypeOnlyForReview(true);
       ReviewPointModel reviewPoint = getReviewPointModel(note);
       AiAdvisorService aiAdvisorService = mock(AiAdvisorService.class);
-      when(aiAdvisorService.generateQuestion(any())).thenReturn(mcqWithAnswer);
+      when(aiAdvisorService.generateQuestion(any(), any())).thenReturn(mcqWithAnswer);
       QuizQuestion randomQuizQuestion =
           reviewPoint.generateAQuizQuestion(
               new RealRandomizer(), userModel.getEntity(), aiAdvisorService);

@@ -10,6 +10,7 @@ import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
+import com.odde.doughnut.services.GlobalSettingsService;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -135,5 +136,9 @@ public class QuizQuestionServant {
   public List<Note> chooseFromCohortAvoidSiblings(Link link1, Note answerNote1) {
     List<Note> linkedSiblingsOfSameLinkType = link1.getLinkedSiblingsOfSameLinkType(user);
     return chooseCohortAndAvoid(answerNote1, link1.getTargetNote(), linkedSiblingsOfSameLinkType);
+  }
+
+  public GlobalSettingsService getGobalSettingsService() {
+    return new GlobalSettingsService(modelFactoryService);
   }
 }
