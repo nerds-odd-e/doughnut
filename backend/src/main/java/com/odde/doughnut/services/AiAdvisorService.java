@@ -29,8 +29,9 @@ public class AiAdvisorService {
     return openAiApiHandler.getOpenAiImage(prompt);
   }
 
-  public MCQWithAnswer generateQuestion(Note note) throws QuizQuestionNotPossibleException {
-    return getAiQuestionGenerator(note).getAiGeneratedQuestion();
+  public MCQWithAnswer generateQuestion(Note note, OpenAIChatAboutNoteRequestBuilder chatBuilder)
+      throws QuizQuestionNotPossibleException {
+    return getAiQuestionGenerator(note).getAiGeneratedQuestion(chatBuilder);
   }
 
   public AiCompletion getAiCompletion(AiCompletionParams aiCompletionParams, Note note) {

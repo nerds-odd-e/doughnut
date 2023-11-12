@@ -278,6 +278,20 @@ class RestQuizQuestionControllerTests {
       assertThrows(ResponseStatusException.class, () -> controller.generateQuestion(note));
       verify(openAiApi, Mockito.times(1)).createChatCompletion(any());
     }
+
+    @Test
+    void mustUseTheRightModel() {
+      mockChatCompletionForGPT3_5MessageOnly(jsonQuestion);
+      GlobalSettingsService globalSettingsService = new GlobalSettingsService(modelFactoryService);
+      globalSettingsService
+          .getGlobalSettingQuestionGeneration()
+          .setKeyValue(makeMe.aTimestamp().please(), "gpt-new");
+      controller.generateQuestion(note);
+      ArgumentCaptor<ChatCompletionRequest> captor =
+          ArgumentCaptor.forClass(ChatCompletionRequest.class);
+      verify(openAiApi).createChatCompletion(captor.capture());
+      assertThat(captor.getValue().getModel(), equalTo("gpt-new"));
+    }
   }
 
   @Nested

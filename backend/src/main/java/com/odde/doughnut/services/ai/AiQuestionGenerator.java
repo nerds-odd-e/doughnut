@@ -21,8 +21,9 @@ public class AiQuestionGenerator {
     this.openAiApiHandler = openAiApiHandler;
   }
 
-  public MCQWithAnswer getAiGeneratedQuestion() throws QuizQuestionNotPossibleException {
-    JsonNode question = generateQuestionByGPT3_5();
+  public MCQWithAnswer getAiGeneratedQuestion(OpenAIChatAboutNoteRequestBuilder chatBuilder)
+      throws QuizQuestionNotPossibleException {
+    JsonNode question = generateQuestionByGPT3_5(chatBuilder);
     return MCQWithAnswer.getValidQuestion(question);
   }
 
@@ -41,10 +42,10 @@ public class AiQuestionGenerator {
         .flatMap(QuestionEvaluation::getQuestionEvaluation);
   }
 
-  private JsonNode generateQuestionByGPT3_5() throws QuizQuestionNotPossibleException {
+  private JsonNode generateQuestionByGPT3_5(OpenAIChatAboutNoteRequestBuilder chatBuilder)
+      throws QuizQuestionNotPossibleException {
     ChatCompletionRequest chatRequest =
-        new OpenAIChatAboutNoteRequestBuilder()
-            .model("ft:gpt-3.5-turbo-1106:odd-e::8IYk5377")
+        chatBuilder
             .systemBrief()
             .contentOfNoteOfCurrentFocus(note)
             .questionSchemaInPlainChat()
@@ -60,10 +61,10 @@ public class AiQuestionGenerator {
         .orElseThrow(QuizQuestionNotPossibleException::new);
   }
 
-  private JsonNode generateQuestionByGPT4() throws QuizQuestionNotPossibleException {
+  private JsonNode generateQuestionByGPT4(OpenAIChatAboutNoteRequestBuilder chatBuilder)
+      throws QuizQuestionNotPossibleException {
     ChatCompletionRequest chatRequest =
-        new OpenAIChatAboutNoteRequestBuilder()
-            .model("gpt-3.5-turbo-1106:odd-e::8IYk5377")
+        chatBuilder
             .systemBrief()
             .contentOfNoteOfCurrentFocus(note)
             .userInstructionToGenerateQuestionWithFunctionCall()
