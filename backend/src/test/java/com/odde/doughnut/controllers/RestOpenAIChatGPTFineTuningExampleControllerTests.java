@@ -47,6 +47,14 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
 
   @Nested
   class getGoodOpenAIChatGPTFineTuningExample {
+    @Test
+    void authentication() {
+      controller =
+          new RestFineTuningDataController(
+              modelFactoryService, makeMe.aUser().toModelPlease(), openAiApi);
+      assertThrows(
+          UnexpectedNoAccessRightException.class, () -> controller.uploadAndTriggerFineTuning());
+    }
 
     @Test
     void shouldSuccessWhen10FeedbackAndUploadFileAndTriggerFineTune() {
