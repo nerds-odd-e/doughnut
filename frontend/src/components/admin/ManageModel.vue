@@ -18,12 +18,13 @@ const selectedModels = ref<Generated.CurrentModelVersionResponse | undefined>(
 );
 
 onMounted(() => {
-  Promise.all([api.ai.getManageModel(), api.ai.getManageModelSelected()]).then(
-    (results) => {
-      const [modelListRes, selectedModelRes] = results;
-      modelList.value = modelListRes;
-      selectedModels.value = selectedModelRes;
-    },
-  );
+  Promise.all([
+    api.ai.getManageModel(),
+    api.settings.getManageModelSelected(),
+  ]).then((results) => {
+    const [modelListRes, selectedModelRes] = results;
+    modelList.value = modelListRes;
+    selectedModels.value = selectedModelRes;
+  });
 });
 </script>

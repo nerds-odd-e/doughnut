@@ -20,8 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-class RestAiControllerGlobalSettingsTest {
-  RestAiController controller;
+class RestGlobalSettingsControllerTest {
+  RestGlobalSettingsController controller;
   UserModel currentUser;
 
   @Mock OpenAiApi openAiApi;
@@ -30,7 +30,7 @@ class RestAiControllerGlobalSettingsTest {
   @BeforeEach
   void Setup() {
     currentUser = makeMe.aUser().toModelPlease();
-    controller = new RestAiController(openAiApi, makeMe.modelFactoryService, currentUser);
+    controller = new RestGlobalSettingsController(makeMe.modelFactoryService, currentUser);
   }
 
   @Nested

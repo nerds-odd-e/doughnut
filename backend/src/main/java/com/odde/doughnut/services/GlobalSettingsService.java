@@ -6,11 +6,11 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AiModelService {
+public class GlobalSettingsService {
 
   private final ModelFactoryService modelFactoryService;
 
-  public AiModelService(ModelFactoryService modelFactoryService) {
+  public GlobalSettingsService(ModelFactoryService modelFactoryService) {
     this.modelFactoryService = modelFactoryService;
   }
 
