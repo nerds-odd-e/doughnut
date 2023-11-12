@@ -81,4 +81,10 @@ public class RestAiController {
   public CurrentModelVersionResponse getCurrentModelVersions() {
     return aiModelService.getCurrentModelVersions();
   }
+
+  @PostMapping("/current-model-version")
+  public CurrentModelVersionResponse setCurrentModelVersions(
+      @RequestBody CurrentModelVersionResponse models) {
+    return aiModelService.setCurrentModelVersions(models);
+  }
 }

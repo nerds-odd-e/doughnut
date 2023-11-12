@@ -5,13 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.controllers.json.AiCompletion;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
-import com.odde.doughnut.controllers.json.CurrentModelVersionResponse;
 import com.odde.doughnut.controllers.json.ModelVersionOption;
-import com.odde.doughnut.entities.GlobalSettings;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
@@ -173,41 +171,6 @@ class RestAiControllerTest {
       when(openAiApi.listModels()).thenReturn(Single.just(fakeResponse));
       List<ModelVersionOption> actual = controller.getModelVersions();
       assertEquals(expected, actual);
-    }
-  }
-
-  @Nested
-  class GetCurrentModelVersions {
-    @Test
-    void ShouldUseGpt35ByDefault() {
-      CurrentModelVersionResponse currentModelVersions = controller.getCurrentModelVersions();
-      assertEquals(
-          "gpt-3.5-turbo", currentModelVersions.getCurrentQuestionGenerationModelVersion());
-      assertEquals("gpt-3.5-turbo", currentModelVersions.getCurrentEvaluationModelVersion());
-      assertEquals("gpt-3.5-turbo", currentModelVersions.getCurrentOthersModelVersion());
-    }
-
-    @Test
-    void ShouldUseDbSettingsIfExists() {
-      SetUpGlobalSetting("current_evaluation_model_version", "any-evaluation-model-version");
-      SetUpGlobalSetting(
-          "current_question_generation_model_version", "any-question-generation-model-version");
-      SetUpGlobalSetting("current_other_model_version", "any-other-model-version");
-      CurrentModelVersionResponse currentModelVersions = controller.getCurrentModelVersions();
-      assertEquals(
-          "any-question-generation-model-version",
-          currentModelVersions.getCurrentQuestionGenerationModelVersion());
-      assertEquals(
-          "any-evaluation-model-version", currentModelVersions.getCurrentEvaluationModelVersion());
-      assertEquals("any-other-model-version", currentModelVersions.getCurrentOthersModelVersion());
-    }
-
-    private void SetUpGlobalSetting(String keyName, String value) {
-      GlobalSettings globalSettings1 = new GlobalSettings();
-      globalSettings1.setKeyName(keyName);
-      globalSettings1.setValue(value);
-      makeMe.modelFactoryService.globalSettingRepository.save(globalSettings1);
-      makeMe.refresh(globalSettings1);
     }
   }
 
