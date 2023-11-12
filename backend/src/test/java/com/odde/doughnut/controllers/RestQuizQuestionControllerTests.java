@@ -18,11 +18,13 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.OpenAiApi;
+import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import io.reactivex.Single;
 import java.sql.Timestamp;
@@ -31,6 +33,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -358,6 +361,21 @@ class RestQuizQuestionControllerTests {
           "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
       QuizQuestionContestResult contest = controller.contest(quizQuestionEntity);
       assertTrue(contest.rejected);
+    }
+
+    @Test
+    void useTheRightModel() throws JsonProcessingException {
+      mockChatCompletionAndReturnFunctionCall(
+          "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
+      GlobalSettingsService globalSettingsService = new GlobalSettingsService(modelFactoryService);
+      globalSettingsService
+          .getGlobalSettingEvaluation()
+          .setKeyValue(makeMe.aTimestamp().please(), "gpt-new");
+      controller.contest(quizQuestionEntity);
+      ArgumentCaptor<ChatCompletionRequest> argumentCaptor =
+          ArgumentCaptor.forClass(ChatCompletionRequest.class);
+      verify(openAiApi, times(1)).createChatCompletion(argumentCaptor.capture());
+      assertThat(argumentCaptor.getValue().getModel(), equalTo("gpt-new"));
     }
 
     @Test

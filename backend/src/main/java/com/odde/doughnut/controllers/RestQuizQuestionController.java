@@ -9,6 +9,7 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionGenerator;
 import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
+import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.OpenAiApi;
 import java.util.List;
@@ -29,6 +30,8 @@ class RestQuizQuestionController {
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
+  private final GlobalSettingsService globalSettingsService;
+
   public RestQuizQuestionController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService,
@@ -38,6 +41,7 @@ class RestQuizQuestionController {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
+    this.globalSettingsService = new GlobalSettingsService(modelFactoryService);
   }
 
   @PostMapping("/generate-question")
@@ -51,7 +55,8 @@ class RestQuizQuestionController {
   public QuizQuestionContestResult contest(
       @PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity) {
     currentUser.assertLoggedIn();
-    return aiAdvisorService.contestQuestion(quizQuestionEntity);
+    return aiAdvisorService.contestQuestion(
+        quizQuestionEntity, globalSettingsService.getChatBuilderForQuestionEvaluation());
   }
 
   @PostMapping("/{quizQuestion}/regenerate")

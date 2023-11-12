@@ -26,10 +26,10 @@ public class AiQuestionGenerator {
     return MCQWithAnswer.getValidQuestion(question);
   }
 
-  public Optional<QuestionEvaluation> evaluateQuestion(MCQWithAnswer question) {
+  public Optional<QuestionEvaluation> evaluateQuestion(
+      MCQWithAnswer question, OpenAIChatAboutNoteRequestBuilder chatBuilder) {
     ChatCompletionRequest chatRequest =
-        new OpenAIChatAboutNoteRequestBuilder()
-            .model("gpt-4")
+        chatBuilder
             .systemBrief()
             .contentOfNoteOfCurrentFocus(note)
             .evaluateQuestion(question)

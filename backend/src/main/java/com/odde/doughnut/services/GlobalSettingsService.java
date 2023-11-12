@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.controllers.json.GlobalAiModelSettings;
 import com.odde.doughnut.entities.GlobalSettings;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
 import java.sql.Timestamp;
 
 public class GlobalSettingsService {
@@ -23,6 +24,10 @@ public class GlobalSettingsService {
 
   public GlobalSettingsModel getGlobalSettingOthers() {
     return new GlobalSettingsModel("others_model", modelFactoryService);
+  }
+
+  public OpenAIChatAboutNoteRequestBuilder getChatBuilderForQuestionEvaluation() {
+    return new OpenAIChatAboutNoteRequestBuilder().model(getGlobalSettingEvaluation().getValue());
   }
 
   public record GlobalSettingsModel(String keyName, ModelFactoryService modelFactoryService) {
