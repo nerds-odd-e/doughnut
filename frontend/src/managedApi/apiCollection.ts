@@ -340,6 +340,12 @@ const apiCollection = (managedApi: ManagedApi) => ({
         `settings/current-model-version`,
       )) as Generated.GlobalAiModelSettings;
     },
+    async setManageModelSelected(settings: Generated.GlobalAiModelSettings) {
+      return (await managedApi.restPost(
+        `settings/current-model-version`,
+        settings,
+      )) as Generated.GlobalAiModelSettings;
+    },
   },
   ai: {
     async chat(noteId: Doughnut.ID, userMessage: string): Promise<string> {
