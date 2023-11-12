@@ -8,7 +8,6 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
 import com.theokanning.openai.OpenAiApi;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -40,8 +39,8 @@ public class RestAiController {
     return aiAdvisorService.getAiCompletion(aiCompletionParams, note, getChatBuilderDefault());
   }
 
-  private OpenAIChatAboutNoteRequestBuilder getChatBuilderDefault() {
-    return new GlobalSettingsService(modelFactoryService).getChatBuilderDefault();
+  private String getChatBuilderDefault() {
+    return new GlobalSettingsService(modelFactoryService).getGlobalSettingOthers().getValue();
   }
 
   @PostMapping("/chat")
