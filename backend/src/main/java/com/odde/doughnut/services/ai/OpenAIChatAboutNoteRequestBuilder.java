@@ -48,7 +48,7 @@ public class OpenAIChatAboutNoteRequestBuilder {
         """
   Please assume the role of a Memory Assistant, which involves helping me review, recall, and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following guidelines:
 
-  1. Generate a multiple-choice question based on the note in the current context path
+  1. Generate a MCQ based on the note in the current context path
   2. Only the top-level of the context path is visible to the user.
   3. Provide 2 to 4 choices with only 1 correct answer.
   4. Vary the lengths of the choice texts so that the correct answer isn't consistently the longest.

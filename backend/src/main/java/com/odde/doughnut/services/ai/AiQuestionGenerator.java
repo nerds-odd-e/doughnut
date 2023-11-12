@@ -23,7 +23,7 @@ public class AiQuestionGenerator {
 
   public MCQWithAnswer getAiGeneratedQuestion(String modelName)
       throws QuizQuestionNotPossibleException {
-    JsonNode question = generateQuestionByGPT3_5(modelName);
+    JsonNode question = generateQuestionByGPT4(modelName);
     return MCQWithAnswer.getValidQuestion(question);
   }
 
@@ -62,10 +62,11 @@ public class AiQuestionGenerator {
         .orElseThrow(QuizQuestionNotPossibleException::new);
   }
 
-  private JsonNode generateQuestionByGPT4(OpenAIChatAboutNoteRequestBuilder chatBuilder)
+  private JsonNode generateQuestionByGPT4(String modelName)
       throws QuizQuestionNotPossibleException {
     ChatCompletionRequest chatRequest =
-        chatBuilder
+        new OpenAIChatAboutNoteRequestBuilder()
+            .model(modelName)
             .systemBrief()
             .contentOfNoteOfCurrentFocus(note)
             .userInstructionToGenerateQuestionWithFunctionCall()
