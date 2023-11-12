@@ -13,52 +13,59 @@ public class GlobalSettingsService {
     this.modelFactoryService = modelFactoryService;
   }
 
+  public GlobalSettingsModel getGlobalSettingQuestionQuestion() {
+    return new GlobalSettingsModel(
+        "current_question_generation_model_version", modelFactoryService);
+  }
+
+  public GlobalSettingsModel getGlobalSettingEvaluation() {
+    return new GlobalSettingsModel("current_evaluation_model_version", modelFactoryService);
+  }
+
+  public GlobalSettingsModel getGlobalSettingOthers() {
+    return new GlobalSettingsModel("current_other_model_version", modelFactoryService);
+  }
+
+  record GlobalSettingsModel(String keyName, ModelFactoryService modelFactoryService) {
+    public String getValue() {
+      return getGlobalSettings().getValue();
+    }
+
+    public void setKeyValue(Timestamp currentUTCTimestamp, String value) {
+      GlobalSettings currentQuestionGenerationModelVersion = getGlobalSettings();
+      currentQuestionGenerationModelVersion.setValue(value);
+      currentQuestionGenerationModelVersion.setCreatedAt(currentUTCTimestamp);
+      modelFactoryService.globalSettingRepository.save(currentQuestionGenerationModelVersion);
+    }
+
+    private GlobalSettings getGlobalSettings() {
+      GlobalSettings currentQuestionGenerationModelVersion =
+          modelFactoryService.globalSettingRepository.findByKeyName(keyName);
+      if (currentQuestionGenerationModelVersion == null) {
+        GlobalSettings globalSettings = new GlobalSettings();
+        globalSettings.setKeyName(keyName);
+        globalSettings.setValue("gpt-3.5-turbo");
+        return globalSettings;
+      }
+      return currentQuestionGenerationModelVersion;
+    }
+  }
+
   public CurrentModelVersionResponse getCurrentModelVersions() {
-    String currentQuestionGenerationModelVersion =
-        getGlobalSettings("current_question_generation_model_version").getValue();
-
-    String currentEvaluationModelVersion =
-        getGlobalSettings("current_evaluation_model_version").getValue();
-
-    String currentOtherModelVersion = getGlobalSettings("current_other_model_version").getValue();
-
     return new CurrentModelVersionResponse(
-        currentQuestionGenerationModelVersion,
-        currentEvaluationModelVersion,
-        currentOtherModelVersion);
+        getGlobalSettingQuestionQuestion().getValue(),
+        getGlobalSettingEvaluation().getValue(),
+        getGlobalSettingOthers().getValue());
   }
 
   public CurrentModelVersionResponse setCurrentModelVersions(
       CurrentModelVersionResponse models, Timestamp currentUTCTimestamp) {
-    setKeyValue(
-        currentUTCTimestamp,
-        "current_question_generation_model_version",
-        models.getCurrentQuestionGenerationModelVersion());
-    setKeyValue(
-        currentUTCTimestamp,
-        "current_evaluation_model_version",
-        models.getCurrentEvaluationModelVersion());
-    setKeyValue(
-        currentUTCTimestamp, "current_other_model_version", models.getCurrentOthersModelVersion());
+    getGlobalSettingQuestionQuestion()
+        .setKeyValue(currentUTCTimestamp, models.getCurrentQuestionGenerationModelVersion());
+    getGlobalSettingEvaluation()
+        .setKeyValue(currentUTCTimestamp, models.getCurrentEvaluationModelVersion());
+    getGlobalSettingOthers()
+        .setKeyValue(currentUTCTimestamp, models.getCurrentOthersModelVersion());
     return models;
-  }
-
-  private void setKeyValue(Timestamp currentUTCTimestamp, String keyName, String value) {
-    GlobalSettings currentQuestionGenerationModelVersion = getGlobalSettings(keyName);
-    currentQuestionGenerationModelVersion.setValue(value);
-    currentQuestionGenerationModelVersion.setCreatedAt(currentUTCTimestamp);
-    modelFactoryService.globalSettingRepository.save(currentQuestionGenerationModelVersion);
-  }
-
-  private GlobalSettings getGlobalSettings(String keyName) {
-    GlobalSettings currentQuestionGenerationModelVersion =
-        modelFactoryService.globalSettingRepository.findByKeyName(keyName);
-    if (currentQuestionGenerationModelVersion == null) {
-      GlobalSettings globalSettings = new GlobalSettings();
-      globalSettings.setKeyName(keyName);
-      globalSettings.setValue("gpt-3.5-turbo");
-      return globalSettings;
-    }
-    return currentQuestionGenerationModelVersion;
   }
 }
