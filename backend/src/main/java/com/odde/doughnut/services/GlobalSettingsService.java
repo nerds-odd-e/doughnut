@@ -45,12 +45,27 @@ public class GlobalSettingsService {
 
   public CurrentModelVersionResponse setCurrentModelVersions(
       CurrentModelVersionResponse models, Timestamp currentUTCTimestamp) {
-    GlobalSettings currentQuestionGenerationModelVersion = new GlobalSettings();
-    currentQuestionGenerationModelVersion.setKeyName("current_question_generation_model_version");
-    currentQuestionGenerationModelVersion.setValue(
+    setKeyValue(
+        currentUTCTimestamp,
+        "current_question_generation_model_version",
         models.getCurrentQuestionGenerationModelVersion());
+    setKeyValue(
+        currentUTCTimestamp,
+        "current_evaluation_model_version",
+        models.getCurrentEvaluationModelVersion());
+    setKeyValue(
+        currentUTCTimestamp, "current_other_model_version", models.getCurrentOthersModelVersion());
+    return models;
+  }
+
+  private void setKeyValue(
+      Timestamp currentUTCTimestamp,
+      String currentQuestionGenerationModelVersion1,
+      String currentQuestionGenerationModelVersion2) {
+    GlobalSettings currentQuestionGenerationModelVersion = new GlobalSettings();
+    currentQuestionGenerationModelVersion.setKeyName(currentQuestionGenerationModelVersion1);
+    currentQuestionGenerationModelVersion.setValue(currentQuestionGenerationModelVersion2);
     currentQuestionGenerationModelVersion.setCreatedAt(currentUTCTimestamp);
     modelFactoryService.globalSettingRepository.save(currentQuestionGenerationModelVersion);
-    return models;
   }
 }

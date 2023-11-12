@@ -101,5 +101,14 @@ class RestGlobalSettingsControllerTest {
       assertEquals("gpt-3.5", currentQuestionGenerationModelVersion.getValue());
       assertEquals(currentTime, currentQuestionGenerationModelVersion.getCreatedAt());
     }
+
+    @Test
+    void allValues() throws UnexpectedNoAccessRightException {
+      controller.setCurrentModelVersions(settings);
+      CurrentModelVersionResponse currentModelVersions = controller.getCurrentModelVersions();
+      assertEquals("gpt-3.5", currentModelVersions.getCurrentQuestionGenerationModelVersion());
+      assertEquals("gpt-4", currentModelVersions.getCurrentEvaluationModelVersion());
+      assertEquals("gpt-5", currentModelVersions.getCurrentOthersModelVersion());
+    }
   }
 }
