@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -81,13 +82,8 @@ class SuggestedQuestionForFineTuningTest {
 
   private QuestionEvaluation getQuestionEvaluation(List<ChatMessage> goodTrainingData)
       throws JsonProcessingException {
-    // strangely, the fine-tuning requires the arguments to be a string, not a json object
-    assertThat(
-        goodTrainingData.get(2).getFunctionCall().getArguments().getNodeType(),
-        equalTo(JsonNodeType.STRING));
-    return new ObjectMapper()
-        .readValue(
-            goodTrainingData.get(2).getFunctionCall().getArguments().asText(),
-            QuestionEvaluation.class);
+    JsonNode arguments = goodTrainingData.get(2).getFunctionCall().getArguments();
+    assertThat(arguments.getNodeType(), equalTo(JsonNodeType.OBJECT));
+    return new ObjectMapper().treeToValue(arguments, QuestionEvaluation.class);
   }
 }
