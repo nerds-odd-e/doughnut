@@ -29,6 +29,7 @@ public class AiQuestionGenerator {
   public Optional<QuestionEvaluation> evaluateQuestion(MCQWithAnswer question) {
     ChatCompletionRequest chatRequest =
         new OpenAIChatAboutNoteRequestBuilder()
+            .model("gpt-4")
             .systemBrief()
             .contentOfNoteOfCurrentFocus(note)
             .evaluateQuestion(question)
@@ -43,6 +44,7 @@ public class AiQuestionGenerator {
   private JsonNode generateQuestionByGPT3_5() throws QuizQuestionNotPossibleException {
     ChatCompletionRequest chatRequest =
         new OpenAIChatAboutNoteRequestBuilder()
+            .model("gpt-3.5-turbo-1106:odd-e::8IYk5377")
             .systemBrief()
             .contentOfNoteOfCurrentFocus(note)
             .questionSchemaInPlainChat()
@@ -61,6 +63,7 @@ public class AiQuestionGenerator {
   private JsonNode generateQuestionByGPT4() throws QuizQuestionNotPossibleException {
     ChatCompletionRequest chatRequest =
         new OpenAIChatAboutNoteRequestBuilder()
+            .model("gpt-3.5-turbo-1106:odd-e::8IYk5377")
             .systemBrief()
             .contentOfNoteOfCurrentFocus(note)
             .userInstructionToGenerateQuestionWithFunctionCall()
