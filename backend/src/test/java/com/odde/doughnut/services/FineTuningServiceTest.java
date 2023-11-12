@@ -9,11 +9,10 @@ import static org.mockito.Mockito.when;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.services.ai.ChatMessageForFineTuning;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
-import com.theokanning.openai.completion.chat.ChatFunctionCall;
-import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.file.File;
 import io.reactivex.Single;
 import java.util.List;
@@ -106,7 +105,7 @@ class FineTuningServiceTest {
       List<OpenAIChatGPTFineTuningExample> goodOpenAIChatGPTFineTuningExampleList =
           fineTuningService.getQuestionGenerationTrainingExamples();
       assertEquals(1, goodOpenAIChatGPTFineTuningExampleList.size());
-      List<ChatMessage> goodTrainingData =
+      List<ChatMessageForFineTuning> goodTrainingData =
           goodOpenAIChatGPTFineTuningExampleList.get(0).getMessages();
       assertThat(goodTrainingData.get(0).getContent(), containsString("Test Topic"));
       assertThat(
@@ -124,7 +123,7 @@ class FineTuningServiceTest {
           .please();
       List<OpenAIChatGPTFineTuningExample> goodOpenAIChatGPTFineTuningExampleList =
           fineTuningService.getQuestionGenerationTrainingExamples();
-      List<ChatMessage> goodTrainingData =
+      List<ChatMessageForFineTuning> goodTrainingData =
           goodOpenAIChatGPTFineTuningExampleList.get(0).getMessages();
       assertThat(
           goodTrainingData.get(2).getFunctionCall().getName(),
@@ -132,17 +131,6 @@ class FineTuningServiceTest {
       assertThat(
           goodTrainingData.get(2).getFunctionCall().getArguments().toString(),
           containsString("This is the raw Json question"));
-    }
-
-    @Test
-    void shouldUseProperJsonForArgument() {
-      makeMe.aQuestionSuggestionForFineTunining().positive().please();
-      List<OpenAIChatGPTFineTuningExample> goodOpenAIChatGPTFineTuningExampleList =
-          fineTuningService.getQuestionGenerationTrainingExamples();
-      List<ChatMessage> goodTrainingData =
-          goodOpenAIChatGPTFineTuningExampleList.get(0).getMessages();
-      ChatFunctionCall functionCall = goodTrainingData.get(2).getFunctionCall();
-      assertThat(functionCall.getArguments().getNodeType().name(), equalTo("OBJECT"));
     }
 
     @Test

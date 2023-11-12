@@ -89,7 +89,7 @@ public class SuggestedQuestionForFineTuning {
             .userInstructionToGenerateQuestionWithFunctionCall()
             .generatedQuestion(getPreservedQuestion())
             .buildMessages();
-    return new OpenAIChatGPTFineTuningExample(messages);
+    return OpenAIChatGPTFineTuningExample.from(messages);
   }
 
   @JsonIgnore
@@ -101,7 +101,7 @@ public class SuggestedQuestionForFineTuning {
             .evaluateQuestion(getPreservedQuestion())
             .evaluationResult(questionEvaluation)
             .buildMessages();
-    return new OpenAIChatGPTFineTuningExample(messages);
+    return OpenAIChatGPTFineTuningExample.from(messages);
   }
 
   @JsonIgnore
