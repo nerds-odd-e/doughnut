@@ -2,6 +2,7 @@
   <ManageModelInner
     v-bind="{ modelList, selectedModels }"
     v-if="modelList && selectedModels"
+    @save="save"
   />
   <LoadingPage v-else />
 </template>
@@ -27,4 +28,8 @@ onMounted(() => {
     selectedModels.value = selectedModelRes;
   });
 });
+
+const save = async (settings: Generated.GlobalAiModelSettings) => {
+  selectedModels.value = await api.settings.setManageModelSelected(settings);
+};
 </script>

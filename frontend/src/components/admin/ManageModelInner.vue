@@ -34,7 +34,7 @@
       ></label>
     </div>
     <div>
-      <button @click="save()">Save</button>
+      <button @click="$emit('save', localSelectedModels)">Save</button>
     </div>
   </div>
 </template>
@@ -53,7 +53,7 @@ const props = defineProps({
   },
 });
 
-const localSelectedModels = ref(props.selectedModels);
+const emit = defineEmits(["save"]);
 
-function save() {}
+const localSelectedModels = ref(props.selectedModels);
 </script>
