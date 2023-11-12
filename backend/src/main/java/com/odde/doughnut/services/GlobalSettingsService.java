@@ -35,7 +35,7 @@ public class GlobalSettingsService {
         .model(getGlobalSettingQuestionGeneration().getValue());
   }
 
-  public OpenAIChatAboutNoteRequestBuilder getChatBuilderForOthers() {
+  public OpenAIChatAboutNoteRequestBuilder getChatBuilderDefault() {
     return new OpenAIChatAboutNoteRequestBuilder().model(getGlobalSettingOthers().getValue());
   }
 

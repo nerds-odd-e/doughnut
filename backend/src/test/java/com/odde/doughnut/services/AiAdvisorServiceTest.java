@@ -15,6 +15,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
+import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
@@ -115,7 +116,10 @@ class AiAdvisorServiceTest {
 
   private AiCompletion getAiCompletionFromAdvisor(String incompleteContent) {
     Note note = makeMe.aNote().inMemoryPlease();
-    return aiAdvisorService.getAiCompletion(new AiCompletionParams("", incompleteContent), note);
+    return aiAdvisorService.getAiCompletion(
+        new AiCompletionParams("", incompleteContent),
+        note,
+        new OpenAIChatAboutNoteRequestBuilder().model("gpt-4"));
   }
 
   @Nested

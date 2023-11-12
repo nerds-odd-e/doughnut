@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.controllers.json.AiCompletion;
@@ -12,9 +13,11 @@ import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.controllers.json.ModelVersionOption;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.OpenAiResponse;
+import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.image.Image;
 import com.theokanning.openai.image.ImageResult;
@@ -26,6 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +65,14 @@ class RestAiControllerTest {
 
   @Nested
   class AskSuggestion {
+    ArgumentCaptor<ChatCompletionRequest> captor =
+        ArgumentCaptor.forClass(ChatCompletionRequest.class);
+
+    @BeforeEach
+    void setup() {
+      when(openAiApi.createChatCompletion(any())).thenReturn(buildCompletionResult("blue planet"));
+    }
+
     @Test
     void askWithNoteThatCannotAccess() {
       assertThrows(
@@ -75,36 +87,36 @@ class RestAiControllerTest {
       Note cosmos = makeMe.aNote("cosmos").please();
       Note solar = makeMe.aNote("solar system").under(cosmos).please();
       Note earth = makeMe.aNote("Earth").under(solar).please();
-      when(openAiApi.createChatCompletion(
-              argThat(
-                  request -> {
-                    assertThat(request.getMaxTokens()).isLessThan(200);
-                    assertThat(request.getMessages()).hasSize(4);
-                    assertEquals("describe Earth", request.getMessages().get(3).getContent());
-                    assertThat(request.getMessages().get(1).getContent())
-                        .contains("Context path: cosmos › solar system");
-                    return true;
-                  })))
-          .thenReturn(buildCompletionResult("blue planet"));
       controller.getCompletion(earth, params);
+      verify(openAiApi).createChatCompletion(captor.capture());
+      assertThat(captor.getValue().getMaxTokens()).isLessThan(200);
+      assertThat(captor.getValue().getMessages()).hasSize(4);
+      assertEquals("describe Earth", captor.getValue().getMessages().get(3).getContent());
+      assertThat(captor.getValue().getMessages().get(1).getContent())
+          .contains("Context path: cosmos › solar system");
+    }
+
+    @Test
+    void askSuggestionWithRightModel() {
+      new GlobalSettingsService(makeMe.modelFactoryService)
+          .getGlobalSettingOthers()
+          .setKeyValue(makeMe.aTimestamp().please(), "gpt-future");
+      controller.getCompletion(note, params);
+
+      verify(openAiApi).createChatCompletion(captor.capture());
+      assertEquals("gpt-future", captor.getValue().getModel());
     }
 
     @Test
     void askSuggestionWithIncompleteAssistantMessage() {
       params.incompleteContent = "What goes up,";
-      when(openAiApi.createChatCompletion(
-              argThat(
-                  request -> {
-                    assertThat(request.getMessages()).hasSize(5);
-                    return true;
-                  })))
-          .thenReturn(buildCompletionResult("blue planet"));
       controller.getCompletion(note, params);
+      verify(openAiApi).createChatCompletion(captor.capture());
+      assertThat(captor.getValue().getMessages()).hasSize(5);
     }
 
     @Test
     void askSuggestionAndUseResponse() {
-      when(openAiApi.createChatCompletion(any())).thenReturn(buildCompletionResult("blue planet"));
       AiCompletion aiCompletion = controller.getCompletion(note, params);
       assertEquals("blue planet", aiCompletion.getMoreCompleteContent());
     }
