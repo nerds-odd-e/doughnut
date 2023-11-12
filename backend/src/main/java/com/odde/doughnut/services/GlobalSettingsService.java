@@ -58,13 +58,13 @@ public class GlobalSettingsService {
     return models;
   }
 
-  private void setKeyValue(
-      Timestamp currentUTCTimestamp,
-      String currentQuestionGenerationModelVersion1,
-      String currentQuestionGenerationModelVersion2) {
-    GlobalSettings currentQuestionGenerationModelVersion = new GlobalSettings();
-    currentQuestionGenerationModelVersion.setKeyName(currentQuestionGenerationModelVersion1);
-    currentQuestionGenerationModelVersion.setValue(currentQuestionGenerationModelVersion2);
+  private void setKeyValue(Timestamp currentUTCTimestamp, String keyName, String value) {
+    GlobalSettings currentQuestionGenerationModelVersion =
+        modelFactoryService.globalSettingRepository.findByKeyName(keyName);
+    if (currentQuestionGenerationModelVersion == null)
+      currentQuestionGenerationModelVersion = new GlobalSettings();
+    currentQuestionGenerationModelVersion.setKeyName(keyName);
+    currentQuestionGenerationModelVersion.setValue(value);
     currentQuestionGenerationModelVersion.setCreatedAt(currentUTCTimestamp);
     modelFactoryService.globalSettingRepository.save(currentQuestionGenerationModelVersion);
   }
