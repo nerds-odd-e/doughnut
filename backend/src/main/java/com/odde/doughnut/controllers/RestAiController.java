@@ -7,6 +7,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
+import com.odde.doughnut.services.GlobalSettingsService;
 import com.theokanning.openai.OpenAiApi;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -35,7 +36,10 @@ public class RestAiController {
   public AiCompletion getCompletion(
       @PathVariable(name = "note") Note note, @RequestBody AiCompletionParams aiCompletionParams) {
     currentUser.assertLoggedIn();
-    return aiAdvisorService.getAiCompletion(aiCompletionParams, note);
+    return aiAdvisorService.getAiCompletion(
+        aiCompletionParams,
+        note,
+        new GlobalSettingsService(modelFactoryService).getChatBuilderDefault());
   }
 
   @PostMapping("/chat")

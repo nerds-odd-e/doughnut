@@ -34,10 +34,12 @@ public class AiAdvisorService {
     return getAiQuestionGenerator(note).getAiGeneratedQuestion(chatBuilder);
   }
 
-  public AiCompletion getAiCompletion(AiCompletionParams aiCompletionParams, Note note) {
+  public AiCompletion getAiCompletion(
+      AiCompletionParams aiCompletionParams,
+      Note note,
+      OpenAIChatAboutNoteRequestBuilder chatBuilder) {
     ChatCompletionRequest chatCompletionRequest =
-        new OpenAIChatAboutNoteRequestBuilder()
-            .model("gpt-4")
+        chatBuilder
             .systemBrief()
             .contentOfNoteOfCurrentFocus(note)
             .instructionForCompletion(aiCompletionParams)
