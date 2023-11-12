@@ -4,14 +4,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
+import com.odde.doughnut.services.ai.ChatMessageForFineTuning;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
-import com.theokanning.openai.completion.chat.ChatMessage;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +32,8 @@ class SuggestedQuestionForFineTuningTest {
   void testFirstPart() {
     OpenAIChatGPTFineTuningExample questionEvaluationFineTuningData =
         suggestedQuestionForFineTuning.toQuestionEvaluationFineTuningData();
-    List<ChatMessage> goodTrainingData = questionEvaluationFineTuningData.getMessages();
+    List<ChatMessageForFineTuning> goodTrainingData =
+        questionEvaluationFineTuningData.getMessages();
     assertThat(goodTrainingData.get(0).getContent(), containsString("note content"));
     assertThat(goodTrainingData.get(1).getContent(), containsString(mcqWithAnswer.stem));
     assertThat(goodTrainingData.get(2).getContent(), nullValue());
@@ -52,7 +51,8 @@ class SuggestedQuestionForFineTuningTest {
     suggestedQuestionForFineTuning.preserveQuestion(legacyMcq);
     OpenAIChatGPTFineTuningExample questionEvaluationFineTuningData =
         suggestedQuestionForFineTuning.toQuestionEvaluationFineTuningData();
-    List<ChatMessage> goodTrainingData = questionEvaluationFineTuningData.getMessages();
+    List<ChatMessageForFineTuning> goodTrainingData =
+        questionEvaluationFineTuningData.getMessages();
     assertThat(goodTrainingData.get(1).getContent(), containsString(legacyMcq.stem));
   }
 
@@ -60,7 +60,8 @@ class SuggestedQuestionForFineTuningTest {
   void testFunctionCall() throws JsonProcessingException {
     OpenAIChatGPTFineTuningExample questionEvaluationFineTuningData =
         suggestedQuestionForFineTuning.toQuestionEvaluationFineTuningData();
-    List<ChatMessage> goodTrainingData = questionEvaluationFineTuningData.getMessages();
+    List<ChatMessageForFineTuning> goodTrainingData =
+        questionEvaluationFineTuningData.getMessages();
     QuestionEvaluation questionEvaluation = getQuestionEvaluation(goodTrainingData);
     assertThat(questionEvaluation.comment, equalTo("a comment"));
     assertThat(questionEvaluation.feasibleQuestion, equalTo(false));
@@ -72,7 +73,8 @@ class SuggestedQuestionForFineTuningTest {
     suggestedQuestionForFineTuning.setPositiveFeedback(true);
     OpenAIChatGPTFineTuningExample questionEvaluationFineTuningData =
         suggestedQuestionForFineTuning.toQuestionEvaluationFineTuningData();
-    List<ChatMessage> goodTrainingData = questionEvaluationFineTuningData.getMessages();
+    List<ChatMessageForFineTuning> goodTrainingData =
+        questionEvaluationFineTuningData.getMessages();
     QuestionEvaluation questionEvaluation = getQuestionEvaluation(goodTrainingData);
     assertThat(questionEvaluation.comment, equalTo("a comment"));
     assertThat(questionEvaluation.feasibleQuestion, equalTo(true));
@@ -80,10 +82,9 @@ class SuggestedQuestionForFineTuningTest {
         questionEvaluation.correctChoices, equalTo(new int[] {mcqWithAnswer.correctChoiceIndex}));
   }
 
-  private QuestionEvaluation getQuestionEvaluation(List<ChatMessage> goodTrainingData)
+  private QuestionEvaluation getQuestionEvaluation(List<ChatMessageForFineTuning> goodTrainingData)
       throws JsonProcessingException {
-    JsonNode arguments = goodTrainingData.get(2).getFunctionCall().getArguments();
-    assertThat(arguments.getNodeType(), equalTo(JsonNodeType.OBJECT));
-    return new ObjectMapper().treeToValue(arguments, QuestionEvaluation.class);
+    String arguments = goodTrainingData.get(2).getFunctionCall().getArguments();
+    return new ObjectMapper().readValue(arguments, QuestionEvaluation.class);
   }
 }
