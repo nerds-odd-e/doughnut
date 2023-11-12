@@ -87,7 +87,7 @@ public class SuggestedQuestionForFineTuning {
         new OpenAIChatAboutNoteRequestBuilder()
             .addMessage(ChatMessageRole.SYSTEM, preservedNoteContent)
             .userInstructionToGenerateQuestionWithFunctionCall()
-            .generatedQuestion(preservedQuestion)
+            .generatedQuestion(getPreservedQuestion())
             .buildMessages();
     return new OpenAIChatGPTFineTuningExample(messages);
   }

@@ -1,8 +1,7 @@
 package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -13,6 +12,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
+import com.theokanning.openai.completion.chat.ChatFunctionCall;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.file.File;
 import io.reactivex.Single;
@@ -132,6 +132,17 @@ class FineTuningServiceTest {
       assertThat(
           goodTrainingData.get(2).getFunctionCall().getArguments().toString(),
           containsString("This is the raw Json question"));
+    }
+
+    @Test
+    void shouldUseProperJsonForArgument() {
+      makeMe.aQuestionSuggestionForFineTunining().positive().please();
+      List<OpenAIChatGPTFineTuningExample> goodOpenAIChatGPTFineTuningExampleList =
+          fineTuningService.getQuestionGenerationTrainingExamples();
+      List<ChatMessage> goodTrainingData =
+          goodOpenAIChatGPTFineTuningExampleList.get(0).getMessages();
+      ChatFunctionCall functionCall = goodTrainingData.get(2).getFunctionCall();
+      assertThat(functionCall.getArguments().getNodeType().name(), equalTo("OBJECT"));
     }
 
     @Test

@@ -163,19 +163,15 @@ please critically check if the following question makes sense and is possible to
 
   public OpenAIChatAboutNoteRequestBuilder evaluationResult(QuestionEvaluation questionEvaluation) {
     ChatMessage msg = new ChatMessage(ChatMessageRole.ASSISTANT.value(), null);
-    JsonNode arguments =
-        new ObjectMapper()
-            .valueToTree(new ObjectMapper().valueToTree(questionEvaluation).toString());
+    JsonNode arguments = new ObjectMapper().valueToTree(questionEvaluation);
     msg.setFunctionCall(new ChatFunctionCall("evaluate_question", arguments));
     messages.add(msg);
     return this;
   }
 
-  public OpenAIChatAboutNoteRequestBuilder generatedQuestion(String preservedQuestion) {
+  public OpenAIChatAboutNoteRequestBuilder generatedQuestion(MCQWithAnswer preservedQuestion) {
     ChatMessage msg = new ChatMessage(ChatMessageRole.ASSISTANT.value(), null);
-    JsonNode arguments =
-        new ObjectMapper()
-            .valueToTree(new ObjectMapper().valueToTree(preservedQuestion).toString());
+    JsonNode arguments = new ObjectMapper().valueToTree(preservedQuestion);
     msg.setFunctionCall(
         new ChatFunctionCall("ask_single_answer_multiple_choice_question", arguments));
     messages.add(msg);
