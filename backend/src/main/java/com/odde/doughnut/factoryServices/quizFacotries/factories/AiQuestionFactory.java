@@ -6,7 +6,6 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
-import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
 
 public class AiQuestionFactory implements QuizQuestionFactory, QuestionRawJsonFactory {
   private Thing thing;
@@ -21,12 +20,10 @@ public class AiQuestionFactory implements QuizQuestionFactory, QuestionRawJsonFa
   public void generateRawJsonQuestion(QuizQuestionEntity quizQuestion)
       throws QuizQuestionNotPossibleException {
     MCQWithAnswer MCQWithAnswer =
-        servant.aiAdvisorService.generateQuestion(thing.getNote(), getChatBuilder());
+        servant.aiAdvisorService.generateQuestion(
+            thing.getNote(),
+            servant.getGobalSettingsService().getGlobalSettingQuestionGeneration().getValue());
     quizQuestion.setRawJsonQuestion(MCQWithAnswer.toJsonString());
     quizQuestion.setCorrectAnswerIndex(MCQWithAnswer.correctChoiceIndex);
-  }
-
-  private OpenAIChatAboutNoteRequestBuilder getChatBuilder() {
-    return servant.getGobalSettingsService().getChatBuilderForQuestionGeneration();
   }
 }

@@ -29,17 +29,16 @@ public class AiAdvisorService {
     return openAiApiHandler.getOpenAiImage(prompt);
   }
 
-  public MCQWithAnswer generateQuestion(Note note, OpenAIChatAboutNoteRequestBuilder chatBuilder)
+  public MCQWithAnswer generateQuestion(Note note, String modelName)
       throws QuizQuestionNotPossibleException {
-    return getAiQuestionGenerator(note).getAiGeneratedQuestion(chatBuilder);
+    return getAiQuestionGenerator(note).getAiGeneratedQuestion(modelName);
   }
 
   public AiCompletion getAiCompletion(
-      AiCompletionParams aiCompletionParams,
-      Note note,
-      OpenAIChatAboutNoteRequestBuilder chatBuilder) {
+      AiCompletionParams aiCompletionParams, Note note, String modelName) {
     ChatCompletionRequest chatCompletionRequest =
-        chatBuilder
+        new OpenAIChatAboutNoteRequestBuilder()
+            .model(modelName)
             .systemBrief()
             .contentOfNoteOfCurrentFocus(note)
             .instructionForCompletion(aiCompletionParams)
@@ -48,10 +47,10 @@ public class AiAdvisorService {
     return openAiApiHandler.getAiCompletion(aiCompletionParams, chatCompletionRequest).orElse(null);
   }
 
-  public String chatWithAi(
-      Note note, String userMessage, OpenAIChatAboutNoteRequestBuilder chatBuilder) {
+  public String chatWithAi(Note note, String userMessage, String modelName) {
     ChatCompletionRequest chatCompletionRequest =
-        chatBuilder
+        new OpenAIChatAboutNoteRequestBuilder()
+            .model(modelName)
             .systemBrief()
             .contentOfNoteOfCurrentFocus(note)
             .chatMessage(userMessage)
@@ -97,9 +96,9 @@ public class AiAdvisorService {
   }
 
   public QuizQuestionContestResult contestQuestion(
-      QuizQuestionEntity quizQuestionEntity, OpenAIChatAboutNoteRequestBuilder chatBuilder) {
+      QuizQuestionEntity quizQuestionEntity, String modelName) {
     return getAiQuestionGenerator(quizQuestionEntity.getThing().getNote())
-        .evaluateQuestion(quizQuestionEntity.getMcqWithAnswer(), chatBuilder)
+        .evaluateQuestion(quizQuestionEntity.getMcqWithAnswer(), modelName)
         .map(e -> e.getQuizQuestionContestResult(quizQuestionEntity.getCorrectAnswerIndex()))
         .orElse(null);
   }

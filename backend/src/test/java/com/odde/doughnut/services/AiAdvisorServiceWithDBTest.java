@@ -10,7 +10,6 @@ import com.odde.doughnut.controllers.json.QuizQuestionContestResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
-import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
@@ -71,14 +70,10 @@ class AiAdvisorServiceWithDBTest {
       mockChatCompletionAndReturnFunctionCall(
           "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
       QuizQuestionContestResult contest =
-          aiAdvisorService.contestQuestion(quizQuestionEntity, getChatBuilder());
+          aiAdvisorService.contestQuestion(quizQuestionEntity, "gpt-4");
       assertTrue(contest.rejected);
       Assertions.assertThat(contest.reason)
           .isEqualTo("This seems to be a legitimate question. Please answer it.");
-    }
-
-    private static OpenAIChatAboutNoteRequestBuilder getChatBuilder() {
-      return new OpenAIChatAboutNoteRequestBuilder().model("gpt-4");
     }
 
     @Test
@@ -87,7 +82,7 @@ class AiAdvisorServiceWithDBTest {
       mockChatCompletionAndReturnFunctionCall(
           "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
       QuizQuestionContestResult contest =
-          aiAdvisorService.contestQuestion(quizQuestionEntity, getChatBuilder());
+          aiAdvisorService.contestQuestion(quizQuestionEntity, "gpt-4");
       assertFalse(contest.rejected);
     }
 
@@ -102,7 +97,7 @@ class AiAdvisorServiceWithDBTest {
       mockChatCompletionAndMatchFunctionCall("evaluate_question", toBeReturned);
       assertThrows(
           RuntimeException.class,
-          () -> aiAdvisorService.contestQuestion(quizQuestionEntity, getChatBuilder()));
+          () -> aiAdvisorService.contestQuestion(quizQuestionEntity, "gpt-4"));
     }
 
     private Single<ChatCompletionResult> buildCompletionResultForFunctionCall(String jsonString)
@@ -112,15 +107,6 @@ class AiAdvisorServiceWithDBTest {
               .openAiCompletionResult()
               .functionCall("", new ObjectMapper().readTree(jsonString))
               .please());
-    }
-
-    private void mockChatCompletionForGPT3_5MessageOnly(String result) {
-      Single<ChatCompletionResult> just =
-          Single.just(makeMe.openAiCompletionResult().choice(result).please());
-
-      doReturn(just)
-          .when(openAiApi)
-          .createChatCompletion(argThat(request -> request.getFunctions() == null));
     }
 
     private void mockChatCompletionAndReturnFunctionCall(String functionName, String result)

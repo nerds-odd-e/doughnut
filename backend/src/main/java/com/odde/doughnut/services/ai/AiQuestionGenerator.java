@@ -21,16 +21,16 @@ public class AiQuestionGenerator {
     this.openAiApiHandler = openAiApiHandler;
   }
 
-  public MCQWithAnswer getAiGeneratedQuestion(OpenAIChatAboutNoteRequestBuilder chatBuilder)
+  public MCQWithAnswer getAiGeneratedQuestion(String modelName)
       throws QuizQuestionNotPossibleException {
-    JsonNode question = generateQuestionByGPT3_5(chatBuilder);
+    JsonNode question = generateQuestionByGPT3_5(modelName);
     return MCQWithAnswer.getValidQuestion(question);
   }
 
-  public Optional<QuestionEvaluation> evaluateQuestion(
-      MCQWithAnswer question, OpenAIChatAboutNoteRequestBuilder chatBuilder) {
+  public Optional<QuestionEvaluation> evaluateQuestion(MCQWithAnswer question, String modelName) {
     ChatCompletionRequest chatRequest =
-        chatBuilder
+        new OpenAIChatAboutNoteRequestBuilder()
+            .model(modelName)
             .systemBrief()
             .contentOfNoteOfCurrentFocus(note)
             .evaluateQuestion(question)
@@ -42,10 +42,11 @@ public class AiQuestionGenerator {
         .flatMap(QuestionEvaluation::getQuestionEvaluation);
   }
 
-  private JsonNode generateQuestionByGPT3_5(OpenAIChatAboutNoteRequestBuilder chatBuilder)
+  private JsonNode generateQuestionByGPT3_5(String modelName)
       throws QuizQuestionNotPossibleException {
     ChatCompletionRequest chatRequest =
-        chatBuilder
+        new OpenAIChatAboutNoteRequestBuilder()
+            .model(modelName)
             .systemBrief()
             .contentOfNoteOfCurrentFocus(note)
             .questionSchemaInPlainChat()
