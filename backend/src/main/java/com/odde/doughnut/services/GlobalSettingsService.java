@@ -4,8 +4,6 @@ import com.odde.doughnut.controllers.json.CurrentModelVersionResponse;
 import com.odde.doughnut.entities.GlobalSettings;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 
 public class GlobalSettingsService {
 
@@ -16,31 +14,18 @@ public class GlobalSettingsService {
   }
 
   public CurrentModelVersionResponse getCurrentModelVersions() {
-    Iterable<GlobalSettings> all = modelFactoryService.globalSettingRepository.findAll();
-    List<GlobalSettings> globalSettings = new ArrayList<>();
-    all.forEach(globalSettings::add);
-
     String currentQuestionGenerationModelVersion =
-        getModelVersion(globalSettings, "current_question_generation_model_version");
+        getGlobalSettings("current_question_generation_model_version").getValue();
 
     String currentEvaluationModelVersion =
-        getModelVersion(globalSettings, "current_evaluation_model_version");
+        getGlobalSettings("current_evaluation_model_version").getValue();
 
-    String currentOtherModelVersion =
-        getModelVersion(globalSettings, "current_other_model_version");
+    String currentOtherModelVersion = getGlobalSettings("current_other_model_version").getValue();
 
     return new CurrentModelVersionResponse(
         currentQuestionGenerationModelVersion,
         currentEvaluationModelVersion,
         currentOtherModelVersion);
-  }
-
-  private static String getModelVersion(List<GlobalSettings> globalSettings, String keyName) {
-    return globalSettings.stream()
-        .filter(g -> g.getKeyName().equals(keyName))
-        .findFirst()
-        .map(GlobalSettings::getValue)
-        .orElse("gpt-3.5-turbo");
   }
 
   public CurrentModelVersionResponse setCurrentModelVersions(
@@ -59,13 +44,21 @@ public class GlobalSettingsService {
   }
 
   private void setKeyValue(Timestamp currentUTCTimestamp, String keyName, String value) {
-    GlobalSettings currentQuestionGenerationModelVersion =
-        modelFactoryService.globalSettingRepository.findByKeyName(keyName);
-    if (currentQuestionGenerationModelVersion == null)
-      currentQuestionGenerationModelVersion = new GlobalSettings();
-    currentQuestionGenerationModelVersion.setKeyName(keyName);
+    GlobalSettings currentQuestionGenerationModelVersion = getGlobalSettings(keyName);
     currentQuestionGenerationModelVersion.setValue(value);
     currentQuestionGenerationModelVersion.setCreatedAt(currentUTCTimestamp);
     modelFactoryService.globalSettingRepository.save(currentQuestionGenerationModelVersion);
+  }
+
+  private GlobalSettings getGlobalSettings(String keyName) {
+    GlobalSettings currentQuestionGenerationModelVersion =
+        modelFactoryService.globalSettingRepository.findByKeyName(keyName);
+    if (currentQuestionGenerationModelVersion == null) {
+      GlobalSettings globalSettings = new GlobalSettings();
+      globalSettings.setKeyName(keyName);
+      globalSettings.setValue("gpt-3.5-turbo");
+      return globalSettings;
+    }
+    return currentQuestionGenerationModelVersion;
   }
 }
