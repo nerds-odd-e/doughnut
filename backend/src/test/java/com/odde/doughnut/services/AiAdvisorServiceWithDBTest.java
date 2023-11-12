@@ -10,6 +10,7 @@ import com.odde.doughnut.controllers.json.QuizQuestionContestResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
@@ -69,10 +70,15 @@ class AiAdvisorServiceWithDBTest {
     void rejected() throws JsonProcessingException {
       mockChatCompletionAndReturnFunctionCall(
           "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
-      QuizQuestionContestResult contest = aiAdvisorService.contestQuestion(quizQuestionEntity);
+      QuizQuestionContestResult contest =
+          aiAdvisorService.contestQuestion(quizQuestionEntity, getChatBuilder());
       assertTrue(contest.rejected);
       Assertions.assertThat(contest.reason)
           .isEqualTo("This seems to be a legitimate question. Please answer it.");
+    }
+
+    private static OpenAIChatAboutNoteRequestBuilder getChatBuilder() {
+      return new OpenAIChatAboutNoteRequestBuilder().model("gpt-4");
     }
 
     @Test
@@ -80,7 +86,8 @@ class AiAdvisorServiceWithDBTest {
       questionEvaluation.feasibleQuestion = false;
       mockChatCompletionAndReturnFunctionCall(
           "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
-      QuizQuestionContestResult contest = aiAdvisorService.contestQuestion(quizQuestionEntity);
+      QuizQuestionContestResult contest =
+          aiAdvisorService.contestQuestion(quizQuestionEntity, getChatBuilder());
       assertFalse(contest.rejected);
     }
 
@@ -94,7 +101,8 @@ class AiAdvisorServiceWithDBTest {
                   .please());
       mockChatCompletionAndMatchFunctionCall("evaluate_question", toBeReturned);
       assertThrows(
-          RuntimeException.class, () -> aiAdvisorService.contestQuestion(quizQuestionEntity));
+          RuntimeException.class,
+          () -> aiAdvisorService.contestQuestion(quizQuestionEntity, getChatBuilder()));
     }
 
     private Single<ChatCompletionResult> buildCompletionResultForFunctionCall(String jsonString)

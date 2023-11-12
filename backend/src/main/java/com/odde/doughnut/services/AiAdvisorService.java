@@ -36,6 +36,7 @@ public class AiAdvisorService {
   public AiCompletion getAiCompletion(AiCompletionParams aiCompletionParams, Note note) {
     ChatCompletionRequest chatCompletionRequest =
         new OpenAIChatAboutNoteRequestBuilder()
+            .model("gpt-4")
             .systemBrief()
             .contentOfNoteOfCurrentFocus(note)
             .instructionForCompletion(aiCompletionParams)
@@ -47,6 +48,7 @@ public class AiAdvisorService {
   public String chatToAi(Note note, String userMessage) {
     ChatCompletionRequest chatCompletionRequest =
         new OpenAIChatAboutNoteRequestBuilder()
+            .model("gpt-4")
             .systemBrief()
             .contentOfNoteOfCurrentFocus(note)
             .chatMessage(userMessage)
@@ -91,9 +93,10 @@ public class AiAdvisorService {
     return modelVersionOptions;
   }
 
-  public QuizQuestionContestResult contestQuestion(QuizQuestionEntity quizQuestionEntity) {
+  public QuizQuestionContestResult contestQuestion(
+      QuizQuestionEntity quizQuestionEntity, OpenAIChatAboutNoteRequestBuilder chatBuilder) {
     return getAiQuestionGenerator(quizQuestionEntity.getThing().getNote())
-        .evaluateQuestion(quizQuestionEntity.getMcqWithAnswer())
+        .evaluateQuestion(quizQuestionEntity.getMcqWithAnswer(), chatBuilder)
         .map(e -> e.getQuizQuestionContestResult(quizQuestionEntity.getCorrectAnswerIndex()))
         .orElse(null);
   }
