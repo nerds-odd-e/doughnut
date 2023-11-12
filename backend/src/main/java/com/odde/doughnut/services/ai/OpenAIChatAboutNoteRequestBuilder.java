@@ -76,6 +76,10 @@ public class OpenAIChatAboutNoteRequestBuilder {
     return this;
   }
 
+  public List<ChatMessage> buildMessages() {
+    return messages;
+  }
+
   public ChatCompletionRequest build() {
     if (model == null) {
       throw new RuntimeException("model is not set");
