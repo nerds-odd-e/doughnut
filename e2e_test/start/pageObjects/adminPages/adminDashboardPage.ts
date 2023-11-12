@@ -26,6 +26,7 @@ export function assumeAdminDashboardPage() {
       return {
         chooseModel(model: string, task: string) {
           cy.findByLabelText(task).select(model)
+          cy.findByRole("button", { name: "Save" }).click()
         },
       }
     },
