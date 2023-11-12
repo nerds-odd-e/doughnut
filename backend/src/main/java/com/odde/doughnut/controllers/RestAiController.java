@@ -1,14 +1,12 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.json.*;
-import com.odde.doughnut.controllers.json.CurrentModelVersionResponse;
 import com.odde.doughnut.controllers.json.ModelVersionOption;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
-import com.odde.doughnut.services.AiModelService;
 import com.theokanning.openai.OpenAiApi;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,7 +20,6 @@ public class RestAiController {
 
   private final AiAdvisorService aiAdvisorService;
   private final ModelFactoryService modelFactoryService;
-  private final AiModelService aiModelService;
   private UserModel currentUser;
 
   public RestAiController(
@@ -32,7 +29,6 @@ public class RestAiController {
     this.aiAdvisorService = new AiAdvisorService(openAiApi);
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
-    this.aiModelService = new AiModelService(modelFactoryService);
   }
 
   @PostMapping("/{note}/completion")
@@ -65,7 +61,6 @@ public class RestAiController {
     try {
       aiAdvisorService.triggerFineTune(fileId);
     } catch (Exception e) {
-      System.out.println(e.toString());
       return new ApiResponse("Failed");
     }
 
@@ -75,16 +70,5 @@ public class RestAiController {
   @GetMapping("/model-versions")
   public List<ModelVersionOption> getModelVersions() {
     return aiAdvisorService.getModelVersions();
-  }
-
-  @GetMapping("/current-model-version")
-  public CurrentModelVersionResponse getCurrentModelVersions() {
-    return aiModelService.getCurrentModelVersions();
-  }
-
-  @PostMapping("/current-model-version")
-  public CurrentModelVersionResponse setCurrentModelVersions(
-      @RequestBody CurrentModelVersionResponse models) {
-    return aiModelService.setCurrentModelVersions(models);
   }
 }

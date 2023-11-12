@@ -334,6 +334,13 @@ const apiCollection = (managedApi: ManagedApi) => ({
       )) as Generated.WikidataSearchEntity[];
     },
   },
+  settings: {
+    async getManageModelSelected() {
+      return (await managedApi.restGet(
+        `settings/current-model-version`,
+      )) as Generated.CurrentModelVersionResponse;
+    },
+  },
   ai: {
     async chat(noteId: Doughnut.ID, userMessage: string): Promise<string> {
       const request: Generated.ChatRequest = { userMessage };
@@ -347,11 +354,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return (await managedApi.restGet(
         `ai/model-versions`,
       )) as Generated.ModelVersionOption[];
-    },
-    async getManageModelSelected() {
-      return (await managedApi.restGet(
-        `ai/current-model-version`,
-      )) as Generated.CurrentModelVersionResponse;
     },
     async keepAskingAICompletionUntilStop(
       prompt: string,
