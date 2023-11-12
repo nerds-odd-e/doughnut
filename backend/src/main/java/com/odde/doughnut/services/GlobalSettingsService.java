@@ -1,6 +1,6 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.controllers.json.CurrentModelVersionResponse;
+import com.odde.doughnut.controllers.json.GlobalAiModelSettings;
 import com.odde.doughnut.entities.GlobalSettings;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
@@ -14,16 +14,15 @@ public class GlobalSettingsService {
   }
 
   public GlobalSettingsModel getGlobalSettingQuestionQuestion() {
-    return new GlobalSettingsModel(
-        "current_question_generation_model_version", modelFactoryService);
+    return new GlobalSettingsModel("question_generation_model", modelFactoryService);
   }
 
   public GlobalSettingsModel getGlobalSettingEvaluation() {
-    return new GlobalSettingsModel("current_evaluation_model_version", modelFactoryService);
+    return new GlobalSettingsModel("evaluation_model", modelFactoryService);
   }
 
   public GlobalSettingsModel getGlobalSettingOthers() {
-    return new GlobalSettingsModel("current_other_model_version", modelFactoryService);
+    return new GlobalSettingsModel("others_model", modelFactoryService);
   }
 
   public record GlobalSettingsModel(String keyName, ModelFactoryService modelFactoryService) {
@@ -55,21 +54,19 @@ public class GlobalSettingsService {
     }
   }
 
-  public CurrentModelVersionResponse getCurrentModelVersions() {
-    return new CurrentModelVersionResponse(
+  public GlobalAiModelSettings getCurrentModelVersions() {
+    return new GlobalAiModelSettings(
         getGlobalSettingQuestionQuestion().getValue(),
         getGlobalSettingEvaluation().getValue(),
         getGlobalSettingOthers().getValue());
   }
 
-  public CurrentModelVersionResponse setCurrentModelVersions(
-      CurrentModelVersionResponse models, Timestamp currentUTCTimestamp) {
+  public GlobalAiModelSettings setCurrentModelVersions(
+      GlobalAiModelSettings models, Timestamp currentUTCTimestamp) {
     getGlobalSettingQuestionQuestion()
-        .setKeyValue(currentUTCTimestamp, models.getCurrentQuestionGenerationModelVersion());
-    getGlobalSettingEvaluation()
-        .setKeyValue(currentUTCTimestamp, models.getCurrentEvaluationModelVersion());
-    getGlobalSettingOthers()
-        .setKeyValue(currentUTCTimestamp, models.getCurrentOthersModelVersion());
+        .setKeyValue(currentUTCTimestamp, models.getQuestionGenerationModel());
+    getGlobalSettingEvaluation().setKeyValue(currentUTCTimestamp, models.getEvaluationModel());
+    getGlobalSettingOthers().setKeyValue(currentUTCTimestamp, models.getOthersModel());
     return models;
   }
 }

@@ -47,12 +47,6 @@ declare namespace Generated {
         invitationCode: string;
     }
 
-    interface CurrentModelVersionResponse {
-        currentQuestionGenerationModelVersion: string;
-        currentEvaluationModelVersion: string;
-        currentOthersModelVersion: string;
-    }
-
     interface CurrentUserInfo {
         user: User;
         externalIdentifier: string;
@@ -67,6 +61,12 @@ declare namespace Generated {
         answeredQuestion: AnsweredQuestion;
         answer: Answer;
         suggestedQuestionForFineTuning: SuggestedQuestionForFineTuning;
+    }
+
+    interface GlobalAiModelSettings {
+        questionGenerationModel: string;
+        evaluationModel: string;
+        othersModel: string;
     }
 
     interface InitialInfo {
