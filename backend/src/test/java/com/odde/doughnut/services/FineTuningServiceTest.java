@@ -127,7 +127,11 @@ class FineTuningServiceTest {
       List<ChatMessage> goodTrainingData =
           goodOpenAIChatGPTFineTuningExampleList.get(0).getMessages();
       assertThat(
-          goodTrainingData.get(2).getContent(), containsString("This is the raw Json question"));
+          goodTrainingData.get(2).getFunctionCall().getName(),
+          containsString("ask_single_answer_multiple_choice_question"));
+      assertThat(
+          goodTrainingData.get(2).getFunctionCall().getArguments().toString(),
+          containsString("This is the raw Json question"));
     }
 
     @Test
