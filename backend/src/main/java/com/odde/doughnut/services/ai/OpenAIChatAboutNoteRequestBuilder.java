@@ -170,4 +170,15 @@ please critically check if the following question makes sense and is possible to
     messages.add(msg);
     return this;
   }
+
+  public OpenAIChatAboutNoteRequestBuilder generatedQuestion(String preservedQuestion) {
+    ChatMessage msg = new ChatMessage(ChatMessageRole.ASSISTANT.value(), null);
+    JsonNode arguments =
+        new ObjectMapper()
+            .valueToTree(new ObjectMapper().valueToTree(preservedQuestion).toString());
+    msg.setFunctionCall(
+        new ChatFunctionCall("ask_single_answer_multiple_choice_question", arguments));
+    messages.add(msg);
+    return this;
+  }
 }
