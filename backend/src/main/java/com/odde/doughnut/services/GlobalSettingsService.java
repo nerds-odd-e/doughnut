@@ -33,12 +33,12 @@ public class GlobalSettingsService {
     public void setKeyValue(Timestamp currentUTCTimestamp, String value) {
       GlobalSettings settings = getGlobalSettings();
       settings.setValue(value);
-      settings.setCreatedAt(currentUTCTimestamp);
+      settings.setUpdatedAt(currentUTCTimestamp);
       modelFactoryService.globalSettingRepository.save(settings);
     }
 
     public Timestamp getCreatedAt() {
-      return getGlobalSettings().getCreatedAt();
+      return getGlobalSettings().getUpdatedAt();
     }
 
     private GlobalSettings getGlobalSettings() {
