@@ -16,7 +16,6 @@ import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.file.File;
 import io.reactivex.Single;
-import java.io.IOException;
 import java.util.List;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -87,7 +86,7 @@ class FineTuningServiceTest {
     }
 
     @Test
-    void whenOpenAiServiceFailShouldGetFailMessage() throws IOException {
+    void whenOpenAiServiceFailShouldGetFailMessage() {
       mockFeedback(10);
       when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
           .thenThrow(new RuntimeException());
