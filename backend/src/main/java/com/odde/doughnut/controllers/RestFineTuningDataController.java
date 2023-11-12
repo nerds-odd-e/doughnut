@@ -64,7 +64,8 @@ class RestFineTuningDataController {
   }
 
   @PostMapping("/upload-and-trigger-fine-tuning")
-  public void uploadAndTriggerFineTuning() throws IOException {
+  public void uploadAndTriggerFineTuning() throws IOException, UnexpectedNoAccessRightException {
+    currentUser.assertAdminAuthorization();
     var uploadResult = fineTuningService.uploadFineTuningExamples();
     try {
       aiAdvisorService.triggerFineTune(uploadResult.get("Question"));
