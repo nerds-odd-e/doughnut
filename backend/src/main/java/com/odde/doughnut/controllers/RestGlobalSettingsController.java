@@ -5,6 +5,8 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.testability.TestabilitySettings;
+import javax.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
 
@@ -15,13 +17,20 @@ public class RestGlobalSettingsController {
 
   private final ModelFactoryService modelFactoryService;
   private final GlobalSettingsService globalSettingsService;
+
+  @Resource(name = "testabilitySettings")
+  private final TestabilitySettings testabilitySettings;
+
   private UserModel currentUser;
 
   public RestGlobalSettingsController(
-      ModelFactoryService modelFactoryService, UserModel currentUser) {
+      ModelFactoryService modelFactoryService,
+      UserModel currentUser,
+      TestabilitySettings testabilitySettings) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.globalSettingsService = new GlobalSettingsService(modelFactoryService);
+    this.testabilitySettings = testabilitySettings;
   }
 
   @GetMapping("/current-model-version")
@@ -33,6 +42,7 @@ public class RestGlobalSettingsController {
   public CurrentModelVersionResponse setCurrentModelVersions(
       @RequestBody CurrentModelVersionResponse models) throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
-    return globalSettingsService.setCurrentModelVersions(models);
+    return globalSettingsService.setCurrentModelVersions(
+        models, testabilitySettings.getCurrentUTCTimestamp());
   }
 }

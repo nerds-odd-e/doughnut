@@ -8,6 +8,8 @@ import com.odde.doughnut.entities.GlobalSettings;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.TestabilitySettings;
+import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -26,10 +28,18 @@ class RestGlobalSettingsControllerTest {
 
   @Autowired MakeMe makeMe;
 
+  Timestamp currentTime;
+
+  TestabilitySettings testabilitySettings = new TestabilitySettings();
+
   @BeforeEach
   void Setup() {
+    currentTime = makeMe.aTimestamp().please();
+    testabilitySettings.timeTravelTo(currentTime);
     currentUser = makeMe.anAdmin().toModelPlease();
-    controller = new RestGlobalSettingsController(makeMe.modelFactoryService, currentUser);
+    controller =
+        new RestGlobalSettingsController(
+            makeMe.modelFactoryService, currentUser, testabilitySettings);
   }
 
   @Nested
@@ -76,7 +86,7 @@ class RestGlobalSettingsControllerTest {
     void authentication() {
       controller =
           new RestGlobalSettingsController(
-              makeMe.modelFactoryService, makeMe.aUser().toModelPlease());
+              makeMe.modelFactoryService, makeMe.aUser().toModelPlease(), testabilitySettings);
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.setCurrentModelVersions(settings));
@@ -85,10 +95,11 @@ class RestGlobalSettingsControllerTest {
     @Test
     void setValues() throws UnexpectedNoAccessRightException {
       controller.setCurrentModelVersions(settings);
-      CurrentModelVersionResponse currentModelVersions = controller.getCurrentModelVersions();
-      assertEquals("gpt-3.5", currentModelVersions.getCurrentQuestionGenerationModelVersion());
-      //      assertEquals("gpt-4", currentModelVersions.getCurrentEvaluationModelVersion());
-      //      assertEquals("gpt-5", currentModelVersions.getCurrentOthersModelVersion());
+      GlobalSettings currentQuestionGenerationModelVersion =
+          makeMe.modelFactoryService.globalSettingRepository.findByKeyName(
+              "current_question_generation_model_version");
+      assertEquals("gpt-3.5", currentQuestionGenerationModelVersion.getValue());
+      assertEquals(currentTime, currentQuestionGenerationModelVersion.getCreatedAt());
     }
   }
 }

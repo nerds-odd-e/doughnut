@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.controllers.json.CurrentModelVersionResponse;
 import com.odde.doughnut.entities.GlobalSettings;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,11 +43,13 @@ public class GlobalSettingsService {
         .orElse("gpt-3.5-turbo");
   }
 
-  public CurrentModelVersionResponse setCurrentModelVersions(CurrentModelVersionResponse models) {
+  public CurrentModelVersionResponse setCurrentModelVersions(
+      CurrentModelVersionResponse models, Timestamp currentUTCTimestamp) {
     GlobalSettings currentQuestionGenerationModelVersion = new GlobalSettings();
     currentQuestionGenerationModelVersion.setKeyName("current_question_generation_model_version");
     currentQuestionGenerationModelVersion.setValue(
         models.getCurrentQuestionGenerationModelVersion());
+    currentQuestionGenerationModelVersion.setCreatedAt(currentUTCTimestamp);
     modelFactoryService.globalSettingRepository.save(currentQuestionGenerationModelVersion);
     return models;
   }
