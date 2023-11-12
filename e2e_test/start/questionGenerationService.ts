@@ -11,7 +11,7 @@ export const questionGenerationService = () => ({
         record["Incorrect Choice 2"],
       ],
     })
-    const messages = [{ role: "system", content: "MCQ" }]
+    const messages = [{ role: "user", content: "Memory Assistant" }]
     cy.then(async () => {
       await mock_services.openAi().restartImposter()
       await mock_services

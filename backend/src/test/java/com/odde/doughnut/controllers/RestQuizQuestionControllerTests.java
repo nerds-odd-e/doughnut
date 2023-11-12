@@ -264,8 +264,9 @@ class RestQuizQuestionControllerTests {
     }
 
     @Test
-    void createQuizQuestion() {
-      mockChatCompletionForGPT3_5MessageOnly(jsonQuestion);
+    void createQuizQuestion() throws JsonProcessingException {
+      mockChatCompletionAndReturnFunctionCall(
+          "ask_single_answer_multiple_choice_question", jsonQuestion);
       QuizQuestion quizQuestion = controller.generateQuestion(note);
 
       Assertions.assertThat(quizQuestion.stem).contains("What is the first color in the rainbow?");
@@ -280,8 +281,9 @@ class RestQuizQuestionControllerTests {
     }
 
     @Test
-    void mustUseTheRightModel() {
-      mockChatCompletionForGPT3_5MessageOnly(jsonQuestion);
+    void mustUseTheRightModel() throws JsonProcessingException {
+      mockChatCompletionAndReturnFunctionCall(
+          "ask_single_answer_multiple_choice_question", jsonQuestion);
       GlobalSettingsService globalSettingsService = new GlobalSettingsService(modelFactoryService);
       globalSettingsService
           .getGlobalSettingQuestionGeneration()
@@ -322,7 +324,7 @@ class RestQuizQuestionControllerTests {
     }
 
     @Test
-    void createQuizQuestion() {
+    void createQuizQuestion() throws JsonProcessingException {
       String jsonQuestion =
           makeMe
               .aMCQWithAnswer()
@@ -330,7 +332,8 @@ class RestQuizQuestionControllerTests {
               .please()
               .toJsonString();
 
-      mockChatCompletionForGPT3_5MessageOnly(jsonQuestion);
+      mockChatCompletionAndReturnFunctionCall(
+          "ask_single_answer_multiple_choice_question", jsonQuestion);
       QuizQuestion quizQuestion = controller.regenerate(quizQuestionEntity);
 
       Assertions.assertThat(quizQuestion.stem).contains("What is the first color in the rainbow?");
