@@ -48,10 +48,10 @@ public class AiAdvisorService {
     return openAiApiHandler.getAiCompletion(aiCompletionParams, chatCompletionRequest).orElse(null);
   }
 
-  public String chatToAi(Note note, String userMessage) {
+  public String chatWithAi(
+      Note note, String userMessage, OpenAIChatAboutNoteRequestBuilder chatBuilder) {
     ChatCompletionRequest chatCompletionRequest =
-        new OpenAIChatAboutNoteRequestBuilder()
-            .model("gpt-4")
+        chatBuilder
             .systemBrief()
             .contentOfNoteOfCurrentFocus(note)
             .chatMessage(userMessage)
