@@ -11,7 +11,7 @@
 - [Cypress](https://www.cypress.io/)
 - [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor#cypress-configuration)
 - [Cypress Testing Library](https://testing-library.com/docs/cypress-testing-library/intro/)
-- [dum](https://github.com/egoist/dum)
+- [pnpm](https://pnpm.io/)
 - [Vue3](https://v3.vuejs.org/guide/introduction.html)
 - [Vite](https://vitejs.dev)
 - [vue-router 4.x](https://router.vuejs.org/)

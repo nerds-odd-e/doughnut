@@ -28,18 +28,18 @@ git config user.email "your_email@your_domain.com"
 
 ### Get your doughnut DB tables setup
 
-- From root of `doughnut` run `dum sut` to setup and migrate your base virgin `doughnut` DB tables via `flyway` migrations. Once the migrations have completed (read the `springboot` startup logs from the VSCode terminal), use `Ctrl-C` to exit `springboot` backend server application process. (this might take some time - once done, `Ctrl-C` to exit process on completion).
+- From root of `doughnut` run `pnpm sut` to setup and migrate your base virgin `doughnut` DB tables via `flyway` migrations. Once the migrations have completed (read the `springboot` startup logs from the VSCode terminal), use `Ctrl-C` to exit `springboot` backend server application process. (this might take some time - once done, `Ctrl-C` to exit process on completion).
 
 ### Preparation steps to run doughnut backend unit tests & cypress End-to-End tests
 
-- From the root of the `doughnut` codebase (this should be on path `/workspace/doughnut`), run `dum i` to get End-to-End testing tooling setup.
-- From root of `doughnut` source path, execute `dum t` to execute the full headless cypress End-to-End test suite.
+- From the root of the `doughnut` codebase (this should be on path `/workspace/doughnut`), run `pnpm i --frozen-lockfile` to get End-to-End testing tooling setup.
+- From root of `doughnut` source path, execute `pnpm t` to execute the full headless cypress End-to-End test suite.
 
 ### Running java springboot unit tests
 
-- From the root of the `doughnut` codebase, run `dum backend:test`. This assumes you have had your doughnut DB tables setup from above.
+- From the root of the `doughnut` codebase, run `pnpm backend:test`. This assumes you have had your doughnut DB tables setup from above.
 
 ### Running frontend Vue3 unit tests
 
-- Navigate to `doughnut` source root directory. Execute `dum frontend:test` to run the full frontend unit tests ONCE.
-- Navigate to `doughnut` source root directory. Execute `dum frontend:test:watch` to run the full frontend unit tests in dev-mode with HMR live reload as you make frontend production/test code changes.
+- Navigate to `doughnut` source root directory. Execute `pnpm frontend:test` to run the full frontend unit tests ONCE.
+- Navigate to `doughnut` source root directory. Execute `pnpm frontend:test:watch` to run the full frontend unit tests in dev-mode with HMR live reload as you make frontend production/test code changes.
