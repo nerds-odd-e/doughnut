@@ -32,7 +32,7 @@ git config user.email "your_email@your_domain.com"
 
 ### Preparation steps to run doughnut backend unit tests & cypress End-to-End tests
 
-- From the root of the `doughnut` codebase (this should be on path `/workspace/doughnut`), run `pnpm i --frozen-lockfile` to get End-to-End testing tooling setup.
+- From the root of the `doughnut` codebase (this should be on path `/workspace/doughnut`), run `pnpm --frozen-lockfile recursive install` to get End-to-End testing tooling setup.
 - From root of `doughnut` source path, execute `pnpm t` to execute the full headless cypress End-to-End test suite.
 
 ### Running java springboot unit tests

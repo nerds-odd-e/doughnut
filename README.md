@@ -63,7 +63,7 @@ nix develop
 Install packages, build the frontend and start the backend
 
 ```bash
-pnpm i --frozen-lockfile && pnpm frontend:build && pnpm sut
+pnpm --frozen-lockfile recursive install && pnpm frontend:build && pnpm sut
 ```
 
 - Rerun it each time you reset the database.
@@ -105,7 +105,7 @@ For MS Windows WSL2 users:
 
 | Purpose                               | Command (run from `doughnut` source root directory)                                                                                            |
 | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Install needed e2e tooling            | `pnpm i --frozen-lockfile`                                                                                                                                        |
+| Install needed e2e tooling            | `pnpm --frozen-lockfile recursive install`                                                                                                                                        |
 | Start SUT (backend system under test) | `pnpm sut` (starts backend SUT ONLY)                                                                                                            |
 | Start Mock for external backend       | `pnpm start:mb` (starts mocked external backend ONLY)                                                                                           |
 | Start only the Cypress IDE            | `pnpm cy:open` (starts Cypress IDE ONLY)                                                                                                        |

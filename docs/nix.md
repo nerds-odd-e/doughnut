@@ -49,7 +49,7 @@ Run E2E profile springboot backend server with gradle (backend app started on po
 
 ```bash
 # from doughnut source root dir
-pnpm i --frozen-lockfile && pnpm frontend:build
+pnpm --frozen-lockfile recursive install && pnpm frontend:build
 pnpm sut
 ```
 
@@ -60,7 +60,7 @@ For MS Windows users, you need to ensure your WSL2 Linux has `xvfb` installed. T
 
 ```bash
 # from doughnut source root dir
-pnpm i --frozen-lockfile && pnpm frontend:sut
+pnpm --frozen-lockfile recursive install && pnpm frontend:sut
 pnpm sut
 pnpm start:mb
 pnpm cy:open
@@ -70,6 +70,6 @@ Run headless E2E (doughnut full stack started on port 9081)
 
 ```bash
 # from doughnut source root dir
-pnpm i --frozen-lockfile && pnpm frontend:build
+pnpm --frozen-lockfile recursive install && pnpm frontend:build
 pnpm t
 ```
