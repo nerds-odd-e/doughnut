@@ -176,7 +176,7 @@ class RestAiControllerTest {
       fakeResponse.setData(fakeModels);
 
       when(openAiApi.listModels()).thenReturn(Single.just(fakeResponse));
-      assertThat(controller.getModelVersions()).contains("gpt-4");
+      assertThat(controller.getAvailableGptModels()).contains("gpt-4");
     }
   }
 

@@ -79,7 +79,7 @@ public class AiAdvisorService {
     openAiApiHandler.triggerFineTune(fineTuningJobRequest);
   }
 
-  public List<String> getModelVersions() {
+  public List<String> getAvailableGptModels() {
     List<String> modelVersionOptions = new ArrayList<>();
 
     openAiApiHandler

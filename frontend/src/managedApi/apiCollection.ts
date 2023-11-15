@@ -356,8 +356,8 @@ const apiCollection = (managedApi: ManagedApi) => ({
       )) as Generated.ChatResponse;
       return res.assistantMessage;
     },
-    async getManageModel() {
-      return (await managedApi.restGet(`ai/model-versions`)) as string[];
+    async getAvailableGptModels() {
+      return (await managedApi.restGet(`ai/available-gpt-models`)) as string[];
     },
     async keepAskingAICompletionUntilStop(
       prompt: string,
