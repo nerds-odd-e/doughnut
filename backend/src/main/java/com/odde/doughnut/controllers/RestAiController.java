@@ -59,8 +59,8 @@ public class RestAiController {
     return new AiGeneratedImage(aiAdvisorService.getImage(aiCompletionParams.prompt));
   }
 
-  @GetMapping("/model-versions")
-  public List<String> getModelVersions() {
-    return aiAdvisorService.getModelVersions();
+  @GetMapping("/available-gpt-models")
+  public List<String> getAvailableGptModels() {
+    return aiAdvisorService.getAvailableGptModels();
   }
 }

@@ -20,7 +20,7 @@ const selectedModels = ref<Generated.GlobalAiModelSettings | undefined>(
 
 onMounted(() => {
   Promise.all([
-    api.ai.getManageModel(),
+    api.ai.getAvailableGptModels(),
     api.settings.getManageModelSelected(),
   ]).then((results) => {
     const [modelListRes, selectedModelRes] = results;
