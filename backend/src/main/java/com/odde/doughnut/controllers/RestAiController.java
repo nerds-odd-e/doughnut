@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.json.*;
-import com.odde.doughnut.controllers.json.ModelVersionOption;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -61,7 +60,7 @@ public class RestAiController {
   }
 
   @GetMapping("/model-versions")
-  public List<ModelVersionOption> getModelVersions() {
+  public List<String> getModelVersions() {
     return aiAdvisorService.getModelVersions();
   }
 }

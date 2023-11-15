@@ -79,16 +79,15 @@ public class AiAdvisorService {
     openAiApiHandler.triggerFineTune(fineTuningJobRequest);
   }
 
-  public List<ModelVersionOption> getModelVersions() {
-    List<ModelVersionOption> modelVersionOptions = new ArrayList<>();
+  public List<String> getModelVersions() {
+    List<String> modelVersionOptions = new ArrayList<>();
 
     openAiApiHandler
         .getModels()
         .forEach(
             (e) -> {
               if (e.id.startsWith("ft:") || e.id.startsWith("gpt")) {
-                ModelVersionOption modelVersionOption = new ModelVersionOption(e.id, e.id, e.id);
-                modelVersionOptions.add(modelVersionOption);
+                modelVersionOptions.add(e.id);
               }
             });
 

@@ -9,10 +9,10 @@
       <option
         class="options"
         v-for="option in options"
-        :key="option.key"
-        :value="option.value"
+        :key="option"
+        :value="option"
       >
-        {{ option.label }}
+        {{ option }}
       </option>
     </select>
   </InputWithType>
@@ -26,7 +26,7 @@ const props = defineProps({
   modelValue: String,
   scopeName: String,
   field: String,
-  options: Array as PropType<{ key: string; value: string; label: string }[]>,
+  options: Array as PropType<string[]>,
   errors: Object,
 });
 

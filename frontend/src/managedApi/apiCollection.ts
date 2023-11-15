@@ -357,9 +357,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return res.assistantMessage;
     },
     async getManageModel() {
-      return (await managedApi.restGet(
-        `ai/model-versions`,
-      )) as Generated.ModelVersionOption[];
+      return (await managedApi.restGet(`ai/model-versions`)) as string[];
     },
     async keepAskingAICompletionUntilStop(
       prompt: string,

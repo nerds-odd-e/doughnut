@@ -44,7 +44,7 @@ import Select from "../form/Select.vue";
 
 const props = defineProps({
   modelList: {
-    type: Object as PropType<Generated.ModelVersionOption[]>,
+    type: Object as PropType<string[]>,
     required: true,
   },
   selectedModels: {
