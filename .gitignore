@@ -58,6 +58,8 @@ hs_err_pid*
 node_modules/
 **/package-lock.json
 **/yarn.errorw
+**/yarn.lock
+**/.yarnclean
 
 # git-secret
 .gitsecret/keys/random_seed
