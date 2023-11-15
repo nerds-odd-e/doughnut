@@ -9,14 +9,14 @@ importers:
   .:
     dependencies:
       '@cucumber/cucumber':
-        specifier: ^10.0
+        specifier: ^10.0.1
         version: 10.0.1
     devDependencies:
       '@anev/ts-mountebank':
         specifier: 1.8.0
         version: 1.8.0
       '@badeball/cypress-cucumber-preprocessor':
-        specifier: ^19.0
+        specifier: ^19.1.0
         version: 19.1.0(cypress@13.5.1)(typescript@5.2.2)
       '@bahmutov/cypress-esbuild-preprocessor':
         specifier: ^2.2.0
@@ -25,64 +25,64 @@ importers:
         specifier: 10.0.1
         version: 10.0.1(cypress@13.5.1)
       '@types/cypress-cucumber-preprocessor':
-        specifier: ^4.0
+        specifier: ^4.0.5
         version: 4.0.5
       '@types/node':
-        specifier: ^20
+        specifier: ^20.9.0
         version: 20.9.0
       '@typescript-eslint/eslint-plugin':
-        specifier: ^6.11
+        specifier: ^6.11.0
         version: 6.11.0(@typescript-eslint/parser@6.11.0)(eslint@8.53.0)(typescript@5.2.2)
       '@typescript-eslint/parser':
-        specifier: ^6.11
+        specifier: ^6.11.0
         version: 6.11.0(eslint@8.53.0)(typescript@5.2.2)
       cypress:
         specifier: 13.5.1
         version: 13.5.1
       cypress-file-upload:
-        specifier: ^5.0
+        specifier: ^5.0.8
         version: 5.0.8(cypress@13.5.1)
       esbuild:
-        specifier: ^0.19
+        specifier: ^0.19.5
         version: 0.19.5
       eslint:
-        specifier: ^8.53
+        specifier: ^8.53.0
         version: 8.53.0
       eslint-config-prettier:
-        specifier: ^9.0
+        specifier: ^9.0.0
         version: 9.0.0(eslint@8.53.0)
       eslint-plugin-chai-friendly:
-        specifier: ^0.7
+        specifier: ^0.7.2
         version: 0.7.2(eslint@8.53.0)
       eslint-plugin-cypress:
-        specifier: ^2.15
+        specifier: ^2.15.1
         version: 2.15.1(eslint@8.53.0)
       eslint-plugin-prettier:
-        specifier: ^5.0
+        specifier: ^5.0.1
         version: 5.0.1(eslint-config-prettier@9.0.0)(eslint@8.53.0)(prettier@3.1.0)
       eslint-plugin-testing-library:
-        specifier: ^6.1
+        specifier: ^6.1.2
         version: 6.1.2(eslint@8.53.0)(typescript@5.2.2)
       eslint-plugin-unused-imports:
-        specifier: ^3.0
+        specifier: ^3.0.0
         version: 3.0.0(@typescript-eslint/eslint-plugin@6.11.0)(eslint@8.53.0)
       github_action_sound:
         specifier: ^1.0.3
         version: 1.0.3
       got:
-        specifier: ^13.0
+        specifier: ^13.0.0
         version: 13.0.0
       jsdom:
-        specifier: ^22.1
+        specifier: ^22.1.0
         version: 22.1.0
       mountebank:
-        specifier: ^2.9
+        specifier: ^2.9.1
         version: 2.9.1
       npm-run-all:
-        specifier: ^4
+        specifier: ^4.1.5
         version: 4.1.5
       prettier:
-        specifier: ^3.1
+        specifier: ^3.1.0
         version: 3.1.0
       superagent:
         specifier: ^8.1.2
@@ -97,10 +97,10 @@ importers:
   frontend:
     dependencies:
       '@popperjs/core':
-        specifier: ^2.11
+        specifier: ^2.11.8
         version: 2.11.8
       '@types/turndown':
-        specifier: ^5.0.2
+        specifier: ^5.0.4
         version: 5.0.4
       '@vue/runtime-core':
         specifier: 3.3.8
@@ -112,13 +112,13 @@ importers:
         specifier: 5.3.2
         version: 5.3.2(@popperjs/core@2.11.8)
       gsap:
-        specifier: ^3.12
+        specifier: ^3.12.2
         version: 3.12.2
       lodash:
-        specifier: ^4.17
+        specifier: ^4.17.21
         version: 4.17.21
       marked:
-        specifier: ^9.1.0
+        specifier: ^9.1.6
         version: 9.1.6
       mini-debounce:
         specifier: ^1.0.8
@@ -143,100 +143,100 @@ importers:
         version: 4.2.5(vue@3.3.8)
     devDependencies:
       '@testing-library/vue':
-        specifier: ^8.0
+        specifier: ^8.0.0
         version: 8.0.0(@vue/compiler-sfc@3.3.8)(vue@3.3.8)
       '@types/lodash':
-        specifier: ^4.14
+        specifier: ^4.14.201
         version: 4.14.201
       '@types/node':
-        specifier: ^20
+        specifier: ^20.9.0
         version: 20.9.0
       '@typescript-eslint/eslint-plugin':
-        specifier: ^6.11
+        specifier: ^6.11.0
         version: 6.11.0(@typescript-eslint/parser@6.11.0)(eslint@8.53.0)(typescript@5.2.2)
       '@typescript-eslint/parser':
-        specifier: ^6.11
+        specifier: ^6.11.0
         version: 6.11.0(eslint@8.53.0)(typescript@5.2.2)
       '@vitejs/plugin-vue':
-        specifier: ^4.4
+        specifier: ^4.4.1
         version: 4.4.1(vite@4.5.0)(vue@3.3.8)
       '@vitejs/plugin-vue-jsx':
-        specifier: ^3.0
+        specifier: ^3.0.2
         version: 3.0.2(vite@4.5.0)(vue@3.3.8)
       '@vue/eslint-config-prettier':
-        specifier: ^8.0
+        specifier: ^8.0.0
         version: 8.0.0(eslint@8.53.0)(prettier@3.1.0)
       '@vue/eslint-config-typescript':
-        specifier: ^12.0
+        specifier: ^12.0.0
         version: 12.0.0(eslint-plugin-vue@9.18.1)(eslint@8.53.0)(typescript@5.2.2)
       '@vue/test-utils':
         specifier: 2.4.2
         version: 2.4.2(vue@3.3.8)
       autoprefixer:
-        specifier: ^10.4
+        specifier: ^10.4.16
         version: 10.4.16(postcss@8.4.31)
       css-loader:
-        specifier: ^6.8
+        specifier: ^6.8.1
         version: 6.8.1(webpack@5.89.0)
       eslint:
-        specifier: ^8.53
+        specifier: ^8.53.0
         version: 8.53.0
       eslint-config-airbnb-base:
-        specifier: ^15.0
+        specifier: ^15.0.0
         version: 15.0.0(eslint-plugin-i@2.29.0)(eslint@8.53.0)
       eslint-config-airbnb-typescript:
-        specifier: ^17.1
+        specifier: ^17.1.0
         version: 17.1.0(@typescript-eslint/eslint-plugin@6.11.0)(@typescript-eslint/parser@6.11.0)(eslint-plugin-i@2.29.0)(eslint@8.53.0)
       eslint-config-prettier:
-        specifier: ^9.0
+        specifier: ^9.0.0
         version: 9.0.0(eslint@8.53.0)
       eslint-import-resolver-alias:
-        specifier: ^1.1
+        specifier: ^1.1.2
         version: 1.1.2(eslint-plugin-i@2.29.0)
       eslint-import-resolver-typescript:
-        specifier: ^3.6
+        specifier: ^3.6.1
         version: 3.6.1(@typescript-eslint/parser@6.11.0)(eslint-plugin-i@2.29.0)(eslint@8.53.0)
       eslint-plugin-import:
-        specifier: npm:eslint-plugin-i
+        specifier: npm:eslint-plugin-i@^2.29.0
         version: /eslint-plugin-i@2.29.0(@typescript-eslint/parser@6.11.0)(eslint-import-resolver-typescript@3.6.1)(eslint@8.53.0)
       eslint-plugin-prettier:
-        specifier: ^5.0
+        specifier: ^5.0.1
         version: 5.0.1(eslint-config-prettier@9.0.0)(eslint@8.53.0)(prettier@3.1.0)
       eslint-plugin-testing-library:
-        specifier: ^6.1
+        specifier: ^6.1.2
         version: 6.1.2(eslint@8.53.0)(typescript@5.2.2)
       eslint-plugin-vitest:
-        specifier: ^0.3
+        specifier: ^0.3.9
         version: 0.3.9(@typescript-eslint/eslint-plugin@6.11.0)(eslint@8.53.0)(typescript@5.2.2)(vitest@0.34.6)
       eslint-plugin-vue:
-        specifier: ^9.18
+        specifier: ^9.18.1
         version: 9.18.1(eslint@8.53.0)
       jsdom:
-        specifier: ^22.1
+        specifier: ^22.1.0
         version: 22.1.0
       optionator:
-        specifier: ^0.9
+        specifier: ^0.9.3
         version: 0.9.3
       postcss:
-        specifier: ^8.4
+        specifier: ^8.4.31
         version: 8.4.31
       prettier:
-        specifier: ^3.1
+        specifier: ^3.1.0
         version: 3.1.0
       sass:
-        specifier: ^1.69
+        specifier: ^1.69.5
         version: 1.69.5
       sass-loader:
         specifier: 13.3.2
         version: 13.3.2(sass@1.69.5)(webpack@5.89.0)
       style-loader:
-        specifier: ^3.3
+        specifier: ^3.3.3
         version: 3.3.3(webpack@5.89.0)
       typescript:
         specifier: 5.2.2
         version: 5.2.2
       unplugin-auto-import:
-        specifier: ^0.16
+        specifier: ^0.16.7
         version: 0.16.7
       vite:
         specifier: 4.5.0
@@ -245,22 +245,22 @@ importers:
         specifier: 0.6.2
         version: 0.6.2(eslint@8.53.0)(optionator@0.9.3)(typescript@5.2.2)(vite@4.5.0)(vue-tsc@1.8.22)
       vite-plugin-compression:
-        specifier: ^0.5
+        specifier: ^0.5.1
         version: 0.5.1(vite@4.5.0)
       vite-plugin-eslint:
-        specifier: ^1.8
+        specifier: ^1.8.1
         version: 1.8.1(eslint@8.53.0)(vite@4.5.0)
       vite-tsconfig-paths:
-        specifier: ^4.2
+        specifier: ^4.2.1
         version: 4.2.1(typescript@5.2.2)(vite@4.5.0)
       vitest:
         specifier: 0.34.6
         version: 0.34.6(jsdom@22.1.0)(sass@1.69.5)
       vitest-dom:
-        specifier: ^0.1
+        specifier: ^0.1.1
         version: 0.1.1(vitest@0.34.6)
       vitest-fetch-mock:
-        specifier: ^0.2
+        specifier: ^0.2.2
         version: 0.2.2(vitest@0.34.6)
       vue-tsc:
         specifier: 1.8.22
@@ -2108,7 +2108,7 @@ packages:
       '@vue/server-renderer':
         optional: true
     dependencies:
-      js-beautify: 1.14.9
+      js-beautify: 1.14.11
       vue: 3.3.8(typescript@5.2.2)
       vue-component-type-helpers: 1.8.22
     dev: true
@@ -2246,8 +2246,9 @@ packages:
     resolution: {integrity: sha512-j2afSsaIENvHZN2B8GOpF566vZ5WVk5opAiMTvWgaQT8DkbOqsTfvNAvHoRGU2zzP8cPoqys+xHTRDWW8L+/BA==}
     dev: true
 
-  /abbrev@1.1.1:
-    resolution: {integrity: sha512-nne9/IiQ/hzIhY6pdDnbBtz7DjPTKrY00P/zvPSm5pOFkl6xuGrGnXn/VtTNNfNtAfZ9/1RtehkszU9qcTii0Q==}
+  /abbrev@2.0.0:
+    resolution: {integrity: sha512-6/mh1E2u2YgEsCHdY0Yx5oW+61gZU+1vXaoiHHrpKeuRNNgFvS+/jrwHiQhB5apAf5oB7UB7E19ol2R2LKH8hQ==}
+    engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
     dev: true
 
   /accepts@1.3.8:
@@ -4910,17 +4911,6 @@ packages:
       once: 1.4.0
       path-is-absolute: 1.0.1
 
-  /glob@8.1.0:
-    resolution: {integrity: sha512-r8hpEjiQEYlF2QU0df3dS+nxxSIreXQS1qRhMJM0Q5NDdR386C7jb7Hwwod8Fgiuex+k0GFjgft18yvxm5XoCQ==}
-    engines: {node: '>=12'}
-    dependencies:
-      fs.realpath: 1.0.0
-      inflight: 1.0.6
-      inherits: 2.0.4
-      minimatch: 5.1.6
-      once: 1.4.0
-    dev: true
-
   /global-dirs@3.0.1:
     resolution: {integrity: sha512-NBcGGFbBA9s1VzD41QXDG+3++t9Mn5t1FpLdhESY6oKY4gYTFpX4wO3sqGUa0Srjtbfj3szX0RnemmrVRUdULA==}
     engines: {node: '>=10'}
@@ -5544,15 +5534,15 @@ packages:
       supports-color: 8.1.1
     dev: true
 
-  /js-beautify@1.14.9:
-    resolution: {integrity: sha512-coM7xq1syLcMyuVGyToxcj2AlzhkDjmfklL8r0JgJ7A76wyGMpJ1oA35mr4APdYNO/o/4YY8H54NQIJzhMbhBg==}
-    engines: {node: '>=12'}
+  /js-beautify@1.14.11:
+    resolution: {integrity: sha512-rPogWqAfoYh1Ryqqh2agUpVfbxAhbjuN1SmU86dskQUKouRiggUTCO4+2ym9UPXllc2WAp0J+T5qxn7Um3lCdw==}
+    engines: {node: '>=14'}
     hasBin: true
     dependencies:
       config-chain: 1.1.13
       editorconfig: 1.0.4
-      glob: 8.1.0
-      nopt: 6.0.0
+      glob: 10.3.10
+      nopt: 7.2.0
     dev: true
 
   /js-tokens@4.0.0:
@@ -6295,12 +6285,12 @@ packages:
     engines: {node: '>=6.0.0'}
     dev: true
 
-  /nopt@6.0.0:
-    resolution: {integrity: sha512-ZwLpbTgdhuZUnZzjd7nb1ZV+4DoiC6/sfiVKok72ym/4Tlf+DFdlHYmT2JPmcNNWV6Pi3SDf1kT+A4r9RTuT9g==}
-    engines: {node: ^12.13.0 || ^14.15.0 || >=16.0.0}
+  /nopt@7.2.0:
+    resolution: {integrity: sha512-CVDtwCdhYIvnAzFoJ6NJ6dX3oga9/HyciQDnG1vQDjSLMeKLJ4A93ZqYKDrgYSr1FBY5/hMYC+2VCi24pgpkGA==}
+    engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
     hasBin: true
     dependencies:
-      abbrev: 1.1.1
+      abbrev: 2.0.0
     dev: true
 
   /normalize-package-data@2.5.0:
@@ -8282,7 +8272,7 @@ packages:
     dependencies:
       assert-plus: 1.0.0
       core-util-is: 1.0.2
-      extsprintf: 1.4.1
+      extsprintf: 1.3.0
     dev: true
 
   /verror@1.10.1:
@@ -8927,11 +8917,6 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /yargs-parser@20.2.9:
-    resolution: {integrity: sha512-y11nGElTIV+CT3Zv9t7VKl+Q3hTQoT9a1Qzezhhl6Rp21gJ/IVTW7Z3y9EWXhuUBC2Shnf+DX0antecpAwSP8w==}
-    engines: {node: '>=10'}
-    dev: true
-
   /yargs-parser@21.1.1:
     resolution: {integrity: sha512-tVpsJW7DdjecAiFpbIB1e3qxIQsE6NoPc5/eTdrbbIC4h0LVsWhnoa3g+m2HclBIujHzsxZ4VJVA+GUuc2/LBw==}
     engines: {node: '>=12'}
@@ -8957,7 +8942,7 @@ packages:
       require-directory: 2.1.1
       string-width: 4.2.3
       y18n: 5.0.8
-      yargs-parser: 20.2.9
+      yargs-parser: 20.2.4
     dev: true
 
   /yargs@17.7.2:
