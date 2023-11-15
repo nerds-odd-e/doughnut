@@ -112,7 +112,6 @@ jobs:
         with:
           browser: chrome
           config-file: e2e_test/config/ci.ts
-          install-command: pnpm --frozen-lockfile --silent recursive
           build: pnpm frontend:build
           start: pnpm run-p -clnr sut start:mb
           wait-on: "http://127.0.0.1:9081/api/healthcheck"
