@@ -43,7 +43,7 @@
     "@types/node": "^20",
     "@typescript-eslint/eslint-plugin": "^6.11",
     "@typescript-eslint/parser": "^6.11",
-    "cypress": "13.5.0",
+    "cypress": "13.5.1",
     "cypress-file-upload": "^5.0",
     "esbuild": "^0.19",
     "eslint": "^8.53",
