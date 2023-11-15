@@ -10,6 +10,7 @@ in mkShell {
   buildInputs = [
     python312
     pipenv
+    corepack_20
     nodejs_20
     zsh
     dum

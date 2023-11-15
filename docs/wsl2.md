@@ -9,10 +9,9 @@ Make sure you do not run WSL2g as `root` user for doughnut development enviromen
 
 ```bash
 sudo apt-get install libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
-curl -sSL https://bina.egoist.sh/egoist/dum | sh
 ```
 
-Follow the instruction from [this article](https://shouv.medium.com/how-to-run-cypress-on-wsl2-989b83795fb6) to setup an X-Server needed to run Cypress with GUI (i.e. `dum cy:open`)
+Follow the instruction from [this article](https://shouv.medium.com/how-to-run-cypress-on-wsl2-989b83795fb6) to setup an X-Server needed to run Cypress with GUI (i.e. `pnpm cy:open`)
 
 Open your start menu > right-click XLaunch shortcut > More > Open file location;
 

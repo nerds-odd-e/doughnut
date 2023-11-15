@@ -2,7 +2,7 @@
 
 ## Code linting and formating (cypress, frontend & backend code)
 
-Details of dum/yarn task aliases described below is visible in `doughnut/package.json`
+Details of pnpm task aliases described below is visible in `doughnut/package.json`
 and `doughnut/frontend/package.json`.
 
 ### 1. VSCode IDE extension for Vue3 Typescript
@@ -34,25 +34,25 @@ From `doughnut` source root directory, run:
 ##### 2.1. Format All code
 
 ```bash
-dum format:all
+pnpm format:all
 ```
 
 ##### 2.2. Backend Java code formatting
 
 ```bash
-dum backend:format
+pnpm backend:format
 ```
 
 ##### 2.3. Frontend Vue3/Typescript code formatting
 
 ```bash
-dum frontend:format
+pnpm frontend:format
 ```
 
 ##### 2.4. Cypress E2E Typescript code formatting
 
 ```bash
-dum cy:format
+pnpm cy:format
 ```
 
 ### 3. Linting
@@ -64,23 +64,23 @@ From `doughnut` source root directory, run:
 ##### 3.1. Lint All code
 
 ```bash
-dum lint:all
+pnpm lint:all
 ```
 
 ##### 3.2. Backend Java code linting
 
 ```bash
-dum backend:lint
+pnpm backend:lint
 ```
 
 ##### 3.3. Frontend Vue3/Typescript code linting
 
 ```bash
-dum frontend:lint
+pnpm frontend:lint
 ```
 
 ##### 3.4. Cypress E2E Typescript code linting
 
 ```bash
-dum cy:lint
+pnpm cy:lint
 ```

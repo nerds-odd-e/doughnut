@@ -49,8 +49,8 @@ Run E2E profile springboot backend server with gradle (backend app started on po
 
 ```bash
 # from doughnut source root dir
-dum i && dum frontend:build
-dum sut
+pnpm i --frozen-lockfile && pnpm frontend:build
+pnpm sut
 ```
 
 Open your browser to visit http://localhost:9081
@@ -60,16 +60,16 @@ For MS Windows users, you need to ensure your WSL2 Linux has `xvfb` installed. T
 
 ```bash
 # from doughnut source root dir
-dum i && dum frontend:sut
-dum sut
-dum start:mb
-dum cy:open
+pnpm i --frozen-lockfile && pnpm frontend:sut
+pnpm sut
+pnpm start:mb
+pnpm cy:open
 ```
 
 Run headless E2E (doughnut full stack started on port 9081)
 
 ```bash
 # from doughnut source root dir
-dum i && dum frontend:build
-dum t
+pnpm i --frozen-lockfile && pnpm frontend:build
+pnpm t
 ```

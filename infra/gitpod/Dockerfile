@@ -55,7 +55,6 @@ RUN apt-get -y update \
 
 # use bash over dash for /bin/sh
 RUN DEBIAN_FRONTEND=noninteractive dpkg-reconfigure -p critical dash
-# RUN cargo install dum
 
 RUN mkdir -m 0755 /nix && chown gitpod /nix \
     && mkdir -p /etc/nix && echo 'sandbox = false' > /etc/nix/nix.conf

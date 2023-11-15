@@ -63,7 +63,7 @@ nix develop
 Install packages, build the frontend and start the backend
 
 ```bash
-dum i && dum frontend:build && dum sut
+pnpm i --frozen-lockfile && pnpm frontend:build && pnpm sut
 ```
 
 - Rerun it each time you reset the database.
@@ -73,7 +73,7 @@ dum i && dum frontend:build && dum sut
 - From doughnut source root directory:
 
 ```bash
-dum backend:test
+pnpm backend:test
 ```
 
 ### 3. [IntelliJ IDEA settings](./docs/idea.md)
@@ -92,7 +92,7 @@ The Cypress+Cucumber tests are in JavaScript/TypeScript.
 - [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor)
 
 - We use [mountebank](http://www.mbtest.org/) to mock external backend services.
-  - To run mountebank in debug mode, run `dum mb --loglevel debug`.
+  - To run mountebank in debug mode, run `pnpm mb --loglevel debug`.
  
 #### Commands
 
@@ -105,13 +105,13 @@ For MS Windows WSL2 users:
 
 | Purpose                               | Command (run from `doughnut` source root directory)                                                                                            |
 | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Install needed e2e tooling            | `dum i`                                                                                                                                        |
-| Start SUT (backend system under test) | `dum sut` (starts backend SUT ONLY)                                                                                                            |
-| Start Mock for external backend       | `dum start:mb` (starts mocked external backend ONLY)                                                                                           |
-| Start only the Cypress IDE            | `dum cy:open` (starts Cypress IDE ONLY)                                                                                                        |
-| Run all e2e test                      | `dum t` (compile frontend assets, start backend SUT, mountebank virtual service provider & cypress headless e2e testing)                       |
-| Run cypress IDE                       | `dum test:open` (starts frontend SUT in HMR mode, backend SUT, mountebank virtual service provider & cypress IDE)                              |
-| Generate TypeScript Interfaces        | `dum generateTypeScript` (Generate TypeScript Interfaces from backend JSON classes. Should run manually every time backend JSON class changes) |
+| Install needed e2e tooling            | `pnpm i --frozen-lockfile`                                                                                                                                        |
+| Start SUT (backend system under test) | `pnpm sut` (starts backend SUT ONLY)                                                                                                            |
+| Start Mock for external backend       | `pnpm start:mb` (starts mocked external backend ONLY)                                                                                           |
+| Start only the Cypress IDE            | `pnpm cy:open` (starts Cypress IDE ONLY)                                                                                                        |
+| Run all e2e test                      | `pnpm t` (compile frontend assets, start backend SUT, mountebank virtual service provider & cypress headless e2e testing)                       |
+| Run cypress IDE                       | `pnpm test:open` (starts frontend SUT in HMR mode, backend SUT, mountebank virtual service provider & cypress IDE)                              |
+| Generate TypeScript Interfaces        | `pnpm generateTypeScript` (Generate TypeScript Interfaces from backend JSON classes. Should run manually every time backend JSON class changes) |
 
 #### Structure
 
@@ -129,7 +129,7 @@ For MS Windows WSL2 users:
 
 You can find the database migrations in `backend/src/main/resources/db.migration/`.
 The migrations are run automatically when the backend app starts up.
-It will also run the migrations for test when you run `dum backend:test`.
+It will also run the migrations for test when you run `pnpm backend:test`.
 To trigger the test DB migration manually, run `backend/gradlew testDBMigrate`.
 
 ### 6. Vue3 web-app frontend
@@ -143,20 +143,20 @@ We chose Vue3 + Vite to build our frontend.
 From `doughnut` source root directory
 
 ```bash
-dum frontend:test
+pnpm frontend:test
 ```
 
 ##### Run frontend web-app (app will launch on port 5173)
 
 ```bash
-dum frontend:sut
+pnpm frontend:sut
 ```
 
 ##### Build & Bundle Vue3 frontend web-app assets and startup backend app (backend webapp will launch on port 9081).
 
 ```bash
-dum frontend:build
-dum sut
+pnpm frontend:build
+pnpm sut
 ```
 
 Expect to find minified and uglified web bundle assets in `backend/src/main/resources/static`
