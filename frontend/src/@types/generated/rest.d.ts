@@ -82,12 +82,6 @@ declare namespace Generated {
         reverse: Link[];
     }
 
-    interface ModelVersionOption {
-        key: string;
-        value: string;
-        label: string;
-    }
-
     interface NoteCreation {
         linkTypeToParent: LinkType;
         textContent: TextContent;

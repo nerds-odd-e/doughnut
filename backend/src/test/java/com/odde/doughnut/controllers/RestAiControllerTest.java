@@ -10,7 +10,6 @@ import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.controllers.json.AiCompletion;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
-import com.odde.doughnut.controllers.json.ModelVersionOption;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
@@ -176,13 +175,8 @@ class RestAiControllerTest {
       OpenAiResponse<Model> fakeResponse = new OpenAiResponse<>();
       fakeResponse.setData(fakeModels);
 
-      List<ModelVersionOption> expected = new ArrayList<>();
-      ModelVersionOption modelVersionOption = new ModelVersionOption("gpt-4", "gpt-4", "gpt-4");
-      expected.add(modelVersionOption);
-
       when(openAiApi.listModels()).thenReturn(Single.just(fakeResponse));
-      List<ModelVersionOption> actual = controller.getModelVersions();
-      assertEquals(expected, actual);
+      assertThat(controller.getModelVersions()).contains("gpt-4");
     }
   }
 
