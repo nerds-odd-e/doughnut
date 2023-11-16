@@ -21,6 +21,7 @@ import com.theokanning.openai.fine_tuning.Hyperparameters;
 import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.model.Model;
+import io.reactivex.Single;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.time.Duration;
@@ -58,13 +59,15 @@ public class OpenAiApiHandler {
   }
 
   public String getOpenAiImage(String prompt) {
-    return withExceptionHandler(
-        () -> {
-          CreateImageRequest completionRequest =
-              CreateImageRequest.builder().prompt(prompt).responseFormat("b64_json").build();
-          ImageResult choices = openAiApi.createImage(completionRequest).blockingGet();
-          return choices.getData().get(0).getB64Json();
-        });
+    ImageResult choices =
+        withExceptionHandler(
+            () -> {
+              CreateImageRequest completionRequest =
+                  CreateImageRequest.builder().prompt(prompt).responseFormat("b64_json").build();
+              return openAiApi.createImage(completionRequest);
+            });
+
+    return choices.getData().get(0).getB64Json();
   }
 
   public Optional<JsonNode> getFunctionCallArguments(ChatCompletionRequest chatRequest) {
@@ -85,15 +88,13 @@ public class OpenAiApiHandler {
   }
 
   public Optional<ChatCompletionChoice> chatCompletion(ChatCompletionRequest request) {
-    return withExceptionHandler(
-        () ->
-            openAiApi.createChatCompletion(request).blockingGet().getChoices().stream()
-                .findFirst());
+    return withExceptionHandler(() -> openAiApi.createChatCompletion(request)).getChoices().stream()
+        .findFirst();
   }
 
-  private <T> T withExceptionHandler(Supplier<T> callable) {
+  private <T> T withExceptionHandler(Supplier<Single<T>> callable) {
     try {
-      return callable.get();
+      return execute(callable.get());
     } catch (HttpException e) {
       if (HttpStatus.UNAUTHORIZED.value() == e.code()) {
         throw new OpenAiUnauthorizedException(e.getMessage());
@@ -130,8 +131,7 @@ public class OpenAiApiHandler {
         (file) -> {
           RequestBody purpose = RequestBody.create("fine-tune", MediaType.parse("text/plain"));
           try {
-            return withExceptionHandler(
-                () -> openAiApi.uploadFile(purpose, file).blockingGet().getId());
+            return withExceptionHandler(() -> openAiApi.uploadFile(purpose, file)).getId();
           } catch (Exception e) {
             throw new OpenAIServiceErrorException(
                 "Upload failed.", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -146,15 +146,12 @@ public class OpenAiApiHandler {
     fineTuningJobRequest.setHyperparameters(
         new Hyperparameters(3)); // not sure what should be the nEpochs value
 
-    return withExceptionHandler(
-        () -> {
-          FineTuningJob fineTuningJob =
-              openAiApi.createFineTuningJob(fineTuningJobRequest).blockingGet();
-          if (List.of("failed", "cancelled").contains(fineTuningJob.getStatus())) {
-            throw new OpenAIServiceErrorException(
-                "Trigger Fine-Tuning Failed: " + fineTuningJob, HttpStatus.BAD_REQUEST);
-          }
-          return fineTuningJob;
-        });
+    FineTuningJob fineTuningJob =
+        withExceptionHandler(() -> openAiApi.createFineTuningJob(fineTuningJobRequest));
+    if (List.of("failed", "cancelled").contains(fineTuningJob.getStatus())) {
+      throw new OpenAIServiceErrorException(
+          "Trigger Fine-Tuning Failed: " + fineTuningJob, HttpStatus.BAD_REQUEST);
+    }
+    return fineTuningJob;
   }
 }
