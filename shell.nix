@@ -96,7 +96,6 @@ in mkShell {
     export MYSQLX_TCP_PORT=33090
     export PATH=$JAVA_HOME/bin:$KOTLIN_HOME/bin:$DUM_PATH/bin:$PNPM_HOME/bin:$NODE_PATH/bin:$MYSQL_BASEDIR/bin:$FLUTTER_PATH/bin:$DART_PATH/bin:$PATH
     export LANG="en_US.UTF-8"
-    #export LC_ALL="en_US.UTF-8"
 
     if [[ "$USER" = @(codespace|gitpod) ]]; then
       [[ -d $HOME/.cache/Cypress ]] || npx --yes cypress install --force
@@ -145,6 +144,12 @@ in mkShell {
       export MYSQLD_PID=$!
 
       sleep 6 && mysql -u root -S $MYSQL_UNIX_SOCKET < $MYSQL_HOME/init_doughnut_db.sql
+    fi
+
+    if [[ -d "$PWD/node_modules" && ! -d "$PWD/node_modules/@vue" ]]; then
+      rm -rf "$PWD/node_modules"
+      rm -rf "$PWD/frontend/node_modules"
+      pnpm --frozen-lockfile recursive install
     fi
 
     export NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
