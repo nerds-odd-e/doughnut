@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -8,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.json.AiCompletion;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.controllers.json.ApiError;
@@ -17,6 +19,8 @@ import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
+import com.theokanning.openai.OpenAiError;
+import com.theokanning.openai.OpenAiHttpException;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.image.Image;
 import com.theokanning.openai.image.ImageResult;
@@ -73,11 +77,12 @@ class AiAdvisorServiceTest {
     }
 
     @Test
-    void getAiSuggestion_givenAString_whenHttpError_returnsEmptySuggestion() {
-      HttpException httpException = buildHttpException(400);
+    void getAiSuggestion_givenAString_whenHttpError_returnsEmptySuggestion()
+        throws JsonProcessingException {
+      HttpException httpException = BuildOpenAiException(400);
       Mockito.when(openAiApi.createChatCompletion(ArgumentMatchers.any()))
           .thenReturn(Single.error(httpException));
-      assertThrows(HttpException.class, () -> getAiCompletionFromAdvisor(""));
+      assertThrows(OpenAiHttpException.class, () -> getAiCompletionFromAdvisor(""));
     }
 
     @Test
@@ -91,8 +96,8 @@ class AiAdvisorServiceTest {
     }
 
     @Test
-    void getAiSuggestion_when_got_502() {
-      RuntimeException exception = buildHttpException(502);
+    void getAiSuggestion_when_got_502() throws JsonProcessingException {
+      RuntimeException exception = BuildOpenAiException(502);
       Mockito.when(openAiApi.createChatCompletion(ArgumentMatchers.any()))
           .thenReturn(Single.error(exception));
       OpenAIServiceErrorException result =
@@ -103,8 +108,8 @@ class AiAdvisorServiceTest {
     }
 
     @Test
-    void getAiSuggestion_given_invalidToken_return_401() {
-      HttpException httpException = buildHttpException(401);
+    void getAiSuggestion_given_invalidToken_return_401() throws JsonProcessingException {
+      HttpException httpException = BuildOpenAiException(401);
       Mockito.when(openAiApi.createChatCompletion(ArgumentMatchers.any()))
           .thenReturn(Single.error(httpException));
       OpenAiUnauthorizedException exception =
@@ -132,9 +137,14 @@ class AiAdvisorServiceTest {
     }
   }
 
-  private static HttpException buildHttpException(int statusCode) {
+  private static HttpException BuildOpenAiException(int statusCode) throws JsonProcessingException {
+    OpenAiError error = new OpenAiError(new OpenAiError.OpenAiErrorDetails());
+    error.error.setMessage("%d".formatted(statusCode));
     return new HttpException(
         Response.error(
-            statusCode, ResponseBody.create("{error:{}}", MediaType.parse("application/json"))));
+            statusCode,
+            ResponseBody.create(
+                defaultObjectMapper().writeValueAsString(error),
+                MediaType.parse("application/json"))));
   }
 }

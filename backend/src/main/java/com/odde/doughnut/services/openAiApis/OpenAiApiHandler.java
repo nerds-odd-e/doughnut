@@ -1,9 +1,6 @@
 package com.odde.doughnut.services.openAiApis;
 
-import static com.theokanning.openai.service.OpenAiService.*;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.json.AiCompletion;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
@@ -20,36 +17,17 @@ import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.model.Model;
 import java.io.IOException;
-import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import org.springframework.http.HttpStatus;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.jackson.JacksonConverterFactory;
 
 public class OpenAiApiHandler {
   private final ApiExecutor apiExecutor;
 
   public OpenAiApiHandler(OpenAiApi openAiApi) {
     this.apiExecutor = new ApiExecutor(openAiApi);
-  }
-
-  public static OpenAiApi getOpenAiApi(String openAiToken, String baseUrl) {
-    ObjectMapper mapper = defaultObjectMapper();
-    OkHttpClient client = defaultClient(openAiToken, Duration.ofSeconds(60));
-    Retrofit retrofit =
-        new Retrofit.Builder()
-            .baseUrl(baseUrl)
-            .client(client)
-            .addConverterFactory(JacksonConverterFactory.create(mapper))
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .build();
-
-    return retrofit.create(OpenAiApi.class);
   }
 
   public String getOpenAiImage(String prompt) {
