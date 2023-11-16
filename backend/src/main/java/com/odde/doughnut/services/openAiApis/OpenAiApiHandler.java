@@ -2,7 +2,6 @@ package com.odde.doughnut.services.openAiApis;
 
 import static com.theokanning.openai.service.OpenAiService.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.json.AiCompletion;
@@ -117,6 +116,13 @@ public class OpenAiApiHandler {
     return openAiApi.listModels().blockingGet().data;
   }
 
+  public String uploadAndTriggerFineTuning(
+      List<OpenAIChatGPTFineTuningExample> questionGenerationTrainingExamples, String Question)
+      throws IOException {
+    String fileId = uploadFineTuningExamples(questionGenerationTrainingExamples, Question);
+    return triggerFineTuning(fileId).getFineTunedModel();
+  }
+
   private String uploadFineTuningExamples(
       List<OpenAIChatGPTFineTuningExample> examples, String subFileName) throws IOException {
     FineTuningFileWrapper uploader = new FineTuningFileWrapper(examples, subFileName);
@@ -132,36 +138,22 @@ public class OpenAiApiHandler {
         });
   }
 
-  public void uploadAndTriggerFineTuning(
-      List<OpenAIChatGPTFineTuningExample> questionGenerationTrainingExamples, String Question)
-      throws IOException {
-    String fileId = uploadFineTuningExamples(questionGenerationTrainingExamples, Question);
-    try {
-      FineTuningJobRequest fineTuningJobRequest = new FineTuningJobRequest();
-      fineTuningJobRequest.setTrainingFile(fileId);
-      fineTuningJobRequest.setModel("gpt-3.5-turbo-1106");
-      fineTuningJobRequest.setHyperparameters(
-          new Hyperparameters(3)); // not sure what should be the nEpochs value
+  private FineTuningJob triggerFineTuning(String fileId) {
+    FineTuningJobRequest fineTuningJobRequest = new FineTuningJobRequest();
+    fineTuningJobRequest.setTrainingFile(fileId);
+    fineTuningJobRequest.setModel("gpt-3.5-turbo-1106");
+    fineTuningJobRequest.setHyperparameters(
+        new Hyperparameters(3)); // not sure what should be the nEpochs value
 
-      withExceptionHandler(
-          () -> {
-            FineTuningJob fineTuningJob =
-                openAiApi.createFineTuningJob(fineTuningJobRequest).blockingGet();
-            List<String> failed = List.of("failed", "cancelled");
-            if (failed.contains(fineTuningJob.getStatus())) {
-              String s = null;
-              try {
-                s = defaultObjectMapper().writeValueAsString(fineTuningJob);
-              } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-              }
-              throw new OpenAIServiceErrorException(
-                  "Trigger Failed: " + s, HttpStatus.valueOf(500));
-            }
-            return fineTuningJob;
-          });
-    } catch (Exception e) {
-      throw new OpenAIServiceErrorException("Training failed.", HttpStatus.BAD_REQUEST);
-    }
+    return withExceptionHandler(
+        () -> {
+          FineTuningJob fineTuningJob =
+              openAiApi.createFineTuningJob(fineTuningJobRequest).blockingGet();
+          if (List.of("failed", "cancelled").contains(fineTuningJob.getStatus())) {
+            throw new OpenAIServiceErrorException(
+                "Trigger Fine-Tuning Failed: " + fineTuningJob, HttpStatus.BAD_REQUEST);
+          }
+          return fineTuningJob;
+        });
   }
 }
