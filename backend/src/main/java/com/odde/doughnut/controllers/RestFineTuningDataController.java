@@ -62,7 +62,7 @@ class RestFineTuningDataController {
   }
 
   @PostMapping("/upload-and-trigger-fine-tuning")
-  public void uploadAndTriggerFineTuning() throws IOException, UnexpectedNoAccessRightException {
+  public void uploadAndTriggerFineTuning() throws UnexpectedNoAccessRightException, IOException {
     currentUser.assertAdminAuthorization();
     fineTuningService.uploadDataAndGTriggerFineTuning();
   }
