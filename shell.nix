@@ -99,10 +99,6 @@ in mkShell {
     export PATH=$JAVA_HOME/bin:$KOTLIN_HOME/bin:$DUM_PATH/bin:$NODE_PATH/bin:$MYSQL_BASEDIR/bin:$FLUTTER_PATH/bin:$DART_PATH/bin:$PATH
     export LANG="en_US.UTF-8"
 
-    if [[ "$USER" = @(codespace|gitpod) ]]; then
-      [[ -d $HOME/.cache/Cypress ]] || npx --yes cypress install --force
-    fi
-
     echo "###################################################################################################################"
     echo "                                                                                "
     echo "##   !! DOUGHNUT NIX DEVELOPMENT ENVIRONMENT ;) !!    "
@@ -120,6 +116,7 @@ in mkShell {
     echo "##   FLUTTER VERSION: `flutter --version | head -n 1` "
     echo "                                                                                "
     echo "###################################################################################################################"
+
     mkdir -p $MYSQL_HOME
     mkdir -p $MYSQL_DATADIR
 
@@ -138,6 +135,11 @@ in mkShell {
     FLUSH PRIVILEGES;
     EOF
 
+    export NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+      export NIX_SSL_CERT_FILE=/etc/ssl/cert.pem
+    fi
+
     export MYSQLD_PID=$(ps -ax | grep -v " grep " | grep mysqld | awk '{ print $1 }')
     if [[ -z "$MYSQLD_PID" ]]; then
       [ ! "$(ls -A mysql/data)" ] && mysqld --initialize-insecure --port=$MYSQL_TCP_PORT --user=`whoami` --datadir=$MYSQL_DATADIR --tls-version=TLSv1.2 --basedir=$MYSQL_BASEDIR --explicit_defaults_for_timestamp
@@ -147,16 +149,16 @@ in mkShell {
       sleep 6 && mysql -u root -S $MYSQL_UNIX_SOCKET < $MYSQL_HOME/init_doughnut_db.sql
     fi
 
+    if [[ "$USER" = @(codespace|gitpod) ]]; then
+      [[ -d $HOME/.cache/Cypress ]] || pnpx --yes cypress install --force
+    fi
+
     if [[ -d "$PWD/node_modules" && ! -d "$PWD/node_modules/@vue" ]]; then
       rm -rf "$PWD/node_modules"
       rm -rf "$PWD/frontend/node_modules"
-      pnpm --frozen-lockfile recursive install
     fi
 
-    export NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-      export NIX_SSL_CERT_FILE=/etc/ssl/cert.pem
-    fi
+    pnpm --frozen-lockfile recursive install
 
     cleanup()
     {
