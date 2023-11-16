@@ -13,7 +13,6 @@ import com.theokanning.openai.fine_tuning.Hyperparameters;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,17 +58,19 @@ public class FineTuningService {
           "Positive feedback cannot be less than 10.", HttpStatus.BAD_REQUEST);
     }
     String jsonString = getJsonString(feedbacks);
-    var fileName = String.format("%s-%s.jsonl", subFileName, System.currentTimeMillis());
-    Path file = Path.of(fileName);
-    Files.createFile(file);
-    Files.write(file, jsonString.getBytes(), StandardOpenOption.WRITE);
+
+    File tempFile = File.createTempFile(subFileName, ".jsonl");
     try {
-      var uploadResult = openAiApiHandler.Upload(new File(fileName));
+      // Write to the temporary file
+      Files.write(tempFile.toPath(), jsonString.getBytes(), StandardOpenOption.WRITE);
+
+      // Upload the file
+      var uploadResult = openAiApiHandler.Upload(tempFile);
       return uploadResult.getId();
     } catch (Exception e) {
       throw new OpenAIServiceErrorException("Upload failed.", HttpStatus.INTERNAL_SERVER_ERROR);
     } finally {
-      Files.delete(file);
+      tempFile.delete();
     }
   }
 
