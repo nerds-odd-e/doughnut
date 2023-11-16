@@ -16,23 +16,19 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import org.springframework.http.HttpStatus;
 
-record FineTuningFileHandler(List<?> examples, String subFileName) {
+record FineTuningFileWrapper(List<?> examples, String subFileName) {
   public <T> T withFileToBeUploaded(Function<MultipartBody.Part, T> consumer) throws IOException {
     String jsonString = toJsonL();
 
     File tempFile = File.createTempFile(subFileName, ".jsonl");
     try {
-      // Write to the temporary file
       Files.write(tempFile.toPath(), jsonString.getBytes(), StandardOpenOption.WRITE);
 
-      // Upload the file
       RequestBody fileRequestBody =
           RequestBody.create(tempFile, MediaType.parse("application/octet-stream"));
       MultipartBody.Part filePart =
           MultipartBody.Part.createFormData("file", tempFile.getName(), fileRequestBody);
       return consumer.apply(filePart);
-    } catch (Exception e) {
-      throw new OpenAIServiceErrorException("Upload failed.", HttpStatus.INTERNAL_SERVER_ERROR);
     } finally {
       tempFile.delete();
     }
