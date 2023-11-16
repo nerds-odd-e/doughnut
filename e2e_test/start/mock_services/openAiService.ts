@@ -162,7 +162,7 @@ const openAiService = () => {
       await serviceMocker.stubPosterUnauthorized(`/*`, {
         status: "BAD_REQUEST",
         message: "nah nah nah, you need a valid token",
-        errors: {
+        error: {
           "OpenAi Error": "BAD_REQUEST",
         },
       })
