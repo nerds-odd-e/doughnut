@@ -94,7 +94,7 @@ public class FineTuningService {
 
   public void uploadDataAndGTriggerFineTuning() throws IOException {
     var questionFeedbacks = getQuestionGenerationTrainingExamples();
-    var evaluationFeedbacks = getQuestionGenerationTrainingExamples();
+    var evaluationFeedbacks = getQuestionEvaluationTrainingExamples();
     String question = uploadFineTuningExamples(questionFeedbacks, "Question");
     String evaluation = uploadFineTuningExamples(evaluationFeedbacks, "Evaluation");
 
