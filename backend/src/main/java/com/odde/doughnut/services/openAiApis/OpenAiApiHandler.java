@@ -57,14 +57,7 @@ public class OpenAiApiHandler {
     return blockGet(openAiApi.listModels()).data;
   }
 
-  public String uploadAndTriggerFineTuning(
-      List<OpenAIChatGPTFineTuningExample> questionGenerationTrainingExamples, String Question)
-      throws IOException {
-    String fileId = uploadFineTuningExamples(questionGenerationTrainingExamples, Question);
-    return triggerFineTuning(fileId).getFineTunedModel();
-  }
-
-  private String uploadFineTuningExamples(
+  public String uploadFineTuningExamples(
       List<OpenAIChatGPTFineTuningExample> examples, String subFileName) throws IOException {
     FineTuningFileWrapper uploader = new FineTuningFileWrapper(examples, subFileName);
     return uploader.withFileToBeUploaded(
@@ -79,7 +72,7 @@ public class OpenAiApiHandler {
         });
   }
 
-  private FineTuningJob triggerFineTuning(String fileId) {
+  public FineTuningJob triggerFineTuning(String fileId) {
     FineTuningJobRequest fineTuningJobRequest = new FineTuningJobRequest();
     fineTuningJobRequest.setTrainingFile(fileId);
     fineTuningJobRequest.setModel("gpt-3.5-turbo-1106");
