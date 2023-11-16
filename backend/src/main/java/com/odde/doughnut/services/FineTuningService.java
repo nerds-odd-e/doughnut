@@ -5,7 +5,6 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.OpenAiApi;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,12 +38,5 @@ public class FineTuningService {
     return getSuggestedQuestionForFineTunings().stream()
         .map(SuggestedQuestionForFineTuning::toQuestionEvaluationFineTuningData)
         .toList();
-  }
-
-  public void uploadDataAndGTriggerFineTuning() throws IOException {
-    openAiApiHandler.uploadAndTriggerFineTuning(
-        getQuestionGenerationTrainingExamples(), "Question");
-    openAiApiHandler.uploadAndTriggerFineTuning(
-        getQuestionEvaluationTrainingExamples(), "Evaluation");
   }
 }

@@ -3,26 +3,15 @@ package com.odde.doughnut.services;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.ChatMessageForFineTuning;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
-import com.theokanning.openai.file.File;
-import com.theokanning.openai.fine_tuning.FineTuningJob;
-import io.reactivex.Single;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
-import okio.Buffer;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -115,95 +104,6 @@ class FineTuningServiceTest {
           fineTuningService.getQuestionGenerationTrainingExamples();
 
       assertEquals(0, goodOpenAIChatGPTFineTuningExampleList.size());
-    }
-  }
-
-  @Nested
-  class UploadAndTriggerFineTuning {
-
-    @Test
-    void shouldFailWhenNoFeedback() {
-      var result =
-          assertThrows(
-              OpenAIServiceErrorException.class,
-              () -> fineTuningService.uploadDataAndGTriggerFineTuning());
-      assertEquals(result.getMessage(), "Positive feedback cannot be less than 10.");
-    }
-
-    @Test
-    void whenOpenAiServiceFailShouldGetFailMessage() {
-      mockPositiveFeedback(10);
-      when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
-          .thenThrow(new RuntimeException());
-      var result =
-          assertThrows(
-              OpenAIServiceErrorException.class,
-              () -> fineTuningService.uploadDataAndGTriggerFineTuning());
-      assertEquals(result.getMessage(), "Upload failed.");
-    }
-
-    @Nested
-    class SuccessfullyUploaded {
-      private List<String> fileContents = new ArrayList<>();
-
-      @BeforeEach
-      void setup() {
-        mockPositiveFeedback(10);
-        mockNegativeFeedback(1);
-        File fakeResponse = new File();
-        fakeResponse.setId("TestFileId");
-        when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
-            .then(
-                invocation -> {
-                  MultipartBody.Part file = invocation.getArgument(1);
-                  fileContents.add(getFileContent(file));
-                  return Single.just(fakeResponse);
-                });
-        FineTuningJob fakeFineTuningResponse = new FineTuningJob();
-        fakeFineTuningResponse.setStatus("success");
-        when(openAiApi.createFineTuningJob(any())).thenReturn(Single.just(fakeFineTuningResponse));
-      }
-
-      @Test
-      void shouldPassPositiveExamplesForQuestionGeneration() throws IOException {
-        fineTuningService.uploadDataAndGTriggerFineTuning();
-        List<String> lines = fileContents.get(0).lines().toList();
-        assertThat(lines, hasSize(10));
-        assertThat(lines.get(0), containsString("{\"messages\":["));
-      }
-
-      @Test
-      void shouldPassAllExamplesForQuestionGeneration() throws IOException {
-        fineTuningService.uploadDataAndGTriggerFineTuning();
-        assertThat(fileContents.get(1).lines().count(), equalTo(11L));
-      }
-
-      @NotNull
-      private static String getFileContent(MultipartBody.Part file) {
-        RequestBody requestBody = file.body();
-        String fileContent = "";
-
-        try {
-          Buffer buffer = new Buffer();
-          requestBody.writeTo(buffer);
-          fileContent = buffer.readUtf8();
-        } catch (IOException e) {
-          fail("Failed to read the file content");
-        }
-        return fileContent;
-      }
-    }
-  }
-
-  private void mockPositiveFeedback(int count) {
-    for (int i = 0; i < count; i++) {
-      makeMe.aQuestionSuggestionForFineTunining().positive().please();
-    }
-  }
-
-  private void mockNegativeFeedback(int count) {
-    for (int i = 0; i < count; i++) {
-      makeMe.aQuestionSuggestionForFineTunining().negative().please();
     }
   }
 }

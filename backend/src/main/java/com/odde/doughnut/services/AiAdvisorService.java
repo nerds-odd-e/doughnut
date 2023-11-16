@@ -7,10 +7,12 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleEx
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
+import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -88,5 +90,11 @@ public class AiAdvisorService {
         .evaluateQuestion(quizQuestionEntity.getMcqWithAnswer(), modelName)
         .map(e -> e.getQuizQuestionContestResult(quizQuestionEntity.getCorrectAnswerIndex()))
         .orElse(null);
+  }
+
+  public String uploadAndTriggerFineTuning(
+      List<OpenAIChatGPTFineTuningExample> examples, String question) throws IOException {
+    String fileId = openAiApiHandler.uploadFineTuningExamples(examples, question);
+    return openAiApiHandler.triggerFineTuning(fileId).getFineTunedModel();
   }
 }
