@@ -134,11 +134,16 @@ public class OpenAiApiHandler {
 
   public String uploadFineTuningExamples(List<? extends Object> examples, String subFileName)
       throws IOException {
-    FineTuningFileHandler uploader = new FineTuningFileHandler(examples, subFileName);
+    FineTuningFileWrapper uploader = new FineTuningFileWrapper(examples, subFileName);
     return uploader.withFileToBeUploaded(
         (file) -> {
           RequestBody purpose = RequestBody.create("fine-tune", MediaType.parse("text/plain"));
-          return execute(openAiApi.uploadFile(purpose, file)).getId();
+          try {
+            return execute(openAiApi.uploadFile(purpose, file)).getId();
+          } catch (Exception e) {
+            throw new OpenAIServiceErrorException(
+                "Upload failed.", HttpStatus.INTERNAL_SERVER_ERROR);
+          }
         });
   }
 }
