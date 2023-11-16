@@ -20,7 +20,7 @@ Feature: Refine OpenAI's AI Model using user feedback
     Examples:
       | upload_result | training_result | message             |
       | failed        | success         | Upload failed.      |
-      | success       | failed          | Training failed.    |
+      | success       | failed          | Trigger Fine-Tuning Failed:    |
       | success       | success         | Training initiated. |
 
   Scenario Outline: There should be at least 10 positive feedback to trigger fine-tuning
