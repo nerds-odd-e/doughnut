@@ -2,6 +2,7 @@ package com.odde.doughnut.services.openAiApis;
 
 import static com.theokanning.openai.service.OpenAiService.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.json.AiCompletion;
@@ -26,7 +27,7 @@ import java.net.SocketTimeoutException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
@@ -91,9 +92,9 @@ public class OpenAiApiHandler {
                 .findFirst());
   }
 
-  private <T> T withExceptionHandler(Callable<T> callable) {
+  private <T> T withExceptionHandler(Supplier<T> callable) {
     try {
-      return callable.call();
+      return callable.get();
     } catch (HttpException e) {
       if (HttpStatus.UNAUTHORIZED.value() == e.code()) {
         throw new OpenAiUnauthorizedException(e.getMessage());
@@ -109,9 +110,6 @@ public class OpenAiApiHandler {
         throw new OpenAITimeoutException(cause.getMessage());
       }
       throw e;
-    } catch (Exception e) {
-      System.out.println(e.getMessage());
-      throw new RuntimeException(e);
     }
   }
 
@@ -151,9 +149,14 @@ public class OpenAiApiHandler {
                 openAiApi.createFineTuningJob(fineTuningJobRequest).blockingGet();
             List<String> failed = List.of("failed", "cancelled");
             if (failed.contains(fineTuningJob.getStatus())) {
+              String s = null;
+              try {
+                s = defaultObjectMapper().writeValueAsString(fineTuningJob);
+              } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+              }
               throw new OpenAIServiceErrorException(
-                  "Trigger Failed: " + defaultObjectMapper().writeValueAsString(fineTuningJob),
-                  HttpStatus.valueOf(500));
+                  "Trigger Failed: " + s, HttpStatus.valueOf(500));
             }
             return fineTuningJob;
           });
