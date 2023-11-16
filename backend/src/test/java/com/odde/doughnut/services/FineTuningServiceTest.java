@@ -14,6 +14,7 @@ import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.file.File;
+import com.theokanning.openai.fine_tuning.FineTuningJob;
 import io.reactivex.Single;
 import java.util.List;
 import okhttp3.MultipartBody;
@@ -114,7 +115,7 @@ class FineTuningServiceTest {
   }
 
   @Nested
-  class UploadFineTuningExamples {
+  class UploadAndTriggerFineTuning {
 
     @Test
     void shouldSuccessWhen10FeedbackAndUploadFile() {
@@ -123,7 +124,10 @@ class FineTuningServiceTest {
       fakeResponse.setId("TestFileId");
       when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
           .thenReturn(Single.just(fakeResponse));
-      assertDoesNotThrow(() -> fineTuningService.uploadFineTuningExamples());
+      FineTuningJob fakeFineTuningResponse = new FineTuningJob();
+      fakeFineTuningResponse.setStatus("success");
+      when(openAiApi.createFineTuningJob(any())).thenReturn(Single.just(fakeFineTuningResponse));
+      assertDoesNotThrow(() -> fineTuningService.uploadDataAndGTriggerFineTuning());
     }
 
     @Test
@@ -131,7 +135,7 @@ class FineTuningServiceTest {
       var result =
           assertThrows(
               OpenAIServiceErrorException.class,
-              () -> fineTuningService.uploadFineTuningExamples());
+              () -> fineTuningService.uploadDataAndGTriggerFineTuning());
       assertEquals(result.getMessage(), "Positive feedback cannot be less than 10.");
     }
 
@@ -143,7 +147,7 @@ class FineTuningServiceTest {
       var result =
           assertThrows(
               OpenAIServiceErrorException.class,
-              () -> fineTuningService.uploadFineTuningExamples());
+              () -> fineTuningService.uploadDataAndGTriggerFineTuning());
       assertEquals(result.getMessage(), "Upload failed.");
     }
   }

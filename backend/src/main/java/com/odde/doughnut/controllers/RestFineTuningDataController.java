@@ -2,7 +2,6 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.json.QuestionSuggestionParams;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
-import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -11,7 +10,6 @@ import com.odde.doughnut.services.FineTuningService;
 import com.theokanning.openai.OpenAiApi;
 import java.io.IOException;
 import java.util.List;
-import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
@@ -66,13 +64,7 @@ class RestFineTuningDataController {
   @PostMapping("/upload-and-trigger-fine-tuning")
   public void uploadAndTriggerFineTuning() throws IOException, UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
-    var uploadResult = fineTuningService.uploadFineTuningExamples();
-    try {
-      aiAdvisorService.triggerFineTune(uploadResult.get("Question"));
-      aiAdvisorService.triggerFineTune(uploadResult.get("Evaluation"));
-    } catch (Exception e) {
-      throw new OpenAIServiceErrorException("Training failed.", HttpStatus.BAD_REQUEST);
-    }
+    fineTuningService.uploadDataAndGTriggerFineTuning();
   }
 
   @GetMapping("/all-suggested-questions-for-fine-tuning")
