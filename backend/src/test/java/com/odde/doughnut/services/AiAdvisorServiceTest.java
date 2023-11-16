@@ -134,6 +134,7 @@ class AiAdvisorServiceTest {
 
   private static HttpException buildHttpException(int statusCode) {
     return new HttpException(
-        Response.error(statusCode, ResponseBody.create("{}", MediaType.parse("application/json"))));
+        Response.error(
+            statusCode, ResponseBody.create("{error:{}}", MediaType.parse("application/json"))));
   }
 }
