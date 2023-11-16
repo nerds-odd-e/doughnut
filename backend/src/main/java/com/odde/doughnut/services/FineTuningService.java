@@ -17,7 +17,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 
@@ -92,19 +91,15 @@ public class FineTuningService {
     this.openAiApiHandler.triggerFineTune(fineTuningJobRequest);
   }
 
-  private Map<String, String> uploadAllFineTuningExamples() throws IOException {
-    var QuestionFeedbacks = getQuestionGenerationTrainingExamples();
-    var EvaluationFeedbacks = getQuestionGenerationTrainingExamples();
-    return Map.of(
-        "Question", uploadFineTuningExamples(QuestionFeedbacks, "Question"),
-        "Evaluation", uploadFineTuningExamples(EvaluationFeedbacks, "Evaluation"));
-  }
-
   public void uploadDataAndGTriggerFineTuning() throws IOException {
-    var uploadResult = uploadAllFineTuningExamples();
+    var questionFeedbacks = getQuestionGenerationTrainingExamples();
+    var evaluationFeedbacks = getQuestionGenerationTrainingExamples();
+    String question = uploadFineTuningExamples(questionFeedbacks, "Question");
+    String evaluation = uploadFineTuningExamples(evaluationFeedbacks, "Evaluation");
+
     try {
-      triggerFineTune(uploadResult.get("Question"));
-      triggerFineTune(uploadResult.get("Evaluation"));
+      triggerFineTune(question);
+      triggerFineTune(evaluation);
     } catch (Exception e) {
       throw new OpenAIServiceErrorException("Training failed.", HttpStatus.BAD_REQUEST);
     }
