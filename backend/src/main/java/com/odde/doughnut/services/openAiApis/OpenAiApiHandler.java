@@ -130,7 +130,8 @@ public class OpenAiApiHandler {
         (file) -> {
           RequestBody purpose = RequestBody.create("fine-tune", MediaType.parse("text/plain"));
           try {
-            return execute(openAiApi.uploadFile(purpose, file)).getId();
+            return withExceptionHandler(
+                () -> openAiApi.uploadFile(purpose, file).blockingGet().getId());
           } catch (Exception e) {
             throw new OpenAIServiceErrorException(
                 "Upload failed.", HttpStatus.INTERNAL_SERVER_ERROR);
