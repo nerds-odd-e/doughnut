@@ -11,8 +11,6 @@ import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
-import com.theokanning.openai.fine_tuning.FineTuningJobRequest;
-import com.theokanning.openai.fine_tuning.Hyperparameters;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -67,16 +65,6 @@ public class AiAdvisorService {
 
   private AiQuestionGenerator getAiQuestionGenerator(Note note) {
     return new AiQuestionGenerator(note, openAiApiHandler);
-  }
-
-  public void triggerFineTune(String fileId) {
-    FineTuningJobRequest fineTuningJobRequest = new FineTuningJobRequest();
-    fineTuningJobRequest.setTrainingFile(fileId);
-    fineTuningJobRequest.setModel("gpt-3.5-turbo-1106");
-    fineTuningJobRequest.setHyperparameters(
-        new Hyperparameters(3)); // not sure what should be the nEpochs value
-
-    openAiApiHandler.triggerFineTune(fineTuningJobRequest);
   }
 
   public List<String> getAvailableGptModels() {

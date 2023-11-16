@@ -8,6 +8,8 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.OpenAiApi;
+import com.theokanning.openai.fine_tuning.FineTuningJobRequest;
+import com.theokanning.openai.fine_tuning.Hyperparameters;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -51,14 +53,6 @@ public class FineTuningService {
         .toList();
   }
 
-  public Map<String, String> uploadFineTuningExamples() throws IOException {
-    var QuestionFeedbacks = getQuestionGenerationTrainingExamples();
-    var EvaluationFeedbacks = getQuestionGenerationTrainingExamples();
-    return Map.of(
-        "Question", uploadFineTuningExamples(QuestionFeedbacks, "Question"),
-        "Evaluation", uploadFineTuningExamples(EvaluationFeedbacks, "Evaluation"));
-  }
-
   private String uploadFineTuningExamples(
       List<OpenAIChatGPTFineTuningExample> feedbacks, String subFileName) throws IOException {
     if (feedbacks.size() < 10) {
@@ -86,5 +80,33 @@ public class FineTuningService {
     return feedbacks.stream()
         .map(x -> x.toJsonString(objectMapper))
         .collect(Collectors.joining("\n"));
+  }
+
+  public void triggerFineTune(String fileId) {
+    FineTuningJobRequest fineTuningJobRequest = new FineTuningJobRequest();
+    fineTuningJobRequest.setTrainingFile(fileId);
+    fineTuningJobRequest.setModel("gpt-3.5-turbo-1106");
+    fineTuningJobRequest.setHyperparameters(
+        new Hyperparameters(3)); // not sure what should be the nEpochs value
+
+    this.openAiApiHandler.triggerFineTune(fineTuningJobRequest);
+  }
+
+  private Map<String, String> uploadAllFineTuningExamples() throws IOException {
+    var QuestionFeedbacks = getQuestionGenerationTrainingExamples();
+    var EvaluationFeedbacks = getQuestionGenerationTrainingExamples();
+    return Map.of(
+        "Question", uploadFineTuningExamples(QuestionFeedbacks, "Question"),
+        "Evaluation", uploadFineTuningExamples(EvaluationFeedbacks, "Evaluation"));
+  }
+
+  public void uploadDataAndGTriggerFineTuning() throws IOException {
+    var uploadResult = uploadAllFineTuningExamples();
+    try {
+      triggerFineTune(uploadResult.get("Question"));
+      triggerFineTune(uploadResult.get("Evaluation"));
+    } catch (Exception e) {
+      throw new OpenAIServiceErrorException("Training failed.", HttpStatus.BAD_REQUEST);
+    }
   }
 }
