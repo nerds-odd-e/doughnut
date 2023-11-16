@@ -1,9 +1,7 @@
 package com.odde.doughnut.services.openAiApis;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
+import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,7 +14,7 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import org.springframework.http.HttpStatus;
 
-record FineTuningFileWrapper(List<?> examples, String subFileName) {
+record FineTuningFileWrapper(List<OpenAIChatGPTFineTuningExample> examples, String subFileName) {
   public <T> T withFileToBeUploaded(Function<MultipartBody.Part, T> consumer) throws IOException {
     String jsonString = toJsonL();
 
@@ -39,17 +37,8 @@ record FineTuningFileWrapper(List<?> examples, String subFileName) {
       throw new OpenAIServiceErrorException(
           "Positive feedback cannot be less than 10.", HttpStatus.BAD_REQUEST);
     }
-    ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     return examples.stream()
-        .map(
-            x -> {
-              try {
-                return objectMapper.writeValueAsString(x);
-              } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-              }
-            })
+        .map(OpenAIChatGPTFineTuningExample::toJsonString)
         .collect(Collectors.joining("\n"));
   }
 }
