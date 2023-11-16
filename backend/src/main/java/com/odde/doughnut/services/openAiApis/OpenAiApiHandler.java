@@ -7,8 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.json.AiCompletion;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
-import com.odde.doughnut.exceptions.OpenAITimeoutException;
-import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
@@ -21,27 +19,23 @@ import com.theokanning.openai.fine_tuning.Hyperparameters;
 import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.model.Model;
-import io.reactivex.Single;
 import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import org.springframework.http.HttpStatus;
-import retrofit2.HttpException;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 public class OpenAiApiHandler {
-  private final OpenAiApi openAiApi;
+  private final ApiExecutor apiExecutor;
 
   public OpenAiApiHandler(OpenAiApi openAiApi) {
-    this.openAiApi = openAiApi;
+    this.apiExecutor = new ApiExecutor(openAiApi);
   }
 
   public static OpenAiApi getOpenAiApi(String openAiToken, String baseUrl) {
@@ -59,13 +53,9 @@ public class OpenAiApiHandler {
   }
 
   public String getOpenAiImage(String prompt) {
-    ImageResult choices =
-        withExceptionHandler(
-            () -> {
-              CreateImageRequest completionRequest =
-                  CreateImageRequest.builder().prompt(prompt).responseFormat("b64_json").build();
-              return openAiApi.createImage(completionRequest);
-            });
+    CreateImageRequest completionRequest =
+        CreateImageRequest.builder().prompt(prompt).responseFormat("b64_json").build();
+    ImageResult choices = apiExecutor.exec((api) -> api.createImage(completionRequest));
 
     return choices.getData().get(0).getB64Json();
   }
@@ -88,33 +78,12 @@ public class OpenAiApiHandler {
   }
 
   public Optional<ChatCompletionChoice> chatCompletion(ChatCompletionRequest request) {
-    return withExceptionHandler(() -> openAiApi.createChatCompletion(request)).getChoices().stream()
+    return apiExecutor.exec((api) -> api.createChatCompletion(request)).getChoices().stream()
         .findFirst();
   }
 
-  private <T> T withExceptionHandler(Supplier<Single<T>> callable) {
-    try {
-      return execute(callable.get());
-    } catch (HttpException e) {
-      if (HttpStatus.UNAUTHORIZED.value() == e.code()) {
-        throw new OpenAiUnauthorizedException(e.getMessage());
-      }
-      if (e.code() / 100 == 5) {
-        throw new OpenAIServiceErrorException(e.getMessage(), HttpStatus.valueOf(e.code()));
-      }
-      System.out.println(e.message());
-      throw e;
-    } catch (RuntimeException e) {
-      Throwable cause = e.getCause();
-      if (cause instanceof SocketTimeoutException) {
-        throw new OpenAITimeoutException(cause.getMessage());
-      }
-      throw e;
-    }
-  }
-
   public List<Model> getModels() {
-    return openAiApi.listModels().blockingGet().data;
+    return apiExecutor.exec(OpenAiApi::listModels).data;
   }
 
   public String uploadAndTriggerFineTuning(
@@ -131,7 +100,7 @@ public class OpenAiApiHandler {
         (file) -> {
           RequestBody purpose = RequestBody.create("fine-tune", MediaType.parse("text/plain"));
           try {
-            return withExceptionHandler(() -> openAiApi.uploadFile(purpose, file)).getId();
+            return apiExecutor.exec((api) -> api.uploadFile(purpose, file)).getId();
           } catch (Exception e) {
             throw new OpenAIServiceErrorException(
                 "Upload failed.", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -147,7 +116,7 @@ public class OpenAiApiHandler {
         new Hyperparameters(3)); // not sure what should be the nEpochs value
 
     FineTuningJob fineTuningJob =
-        withExceptionHandler(() -> openAiApi.createFineTuningJob(fineTuningJobRequest));
+        apiExecutor.exec((api) -> api.createFineTuningJob(fineTuningJobRequest));
     if (List.of("failed", "cancelled").contains(fineTuningJob.getStatus())) {
       throw new OpenAIServiceErrorException(
           "Trigger Fine-Tuning Failed: " + fineTuningJob, HttpStatus.BAD_REQUEST);
