@@ -19,14 +19,13 @@ import com.theokanning.openai.fine_tuning.FineTuningJobRequest;
 import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.model.Model;
-import java.io.File;
+import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import okhttp3.MediaType;
-import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import org.springframework.http.HttpStatus;
@@ -133,12 +132,13 @@ public class OpenAiApiHandler {
     return openAiApi.listModels().blockingGet().data;
   }
 
-  public com.theokanning.openai.file.File Upload(File file) {
-    RequestBody purpose = RequestBody.create("fine-tune", MediaType.parse("text/plain"));
-    RequestBody fileRequestBody =
-        RequestBody.create(file, MediaType.parse("application/octet-stream"));
-    MultipartBody.Part filePart =
-        MultipartBody.Part.createFormData("file", file.getName(), fileRequestBody);
-    return execute(openAiApi.uploadFile(purpose, filePart));
+  public String uploadFineTuningExamples(List<? extends Object> examples, String subFileName)
+      throws IOException {
+    FineTuningFileHandler uploader = new FineTuningFileHandler(examples, subFileName);
+    return uploader.withFileToBeUploaded(
+        (file) -> {
+          RequestBody purpose = RequestBody.create("fine-tune", MediaType.parse("text/plain"));
+          return execute(openAiApi.uploadFile(purpose, file)).getId();
+        });
   }
 }
