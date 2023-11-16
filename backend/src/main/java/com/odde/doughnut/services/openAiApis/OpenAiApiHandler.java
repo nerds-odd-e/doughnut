@@ -17,6 +17,7 @@ import com.theokanning.openai.completion.chat.ChatFunctionCall;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.fine_tuning.FineTuningJob;
 import com.theokanning.openai.fine_tuning.FineTuningJobRequest;
+import com.theokanning.openai.fine_tuning.Hyperparameters;
 import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.model.Model;
@@ -36,7 +37,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 public class OpenAiApiHandler {
-  protected final OpenAiApi openAiApi;
+  private final OpenAiApi openAiApi;
 
   public OpenAiApiHandler(OpenAiApi openAiApi) {
     this.openAiApi = openAiApi;
@@ -90,21 +91,6 @@ public class OpenAiApiHandler {
                 .findFirst());
   }
 
-  public FineTuningJob triggerFineTune(FineTuningJobRequest fineTuningJobRequest) {
-    return withExceptionHandler(
-        () -> {
-          FineTuningJob fineTuningJob =
-              openAiApi.createFineTuningJob(fineTuningJobRequest).blockingGet();
-          List<String> failed = List.of("failed", "cancelled");
-          if (failed.contains(fineTuningJob.getStatus())) {
-            throw new OpenAIServiceErrorException(
-                "Trigger Failed: " + defaultObjectMapper().writeValueAsString(fineTuningJob),
-                HttpStatus.valueOf(500));
-          }
-          return fineTuningJob;
-        });
-  }
-
   private <T> T withExceptionHandler(Callable<T> callable) {
     try {
       return callable.call();
@@ -133,7 +119,7 @@ public class OpenAiApiHandler {
     return openAiApi.listModels().blockingGet().data;
   }
 
-  public String uploadFineTuningExamples(
+  private String uploadFineTuningExamples(
       List<OpenAIChatGPTFineTuningExample> examples, String subFileName) throws IOException {
     FineTuningFileWrapper uploader = new FineTuningFileWrapper(examples, subFileName);
     return uploader.withFileToBeUploaded(
@@ -146,5 +132,33 @@ public class OpenAiApiHandler {
                 "Upload failed.", HttpStatus.INTERNAL_SERVER_ERROR);
           }
         });
+  }
+
+  public void uploadAndTriggerFineTuning(
+      List<OpenAIChatGPTFineTuningExample> questionGenerationTrainingExamples, String Question)
+      throws IOException {
+    String fileId = uploadFineTuningExamples(questionGenerationTrainingExamples, Question);
+    try {
+      FineTuningJobRequest fineTuningJobRequest = new FineTuningJobRequest();
+      fineTuningJobRequest.setTrainingFile(fileId);
+      fineTuningJobRequest.setModel("gpt-3.5-turbo-1106");
+      fineTuningJobRequest.setHyperparameters(
+          new Hyperparameters(3)); // not sure what should be the nEpochs value
+
+      withExceptionHandler(
+          () -> {
+            FineTuningJob fineTuningJob =
+                openAiApi.createFineTuningJob(fineTuningJobRequest).blockingGet();
+            List<String> failed = List.of("failed", "cancelled");
+            if (failed.contains(fineTuningJob.getStatus())) {
+              throw new OpenAIServiceErrorException(
+                  "Trigger Failed: " + defaultObjectMapper().writeValueAsString(fineTuningJob),
+                  HttpStatus.valueOf(500));
+            }
+            return fineTuningJob;
+          });
+    } catch (Exception e) {
+      throw new OpenAIServiceErrorException("Training failed.", HttpStatus.BAD_REQUEST);
+    }
   }
 }
