@@ -1,15 +1,14 @@
 package com.odde.doughnut.services.openAiApis;
 
+import static com.odde.doughnut.services.openAiApis.ApiExecutor.blockGet;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.controllers.json.AiCompletion;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.theokanning.openai.OpenAiApi;
-import com.theokanning.openai.completion.chat.ChatCompletionChoice;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
-import com.theokanning.openai.completion.chat.ChatFunctionCall;
-import com.theokanning.openai.completion.chat.ChatMessage;
+import com.theokanning.openai.completion.chat.*;
 import com.theokanning.openai.fine_tuning.FineTuningJob;
 import com.theokanning.openai.fine_tuning.FineTuningJobRequest;
 import com.theokanning.openai.fine_tuning.Hyperparameters;
@@ -24,16 +23,16 @@ import okhttp3.RequestBody;
 import org.springframework.http.HttpStatus;
 
 public class OpenAiApiHandler {
-  private final ApiExecutor apiExecutor;
+  private final OpenAiApi openAiApi;
 
   public OpenAiApiHandler(OpenAiApi openAiApi) {
-    this.apiExecutor = new ApiExecutor(openAiApi);
+    this.openAiApi = openAiApi;
   }
 
   public String getOpenAiImage(String prompt) {
     CreateImageRequest completionRequest =
         CreateImageRequest.builder().prompt(prompt).responseFormat("b64_json").build();
-    ImageResult choices = apiExecutor.exec((api) -> api.createImage(completionRequest));
+    ImageResult choices = blockGet(openAiApi.createImage(completionRequest));
 
     return choices.getData().get(0).getB64Json();
   }
@@ -41,11 +40,6 @@ public class OpenAiApiHandler {
   public Optional<JsonNode> getFunctionCallArguments(ChatCompletionRequest chatRequest) {
     return chatCompletion(chatRequest)
         .map(ChatCompletionChoice::getMessage)
-        .map(
-            (x) -> {
-              System.out.println(x);
-              return x;
-            })
         .map(ChatMessage::getFunctionCall)
         .map(ChatFunctionCall::getArguments);
   }
@@ -56,12 +50,11 @@ public class OpenAiApiHandler {
   }
 
   public Optional<ChatCompletionChoice> chatCompletion(ChatCompletionRequest request) {
-    return apiExecutor.exec((api) -> api.createChatCompletion(request)).getChoices().stream()
-        .findFirst();
+    return blockGet(openAiApi.createChatCompletion(request)).getChoices().stream().findFirst();
   }
 
   public List<Model> getModels() {
-    return apiExecutor.exec(OpenAiApi::listModels).data;
+    return blockGet(openAiApi.listModels()).data;
   }
 
   public String uploadAndTriggerFineTuning(
@@ -78,7 +71,7 @@ public class OpenAiApiHandler {
         (file) -> {
           RequestBody purpose = RequestBody.create("fine-tune", MediaType.parse("text/plain"));
           try {
-            return apiExecutor.exec((api) -> api.uploadFile(purpose, file)).getId();
+            return blockGet(openAiApi.uploadFile(purpose, file)).getId();
           } catch (Exception e) {
             throw new OpenAIServiceErrorException(
                 "Upload failed.", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -93,8 +86,7 @@ public class OpenAiApiHandler {
     fineTuningJobRequest.setHyperparameters(
         new Hyperparameters(3)); // not sure what should be the nEpochs value
 
-    FineTuningJob fineTuningJob =
-        apiExecutor.exec((api) -> api.createFineTuningJob(fineTuningJobRequest));
+    FineTuningJob fineTuningJob = blockGet(openAiApi.createFineTuningJob(fineTuningJobRequest));
     if (List.of("failed", "cancelled").contains(fineTuningJob.getStatus())) {
       throw new OpenAIServiceErrorException(
           "Trigger Fine-Tuning Failed: " + fineTuningJob, HttpStatus.BAD_REQUEST);

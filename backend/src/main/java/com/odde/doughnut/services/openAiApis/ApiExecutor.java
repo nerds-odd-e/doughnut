@@ -11,14 +11,13 @@ import com.theokanning.openai.OpenAiHttpException;
 import io.reactivex.Single;
 import java.net.SocketTimeoutException;
 import java.time.Duration;
-import java.util.function.Function;
 import okhttp3.OkHttpClient;
 import org.springframework.http.HttpStatus;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
-public record ApiExecutor(OpenAiApi openAiApi) {
+public record ApiExecutor() {
   public static OpenAiApi getOpenAiApi(String openAiToken, String baseUrl) {
     ObjectMapper mapper = defaultObjectMapper();
     OkHttpClient client = defaultClient(openAiToken, Duration.ofSeconds(60));
@@ -33,9 +32,9 @@ public record ApiExecutor(OpenAiApi openAiApi) {
     return retrofit.create(OpenAiApi.class);
   }
 
-  public <T> T exec(Function<OpenAiApi, Single<T>> callable) {
+  public static <T> T blockGet(Single<T> apply) {
     try {
-      return execute(callable.apply(openAiApi));
+      return execute(apply);
     } catch (OpenAiHttpException e) {
       if (HttpStatus.UNAUTHORIZED.value() == e.statusCode) {
         throw new OpenAiUnauthorizedException(e.getMessage());
