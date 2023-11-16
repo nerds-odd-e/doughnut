@@ -1,7 +1,6 @@
 package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
@@ -17,6 +16,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 
 public class FineTuningService {
@@ -80,14 +80,11 @@ public class FineTuningService {
     }
   }
 
-  private String getJsonString(List<OpenAIChatGPTFineTuningExample> feedbacks)
-      throws JsonProcessingException {
+  private String getJsonString(List<OpenAIChatGPTFineTuningExample> feedbacks) {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-    String jsonString = "";
-    for (OpenAIChatGPTFineTuningExample feedback : feedbacks) {
-      jsonString += objectMapper.writeValueAsString(feedback) + "\n";
-    }
-    return jsonString;
+    return feedbacks.stream()
+        .map(x -> x.toJsonString(objectMapper))
+        .collect(Collectors.joining("\n"));
   }
 }
