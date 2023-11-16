@@ -9,6 +9,7 @@ import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
+import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
@@ -132,8 +133,8 @@ public class OpenAiApiHandler {
     return openAiApi.listModels().blockingGet().data;
   }
 
-  public String uploadFineTuningExamples(List<? extends Object> examples, String subFileName)
-      throws IOException {
+  public String uploadFineTuningExamples(
+      List<OpenAIChatGPTFineTuningExample> examples, String subFileName) throws IOException {
     FineTuningFileWrapper uploader = new FineTuningFileWrapper(examples, subFileName);
     return uploader.withFileToBeUploaded(
         (file) -> {
