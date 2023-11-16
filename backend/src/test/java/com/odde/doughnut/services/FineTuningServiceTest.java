@@ -167,7 +167,9 @@ class FineTuningServiceTest {
       @Test
       void shouldPassPositiveExamplesForQuestionGeneration() throws IOException {
         fineTuningService.uploadDataAndGTriggerFineTuning();
-        assertThat(fileContents.get(0).lines().count(), equalTo(10L));
+        List<String> lines = fileContents.get(0).lines().toList();
+        assertThat(lines, hasSize(10));
+        assertThat(lines.get(0), containsString("{\"messages\":["));
       }
 
       @Test

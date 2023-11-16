@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
@@ -51,13 +52,25 @@ public class FineTuningService {
         .toList();
   }
 
-  private String uploadFineTuningExamples(
-      List<OpenAIChatGPTFineTuningExample> feedbacks, String subFileName) throws IOException {
-    if (feedbacks.size() < 10) {
+  private String uploadFineTuningExamples(List<? extends Object> examples, String subFileName)
+      throws IOException {
+    if (examples.size() < 10) {
       throw new OpenAIServiceErrorException(
           "Positive feedback cannot be less than 10.", HttpStatus.BAD_REQUEST);
     }
-    String jsonString = getJsonString(feedbacks);
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    String jsonString =
+        examples.stream()
+            .map(
+                x -> {
+                  try {
+                    return objectMapper.writeValueAsString(x);
+                  } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                  }
+                })
+            .collect(Collectors.joining("\n"));
 
     File tempFile = File.createTempFile(subFileName, ".jsonl");
     try {
@@ -72,14 +85,6 @@ public class FineTuningService {
     } finally {
       tempFile.delete();
     }
-  }
-
-  private String getJsonString(List<OpenAIChatGPTFineTuningExample> feedbacks) {
-    ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-    return feedbacks.stream()
-        .map(x -> x.toJsonString(objectMapper))
-        .collect(Collectors.joining("\n"));
   }
 
   public void triggerFineTune(String fileId) {
