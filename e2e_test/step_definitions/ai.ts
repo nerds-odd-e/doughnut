@@ -7,7 +7,7 @@ import "../support/string.extensions"
 import { MessageToMatch } from "start/mock_services/MessageToMatch"
 import start, { mock_services } from "start/index"
 
-Given("open AI service always think the system token is invalid", () => {
+Given("the OpenAI service is unavailable due to invalid system token", () => {
   mock_services.openAi().alwaysResponseAsUnauthorized()
 })
 
@@ -29,7 +29,7 @@ Given("OpenAI has models {string} available", (modelNames: string) => {
 })
 
 Given(
-  "OpenAI completes with {string} for context containing {string}",
+  "OpenAI will complete with {string} for context containing {string}",
   (returnMessage: string, context: string) => {
     mock_services
       .openAi()
@@ -38,7 +38,7 @@ Given(
 )
 
 Given(
-  "OpenAI completes with {string} for messages containing:",
+  "OpenAI assistant will reply {string} for messages containing:",
   (returnMessage: string, data: DataTable) => {
     const messages: MessageToMatch[] = data.hashes().map((row) => {
       return {
@@ -51,8 +51,8 @@ Given(
 )
 
 Given(
-  "OpenAI completes with {string} for incomplete note details {string}",
-  (returnMessage: string, incompleteAssistantMessage: string) => {
+  "OpenAI will complete the phrase {string} with {string}",
+  (incompleteAssistantMessage: string, returnMessage: string) => {
     mock_services
       .openAi()
       .stubChatCompletionWithNoteDetailsCompletion(incompleteAssistantMessage, returnMessage)

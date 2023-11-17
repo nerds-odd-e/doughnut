@@ -13,8 +13,8 @@ Feature: Manage AI models
 
   Scenario: Admin choose a model for content completion
     When I choose model "gpt-future" for "Others"
-    Then I ask to complete the details for note "Taiwan"
-    And I should see the note details on current page becomes "A message from the future."
+    Then I request to complete the details for the note "Taiwan"
+    And the note details on the current page should be "A message from the future."
 
 
 
