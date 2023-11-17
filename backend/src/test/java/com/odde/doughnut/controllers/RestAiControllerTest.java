@@ -85,9 +85,8 @@ class RestAiControllerTest {
       verify(openAiApi).createChatCompletion(captor.capture());
       assertThat(captor.getValue().getMaxTokens()).isLessThan(200);
       assertThat(captor.getValue().getMessages()).hasSize(3);
-      assertEquals(
-          "Please behave like a text completion service and keep the content concise. The content is in markdown format.",
-          captor.getValue().getMessages().get(2).getContent());
+      assertThat(captor.getValue().getMessages().get(2).getContent())
+          .contains(" \"details_to_complete\" : \"\"");
       assertThat(captor.getValue().getMessages().get(1).getContent())
           .contains("Context path: cosmos › solar system");
     }
@@ -108,7 +107,8 @@ class RestAiControllerTest {
       params.detailsToComplete = "What goes up,";
       controller.getCompletion(note, params);
       verify(openAiApi).createChatCompletion(captor.capture());
-      assertThat(captor.getValue().getMessages()).hasSize(4);
+      assertThat(captor.getValue().getMessages().get(2).getContent())
+          .contains(" \"details_to_complete\" : \"What goes up,\"");
     }
 
     @Test

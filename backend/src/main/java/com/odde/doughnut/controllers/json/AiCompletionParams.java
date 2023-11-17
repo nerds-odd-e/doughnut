@@ -9,7 +9,7 @@ import org.apache.logging.log4j.util.Strings;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AiCompletionParams {
-  public String detailsToComplete;
+  public String detailsToComplete = "";
 
   public static String concat(String part1, String part2) {
     if (!Strings.isBlank(part1)) {

@@ -1,5 +1,7 @@
 package com.odde.doughnut.services.ai;
 
+import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,7 +12,6 @@ import com.odde.doughnut.entities.Note;
 import com.theokanning.openai.completion.chat.*;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.logging.log4j.util.Strings;
 
 public class OpenAIChatAboutNoteRequestBuilder {
   String model = null;
@@ -60,13 +61,17 @@ public class OpenAIChatAboutNoteRequestBuilder {
   }
 
   public OpenAIChatAboutNoteRequestBuilder instructionForDetailsCompletion(
-      AiCompletionParams aiCompletionParams) {
+      AiCompletionParams noteDetailsCompletion) {
+    //    functions.add(
+    //      ChatFunction.builder()
+    //        .name("complete_note_details")
+    //        .description("Text completion for the details of the note of focus")
+    //        .executor(NoteDetailsCompletion.class, null)
+    //        .build());
     addMessage(
-        ChatMessageRole.SYSTEM,
-        "Please behave like a text completion service and keep the content concise. The content is in markdown format.");
-    if (!Strings.isEmpty(aiCompletionParams.detailsToComplete)) {
-      addMessage(ChatMessageRole.ASSISTANT, aiCompletionParams.detailsToComplete);
-    }
+        ChatMessageRole.USER,
+        "Please complete the details of the note of focus. The current details in JSON format are: \n%s"
+            .formatted(defaultObjectMapper().valueToTree(noteDetailsCompletion).toPrettyString()));
     return this;
   }
 

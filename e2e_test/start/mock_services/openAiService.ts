@@ -89,7 +89,7 @@ const openAiService = () => {
       reply: string,
       finishReason: "stop" | "length",
     ) {
-      const messages = [{ content: "^" + Cypress._.escapeRegExp(incomplete) + "$" }]
+      const messages = [{ content: '"' + Cypress._.escapeRegExp(incomplete) + '"' }]
       return mockChatCompletionForMessageContaining(
         serviceMocker,
         { messages },
