@@ -7,7 +7,7 @@ Feature: Manage AI models
 
   Background:
     Given I am logged in as an admin
-    And OpenAI returns text completion "A message from the future." for model "gpt-future"
+    And OpenAI returns text completion "A message from the future." for gpt model "gpt-future"
     And OpenAI has models "gpt-future, gpt-3.5" available
     And I have a note with the topic "Taiwan"
 
