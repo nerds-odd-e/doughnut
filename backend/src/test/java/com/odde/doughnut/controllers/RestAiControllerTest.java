@@ -136,7 +136,7 @@ class RestAiControllerTest {
           ResponseStatusException.class,
           () ->
               new RestAiController(openAiApi, makeMe.modelFactoryService, makeMe.aNullUserModel())
-                  .generateImage(params));
+                  .generateImage("create an image"));
     }
 
     @Test
@@ -144,18 +144,18 @@ class RestAiControllerTest {
       when(openAiApi.createImage(
               argThat(
                   request -> {
-                    assertEquals("describe Earth", request.getPrompt());
+                    assertEquals("create an image", request.getPrompt());
                     return true;
                   })))
           .thenReturn(buildImageResult("This is an engaging story."));
-      controller.generateImage(params);
+      controller.generateImage("create an image");
     }
 
     @Test
     void generateImage() {
       when(openAiApi.createImage(Mockito.any()))
           .thenReturn(buildImageResult("this is supposed to be a base64 image"));
-      final String aiImage = controller.generateImage(params).b64encoded();
+      final String aiImage = controller.generateImage("create an image").b64encoded();
       assertEquals("this is supposed to be a base64 image", aiImage);
     }
   }

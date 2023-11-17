@@ -54,9 +54,9 @@ public class RestAiController {
   }
 
   @PostMapping("/generate-image")
-  public AiGeneratedImage generateImage(@RequestBody AiCompletionParams aiCompletionParams) {
+  public AiGeneratedImage generateImage(@RequestBody String prompt) {
     currentUser.assertLoggedIn();
-    return new AiGeneratedImage(aiAdvisorService.getImage(aiCompletionParams.prompt));
+    return new AiGeneratedImage(aiAdvisorService.getImage(prompt));
   }
 
   @GetMapping("/available-gpt-models")

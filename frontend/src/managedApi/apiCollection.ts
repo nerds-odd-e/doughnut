@@ -398,13 +398,9 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
 
     async generateImage(prompt: string) {
-      const request: Generated.AiCompletionParams = {
-        prompt,
-        incompleteContent: "",
-      };
       return (await managedApi.restPost(
         `ai/generate-image`,
-        request,
+        prompt,
       )) as Generated.AiGeneratedImage;
     },
   },
