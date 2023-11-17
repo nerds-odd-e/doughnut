@@ -4,9 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.doReturn;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,11 +20,10 @@ import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
-import com.theokanning.openai.completion.chat.ChatCompletionResult;
-import io.reactivex.Single;
 import java.sql.Timestamp;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,11 +48,13 @@ class RestQuizQuestionControllerTests {
   @Autowired MakeMe makeMe;
   private UserModel currentUser;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
+  OpenAIChatCompletionMock openAIChatCompletionMock;
 
   RestQuizQuestionController controller;
 
   @BeforeEach
   void setup() {
+    openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
     currentUser = makeMe.aUser().toModelPlease();
     controller =
         new RestQuizQuestionController(
@@ -232,20 +231,19 @@ class RestQuizQuestionControllerTests {
 
   @Nested
   class GenerateQuestion {
-    String jsonQuestion;
+    MCQWithAnswer jsonQuestion;
     Note note;
 
     @BeforeEach
     void setUp() {
       note = makeMe.aNote().please();
-      MCQWithAnswer aiGeneratedQuestion =
+      jsonQuestion =
           makeMe
               .aMCQWithAnswer()
               .stem("What is the first color in the rainbow?")
               .choices("red", "black", "green")
               .correctChoiceIndex(0)
               .please();
-      jsonQuestion = aiGeneratedQuestion.toJsonString();
     }
 
     @Test
@@ -264,8 +262,8 @@ class RestQuizQuestionControllerTests {
     }
 
     @Test
-    void createQuizQuestion() throws JsonProcessingException {
-      mockChatCompletionAndReturnFunctionCall(
+    void createQuizQuestion() {
+      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
           "ask_single_answer_multiple_choice_question", jsonQuestion);
       QuizQuestion quizQuestion = controller.generateQuestion(note);
 
@@ -274,15 +272,16 @@ class RestQuizQuestionControllerTests {
 
     @Test
     void createQuizQuestionFailedWithGpt35WillNotTryAgain() throws JsonProcessingException {
-      when(openAiApi.createChatCompletion(any()))
-          .thenReturn(buildCompletionResultForFunctionCall("{\"stem\": \"\"}"));
+      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCallJsonNode(
+          "ask_single_answer_multiple_choice_question",
+          new ObjectMapper().readTree("{\"stem\": \"\"}"));
       assertThrows(ResponseStatusException.class, () -> controller.generateQuestion(note));
       verify(openAiApi, Mockito.times(1)).createChatCompletion(any());
     }
 
     @Test
-    void mustUseTheRightModel() throws JsonProcessingException {
-      mockChatCompletionAndReturnFunctionCall(
+    void mustUseTheRightModel() {
+      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
           "ask_single_answer_multiple_choice_question", jsonQuestion);
       GlobalSettingsService globalSettingsService = new GlobalSettingsService(modelFactoryService);
       globalSettingsService
@@ -324,15 +323,11 @@ class RestQuizQuestionControllerTests {
     }
 
     @Test
-    void createQuizQuestion() throws JsonProcessingException {
-      String jsonQuestion =
-          makeMe
-              .aMCQWithAnswer()
-              .stem("What is the first color in the rainbow?")
-              .please()
-              .toJsonString();
+    void createQuizQuestion() {
+      MCQWithAnswer jsonQuestion =
+          makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
 
-      mockChatCompletionAndReturnFunctionCall(
+      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
           "ask_single_answer_multiple_choice_question", jsonQuestion);
       QuizQuestion quizQuestion = controller.regenerate(quizQuestionEntity);
 
@@ -373,17 +368,17 @@ class RestQuizQuestionControllerTests {
     }
 
     @Test
-    void rejected() throws JsonProcessingException {
-      mockChatCompletionAndReturnFunctionCall(
-          "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
+    void rejected() {
+      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
+          "evaluate_question", questionEvaluation);
       QuizQuestionContestResult contest = controller.contest(quizQuestionEntity);
       assertTrue(contest.rejected);
     }
 
     @Test
-    void useTheRightModel() throws JsonProcessingException {
-      mockChatCompletionAndReturnFunctionCall(
-          "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
+    void useTheRightModel() {
+      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
+          "evaluate_question", questionEvaluation);
       GlobalSettingsService globalSettingsService = new GlobalSettingsService(modelFactoryService);
       globalSettingsService
           .getGlobalSettingEvaluation()
@@ -396,38 +391,12 @@ class RestQuizQuestionControllerTests {
     }
 
     @Test
-    void acceptTheContest() throws JsonProcessingException {
+    void acceptTheContest() {
       questionEvaluation.feasibleQuestion = false;
-      mockChatCompletionAndReturnFunctionCall(
-          "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
+      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
+          "evaluate_question", questionEvaluation);
       QuizQuestionContestResult contest = controller.contest(quizQuestionEntity);
       assertFalse(contest.rejected);
     }
-  }
-
-  private Single<ChatCompletionResult> buildCompletionResultForFunctionCall(String jsonString)
-      throws JsonProcessingException {
-    return Single.just(
-        makeMe
-            .openAiCompletionResult()
-            .functionCall("", new ObjectMapper().readTree(jsonString))
-            .please());
-  }
-
-  private void mockChatCompletionAndReturnFunctionCall(String functionName, String result)
-      throws JsonProcessingException {
-    mockChatCompletionAndMatchFunctionCall(
-        functionName, buildCompletionResultForFunctionCall(result));
-  }
-
-  private void mockChatCompletionAndMatchFunctionCall(
-      String functionName, Single<ChatCompletionResult> toBeReturned) {
-    doReturn(toBeReturned)
-        .when(openAiApi)
-        .createChatCompletion(
-            argThat(
-                request ->
-                    request.getFunctions() != null
-                        && request.getFunctions().get(0).getName().equals(functionName)));
   }
 }
