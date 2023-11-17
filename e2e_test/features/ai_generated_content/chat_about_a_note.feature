@@ -11,7 +11,7 @@ Feature: Chat about a note with AI
 
 
   Scenario: The users can conmunicate with AI
-    Given OpenAI completes with "No. It is not." for messages containing:
+    Given OpenAI assistant will reply "No. It is not." for messages containing:
       | role   | content                           |
       | system | There are 42 prefectures in Japan |
       | user   | Is Naba one of them?              |

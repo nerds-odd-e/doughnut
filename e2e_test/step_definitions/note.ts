@@ -278,7 +278,7 @@ Then("I type {string} in the topic", (content: string) => {
   cy.focused().clear().type(content)
 })
 
-Then("I should see the note details on current page becomes {string}", (detailsText: string) => {
+Then("the note details on the current page should be {string}", (detailsText: string) => {
   cy.findNoteDetailsOnCurrentPage(detailsText)
 })
 
@@ -290,11 +290,11 @@ Then("I should find an art created by the ai", () => {
   cy.get("img.ai-art").should("be.visible")
 })
 
-Given("I ask to complete the details for note {string}", (noteTopic: string) => {
+Given("I request to complete the details for the note {string}", (noteTopic: string) => {
   start.jumpToNotePage(noteTopic).aiSuggestDetailsForNote()
 })
 
-Then("I should see that the open AI service is not available in controller bar", () => {
+Then("I should see a notification of OpenAI service unavailability in the controller bar", () => {
   cy.get(".last-error-message")
     .should((elem) => {
       expect(elem.text()).to.equal("The OpenAI request was not Authorized.")

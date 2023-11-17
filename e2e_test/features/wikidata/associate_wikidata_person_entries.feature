@@ -20,7 +20,7 @@ Feature: Note creation should have details if wikidata is a person
     When I create a note belonging to "People":
       | Topic         | Wikidata Id  |
       | <person name> | <wikidataId> |
-    Then I should see the note details on current page becomes "<expected details>"
+    Then the note details on the current page should be "<expected details>"
 
     Examples:
       | person name     | wikidataId | expected details           |
