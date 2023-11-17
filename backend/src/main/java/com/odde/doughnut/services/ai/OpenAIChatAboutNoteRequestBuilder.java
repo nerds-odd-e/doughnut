@@ -62,12 +62,12 @@ public class OpenAIChatAboutNoteRequestBuilder {
 
   public OpenAIChatAboutNoteRequestBuilder instructionForDetailsCompletion(
       AiCompletionParams noteDetailsCompletion) {
-    //    functions.add(
-    //      ChatFunction.builder()
-    //        .name("complete_note_details")
-    //        .description("Text completion for the details of the note of focus")
-    //        .executor(NoteDetailsCompletion.class, null)
-    //        .build());
+    functions.add(
+        ChatFunction.builder()
+            .name("complete_note_details")
+            .description("Text completion for the details of the note of focus")
+            .executor(NoteDetailsCompletion.class, null)
+            .build());
     addMessage(
         ChatMessageRole.USER,
         "Please complete the details of the note of focus. The current details in JSON format are: \n%s"

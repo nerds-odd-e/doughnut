@@ -3,7 +3,6 @@ package com.odde.doughnut.controllers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,11 +12,12 @@ import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.ai.NoteDetailsCompletion;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.OpenAiResponse;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
-import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.image.Image;
 import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.model.Model;
@@ -61,10 +61,13 @@ class RestAiControllerTest {
   class AskSuggestion {
     ArgumentCaptor<ChatCompletionRequest> captor =
         ArgumentCaptor.forClass(ChatCompletionRequest.class);
+    OpenAIChatCompletionMock openAIChatCompletionMock;
 
     @BeforeEach
     void setup() {
-      when(openAiApi.createChatCompletion(any())).thenReturn(buildCompletionResult("blue planet"));
+      openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
+      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
+          "complete_note_details", new NoteDetailsCompletion("blue planet"));
     }
 
     @Test
@@ -183,9 +186,5 @@ class RestAiControllerTest {
     image.setB64Json(s);
     result.setData(List.of(image));
     return Single.just(result);
-  }
-
-  private Single<ChatCompletionResult> buildCompletionResult(String text) {
-    return Single.just(makeMe.openAiCompletionResult().choice(text).please());
   }
 }

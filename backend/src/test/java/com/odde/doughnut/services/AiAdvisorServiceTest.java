@@ -6,22 +6,20 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.doughnut.controllers.json.AiCompletion;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.controllers.json.ApiError;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
+import com.odde.doughnut.services.ai.NoteDetailsCompletion;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.OpenAiError;
 import com.theokanning.openai.OpenAiHttpException;
-import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.image.Image;
 import com.theokanning.openai.image.ImageResult;
 import io.reactivex.Single;
@@ -44,36 +42,22 @@ class AiAdvisorServiceTest {
   private AiAdvisorService aiAdvisorService;
   @Mock private OpenAiApi openAiApi;
   MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
+  OpenAIChatCompletionMock openAIChatCompletionMock;
 
   @BeforeEach
   void Setup() {
     MockitoAnnotations.openMocks(this);
+    openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
     aiAdvisorService = new AiAdvisorService(openAiApi);
   }
 
   @Nested
   class GetSuggestion {
-    Single<ChatCompletionResult> completionResultSingle =
-        Single.just(makeMe.openAiCompletionResult().choice("must come down").please());
-
-    Single<ChatCompletionResult> IncompleteCompletionResultSingle =
-        Single.just(
-            makeMe.openAiCompletionResult().choiceReachingLengthLimit("what goes up").please());
-
     @Test
     void getAiSuggestion_givenAString_returnsAiSuggestionObject() {
-      Mockito.when(openAiApi.createChatCompletion(Mockito.any()))
-          .thenReturn(completionResultSingle);
-      assertEquals(
-          "what goes up must come down",
-          getAiCompletionFromAdvisor("what goes up").getMoreCompleteContent());
-    }
-
-    @Test
-    void the_data_returned_is_incomplete() {
-      when(openAiApi.createChatCompletion(any())).thenReturn(IncompleteCompletionResultSingle);
-      AiCompletion suggestion = getAiCompletionFromAdvisor("");
-      assertEquals("length", suggestion.getFinishReason());
+      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
+          "complete_note_details", new NoteDetailsCompletion(" must come down"));
+      assertEquals("what goes up must come down", getAiCompletionFromAdvisor("what goes up"));
     }
 
     @Test
@@ -118,7 +102,7 @@ class AiAdvisorServiceTest {
     }
   }
 
-  private AiCompletion getAiCompletionFromAdvisor(String incompleteContent) {
+  private String getAiCompletionFromAdvisor(String incompleteContent) {
     Note note = makeMe.aNote().inMemoryPlease();
     return aiAdvisorService.getAiCompletion(
         new AiCompletionParams(incompleteContent), note, "gpt-4");

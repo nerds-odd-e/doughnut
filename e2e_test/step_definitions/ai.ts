@@ -4,8 +4,8 @@
 
 import { Given, Then, DataTable } from "@badeball/cypress-cucumber-preprocessor"
 import "../support/string.extensions"
-import start, { mock_services } from "start"
 import { MessageToMatch } from "start/mock_services/MessageToMatch"
+import start, { mock_services } from "start/index"
 
 Given("open AI service always think the system token is invalid", () => {
   mock_services.openAi().alwaysResponseAsUnauthorized()
@@ -15,7 +15,7 @@ Then("I should be prompted with an error message saying {string}", (errorMessage
   cy.expectFieldErrorMessage("Prompt", errorMessage)
 })
 
-Given("OpenAI by default returns text completion {string}", (details: string) => {
+Given("OpenAI by default reply text completion assistant message {string}", (details: string) => {
   cy.then(async () => {
     await mock_services.openAi().restartImposter()
     mock_services.openAi().stubChatCompletion(details, "stop")
@@ -31,7 +31,9 @@ Given("OpenAI has models {string} available", (modelNames: string) => {
 Given(
   "OpenAI completes with {string} for context containing {string}",
   (returnMessage: string, context: string) => {
-    mock_services.openAi().mockChatCompletionWithContext(returnMessage, context)
+    mock_services
+      .openAi()
+      .stubChatCompletionWithNoteDetailsCompletionForRequestInContext(returnMessage, context)
   },
 )
 
@@ -53,11 +55,7 @@ Given(
   (returnMessage: string, incompleteAssistantMessage: string) => {
     mock_services
       .openAi()
-      .mockChatCompletionWithIncompleteAssistantMessage(
-        incompleteAssistantMessage,
-        returnMessage,
-        "stop",
-      )
+      .stubChatCompletionWithNoteDetailsCompletion(incompleteAssistantMessage, returnMessage)
   },
 )
 
@@ -69,15 +67,6 @@ Given(
   "OpenAI returns text completion {string} for model {string}",
   (details: string, modelName: string) => {
     mock_services.openAi().mockChatCompletionWithModelName(modelName, details)
-  },
-)
-
-Given(
-  "OpenAI returns an incomplete text completion {string} for assistant message {string}",
-  (details: string, assistantMessage: string) => {
-    mock_services
-      .openAi()
-      .mockChatCompletionWithIncompleteAssistantMessage(assistantMessage, details, "length")
   },
 )
 
