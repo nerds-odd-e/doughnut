@@ -150,7 +150,7 @@ in mkShell {
     fi
 
     if [[ "$USER" = @(codespace|gitpod) ]]; then
-      [[ -d $HOME/.cache/Cypress ]] || pnpx --yes cypress install --force
+      [[ -d $HOME/.cache/Cypress ]] || pnpx cypress install --force
     fi
 
     if [[ -d "$PWD/node_modules" && ! -d "$PWD/node_modules/@vue" ]]; then
