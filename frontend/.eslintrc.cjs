@@ -35,7 +35,7 @@ module.exports = {
     "plugin:prettier/recommended",
     "prettier",
   ],
-  ignorePatterns: ["vite.config.ts", "tests/setupVitest.js"],
+  ignorePatterns: ["tsconfig.json", "vite.config.ts", "tests/setupVitest.js", ".eslintrc.cjs"],
   settings: {
     "import/extensions": [".ts", ".tsx"],
     "import/resolver": {
