@@ -9,7 +9,6 @@ declare namespace Generated {
     }
 
     interface AiCompletionParams {
-        prompt: string;
         incompleteContent: string;
     }
 

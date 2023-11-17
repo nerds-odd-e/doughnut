@@ -48,12 +48,7 @@ class RestAiControllerTest {
   @Mock OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
 
-  AiCompletionParams params =
-      new AiCompletionParams() {
-        {
-          this.prompt = "describe Earth";
-        }
-      };
+  AiCompletionParams params = new AiCompletionParams();
 
   @BeforeEach
   void Setup() {
@@ -89,8 +84,10 @@ class RestAiControllerTest {
       controller.getCompletion(earth, params);
       verify(openAiApi).createChatCompletion(captor.capture());
       assertThat(captor.getValue().getMaxTokens()).isLessThan(200);
-      assertThat(captor.getValue().getMessages()).hasSize(4);
-      assertEquals("describe Earth", captor.getValue().getMessages().get(3).getContent());
+      assertThat(captor.getValue().getMessages()).hasSize(3);
+      assertEquals(
+          "Please behave like a text completion service and keep the content concise. The content is in markdown format.",
+          captor.getValue().getMessages().get(2).getContent());
       assertThat(captor.getValue().getMessages().get(1).getContent())
           .contains("Context path: cosmos › solar system");
     }
@@ -111,7 +108,7 @@ class RestAiControllerTest {
       params.incompleteContent = "What goes up,";
       controller.getCompletion(note, params);
       verify(openAiApi).createChatCompletion(captor.capture());
-      assertThat(captor.getValue().getMessages()).hasSize(5);
+      assertThat(captor.getValue().getMessages()).hasSize(4);
     }
 
     @Test

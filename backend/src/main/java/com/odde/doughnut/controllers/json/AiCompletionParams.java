@@ -9,7 +9,6 @@ import org.apache.logging.log4j.util.Strings;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AiCompletionParams {
-  public String prompt;
   public String incompleteContent;
 
   public static String concat(String part1, String part2) {

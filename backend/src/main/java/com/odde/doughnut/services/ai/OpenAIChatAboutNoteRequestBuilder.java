@@ -59,12 +59,11 @@ public class OpenAIChatAboutNoteRequestBuilder {
     return addMessage(ChatMessageRole.USER, messageBody);
   }
 
-  public OpenAIChatAboutNoteRequestBuilder instructionForCompletion(
+  public OpenAIChatAboutNoteRequestBuilder instructionForDetailsCompletion(
       AiCompletionParams aiCompletionParams) {
     addMessage(
         ChatMessageRole.SYSTEM,
         "Please behave like a text completion service and keep the content concise. The content is in markdown format.");
-    addMessage(ChatMessageRole.USER, aiCompletionParams.prompt);
     if (!Strings.isEmpty(aiCompletionParams.incompleteContent)) {
       addMessage(ChatMessageRole.ASSISTANT, aiCompletionParams.incompleteContent);
     }
