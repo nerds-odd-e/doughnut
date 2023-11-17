@@ -2,6 +2,7 @@
   "name": "doughnut-frontend",
   "version": "1.0.0",
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "vite --host",

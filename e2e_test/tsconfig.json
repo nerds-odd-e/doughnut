@@ -2,7 +2,7 @@
   "compilerOptions": {
     "sourceMap": true,
     "target": "es2022",
-    "module": "CommonJS",
+    "module": "ESNext",
     "strict": true,
     "allowJs": true,
     "lib": [
@@ -25,6 +25,13 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": "."
   },
+  "exclude": [
+    "cypress.config.ts",
+    "config/ci.ts",
+    "config/common.ts",
+    "cypress",
+    "node_modules"
+  ],
   "include": [
     "**/*.ts",
     "**/*.js"

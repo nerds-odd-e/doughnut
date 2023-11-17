@@ -27,7 +27,12 @@ module.exports = {
     tsconfigRootDir: "./e2e_test",
     project: ["./tsconfig.json"],
   },
-  ignorePatterns: ["tsconfig.json"],
+  ignorePatterns: [
+    "tsconfig.json",
+    ".eslintrc.cjs",
+    "e2e_test/config/ci.ts",
+    "e2e_test/config/common.ts"
+  ],
   rules: {
     "no-unused-expressions": "off",
     "chai-friendly/no-unused-expressions": "error",
