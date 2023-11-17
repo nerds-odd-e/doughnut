@@ -359,10 +359,9 @@ const apiCollection = (managedApi: ManagedApi) => ({
     async getAvailableGptModels() {
       return (await managedApi.restGet(`ai/available-gpt-models`)) as string[];
     },
-    async keepAskingAICompletionUntilStop(
+    async aiNoteDetailsCompletion(
       noteId: Doughnut.ID,
       prev?: string,
-      interimResultShouldContinue?: (moreCompleteContent: string) => boolean,
     ): Promise<string> {
       const res = await this.askAiCompletion(
         {
@@ -370,17 +369,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
         },
         noteId,
       );
-      if (interimResultShouldContinue) {
-        if (!interimResultShouldContinue(res.moreCompleteContent))
-          return res.moreCompleteContent;
-      }
-      if (res.finishReason === "length") {
-        return this.keepAskingAICompletionUntilStop(
-          noteId,
-          res.moreCompleteContent,
-          interimResultShouldContinue,
-        );
-      }
       return res.moreCompleteContent;
     },
 

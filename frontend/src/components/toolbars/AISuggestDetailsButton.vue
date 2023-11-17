@@ -41,22 +41,22 @@ export default defineComponent({
   },
   methods: {
     async suggestDetails(prev?: string) {
-      await this.api.ai.keepAskingAICompletionUntilStop(
+      const details = await this.api.ai.aiNoteDetailsCompletion(
         this.selectedNote.id,
         prev,
-        (moreCompleteContent) => {
-          this.storageAccessor.api(this.$router).updateTextContent(
-            this.selectedNote.id,
-            {
-              topic: this.selectedNote.topic,
-              details: moreCompleteContent,
-            },
-            {
-              topic: this.selectedNote.topic,
-              details: this.selectedNote.details,
-            },
-          );
-          return !this.isUnmounted;
+      );
+
+      if (this.isUnmounted) return;
+
+      this.storageAccessor.api(this.$router).updateTextContent(
+        this.selectedNote.id,
+        {
+          topic: this.selectedNote.topic,
+          details,
+        },
+        {
+          topic: this.selectedNote.topic,
+          details: this.selectedNote.details,
         },
       );
     },

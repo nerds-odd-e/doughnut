@@ -70,7 +70,7 @@ public class OpenAIChatAboutNoteRequestBuilder {
             .build());
     addMessage(
         ChatMessageRole.USER,
-        "Please complete the details of the note of focus. The current details in JSON format are: \n%s"
+        "Please complete the concise details of the note of focus. Keep it short. The current details in JSON format are: \n%s"
             .formatted(defaultObjectMapper().valueToTree(noteDetailsCompletion).toPrettyString()));
     return this;
   }
