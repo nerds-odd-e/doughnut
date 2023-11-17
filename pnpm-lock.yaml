@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  ejs@<3.1.7: '>=3.1.7'
+
 importers:
 
   .:
@@ -3430,12 +3433,6 @@ packages:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
     dev: true
 
-  /ejs@2.7.4:
-    resolution: {integrity: sha512-7vmuyh5+kuUyJKePhQfRQBhXV5Ce+RnaeeQArKu1EAMpL3WbgMt5WG6uQZpEVvYSSsxMXRKOewtDk9RaTKXRlA==}
-    engines: {node: '>=0.10.0'}
-    requiresBuild: true
-    dev: true
-
   /ejs@3.1.9:
     resolution: {integrity: sha512-rC+QVNMJWv+MtPgkt0y+0rVEIdbtxVADApW9JXrUVlzHetgcyczP/E7DJmWJ4fJCZF2cPcBk0laWO9ZHMG3DmQ==}
     engines: {node: '>=0.10.0'}
@@ -6049,7 +6046,7 @@ packages:
     resolution: {integrity: sha512-zNFk187W4crPPyGKWIZwkZItdf5B3+UtdSqkDcRwKg9BZRMNoNIBGg6y29kbWKFKh/neFLx9XcCXx06z7AWalA==}
     engines: {node: '>=10'}
     dependencies:
-      ejs: 2.7.4
+      ejs: 3.1.9
       fs-extra: 9.0.1
     dev: true
 
