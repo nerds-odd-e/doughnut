@@ -20,9 +20,9 @@ Feature: Chat about a note with AI
 
 
   Scenario: The users can continue to conmunication with AI
-    Given OpenAI by default returns text completion "I'm ChatGPT"
+    Given OpenAI by default reply text completion assistant message "I'm ChatGPT"
     When I send the message "What's your name?" to AI
     Then I should receive the response "I'm ChatGPT"
-    Given OpenAI by default returns text completion "365"
+    Given OpenAI by default reply text completion assistant message "365"
     When I send the message "How many days are there in the year 2023?" to AI
     Then I should receive the response "365"

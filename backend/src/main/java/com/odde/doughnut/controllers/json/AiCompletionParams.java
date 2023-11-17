@@ -1,7 +1,11 @@
 package com.odde.doughnut.controllers.json;
 
+import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.algorithms.ClozePatternCreator;
-import com.theokanning.openai.completion.chat.ChatCompletionChoice;
+import com.odde.doughnut.services.ai.NoteDetailsCompletion;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.apache.logging.log4j.util.Strings;
@@ -22,9 +26,13 @@ public class AiCompletionParams {
     return part1 + part2;
   }
 
-  public AiCompletion getAiCompletion(ChatCompletionChoice chatCompletionChoice) {
-    String appendingContent = chatCompletionChoice.getMessage().getContent();
-    return new AiCompletion(
-        concat(detailsToComplete, appendingContent), chatCompletionChoice.getFinishReason());
+  public String complete(JsonNode jsonNode) {
+    try {
+      NoteDetailsCompletion noteDetailsCompletion =
+          defaultObjectMapper().treeToValue(jsonNode, NoteDetailsCompletion.class);
+      return detailsToComplete += noteDetailsCompletion.completion;
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

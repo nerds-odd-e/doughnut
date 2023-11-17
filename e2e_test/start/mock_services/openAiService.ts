@@ -84,27 +84,26 @@ const openAiService = () => {
       )
     },
 
-    mockChatCompletionWithIncompleteAssistantMessage(
-      incomplete: string,
-      reply: string,
-      finishReason: "stop" | "length",
-    ) {
+    stubChatCompletionWithNoteDetailsCompletion(incomplete: string, reply: string) {
       const messages = [{ content: '"' + Cypress._.escapeRegExp(incomplete) + '"' }]
-      return mockChatCompletionForMessageContaining(
-        serviceMocker,
-        { messages },
-        reply,
-        finishReason,
+      return this.stubChatCompletionFunctionCallForMessageContaining(
+        messages,
+        "note_details_completion",
+        JSON.stringify({ completion: reply }),
       )
     },
 
-    mockChatCompletionWithContext(reply: string, context: string) {
+    stubChatCompletionWithNoteDetailsCompletionForRequestInContext(reply: string, context: string) {
       const messageToMatch: MessageToMatch = {
         role: "system",
         content: context,
       }
       const messages = [messageToMatch]
-      return mockChatCompletionForMessageContaining(serviceMocker, { messages }, reply, "stop")
+      return this.stubChatCompletionFunctionCallForMessageContaining(
+        messages,
+        "note_details_completion",
+        JSON.stringify({ completion: reply }),
+      )
     },
 
     mockChatCompletionWithMessages(reply: string, messages: MessageToMatch[]) {

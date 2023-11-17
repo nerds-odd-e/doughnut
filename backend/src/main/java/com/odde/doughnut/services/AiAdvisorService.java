@@ -4,10 +4,7 @@ import com.odde.doughnut.controllers.json.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
-import com.odde.doughnut.services.ai.AiQuestionGenerator;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
-import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
-import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
+import com.odde.doughnut.services.ai.*;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
@@ -34,7 +31,7 @@ public class AiAdvisorService {
     return getAiQuestionGenerator(note).getAiGeneratedQuestion(modelName);
   }
 
-  public AiCompletion getAiCompletion(
+  public String getAiCompletion(
       AiCompletionParams aiCompletionParams, Note note, String modelName) {
     ChatCompletionRequest chatCompletionRequest =
         new OpenAIChatAboutNoteRequestBuilder()
@@ -44,7 +41,10 @@ public class AiAdvisorService {
             .instructionForDetailsCompletion(aiCompletionParams)
             .maxTokens(100)
             .build();
-    return openAiApiHandler.getAiCompletion(aiCompletionParams, chatCompletionRequest).orElse(null);
+    return openAiApiHandler
+        .getFunctionCallArguments(chatCompletionRequest)
+        .map(aiCompletionParams::complete)
+        .orElseThrow();
   }
 
   public String chatWithAi(Note note, String userMessage, String modelName) {

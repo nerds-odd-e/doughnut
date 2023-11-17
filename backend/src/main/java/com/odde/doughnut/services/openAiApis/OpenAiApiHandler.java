@@ -3,8 +3,6 @@ package com.odde.doughnut.services.openAiApis;
 import static com.odde.doughnut.services.openAiApis.ApiExecutor.blockGet;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.odde.doughnut.controllers.json.AiCompletion;
-import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.theokanning.openai.OpenAiApi;
@@ -42,11 +40,6 @@ public class OpenAiApiHandler {
         .map(ChatCompletionChoice::getMessage)
         .map(ChatMessage::getFunctionCall)
         .map(ChatFunctionCall::getArguments);
-  }
-
-  public Optional<AiCompletion> getAiCompletion(
-      AiCompletionParams aiCompletionParams, ChatCompletionRequest chatCompletionRequest) {
-    return chatCompletion(chatCompletionRequest).map(aiCompletionParams::getAiCompletion);
   }
 
   public Optional<ChatCompletionChoice> chatCompletion(ChatCompletionRequest request) {
