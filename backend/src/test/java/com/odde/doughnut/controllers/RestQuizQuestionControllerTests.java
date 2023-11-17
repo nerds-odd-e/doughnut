@@ -414,15 +414,6 @@ class RestQuizQuestionControllerTests {
             .please());
   }
 
-  private void mockChatCompletionForGPT3_5MessageOnly(String result) {
-    Single<ChatCompletionResult> just =
-        Single.just(makeMe.openAiCompletionResult().choice(result).please());
-
-    doReturn(just)
-        .when(openAiApi)
-        .createChatCompletion(argThat(request -> request.getFunctions() == null));
-  }
-
   private void mockChatCompletionAndReturnFunctionCall(String functionName, String result)
       throws JsonProcessingException {
     mockChatCompletionAndMatchFunctionCall(
