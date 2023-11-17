@@ -5,7 +5,7 @@
 
 import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 import TestabilityHelper from "../support/TestabilityHelper"
-import start from "start"
+import start from "../start"
 
 When("Someone triggered an exception", () => {
   start.testability().triggerException()

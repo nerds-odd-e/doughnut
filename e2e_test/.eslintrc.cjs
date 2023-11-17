@@ -11,7 +11,7 @@ module.exports = {
   settings: {
     "import/resolver": {
       node: {
-        extensions: [".js", ".ts"],
+        extensions: [".cjs", ".js", ".ts"],
       },
     },
   },
@@ -24,14 +24,14 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 15, // Allows for the parsing of modern ECMAScript features
     sourceType: "module", // Allows for the use of imports
-    tsconfigRootDir: "./e2e_test",
-    project: ["./tsconfig.json"],
+    project: "tsconfig.cypress.json",
+    tsconfigRootDir: __dirname
   },
   ignorePatterns: [
-    "tsconfig.json",
+    "tsconfig.cypress.json",
     ".eslintrc.cjs",
-    "e2e_test/config/ci.ts",
-    "e2e_test/config/common.ts"
+    "config/ci.ts",
+    "config/common.ts"
   ],
   rules: {
     "no-unused-expressions": "off",

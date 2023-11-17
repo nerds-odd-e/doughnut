@@ -11,7 +11,7 @@ import {
 } from "@badeball/cypress-cucumber-preprocessor"
 import NotePath from "../support/NotePath"
 import "../support/string.extensions"
-import start from "start"
+import start from "../start"
 
 defineParameterType({
   name: "notepath",

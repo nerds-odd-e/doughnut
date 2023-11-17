@@ -4,8 +4,8 @@
 
 import { Given, Then, DataTable } from "@badeball/cypress-cucumber-preprocessor"
 import "../support/string.extensions"
-import { MessageToMatch } from "start/mock_services/MessageToMatch"
-import start, { mock_services } from "start/index"
+import start, { mock_services } from "../start"
+import { MessageToMatch } from "../start/mock_services/MessageToMatch"
 
 Given("the OpenAI service is unavailable due to invalid system token", () => {
   mock_services.openAi().alwaysResponseAsUnauthorized()

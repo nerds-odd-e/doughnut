@@ -1,7 +1,7 @@
 import { FlexiPredicate, HttpMethod, Operator } from "@anev/ts-mountebank"
 import ServiceMocker from "../../support/ServiceMocker"
 import { MessageToMatch } from "./MessageToMatch"
-import testability from "start/testability"
+import testability from "../testability"
 
 type FunctionCall = {
   role: "function"
@@ -129,8 +129,8 @@ const openAiService = () => {
               function_call: {
                 name: functionName,
                 arguments: argumentsString,
+                content: argumentsString,
               },
-              content: argumentsString,
             },
             "function_call",
           )

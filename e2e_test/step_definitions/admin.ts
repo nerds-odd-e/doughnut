@@ -2,7 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 import { DataTable, Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
-import start, { mock_services } from "start"
+import start, { mock_services } from "../start"
 
 Given("my question should not be included in the admin's fine-tuning data", () => {
   start.loginAsAdminAndGoToAdminDashboard().goToFineTuningData().expectFineTuningExamplesCount(0)

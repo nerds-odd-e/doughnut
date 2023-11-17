@@ -1,5 +1,4 @@
 module.exports = {
-  root: true,
   parser: "vue-eslint-parser",
   parserOptions: {
     parser: {
@@ -8,7 +7,8 @@ module.exports = {
     ecmaVersion: 15,
     sourceType: "module",
     createDefaultProgram: true,
-    project: ["./tsconfig.json"],
+    project: "tsconfig.json",
+    tsconfigRootDir: __dirname,
     extraFileExtensions: [".vue"],
     vueFeatures: {
       filter: false,
@@ -35,7 +35,12 @@ module.exports = {
     "plugin:prettier/recommended",
     "prettier",
   ],
-  ignorePatterns: ["tsconfig.json", "vite.config.ts", "tests/setupVitest.js", ".eslintrc.cjs"],
+  ignorePatterns: [
+    "tsconfig.json",
+    ".eslintrc.cjs",
+    "vite.config.ts",
+    "tests/setupVitest.js"
+  ],
   settings: {
     "import/extensions": [".ts", ".tsx"],
     "import/resolver": {
