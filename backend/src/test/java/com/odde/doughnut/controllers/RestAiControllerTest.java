@@ -105,7 +105,7 @@ class RestAiControllerTest {
 
     @Test
     void askSuggestionWithIncompleteAssistantMessage() {
-      params.incompleteContent = "What goes up,";
+      params.detailsToComplete = "What goes up,";
       controller.getCompletion(note, params);
       verify(openAiApi).createChatCompletion(captor.capture());
       assertThat(captor.getValue().getMessages()).hasSize(4);

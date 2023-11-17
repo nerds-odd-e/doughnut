@@ -64,8 +64,8 @@ public class OpenAIChatAboutNoteRequestBuilder {
     addMessage(
         ChatMessageRole.SYSTEM,
         "Please behave like a text completion service and keep the content concise. The content is in markdown format.");
-    if (!Strings.isEmpty(aiCompletionParams.incompleteContent)) {
-      addMessage(ChatMessageRole.ASSISTANT, aiCompletionParams.incompleteContent);
+    if (!Strings.isEmpty(aiCompletionParams.detailsToComplete)) {
+      addMessage(ChatMessageRole.ASSISTANT, aiCompletionParams.detailsToComplete);
     }
     return this;
   }
