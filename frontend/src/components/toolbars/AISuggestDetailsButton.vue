@@ -41,9 +41,7 @@ export default defineComponent({
   },
   methods: {
     async suggestDetails(prev?: string) {
-      const prompt = `Please provide the details for the note titled: ${this.selectedNote.topic}`;
       await this.api.ai.keepAskingAICompletionUntilStop(
-        prompt,
         this.selectedNote.id,
         prev,
         (moreCompleteContent) => {

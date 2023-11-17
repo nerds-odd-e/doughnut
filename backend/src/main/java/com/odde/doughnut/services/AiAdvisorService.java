@@ -41,7 +41,7 @@ public class AiAdvisorService {
             .model(modelName)
             .systemBrief()
             .contentOfNoteOfCurrentFocus(note)
-            .instructionForCompletion(aiCompletionParams)
+            .instructionForDetailsCompletion(aiCompletionParams)
             .maxTokens(100)
             .build();
     return openAiApiHandler.getAiCompletion(aiCompletionParams, chatCompletionRequest).orElse(null);
