@@ -1,4 +1,4 @@
-import ServiceMocker from "support/ServiceMocker"
+import ServiceMocker from "../support/ServiceMocker"
 
 const hourOfDay = (days: number, hours: number) => {
   return new Date(1976, 5, 1 + days, hours)

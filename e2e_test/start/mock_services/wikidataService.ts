@@ -1,4 +1,4 @@
-import testability from "start/testability"
+import testability from "../testability"
 import ServiceMocker from "../../support/ServiceMocker"
 import WikidataEntitiesBuilder, { Claim } from "../../support/json/WikidataEntitiesBuilder"
 

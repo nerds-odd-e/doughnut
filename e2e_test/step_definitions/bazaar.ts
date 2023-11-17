@@ -4,7 +4,7 @@
 // @ts-check
 
 import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
-import start from "start"
+import start from "../start"
 
 Given("I choose to share my notebook {string}", (noteTopic: string) => {
   cy.routerToNotebooks()

@@ -5,7 +5,7 @@
 
 import { Then, When } from "@badeball/cypress-cucumber-preprocessor"
 import "../support/string.extensions"
-import start from "start"
+import start from "../start"
 
 When("I start searching", () => {
   cy.startSearching()

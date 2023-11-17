@@ -2,7 +2,9 @@
   "compilerOptions": {
     "sourceMap": true,
     "target": "es2022",
-    "module": "ESNext",
+    "moduleResolution": "node16",
+    "module": "NodeNext",
+    "esModuleInterop": true,
     "strict": true,
     "allowJs": true,
     "lib": [
@@ -10,15 +12,18 @@
       "dom",
       "dom.iterable"
     ],
-    "esModuleInterop": true,
     "typeRoots": [
       "types",
-      "node_modules/@types"
+      "node_modules",
+      "node_modules/@types",
+      "node_modules/@testing-library",
+      "node_modules/@badeball/cypress-cucumber-preprocessor"
     ],
     "types": [
       "node",
       "cypress",
       "@testing-library/cypress",
+      "@badeball/cypress-cucumber-preprocessor",
       "./support"
     ],
     "skipLibCheck": true,
@@ -34,6 +39,7 @@
   ],
   "include": [
     "**/*.ts",
-    "**/*.js"
+    "**/*.js",
+    "**/*.cjs"
   ]
 }
