@@ -1,8 +1,6 @@
 package com.odde.doughnut.services;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.doReturn;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,8 +11,6 @@ import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.OpenAiApi;
-import com.theokanning.openai.completion.chat.ChatCompletionResult;
-import io.reactivex.Single;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -44,11 +40,13 @@ class AiAdvisorServiceWithDBTest {
 
   @Nested
   class ContestQuestion {
+    private OpenAIChatCompletionMock openAIChatCompletionMock;
     QuizQuestionEntity quizQuestionEntity;
     QuestionEvaluation questionEvaluation = new QuestionEvaluation();
 
     @BeforeEach
     void setUp() {
+      openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
       questionEvaluation.correctChoices = new int[] {0};
       questionEvaluation.feasibleQuestion = true;
       questionEvaluation.comment = "what a horrible question!";
@@ -66,9 +64,9 @@ class AiAdvisorServiceWithDBTest {
     }
 
     @Test
-    void rejected() throws JsonProcessingException {
-      mockChatCompletionAndReturnFunctionCall(
-          "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
+    void rejected() {
+      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
+          "evaluate_question", questionEvaluation);
       QuizQuestionContestResult contest =
           aiAdvisorService.contestQuestion(quizQuestionEntity, "gpt-4");
       assertTrue(contest.rejected);
@@ -77,10 +75,10 @@ class AiAdvisorServiceWithDBTest {
     }
 
     @Test
-    void acceptTheContest() throws JsonProcessingException {
+    void acceptTheContest() {
       questionEvaluation.feasibleQuestion = false;
-      mockChatCompletionAndReturnFunctionCall(
-          "evaluate_question", new ObjectMapper().writeValueAsString(questionEvaluation));
+      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
+          "evaluate_question", questionEvaluation);
       QuizQuestionContestResult contest =
           aiAdvisorService.contestQuestion(quizQuestionEntity, "gpt-4");
       assertFalse(contest.rejected);
@@ -88,42 +86,11 @@ class AiAdvisorServiceWithDBTest {
 
     @Test
     void noFunctionCallInvoked() throws JsonProcessingException {
-      Single<ChatCompletionResult> toBeReturned =
-          Single.just(
-              makeMe
-                  .openAiCompletionResult()
-                  .functionCall("", new ObjectMapper().readTree(""))
-                  .please());
-      mockChatCompletionAndMatchFunctionCall("evaluate_question", toBeReturned);
+      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCallJsonNode(
+          "evaluate_question", new ObjectMapper().readTree(""));
       assertThrows(
           RuntimeException.class,
           () -> aiAdvisorService.contestQuestion(quizQuestionEntity, "gpt-4"));
-    }
-
-    private Single<ChatCompletionResult> buildCompletionResultForFunctionCall(String jsonString)
-        throws JsonProcessingException {
-      return Single.just(
-          makeMe
-              .openAiCompletionResult()
-              .functionCall("", new ObjectMapper().readTree(jsonString))
-              .please());
-    }
-
-    private void mockChatCompletionAndReturnFunctionCall(String functionName, String result)
-        throws JsonProcessingException {
-      mockChatCompletionAndMatchFunctionCall(
-          functionName, buildCompletionResultForFunctionCall(result));
-    }
-
-    private void mockChatCompletionAndMatchFunctionCall(
-        String functionName, Single<ChatCompletionResult> toBeReturned) {
-      doReturn(toBeReturned)
-          .when(openAiApi)
-          .createChatCompletion(
-              argThat(
-                  request ->
-                      request.getFunctions() != null
-                          && request.getFunctions().get(0).getName().equals(functionName)));
     }
   }
 }
