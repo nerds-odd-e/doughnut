@@ -118,24 +118,32 @@ const openAiService = () => {
       )
     },
 
+    chatCompletion(bodyToMatch: BodyToMatch) {
+      return {
+        stubFunctionCall(functionName: string, argumentsString: string) {
+          return mockChatCompletion(
+            serviceMocker,
+            bodyToMatch,
+            {
+              role: "function",
+              function_call: {
+                name: functionName,
+                arguments: argumentsString,
+              },
+              content: argumentsString,
+            },
+            "function_call",
+          )
+        },
+      }
+    },
+
     stubChatCompletionFunctionCallForMessageContaining(
       bodyToMatch: BodyToMatch,
       functionName: string,
       argumentsString: string,
     ) {
-      return mockChatCompletion(
-        serviceMocker,
-        bodyToMatch,
-        {
-          role: "function",
-          function_call: {
-            name: functionName,
-            arguments: argumentsString,
-          },
-          content: argumentsString,
-        },
-        "function_call",
-      )
+      return this.chatCompletion(bodyToMatch).stubFunctionCall(functionName, argumentsString)
     },
 
     stubCreateImage() {
