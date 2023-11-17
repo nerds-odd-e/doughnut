@@ -49,15 +49,8 @@ describe("AISuggestDetailsButton", () => {
     });
   });
 
-  it('ask api be called many times until res.finishReason equal "stop" when clicking the suggest button', async () => {
+  it("get more completed content and update", async () => {
     const note = makeMe.aNote.please();
-
-    helper.apiMock
-      .expectingPost(`/api/ai/${note.id}/completion`)
-      .andReturnOnce({
-        moreCompleteContent: "suggestion",
-        finishReason: "length",
-      });
 
     helper.apiMock
       .expectingPost(`/api/ai/${note.id}/completion`)
@@ -66,27 +59,24 @@ describe("AISuggestDetailsButton", () => {
         finishReason: "stop",
       });
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
-    helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
 
     await triggerSuggestion(note);
   });
 
-  it("stop calling if the component is unmounted", async () => {
+  it("stop updating if the component is unmounted", async () => {
     const note = makeMe.aNote.please();
 
     helper.apiMock
       .expectingPost(`/api/ai/${note.id}/completion`)
       .andReturnOnce({
         moreCompleteContent: "suggestion",
-        finishReason: "length",
+        finishReason: "stop",
       });
-
-    helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
 
     const wrapper = await triggerSuggestionwithoutFlushPromises(note);
     wrapper.unmount();
     await flushPromises();
-    // AI completion API should be called only once, although the finishReaon is "length."
+    // no future api call expected.
     // Because the component is unmounted.
   });
 });

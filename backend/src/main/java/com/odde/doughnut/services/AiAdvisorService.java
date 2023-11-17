@@ -39,7 +39,7 @@ public class AiAdvisorService {
             .systemBrief()
             .contentOfNoteOfCurrentFocus(note)
             .instructionForDetailsCompletion(aiCompletionParams)
-            .maxTokens(100)
+            .maxTokens(150)
             .build();
     return openAiApiHandler
         .getFunctionCallArguments(chatCompletionRequest)
