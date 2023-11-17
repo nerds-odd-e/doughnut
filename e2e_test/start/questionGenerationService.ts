@@ -17,7 +17,7 @@ export const questionGenerationService = () => ({
       await mock_services
         .openAi()
         .stubChatCompletionFunctionCallForMessageContaining(
-          messages,
+          { messages },
           "ask_single_answer_multiple_choice_question",
           reply,
         )
@@ -29,7 +29,7 @@ export const questionGenerationService = () => ({
       await mock_services
         .openAi()
         .stubChatCompletionFunctionCallForMessageContaining(
-          messages,
+          { messages },
           "evaluate_question",
           JSON.stringify(record),
         )

@@ -51,7 +51,7 @@ Given(
 )
 
 Given(
-  "OpenAI completes with {string} for assistant message {string}",
+  "OpenAI completes with {string} for incomplete note details {string}",
   (returnMessage: string, incompleteAssistantMessage: string) => {
     mock_services
       .openAi()
@@ -64,9 +64,11 @@ Given("OpenAI always return image of a moon", () => {
 })
 
 Given(
-  "OpenAI returns text completion {string} for model {string}",
+  "OpenAI returns text completion {string} for gpt model {string}",
   (details: string, modelName: string) => {
-    mock_services.openAi().mockChatCompletionWithModelName(modelName, details)
+    mock_services
+      .openAi()
+      .stubChatCompletionWithNoteDetailsCompletionForGPTModel(modelName, details)
   },
 )
 
