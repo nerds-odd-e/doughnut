@@ -33,7 +33,7 @@ describe("AISuggestDetailsButton", () => {
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
     await triggerSuggestion(note);
     expect(expectation.actualRequestJsonBody()).toMatchObject({
-      prompt: "Please provide the details for the note titled: Note1.1.1",
+      detailsToComplete: "",
     });
   });
 
@@ -45,7 +45,7 @@ describe("AISuggestDetailsButton", () => {
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
     await triggerSuggestion(note);
     expect(expectation.actualRequestJsonBody()).toMatchObject({
-      prompt: expect.stringContaining("Please"),
+      detailsToComplete: "<p>Desc</p>",
     });
   });
 

@@ -9,7 +9,7 @@ import org.apache.logging.log4j.util.Strings;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AiCompletionParams {
-  public String incompleteContent;
+  public String detailsToComplete;
 
   public static String concat(String part1, String part2) {
     if (!Strings.isBlank(part1)) {
@@ -25,6 +25,6 @@ public class AiCompletionParams {
   public AiCompletion getAiCompletion(ChatCompletionChoice chatCompletionChoice) {
     String appendingContent = chatCompletionChoice.getMessage().getContent();
     return new AiCompletion(
-        concat(incompleteContent, appendingContent), chatCompletionChoice.getFinishReason());
+        concat(detailsToComplete, appendingContent), chatCompletionChoice.getFinishReason());
   }
 }

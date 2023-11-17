@@ -366,7 +366,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     ): Promise<string> {
       const res = await this.askAiCompletion(
         {
-          incompleteContent: prev ?? "",
+          detailsToComplete: prev ?? "",
         },
         noteId,
       );

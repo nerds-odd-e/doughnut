@@ -9,7 +9,7 @@ declare namespace Generated {
     }
 
     interface AiCompletionParams {
-        incompleteContent: string;
+        detailsToComplete: string;
     }
 
     interface AiGeneratedImage {
