@@ -18,7 +18,11 @@ Then("I should be prompted with an error message saying {string}", (errorMessage
 Given("OpenAI by default reply text completion assistant message {string}", (details: string) => {
   cy.then(async () => {
     await mock_services.openAi().restartImposter()
-    mock_services.openAi().stubChatCompletion(details, "stop")
+    mock_services
+      .openAi()
+      .chatCompletion()
+      .requestMessagesMatch([])
+      .stubNonfunctionCallResponse(details, "stop")
   })
 })
 

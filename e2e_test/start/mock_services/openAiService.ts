@@ -46,20 +46,6 @@ function mockChatCompletion(
   })
 }
 
-function mockChatCompletionForMessageContaining(
-  serviceMocker: ServiceMocker,
-  bodyToMatch: BodyToMatch,
-  reply: string,
-  finishReason: "length" | "stop",
-) {
-  return mockChatCompletion(
-    serviceMocker,
-    bodyToMatch,
-    { role: "assistant", content: reply },
-    finishReason,
-  )
-}
-
 const openAiService = () => {
   const serviceMocker = new ServiceMocker("openAi", 5001)
   return {
@@ -72,15 +58,6 @@ const openAiService = () => {
 
     restartImposter() {
       return serviceMocker.install()
-    },
-
-    stubChatCompletion(reply: string, finishReason: "length" | "stop") {
-      return mockChatCompletionForMessageContaining(
-        serviceMocker,
-        { messages: [] },
-        reply,
-        finishReason,
-      )
     },
 
     chatCompletion() {
@@ -108,12 +85,12 @@ const openAiService = () => {
           }
 
           return {
-            stubNonfunctionCallResponse(reply: string) {
-              return mockChatCompletionForMessageContaining(
+            stubNonfunctionCallResponse(reply: string, finishReason: "length" | "stop" = "stop") {
+              return mockChatCompletion(
                 serviceMocker,
                 bodyToMatch,
-                reply,
-                "stop",
+                { role: "assistant", content: reply },
+                finishReason,
               )
             },
             stubNoteDetailsCompletion(reply: string) {
