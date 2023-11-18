@@ -107,7 +107,11 @@ const openAiService = () => {
       )
     },
 
-    chatCompletion(bodyToMatch: BodyToMatch) {
+    chatCompletionRequestWithMessages(messages: MessageToMatch[]) {
+      return this.chatCompletionRequest({ messages })
+    },
+
+    chatCompletionRequest(bodyToMatch: BodyToMatch) {
       return {
         stubFunctionCall(functionName: string, argumentsString: string) {
           return mockChatCompletion(
