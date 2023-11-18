@@ -78,7 +78,7 @@ in mkShell {
     #!/usr/bin/env bash
 
     # Deactivate nvm if exists
-    command -v nvm >/dev/null 2>&1 && { nvm deactivate }
+    command -v nvm >/dev/null 2>&1 && { nvm deactivate; }
 
     export NIXPKGS_ALLOW_UNFREE=1
     export PS1="(nix)$PS1"
