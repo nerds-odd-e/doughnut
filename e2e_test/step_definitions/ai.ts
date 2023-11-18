@@ -51,7 +51,11 @@ Given(
         content: row["content"],
       } as MessageToMatch
     })
-    mock_services.openAi().mockChatCompletionWithMessages(returnMessage, messages)
+    mock_services
+      .openAi()
+      .chatCompletion()
+      .requestMessagesMatch(messages)
+      .stubNonfunctionCallResponse(returnMessage)
   },
 )
 
