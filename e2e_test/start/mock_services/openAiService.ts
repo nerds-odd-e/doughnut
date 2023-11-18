@@ -1,50 +1,7 @@
 import { FlexiPredicate, HttpMethod, Operator } from "@anev/ts-mountebank"
 import ServiceMocker from "../../support/ServiceMocker"
-import { MessageToMatch } from "./MessageToMatch"
 import testability from "../testability"
-
-type FunctionCall = {
-  role: "function"
-  function_call: {
-    name: string
-    arguments: string
-  }
-}
-
-type TextBasedMessage = {
-  role: "user" | "assistant" | "system"
-  content: string
-}
-
-type BodyToMatch = {
-  messages?: MessageToMatch[]
-  model?: string
-}
-
-type ChatMessageInResponse = TextBasedMessage | FunctionCall
-
-function mockChatCompletion(
-  serviceMocker: ServiceMocker,
-  bodyToMatch: BodyToMatch,
-  message: ChatMessageInResponse,
-  finishReason: "length" | "stop" | "function_call",
-): Promise<void> {
-  const predicate = new FlexiPredicate()
-    .withOperator(Operator.matches)
-    .withPath(`/v1/chat/completions`)
-    .withMethod(HttpMethod.POST)
-    .withBody(bodyToMatch)
-  return serviceMocker.mockWithPredicate(predicate, {
-    object: "chat.completion",
-    choices: [
-      {
-        message,
-        index: 0,
-        finish_reason: finishReason,
-      },
-    ],
-  })
-}
+import createOpenAiChatCompletionMock from "./createOpenAiChatCompletionMock"
 
 const openAiService = () => {
   const serviceMocker = new ServiceMocker("openAi", 5001)
@@ -61,50 +18,7 @@ const openAiService = () => {
     },
 
     chatCompletion() {
-      return {
-        requestMessageMatches(message: MessageToMatch) {
-          return this.requestMessagesMatch([message])
-        },
-        requestMessagesMatch(messages: MessageToMatch[]) {
-          return this.requestMatches({ messages })
-        },
-        requestMatches(bodyToMatch: BodyToMatch) {
-          const stubFunctionCall = (functionName: string, argumentsString: string) => {
-            return mockChatCompletion(
-              serviceMocker,
-              bodyToMatch,
-              {
-                role: "function",
-                function_call: {
-                  name: functionName,
-                  arguments: argumentsString,
-                },
-              },
-              "function_call",
-            )
-          }
-
-          return {
-            stubNonfunctionCallResponse(reply: string, finishReason: "length" | "stop" = "stop") {
-              return mockChatCompletion(
-                serviceMocker,
-                bodyToMatch,
-                { role: "assistant", content: reply },
-                finishReason,
-              )
-            },
-            stubNoteDetailsCompletion(reply: string) {
-              return stubFunctionCall("note_details_completion", reply)
-            },
-            stubQuestionGeneration(reply: string) {
-              return stubFunctionCall("ask_single_answer_multiple_choice_question", reply)
-            },
-            stubQuestionEvaluation(reply: string) {
-              return stubFunctionCall("evaluate_question", reply)
-            },
-          }
-        },
-      }
+      return createOpenAiChatCompletionMock(serviceMocker)
     },
 
     stubCreateImage() {

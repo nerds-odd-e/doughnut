@@ -20,7 +20,7 @@ export const questionGenerationService = () => ({
         .stubQuestionGeneration(reply)
     })
   },
-  stubEvaluationQuestion: (record: Record<string, boolean | string>) => {
+  stubEvaluationQuestion: (record: Record<string, boolean | string | number[]>) => {
     cy.then(async () => {
       await mock_services
         .openAi()
