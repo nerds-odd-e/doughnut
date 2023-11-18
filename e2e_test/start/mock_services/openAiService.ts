@@ -94,24 +94,30 @@ const openAiService = () => {
         },
 
         requestMatches(bodyToMatch: BodyToMatch) {
+          const stubFunctionCall = (functionName: string, argumentsString: string) => {
+            return mockChatCompletion(
+              serviceMocker,
+              bodyToMatch,
+              {
+                role: "function",
+                function_call: {
+                  name: functionName,
+                  arguments: argumentsString,
+                },
+              },
+              "function_call",
+            )
+          }
+
           return {
             stubNoteDetailsCompletion(reply: string) {
-              return this.stubFunctionCall("note_details_completion", reply)
+              return stubFunctionCall("note_details_completion", reply)
             },
-
-            stubFunctionCall(functionName: string, argumentsString: string) {
-              return mockChatCompletion(
-                serviceMocker,
-                bodyToMatch,
-                {
-                  role: "function",
-                  function_call: {
-                    name: functionName,
-                    arguments: argumentsString,
-                  },
-                },
-                "function_call",
-              )
+            stubQuestionGeneration(reply: string) {
+              return stubFunctionCall("ask_single_answer_multiple_choice_question", reply)
+            },
+            stubQuestionEvaluation(reply: string) {
+              return stubFunctionCall("evaluate_question", reply)
             },
           }
         },

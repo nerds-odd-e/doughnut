@@ -17,7 +17,7 @@ export const questionGenerationService = () => ({
         .openAi()
         .chatCompletion()
         .requestMessageMatches({ role: "user", content: "Memory Assistant" })
-        .stubFunctionCall("ask_single_answer_multiple_choice_question", reply)
+        .stubQuestionGeneration(reply)
     })
   },
   stubEvaluationQuestion: (record: Record<string, boolean | string>) => {
@@ -26,7 +26,7 @@ export const questionGenerationService = () => ({
         .openAi()
         .chatCompletion()
         .requestMessageMatches({ role: "user", content: ".*critically check.*" })
-        .stubFunctionCall("evaluate_question", JSON.stringify(record))
+        .stubQuestionEvaluation(JSON.stringify(record))
     })
   },
 })
