@@ -16,11 +16,8 @@ export const questionGenerationService = () => ({
       await mock_services.openAi().restartImposter()
       await mock_services
         .openAi()
-        .stubChatCompletionFunctionCallForMessageContaining(
-          { messages },
-          "ask_single_answer_multiple_choice_question",
-          reply,
-        )
+        .chatCompletionRequestWithMessages(messages)
+        .stubFunctionCall("ask_single_answer_multiple_choice_question", reply)
     })
   },
   stubEvaluationQuestion: (record: Record<string, boolean | string>) => {
@@ -28,11 +25,8 @@ export const questionGenerationService = () => ({
     cy.then(async () => {
       await mock_services
         .openAi()
-        .stubChatCompletionFunctionCallForMessageContaining(
-          { messages },
-          "evaluate_question",
-          JSON.stringify(record),
-        )
+        .chatCompletionRequestWithMessages(messages)
+        .stubFunctionCall("evaluate_question", JSON.stringify(record))
     })
   },
 })

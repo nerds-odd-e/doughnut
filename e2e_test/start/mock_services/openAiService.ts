@@ -76,20 +76,12 @@ const openAiService = () => {
     },
 
     stubChatCompletionWithNoteDetailsCompletionForGPTModel(modelName: string, reply: string) {
-      return this.stubChatCompletionFunctionCallForMessageContaining(
-        { model: modelName },
-        "note_details_completion",
-        JSON.stringify({ completion: reply }),
-      )
+      return this.chatCompletionRequest({ model: modelName }).stubNoteDetailsCompletion(reply)
     },
 
     stubChatCompletionWithNoteDetailsCompletion(incomplete: string, reply: string) {
       const messages = [{ content: '"' + Cypress._.escapeRegExp(incomplete) + '"' }]
-      return this.stubChatCompletionFunctionCallForMessageContaining(
-        { messages },
-        "note_details_completion",
-        JSON.stringify({ completion: reply }),
-      )
+      return this.chatCompletionRequestWithMessages(messages).stubNoteDetailsCompletion(reply)
     },
 
     stubChatCompletionWithNoteDetailsCompletionForRequestInContext(reply: string, context: string) {
@@ -97,11 +89,8 @@ const openAiService = () => {
         role: "system",
         content: context,
       }
-      const messages = [messageToMatch]
-      return this.stubChatCompletionFunctionCallForMessageContaining(
-        { messages },
-        "note_details_completion",
-        JSON.stringify({ completion: reply }),
+      return this.chatCompletionRequestWithMessages([messageToMatch]).stubNoteDetailsCompletion(
+        reply,
       )
     },
 
@@ -129,21 +118,13 @@ const openAiService = () => {
               function_call: {
                 name: functionName,
                 arguments: argumentsString,
-                content: argumentsString,
               },
+              content: argumentsString,
             },
             "function_call",
           )
         },
       }
-    },
-
-    stubChatCompletionFunctionCallForMessageContaining(
-      bodyToMatch: BodyToMatch,
-      functionName: string,
-      argumentsString: string,
-    ) {
-      return this.chatCompletion(bodyToMatch).stubFunctionCall(functionName, argumentsString)
     },
 
     stubCreateImage() {
