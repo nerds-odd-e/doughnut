@@ -8,7 +8,6 @@ type FunctionCall = {
   function_call: {
     name: string
     arguments: string
-    content: string // this is temporary, until chat-gpt 3.5 fine tuning support function_call
   }
 }
 
@@ -76,22 +75,23 @@ const openAiService = () => {
     },
 
     stubChatCompletionWithNoteDetailsCompletionForGPTModel(modelName: string, reply: string) {
-      return this.chatCompletionRequest({ model: modelName }).stubNoteDetailsCompletion(reply)
+      return this.chatCompletion()
+        .requestMatches({ model: modelName })
+        .stubNoteDetailsCompletion(reply)
     },
 
     stubChatCompletionWithNoteDetailsCompletion(incomplete: string, reply: string) {
-      const message = { content: '"' + Cypress._.escapeRegExp(incomplete) + '"' }
-      return this.chatCompletionRequestHavingMessage(message).stubNoteDetailsCompletion(reply)
+      const message = { role: "user", content: '"' + Cypress._.escapeRegExp(incomplete) + '"' }
+      return this.chatCompletion().requestMessageMatches(message).stubNoteDetailsCompletion(reply)
     },
 
     stubChatCompletionWithNoteDetailsCompletionForRequestInContext(reply: string, context: string) {
-      const messageToMatch: MessageToMatch = {
-        role: "system",
-        content: context,
-      }
-      return this.chatCompletionRequestHavingMessage(messageToMatch).stubNoteDetailsCompletion(
-        reply,
-      )
+      return this.chatCompletion()
+        .requestMessageMatches({
+          role: "system",
+          content: context,
+        })
+        .stubNoteDetailsCompletion(reply)
     },
 
     mockChatCompletionWithMessages(reply: string, messages: MessageToMatch[]) {
@@ -107,30 +107,33 @@ const openAiService = () => {
       )
     },
 
-    chatCompletionRequestHavingMessage(message: MessageToMatch) {
-      return this.chatCompletionRequest({ messages: [message] })
-    },
-
-    chatCompletionRequest(bodyToMatch: BodyToMatch) {
+    chatCompletion() {
       return {
-        stubNoteDetailsCompletion(reply: string) {
-          return this.stubFunctionCall("note_details_completion", reply)
+        requestMessageMatches(message: MessageToMatch) {
+          return this.requestMatches({ messages: [message] })
         },
 
-        stubFunctionCall(functionName: string, argumentsString: string) {
-          return mockChatCompletion(
-            serviceMocker,
-            bodyToMatch,
-            {
-              role: "function",
-              function_call: {
-                name: functionName,
-                arguments: argumentsString,
-              },
-              content: argumentsString,
+        requestMatches(bodyToMatch: BodyToMatch) {
+          return {
+            stubNoteDetailsCompletion(reply: string) {
+              return this.stubFunctionCall("note_details_completion", reply)
             },
-            "function_call",
-          )
+
+            stubFunctionCall(functionName: string, argumentsString: string) {
+              return mockChatCompletion(
+                serviceMocker,
+                bodyToMatch,
+                {
+                  role: "function",
+                  function_call: {
+                    name: functionName,
+                    arguments: argumentsString,
+                  },
+                },
+                "function_call",
+              )
+            },
+          }
         },
       }
     },

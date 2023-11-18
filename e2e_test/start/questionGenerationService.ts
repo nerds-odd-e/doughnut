@@ -15,7 +15,8 @@ export const questionGenerationService = () => ({
       await mock_services.openAi().restartImposter()
       await mock_services
         .openAi()
-        .chatCompletionRequestHavingMessage({ role: "user", content: "Memory Assistant" })
+        .chatCompletion()
+        .requestMessageMatches({ role: "user", content: "Memory Assistant" })
         .stubFunctionCall("ask_single_answer_multiple_choice_question", reply)
     })
   },
@@ -23,7 +24,8 @@ export const questionGenerationService = () => ({
     cy.then(async () => {
       await mock_services
         .openAi()
-        .chatCompletionRequestHavingMessage({ role: "user", content: ".*critically check.*" })
+        .chatCompletion()
+        .requestMessageMatches({ role: "user", content: ".*critically check.*" })
         .stubFunctionCall("evaluate_question", JSON.stringify(record))
     })
   },
