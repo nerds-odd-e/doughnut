@@ -11,21 +11,19 @@ export const questionGenerationService = () => ({
         record["Incorrect Choice 2"],
       ],
     })
-    const messages = [{ role: "user", content: "Memory Assistant" }]
     cy.then(async () => {
       await mock_services.openAi().restartImposter()
       await mock_services
         .openAi()
-        .chatCompletionRequestWithMessages(messages)
+        .chatCompletionRequestHavingMessage({ role: "user", content: "Memory Assistant" })
         .stubFunctionCall("ask_single_answer_multiple_choice_question", reply)
     })
   },
   stubEvaluationQuestion: (record: Record<string, boolean | string>) => {
-    const messages = [{ role: "user", content: ".*critically check.*" }]
     cy.then(async () => {
       await mock_services
         .openAi()
-        .chatCompletionRequestWithMessages(messages)
+        .chatCompletionRequestHavingMessage({ role: "user", content: ".*critically check.*" })
         .stubFunctionCall("evaluate_question", JSON.stringify(record))
     })
   },
