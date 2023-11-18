@@ -74,10 +74,6 @@ const openAiService = () => {
       return serviceMocker.install()
     },
 
-    mockChatCompletionWithMessages(reply: string, messages: MessageToMatch[]) {
-      return mockChatCompletionForMessageContaining(serviceMocker, { messages }, reply, "stop")
-    },
-
     stubChatCompletion(reply: string, finishReason: "length" | "stop") {
       return mockChatCompletionForMessageContaining(
         serviceMocker,
@@ -90,9 +86,11 @@ const openAiService = () => {
     chatCompletion() {
       return {
         requestMessageMatches(message: MessageToMatch) {
-          return this.requestMatches({ messages: [message] })
+          return this.requestMessagesMatch([message])
         },
-
+        requestMessagesMatch(messages: MessageToMatch[]) {
+          return this.requestMatches({ messages })
+        },
         requestMatches(bodyToMatch: BodyToMatch) {
           const stubFunctionCall = (functionName: string, argumentsString: string) => {
             return mockChatCompletion(
@@ -110,6 +108,14 @@ const openAiService = () => {
           }
 
           return {
+            stubNonfunctionCallResponse(reply: string) {
+              return mockChatCompletionForMessageContaining(
+                serviceMocker,
+                bodyToMatch,
+                reply,
+                "stop",
+              )
+            },
             stubNoteDetailsCompletion(reply: string) {
               return stubFunctionCall("note_details_completion", reply)
             },
