@@ -74,26 +74,6 @@ const openAiService = () => {
       return serviceMocker.install()
     },
 
-    stubChatCompletionWithNoteDetailsCompletionForGPTModel(modelName: string, reply: string) {
-      return this.chatCompletion()
-        .requestMatches({ model: modelName })
-        .stubNoteDetailsCompletion(reply)
-    },
-
-    stubChatCompletionWithNoteDetailsCompletion(incomplete: string, reply: string) {
-      const message = { role: "user", content: '"' + Cypress._.escapeRegExp(incomplete) + '"' }
-      return this.chatCompletion().requestMessageMatches(message).stubNoteDetailsCompletion(reply)
-    },
-
-    stubChatCompletionWithNoteDetailsCompletionForRequestInContext(reply: string, context: string) {
-      return this.chatCompletion()
-        .requestMessageMatches({
-          role: "system",
-          content: context,
-        })
-        .stubNoteDetailsCompletion(reply)
-    },
-
     mockChatCompletionWithMessages(reply: string, messages: MessageToMatch[]) {
       return mockChatCompletionForMessageContaining(serviceMocker, { messages }, reply, "stop")
     },
