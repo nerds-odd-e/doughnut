@@ -80,8 +80,8 @@ const openAiService = () => {
     },
 
     stubChatCompletionWithNoteDetailsCompletion(incomplete: string, reply: string) {
-      const messages = [{ content: '"' + Cypress._.escapeRegExp(incomplete) + '"' }]
-      return this.chatCompletionRequestWithMessages(messages).stubNoteDetailsCompletion(reply)
+      const message = { content: '"' + Cypress._.escapeRegExp(incomplete) + '"' }
+      return this.chatCompletionRequestHavingMessage(message).stubNoteDetailsCompletion(reply)
     },
 
     stubChatCompletionWithNoteDetailsCompletionForRequestInContext(reply: string, context: string) {
@@ -89,7 +89,7 @@ const openAiService = () => {
         role: "system",
         content: context,
       }
-      return this.chatCompletionRequestWithMessages([messageToMatch]).stubNoteDetailsCompletion(
+      return this.chatCompletionRequestHavingMessage(messageToMatch).stubNoteDetailsCompletion(
         reply,
       )
     },
@@ -107,12 +107,16 @@ const openAiService = () => {
       )
     },
 
-    chatCompletionRequestWithMessages(messages: MessageToMatch[]) {
-      return this.chatCompletionRequest({ messages })
+    chatCompletionRequestHavingMessage(message: MessageToMatch) {
+      return this.chatCompletionRequest({ messages: [message] })
     },
 
     chatCompletionRequest(bodyToMatch: BodyToMatch) {
       return {
+        stubNoteDetailsCompletion(reply: string) {
+          return this.stubFunctionCall("note_details_completion", reply)
+        },
+
         stubFunctionCall(functionName: string, argumentsString: string) {
           return mockChatCompletion(
             serviceMocker,
