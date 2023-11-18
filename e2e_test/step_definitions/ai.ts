@@ -33,7 +33,12 @@ Given(
   (returnMessage: string, context: string) => {
     mock_services
       .openAi()
-      .stubChatCompletionWithNoteDetailsCompletionForRequestInContext(returnMessage, context)
+      .chatCompletion()
+      .requestMessageMatches({
+        role: "system",
+        content: context,
+      })
+      .stubNoteDetailsCompletion(returnMessage)
   },
 )
 
@@ -52,10 +57,15 @@ Given(
 
 Given(
   "OpenAI will complete the phrase {string} with {string}",
-  (incompleteAssistantMessage: string, returnMessage: string) => {
+  (incomplete: string, returnMessage: string) => {
     mock_services
       .openAi()
-      .stubChatCompletionWithNoteDetailsCompletion(incompleteAssistantMessage, returnMessage)
+      .chatCompletion()
+      .requestMessageMatches({
+        role: "user",
+        content: '"' + Cypress._.escapeRegExp(incomplete) + '"',
+      })
+      .stubNoteDetailsCompletion(returnMessage)
   },
 )
 
@@ -68,7 +78,9 @@ Given(
   (details: string, modelName: string) => {
     mock_services
       .openAi()
-      .stubChatCompletionWithNoteDetailsCompletionForGPTModel(modelName, details)
+      .chatCompletion()
+      .requestMatches({ model: modelName })
+      .stubNoteDetailsCompletion(details)
   },
 )
 
