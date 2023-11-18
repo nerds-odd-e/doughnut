@@ -85,8 +85,8 @@ in mkShell {
     export GPG_TTY=$(tty)
     export JAVA_HOME="$(readlink -e $(type -p javac) | sed  -e 's/\/bin\/javac//g')"
     export KOTLIN_HOME="$(readlink -e $(type -p kotlinc) | sed -e 's/\/bin\/kotlinc//g')"
+    export PNPM_HOME="$(readlink -e $(type -p pnpm) | sed -e 's/\/bin\/pnpm//g')"
     export NODE_PATH="$(readlink -e $(type -p node) | sed  -e 's/\/bin\/node//g')"
-    export DUM_PATH="$(readlink -e $(type -p dum) | sed  -e 's/\/bin\/dum//g')"
     export FLUTTER_PATH="$(readlink -e $(type -p flutter) | sed  -e 's/\/bin\/flutter//g')"
     export DART_PATH="$(readlink -e $(type -p dart) | sed  -e 's/\/bin\/dart//g')"
     export PUB_CACHE="''${PUB_CACHE:-$PWD/.pub-cache}"
@@ -99,7 +99,7 @@ in mkShell {
     export MYSQL_PID_FILE=$MYSQL_HOME/mysql.pid
     export MYSQL_TCP_PORT=3309
     export MYSQLX_TCP_PORT=33090
-    export PATH=$JAVA_HOME/bin:$KOTLIN_HOME/bin:$DUM_PATH/bin:$NODE_PATH/bin:$MYSQL_BASEDIR/bin:$FLUTTER_PATH/bin:$DART_PATH/bin:$PATH
+    export PATH=$JAVA_HOME/bin:$KOTLIN_HOME/bin:$DUM_PATH/bin:$PNPM_HOME/bin:$NODE_PATH/bin:$MYSQL_BASEDIR/bin:$FLUTTER_PATH/bin:$DART_PATH/bin:$PATH
     export LANG="en_US.UTF-8"
 
     echo "###################################################################################################################"
@@ -109,6 +109,7 @@ in mkShell {
     echo "##   JAVA_HOME: $JAVA_HOME                            "
     echo "##   KOTLIN_HOME: $KOTLIN_HOME                        "
     echo "##   NODE_PATH: $NODE_PATH                            "
+    echo "##   PNPM_HOME: $PNPM_HOME                            "
     echo "##   FLUTTER_PATH: $FLUTTER_PATH                      "
     echo "##   MYSQL_BASEDIR: $MYSQL_BASEDIR                    "
     echo "##   MYSQL_HOME: $MYSQL_HOME                          "
