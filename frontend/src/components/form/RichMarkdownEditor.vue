@@ -1,22 +1,17 @@
 <template>
-  <QuillEditor
-    ref="quillEditor"
-    v-model:content="localHtmlValue"
-    :options="editorOptions"
-    :content-type="'html'"
-    @blur="onBlurTextField"
-    @update:content="onUpdateContent"
-    @focus="hadFocus = true"
+  <RichHtmlEditor
+    v-bind="{ multipleLine, scopeName, field, title, errors }"
+    v-model="localHtmlValue"
+    @blur="$emit('blur')"
   />
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 import { marked } from "marked";
-import { QuillEditor } from "@vueup/vue-quill";
-
 import "quill/dist/quill.snow.css";
 import TurndownService from "turndown";
+import RichHtmlEditor from "./RichHtmlEditor.vue";
 
 const turndownService = new TurndownService();
 
@@ -42,63 +37,23 @@ export default defineComponent({
   },
   emits: ["update:modelValue", "blur"],
   components: {
-    QuillEditor,
+    RichHtmlEditor,
   },
   data() {
     return {
-      editorOptions: {
-        modules: {
-          toolbar: false,
-          keyboard: {
-            bindings: {
-              custom: {
-                key: 13,
-                shiftKey: true,
-                handler: this.onBlurTextField,
-              },
-            },
-          },
-        },
-        placeholder: "Enter note details here...",
-      },
       localHtmlValue: markdownizer.markdownToHtml(this.modelValue),
-      hadFocus: false as boolean,
     };
   },
   watch: {
     modelValue() {
       this.localHtmlValue = markdownizer.markdownToHtml(this.modelValue);
     },
-  },
-  computed: {
-    localMarkdownValue() {
-      return markdownizer.htmlToMarkdown(this.localHtmlValue);
-    },
-  },
-  methods: {
-    onUpdateContent() {
-      if (this.localMarkdownValue === this.modelValue) {
-        return;
-      }
-      this.$emit("update:modelValue", this.localMarkdownValue);
-    },
-    onBlurTextField() {
-      this.$emit("blur");
+    localHtmlValue() {
+      const localMarkdownValue = markdownizer.htmlToMarkdown(
+        this.localHtmlValue,
+      );
+      this.$emit("update:modelValue", localMarkdownValue);
     },
   },
 });
 </script>
-
-<style lang="sass">
-.ql-editor
-  padding: 0
-  margin-bottom: 15px
-  &::before
-    left: 0 !important
-    right:0 !important
-  li
-    list-style-type: inherit
-.ql-container.ql-snow
-  border: none
-  font-size: inherit !important
-</style>
