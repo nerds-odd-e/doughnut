@@ -20,10 +20,16 @@ import TurndownService from "turndown";
 
 const turndownService = new TurndownService();
 
-const markdownToQillHtml = (markdown: string | undefined) =>
-  marked(markdown || "")
-    .trim()
-    .replace(/>\s+</g, "><");
+const markdownizer = {
+  markdownToHtml(markdown: string | undefined) {
+    return marked(markdown || "")
+      .trim()
+      .replace(/>\s+</g, "><");
+  },
+  htmlToMarkdown(html: string) {
+    return turndownService.turndown(html);
+  },
+};
 
 export default defineComponent({
   props: {
@@ -55,18 +61,18 @@ export default defineComponent({
         },
         placeholder: "Enter note details here...",
       },
-      localHtmlValue: markdownToQillHtml(this.modelValue),
+      localHtmlValue: markdownizer.markdownToHtml(this.modelValue),
       hadFocus: false as boolean,
     };
   },
   watch: {
     modelValue() {
-      this.localHtmlValue = markdownToQillHtml(this.modelValue);
+      this.localHtmlValue = markdownizer.markdownToHtml(this.modelValue);
     },
   },
   computed: {
     localMarkdownValue() {
-      return turndownService.turndown(this.localHtmlValue);
+      return markdownizer.htmlToMarkdown(this.localHtmlValue);
     },
   },
   methods: {
