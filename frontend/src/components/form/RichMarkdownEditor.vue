@@ -1,7 +1,8 @@
 <template>
   <RichHtmlEditor
     v-bind="{ multipleLine, scopeName, field, title, errors }"
-    v-model="localHtmlValue"
+    :model-value="htmlValue"
+    @update:model-value="htmlValueUpdated($event)"
     @blur="$emit('blur')"
   />
 </template>
@@ -39,20 +40,15 @@ export default defineComponent({
   components: {
     RichHtmlEditor,
   },
-  data() {
-    return {
-      localHtmlValue: markdownizer.markdownToHtml(this.modelValue),
-    };
-  },
-  watch: {
-    modelValue() {
-      this.localHtmlValue = markdownizer.markdownToHtml(this.modelValue);
+  computed: {
+    htmlValue() {
+      return markdownizer.markdownToHtml(this.modelValue);
     },
-    localHtmlValue() {
-      const localMarkdownValue = markdownizer.htmlToMarkdown(
-        this.localHtmlValue,
-      );
-      this.$emit("update:modelValue", localMarkdownValue);
+  },
+  methods: {
+    htmlValueUpdated(htmlValue) {
+      const markdownValue = markdownizer.htmlToMarkdown(htmlValue);
+      this.$emit("update:modelValue", markdownValue);
     },
   },
 });
