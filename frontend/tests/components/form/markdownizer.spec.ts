@@ -21,7 +21,7 @@ describe("Markdown and HTML Conversion Tests", () => {
     });
     it("converts empty lines correctly", () => {
       const html = "<p>a</p><p></p><p>b</p>";
-      const expectedMarkdown = "a\n\nb";
+      const expectedMarkdown = "a\n\n<p></p>\n\nb";
       expect(markdownizer.htmlToMarkdown(html)).toBe(expectedMarkdown);
     });
   });

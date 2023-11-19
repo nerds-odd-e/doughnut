@@ -1,7 +1,11 @@
 import { marked } from "marked";
 import TurndownService from "turndown";
 
-export const turndownService = new TurndownService();
+export const turndownService = new TurndownService({
+  blankReplacement(_, node: Node) {
+    return (node as HTMLElement).outerHTML;
+  },
+});
 
 export default {
   markdownToHtml(markdown: string | undefined) {
