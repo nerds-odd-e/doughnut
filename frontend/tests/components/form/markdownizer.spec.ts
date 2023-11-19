@@ -19,9 +19,9 @@ describe("Markdown and HTML Conversion Tests", () => {
         "Hello World\n===========\n\nThis is _markdown_.";
       expect(markdownizer.htmlToMarkdown(html)).toBe(expectedMarkdown);
     });
-    it("converts empty lines correctly", () => {
-      const html = "<p>a</p><p></p><p>b</p>";
-      const expectedMarkdown = "a\n\n<p></p>\n\nb";
+    it("converts empty lines with br correctly", () => {
+      const html = "<p>a</p><p><br></p><p>b</p>";
+      const expectedMarkdown = "a\n\n<p><br></p>\n\nb";
       expect(markdownizer.htmlToMarkdown(html)).toBe(expectedMarkdown);
     });
   });
