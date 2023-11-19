@@ -43,7 +43,7 @@
     "enable": true
   },
   "files": [
-    "./vite.config.ts"
+    "./vite.config.ts", "./src/components/form/markdownizer.ts"
   ],
   "include": [
     "src/**/*.ts",

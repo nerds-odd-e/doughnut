@@ -9,23 +9,9 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { marked } from "marked";
 import "quill/dist/quill.snow.css";
-import TurndownService from "turndown";
 import RichHtmlEditor from "./RichHtmlEditor.vue";
-
-const turndownService = new TurndownService();
-
-const markdownizer = {
-  markdownToHtml(markdown: string | undefined) {
-    return marked(markdown || "")
-      .trim()
-      .replace(/>\s+</g, "><");
-  },
-  htmlToMarkdown(html: string) {
-    return turndownService.turndown(html);
-  },
-};
+import markdownizer from "./markdownizer";
 
 export default defineComponent({
   props: {
