@@ -4,8 +4,8 @@ SCRIPTPATH="$(
   pwd -P
 )"
 
-gcloud compute instance-templates create doughnut-app-zulu17-openai-mig-template \
-  --image doughnut-debian11-mysql80-base-saltstack \
+gcloud compute instance-templates create doughnut-app-debian12-zulu17-openai-mig-template \
+  --image doughnut-debian12-mysql80-base-saltstack \
   --service-account 220715781008-compute@developer.gserviceaccount.com \
   --service-account doughnut-gcp-svc-acct@carbon-syntax-298809.iam.gserviceaccount.com \
   --scopes https://www.googleapis.com/auth/cloud-platform \
