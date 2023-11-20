@@ -32,7 +32,7 @@
   "devDependencies": {
     "@testing-library/vue": "^8.0.0",
     "@types/lodash": "^4.14.201",
-    "@types/node": "^20.9.1",
+    "@types/node": "^20.9.2",
     "@typescript-eslint/eslint-plugin": "^6.11.0",
     "@typescript-eslint/parser": "^6.11.0",
     "@vitejs/plugin-vue": "^4.5.0",
@@ -51,7 +51,7 @@
     "eslint-plugin-import": "npm:eslint-plugin-i@^2.29.0",
     "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-testing-library": "^6.1.2",
-    "eslint-plugin-vitest": "^0.3.9",
+    "eslint-plugin-vitest": "^0.3.10",
     "eslint-plugin-vue": "^9.18.1",
     "jsdom": "^22.1.0",
     "optionator": "^0.9.3",
