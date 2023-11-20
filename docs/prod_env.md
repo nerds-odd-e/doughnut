@@ -62,4 +62,4 @@ PACKER_LOG=1 packer build packer.json
 ```
 
 Expect to see following log line towards end of Packer build stdout log:
-`--> googlecompute: A disk image was created: doughnut-debian11-mysql80-base-saltstack`
+`--> googlecompute: A disk image was created: doughnut-debian12-mysql80-base-saltstack`

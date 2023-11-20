@@ -16,8 +16,8 @@
 mysql-deb-apt-repo:
   pkgrepo.managed:
     - humanname: MySQL
-    - name: deb http://repo.mysql.com/apt/debian/ Bullseye mysql-8.0
-    - dist: bullseye
+    - name: deb http://repo.mysql.com/apt/debian/ Bookworm mysql-8.0
+    - dist: bookworm
     - file: /etc/apt/sources.list.d/mysql.list
     - keyid: 467B942D3A79BD29
     - keyserver: keyserver.ubuntu.com
