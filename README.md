@@ -184,6 +184,10 @@ directory:
 
 ### 9. [Doughnut source code secrets management](./docs/secrets_management.md)
 
+### 10. Architecture and Design documentation
+
+[Miro board](https://miro.com/app/board/uXjVNNaWVeA=/?share_link_id=753160038592)
+
 ## How to Contribute
 
 - We welcome product ideas and code contribution.
