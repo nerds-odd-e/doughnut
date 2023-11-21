@@ -118,6 +118,6 @@ Then("I contest the question", () => {
   cy.findByRole("button", { name: "Doesn't make sense?" }).click()
 })
 
-Then('I see after "Scrum " the suggestion from AI: "is a popular Software Development Framework."', () => {
-  // TODO
+Then('I see after "Scrum " the suggestion from AI: {string}', (suggestionString : string) => {
+  cy.get('.suggestedText').clearFocusedText().contains(suggestionString);
 })

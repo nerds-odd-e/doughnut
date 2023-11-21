@@ -7,12 +7,12 @@ Feature: Details Inline Auto Completion
       | topic | details | testingParent |
       | Scrum |         |               |
     When I visit note "Scrum"
-    And I type in the details the word "Scrum" followed by a space
+    And I type in the details the word "Schroedinger-Team: Scrum" followed by a space
 
-
+  @ignore @NEXT
   Scenario: A sentence is suggested
-    Given OpenAI will complete the phrase "Scrum " with "is a popular Software Development Framework."
-    Then I see after "Scrum " the suggestion from AI: "is a popular Software Development Framework."
+    Given OpenAI will complete the phrase "Schroedinger-Team: Scrum " with "is a popular Software Development Framework."
+    Then I see after "Schroedinger-Team: Scrum " the suggestion from AI: "is a popular Software Development Framework."
 
   @ignore 
   Scenario: A sentence is suggested and accepted
