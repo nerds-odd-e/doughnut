@@ -306,7 +306,14 @@ When("I start to chat about the note {string}", (noteTopic: string) => {
   start.jumpToNotePage(noteTopic).chatAboutNote()
 })
 
-
 When("I click the Refine button", (noteTopic: string) => {
   start.jumpToNotePage(noteTopic).refineNoteDetails()
+})
+
+Then("OpenAI assistant will ask the question {string} and generate no note details", () => {
+  
+})
+
+When("I answer with {string}", () => {
+  
 })
