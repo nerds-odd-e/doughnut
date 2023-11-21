@@ -7,6 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AIClarifyingQuestionDialog: typeof import('./src/components/notes/AIClarifyingQuestionDialog.vue')['default']
     AIGenerateImageDialog: typeof import('./src/components/notes/AIGenerateImageDialog.vue')['default']
     AISuggestDetailsButton: typeof import('./src/components/toolbars/AISuggestDetailsButton.vue')['default']
     AnsweredQuestion: typeof import('./src/components/review/AnsweredQuestion.vue')['default']
