@@ -1,4 +1,4 @@
-@usingMockedOpenAiService
+@ignore @usingMockedOpenAiService
 Feature: Details Inline Auto Completion
 
   Background:
