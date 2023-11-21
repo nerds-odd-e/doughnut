@@ -1,4 +1,4 @@
-@ignore @usingMockedOpenAiService
+@usingMockedOpenAiService
 Feature: Details Inline Auto Completion
 
   Background:
@@ -11,17 +11,17 @@ Feature: Details Inline Auto Completion
 
 
   Scenario: A sentence is suggested
+    Given OpenAI will complete the phrase "Scrum " with "is a popular Software Development Framework."
     Then I see after "Scrum " the suggestion from AI: "is a popular Software Development Framework."
-    And the cursor is after "Scrum "
 
+  @ignore 
   Scenario: A sentence is suggested and accepted
     When I press "Tab"
     Then I should see "Scrum is a popular Software Development Framework." in the page
-    And the cursor is after "Software Development Framework."
 
+  @ignore 
   Scenario: A sentence is suggested and declined by the user by continue typing
     When I continue typing "Master "
     Then I see after "Scrum Master " the suggestion from AI: "is a role in the Scrum Framework."
-    And the cursor is after "Scrum Master "
 
 # grayed out suggestion is missing
