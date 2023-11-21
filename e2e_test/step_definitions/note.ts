@@ -310,11 +310,11 @@ When("I click the Refine button", (noteTopic: string) => {
   start.jumpToNotePage(noteTopic).refineNoteDetails()
 })
 
-Then("OpenAI assistant will ask the question {string} and generate no note details", () => {
-  
+Then("OpenAI assistant will ask the question {string} and generate no note details", (question: string) => {
+
 })
 
-When("I answer with {string}", () => {
+When("I answer with {string}", (answer: string) => {
   
 })
 
