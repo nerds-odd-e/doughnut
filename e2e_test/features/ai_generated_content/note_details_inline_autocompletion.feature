@@ -1,4 +1,4 @@
-@ignore @usingMockedOpenAiService
+@ignore @usingMockedOpenAiService @focus
 Feature: Details Inline Auto Completion
 
   Background:
@@ -24,3 +24,4 @@ Feature: Details Inline Auto Completion
     Then I see after "Scrum Master " the suggestion from AI: "is a role in the Scrum Framework."
     And the cursor is after "Scrum Master "
 
+# grayed out suggestion is missing
