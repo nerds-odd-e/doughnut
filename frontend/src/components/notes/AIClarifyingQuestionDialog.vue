@@ -18,12 +18,12 @@ import TextInput from "../form/TextInput.vue";
 
 export default {
   props: {
-    question: string
+    question: string,
   },
   components: { TextInput },
   data() {
     return {
-      answerToAI: string
+      answerToAI: string,
     };
   },
   methods: {},
@@ -31,5 +31,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 </style>
