@@ -317,3 +317,7 @@ Then("OpenAI assistant will ask the question {string} and generate no note detai
 When("I answer with {string}", () => {
   
 })
+
+When("I type in the details the word {string} followed by a space", (detailsText: string) => {
+  cy.findNoteDetailsOnCurrentPage("").type(detailsText)
+})
