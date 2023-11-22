@@ -6,7 +6,7 @@
     @click="suggestDetails(selectedNote.details)"
   >
     <SvgRobot />
-    <Popup :show="!!clarificationQuestion">
+    <Popup :show="!!clarificationQuestion" @popupDone="clarificationQuestion = ''">
       <AIClarifyingQuestionDialog :question="clarificationQuestion" />
     </Popup>
   </a>
@@ -59,6 +59,7 @@ export default defineComponent({
 
       if (response.question) {
         this.clarificationQuestion = response.question;
+        return;
       }
 
       this.storageAccessor.api(this.$router).updateTextContent(
