@@ -6,6 +6,9 @@
     @click="suggestDetails(selectedNote.details)"
   >
     <SvgRobot />
+    <Popup :show="!!clarificationQuestion" sidebar="left">
+      <AIClarifyingQuestionDialog />
+    </Popup>
   </a>
 </template>
 
@@ -14,6 +17,8 @@ import { defineComponent, PropType } from "vue";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import { StorageAccessor } from "@/store/createNoteStorage";
 import SvgRobot from "../svgs/SvgRobot.vue";
+import AIClarifyingQuestionDialog from "../notes/AIClarifyingQuestionDialog.vue";
+import Popup from "../commons/Popups/Popup.vue";
 
 export default defineComponent({
   setup() {
@@ -33,20 +38,28 @@ export default defineComponent({
   },
   components: {
     SvgRobot,
+    Popup,
+    AIClarifyingQuestionDialog,
   },
   data() {
     return {
       isUnmounted: false,
+      clarificationQuestion: "",
     };
   },
   methods: {
     async suggestDetails(prev?: string) {
-      const details = await this.api.ai.aiNoteDetailsCompletion(
-        this.selectedNote.id,
-        prev,
-      );
+      const { moreCompleteContent: details, ...response } =
+        await this.api.ai.aiNoteDetailsCompletion(this.selectedNote.id, prev);
+
+      // eslint-disable-next-line
+      console.log(response);
 
       if (this.isUnmounted) return;
+
+      if (response.question) {
+        this.clarificationQuestion = response.question;
+      }
 
       this.storageAccessor.api(this.$router).updateTextContent(
         this.selectedNote.id,

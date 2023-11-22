@@ -1,8 +1,8 @@
 <template>
-  <h3>
-    Clarification question by the AI: <strong>{{ question }}</strong>
-  </h3>
   <form>
+    <h3>
+      Clarification question by the AI: <strong>{{ question }}</strong>
+    </h3>
     <TextInput
       scope-name="note"
       field="answerToAI"
@@ -18,12 +18,12 @@ import TextInput from "../form/TextInput.vue";
 
 export default {
   props: {
-    question: string,
+    question: String,
   },
   components: { TextInput },
   data() {
     return {
-      answerToAI: string,
+      answerToAI: "",
     };
   },
   methods: {},
