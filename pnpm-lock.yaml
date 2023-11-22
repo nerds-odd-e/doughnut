@@ -73,8 +73,8 @@ importers:
         specifier: ^3.0.0
         version: 3.0.0(@typescript-eslint/eslint-plugin@6.12.0)(eslint@8.54.0)
       github_action_sound:
-        specifier: ^1.0.3
-        version: 1.0.3
+        specifier: ^1.0.4
+        version: 1.0.4
       got:
         specifier: ^13.0.0
         version: 13.0.0
@@ -4862,8 +4862,8 @@ packages:
       assert-plus: 1.0.0
     dev: true
 
-  /github_action_sound@1.0.3:
-    resolution: {integrity: sha512-s9mk8crGtr6LWLEfC8zWfUSuJMPlV5SgyElCpVeAF3FYtRJpLq0fRbL99tKyKn0qCp2eAVqOzPaHoNuj2SzmUw==}
+  /github_action_sound@1.0.4:
+    resolution: {integrity: sha512-ogf/lga7W5C9p1dPP6/tYxTXHrv58ykrbe8t51S8ZitVe3S3IWOqHjY/87ocwy2D0iB839dPWGpq+8TWmVt+Bw==}
     hasBin: true
     dependencies:
       got: 11.8.6
