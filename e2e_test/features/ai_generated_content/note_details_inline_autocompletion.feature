@@ -17,8 +17,9 @@ Feature: Details Inline Auto Completion
     Then the note details are "<final note details>"
 
   Examples:
-      | action                     | final note details                                  |
-      | accept the suggestion      | Schroedinger-Team: Scrum is a popular Software Development Framework. |
+      | action                    | final note details                                  |
+      | accept the suggestion     | Schroedinger-Team: Scrum is a popular Software Development Framework. |
+      | continue typing "Master " | Schroedinger-Team: Scrum Master is a role in the Scrum Framework. |
 
   @ignore
   Scenario: A sentence is suggested and declined by the user by continue typing
