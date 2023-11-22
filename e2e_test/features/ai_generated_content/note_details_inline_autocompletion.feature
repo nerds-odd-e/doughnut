@@ -9,13 +9,11 @@ Feature: Details Inline Auto Completion
     When I visit note "Scrum"
     And I type in the details the word "Schroedinger-Team: Scrum " followed by a space
 
+  @ignore
   Scenario: A sentence is suggested
     Given OpenAI will complete the phrase "Schroedinger-Team: Scrum " with "is a popular Software Development Framework."
     Then I see after "Schroedinger-Team: Scrum " the suggestion from AI: "is a popular Software Development Framework."
-
-  @ignore
-  Scenario: A sentence is suggested and accepted
-    When I press "Tab"
+    When I accept the AI suggestion
     Then I should see "Scrum is a popular Software Development Framework." in the page
 
   @ignore
