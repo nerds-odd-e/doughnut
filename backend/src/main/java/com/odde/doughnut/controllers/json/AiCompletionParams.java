@@ -7,13 +7,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.Nullable;
 
 @NoArgsConstructor
 @AllArgsConstructor
 public class AiCompletionParams {
   public String detailsToComplete = "";
-  public String questionFromAI = "";
-  public String answerFromUser = "";
+  @Nullable
+  public String questionFromAI;
+  @Nullable
+  public String answerFromUser;
 
   public String complete(JsonNode jsonNode) {
     try {
