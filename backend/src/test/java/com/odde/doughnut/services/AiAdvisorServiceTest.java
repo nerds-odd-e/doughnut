@@ -104,8 +104,9 @@ class AiAdvisorServiceTest {
 
   private String getAiCompletionFromAdvisor(String incompleteContent) {
     Note note = makeMe.aNote().inMemoryPlease();
-    return aiAdvisorService.getAiCompletion(
-        new AiCompletionParams(incompleteContent), note, "gpt-4");
+    return aiAdvisorService
+        .getAiCompletion(new AiCompletionParams(incompleteContent), note, "gpt-4")
+        .getMoreCompleteContent();
   }
 
   @Nested

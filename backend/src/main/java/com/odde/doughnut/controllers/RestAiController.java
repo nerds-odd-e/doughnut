@@ -35,9 +35,7 @@ public class RestAiController {
   public AiCompletion getCompletion(
       @PathVariable(name = "note") Note note, @RequestBody AiCompletionParams aiCompletionParams) {
     currentUser.assertLoggedIn();
-    return new AiCompletion(
-        aiAdvisorService.getAiCompletion(aiCompletionParams, note, getChatBuilderDefault()),
-        "stop");
+    return aiAdvisorService.getAiCompletion(aiCompletionParams, note, getChatBuilderDefault());
   }
 
   private String getChatBuilderDefault() {

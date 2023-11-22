@@ -8,4 +8,5 @@ import lombok.Data;
 public final class AiCompletion {
   String moreCompleteContent;
   String finishReason;
+  String question;
 }
