@@ -2,6 +2,7 @@
   <RichHtmlEditor
     v-bind="{ multipleLine, scopeName, field, title, errors }"
     :model-value="htmlValue"
+    :note-id="noteId"
     @update:model-value="htmlValueUpdated($event)"
     @blur="$emit('blur')"
   />
@@ -21,6 +22,7 @@ export default defineComponent({
     field: String,
     title: String,
     errors: Object,
+    noteId: { type: Number, required: true },
   },
   emits: ["update:modelValue", "blur"],
   components: {

@@ -19,10 +19,16 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { QuillEditor } from "@vueup/vue-quill";
+import useLoadingApi from "@/managedApi/useLoadingApi";
 
 import "quill/dist/quill.snow.css";
 
 export default defineComponent({
+  setup() {
+    return {
+      ...useLoadingApi(),
+    };
+  },
   props: {
     multipleLine: Boolean,
     modelValue: String,
@@ -30,6 +36,7 @@ export default defineComponent({
     field: String,
     title: String,
     errors: Object,
+    noteId: { type: Number, required: true },
   },
   emits: ["update:modelValue", "blur"],
   components: {
@@ -99,13 +106,16 @@ export default defineComponent({
           .insertText(quill.getQuill().getSelection()?.index || 0, "\n");
       }
     },
-    onSpacePress() {
+    async onSpacePress() {
       const quill = this.$refs.quillEditor as typeof QuillEditor;
       quill
         .getQuill()
         .insertText(quill.getQuill().getSelection()?.index || 0, " ");
       if (this.modelValue === "<p>Schroedinger-Team: Scrum</p>") {
-        this.suggestion = "is a popular Software Development Framework.";
+        this.suggestion = await this.api.ai.aiNoteDetailsCompletion(
+          this.noteId,
+          this.simpleText,
+        );
       } else {
         this.suggestion = "";
       }
