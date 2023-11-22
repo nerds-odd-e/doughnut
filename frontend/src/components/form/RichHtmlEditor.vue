@@ -112,10 +112,11 @@ export default defineComponent({
         .getQuill()
         .insertText(quill.getQuill().getSelection()?.index || 0, " ");
       if (this.modelValue === "<p>Schroedinger-Team: Scrum</p>") {
-        this.suggestion = await this.api.ai.aiNoteDetailsCompletion(
+        const response = await this.api.ai.aiNoteDetailsCompletion(
           this.noteId,
           this.simpleText,
         );
+        this.suggestion = response.moreCompleteContent;
       } else {
         this.suggestion = "";
       }
