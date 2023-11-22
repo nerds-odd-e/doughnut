@@ -21,7 +21,3 @@ Feature: Details Inline Auto Completion
       | accept the suggestion     | Schroedinger-Team: Scrum is a popular Software Development Framework. |
       | continue typing "Master"  | Schroedinger-Team: Scrum Master |
 
-  @ignore
-  Scenario: A sentence is suggested and declined by the user by continue typing
-    When I continue typing "Master "
-    Then I see after "Scrum Master " the suggestion from AI: "is a role in the Scrum Framework."
