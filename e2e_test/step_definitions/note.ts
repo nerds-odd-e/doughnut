@@ -325,3 +325,6 @@ When("I answer with {string}", (answer: string) => {
 When("I type in the details the word {string} followed by a space", (detailsText: string) => {
   cy.findNoteDetailsOnCurrentPage("").type(detailsText)
 })
+
+When("the note details are {string}", (finalText: string) => {
+})
