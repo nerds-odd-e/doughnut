@@ -3,7 +3,7 @@ Feature: AI asks clarifying questions when auto-generating note details
 
   @ignore
   @usingMockedOpenAiService
-  Scenario outline: User supplies an answer to a clarifying question
+  Scenario Outline: User supplies an answer to a clarifying question
     Given I am logged in as an existing user
     And there are some notes for the current user:
       | topic   | details                        |
