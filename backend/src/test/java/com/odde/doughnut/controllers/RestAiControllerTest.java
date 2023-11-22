@@ -115,9 +115,19 @@ class RestAiControllerTest {
     }
 
     @Test
-    void askSuggestionAndUseResponse() {
+    void askCompletionAndUseStopResponse() {
       AiCompletion aiCompletion = controller.getCompletion(note, params);
       assertEquals("blue planet", aiCompletion.getMoreCompleteContent());
+      assertEquals("stop", aiCompletion.getFinishReason());
+    }
+
+    @Test
+    void askCompletionAndUseQuestionResponse() {
+      params.detailsToComplete = "Football";
+      AiCompletion aiCompletion = controller.getCompletion(note, params);
+      assertEquals("question", aiCompletion.getFinishReason());
+      assertEquals(
+          "Do you mean American Football or European Football?", aiCompletion.getQuestion());
     }
   }
 
