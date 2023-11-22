@@ -9,7 +9,6 @@ Feature: Details Inline Auto Completion
     When I visit note "Scrum"
     And I type in the details the word "Schroedinger-Team: Scrum " followed by a space
 
-  @ignore
   Scenario Outline: Inline autocomplete note details
     Given OpenAI will complete the phrase "Schroedinger-Team: Scrum " with "is a popular Software Development Framework."
     Then I see after "Schroedinger-Team: Scrum " the suggestion from AI: "is a popular Software Development Framework."
@@ -18,6 +17,6 @@ Feature: Details Inline Auto Completion
 
   Examples:
       | action                    | final note details                                  |
-      | accept the suggestion     | Schroedinger-Team: Scrum is a popular Software Development Framework. |
+      | accept the AI suggestion     | Schroedinger-Team: Scrum is a popular Software Development Framework. |
       | continue typing "Master"  | Schroedinger-Team: Scrum Master |
 
