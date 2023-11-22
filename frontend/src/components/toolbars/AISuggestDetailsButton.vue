@@ -52,9 +52,6 @@ export default defineComponent({
       const { moreCompleteContent: details, ...response } =
         await this.api.ai.aiNoteDetailsCompletion(this.selectedNote.id, prev);
 
-      // eslint-disable-next-line
-      console.log(response);
-
       if (this.isUnmounted) return;
 
       if (response.question) {
