@@ -6,7 +6,10 @@
     @click="suggestDetails(selectedNote.details)"
   >
     <SvgRobot />
-    <Popup :show="!!clarificationQuestion" @popupDone="clarificationQuestion = ''">
+    <Popup
+      :show="!!clarificationQuestion"
+      @popup-done="clarificationQuestion = ''"
+    >
       <AIClarifyingQuestionDialog :question="clarificationQuestion" />
     </Popup>
   </a>
