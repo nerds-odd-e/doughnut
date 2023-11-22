@@ -13,10 +13,11 @@ Feature: Details Inline Auto Completion
     Given OpenAI will complete the phrase "Schroedinger-Team: Scrum " with "is a popular Software Development Framework."
     Then I see after "Schroedinger-Team: Scrum " the suggestion from AI: "is a popular Software Development Framework."
     When I <action>
-    Then the note details are "<final note details>"
+    And I continue typing <further word>
+    Then the note details are <complete note details>
+    
 
   Examples:
-      | action                    | final note details                                  |
-      | accept the AI suggestion     | Schroedinger-Team: Scrum is a popular Software Development Framework. |
-      | continue typing "Master"  | Schroedinger-Team: Scrum Master |
-
+      | action                       | final note details                                                    | further word          | complete note details |
+      | accept the AI suggestion     | Schroedinger-Team: Scrum is a popular Software Development Framework. | " The term comes from" | "Schroedinger-Team: Scrum is a popular Software Development Framework. The term comes from" |
+      | continue typing "Master"     | Schroedinger-Team: Scrum Master                                       | " is"                 | "Schroedinger-Team: Scrum Master is" |
