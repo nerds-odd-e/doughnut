@@ -87,7 +87,16 @@ export default defineComponent({
       this.$emit("blur");
     },
     onEnterPress() {
-      // accept function
+      const quill = this.$refs.quillEditor as typeof QuillEditor;
+
+      if (this.suggestion) {
+        const finalText = `<p>${this.simpleText} ${this.suggestion}</p>`;
+        quill.setHTML(finalText);
+      } else {
+        quill
+          .getQuill()
+          .insertText(quill.getQuill().getSelection()?.index || 0, "\n");
+      }
     },
     onSpacePress() {
       const quill = this.$refs.quillEditor as typeof QuillEditor;
