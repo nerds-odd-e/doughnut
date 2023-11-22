@@ -328,3 +328,5 @@ When("I type in the details the word {string} followed by a space", (detailsText
 
 When("the note details are {string}", (finalText: string) => {
 })
+When("I continue typing {string}", (additionalText: string) => {
+})
