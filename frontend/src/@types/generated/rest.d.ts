@@ -6,6 +6,7 @@ declare namespace Generated {
     interface AiCompletion {
         moreCompleteContent: string;
         finishReason: string;
+        question: string;
     }
 
     interface AiCompletionParams {
