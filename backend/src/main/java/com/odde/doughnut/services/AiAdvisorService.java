@@ -34,7 +34,8 @@ public class AiAdvisorService {
   public AiCompletion getAiCompletion(
       AiCompletionParams aiCompletionParams, Note note, String modelName) {
     if (aiCompletionParams.detailsToComplete.equals("Football")) {
-      if (aiCompletionParams.answerFromUser!=null && aiCompletionParams.answerFromUser.isEmpty()) {
+      if (aiCompletionParams.answerFromUser != null
+          && aiCompletionParams.answerFromUser.isEmpty()) {
         return new AiCompletion(
             null, "question", "Do you mean American Football or European Football?");
       }
