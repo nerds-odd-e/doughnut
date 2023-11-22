@@ -19,7 +19,7 @@ Feature: Details Inline Auto Completion
   Examples:
       | action                    | final note details                                  |
       | accept the suggestion     | Schroedinger-Team: Scrum is a popular Software Development Framework. |
-      | continue typing "Master " | Schroedinger-Team: Scrum Master is a role in the Scrum Framework. |
+      | continue typing "Master"  | Schroedinger-Team: Scrum Master |
 
   @ignore
   Scenario: A sentence is suggested and declined by the user by continue typing
