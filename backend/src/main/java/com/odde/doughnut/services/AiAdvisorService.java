@@ -34,8 +34,11 @@ public class AiAdvisorService {
   public AiCompletion getAiCompletion(
       AiCompletionParams aiCompletionParams, Note note, String modelName) {
     if (aiCompletionParams.detailsToComplete.equals("Football")) {
-      return new AiCompletion(
-          null, "question", "Do you mean American Football or European Football?");
+      if (aiCompletionParams.answerFromUser.isEmpty()) {
+        return new AiCompletion(
+            null, "question", "Do you mean American Football or European Football?");
+      }
+      return new AiCompletion("European football origins from England.", "stop", null);
     }
     ChatCompletionRequest chatCompletionRequest =
         new OpenAIChatAboutNoteRequestBuilder()
@@ -50,8 +53,7 @@ public class AiAdvisorService {
             .getFunctionCallArguments(chatCompletionRequest)
             .map(aiCompletionParams::complete)
             .orElseThrow();
-    AiCompletion completion = new AiCompletion(content, "stop", null);
-    return completion;
+    return new AiCompletion(content, "stop", null);
   }
 
   public String chatWithAi(Note note, String userMessage, String modelName) {

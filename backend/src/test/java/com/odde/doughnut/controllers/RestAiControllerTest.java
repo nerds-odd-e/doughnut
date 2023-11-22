@@ -129,6 +129,17 @@ class RestAiControllerTest {
       assertEquals(
           "Do you mean American Football or European Football?", aiCompletion.getQuestion());
     }
+
+    @Test
+    void askCompletionAndUseStopResponseWithQuestionAnswer() {
+      params.detailsToComplete = "Football";
+      params.questionFromAI = "Do you mean American Football or European Football?";
+      params.answerFromUser = "European Football";
+      AiCompletion aiCompletion = controller.getCompletion(note, params);
+      assertEquals("stop", aiCompletion.getFinishReason());
+      assertEquals(
+          "European football origins from England.", aiCompletion.getMoreCompleteContent());
+    }
   }
 
   @Nested
