@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AiCompletionParams {
   public String detailsToComplete = "";
+  public String questionFromAI = "";
+  public String answerFromUser = "";
 
   public String complete(JsonNode jsonNode) {
     try {

@@ -11,6 +11,8 @@ declare namespace Generated {
 
     interface AiCompletionParams {
         detailsToComplete: string;
+        questionFromAI: string;
+        answerFromUser: string;
     }
 
     interface AiGeneratedImage {
