@@ -10,6 +10,7 @@ describe("RichMarkdownEditor", () => {
       .component(RichMarkdownEditor)
       .withProps({
         modelValue: "initial value",
+        noteIde: 3,
       })
       .mount();
 
