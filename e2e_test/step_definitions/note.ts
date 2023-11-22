@@ -326,7 +326,9 @@ When("I type in the details the word {string} followed by a space", (detailsText
   cy.findNoteDetailsOnCurrentPage("").type(detailsText)
 })
 
-When("the note details are {string}", (finalText: string) => {
+Then("the note details are {string}", (detailsText: string) => {
+  cy.findNoteDetailsOnCurrentPage(detailsText)
 })
 When("I continue typing {string}", (additionalText: string) => {
+  cy.findNoteDetailsOnCurrentPage("").type(additionalText)
 })

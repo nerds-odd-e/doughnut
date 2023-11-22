@@ -122,9 +122,6 @@ Then("I see after \"Schroedinger-Team: Scrum \" the suggestion from AI: {string}
   cy.get('.suggestion-text').contains(suggestionString);
 })
 
-Then("I accept the suggestion", () => {
-})
-
 Given(
   "OpenAI assistant will ask the question {string} and generate no note details",
   (question: string) => {
