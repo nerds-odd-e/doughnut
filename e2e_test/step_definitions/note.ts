@@ -282,6 +282,10 @@ Then("the note details on the current page should be {string}", (detailsText: st
   cy.findNoteDetailsOnCurrentPage(detailsText)
 })
 
+When("I accept the AI suggestion", () => {
+  cy.findNoteDetailsOnCurrentPage('').type('{enter}');
+})
+
 When("I generate an image for {string}", (noteTopic: string) => {
   start.jumpToNotePage(noteTopic).aiGenerateImage()
 })
@@ -315,7 +319,7 @@ Then("OpenAI assistant will ask the question {string} and generate no note detai
 })
 
 When("I answer with {string}", (answer: string) => {
-  
+
 })
 
 When("I type in the details the word {string} followed by a space", (detailsText: string) => {

@@ -52,6 +52,11 @@ export default defineComponent({
                 shiftKey: false,
                 handler: this.onSpacePress,
               },
+              enter: {
+                key: 13,
+                shiftKey: false,
+                handler: this.onEnterPress,
+              },
             },
           },
         },
@@ -80,6 +85,9 @@ export default defineComponent({
     },
     onBlurTextField() {
       this.$emit("blur");
+    },
+    onEnterPress() {
+      // accept function
     },
     onSpacePress() {
       const quill = this.$refs.quillEditor as typeof QuillEditor;
