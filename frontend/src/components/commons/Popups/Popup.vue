@@ -20,10 +20,7 @@ export default defineComponent({
   emits: ["popupDone"],
   watch: {
     show() {
-      if (!this.show) {
-        this.popups.done(false);
-        return;
-      }
+      if (!this.show) return;
       this.popups
         .dialog(this.$slots.default, this.sidebar)
         .then((result) => this.$emit("popupDone", result));
