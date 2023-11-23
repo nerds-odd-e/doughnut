@@ -13,6 +13,7 @@ Feature: Details Inline Auto Completion
     Given OpenAI will complete the phrase "Schroedinger-Team: Scrum " with "is a super-dupa popular Software Development Framework."
     Then I see after "Schroedinger-Team: Scrum " the suggestion from AI: "is a super-dupa popular Software Development Framework."
     When I <action>
+    Then the note details are "<final note details>"
     And I continue typing <further word>
     Then the note details are <complete note details>
 
