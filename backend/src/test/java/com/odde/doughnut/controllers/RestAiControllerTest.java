@@ -127,13 +127,13 @@ class RestAiControllerTest {
       AiCompletion aiCompletion = controller.getCompletion(note, params);
       assertEquals("question", aiCompletion.getFinishReason());
       assertEquals(
-          "Do you mean American Football or European Football?", aiCompletion.getQuestion());
+          "Are you referring to American football or association football (soccer)?", aiCompletion.getQuestion());
     }
 
     @Test
     void askCompletionAndUseStopResponseWithQuestionAnswer() {
       params.detailsToComplete = "Football";
-      params.questionFromAI = "Do you mean American Football or European Football?";
+      params.questionFromAI = "Are you referring to American football or association football (soccer)?";
       params.answerFromUser = "European Football";
       AiCompletion aiCompletion = controller.getCompletion(note, params);
       assertEquals("stop", aiCompletion.getFinishReason());
