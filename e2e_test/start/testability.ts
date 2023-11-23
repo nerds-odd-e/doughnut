@@ -1,4 +1,5 @@
 /// <reference types="Cypress" />
+// @ts-check
 import ServiceMocker from "../support/ServiceMocker"
 
 const hourOfDay = (days: number, hours: number) => {
