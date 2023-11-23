@@ -119,8 +119,8 @@ Then("I contest the question", () => {
 })
 
 Then(
-  'I see after "Schroedinger-Team: Scrum " the suggestion from AI: {string}',
-  (suggestionString: string) => {
+  'I see after {string} the suggestion from AI: {string}',
+  (noteDetails: string, suggestionString: string) => {
     cy.get(".suggestion-text").contains(suggestionString)
   },
 )

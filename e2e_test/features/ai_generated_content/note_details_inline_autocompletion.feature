@@ -18,6 +18,6 @@ Feature: Details Inline Auto Completion
     Then the note details are <complete note details>
 
     Examples:
-      | action                   | final note details                                 | further word           | complete note details                                                                       |
-      | accept the AI suggestion | Scrum is a popular Software Development Framework. | " The term comes from" | "Scrum is a popular Software Development Framework." |
-      | continue typing "Master" | Scrum Master                                       | " is"                  | "Scrum Master is"                                                        |
+      | action                   | final note details                                 | further word  | complete note details                                                                       |
+      | accept the AI suggestion | Scrum is a popular Software Development Framework. | "It"          | "Scrum is a popular Software Development Framework." |
+      | continue typing "Master" | Scrum Master                                       | "s"           | "Scrum Masters"                                                        |
