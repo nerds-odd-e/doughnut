@@ -316,6 +316,11 @@ When("I click the Refine button", (noteTopic: string) => {
 
 When("I answer with {string}", (_answer: string) => {})
 
+When("I cancel to the clarifying question {string}", (question: string) => {
+  cy.findNoteDetailsCompletionDialogInput().type(answer)
+  cy.sendCompletionAnswer()
+})
+
 When("I type in the details the word {string} followed by a space", (detailsText: string) => {
   cy.findNoteDetailsOnCurrentPage("").type(detailsText)
 })
