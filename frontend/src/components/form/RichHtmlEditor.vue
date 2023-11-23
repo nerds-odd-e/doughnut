@@ -114,7 +114,7 @@ export default defineComponent({
       if (this.modelValue === "<p>Schroedinger-Team: Scrum</p>") {
         const response = await this.api.ai.aiNoteDetailsCompletion(
           this.noteId,
-          this.simpleText,
+          { detailsToComplete: this.simpleText },
         );
         const fixedSuggestion = response.moreCompleteContent.substring(
           this.simpleText.length - 1,
