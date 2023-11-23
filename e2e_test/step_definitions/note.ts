@@ -283,7 +283,7 @@ Then("the note details on the current page should be {string}", (detailsText: st
 })
 
 When("I accept the AI suggestion", () => {
-  cy.findNoteDetailsOnCurrentPage('').type('{enter}');
+  cy.findNoteDetailsOnCurrentPage("").type("{enter}")
 })
 
 When("I generate an image for {string}", (noteTopic: string) => {
@@ -314,13 +314,12 @@ When("I click the Refine button", (noteTopic: string) => {
   start.jumpToNotePage(noteTopic).refineNoteDetails()
 })
 
-Then("OpenAI assistant will ask the question {string} and generate no note details", (question: string) => {
+Then(
+  "OpenAI assistant will ask the question {string} and generate no note details",
+  (_question: string) => {},
+)
 
-})
-
-When("I answer with {string}", (answer: string) => {
-
-})
+When("I answer with {string}", (_answer: string) => {})
 
 When("I type in the details the word {string} followed by a space", (detailsText: string) => {
   cy.findNoteDetailsOnCurrentPage("").type(detailsText)
