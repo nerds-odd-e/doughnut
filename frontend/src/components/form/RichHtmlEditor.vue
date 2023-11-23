@@ -102,7 +102,9 @@ export default defineComponent({
       if (this.suggestion) {
         const finalText = `<p>${this.simpleText} ${this.suggestion}</p>`;
         quill.setHTML(finalText);
-        setTimeout(() => quill.getQuill().setSelection(quill.getQuill().getLength(), 0));
+        setTimeout(() =>
+          quill.getQuill().setSelection(quill.getQuill().getLength(), 0),
+        );
       } else {
         quill
           .getQuill()
