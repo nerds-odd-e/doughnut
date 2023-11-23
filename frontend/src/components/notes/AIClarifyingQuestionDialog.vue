@@ -20,8 +20,8 @@ import asPopup from "../commons/Popups/asPopup";
 export default {
   setup() {
     return {
-      ...asPopup()
-    }
+      ...asPopup(),
+    };
   },
   props: {
     question: String,
