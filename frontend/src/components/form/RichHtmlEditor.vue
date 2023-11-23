@@ -143,6 +143,7 @@ export default defineComponent({
 
 .editor
   position: relative
+  padding-bottom: 40px
 .suggestion
   position: absolute
   top: 0
