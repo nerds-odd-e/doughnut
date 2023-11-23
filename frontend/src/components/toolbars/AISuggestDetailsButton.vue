@@ -3,7 +3,7 @@
     :title="'suggest details'"
     class="btn btn-sm"
     role="button"
-    @click="suggestDetails(selectedNote.details)"
+    @click="suggestDetails({ detailsToComplete: selectedNote.details })"
   >
     <SvgRobot />
     <Popup
@@ -12,7 +12,14 @@
     >
       <AIClarifyingQuestionDialog
         :question="clarificationQuestion"
-        @submit="handleClarificationAnswerSubmit"
+        @submit="
+          (clarificationAnswer) =>
+            suggestDetails({
+              detailsToComplete: selectedNote.details,
+              questionFromAI: clarificationQuestion,
+              answerFromUser: clarificationAnswer,
+            })
+        "
       />
     </Popup>
   </a>
@@ -54,10 +61,11 @@ export default defineComponent({
     };
   },
   methods: {
-    async suggestDetails(prev?: string) {
+    async suggestDetails(data: Generated.AiCompletionParams) {
       const { moreCompleteContent: details, ...response } =
         await this.api.ai.aiNoteDetailsCompletion(this.selectedNote.id, {
-          detailsToComplete: prev || "",
+          detailsToComplete: data?.detailsToComplete || "",
+          ...data,
         });
 
       if (this.isUnmounted) return;
@@ -66,28 +74,6 @@ export default defineComponent({
         this.clarificationQuestion = response.question;
         return;
       }
-
-      this.storageAccessor.api(this.$router).updateTextContent(
-        this.selectedNote.id,
-        {
-          topic: this.selectedNote.topic,
-          details,
-        },
-        {
-          topic: this.selectedNote.topic,
-          details: this.selectedNote.details,
-        },
-      );
-    },
-    async handleClarificationAnswerSubmit(answerToAI: string) {
-      const { moreCompleteContent: details } =
-        await this.api.ai.aiNoteDetailsCompletion(this.selectedNote.id, {
-          detailsToComplete: this.selectedNote.details,
-          answerFromUser: answerToAI,
-          questionFromAI: this.clarificationQuestion,
-        });
-
-      this.clarificationQuestion = "";
 
       this.storageAccessor.api(this.$router).updateTextContent(
         this.selectedNote.id,
