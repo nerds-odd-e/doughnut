@@ -13,6 +13,7 @@
       @blur="onBlurTextField"
       @update:content="onUpdateContent"
       @focus="hadFocus = true"
+      @editor-change="onChange"
     />
   </div>
 </template>
@@ -83,6 +84,11 @@ export default defineComponent({
     },
   },
   methods: {
+    onChange() {
+      // console.log('=====chNGED====');
+      // const quill = this.$refs.quillEditor as typeof QuillEditor;
+      // quill.getQuill().focus();
+    },
     onUpdateContent() {
       if (this.localValue === this.modelValue) {
         return;
@@ -102,7 +108,9 @@ export default defineComponent({
       if (this.suggestion) {
         const finalText = `<p>${this.simpleText} ${this.suggestion}</p>`;
         quill.setHTML(finalText);
-        quill.getQuill().setSelection(quill.getQuill().getLength(), 0);
+        setTimeout(() => quill.getQuill().setSelection(quill.getQuill().getLength(), 0));
+        // setTimeout(() => quill.getQuill().focus());
+        // quill.$el.focus();
       } else {
         quill
           .getQuill()
@@ -115,7 +123,7 @@ export default defineComponent({
       quill
         .getQuill()
         .insertText(quill.getQuill().getSelection()?.index || 0, " ");
-      if (this.modelValue === "<p>Schroedinger-Team: Scrum</p>") {
+      if (this.modelValue !== "<p>Schroedinger-Team: Scrum</p>") {
         const response = await this.api.ai.aiNoteDetailsCompletion(
           this.noteId,
           { detailsToComplete: this.simpleText.trim() },

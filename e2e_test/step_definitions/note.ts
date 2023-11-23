@@ -333,5 +333,5 @@ Then("the note details are {string}", (detailsText: string) => {
   cy.findNoteDetailsOnCurrentPage(detailsText)
 })
 When("I continue typing {string}", (additionalText: string) => {
-  cy.findNoteDetailsOnCurrentPage("").type(additionalText)
+  cy.focused().type(additionalText)
 })
