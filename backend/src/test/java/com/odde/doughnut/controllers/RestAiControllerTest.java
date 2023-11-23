@@ -67,7 +67,7 @@ class RestAiControllerTest {
     void setup() {
       openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
-          "complete_note_details", new NoteDetailsCompletion("blue planet"));
+        new NoteDetailsCompletion("blue planet"));
     }
 
     @Test
@@ -131,7 +131,7 @@ class RestAiControllerTest {
     void setup() {
       openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
-          "complete_note_details", new NoteDetailsCompletion("blue planet"));
+        new NoteDetailsCompletion("blue planet"));
     }
 
     @Test

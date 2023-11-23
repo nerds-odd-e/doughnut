@@ -9,13 +9,13 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 public record OpenAIChatCompletionMock(OpenAiApi openAiApi) {
-  public void mockChatCompletionAndReturnFunctionCall(String functionName, Object result) {
+  public void mockChatCompletionAndReturnFunctionCall(Object result) {
     mockChatCompletionAndReturnFunctionCallJsonNode(
-        functionName, new ObjectMapper().valueToTree(result));
+      new ObjectMapper().valueToTree(result));
   }
 
   public void mockChatCompletionAndReturnFunctionCallJsonNode(
-      String functionName, JsonNode arguments) {
+      JsonNode arguments) {
     MakeMeWithoutDB makeMe = MakeMe.makeMeWithoutFactoryService();
     mockChatCompletion(makeMe.openAiCompletionResult().functionCall("", arguments).please());
   }
