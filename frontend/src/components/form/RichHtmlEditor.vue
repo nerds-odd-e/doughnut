@@ -152,6 +152,7 @@ export default defineComponent({
   color: grey
   line-height: 1.42
   word-wrap: break-word
+  font-family: Helvetica, Arial, sans-serif
 .suggestion-local
   color: transparent
   pointer-events: none
