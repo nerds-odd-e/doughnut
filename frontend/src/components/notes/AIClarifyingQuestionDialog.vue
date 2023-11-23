@@ -9,7 +9,12 @@
       v-model="answerToAI"
       v-focus
     />
-    <input type="submit" value="Send" class="btn btn-primary" />
+    <input
+      type="submit"
+      value="Send"
+      class="btn btn-primary"
+      data-cy="submit-answer"
+    />
   </form>
 </template>
 
