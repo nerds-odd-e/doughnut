@@ -37,7 +37,9 @@ public class AiAdvisorService {
       if (aiCompletionParams.answerFromUser == null
           || aiCompletionParams.answerFromUser.isEmpty()) {
         return new AiCompletion(
-            null, "question", "Are you referring to American football or association football (soccer)?");
+            null,
+            "question",
+            "Are you referring to American football or association football (soccer)?");
       }
       return new AiCompletion("European football origins from England.", "stop", null);
     }
