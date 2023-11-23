@@ -41,7 +41,12 @@ public class AiAdvisorService {
             "question",
             "Are you referring to American football or association football (soccer)?");
       }
-      return new AiCompletion("European football origins from England.", "stop", null);
+      if (aiCompletionParams.answerFromUser.equals("American")) {
+        return new AiCompletion("American football origins from the USA.", "stop", null);
+      }
+      else {
+        return new AiCompletion("European football origins from England.", "stop", null);
+      }
     }
     ChatCompletionRequest chatCompletionRequest =
         new OpenAIChatAboutNoteRequestBuilder()
