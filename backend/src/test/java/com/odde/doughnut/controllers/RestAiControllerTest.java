@@ -12,6 +12,7 @@ import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.ai.ClarifyingQuestion;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
@@ -131,7 +132,7 @@ class RestAiControllerTest {
     void setup() {
       openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
-        new NoteDetailsCompletion("blue planet"));
+        new ClarifyingQuestion("Are you referring to American football or association football (soccer)?"));
     }
 
     @Test
