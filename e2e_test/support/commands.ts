@@ -364,6 +364,14 @@ Cypress.Commands.add("findNoteDetailsOnCurrentPage", (expected: string) => {
   expected.split("\\n").forEach((line) => cy.get("[role=details]").should("contain", line))
 })
 
+Cypress.Commands.add("findNoteDetailsCompletionDialogInput", () => {
+  cy.get("[id=note-answerToAI]").should("exist").should('be.visible')
+})
+
+Cypress.Commands.add("sendCompletionAnswer", () => {
+  cy.get('[data-cy="submit-answer"]').click()
+})
+
 Cypress.Commands.add("findCardTitle", (topic) => cy.findByText(topic, { selector: "a.card-title" }))
 
 Cypress.Commands.add("yesIRemember", () => {
