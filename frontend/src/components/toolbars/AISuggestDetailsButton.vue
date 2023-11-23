@@ -64,8 +64,8 @@ export default defineComponent({
     async suggestDetails(data: Generated.AiCompletionParams) {
       const { moreCompleteContent: details, ...response } =
         await this.api.ai.aiNoteDetailsCompletion(this.selectedNote.id, {
-          detailsToComplete: data?.detailsToComplete || "",
           ...data,
+          detailsToComplete: data?.detailsToComplete || "",
         });
 
       if (this.isUnmounted) return;
