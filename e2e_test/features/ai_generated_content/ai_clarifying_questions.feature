@@ -1,7 +1,6 @@
 Feature: AI asks clarifying questions when auto-generating note details
   To have better auto-generated note details, I want to answer clarifying questions from the AI.
 
-  @ignore
   @usingMockedOpenAiService
   Scenario Outline: User supplies an answer to a clarifying question
     Given I am logged in as an existing user
@@ -19,5 +18,5 @@ Feature: AI asks clarifying questions when auto-generating note details
         | react                   | note details                                    | 
         | answer with "European"  | European football origins from England.         |
         | answer with "American"  | American football origins from the USA.         |
-        | cancel                  | Football                                        |
+        #| cancel                  | Football                                        |
 
