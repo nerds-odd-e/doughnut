@@ -37,9 +37,9 @@ repositories {
 dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
   implementation 'org.springframework.boot:spring-boot-starter-web'
-  implementation 'org.flywaydb:flyway-mysql:9.22.3'
-  implementation 'com.fasterxml.jackson.module:jackson-module-jsonSchema:2.15.3'
-  compileOnly 'org.flywaydb:flyway-core:9.22.3'
+  implementation 'org.flywaydb:flyway-mysql'
+  implementation 'com.fasterxml.jackson.module:jackson-module-jsonSchema:2.15.2'
+  compileOnly 'org.flywaydb:flyway-core'
   implementation 'org.springframework.session:spring-session-core'
   implementation 'org.springframework.boot:spring-boot-starter-validation'
   implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
