@@ -36,10 +36,13 @@ public class OpenAiApiHandler {
   }
 
   public Optional<JsonNode> getFunctionCallArguments(ChatCompletionRequest chatRequest) {
+    return getFunctionCall(chatRequest).map(ChatFunctionCall::getArguments);
+  }
+
+  public Optional<ChatFunctionCall> getFunctionCall(ChatCompletionRequest chatRequest) {
     return chatCompletion(chatRequest)
         .map(ChatCompletionChoice::getMessage)
-        .map(ChatMessage::getFunctionCall)
-        .map(ChatFunctionCall::getArguments);
+        .map(ChatMessage::getFunctionCall);
   }
 
   public Optional<ChatCompletionChoice> chatCompletion(ChatCompletionRequest request) {
