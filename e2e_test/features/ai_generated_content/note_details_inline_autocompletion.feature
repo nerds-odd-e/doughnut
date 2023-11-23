@@ -20,5 +20,5 @@ Feature: Details Inline Auto Completion
 
     Examples:
       | action                   | final note details                                                    | further word           | complete note details                                                                       |
-      | accept the AI suggestion | Schroedinger-Team: Scrum is a popular Software Development Framework. | " The term comes from" | "Schroedinger-Team: Scrum is a popular Software Development Framework. The term comes from" |
+      | accept the AI suggestion | Schroedinger-Team: Scrum is a popular Software Development Framework. | " The term comes from" | "Schroedinger-Team: Scrum is a popular Software Development Framework." |
       | continue typing "Master" | Schroedinger-Team: Scrum Master                                       | " is"                  | "Schroedinger-Team: Scrum Master is"                                                        |

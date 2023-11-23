@@ -5,6 +5,7 @@
       <span class="suggestion-text">{{ suggestion }}</span>
     </p>
     <QuillEditor
+      class="quill-editor"
       ref="quillEditor"
       v-model:content="localValue"
       :options="editorOptions"
@@ -130,7 +131,7 @@ export default defineComponent({
 
 <style lang="sass">
 .ql-editor
-  padding: 0
+  padding: 0 0 40px 0
   margin-bottom: 15px
   &::before
     left: 0 !important
@@ -143,7 +144,7 @@ export default defineComponent({
 
 .editor
   position: relative
-  padding-bottom: 40px
+
 .suggestion
   position: absolute
   top: 0
