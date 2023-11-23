@@ -8,11 +8,11 @@ buildscript {
 }
 
 plugins {
-  id 'org.springframework.boot' version '2.7.17'
+  id 'org.springframework.boot' version '2.7.18'
   id 'io.spring.dependency-management' version '1.1.0'
   id 'java'
   // Spotless for the code style
-  id "com.diffplug.spotless" version "6.21.0"
+  id "com.diffplug.spotless" version "6.22.0"
 }
 
 apply plugin: 'cz.habarta.typescript-generator'
@@ -38,14 +38,14 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation 'org.flywaydb:flyway-mysql'
-  implementation 'com.fasterxml.jackson.module:jackson-module-jsonSchema:2.15.2'
+  implementation 'com.fasterxml.jackson.module:jackson-module-jsonSchema:2.16.0'
   compileOnly 'org.flywaydb:flyway-core'
   implementation 'org.springframework.session:spring-session-core'
   implementation 'org.springframework.boot:spring-boot-starter-validation'
   implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
   implementation 'org.springframework.boot:spring-boot-starter-security'
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-  implementation 'com.theokanning.openai-gpt3-java:service:0.16.0'
+  implementation 'com.theokanning.openai-gpt3-java:service:0.16.1'
   implementation 'com.squareup.retrofit2:adapter-rxjava2:2.9.0'
   implementation 'com.squareup.retrofit2:converter-jackson:2.9.0'
   implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
