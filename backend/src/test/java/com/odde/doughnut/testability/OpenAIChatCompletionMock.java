@@ -10,12 +10,10 @@ import org.mockito.Mockito;
 
 public record OpenAIChatCompletionMock(OpenAiApi openAiApi) {
   public void mockChatCompletionAndReturnFunctionCall(Object result) {
-    mockChatCompletionAndReturnFunctionCallJsonNode(
-      new ObjectMapper().valueToTree(result));
+    mockChatCompletionAndReturnFunctionCallJsonNode(new ObjectMapper().valueToTree(result));
   }
 
-  public void mockChatCompletionAndReturnFunctionCallJsonNode(
-      JsonNode arguments) {
+  public void mockChatCompletionAndReturnFunctionCallJsonNode(JsonNode arguments) {
     MakeMeWithoutDB makeMe = MakeMe.makeMeWithoutFactoryService();
     mockChatCompletion(makeMe.openAiCompletionResult().functionCall("", arguments).please());
   }
