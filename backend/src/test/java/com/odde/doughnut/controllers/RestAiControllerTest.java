@@ -68,7 +68,7 @@ class RestAiControllerTest {
     void setup() {
       openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
-        new NoteDetailsCompletion("blue planet"));
+          new NoteDetailsCompletion("blue planet"));
     }
 
     @Test
@@ -132,7 +132,8 @@ class RestAiControllerTest {
     void setup() {
       openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
-        new ClarifyingQuestion("Are you referring to American football or association football (soccer)?"));
+          new ClarifyingQuestion(
+              "Are you referring to American football or association football (soccer)?"));
     }
 
     @Test

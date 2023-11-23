@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ClarifyingQuestion {
 
-  @JsonPropertyDescription(
-      "content of the question as plain string.")
+  @JsonPropertyDescription("content of the question as plain string.")
   @JsonProperty(required = true)
   public String question;
 }
