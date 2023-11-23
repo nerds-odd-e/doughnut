@@ -115,18 +115,14 @@ export default defineComponent({
       quill
         .getQuill()
         .insertText(quill.getQuill().getSelection()?.index || 0, " ");
-      if (this.modelValue === "<p>Schroedinger-Team: Scrum</p>") {
-        const response = await this.api.ai.aiNoteDetailsCompletion(
-          this.noteId,
-          { detailsToComplete: this.simpleText.trim() },
-        );
-        const fixedSuggestion = response.moreCompleteContent.substring(
-          this.simpleText.length - 1,
-        );
-        this.suggestion = fixedSuggestion;
-      } else {
-        this.suggestion = "";
-      }
+
+      const response = await this.api.ai.aiNoteDetailsCompletion(this.noteId, {
+        detailsToComplete: this.simpleText.trim(),
+      });
+      const fixedSuggestion = response.moreCompleteContent.substring(
+        this.simpleText.length - 1,
+      );
+      this.suggestion = fixedSuggestion;
     },
   },
 });
