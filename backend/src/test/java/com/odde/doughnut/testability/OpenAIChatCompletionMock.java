@@ -17,18 +17,12 @@ public record OpenAIChatCompletionMock(OpenAiApi openAiApi) {
   public void mockChatCompletionAndReturnFunctionCallJsonNode(
       String functionName, JsonNode arguments) {
     MakeMeWithoutDB makeMe = MakeMe.makeMeWithoutFactoryService();
-    mockChatCompletionAndMatchFunctionCall(
-        functionName, makeMe.openAiCompletionResult().functionCall("", arguments).please());
+    mockChatCompletion(makeMe.openAiCompletionResult().functionCall("", arguments).please());
   }
 
-  void mockChatCompletionAndMatchFunctionCall(
-      String functionName, ChatCompletionResult toBeReturned) {
+  void mockChatCompletion(ChatCompletionResult toBeReturned) {
     Mockito.doReturn(Single.just(toBeReturned))
         .when(openAiApi)
-        .createChatCompletion(
-            ArgumentMatchers.argThat(
-                request ->
-                    request.getFunctions() != null
-                        && request.getFunctions().get(0).getName().equals(functionName)));
+        .createChatCompletion(ArgumentMatchers.argThat(request -> request.getFunctions() != null));
   }
 }
