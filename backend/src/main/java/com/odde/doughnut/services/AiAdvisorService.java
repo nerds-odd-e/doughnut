@@ -43,8 +43,7 @@ public class AiAdvisorService {
       }
       if (aiCompletionParams.answerFromUser.equals("American")) {
         return new AiCompletion("American football origins from the USA.", "stop", null);
-      }
-      else {
+      } else {
         return new AiCompletion("European football origins from England.", "stop", null);
       }
     }
