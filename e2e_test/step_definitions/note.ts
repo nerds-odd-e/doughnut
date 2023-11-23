@@ -314,7 +314,7 @@ When("I click the Refine button", (noteTopic: string) => {
   start.jumpToNotePage(noteTopic).refineNoteDetails()
 })
 
-When("I answer with {string} to the clarifying question {string}", (answer: string, question: string) => {
+When("I answer with {string} to the clarifying question {string}", (answer: string) => {
   cy.findNoteDetailsCompletionDialogInput().type(answer)
   cy.sendCompletionAnswer()
 })
@@ -323,9 +323,7 @@ Then("The clarification question dialog is invisible", () => {
   cy.noteDetailsCompletionDialogInputInvisible()
 })
 
-When("I cancel to the clarifying question {string}", (question: string) => {
-  
-})
+When("I cancel to the clarifying question {string}", () => {})
 
 When("I type in the details the word {string} followed by a space", (detailsText: string) => {
   cy.findNoteDetailsOnCurrentPage("").type(detailsText)
