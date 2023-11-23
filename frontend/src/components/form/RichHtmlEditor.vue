@@ -116,7 +116,10 @@ export default defineComponent({
           this.noteId,
           this.simpleText,
         );
-        this.suggestion = response.moreCompleteContent;
+        const fixedSuggestion = response.moreCompleteContent.substring(
+          this.simpleText.length - 1,
+        );
+        this.suggestion = fixedSuggestion;
       } else {
         this.suggestion = "";
       }
