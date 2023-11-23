@@ -87,6 +87,8 @@ export default defineComponent({
           questionFromAI: this.clarificationQuestion,
         });
 
+      this.clarificationQuestion = "";
+
       this.storageAccessor.api(this.$router).updateTextContent(
         this.selectedNote.id,
         {
