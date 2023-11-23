@@ -79,8 +79,6 @@ export default defineComponent({
   watch: {
     modelValue() {
       this.localValue = this.modelValue;
-      const quill = this.$refs.quillEditor as typeof QuillEditor;
-      this.simpleText = quill.getText();
       this.suggestion = "";
     },
   },
@@ -93,6 +91,10 @@ export default defineComponent({
     },
     onBlurTextField() {
       this.$emit("blur");
+    },
+    setSimpleText() {
+      const quill = this.$refs.quillEditor as typeof QuillEditor;
+      this.simpleText = quill.getText();
     },
     onEnterPress() {
       const quill = this.$refs.quillEditor as typeof QuillEditor;
@@ -108,6 +110,7 @@ export default defineComponent({
       }
     },
     async onSpacePress() {
+      this.setSimpleText();
       const quill = this.$refs.quillEditor as typeof QuillEditor;
       quill
         .getQuill()
