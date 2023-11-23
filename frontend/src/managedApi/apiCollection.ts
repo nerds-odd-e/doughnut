@@ -361,11 +361,12 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
     async aiNoteDetailsCompletion(
       noteId: Doughnut.ID,
-      prev?: string,
+      data?: Generated.AiCompletionParams,
     ): Promise<Generated.AiCompletion> {
       const res = await this.askAiCompletion(
         {
-          detailsToComplete: prev ?? "",
+          ...(data || {}),
+          detailsToComplete: data?.detailsToComplete || "",
         },
         noteId,
       );

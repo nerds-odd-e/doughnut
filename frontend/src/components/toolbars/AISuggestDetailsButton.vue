@@ -10,7 +10,10 @@
       :show="!!clarificationQuestion"
       @popup-done="clarificationQuestion = ''"
     >
-      <AIClarifyingQuestionDialog :question="clarificationQuestion" />
+      <AIClarifyingQuestionDialog
+        :question="clarificationQuestion"
+        @submit="handleClarificationAnswerSubmit"
+      />
     </Popup>
   </a>
 </template>
@@ -53,7 +56,9 @@ export default defineComponent({
   methods: {
     async suggestDetails(prev?: string) {
       const { moreCompleteContent: details, ...response } =
-        await this.api.ai.aiNoteDetailsCompletion(this.selectedNote.id, prev);
+        await this.api.ai.aiNoteDetailsCompletion(this.selectedNote.id, {
+          detailsToComplete: prev || "",
+        });
 
       if (this.isUnmounted) return;
 
@@ -61,6 +66,26 @@ export default defineComponent({
         this.clarificationQuestion = response.question;
         return;
       }
+
+      this.storageAccessor.api(this.$router).updateTextContent(
+        this.selectedNote.id,
+        {
+          topic: this.selectedNote.topic,
+          details,
+        },
+        {
+          topic: this.selectedNote.topic,
+          details: this.selectedNote.details,
+        },
+      );
+    },
+    async handleClarificationAnswerSubmit(answerToAI: string) {
+      const { moreCompleteContent: details } =
+        await this.api.ai.aiNoteDetailsCompletion(this.selectedNote.id, {
+          detailsToComplete: this.selectedNote.details,
+          answerFromUser: answerToAI,
+          questionFromAI: this.clarificationQuestion,
+        });
 
       this.storageAccessor.api(this.$router).updateTextContent(
         this.selectedNote.id,

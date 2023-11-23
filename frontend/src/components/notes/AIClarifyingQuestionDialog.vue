@@ -1,5 +1,5 @@
 <template>
-  <form>
+  <form @submit.prevent="handleFormSubmit">
     <h3>
       Clarification question by the AI: <strong>{{ question }}</strong>
     </h3>
@@ -21,12 +21,17 @@ export default {
     question: String,
   },
   components: { TextInput },
+  emits: ["submit"],
   data() {
     return {
       answerToAI: "",
     };
   },
-  methods: {},
+  methods: {
+    handleFormSubmit() {
+      this.$emit("submit", this.answerToAI);
+    },
+  },
 };
 </script>
 
