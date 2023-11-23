@@ -323,7 +323,9 @@ Then("The clarification question dialog is invisible", () => {
   cy.noteDetailsCompletionDialogInputInvisible()
 })
 
-When("I cancel to the clarifying question {string}", () => {})
+When("I cancel to the clarifying question {string}", () => {
+  cy.closePopup()
+})
 
 When("I type in the details the word {string} followed by a space", (detailsText: string) => {
   cy.findNoteDetailsOnCurrentPage("").type(detailsText)

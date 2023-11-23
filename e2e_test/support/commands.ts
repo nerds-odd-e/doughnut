@@ -368,6 +368,10 @@ Cypress.Commands.add("findNoteDetailsCompletionDialogInput", () => {
   cy.get("[id=note-answerToAI]").should("exist").should("be.visible")
 })
 
+Cypress.Commands.add("closePopup", () => {
+  cy.get("button.close-button").click()
+})
+
 Cypress.Commands.add("noteDetailsCompletionDialogInputInvisible", () => {
   cy.get("[id=note-answerToAI]").should("not.exist")
 })
