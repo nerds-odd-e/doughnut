@@ -121,6 +121,7 @@ class RestAiControllerTest {
       assertEquals("stop", aiCompletion.getFinishReason());
     }
   }
+
   @Nested
   class CompleteNoteDetailWithClarifyingQuestion {
 
@@ -130,7 +131,7 @@ class RestAiControllerTest {
     void setup() {
       openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
-        "complete_note_details", new NoteDetailsCompletion("blue planet"));
+          "complete_note_details", new NoteDetailsCompletion("blue planet"));
     }
 
     @Test
@@ -139,24 +140,23 @@ class RestAiControllerTest {
       AiCompletion aiCompletion = controller.getCompletion(note, params);
       assertEquals("question", aiCompletion.getFinishReason());
       assertEquals(
-        "Are you referring to American football or association football (soccer)?",
-        aiCompletion.getQuestion());
+          "Are you referring to American football or association football (soccer)?",
+          aiCompletion.getQuestion());
     }
 
     @Test
     void askCompletionAndUseStopResponseWithQuestionAnswer() {
       params.detailsToComplete = "Football";
       params.questionFromAI =
-        "Are you referring to American football or association football (soccer)?";
+          "Are you referring to American football or association football (soccer)?";
       params.answerFromUser = "European Football";
       AiCompletion aiCompletion = controller.getCompletion(note, params);
       assertEquals("stop", aiCompletion.getFinishReason());
       assertEquals(
-        "European football origins from England.", aiCompletion.getMoreCompleteContent());
+          "European football origins from England.", aiCompletion.getMoreCompleteContent());
     }
-
-
   }
+
   @Nested
   class AskEngagingStory {
     Note aNote;
