@@ -314,11 +314,6 @@ When("I click the Refine button", (noteTopic: string) => {
   start.jumpToNotePage(noteTopic).refineNoteDetails()
 })
 
-Then(
-  "OpenAI assistant will ask the question {string} and generate no note details",
-  (_question: string) => {},
-)
-
 When("I answer with {string}", (_answer: string) => {})
 
 When("I type in the details the word {string} followed by a space", (detailsText: string) => {
