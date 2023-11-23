@@ -96,15 +96,13 @@ export default defineComponent({
       const quill = this.$refs.quillEditor as typeof QuillEditor;
       this.simpleText = quill.getText();
     },
-    onEnterPress() {
+    async onEnterPress() {
       const quill = this.$refs.quillEditor as typeof QuillEditor;
 
       if (this.suggestion) {
         const finalText = `<p>${this.simpleText} ${this.suggestion}</p>`;
-        quill.setHTML(finalText);
-        setTimeout(() =>
-          quill.getQuill().setSelection(quill.getQuill().getLength(), 0),
-        );
+        await quill.setHTML(finalText);
+        quill.getQuill().setSelection(quill.getQuill().getLength(), 0);
       } else {
         quill
           .getQuill()
