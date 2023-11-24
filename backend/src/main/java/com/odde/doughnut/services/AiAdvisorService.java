@@ -9,6 +9,7 @@ import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import com.theokanning.openai.completion.chat.ChatFunctionCall;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,11 +57,16 @@ public class AiAdvisorService {
                 aiCompletionParams, aiCompletionParams.detailsToComplete.equals("Football "))
             .maxTokens(150)
             .build();
-    String content =
-        openAiApiHandler
-            .getFunctionCallArguments(chatCompletionRequest)
-            .map(aiCompletionParams::complete)
-            .orElseThrow();
+    ChatFunctionCall chatFunctionCall =
+        openAiApiHandler.getFunctionCall(chatCompletionRequest).orElseThrow();
+    boolean isClarifyingQuestion = chatFunctionCall.getName().equals("clarifying_question");
+    String content = aiCompletionParams.complete(chatFunctionCall.getArguments());
+    if (isClarifyingQuestion) {
+      return new AiCompletion(
+          null,
+          "question",
+          "Are you referring to American football or association football (soccer)?");
+    }
     return new AiCompletion(content, "stop", null);
   }
 
