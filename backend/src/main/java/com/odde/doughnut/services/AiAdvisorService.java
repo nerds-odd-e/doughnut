@@ -52,7 +52,8 @@ public class AiAdvisorService {
             .model(modelName)
             .systemBrief()
             .contentOfNoteOfCurrentFocus(note)
-            .instructionForDetailsCompletion(aiCompletionParams)
+            .instructionForDetailsCompletion(
+                aiCompletionParams, aiCompletionParams.detailsToComplete.equals("Football "))
             .maxTokens(150)
             .build();
     String content =
