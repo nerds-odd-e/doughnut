@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "target": "es2022",
+    "esModuleInterop": true,
+    "useDefineForClassFields": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "isolatedModules": true,
+    "noImplicitAny": false,
+  },
+  "exclude": [
+    "backend/build/**/*.js",
+    "backend/src/main/resources/static/assets/*.js",
+    "frontend/tests/setupVitest.js"
+  ],
+}
