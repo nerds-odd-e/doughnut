@@ -56,7 +56,7 @@ class AiAdvisorServiceTest {
     @Test
     void getAiSuggestion_givenAString_returnsAiSuggestionObject() {
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
-          new NoteDetailsCompletion(" must come down"));
+          new NoteDetailsCompletion(" must come down"), "");
       assertEquals("what goes up must come down", getAiCompletionFromAdvisor("what goes up"));
     }
 

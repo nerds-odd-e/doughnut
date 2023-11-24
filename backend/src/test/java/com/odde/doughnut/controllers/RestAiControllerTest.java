@@ -69,7 +69,7 @@ class RestAiControllerTest {
     void setup() {
       openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
-          new NoteDetailsCompletion("blue planet"));
+          new NoteDetailsCompletion("blue planet"), "");
     }
 
     @Test
@@ -131,15 +131,13 @@ class RestAiControllerTest {
     OpenAIChatCompletionMock openAIChatCompletionMock;
 
     @BeforeEach
-    void setup() {
-      openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
-      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
-          new ClarifyingQuestion(
-              "Are you referring to American football or association football (soccer)?"));
-    }
+    void setup() {}
 
     @Test
     void askCompletionAndWithTwoFunctions() {
+      openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
+      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
+          new ClarifyingQuestion("content not tested"), "");
       params.detailsToComplete = "Football ";
       controller.getCompletion(note, params);
 
@@ -151,7 +149,12 @@ class RestAiControllerTest {
 
     @Test
     void askCompletionAndUseQuestionResponse() {
-      params.detailsToComplete = "Football";
+      openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
+      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
+          new ClarifyingQuestion(
+              "Are you referring to American football or association football (soccer)?"),
+          "clarifying_question");
+      params.detailsToComplete = "Football ";
       AiCompletion aiCompletion = controller.getCompletion(note, params);
       assertEquals("question", aiCompletion.getFinishReason());
       assertEquals(
