@@ -63,9 +63,7 @@ public class AiAdvisorService {
     String content = aiCompletionParams.complete(chatFunctionCall.getArguments());
     if (isClarifyingQuestion) {
       return new AiCompletion(
-          null,
-          "question",
-          "Are you referring to American football or association football (soccer)?");
+          null, "question", aiCompletionParams.clarifyingQuestion(chatFunctionCall.getArguments()));
     }
     return new AiCompletion(content, "stop", null);
   }
