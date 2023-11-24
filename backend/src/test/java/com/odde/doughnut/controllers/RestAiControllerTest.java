@@ -152,13 +152,13 @@ class RestAiControllerTest {
       openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
           new ClarifyingQuestion(
-              "Are you referring to American football or association football (soccer)?"),
+              "Are you referring to American football or association football (soccer) ?"),
           "clarifying_question");
       params.detailsToComplete = "Football ";
       AiCompletion aiCompletion = controller.getCompletion(note, params);
       assertEquals("question", aiCompletion.getFinishReason());
       assertEquals(
-          "Are you referring to American football or association football (soccer)?",
+          "Are you referring to American football or association football (soccer) ?",
           aiCompletion.getQuestion());
     }
 
