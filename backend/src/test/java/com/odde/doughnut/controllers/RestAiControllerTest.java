@@ -19,6 +19,7 @@ import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.OpenAiApi;
 import com.theokanning.openai.OpenAiResponse;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import com.theokanning.openai.completion.chat.ChatFunction;
 import com.theokanning.openai.image.Image;
 import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.model.Model;
@@ -125,7 +126,8 @@ class RestAiControllerTest {
 
   @Nested
   class CompleteNoteDetailWithClarifyingQuestion {
-
+    ArgumentCaptor<ChatCompletionRequest> captor =
+        ArgumentCaptor.forClass(ChatCompletionRequest.class);
     OpenAIChatCompletionMock openAIChatCompletionMock;
 
     @BeforeEach
@@ -134,6 +136,17 @@ class RestAiControllerTest {
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
           new ClarifyingQuestion(
               "Are you referring to American football or association football (soccer)?"));
+    }
+
+    @Test
+    void askCompletionAndWithTwoFunctions() {
+      params.detailsToComplete = "Football ";
+      controller.getCompletion(note, params);
+
+      verify(openAiApi).createChatCompletion(captor.capture());
+      assertEquals(2, captor.getValue().getFunctions().size());
+      assertThat(captor.getValue().getFunctions().stream().map(ChatFunction::getName))
+          .contains("complete_note_details", "clarifying_question");
     }
 
     @Test
