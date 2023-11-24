@@ -1,12 +1,9 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "sourceMap": true,
-    "target": "es2022",
-    "moduleResolution": "node16",
     "module": "NodeNext",
-    "esModuleInterop": true,
-    "strict": true,
-    "allowJs": true,
+    "moduleResolution": "node16",
+    "baseUrl": "./",
     "lib": [
       "es2022",
       "dom",
@@ -26,9 +23,6 @@
       "@badeball/cypress-cucumber-preprocessor",
       "./support"
     ],
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "baseUrl": "."
   },
   "exclude": [
     "cypress.config.ts",

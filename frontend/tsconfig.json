@@ -1,42 +1,27 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "target": "es2022",
     "module": "ESNext",
     "moduleResolution": "Node",
+    "jsx": "preserve",
+    "resolveJsonModule": true,
+    "baseUrl": "./",
+    "lib": [
+      "es2022",
+      "dom",
+      "dom.iterable"
+    ],
     "types": [
       "vite/client",
       "vitest/globals",
       "vitest-dom/extend-expect",
       "node"
     ],
-    "useDefineForClassFields": true,
-    "strict": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "jsx": "preserve",
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
-    "isolatedModules": true,
-    "noImplicitAny": false,
-    "baseUrl": "./",
     "paths": {
       "@/*": [
         "src/*"
       ]
     },
-    "lib": [
-      "es2022",
-      "dom",
-      "dom.iterable"
-    ]
   },
   "compileOnSave": true,
   "typeAcquisition": {
