@@ -125,8 +125,9 @@ Then(
   },
 )
 
+
 Given(
-  "OpenAI assistant will ask the question {string} and generate no note details",
+  "OpenAI assistant will ask the clarifying question {string} for any completion request",
   (question: string) => {
     mock_services
       .openAi()

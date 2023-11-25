@@ -372,10 +372,6 @@ Cypress.Commands.add("closePopup", () => {
   cy.get("button.close-button").click()
 })
 
-Cypress.Commands.add("noteDetailsCompletionDialogInputInvisible", () => {
-  cy.get("[id=note-answerToAI]").should("not.exist")
-})
-
 Cypress.Commands.add("sendCompletionAnswer", () => {
   cy.get('[data-cy="submit-answer"]').click()
 })
