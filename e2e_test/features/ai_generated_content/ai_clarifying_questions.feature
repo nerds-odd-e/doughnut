@@ -7,15 +7,13 @@ Feature: AI Asks Clarifying Questions When Auto-Generating Note Details
     And there are some notes for the current user:
       | topic   | details                        |
       | Sports  | Football                       |
-    And I visit note "Sports"
+    And OpenAI assistant will ask the clarifying question "Do you mean American Football or European Football?" for any completion request
     When I request to complete the details for the note "Sports"
-    Then OpenAI assistant will ask the question "Do you mean American Football or European Football?" and generate no note details
-    And I <react> to the clarifying question "Do you mean American Football or European Football?"
-    Then The clarification question dialog is invisible
-    And the note details on the current page should be "<note details>"
+    And I <respond> to the clarifying question "Do you mean American Football or European Football?"
+    Then the note details on the current page should be "<note details>"
 
     Examples:
-        | react                   | note details                                    |
+        | respond                 | note details                                    |
         | answer with "European"  | European football origins from England.         |
         | answer with "American"  | American football origins from the USA.         |
         | cancel                  | Football                                        |

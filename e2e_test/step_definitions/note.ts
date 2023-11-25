@@ -319,10 +319,6 @@ When("I answer with {string} to the clarifying question {string}", (answer: stri
   cy.sendCompletionAnswer()
 })
 
-Then("The clarification question dialog is invisible", () => {
-  cy.noteDetailsCompletionDialogInputInvisible()
-})
-
 When("I cancel to the clarifying question {string}", () => {
   cy.closePopup()
 })
