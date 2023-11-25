@@ -119,7 +119,7 @@ Then("I contest the question", () => {
 })
 
 Then(
-  'I see after {string} the suggestion from AI: {string}',
+  "I see after {string} the suggestion from AI: {string}",
   (noteDetails: string, suggestionString: string) => {
     cy.get(".suggestion-text").contains(suggestionString)
   },

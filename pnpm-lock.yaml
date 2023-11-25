@@ -242,8 +242,8 @@ importers:
         specifier: 5.2.2
         version: 5.2.2
       unplugin-auto-import:
-        specifier: ^0.16.7
-        version: 0.16.7
+        specifier: ^0.17.1
+        version: 0.17.1
       vite:
         specifier: 5.0.2
         version: 5.0.2(@types/node@20.9.4)(sass@1.69.5)
@@ -8158,8 +8158,8 @@ packages:
     engines: {node: '>= 0.8'}
     dev: true
 
-  /unplugin-auto-import@0.16.7:
-    resolution: {integrity: sha512-w7XmnRlchq6YUFJVFGSvG1T/6j8GrdYN6Em9Wf0Ye+HXgD/22kont+WnuCAA0UaUoxtuvRR1u/mXKy63g/hfqQ==}
+  /unplugin-auto-import@0.17.1:
+    resolution: {integrity: sha512-QvdJKtFK0COSuRXzVnwjG3ir870zVhdMg6O8GKG3UO/O5W4fmJm5h71QvzI7Gp8Sx0qfCvC3f+2v0Vm489fnqQ==}
     engines: {node: '>=14'}
     peerDependencies:
       '@nuxt/kit': ^3.2.2
