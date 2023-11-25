@@ -1,8 +1,8 @@
-Feature: AI asks clarifying questions when auto-generating note details
-  To have better auto-generated note details, I want to answer clarifying questions from the AI.
+Feature: AI Asks Clarifying Questions When Auto-Generating Note Details
+  To obtain better auto-generated note details, I want to answer clarifying questions from the AI.
 
   @usingMockedOpenAiService
-  Scenario Outline: User supplies an answer to a clarifying question
+  Scenario Outline: Responding to AI's Clarification Question
     Given I am logged in as an existing user
     And there are some notes for the current user:
       | topic   | details                        |
@@ -15,7 +15,7 @@ Feature: AI asks clarifying questions when auto-generating note details
     And the note details on the current page should be "<note details>"
 
     Examples:
-        | react                   | note details                                    | 
+        | react                   | note details                                    |
         | answer with "European"  | European football origins from England.         |
         | answer with "American"  | American football origins from the USA.         |
         | cancel                  | Football                                        |
