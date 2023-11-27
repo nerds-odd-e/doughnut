@@ -141,5 +141,14 @@ Given(
 
 Given(
   "the OpenAI assistant will complete the details with {string} if the clarifying answer contains {string}",
-  (clarifyingQuestion: string, incompleteDetails: string) => {},
+  (details: string, userAnswer: string) => {
+    mock_services
+      .openAi()
+      .chatCompletion()
+      .requestMessageMatches({
+        role: "user",
+        content: userAnswer,
+      })
+      .stubNoteDetailsCompletion(details)
+  },
 )
