@@ -126,7 +126,7 @@ Then(
 )
 
 Given(
-  "the OpenAI assistant is set to ask {string} for any completion request on {string}",
+  "otherwise, the OpenAI assistant is set to ask {string} for unclear request on {string}",
   (clarifyingQuestion: string, incompleteDetails: string) => {
     mock_services
       .openAi()
