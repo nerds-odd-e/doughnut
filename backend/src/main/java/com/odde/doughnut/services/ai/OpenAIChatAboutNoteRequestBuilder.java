@@ -71,7 +71,7 @@ public class OpenAIChatAboutNoteRequestBuilder {
     if (football) {
       functions.add(
           ChatFunction.builder()
-              .name("clarifying_question")
+              .name("ask_clarification_question")
               .description("Ask question to get more context")
               .executor(ClarifyingQuestion.class, null)
               .build());

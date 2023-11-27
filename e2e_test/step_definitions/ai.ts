@@ -132,8 +132,8 @@ Given(
       .openAi()
       .chatCompletion()
       .requestMessageMatches({
-        role: "system",
-        content: clarifyingQuestion,
+        role: "user",
+        content: incompleteDetails,
       })
       .stubAskClarificationQuestion(clarifyingQuestion)
   },
