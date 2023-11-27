@@ -53,7 +53,7 @@
     "eslint-plugin-testing-library": "^6.2.0",
     "eslint-plugin-vitest": "^0.3.10",
     "eslint-plugin-vue": "^9.18.1",
-    "jsdom": "^22.1.0",
+    "jsdom": "^23.0.0",
     "optionator": "^0.9.3",
     "postcss": "^8.4.31",
     "prettier": "^3.1.0",
