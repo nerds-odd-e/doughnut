@@ -144,7 +144,10 @@ class RestAiControllerTest {
 
       verify(openAiApi).createChatCompletion(captor.capture());
       assertEquals(2, captor.getValue().getFunctions().size());
-      assertThat(captor.getValue().getFunctions().stream().map(ChatFunction::getName))
+      assertThat(
+              captor.getValue().getFunctions().stream()
+                  .map(ChatFunction.class::cast)
+                  .map(ChatFunction::getName))
           .contains("complete_note_details", "ask_clarification_question");
     }
 

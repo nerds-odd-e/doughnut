@@ -45,7 +45,7 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
   implementation 'org.springframework.boot:spring-boot-starter-security'
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-  implementation 'com.theokanning.openai-gpt3-java:service:0.16.1'
+  implementation 'com.theokanning.openai-gpt3-java:service:0.18.2'
   implementation 'com.squareup.retrofit2:adapter-rxjava2:2.9.0'
   implementation 'com.squareup.retrofit2:converter-jackson:2.9.0'
   implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
