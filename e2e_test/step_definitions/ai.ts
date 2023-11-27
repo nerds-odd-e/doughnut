@@ -125,7 +125,6 @@ Then(
   },
 )
 
-
 Given(
   "OpenAI assistant will ask the clarifying question {string} for any completion request",
   (question: string) => {
