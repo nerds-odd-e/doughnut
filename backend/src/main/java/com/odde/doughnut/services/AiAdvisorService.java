@@ -34,27 +34,22 @@ public class AiAdvisorService {
 
   public AiCompletion getAiCompletion(
       AiCompletionParams aiCompletionParams, Note note, String modelName) {
-    if (aiCompletionParams.detailsToComplete.equals("Football is a game of")) {
-      if (aiCompletionParams.answerFromUser != null
-          && !aiCompletionParams.answerFromUser.isEmpty()) {
-        if (aiCompletionParams.answerFromUser.equals("American")) {
-          return new AiCompletion(
-              "Football is a game of American football from the USA.", "stop", null);
-        } else {
-          return new AiCompletion(
-              "Football is a game of European football from England.", "stop", null);
-        }
-      }
-    }
-    ChatCompletionRequest chatCompletionRequest =
+    OpenAIChatAboutNoteRequestBuilder requestBuilder =
         new OpenAIChatAboutNoteRequestBuilder()
             .model(modelName)
             .systemBrief()
             .contentOfNoteOfCurrentFocus(note)
             .instructionForDetailsCompletion(
-                aiCompletionParams, aiCompletionParams.detailsToComplete.equals("Football "))
-            .maxTokens(150)
-            .build();
+                aiCompletionParams, aiCompletionParams.detailsToComplete.equals("Football "));
+
+    if (aiCompletionParams.detailsToComplete.equals("Football is a game of")) {
+      if (aiCompletionParams.answerFromUser != null
+          && !aiCompletionParams.answerFromUser.isEmpty()) {
+        requestBuilder.answerClarifyingQuestion(aiCompletionParams.answerFromUser);
+      }
+    }
+
+    ChatCompletionRequest chatCompletionRequest = requestBuilder.maxTokens(150).build();
     ChatFunctionCall chatFunctionCall =
         openAiApiHandler.getFunctionCall(chatCompletionRequest).orElseThrow();
     boolean isClarifyingQuestion = chatFunctionCall.getName().equals("ask_clarification_question");

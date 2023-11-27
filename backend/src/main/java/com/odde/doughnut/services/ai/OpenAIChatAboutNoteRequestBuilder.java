@@ -189,4 +189,11 @@ please critically check if the following question makes sense and is possible to
     messages.add(msg);
     return this;
   }
+
+  public OpenAIChatAboutNoteRequestBuilder answerClarifyingQuestion(String answerFromUser) {
+    ChatMessage callResponse = new ChatMessage(ChatMessageRole.FUNCTION.value(), answerFromUser);
+    callResponse.setName("ask_clarification_question");
+    messages.add(callResponse);
+    return this;
+  }
 }

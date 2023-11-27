@@ -146,7 +146,8 @@ Given(
       .openAi()
       .chatCompletion()
       .requestMessageMatches({
-        role: "user",
+        role: "function",
+        name: "ask_clarification_question",
         content: userAnswer,
       })
       .stubNoteDetailsCompletion(details)

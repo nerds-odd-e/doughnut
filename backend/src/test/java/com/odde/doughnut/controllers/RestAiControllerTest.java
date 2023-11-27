@@ -131,11 +131,12 @@ class RestAiControllerTest {
     OpenAIChatCompletionMock openAIChatCompletionMock;
 
     @BeforeEach
-    void setup() {}
+    void setup() {
+      openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
+    }
 
     @Test
     void askCompletionAndWithTwoFunctions() {
-      openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
           new ClarifyingQuestion("content not tested"), "");
       params.detailsToComplete = "Football ";
@@ -149,7 +150,6 @@ class RestAiControllerTest {
 
     @Test
     void askCompletionAndUseQuestionResponse() {
-      openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
           new ClarifyingQuestion(
               "Are you referring to American football or association football (soccer) ?"),
@@ -164,14 +164,16 @@ class RestAiControllerTest {
 
     @Test
     void askCompletionAndUseStopResponseWithQuestionAnswer() {
-      params.detailsToComplete = "Football is a game of";
-      params.questionFromAI =
-          "Are you referring to American football or association football (soccer)?";
-      params.answerFromUser = "European Football";
+      params.detailsToComplete = "Tea";
+      params.questionFromAI = "Black tea or green tea?";
+      params.answerFromUser = "green tea";
+      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
+          new NoteDetailsCompletion(" is common in China, if you are referring to green tea."),
+          "complete_note_details");
       AiCompletion aiCompletion = controller.getCompletion(note, params);
       assertEquals("stop", aiCompletion.getFinishReason());
       assertEquals(
-          "Football is a game of European football from England.",
+          "Tea is common in China, if you are referring to green tea.",
           aiCompletion.getMoreCompleteContent());
     }
   }
