@@ -5,7 +5,7 @@ import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.models.randomizers.RealRandomizer;
 import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.services.openAiApis.ApiExecutor;
-import com.theokanning.openai.OpenAiApi;
+import com.theokanning.openai.client.OpenAiApi;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
