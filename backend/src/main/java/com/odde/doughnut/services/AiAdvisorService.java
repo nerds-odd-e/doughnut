@@ -34,7 +34,7 @@ public class AiAdvisorService {
 
   public AiCompletion getAiCompletion(
       AiCompletionParams aiCompletionParams, Note note, String modelName) {
-    if (aiCompletionParams.detailsToComplete.equals("Football")) {
+    if (aiCompletionParams.detailsToComplete.equals("Football is a game of")) {
       if (aiCompletionParams.answerFromUser == null
           || aiCompletionParams.answerFromUser.isEmpty()) {
         return new AiCompletion(
@@ -43,9 +43,11 @@ public class AiAdvisorService {
             "Are you referring to American football or association football (soccer)?");
       }
       if (aiCompletionParams.answerFromUser.equals("American")) {
-        return new AiCompletion("American football origins from the USA.", "stop", null);
+        return new AiCompletion(
+            "Football is a game of American football from the USA.", "stop", null);
       } else {
-        return new AiCompletion("European football origins from England.", "stop", null);
+        return new AiCompletion(
+            "Football is a game of European football from England.", "stop", null);
       }
     }
     ChatCompletionRequest chatCompletionRequest =

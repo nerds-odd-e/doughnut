@@ -126,15 +126,20 @@ Then(
 )
 
 Given(
-  "OpenAI assistant will ask the clarifying question {string} for any completion request",
-  (question: string) => {
+  "the OpenAI assistant is set to ask {string} for any completion request on {string}",
+  (clarifyingQuestion: string, incompleteDetails: string) => {
     mock_services
       .openAi()
       .chatCompletion()
       .requestMessageMatches({
         role: "system",
-        content: question,
+        content: clarifyingQuestion,
       })
-      .stubAskClarificationQuestion(question)
+      .stubAskClarificationQuestion(clarifyingQuestion)
   },
+)
+
+Given(
+  "the OpenAI assistant will complete the details with {string} if the clarifying answer contains {string}",
+  (clarifyingQuestion: string, incompleteDetails: string) => {},
 )

@@ -319,7 +319,7 @@ When("I answer with {string} to the clarifying question {string}", (answer: stri
   cy.sendCompletionAnswer()
 })
 
-When("I cancel to the clarifying question {string}", () => {
+When('I respond with "cancel" to the clarifying question {string}', () => {
   cy.closePopup()
 })
 
