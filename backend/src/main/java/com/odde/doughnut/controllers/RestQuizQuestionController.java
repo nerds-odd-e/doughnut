@@ -11,7 +11,7 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.testability.TestabilitySettings;
-import com.theokanning.openai.OpenAiApi;
+import com.theokanning.openai.client.OpenAiApi;
 import java.util.List;
 import jakarta.annotation.Resource;
 import javax.validation.Valid;

@@ -2,7 +2,7 @@ package com.odde.doughnut.testability;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.theokanning.openai.OpenAiApi;
+import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import io.reactivex.Single;
 import org.mockito.ArgumentMatchers;
