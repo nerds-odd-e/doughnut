@@ -144,7 +144,7 @@ class RestAiControllerTest {
       verify(openAiApi).createChatCompletion(captor.capture());
       assertEquals(2, captor.getValue().getFunctions().size());
       assertThat(captor.getValue().getFunctions().stream().map(ChatFunction::getName))
-          .contains("complete_note_details", "clarifying_question");
+          .contains("complete_note_details", "ask_clarification_question");
     }
 
     @Test
@@ -153,7 +153,7 @@ class RestAiControllerTest {
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
           new ClarifyingQuestion(
               "Are you referring to American football or association football (soccer) ?"),
-          "clarifying_question");
+          "ask_clarification_question");
       params.detailsToComplete = "Football ";
       AiCompletion aiCompletion = controller.getCompletion(note, params);
       assertEquals("question", aiCompletion.getFinishReason());
