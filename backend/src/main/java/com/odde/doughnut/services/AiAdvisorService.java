@@ -39,8 +39,7 @@ public class AiAdvisorService {
             .model(modelName)
             .systemBrief()
             .contentOfNoteOfCurrentFocus(note)
-            .instructionForDetailsCompletion(
-                aiCompletionParams, aiCompletionParams.detailsToComplete.equals("Football "));
+            .instructionForDetailsCompletion(aiCompletionParams);
 
     if (aiCompletionParams.detailsToComplete.equals("Football is a game of")) {
       if (aiCompletionParams.answerFromUser != null

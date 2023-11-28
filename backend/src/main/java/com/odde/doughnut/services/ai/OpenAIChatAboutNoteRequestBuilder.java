@@ -61,21 +61,19 @@ public class OpenAIChatAboutNoteRequestBuilder {
   }
 
   public OpenAIChatAboutNoteRequestBuilder instructionForDetailsCompletion(
-      AiCompletionParams noteDetailsCompletion, boolean football) {
+      AiCompletionParams noteDetailsCompletion) {
     functions.add(
         ChatFunction.builder()
             .name("complete_note_details")
             .description("Text completion for the details of the note of focus")
             .executor(NoteDetailsCompletion.class, null)
             .build());
-    if (football) {
-      functions.add(
-          ChatFunction.builder()
-              .name("ask_clarification_question")
-              .description("Ask question to get more context")
-              .executor(ClarifyingQuestion.class, null)
-              .build());
-    }
+    functions.add(
+        ChatFunction.builder()
+            .name("ask_clarification_question")
+            .description("Ask question to get more context")
+            .executor(ClarifyingQuestion.class, null)
+            .build());
     addMessage(
         ChatMessageRole.USER,
         "Please complete the concise details of the note of focus. Keep it short. The current details in JSON format are: \n%s"
