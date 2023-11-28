@@ -127,7 +127,6 @@ class AiAdvisorServiceAutoCompleteTest {
     void askCompletionAndWithTwoFunctions() {
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
           new ClarifyingQuestion("content not tested"), "");
-      params.detailsToComplete = "Football ";
       aiAdvisorService.getAiCompletion(params, note, "gpt-4");
 
       verify(openAiApi).createChatCompletion(captor.capture());
