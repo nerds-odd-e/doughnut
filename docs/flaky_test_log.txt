@@ -9,3 +9,6 @@ notes/note_edit_accessories.feature/Edit a note
 
 circles/notebooks_in_circles.feature/subscribe to a note and review
   * 2023 10 14: Unable to find an element with the text: Team agreement
+
+notebooks/Notebook creation
+  * 2023 11 28: Unable to find an element with the text: Team agreement (uncaught exception) TypeError: Cannot read properties of null (reading 'substring')
