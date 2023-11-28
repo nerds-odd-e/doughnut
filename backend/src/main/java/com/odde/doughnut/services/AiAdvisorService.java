@@ -41,11 +41,8 @@ public class AiAdvisorService {
             .contentOfNoteOfCurrentFocus(note)
             .instructionForDetailsCompletion(aiCompletionParams);
 
-    if (aiCompletionParams.detailsToComplete.equals("Football is a game of")) {
-      if (aiCompletionParams.answerFromUser != null
-          && !aiCompletionParams.answerFromUser.isEmpty()) {
-        requestBuilder.answerClarifyingQuestion(aiCompletionParams.answerFromUser);
-      }
+    if (aiCompletionParams.answerFromUser != null && !aiCompletionParams.answerFromUser.isEmpty()) {
+      requestBuilder.answerClarifyingQuestion(aiCompletionParams.answerFromUser);
     }
 
     ChatCompletionRequest chatCompletionRequest = requestBuilder.maxTokens(150).build();

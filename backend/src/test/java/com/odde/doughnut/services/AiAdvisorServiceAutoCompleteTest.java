@@ -123,17 +123,17 @@ class AiAdvisorServiceAutoCompleteTest {
       openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
     }
 
+    private ChatCompletionRequest captureChatCompletionRequest() {
+      verify(openAiApi).createChatCompletion(captor.capture());
+      return captor.getValue();
+    }
+
     @Nested
     class RequestWithFunctionForClarifyingQuestion {
       @BeforeEach
       void setup() {
         openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
             new NoteDetailsCompletion(" must come down"), "");
-      }
-
-      private ChatCompletionRequest captureChatCompletionRequest() {
-        verify(openAiApi).createChatCompletion(captor.capture());
-        return captor.getValue();
       }
 
       @Test
@@ -170,19 +170,35 @@ class AiAdvisorServiceAutoCompleteTest {
           aiCompletion.getQuestion());
     }
 
-    @Test
-    void askCompletionAndUseStopResponseWithQuestionAnswer() {
-      params.detailsToComplete = "Tea";
-      params.questionFromAI = "Black tea or green tea?";
-      params.answerFromUser = "green tea";
-      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
-          new NoteDetailsCompletion(" is common in China, if you are referring to green tea."),
-          "complete_note_details");
-      AiCompletion aiCompletion = aiAdvisorService.getAiCompletion(params, note, "gpt-4");
-      assertEquals("stop", aiCompletion.getFinishReason());
-      assertEquals(
-          "Tea is common in China, if you are referring to green tea.",
-          aiCompletion.getMoreCompleteContent());
+    @Nested
+    class userAnswerToClarifyingQuestion {
+      @BeforeEach
+      void setup() {
+        params.detailsToComplete = "Tea";
+        params.questionFromAI = "Black tea or green tea?";
+        params.answerFromUser = "green tea";
+      }
+
+      @Test
+      void mustIncludeTheQuestionAndAnswerInMessages() {
+        openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
+            new NoteDetailsCompletion(" is healthy."), "complete_note_details");
+        aiAdvisorService.getAiCompletion(params, note, "gpt-4");
+        ChatCompletionRequest request = captureChatCompletionRequest();
+        assertThat(request.getMessages().get(3).getName(), equalTo("ask_clarification_question"));
+      }
+
+      @Test
+      void askCompletionAndUseStopResponseWithQuestionAnswer() {
+        openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
+            new NoteDetailsCompletion(" is common in China, if you are referring to green tea."),
+            "complete_note_details");
+        AiCompletion aiCompletion = aiAdvisorService.getAiCompletion(params, note, "gpt-4");
+        assertEquals("stop", aiCompletion.getFinishReason());
+        assertEquals(
+            "Tea is common in China, if you are referring to green tea.",
+            aiCompletion.getMoreCompleteContent());
+      }
     }
   }
 
