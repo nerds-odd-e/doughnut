@@ -39,7 +39,7 @@ class ServiceMocker {
   }
 
   public mockWithPredicate(predicate: Predicate, response: unknown): Promise<void> {
-    return this.mountebank.stubWithPredicate(predicate, response)
+    return this.mountebank.stubWithPredicates([predicate], response)
   }
 
   public stubPosterUnauthorized(pathMatcher: string, response: unknown) {
