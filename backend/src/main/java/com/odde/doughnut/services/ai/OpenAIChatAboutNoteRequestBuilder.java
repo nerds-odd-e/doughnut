@@ -194,9 +194,14 @@ please critically check if the following question makes sense and is possible to
     return this;
   }
 
-  public OpenAIChatAboutNoteRequestBuilder answerClarifyingQuestion(String answerFromUser) {
+  public OpenAIChatAboutNoteRequestBuilder answerClarifyingQuestion(
+      String questionFromAI, String answerFromUser) {
     ChatMessage callResponse = new ChatMessage(ChatMessageRole.FUNCTION.value(), answerFromUser);
-    callResponse.setName("ask_clarification_question");
+    callResponse.setName(askClarificationQuestion);
+    ClarifyingQuestion clarifyingQuestion = new ClarifyingQuestion(questionFromAI);
+    callResponse.setFunctionCall(
+        new ChatFunctionCall(
+            askClarificationQuestion, defaultObjectMapper().valueToTree(clarifyingQuestion)));
     messages.add(callResponse);
     return this;
   }
