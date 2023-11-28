@@ -1,6 +1,13 @@
-import { DefaultPredicate, FlexiPredicate, HttpMethod, Predicate } from "@anev/ts-mountebank"
 /// <reference types="cypress" />
+import {
+  DefaultPredicate,
+  FlexiPredicate,
+  HttpMethod,
+  Predicate,
+  Operator,
+} from "@anev/ts-mountebank"
 import MountebankWrapper from "./MountebankWrapper"
+import { NotPredicate } from "./NotPredicate"
 
 class ServiceMocker {
   private readonly mountebank: MountebankWrapper
@@ -38,8 +45,22 @@ class ServiceMocker {
     return this.mockWithPredicates([new DefaultPredicate(path, HttpMethod.POST)], response)
   }
 
-  public mockWithPredicates(predicates: Predicate[], response: unknown): Promise<void> {
-    return this.mountebank.stubWithPredicates(predicates, response)
+  public mockMatchsAndNotMatches(
+    path: string,
+    bodyToMatch: unknown,
+    bodyNotToMatch: unknown,
+    response: unknown,
+  ): Promise<void> {
+    const nots = bodyNotToMatch
+      ? [new NotPredicate(new FlexiPredicate().withBody(bodyNotToMatch))]
+      : []
+
+    const predicate = new FlexiPredicate()
+      .withOperator(Operator.matches)
+      .withPath(path)
+      .withMethod(HttpMethod.POST)
+      .withBody(bodyToMatch)
+    return this.mockWithPredicates([predicate, ...nots], response)
   }
 
   public stubPosterUnauthorized(pathMatcher: string, response: unknown) {
@@ -52,6 +73,10 @@ class ServiceMocker {
 
   public stubPosterWithError500Response(pathMatcher: string, response: unknown) {
     return this.mountebank.stubWithErrorResponse(pathMatcher, HttpMethod.POST, 500, response)
+  }
+
+  private mockWithPredicates(predicates: Predicate[], response: unknown): Promise<void> {
+    return this.mountebank.stubWithPredicates(predicates, response)
   }
 }
 

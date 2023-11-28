@@ -1,4 +1,3 @@
-import { FlexiPredicate, HttpMethod, Operator } from "@anev/ts-mountebank"
 import ServiceMocker from "../../support/ServiceMocker"
 import testability from "../testability"
 import createOpenAiChatCompletionMock from "./createOpenAiChatCompletionMock"
