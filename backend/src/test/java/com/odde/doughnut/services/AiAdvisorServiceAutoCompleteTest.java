@@ -123,19 +123,37 @@ class AiAdvisorServiceAutoCompleteTest {
       openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
     }
 
-    @Test
-    void askCompletionAndWithTwoFunctions() {
-      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
-          new ClarifyingQuestion("content not tested"), "");
-      aiAdvisorService.getAiCompletion(params, note, "gpt-4");
+    @Nested
+    class RequestWithFunctionForClarifyingQuestion {
+      @BeforeEach
+      void setup() {
+        openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
+            new NoteDetailsCompletion(" must come down"), "");
+      }
 
-      verify(openAiApi).createChatCompletion(captor.capture());
-      assertEquals(2, captor.getValue().getFunctions().size());
-      Assertions.assertThat(
-              captor.getValue().getFunctions().stream()
-                  .map(ChatFunction.class::cast)
-                  .map(ChatFunction::getName))
-          .contains("complete_note_details", "ask_clarification_question");
+      private ChatCompletionRequest captureChatCompletionRequest() {
+        verify(openAiApi).createChatCompletion(captor.capture());
+        return captor.getValue();
+      }
+
+      @Test
+      void askCompletionAndWithTwoFunctions() {
+        aiAdvisorService.getAiCompletion(params, note, "gpt-4");
+        ChatCompletionRequest request = captureChatCompletionRequest();
+        Assertions.assertThat(
+                request.getFunctions().stream()
+                    .map(ChatFunction.class::cast)
+                    .map(ChatFunction::getName))
+            .contains("complete_note_details", "ask_clarification_question");
+      }
+
+      @Test
+      void askCompletionWithNoAssumption() {
+        aiAdvisorService.getAiCompletion(params, note, "gpt-4");
+        ChatCompletionRequest request = captureChatCompletionRequest();
+        Assertions.assertThat(request.getMessages().get(2).getContent())
+            .contains("Don't make assumptions");
+      }
     }
 
     @Test

@@ -51,7 +51,10 @@ public class AiAdvisorService {
     ChatCompletionRequest chatCompletionRequest = requestBuilder.maxTokens(150).build();
     ChatFunctionCall chatFunctionCall =
         openAiApiHandler.getFunctionCall(chatCompletionRequest).orElseThrow();
-    boolean isClarifyingQuestion = chatFunctionCall.getName().equals("ask_clarification_question");
+    boolean isClarifyingQuestion =
+        chatFunctionCall
+            .getName()
+            .equals(OpenAIChatAboutNoteRequestBuilder.askClarificationQuestion);
     String content = aiCompletionParams.complete(chatFunctionCall.getArguments());
     if (isClarifyingQuestion) {
       return new AiCompletion(

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OpenAIChatAboutNoteRequestBuilder {
+  public static String askClarificationQuestion = "ask_clarification_question";
   String model = null;
   private List<ChatMessage> messages = new ArrayList<>();
   private List<ChatFunction> functions = new ArrayList<>();
@@ -70,14 +71,18 @@ public class OpenAIChatAboutNoteRequestBuilder {
             .build());
     functions.add(
         ChatFunction.builder()
-            .name("ask_clarification_question")
+            .name(askClarificationQuestion)
             .description("Ask question to get more context")
             .executor(ClarifyingQuestion.class, null)
             .build());
     addMessage(
         ChatMessageRole.USER,
-        "Please complete the concise details of the note of focus. Keep it short. The current details in JSON format are: \n%s"
-            .formatted(defaultObjectMapper().valueToTree(noteDetailsCompletion).toPrettyString()));
+        ("Please complete the concise details of the note of focus. Keep it short."
+                + " Don't make assumptions about the context. Ask for clarification through function `%s` if my request is ambiguous."
+                + " The current details in JSON format are: \n%s")
+            .formatted(
+                askClarificationQuestion,
+                defaultObjectMapper().valueToTree(noteDetailsCompletion).toPrettyString()));
     return this;
   }
 
