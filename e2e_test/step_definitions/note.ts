@@ -11,7 +11,7 @@ import {
 } from "@badeball/cypress-cucumber-preprocessor"
 import NotePath from "../support/NotePath"
 import "../support/string.extensions"
-import start from "../start"
+import start from "../start/index"
 
 defineParameterType({
   name: "notepath",
@@ -320,7 +320,7 @@ When("I answer with {string} to the clarifying question {string}", (answer: stri
 })
 
 When('I respond with "cancel" to the clarifying question {string}', () => {
-  cy.closePopup()
+  start.assumeDialogIsOpen().close()
 })
 
 When("I type in the details the word {string} followed by a space", (detailsText: string) => {
