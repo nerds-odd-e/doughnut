@@ -64,12 +64,7 @@ const openAiService = () => {
       }
     },
     async stubFineTuningStatus(successful: boolean) {
-      const predicate = new FlexiPredicate()
-        .withOperator(Operator.matches)
-        .withPath(`/v1/fine_tuning/jobs`)
-        .withMethod(HttpMethod.POST)
-
-      return await serviceMocker.mockWithPredicates([predicate], {
+      return await serviceMocker.stubPoster(`/v1/fine_tuning/jobs`, {
         object: "fine_tuning.job",
         id: "ftjob-abc123",
         model: "gpt-3.5-turbo-0613",
