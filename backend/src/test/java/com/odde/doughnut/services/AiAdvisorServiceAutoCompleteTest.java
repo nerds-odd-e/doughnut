@@ -25,6 +25,7 @@ import com.theokanning.openai.OpenAiHttpException;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatFunction;
+import com.theokanning.openai.completion.chat.ChatMessage;
 import io.reactivex.Single;
 import java.net.SocketTimeoutException;
 import okhttp3.MediaType;
@@ -184,8 +185,12 @@ class AiAdvisorServiceAutoCompleteTest {
         openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
             new NoteDetailsCompletion(" is healthy."), "complete_note_details");
         aiAdvisorService.getAiCompletion(params, note, "gpt-4");
-        ChatCompletionRequest request = captureChatCompletionRequest();
-        assertThat(request.getMessages().get(3).getName(), equalTo("ask_clarification_question"));
+        ChatMessage functionResultMessage = captureChatCompletionRequest().getMessages().get(3);
+        assertThat(functionResultMessage.getName(), equalTo("ask_clarification_question"));
+        assertThat(functionResultMessage.getContent(), equalTo("green tea"));
+        assertThat(
+            functionResultMessage.getFunctionCall().getArguments().toString(),
+            equalTo("{\"question\":\"Black tea or green tea?\"}"));
       }
 
       @Test

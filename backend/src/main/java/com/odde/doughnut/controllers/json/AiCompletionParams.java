@@ -27,7 +27,7 @@ public class AiCompletionParams {
     }
   }
 
-  public String clarifyingQuestion(JsonNode jsonNode) {
+  public static String clarifyingQuestion(JsonNode jsonNode) {
     try {
       return defaultObjectMapper().treeToValue(jsonNode, ClarifyingQuestion.class).question;
     } catch (JsonProcessingException e) {

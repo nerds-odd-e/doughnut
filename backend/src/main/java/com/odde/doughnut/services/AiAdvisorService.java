@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.apache.logging.log4j.util.Strings;
 
 public class AiAdvisorService {
 
@@ -41,8 +42,9 @@ public class AiAdvisorService {
             .contentOfNoteOfCurrentFocus(note)
             .instructionForDetailsCompletion(aiCompletionParams);
 
-    if (aiCompletionParams.answerFromUser != null && !aiCompletionParams.answerFromUser.isEmpty()) {
-      requestBuilder.answerClarifyingQuestion(aiCompletionParams.answerFromUser);
+    if (Strings.isNotEmpty(aiCompletionParams.answerFromUser)) {
+      requestBuilder.answerClarifyingQuestion(
+          aiCompletionParams.questionFromAI, aiCompletionParams.answerFromUser);
     }
 
     ChatCompletionRequest chatCompletionRequest = requestBuilder.maxTokens(150).build();
