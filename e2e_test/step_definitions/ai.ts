@@ -126,7 +126,7 @@ Then(
 )
 
 Given(
-  "otherwise, the OpenAI assistant is set to ask {string} for unclear request on {string}",
+  "the OpenAI assistant is set to ask {string} for unclarified request on {string}",
   (clarifyingQuestion: string, incompleteDetails: string) => {
     mock_services
       .openAi()
@@ -134,6 +134,10 @@ Given(
       .requestMessageMatches({
         role: "user",
         content: incompleteDetails,
+      })
+      .requestDoesNotMessageMatch({
+        role: "function",
+        name: "ask_clarification_question",
       })
       .stubAskClarificationQuestion(clarifyingQuestion)
   },
