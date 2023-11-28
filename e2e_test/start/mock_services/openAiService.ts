@@ -83,12 +83,7 @@ const openAiService = () => {
       })
     },
     async stubGetModels(modelNames: string) {
-      const predicate = new FlexiPredicate()
-        .withOperator(Operator.matches)
-        .withPath(`/v1/models`)
-        .withMethod(HttpMethod.GET)
-
-      return await serviceMocker.mockWithPredicates([predicate], {
+      return await serviceMocker.stubGetter(`/v1/models`, undefined, {
         object: "list",
         data: modelNames.split(",").map((modelName) => {
           return {

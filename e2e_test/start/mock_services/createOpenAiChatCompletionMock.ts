@@ -1,6 +1,7 @@
-import { FlexiPredicate, Predicate, HttpMethod, Operator } from "@anev/ts-mountebank"
+import { FlexiPredicate, HttpMethod, Operator } from "@anev/ts-mountebank"
 import ServiceMocker from "../../support/ServiceMocker"
 import { MessageToMatch } from "./MessageToMatch"
+import { NotPredicate } from "../../support/NotPredicate"
 
 type FunctionCall = {
   role: "function"
@@ -18,20 +19,6 @@ type TextBasedMessage = {
 type BodyToMatch = {
   messages?: MessageToMatch[]
   model?: string
-}
-
-class NotPredicate implements Predicate {
-  Predicate: Predicate
-
-  constructor(predicate: Predicate) {
-    this.Predicate = predicate
-  }
-
-  toJSON() {
-    return {
-      not: this.Predicate.toJSON(),
-    }
-  }
 }
 
 type ChatMessageInResponse = TextBasedMessage | FunctionCall
