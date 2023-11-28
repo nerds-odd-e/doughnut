@@ -12,14 +12,12 @@ import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.ai.ClarifyingQuestion;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.OpenAiResponse;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
-import com.theokanning.openai.completion.chat.ChatFunction;
 import com.theokanning.openai.image.Image;
 import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.model.Model;
@@ -60,7 +58,7 @@ class RestAiControllerTest {
   }
 
   @Nested
-  class AskSuggestion {
+  class AutoCompleteNoteDetails {
     ArgumentCaptor<ChatCompletionRequest> captor =
         ArgumentCaptor.forClass(ChatCompletionRequest.class);
     OpenAIChatCompletionMock openAIChatCompletionMock;
@@ -121,63 +119,6 @@ class RestAiControllerTest {
       AiCompletion aiCompletion = controller.getCompletion(note, params);
       assertEquals("blue planet", aiCompletion.getMoreCompleteContent());
       assertEquals("stop", aiCompletion.getFinishReason());
-    }
-  }
-
-  @Nested
-  class CompleteNoteDetailWithClarifyingQuestion {
-    ArgumentCaptor<ChatCompletionRequest> captor =
-        ArgumentCaptor.forClass(ChatCompletionRequest.class);
-    OpenAIChatCompletionMock openAIChatCompletionMock;
-
-    @BeforeEach
-    void setup() {
-      openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
-    }
-
-    @Test
-    void askCompletionAndWithTwoFunctions() {
-      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
-          new ClarifyingQuestion("content not tested"), "");
-      params.detailsToComplete = "Football ";
-      controller.getCompletion(note, params);
-
-      verify(openAiApi).createChatCompletion(captor.capture());
-      assertEquals(2, captor.getValue().getFunctions().size());
-      assertThat(
-              captor.getValue().getFunctions().stream()
-                  .map(ChatFunction.class::cast)
-                  .map(ChatFunction::getName))
-          .contains("complete_note_details", "ask_clarification_question");
-    }
-
-    @Test
-    void askCompletionAndUseQuestionResponse() {
-      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
-          new ClarifyingQuestion(
-              "Are you referring to American football or association football (soccer) ?"),
-          "ask_clarification_question");
-      params.detailsToComplete = "Football ";
-      AiCompletion aiCompletion = controller.getCompletion(note, params);
-      assertEquals("question", aiCompletion.getFinishReason());
-      assertEquals(
-          "Are you referring to American football or association football (soccer) ?",
-          aiCompletion.getQuestion());
-    }
-
-    @Test
-    void askCompletionAndUseStopResponseWithQuestionAnswer() {
-      params.detailsToComplete = "Tea";
-      params.questionFromAI = "Black tea or green tea?";
-      params.answerFromUser = "green tea";
-      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
-          new NoteDetailsCompletion(" is common in China, if you are referring to green tea."),
-          "complete_note_details");
-      AiCompletion aiCompletion = controller.getCompletion(note, params);
-      assertEquals("stop", aiCompletion.getFinishReason());
-      assertEquals(
-          "Tea is common in China, if you are referring to green tea.",
-          aiCompletion.getMoreCompleteContent());
     }
   }
 
