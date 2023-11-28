@@ -15,7 +15,7 @@ Feature: AI Asks Clarifying Questions When Auto-Generating Note Details
     Then the note details on the current page should be "<note details>"
 
     Examples:
-      | respond                | note details                                                |
+      | respond                | note details                                                   |
       | answer with "European" | Football is a game of which originated from England.           |
       | answer with "American" | Football is a game of which originated from the United States. |
-      | respond with "cancel"  | Football is a game                                          |
+      | respond with "cancel"  | Football is a game                                             |
