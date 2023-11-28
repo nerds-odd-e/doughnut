@@ -7,9 +7,9 @@ Feature: AI Asks Clarifying Questions When Auto-Generating Note Details
     And there are some notes for the current user:
       | topic   | details            |
       | Sports  | Football is        |
+    And the OpenAI assistant is set to ask "Do you mean American Football or European Football?" for unclarified request on "Football is"
     And the OpenAI assistant will complete the details with " originated from England." if the clarifying answer contains "European"
     And the OpenAI assistant will complete the details with " originated from the United States." if the clarifying answer contains "American"
-    And otherwise, the OpenAI assistant is set to ask "Do you mean American Football or European Football?" for unclear request on "Football is"
     When I request to complete the details for the note "Sports"
     And I <respond> to the clarifying question "Do you mean American Football or European Football?"
     Then the note details on the current page should be "<note details>"

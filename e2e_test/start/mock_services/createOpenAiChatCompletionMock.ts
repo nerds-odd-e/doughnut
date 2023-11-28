@@ -1,4 +1,4 @@
-import { FlexiPredicate, HttpMethod, Operator } from "@anev/ts-mountebank"
+import { FlexiPredicate, Predicate, HttpMethod, Operator } from "@anev/ts-mountebank"
 import ServiceMocker from "../../support/ServiceMocker"
 import { MessageToMatch } from "./MessageToMatch"
 
@@ -20,9 +20,33 @@ type BodyToMatch = {
   model?: string
 }
 
+class NotPredicate implements Predicate {
+  Predicate: Predicate
+
+  constructor(predicate: Predicate) {
+    this.Predicate = predicate
+  }
+
+  toJSON() {
+    return {
+      not: this.Predicate.toJSON(),
+    }
+  }
+}
+
 type ChatMessageInResponse = TextBasedMessage | FunctionCall
 
 const openAiChatCompletionStubber = (serviceMocker: ServiceMocker, bodyToMatch: BodyToMatch) => {
+  let notBody: BodyToMatch | undefined = undefined
+
+  const nots = () => {
+    if (notBody) {
+      return [new NotPredicate(new FlexiPredicate().withBody(notBody))]
+    } else {
+      return []
+    }
+  }
+
   const stubChatCompletion = (
     message: ChatMessageInResponse,
     finishReason: "length" | "stop" | "function_call",
@@ -32,7 +56,7 @@ const openAiChatCompletionStubber = (serviceMocker: ServiceMocker, bodyToMatch: 
       .withPath(`/v1/chat/completions`)
       .withMethod(HttpMethod.POST)
       .withBody(bodyToMatch)
-    return serviceMocker.mockWithPredicates([predicate], {
+    return serviceMocker.mockWithPredicates([predicate, ...nots()], {
       object: "chat.completion",
       choices: [
         {
@@ -58,6 +82,10 @@ const openAiChatCompletionStubber = (serviceMocker: ServiceMocker, bodyToMatch: 
   }
 
   return {
+    requestDoesNotMessageMatch(message: MessageToMatch) {
+      notBody = { messages: [message] }
+      return this
+    },
     stubNonfunctionCallResponse(reply: string, finishReason: "length" | "stop" = "stop") {
       return stubChatCompletion({ role: "assistant", content: reply }, finishReason)
     },
