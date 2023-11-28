@@ -69,7 +69,7 @@ const openAiService = () => {
         .withPath(`/v1/fine_tuning/jobs`)
         .withMethod(HttpMethod.POST)
 
-      return await serviceMocker.mockWithPredicate(predicate, {
+      return await serviceMocker.mockWithPredicates([predicate], {
         object: "fine_tuning.job",
         id: "ftjob-abc123",
         model: "gpt-3.5-turbo-0613",
@@ -88,7 +88,7 @@ const openAiService = () => {
         .withPath(`/v1/models`)
         .withMethod(HttpMethod.GET)
 
-      return await serviceMocker.mockWithPredicate(predicate, {
+      return await serviceMocker.mockWithPredicates([predicate], {
         object: "list",
         data: modelNames.split(",").map((modelName) => {
           return {

@@ -32,7 +32,7 @@ const openAiChatCompletionStubber = (serviceMocker: ServiceMocker, bodyToMatch: 
       .withPath(`/v1/chat/completions`)
       .withMethod(HttpMethod.POST)
       .withBody(bodyToMatch)
-    return serviceMocker.mockWithPredicate(predicate, {
+    return serviceMocker.mockWithPredicates([predicate], {
       object: "chat.completion",
       choices: [
         {

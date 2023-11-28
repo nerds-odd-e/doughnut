@@ -28,18 +28,18 @@ class ServiceMocker {
   }
 
   public stubGetter(path: string, queryData: unknown, response: unknown) {
-    return this.mockWithPredicate(
-      new FlexiPredicate().withPath(path).withMethod(HttpMethod.GET).withQuery(queryData),
+    return this.mockWithPredicates(
+      [new FlexiPredicate().withPath(path).withMethod(HttpMethod.GET).withQuery(queryData)],
       response,
     )
   }
 
   public stubPoster(path: string, response: unknown) {
-    return this.mockWithPredicate(new DefaultPredicate(path, HttpMethod.POST), response)
+    return this.mockWithPredicates([new DefaultPredicate(path, HttpMethod.POST)], response)
   }
 
-  public mockWithPredicate(predicate: Predicate, response: unknown): Promise<void> {
-    return this.mountebank.stubWithPredicates([predicate], response)
+  public mockWithPredicates(predicates: Predicate[], response: unknown): Promise<void> {
+    return this.mountebank.stubWithPredicates(predicates, response)
   }
 
   public stubPosterUnauthorized(pathMatcher: string, response: unknown) {
