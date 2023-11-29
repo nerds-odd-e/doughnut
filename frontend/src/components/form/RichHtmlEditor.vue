@@ -116,7 +116,7 @@ export default defineComponent({
         .getQuill()
         .insertText(quill.getQuill().getSelection()?.index || 0, " ");
 
-      const response = await this.api.ai.aiNoteDetailsCompletion(this.noteId, {
+      const response = await this.api.ai.askAiCompletion(this.noteId, {
         detailsToComplete: this.simpleText.trim(),
         clarifyingQuestionAndAnswers: [],
       });

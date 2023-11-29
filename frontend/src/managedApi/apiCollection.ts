@@ -356,27 +356,14 @@ const apiCollection = (managedApi: ManagedApi) => ({
       )) as Generated.ChatResponse;
       return res.assistantMessage;
     },
+
     async getAvailableGptModels() {
       return (await managedApi.restGet(`ai/available-gpt-models`)) as string[];
     },
-    async aiNoteDetailsCompletion(
-      noteId: Doughnut.ID,
-      data?: Generated.AiCompletionParams,
-    ): Promise<Generated.AiCompletion> {
-      const res = await this.askAiCompletion(
-        {
-          detailsToComplete: data?.detailsToComplete || "",
-          clarifyingQuestionAndAnswers:
-            data?.clarifyingQuestionAndAnswers || [],
-        },
-        noteId,
-      );
-      return res;
-    },
 
     async askAiCompletion(
-      request: Generated.AiCompletionParams,
       noteId: Doughnut.ID,
+      request: Generated.AiCompletionParams,
     ) {
       return (await managedApi.restPost(
         `ai/${noteId}/completion`,
