@@ -12,18 +12,18 @@
   >
     <SvgRobot />
     <Popup
-      :show="!!clarificationQuestion"
-      @popup-done="clarificationQuestion = ''"
+      :show="aiCompletion !== undefined"
+      @popup-done="aiCompletion = undefined"
     >
       <AIClarifyingQuestionDialog
-        :question="clarificationQuestion"
+        :ai-completion="aiCompletion!"
         @submit="
           (clarificationAnswer) =>
             suggestDetails({
               detailsToComplete: selectedNote.details,
               clarifyingQuestionAndAnswers: [
                 {
-                  questionFromAI: clarificationQuestion,
+                  questionFromAI: aiCompletion?.question,
                   answerFromUser: clarificationAnswer,
                 },
               ],
@@ -66,18 +66,20 @@ export default defineComponent({
   data() {
     return {
       isUnmounted: false,
-      clarificationQuestion: "",
+      aiCompletion: undefined as undefined | Generated.AiCompletion,
     };
   },
   methods: {
     async suggestDetails(data: Generated.AiCompletionParams) {
-      const { moreCompleteContent: details, ...response } =
-        await this.api.ai.askAiCompletion(this.selectedNote.id, data);
+      const response = await this.api.ai.askAiCompletion(
+        this.selectedNote.id,
+        data,
+      );
 
       if (this.isUnmounted) return;
 
       if (response.question) {
-        this.clarificationQuestion = response.question;
+        this.aiCompletion = response;
         return;
       }
 
@@ -85,7 +87,7 @@ export default defineComponent({
         this.selectedNote.id,
         {
           topic: this.selectedNote.topic,
-          details,
+          details: response.moreCompleteContent,
         },
         {
           topic: this.selectedNote.topic,
