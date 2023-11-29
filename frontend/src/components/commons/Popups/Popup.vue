@@ -1,11 +1,5 @@
 <!-- eslint-disable vue/valid-template-root -->
-<template>
-  <template v-if="show">
-    <Popup1 v-bind="{ sidebar }" @popup-done="$emit('popupDone', $event)">
-      <slot />
-    </Popup1>
-  </template>
-</template>
+<template></template>
 
 <script lang="ts">
 //
@@ -17,14 +11,19 @@
 //
 import { PropType, defineComponent } from "vue";
 import usePopups from "./usePopups";
-import Popup1 from "./Popup1.vue";
 
 export default defineComponent({
   setup() {
     return usePopups();
   },
-  props: { show: Boolean, sidebar: String as PropType<"left" | "right"> },
+  props: {
+    sidebar: String as PropType<"left" | "right">,
+  },
   emits: ["popupDone"],
-  components: { Popup1 },
+  mounted() {
+    this.popups
+      .dialog(this.$slots.default, this.sidebar)
+      .then((result) => this.$emit("popupDone", result));
+  },
 });
 </script>
