@@ -315,7 +315,7 @@ When("I click the Refine button", (noteTopic: string) => {
 })
 
 When(
-  "I answer with {string} to the clarifying question {string}",
+  "I answer {string} to the clarifying question {string}",
   (answer: string, question: string) => {
     start.assumeClarifyingQuestionDialog(question).answer(answer)
   },
@@ -324,6 +324,20 @@ When(
 When('I respond with "cancel" to the clarifying question {string}', (question: string) => {
   start.assumeClarifyingQuestionDialog(question).close()
 })
+
+When("I should see a follow-up question {string}", (question: string) => {
+  start.assumeClarifyingQuestionDialog(question)
+  cy.wrap(question).as("lastClarifyingQuestion")
+})
+
+When(
+  "the initial clarifying question with the response {string} should be visible",
+  (oldAnswer: string) => {
+    cy.get("@lastClarifyingQuestion").then((question) => {
+      start.assumeClarifyingQuestionDialog(question as unknown as string).oldAnswer(oldAnswer)
+    })
+  },
+)
 
 When("I type in the details the word {string} followed by a space", (detailsText: string) => {
   cy.get("[role=details]").type(detailsText)

@@ -17,10 +17,10 @@ Feature: AI Asks Clarifying Questions When Auto-Generating Note Details
     Then the note details on the current page should be "<note details>"
 
     Examples:
-      | respond                | note details                                   |
-      | answer with "European" | Football is originated from England.           |
-      | answer with "American" | Football is originated from the United States. |
-      | respond with "cancel"  | Football is                                    |
+      | respond               | note details                                   |
+      | answer "European"     | Football is originated from England.           |
+      | answer "American"     | Football is originated from the United States. |
+      | respond with "cancel" | Football is                                    |
 
   @ignore
   @usingMockedOpenAiService
