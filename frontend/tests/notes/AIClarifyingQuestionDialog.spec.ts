@@ -4,16 +4,17 @@ import helper from "../helpers";
 
 describe("answering a clarifying question for note details geeration", () => {
   let wrapper: VueWrapper;
-
+  const aiCompletion: Generated.AiCompletion = {
+    moreCompleteContent: "Football",
+    question: "Do you mean American Football or European Football?",
+    finishReason: "clarifying_question",
+    clarifyingHistory: [],
+  };
   beforeEach(() => {
     vi.useFakeTimers();
     wrapper = helper
       .component(AIClarifyingQuestionDialog)
-      .withStorageProps({
-        aiCompletion: {
-          question: "Do you mean American Football or European Football?",
-        },
-      })
+      .withStorageProps({ aiCompletion })
       .mount();
   });
 
