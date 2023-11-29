@@ -18,7 +18,10 @@
       />
     </tbody>
   </table>
-  <Popup v-if="editingIndex" @popup-done="editingIndex = undefined">
+  <Popup
+    v-if="editingIndex !== undefined"
+    @popup-done="editingIndex = undefined"
+  >
     <SuggestedQuestionEdit v-model="localSuggestedQuestions[editingIndex]" />
   </Popup>
 </template>
