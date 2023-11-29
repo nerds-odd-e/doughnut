@@ -43,10 +43,7 @@ public class AiAdvisorService {
 
     aiCompletionParams
         .getClarifyingQuestionAndAnswers()
-        .forEach(
-            qa -> {
-              requestBuilder.answerClarifyingQuestion(qa.questionFromAI, qa.answerFromUser);
-            });
+        .forEach(requestBuilder::answeredClarifyingQuestion);
 
     ChatCompletionRequest chatCompletionRequest = requestBuilder.maxTokens(150).build();
     ChatFunctionCall chatFunctionCall =
