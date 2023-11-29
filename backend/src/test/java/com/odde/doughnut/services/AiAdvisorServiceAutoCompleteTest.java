@@ -2,8 +2,7 @@ package com.odde.doughnut.services;
 
 import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
@@ -216,7 +215,8 @@ class AiAdvisorServiceAutoCompleteTest {
                 "Are you referring to American football or association football (soccer) ?"),
             "ask_clarification_question");
         AiCompletion aiCompletion = aiAdvisorService.getAiCompletion(params, note, "gpt-4");
-        assertEquals("question", aiCompletion.getFinishReason());
+        assertThat(aiCompletion.getFinishReason(), equalTo("question"));
+        assertThat(aiCompletion.getClarifyingHistory(), hasSize(1));
       }
     }
   }

@@ -7,6 +7,7 @@ declare namespace Generated {
         moreCompleteContent: string;
         finishReason: string;
         question: string;
+        clarifyingHistory: ClarifyingQuestionAndAnswer[];
     }
 
     interface AiCompletionParams {

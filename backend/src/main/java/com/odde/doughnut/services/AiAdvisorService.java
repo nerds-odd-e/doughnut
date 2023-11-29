@@ -52,13 +52,14 @@ public class AiAdvisorService {
         chatFunctionCall
             .getName()
             .equals(OpenAIChatAboutNoteRequestBuilder.askClarificationQuestion);
-    String content = aiCompletionParams.complete(chatFunctionCall.getArguments());
     AiCompletion result = new AiCompletion();
     if (isClarifyingQuestion) {
       result.setFinishReason("question");
       result.setQuestion(AiCompletionParams.clarifyingQuestion(chatFunctionCall.getArguments()));
+      aiCompletionParams.getClarifyingQuestionAndAnswers().forEach(result::addClarifyingHistory);
       return result;
     }
+    String content = aiCompletionParams.complete(chatFunctionCall.getArguments());
     result.setMoreCompleteContent(content);
     result.setFinishReason("stop");
     return result;
