@@ -118,6 +118,7 @@ export default defineComponent({
 
       const response = await this.api.ai.aiNoteDetailsCompletion(this.noteId, {
         detailsToComplete: this.simpleText.trim(),
+        clarifyingQuestionAndAnswers: [],
       });
       const fixedSuggestion = response.moreCompleteContent.substring(
         this.simpleText.length - 1,
