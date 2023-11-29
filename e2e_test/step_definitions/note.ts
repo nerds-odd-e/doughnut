@@ -102,7 +102,7 @@ Given(
 When("I update note {string} with details {string}", (noteTopic: string, newDetails: string) => {
   start.jumpToNotePage(noteTopic)
   cy.inPlaceEdit({ Details: newDetails })
-  cy.findNoteDetailsOnCurrentPage(newDetails)
+  start.assumeNotePage().findNoteDetails(newDetails)
 })
 
 When("I create a note belonging to {string}:", (noteTopic: string, data: DataTable) => {
@@ -279,11 +279,11 @@ Then("I type {string} in the topic", (content: string) => {
 })
 
 Then("the note details on the current page should be {string}", (detailsText: string) => {
-  cy.findNoteDetailsOnCurrentPage(detailsText)
+  start.assumeNotePage().findNoteDetails(detailsText)
 })
 
 When("I accept the AI suggestion", () => {
-  cy.findNoteDetailsOnCurrentPage("").type("{enter}")
+  cy.get("[role=details]").type("{enter}")
 })
 
 When("I generate an image for {string}", (noteTopic: string) => {
@@ -326,11 +326,11 @@ When('I respond with "cancel" to the clarifying question {string}', (question: s
 })
 
 When("I type in the details the word {string} followed by a space", (detailsText: string) => {
-  cy.findNoteDetailsOnCurrentPage("").type(detailsText)
+  cy.get("[role=details]").type(detailsText)
 })
 
 Then("the note details are {string}", (detailsText: string) => {
-  cy.findNoteDetailsOnCurrentPage(detailsText)
+  start.assumeNotePage().findNoteDetails(detailsText)
 })
 When("I continue typing {string}", (additionalText: string) => {
   cy.focused().type(additionalText)

@@ -6,6 +6,9 @@ export const assumeNotePage = () => {
   }
 
   return {
+    findNoteDetails: (expected: string) => {
+      expected.split("\\n").forEach((line) => cy.get("[role=details]").should("contain", line))
+    },
     startSearchingAndLinkNote() {
       cy.notePageButtonOnCurrentPage("search and link note").click()
     },
