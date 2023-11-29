@@ -302,10 +302,6 @@ When("I start to chat about the note {string}", (noteTopic: string) => {
   start.jumpToNotePage(noteTopic).chatAboutNote()
 })
 
-When("I click the Refine button", (noteTopic: string) => {
-  start.jumpToNotePage(noteTopic).refineNoteDetails()
-})
-
 When(
   "I answer {string} to the clarifying question {string}",
   (answer: string, question: string) => {
