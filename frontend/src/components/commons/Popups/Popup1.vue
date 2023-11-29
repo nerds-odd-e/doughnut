@@ -1,5 +1,5 @@
 <!-- eslint-disable vue/valid-template-root -->
-<template><slot /></template>
+<template></template>
 
 <script lang="ts">
 //
@@ -16,15 +16,14 @@ export default defineComponent({
   setup() {
     return usePopups();
   },
-  props: { show: Boolean, sidebar: String as PropType<"left" | "right"> },
+  props: {
+    sidebar: String as PropType<"left" | "right">,
+  },
   emits: ["popupDone"],
-  watch: {
-    show() {
-      if (!this.show) return;
-      this.popups
-        .dialog(this.$slots.default, this.sidebar)
-        .then((result) => this.$emit("popupDone", result));
-    },
+  mounted() {
+    this.popups
+      .dialog(this.$slots.default, this.sidebar)
+      .then((result) => this.$emit("popupDone", result));
   },
 });
 </script>
