@@ -157,3 +157,18 @@ Given(
       .stubNoteDetailsCompletion(details)
   },
 )
+
+Given(
+  "the OpenAI assistant will ask {string} following an unclear response like {string}",
+  (furtherQuestion: string, previousAnswer: string) => {
+    mock_services
+      .openAi()
+      .chatCompletion()
+      .requestMessageMatches({
+        role: "function",
+        name: "ask_clarification_question",
+        content: previousAnswer,
+      })
+      .stubAskClarificationQuestion(furtherQuestion)
+  },
+)
