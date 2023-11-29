@@ -10,7 +10,9 @@ describe("answering a clarifying question for note details geeration", () => {
     wrapper = helper
       .component(AIClarifyingQuestionDialog)
       .withStorageProps({
-        question: "Do you mean American Football or European Football?",
+        aiCompletion: {
+          question: "Do you mean American Football or European Football?",
+        }
       })
       .mount();
   });

@@ -1,16 +1,21 @@
 <!-- eslint-disable vue/valid-template-root -->
-<template></template>
+<template>
+  <Popup1 v-bind="{ show, sidebar }" @popup-done="$emit('popupDone', $event)">
+    <slot />
+  </Popup1>
+</template>
 
 <script lang="ts">
 //
 // Usage:
-//  <Pop v-model="showThisDialog">
+//  <Popup v-model="showThisDialog">
 //    <h2>Dialog Title</h2>
 //     <button @click="popup.done()">OK</button>
-//  </Pop>
+//  </Popup>
 //
 import { PropType, defineComponent } from "vue";
 import usePopups from "./usePopups";
+import Popup1 from "./Popup1.vue";
 
 export default defineComponent({
   setup() {
@@ -18,13 +23,6 @@ export default defineComponent({
   },
   props: { show: Boolean, sidebar: String as PropType<"left" | "right"> },
   emits: ["popupDone"],
-  watch: {
-    show() {
-      if (!this.show) return;
-      this.popups
-        .dialog(this.$slots.default, this.sidebar)
-        .then((result) => this.$emit("popupDone", result));
-    },
-  },
+  components: { Popup1 },
 });
 </script>
