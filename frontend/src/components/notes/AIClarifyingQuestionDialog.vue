@@ -1,4 +1,19 @@
 <template>
+  <div>
+    <ul>
+      <li
+        v-for="(
+          { questionFromAI, answerFromUser }, index
+        ) in aiCompletion.clarifyingHistory"
+        :key="index"
+      >
+        {{ questionFromAI }}
+        <ul>
+          <li>{{ answerFromUser }}</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
   <form @submit.prevent="handleFormSubmit">
     <h3>
       Clarification question by the AI:

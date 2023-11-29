@@ -22,7 +22,6 @@ Feature: AI Asks Clarifying Questions When Auto-Generating Note Details
       | answer "American"     | Football is originated from the United States. |
       | respond with "cancel" | Football is                                    |
 
-  @ignore
   @usingMockedOpenAiService
   Scenario: Managing Extended Clarification Dialogue
     Given the OpenAI assistant will ask "Do you mean the American version?" following an unclear response like "Ameriland"
