@@ -12,9 +12,6 @@ export const assumeNotePage = () => {
     startSearchingAndLinkNote() {
       cy.notePageButtonOnCurrentPage("search and link note").click()
     },
-    refineNoteDetails() {
-      cy.notePageButtonOnCurrentPage("refine").click()
-    },
     aiGenerateImage() {
       clickNotePageMoreOptionsButton("Generate Image with DALL-E")
     },
