@@ -4,7 +4,7 @@
 <script lang="ts">
 //
 // Usage:
-//  <Popup v-model="showThisDialog">
+//  <Popup v-if="showThisDialog">
 //    <h2>Dialog Title</h2>
 //     <button @click="popup.done()">OK</button>
 //  </Popup>
