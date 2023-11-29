@@ -12,6 +12,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.json.AiCompletion;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.controllers.json.ApiError;
+import com.odde.doughnut.controllers.json.ClarifyingQuestionAndAnswer;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.OpenAITimeoutException;
@@ -105,7 +106,7 @@ class AiAdvisorServiceAutoCompleteTest {
     private String getAiCompletionFromAdvisor(String incompleteContent) {
       Note note = makeMe.aNote().inMemoryPlease();
       return aiAdvisorService
-          .getAiCompletion(new AiCompletionParams(incompleteContent, null, null), note, "gpt-4")
+          .getAiCompletion(new AiCompletionParams(incompleteContent, null), note, "gpt-4")
           .getMoreCompleteContent();
     }
   }
@@ -176,8 +177,9 @@ class AiAdvisorServiceAutoCompleteTest {
       @BeforeEach
       void setup() {
         params.detailsToComplete = "Tea";
-        params.questionFromAI = "Black tea or green tea?";
-        params.answerFromUser = "green tea";
+        params.clarifyingQuestionAndAnswer = new ClarifyingQuestionAndAnswer();
+        params.clarifyingQuestionAndAnswer.questionFromAI = "Black tea or green tea?";
+        params.clarifyingQuestionAndAnswer.answerFromUser = "green tea";
       }
 
       @Test

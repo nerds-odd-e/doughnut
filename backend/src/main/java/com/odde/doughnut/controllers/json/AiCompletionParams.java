@@ -14,8 +14,7 @@ import org.springframework.lang.Nullable;
 @AllArgsConstructor
 public class AiCompletionParams {
   public String detailsToComplete = "";
-  @Nullable public String questionFromAI;
-  @Nullable public String answerFromUser;
+  @Nullable public ClarifyingQuestionAndAnswer clarifyingQuestionAndAnswer = null;
 
   public String complete(JsonNode jsonNode) {
     try {

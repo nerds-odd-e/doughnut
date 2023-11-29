@@ -11,8 +11,7 @@ declare namespace Generated {
 
     interface AiCompletionParams {
         detailsToComplete: string;
-        questionFromAI?: string;
-        answerFromUser?: string;
+        clarifyingQuestionAndAnswer?: ClarifyingQuestionAndAnswer;
     }
 
     interface AiGeneratedImage {
@@ -43,6 +42,11 @@ declare namespace Generated {
 
     interface CircleJoiningByInvitation {
         invitationCode: string;
+    }
+
+    interface ClarifyingQuestionAndAnswer {
+        questionFromAI?: string;
+        answerFromUser?: string;
     }
 
     interface CurrentUserInfo {
