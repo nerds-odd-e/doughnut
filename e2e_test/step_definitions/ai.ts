@@ -118,13 +118,6 @@ Then("I contest the question", () => {
   cy.findByRole("button", { name: "Doesn't make sense?" }).click()
 })
 
-Then(
-  "I see after {string} the suggestion from AI: {string}",
-  (noteDetails: string, suggestionString: string) => {
-    cy.get(".suggestion-text").contains(suggestionString)
-  },
-)
-
 Given(
   "the OpenAI assistant is set to ask {string} for unclarified request on {string}",
   (clarifyingQuestion: string, incompleteDetails: string) => {
