@@ -1,8 +1,10 @@
 <!-- eslint-disable vue/valid-template-root -->
 <template>
-  <Popup1 v-bind="{ show, sidebar }" @popup-done="$emit('popupDone', $event)">
-    <slot />
-  </Popup1>
+  <template v-if="show">
+    <Popup1 v-bind="{ sidebar }" @popup-done="$emit('popupDone', $event)">
+      <slot />
+    </Popup1>
+  </template>
 </template>
 
 <script lang="ts">
