@@ -13,7 +13,7 @@
   </form>
 </template>
 
-<script>
+<script lang="ts">
 import TextInput from "../form/TextInput.vue";
 import asPopup from "../commons/Popups/asPopup";
 
