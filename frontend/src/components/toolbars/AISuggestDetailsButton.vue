@@ -11,12 +11,9 @@
     "
   >
     <SvgRobot />
-    <Popup
-      :show="aiCompletion !== undefined"
-      @popup-done="aiCompletion = undefined"
-    >
+    <Popup1 v-if="aiCompletion" @popup-done="aiCompletion = undefined">
       <AIClarifyingQuestionDialog
-        :ai-completion="aiCompletion!"
+        :ai-completion="aiCompletion"
         @submit="
           (clarificationAnswer) =>
             suggestDetails({
@@ -30,7 +27,7 @@
             })
         "
       />
-    </Popup>
+    </Popup1>
   </a>
 </template>
 
@@ -40,7 +37,7 @@ import useLoadingApi from "@/managedApi/useLoadingApi";
 import { StorageAccessor } from "@/store/createNoteStorage";
 import SvgRobot from "../svgs/SvgRobot.vue";
 import AIClarifyingQuestionDialog from "../notes/AIClarifyingQuestionDialog.vue";
-import Popup from "../commons/Popups/Popup.vue";
+import Popup1 from "../commons/Popups/Popup1.vue";
 
 export default defineComponent({
   setup() {
@@ -60,7 +57,7 @@ export default defineComponent({
   },
   components: {
     SvgRobot,
-    Popup,
+    Popup1,
     AIClarifyingQuestionDialog,
   },
   data() {
