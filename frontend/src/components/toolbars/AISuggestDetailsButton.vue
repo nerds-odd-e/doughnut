@@ -16,8 +16,10 @@
           (clarificationAnswer) =>
             suggestDetails({
               detailsToComplete: selectedNote.details,
-              questionFromAI: clarificationQuestion,
-              answerFromUser: clarificationAnswer,
+              clarifyingQuestionAndAnswer: {
+                questionFromAI: clarificationQuestion,
+                answerFromUser: clarificationAnswer,
+              },
             })
         "
       />
