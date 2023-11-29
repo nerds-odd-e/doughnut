@@ -18,15 +18,15 @@
       />
     </tbody>
   </table>
-  <Popup1 v-if="editingIndex" @popup-done="editingIndex = undefined">
+  <Popup v-if="editingIndex" @popup-done="editingIndex = undefined">
     <SuggestedQuestionEdit v-model="localSuggestedQuestions[editingIndex]" />
-  </Popup1>
+  </Popup>
 </template>
 
 <script lang="ts">
 import { PropType } from "vue";
 import SuggestedQuestionRow from "./SuggestedQuestionRow.vue";
-import Popup1 from "../commons/Popups/Popup1.vue";
+import Popup from "../commons/Popups/Popup.vue";
 
 export default {
   props: {
@@ -51,6 +51,6 @@ export default {
     };
   },
 
-  components: { Popup1, SuggestedQuestionRow },
+  components: { Popup, SuggestedQuestionRow },
 };
 </script>
