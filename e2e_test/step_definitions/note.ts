@@ -21,10 +21,6 @@ defineParameterType({
   },
 })
 
-Given("I visit note {string}", (noteTopic) => {
-  start.jumpToNotePage(noteTopic)
-})
-
 Given("there are some notes for the current user:", (data: DataTable) => {
   start.testability().seedNotes(data.hashes())
 })
@@ -282,10 +278,6 @@ Then("the note details on the current page should be {string}", (detailsText: st
   start.assumeNotePage().findNoteDetails(detailsText)
 })
 
-When("I accept the AI suggestion", () => {
-  cy.get("[role=details]").type("{enter}")
-})
-
 When("I generate an image for {string}", (noteTopic: string) => {
   start.jumpToNotePage(noteTopic).aiGenerateImage()
 })
@@ -338,14 +330,3 @@ When(
     })
   },
 )
-
-When("I type in the details the word {string} followed by a space", (detailsText: string) => {
-  cy.get("[role=details]").type(detailsText)
-})
-
-Then("the note details are {string}", (detailsText: string) => {
-  start.assumeNotePage().findNoteDetails(detailsText)
-})
-When("I continue typing {string}", (additionalText: string) => {
-  cy.focused().type(additionalText)
-})
