@@ -12,7 +12,7 @@ describe("answering a clarifying question for note details geeration", () => {
       .withStorageProps({
         aiCompletion: {
           question: "Do you mean American Football or European Football?",
-        }
+        },
       })
       .mount();
   });
