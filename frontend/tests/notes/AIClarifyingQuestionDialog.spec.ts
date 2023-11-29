@@ -8,13 +8,19 @@ describe("answering a clarifying question for note details geeration", () => {
     moreCompleteContent: "Football",
     question: "Do you mean American Football or European Football?",
     finishReason: "clarifying_question",
-    clarifyingHistory: [],
+    clarifyingHistory: [
+      {
+        questionFromAI: "Is it a sport?",
+        answerFromUser: "Yes",
+      },
+    ],
   };
+
   beforeEach(() => {
     vi.useFakeTimers();
     wrapper = helper
       .component(AIClarifyingQuestionDialog)
-      .withStorageProps({ aiCompletion })
+      .withProps({ aiCompletion })
       .mount();
   });
 
@@ -27,6 +33,10 @@ describe("answering a clarifying question for note details geeration", () => {
     expect(wrapper.text()).toContain(
       "Do you mean American Football or European Football?",
     );
+  });
+
+  it("renders the previous questions", () => {
+    expect(wrapper.text()).toContain("Is it a sport?");
   });
 
   it("submitting the form propagates the submit event to the parent component", () => {

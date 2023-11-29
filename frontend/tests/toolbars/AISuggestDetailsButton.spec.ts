@@ -4,41 +4,40 @@ import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
 describe("AISuggestDetailsButton", () => {
+  const note = makeMe.aNote.please();
+
   helper.resetWithApiMock(beforeEach, afterEach);
 
   const triggerSuggestionwithoutFlushPromises = async (
-    note: Generated.Note,
+    selectedNote: Generated.Note,
   ) => {
     const wrapper = helper
       .component(AISuggestDetailsButton)
-      .withStorageProps({
-        selectedNote: note,
-      })
+      .withStorageProps({ selectedNote })
       .mount();
     await wrapper.find(".btn").trigger("click");
     return wrapper;
   };
 
-  const triggerSuggestion = async (note: Generated.Note) => {
-    const wrapper = triggerSuggestionwithoutFlushPromises(note);
+  const triggerSuggestion = async (n: Generated.Note) => {
+    const wrapper = triggerSuggestionwithoutFlushPromises(n);
     await flushPromises();
     return wrapper;
   };
 
   it("ask api to generate suggested details when details is empty", async () => {
-    const note = makeMe.aNote.details("").please();
+    const noteWithNoDetails = makeMe.aNote.details("").please();
     const expectation = helper.apiMock
-      .expectingPost(`/api/ai/${note.id}/completion`)
+      .expectingPost(`/api/ai/${noteWithNoDetails.id}/completion`)
       .andReturnOnce({ moreCompleteContent: "suggestion" });
-    helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
-    await triggerSuggestion(note);
+    helper.apiMock.expectingPatch(`/api/text_content/${noteWithNoDetails.id}`);
+    await triggerSuggestion(noteWithNoDetails);
     expect(expectation.actualRequestJsonBody()).toMatchObject({
       detailsToComplete: "",
     });
   });
 
   it("ask api be called once when clicking the suggest button", async () => {
-    const note = makeMe.aNote.please();
     const expectation = helper.apiMock
       .expectingPost(`/api/ai/${note.id}/completion`)
       .andReturnOnce({ moreCompleteContent: "suggestion" });
@@ -50,8 +49,6 @@ describe("AISuggestDetailsButton", () => {
   });
 
   it("get more completed content and update", async () => {
-    const note = makeMe.aNote.please();
-
     helper.apiMock
       .expectingPost(`/api/ai/${note.id}/completion`)
       .andReturnOnce({
@@ -64,8 +61,6 @@ describe("AISuggestDetailsButton", () => {
   });
 
   it("stop updating if the component is unmounted", async () => {
-    const note = makeMe.aNote.please();
-
     helper.apiMock
       .expectingPost(`/api/ai/${note.id}/completion`)
       .andReturnOnce({

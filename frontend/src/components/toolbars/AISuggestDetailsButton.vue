@@ -19,6 +19,7 @@
             suggestDetails({
               detailsToComplete: selectedNote.details,
               clarifyingQuestionAndAnswers: [
+                ...(aiCompletion?.clarifyingHistory ?? []),
                 {
                   questionFromAI: aiCompletion?.question,
                   answerFromUser: clarificationAnswer,
