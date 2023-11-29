@@ -7,6 +7,7 @@ import { assumeClarifyingQuestionDialog } from "./pageObjects/clarifyingQuestion
 import testability from "./testability"
 
 export default {
+  assumeNotePage,
   assumeAnsweredQuestionPage,
   assumeChatAboutNotePage,
   assumeQuestionPage,
