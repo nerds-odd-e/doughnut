@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
+import com.odde.doughnut.controllers.json.ClarifyingQuestionAndAnswer;
 import com.odde.doughnut.entities.Note;
 import com.theokanning.openai.completion.chat.*;
 import java.util.ArrayList;
@@ -194,15 +195,13 @@ please critically check if the following question makes sense and is possible to
     return this;
   }
 
-  public OpenAIChatAboutNoteRequestBuilder answerClarifyingQuestion(
-      String questionFromAI, String answerFromUser) {
-    ChatMessage callResponse = new ChatMessage(ChatMessageRole.FUNCTION.value(), answerFromUser);
+  public void answeredClarifyingQuestion(ClarifyingQuestionAndAnswer qa) {
+    ChatMessage callResponse = new ChatMessage(ChatMessageRole.FUNCTION.value(), qa.answerFromUser);
     callResponse.setName(askClarificationQuestion);
-    ClarifyingQuestion clarifyingQuestion = new ClarifyingQuestion(questionFromAI);
+    ClarifyingQuestion clarifyingQuestion = new ClarifyingQuestion(qa.questionFromAI);
     callResponse.setFunctionCall(
         new ChatFunctionCall(
             askClarificationQuestion, defaultObjectMapper().valueToTree(clarifyingQuestion)));
     messages.add(callResponse);
-    return this;
   }
 }
