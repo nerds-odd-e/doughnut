@@ -1,7 +1,8 @@
 <template>
   <form @submit.prevent="handleFormSubmit">
     <h3>
-      Clarification question by the AI: <strong>{{ question }}</strong>
+      Clarification question by the AI:
+      <strong>{{ aiCompletion.question }}</strong>
     </h3>
     <TextInput
       scope-name="note"
@@ -14,17 +15,21 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, PropType } from "vue";
 import TextInput from "../form/TextInput.vue";
 import asPopup from "../commons/Popups/asPopup";
 
-export default {
+export default defineComponent({
   setup() {
     return {
       ...asPopup(),
     };
   },
   props: {
-    question: String,
+    aiCompletion: {
+      type: Object as PropType<Generated.AiCompletion>,
+      required: true,
+    },
   },
   components: { TextInput },
   emits: ["submit"],
@@ -39,7 +44,7 @@ export default {
       this.popup.done(this.answerToAI);
     },
   },
-};
+});
 </script>
 
 <style lang="scss" scoped></style>
