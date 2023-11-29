@@ -15,7 +15,6 @@
     <RichMarkdownEditor
       :multiple-line="true"
       scope-name="note"
-      :note-id="noteId"
       :model-value="localTextContent.details"
       @update:model-value="onUpdateDetails"
       @blur="onBlurTextField"
