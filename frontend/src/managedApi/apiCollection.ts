@@ -365,8 +365,9 @@ const apiCollection = (managedApi: ManagedApi) => ({
     ): Promise<Generated.AiCompletion> {
       const res = await this.askAiCompletion(
         {
-          ...(data || {}),
           detailsToComplete: data?.detailsToComplete || "",
+          clarifyingQuestionAndAnswers:
+            data?.clarifyingQuestionAndAnswers || [],
         },
         noteId,
       );

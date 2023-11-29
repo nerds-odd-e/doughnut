@@ -41,11 +41,12 @@ public class AiAdvisorService {
             .contentOfNoteOfCurrentFocus(note)
             .instructionForDetailsCompletion(aiCompletionParams);
 
-    if (aiCompletionParams.clarifyingQuestionAndAnswer != null) {
-      requestBuilder.answerClarifyingQuestion(
-          aiCompletionParams.clarifyingQuestionAndAnswer.questionFromAI,
-          aiCompletionParams.clarifyingQuestionAndAnswer.answerFromUser);
-    }
+    aiCompletionParams
+        .getClarifyingQuestionAndAnswers()
+        .forEach(
+            qa -> {
+              requestBuilder.answerClarifyingQuestion(qa.questionFromAI, qa.answerFromUser);
+            });
 
     ChatCompletionRequest chatCompletionRequest = requestBuilder.maxTokens(150).build();
     ChatFunctionCall chatFunctionCall =

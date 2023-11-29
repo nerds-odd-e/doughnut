@@ -6,15 +6,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.services.ai.ClarifyingQuestion;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
-import lombok.AllArgsConstructor;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.lang.Nullable;
 
 @NoArgsConstructor
-@AllArgsConstructor
+@Data
 public class AiCompletionParams {
-  public String detailsToComplete = "";
-  @Nullable public ClarifyingQuestionAndAnswer clarifyingQuestionAndAnswer = null;
+  private String detailsToComplete = "";
+  private List<ClarifyingQuestionAndAnswer> clarifyingQuestionAndAnswers = new ArrayList<>();
 
   public String complete(JsonNode jsonNode) {
     try {

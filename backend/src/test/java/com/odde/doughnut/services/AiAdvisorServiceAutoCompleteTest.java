@@ -105,8 +105,10 @@ class AiAdvisorServiceAutoCompleteTest {
 
     private String getAiCompletionFromAdvisor(String incompleteContent) {
       Note note = makeMe.aNote().inMemoryPlease();
+      AiCompletionParams aiCompletionParams = new AiCompletionParams();
+      aiCompletionParams.setDetailsToComplete(incompleteContent);
       return aiAdvisorService
-          .getAiCompletion(new AiCompletionParams(incompleteContent, null), note, "gpt-4")
+          .getAiCompletion(aiCompletionParams, note, "gpt-4")
           .getMoreCompleteContent();
     }
   }
@@ -164,7 +166,7 @@ class AiAdvisorServiceAutoCompleteTest {
           new ClarifyingQuestion(
               "Are you referring to American football or association football (soccer) ?"),
           "ask_clarification_question");
-      params.detailsToComplete = "Football ";
+      params.setDetailsToComplete("Football ");
       AiCompletion aiCompletion = aiAdvisorService.getAiCompletion(params, note, "gpt-4");
       assertEquals("question", aiCompletion.getFinishReason());
       assertEquals(
@@ -176,10 +178,11 @@ class AiAdvisorServiceAutoCompleteTest {
     class userAnswerToClarifyingQuestion {
       @BeforeEach
       void setup() {
-        params.detailsToComplete = "Tea";
-        params.clarifyingQuestionAndAnswer = new ClarifyingQuestionAndAnswer();
-        params.clarifyingQuestionAndAnswer.questionFromAI = "Black tea or green tea?";
-        params.clarifyingQuestionAndAnswer.answerFromUser = "green tea";
+        params.setDetailsToComplete("Tea");
+        ClarifyingQuestionAndAnswer clarifyingQuestionAndAnswer = new ClarifyingQuestionAndAnswer();
+        clarifyingQuestionAndAnswer.questionFromAI = "Black tea or green tea?";
+        clarifyingQuestionAndAnswer.answerFromUser = "green tea";
+        params.getClarifyingQuestionAndAnswers().add(clarifyingQuestionAndAnswer);
       }
 
       @Test

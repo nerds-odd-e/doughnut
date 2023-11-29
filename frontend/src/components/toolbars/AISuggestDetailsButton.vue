@@ -3,7 +3,12 @@
     :title="'suggest details'"
     class="btn btn-sm"
     role="button"
-    @click="suggestDetails({ detailsToComplete: selectedNote.details })"
+    @click="
+      suggestDetails({
+        detailsToComplete: selectedNote.details,
+        clarifyingQuestionAndAnswers: [],
+      })
+    "
   >
     <SvgRobot />
     <Popup
@@ -16,10 +21,12 @@
           (clarificationAnswer) =>
             suggestDetails({
               detailsToComplete: selectedNote.details,
-              clarifyingQuestionAndAnswer: {
-                questionFromAI: clarificationQuestion,
-                answerFromUser: clarificationAnswer,
-              },
+              clarifyingQuestionAndAnswers: [
+                {
+                  questionFromAI: clarificationQuestion,
+                  answerFromUser: clarificationAnswer,
+                },
+              ],
             })
         "
       />
