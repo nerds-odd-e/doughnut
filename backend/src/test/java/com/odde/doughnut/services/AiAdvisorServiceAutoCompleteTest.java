@@ -166,7 +166,6 @@ class AiAdvisorServiceAutoCompleteTest {
           new ClarifyingQuestion(
               "Are you referring to American football or association football (soccer) ?"),
           "ask_clarification_question");
-      params.setDetailsToComplete("Football ");
       AiCompletion aiCompletion = aiAdvisorService.getAiCompletion(params, note, "gpt-4");
       assertEquals("question", aiCompletion.getFinishReason());
       assertEquals(
@@ -208,6 +207,16 @@ class AiAdvisorServiceAutoCompleteTest {
         assertEquals(
             "Tea is common in China, if you are referring to green tea.",
             aiCompletion.getMoreCompleteContent());
+      }
+
+      @Test
+      void returnTheClarificationHistory() {
+        openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
+            new ClarifyingQuestion(
+                "Are you referring to American football or association football (soccer) ?"),
+            "ask_clarification_question");
+        AiCompletion aiCompletion = aiAdvisorService.getAiCompletion(params, note, "gpt-4");
+        assertEquals("question", aiCompletion.getFinishReason());
       }
     }
   }

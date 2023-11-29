@@ -53,11 +53,15 @@ public class AiAdvisorService {
             .getName()
             .equals(OpenAIChatAboutNoteRequestBuilder.askClarificationQuestion);
     String content = aiCompletionParams.complete(chatFunctionCall.getArguments());
+    AiCompletion result = new AiCompletion();
     if (isClarifyingQuestion) {
-      return new AiCompletion(
-          null, "question", aiCompletionParams.clarifyingQuestion(chatFunctionCall.getArguments()));
+      result.setFinishReason("question");
+      result.setQuestion(AiCompletionParams.clarifyingQuestion(chatFunctionCall.getArguments()));
+      return result;
     }
-    return new AiCompletion(content, "stop", null);
+    result.setMoreCompleteContent(content);
+    result.setFinishReason("stop");
+    return result;
   }
 
   public String chatWithAi(Note note, String userMessage, String modelName) {
