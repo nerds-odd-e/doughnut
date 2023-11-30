@@ -11,24 +11,14 @@
     "
   >
     <SvgRobot />
-    <Popup v-if="aiCompletion" @popup-done="aiCompletion = undefined">
-      <AIClarifyingQuestionDialog
-        :ai-completion="aiCompletion"
-        @submit="
-          (clarificationAnswer) =>
-            suggestDetails({
-              detailsToComplete: selectedNote.details,
-              clarifyingQuestionAndAnswers: [
-                ...(aiCompletion?.clarifyingHistory ?? []),
-                {
-                  questionFromAI: aiCompletion?.question,
-                  answerFromUser: clarificationAnswer,
-                },
-              ],
-            })
-        "
-      />
-    </Popup>
+    <Modal v-if="aiCompletion" @close_request="aiCompletion = undefined">
+      <template #body>
+        <AIClarifyingQuestionDialog
+          :ai-completion="aiCompletion"
+          @submit="clarifyingQuestionAndAnswered"
+        />
+      </template>
+    </Modal>
   </a>
 </template>
 
@@ -38,7 +28,7 @@ import useLoadingApi from "@/managedApi/useLoadingApi";
 import { StorageAccessor } from "@/store/createNoteStorage";
 import SvgRobot from "../svgs/SvgRobot.vue";
 import AIClarifyingQuestionDialog from "../notes/AIClarifyingQuestionDialog.vue";
-import Popup from "../commons/Popups/Popup.vue";
+import Modal from "../commons/Modal.vue";
 
 export default defineComponent({
   setup() {
@@ -58,7 +48,7 @@ export default defineComponent({
   },
   components: {
     SvgRobot,
-    Popup,
+    Modal,
     AIClarifyingQuestionDialog,
   },
   data() {
@@ -92,6 +82,19 @@ export default defineComponent({
           details: this.selectedNote.details,
         },
       );
+    },
+    clarifyingQuestionAndAnswered(clarificationAnswer: string) {
+      this.suggestDetails({
+        detailsToComplete: this.selectedNote.details,
+        clarifyingQuestionAndAnswers: [
+          ...(this.aiCompletion?.clarifyingHistory ?? []),
+          {
+            questionFromAI: this.aiCompletion?.question,
+            answerFromUser: clarificationAnswer,
+          },
+        ],
+      });
+      this.aiCompletion = undefined;
     },
   },
   unmounted() {
