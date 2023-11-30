@@ -10,8 +10,8 @@ in mkShell {
   buildInputs = [
     python312
     pipenv
-    corepack_20
-    nodejs_20
+    corepack_21
+    nodejs_21
     zsh
     dum
     yarn
@@ -117,6 +117,7 @@ in mkShell {
     echo "##   JAVA VERSION: `javac --version`                  "
     echo "##   KOTLIN VERSION: `kotlin -version`                "
     echo "##   NODE VERSION: `node --version`                   "
+    echo "##   PNPM VERSION: `pnpm --version`                   "
     echo "##   FLUTTER VERSION: `flutter --version | head -n 1` "
     echo "                                                                                "
     echo "###################################################################################################################"
