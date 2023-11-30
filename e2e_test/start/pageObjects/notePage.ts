@@ -1,6 +1,9 @@
 import { assumeChatAboutNotePage } from "./chatAboutNotePage"
 
-export const assumeNotePage = () => {
+export const assumeNotePage = (noteTopic?: string) => {
+  if (noteTopic) {
+    cy.findNoteTopic(noteTopic)
+  }
   const clickNotePageMoreOptionsButton = (btnTextOrTitle: string) => {
     cy.clickNotePageMoreOptionsButtonOnCurrentPage(btnTextOrTitle)
   }

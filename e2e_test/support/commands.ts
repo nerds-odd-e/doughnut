@@ -105,8 +105,7 @@ Cypress.Commands.add("submitNoteCreationFormWith", (noteAttributes) => {
 Cypress.Commands.add(
   "openAndSubmitNoteAccessoriesFormWith",
   (noteTopic: string, noteAccessoriesAttributes: Record<string, string>) => {
-    cy.findNoteTopic(noteTopic)
-    start.assumeNotePage().editNoteButton().click()
+    start.assumeNotePage(noteTopic).editNoteButton().click()
     cy.submitNoteFormWith(noteAccessoriesAttributes)
   },
 )
