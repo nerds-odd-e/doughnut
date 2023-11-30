@@ -53,7 +53,6 @@
 import { defineComponent, PropType } from "vue";
 import _ from "lodash";
 import useLoadingApi from "../../managedApi/useLoadingApi";
-import asPopup from "../commons/Popups/asPopup";
 import TextInput from "../form/TextInput.vue";
 import TextArea from "../form/TextArea.vue";
 import CheckInput from "../form/CheckInput.vue";
@@ -67,7 +66,7 @@ const validateRealCorrectAnswers = (answers: string) => {
 export default defineComponent({
   inheritAttrs: false,
   setup() {
-    return { ...useLoadingApi(), ...asPopup() };
+    return { ...useLoadingApi() };
   },
   props: {
     modelValue: {
@@ -101,7 +100,6 @@ export default defineComponent({
           validated,
         );
       this.$emit("update:modelValue", updated);
-      this.popup.done(updated);
     },
     validateSuggestedQuestion(
       params: Generated.QuestionSuggestionParams,
