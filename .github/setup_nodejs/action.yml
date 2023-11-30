@@ -4,7 +4,7 @@ inputs:
   node-version:
     description: "NodeJS Version"
     required: true
-    default: "20"
+    default: "21"
 runs:
   using: "composite"
   steps:
@@ -15,7 +15,7 @@ runs:
     - name: Setup pnpm & install deps
       uses: pnpm/action-setup@v2
       with:
-        version: 8
+        version: 8.11.0
         run_install: |
           - recursive: true
             args: [--frozen-lockfile, --strict-peer-dependencies]

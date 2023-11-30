@@ -4,7 +4,7 @@ inputs:
   node-version:
     description: "NodeJS Version"
     required: true
-    default: "20"
+    default: "21"
 runs:
   using: "composite"
   steps:
@@ -15,7 +15,7 @@ runs:
     - name: Install pnpm
       uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 8.11.0
           run_install: false
     - name: Get pnpm store directory
       shell: bash
