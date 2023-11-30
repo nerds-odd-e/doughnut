@@ -196,12 +196,15 @@ please critically check if the following question makes sense and is possible to
   }
 
   public void answeredClarifyingQuestion(ClarifyingQuestionAndAnswer qa) {
-    ChatMessage callResponse = new ChatMessage(ChatMessageRole.FUNCTION.value(), qa.answerFromUser);
-    callResponse.setName(askClarificationQuestion);
+    ChatMessage functionCall =
+        new ChatMessage(ChatMessageRole.ASSISTANT.value(), qa.answerFromUser);
     ClarifyingQuestion clarifyingQuestion = new ClarifyingQuestion(qa.questionFromAI);
-    callResponse.setFunctionCall(
+    functionCall.setFunctionCall(
         new ChatFunctionCall(
             askClarificationQuestion, defaultObjectMapper().valueToTree(clarifyingQuestion)));
+    messages.add(functionCall);
+    ChatMessage callResponse = new ChatMessage(ChatMessageRole.FUNCTION.value(), qa.answerFromUser);
+    callResponse.setName(askClarificationQuestion);
     messages.add(callResponse);
   }
 }

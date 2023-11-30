@@ -184,16 +184,24 @@ class AiAdvisorServiceAutoCompleteTest {
       }
 
       @Test
-      void mustIncludeTheQuestionAndAnswerInMessages() {
+      void mustIncludeThePreviousQuestionInMessages() {
         openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
             new NoteDetailsCompletion(" is healthy."), "complete_note_details");
         aiAdvisorService.getAiCompletion(params, note, "gpt-4");
         ChatMessage functionResultMessage = captureChatCompletionRequest().getMessages().get(3);
-        assertThat(functionResultMessage.getName(), equalTo("ask_clarification_question"));
-        assertThat(functionResultMessage.getContent(), equalTo("green tea"));
         assertThat(
             functionResultMessage.getFunctionCall().getArguments().toString(),
             equalTo("{\"question\":\"Black tea or green tea?\"}"));
+      }
+
+      @Test
+      void mustIncludeThePreviousAnswerInMessages() {
+        openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
+            new NoteDetailsCompletion(" is healthy."), "complete_note_details");
+        aiAdvisorService.getAiCompletion(params, note, "gpt-4");
+        ChatMessage functionResultMessage = captureChatCompletionRequest().getMessages().get(4);
+        assertThat(functionResultMessage.getName(), equalTo("ask_clarification_question"));
+        assertThat(functionResultMessage.getContent(), equalTo("green tea"));
       }
 
       @Test
