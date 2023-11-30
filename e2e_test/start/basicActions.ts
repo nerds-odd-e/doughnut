@@ -23,9 +23,8 @@ export default {
         if (forceLoadPage) cy.visit(url)
         else cy.routerPush(url, "noteShow", { noteId: noteId })
       })
-    cy.findNoteTopic(noteTopic)
 
-    return assumeNotePage()
+    return assumeNotePage(noteTopic)
   },
 
   loginAsAdmin: () => {
