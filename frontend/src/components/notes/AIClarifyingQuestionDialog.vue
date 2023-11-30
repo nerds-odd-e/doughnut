@@ -32,14 +32,8 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import TextInput from "../form/TextInput.vue";
-import asPopup from "../commons/Popups/asPopup";
 
 export default defineComponent({
-  setup() {
-    return {
-      ...asPopup(),
-    };
-  },
   props: {
     aiCompletion: {
       type: Object as PropType<Generated.AiCompletion>,
@@ -56,7 +50,6 @@ export default defineComponent({
   methods: {
     handleFormSubmit() {
       this.$emit("submit", this.answerToAI);
-      this.popup.done(this.answerToAI);
     },
   },
 });
