@@ -106,7 +106,7 @@ Cypress.Commands.add(
   "openAndSubmitNoteAccessoriesFormWith",
   (noteTopic: string, noteAccessoriesAttributes: Record<string, string>) => {
     cy.findNoteTopic(noteTopic)
-    cy.notePageButtonOnCurrentPageEditNote().click()
+    start.assumeNotePage().editNoteButton().click()
     cy.submitNoteFormWith(noteAccessoriesAttributes)
   },
 )
@@ -272,12 +272,12 @@ Cypress.Commands.add("routerToNotebooks", () => {
 })
 
 Cypress.Commands.add("startSearching", () => {
-  cy.notePageButtonOnCurrentPage("search note").click()
+  start.assumeNotePage().toolbarButton("search note").click()
 })
 
 Cypress.Commands.add("clickNotePageMoreOptionsButtonOnCurrentPage", (btnTextOrTitle: string) => {
-  cy.notePageButtonOnCurrentPage("more options").click()
-  cy.notePageButtonOnCurrentPage(btnTextOrTitle).click()
+  start.assumeNotePage().toolbarButton("more options").click()
+  start.assumeNotePage().toolbarButton(btnTextOrTitle).click()
 })
 
 Cypress.Commands.add("expectExactLinkTargets", (targets) => {
@@ -473,14 +473,6 @@ Cypress.Commands.add("searchNote", (searchKey: string, options: string[]) => {
 
 Cypress.Commands.add("failure", () => {
   throw new Error("Deliberate CYPRESS test Failure!!!")
-})
-
-Cypress.Commands.add("notePageButtonOnCurrentPage", (btnTextOrTitle) => {
-  cy.findByRole("button", { name: btnTextOrTitle })
-})
-
-Cypress.Commands.add("notePageButtonOnCurrentPageEditNote", () => {
-  cy.notePageButtonOnCurrentPage("edit note")
 })
 
 Cypress.Commands.add("undoLast", (undoType: string) => {

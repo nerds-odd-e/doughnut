@@ -9,8 +9,18 @@ export const assumeNotePage = () => {
     findNoteDetails: (expected: string) => {
       expected.split("\\n").forEach((line) => cy.get("[role=details]").should("contain", line))
     },
+    toolbarButton: (btnTextOrTitle: string) => {
+      const getButton = () => cy.findByRole("button", { name: btnTextOrTitle })
+      return {
+        click: () => getButton().click(),
+        shouldNotExist: () => getButton().should("not.exist"),
+      }
+    },
+    editNoteButton() {
+      return this.toolbarButton("edit note")
+    },
     startSearchingAndLinkNote() {
-      cy.notePageButtonOnCurrentPage("search and link note").click()
+      this.toolbarButton("search and link note").click()
     },
     aiGenerateImage() {
       clickNotePageMoreOptionsButton("Generate Image with DALL-E")
@@ -21,7 +31,7 @@ export const assumeNotePage = () => {
       cy.pageIsNotLoading()
     },
     associateNoteWithWikidataId(wikiID: string) {
-      cy.notePageButtonOnCurrentPage("associate wikidata").click()
+      this.toolbarButton("associate wikidata").click()
       cy.replaceFocusedTextAndEnter(wikiID)
     },
     aiSuggestDetailsForNote: () => {

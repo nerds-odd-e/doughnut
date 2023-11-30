@@ -9,8 +9,6 @@ declare namespace Cypress {
     cleanDownloadFolder(): Chainable<any>
     clickAddChildNoteButton(): Chainable<any>
     clickButtonOnCardBody(noteTopic: any, buttonTitle: any): Chainable<any>
-    notePageButtonOnCurrentPage(btnTextOrTitle: any): Chainable<any>
-    notePageButtonOnCurrentPageEditNote(): Chainable<any>
     clickNotePageMoreOptionsButtonOnCurrentPage(btnTextOrTitle: string): Chainable<any>
     clickLinkNob(target: string): Chainable<any>
     changeLinkType(targetNote: string, linkType: string): Chainable<any>
