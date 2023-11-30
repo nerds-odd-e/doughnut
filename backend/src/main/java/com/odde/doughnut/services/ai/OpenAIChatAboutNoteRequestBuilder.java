@@ -12,6 +12,7 @@ import com.odde.doughnut.controllers.json.ClarifyingQuestionAndAnswer;
 import com.odde.doughnut.entities.Note;
 import com.theokanning.openai.completion.chat.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class OpenAIChatAboutNoteRequestBuilder {
@@ -77,6 +78,8 @@ public class OpenAIChatAboutNoteRequestBuilder {
             .executor(ClarifyingQuestion.class, null)
             .build());
 
+    HashMap<String, String> arguments = new HashMap<>();
+    arguments.put("details_to_complete", noteDetailsCompletion.getDetailsToComplete());
     addMessage(
         ChatMessageRole.USER,
         ("Please complete the concise details of the note of focus. Keep it short."
@@ -84,7 +87,7 @@ public class OpenAIChatAboutNoteRequestBuilder {
                 + " The current details in JSON format are: \n%s")
             .formatted(
                 askClarificationQuestion,
-                defaultObjectMapper().valueToTree(noteDetailsCompletion).toPrettyString()));
+                defaultObjectMapper().valueToTree(arguments).toPrettyString()));
     return this;
   }
 
