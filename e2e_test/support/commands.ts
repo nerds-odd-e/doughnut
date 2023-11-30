@@ -274,11 +274,6 @@ Cypress.Commands.add("startSearching", () => {
   start.assumeNotePage().toolbarButton("search note").click()
 })
 
-Cypress.Commands.add("clickNotePageMoreOptionsButtonOnCurrentPage", (btnTextOrTitle: string) => {
-  start.assumeNotePage().toolbarButton("more options").click()
-  start.assumeNotePage().toolbarButton(btnTextOrTitle).click()
-})
-
 Cypress.Commands.add("expectExactLinkTargets", (targets) => {
   cy.get(".search-result .card-title a")
     .then((elms) => Cypress._.map(elms, "innerText"))

@@ -4,8 +4,18 @@ export const assumeNotePage = (noteTopic?: string) => {
   if (noteTopic) {
     cy.findNoteTopic(noteTopic)
   }
+
+  const privateToolbarButton = (btnTextOrTitle: string) => {
+    const getButton = () => cy.findByRole("button", { name: btnTextOrTitle })
+    return {
+      click: () => getButton().click(),
+      shouldNotExist: () => getButton().should("not.exist"),
+    }
+  }
+
   const clickNotePageMoreOptionsButton = (btnTextOrTitle: string) => {
-    cy.clickNotePageMoreOptionsButtonOnCurrentPage(btnTextOrTitle)
+    privateToolbarButton("more options").click()
+    privateToolbarButton(btnTextOrTitle).click()
   }
 
   return {
@@ -13,11 +23,7 @@ export const assumeNotePage = (noteTopic?: string) => {
       expected.split("\\n").forEach((line) => cy.get("[role=details]").should("contain", line))
     },
     toolbarButton: (btnTextOrTitle: string) => {
-      const getButton = () => cy.findByRole("button", { name: btnTextOrTitle })
-      return {
-        click: () => getButton().click(),
-        shouldNotExist: () => getButton().should("not.exist"),
-      }
+      return privateToolbarButton(btnTextOrTitle)
     },
     editNoteButton() {
       return this.toolbarButton("edit note")
