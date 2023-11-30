@@ -7,7 +7,6 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    AIClarifyingQuestion: typeof import('./src/components/toolbars/AIClarifyingQuestion.vue')['default']
     AIClarifyingQuestionDialog: typeof import('./src/components/notes/AIClarifyingQuestionDialog.vue')['default']
     AIGenerateImageDialog: typeof import('./src/components/notes/AIGenerateImageDialog.vue')['default']
     AISuggestDetailsButton: typeof import('./src/components/toolbars/AISuggestDetailsButton.vue')['default']
@@ -28,7 +27,6 @@ declare module 'vue' {
     ContentLoader: typeof import('./src/components/commons/ContentLoader.vue')['default']
     ContestableQuestion: typeof import('./src/components/review/ContestableQuestion.vue')['default']
     ControlCenterForNote: typeof import('./src/components/toolbars/ControlCenterForNote.vue')['default']
-    copy: typeof import('./src/components/commons/Popups/Popup copy.vue')['default']
     EditableText: typeof import('./src/components/form/EditableText.vue')['default']
     FailureReportList: typeof import('./src/components/admin/FailureReportList.vue')['default']
     Feather: typeof import('./src/components/svgs/link_types/Feather.vue')['default']
