@@ -524,12 +524,3 @@ Cypress.Commands.add("expectAMapTo", (latitude: string, longitude: string) => {
 Cypress.Commands.add("dismissLastErrorMessage", () => {
   cy.get(".last-error-message").click()
 })
-
-Cypress.Commands.add("typeTab", (element, shiftKey, ctrlKey) => {
-  element.trigger("keydown", {
-    keyCode: 9,
-    which: 9,
-    shiftKey: shiftKey,
-    ctrlKey: ctrlKey,
-  })
-})
