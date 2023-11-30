@@ -22,7 +22,7 @@ Then("notebook {string} is shared to the Bazaar", (noteTopic: string) => {
 })
 
 Then("there shouldn't be any note edit button", () => {
-  cy.notePageButtonOnCurrentPageEditNote().should("not.exist")
+  start.assumeNotePage().editNoteButton().shouldNotExist()
 })
 
 When("I open the notebook {string} in the Bazaar", (noteTopic: string) => {
@@ -52,7 +52,7 @@ Then("I should see readonly notebook {string} in my notes", (noteTopic: string) 
   cy.routerToNotebooks()
   cy.findByText(noteTopic).click()
   cy.pageIsNotLoading()
-  cy.notePageButtonOnCurrentPageEditNote().should("not.exist")
+  start.assumeNotePage().editNoteButton().shouldNotExist()
 })
 
 Then("I should see I've subscribed to {string}", (noteTopic: string) => {
