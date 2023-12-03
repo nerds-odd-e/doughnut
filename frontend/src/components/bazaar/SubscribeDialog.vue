@@ -16,11 +16,10 @@
 import { defineComponent, PropType } from "vue";
 import TextInput from "../form/TextInput.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
-import asPopup from "../commons/Popups/asPopup";
 
 export default defineComponent({
   setup() {
-    return { ...useLoadingApi(), ...asPopup() };
+    return { ...useLoadingApi() };
   },
   props: {
     notebook: { type: Object as PropType<Generated.Notebook>, required: true },
