@@ -35,6 +35,12 @@ export default defineComponent({
       return "modal-container";
     },
   },
+  watch: {
+    // When the route changes, close the modal.
+    $route() {
+      this.$emit("close_request");
+    },
+  },
 });
 </script>
 
