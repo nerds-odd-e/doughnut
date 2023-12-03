@@ -1,11 +1,7 @@
-import { Slot } from "vue";
-
 interface PopupInfo {
   type: "alert" | "confirm" | "dialog";
   message?: string;
-  sidebar?: "left" | "right";
   doneResolve: ((value: unknown) => void) | ((value: boolean) => void);
-  slot?: Slot;
 }
 
 class Popup {
@@ -37,12 +33,6 @@ function usePopups() {
       confirm(msg: string) {
         return new Promise<boolean>((resolve) => {
           push({ type: "confirm", message: msg, doneResolve: resolve });
-        });
-      },
-
-      dialog(slot?: Slot, sidebar?: "left" | "right") {
-        return new Promise((resolve) => {
-          push({ type: "dialog", slot, doneResolve: resolve, sidebar });
         });
       },
 
