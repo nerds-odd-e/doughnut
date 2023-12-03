@@ -15,7 +15,9 @@
         <template #button_face>
           <SvgSearch />
         </template>
-        <LinkNoteDialog v-bind="{ storageAccessor }" />
+        <template #default="{ closer }">
+          <LinkNoteDialog v-bind="{ storageAccessor }" @close-dialog="closer" />
+        </template>
       </PopButton>
       <NoteUndoButton v-bind="{ storageAccessor }" />
     </div>
