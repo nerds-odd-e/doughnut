@@ -1,16 +1,21 @@
 <template>
-  <PopButton :title="buttonTitle">
+  <PopButton1 :title="buttonTitle">
     <template #button_face>
       <slot />
     </template>
-    <NoteNewDialog v-bind="{ parentId, storageAccessor }" />
-  </PopButton>
+    <template #default="{ closer }">
+      <NoteNewDialog
+        v-bind="{ parentId, storageAccessor }"
+        @close-dialog="closer"
+      />
+    </template>
+  </PopButton1>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import NoteNewDialog from "../notes/NoteNewDialog.vue";
-import PopButton from "../commons/Popups/PopButton.vue";
+import PopButton1 from "../commons/Popups/PopButton1.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
@@ -22,6 +27,6 @@ export default defineComponent({
       required: true,
     },
   },
-  components: { PopButton, NoteNewDialog },
+  components: { PopButton1, NoteNewDialog },
 });
 </script>

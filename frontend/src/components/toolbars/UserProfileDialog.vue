@@ -40,11 +40,10 @@ import ContainerPage from "../../pages/commons/ContainerPage.vue";
 import CheckInput from "../form/CheckInput.vue";
 import TextInput from "../form/TextInput.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
-import asPopup from "../commons/Popups/asPopup";
 
 export default {
   setup() {
-    return { ...useLoadingApi(), ...asPopup() };
+    return { ...useLoadingApi() };
   },
   components: { ContainerPage, TextInput, CheckInput },
   emits: ["user-updated"],
@@ -64,7 +63,6 @@ export default {
         .catch((err) => {
           this.errors = err;
         });
-      this.popup.done(updated);
       this.$emit("user-updated", updated);
     },
   },

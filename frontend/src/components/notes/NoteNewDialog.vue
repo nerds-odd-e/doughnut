@@ -45,12 +45,8 @@ import LinkTypeSelectCompact from "../links/LinkTypeSelectCompact.vue";
 import WikidataSearchByLabel from "./WikidataSearchByLabel.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import SuggestTopic from "./SuggestTopic.vue";
-import asPopup from "../commons/Popups/asPopup";
 
 export default defineComponent({
-  setup() {
-    return asPopup();
-  },
   components: {
     NoteFormTopicOnly,
     SearchResults,
@@ -65,6 +61,7 @@ export default defineComponent({
       required: true,
     },
   },
+  emits: ["closeDialog"],
   data() {
     return {
       creationData: {
@@ -90,7 +87,9 @@ export default defineComponent({
       this.storageAccessor
         .api(this.$router)
         .createNote(this.parentId, this.creationData)
-        .then(this.popup.done)
+        .then(() => {
+          this.$emit("closeDialog");
+        })
         .catch((res) => {
           this.noteFormErrors = res;
         })

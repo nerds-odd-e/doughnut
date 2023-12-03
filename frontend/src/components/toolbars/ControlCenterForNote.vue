@@ -20,14 +20,17 @@
         </template>
       </PopButton1>
 
-      <PopButton title="associate wikidata">
+      <PopButton1 title="associate wikidata">
         <template #button_face>
           <SvgWikidata />
         </template>
-        <WikidataAssociationDialog
-          v-bind="{ note: selectedNote, storageAccessor }"
-        />
-      </PopButton>
+        <template #default="{ closer }">
+          <WikidataAssociationDialog
+            v-bind="{ note: selectedNote, storageAccessor }"
+            @close-dialog="closer"
+          />
+        </template>
+      </PopButton1>
       <AISuggestDetailsButton v-bind="{ selectedNote, storageAccessor }" />
       <PopButton title="search and link note">
         <template #button_face>
