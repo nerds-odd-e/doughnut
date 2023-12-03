@@ -12,16 +12,20 @@
       {{ user.name }}
     </button>
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-      <PopButton btn-class="dropdown-item" title="user settings">
+      <PopButton1 btn-class="dropdown-item" title="user settings">
         <template #button_face> Settings for {{ user.name }}</template>
-        <UserProfileDialog
-          @user-updated="
-            if ($event) {
-              $emit('updateUser', $event);
-            }
-          "
-        />
-      </PopButton>
+        <template #default="{ closer }">
+          <UserProfileDialog
+            v-bind="{ user }"
+            @user-updated="
+              if ($event) {
+                $emit('updateUser', $event);
+              }
+              closer();
+            "
+          />
+        </template>
+      </PopButton1>
       <a href="#" class="dropdown-item" role="button" @click="logout">Logout</a>
     </div>
   </div>
@@ -29,7 +33,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import PopButton from "../commons/Popups/PopButton.vue";
+import PopButton1 from "../commons/Popups/PopButton1.vue";
 import UserProfileDialog from "./UserProfileDialog.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import SvgMissingAvatar from "../svgs/SvgMissingAvatar.vue";
@@ -43,7 +47,7 @@ export default defineComponent({
   },
   emits: ["updateUser"],
   components: {
-    PopButton,
+    PopButton1,
     UserProfileDialog,
     SvgMissingAvatar,
   },
