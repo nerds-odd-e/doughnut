@@ -1,12 +1,8 @@
 <template>
   <InputWithType v-bind="{ scopeName, field: '', errors, title: titlized }">
-    <PopButton>
+    <PopButton :aria-label="titlized">
       <template #button_face>
-        <SvgLinkTypeIcon
-          :aria-label="titlized"
-          :link-type="modelValue"
-          :inverse-icon="inverseIcon"
-        />
+        <SvgLinkTypeIcon :link-type="modelValue" :inverse-icon="inverseIcon" />
         {{ label }}
       </template>
       <LinkTypeSelect

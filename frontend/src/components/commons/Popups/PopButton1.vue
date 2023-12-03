@@ -1,6 +1,7 @@
 <template>
   <a
     :class="`btn btn-sm ${btnClass}`"
+    :aria-label="ariaLabel"
     role="button"
     @click="show = true"
     :title="title"
@@ -26,6 +27,7 @@ export default defineComponent({
     title: String,
     sidebar: String as PropType<"left" | "right">,
     btnClass: String,
+    ariaLabel: String,
   },
   data() {
     return { show: false };
