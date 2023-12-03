@@ -18,12 +18,13 @@ describe("Modal", () => {
     emits: ["close_request"],
   };
 
-const mountWithoutTeleport = () => mount(TestComponent, {
+  const mountWithoutTeleport = () =>
+    mount(TestComponent, {
       global: {
         stubs: {
           Teleport: true, // Stub the Teleport component
-        }
-      }
+        },
+      },
     });
 
   it("click on note when doing review", async () => {
