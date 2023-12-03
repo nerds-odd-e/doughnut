@@ -4,12 +4,12 @@
     <template v-if="!$slots.button_face">
       {{ title }}
     </template>
-    <Modal v-if="show" :sidebar="sidebar" @close_request="show = false">
-      <template #body>
-        <slot />
-      </template>
-    </Modal>
   </a>
+  <Modal v-if="show" :sidebar="sidebar" @close_request="show = false">
+    <template #body>
+      <slot />
+    </template>
+  </Modal>
 </template>
 
 <script lang="ts">
