@@ -1,24 +1,24 @@
 <template>
   <ToolbarFrame>
-    <PopButton1 v-if="user" title="open sidebar" :sidebar="'left'">
+    <PopButton v-if="user" title="open sidebar" :sidebar="'left'">
       <template #button_face>
         <SvgSidebar />
       </template>
       <GlobalSidebar :user="user" @update-user="$emit('updateUser', $event)" />
-    </PopButton1>
+    </PopButton>
     <LoginButton v-else />
     <div class="btn-group btn-group-sm">
       <BrandBar />
     </div>
     <div class="btn-group btn-group-sm">
-      <PopButton1 v-if="user" title="search note">
+      <PopButton v-if="user" title="search note">
         <template #button_face>
           <SvgSearch />
         </template>
         <template #default="{ closer }">
           <LinkNoteDialog v-bind="{ storageAccessor }" @close-dialog="closer" />
         </template>
-      </PopButton1>
+      </PopButton>
       <NoteUndoButton v-bind="{ storageAccessor }" />
     </div>
     <ApiStatus
@@ -30,7 +30,7 @@
 
 <script lang="ts">
 import { PropType, defineComponent } from "vue";
-import PopButton1 from "../commons/Popups/PopButton1.vue";
+import PopButton from "../commons/Popups/PopButton.vue";
 import SvgSidebar from "../svgs/SvgSidebar.vue";
 import GlobalSidebar from "./GlobalSidebar.vue";
 import ToolbarFrame from "./ToolbarFrame.vue";
@@ -48,7 +48,7 @@ export default defineComponent({
     user: { type: Object as PropType<Generated.User> },
   },
   components: {
-    PopButton1,
+    PopButton,
     SvgSidebar,
     GlobalSidebar,
     ToolbarFrame,

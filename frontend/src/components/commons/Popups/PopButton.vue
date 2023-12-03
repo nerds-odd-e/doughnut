@@ -11,14 +11,16 @@
       {{ title }}
     </template>
   </a>
-  <Popup v-if="show" :sidebar="sidebar" @popup-done="show = false">
-    <slot />
-  </Popup>
+  <Modal v-if="show" :sidebar="sidebar" @close_request="closeDialog">
+    <template #body>
+      <slot name="default" :closer="closeDialog" />
+    </template>
+  </Modal>
 </template>
 
 <script lang="ts">
 import { PropType, defineComponent } from "vue";
-import Popup from "./Popup.vue";
+import Modal from "../Modal.vue";
 
 export default defineComponent({
   props: {
@@ -30,6 +32,11 @@ export default defineComponent({
   data() {
     return { show: false };
   },
-  components: { Popup },
+  components: { Modal },
+  methods: {
+    closeDialog() {
+      this.show = false;
+    },
+  },
 });
 </script>

@@ -1,6 +1,6 @@
 <template>
   <span class="link-nob">
-    <PopButton1 :title="link.linkType">
+    <PopButton :title="link.linkType">
       <template #button_face>
         <SvgLinkTypeIcon
           :link-type="link.linkType"
@@ -13,14 +13,14 @@
           @close-dialog="closer"
         />
       </template>
-    </PopButton1>
+    </PopButton>
   </span>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue";
-import PopButton1 from "../commons/Popups/PopButton1.vue";
+import PopButton from "../commons/Popups/PopButton.vue";
 import LinkNobDialog from "./LinkNobDialog.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
@@ -37,6 +37,6 @@ export default defineComponent({
     inverseIcon: Boolean,
     colors: Object,
   },
-  components: { SvgLinkTypeIcon, PopButton1, LinkNobDialog },
+  components: { SvgLinkTypeIcon, PopButton, LinkNobDialog },
 });
 </script>

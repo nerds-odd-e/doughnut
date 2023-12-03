@@ -1,5 +1,5 @@
 <template>
-  <PopButton1 :title="buttonTitle">
+  <PopButton :title="buttonTitle">
     <template #button_face>
       <slot />
     </template>
@@ -9,13 +9,13 @@
         @close-dialog="closer"
       />
     </template>
-  </PopButton1>
+  </PopButton>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import NoteNewDialog from "../notes/NoteNewDialog.vue";
-import PopButton1 from "../commons/Popups/PopButton1.vue";
+import PopButton from "../commons/Popups/PopButton.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
@@ -27,6 +27,6 @@ export default defineComponent({
       required: true,
     },
   },
-  components: { PopButton1, NoteNewDialog },
+  components: { PopButton, NoteNewDialog },
 });
 </script>
