@@ -1,5 +1,10 @@
 <template>
-  <a class="btn btn-sm" role="button" @click="show = true" :title="title">
+  <a
+    :class="`btn btn-sm ${btnClass}`"
+    role="button"
+    @click="show = true"
+    :title="title"
+  >
     <slot name="button_face" />
     <template v-if="!$slots.button_face">
       {{ title }}
@@ -15,7 +20,11 @@ import { PropType, defineComponent } from "vue";
 import Popup from "./Popup.vue";
 
 export default defineComponent({
-  props: { title: String, sidebar: String as PropType<"left" | "right"> },
+  props: {
+    title: String,
+    sidebar: String as PropType<"left" | "right">,
+    btnClass: String,
+  },
   data() {
     return { show: false };
   },

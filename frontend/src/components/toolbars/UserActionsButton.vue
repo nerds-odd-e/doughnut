@@ -12,7 +12,7 @@
       {{ user.name }}
     </button>
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-      <PopButton class="dropdown-item" title="user settings">
+      <PopButton btn-class="dropdown-item" title="user settings">
         <template #button_face> Settings for {{ user.name }}</template>
         <UserProfileDialog
           @user-updated="

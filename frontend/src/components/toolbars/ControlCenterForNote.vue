@@ -46,7 +46,7 @@
         </button>
         <div class="dropdown-menu dropdown-menu-end">
           <PopButton
-            class="dropdown-item btn-primary"
+            btn-class="dropdown-item btn-primary"
             title="Generate Image with DALL-E"
           >
             <AIGenerateImageDialog v-bind="{ selectedNote, storageAccessor }" />
