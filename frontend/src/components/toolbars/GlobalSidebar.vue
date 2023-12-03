@@ -8,7 +8,7 @@
       @update-user="$emit('updateUser', $event)"
     />
   </ToolbarFrame>
-  <LoadingPage v-bind="{ contentExists: circles, title: 'My Circles' }">
+  <LoadingPage v-bind="{ contentExists: circles }">
     <ul class="list-group">
       <li v-if="user?.admin" class="list-group-item">
         <router-link :to="{ name: 'adminDashboard' }">
