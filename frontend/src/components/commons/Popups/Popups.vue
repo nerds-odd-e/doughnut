@@ -34,21 +34,6 @@
         </button>
       </template>
     </Modal>
-
-    <Modal
-      v-if="popupInfo.type === 'dialog'"
-      class="popups"
-      :sidebar="popupInfo.sidebar"
-      @close_request="resolve($event)"
-    >
-      <template #body>
-        <component
-          v-if="popupInfo.slot"
-          :is="popupInfo.slot"
-          v-bind="{ doneHandler: resolve }"
-        />
-      </template>
-    </Modal>
   </template>
 </template>
 
