@@ -36,7 +36,9 @@
     </ul>
     <div class="btn-group">
       <PopButton btn-class="btn btn-secondary" title="Create a new circle">
-        <CircleNewDialog />
+        <template #default="{ closer }">
+          <CircleNewDialog @close-dialog="closer" />
+        </template>
       </PopButton>
       <router-link btn-class="btn btn-primary" :to="{ name: 'circleJoin' }">
         Join a circle
