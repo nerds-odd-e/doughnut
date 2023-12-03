@@ -5,7 +5,6 @@ import GlobalBar from "@/components/toolbars/GlobalBar.vue";
 import NoteEditingHistory from "@/store/NoteEditingHistory";
 import createNoteStorage, { StorageAccessor } from "@/store/createNoteStorage";
 import makeMe from "../fixtures/makeMe";
-import usePopups from "../../src/components/commons/Popups/usePopups";
 import helper from "../helpers";
 
 helper.resetWithApiMock(beforeEach, afterEach);
@@ -33,9 +32,9 @@ describe("global bar", () => {
         apiStatus: { states: [] },
       })
       .mount();
+    helper.apiMock.expectingGet("/api/circles");
     wrapper.find("[role='button']").trigger("click");
     await flushPromises();
-    expect(usePopups().popups.peek()).toHaveLength(1);
   });
 
   it("fetch API to be called ONCE", async () => {

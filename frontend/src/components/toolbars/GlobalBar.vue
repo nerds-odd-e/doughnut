@@ -1,11 +1,11 @@
 <template>
   <ToolbarFrame>
-    <PopButton v-if="user" title="open sidebar" :sidebar="'left'">
+    <PopButton1 v-if="user" title="open sidebar" :sidebar="'left'">
       <template #button_face>
         <SvgSidebar />
       </template>
       <GlobalSidebar :user="user" @update-user="$emit('updateUser', $event)" />
-    </PopButton>
+    </PopButton1>
     <LoginButton v-else />
     <div class="btn-group btn-group-sm">
       <BrandBar />
@@ -29,6 +29,7 @@
 <script lang="ts">
 import { PropType, defineComponent } from "vue";
 import PopButton from "../commons/Popups/PopButton.vue";
+import PopButton1 from "../commons/Popups/PopButton1.vue";
 import SvgSidebar from "../svgs/SvgSidebar.vue";
 import GlobalSidebar from "./GlobalSidebar.vue";
 import ToolbarFrame from "./ToolbarFrame.vue";
@@ -47,6 +48,7 @@ export default defineComponent({
   },
   components: {
     PopButton,
+    PopButton1,
     SvgSidebar,
     GlobalSidebar,
     ToolbarFrame,
