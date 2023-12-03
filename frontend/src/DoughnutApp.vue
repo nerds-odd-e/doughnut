@@ -42,11 +42,6 @@ export default defineComponent({
     UserNewRegisterPage,
     GlobalBar,
   },
-  watch: {
-    $route() {
-      this.popups.done(false);
-    },
-  },
 
   methods: {
     clearErrorMessage(_id: number) {
