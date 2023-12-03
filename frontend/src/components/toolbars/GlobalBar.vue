@@ -11,14 +11,14 @@
       <BrandBar />
     </div>
     <div class="btn-group btn-group-sm">
-      <PopButton v-if="user" title="search note">
+      <PopButton1 v-if="user" title="search note">
         <template #button_face>
           <SvgSearch />
         </template>
         <template #default="{ closer }">
           <LinkNoteDialog v-bind="{ storageAccessor }" @close-dialog="closer" />
         </template>
-      </PopButton>
+      </PopButton1>
       <NoteUndoButton v-bind="{ storageAccessor }" />
     </div>
     <ApiStatus
@@ -30,7 +30,6 @@
 
 <script lang="ts">
 import { PropType, defineComponent } from "vue";
-import PopButton from "../commons/Popups/PopButton.vue";
 import PopButton1 from "../commons/Popups/PopButton1.vue";
 import SvgSidebar from "../svgs/SvgSidebar.vue";
 import GlobalSidebar from "./GlobalSidebar.vue";
@@ -49,7 +48,6 @@ export default defineComponent({
     user: { type: Object as PropType<Generated.User> },
   },
   components: {
-    PopButton,
     PopButton1,
     SvgSidebar,
     GlobalSidebar,
