@@ -30,7 +30,12 @@
         <template #button_face>
           <SvgSearchForLink />
         </template>
-        <LinkNoteDialog v-bind="{ note: selectedNote, storageAccessor }" />
+        <template #default="{ closer }">
+          <LinkNoteDialog
+            v-bind="{ note: selectedNote, storageAccessor }"
+            @close-dialog="closer"
+          />
+        </template>
       </PopButton>
       <div class="dropdown">
         <button
