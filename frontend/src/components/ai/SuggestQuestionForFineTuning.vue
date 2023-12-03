@@ -41,18 +41,18 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
-import asPopup from "../commons/Popups/asPopup";
 
 const params = ref<Generated.QuestionSuggestionCreationParams>({
   isPositiveFeedback: false,
   comment: "",
 });
 const { api } = useLoadingApi();
-const { popup } = asPopup();
 
 const props = defineProps<{
   quizQuestion: Generated.QuizQuestion;
 }>();
+
+const emit = defineEmits(["closeDialog"]);
 
 const { quizQuestion } = props;
 
@@ -61,7 +61,7 @@ async function suggestQuestionForFineTuning() {
     quizQuestion.quizQuestionId,
     params.value,
   );
-  popup.done(null);
+  emit("closeDialog");
 }
 </script>
 <style scoped>

@@ -40,14 +40,19 @@
       @answer="submitAnswer($event)"
     />
     <div class="mark-question">
-      <PopButton
+      <PopButton1
         title="send this question for fine tuning the question generation model"
       >
         <template #button_face>
           <SvgRaiseHand />
         </template>
-        <SuggestQuestionForFineTuning :quiz-question="quizQuestion" />
-      </PopButton>
+        <template #default="{ closer }">
+          <SuggestQuestionForFineTuning
+            :quiz-question="quizQuestion"
+            @close-dialog="closer()"
+          />
+        </template>
+      </PopButton1>
       <slot />
     </div>
   </div>

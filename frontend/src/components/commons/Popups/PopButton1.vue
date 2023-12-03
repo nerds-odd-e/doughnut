@@ -11,9 +11,9 @@
       {{ title }}
     </template>
   </a>
-  <Modal v-if="show" :sidebar="sidebar" @close_request="show = false">
+  <Modal v-if="show" :sidebar="sidebar" @close_request="closeDialog">
     <template #body>
-      <slot />
+      <slot name="default" :closer="closeDialog" />
     </template>
   </Modal>
 </template>
@@ -33,5 +33,10 @@ export default defineComponent({
     return { show: false };
   },
   components: { Modal },
+  methods: {
+    closeDialog() {
+      this.show = false;
+    },
+  },
 });
 </script>
