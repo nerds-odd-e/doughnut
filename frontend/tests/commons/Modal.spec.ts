@@ -18,15 +18,23 @@ describe("Modal", () => {
     emits: ["close_request"],
   };
 
+const mountWithoutTeleport = () => mount(TestComponent, {
+      global: {
+        stubs: {
+          Teleport: true, // Stub the Teleport component
+        }
+      }
+    });
+
   it("click on note when doing review", async () => {
-    const wrapper = mount(TestComponent);
+    const wrapper = mountWithoutTeleport();
     expect(wrapper.find(".close-button").exists()).toBe(true);
     await wrapper.find(".close-button").trigger("click");
     expect(wrapper.emitted().close_request).toHaveLength(1);
   });
 
   it("click on note when doing review", async () => {
-    const wrapper = mount(TestComponent);
+    const wrapper = mountWithoutTeleport();
     await wrapper.find(".modal-wrapper").trigger("mousedown");
     expect(wrapper.emitted().close_request).toHaveLength(1);
   });

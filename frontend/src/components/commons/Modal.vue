@@ -1,21 +1,23 @@
 <template>
-  <div class="modal-mask">
-    <div class="modal-wrapper" @mousedown.self="$emit('close_request')">
-      <div :class="sidebarStyle">
-        <button class="close-button" @click="$emit('close_request')">
-          <SvgClose />
-        </button>
+  <Teleport to="body">
+    <div class="modal-mask">
+      <div class="modal-wrapper" @mousedown.self="$emit('close_request')">
+        <div :class="sidebarStyle">
+          <button class="close-button" @click="$emit('close_request')">
+            <SvgClose />
+          </button>
 
-        <div class="modal-header" v-if="$slots.header">
-          <slot name="header" />
-        </div>
+          <div class="modal-header" v-if="$slots.header">
+            <slot name="header" />
+          </div>
 
-        <div class="modal-body">
-          <slot name="body" />
+          <div class="modal-body">
+            <slot name="body" />
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <script lang="ts">
