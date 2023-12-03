@@ -5,20 +5,22 @@
         <SvgLinkTypeIcon :link-type="modelValue" :inverse-icon="inverseIcon" />
         {{ label }}
       </template>
-      <LinkTypeSelect
-        v-bind="{
-          scopeName,
-          modelValue,
-          errors,
-          allowEmpty,
-          field,
-          inverseIcon,
-        }"
-        @update:model-value="
-          popup.done($event);
-          $emit('update:modelValue', $event);
-        "
-      />
+      <template #default="{ closer }">
+        <LinkTypeSelect
+          v-bind="{
+            scopeName,
+            modelValue,
+            errors,
+            allowEmpty,
+            field,
+            inverseIcon,
+          }"
+          @update:model-value="
+            closer();
+            $emit('update:modelValue', $event);
+          "
+        />
+      </template>
     </PopButton>
   </InputWithType>
 </template>
@@ -30,12 +32,8 @@ import PopButton from "../commons/Popups/PopButton.vue";
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue";
 import LinkTypeSelect from "./LinkTypeSelect.vue";
 import InputWithType from "../form/InputWithType.vue";
-import asPopup from "../commons/Popups/asPopup";
 
 export default defineComponent({
-  setup() {
-    return { ...asPopup() };
-  },
   props: {
     scopeName: String,
     modelValue: {
