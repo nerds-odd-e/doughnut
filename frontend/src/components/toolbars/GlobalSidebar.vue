@@ -35,10 +35,10 @@
       </template>
     </ul>
     <div class="btn-group">
-      <PopButton class="btn btn-secondary" title="Create a new circle">
+      <PopButton btn-class="btn btn-secondary" title="Create a new circle">
         <CircleNewDialog />
       </PopButton>
-      <router-link class="btn btn-primary" :to="{ name: 'circleJoin' }">
+      <router-link btn-class="btn btn-primary" :to="{ name: 'circleJoin' }">
         Join a circle
       </router-link>
     </div>

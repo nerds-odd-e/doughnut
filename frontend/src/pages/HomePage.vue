@@ -56,7 +56,7 @@
           </p>
           <p v-if="!user">Please login</p>
           <PopButton
-            class="btn btn-light"
+            btn-class="btn btn-light"
             title="choose a circle"
             :sidebar="'left'"
           >
