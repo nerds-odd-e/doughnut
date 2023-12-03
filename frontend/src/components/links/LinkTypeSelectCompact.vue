@@ -1,6 +1,6 @@
 <template>
   <InputWithType v-bind="{ scopeName, field: '', errors, title: titlized }">
-    <PopButton :aria-label="titlized">
+    <PopButton1 :aria-label="titlized">
       <template #button_face>
         <SvgLinkTypeIcon :link-type="modelValue" :inverse-icon="inverseIcon" />
         {{ label }}
@@ -21,14 +21,14 @@
           "
         />
       </template>
-    </PopButton>
+    </PopButton1>
   </InputWithType>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { startCase, camelCase } from "lodash";
-import PopButton from "../commons/Popups/PopButton.vue";
+import PopButton1 from "../commons/Popups/PopButton1.vue";
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue";
 import LinkTypeSelect from "./LinkTypeSelect.vue";
 import InputWithType from "../form/InputWithType.vue";
@@ -45,7 +45,7 @@ export default defineComponent({
     field: { type: String, defalt: "linkType" },
     inverseIcon: Boolean,
   },
-  components: { PopButton, SvgLinkTypeIcon, LinkTypeSelect, InputWithType },
+  components: { PopButton1, SvgLinkTypeIcon, LinkTypeSelect, InputWithType },
   emits: ["update:modelValue"],
   computed: {
     titlized() {

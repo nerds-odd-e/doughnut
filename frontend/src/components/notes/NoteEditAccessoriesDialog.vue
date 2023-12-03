@@ -12,13 +12,9 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
-import asPopup from "../commons/Popups/asPopup";
 import NoteFormBody from "./NoteFormBody.vue";
 
 export default defineComponent({
-  setup() {
-    return asPopup();
-  },
   components: {
     NoteFormBody,
   },
@@ -29,6 +25,7 @@ export default defineComponent({
       required: true,
     },
   },
+  emits: ["closeDialog"],
   data() {
     const { ...rest } = this.note.noteAccessories;
     return {
@@ -43,7 +40,7 @@ export default defineComponent({
       this.storageAccessor
         .api(this.$router)
         .updateNoteAccessories(this.note.id, this.formData)
-        .then(this.popup.done)
+        .then(() => this.$emit("closeDialog"))
         .catch((error) => {
           this.noteFormErrors = error;
         });
