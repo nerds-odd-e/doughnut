@@ -14,13 +14,13 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
-import asPopup from "../commons/Popups/asPopup";
 import TextInput from "../form/TextInput.vue";
 
 export default defineComponent({
   setup() {
-    return { ...useLoadingApi(), ...asPopup() };
+    return { ...useLoadingApi() };
   },
+  emits: ["closeDialog"],
   components: { TextInput },
   data() {
     return {
@@ -34,7 +34,7 @@ export default defineComponent({
       this.api.circleMethods
         .createCircle(this.formData)
         .then((res) => {
-          this.popup.done(res);
+          this.$emit("closeDialog");
           this.$router.push({
             name: "circleShow",
             params: { circleId: res.id },
