@@ -8,7 +8,7 @@
         <SvgAddChild />
       </NoteNewButton>
 
-      <PopButton1 title="edit note">
+      <PopButton title="edit note">
         <template #button_face>
           <SvgEdit />
         </template>
@@ -18,9 +18,9 @@
             @close-dialog="closer"
           />
         </template>
-      </PopButton1>
+      </PopButton>
 
-      <PopButton1 title="associate wikidata">
+      <PopButton title="associate wikidata">
         <template #button_face>
           <SvgWikidata />
         </template>
@@ -30,7 +30,7 @@
             @close-dialog="closer"
           />
         </template>
-      </PopButton1>
+      </PopButton>
       <AISuggestDetailsButton v-bind="{ selectedNote, storageAccessor }" />
       <PopButton title="search and link note">
         <template #button_face>
@@ -86,7 +86,6 @@ import LinkNoteDialog from "../links/LinkNoteDialog.vue";
 import SvgCog from "../svgs/SvgCog.vue";
 import NoteDeleteButton from "./NoteDeleteButton.vue";
 import PopButton from "../commons/Popups/PopButton.vue";
-import PopButton1 from "../commons/Popups/PopButton1.vue";
 import AIGenerateImageDialog from "../notes/AIGenerateImageDialog.vue";
 import AISuggestDetailsButton from "./AISuggestDetailsButton.vue";
 
@@ -113,7 +112,6 @@ export default defineComponent({
     SvgCog,
     NoteDeleteButton,
     PopButton,
-    PopButton1,
     AIGenerateImageDialog,
     AISuggestDetailsButton,
   },

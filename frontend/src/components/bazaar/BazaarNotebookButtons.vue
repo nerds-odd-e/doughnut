@@ -1,6 +1,6 @@
 <template>
   <div class="btn-group btn-group-sm">
-    <PopButton1 v-if="!notebook.skipReviewEntirely" title="Add to my learning">
+    <PopButton v-if="!notebook.skipReviewEntirely" title="Add to my learning">
       <template #button_face>
         <SvgAdd />
       </template>
@@ -10,13 +10,13 @@
           @close-dialog="closer"
         />
       </template>
-    </PopButton1>
+    </PopButton>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import PopButton1 from "../commons/Popups/PopButton1.vue";
+import PopButton from "../commons/Popups/PopButton.vue";
 import SubscribeDialog from "./SubscribeDialog.vue";
 import SvgAdd from "../svgs/SvgAdd.vue";
 
@@ -26,7 +26,7 @@ export default defineComponent({
     loggedIn: Boolean,
   },
   components: {
-    PopButton1,
+    PopButton,
     SvgAdd,
     SubscribeDialog,
   },

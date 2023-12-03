@@ -12,7 +12,7 @@
       {{ user.name }}
     </button>
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-      <PopButton1 btn-class="dropdown-item" title="user settings">
+      <PopButton btn-class="dropdown-item" title="user settings">
         <template #button_face> Settings for {{ user.name }}</template>
         <template #default="{ closer }">
           <UserProfileDialog
@@ -25,7 +25,7 @@
             "
           />
         </template>
-      </PopButton1>
+      </PopButton>
       <a href="#" class="dropdown-item" role="button" @click="logout">Logout</a>
     </div>
   </div>
@@ -33,7 +33,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import PopButton1 from "../commons/Popups/PopButton1.vue";
+import PopButton from "../commons/Popups/PopButton.vue";
 import UserProfileDialog from "./UserProfileDialog.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import SvgMissingAvatar from "../svgs/SvgMissingAvatar.vue";
@@ -47,7 +47,7 @@ export default defineComponent({
   },
   emits: ["updateUser"],
   components: {
-    PopButton1,
+    PopButton,
     UserProfileDialog,
     SvgMissingAvatar,
   },

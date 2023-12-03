@@ -40,7 +40,7 @@
       @answer="submitAnswer($event)"
     />
     <div class="mark-question">
-      <PopButton1
+      <PopButton
         title="send this question for fine tuning the question generation model"
       >
         <template #button_face>
@@ -52,7 +52,7 @@
             @close-dialog="closer()"
           />
         </template>
-      </PopButton1>
+      </PopButton>
       <slot />
     </div>
   </div>

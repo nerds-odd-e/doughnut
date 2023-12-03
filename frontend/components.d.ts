@@ -91,7 +91,6 @@ declare module 'vue' {
     ObjectRight: typeof import('./src/components/svgs/link_types/ObjectRight.vue')['default']
     Person: typeof import('./src/components/svgs/link_types/Person.vue')['default']
     PopButton: typeof import('./src/components/commons/Popups/PopButton.vue')['default']
-    PopButton1: typeof import('./src/components/commons/Popups/PopButton1.vue')['default']
     Popup: typeof import('./src/components/commons/Popups/Popup.vue')['default']
     Popup1: typeof import('./src/components/commons/Popups/Popup1.vue')['default']
     Popups: typeof import('./src/components/commons/Popups/Popups.vue')['default']
