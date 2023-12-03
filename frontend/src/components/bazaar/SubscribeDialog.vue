@@ -26,6 +26,7 @@ export default defineComponent({
     notebook: { type: Object as PropType<Generated.Notebook>, required: true },
     loggedIn: Boolean,
   },
+  emits: ["closeDialog"],
   components: { TextInput },
   data() {
     return {
@@ -38,8 +39,8 @@ export default defineComponent({
     processForm() {
       this.api.subscriptionMethods
         .subscribe(this.notebook.id, this.formData)
-        .then((res) => {
-          this.popup.done(res);
+        .then(() => {
+          this.$emit("closeDialog");
           this.$router.push({ name: "notebooks" });
         })
         .catch((res) => (this.errors = res));
