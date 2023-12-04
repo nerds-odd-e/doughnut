@@ -19,10 +19,9 @@ turndownService.addRule("p", {
 });
 
 export default {
-  markdownToHtml(markdown: string | undefined) {
-    return marked(markdown || "")
-      .trim()
-      .replace(/>\s+</g, "><");
+  markdownToHtml(markdown: string | undefined): string {
+    const result = marked(markdown || "") as string;
+    return result.trim().replace(/>\s+</g, "><");
   },
   htmlToMarkdown(html: string) {
     return turndownService.turndown(html);
