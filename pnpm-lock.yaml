@@ -136,8 +136,8 @@ importers:
         specifier: ^7.1.2
         version: 7.1.2
       unplugin-vue-components:
-        specifier: 0.25.2
-        version: 0.25.2(vue@3.3.9)
+        specifier: 0.26.0
+        version: 0.26.0(vue@3.3.9)
       vue:
         specifier: 3.3.9
         version: 3.3.9(typescript@5.2.2)
@@ -164,8 +164,8 @@ importers:
         specifier: ^6.13.1
         version: 6.13.1(eslint@8.55.0)(typescript@5.2.2)
       '@vitejs/plugin-vue':
-        specifier: ^4.5.0
-        version: 4.5.0(vite@5.0.4)(vue@3.3.9)
+        specifier: ^4.5.1
+        version: 4.5.1(vite@5.0.4)(vue@3.3.9)
       '@vitejs/plugin-vue-jsx':
         specifier: ^3.1.0
         version: 3.1.0(vite@5.0.4)(vue@3.3.9)
@@ -242,8 +242,8 @@ importers:
         specifier: 5.2.2
         version: 5.2.2
       unplugin-auto-import:
-        specifier: ^0.17.1
-        version: 0.17.1
+        specifier: ^0.17.2
+        version: 0.17.2
       vite:
         specifier: 5.0.4
         version: 5.0.4(@types/node@20.10.1)(sass@1.69.5)
@@ -1851,8 +1851,8 @@ packages:
       - supports-color
     dev: true
 
-  /@vitejs/plugin-vue@4.5.0(vite@5.0.4)(vue@3.3.9):
-    resolution: {integrity: sha512-a2WSpP8X8HTEww/U00bU4mX1QpLINNuz/2KMNpLsdu3BzOpak3AGI1CJYBTXcc4SPhaD0eNRUp7IyQK405L5dQ==}
+  /@vitejs/plugin-vue@4.5.1(vite@5.0.4)(vue@3.3.9):
+    resolution: {integrity: sha512-DaUzYFr+2UGDG7VSSdShKa9sIWYBa1LL8KC0MNOf2H5LjcTPjob0x8LbkqXWmAtbANJCkpiQTj66UVcQkN2s3g==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
       vite: ^4.0.0 || ^5.0.0
@@ -8128,8 +8128,8 @@ packages:
     engines: {node: '>= 0.8'}
     dev: true
 
-  /unplugin-auto-import@0.17.1:
-    resolution: {integrity: sha512-QvdJKtFK0COSuRXzVnwjG3ir870zVhdMg6O8GKG3UO/O5W4fmJm5h71QvzI7Gp8Sx0qfCvC3f+2v0Vm489fnqQ==}
+  /unplugin-auto-import@0.17.2:
+    resolution: {integrity: sha512-Eu/xWI6SH4jTWXvzOfXQWAxRtiz/gMObm7wXtgMj7wBjHQKLgHTmHd4R4oha87KYGah1aKMqiqDeAxiPmfSoTg==}
     engines: {node: '>=14'}
     peerDependencies:
       '@nuxt/kit': ^3.2.2
@@ -8152,8 +8152,8 @@ packages:
       - rollup
     dev: true
 
-  /unplugin-vue-components@0.25.2(vue@3.3.9):
-    resolution: {integrity: sha512-OVmLFqILH6w+eM8fyt/d/eoJT9A6WO51NZLf1vC5c1FZ4rmq2bbGxTy8WP2Jm7xwFdukaIdv819+UI7RClPyCA==}
+  /unplugin-vue-components@0.26.0(vue@3.3.9):
+    resolution: {integrity: sha512-s7IdPDlnOvPamjunVxw8kNgKNK8A5KM1YpK5j/p97jEKTjlPNrA0nZBiSfAKKlK1gWZuyWXlKL5dk3EDw874LQ==}
     engines: {node: '>=14'}
     peerDependencies:
       '@babel/parser': ^7.15.8
