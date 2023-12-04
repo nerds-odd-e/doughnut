@@ -8,7 +8,7 @@ describe("NoteDetailsAutoCompletionButton", () => {
 
   helper.resetWithApiMock(beforeEach, afterEach);
 
-  const triggerSuggestionwithoutFlushPromises = async (
+  const triggerAutoCompletionWithoutFlushPromises = async (
     selectedNote: Generated.Note,
   ) => {
     const wrapper = helper
@@ -19,8 +19,8 @@ describe("NoteDetailsAutoCompletionButton", () => {
     return wrapper;
   };
 
-  const triggerSuggestion = async (n: Generated.Note) => {
-    const wrapper = triggerSuggestionwithoutFlushPromises(n);
+  const triggerAutoCompletion = async (n: Generated.Note) => {
+    const wrapper = triggerAutoCompletionWithoutFlushPromises(n);
     await flushPromises();
     return wrapper;
   };
@@ -31,7 +31,7 @@ describe("NoteDetailsAutoCompletionButton", () => {
       .expectingPost(`/api/ai/${noteWithNoDetails.id}/completion`)
       .andReturnOnce({ moreCompleteContent: "suggestion" });
     helper.apiMock.expectingPatch(`/api/text_content/${noteWithNoDetails.id}`);
-    await triggerSuggestion(noteWithNoDetails);
+    await triggerAutoCompletion(noteWithNoDetails);
     expect(expectation.actualRequestJsonBody()).toMatchObject({
       detailsToComplete: "",
     });
@@ -42,7 +42,7 @@ describe("NoteDetailsAutoCompletionButton", () => {
       .expectingPost(`/api/ai/${note.id}/completion`)
       .andReturnOnce({ moreCompleteContent: "suggestion" });
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
-    await triggerSuggestion(note);
+    await triggerAutoCompletion(note);
     expect(expectation.actualRequestJsonBody()).toMatchObject({
       detailsToComplete: "<p>Desc</p>",
     });
@@ -57,7 +57,7 @@ describe("NoteDetailsAutoCompletionButton", () => {
       });
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
 
-    await triggerSuggestion(note);
+    await triggerAutoCompletion(note);
   });
 
   it("stop updating if the component is unmounted", async () => {
@@ -68,7 +68,7 @@ describe("NoteDetailsAutoCompletionButton", () => {
         finishReason: "stop",
       });
 
-    const wrapper = await triggerSuggestionwithoutFlushPromises(note);
+    const wrapper = await triggerAutoCompletionWithoutFlushPromises(note);
     wrapper.unmount();
     await flushPromises();
     // no future api call expected.
