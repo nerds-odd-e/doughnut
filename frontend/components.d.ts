@@ -67,6 +67,7 @@ declare module 'vue' {
     NoteChatDialog: typeof import('./src/components/notes/NoteChatDialog.vue')['default']
     NoteContent: typeof import('./src/components/notes/NoteContent.vue')['default']
     NoteDeleteButton: typeof import('./src/components/toolbars/NoteDeleteButton.vue')['default']
+    NoteDetailsAutoCompletionButton: typeof import('./src/components/toolbars/NoteDetailsAutoCompletionButton.vue')['default']
     NoteEditAccessoriesDialog: typeof import('./src/components/notes/NoteEditAccessoriesDialog.vue')['default']
     NoteFormBody: typeof import('./src/components/notes/NoteFormBody.vue')['default']
     NoteFormTopicOnly: typeof import('./src/components/notes/NoteFormTopicOnly.vue')['default']
