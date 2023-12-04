@@ -13,7 +13,7 @@ const createWrapper = async () => {
     .andReturnOnce({ b64encoded: "This is an encoded image" });
   const wrapper = helper
     .component(AIGenerateImageDialog)
-    .withStorageProps({ selectedNote: note.note })
+    .withStorageProps({ note: note.note })
     .mount();
   await flushPromises();
   return wrapper;

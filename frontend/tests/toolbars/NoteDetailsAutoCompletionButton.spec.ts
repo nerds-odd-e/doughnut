@@ -9,11 +9,11 @@ describe("NoteDetailsAutoCompletionButton", () => {
   helper.resetWithApiMock(beforeEach, afterEach);
 
   const triggerAutoCompletionWithoutFlushPromises = async (
-    selectedNote: Generated.Note,
+    n: Generated.Note,
   ) => {
     const wrapper = helper
       .component(NoteDetailsAutoCompletionButton)
-      .withStorageProps({ selectedNote })
+      .withStorageProps({ note: n })
       .mount();
     await wrapper.find(".btn").trigger("click");
     return wrapper;
