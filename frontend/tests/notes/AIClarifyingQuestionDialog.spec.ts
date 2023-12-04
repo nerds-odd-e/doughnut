@@ -4,7 +4,7 @@ import helper from "../helpers";
 
 describe("answering a clarifying question for note details geeration", () => {
   let wrapper: VueWrapper;
-  const aiCompletion: Generated.AiCompletion = {
+  const completionInProgress: Generated.AiCompletion = {
     moreCompleteContent: "Football",
     question: "Do you mean American Football or European Football?",
     finishReason: "clarifying_question",
@@ -20,7 +20,7 @@ describe("answering a clarifying question for note details geeration", () => {
     vi.useFakeTimers();
     wrapper = helper
       .component(AIClarifyingQuestionDialog)
-      .withProps({ aiCompletion })
+      .withProps({ completionInProgress })
       .mount();
   });
 
@@ -44,6 +44,8 @@ describe("answering a clarifying question for note details geeration", () => {
     wrapper.find("form").trigger("submit");
 
     const [submitEvent] = (wrapper.emitted().submit as string[]) || [];
-    expect(submitEvent?.at(0)).toEqual("Europe Football");
+    expect(submitEvent?.at(0)).toMatchObject({
+      answerFromUser: "Europe Football",
+    });
   });
 });

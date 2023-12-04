@@ -49,7 +49,10 @@ export default defineComponent({
   },
   methods: {
     handleFormSubmit() {
-      this.$emit("submit", this.answerToAI);
+      this.$emit("submit", <Generated.ClarifyingQuestionAndAnswer>{
+        questionFromAI: this.completionInProgress.question,
+        answerFromUser: this.answerToAI,
+      });
     },
   },
 });

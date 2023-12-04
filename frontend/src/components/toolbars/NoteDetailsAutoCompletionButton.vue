@@ -86,13 +86,12 @@ export default defineComponent({
         },
       );
     },
-    clarifyingQuestionAndAnswered(clarificationAnswer: string) {
+    clarifyingQuestionAndAnswered(
+      clarifyingQuestionAndAnswer: Generated.ClarifyingQuestionAndAnswer,
+    ) {
       this.autoCompleteDetails([
         ...(this.completionInProgress?.clarifyingHistory ?? []),
-        {
-          questionFromAI: this.completionInProgress?.question,
-          answerFromUser: clarificationAnswer,
-        },
+        clarifyingQuestionAndAnswer,
       ]);
       this.completionInProgress = undefined;
     },
