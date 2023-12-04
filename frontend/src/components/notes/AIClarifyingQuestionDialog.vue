@@ -4,7 +4,7 @@
       <li
         v-for="(
           { questionFromAI, answerFromUser }, index
-        ) in aiCompletion.clarifyingHistory"
+        ) in completionInProgress.clarifyingHistory"
         :key="index"
       >
         {{ questionFromAI }}
@@ -17,7 +17,7 @@
   <form @submit.prevent="handleFormSubmit">
     <h3>
       Clarification question by the AI:
-      <strong>{{ aiCompletion.question }}</strong>
+      <strong>{{ completionInProgress.question }}</strong>
     </h3>
     <TextInput
       scope-name="note"
@@ -35,7 +35,7 @@ import TextInput from "../form/TextInput.vue";
 
 export default defineComponent({
   props: {
-    aiCompletion: {
+    completionInProgress: {
       type: Object as PropType<Generated.AiCompletion>,
       required: true,
     },

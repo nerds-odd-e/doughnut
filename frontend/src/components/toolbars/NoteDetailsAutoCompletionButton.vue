@@ -3,18 +3,16 @@
     :title="'auto-complete details'"
     class="btn btn-sm"
     role="button"
-    @click="
-      autoCompleteDetails({
-        detailsToComplete: note.details,
-        clarifyingQuestionAndAnswers: [],
-      })
-    "
+    @click="initialAutoCompleteDetails"
   >
     <SvgRobot />
-    <Modal v-if="aiCompletion" @close_request="aiCompletion = undefined">
+    <Modal
+      v-if="completionInProgress"
+      @close_request="completionInProgress = undefined"
+    >
       <template #body>
         <AIClarifyingQuestionDialog
-          :ai-completion="aiCompletion"
+          :completion-in-progress="completionInProgress"
           @submit="clarifyingQuestionAndAnswered"
         />
       </template>
@@ -54,17 +52,23 @@ export default defineComponent({
   data() {
     return {
       isUnmounted: false,
-      aiCompletion: undefined as undefined | Generated.AiCompletion,
+      completionInProgress: undefined as undefined | Generated.AiCompletion,
     };
   },
   methods: {
+    initialAutoCompleteDetails() {
+      return this.autoCompleteDetails({
+        detailsToComplete: this.note.details,
+        clarifyingQuestionAndAnswers: [],
+      });
+    },
     async autoCompleteDetails(data: Generated.AiCompletionParams) {
       const response = await this.api.ai.askAiCompletion(this.note.id, data);
 
       if (this.isUnmounted) return;
 
       if (response.question) {
-        this.aiCompletion = response;
+        this.completionInProgress = response;
         return;
       }
 
@@ -84,14 +88,14 @@ export default defineComponent({
       this.autoCompleteDetails({
         detailsToComplete: this.note.details,
         clarifyingQuestionAndAnswers: [
-          ...(this.aiCompletion?.clarifyingHistory ?? []),
+          ...(this.completionInProgress?.clarifyingHistory ?? []),
           {
-            questionFromAI: this.aiCompletion?.question,
+            questionFromAI: this.completionInProgress?.question,
             answerFromUser: clarificationAnswer,
           },
         ],
       });
-      this.aiCompletion = undefined;
+      this.completionInProgress = undefined;
     },
   },
   unmounted() {
