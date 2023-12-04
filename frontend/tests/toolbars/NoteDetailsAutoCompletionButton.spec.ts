@@ -25,11 +25,11 @@ describe("NoteDetailsAutoCompletionButton", () => {
     return wrapper;
   };
 
-  it("ask api to generate suggested details when details is empty", async () => {
+  it("ask api to generate details when details is empty", async () => {
     const noteWithNoDetails = makeMe.aNote.details("").please();
     const expectation = helper.apiMock
       .expectingPost(`/api/ai/${noteWithNoDetails.id}/completion`)
-      .andReturnOnce({ moreCompleteContent: "suggestion" });
+      .andReturnOnce({ moreCompleteContent: "auto completed content" });
     helper.apiMock.expectingPatch(`/api/text_content/${noteWithNoDetails.id}`);
     await triggerAutoCompletion(noteWithNoDetails);
     expect(expectation.actualRequestJsonBody()).toMatchObject({
@@ -37,10 +37,10 @@ describe("NoteDetailsAutoCompletionButton", () => {
     });
   });
 
-  it("ask api be called once when clicking the suggest button", async () => {
+  it("ask api be called once when clicking the auto-complete button", async () => {
     const expectation = helper.apiMock
       .expectingPost(`/api/ai/${note.id}/completion`)
-      .andReturnOnce({ moreCompleteContent: "suggestion" });
+      .andReturnOnce({ moreCompleteContent: "auto completed content" });
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
     await triggerAutoCompletion(note);
     expect(expectation.actualRequestJsonBody()).toMatchObject({
@@ -52,7 +52,7 @@ describe("NoteDetailsAutoCompletionButton", () => {
     helper.apiMock
       .expectingPost(`/api/ai/${note.id}/completion`)
       .andReturnOnce({
-        moreCompleteContent: "suggestion",
+        moreCompleteContent: "auto completed content",
         finishReason: "stop",
       });
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
@@ -64,7 +64,7 @@ describe("NoteDetailsAutoCompletionButton", () => {
     helper.apiMock
       .expectingPost(`/api/ai/${note.id}/completion`)
       .andReturnOnce({
-        moreCompleteContent: "suggestion",
+        moreCompleteContent: "auto completed content",
         finishReason: "stop",
       });
 
