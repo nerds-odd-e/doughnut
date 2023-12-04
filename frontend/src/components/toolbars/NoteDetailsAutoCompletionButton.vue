@@ -1,10 +1,10 @@
 <template>
   <a
-    :title="'suggest details'"
+    :title="'auto-complete details'"
     class="btn btn-sm"
     role="button"
     @click="
-      suggestDetails({
+      autoCompleteDetails({
         detailsToComplete: selectedNote.details,
         clarifyingQuestionAndAnswers: [],
       })
@@ -58,7 +58,7 @@ export default defineComponent({
     };
   },
   methods: {
-    async suggestDetails(data: Generated.AiCompletionParams) {
+    async autoCompleteDetails(data: Generated.AiCompletionParams) {
       const response = await this.api.ai.askAiCompletion(
         this.selectedNote.id,
         data,
@@ -84,7 +84,7 @@ export default defineComponent({
       );
     },
     clarifyingQuestionAndAnswered(clarificationAnswer: string) {
-      this.suggestDetails({
+      this.autoCompleteDetails({
         detailsToComplete: this.selectedNote.details,
         clarifyingQuestionAndAnswers: [
           ...(this.aiCompletion?.clarifyingHistory ?? []),

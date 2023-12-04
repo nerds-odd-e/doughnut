@@ -47,7 +47,7 @@ export const assumeNotePage = (noteTopic?: string) => {
       cy.on("uncaught:exception", () => {
         return false
       })
-      cy.findByRole("button", { name: "suggest details" }).click()
+      cy.findByRole("button", { name: "auto-complete details" }).click()
     },
     chatAboutNote() {
       return assumeChatAboutNotePage()
