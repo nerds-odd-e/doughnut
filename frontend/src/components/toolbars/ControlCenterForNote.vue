@@ -3,7 +3,7 @@
     <div class="btn-group btn-group-sm">
       <NoteNewButton
         button-title="Add Child Note"
-        v-bind="{ parentId: selectedNote.id, storageAccessor }"
+        v-bind="{ parentId: note.id, storageAccessor }"
       >
         <SvgAddChild />
       </NoteNewButton>
@@ -14,7 +14,7 @@
         </template>
         <template #default="{ closer }">
           <NoteEditAccessoriesDialog
-            v-bind="{ note: selectedNote, storageAccessor }"
+            v-bind="{ note, storageAccessor }"
             @close-dialog="closer"
           />
         </template>
@@ -26,21 +26,19 @@
         </template>
         <template #default="{ closer }">
           <WikidataAssociationDialog
-            v-bind="{ note: selectedNote, storageAccessor }"
+            v-bind="{ note, storageAccessor }"
             @close-dialog="closer"
           />
         </template>
       </PopButton>
-      <NoteDetailsAutoCompletionButton
-        v-bind="{ selectedNote, storageAccessor }"
-      />
+      <NoteDetailsAutoCompletionButton v-bind="{ note, storageAccessor }" />
       <PopButton title="search and link note">
         <template #button_face>
           <SvgSearchForLink />
         </template>
         <template #default="{ closer }">
           <LinkNoteDialog
-            v-bind="{ note: selectedNote, storageAccessor }"
+            v-bind="{ note, storageAccessor }"
             @close-dialog="closer"
           />
         </template>
@@ -62,11 +60,11 @@
             btn-class="dropdown-item btn-primary"
             title="Generate Image with DALL-E"
           >
-            <AIGenerateImageDialog v-bind="{ selectedNote, storageAccessor }" />
+            <AIGenerateImageDialog v-bind="{ note, storageAccessor }" />
           </PopButton>
           <NoteDeleteButton
             class="dropdown-item"
-            v-bind="{ noteId: selectedNote.id, storageAccessor }"
+            v-bind="{ noteId: note.id, storageAccessor }"
           />
         </div>
       </div>
@@ -97,7 +95,7 @@ export default defineComponent({
       type: Object as PropType<StorageAccessor>,
       required: true,
     },
-    selectedNote: {
+    note: {
       type: Object as PropType<Generated.Note>,
       required: true,
     },

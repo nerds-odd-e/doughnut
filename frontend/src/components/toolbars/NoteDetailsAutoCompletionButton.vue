@@ -5,7 +5,7 @@
     role="button"
     @click="
       autoCompleteDetails({
-        detailsToComplete: selectedNote.details,
+        detailsToComplete: note.details,
         clarifyingQuestionAndAnswers: [],
       })
     "
@@ -41,7 +41,7 @@ export default defineComponent({
       type: Object as PropType<StorageAccessor>,
       required: true,
     },
-    selectedNote: {
+    note: {
       type: Object as PropType<Generated.Note>,
       required: true,
     },
@@ -59,10 +59,7 @@ export default defineComponent({
   },
   methods: {
     async autoCompleteDetails(data: Generated.AiCompletionParams) {
-      const response = await this.api.ai.askAiCompletion(
-        this.selectedNote.id,
-        data,
-      );
+      const response = await this.api.ai.askAiCompletion(this.note.id, data);
 
       if (this.isUnmounted) return;
 
@@ -72,20 +69,20 @@ export default defineComponent({
       }
 
       this.storageAccessor.api(this.$router).updateTextContent(
-        this.selectedNote.id,
+        this.note.id,
         {
-          topic: this.selectedNote.topic,
+          topic: this.note.topic,
           details: response.moreCompleteContent,
         },
         {
-          topic: this.selectedNote.topic,
-          details: this.selectedNote.details,
+          topic: this.note.topic,
+          details: this.note.details,
         },
       );
     },
     clarifyingQuestionAndAnswered(clarificationAnswer: string) {
       this.autoCompleteDetails({
-        detailsToComplete: this.selectedNote.details,
+        detailsToComplete: this.note.details,
         clarifyingQuestionAndAnswers: [
           ...(this.aiCompletion?.clarifyingHistory ?? []),
           {
