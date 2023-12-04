@@ -1,9 +1,9 @@
 import { flushPromises } from "@vue/test-utils";
-import AISuggestDetailsButton from "@/components/toolbars/AISuggestDetailsButton.vue";
+import NoteDetailsAutoCompletionButton from "@/components/toolbars/NoteDetailsAutoCompletionButton.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
-describe("AISuggestDetailsButton", () => {
+describe("NoteDetailsAutoCompletionButton", () => {
   const note = makeMe.aNote.please();
 
   helper.resetWithApiMock(beforeEach, afterEach);
@@ -12,7 +12,7 @@ describe("AISuggestDetailsButton", () => {
     selectedNote: Generated.Note,
   ) => {
     const wrapper = helper
-      .component(AISuggestDetailsButton)
+      .component(NoteDetailsAutoCompletionButton)
       .withStorageProps({ selectedNote })
       .mount();
     await wrapper.find(".btn").trigger("click");

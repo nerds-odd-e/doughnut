@@ -31,7 +31,9 @@
           />
         </template>
       </PopButton>
-      <AISuggestDetailsButton v-bind="{ selectedNote, storageAccessor }" />
+      <NoteDetailsAutoCompletionButton
+        v-bind="{ selectedNote, storageAccessor }"
+      />
       <PopButton title="search and link note">
         <template #button_face>
           <SvgSearchForLink />
@@ -87,7 +89,7 @@ import SvgCog from "../svgs/SvgCog.vue";
 import NoteDeleteButton from "./NoteDeleteButton.vue";
 import PopButton from "../commons/Popups/PopButton.vue";
 import AIGenerateImageDialog from "../notes/AIGenerateImageDialog.vue";
-import AISuggestDetailsButton from "./AISuggestDetailsButton.vue";
+import NoteDetailsAutoCompletionButton from "./NoteDetailsAutoCompletionButton.vue";
 
 export default defineComponent({
   props: {
@@ -113,7 +115,7 @@ export default defineComponent({
     NoteDeleteButton,
     PopButton,
     AIGenerateImageDialog,
-    AISuggestDetailsButton,
+    NoteDetailsAutoCompletionButton,
   },
 });
 </script>
