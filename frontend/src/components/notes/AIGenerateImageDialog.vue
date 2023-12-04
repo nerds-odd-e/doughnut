@@ -20,7 +20,7 @@ export default defineComponent({
     return useLoadingApi();
   },
   props: {
-    selectedNote: { type: Object as PropType<Generated.Note>, required: true },
+    note: { type: Object as PropType<Generated.Note>, required: true },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: false,
@@ -31,7 +31,7 @@ export default defineComponent({
   },
   data() {
     return {
-      prompt: this.selectedNote.topic,
+      prompt: this.note.topic,
       b64Json: undefined as string | undefined,
       promptError: undefined as string | undefined,
     };

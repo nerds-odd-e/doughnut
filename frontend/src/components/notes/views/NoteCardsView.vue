@@ -13,7 +13,7 @@
         </Breadcrumb>
         <ControlCenterForNote
           v-if="!readonly"
-          v-bind="{ selectedNote: noteRealm.note, storageAccessor }"
+          v-bind="{ note: noteRealm.note, storageAccessor }"
         />
         <NoteWithLinks
           v-bind="{
