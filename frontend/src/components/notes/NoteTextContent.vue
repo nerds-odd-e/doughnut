@@ -100,7 +100,7 @@ export default defineComponent({
     },
   },
   mounted() {
-    this.submitChange = debounce((newValue: Generated.TextContent) => {
+    const changer = (newValue: Generated.TextContent) => {
       if (!isMeaningfulChange(this.textContent, newValue)) {
         return;
       }
@@ -117,7 +117,8 @@ export default defineComponent({
           }
           this.errors = errors;
         });
-    }, 1000);
+    };
+    this.submitChange = debounce(changer, 1000);
   },
   unmounted() {
     if (this.submitChange) {
