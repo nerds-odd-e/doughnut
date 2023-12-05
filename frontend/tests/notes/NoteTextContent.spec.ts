@@ -112,18 +112,6 @@ describe("in place edit on title", () => {
     // because the initial details is not changed.
   });
 
-  it("when there is pending changes not saved but the previous change trigger refresh", async () => {
-    note.details = "initial\n\ndescription";
-    const wrapper = mountComponent(note);
-    await wrapper.find('[role="topic"]').trigger("click");
-    await wrapper.find('[role="topic"] input').setValue("updated");
-    await wrapper.setProps({ textContent: { topic: "change from outside." } });
-    expect(
-      wrapper.find<HTMLInputElement>('[role="topic"] input').element.value,
-    ).toBe("updated");
-    helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
-  });
-
   describe("with mocked window.confirm", () => {
     // eslint-disable-next-line no-alert
     const jsdomConfirm = window.confirm;

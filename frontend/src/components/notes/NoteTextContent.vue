@@ -66,13 +66,11 @@ export default defineComponent({
     return {
       localTextContent: { ...this.textContent } as Generated.TextContent,
       errors: {} as Record<string, string>,
-      revision: 0,
     };
   },
   watch: {
     textContent: {
       handler(newValue) {
-        if (this.revision !== 0) return;
         this.localTextContent = { ...newValue };
       },
       deep: true,
@@ -88,7 +86,6 @@ export default defineComponent({
       this.saveChange();
     },
     saveChange() {
-      this.revision += 1;
       this.errors = {};
       if (!this.submitChange) {
         return;
@@ -107,7 +104,6 @@ export default defineComponent({
       if (!isMeaningfulChange(this.textContent, newValue)) {
         return;
       }
-      const savingRevision = this.revision;
       this.storageAccessor
         .api(this.$router)
         .updateTextContent(this.noteId, newValue, this.textContent)
@@ -120,10 +116,6 @@ export default defineComponent({
             return;
           }
           this.errors = errors;
-        })
-        .finally(() => {
-          if (this.revision !== savingRevision) return;
-          this.revision = 0;
         });
     }, 1000);
   },
