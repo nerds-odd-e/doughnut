@@ -30,6 +30,15 @@ import EditableText from "../form/EditableText.vue";
 import RichMarkdownEditor from "../form/RichMarkdownEditor.vue";
 import type { StorageAccessor } from "../../store/createNoteStorage";
 
+function isMeaningfulChange(
+  oldValue: Generated.TextContent,
+  newValue: Generated.TextContent,
+) {
+  return (
+    newValue.topic !== oldValue.topic || newValue.details !== oldValue.details
+  );
+}
+
 export default defineComponent({
   setup() {
     return {
@@ -76,18 +85,9 @@ export default defineComponent({
       this.localTextContent.details = newValue;
       this.saveChange();
     },
-    isMeaningfulChange() {
-      return (
-        this.localTextContent.topic !== this.textContent.topic ||
-        this.localTextContent.details !== this.textContent.details
-      );
-    },
     saveChange() {
       this.errors = {};
       if (!this.submitChange) {
-        return;
-      }
-      if (!this.isMeaningfulChange()) {
         return;
       }
       this.submitChange(this.localTextContent);
@@ -101,6 +101,9 @@ export default defineComponent({
   },
   mounted() {
     this.submitChange = debounce((newValue: Generated.TextContent) => {
+      if (!isMeaningfulChange(this.textContent, newValue)) {
+        return;
+      }
       this.storageAccessor
         .api(this.$router)
         .updateTextContent(this.noteId, newValue, this.textContent)
