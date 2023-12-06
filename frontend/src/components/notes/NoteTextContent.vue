@@ -30,15 +30,6 @@ import EditableText from "../form/EditableText.vue";
 import RichMarkdownEditor from "../form/RichMarkdownEditor.vue";
 import type { StorageAccessor } from "../../store/createNoteStorage";
 
-function isMeaningfulChange(
-  oldValue: Generated.TextContent,
-  newValue: Generated.TextContent,
-) {
-  return (
-    newValue.topic !== oldValue.topic || newValue.details !== oldValue.details
-  );
-}
-
 // class SumbitChange {
 //   changer: DebouncedFunc<(newValue: Generated.TextContent) => void>;
 
@@ -130,7 +121,10 @@ export default defineComponent({
       oldValue: Generated.TextContent,
       errorHander: (errs: unknown) => void,
     ) => {
-      if (!isMeaningfulChange(this.textContent, newValue)) {
+      if (
+        newValue.topic === oldValue.topic &&
+        newValue.details === oldValue.details
+      ) {
         return;
       }
       this.storageAccessor
