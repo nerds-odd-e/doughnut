@@ -117,8 +117,12 @@ export default defineComponent({
       }
       this.storageAccessor
         .api(this.$router)
-        .updateTextContent(this.noteId, newValue, this.textContent)
-        .catch(this.setError);
+        .updateTextContent(
+          this.noteId,
+          newValue,
+          this.textContent,
+          this.setError,
+        );
     };
     this.submitChange = debounce(changer, 1000);
   },

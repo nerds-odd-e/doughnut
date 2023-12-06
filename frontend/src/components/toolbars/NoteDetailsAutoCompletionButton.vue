@@ -84,6 +84,7 @@ export default defineComponent({
           topic: this.note.topic,
           details: this.note.details,
         },
+        () => {},
       );
     },
     clarifyingQuestionAndAnswered(
