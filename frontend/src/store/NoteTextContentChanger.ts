@@ -5,7 +5,6 @@ export default class NoteTextContentChanger {
     (
       noteId: number,
       newValue: Generated.TextContent,
-      oldValue: Generated.TextContent,
       errorHander: (errs: unknown) => void,
     ) => void
   >;
@@ -15,7 +14,6 @@ export default class NoteTextContentChanger {
       (
         noteId: number,
         newValue: Generated.TextContent,
-        oldValue: Generated.TextContent,
         errorHander: (errs: unknown) => void,
       ) => void
     >,
@@ -26,10 +24,9 @@ export default class NoteTextContentChanger {
   change(
     noteId: number,
     newValue: Generated.TextContent,
-    oldValue: Generated.TextContent,
     errorHander: (errs: unknown) => void,
   ): void {
-    this.changer(noteId, newValue, oldValue, errorHander);
+    this.changer(noteId, newValue, errorHander);
   }
 
   flush(): void {
