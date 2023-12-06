@@ -39,11 +39,25 @@ function isMeaningfulChange(
   );
 }
 
+// class SumbitChange {
+//   changer: DebouncedFunc<(newValue: Generated.TextContent) => void>;
+
+//   constructor(
+//     submitChange: DebouncedFunc<(newValue: Generated.TextContent) => void>,
+//   ) {
+//     this.changer = submitChange;
+//   }
+// }
+
 export default defineComponent({
   setup() {
     return {
       submitChange: null as DebouncedFunc<
-        (newValue: Generated.TextContent) => void
+        (
+          newValue: Generated.TextContent,
+          oldValue: Generated.TextContent,
+          errorHander: (errs: unknown) => void,
+        ) => void
       > | null,
     };
   },
@@ -90,7 +104,7 @@ export default defineComponent({
       if (!this.submitChange) {
         return;
       }
-      this.submitChange(this.localTextContent);
+      this.submitChange(this.localTextContent, this.textContent, this.setError);
     },
     onBlurTextField() {
       if (!this.submitChange) {
@@ -111,18 +125,17 @@ export default defineComponent({
     },
   },
   mounted() {
-    const changer = (newValue: Generated.TextContent) => {
+    const changer = (
+      newValue: Generated.TextContent,
+      oldValue: Generated.TextContent,
+      errorHander: (errs: unknown) => void,
+    ) => {
       if (!isMeaningfulChange(this.textContent, newValue)) {
         return;
       }
       this.storageAccessor
         .api(this.$router)
-        .updateTextContent(
-          this.noteId,
-          newValue,
-          this.textContent,
-          this.setError,
-        );
+        .updateTextContent(this.noteId, newValue, oldValue, errorHander);
     };
     this.submitChange = debounce(changer, 1000);
   },
