@@ -83,7 +83,7 @@ export default defineComponent({
     },
     async save() {
       await this.storageAccessor
-        .storedApi(this.$router)
+        .storedApi()
         .updateWikidataId(this.note.id, this.associationData);
       this.$emit("closeDialog");
     },

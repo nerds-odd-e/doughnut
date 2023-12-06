@@ -1,12 +1,11 @@
 import { Ref } from "vue";
-import { Router } from "vue-router";
 import ManagedApi from "@/managedApi/ManagedApi";
 import NoteEditingHistory, { HistoryRecord } from "./NoteEditingHistory";
 import NoteStorage, { StorageImplementation } from "./NoteStorage";
 import StoredApiCollection, { StoredApi } from "./StoredApiCollection";
 
 interface StorageAccessor extends NoteStorage {
-  storedApi(router: Router): StoredApi;
+  storedApi(): StoredApi;
   peekUndo(): null | HistoryRecord;
   refOfNoteRealm(noteId: Doughnut.ID): Ref<Generated.NoteRealm | undefined>;
 }
@@ -33,11 +32,10 @@ class AccessorImplementation
     return this.noteEditingHistory.peekUndo() as HistoryRecord;
   }
 
-  storedApi(router: Router): StoredApi {
+  storedApi(): StoredApi {
     return new StoredApiCollection(
       this.managedApi,
       this.noteEditingHistory,
-      router,
       this,
     );
   }

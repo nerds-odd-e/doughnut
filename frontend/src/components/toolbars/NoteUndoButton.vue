@@ -39,7 +39,7 @@ export default defineComponent({
   },
   methods: {
     undoDelete() {
-      this.storageAccessor.storedApi(this.$router).undo();
+      this.storageAccessor.storedApi().undo(this.$router);
     },
   },
 });
