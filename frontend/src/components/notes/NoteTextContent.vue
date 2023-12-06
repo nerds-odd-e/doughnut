@@ -25,37 +25,14 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { debounce } from "lodash";
 import EditableText from "../form/EditableText.vue";
 import RichMarkdownEditor from "../form/RichMarkdownEditor.vue";
 import type { StorageAccessor } from "../../store/createNoteStorage";
-import { NoteTextContentChanger } from "../../store/createNoteStorage";
-
-const noteTextContentChanger = (storageAccessor: StorageAccessor) => {
-  return (
-    noteId: number,
-    newValue: Generated.TextContent,
-    oldValue: Generated.TextContent,
-    errorHander: (errs: unknown) => void,
-  ) => {
-    if (
-      newValue.topic === oldValue.topic &&
-      newValue.details === oldValue.details
-    ) {
-      return;
-    }
-    storageAccessor
-      .storedApi()
-      .updateTextContent(noteId, newValue, oldValue, errorHander);
-  };
-};
 
 export default defineComponent({
   setup(props) {
     return {
-      changer: new NoteTextContentChanger(
-        debounce(noteTextContentChanger(props.storageAccessor), 1000),
-      ),
+      changer: props.storageAccessor.storedApi().noteTextContentChanger(),
     };
   },
   props: {
