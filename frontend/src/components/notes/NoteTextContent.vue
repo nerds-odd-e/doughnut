@@ -26,6 +26,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { debounce, DebouncedFunc } from "lodash";
+import { useRouter } from "vue-router";
 import EditableText from "../form/EditableText.vue";
 import RichMarkdownEditor from "../form/RichMarkdownEditor.vue";
 import type { StorageAccessor } from "../../store/createNoteStorage";
@@ -33,6 +34,7 @@ import type { StorageAccessor } from "../../store/createNoteStorage";
 class SumbitChange {
   changer: DebouncedFunc<
     (
+      noteId: number,
       newValue: Generated.TextContent,
       oldValue: Generated.TextContent,
       errorHander: (errs: unknown) => void,
@@ -42,6 +44,7 @@ class SumbitChange {
   constructor(
     changer: DebouncedFunc<
       (
+        noteId: number,
         newValue: Generated.TextContent,
         oldValue: Generated.TextContent,
         errorHander: (errs: unknown) => void,
@@ -52,11 +55,12 @@ class SumbitChange {
   }
 
   change(
+    noteId: number,
     newValue: Generated.TextContent,
     oldValue: Generated.TextContent,
     errorHander: (errs: unknown) => void,
   ): void {
-    this.changer(newValue, oldValue, errorHander);
+    this.changer(noteId, newValue, oldValue, errorHander);
   }
 
   flush(): void {
@@ -69,6 +73,28 @@ class SumbitChange {
 }
 
 export default defineComponent({
+  setup(props) {
+    const changer = (
+      noteId: number,
+      newValue: Generated.TextContent,
+      oldValue: Generated.TextContent,
+      errorHander: (errs: unknown) => void,
+    ) => {
+      if (
+        newValue.topic === oldValue.topic &&
+        newValue.details === oldValue.details
+      ) {
+        return;
+      }
+      props.storageAccessor
+        .storedApi(useRouter())
+        .updateTextContent(noteId, newValue, oldValue, errorHander);
+    };
+
+    return {
+      changer: new SumbitChange(debounce(changer, 1000)),
+    };
+  },
   props: {
     noteId: { type: Number, required: true },
     textContent: {
@@ -88,7 +114,6 @@ export default defineComponent({
     return {
       localTextContent: { ...this.textContent } as Generated.TextContent,
       errors: {} as Record<string, string>,
-      changer: null as SumbitChange | null,
     };
   },
   watch: {
@@ -111,6 +136,7 @@ export default defineComponent({
     saveChange() {
       this.errors = {};
       this.changer?.change(
+        this.noteId,
         this.localTextContent,
         this.textContent,
         this.setError,
@@ -130,24 +156,6 @@ export default defineComponent({
       }
       this.errors = errs;
     },
-  },
-  mounted() {
-    const changer = (
-      newValue: Generated.TextContent,
-      oldValue: Generated.TextContent,
-      errorHander: (errs: unknown) => void,
-    ) => {
-      if (
-        newValue.topic === oldValue.topic &&
-        newValue.details === oldValue.details
-      ) {
-        return;
-      }
-      this.storageAccessor
-        .storedApi(this.$router)
-        .updateTextContent(this.noteId, newValue, oldValue, errorHander);
-    };
-    this.changer = new SumbitChange(debounce(changer, 1000));
   },
   unmounted() {
     this.changer?.flush();
