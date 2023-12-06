@@ -72,27 +72,31 @@ class SumbitChange {
   }
 }
 
+const noteTextContentChanger = (storageAccessor: StorageAccessor) => {
+  return (
+    noteId: number,
+    newValue: Generated.TextContent,
+    oldValue: Generated.TextContent,
+    errorHander: (errs: unknown) => void,
+  ) => {
+    if (
+      newValue.topic === oldValue.topic &&
+      newValue.details === oldValue.details
+    ) {
+      return;
+    }
+    storageAccessor
+      .storedApi(useRouter())
+      .updateTextContent(noteId, newValue, oldValue, errorHander);
+  };
+};
+
 export default defineComponent({
   setup(props) {
-    const changer = (
-      noteId: number,
-      newValue: Generated.TextContent,
-      oldValue: Generated.TextContent,
-      errorHander: (errs: unknown) => void,
-    ) => {
-      if (
-        newValue.topic === oldValue.topic &&
-        newValue.details === oldValue.details
-      ) {
-        return;
-      }
-      props.storageAccessor
-        .storedApi(useRouter())
-        .updateTextContent(noteId, newValue, oldValue, errorHander);
-    };
-
     return {
-      changer: new SumbitChange(debounce(changer, 1000)),
+      changer: new SumbitChange(
+        debounce(noteTextContentChanger(props.storageAccessor), 1000),
+      ),
     };
   },
   props: {
