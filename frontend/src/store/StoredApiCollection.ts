@@ -106,10 +106,12 @@ export default class StoredApiCollection implements StoredApi {
       const { [property]: _, ...rest } = obj as T & Record<K, unknown>;
       return rest;
     }
-    return (await this.managedApi.restPatchMultiplePartForm(
-      `text_content/${noteId}`,
-      excludeProperty(noteContentData, "updatedAt"),
-    )) as Generated.NoteRealm;
+    return this.storage.refreshNoteRealm(
+      (await this.managedApi.restPatchMultiplePartForm(
+        `text_content/${noteId}`,
+        excludeProperty(noteContentData, "updatedAt"),
+      )) as Generated.NoteRealm,
+    );
   }
 
   async updateWikidataId(
@@ -187,12 +189,6 @@ export default class StoredApiCollection implements StoredApi {
       oldValue: Generated.TextContent,
       errorHander: (errs: unknown) => void,
     ) => {
-      if (
-        newValue.topic === oldValue.topic &&
-        newValue.details === oldValue.details
-      ) {
-        return;
-      }
       this.updateTextContent(noteId, newValue, oldValue, errorHander);
     };
 
@@ -205,11 +201,16 @@ export default class StoredApiCollection implements StoredApi {
     oldContent: Generated.TextContent,
     errorHander: (err: unknown) => void,
   ) {
+    if (
+      noteContentData.topic === oldContent.topic &&
+      noteContentData.details === oldContent.details
+    ) {
+      return;
+    }
+
     this.noteEditingHistory.addEditingToUndoHistory(noteId, oldContent);
     try {
-      this.storage.refreshNoteRealm(
-        await this.updateTextContentWithoutUndo(noteId, noteContentData),
-      );
+      await this.updateTextContentWithoutUndo(noteId, noteContentData);
     } catch (err) {
       errorHander(err);
     }
@@ -232,7 +233,7 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   async undo(router: Router) {
-    const noteRealm = this.storage.refreshNoteRealm(await this.undoInner());
+    const noteRealm = await this.undoInner();
     router.push({
       name: "noteShow",
       params: { noteId: noteRealm.id },
