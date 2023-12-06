@@ -26,7 +26,6 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { debounce, DebouncedFunc } from "lodash";
-import { useRouter } from "vue-router";
 import EditableText from "../form/EditableText.vue";
 import RichMarkdownEditor from "../form/RichMarkdownEditor.vue";
 import type { StorageAccessor } from "../../store/createNoteStorage";
@@ -86,7 +85,7 @@ const noteTextContentChanger = (storageAccessor: StorageAccessor) => {
       return;
     }
     storageAccessor
-      .storedApi(useRouter())
+      .storedApi()
       .updateTextContent(noteId, newValue, oldValue, errorHander);
   };
 };

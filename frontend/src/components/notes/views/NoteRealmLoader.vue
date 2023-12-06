@@ -38,7 +38,7 @@ export default defineComponent({
   methods: {
     fetchData() {
       this.storageAccessor
-        .storedApi(this.$router)
+        .storedApi()
         .getNoteRealmAndReloadPosition(this.noteId);
     },
   },

@@ -89,7 +89,7 @@ export default defineComponent({
         }
       }
       this.storageAccessor
-        .storedApi(this.$router)
+        .storedApi()
         .createLink(this.note.id, this.targetNote.id, this.formData)
         .then((r) => this.$emit("success", r))
         .catch((res) => {

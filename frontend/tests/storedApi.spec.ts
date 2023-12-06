@@ -11,7 +11,8 @@ describe("storedApiCollection", () => {
   const note = makeMe.aNoteRealm.please();
   const history = createNoteStorage(new ManagedApi({ states: [], errors: [] }));
   const routerReplace = vitest.fn();
-  const sa = history.storedApi({ replace: routerReplace } as unknown as Router);
+  const router = { replace: routerReplace } as unknown as Router;
+  const sa = history.storedApi();
 
   describe("delete note", () => {
     beforeEach(() => {
@@ -19,7 +20,7 @@ describe("storedApiCollection", () => {
     });
 
     it("should call the api", async () => {
-      await sa.deleteNote(note.id);
+      await sa.deleteNote(router, note.id);
       expect(fetch).toHaveBeenCalledTimes(1);
       expect(fetch).toHaveBeenCalledWith(
         `/api/notes/${note.id}/delete`,

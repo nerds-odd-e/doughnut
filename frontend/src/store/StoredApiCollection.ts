@@ -48,7 +48,7 @@ export interface StoredApi {
     data: Generated.WikidataAssociationCreation,
   ): Promise<Generated.NoteRealm>;
 
-  undo(): Promise<Generated.NoteRealm>;
+  undo(router: Router): Promise<Generated.NoteRealm>;
 
   deleteNote(
     router: Router,
@@ -62,18 +62,14 @@ export default class StoredApiCollection implements StoredApi {
 
   storage: NoteStorage;
 
-  router: Router;
-
   constructor(
     managedApi: ManagedApi,
     undoHistory: NoteEditingHistory,
-    router: Router,
     storage: NoteStorage,
   ) {
     this.managedApi = managedApi;
     this.noteEditingHistory = undoHistory;
     this.storage = storage;
-    this.router = router;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -85,23 +81,6 @@ export default class StoredApiCollection implements StoredApi {
       return router.replace({ name: "notebooks" });
     }
     return router.replace({
-      name: "noteShow",
-      params: { noteId: focusOnNote.id },
-    });
-  }
-
-  private routerReplace(focusOnNote?: Generated.NoteRealm) {
-    if (!focusOnNote) {
-      return this.router.replace({ name: "notebooks" });
-    }
-    return this.router.replace({
-      name: "noteShow",
-      params: { noteId: focusOnNote.id },
-    });
-  }
-
-  private routerPush(focusOnNote: Generated.NoteRealm) {
-    return this.router.push({
       name: "noteShow",
       params: { noteId: focusOnNote.id },
     });
@@ -229,9 +208,12 @@ export default class StoredApiCollection implements StoredApi {
     )) as Generated.NoteRealm;
   }
 
-  async undo() {
+  async undo(router: Router) {
     const noteRealm = this.storage.refreshNoteRealm(await this.undoInner());
-    this.routerPush(noteRealm);
+    router.push({
+      name: "noteShow",
+      params: { noteId: noteRealm.id },
+    });
     return noteRealm;
   }
 
@@ -248,7 +230,7 @@ export default class StoredApiCollection implements StoredApi {
     const noteRealm = this.storage.refreshNoteRealm(
       res[0] as Generated.NoteRealm,
     );
-    this.routerReplace(noteRealm);
+    this.routerReplaceFocus(router, noteRealm);
     return noteRealm;
   }
 }

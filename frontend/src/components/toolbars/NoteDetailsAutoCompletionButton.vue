@@ -74,7 +74,7 @@ export default defineComponent({
         return;
       }
 
-      this.storageAccessor.storedApi(this.$router).updateTextContent(
+      this.storageAccessor.storedApi().updateTextContent(
         this.note.id,
         {
           topic: this.note.topic,
