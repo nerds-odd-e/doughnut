@@ -58,20 +58,17 @@ class SumbitChange {
   ): void {
     this.changer(newValue, oldValue, errorHander);
   }
+
+  flush(): void {
+    this.changer.flush();
+  }
+
+  cancel(): void {
+    this.changer.cancel();
+  }
 }
 
 export default defineComponent({
-  setup() {
-    return {
-      submitChange: null as DebouncedFunc<
-        (
-          newValue: Generated.TextContent,
-          oldValue: Generated.TextContent,
-          errorHander: (errs: unknown) => void,
-        ) => void
-      > | null,
-    };
-  },
   props: {
     noteId: { type: Number, required: true },
     textContent: {
@@ -113,20 +110,14 @@ export default defineComponent({
     },
     saveChange() {
       this.errors = {};
-      if (!this.changer) {
-        return;
-      }
-      this.changer.change(
+      this.changer?.change(
         this.localTextContent,
         this.textContent,
         this.setError,
       );
     },
     onBlurTextField() {
-      if (!this.submitChange) {
-        return;
-      }
-      this.submitChange.flush();
+      this.changer?.flush();
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setError(errs: any) {
@@ -156,14 +147,11 @@ export default defineComponent({
         .api(this.$router)
         .updateTextContent(this.noteId, newValue, oldValue, errorHander);
     };
-    this.submitChange = debounce(changer, 1000);
-    this.changer = new SumbitChange(this.submitChange);
+    this.changer = new SumbitChange(debounce(changer, 1000));
   },
   unmounted() {
-    if (this.submitChange) {
-      this.submitChange.flush();
-      this.submitChange.cancel();
-    }
+    this.changer?.flush();
+    this.changer?.cancel();
   },
 });
 </script>
