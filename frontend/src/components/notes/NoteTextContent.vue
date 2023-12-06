@@ -75,12 +75,7 @@ export default defineComponent({
     },
     saveChange() {
       this.errors = {};
-      this.changer?.change(
-        this.noteId,
-        this.localTextContent,
-        this.textContent,
-        this.setError,
-      );
+      this.changer?.change(this.noteId, this.localTextContent, this.setError);
     },
     onBlurTextField() {
       this.changer?.flush();

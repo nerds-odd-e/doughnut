@@ -43,7 +43,6 @@ export interface StoredApi {
   updateTextContent(
     noteId: Doughnut.ID,
     noteContentData: Omit<Generated.TextContent, "updatedAt">,
-    oldContent: Generated.TextContent,
     errorHandler: (err: unknown) => void,
   ): Promise<void>;
 
@@ -186,10 +185,9 @@ export default class StoredApiCollection implements StoredApi {
     const changer = (
       noteId: number,
       newValue: Generated.TextContent,
-      oldValue: Generated.TextContent,
       errorHander: (errs: unknown) => void,
     ) => {
-      this.updateTextContent(noteId, newValue, oldValue, errorHander);
+      this.updateTextContent(noteId, newValue, errorHander);
     };
 
     return new NoteTextContentChanger(debounce(changer, 1000));
@@ -198,18 +196,21 @@ export default class StoredApiCollection implements StoredApi {
   async updateTextContent(
     noteId: Doughnut.ID,
     noteContentData: Omit<Generated.TextContent, "updatedAt">,
-    oldContent: Generated.TextContent,
     errorHander: (err: unknown) => void,
   ) {
-    const noteRealm = this.storage.refOfNoteRealm(noteId).value;
-    if (noteRealm) {
+    const currentNote = this.storage.refOfNoteRealm(noteId).value?.note;
+    if (currentNote) {
+      const old: Generated.TextContent = {
+        topic: currentNote.topic,
+        details: currentNote.details,
+      };
       if (
-        noteRealm.note.topic === noteContentData.topic &&
-        noteRealm.note.details === noteContentData.details
+        old.topic === noteContentData.topic &&
+        old.details === noteContentData.details
       ) {
         return;
       }
-      this.noteEditingHistory.addEditingToUndoHistory(noteId, oldContent);
+      this.noteEditingHistory.addEditingToUndoHistory(noteId, old);
     }
     try {
       await this.updateTextContentWithoutUndo(noteId, noteContentData);
