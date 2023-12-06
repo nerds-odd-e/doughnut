@@ -144,7 +144,7 @@ export default defineComponent({
         return;
       }
       this.storageAccessor
-        .api(this.$router)
+        .storedApi(this.$router)
         .updateTextContent(this.noteId, newValue, oldValue, errorHander);
     };
     this.changer = new SumbitChange(debounce(changer, 1000));

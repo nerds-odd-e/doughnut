@@ -85,7 +85,7 @@ export default defineComponent({
       this.noteFormErrors.wikidataId = undefined;
       this.noteFormErrors.textContent = {};
       this.storageAccessor
-        .api(this.$router)
+        .storedApi(this.$router)
         .createNote(this.parentId, this.creationData)
         .then(() => {
           this.$emit("closeDialog");
