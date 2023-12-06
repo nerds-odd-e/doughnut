@@ -25,51 +25,11 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { debounce, DebouncedFunc } from "lodash";
+import { debounce } from "lodash";
 import EditableText from "../form/EditableText.vue";
 import RichMarkdownEditor from "../form/RichMarkdownEditor.vue";
 import type { StorageAccessor } from "../../store/createNoteStorage";
-
-class SumbitChange {
-  changer: DebouncedFunc<
-    (
-      noteId: number,
-      newValue: Generated.TextContent,
-      oldValue: Generated.TextContent,
-      errorHander: (errs: unknown) => void,
-    ) => void
-  >;
-
-  constructor(
-    changer: DebouncedFunc<
-      (
-        noteId: number,
-        newValue: Generated.TextContent,
-        oldValue: Generated.TextContent,
-        errorHander: (errs: unknown) => void,
-      ) => void
-    >,
-  ) {
-    this.changer = changer;
-  }
-
-  change(
-    noteId: number,
-    newValue: Generated.TextContent,
-    oldValue: Generated.TextContent,
-    errorHander: (errs: unknown) => void,
-  ): void {
-    this.changer(noteId, newValue, oldValue, errorHander);
-  }
-
-  flush(): void {
-    this.changer.flush();
-  }
-
-  cancel(): void {
-    this.changer.cancel();
-  }
-}
+import { NoteTextContentChanger } from "../../store/createNoteStorage";
 
 const noteTextContentChanger = (storageAccessor: StorageAccessor) => {
   return (
@@ -93,7 +53,7 @@ const noteTextContentChanger = (storageAccessor: StorageAccessor) => {
 export default defineComponent({
   setup(props) {
     return {
-      changer: new SumbitChange(
+      changer: new NoteTextContentChanger(
         debounce(noteTextContentChanger(props.storageAccessor), 1000),
       ),
     };
