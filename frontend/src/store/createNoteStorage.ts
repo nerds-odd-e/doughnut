@@ -1,4 +1,3 @@
-import { Ref } from "vue";
 import ManagedApi from "@/managedApi/ManagedApi";
 import NoteEditingHistory, { HistoryRecord } from "./NoteEditingHistory";
 import NoteStorage, { StorageImplementation } from "./NoteStorage";
@@ -8,7 +7,6 @@ import NoteTextContentChanger from "./NoteTextContentChanger";
 interface StorageAccessor extends NoteStorage {
   storedApi(): StoredApi;
   peekUndo(): null | HistoryRecord;
-  refOfNoteRealm(noteId: Doughnut.ID): Ref<Generated.NoteRealm | undefined>;
 }
 
 class AccessorImplementation
