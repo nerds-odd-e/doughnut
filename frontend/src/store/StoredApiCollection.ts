@@ -201,10 +201,7 @@ export default class StoredApiCollection implements StoredApi {
     oldContent: Generated.TextContent,
     errorHander: (err: unknown) => void,
   ) {
-    if (
-      noteContentData.topic === oldContent.topic &&
-      noteContentData.details === oldContent.details
-    ) {
+    if (!this.storage.isContentChanged(noteId, noteContentData)) {
       return;
     }
 
