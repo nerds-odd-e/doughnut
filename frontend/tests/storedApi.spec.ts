@@ -11,7 +11,7 @@ describe("storedApiCollection", () => {
   const note = makeMe.aNoteRealm.please();
   const history = createNoteStorage(new ManagedApi({ states: [], errors: [] }));
   const routerReplace = vitest.fn();
-  const sa = history.api({ replace: routerReplace } as unknown as Router);
+  const sa = history.storedApi({ replace: routerReplace } as unknown as Router);
 
   describe("delete note", () => {
     beforeEach(() => {

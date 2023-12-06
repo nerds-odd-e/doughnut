@@ -71,7 +71,7 @@ export default defineComponent({
   methods: {
     updateLink() {
       this.storageAccessor
-        .api(this.$router)
+        .storedApi(this.$router)
         .updateLink(this.link.id, this.formData)
         .then(() => this.$emit("closeDialog"))
         .catch((error) => {
@@ -85,7 +85,7 @@ export default defineComponent({
         return;
       }
       await this.storageAccessor
-        .api(this.$router)
+        .storedApi(this.$router)
         .deleteLink(this.link.id, this.inverseIcon);
       this.$emit("closeDialog");
     },

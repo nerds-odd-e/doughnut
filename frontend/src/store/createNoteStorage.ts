@@ -6,7 +6,7 @@ import NoteStorage, { StorageImplementation } from "./NoteStorage";
 import StoredApiCollection, { StoredApi } from "./StoredApiCollection";
 
 interface StorageAccessor extends NoteStorage {
-  api(router: Router): StoredApi;
+  storedApi(router: Router): StoredApi;
   peekUndo(): null | HistoryRecord;
   refOfNoteRealm(noteId: Doughnut.ID): Ref<Generated.NoteRealm | undefined>;
 }
@@ -33,7 +33,7 @@ class AccessorImplementation
     return this.noteEditingHistory.peekUndo() as HistoryRecord;
   }
 
-  api(router: Router): StoredApi {
+  storedApi(router: Router): StoredApi {
     return new StoredApiCollection(
       this.managedApi,
       this.noteEditingHistory,
