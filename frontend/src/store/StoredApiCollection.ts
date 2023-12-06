@@ -201,11 +201,16 @@ export default class StoredApiCollection implements StoredApi {
     oldContent: Generated.TextContent,
     errorHander: (err: unknown) => void,
   ) {
-    if (!this.storage.isContentChanged(noteId, noteContentData)) {
-      return;
+    const noteRealm = this.storage.refOfNoteRealm(noteId).value;
+    if (noteRealm) {
+      if (
+        noteRealm.note.topic === noteContentData.topic &&
+        noteRealm.note.details === noteContentData.details
+      ) {
+        return;
+      }
+      this.noteEditingHistory.addEditingToUndoHistory(noteId, oldContent);
     }
-
-    this.noteEditingHistory.addEditingToUndoHistory(noteId, oldContent);
     try {
       await this.updateTextContentWithoutUndo(noteId, noteContentData);
     } catch (err) {
