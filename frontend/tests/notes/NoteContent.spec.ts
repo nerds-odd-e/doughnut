@@ -14,6 +14,7 @@ describe("undo editing", () => {
     );
 
     const noteRealm = makeMe.aNoteRealm.topic("Dummy Title").please();
+    histories.refreshNoteRealm(noteRealm);
     helper.apiMock.expectingPatch(`/api/text_content/${noteRealm.id}`);
 
     const updatedTitle = "updated";
