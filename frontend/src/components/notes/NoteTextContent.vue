@@ -30,15 +30,35 @@ import EditableText from "../form/EditableText.vue";
 import RichMarkdownEditor from "../form/RichMarkdownEditor.vue";
 import type { StorageAccessor } from "../../store/createNoteStorage";
 
-// class SumbitChange {
-//   changer: DebouncedFunc<(newValue: Generated.TextContent) => void>;
+class SumbitChange {
+  changer: DebouncedFunc<
+    (
+      newValue: Generated.TextContent,
+      oldValue: Generated.TextContent,
+      errorHander: (errs: unknown) => void,
+    ) => void
+  >;
 
-//   constructor(
-//     submitChange: DebouncedFunc<(newValue: Generated.TextContent) => void>,
-//   ) {
-//     this.changer = submitChange;
-//   }
-// }
+  constructor(
+    changer: DebouncedFunc<
+      (
+        newValue: Generated.TextContent,
+        oldValue: Generated.TextContent,
+        errorHander: (errs: unknown) => void,
+      ) => void
+    >,
+  ) {
+    this.changer = changer;
+  }
+
+  change(
+    newValue: Generated.TextContent,
+    oldValue: Generated.TextContent,
+    errorHander: (errs: unknown) => void,
+  ): void {
+    this.changer(newValue, oldValue, errorHander);
+  }
+}
 
 export default defineComponent({
   setup() {
@@ -71,6 +91,7 @@ export default defineComponent({
     return {
       localTextContent: { ...this.textContent } as Generated.TextContent,
       errors: {} as Record<string, string>,
+      changer: null as SumbitChange | null,
     };
   },
   watch: {
@@ -92,10 +113,14 @@ export default defineComponent({
     },
     saveChange() {
       this.errors = {};
-      if (!this.submitChange) {
+      if (!this.changer) {
         return;
       }
-      this.submitChange(this.localTextContent, this.textContent, this.setError);
+      this.changer.change(
+        this.localTextContent,
+        this.textContent,
+        this.setError,
+      );
     },
     onBlurTextField() {
       if (!this.submitChange) {
@@ -132,6 +157,7 @@ export default defineComponent({
         .updateTextContent(this.noteId, newValue, oldValue, errorHander);
     };
     this.submitChange = debounce(changer, 1000);
+    this.changer = new SumbitChange(this.submitChange);
   },
   unmounted() {
     if (this.submitChange) {
