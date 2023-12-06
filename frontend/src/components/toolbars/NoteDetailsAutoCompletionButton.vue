@@ -74,14 +74,10 @@ export default defineComponent({
         return;
       }
 
-      this.storageAccessor.storedApi().updateTextContent(
-        this.note.id,
-        {
-          topic: this.note.topic,
-          details: response.moreCompleteContent,
-        },
-        () => {},
-      );
+      this.storageAccessor.storedApi().updateTextContent(this.note.id, {
+        topic: this.note.topic,
+        details: response.moreCompleteContent,
+      });
     },
     clarifyingQuestionAndAnswered(
       clarifyingQuestionAndAnswer: Generated.ClarifyingQuestionAndAnswer,
