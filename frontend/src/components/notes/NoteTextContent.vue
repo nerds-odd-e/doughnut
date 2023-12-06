@@ -98,6 +98,17 @@ export default defineComponent({
       }
       this.submitChange.flush();
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setError(errs: any) {
+      if (errs.status === 401) {
+        this.errors = {
+          topic:
+            "You are not authorized to edit this note. Perhaps you are not logged in?",
+        };
+        return;
+      }
+      this.errors = errs;
+    },
   },
   mounted() {
     const changer = (newValue: Generated.TextContent) => {
@@ -107,16 +118,7 @@ export default defineComponent({
       this.storageAccessor
         .api(this.$router)
         .updateTextContent(this.noteId, newValue, this.textContent)
-        .catch((errors) => {
-          if (errors.status === 401) {
-            this.errors = {
-              topic:
-                "You are not authorized to edit this note. Perhaps you are not logged in?",
-            };
-            return;
-          }
-          this.errors = errors;
-        });
+        .catch(this.setError);
     };
     this.submitChange = debounce(changer, 1000);
   },
