@@ -1,8 +1,10 @@
 import { Router } from "vue-router";
+import { debounce } from "lodash";
 import ManagedApi from "../managedApi/ManagedApi";
 import apiCollection from "../managedApi/apiCollection";
 import NoteEditingHistory from "./NoteEditingHistory";
 import NoteStorage from "./NoteStorage";
+import NoteTextContentChanger from "./NoteTextContentChanger";
 
 export interface StoredApi {
   getNoteRealmAndReloadPosition(
@@ -35,6 +37,8 @@ export interface StoredApi {
     noteId: Doughnut.ID,
     noteAccessories: Generated.NoteAccessories,
   ): Promise<Generated.NoteRealm>;
+
+  noteTextContentChanger(): NoteTextContentChanger;
 
   updateTextContent(
     noteId: Doughnut.ID,
@@ -174,6 +178,25 @@ export default class StoredApiCollection implements StoredApi {
         noteContentData,
       )) as Generated.NoteRealm,
     );
+  }
+
+  noteTextContentChanger() {
+    const changer = (
+      noteId: number,
+      newValue: Generated.TextContent,
+      oldValue: Generated.TextContent,
+      errorHander: (errs: unknown) => void,
+    ) => {
+      if (
+        newValue.topic === oldValue.topic &&
+        newValue.details === oldValue.details
+      ) {
+        return;
+      }
+      this.updateTextContent(noteId, newValue, oldValue, errorHander);
+    };
+
+    return new NoteTextContentChanger(debounce(changer, 1000));
   }
 
   async updateTextContent(
