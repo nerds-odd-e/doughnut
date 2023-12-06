@@ -31,7 +31,7 @@ export default defineComponent({
       if (await this.popups.confirm(`Confirm to delete this note?`)) {
         await this.storageAccessor
           .storedApi(this.$router)
-          .deleteNote(this.noteId);
+          .deleteNote(this.$router, this.noteId);
       }
     },
   },

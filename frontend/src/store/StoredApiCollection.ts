@@ -10,6 +10,7 @@ export interface StoredApi {
   ): Promise<Generated.NoteRealm>;
 
   createNote(
+    router: Router,
     parentId: Doughnut.ID,
     data: Generated.NoteCreation,
   ): Promise<Generated.NoteRealm>;
@@ -49,7 +50,10 @@ export interface StoredApi {
 
   undo(): Promise<Generated.NoteRealm>;
 
-  deleteNote(noteId: Doughnut.ID): Promise<Generated.NoteRealm | undefined>;
+  deleteNote(
+    router: Router,
+    noteId: Doughnut.ID,
+  ): Promise<Generated.NoteRealm | undefined>;
 }
 export default class StoredApiCollection implements StoredApi {
   noteEditingHistory: NoteEditingHistory;
@@ -70,6 +74,20 @@ export default class StoredApiCollection implements StoredApi {
     this.noteEditingHistory = undoHistory;
     this.storage = storage;
     this.router = router;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  private routerReplaceFocus(
+    router: Router,
+    focusOnNote?: Generated.NoteRealm,
+  ) {
+    if (!focusOnNote) {
+      return router.replace({ name: "notebooks" });
+    }
+    return router.replace({
+      name: "noteShow",
+      params: { noteId: focusOnNote.id },
+    });
   }
 
   private routerReplace(focusOnNote?: Generated.NoteRealm) {
@@ -125,10 +143,14 @@ export default class StoredApiCollection implements StoredApi {
     return this.storage.refreshNoteRealm(nrwp);
   }
 
-  async createNote(parentId: Doughnut.ID, data: Generated.NoteCreation) {
+  async createNote(
+    router: Router,
+    parentId: Doughnut.ID,
+    data: Generated.NoteCreation,
+  ) {
     const nrwp = await this.statelessApi.noteMethods.createNote(parentId, data);
     const focus = this.storage.refreshNoteRealm(nrwp);
-    this.routerReplace(focus);
+    this.routerReplaceFocus(router, focus);
     return focus;
   }
 
@@ -213,14 +235,14 @@ export default class StoredApiCollection implements StoredApi {
     return noteRealm;
   }
 
-  async deleteNote(noteId: Doughnut.ID) {
+  async deleteNote(router: Router, noteId: Doughnut.ID) {
     const res = (await this.managedApi.restPost(
       `notes/${noteId}/delete`,
       {},
     )) as Generated.NoteRealm[];
     this.noteEditingHistory.deleteNote(noteId);
     if (res.length === 0) {
-      this.routerReplace();
+      this.routerReplaceFocus(router);
       return undefined;
     }
     const noteRealm = this.storage.refreshNoteRealm(
