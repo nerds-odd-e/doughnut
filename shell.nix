@@ -22,6 +22,7 @@ in mkShell {
     git
     git-secret
     gitAndTools.delta
+    gitleaks
     binutils-unwrapped
     hostname
     inetutils
