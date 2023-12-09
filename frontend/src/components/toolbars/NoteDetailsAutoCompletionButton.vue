@@ -52,7 +52,9 @@ export default defineComponent({
   data() {
     return {
       isUnmounted: false,
-      completionInProgress: undefined as undefined | Generated.AiCompletion,
+      completionInProgress: undefined as
+        | undefined
+        | Generated.AiCompletionResponse,
     };
   },
   methods: {

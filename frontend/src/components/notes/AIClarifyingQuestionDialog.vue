@@ -36,7 +36,7 @@ import TextInput from "../form/TextInput.vue";
 export default defineComponent({
   props: {
     completionInProgress: {
-      type: Object as PropType<Generated.AiCompletion>,
+      type: Object as PropType<Generated.AiCompletionResponse>,
       required: true,
     },
   },

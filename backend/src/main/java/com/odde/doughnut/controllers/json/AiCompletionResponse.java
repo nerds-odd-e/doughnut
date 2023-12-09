@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public final class AiCompletion {
+public final class AiCompletionResponse {
   String moreCompleteContent;
   String finishReason;
   String question;

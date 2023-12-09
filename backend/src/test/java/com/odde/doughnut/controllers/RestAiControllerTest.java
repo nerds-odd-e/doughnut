@@ -7,8 +7,8 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.odde.doughnut.controllers.json.AiCompletion;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
+import com.odde.doughnut.controllers.json.AiCompletionResponse;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
@@ -116,9 +116,9 @@ class RestAiControllerTest {
 
     @Test
     void askCompletionAndUseStopResponse() {
-      AiCompletion aiCompletion = controller.getCompletion(note, params);
-      assertEquals("blue planet", aiCompletion.getMoreCompleteContent());
-      assertEquals("stop", aiCompletion.getFinishReason());
+      AiCompletionResponse aiCompletionResponse = controller.getCompletion(note, params);
+      assertEquals("blue planet", aiCompletionResponse.getMoreCompleteContent());
+      assertEquals("stop", aiCompletionResponse.getFinishReason());
     }
   }
 
