@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public final class AiCompletionResponse {
   String moreCompleteContent;
   String finishReason;
-  String question;
+  String clarifyingQuestion;
   List<ClarifyingQuestionAndAnswer> clarifyingHistory = new ArrayList<>();
 
   public void addClarifyingHistory(ClarifyingQuestionAndAnswer clarifyingQuestionAndAnswer) {

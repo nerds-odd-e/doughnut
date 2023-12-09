@@ -170,7 +170,7 @@ class AiAdvisorServiceAutoCompleteTest {
       assertEquals("question", aiCompletionResponse.getFinishReason());
       assertEquals(
           "Are you referring to American football or association football (soccer) ?",
-          aiCompletionResponse.getQuestion());
+          aiCompletionResponse.getClarifyingQuestion());
     }
 
     @Nested

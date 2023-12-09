@@ -55,7 +55,8 @@ public class AiAdvisorService {
     AiCompletionResponse result = new AiCompletionResponse();
     if (isClarifyingQuestion) {
       result.setFinishReason("question");
-      result.setQuestion(AiCompletionParams.clarifyingQuestion(chatFunctionCall.getArguments()));
+      result.setClarifyingQuestion(
+          AiCompletionParams.clarifyingQuestion(chatFunctionCall.getArguments()));
       aiCompletionParams.getClarifyingQuestionAndAnswers().forEach(result::addClarifyingHistory);
       return result;
     }

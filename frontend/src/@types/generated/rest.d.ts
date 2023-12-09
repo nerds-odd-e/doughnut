@@ -6,7 +6,7 @@ declare namespace Generated {
     interface AiCompletionResponse {
         moreCompleteContent: string;
         finishReason: string;
-        question: string;
+        clarifyingQuestion: string;
         clarifyingHistory: ClarifyingQuestionAndAnswer[];
     }
 
