@@ -11,7 +11,7 @@ declare namespace Generated {
     interface AiCompletionResponse {
         finishReason: string;
         moreCompleteContent: string;
-        clarifyingQuestion: string;
+        clarifyingQuestion: ClarifyingQuestion;
         clarifyingHistory: ClarifyingQuestionAndAnswer[];
     }
 
@@ -197,6 +197,13 @@ declare namespace Generated {
         id: string;
         label: string;
         description: string;
+    }
+
+    interface ClarifyingQuestion {
+        /**
+         * content of the question as plain string.
+         */
+        question: string;
     }
 
     interface User {

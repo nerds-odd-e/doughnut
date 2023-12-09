@@ -59,10 +59,10 @@ public class AiAdvisorService {
     AiCompletionResponse result = new AiCompletionResponse();
     if (isClarifyingQuestion) {
       result.setFinishReason("question");
-      String result1;
+      ClarifyingQuestion result1;
       JsonNode jsonNode = chatFunctionCall.getArguments();
       try {
-        result1 = defaultObjectMapper().treeToValue(jsonNode, ClarifyingQuestion.class).question;
+        result1 = defaultObjectMapper().treeToValue(jsonNode, ClarifyingQuestion.class);
       } catch (JsonProcessingException e) {
         throw new RuntimeException(e);
       }
