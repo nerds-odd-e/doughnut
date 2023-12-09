@@ -1,5 +1,9 @@
 package com.odde.doughnut.services;
 
+import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.controllers.json.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
@@ -55,12 +59,29 @@ public class AiAdvisorService {
     AiCompletionResponse result = new AiCompletionResponse();
     if (isClarifyingQuestion) {
       result.setFinishReason("question");
-      result.setClarifyingQuestion(
-          AiCompletionParams.clarifyingQuestion(chatFunctionCall.getArguments()));
+      String result1;
+      JsonNode jsonNode = chatFunctionCall.getArguments();
+      try {
+        result1 = defaultObjectMapper().treeToValue(jsonNode, ClarifyingQuestion.class).question;
+      } catch (JsonProcessingException e) {
+        throw new RuntimeException(e);
+      }
+      result.setClarifyingQuestion(result1);
       aiCompletionParams.getClarifyingQuestionAndAnswers().forEach(result::addClarifyingHistory);
       return result;
     }
-    String content = aiCompletionParams.complete(chatFunctionCall.getArguments());
+    String result1;
+    JsonNode jsonNode = chatFunctionCall.getArguments();
+    try {
+      NoteDetailsCompletion noteDetailsCompletion =
+          defaultObjectMapper().treeToValue(jsonNode, NoteDetailsCompletion.class);
+      aiCompletionParams.setDetailsToComplete(
+          aiCompletionParams.getDetailsToComplete() + noteDetailsCompletion.completion);
+      result1 = aiCompletionParams.getDetailsToComplete();
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
+    String content = result1;
     result.setMoreCompleteContent(content);
     result.setFinishReason("stop");
     return result;
