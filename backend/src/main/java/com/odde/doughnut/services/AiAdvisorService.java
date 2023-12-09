@@ -32,7 +32,7 @@ public class AiAdvisorService {
     return getAiQuestionGenerator(note).getAiGeneratedQuestion(modelName);
   }
 
-  public AiCompletion getAiCompletion(
+  public AiCompletionResponse getAiCompletion(
       AiCompletionParams aiCompletionParams, Note note, String modelName) {
     OpenAIChatAboutNoteRequestBuilder requestBuilder =
         new OpenAIChatAboutNoteRequestBuilder()
@@ -52,7 +52,7 @@ public class AiAdvisorService {
         chatFunctionCall
             .getName()
             .equals(OpenAIChatAboutNoteRequestBuilder.askClarificationQuestion);
-    AiCompletion result = new AiCompletion();
+    AiCompletionResponse result = new AiCompletionResponse();
     if (isClarifyingQuestion) {
       result.setFinishReason("question");
       result.setQuestion(AiCompletionParams.clarifyingQuestion(chatFunctionCall.getArguments()));

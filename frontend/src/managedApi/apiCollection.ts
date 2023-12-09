@@ -368,7 +368,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return (await managedApi.restPost(
         `ai/${noteId}/completion`,
         request,
-      )) as Generated.AiCompletion;
+      )) as Generated.AiCompletionResponse;
     },
 
     async generateImage(prompt: string) {

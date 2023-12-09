@@ -8,8 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.doughnut.controllers.json.AiCompletion;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
+import com.odde.doughnut.controllers.json.AiCompletionResponse;
 import com.odde.doughnut.controllers.json.ApiError;
 import com.odde.doughnut.controllers.json.ClarifyingQuestionAndAnswer;
 import com.odde.doughnut.entities.Note;
@@ -165,11 +165,12 @@ class AiAdvisorServiceAutoCompleteTest {
           new ClarifyingQuestion(
               "Are you referring to American football or association football (soccer) ?"),
           "ask_clarification_question");
-      AiCompletion aiCompletion = aiAdvisorService.getAiCompletion(params, note, "gpt-4");
-      assertEquals("question", aiCompletion.getFinishReason());
+      AiCompletionResponse aiCompletionResponse =
+          aiAdvisorService.getAiCompletion(params, note, "gpt-4");
+      assertEquals("question", aiCompletionResponse.getFinishReason());
       assertEquals(
           "Are you referring to American football or association football (soccer) ?",
-          aiCompletion.getQuestion());
+          aiCompletionResponse.getQuestion());
     }
 
     @Nested
@@ -209,11 +210,12 @@ class AiAdvisorServiceAutoCompleteTest {
         openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
             new NoteDetailsCompletion(" is common in China, if you are referring to green tea."),
             "complete_note_details");
-        AiCompletion aiCompletion = aiAdvisorService.getAiCompletion(params, note, "gpt-4");
-        assertEquals("stop", aiCompletion.getFinishReason());
+        AiCompletionResponse aiCompletionResponse =
+            aiAdvisorService.getAiCompletion(params, note, "gpt-4");
+        assertEquals("stop", aiCompletionResponse.getFinishReason());
         assertEquals(
             "Tea is common in China, if you are referring to green tea.",
-            aiCompletion.getMoreCompleteContent());
+            aiCompletionResponse.getMoreCompleteContent());
       }
 
       @Test
@@ -222,9 +224,10 @@ class AiAdvisorServiceAutoCompleteTest {
             new ClarifyingQuestion(
                 "Are you referring to American football or association football (soccer) ?"),
             "ask_clarification_question");
-        AiCompletion aiCompletion = aiAdvisorService.getAiCompletion(params, note, "gpt-4");
-        assertThat(aiCompletion.getFinishReason(), equalTo("question"));
-        assertThat(aiCompletion.getClarifyingHistory(), hasSize(1));
+        AiCompletionResponse aiCompletionResponse =
+            aiAdvisorService.getAiCompletion(params, note, "gpt-4");
+        assertThat(aiCompletionResponse.getFinishReason(), equalTo("question"));
+        assertThat(aiCompletionResponse.getClarifyingHistory(), hasSize(1));
       }
     }
   }

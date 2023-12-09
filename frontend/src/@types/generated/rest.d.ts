@@ -3,7 +3,7 @@
 
 declare namespace Generated {
 
-    interface AiCompletion {
+    interface AiCompletionResponse {
         moreCompleteContent: string;
         finishReason: string;
         question: string;
