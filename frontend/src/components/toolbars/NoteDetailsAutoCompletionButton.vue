@@ -71,7 +71,7 @@ export default defineComponent({
 
       if (this.isUnmounted) return;
 
-      if (response.question) {
+      if (response.clarifyingQuestion) {
         this.completionInProgress = response;
         return;
       }
