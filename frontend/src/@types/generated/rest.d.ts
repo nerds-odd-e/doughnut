@@ -3,16 +3,16 @@
 
 declare namespace Generated {
 
-    interface AiCompletionResponse {
-        moreCompleteContent: string;
-        finishReason: string;
-        clarifyingQuestion: string;
-        clarifyingHistory: ClarifyingQuestionAndAnswer[];
-    }
-
     interface AiCompletionParams {
         detailsToComplete: string;
         clarifyingQuestionAndAnswers: ClarifyingQuestionAndAnswer[];
+    }
+
+    interface AiCompletionResponse {
+        finishReason: string;
+        moreCompleteContent: string;
+        clarifyingQuestion: string;
+        clarifyingHistory: ClarifyingQuestionAndAnswer[];
     }
 
     interface AiGeneratedImage {
