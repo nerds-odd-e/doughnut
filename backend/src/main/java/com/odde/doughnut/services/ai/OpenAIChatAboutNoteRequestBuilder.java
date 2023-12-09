@@ -64,7 +64,7 @@ public class OpenAIChatAboutNoteRequestBuilder {
   }
 
   public OpenAIChatAboutNoteRequestBuilder instructionForDetailsCompletion(
-      AiCompletionParams noteDetailsCompletion) {
+      AiCompletionParams aiCompletionParams) {
     functions.add(
         ChatFunction.builder()
             .name("complete_note_details")
@@ -79,7 +79,7 @@ public class OpenAIChatAboutNoteRequestBuilder {
             .build());
 
     HashMap<String, String> arguments = new HashMap<>();
-    arguments.put("details_to_complete", noteDetailsCompletion.getDetailsToComplete());
+    arguments.put("details_to_complete", aiCompletionParams.getDetailsToComplete());
     addMessage(
         ChatMessageRole.USER,
         ("Please complete the concise details of the note of focus. Keep it short."

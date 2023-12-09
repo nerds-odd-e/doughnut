@@ -8,20 +8,29 @@ import com.odde.doughnut.services.ai.ClarifyingQuestion;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @NoArgsConstructor
-@Data
 public class AiCompletionParams {
-  private String detailsToComplete = "";
+  @Setter private String detailsToComplete;
+
+  @Getter
   private List<ClarifyingQuestionAndAnswer> clarifyingQuestionAndAnswers = new ArrayList<>();
+
+  public String getDetailsToComplete() {
+    if (detailsToComplete == null) {
+      return "";
+    }
+    return detailsToComplete;
+  }
 
   public String complete(JsonNode jsonNode) {
     try {
       NoteDetailsCompletion noteDetailsCompletion =
           defaultObjectMapper().treeToValue(jsonNode, NoteDetailsCompletion.class);
-      return detailsToComplete += noteDetailsCompletion.completion;
+      return detailsToComplete = getDetailsToComplete() + noteDetailsCompletion.completion;
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
