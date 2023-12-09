@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public final class AiCompletionResponse {
-  String moreCompleteContent;
   String finishReason;
+  String moreCompleteContent;
   String clarifyingQuestion;
   List<ClarifyingQuestionAndAnswer> clarifyingHistory = new ArrayList<>();
 
