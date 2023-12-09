@@ -46,8 +46,8 @@ declare namespace Generated {
     }
 
     interface ClarifyingQuestionAndAnswer {
-        questionFromAI?: string;
-        answerFromUser?: string;
+        questionFromAI: string;
+        answerFromUser: string;
     }
 
     interface CurrentUserInfo {
