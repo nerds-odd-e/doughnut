@@ -52,7 +52,7 @@
     "@typescript-eslint/parser": "^6.13.2",
     "cypress": "13.6.1",
     "cypress-file-upload": "^5.0.8",
-    "esbuild": "^0.19.8",
+    "esbuild": "^0.19.9",
     "eslint": "^8.55.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-chai-friendly": "^0.7.2",
@@ -65,7 +65,7 @@
     "jsdom": "^23.0.1",
     "mountebank": "^2.9.1",
     "npm-run-all": "^4.1.5",
-    "prettier": "^3.1.0",
+    "prettier": "^3.1.1",
     "superagent": "^8.1.2",
     "syncpack": "^11.2.1",
     "typescript": "5.3.3"
