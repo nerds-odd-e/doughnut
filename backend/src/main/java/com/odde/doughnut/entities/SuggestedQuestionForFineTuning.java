@@ -8,7 +8,6 @@ import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.theokanning.openai.completion.chat.ChatMessage;
-
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
