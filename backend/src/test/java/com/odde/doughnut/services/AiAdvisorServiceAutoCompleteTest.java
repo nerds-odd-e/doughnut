@@ -179,7 +179,8 @@ class AiAdvisorServiceAutoCompleteTest {
       void setup() {
         params.setDetailsToComplete("Tea");
         ClarifyingQuestionAndAnswer clarifyingQuestionAndAnswer = new ClarifyingQuestionAndAnswer();
-        clarifyingQuestionAndAnswer.questionFromAI = "Black tea or green tea?";
+        clarifyingQuestionAndAnswer.questionFromAI =
+            new ClarifyingQuestion("Black tea or green tea?");
         clarifyingQuestionAndAnswer.answerFromUser = "green tea";
         params.getClarifyingQuestionAndAnswers().add(clarifyingQuestionAndAnswer);
       }

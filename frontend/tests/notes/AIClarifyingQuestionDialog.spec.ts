@@ -12,7 +12,9 @@ describe("answering a clarifying question for note details geeration", () => {
     finishReason: "clarifying_question",
     clarifyingHistory: [
       {
-        questionFromAI: "Is it a sport?",
+        questionFromAI: {
+          question: "Is it a sport?",
+        },
         answerFromUser: "Yes",
       },
     ],
