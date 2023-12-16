@@ -38,18 +38,15 @@ public class AiAdvisorService {
 
   public AiCompletionResponse getAiCompletion(
       AiCompletionParams aiCompletionParams, Note note, String modelName) {
-    OpenAIChatAboutNoteRequestBuilder requestBuilder =
+    ChatCompletionRequest chatCompletionRequest =
         new OpenAIChatAboutNoteRequestBuilder()
             .model(modelName)
             .systemBrief()
             .contentOfNoteOfCurrentFocus(note)
-            .instructionForDetailsCompletion(aiCompletionParams);
+            .instructionForDetailsCompletion(aiCompletionParams)
+            .maxTokens(150)
+            .build();
 
-    aiCompletionParams
-        .getClarifyingQuestionAndAnswers()
-        .forEach(requestBuilder::answeredClarifyingQuestion);
-
-    ChatCompletionRequest chatCompletionRequest = requestBuilder.maxTokens(150).build();
     ChatFunctionCall chatFunctionCall =
         openAiApiHandler.getFunctionCall(chatCompletionRequest).orElseThrow();
     boolean isClarifyingQuestion =

@@ -8,7 +8,7 @@ import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.theokanning.openai.completion.chat.ChatMessage;
-import com.theokanning.openai.completion.chat.ChatMessageRole;
+
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
@@ -85,7 +85,7 @@ public class SuggestedQuestionForFineTuning {
   public OpenAIChatGPTFineTuningExample toQuestionGenerationFineTuningExample() {
     List<ChatMessage> messages =
         new OpenAIChatAboutNoteRequestBuilder()
-            .addMessage(ChatMessageRole.SYSTEM, preservedNoteContent)
+            .rawNoteContent(preservedNoteContent)
             .userInstructionToGenerateQuestionWithFunctionCall()
             .generatedQuestion(getPreservedQuestion())
             .buildMessages();
@@ -97,7 +97,7 @@ public class SuggestedQuestionForFineTuning {
     QuestionEvaluation questionEvaluation = getQuestionEvaluation();
     var messages =
         new OpenAIChatAboutNoteRequestBuilder()
-            .addMessage(ChatMessageRole.SYSTEM, preservedNoteContent)
+            .rawNoteContent(preservedNoteContent)
             .evaluateQuestion(getPreservedQuestion())
             .evaluationResult(questionEvaluation)
             .buildMessages();
