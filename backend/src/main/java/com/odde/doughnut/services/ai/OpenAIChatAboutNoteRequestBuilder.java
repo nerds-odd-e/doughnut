@@ -3,7 +3,6 @@ package com.odde.doughnut.services.ai;
 import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator;
@@ -12,7 +11,6 @@ import com.odde.doughnut.controllers.json.ClarifyingQuestionAndAnswer;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.theokanning.openai.completion.chat.*;
-
 import java.util.HashMap;
 import java.util.List;
 
@@ -23,7 +21,7 @@ public class OpenAIChatAboutNoteRequestBuilder {
   public OpenAIChatAboutNoteRequestBuilder() {}
 
   public OpenAIChatAboutNoteRequestBuilder systemBrief() {
-    openAIChatRequestBuilder.addMessage(
+    openAIChatRequestBuilder.addTextMessage(
         ChatMessageRole.SYSTEM,
         "This is a PKM system using hierarchical notes, each with a topic and details, to capture atomic concepts.");
     return this;
@@ -54,7 +52,7 @@ public class OpenAIChatAboutNoteRequestBuilder {
 
   Note: The specific note of focus and its more detailed contexts are not known. Focus on memory reinforcement and recall across various subjects.
   """;
-    openAIChatRequestBuilder.addMessage(ChatMessageRole.USER, messageBody);
+    openAIChatRequestBuilder.addTextMessage(ChatMessageRole.USER, messageBody);
     return this;
   }
 
@@ -75,7 +73,7 @@ public class OpenAIChatAboutNoteRequestBuilder {
 
     HashMap<String, String> arguments = new HashMap<>();
     arguments.put("details_to_complete", aiCompletionParams.getDetailsToComplete());
-    openAIChatRequestBuilder.addMessage(
+    openAIChatRequestBuilder.addTextMessage(
         ChatMessageRole.USER,
         ("Please complete the concise details of the note of focus. Keep it short."
                 + " Don't make assumptions about the context. Ask for clarification through tool function `%s` if my request is ambiguous."
@@ -111,7 +109,7 @@ please critically check if the following question makes sense and is possible to
 
 """
             .formatted(clone.toJsonString());
-    openAIChatRequestBuilder.addMessage(ChatMessageRole.USER, messageBody);
+    openAIChatRequestBuilder.addTextMessage(ChatMessageRole.USER, messageBody);
     return this;
   }
 
@@ -126,7 +124,7 @@ please critically check if the following question makes sense and is possible to
       throw new RuntimeException(e);
     }
 
-    openAIChatRequestBuilder.addMessage(
+    openAIChatRequestBuilder.addTextMessage(
         ChatMessageRole.SYSTEM,
         "When generating a question, please use this json structure:\n" + schemaString);
     return this;
@@ -137,24 +135,18 @@ please critically check if the following question makes sense and is possible to
     String messageBody =
         "Please assume the role of a Memory Assistant. Generate a MCQ based on the note of current focus in its context path.";
 
-    openAIChatRequestBuilder.addMessage(ChatMessageRole.USER, messageBody);
+    openAIChatRequestBuilder.addTextMessage(ChatMessageRole.USER, messageBody);
     return this;
   }
 
   public OpenAIChatAboutNoteRequestBuilder evaluationResult(QuestionEvaluation questionEvaluation) {
-    ChatMessage msg = new ChatMessage(ChatMessageRole.ASSISTANT.value(), null);
-    JsonNode arguments = new ObjectMapper().valueToTree(questionEvaluation);
-    msg.setFunctionCall(new ChatFunctionCall("evaluate_question", arguments));
-    openAIChatRequestBuilder.messages.add(msg);
+    openAIChatRequestBuilder.addFunctionCallMessage(questionEvaluation, "evaluate_question");
     return this;
   }
 
   public OpenAIChatAboutNoteRequestBuilder generatedQuestion(MCQWithAnswer preservedQuestion) {
-    ChatMessage msg = new ChatMessage(ChatMessageRole.ASSISTANT.value(), null);
-    JsonNode arguments = new ObjectMapper().valueToTree(preservedQuestion);
-    msg.setFunctionCall(
-        new ChatFunctionCall("ask_single_answer_multiple_choice_question", arguments));
-    openAIChatRequestBuilder.messages.add(msg);
+    openAIChatRequestBuilder.addFunctionCallMessage(
+        preservedQuestion, "ask_single_answer_multiple_choice_question");
     return this;
   }
 
@@ -171,7 +163,7 @@ please critically check if the following question makes sense and is possible to
   }
 
   public OpenAIChatAboutNoteRequestBuilder rawNoteContent(String noteContent) {
-    openAIChatRequestBuilder.addMessage(ChatMessageRole.SYSTEM, noteContent);
+    openAIChatRequestBuilder.addTextMessage(ChatMessageRole.SYSTEM, noteContent);
     return this;
   }
 
@@ -185,7 +177,7 @@ please critically check if the following question makes sense and is possible to
   }
 
   public OpenAIChatAboutNoteRequestBuilder chatMessage(String userMessage) {
-    openAIChatRequestBuilder.addMessage(ChatMessageRole.USER, userMessage);
+    openAIChatRequestBuilder.addTextMessage(ChatMessageRole.USER, userMessage);
     return this;
   }
 
