@@ -9,10 +9,10 @@ buildscript {
 
 plugins {
   id 'org.springframework.boot' version '2.7.18'
-  id 'io.spring.dependency-management' version '1.1.0'
+  id 'io.spring.dependency-management' version '1.1.4'
   id 'java'
   // Spotless for the code style
-  id "com.diffplug.spotless" version "6.22.0"
+  id "com.diffplug.spotless" version "6.23.3"
 }
 
 apply plugin: 'cz.habarta.typescript-generator'
