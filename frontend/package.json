@@ -49,9 +49,9 @@
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "npm:eslint-plugin-i@^2.29.1",
-    "eslint-plugin-prettier": "^5.0.1",
+    "eslint-plugin-prettier": "^5.1.2",
     "eslint-plugin-testing-library": "^6.2.0",
-    "eslint-plugin-vitest": "^0.3.18",
+    "eslint-plugin-vitest": "^0.3.20",
     "eslint-plugin-vue": "^9.19.2",
     "jsdom": "^23.0.1",
     "optionator": "^0.9.3",
@@ -70,6 +70,6 @@
     "vitest": "1.1.0",
     "vitest-dom": "^0.1.1",
     "vitest-fetch-mock": "^0.2.2",
-    "vue-tsc": "1.8.25"
+    "vue-tsc": "1.8.26"
   }
 }
