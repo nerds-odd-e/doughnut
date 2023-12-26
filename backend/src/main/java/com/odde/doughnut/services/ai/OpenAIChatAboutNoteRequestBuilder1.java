@@ -7,11 +7,9 @@ public class OpenAIChatAboutNoteRequestBuilder1 extends OpenAIChatAboutNoteReque
   public OpenAIChatAboutNoteRequestBuilder1(String modelName, Note note) {
     openAIChatRequestBuilder.model(modelName);
     this.openAIChatRequestBuilder.addTextMessage(
-      ChatMessageRole.SYSTEM,
-      "This is a PKM system using hierarchical notes, each with a topic and details, to capture atomic concepts.");
+        ChatMessageRole.SYSTEM,
+        "This is a PKM system using hierarchical notes, each with a topic and details, to capture atomic concepts.");
     String noteOfCurrentFocus = note.getNoteDescription();
     rawNoteContent(noteOfCurrentFocus);
   }
-
 }
-

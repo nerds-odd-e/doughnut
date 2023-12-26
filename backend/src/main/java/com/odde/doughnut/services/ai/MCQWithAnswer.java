@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
+import java.util.Optional;
 import org.apache.logging.log4j.util.Strings;
 
 @JsonIgnoreProperties({"confidence"})
@@ -16,15 +16,19 @@ public class MCQWithAnswer extends MultipleChoicesQuestion {
   @JsonProperty(required = true)
   public int correctChoiceIndex;
 
-  public static MCQWithAnswer getValidQuestion(JsonNode question)
-      throws QuizQuestionNotPossibleException {
+  public static Optional<MCQWithAnswer> getValidQuestion(JsonNode question) {
     try {
-      MCQWithAnswer MCQWithAnswer = new ObjectMapper().treeToValue(question, MCQWithAnswer.class);
-      if (MCQWithAnswer.stem != null && !Strings.isBlank(MCQWithAnswer.stem)) {
-        return MCQWithAnswer;
+      MCQWithAnswer mcqWithAnswer = new ObjectMapper().treeToValue(question, MCQWithAnswer.class);
+      if (mcqWithAnswer.validQuestion()) {
+        return Optional.of(mcqWithAnswer);
       }
     } catch (JsonProcessingException e) {
+      e.printStackTrace();
     }
-    throw new QuizQuestionNotPossibleException();
+    return Optional.empty();
+  }
+
+  private boolean validQuestion() {
+    return this.stem != null && !Strings.isBlank(this.stem);
   }
 }
