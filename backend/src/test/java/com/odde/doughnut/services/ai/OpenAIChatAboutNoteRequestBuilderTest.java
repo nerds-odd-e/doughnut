@@ -21,7 +21,6 @@ class OpenAIChatAboutNoteRequestBuilderTest {
 
   private static ChatCompletionRequest getChatCompletionRequest(Note note) {
     return new OpenAIChatAboutNoteRequestBuilder()
-        .model("gpt")
         .contentOfNoteOfCurrentFocus(note)
         .build();
   }
