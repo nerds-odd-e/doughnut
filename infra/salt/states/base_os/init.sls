@@ -19,7 +19,7 @@ mysql-deb-apt-repo:
     - name: deb http://repo.mysql.com/apt/debian/ Bookworm mysql-8.0
     - dist: bookworm
     - file: /etc/apt/sources.list.d/mysql.list
-    - keyid: 467B942D3A79BD29
+    - keyid: A8D3785C
     - keyserver: keyserver.ubuntu.com
     - require_in:
         - file: /etc/apt/sources.list.d/mysql.list

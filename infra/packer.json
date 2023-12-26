@@ -19,7 +19,7 @@
       "region": "{{ user `region` }}",
       "zone": "{{ user `zone` }}",
       "image_description": "doughnut Debian12 MySQL80 base image provisioned with saltstack",
-      "image_name": "doughnut-debian12-mysql80-base-saltstack",
+      "image_name": "doughnut-debian12-zulu21-mysql80-base-saltstack",
       "ssh_username": "{{ user `ssh_username` }}",
       "disk_size": 25,
       "disk_type": "pd-ssd",
