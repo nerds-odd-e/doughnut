@@ -8,10 +8,10 @@ import java.util.Optional;
 
 public class AiQuestionGenerator {
   private final OpenAiApiHandler openAiApiHandler;
-  private final OpenAIChatAboutNoteRequestBuilder1 chatAboutNoteRequestBuilder;
+  private final OpenAIChatAboutNoteRequestBuilder chatAboutNoteRequestBuilder;
 
   public AiQuestionGenerator(Note note, OpenAiApiHandler openAiApiHandler, String modelName) {
-    this.chatAboutNoteRequestBuilder = new OpenAIChatAboutNoteRequestBuilder1(modelName, note);
+    this.chatAboutNoteRequestBuilder = new OpenAIChatAboutNoteRequestBuilder(modelName, note);
     this.openAiApiHandler = openAiApiHandler;
   }
 

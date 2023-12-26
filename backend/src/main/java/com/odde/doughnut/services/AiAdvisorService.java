@@ -39,7 +39,7 @@ public class AiAdvisorService {
   public AiCompletionResponse getAiCompletion(
       AiCompletionParams aiCompletionParams, Note note, String modelName) {
     ChatCompletionRequest chatCompletionRequest =
-        new OpenAIChatAboutNoteRequestBuilder1(modelName, note)
+        new OpenAIChatAboutNoteRequestBuilder(modelName, note)
             .instructionForDetailsCompletion(aiCompletionParams)
             .maxTokens(150)
             .build();
@@ -49,7 +49,7 @@ public class AiAdvisorService {
     boolean isClarifyingQuestion =
         chatFunctionCall
             .getName()
-            .equals(OpenAIChatAboutNoteRequestBuilder.askClarificationQuestion);
+            .equals(OpenAIChatAboutNoteRequestBuilderBase.askClarificationQuestion);
     AiCompletionResponse result = new AiCompletionResponse();
     if (isClarifyingQuestion) {
       result.setFinishReason("question");
@@ -83,7 +83,7 @@ public class AiAdvisorService {
 
   public String chatWithAi(Note note, String userMessage, String modelName) {
     ChatCompletionRequest chatCompletionRequest =
-        new OpenAIChatAboutNoteRequestBuilder1(modelName, note)
+        new OpenAIChatAboutNoteRequestBuilder(modelName, note)
             .chatMessage(userMessage)
             .maxTokens(150)
             .build();

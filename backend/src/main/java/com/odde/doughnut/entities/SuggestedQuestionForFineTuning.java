@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
-import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
+import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilderBase;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.theokanning.openai.completion.chat.ChatMessage;
@@ -83,7 +83,7 @@ public class SuggestedQuestionForFineTuning {
   @JsonIgnore
   public OpenAIChatGPTFineTuningExample toQuestionGenerationFineTuningExample() {
     List<ChatMessage> messages =
-        new OpenAIChatAboutNoteRequestBuilder()
+        new OpenAIChatAboutNoteRequestBuilderBase()
             .rawNoteContent(preservedNoteContent)
             .userInstructionToGenerateQuestionWithFunctionCall()
             .generatedQuestion(getPreservedQuestion())
@@ -95,7 +95,7 @@ public class SuggestedQuestionForFineTuning {
   public OpenAIChatGPTFineTuningExample toQuestionEvaluationFineTuningData() {
     QuestionEvaluation questionEvaluation = getQuestionEvaluation();
     var messages =
-        new OpenAIChatAboutNoteRequestBuilder()
+        new OpenAIChatAboutNoteRequestBuilderBase()
             .rawNoteContent(preservedNoteContent)
             .evaluateQuestion(getPreservedQuestion())
             .evaluationResult(questionEvaluation)
