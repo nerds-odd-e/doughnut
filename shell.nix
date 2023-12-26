@@ -13,6 +13,7 @@ in mkShell {
     corepack_21
     nodejs_21
     zsh
+    jdk21
     dum
     yarn
     jdk21
@@ -100,7 +101,7 @@ in mkShell {
     export MYSQL_PID_FILE=$MYSQL_HOME/mysql.pid
     export MYSQL_TCP_PORT=3309
     export MYSQLX_TCP_PORT=33090
-    export PATH=$JAVA_HOME/bin:$KOTLIN_HOME/bin:$DUM_PATH/bin:$PNPM_HOME/bin:$NODE_PATH/bin:$MYSQL_BASEDIR/bin:$FLUTTER_PATH/bin:$DART_PATH/bin:$PATH
+    export PATH=$JAVA_HOME/bin:$KOTLIN_HOME/bin:$NODE_PATH/bin:$PNPM_HOME/bin:$MYSQL_BASEDIR/bin:$FLUTTER_PATH/bin:$DART_PATH/bin:$PATH
     export LANG="en_US.UTF-8"
 
     echo "###################################################################################################################"
