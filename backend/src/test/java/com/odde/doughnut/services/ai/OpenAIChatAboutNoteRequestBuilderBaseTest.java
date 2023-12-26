@@ -8,7 +8,7 @@ import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import org.junit.jupiter.api.Test;
 
-class OpenAIChatAboutNoteRequestBuilderTest {
+class OpenAIChatAboutNoteRequestBuilderBaseTest {
   MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
   String DETAILS = "Details";
 
@@ -35,7 +35,7 @@ class OpenAIChatAboutNoteRequestBuilderTest {
   }
 
   private static String getNoteOfFocusDescription(Note note) {
-    ChatCompletionRequest request = new OpenAIChatAboutNoteRequestBuilder1("gpt", note).build();
+    ChatCompletionRequest request = new OpenAIChatAboutNoteRequestBuilder("gpt", note).build();
     return request.getMessages().get(1).getContent();
   }
 }
