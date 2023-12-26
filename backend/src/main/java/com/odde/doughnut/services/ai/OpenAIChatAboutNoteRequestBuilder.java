@@ -20,11 +20,6 @@ public class OpenAIChatAboutNoteRequestBuilder {
 
   public OpenAIChatAboutNoteRequestBuilder() {}
 
-  public OpenAIChatAboutNoteRequestBuilder contentOfNoteOfCurrentFocus(Note note) {
-    String noteOfCurrentFocus = note.getNoteDescription();
-    return rawNoteContent(noteOfCurrentFocus);
-  }
-
   public OpenAIChatAboutNoteRequestBuilder userInstructionToGenerateQuestionWithFunctionCall() {
     openAIChatRequestBuilder.functions.add(
         ChatFunction.builder()

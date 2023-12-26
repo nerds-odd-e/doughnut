@@ -15,28 +15,29 @@ class OpenAIChatAboutNoteRequestBuilderTest {
   @Test
   void messageShouldContainTopic() {
     Note note = makeMe.aNote().inMemoryPlease();
-    ChatCompletionRequest request = getChatCompletionRequest(note);
-    assertThat(request.getMessages().get(0).getContent(), containsString(note.getTopic()));
-  }
-
-  private static ChatCompletionRequest getChatCompletionRequest(Note note) {
-    return new OpenAIChatAboutNoteRequestBuilder()
-        .contentOfNoteOfCurrentFocus(note)
-        .build();
+    String content = getNoteOfFocusDescription(note);
+    assertThat(content, containsString(note.getTopic()));
   }
 
   @Test
   void messageShouldContainDetails() {
     Note note = makeMe.aNote().details("description").inMemoryPlease();
-    ChatCompletionRequest request = getChatCompletionRequest(note);
-    assertThat(request.getMessages().get(0).getContent(), containsString(DETAILS));
-    assertThat(request.getMessages().get(0).getContent(), containsString(note.getDetails()));
+    String content = getNoteOfFocusDescription(note);
+    assertThat(content, containsString(DETAILS));
+    assertThat(content, containsString(note.getDetails()));
   }
 
   @Test
   void messageShouldNotContainDetailsIfEmpty() {
     Note note = makeMe.aNote().withNoDescription().inMemoryPlease();
-    ChatCompletionRequest request = getChatCompletionRequest(note);
-    assertThat(request.getMessages().get(0).getContent(), not(containsString(DETAILS)));
+    String content = getNoteOfFocusDescription(note);
+    assertThat(content, not(containsString(DETAILS)));
   }
+
+  private static String getNoteOfFocusDescription(Note note) {
+    ChatCompletionRequest request = new OpenAIChatAboutNoteRequestBuilder1("gpt", note)
+      .build();
+    return request.getMessages().get(1).getContent();
+  }
+
 }
