@@ -1,14 +1,11 @@
 package com.odde.doughnut.services.ai;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
-import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
-import com.theokanning.openai.completion.chat.ChatMessage;
+
 import java.util.Optional;
 
 public class AiQuestionGenerator {
@@ -23,7 +20,14 @@ public class AiQuestionGenerator {
 
   public MCQWithAnswer getAiGeneratedQuestion(String modelName)
       throws QuizQuestionNotPossibleException {
-    JsonNode question = generateQuestionByGPT4(modelName);
+    ChatCompletionRequest chatRequest =
+        new OpenAIChatAboutNoteRequestBuilder1(modelName, note)
+            .userInstructionToGenerateQuestionWithFunctionCall()
+            .maxTokens(1500)
+            .build();
+    JsonNode question = openAiApiHandler
+      .getFunctionCallArguments(chatRequest)
+      .orElseThrow(QuizQuestionNotPossibleException::new);
     return MCQWithAnswer.getValidQuestion(question);
   }
 
@@ -39,40 +43,4 @@ public class AiQuestionGenerator {
         .flatMap(QuestionEvaluation::getQuestionEvaluation);
   }
 
-  private JsonNode generateQuestionByGPT3_5(String modelName)
-      throws QuizQuestionNotPossibleException {
-    ChatCompletionRequest chatRequest =
-        new OpenAIChatAboutNoteRequestBuilder1(modelName, note)
-            .questionSchemaInPlainChat()
-            .userInstructionToGenerateQuestionWithGPT35FineTunedModel()
-            .maxTokens(1500)
-            .build();
-
-    return openAiApiHandler
-        .chatCompletion(chatRequest)
-        .map(ChatCompletionChoice::getMessage)
-        .map(ChatMessage::getContent)
-        .map(AiQuestionGenerator::getJsonNode)
-        .orElseThrow(QuizQuestionNotPossibleException::new);
-  }
-
-  private JsonNode generateQuestionByGPT4(String modelName)
-      throws QuizQuestionNotPossibleException {
-    ChatCompletionRequest chatRequest =
-        new OpenAIChatAboutNoteRequestBuilder1(modelName, note)
-            .userInstructionToGenerateQuestionWithFunctionCall()
-            .maxTokens(1500)
-            .build();
-    return openAiApiHandler
-        .getFunctionCallArguments(chatRequest)
-        .orElseThrow(QuizQuestionNotPossibleException::new);
-  }
-
-  private static JsonNode getJsonNode(String content) {
-    try {
-      return new ObjectMapper().readTree(content);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
-  }
 }
