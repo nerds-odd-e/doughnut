@@ -101,32 +101,6 @@ please critically check if the following question makes sense and is possible to
     return this;
   }
 
-  public OpenAIChatAboutNoteRequestBuilder questionSchemaInPlainChat() {
-    ObjectMapper objectMapper = new ObjectMapper();
-    JsonSchemaGenerator jsonSchemaGenerator = new JsonSchemaGenerator(objectMapper);
-    String schemaString;
-    try {
-      JsonSchema schema = jsonSchemaGenerator.generateSchema(MCQWithAnswer.class);
-      schemaString = objectMapper.writeValueAsString(schema);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
-
-    openAIChatRequestBuilder.addTextMessage(
-        ChatMessageRole.SYSTEM,
-        "When generating a question, please use this json structure:\n" + schemaString);
-    return this;
-  }
-
-  public OpenAIChatAboutNoteRequestBuilder
-      userInstructionToGenerateQuestionWithGPT35FineTunedModel() {
-    String messageBody =
-        "Please assume the role of a Memory Assistant. Generate a MCQ based on the note of current focus in its context path.";
-
-    openAIChatRequestBuilder.addTextMessage(ChatMessageRole.USER, messageBody);
-    return this;
-  }
-
   public OpenAIChatAboutNoteRequestBuilder evaluationResult(QuestionEvaluation questionEvaluation) {
     openAIChatRequestBuilder.addFunctionCallMessage(questionEvaluation, "evaluate_question");
     return this;
