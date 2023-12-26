@@ -16,16 +16,9 @@ import java.util.List;
 
 public class OpenAIChatAboutNoteRequestBuilder {
   public static String askClarificationQuestion = "ask_clarification_question";
-  private final OpenAIChatRequestBuilder openAIChatRequestBuilder = new OpenAIChatRequestBuilder();
+  protected final OpenAIChatRequestBuilder openAIChatRequestBuilder = new OpenAIChatRequestBuilder();
 
   public OpenAIChatAboutNoteRequestBuilder() {}
-
-  public OpenAIChatAboutNoteRequestBuilder systemBrief() {
-    openAIChatRequestBuilder.addTextMessage(
-        ChatMessageRole.SYSTEM,
-        "This is a PKM system using hierarchical notes, each with a topic and details, to capture atomic concepts.");
-    return this;
-  }
 
   public OpenAIChatAboutNoteRequestBuilder contentOfNoteOfCurrentFocus(Note note) {
     String noteOfCurrentFocus = note.getNoteDescription();
@@ -150,7 +143,7 @@ please critically check if the following question makes sense and is possible to
     return this;
   }
 
-  public void answeredClarifyingQuestion(ClarifyingQuestionAndAnswer qa) {
+  private void answeredClarifyingQuestion(ClarifyingQuestionAndAnswer qa) {
     ChatMessage functionCall =
         new ChatMessage(ChatMessageRole.ASSISTANT.value(), qa.answerFromUser);
     functionCall.setFunctionCall(
