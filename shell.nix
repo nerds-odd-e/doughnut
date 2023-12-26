@@ -13,7 +13,7 @@ in mkShell {
     corepack_21
     nodejs_21
     zsh
-    jdk17
+    jdk21
     kotlin
     flutter
     libiconv
