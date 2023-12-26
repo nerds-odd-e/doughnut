@@ -2,7 +2,7 @@
 
 - [Nix](https://nixos.org/learn.html)
 - [nix flakes](https://nixos.wiki/wiki/Flakes)
-- [Zulu OpenJDK 17](https://docs.azul.com/core/zulu-openjdk/release-notes/october-2022)
+- [Zulu OpenJDK 21](https://docs.azul.com/core/release/21-ga/release-notes/release-notes)
 - [Spring Boot](https://spring.io/guides)
 - [Flyway](https://flywaydb.org)
 - [Gradle](https://gradle.org/)
