@@ -33,7 +33,7 @@ public class AiAdvisorService {
 
   public MCQWithAnswer generateQuestion(Note note, String modelName)
       throws QuizQuestionNotPossibleException {
-    return getAiQuestionGenerator(note).getAiGeneratedQuestion(modelName);
+    return getAiQuestionGenerator(note, modelName).getAiGeneratedQuestion();
   }
 
   public AiCompletionResponse getAiCompletion(
@@ -96,8 +96,8 @@ public class AiAdvisorService {
     return "";
   }
 
-  private AiQuestionGenerator getAiQuestionGenerator(Note note) {
-    return new AiQuestionGenerator(note, openAiApiHandler);
+  private AiQuestionGenerator getAiQuestionGenerator(Note note, String modelName) {
+    return new AiQuestionGenerator(note, openAiApiHandler, modelName);
   }
 
   public List<String> getAvailableGptModels() {
@@ -117,8 +117,8 @@ public class AiAdvisorService {
 
   public QuizQuestionContestResult contestQuestion(
       QuizQuestionEntity quizQuestionEntity, String modelName) {
-    return getAiQuestionGenerator(quizQuestionEntity.getThing().getNote())
-        .evaluateQuestion(quizQuestionEntity.getMcqWithAnswer(), modelName)
+    return getAiQuestionGenerator(quizQuestionEntity.getThing().getNote(), modelName)
+        .evaluateQuestion(quizQuestionEntity.getMcqWithAnswer())
         .map(e -> e.getQuizQuestionContestResult(quizQuestionEntity.getCorrectAnswerIndex()))
         .orElse(null);
   }
