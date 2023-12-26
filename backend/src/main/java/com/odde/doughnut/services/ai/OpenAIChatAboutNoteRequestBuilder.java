@@ -164,11 +164,6 @@ please critically check if the following question makes sense and is possible to
     return openAIChatRequestBuilder.buildMessages();
   }
 
-  public OpenAIChatAboutNoteRequestBuilder model(String modelName) {
-    openAIChatRequestBuilder.model(modelName);
-    return this;
-  }
-
   public OpenAIChatAboutNoteRequestBuilder chatMessage(String userMessage) {
     openAIChatRequestBuilder.addTextMessage(ChatMessageRole.USER, userMessage);
     return this;

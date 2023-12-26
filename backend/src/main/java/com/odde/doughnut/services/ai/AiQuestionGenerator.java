@@ -29,8 +29,7 @@ public class AiQuestionGenerator {
 
   public Optional<QuestionEvaluation> evaluateQuestion(MCQWithAnswer question, String modelName) {
     ChatCompletionRequest chatRequest =
-        new OpenAIChatAboutNoteRequestBuilder1()
-            .model(modelName)
+        new OpenAIChatAboutNoteRequestBuilder1(modelName)
             .contentOfNoteOfCurrentFocus(note)
             .evaluateQuestion(question)
             .maxTokens(1500)
@@ -44,8 +43,7 @@ public class AiQuestionGenerator {
   private JsonNode generateQuestionByGPT3_5(String modelName)
       throws QuizQuestionNotPossibleException {
     ChatCompletionRequest chatRequest =
-        new OpenAIChatAboutNoteRequestBuilder1()
-            .model(modelName)
+        new OpenAIChatAboutNoteRequestBuilder1(modelName)
             .contentOfNoteOfCurrentFocus(note)
             .questionSchemaInPlainChat()
             .userInstructionToGenerateQuestionWithGPT35FineTunedModel()
@@ -63,8 +61,7 @@ public class AiQuestionGenerator {
   private JsonNode generateQuestionByGPT4(String modelName)
       throws QuizQuestionNotPossibleException {
     ChatCompletionRequest chatRequest =
-        new OpenAIChatAboutNoteRequestBuilder1()
-            .model(modelName)
+        new OpenAIChatAboutNoteRequestBuilder1(modelName)
             .contentOfNoteOfCurrentFocus(note)
             .userInstructionToGenerateQuestionWithFunctionCall()
             .maxTokens(1500)
