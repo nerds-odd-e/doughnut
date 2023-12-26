@@ -4,7 +4,7 @@ inputs:
   java-version:
     description: "JDK Version"
     required: true
-    default: "17"
+    default: "21"
   distribution:
     description: "JDK Type e.g. Zulu, Adopt, OpenJDK"
     required: true
