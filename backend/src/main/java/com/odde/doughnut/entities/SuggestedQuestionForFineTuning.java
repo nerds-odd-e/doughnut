@@ -3,10 +3,7 @@ package com.odde.doughnut.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
-import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilderBase;
-import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
-import com.odde.doughnut.services.ai.QuestionEvaluation;
+import com.odde.doughnut.services.ai.*;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import java.sql.Timestamp;
 import java.util.Arrays;
@@ -82,12 +79,11 @@ public class SuggestedQuestionForFineTuning {
 
   @JsonIgnore
   public OpenAIChatGPTFineTuningExample toQuestionGenerationFineTuningExample() {
-    List<ChatMessage> messages =
-        new OpenAIChatAboutNoteRequestBuilderBase()
-            .rawNoteContent(preservedNoteContent)
-            .userInstructionToGenerateQuestionWithFunctionCall()
-            .generatedQuestion(getPreservedQuestion())
-            .buildMessages();
+    OpenAIChatAboutNoteFineTuningBuilder builder =
+        new OpenAIChatAboutNoteFineTuningBuilder(preservedNoteContent);
+    builder.userInstructionToGenerateQuestionWithFunctionCall();
+    builder.generatedQuestion(getPreservedQuestion());
+    List<ChatMessage> messages = builder.buildMessages();
     return OpenAIChatGPTFineTuningExample.from(messages);
   }
 
@@ -95,8 +91,7 @@ public class SuggestedQuestionForFineTuning {
   public OpenAIChatGPTFineTuningExample toQuestionEvaluationFineTuningData() {
     QuestionEvaluation questionEvaluation = getQuestionEvaluation();
     var messages =
-        new OpenAIChatAboutNoteRequestBuilderBase()
-            .rawNoteContent(preservedNoteContent)
+        new OpenAIChatAboutNoteFineTuningBuilder(preservedNoteContent)
             .evaluateQuestion(getPreservedQuestion())
             .evaluationResult(questionEvaluation)
             .buildMessages();

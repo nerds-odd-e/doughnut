@@ -9,7 +9,7 @@ import com.theokanning.openai.completion.chat.*;
 import java.util.HashMap;
 import java.util.List;
 
-public class OpenAIChatAboutNoteRequestBuilderBase {
+public abstract class OpenAIChatAboutNoteRequestBuilderBase {
   public static final String evaluateQuestion = "evaluate_question";
   public static final String askClarificationQuestion = "ask_clarification_question";
   public static final String askSingleAnswerMultipleChoiceQuestion =
@@ -20,32 +20,14 @@ public class OpenAIChatAboutNoteRequestBuilderBase {
   public OpenAIChatAboutNoteRequestBuilderBase() {}
 
   public OpenAIChatAboutNoteRequestBuilderBase userInstructionToGenerateQuestionWithFunctionCall() {
-    openAIChatRequestBuilder.functions.add(
-        ChatFunction.builder()
-            .name(askSingleAnswerMultipleChoiceQuestion)
-            .description("Ask a single-answer multiple-choice question to the user")
-            .executor(MCQWithAnswer.class, null)
-            .build());
-
-    String messageBody =
-        """
-  Please assume the role of a Memory Assistant, which involves helping me review, recall, and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following guidelines:
-
-  1. Generate a MCQ based on the note in the current context path
-  2. Only the top-level of the context path is visible to the user.
-  3. Provide 2 to 4 choices with only 1 correct answer.
-  4. Vary the lengths of the choice texts so that the correct answer isn't consistently the longest.
-  5. If there's insufficient information in the note to create a question, leave the 'stem' field empty.
-
-  Note: The specific note of focus and its more detailed contexts are not known. Focus on memory reinforcement and recall across various subjects.
-  """;
-    openAIChatRequestBuilder.addUserMessage(messageBody);
+    var tool = new AiTool();
+    tool.userInstructionToGenerateQuestionWithFunctionCall(openAIChatRequestBuilder);
     return this;
   }
 
   public OpenAIChatAboutNoteRequestBuilderBase generatedQuestion(MCQWithAnswer preservedQuestion) {
-    openAIChatRequestBuilder.addFunctionCallMessage(
-        preservedQuestion, askSingleAnswerMultipleChoiceQuestion);
+    var tool = new AiTool();
+    tool.generatedQuestion(openAIChatRequestBuilder, preservedQuestion);
     return this;
   }
 
@@ -121,11 +103,6 @@ please critically check if the following question makes sense and is possible to
     ChatMessage callResponse = new ChatMessage(ChatMessageRole.FUNCTION.value(), qa.answerFromUser);
     callResponse.setName(askClarificationQuestion);
     openAIChatRequestBuilder.messages.add(callResponse);
-  }
-
-  public OpenAIChatAboutNoteRequestBuilderBase rawNoteContent(String noteContent) {
-    openAIChatRequestBuilder.addSystemMessage(noteContent);
-    return this;
   }
 
   public List<ChatMessage> buildMessages() {
