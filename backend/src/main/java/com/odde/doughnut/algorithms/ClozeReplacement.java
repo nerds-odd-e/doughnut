@@ -45,7 +45,10 @@ record ClozeReplacement(
 
   String maskPronunciationsAndTitles(String originalContent1, List<NoteTitle> noteTitles1) {
     final String internalPronunciationReplacement = "__p_r_o_n_u_n_c__";
-    final Pattern pattern = Pattern.compile("/[^\\s^/][^/\\n]*/(?!\\w)", Pattern.CASE_INSENSITIVE);
+    final Pattern pattern =
+        Pattern.compile(
+            "/[^\\s^/][^/\\n]*/(?!\\w)",
+            Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CHARACTER_CLASS);
     String pronunciationsReplaced =
         pattern.matcher(originalContent1).replaceAll(internalPronunciationReplacement);
     return noteTitles1.stream()
