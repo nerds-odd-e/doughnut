@@ -6,7 +6,8 @@ import java.util.stream.Collectors;
 
 public class ClozePatternCreator {
   final boolean suffix;
-  public static final String regexForCJK = "\\p{IsHan}|\\p{IsKatakana}|\\p{IsHiragana}";
+  public static final String potentialWordBoundary =
+      "\\b|\\p{IsHan}|\\p{IsKatakana}|\\p{IsHiragana}";
 
   public ClozePatternCreator(boolean suffix) {
     this.suffix = suffix;
@@ -19,7 +20,7 @@ public class ClozePatternCreator {
     if (toMatch.matches("^\\d+$")) {
       return "(?<!\\d)" + Pattern.quote(toMatch) + "(?!\\d)";
     }
-    return "(?<!\\w)" + Pattern.quote(toMatch) + "(?!\\w)";
+    return Pattern.quote(toMatch) + "(?=" + potentialWordBoundary + ")";
   }
 
   private String ignoreConjunctions(String toMatch) {
@@ -33,11 +34,12 @@ public class ClozePatternCreator {
     if (suffix) {
       return "(?U)(?<=[^\\s])" + pattern;
     }
-    return "(?<=\\b|" + regexForCJK + ")" + pattern;
+    return "(?<=" + potentialWordBoundary + ")" + pattern;
   }
 
   Pattern getPattern(String toMatch) {
     return Pattern.compile(
-        suffixIfNeeded(getPatternStringToMatch(toMatch)), Pattern.CASE_INSENSITIVE);
+        suffixIfNeeded(getPatternStringToMatch(toMatch)),
+        Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CHARACTER_CLASS);
   }
 }
