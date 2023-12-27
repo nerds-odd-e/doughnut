@@ -39,7 +39,6 @@ export default defineConfig({
       }
     }),
     vue({
-      reactivityTransform: true,
       template: {
         compilerOptions: {
           isCustomElement: (tag) => /^x-/.test(tag),
