@@ -41,8 +41,13 @@ public class OpenAIChatRequestBuilder {
     return requestBuilder.build();
   }
 
-  public OpenAIChatRequestBuilder addTextMessage(ChatMessageRole role, String userMessage) {
-    messages.add(new ChatMessage(role.value(), userMessage));
+  public OpenAIChatRequestBuilder addSystemMessage(String message) {
+    messages.add(new ChatMessage(ChatMessageRole.SYSTEM.value(), message));
+    return this;
+  }
+
+  public OpenAIChatRequestBuilder addUserMessage(String message) {
+    messages.add(new ChatMessage(ChatMessageRole.USER.value(), message));
     return this;
   }
 
