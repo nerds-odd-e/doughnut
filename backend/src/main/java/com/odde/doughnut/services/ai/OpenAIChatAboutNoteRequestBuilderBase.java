@@ -11,14 +11,13 @@ import java.util.HashMap;
 import java.util.List;
 
 public abstract class OpenAIChatAboutNoteRequestBuilderBase {
-  public static final String evaluateQuestion = "evaluate_question";
   public static final String askClarificationQuestion = "ask_clarification_question";
   protected final OpenAIChatRequestBuilder openAIChatRequestBuilder =
       new OpenAIChatRequestBuilder();
 
   public OpenAIChatAboutNoteRequestBuilderBase() {}
 
-  public OpenAIChatAboutNoteRequestBuilderBase addTool(AiTool<MCQWithAnswer> tool) {
+  public OpenAIChatAboutNoteRequestBuilderBase addTool(AiTool tool) {
     tool.addToolToChatMessages(openAIChatRequestBuilder);
     return this;
   }
@@ -52,40 +51,6 @@ public abstract class OpenAIChatAboutNoteRequestBuilderBase {
     return this;
   }
 
-  public OpenAIChatAboutNoteRequestBuilderBase evaluateQuestion(MCQWithAnswer question) {
-    openAIChatRequestBuilder.functions.add(
-        ChatFunction.builder()
-            .name(evaluateQuestion)
-            .description("answer and evaluate the feasibility of the question")
-            .executor(QuestionEvaluation.class, null)
-            .build());
-
-    MultipleChoicesQuestion clone = new MultipleChoicesQuestion();
-    clone.stem = question.stem;
-    clone.choices = question.choices;
-
-    String messageBody =
-        """
-Please assume the role of a learner, who has learned the note of focus as well as many other notes.
-Only the top-level of the context path is visible to you.
-Without the specific note of focus and its more detailed contexts revealed to you,
-please critically check if the following question makes sense and is possible to you:
-
-%s
-
-"""
-            .formatted(clone.toJsonString());
-
-    openAIChatRequestBuilder.addUserMessage(messageBody);
-    return this;
-  }
-
-  public OpenAIChatAboutNoteRequestBuilderBase evaluationResult(
-      QuestionEvaluation questionEvaluation) {
-    openAIChatRequestBuilder.addFunctionCallMessage(questionEvaluation, evaluateQuestion);
-    return this;
-  }
-
   private void answeredClarifyingQuestion(ClarifyingQuestionAndAnswer qa) {
     ChatMessage functionCall =
         new ChatMessage(ChatMessageRole.ASSISTANT.value(), qa.answerFromUser);
@@ -96,10 +61,6 @@ please critically check if the following question makes sense and is possible to
     ChatMessage callResponse = new ChatMessage(ChatMessageRole.FUNCTION.value(), qa.answerFromUser);
     callResponse.setName(askClarificationQuestion);
     openAIChatRequestBuilder.messages.add(callResponse);
-  }
-
-  public List<ChatMessage> buildMessages() {
-    return openAIChatRequestBuilder.buildMessages();
   }
 
   public OpenAIChatAboutNoteRequestBuilderBase chatMessage(String userMessage) {

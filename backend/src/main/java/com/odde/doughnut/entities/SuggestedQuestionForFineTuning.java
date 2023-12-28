@@ -92,10 +92,11 @@ public class SuggestedQuestionForFineTuning {
   @JsonIgnore
   public OpenAIChatGPTFineTuningExample toQuestionEvaluationFineTuningData() {
     QuestionEvaluation questionEvaluation = getQuestionEvaluation();
+    AiTool<QuestionEvaluation> questionEvaluationAiTool =
+        AiToolFactory.questionEvaluationAiTool(getPreservedQuestion());
     var messages =
         new OpenAIChatAboutNoteFineTuningBuilder(preservedNoteContent)
-            .evaluateQuestion(getPreservedQuestion())
-            .evaluationResult(questionEvaluation)
+            .addToolAndResult(questionEvaluation, questionEvaluationAiTool)
             .buildMessages();
     return OpenAIChatGPTFineTuningExample.from(messages);
   }
