@@ -38,22 +38,16 @@ public class OpenAIChatAboutNoteRequestBuilder {
             .description("Text completion for the details of the note of focus")
             .executor(NoteDetailsCompletion.class, null)
             .build());
-    openAIChatRequestBuilder.functions.add(
-        ChatFunction.builder()
-            .name(askClarificationQuestion)
-            .description("Ask question to get more context")
-            .executor(ClarifyingQuestion.class, null)
-            .build());
+    openAIChatRequestBuilder.functions.addAll(
+        AiToolFactory.getAskClarificationQuestionTool().getFunctions());
 
     HashMap<String, String> arguments = new HashMap<>();
     arguments.put("details_to_complete", aiCompletionParams.getDetailsToComplete());
     openAIChatRequestBuilder.addUserMessage(
         ("Please complete the concise details of the note of focus. Keep it short."
-                + " Don't make assumptions about the context. Ask for clarification through tool function `%s` if my request is ambiguous."
+                + " Don't make assumptions about the context. Ask for clarification through tool function if my request is ambiguous."
                 + " The current details in JSON format are: \n%s")
-            .formatted(
-                askClarificationQuestion,
-                defaultObjectMapper().valueToTree(arguments).toPrettyString()));
+            .formatted(defaultObjectMapper().valueToTree(arguments).toPrettyString()));
     aiCompletionParams.getClarifyingQuestionAndAnswers().forEach(this::answeredClarifyingQuestion);
 
     return this;
@@ -73,8 +67,10 @@ public class OpenAIChatAboutNoteRequestBuilder {
     openAIChatRequestBuilder.messages.add(functionCallMessage);
 
     Optional<ChatMessage> message =
-        AiToolFactory.getFunctionExecutor(qa)
-            .executeAndConvertToMessageSafely(functionCallMessage.getFunctionCall());
+        AiToolFactory.getAskClarificationQuestionTool()
+            .execute(
+                functionCallMessage.getFunctionCall(),
+                w -> new UserResponseToClarifyingQuestion(qa.answerFromUser));
 
     openAIChatRequestBuilder.messages.add(message.get());
   }
