@@ -13,10 +13,9 @@ public class OpenAIChatAboutNoteFineTuningBuilder {
     openAIChatRequestBuilder.addSystemMessage(preservedNoteContent);
   }
 
-  public <T> OpenAIChatAboutNoteFineTuningBuilder addToolAndResult(
-      T preservedQuestion, AiTool<T> tool) {
+  public <T> OpenAIChatAboutNoteFineTuningBuilder addToolAndToolCall(AiTool<T> tool, T arguments) {
     tool.addToolToChatMessages(openAIChatRequestBuilder);
-    tool.addFunctionCallToMessages(openAIChatRequestBuilder, preservedQuestion);
+    tool.addFunctionCallToMessages(openAIChatRequestBuilder, arguments);
     return this;
   }
 
