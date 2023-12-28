@@ -5,6 +5,7 @@ import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.controllers.json.ClarifyingQuestionAndAnswer;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
+import com.odde.doughnut.services.ai.tools.AiTool;
 import com.theokanning.openai.completion.chat.*;
 import java.util.HashMap;
 import java.util.List;
@@ -12,22 +13,13 @@ import java.util.List;
 public abstract class OpenAIChatAboutNoteRequestBuilderBase {
   public static final String evaluateQuestion = "evaluate_question";
   public static final String askClarificationQuestion = "ask_clarification_question";
-  public static final String askSingleAnswerMultipleChoiceQuestion =
-      "ask_single_answer_multiple_choice_question";
   protected final OpenAIChatRequestBuilder openAIChatRequestBuilder =
       new OpenAIChatRequestBuilder();
 
   public OpenAIChatAboutNoteRequestBuilderBase() {}
 
-  public OpenAIChatAboutNoteRequestBuilderBase userInstructionToGenerateQuestionWithFunctionCall() {
-    var tool = new AiTool();
-    tool.userInstructionToGenerateQuestionWithFunctionCall(openAIChatRequestBuilder);
-    return this;
-  }
-
-  public OpenAIChatAboutNoteRequestBuilderBase generatedQuestion(MCQWithAnswer preservedQuestion) {
-    var tool = new AiTool();
-    tool.generatedQuestion(openAIChatRequestBuilder, preservedQuestion);
+  public OpenAIChatAboutNoteRequestBuilderBase addTool(AiTool<MCQWithAnswer> tool) {
+    tool.addToolToChatMessages(openAIChatRequestBuilder);
     return this;
   }
 
@@ -83,6 +75,7 @@ please critically check if the following question makes sense and is possible to
 
 """
             .formatted(clone.toJsonString());
+
     openAIChatRequestBuilder.addUserMessage(messageBody);
     return this;
   }

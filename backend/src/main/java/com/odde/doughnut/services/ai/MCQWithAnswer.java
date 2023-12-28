@@ -1,5 +1,6 @@
 package com.odde.doughnut.services.ai;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
@@ -26,6 +27,14 @@ public class MCQWithAnswer extends MultipleChoicesQuestion {
       e.printStackTrace();
     }
     return Optional.empty();
+  }
+
+  @JsonIgnore
+  public MultipleChoicesQuestion getMultipleChoicesQuestion() {
+    MultipleChoicesQuestion clone = new MultipleChoicesQuestion();
+    clone.stem = stem;
+    clone.choices = choices;
+    return clone;
   }
 
   private boolean validQuestion() {
