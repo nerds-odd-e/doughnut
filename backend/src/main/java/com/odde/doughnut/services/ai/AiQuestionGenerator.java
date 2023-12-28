@@ -28,8 +28,10 @@ public class AiQuestionGenerator {
   }
 
   public Optional<QuestionEvaluation> evaluateQuestion(MCQWithAnswer question) {
+    AiTool<QuestionEvaluation> questionEvaluationAiTool =
+        AiToolFactory.questionEvaluationAiTool(question);
     ChatCompletionRequest chatRequest =
-        chatAboutNoteRequestBuilder.evaluateQuestion(question).maxTokens(1500).build();
+        chatAboutNoteRequestBuilder.addTool(questionEvaluationAiTool).maxTokens(1500).build();
 
     return openAiApiHandler
         .getFunctionCallArguments(chatRequest)
