@@ -84,7 +84,7 @@ public class SuggestedQuestionForFineTuning {
     AiTool<MCQWithAnswer> tool = AiToolFactory.mcqWithAnswerAiTool();
     List<ChatMessage> messages =
         new OpenAIChatAboutNoteFineTuningBuilder(preservedNoteContent)
-            .addToolAndResult(getPreservedQuestion(), tool)
+            .addToolAndToolCall(tool, getPreservedQuestion())
             .buildMessages();
     return OpenAIChatGPTFineTuningExample.from(messages);
   }
@@ -96,7 +96,7 @@ public class SuggestedQuestionForFineTuning {
         AiToolFactory.questionEvaluationAiTool(getPreservedQuestion());
     var messages =
         new OpenAIChatAboutNoteFineTuningBuilder(preservedNoteContent)
-            .addToolAndResult(questionEvaluation, questionEvaluationAiTool)
+            .addToolAndToolCall(questionEvaluationAiTool, questionEvaluation)
             .buildMessages();
     return OpenAIChatGPTFineTuningExample.from(messages);
   }

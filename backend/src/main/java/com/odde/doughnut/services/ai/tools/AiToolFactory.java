@@ -2,7 +2,6 @@ package com.odde.doughnut.services.ai.tools;
 
 import com.odde.doughnut.services.ai.*;
 import com.theokanning.openai.completion.chat.ChatFunction;
-import com.theokanning.openai.service.FunctionExecutor;
 import java.util.List;
 
 public class AiToolFactory {
@@ -47,19 +46,18 @@ please critically check if the following question makes sense and is possible to
   }
 
   public static AiToolList getNoteContentCompletionTools() {
-    FunctionExecutor functionExecutor =
-        new FunctionExecutor(
-            List.of(
-                ChatFunction.builder()
-                    .name("complete_note_details")
-                    .description("Text completion for the details of the note of focus")
-                    .executor(NoteDetailsCompletion.class, null)
-                    .build(),
-                ChatFunction.builder()
-                    .name("ask_clarification_question")
-                    .description("Ask question to get more context")
-                    .executor(ClarifyingQuestion.class, null)
-                    .build()));
-    return new AiToolList(functionExecutor);
+    List<ChatFunction> functions =
+        List.of(
+            ChatFunction.builder()
+                .name("complete_note_details")
+                .description("Text completion for the details of the note of focus")
+                .executor(NoteDetailsCompletion.class, null)
+                .build(),
+            ChatFunction.builder()
+                .name("ask_clarification_question")
+                .description("Ask question to get more context")
+                .executor(ClarifyingQuestion.class, null)
+                .build());
+    return new AiToolList(functions);
   }
 }
