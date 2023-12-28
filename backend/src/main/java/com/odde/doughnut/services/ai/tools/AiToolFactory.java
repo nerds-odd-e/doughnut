@@ -1,8 +1,10 @@
 package com.odde.doughnut.services.ai.tools;
 
-import com.odde.doughnut.services.ai.MCQWithAnswer;
-import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
-import com.odde.doughnut.services.ai.QuestionEvaluation;
+import com.odde.doughnut.controllers.json.ClarifyingQuestionAndAnswer;
+import com.odde.doughnut.services.ai.*;
+import com.theokanning.openai.completion.chat.ChatFunction;
+import com.theokanning.openai.service.FunctionExecutor;
+import java.util.Collections;
 
 public class AiToolFactory {
   public static AiTool<MCQWithAnswer> mcqWithAnswerAiTool() {
@@ -43,5 +45,21 @@ please critically check if the following question makes sense and is possible to
         "evaluate_question",
         "answer and evaluate the feasibility of the question",
         messageBody);
+  }
+
+  public static FunctionExecutor getFunctionExecutor(ClarifyingQuestionAndAnswer qa) {
+    FunctionExecutor functionExecutor =
+        new FunctionExecutor(
+            Collections.singletonList(
+                ChatFunction.builder()
+                    .name("ask_clarification_question")
+                    .description("Ask question to get more context")
+                    .executor(
+                        ClarifyingQuestion.class,
+                        w ->
+                            new OpenAIChatAboutNoteRequestBuilder.UserResponseToClarifyingQuestion(
+                                qa.answerFromUser))
+                    .build()));
+    return functionExecutor;
   }
 }
