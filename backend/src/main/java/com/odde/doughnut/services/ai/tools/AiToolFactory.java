@@ -3,7 +3,7 @@ package com.odde.doughnut.services.ai.tools;
 import com.odde.doughnut.services.ai.*;
 import com.theokanning.openai.completion.chat.ChatFunction;
 import com.theokanning.openai.service.FunctionExecutor;
-import java.util.Collections;
+import java.util.List;
 
 public class AiToolFactory {
   public static AiTool<MCQWithAnswer> mcqWithAnswerAiTool() {
@@ -46,15 +46,20 @@ please critically check if the following question makes sense and is possible to
         messageBody);
   }
 
-  public static AiTool1 getAskClarificationQuestionTool() {
+  public static AiToolList getAskClarificationQuestionTool() {
     FunctionExecutor functionExecutor =
         new FunctionExecutor(
-            Collections.singletonList(
+            List.of(
+                ChatFunction.builder()
+                    .name("complete_note_details")
+                    .description("Text completion for the details of the note of focus")
+                    .executor(NoteDetailsCompletion.class, null)
+                    .build(),
                 ChatFunction.builder()
                     .name("ask_clarification_question")
                     .description("Ask question to get more context")
                     .executor(ClarifyingQuestion.class, null)
                     .build()));
-    return new AiTool1(functionExecutor);
+    return new AiToolList(functionExecutor);
   }
 }
