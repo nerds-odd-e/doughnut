@@ -27,7 +27,7 @@ public class AiTool<T> {
     openAIChatRequestBuilder.addUserMessage(messageBody);
   }
 
-  public void addFunctionCallResultToMessages(
+  public void addFunctionCallToMessages(
       OpenAIChatRequestBuilder openAIChatRequestBuilder, T argument) {
     openAIChatRequestBuilder.addFunctionCallMessage(argument, functionName);
   }

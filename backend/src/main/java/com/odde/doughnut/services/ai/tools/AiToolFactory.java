@@ -46,7 +46,7 @@ please critically check if the following question makes sense and is possible to
         messageBody);
   }
 
-  public static AiToolList getAskClarificationQuestionTool() {
+  public static AiToolList getNoteContentCompletionTools() {
     FunctionExecutor functionExecutor =
         new FunctionExecutor(
             List.of(
