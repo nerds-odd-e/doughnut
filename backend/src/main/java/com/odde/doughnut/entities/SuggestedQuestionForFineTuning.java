@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.services.ai.*;
+import com.odde.doughnut.services.ai.tools.AiTool;
+import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import java.sql.Timestamp;
 import java.util.Arrays;
@@ -79,11 +81,11 @@ public class SuggestedQuestionForFineTuning {
 
   @JsonIgnore
   public OpenAIChatGPTFineTuningExample toQuestionGenerationFineTuningExample() {
-    OpenAIChatAboutNoteFineTuningBuilder builder =
-        new OpenAIChatAboutNoteFineTuningBuilder(preservedNoteContent);
-    builder.userInstructionToGenerateQuestionWithFunctionCall();
-    builder.generatedQuestion(getPreservedQuestion());
-    List<ChatMessage> messages = builder.buildMessages();
+    AiTool<MCQWithAnswer> tool = AiToolFactory.mcqWithAnswerAiTool();
+    List<ChatMessage> messages =
+        new OpenAIChatAboutNoteFineTuningBuilder(preservedNoteContent)
+            .addToolAndResult(getPreservedQuestion(), tool)
+            .buildMessages();
     return OpenAIChatGPTFineTuningExample.from(messages);
   }
 
