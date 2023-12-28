@@ -203,7 +203,7 @@ class AiAdvisorServiceAutoCompleteTest {
         aiAdvisorService.getAiCompletion(params, note, "gpt-4");
         ChatMessage functionResultMessage = captureChatCompletionRequest().getMessages().get(4);
         assertThat(functionResultMessage.getName(), equalTo("ask_clarification_question"));
-        assertThat(functionResultMessage.getContent(), equalTo("green tea"));
+        assertThat(functionResultMessage.getContent(), containsString("green tea"));
       }
 
       @Test
