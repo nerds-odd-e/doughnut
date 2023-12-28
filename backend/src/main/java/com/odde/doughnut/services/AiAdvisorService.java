@@ -49,7 +49,7 @@ public class AiAdvisorService {
     boolean isClarifyingQuestion =
         chatFunctionCall
             .getName()
-            .equals(OpenAIChatAboutNoteRequestBuilderBase.askClarificationQuestion);
+            .equals(OpenAIChatAboutNoteRequestBuilder.askClarificationQuestion);
     AiCompletionResponse result = new AiCompletionResponse();
     if (isClarifyingQuestion) {
       result.setFinishReason("question");
