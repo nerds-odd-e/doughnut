@@ -7,9 +7,8 @@ import com.odde.doughnut.controllers.json.ClarifyingQuestionAndAnswer;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiTool;
+import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.theokanning.openai.completion.chat.*;
-import com.theokanning.openai.service.FunctionExecutor;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -66,16 +65,6 @@ public class OpenAIChatAboutNoteRequestBuilder {
   }
 
   private void answeredClarifyingQuestion(ClarifyingQuestionAndAnswer qa) {
-    FunctionExecutor functionExecutor =
-        new FunctionExecutor(
-            Collections.singletonList(
-                ChatFunction.builder()
-                    .name(askClarificationQuestion)
-                    .description("Get the current weather of a location")
-                    .executor(
-                        ClarifyingQuestion.class,
-                        w -> new UserResponseToClarifyingQuestion(qa.answerFromUser))
-                    .build()));
 
     ChatMessage functionCallMessage = new ChatMessage(ChatMessageRole.ASSISTANT.value());
     functionCallMessage.setFunctionCall(
@@ -84,7 +73,8 @@ public class OpenAIChatAboutNoteRequestBuilder {
     openAIChatRequestBuilder.messages.add(functionCallMessage);
 
     Optional<ChatMessage> message =
-        functionExecutor.executeAndConvertToMessageSafely(functionCallMessage.getFunctionCall());
+        AiToolFactory.getFunctionExecutor(qa)
+            .executeAndConvertToMessageSafely(functionCallMessage.getFunctionCall());
 
     openAIChatRequestBuilder.messages.add(message.get());
   }
