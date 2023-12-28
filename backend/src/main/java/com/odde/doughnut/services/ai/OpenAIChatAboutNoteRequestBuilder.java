@@ -8,7 +8,11 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.theokanning.openai.completion.chat.*;
+import com.theokanning.openai.service.FunctionExecutor;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Optional;
+import lombok.AllArgsConstructor;
 
 public class OpenAIChatAboutNoteRequestBuilder {
   public static final String askClarificationQuestion = "ask_clarification_question";
@@ -56,16 +60,33 @@ public class OpenAIChatAboutNoteRequestBuilder {
     return this;
   }
 
+  @AllArgsConstructor
+  public static class UserResponseToClarifyingQuestion {
+    public String answerFromUser;
+  }
+
   private void answeredClarifyingQuestion(ClarifyingQuestionAndAnswer qa) {
-    ChatMessage functionCall =
-        new ChatMessage(ChatMessageRole.ASSISTANT.value(), qa.answerFromUser);
-    functionCall.setFunctionCall(
+    FunctionExecutor functionExecutor =
+        new FunctionExecutor(
+            Collections.singletonList(
+                ChatFunction.builder()
+                    .name(askClarificationQuestion)
+                    .description("Get the current weather of a location")
+                    .executor(
+                        ClarifyingQuestion.class,
+                        w -> new UserResponseToClarifyingQuestion(qa.answerFromUser))
+                    .build()));
+
+    ChatMessage functionCallMessage = new ChatMessage(ChatMessageRole.ASSISTANT.value());
+    functionCallMessage.setFunctionCall(
         new ChatFunctionCall(
             askClarificationQuestion, defaultObjectMapper().valueToTree(qa.questionFromAI)));
-    openAIChatRequestBuilder.messages.add(functionCall);
-    ChatMessage callResponse = new ChatMessage(ChatMessageRole.FUNCTION.value(), qa.answerFromUser);
-    callResponse.setName(askClarificationQuestion);
-    openAIChatRequestBuilder.messages.add(callResponse);
+    openAIChatRequestBuilder.messages.add(functionCallMessage);
+
+    Optional<ChatMessage> message =
+        functionExecutor.executeAndConvertToMessageSafely(functionCallMessage.getFunctionCall());
+
+    openAIChatRequestBuilder.messages.add(message.get());
   }
 
   public OpenAIChatAboutNoteRequestBuilder chatMessage(String userMessage) {
