@@ -1,6 +1,5 @@
 package com.odde.doughnut.services.ai.tools;
 
-import com.odde.doughnut.controllers.json.ClarifyingQuestionAndAnswer;
 import com.odde.doughnut.services.ai.*;
 import com.theokanning.openai.completion.chat.ChatFunction;
 import com.theokanning.openai.service.FunctionExecutor;
@@ -47,19 +46,15 @@ please critically check if the following question makes sense and is possible to
         messageBody);
   }
 
-  public static FunctionExecutor getFunctionExecutor(ClarifyingQuestionAndAnswer qa) {
+  public static AiTool1 getAskClarificationQuestionTool() {
     FunctionExecutor functionExecutor =
         new FunctionExecutor(
             Collections.singletonList(
                 ChatFunction.builder()
                     .name("ask_clarification_question")
                     .description("Ask question to get more context")
-                    .executor(
-                        ClarifyingQuestion.class,
-                        w ->
-                            new OpenAIChatAboutNoteRequestBuilder.UserResponseToClarifyingQuestion(
-                                qa.answerFromUser))
+                    .executor(ClarifyingQuestion.class, null)
                     .build()));
-    return functionExecutor;
+    return new AiTool1(functionExecutor);
   }
 }
