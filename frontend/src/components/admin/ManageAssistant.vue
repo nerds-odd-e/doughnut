@@ -18,6 +18,6 @@ const { api } = useLoadingApi();
 const assistants = ref<Record<string, string> | undefined>(undefined);
 
 const recreateAllAssistants = async () => {
-  assistants.value = await api.settings.recreateAllAssistants();
+  assistants.value = await api.ai.recreateAllAssistants();
 };
 </script>

@@ -62,6 +62,13 @@ const openAiService = () => {
         return serviceMocker.stubPosterWithError500Response("/v1/files", {})
       }
     },
+
+    async stubCreateAssistant(newId: string, _nameOfAssistant: string) {
+      return await serviceMocker.stubPoster(`/v1/assistants`, {
+        id: newId,
+      })
+    },
+
     async stubFineTuningStatus(successful: boolean) {
       return await serviceMocker.stubPoster(`/v1/fine_tuning/jobs`, {
         object: "fine_tuning.job",
@@ -76,6 +83,7 @@ const openAiService = () => {
         training_file: "file-abc123",
       })
     },
+
     async stubGetModels(modelNames: string) {
       return await serviceMocker.stubGetter(`/v1/models`, undefined, {
         object: "list",
