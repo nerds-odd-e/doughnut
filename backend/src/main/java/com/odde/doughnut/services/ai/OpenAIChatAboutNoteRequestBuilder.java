@@ -7,6 +7,7 @@ import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.AiToolList;
 import com.theokanning.openai.completion.chat.*;
+import lombok.AllArgsConstructor;
 
 public class OpenAIChatAboutNoteRequestBuilder {
   public static final String askClarificationQuestion = "ask_clarification_question";
@@ -25,6 +26,11 @@ public class OpenAIChatAboutNoteRequestBuilder {
     return this;
   }
 
+  @AllArgsConstructor
+  public static class UserResponseToClarifyingQuestion {
+    public String answerFromUser;
+  }
+
   public OpenAIChatAboutNoteRequestBuilder instructionForDetailsCompletion(
       AiCompletionParams aiCompletionParams) {
     AiToolList aiToolList = AiToolFactory.getNoteContentCompletionTools();
@@ -35,7 +41,10 @@ public class OpenAIChatAboutNoteRequestBuilder {
         .getClarifyingQuestionAndAnswers()
         .forEach(
             qa ->
-                openAIChatRequestBuilder.messages.addAll(aiToolList.functionReturningMessages(qa)));
+                openAIChatRequestBuilder.messages.addAll(
+                    aiToolList.functionReturningMessages(
+                        qa.questionFromAI,
+                        new UserResponseToClarifyingQuestion(qa.answerFromUser))));
 
     return this;
   }
