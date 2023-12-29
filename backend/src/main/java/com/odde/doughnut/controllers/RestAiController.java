@@ -7,8 +7,11 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.theokanning.openai.assistants.Assistant;
 import com.theokanning.openai.client.OpenAiApi;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
@@ -35,10 +38,10 @@ public class RestAiController {
   public AiCompletionResponse getCompletion(
       @PathVariable(name = "note") Note note, @RequestBody AiCompletionParams aiCompletionParams) {
     currentUser.assertLoggedIn();
-    return aiAdvisorService.getAiCompletion(aiCompletionParams, note, getChatBuilderDefault());
+    return aiAdvisorService.getAiCompletion(aiCompletionParams, note, getDefaultOpenAiChatModel());
   }
 
-  private String getChatBuilderDefault() {
+  private String getDefaultOpenAiChatModel() {
     return new GlobalSettingsService(modelFactoryService).getGlobalSettingOthers().getValue();
   }
 
@@ -49,7 +52,7 @@ public class RestAiController {
     currentUser.assertReadAuthorization(note);
     String userMessage = request.getUserMessage();
     String assistantMessage =
-        this.aiAdvisorService.chatWithAi(note, userMessage, getChatBuilderDefault());
+        this.aiAdvisorService.chatWithAi(note, userMessage, getDefaultOpenAiChatModel());
     return new ChatResponse(assistantMessage);
   }
 
@@ -62,5 +65,15 @@ public class RestAiController {
   @GetMapping("/available-gpt-models")
   public List<String> getAvailableGptModels() {
     return aiAdvisorService.getAvailableGptModels();
+  }
+
+  @PostMapping("/recreate-all-assistants")
+  public Map<String, String> recreateAllAssistants() throws UnexpectedNoAccessRightException {
+    currentUser.assertAdminAuthorization();
+    Map<String, String> result = new HashMap<>();
+    Assistant noteCompletionAssistant =
+        aiAdvisorService.createNoteCompletionAssistant(getDefaultOpenAiChatModel());
+    result.put("note details completion", noteCompletionAssistant.getId());
+    return result;
   }
 }
