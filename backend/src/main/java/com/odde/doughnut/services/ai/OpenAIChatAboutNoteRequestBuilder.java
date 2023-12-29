@@ -35,16 +35,18 @@ public class OpenAIChatAboutNoteRequestBuilder {
       AiCompletionParams aiCompletionParams) {
     AiToolList aiToolList = AiToolFactory.getNoteContentCompletionTools();
     openAIChatRequestBuilder.functions.addAll(aiToolList.getFunctions());
-
     openAIChatRequestBuilder.addUserMessage(aiCompletionParams.getCompletionPrompt());
     aiCompletionParams
         .getClarifyingQuestionAndAnswers()
         .forEach(
-            qa ->
-                openAIChatRequestBuilder.messages.addAll(
-                    aiToolList.functionReturningMessages(
-                        qa.questionFromAI,
-                        new UserResponseToClarifyingQuestion(qa.answerFromUser))));
+            qa -> {
+              openAIChatRequestBuilder.messages.add(
+                  AiToolList.functionCall(askClarificationQuestion, qa.questionFromAI));
+              openAIChatRequestBuilder.messages.add(
+                  AiToolList.functionCallResponse(
+                      askClarificationQuestion,
+                      new UserResponseToClarifyingQuestion(qa.answerFromUser)));
+            });
 
     return this;
   }
