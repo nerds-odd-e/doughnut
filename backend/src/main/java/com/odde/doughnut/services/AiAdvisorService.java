@@ -4,7 +4,9 @@ import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.odde.doughnut.controllers.json.*;
+import com.odde.doughnut.controllers.json.AiCompletionParams;
+import com.odde.doughnut.controllers.json.AiCompletionResponse;
+import com.odde.doughnut.controllers.json.QuizQuestionContestResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
@@ -13,6 +15,8 @@ import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.AiToolList;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
+import com.theokanning.openai.assistants.Assistant;
+import com.theokanning.openai.assistants.AssistantRequest;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
@@ -43,6 +47,7 @@ public class AiAdvisorService {
       AiCompletionParams aiCompletionParams, Note note, String modelName) {
     AiToolList tool =
         AiToolFactory.getNoteContentCompletionTools(aiCompletionParams.getCompletionPrompt());
+
     ChatCompletionRequest chatCompletionRequest =
         OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(modelName, note)
             .addTool(tool)
@@ -54,22 +59,32 @@ public class AiAdvisorService {
         openAiApiHandler.getFunctionCall(chatCompletionRequest).orElseThrow();
     boolean isClarifyingQuestion =
         chatFunctionCall.getName().equals(OpenAIChatRequestBuilder.askClarificationQuestion);
-    AiCompletionResponse result = new AiCompletionResponse();
     if (isClarifyingQuestion) {
-      result.setFinishReason("question");
-      ClarifyingQuestion result1;
-      JsonNode jsonNode = chatFunctionCall.getArguments();
-      try {
-        result1 = defaultObjectMapper().treeToValue(jsonNode, ClarifyingQuestion.class);
-      } catch (JsonProcessingException e) {
-        throw new RuntimeException(e);
-      }
-      result.setClarifyingQuestion(result1);
-      aiCompletionParams.getClarifyingQuestionAndAnswers().forEach(result::addClarifyingHistory);
-      return result;
+      return getCompletionResponseForClarification(
+          aiCompletionParams, chatFunctionCall.getArguments());
     }
+    return getAiCompletionResponse(aiCompletionParams, chatFunctionCall.getArguments());
+  }
+
+  public Assistant createNoteCompletionAssistant(String modelName) {
+    AiToolList tool = AiToolFactory.getNoteContentCompletionTools(null);
+    return createAssistant(modelName, tool);
+  }
+
+  private Assistant createAssistant(String modelName, AiToolList tool) {
+    AssistantRequest assistantRequest =
+        AssistantRequest.builder()
+            .model(modelName)
+            .name("Note details completion")
+            .instructions("You are a personal Math Tutor.")
+            .tools(tool.getTools())
+            .build();
+    return openAiApiHandler.createAssistant(assistantRequest);
+  }
+
+  private static AiCompletionResponse getAiCompletionResponse(
+      AiCompletionParams aiCompletionParams, JsonNode jsonNode) {
     String result1;
-    JsonNode jsonNode = chatFunctionCall.getArguments();
     try {
       NoteDetailsCompletion noteDetailsCompletion =
           defaultObjectMapper().treeToValue(jsonNode, NoteDetailsCompletion.class);
@@ -79,9 +94,25 @@ public class AiAdvisorService {
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
+    AiCompletionResponse result = new AiCompletionResponse();
     String content = result1;
     result.setMoreCompleteContent(content);
     result.setFinishReason("stop");
+    return result;
+  }
+
+  private static AiCompletionResponse getCompletionResponseForClarification(
+      AiCompletionParams aiCompletionParams, JsonNode jsonNode) {
+    ClarifyingQuestion result1;
+    try {
+      result1 = defaultObjectMapper().treeToValue(jsonNode, ClarifyingQuestion.class);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
+    AiCompletionResponse result = new AiCompletionResponse();
+    result.setFinishReason("question");
+    result.setClarifyingQuestion(result1);
+    aiCompletionParams.getClarifyingQuestionAndAnswers().forEach(result::addClarifyingHistory);
     return result;
   }
 

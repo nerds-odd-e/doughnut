@@ -5,6 +5,8 @@ import static com.odde.doughnut.services.openAiApis.ApiExecutor.blockGet;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
+import com.theokanning.openai.assistants.Assistant;
+import com.theokanning.openai.assistants.AssistantRequest;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.*;
 import com.theokanning.openai.fine_tuning.FineTuningJob;
@@ -86,5 +88,9 @@ public class OpenAiApiHandler {
           "Trigger Fine-Tuning Failed: " + fineTuningJob, HttpStatus.BAD_REQUEST);
     }
     return fineTuningJob;
+  }
+
+  public Assistant createAssistant(AssistantRequest assistantRequest) {
+    return openAiApi.createAssistant(assistantRequest).blockingGet();
   }
 }
