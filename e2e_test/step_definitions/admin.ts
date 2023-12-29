@@ -116,6 +116,13 @@ Given(
   (newId: string, nameOfAssistant: string) => {},
 )
 
-When("I create new assitant", () => {
-  start.goToAdminDashboard().goToAssistantManagement().recreate()
-})
+When(
+  "I recreate all the assitants and the new assistant ID should be {string} for {string}",
+  (newId: string, nameOfAssistant: string) => {
+    start
+      .goToAdminDashboard()
+      .goToAssistantManagement()
+      .recreate()
+      .expectNewAssistant(newId, nameOfAssistant)
+  },
+)

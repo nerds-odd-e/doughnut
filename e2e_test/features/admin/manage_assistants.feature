@@ -6,8 +6,7 @@ Feature: Manage AI assistants
     And OpenAI creates an assistant of ID "new_assistant" for name "note details completion"
 
   Scenario: Admin creates new assistant
-    # When I create new assitant
-    # Then I should see the current assistant ID should be "new_assistant" for "note details completion"
+    * I recreate all the assitants and the new assistant ID should be "new_assistant" for "note details completion"
 
 
 
