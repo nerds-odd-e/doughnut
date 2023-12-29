@@ -4,13 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.services.ai.*;
+import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.AiToolList;
-import com.theokanning.openai.completion.chat.ChatMessage;
 import java.sql.Timestamp;
 import java.util.Arrays;
-import java.util.List;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -82,20 +81,23 @@ public class SuggestedQuestionForFineTuning {
   @JsonIgnore
   public OpenAIChatGPTFineTuningExample toQuestionGenerationFineTuningExample() {
     AiToolList tool = AiToolFactory.mcqWithAnswerAiTool();
-    List<ChatMessage> messages =
-        new OpenAIChatAboutNoteFineTuningBuilder(preservedNoteContent)
-            .addToolAndToolCall(tool, getPreservedQuestion())
-            .buildMessages();
-    return OpenAIChatGPTFineTuningExample.from(messages);
+    return getOpenAIChatGPTFineTuningExample(tool, getPreservedQuestion());
   }
 
   @JsonIgnore
   public OpenAIChatGPTFineTuningExample toQuestionEvaluationFineTuningData() {
     AiToolList tool = AiToolFactory.questionEvaluationAiTool(getPreservedQuestion());
-    var messages =
-        new OpenAIChatAboutNoteFineTuningBuilder(preservedNoteContent)
-            .addToolAndToolCall(tool, getQuestionEvaluation())
-            .buildMessages();
+    return getOpenAIChatGPTFineTuningExample(tool, getQuestionEvaluation());
+  }
+
+  private OpenAIChatGPTFineTuningExample getOpenAIChatGPTFineTuningExample(
+      AiToolList tool, Object preservedQuestion1) {
+    OpenAIChatRequestBuilder openAIChatRequestBuilder = new OpenAIChatRequestBuilder();
+    openAIChatRequestBuilder.addSystemMessage(preservedNoteContent);
+    tool.addToChat(openAIChatRequestBuilder);
+    openAIChatRequestBuilder.addFunctionCallMessage(
+        preservedQuestion1, tool.getFirstFunctionName());
+    var messages = openAIChatRequestBuilder.buildMessages();
     return OpenAIChatGPTFineTuningExample.from(messages);
   }
 
