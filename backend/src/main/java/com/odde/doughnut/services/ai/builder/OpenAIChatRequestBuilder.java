@@ -75,4 +75,9 @@ public class OpenAIChatRequestBuilder {
     messages.add(msg);
     return this;
   }
+
+  public OpenAIChatRequestBuilder addMessages(List<ChatMessage> additionalMessages) {
+    messages.addAll(additionalMessages);
+    return this;
+  }
 }
