@@ -1,5 +1,6 @@
 package com.odde.doughnut.services.ai;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
@@ -21,21 +22,20 @@ public class AiQuestionGenerator {
 
   public MCQWithAnswer getAiGeneratedQuestion() throws QuizQuestionNotPossibleException {
     AiToolList tool = AiToolFactory.mcqWithAnswerAiTool();
-    ChatCompletionRequest chatRequest =
-        chatAboutNoteRequestBuilder.addTool(tool).maxTokens(1500).build();
-    return openAiApiHandler
-        .getFunctionCallArguments(chatRequest)
+    return requestAndGetFunctionCallArguments(tool)
         .flatMap(MCQWithAnswer::getValidQuestion)
         .orElseThrow(QuizQuestionNotPossibleException::new);
   }
 
   public Optional<QuestionEvaluation> evaluateQuestion(MCQWithAnswer question) {
     AiToolList questionEvaluationAiTool = AiToolFactory.questionEvaluationAiTool(question);
-    ChatCompletionRequest chatRequest =
-        chatAboutNoteRequestBuilder.addTool(questionEvaluationAiTool).maxTokens(1500).build();
-
-    return openAiApiHandler
-        .getFunctionCallArguments(chatRequest)
+    return requestAndGetFunctionCallArguments(questionEvaluationAiTool)
         .flatMap(QuestionEvaluation::getQuestionEvaluation);
+  }
+
+  private Optional<JsonNode> requestAndGetFunctionCallArguments(AiToolList tool) {
+    ChatCompletionRequest chatRequest =
+        chatAboutNoteRequestBuilder.addTool(tool).maxTokens(1500).build();
+    return openAiApiHandler.getFunctionCallArguments(chatRequest);
   }
 }
