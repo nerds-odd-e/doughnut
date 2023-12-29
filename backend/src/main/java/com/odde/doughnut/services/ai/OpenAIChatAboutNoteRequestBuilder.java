@@ -20,8 +20,7 @@ public class OpenAIChatAboutNoteRequestBuilder {
   }
 
   public OpenAIChatAboutNoteRequestBuilder addTool(AiToolList tool) {
-    openAIChatRequestBuilder.functions.addAll(tool.getFunctions());
-    openAIChatRequestBuilder.addUserMessage(tool.getUserRequestMessage());
+    tool.addToChat(openAIChatRequestBuilder);
     return this;
   }
 
