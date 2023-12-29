@@ -81,7 +81,7 @@ public class SuggestedQuestionForFineTuning {
 
   @JsonIgnore
   public OpenAIChatGPTFineTuningExample toQuestionGenerationFineTuningExample() {
-    AiTool<MCQWithAnswer> tool = AiToolFactory.mcqWithAnswerAiTool();
+    AiTool tool = AiToolFactory.mcqWithAnswerAiTool();
     List<ChatMessage> messages =
         new OpenAIChatAboutNoteFineTuningBuilder(preservedNoteContent)
             .addToolAndToolCall(tool, getPreservedQuestion())
@@ -91,12 +91,10 @@ public class SuggestedQuestionForFineTuning {
 
   @JsonIgnore
   public OpenAIChatGPTFineTuningExample toQuestionEvaluationFineTuningData() {
-    QuestionEvaluation questionEvaluation = getQuestionEvaluation();
-    AiTool<QuestionEvaluation> questionEvaluationAiTool =
-        AiToolFactory.questionEvaluationAiTool(getPreservedQuestion());
+    AiTool tool = AiToolFactory.questionEvaluationAiTool(getPreservedQuestion());
     var messages =
         new OpenAIChatAboutNoteFineTuningBuilder(preservedNoteContent)
-            .addToolAndToolCall(questionEvaluationAiTool, questionEvaluation)
+            .addToolAndToolCall(tool, getQuestionEvaluation())
             .buildMessages();
     return OpenAIChatGPTFineTuningExample.from(messages);
   }
