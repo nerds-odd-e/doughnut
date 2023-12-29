@@ -3,14 +3,12 @@ package com.odde.doughnut.services.ai.tools;
 import static com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder.askClarificationQuestion;
 import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 
-import com.odde.doughnut.controllers.json.ClarifyingQuestionAndAnswer;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.theokanning.openai.completion.chat.ChatFunction;
 import com.theokanning.openai.completion.chat.ChatFunctionCall;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import java.util.*;
-import java.util.function.Function;
-import lombok.AllArgsConstructor;
 
 public class AiToolList {
   final Map<String, ChatFunction> FUNCTIONS = new HashMap<>();
@@ -23,33 +21,19 @@ public class AiToolList {
     return new ArrayList<>(FUNCTIONS.values());
   }
 
-  @AllArgsConstructor
-  public static class UserResponseToClarifyingQuestion {
-    public String answerFromUser;
-  }
-
-  public List<ChatMessage> functionReturningMessages(ClarifyingQuestionAndAnswer qa) {
+  public List<ChatMessage> functionReturningMessages(Object arguments, Object resp) {
     ChatMessage functionCallMessage = new ChatMessage(ChatMessageRole.ASSISTANT.value());
     functionCallMessage.setFunctionCall(
         new ChatFunctionCall(
-            askClarificationQuestion, defaultObjectMapper().valueToTree(qa.questionFromAI)));
+            askClarificationQuestion, defaultObjectMapper().valueToTree(arguments)));
     ChatMessage functionCallResponse =
-        execute(
-            functionCallMessage.getFunctionCall(),
-            w -> new UserResponseToClarifyingQuestion(qa.answerFromUser));
+        functionCallResponse(functionCallMessage.getFunctionCall().getName(), resp);
     return List.of(functionCallMessage, functionCallResponse);
   }
 
-  private ChatMessage execute(ChatFunctionCall functionCall, Function<Object, Object> executor) {
-    new ArrayList<>(FUNCTIONS.values())
-        .stream()
-            .filter(f -> f.getName().equals(functionCall.getName()))
-            .findFirst()
-            .ifPresent(
-                f -> {
-                  f.setExecutor(executor);
-                });
-    return new FunctionExecutor1(FUNCTIONS.get(functionCall.getName()))
-        .executeAndConvertToMessage(functionCall);
+  private ChatMessage functionCallResponse(String functionName, Object resp) {
+    JsonNode jsonNode = defaultObjectMapper().convertValue(resp, JsonNode.class);
+    return new ChatMessage(
+        ChatMessageRole.FUNCTION.value(), jsonNode.toPrettyString(), functionName);
   }
 }
