@@ -11,13 +11,23 @@ import java.util.*;
 
 public class AiToolList {
   final Map<String, ChatFunction> functions = new HashMap<>();
+  private String messageBody;
 
-  public AiToolList(List<ChatFunction> functions) {
+  public AiToolList(String message, List<ChatFunction> functions) {
+    this.messageBody = message;
     functions.forEach(f -> this.functions.put(f.getName(), f));
   }
 
   public Collection<ChatFunction> getFunctions() {
     return new ArrayList<>(functions.values());
+  }
+
+  public String getUserRequestMessage() {
+    return messageBody;
+  }
+
+  public String getFirstFunctionName() {
+    return functions.keySet().iterator().next();
   }
 
   public static ChatMessage functionCall(String functionName, Object arguments) {

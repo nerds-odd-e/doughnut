@@ -1,7 +1,7 @@
 package com.odde.doughnut.services.ai;
 
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
-import com.odde.doughnut.services.ai.tools.AiTool;
+import com.odde.doughnut.services.ai.tools.AiToolList;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import java.util.List;
 
@@ -13,10 +13,11 @@ public class OpenAIChatAboutNoteFineTuningBuilder {
     openAIChatRequestBuilder.addSystemMessage(preservedNoteContent);
   }
 
-  public OpenAIChatAboutNoteFineTuningBuilder addToolAndToolCall(AiTool tool, Object arguments) {
-    openAIChatRequestBuilder.functions.add(tool.getFunction());
+  public OpenAIChatAboutNoteFineTuningBuilder addToolAndToolCall(
+      AiToolList tool, Object arguments) {
+    openAIChatRequestBuilder.functions.addAll(tool.getFunctions());
     openAIChatRequestBuilder.addUserMessage(tool.getUserRequestMessage());
-    openAIChatRequestBuilder.addFunctionCallMessage(arguments, tool.getFunctionName());
+    openAIChatRequestBuilder.addFunctionCallMessage(arguments, tool.getFirstFunctionName());
     return this;
   }
 

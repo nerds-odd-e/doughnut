@@ -3,7 +3,6 @@ package com.odde.doughnut.services.ai;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
-import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.AiToolList;
 import com.theokanning.openai.completion.chat.*;
@@ -21,8 +20,8 @@ public class OpenAIChatAboutNoteRequestBuilder {
     openAIChatRequestBuilder.addSystemMessage(note.getNoteDescription());
   }
 
-  public OpenAIChatAboutNoteRequestBuilder addTool(AiTool tool) {
-    openAIChatRequestBuilder.functions.add(tool.getFunction());
+  public OpenAIChatAboutNoteRequestBuilder addTool(AiToolList tool) {
+    openAIChatRequestBuilder.functions.addAll(tool.getFunctions());
     openAIChatRequestBuilder.addUserMessage(tool.getUserRequestMessage());
     return this;
   }

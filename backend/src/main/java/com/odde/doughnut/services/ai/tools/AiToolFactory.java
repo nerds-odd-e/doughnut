@@ -5,8 +5,8 @@ import com.theokanning.openai.completion.chat.ChatFunction;
 import java.util.List;
 
 public class AiToolFactory {
-  public static AiTool mcqWithAnswerAiTool() {
-    return new AiTool(
+  public static AiToolList mcqWithAnswerAiTool() {
+    return new AiToolList(
         """
       Please assume the role of a Memory Assistant, which involves helping me review, recall, and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following guidelines:
 
@@ -18,14 +18,15 @@ public class AiToolFactory {
 
       Note: The specific note of focus and its more detailed contexts are not known. Focus on memory reinforcement and recall across various subjects.
       """,
-        ChatFunction.builder()
-            .name("ask_single_answer_multiple_choice_question")
-            .description("Ask a single-answer multiple-choice question to the user")
-            .executor(MCQWithAnswer.class, null)
-            .build());
+        List.of(
+            ChatFunction.builder()
+                .name("ask_single_answer_multiple_choice_question")
+                .description("Ask a single-answer multiple-choice question to the user")
+                .executor(MCQWithAnswer.class, null)
+                .build()));
   }
 
-  public static AiTool questionEvaluationAiTool(MCQWithAnswer question) {
+  public static AiToolList questionEvaluationAiTool(MCQWithAnswer question) {
     MultipleChoicesQuestion clone = question.getMultipleChoicesQuestion();
 
     String messageBody =
@@ -40,13 +41,14 @@ please critically check if the following question makes sense and is possible to
 """
             .formatted(clone.toJsonString());
 
-    return new AiTool(
+    return new AiToolList(
         messageBody,
-        ChatFunction.builder()
-            .name("evaluate_question")
-            .description("answer and evaluate the feasibility of the question")
-            .executor(QuestionEvaluation.class, null)
-            .build());
+        List.of(
+            ChatFunction.builder()
+                .name("evaluate_question")
+                .description("answer and evaluate the feasibility of the question")
+                .executor(QuestionEvaluation.class, null)
+                .build()));
   }
 
   public static AiToolList getNoteContentCompletionTools() {
@@ -62,6 +64,6 @@ please critically check if the following question makes sense and is possible to
                 .description("Ask question to get more context")
                 .executor(ClarifyingQuestion.class, null)
                 .build());
-    return new AiToolList(functions);
+    return new AiToolList("", functions);
   }
 }
