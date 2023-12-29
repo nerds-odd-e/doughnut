@@ -10,12 +10,14 @@ import static org.mockito.Mockito.when;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.controllers.json.AiCompletionResponse;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.OpenAiResponse;
+import com.theokanning.openai.assistants.Assistant;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.image.Image;
@@ -24,11 +26,13 @@ import com.theokanning.openai.model.Model;
 import io.reactivex.Single;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -178,6 +182,31 @@ class RestAiControllerTest {
 
       when(openAiApi.listModels()).thenReturn(Single.just(fakeResponse));
       assertThat(controller.getAvailableGptModels()).contains("gpt-4");
+    }
+  }
+
+  @Nested
+  class recreateAllAssistants {
+    @Test
+    void authentication() {
+      controller =
+          new RestAiController(
+              openAiApi, makeMe.modelFactoryService, makeMe.aUser().toModelPlease());
+      assertThrows(
+          UnexpectedNoAccessRightException.class, () -> controller.recreateAllAssistants());
+    }
+
+    @Test
+    void callingTheApi() throws UnexpectedNoAccessRightException {
+      controller =
+          new RestAiController(
+              openAiApi, makeMe.modelFactoryService, makeMe.anAdmin().toModelPlease());
+      Assistant assistantToReturn = new Assistant();
+      assistantToReturn.setId("1234");
+      when(openAiApi.createAssistant(ArgumentMatchers.any()))
+          .thenReturn(Single.just(assistantToReturn));
+      Map<String, String> result = controller.recreateAllAssistants();
+      assertThat(result.get("note details completion")).isEqualTo("1234");
     }
   }
 
