@@ -3,6 +3,9 @@ package com.odde.doughnut.controllers.json;
 import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
+import com.odde.doughnut.services.ai.tools.AiToolList;
+import com.theokanning.openai.completion.chat.ChatMessage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,5 +35,24 @@ public class AiCompletionParams {
             + " Don't make assumptions about the context. Ask for clarification through tool function if my request is ambiguous."
             + " The current details in JSON format are: \n%s")
         .formatted(defaultObjectMapper().valueToTree(arguments).toPrettyString());
+  }
+
+  @JsonIgnore
+  public List<ChatMessage> getQAMessages() {
+    List<ChatMessage> messages = new ArrayList<>();
+    getClarifyingQuestionAndAnswers()
+        .forEach(
+            qa -> {
+              messages.add(
+                  AiToolList.functionCall(
+                      OpenAIChatAboutNoteRequestBuilder.askClarificationQuestion,
+                      qa.questionFromAI));
+              messages.add(
+                  AiToolList.functionCallResponse(
+                      OpenAIChatAboutNoteRequestBuilder.askClarificationQuestion,
+                      new OpenAIChatAboutNoteRequestBuilder.UserResponseToClarifyingQuestion(
+                          qa.answerFromUser)));
+            });
+    return messages;
   }
 }

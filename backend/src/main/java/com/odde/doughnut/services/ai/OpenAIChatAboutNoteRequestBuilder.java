@@ -1,6 +1,5 @@
 package com.odde.doughnut.services.ai;
 
-import com.odde.doughnut.controllers.json.ClarifyingQuestionAndAnswer;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolList;
@@ -31,17 +30,8 @@ public class OpenAIChatAboutNoteRequestBuilder {
     public String answerFromUser;
   }
 
-  public OpenAIChatAboutNoteRequestBuilder addAnsweredQuestions(
-      List<ClarifyingQuestionAndAnswer> clarifyingQuestionAndAnswers) {
-    clarifyingQuestionAndAnswers.forEach(
-        qa -> {
-          openAIChatRequestBuilder.messages.add(
-              AiToolList.functionCall(askClarificationQuestion, qa.questionFromAI));
-          openAIChatRequestBuilder.messages.add(
-              AiToolList.functionCallResponse(
-                  askClarificationQuestion,
-                  new UserResponseToClarifyingQuestion(qa.answerFromUser)));
-        });
+  public OpenAIChatAboutNoteRequestBuilder addMessages(List<ChatMessage> messages) {
+    openAIChatRequestBuilder.messages.addAll(messages);
 
     return this;
   }
