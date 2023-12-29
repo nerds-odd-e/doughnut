@@ -1,5 +1,13 @@
 <template>
   <button @click="recreateAllAssistants">Recreate All Assistants</button>
+  <div v-if="assistants">
+    <div v-for="(assistant, assistantId) in assistants" :key="assistantId">
+      <label
+        >{{ assistantId }}
+        <input type="text" :value="assistant" />
+      </label>
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>

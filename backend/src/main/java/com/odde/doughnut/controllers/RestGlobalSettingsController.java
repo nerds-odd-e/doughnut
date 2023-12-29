@@ -6,6 +6,8 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.testability.TestabilitySettings;
+import java.util.HashMap;
+import java.util.Map;
 import javax.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
@@ -44,5 +46,14 @@ public class RestGlobalSettingsController {
     currentUser.assertAdminAuthorization();
     return globalSettingsService.setCurrentModelVersions(
         models, testabilitySettings.getCurrentUTCTimestamp());
+  }
+
+  @PostMapping("/recreate-all-assistants")
+  public Map<String, String> recreateAllAssistants(@RequestBody GlobalAiModelSettings models)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAdminAuthorization();
+    Map<String, String> result = new HashMap<>();
+    result.put("note details completion", "new_assistant");
+    return result;
   }
 }

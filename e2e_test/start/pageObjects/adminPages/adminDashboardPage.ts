@@ -36,6 +36,11 @@ export function assumeAdminDashboardPage() {
       return {
         recreate() {
           cy.findByRole("button", { name: "Recreate All Assistants" }).click()
+          return {
+            expectNewAssistant(newId: string, nameOfAssistant: string) {
+              cy.findByLabelText(nameOfAssistant).should("have.value", newId)
+            },
+          }
         },
       }
     },
