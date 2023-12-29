@@ -18,7 +18,7 @@ public class AiQuestionGenerator {
   }
 
   public MCQWithAnswer getAiGeneratedQuestion() throws QuizQuestionNotPossibleException {
-    AiTool<MCQWithAnswer> tool = AiToolFactory.mcqWithAnswerAiTool();
+    AiTool tool = AiToolFactory.mcqWithAnswerAiTool();
     ChatCompletionRequest chatRequest =
         chatAboutNoteRequestBuilder.addTool(tool).maxTokens(1500).build();
     return openAiApiHandler
@@ -28,8 +28,7 @@ public class AiQuestionGenerator {
   }
 
   public Optional<QuestionEvaluation> evaluateQuestion(MCQWithAnswer question) {
-    AiTool<QuestionEvaluation> questionEvaluationAiTool =
-        AiToolFactory.questionEvaluationAiTool(question);
+    AiTool questionEvaluationAiTool = AiToolFactory.questionEvaluationAiTool(question);
     ChatCompletionRequest chatRequest =
         chatAboutNoteRequestBuilder.addTool(questionEvaluationAiTool).maxTokens(1500).build();
 

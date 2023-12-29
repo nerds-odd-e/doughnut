@@ -1,34 +1,25 @@
 package com.odde.doughnut.services.ai.tools;
 
-import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.theokanning.openai.completion.chat.*;
 
-public class AiTool<T> {
-  public final String functionName;
-  private final Class<T> type;
-  private final String description;
+public class AiTool {
   private final String messageBody;
+  private final ChatFunction function;
 
-  public AiTool(Class<T> type, String functionName, String description, String message) {
-    this.type = type;
-    this.functionName = functionName;
-    this.description = description;
+  public AiTool(String message, ChatFunction chatFunction) {
     this.messageBody = message;
+    function = chatFunction;
   }
 
-  public void addToolToChatMessages(OpenAIChatRequestBuilder openAIChatRequestBuilder) {
-    openAIChatRequestBuilder.functions.add(
-        ChatFunction.builder()
-            .name(functionName)
-            .description(description)
-            .executor(type, null)
-            .build());
-
-    openAIChatRequestBuilder.addUserMessage(messageBody);
+  public ChatFunction getFunction() {
+    return function;
   }
 
-  public void addFunctionCallToMessages(
-      OpenAIChatRequestBuilder openAIChatRequestBuilder, T argument) {
-    openAIChatRequestBuilder.addFunctionCallMessage(argument, functionName);
+  public String getUserRequestMessage() {
+    return messageBody;
+  }
+
+  public String getFunctionName() {
+    return function.getName();
   }
 }

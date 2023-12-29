@@ -10,14 +10,14 @@ import com.theokanning.openai.completion.chat.ChatMessageRole;
 import java.util.*;
 
 public class AiToolList {
-  final Map<String, ChatFunction> FUNCTIONS = new HashMap<>();
+  final Map<String, ChatFunction> functions = new HashMap<>();
 
   public AiToolList(List<ChatFunction> functions) {
-    functions.forEach(f -> this.FUNCTIONS.put(f.getName(), f));
+    functions.forEach(f -> this.functions.put(f.getName(), f));
   }
 
   public Collection<ChatFunction> getFunctions() {
-    return new ArrayList<>(FUNCTIONS.values());
+    return new ArrayList<>(functions.values());
   }
 
   public static ChatMessage functionCall(String functionName, Object arguments) {
