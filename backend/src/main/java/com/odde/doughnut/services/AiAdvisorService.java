@@ -45,7 +45,7 @@ public class AiAdvisorService {
     ChatCompletionRequest chatCompletionRequest =
         new OpenAIChatAboutNoteRequestBuilder(modelName, note)
             .addTool(tool)
-            .addAnsweredQuestions(aiCompletionParams.getClarifyingQuestionAndAnswers())
+            .addMessages(aiCompletionParams.getQAMessages())
             .maxTokens(150)
             .build();
 
