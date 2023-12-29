@@ -3,14 +3,12 @@ package com.odde.doughnut.controllers.json;
 import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolList;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -53,13 +51,11 @@ public class AiCompletionParams {
             qa -> {
               messages.add(
                   AiToolList.functionCall(
-                      OpenAIChatRequestBuilder.askClarificationQuestion,
-                      qa.questionFromAI));
+                      OpenAIChatRequestBuilder.askClarificationQuestion, qa.questionFromAI));
               messages.add(
                   AiToolList.functionCallResponse(
                       OpenAIChatRequestBuilder.askClarificationQuestion,
-                      new UserResponseToClarifyingQuestion(
-                          qa.answerFromUser)));
+                      new UserResponseToClarifyingQuestion(qa.answerFromUser)));
             });
     return messages;
   }

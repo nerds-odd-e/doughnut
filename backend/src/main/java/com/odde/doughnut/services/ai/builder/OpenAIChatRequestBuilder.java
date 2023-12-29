@@ -14,11 +14,11 @@ public class OpenAIChatRequestBuilder {
   ChatCompletionRequest.ChatCompletionRequestBuilder builder = ChatCompletionRequest.builder();
 
   public static OpenAIChatRequestBuilder chatAboutNoteRequestBuilder(String modelName, Note note) {
-    return  new OpenAIChatRequestBuilder()
-    .model(modelName)
-    .addSystemMessage(
-        "This is a PKM system using hierarchical notes, each with a topic and details, to capture atomic concepts.")
-    .addSystemMessage(note.getNoteDescription());
+    return new OpenAIChatRequestBuilder()
+        .model(modelName)
+        .addSystemMessage(
+            "This is a PKM system using hierarchical notes, each with a topic and details, to capture atomic concepts.")
+        .addSystemMessage(note.getNoteDescription());
   }
 
   public OpenAIChatRequestBuilder model(String modelName) {
