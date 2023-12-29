@@ -51,7 +51,7 @@ please critically check if the following question makes sense and is possible to
                 .build()));
   }
 
-  public static AiToolList getNoteContentCompletionTools() {
+  public static AiToolList getNoteContentCompletionTools(String completionPrompt) {
     List<ChatFunction> functions =
         List.of(
             ChatFunction.builder()
@@ -64,6 +64,6 @@ please critically check if the following question makes sense and is possible to
                 .description("Ask question to get more context")
                 .executor(ClarifyingQuestion.class, null)
                 .build());
-    return new AiToolList("", functions);
+    return new AiToolList(completionPrompt, functions);
   }
 }
