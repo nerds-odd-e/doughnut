@@ -113,7 +113,9 @@ Then("I choose model {string} for {string}", (model: string, task: string) => {
 
 Given(
   "OpenAI creates an assistant of ID {string} for name {string}",
-  (newId: string, nameOfAssistant: string) => {},
+  (newId: string, nameOfAssistant: string) => {
+    mock_services.openAi().stubCreateAssistant(newId, nameOfAssistant)
+  },
 )
 
 When(
