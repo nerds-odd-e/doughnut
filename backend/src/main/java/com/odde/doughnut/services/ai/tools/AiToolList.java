@@ -1,6 +1,5 @@
 package com.odde.doughnut.services.ai.tools;
 
-import static com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder.askClarificationQuestion;
 import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -21,17 +20,14 @@ public class AiToolList {
     return new ArrayList<>(FUNCTIONS.values());
   }
 
-  public List<ChatMessage> functionReturningMessages(Object arguments, Object resp) {
+  public static ChatMessage functionCall(String functionName, Object arguments) {
     ChatMessage functionCallMessage = new ChatMessage(ChatMessageRole.ASSISTANT.value());
     functionCallMessage.setFunctionCall(
-        new ChatFunctionCall(
-            askClarificationQuestion, defaultObjectMapper().valueToTree(arguments)));
-    ChatMessage functionCallResponse =
-        functionCallResponse(functionCallMessage.getFunctionCall().getName(), resp);
-    return List.of(functionCallMessage, functionCallResponse);
+        new ChatFunctionCall(functionName, defaultObjectMapper().valueToTree(arguments)));
+    return functionCallMessage;
   }
 
-  private ChatMessage functionCallResponse(String functionName, Object resp) {
+  public static ChatMessage functionCallResponse(String functionName, Object resp) {
     JsonNode jsonNode = defaultObjectMapper().convertValue(resp, JsonNode.class);
     return new ChatMessage(
         ChatMessageRole.FUNCTION.value(), jsonNode.toPrettyString(), functionName);
