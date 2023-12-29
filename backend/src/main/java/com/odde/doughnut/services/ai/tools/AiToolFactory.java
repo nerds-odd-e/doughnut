@@ -4,6 +4,8 @@ import com.odde.doughnut.services.ai.*;
 import com.theokanning.openai.completion.chat.ChatFunction;
 import java.util.List;
 
+import static com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder.askClarificationQuestion;
+
 public class AiToolFactory {
   public static AiToolList mcqWithAnswerAiTool() {
     return new AiToolList(
@@ -60,7 +62,7 @@ please critically check if the following question makes sense and is possible to
                 .executor(NoteDetailsCompletion.class, null)
                 .build(),
             ChatFunction.builder()
-                .name("ask_clarification_question")
+                .name(askClarificationQuestion)
                 .description("Ask question to get more context")
                 .executor(ClarifyingQuestion.class, null)
                 .build());

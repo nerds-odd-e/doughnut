@@ -8,25 +8,15 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 
 public class OpenAIChatAboutNoteRequestBuilder {
-  public static final String askClarificationQuestion = "ask_clarification_question";
-  protected final OpenAIChatRequestBuilder openAIChatRequestBuilder =
-      new OpenAIChatRequestBuilder();
+  protected final OpenAIChatRequestBuilder openAIChatRequestBuilder;
 
   public OpenAIChatAboutNoteRequestBuilder(String modelName, Note note) {
-    openAIChatRequestBuilder.model(modelName);
-    this.openAIChatRequestBuilder.addSystemMessage(
-        "This is a PKM system using hierarchical notes, each with a topic and details, to capture atomic concepts.");
-    openAIChatRequestBuilder.addSystemMessage(note.getNoteDescription());
+    openAIChatRequestBuilder = OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(modelName, note);
   }
 
   public OpenAIChatAboutNoteRequestBuilder addTool(AiToolList tool) {
-    tool.addToChat(openAIChatRequestBuilder);
+    openAIChatRequestBuilder.addTool(tool);
     return this;
-  }
-
-  @AllArgsConstructor
-  public static class UserResponseToClarifyingQuestion {
-    public String answerFromUser;
   }
 
   public OpenAIChatAboutNoteRequestBuilder addMessages(List<ChatMessage> messages) {

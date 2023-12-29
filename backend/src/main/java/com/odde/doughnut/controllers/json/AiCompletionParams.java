@@ -4,11 +4,14 @@ import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.services.ai.OpenAIChatAboutNoteRequestBuilder;
+import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolList;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -37,6 +40,11 @@ public class AiCompletionParams {
         .formatted(defaultObjectMapper().valueToTree(arguments).toPrettyString());
   }
 
+  @AllArgsConstructor
+  public static class UserResponseToClarifyingQuestion {
+    public String answerFromUser;
+  }
+
   @JsonIgnore
   public List<ChatMessage> getQAMessages() {
     List<ChatMessage> messages = new ArrayList<>();
@@ -45,12 +53,12 @@ public class AiCompletionParams {
             qa -> {
               messages.add(
                   AiToolList.functionCall(
-                      OpenAIChatAboutNoteRequestBuilder.askClarificationQuestion,
+                      OpenAIChatRequestBuilder.askClarificationQuestion,
                       qa.questionFromAI));
               messages.add(
                   AiToolList.functionCallResponse(
-                      OpenAIChatAboutNoteRequestBuilder.askClarificationQuestion,
-                      new OpenAIChatAboutNoteRequestBuilder.UserResponseToClarifyingQuestion(
+                      OpenAIChatRequestBuilder.askClarificationQuestion,
+                      new UserResponseToClarifyingQuestion(
                           qa.answerFromUser)));
             });
     return messages;
