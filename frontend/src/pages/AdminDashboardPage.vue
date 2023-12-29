@@ -30,16 +30,28 @@
         Manage Models</a
       >
     </li>
+    <li class="nav-item">
+      <a
+        :class="`nav-link ${activePage === 'manageAssistant' ? 'active' : ''}`"
+        role="button"
+        href="#"
+        @click="activePage = 'manageAssistant'"
+      >
+        Manage Assistant</a
+      >
+    </li>
   </ul>
   <FineTuningData v-if="activePage === 'fineTuningData'" />
   <FailureReportList v-if="activePage === 'failureReport'" />
   <ManageModel v-if="activePage === 'manageModel'" />
+  <ManageAssistant v-if="activePage === 'manageAssistant'" />
 </template>
 
 <script lang="ts">
 import FineTuningData from "../components/admin/FineTuningData.vue";
 import FailureReportList from "../components/admin/FailureReportList.vue";
 import ManageModel from "../components/admin/ManageModel.vue";
+import ManageAssistant from "../components/admin/ManageAssistant.vue";
 
 export default {
   data() {
@@ -48,6 +60,7 @@ export default {
         | "fineTuningData"
         | "failureReport"
         | "manageModel"
+        | "manageAssistant"
         | undefined,
     };
   },
@@ -55,6 +68,7 @@ export default {
     FineTuningData,
     FailureReportList,
     ManageModel,
+    ManageAssistant,
   },
 };
 </script>

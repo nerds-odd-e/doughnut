@@ -30,5 +30,14 @@ export function assumeAdminDashboardPage() {
         },
       }
     },
+
+    goToAssistantManagement() {
+      this.goToTabInAdminDashboard("Manage Assistant")
+      return {
+        recreate() {
+          cy.findByRole("button", { name: "Recreate All Assistants" }).click()
+        },
+      }
+    },
   }
 }

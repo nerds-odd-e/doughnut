@@ -346,6 +346,12 @@ const apiCollection = (managedApi: ManagedApi) => ({
         settings,
       )) as Generated.GlobalAiModelSettings;
     },
+    async recreateAllAssistants() {
+      return (await managedApi.restPost(
+        `settings/recreate-all-assistants`,
+        {},
+      )) as Record<string, string>;
+    },
   },
   ai: {
     async chat(noteId: Doughnut.ID, userMessage: string): Promise<string> {
