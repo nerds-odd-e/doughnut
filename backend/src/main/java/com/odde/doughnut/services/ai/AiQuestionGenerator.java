@@ -2,8 +2,8 @@ package com.odde.doughnut.services.ai;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
-import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
+import com.odde.doughnut.services.ai.tools.AiToolList;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import java.util.Optional;
@@ -18,7 +18,7 @@ public class AiQuestionGenerator {
   }
 
   public MCQWithAnswer getAiGeneratedQuestion() throws QuizQuestionNotPossibleException {
-    AiTool tool = AiToolFactory.mcqWithAnswerAiTool();
+    AiToolList tool = AiToolFactory.mcqWithAnswerAiTool();
     ChatCompletionRequest chatRequest =
         chatAboutNoteRequestBuilder.addTool(tool).maxTokens(1500).build();
     return openAiApiHandler
@@ -28,7 +28,7 @@ public class AiQuestionGenerator {
   }
 
   public Optional<QuestionEvaluation> evaluateQuestion(MCQWithAnswer question) {
-    AiTool questionEvaluationAiTool = AiToolFactory.questionEvaluationAiTool(question);
+    AiToolList questionEvaluationAiTool = AiToolFactory.questionEvaluationAiTool(question);
     ChatCompletionRequest chatRequest =
         chatAboutNoteRequestBuilder.addTool(questionEvaluationAiTool).maxTokens(1500).build();
 
