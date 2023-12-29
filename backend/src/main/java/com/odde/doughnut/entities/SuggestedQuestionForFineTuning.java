@@ -7,8 +7,10 @@ import com.odde.doughnut.services.ai.*;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.AiToolList;
+import com.theokanning.openai.completion.chat.ChatMessage;
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.List;
 import javax.persistence.*;
 import lombok.Getter;
 import lombok.NonNull;
@@ -91,13 +93,13 @@ public class SuggestedQuestionForFineTuning {
   }
 
   private OpenAIChatGPTFineTuningExample getOpenAIChatGPTFineTuningExample(
-      AiToolList tool, Object preservedQuestion1) {
-    OpenAIChatRequestBuilder openAIChatRequestBuilder = new OpenAIChatRequestBuilder();
-    openAIChatRequestBuilder.addSystemMessage(preservedNoteContent);
-    tool.addToChat(openAIChatRequestBuilder);
-    openAIChatRequestBuilder.addFunctionCallMessage(
-        preservedQuestion1, tool.getFirstFunctionName());
-    var messages = openAIChatRequestBuilder.buildMessages();
+      AiToolList tool, Object argument) {
+    List<ChatMessage> messages =
+        new OpenAIChatRequestBuilder()
+            .addSystemMessage(preservedNoteContent)
+            .addTool(tool)
+            .addFunctionCallMessage(argument, tool.getFirstFunctionName())
+            .buildMessages();
     return OpenAIChatGPTFineTuningExample.from(messages);
   }
 
