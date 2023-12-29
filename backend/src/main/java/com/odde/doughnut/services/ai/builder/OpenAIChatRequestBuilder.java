@@ -1,15 +1,25 @@
 package com.odde.doughnut.services.ai.builder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.tools.AiToolList;
 import com.theokanning.openai.completion.chat.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class OpenAIChatRequestBuilder {
+  public static final String askClarificationQuestion = "ask_clarification_question";
   public final List<ChatMessage> messages = new ArrayList<>();
   public final List<ChatFunction> functions = new ArrayList<>();
   ChatCompletionRequest.ChatCompletionRequestBuilder builder = ChatCompletionRequest.builder();
+
+  public static OpenAIChatRequestBuilder chatAboutNoteRequestBuilder(String modelName, Note note) {
+    return  new OpenAIChatRequestBuilder()
+    .model(modelName)
+    .addSystemMessage(
+        "This is a PKM system using hierarchical notes, each with a topic and details, to capture atomic concepts.")
+    .addSystemMessage(note.getNoteDescription());
+  }
 
   public OpenAIChatRequestBuilder model(String modelName) {
     builder.model(modelName);

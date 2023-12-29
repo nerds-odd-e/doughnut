@@ -9,6 +9,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.services.ai.*;
+import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.AiToolList;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
@@ -54,7 +55,7 @@ public class AiAdvisorService {
     boolean isClarifyingQuestion =
         chatFunctionCall
             .getName()
-            .equals(OpenAIChatAboutNoteRequestBuilder.askClarificationQuestion);
+            .equals(OpenAIChatRequestBuilder.askClarificationQuestion);
     AiCompletionResponse result = new AiCompletionResponse();
     if (isClarifyingQuestion) {
       result.setFinishReason("question");
