@@ -1,10 +1,10 @@
 package com.odde.doughnut.services.ai.tools;
 
+import static com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder.askClarificationQuestion;
+
 import com.odde.doughnut.services.ai.*;
 import com.theokanning.openai.completion.chat.ChatFunction;
 import java.util.List;
-
-import static com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder.askClarificationQuestion;
 
 public class AiToolFactory {
   public static AiToolList mcqWithAnswerAiTool() {

@@ -5,13 +5,13 @@ import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolList;
 import com.theokanning.openai.completion.chat.*;
 import java.util.List;
-import lombok.AllArgsConstructor;
 
 public class OpenAIChatAboutNoteRequestBuilder {
   protected final OpenAIChatRequestBuilder openAIChatRequestBuilder;
 
   public OpenAIChatAboutNoteRequestBuilder(String modelName, Note note) {
-    openAIChatRequestBuilder = OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(modelName, note);
+    openAIChatRequestBuilder =
+        OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(modelName, note);
   }
 
   public OpenAIChatAboutNoteRequestBuilder addTool(AiToolList tool) {
