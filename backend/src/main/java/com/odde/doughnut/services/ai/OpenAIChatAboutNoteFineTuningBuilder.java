@@ -15,8 +15,7 @@ public class OpenAIChatAboutNoteFineTuningBuilder {
 
   public OpenAIChatAboutNoteFineTuningBuilder addToolAndToolCall(
       AiToolList tool, Object arguments) {
-    openAIChatRequestBuilder.functions.addAll(tool.getFunctions());
-    openAIChatRequestBuilder.addUserMessage(tool.getUserRequestMessage());
+    tool.addToChat(openAIChatRequestBuilder);
     openAIChatRequestBuilder.addFunctionCallMessage(arguments, tool.getFirstFunctionName());
     return this;
   }
