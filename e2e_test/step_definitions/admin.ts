@@ -110,3 +110,12 @@ Given(
 Then("I choose model {string} for {string}", (model: string, task: string) => {
   start.goToAdminDashboard().goToModelManagement().chooseModel(model, task)
 })
+
+Given(
+  "OpenAI creates an assistant of ID {string} for name {string}",
+  (newId: string, nameOfAssistant: string) => {},
+)
+
+When("I create new assitant", () => {
+  start.goToAdminDashboard().goToAssistantManagement().recreate()
+})
