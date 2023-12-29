@@ -44,7 +44,7 @@ public class AiAdvisorService {
     AiToolList tool =
         AiToolFactory.getNoteContentCompletionTools(aiCompletionParams.getCompletionPrompt());
     ChatCompletionRequest chatCompletionRequest =
-        new OpenAIChatAboutNoteRequestBuilder(modelName, note)
+        OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(modelName, note)
             .addTool(tool)
             .addMessages(aiCompletionParams.getQAMessages())
             .maxTokens(150)
@@ -87,8 +87,8 @@ public class AiAdvisorService {
 
   public String chatWithAi(Note note, String userMessage, String modelName) {
     ChatCompletionRequest chatCompletionRequest =
-        new OpenAIChatAboutNoteRequestBuilder(modelName, note)
-            .chatMessage(userMessage)
+        OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(modelName, note)
+            .addUserMessage(userMessage)
             .maxTokens(150)
             .build();
 

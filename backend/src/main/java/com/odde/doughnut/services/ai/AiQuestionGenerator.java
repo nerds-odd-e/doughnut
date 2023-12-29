@@ -2,6 +2,7 @@ package com.odde.doughnut.services.ai;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
+import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.AiToolList;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
@@ -10,10 +11,11 @@ import java.util.Optional;
 
 public class AiQuestionGenerator {
   private final OpenAiApiHandler openAiApiHandler;
-  private final OpenAIChatAboutNoteRequestBuilder chatAboutNoteRequestBuilder;
+  private final OpenAIChatRequestBuilder chatAboutNoteRequestBuilder;
 
   public AiQuestionGenerator(Note note, OpenAiApiHandler openAiApiHandler, String modelName) {
-    this.chatAboutNoteRequestBuilder = new OpenAIChatAboutNoteRequestBuilder(modelName, note);
+    this.chatAboutNoteRequestBuilder =
+        OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(modelName, note);
     this.openAiApiHandler = openAiApiHandler;
   }
 
