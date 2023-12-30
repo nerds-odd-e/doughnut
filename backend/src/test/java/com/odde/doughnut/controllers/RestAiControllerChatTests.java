@@ -10,6 +10,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
@@ -38,13 +39,15 @@ public class RestAiControllerChatTests {
   RestAiController controller;
   UserModel currentUser;
   Note note;
-
   Single<ChatCompletionResult> completionResultSingle;
+  TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setUp() {
     currentUser = makeMe.aUser().toModelPlease();
-    controller = new RestAiController(openAiApi, makeMe.modelFactoryService, currentUser);
+    controller =
+        new RestAiController(
+            openAiApi, makeMe.modelFactoryService, currentUser, testabilitySettings);
     note = makeMe.aNote().creatorAndOwner(currentUser).please();
     completionResultSingle =
         Single.just(makeMe.openAiCompletionResult().choice("I'm ChatGPT").please());
@@ -63,7 +66,10 @@ public class RestAiControllerChatTests {
         UnexpectedNoAccessRightException.class,
         () ->
             new RestAiController(
-                    openAiApi, makeMe.modelFactoryService, makeMe.aUser().toModelPlease())
+                    openAiApi,
+                    makeMe.modelFactoryService,
+                    makeMe.aUser().toModelPlease(),
+                    testabilitySettings)
                 .chat(note, new ChatRequest("What's your name?")));
   }
 
