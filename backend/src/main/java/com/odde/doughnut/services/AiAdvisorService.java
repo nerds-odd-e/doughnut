@@ -21,6 +21,7 @@ import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatFunctionCall;
+import com.theokanning.openai.messages.MessageRequest;
 import com.theokanning.openai.runs.RunCreateRequest;
 import com.theokanning.openai.threads.Thread;
 import com.theokanning.openai.threads.ThreadRequest;
@@ -48,15 +49,23 @@ public class AiAdvisorService {
 
   public AiCompletionResponse getAiCompletion(
       AiCompletionParams aiCompletionParams, Note note, String modelName, String assistantId) {
-    String threadId = ensureThread(aiCompletionParams);
+    String threadId = ensureThread(aiCompletionParams, note);
     return getAiCompletionResponse(threadId, assistantId, aiCompletionParams, note, modelName);
   }
 
-  private String ensureThread(AiCompletionParams aiCompletionParams) {
+  private String ensureThread(AiCompletionParams aiCompletionParams, Note note) {
     String threadId = aiCompletionParams.getThreadId();
     if (threadId == null) {
       ThreadRequest threadRequest = ThreadRequest.builder().build();
       Thread thread = openAiApiHandler.createThread(threadRequest);
+      MessageRequest messageRequest =
+          MessageRequest.builder().content(note.getNoteDescription()).build();
+
+      openAiApiHandler.createMessage(thread.getId(), messageRequest);
+      MessageRequest messageRequest1 =
+          MessageRequest.builder().content(aiCompletionParams.getCompletionPrompt()).build();
+
+      openAiApiHandler.createMessage(thread.getId(), messageRequest1);
       return thread.getId();
     }
     return threadId;
