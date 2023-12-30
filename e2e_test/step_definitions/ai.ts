@@ -81,17 +81,6 @@ Given("OpenAI always return image of a moon", () => {
   mock_services.openAi().stubCreateImage()
 })
 
-Given(
-  "OpenAI returns text completion {string} for gpt model {string}",
-  (details: string, modelName: string) => {
-    mock_services
-      .openAi()
-      .chatCompletion()
-      .requestMatches({ model: modelName })
-      .stubNoteDetailsCompletion(details)
-  },
-)
-
 Given("An OpenAI response is unavailable", () => {
   mock_services.openAi().stubOpenAiCompletionWithErrorResponse()
 })
