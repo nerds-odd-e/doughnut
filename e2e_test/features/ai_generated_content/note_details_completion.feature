@@ -8,6 +8,7 @@ Feature: Note details completion
       | Taiwan  |             |               |
       | Taipei  | It is a     | Taiwan        |
       | Weather | It rains a  | Taipei        |
+    And OpenAI service can create thread with id "thread-111" when requested
 
   Scenario: OpenAI Service Unavailability
     Given the OpenAI service is unavailable due to invalid system token

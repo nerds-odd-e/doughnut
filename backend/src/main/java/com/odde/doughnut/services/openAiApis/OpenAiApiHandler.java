@@ -95,14 +95,14 @@ public class OpenAiApiHandler {
   }
 
   public Assistant createAssistant(AssistantRequest assistantRequest) {
-    return openAiApi.createAssistant(assistantRequest).blockingGet();
+    return blockGet(openAiApi.createAssistant(assistantRequest));
   }
 
   public Thread createThread(ThreadRequest threadRequest) {
-    return openAiApi.createThread(threadRequest).blockingGet();
+    return blockGet(openAiApi.createThread(threadRequest));
   }
 
   public Run createRun(String threadId, RunCreateRequest runCreateRequest) {
-    return openAiApi.createRun(threadId, runCreateRequest).blockingGet();
+    return blockGet(openAiApi.createRun(threadId, runCreateRequest));
   }
 }
