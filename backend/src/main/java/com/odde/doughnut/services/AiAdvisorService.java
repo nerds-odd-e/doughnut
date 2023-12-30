@@ -70,11 +70,17 @@ public class AiAdvisorService {
         openAiApiHandler.getFunctionCall(chatCompletionRequest).orElseThrow();
     boolean isClarifyingQuestion =
         chatFunctionCall.getName().equals(OpenAIChatRequestBuilder.askClarificationQuestion);
+    AiCompletionResponse completionResponseForClarification;
     if (isClarifyingQuestion) {
-      return getCompletionResponseForClarification(
-          aiCompletionParams, chatFunctionCall.getArguments());
+      completionResponseForClarification =
+          getCompletionResponseForClarification(
+              aiCompletionParams, chatFunctionCall.getArguments());
+    } else {
+      completionResponseForClarification =
+          getAiCompletionResponse(aiCompletionParams, chatFunctionCall.getArguments());
     }
-    return getAiCompletionResponse(aiCompletionParams, chatFunctionCall.getArguments());
+    completionResponseForClarification.setThreadId(aiCompletionParams.getThreadId());
+    return completionResponseForClarification;
   }
 
   public Assistant createNoteCompletionAssistant(String modelName) {
