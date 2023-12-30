@@ -15,6 +15,10 @@ import com.theokanning.openai.fine_tuning.Hyperparameters;
 import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.model.Model;
+import com.theokanning.openai.runs.Run;
+import com.theokanning.openai.runs.RunCreateRequest;
+import com.theokanning.openai.threads.Thread;
+import com.theokanning.openai.threads.ThreadRequest;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -92,5 +96,13 @@ public class OpenAiApiHandler {
 
   public Assistant createAssistant(AssistantRequest assistantRequest) {
     return openAiApi.createAssistant(assistantRequest).blockingGet();
+  }
+
+  public Thread createThread(ThreadRequest threadRequest) {
+    return openAiApi.createThread(threadRequest).blockingGet();
+  }
+
+  public Run createRun(String threadId, RunCreateRequest runCreateRequest) {
+    return openAiApi.createRun(threadId, runCreateRequest).blockingGet();
   }
 }

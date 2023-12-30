@@ -4,6 +4,7 @@
 declare namespace Generated {
 
     interface AiCompletionParams {
+        threadId?: string;
         detailsToComplete: string;
         clarifyingQuestionAndAnswers: ClarifyingQuestionAndAnswer[];
     }

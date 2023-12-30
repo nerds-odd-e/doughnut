@@ -9,16 +9,14 @@ import com.theokanning.openai.completion.chat.ChatMessage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.springframework.lang.Nullable;
 
 @NoArgsConstructor
+@Data
 public class AiCompletionParams {
-  @Setter private String detailsToComplete;
-
-  @Getter
+  @Nullable private String threadId;
+  private String detailsToComplete;
   private List<ClarifyingQuestionAndAnswer> clarifyingQuestionAndAnswers = new ArrayList<>();
 
   public String getDetailsToComplete() {
