@@ -69,6 +69,12 @@ const openAiService = () => {
       })
     },
 
+    async stubCreateThread(threadId: string) {
+      return await serviceMocker.stubPoster(`/v1/threads`, {
+        id: threadId,
+      })
+    },
+
     async stubFineTuningStatus(successful: boolean) {
       return await serviceMocker.stubPoster(`/v1/fine_tuning/jobs`, {
         object: "fine_tuning.job",

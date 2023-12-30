@@ -165,3 +165,7 @@ Given(
       .stubAskClarificationQuestion(furtherQuestion)
   },
 )
+
+Given("OpenAI service can create thread with id {string} when requested", (threadId: string) => {
+  mock_services.openAi().stubCreateThread(threadId)
+})

@@ -24,6 +24,7 @@ import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.image.Image;
 import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.model.Model;
+import com.theokanning.openai.threads.Thread;
 import io.reactivex.Single;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +74,6 @@ class RestAiControllerTest {
 
     @BeforeEach
     void setup() {
-      params.setThreadId("any-thread-id");
       openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
           new NoteDetailsCompletion("blue planet"), "");
@@ -93,51 +93,68 @@ class RestAiControllerTest {
     }
 
     @Test
-    void askSuggestionWithRightPrompt() {
-      Note cosmos = makeMe.aNote("cosmos").please();
-      Note solar = makeMe.aNote("solar system").under(cosmos).please();
-      Note earth = makeMe.aNote("Earth").under(solar).please();
-      controller.getCompletion(earth, params);
-      verify(openAiApi).createChatCompletion(captor.capture());
-      assertThat(captor.getValue().getMaxTokens()).isLessThan(200);
-      assertThat(captor.getValue().getMessages()).hasSize(3);
-      assertThat(captor.getValue().getMessages().get(2).getContent())
-          .contains(" \"details_to_complete\" : \"\"");
-      assertThat(captor.getValue().getMessages().get(1).getContent())
-          .contains("Context path: cosmos › solar system");
-    }
-
-    @Test
-    void askSuggestionWithRightModel() {
-      new GlobalSettingsService(makeMe.modelFactoryService)
-          .getGlobalSettingOthers()
-          .setKeyValue(makeMe.aTimestamp().please(), "gpt-future");
-      controller.getCompletion(note, params);
-
-      verify(openAiApi).createChatCompletion(captor.capture());
-      assertEquals("gpt-future", captor.getValue().getModel());
-    }
-
-    @Test
-    void askSuggestionWithIncompleteAssistantMessage() {
-      params.setDetailsToComplete("What goes up,");
-      controller.getCompletion(note, params);
-      verify(openAiApi).createChatCompletion(captor.capture());
-      assertThat(captor.getValue().getMessages().get(2).getContent())
-          .contains(" \"details_to_complete\" : \"What goes up,\"");
-    }
-
-    @Test
-    void askCompletionAndUseStopResponse() {
+    void mustCreateANewThreadIfNoThreadIDGiven() {
+      Thread thread = new Thread();
+      thread.setId("this-thread");
+      when(openAiApi.createThread(ArgumentMatchers.any())).thenReturn(Single.just(thread));
       AiCompletionResponse aiCompletionResponse = controller.getCompletion(note, params);
-      assertEquals("blue planet", aiCompletionResponse.getMoreCompleteContent());
-      assertEquals("stop", aiCompletionResponse.getFinishReason());
+      assertEquals("this-thread", aiCompletionResponse.getThreadId());
     }
 
-    @Test
-    void itMustPassTheThreadIdBack() {
-      AiCompletionResponse aiCompletionResponse = controller.getCompletion(note, params);
-      assertEquals("any-thread-id", aiCompletionResponse.getThreadId());
+    @Nested
+    class withExistingThread {
+      @BeforeEach
+      void setup() {
+        params.setThreadId("any-thread-id");
+      }
+
+      @Test
+      void askSuggestionWithRightPrompt() {
+        Note cosmos = makeMe.aNote("cosmos").please();
+        Note solar = makeMe.aNote("solar system").under(cosmos).please();
+        Note earth = makeMe.aNote("Earth").under(solar).please();
+        controller.getCompletion(earth, params);
+        verify(openAiApi).createChatCompletion(captor.capture());
+        assertThat(captor.getValue().getMaxTokens()).isLessThan(200);
+        assertThat(captor.getValue().getMessages()).hasSize(3);
+        assertThat(captor.getValue().getMessages().get(2).getContent())
+            .contains(" \"details_to_complete\" : \"\"");
+        assertThat(captor.getValue().getMessages().get(1).getContent())
+            .contains("Context path: cosmos › solar system");
+      }
+
+      @Test
+      void askSuggestionWithRightModel() {
+        new GlobalSettingsService(makeMe.modelFactoryService)
+            .getGlobalSettingOthers()
+            .setKeyValue(makeMe.aTimestamp().please(), "gpt-future");
+        controller.getCompletion(note, params);
+
+        verify(openAiApi).createChatCompletion(captor.capture());
+        assertEquals("gpt-future", captor.getValue().getModel());
+      }
+
+      @Test
+      void askSuggestionWithIncompleteAssistantMessage() {
+        params.setDetailsToComplete("What goes up,");
+        controller.getCompletion(note, params);
+        verify(openAiApi).createChatCompletion(captor.capture());
+        assertThat(captor.getValue().getMessages().get(2).getContent())
+            .contains(" \"details_to_complete\" : \"What goes up,\"");
+      }
+
+      @Test
+      void askCompletionAndUseStopResponse() {
+        AiCompletionResponse aiCompletionResponse = controller.getCompletion(note, params);
+        assertEquals("blue planet", aiCompletionResponse.getMoreCompleteContent());
+        assertEquals("stop", aiCompletionResponse.getFinishReason());
+      }
+
+      @Test
+      void itMustPassTheThreadIdBack() {
+        AiCompletionResponse aiCompletionResponse = controller.getCompletion(note, params);
+        assertEquals("any-thread-id", aiCompletionResponse.getThreadId());
+      }
     }
   }
 

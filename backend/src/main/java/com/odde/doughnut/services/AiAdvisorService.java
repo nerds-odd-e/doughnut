@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class AiAdvisorService {
 
@@ -47,15 +48,29 @@ public class AiAdvisorService {
 
   public AiCompletionResponse getAiCompletion(
       AiCompletionParams aiCompletionParams, Note note, String modelName, String assistantId) {
-    if (aiCompletionParams.getThreadId() == null) {
+    return ensureThread(
+        aiCompletionParams, () -> getAiCompletionResponse(aiCompletionParams, note, modelName));
+  }
+
+  private AiCompletionResponse ensureThread(
+      AiCompletionParams aiCompletionParams, Supplier<AiCompletionResponse> supplier) {
+    String threadId = aiCompletionParams.getThreadId();
+    if (threadId == null) {
       ThreadRequest threadRequest = ThreadRequest.builder().build();
       Thread thread = openAiApiHandler.createThread(threadRequest);
-
+      threadId = thread.getId();
       //      RunCreateRequest runCreateRequest =
       //          RunCreateRequest.builder().assistantId(assistantId).build();
       //
       //      openAiApiHandler.createRun(thread.getId(), runCreateRequest);
     }
+    AiCompletionResponse completionResponseForClarification = supplier.get();
+    completionResponseForClarification.setThreadId(threadId);
+    return completionResponseForClarification;
+  }
+
+  private AiCompletionResponse getAiCompletionResponse(
+      AiCompletionParams aiCompletionParams, Note note, String modelName) {
     AiToolList tool =
         AiToolFactory.getNoteContentCompletionTools(aiCompletionParams.getCompletionPrompt());
 
@@ -70,17 +85,11 @@ public class AiAdvisorService {
         openAiApiHandler.getFunctionCall(chatCompletionRequest).orElseThrow();
     boolean isClarifyingQuestion =
         chatFunctionCall.getName().equals(OpenAIChatRequestBuilder.askClarificationQuestion);
-    AiCompletionResponse completionResponseForClarification;
     if (isClarifyingQuestion) {
-      completionResponseForClarification =
-          getCompletionResponseForClarification(
-              aiCompletionParams, chatFunctionCall.getArguments());
-    } else {
-      completionResponseForClarification =
-          getAiCompletionResponse(aiCompletionParams, chatFunctionCall.getArguments());
+      return getCompletionResponseForClarification(
+          aiCompletionParams, chatFunctionCall.getArguments());
     }
-    completionResponseForClarification.setThreadId(aiCompletionParams.getThreadId());
-    return completionResponseForClarification;
+    return getAiCompletionResponse(aiCompletionParams, chatFunctionCall.getArguments());
   }
 
   public Assistant createNoteCompletionAssistant(String modelName) {
