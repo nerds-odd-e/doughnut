@@ -73,6 +73,7 @@ class RestAiControllerTest {
 
     @BeforeEach
     void setup() {
+      params.setThreadId("any-thread-id");
       openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
           new NoteDetailsCompletion("blue planet"), "");

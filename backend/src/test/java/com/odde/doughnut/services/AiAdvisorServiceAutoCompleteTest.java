@@ -105,6 +105,7 @@ class AiAdvisorServiceAutoCompleteTest {
     private String getAiCompletionFromAdvisor(String incompleteContent) {
       Note note = makeMe.aNote().inMemoryPlease();
       AiCompletionParams aiCompletionParams = new AiCompletionParams();
+      aiCompletionParams.setThreadId("any-thread-id");
       aiCompletionParams.setDetailsToComplete(incompleteContent);
       return aiAdvisorService
           .getAiCompletion(aiCompletionParams, note, "gpt-4", "asst_example_id")
@@ -122,6 +123,7 @@ class AiAdvisorServiceAutoCompleteTest {
 
     @BeforeEach
     void setup() {
+      params.setThreadId("any-thread-id");
       note = makeMe.aNote().inMemoryPlease();
       openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
     }
