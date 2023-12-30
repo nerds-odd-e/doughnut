@@ -76,7 +76,7 @@ public class AiAdvisorService {
       AiCompletionParams aiCompletionParams,
       Note note,
       String modelName) {
-    openAiApiHandler.blockRetrieveRun(threadId, assistantId);
+    openAiApiHandler.blockGetRun(threadId, assistantId);
 
     AiToolList tool =
         AiToolFactory.getNoteContentCompletionTools(aiCompletionParams.getCompletionPrompt());
