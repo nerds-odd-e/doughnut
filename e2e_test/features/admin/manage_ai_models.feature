@@ -9,6 +9,7 @@ Feature: Manage AI models
     Given I am logged in as an admin
     And OpenAI returns text completion "A message from the future." for gpt model "gpt-future"
     And OpenAI has models "gpt-future, gpt-3.5" available
+    And OpenAI service can create thread and run with id "thread-111" when requested
     And I have a note with the topic "Taiwan"
 
   Scenario: Admin choose a model for content completion

@@ -21,13 +21,13 @@ import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatFunctionCall;
+import com.theokanning.openai.runs.RunCreateRequest;
 import com.theokanning.openai.threads.Thread;
 import com.theokanning.openai.threads.ThreadRequest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 public class AiAdvisorService {
 
@@ -48,29 +48,30 @@ public class AiAdvisorService {
 
   public AiCompletionResponse getAiCompletion(
       AiCompletionParams aiCompletionParams, Note note, String modelName, String assistantId) {
-    return ensureThread(
-        aiCompletionParams, () -> getAiCompletionResponse(aiCompletionParams, note, modelName));
+    String threadId = ensureThread(aiCompletionParams);
+    return getAiCompletionResponse(threadId, assistantId, aiCompletionParams, note, modelName);
   }
 
-  private AiCompletionResponse ensureThread(
-      AiCompletionParams aiCompletionParams, Supplier<AiCompletionResponse> supplier) {
+  private String ensureThread(AiCompletionParams aiCompletionParams) {
     String threadId = aiCompletionParams.getThreadId();
     if (threadId == null) {
       ThreadRequest threadRequest = ThreadRequest.builder().build();
       Thread thread = openAiApiHandler.createThread(threadRequest);
-      threadId = thread.getId();
-      //      RunCreateRequest runCreateRequest =
-      //          RunCreateRequest.builder().assistantId(assistantId).build();
-      //
-      //      openAiApiHandler.createRun(thread.getId(), runCreateRequest);
+      return thread.getId();
     }
-    AiCompletionResponse completionResponseForClarification = supplier.get();
-    completionResponseForClarification.setThreadId(threadId);
-    return completionResponseForClarification;
+    return threadId;
   }
 
   private AiCompletionResponse getAiCompletionResponse(
-      AiCompletionParams aiCompletionParams, Note note, String modelName) {
+      String threadId,
+      String assistantId,
+      AiCompletionParams aiCompletionParams,
+      Note note,
+      String modelName) {
+    RunCreateRequest runCreateRequest = RunCreateRequest.builder().assistantId(assistantId).build();
+
+    openAiApiHandler.createRun(threadId, runCreateRequest);
+
     AiToolList tool =
         AiToolFactory.getNoteContentCompletionTools(aiCompletionParams.getCompletionPrompt());
 
@@ -85,11 +86,17 @@ public class AiAdvisorService {
         openAiApiHandler.getFunctionCall(chatCompletionRequest).orElseThrow();
     boolean isClarifyingQuestion =
         chatFunctionCall.getName().equals(OpenAIChatRequestBuilder.askClarificationQuestion);
+    AiCompletionResponse completionResponseForClarification;
     if (isClarifyingQuestion) {
-      return getCompletionResponseForClarification(
-          aiCompletionParams, chatFunctionCall.getArguments());
+      completionResponseForClarification =
+          getCompletionResponseForClarification(
+              aiCompletionParams, chatFunctionCall.getArguments());
+    } else {
+      completionResponseForClarification =
+          getAiCompletionResponse(aiCompletionParams, chatFunctionCall.getArguments());
     }
-    return getAiCompletionResponse(aiCompletionParams, chatFunctionCall.getArguments());
+    completionResponseForClarification.setThreadId(threadId);
+    return completionResponseForClarification;
   }
 
   public Assistant createNoteCompletionAssistant(String modelName) {

@@ -65,7 +65,7 @@ class AiAdvisorServiceAutoCompleteTest {
     void getAiSuggestion_givenAString_whenHttpError_returnsEmptySuggestion()
         throws JsonProcessingException {
       HttpException httpException = BuildOpenAiException(400);
-      Mockito.when(openAiApi.createChatCompletion(ArgumentMatchers.any()))
+      Mockito.when(openAiApi.createRun(ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Single.error(httpException));
       assertThrows(OpenAiHttpException.class, () -> getAiCompletionFromAdvisor(""));
     }
@@ -73,7 +73,7 @@ class AiAdvisorServiceAutoCompleteTest {
     @Test
     void getAiSuggestion_when_timeout() {
       RuntimeException exception = new RuntimeException(new SocketTimeoutException());
-      Mockito.when(openAiApi.createChatCompletion(ArgumentMatchers.any()))
+      Mockito.when(openAiApi.createRun(ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Single.error(exception));
       OpenAITimeoutException result =
           assertThrows(OpenAITimeoutException.class, () -> getAiCompletionFromAdvisor(""));
@@ -83,7 +83,7 @@ class AiAdvisorServiceAutoCompleteTest {
     @Test
     void getAiSuggestion_when_got_502() throws JsonProcessingException {
       RuntimeException exception = BuildOpenAiException(502);
-      Mockito.when(openAiApi.createChatCompletion(ArgumentMatchers.any()))
+      Mockito.when(openAiApi.createRun(ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Single.error(exception));
       OpenAIServiceErrorException result =
           assertThrows(OpenAIServiceErrorException.class, () -> getAiCompletionFromAdvisor(""));
@@ -95,7 +95,7 @@ class AiAdvisorServiceAutoCompleteTest {
     @Test
     void getAiSuggestion_given_invalidToken_return_401() throws JsonProcessingException {
       HttpException httpException = BuildOpenAiException(401);
-      Mockito.when(openAiApi.createChatCompletion(ArgumentMatchers.any()))
+      Mockito.when(openAiApi.createRun(ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Single.error(httpException));
       OpenAiUnauthorizedException exception =
           assertThrows(OpenAiUnauthorizedException.class, () -> getAiCompletionFromAdvisor(""));
