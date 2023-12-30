@@ -3,9 +3,8 @@ package com.odde.doughnut.controllers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.controllers.json.AiCompletionResponse;
@@ -23,6 +22,8 @@ import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.image.Image;
 import com.theokanning.openai.image.ImageResult;
+import com.theokanning.openai.messages.Message;
+import com.theokanning.openai.messages.MessageRequest;
 import com.theokanning.openai.model.Model;
 import com.theokanning.openai.threads.Thread;
 import io.reactivex.Single;
@@ -74,6 +75,9 @@ class RestAiControllerTest {
 
     @BeforeEach
     void setup() {
+      Note cosmos = makeMe.aNote("cosmos").please();
+      Note solar = makeMe.aNote("solar system").under(cosmos).please();
+      note = makeMe.aNote("Earth").under(solar).please();
       openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
           new NoteDetailsCompletion("blue planet"), "");
@@ -92,13 +96,33 @@ class RestAiControllerTest {
                   .getCompletion(note, params));
     }
 
-    @Test
-    void mustCreateANewThreadIfNoThreadIDGiven() {
-      Thread thread = new Thread();
-      thread.setId("this-thread");
-      when(openAiApi.createThread(ArgumentMatchers.any())).thenReturn(Single.just(thread));
-      AiCompletionResponse aiCompletionResponse = controller.getCompletion(note, params);
-      assertEquals("this-thread", aiCompletionResponse.getThreadId());
+    @Nested
+    class withoutExistingThread {
+      @BeforeEach
+      void setup() {
+        Thread thread = new Thread();
+        thread.setId("this-thread");
+        when(openAiApi.createThread(ArgumentMatchers.any())).thenReturn(Single.just(thread));
+        when(openAiApi.createMessage(eq("this-thread"), ArgumentMatchers.any()))
+            .thenReturn(Single.just(new Message()));
+      }
+
+      @Test
+      void mustCreateANewThreadIfNoThreadIDGiven() {
+        AiCompletionResponse aiCompletionResponse = controller.getCompletion(note, params);
+        assertEquals("this-thread", aiCompletionResponse.getThreadId());
+      }
+
+      @Test
+      void mustCreateMessageToRequestCompletion() {
+        ArgumentCaptor<MessageRequest> captor = ArgumentCaptor.forClass(MessageRequest.class);
+        controller.getCompletion(note, params);
+        verify(openAiApi, times(2)).createMessage(any(), captor.capture());
+        assertThat(captor.getAllValues().get(0).getContent())
+            .contains("Context path: cosmos › solar system");
+        assertThat(captor.getAllValues().get(1).getContent())
+            .contains(" \"details_to_complete\" : \"\"");
+      }
     }
 
     @Nested
@@ -110,10 +134,7 @@ class RestAiControllerTest {
 
       @Test
       void askSuggestionWithRightPrompt() {
-        Note cosmos = makeMe.aNote("cosmos").please();
-        Note solar = makeMe.aNote("solar system").under(cosmos).please();
-        Note earth = makeMe.aNote("Earth").under(solar).please();
-        controller.getCompletion(earth, params);
+        controller.getCompletion(note, params);
         verify(openAiApi).createChatCompletion(captor.capture());
         assertThat(captor.getValue().getMaxTokens()).isLessThan(200);
         assertThat(captor.getValue().getMessages()).hasSize(3);

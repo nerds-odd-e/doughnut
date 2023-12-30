@@ -14,6 +14,7 @@ import com.theokanning.openai.fine_tuning.FineTuningJobRequest;
 import com.theokanning.openai.fine_tuning.Hyperparameters;
 import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.ImageResult;
+import com.theokanning.openai.messages.MessageRequest;
 import com.theokanning.openai.model.Model;
 import com.theokanning.openai.runs.Run;
 import com.theokanning.openai.runs.RunCreateRequest;
@@ -104,5 +105,9 @@ public class OpenAiApiHandler {
 
   public Run createRun(String threadId, RunCreateRequest runCreateRequest) {
     return blockGet(openAiApi.createRun(threadId, runCreateRequest));
+  }
+
+  public void createMessage(String threadId, MessageRequest messageRequest) {
+    blockGet(openAiApi.createMessage(threadId, messageRequest));
   }
 }
