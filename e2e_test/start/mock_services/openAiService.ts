@@ -69,9 +69,12 @@ const openAiService = () => {
       })
     },
 
-    async stubCreateThread(threadId: string) {
-      return await serviceMocker.stubPoster(`/v1/threads`, {
+    async stubCreateThreadAndRun(threadId: string) {
+      await serviceMocker.stubPoster(`/v1/threads`, {
         id: threadId,
+      })
+      return await serviceMocker.stubPoster(`/v1/threads/${threadId}/runs`, {
+        id: "run-abc123",
       })
     },
 

@@ -6,6 +6,7 @@ Feature: AI Asks Clarifying Questions When Auto-Generating Note Details
     And there are some notes for the current user:
       | topic   | details            |
       | Sports  | Football is        |
+    And OpenAI service can create thread and run with id "thread-111" when requested
     And the OpenAI assistant is set to ask "Do you mean American Football or European Football?" for unclarified request on "Football is"
 
   @usingMockedOpenAiService
