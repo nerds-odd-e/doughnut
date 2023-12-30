@@ -22,7 +22,6 @@ import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatFunctionCall;
 import com.theokanning.openai.messages.MessageRequest;
-import com.theokanning.openai.runs.RunCreateRequest;
 import com.theokanning.openai.threads.Thread;
 import com.theokanning.openai.threads.ThreadRequest;
 import java.io.IOException;
@@ -77,9 +76,7 @@ public class AiAdvisorService {
       AiCompletionParams aiCompletionParams,
       Note note,
       String modelName) {
-    RunCreateRequest runCreateRequest = RunCreateRequest.builder().assistantId(assistantId).build();
-
-    openAiApiHandler.createRun(threadId, runCreateRequest);
+    openAiApiHandler.blockRetrieveRun(threadId, assistantId);
 
     AiToolList tool =
         AiToolFactory.getNoteContentCompletionTools(aiCompletionParams.getCompletionPrompt());
