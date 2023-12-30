@@ -45,6 +45,7 @@ public class RestAiController {
   public AiCompletionResponse getCompletion(
       @PathVariable(name = "note") Note note, @RequestBody AiCompletionParams aiCompletionParams) {
     currentUser.assertLoggedIn();
+    aiCompletionParams.setThreadId("any-thread-id");
     return aiAdvisorService.getAiCompletion(
         aiCompletionParams, note, getDefaultOpenAiChatModel(), "asst_example_id");
   }

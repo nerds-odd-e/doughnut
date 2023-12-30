@@ -133,6 +133,12 @@ class RestAiControllerTest {
       assertEquals("blue planet", aiCompletionResponse.getMoreCompleteContent());
       assertEquals("stop", aiCompletionResponse.getFinishReason());
     }
+
+    @Test
+    void itMustPassTheThreadIdBack() {
+      AiCompletionResponse aiCompletionResponse = controller.getCompletion(note, params);
+      assertEquals("any-thread-id", aiCompletionResponse.getThreadId());
+    }
   }
 
   @Nested

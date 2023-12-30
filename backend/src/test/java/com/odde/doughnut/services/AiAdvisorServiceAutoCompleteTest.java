@@ -53,7 +53,7 @@ class AiAdvisorServiceAutoCompleteTest {
   }
 
   @Nested
-  class GetSuggestion {
+  class SimpleAutoComplete {
     @Test
     void getAiSuggestion_givenAString_returnsAiSuggestionObject() {
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(

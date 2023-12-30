@@ -5,6 +5,7 @@ import helper from "../helpers";
 describe("answering a clarifying question for note details geeration", () => {
   let wrapper: VueWrapper;
   const completionInProgress: Generated.AiCompletionResponse = {
+    threadId: "123",
     moreCompleteContent: "Football",
     clarifyingQuestion: {
       question: "Do you mean American Football or European Football?",

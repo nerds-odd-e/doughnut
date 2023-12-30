@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public final class AiCompletionResponse {
+  String threadId;
   String finishReason;
   String moreCompleteContent;
   ClarifyingQuestion clarifyingQuestion;

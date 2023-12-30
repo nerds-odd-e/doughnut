@@ -10,6 +10,7 @@ declare namespace Generated {
     }
 
     interface AiCompletionResponse {
+        threadId: string;
         finishReason: string;
         moreCompleteContent: string;
         clarifyingQuestion: ClarifyingQuestion;
