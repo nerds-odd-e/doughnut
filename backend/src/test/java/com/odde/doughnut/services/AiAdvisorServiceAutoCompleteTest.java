@@ -107,7 +107,7 @@ class AiAdvisorServiceAutoCompleteTest {
       AiCompletionParams aiCompletionParams = new AiCompletionParams();
       aiCompletionParams.setDetailsToComplete(incompleteContent);
       return aiAdvisorService
-          .getAiCompletion(aiCompletionParams, note, "gpt-4")
+          .getAiCompletion(aiCompletionParams, note, "gpt-4", "asst_example_id")
           .getMoreCompleteContent();
     }
   }
@@ -141,7 +141,7 @@ class AiAdvisorServiceAutoCompleteTest {
 
       @Test
       void askCompletionAndWithTwoFunctions() {
-        aiAdvisorService.getAiCompletion(params, note, "gpt-4");
+        aiAdvisorService.getAiCompletion(params, note, "gpt-4", "asst_example_id");
         ChatCompletionRequest request = captureChatCompletionRequest();
         Assertions.assertThat(
                 request.getFunctions().stream()
@@ -152,7 +152,7 @@ class AiAdvisorServiceAutoCompleteTest {
 
       @Test
       void askCompletionWithNoAssumption() {
-        aiAdvisorService.getAiCompletion(params, note, "gpt-4");
+        aiAdvisorService.getAiCompletion(params, note, "gpt-4", "asst_example_id");
         ChatCompletionRequest request = captureChatCompletionRequest();
         Assertions.assertThat(request.getMessages().get(2).getContent())
             .contains("Don't make assumptions");
@@ -166,7 +166,7 @@ class AiAdvisorServiceAutoCompleteTest {
               "Are you referring to American football or association football (soccer) ?"),
           "ask_clarification_question");
       AiCompletionResponse aiCompletionResponse =
-          aiAdvisorService.getAiCompletion(params, note, "gpt-4");
+          aiAdvisorService.getAiCompletion(params, note, "gpt-4", "asst_example_id");
       assertEquals("question", aiCompletionResponse.getFinishReason());
       assertEquals(
           "Are you referring to American football or association football (soccer) ?",
@@ -189,7 +189,7 @@ class AiAdvisorServiceAutoCompleteTest {
       void mustIncludeThePreviousQuestionInMessages() {
         openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
             new NoteDetailsCompletion(" is healthy."), "complete_note_details");
-        aiAdvisorService.getAiCompletion(params, note, "gpt-4");
+        aiAdvisorService.getAiCompletion(params, note, "gpt-4", "asst_example_id");
         ChatMessage functionResultMessage = captureChatCompletionRequest().getMessages().get(3);
         assertThat(
             functionResultMessage.getFunctionCall().getArguments().toString(),
@@ -200,7 +200,7 @@ class AiAdvisorServiceAutoCompleteTest {
       void mustIncludeThePreviousAnswerInMessages() {
         openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
             new NoteDetailsCompletion(" is healthy."), "complete_note_details");
-        aiAdvisorService.getAiCompletion(params, note, "gpt-4");
+        aiAdvisorService.getAiCompletion(params, note, "gpt-4", "asst_example_id");
         ChatMessage functionResultMessage = captureChatCompletionRequest().getMessages().get(4);
         assertThat(functionResultMessage.getName(), equalTo("ask_clarification_question"));
         assertThat(functionResultMessage.getContent(), containsString("green tea"));
@@ -212,7 +212,7 @@ class AiAdvisorServiceAutoCompleteTest {
             new NoteDetailsCompletion(" is common in China, if you are referring to green tea."),
             "complete_note_details");
         AiCompletionResponse aiCompletionResponse =
-            aiAdvisorService.getAiCompletion(params, note, "gpt-4");
+            aiAdvisorService.getAiCompletion(params, note, "gpt-4", "asst_example_id");
         assertEquals("stop", aiCompletionResponse.getFinishReason());
         assertEquals(
             "Tea is common in China, if you are referring to green tea.",
@@ -226,7 +226,7 @@ class AiAdvisorServiceAutoCompleteTest {
                 "Are you referring to American football or association football (soccer) ?"),
             "ask_clarification_question");
         AiCompletionResponse aiCompletionResponse =
-            aiAdvisorService.getAiCompletion(params, note, "gpt-4");
+            aiAdvisorService.getAiCompletion(params, note, "gpt-4", "asst_example_id");
         assertThat(aiCompletionResponse.getFinishReason(), equalTo("question"));
         assertThat(aiCompletionResponse.getClarifyingHistory(), hasSize(1));
       }
