@@ -26,6 +26,11 @@ public record OpenAIChatCompletionMock(OpenAiApi openAiApi) {
     Mockito.doReturn(Single.just(new Run()))
         .when(openAiApi)
         .createRun(ArgumentMatchers.any(), ArgumentMatchers.any());
+    Run retrievedRun = new Run();
+    retrievedRun.setStatus("completed");
+    Mockito.doReturn(Single.just(retrievedRun))
+        .when(openAiApi)
+        .retrieveRun(ArgumentMatchers.any(), ArgumentMatchers.any());
     Mockito.doReturn(Single.just(toBeReturned))
         .when(openAiApi)
         .createChatCompletion(ArgumentMatchers.argThat(request -> request.getFunctions() != null));

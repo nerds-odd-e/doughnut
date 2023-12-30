@@ -110,4 +110,25 @@ public class OpenAiApiHandler {
   public void createMessage(String threadId, MessageRequest messageRequest) {
     blockGet(openAiApi.createMessage(threadId, messageRequest));
   }
+
+  private Run retrieveRun(String threadId, String runId) {
+    return blockGet(openAiApi.retrieveRun(threadId, runId));
+  }
+
+  public Run blockRetrieveRun(String threadId, String assistantId) {
+    RunCreateRequest runCreateRequest = RunCreateRequest.builder().assistantId(assistantId).build();
+
+    Run run = createRun(threadId, runCreateRequest);
+
+    Run retrievedRun = retrieveRun(threadId, run.getId());
+    while (!(retrievedRun.getStatus().equals("completed"))
+        && !(retrievedRun.getStatus().equals("failed"))
+        && !(retrievedRun.getStatus().equals("requires_action"))) {
+      retrievedRun = retrieveRun(threadId, run.getId());
+    }
+    if (retrievedRun.getStatus().equals("failed")) {
+      throw new RuntimeException("OpenAI failed to complete the request");
+    }
+    return retrievedRun;
+  }
 }
