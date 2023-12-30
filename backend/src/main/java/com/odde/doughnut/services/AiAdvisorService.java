@@ -76,7 +76,7 @@ public class AiAdvisorService {
         AssistantRequest.builder()
             .model(modelName)
             .name("Note details completion")
-            .instructions("You are a personal Math Tutor.")
+            .instructions(OpenAIChatRequestBuilder.systemInstruction)
             .tools(tool.getTools())
             .build();
     return openAiApiHandler.createAssistant(assistantRequest);

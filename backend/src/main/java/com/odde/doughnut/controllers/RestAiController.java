@@ -7,11 +7,13 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.assistants.Assistant;
 import com.theokanning.openai.client.OpenAiApi;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Resource;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
@@ -23,15 +25,20 @@ public class RestAiController {
 
   private final AiAdvisorService aiAdvisorService;
   private final ModelFactoryService modelFactoryService;
-  private UserModel currentUser;
+  private final UserModel currentUser;
+
+  @Resource(name = "testabilitySettings")
+  private final TestabilitySettings testabilitySettings;
 
   public RestAiController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService,
-      UserModel currentUser) {
+      UserModel currentUser,
+      TestabilitySettings testabilitySettings) {
     this.aiAdvisorService = new AiAdvisorService(openAiApi);
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
+    this.testabilitySettings = testabilitySettings;
   }
 
   @PostMapping("/{note}/completion")
@@ -39,10 +46,6 @@ public class RestAiController {
       @PathVariable(name = "note") Note note, @RequestBody AiCompletionParams aiCompletionParams) {
     currentUser.assertLoggedIn();
     return aiAdvisorService.getAiCompletion(aiCompletionParams, note, getDefaultOpenAiChatModel());
-  }
-
-  private String getDefaultOpenAiChatModel() {
-    return new GlobalSettingsService(modelFactoryService).getGlobalSettingOthers().getValue();
   }
 
   @PostMapping("/chat")
@@ -73,7 +76,20 @@ public class RestAiController {
     Map<String, String> result = new HashMap<>();
     Assistant noteCompletionAssistant =
         aiAdvisorService.createNoteCompletionAssistant(getDefaultOpenAiChatModel());
-    result.put("note details completion", noteCompletionAssistant.getId());
+    String id = noteCompletionAssistant.getId();
+    getGlobalSettingsService()
+        .getNoteCompletionAssistantId()
+        .setKeyValue(testabilitySettings.getCurrentUTCTimestamp(), id);
+
+    result.put("note details completion", id);
     return result;
+  }
+
+  private String getDefaultOpenAiChatModel() {
+    return getGlobalSettingsService().getGlobalSettingOthers().getValue();
+  }
+
+  private GlobalSettingsService getGlobalSettingsService() {
+    return new GlobalSettingsService(modelFactoryService);
   }
 }

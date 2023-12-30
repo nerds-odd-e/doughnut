@@ -39,6 +39,7 @@ class AiAdvisorServiceCompletionAssistantTest {
       verify(openAiApi).createAssistant(captor.capture());
       AssistantRequest assistantRequest = captor.getValue();
       assertThat(assistantRequest.getName(), is("Note details completion"));
+      assertThat(assistantRequest.getInstructions(), containsString("PKM system"));
       assertThat(assistantRequest.getTools(), hasSize(2));
     }
   }

@@ -16,6 +16,7 @@ import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.OpenAiResponse;
 import com.theokanning.openai.assistants.Assistant;
 import com.theokanning.openai.client.OpenAiApi;
@@ -51,6 +52,7 @@ class RestAiControllerTest {
   Note note;
   @Mock OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
+  TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   AiCompletionParams params = new AiCompletionParams();
 
@@ -58,7 +60,9 @@ class RestAiControllerTest {
   void Setup() {
     currentUser = makeMe.aUser().toModelPlease();
     note = makeMe.aNote().please();
-    controller = new RestAiController(openAiApi, makeMe.modelFactoryService, currentUser);
+    controller =
+        new RestAiController(
+            openAiApi, makeMe.modelFactoryService, currentUser, testabilitySettings);
   }
 
   @Nested
@@ -79,7 +83,11 @@ class RestAiControllerTest {
       assertThrows(
           ResponseStatusException.class,
           () ->
-              new RestAiController(openAiApi, makeMe.modelFactoryService, makeMe.aNullUserModel())
+              new RestAiController(
+                      openAiApi,
+                      makeMe.modelFactoryService,
+                      makeMe.aNullUserModel(),
+                      testabilitySettings)
                   .getCompletion(note, params));
     }
 
@@ -140,7 +148,11 @@ class RestAiControllerTest {
       assertThrows(
           ResponseStatusException.class,
           () ->
-              new RestAiController(openAiApi, makeMe.modelFactoryService, makeMe.aNullUserModel())
+              new RestAiController(
+                      openAiApi,
+                      makeMe.modelFactoryService,
+                      makeMe.aNullUserModel(),
+                      testabilitySettings)
                   .generateImage("create an image"));
     }
 
@@ -189,24 +201,38 @@ class RestAiControllerTest {
   class recreateAllAssistants {
     @Test
     void authentication() {
-      controller =
-          new RestAiController(
-              openAiApi, makeMe.modelFactoryService, makeMe.aUser().toModelPlease());
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.recreateAllAssistants());
     }
 
-    @Test
-    void callingTheApi() throws UnexpectedNoAccessRightException {
-      controller =
-          new RestAiController(
-              openAiApi, makeMe.modelFactoryService, makeMe.anAdmin().toModelPlease());
-      Assistant assistantToReturn = new Assistant();
-      assistantToReturn.setId("1234");
-      when(openAiApi.createAssistant(ArgumentMatchers.any()))
-          .thenReturn(Single.just(assistantToReturn));
-      Map<String, String> result = controller.recreateAllAssistants();
-      assertThat(result.get("note details completion")).isEqualTo("1234");
+    @Nested
+    class asAdmin {
+      @BeforeEach
+      void setup() {
+        currentUser = makeMe.anAdmin().toModelPlease();
+        controller =
+            new RestAiController(
+                openAiApi, makeMe.modelFactoryService, currentUser, testabilitySettings);
+        Assistant assistantToReturn = new Assistant();
+        assistantToReturn.setId("1234");
+        when(openAiApi.createAssistant(ArgumentMatchers.any()))
+            .thenReturn(Single.just(assistantToReturn));
+      }
+
+      @Test
+      void callingTheApi() throws UnexpectedNoAccessRightException {
+        Map<String, String> result = controller.recreateAllAssistants();
+        assertThat(result.get("note details completion")).isEqualTo("1234");
+      }
+
+      @Test
+      void resultMustBePersisted() throws UnexpectedNoAccessRightException {
+        controller.recreateAllAssistants();
+        GlobalSettingsService globalSettingsService =
+            new GlobalSettingsService(makeMe.modelFactoryService);
+        assertThat(globalSettingsService.getNoteCompletionAssistantId().getValue())
+            .isEqualTo("1234");
+      }
     }
   }
 

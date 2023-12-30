@@ -9,6 +9,8 @@ import java.util.List;
 
 public class OpenAIChatRequestBuilder {
   public static final String askClarificationQuestion = "ask_clarification_question";
+  public static final String systemInstruction =
+      "This is a PKM system using hierarchical notes, each with a topic and details, to capture atomic concepts.";
   public final List<ChatMessage> messages = new ArrayList<>();
   public final List<ChatFunction> functions = new ArrayList<>();
   ChatCompletionRequest.ChatCompletionRequestBuilder builder = ChatCompletionRequest.builder();
@@ -16,8 +18,7 @@ public class OpenAIChatRequestBuilder {
   public static OpenAIChatRequestBuilder chatAboutNoteRequestBuilder(String modelName, Note note) {
     return new OpenAIChatRequestBuilder()
         .model(modelName)
-        .addSystemMessage(
-            "This is a PKM system using hierarchical notes, each with a topic and details, to capture atomic concepts.")
+        .addSystemMessage(systemInstruction)
         .addSystemMessage(note.getNoteDescription());
   }
 

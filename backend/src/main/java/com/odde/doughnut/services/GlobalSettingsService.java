@@ -13,19 +13,23 @@ public class GlobalSettingsService {
     this.modelFactoryService = modelFactoryService;
   }
 
-  public GlobalSettingsModel getGlobalSettingQuestionGeneration() {
-    return new GlobalSettingsModel("question_generation_model", modelFactoryService);
+  public GlobalSettingsKeyValue getGlobalSettingQuestionGeneration() {
+    return new GlobalSettingsKeyValue("question_generation_model", modelFactoryService);
   }
 
-  public GlobalSettingsModel getGlobalSettingEvaluation() {
-    return new GlobalSettingsModel("evaluation_model", modelFactoryService);
+  public GlobalSettingsKeyValue getGlobalSettingEvaluation() {
+    return new GlobalSettingsKeyValue("evaluation_model", modelFactoryService);
   }
 
-  public GlobalSettingsModel getGlobalSettingOthers() {
-    return new GlobalSettingsModel("others_model", modelFactoryService);
+  public GlobalSettingsKeyValue getGlobalSettingOthers() {
+    return new GlobalSettingsKeyValue("others_model", modelFactoryService);
   }
 
-  public record GlobalSettingsModel(String keyName, ModelFactoryService modelFactoryService) {
+  public GlobalSettingsKeyValue getNoteCompletionAssistantId() {
+    return new GlobalSettingsKeyValue("note_completion_assistant", modelFactoryService);
+  }
+
+  public record GlobalSettingsKeyValue(String keyName, ModelFactoryService modelFactoryService) {
     public String getValue() {
       return getGlobalSettings().getValue();
     }

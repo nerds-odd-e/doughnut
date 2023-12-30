@@ -91,7 +91,7 @@ class RestGlobalSettingsControllerTest {
     @Test
     void setValues() throws UnexpectedNoAccessRightException {
       controller.setCurrentModelVersions(settings);
-      GlobalSettingsService.GlobalSettingsModel globalSettingQuestionQuestion =
+      GlobalSettingsService.GlobalSettingsKeyValue globalSettingQuestionQuestion =
           globalSettingsService.getGlobalSettingQuestionGeneration();
       assertEquals("gpt-3.5", globalSettingQuestionQuestion.getValue());
       assertEquals(currentTime, globalSettingQuestionQuestion.getCreatedAt());
