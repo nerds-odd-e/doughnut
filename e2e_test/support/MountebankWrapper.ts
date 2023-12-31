@@ -43,11 +43,15 @@ class MountebankWrapper {
       throw new Error(`Problem creating imposter: ${JSON.stringify(response?.error)}`)
   }
 
-  public stubWithPredicates(predicates: Predicate[], response: unknown): Promise<void> {
+  public stubWithPredicates(
+    predicates: Predicate[],
+    response: unknown,
+    stubIndex?: number,
+  ): Promise<void> {
     const stub = new Stub()
     predicates.forEach((predicate) => stub.withPredicate(predicate))
     stub.withResponse(new Response().withStatusCode(200).withJSONBody(response))
-    return this.addStubToImposter(stub)
+    return this.addStubToImposter(stub, stubIndex)
   }
 
   public stubWithErrorResponse(
@@ -68,10 +72,10 @@ class MountebankWrapper {
     )
   }
 
-  private async addStubToImposter(stub: Stub): Promise<void> {
+  private async addStubToImposter(stub: Stub, index?: number): Promise<void> {
     const response = await request
       .post(`${this.mountebank.mountebankUrl}/imposters/${this.port}/stubs`)
-      .send(JSON.stringify({ stub }))
+      .send(JSON.stringify({ index, stub }))
 
     if (response.statusCode != 200)
       throw new Error(`Problem adding stub to imposter: ${JSON.stringify(response?.error)}`)
