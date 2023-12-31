@@ -16,12 +16,12 @@ Feature: Note details completion
 
   Scenario: Completing Note Details Using OpenAI
     Given OpenAI service can create thread and run with id "thread-111" when requested
-    And OpenAI will complete the phrase "It is a" with " vigorous city."
+    And OpenAI will complete the phrase "It is a" with " vigorous city." in thread "thread-111"
     When I request to complete the details for the note "Taipei"
     Then the note details on the current page should be "It is a vigorous city."
 
   Scenario: Context-Aware Completion of Note Details by OpenAI
     Given OpenAI service can create thread and run with id "thread-111" when requested
-    And OpenAI will complete with "It rains a lot." for context containing "Taiwan › Taipei"
+    And OpenAI will complete with "It rains a lot." for context containing "Taiwan › Taipei" in thread "thread-111"
     When I request to complete the details for the note "Weather"
     Then the note details on the current page should be "It rains a lot."

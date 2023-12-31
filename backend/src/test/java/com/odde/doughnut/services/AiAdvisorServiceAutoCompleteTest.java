@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import static com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder.askClarificationQuestion;
 import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -166,7 +167,7 @@ class AiAdvisorServiceAutoCompleteTest {
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
           new ClarifyingQuestion(
               "Are you referring to American football or association football (soccer) ?"),
-          "ask_clarification_question");
+          askClarificationQuestion);
       AiCompletionResponse aiCompletionResponse =
           aiAdvisorService.getAiCompletion(params, note, "gpt-4", "asst_example_id");
       assertEquals("question", aiCompletionResponse.getFinishReason());
