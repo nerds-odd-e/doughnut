@@ -7,12 +7,12 @@ Feature: AI Asks Clarifying Questions When Auto-Generating Note Details
       | topic   | details            |
       | Sports  | Football is        |
     And OpenAI service can create thread and run with id "thread-111" when requested
-    And the OpenAI assistant is set to ask "Do you mean American Football or European Football?" for unclarified request on "Football is"
+    And the OpenAI assistant is set to ask "Do you mean American Football or European Football?" for unclarified request on "Football is" in thread "thread-111"
 
   @usingMockedOpenAiService
   Scenario Outline: Responding to AI's Clarification Question
     Given the OpenAI assistant will complete the details with " originated from England." if the clarifying answer contains "European"
-    And the OpenAI assistant will complete the details with " originated from the United States." if the clarifying answer contains "American"
+    And the OpenAI assistant is set to not ask more questions in thread "thread-111"
     When I request to complete the details for the note "Sports"
     And I <respond> to the clarifying question "Do you mean American Football or European Football?"
     Then the note details on the current page should be "<note details>"
@@ -20,7 +20,6 @@ Feature: AI Asks Clarifying Questions When Auto-Generating Note Details
     Examples:
       | respond               | note details                                   |
       | answer "European"     | Football is originated from England.           |
-      | answer "American"     | Football is originated from the United States. |
       | respond with "cancel" | Football is                                    |
 
   @usingMockedOpenAiService

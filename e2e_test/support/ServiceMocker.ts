@@ -76,6 +76,9 @@ class ServiceMocker {
     return this.mountebank.stubWithErrorResponse(pathMatcher, HttpMethod.POST, 500, response)
   }
 
+  public deleteStub(stubId: number) {
+    return this.mountebank.deleteStub(stubId)
+  }
   private mockWithPredicates(
     predicates: Predicate[],
     response: unknown,

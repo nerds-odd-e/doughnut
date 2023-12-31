@@ -1,5 +1,7 @@
 package com.odde.doughnut.testability;
 
+import static com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder.askClarificationQuestion;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theokanning.openai.client.OpenAiApi;
@@ -19,15 +21,17 @@ public record OpenAIChatCompletionMock(OpenAiApi openAiApi) {
       JsonNode arguments, String functionName) {
     MakeMeWithoutDB makeMe = MakeMe.makeMeWithoutFactoryService();
     mockChatCompletion(
+        functionName,
         makeMe.openAiCompletionResult().functionCall(functionName, arguments).please());
   }
 
-  void mockChatCompletion(ChatCompletionResult toBeReturned) {
+  private void mockChatCompletion(String functionName, ChatCompletionResult toBeReturned) {
     Mockito.doReturn(Single.just(new Run()))
         .when(openAiApi)
         .createRun(ArgumentMatchers.any(), ArgumentMatchers.any());
     Run retrievedRun = new Run();
-    retrievedRun.setStatus("completed");
+    retrievedRun.setStatus(
+        functionName != askClarificationQuestion ? "completed" : "requires_action");
     Mockito.doReturn(Single.just(retrievedRun))
         .when(openAiApi)
         .retrieveRun(ArgumentMatchers.any(), ArgumentMatchers.any());

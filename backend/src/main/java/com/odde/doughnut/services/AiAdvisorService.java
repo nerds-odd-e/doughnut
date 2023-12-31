@@ -22,6 +22,7 @@ import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatFunctionCall;
 import com.theokanning.openai.messages.MessageRequest;
+import com.theokanning.openai.runs.Run;
 import com.theokanning.openai.threads.Thread;
 import com.theokanning.openai.threads.ThreadRequest;
 import java.io.IOException;
@@ -76,7 +77,7 @@ public class AiAdvisorService {
       AiCompletionParams aiCompletionParams,
       Note note,
       String modelName) {
-    openAiApiHandler.blockGetRun(threadId, assistantId);
+    Run run = openAiApiHandler.blockGetRun(threadId, assistantId);
 
     AiToolList tool =
         AiToolFactory.getNoteContentCompletionTools(aiCompletionParams.getCompletionPrompt());
@@ -90,8 +91,7 @@ public class AiAdvisorService {
 
     ChatFunctionCall chatFunctionCall =
         openAiApiHandler.getFunctionCall(chatCompletionRequest).orElseThrow();
-    boolean isClarifyingQuestion =
-        chatFunctionCall.getName().equals(OpenAIChatRequestBuilder.askClarificationQuestion);
+    boolean isClarifyingQuestion = run.getStatus().equals("requires_action");
     AiCompletionResponse completionResponseForClarification;
     if (isClarifyingQuestion) {
       completionResponseForClarification =

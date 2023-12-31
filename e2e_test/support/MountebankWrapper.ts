@@ -43,6 +43,10 @@ class MountebankWrapper {
       throw new Error(`Problem creating imposter: ${JSON.stringify(response?.error)}`)
   }
 
+  deleteStub(stubId: number) {
+    return request.delete(`${this.mountebank.mountebankUrl}/imposters/${this.port}/stubs/${stubId}`)
+  }
+
   public stubWithPredicates(
     predicates: Predicate[],
     response: unknown,
