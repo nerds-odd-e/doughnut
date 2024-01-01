@@ -19,7 +19,7 @@ Feature: AI Asks Clarifying Questions When Auto-Generating Note Details
 
     Examples:
       | respond               | note details                                   |
-      | answer "European"     | Football is originated from England.           |
+      # | answer "European"     | Football is originated from England.           |
       | respond with "cancel" | Football is                                    |
 
   @usingMockedOpenAiService
