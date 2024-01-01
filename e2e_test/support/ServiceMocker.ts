@@ -34,11 +34,10 @@ class ServiceMocker {
     return this.stubGetter(url, {}, data)
   }
 
-  public stubGetter(path: string, queryData: unknown, response: unknown, stubIndex?: number) {
+  public stubGetter(path: string, queryData: unknown, response: unknown) {
     return this.mockWithPredicates(
       [new FlexiPredicate().withPath(path).withMethod(HttpMethod.GET).withQuery(queryData)],
       response,
-      stubIndex,
     )
   }
 
@@ -76,12 +75,8 @@ class ServiceMocker {
     return this.mountebank.stubWithErrorResponse(pathMatcher, HttpMethod.POST, 500, response)
   }
 
-  private mockWithPredicates(
-    predicates: Predicate[],
-    response: unknown,
-    stubIndex?: number,
-  ): Promise<void> {
-    return this.mountebank.stubWithPredicates(predicates, response, stubIndex)
+  private mockWithPredicates(predicates: Predicate[], response: unknown): Promise<void> {
+    return this.mountebank.stubWithPredicates(predicates, response)
   }
 }
 
