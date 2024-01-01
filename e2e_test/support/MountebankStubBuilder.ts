@@ -11,10 +11,12 @@ import {
 // @ts-check
 
 class MountebankStubBuilder {
-  public stubWithPredicates(predicates: Predicate[], response: unknown): Stub {
+  public stubWithPredicates(predicates: Predicate[], responses: unknown[]): Stub {
     const stub = new Stub()
     predicates.forEach((predicate) => stub.withPredicate(predicate))
-    stub.withResponse(new Response().withStatusCode(200).withJSONBody(response))
+    responses.forEach((response) =>
+      stub.withResponse(new Response().withStatusCode(200).withJSONBody(response)),
+    )
     return stub
   }
 
