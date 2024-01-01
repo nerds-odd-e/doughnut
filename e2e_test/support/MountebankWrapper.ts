@@ -1,13 +1,4 @@
-import {
-  Predicate,
-  Response,
-  Stub,
-  Mountebank,
-  Imposter,
-  HttpMethod,
-  FlexiPredicate,
-  Operator,
-} from "@anev/ts-mountebank"
+import { Stub, Mountebank, Imposter } from "@anev/ts-mountebank"
 /// <reference types="cypress" />
 
 import request from "superagent"
@@ -41,29 +32,6 @@ class MountebankWrapper {
 
     if (response.statusCode != 201)
       throw new Error(`Problem creating imposter: ${JSON.stringify(response?.error)}`)
-  }
-
-  public stubWithPredicates(predicates: Predicate[], response: unknown): Stub {
-    const stub = new Stub()
-    predicates.forEach((predicate) => stub.withPredicate(predicate))
-    stub.withResponse(new Response().withStatusCode(200).withJSONBody(response))
-    return stub
-  }
-
-  public stubWithErrorResponse(
-    pathMatcher: string,
-    method: HttpMethod,
-    status: number,
-    response: unknown,
-  ) {
-    return new Stub()
-      .withPredicate(
-        new FlexiPredicate()
-          .withOperator(Operator.matches)
-          .withPath(pathMatcher)
-          .withMethod(method),
-      )
-      .withResponse(new Response().withStatusCode(status).withJSONBody(response))
   }
 
   public async addStubToImposter(stub: Stub): Promise<void> {

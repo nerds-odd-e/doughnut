@@ -8,13 +8,16 @@ import {
 } from "@anev/ts-mountebank"
 import MountebankWrapper from "./MountebankWrapper"
 import { NotPredicate } from "./NotPredicate"
+import MountebankStubBuilder from "./MountebankStubBuilder"
 
 class ServiceMocker {
   private readonly mountebank: MountebankWrapper
+  private readonly mountebankStubBuilder: MountebankStubBuilder
   readonly serviceName: string
 
   constructor(serviceName: string, port: number) {
     this.mountebank = new MountebankWrapper(port)
+    this.mountebankStubBuilder = new MountebankStubBuilder()
     this.serviceName = serviceName
   }
 
@@ -64,22 +67,37 @@ class ServiceMocker {
   }
 
   public stubPosterUnauthorized(pathMatcher: string, response: unknown) {
-    const stub = this.mountebank.stubWithErrorResponse(pathMatcher, HttpMethod.POST, 401, response)
+    const stub = this.mountebankStubBuilder.stubWithErrorResponse(
+      pathMatcher,
+      HttpMethod.POST,
+      401,
+      response,
+    )
     return this.mountebank.addStubToImposter(stub)
   }
 
   public stubGetterWithError500Response(pathMatcher: string, response: unknown) {
-    const stub = this.mountebank.stubWithErrorResponse(pathMatcher, HttpMethod.GET, 500, response)
+    const stub = this.mountebankStubBuilder.stubWithErrorResponse(
+      pathMatcher,
+      HttpMethod.GET,
+      500,
+      response,
+    )
     return this.mountebank.addStubToImposter(stub)
   }
 
   public stubPosterWithError500Response(pathMatcher: string, response: unknown) {
-    const stub = this.mountebank.stubWithErrorResponse(pathMatcher, HttpMethod.POST, 500, response)
+    const stub = this.mountebankStubBuilder.stubWithErrorResponse(
+      pathMatcher,
+      HttpMethod.POST,
+      500,
+      response,
+    )
     return this.mountebank.addStubToImposter(stub)
   }
 
   private mockWithPredicates(predicates: Predicate[], response: unknown): Promise<void> {
-    const stub = this.mountebank.stubWithPredicates(predicates, response)
+    const stub = this.mountebankStubBuilder.stubWithPredicates(predicates, response)
     return this.mountebank.addStubToImposter(stub)
   }
 }
