@@ -68,10 +68,10 @@ class MountebankWrapper {
     )
   }
 
-  private async addStubToImposter(stub: Stub, index?: number): Promise<void> {
+  public async addStubToImposter(stub: Stub): Promise<void> {
     const response = await request
       .post(`${this.mountebank.mountebankUrl}/imposters/${this.port}/stubs`)
-      .send(JSON.stringify({ index, stub }))
+      .send(JSON.stringify({ stub }))
 
     if (response.statusCode != 200)
       throw new Error(`Problem adding stub to imposter: ${JSON.stringify(response?.error)}`)
