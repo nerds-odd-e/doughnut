@@ -31,7 +31,7 @@ class ServiceMocker {
   }
 
   install() {
-    cy.wrap({}).as(this.stubsName)
+    cy.wrap([]).as(this.stubsName)
     return this.mountebank.createImposter()
   }
 
@@ -108,8 +108,10 @@ class ServiceMocker {
   }
 
   private async addStubToMountebank(stub: Stub): Promise<void> {
-    cy.get(`@${this.stubsName}`).then((stubs)=>{
-      return this.mountebank.addStubToImposter(stub)
+    cy.get(`@${this.stubsName}`).then((stubs) => {
+      const newStubs = [...stubs, stub]
+      cy.wrap(newStubs).as(this.stubsName)
+      return this.mountebank.addStubsToImposter(newStubs)
     })
   }
 }
