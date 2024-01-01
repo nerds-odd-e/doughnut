@@ -21,7 +21,7 @@ const stubWikidataEntity = (serviceMocker: ServiceMocker, wikidataId: string, cl
 }
 
 const wikidataService = () => {
-  const serviceMocker = new ServiceMocker("wikidata", 5001)
+  const serviceMocker = new ServiceMocker("wikidata", 5002)
   return {
     mock() {
       testability().mockService(serviceMocker)
