@@ -16,7 +16,7 @@ class MountebankWrapper {
   public get serviceUrl(): string {
     return `http://localhost:${this.port}`
   }
-  public async tryDeleteImposter(): Promise<void> {
+  private async tryDeleteImposter(): Promise<void> {
     try {
       // just try to delete in case an imposter is there
       await this.mountebank.deleteImposter(this.port)
