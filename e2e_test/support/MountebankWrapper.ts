@@ -42,6 +42,16 @@ class MountebankWrapper {
     if (response.statusCode != 200)
       throw new Error(`Problem adding stub to imposter: ${JSON.stringify(response?.error)}`)
   }
+
+  public async addStubsToImposter(stubs: Stub[]): Promise<void> {
+    const response = await request
+      .put(`${this.mountebank.mountebankUrl}/imposters/${this.port}/stubs`)
+      .send(JSON.stringify({ stubs }))
+
+    if (response.statusCode != 200)
+      throw new Error(`Problem adding stubs to imposter: ${JSON.stringify(response?.error)}`)
+  }
+
 }
 
 export default MountebankWrapper
