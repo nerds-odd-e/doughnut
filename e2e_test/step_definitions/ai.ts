@@ -52,7 +52,7 @@ Given(
 Given(
   "OpenAI will complete with {string} for context containing {string} in thread {string}",
   (returnMessage: string, context: string, threadId) => {
-    mock_services.openAi().thread(threadId).singletonStubRetrieveRun("completed")
+    mock_services.openAi().thread(threadId).stubRetrieveRun("completed")
     mock_services
       .openAi()
       .chatCompletion()
@@ -67,7 +67,7 @@ Given(
 Given(
   "OpenAI will complete the phrase {string} with {string} in thread {string}",
   (incomplete: string, returnMessage: string, threadId: string) => {
-    mock_services.openAi().thread(threadId).singletonStubRetrieveRun("completed")
+    mock_services.openAi().thread(threadId).stubRetrieveRun("completed")
     mock_services
       .openAi()
       .chatCompletion()
@@ -112,7 +112,6 @@ Then("I contest the question", () => {
 Given(
   "the OpenAI assistant is set to ask {string} for unclarified request on {string} in thread {string}",
   (clarifyingQuestion: string, incompleteDetails: string, threadId: string) => {
-    mock_services.openAi().thread(threadId).singletonStubRetrieveRun("requires_action")
     mock_services
       .openAi()
       .chatCompletion()
@@ -128,12 +127,9 @@ Given(
   },
 )
 
-Given(
-  "the OpenAI assistant is set to not ask more questions in thread {string}",
-  (threadId: string) => {
-    mock_services.openAi().thread(threadId).singletonStubRetrieveRun("completed")
-  },
-)
+Given("the OpenAI assistant in thread {string} is set to:", (threadId: string, data: DataTable) => {
+  mock_services.openAi().thread(threadId).stubRetrieveRuns(data.hashes())
+})
 
 Given(
   "the OpenAI assistant will complete the details with {string} if the clarifying answer contains {string}",

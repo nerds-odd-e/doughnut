@@ -51,7 +51,6 @@ class MountebankWrapper {
     if (response.statusCode != 200)
       throw new Error(`Problem adding stubs to imposter: ${JSON.stringify(response?.error)}`)
   }
-
 }
 
 export default MountebankWrapper

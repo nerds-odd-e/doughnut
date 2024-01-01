@@ -90,7 +90,8 @@ const openAiService = () => {
             id: "run-abc123",
           })
         },
-        async singletonStubRetrieveRun(status: string) {
+
+        async stubRetrieveRun(status: string) {
           return await serviceMocker.stubGetter(
             `/v1/threads/${threadId}/runs/run-abc123`,
             {},
@@ -98,6 +99,31 @@ const openAiService = () => {
               id: "run-abc123",
               status,
             },
+          )
+        },
+
+        async stubRetrieveRuns(hashes: Record<string, string>[]) {
+          const responses = hashes.map((hash) => {
+            switch (hash["response"]) {
+              case "ask":
+                return {
+                  id: "run-abc123",
+                  status: "requires_action",
+                }
+              case "complete":
+                return {
+                  id: "run-abc123",
+                  status: "completed",
+                }
+              default:
+                throw new Error(`Unknown response: ${hash["response"]}`)
+            }
+          })
+
+          return await serviceMocker.stubGetterWithMutipleResponses(
+            `/v1/threads/${threadId}/runs/run-abc123`,
+            {},
+            responses,
           )
         },
       }

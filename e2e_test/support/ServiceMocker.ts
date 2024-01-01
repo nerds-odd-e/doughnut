@@ -46,12 +46,19 @@ class ServiceMocker {
   public stubGetter(path: string, queryData: unknown, response: unknown) {
     return this.mockWithPredicates(
       [new FlexiPredicate().withPath(path).withMethod(HttpMethod.GET).withQuery(queryData)],
-      response,
+      [response],
+    )
+  }
+
+  public stubGetterWithMutipleResponses(path: string, queryData: unknown, responses: unknown[]) {
+    return this.mockWithPredicates(
+      [new FlexiPredicate().withPath(path).withMethod(HttpMethod.GET).withQuery(queryData)],
+      responses,
     )
   }
 
   public stubPoster(path: string, response: unknown) {
-    return this.mockWithPredicates([new DefaultPredicate(path, HttpMethod.POST)], response)
+    return this.mockWithPredicates([new DefaultPredicate(path, HttpMethod.POST)], [response])
   }
 
   public mockMatchsAndNotMatches(
@@ -69,7 +76,7 @@ class ServiceMocker {
       .withPath(path)
       .withMethod(HttpMethod.POST)
       .withBody(bodyToMatch)
-    return this.mockWithPredicates([predicate, ...nots], response)
+    return this.mockWithPredicates([predicate, ...nots], [response])
   }
 
   public stubPosterUnauthorized(pathMatcher: string, response: unknown) {
@@ -102,8 +109,8 @@ class ServiceMocker {
     return this.addStubToMountebank(stub)
   }
 
-  private mockWithPredicates(predicates: Predicate[], response: unknown): Promise<void> {
-    const stub = this.mountebankStubBuilder.stubWithPredicates(predicates, response)
+  private mockWithPredicates(predicates: Predicate[], responses: unknown[]): Promise<void> {
+    const stub = this.mountebankStubBuilder.stubWithPredicates(predicates, responses)
     return this.addStubToMountebank(stub)
   }
 
