@@ -5,6 +5,7 @@ import {
   HttpMethod,
   Predicate,
   Operator,
+  Stub,
 } from "@anev/ts-mountebank"
 import MountebankWrapper from "./MountebankWrapper"
 import { NotPredicate } from "./NotPredicate"
@@ -25,7 +26,12 @@ class ServiceMocker {
     return `saved${this.serviceName}Url`
   }
 
+  private get stubsName() {
+    return `${this.serviceName}Stubs`
+  }
+
   install() {
+    cy.wrap({}).as(this.stubsName)
     return this.mountebank.createImposter()
   }
 
@@ -73,7 +79,7 @@ class ServiceMocker {
       401,
       response,
     )
-    return this.mountebank.addStubToImposter(stub)
+    return this.addStubToMountebank(stub)
   }
 
   public stubGetterWithError500Response(pathMatcher: string, response: unknown) {
@@ -83,7 +89,7 @@ class ServiceMocker {
       500,
       response,
     )
-    return this.mountebank.addStubToImposter(stub)
+    return this.addStubToMountebank(stub)
   }
 
   public stubPosterWithError500Response(pathMatcher: string, response: unknown) {
@@ -93,12 +99,18 @@ class ServiceMocker {
       500,
       response,
     )
-    return this.mountebank.addStubToImposter(stub)
+    return this.addStubToMountebank(stub)
   }
 
   private mockWithPredicates(predicates: Predicate[], response: unknown): Promise<void> {
     const stub = this.mountebankStubBuilder.stubWithPredicates(predicates, response)
-    return this.mountebank.addStubToImposter(stub)
+    return this.addStubToMountebank(stub)
+  }
+
+  private async addStubToMountebank(stub: Stub): Promise<void> {
+    cy.get(`@${this.stubsName}`).then((stubs)=>{
+      return this.mountebank.addStubToImposter(stub)
+    })
   }
 }
 
