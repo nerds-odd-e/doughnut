@@ -64,19 +64,23 @@ class ServiceMocker {
   }
 
   public stubPosterUnauthorized(pathMatcher: string, response: unknown) {
-    return this.mountebank.stubWithErrorResponse(pathMatcher, HttpMethod.POST, 401, response)
+    const stub = this.mountebank.stubWithErrorResponse(pathMatcher, HttpMethod.POST, 401, response)
+    return this.mountebank.addStubToImposter(stub)
   }
 
   public stubGetterWithError500Response(pathMatcher: string, response: unknown) {
-    return this.mountebank.stubWithErrorResponse(pathMatcher, HttpMethod.GET, 500, response)
+    const stub = this.mountebank.stubWithErrorResponse(pathMatcher, HttpMethod.GET, 500, response)
+    return this.mountebank.addStubToImposter(stub)
   }
 
   public stubPosterWithError500Response(pathMatcher: string, response: unknown) {
-    return this.mountebank.stubWithErrorResponse(pathMatcher, HttpMethod.POST, 500, response)
+    const stub = this.mountebank.stubWithErrorResponse(pathMatcher, HttpMethod.POST, 500, response)
+    return this.mountebank.addStubToImposter(stub)
   }
 
   private mockWithPredicates(predicates: Predicate[], response: unknown): Promise<void> {
-    return this.mountebank.stubWithPredicates(predicates, response)
+    const stub = this.mountebank.stubWithPredicates(predicates, response)
+    return this.mountebank.addStubToImposter(stub)
   }
 }
 
