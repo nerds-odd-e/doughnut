@@ -34,13 +34,8 @@ class MountebankWrapper {
       throw new Error(`Problem creating imposter: ${JSON.stringify(response?.error)}`)
   }
 
-  public async addStubToImposter(stub: Stub): Promise<void> {
-    const response = await request
-      .post(`${this.mountebank.mountebankUrl}/imposters/${this.port}/stubs`)
-      .send(JSON.stringify({ stub }))
-
-    if (response.statusCode != 200)
-      throw new Error(`Problem adding stub to imposter: ${JSON.stringify(response?.error)}`)
+  deleteStub(stubId: number) {
+    return request.delete(`${this.mountebank.mountebankUrl}/imposters/${this.port}/stubs/${stubId}`)
   }
 
   public async addStubsToImposter(stubs: Stub[]): Promise<void> {

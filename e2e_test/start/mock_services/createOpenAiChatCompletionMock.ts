@@ -70,9 +70,6 @@ const openAiChatCompletionStubber = (
     stubNoteDetailsCompletion(argumentsString: string) {
       return stubFunctionCall("note_details_completion", argumentsString)
     },
-    stubAskClarificationQuestion(argumentsString: string) {
-      return stubFunctionCall("ask_clarification_question", argumentsString)
-    },
     stubQuestionGeneration(argumentsString: string) {
       return stubFunctionCall("ask_single_answer_multiple_choice_question", argumentsString)
     },

@@ -52,7 +52,7 @@ Given(
 Given(
   "OpenAI will complete with {string} for context containing {string} in thread {string}",
   (returnMessage: string, context: string, threadId) => {
-    mock_services.openAi().thread(threadId).stubRetrieveRun("completed")
+    mock_services.openAi().thread(threadId).singletonStubRetrieveRun().completed()
     mock_services
       .openAi()
       .chatCompletion()
@@ -67,7 +67,7 @@ Given(
 Given(
   "OpenAI will complete the phrase {string} with {string} in thread {string}",
   (incomplete: string, returnMessage: string, threadId: string) => {
-    mock_services.openAi().thread(threadId).stubRetrieveRun("completed")
+    mock_services.openAi().thread(threadId).singletonStubRetrieveRun().completed()
     mock_services
       .openAi()
       .chatCompletion()
@@ -109,24 +109,6 @@ Then("I contest the question", () => {
   cy.findByRole("button", { name: "Doesn't make sense?" }).click()
 })
 
-Given(
-  "the OpenAI assistant is set to ask {string} for unclarified request on {string} in thread {string}",
-  (clarifyingQuestion: string, incompleteDetails: string, threadId: string) => {
-    mock_services
-      .openAi()
-      .chatCompletion()
-      .requestMessageMatches({
-        role: "user",
-        content: incompleteDetails,
-      })
-      .requestDoesNotMessageMatch({
-        role: "function",
-        name: "ask_clarification_question",
-      })
-      .stubAskClarificationQuestion(clarifyingQuestion)
-  },
-)
-
 Given("the OpenAI assistant in thread {string} is set to:", (threadId: string, data: DataTable) => {
   mock_services.openAi().thread(threadId).stubRetrieveRuns(data.hashes())
 })
@@ -143,21 +125,6 @@ Given(
         content: userAnswer,
       })
       .stubNoteDetailsCompletion(details)
-  },
-)
-
-Given(
-  "the OpenAI assistant will ask {string} following an unclear response like {string}",
-  (furtherQuestion: string, previousAnswer: string) => {
-    mock_services
-      .openAi()
-      .chatCompletion()
-      .requestMessageMatches({
-        role: "function",
-        name: "ask_clarification_question",
-        content: previousAnswer,
-      })
-      .stubAskClarificationQuestion(furtherQuestion)
   },
 )
 

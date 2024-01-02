@@ -6,8 +6,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
-import com.theokanning.openai.runs.Run;
+import com.theokanning.openai.runs.*;
 import io.reactivex.Single;
+import java.util.List;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
@@ -30,13 +31,38 @@ public record OpenAIChatCompletionMock(OpenAiApi openAiApi) {
         .when(openAiApi)
         .createRun(ArgumentMatchers.any(), ArgumentMatchers.any());
     Run retrievedRun = new Run();
-    retrievedRun.setStatus(
-        functionName != askClarificationQuestion ? "completed" : "requires_action");
+    if (functionName == askClarificationQuestion) {
+      retrievedRun.setStatus("requires_action");
+      retrievedRun.setRequiredAction(
+          RequiredAction.builder()
+              .submitToolOutputs(
+                  SubmitToolOutputs.builder()
+                      .toolCalls(
+                          List.of(
+                              ToolCall.builder()
+                                  .function(
+                                      ToolCallFunction.builder()
+                                          .arguments(
+                                              toBeReturned
+                                                  .getChoices()
+                                                  .get(0)
+                                                  .getMessage()
+                                                  .getFunctionCall()
+                                                  .getArguments()
+                                                  .toString())
+                                          .build())
+                                  .build()))
+                      .build())
+              .build());
+    } else {
+      Mockito.doReturn(Single.just(toBeReturned))
+          .when(openAiApi)
+          .createChatCompletion(
+              ArgumentMatchers.argThat(request -> request.getFunctions() != null));
+      retrievedRun.setStatus("completed");
+    }
     Mockito.doReturn(Single.just(retrievedRun))
         .when(openAiApi)
         .retrieveRun(ArgumentMatchers.any(), ArgumentMatchers.any());
-    Mockito.doReturn(Single.just(toBeReturned))
-        .when(openAiApi)
-        .createChatCompletion(ArgumentMatchers.argThat(request -> request.getFunctions() != null));
   }
 }

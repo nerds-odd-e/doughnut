@@ -22,6 +22,7 @@ import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatFunctionCall;
 import com.theokanning.openai.messages.MessageRequest;
+import com.theokanning.openai.runs.RequiredAction;
 import com.theokanning.openai.runs.Run;
 import com.theokanning.openai.threads.Thread;
 import com.theokanning.openai.threads.ThreadRequest;
@@ -89,15 +90,32 @@ public class AiAdvisorService {
             .maxTokens(150)
             .build();
 
-    ChatFunctionCall chatFunctionCall =
-        openAiApiHandler.getFunctionCall(chatCompletionRequest).orElseThrow();
     boolean isClarifyingQuestion = run.getStatus().equals("requires_action");
     AiCompletionResponse completionResponseForClarification;
     if (isClarifyingQuestion) {
-      completionResponseForClarification =
-          getCompletionResponseForClarification(
-              aiCompletionParams, chatFunctionCall.getArguments());
+      RequiredAction requiredAction = run.getRequiredAction();
+      String arguments =
+          requiredAction.getSubmitToolOutputs().getToolCalls().get(0).getFunction().getArguments();
+      JsonNode jsonNode = null;
+      try {
+        jsonNode = defaultObjectMapper().readTree(arguments);
+      } catch (JsonProcessingException e) {
+        throw new RuntimeException(e);
+      }
+      ClarifyingQuestion result1;
+      try {
+        result1 = defaultObjectMapper().treeToValue(jsonNode, ClarifyingQuestion.class);
+      } catch (JsonProcessingException e) {
+        throw new RuntimeException(e);
+      }
+      AiCompletionResponse result = new AiCompletionResponse();
+      result.setFinishReason("question");
+      result.setClarifyingQuestion(result1);
+      aiCompletionParams.getClarifyingQuestionAndAnswers().forEach(result::addClarifyingHistory);
+      completionResponseForClarification = result;
     } else {
+      ChatFunctionCall chatFunctionCall =
+          openAiApiHandler.getFunctionCall(chatCompletionRequest).orElseThrow();
       completionResponseForClarification =
           getAiCompletionResponse(aiCompletionParams, chatFunctionCall.getArguments());
     }
@@ -137,21 +155,6 @@ public class AiAdvisorService {
     String content = result1;
     result.setMoreCompleteContent(content);
     result.setFinishReason("stop");
-    return result;
-  }
-
-  private static AiCompletionResponse getCompletionResponseForClarification(
-      AiCompletionParams aiCompletionParams, JsonNode jsonNode) {
-    ClarifyingQuestion result1;
-    try {
-      result1 = defaultObjectMapper().treeToValue(jsonNode, ClarifyingQuestion.class);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
-    AiCompletionResponse result = new AiCompletionResponse();
-    result.setFinishReason("question");
-    result.setClarifyingQuestion(result1);
-    aiCompletionParams.getClarifyingQuestionAndAnswers().forEach(result::addClarifyingHistory);
     return result;
   }
 
