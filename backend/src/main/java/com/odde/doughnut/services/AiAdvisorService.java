@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import static com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder.askClarificationQuestion;
 import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,6 +25,7 @@ import com.theokanning.openai.completion.chat.ChatFunctionCall;
 import com.theokanning.openai.messages.MessageRequest;
 import com.theokanning.openai.runs.RequiredAction;
 import com.theokanning.openai.runs.Run;
+import com.theokanning.openai.runs.ToolCallFunction;
 import com.theokanning.openai.threads.Thread;
 import com.theokanning.openai.threads.ThreadRequest;
 import java.io.IOException;
@@ -94,25 +96,30 @@ public class AiAdvisorService {
     AiCompletionResponse completionResponseForClarification;
     if (isClarifyingQuestion) {
       RequiredAction requiredAction = run.getRequiredAction();
-      String arguments =
-          requiredAction.getSubmitToolOutputs().getToolCalls().get(0).getFunction().getArguments();
-      JsonNode jsonNode = null;
-      try {
-        jsonNode = defaultObjectMapper().readTree(arguments);
-      } catch (JsonProcessingException e) {
-        throw new RuntimeException(e);
+      ToolCallFunction function =
+          requiredAction.getSubmitToolOutputs().getToolCalls().get(0).getFunction();
+      if (function.getName().equals(askClarificationQuestion)) {
+        String arguments = function.getArguments();
+        JsonNode jsonNode = null;
+        try {
+          jsonNode = defaultObjectMapper().readTree(arguments);
+        } catch (JsonProcessingException e) {
+          throw new RuntimeException(e);
+        }
+        ClarifyingQuestion result1;
+        try {
+          result1 = defaultObjectMapper().treeToValue(jsonNode, ClarifyingQuestion.class);
+        } catch (JsonProcessingException e) {
+          throw new RuntimeException(e);
+        }
+        AiCompletionResponse result = new AiCompletionResponse();
+        result.setFinishReason("question");
+        result.setClarifyingQuestion(result1);
+        aiCompletionParams.getClarifyingQuestionAndAnswers().forEach(result::addClarifyingHistory);
+        completionResponseForClarification = result;
+      } else {
+        throw new RuntimeException("Unknown function name: " + function.getName());
       }
-      ClarifyingQuestion result1;
-      try {
-        result1 = defaultObjectMapper().treeToValue(jsonNode, ClarifyingQuestion.class);
-      } catch (JsonProcessingException e) {
-        throw new RuntimeException(e);
-      }
-      AiCompletionResponse result = new AiCompletionResponse();
-      result.setFinishReason("question");
-      result.setClarifyingQuestion(result1);
-      aiCompletionParams.getClarifyingQuestionAndAnswers().forEach(result::addClarifyingHistory);
-      completionResponseForClarification = result;
     } else {
       ChatFunctionCall chatFunctionCall =
           openAiApiHandler.getFunctionCall(chatCompletionRequest).orElseThrow();
