@@ -42,6 +42,7 @@ public record OpenAIChatCompletionMock(OpenAiApi openAiApi) {
                               ToolCall.builder()
                                   .function(
                                       ToolCallFunction.builder()
+                                          .name(askClarificationQuestion)
                                           .arguments(
                                               toBeReturned
                                                   .getChoices()

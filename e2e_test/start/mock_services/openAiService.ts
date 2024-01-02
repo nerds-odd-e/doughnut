@@ -127,7 +127,7 @@ const openAiService = () => {
                         {
                           type: "function",
                           function: {
-                            name: "",
+                            name: "ask_clarification_question",
                             arguments: JSON.stringify({
                               question: hash["arguments"],
                             }),
