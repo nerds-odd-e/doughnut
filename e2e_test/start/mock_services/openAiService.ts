@@ -90,16 +90,27 @@ const openAiService = () => {
             id: "run-abc123",
           })
         },
-
-        async stubRetrieveRun(status: string) {
-          return await serviceMocker.stubGetter(
-            `/v1/threads/${threadId}/runs/run-abc123`,
-            {},
-            {
-              id: "run-abc123",
-              status,
+        singletonStubRetrieveRun() {
+          const singletonIndex = undefined
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const stubRetrieveRun = async (status: string, partial: any) => {
+            const resp = await serviceMocker.stubGetter(
+              `/v1/threads/${threadId}/runs/run-abc123`,
+              {},
+              {
+                id: "run-abc123",
+                status,
+                ...partial,
+              },
+              singletonIndex,
+            )
+            return resp
+          }
+          return {
+            async completed() {
+              return stubRetrieveRun("completed", {})
             },
-          )
+          }
         },
 
         async stubRetrieveRuns(hashes: Record<string, string>[]) {
@@ -109,6 +120,22 @@ const openAiService = () => {
                 return {
                   id: "run-abc123",
                   status: "requires_action",
+                  required_action: {
+                    type: "submit_tool_outputs",
+                    submit_tool_outputs: {
+                      tool_calls: [
+                        {
+                          type: "function",
+                          function: {
+                            name: "",
+                            arguments: JSON.stringify({
+                              question: hash["arguments"],
+                            }),
+                          },
+                        },
+                      ],
+                    },
+                  },
                 }
               case "complete":
                 return {
