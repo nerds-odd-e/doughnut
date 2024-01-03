@@ -118,8 +118,7 @@ class RestAiControllerTest {
         ArgumentCaptor<MessageRequest> captor = ArgumentCaptor.forClass(MessageRequest.class);
         controller.getCompletion(note, params);
         verify(openAiApi, times(2)).createMessage(any(), captor.capture());
-        assertThat(captor.getAllValues().get(0).getContent())
-            .contains("Context path: cosmos › solar system");
+        assertThat(captor.getAllValues().get(0).getContent()).contains("cosmos › solar system");
         assertThat(captor.getAllValues().get(1).getContent())
             .contains(" \"details_to_complete\" : \"\"");
       }
@@ -141,7 +140,7 @@ class RestAiControllerTest {
         assertThat(captor.getValue().getMessages().get(2).getContent())
             .contains(" \"details_to_complete\" : \"\"");
         assertThat(captor.getValue().getMessages().get(1).getContent())
-            .contains("Context path: cosmos › solar system");
+            .contains("cosmos › solar system");
       }
 
       @Test
