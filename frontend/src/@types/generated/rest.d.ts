@@ -13,7 +13,7 @@ declare namespace Generated {
         threadId: string;
         finishReason: string;
         moreCompleteContent: string;
-        clarifyingQuestion: ClarifyingQuestion;
+        clarifyingQuestionRequiredAction: ClarifyingQuestionRequiredAction;
         clarifyingHistory: ClarifyingQuestionAndAnswer[];
     }
 
@@ -50,6 +50,11 @@ declare namespace Generated {
     interface ClarifyingQuestionAndAnswer {
         questionFromAI: ClarifyingQuestion;
         answerFromUser: string;
+    }
+
+    interface ClarifyingQuestionRequiredAction {
+        toolCallId: string;
+        clarifyingQuestion: ClarifyingQuestion;
     }
 
     interface CurrentUserInfo {

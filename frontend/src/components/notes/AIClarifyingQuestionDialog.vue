@@ -17,7 +17,10 @@
   <form @submit.prevent="handleFormSubmit">
     <h3>
       Clarification question by the AI:
-      <strong>{{ completionInProgress.clarifyingQuestion.question }}</strong>
+      <strong>{{
+        completionInProgress.clarifyingQuestionRequiredAction.clarifyingQuestion
+          .question
+      }}</strong>
     </h3>
     <TextInput
       scope-name="note"
@@ -50,7 +53,9 @@ export default defineComponent({
   methods: {
     handleFormSubmit() {
       this.$emit("submit", <Generated.ClarifyingQuestionAndAnswer>{
-        questionFromAI: this.completionInProgress.clarifyingQuestion,
+        questionFromAI:
+          this.completionInProgress.clarifyingQuestionRequiredAction
+            .clarifyingQuestion,
         answerFromUser: this.answerToAI,
       });
     },
