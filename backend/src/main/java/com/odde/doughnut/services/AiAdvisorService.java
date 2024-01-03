@@ -62,13 +62,14 @@ public class AiAdvisorService {
       ThreadRequest threadRequest = ThreadRequest.builder().build();
       Thread thread = openAiApiHandler.createThread(threadRequest);
       MessageRequest messageRequest =
-          MessageRequest.builder().content(note.getNoteDescription()).build();
+          MessageRequest.builder()
+              .content(
+                  note.getNoteDescription()
+                      + "------------\n"
+                      + aiCompletionParams.getCompletionPrompt())
+              .build();
 
       openAiApiHandler.createMessage(thread.getId(), messageRequest);
-      MessageRequest messageRequest1 =
-          MessageRequest.builder().content(aiCompletionParams.getCompletionPrompt()).build();
-
-      openAiApiHandler.createMessage(thread.getId(), messageRequest1);
       return thread.getId();
     }
     return threadId;
