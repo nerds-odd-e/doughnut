@@ -1,5 +1,6 @@
 package com.odde.doughnut.entities;
 
+import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -381,22 +382,22 @@ public class Note extends Thingy {
     return getNoteTitle().matches(spellingAnswer);
   }
 
-  @JsonIgnore
-  public String getNoteDescription() {
-    return """
-The note of current focus:
-Context path: %s
-Topic: %s
-%s"""
-        .formatted(getContextPathString(), getTopic(), getDetailsIfNotEmpty());
+  public static class NoteBrief {
+    public String contextPath;
+    public String topic;
+    public String details;
   }
 
   @JsonIgnore
-  private String getDetailsIfNotEmpty() {
-    String result = "";
-    if (!isDetailsBlankHtml()) {
-      result = "Details (until the end of this message):\n%s".formatted(getDetails());
-    }
-    return result;
+  public String getNoteDescription() {
+    NoteBrief noteBrief = new NoteBrief();
+    noteBrief.contextPath = getContextPathString();
+    noteBrief.topic = getTopic();
+    noteBrief.details = getDetails();
+    return """
+The note of current focus (in JSON format):
+%s
+"""
+        .formatted(defaultObjectMapper().valueToTree(noteBrief).toPrettyString());
   }
 }

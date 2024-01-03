@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 class OpenAIChatAboutNoteRequestBuilderBaseTest {
   MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
-  String DETAILS = "Details";
+  String DETAILS = "details";
 
   @Test
   void messageShouldContainTopic() {
@@ -26,13 +26,6 @@ class OpenAIChatAboutNoteRequestBuilderBaseTest {
     String content = getNoteOfFocusDescription(note);
     assertThat(content, containsString(DETAILS));
     assertThat(content, containsString(note.getDetails()));
-  }
-
-  @Test
-  void messageShouldNotContainDetailsIfEmpty() {
-    Note note = makeMe.aNote().withNoDescription().inMemoryPlease();
-    String content = getNoteOfFocusDescription(note);
-    assertThat(content, not(containsString(DETAILS)));
   }
 
   private static String getNoteOfFocusDescription(Note note) {
