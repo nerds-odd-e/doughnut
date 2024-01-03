@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.controllers.json.AiCompletionResponse;
+import com.odde.doughnut.controllers.json.ClarifyingQuestionRequiredAction;
 import com.odde.doughnut.controllers.json.QuizQuestionContestResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
@@ -25,6 +26,7 @@ import com.theokanning.openai.completion.chat.ChatFunctionCall;
 import com.theokanning.openai.messages.MessageRequest;
 import com.theokanning.openai.runs.RequiredAction;
 import com.theokanning.openai.runs.Run;
+import com.theokanning.openai.runs.ToolCall;
 import com.theokanning.openai.runs.ToolCallFunction;
 import com.theokanning.openai.threads.Thread;
 import com.theokanning.openai.threads.ThreadRequest;
@@ -97,8 +99,8 @@ public class AiAdvisorService {
     AiCompletionResponse completionResponseForClarification;
     if (isClarifyingQuestion) {
       RequiredAction requiredAction = run.getRequiredAction();
-      ToolCallFunction function =
-          requiredAction.getSubmitToolOutputs().getToolCalls().get(0).getFunction();
+      ToolCall toolCall = requiredAction.getSubmitToolOutputs().getToolCalls().get(0);
+      ToolCallFunction function = toolCall.getFunction();
       if (function.getName().equals(askClarificationQuestion)) {
         String arguments = function.getArguments();
         JsonNode jsonNode = null;
@@ -115,7 +117,11 @@ public class AiAdvisorService {
         }
         AiCompletionResponse result = new AiCompletionResponse();
         result.setFinishReason("question");
-        result.setClarifyingQuestion(result1);
+        ClarifyingQuestionRequiredAction cqra = new ClarifyingQuestionRequiredAction();
+        cqra.clarifyingQuestion = result1;
+        cqra.toolCallId = toolCall.getId();
+
+        result.setClarifyingQuestionRequiredAction(cqra);
         aiCompletionParams.getClarifyingQuestionAndAnswers().forEach(result::addClarifyingHistory);
         completionResponseForClarification = result;
       } else {

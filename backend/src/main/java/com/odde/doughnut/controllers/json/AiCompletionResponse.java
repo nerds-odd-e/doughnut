@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers.json;
 
-import com.odde.doughnut.services.ai.ClarifyingQuestion;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
@@ -12,7 +11,7 @@ public final class AiCompletionResponse {
   String threadId;
   String finishReason;
   String moreCompleteContent;
-  ClarifyingQuestion clarifyingQuestion;
+  ClarifyingQuestionRequiredAction clarifyingQuestionRequiredAction;
   List<ClarifyingQuestionAndAnswer> clarifyingHistory = new ArrayList<>();
 
   public void addClarifyingHistory(ClarifyingQuestionAndAnswer clarifyingQuestionAndAnswer) {

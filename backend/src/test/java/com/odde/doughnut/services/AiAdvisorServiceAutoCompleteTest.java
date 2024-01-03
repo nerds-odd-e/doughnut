@@ -172,8 +172,11 @@ class AiAdvisorServiceAutoCompleteTest {
           aiAdvisorService.getAiCompletion(params, note, "gpt-4", "asst_example_id");
       assertEquals("question", aiCompletionResponse.getFinishReason());
       assertEquals(
+          "mocked-tool-call-id",
+          aiCompletionResponse.getClarifyingQuestionRequiredAction().toolCallId);
+      assertEquals(
           "Are you referring to American football or association football (soccer) ?",
-          aiCompletionResponse.getClarifyingQuestion().question);
+          aiCompletionResponse.getClarifyingQuestionRequiredAction().clarifyingQuestion.question);
     }
 
     @Nested

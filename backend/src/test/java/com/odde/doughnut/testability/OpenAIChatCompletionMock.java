@@ -40,6 +40,7 @@ public record OpenAIChatCompletionMock(OpenAiApi openAiApi) {
                       .toolCalls(
                           List.of(
                               ToolCall.builder()
+                                  .id("mocked-tool-call-id")
                                   .function(
                                       ToolCallFunction.builder()
                                           .name(askClarificationQuestion)
