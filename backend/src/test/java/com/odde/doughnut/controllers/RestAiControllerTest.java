@@ -117,9 +117,9 @@ class RestAiControllerTest {
       void mustCreateMessageToRequestCompletion() {
         ArgumentCaptor<MessageRequest> captor = ArgumentCaptor.forClass(MessageRequest.class);
         controller.getCompletion(note, params);
-        verify(openAiApi, times(2)).createMessage(any(), captor.capture());
+        verify(openAiApi, times(1)).createMessage(any(), captor.capture());
         assertThat(captor.getAllValues().get(0).getContent()).contains("cosmos › solar system");
-        assertThat(captor.getAllValues().get(1).getContent())
+        assertThat(captor.getAllValues().get(0).getContent())
             .contains(" \"details_to_complete\" : \"\"");
       }
     }
