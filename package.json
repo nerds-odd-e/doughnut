@@ -48,8 +48,8 @@
     "@types/cypress-cucumber-preprocessor": "^4.0.5",
     "@types/node": "^20.10.6",
     "@types/testing-library__cypress": "^5.0.13",
-    "@typescript-eslint/eslint-plugin": "^6.16.0",
-    "@typescript-eslint/parser": "^6.16.0",
+    "@typescript-eslint/eslint-plugin": "^6.17.0",
+    "@typescript-eslint/parser": "^6.17.0",
     "cypress": "13.6.2",
     "cypress-file-upload": "^5.0.8",
     "esbuild": "^0.19.11",
@@ -67,7 +67,7 @@
     "npm-run-all": "^4.1.5",
     "prettier": "^3.1.1",
     "superagent": "^8.1.2",
-    "syncpack": "^12.2.0",
+    "syncpack": "^12.3.0",
     "typescript": "5.3.3"
   },
   "dependencies": {
