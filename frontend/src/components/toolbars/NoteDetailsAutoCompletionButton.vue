@@ -55,6 +55,7 @@ export default defineComponent({
       completionInProgress: undefined as
         | undefined
         | Generated.AiCompletionResponse,
+      clarifyingHistory: [] as Generated.ClarifyingQuestionAndAnswer[],
     };
   },
   methods: {
@@ -82,16 +83,13 @@ export default defineComponent({
     async clarifyingQuestionAndAnswered(
       clarifyingQuestionAndAnswer: Generated.ClarifyingQuestionAndAnswer,
     ) {
-      const clarifyingQuestionAndAnswers = [
-        ...(this.completionInProgress?.clarifyingHistory ?? []),
-        clarifyingQuestionAndAnswer,
-      ];
+      this.clarifyingHistory.push(clarifyingQuestionAndAnswer);
       this.completionInProgress = undefined;
       const response = await this.api.ai.answerCompletionClarifyingQuestion(
         this.note.id,
         {
           detailsToComplete: this.note.details,
-          clarifyingQuestionAndAnswers,
+          clarifyingQuestionAndAnswers: this.clarifyingHistory,
         },
       );
       await this.autoCompleteDetails(response);

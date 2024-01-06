@@ -3,6 +3,12 @@
 
 declare namespace Generated {
 
+    interface AiCompletionAnswerClarifyingQuestionParams {
+        threadId: string;
+        toolCallId: string;
+        answer: string;
+    }
+
     interface AiCompletionParams {
         threadId?: string;
         detailsToComplete: string;
