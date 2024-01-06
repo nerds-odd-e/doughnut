@@ -25,6 +25,7 @@ import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.messages.Message;
 import com.theokanning.openai.messages.MessageRequest;
 import com.theokanning.openai.model.Model;
+import com.theokanning.openai.runs.RunCreateRequest;
 import com.theokanning.openai.threads.Thread;
 import io.reactivex.Single;
 import java.util.ArrayList;
@@ -108,6 +109,18 @@ class RestAiControllerTest {
       }
 
       @Test
+      void useTheCorrectAssistant() {
+        new GlobalSettingsService(makeMe.modelFactoryService)
+            .getNoteCompletionAssistantId()
+            .setKeyValue(makeMe.aTimestamp().please(), "my-assistant-id");
+        controller.getCompletion(note, params);
+        ArgumentCaptor<RunCreateRequest> runRequest =
+            ArgumentCaptor.forClass(RunCreateRequest.class);
+        verify(openAiApi).createRun(any(), runRequest.capture());
+        assertEquals("my-assistant-id", runRequest.getValue().getAssistantId());
+      }
+
+      @Test
       void mustCreateANewThreadIfNoThreadIDGiven() {
         AiCompletionResponse aiCompletionResponse = controller.getCompletion(note, params);
         assertEquals("this-thread", aiCompletionResponse.getThreadId());
@@ -149,7 +162,6 @@ class RestAiControllerTest {
             .getGlobalSettingOthers()
             .setKeyValue(makeMe.aTimestamp().please(), "gpt-future");
         controller.answerCompletionClarifyingQuestion(note, params);
-
         verify(openAiApi).createChatCompletion(captor.capture());
         assertEquals("gpt-future", captor.getValue().getModel());
       }
@@ -165,14 +177,16 @@ class RestAiControllerTest {
 
       @Test
       void askCompletionAndUseStopResponse() {
-        AiCompletionResponse aiCompletionResponse = controller.answerCompletionClarifyingQuestion(note, params);
+        AiCompletionResponse aiCompletionResponse =
+            controller.answerCompletionClarifyingQuestion(note, params);
         assertEquals("blue planet", aiCompletionResponse.getMoreCompleteContent());
         assertEquals("stop", aiCompletionResponse.getFinishReason());
       }
 
       @Test
       void itMustPassTheThreadIdBack() {
-        AiCompletionResponse aiCompletionResponse = controller.answerCompletionClarifyingQuestion(note, params);
+        AiCompletionResponse aiCompletionResponse =
+            controller.answerCompletionClarifyingQuestion(note, params);
         assertEquals("any-thread-id", aiCompletionResponse.getThreadId());
       }
     }
