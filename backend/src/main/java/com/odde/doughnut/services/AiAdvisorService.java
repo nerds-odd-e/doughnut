@@ -58,6 +58,12 @@ public class AiAdvisorService {
     return getAiCompletionResponse(threadId, assistantId, aiCompletionParams, note, modelName);
   }
 
+  public AiCompletionResponse answerAiCompletionClarifyingQuestion(
+      AiCompletionParams aiCompletionParams, Note note, String modelName, String assistantId) {
+    String threadId = ensureThread(aiCompletionParams, note);
+    return getAiCompletionResponse(threadId, assistantId, aiCompletionParams, note, modelName);
+  }
+
   private String ensureThread(AiCompletionParams aiCompletionParams, Note note) {
     String threadId = aiCompletionParams.getThreadId();
     if (threadId == null) {

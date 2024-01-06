@@ -195,7 +195,8 @@ class AiAdvisorServiceAutoCompleteTest {
       void mustIncludeThePreviousQuestionInMessages() {
         openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
             new NoteDetailsCompletion(" is healthy."), "complete_note_details");
-        aiAdvisorService.getAiCompletion(params, note, "gpt-4", "asst_example_id");
+        aiAdvisorService.answerAiCompletionClarifyingQuestion(
+            params, note, "gpt-4", "asst_example_id");
         ChatMessage functionResultMessage = captureChatCompletionRequest().getMessages().get(3);
         assertThat(
             functionResultMessage.getFunctionCall().getArguments().toString(),
@@ -206,7 +207,8 @@ class AiAdvisorServiceAutoCompleteTest {
       void mustIncludeThePreviousAnswerInMessages() {
         openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
             new NoteDetailsCompletion(" is healthy."), "complete_note_details");
-        aiAdvisorService.getAiCompletion(params, note, "gpt-4", "asst_example_id");
+        aiAdvisorService.answerAiCompletionClarifyingQuestion(
+            params, note, "gpt-4", "asst_example_id");
         ChatMessage functionResultMessage = captureChatCompletionRequest().getMessages().get(4);
         assertThat(functionResultMessage.getName(), equalTo("ask_clarification_question"));
         assertThat(functionResultMessage.getContent(), containsString("green tea"));
@@ -218,7 +220,8 @@ class AiAdvisorServiceAutoCompleteTest {
             new NoteDetailsCompletion(" is common in China, if you are referring to green tea."),
             "complete_note_details");
         AiCompletionResponse aiCompletionResponse =
-            aiAdvisorService.getAiCompletion(params, note, "gpt-4", "asst_example_id");
+            aiAdvisorService.answerAiCompletionClarifyingQuestion(
+                params, note, "gpt-4", "asst_example_id");
         assertEquals("stop", aiCompletionResponse.getFinishReason());
         assertEquals(
             "Tea is common in China, if you are referring to green tea.",
@@ -232,7 +235,8 @@ class AiAdvisorServiceAutoCompleteTest {
                 "Are you referring to American football or association football (soccer) ?"),
             "ask_clarification_question");
         AiCompletionResponse aiCompletionResponse =
-            aiAdvisorService.getAiCompletion(params, note, "gpt-4", "asst_example_id");
+            aiAdvisorService.answerAiCompletionClarifyingQuestion(
+                params, note, "gpt-4", "asst_example_id");
         assertThat(aiCompletionResponse.getFinishReason(), equalTo("question"));
       }
     }
