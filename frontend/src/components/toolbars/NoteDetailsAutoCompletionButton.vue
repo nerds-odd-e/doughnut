@@ -13,6 +13,7 @@
       <template #body>
         <AIClarifyingQuestionDialog
           :completion-in-progress="completionInProgress"
+          :clarifying-history="clarifyingHistory"
           @submit="clarifyingQuestionAndAnswered"
         />
       </template>
