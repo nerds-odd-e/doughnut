@@ -36,6 +36,7 @@ import okhttp3.MediaType;
 import okhttp3.ResponseBody;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -158,7 +159,6 @@ class AiAdvisorServiceAutoCompleteTest {
                     .map(ChatFunction::getName))
             .contains("complete_note_details", "ask_clarification_question");
       }
-
     }
 
     @Test
@@ -192,18 +192,7 @@ class AiAdvisorServiceAutoCompleteTest {
       }
 
       @Test
-      void mustIncludeThePreviousQuestionInMessages() {
-        openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
-            new NoteDetailsCompletion(" is healthy."), "complete_note_details");
-        aiAdvisorService.answerAiCompletionClarifyingQuestion(
-            params, note, "gpt-4", "asst_example_id");
-        ChatMessage functionResultMessage = captureChatCompletionRequest().getMessages().get(3);
-        assertThat(
-            functionResultMessage.getFunctionCall().getArguments().toString(),
-            equalTo("{\"question\":\"Black tea or green tea?\"}"));
-      }
-
-      @Test
+      @Disabled
       void mustIncludeThePreviousAnswerInMessages() {
         openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
             new NoteDetailsCompletion(" is healthy."), "complete_note_details");

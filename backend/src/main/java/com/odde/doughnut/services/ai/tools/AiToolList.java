@@ -1,7 +1,5 @@
 package com.odde.doughnut.services.ai.tools;
 
-import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator;
@@ -10,9 +8,6 @@ import com.theokanning.openai.assistants.AssistantFunction;
 import com.theokanning.openai.assistants.AssistantToolsEnum;
 import com.theokanning.openai.assistants.Tool;
 import com.theokanning.openai.completion.chat.ChatFunction;
-import com.theokanning.openai.completion.chat.ChatFunctionCall;
-import com.theokanning.openai.completion.chat.ChatMessage;
-import com.theokanning.openai.completion.chat.ChatMessageRole;
 import java.util.*;
 
 public class AiToolList {
@@ -26,19 +21,6 @@ public class AiToolList {
 
   public String getFirstFunctionName() {
     return functions.keySet().iterator().next();
-  }
-
-  public static ChatMessage functionCall(String functionName, Object arguments) {
-    ChatMessage functionCallMessage = new ChatMessage(ChatMessageRole.ASSISTANT.value());
-    functionCallMessage.setFunctionCall(
-        new ChatFunctionCall(functionName, defaultObjectMapper().valueToTree(arguments)));
-    return functionCallMessage;
-  }
-
-  public static ChatMessage functionCallResponse(String functionName, Object resp) {
-    JsonNode jsonNode = defaultObjectMapper().convertValue(resp, JsonNode.class);
-    return new ChatMessage(
-        ChatMessageRole.FUNCTION.value(), jsonNode.toPrettyString(), functionName);
   }
 
   public void addToChat(OpenAIChatRequestBuilder openAIChatRequestBuilder) {
