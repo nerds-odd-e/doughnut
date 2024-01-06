@@ -79,8 +79,8 @@ importers:
         specifier: ^14.0.0
         version: 14.0.0
       jsdom:
-        specifier: ^23.0.1
-        version: 23.0.1
+        specifier: ^23.1.0
+        version: 23.1.0
       mountebank:
         specifier: ^2.9.1
         version: 2.9.1
@@ -218,8 +218,8 @@ importers:
         specifier: ^9.19.2
         version: 9.19.2(eslint@8.56.0)
       jsdom:
-        specifier: ^23.0.1
-        version: 23.0.1
+        specifier: ^23.1.0
+        version: 23.1.0
       optionator:
         specifier: ^0.9.3
         version: 0.9.3
@@ -261,7 +261,7 @@ importers:
         version: 4.2.3(typescript@5.3.3)(vite@5.0.11)
       vitest:
         specifier: 1.1.3
-        version: 1.1.3(@types/node@20.10.6)(jsdom@23.0.1)(sass@1.69.7)
+        version: 1.1.3(@types/node@20.10.6)(jsdom@23.1.0)(sass@1.69.7)
       vitest-dom:
         specifier: ^0.1.1
         version: 0.1.1(vitest@1.1.3)
@@ -1846,7 +1846,7 @@ packages:
     dependencies:
       '@vitest/spy': 1.1.3
       '@vitest/utils': 1.1.3
-      chai: 4.3.10
+      chai: 4.4.0
     dev: true
 
   /@vitest/runner@1.1.3:
@@ -2573,7 +2573,7 @@ packages:
     hasBin: true
     dependencies:
       caniuse-lite: 1.0.30001574
-      electron-to-chromium: 1.4.622
+      electron-to-chromium: 1.4.623
       node-releases: 2.0.14
       update-browserslist-db: 1.0.13(browserslist@4.22.2)
     dev: true
@@ -2681,8 +2681,8 @@ packages:
     resolution: {integrity: sha512-4tYFyifaFfGacoiObjJegolkwSU4xQNGbVgUiNYVUxbQ2x2lUsFvY4hVgVzGiIe6WLOPqycWXA40l+PWsxthUw==}
     dev: true
 
-  /chai@4.3.10:
-    resolution: {integrity: sha512-0UXG04VuVbruMUYbJ6JctvH0YnC/4q3/AkT18q4NaITo91CUm0liMS9VqzT9vZhVQ/1eqPanMWjBM+Juhfb/9g==}
+  /chai@4.4.0:
+    resolution: {integrity: sha512-x9cHNq1uvkCdU+5xTkNh5WtgD4e4yDFCsp9jVc7N7qVeKeftv3gO/ZrviX5d+3ZfxdYnZXZYujjRInu1RogU6A==}
     engines: {node: '>=4'}
     dependencies:
       assertion-error: 1.1.0
@@ -3084,9 +3084,9 @@ packages:
       cssom: 0.3.8
     dev: true
 
-  /cssstyle@3.0.0:
-    resolution: {integrity: sha512-N4u2ABATi3Qplzf0hWbVCdjenim8F3ojEXpBDF5hBpjzW182MjNGLqfmQ0SkSPeQ+V86ZXgeH8aXj6kayd4jgg==}
-    engines: {node: '>=14'}
+  /cssstyle@4.0.1:
+    resolution: {integrity: sha512-8ZYiJ3A/3OkDd093CBT/0UKDWry7ak4BdPTFP2+QEP7cmhouyq/Up709ASSj2cK02BbZiMgk7kYjZNS4QP5qrQ==}
+    engines: {node: '>=18'}
     dependencies:
       rrweb-cssom: 0.6.0
     dev: true
@@ -3459,8 +3459,8 @@ packages:
       jake: 10.8.7
     dev: true
 
-  /electron-to-chromium@1.4.622:
-    resolution: {integrity: sha512-GZ47DEy0Gm2Z8RVG092CkFvX7SdotG57c4YZOe8W8qD4rOmk3plgeNmiLVRHP/Liqj1wRiY3uUUod9vb9hnxZA==}
+  /electron-to-chromium@1.4.623:
+    resolution: {integrity: sha512-lKoz10iCYlP1WtRYdh5MvocQPWVRoI7ysp6qf18bmeBgR8abE6+I2CsfyNKztRDZvhdWc+krKT6wS7Neg8sw3A==}
     dev: true
 
   /emoji-regex@8.0.0:
@@ -4104,7 +4104,7 @@ packages:
       '@typescript-eslint/eslint-plugin': 6.17.0(@typescript-eslint/parser@6.17.0)(eslint@8.56.0)(typescript@5.3.3)
       '@typescript-eslint/utils': 6.17.0(eslint@8.56.0)(typescript@5.3.3)
       eslint: 8.56.0
-      vitest: 1.1.3(@types/node@20.10.6)(jsdom@23.0.1)(sass@1.69.7)
+      vitest: 1.1.3(@types/node@20.10.6)(jsdom@23.1.0)(sass@1.69.7)
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -5463,8 +5463,8 @@ packages:
       - utf-8-validate
     dev: true
 
-  /jsdom@23.0.1:
-    resolution: {integrity: sha512-2i27vgvlUsGEBO9+/kJQRbtqtm+191b5zAZrU/UezVmnC2dlDAFLgDYJvAEi94T4kjsRKkezEtLQTgsNEsW2lQ==}
+  /jsdom@23.1.0:
+    resolution: {integrity: sha512-wRscu8dBFxi7O65Cvi0jFRDv0Qa7XEHPix8Qg/vlXHLAMQsRWV1EDeQHBermzXf4Dt7JtFgBLbva3iTcBZDXEQ==}
     engines: {node: '>=18'}
     peerDependencies:
       canvas: ^2.11.2
@@ -5472,7 +5472,7 @@ packages:
       canvas:
         optional: true
     dependencies:
-      cssstyle: 3.0.0
+      cssstyle: 4.0.1
       data-urls: 5.0.0
       decimal.js: 10.4.3
       form-data: 4.0.0
@@ -8313,7 +8313,7 @@ packages:
       dom-accessibility-api: 0.6.3
       lodash-es: 4.17.21
       redent: 4.0.0
-      vitest: 1.1.3(@types/node@20.10.6)(jsdom@23.0.1)(sass@1.69.7)
+      vitest: 1.1.3(@types/node@20.10.6)(jsdom@23.1.0)(sass@1.69.7)
     dev: true
 
   /vitest-fetch-mock@0.2.2(vitest@1.1.3):
@@ -8323,12 +8323,12 @@ packages:
       vitest: '>=0.16.0'
     dependencies:
       cross-fetch: 3.1.8
-      vitest: 1.1.3(@types/node@20.10.6)(jsdom@23.0.1)(sass@1.69.7)
+      vitest: 1.1.3(@types/node@20.10.6)(jsdom@23.1.0)(sass@1.69.7)
     transitivePeerDependencies:
       - encoding
     dev: true
 
-  /vitest@1.1.3(@types/node@20.10.6)(jsdom@23.0.1)(sass@1.69.7):
+  /vitest@1.1.3(@types/node@20.10.6)(jsdom@23.1.0)(sass@1.69.7):
     resolution: {integrity: sha512-2l8om1NOkiA90/Y207PsEvJLYygddsOyr81wLQ20Ra8IlLKbyQncWsGZjnbkyG2KwwuTXLQjEPOJuxGMG8qJBQ==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
@@ -8361,10 +8361,10 @@ packages:
       '@vitest/utils': 1.1.3
       acorn-walk: 8.3.1
       cac: 6.7.14
-      chai: 4.3.10
+      chai: 4.4.0
       debug: 4.3.4(supports-color@8.1.1)
       execa: 8.0.1
-      jsdom: 23.0.1
+      jsdom: 23.1.0
       local-pkg: 0.5.0
       magic-string: 0.30.5
       pathe: 1.1.1
