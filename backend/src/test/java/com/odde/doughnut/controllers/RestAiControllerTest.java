@@ -31,8 +31,6 @@ import io.reactivex.Single;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -136,8 +134,7 @@ class RestAiControllerTest {
         assertThat(captor.getAllValues().get(0).getContent()).contains("cosmos › solar system");
         assertThat(captor.getAllValues().get(0).getContent())
             .contains(" \"details_to_complete\" : \"\"");
-        assertThat(captor.getAllValues().get(0).getContent())
-          .contains("Don't make assumptions");
+        assertThat(captor.getAllValues().get(0).getContent()).contains("Don't make assumptions");
       }
     }
 
