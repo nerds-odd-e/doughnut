@@ -82,18 +82,19 @@ export default defineComponent({
     async clarifyingQuestionAndAnswered(
       clarifyingQuestionAndAnswer: Generated.ClarifyingQuestionAndAnswer,
     ) {
+      const clarifyingQuestionAndAnswers = [
+        ...(this.completionInProgress?.clarifyingHistory ?? []),
+        clarifyingQuestionAndAnswer,
+      ];
+      this.completionInProgress = undefined;
       const response = await this.api.ai.answerCompletionClarifyingQuestion(
         this.note.id,
         {
           detailsToComplete: this.note.details,
-          clarifyingQuestionAndAnswers: [
-            ...(this.completionInProgress?.clarifyingHistory ?? []),
-            clarifyingQuestionAndAnswer,
-          ],
+          clarifyingQuestionAndAnswers,
         },
       );
-      this.autoCompleteDetails(response);
-      this.completionInProgress = undefined;
+      await this.autoCompleteDetails(response);
     },
   },
   unmounted() {
