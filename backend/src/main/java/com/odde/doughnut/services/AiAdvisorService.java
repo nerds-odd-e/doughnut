@@ -132,7 +132,8 @@ public class AiAdvisorService {
       ChatFunctionCall chatFunctionCall =
           openAiApiHandler.getFunctionCall(chatCompletionRequest).orElseThrow();
       completionResponseForClarification =
-          getAiCompletionResponse(aiCompletionParams, chatFunctionCall.getArguments());
+          getAiCompletionResponse(
+              chatFunctionCall.getArguments(), aiCompletionParams.getDetailsToComplete());
     }
     completionResponseForClarification.setThreadId(threadId);
     return completionResponseForClarification;
@@ -155,14 +156,12 @@ public class AiAdvisorService {
   }
 
   private static AiCompletionResponse getAiCompletionResponse(
-      AiCompletionParams aiCompletionParams, JsonNode jsonNode) {
+      JsonNode jsonNode, String detailsToComplete) {
     String result1;
     try {
       NoteDetailsCompletion noteDetailsCompletion =
           defaultObjectMapper().treeToValue(jsonNode, NoteDetailsCompletion.class);
-      aiCompletionParams.setDetailsToComplete(
-          aiCompletionParams.getDetailsToComplete() + noteDetailsCompletion.completion);
-      result1 = aiCompletionParams.getDetailsToComplete();
+      result1 = detailsToComplete + noteDetailsCompletion.completion;
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
