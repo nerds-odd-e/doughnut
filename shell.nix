@@ -14,8 +14,6 @@ in mkShell {
     nodejs_21
     zsh
     jdk21
-    kotlin
-    flutter
     libiconv
     git
     git-secret
