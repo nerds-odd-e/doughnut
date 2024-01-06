@@ -53,7 +53,7 @@ public class RestAiController {
   public AiCompletionResponse answerCompletionClarifyingQuestion(
       @PathVariable(name = "note") Note note, @RequestBody AiCompletionParams aiCompletionParams) {
     currentUser.assertLoggedIn();
-    return aiAdvisorService.getAiCompletion(
+    return aiAdvisorService.answerAiCompletionClarifyingQuestion(
         aiCompletionParams, note, getDefaultOpenAiChatModel(), getAssistantId());
   }
 
