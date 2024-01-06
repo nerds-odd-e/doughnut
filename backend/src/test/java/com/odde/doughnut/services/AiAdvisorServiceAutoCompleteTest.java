@@ -23,7 +23,6 @@ import com.theokanning.openai.OpenAiError;
 import com.theokanning.openai.OpenAiHttpException;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
-import com.theokanning.openai.completion.chat.ChatFunction;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.messages.Message;
 import com.theokanning.openai.threads.Thread;
@@ -31,7 +30,6 @@ import io.reactivex.Single;
 import java.net.SocketTimeoutException;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
@@ -133,32 +131,6 @@ class AiAdvisorServiceAutoCompleteTest {
       openAIAssistantMock = new OpenAIAssistantMock(openAiApi);
     }
 
-    private ChatCompletionRequest captureChatCompletionRequest() {
-      verify(openAiApi).createChatCompletion(captor.capture());
-      return captor.getValue();
-    }
-
-    @Nested
-    class RequestWithFunctionForClarifyingQuestion {
-      @BeforeEach
-      void setup() {
-        openAIAssistantMock.mockChatCompletionAndReturnFunctionCall(
-            new NoteDetailsCompletion(" must come down"), "");
-      }
-
-      @Test
-      void askCompletionAndWithTwoFunctions() {
-        aiAdvisorService.answerAiCompletionClarifyingQuestion(
-            params, note, "gpt-4", "asst_example_id");
-        ChatCompletionRequest request = captureChatCompletionRequest();
-        Assertions.assertThat(
-                request.getFunctions().stream()
-                    .map(ChatFunction.class::cast)
-                    .map(ChatFunction::getName))
-            .contains("complete_note_details", "ask_clarification_question");
-      }
-    }
-
     @Test
     void askCompletionAndUseQuestionResponse() {
       openAIAssistantMock.mockChatCompletionAndReturnFunctionCall(
@@ -192,7 +164,8 @@ class AiAdvisorServiceAutoCompleteTest {
             new NoteDetailsCompletion(" is healthy."), "complete_note_details");
         aiAdvisorService.answerAiCompletionClarifyingQuestion(
             params, note, "gpt-4", "asst_example_id");
-        ChatMessage functionResultMessage = captureChatCompletionRequest().getMessages().get(4);
+        verify(openAiApi).createChatCompletion(captor.capture());
+        ChatMessage functionResultMessage = captor.getValue().getMessages().get(4);
         assertThat(functionResultMessage.getName(), equalTo("ask_clarification_question"));
         assertThat(functionResultMessage.getContent(), containsString("green tea"));
       }

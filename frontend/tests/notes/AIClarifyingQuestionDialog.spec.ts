@@ -15,12 +15,20 @@ describe("answering a clarifying question for note details geeration", () => {
     },
     finishReason: "clarifying_question",
   };
+  const clarifyingHistory = [
+    {
+      questionFromAI: {
+        question: "Is it a sport?",
+      },
+      answerFromUser: "Yes",
+    },
+  ];
 
   beforeEach(() => {
     vi.useFakeTimers();
     wrapper = helper
       .component(AIClarifyingQuestionDialog)
-      .withProps({ completionInProgress })
+      .withProps({ completionInProgress, clarifyingHistory })
       .mount();
   });
 
@@ -33,6 +41,10 @@ describe("answering a clarifying question for note details geeration", () => {
     expect(wrapper.text()).toContain(
       "Do you mean American Football or European Football?",
     );
+  });
+
+  it("renders the previous questions", () => {
+    expect(wrapper.text()).toContain("Is it a sport?");
   });
 
   it("submitting the form propagates the submit event to the parent component", () => {

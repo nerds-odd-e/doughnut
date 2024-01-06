@@ -59,8 +59,7 @@ public record OpenAIAssistantMock(OpenAiApi openAiApi) {
     } else {
       Mockito.doReturn(Single.just(toBeReturned))
           .when(openAiApi)
-          .createChatCompletion(
-              ArgumentMatchers.argThat(request -> request.getFunctions() != null));
+          .createChatCompletion(ArgumentMatchers.any());
       retrievedRun.setStatus("completed");
     }
     Mockito.doReturn(Single.just(retrievedRun))
