@@ -6,6 +6,7 @@ describe("answering a clarifying question for note details geeration", () => {
   let wrapper: VueWrapper;
   const completionInProgress: Generated.AiCompletionResponse = {
     threadId: "123",
+    runId: "123",
     moreCompleteContent: "Football",
     clarifyingQuestionRequiredAction: {
       toolCallId: "123",
