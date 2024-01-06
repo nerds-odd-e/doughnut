@@ -54,33 +54,29 @@ public class AiAdvisorService {
 
   public AiCompletionResponse getAiCompletion(
       AiCompletionParams aiCompletionParams, Note note, String modelName, String assistantId) {
-    String threadId = ensureThread(aiCompletionParams, note);
+    String threadId = createThread(aiCompletionParams, note);
     return getAiCompletionResponse(threadId, assistantId, aiCompletionParams, note, modelName);
   }
 
   public AiCompletionResponse answerAiCompletionClarifyingQuestion(
       AiCompletionParams aiCompletionParams, Note note, String modelName, String assistantId) {
-    String threadId = ensureThread(aiCompletionParams, note);
+    String threadId = aiCompletionParams.getThreadId();
     return getAiCompletionResponse(threadId, assistantId, aiCompletionParams, note, modelName);
   }
 
-  private String ensureThread(AiCompletionParams aiCompletionParams, Note note) {
-    String threadId = aiCompletionParams.getThreadId();
-    if (threadId == null) {
-      ThreadRequest threadRequest = ThreadRequest.builder().build();
-      Thread thread = openAiApiHandler.createThread(threadRequest);
-      MessageRequest messageRequest =
-          MessageRequest.builder()
-              .content(
-                  note.getNoteDescription()
-                      + "------------\n"
-                      + aiCompletionParams.getCompletionPrompt())
-              .build();
+  private String createThread(AiCompletionParams aiCompletionParams, Note note) {
+    ThreadRequest threadRequest = ThreadRequest.builder().build();
+    Thread thread = openAiApiHandler.createThread(threadRequest);
+    MessageRequest messageRequest =
+        MessageRequest.builder()
+            .content(
+                note.getNoteDescription()
+                    + "------------\n"
+                    + aiCompletionParams.getCompletionPrompt())
+            .build();
 
-      openAiApiHandler.createMessage(thread.getId(), messageRequest);
-      return thread.getId();
-    }
-    return threadId;
+    openAiApiHandler.createMessage(thread.getId(), messageRequest);
+    return thread.getId();
   }
 
   private AiCompletionResponse getAiCompletionResponse(
