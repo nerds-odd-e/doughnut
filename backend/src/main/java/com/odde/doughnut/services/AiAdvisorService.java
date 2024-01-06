@@ -83,7 +83,8 @@ public class AiAdvisorService {
 
   private AiCompletionResponse getAiCompletionResponse(
       String threadId, String assistantId, Note note, String modelName, String detailsToComplete) {
-    Run run = openAiApiHandler.blockGetRun(threadId, assistantId);
+    Run run1 = openAiApiHandler.createRun(threadId, assistantId);
+    Run run = openAiApiHandler.retrieveUntilCompletedOrRequiresAction(threadId, run1.getId());
 
     boolean isClarifyingQuestion = run.getStatus().equals("requires_action");
     AiCompletionResponse completionResponseForClarification;
