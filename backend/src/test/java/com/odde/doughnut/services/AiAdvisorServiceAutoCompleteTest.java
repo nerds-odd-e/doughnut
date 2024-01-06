@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
@@ -27,6 +28,8 @@ import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatFunction;
 import com.theokanning.openai.completion.chat.ChatMessage;
+import com.theokanning.openai.messages.Message;
+import com.theokanning.openai.threads.Thread;
 import io.reactivex.Single;
 import java.net.SocketTimeoutException;
 import okhttp3.MediaType;
@@ -51,6 +54,9 @@ class AiAdvisorServiceAutoCompleteTest {
     MockitoAnnotations.openMocks(this);
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
     aiAdvisorService = new AiAdvisorService(openAiApi);
+    when(openAiApi.createThread(ArgumentMatchers.any())).thenReturn(Single.just(new Thread()));
+    when(openAiApi.createMessage(ArgumentMatchers.any(), ArgumentMatchers.any()))
+        .thenReturn(Single.just(new Message()));
   }
 
   @Nested
@@ -106,7 +112,6 @@ class AiAdvisorServiceAutoCompleteTest {
     private String getAiCompletionFromAdvisor(String incompleteContent) {
       Note note = makeMe.aNote().inMemoryPlease();
       AiCompletionParams aiCompletionParams = new AiCompletionParams();
-      aiCompletionParams.setThreadId("any-thread-id");
       aiCompletionParams.setDetailsToComplete(incompleteContent);
       return aiAdvisorService
           .getAiCompletion(aiCompletionParams, note, "gpt-4", "asst_example_id")
@@ -144,7 +149,8 @@ class AiAdvisorServiceAutoCompleteTest {
 
       @Test
       void askCompletionAndWithTwoFunctions() {
-        aiAdvisorService.getAiCompletion(params, note, "gpt-4", "asst_example_id");
+        aiAdvisorService.answerAiCompletionClarifyingQuestion(
+            params, note, "gpt-4", "asst_example_id");
         ChatCompletionRequest request = captureChatCompletionRequest();
         Assertions.assertThat(
                 request.getFunctions().stream()
@@ -155,7 +161,8 @@ class AiAdvisorServiceAutoCompleteTest {
 
       @Test
       void askCompletionWithNoAssumption() {
-        aiAdvisorService.getAiCompletion(params, note, "gpt-4", "asst_example_id");
+        aiAdvisorService.answerAiCompletionClarifyingQuestion(
+            params, note, "gpt-4", "asst_example_id");
         ChatCompletionRequest request = captureChatCompletionRequest();
         Assertions.assertThat(request.getMessages().get(2).getContent())
             .contains("Don't make assumptions");
@@ -169,7 +176,8 @@ class AiAdvisorServiceAutoCompleteTest {
               "Are you referring to American football or association football (soccer) ?"),
           askClarificationQuestion);
       AiCompletionResponse aiCompletionResponse =
-          aiAdvisorService.getAiCompletion(params, note, "gpt-4", "asst_example_id");
+          aiAdvisorService.answerAiCompletionClarifyingQuestion(
+              params, note, "gpt-4", "asst_example_id");
       assertEquals("question", aiCompletionResponse.getFinishReason());
       assertEquals(
           "mocked-tool-call-id",
