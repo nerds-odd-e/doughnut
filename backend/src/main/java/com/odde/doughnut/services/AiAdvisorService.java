@@ -120,7 +120,7 @@ public class AiAdvisorService {
       }
     } else {
       AiToolList tool =
-          AiToolFactory.getNoteContentCompletionTools(aiCompletionParams.getCompletionPrompt());
+          AiToolFactory.getNoteContentCompletionTools("");
 
       ChatCompletionRequest chatCompletionRequest =
           OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(modelName, note)

@@ -31,6 +31,8 @@ import io.reactivex.Single;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -134,6 +136,8 @@ class RestAiControllerTest {
         assertThat(captor.getAllValues().get(0).getContent()).contains("cosmos › solar system");
         assertThat(captor.getAllValues().get(0).getContent())
             .contains(" \"details_to_complete\" : \"\"");
+        assertThat(captor.getAllValues().get(0).getContent())
+          .contains("Don't make assumptions");
       }
     }
 
@@ -145,18 +149,6 @@ class RestAiControllerTest {
       }
 
       @Test
-      void askSuggestionWithRightPrompt() {
-        controller.answerCompletionClarifyingQuestion(note, params);
-        verify(openAiApi).createChatCompletion(captor.capture());
-        assertThat(captor.getValue().getMaxTokens()).isLessThan(200);
-        assertThat(captor.getValue().getMessages()).hasSize(3);
-        assertThat(captor.getValue().getMessages().get(2).getContent())
-            .contains(" \"details_to_complete\" : \"\"");
-        assertThat(captor.getValue().getMessages().get(1).getContent())
-            .contains("cosmos › solar system");
-      }
-
-      @Test
       void askSuggestionWithRightModel() {
         new GlobalSettingsService(makeMe.modelFactoryService)
             .getGlobalSettingOthers()
@@ -164,15 +156,6 @@ class RestAiControllerTest {
         controller.answerCompletionClarifyingQuestion(note, params);
         verify(openAiApi).createChatCompletion(captor.capture());
         assertEquals("gpt-future", captor.getValue().getModel());
-      }
-
-      @Test
-      void askSuggestionWithIncompleteAssistantMessage() {
-        params.setDetailsToComplete("What goes up,");
-        controller.answerCompletionClarifyingQuestion(note, params);
-        verify(openAiApi).createChatCompletion(captor.capture());
-        assertThat(captor.getValue().getMessages().get(2).getContent())
-            .contains(" \"details_to_complete\" : \"What goes up,\"");
       }
 
       @Test

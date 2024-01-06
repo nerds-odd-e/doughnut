@@ -159,14 +159,6 @@ class AiAdvisorServiceAutoCompleteTest {
             .contains("complete_note_details", "ask_clarification_question");
       }
 
-      @Test
-      void askCompletionWithNoAssumption() {
-        aiAdvisorService.answerAiCompletionClarifyingQuestion(
-            params, note, "gpt-4", "asst_example_id");
-        ChatCompletionRequest request = captureChatCompletionRequest();
-        Assertions.assertThat(request.getMessages().get(2).getContent())
-            .contains("Don't make assumptions");
-      }
     }
 
     @Test
