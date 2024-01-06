@@ -17,8 +17,6 @@ in mkShell {
     dum
     yarn
     jdk21
-    kotlin
-    flutter
     libiconv
     git
     git-secret
