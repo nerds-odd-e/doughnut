@@ -234,7 +234,6 @@ class AiAdvisorServiceAutoCompleteTest {
         AiCompletionResponse aiCompletionResponse =
             aiAdvisorService.getAiCompletion(params, note, "gpt-4", "asst_example_id");
         assertThat(aiCompletionResponse.getFinishReason(), equalTo("question"));
-        assertThat(aiCompletionResponse.getClarifyingHistory(), hasSize(1));
       }
     }
   }

@@ -20,7 +20,6 @@ declare namespace Generated {
         finishReason: string;
         moreCompleteContent: string;
         clarifyingQuestionRequiredAction: ClarifyingQuestionRequiredAction;
-        clarifyingHistory: ClarifyingQuestionAndAnswer[];
     }
 
     interface AiGeneratedImage {
