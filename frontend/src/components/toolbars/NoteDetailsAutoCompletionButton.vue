@@ -63,7 +63,6 @@ export default defineComponent({
     async initialAutoCompleteDetails() {
       const response = await this.api.ai.askAiCompletion(this.note.id, {
         detailsToComplete: this.note.details,
-        clarifyingQuestionAndAnswers: [],
       });
 
       return this.autoCompleteDetails(response);
@@ -76,6 +75,7 @@ export default defineComponent({
         return;
       }
 
+      this.completionInProgress = undefined;
       this.storageAccessor.storedApi().updateTextContent(this.note.id, {
         topic: this.note.topic,
         details: response.moreCompleteContent,
@@ -85,12 +85,13 @@ export default defineComponent({
       clarifyingQuestionAndAnswer: Generated.ClarifyingQuestionAndAnswer,
     ) {
       this.clarifyingHistory.push(clarifyingQuestionAndAnswer);
-      this.completionInProgress = undefined;
       const response = await this.api.ai.answerCompletionClarifyingQuestion(
         this.note.id,
         {
           detailsToComplete: this.note.details,
-          clarifyingQuestionAndAnswers: this.clarifyingHistory,
+          answer: clarifyingQuestionAndAnswer.answerFromUser,
+          threadId: this.completionInProgress!.threadId,
+          toolCallId: "xx",
         },
       );
       await this.autoCompleteDetails(response);

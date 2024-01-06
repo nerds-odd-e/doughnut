@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import com.odde.doughnut.controllers.json.AiCompletionAnswerClarifyingQuestionParams;
 import com.odde.doughnut.controllers.json.AiCompletionParams;
 import com.odde.doughnut.controllers.json.AiCompletionResponse;
 import com.odde.doughnut.entities.Note;
@@ -57,8 +58,6 @@ class RestAiControllerTest {
   @Autowired MakeMe makeMe;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
 
-  AiCompletionParams params = new AiCompletionParams();
-
   @BeforeEach
   void Setup() {
     currentUser = makeMe.aUser().toModelPlease();
@@ -70,6 +69,7 @@ class RestAiControllerTest {
 
   @Nested
   class AutoCompleteNoteDetails {
+    AiCompletionParams params = new AiCompletionParams();
     ArgumentCaptor<ChatCompletionRequest> captor =
         ArgumentCaptor.forClass(ChatCompletionRequest.class);
     OpenAIChatCompletionMock openAIChatCompletionMock;
@@ -140,6 +140,9 @@ class RestAiControllerTest {
 
     @Nested
     class AnswerClarifyingQuestion {
+      AiCompletionAnswerClarifyingQuestionParams params =
+          new AiCompletionAnswerClarifyingQuestionParams();
+
       @BeforeEach
       void setup() {
         params.setThreadId("any-thread-id");

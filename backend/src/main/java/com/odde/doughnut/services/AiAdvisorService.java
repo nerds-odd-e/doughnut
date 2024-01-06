@@ -5,10 +5,7 @@ import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.odde.doughnut.controllers.json.AiCompletionParams;
-import com.odde.doughnut.controllers.json.AiCompletionResponse;
-import com.odde.doughnut.controllers.json.ClarifyingQuestionRequiredAction;
-import com.odde.doughnut.controllers.json.QuizQuestionContestResult;
+import com.odde.doughnut.controllers.json.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
@@ -55,13 +52,18 @@ public class AiAdvisorService {
   public AiCompletionResponse getAiCompletion(
       AiCompletionParams aiCompletionParams, Note note, String modelName, String assistantId) {
     String threadId = createThread(aiCompletionParams, note);
-    return getAiCompletionResponse(threadId, assistantId, aiCompletionParams, note, modelName);
+    return getAiCompletionResponse(
+        threadId, assistantId, note, modelName, aiCompletionParams.getDetailsToComplete());
   }
 
   public AiCompletionResponse answerAiCompletionClarifyingQuestion(
-      AiCompletionParams aiCompletionParams, Note note, String modelName, String assistantId) {
+      AiCompletionAnswerClarifyingQuestionParams aiCompletionParams,
+      Note note,
+      String modelName,
+      String assistantId) {
     String threadId = aiCompletionParams.getThreadId();
-    return getAiCompletionResponse(threadId, assistantId, aiCompletionParams, note, modelName);
+    return getAiCompletionResponse(
+        threadId, assistantId, note, modelName, aiCompletionParams.getDetailsToComplete());
   }
 
   private String createThread(AiCompletionParams aiCompletionParams, Note note) {
@@ -80,11 +82,7 @@ public class AiAdvisorService {
   }
 
   private AiCompletionResponse getAiCompletionResponse(
-      String threadId,
-      String assistantId,
-      AiCompletionParams aiCompletionParams,
-      Note note,
-      String modelName) {
+      String threadId, String assistantId, Note note, String modelName, String detailsToComplete) {
     Run run = openAiApiHandler.blockGetRun(threadId, assistantId);
 
     boolean isClarifyingQuestion = run.getStatus().equals("requires_action");
@@ -130,8 +128,7 @@ public class AiAdvisorService {
       ChatFunctionCall chatFunctionCall =
           openAiApiHandler.getFunctionCall(chatCompletionRequest).orElseThrow();
       completionResponseForClarification =
-          getAiCompletionResponse(
-              chatFunctionCall.getArguments(), aiCompletionParams.getDetailsToComplete());
+          getAiCompletionResponse(chatFunctionCall.getArguments(), detailsToComplete);
     }
     completionResponseForClarification.setThreadId(threadId);
     return completionResponseForClarification;

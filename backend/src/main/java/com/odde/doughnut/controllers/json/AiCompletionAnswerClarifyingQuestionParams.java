@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Data
-public class AiCompletionAnswerClarifyingQuestionParams {
+public class AiCompletionAnswerClarifyingQuestionParams extends AiCompletionParams {
   private String threadId;
   private String toolCallId;
   private String answer;
