@@ -2,9 +2,7 @@
   <div>
     <ul>
       <li
-        v-for="(
-          { questionFromAI, answerFromUser }, index
-        ) in completionInProgress.clarifyingHistory"
+        v-for="({ questionFromAI, answerFromUser }, index) in clarifyingHistory"
         :key="index"
       >
         {{ questionFromAI }}
@@ -40,6 +38,10 @@ export default defineComponent({
   props: {
     completionInProgress: {
       type: Object as PropType<Generated.AiCompletionResponse>,
+      required: true,
+    },
+    clarifyingHistory: {
+      type: Array as PropType<Generated.ClarifyingQuestionAndAnswer[]>,
       required: true,
     },
   },
