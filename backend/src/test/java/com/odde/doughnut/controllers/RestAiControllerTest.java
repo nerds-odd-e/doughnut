@@ -97,7 +97,7 @@ class RestAiControllerTest {
     }
 
     @Nested
-    class withoutExistingThread {
+    class StartACompletionThread {
       @BeforeEach
       void setup() {
         Thread thread = new Thread();
@@ -125,7 +125,7 @@ class RestAiControllerTest {
     }
 
     @Nested
-    class withExistingThread {
+    class AnswerClarifyingQuestion {
       @BeforeEach
       void setup() {
         params.setThreadId("any-thread-id");
@@ -133,7 +133,7 @@ class RestAiControllerTest {
 
       @Test
       void askSuggestionWithRightPrompt() {
-        controller.getCompletion(note, params);
+        controller.answerCompletionClarifyingQuestion(note, params);
         verify(openAiApi).createChatCompletion(captor.capture());
         assertThat(captor.getValue().getMaxTokens()).isLessThan(200);
         assertThat(captor.getValue().getMessages()).hasSize(3);
@@ -148,7 +148,7 @@ class RestAiControllerTest {
         new GlobalSettingsService(makeMe.modelFactoryService)
             .getGlobalSettingOthers()
             .setKeyValue(makeMe.aTimestamp().please(), "gpt-future");
-        controller.getCompletion(note, params);
+        controller.answerCompletionClarifyingQuestion(note, params);
 
         verify(openAiApi).createChatCompletion(captor.capture());
         assertEquals("gpt-future", captor.getValue().getModel());
@@ -157,7 +157,7 @@ class RestAiControllerTest {
       @Test
       void askSuggestionWithIncompleteAssistantMessage() {
         params.setDetailsToComplete("What goes up,");
-        controller.getCompletion(note, params);
+        controller.answerCompletionClarifyingQuestion(note, params);
         verify(openAiApi).createChatCompletion(captor.capture());
         assertThat(captor.getValue().getMessages().get(2).getContent())
             .contains(" \"details_to_complete\" : \"What goes up,\"");
@@ -165,14 +165,14 @@ class RestAiControllerTest {
 
       @Test
       void askCompletionAndUseStopResponse() {
-        AiCompletionResponse aiCompletionResponse = controller.getCompletion(note, params);
+        AiCompletionResponse aiCompletionResponse = controller.answerCompletionClarifyingQuestion(note, params);
         assertEquals("blue planet", aiCompletionResponse.getMoreCompleteContent());
         assertEquals("stop", aiCompletionResponse.getFinishReason());
       }
 
       @Test
       void itMustPassTheThreadIdBack() {
-        AiCompletionResponse aiCompletionResponse = controller.getCompletion(note, params);
+        AiCompletionResponse aiCompletionResponse = controller.answerCompletionClarifyingQuestion(note, params);
         assertEquals("any-thread-id", aiCompletionResponse.getThreadId());
       }
     }
