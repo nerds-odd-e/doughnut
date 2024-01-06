@@ -80,8 +80,7 @@ class RestAiControllerTest {
       Note solar = makeMe.aNote("solar system").under(cosmos).please();
       note = makeMe.aNote("Earth").under(solar).please();
       openAIAssistantMock = new OpenAIAssistantMock(openAiApi);
-      openAIAssistantMock.mockChatCompletionAndReturnFunctionCall(
-          new NoteDetailsCompletion("blue planet"), "");
+      openAIAssistantMock.mockThreadCompletion(new NoteDetailsCompletion("blue planet"), "");
     }
 
     @Test

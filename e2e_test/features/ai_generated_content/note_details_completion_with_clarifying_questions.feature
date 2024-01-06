@@ -30,7 +30,6 @@ Feature: AI Asks Clarifying Questions When Auto-Generating Note Details
       | response | arguments                                           |
       | ask      | Do you mean American Football or European Football? |
       | ask      | Do you mean the American version?                   |
-    # And the OpenAI assistant will ask "Do you mean the American version?" following an unclear response like "Ameriland"
     When I request to complete the details for the note "Sports"
     And I answer "Ameriland" to the clarifying question "Do you mean American Football or European Football?"
     Then I should see a follow-up question "Do you mean the American version?"
