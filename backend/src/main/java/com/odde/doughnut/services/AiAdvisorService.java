@@ -130,6 +130,7 @@ public class AiAdvisorService {
           getAiCompletionResponse(chatFunctionCall.getArguments(), detailsToComplete);
     }
     completionResponseForClarification.setThreadId(threadId);
+    completionResponseForClarification.setRunId(run1.getId());
     return completionResponseForClarification;
   }
 

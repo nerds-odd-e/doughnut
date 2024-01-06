@@ -117,7 +117,7 @@ public class OpenAiApiHandler {
 
   public Run createRun(String threadId, String assistantId) {
     RunCreateRequest runCreateRequest = RunCreateRequest.builder().assistantId(assistantId).build();
-      return blockGet(openAiApi.createRun(threadId, runCreateRequest));
+    return blockGet(openAiApi.createRun(threadId, runCreateRequest));
   }
 
   public Run retrieveUntilCompletedOrRequiresAction(String threadId, String runId) {

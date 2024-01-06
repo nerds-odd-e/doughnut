@@ -1,6 +1,5 @@
 package com.odde.doughnut.services;
 
-import static com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder.askClarificationQuestion;
 import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -59,7 +58,8 @@ class AiAdvisorServiceAutoCompleteTest {
   class SimpleAutoComplete {
     @Test
     void getAiSuggestion_givenAString_returnsAiSuggestionObject() {
-      openAIAssistantMock.mockThreadCompletion(new NoteDetailsCompletion(" must come down"), "");
+      openAIAssistantMock.mockThreadCompletion(
+          new NoteDetailsCompletion(" must come down"), "", "my-run-id");
       assertEquals("what goes up must come down", getAiCompletionFromAdvisor("what goes up"));
     }
 
@@ -135,7 +135,7 @@ class AiAdvisorServiceAutoCompleteTest {
       openAIAssistantMock.mockThreadAndRequiredAction(
           new ClarifyingQuestion(
               "Are you referring to American football or association football (soccer) ?"),
-          askClarificationQuestion);
+          "my-run-id");
       AiCompletionResponse aiCompletionResponse =
           aiAdvisorService.answerAiCompletionClarifyingQuestion(
               params, note, "gpt-4", "asst_example_id");
@@ -160,7 +160,7 @@ class AiAdvisorServiceAutoCompleteTest {
       @Disabled
       void mustIncludeThePreviousAnswerInMessages() {
         openAIAssistantMock.mockThreadAndRequiredAction(
-            new NoteDetailsCompletion(" is healthy."), "complete_note_details");
+            new NoteDetailsCompletion(" is healthy."), "my-run-id");
         aiAdvisorService.answerAiCompletionClarifyingQuestion(
             params, note, "gpt-4", "asst_example_id");
         verify(openAiApi).createChatCompletion(captor.capture());
@@ -173,7 +173,8 @@ class AiAdvisorServiceAutoCompleteTest {
       void askCompletionAndUseStopResponseWithQuestionAnswer() {
         openAIAssistantMock.mockThreadCompletion(
             new NoteDetailsCompletion(" is common in China, if you are referring to green tea."),
-            "complete_note_details");
+            "complete_note_details",
+            "my-run-id");
         AiCompletionResponse aiCompletionResponse =
             aiAdvisorService.answerAiCompletionClarifyingQuestion(
                 params, note, "gpt-4", "asst_example_id");
@@ -188,7 +189,7 @@ class AiAdvisorServiceAutoCompleteTest {
         openAIAssistantMock.mockThreadAndRequiredAction(
             new ClarifyingQuestion(
                 "Are you referring to American football or association football (soccer) ?"),
-            "ask_clarification_question");
+            "my-run-id");
         AiCompletionResponse aiCompletionResponse =
             aiAdvisorService.answerAiCompletionClarifyingQuestion(
                 params, note, "gpt-4", "asst_example_id");
