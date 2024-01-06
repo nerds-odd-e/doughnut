@@ -59,16 +59,14 @@ export default defineComponent({
   },
   methods: {
     async initialAutoCompleteDetails() {
-      return this.autoCompleteDetails([]);
-    },
-    async autoCompleteDetails(
-      clarifyingQuestionAndAnswers: Generated.ClarifyingQuestionAndAnswer[],
-    ) {
       const response = await this.api.ai.askAiCompletion(this.note.id, {
         detailsToComplete: this.note.details,
-        clarifyingQuestionAndAnswers,
+        clarifyingQuestionAndAnswers: [],
       });
 
+      return this.autoCompleteDetails(response);
+    },
+    async autoCompleteDetails(response: Generated.AiCompletionResponse) {
       if (this.isUnmounted) return;
 
       if (response.clarifyingQuestionRequiredAction) {
@@ -81,13 +79,20 @@ export default defineComponent({
         details: response.moreCompleteContent,
       });
     },
-    clarifyingQuestionAndAnswered(
+    async clarifyingQuestionAndAnswered(
       clarifyingQuestionAndAnswer: Generated.ClarifyingQuestionAndAnswer,
     ) {
-      this.autoCompleteDetails([
-        ...(this.completionInProgress?.clarifyingHistory ?? []),
-        clarifyingQuestionAndAnswer,
-      ]);
+      const response = await this.api.ai.answerCompletionClarifyingQuestion(
+        this.note.id,
+        {
+          detailsToComplete: this.note.details,
+          clarifyingQuestionAndAnswers: [
+            ...(this.completionInProgress?.clarifyingHistory ?? []),
+            clarifyingQuestionAndAnswer,
+          ],
+        },
+      );
+      this.autoCompleteDetails(response);
       this.completionInProgress = undefined;
     },
   },
