@@ -46,7 +46,7 @@ public class RestAiController {
       @PathVariable(name = "note") Note note, @RequestBody AiCompletionParams aiCompletionParams) {
     currentUser.assertLoggedIn();
     return aiAdvisorService.getAiCompletion(
-        aiCompletionParams, note, getDefaultOpenAiChatModel(), "asst_example_id");
+        aiCompletionParams, note, getDefaultOpenAiChatModel(), getAssistantId());
   }
 
   @PostMapping("/{note}/answer-clarifying-question")
@@ -54,7 +54,7 @@ public class RestAiController {
       @PathVariable(name = "note") Note note, @RequestBody AiCompletionParams aiCompletionParams) {
     currentUser.assertLoggedIn();
     return aiAdvisorService.getAiCompletion(
-        aiCompletionParams, note, getDefaultOpenAiChatModel(), "asst_example_id");
+        aiCompletionParams, note, getDefaultOpenAiChatModel(), getAssistantId());
   }
 
   @PostMapping("/chat")
@@ -96,6 +96,10 @@ public class RestAiController {
 
   private String getDefaultOpenAiChatModel() {
     return getGlobalSettingsService().getGlobalSettingOthers().getValue();
+  }
+
+  private String getAssistantId() {
+    return getGlobalSettingsService().getNoteCompletionAssistantId().getValue();
   }
 
   private GlobalSettingsService getGlobalSettingsService() {
