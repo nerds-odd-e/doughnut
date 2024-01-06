@@ -122,7 +122,6 @@ public class AiAdvisorService {
         cqra.toolCallId = toolCall.getId();
 
         result.setClarifyingQuestionRequiredAction(cqra);
-        aiCompletionParams.getClarifyingQuestionAndAnswers().forEach(result::addClarifyingHistory);
         completionResponseForClarification = result;
       } else {
         throw new RuntimeException("Unknown function name: " + function.getName());
