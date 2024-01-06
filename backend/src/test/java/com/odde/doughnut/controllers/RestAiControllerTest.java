@@ -15,7 +15,7 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.odde.doughnut.testability.OpenAIAssistantMock;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.OpenAiResponse;
 import com.theokanning.openai.assistants.Assistant;
@@ -72,15 +72,15 @@ class RestAiControllerTest {
     AiCompletionParams params = new AiCompletionParams();
     ArgumentCaptor<ChatCompletionRequest> captor =
         ArgumentCaptor.forClass(ChatCompletionRequest.class);
-    OpenAIChatCompletionMock openAIChatCompletionMock;
+    OpenAIAssistantMock openAIAssistantMock;
 
     @BeforeEach
     void setup() {
       Note cosmos = makeMe.aNote("cosmos").please();
       Note solar = makeMe.aNote("solar system").under(cosmos).please();
       note = makeMe.aNote("Earth").under(solar).please();
-      openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
-      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
+      openAIAssistantMock = new OpenAIAssistantMock(openAiApi);
+      openAIAssistantMock.mockChatCompletionAndReturnFunctionCall(
           new NoteDetailsCompletion("blue planet"), "");
     }
 

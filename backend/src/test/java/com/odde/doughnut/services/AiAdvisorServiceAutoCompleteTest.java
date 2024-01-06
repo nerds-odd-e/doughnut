@@ -18,7 +18,7 @@ import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.services.ai.ClarifyingQuestion;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.odde.doughnut.testability.OpenAIAssistantMock;
 import com.theokanning.openai.OpenAiError;
 import com.theokanning.openai.OpenAiHttpException;
 import com.theokanning.openai.client.OpenAiApi;
@@ -45,12 +45,12 @@ class AiAdvisorServiceAutoCompleteTest {
   private AiAdvisorService aiAdvisorService;
   @Mock private OpenAiApi openAiApi;
   MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
-  OpenAIChatCompletionMock openAIChatCompletionMock;
+  OpenAIAssistantMock openAIAssistantMock;
 
   @BeforeEach
   void Setup() {
     MockitoAnnotations.openMocks(this);
-    openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
+    openAIAssistantMock = new OpenAIAssistantMock(openAiApi);
     aiAdvisorService = new AiAdvisorService(openAiApi);
     when(openAiApi.createThread(ArgumentMatchers.any())).thenReturn(Single.just(new Thread()));
     when(openAiApi.createMessage(ArgumentMatchers.any(), ArgumentMatchers.any()))
@@ -61,7 +61,7 @@ class AiAdvisorServiceAutoCompleteTest {
   class SimpleAutoComplete {
     @Test
     void getAiSuggestion_givenAString_returnsAiSuggestionObject() {
-      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
+      openAIAssistantMock.mockChatCompletionAndReturnFunctionCall(
           new NoteDetailsCompletion(" must come down"), "");
       assertEquals("what goes up must come down", getAiCompletionFromAdvisor("what goes up"));
     }
@@ -124,13 +124,13 @@ class AiAdvisorServiceAutoCompleteTest {
         new AiCompletionAnswerClarifyingQuestionParams();
     ArgumentCaptor<ChatCompletionRequest> captor =
         ArgumentCaptor.forClass(ChatCompletionRequest.class);
-    OpenAIChatCompletionMock openAIChatCompletionMock;
+    OpenAIAssistantMock openAIAssistantMock;
 
     @BeforeEach
     void setup() {
       params.setThreadId("any-thread-id");
       note = makeMe.aNote().inMemoryPlease();
-      openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
+      openAIAssistantMock = new OpenAIAssistantMock(openAiApi);
     }
 
     private ChatCompletionRequest captureChatCompletionRequest() {
@@ -142,7 +142,7 @@ class AiAdvisorServiceAutoCompleteTest {
     class RequestWithFunctionForClarifyingQuestion {
       @BeforeEach
       void setup() {
-        openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
+        openAIAssistantMock.mockChatCompletionAndReturnFunctionCall(
             new NoteDetailsCompletion(" must come down"), "");
       }
 
@@ -161,7 +161,7 @@ class AiAdvisorServiceAutoCompleteTest {
 
     @Test
     void askCompletionAndUseQuestionResponse() {
-      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
+      openAIAssistantMock.mockChatCompletionAndReturnFunctionCall(
           new ClarifyingQuestion(
               "Are you referring to American football or association football (soccer) ?"),
           askClarificationQuestion);
@@ -188,7 +188,7 @@ class AiAdvisorServiceAutoCompleteTest {
       @Test
       @Disabled
       void mustIncludeThePreviousAnswerInMessages() {
-        openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
+        openAIAssistantMock.mockChatCompletionAndReturnFunctionCall(
             new NoteDetailsCompletion(" is healthy."), "complete_note_details");
         aiAdvisorService.answerAiCompletionClarifyingQuestion(
             params, note, "gpt-4", "asst_example_id");
@@ -199,7 +199,7 @@ class AiAdvisorServiceAutoCompleteTest {
 
       @Test
       void askCompletionAndUseStopResponseWithQuestionAnswer() {
-        openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
+        openAIAssistantMock.mockChatCompletionAndReturnFunctionCall(
             new NoteDetailsCompletion(" is common in China, if you are referring to green tea."),
             "complete_note_details");
         AiCompletionResponse aiCompletionResponse =
@@ -213,7 +213,7 @@ class AiAdvisorServiceAutoCompleteTest {
 
       @Test
       void returnTheClarificationHistory() {
-        openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(
+        openAIAssistantMock.mockChatCompletionAndReturnFunctionCall(
             new ClarifyingQuestion(
                 "Are you referring to American football or association football (soccer) ?"),
             "ask_clarification_question");
