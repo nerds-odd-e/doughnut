@@ -58,7 +58,7 @@ export default defineComponent({
     };
   },
   methods: {
-    initialAutoCompleteDetails() {
+    async initialAutoCompleteDetails() {
       return this.autoCompleteDetails([]);
     },
     async autoCompleteDetails(

@@ -377,6 +377,16 @@ const apiCollection = (managedApi: ManagedApi) => ({
       )) as Generated.AiCompletionResponse;
     },
 
+    async answerCompletionClarifyingQuestion(
+      noteId: Doughnut.ID,
+      request: Generated.AiCompletionParams,
+    ) {
+      return (await managedApi.restPost(
+        `ai/${noteId}/answer-clarifying-question`,
+        request,
+      )) as Generated.AiCompletionResponse;
+    },
+
     async generateImage(prompt: string) {
       return (await managedApi.restPost(
         `ai/generate-image`,
