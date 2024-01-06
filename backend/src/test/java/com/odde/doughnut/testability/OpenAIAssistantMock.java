@@ -13,55 +13,54 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 public record OpenAIAssistantMock(OpenAiApi openAiApi) {
-  public void mockChatCompletionAndReturnFunctionCall(Object result, String functionName) {
-    mockChatCompletionAndReturnFunctionCallJsonNode(
-        new ObjectMapper().valueToTree(result), functionName);
+
+  public void mockThreadAndRequiredAction(Object result, String functionName) {
+    JsonNode arguments = new ObjectMapper().valueToTree(result);
+    mockRequireAction(arguments.toString());
   }
 
-  public void mockChatCompletionAndReturnFunctionCallJsonNode(
-      JsonNode arguments, String functionName) {
+  public void mockThreadCompletion(Object result, String functionName) {
+    JsonNode arguments = new ObjectMapper().valueToTree(result);
     MakeMeWithoutDB makeMe = MakeMe.makeMeWithoutFactoryService();
-    mockChatCompletion(
-        functionName,
-        makeMe.openAiCompletionResult().functionCall(functionName, arguments).please());
+    mockCompletion(makeMe.openAiCompletionResult().functionCall(functionName, arguments).please());
   }
 
-  private void mockChatCompletion(String functionName, ChatCompletionResult toBeReturned) {
+  private void mockCompletion(ChatCompletionResult toBeReturned) {
     Mockito.doReturn(Single.just(new Run()))
         .when(openAiApi)
         .createRun(ArgumentMatchers.any(), ArgumentMatchers.any());
     Run retrievedRun = new Run();
-    if (functionName == askClarificationQuestion) {
-      retrievedRun.setStatus("requires_action");
-      retrievedRun.setRequiredAction(
-          RequiredAction.builder()
-              .submitToolOutputs(
-                  SubmitToolOutputs.builder()
-                      .toolCalls(
-                          List.of(
-                              ToolCall.builder()
-                                  .id("mocked-tool-call-id")
-                                  .function(
-                                      ToolCallFunction.builder()
-                                          .name(askClarificationQuestion)
-                                          .arguments(
-                                              toBeReturned
-                                                  .getChoices()
-                                                  .get(0)
-                                                  .getMessage()
-                                                  .getFunctionCall()
-                                                  .getArguments()
-                                                  .toString())
-                                          .build())
-                                  .build()))
-                      .build())
-              .build());
-    } else {
-      Mockito.doReturn(Single.just(toBeReturned))
-          .when(openAiApi)
-          .createChatCompletion(ArgumentMatchers.any());
-      retrievedRun.setStatus("completed");
-    }
+    Mockito.doReturn(Single.just(toBeReturned))
+        .when(openAiApi)
+        .createChatCompletion(ArgumentMatchers.any());
+    retrievedRun.setStatus("completed");
+    Mockito.doReturn(Single.just(retrievedRun))
+        .when(openAiApi)
+        .retrieveRun(ArgumentMatchers.any(), ArgumentMatchers.any());
+  }
+
+  private void mockRequireAction(String arguments) {
+    Mockito.doReturn(Single.just(new Run()))
+        .when(openAiApi)
+        .createRun(ArgumentMatchers.any(), ArgumentMatchers.any());
+    Run retrievedRun = new Run();
+    retrievedRun.setStatus("requires_action");
+    retrievedRun.setRequiredAction(
+        RequiredAction.builder()
+            .submitToolOutputs(
+                SubmitToolOutputs.builder()
+                    .toolCalls(
+                        List.of(
+                            ToolCall.builder()
+                                .id("mocked-tool-call-id")
+                                .function(
+                                    ToolCallFunction.builder()
+                                        .name(askClarificationQuestion)
+                                        .arguments(arguments)
+                                        .build())
+                                .build()))
+                    .build())
+            .build());
     Mockito.doReturn(Single.just(retrievedRun))
         .when(openAiApi)
         .retrieveRun(ArgumentMatchers.any(), ArgumentMatchers.any());

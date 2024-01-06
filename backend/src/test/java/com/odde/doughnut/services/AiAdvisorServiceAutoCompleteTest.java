@@ -59,8 +59,7 @@ class AiAdvisorServiceAutoCompleteTest {
   class SimpleAutoComplete {
     @Test
     void getAiSuggestion_givenAString_returnsAiSuggestionObject() {
-      openAIAssistantMock.mockChatCompletionAndReturnFunctionCall(
-          new NoteDetailsCompletion(" must come down"), "");
+      openAIAssistantMock.mockThreadCompletion(new NoteDetailsCompletion(" must come down"), "");
       assertEquals("what goes up must come down", getAiCompletionFromAdvisor("what goes up"));
     }
 
@@ -133,7 +132,7 @@ class AiAdvisorServiceAutoCompleteTest {
 
     @Test
     void askCompletionAndUseQuestionResponse() {
-      openAIAssistantMock.mockChatCompletionAndReturnFunctionCall(
+      openAIAssistantMock.mockThreadAndRequiredAction(
           new ClarifyingQuestion(
               "Are you referring to American football or association football (soccer) ?"),
           askClarificationQuestion);
@@ -160,7 +159,7 @@ class AiAdvisorServiceAutoCompleteTest {
       @Test
       @Disabled
       void mustIncludeThePreviousAnswerInMessages() {
-        openAIAssistantMock.mockChatCompletionAndReturnFunctionCall(
+        openAIAssistantMock.mockThreadAndRequiredAction(
             new NoteDetailsCompletion(" is healthy."), "complete_note_details");
         aiAdvisorService.answerAiCompletionClarifyingQuestion(
             params, note, "gpt-4", "asst_example_id");
@@ -172,7 +171,7 @@ class AiAdvisorServiceAutoCompleteTest {
 
       @Test
       void askCompletionAndUseStopResponseWithQuestionAnswer() {
-        openAIAssistantMock.mockChatCompletionAndReturnFunctionCall(
+        openAIAssistantMock.mockThreadCompletion(
             new NoteDetailsCompletion(" is common in China, if you are referring to green tea."),
             "complete_note_details");
         AiCompletionResponse aiCompletionResponse =
@@ -186,7 +185,7 @@ class AiAdvisorServiceAutoCompleteTest {
 
       @Test
       void returnTheClarificationHistory() {
-        openAIAssistantMock.mockChatCompletionAndReturnFunctionCall(
+        openAIAssistantMock.mockThreadAndRequiredAction(
             new ClarifyingQuestion(
                 "Are you referring to American football or association football (soccer) ?"),
             "ask_clarification_question");
