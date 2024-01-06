@@ -87,16 +87,6 @@ public class AiAdvisorService {
       String modelName) {
     Run run = openAiApiHandler.blockGetRun(threadId, assistantId);
 
-    AiToolList tool =
-        AiToolFactory.getNoteContentCompletionTools(aiCompletionParams.getCompletionPrompt());
-
-    ChatCompletionRequest chatCompletionRequest =
-        OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(modelName, note)
-            .addTool(tool)
-            .addMessages(aiCompletionParams.getQAMessages())
-            .maxTokens(150)
-            .build();
-
     boolean isClarifyingQuestion = run.getStatus().equals("requires_action");
     AiCompletionResponse completionResponseForClarification;
     if (isClarifyingQuestion) {
@@ -129,6 +119,16 @@ public class AiAdvisorService {
         throw new RuntimeException("Unknown function name: " + function.getName());
       }
     } else {
+      AiToolList tool =
+          AiToolFactory.getNoteContentCompletionTools(aiCompletionParams.getCompletionPrompt());
+
+      ChatCompletionRequest chatCompletionRequest =
+          OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(modelName, note)
+              .addTool(tool)
+              .addMessages(aiCompletionParams.getQAMessages())
+              .maxTokens(150)
+              .build();
+
       ChatFunctionCall chatFunctionCall =
           openAiApiHandler.getFunctionCall(chatCompletionRequest).orElseThrow();
       completionResponseForClarification =
