@@ -379,7 +379,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
 
     async answerCompletionClarifyingQuestion(
       noteId: Doughnut.ID,
-      request: Generated.AiCompletionParams,
+      request: Generated.AiCompletionAnswerClarifyingQuestionParams,
     ) {
       return (await managedApi.restPost(
         `ai/${noteId}/answer-clarifying-question`,

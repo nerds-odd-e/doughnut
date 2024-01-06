@@ -10,10 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.doughnut.controllers.json.AiCompletionParams;
-import com.odde.doughnut.controllers.json.AiCompletionResponse;
-import com.odde.doughnut.controllers.json.ApiError;
-import com.odde.doughnut.controllers.json.ClarifyingQuestionAndAnswer;
+import com.odde.doughnut.controllers.json.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.OpenAITimeoutException;
@@ -123,7 +120,8 @@ class AiAdvisorServiceAutoCompleteTest {
   @Nested
   class CompleteNoteDetailWithClarifyingQuestion {
     Note note;
-    AiCompletionParams params = new AiCompletionParams();
+    AiCompletionAnswerClarifyingQuestionParams params =
+        new AiCompletionAnswerClarifyingQuestionParams();
     ArgumentCaptor<ChatCompletionRequest> captor =
         ArgumentCaptor.forClass(ChatCompletionRequest.class);
     OpenAIChatCompletionMock openAIChatCompletionMock;
@@ -184,11 +182,7 @@ class AiAdvisorServiceAutoCompleteTest {
       @BeforeEach
       void setup() {
         params.setDetailsToComplete("Tea");
-        ClarifyingQuestionAndAnswer clarifyingQuestionAndAnswer = new ClarifyingQuestionAndAnswer();
-        clarifyingQuestionAndAnswer.questionFromAI =
-            new ClarifyingQuestion("Black tea or green tea?");
-        clarifyingQuestionAndAnswer.answerFromUser = "green tea";
-        params.getClarifyingQuestionAndAnswers().add(clarifyingQuestionAndAnswer);
+        params.setAnswer("green tea");
       }
 
       @Test

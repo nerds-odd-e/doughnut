@@ -3,16 +3,14 @@
 
 declare namespace Generated {
 
-    interface AiCompletionAnswerClarifyingQuestionParams {
+    interface AiCompletionAnswerClarifyingQuestionParams extends AiCompletionParams {
         threadId: string;
         toolCallId: string;
         answer: string;
     }
 
     interface AiCompletionParams {
-        threadId?: string;
         detailsToComplete: string;
-        clarifyingQuestionAndAnswers: ClarifyingQuestionAndAnswer[];
     }
 
     interface AiCompletionResponse {
