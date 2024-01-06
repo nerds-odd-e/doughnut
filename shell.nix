@@ -84,7 +84,6 @@ in mkShell {
     export PS1="(nix)$PS1"
     export GPG_TTY=$(tty)
     export JAVA_HOME="$(readlink -e $(type -p javac) | sed  -e 's/\/bin\/javac//g')"
-    export KOTLIN_HOME="$(readlink -e $(type -p kotlinc) | sed -e 's/\/bin\/kotlinc//g')"
     export PNPM_HOME="$(readlink -e $(type -p pnpm) | sed -e 's/\/bin\/pnpm//g')"
     export NODE_PATH="$(readlink -e $(type -p node) | sed  -e 's/\/bin\/node//g')"
     export FLUTTER_PATH="$(readlink -e $(type -p flutter) | sed  -e 's/\/bin\/flutter//g')"
@@ -107,7 +106,6 @@ in mkShell {
     echo "##   !! DOUGHNUT NIX DEVELOPMENT ENVIRONMENT ;) !!    "
     echo "##   NIX VERSION: `nix --version`                     "
     echo "##   JAVA_HOME: $JAVA_HOME                            "
-    echo "##   KOTLIN_HOME: $KOTLIN_HOME                        "
     echo "##   NODE_PATH: $NODE_PATH                            "
     echo "##   PNPM_HOME: $PNPM_HOME                            "
     echo "##   FLUTTER_PATH: $FLUTTER_PATH                      "
@@ -115,7 +113,6 @@ in mkShell {
     echo "##   MYSQL_HOME: $MYSQL_HOME                          "
     echo "##   MYSQL_DATADIR: $MYSQL_DATADIR                    "
     echo "##   JAVA VERSION: `javac --version`                  "
-    echo "##   KOTLIN VERSION: `kotlin -version`                "
     echo "##   NODE VERSION: `node --version`                   "
     echo "##   PNPM VERSION: `pnpm --version`                   "
     echo "##   FLUTTER VERSION: `flutter --version | head -n 1` "
