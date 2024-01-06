@@ -117,11 +117,9 @@ public class AiAdvisorService {
         throw new RuntimeException("Unknown function name: " + function.getName());
       }
     } else {
-      AiToolList tool = AiToolFactory.getNoteContentCompletionTools("");
 
       ChatCompletionRequest chatCompletionRequest =
           OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(modelName, note)
-              .addTool(tool)
               .maxTokens(150)
               .build();
 

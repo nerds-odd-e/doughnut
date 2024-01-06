@@ -49,36 +49,6 @@ Given(
   },
 )
 
-Given(
-  "OpenAI will complete with {string} for context containing {string} in thread {string}",
-  (returnMessage: string, context: string, threadId) => {
-    mock_services.openAi().thread(threadId).singletonStubRetrieveRun().completed()
-    mock_services
-      .openAi()
-      .chatCompletion()
-      .requestMessageMatches({
-        role: "system",
-        content: context,
-      })
-      .stubNoteDetailsCompletion(returnMessage)
-  },
-)
-
-Given(
-  "OpenAI will complete the phrase {string} with {string} in thread {string}",
-  (incomplete: string, returnMessage: string, threadId: string) => {
-    mock_services.openAi().thread(threadId).singletonStubRetrieveRun().completed()
-    mock_services
-      .openAi()
-      .chatCompletion()
-      .requestMessageMatches({
-        role: "user",
-        content: '"' + Cypress._.escapeRegExp(incomplete) + '"',
-      })
-      .stubNoteDetailsCompletion(returnMessage)
-  },
-)
-
 Given("OpenAI always return image of a moon", () => {
   mock_services.openAi().stubCreateImage()
 })
@@ -113,15 +83,19 @@ Given("the OpenAI assistant in thread {string} is set to:", (threadId: string, d
   mock_services.openAi().thread(threadId).stubRetrieveRuns(data.hashes())
 })
 
-Given("the OpenAI assistant will complete the details with {string}", (details: string) => {
-  mock_services
-    .openAi()
-    .chatCompletion()
-    .requestMessageMatches({
-      role: "user",
-    })
-    .stubNoteDetailsCompletion(details)
-})
+Given(
+  "the OpenAI assistant will complete the details with {string} in the thread {string}",
+  (details: string, threadId: string) => {
+    mock_services.openAi().thread(threadId).singletonStubRetrieveRun().completed()
+    mock_services
+      .openAi()
+      .chatCompletion()
+      .requestMessageMatches({
+        role: "system",
+      })
+      .stubNoteDetailsCompletion(details)
+  },
+)
 
 Given(
   "OpenAI service can create thread and run with id {string} when requested",
