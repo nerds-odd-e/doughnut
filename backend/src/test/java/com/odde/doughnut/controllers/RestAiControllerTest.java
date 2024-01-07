@@ -105,7 +105,7 @@ class RestAiControllerTest {
         when(openAiApi.createMessage(eq("this-thread"), ArgumentMatchers.any()))
             .thenReturn(Single.just(new Message()));
         openAIAssistantMock.mockThreadCompletion(
-            new NoteDetailsCompletion("blue planet"), "", "my-run-id");
+            new NoteDetailsCompletion("blue planet"), "my-run-id");
       }
 
       @Test
@@ -148,17 +148,7 @@ class RestAiControllerTest {
       void setup() {
         params.setThreadId("any-thread-id");
         openAIAssistantMock.mockSubmitOutputAndCompletion(
-            new NoteDetailsCompletion("blue planet"), "", "my-run-id");
-      }
-
-      @Test
-      void askSuggestionWithRightModel() {
-        new GlobalSettingsService(makeMe.modelFactoryService)
-            .getGlobalSettingOthers()
-            .setKeyValue(makeMe.aTimestamp().please(), "gpt-future");
-        controller.answerCompletionClarifyingQuestion(note, params);
-        verify(openAiApi).createChatCompletion(captor.capture());
-        assertEquals("gpt-future", captor.getValue().getModel());
+            new NoteDetailsCompletion("blue planet"), "my-run-id");
       }
 
       @Test
