@@ -14,7 +14,7 @@
         <AIClarifyingQuestionDialog
           :completion-in-progress="completionInProgress"
           :clarifying-history="clarifyingHistory"
-          @submit="clarifyingQuestionAndAnswered"
+          @submit="clarifyingQuestionAnswered"
         />
       </template>
     </Modal>
@@ -81,7 +81,7 @@ export default defineComponent({
         details: response.moreCompleteContent,
       });
     },
-    async clarifyingQuestionAndAnswered(
+    async clarifyingQuestionAnswered(
       clarifyingQuestionAndAnswer: Generated.ClarifyingQuestionAndAnswer,
     ) {
       this.clarifyingHistory.push(clarifyingQuestionAndAnswer);
@@ -91,7 +91,10 @@ export default defineComponent({
           detailsToComplete: this.note.details,
           answer: clarifyingQuestionAndAnswer.answerFromUser,
           threadId: this.completionInProgress!.threadId,
-          toolCallId: "xx",
+          runId: this.completionInProgress!.runId,
+          toolCallId:
+            this.completionInProgress!.clarifyingQuestionRequiredAction
+              .toolCallId,
         },
       );
       await this.autoCompleteDetails(response);

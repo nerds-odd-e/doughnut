@@ -1,5 +1,6 @@
 import { flushPromises } from "@vue/test-utils";
 import NoteDetailsAutoCompletionButton from "@/components/toolbars/NoteDetailsAutoCompletionButton.vue";
+import AIClarifyingQuestionDialog from "@/components/notes/AIClarifyingQuestionDialog.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
@@ -58,6 +59,32 @@ describe("NoteDetailsAutoCompletionButton", () => {
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
 
     await triggerAutoCompletion(note);
+  });
+
+  it("ask for clarifying question", async () => {
+    helper.apiMock
+      .expectingPost(`/api/ai/${note.id}/completion`)
+      .andReturnOnce({
+        runId: "run-id",
+        threadId: "thread-id",
+        clarifyingQuestionRequiredAction: {
+          toolCallId: "tool-call-id",
+          clarifyingQuestion: "what do you mean?",
+        },
+      });
+    const wrapper = await triggerAutoCompletion(note);
+    const dialog = wrapper.getComponent(AIClarifyingQuestionDialog);
+    dialog.find("input#note-answerToAI").setValue("I mean this");
+    helper.apiMock.expectingPost(
+      `/api/ai/${note.id}/answer-clarifying-question`,
+    );
+    dialog.find("input[type='submit']").trigger("click");
+    helper.apiMock.verifyCall(
+      `/api/ai/${note.id}/answer-clarifying-question`,
+      expect.objectContaining({
+        body: expect.stringContaining("tool-call-id"),
+      }),
+    );
   });
 
   it("stop updating if the component is unmounted", async () => {
