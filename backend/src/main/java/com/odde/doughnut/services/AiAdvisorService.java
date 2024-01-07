@@ -47,25 +47,20 @@ public class AiAdvisorService {
   }
 
   public AiCompletionResponse getAiCompletion(
-      AiCompletionParams aiCompletionParams, Note note, String modelName, String assistantId) {
+      AiCompletionParams aiCompletionParams, Note note, String assistantId) {
     String threadId = createThread(aiCompletionParams, note);
     Run run = openAiApiHandler.createRun(threadId, assistantId);
-    return getThreadResponse(
-        threadId, modelName, aiCompletionParams.getDetailsToComplete(), run);
+    return getThreadResponse(threadId, aiCompletionParams.getDetailsToComplete(), run);
   }
 
   public AiCompletionResponse answerAiCompletionClarifyingQuestion(
-      AiCompletionAnswerClarifyingQuestionParams answerClarifyingQuestionParams,
-      String modelName) {
+      AiCompletionAnswerClarifyingQuestionParams answerClarifyingQuestionParams) {
     String threadId = answerClarifyingQuestionParams.getThreadId();
 
     Run retrievedRun = openAiApiHandler.submitToolOutputs(answerClarifyingQuestionParams);
 
     return getThreadResponse(
-        threadId,
-      modelName,
-        answerClarifyingQuestionParams.getDetailsToComplete(),
-        retrievedRun);
+        threadId, answerClarifyingQuestionParams.getDetailsToComplete(), retrievedRun);
   }
 
   private String createThread(AiCompletionParams aiCompletionParams, Note note) {
@@ -84,7 +79,7 @@ public class AiAdvisorService {
   }
 
   private AiCompletionResponse getThreadResponse(
-    String threadId, String modelName, String detailsToComplete, Run currentRun) {
+      String threadId, String detailsToComplete, Run currentRun) {
     Run run = openAiApiHandler.retrieveUntilCompletedOrRequiresAction(threadId, currentRun);
 
     AiCompletionResponse completionResponseForClarification;

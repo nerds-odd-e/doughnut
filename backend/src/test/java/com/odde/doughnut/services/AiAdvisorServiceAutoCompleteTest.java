@@ -108,7 +108,7 @@ class AiAdvisorServiceAutoCompleteTest {
       AiCompletionParams aiCompletionParams = new AiCompletionParams();
       aiCompletionParams.setDetailsToComplete(incompleteContent);
       return aiAdvisorService
-          .getAiCompletion(aiCompletionParams, note, "gpt-4", "asst_example_id")
+          .getAiCompletion(aiCompletionParams, note, "asst_example_id")
           .getMoreCompleteContent();
     }
   }
@@ -134,7 +134,7 @@ class AiAdvisorServiceAutoCompleteTest {
               "Are you referring to American football or association football (soccer) ?"),
           "my-run-id");
       AiCompletionResponse aiCompletionResponse =
-          aiAdvisorService.answerAiCompletionClarifyingQuestion(params, "gpt-4");
+          aiAdvisorService.answerAiCompletionClarifyingQuestion(params);
       assertEquals("question", aiCompletionResponse.getFinishReason());
       assertEquals(
           "mocked-tool-call-id",
@@ -157,7 +157,7 @@ class AiAdvisorServiceAutoCompleteTest {
         openAIAssistantMock.mockSubmitOutputAndCompletion(
             new NoteDetailsCompletion("blue planet"), "my-run-id");
         params.setToolCallId("tool-call-id");
-        aiAdvisorService.answerAiCompletionClarifyingQuestion(params, "gpt-4");
+        aiAdvisorService.answerAiCompletionClarifyingQuestion(params);
         ArgumentCaptor<SubmitToolOutputsRequest> captor =
             ArgumentCaptor.forClass(SubmitToolOutputsRequest.class);
         verify(openAiApi)
@@ -173,7 +173,7 @@ class AiAdvisorServiceAutoCompleteTest {
             new NoteDetailsCompletion(" is common in China, if you are referring to green tea."),
             "my-run-id");
         AiCompletionResponse aiCompletionResponse =
-            aiAdvisorService.answerAiCompletionClarifyingQuestion(params, "gpt-4");
+            aiAdvisorService.answerAiCompletionClarifyingQuestion(params);
         assertEquals("stop", aiCompletionResponse.getFinishReason());
         assertEquals(
             "Tea is common in China, if you are referring to green tea.",
@@ -187,7 +187,7 @@ class AiAdvisorServiceAutoCompleteTest {
                 "Are you referring to American football or association football (soccer) ?"),
             "my-run-id");
         AiCompletionResponse aiCompletionResponse =
-            aiAdvisorService.answerAiCompletionClarifyingQuestion(params, "gpt-4");
+            aiAdvisorService.answerAiCompletionClarifyingQuestion(params);
         assertThat(aiCompletionResponse.getFinishReason(), equalTo("question"));
       }
     }
