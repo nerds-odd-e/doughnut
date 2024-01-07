@@ -84,20 +84,6 @@ Given("the OpenAI assistant in thread {string} is set to:", (threadId: string, d
 })
 
 Given(
-  "the OpenAI assistant will complete the details with {string} in the thread {string}",
-  (details: string, threadId: string) => {
-    mock_services.openAi().thread(threadId).singletonStubRetrieveRun().completed()
-    mock_services
-      .openAi()
-      .chatCompletion()
-      .requestMessageMatches({
-        role: "system",
-      })
-      .stubNoteDetailsCompletion(details)
-  },
-)
-
-Given(
   "OpenAI service can create thread and run with id {string} when requested",
   (threadId: string) => {
     mock_services.openAi().thread(threadId).stubCreateThreadRunAndSubmitOutput()

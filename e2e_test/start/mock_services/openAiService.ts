@@ -101,58 +101,38 @@ const openAiService = () => {
             },
           )
         },
-        singletonStubRetrieveRun() {
-          const singletonIndex = undefined
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const stubRetrieveRun = async (status: string, partial: any) => {
-            const resp = await serviceMocker.stubGetter(
-              `/v1/threads/${threadId}/runs/run-abc123`,
-              {},
-              {
-                id: "run-abc123",
-                status,
-                ...partial,
-              },
-              singletonIndex,
-            )
-            return resp
-          }
-          return {
-            async completed() {
-              return stubRetrieveRun("completed", {})
-            },
-          }
-        },
 
         async stubRetrieveRuns(hashes: Record<string, string>[]) {
+          const createRequiresActionRun = (functionName: string, argumentsObj: unknown) => {
+            return {
+              id: "run-abc123",
+              status: "requires_action",
+              required_action: {
+                type: "submit_tool_outputs",
+                submit_tool_outputs: {
+                  tool_calls: [
+                    {
+                      type: "function",
+                      function: {
+                        name: functionName,
+                        arguments: JSON.stringify(argumentsObj),
+                      },
+                    },
+                  ],
+                },
+              },
+            }
+          }
           const responses = hashes.map((hash) => {
             switch (hash["response"]) {
               case "ask":
-                return {
-                  id: "run-abc123",
-                  status: "requires_action",
-                  required_action: {
-                    type: "submit_tool_outputs",
-                    submit_tool_outputs: {
-                      tool_calls: [
-                        {
-                          type: "function",
-                          function: {
-                            name: "ask_clarification_question",
-                            arguments: JSON.stringify({
-                              question: hash["arguments"],
-                            }),
-                          },
-                        },
-                      ],
-                    },
-                  },
-                }
+                return createRequiresActionRun("ask_clarification_question", {
+                  question: hash["arguments"],
+                })
               case "complete":
-                return {
-                  id: "run-abc123",
-                  status: "completed",
-                }
+                return createRequiresActionRun("complete_note_details", {
+                  completion: hash["arguments"]?.match(/"(.*)"/)?.[1],
+                })
               default:
                 throw new Error(`Unknown response: ${hash["response"]}`)
             }
