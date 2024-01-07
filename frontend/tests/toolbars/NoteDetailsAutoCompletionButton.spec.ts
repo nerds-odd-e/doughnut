@@ -54,7 +54,6 @@ describe("NoteDetailsAutoCompletionButton", () => {
       .expectingPost(`/api/ai/${note.id}/completion`)
       .andReturnOnce({
         moreCompleteContent: "auto completed content",
-        finishReason: "stop",
       });
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
 
@@ -90,7 +89,6 @@ describe("NoteDetailsAutoCompletionButton", () => {
       .expectingPost(`/api/ai/${note.id}/completion`)
       .andReturnOnce({
         moreCompleteContent: "auto completed content",
-        finishReason: "stop",
       });
 
     const wrapper = await triggerAutoCompletionWithoutFlushPromises(note);

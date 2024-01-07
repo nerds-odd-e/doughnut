@@ -14,7 +14,6 @@ describe("answering a clarifying question for note details geeration", () => {
         question: "Do you mean American Football or European Football?",
       },
     },
-    finishReason: "clarifying_question",
   };
   const clarifyingHistory = [
     {

@@ -103,7 +103,6 @@ public class AiAdvisorService {
           throw new RuntimeException(e);
         }
         AiCompletionResponse result = new AiCompletionResponse();
-        result.setFinishReason("question");
         ClarifyingQuestionRequiredAction cqra = new ClarifyingQuestionRequiredAction();
         cqra.clarifyingQuestion = result1;
         cqra.toolCallId = toolCall.getId();
@@ -152,7 +151,6 @@ public class AiAdvisorService {
     AiCompletionResponse result = new AiCompletionResponse();
     String content = result1;
     result.setMoreCompleteContent(content);
-    result.setFinishReason("stop");
     return result;
   }
 

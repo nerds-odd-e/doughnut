@@ -156,7 +156,6 @@ class RestAiControllerTest {
         AiCompletionResponse aiCompletionResponse =
             controller.answerCompletionClarifyingQuestion(params);
         assertEquals("blue planet", aiCompletionResponse.getMoreCompleteContent());
-        assertEquals("stop", aiCompletionResponse.getFinishReason());
       }
 
       @Test
