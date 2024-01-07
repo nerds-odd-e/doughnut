@@ -79,16 +79,27 @@ const openAiService = () => {
 
     thread(threadId: string) {
       return {
-        async stubCreateThreadAndRun() {
+        async stubCreateThreadRunAndSubmitOutput() {
           await serviceMocker.stubPoster(`/v1/threads`, {
             id: threadId,
           })
           await serviceMocker.stubPoster(`/v1/threads/${threadId}/messages`, {
             id: "msg-abc123",
           })
-          return await serviceMocker.stubPoster(`/v1/threads/${threadId}/runs`, {
-            id: "run-abc123",
+          await serviceMocker.stubPoster(`/v1/threads/${threadId}/messages`, {
+            id: "msg-abc123",
           })
+          await serviceMocker.stubPoster(`/v1/threads/${threadId}/runs`, {
+            id: "run-abc123",
+            status: "queued",
+          })
+          return await serviceMocker.stubPoster(
+            `/v1/threads/${threadId}/runs/run-abc123/submit_tool_outputs`,
+            {
+              id: "run-abc123",
+              status: "queued",
+            },
+          )
         },
         singletonStubRetrieveRun() {
           const singletonIndex = undefined
