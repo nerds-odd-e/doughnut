@@ -5,6 +5,7 @@ declare namespace Generated {
 
     interface AiCompletionAnswerClarifyingQuestionParams extends AiCompletionParams {
         threadId: string;
+        runId: string;
         toolCallId: string;
         answer: string;
     }

@@ -3,6 +3,7 @@ package com.odde.doughnut.services.openAiApis;
 import static com.odde.doughnut.services.openAiApis.ApiExecutor.blockGet;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.odde.doughnut.controllers.json.AiCompletionAnswerClarifyingQuestionParams;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.theokanning.openai.assistants.Assistant;
@@ -18,9 +19,12 @@ import com.theokanning.openai.messages.MessageRequest;
 import com.theokanning.openai.model.Model;
 import com.theokanning.openai.runs.Run;
 import com.theokanning.openai.runs.RunCreateRequest;
+import com.theokanning.openai.runs.SubmitToolOutputRequestItem;
+import com.theokanning.openai.runs.SubmitToolOutputsRequest;
 import com.theokanning.openai.threads.Thread;
 import com.theokanning.openai.threads.ThreadRequest;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import okhttp3.MediaType;
@@ -120,8 +124,8 @@ public class OpenAiApiHandler {
     return blockGet(openAiApi.createRun(threadId, runCreateRequest));
   }
 
-  public Run retrieveUntilCompletedOrRequiresAction(String threadId, String runId) {
-    Run retrievedRun = retrieveRun(threadId, runId);
+  public Run retrieveUntilCompletedOrRequiresAction(String threadId, Run currentRun) {
+    Run retrievedRun = currentRun;
     int count = 0;
     while (!(retrievedRun.getStatus().equals("completed"))
         && !(retrievedRun.getStatus().equals("failed"))
@@ -130,11 +134,29 @@ public class OpenAiApiHandler {
       if (count > 10) {
         break;
       }
-      retrievedRun = retrieveRun(threadId, runId);
+      retrievedRun = retrieveRun(threadId, currentRun.getId());
     }
     if (retrievedRun.getStatus().equals("failed")) {
       throw new RuntimeException("OpenAI failed to complete the request");
     }
     return retrievedRun;
+  }
+
+  public Run submitToolOutputs(
+      AiCompletionAnswerClarifyingQuestionParams answerClarifyingQuestionParams) {
+    SubmitToolOutputRequestItem toolOutputRequestItem =
+        SubmitToolOutputRequestItem.builder()
+            .toolCallId(answerClarifyingQuestionParams.getToolCallId())
+            .output(answerClarifyingQuestionParams.getAnswer())
+            .build();
+    List<SubmitToolOutputRequestItem> toolOutputRequestItems = new ArrayList<>();
+    toolOutputRequestItems.add(toolOutputRequestItem);
+    SubmitToolOutputsRequest submitToolOutputsRequest =
+        SubmitToolOutputsRequest.builder().toolOutputs(toolOutputRequestItems).build();
+    return blockGet(
+        openAiApi.submitToolOutputs(
+            answerClarifyingQuestionParams.getThreadId(),
+            answerClarifyingQuestionParams.getRunId(),
+            submitToolOutputsRequest));
   }
 }

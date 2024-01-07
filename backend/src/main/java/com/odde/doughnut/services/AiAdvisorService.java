@@ -21,10 +21,7 @@ import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatFunctionCall;
 import com.theokanning.openai.messages.MessageRequest;
-import com.theokanning.openai.runs.RequiredAction;
-import com.theokanning.openai.runs.Run;
-import com.theokanning.openai.runs.ToolCall;
-import com.theokanning.openai.runs.ToolCallFunction;
+import com.theokanning.openai.runs.*;
 import com.theokanning.openai.threads.Thread;
 import com.theokanning.openai.threads.ThreadRequest;
 import java.io.IOException;
@@ -52,18 +49,27 @@ public class AiAdvisorService {
   public AiCompletionResponse getAiCompletion(
       AiCompletionParams aiCompletionParams, Note note, String modelName, String assistantId) {
     String threadId = createThread(aiCompletionParams, note);
-    return getAiCompletionResponse(
-        threadId, assistantId, note, modelName, aiCompletionParams.getDetailsToComplete());
+    Run run = openAiApiHandler.createRun(threadId, assistantId);
+    return getThreadResponse(
+        threadId, assistantId, note, modelName, aiCompletionParams.getDetailsToComplete(), run);
   }
 
   public AiCompletionResponse answerAiCompletionClarifyingQuestion(
-      AiCompletionAnswerClarifyingQuestionParams aiCompletionParams,
+      AiCompletionAnswerClarifyingQuestionParams answerClarifyingQuestionParams,
       Note note,
       String modelName,
       String assistantId) {
-    String threadId = aiCompletionParams.getThreadId();
-    return getAiCompletionResponse(
-        threadId, assistantId, note, modelName, aiCompletionParams.getDetailsToComplete());
+    String threadId = answerClarifyingQuestionParams.getThreadId();
+
+    Run retrievedRun = openAiApiHandler.submitToolOutputs(answerClarifyingQuestionParams);
+
+    return getThreadResponse(
+        threadId,
+        assistantId,
+        note,
+        modelName,
+        answerClarifyingQuestionParams.getDetailsToComplete(),
+        retrievedRun);
   }
 
   private String createThread(AiCompletionParams aiCompletionParams, Note note) {
@@ -81,10 +87,14 @@ public class AiAdvisorService {
     return thread.getId();
   }
 
-  private AiCompletionResponse getAiCompletionResponse(
-      String threadId, String assistantId, Note note, String modelName, String detailsToComplete) {
-    Run run1 = openAiApiHandler.createRun(threadId, assistantId);
-    Run run = openAiApiHandler.retrieveUntilCompletedOrRequiresAction(threadId, run1.getId());
+  private AiCompletionResponse getThreadResponse(
+      String threadId,
+      String assistantId,
+      Note note,
+      String modelName,
+      String detailsToComplete,
+      Run currentRun) {
+    Run run = openAiApiHandler.retrieveUntilCompletedOrRequiresAction(threadId, currentRun);
 
     boolean isClarifyingQuestion = run.getStatus().equals("requires_action");
     AiCompletionResponse completionResponseForClarification;
@@ -130,7 +140,7 @@ public class AiAdvisorService {
           getAiCompletionResponse(chatFunctionCall.getArguments(), detailsToComplete);
     }
     completionResponseForClarification.setThreadId(threadId);
-    completionResponseForClarification.setRunId(run1.getId());
+    completionResponseForClarification.setRunId(currentRun.getId());
     return completionResponseForClarification;
   }
 

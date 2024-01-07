@@ -1,6 +1,8 @@
 package com.odde.doughnut.testability;
 
 import static com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder.askClarificationQuestion;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,40 +16,57 @@ import org.mockito.Mockito;
 
 public record OpenAIAssistantMock(OpenAiApi openAiApi) {
 
-  public void mockThreadAndRequiredAction(Object result, String runId) {
-    mockCreateRun(runId);
-    JsonNode arguments = new ObjectMapper().valueToTree(result);
-    mockRequireAction(arguments.toString());
-  }
-
   public void mockThreadCompletion(Object result, String functionName, String runId) {
-    mockCreateRun(runId);
+    mockCreateRunInProcess(runId);
     JsonNode arguments = new ObjectMapper().valueToTree(result);
     MakeMeWithoutDB makeMe = MakeMe.makeMeWithoutFactoryService();
-    mockCompletion(makeMe.openAiCompletionResult().functionCall(functionName, arguments).please());
-  }
-
-  private void mockCompletion(ChatCompletionResult toBeReturned) {
-    Run retrievedRun = new Run();
+    ChatCompletionResult toBeReturned =
+        makeMe.openAiCompletionResult().functionCall(functionName, arguments).please();
     Mockito.doReturn(Single.just(toBeReturned))
         .when(openAiApi)
         .createChatCompletion(ArgumentMatchers.any());
-    retrievedRun.setStatus("completed");
+    Run retrievedRun = getRunThatCompleted(runId);
     Mockito.doReturn(Single.just(retrievedRun))
         .when(openAiApi)
         .retrieveRun(ArgumentMatchers.any(), ArgumentMatchers.any());
   }
 
-  private void mockCreateRun(String runId) {
+  public void mockSubmitOutputAndCompletion(Object result, String functionName, String runId) {
+    JsonNode arguments = new ObjectMapper().valueToTree(result);
+    MakeMeWithoutDB makeMe = MakeMe.makeMeWithoutFactoryService();
+    ChatCompletionResult toBeReturned =
+        makeMe.openAiCompletionResult().functionCall(functionName, arguments).please();
+    Mockito.doReturn(Single.just(toBeReturned))
+        .when(openAiApi)
+        .createChatCompletion(ArgumentMatchers.any());
+    Run run = getRunThatCompleted(runId);
+    when(openAiApi.submitToolOutputs(any(), any(), any())).thenReturn(Single.just(run));
+  }
+
+  public void mockSubmitOutputAndRequiredMoreAction(Object result, String runId) {
+    Run run = getRunThatRequiresAction(new ObjectMapper().valueToTree(result).toString(), runId);
+    when(openAiApi.submitToolOutputs(any(), any(), any())).thenReturn(Single.just(run));
+  }
+
+  private static Run getRunThatCompleted(String runId) {
+    Run retrievedRun = new Run();
+    retrievedRun.setId(runId);
+    retrievedRun.setStatus("completed");
+    return retrievedRun;
+  }
+
+  private void mockCreateRunInProcess(String runId) {
     Run run = new Run();
     run.setId(runId);
+    run.setStatus("processing");
     Mockito.doReturn(Single.just(run))
         .when(openAiApi)
         .createRun(ArgumentMatchers.any(), ArgumentMatchers.any());
   }
 
-  private void mockRequireAction(String arguments) {
+  private static Run getRunThatRequiresAction(String arguments, String runId) {
     Run retrievedRun = new Run();
+    retrievedRun.setId(runId);
     retrievedRun.setStatus("requires_action");
     retrievedRun.setRequiredAction(
         RequiredAction.builder()
@@ -65,8 +84,6 @@ public record OpenAIAssistantMock(OpenAiApi openAiApi) {
                                 .build()))
                     .build())
             .build());
-    Mockito.doReturn(Single.just(retrievedRun))
-        .when(openAiApi)
-        .retrieveRun(ArgumentMatchers.any(), ArgumentMatchers.any());
+    return retrievedRun;
   }
 }
