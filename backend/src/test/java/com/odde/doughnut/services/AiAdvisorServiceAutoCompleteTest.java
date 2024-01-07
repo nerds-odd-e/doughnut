@@ -134,8 +134,7 @@ class AiAdvisorServiceAutoCompleteTest {
               "Are you referring to American football or association football (soccer) ?"),
           "my-run-id");
       AiCompletionResponse aiCompletionResponse =
-          aiAdvisorService.answerAiCompletionClarifyingQuestion(
-              params, note, "gpt-4", "asst_example_id");
+          aiAdvisorService.answerAiCompletionClarifyingQuestion(params, note, "gpt-4");
       assertEquals("question", aiCompletionResponse.getFinishReason());
       assertEquals(
           "mocked-tool-call-id",
@@ -158,8 +157,7 @@ class AiAdvisorServiceAutoCompleteTest {
         openAIAssistantMock.mockSubmitOutputAndCompletion(
             new NoteDetailsCompletion("blue planet"), "", "my-run-id");
         params.setToolCallId("tool-call-id");
-        aiAdvisorService.answerAiCompletionClarifyingQuestion(
-            params, note, "gpt-4", "asst_example_id");
+        aiAdvisorService.answerAiCompletionClarifyingQuestion(params, note, "gpt-4");
         ArgumentCaptor<SubmitToolOutputsRequest> captor =
             ArgumentCaptor.forClass(SubmitToolOutputsRequest.class);
         verify(openAiApi)
@@ -176,8 +174,7 @@ class AiAdvisorServiceAutoCompleteTest {
             "complete_note_details",
             "my-run-id");
         AiCompletionResponse aiCompletionResponse =
-            aiAdvisorService.answerAiCompletionClarifyingQuestion(
-                params, note, "gpt-4", "asst_example_id");
+            aiAdvisorService.answerAiCompletionClarifyingQuestion(params, note, "gpt-4");
         assertEquals("stop", aiCompletionResponse.getFinishReason());
         assertEquals(
             "Tea is common in China, if you are referring to green tea.",
@@ -191,8 +188,7 @@ class AiAdvisorServiceAutoCompleteTest {
                 "Are you referring to American football or association football (soccer) ?"),
             "my-run-id");
         AiCompletionResponse aiCompletionResponse =
-            aiAdvisorService.answerAiCompletionClarifyingQuestion(
-                params, note, "gpt-4", "asst_example_id");
+            aiAdvisorService.answerAiCompletionClarifyingQuestion(params, note, "gpt-4");
         assertThat(aiCompletionResponse.getFinishReason(), equalTo("question"));
       }
     }

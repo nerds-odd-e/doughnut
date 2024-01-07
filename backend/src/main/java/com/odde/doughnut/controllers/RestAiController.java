@@ -55,7 +55,7 @@ public class RestAiController {
       @RequestBody AiCompletionAnswerClarifyingQuestionParams answerClarifyingQuestionParams) {
     currentUser.assertLoggedIn();
     return aiAdvisorService.answerAiCompletionClarifyingQuestion(
-        answerClarifyingQuestionParams, note, getDefaultOpenAiChatModel(), getAssistantId());
+        answerClarifyingQuestionParams, note, getDefaultOpenAiChatModel());
   }
 
   @PostMapping("/chat")
