@@ -135,7 +135,6 @@ class AiAdvisorServiceAutoCompleteTest {
           "my-run-id");
       AiCompletionResponse aiCompletionResponse =
           aiAdvisorService.answerAiCompletionClarifyingQuestion(params);
-      assertEquals("question", aiCompletionResponse.getFinishReason());
       assertEquals(
           "mocked-tool-call-id",
           aiCompletionResponse.getClarifyingQuestionRequiredAction().toolCallId);
@@ -174,21 +173,9 @@ class AiAdvisorServiceAutoCompleteTest {
             "my-run-id");
         AiCompletionResponse aiCompletionResponse =
             aiAdvisorService.answerAiCompletionClarifyingQuestion(params);
-        assertEquals("stop", aiCompletionResponse.getFinishReason());
         assertEquals(
             "Tea is common in China, if you are referring to green tea.",
             aiCompletionResponse.getMoreCompleteContent());
-      }
-
-      @Test
-      void returnTheClarificationHistory() {
-        openAIAssistantMock.mockSubmitOutputAndRequiredMoreAction(
-            new ClarifyingQuestion(
-                "Are you referring to American football or association football (soccer) ?"),
-            "my-run-id");
-        AiCompletionResponse aiCompletionResponse =
-            aiAdvisorService.answerAiCompletionClarifyingQuestion(params);
-        assertThat(aiCompletionResponse.getFinishReason(), equalTo("question"));
       }
     }
   }
