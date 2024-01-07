@@ -45,16 +45,14 @@ public class RestAiController {
   public AiCompletionResponse getCompletion(
       @PathVariable(name = "note") Note note, @RequestBody AiCompletionParams aiCompletionParams) {
     currentUser.assertLoggedIn();
-    return aiAdvisorService.getAiCompletion(
-        aiCompletionParams, note, getDefaultOpenAiChatModel(), getAssistantId());
+    return aiAdvisorService.getAiCompletion(aiCompletionParams, note, getAssistantId());
   }
 
   @PostMapping("/answer-clarifying-question")
   public AiCompletionResponse answerCompletionClarifyingQuestion(
       @RequestBody AiCompletionAnswerClarifyingQuestionParams answerClarifyingQuestionParams) {
     currentUser.assertLoggedIn();
-    return aiAdvisorService.answerAiCompletionClarifyingQuestion(
-        answerClarifyingQuestionParams, getDefaultOpenAiChatModel());
+    return aiAdvisorService.answerAiCompletionClarifyingQuestion(answerClarifyingQuestionParams);
   }
 
   @PostMapping("/chat")
