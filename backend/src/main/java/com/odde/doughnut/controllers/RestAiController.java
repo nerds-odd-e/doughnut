@@ -49,13 +49,12 @@ public class RestAiController {
         aiCompletionParams, note, getDefaultOpenAiChatModel(), getAssistantId());
   }
 
-  @PostMapping("/{note}/answer-clarifying-question")
+  @PostMapping("/answer-clarifying-question")
   public AiCompletionResponse answerCompletionClarifyingQuestion(
-      @PathVariable(name = "note") Note note,
       @RequestBody AiCompletionAnswerClarifyingQuestionParams answerClarifyingQuestionParams) {
     currentUser.assertLoggedIn();
     return aiAdvisorService.answerAiCompletionClarifyingQuestion(
-        answerClarifyingQuestionParams, note, getDefaultOpenAiChatModel());
+        answerClarifyingQuestionParams, getDefaultOpenAiChatModel());
   }
 
   @PostMapping("/chat")
