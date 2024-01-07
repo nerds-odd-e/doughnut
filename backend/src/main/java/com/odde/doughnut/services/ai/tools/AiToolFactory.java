@@ -7,6 +7,9 @@ import com.theokanning.openai.completion.chat.ChatFunction;
 import java.util.List;
 
 public class AiToolFactory {
+
+  public static final String COMPLETE_NOTE_DETAILS = "complete_note_details";
+
   public static AiToolList mcqWithAnswerAiTool() {
     return new AiToolList(
         """
@@ -57,7 +60,7 @@ please critically check if the following question makes sense and is possible to
     List<ChatFunction> functions =
         List.of(
             ChatFunction.builder()
-                .name("complete_note_details")
+                .name(COMPLETE_NOTE_DETAILS)
                 .description("Text completion for the details of the note of focus")
                 .executor(NoteDetailsCompletion.class, null)
                 .build(),

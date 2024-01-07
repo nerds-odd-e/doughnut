@@ -58,7 +58,7 @@ class AiAdvisorServiceAutoCompleteTest {
     @Test
     void getAiSuggestion_givenAString_returnsAiSuggestionObject() {
       openAIAssistantMock.mockThreadCompletion(
-          new NoteDetailsCompletion(" must come down"), "", "my-run-id");
+          new NoteDetailsCompletion(" must come down"), "my-run-id");
       assertEquals("what goes up must come down", getAiCompletionFromAdvisor("what goes up"));
     }
 
@@ -155,7 +155,7 @@ class AiAdvisorServiceAutoCompleteTest {
       @Test
       void mustSubmitTheAnswer() {
         openAIAssistantMock.mockSubmitOutputAndCompletion(
-            new NoteDetailsCompletion("blue planet"), "", "my-run-id");
+            new NoteDetailsCompletion("blue planet"), "my-run-id");
         params.setToolCallId("tool-call-id");
         aiAdvisorService.answerAiCompletionClarifyingQuestion(params, note, "gpt-4");
         ArgumentCaptor<SubmitToolOutputsRequest> captor =
@@ -171,7 +171,6 @@ class AiAdvisorServiceAutoCompleteTest {
       void askCompletionAndUseStopResponseWithQuestionAnswer() {
         openAIAssistantMock.mockSubmitOutputAndCompletion(
             new NoteDetailsCompletion(" is common in China, if you are referring to green tea."),
-            "complete_note_details",
             "my-run-id");
         AiCompletionResponse aiCompletionResponse =
             aiAdvisorService.answerAiCompletionClarifyingQuestion(params, note, "gpt-4");
