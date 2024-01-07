@@ -100,6 +100,6 @@ Given(
 Given(
   "OpenAI service can create thread and run with id {string} when requested",
   (threadId: string) => {
-    mock_services.openAi().thread(threadId).stubCreateThreadAndRun()
+    mock_services.openAi().thread(threadId).stubCreateThreadRunAndSubmitOutput()
   },
 )
