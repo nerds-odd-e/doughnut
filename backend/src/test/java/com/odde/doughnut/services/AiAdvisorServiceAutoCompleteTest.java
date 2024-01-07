@@ -21,16 +21,15 @@ import com.odde.doughnut.testability.OpenAIAssistantMock;
 import com.theokanning.openai.OpenAiError;
 import com.theokanning.openai.OpenAiHttpException;
 import com.theokanning.openai.client.OpenAiApi;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
-import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.messages.Message;
+import com.theokanning.openai.runs.SubmitToolOutputRequestItem;
+import com.theokanning.openai.runs.SubmitToolOutputsRequest;
 import com.theokanning.openai.threads.Thread;
 import io.reactivex.Single;
 import java.net.SocketTimeoutException;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -119,8 +118,6 @@ class AiAdvisorServiceAutoCompleteTest {
     Note note;
     AiCompletionAnswerClarifyingQuestionParams params =
         new AiCompletionAnswerClarifyingQuestionParams();
-    ArgumentCaptor<ChatCompletionRequest> captor =
-        ArgumentCaptor.forClass(ChatCompletionRequest.class);
     OpenAIAssistantMock openAIAssistantMock;
 
     @BeforeEach
@@ -132,7 +129,7 @@ class AiAdvisorServiceAutoCompleteTest {
 
     @Test
     void askCompletionAndUseQuestionResponse() {
-      openAIAssistantMock.mockThreadAndRequiredAction(
+      openAIAssistantMock.mockSubmitOutputAndRequiredMoreAction(
           new ClarifyingQuestion(
               "Are you referring to American football or association football (soccer) ?"),
           "my-run-id");
@@ -157,21 +154,24 @@ class AiAdvisorServiceAutoCompleteTest {
       }
 
       @Test
-      @Disabled
-      void mustIncludeThePreviousAnswerInMessages() {
-        openAIAssistantMock.mockThreadAndRequiredAction(
-            new NoteDetailsCompletion(" is healthy."), "my-run-id");
+      void mustSubmitTheAnswer() {
+        openAIAssistantMock.mockSubmitOutputAndCompletion(
+            new NoteDetailsCompletion("blue planet"), "", "my-run-id");
+        params.setToolCallId("tool-call-id");
         aiAdvisorService.answerAiCompletionClarifyingQuestion(
             params, note, "gpt-4", "asst_example_id");
-        verify(openAiApi).createChatCompletion(captor.capture());
-        ChatMessage functionResultMessage = captor.getValue().getMessages().get(4);
-        assertThat(functionResultMessage.getName(), equalTo("ask_clarification_question"));
-        assertThat(functionResultMessage.getContent(), containsString("green tea"));
+        ArgumentCaptor<SubmitToolOutputsRequest> captor =
+            ArgumentCaptor.forClass(SubmitToolOutputsRequest.class);
+        verify(openAiApi)
+            .submitToolOutputs(ArgumentMatchers.any(), ArgumentMatchers.any(), captor.capture());
+        SubmitToolOutputRequestItem submit = captor.getValue().getToolOutputs().get(0);
+        assertThat(submit.getToolCallId(), equalTo("tool-call-id"));
+        assertThat(submit.getOutput(), containsString("green tea"));
       }
 
       @Test
       void askCompletionAndUseStopResponseWithQuestionAnswer() {
-        openAIAssistantMock.mockThreadCompletion(
+        openAIAssistantMock.mockSubmitOutputAndCompletion(
             new NoteDetailsCompletion(" is common in China, if you are referring to green tea."),
             "complete_note_details",
             "my-run-id");
@@ -186,7 +186,7 @@ class AiAdvisorServiceAutoCompleteTest {
 
       @Test
       void returnTheClarificationHistory() {
-        openAIAssistantMock.mockThreadAndRequiredAction(
+        openAIAssistantMock.mockSubmitOutputAndRequiredMoreAction(
             new ClarifyingQuestion(
                 "Are you referring to American football or association football (soccer) ?"),
             "my-run-id");

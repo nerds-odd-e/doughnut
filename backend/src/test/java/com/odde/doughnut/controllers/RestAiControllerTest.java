@@ -80,8 +80,6 @@ class RestAiControllerTest {
       Note solar = makeMe.aNote("solar system").under(cosmos).please();
       note = makeMe.aNote("Earth").under(solar).please();
       openAIAssistantMock = new OpenAIAssistantMock(openAiApi);
-      openAIAssistantMock.mockThreadCompletion(
-          new NoteDetailsCompletion("blue planet"), "", "my-run-id");
     }
 
     @Test
@@ -106,6 +104,8 @@ class RestAiControllerTest {
         when(openAiApi.createThread(ArgumentMatchers.any())).thenReturn(Single.just(thread));
         when(openAiApi.createMessage(eq("this-thread"), ArgumentMatchers.any()))
             .thenReturn(Single.just(new Message()));
+        openAIAssistantMock.mockThreadCompletion(
+            new NoteDetailsCompletion("blue planet"), "", "my-run-id");
       }
 
       @Test
@@ -147,6 +147,8 @@ class RestAiControllerTest {
       @BeforeEach
       void setup() {
         params.setThreadId("any-thread-id");
+        openAIAssistantMock.mockSubmitOutputAndCompletion(
+            new NoteDetailsCompletion("blue planet"), "", "my-run-id");
       }
 
       @Test
