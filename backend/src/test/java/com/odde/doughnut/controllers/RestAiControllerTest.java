@@ -154,7 +154,7 @@ class RestAiControllerTest {
       @Test
       void askCompletionAndUseStopResponse() {
         AiCompletionResponse aiCompletionResponse =
-            controller.answerCompletionClarifyingQuestion(note, params);
+            controller.answerCompletionClarifyingQuestion(params);
         assertEquals("blue planet", aiCompletionResponse.getMoreCompleteContent());
         assertEquals("stop", aiCompletionResponse.getFinishReason());
       }
@@ -162,7 +162,7 @@ class RestAiControllerTest {
       @Test
       void itMustPassTheThreadIdBack() {
         AiCompletionResponse aiCompletionResponse =
-            controller.answerCompletionClarifyingQuestion(note, params);
+            controller.answerCompletionClarifyingQuestion(params);
         assertEquals("any-thread-id", aiCompletionResponse.getThreadId());
       }
     }

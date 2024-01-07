@@ -85,18 +85,15 @@ export default defineComponent({
       clarifyingQuestionAndAnswer: Generated.ClarifyingQuestionAndAnswer,
     ) {
       this.clarifyingHistory.push(clarifyingQuestionAndAnswer);
-      const response = await this.api.ai.answerCompletionClarifyingQuestion(
-        this.note.id,
-        {
-          detailsToComplete: this.note.details,
-          answer: clarifyingQuestionAndAnswer.answerFromUser,
-          threadId: this.completionInProgress!.threadId,
-          runId: this.completionInProgress!.runId,
-          toolCallId:
-            this.completionInProgress!.clarifyingQuestionRequiredAction
-              .toolCallId,
-        },
-      );
+      const response = await this.api.ai.answerCompletionClarifyingQuestion({
+        detailsToComplete: this.note.details,
+        answer: clarifyingQuestionAndAnswer.answerFromUser,
+        threadId: this.completionInProgress!.threadId,
+        runId: this.completionInProgress!.runId,
+        toolCallId:
+          this.completionInProgress!.clarifyingQuestionRequiredAction
+            .toolCallId,
+      });
       await this.autoCompleteDetails(response);
     },
   },
