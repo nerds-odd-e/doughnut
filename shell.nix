@@ -10,8 +10,8 @@ in mkShell {
   buildInputs = [
     python312
     pipenv
-    corepack_21
     nodejs_21
+    corepack_21
     zsh
     jdk21
     libiconv
@@ -83,8 +83,6 @@ in mkShell {
     export JAVA_HOME="$(readlink -e $(type -p javac) | sed  -e 's/\/bin\/javac//g')"
     export PNPM_HOME="$(readlink -e $(type -p pnpm) | sed -e 's/\/bin\/pnpm//g')"
     export NODE_PATH="$(readlink -e $(type -p node) | sed  -e 's/\/bin\/node//g')"
-    export FLUTTER_PATH="$(readlink -e $(type -p flutter) | sed  -e 's/\/bin\/flutter//g')"
-    export DART_PATH="$(readlink -e $(type -p dart) | sed  -e 's/\/bin\/dart//g')"
     export PUB_CACHE="''${PUB_CACHE:-$PWD/.pub-cache}"
 
     export MYSQL_BASEDIR=${pkgs.mysql80}
@@ -105,14 +103,12 @@ in mkShell {
     echo "##   JAVA_HOME: $JAVA_HOME                            "
     echo "##   NODE_PATH: $NODE_PATH                            "
     echo "##   PNPM_HOME: $PNPM_HOME                            "
-    echo "##   FLUTTER_PATH: $FLUTTER_PATH                      "
     echo "##   MYSQL_BASEDIR: $MYSQL_BASEDIR                    "
     echo "##   MYSQL_HOME: $MYSQL_HOME                          "
     echo "##   MYSQL_DATADIR: $MYSQL_DATADIR                    "
     echo "##   JAVA VERSION: `javac --version`                  "
     echo "##   NODE VERSION: `node --version`                   "
     echo "##   PNPM VERSION: `pnpm --version`                   "
-    echo "##   FLUTTER VERSION: `flutter --version | head -n 1` "
     echo "                                                                                "
     echo "###################################################################################################################"
 
