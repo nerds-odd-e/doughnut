@@ -7,7 +7,7 @@
   "license": "MIT",
   "engines": {
     "node": ">=20",
-    "pnpm": ">=8.14"
+    "pnpm": ">=8.14.1"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
