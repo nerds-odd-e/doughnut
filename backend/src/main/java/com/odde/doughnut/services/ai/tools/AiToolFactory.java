@@ -1,7 +1,5 @@
 package com.odde.doughnut.services.ai.tools;
 
-import static com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder.askClarificationQuestion;
-
 import com.odde.doughnut.services.ai.*;
 import com.theokanning.openai.completion.chat.ChatFunction;
 import java.util.List;
@@ -54,21 +52,5 @@ please critically check if the following question makes sense and is possible to
                 .description("answer and evaluate the feasibility of the question")
                 .executor(QuestionEvaluation.class, null)
                 .build()));
-  }
-
-  public static AiToolList getNoteContentCompletionTools(String completionPrompt) {
-    List<ChatFunction> functions =
-        List.of(
-            ChatFunction.builder()
-                .name(COMPLETE_NOTE_DETAILS)
-                .description("Text completion for the details of the note of focus")
-                .executor(NoteDetailsCompletion.class, null)
-                .build(),
-            ChatFunction.builder()
-                .name(askClarificationQuestion)
-                .description("Ask question to get more context")
-                .executor(ClarifyingQuestion.class, null)
-                .build());
-    return new AiToolList(completionPrompt, functions);
   }
 }
