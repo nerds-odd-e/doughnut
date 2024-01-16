@@ -6,11 +6,10 @@ import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator;
 import com.odde.doughnut.controllers.json.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
+import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.assistants.*;
 import com.theokanning.openai.messages.MessageRequest;
@@ -21,7 +20,6 @@ import com.theokanning.openai.runs.ToolCallFunction;
 import com.theokanning.openai.threads.Thread;
 import com.theokanning.openai.threads.ThreadRequest;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
@@ -102,29 +100,20 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
   }
 
   public Assistant createNoteCompletionAssistant(String modelName) {
-    List<Tool> toolList =
-        Stream.of(
-                AssistantFunction.builder()
-                    .name(COMPLETE_NOTE_DETAILS)
-                    .description("Text completion for the details of the note of focus")
-                    .parameters(serializeClassSchema(NoteDetailsCompletion.class))
-                    .build(),
-                AssistantFunction.builder()
-                    .name(askClarificationQuestion)
-                    .description("Ask question to get more context")
-                    .parameters(serializeClassSchema(ClarifyingQuestion.class))
-                    .build())
-            .map(f -> new Tool(AssistantToolsEnum.FUNCTION, f))
-            .toList();
+    List<Tool> toolList = getTools().map(AiTool::getTool).toList();
     return createAssistant(modelName, toolList);
   }
 
-  private static Map<String, Object> serializeClassSchema(Class<?> value) {
-    ObjectMapper objectMapper = new ObjectMapper();
-    JsonSchemaGenerator jsonSchemaGenerator = new JsonSchemaGenerator(objectMapper);
-    JsonNode jsonSchema = jsonSchemaGenerator.generateJsonSchema(value);
-    JsonNode jsonNode = objectMapper.valueToTree(jsonSchema);
-    return objectMapper.convertValue(jsonNode, Map.class);
+  private static Stream<AiTool> getTools() {
+    return Stream.of(
+        new AiTool(
+            COMPLETE_NOTE_DETAILS,
+            "Text completion for the details of the note of focus",
+            NoteDetailsCompletion.class),
+        new AiTool(
+            askClarificationQuestion,
+            "Ask question to get more context",
+            ClarifyingQuestion.class));
   }
 
   private Assistant createAssistant(String modelName, List<Tool> tools) {
