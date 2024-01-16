@@ -19,7 +19,6 @@ import com.theokanning.openai.assistants.*;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
-import com.theokanning.openai.completion.chat.ChatFunction;
 import com.theokanning.openai.messages.MessageRequest;
 import com.theokanning.openai.runs.*;
 import com.theokanning.openai.threads.Thread;
@@ -127,26 +126,17 @@ public class AiAdvisorService {
   public Assistant createNoteCompletionAssistant(String modelName) {
     List<Tool> toolList =
         Stream.of(
-                ChatFunction.builder()
+                AssistantFunction.builder()
                     .name(COMPLETE_NOTE_DETAILS)
                     .description("Text completion for the details of the note of focus")
-                    .executor(NoteDetailsCompletion.class, null)
+                    .parameters(serializeClassSchema(NoteDetailsCompletion.class))
                     .build(),
-                ChatFunction.builder()
+                AssistantFunction.builder()
                     .name(askClarificationQuestion)
                     .description("Ask question to get more context")
-                    .executor(ClarifyingQuestion.class, null)
+                    .parameters(serializeClassSchema(ClarifyingQuestion.class))
                     .build())
-            .map(
-                f -> {
-                  AssistantFunction function =
-                      AssistantFunction.builder()
-                          .name(f.getName())
-                          .description(f.getDescription())
-                          .parameters(serializeClassSchema(f.getParametersClass()))
-                          .build();
-                  return new Tool(AssistantToolsEnum.FUNCTION, function);
-                })
+            .map(f -> new Tool(AssistantToolsEnum.FUNCTION, f))
             .toList();
     return createAssistant(modelName, toolList);
   }
