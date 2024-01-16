@@ -60,37 +60,63 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
     Run run = openAiApiHandler.retrieveUntilCompletedOrRequiresAction(threadId, currentRun);
 
     AiCompletionResponse completionResponseForClarification;
+
     if (run.getStatus().equals("requires_action")) {
       RequiredAction requiredAction = run.getRequiredAction();
       ToolCall toolCall = requiredAction.getSubmitToolOutputs().getToolCalls().get(0);
       ToolCallFunction function = toolCall.getFunction();
       String arguments = function.getArguments();
-      JsonNode jsonNode = null;
-      try {
-        jsonNode = defaultObjectMapper().readTree(arguments);
-      } catch (JsonProcessingException e) {
-        throw new RuntimeException(e);
-      }
 
-      if (function.getName().equals(askClarificationQuestion)) {
-        ClarifyingQuestion result1;
-        try {
-          result1 = defaultObjectMapper().treeToValue(jsonNode, ClarifyingQuestion.class);
-        } catch (JsonProcessingException e) {
-          throw new RuntimeException(e);
-        }
-        AiCompletionResponse result = new AiCompletionResponse();
-        ClarifyingQuestionRequiredAction cqra = new ClarifyingQuestionRequiredAction();
-        cqra.clarifyingQuestion = result1;
-        cqra.toolCallId = toolCall.getId();
+      completionResponseForClarification =
+          getTools()
+              .filter(t -> t.name().equals(function.getName()))
+              .findFirst()
+              .map(
+                  t -> {
+                    JsonNode jsonNode = null;
+                    try {
+                      jsonNode = defaultObjectMapper().readTree(arguments);
+                    } catch (JsonProcessingException e) {
+                      throw new RuntimeException(e);
+                    }
 
-        result.setClarifyingQuestionRequiredAction(cqra);
-        completionResponseForClarification = result;
-      } else if (function.getName().equals(COMPLETE_NOTE_DETAILS)) {
-        completionResponseForClarification = getAiCompletionResponse(jsonNode, detailsToComplete);
-      } else {
-        throw new RuntimeException("Unknown function name: " + function.getName());
-      }
+                    if (function.getName().equals(askClarificationQuestion)) {
+                      ClarifyingQuestion result1;
+                      try {
+                        result1 =
+                            defaultObjectMapper().treeToValue(jsonNode, ClarifyingQuestion.class);
+                      } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                      }
+                      AiCompletionResponse result = new AiCompletionResponse();
+                      ClarifyingQuestionRequiredAction cqra =
+                          new ClarifyingQuestionRequiredAction();
+                      cqra.clarifyingQuestion = result1;
+                      cqra.toolCallId = toolCall.getId();
+
+                      result.setClarifyingQuestionRequiredAction(cqra);
+                      return result;
+                    } else if (function.getName().equals(COMPLETE_NOTE_DETAILS)) {
+                      String result1;
+                      try {
+                        NoteDetailsCompletion noteDetailsCompletion =
+                            defaultObjectMapper()
+                                .treeToValue(jsonNode, NoteDetailsCompletion.class);
+                        result1 = detailsToComplete + noteDetailsCompletion.completion;
+                      } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                      }
+                      AiCompletionResponse result = new AiCompletionResponse();
+                      String content = result1;
+                      result.setMoreCompleteContent(content);
+                      return result;
+                    }
+
+                    return null;
+                  })
+              .orElseThrow(
+                  () -> new RuntimeException("Unknown function name: " + function.getName()));
+
     } else {
       throw new RuntimeException("not implemented");
     }
@@ -125,21 +151,5 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
             .tools(tools)
             .build();
     return openAiApiHandler.createAssistant(assistantRequest);
-  }
-
-  private static AiCompletionResponse getAiCompletionResponse(
-      JsonNode jsonNode, String detailsToComplete) {
-    String result1;
-    try {
-      NoteDetailsCompletion noteDetailsCompletion =
-          defaultObjectMapper().treeToValue(jsonNode, NoteDetailsCompletion.class);
-      result1 = detailsToComplete + noteDetailsCompletion.completion;
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
-    AiCompletionResponse result = new AiCompletionResponse();
-    String content = result1;
-    result.setMoreCompleteContent(content);
-    return result;
   }
 }
