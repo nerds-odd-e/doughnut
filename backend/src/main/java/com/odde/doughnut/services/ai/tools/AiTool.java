@@ -8,12 +8,12 @@ import com.theokanning.openai.assistants.AssistantToolsEnum;
 import com.theokanning.openai.assistants.Tool;
 import java.util.Map;
 
-public record AiTool(String completeNoteDetails, String description, Class<?> parameters) {
+public record AiTool(String name, String description, Class<?> parameters) {
   public Tool getTool() {
     return new Tool(
         AssistantToolsEnum.FUNCTION,
         AssistantFunction.builder()
-            .name(completeNoteDetails)
+            .name(name)
             .description(description)
             .parameters(serializeClassSchema(parameters))
             .build());
