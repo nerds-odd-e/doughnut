@@ -6,20 +6,20 @@ import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator;
 import com.odde.doughnut.controllers.json.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.services.ai.*;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
-import com.odde.doughnut.services.ai.tools.AiToolFactory;
-import com.odde.doughnut.services.ai.tools.AiToolList;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
-import com.theokanning.openai.assistants.Assistant;
-import com.theokanning.openai.assistants.AssistantRequest;
+import com.theokanning.openai.assistants.*;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import com.theokanning.openai.completion.chat.ChatFunction;
 import com.theokanning.openai.messages.MessageRequest;
 import com.theokanning.openai.runs.*;
 import com.theokanning.openai.threads.Thread;
@@ -27,7 +27,9 @@ import com.theokanning.openai.threads.ThreadRequest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class AiAdvisorService {
 
@@ -123,17 +125,47 @@ public class AiAdvisorService {
   }
 
   public Assistant createNoteCompletionAssistant(String modelName) {
-    AiToolList tool = AiToolFactory.getNoteContentCompletionTools(null);
-    return createAssistant(modelName, tool);
+    List<Tool> toolList =
+        Stream.of(
+                ChatFunction.builder()
+                    .name(COMPLETE_NOTE_DETAILS)
+                    .description("Text completion for the details of the note of focus")
+                    .executor(NoteDetailsCompletion.class, null)
+                    .build(),
+                ChatFunction.builder()
+                    .name(askClarificationQuestion)
+                    .description("Ask question to get more context")
+                    .executor(ClarifyingQuestion.class, null)
+                    .build())
+            .map(
+                f -> {
+                  AssistantFunction function =
+                      AssistantFunction.builder()
+                          .name(f.getName())
+                          .description(f.getDescription())
+                          .parameters(serializeClassSchema(f.getParametersClass()))
+                          .build();
+                  return new Tool(AssistantToolsEnum.FUNCTION, function);
+                })
+            .toList();
+    return createAssistant(modelName, toolList);
   }
 
-  private Assistant createAssistant(String modelName, AiToolList tool) {
+  private static Map<String, Object> serializeClassSchema(Class<?> value) {
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonSchemaGenerator jsonSchemaGenerator = new JsonSchemaGenerator(objectMapper);
+    JsonNode jsonSchema = jsonSchemaGenerator.generateJsonSchema(value);
+    JsonNode jsonNode = objectMapper.valueToTree(jsonSchema);
+    return objectMapper.convertValue(jsonNode, Map.class);
+  }
+
+  private Assistant createAssistant(String modelName, List<Tool> tools) {
     AssistantRequest assistantRequest =
         AssistantRequest.builder()
             .model(modelName)
             .name("Note details completion")
             .instructions(OpenAIChatRequestBuilder.systemInstruction)
-            .tools(tool.getTools())
+            .tools(tools)
             .build();
     return openAiApiHandler.createAssistant(assistantRequest);
   }
