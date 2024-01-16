@@ -2,10 +2,7 @@ package com.odde.doughnut.services.ai;
 
 import static com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder.askClarificationQuestion;
 import static com.odde.doughnut.services.ai.tools.AiToolFactory.COMPLETE_NOTE_DETAILS;
-import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.controllers.json.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
@@ -16,10 +13,8 @@ import com.theokanning.openai.messages.MessageRequest;
 import com.theokanning.openai.runs.RequiredAction;
 import com.theokanning.openai.runs.Run;
 import com.theokanning.openai.runs.ToolCall;
-import com.theokanning.openai.runs.ToolCallFunction;
 import com.theokanning.openai.threads.Thread;
 import com.theokanning.openai.threads.ThreadRequest;
-import java.util.List;
 import java.util.stream.Stream;
 
 public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
@@ -64,58 +59,15 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
     if (run.getStatus().equals("requires_action")) {
       RequiredAction requiredAction = run.getRequiredAction();
       ToolCall toolCall = requiredAction.getSubmitToolOutputs().getToolCalls().get(0);
-      ToolCallFunction function = toolCall.getFunction();
-      String arguments = function.getArguments();
 
       completionResponseForClarification =
           getTools()
-              .filter(t -> t.name().equals(function.getName()))
+              .flatMap(t -> t.tryConsume(detailsToComplete, toolCall))
               .findFirst()
-              .map(
-                  t -> {
-                    JsonNode jsonNode = null;
-                    try {
-                      jsonNode = defaultObjectMapper().readTree(arguments);
-                    } catch (JsonProcessingException e) {
-                      throw new RuntimeException(e);
-                    }
-
-                    if (function.getName().equals(askClarificationQuestion)) {
-                      ClarifyingQuestion result1;
-                      try {
-                        result1 =
-                            defaultObjectMapper().treeToValue(jsonNode, ClarifyingQuestion.class);
-                      } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                      }
-                      AiCompletionResponse result = new AiCompletionResponse();
-                      ClarifyingQuestionRequiredAction cqra =
-                          new ClarifyingQuestionRequiredAction();
-                      cqra.clarifyingQuestion = result1;
-                      cqra.toolCallId = toolCall.getId();
-
-                      result.setClarifyingQuestionRequiredAction(cqra);
-                      return result;
-                    } else if (function.getName().equals(COMPLETE_NOTE_DETAILS)) {
-                      String result1;
-                      try {
-                        NoteDetailsCompletion noteDetailsCompletion =
-                            defaultObjectMapper()
-                                .treeToValue(jsonNode, NoteDetailsCompletion.class);
-                        result1 = detailsToComplete + noteDetailsCompletion.completion;
-                      } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                      }
-                      AiCompletionResponse result = new AiCompletionResponse();
-                      String content = result1;
-                      result.setMoreCompleteContent(content);
-                      return result;
-                    }
-
-                    return null;
-                  })
               .orElseThrow(
-                  () -> new RuntimeException("Unknown function name: " + function.getName()));
+                  () ->
+                      new RuntimeException(
+                          "Unknown function name: " + toolCall.getFunction().getName()));
 
     } else {
       throw new RuntimeException("not implemented");
@@ -126,8 +78,14 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
   }
 
   public Assistant createNoteCompletionAssistant(String modelName) {
-    List<Tool> toolList = getTools().map(AiTool::getTool).toList();
-    return createAssistant(modelName, toolList);
+    AssistantRequest assistantRequest =
+        AssistantRequest.builder()
+            .model(modelName)
+            .name("Note details completion")
+            .instructions(OpenAIChatRequestBuilder.systemInstruction)
+            .tools(getTools().map(AiTool::getTool).toList())
+            .build();
+    return openAiApiHandler.createAssistant(assistantRequest);
   }
 
   private static Stream<AiTool> getTools() {
@@ -140,16 +98,5 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
             askClarificationQuestion,
             "Ask question to get more context",
             ClarifyingQuestion.class));
-  }
-
-  private Assistant createAssistant(String modelName, List<Tool> tools) {
-    AssistantRequest assistantRequest =
-        AssistantRequest.builder()
-            .model(modelName)
-            .name("Note details completion")
-            .instructions(OpenAIChatRequestBuilder.systemInstruction)
-            .tools(tools)
-            .build();
-    return openAiApiHandler.createAssistant(assistantRequest);
   }
 }
