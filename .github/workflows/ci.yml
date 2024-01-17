@@ -118,7 +118,7 @@ jobs:
           spec: ${{ matrix.spec }}
         env:
           GITHUB_FOR_ISSUES_API_TOKEN: ${{ env.GITHUB_FOR_ISSUES_API_TOKEN }}
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: cypress-screenshots
@@ -141,7 +141,7 @@ jobs:
         with:
           credentials_json: ${{ env.GCP_CREDENTIALS }}
       - name: Upload production application jar to Google Cloud Storage
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
       - uses: google-github-actions/upload-cloud-storage@v0
