@@ -92,23 +92,22 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
 
   private static Stream<AiTool> getTools() {
     return Stream.of(
-        new AiTool(
+        AiTool.build(
             COMPLETE_NOTE_DETAILS,
             "Text completion for the details of the note of focus",
             NoteDetailsCompletion.class,
-            (o, toolCallId) -> {
-              NoteDetailsCompletion noteDetailsCompletion = (NoteDetailsCompletion) o;
+            (noteDetailsCompletion, toolCallId) -> {
               AiCompletionResponse result = new AiCompletionResponse();
               result.setMoreCompleteContent(noteDetailsCompletion.completion);
               return result;
             }),
-        new AiTool(
+        AiTool.build(
             askClarificationQuestion,
             "Ask question to get more context",
             ClarifyingQuestion.class,
             (o, toolCallId) -> {
               ClarifyingQuestionRequiredAction cqra = new ClarifyingQuestionRequiredAction();
-              cqra.clarifyingQuestion = (ClarifyingQuestion) o;
+              cqra.clarifyingQuestion = o;
               cqra.toolCallId = toolCallId;
 
               AiCompletionResponse result = new AiCompletionResponse();

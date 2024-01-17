@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers.json;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

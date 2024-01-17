@@ -21,6 +21,18 @@ public record AiTool(
     String description,
     Class<?> parameterClass,
     BiFunction<Object, String, AiCompletionResponse> executor) {
+  public static <T> AiTool build(
+      String name,
+      String description,
+      Class<T> parameterClass,
+      BiFunction<T, String, AiCompletionResponse> executor) {
+    return new AiTool(
+        name,
+        description,
+        parameterClass,
+        (arguments, callId) -> executor.apply((T) arguments, callId));
+  }
+
   public Tool getTool() {
     return new Tool(
         AssistantToolsEnum.FUNCTION,
