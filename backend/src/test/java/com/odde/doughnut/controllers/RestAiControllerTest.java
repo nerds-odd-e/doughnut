@@ -104,7 +104,7 @@ class RestAiControllerTest {
         when(openAiApi.createThread(ArgumentMatchers.any())).thenReturn(Single.just(thread));
         when(openAiApi.createMessage(eq("this-thread"), ArgumentMatchers.any()))
             .thenReturn(Single.just(new Message()));
-        openAIAssistantMock.mockThreadCompletion(
+        openAIAssistantMock.mockThreadRunCompletionToolCalled(
             new NoteDetailsCompletion("blue planet"), "my-run-id");
       }
 

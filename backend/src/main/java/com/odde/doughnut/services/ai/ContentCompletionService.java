@@ -52,31 +52,41 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
   private AiCompletionResponse getThreadResponse(String threadId, Run currentRun) {
     Run run = openAiApiHandler.retrieveUntilCompletedOrRequiresAction(threadId, currentRun);
 
-    if (!run.getStatus().equals("requires_action")) {
-      throw new RuntimeException("not implemented");
+    AiCompletionResponse completionResponse = new AiCompletionResponse();
+    completionResponse.setThreadId(threadId);
+    completionResponse.setRunId(currentRun.getId());
+
+    if (run.getStatus().equals("requires_action")) {
+      RequiredAction requiredAction = run.getRequiredAction();
+      int size = requiredAction.getSubmitToolOutputs().getToolCalls().size();
+      if (size != 1) {
+        throw new RuntimeException("Unexpected number of tool calls: " + size);
+      }
+      ToolCall toolCall = requiredAction.getSubmitToolOutputs().getToolCalls().get(0);
+
+      AiCompletionRequiredAction actionRequired =
+          getTools()
+              .flatMap(t -> t.tryConsume(toolCall))
+              .findFirst()
+              .orElseThrow(
+                  () ->
+                      new RuntimeException(
+                          "Unknown function name: " + toolCall.getFunction().getName()));
+
+      actionRequired.setToolCallId(toolCall.getId());
+
+      completionResponse.setRequiredAction(actionRequired);
+    } else {
+      String message =
+          openAiApiHandler
+              .getThreadLastMessage(threadId)
+              .getContent()
+              .getFirst()
+              .getText()
+              .getValue();
+      completionResponse.setLastMessage(message);
     }
-    RequiredAction requiredAction = run.getRequiredAction();
-    ToolCall toolCall = requiredAction.getSubmitToolOutputs().getToolCalls().get(0);
-
-    AiCompletionRequiredAction actionRequired =
-        getTools()
-            .flatMap(t -> t.tryConsume(toolCall))
-            .findFirst()
-            .orElseThrow(
-                () ->
-                    new RuntimeException(
-                        "Unknown function name: " + toolCall.getFunction().getName()));
-
-    actionRequired.setToolCallId(toolCall.getId());
-
-    if (actionRequired.getContentToAppend() != null) {
-      actionRequired.setContentToAppend(actionRequired.getContentToAppend());
-    }
-    AiCompletionResponse completionResponseForClarification = new AiCompletionResponse();
-    completionResponseForClarification.setRequiredAction(actionRequired);
-    completionResponseForClarification.setThreadId(threadId);
-    completionResponseForClarification.setRunId(currentRun.getId());
-    return completionResponseForClarification;
+    return completionResponse;
   }
 
   public Assistant createNoteCompletionAssistant(String modelName) {
