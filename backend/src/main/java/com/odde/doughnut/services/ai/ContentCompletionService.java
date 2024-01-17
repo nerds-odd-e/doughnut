@@ -22,7 +22,7 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
       AiCompletionParams aiCompletionParams, Note note, String assistantId) {
     String threadId = createThread(aiCompletionParams, note);
     Run run = openAiApiHandler.createRun(threadId, assistantId);
-    return getThreadResponse(threadId, aiCompletionParams.getDetailsToComplete(), run);
+    return getThreadResponse(threadId, run);
   }
 
   public AiCompletionResponse answerAiCompletionClarifyingQuestion(
@@ -31,8 +31,7 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
 
     Run retrievedRun = openAiApiHandler.submitToolOutputs(answerClarifyingQuestionParams);
 
-    return getThreadResponse(
-        threadId, answerClarifyingQuestionParams.getDetailsToComplete(), retrievedRun);
+    return getThreadResponse(threadId, retrievedRun);
   }
 
   private String createThread(AiCompletionParams aiCompletionParams, Note note) {
@@ -50,8 +49,7 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
     return thread.getId();
   }
 
-  private AiCompletionResponse getThreadResponse(
-      String threadId, String detailsToComplete, Run currentRun) {
+  private AiCompletionResponse getThreadResponse(String threadId, Run currentRun) {
     Run run = openAiApiHandler.retrieveUntilCompletedOrRequiresAction(threadId, currentRun);
 
     if (!run.getStatus().equals("requires_action")) {
@@ -71,9 +69,8 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
 
     actionRequired.setToolCallId(toolCall.getId());
 
-    if (actionRequired.getMoreCompleteContent() != null) {
-      actionRequired.setMoreCompleteContent(
-          detailsToComplete + actionRequired.getMoreCompleteContent());
+    if (actionRequired.getContentToAppend() != null) {
+      actionRequired.setContentToAppend(actionRequired.getContentToAppend());
     }
     AiCompletionResponse completionResponseForClarification = new AiCompletionResponse();
     completionResponseForClarification.setRequiredAction(actionRequired);
@@ -101,7 +98,7 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
             NoteDetailsCompletion.class,
             (noteDetailsCompletion) -> {
               AiCompletionRequiredAction result = new AiCompletionRequiredAction();
-              result.setMoreCompleteContent(noteDetailsCompletion.completion);
+              result.setContentToAppend(noteDetailsCompletion.completion);
               return result;
             }),
         AiTool.build(

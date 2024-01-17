@@ -59,7 +59,7 @@ class AiAdvisorServiceAutoCompleteTest {
     void getAiSuggestion_givenAString_returnsAiSuggestionObject() {
       openAIAssistantMock.mockThreadCompletion(
           new NoteDetailsCompletion(" must come down"), "my-run-id");
-      assertEquals("what goes up must come down", getAiCompletionFromAdvisor("what goes up"));
+      assertEquals(" must come down", getAiCompletionFromAdvisor("what goes up"));
     }
 
     @Test
@@ -110,7 +110,7 @@ class AiAdvisorServiceAutoCompleteTest {
       return aiAdvisorService
           .getAiCompletion(aiCompletionParams, note, "asst_example_id")
           .getRequiredAction()
-          .getMoreCompleteContent();
+          .getContentToAppend();
     }
   }
 
@@ -173,8 +173,8 @@ class AiAdvisorServiceAutoCompleteTest {
         AiCompletionResponse aiCompletionResponse =
             aiAdvisorService.answerAiCompletionClarifyingQuestion(params);
         assertEquals(
-            "Tea is common in China, if you are referring to green tea.",
-            aiCompletionResponse.getRequiredAction().getMoreCompleteContent());
+            " is common in China, if you are referring to green tea.",
+            aiCompletionResponse.getRequiredAction().getContentToAppend());
       }
     }
   }

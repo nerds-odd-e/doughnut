@@ -78,7 +78,7 @@ export default defineComponent({
       this.clarifyingQuestion = undefined;
       this.storageAccessor.storedApi().updateTextContent(this.note.id, {
         topic: this.note.topic,
-        details: response.requiredAction.moreCompleteContent!,
+        details: this.note.details + response.requiredAction.contentToAppend!,
       });
     },
     async clarifyingQuestionAnswered(
