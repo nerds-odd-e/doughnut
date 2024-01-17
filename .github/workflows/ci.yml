@@ -191,7 +191,7 @@ jobs:
   #   strategy:
   #     matrix:
   #       device:
-  #         - "iPhone 11"
+  #         - "iPhone 15"
   #     fail-fast: false
   #   runs-on: ubuntu-22.04
   #   steps:
@@ -228,7 +228,7 @@ jobs:
   #       with:
   #         flutter-version: "2.16.2"
   #     - name: Run Flutter Driver tests
-  #       uses: reactivecircus/android-emulator-runner@v2.21.0
+  #       uses: reactivecircus/android-emulator-runner@v2
   #       with:
   #         api-level: ${{ matrix.api-level }}
   #         script: |
