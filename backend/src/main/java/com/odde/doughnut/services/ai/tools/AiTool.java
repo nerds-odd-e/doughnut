@@ -47,7 +47,7 @@ public record AiTool(
     return Stream.empty();
   }
 
-  public Object convertArguments(ToolCallFunction function) {
+  private Object convertArguments(ToolCallFunction function) {
     String arguments = function.getArguments();
     try {
       JsonNode jsonNode = defaultObjectMapper().readTree(arguments);
