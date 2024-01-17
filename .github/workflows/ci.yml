@@ -29,9 +29,8 @@ jobs:
     name: Backend + Frontend + Cypress Lint
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/setup_jdk_with_cache
-      - uses: actions/checkout@v3
       - uses: ./.github/setup_nodejs
       - run: pnpm lint:all
 
@@ -39,7 +38,7 @@ jobs:
     name: Backend Unit tests
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup MySQL DB Server
         uses: ./.github/mysql_db
         with:
@@ -57,7 +56,7 @@ jobs:
     env:
       FRONTEND_UT_CONSOLE_OUTPUT_AS_FAILURE: true
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/setup_nodejs
       - run: pnpm frontend:test
 
@@ -65,7 +64,7 @@ jobs:
     name: Package backend & frontend artifacts for deployment
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/setup_jdk_with_cache
       - uses: ./.github/setup_nodejs
       - name: Compile & transform frontend assets for bundling with Backend
@@ -99,7 +98,7 @@ jobs:
           - |
             e2e_test/features/w*/**
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/mysql_db
         with:
           mysql_db_instance: ${{ env.MYSQL_E2E_DB }}
@@ -137,7 +136,7 @@ jobs:
         E2E-tests,
       ]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/gcloud_auth_n_sdk
         with:
           credentials_json: ${{ env.GCP_CREDENTIALS }}
@@ -180,7 +179,7 @@ jobs:
   # mobile-unit-test:
   #   runs-on: ubuntu-22.04
   #   steps:
-  #     - uses: actions/checkout@v3
+  #     - uses: actions/checkout@v4
   #     - uses: subosito/flutter-action@v1
   #       with:
   #         flutter-version: "2.16.2"
@@ -200,7 +199,7 @@ jobs:
   #       run: xcrun xctrace list devices
   #     - name: Start Simulator
   #       run: xcrun simctl boot "${{ matrix.device }}"
-  #     - uses: actions/checkout@v3
+  #     - uses: actions/checkout@v4
   #     - uses: ./.github/starting_backend_actions
   #       with:
   #         dbuser: ${{ secrets.DBUSER }}
@@ -208,7 +207,7 @@ jobs:
   #         db_url: ${{ secrets.CI_E2E_DB_URL }}
   #     - uses: ./.github/mobile_actions
   #       with:
-  #         flutter-version: "2.5.3"
+  #         flutter-version: "2.16.2"
   #     - run: dart test_driver/app_test.dart
   #       working-directory: ./doughnut_mobile
   # drive_android:
@@ -217,9 +216,9 @@ jobs:
   #   strategy:
   #     #set of different configurations of the virtual environment.
   #     matrix:
-  #       api-level: [29]
+  #       api-level: [34]
   #   steps:
-  #     - uses: actions/checkout@v1
+  #     - uses: actions/checkout@v4
   #     - uses: ./.github/starting_backend_actions
   #       with:
   #         dbuser: ${{ secrets.DBUSER }}
@@ -227,7 +226,7 @@ jobs:
   #         db_url: ${{ secrets.CI_E2E_DB_URL }}
   #     - uses: ./.github/mobile_actions
   #       with:
-  #         flutter-version: "2.5.3"
+  #         flutter-version: "2.16.2"
   #     - name: Run Flutter Driver tests
   #       uses: reactivecircus/android-emulator-runner@v2.21.0
   #       with:
