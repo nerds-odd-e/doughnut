@@ -6,31 +6,28 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator;
-import com.odde.doughnut.controllers.json.AiCompletionResponse;
+import com.odde.doughnut.controllers.json.AiCompletionRequiredAction;
 import com.theokanning.openai.assistants.AssistantFunction;
 import com.theokanning.openai.assistants.AssistantToolsEnum;
 import com.theokanning.openai.assistants.Tool;
 import com.theokanning.openai.runs.ToolCall;
 import com.theokanning.openai.runs.ToolCallFunction;
 import java.util.Map;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 public record AiTool(
     String name,
     String description,
     Class<?> parameterClass,
-    BiFunction<Object, String, AiCompletionResponse> executor) {
+    Function<Object, AiCompletionRequiredAction> executor) {
   public static <T> AiTool build(
       String name,
       String description,
       Class<T> parameterClass,
-      BiFunction<T, String, AiCompletionResponse> executor) {
+      Function<T, AiCompletionRequiredAction> executor) {
     return new AiTool(
-        name,
-        description,
-        parameterClass,
-        (arguments, callId) -> executor.apply((T) arguments, callId));
+        name, description, parameterClass, (arguments) -> executor.apply((T) arguments));
   }
 
   public Tool getTool() {
@@ -51,10 +48,10 @@ public record AiTool(
     return objectMapper.convertValue(jsonNode, Map.class);
   }
 
-  public Stream<AiCompletionResponse> tryConsume(ToolCall toolCall) {
+  public Stream<AiCompletionRequiredAction> tryConsume(ToolCall toolCall) {
     ToolCallFunction function = toolCall.getFunction();
     if (name.equals(function.getName())) {
-      return Stream.of(executor.apply(convertArguments(function), toolCall.getId()));
+      return Stream.of(executor.apply(convertArguments(function)));
     }
     return Stream.empty();
   }

@@ -54,28 +54,31 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
       String threadId, String detailsToComplete, Run currentRun) {
     Run run = openAiApiHandler.retrieveUntilCompletedOrRequiresAction(threadId, currentRun);
 
-    AiCompletionResponse completionResponseForClarification;
-
-    if (run.getStatus().equals("requires_action")) {
-      RequiredAction requiredAction = run.getRequiredAction();
-      ToolCall toolCall = requiredAction.getSubmitToolOutputs().getToolCalls().get(0);
-
-      completionResponseForClarification =
-          getTools()
-              .flatMap(t -> t.tryConsume(toolCall))
-              .findFirst()
-              .orElseThrow(
-                  () ->
-                      new RuntimeException(
-                          "Unknown function name: " + toolCall.getFunction().getName()));
-
-    } else {
+    if (!run.getStatus().equals("requires_action")) {
       throw new RuntimeException("not implemented");
     }
+    RequiredAction requiredAction = run.getRequiredAction();
+    ToolCall toolCall = requiredAction.getSubmitToolOutputs().getToolCalls().get(0);
+
+    AiCompletionRequiredAction actionRequired =
+        getTools()
+            .flatMap(t -> t.tryConsume(toolCall))
+            .findFirst()
+            .orElseThrow(
+                () ->
+                    new RuntimeException(
+                        "Unknown function name: " + toolCall.getFunction().getName()));
+
+    actionRequired.setToolCallId(toolCall.getId());
+
+    if (actionRequired.getMoreCompleteContent() != null) {
+      actionRequired.setMoreCompleteContent(
+          detailsToComplete + actionRequired.getMoreCompleteContent());
+    }
+    AiCompletionResponse completionResponseForClarification = new AiCompletionResponse();
+    completionResponseForClarification.setRequiredAction(actionRequired);
     completionResponseForClarification.setThreadId(threadId);
     completionResponseForClarification.setRunId(currentRun.getId());
-    completionResponseForClarification.setMoreCompleteContent(
-        detailsToComplete + completionResponseForClarification.getMoreCompleteContent());
     return completionResponseForClarification;
   }
 
@@ -96,8 +99,8 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
             COMPLETE_NOTE_DETAILS,
             "Text completion for the details of the note of focus",
             NoteDetailsCompletion.class,
-            (noteDetailsCompletion, toolCallId) -> {
-              AiCompletionResponse result = new AiCompletionResponse();
+            (noteDetailsCompletion) -> {
+              AiCompletionRequiredAction result = new AiCompletionRequiredAction();
               result.setMoreCompleteContent(noteDetailsCompletion.completion);
               return result;
             }),
@@ -105,13 +108,9 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
             askClarificationQuestion,
             "Ask question to get more context",
             ClarifyingQuestion.class,
-            (o, toolCallId) -> {
-              ClarifyingQuestionRequiredAction cqra = new ClarifyingQuestionRequiredAction();
-              cqra.clarifyingQuestion = o;
-              cqra.toolCallId = toolCallId;
-
-              AiCompletionResponse result = new AiCompletionResponse();
-              result.setClarifyingQuestionRequiredAction(cqra);
+            (clarifyingQuestion) -> {
+              AiCompletionRequiredAction result = new AiCompletionRequiredAction();
+              result.setClarifyingQuestion(clarifyingQuestion);
               return result;
             }));
   }

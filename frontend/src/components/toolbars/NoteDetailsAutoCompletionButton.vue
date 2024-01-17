@@ -7,12 +7,12 @@
   >
     <SvgRobot />
     <Modal
-      v-if="completionInProgress"
-      @close_request="completionInProgress = undefined"
+      v-if="clarifyingQuestion"
+      @close_request="clarifyingQuestion = undefined"
     >
       <template #body>
         <AIClarifyingQuestionDialog
-          :completion-in-progress="completionInProgress"
+          :clarifying-question="clarifyingQuestion"
           :clarifying-history="clarifyingHistory"
           @submit="clarifyingQuestionAnswered"
         />
@@ -53,9 +53,8 @@ export default defineComponent({
   data() {
     return {
       isUnmounted: false,
-      completionInProgress: undefined as
-        | undefined
-        | Generated.AiCompletionResponse,
+      threadRespons: undefined as undefined | Generated.AiCompletionResponse,
+      clarifyingQuestion: undefined as undefined | Generated.ClarifyingQuestion,
       clarifyingHistory: [] as Generated.ClarifyingQuestionAndAnswer[],
     };
   },
@@ -70,15 +69,16 @@ export default defineComponent({
     async autoCompleteDetails(response: Generated.AiCompletionResponse) {
       if (this.isUnmounted) return;
 
-      if (response.clarifyingQuestionRequiredAction) {
-        this.completionInProgress = response;
+      if (response.requiredAction?.clarifyingQuestion) {
+        this.threadRespons = response;
+        this.clarifyingQuestion = response.requiredAction.clarifyingQuestion;
         return;
       }
 
-      this.completionInProgress = undefined;
+      this.clarifyingQuestion = undefined;
       this.storageAccessor.storedApi().updateTextContent(this.note.id, {
         topic: this.note.topic,
-        details: response.moreCompleteContent,
+        details: response.requiredAction.moreCompleteContent!,
       });
     },
     async clarifyingQuestionAnswered(
@@ -88,11 +88,9 @@ export default defineComponent({
       const response = await this.api.ai.answerCompletionClarifyingQuestion({
         detailsToComplete: this.note.details,
         answer: clarifyingQuestionAndAnswer.answerFromUser,
-        threadId: this.completionInProgress!.threadId,
-        runId: this.completionInProgress!.runId,
-        toolCallId:
-          this.completionInProgress!.clarifyingQuestionRequiredAction
-            .toolCallId,
+        threadId: this.threadRespons!.threadId,
+        runId: this.threadRespons!.runId,
+        toolCallId: this.threadRespons!.requiredAction.toolCallId,
       });
       await this.autoCompleteDetails(response);
     },

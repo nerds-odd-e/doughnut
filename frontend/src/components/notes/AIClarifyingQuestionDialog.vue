@@ -15,10 +15,7 @@
   <form @submit.prevent="handleFormSubmit">
     <h3>
       Clarification question by the AI:
-      <strong>{{
-        completionInProgress.clarifyingQuestionRequiredAction.clarifyingQuestion
-          .question
-      }}</strong>
+      <strong>{{ clarifyingQuestion.question }}</strong>
     </h3>
     <TextInput
       scope-name="note"
@@ -36,8 +33,8 @@ import TextInput from "../form/TextInput.vue";
 
 export default defineComponent({
   props: {
-    completionInProgress: {
-      type: Object as PropType<Generated.AiCompletionResponse>,
+    clarifyingQuestion: {
+      type: Object as PropType<Generated.ClarifyingQuestion>,
       required: true,
     },
     clarifyingHistory: {
@@ -55,9 +52,7 @@ export default defineComponent({
   methods: {
     handleFormSubmit() {
       this.$emit("submit", <Generated.ClarifyingQuestionAndAnswer>{
-        questionFromAI:
-          this.completionInProgress.clarifyingQuestionRequiredAction
-            .clarifyingQuestion,
+        questionFromAI: this.clarifyingQuestion,
         answerFromUser: this.answerToAI,
       });
     },
