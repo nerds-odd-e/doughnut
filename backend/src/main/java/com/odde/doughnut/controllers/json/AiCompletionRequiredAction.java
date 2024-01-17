@@ -10,5 +10,5 @@ import org.springframework.lang.Nullable;
 public final class AiCompletionRequiredAction {
   public String toolCallId;
   @Nullable ClarifyingQuestion clarifyingQuestion;
-  @Nullable String moreCompleteContent;
+  @Nullable String contentToAppend;
 }

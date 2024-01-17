@@ -31,7 +31,7 @@ describe("NoteDetailsAutoCompletionButton", () => {
     const expectation = helper.apiMock
       .expectingPost(`/api/ai/${noteWithNoDetails.id}/completion`)
       .andReturnOnce({
-        requiredAction: { moreCompleteContent: "auto completed content" },
+        requiredAction: { contentToAppend: "auto completed content" },
       });
     helper.apiMock.expectingPatch(`/api/text_content/${noteWithNoDetails.id}`);
     await triggerAutoCompletion(noteWithNoDetails);
@@ -44,7 +44,7 @@ describe("NoteDetailsAutoCompletionButton", () => {
     const expectation = helper.apiMock
       .expectingPost(`/api/ai/${note.id}/completion`)
       .andReturnOnce({
-        requiredAction: { moreCompleteContent: "auto completed content" },
+        requiredAction: { contentToAppend: "auto completed content" },
       });
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
     await triggerAutoCompletion(note);
@@ -58,7 +58,7 @@ describe("NoteDetailsAutoCompletionButton", () => {
       .expectingPost(`/api/ai/${note.id}/completion`)
       .andReturnOnce({
         requiredAction: {
-          moreCompleteContent: "auto completed content",
+          contentToAppend: "auto completed content",
         },
       });
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
@@ -97,7 +97,7 @@ describe("NoteDetailsAutoCompletionButton", () => {
       .expectingPost(`/api/ai/${note.id}/completion`)
       .andReturnOnce({
         requiredAction: {
-          moreCompleteContent: "auto completed content",
+          contentToAppend: "auto completed content",
         },
       });
 

@@ -17,7 +17,7 @@ declare namespace Generated {
     interface AiCompletionRequiredAction {
         toolCallId: string;
         clarifyingQuestion?: ClarifyingQuestion;
-        moreCompleteContent?: string;
+        contentToAppend?: string;
     }
 
     interface AiCompletionResponse {
