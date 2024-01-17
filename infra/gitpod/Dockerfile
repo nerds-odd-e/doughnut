@@ -39,7 +39,6 @@ RUN apt-get -y update \
     xclip \
     fasd \
     fzf \
-    cargo \
     direnv \
     && apt-get autoremove \
     && rm -rf /var/lib/apt/lists/* \
@@ -84,9 +83,6 @@ RUN mkdir -p /home/gitpod/.config/nix \
 # xclip & nix develop
 RUN echo "test -f ./sh_profile && source ./sh_profile" >> /home/gitpod/.bashrc \
     && echo "test -f ./sh_profile && source ./sh_profile" >> /home/gitpod/.zshrc
-
-# atuin shell history
-# RUN curl https://raw.githubusercontent.com/ellie/atuin/main/install.sh | bash
 
 EXPOSE 5173
 EXPOSE 3309
