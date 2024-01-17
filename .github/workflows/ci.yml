@@ -23,6 +23,7 @@ env:
   GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
   GITHUB_FOR_ISSUES_API_TOKEN: ${{ secrets.GH_ISSUES_API_TOKEN }}
   OPENAI_API_TOKEN: ${{ secrets.OPENAI_API_TOKEN }}
+  FLUTTER_VERSION: "3.7.12"
 
 jobs:
   Linting:
@@ -180,9 +181,9 @@ jobs:
   #   runs-on: ubuntu-22.04
   #   steps:
   #     - uses: actions/checkout@v4
-  #     - uses: subosito/flutter-action@v1
+  #     - uses: subosito/flutter-action@v2
   #       with:
-  #         flutter-version: "2.16.2"
+  #         flutter-version: ${{ env.FLUTTER_VERSION }}
   #     - run: flutter pub get
   #       working-directory: ./doughnut_mobile
   #     - run: flutter test
@@ -207,7 +208,7 @@ jobs:
   #         db_url: ${{ secrets.CI_E2E_DB_URL }}
   #     - uses: ./.github/mobile_actions
   #       with:
-  #         flutter-version: "2.16.2"
+  #         flutter-version: ${{ env.FLUTTER_VERSION }}
   #     - run: dart test_driver/app_test.dart
   #       working-directory: ./doughnut_mobile
   # drive_android:
@@ -226,7 +227,7 @@ jobs:
   #         db_url: ${{ secrets.CI_E2E_DB_URL }}
   #     - uses: ./.github/mobile_actions
   #       with:
-  #         flutter-version: "2.16.2"
+  #         flutter-version: ${{ env.FLUTTER_VERSION }}
   #     - name: Run Flutter Driver tests
   #       uses: reactivecircus/android-emulator-runner@v2
   #       with:
