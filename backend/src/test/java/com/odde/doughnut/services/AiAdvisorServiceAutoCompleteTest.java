@@ -66,7 +66,7 @@ class AiAdvisorServiceAutoCompleteTest {
     @Test
     void aiTryToChatWithoutCallingAnyTool() {
       openAIAssistantMock.mockThreadRunCompletedAndListMessage("Interesting idea.", "my-run-id");
-      assertEquals("Interesting idea", getAiCompletionResponse("what goes up").getLastMessage());
+      assertEquals("Interesting idea.", getAiCompletionResponse("what goes up").getLastMessage());
     }
 
     @Test
