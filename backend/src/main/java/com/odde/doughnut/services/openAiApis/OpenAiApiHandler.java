@@ -1,6 +1,7 @@
 package com.odde.doughnut.services.openAiApis;
 
 import static com.odde.doughnut.services.openAiApis.ApiExecutor.blockGet;
+import static java.lang.Thread.sleep;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.controllers.json.AiCompletionAnswerClarifyingQuestionParams;
@@ -128,9 +129,10 @@ public class OpenAiApiHandler {
         && !(retrievedRun.getStatus().equals("failed"))
         && !(retrievedRun.getStatus().equals("requires_action"))) {
       count++;
-      if (count > 20) {
+      if (count > 15) {
         break;
       }
+      wait(count - 1);
       retrievedRun = retrieveRun(threadId, currentRun.getId());
     }
     if (retrievedRun.getStatus().equals("requires_action")
@@ -138,6 +140,14 @@ public class OpenAiApiHandler {
       return retrievedRun;
     }
     throw new RuntimeException("OpenAI run status: " + retrievedRun.getStatus());
+  }
+
+  private static void wait(int hundredMilliSeconds) {
+    try {
+      sleep(hundredMilliSeconds * 100L);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public Run submitToolOutputs(
