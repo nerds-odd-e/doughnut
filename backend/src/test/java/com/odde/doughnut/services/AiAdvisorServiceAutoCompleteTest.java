@@ -55,11 +55,18 @@ class AiAdvisorServiceAutoCompleteTest {
 
   @Nested
   class SimpleAutoComplete {
+
     @Test
-    void getAiSuggestion_givenAString_returnsAiSuggestionObject() {
-      openAIAssistantMock.mockThreadCompletion(
+    void aiUnderstandHowToCompete() {
+      openAIAssistantMock.mockThreadRunCompletionToolCalled(
           new NoteDetailsCompletion(" must come down"), "my-run-id");
-      assertEquals(" must come down", getAiCompletionFromAdvisor("what goes up"));
+      assertEquals(" must come down", getAiCompletionAndResult("what goes up"));
+    }
+
+    @Test
+    void aiTryToChatWithoutCallingAnyTool() {
+      openAIAssistantMock.mockThreadRunCompletedAndListMessage("Interesting idea.", "my-run-id");
+      assertEquals("Interesting idea", getAiCompletionResponse("what goes up").getLastMessage());
     }
 
     @Test
@@ -68,7 +75,7 @@ class AiAdvisorServiceAutoCompleteTest {
       HttpException httpException = BuildOpenAiException(400);
       Mockito.when(openAiApi.createRun(ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Single.error(httpException));
-      assertThrows(OpenAiHttpException.class, () -> getAiCompletionFromAdvisor(""));
+      assertThrows(OpenAiHttpException.class, () -> getAiCompletionAndResult(""));
     }
 
     @Test
@@ -77,7 +84,7 @@ class AiAdvisorServiceAutoCompleteTest {
       Mockito.when(openAiApi.createRun(ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Single.error(exception));
       OpenAITimeoutException result =
-          assertThrows(OpenAITimeoutException.class, () -> getAiCompletionFromAdvisor(""));
+          assertThrows(OpenAITimeoutException.class, () -> getAiCompletionAndResult(""));
       assertThat(result.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.OPENAI_TIMEOUT));
     }
 
@@ -87,7 +94,7 @@ class AiAdvisorServiceAutoCompleteTest {
       Mockito.when(openAiApi.createRun(ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Single.error(exception));
       OpenAIServiceErrorException result =
-          assertThrows(OpenAIServiceErrorException.class, () -> getAiCompletionFromAdvisor(""));
+          assertThrows(OpenAIServiceErrorException.class, () -> getAiCompletionAndResult(""));
       assertThat(
           result.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.OPENAI_SERVICE_ERROR));
       assertThat(result.getMessage(), containsString("502"));
@@ -99,18 +106,19 @@ class AiAdvisorServiceAutoCompleteTest {
       Mockito.when(openAiApi.createRun(ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Single.error(httpException));
       OpenAiUnauthorizedException exception =
-          assertThrows(OpenAiUnauthorizedException.class, () -> getAiCompletionFromAdvisor(""));
+          assertThrows(OpenAiUnauthorizedException.class, () -> getAiCompletionAndResult(""));
       assertThat(exception.getMessage(), containsString("401"));
     }
 
-    private String getAiCompletionFromAdvisor(String incompleteContent) {
+    private String getAiCompletionAndResult(String incompleteContent) {
+      return getAiCompletionResponse(incompleteContent).getRequiredAction().getContentToAppend();
+    }
+
+    private AiCompletionResponse getAiCompletionResponse(String incompleteContent) {
       Note note = makeMe.aNote().inMemoryPlease();
       AiCompletionParams aiCompletionParams = new AiCompletionParams();
       aiCompletionParams.setDetailsToComplete(incompleteContent);
-      return aiAdvisorService
-          .getAiCompletion(aiCompletionParams, note, "asst_example_id")
-          .getRequiredAction()
-          .getContentToAppend();
+      return aiAdvisorService.getAiCompletion(aiCompletionParams, note, "asst_example_id");
     }
   }
 

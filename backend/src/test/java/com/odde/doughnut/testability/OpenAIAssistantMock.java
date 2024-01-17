@@ -7,7 +7,11 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.theokanning.openai.OpenAiResponse;
 import com.theokanning.openai.client.OpenAiApi;
+import com.theokanning.openai.messages.Message;
+import com.theokanning.openai.messages.MessageContent;
+import com.theokanning.openai.messages.content.Text;
 import com.theokanning.openai.runs.*;
 import io.reactivex.Single;
 import java.util.List;
@@ -16,17 +20,31 @@ import org.mockito.Mockito;
 
 public record OpenAIAssistantMock(OpenAiApi openAiApi) {
 
-  public void mockThreadCompletion(Object result, String runId) {
+  public void mockThreadRunCompletionToolCalled(Object result, String runId) {
     mockCreateRunInProcess(runId);
-    Run retrievedRun = getRunThatCompleted(runId, result);
+    Run retrievedRun = getRunThatCallCompletionTool(runId, result);
     Mockito.doReturn(Single.just(retrievedRun))
         .when(openAiApi)
         .retrieveRun(ArgumentMatchers.any(), ArgumentMatchers.any());
   }
 
+  public void mockThreadRunCompletedAndListMessage(String msg, String runId) {
+    mockCreateRunInProcess(runId);
+    Run retrievedRun = getRunThatCompleted(runId);
+    Mockito.doReturn(Single.just(retrievedRun))
+        .when(openAiApi)
+        .retrieveRun(ArgumentMatchers.any(), ArgumentMatchers.any());
+    Text txt = new Text(msg, List.of());
+    MessageContent cnt = new MessageContent();
+    cnt.setText(txt);
+    List<MessageContent> contentList = List.of(cnt);
+    OpenAiResponse<Message> msgs = new OpenAiResponse<>();
+    msgs.setData(List.of(Message.builder().content(contentList).build()));
+    Mockito.doReturn(Single.just(msgs)).when(openAiApi).listMessages(retrievedRun.getThreadId());
+  }
+
   public void mockSubmitOutputAndCompletion(Object result, String runId) {
-    JsonNode arguments = new ObjectMapper().valueToTree(result);
-    Run run = getRunThatCompleted(runId, result);
+    Run run = getRunThatCallCompletionTool(runId, result);
     when(openAiApi.submitToolOutputs(any(), any(), any())).thenReturn(Single.just(run));
   }
 
@@ -37,7 +55,7 @@ public record OpenAIAssistantMock(OpenAiApi openAiApi) {
     when(openAiApi.submitToolOutputs(any(), any(), any())).thenReturn(Single.just(run));
   }
 
-  private static Run getRunThatCompleted(String runId, Object result) {
+  private static Run getRunThatCallCompletionTool(String runId, Object result) {
     JsonNode arguments = new ObjectMapper().valueToTree(result);
     return getRunThatRequiresAction(arguments.toString(), runId, COMPLETE_NOTE_DETAILS);
   }
@@ -49,6 +67,13 @@ public record OpenAIAssistantMock(OpenAiApi openAiApi) {
     Mockito.doReturn(Single.just(run))
         .when(openAiApi)
         .createRun(ArgumentMatchers.any(), ArgumentMatchers.any());
+  }
+
+  private static Run getRunThatCompleted(String runId) {
+    Run retrievedRun = new Run();
+    retrievedRun.setId(runId);
+    retrievedRun.setStatus("completed");
+    return retrievedRun;
   }
 
   private static Run getRunThatRequiresAction(

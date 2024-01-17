@@ -23,7 +23,8 @@ declare namespace Generated {
     interface AiCompletionResponse {
         threadId: string;
         runId: string;
-        requiredAction: AiCompletionRequiredAction;
+        requiredAction?: AiCompletionRequiredAction;
+        lastMessage: string;
     }
 
     interface AiGeneratedImage {

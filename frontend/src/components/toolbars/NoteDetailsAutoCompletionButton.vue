@@ -78,7 +78,7 @@ export default defineComponent({
       this.clarifyingQuestion = undefined;
       this.storageAccessor.storedApi().updateTextContent(this.note.id, {
         topic: this.note.topic,
-        details: this.note.details + response.requiredAction.contentToAppend!,
+        details: this.note.details + response.requiredAction!.contentToAppend!,
       });
     },
     async clarifyingQuestionAnswered(
@@ -90,7 +90,7 @@ export default defineComponent({
         answer: clarifyingQuestionAndAnswer.answerFromUser,
         threadId: this.threadRespons!.threadId,
         runId: this.threadRespons!.runId,
-        toolCallId: this.threadRespons!.requiredAction.toolCallId,
+        toolCallId: this.threadRespons!.requiredAction!.toolCallId,
       });
       await this.autoCompleteDetails(response);
     },

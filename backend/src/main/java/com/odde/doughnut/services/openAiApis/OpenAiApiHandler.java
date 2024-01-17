@@ -15,6 +15,7 @@ import com.theokanning.openai.fine_tuning.FineTuningJobRequest;
 import com.theokanning.openai.fine_tuning.Hyperparameters;
 import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.ImageResult;
+import com.theokanning.openai.messages.Message;
 import com.theokanning.openai.messages.MessageRequest;
 import com.theokanning.openai.model.Model;
 import com.theokanning.openai.runs.Run;
@@ -107,10 +108,6 @@ public class OpenAiApiHandler {
     return blockGet(openAiApi.createThread(threadRequest));
   }
 
-  public Run createRun(String threadId, RunCreateRequest runCreateRequest) {
-    return blockGet(openAiApi.createRun(threadId, runCreateRequest));
-  }
-
   public void createMessage(String threadId, MessageRequest messageRequest) {
     blockGet(openAiApi.createMessage(threadId, messageRequest));
   }
@@ -131,15 +128,16 @@ public class OpenAiApiHandler {
         && !(retrievedRun.getStatus().equals("failed"))
         && !(retrievedRun.getStatus().equals("requires_action"))) {
       count++;
-      if (count > 10) {
+      if (count > 20) {
         break;
       }
       retrievedRun = retrieveRun(threadId, currentRun.getId());
     }
-    if (retrievedRun.getStatus().equals("failed")) {
-      throw new RuntimeException("OpenAI failed to complete the request");
+    if (retrievedRun.getStatus().equals("requires_action")
+        || retrievedRun.getStatus().equals("completed")) {
+      return retrievedRun;
     }
-    return retrievedRun;
+    throw new RuntimeException("OpenAI run status: " + retrievedRun.getStatus());
   }
 
   public Run submitToolOutputs(
@@ -158,5 +156,9 @@ public class OpenAiApiHandler {
             answerClarifyingQuestionParams.getThreadId(),
             answerClarifyingQuestionParams.getRunId(),
             submitToolOutputsRequest));
+  }
+
+  public Message getThreadLastMessage(String threadId) {
+    return blockGet(openAiApi.listMessages(threadId)).getData().getLast();
   }
 }
