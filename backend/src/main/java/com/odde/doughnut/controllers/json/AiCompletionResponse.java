@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers.json;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,4 +11,12 @@ public final class AiCompletionResponse {
   String runId;
   String moreCompleteContent;
   ClarifyingQuestionRequiredAction clarifyingQuestionRequiredAction;
+
+  @JsonIgnore
+  public String getMoreCompleteContent() {
+    if (moreCompleteContent == null) {
+      return "";
+    }
+    return moreCompleteContent;
+  }
 }
