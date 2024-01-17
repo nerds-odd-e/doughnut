@@ -62,7 +62,7 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
 
       completionResponseForClarification =
           getTools()
-              .flatMap(t -> t.tryConsume(detailsToComplete, toolCall))
+              .flatMap(t -> t.tryConsume(toolCall))
               .findFirst()
               .orElseThrow(
                   () ->
@@ -74,6 +74,8 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
     }
     completionResponseForClarification.setThreadId(threadId);
     completionResponseForClarification.setRunId(currentRun.getId());
+    completionResponseForClarification.setMoreCompleteContent(
+        detailsToComplete + completionResponseForClarification.getMoreCompleteContent());
     return completionResponseForClarification;
   }
 

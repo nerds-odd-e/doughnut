@@ -39,7 +39,7 @@ public record AiTool(String name, String description, Class<?> parameterClass) {
     return objectMapper.convertValue(jsonNode, Map.class);
   }
 
-  public Stream<AiCompletionResponse> tryConsume(String detailsToComplete, ToolCall toolCall) {
+  public Stream<AiCompletionResponse> tryConsume(ToolCall toolCall) {
     ToolCallFunction function = toolCall.getFunction();
     if (!name.equals(function.getName())) {
       return Stream.empty();
@@ -57,9 +57,8 @@ public record AiTool(String name, String description, Class<?> parameterClass) {
     } else if (function.getName().equals(COMPLETE_NOTE_DETAILS)) {
       NoteDetailsCompletion noteDetailsCompletion =
           (NoteDetailsCompletion) convertArguments(function);
-      String content = detailsToComplete + noteDetailsCompletion.completion;
       AiCompletionResponse result = new AiCompletionResponse();
-      result.setMoreCompleteContent(content);
+      result.setMoreCompleteContent(noteDetailsCompletion.completion);
       return Stream.of(result);
     }
     return Stream.empty();
