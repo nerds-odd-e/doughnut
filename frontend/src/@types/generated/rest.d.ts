@@ -14,11 +14,16 @@ declare namespace Generated {
         detailsToComplete: string;
     }
 
+    interface AiCompletionRequiredAction {
+        toolCallId: string;
+        clarifyingQuestion?: ClarifyingQuestion;
+        moreCompleteContent?: string;
+    }
+
     interface AiCompletionResponse {
         threadId: string;
         runId: string;
-        moreCompleteContent: string;
-        clarifyingQuestionRequiredAction: ClarifyingQuestionRequiredAction;
+        requiredAction: AiCompletionRequiredAction;
     }
 
     interface AiGeneratedImage {
@@ -54,11 +59,6 @@ declare namespace Generated {
     interface ClarifyingQuestionAndAnswer {
         questionFromAI: ClarifyingQuestion;
         answerFromUser: string;
-    }
-
-    interface ClarifyingQuestionRequiredAction {
-        toolCallId: string;
-        clarifyingQuestion: ClarifyingQuestion;
     }
 
     interface CurrentUserInfo {

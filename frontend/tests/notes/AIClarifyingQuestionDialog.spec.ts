@@ -4,16 +4,8 @@ import helper from "../helpers";
 
 describe("answering a clarifying question for note details geeration", () => {
   let wrapper: VueWrapper;
-  const completionInProgress: Generated.AiCompletionResponse = {
-    threadId: "123",
-    runId: "123",
-    moreCompleteContent: "Football",
-    clarifyingQuestionRequiredAction: {
-      toolCallId: "123",
-      clarifyingQuestion: {
-        question: "Do you mean American Football or European Football?",
-      },
-    },
+  const clarifyingQuestion: Generated.ClarifyingQuestion = {
+    question: "Do you mean American Football or European Football?",
   };
   const clarifyingHistory = [
     {
@@ -28,7 +20,7 @@ describe("answering a clarifying question for note details geeration", () => {
     vi.useFakeTimers();
     wrapper = helper
       .component(AIClarifyingQuestionDialog)
-      .withProps({ completionInProgress, clarifyingHistory })
+      .withProps({ clarifyingQuestion, clarifyingHistory })
       .mount();
   });
 

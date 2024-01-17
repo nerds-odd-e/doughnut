@@ -109,6 +109,7 @@ class AiAdvisorServiceAutoCompleteTest {
       aiCompletionParams.setDetailsToComplete(incompleteContent);
       return aiAdvisorService
           .getAiCompletion(aiCompletionParams, note, "asst_example_id")
+          .getRequiredAction()
           .getMoreCompleteContent();
     }
   }
@@ -135,12 +136,10 @@ class AiAdvisorServiceAutoCompleteTest {
           "my-run-id");
       AiCompletionResponse aiCompletionResponse =
           aiAdvisorService.answerAiCompletionClarifyingQuestion(params);
-      assertEquals(
-          "mocked-tool-call-id",
-          aiCompletionResponse.getClarifyingQuestionRequiredAction().toolCallId);
+      assertEquals("mocked-tool-call-id", aiCompletionResponse.getRequiredAction().toolCallId);
       assertEquals(
           "Are you referring to American football or association football (soccer) ?",
-          aiCompletionResponse.getClarifyingQuestionRequiredAction().clarifyingQuestion.question);
+          aiCompletionResponse.getRequiredAction().getClarifyingQuestion().question);
     }
 
     @Nested
@@ -175,7 +174,7 @@ class AiAdvisorServiceAutoCompleteTest {
             aiAdvisorService.answerAiCompletionClarifyingQuestion(params);
         assertEquals(
             "Tea is common in China, if you are referring to green tea.",
-            aiCompletionResponse.getMoreCompleteContent());
+            aiCompletionResponse.getRequiredAction().getMoreCompleteContent());
       }
     }
   }

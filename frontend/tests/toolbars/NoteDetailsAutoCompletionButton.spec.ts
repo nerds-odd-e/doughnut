@@ -30,7 +30,9 @@ describe("NoteDetailsAutoCompletionButton", () => {
     const noteWithNoDetails = makeMe.aNote.details("").please();
     const expectation = helper.apiMock
       .expectingPost(`/api/ai/${noteWithNoDetails.id}/completion`)
-      .andReturnOnce({ moreCompleteContent: "auto completed content" });
+      .andReturnOnce({
+        requiredAction: { moreCompleteContent: "auto completed content" },
+      });
     helper.apiMock.expectingPatch(`/api/text_content/${noteWithNoDetails.id}`);
     await triggerAutoCompletion(noteWithNoDetails);
     expect(expectation.actualRequestJsonBody()).toMatchObject({
@@ -41,7 +43,9 @@ describe("NoteDetailsAutoCompletionButton", () => {
   it("ask api be called once when clicking the auto-complete button", async () => {
     const expectation = helper.apiMock
       .expectingPost(`/api/ai/${note.id}/completion`)
-      .andReturnOnce({ moreCompleteContent: "auto completed content" });
+      .andReturnOnce({
+        requiredAction: { moreCompleteContent: "auto completed content" },
+      });
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
     await triggerAutoCompletion(note);
     expect(expectation.actualRequestJsonBody()).toMatchObject({
@@ -53,7 +57,9 @@ describe("NoteDetailsAutoCompletionButton", () => {
     helper.apiMock
       .expectingPost(`/api/ai/${note.id}/completion`)
       .andReturnOnce({
-        moreCompleteContent: "auto completed content",
+        requiredAction: {
+          moreCompleteContent: "auto completed content",
+        },
       });
     helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
 
@@ -66,9 +72,11 @@ describe("NoteDetailsAutoCompletionButton", () => {
       .andReturnOnce({
         runId: "run-id",
         threadId: "thread-id",
-        clarifyingQuestionRequiredAction: {
+        requiredAction: {
           toolCallId: "tool-call-id",
-          clarifyingQuestion: "what do you mean?",
+          clarifyingQuestion: {
+            question: "what do you mean?",
+          },
         },
       });
     const wrapper = await triggerAutoCompletion(note);
@@ -88,7 +96,9 @@ describe("NoteDetailsAutoCompletionButton", () => {
     helper.apiMock
       .expectingPost(`/api/ai/${note.id}/completion`)
       .andReturnOnce({
-        moreCompleteContent: "auto completed content",
+        requiredAction: {
+          moreCompleteContent: "auto completed content",
+        },
       });
 
     const wrapper = await triggerAutoCompletionWithoutFlushPromises(note);

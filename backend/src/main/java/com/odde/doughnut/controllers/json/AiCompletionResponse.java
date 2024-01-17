@@ -8,13 +8,5 @@ import lombok.NoArgsConstructor;
 public final class AiCompletionResponse {
   String threadId;
   String runId;
-  String moreCompleteContent;
-  ClarifyingQuestionRequiredAction clarifyingQuestionRequiredAction;
-
-  public String getMoreCompleteContent() {
-    if (moreCompleteContent == null) {
-      return "";
-    }
-    return moreCompleteContent;
-  }
+  AiCompletionRequiredAction requiredAction;
 }
