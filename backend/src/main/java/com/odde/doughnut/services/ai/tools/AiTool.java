@@ -20,14 +20,14 @@ import com.theokanning.openai.runs.ToolCallFunction;
 import java.util.Map;
 import java.util.stream.Stream;
 
-public record AiTool(String name, String description, Class<?> parameters) {
+public record AiTool(String name, String description, Class<?> parameterClass) {
   public Tool getTool() {
     return new Tool(
         AssistantToolsEnum.FUNCTION,
         AssistantFunction.builder()
             .name(name)
             .description(description)
-            .parameters(serializeClassSchema(parameters))
+            .parameters(serializeClassSchema(parameterClass))
             .build());
   }
 
@@ -41,10 +41,10 @@ public record AiTool(String name, String description, Class<?> parameters) {
 
   public Stream<AiCompletionResponse> tryConsume(String detailsToComplete, ToolCall toolCall) {
     ToolCallFunction function = toolCall.getFunction();
-    String arguments = function.getArguments();
-    if (name().equals(function.getName())) {
+    if (!name.equals(function.getName())) {
       return Stream.empty();
     }
+    String arguments = function.getArguments();
     JsonNode jsonNode = null;
     try {
       jsonNode = defaultObjectMapper().readTree(arguments);
@@ -55,7 +55,7 @@ public record AiTool(String name, String description, Class<?> parameters) {
     if (function.getName().equals(askClarificationQuestion)) {
       ClarifyingQuestion result1;
       try {
-        result1 = defaultObjectMapper().treeToValue(jsonNode, ClarifyingQuestion.class);
+        result1 = (ClarifyingQuestion) defaultObjectMapper().treeToValue(jsonNode, parameterClass);
       } catch (JsonProcessingException e) {
         throw new RuntimeException(e);
       }
@@ -70,7 +70,7 @@ public record AiTool(String name, String description, Class<?> parameters) {
       String result1;
       try {
         NoteDetailsCompletion noteDetailsCompletion =
-            defaultObjectMapper().treeToValue(jsonNode, NoteDetailsCompletion.class);
+            (NoteDetailsCompletion) defaultObjectMapper().treeToValue(jsonNode, parameterClass);
         result1 = detailsToComplete + noteDetailsCompletion.completion;
       } catch (JsonProcessingException e) {
         throw new RuntimeException(e);
@@ -80,7 +80,6 @@ public record AiTool(String name, String description, Class<?> parameters) {
       result.setMoreCompleteContent(content);
       return Stream.of(result);
     }
-
     return Stream.empty();
   }
 }
