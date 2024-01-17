@@ -95,10 +95,25 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
         new AiTool(
             COMPLETE_NOTE_DETAILS,
             "Text completion for the details of the note of focus",
-            NoteDetailsCompletion.class),
+            NoteDetailsCompletion.class,
+            (o, toolCallId) -> {
+              NoteDetailsCompletion noteDetailsCompletion = (NoteDetailsCompletion) o;
+              AiCompletionResponse result = new AiCompletionResponse();
+              result.setMoreCompleteContent(noteDetailsCompletion.completion);
+              return result;
+            }),
         new AiTool(
             askClarificationQuestion,
             "Ask question to get more context",
-            ClarifyingQuestion.class));
+            ClarifyingQuestion.class,
+            (o, toolCallId) -> {
+              ClarifyingQuestionRequiredAction cqra = new ClarifyingQuestionRequiredAction();
+              cqra.clarifyingQuestion = (ClarifyingQuestion) o;
+              cqra.toolCallId = toolCallId;
+
+              AiCompletionResponse result = new AiCompletionResponse();
+              result.setClarifyingQuestionRequiredAction(cqra);
+              return result;
+            }));
   }
 }
