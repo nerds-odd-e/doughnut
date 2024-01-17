@@ -12,7 +12,6 @@ public final class AiCompletionResponse {
   String moreCompleteContent;
   ClarifyingQuestionRequiredAction clarifyingQuestionRequiredAction;
 
-  @JsonIgnore
   public String getMoreCompleteContent() {
     if (moreCompleteContent == null) {
       return "";
