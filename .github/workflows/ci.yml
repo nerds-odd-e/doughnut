@@ -71,7 +71,7 @@ jobs:
         run: pnpm frontend:build
       - name: Build application jar artifact
         run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
           path: backend/build/libs/${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
