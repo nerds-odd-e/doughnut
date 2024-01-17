@@ -44,21 +44,9 @@ public record AiTool(String name, String description, Class<?> parameterClass) {
     if (!name.equals(function.getName())) {
       return Stream.empty();
     }
-    String arguments = function.getArguments();
-    JsonNode jsonNode = null;
-    try {
-      jsonNode = defaultObjectMapper().readTree(arguments);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
 
     if (function.getName().equals(askClarificationQuestion)) {
-      ClarifyingQuestion result1;
-      try {
-        result1 = (ClarifyingQuestion) defaultObjectMapper().treeToValue(jsonNode, parameterClass);
-      } catch (JsonProcessingException e) {
-        throw new RuntimeException(e);
-      }
+      ClarifyingQuestion result1 = (ClarifyingQuestion) convertArguments(function);
       AiCompletionResponse result = new AiCompletionResponse();
       ClarifyingQuestionRequiredAction cqra = new ClarifyingQuestionRequiredAction();
       cqra.clarifyingQuestion = result1;
@@ -67,19 +55,23 @@ public record AiTool(String name, String description, Class<?> parameterClass) {
       result.setClarifyingQuestionRequiredAction(cqra);
       return Stream.of(result);
     } else if (function.getName().equals(COMPLETE_NOTE_DETAILS)) {
-      String result1;
-      try {
-        NoteDetailsCompletion noteDetailsCompletion =
-            (NoteDetailsCompletion) defaultObjectMapper().treeToValue(jsonNode, parameterClass);
-        result1 = detailsToComplete + noteDetailsCompletion.completion;
-      } catch (JsonProcessingException e) {
-        throw new RuntimeException(e);
-      }
+      NoteDetailsCompletion noteDetailsCompletion =
+          (NoteDetailsCompletion) convertArguments(function);
+      String content = detailsToComplete + noteDetailsCompletion.completion;
       AiCompletionResponse result = new AiCompletionResponse();
-      String content = result1;
       result.setMoreCompleteContent(content);
       return Stream.of(result);
     }
     return Stream.empty();
+  }
+
+  public Object convertArguments(ToolCallFunction function) {
+    String arguments = function.getArguments();
+    try {
+      JsonNode jsonNode = defaultObjectMapper().readTree(arguments);
+      return defaultObjectMapper().treeToValue(jsonNode, parameterClass);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
   }
 }
