@@ -19,19 +19,18 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(locations = {"classpath:repository.xml"})
+@SpringBootTest
+@ActiveProfiles("test")
 @Transactional
 public class ControllerSetupTest {
   @Autowired MakeMe makeMe;

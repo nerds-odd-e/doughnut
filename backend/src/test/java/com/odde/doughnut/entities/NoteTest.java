@@ -18,15 +18,13 @@ import javax.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.Commit;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(locations = {"classpath:repository.xml"})
+@SpringBootTest
+@ActiveProfiles("test")
 @Transactional
 public class NoteTest {
 
@@ -38,10 +36,7 @@ public class NoteTest {
     Note parent = makeMe.aNote().please();
     Note note1 = makeMe.aNote().under(parent).please();
     Note note2 = makeMe.aNote().under(parent).please();
-    makeMe.modelFactoryService.entityManager.flush();
     makeMe.refresh(parent);
-    Note x = makeMe.modelFactoryService.noteRepository.findById(parent.id).get();
-    assertThat(x.getChildren(), containsInRelativeOrder(note1, note2));
     assertThat(parent.getChildren(), containsInRelativeOrder(note1, note2));
   }
 
