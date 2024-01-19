@@ -1,7 +1,7 @@
 package com.odde.doughnut.entities;
 
 import java.sql.Timestamp;
-import javax.persistence.*;
+import jakarta.persistence.*;
 import javax.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;

@@ -6,7 +6,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.testability.TestabilitySettings;
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
 

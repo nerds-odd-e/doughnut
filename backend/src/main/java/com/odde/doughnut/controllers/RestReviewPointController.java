@@ -10,7 +10,7 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.OpenAiApi;
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;

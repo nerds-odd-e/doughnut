@@ -11,7 +11,7 @@ import com.theokanning.openai.completion.chat.ChatMessage;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
-import javax.persistence.*;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
