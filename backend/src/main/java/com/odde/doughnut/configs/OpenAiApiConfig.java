@@ -16,7 +16,9 @@ public class OpenAiApiConfig {
   @Bean
   @SessionScope
   @Qualifier("testableOpenAiApi")
-  public OpenAiApi getTestableOpenAiApi(@Value("${spring.openai.token}") String openAiToken, @Autowired TestabilitySettings testabilitySettings) {
+  public OpenAiApi getTestableOpenAiApi(
+      @Value("${spring.openai.token}") String openAiToken,
+      @Autowired TestabilitySettings testabilitySettings) {
     return ApiExecutor.getOpenAiApi(openAiToken, testabilitySettings.getOpenAiApiUrl());
   }
 }
