@@ -9,7 +9,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.testability.TestabilitySettings;
-import com.theokanning.openai.OpenAiApi;
+import com.theokanning.openai.client.OpenAiApi;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
