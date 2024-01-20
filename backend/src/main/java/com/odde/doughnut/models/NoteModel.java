@@ -3,6 +3,7 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.List;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -56,5 +57,9 @@ public class NoteModel {
       bindingResult.rejectValue(null, "error.error", "Duplicate Wikidata ID Detected.");
       throw new BindException(bindingResult);
     }
+  }
+
+  public Collection<Note> getDescendantsInBreathFirstOrder() {
+    return modelFactoryService.noteRepository.getDescendantsInBreathFirstOrder(entity.getId());
   }
 }

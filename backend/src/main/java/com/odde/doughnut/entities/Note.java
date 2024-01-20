@@ -129,31 +129,6 @@ public class Note extends Thingy {
             updatable = false)
       })
   @OneToMany(cascade = CascadeType.DETACH)
-  @Where(clause = "deleted_at is null")
-  @OrderBy("`notes_closure`.depth, sibling_order")
-  @JsonIgnore
-  @Getter
-  private List<Note> descendantsInBreathFirstOrder = new ArrayList<>();
-
-  @JoinTable(
-      name = "notes_closure",
-      joinColumns = {
-        @JoinColumn(
-            name = "ancestor_id",
-            referencedColumnName = "id",
-            nullable = false,
-            insertable = false,
-            updatable = false)
-      },
-      inverseJoinColumns = {
-        @JoinColumn(
-            name = "note_id",
-            referencedColumnName = "id",
-            nullable = false,
-            insertable = false,
-            updatable = false)
-      })
-  @OneToMany(cascade = CascadeType.DETACH)
   @JsonIgnore
   @WhereJoinTable(clause = "depth = 1")
   @Where(clause = "deleted_at is null")

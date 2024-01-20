@@ -21,8 +21,8 @@ public class NoteMotionModel {
     entity.moveHeadNoteOnly();
     updateAncestors(entity.getSubject(), entity.getNewParent());
     modelFactoryService.noteRepository.save(entity.getSubject());
-    entity
-        .getSubject()
+    modelFactoryService
+        .toNoteModel(entity.getSubject())
         .getDescendantsInBreathFirstOrder()
         .forEach(
             desc -> {
