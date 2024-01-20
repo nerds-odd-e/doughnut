@@ -210,8 +210,6 @@ public class Note extends Thingy {
   }
 
   public void updateNoteContent(NoteAccessories noteAccessories, User user) throws IOException {
-    noteAccessories.fetchUploadedPicture(user);
-
     if (noteAccessories.getUploadPicture() == null) {
       noteAccessories.setUploadPicture(getNoteAccessories().getUploadPicture());
     }
