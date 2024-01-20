@@ -45,6 +45,7 @@ class RestQuizQuestionController {
   }
 
   @PostMapping("/generate-question")
+  @Transactional
   public QuizQuestion generateQuestion(@RequestParam(value = "note") Note note) {
     currentUser.assertLoggedIn();
     return generateAIQuestion(note.getThing());
