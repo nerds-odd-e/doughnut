@@ -7,6 +7,8 @@ import com.odde.doughnut.models.Authorization;
 import com.odde.doughnut.models.UserModel;
 import jakarta.validation.Valid;
 import java.security.Principal;
+
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
