@@ -1,14 +1,14 @@
 package com.odde.doughnut.testability;
 
-import java.util.List;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Table;
 import jakarta.persistence.metamodel.EntityType;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import org.hibernate.metamodel.model.domain.JpaMetamodel;
 import org.springframework.transaction.annotation.Transactional;
 

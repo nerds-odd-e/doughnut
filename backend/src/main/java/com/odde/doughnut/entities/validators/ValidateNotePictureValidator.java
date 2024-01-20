@@ -11,8 +11,7 @@ public class ValidateNotePictureValidator
     implements ConstraintValidator<ValidateNotePicture, Object> {
 
   @Override
-  public void initialize(ValidateNotePicture constraintAnnotation) {
-  }
+  public void initialize(ValidateNotePicture constraintAnnotation) {}
 
   @Override
   public boolean isValid(Object value, ConstraintValidatorContext context) {

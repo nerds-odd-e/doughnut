@@ -8,8 +8,7 @@ import javax.validation.ConstraintValidatorContext;
 public class ValidateLinkTypeValidator implements ConstraintValidator<ValidateLinkType, Object> {
 
   @Override
-  public void initialize(ValidateLinkType constraintAnnotation) {
-  }
+  public void initialize(ValidateLinkType constraintAnnotation) {}
 
   @Override
   public boolean isValid(Object value, ConstraintValidatorContext context) {

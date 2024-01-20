@@ -6,11 +6,11 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.*;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionPresenter;
 import com.odde.doughnut.models.*;
+import jakarta.persistence.EntityManager;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,8 +47,7 @@ public class ModelFactoryService {
     if (!asFirstChild) {
       List<Note> children = targetNote.getChildren();
       if (!children.isEmpty()) {
-        return toNoteMotionModel(
-            new NoteMotion(children.getLast(), false), sourceNote);
+        return toNoteMotionModel(new NoteMotion(children.getLast(), false), sourceNote);
       }
     }
     return toNoteMotionModel(new NoteMotion(targetNote, true), sourceNote);
