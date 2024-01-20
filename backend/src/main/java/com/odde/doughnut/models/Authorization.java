@@ -113,6 +113,8 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
   private void assertAuthorizationCircle(Circle circle) throws UnexpectedNoAccessRightException {
     assertLoggedIn();
     if (user == null || !user.inCircle(circle)) {
+      System.out.printf("user: %s, circle: %s%n", user, circle);
+      System.out.printf("user: %s, circle: %s%n", user, circle);
       throw new UnexpectedNoAccessRightException();
     }
   }

@@ -14,13 +14,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "user")
-public class User {
-
-  @Id
-  @Getter
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
-
+public class User extends EntityIdentifiedByIdOnly {
   @NotNull
   @Size(min = 1, max = 100)
   @Getter
