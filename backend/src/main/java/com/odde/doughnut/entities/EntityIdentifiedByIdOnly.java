@@ -1,7 +1,7 @@
 package com.odde.doughnut.entities;
 
-import javax.persistence.*;
 import java.util.Objects;
+import javax.persistence.*;
 import lombok.Getter;
 
 @MappedSuperclass
