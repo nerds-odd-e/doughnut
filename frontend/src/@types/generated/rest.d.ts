@@ -218,8 +218,7 @@ declare namespace Generated {
         question: string;
     }
 
-    interface User {
-        id: number;
+    interface User extends EntityIdentifiedByIdOnly {
         name: string;
         externalIdentifier: string;
         ownership: Ownership;
@@ -329,12 +328,14 @@ declare namespace Generated {
         pictureMask: string;
     }
 
-    interface Thingy {
+    interface EntityIdentifiedByIdOnly {
         id: number;
     }
 
-    interface Thing {
-        id: number;
+    interface Thingy extends EntityIdentifiedByIdOnly {
+    }
+
+    interface Thing extends EntityIdentifiedByIdOnly {
         createdAt: string;
         note?: Note;
         link?: Link;
@@ -352,8 +353,7 @@ declare namespace Generated {
         name: string;
     }
 
-    interface Notebook {
-        id: number;
+    interface Notebook extends EntityIdentifiedByIdOnly {
         ownership: Ownership;
         headNote: Note;
         skipReviewEntirely: boolean;
