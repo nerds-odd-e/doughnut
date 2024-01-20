@@ -57,6 +57,7 @@ class RestReviewPointController {
   }
 
   @PostMapping(path = "/{reviewPoint}/remove")
+  @Transactional
   public ReviewPoint removeFromRepeating(ReviewPoint reviewPoint) {
     reviewPoint.setRemovedFromReview(true);
     modelFactoryService.updateRecord(reviewPoint);
