@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
 
@@ -42,6 +43,7 @@ public class RestAiController {
   }
 
   @PostMapping("/{note}/completion")
+  @Transactional
   public AiCompletionResponse getCompletion(
       @PathVariable(name = "note") Note note, @RequestBody AiCompletionParams aiCompletionParams) {
     currentUser.assertLoggedIn();
@@ -49,6 +51,7 @@ public class RestAiController {
   }
 
   @PostMapping("/answer-clarifying-question")
+  @Transactional
   public AiCompletionResponse answerCompletionClarifyingQuestion(
       @RequestBody AiCompletionAnswerClarifyingQuestionParams answerClarifyingQuestionParams) {
     currentUser.assertLoggedIn();
@@ -56,6 +59,7 @@ public class RestAiController {
   }
 
   @PostMapping("/chat")
+  @Transactional
   public ChatResponse chat(
       @RequestParam(value = "note") Note note, @RequestBody ChatRequest request)
       throws UnexpectedNoAccessRightException {
@@ -67,6 +71,7 @@ public class RestAiController {
   }
 
   @PostMapping("/generate-image")
+  @Transactional
   public AiGeneratedImage generateImage(@RequestBody String prompt) {
     currentUser.assertLoggedIn();
     return new AiGeneratedImage(aiAdvisorService.getImage(prompt));
@@ -78,6 +83,7 @@ public class RestAiController {
   }
 
   @PostMapping("/recreate-all-assistants")
+  @Transactional
   public Map<String, String> recreateAllAssistants() throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
     Map<String, String> result = new HashMap<>();

@@ -7,6 +7,7 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import javax.annotation.Resource;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
 
@@ -39,6 +40,7 @@ public class RestGlobalSettingsController {
   }
 
   @PostMapping("/current-model-version")
+  @Transactional
   public GlobalAiModelSettings setCurrentModelVersions(@RequestBody GlobalAiModelSettings models)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();

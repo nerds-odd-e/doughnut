@@ -44,6 +44,7 @@ class RestFineTuningDataController {
   }
 
   @PostMapping("/{suggestedQuestion}/duplicate")
+  @Transactional
   public SuggestedQuestionForFineTuning duplicate(
       @PathVariable("suggestedQuestion") SuggestedQuestionForFineTuning suggestedQuestion)
       throws UnexpectedNoAccessRightException {
@@ -54,6 +55,7 @@ class RestFineTuningDataController {
   }
 
   @PostMapping("/{suggestedQuestion}/delete")
+  @Transactional
   public SuggestedQuestionForFineTuning delete(
       @PathVariable("suggestedQuestion") SuggestedQuestionForFineTuning suggestedQuestion)
       throws UnexpectedNoAccessRightException {
@@ -62,6 +64,7 @@ class RestFineTuningDataController {
   }
 
   @PostMapping("/upload-and-trigger-fine-tuning")
+  @Transactional
   public void uploadAndTriggerFineTuning() throws UnexpectedNoAccessRightException, IOException {
     currentUser.assertAdminAuthorization();
     aiAdvisorService.uploadAndTriggerFineTuning(

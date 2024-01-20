@@ -73,6 +73,7 @@ class RestNotebookController {
   }
 
   @PostMapping(value = "/{notebook}/share")
+  @Transactional
   public Notebook shareNote(@PathVariable("notebook") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(notebook);
