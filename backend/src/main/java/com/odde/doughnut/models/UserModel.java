@@ -59,11 +59,11 @@ public class UserModel implements ReviewScope {
       Timestamp currentUTCTimestamp, ZoneId timeZone) {
     final Timestamp timestamp = TimestampOperations.alignByHalfADay(currentUTCTimestamp, timeZone);
     return modelFactoryService.reviewPointRepository
-        .findAllByUserAndNextReviewAtLessThanEqualOrderByNextReviewAt(getEntity(), timestamp);
+        .findAllByUserAndNextReviewAtLessThanEqualOrderByNextReviewAt(entity.getId(), timestamp);
   }
 
   int learntCount() {
-    return modelFactoryService.reviewPointRepository.countByUserNotRemoved(entity);
+    return modelFactoryService.reviewPointRepository.countByUserNotRemoved(entity.getId());
   }
 
   public Reviewing createReviewing(Timestamp currentUTCTimestamp, ZoneId timeZone) {
@@ -84,7 +84,8 @@ public class UserModel implements ReviewScope {
   }
 
   public ReviewPoint getReviewPointFor(Thing thing) {
-    return modelFactoryService.reviewPointRepository.findByUserAndThing(entity, thing);
+    return modelFactoryService.reviewPointRepository.findByUserAndThing(
+        entity.getId(), thing.getId());
   }
 
   public <T> void assertAuthorization(T object) throws UnexpectedNoAccessRightException {
