@@ -1,8 +1,6 @@
 package com.odde.doughnut.entities.repositories;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.User;
 import java.sql.Timestamp;
 import java.util.List;
 import org.springframework.data.jpa.repository.Modifying;
@@ -19,17 +17,16 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
 
   @Query(value = inAllMyNotebooksAndSubscriptions + searchForLinkTarget, nativeQuery = true)
   List<Note> searchForUserInAllMyNotebooksAndSubscriptions(
-      @Param("user") User user, @Param("pattern") String pattern);
+      Integer userId, @Param("pattern") String pattern);
 
   @Query(value = inAllMyNotebooksSubscriptionsAndCircles + searchForLinkTarget, nativeQuery = true)
   List<Note> searchForUserInAllMyNotebooksSubscriptionsAndCircle(
-      @Param("user") User user, @Param("pattern") String pattern);
+      Integer userId, @Param("pattern") String pattern);
 
   @Query(
-      value = selectFromNote + " WHERE note.notebook_id = :notebook " + searchForLinkTarget,
+      value = selectFromNote + " WHERE note.notebook_id = :notebookId " + searchForLinkTarget,
       nativeQuery = true)
-  List<Note> searchInNotebook(
-      @Param("notebook") Notebook notebook, @Param("pattern") String pattern);
+  List<Note> searchInNotebook(Integer notebookId, @Param("pattern") String pattern);
 
   @Query(
       value =
@@ -46,21 +43,21 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   String joinNotebooksEnd =
       "          UNION "
           + "          SELECT notebook_id FROM subscription "
-          + "             WHERE subscription.user_id = :user "
+          + "             WHERE subscription.user_id = :userId "
           + "       ) nb ON nb.id = note.notebook_id "
           + "  WHERE 1=1 ";
 
   String inAllMyNotebooksAndSubscriptions =
       joinNotebooksBegin
-          + "             JOIN ownership ON ownership.user_id = :user "
+          + "             JOIN ownership ON ownership.user_id = :userId "
           + "             WHERE notebook.ownership_id = ownership.id "
           + joinNotebooksEnd;
 
   String inAllMyNotebooksSubscriptionsAndCircles =
       joinNotebooksBegin
-          + "             LEFT JOIN circle_user ON circle_user.user_id = :user "
+          + "             LEFT JOIN circle_user ON circle_user.user_id = :userId "
           + "             LEFT JOIN circle ON circle.id = circle_user.circle_id "
-          + "             JOIN ownership ON circle.id = ownership.circle_id OR ownership.user_id = :user "
+          + "             JOIN ownership ON circle.id = ownership.circle_id OR ownership.user_id = :userId "
           + "             WHERE notebook.ownership_id = ownership.id "
           + joinNotebooksEnd;
 

@@ -163,6 +163,7 @@ class RestReviewsControllerTests {
             .forUser(currentUser.getEntity())
             .forNotebook(noteByAnotherUser.getNotebook())
             .please();
+        makeMe.flush();
         makeMe.refresh(currentUser.getEntity());
         AnsweredQuestion answeredQuestion = controller.showAnswer(answer);
         assertThat(answeredQuestion.answerId, equalTo(answer.getId()));
