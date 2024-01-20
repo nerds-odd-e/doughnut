@@ -18,6 +18,7 @@ Given("I am logged in as an existing user", () => {
 })
 
 Given("I am logged in as another existing user", () => {
+  cy.logout()
   cy.loginAs("another_old_learner")
 })
 
