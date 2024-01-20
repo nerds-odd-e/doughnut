@@ -52,6 +52,7 @@ class RestNotebookController {
   }
 
   @PostMapping({"/create"})
+  @Transactional
   public RedirectToNoteResponse createNotebook(@Valid @ModelAttribute TextContent textContent) {
     currentUser.assertLoggedIn();
     User userEntity = currentUser.getEntity();

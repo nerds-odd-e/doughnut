@@ -7,6 +7,7 @@ import com.odde.doughnut.models.Authorization;
 import com.odde.doughnut.models.UserModel;
 import java.security.Principal;
 import javax.validation.Valid;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,9 +16,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/user")
-record RestUserController(ModelFactoryService modelFactoryService, UserModel currentUser) {
+class RestUserController {
+  private final ModelFactoryService modelFactoryService;
+  private final UserModel currentUser;
+
+  public RestUserController(ModelFactoryService modelFactoryService, UserModel currentUser) {
+    this.modelFactoryService = modelFactoryService;
+    this.currentUser = currentUser;
+  }
 
   @PostMapping("")
+  @Transactional
   public User createUser(Principal principal, User user) {
     if (principal == null) Authorization.throwUserNotFound();
     user.setExternalIdentifier(principal.getName());
@@ -31,6 +40,7 @@ record RestUserController(ModelFactoryService modelFactoryService, UserModel cur
   }
 
   @PatchMapping("/{user}")
+  @Transactional
   public @Valid User updateUser(@Valid User user) throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(user);
     modelFactoryService.updateRecord(user);
