@@ -103,7 +103,7 @@ class RestCircleController {
             .getOwnership()
             .createNotebook(
                 currentUser.getEntity(), textContent, testabilitySettings.getCurrentUTCTimestamp());
-    modelFactoryService.noteRepository.save(note);
+    modelFactoryService.updateRecord(note);
     return new RedirectToNoteResponse(note.getId());
   }
 }

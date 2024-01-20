@@ -47,7 +47,7 @@ class RestTextContentController {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     note.updateTextContent(currentUTCTimestamp, textContent);
 
-    modelFactoryService.noteRepository.save(note);
+    modelFactoryService.updateRecord(note);
     return new NoteViewer(currentUser.getEntity(), note).toJsonObject();
   }
 }

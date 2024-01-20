@@ -51,7 +51,7 @@ class RestNoteController {
     WikidataIdWithApi wikidataIdWithApi =
         wikidataService.wrapWikidataIdWithApi(wikidataAssociationCreation.wikidataId);
     wikidataIdWithApi.associateNoteToWikidata(note, modelFactoryService);
-    modelFactoryService.noteRepository.save(note);
+    modelFactoryService.updateRecord(note);
     return new NoteViewer(currentUser.getEntity(), note).toJsonObject();
   }
 
@@ -98,7 +98,7 @@ class RestNoteController {
     final User user = currentUser.getEntity();
     note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     note.updateNoteContent(noteAccessories, user);
-    modelFactoryService.noteRepository.save(note);
+    modelFactoryService.updateRecord(note);
     return new NoteViewer(user, note).toJsonObject();
   }
 
@@ -160,7 +160,7 @@ class RestNoteController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
     note.mergeMasterReviewSetting(reviewSetting);
-    modelFactoryService.noteRepository.save(note);
+    modelFactoryService.updateRecord(note);
     return new RedirectToNoteResponse(note.getId());
   }
 }

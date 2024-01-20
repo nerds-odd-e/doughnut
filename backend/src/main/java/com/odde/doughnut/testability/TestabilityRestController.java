@@ -77,7 +77,7 @@ class TestabilityRestController {
     User user = new User();
     user.setExternalIdentifier(externalIdentifier);
     user.setName(name);
-    userRepository.save(user);
+    modelFactoryService.createRecord(user);
   }
 
   static class SeedNote {
@@ -148,8 +148,8 @@ class TestabilityRestController {
     }
 
     private void saveByOriginalOrder(
-        Map<String, Note> titleNoteMap, NoteRepository noteRepository1) {
-      seedNotes.forEach((seed -> noteRepository1.save(titleNoteMap.get(seed.topic))));
+        Map<String, Note> titleNoteMap, ModelFactoryService modelFactoryService) {
+      seedNotes.forEach((seed -> modelFactoryService.createRecord(titleNoteMap.get(seed.topic))));
     }
   }
 
@@ -162,7 +162,7 @@ class TestabilityRestController {
 
     Map<String, Note> titleNoteMap = seedInfo.buildIndividualNotes(user, currentUTCTimestamp);
     seedInfo.buildNoteTree(user, ownership, titleNoteMap, this.noteRepository);
-    seedInfo.saveByOriginalOrder(titleNoteMap, this.noteRepository);
+    seedInfo.saveByOriginalOrder(titleNoteMap, this.modelFactoryService);
     return titleNoteMap.values().stream().collect(Collectors.toMap(Note::getTopic, Thingy::getId));
   }
 
@@ -185,7 +185,7 @@ class TestabilityRestController {
         Link.createLink(
             sourceNote, targetNote, sourceNote.getThing().getCreator(), type, currentUTCTimestamp);
 
-    linkRepository.save(link);
+    modelFactoryService.createRecord(link);
     return "OK";
   }
 

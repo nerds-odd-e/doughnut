@@ -42,7 +42,11 @@ public class GlobalSettingsService {
       GlobalSettings settings = getGlobalSettings();
       settings.setValue(value);
       settings.setUpdatedAt(currentUTCTimestamp);
-      modelFactoryService.globalSettingRepository.save(settings);
+      if (settings.getId() == null) {
+        modelFactoryService.createRecord(settings);
+      } else {
+        modelFactoryService.updateRecord(settings);
+      }
     }
 
     public Timestamp getCreatedAt() {

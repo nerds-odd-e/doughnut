@@ -55,7 +55,7 @@ class RestLinkController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(link);
     link.setLinkType(linkCreation.linkType);
-    modelFactoryService.linkRepository.save(link);
+    modelFactoryService.updateRecord(link);
     return getNoteRealm(link, currentUser.getEntity(), linkCreation.fromTargetPerspective);
   }
 
@@ -99,7 +99,7 @@ class RestLinkController {
             user,
             linkCreation.linkType,
             testabilitySettings.getCurrentUTCTimestamp());
-    modelFactoryService.linkRepository.save(link);
+    modelFactoryService.createRecord(link);
     return getNoteRealm(link, user, linkCreation.fromTargetPerspective);
   }
 }

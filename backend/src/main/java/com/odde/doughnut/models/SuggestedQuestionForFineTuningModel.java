@@ -28,7 +28,10 @@ public class SuggestedQuestionForFineTuningModel {
   }
 
   private SuggestedQuestionForFineTuning save() {
-    return modelFactoryService.questionSuggestionForFineTuningRepository.save(entity);
+    if (entity.getId() == null) {
+      return modelFactoryService.createRecord(entity);
+    }
+    return modelFactoryService.updateRecord(entity);
   }
 
   public SuggestedQuestionForFineTuning suggestQuestionForFineTuning(
@@ -56,7 +59,7 @@ public class SuggestedQuestionForFineTuningModel {
     newObject.setPreservedNoteContent(entity.getPreservedNoteContent());
     newObject.setComment(entity.getComment());
     newObject.setPositiveFeedback(entity.isPositiveFeedback());
-    modelFactoryService.questionSuggestionForFineTuningRepository.save(newObject);
+    modelFactoryService.createRecord(newObject);
     return newObject;
   }
 
