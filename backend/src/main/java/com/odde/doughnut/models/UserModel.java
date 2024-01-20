@@ -84,6 +84,7 @@ public class UserModel implements ReviewScope {
   }
 
   public ReviewPoint getReviewPointFor(Thing thing) {
+    if (entity == null) return null;
     return modelFactoryService.reviewPointRepository.findByUserAndThing(
         entity.getId(), thing.getId());
   }
