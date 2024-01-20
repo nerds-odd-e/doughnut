@@ -96,6 +96,7 @@ class RestNoteController {
     currentUser.assertAuthorization(note);
 
     final User user = currentUser.getEntity();
+    noteAccessories.fetchUploadedPicture(user, modelFactoryService);
     note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     note.updateNoteContent(noteAccessories, user);
     modelFactoryService.updateRecord(note);

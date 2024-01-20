@@ -2,6 +2,7 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.entities.validators.ValidateNotePicture;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.ImageBuilder;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -59,10 +60,12 @@ public class NoteAccessories {
     return Optional.of(pictureUrl);
   }
 
-  public void fetchUploadedPicture(User user) throws IOException {
+  public void fetchUploadedPicture(User user, ModelFactoryService modelFactoryService)
+      throws IOException {
     MultipartFile file = getUploadPictureProxy();
     if (file != null && !file.isEmpty()) {
       Image image = new ImageBuilder().buildImageFromUploadedPicture(user, file);
+      modelFactoryService.createRecord(image);
       setUploadPicture(image);
     }
   }
