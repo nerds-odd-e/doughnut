@@ -21,7 +21,7 @@ record RestUserController(ModelFactoryService modelFactoryService, UserModel cur
   public User createUser(Principal principal, User user) {
     if (principal == null) Authorization.throwUserNotFound();
     user.setExternalIdentifier(principal.getName());
-    modelFactoryService.userRepository.save(user);
+    modelFactoryService.createRecord(user);
     return user;
   }
 
@@ -33,7 +33,7 @@ record RestUserController(ModelFactoryService modelFactoryService, UserModel cur
   @PatchMapping("/{user}")
   public @Valid User updateUser(@Valid User user) throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(user);
-    modelFactoryService.userRepository.save(user);
+    modelFactoryService.updateRecord(user);
     return user;
   }
 }

@@ -22,7 +22,7 @@ public record FailureReportFactory(
     FailureReport failureReport = createFailureReport();
     Integer issueNumber = githubService.createGithubIssue(failureReport);
     failureReport.setIssueNumber(issueNumber);
-    this.modelFactoryService.failureReportRepository.save(failureReport);
+    this.modelFactoryService.createRecord(failureReport);
   }
 
   private FailureReport createFailureReport() {
@@ -32,7 +32,7 @@ public record FailureReportFactory(
     PrintWriter pw = new PrintWriter(sw);
     exception.printStackTrace(pw);
     failureReport.setErrorDetail(getUserInfo() + getRequestInfo() + "# Stack trace\n" + sw);
-    this.modelFactoryService.failureReportRepository.save(failureReport);
+    this.modelFactoryService.createRecord(failureReport);
 
     return failureReport;
   }

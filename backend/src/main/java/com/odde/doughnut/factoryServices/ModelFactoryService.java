@@ -127,4 +127,13 @@ public class ModelFactoryService {
       SuggestedQuestionForFineTuning suggestion) {
     return new SuggestedQuestionForFineTuningModel(suggestion, this);
   }
+
+  public <T> T updateRecord(T record) {
+    return entityManager.merge(record);
+  }
+
+  public <T> T createRecord(T record) {
+    entityManager.persist(record);
+    return record;
+  }
 }

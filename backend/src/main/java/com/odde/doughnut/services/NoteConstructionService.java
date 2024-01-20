@@ -21,7 +21,7 @@ public record NoteConstructionService(
       Link.LinkType linkTypeToParent) {
     Note note = parentNote.buildChildNote(user, currentUTCTimestamp, textContent);
     note.buildLinkToParent(user, linkTypeToParent, currentUTCTimestamp);
-    modelFactoryService.noteRepository.save(note);
+    modelFactoryService.createRecord(note);
     if (wikidataIdWithApi != null) {
       wikidataIdWithApi.associateNoteToWikidata(note, modelFactoryService);
       wikidataIdWithApi.getCountryOfOrigin().ifPresent(wwa -> createSubNote(note, wwa));
@@ -46,7 +46,7 @@ public record NoteConstructionService(
                       Link link =
                           parentNote.buildLinkToNote(
                               user, Link.LinkType.RELATED_TO, currentUTCTimestamp, existingNote);
-                      this.modelFactoryService.linkRepository.save(link);
+                      this.modelFactoryService.createRecord(link);
                     },
                     () -> {
                       TextContent textContent = new TextContent();

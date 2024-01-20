@@ -59,7 +59,7 @@ class RestNotebookController {
         userEntity
             .getOwnership()
             .createNotebook(userEntity, textContent, testabilitySettings.getCurrentUTCTimestamp());
-    modelFactoryService.noteRepository.save(note);
+    modelFactoryService.createRecord(note);
     return new RedirectToNoteResponse(note.getId());
   }
 
@@ -67,7 +67,7 @@ class RestNotebookController {
   @Transactional
   public Notebook update(@Valid Notebook notebook) throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(notebook);
-    modelFactoryService.notebookRepository.save(notebook);
+    modelFactoryService.updateRecord(notebook);
     return notebook;
   }
 

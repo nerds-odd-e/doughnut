@@ -49,12 +49,12 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
     } else {
       entity.reviewFailed(currentUTCTimestamp);
     }
-    this.modelFactoryService.reviewPointRepository.save(entity);
+    this.modelFactoryService.updateRecord(entity);
   }
 
   public void updateForgettingCurve(int adjustment) {
     entity.setForgettingCurveIndex(entity.getForgettingCurveIndex() + adjustment);
     entity.setNextReviewAt(entity.calculateNextReviewAt());
-    this.modelFactoryService.reviewPointRepository.save(entity);
+    this.modelFactoryService.updateRecord(entity);
   }
 }

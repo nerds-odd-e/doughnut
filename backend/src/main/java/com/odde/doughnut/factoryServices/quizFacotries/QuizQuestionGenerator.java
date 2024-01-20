@@ -38,7 +38,7 @@ public record QuizQuestionGenerator(
             .findFirst()
             .orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
-    modelFactoryService.quizQuestionRepository.save(quizQuestionEntity);
+    modelFactoryService.createRecord(quizQuestionEntity);
     return modelFactoryService.toQuizQuestion(quizQuestionEntity, user);
   }
 }
