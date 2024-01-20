@@ -19,7 +19,7 @@ public class BazaarNotebook {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-  @ManyToOne(cascade = CascadeType.PERSIST)
+  @ManyToOne(cascade = CascadeType.DETACH)
   @JoinColumn(name = "notebook_id", referencedColumnName = "id")
   @Getter
   @Setter
