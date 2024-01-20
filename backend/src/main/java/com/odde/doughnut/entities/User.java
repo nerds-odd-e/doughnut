@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -80,7 +81,7 @@ public class User extends EntityIdentifiedByIdOnly {
 
   public boolean canReferTo(Notebook notebook) {
     if (owns(notebook)) return true;
-    return getSubscriptions().stream().anyMatch(s -> s.getNotebook() == notebook);
+    return getSubscriptions().stream().anyMatch(s -> Objects.equals(s.getNotebook(), notebook));
   }
 
   public boolean inCircle(Circle circle) {
