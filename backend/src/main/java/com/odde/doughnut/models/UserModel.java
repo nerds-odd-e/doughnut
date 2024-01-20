@@ -42,12 +42,14 @@ public class UserModel implements ReviewScope {
 
   @Override
   public int getThingsHaveNotBeenReviewedAtAllCount() {
-    return modelFactoryService.thingRepository.countByOwnershipWhereThereIsNoReviewPoint(entity);
+    return modelFactoryService.thingRepository.countByOwnershipWhereThereIsNoReviewPoint(
+        entity.getId(), entity.getOwnership().getId());
   }
 
   @Override
   public Stream<Thing> getThingHaveNotBeenReviewedAtAll() {
-    return modelFactoryService.thingRepository.findByOwnershipWhereThereIsNoReviewPoint(entity);
+    return modelFactoryService.thingRepository.findByOwnershipWhereThereIsNoReviewPoint(
+        entity.getId(), entity.getOwnership().getId());
   }
 
   public List<ReviewPoint> getRecentReviewPoints(Timestamp since) {

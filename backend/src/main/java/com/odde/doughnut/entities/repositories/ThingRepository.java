@@ -1,8 +1,6 @@
 package com.odde.doughnut.entities.repositories;
 
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Thing;
-import com.odde.doughnut.entities.User;
 import java.util.List;
 import java.util.stream.Stream;
 import org.springframework.data.jpa.repository.Query;
@@ -19,7 +17,7 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
   @Query(
       value = selectThingsFrom + selectThings + selectNoteThings + orderByDate,
       nativeQuery = true)
-  Stream<Thing> findByOwnershipWhereThereIsNoReviewPoint(@Param("user") User user);
+  Stream<Thing> findByOwnershipWhereThereIsNoReviewPoint(Integer userId, Integer ownershipId);
 
   @Query(
       value =
@@ -28,13 +26,12 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
               + selectNoteThings
               + whereThereIsNoReviewPoint,
       nativeQuery = true)
-  int countByOwnershipWhereThereIsNoReviewPoint(@Param("user") User user);
+  int countByOwnershipWhereThereIsNoReviewPoint(Integer userId, Integer ownershipId);
 
   @Query(
       value = selectThingsFrom + selectThingsByAncestor + selectNoteThingsByAncestor + orderByDate,
       nativeQuery = true)
-  Stream<Thing> findByAncestorWhereThereIsNoReviewPoint(
-      @Param("user") User user, @Param("ancestor") Note ancestor);
+  Stream<Thing> findByAncestorWhereThereIsNoReviewPoint(Integer userId, Integer ancestorId);
 
   @Query(
       value =
@@ -43,8 +40,7 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
               + selectNoteThingsByAncestor
               + whereThereIsNoReviewPoint,
       nativeQuery = true)
-  int countByAncestorWhereThereIsNoReviewPoint(
-      @Param("user") User user, @Param("ancestor") Note ancestor);
+  int countByAncestorWhereThereIsNoReviewPoint(Integer userId, Integer ancestorId);
 
   @Query(
       value =
@@ -53,12 +49,11 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
               + selectNoteThingsByAncestor
               + " WHERE (jlink.id IS NOT NULL OR jnote.id IS NOT NULL) AND thing.id in :thingIds",
       nativeQuery = true)
-  int countByAncestorAndInTheList(
-      @Param("ancestor") Note ancestor, @Param("thingIds") List<Integer> thingIds);
+  int countByAncestorAndInTheList(Integer ancestorId, @Param("thingIds") List<Integer> thingIds);
 
   String byAncestorWhereThereIsNoReviewPoint =
       "JOIN notes_closure ON notes_closure.note_id = source_id "
-          + "   AND notes_closure.ancestor_id = :ancestor ";
+          + "   AND notes_closure.ancestor_id = :ancestorId ";
 
   String selectLinkWithLevelFromNotes =
       ", GREATEST(IFNULL(source.level, 0), IFNULL(target.level, 0)) as level from link "
@@ -71,7 +66,7 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
 
   String joinNotebook =
       " JOIN notebook ON notebook.id = note.notebook_id "
-          + " AND notebook.ownership_id = :#{#user.ownership.id} ";
+          + " AND notebook.ownership_id = :ownershipId ";
 
   String byOwnershipWhereThereIsNoReviewPoint = " JOIN note ON note.id = source_id" + joinNotebook;
 
@@ -85,7 +80,7 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
   String whereThereIsNoReviewPoint =
       " LEFT JOIN review_point rp"
           + " ON thing.id = rp.thing_id "
-          + "   AND rp.user_id = :user"
+          + "   AND rp.user_id = :userId"
           + " WHERE "
           + "   rp.id IS NULL "
           + "   AND (jlink.id IS NOT NULL OR jnote.id IS NOT NULL) ";
@@ -101,7 +96,7 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
 
   String joinClosure =
       " JOIN notes_closure ON notes_closure.note_id = note.id "
-          + "   AND notes_closure.ancestor_id = :ancestor ";
+          + "   AND notes_closure.ancestor_id = :ancestorId ";
 
   String selectThingJoinNote = "LEFT JOIN (" + " SELECT note.id as id, rs.level as level FROM note";
 
