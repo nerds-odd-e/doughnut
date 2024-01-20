@@ -28,6 +28,7 @@ export default {
   },
 
   loginAsAdmin: () => {
+    cy.logout()
     cy.loginAs("admin")
   },
 
