@@ -36,6 +36,7 @@ public class NoteTest {
     Note parent = makeMe.aNote().please();
     Note note1 = makeMe.aNote().under(parent).please();
     Note note2 = makeMe.aNote().under(parent).please();
+    makeMe.flush();
     makeMe.refresh(parent);
     assertThat(parent.getChildren(), containsInRelativeOrder(note1, note2));
   }
