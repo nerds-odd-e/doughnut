@@ -2,7 +2,6 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.controllers.json.SearchTerm;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import java.util.List;
@@ -23,16 +22,18 @@ public class SearchTermModel {
 
   private List<Note> search() {
     if (searchTerm.getAllMyCircles()) {
-      return noteRepository.searchForUserInAllMyNotebooksSubscriptionsAndCircle(user, getPattern());
+      return noteRepository.searchForUserInAllMyNotebooksSubscriptionsAndCircle(
+          user.getId(), getPattern());
     }
     if (searchTerm.getAllMyNotebooksAndSubscriptions()) {
-      return noteRepository.searchForUserInAllMyNotebooksAndSubscriptions(user, getPattern());
+      return noteRepository.searchForUserInAllMyNotebooksAndSubscriptions(
+          user.getId(), getPattern());
     }
-    Notebook notebook = null;
+    Integer notebookId = null;
     if (searchTerm.note != null) {
-      notebook = searchTerm.note.getNotebook();
+      notebookId = searchTerm.note.getNotebook().getId();
     }
-    return noteRepository.searchInNotebook(notebook, getPattern());
+    return noteRepository.searchInNotebook(notebookId, getPattern());
   }
 
   private String getPattern() {
