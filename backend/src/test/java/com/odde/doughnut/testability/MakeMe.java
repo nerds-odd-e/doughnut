@@ -56,6 +56,10 @@ public class MakeMe extends MakeMeWithoutDB {
     return object;
   }
 
+  public void flush() {
+    modelFactoryService.entityManager.flush();
+  }
+
   public ReviewPointBuilder aReviewPointFor(Note note) {
     ReviewPoint reviewPoint = ReviewPoint.buildReviewPointForThing(note.getThing());
     return new ReviewPointBuilder(reviewPoint, this).forNote(note);
@@ -123,4 +127,5 @@ public class MakeMe extends MakeMeWithoutDB {
   public SuggestedQuestionForFineTuningBuilder aQuestionSuggestionForFineTunining() {
     return new SuggestedQuestionForFineTuningBuilder(this);
   }
+
 }
