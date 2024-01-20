@@ -38,7 +38,7 @@ public record NoteConstructionService(
             modelFactoryService
                 .noteRepository
                 .noteWithWikidataIdWithinNotebook(
-                    parentNote.getNotebook(), subWikidataIdWithApi.wikidataId())
+                    parentNote.getNotebook().getId(), subWikidataIdWithApi.wikidataId())
                 .stream()
                 .findFirst()
                 .ifPresentOrElse(

@@ -49,7 +49,7 @@ public class NoteModel {
     }
     List<Note> existingNotes =
         modelFactoryService.noteRepository.noteWithWikidataIdWithinNotebook(
-            entity.getNotebook(), entity.getWikidataId());
+            entity.getNotebook().getId(), entity.getWikidataId());
     if (existingNotes.stream().anyMatch(n -> !n.equals(entity))) {
       BindingResult bindingResult =
           new BeanPropertyBindingResult(entity.getWikidataId(), "wikidataId");

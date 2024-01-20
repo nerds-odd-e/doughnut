@@ -34,11 +34,11 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   @Query(
       value =
           selectFromNote
-              + " WHERE note.notebook_id = :notebook "
+              + " WHERE note.notebook_id = :notebookId "
               + " AND note.wikidata_id = :wikidataId AND note.wikidata_id IS NOT NULL AND note.deleted_at IS NULL ",
       nativeQuery = true)
   List<Note> noteWithWikidataIdWithinNotebook(
-      @Param("notebook") Notebook notebook, @Param("wikidataId") String wikidataId);
+      @Param("notebookId") Integer notebookId, @Param("wikidataId") String wikidataId);
 
   String joinNotebooksBegin =
       selectFromNote + "  JOIN (" + "          SELECT notebook.id FROM notebook ";
