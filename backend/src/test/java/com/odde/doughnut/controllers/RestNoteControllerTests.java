@@ -432,7 +432,9 @@ class RestNoteControllerTests {
       controller.deleteNote(subject);
       makeMe.refresh(parent);
       assertThat(parent.getChildren(), hasSize(1));
-      assertThat(parent.getDescendantsInBreathFirstOrder(), hasSize(1));
+      assertThat(
+          makeMe.modelFactoryService.toNoteModel(parent).getDescendantsInBreathFirstOrder(),
+          hasSize(1));
     }
 
     @Nested
@@ -444,11 +446,13 @@ class RestNoteControllerTests {
         controller.undoDeleteNote(subject);
         makeMe.refresh(parent);
         assertThat(parent.getChildren(), hasSize(1));
-        assertThat(parent.getDescendantsInBreathFirstOrder(), hasSize(2));
+        assertThat(
+            makeMe.modelFactoryService.toNoteModel(parent).getDescendantsInBreathFirstOrder(),
+            hasSize(2));
       }
 
       @Test
-      void shouldUndoOnlylastChange() throws UnexpectedNoAccessRightException {
+      void shouldUndoOnlyLastChange() throws UnexpectedNoAccessRightException {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         testabilitySettings.timeTravelTo(timestamp);
         controller.deleteNote(child);
@@ -461,7 +465,9 @@ class RestNoteControllerTests {
 
         controller.undoDeleteNote(subject);
         makeMe.refresh(parent);
-        assertThat(parent.getDescendantsInBreathFirstOrder(), hasSize(1));
+        assertThat(
+            makeMe.modelFactoryService.toNoteModel(parent).getDescendantsInBreathFirstOrder(),
+            hasSize(1));
       }
     }
   }
