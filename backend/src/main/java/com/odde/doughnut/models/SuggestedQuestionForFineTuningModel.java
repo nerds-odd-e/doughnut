@@ -64,7 +64,7 @@ public class SuggestedQuestionForFineTuningModel {
   }
 
   public SuggestedQuestionForFineTuning delete() {
-    modelFactoryService.questionSuggestionForFineTuningRepository.delete(entity);
+    modelFactoryService.entityManager.remove(entity);
     return entity;
   }
 }

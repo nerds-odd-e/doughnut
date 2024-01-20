@@ -22,11 +22,6 @@ public class ModelFactoryService {
   @Autowired public BazaarNotebookRepository bazaarNotebookRepository;
   @Autowired public ReviewPointRepository reviewPointRepository;
   @Autowired public CircleRepository circleRepository;
-  @Autowired public LinkRepository linkRepository;
-  @Autowired public QuizQuestionRepository quizQuestionRepository;
-  @Autowired public AnswerRepository answerRepository;
-  @Autowired public NotesClosureRepository notesClosureRepository;
-  @Autowired public NotebookRepository notebookRepository;
   @Autowired public EntityManager entityManager;
   @Autowired public FailureReportRepository failureReportRepository;
   @Autowired public GlobalSettingRepository globalSettingRepository;
