@@ -16,6 +16,10 @@ public class CircleModel {
 
   public void joinAndSave(User user) {
     entity.getMembers().add(user);
-    modelFactoryService.updateRecord(entity);
+    if (entity.getId() == null) {
+      modelFactoryService.createRecord(entity);
+    } else {
+      modelFactoryService.updateRecord(entity);
+    }
   }
 }

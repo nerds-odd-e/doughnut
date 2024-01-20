@@ -61,6 +61,7 @@ class RestCircleController {
   }
 
   @PostMapping("")
+  @Transactional
   public Circle createCircle(@Valid Circle circle) {
     CircleModel circleModel = modelFactoryService.toCircleModel(circle);
     circleModel.joinAndSave(currentUser.getEntity());
@@ -93,6 +94,7 @@ class RestCircleController {
   }
 
   @PostMapping({"/{circle}/notebooks"})
+  @Transactional
   public RedirectToNoteResponse createNotebook(
       Circle circle, @Valid @ModelAttribute TextContent textContent)
       throws UnexpectedNoAccessRightException {
@@ -103,7 +105,7 @@ class RestCircleController {
             .getOwnership()
             .createNotebook(
                 currentUser.getEntity(), textContent, testabilitySettings.getCurrentUTCTimestamp());
-    modelFactoryService.updateRecord(note);
+    modelFactoryService.createRecord(note);
     return new RedirectToNoteResponse(note.getId());
   }
 }
