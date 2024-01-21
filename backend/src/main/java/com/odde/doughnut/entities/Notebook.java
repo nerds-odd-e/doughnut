@@ -35,7 +35,7 @@ public class Notebook extends EntityIdentifiedByIdOnly {
       name = "notebook_head_note",
       joinColumns = {@JoinColumn(name = "notebook_id", referencedColumnName = "id")},
       inverseJoinColumns = {@JoinColumn(name = "head_note_id", referencedColumnName = "id")})
-  @OneToOne(cascade = CascadeType.ALL)
+  @OneToOne
   @Getter
   @Setter
   private Note headNote;
