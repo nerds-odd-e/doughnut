@@ -27,13 +27,13 @@ public class Subscription {
   @Setter
   private Integer dailyTargetOfNewNotes = 5;
 
-  @ManyToOne(cascade = CascadeType.PERSIST)
+  @ManyToOne(cascade = CascadeType.DETACH)
   @JoinColumn(name = "user_id", referencedColumnName = "id")
   @Getter
   @Setter
   private User user;
 
-  @ManyToOne(cascade = CascadeType.PERSIST)
+  @ManyToOne(cascade = CascadeType.DETACH)
   @JoinColumn(name = "notebook_id", referencedColumnName = "id")
   @Getter
   @Setter
