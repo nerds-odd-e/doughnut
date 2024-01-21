@@ -74,7 +74,10 @@ const apiCollection = (managedApi: ManagedApi) => ({
       ) as Promise<string>;
     },
 
-    async processAnswer(quizQuestionId: Doughnut.ID, data: Generated.Answer) {
+    async processAnswer(
+      quizQuestionId: Doughnut.ID,
+      data: Partial<Generated.Answer>,
+    ) {
       const res = (await managedApi.restPost(
         `quiz-questions/${quizQuestionId}/answer`,
         data,
