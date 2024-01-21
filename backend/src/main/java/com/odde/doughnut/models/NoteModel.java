@@ -62,4 +62,15 @@ public class NoteModel {
   public Collection<Note> getDescendantsInBreathFirstOrder() {
     return modelFactoryService.noteRepository.getDescendantsInBreathFirstOrder(entity.getId());
   }
+
+  public void save() {
+    if (entity.getNotebook().getId() == null) {
+      modelFactoryService.createRecord(entity.getNotebook());
+    }
+    if (entity.getId() == null) {
+      modelFactoryService.createRecord(entity);
+    } else {
+      modelFactoryService.updateRecord(entity);
+    }
+  }
 }

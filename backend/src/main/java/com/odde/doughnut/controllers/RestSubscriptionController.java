@@ -33,14 +33,14 @@ class RestSubscriptionController {
     currentUser.assertReadAuthorization(notebook);
     subscription.setNotebook(notebook);
     subscription.setUser(currentUser.getEntity());
-    modelFactoryService.entityManager.persist(subscription);
+    modelFactoryService.createRecord(subscription);
     return subscription;
   }
 
   @PostMapping("/{subscription}")
   @Transactional
   public @Valid Subscription update(@Valid Subscription subscription) {
-    modelFactoryService.entityManager.persist(subscription);
+    modelFactoryService.updateRecord(subscription);
     return subscription;
   }
 
