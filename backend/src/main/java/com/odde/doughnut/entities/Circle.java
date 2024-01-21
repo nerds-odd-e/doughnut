@@ -23,12 +23,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "circle")
-public class Circle {
-  @Id
-  @Getter
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
-
+public class Circle extends EntityIdentifiedByIdOnly {
   @NotNull
   @Size(min = 1, max = 255)
   @Getter

@@ -8,12 +8,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "global_settings")
-public class GlobalSettings {
-  @Id
-  @Getter
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
-
+public class GlobalSettings extends EntityIdentifiedByIdOnly {
   @NotNull
   @Column(name = "key_name")
   @Getter

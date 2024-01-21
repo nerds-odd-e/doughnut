@@ -13,12 +13,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "bazaar_notebook")
-public class BazaarNotebook {
-  @Id
-  @Getter
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
-
+public class BazaarNotebook extends EntityIdentifiedByIdOnly {
   @ManyToOne(cascade = CascadeType.DETACH)
   @JoinColumn(name = "notebook_id", referencedColumnName = "id")
   @Getter

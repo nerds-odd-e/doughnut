@@ -18,13 +18,7 @@ import org.springframework.lang.Nullable;
 
 @Entity
 @Table(name = "quiz_answer")
-public class Answer {
-  @Id
-  @Getter
-  @JsonIgnore
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
-
+public class Answer extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   @Column(name = "answer")

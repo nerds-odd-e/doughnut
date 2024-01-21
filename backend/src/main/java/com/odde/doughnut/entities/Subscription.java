@@ -16,12 +16,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "subscription")
 @JsonPropertyOrder({"headNote", "title", "shortDescription"})
-public class Subscription {
-  @Id
-  @Getter
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
-
+public class Subscription extends EntityIdentifiedByIdOnly {
   @Column(name = "daily_target_of_new_notes")
   @Getter
   @Setter

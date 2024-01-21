@@ -27,7 +27,7 @@ import org.apache.logging.log4j.util.Strings;
 //
 @Entity
 @Table(name = "quiz_question")
-public class QuizQuestionEntity {
+public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
 
   public enum QuestionType {
     CLOZE_SELECTION(1, ClozeTitleSelectionQuizFactory::new, ClozeTitleSelectionQuizPresenter::new),
@@ -72,11 +72,6 @@ public class QuizQuestionEntity {
       return idMap.getOrDefault(id, null);
     }
   }
-
-  @Id
-  @Getter
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
 
   @ManyToOne(cascade = CascadeType.DETACH)
   @JoinColumn(name = "thing_id", referencedColumnName = "id")

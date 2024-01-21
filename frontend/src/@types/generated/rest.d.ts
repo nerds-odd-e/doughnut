@@ -238,13 +238,12 @@ declare namespace Generated {
         quizQuestion: QuizQuestion;
     }
 
-    interface Answer {
+    interface Answer extends EntityIdentifiedByIdOnly {
         spellingAnswer?: string;
         choiceIndex?: number;
     }
 
-    interface SuggestedQuestionForFineTuning {
-        id: number;
+    interface SuggestedQuestionForFineTuning extends EntityIdentifiedByIdOnly {
         comment: string;
         preservedQuestion: MCQWithAnswer;
         preservedNoteContent: string;
@@ -301,10 +300,9 @@ declare namespace Generated {
         circle?: Circle;
     }
 
-    interface Subscription {
+    interface Subscription extends EntityIdentifiedByIdOnly {
         headNote: Note;
         title: string;
-        id: number;
         dailyTargetOfNewNotes: number;
         user: User;
         notebook: Notebook;
@@ -348,8 +346,7 @@ declare namespace Generated {
         useParentPicture: boolean;
     }
 
-    interface Circle {
-        id: number;
+    interface Circle extends EntityIdentifiedByIdOnly {
         name: string;
     }
 

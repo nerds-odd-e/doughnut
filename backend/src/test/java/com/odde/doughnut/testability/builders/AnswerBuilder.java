@@ -13,7 +13,7 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
   protected void beforeCreate(boolean needPersist) {
     if (needPersist) {
       if (entity.getQuestion().getId() == null) {
-        makeMe.modelFactoryService.createRecord(entity.getQuestion());
+        makeMe.modelFactoryService.save(entity.getQuestion());
       }
     }
   }

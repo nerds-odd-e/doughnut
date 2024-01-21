@@ -132,11 +132,6 @@ public class ModelFactoryService {
     return entityManager.merge(record);
   }
 
-  public <T> T createRecord(T record) {
-    entityManager.persist(record);
-    return record;
-  }
-
   public <T extends EntityIdentifiedByIdOnly> T save(T entity) {
     if (entity.getId() == null) {
       entity.beforeCreate(this);
@@ -145,7 +140,8 @@ public class ModelFactoryService {
     }
     entity.beforeCommit(this);
     if (entity.getId() == null) {
-      return createRecord(entity);
+      entityManager.persist(entity);
+      return entity;
     }
     return updateRecord(entity);
   }

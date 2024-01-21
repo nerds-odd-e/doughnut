@@ -15,7 +15,7 @@ public class AnswerModel {
   }
 
   public void save() {
-    modelFactoryService.createRecord(answer);
+    modelFactoryService.save(answer);
   }
 
   public AnsweredQuestion getAnswerViewedByUser(User user) {

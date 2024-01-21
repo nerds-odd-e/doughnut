@@ -77,7 +77,7 @@ class TestabilityRestController {
     User user = new User();
     user.setExternalIdentifier(externalIdentifier);
     user.setName(name);
-    modelFactoryService.createRecord(user);
+    modelFactoryService.save(user);
   }
 
   static class SeedNote {
@@ -185,7 +185,7 @@ class TestabilityRestController {
         Link.createLink(
             sourceNote, targetNote, sourceNote.getThing().getCreator(), type, currentUTCTimestamp);
 
-    modelFactoryService.createRecord(link);
+    modelFactoryService.save(link);
     return "OK";
   }
 

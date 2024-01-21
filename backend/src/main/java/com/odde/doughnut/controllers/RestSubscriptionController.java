@@ -33,7 +33,7 @@ class RestSubscriptionController {
     currentUser.assertReadAuthorization(notebook);
     subscription.setNotebook(notebook);
     subscription.setUser(currentUser.getEntity());
-    modelFactoryService.createRecord(subscription);
+    modelFactoryService.save(subscription);
     return subscription;
   }
 
