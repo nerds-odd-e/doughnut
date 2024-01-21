@@ -92,13 +92,13 @@ public class Note extends Thingy {
   @Setter
   private ReviewSetting masterReviewSetting;
 
-  @OneToMany(mappedBy = "sourceNote", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "sourceNote")
   @JsonIgnore
   @Getter
   @Setter
   private List<Link> links = new ArrayList<>();
 
-  @OneToMany(mappedBy = "targetNote", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "targetNote")
   @JsonIgnore
   @Getter
   @Setter
@@ -380,5 +380,23 @@ The note of current focus (in JSON format):
     if (getNotebook().getId() == null) {
       modelFactoryService.save(getNotebook());
     }
+  }
+
+  @Override
+  public void beforeCommit(ModelFactoryService modelFactoryService) {
+
+    links.forEach(
+        link -> {
+          if (link.getId() == null) {
+            modelFactoryService.save(link);
+          }
+        });
+
+    refers.forEach(
+        link -> {
+          if (link.getId() == null) {
+            modelFactoryService.save(link);
+          }
+        });
   }
 }
