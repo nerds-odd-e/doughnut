@@ -24,8 +24,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.annotation.SessionScope;
 
 @RestController
+@SessionScope
 @RequestMapping("/api/reviews")
 class RestReviewsController {
   private final ModelFactoryService modelFactoryService;

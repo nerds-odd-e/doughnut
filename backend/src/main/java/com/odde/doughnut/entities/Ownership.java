@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +13,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Where;

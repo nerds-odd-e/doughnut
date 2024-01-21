@@ -15,9 +15,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.annotation.SessionScope;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
+@SessionScope
 @RequestMapping("/api/review-points")
 class RestReviewPointController {
   private final ModelFactoryService modelFactoryService;
