@@ -11,13 +11,13 @@ Feature: Creating circles
     And I join the circle
     Then I should see the circle "Odd-e SG Team" and it has two members in it
 
-  # Scenario: New user via circle invitation
-  #   Given my session is logged out
-  #   When I visit the invitation link
-  #   And I identify myself as a new user
-  #   Then I should be asked to create my profile
-  #   When I save my profile with:
-  #     | Name      |
-  #     | Learner A |
-  #   And I join the circle
-  #   Then I should see the circle "Odd-e SG Team" and it has two members in it
+  Scenario: New user via circle invitation
+    Given my session is logged out
+    When I visit the invitation link
+    And I identify myself as a new user
+    Then I should be asked to create my profile
+    When I save my profile with:
+      | Name      |
+      | Learner A |
+    And I join the circle
+    Then I should see the circle "Odd-e SG Team" and it has two members in it
