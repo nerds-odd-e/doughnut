@@ -71,7 +71,7 @@ class RestNotebookController {
   @Transactional
   public Notebook update(@Valid Notebook notebook) throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(notebook);
-    modelFactoryService.updateRecord(notebook);
+    modelFactoryService.save(notebook);
     return notebook;
   }
 

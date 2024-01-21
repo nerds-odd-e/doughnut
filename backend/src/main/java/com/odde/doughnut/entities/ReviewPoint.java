@@ -11,9 +11,6 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -22,13 +19,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "review_point")
-public class ReviewPoint {
-
-  @Id
-  @Getter
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
-
+public class ReviewPoint extends EntityIdentifiedByIdOnly {
   public static ReviewPoint buildReviewPointForThing(Thing thing) {
     ReviewPoint entity = new ReviewPoint();
     entity.setThing(thing);

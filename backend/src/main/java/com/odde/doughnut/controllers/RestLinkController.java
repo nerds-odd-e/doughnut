@@ -55,7 +55,7 @@ class RestLinkController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(link);
     link.setLinkType(linkCreation.linkType);
-    modelFactoryService.updateRecord(link);
+    modelFactoryService.save(link);
     return getNoteRealm(link, currentUser.getEntity(), linkCreation.fromTargetPerspective);
   }
 

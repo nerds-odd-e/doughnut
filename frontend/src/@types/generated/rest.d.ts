@@ -263,8 +263,7 @@ declare namespace Generated {
         details: string;
     }
 
-    interface ReviewPoint {
-        id: number;
+    interface ReviewPoint extends EntityIdentifiedByIdOnly {
         thing: Thing;
         lastReviewedAt: string;
         nextReviewAt: string;
