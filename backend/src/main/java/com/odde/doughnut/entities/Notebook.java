@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -35,7 +34,7 @@ public class Notebook extends EntityIdentifiedByIdOnly {
       name = "notebook_head_note",
       joinColumns = {@JoinColumn(name = "notebook_id", referencedColumnName = "id")},
       inverseJoinColumns = {@JoinColumn(name = "head_note_id", referencedColumnName = "id")})
-  @OneToOne(cascade = CascadeType.ALL)
+  @OneToOne
   @Getter
   @Setter
   private Note headNote;

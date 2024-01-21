@@ -96,6 +96,11 @@ public class NoteBuilder extends EntityBuilder<Note> {
       creator(makeMe.aUser().please(needPersist));
     }
     if (creatorBuilder != null) creatorBuilder.please(needPersist);
+    if (needPersist) {
+      if (entity.getNotebook().getId() == null) {
+        makeMe.modelFactoryService.createRecord(entity.getNotebook());
+      }
+    }
   }
 
   public NoteBuilder skipReview() {
