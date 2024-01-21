@@ -68,7 +68,7 @@ public class Note extends Thingy {
   @Column(name = "sibling_order")
   private Long siblingOrder = SiblingOrder.getGoodEnoughOrderNumber();
 
-  @ManyToOne(cascade = CascadeType.PERSIST)
+  @ManyToOne
   @JoinColumn(name = "notebook_id", referencedColumnName = "id")
   @JsonIgnore
   @Getter
@@ -84,7 +84,7 @@ public class Note extends Thingy {
     if (this.thing != null) this.thing.setDeletedAt(value);
   }
 
-  @OneToOne(cascade = CascadeType.PERSIST)
+  @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinColumn(name = "master_review_setting_id", referencedColumnName = "id")
   @JsonIgnore
   @Getter
