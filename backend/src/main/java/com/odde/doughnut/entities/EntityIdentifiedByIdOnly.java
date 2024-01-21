@@ -12,14 +12,14 @@ public class EntityIdentifiedByIdOnly {
   @Id
   @Getter
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  protected Integer id;
+  private Integer id;
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    EntityIdentifiedByIdOnly entity = (EntityIdentifiedByIdOnly) o;
-    return Objects.equals(id, entity.id);
+    EntityIdentifiedByIdOnly user = (EntityIdentifiedByIdOnly) o;
+    return Objects.equals(id, user.id);
   }
 
   @Override
