@@ -53,7 +53,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
   class WhenTheNoteHasInstance {
     @BeforeEach
     void setup() {
-      makeMe.theNote(source).linkTo(anotherSource, Link.LinkType.INSTANCE);
+      makeMe.theNote(source).linkTo(anotherSource, Link.LinkType.INSTANCE).please();
     }
 
     @Test
@@ -80,7 +80,9 @@ class WhichSpecHasInstanceQuizFactoryTest {
 
         @BeforeEach
         void setup() {
-          makeMe.aReviewPointFor(source.getLinks().get(1)).by(userModel).please();
+          Link link = source.getLinks().get(1);
+
+          makeMe.aReviewPointFor(link).by(userModel).please();
           makeMe.refresh(userModel.getEntity());
         }
 
