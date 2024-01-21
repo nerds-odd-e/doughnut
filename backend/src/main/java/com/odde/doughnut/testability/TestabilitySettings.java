@@ -11,10 +11,11 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.ApplicationScope;
 import org.springframework.web.context.annotation.SessionScope;
 
 @Component
-@SessionScope
+@ApplicationScope
 public class TestabilitySettings {
   private Timestamp timestamp = null;
   private NonRandomizer nonRandomizer = null;
