@@ -68,7 +68,7 @@ public class Note extends Thingy {
   @Column(name = "sibling_order")
   private Long siblingOrder = SiblingOrder.getGoodEnoughOrderNumber();
 
-  @ManyToOne
+  @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "notebook_id", referencedColumnName = "id")
   @JsonIgnore
   @Getter
