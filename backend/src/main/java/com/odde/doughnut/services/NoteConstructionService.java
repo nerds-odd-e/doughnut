@@ -46,7 +46,7 @@ public record NoteConstructionService(
                       Link link =
                           parentNote.buildLinkToNote(
                               user, Link.LinkType.RELATED_TO, currentUTCTimestamp, existingNote);
-                      this.modelFactoryService.createRecord(link);
+                      this.modelFactoryService.save(link);
                     },
                     () -> {
                       TextContent textContent = new TextContent();

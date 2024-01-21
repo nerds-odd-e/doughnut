@@ -99,7 +99,7 @@ class RestLinkController {
             user,
             linkCreation.linkType,
             testabilitySettings.getCurrentUTCTimestamp());
-    modelFactoryService.createRecord(link);
+    modelFactoryService.save(link);
     return getNoteRealm(link, user, linkCreation.fromTargetPerspective);
   }
 }

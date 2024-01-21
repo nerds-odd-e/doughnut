@@ -218,8 +218,7 @@ declare namespace Generated {
         question: string;
     }
 
-    interface User {
-        id: number;
+    interface User extends EntityIdentifiedByIdOnly {
         name: string;
         externalIdentifier: string;
         ownership: Ownership;
@@ -239,13 +238,12 @@ declare namespace Generated {
         quizQuestion: QuizQuestion;
     }
 
-    interface Answer {
+    interface Answer extends EntityIdentifiedByIdOnly {
         spellingAnswer?: string;
         choiceIndex?: number;
     }
 
-    interface SuggestedQuestionForFineTuning {
-        id: number;
+    interface SuggestedQuestionForFineTuning extends EntityIdentifiedByIdOnly {
         comment: string;
         preservedQuestion: MCQWithAnswer;
         preservedNoteContent: string;
@@ -302,10 +300,9 @@ declare namespace Generated {
         circle?: Circle;
     }
 
-    interface Subscription {
+    interface Subscription extends EntityIdentifiedByIdOnly {
         headNote: Note;
         title: string;
-        id: number;
         dailyTargetOfNewNotes: number;
         user: User;
         notebook: Notebook;
@@ -329,12 +326,14 @@ declare namespace Generated {
         pictureMask: string;
     }
 
-    interface Thingy {
+    interface EntityIdentifiedByIdOnly {
         id: number;
     }
 
-    interface Thing {
-        id: number;
+    interface Thingy extends EntityIdentifiedByIdOnly {
+    }
+
+    interface Thing extends EntityIdentifiedByIdOnly {
         createdAt: string;
         note?: Note;
         link?: Link;
@@ -347,13 +346,11 @@ declare namespace Generated {
         useParentPicture: boolean;
     }
 
-    interface Circle {
-        id: number;
+    interface Circle extends EntityIdentifiedByIdOnly {
         name: string;
     }
 
-    interface Notebook {
-        id: number;
+    interface Notebook extends EntityIdentifiedByIdOnly {
         ownership: Ownership;
         headNote: Note;
         skipReviewEntirely: boolean;

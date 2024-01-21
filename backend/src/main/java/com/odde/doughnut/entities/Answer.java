@@ -4,9 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -18,13 +15,7 @@ import org.springframework.lang.Nullable;
 
 @Entity
 @Table(name = "quiz_answer")
-public class Answer {
-  @Id
-  @Getter
-  @JsonIgnore
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
-
+public class Answer extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   @Column(name = "answer")

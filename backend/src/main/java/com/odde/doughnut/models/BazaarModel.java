@@ -23,6 +23,6 @@ public class BazaarModel {
   public void shareNote(Notebook notebook) {
     BazaarNotebook bazaarNotebook = new BazaarNotebook();
     bazaarNotebook.setNotebook(notebook);
-    modelFactoryService.createRecord(bazaarNotebook);
+    modelFactoryService.save(bazaarNotebook);
   }
 }

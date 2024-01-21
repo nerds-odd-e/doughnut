@@ -30,7 +30,7 @@ class RestUserController {
   public User createUser(Principal principal, User user) {
     if (principal == null) Authorization.throwUserNotFound();
     user.setExternalIdentifier(principal.getName());
-    modelFactoryService.createRecord(user);
+    modelFactoryService.save(user);
     return user;
   }
 

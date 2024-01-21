@@ -20,12 +20,7 @@ import org.springframework.lang.Nullable;
 
 @Entity
 @Table(name = "suggested_question_for_fine_tuning")
-public class SuggestedQuestionForFineTuning {
-
-  @Id
-  @Getter
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
+public class SuggestedQuestionForFineTuning extends EntityIdentifiedByIdOnly {
 
   @ManyToOne
   @JoinColumn(name = "user_id")

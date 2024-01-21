@@ -31,14 +31,14 @@ public record QuizQuestionGenerator(
   }
 
   public QuizQuestion generateAQuestionOfFirstPossibleType(List<QuestionType> shuffled) {
-    var quizQuestionEntity =
+    QuizQuestionEntity quizQuestionEntity =
         shuffled.stream()
             .map(this::buildQuizQuestion)
             .flatMap(Optional::stream)
             .findFirst()
             .orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
-    modelFactoryService.createRecord(quizQuestionEntity);
+    modelFactoryService.save(quizQuestionEntity);
     return modelFactoryService.toQuizQuestion(quizQuestionEntity, user);
   }
 }

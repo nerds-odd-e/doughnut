@@ -4,9 +4,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -16,12 +13,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "subscription")
 @JsonPropertyOrder({"headNote", "title", "shortDescription"})
-public class Subscription {
-  @Id
-  @Getter
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
-
+public class Subscription extends EntityIdentifiedByIdOnly {
   @Column(name = "daily_target_of_new_notes")
   @Getter
   @Setter
