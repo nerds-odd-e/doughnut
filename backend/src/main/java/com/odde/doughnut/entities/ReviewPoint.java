@@ -6,9 +6,6 @@ import com.odde.doughnut.models.TimestampOperations;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -22,13 +19,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "review_point")
-public class ReviewPoint {
-
-  @Id
-  @Getter
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
-
+public class ReviewPoint extends EntityIdentifiedByIdOnly {
   public static ReviewPoint buildReviewPointForThing(Thing thing) {
     ReviewPoint entity = new ReviewPoint();
     entity.setThing(thing);

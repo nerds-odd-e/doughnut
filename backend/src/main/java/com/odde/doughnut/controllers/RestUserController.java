@@ -43,7 +43,7 @@ class RestUserController {
   @Transactional
   public @Valid User updateUser(@Valid User user) throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(user);
-    modelFactoryService.updateRecord(user);
+    modelFactoryService.save(user);
     return user;
   }
 }

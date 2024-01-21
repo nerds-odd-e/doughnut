@@ -32,12 +32,12 @@ public class UserModel implements ReviewScope {
 
   public void setAndSaveDailyNewNotesCount(Integer dailyNewNotesCount) {
     entity.setDailyNewNotesCount(dailyNewNotesCount);
-    save();
+    modelFactoryService.save(entity);
   }
 
   public void setAndSaveSpaceIntervals(String spaceIntervals) {
     entity.setSpaceIntervals(spaceIntervals);
-    save();
+    modelFactoryService.save(entity);
   }
 
   @Override
@@ -70,10 +70,6 @@ public class UserModel implements ReviewScope {
 
   public Reviewing createReviewing(Timestamp currentUTCTimestamp, ZoneId timeZone) {
     return new Reviewing(this, currentUTCTimestamp, timeZone, modelFactoryService);
-  }
-
-  private void save() {
-    modelFactoryService.entityManager.persist(entity);
   }
 
   boolean isInitialReviewOnSameDay(

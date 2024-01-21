@@ -123,10 +123,6 @@ public class ModelFactoryService {
     return new SuggestedQuestionForFineTuningModel(suggestion, this);
   }
 
-  public <T> T updateRecord(T record) {
-    return entityManager.merge(record);
-  }
-
   public <T extends EntityIdentifiedByIdOnly> T save(T entity) {
     if (entity.getId() == null) {
       entity.beforeCreate(this);
@@ -138,6 +134,6 @@ public class ModelFactoryService {
       entityManager.persist(entity);
       return entity;
     }
-    return updateRecord(entity);
+    return entityManager.merge(entity);
   }
 }

@@ -40,7 +40,7 @@ class RestSubscriptionController {
   @PostMapping("/{subscription}")
   @Transactional
   public @Valid Subscription update(@Valid Subscription subscription) {
-    modelFactoryService.updateRecord(subscription);
+    modelFactoryService.save(subscription);
     return subscription;
   }
 

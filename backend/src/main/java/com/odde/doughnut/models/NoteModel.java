@@ -23,12 +23,12 @@ public class NoteModel {
     if (entity.getNotebook() != null) {
       if (entity.getNotebook().getHeadNote() == entity) {
         entity.getNotebook().setDeletedAt(currentUTCTimestamp);
-        modelFactoryService.updateRecord(entity.getNotebook());
+        modelFactoryService.save(entity.getNotebook());
       }
     }
 
     entity.setDeletedAt(currentUTCTimestamp);
-    modelFactoryService.updateRecord(entity);
+    modelFactoryService.save(entity);
     modelFactoryService.noteRepository.softDeleteDescendants(entity, currentUTCTimestamp);
   }
 
@@ -36,12 +36,12 @@ public class NoteModel {
     if (entity.getNotebook() != null) {
       if (entity.getNotebook().getHeadNote() == entity) {
         entity.getNotebook().setDeletedAt(null);
-        modelFactoryService.updateRecord(entity.getNotebook());
+        modelFactoryService.save(entity.getNotebook());
       }
     }
     modelFactoryService.noteRepository.undoDeleteDescendants(entity, entity.getDeletedAt());
     entity.setDeletedAt(null);
-    modelFactoryService.updateRecord(entity);
+    modelFactoryService.save(entity);
   }
 
   public void checkDuplicateWikidataId() throws BindException {

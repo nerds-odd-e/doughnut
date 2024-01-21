@@ -85,7 +85,7 @@ public class Note extends Thingy {
     if (this.thing != null) this.thing.setDeletedAt(value);
   }
 
-  @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "master_review_setting_id", referencedColumnName = "id")
   @JsonIgnore
   @Getter

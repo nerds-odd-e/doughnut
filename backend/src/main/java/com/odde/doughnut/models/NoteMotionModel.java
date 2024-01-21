@@ -20,14 +20,14 @@ public class NoteMotionModel {
     Notebook notebook = entity.getSubject().getNotebook();
     entity.moveHeadNoteOnly();
     updateAncestors(entity.getSubject(), entity.getNewParent());
-    modelFactoryService.updateRecord(entity.getSubject());
+    modelFactoryService.save(entity.getSubject());
     modelFactoryService
         .toNoteModel(entity.getSubject())
         .getDescendantsInBreathFirstOrder()
         .forEach(
             desc -> {
               updateAncestors(desc, desc.getParentNote());
-              modelFactoryService.updateRecord(desc);
+              modelFactoryService.save(desc);
             });
     if (notebook.getHeadNote() == entity.getSubject()) {
       modelFactoryService.entityManager.remove(notebook);

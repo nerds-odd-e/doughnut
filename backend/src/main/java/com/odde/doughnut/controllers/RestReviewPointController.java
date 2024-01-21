@@ -60,7 +60,7 @@ class RestReviewPointController {
   @Transactional
   public ReviewPoint removeFromRepeating(ReviewPoint reviewPoint) {
     reviewPoint.setRemovedFromReview(true);
-    modelFactoryService.updateRecord(reviewPoint);
+    modelFactoryService.save(reviewPoint);
     return reviewPoint;
   }
 
