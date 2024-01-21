@@ -38,7 +38,7 @@ public class Answer {
   @Nullable
   Integer choiceIndex;
 
-  @ManyToOne(cascade = CascadeType.PERSIST)
+  @ManyToOne(cascade = CascadeType.DETACH)
   @JoinColumn(name = "quiz_question_id", referencedColumnName = "id")
   @Getter
   @Setter
