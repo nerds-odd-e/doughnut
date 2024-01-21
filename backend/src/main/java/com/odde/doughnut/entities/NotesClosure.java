@@ -1,6 +1,5 @@
 package com.odde.doughnut.entities;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -19,13 +18,13 @@ public class NotesClosure {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-  @ManyToOne(cascade = CascadeType.PERSIST)
+  @ManyToOne
   @JoinColumn(name = "note_id", referencedColumnName = "id")
   @Getter
   @Setter
   private Note note;
 
-  @ManyToOne(cascade = CascadeType.PERSIST)
+  @ManyToOne
   @JoinColumn(name = "ancestor_id", referencedColumnName = "id")
   @Getter
   @Setter
