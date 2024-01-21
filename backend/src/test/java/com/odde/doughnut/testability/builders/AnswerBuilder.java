@@ -10,7 +10,13 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
   }
 
   @Override
-  protected void beforeCreate(boolean needPersist) {}
+  protected void beforeCreate(boolean needPersist) {
+    if (needPersist) {
+      if (entity.getQuestion().getId() == null) {
+        makeMe.modelFactoryService.createRecord(entity.getQuestion());
+      }
+    }
+  }
 
   public AnswerBuilder withValidQuestion(
       QuizQuestionEntity.QuestionType questionType, ReviewPoint reviewPoint) {
