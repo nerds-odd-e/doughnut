@@ -149,8 +149,7 @@ class TestabilityRestController {
 
     private void saveByOriginalOrder(
         Map<String, Note> titleNoteMap, ModelFactoryService modelFactoryService) {
-      seedNotes.forEach(
-          (seed -> modelFactoryService.toNoteModel(titleNoteMap.get(seed.topic)).save()));
+      seedNotes.forEach((seed -> modelFactoryService.save(titleNoteMap.get(seed.topic))));
     }
   }
 

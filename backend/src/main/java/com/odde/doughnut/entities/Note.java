@@ -11,6 +11,7 @@ import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.algorithms.HtmlOrMarkdown;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
@@ -372,5 +373,12 @@ The note of current focus (in JSON format):
 %s
 """
         .formatted(defaultObjectMapper().valueToTree(noteBrief).toPrettyString());
+  }
+
+  @Override
+  public void beforeCreate(ModelFactoryService modelFactoryService) {
+    if (getNotebook().getId() == null) {
+      modelFactoryService.save(getNotebook());
+    }
   }
 }

@@ -21,7 +21,7 @@ public record NoteConstructionService(
       Link.LinkType linkTypeToParent) {
     Note note = parentNote.buildChildNote(user, currentUTCTimestamp, textContent);
     note.buildLinkToParent(user, linkTypeToParent, currentUTCTimestamp);
-    modelFactoryService.toNoteModel(note).save();
+    modelFactoryService.save(note);
     if (wikidataIdWithApi != null) {
       wikidataIdWithApi.associateNoteToWikidata(note, modelFactoryService);
       wikidataIdWithApi.getCountryOfOrigin().ifPresent(wwa -> createSubNote(note, wwa));

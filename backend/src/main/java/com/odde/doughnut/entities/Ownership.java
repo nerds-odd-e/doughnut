@@ -62,8 +62,7 @@ public class Ownership {
       ModelFactoryService modelFactoryService) {
     final Note note = Note.createNote(user, currentUTCTimestamp, textContent);
     note.buildNotebookForHeadNote(this, user);
-    modelFactoryService.createRecord(note.getNotebook());
-    modelFactoryService.toNoteModel(note).save();
+    modelFactoryService.save(note);
     return note;
   }
 }
