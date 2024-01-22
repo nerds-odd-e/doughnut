@@ -58,6 +58,7 @@ class TestabilityRestController {
     createUser("non_admin", "Non Admin");
     testabilitySettings.setUseRealGithub(false);
     testabilitySettings.enableFeatureToggle(false);
+    testabilitySettings.setAlwaysChoose("first");
     return "OK";
   }
 
