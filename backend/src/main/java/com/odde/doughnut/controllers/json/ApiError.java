@@ -16,6 +16,7 @@ public class ApiError {
     BINDING_ERROR,
     OPENAI_TIMEOUT,
     OPENAI_SERVICE_ERROR,
+    WIKIDATA_SERVICE_ERROR,
   };
 
   public ApiError(String message, ErrorType type) {
