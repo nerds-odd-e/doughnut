@@ -49,7 +49,7 @@ class RestSubscriptionController {
   public List<Integer> destroySubscription(@Valid Subscription subscription)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(subscription);
-    modelFactoryService.entityManager.remove(subscription);
+    modelFactoryService.remove(subscription);
     return List.of(1);
   }
 }
