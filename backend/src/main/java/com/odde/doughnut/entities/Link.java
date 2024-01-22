@@ -234,13 +234,13 @@ public class Link extends Thingy {
     }
   }
 
-  @ManyToOne(cascade = CascadeType.PERSIST)
+  @ManyToOne
   @JoinColumn(name = "source_id", referencedColumnName = "id")
   @Getter
   @Setter
   private Note sourceNote;
 
-  @ManyToOne(cascade = CascadeType.PERSIST)
+  @ManyToOne
   @JoinColumn(name = "target_id", referencedColumnName = "id")
   @Getter
   @Setter
