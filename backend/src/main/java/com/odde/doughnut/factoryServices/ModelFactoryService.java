@@ -128,8 +128,11 @@ public class ModelFactoryService {
     entity.beforeCommit(this);
     if (entity.getId() == null) {
       entityManager.persist(entity);
-      return entity;
+      entity.afterEnsureId(this);
+    } else {
+      entity.afterEnsureId(this);
+      entityManager.merge(entity);
     }
-    return entityManager.merge(entity);
+    return entity;
   }
 }
