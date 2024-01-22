@@ -13,7 +13,7 @@ public class LinkModel {
   }
 
   public void destroy() {
-    modelFactoryService.entityManager.remove(entity);
+    modelFactoryService.remove(entity);
     modelFactoryService.entityManager.flush();
   }
 }

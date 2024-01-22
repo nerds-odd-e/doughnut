@@ -1,9 +1,6 @@
 package com.odde.doughnut.entities;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -12,12 +9,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "notes_closure")
-public class NotesClosure {
-  @Id
-  @Getter
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
-
+public class NotesClosure extends EntityIdentifiedByIdOnly {
   @ManyToOne
   @JoinColumn(name = "note_id", referencedColumnName = "id")
   @Getter

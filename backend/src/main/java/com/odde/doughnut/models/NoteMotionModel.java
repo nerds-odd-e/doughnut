@@ -30,12 +30,12 @@ public class NoteMotionModel {
               modelFactoryService.save(desc);
             });
     if (notebook.getHeadNote() == entity.getSubject()) {
-      modelFactoryService.entityManager.remove(notebook);
+      modelFactoryService.remove(notebook);
     }
   }
 
   private void updateAncestors(Note note, Note parent) {
-    note.getAncestorNotesClosures().forEach(modelFactoryService.entityManager::remove);
+    note.getAncestorNotesClosures().forEach(modelFactoryService::remove);
     note.setAncestorNotesClosures(new ArrayList<>());
     modelFactoryService.entityManager.flush();
     note.setParentNote(parent);
