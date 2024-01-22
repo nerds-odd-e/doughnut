@@ -2,7 +2,7 @@ package com.odde.doughnut.services.wikidataApis;
 
 import com.fasterxml.jackson.annotation.ObjectIdGenerator;
 import com.fasterxml.jackson.annotation.ObjectIdResolver;
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 public class EntityIdResolver implements ObjectIdResolver {
 

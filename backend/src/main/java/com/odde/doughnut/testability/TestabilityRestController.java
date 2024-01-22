@@ -11,6 +11,7 @@ import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GithubService;
+import jakarta.persistence.EntityManagerFactory;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -22,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.persistence.EntityManagerFactory;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +58,7 @@ class TestabilityRestController {
     createUser("non_admin", "Non Admin");
     testabilitySettings.setUseRealGithub(false);
     testabilitySettings.enableFeatureToggle(false);
+    testabilitySettings.setAlwaysChoose("first");
     return "OK";
   }
 

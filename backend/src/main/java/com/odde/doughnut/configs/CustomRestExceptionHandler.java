@@ -5,6 +5,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
@@ -21,7 +22,7 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
   protected ResponseEntity<Object> handleBindException(
       final BindException ex,
       final HttpHeaders headers,
-      final HttpStatus status,
+      final HttpStatusCode status,
       final WebRequest request) {
     final ApiError apiError = new ApiError("binding error", ApiError.ErrorType.BINDING_ERROR);
     for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
@@ -37,7 +38,7 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
   protected ResponseEntity<Object> handleMethodArgumentNotValid(
       MethodArgumentNotValidException ex,
       HttpHeaders headers,
-      HttpStatus status,
+      HttpStatusCode status,
       WebRequest request) {
     final ApiError apiError = new ApiError("binding error", ApiError.ErrorType.BINDING_ERROR);
     for (final FieldError error : ex.getBindingResult().getFieldErrors()) {

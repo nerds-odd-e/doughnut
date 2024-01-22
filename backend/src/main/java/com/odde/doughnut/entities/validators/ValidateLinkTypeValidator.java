@@ -2,10 +2,13 @@ package com.odde.doughnut.entities.validators;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Link.LinkType;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class ValidateLinkTypeValidator implements ConstraintValidator<ValidateLinkType, Object> {
+
+  @Override
+  public void initialize(ValidateLinkType constraintAnnotation) {}
 
   @Override
   public boolean isValid(Object value, ConstraintValidatorContext context) {

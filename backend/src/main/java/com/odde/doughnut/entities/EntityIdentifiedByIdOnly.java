@@ -1,12 +1,12 @@
 package com.odde.doughnut.entities;
 
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import jakarta.persistence.*;
 import java.util.Objects;
-import javax.persistence.*;
 import lombok.Getter;
 
 @MappedSuperclass
-public abstract class EntityIdentifiedByIdOnly {
+public class EntityIdentifiedByIdOnly {
   @Id
   @Getter
   @GeneratedValue(strategy = GenerationType.IDENTITY)

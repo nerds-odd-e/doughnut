@@ -6,11 +6,11 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.*;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionPresenter;
 import com.odde.doughnut.models.*;
+import jakarta.persistence.EntityManager;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import javax.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,11 +22,6 @@ public class ModelFactoryService {
   @Autowired public BazaarNotebookRepository bazaarNotebookRepository;
   @Autowired public ReviewPointRepository reviewPointRepository;
   @Autowired public CircleRepository circleRepository;
-  @Autowired public LinkRepository linkRepository;
-  @Autowired public QuizQuestionRepository quizQuestionRepository;
-  @Autowired public AnswerRepository answerRepository;
-  @Autowired public NotesClosureRepository notesClosureRepository;
-  @Autowired public NotebookRepository notebookRepository;
   @Autowired public EntityManager entityManager;
   @Autowired public FailureReportRepository failureReportRepository;
   @Autowired public GlobalSettingRepository globalSettingRepository;
