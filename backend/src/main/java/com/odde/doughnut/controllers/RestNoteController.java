@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.json.*;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteViewer;
@@ -50,7 +51,14 @@ class RestNoteController {
     currentUser.assertAuthorization(note);
     WikidataIdWithApi wikidataIdWithApi =
         wikidataService.wrapWikidataIdWithApi(wikidataAssociationCreation.wikidataId);
-    wikidataIdWithApi.associateNoteToWikidata(note, modelFactoryService);
+    try {
+      wikidataIdWithApi.associateNoteToWikidata(note, modelFactoryService);
+    } catch (DuplicateWikidataIdException e) {
+      BindingResult bindingResult =
+          new BeanPropertyBindingResult(wikidataAssociationCreation, "wikidataAssociationCreation");
+      bindingResult.rejectValue("wikidataId", "duplicate", "Duplicate Wikidata ID Detected.");
+      throw new BindException(bindingResult);
+    }
     modelFactoryService.save(note);
     return new NoteViewer(currentUser.getEntity(), note).toJsonObject();
   }
@@ -60,19 +68,24 @@ class RestNoteController {
   public NoteRealm createNote(
       @PathVariable(name = "parentNote") Note parentNote,
       @Valid @ModelAttribute NoteCreation noteCreation)
-      throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
+      throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
     currentUser.assertAuthorization(parentNote);
     User user = currentUser.getEntity();
 
-    Note note =
-        getNoteConstructionService(user)
-            .createNoteWithWikidataInfo(
-                parentNote,
-                wikidataService.wrapWikidataIdWithApi(noteCreation.wikidataId),
-                noteCreation.textContent,
-                noteCreation.getLinkTypeToParent());
-
-    return new NoteViewer(user, note).toJsonObject();
+    try {
+      Note note =
+          getNoteConstructionService(user)
+              .createNoteWithWikidataInfo(
+                  parentNote,
+                  wikidataService.wrapWikidataIdWithApi(noteCreation.wikidataId),
+                  noteCreation.textContent,
+                  noteCreation.getLinkTypeToParent());
+      return new NoteViewer(user, note).toJsonObject();
+    } catch (DuplicateWikidataIdException e) {
+      BindingResult bindingResult = new BeanPropertyBindingResult(noteCreation, "noteCreation");
+      bindingResult.rejectValue("wikidataId", "duplicate", "Duplicate Wikidata ID Detected.");
+      throw new BindException(bindingResult);
+    }
   }
 
   private NoteConstructionService getNoteConstructionService(User user) {

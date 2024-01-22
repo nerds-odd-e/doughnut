@@ -2,6 +2,7 @@ package com.odde.doughnut.services.wikidataApis;
 
 import com.odde.doughnut.controllers.json.WikidataEntityData;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.wikidataApis.thirdPartyEntities.WikidataEntityHash;
 import java.io.IOException;
@@ -9,7 +10,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.validation.BindException;
 
 public final class WikidataIdWithApi {
   private final String wikidataId;
@@ -58,9 +58,11 @@ public final class WikidataIdWithApi {
   }
 
   public void associateNoteToWikidata(Note note, ModelFactoryService modelFactoryService)
-      throws BindException, IOException, InterruptedException {
+      throws IOException, InterruptedException, DuplicateWikidataIdException {
     note.setWikidataId(this.wikidataId);
-    modelFactoryService.toNoteModel(note).checkDuplicateWikidataId();
+    if (modelFactoryService.toNoteModel(note).hasDuplicateWikidataId()) {
+      throw new DuplicateWikidataIdException();
+    }
     extractWikidataInfoToNote(note);
   }
 

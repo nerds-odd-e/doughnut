@@ -75,17 +75,22 @@ export default defineComponent({
           this.conflictWikidataTitle = res.WikidataTitleInEnglish;
           return;
         }
-        await this.save();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
         this.wikidataIdError = e.message;
       }
+      await this.save();
     },
     async save() {
-      await this.storageAccessor
-        .storedApi()
-        .updateWikidataId(this.note.id, this.associationData);
-      this.$emit("closeDialog");
+      try {
+        await this.storageAccessor
+          .storedApi()
+          .updateWikidataId(this.note.id, this.associationData);
+        this.$emit("closeDialog");
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (e: any) {
+        this.wikidataIdError = e.wikidataId;
+      }
     },
   },
 });

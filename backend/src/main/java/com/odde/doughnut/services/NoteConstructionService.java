@@ -4,8 +4,10 @@ import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.TextContent;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Optional;
 import lombok.SneakyThrows;
@@ -13,12 +15,12 @@ import lombok.SneakyThrows;
 public record NoteConstructionService(
     User user, Timestamp currentUTCTimestamp, ModelFactoryService modelFactoryService) {
 
-  @SneakyThrows
   public Note createNoteWithWikidataInfo(
       Note parentNote,
       WikidataIdWithApi wikidataIdWithApi,
       TextContent textContent,
-      Link.LinkType linkTypeToParent) {
+      Link.LinkType linkTypeToParent)
+      throws DuplicateWikidataIdException, IOException, InterruptedException {
     Note note = parentNote.buildChildNote(user, currentUTCTimestamp, textContent);
     note.buildLinkToParent(user, linkTypeToParent, currentUTCTimestamp);
     modelFactoryService.save(note);
@@ -51,8 +53,17 @@ public record NoteConstructionService(
                     () -> {
                       TextContent textContent = new TextContent();
                       textContent.setTopic(subNoteTitle);
-                      createNoteWithWikidataInfo(
-                          parentNote, subWikidataIdWithApi, textContent, Link.LinkType.RELATED_TO);
+                      try {
+                        createNoteWithWikidataInfo(
+                            parentNote,
+                            subWikidataIdWithApi,
+                            textContent,
+                            Link.LinkType.RELATED_TO);
+                      } catch (Exception e) {
+                        throw new RuntimeException(e);
+                      } catch (DuplicateWikidataIdException e) {
+                        throw new RuntimeException(e);
+                      }
                     }));
   }
 }

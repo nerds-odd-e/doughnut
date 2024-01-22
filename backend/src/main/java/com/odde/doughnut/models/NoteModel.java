@@ -6,9 +6,6 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.BindException;
-import org.springframework.validation.BindingResult;
 
 public class NoteModel {
   public final Note entity;
@@ -44,19 +41,14 @@ public class NoteModel {
     modelFactoryService.save(entity);
   }
 
-  public void checkDuplicateWikidataId() throws BindException {
+  public boolean hasDuplicateWikidataId() {
     if (Strings.isEmpty(entity.getWikidataId())) {
-      return;
+      return false;
     }
     List<Note> existingNotes =
         modelFactoryService.noteRepository.noteWithWikidataIdWithinNotebook(
             entity.getNotebook().getId(), entity.getWikidataId());
-    if (existingNotes.stream().anyMatch(n -> !n.equals(entity))) {
-      BindingResult bindingResult =
-          new BeanPropertyBindingResult(entity.getWikidataId(), "wikidataId");
-      bindingResult.rejectValue(null, "error.error", "Duplicate Wikidata ID Detected.");
-      throw new BindException(bindingResult);
-    }
+    return (existingNotes.stream().anyMatch(n -> !n.equals(entity)));
   }
 
   public Collection<Note> getDescendantsInBreathFirstOrder() {
