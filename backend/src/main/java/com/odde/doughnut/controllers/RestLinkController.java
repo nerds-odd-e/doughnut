@@ -100,7 +100,7 @@ class RestLinkController {
 
   private NoteRealm getNoteRealm(Link link, User user, Boolean fromTargetPerspective) {
     Note note = fromTargetPerspective ? link.getTargetNote() : link.getSourceNote();
-    modelFactoryService.entityManager.refresh(note);
-    return new NoteViewer(user, note).toJsonObject();
+    Note nn = modelFactoryService.entityManager.find(Note.class, note.getId());
+    return new NoteViewer(user, nn).toJsonObject();
   }
 }
