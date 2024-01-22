@@ -69,10 +69,6 @@ public class ModelFactoryService {
     return new ReviewPointModel(reviewPoint, this);
   }
 
-  public ReviewPointModel toReviewPointModel(Integer reviewPointId) {
-    return new ReviewPointModel(reviewPointRepository.findById(reviewPointId).get(), this);
-  }
-
   public CircleModel toCircleModel(Circle circle) {
     return new CircleModel(circle, this);
   }
