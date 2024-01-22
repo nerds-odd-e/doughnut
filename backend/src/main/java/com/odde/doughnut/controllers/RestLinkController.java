@@ -59,11 +59,6 @@ class RestLinkController {
     return getNoteRealm(link, currentUser.getEntity(), linkCreation.fromTargetPerspective);
   }
 
-  private NoteRealm getNoteRealm(Link link, User user, Boolean fromTargetPerspective) {
-    Note note = fromTargetPerspective ? link.getTargetNote() : link.getSourceNote();
-    return new NoteViewer(user, note).toJsonObject();
-  }
-
   @PostMapping(value = "/{link}/{perspective}/delete")
   @Transactional
   public NoteRealm deleteLink(@PathVariable Link link, @PathVariable String perspective)
@@ -101,5 +96,11 @@ class RestLinkController {
             testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.save(link);
     return getNoteRealm(link, user, linkCreation.fromTargetPerspective);
+  }
+
+  private NoteRealm getNoteRealm(Link link, User user, Boolean fromTargetPerspective) {
+    modelFactoryService.entityManager.refresh(link);
+    Note note = fromTargetPerspective ? link.getTargetNote() : link.getSourceNote();
+    return new NoteViewer(user, note).toJsonObject();
   }
 }
