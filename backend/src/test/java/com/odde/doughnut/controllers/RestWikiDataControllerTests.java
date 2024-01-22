@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 
 import com.odde.doughnut.controllers.json.WikidataEntityData;
 import com.odde.doughnut.controllers.json.WikidataSearchEntity;
+import com.odde.doughnut.exceptions.WikidataServiceErrorException;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -49,9 +50,8 @@ class RestWikidataControllerTests {
     @Test
     void serviceNotAvailable() throws IOException, InterruptedException {
       Mockito.when(httpClientAdapter.getResponseString(any())).thenThrow(new IOException());
-      BindException exception =
-          assertThrows(BindException.class, () -> controller.fetchWikidataEntityDataByID("Q1"));
-      assertThat(exception.getErrorCount(), equalTo(1));
+      assertThrows(
+          WikidataServiceErrorException.class, () -> controller.fetchWikidataEntityDataByID("Q1"));
     }
 
     @Test
@@ -100,9 +100,7 @@ class RestWikidataControllerTests {
     @Test
     void serviceNotAvailableAtSearchWikidata() throws IOException, InterruptedException {
       Mockito.when(httpClientAdapter.getResponseString(any())).thenThrow(new IOException());
-      BindException exception =
-          assertThrows(BindException.class, () -> controller.searchWikidata("berlin"));
-      assertThat(exception.getErrorCount(), equalTo(1));
+      assertThrows(WikidataServiceErrorException.class, () -> controller.searchWikidata("berlin"));
     }
 
     @Test
