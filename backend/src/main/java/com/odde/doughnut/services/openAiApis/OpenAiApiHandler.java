@@ -144,7 +144,7 @@ public class OpenAiApiHandler {
 
   private static void wait(int hundredMilliSeconds) {
     try {
-      sleep(hundredMilliSeconds * 100L);
+      sleep(hundredMilliSeconds * 200L);
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
     }
