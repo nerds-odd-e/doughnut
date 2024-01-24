@@ -56,6 +56,10 @@ public class Note extends Thingy {
   @Column(name = "title")
   private String topic = "";
 
+  public String getTopicConstructor() {
+    return topic;
+  }
+
   @Column(name = "updated_at")
   @Getter
   @Setter

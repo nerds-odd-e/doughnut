@@ -292,6 +292,7 @@ declare namespace Generated {
         wikidataId: string;
         deletedAt: string;
         pictureWithMask?: PictureWithMask;
+        topicConstructor: string;
     }
 
     interface Ownership {

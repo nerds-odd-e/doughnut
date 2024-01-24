@@ -9,6 +9,7 @@ class NoteBuilder extends Builder<Generated.Note> {
     this.data = {
       id: generateId(),
       topic: "Note1.1.1",
+      topicConstructor: "Note1.1.1",
       details: "<p>Desc</p>",
       wikidataId: "",
       deletedAt: "",
