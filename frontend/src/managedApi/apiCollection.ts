@@ -268,7 +268,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
   notebookMethods: {
     async createNotebook(
       circle: Generated.Circle | undefined,
-      data: Generated.Notebook,
+      data: Generated.TextContent,
     ) {
       const url = (() => {
         if (circle) {
@@ -277,8 +277,10 @@ const apiCollection = (managedApi: ManagedApi) => ({
         return `notebooks/create`;
       })();
 
-      const res = await managedApi.restPostMultiplePartForm(url, data);
-      return res;
+      return (await managedApi.restPostMultiplePartForm(
+        url,
+        data,
+      )) as Generated.RedirectToNoteResponse;
     },
 
     async getNotebooks() {

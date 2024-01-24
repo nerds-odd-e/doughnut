@@ -5,22 +5,22 @@
   </form>
 </template>
 
-<script>
+<script lang="ts">
+import { PropType } from "vue";
 import NoteFormTitleOnly from "../notes/NoteFormTopicOnly.vue";
-import LoadingPage from "../../pages/commons/LoadingPage.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default {
   setup() {
     return useLoadingApi();
   },
-  props: { circle: Object },
+  props: { circle: { type: Object as PropType<Generated.Circle> } },
   components: {
     NoteFormTitleOnly,
   },
   data() {
     return {
-      noteFormData: {},
+      noteFormData: {} as Generated.TextContent,
       errors: {},
     };
   },
