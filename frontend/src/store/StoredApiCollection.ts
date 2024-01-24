@@ -14,7 +14,7 @@ export interface StoredApi {
   createNote(
     router: Router,
     parentId: Doughnut.ID,
-    data: Generated.NoteCreation,
+    data: Generated.NoteCreationDTO,
   ): Promise<Generated.NoteRealm>;
 
   createLink(
@@ -129,7 +129,7 @@ export default class StoredApiCollection implements StoredApi {
   async createNote(
     router: Router,
     parentId: Doughnut.ID,
-    data: Generated.NoteCreation,
+    data: Generated.NoteCreationDTO,
   ) {
     const nrwp = await this.statelessApi.noteMethods.createNote(parentId, data);
     const focus = this.storage.refreshNoteRealm(nrwp);

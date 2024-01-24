@@ -2,7 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.json.CircleForUserView;
 import com.odde.doughnut.controllers.json.CircleJoiningByInvitation;
-import com.odde.doughnut.controllers.json.NoteCreation;
+import com.odde.doughnut.controllers.json.NoteCreationDTO;
 import com.odde.doughnut.controllers.json.RedirectToNoteResponse;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
@@ -96,7 +96,7 @@ class RestCircleController {
   @PostMapping({"/{circle}/notebooks"})
   @Transactional
   public RedirectToNoteResponse createNotebook(
-      Circle circle, @Valid @ModelAttribute NoteCreation noteCreation)
+      Circle circle, @Valid @ModelAttribute NoteCreationDTO noteCreation)
       throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
     currentUser.assertAuthorization(circle);

@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.lang.Nullable;
 
-public class NoteCreation {
+public class NoteCreationDTO {
   @Getter @Setter @Nullable public LinkType linkTypeToParent;
 
   @Size(min = 1, max = Note.MAX_TITLE_LENGTH)

@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.json.NoteCreation;
+import com.odde.doughnut.controllers.json.NoteCreationDTO;
 import com.odde.doughnut.controllers.json.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.json.RedirectToNoteResponse;
 import com.odde.doughnut.entities.Note;
@@ -53,7 +53,8 @@ class RestNotebookController {
 
   @PostMapping({"/create"})
   @Transactional
-  public RedirectToNoteResponse createNotebook(@Valid @ModelAttribute NoteCreation noteCreation) {
+  public RedirectToNoteResponse createNotebook(
+      @Valid @ModelAttribute NoteCreationDTO noteCreation) {
     currentUser.assertLoggedIn();
     User userEntity = currentUser.getEntity();
     Note note =

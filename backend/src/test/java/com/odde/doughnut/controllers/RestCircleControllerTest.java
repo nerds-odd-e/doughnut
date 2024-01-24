@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.json.CircleForUserView;
 import com.odde.doughnut.controllers.json.CircleJoiningByInvitation;
-import com.odde.doughnut.controllers.json.NoteCreation;
+import com.odde.doughnut.controllers.json.NoteCreationDTO;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -62,7 +62,7 @@ class RestCircleControllerTest {
     @Test
     void whenTheUserIsNotAMemberOfTheCircle() {
       Circle circle = makeMe.aCircle().please();
-      NoteCreation noteCreation = new NoteCreation();
+      NoteCreationDTO noteCreation = new NoteCreationDTO();
       noteCreation.setTopicConstructor("new title");
       assertThrows(
           UnexpectedNoAccessRightException.class,

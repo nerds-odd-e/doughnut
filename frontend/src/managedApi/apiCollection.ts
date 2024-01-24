@@ -268,7 +268,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
   notebookMethods: {
     async createNotebook(
       circle: Generated.Circle | undefined,
-      data: Generated.NoteCreation,
+      data: Generated.NoteCreationDTO,
     ) {
       const url = (() => {
         if (circle) {
@@ -298,7 +298,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
   },
 
   noteMethods: {
-    async createNote(parentId: Doughnut.ID, data: Generated.NoteCreation) {
+    async createNote(parentId: Doughnut.ID, data: Generated.NoteCreationDTO) {
       return (await managedApi.restPostMultiplePartForm(
         `notes/${parentId}/create`,
         data,

@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 
-import com.odde.doughnut.controllers.json.NoteCreation;
+import com.odde.doughnut.controllers.json.NoteCreationDTO;
 import com.odde.doughnut.controllers.json.NoteRealm;
 import com.odde.doughnut.controllers.json.WikidataAssociationCreation;
 import com.odde.doughnut.entities.Link.LinkType;
@@ -139,7 +139,7 @@ class RestNoteControllerTests {
   @Nested
   class createNoteTest {
     Note parent;
-    NoteCreation noteCreation = new NoteCreation();
+    NoteCreationDTO noteCreation = new NoteCreationDTO();
 
     @BeforeEach
     void setup() {

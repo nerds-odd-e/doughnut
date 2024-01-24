@@ -64,11 +64,11 @@ export default defineComponent({
   emits: ["closeDialog"],
   data() {
     return {
-      creationData: {
+      creationData: <Generated.NoteCreationDTO>{
         linkTypeToParent: "no link",
         topicConstructor: "",
         wikidataId: "",
-      } as Generated.NoteCreation,
+      },
       noteFormErrors: {
         linkTypeToParent: undefined,
         topicConstructor: undefined as undefined | string,

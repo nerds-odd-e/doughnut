@@ -102,7 +102,7 @@ declare namespace Generated {
         reverse: Link[];
     }
 
-    interface NoteCreation {
+    interface NoteCreationDTO {
         linkTypeToParent?: LinkType;
         topicConstructor: string;
         wikidataId?: string;
@@ -282,6 +282,8 @@ declare namespace Generated {
     }
 
     interface Note extends Thingy {
+        topic: string;
+        topicConstructor: string;
         /**
          * The details of the note is in markdown format.
          */
@@ -289,11 +291,9 @@ declare namespace Generated {
         parentId?: number;
         updatedAt: string;
         noteAccessories: NoteAccessories;
-        topic: string;
         wikidataId: string;
         deletedAt: string;
         pictureWithMask?: PictureWithMask;
-        topicConstructor: string;
     }
 
     interface Ownership {

@@ -23,7 +23,7 @@ export default {
   },
   data() {
     return {
-      noteFormData: { topicConstructor: "" } as Generated.NoteCreation,
+      noteFormData: { topicConstructor: "" } as Generated.NoteCreationDTO,
       errors: { topicConstructor: undefined as undefined | string },
     };
   },

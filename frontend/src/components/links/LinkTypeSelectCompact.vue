@@ -38,7 +38,7 @@ export default defineComponent({
     scopeName: String,
     modelValue: {
       type: String as PropType<Generated.LinkType>,
-      required: true,
+      default: () => "no link" as Generated.LinkType,
     },
     errors: String,
     allowEmpty: { type: Boolean, default: false },

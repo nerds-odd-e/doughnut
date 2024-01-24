@@ -30,7 +30,7 @@ import org.springframework.beans.BeanUtils;
 
 @Entity
 @Table(name = "note")
-@JsonPropertyOrder({"title", "details", "parentId", "updatedAt"})
+@JsonPropertyOrder({"topic", "topicConstructor", "details", "parentId", "updatedAt"})
 public class Note extends Thingy {
   public static final int MAX_TITLE_LENGTH = 150;
 
