@@ -1,6 +1,7 @@
 import { VueWrapper, flushPromises } from "@vue/test-utils";
 import { ComponentPublicInstance } from "vue";
 import NoteTextContent from "@/components/notes/NoteTextContent.vue";
+import TextContentWrapper from "@/components/notes/TextContentWrapper.vue";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
@@ -15,7 +16,8 @@ describe("in place edit on title", () => {
       .component(NoteTextContent)
       .withStorageProps({
         noteId: n.id,
-        textContent: { topic: n.topic, details: n.details },
+        topicConstructor: n.topic,
+        details: n.details,
       })
       .mount();
   };
@@ -37,7 +39,7 @@ describe("in place edit on title", () => {
     // with an empty function.
 
     const mockUnmounted = vitest
-      .spyOn(NoteTextContent, "unmounted")
+      .spyOn(TextContentWrapper, "unmounted")
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       .mockImplementation(() => {});
     const wrapper = mountComponent(note);
@@ -71,42 +73,40 @@ describe("in place edit on title", () => {
     await editTitle(wrapper);
   });
 
-  it("should display error when saving failed", async () => {
-    const wrapper = mountComponent(note);
-    helper.apiMock
-      .expectingPatch(`/api/text_content/${note.id}/topic-constructor`)
-      .andRespondOnce({
-        status: 400,
-        body: JSON.stringify({
-          message: "binding error",
-          errors: {
-            topic: "size must be between 1 and 100",
-          },
-          errorType: "BINDING_ERROR",
-        }),
-      });
-    await editTitle(wrapper);
-    await flushPromises();
-    const { errors } = wrapper.vm.$data as { errors: { topic: string } };
-    expect(errors.topic).toBe("size must be between 1 and 100");
-    expect(wrapper.find(".error-msg").text()).toBe(
-      "size must be between 1 and 100",
-    );
-  });
+  describe("saved and having error", () => {
+    let wrapper: VueWrapper<ComponentPublicInstance>;
+    beforeEach(async () => {
+      wrapper = mountComponent(note);
+      helper.apiMock
+        .expectingPatch(`/api/text_content/${note.id}/topic-constructor`)
+        .andRespondOnce({
+          status: 400,
+          body: JSON.stringify({
+            message: "binding error",
+            errors: {
+              topic: "size must be between 1 and 100",
+            },
+            errorType: "BINDING_ERROR",
+          }),
+        });
+      await editTitle(wrapper);
+      await flushPromises();
+    });
 
-  it("should clean up errors when editing", async () => {
-    const wrapper = mountComponent(note);
-    const { errors } = wrapper.vm.$data as { errors: { topic: string } };
-    errors.topic = "size must be between 1 and 100";
-    helper.apiMock.expectingPatch(
-      `/api/text_content/${note.id}/topic-constructor`,
-    );
-    await editTitle(wrapper);
-    await flushPromises();
-    const { errors: expectedErrors } = wrapper.vm.$data as {
-      errors: { topic: string };
-    };
-    expect(expectedErrors.topic).toBeUndefined();
+    it("should display error when saving failed", async () => {
+      expect(wrapper.find(".error-msg").text()).toBe(
+        "size must be between 1 and 100",
+      );
+    });
+
+    it("should clean up errors when editing", async () => {
+      helper.apiMock.expectingPatch(
+        `/api/text_content/${note.id}/topic-constructor`,
+      );
+      await editTitle(wrapper);
+      await flushPromises();
+      expect(wrapper.findAll(".error-msg")).toHaveLength(0);
+    });
   });
 
   it("should not trigger changes for initial details content", async () => {
@@ -140,8 +140,7 @@ describe("in place edit on title", () => {
         });
       await editTitle(wrapper);
       await flushPromises();
-      const { errors } = wrapper.vm.$data as { errors: { topic: string } };
-      expect(errors.topic).toBe(
+      expect(wrapper.find(".error-msg").text()).toBe(
         "You are not authorized to edit this note. Perhaps you are not logged in?",
       );
     });

@@ -76,7 +76,6 @@ declare namespace Generated {
         answeredQuestion: AnsweredQuestion;
         answer: Answer;
         suggestedQuestionForFineTuning: SuggestedQuestionForFineTuning;
-        textContent: TextContent;
     }
 
     interface GlobalAiModelSettings {
@@ -258,11 +257,6 @@ declare namespace Generated {
         realCorrectAnswers: string;
         createdAt?: string;
         positiveFeedback: boolean;
-    }
-
-    interface TextContent {
-        topic: string;
-        details: string;
     }
 
     interface Link extends Thingy {

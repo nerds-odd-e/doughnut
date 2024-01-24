@@ -6,10 +6,10 @@
           role="topic"
           class="note-topic"
           scope-name="note"
-          :model-value="localTextContent.topic"
+          :model-value="localTopicConstructor"
           @update:model-value="
             update(noteId, $event);
-            localTextContent.topic = $event;
+            localTopicConstructor = $event;
           "
           @blur="blur"
           :errors="errors.topic"
@@ -27,10 +27,10 @@
         <RichMarkdownEditor
           :multiple-line="true"
           scope-name="note"
-          :model-value="localTextContent.details"
+          :model-value="localDetails"
           @update:model-value="
             update(noteId, $event);
-            localTextContent.details = $event;
+            localDetails = $event;
           "
           @blur="blur"
         />
@@ -50,10 +50,8 @@ import TextContentWrapper from "./TextContentWrapper.vue";
 export default defineComponent({
   props: {
     noteId: { type: Number, required: true },
-    textContent: {
-      type: Object as PropType<Generated.TextContent>,
-      required: true,
-    },
+    topicConstructor: { type: String, required: true },
+    details: { type: String, required: false },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,
@@ -66,15 +64,16 @@ export default defineComponent({
   },
   data() {
     return {
-      localTextContent: { ...this.textContent } as Generated.TextContent,
+      localTopicConstructor: this.topicConstructor,
+      localDetails: this.details,
     };
   },
   watch: {
-    textContent: {
-      handler(newValue) {
-        this.localTextContent = { ...newValue };
-      },
-      deep: true,
+    topicConstructor() {
+      this.localTopicConstructor = this.topicConstructor;
+    },
+    details() {
+      this.localDetails = this.details;
     },
   },
 });

@@ -4,10 +4,8 @@
   </div>
   <NoteTextContent
     :note-id="note.id"
-    :text-content="{
-      topic: note.topic,
-      details: note.details,
-    }"
+    :topic-constructor="note.topic"
+    :details="note.details"
     :storage-accessor="storageAccessor"
   >
     <template #topic-additional>
