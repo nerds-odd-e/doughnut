@@ -2,80 +2,60 @@
   <slot :update="onUpdate" :blur="onBlur" :errors="errors" />
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from "vue";
+<script setup lang="ts">
+import { ref, onUnmounted, PropType } from "vue";
 import { debounce } from "lodash";
-import {
-  NoteTextContentChanger,
-  type StorageAccessor,
-} from "../../store/createNoteStorage";
+import type { StorageAccessor } from "../../store/createNoteStorage";
 
-export default defineComponent({
-  setup(props) {
-    const changerInner = async (
-      noteId: number,
-      newValue: string,
-      errorHander: (errs: unknown) => void,
-    ) => {
-      try {
-        await props.storageAccessor
-          .storedApi()
-          .updateTextField(noteId, props.field, newValue);
-      } catch (e) {
-        errorHander(e);
-      }
-    };
-    const changer = new NoteTextContentChanger(debounce(changerInner, 1000));
+const props = defineProps({
+  field: {
+    type: String as PropType<"edit topic" | "edit details">,
+    required: true,
+  },
+  storageAccessor: {
+    type: Object as PropType<StorageAccessor>,
+    required: true,
+  },
+});
 
-    return { changer };
-  },
-  props: {
-    field: {
-      type: String as PropType<"edit topic" | "edit details">,
-      required: true,
-    },
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      localTextContent: { ...this.textContent } as Generated.TextContent,
-      errors: {} as Record<string, string>,
+const errors = ref({} as Record<string, string>);
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const setError = (errs: any) => {
+  if (errs.status === 401) {
+    errors.value = {
+      topic:
+        "You are not authorized to edit this note. Perhaps you are not logged in?",
     };
-  },
-  watch: {
-    textContent: {
-      handler(newValue) {
-        this.localTextContent = { ...newValue };
-      },
-      deep: true,
-    },
-  },
-  methods: {
-    onUpdate(noteId: number, newValue: string) {
-      this.errors = {};
-      this.changer?.change(noteId, newValue, this.setError);
-    },
-    onBlur() {
-      this.changer?.flush();
-    },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setError(errs: any) {
-      if (errs.status === 401) {
-        this.errors = {
-          topic:
-            "You are not authorized to edit this note. Perhaps you are not logged in?",
-        };
-        return;
-      }
-      this.errors = errs;
-    },
-  },
-  unmounted() {
-    this.changer?.flush();
-    this.changer?.cancel();
-  },
+    return;
+  }
+  errors.value = errs;
+};
+
+const changerInner = (
+  noteId: number,
+  newValue: string,
+  errorHandler: (errs: unknown) => void,
+) => {
+  props.storageAccessor
+    .storedApi()
+    .updateTextField(noteId, props.field, newValue)
+    .catch(errorHandler);
+};
+
+const changer = debounce(changerInner, 1000);
+
+const onUpdate = (noteId: number, newValue: string) => {
+  errors.value = {};
+  changer(noteId, newValue, setError);
+};
+
+const onBlur = () => {
+  changer.flush();
+};
+
+onUnmounted(() => {
+  changer.flush();
+  changer.cancel();
 });
 </script>

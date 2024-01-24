@@ -2,7 +2,6 @@ import ManagedApi from "@/managedApi/ManagedApi";
 import NoteEditingHistory, { HistoryRecord } from "./NoteEditingHistory";
 import NoteStorage, { StorageImplementation } from "./NoteStorage";
 import StoredApiCollection, { StoredApi } from "./StoredApiCollection";
-import NoteTextContentChanger from "./NoteTextContentChanger";
 
 interface StorageAccessor extends NoteStorage {
   storedApi(): StoredApi;
@@ -49,4 +48,4 @@ function createNoteStorage(
 
 export default createNoteStorage;
 export type { StorageAccessor };
-export { NoteEditingHistory, NoteTextContentChanger };
+export { NoteEditingHistory };
