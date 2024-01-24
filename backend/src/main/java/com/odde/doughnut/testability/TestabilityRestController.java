@@ -92,7 +92,7 @@ class TestabilityRestController {
     @Setter private String wikidataId;
 
     private Note buildNote(User user, Timestamp currentUTCTimestamp) {
-      Note note = Note.createNote(user, currentUTCTimestamp, new TextContent());
+      Note note = Note.createNote(user, currentUTCTimestamp, "");
       NoteAccessories content = note.getNoteAccessories();
 
       note.setTopicConstructor(topicConstructor);

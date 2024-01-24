@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers.json;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.entities.Link.LinkType;
 import com.odde.doughnut.entities.TextContent;
 import jakarta.validation.Valid;
@@ -11,7 +12,12 @@ import org.springframework.lang.Nullable;
 
 public class NoteCreation {
   @Getter @Setter @NotNull public LinkType linkTypeToParent;
-  @Getter @Setter @Valid @NotNull public TextContent textContent = new TextContent();
+  @Getter @Setter @Valid @NotNull private TextContent textContent = new TextContent();
+
+  @JsonIgnore
+  public String getTopicConstructor() {
+    return textContent.getTopic();
+  }
 
   @Getter
   @Setter

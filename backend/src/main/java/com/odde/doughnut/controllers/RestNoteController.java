@@ -78,8 +78,8 @@ class RestNoteController {
               .createNoteWithWikidataInfo(
                   parentNote,
                   wikidataService.wrapWikidataIdWithApi(noteCreation.wikidataId),
-                  noteCreation.textContent,
-                  noteCreation.getLinkTypeToParent());
+                  noteCreation.getLinkTypeToParent(),
+                  noteCreation.getTopicConstructor());
       return new NoteViewer(user, note).toJsonObject();
     } catch (DuplicateWikidataIdException e) {
       BindingResult bindingResult = new BeanPropertyBindingResult(noteCreation, "noteCreation");

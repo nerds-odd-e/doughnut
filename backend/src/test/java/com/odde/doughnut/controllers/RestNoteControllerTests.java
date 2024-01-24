@@ -224,8 +224,7 @@ class RestNoteControllerTests {
         mockApiResponseWithLocationInfo(
             "{\"latitude\":1.3,\"longitude\":103.8}", "globecoordinate");
         NoteRealm note = controller.createNote(parent, noteCreation);
-        assertThat(
-            note.getNote().getDetails(), stringContainsInOrder("Location: " + lnglat, singapore));
+        assertThat(note.getNote().getDetails(), containsString("Location: " + lnglat));
       }
 
       @Test

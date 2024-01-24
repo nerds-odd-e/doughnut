@@ -57,10 +57,10 @@ public class Ownership {
 
   public Note createAndPersistNotebook(
       User user,
-      TextContent textContent,
       Timestamp currentUTCTimestamp,
-      ModelFactoryService modelFactoryService) {
-    final Note note = Note.createNote(user, currentUTCTimestamp, textContent);
+      ModelFactoryService modelFactoryService,
+      String topicConstructor) {
+    final Note note = Note.createNote(user, currentUTCTimestamp, topicConstructor);
     note.buildNotebookForHeadNote(this, user);
     modelFactoryService.save(note);
     return note;

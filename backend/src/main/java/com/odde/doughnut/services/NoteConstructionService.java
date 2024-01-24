@@ -2,7 +2,6 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.TextContent;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -18,10 +17,10 @@ public record NoteConstructionService(
   public Note createNoteWithWikidataInfo(
       Note parentNote,
       WikidataIdWithApi wikidataIdWithApi,
-      TextContent textContent,
-      Link.LinkType linkTypeToParent)
+      Link.LinkType linkTypeToParent,
+      String topicConstructor)
       throws DuplicateWikidataIdException, IOException, InterruptedException {
-    Note note = parentNote.buildChildNote(user, currentUTCTimestamp, textContent);
+    Note note = parentNote.buildChildNote(user, currentUTCTimestamp, topicConstructor);
     note.buildLinkToParent(user, linkTypeToParent, currentUTCTimestamp);
     modelFactoryService.save(note);
     if (wikidataIdWithApi != null) {
@@ -51,17 +50,13 @@ public record NoteConstructionService(
                       this.modelFactoryService.save(link);
                     },
                     () -> {
-                      TextContent textContent = new TextContent();
-                      textContent.setTopic(subNoteTitle);
                       try {
                         createNoteWithWikidataInfo(
                             parentNote,
                             subWikidataIdWithApi,
-                            textContent,
-                            Link.LinkType.RELATED_TO);
-                      } catch (Exception e) {
-                        throw new RuntimeException(e);
-                      } catch (DuplicateWikidataIdException e) {
+                            Link.LinkType.RELATED_TO,
+                            subNoteTitle);
+                      } catch (Exception | DuplicateWikidataIdException e) {
                         throw new RuntimeException(e);
                       }
                     }));
