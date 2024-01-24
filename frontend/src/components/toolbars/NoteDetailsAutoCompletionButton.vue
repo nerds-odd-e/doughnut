@@ -76,10 +76,13 @@ export default defineComponent({
       }
 
       this.clarifyingQuestion = undefined;
-      this.storageAccessor.storedApi().updateTextContent(this.note.id, {
-        topic: this.note.topic,
-        details: this.note.details + response.requiredAction!.contentToAppend!,
-      });
+      this.storageAccessor
+        .storedApi()
+        .updateTextField(
+          this.note.id,
+          "edit details",
+          this.note.details + response.requiredAction!.contentToAppend!,
+        );
     },
     async clarifyingQuestionAnswered(
       clarifyingQuestionAndAnswer: Generated.ClarifyingQuestionAndAnswer,

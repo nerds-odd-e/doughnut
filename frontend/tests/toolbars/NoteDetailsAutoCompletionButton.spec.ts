@@ -33,7 +33,9 @@ describe("NoteDetailsAutoCompletionButton", () => {
       .andReturnOnce({
         requiredAction: { contentToAppend: "auto completed content" },
       });
-    helper.apiMock.expectingPatch(`/api/text_content/${noteWithNoDetails.id}`);
+    helper.apiMock.expectingPatch(
+      `/api/text_content/${noteWithNoDetails.id}/details`,
+    );
     await triggerAutoCompletion(noteWithNoDetails);
     expect(expectation.actualRequestJsonBody()).toMatchObject({
       detailsToComplete: "",
@@ -46,7 +48,7 @@ describe("NoteDetailsAutoCompletionButton", () => {
       .andReturnOnce({
         requiredAction: { contentToAppend: "auto completed content" },
       });
-    helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
+    helper.apiMock.expectingPatch(`/api/text_content/${note.id}/details`);
     await triggerAutoCompletion(note);
     expect(expectation.actualRequestJsonBody()).toMatchObject({
       detailsToComplete: "<p>Desc</p>",
@@ -61,7 +63,7 @@ describe("NoteDetailsAutoCompletionButton", () => {
           contentToAppend: "auto completed content",
         },
       });
-    helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
+    helper.apiMock.expectingPatch(`/api/text_content/${note.id}/details`);
 
     await triggerAutoCompletion(note);
   });

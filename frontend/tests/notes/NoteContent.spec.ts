@@ -15,7 +15,9 @@ describe("undo editing", () => {
 
     const noteRealm = makeMe.aNoteRealm.topic("Dummy Title").please();
     histories.refreshNoteRealm(noteRealm);
-    helper.apiMock.expectingPatch(`/api/text_content/${noteRealm.id}`);
+    helper.apiMock.expectingPatch(
+      `/api/text_content/${noteRealm.id}/topic-constructor`,
+    );
 
     const updatedTitle = "updated";
     const wrapper = helper
@@ -31,6 +33,6 @@ describe("undo editing", () => {
     await wrapper.find('[role="topic"] input').trigger("blur");
     await flushPromises();
 
-    expect(histories.peekUndo()).toMatchObject({ type: "editing" });
+    expect(histories.peekUndo()).toMatchObject({ type: "edit topic" });
   });
 });

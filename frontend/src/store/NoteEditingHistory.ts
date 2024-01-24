@@ -1,7 +1,7 @@
 export interface HistoryRecord {
-  type: "editing" | "delete note";
+  type: "edit topic" | "edit details" | "delete note";
   noteId: Doughnut.ID;
-  textContent?: Generated.TextContent;
+  textContent?: string;
 }
 
 export default class NoteEditingHistory {
@@ -18,12 +18,13 @@ export default class NoteEditingHistory {
 
   addEditingToUndoHistory(
     noteId: Doughnut.ID,
-    textContent: Generated.TextContent,
+    field: "edit topic" | "edit details",
+    textContent: string,
   ) {
     this.noteUndoHistories.push({
-      type: "editing",
+      type: field,
       noteId,
-      textContent: { ...textContent },
+      textContent,
     });
   }
 

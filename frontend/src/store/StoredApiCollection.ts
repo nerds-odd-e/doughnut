@@ -40,9 +40,10 @@ export interface StoredApi {
 
   noteTextContentChanger(): NoteTextContentChanger;
 
-  updateTextContent(
+  updateTextField(
     noteId: Doughnut.ID,
-    noteContentData: Omit<Generated.TextContent, "updatedAt">,
+    field: "edit topic" | "edit details",
+    value: string,
   ): Promise<void>;
 
   updateWikidataId(
@@ -94,22 +95,29 @@ export default class StoredApiCollection implements StoredApi {
 
   private async updateTextContentWithoutUndo(
     noteId: Doughnut.ID,
-    noteContentData: Omit<Generated.TextContent, "updatedAt">,
+    field: "edit topic" | "edit details",
+    content: string,
   ) {
-    function excludeProperty<T, K extends string>(
-      obj: T,
-      property: K,
-    ): Omit<T, K> {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { [property]: _, ...rest } = obj as T & Record<K, unknown>;
-      return rest;
-    }
     return this.storage.refreshNoteRealm(
-      (await this.managedApi.restPatchMultiplePartForm(
-        `text_content/${noteId}`,
-        excludeProperty(noteContentData, "updatedAt"),
-      )) as Generated.NoteRealm,
+      await this.callUpdateApi(noteId, field, content),
     );
+  }
+
+  private async callUpdateApi(
+    noteId: Doughnut.ID,
+    field: "edit topic" | "edit details",
+    content: string,
+  ) {
+    if (field === "edit topic") {
+      return (await this.managedApi.restPatchMultiplePartForm(
+        `text_content/${noteId}/topic-constructor`,
+        { topicConstructor: content },
+      )) as Generated.NoteRealm;
+    }
+    return (await this.managedApi.restPatchMultiplePartForm(
+      `text_content/${noteId}/details`,
+      { details: content },
+    )) as Generated.NoteRealm;
   }
 
   async updateWikidataId(
@@ -197,30 +205,69 @@ export default class StoredApiCollection implements StoredApi {
     noteContentData: Omit<Generated.TextContent, "updatedAt">,
   ) {
     const currentNote = this.storage.refOfNoteRealm(noteId).value?.note;
+    const field =
+      currentNote?.topic !== noteContentData.topic
+        ? "edit topic"
+        : "edit details";
+    const oldValue =
+      currentNote?.topic !== noteContentData.topic
+        ? currentNote?.topic
+        : currentNote?.details;
+    const value =
+      currentNote?.topic !== noteContentData.topic
+        ? noteContentData.topic
+        : noteContentData.details;
     if (currentNote) {
       const old: Generated.TextContent = {
         topic: currentNote.topic,
         details: currentNote.details,
       };
+
       if (
         old.topic === noteContentData.topic &&
         old.details === noteContentData.details
       ) {
         return;
       }
-      this.noteEditingHistory.addEditingToUndoHistory(noteId, old);
+
+      this.noteEditingHistory.addEditingToUndoHistory(
+        noteId,
+        field,
+        oldValue ?? "",
+      );
     }
-    await this.updateTextContentWithoutUndo(noteId, noteContentData);
+    await this.updateTextContentWithoutUndo(noteId, field, value);
+  }
+
+  async updateTextField(
+    noteId: Doughnut.ID,
+    field: "edit topic" | "edit details",
+    value: string,
+  ) {
+    const currentNote = this.storage.refOfNoteRealm(noteId).value?.note;
+    if (currentNote) {
+      const old: string =
+        field === "edit topic" ? currentNote.topic : currentNote.details;
+      if (old === value) {
+        return;
+      }
+      this.noteEditingHistory.addEditingToUndoHistory(noteId, field, old);
+    }
+    await this.updateTextContentWithoutUndo(noteId, field, value);
   }
 
   private async undoInner() {
     const undone = this.noteEditingHistory.peekUndo();
     if (!undone) throw new Error("undo history is empty");
     this.noteEditingHistory.popUndoHistory();
-    if (undone.type === "editing" && undone.textContent) {
+    if (
+      undone.type === "edit topic" ||
+      (undone.type === "edit details" && undone.textContent !== undefined)
+    ) {
       return this.updateTextContentWithoutUndo(
         undone.noteId,
-        undone.textContent,
+        undone.type,
+        undone.textContent!,
       );
     }
     return (await this.managedApi.restPatch(

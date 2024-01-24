@@ -51,7 +51,9 @@ describe("in place edit on title", () => {
     const wrapper = mountComponent(note);
     await wrapper.find('[role="topic"]').trigger("click");
     await wrapper.find('[role="topic"] input').setValue("updated");
-    helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
+    helper.apiMock.expectingPatch(
+      `/api/text_content/${note.id}/topic-constructor`,
+    );
     wrapper.unmount();
   });
 
@@ -63,14 +65,16 @@ describe("in place edit on title", () => {
 
   it("should save content when blur text field title", async () => {
     const wrapper = mountComponent(note);
-    helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
+    helper.apiMock.expectingPatch(
+      `/api/text_content/${note.id}/topic-constructor`,
+    );
     await editTitle(wrapper);
   });
 
   it("should display error when saving failed", async () => {
     const wrapper = mountComponent(note);
     helper.apiMock
-      .expectingPatch(`/api/text_content/${note.id}`)
+      .expectingPatch(`/api/text_content/${note.id}/topic-constructor`)
       .andRespondOnce({
         status: 400,
         body: JSON.stringify({
@@ -94,7 +98,9 @@ describe("in place edit on title", () => {
     const wrapper = mountComponent(note);
     const { errors } = wrapper.vm.$data as { errors: { topic: string } };
     errors.topic = "size must be between 1 and 100";
-    helper.apiMock.expectingPatch(`/api/text_content/${note.id}`);
+    helper.apiMock.expectingPatch(
+      `/api/text_content/${note.id}/topic-constructor`,
+    );
     await editTitle(wrapper);
     await flushPromises();
     const { errors: expectedErrors } = wrapper.vm.$data as {
@@ -128,7 +134,7 @@ describe("in place edit on title", () => {
     it("should display error when no authorization to save", async () => {
       const wrapper = mountComponent(note);
       helper.apiMock
-        .expectingPatch(`/api/text_content/${note.id}`)
+        .expectingPatch(`/api/text_content/${note.id}/topic-constructor`)
         .andRespondOnce({
           status: 401,
         });
