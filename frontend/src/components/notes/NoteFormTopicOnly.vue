@@ -2,12 +2,10 @@
   <TextInput
     scope-name="note"
     field="topic"
-    :model-value="modelValue.topic"
+    :model-value="modelValue"
     :errors="errors.topic"
     v-focus
-    @update:model-value="
-      $emit('update:modelValue', { ...modelValue, topic: $event })
-    "
+    @update:model-value="$emit('update:modelValue', $event)"
   />
 </template>
 
@@ -17,7 +15,7 @@ import TextInput from "../form/TextInput.vue";
 
 export default defineComponent({
   props: {
-    modelValue: { type: Object, required: true },
+    modelValue: { type: String, required: true },
     errors: {
       type: Object,
       default() {

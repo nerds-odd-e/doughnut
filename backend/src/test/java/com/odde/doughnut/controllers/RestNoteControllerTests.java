@@ -11,7 +11,6 @@ import com.odde.doughnut.controllers.json.WikidataAssociationCreation;
 import com.odde.doughnut.entities.Link.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessories;
-import com.odde.doughnut.entities.TextContent;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -145,9 +144,7 @@ class RestNoteControllerTests {
     @BeforeEach
     void setup() {
       parent = makeMe.aNote().creatorAndOwner(userModel).please();
-      TextContent textContent = new TextContent();
-      textContent.setTopic("new title");
-      noteCreation.setTextContent(textContent);
+      noteCreation.setTopicConstructor("new title");
       noteCreation.setLinkTypeToParent(LinkType.NO_LINK);
     }
 
@@ -205,7 +202,6 @@ class RestNoteControllerTests {
       @BeforeEach
       void thereIsAWikidataEntryOfALocation() {
         noteCreation.setWikidataId(wikidataIdOfALocation);
-        noteCreation.getTextContent().setDetails(singapore);
       }
 
       private void mockApiResponseWithLocationInfo(String locationInfo, String type)
@@ -245,7 +241,6 @@ class RestNoteControllerTests {
       @BeforeEach
       void thereIsAWikidataEntryOfAHuman() {
         noteCreation.setWikidataId("");
-        noteCreation.getTextContent().setDetails("");
       }
 
       private void mockWikidataHumanEntity(
@@ -308,7 +303,7 @@ class RestNoteControllerTests {
         mockWikidataHumanEntity("Q8337", null, "Q34660");
         mockWikidataEntity("Q34660", "Canada");
         noteCreation.setWikidataId("Q8337");
-        noteCreation.getTextContent().setTopic("Johnny boy");
+        noteCreation.setTopicConstructor("Johnny boy");
         NoteRealm note = controller.createNote(parent, noteCreation);
         makeMe.refresh(note.getNote());
 
@@ -325,7 +320,7 @@ class RestNoteControllerTests {
         mockWikidataEntity("Q34660", "J. K. Rowling");
         mockWikidataEntity("Q12345", "The girl sat next to the window");
         noteCreation.setWikidataId("Q8337");
-        noteCreation.getTextContent().setTopic("Harry Potter");
+        noteCreation.setTopicConstructor("Harry Potter");
       }
 
       @Test

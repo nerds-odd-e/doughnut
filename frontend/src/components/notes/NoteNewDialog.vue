@@ -9,16 +9,16 @@
         :errors="noteFormErrors.linkTypeToParent"
       />
       <NoteFormTopicOnly
-        v-model="creationData.textContent"
+        v-model="creationData.topicConstructor"
         :errors="noteFormErrors.textContent"
       />
       <SuggestTopic
-        :original-topic="creationData.textContent.topic"
+        :original-topic="creationData.topicConstructor"
         :suggested-topic="suggestedTopic"
         @suggested-topic-selected="takeSuggestedTopic"
       />
       <WikidataSearchByLabel
-        :search-key="creationData.textContent.topic"
+        :search-key="creationData.topicConstructor"
         v-model="creationData.wikidataId"
         :errors="noteFormErrors.wikidataId"
         @selected="onSelectWikidataEntry"
@@ -29,7 +29,7 @@
         <SearchResults
           v-bind="{
             noteId: parentId,
-            inputSearchKey: creationData.textContent.topic,
+            inputSearchKey: creationData.topicConstructor,
           }"
         />
       </fieldset>
@@ -66,7 +66,7 @@ export default defineComponent({
     return {
       creationData: {
         linkTypeToParent: "no link",
-        textContent: { topic: "" },
+        topicConstructor: "",
         wikidataId: "",
       } as Generated.NoteCreation,
       noteFormErrors: {
@@ -98,11 +98,11 @@ export default defineComponent({
         });
     },
     onSelectWikidataEntry(selectedSuggestion: Generated.WikidataSearchEntity) {
-      const currentLabel = this.creationData.textContent.topic.toUpperCase();
+      const currentLabel = this.creationData.topicConstructor.toUpperCase();
       const newLabel = selectedSuggestion.label.toUpperCase();
 
       if (currentLabel === newLabel) {
-        this.creationData.textContent.topic = selectedSuggestion.label;
+        this.creationData.topicConstructor = selectedSuggestion.label;
         this.suggestedTopic = "";
       } else {
         this.suggestedTopic = selectedSuggestion.label;
@@ -111,7 +111,7 @@ export default defineComponent({
       this.creationData.wikidataId = selectedSuggestion.id;
     },
     takeSuggestedTopic(topic: string) {
-      this.creationData.textContent.topic = topic;
+      this.creationData.topicConstructor = topic;
       this.suggestedTopic = "";
     },
   },

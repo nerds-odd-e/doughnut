@@ -8,12 +8,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { PropType, defineComponent } from "vue";
 import NotebookNewDialog from "./NotebookNewDialog.vue";
 import PopButton from "../commons/Popups/PopButton.vue";
 
 export default defineComponent({
-  props: { circle: Object },
+  props: { circle: { type: Object as PropType<Generated.Circle> } },
   components: { PopButton, NotebookNewDialog },
 });
 </script>

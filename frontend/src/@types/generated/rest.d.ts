@@ -76,6 +76,7 @@ declare namespace Generated {
         answeredQuestion: AnsweredQuestion;
         answer: Answer;
         suggestedQuestionForFineTuning: SuggestedQuestionForFineTuning;
+        textContent: TextContent;
     }
 
     interface GlobalAiModelSettings {
@@ -103,7 +104,7 @@ declare namespace Generated {
 
     interface NoteCreation {
         linkTypeToParent: LinkType;
-        textContent: TextContent;
+        topicConstructor: string;
         wikidataId?: string;
     }
 
@@ -252,15 +253,15 @@ declare namespace Generated {
         positiveFeedback: boolean;
     }
 
+    interface TextContent {
+        topic: string;
+        details: string;
+    }
+
     interface Link extends Thingy {
         sourceNote: Note;
         targetNote: Note;
         linkType: LinkType;
-    }
-
-    interface TextContent {
-        topic: string;
-        details: string;
     }
 
     interface ReviewPoint extends EntityIdentifiedByIdOnly {

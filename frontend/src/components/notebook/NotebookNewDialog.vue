@@ -1,13 +1,13 @@
 <template>
   <form @submit.prevent.once="processForm">
-    <NoteFormTitleOnly v-model="noteFormData" :errors="errors" />
+    <NoteFormTopicOnly v-model="noteFormData.topic" :errors="errors" />
     <input type="submit" value="Submit" class="btn btn-primary" />
   </form>
 </template>
 
 <script lang="ts">
 import { PropType } from "vue";
-import NoteFormTitleOnly from "../notes/NoteFormTopicOnly.vue";
+import NoteFormTopicOnly from "../notes/NoteFormTopicOnly.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default {
@@ -16,11 +16,11 @@ export default {
   },
   props: { circle: { type: Object as PropType<Generated.Circle> } },
   components: {
-    NoteFormTitleOnly,
+    NoteFormTopicOnly,
   },
   data() {
     return {
-      noteFormData: {} as Generated.TextContent,
+      noteFormData: { topic: "" } as Generated.TextContent,
       errors: {},
     };
   },
