@@ -103,7 +103,7 @@ declare namespace Generated {
     }
 
     interface NoteCreation {
-        linkTypeToParent: LinkType;
+        linkTypeToParent?: LinkType;
         topicConstructor: string;
         wikidataId?: string;
     }
