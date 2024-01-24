@@ -4,7 +4,7 @@ export default class NoteTextContentChanger {
   changer: DebouncedFunc<
     (
       noteId: number,
-      newValue: Generated.TextContent,
+      newValue: string,
       errorHander: (errs: unknown) => void,
     ) => void
   >;
@@ -13,7 +13,7 @@ export default class NoteTextContentChanger {
     changer: DebouncedFunc<
       (
         noteId: number,
-        newValue: Generated.TextContent,
+        newValue: string,
         errorHander: (errs: unknown) => void,
       ) => void
     >,
@@ -23,7 +23,7 @@ export default class NoteTextContentChanger {
 
   change(
     noteId: number,
-    newValue: Generated.TextContent,
+    newValue: string,
     errorHander: (errs: unknown) => void,
   ): void {
     this.changer(noteId, newValue, errorHander);
