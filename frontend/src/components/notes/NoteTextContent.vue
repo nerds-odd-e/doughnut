@@ -7,7 +7,10 @@
           class="note-topic"
           scope-name="note"
           :model-value="localTextContent.topic"
-          @update:model-value="update(noteId, $event)"
+          @update:model-value="
+            update(noteId, $event);
+            localTextContent.topic = $event;
+          "
           @blur="blur"
           :errors="errors.topic"
         />
@@ -25,7 +28,10 @@
           :multiple-line="true"
           scope-name="note"
           :model-value="localTextContent.details"
-          @update:model-value="update(noteId, $event)"
+          @update:model-value="
+            update(noteId, $event);
+            localTextContent.details = $event;
+          "
           @blur="blur"
         />
       </template>
