@@ -1,10 +1,8 @@
 import { Router } from "vue-router";
-import { debounce } from "lodash";
 import ManagedApi from "../managedApi/ManagedApi";
 import apiCollection from "../managedApi/apiCollection";
 import NoteEditingHistory from "./NoteEditingHistory";
 import NoteStorage from "./NoteStorage";
-import NoteTextContentChanger from "./NoteTextContentChanger";
 
 export interface StoredApi {
   getNoteRealmAndReloadPosition(
@@ -37,8 +35,6 @@ export interface StoredApi {
     noteId: Doughnut.ID,
     noteAccessories: Generated.NoteAccessories,
   ): Promise<Generated.NoteRealm>;
-
-  noteTextContentChanger(): NoteTextContentChanger;
 
   updateTextField(
     noteId: Doughnut.ID,
@@ -186,51 +182,6 @@ export default class StoredApiCollection implements StoredApi {
         noteContentData,
       )) as Generated.NoteRealm,
     );
-  }
-
-  noteTextContentChanger() {
-    const changer = async (
-      noteId: number,
-      newValue: Generated.TextContent,
-      errorHander: (errs: unknown) => void,
-    ) => {
-      try {
-        const currentNote = this.storage.refOfNoteRealm(noteId).value?.note;
-        const field =
-          currentNote?.topic !== newValue.topic ? "edit topic" : "edit details";
-        const oldValue =
-          currentNote?.topic !== newValue.topic
-            ? currentNote?.topic
-            : currentNote?.details;
-        const value =
-          currentNote?.topic !== newValue.topic
-            ? newValue.topic
-            : newValue.details;
-        if (currentNote) {
-          const old: Generated.TextContent = {
-            topic: currentNote.topic,
-            details: currentNote.details,
-          };
-
-          if (
-            old.topic === newValue.topic &&
-            old.details === newValue.details
-          ) {
-            return;
-          }
-
-          this.noteEditingHistory.addEditingToUndoHistory(
-            noteId,
-            field,
-            oldValue ?? "",
-          );
-        }
-        await this.updateTextContentWithoutUndo(noteId, field, value);
-      } catch (e) {
-        errorHander(e);
-      }
-    };
-    return new NoteTextContentChanger(debounce(changer, 1000));
   }
 
   async updateTextField(

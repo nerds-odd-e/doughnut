@@ -25,15 +25,53 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { debounce } from "lodash";
 import EditableText from "../form/EditableText.vue";
 import RichMarkdownEditor from "../form/RichMarkdownEditor.vue";
-import type { StorageAccessor } from "../../store/createNoteStorage";
+import {
+  NoteTextContentChanger,
+  type StorageAccessor,
+} from "../../store/createNoteStorage";
 
 export default defineComponent({
   setup(props) {
-    return {
-      changer: props.storageAccessor.storedApi().noteTextContentChanger(),
+    const changerInner = async (
+      noteId: number,
+      newValue: Generated.TextContent,
+      errorHander: (errs: unknown) => void,
+    ) => {
+      try {
+        const currentNote =
+          props.storageAccessor.refOfNoteRealm(noteId).value?.note;
+        const field =
+          currentNote?.topic !== newValue.topic ? "edit topic" : "edit details";
+        const value =
+          currentNote?.topic !== newValue.topic
+            ? newValue.topic
+            : newValue.details;
+        if (currentNote) {
+          const old: Generated.TextContent = {
+            topic: currentNote.topic,
+            details: currentNote.details,
+          };
+
+          if (
+            old.topic === newValue.topic &&
+            old.details === newValue.details
+          ) {
+            return;
+          }
+        }
+        await props.storageAccessor
+          .storedApi()
+          .updateTextField(noteId, field, value);
+      } catch (e) {
+        errorHander(e);
+      }
     };
+    const changer = new NoteTextContentChanger(debounce(changerInner, 1000));
+
+    return { changer };
   },
   props: {
     noteId: { type: Number, required: true },
