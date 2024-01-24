@@ -10,7 +10,7 @@
       />
       <NoteFormTopicOnly
         v-model="creationData.topicConstructor"
-        :errors="noteFormErrors.textContent"
+        :errors="noteFormErrors.topicConstructor"
       />
       <SuggestTopic
         :original-topic="creationData.topicConstructor"
@@ -71,7 +71,7 @@ export default defineComponent({
       } as Generated.NoteCreation,
       noteFormErrors: {
         linkTypeToParent: undefined,
-        textContent: {},
+        topicConstructor: undefined as undefined | string,
         wikidataId: undefined as undefined | string,
       },
       suggestedTopic: "",
@@ -83,7 +83,7 @@ export default defineComponent({
       if (this.processing) return;
       this.processing = true;
       this.noteFormErrors.wikidataId = undefined;
-      this.noteFormErrors.textContent = {};
+      this.noteFormErrors.topicConstructor = undefined;
       this.storageAccessor
         .storedApi()
         .createNote(this.$router, this.parentId, this.creationData)

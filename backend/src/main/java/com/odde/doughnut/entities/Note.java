@@ -343,7 +343,7 @@ public class Note extends Thingy {
 
   public Link buildLinkToNote(
       User user, Link.LinkType linkType, Timestamp currentUTCTimestamp, Note targetNote) {
-    if (linkType == Link.LinkType.NO_LINK) {
+    if (linkType == null || linkType == Link.LinkType.NO_LINK) {
       return null;
     }
     Link link = Link.createLink(this, targetNote, user, linkType, currentUTCTimestamp);

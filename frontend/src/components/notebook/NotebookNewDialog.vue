@@ -1,6 +1,9 @@
 <template>
   <form @submit.prevent.once="processForm">
-    <NoteFormTopicOnly v-model="noteFormData.topic" :errors="errors" />
+    <NoteFormTopicOnly
+      v-model="noteFormData.topicConstructor"
+      :errors="errors.topicConstructor"
+    />
     <input type="submit" value="Submit" class="btn btn-primary" />
   </form>
 </template>
@@ -20,8 +23,8 @@ export default {
   },
   data() {
     return {
-      noteFormData: { topic: "" } as Generated.TextContent,
-      errors: {},
+      noteFormData: { topicConstructor: "" } as Generated.NoteCreation,
+      errors: { topicConstructor: undefined as undefined | string },
     };
   },
   methods: {

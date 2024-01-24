@@ -1,10 +1,10 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.json.NoteCreation;
 import com.odde.doughnut.controllers.json.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.json.RedirectToNoteResponse;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.TextContent;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -53,7 +53,7 @@ class RestNotebookController {
 
   @PostMapping({"/create"})
   @Transactional
-  public RedirectToNoteResponse createNotebook(@Valid @ModelAttribute TextContent textContent) {
+  public RedirectToNoteResponse createNotebook(@Valid @ModelAttribute NoteCreation noteCreation) {
     currentUser.assertLoggedIn();
     User userEntity = currentUser.getEntity();
     Note note =
@@ -61,7 +61,7 @@ class RestNotebookController {
             .getOwnership()
             .createAndPersistNotebook(
                 userEntity, testabilitySettings.getCurrentUTCTimestamp(),
-                modelFactoryService, textContent.getTopic());
+                modelFactoryService, noteCreation.getTopicConstructor());
     return new RedirectToNoteResponse(note.getId());
   }
 

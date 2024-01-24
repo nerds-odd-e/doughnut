@@ -268,7 +268,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
   notebookMethods: {
     async createNotebook(
       circle: Generated.Circle | undefined,
-      data: Generated.TextContent,
+      data: Generated.NoteCreation,
     ) {
       const url = (() => {
         if (circle) {
