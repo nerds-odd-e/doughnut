@@ -10,9 +10,9 @@ Feature: Logged in status
 
   Scenario: User logout because of session timeout
     Given there are some notes for the current user:
-      | topic                | testingParent |
-      | Shape                |               |
-      | Triangle             | Shape         |
+      | topicConstructor | testingParent |
+      | Shape            |               |
+      | Triangle         | Shape         |
     And I navigate to "My Notes/Shape" note
     When my session is logged out
     Then I should be asked to log in again when I click the link "Triangle"

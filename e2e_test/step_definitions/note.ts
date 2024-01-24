@@ -26,7 +26,7 @@ Given("there are some notes for the current user:", (data: DataTable) => {
 })
 
 Given("I have a note with the topic {string}", (noteTopic: string) => {
-  start.testability().seedNotes([{ topic: noteTopic }])
+  start.testability().seedNotes([{ topicConstructor: noteTopic }])
 })
 
 Given("there are some notes for existing user {string}", (externalIdentifier, data: DataTable) => {
@@ -37,7 +37,7 @@ Given("there are notes from Note {int} to Note {int}", (from: number, to: number
   const notes = Array(to - from + 1)
     .fill(0)
     .map((_, i) => {
-      return { topic: `Note ${i + from}` }
+      return { topicConstructor: `Note ${i + from}` }
     })
   start.testability().seedNotes(notes)
 })

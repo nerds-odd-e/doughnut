@@ -6,12 +6,12 @@ Feature: link note
   Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
-      | topic    | details           |
-      | Sedition | Incite violence |
-      | Sedation | Put to sleep    |
-      | Sedative | Sleep medicine  |
+      | topicConstructor | details         |
+      | Sedition         | Incite violence |
+      | Sedation         | Put to sleep    |
+      | Sedative         | Sleep medicine  |
 
-    @mockBrowserTime
+  @mockBrowserTime
   Scenario: View all linkable notes for a note when no link exists
     When I am creating link for note "Sedition"
     Then I should see the source note as "Sedition"

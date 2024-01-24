@@ -82,7 +82,7 @@ class TestabilityRestController {
   }
 
   static class SeedNote {
-    public String topic;
+    public String topicConstructor;
     @Setter private String details;
     @Setter private String testingParent;
     @Setter private Boolean skipReview;
@@ -95,7 +95,7 @@ class TestabilityRestController {
       Note note = Note.createNote(user, currentUTCTimestamp, new TextContent());
       NoteAccessories content = note.getNoteAccessories();
 
-      note.setTopic(topic);
+      note.setTopicConstructor(topicConstructor);
       note.setDetails(details);
       note.setUpdatedAt(currentUTCTimestamp);
       if (skipReview != null) {
@@ -131,7 +131,7 @@ class TestabilityRestController {
         NoteRepository noteRepository) {
       seedNotes.forEach(
           seed -> {
-            Note note = titleNoteMap.get(seed.topic);
+            Note note = titleNoteMap.get(seed.topicConstructor);
 
             if (Strings.isBlank(seed.testingParent)) {
               note.buildNotebookForHeadNote(ownership, user);
@@ -150,7 +150,8 @@ class TestabilityRestController {
 
     private void saveByOriginalOrder(
         Map<String, Note> titleNoteMap, ModelFactoryService modelFactoryService) {
-      seedNotes.forEach((seed -> modelFactoryService.save(titleNoteMap.get(seed.topic))));
+      seedNotes.forEach(
+          (seed -> modelFactoryService.save(titleNoteMap.get(seed.topicConstructor))));
     }
   }
 

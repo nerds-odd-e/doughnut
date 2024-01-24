@@ -7,10 +7,10 @@ Feature: Bazaar sharing
 
   Scenario: Contributing To Bazaar
     Given there are some notes for the current user:
-      | topic    | details                     | testingParent |
-      | Shape    | The form of something     |               |
-      | Square   | four equal straight sides | Shape         |
-      | Triangle | three sides shape         | Shape         |
+      | topicConstructor | details                   | testingParent |
+      | Shape            | The form of something     |               |
+      | Square           | four equal straight sides | Shape         |
+      | Triangle         | three sides shape         | Shape         |
     When I choose to share my notebook "Shape"
     Then I should see "Shape" is shared in the Bazaar
 

@@ -60,6 +60,10 @@ public class Note extends Thingy {
     return topic;
   }
 
+  public void setTopicConstructor(String value) {
+    this.topic = value;
+  }
+
   @Column(name = "updated_at")
   @Getter
   @Setter

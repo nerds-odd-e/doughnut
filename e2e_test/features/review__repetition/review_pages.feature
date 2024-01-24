@@ -4,10 +4,10 @@ Feature: Review Pages
   Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
-      | topic    | details           | pictureUrl  |
-      | Sedition | Incite violence |             |
-      | Sedation | Put to sleep    |             |
-      | Sedative | Sleep medicine  | a_slide.jpg |
+      | topicConstructor | details         | pictureUrl  |
+      | Sedition         | Incite violence |             |
+      | Sedation         | Put to sleep    |             |
+      | Sedative         | Sleep medicine  | a_slide.jpg |
     And there is "similar to" link between note "Sedition" and "Sedation"
 
   Scenario: Different review pages for different notes
@@ -16,7 +16,7 @@ Feature: Review Pages
       | single note  | Sedition | Incite violence             |
       | single note  | Sedation | Put to sleep                |
       | picture note | Sedative | Sleep medicine; a_slide.jpg |
-      | link         | Sedition | similar to; Sedation     |
+      | link         | Sedition | similar to; Sedation        |
       | initial done |          |                             |
 
   Scenario: Index page

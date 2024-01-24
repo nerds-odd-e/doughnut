@@ -6,13 +6,13 @@ Feature: see recent note update
     Given I am logged in as an existing user
     And I let the server to time travel to 100 hours ago
     And there are some notes for the current user:
-      | topic    | testingParent | details     |
-      | NoteBook |               |             |
-      | Note1    | NoteBook      |             |
-      | Note2    | NoteBook      |             |
-      | Note1.1  | Note1         | note1.1     |
-      | Note1.2  | Note1         | note1.2     |
-      | Note3    | NoteBook      |             |
+      | topicConstructor | testingParent | details |
+      | NoteBook         |               |         |
+      | Note1            | NoteBook      |         |
+      | Note2            | NoteBook      |         |
+      | Note1.1          | Note1         | note1.1 |
+      | Note1.2          | Note1         | note1.2 |
+      | Note3            | NoteBook      |         |
     And I let the server to time travel to 24 hours ago
 
   Scenario Outline: I should see the color of a newer note is fresher

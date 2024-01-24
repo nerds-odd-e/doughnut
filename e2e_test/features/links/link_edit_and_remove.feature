@@ -3,11 +3,11 @@ Feature: link edit and remove
   Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
-      | topic | skipReview | testingParent |
-      | Space | true       |               |
-      | Moon  | true       | Space         |
-      | Earth | true       | Space         |
-      | Mars  | true       | Space         |
+      | topicConstructor | skipReview | testingParent |
+      | Space            | true       |               |
+      | Moon             | true       | Space         |
+      | Earth            | true       | Space         |
+      | Mars             | true       | Space         |
     And there is "a part of" link between note "Moon" and "Earth"
 
   Scenario: change link type

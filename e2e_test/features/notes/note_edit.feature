@@ -5,16 +5,16 @@ Feature: Note Edit
   Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
-      | topic          | details               |
-      | LeSS in Action | An awesome training |
+      | topicConstructor | details             |
+      | LeSS in Action   | An awesome training |
 
   Scenario: Edit a note
     And I update note "LeSS in Action" to become:
-      | Topic     | Details             |
+      | Topic     | Details           |
       | Odd-e CSD | Our best training |
     Then I should see "Odd-e CSD" in the page
     And I should see these notes belonging to the user at the top level of all my notes
-      | topic     | details             |
+      | topic     | details           |
       | Odd-e CSD | Our best training |
 
   Scenario: Edit a note topic and edit details

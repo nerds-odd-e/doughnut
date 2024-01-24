@@ -47,10 +47,10 @@ Feature: associate wikidata ID to note
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Associate a new note with exisitng wikidata id
     Given there are some notes for the current user:
-      | topic   | wikidataId | testingParent |
-      | Animals |            |               |
-      | Dog     | Q123       | Animals       |
-      | Canine  | Q456       | Animals       |
+      | topicConstructor | wikidataId | testingParent |
+      | Animals          |            |               |
+      | Dog              | Q123       | Animals       |
+      | Canine           | Q456       | Animals       |
     And Wikidata.org has an entity "Q123" with label "Canine"
     And I associate the note "Canine" with wikidata id "Q123"
     Then I should see an error "Duplicate Wikidata ID Detected." on "Wikidata Id"

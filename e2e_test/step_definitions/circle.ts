@@ -67,7 +67,7 @@ When("I am on {string} circle page", (circleName) => {
 })
 
 When("There is a notebook {string} in circle {string}", (topic, circleName) => {
-  start.testability().seedNotes([{ topic }], "", circleName)
+  start.testability().seedNotes([{ topicConstructor: topic }], "", circleName)
 })
 
 When("someone of my circle deletes the {string} notebook", (noteTopic: string) => {

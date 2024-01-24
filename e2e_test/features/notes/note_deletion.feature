@@ -3,12 +3,12 @@ Feature: Note deletion
   Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
-      | topic          | testingParent  |
-      | LeSS in Action |                |
-      | team           | LeSS in Action |
-      | tech           | LeSS in Action |
-      | TDD            | tech           |
-      | CI System      | tech           |
+      | topicConstructor | testingParent  |
+      | LeSS in Action   |                |
+      | team             | LeSS in Action |
+      | tech             | LeSS in Action |
+      | TDD              | tech           |
+      | CI System        | tech           |
 
   Scenario: Delete a note
     When I delete note "TDD"
@@ -27,10 +27,10 @@ Feature: Note deletion
     And I delete note "tech" at 14:00
     When I undo "delete note"
     And I should see "My Notes/LeSS in Action/tech" with these children
-      | note-topic   |
-      | CI System    |
+      | note-topic |
+      | CI System  |
     When I undo "delete note" again
     And I should see "My Notes/LeSS in Action/tech" with these children
-      | note-topic   |
-      | CI System    |
-      | TDD          |
+      | note-topic |
+      | CI System  |
+      | TDD        |

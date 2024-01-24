@@ -12,21 +12,21 @@ Feature: Note creation/edit for a location
   @usingMockedWikidataService
   Scenario: New Note creation and wikidata is selected by user
     When I create a note belonging to "places":
-      | Topic     | Wikidata Id  |
-      | Singapore | Q334         |
+      | Topic     | Wikidata Id |
+      | Singapore | Q334        |
     Then the note details on the current page should be "Location: 1.3'N, 103.8'E"
 
   @usingMockedWikidataService
   Scenario: Existing Note wikidata edited by user
     When there are some notes for the current user:
-      | topic      | details        | testingParent |
-      | Singapore  | The red dot  | places        |
+      | topicConstructor | details     | testingParent |
+      | Singapore        | The red dot | places        |
     And I associate the note "Singapore" with wikidata id "Q334"
     Then the note details on the current page should be "Location: 1.3'N, 103.8'E\nThe red dot"
 
   @usingMockedWikidataService
   Scenario: A note can be created for a location with a map and identifying picture
     When I create a note belonging to "places":
-      | Topic     | Wikidata Id  |
-      | Singapore | Q334         |
+      | Topic     | Wikidata Id |
+      | Singapore | Q334        |
     Then a map pointing to lat: "1.3", lon: "103.8" is added to the note

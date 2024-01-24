@@ -72,7 +72,7 @@ Then("I initial review {string}", (noteTopic) => {
 })
 
 Then("I added and learned one note {string} on day {int}", (noteTopic: string, day: number) => {
-  start.testability().seedNotes([{ topic: noteTopic }])
+  start.testability().seedNotes([{ topicConstructor: noteTopic }])
   start.testability().backendTimeTravelTo(day, 8)
   cy.initialReviewNotes(noteTopic)
 })

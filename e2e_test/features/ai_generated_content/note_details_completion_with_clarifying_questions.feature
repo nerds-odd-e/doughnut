@@ -4,8 +4,8 @@ Feature: AI Asks Clarifying Questions When Auto-Generating Note Details
   Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
-      | topic   | details            |
-      | Sports  | Football is        |
+      | topicConstructor | details     |
+      | Sports           | Football is |
     And OpenAI service can create thread and run with id "thread-111" when requested
 
   @usingMockedOpenAiService
@@ -19,9 +19,9 @@ Feature: AI Asks Clarifying Questions When Auto-Generating Note Details
     Then the note details on the current page should be "<note details>"
 
     Examples:
-      | respond               | note details                                   |
-      | answer "European"     | Football is originated from England.           |
-      | respond with "cancel" | Football is                                    |
+      | respond               | note details                         |
+      | answer "European"     | Football is originated from England. |
+      | respond with "cancel" | Football is                          |
 
   @usingMockedOpenAiService
   Scenario: Managing Extended Clarification Dialogue
