@@ -189,46 +189,48 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   noteTextContentChanger() {
-    const changer = (
+    const changer = async (
       noteId: number,
       newValue: Generated.TextContent,
       errorHander: (errs: unknown) => void,
     ) => {
-      this.updateTextContent(noteId, newValue).catch(errorHander);
+      try {
+        const currentNote = this.storage.refOfNoteRealm(noteId).value?.note;
+        const field =
+          currentNote?.topic !== newValue.topic ? "edit topic" : "edit details";
+        const oldValue =
+          currentNote?.topic !== newValue.topic
+            ? currentNote?.topic
+            : currentNote?.details;
+        const value =
+          currentNote?.topic !== newValue.topic
+            ? newValue.topic
+            : newValue.details;
+        if (currentNote) {
+          const old: Generated.TextContent = {
+            topic: currentNote.topic,
+            details: currentNote.details,
+          };
+
+          if (
+            old.topic === newValue.topic &&
+            old.details === newValue.details
+          ) {
+            return;
+          }
+
+          this.noteEditingHistory.addEditingToUndoHistory(
+            noteId,
+            field,
+            oldValue ?? "",
+          );
+        }
+        await this.updateTextContentWithoutUndo(noteId, field, value);
+      } catch (e) {
+        errorHander(e);
+      }
     };
     return new NoteTextContentChanger(debounce(changer, 1000));
-  }
-
-  async updateTextContent(
-    noteId: Doughnut.ID,
-    newValue: Omit<Generated.TextContent, "updatedAt">,
-  ) {
-    const currentNote = this.storage.refOfNoteRealm(noteId).value?.note;
-    const field =
-      currentNote?.topic !== newValue.topic ? "edit topic" : "edit details";
-    const oldValue =
-      currentNote?.topic !== newValue.topic
-        ? currentNote?.topic
-        : currentNote?.details;
-    const value =
-      currentNote?.topic !== newValue.topic ? newValue.topic : newValue.details;
-    if (currentNote) {
-      const old: Generated.TextContent = {
-        topic: currentNote.topic,
-        details: currentNote.details,
-      };
-
-      if (old.topic === newValue.topic && old.details === newValue.details) {
-        return;
-      }
-
-      this.noteEditingHistory.addEditingToUndoHistory(
-        noteId,
-        field,
-        oldValue ?? "",
-      );
-    }
-    await this.updateTextContentWithoutUndo(noteId, field, value);
   }
 
   async updateTextField(
