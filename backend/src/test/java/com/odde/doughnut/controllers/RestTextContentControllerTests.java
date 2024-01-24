@@ -5,8 +5,9 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.json.NoteRealm;
+import com.odde.doughnut.controllers.json.NoteUpdateDetailsDTO;
+import com.odde.doughnut.controllers.json.NoteUpdateTopicDTO;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.TextContent;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -31,37 +32,54 @@ class RestTextContentControllerTests {
   private UserModel userModel;
   RestTextContentController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
+  Note note;
 
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
+    note = makeMe.aNote("new").creatorAndOwner(userModel).please();
     controller = new RestTextContentController(modelFactoryService, userModel, testabilitySettings);
   }
 
   @Nested
-  class updateNoteTest {
-    Note note;
-    TextContent textContent = new TextContent();
+  class updateNoteTopticTest {
+    NoteUpdateTopicDTO noteUpdateTopicDTO = new NoteUpdateTopicDTO();
 
     @BeforeEach
     void setup() {
-      note = makeMe.aNote("new").creatorAndOwner(userModel).please();
-      textContent.setTopic("new title");
-      textContent.setDetails("new description");
+      noteUpdateTopicDTO.setTopicConstructor("new title");
     }
 
     @Test
-    void shouldBeAbleToSaveNoteWhenValid() throws UnexpectedNoAccessRightException, IOException {
-      NoteRealm response = controller.updateNote(note, textContent);
+    void shouldBeAbleToSaveNoteTopic() throws UnexpectedNoAccessRightException, IOException {
+      NoteRealm response = controller.updateNoteTopicConstructor(note, noteUpdateTopicDTO);
       assertThat(response.getId(), equalTo(note.getId()));
-      assertThat(response.getNote().getDetails(), equalTo("new description"));
+      assertThat(response.getNote().getTopic(), equalTo("new title"));
     }
 
     @Test
     void shouldNotAllowOthersToChange() {
       note = makeMe.aNote("another").creatorAndOwner(makeMe.aUser().please()).please();
       assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.updateNote(note, textContent));
+          UnexpectedNoAccessRightException.class,
+          () -> controller.updateNoteTopicConstructor(note, noteUpdateTopicDTO));
+    }
+  }
+
+  @Nested
+  class updateNoteDetailsTest {
+    NoteUpdateDetailsDTO noteUpdateDetailsDTO = new NoteUpdateDetailsDTO();
+
+    @BeforeEach
+    void setup() {
+      noteUpdateDetailsDTO.setDetails("new details");
+    }
+
+    @Test
+    void shouldBeAbleToSaveNoteWhenValid() throws UnexpectedNoAccessRightException, IOException {
+      NoteRealm response = controller.updateNoteDetails(note, noteUpdateDetailsDTO);
+      assertThat(response.getId(), equalTo(note.getId()));
+      assertThat(response.getNote().getDetails(), equalTo("new details"));
     }
   }
 }

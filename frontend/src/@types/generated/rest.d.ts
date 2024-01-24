@@ -102,9 +102,8 @@ declare namespace Generated {
         reverse: Link[];
     }
 
-    interface NoteCreationDTO {
+    interface NoteCreationDTO extends NoteUpdateTopicDTO {
         linkTypeToParent?: LinkType;
-        topicConstructor: string;
         wikidataId?: string;
     }
 
@@ -127,6 +126,14 @@ declare namespace Generated {
         children: Note[];
         note: Note;
         notePosition: NotePositionViewedByUser;
+    }
+
+    interface NoteUpdateDetailsDTO {
+        details: string;
+    }
+
+    interface NoteUpdateTopicDTO {
+        topicConstructor: string;
     }
 
     interface NotebookViewedByUser {

@@ -145,27 +145,14 @@ public class Note extends Thingy {
   @Getter
   private final List<Note> children = new ArrayList<>();
 
-  public static Note createNote(
-      User user,
-      Timestamp currentUTCTimestamp,
-      @Size(min = 1, max = Note.MAX_TITLE_LENGTH) String topicConstructor) {
+  public static Note createNote(User user, Timestamp currentUTCTimestamp, String topicConstructor) {
     final Note note = new Note();
-    note.updateTopicConstructor(currentUTCTimestamp, topicConstructor);
+    note.setUpdatedAt(currentUTCTimestamp);
+    note.setTopicConstructor(topicConstructor);
     note.setUpdatedAt(currentUTCTimestamp);
 
     Thing.createThing(user, note, currentUTCTimestamp);
     return note;
-  }
-
-  public void updateTopicConstructor(Timestamp currentUTCTimestamp, String value) {
-    setUpdatedAt(currentUTCTimestamp);
-    setTopicConstructor(value);
-  }
-
-  public void updateTextContent(Timestamp currentUTCTimestamp, TextContent textContent) {
-    setUpdatedAt(currentUTCTimestamp);
-    setTopicConstructor(textContent.getTopic());
-    setDetails(textContent.getDetails());
   }
 
   @Override

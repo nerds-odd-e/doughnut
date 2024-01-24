@@ -1,20 +1,13 @@
 package com.odde.doughnut.controllers.json;
 
 import com.odde.doughnut.entities.Link.LinkType;
-import com.odde.doughnut.entities.Note;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.lang.Nullable;
 
-public class NoteCreationDTO {
+public class NoteCreationDTO extends NoteUpdateTopicDTO {
   @Getter @Setter @Nullable public LinkType linkTypeToParent;
-
-  @Size(min = 1, max = Note.MAX_TITLE_LENGTH)
-  @Getter
-  @Setter
-  private String topicConstructor = "";
 
   @Getter
   @Setter
