@@ -12,7 +12,11 @@ describe("storeUndoCommand", () => {
   describe("addEditingToUndoHistory", () => {
     const histories = new NoteEditingHistory();
     it("should push textContent into store state noteUndoHistories ", () => {
-      histories.addEditingToUndoHistory(note.id, textContent);
+      histories.addEditingToUndoHistory(
+        note.id,
+        "edit topic",
+        textContent.topic,
+      );
 
       expect(histories.noteUndoHistories.length).toEqual(1);
     });
@@ -23,7 +27,11 @@ describe("storeUndoCommand", () => {
     const histories = new NoteEditingHistory();
 
     beforeEach(() => {
-      histories.addEditingToUndoHistory(note.id, textContent);
+      histories.addEditingToUndoHistory(
+        note.id,
+        "edit details",
+        textContent.details,
+      );
       initialUndoCount = histories.noteUndoHistories.length;
     });
 

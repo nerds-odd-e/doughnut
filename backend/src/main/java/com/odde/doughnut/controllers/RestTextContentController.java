@@ -4,7 +4,6 @@ import com.odde.doughnut.controllers.json.NoteRealm;
 import com.odde.doughnut.controllers.json.NoteUpdateDetailsDTO;
 import com.odde.doughnut.controllers.json.NoteUpdateTopicDTO;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.TextContent;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteViewer;
@@ -38,19 +37,6 @@ class RestTextContentController {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
-  }
-
-  @PatchMapping(path = "/{note}")
-  @Transactional
-  public NoteRealm updateTextContent(
-      @PathVariable(name = "note") Note note, @Valid @ModelAttribute TextContent textContent)
-      throws UnexpectedNoAccessRightException {
-    return updateNote(
-        note,
-        n -> {
-          n.setTopicConstructor(textContent.getTopic());
-          n.setDetails(textContent.getDetails());
-        });
   }
 
   @PatchMapping(path = "/{note}/topic-constructor")

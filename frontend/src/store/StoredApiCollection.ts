@@ -196,37 +196,29 @@ export default class StoredApiCollection implements StoredApi {
     ) => {
       this.updateTextContent(noteId, newValue).catch(errorHander);
     };
-
     return new NoteTextContentChanger(debounce(changer, 1000));
   }
 
   async updateTextContent(
     noteId: Doughnut.ID,
-    noteContentData: Omit<Generated.TextContent, "updatedAt">,
+    newValue: Omit<Generated.TextContent, "updatedAt">,
   ) {
     const currentNote = this.storage.refOfNoteRealm(noteId).value?.note;
     const field =
-      currentNote?.topic !== noteContentData.topic
-        ? "edit topic"
-        : "edit details";
+      currentNote?.topic !== newValue.topic ? "edit topic" : "edit details";
     const oldValue =
-      currentNote?.topic !== noteContentData.topic
+      currentNote?.topic !== newValue.topic
         ? currentNote?.topic
         : currentNote?.details;
     const value =
-      currentNote?.topic !== noteContentData.topic
-        ? noteContentData.topic
-        : noteContentData.details;
+      currentNote?.topic !== newValue.topic ? newValue.topic : newValue.details;
     if (currentNote) {
       const old: Generated.TextContent = {
         topic: currentNote.topic,
         details: currentNote.details,
       };
 
-      if (
-        old.topic === noteContentData.topic &&
-        old.details === noteContentData.details
-      ) {
+      if (old.topic === newValue.topic && old.details === newValue.details) {
         return;
       }
 
