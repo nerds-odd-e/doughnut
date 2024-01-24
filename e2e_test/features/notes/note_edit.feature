@@ -22,8 +22,8 @@ Feature: Note Edit
     And I should see "Odd-e CSD" in the page
     And I update note "Odd-e CSD" details from "An awesome training" to become "A super awesome training"
     And I should see "A super awesome training" in the page
-    When I undo "editing"
+    When I undo "edit details"
     Then I should see "An awesome training" in the page
-    When I undo "editing" again
+    When I undo "edit topic" again
     Then I should see "LeSS in Action" in the page
     And there should be no more undo to do
