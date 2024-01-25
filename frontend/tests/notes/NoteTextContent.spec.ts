@@ -7,7 +7,6 @@ import helper from "../helpers";
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
-
 describe("in place edit on title", () => {
   const note = makeMe.aNote.topic("Dummy Title").please();
   const mountComponent = (
