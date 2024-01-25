@@ -82,7 +82,7 @@ public class Note extends Thingy {
     if (this.thing != null) this.thing.setDeletedAt(value);
   }
 
-  @OneToOne(fetch = FetchType.LAZY)
+  @OneToOne
   @JoinColumn(name = "parent_id", referencedColumnName = "id")
   @JsonIgnore
   @Getter
