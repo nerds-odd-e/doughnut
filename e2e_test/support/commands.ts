@@ -199,13 +199,8 @@ Cypress.Commands.add("expectNoteCards", (expectedCards: string[]) => {
   })
 })
 
-Cypress.Commands.add("navigateToChild", (noteTopic) => {
-  start.assumeNotePage().navigateToChild(noteTopic)
-})
-
 Cypress.Commands.add("navigateToNotePage", (notePath: NotePath) => {
-  start.routerToNotebooksPage()
-  notePath.path.forEach((noteTopic) => cy.navigateToChild(noteTopic))
+  start.routerToNotebooksPage().navigateToPath(notePath)
 })
 
 // jumptoNotePage is faster than navigateToNotePage

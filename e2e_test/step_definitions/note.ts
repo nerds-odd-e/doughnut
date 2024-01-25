@@ -1,3 +1,4 @@
+import { assumeNotePage } from './../start/pageObjects/notePage';
 /// <reference types="cypress" />
 /// <reference types="../support" />
 // @ts-check
@@ -192,7 +193,7 @@ When("I navigate to {notepath} note", (notePath: NotePath) => {
 })
 
 When("I click the child note {string}", (noteTopic) => {
-  cy.navigateToChild(noteTopic)
+  start.assumeNotePage().navigateToChild(noteTopic)
 })
 
 When("I move note {string} left", (noteTopic) => {
