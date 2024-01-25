@@ -144,9 +144,7 @@ When("I delete note {string}", (noteTopic: string) => {
 
 When("I create a sibling note of {string}:", (noteTopic: string, data: DataTable) => {
   expect(data.hashes().length).to.equal(1)
-  cy.findNoteTopic(noteTopic)
-  cy.addSiblingNoteButton().click()
-  cy.submitNoteCreationFormSuccessfully(data.hashes()[0])
+  start.assumeNotePage(noteTopic).addingSiblingNote().createNoteWithAttributes(data.hashes()[0]!)
 })
 
 When("I should see that the note creation is not successful", () => {

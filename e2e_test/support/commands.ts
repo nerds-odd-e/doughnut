@@ -28,7 +28,6 @@ import "@testing-library/cypress/add-commands"
 import "cypress-file-upload"
 import start from "../start"
 import "./string.extensions"
-import noteCreationForm from "../start/pageObjects/noteForms/noteCreationForm"
 
 Cypress.Commands.add("pageIsNotLoading", () => {
   cy.get(".loading-bar").should("not.exist")
@@ -72,26 +71,6 @@ Cypress.Commands.add("expectBreadcrumb", (items: string) => {
   cy.get(".breadcrumb").within(() =>
     items.commonSenseSplit(", ").forEach((noteTopic: string) => cy.findByText(noteTopic)),
   )
-})
-
-Cypress.Commands.add("submitNoteCreationFormSuccessfully", (noteAttributes) => {
-  const {
-    Topic,
-    Details,
-    ["Link Type To Parent"]: linkTypeToParent,
-    ["Wikidata Id"]: wikidataId,
-    ...remainingAttrs
-  } = noteAttributes
-  noteCreationForm.createNote(Topic, linkTypeToParent, wikidataId)
-
-  if (!!Details) {
-    cy.inPlaceEdit({ Details })
-  }
-  if (Object.keys(remainingAttrs).length > 0) {
-    cy.openAndSubmitNoteAccessoriesFormWith(Topic, remainingAttrs)
-  }
-
-  cy.dialogDisappeared()
 })
 
 Cypress.Commands.add(
@@ -152,10 +131,6 @@ Cypress.Commands.add(
     }
   },
 )
-
-Cypress.Commands.add("addSiblingNoteButton", () => {
-  cy.findByRole("button", { name: "Add Sibling Note" })
-})
 
 Cypress.Commands.add("clickRadioByLabel", (labelText) => {
   cy.findByText(labelText, { selector: "label" }).click({ force: true })

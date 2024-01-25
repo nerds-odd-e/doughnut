@@ -31,8 +31,8 @@ Feature: Nested Note creation
       | Topic        |
       | Re-quirement |
     When I create a sibling note of "Re-quirement":
-      | Topic     | Details                       | Link Type To Parent |
-      | Re-Design | Re-think the way we do design | a specialization of |
+      | Topic     | Link Type To Parent |
+      | Re-Design | a specialization of |
     And I should see "My Notes/LeSS in Action" with these children
       | note-topic   |
       | Re-quirement |

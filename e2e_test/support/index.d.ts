@@ -5,7 +5,6 @@
 declare namespace Cypress {
   interface Chainable<Subject = any> {
     dismissLastErrorMessage(): Chainable<any>
-    addSiblingNoteButton(): Chainable<any>
     cleanDownloadFolder(): Chainable<any>
     clickButtonOnCardBody(noteTopic: any, buttonTitle: any): Chainable<any>
     clickLinkNob(target: string): Chainable<any>
@@ -61,7 +60,6 @@ declare namespace Cypress {
     shouldSeeQuizWithOptions(questionParts: any, options: any): Chainable<any>
     startSearching(): Chainable<any>
     subscribeToNotebook(notebookTitle: string, dailyLearningCount: string): Chinputainable<any>
-    submitNoteCreationFormSuccessfully(noteAttributes: any): Chainable<any>
     undoLast(undoThpe: string): Chainable<any>
     unsubscribeFromNotebook(noteTopic: string): Chainable<any>
     yesIRemember(): Chainable<any>
