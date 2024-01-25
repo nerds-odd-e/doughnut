@@ -1,5 +1,6 @@
 import { assumeChatAboutNotePage } from "./chatAboutNotePage"
 import submittableForm from "../submittableForm"
+import noteCreationForm from "./noteForms/noteCreationForm"
 
 export const assumeNotePage = (noteTopic?: string) => {
   if (noteTopic) {
@@ -41,6 +42,11 @@ export const assumeNotePage = (noteTopic?: string) => {
     },
     startSearchingAndLinkNote() {
       this.toolbarButton("search and link note").click()
+    },
+    addingChildNote() {
+      cy.pageIsNotLoading()
+      this.toolbarButton("Add Child Note").click()
+      return noteCreationForm
     },
     aiGenerateImage() {
       clickNotePageMoreOptionsButton("Generate Image with DALL-E")

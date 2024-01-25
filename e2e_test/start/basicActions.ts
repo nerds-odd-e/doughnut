@@ -15,7 +15,7 @@ export default {
   assumeAdminDashboardPage,
   assumeClarifyingQuestionDialog,
   routerToNotebooksPage,
-  // jumptoNotePage is faster than navigateToNotePage
+  // jumptoNotePage is faster than navigateToPage
   //    it uses the note id memorized when creating them with testability api
   jumpToNotePage: (noteTopic: string, forceLoadPage = false) => {
     testability()

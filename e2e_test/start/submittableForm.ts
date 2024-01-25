@@ -1,5 +1,5 @@
 const submittableForm = {
-  submitWith: (noteAttributes: Record<string, string>) => {
+  submitWith: (noteAttributes: Record<string, string | undefined>) => {
     for (const propName in noteAttributes) {
       const value = noteAttributes[propName]
       if (value) {

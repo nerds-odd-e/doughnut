@@ -1,4 +1,3 @@
-import { assumeNotePage } from './../start/pageObjects/notePage';
 /// <reference types="cypress" />
 /// <reference types="../support" />
 // @ts-check
@@ -105,29 +104,26 @@ When("I update note {string} with details {string}", (noteTopic: string, newDeta
 
 When("I create a note belonging to {string}:", (noteTopic: string, data: DataTable) => {
   expect(data.hashes().length).to.equal(1)
-  start.jumpToNotePage(noteTopic)
-  cy.clickAddChildNoteButton()
+  start.jumpToNotePage(noteTopic).addingChildNote()
   cy.submitNoteCreationFormSuccessfully(data.hashes()[0])
 })
 
 When("I try to create a note belonging to {string}:", (noteTopic: string, data: DataTable) => {
   expect(data.hashes().length).to.equal(1)
-  start.jumpToNotePage(noteTopic)
-  cy.clickAddChildNoteButton()
-
   const {
     Topic,
     ["Link Type To Parent"]: linkTypeToParent,
     ["Wikidata Id"]: wikidataId,
     ...remainingAttrs
-  } = data.hashes()[0]
-  noteCreationForm.createNote(Topic, linkTypeToParent, wikidataId)
+  } = data.hashes()[0]!
   expect(Object.keys(remainingAttrs)).to.have.lengthOf(0)
+
+  start.jumpToNotePage(noteTopic).addingChildNote()
+  noteCreationForm.createNote(Topic!, linkTypeToParent, wikidataId)
 })
 
 When("I am creating a note under {notepath}", (notePath: NotePath) => {
-  cy.navigateToNotePage(notePath)
-  cy.clickAddChildNoteButton()
+  start.routerToNotebooksPage().navigateToPath(notePath).addingChildNote()
 })
 
 Then("I should see {string} in breadcrumb", (noteTopics: string) => {
@@ -148,7 +144,8 @@ Then(
 )
 
 Then("I should see {notepath} with these children", (notePath: NotePath, data: DataTable) => {
-  cy.navigateToNotePage(notePath).then(() => cy.expectNoteCards(data.hashes()))
+  start.routerToNotebooksPage().navigateToPath(notePath)
+  cy.expectNoteCards(data.hashes())
 })
 
 When("I delete notebook {string}", (noteTopic: string) => {
@@ -189,14 +186,14 @@ Then("I should not see note {string} at the top level of all my notes", (noteTop
 })
 
 When("I navigate to {notepath} note", (notePath: NotePath) => {
-  cy.navigateToNotePage(notePath)
+  start.routerToNotebooksPage().navigateToPath(notePath)
 })
 
-When("I click the child note {string}", (noteTopic) => {
+When("I click the child note {string}", (noteTopic: string) => {
   start.assumeNotePage().navigateToChild(noteTopic)
 })
 
-When("I move note {string} left", (noteTopic) => {
+When("I move note {string} left", (noteTopic: string) => {
   start.jumpToNotePage(noteTopic)
   cy.findByText("Move This Note").click()
   cy.findByRole("button", { name: "Move Left" }).click()

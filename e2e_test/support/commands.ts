@@ -26,7 +26,6 @@
 // @ts-check
 import "@testing-library/cypress/add-commands"
 import "cypress-file-upload"
-import NotePath from "./NotePath"
 import start from "../start"
 import "./string.extensions"
 import noteCreationForm from "../start/pageObjects/noteForms/noteCreationForm"
@@ -199,11 +198,7 @@ Cypress.Commands.add("expectNoteCards", (expectedCards: string[]) => {
   })
 })
 
-Cypress.Commands.add("navigateToNotePage", (notePath: NotePath) => {
-  start.routerToNotebooksPage().navigateToPath(notePath)
-})
-
-// jumptoNotePage is faster than navigateToNotePage
+// jumptoNotePage is faster than navigateToPath
 //    it uses the note id memorized when creating them with testability api
 Cypress.Commands.add("jumpToNotePage", (noteTopic: string, forceLoadPage = false) => {
   start
