@@ -62,7 +62,6 @@ declare namespace Cypress {
     shouldSeeQuizWithOptions(questionParts: any, options: any): Chainable<any>
     startSearching(): Chainable<any>
     subscribeToNotebook(notebookTitle: string, dailyLearningCount: string): Chinputainable<any>
-    legacysubmitNoteCreationFormWith(title: any, details: any, noteAttributes: any): Chainable<any>
     submitNoteCreationFormSuccessfully(noteAttributes: any): Chainable<any>
     undoLast(undoThpe: string): Chainable<any>
     unsubscribeFromNotebook(noteTopic: string): Chainable<any>

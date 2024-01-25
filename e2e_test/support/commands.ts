@@ -84,18 +84,14 @@ Cypress.Commands.add("submitNoteCreationFormSuccessfully", (noteAttributes) => {
   } = noteAttributes
   noteCreationForm.createNote(Topic, linkTypeToParent, wikidataId)
 
-  cy.legacysubmitNoteCreationFormWith(Topic, Details, remainingAttrs)
+  if (!!Details) {
+    cy.inPlaceEdit({ Details })
+  }
+  if (Object.keys(remainingAttrs).length > 0) {
+    cy.openAndSubmitNoteAccessoriesFormWith(Topic, remainingAttrs)
+  }
+
   cy.dialogDisappeared()
-})
-
-Cypress.Commands.add("legacysubmitNoteCreationFormWith", (topic, details, noteAttributes) => {
-  if (!!details) {
-    cy.inPlaceEdit({ Details: details })
-  }
-
-  if (Object.keys(noteAttributes).length > 0) {
-    cy.openAndSubmitNoteAccessoriesFormWith(topic, noteAttributes)
-  }
 })
 
 Cypress.Commands.add(
