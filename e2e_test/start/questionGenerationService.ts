@@ -1,4 +1,4 @@
-import mock_services from "./mock_services/index"
+import mock_services from "./mock_services"
 
 export const questionGenerationService = () => ({
   resetAndStubAskingMCQ: (record: Record<string, string>) => {

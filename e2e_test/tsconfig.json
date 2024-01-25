@@ -17,7 +17,8 @@
       "node_modules/@badeball/cypress-cucumber-preprocessor"
     ],
     "paths": {
-      "@badeball/cypress-cucumber-preprocessor": ["node_modules/@badeball/cypress-cucumber-preprocessor"]
+      "@badeball/cypress-cucumber-preprocessor": ["node_modules/@badeball/cypress-cucumber-preprocessor"],
+      "@badeball/cypress-cucumber-preprocessor/esbuild": ["node_modules/@badeball/cypress-cucumber-preprocessor/dist/subpath-entrypoints/esbuild.d.ts"]
     }
   },
   "exclude": [
