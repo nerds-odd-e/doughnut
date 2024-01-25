@@ -19,14 +19,15 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { PropType, defineComponent } from "vue";
 import Card from "./Card.vue";
 
-export default {
+export default defineComponent({
   props: {
-    notes: Array,
+    notes: { type: Array as PropType<Generated.Note[]>, required: true },
     columns: { type: Number, default: 4 },
   },
   components: { Card },
-};
+});
 </script>

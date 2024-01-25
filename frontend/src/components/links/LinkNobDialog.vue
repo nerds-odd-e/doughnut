@@ -3,7 +3,7 @@
   <div v-if="!!inverseIcon">
     Source:
     <strong>
-      <NoteTopicWithLink
+      <NoteTopicConstructorWithLink
         class="link-title"
         v-bind="{ note: link.sourceNote }"
       />
@@ -20,7 +20,7 @@
   <div v-if="!inverseIcon">
     Target:
     <strong>
-      <NoteTopicWithLink
+      <NoteTopicConstructorWithLink
         class="link-title"
         v-bind="{ note: link.targetNote }"
       />
@@ -33,7 +33,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import LinkTypeSelect from "./LinkTypeSelect.vue";
-import NoteTopicWithLink from "../notes/NoteTopicWithLink.vue";
+import NoteTopicConstructorWithLink from "../notes/NoteTopicConstructorWithLink.vue";
 import usePopups from "../commons/Popups/usePopups";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
@@ -56,7 +56,7 @@ export default defineComponent({
   emits: ["closeDialog"],
   components: {
     LinkTypeSelect,
-    NoteTopicWithLink,
+    NoteTopicConstructorWithLink,
   },
   data() {
     return {
