@@ -28,7 +28,7 @@ module.exports = {
     tsconfigRootDir: __dirname
   },
   ignorePatterns: [
-    "tsconfig.cypress.json",
+    "tsconfig.json",
     ".eslintrc.cjs",
     "config/ci.ts",
     "config/common.ts"
