@@ -18,7 +18,7 @@ Feature: Nested Note Create with wikidata
 
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Create a new note with invalid wikidata id
-    When I try to create a note belonging to "Animals":
+    When I create a note belonging to "Animals":
       | Topic | Wikidata Id |
       | snake | Q12345R     |
     Then I should see an error "The wikidata Id should be Q<numbers>" on "Wikidata Id"
@@ -38,7 +38,7 @@ Feature: Nested Note Create with wikidata
       | topicConstructor | wikidataId | testingParent |
       | Star             |            |               |
       | Sun              | Q123       | Star          |
-    When I try to create a note belonging to "Star":
+    When I create a note belonging to "Star":
       | Topic | Wikidata Id |
       | Solar | Q123        |
     Then I should see an error "Duplicate Wikidata ID Detected." on "Wikidata Id"

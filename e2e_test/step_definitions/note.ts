@@ -11,7 +11,6 @@ import {
 } from "@badeball/cypress-cucumber-preprocessor"
 import NotePath from "../support/NotePath"
 import "../support/string.extensions"
-import noteCreationForm from "../start/pageObjects/noteForms/noteCreationForm"
 import start from "../start"
 
 defineParameterType({
@@ -101,22 +100,7 @@ When("I update note {string} with details {string}", (noteTopic: string, newDeta
 
 When("I create a note belonging to {string}:", (noteTopic: string, data: DataTable) => {
   expect(data.hashes().length).to.equal(1)
-  start.jumpToNotePage(noteTopic).addingChildNote()
-  cy.submitNoteCreationFormSuccessfully(data.hashes()[0])
-})
-
-When("I try to create a note belonging to {string}:", (noteTopic: string, data: DataTable) => {
-  expect(data.hashes().length).to.equal(1)
-  const {
-    Topic,
-    ["Link Type To Parent"]: linkTypeToParent,
-    ["Wikidata Id"]: wikidataId,
-    ...remainingAttrs
-  } = data.hashes()[0]!
-  expect(Object.keys(remainingAttrs)).to.have.lengthOf(0)
-
-  start.jumpToNotePage(noteTopic).addingChildNote()
-  noteCreationForm.createNote(Topic!, linkTypeToParent, wikidataId)
+  start.jumpToNotePage(noteTopic).addingChildNote().createNoteWithAttributes(data.hashes()[0]!)
 })
 
 When("I am creating a note under {notepath}", (notePath: NotePath) => {
