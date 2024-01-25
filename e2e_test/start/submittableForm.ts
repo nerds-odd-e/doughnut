@@ -1,4 +1,4 @@
-const submittableForm = () => ({
+const submittableForm = {
   submitWith: (noteAttributes: Record<string, string>) => {
     for (const propName in noteAttributes) {
       const value = noteAttributes[propName]
@@ -8,6 +8,6 @@ const submittableForm = () => ({
     }
     cy.get('input[value="Submit"]').click()
   },
-})
+}
 
 export default submittableForm

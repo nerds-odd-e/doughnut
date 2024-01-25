@@ -11,7 +11,7 @@ export const assumeNotePage = (noteTopic?: string) => {
     return {
       click: () => {
         getButton().click()
-        return { ...submittableForm() }
+        return { ...submittableForm }
       },
       shouldNotExist: () => getButton().should("not.exist"),
     }

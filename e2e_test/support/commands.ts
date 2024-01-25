@@ -29,6 +29,7 @@ import "cypress-file-upload"
 import NotePath from "./NotePath"
 import start from "../start/index"
 import "./string.extensions"
+import noteCreationForm from "../start/pageObjects/noteForms/noteCreationForm"
 
 Cypress.Commands.add("pageIsNotLoading", () => {
   cy.get(".loading-bar").should("not.exist")
@@ -84,11 +85,7 @@ Cypress.Commands.add("submitNoteCreationFormWith", (noteAttributes) => {
   delete noteAttributes["Link Type To Parent"]
   const { Topic, Details, ["Wikidata Id"]: wikidataId, ...remainingAttrs } = noteAttributes
 
-  start.submittableForm().submitWith({
-    Topic,
-    "Link Type To Parent": linkTypeToParent,
-    "Wikidata Id": wikidataId,
-  })
+  noteCreationForm.createNote(Topic, linkTypeToParent, wikidataId)
 
   if (!!Details) {
     if (!!Topic) {
