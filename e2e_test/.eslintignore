@@ -1,0 +1,6 @@
+tsconfig.json
+components.d.ts
+node_modules
+.git
+.github
+*.md

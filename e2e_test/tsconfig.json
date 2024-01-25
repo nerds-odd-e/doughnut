@@ -1,0 +1,35 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "node16",
+    "baseUrl": "../e2e_test",
+    "lib": [
+      "es2022",
+      "dom",
+      "dom.iterable"
+    ],
+    "typeRoots": [
+      "types",
+      "node_modules",
+      "node_modules/@types",
+      "node_modules/@testing-library",
+      "node_modules/@badeball/cypress-cucumber-preprocessor"
+    ],
+    "paths": {
+      "@badeball/cypress-cucumber-preprocessor": ["node_modules/@badeball/cypress-cucumber-preprocessor"]
+    }
+  },
+  "exclude": [
+    "cypress.config.ts",
+    "config/ci.ts",
+    "config/common.ts",
+    "cypress",
+    "node_modules"
+  ],
+  "include": [
+    "**/*.ts",
+    "**/*.js",
+    "**/*.cjs"
+  ]
+}
