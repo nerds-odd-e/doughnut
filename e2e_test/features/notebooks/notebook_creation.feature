@@ -5,7 +5,7 @@ Feature: Notebook creation
 
   Scenario: Create two new notebooks
     When I create notebooks with:
-      | Topic    | Details           | Upload Picture    | Picture Url | Picture Mask |
+      | Topic    | Details         | Upload Picture    | Picture Url | Picture Mask |
       | Sedation | Put to sleep    | example-large.png |             | 20 40 70 30  |
       | Sedition | Incite violence |                   | a_slide.jpg |              |
     Then I should see these notes belonging to the user at the top level of all my notes

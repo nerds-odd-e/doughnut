@@ -88,9 +88,6 @@ Cypress.Commands.add("submitNoteCreationFormWith", (noteAttributes) => {
   noteCreationForm.createNote(Topic, linkTypeToParent, wikidataId)
 
   if (!!Details) {
-    if (!!Topic) {
-      cy.findByText(Topic) // the creation has to be successful before continuing to edit the details
-    }
     cy.inPlaceEdit({ Details })
   }
 
