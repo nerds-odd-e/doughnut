@@ -81,9 +81,13 @@ Cypress.Commands.add("submitNoteCreationFormSuccessfully", (noteAttributes) => {
 })
 
 Cypress.Commands.add("submitNoteCreationFormWith", (noteAttributes) => {
-  const linkTypeToParent = noteAttributes["Link Type To Parent"]
-  delete noteAttributes["Link Type To Parent"]
-  const { Topic, Details, ["Wikidata Id"]: wikidataId, ...remainingAttrs } = noteAttributes
+  const {
+    Topic,
+    Details,
+    ["Link Type To Parent"]: linkTypeToParent,
+    ["Wikidata Id"]: wikidataId,
+    ...remainingAttrs
+  } = noteAttributes
 
   noteCreationForm.createNote(Topic, linkTypeToParent, wikidataId)
 
