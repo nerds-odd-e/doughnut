@@ -23,6 +23,10 @@ export const assumeNotePage = (noteTopic?: string) => {
   }
 
   return {
+    navigateToChild: (noteTopic: string) => {
+      cy.findCardTitle(noteTopic).click()
+      return assumeNotePage(noteTopic)
+    },
     findNoteDetails: (expected: string) => {
       expected.split("\\n").forEach((line) => cy.get("[role=details]").should("contain", line))
     },

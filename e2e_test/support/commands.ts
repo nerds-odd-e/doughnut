@@ -200,8 +200,7 @@ Cypress.Commands.add("expectNoteCards", (expectedCards: string[]) => {
 })
 
 Cypress.Commands.add("navigateToChild", (noteTopic) => {
-  cy.findCardTitle(noteTopic).click()
-  cy.findNoteTopic(noteTopic)
+  start.assumeNotePage().navigateToChild(noteTopic)
 })
 
 Cypress.Commands.add("navigateToNotePage", (notePath: NotePath) => {
