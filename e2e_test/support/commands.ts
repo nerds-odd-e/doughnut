@@ -27,7 +27,7 @@
 import "@testing-library/cypress/add-commands"
 import "cypress-file-upload"
 import NotePath from "./NotePath"
-import start from "../start"
+import start from "../start/index"
 import "./string.extensions"
 
 Cypress.Commands.add("pageIsNotLoading", () => {
@@ -132,13 +132,7 @@ Cypress.Commands.add("inPlaceEdit", (noteAttributes) => {
 })
 
 Cypress.Commands.add("submitNoteFormWith", (noteAttributes) => {
-  for (const propName in noteAttributes) {
-    const value = noteAttributes[propName]
-    if (value) {
-      cy.formField(propName).assignFieldValue(value)
-    }
-  }
-  cy.get('input[value="Submit"]').click()
+  start.submittableForm().submitWith(noteAttributes)
 })
 
 Cypress.Commands.add(
@@ -189,10 +183,6 @@ Cypress.Commands.add("createNotebookWith", (notebookAttributes) => {
   cy.routerToNotebooks()
   cy.findByText("Add New Notebook").click()
   cy.submitNoteCreationFormWith(notebookAttributes)
-})
-
-Cypress.Commands.add("submitNoteFormsWith", (notes) => {
-  notes.forEach((noteAttributes: string) => cy.submitNoteFormWith(noteAttributes))
 })
 
 Cypress.Commands.add("expectNoteCards", (expectedCards: string[]) => {

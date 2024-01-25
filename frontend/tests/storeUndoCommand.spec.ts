@@ -3,20 +3,11 @@ import makeMe from "./fixtures/makeMe";
 
 describe("storeUndoCommand", () => {
   const note = makeMe.aNoteRealm.topic("Dummy Title").please();
-  const textContent = {
-    topic: note.note.topic,
-    details: note.note.details,
-    updatedAt: note.note.updatedAt,
-  };
 
   describe("addEditingToUndoHistory", () => {
     const histories = new NoteEditingHistory();
     it("should push textContent into store state noteUndoHistories ", () => {
-      histories.addEditingToUndoHistory(
-        note.id,
-        "edit topic",
-        textContent.topic,
-      );
+      histories.addEditingToUndoHistory(note.id, "edit topic", note.note.topic);
 
       expect(histories.noteUndoHistories.length).toEqual(1);
     });
@@ -30,7 +21,7 @@ describe("storeUndoCommand", () => {
       histories.addEditingToUndoHistory(
         note.id,
         "edit details",
-        textContent.details,
+        note.note.details,
       );
       initialUndoCount = histories.noteUndoHistories.length;
     });
