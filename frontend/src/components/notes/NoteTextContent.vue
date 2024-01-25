@@ -72,10 +72,8 @@ export default defineComponent({
     };
   },
   watch: {
-    topicConstructor() {
+    note() {
       this.localTopicConstructor = this.note.topicConstructor;
-    },
-    details() {
       this.localDetails = this.note.details;
     },
   },

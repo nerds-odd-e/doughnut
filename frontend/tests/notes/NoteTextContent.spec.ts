@@ -7,6 +7,7 @@ import helper from "../helpers";
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
+
 describe("in place edit on title", () => {
   const note = makeMe.aNote.topic("Dummy Title").please();
   const mountComponent = (
@@ -15,9 +16,7 @@ describe("in place edit on title", () => {
     return helper
       .component(NoteTextContent)
       .withStorageProps({
-        noteId: n.id,
-        topicConstructor: n.topic,
-        details: n.details,
+        note: n,
       })
       .mount();
   };
