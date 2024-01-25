@@ -61,7 +61,6 @@ declare namespace Cypress {
     routerToRoot(): Chainable<any>
     routerToInitialReview(): Chainable<any>
     routerToRepeatReview(): Chainable<any>
-    routerToNotebooks(noteTopic?: string): Chainable<any>
     searchNote(searchKey: any, options: any): Chainable<any>
     shouldSeeQuizWithOptions(questionParts: any, options: any): Chainable<any>
     startSearching(): Chainable<any>

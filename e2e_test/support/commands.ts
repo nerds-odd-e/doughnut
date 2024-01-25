@@ -172,7 +172,7 @@ Cypress.Commands.add("clickRadioByLabel", (labelText) => {
 })
 
 Cypress.Commands.add("createNotebookWith", (notebookAttributes) => {
-  cy.routerToNotebooks()
+  start.routerToNotebooksPage()
   cy.findByText("Add New Notebook").click()
   cy.submitNoteCreationFormWith(notebookAttributes)
 })
@@ -196,7 +196,7 @@ Cypress.Commands.add("navigateToChild", (noteTopic) => {
 })
 
 Cypress.Commands.add("navigateToNotePage", (notePath: NotePath) => {
-  cy.routerToNotebooks()
+  start.routerToNotebooksPage()
   notePath.path.forEach((noteTopic) => cy.navigateToChild(noteTopic))
 })
 
@@ -246,10 +246,6 @@ Cypress.Commands.add("clickButtonOnCardBody", (noteTopic, buttonTitle) => {
         cy.wrap($button).click()
       })
   })
-})
-
-Cypress.Commands.add("routerToNotebooks", () => {
-  cy.routerPush("/notebooks", "notebooks", {})
 })
 
 Cypress.Commands.add("startSearching", () => {
@@ -347,10 +343,9 @@ Cypress.Commands.add("yesIRemember", () => {
 })
 
 Cypress.Commands.add("openSidebar", () => {
-  cy.routerToNotebooks().then(() => {
-    cy.pageIsNotLoading()
-    cy.findByRole("button", { name: "open sidebar" }).click({ force: true })
-  })
+  start.routerToNotebooksPage()
+  cy.pageIsNotLoading()
+  cy.findByRole("button", { name: "open sidebar" }).click({ force: true })
 })
 
 Cypress.Commands.add("navigateToCircle", (circleName) => {
@@ -437,7 +432,7 @@ Cypress.Commands.add("subscribeToNotebook", (notebookTitle: string, dailyLearnin
 })
 
 Cypress.Commands.add("unsubscribeFromNotebook", (noteTopic) => {
-  cy.routerToNotebooks()
+  start.routerToNotebooksPage()
   cy.findNoteCardButton(noteTopic, "Unsubscribe").click()
 })
 

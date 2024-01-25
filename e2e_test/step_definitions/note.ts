@@ -126,13 +126,13 @@ Then("I should see {string} in breadcrumb", (noteTopics: string) => {
 })
 
 When("I visit all my notebooks", () => {
-  cy.routerToNotebooks()
+  start.routerToNotebooksPage()
 })
 
 Then(
   "I should see these notes belonging to the user at the top level of all my notes",
   (data: DataTable) => {
-    cy.routerToNotebooks()
+    start.routerToNotebooksPage()
     cy.expectNoteCards(data.hashes())
   },
 )
