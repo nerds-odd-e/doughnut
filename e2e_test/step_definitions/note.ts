@@ -116,14 +116,12 @@ When("I try to create a note belonging to {string}:", (noteTopic: string, data: 
 
   const {
     Topic,
-    Details,
     ["Link Type To Parent"]: linkTypeToParent,
     ["Wikidata Id"]: wikidataId,
     ...remainingAttrs
   } = data.hashes()[0]
   noteCreationForm.createNote(Topic, linkTypeToParent, wikidataId)
-
-  cy.legacysubmitNoteCreationFormWith(Topic, Details, remainingAttrs)
+  expect(Object.keys(remainingAttrs)).to.have.lengthOf(0)
 })
 
 When("I am creating a note under {notepath}", (notePath: NotePath) => {
