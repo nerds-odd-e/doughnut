@@ -2,6 +2,7 @@ import { assumeAdminDashboardPage } from "./pageObjects/adminPages/adminDashboar
 import { assumeChatAboutNotePage } from "./pageObjects/chatAboutNotePage"
 import { assumeNotePage } from "./pageObjects/notePage"
 import { routerToNotebooksPage } from "./pageObjects/notebooksPage"
+import { navigateToCircle } from "./pageObjects/circlePage"
 import { assumeAnsweredQuestionPage } from "./pageObjects/AnsweredQuestionPage"
 import { assumeQuestionPage } from "./pageObjects/QuizQuestionPage"
 import { assumeClarifyingQuestionDialog } from "./pageObjects/clarifyingQuestionDialog"
@@ -15,6 +16,7 @@ export default {
   assumeAdminDashboardPage,
   assumeClarifyingQuestionDialog,
   routerToNotebooksPage,
+  navigateToCircle,
   // jumptoNotePage is faster than navigateToPage
   //    it uses the note id memorized when creating them with testability api
   jumpToNotePage: (noteTopic: string, forceLoadPage = false) => {

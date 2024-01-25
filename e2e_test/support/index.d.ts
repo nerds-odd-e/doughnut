@@ -40,7 +40,6 @@ declare namespace Cypress {
     jumpToNotePage(noteTopic: any, forceLoadPage?: any): Chainable<any>
     loginAs(username: string): Chainable<any>
     logout(username?: string): Chainable<any>
-    navigateToCircle(circleName: any): Chainable<any>
     noteByTitle(noteTopic: string): Chainable<any>
     openAndSubmitNoteAccessoriesFormWith(
       noteTopic: string,

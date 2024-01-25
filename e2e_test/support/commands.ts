@@ -322,13 +322,6 @@ Cypress.Commands.add("openSidebar", () => {
   cy.findByRole("button", { name: "open sidebar" }).click({ force: true })
 })
 
-Cypress.Commands.add("navigateToCircle", (circleName) => {
-  cy.routerToRoot()
-  cy.pageIsNotLoading()
-  cy.openSidebar()
-  cy.findByText(circleName, { selector: ".modal-body a" }).click()
-})
-
 Cypress.Commands.add("routerToInitialReview", () => {
   cy.routerPush("/reviews/initial", "initial", {})
 })
