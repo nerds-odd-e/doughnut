@@ -8,7 +8,7 @@
       :inverse-icon="true"
     />
     <div>
-      Target: <strong>{{ targetNote.topic }}</strong>
+      Target: <strong>{{ targetNote.topicConstructor }}</strong>
     </div>
     <CheckInput
       scope-name="link"
@@ -82,7 +82,7 @@ export default defineComponent({
       if (this.formData.moveUnder && this.note.parentId === null) {
         if (
           !(await this.popups.confirm(
-            `"${this.note.topic}" is a top level notebook. Do you want to move it under other notebook?`,
+            `"${this.note.topicConstructor}" is a top level notebook. Do you want to move it under other notebook?`,
           ))
         ) {
           return;

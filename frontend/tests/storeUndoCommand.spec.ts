@@ -7,7 +7,11 @@ describe("storeUndoCommand", () => {
   describe("addEditingToUndoHistory", () => {
     const histories = new NoteEditingHistory();
     it("should push textContent into store state noteUndoHistories ", () => {
-      histories.addEditingToUndoHistory(note.id, "edit topic", note.note.topic);
+      histories.addEditingToUndoHistory(
+        note.id,
+        "edit topic",
+        note.note.topicConstructor,
+      );
 
       expect(histories.noteUndoHistories.length).toEqual(1);
     });

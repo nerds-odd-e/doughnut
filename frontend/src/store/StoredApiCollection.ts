@@ -192,7 +192,9 @@ export default class StoredApiCollection implements StoredApi {
     const currentNote = this.storage.refOfNoteRealm(noteId).value?.note;
     if (currentNote) {
       const old: string =
-        field === "edit topic" ? currentNote.topic : currentNote.details;
+        field === "edit topic"
+          ? currentNote.topicConstructor
+          : currentNote.details;
       if (old === value) {
         return;
       }

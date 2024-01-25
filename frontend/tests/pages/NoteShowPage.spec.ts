@@ -17,7 +17,7 @@ describe("all in note show page", () => {
         .component(NoteShowPage)
         .withStorageProps({ noteId: noteRealm.id })
         .render();
-      await screen.findByText(noteRealm.note.topic);
+      await screen.findByText(noteRealm.note.topicConstructor);
     });
   });
 });
