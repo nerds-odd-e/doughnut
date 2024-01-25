@@ -77,7 +77,7 @@ class PictureSelectionQuizFactoryTest {
         assertThat(quizQuestion.getStem(), equalTo(""));
         assertThat(quizQuestion.getMainTopic(), equalTo("source"));
         List<String> options = toOptionStrings(quizQuestion);
-        assertThat(source.getTopic(), in(options));
+        assertThat(source.getTopicConstructor(), in(options));
       }
     }
 
@@ -92,7 +92,7 @@ class PictureSelectionQuizFactoryTest {
       void shouldIncludeUncle() {
         QuizQuestion quizQuestion = buildQuestion();
         List<String> options = toOptionStrings(quizQuestion);
-        assertThat(uncle.getTopic(), in(options));
+        assertThat(uncle.getTopicConstructor(), in(options));
       }
     }
   }

@@ -3,7 +3,6 @@ package com.odde.doughnut.services;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -57,7 +56,7 @@ class FineTuningServiceTest {
 
     @Test
     void shouldReturnGoodTrainingDataIfHavingReadingAuth_whenCallGetGoodTrainingData() {
-      Note note = makeMe.aNote().title("Test Topic").please();
+      Note note = makeMe.aNote().titleConstructor("Test Topic").please();
       makeMe.aQuestionSuggestionForFineTunining().ofNote(note).positive().please();
       List<OpenAIChatGPTFineTuningExample> goodOpenAIChatGPTFineTuningExampleList =
           fineTuningService.getQuestionGenerationTrainingExamples();

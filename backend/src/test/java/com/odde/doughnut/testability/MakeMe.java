@@ -32,15 +32,15 @@ public class MakeMe extends MakeMeWithoutDB {
   }
 
   public NoteBuilder aNote(String title) {
-    return aNote().title(title);
+    return aNote().titleConstructor(title);
   }
 
   public NoteBuilder aHeadNote(String title) {
-    return aNote().title(title);
+    return aNote().titleConstructor(title);
   }
 
   public NoteBuilder aNote(String title, String details) {
-    return aNote().title(title).details(details);
+    return aNote().titleConstructor(title).details(details);
   }
 
   public NoteBuilder theNote(Note note) {

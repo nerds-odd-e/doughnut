@@ -121,7 +121,7 @@ class TestabilityRestController {
     private Map<String, Note> buildIndividualNotes(User user, Timestamp currentUTCTimestamp) {
       return seedNotes.stream()
           .map(seedNote -> seedNote.buildNote(user, currentUTCTimestamp))
-          .collect(Collectors.toMap(Note::getTopic, n -> n));
+          .collect(Collectors.toMap(note -> note.getTopicConstructor(), n -> n));
     }
 
     private void buildNoteTree(
@@ -145,7 +145,7 @@ class TestabilityRestController {
         Map<String, Note> titleNoteMap, NoteRepository noteRepository, String testingParent) {
       Note parentNote = titleNoteMap.get(testingParent);
       if (parentNote != null) return parentNote;
-      return noteRepository.findFirstByTitle(testingParent);
+      return noteRepository.findFirstByTopicConstructor(testingParent);
     }
 
     private void saveByOriginalOrder(
@@ -165,7 +165,8 @@ class TestabilityRestController {
     Map<String, Note> titleNoteMap = seedInfo.buildIndividualNotes(user, currentUTCTimestamp);
     seedInfo.buildNoteTree(user, ownership, titleNoteMap, this.noteRepository);
     seedInfo.saveByOriginalOrder(titleNoteMap, this.modelFactoryService);
-    return titleNoteMap.values().stream().collect(Collectors.toMap(Note::getTopic, Thingy::getId));
+    return titleNoteMap.values().stream()
+        .collect(Collectors.toMap(note -> note.getTopicConstructor(), Thingy::getId));
   }
 
   private Ownership getOwnership(SeedInfo seedInfo, User user) {
@@ -205,7 +206,7 @@ class TestabilityRestController {
   @PostMapping("/share_to_bazaar")
   @Transactional
   public String shareToBazaar(@RequestBody HashMap<String, String> map) {
-    Note note = noteRepository.findFirstByTitle(map.get("noteTopic"));
+    Note note = noteRepository.findFirstByTopicConstructor(map.get("noteTopic"));
     modelFactoryService.toBazaarModel().shareNote(note.getNotebook());
     return "OK";
   }

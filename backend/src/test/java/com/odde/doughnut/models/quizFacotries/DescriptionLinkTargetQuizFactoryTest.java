@@ -73,7 +73,7 @@ class DescriptionLinkTargetQuizFactoryTest {
 
   @Test
   void shouldIncludeMasks() {
-    makeMe.theNote(source).title("token").details("token /.").please();
+    makeMe.theNote(source).titleConstructor("token").details("token /.").please();
     assertThat(
         buildQuestion().getStem(),
         containsString("<mark title='Hidden text that is matching the answer'>[...]</mark> /."));

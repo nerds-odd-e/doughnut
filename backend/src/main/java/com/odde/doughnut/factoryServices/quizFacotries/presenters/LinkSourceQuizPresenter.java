@@ -13,7 +13,7 @@ public class LinkSourceQuizPresenter extends QuizQuestionWithOptionsPresenter {
 
   @Override
   public String mainTopic() {
-    return link.getTargetNote().getTopic();
+    return link.getTargetNote().getTopicConstructor();
   }
 
   @Override

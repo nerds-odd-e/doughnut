@@ -55,7 +55,8 @@ class QuizQuestionTest {
   void useClozeDescription() {
     Note top = makeMe.aNote().please();
     makeMe.aNote().under(top).please();
-    Note note = makeMe.aNote().under(top).title("abc").details("abc has 3 letters").please();
+    Note note =
+        makeMe.aNote().under(top).titleConstructor("abc").details("abc has 3 letters").please();
     makeMe.refresh(top);
     QuizQuestion quizQuestion = getQuizQuestion(note);
     assertThat(
@@ -96,14 +97,18 @@ class QuizQuestionTest {
       @Test
       void descendingRandomizer() {
         List<String> options = getOptions(note1);
-        assertThat(options, containsInRelativeOrder(note2.getTopic(), note1.getTopic()));
+        assertThat(
+            options,
+            containsInRelativeOrder(note2.getTopicConstructor(), note1.getTopicConstructor()));
       }
 
       @Test
       void ascendingRandomizer() {
         randomizer.alwaysChoose = "last";
         List<String> options = getOptions(note1);
-        assertThat(options, containsInRelativeOrder(note1.getTopic(), note2.getTopic()));
+        assertThat(
+            options,
+            containsInRelativeOrder(note1.getTopicConstructor(), note2.getTopicConstructor()));
       }
     }
 
@@ -115,7 +120,7 @@ class QuizQuestionTest {
       makeMe.refresh(top);
       List<String> options = getOptions(note);
       assertThat(options.size(), equalTo(3));
-      assertThat(options.contains(note.getTopic()), is(true));
+      assertThat(options.contains(note.getTopicConstructor()), is(true));
     }
   }
 

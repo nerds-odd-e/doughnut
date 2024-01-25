@@ -19,12 +19,12 @@ public class FromDifferentPartAsQuizPresenter extends QuizQuestionWithOptionsPre
         + "</mark> a <em>DIFFERENT</em> "
         + categoryLink.getLinkType().nameOfSource
         + " of <mark>"
-        + categoryLink.getTargetNote().getTopic()
+        + categoryLink.getTargetNote().getTopicConstructor()
         + "</mark> than:";
   }
 
   @Override
   public String mainTopic() {
-    return link.getSourceNote().getTopic();
+    return link.getSourceNote().getTopicConstructor();
   }
 }

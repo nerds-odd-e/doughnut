@@ -28,7 +28,7 @@ public abstract class QuizQuestionWithOptionsPresenter implements QuizQuestionPr
         .map(
             thing -> {
               QuizQuestion.Choice choice = new QuizQuestion.Choice();
-              choice.setDisplay(thing.getNote().getTopic());
+              choice.setDisplay(thing.getNote().getTopicConstructor());
               return choice;
             })
         .toList();

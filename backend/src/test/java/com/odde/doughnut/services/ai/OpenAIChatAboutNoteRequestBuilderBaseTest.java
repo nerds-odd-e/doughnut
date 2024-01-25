@@ -17,7 +17,7 @@ class OpenAIChatAboutNoteRequestBuilderBaseTest {
   void messageShouldContainTopic() {
     Note note = makeMe.aNote().inMemoryPlease();
     String content = getNoteOfFocusDescription(note);
-    assertThat(content, containsString(note.getTopic()));
+    assertThat(content, containsString(note.getTopicConstructor()));
   }
 
   @Test

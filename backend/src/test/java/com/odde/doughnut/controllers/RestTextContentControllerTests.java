@@ -54,7 +54,7 @@ class RestTextContentControllerTests {
     void shouldBeAbleToSaveNoteTopic() throws UnexpectedNoAccessRightException, IOException {
       NoteRealm response = controller.updateNoteTopicConstructor(note, noteUpdateTopicDTO);
       assertThat(response.getId(), equalTo(note.getId()));
-      assertThat(response.getNote().getTopic(), equalTo("new title"));
+      assertThat(response.getNote().getTopicConstructor(), equalTo("new title"));
     }
 
     @Test

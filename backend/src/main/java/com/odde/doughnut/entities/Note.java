@@ -53,17 +53,8 @@ public class Note extends Thingy {
   @Size(min = 1, max = Note.MAX_TITLE_LENGTH)
   @Getter
   @Setter
-  @Column(name = "title")
-  @JsonIgnore
-  private String topic = "";
-
-  public String getTopicConstructor() {
-    return topic;
-  }
-
-  public void setTopicConstructor(String value) {
-    this.topic = value;
-  }
+  @Column(name = "topic_constructor")
+  private String topicConstructor = "";
 
   @Column(name = "updated_at")
   @Getter
@@ -158,7 +149,7 @@ public class Note extends Thingy {
 
   @Override
   public String toString() {
-    return "Note{" + "id=" + id + ", title='" + getTopic() + '\'' + '}';
+    return "Note{" + "id=" + id + ", title='" + getTopicConstructor() + '\'' + '}';
   }
 
   private void addAncestors(List<Note> ancestors) {
@@ -291,7 +282,7 @@ public class Note extends Thingy {
 
   @JsonIgnore
   public NoteTitle getNoteTitle() {
-    return new NoteTitle(getTopic());
+    return new NoteTitle(getTopicConstructor());
   }
 
   public Optional<PictureWithMask> getPictureWithMask() {
@@ -352,7 +343,9 @@ public class Note extends Thingy {
 
   @JsonIgnore
   public String getContextPathString() {
-    return getAncestors().stream().map(Note::getTopic).collect(Collectors.joining(" › "));
+    return getAncestors().stream()
+        .map(note -> note.getTopicConstructor())
+        .collect(Collectors.joining(" › "));
   }
 
   @JsonIgnore
@@ -370,7 +363,7 @@ public class Note extends Thingy {
   public String getNoteDescription() {
     NoteBrief noteBrief = new NoteBrief();
     noteBrief.contextPath = getContextPathString();
-    noteBrief.topic = getTopic();
+    noteBrief.topic = getTopicConstructor();
     noteBrief.details = getDetails();
     return """
 The note of current focus (in JSON format):

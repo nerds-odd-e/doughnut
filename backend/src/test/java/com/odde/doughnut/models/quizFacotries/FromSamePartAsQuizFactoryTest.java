@@ -106,11 +106,11 @@ class FromSamePartAsQuizFactoryTest {
               quizQuestion.getStem(),
               containsString(
                   "<p>Which one <mark>is tagged by</mark> the same part of <mark>perspective</mark> as:"));
-          assertThat(quizQuestion.getMainTopic(), containsString(ugly.getTopic()));
+          assertThat(quizQuestion.getMainTopic(), containsString(ugly.getTopicConstructor()));
           List<String> strings = toOptionStrings(quizQuestion);
-          assertThat(pretty.getTopic(), in(strings));
-          assertThat(tall.getTopic(), in(strings));
-          assertThat(ugly.getTopic(), not(in(strings)));
+          assertThat(pretty.getTopicConstructor(), in(strings));
+          assertThat(tall.getTopicConstructor(), in(strings));
+          assertThat(ugly.getTopicConstructor(), not(in(strings)));
         }
       }
     }

@@ -14,7 +14,7 @@ public class FromSamePartAsQuizPresenter extends QuizQuestionWithOptionsPresente
 
   @Override
   public String mainTopic() {
-    return link.getSourceNote().getTopic();
+    return link.getSourceNote().getTopicConstructor();
   }
 
   @Override
@@ -24,7 +24,7 @@ public class FromSamePartAsQuizPresenter extends QuizQuestionWithOptionsPresente
         + "</mark> the same "
         + categoryLink.getLinkType().nameOfSource
         + " of <mark>"
-        + categoryLink.getTargetNote().getTopic()
+        + categoryLink.getTargetNote().getTopicConstructor()
         + "</mark> as:";
   }
 }
