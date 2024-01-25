@@ -12,8 +12,8 @@ Feature: Nested Note creation
 
   Scenario: Create a new note belonging to another note
     When I create a note belonging to "LeSS in Action":
-      | Topic        | Details                            |
-      | Re-quirement | Re-think the way we do requirement |
+      | Topic        |
+      | Re-quirement |
     Then I should see "My Notes/LeSS in Action" with these children
       | note-topic   |
       | team         |
@@ -28,8 +28,8 @@ Feature: Nested Note creation
 
   Scenario: Create a new sibling note
     Given I create a note belonging to "LeSS in Action":
-      | Topic        | Details                            |
-      | Re-quirement | Re-think the way we do requirement |
+      | Topic        |
+      | Re-quirement |
     When I create a sibling note of "Re-quirement":
       | Topic     | Details                       | Link Type To Parent |
       | Re-Design | Re-think the way we do design | a specialization of |

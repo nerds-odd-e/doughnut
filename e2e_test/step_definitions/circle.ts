@@ -48,8 +48,7 @@ When(
 )
 
 When("I add a note {string} under {string}", (noteTopic: string, parentNoteTopic: string) => {
-  start.assumeNotePage().navigateToChild(parentNoteTopic).addingChildNote()
-  cy.submitNoteCreationFormSuccessfully({ Topic: noteTopic })
+  start.assumeNotePage().navigateToChild(parentNoteTopic).addingChildNote().createNote(noteTopic)
 })
 
 When(
