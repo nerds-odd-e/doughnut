@@ -80,7 +80,7 @@ declare module 'vue' {
     NoteShell: typeof import('./src/components/notes/NoteShell.vue')['default']
     NoteShortDetails: typeof import('./src/components/notes/NoteShortDetails.vue')['default']
     NoteTextContent: typeof import('./src/components/notes/NoteTextContent.vue')['default']
-    NoteTitleWithLink: typeof import('./src/components/notes/NoteTitleWithLink.vue')['default']
+    NoteTopicWithLink: typeof import('./src/components/notes/NoteTopicWithLink.vue')['default']
     NoteUndoButton: typeof import('./src/components/toolbars/NoteUndoButton.vue')['default']
     NoteWikidataAssociation: typeof import('./src/components/notes/NoteWikidataAssociation.vue')['default']
     NoteWithLinks: typeof import('./src/components/notes/NoteWithLinks.vue')['default']

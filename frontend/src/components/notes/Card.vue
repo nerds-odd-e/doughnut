@@ -3,7 +3,7 @@
     <slot name="cardHeader" />
     <div class="card-body">
       <h5 class="card-title">
-        <NoteTitleWithLink :note="note" class="card-title" />
+        <NoteTopicWithLink :note="note" class="card-title" />
       </h5>
       <NoteShortDetails :details="note.details" />
       <slot name="button" :note="note" />
@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import NoteTitleWithLink from "./NoteTitleWithLink.vue";
+import NoteTopicWithLink from "./NoteTopicWithLink.vue";
 import NoteShortDetails from "./NoteShortDetails.vue";
 
 export default defineComponent({
@@ -21,7 +21,7 @@ export default defineComponent({
     note: { type: Object as PropType<Generated.Note>, required: true },
   },
   components: {
-    NoteTitleWithLink,
+    NoteTopicWithLink,
     NoteShortDetails,
   },
 });
