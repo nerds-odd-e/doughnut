@@ -3,14 +3,21 @@
     :to="{ name: 'noteShow', params: { noteId: note.id } }"
     class="text-decoration-none"
   >
-    {{ note.topic }}
+    {{ topic }}
   </router-link>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { PropType, defineComponent } from "vue";
+
+export default defineComponent({
   props: {
-    note: { type: Object, required: true },
+    note: { type: Object as PropType<Generated.Note>, required: true },
   },
-};
+  computed: {
+    topic() {
+      return this.note.topicConstructor.replace(/%P/g, "[LeSS in Action]");
+    },
+  },
+});
 </script>

@@ -36,7 +36,6 @@ declare namespace Cypress {
       skip,
     }: any): Chainable<any>
     inPlaceEdit(noteAttributes: any): Chainable<any>
-    jumpToNotePage(noteTopic: any, forceLoadPage?: any): Chainable<any>
     loginAs(username: string): Chainable<any>
     logout(username?: string): Chainable<any>
     noteByTitle(noteTopic: string): Chainable<any>

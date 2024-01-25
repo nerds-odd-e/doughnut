@@ -312,3 +312,7 @@ When(
     })
   },
 )
+
+Then("I should see a child note {string}", (childTopic: string) => {
+  cy.findCardTitle(childTopic)
+})

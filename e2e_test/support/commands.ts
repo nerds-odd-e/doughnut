@@ -149,20 +149,6 @@ Cypress.Commands.add("expectNoteCards", (expectedCards: string[]) => {
   })
 })
 
-// jumptoNotePage is faster than navigateToPath
-//    it uses the note id memorized when creating them with testability api
-Cypress.Commands.add("jumpToNotePage", (noteTopic: string, forceLoadPage = false) => {
-  start
-    .testability()
-    .getSeededNoteIdByTitle(noteTopic)
-    .then((noteId) => {
-      const url = `/notes/${noteId}`
-      if (forceLoadPage) cy.visit(url)
-      else cy.routerPush(url, "noteShow", { noteId: noteId })
-    })
-  cy.findNoteTopic(noteTopic)
-})
-
 Cypress.Commands.add("routerPush", (fallback, name, params) => {
   cy.get("@firstVisited").then((firstVisited) => {
     cy.window().then(async (win) => {
