@@ -8,10 +8,15 @@ import { PropType, defineComponent } from "vue";
 export default defineComponent({
   props: {
     note: { type: Object as PropType<Generated.Note>, required: true },
+    parentNote: { type: Object as PropType<Generated.Note> },
   },
   computed: {
     topic() {
-      return this.note.topicConstructor.replace(/%P/g, "[LeSS in Action]");
+      if (!this.parentNote) return this.note.topicConstructor;
+      return this.note.topicConstructor.replace(
+        /%P/g,
+        `[${this.parentNote.topicConstructor}]`,
+      );
     },
   },
 });

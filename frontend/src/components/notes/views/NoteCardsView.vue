@@ -32,7 +32,11 @@
             />
           </template>
         </NoteWithLinks>
-        <Cards v-if="expandChildren" :notes="noteRealm.children" />
+        <Cards
+          v-if="expandChildren"
+          :notes="noteRealm.children"
+          :parent-note="noteRealm.note"
+        />
         <slot />
         <NoteChatDialog
           v-bind="{ selectedNote: noteRealm.note, storageAccessor }"
