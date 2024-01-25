@@ -1,4 +1,5 @@
 import { assumeChatAboutNotePage } from "./chatAboutNotePage"
+import submittableForm from "../submittableForm"
 
 export const assumeNotePage = (noteTopic?: string) => {
   if (noteTopic) {
@@ -8,7 +9,10 @@ export const assumeNotePage = (noteTopic?: string) => {
   const privateToolbarButton = (btnTextOrTitle: string) => {
     const getButton = () => cy.findByRole("button", { name: btnTextOrTitle })
     return {
-      click: () => getButton().click(),
+      click: () => {
+        getButton().click()
+        return { ...submittableForm() }
+      },
       shouldNotExist: () => getButton().should("not.exist"),
     }
   }
@@ -27,6 +31,9 @@ export const assumeNotePage = (noteTopic?: string) => {
     },
     editNoteButton() {
       return this.toolbarButton("edit note")
+    },
+    updateNoteAccessories(attributes: Record<string, string>) {
+      this.editNoteButton().click().submitWith(attributes)
     },
     startSearchingAndLinkNote() {
       this.toolbarButton("search and link note").click()

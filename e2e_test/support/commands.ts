@@ -84,7 +84,7 @@ Cypress.Commands.add("submitNoteCreationFormWith", (noteAttributes) => {
   delete noteAttributes["Link Type To Parent"]
   const { Topic, Details, ["Wikidata Id"]: wikidataId, ...remainingAttrs } = noteAttributes
 
-  cy.submitNoteFormWith({
+  start.submittableForm().submitWith({
     Topic,
     "Link Type To Parent": linkTypeToParent,
     "Wikidata Id": wikidataId,
@@ -105,8 +105,7 @@ Cypress.Commands.add("submitNoteCreationFormWith", (noteAttributes) => {
 Cypress.Commands.add(
   "openAndSubmitNoteAccessoriesFormWith",
   (noteTopic: string, noteAccessoriesAttributes: Record<string, string>) => {
-    start.assumeNotePage(noteTopic).editNoteButton().click()
-    cy.submitNoteFormWith(noteAccessoriesAttributes)
+    start.assumeNotePage(noteTopic).updateNoteAccessories(noteAccessoriesAttributes)
   },
 )
 
@@ -129,10 +128,6 @@ Cypress.Commands.add("inPlaceEdit", (noteAttributes) => {
       cy.replaceFocusedTextAndEnter(value)
     }
   }
-})
-
-Cypress.Commands.add("submitNoteFormWith", (noteAttributes) => {
-  start.submittableForm().submitWith(noteAttributes)
 })
 
 Cypress.Commands.add(
