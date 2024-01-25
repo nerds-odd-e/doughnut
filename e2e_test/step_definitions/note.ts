@@ -12,6 +12,7 @@ import {
 import NotePath from "../support/NotePath"
 import "../support/string.extensions"
 import start from "../start/index"
+import noteCreationForm from "../start/pageObjects/noteForms/noteCreationForm"
 
 defineParameterType({
   name: "notepath",
@@ -112,7 +113,17 @@ When("I try to create a note belonging to {string}:", (noteTopic: string, data: 
   expect(data.hashes().length).to.equal(1)
   start.jumpToNotePage(noteTopic)
   cy.clickAddChildNoteButton()
-  cy.submitNoteCreationFormWith(data.hashes()[0])
+
+  const {
+    Topic,
+    Details,
+    ["Link Type To Parent"]: linkTypeToParent,
+    ["Wikidata Id"]: wikidataId,
+    ...remainingAttrs
+  } = data.hashes()[0]
+  noteCreationForm.createNote(Topic, linkTypeToParent, wikidataId)
+
+  cy.legacysubmitNoteCreationFormWith(Topic, Details, remainingAttrs)
 })
 
 When("I am creating a note under {notepath}", (notePath: NotePath) => {

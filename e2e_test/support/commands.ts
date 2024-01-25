@@ -76,11 +76,6 @@ Cypress.Commands.add("expectBreadcrumb", (items: string) => {
 })
 
 Cypress.Commands.add("submitNoteCreationFormSuccessfully", (noteAttributes) => {
-  cy.submitNoteCreationFormWith(noteAttributes)
-  cy.dialogDisappeared()
-})
-
-Cypress.Commands.add("submitNoteCreationFormWith", (noteAttributes) => {
   const {
     Topic,
     Details,
@@ -88,15 +83,19 @@ Cypress.Commands.add("submitNoteCreationFormWith", (noteAttributes) => {
     ["Wikidata Id"]: wikidataId,
     ...remainingAttrs
   } = noteAttributes
-
   noteCreationForm.createNote(Topic, linkTypeToParent, wikidataId)
 
-  if (!!Details) {
-    cy.inPlaceEdit({ Details })
+  cy.legacysubmitNoteCreationFormWith(Topic, Details, remainingAttrs)
+  cy.dialogDisappeared()
+})
+
+Cypress.Commands.add("legacysubmitNoteCreationFormWith", (topic, details, noteAttributes) => {
+  if (!!details) {
+    cy.inPlaceEdit({ Details: details })
   }
 
-  if (Object.keys(remainingAttrs).length > 0) {
-    cy.openAndSubmitNoteAccessoriesFormWith(Topic, remainingAttrs)
+  if (Object.keys(noteAttributes).length > 0) {
+    cy.openAndSubmitNoteAccessoriesFormWith(topic, noteAttributes)
   }
 })
 
@@ -175,7 +174,16 @@ Cypress.Commands.add("clickRadioByLabel", (labelText) => {
 Cypress.Commands.add("createNotebookWith", (notebookAttributes) => {
   start.routerToNotebooksPage()
   cy.findByText("Add New Notebook").click()
-  cy.submitNoteCreationFormWith(notebookAttributes)
+  const {
+    Topic,
+    Details,
+    ["Link Type To Parent"]: linkTypeToParent,
+    ["Wikidata Id"]: wikidataId,
+    ...remainingAttrs
+  } = notebookAttributes
+  noteCreationForm.createNote(Topic, linkTypeToParent, wikidataId)
+
+  cy.legacysubmitNoteCreationFormWith(Topic, Details, remainingAttrs)
 })
 
 Cypress.Commands.add("expectNoteCards", (expectedCards: string[]) => {
