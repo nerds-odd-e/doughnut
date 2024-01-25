@@ -8,12 +8,14 @@
           scope-name="note"
           :model-value="localTopicConstructor"
           @update:model-value="
-            update(noteId, $event);
+            update(note.id, $event);
             localTopicConstructor = $event;
           "
           @blur="blur"
           :errors="errors.topic"
-        />
+        >
+          <h2><NoteTopic v-bind="{ note, parentNote }" /></h2>
+        </EditableText>
       </template>
     </TextContentWrapper>
     <slot name="topic-additional" />
@@ -29,7 +31,7 @@
           scope-name="note"
           :model-value="localDetails"
           @update:model-value="
-            update(noteId, $event);
+            update(note.id, $event);
             localDetails = $event;
           "
           @blur="blur"
@@ -46,12 +48,12 @@ import EditableText from "../form/EditableText.vue";
 import RichMarkdownEditor from "../form/RichMarkdownEditor.vue";
 import { type StorageAccessor } from "../../store/createNoteStorage";
 import TextContentWrapper from "./TextContentWrapper.vue";
+import NoteTopic from "./NoteTopic.vue";
 
 export default defineComponent({
   props: {
-    noteId: { type: Number, required: true },
-    topicConstructor: { type: String, required: true },
-    details: { type: String, required: false },
+    note: { type: Object as PropType<Generated.Note>, required: true },
+    parentNote: { type: Object as PropType<Generated.Note> },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,
@@ -61,19 +63,20 @@ export default defineComponent({
     EditableText,
     RichMarkdownEditor,
     TextContentWrapper,
+    NoteTopic,
   },
   data() {
     return {
-      localTopicConstructor: this.topicConstructor,
-      localDetails: this.details,
+      localTopicConstructor: this.note.topicConstructor,
+      localDetails: this.note.details,
     };
   },
   watch: {
     topicConstructor() {
-      this.localTopicConstructor = this.topicConstructor;
+      this.localTopicConstructor = this.note.topicConstructor;
     },
     details() {
-      this.localDetails = this.details;
+      this.localDetails = this.note.details;
     },
   },
 });

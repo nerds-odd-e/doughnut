@@ -3,9 +3,8 @@
     This note has been deleted
   </div>
   <NoteTextContent
-    :note-id="note.id"
-    :topic-constructor="note.topic"
-    :details="note.details"
+    :note="note"
+    :parent-note="parentNote"
     :storage-accessor="storageAccessor"
   >
     <template #topic-additional>
@@ -47,6 +46,7 @@ import NoteTextContent from "./NoteTextContent.vue";
 export default defineComponent({
   props: {
     note: { type: Object as PropType<Generated.Note>, required: true },
+    parentNote: { type: Object as PropType<Generated.Note> },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,

@@ -2,9 +2,7 @@
   <div class="text" @click="startEditing">
     <template v-if="!isEditing">
       <InputWithType v-bind="{ scopeName, field, title, errors }">
-        <h2 v-if="!!modelValue">
-          {{ modelValue }}
-        </h2>
+        <slot v-if="!!modelValue" />
         <SvgEditText v-else />
       </InputWithType>
     </template>

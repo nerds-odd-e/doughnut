@@ -18,6 +18,7 @@
         <NoteWithLinks
           v-bind="{
             note: noteRealm.note,
+            parentNote: getParent(noteRealm),
             links: noteRealm.links,
             storageAccessor,
           }"
@@ -75,6 +76,16 @@ export default defineComponent({
     Breadcrumb,
     ControlCenterForNote,
     NoteChatDialog,
+  },
+  methods: {
+    getParent(noteRealm: Generated.NoteRealm) {
+      if (noteRealm.notePosition.ancestors.length === 0) {
+        return undefined;
+      }
+      return noteRealm.notePosition.ancestors[
+        noteRealm.notePosition.ancestors.length - 1
+      ];
+    },
   },
 });
 </script>
