@@ -43,15 +43,12 @@ Given("there are notes from Note {int} to Note {int}", (from: number, to: number
   start.testability().seedNotes(notes)
 })
 
-When("I create notebooks with:", (notes: DataTable) => {
-  notes.hashes().forEach((noteAttributes) => {
-    cy.createNotebookWith(noteAttributes)
-    cy.dialogDisappeared()
-  })
+When("I create a notebook with topic {string}", (notebookTopic: string) => {
+  start.routerToNotebooksPage().creatingNotebook(notebookTopic)
 })
 
 When("I create a notebook with empty topic", () => {
-  cy.createNotebookWith({ Topic: "" })
+  start.routerToNotebooksPage().creatingNotebook("")
 })
 
 When("I update note {string} to become:", (noteTopic: string, data: DataTable) => {

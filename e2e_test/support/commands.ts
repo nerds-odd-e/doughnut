@@ -165,21 +165,6 @@ Cypress.Commands.add("clickRadioByLabel", (labelText) => {
   cy.findByText(labelText, { selector: "label" }).click({ force: true })
 })
 
-Cypress.Commands.add("createNotebookWith", (notebookAttributes) => {
-  start.routerToNotebooksPage()
-  cy.findByText("Add New Notebook").click()
-  const {
-    Topic,
-    Details,
-    ["Link Type To Parent"]: linkTypeToParent,
-    ["Wikidata Id"]: wikidataId,
-    ...remainingAttrs
-  } = notebookAttributes
-  noteCreationForm.createNote(Topic, linkTypeToParent, wikidataId)
-
-  cy.legacysubmitNoteCreationFormWith(Topic, Details, remainingAttrs)
-})
-
 Cypress.Commands.add("expectNoteCards", (expectedCards: string[]) => {
   cy.get("a.card-title").should("have.length", expectedCards.length)
   expectedCards.forEach((elem) => {

@@ -64,7 +64,6 @@ declare namespace Cypress {
     subscribeToNotebook(notebookTitle: string, dailyLearningCount: string): Chinputainable<any>
     legacysubmitNoteCreationFormWith(title: any, details: any, noteAttributes: any): Chainable<any>
     submitNoteCreationFormSuccessfully(noteAttributes: any): Chainable<any>
-    createNotebookWith(notes: any): Chainable<any>
     undoLast(undoThpe: string): Chainable<any>
     unsubscribeFromNotebook(noteTopic: string): Chainable<any>
     yesIRemember(): Chainable<any>
