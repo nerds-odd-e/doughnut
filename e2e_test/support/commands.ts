@@ -161,11 +161,6 @@ Cypress.Commands.add("addSiblingNoteButton", () => {
   cy.findByRole("button", { name: "Add Sibling Note" })
 })
 
-Cypress.Commands.add("clickAddChildNoteButton", () => {
-  cy.pageIsNotLoading()
-  cy.findByRole("button", { name: "Add Child Note" }).click()
-})
-
 Cypress.Commands.add("clickRadioByLabel", (labelText) => {
   cy.findByText(labelText, { selector: "label" }).click({ force: true })
 })
