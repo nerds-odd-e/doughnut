@@ -17,6 +17,9 @@
     "noUncheckedIndexedAccess": true,
     "isolatedModules": true,
     "noImplicitAny": false,
+    "paths": {
+      "@badeball/cypress-cucumber-preprocessor": ["node_modules/@badeball/cypress-cucumber-preprocessor"]
+    }
   },
   "exclude": [
     "backend/build/**/*.js",

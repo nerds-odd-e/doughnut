@@ -27,7 +27,7 @@
 import "@testing-library/cypress/add-commands"
 import "cypress-file-upload"
 import NotePath from "./NotePath"
-import start from "../start/index"
+import start from "../start"
 import "./string.extensions"
 import noteCreationForm from "../start/pageObjects/noteForms/noteCreationForm"
 

@@ -24,7 +24,7 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 15, // Allows for the parsing of modern ECMAScript features
     sourceType: "module", // Allows for the use of imports
-    project: "tsconfig.cypress.json",
+    project: "tsconfig.json",
     tsconfigRootDir: __dirname
   },
   ignorePatterns: [
