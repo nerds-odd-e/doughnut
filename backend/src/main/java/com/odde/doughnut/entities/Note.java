@@ -33,6 +33,8 @@ import org.springframework.beans.BeanUtils;
 public class Note extends Thingy {
   public static final int MAX_TITLE_LENGTH = 150;
 
+  private Note() {}
+
   @Embedded @Valid @Getter private final NoteAccessories noteAccessories = new NoteAccessories();
 
   @OneToOne(mappedBy = "note", cascade = CascadeType.ALL)
@@ -137,6 +139,7 @@ public class Note extends Thingy {
     return "Note{" + "id=" + id + ", title='" + getTopicConstructor() + '\'' + '}';
   }
 
+  @JsonIgnore
   public void setParentNote(Note parentNote) {
     if (parentNote == null) return;
     notebook = parentNote.getNotebook();
