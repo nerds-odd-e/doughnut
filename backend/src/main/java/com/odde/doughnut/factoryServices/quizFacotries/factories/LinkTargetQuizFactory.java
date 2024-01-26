@@ -22,7 +22,7 @@ public class LinkTargetQuizFactory implements QuizQuestionFactory, QuestionOptio
   @Override
   public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
-      cachedFillingOptions = servant.chooseFromCohortAvoidUncles(link, answerNote);
+      cachedFillingOptions = servant.chooseFromCohortAvoidUncles(link, answerNote).toList();
     }
     return cachedFillingOptions;
   }

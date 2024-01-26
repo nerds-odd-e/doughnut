@@ -26,7 +26,7 @@ public class ClozeTitleSelectionQuizFactory implements QuestionOptionsFactory, Q
 
   @Override
   public List<Note> generateFillingOptions() {
-    return servant.chooseFromCohort(answerNote, n -> !n.equals(answerNote));
+    return servant.chooseFromCohort(answerNote, n -> !n.equals(answerNote)).toList();
   }
 
   @Override

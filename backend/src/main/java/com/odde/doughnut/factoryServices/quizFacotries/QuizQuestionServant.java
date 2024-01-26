@@ -44,29 +44,26 @@ public class QuizQuestionServant {
     this.aiAdvisorService = aiAdvisorService;
   }
 
-  public List<Note> chooseFromCohort(Note answerNote, Predicate<Note> notePredicate) {
-    List<Note> list = getCohort(answerNote, notePredicate);
-    return randomizer.randomlyChoose(maxFillingOptionCount, list);
+  public Stream<Note> chooseFromCohort(Note answerNote, Predicate<Note> notePredicate) {
+    return randomizer.randomlyChoose(maxFillingOptionCount, getCohort(answerNote, notePredicate));
   }
 
-  public List<Note> getCohort(Note note, Predicate<Note> notePredicate) {
-    List<Note> list =
-        note.getSiblings().stream().filter(notePredicate).collect(Collectors.toList());
-    if (list.size() > 1) return list;
+  public Stream<Note> getCohort(Note note, Predicate<Note> notePredicate) {
+    List<Note> list = note.getSiblings().filter(notePredicate).toList();
+    if (list.size() > 1) return list.stream();
 
     return this.modelFactoryService
         .toNoteModel(note.getGrandAsPossible())
         .getDescendantsInBreathFirstOrder()
         .stream()
-        .filter(notePredicate)
-        .collect(Collectors.toList());
+        .filter(notePredicate);
   }
 
   private Optional<Link> chooseOneCategoryLink(Link link) {
     return randomizer.chooseOneRandomly(link.categoryLinksOfTarget(this.user));
   }
 
-  public <T> List<T> chooseFillingOptionsRandomly(List<T> candidates) {
+  public <T> Stream<T> chooseFillingOptionsRandomly(Stream<T> candidates) {
     return randomizer.randomlyChoose(maxFillingOptionCount, candidates);
   }
 
@@ -86,25 +83,18 @@ public class QuizQuestionServant {
     return cousinLinksOfSameLinkType.filter(l -> getReviewPoint(l.getThing()) != null);
   }
 
-  public List<ReviewPoint> getReviewPoints(Link link) {
-    ReviewPoint reviewPointFor = getReviewPoint(link.getThing());
-    if (reviewPointFor == null) return List.of();
-    return List.of(reviewPointFor);
-  }
-
   public ParentGrandLinkHelper getParentGrandLinkHelper(Link link) {
     Link parentGrandLink = chooseOneCategoryLink(link).orElse(null);
     if (parentGrandLink == null) return new NullParentGrandLinkHelper();
     return new ParentGrandLinkHelperImpl(this.user, link, parentGrandLink);
   }
 
-  public List<Note> chooseBackwardPeers(Link instanceLink, Link link1) {
+  public Stream<Note> chooseBackwardPeers(Link instanceLink, Link link1) {
     List<Note> instanceReverse = instanceLink.getLinkedSiblingsOfSameLinkType(user);
     List<Note> specReverse = link1.getLinkedSiblingsOfSameLinkType(user);
-    List<Note> backwardPeers =
+    Stream<Note> backwardPeers =
         Stream.concat(instanceReverse.stream(), specReverse.stream())
-            .filter(n -> !(instanceReverse.contains(n) && specReverse.contains(n)))
-            .collect(Collectors.toList());
+            .filter(n -> !(instanceReverse.contains(n) && specReverse.contains(n)));
     return chooseFillingOptionsRandomly(backwardPeers);
   }
 
@@ -113,34 +103,30 @@ public class QuizQuestionServant {
     return userModel.getReviewPointFor(thing);
   }
 
-  public List<Note> chooseFromCohortAvoidUncles(Link link1, Note answerNote) {
+  public Stream<Note> chooseFromCohortAvoidUncles(Link link1, Note answerNote) {
     List<Note> uncles = link1.getPiblingOfTheSameLinkType(user);
     return chooseCohortAndAvoid(answerNote, link1.getSourceNote(), uncles);
   }
 
-  private List<Note> chooseCohortAndAvoid(
+  private Stream<Note> chooseCohortAndAvoid(
       Note answerNote, Note noteToAvoid, List<Note> notesToAvoid) {
     return chooseFromCohort(
         answerNote,
         n -> !n.equals(answerNote) && !n.equals(noteToAvoid) && !notesToAvoid.contains(n));
   }
 
-  public List<Link> chooseLinkFromCohortAvoidSiblingsOfSameLinkType(Link link1, Note answerNote1) {
-    return chooseFromCohortAvoidSiblings(link1, answerNote1).stream()
-        .filter(n1 -> !n1.getLinks().isEmpty())
-        //                !new NoteViewer(user, n1)
-        //                    .linksOfTypeThroughDirect(List.of(link1.getLinkType()))
-        //                    .isEmpty())
-        .map(n -> n.getLinks().get(0))
+  public List<Link> chooseLinkFromCohortAvoidSiblingsOfSameLinkType(Link link, Note answerNote) {
+    return chooseFromCohortAvoidSiblings(link, answerNote)
+        .flatMap(n -> n.getLinks().stream())
         .collect(Collectors.toList());
   }
 
-  public List<Note> chooseFromCohortAvoidSiblings(Link link1, Note answerNote1) {
+  public Stream<Note> chooseFromCohortAvoidSiblings(Link link1, Note answerNote1) {
     List<Note> linkedSiblingsOfSameLinkType = link1.getLinkedSiblingsOfSameLinkType(user);
     return chooseCohortAndAvoid(answerNote1, link1.getTargetNote(), linkedSiblingsOfSameLinkType);
   }
 
-  public GlobalSettingsService getGobalSettingsService() {
+  public GlobalSettingsService getGlobalSettingsService() {
     return new GlobalSettingsService(modelFactoryService);
   }
 }
