@@ -1,0 +1,4 @@
+ALTER TABLE note DROP FOREIGN KEY note_ibfk_2;
+ALTER TABLE note DROP FOREIGN KEY note_ibfk_3;
+ALTER TABLE note DROP COLUMN parent_id;
+ALTER TABLE note DROP COLUMN constructor_id;

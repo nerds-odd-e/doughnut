@@ -85,13 +85,6 @@ public class Note extends Thingy {
     if (this.thing != null) this.thing.setDeletedAt(value);
   }
 
-  @OneToOne
-  @JoinColumn(name = "parent_id", referencedColumnName = "id")
-  @JsonIgnore
-  @Getter
-  @Setter
-  private Note parent;
-
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "master_review_setting_id", referencedColumnName = "id")
   @JsonIgnore
@@ -159,14 +152,7 @@ public class Note extends Thingy {
     return "Note{" + "id=" + id + ", title='" + getTopicConstructor() + '\'' + '}';
   }
 
-  @JsonIgnore
-  public void setParentNote(Note parentNote) {
-    if (parentNote == null) return;
-    notebook = parentNote.getNotebook();
-    parent = parentNote;
-    List<Note> ancestors = parentNote.getAncestors();
-    ancestors.add(parentNote);
-    Collections.reverse(ancestors);
+  private void addAncestors(List<Note> ancestors) {
     int[] counter = {1};
     ancestors.forEach(
         anc -> {
@@ -179,6 +165,15 @@ public class Note extends Thingy {
         });
   }
 
+  public void setParentNote(Note parentNote) {
+    if (parentNote == null) return;
+    notebook = parentNote.getNotebook();
+    List<Note> ancestors = parentNote.getAncestors();
+    ancestors.add(parentNote);
+    Collections.reverse(ancestors);
+    addAncestors(ancestors);
+  }
+
   @JsonIgnore
   public List<Note> getAncestors() {
     return getAncestorNotesClosures().stream().map(NotesClosure::getAncestor).collect(toList());
@@ -186,7 +181,11 @@ public class Note extends Thingy {
 
   @JsonIgnore
   public Note getParentNote() {
-    return getParent();
+    List<Note> ancestors = getAncestors();
+    if (ancestors.size() == 0) {
+      return null;
+    }
+    return ancestors.get(ancestors.size() - 1);
   }
 
   @JsonIgnore
