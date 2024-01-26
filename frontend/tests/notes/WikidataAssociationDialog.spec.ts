@@ -44,7 +44,7 @@ describe("Save wikidata id", () => {
   `(
     "associate $noteTitle with $wikidataTitle and choose to $userAction",
     async ({ noteTitle, wikidataTitle, userAction, shouldSave }) => {
-      const note = makeMe.aNote.topic(noteTitle).please();
+      const note = makeMe.aNote.topicConstructor(noteTitle).please();
       const wikidata = makeMe.aWikidataEntity
         .wikidataTitle(wikidataTitle)
         .please();

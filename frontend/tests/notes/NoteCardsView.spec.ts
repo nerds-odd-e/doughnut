@@ -7,8 +7,8 @@ helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("note wth child cards", () => {
   it("should render note with one child", async () => {
-    const noteParent = makeMe.aNoteRealm.topic("parent").please();
-    makeMe.aNoteRealm.topic("child").under(noteParent).please();
+    const noteParent = makeMe.aNoteRealm.topicConstructor("parent").please();
+    makeMe.aNoteRealm.topicConstructor("child").under(noteParent).please();
     helper.apiMock
       .expectingGet(`/api/notes/${noteParent.id}`)
       .andReturnOnce(noteParent);

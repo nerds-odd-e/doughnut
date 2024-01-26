@@ -4,7 +4,7 @@ import LinkViewedBuilder, { LinksMap } from "./LinkViewedBuilder";
 import NoteRealmBuilder from "./NoteRealmBuilder";
 
 class LinksMapBuilder extends Builder<LinksMap> {
-  from = new NoteRealmBuilder().topic("source note").do();
+  from = new NoteRealmBuilder().topicConstructor("source note").do();
 
   protected childrenBuilders: Omit<LinkViewedBuilder, "please">[] = [];
 
@@ -12,7 +12,9 @@ class LinksMapBuilder extends Builder<LinksMap> {
     const child = new LinkViewedBuilder(
       linkType,
       this.from,
-      new NoteRealmBuilder().topic(`target note ${generateId()}`).do(),
+      new NoteRealmBuilder()
+        .topicConstructor(`target note ${generateId()}`)
+        .do(),
     ).parent(this);
     this.childrenBuilders.push(child);
     return child;

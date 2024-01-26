@@ -13,7 +13,9 @@ describe("undo editing", () => {
       new ManagedApi({ errors: [], states: [] }),
     );
 
-    const noteRealm = makeMe.aNoteRealm.topic("Dummy Title").please();
+    const noteRealm = makeMe.aNoteRealm
+      .topicConstructor("Dummy Title")
+      .please();
     histories.refreshNoteRealm(noteRealm);
     helper.apiMock.expectingPatch(
       `/api/text_content/${noteRealm.id}/topic-constructor`,

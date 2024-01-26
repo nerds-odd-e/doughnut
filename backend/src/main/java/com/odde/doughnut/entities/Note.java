@@ -17,10 +17,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
@@ -147,6 +144,14 @@ public class Note extends Thingy {
     return note;
   }
 
+  public String getTopic() {
+    // avoid unnecessary database query
+    if (!topicConstructor.contains("%P")) return topicConstructor;
+    Note parent = getParentNote();
+    if (parent == null) return topicConstructor;
+    return topicConstructor.replace("%P", "[" + parent.getTopic() + "]");
+  }
+
   @Override
   public String toString() {
     return "Note{" + "id=" + id + ", title='" + getTopicConstructor() + '\'' + '}';
@@ -165,6 +170,7 @@ public class Note extends Thingy {
         });
   }
 
+  @JsonIgnore
   public void setParentNote(Note parentNote) {
     if (parentNote == null) return;
     notebook = parentNote.getNotebook();
@@ -181,11 +187,11 @@ public class Note extends Thingy {
 
   @JsonIgnore
   public Note getParentNote() {
-    List<Note> ancestors = getAncestors();
-    if (ancestors.size() == 0) {
+    try {
+      return getAncestors().getLast();
+    } catch (NoSuchElementException e) {
       return null;
     }
-    return ancestors.get(ancestors.size() - 1);
   }
 
   @JsonIgnore

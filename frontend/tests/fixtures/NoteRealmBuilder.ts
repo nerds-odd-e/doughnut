@@ -25,8 +25,8 @@ class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
     };
   }
 
-  topic(value: string): NoteRealmBuilder {
-    this.noteBuilder.topic(value);
+  topicConstructor(value: string): NoteRealmBuilder {
+    this.noteBuilder.topicConstructor(value);
     return this;
   }
 
@@ -63,7 +63,7 @@ class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
   }
 
   linkToSomeNote(title: string): NoteRealmBuilder {
-    return this.linkTo(new NoteRealmBuilder().topic(title).do());
+    return this.linkTo(new NoteRealmBuilder().topicConstructor(title).do());
   }
 
   linkTo(note: Generated.NoteRealm): NoteRealmBuilder {

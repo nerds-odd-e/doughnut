@@ -294,6 +294,7 @@ declare namespace Generated {
         wikidataId: string;
         deletedAt: string;
         pictureWithMask?: PictureWithMask;
+        topic: string;
     }
 
     interface Ownership {

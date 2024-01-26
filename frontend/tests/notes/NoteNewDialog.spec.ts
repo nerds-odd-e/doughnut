@@ -16,7 +16,7 @@ describe("adding new note", () => {
     vi.useRealTimers();
   });
 
-  const note = makeMe.aNote.topic("mythical").please();
+  const note = makeMe.aNote.topicConstructor("mythical").please();
 
   it("search for duplicate", async () => {
     helper.apiMock.expectingPost(`/api/notes/search`).andReturnOnce([note]);
