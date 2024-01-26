@@ -139,7 +139,7 @@ public class Note extends Thingy {
   @Where(clause = "deleted_at is null")
   @OrderBy("sibling_order")
   @Getter
-  private final List<Note> children = new ArrayList<>();
+  private final List<Note> allChildren = new ArrayList<>();
 
   public static Note createNote(User user, Timestamp currentUTCTimestamp, String topicConstructor) {
     final Note note = new Note();
@@ -149,6 +149,20 @@ public class Note extends Thingy {
 
     Thing.createThing(user, note, currentUTCTimestamp);
     return note;
+  }
+
+  @JsonIgnore
+  public List<Note> getChildren() {
+    return getAllChildren().stream()
+        .filter(nc -> !nc.usingLinkTypeAsTopicConstructor())
+        .collect(toList());
+  }
+
+  @JsonIgnore
+  public List<Note> getLinkChildren() {
+    return getAllChildren().stream()
+        .filter(Note::usingLinkTypeAsTopicConstructor)
+        .collect(toList());
   }
 
   public String getTopic() {
@@ -163,12 +177,16 @@ public class Note extends Thingy {
   }
 
   private String getLinkConstructor() {
-    if (topicConstructor.startsWith(":")) {
+    if (usingLinkTypeAsTopicConstructor()) {
       Link.LinkType linkType = Link.LinkType.fromLabel(topicConstructor.substring(1));
       if (linkType == null) throw new RuntimeException("Invalid link type: " + topicConstructor);
       return "%P is " + linkType.label + " %T";
     }
     return topicConstructor;
+  }
+
+  private boolean usingLinkTypeAsTopicConstructor() {
+    return topicConstructor.startsWith(":");
   }
 
   @Override

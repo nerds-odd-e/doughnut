@@ -50,15 +50,6 @@ public class LinkTest {
     }
 
     @Test
-    void allLinkTypesAreAvailable() {
-      Link link = Link.createLink(noteA, noteB, null, null, null);
-      link.setSourceNote(noteA);
-      link.setTargetNote(noteB);
-      assertTrue(link.getPossibleLinkTypes().contains(RELATED_TO));
-      assertTrue(link.getPossibleLinkTypes().contains(SPECIALIZE));
-    }
-
-    @Test
     public void shouldNeverUseTheNoLinkType() {
       Link link = makeMe.aLink().inMemoryPlease();
       link.setLinkType(NO_LINK);
@@ -104,16 +95,6 @@ public class LinkTest {
         final Map<Link.LinkType, LinkViewed> allLinks = new NoteViewer(null, noteB).getAllLinks();
         assertThat(allLinks.keySet(), contains(SPECIALIZE));
         assertThat(allLinks.get(SPECIALIZE).getReverse(), hasSize(1));
-      }
-
-      @Test
-      void belongsIsNotAvailableBetweenTheSourceAndTargetAnyMore() {
-        makeMe.refresh(noteA);
-        Link link = Link.createLink(noteA, noteB, null, null, null);
-        link.setSourceNote(noteA);
-        link.setTargetNote(noteB);
-        assertTrue(link.getPossibleLinkTypes().contains(RELATED_TO));
-        assertFalse(link.getPossibleLinkTypes().contains(SPECIALIZE));
       }
     }
   }

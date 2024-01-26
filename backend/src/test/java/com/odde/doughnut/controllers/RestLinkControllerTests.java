@@ -111,9 +111,10 @@ class RestLinkControllerTests {
       Note note3 = makeMe.aNote("flower tea").creatorAndOwner(userModel).please();
       controller().linkNoteFinalize(note3, note2, linkCreation, makeMe.successfulBindingResult());
       makeMe.refresh(note3);
-      assertThat(note3.getChildren(), hasSize(1));
+      assertThat(note3.getChildren(), hasSize(0));
+      assertThat(note3.getLinkChildren(), hasSize(1));
       assertThat(
-          note3.getChildren().get(0).getTopic(),
+          note3.getLinkChildren().get(0).getTopic(),
           equalTo("[flower tea] is an application of [flower]"));
     }
 

@@ -302,18 +302,6 @@ public class Link extends Thingy {
   }
 
   @JsonIgnore
-  public List<LinkType> getPossibleLinkTypes() {
-    final List<LinkType> existingTypes =
-        sourceNote.getLinks().stream()
-            .filter(l -> l.targetNote == targetNote)
-            .map(Link::getLinkType)
-            .toList();
-    return Arrays.stream(LinkType.values())
-        .filter(lt -> lt == getLinkType() || !existingTypes.contains(lt))
-        .collect(Collectors.toList());
-  }
-
-  @JsonIgnore
   public boolean sourceVisibleAsTargetOrTo(User viewer) {
     if (sourceNote.getNotebook() == targetNote.getNotebook()) return true;
     if (viewer == null) return false;
