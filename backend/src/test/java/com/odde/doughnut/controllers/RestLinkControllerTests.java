@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.json.LinkCreation;
@@ -101,7 +102,16 @@ class RestLinkControllerTests {
       long beforeThingCount = makeMe.modelFactoryService.thingRepository.count();
       controller().linkNoteFinalize(note3, note2, linkCreation, makeMe.successfulBindingResult());
       long afterThingCount = makeMe.modelFactoryService.thingRepository.count();
-      assertThat(afterThingCount, equalTo(beforeThingCount + 1));
+      assertThat(afterThingCount, equalTo(beforeThingCount + 2));
+    }
+
+    @Test
+    void createdChildNoteSuccessfully()
+        throws CyclicLinkDetectedException, BindException, UnexpectedNoAccessRightException {
+      Note note3 = makeMe.aNote().creatorAndOwner(userModel).please();
+      controller().linkNoteFinalize(note3, note2, linkCreation, makeMe.successfulBindingResult());
+      makeMe.refresh(note3);
+      assertThat(note3.getChildren(), hasSize(1));
     }
 
     @Test
