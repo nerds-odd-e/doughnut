@@ -283,6 +283,7 @@ declare namespace Generated {
     }
 
     interface Note extends Thingy {
+        topic: string;
         topicConstructor: string;
         /**
          * The details of the note is in markdown format.
@@ -294,7 +295,6 @@ declare namespace Generated {
         wikidataId: string;
         deletedAt: string;
         pictureWithMask?: PictureWithMask;
-        topic: string;
     }
 
     interface Ownership {

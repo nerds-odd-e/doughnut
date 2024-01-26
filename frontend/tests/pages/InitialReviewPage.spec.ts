@@ -82,7 +82,7 @@ describe("repeat page", () => {
     expect(mockRouterPush).toHaveBeenCalledTimes(0);
     expect(wrapper.findAll(".initial-review-paused")).toHaveLength(1);
     expect(wrapper.find(".review-point-abbr span").text()).toContain(
-      noteRealm.note.topicConstructor,
+      noteRealm.note.topic,
     );
   });
 
@@ -100,10 +100,10 @@ describe("repeat page", () => {
     expect(mockRouterPush).toHaveBeenCalledTimes(0);
     expect(wrapper.findAll(".initial-review-paused")).toHaveLength(1);
     expect(wrapper.find(".review-point-abbr span").text()).toContain(
-      link.sourceNote.topicConstructor,
+      link.sourceNote.topic,
     );
     expect(wrapper.find(".review-point-abbr span").text()).toContain(
-      link.targetNote.topicConstructor,
+      link.targetNote.topic,
     );
   });
 });
