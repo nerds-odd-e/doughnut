@@ -1,7 +1,7 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.Link;
-import java.util.stream.Stream;
+import java.util.List;
 
 public class NullParentGrandLinkHelper implements ParentGrandLinkHelper {
 
@@ -11,7 +11,7 @@ public class NullParentGrandLinkHelper implements ParentGrandLinkHelper {
   }
 
   @Override
-  public Stream<Link> getCousinLinksAvoidingSiblings() {
-    return Stream.empty();
+  public List<Link> getCousinLinksAvoidingSiblings() {
+    return List.of();
   }
 }

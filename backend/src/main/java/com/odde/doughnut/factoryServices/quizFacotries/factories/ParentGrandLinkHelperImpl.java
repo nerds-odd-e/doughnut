@@ -17,14 +17,15 @@ public record ParentGrandLinkHelperImpl(User user, Link link, Link parentGrandLi
   }
 
   @Override
-  public Stream<Link> getCousinLinksAvoidingSiblings() {
+  public List<Link> getCousinLinksAvoidingSiblings() {
     List<Note> linkedSiblingsOfSameLinkType = link.getLinkedSiblingsOfSameLinkType(user);
     return getUncles()
         .flatMap(
             p ->
                 new NoteViewer(user, p.getSourceNote())
                     .linksOfTypeThroughReverse(link.getLinkType()))
-        .filter(cousinLink -> !linkedSiblingsOfSameLinkType.contains(cousinLink.getSourceNote()));
+        .filter(cousinLink -> !linkedSiblingsOfSameLinkType.contains(cousinLink.getSourceNote()))
+        .collect(Collectors.toList());
   }
 
   private Stream<Link> getUncles() {

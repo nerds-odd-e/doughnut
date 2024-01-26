@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Where;
@@ -233,11 +232,11 @@ public class Note extends Thingy {
   }
 
   @JsonIgnore
-  public Stream<Note> getSiblings() {
+  public List<Note> getSiblings() {
     if (getParentNote() == null) {
-      return Stream.empty();
+      return new ArrayList<>();
     }
-    return getParentNote().getChildren().stream();
+    return Collections.unmodifiableList(getParentNote().getChildren());
   }
 
   public void mergeMasterReviewSetting(ReviewSetting reviewSetting) {
@@ -270,7 +269,7 @@ public class Note extends Thingy {
   }
 
   private Optional<Note> nextSibling() {
-    return getSiblings().filter(nc -> nc.siblingOrder > siblingOrder).findFirst();
+    return getSiblings().stream().filter(nc -> nc.siblingOrder > siblingOrder).findFirst();
   }
 
   private long getSiblingOrderToInsertBehindMe() {

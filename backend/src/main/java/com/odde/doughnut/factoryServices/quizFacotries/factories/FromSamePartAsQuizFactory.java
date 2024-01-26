@@ -5,7 +5,6 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class FromSamePartAsQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
@@ -25,10 +24,9 @@ public class FromSamePartAsQuizFactory
   @Override
   public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
-      Stream<Link> remoteCousins = parentGrandLinkHelper.getCousinLinksAvoidingSiblings();
+      List<Link> remoteCousins = parentGrandLinkHelper.getCousinLinksAvoidingSiblings();
       cachedFillingOptions =
-          servant
-              .chooseFillingOptionsRandomly(remoteCousins)
+          servant.chooseFillingOptionsRandomly(remoteCousins).stream()
               .map(Link::getSourceNote)
               .collect(Collectors.toList());
     }

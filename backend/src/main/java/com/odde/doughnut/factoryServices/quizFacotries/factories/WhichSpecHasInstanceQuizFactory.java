@@ -26,7 +26,7 @@ public class WhichSpecHasInstanceQuizFactory
     if (cachedFillingOptions != null) {
       return cachedFillingOptions;
     }
-    this.cachedFillingOptions = servant.chooseBackwardPeers(cachedInstanceLink, link).toList();
+    this.cachedFillingOptions = servant.chooseBackwardPeers(cachedInstanceLink, link);
     return cachedFillingOptions;
   }
 
