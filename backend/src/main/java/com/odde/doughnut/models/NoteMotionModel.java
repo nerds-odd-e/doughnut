@@ -26,7 +26,7 @@ public class NoteMotionModel {
         .getDescendantsInBreathFirstOrder()
         .forEach(
             desc -> {
-              updateAncestors(desc, desc.getParent());
+              updateAncestors(desc, desc.getParentNote());
               modelFactoryService.save(desc);
             });
     if (notebook.getHeadNote() == entity.getSubject()) {

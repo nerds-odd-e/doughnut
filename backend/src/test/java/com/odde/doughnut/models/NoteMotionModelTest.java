@@ -54,7 +54,7 @@ public class NoteMotionModelTest {
   }
 
   private void assertOrder(Note note1, Note note2) {
-    Note parentNote = note1.getParent();
+    Note parentNote = note1.getParentNote();
     makeMe.refresh(parentNote);
     assertThat(parentNote.getChildren(), containsInRelativeOrder(note1, note2));
   }
@@ -74,7 +74,7 @@ public class NoteMotionModelTest {
   @Test
   void moveUnder() throws CyclicLinkDetectedException {
     move(firstChild, secondChild, true);
-    assertThat(firstChild.getParent(), equalTo(secondChild));
+    assertThat(firstChild.getParentNote(), equalTo(secondChild));
   }
 
   @Test
@@ -98,7 +98,7 @@ public class NoteMotionModelTest {
     @Test
     void moveAfterNoteOfDifferentLevel() throws CyclicLinkDetectedException {
       move(secondChild, thirdLevel, false);
-      assertThat(secondChild.getParent(), equalTo(firstChild));
+      assertThat(secondChild.getParentNote(), equalTo(firstChild));
     }
 
     @Test

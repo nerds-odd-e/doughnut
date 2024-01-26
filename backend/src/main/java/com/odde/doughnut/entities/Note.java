@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Where;
+import org.hibernate.annotations.WhereJoinTable;
 import org.springframework.beans.BeanUtils;
 
 @Entity
@@ -117,10 +118,29 @@ public class Note extends Thingy {
   @Setter
   private List<NotesClosure> ancestorNotesClosures = new ArrayList<>();
 
-  @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinTable(
+      name = "notes_closure",
+      joinColumns = {
+        @JoinColumn(
+            name = "ancestor_id",
+            referencedColumnName = "id",
+            nullable = false,
+            insertable = false,
+            updatable = false)
+      },
+      inverseJoinColumns = {
+        @JoinColumn(
+            name = "note_id",
+            referencedColumnName = "id",
+            nullable = false,
+            insertable = false,
+            updatable = false)
+      })
+  @OneToMany(cascade = CascadeType.DETACH)
+  @JsonIgnore
+  @WhereJoinTable(clause = "depth = 1")
   @Where(clause = "deleted_at is null")
   @OrderBy("sibling_order")
-  @JsonIgnore
   @Getter
   private final List<Note> children = new ArrayList<>();
 
@@ -165,11 +185,16 @@ public class Note extends Thingy {
   }
 
   @JsonIgnore
+  public Note getParentNote() {
+    return getParent();
+  }
+
+  @JsonIgnore
   public List<Note> getSiblings() {
-    if (getParent() == null) {
+    if (getParentNote() == null) {
       return new ArrayList<>();
     }
-    return Collections.unmodifiableList(getParent().getChildren());
+    return Collections.unmodifiableList(getParentNote().getChildren());
   }
 
   public void mergeMasterReviewSetting(ReviewSetting reviewSetting) {
@@ -237,7 +262,7 @@ public class Note extends Thingy {
   }
 
   public Optional<Integer> getParentId() {
-    Note parent = getParent();
+    Note parent = getParentNote();
     if (parent == null) return Optional.empty();
     return Optional.ofNullable(parent.id);
   }
@@ -245,10 +270,7 @@ public class Note extends Thingy {
   @JsonIgnore
   public Note getGrandAsPossible() {
     Note grand = this;
-    for (int i = 0; i < 2; i++)
-      if (grand.getParent() != null) {
-        grand = grand.getParent();
-      }
+    for (int i = 0; i < 2; i++) if (grand.getParentNote() != null) grand = grand.getParentNote();
     return grand;
   }
 
@@ -276,8 +298,8 @@ public class Note extends Thingy {
   }
 
   private Optional<String> getNotePicture() {
-    if (noteAccessories.getUseParentPicture() && getParent() != null) {
-      return getParent().getNotePicture();
+    if (noteAccessories.getUseParentPicture() && getParentNote() != null) {
+      return getParentNote().getNotePicture();
     }
     return noteAccessories.getNotePicture();
   }
@@ -296,7 +318,7 @@ public class Note extends Thingy {
 
   public void buildLinkToParent(
       User user, Link.LinkType linkTypeToParent, Timestamp currentUTCTimestamp) {
-    buildLinkToNote(user, linkTypeToParent, currentUTCTimestamp, getParent());
+    buildLinkToNote(user, linkTypeToParent, currentUTCTimestamp, getParentNote());
   }
 
   public Link buildLinkToNote(

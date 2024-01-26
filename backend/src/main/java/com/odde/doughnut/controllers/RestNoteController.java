@@ -143,7 +143,7 @@ class RestNoteController {
     currentUser.assertAuthorization(note);
     modelFactoryService.toNoteModel(note).destroy(testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.entityManager.flush();
-    Note parentNote = note.getParent();
+    Note parentNote = note.getParentNote();
     if (parentNote != null) {
       return List.of(new NoteViewer(currentUser.getEntity(), parentNote).toJsonObject());
     }
