@@ -99,6 +99,7 @@ class RestLinkController {
     Note note =
         sourceNote.buildChildNote(
             user, testabilitySettings.getCurrentUTCTimestamp(), ":" + linkCreation.linkType.label);
+    note.setTargetNote(targetNote);
     modelFactoryService.save(note);
 
     return getNoteRealm(link, user, linkCreation.fromTargetPerspective);

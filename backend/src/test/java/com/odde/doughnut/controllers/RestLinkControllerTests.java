@@ -90,7 +90,7 @@ class RestLinkControllerTests {
     void setup() {
       anotherUser = makeMe.aUser().please();
       note1 = makeMe.aNote().creatorAndOwner(anotherUser).please();
-      note2 = makeMe.aNote().creatorAndOwner(userModel).please();
+      note2 = makeMe.aNote("flower").creatorAndOwner(userModel).please();
       linkCreation.linkType = LinkType.APPLICATION;
       linkCreation.moveUnder = true;
     }
@@ -108,10 +108,13 @@ class RestLinkControllerTests {
     @Test
     void createdChildNoteSuccessfully()
         throws CyclicLinkDetectedException, BindException, UnexpectedNoAccessRightException {
-      Note note3 = makeMe.aNote().creatorAndOwner(userModel).please();
+      Note note3 = makeMe.aNote("flower tea").creatorAndOwner(userModel).please();
       controller().linkNoteFinalize(note3, note2, linkCreation, makeMe.successfulBindingResult());
       makeMe.refresh(note3);
       assertThat(note3.getChildren(), hasSize(1));
+      assertThat(
+          note3.getChildren().get(0).getTopic(),
+          equalTo("[flower tea] is an application of [flower]"));
     }
 
     @Test

@@ -72,6 +72,13 @@ public class Note extends Thingy {
   @Getter
   private Notebook notebook;
 
+  @ManyToOne
+  @JoinColumn(name = "target_note_id", referencedColumnName = "id")
+  @JsonIgnore
+  @Getter
+  @Setter
+  private Note targetNote;
+
   @Column(name = "deleted_at")
   @Getter
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -145,11 +152,23 @@ public class Note extends Thingy {
   }
 
   public String getTopic() {
-    // avoid unnecessary database query
-    if (!topicConstructor.contains("%P")) return topicConstructor;
+    String constructor = getLinkConstructor();
+    if (!constructor.contains("%P")) return constructor;
     Note parent = getParentNote();
-    if (parent == null) return topicConstructor;
-    return topicConstructor.replace("%P", "[" + parent.getTopic() + "]");
+    if (parent == null) return constructor;
+    String target = getTargetNote() == null ? "missing target" : getTargetNote().getTopic();
+    return constructor
+        .replace("%P", "[" + parent.getTopic() + "]")
+        .replace("%T", "[" + target + "]");
+  }
+
+  private String getLinkConstructor() {
+    if (topicConstructor.startsWith(":")) {
+      Link.LinkType linkType = Link.LinkType.fromLabel(topicConstructor.substring(1));
+      if (linkType == null) throw new RuntimeException("Invalid link type: " + topicConstructor);
+      return "%P is " + linkType.label + " %T";
+    }
+    return topicConstructor;
   }
 
   @Override
