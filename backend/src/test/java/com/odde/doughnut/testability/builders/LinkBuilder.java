@@ -14,7 +14,15 @@ public class LinkBuilder extends EntityBuilder<Link> {
   }
 
   @Override
-  protected void beforeCreate(boolean needPersist) {}
+  protected void beforeCreate(boolean needPersist) {
+    if (entity.getSourceNote() == null) return;
+    makeMe
+        .aNote()
+        .creatorAndOwner(entity.getThing().getCreator())
+        .under(entity.getSourceNote())
+        .target(entity.getTargetNote(), entity.getLinkType())
+        .please(needPersist);
+  }
 
   public LinkBuilder creator(User user) {
     entity.getThing().setCreator(user);

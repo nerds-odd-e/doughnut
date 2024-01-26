@@ -174,4 +174,10 @@ public class NoteBuilder extends EntityBuilder<Note> {
     entity.setWikidataId(wikidataId);
     return this;
   }
+
+  public NoteBuilder target(Note targetNote, Link.LinkType linkType) {
+    entity.setTargetNote(targetNote);
+    entity.setTopicConstructor(":" + linkType.label);
+    return this;
+  }
 }
