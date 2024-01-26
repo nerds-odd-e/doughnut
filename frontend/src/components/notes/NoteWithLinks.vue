@@ -1,7 +1,7 @@
 <template>
   <NoteShell v-if="note" v-bind="{ id: note.id, updatedAt: note.updatedAt }">
     <NoteFrameOfLinks v-if="links" v-bind="{ links, storageAccessor }">
-      <NoteContent v-bind="{ note, parentNote, storageAccessor }" />
+      <NoteContent v-bind="{ note, storageAccessor }" />
     </NoteFrameOfLinks>
     <template #footer>
       <slot name="footer" />
@@ -20,7 +20,6 @@ import LinksMap from "../../models/LinksMap";
 export default defineComponent({
   props: {
     note: { type: Object as PropType<Generated.Note>, required: true },
-    parentNote: { type: Object as PropType<Generated.Note> },
     links: {
       type: Object as PropType<LinksMap>,
     },

@@ -2,11 +2,7 @@
   <div class="alert alert-warning" v-if="note.deletedAt">
     This note has been deleted
   </div>
-  <NoteTextContent
-    :note="note"
-    :parent-note="parentNote"
-    :storage-accessor="storageAccessor"
-  >
+  <NoteTextContent :note="note" :storage-accessor="storageAccessor">
     <template #topic-additional>
       <div class="header-options">
         <NoteWikidataAssociation
@@ -46,7 +42,6 @@ import NoteTextContent from "./NoteTextContent.vue";
 export default defineComponent({
   props: {
     note: { type: Object as PropType<Generated.Note>, required: true },
-    parentNote: { type: Object as PropType<Generated.Note> },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,

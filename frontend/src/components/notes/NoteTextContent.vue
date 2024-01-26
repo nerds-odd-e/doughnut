@@ -14,7 +14,7 @@
           @blur="blur"
           :errors="errors.topic"
         >
-          <h2><NoteTopic v-bind="{ note, parentNote }" /></h2>
+          <h2><NoteTopic v-bind="{ topic: note.topic }" /></h2>
         </EditableText>
       </template>
     </TextContentWrapper>
@@ -53,7 +53,6 @@ import NoteTopic from "./NoteTopic.vue";
 export default defineComponent({
   props: {
     note: { type: Object as PropType<Generated.Note>, required: true },
-    parentNote: { type: Object as PropType<Generated.Note> },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,

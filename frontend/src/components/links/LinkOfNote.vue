@@ -5,7 +5,7 @@
       v-if="!!reverse"
       :inverse-icon="true"
     />
-    <NoteTopicConstructorWithLink class="link-title" v-bind="{ note }" />
+    <NoteTopicWithLink class="link-title" v-bind="{ note }" />
     <LinkNob
       v-bind="{ link, colors, storageAccessor }"
       v-if="!reverse"
@@ -16,7 +16,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import NoteTopicConstructorWithLink from "../notes/NoteTopicConstructorWithLink.vue";
+import NoteTopicWithLink from "../notes/NoteTopicWithLink.vue";
 import LinkNob from "./LinkNob.vue";
 import { colors } from "../../colors";
 import { StorageAccessor } from "../../store/createNoteStorage";
@@ -30,7 +30,7 @@ export default defineComponent({
       required: true,
     },
   },
-  components: { NoteTopicConstructorWithLink, LinkNob },
+  components: { NoteTopicWithLink, LinkNob },
   computed: {
     note() {
       return this.reverse ? this.link.sourceNote : this.link.targetNote;

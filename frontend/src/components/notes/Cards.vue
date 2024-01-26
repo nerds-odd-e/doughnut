@@ -7,7 +7,7 @@
       v-for="note in notes"
       :key="note.id"
     >
-      <Card v-bind="{ note, parentNote }">
+      <Card v-bind="{ note }">
         <template #cardHeader>
           <slot name="cardHeader" :note="note" />
         </template>
@@ -27,7 +27,6 @@ export default defineComponent({
   props: {
     notes: { type: Array as PropType<Generated.Note[]>, required: true },
     columns: { type: Number, default: 4 },
-    parentNote: { type: Object as PropType<Generated.Note> },
   },
   components: { Card },
 });
