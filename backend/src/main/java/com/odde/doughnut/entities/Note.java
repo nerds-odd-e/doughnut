@@ -430,12 +430,5 @@ The note of current focus (in JSON format):
             modelFactoryService.save(link);
           }
         });
-
-    refers.forEach(
-        link -> {
-          if (link.getId() == null) {
-            modelFactoryService.save(link);
-          }
-        });
   }
 }
