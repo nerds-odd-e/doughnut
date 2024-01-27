@@ -358,9 +358,9 @@ public class Note extends Thingy {
     setDetails(desc);
   }
 
-  public void buildLinkToParent(
+  public Link buildLinkToParent(
       User user, Link.LinkType linkTypeToParent, Timestamp currentUTCTimestamp) {
-    buildLinkToNote(user, linkTypeToParent, currentUTCTimestamp, getParentNote());
+    return buildLinkToNote(user, linkTypeToParent, currentUTCTimestamp, getParentNote());
   }
 
   public Link buildLinkToNote(

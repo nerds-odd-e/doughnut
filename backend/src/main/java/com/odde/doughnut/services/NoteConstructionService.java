@@ -21,8 +21,11 @@ public record NoteConstructionService(
       String topicConstructor)
       throws DuplicateWikidataIdException, IOException, InterruptedException {
     Note note = parentNote.buildChildNote(user, currentUTCTimestamp, topicConstructor);
-    note.buildLinkToParent(user, linkTypeToParent, currentUTCTimestamp);
+    Link link = note.buildLinkToParent(user, linkTypeToParent, currentUTCTimestamp);
     modelFactoryService.save(note);
+    if (link != null) {
+      modelFactoryService.save(link);
+    }
     if (wikidataIdWithApi != null) {
       wikidataIdWithApi.associateNoteToWikidata(note, modelFactoryService);
       wikidataIdWithApi.getCountryOfOrigin().ifPresent(wwa -> createSubNote(note, wwa));
