@@ -92,10 +92,13 @@ public class NoteBuilder extends EntityBuilder<Note> {
     if (entity.getThing().getCreator() == null) {
       creator(makeMe.aUser().please(needPersist));
     }
+    if (creatorBuilder != null) creatorBuilder.please(needPersist);
     if (entity.getNotebook() == null) {
       asHeadNoteOfANotebook(entity.getThing().getCreator().getOwnership());
     }
-    if (creatorBuilder != null) creatorBuilder.please(needPersist);
+    if (entity.getNotebook().getId() == null && needPersist) {
+      makeMe.modelFactoryService.save(entity.getNotebook());
+    }
   }
 
   @Override

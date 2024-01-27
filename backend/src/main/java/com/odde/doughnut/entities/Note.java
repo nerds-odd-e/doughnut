@@ -416,12 +416,5 @@ The note of current focus (in JSON format):
   }
 
   @Override
-  public void beforeCreate(ModelFactoryService modelFactoryService) {
-    if (getNotebook().getId() == null) {
-      modelFactoryService.save(getNotebook());
-    }
-  }
-
-  @Override
-  public void afterEnsureId(ModelFactoryService modelFactoryService) {}
+  public void beforeCreate(ModelFactoryService modelFactoryService) {}
 }

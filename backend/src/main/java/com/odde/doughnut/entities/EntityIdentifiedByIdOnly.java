@@ -30,6 +30,4 @@ public class EntityIdentifiedByIdOnly {
   public void beforeCreate(ModelFactoryService modelFactoryService) {}
 
   public void beforeUpdate(ModelFactoryService modelFactoryService) {}
-
-  public void afterEnsureId(ModelFactoryService modelFactoryService) {}
 }

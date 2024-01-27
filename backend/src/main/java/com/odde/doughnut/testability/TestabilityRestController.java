@@ -128,15 +128,18 @@ class TestabilityRestController {
         User user,
         Ownership ownership,
         Map<String, Note> titleNoteMap,
-        NoteRepository noteRepository) {
+        ModelFactoryService modelFactoryService) {
       seedNotes.forEach(
           seed -> {
             Note note = titleNoteMap.get(seed.topicConstructor);
 
             if (Strings.isBlank(seed.testingParent)) {
               note.buildNotebookForHeadNote(ownership, user);
+              modelFactoryService.save(note.getNotebook());
             } else {
-              note.setParentNote(getParentNote(titleNoteMap, noteRepository, seed.testingParent));
+              note.setParentNote(
+                  getParentNote(
+                      titleNoteMap, modelFactoryService.noteRepository, seed.testingParent));
             }
           });
     }
@@ -163,7 +166,7 @@ class TestabilityRestController {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
     Map<String, Note> titleNoteMap = seedInfo.buildIndividualNotes(user, currentUTCTimestamp);
-    seedInfo.buildNoteTree(user, ownership, titleNoteMap, this.noteRepository);
+    seedInfo.buildNoteTree(user, ownership, titleNoteMap, this.modelFactoryService);
     seedInfo.saveByOriginalOrder(titleNoteMap, this.modelFactoryService);
     return titleNoteMap.values().stream()
         .collect(Collectors.toMap(note -> note.getTopicConstructor(), Thingy::getId));

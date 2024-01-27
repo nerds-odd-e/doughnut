@@ -62,6 +62,7 @@ public class Ownership {
       String topicConstructor) {
     final Note note = Note.createNote(user, currentUTCTimestamp, topicConstructor);
     note.buildNotebookForHeadNote(this, user);
+    modelFactoryService.save(note.getNotebook());
     modelFactoryService.save(note);
     return note;
   }

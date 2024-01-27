@@ -128,12 +128,9 @@ public class ModelFactoryService {
     entity.beforeCommit(this);
     if (entity.getId() == null) {
       entityManager.persist(entity);
-      entity.afterEnsureId(this);
-    } else {
-      entity.afterEnsureId(this);
-      entityManager.merge(entity);
+      return entity;
     }
-    return entity;
+    return entityManager.merge(entity);
   }
 
   public <T extends EntityIdentifiedByIdOnly> T remove(T entity) {
