@@ -117,9 +117,9 @@ public class QuizQuestionServant {
     return chooseFromCohort(answerNote, n -> !n.equals(noteToAvoid) && !notesToAvoid.contains(n));
   }
 
-  public List<Link> chooseLinkFromCohortAvoidSiblingsOfSameLinkType(Link answerLink) {
+  public List<Link> chooseOneLinkFromEachCohortAvoidSiblingsOfSameLinkType(Link answerLink) {
     return chooseFromCohortAvoidSiblings(answerLink).stream()
-        .flatMap(n -> n.getLinks().stream())
+        .flatMap(n -> randomizer.chooseOneRandomly(n.getLinks()).stream())
         .collect(Collectors.toList());
   }
 

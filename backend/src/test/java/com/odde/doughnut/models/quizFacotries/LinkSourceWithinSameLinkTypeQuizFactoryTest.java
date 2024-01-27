@@ -2,10 +2,7 @@ package com.odde.doughnut.models.quizFacotries;
 
 import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.LINK_SOURCE_WITHIN_SAME_LINK_TYPE;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.in;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.Link;
@@ -73,6 +70,14 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
       assertThat(
           "tomato <mark title='Hidden text that is matching the answer'>[...]</mark>", in(options));
       assertThat(anotherSource.getTopicConstructor(), in(options));
+    }
+
+    @Test
+    void shouldIncludeOneLinkFromEachFillingOptions() {
+      makeMe.aLink().between(anotherSource, top).please();
+      QuizQuestion quizQuestion = buildLinkTargetQuizQuestion();
+      List<String> options = toOptionStrings(quizQuestion);
+      assertThat(options, hasSize(2));
     }
   }
 
