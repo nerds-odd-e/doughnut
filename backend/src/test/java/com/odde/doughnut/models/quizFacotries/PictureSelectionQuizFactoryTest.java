@@ -2,10 +2,7 @@ package com.odde.doughnut.models.quizFacotries;
 
 import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.PICTURE_SELECTION;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.in;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.Note;
@@ -93,6 +90,14 @@ class PictureSelectionQuizFactoryTest {
         QuizQuestion quizQuestion = buildQuestion();
         List<String> options = toOptionStrings(quizQuestion);
         assertThat(uncle.getTopicConstructor(), in(options));
+      }
+
+      @Test
+      void shouldNotIncludeUncleIfEnoughOptions() {
+        makeMe.theNote(brother).pictureUrl("http://img/img2.jpg").please();
+        QuizQuestion quizQuestion = buildQuestion();
+        List<String> options = toOptionStrings(quizQuestion);
+        assertThat(uncle.getTopicConstructor(), not(in(options)));
       }
     }
   }

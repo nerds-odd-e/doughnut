@@ -50,9 +50,9 @@ public class QuizQuestionServant {
   }
 
   public List<Note> getCohort(Note note, Predicate<Note> notePredicate) {
-    //    List<Note> list =
-    //        note.getSiblings().stream().filter(notePredicate).collect(Collectors.toList());
-    //    if (list.size() > 1) return list;
+    List<Note> list =
+        note.getSiblings().stream().filter(notePredicate).collect(Collectors.toList());
+    if (list.size() > 0) return list;
 
     return this.modelFactoryService
         .toNoteModel(note.getGrandAsPossible())
