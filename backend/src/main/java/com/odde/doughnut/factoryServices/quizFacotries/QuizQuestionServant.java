@@ -127,11 +127,7 @@ public class QuizQuestionServant {
 
   public List<Link> chooseLinkFromCohortAvoidSiblingsOfSameLinkType(Link link1, Note answerNote1) {
     return chooseFromCohortAvoidSiblings(link1, answerNote1).stream()
-        .filter(n1 -> !n1.getLinks().isEmpty())
-        //                !new NoteViewer(user, n1)
-        //                    .linksOfTypeThroughDirect(List.of(link1.getLinkType()))
-        //                    .isEmpty())
-        .map(n -> n.getLinks().get(0))
+        .flatMap(n -> n.getLinks().stream())
         .collect(Collectors.toList());
   }
 
