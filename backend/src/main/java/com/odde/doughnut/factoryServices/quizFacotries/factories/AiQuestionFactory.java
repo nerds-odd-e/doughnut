@@ -22,7 +22,7 @@ public class AiQuestionFactory implements QuizQuestionFactory, QuestionRawJsonFa
     MCQWithAnswer MCQWithAnswer =
         servant.aiAdvisorService.generateQuestion(
             thing.getNote(),
-            servant.getGobalSettingsService().getGlobalSettingQuestionGeneration().getValue());
+            servant.getGlobalSettingsService().getGlobalSettingQuestionGeneration().getValue());
     quizQuestion.setRawJsonQuestion(MCQWithAnswer.toJsonString());
     quizQuestion.setCorrectAnswerIndex(MCQWithAnswer.correctChoiceIndex);
   }

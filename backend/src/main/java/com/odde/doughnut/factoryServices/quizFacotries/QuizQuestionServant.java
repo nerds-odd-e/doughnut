@@ -46,7 +46,7 @@ public class QuizQuestionServant {
 
   public List<Note> chooseFromCohort(Note answerNote, Predicate<Note> notePredicate) {
     List<Note> list = getCohort(answerNote, notePredicate);
-    return randomizer.randomlyChoose(maxFillingOptionCount, list);
+    return randomizer.randomlyChoose(maxFillingOptionCount, list).toList();
   }
 
   public List<Note> getCohort(Note note, Predicate<Note> notePredicate) {
@@ -67,7 +67,7 @@ public class QuizQuestionServant {
   }
 
   public <T> List<T> chooseFillingOptionsRandomly(List<T> candidates) {
-    return randomizer.randomlyChoose(maxFillingOptionCount, candidates);
+    return randomizer.randomlyChoose(maxFillingOptionCount, candidates).toList();
   }
 
   public Stream<Link> getSiblingLinksOfSameLinkTypeHavingReviewPoint(Link link) {
@@ -131,7 +131,7 @@ public class QuizQuestionServant {
         answerLink.getSourceNote(), answerLink.getTargetNote(), linkedSiblingsOfSameLinkType);
   }
 
-  public GlobalSettingsService getGobalSettingsService() {
+  public GlobalSettingsService getGlobalSettingsService() {
     return new GlobalSettingsService(modelFactoryService);
   }
 }
