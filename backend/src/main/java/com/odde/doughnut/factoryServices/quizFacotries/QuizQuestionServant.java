@@ -86,12 +86,6 @@ public class QuizQuestionServant {
     return cousinLinksOfSameLinkType.filter(l -> getReviewPoint(l.getThing()) != null);
   }
 
-  public List<ReviewPoint> getReviewPoints(Link link) {
-    ReviewPoint reviewPointFor = getReviewPoint(link.getThing());
-    if (reviewPointFor == null) return List.of();
-    return List.of(reviewPointFor);
-  }
-
   public ParentGrandLinkHelper getParentGrandLinkHelper(Link link) {
     Link parentGrandLink = chooseOneCategoryLink(link).orElse(null);
     if (parentGrandLink == null) return new NullParentGrandLinkHelper();
@@ -125,15 +119,16 @@ public class QuizQuestionServant {
         n -> !n.equals(answerNote) && !n.equals(noteToAvoid) && !notesToAvoid.contains(n));
   }
 
-  public List<Link> chooseLinkFromCohortAvoidSiblingsOfSameLinkType(Link link1, Note answerNote1) {
-    return chooseFromCohortAvoidSiblings(link1, answerNote1).stream()
+  public List<Link> chooseLinkFromCohortAvoidSiblingsOfSameLinkType(Link answerLink) {
+    return chooseFromCohortAvoidSiblings(answerLink).stream()
         .flatMap(n -> n.getLinks().stream())
         .collect(Collectors.toList());
   }
 
-  public List<Note> chooseFromCohortAvoidSiblings(Link link1, Note answerNote1) {
-    List<Note> linkedSiblingsOfSameLinkType = link1.getLinkedSiblingsOfSameLinkType(user);
-    return chooseCohortAndAvoid(answerNote1, link1.getTargetNote(), linkedSiblingsOfSameLinkType);
+  public List<Note> chooseFromCohortAvoidSiblings(Link answerLink) {
+    List<Note> linkedSiblingsOfSameLinkType = answerLink.getLinkedSiblingsOfSameLinkType(user);
+    return chooseCohortAndAvoid(
+        answerLink.getSourceNote(), answerLink.getTargetNote(), linkedSiblingsOfSameLinkType);
   }
 
   public GlobalSettingsService getGobalSettingsService() {

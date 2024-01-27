@@ -8,25 +8,23 @@ import java.util.List;
 public class LinkSourceQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
   protected final Link link;
   private QuizQuestionServant servant;
-  protected final Note answerNote;
   private List<Note> cachedFillingOptions = null;
 
   public LinkSourceQuizFactory(Thing thing, QuizQuestionServant servant) {
     this.link = thing.getLink();
     this.servant = servant;
-    this.answerNote = link.getSourceNote();
   }
 
   @Override
   public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
-      cachedFillingOptions = servant.chooseFromCohortAvoidSiblings(link, answerNote);
+      cachedFillingOptions = servant.chooseFromCohortAvoidSiblings(link);
     }
     return cachedFillingOptions;
   }
 
   @Override
   public Note generateAnswer() {
-    return answerNote;
+    return link.getSourceNote();
   }
 }
