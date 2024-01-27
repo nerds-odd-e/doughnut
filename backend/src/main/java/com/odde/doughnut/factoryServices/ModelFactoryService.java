@@ -121,12 +121,6 @@ public class ModelFactoryService {
 
   public <T extends EntityIdentifiedByIdOnly> T save(T entity) {
     if (entity.getId() == null) {
-      entity.beforeCreate(this);
-    } else {
-      entity.beforeUpdate(this);
-    }
-    entity.beforeCommit(this);
-    if (entity.getId() == null) {
       entityManager.persist(entity);
       return entity;
     }

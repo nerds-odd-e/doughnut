@@ -1,6 +1,5 @@
 package com.odde.doughnut.entities;
 
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import jakarta.persistence.*;
 import java.util.Objects;
 import lombok.Getter;
@@ -24,10 +23,4 @@ public class EntityIdentifiedByIdOnly {
   public int hashCode() {
     return Objects.hash(id);
   }
-
-  public void beforeCommit(ModelFactoryService modelFactoryService) {}
-
-  public void beforeCreate(ModelFactoryService modelFactoryService) {}
-
-  public void beforeUpdate(ModelFactoryService modelFactoryService) {}
 }
