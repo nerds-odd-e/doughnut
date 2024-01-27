@@ -18,8 +18,7 @@ public class PictureSelectionQuizFactory implements QuizQuestionFactory, Questio
 
   @Override
   public List<Note> generateFillingOptions() {
-    return servant.chooseFromCohort(
-        answerNote, n -> !n.equals(answerNote) && n.getPictureWithMask().isPresent());
+    return servant.chooseFromCohort(answerNote, n -> n.getPictureWithMask().isPresent());
   }
 
   @Override

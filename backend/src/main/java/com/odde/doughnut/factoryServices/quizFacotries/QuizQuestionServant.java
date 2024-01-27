@@ -45,14 +45,14 @@ public class QuizQuestionServant {
   }
 
   public List<Note> chooseFromCohort(Note answerNote, Predicate<Note> notePredicate) {
-    List<Note> list = getCohort(answerNote, notePredicate);
+    List<Note> list = getCohort(answerNote, n -> !n.equals(answerNote) && notePredicate.test(n));
     return randomizer.randomlyChoose(maxFillingOptionCount, list).toList();
   }
 
   public List<Note> getCohort(Note note, Predicate<Note> notePredicate) {
-    List<Note> list =
-        note.getSiblings().stream().filter(notePredicate).collect(Collectors.toList());
-    if (list.size() > 1) return list;
+    //    List<Note> list =
+    //        note.getSiblings().stream().filter(notePredicate).collect(Collectors.toList());
+    //    if (list.size() > 1) return list;
 
     return this.modelFactoryService
         .toNoteModel(note.getGrandAsPossible())
@@ -114,9 +114,7 @@ public class QuizQuestionServant {
 
   private List<Note> chooseCohortAndAvoid(
       Note answerNote, Note noteToAvoid, List<Note> notesToAvoid) {
-    return chooseFromCohort(
-        answerNote,
-        n -> !n.equals(answerNote) && !n.equals(noteToAvoid) && !notesToAvoid.contains(n));
+    return chooseFromCohort(answerNote, n -> !n.equals(noteToAvoid) && !notesToAvoid.contains(n));
   }
 
   public List<Link> chooseLinkFromCohortAvoidSiblingsOfSameLinkType(Link answerLink) {
