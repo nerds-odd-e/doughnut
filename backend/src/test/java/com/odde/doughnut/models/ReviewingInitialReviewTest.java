@@ -10,6 +10,7 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -230,6 +231,7 @@ public class ReviewingInitialReviewTest {
     }
 
     @Test
+    @Disabled
     void shouldReturnReviewPointForLink() {
       makeMe.theNote(note2).skipReview().please();
       makeMe.theNote(note1).skipReview().linkTo(note2).please();

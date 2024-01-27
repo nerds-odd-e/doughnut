@@ -11,12 +11,15 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.logging.log4j.util.Strings;
 
 public class NoteBuilder extends EntityBuilder<Note> {
   static final TestObjectCounter titleCounter = new TestObjectCounter(n -> "title" + n);
 
   UserBuilder creatorBuilder = null;
+  List<LinkBuilder> linkBuilders = new ArrayList<>();
 
   public NoteBuilder(Note note, MakeMe makeMe) {
     super(makeMe, note);
@@ -71,7 +74,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder linkTo(Note referTo, Link.LinkType linkType) {
-    makeMe.aLink().between(entity, referTo, linkType);
+    linkBuilders.add(makeMe.aLink().between(entity, referTo, linkType));
     return this;
   }
 
@@ -93,6 +96,13 @@ public class NoteBuilder extends EntityBuilder<Note> {
       creator(makeMe.aUser().please(needPersist));
     }
     if (creatorBuilder != null) creatorBuilder.please(needPersist);
+  }
+
+  @Override
+  protected void afterCreate(boolean needPersist) {
+    if (linkBuilders.isEmpty()) return;
+    linkBuilders.forEach(linkBuilder -> linkBuilder.please(needPersist));
+    if (needPersist) makeMe.refresh(entity);
   }
 
   public NoteBuilder skipReview() {

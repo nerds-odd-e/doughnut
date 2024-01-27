@@ -28,8 +28,12 @@ public abstract class EntityBuilder<T> {
         makeMe.modelFactoryService.entityManager.persist(entity);
       }
     }
+    afterCreate(persistNeeded);
     return entity;
   }
 
   protected abstract void beforeCreate(boolean needPersist);
+
+  protected void afterCreate(boolean needPersist) {}
+  ;
 }

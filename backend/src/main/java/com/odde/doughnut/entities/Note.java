@@ -423,12 +423,5 @@ The note of current focus (in JSON format):
   }
 
   @Override
-  public void afterEnsureId(ModelFactoryService modelFactoryService) {
-    links.forEach(
-        link -> {
-          if (link.getId() == null) {
-            modelFactoryService.save(link);
-          }
-        });
-  }
+  public void afterEnsureId(ModelFactoryService modelFactoryService) {}
 }
