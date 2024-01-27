@@ -89,11 +89,11 @@ public class NoteBuilder extends EntityBuilder<Note> {
   @Override
   protected void beforeCreate(boolean needPersist) {
     buildCreatorIfNotExist();
-    if (entity.getNotebook() == null) {
-      asHeadNoteOfANotebook(entity.getThing().getCreator().getOwnership());
-    }
     if (entity.getThing().getCreator() == null) {
       creator(makeMe.aUser().please(needPersist));
+    }
+    if (entity.getNotebook() == null) {
+      asHeadNoteOfANotebook(entity.getThing().getCreator().getOwnership());
     }
     if (creatorBuilder != null) creatorBuilder.please(needPersist);
   }
