@@ -51,7 +51,7 @@ dependencies {
   implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
   compileOnly 'org.projectlombok:lombok'
   developmentOnly 'org.springframework.boot:spring-boot-devtools'
-  runtimeOnly 'com.mysql:mysql-connector-j:8.1.0'
+  runtimeOnly 'com.mysql:mysql-connector-j:8.3.0'
   annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
   annotationProcessor 'org.projectlombok:lombok'
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
