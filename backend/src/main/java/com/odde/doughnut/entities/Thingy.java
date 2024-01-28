@@ -10,4 +10,8 @@ public abstract class Thingy extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public abstract Thing getThing();
+
+  public String getTopic() {
+    return getThing().getNote().getTopic();
+  }
 }
