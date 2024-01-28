@@ -79,23 +79,4 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
       nativeQuery = true)
   void undoDeleteDescendants(
       @Param("note") Note note, @Param("currentUTCTimestamp") Timestamp currentUTCTimestamp);
-
-  @Query(
-      value =
-          """
-      SELECT
-          note.*
-      FROM
-          notes_closure
-      JOIN
-          note ON note.id = notes_closure.note_id
-      WHERE
-          notes_closure.ancestor_id = ? AND
-          note.deleted_at IS NULL
-      ORDER BY
-          notes_closure.depth,
-          note.sibling_order
-      """,
-      nativeQuery = true)
-  List<Note> getDescendantsInBreathFirstOrder(Integer ancestorId);
 }

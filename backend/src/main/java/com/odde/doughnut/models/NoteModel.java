@@ -52,6 +52,6 @@ public class NoteModel {
   }
 
   public Collection<Note> getDescendantsInBreathFirstOrder() {
-    return modelFactoryService.noteRepository.getDescendantsInBreathFirstOrder(entity.getId());
+    return entity.getDescendants().toList();
   }
 }

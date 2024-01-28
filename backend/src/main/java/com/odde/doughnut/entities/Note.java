@@ -12,6 +12,7 @@ import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Where;
@@ -355,6 +356,11 @@ public class Note extends Notey {
   @JsonIgnore
   public boolean matchAnswer(String spellingAnswer) {
     return getNoteTitle().matches(spellingAnswer);
+  }
+
+  @JsonIgnore
+  public Stream<Note> getDescendants() {
+    return getAllChildren().stream().flatMap(c -> Stream.concat(Stream.of(c), c.getDescendants()));
   }
 
   public static class NoteBrief {
