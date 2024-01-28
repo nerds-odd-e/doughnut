@@ -282,18 +282,11 @@ declare namespace Generated {
         level: number;
     }
 
-    interface Note extends Thingy {
+    interface Note extends Notey {
         topic: string;
-        topicConstructor: string;
-        /**
-         * The details of the note is in markdown format.
-         */
-        details: string;
         parentId?: number;
         updatedAt: string;
-        noteAccessories: NoteAccessories;
         wikidataId: string;
-        deletedAt: string;
         pictureWithMask?: PictureWithMask;
     }
 
@@ -347,6 +340,16 @@ declare namespace Generated {
         pictureUrl: string;
         pictureMask: string;
         useParentPicture: boolean;
+    }
+
+    interface Notey extends Thingy {
+        noteAccessories: NoteAccessories;
+        /**
+         * The details of the note is in markdown format.
+         */
+        details: string;
+        topicConstructor: string;
+        deletedAt: string;
     }
 
     interface Circle extends EntityIdentifiedByIdOnly {
