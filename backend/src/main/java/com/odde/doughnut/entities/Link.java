@@ -46,6 +46,9 @@ public class Link extends Thingy {
       User user,
       LinkType linkType,
       Timestamp currentUTCTimestamp) {
+    if (linkType == null || linkType == Link.LinkType.NO_LINK) {
+      return null;
+    }
     Link link = new Link();
     link.setSourceNote(sourceNote);
     link.setTargetNote(targetNote);

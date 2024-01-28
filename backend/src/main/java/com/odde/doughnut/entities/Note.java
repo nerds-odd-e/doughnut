@@ -322,15 +322,8 @@ public class Note extends Notey {
 
   public Link buildLinkToParent(
       User user, Link.LinkType linkTypeToParent, Timestamp currentUTCTimestamp) {
-    return buildLinkToNote(user, linkTypeToParent, currentUTCTimestamp, getParentNote());
-  }
-
-  public Link buildLinkToNote(
-      User user, Link.LinkType linkType, Timestamp currentUTCTimestamp, Note targetNote) {
-    if (linkType == null || linkType == Link.LinkType.NO_LINK) {
-      return null;
-    }
-    return Link.createLink(this, targetNote, user, linkType, currentUTCTimestamp);
+    Note targetNote1 = getParentNote();
+    return Link.createLink(this, targetNote1, user, linkTypeToParent, currentUTCTimestamp);
   }
 
   public Note buildChildNote(User user, Timestamp currentUTCTimestamp, String topicConstructor) {

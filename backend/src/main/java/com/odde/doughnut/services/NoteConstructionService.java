@@ -48,8 +48,12 @@ public record NoteConstructionService(
                 .ifPresentOrElse(
                     existingNote -> {
                       Link link =
-                          parentNote.buildLinkToNote(
-                              user, Link.LinkType.RELATED_TO, currentUTCTimestamp, existingNote);
+                          Link.createLink(
+                              parentNote,
+                              existingNote,
+                              user,
+                              Link.LinkType.RELATED_TO,
+                              currentUTCTimestamp);
                       this.modelFactoryService.save(link);
                     },
                     () -> {
