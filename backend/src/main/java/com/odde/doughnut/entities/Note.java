@@ -189,7 +189,13 @@ public class Note extends Notey {
 
   @JsonIgnore
   public List<Note> getAncestors() {
-    return getAncestorNotesClosures().stream().map(NotesClosure::getAncestor).collect(toList());
+    List<Note> result = new ArrayList<>();
+    Note p = getParent();
+    while (p != null) {
+      result.add(0, p);
+      p = p.getParent();
+    }
+    return result;
   }
 
   @JsonIgnore
