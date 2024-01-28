@@ -189,7 +189,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder target(Note targetNote, Link.LinkType linkType) {
-    entity.setTargetNote(targetNote);
+    entity.setTargetNote(makeMe.convertToSimple(targetNote));
     entity.setTopicConstructor(":" + linkType.label);
     return this;
   }

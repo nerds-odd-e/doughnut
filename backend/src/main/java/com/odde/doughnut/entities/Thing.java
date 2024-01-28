@@ -78,7 +78,7 @@ public class Thing extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public ClozedString getClozeSource() {
     Note source = getParentNote();
-    Note target = getTargetNote();
+    Notey target = getTargetNote();
     return ClozedString.htmlClozedString(source.getTopicConstructor()).hide(target.getNoteTitle());
   }
 
@@ -91,7 +91,7 @@ public class Thing extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public Note getTargetNote() {
+  public Notey getTargetNote() {
     if (getLink() != null) {
       return getLink().getTargetNote();
     }

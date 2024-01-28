@@ -6,6 +6,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.builders.*;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -127,5 +128,14 @@ public class MakeMe extends MakeMeWithoutDB {
 
   public SuggestedQuestionForFineTuningBuilder aQuestionSuggestionForFineTunining() {
     return new SuggestedQuestionForFineTuningBuilder(this);
+  }
+
+  public NoteSimple convertToSimple(Note note) {
+    if (note.getId() == null) {
+      NoteSimple simpleNote = new NoteSimple();
+      BeanUtils.copyProperties(note, simpleNote);
+      return simpleNote;
+    }
+    return modelFactoryService.entityManager.find(NoteSimple.class, note.getId());
   }
 }

@@ -4,16 +4,11 @@ import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.algorithms.HtmlOrMarkdown;
-import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,30 +21,10 @@ import org.springframework.beans.BeanUtils;
 @Entity
 @Table(name = "note")
 @JsonPropertyOrder({"topic", "topicConstructor", "details", "parentId", "updatedAt"})
-public class Note extends Thingy {
+public class Note extends Notey {
   public static final int MAX_TITLE_LENGTH = 150;
 
   private Note() {}
-
-  @Embedded @Valid @Getter private final NoteAccessories noteAccessories = new NoteAccessories();
-
-  @OneToOne(mappedBy = "note", cascade = CascadeType.ALL)
-  @Getter
-  @Setter
-  @JsonIgnore
-  private Thing thing;
-
-  @Column(name = "description")
-  @Getter
-  @Setter
-  @JsonPropertyDescription("The details of the note is in markdown format.")
-  private String details;
-
-  @Size(min = 1, max = Note.MAX_TITLE_LENGTH)
-  @Getter
-  @Setter
-  @Column(name = "topic_constructor")
-  private String topicConstructor = "";
 
   @Column(name = "updated_at")
   @Getter
@@ -65,27 +40,11 @@ public class Note extends Thingy {
   private Long siblingOrder = SiblingOrder.getGoodEnoughOrderNumber();
 
   @ManyToOne
-  @JoinColumn(name = "notebook_id", referencedColumnName = "id")
-  @JsonIgnore
-  @Getter
-  private Notebook notebook;
-
-  @ManyToOne
   @JoinColumn(name = "target_note_id", referencedColumnName = "id")
   @JsonIgnore
   @Getter
   @Setter
-  private Note targetNote;
-
-  @Column(name = "deleted_at")
-  @Getter
-  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-  private Timestamp deletedAt;
-
-  public void setDeletedAt(Timestamp value) {
-    this.deletedAt = value;
-    if (this.thing != null) this.thing.setDeletedAt(value);
-  }
+  private NoteSimple targetNote;
 
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "master_review_setting_id", referencedColumnName = "id")
@@ -169,7 +128,8 @@ public class Note extends Thingy {
     if (!constructor.contains("%P")) return constructor;
     Note parent = getParentNote();
     if (parent == null) return constructor;
-    String target = getTargetNote() == null ? "missing target" : getTargetNote().getTopic();
+    String target =
+        getTargetNote() == null ? "missing target" : getTargetNote().getTopicConstructor();
     return constructor
         .replace("%P", "[" + parent.getTopic() + "]")
         .replace("%T", "[" + target + "]");
@@ -178,16 +138,17 @@ public class Note extends Thingy {
   private String getLinkConstructor() {
     if (usingLinkTypeAsTopicConstructor()) {
       Link.LinkType linkType = getLinkType();
-      if (linkType == null) throw new RuntimeException("Invalid link type: " + topicConstructor);
+      if (linkType == null)
+        throw new RuntimeException("Invalid link type: " + getTopicConstructor());
       return "%P is " + linkType.label + " %T";
     }
-    return topicConstructor;
+    return getTopicConstructor();
   }
 
   @JsonIgnore
   public Link.LinkType getLinkType() {
-    if (!topicConstructor.startsWith(":")) return null;
-    return Link.LinkType.fromLabel(topicConstructor.substring(1));
+    if (!getTopicConstructor().startsWith(":")) return null;
+    return Link.LinkType.fromLabel(getTopicConstructor().substring(1));
   }
 
   private boolean usingLinkTypeAsTopicConstructor() {
@@ -215,7 +176,7 @@ public class Note extends Thingy {
   @JsonIgnore
   public void setParentNote(Note parentNote) {
     if (parentNote == null) return;
-    notebook = parentNote.getNotebook();
+    setNotebook(parentNote.getNotebook());
     List<Note> ancestors = parentNote.getAncestors();
     ancestors.add(parentNote);
     Collections.reverse(ancestors);
@@ -305,7 +266,7 @@ public class Note extends Thingy {
     notebook.setOwnership(ownership);
     notebook.setHeadNote(this);
 
-    this.notebook = notebook;
+    setNotebook(notebook);
   }
 
   public Optional<Integer> getParentId() {
@@ -328,11 +289,6 @@ public class Note extends Thingy {
     return ClozedString.htmlClozedString(getDetails()).hide(getNoteTitle());
   }
 
-  @JsonIgnore
-  public NoteTitle getNoteTitle() {
-    return new NoteTitle(getTopicConstructor());
-  }
-
   public Optional<PictureWithMask> getPictureWithMask() {
     return getNotePicture()
         .map(
@@ -345,10 +301,10 @@ public class Note extends Thingy {
   }
 
   private Optional<String> getNotePicture() {
-    if (noteAccessories.getUseParentPicture() && getParentNote() != null) {
+    if (getNoteAccessories().getUseParentPicture() && getParentNote() != null) {
       return getParentNote().getNotePicture();
     }
-    return noteAccessories.getNotePicture();
+    return getNoteAccessories().getNotePicture();
   }
 
   @JsonIgnore
