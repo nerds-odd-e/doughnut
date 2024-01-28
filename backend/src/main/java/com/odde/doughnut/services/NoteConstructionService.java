@@ -21,7 +21,8 @@ public record NoteConstructionService(
       String topicConstructor)
       throws DuplicateWikidataIdException, IOException, InterruptedException {
     Note note = parentNote.buildChildNote(user, currentUTCTimestamp, topicConstructor);
-    Link link = note.buildLinkToParent(user, linkTypeToParent, currentUTCTimestamp);
+    Link link =
+        Link.createLink(note, note.getParentNote(), user, linkTypeToParent, currentUTCTimestamp);
     modelFactoryService.save(note);
     if (link != null) {
       modelFactoryService.save(link);

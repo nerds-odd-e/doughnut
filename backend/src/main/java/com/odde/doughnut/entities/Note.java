@@ -320,12 +320,6 @@ public class Note extends Notey {
     setDetails(desc);
   }
 
-  public Link buildLinkToParent(
-      User user, Link.LinkType linkTypeToParent, Timestamp currentUTCTimestamp) {
-    Note targetNote1 = getParentNote();
-    return Link.createLink(this, targetNote1, user, linkTypeToParent, currentUTCTimestamp);
-  }
-
   public Note buildChildNote(User user, Timestamp currentUTCTimestamp, String topicConstructor) {
     Note note = createNote(user, currentUTCTimestamp, topicConstructor);
     note.setParentNote(this);
