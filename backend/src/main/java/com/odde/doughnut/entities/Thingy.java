@@ -12,7 +12,7 @@ public abstract class Thingy extends EntityIdentifiedByIdOnly {
   public abstract Thing getThing();
 
   @JsonIgnore
-  public String getTopic() {
+  public String getNoteTopic() {
     return getThing().getNote().getTopic();
   }
 }
