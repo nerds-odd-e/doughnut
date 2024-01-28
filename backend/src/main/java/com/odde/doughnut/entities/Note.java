@@ -330,9 +330,7 @@ public class Note extends Notey {
     if (linkType == null || linkType == Link.LinkType.NO_LINK) {
       return null;
     }
-    Link link = Link.createLink(this, targetNote, user, linkType, currentUTCTimestamp);
-    getRefers().add(link);
-    return link;
+    return Link.createLink(this, targetNote, user, linkType, currentUTCTimestamp);
   }
 
   public Note buildChildNote(User user, Timestamp currentUTCTimestamp, String topicConstructor) {
