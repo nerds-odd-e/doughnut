@@ -131,7 +131,7 @@ public class Note extends Notey {
     String target =
         getTargetNote() == null ? "missing target" : getTargetNote().getTopicConstructor();
     return constructor
-        .replace("%P", "[" + parent.getTopic() + "]")
+        .replace("%P", "[" + parent.getTopicConstructor() + "]")
         .replace("%T", "[" + target + "]");
   }
 
