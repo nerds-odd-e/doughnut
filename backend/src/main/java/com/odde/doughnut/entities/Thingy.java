@@ -25,6 +25,7 @@ public abstract class Thingy extends EntityIdentifiedByIdOnly {
     return viewer.canReferTo(getThing().getTargetNote().getNotebook());
   }
 
+  @JsonIgnore
   public Link.LinkType getNoteLinkType() {
     if (getThing().getLink() != null) {
       return getThing().getLink().getLinkType();
