@@ -333,6 +333,7 @@ declare namespace Generated {
     }
 
     interface Thingy extends EntityIdentifiedByIdOnly {
+        noteLinkType: LinkType;
     }
 
     interface Thing extends EntityIdentifiedByIdOnly {

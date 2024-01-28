@@ -184,6 +184,7 @@ public class Note extends Thingy {
     return topicConstructor;
   }
 
+  @JsonIgnore
   public Link.LinkType getLinkType() {
     if (!topicConstructor.startsWith(":")) return null;
     return Link.LinkType.fromLabel(topicConstructor.substring(1));
