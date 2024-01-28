@@ -12,7 +12,6 @@ import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.WHICH_S
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.entities.QuizQuestionEntity.QuestionType;
 import com.odde.doughnut.entities.validators.ValidateLinkType;
 import com.odde.doughnut.models.NoteViewer;
@@ -255,12 +254,6 @@ public class Link extends Thingy {
 
   public LinkType getLinkType() {
     return LinkType.fromId(typeId);
-  }
-
-  @JsonIgnore
-  public ClozedString getClozeSource() {
-    return ClozedString.htmlClozedString(getSourceNote().getTopicConstructor())
-        .hide(getTargetNote().getNoteTitle());
   }
 
   @JsonIgnore

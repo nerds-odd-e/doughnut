@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.algorithms.ClozedString;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -72,5 +73,19 @@ public class Thing extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public boolean isDescriptionBlankHtml() {
     return getNote().isDetailsBlankHtml();
+  }
+
+  @JsonIgnore
+  public ClozedString getClozeSource() {
+    Note source;
+    Note target;
+    if (getLink() != null) {
+      source = getLink().getSourceNote();
+      target = getLink().getTargetNote();
+    } else {
+      source = getNote().getParentNote();
+      target = getNote().getTargetNote();
+    }
+    return ClozedString.htmlClozedString(source.getTopicConstructor()).hide(target.getNoteTitle());
   }
 }

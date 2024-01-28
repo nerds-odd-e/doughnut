@@ -43,6 +43,7 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
     anotherSource = makeMe.aNote("blue cheese").under(top).linkTo(cheese).please();
     reviewPoint = makeMe.aReviewPointFor(sourceTarget).inMemoryPlease();
     makeMe.refresh(top);
+    makeMe.refresh(anotherSource);
   }
 
   @Test
@@ -67,9 +68,9 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
           equalTo("Which one <em>is immediately a specialization of</em>:"));
       assertThat(quizQuestion.getMainTopic(), equalTo(target.getTopicConstructor()));
       List<String> options = toOptionStrings(quizQuestion);
+      assertThat(anotherSource.getTopicConstructor(), in(options));
       assertThat(
           "tomato <mark title='Hidden text that is matching the answer'>[...]</mark>", in(options));
-      assertThat(anotherSource.getTopicConstructor(), in(options));
     }
 
     @Test
