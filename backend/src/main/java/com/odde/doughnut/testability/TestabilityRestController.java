@@ -3,7 +3,6 @@ package com.odde.doughnut.testability;
 import com.odde.doughnut.controllers.json.QuestionSuggestionParams;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.Link.LinkType;
-import com.odde.doughnut.entities.repositories.LinkRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -42,7 +41,6 @@ class TestabilityRestController {
 
   @Autowired EntityManagerFactory emf;
   @Autowired NoteRepository noteRepository;
-  @Autowired LinkRepository linkRepository;
   @Autowired UserRepository userRepository;
   @Autowired UserModel currentUser;
   @Autowired ModelFactoryService modelFactoryService;
@@ -183,8 +181,12 @@ class TestabilityRestController {
   @PostMapping("/link_notes")
   @Transactional
   public String linkNotes(@RequestBody HashMap<String, String> linkInfo) {
-    Note sourceNote = noteRepository.findById(Integer.valueOf(linkInfo.get("source_id"))).get();
-    Note targetNote = noteRepository.findById(Integer.valueOf(linkInfo.get("target_id"))).get();
+    Note sourceNote =
+        modelFactoryService.entityManager.find(
+            Note.class, Integer.valueOf(linkInfo.get("source_id")));
+    Note targetNote =
+        modelFactoryService.entityManager.find(
+            Note.class, Integer.valueOf(linkInfo.get("target_id")));
     LinkType type = LinkType.fromLabel(linkInfo.get("type"));
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     Link link =
