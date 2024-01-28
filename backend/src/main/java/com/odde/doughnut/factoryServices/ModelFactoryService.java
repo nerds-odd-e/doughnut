@@ -132,4 +132,8 @@ public class ModelFactoryService {
     entityManager.remove(nb);
     return nb;
   }
+
+  public NoteSimple convertToNoteSimple(Note note) {
+    return entityManager.find(NoteSimple.class, note.getId());
+  }
 }

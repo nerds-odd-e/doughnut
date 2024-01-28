@@ -136,6 +136,6 @@ public class MakeMe extends MakeMeWithoutDB {
       BeanUtils.copyProperties(note, simpleNote);
       return simpleNote;
     }
-    return modelFactoryService.entityManager.find(NoteSimple.class, note.getId());
+    return modelFactoryService.convertToNoteSimple(note);
   }
 }
