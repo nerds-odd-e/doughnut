@@ -15,4 +15,20 @@ public abstract class Thingy extends EntityIdentifiedByIdOnly {
   public String getNoteTopic() {
     return getThing().getNote().getTopic();
   }
+
+  @JsonIgnore
+  public boolean targetVisibleAsSourceOrTo(User viewer) {
+    if (getThing().getParentNote().getNotebook() == getThing().getTargetNote().getNotebook())
+      return true;
+    if (viewer == null) return false;
+
+    return viewer.canReferTo(getThing().getTargetNote().getNotebook());
+  }
+
+  public Link.LinkType getNoteLinkType() {
+    if (getThing().getLink() != null) {
+      return getThing().getLink().getLinkType();
+    }
+    return getThing().getNote().getLinkType();
+  }
 }

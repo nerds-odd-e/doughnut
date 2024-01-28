@@ -14,7 +14,6 @@ import com.odde.doughnut.algorithms.SiblingOrder;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -178,15 +177,20 @@ public class Note extends Thingy {
 
   private String getLinkConstructor() {
     if (usingLinkTypeAsTopicConstructor()) {
-      Link.LinkType linkType = Link.LinkType.fromLabel(topicConstructor.substring(1));
+      Link.LinkType linkType = getLinkType();
       if (linkType == null) throw new RuntimeException("Invalid link type: " + topicConstructor);
       return "%P is " + linkType.label + " %T";
     }
     return topicConstructor;
   }
 
+  public Link.LinkType getLinkType() {
+    if (!topicConstructor.startsWith(":")) return null;
+    return Link.LinkType.fromLabel(topicConstructor.substring(1));
+  }
+
   private boolean usingLinkTypeAsTopicConstructor() {
-    return topicConstructor.startsWith(":");
+    return getLinkType() != null;
   }
 
   @Override
@@ -248,7 +252,7 @@ public class Note extends Thingy {
     }
   }
 
-  public void updateNoteContent(NoteAccessories noteAccessories, User user) throws IOException {
+  public void updateNoteContent(NoteAccessories noteAccessories) {
     if (noteAccessories.getUploadPicture() == null) {
       noteAccessories.setUploadPicture(getNoteAccessories().getUploadPicture());
     }

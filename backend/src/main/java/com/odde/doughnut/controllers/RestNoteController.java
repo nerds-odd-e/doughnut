@@ -111,7 +111,7 @@ class RestNoteController {
     final User user = currentUser.getEntity();
     noteAccessories.fetchUploadedPicture(user);
     note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
-    note.updateNoteContent(noteAccessories, user);
+    note.updateNoteContent(noteAccessories);
     modelFactoryService.save(note);
     return new NoteViewer(user, note).toJsonObject();
   }

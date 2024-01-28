@@ -52,9 +52,10 @@ public class NoteViewer {
   }
 
   public List<Link> linksOfTypeThroughDirect(List<Link.LinkType> linkTypes) {
-    return note.getLinks().stream()
+    return note.getLinkChildren().stream()
         .filter(l -> l.targetVisibleAsSourceOrTo(viewer))
-        .filter(l -> linkTypes.contains(l.getLinkType()))
+        .filter(l -> linkTypes.contains(l.getNoteLinkType()))
+        .map(t -> t.getThing().getLink())
         .collect(Collectors.toList());
   }
 

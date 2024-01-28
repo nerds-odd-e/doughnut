@@ -77,15 +77,24 @@ public class Thing extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public ClozedString getClozeSource() {
-    Note source;
-    Note target;
-    if (getLink() != null) {
-      source = getLink().getSourceNote();
-      target = getLink().getTargetNote();
-    } else {
-      source = getNote().getParentNote();
-      target = getNote().getTargetNote();
-    }
+    Note source = getParentNote();
+    Note target = getTargetNote();
     return ClozedString.htmlClozedString(source.getTopicConstructor()).hide(target.getNoteTitle());
+  }
+
+  @JsonIgnore
+  public Note getParentNote() {
+    if (getLink() != null) {
+      return getLink().getSourceNote();
+    }
+    return getNote().getParentNote();
+  }
+
+  @JsonIgnore
+  public Note getTargetNote() {
+    if (getLink() != null) {
+      return getLink().getTargetNote();
+    }
+    return getNote().getTargetNote();
   }
 }

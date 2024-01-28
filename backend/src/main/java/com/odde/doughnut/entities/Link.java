@@ -303,14 +303,6 @@ public class Link extends Thingy {
   }
 
   @JsonIgnore
-  public boolean targetVisibleAsSourceOrTo(User viewer) {
-    if (sourceNote.getNotebook() == targetNote.getNotebook()) return true;
-    if (viewer == null) return false;
-
-    return viewer.canReferTo(targetNote.getNotebook());
-  }
-
-  @JsonIgnore
   public List<Link> categoryLinksOfTarget(User viewer) {
     return new NoteViewer(viewer, getTargetNote())
         .linksOfTypeThroughDirect(
