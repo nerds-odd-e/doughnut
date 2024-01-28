@@ -202,7 +202,7 @@ public class Note extends Notey {
     if (getParentNote() == null) {
       return new ArrayList<>();
     }
-    return Collections.unmodifiableList(getParentNote().getChildren());
+    return getParentNote().getChildren();
   }
 
   public void mergeMasterReviewSetting(ReviewSetting reviewSetting) {
