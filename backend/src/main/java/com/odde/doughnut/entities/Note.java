@@ -159,10 +159,10 @@ public class Note extends Thingy {
 
   @JsonIgnore
   public List<? extends Thingy> getLinkChildren() {
-    return getAllChildren().stream()
-        .filter(Note::usingLinkTypeAsTopicConstructor)
-        .collect(toList());
-    //    return getLinks();
+    //    return getAllChildren().stream()
+    //        .filter(Note::usingLinkTypeAsTopicConstructor)
+    //        .collect(toList());
+    return getLinks();
   }
 
   public String getTopic() {
