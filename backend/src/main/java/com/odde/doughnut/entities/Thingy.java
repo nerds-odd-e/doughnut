@@ -11,6 +11,7 @@ public abstract class Thingy extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public abstract Thing getThing();
 
+  @JsonIgnore
   public String getTopic() {
     return getThing().getNote().getTopic();
   }
