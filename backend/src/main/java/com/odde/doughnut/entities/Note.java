@@ -46,6 +46,13 @@ public class Note extends Notey {
   @Setter
   private NoteSimple targetNote;
 
+  @OneToOne
+  @JoinColumn(name = "parent_id", referencedColumnName = "id")
+  @JsonIgnore
+  @Getter
+  @Setter
+  private Note parent;
+
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "master_review_setting_id", referencedColumnName = "id")
   @JsonIgnore
@@ -160,7 +167,14 @@ public class Note extends Notey {
     return "Note{" + "id=" + id + ", title='" + getTopicConstructor() + '\'' + '}';
   }
 
-  private void addAncestors(List<Note> ancestors) {
+  @JsonIgnore
+  public void setParentNote(Note parentNote) {
+    if (parentNote == null) return;
+    setNotebook(parentNote.getNotebook());
+    parent = parentNote;
+    List<Note> ancestors = parentNote.getAncestors();
+    ancestors.add(parentNote);
+    Collections.reverse(ancestors);
     int[] counter = {1};
     ancestors.forEach(
         anc -> {
@@ -174,27 +188,13 @@ public class Note extends Notey {
   }
 
   @JsonIgnore
-  public void setParentNote(Note parentNote) {
-    if (parentNote == null) return;
-    setNotebook(parentNote.getNotebook());
-    List<Note> ancestors = parentNote.getAncestors();
-    ancestors.add(parentNote);
-    Collections.reverse(ancestors);
-    addAncestors(ancestors);
-  }
-
-  @JsonIgnore
   public List<Note> getAncestors() {
     return getAncestorNotesClosures().stream().map(NotesClosure::getAncestor).collect(toList());
   }
 
   @JsonIgnore
   public Note getParentNote() {
-    try {
-      return getAncestors().getLast();
-    } catch (NoSuchElementException e) {
-      return null;
-    }
+    return getParent();
   }
 
   @JsonIgnore
