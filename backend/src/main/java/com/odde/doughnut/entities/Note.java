@@ -307,12 +307,6 @@ public class Note extends Notey {
     return getNoteAccessories().getNotePicture();
   }
 
-  @JsonIgnore
-  public Integer getLevel() {
-    if (masterReviewSetting == null) return ReviewSetting.defaultLevel;
-    return masterReviewSetting.getLevel();
-  }
-
   public void prependDescription(String addition) {
     String prevDesc = getDetails() != null ? getDetails() : "";
     String desc = prevDesc.isEmpty() ? addition : addition + "\n" + prevDesc;
