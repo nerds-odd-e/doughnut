@@ -11,7 +11,7 @@ import java.util.List;
 public class LinkTargetQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
   protected final Link link;
   private QuizQuestionServant servant;
-  protected final Note answerNote;
+  protected final NoteBase answerNote;
   private List<Note> cachedFillingOptions = null;
 
   public LinkTargetQuizFactory(Thing thing, QuizQuestionServant servant) {
