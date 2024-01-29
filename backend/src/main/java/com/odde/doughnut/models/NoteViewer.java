@@ -30,7 +30,7 @@ public class NoteViewer {
     nvb.setLinks(getAllLinks());
     nvb.setChildren(note.getChildren());
     nvb.setNote(note);
-    nvb.setNotePosition(jsonNotePosition(false));
+    nvb.setNotePosition(jsonNotePosition());
 
     return nvb;
   }
@@ -65,18 +65,20 @@ public class NoteViewer {
         .filter(l -> l.sourceVisibleAsTargetOrTo(viewer));
   }
 
-  public NotePositionViewedByUser jsonNotePosition(boolean inclusive) {
+  public NotePositionViewedByUser jsonNotebookPosition() {
+    Note headNote = this.note.getNotebook().getHeadNote();
     NotePositionViewedByUser nvb = new NotePositionViewedByUser();
-    nvb.setNoteId(note.getId());
-    nvb.setNotebook(jsonViewer.jsonNotebookViewedByUser(note.getNotebook()));
-    nvb.setAncestors(note.getAncestors());
-    if (inclusive) {
-      nvb.getAncestors().add(note);
-    }
+    nvb.setNoteId(headNote.getId());
+    nvb.setNotebook(jsonViewer.jsonNotebookViewedByUser(headNote.getNotebook()));
+    nvb.getAncestors().add(headNote);
     return nvb;
   }
 
   public NotePositionViewedByUser jsonNotePosition() {
-    return jsonNotePosition(false);
+    NotePositionViewedByUser nvb = new NotePositionViewedByUser();
+    nvb.setNoteId(note.getId());
+    nvb.setNotebook(jsonViewer.jsonNotebookViewedByUser(note.getNotebook()));
+    nvb.setAncestors(note.getAncestors());
+    return nvb;
   }
 }

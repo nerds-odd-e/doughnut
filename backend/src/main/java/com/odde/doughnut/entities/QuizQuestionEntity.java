@@ -164,7 +164,7 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
       result = thing.getNote();
     }
 
-    return new NoteViewer(user, result.getNotebook().getHeadNote()).jsonNotePosition(true);
+    return new NoteViewer(user, result).jsonNotebookPosition();
   }
 
   public MCQWithAnswer getMcqWithAnswer() {
