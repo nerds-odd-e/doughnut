@@ -39,8 +39,7 @@ module.exports = {
     "tsconfig.json",
     ".eslintrc.cjs",
     "vite.config.ts",
-    "tests/setupVitest.js",
-    "src/@types/generated/schema.d.ts"
+    "tests/setupVitest.js"
   ],
   settings: {
     "import/extensions": [".ts", ".tsx"],
