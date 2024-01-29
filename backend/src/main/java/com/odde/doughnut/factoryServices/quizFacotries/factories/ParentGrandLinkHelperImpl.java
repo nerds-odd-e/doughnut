@@ -2,6 +2,7 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.models.NoteViewer;
 import java.util.List;
@@ -12,8 +13,8 @@ public record ParentGrandLinkHelperImpl(User user, Link link, Link parentGrandLi
     implements ParentGrandLinkHelper {
 
   @Override
-  public Link getParentGrandLink() {
-    return parentGrandLink;
+  public Thing getParentGrandLink() {
+    return parentGrandLink.getThing();
   }
 
   @Override

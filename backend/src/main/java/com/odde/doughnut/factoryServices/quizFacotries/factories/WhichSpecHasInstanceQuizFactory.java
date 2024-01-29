@@ -50,7 +50,7 @@ public class WhichSpecHasInstanceQuizFactory
   }
 
   @Override
-  public Link getCategoryLink() {
-    return getInstanceLink();
+  public Thing getCategoryLink() {
+    return getInstanceLink().getThing();
   }
 }
