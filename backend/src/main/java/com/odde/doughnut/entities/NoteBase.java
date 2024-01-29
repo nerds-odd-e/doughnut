@@ -17,7 +17,6 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Where;
-import org.hibernate.annotations.WhereJoinTable;
 
 @MappedSuperclass
 public abstract class NoteBase extends Thingy {
@@ -66,27 +65,8 @@ public abstract class NoteBase extends Thingy {
   @Setter
   private List<Link> refers = new ArrayList<>();
 
-  @JoinTable(
-      name = "notes_closure",
-      joinColumns = {
-        @JoinColumn(
-            name = "ancestor_id",
-            referencedColumnName = "id",
-            nullable = false,
-            insertable = false,
-            updatable = false)
-      },
-      inverseJoinColumns = {
-        @JoinColumn(
-            name = "note_id",
-            referencedColumnName = "id",
-            nullable = false,
-            insertable = false,
-            updatable = false)
-      })
-  @OneToMany(cascade = CascadeType.DETACH)
+  @OneToMany(mappedBy = "parent", cascade = CascadeType.DETACH)
   @JsonIgnore
-  @WhereJoinTable(clause = "depth = 1")
   @Where(clause = "deleted_at is null")
   @OrderBy("sibling_order")
   @Getter
