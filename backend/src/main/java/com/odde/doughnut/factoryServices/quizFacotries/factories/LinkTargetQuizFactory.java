@@ -2,6 +2,7 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteBase;
 import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
@@ -28,7 +29,7 @@ public class LinkTargetQuizFactory implements QuizQuestionFactory, QuestionOptio
   }
 
   @Override
-  public Note generateAnswer() {
+  public NoteBase generateAnswer() {
     return answerNote;
   }
 }
