@@ -38,7 +38,7 @@ import lombok.Setter;
 @Table(name = "link")
 @JsonPropertyOrder({"clozeSource", "linkTypeLabel"})
 public class Link extends Thingy {
-  private Link() {}
+  public Link() {}
 
   public static Link createLink(
       Note sourceNote,

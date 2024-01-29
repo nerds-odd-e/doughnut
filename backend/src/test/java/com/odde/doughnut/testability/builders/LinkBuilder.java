@@ -2,6 +2,7 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
@@ -9,8 +10,7 @@ import java.sql.Timestamp;
 
 public class LinkBuilder extends EntityBuilder<Link> {
   public LinkBuilder(MakeMe makeMe) {
-    super(
-        makeMe, Link.createLink(null, null, null, null, new Timestamp(System.currentTimeMillis())));
+    super(makeMe, Thing.createThing(null, new Link(), new Timestamp(System.currentTimeMillis())));
   }
 
   @Override
