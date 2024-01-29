@@ -5,8 +5,6 @@ import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class WhichSpecHasInstanceQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
@@ -38,12 +36,8 @@ public class WhichSpecHasInstanceQuizFactory
 
   private Thing getInstanceLink() {
     if (cachedInstanceLink == null) {
-      Stream<Thing> candidates = servant.getLinksFromSameSourceHavingReviewPoint(link);
-      cachedInstanceLink =
-          servant
-              .randomizer
-              .chooseOneRandomly(candidates.collect(Collectors.toList()))
-              .orElse(null);
+      List<Thing> candidates = servant.getLinksFromSameSourceHavingReviewPoint(link).toList();
+      cachedInstanceLink = servant.randomizer.chooseOneRandomly(candidates).orElse(null);
     }
     return cachedInstanceLink;
   }

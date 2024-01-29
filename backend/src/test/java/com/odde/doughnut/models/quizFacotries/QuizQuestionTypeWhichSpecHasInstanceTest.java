@@ -10,6 +10,7 @@ import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.Thingy;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -83,6 +84,8 @@ class WhichSpecHasInstanceQuizFactoryTest {
           Link link = source.getLinks().get(1);
 
           makeMe.aReviewPointFor(link).by(userModel).please();
+          Thingy nl = source.getLinkChildren().get(1);
+          //          makeMe.aReviewPointFor(nl.getThing().getNote()).by(userModel).please();
           makeMe.refresh(userModel.getEntity());
         }
 
