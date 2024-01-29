@@ -62,7 +62,7 @@ public class QuizQuestionServant {
     return grand.getDescendants().filter(notePredicate).collect(Collectors.toList());
   }
 
-  private Optional<Thing> chooseOneCategoryLink(Link link) {
+  private Optional<Thing> chooseOneCategoryLink(Thing link) {
     return randomizer.chooseOneRandomly(link.categoryLinksOfTarget(this.user));
   }
 
@@ -70,8 +70,8 @@ public class QuizQuestionServant {
     return randomizer.randomlyChoose(maxFillingOptionCount, candidates).toList();
   }
 
-  public Stream<Thing> getSiblingLinksOfSameLinkTypeHavingReviewPoint(Link link) {
-    return linksWithReviewPoint(link.getThing().getSiblingLinksOfSameLinkType(this.user));
+  public Stream<Thing> getSiblingLinksOfSameLinkTypeHavingReviewPoint(Thing link) {
+    return linksWithReviewPoint(link.getSiblingLinksOfSameLinkType(this.user));
   }
 
   public Stream<Thing> getLinksFromSameSourceHavingReviewPoint(Link link) {
@@ -85,7 +85,7 @@ public class QuizQuestionServant {
     return cousinLinksOfSameLinkType.filter(l -> getReviewPoint(l) != null);
   }
 
-  public ParentGrandLinkHelper getParentGrandLinkHelper(Link link) {
+  public ParentGrandLinkHelper getParentGrandLinkHelper(Thing link) {
     Thing parentGrandLink = chooseOneCategoryLink(link).orElse(null);
     if (parentGrandLink == null) return new NullParentGrandLinkHelper();
     return new ParentGrandLinkHelperImpl(this.user, link, parentGrandLink);

@@ -286,11 +286,4 @@ public class Link extends Thingy {
 
     return viewer.canReferTo(sourceNote.getNotebook());
   }
-
-  @JsonIgnore
-  public List<Thing> categoryLinksOfTarget(User viewer) {
-    return new NoteViewer(viewer, getTargetNote())
-        .linksOfTypeThroughDirect(
-            List.of(LinkType.PART, LinkType.INSTANCE, LinkType.SPECIALIZE, LinkType.APPLICATION));
-  }
 }

@@ -114,4 +114,15 @@ public class Thing extends EntityIdentifiedByIdOnly {
   public List<Note> getLinkedSiblingsOfSameLinkType(User user) {
     return getSiblingLinksOfSameLinkType(user).map(Thing::getParentNote).toList();
   }
+
+  @JsonIgnore
+  public List<Thing> categoryLinksOfTarget(User user) {
+    return new NoteViewer(user, getTargetNote())
+        .linksOfTypeThroughDirect(
+            List.of(
+                Link.LinkType.PART,
+                Link.LinkType.INSTANCE,
+                Link.LinkType.SPECIALIZE,
+                Link.LinkType.APPLICATION));
+  }
 }

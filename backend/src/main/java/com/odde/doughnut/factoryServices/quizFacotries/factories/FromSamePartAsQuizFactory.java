@@ -12,11 +12,11 @@ public class FromSamePartAsQuizFactory
   private final ParentGrandLinkHelper parentGrandLinkHelper;
   private Thing cachedAnswerLink = null;
   private List<Note> cachedFillingOptions = null;
-  private final Link link;
+  private final Thing link;
   private final QuizQuestionServant servant;
 
   public FromSamePartAsQuizFactory(Thing thing, QuizQuestionServant servant) {
-    link = thing.getLink();
+    link = thing;
     this.servant = servant;
     parentGrandLinkHelper = servant.getParentGrandLinkHelper(link);
   }
