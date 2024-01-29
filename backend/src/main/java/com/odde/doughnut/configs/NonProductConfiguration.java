@@ -27,7 +27,10 @@ public class NonProductConfiguration {
     http.csrf()
         .disable()
         .authorizeHttpRequests()
-        .requestMatchers("/api/healthcheck", "/api/testability/**", "/api-docs/**", "/api-docs.json", "/api-docs.yaml")
+        .requestMatchers(
+            "/api/healthcheck",
+            "/api/testability/**",
+            "/api-docs.yaml")
         .permitAll()
         .and()
         .rememberMe()
