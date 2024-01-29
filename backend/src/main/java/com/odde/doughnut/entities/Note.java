@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities;
 
 import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
-import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -13,8 +12,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Where;
-import org.hibernate.annotations.WhereJoinTable;
 import org.springframework.beans.BeanUtils;
 
 @Entity
@@ -78,32 +75,6 @@ public class Note extends NoteBase {
   @Setter
   private List<NotesClosure> ancestorNotesClosures = new ArrayList<>();
 
-  @JoinTable(
-      name = "notes_closure",
-      joinColumns = {
-        @JoinColumn(
-            name = "ancestor_id",
-            referencedColumnName = "id",
-            nullable = false,
-            insertable = false,
-            updatable = false)
-      },
-      inverseJoinColumns = {
-        @JoinColumn(
-            name = "note_id",
-            referencedColumnName = "id",
-            nullable = false,
-            insertable = false,
-            updatable = false)
-      })
-  @OneToMany(cascade = CascadeType.DETACH)
-  @JsonIgnore
-  @WhereJoinTable(clause = "depth = 1")
-  @Where(clause = "deleted_at is null")
-  @OrderBy("sibling_order")
-  @Getter
-  private final List<Note> allChildren = new ArrayList<>();
-
   public static Note createNote(User user, Timestamp currentUTCTimestamp, String topicConstructor) {
     final Note note = new Note();
     note.setUpdatedAt(currentUTCTimestamp);
@@ -112,13 +83,6 @@ public class Note extends NoteBase {
 
     Thing.createThing(user, note, currentUTCTimestamp);
     return note;
-  }
-
-  @JsonIgnore
-  public List<Note> getChildren() {
-    return getAllChildren().stream()
-        .filter(nc -> !nc.usingLinkTypeAsTopicConstructor())
-        .collect(toList());
   }
 
   @JsonIgnore
@@ -139,26 +103,6 @@ public class Note extends NoteBase {
     return constructor
         .replace("%P", "[" + parent.getTopicConstructor() + "]")
         .replace("%T", "[" + target + "]");
-  }
-
-  private String getLinkConstructor() {
-    if (usingLinkTypeAsTopicConstructor()) {
-      Link.LinkType linkType = getLinkType();
-      if (linkType == null)
-        throw new RuntimeException("Invalid link type: " + getTopicConstructor());
-      return "%P is " + linkType.label + " %T";
-    }
-    return getTopicConstructor();
-  }
-
-  @JsonIgnore
-  public Link.LinkType getLinkType() {
-    if (!getTopicConstructor().startsWith(":")) return null;
-    return Link.LinkType.fromLabel(getTopicConstructor().substring(1));
-  }
-
-  private boolean usingLinkTypeAsTopicConstructor() {
-    return getLinkType() != null;
   }
 
   @Override

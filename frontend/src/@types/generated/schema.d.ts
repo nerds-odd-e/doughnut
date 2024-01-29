@@ -3,7 +3,6 @@
  * Do not make direct changes to the file.
  */
 
-
 export interface paths {
   "/api/user": {
     get: operations["getUserProfile"];
@@ -372,7 +371,22 @@ export interface components {
       sourceNote?: components["schemas"]["Note"];
       targetNote?: components["schemas"]["Note"];
       /** @enum {string} */
-      linkType?: "no link" | "related to" | "a specialization of" | "an application of" | "an instance of" | "a part of" | "tagged by" | "an attribute of" | "the opposite of" | "author of" | "using" | "an example of" | "before" | "similar to" | "confused with";
+      linkType?:
+        | "no link"
+        | "related to"
+        | "a specialization of"
+        | "an application of"
+        | "an instance of"
+        | "a part of"
+        | "tagged by"
+        | "an attribute of"
+        | "the opposite of"
+        | "author of"
+        | "using"
+        | "an example of"
+        | "before"
+        | "similar to"
+        | "confused with";
     };
     ReviewPoint: {
       /** Format: int32 */
@@ -451,7 +465,20 @@ export interface components {
       /** Format: int32 */
       quizQuestionId?: number;
       /** @enum {string} */
-      questionType?: "CLOZE_SELECTION" | "SPELLING" | "PICTURE_TITLE" | "PICTURE_SELECTION" | "LINK_TARGET" | "LINK_SOURCE" | "LINK_SOURCE_WITHIN_SAME_LINK_TYPE" | "CLOZE_LINK_TARGET" | "DESCRIPTION_LINK_TARGET" | "WHICH_SPEC_HAS_INSTANCE" | "FROM_SAME_PART_AS" | "FROM_DIFFERENT_PART_AS" | "AI_QUESTION";
+      questionType?:
+        | "CLOZE_SELECTION"
+        | "SPELLING"
+        | "PICTURE_TITLE"
+        | "PICTURE_SELECTION"
+        | "LINK_TARGET"
+        | "LINK_SOURCE"
+        | "LINK_SOURCE_WITHIN_SAME_LINK_TYPE"
+        | "CLOZE_LINK_TARGET"
+        | "DESCRIPTION_LINK_TARGET"
+        | "WHICH_SPEC_HAS_INSTANCE"
+        | "FROM_SAME_PART_AS"
+        | "FROM_DIFFERENT_PART_AS"
+        | "AI_QUESTION";
       stem?: string;
       mainTopic?: string;
       notebook?: components["schemas"]["NotebookViewedByUser"];
@@ -484,7 +511,22 @@ export interface components {
     NoteCreationDTO: {
       topicConstructor?: string;
       /** @enum {string} */
-      linkTypeToParent?: "no link" | "related to" | "a specialization of" | "an application of" | "an instance of" | "a part of" | "tagged by" | "an attribute of" | "the opposite of" | "author of" | "using" | "an example of" | "before" | "similar to" | "confused with";
+      linkTypeToParent?:
+        | "no link"
+        | "related to"
+        | "a specialization of"
+        | "an application of"
+        | "an instance of"
+        | "a part of"
+        | "tagged by"
+        | "an attribute of"
+        | "the opposite of"
+        | "author of"
+        | "using"
+        | "an example of"
+        | "before"
+        | "similar to"
+        | "confused with";
       wikidataId?: string;
     };
     LinkViewed: {
@@ -531,7 +573,22 @@ export interface components {
     };
     LinkCreation: {
       /** @enum {string} */
-      linkType: "no link" | "related to" | "a specialization of" | "an application of" | "an instance of" | "a part of" | "tagged by" | "an attribute of" | "the opposite of" | "author of" | "using" | "an example of" | "before" | "similar to" | "confused with";
+      linkType:
+        | "no link"
+        | "related to"
+        | "a specialization of"
+        | "an application of"
+        | "an instance of"
+        | "a part of"
+        | "tagged by"
+        | "an attribute of"
+        | "the opposite of"
+        | "author of"
+        | "using"
+        | "an example of"
+        | "before"
+        | "similar to"
+        | "confused with";
       fromTargetPerspective?: boolean;
       moveUnder?: boolean;
       asFirstChild?: boolean;
@@ -660,7 +717,6 @@ export type $defs = Record<string, never>;
 export type external = Record<string, never>;
 
 export interface operations {
-
   getUserProfile: {
     responses: {
       /** @description OK */
@@ -2081,8 +2137,8 @@ export interface operations {
       200: {
         content: {
           "*/*": {
-              [key: string]: Record<string, never>;
-            }[];
+            [key: string]: Record<string, never>;
+          }[];
         };
       };
       /** @description Internal Server Error */

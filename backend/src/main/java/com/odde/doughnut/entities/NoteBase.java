@@ -1,5 +1,7 @@
 package com.odde.doughnut.entities;
 
+import static java.util.stream.Collectors.toList;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
@@ -14,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
+import org.hibernate.annotations.WhereJoinTable;
 
 @MappedSuperclass
 public abstract class NoteBase extends Thingy {
@@ -50,6 +54,32 @@ public abstract class NoteBase extends Thingy {
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private Timestamp deletedAt;
 
+  @JoinTable(
+      name = "notes_closure",
+      joinColumns = {
+        @JoinColumn(
+            name = "ancestor_id",
+            referencedColumnName = "id",
+            nullable = false,
+            insertable = false,
+            updatable = false)
+      },
+      inverseJoinColumns = {
+        @JoinColumn(
+            name = "note_id",
+            referencedColumnName = "id",
+            nullable = false,
+            insertable = false,
+            updatable = false)
+      })
+  @OneToMany(cascade = CascadeType.DETACH)
+  @JsonIgnore
+  @WhereJoinTable(clause = "depth = 1")
+  @Where(clause = "deleted_at is null")
+  @OrderBy("sibling_order")
+  @Getter
+  private final List<Note> allChildren = new ArrayList<>();
+
   public void setDeletedAt(Timestamp value) {
     this.deletedAt = value;
     if (this.thing != null) this.thing.setDeletedAt(value);
@@ -81,5 +111,32 @@ public abstract class NoteBase extends Thingy {
   @JsonIgnore
   public boolean isDetailsBlankHtml() {
     return new HtmlOrMarkdown(getDetails()).isBlank();
+  }
+
+  @JsonIgnore
+  public List<Note> getChildren() {
+    return getAllChildren().stream()
+        .filter(nc -> !nc.usingLinkTypeAsTopicConstructor())
+        .collect(toList());
+  }
+
+  @JsonIgnore
+  public Link.LinkType getLinkType() {
+    if (!getTopicConstructor().startsWith(":")) return null;
+    return Link.LinkType.fromLabel(getTopicConstructor().substring(1));
+  }
+
+  protected boolean usingLinkTypeAsTopicConstructor() {
+    return getLinkType() != null;
+  }
+
+  protected String getLinkConstructor() {
+    if (usingLinkTypeAsTopicConstructor()) {
+      Link.LinkType linkType = getLinkType();
+      if (linkType == null)
+        throw new RuntimeException("Invalid link type: " + getTopicConstructor());
+      return "%P is " + linkType.label + " %T";
+    }
+    return getTopicConstructor();
   }
 }
