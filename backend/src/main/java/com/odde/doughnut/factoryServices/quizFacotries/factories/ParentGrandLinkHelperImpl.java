@@ -9,17 +9,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public record ParentGrandLinkHelperImpl(User user, Link link, Link parentGrandLink)
+public record ParentGrandLinkHelperImpl(User user, Link link, Thing parentGrandLink)
     implements ParentGrandLinkHelper {
 
   @Override
   public Thing getParentGrandLink() {
-    return parentGrandLink.getThing();
+    return parentGrandLink;
   }
 
   @Override
   public List<Link> getCousinLinksAvoidingSiblings() {
-    List<Note> linkedSiblingsOfSameLinkType = link.getLinkedSiblingsOfSameLinkType(user);
+    List<Note> linkedSiblingsOfSameLinkType = link.getThing().getLinkedSiblingsOfSameLinkType(user);
     return getUncles()
         .flatMap(
             p ->
@@ -33,7 +33,7 @@ public record ParentGrandLinkHelperImpl(User user, Link link, Link parentGrandLi
     List<Note> linkTargetOfType =
         new NoteViewer(user, link.getSourceNote())
             .linksOfTypeThroughDirect(List.of(link.getLinkType())).stream()
-                .map(Link::getTargetNote)
+                .map(Thing::getTargetNote)
                 .collect(Collectors.toList());
     return parentGrandLink
         .getSiblingLinksOfSameLinkType(user)

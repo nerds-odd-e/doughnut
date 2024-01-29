@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 
 public class WhichSpecHasInstanceQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
-  private Link cachedInstanceLink = null;
+  private Thing cachedInstanceLink = null;
   private List<Note> cachedFillingOptions = null;
   private final Link link;
   private final QuizQuestionServant servant;
@@ -32,14 +32,14 @@ public class WhichSpecHasInstanceQuizFactory
 
   @Override
   public Note generateAnswer() {
-    Link instanceLink = getInstanceLink();
+    Thing instanceLink = getInstanceLink();
     if (instanceLink == null) return null;
-    return instanceLink.getSourceNote();
+    return instanceLink.getParentNote();
   }
 
-  private Link getInstanceLink() {
+  private Thing getInstanceLink() {
     if (cachedInstanceLink == null) {
-      Stream<Link> candidates = servant.getLinksFromSameSourceHavingReviewPoint(link);
+      Stream<Thing> candidates = servant.getLinksFromSameSourceHavingReviewPoint(link);
       cachedInstanceLink =
           servant
               .randomizer
@@ -51,6 +51,6 @@ public class WhichSpecHasInstanceQuizFactory
 
   @Override
   public Thing getCategoryLink() {
-    return getInstanceLink().getThing();
+    return getInstanceLink();
   }
 }

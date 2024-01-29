@@ -29,10 +29,10 @@ public class FromDifferentPartAsQuizFactory
     if (getCategoryLink() == null) {
       return null;
     }
-    List<Link> cousinLinks =
+    List<Thing> cousinLinks =
         servant.getSiblingLinksOfSameLinkTypeHavingReviewPoint(link).collect(Collectors.toList());
     return servant.chooseFillingOptionsRandomly(cousinLinks).stream()
-        .map(Link::getSourceNote)
+        .map(Thing::getParentNote)
         .collect(Collectors.toList());
   }
 

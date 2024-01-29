@@ -2,6 +2,7 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.algorithms.ClozedString;
+import com.odde.doughnut.models.NoteViewer;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,6 +10,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.sql.Timestamp;
+import java.util.List;
+import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.lang.Nullable;
@@ -72,7 +75,7 @@ public class Thing extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public NoteBase getParentNote() {
+  public Note getParentNote() {
     if (getLink() != null) {
       return getLink().getSourceNote();
     }
@@ -80,7 +83,7 @@ public class Thing extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public NoteBase getTargetNote() {
+  public Note getTargetNote() {
     if (getLink() != null) {
       return getLink().getTargetNote();
     }
@@ -98,5 +101,17 @@ public class Thing extends EntityIdentifiedByIdOnly {
       return getLink().getLinkType();
     }
     return getNote().getLinkType();
+  }
+
+  @JsonIgnore
+  public Stream<Link> getSiblingLinksOfSameLinkType(User user) {
+    return new NoteViewer(user, getTargetNote())
+        .linksOfTypeThroughReverse(getLinkType())
+        .filter(l -> !l.getThing().equals(this));
+  }
+
+  @JsonIgnore
+  public List<Note> getLinkedSiblingsOfSameLinkType(User user) {
+    return getSiblingLinksOfSameLinkType(user).map(Link::getSourceNote).toList();
   }
 }

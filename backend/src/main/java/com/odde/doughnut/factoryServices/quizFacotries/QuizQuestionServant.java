@@ -62,7 +62,7 @@ public class QuizQuestionServant {
     return grand.getDescendants().filter(notePredicate).collect(Collectors.toList());
   }
 
-  private Optional<Link> chooseOneCategoryLink(Link link) {
+  private Optional<Thing> chooseOneCategoryLink(Link link) {
     return randomizer.chooseOneRandomly(link.categoryLinksOfTarget(this.user));
   }
 
@@ -70,31 +70,32 @@ public class QuizQuestionServant {
     return randomizer.randomlyChoose(maxFillingOptionCount, candidates).toList();
   }
 
-  public Stream<Link> getSiblingLinksOfSameLinkTypeHavingReviewPoint(Link link) {
-    Stream<Link> siblingLinksOfSameLinkType = link.getSiblingLinksOfSameLinkType(this.user);
-    return linksWithReviewPoint(siblingLinksOfSameLinkType);
+  public Stream<Thing> getSiblingLinksOfSameLinkTypeHavingReviewPoint(Link link) {
+    Stream<Link> siblingLinksOfSameLinkType =
+        link.getThing().getSiblingLinksOfSameLinkType(this.user);
+    return linksWithReviewPoint(siblingLinksOfSameLinkType.map(Link::getThing));
   }
 
-  public Stream<Link> getLinksFromSameSourceHavingReviewPoint(Link link) {
-    Stream<Link> stream =
+  public Stream<Thing> getLinksFromSameSourceHavingReviewPoint(Link link) {
+    Stream<Thing> stream =
         new NoteViewer(this.user, link.getSourceNote())
             .linksOfTypeThroughDirect(candidateQuestionLinkTypes).stream();
-    return linksWithReviewPoint(stream).filter(l -> !link.equals(l));
+    return linksWithReviewPoint(stream).filter(l -> !link.getThing().equals(l));
   }
 
-  private Stream<Link> linksWithReviewPoint(Stream<Link> cousinLinksOfSameLinkType) {
-    return cousinLinksOfSameLinkType.filter(l -> getReviewPoint(l.getThing()) != null);
+  private Stream<Thing> linksWithReviewPoint(Stream<Thing> cousinLinksOfSameLinkType) {
+    return cousinLinksOfSameLinkType.filter(l -> getReviewPoint(l) != null);
   }
 
   public ParentGrandLinkHelper getParentGrandLinkHelper(Link link) {
-    Link parentGrandLink = chooseOneCategoryLink(link).orElse(null);
+    Thing parentGrandLink = chooseOneCategoryLink(link).orElse(null);
     if (parentGrandLink == null) return new NullParentGrandLinkHelper();
     return new ParentGrandLinkHelperImpl(this.user, link, parentGrandLink);
   }
 
-  public List<Note> chooseBackwardPeers(Link instanceLink, Link link1) {
+  public List<Note> chooseBackwardPeers(Thing instanceLink, Link link1) {
     List<Note> instanceReverse = instanceLink.getLinkedSiblingsOfSameLinkType(user);
-    List<Note> specReverse = link1.getLinkedSiblingsOfSameLinkType(user);
+    List<Note> specReverse = link1.getThing().getLinkedSiblingsOfSameLinkType(user);
     List<Note> backwardPeers =
         Stream.concat(instanceReverse.stream(), specReverse.stream())
             .filter(n -> !(instanceReverse.contains(n) && specReverse.contains(n)))
@@ -118,7 +119,8 @@ public class QuizQuestionServant {
   }
 
   public List<Note> chooseFromCohortAvoidSiblings(Link answerLink) {
-    List<Note> linkedSiblingsOfSameLinkType = answerLink.getLinkedSiblingsOfSameLinkType(user);
+    List<Note> linkedSiblingsOfSameLinkType =
+        answerLink.getThing().getLinkedSiblingsOfSameLinkType(user);
     return chooseCohortAndAvoid(
         answerLink.getSourceNote(), answerLink.getTargetNote(), linkedSiblingsOfSameLinkType);
   }

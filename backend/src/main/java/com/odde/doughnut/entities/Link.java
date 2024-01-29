@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -268,24 +267,12 @@ public class Link extends Thingy {
   }
 
   @JsonIgnore
-  public List<Note> getLinkedSiblingsOfSameLinkType(User viewer) {
-    return getSiblingLinksOfSameLinkType(viewer).map(Link::getSourceNote).toList();
-  }
-
-  @JsonIgnore
-  public Stream<Link> getSiblingLinksOfSameLinkType(User viewer) {
-    return new NoteViewer(viewer, targetNote)
-        .linksOfTypeThroughReverse(getLinkType())
-        .filter(l -> !l.equals(this));
-  }
-
-  @JsonIgnore
   public List<Note> getPiblingOfTheSameLinkType(User viewer) {
-    return getPiblingLinksOfSameLinkType(viewer).stream().map(Link::getTargetNote).toList();
+    return getPiblingLinksOfSameLinkType(viewer).stream().map(Thing::getTargetNote).toList();
   }
 
   @JsonIgnore
-  public List<Link> getPiblingLinksOfSameLinkType(User viewer) {
+  public List<Thing> getPiblingLinksOfSameLinkType(User viewer) {
     return new NoteViewer(viewer, sourceNote)
         .linksOfTypeThroughDirect(List.of(getLinkType())).stream()
             .filter(l -> !l.equals(this))
@@ -301,7 +288,7 @@ public class Link extends Thingy {
   }
 
   @JsonIgnore
-  public List<Link> categoryLinksOfTarget(User viewer) {
+  public List<Thing> categoryLinksOfTarget(User viewer) {
     return new NoteViewer(viewer, getTargetNote())
         .linksOfTypeThroughDirect(
             List.of(LinkType.PART, LinkType.INSTANCE, LinkType.SPECIALIZE, LinkType.APPLICATION));

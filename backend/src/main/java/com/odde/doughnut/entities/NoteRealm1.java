@@ -6,6 +6,6 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "note")
 @JsonPropertyOrder({"topic", "topicConstructor", "details", "parentId", "updatedAt"})
-public class NoteSimple extends NoteBase {
-  public NoteSimple() {}
+public class NoteRealm1 extends NoteBase {
+  public NoteRealm1() {}
 }

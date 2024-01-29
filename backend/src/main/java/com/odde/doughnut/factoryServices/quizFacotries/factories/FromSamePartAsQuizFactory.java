@@ -10,7 +10,7 @@ public class FromSamePartAsQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
 
   private final ParentGrandLinkHelper parentGrandLinkHelper;
-  private Link cachedAnswerLink = null;
+  private Thing cachedAnswerLink = null;
   private List<Note> cachedFillingOptions = null;
   private final Link link;
   private final QuizQuestionServant servant;
@@ -36,7 +36,7 @@ public class FromSamePartAsQuizFactory
   @Override
   public Note generateAnswer() {
     if (getAnswerLink() == null) return null;
-    return getAnswerLink().getSourceNote();
+    return getAnswerLink().getParentNote();
   }
 
   @Override
@@ -44,9 +44,9 @@ public class FromSamePartAsQuizFactory
     return parentGrandLinkHelper.getParentGrandLink();
   }
 
-  protected Link getAnswerLink() {
+  protected Thing getAnswerLink() {
     if (cachedAnswerLink == null) {
-      List<Link> backwardPeers =
+      List<Thing> backwardPeers =
           servant.getSiblingLinksOfSameLinkTypeHavingReviewPoint(link).toList();
       cachedAnswerLink = servant.randomizer.chooseOneRandomly(backwardPeers).orElse(null);
     }
