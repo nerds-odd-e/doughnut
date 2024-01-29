@@ -1,7 +1,7 @@
 <template>
   <Breadcrumb
     v-bind="{
-      ancestors: [quizQuestion.notebook?.headNote],
+      ancestors: quizQuestion.notebook ? [quizQuestion.notebook.headNote] : [],
       notebook: quizQuestion.notebook,
     }"
   />
