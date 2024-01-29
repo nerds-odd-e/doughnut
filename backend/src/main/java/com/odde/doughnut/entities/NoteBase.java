@@ -54,6 +54,18 @@ public abstract class NoteBase extends Thingy {
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private Timestamp deletedAt;
 
+  @OneToMany(mappedBy = "sourceNote")
+  @JsonIgnore
+  @Getter
+  @Setter
+  private List<Link> links = new ArrayList<>();
+
+  @OneToMany(mappedBy = "targetNote")
+  @JsonIgnore
+  @Getter
+  @Setter
+  private List<Link> refers = new ArrayList<>();
+
   @JoinTable(
       name = "notes_closure",
       joinColumns = {
@@ -149,5 +161,13 @@ public abstract class NoteBase extends Thingy {
       p = p.getParent();
     }
     return result;
+  }
+
+  @JsonIgnore
+  public List<? extends Thingy> getLinkChildren() {
+    //    return getAllChildren().stream()
+    //        .filter(Note::usingLinkTypeAsTopicConstructor)
+    //        .collect(toList());
+    return getLinks();
   }
 }

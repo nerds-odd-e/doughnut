@@ -56,18 +56,6 @@ public class Note extends NoteBase {
   @Setter
   private ReviewSetting masterReviewSetting;
 
-  @OneToMany(mappedBy = "sourceNote")
-  @JsonIgnore
-  @Getter
-  @Setter
-  private List<Link> links = new ArrayList<>();
-
-  @OneToMany(mappedBy = "targetNote")
-  @JsonIgnore
-  @Getter
-  @Setter
-  private List<Link> refers = new ArrayList<>();
-
   @OneToMany(mappedBy = "note", cascade = CascadeType.ALL)
   @JsonIgnore
   @OrderBy("depth DESC")
@@ -83,14 +71,6 @@ public class Note extends NoteBase {
 
     Thing.createThing(user, note, currentUTCTimestamp);
     return note;
-  }
-
-  @JsonIgnore
-  public List<? extends Thingy> getLinkChildren() {
-    //    return getAllChildren().stream()
-    //        .filter(Note::usingLinkTypeAsTopicConstructor)
-    //        .collect(toList());
-    return getLinks();
   }
 
   public String getTopic() {
