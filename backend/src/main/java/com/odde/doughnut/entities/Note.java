@@ -5,8 +5,6 @@ import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.odde.doughnut.algorithms.ClozedString;
-import com.odde.doughnut.algorithms.HtmlOrMarkdown;
 import com.odde.doughnut.algorithms.SiblingOrder;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
@@ -269,13 +267,6 @@ public class Note extends NoteBase {
     return Optional.ofNullable(parent.id);
   }
 
-  @JsonIgnore
-  public ClozedString getClozeDescription() {
-    if (isDetailsBlankHtml()) return new ClozedString(null, "");
-
-    return ClozedString.htmlClozedString(getDetails()).hide(getNoteTitle());
-  }
-
   public Optional<PictureWithMask> getPictureWithMask() {
     return getNotePicture()
         .map(
@@ -304,11 +295,6 @@ public class Note extends NoteBase {
     Note note = createNote(user, currentUTCTimestamp, topicConstructor);
     note.setParentNote(this);
     return note;
-  }
-
-  @JsonIgnore
-  public boolean isDetailsBlankHtml() {
-    return new HtmlOrMarkdown(getDetails()).isBlank();
   }
 
   @JsonIgnore

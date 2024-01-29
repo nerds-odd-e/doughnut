@@ -3,6 +3,8 @@ package com.odde.doughnut.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.odde.doughnut.algorithms.ClozedString;
+import com.odde.doughnut.algorithms.HtmlOrMarkdown;
 import com.odde.doughnut.algorithms.NoteTitle;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
@@ -68,4 +70,16 @@ public abstract class NoteBase extends Thingy {
 
   @JsonIgnore
   public abstract Note getParent();
+
+  @JsonIgnore
+  public ClozedString getClozeDescription() {
+    if (isDetailsBlankHtml()) return new ClozedString(null, "");
+
+    return ClozedString.htmlClozedString(getDetails()).hide(getNoteTitle());
+  }
+
+  @JsonIgnore
+  public boolean isDetailsBlankHtml() {
+    return new HtmlOrMarkdown(getDetails()).isBlank();
+  }
 }
