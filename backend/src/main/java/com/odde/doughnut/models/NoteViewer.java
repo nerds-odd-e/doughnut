@@ -56,7 +56,7 @@ public class NoteViewer {
     return note.getLinkChildren().stream()
         .filter(l -> l.targetVisibleAsSourceOrTo(viewer))
         .filter(l -> linkTypes.contains(l.getNoteLinkType()))
-        .map(t -> t.getThing())
+        .map(Thingy::getThing)
         .toList();
   }
 
