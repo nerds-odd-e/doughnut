@@ -35,6 +35,10 @@ spring:
 server:
   forward-headers-strategy: FRAMEWORK
   port: 8081
+springdoc:
+  api-docs:
+    enabled: true
+    path: /api-docs
 
 ---
 spring:
@@ -75,6 +79,10 @@ spring:
 server:
   forward-headers-strategy: FRAMEWORK
   port: 9081
+springdoc:
+  api-docs:
+    enabled: true
+    path: /api-docs
 
 ---
 spring:
@@ -121,3 +129,6 @@ server:
   error:
     include-stacktrace: never
   forward-headers-strategy: FRAMEWORK
+springdoc:
+  api-docs:
+    enabled: false
