@@ -104,14 +104,15 @@ public class Thing extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public Stream<Link> getSiblingLinksOfSameLinkType(User user) {
+  public Stream<Thing> getSiblingLinksOfSameLinkType(User user) {
     return new NoteViewer(user, getTargetNote())
         .linksOfTypeThroughReverse(getLinkType())
-        .filter(l -> !l.getThing().equals(this));
+        .filter(l -> !l.getThing().equals(this))
+        .map(Link::getThing);
   }
 
   @JsonIgnore
   public List<Note> getLinkedSiblingsOfSameLinkType(User user) {
-    return getSiblingLinksOfSameLinkType(user).map(Link::getSourceNote).toList();
+    return getSiblingLinksOfSameLinkType(user).map(Thing::getParentNote).toList();
   }
 }

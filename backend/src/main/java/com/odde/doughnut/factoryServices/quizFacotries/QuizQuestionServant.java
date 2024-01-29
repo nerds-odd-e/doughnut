@@ -71,9 +71,7 @@ public class QuizQuestionServant {
   }
 
   public Stream<Thing> getSiblingLinksOfSameLinkTypeHavingReviewPoint(Link link) {
-    Stream<Link> siblingLinksOfSameLinkType =
-        link.getThing().getSiblingLinksOfSameLinkType(this.user);
-    return linksWithReviewPoint(siblingLinksOfSameLinkType.map(Link::getThing));
+    return linksWithReviewPoint(link.getThing().getSiblingLinksOfSameLinkType(this.user));
   }
 
   public Stream<Thing> getLinksFromSameSourceHavingReviewPoint(Link link) {

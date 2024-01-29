@@ -34,9 +34,10 @@ public record ParentGrandLinkHelperImpl(User user, Link link, Thing parentGrandL
         new NoteViewer(user, link.getSourceNote())
             .linksOfTypeThroughDirect(List.of(link.getLinkType())).stream()
                 .map(Thing::getTargetNote)
-                .collect(Collectors.toList());
+                .toList();
     return parentGrandLink
         .getSiblingLinksOfSameLinkType(user)
-        .filter(cl1 -> !linkTargetOfType.contains(cl1.getSourceNote()));
+        .filter(cl1 -> !linkTargetOfType.contains(cl1.getParentNote()))
+        .map(Thing::getLink);
   }
 }
