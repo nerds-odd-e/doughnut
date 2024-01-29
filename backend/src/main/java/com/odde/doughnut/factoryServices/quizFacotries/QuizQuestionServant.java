@@ -54,10 +54,8 @@ public class QuizQuestionServant {
         note.getSiblings().stream().filter(notePredicate).collect(Collectors.toList());
     if (list.size() > 0) return list;
 
-    return this.modelFactoryService
-        .toNoteModel(note.getGrandAsPossible())
-        .getDescendantsInBreathFirstOrder()
-        .stream()
+    return note.getGrandAsPossible()
+        .getDescendants()
         .filter(notePredicate)
         .collect(Collectors.toList());
   }

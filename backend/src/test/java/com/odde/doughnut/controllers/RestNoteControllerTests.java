@@ -428,9 +428,7 @@ class RestNoteControllerTests {
       controller.deleteNote(subject);
       makeMe.refresh(parent);
       assertThat(parent.getChildren(), hasSize(1));
-      assertThat(
-          makeMe.modelFactoryService.toNoteModel(parent).getDescendantsInBreathFirstOrder(),
-          hasSize(1));
+      assertThat(parent.getDescendants().toList(), hasSize(1));
     }
 
     @Nested
@@ -442,9 +440,7 @@ class RestNoteControllerTests {
         controller.undoDeleteNote(subject);
         makeMe.refresh(parent);
         assertThat(parent.getChildren(), hasSize(1));
-        assertThat(
-            makeMe.modelFactoryService.toNoteModel(parent).getDescendantsInBreathFirstOrder(),
-            hasSize(2));
+        assertThat(parent.getDescendants().toList(), hasSize(2));
       }
 
       @Test
@@ -461,9 +457,7 @@ class RestNoteControllerTests {
 
         controller.undoDeleteNote(subject);
         makeMe.refresh(parent);
-        assertThat(
-            makeMe.modelFactoryService.toNoteModel(parent).getDescendantsInBreathFirstOrder(),
-            hasSize(1));
+        assertThat(parent.getDescendants().toList(), hasSize(1));
       }
     }
   }

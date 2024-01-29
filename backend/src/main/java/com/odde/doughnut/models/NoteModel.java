@@ -3,7 +3,6 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
-import java.util.Collection;
 import java.util.List;
 import org.apache.logging.log4j.util.Strings;
 
@@ -49,9 +48,5 @@ public class NoteModel {
         modelFactoryService.noteRepository.noteWithWikidataIdWithinNotebook(
             entity.getNotebook().getId(), entity.getWikidataId());
     return (existingNotes.stream().anyMatch(n -> !n.equals(entity)));
-  }
-
-  public Collection<Note> getDescendantsInBreathFirstOrder() {
-    return entity.getDescendants().toList();
   }
 }
