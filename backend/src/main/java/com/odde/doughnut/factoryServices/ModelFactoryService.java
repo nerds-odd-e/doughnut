@@ -103,7 +103,6 @@ public class ModelFactoryService {
         quizQuestionEntity.getQuestionType(),
         presenter.stem(),
         presenter.mainTopic(),
-        quizQuestionEntity.getNotebookPosition(user),
         new JsonViewer(user)
             .jsonNotebookViewedByUser(quizQuestionEntity.getHeadNoteOfNotebook().getNotebook()),
         presenter.getOptions(this),

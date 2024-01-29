@@ -65,15 +65,6 @@ public class NoteViewer {
         .filter(l -> l.sourceVisibleAsTargetOrTo(viewer));
   }
 
-  public NotePositionViewedByUser jsonNotebookPosition() {
-    Note headNote = this.note.getNotebook().getHeadNote();
-    NotePositionViewedByUser nvb = new NotePositionViewedByUser();
-    nvb.setNoteId(headNote.getId());
-    nvb.setNotebook(jsonViewer.jsonNotebookViewedByUser(headNote.getNotebook()));
-    nvb.getAncestors().add(headNote);
-    return nvb;
-  }
-
   public NotePositionViewedByUser jsonNotePosition() {
     NotePositionViewedByUser nvb = new NotePositionViewedByUser();
     nvb.setNoteId(note.getId());

@@ -3,11 +3,9 @@ package com.odde.doughnut.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.controllers.json.NotePositionViewedByUser;
 import com.odde.doughnut.factoryServices.quizFacotries.*;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.*;
 import com.odde.doughnut.factoryServices.quizFacotries.presenters.*;
-import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -150,13 +148,6 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public ReviewPoint getReviewPointFor(UserModel userModel) {
     return userModel.getReviewPointFor(thing);
-  }
-
-  @JsonIgnore
-  public NotePositionViewedByUser getNotebookPosition(User user) {
-    Note result = getHeadNoteOfNotebook();
-    if (result == null) return null;
-    return new NoteViewer(user, result).jsonNotebookPosition();
   }
 
   @JsonIgnore

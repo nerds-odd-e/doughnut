@@ -1,5 +1,5 @@
 <template>
-  <Breadcrumb v-bind="quizQuestion.notebookPosition" />
+  <Breadcrumb v-bind="{ ancestors: [], notebook: quizQuestion.notebook }" />
   <div class="quiz-instruction">
     <ShowPicture
       v-if="quizQuestion.pictureWithMask"

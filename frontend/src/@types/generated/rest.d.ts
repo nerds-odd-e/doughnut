@@ -167,7 +167,6 @@ declare namespace Generated {
         questionType: QuestionType;
         stem: string;
         mainTopic: string;
-        notebookPosition?: NotePositionViewedByUser;
         notebook?: NotebookViewedByUser;
         choices: Choice[];
         pictureWithMask?: PictureWithMask;
