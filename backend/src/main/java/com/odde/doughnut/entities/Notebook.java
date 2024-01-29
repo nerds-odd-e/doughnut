@@ -39,12 +39,6 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @Setter
   private Note headNote;
 
-  @OneToMany(mappedBy = "notebook")
-  @JsonIgnore
-  @Getter
-  @Setter
-  private List<Note> notes = new ArrayList<>();
-
   @Column(name = "skip_review_entirely")
   @Getter
   @Setter
