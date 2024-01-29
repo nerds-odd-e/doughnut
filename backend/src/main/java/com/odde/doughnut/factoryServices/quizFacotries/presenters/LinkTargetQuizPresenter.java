@@ -2,11 +2,12 @@ package com.odde.doughnut.factoryServices.quizFacotries.presenters;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteBase;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 
 public class LinkTargetQuizPresenter extends QuizQuestionWithOptionsPresenter {
   protected final Link link;
-  protected final Note answerNote;
+  protected final NoteBase answerNote;
 
   public LinkTargetQuizPresenter(QuizQuestionEntity quizQuestion) {
     super(quizQuestion);
