@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.NoteMotion;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import java.util.ArrayList;
 
 public class NoteMotionModel {
   protected final NoteMotion entity;
@@ -19,25 +18,11 @@ public class NoteMotionModel {
   public void execute() throws CyclicLinkDetectedException {
     Notebook notebook = entity.getSubject().getNotebook();
     entity.moveHeadNoteOnly();
-    updateAncestors(entity.getSubject(), entity.getNewParent());
+    Note parent = entity.getNewParent();
+    entity.getSubject().setParentNote(parent);
     modelFactoryService.save(entity.getSubject());
-    entity
-        .getSubject()
-        .getDescendants()
-        .forEach(
-            desc -> {
-              updateAncestors(desc, desc.getParent());
-              modelFactoryService.save(desc);
-            });
     if (notebook.getHeadNote() == entity.getSubject()) {
       modelFactoryService.remove(notebook);
     }
-  }
-
-  private void updateAncestors(Note note, Note parent) {
-    note.getAncestorNotesClosures().forEach(modelFactoryService::remove);
-    note.setAncestorNotesClosures(new ArrayList<>());
-    modelFactoryService.entityManager.flush();
-    note.setParentNote(parent);
   }
 }

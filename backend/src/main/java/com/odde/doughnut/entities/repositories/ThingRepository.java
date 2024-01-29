@@ -30,15 +30,15 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
 
   @Query(
       value =
-          selectThingsFrom + selectThingsByAncestor1 + selectNoteThingsByAncestor1 + orderByDate,
+          selectThingsFrom + selectThingsFromNotebook + selectNoteThingFromNotebook + orderByDate,
       nativeQuery = true)
   Stream<Thing> findByAncestorWhereThereIsNoReviewPoint(Integer userId, Integer notebookId);
 
   @Query(
       value =
           "SELECT count(1) as count from thing "
-              + selectThingsByAncestor1
-              + selectNoteThingsByAncestor1
+              + selectThingsFromNotebook
+              + selectNoteThingFromNotebook
               + whereThereIsNoReviewPoint,
       nativeQuery = true)
   int countByAncestorWhereThereIsNoReviewPoint(Integer userId, Integer notebookId);
@@ -46,15 +46,11 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
   @Query(
       value =
           "SELECT count(1) as count from thing "
-              + selectThingsByAncestor1
-              + selectNoteThingsByAncestor1
+              + selectThingsFromNotebook
+              + selectNoteThingFromNotebook
               + " WHERE (jlink.id IS NOT NULL OR jnote.id IS NOT NULL) AND thing.id in :thingIds",
       nativeQuery = true)
   int countByAncestorAndInTheList(Integer notebookId, @Param("thingIds") List<Integer> thingIds);
-
-  String byAncestorWhereThereIsNoReviewPoint =
-      "JOIN notes_closure ON notes_closure.note_id = source_id "
-          + "   AND notes_closure.ancestor_id = :ancestorId ";
 
   String byAncestorWhereThereIsNoReviewPoint1 =
       "JOIN note ns ON ns.id = source_id " + "   AND ns.notebook_id = :notebookId ";
@@ -76,12 +72,7 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
 
   String selectThingsJoinLink = "LEFT JOIN (" + " SELECT link.id" + selectLinkWithLevelFromNotes;
 
-  String selectThingsByAncestor =
-      selectThingsJoinLink
-          + byAncestorWhereThereIsNoReviewPoint
-          + ") jlink ON jlink.id = thing.link_id ";
-
-  String selectThingsByAncestor1 =
+  String selectThingsFromNotebook =
       selectThingsJoinLink
           + byAncestorWhereThereIsNoReviewPoint1
           + ") jlink ON jlink.id = thing.link_id ";
@@ -115,5 +106,5 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
 
   String selectNoteThings = selectThingJoinNote + joinNotebook + whereNoteIsNotSkipped;
 
-  String selectNoteThingsByAncestor1 = selectThingJoinNote + fromNotebook + whereNoteIsNotSkipped;
+  String selectNoteThingFromNotebook = selectThingJoinNote + fromNotebook + whereNoteIsNotSkipped;
 }

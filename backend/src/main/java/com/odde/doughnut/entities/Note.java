@@ -56,13 +56,6 @@ public class Note extends NoteBase {
   @Setter
   private ReviewSetting masterReviewSetting;
 
-  @OneToMany(mappedBy = "note", cascade = CascadeType.ALL)
-  @JsonIgnore
-  @OrderBy("depth DESC")
-  @Getter
-  @Setter
-  private List<NotesClosure> ancestorNotesClosures = new ArrayList<>();
-
   public static Note createNote(User user, Timestamp currentUTCTimestamp, String topicConstructor) {
     final Note note = new Note();
     note.setUpdatedAt(currentUTCTimestamp);
@@ -95,19 +88,6 @@ public class Note extends NoteBase {
     if (parentNote == null) return;
     setNotebook(parentNote.getNotebook());
     parent = parentNote;
-    List<Note> ancestors = parentNote.getAncestors();
-    ancestors.add(parentNote);
-    Collections.reverse(ancestors);
-    int[] counter = {1};
-    ancestors.forEach(
-        anc -> {
-          NotesClosure notesClosure = new NotesClosure();
-          notesClosure.setNote(this);
-          notesClosure.setAncestor(anc);
-          notesClosure.setDepth(counter[0]);
-          getAncestorNotesClosures().add(0, notesClosure);
-          counter[0] += 1;
-        });
   }
 
   public void mergeMasterReviewSetting(ReviewSetting reviewSetting) {
