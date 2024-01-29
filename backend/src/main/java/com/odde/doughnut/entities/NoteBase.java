@@ -139,4 +139,15 @@ public abstract class NoteBase extends Thingy {
     }
     return getTopicConstructor();
   }
+
+  @JsonIgnore
+  public List<Note> getAncestors() {
+    List<Note> result = new ArrayList<>();
+    Note p = getParent();
+    while (p != null) {
+      result.add(0, p);
+      p = p.getParent();
+    }
+    return result;
+  }
 }
