@@ -40,7 +40,7 @@ public class Note extends NoteBase {
   @JsonIgnore
   @Getter
   @Setter
-  private NoteSimple targetNote;
+  private Note targetNote;
 
   @OneToOne
   @JoinColumn(name = "parent_id", referencedColumnName = "id")
