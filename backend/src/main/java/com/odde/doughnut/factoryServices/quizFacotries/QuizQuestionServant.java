@@ -74,11 +74,11 @@ public class QuizQuestionServant {
     return linksWithReviewPoint(link.getSiblingLinksOfSameLinkType(this.user));
   }
 
-  public Stream<Thing> getLinksFromSameSourceHavingReviewPoint(Link link) {
+  public Stream<Thing> getLinksFromSameSourceHavingReviewPoint(Thing link) {
     Stream<Thing> stream =
-        new NoteViewer(this.user, link.getSourceNote())
+        new NoteViewer(this.user, link.getParentNote())
             .linksOfTypeThroughDirect(candidateQuestionLinkTypes).stream();
-    return linksWithReviewPoint(stream).filter(l -> !link.getThing().equals(l));
+    return linksWithReviewPoint(stream).filter(l -> !link.equals(l));
   }
 
   private Stream<Thing> linksWithReviewPoint(Stream<Thing> cousinLinksOfSameLinkType) {
@@ -91,9 +91,9 @@ public class QuizQuestionServant {
     return new ParentGrandLinkHelperImpl(this.user, link, parentGrandLink);
   }
 
-  public List<Note> chooseBackwardPeers(Thing instanceLink, Link link1) {
+  public List<Note> chooseBackwardPeers(Thing instanceLink, Thing link1) {
     List<Note> instanceReverse = instanceLink.getLinkedSiblingsOfSameLinkType(user);
-    List<Note> specReverse = link1.getThing().getLinkedSiblingsOfSameLinkType(user);
+    List<Note> specReverse = link1.getLinkedSiblingsOfSameLinkType(user);
     List<Note> backwardPeers =
         Stream.concat(instanceReverse.stream(), specReverse.stream())
             .filter(n -> !(instanceReverse.contains(n) && specReverse.contains(n)))

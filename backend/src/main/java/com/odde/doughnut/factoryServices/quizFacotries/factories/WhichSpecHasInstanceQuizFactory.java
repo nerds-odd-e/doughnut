@@ -1,6 +1,5 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
-import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
@@ -13,11 +12,11 @@ public class WhichSpecHasInstanceQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
   private Thing cachedInstanceLink = null;
   private List<Note> cachedFillingOptions = null;
-  private final Link link;
+  private final Thing link;
   private final QuizQuestionServant servant;
 
   public WhichSpecHasInstanceQuizFactory(Thing thing, QuizQuestionServant servant) {
-    this.link = thing.getLink();
+    this.link = thing;
     this.servant = servant;
   }
 
