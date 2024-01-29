@@ -14,9 +14,9 @@ runs:
         node-version: ${{ inputs.node-version }}
     - name: Install pnpm
       uses: pnpm/action-setup@v2
-        with:
-          version: 8.14.3
-          run_install: false
+      with:
+        version: 8.15.0
+        run_install: false
     - name: Get pnpm store directory
       shell: bash
       run: |

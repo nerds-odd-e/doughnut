@@ -7,7 +7,7 @@
   "license": "MIT",
   "engines": {
     "node": ">=20",
-    "pnpm": ">=8.14.3"
+    "pnpm": ">=8.15.0"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
@@ -25,8 +25,8 @@
     "backend:build": "backend/gradlew -p backend build -x test --build-cache --parallel",
     "backend:prod_build": "backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel",
     "generateTypeScript": "backend/gradlew -p backend generateTypeScript",
-    "generateTypeScript:on_backend_ready": "pnpm --frozen-lockfile --silent install && wait-on tcp:9081 && pnpx openapi-typescript http://localhost:9081/api-docs.yaml -o ./frontend/src/@types/generated/schema.d.ts",
-    "generateTypeScript:now": "pnpm run-p -clnr sut generateTypeScript:on_backend_ready",
+    "generateTypescript:on_backend_ready": "pnpm --frozen-lockfile --silent install && wait-on tcp:9081 && pnpx openapi-typescript http://localhost:9081/api-docs.yaml -o ./frontend/src/@types/generated/schema.d.ts",
+    "generateTypescript:now": "pnpm run-p -clnr sut generateTypescript:on_backend_ready",
     "cy:format": "pnpm --frozen-lockfile --silent install && pnpm eslint e2e_test --fix",
     "cy:lint": "pnpm --frozen-lockfile --silent install && pnpm eslint e2e_test",
     "cy:open": "cypress open --e2e",

@@ -437,17 +437,12 @@ export interface components {
       pictureWithMask?: components["schemas"]["PictureWithMask"];
       picture?: boolean;
     };
-    NotePositionViewedByUser: {
-      /** Format: int32 */
-      noteId?: number;
-      notebook?: components["schemas"]["NotebookViewedByUser"];
-      ancestors?: components["schemas"]["Note"][];
-    };
     NotebookViewedByUser: {
       /** Format: int32 */
       id?: number;
       /** Format: int32 */
       headNoteId?: number;
+      headNote?: components["schemas"]["Note"];
       skipReviewEntirely?: boolean;
       fromBazaar?: boolean;
       ownership?: components["schemas"]["Ownership"];
@@ -459,7 +454,7 @@ export interface components {
       questionType?: "CLOZE_SELECTION" | "SPELLING" | "PICTURE_TITLE" | "PICTURE_SELECTION" | "LINK_TARGET" | "LINK_SOURCE" | "LINK_SOURCE_WITHIN_SAME_LINK_TYPE" | "CLOZE_LINK_TARGET" | "DESCRIPTION_LINK_TARGET" | "WHICH_SPEC_HAS_INSTANCE" | "FROM_SAME_PART_AS" | "FROM_DIFFERENT_PART_AS" | "AI_QUESTION";
       stem?: string;
       mainTopic?: string;
-      notebookPosition?: components["schemas"]["NotePositionViewedByUser"];
+      notebook?: components["schemas"]["NotebookViewedByUser"];
       choices?: components["schemas"]["Choice"][];
       pictureWithMask?: components["schemas"]["PictureWithMask"];
     };
@@ -495,6 +490,12 @@ export interface components {
     LinkViewed: {
       direct?: components["schemas"]["Link"][];
       reverse?: components["schemas"]["Link"][];
+    };
+    NotePositionViewedByUser: {
+      /** Format: int32 */
+      noteId?: number;
+      notebook?: components["schemas"]["NotebookViewedByUser"];
+      ancestors?: components["schemas"]["Note"][];
     };
     NoteRealm: {
       /** Format: int32 */
