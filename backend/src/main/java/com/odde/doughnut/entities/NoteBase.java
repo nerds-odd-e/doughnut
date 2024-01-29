@@ -12,7 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @MappedSuperclass
-public abstract class Notey extends Thingy {
+public abstract class NoteBase extends Thingy {
 
   @OneToOne(mappedBy = "note", cascade = CascadeType.ALL)
   @Getter

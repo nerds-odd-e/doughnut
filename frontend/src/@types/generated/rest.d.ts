@@ -282,7 +282,7 @@ declare namespace Generated {
         level: number;
     }
 
-    interface Note extends Notey {
+    interface Note extends NoteBase {
         topic: string;
         parentId?: number;
         updatedAt: string;
@@ -341,7 +341,7 @@ declare namespace Generated {
         useParentPicture: boolean;
     }
 
-    interface Notey extends Thingy {
+    interface NoteBase extends Thingy {
         noteAccessories: NoteAccessories;
         /**
          * The details of the note is in markdown format.
