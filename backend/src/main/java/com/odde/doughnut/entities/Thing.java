@@ -107,8 +107,7 @@ public class Thing extends EntityIdentifiedByIdOnly {
   public Stream<Thing> getSiblingLinksOfSameLinkType(User user) {
     return new NoteViewer(user, getTargetNote())
         .linksOfTypeThroughReverse(getLinkType())
-        .filter(l -> !l.getThing().equals(this))
-        .map(Link::getThing);
+        .filter(l -> !l.equals(this));
   }
 
   @JsonIgnore

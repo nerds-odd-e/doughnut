@@ -148,7 +148,8 @@ class FromDifferentPartAsQuizFactoryTest {
           @Test
           void noRightAnswers() {
             makeMe.refresh(userModel.getEntity());
-            assertThat(buildQuestion(), nullValue());
+            QuizQuestion actual = buildQuestion();
+            assertThat(actual, nullValue());
           }
 
           @Nested

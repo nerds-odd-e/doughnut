@@ -6,7 +6,6 @@ import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.models.NoteViewer;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public record ParentGrandLinkHelperImpl(User user, Link link, Thing parentGrandLink)
@@ -18,18 +17,18 @@ public record ParentGrandLinkHelperImpl(User user, Link link, Thing parentGrandL
   }
 
   @Override
-  public List<Link> getCousinLinksAvoidingSiblings() {
+  public List<Thing> getCousinLinksAvoidingSiblings() {
     List<Note> linkedSiblingsOfSameLinkType = link.getThing().getLinkedSiblingsOfSameLinkType(user);
     return getUncles()
         .flatMap(
             p ->
-                new NoteViewer(user, p.getSourceNote())
+                new NoteViewer(user, p.getParentNote())
                     .linksOfTypeThroughReverse(link.getLinkType()))
-        .filter(cousinLink -> !linkedSiblingsOfSameLinkType.contains(cousinLink.getSourceNote()))
-        .collect(Collectors.toList());
+        .filter(cousinLink -> !linkedSiblingsOfSameLinkType.contains(cousinLink.getParentNote()))
+        .toList();
   }
 
-  private Stream<Link> getUncles() {
+  private Stream<Thing> getUncles() {
     List<Note> linkTargetOfType =
         new NoteViewer(user, link.getSourceNote())
             .linksOfTypeThroughDirect(List.of(link.getLinkType())).stream()
@@ -37,7 +36,6 @@ public record ParentGrandLinkHelperImpl(User user, Link link, Thing parentGrandL
                 .toList();
     return parentGrandLink
         .getSiblingLinksOfSameLinkType(user)
-        .filter(cl1 -> !linkTargetOfType.contains(cl1.getParentNote()))
-        .map(Thing::getLink);
+        .filter(cl1 -> !linkTargetOfType.contains(cl1.getParentNote()));
   }
 }

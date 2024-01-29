@@ -24,10 +24,10 @@ public class FromSamePartAsQuizFactory
   @Override
   public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
-      List<Link> remoteCousins = parentGrandLinkHelper.getCousinLinksAvoidingSiblings();
+      List<Thing> remoteCousins = parentGrandLinkHelper.getCousinLinksAvoidingSiblings();
       cachedFillingOptions =
           servant.chooseFillingOptionsRandomly(remoteCousins).stream()
-              .map(Link::getSourceNote)
+              .map(Thing::getParentNote)
               .collect(Collectors.toList());
     }
     return cachedFillingOptions;

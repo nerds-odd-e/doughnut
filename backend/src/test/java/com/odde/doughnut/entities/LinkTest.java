@@ -127,8 +127,7 @@ public class LinkTest {
       makeMe.theNote(source).linkTo(target, SPECIALIZE).please();
       final LinkViewed linksMap = new NoteViewer(viewer, target).getAllLinks().get(SPECIALIZE);
       if (linksMap == null) return false;
-      final List<Link> links = linksMap.getReverse();
-      return !links.isEmpty();
+      return !linksMap.getReverse().isEmpty();
     }
   }
 

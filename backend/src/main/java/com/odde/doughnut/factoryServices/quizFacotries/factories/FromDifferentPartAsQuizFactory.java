@@ -46,7 +46,7 @@ public class FromDifferentPartAsQuizFactory
     return servant
         .randomizer
         .chooseOneRandomly(parentGrandLinkHelper.getCousinLinksAvoidingSiblings())
-        .map(Link::getSourceNote)
+        .map(Thing::getParentNote)
         .orElse(null);
   }
 }

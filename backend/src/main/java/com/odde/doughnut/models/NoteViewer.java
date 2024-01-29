@@ -45,7 +45,7 @@ public class NoteViewer {
                             linksOfTypeThroughDirect(List.of(type)).stream()
                                 .map(Thing::getLink)
                                 .toList());
-                        setReverse(linksOfTypeThroughReverse(type).collect(Collectors.toList()));
+                        setReverse(linksOfTypeThroughReverse(type).map(Thing::getLink).toList());
                       }
                     }))
         .filter(x -> x.getValue().notEmpty())
@@ -57,13 +57,14 @@ public class NoteViewer {
         .filter(l -> l.targetVisibleAsSourceOrTo(viewer))
         .filter(l -> linkTypes.contains(l.getNoteLinkType()))
         .map(t -> t.getThing())
-        .collect(Collectors.toList());
+        .toList();
   }
 
-  public Stream<Link> linksOfTypeThroughReverse(Link.LinkType linkType) {
+  public Stream<Thing> linksOfTypeThroughReverse(Link.LinkType linkType) {
     return note.getRefers().stream()
         .filter(l -> l.getLinkType().equals(linkType))
-        .filter(l -> l.sourceVisibleAsTargetOrTo(viewer));
+        .filter(l -> l.sourceVisibleAsTargetOrTo(viewer))
+        .map(Link::getThing);
   }
 
   public NotePositionViewedByUser jsonNotePosition() {
