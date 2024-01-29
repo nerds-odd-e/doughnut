@@ -18,11 +18,11 @@ public abstract class Thingy extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public boolean targetVisibleAsSourceOrTo(User viewer) {
-    if (getThing().getParentNote().getNotebook() == getThing().getTargetNote().getNotebook())
-      return true;
+    Thing thing = getThing();
+    if (thing.getParentNote().getNotebook() == thing.getTargetNote().getNotebook()) return true;
     if (viewer == null) return false;
 
-    return viewer.canReferTo(getThing().getTargetNote().getNotebook());
+    return viewer.canReferTo(thing.getTargetNote().getNotebook());
   }
 
   @JsonIgnore

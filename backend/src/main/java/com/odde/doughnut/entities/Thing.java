@@ -66,13 +66,13 @@ public class Thing extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public ClozedString getClozeSource() {
-    Note source = getParentNote();
+    NoteBase source = getParentNote();
     NoteBase target = getTargetNote();
     return ClozedString.htmlClozedString(source.getTopicConstructor()).hide(target.getNoteTitle());
   }
 
   @JsonIgnore
-  public Note getParentNote() {
+  public NoteBase getParentNote() {
     if (getLink() != null) {
       return getLink().getSourceNote();
     }
