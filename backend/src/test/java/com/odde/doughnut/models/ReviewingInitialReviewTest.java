@@ -213,7 +213,7 @@ public class ReviewingInitialReviewTest {
     @BeforeEach
     void setup() {
       User anotherUser = makeMe.aUser().please();
-      Note top = makeMe.aNote().creatorAndOwner(anotherUser).please();
+      Note top = makeMe.aNote().skipReview().creatorAndOwner(anotherUser).please();
       note1 = makeMe.aNote().under(top).please();
       note2 = makeMe.aNote().under(top).please();
       makeMe

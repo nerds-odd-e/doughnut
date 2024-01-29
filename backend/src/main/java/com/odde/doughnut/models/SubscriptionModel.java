@@ -24,7 +24,7 @@ public class SubscriptionModel implements ReviewScope {
   @Override
   public Stream<Thing> getThingHaveNotBeenReviewedAtAll() {
     return modelFactoryService.thingRepository.findByAncestorWhereThereIsNoReviewPoint(
-        entity.getUser().getId(), entity.getHeadNote().getId());
+        entity.getUser().getId(), entity.getHeadNote().getId(), entity.getNotebook().getId());
   }
 
   public int needToLearnCountToday(List<Integer> thingIds) {

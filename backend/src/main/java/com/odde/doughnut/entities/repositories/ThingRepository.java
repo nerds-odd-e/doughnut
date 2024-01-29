@@ -29,9 +29,10 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
   int countByOwnershipWhereThereIsNoReviewPoint(Integer userId, Integer ownershipId);
 
   @Query(
-      value = selectThingsFrom + selectThingsByAncestor + selectNoteThingsByAncestor + orderByDate,
+      value = selectThingsFrom + selectThingsByAncestor + selectNoteThingsByAncestor1 + orderByDate,
       nativeQuery = true)
-  Stream<Thing> findByAncestorWhereThereIsNoReviewPoint(Integer userId, Integer ancestorId);
+  Stream<Thing> findByAncestorWhereThereIsNoReviewPoint(
+      Integer userId, Integer ancestorId, Integer notebookId);
 
   @Query(
       value =
@@ -98,6 +99,9 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
       " JOIN notes_closure ON notes_closure.note_id = note.id "
           + "   AND notes_closure.ancestor_id = :ancestorId ";
 
+  String fromNotebook =
+      " JOIN note ns ON ns.id = note.id " + "   AND ns.notebook_id = :notebookId ";
+
   String selectThingJoinNote = "LEFT JOIN (" + " SELECT note.id as id, rs.level as level FROM note";
 
   String selectThings =
@@ -108,4 +112,5 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
   String selectNoteThings = selectThingJoinNote + joinNotebook + whereNoteIsNotSkipped;
 
   String selectNoteThingsByAncestor = selectThingJoinNote + joinClosure + whereNoteIsNotSkipped;
+  String selectNoteThingsByAncestor1 = selectThingJoinNote + fromNotebook + whereNoteIsNotSkipped;
 }
