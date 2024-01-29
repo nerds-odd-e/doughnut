@@ -76,7 +76,7 @@ public class Thing extends EntityIdentifiedByIdOnly {
     if (getLink() != null) {
       return getLink().getSourceNote();
     }
-    return getNote().getParentNote();
+    return getNote().getParent();
   }
 
   @JsonIgnore

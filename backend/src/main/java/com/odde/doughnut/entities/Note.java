@@ -134,7 +134,7 @@ public class Note extends NoteBase {
   public String getTopic() {
     String constructor = getLinkConstructor();
     if (!constructor.contains("%P")) return constructor;
-    Note parent = getParentNote();
+    Note parent = getParent();
     if (parent == null) return constructor;
     String target =
         getTargetNote() == null ? "missing target" : getTargetNote().getTopicConstructor();
@@ -197,19 +197,6 @@ public class Note extends NoteBase {
       p = p.getParent();
     }
     return result;
-  }
-
-  @JsonIgnore
-  public Note getParentNote() {
-    return getParent();
-  }
-
-  @JsonIgnore
-  public List<Note> getSiblings() {
-    if (getParentNote() == null) {
-      return new ArrayList<>();
-    }
-    return getParentNote().getChildren();
   }
 
   public void mergeMasterReviewSetting(ReviewSetting reviewSetting) {
@@ -277,7 +264,7 @@ public class Note extends NoteBase {
   }
 
   public Optional<Integer> getParentId() {
-    Note parent = getParentNote();
+    Note parent = getParent();
     if (parent == null) return Optional.empty();
     return Optional.ofNullable(parent.id);
   }
@@ -285,7 +272,10 @@ public class Note extends NoteBase {
   @JsonIgnore
   public Note getGrandAsPossible() {
     Note grand = this;
-    for (int i = 0; i < 2; i++) if (grand.getParentNote() != null) grand = grand.getParentNote();
+    for (int i = 0; i < 2; i++)
+      if (grand.getParent() != null) {
+        grand = grand.getParent();
+      }
     return grand;
   }
 
@@ -308,8 +298,8 @@ public class Note extends NoteBase {
   }
 
   private Optional<String> getNotePicture() {
-    if (getNoteAccessories().getUseParentPicture() && getParentNote() != null) {
-      return getParentNote().getNotePicture();
+    if (getNoteAccessories().getUseParentPicture() && getParent() != null) {
+      return getParent().getNotePicture();
     }
     return getNoteAccessories().getNotePicture();
   }

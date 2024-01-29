@@ -8,6 +8,8 @@ import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -55,4 +57,15 @@ public abstract class NoteBase extends Thingy {
   public NoteTitle getNoteTitle() {
     return new NoteTitle(getTopicConstructor());
   }
+
+  @JsonIgnore
+  public List<Note> getSiblings() {
+    if (getParent() == null) {
+      return new ArrayList<>();
+    }
+    return getParent().getChildren();
+  }
+
+  @JsonIgnore
+  public abstract Note getParent();
 }

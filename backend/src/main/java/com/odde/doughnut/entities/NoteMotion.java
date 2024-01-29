@@ -18,7 +18,7 @@ public class NoteMotion {
     if (asFirstChildOfNote) {
       return relativeToNote;
     }
-    return relativeToNote.getParentNote();
+    return relativeToNote.getParent();
   }
 
   public void moveHeadNoteOnly() throws CyclicLinkDetectedException {
