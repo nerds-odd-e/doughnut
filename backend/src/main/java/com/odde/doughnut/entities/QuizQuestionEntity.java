@@ -154,6 +154,13 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public NotePositionViewedByUser getNotebookPosition(User user) {
+    Note result = getHeadNoteOfNotebook();
+    if (result == null) return null;
+    return new NoteViewer(user, result).jsonNotebookPosition();
+  }
+
+  @JsonIgnore
+  public Note getHeadNoteOfNotebook() {
     if (thing == null) {
       return null;
     }
@@ -163,8 +170,7 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
     } else {
       result = thing.getNote();
     }
-
-    return new NoteViewer(user, result).jsonNotebookPosition();
+    return result;
   }
 
   public MCQWithAnswer getMcqWithAnswer() {

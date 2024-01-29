@@ -168,6 +168,7 @@ declare namespace Generated {
         stem: string;
         mainTopic: string;
         notebookPosition?: NotePositionViewedByUser;
+        notebook?: NotebookViewedByUser;
         choices: Choice[];
         pictureWithMask?: PictureWithMask;
     }

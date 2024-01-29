@@ -20,6 +20,7 @@ public class QuizQuestion {
   @Getter public String mainTopic;
 
   @Getter @Nullable public NotePositionViewedByUser notebookPosition;
+  @Getter @Nullable public NotebookViewedByUser notebook;
 
   @Getter public List<Choice> choices;
 
