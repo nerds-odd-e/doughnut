@@ -157,7 +157,14 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
     if (thing == null) {
       return null;
     }
-    return new NoteViewer(user, thing.getHeadNoteOfNotebook()).jsonNotePosition(true);
+    Note result;
+    if (thing.getLink() != null) {
+      result = thing.getLink().getSourceNote();
+    } else {
+      result = thing.getNote();
+    }
+
+    return new NoteViewer(user, result.getNotebook().getHeadNote()).jsonNotePosition(true);
   }
 
   public MCQWithAnswer getMcqWithAnswer() {

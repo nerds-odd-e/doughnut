@@ -59,18 +59,6 @@ public class Thing extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  Note getHeadNoteOfNotebook() {
-    Note result;
-    if (getLink() != null) {
-      result = getLink().getSourceNote();
-    } else {
-      result = getNote();
-    }
-
-    return result.getNotebook().getHeadNote();
-  }
-
-  @JsonIgnore
   public boolean isDescriptionBlankHtml() {
     return getNote().isDetailsBlankHtml();
   }
