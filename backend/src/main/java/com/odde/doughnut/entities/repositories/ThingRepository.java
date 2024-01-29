@@ -37,20 +37,20 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
   @Query(
       value =
           "SELECT count(1) as count from thing "
-              + selectThingsByAncestor
-              + selectNoteThingsByAncestor
+              + selectThingsByAncestor1
+              + selectNoteThingsByAncestor1
               + whereThereIsNoReviewPoint,
       nativeQuery = true)
-  int countByAncestorWhereThereIsNoReviewPoint(Integer userId, Integer ancestorId);
+  int countByAncestorWhereThereIsNoReviewPoint(Integer userId, Integer notebookId);
 
   @Query(
       value =
           "SELECT count(1) as count from thing "
-              + selectThingsByAncestor
-              + selectNoteThingsByAncestor
+              + selectThingsByAncestor1
+              + selectNoteThingsByAncestor1
               + " WHERE (jlink.id IS NOT NULL OR jnote.id IS NOT NULL) AND thing.id in :thingIds",
       nativeQuery = true)
-  int countByAncestorAndInTheList(Integer ancestorId, @Param("thingIds") List<Integer> thingIds);
+  int countByAncestorAndInTheList(Integer notebookId, @Param("thingIds") List<Integer> thingIds);
 
   String byAncestorWhereThereIsNoReviewPoint =
       "JOIN notes_closure ON notes_closure.note_id = source_id "
@@ -103,10 +103,6 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
           + "   AND note.deleted_at IS NULL "
           + ") jnote ON jnote.id = thing.note_id ";
 
-  String joinClosure =
-      " JOIN notes_closure ON notes_closure.note_id = note.id "
-          + "   AND notes_closure.ancestor_id = :ancestorId ";
-
   String fromNotebook =
       " JOIN note ns ON ns.id = note.id " + "   AND ns.notebook_id = :notebookId ";
 
@@ -119,6 +115,5 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
 
   String selectNoteThings = selectThingJoinNote + joinNotebook + whereNoteIsNotSkipped;
 
-  String selectNoteThingsByAncestor = selectThingJoinNote + joinClosure + whereNoteIsNotSkipped;
   String selectNoteThingsByAncestor1 = selectThingJoinNote + fromNotebook + whereNoteIsNotSkipped;
 }

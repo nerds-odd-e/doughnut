@@ -18,7 +18,7 @@ public class SubscriptionModel implements ReviewScope {
   @Override
   public int getThingsHaveNotBeenReviewedAtAllCount() {
     return modelFactoryService.thingRepository.countByAncestorWhereThereIsNoReviewPoint(
-        entity.getUser().getId(), entity.getHeadNote().getId());
+        entity.getUser().getId(), entity.getNotebook().getId());
   }
 
   @Override
@@ -30,7 +30,7 @@ public class SubscriptionModel implements ReviewScope {
   public int needToLearnCountToday(List<Integer> thingIds) {
     int count =
         modelFactoryService.thingRepository.countByAncestorAndInTheList(
-            entity.getHeadNote().getId(), thingIds);
+            entity.getNotebook().getId(), thingIds);
     return Math.max(0, entity.getDailyTargetOfNewNotes() - count);
   }
 }
