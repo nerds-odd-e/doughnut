@@ -105,7 +105,7 @@ public class ReviewingInitialReviewTest {
         assertThat(reviewPoints, hasSize(5));
         assertThat(reviewPoints.get(0).getNote(), equalTo(note1));
         assertThat(reviewPoints.get(1).getNote(), equalTo(note2));
-        assertThat(reviewPoints.get(3).getLink(), equalTo(note1ToNote2));
+        assertThat(reviewPoints.get(3).getThing().getLink(), equalTo(note1ToNote2));
         assertThat(reviewPoints.get(4).getNote(), equalTo(anotherNote));
       }
 
@@ -124,7 +124,7 @@ public class ReviewingInitialReviewTest {
           assertThat(reviewPoints.get(1).getNote(), equalTo(anotherNote));
           assertThat(reviewPoints.get(2).getNote(), equalTo(note2));
           assertThat(reviewPoints.get(3).getNote(), equalTo(note1));
-          assertThat(reviewPoints.get(4).getLink(), equalTo(note1ToNote2));
+          assertThat(reviewPoints.get(4).getThing().getLink(), equalTo(note1ToNote2));
         }
 
         @Test
@@ -135,8 +135,8 @@ public class ReviewingInitialReviewTest {
           assertThat(reviewPoints, hasSize(7));
           assertThat(reviewPoints.get(1).getNote(), equalTo(anotherNote));
           assertThat(reviewPoints.get(3).getNote(), equalTo(note2));
-          assertThat(reviewPoints.get(4).getLink(), equalTo(aLevel2Link));
-          assertThat(reviewPoints.get(6).getLink(), equalTo(note1ToNote2));
+          assertThat(reviewPoints.get(4).getThing().getLink(), equalTo(aLevel2Link));
+          assertThat(reviewPoints.get(6).getThing().getLink(), equalTo(note1ToNote2));
         }
 
         @Test
@@ -235,8 +235,8 @@ public class ReviewingInitialReviewTest {
     void shouldReturnReviewPointForLink() {
       makeMe.theNote(note2).skipReview().please();
       makeMe.theNote(note1).skipReview().linkTo(note2).please();
-      assertThat(
-          getOneInitialReviewPoint(reviewingOnDay1).getLink().getSourceNote(), equalTo(note1));
+      ReviewPoint reviewPoint = getOneInitialReviewPoint(reviewingOnDay1);
+      assertThat(reviewPoint.getThing().getLink().getSourceNote(), equalTo(note1));
     }
 
     @Test

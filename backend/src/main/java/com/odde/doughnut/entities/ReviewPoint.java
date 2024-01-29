@@ -81,11 +81,6 @@ public class ReviewPoint extends EntityIdentifiedByIdOnly {
     return this.thing.getNote();
   }
 
-  @JsonIgnore
-  public Link getLink() {
-    return this.thing.getLink();
-  }
-
   public boolean isInitialReviewOnSameDay(Timestamp currentTime, ZoneId timeZone) {
     return TimestampOperations.getDayId(getInitialReviewedAt(), timeZone)
         == TimestampOperations.getDayId(currentTime, timeZone);
@@ -94,8 +89,8 @@ public class ReviewPoint extends EntityIdentifiedByIdOnly {
   public List<QuizQuestionEntity.QuestionType> availableQuestionTypes(
       Boolean aiQuestionTypeOnlyForReview) {
     List<QuizQuestionEntity.QuestionType> questionTypes = new ArrayList<>();
-    if (getLink() != null) {
-      Collections.addAll(questionTypes, getLink().getLinkType().getQuestionTypes());
+    if (this.getThing().getLinkType() != null) {
+      Collections.addAll(questionTypes, this.getThing().getLinkType().getQuestionTypes());
     } else {
       if (aiQuestionTypeOnlyForReview) {
         questionTypes.add(QuestionType.AI_QUESTION);
