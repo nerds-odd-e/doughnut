@@ -29,10 +29,10 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
   int countByOwnershipWhereThereIsNoReviewPoint(Integer userId, Integer ownershipId);
 
   @Query(
-      value = selectThingsFrom + selectThingsByAncestor + selectNoteThingsByAncestor1 + orderByDate,
+      value =
+          selectThingsFrom + selectThingsByAncestor1 + selectNoteThingsByAncestor1 + orderByDate,
       nativeQuery = true)
-  Stream<Thing> findByAncestorWhereThereIsNoReviewPoint(
-      Integer userId, Integer ancestorId, Integer notebookId);
+  Stream<Thing> findByAncestorWhereThereIsNoReviewPoint(Integer userId, Integer notebookId);
 
   @Query(
       value =
@@ -56,6 +56,9 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
       "JOIN notes_closure ON notes_closure.note_id = source_id "
           + "   AND notes_closure.ancestor_id = :ancestorId ";
 
+  String byAncestorWhereThereIsNoReviewPoint1 =
+      "JOIN note ns ON ns.id = source_id " + "   AND ns.notebook_id = :notebookId ";
+
   String selectLinkWithLevelFromNotes =
       ", GREATEST(IFNULL(source.level, 0), IFNULL(target.level, 0)) as level from link "
           + "INNER JOIN ("
@@ -76,6 +79,11 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
   String selectThingsByAncestor =
       selectThingsJoinLink
           + byAncestorWhereThereIsNoReviewPoint
+          + ") jlink ON jlink.id = thing.link_id ";
+
+  String selectThingsByAncestor1 =
+      selectThingsJoinLink
+          + byAncestorWhereThereIsNoReviewPoint1
           + ") jlink ON jlink.id = thing.link_id ";
 
   String whereThereIsNoReviewPoint =
