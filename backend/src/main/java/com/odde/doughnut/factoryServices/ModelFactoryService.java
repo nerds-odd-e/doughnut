@@ -134,10 +134,6 @@ public class ModelFactoryService {
     return nb;
   }
 
-  public NoteSimple convertToNoteSimple(Note note) {
-    return entityManager.find(NoteSimple.class, note.getId());
-  }
-
   public Note convertToNote(NoteBase note) {
     return entityManager.find(Note.class, note.getId());
   }

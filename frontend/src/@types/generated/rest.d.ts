@@ -283,11 +283,6 @@ declare namespace Generated {
     }
 
     interface Note extends NoteBase {
-        topic: string;
-        parentId?: number;
-        updatedAt: string;
-        wikidataId: string;
-        pictureWithMask?: PictureWithMask;
     }
 
     interface Ownership {
@@ -349,6 +344,11 @@ declare namespace Generated {
         details: string;
         topicConstructor: string;
         deletedAt: string;
+        updatedAt: string;
+        wikidataId: string;
+        pictureWithMask?: PictureWithMask;
+        topic: string;
+        parentId?: number;
     }
 
     interface Circle extends EntityIdentifiedByIdOnly {

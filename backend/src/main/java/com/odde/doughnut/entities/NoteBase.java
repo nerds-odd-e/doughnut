@@ -1,5 +1,6 @@
 package com.odde.doughnut.entities;
 
+import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -8,15 +9,20 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.algorithms.HtmlOrMarkdown;
 import com.odde.doughnut.algorithms.NoteTitle;
+import com.odde.doughnut.algorithms.SiblingOrder;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Where;
+import org.springframework.beans.BeanUtils;
 
 @MappedSuperclass
 public abstract class NoteBase extends Thingy {
@@ -42,7 +48,7 @@ public abstract class NoteBase extends Thingy {
   @JsonPropertyDescription("The details of the note is in markdown format.")
   private String details;
 
-  @Size(min = 1, max = NoteSimple.MAX_TITLE_LENGTH)
+  @Size(min = 1, max = Note.MAX_TITLE_LENGTH)
   @Getter
   @Setter
   @Column(name = "topic_constructor")
@@ -72,6 +78,42 @@ public abstract class NoteBase extends Thingy {
   @Getter
   private final List<Note> allChildren = new ArrayList<>();
 
+  @Column(name = "updated_at")
+  @Getter
+  @Setter
+  private Timestamp updatedAt;
+
+  @Column(name = "wikidata_id")
+  @Getter
+  @Setter
+  private String wikidataId;
+
+  @Column(name = "sibling_order")
+  @JsonIgnore
+  @Getter
+  private Long siblingOrder = SiblingOrder.getGoodEnoughOrderNumber();
+
+  @ManyToOne
+  @JoinColumn(name = "target_note_id", referencedColumnName = "id")
+  @JsonIgnore
+  @Getter
+  @Setter
+  private Note targetNote;
+
+  @OneToOne
+  @JoinColumn(name = "parent_id", referencedColumnName = "id")
+  @JsonIgnore
+  @Getter
+  @Setter
+  private Note parent;
+
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "master_review_setting_id", referencedColumnName = "id")
+  @JsonIgnore
+  @Getter
+  @Setter
+  private ReviewSetting masterReviewSetting;
+
   public void setDeletedAt(Timestamp value) {
     this.deletedAt = value;
     if (this.thing != null) this.thing.setDeletedAt(value);
@@ -89,9 +131,6 @@ public abstract class NoteBase extends Thingy {
     }
     return getParent().getChildren();
   }
-
-  @JsonIgnore
-  public abstract Note getParent();
 
   @JsonIgnore
   public ClozedString getClozeDescription() {
@@ -149,5 +188,150 @@ public abstract class NoteBase extends Thingy {
     //        .filter(Note::usingLinkTypeAsTopicConstructor)
     //        .collect(toList());
     return getLinks();
+  }
+
+  public String getTopic() {
+    String constructor = getLinkConstructor();
+    if (!constructor.contains("%P")) return constructor;
+    Note parent = getParent();
+    if (parent == null) return constructor;
+    String target =
+        getTargetNote() == null ? "missing target" : getTargetNote().getTopicConstructor();
+    return constructor
+        .replace("%P", "[" + parent.getTopicConstructor() + "]")
+        .replace("%T", "[" + target + "]");
+  }
+
+  @Override
+  public String toString() {
+    return "Note{" + "id=" + id + ", title='" + getTopicConstructor() + '\'' + '}';
+  }
+
+  @JsonIgnore
+  public void setParentNote(Note parentNote) {
+    if (parentNote == null) return;
+    setNotebook(parentNote.getNotebook());
+    parent = parentNote;
+  }
+
+  public void mergeMasterReviewSetting(ReviewSetting reviewSetting) {
+    ReviewSetting current = getMasterReviewSetting();
+    if (current == null) {
+      setMasterReviewSetting(reviewSetting);
+    } else {
+      BeanUtils.copyProperties(reviewSetting, getMasterReviewSetting());
+    }
+  }
+
+  public void updateNoteContent(NoteAccessories noteAccessories) {
+    if (noteAccessories.getUploadPicture() == null) {
+      noteAccessories.setUploadPicture(getNoteAccessories().getUploadPicture());
+    }
+    BeanUtils.copyProperties(noteAccessories, getNoteAccessories());
+  }
+
+  @JsonIgnore
+  private Note getFirstChild() {
+    return getChildren().stream().findFirst().orElse(null);
+  }
+
+  public void updateSiblingOrder(Note relativeToNote, boolean asFirstChildOfNote) {
+    Long newSiblingOrder =
+        relativeToNote.theSiblingOrderItTakesToMoveRelativeToMe(asFirstChildOfNote);
+    if (newSiblingOrder != null) {
+      siblingOrder = newSiblingOrder;
+    }
+  }
+
+  private Optional<Note> nextSibling() {
+    return getSiblings().stream().filter(nc -> nc.getSiblingOrder() > siblingOrder).findFirst();
+  }
+
+  private long getSiblingOrderToInsertBehindMe() {
+    Optional<Note> nextSiblingNote = nextSibling();
+    return nextSiblingNote
+        .map(x -> (siblingOrder + x.getSiblingOrder()) / 2)
+        .orElse(siblingOrder + SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT);
+  }
+
+  private Long getSiblingOrderToBecomeMyFirstChild() {
+    Note firstChild = getFirstChild();
+    if (firstChild != null) {
+      return firstChild.getSiblingOrder() - SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT;
+    }
+    return null;
+  }
+
+  protected Long theSiblingOrderItTakesToMoveRelativeToMe(boolean asFirstChildOfNote) {
+    if (!asFirstChildOfNote) {
+      return getSiblingOrderToInsertBehindMe();
+    }
+    return getSiblingOrderToBecomeMyFirstChild();
+  }
+
+  public Optional<Integer> getParentId() {
+    Note parent = getParent();
+    if (parent == null) return Optional.empty();
+    return Optional.ofNullable(parent.id);
+  }
+
+  public Optional<PictureWithMask> getPictureWithMask() {
+    return getNotePicture()
+        .map(
+            (pic) -> {
+              PictureWithMask pictureWithMask = new PictureWithMask();
+              pictureWithMask.notePicture = pic;
+              pictureWithMask.pictureMask = getNoteAccessories().getPictureMask();
+              return pictureWithMask;
+            });
+  }
+
+  protected Optional<String> getNotePicture() {
+    if (getNoteAccessories().getUseParentPicture() && getParent() != null) {
+      return getParent().getNotePicture();
+    }
+    return getNoteAccessories().getNotePicture();
+  }
+
+  public void prependDescription(String addition) {
+    String prevDesc = getDetails() != null ? getDetails() : "";
+    String desc = prevDesc.isEmpty() ? addition : addition + "\n" + prevDesc;
+    setDetails(desc);
+  }
+
+  @JsonIgnore
+  public String getContextPathString() {
+    return getAncestors().stream()
+        .map(note -> note.getTopicConstructor())
+        .collect(Collectors.joining(" › "));
+  }
+
+  @JsonIgnore
+  public boolean matchAnswer(String spellingAnswer) {
+    return getNoteTitle().matches(spellingAnswer);
+  }
+
+  @JsonIgnore
+  public Stream<Note> getDescendants() {
+    return getAllChildren().stream().flatMap(c -> Stream.concat(Stream.of(c), c.getDescendants()));
+  }
+
+  public static class NoteBrief {
+    public String contextPath;
+    public String topic;
+    public String details;
+  }
+
+  @JsonIgnore
+  public String getNoteDescription() {
+    NoteBrief noteBrief = new NoteBrief();
+    noteBrief.contextPath = getContextPathString();
+    noteBrief.topic = getTopicConstructor();
+    noteBrief.details = getDetails();
+    return """
+The note of current focus (in JSON format):
+%s
+"""
+        .formatted(defaultObjectMapper().valueToTree(noteBrief).toPrettyString());
   }
 }
