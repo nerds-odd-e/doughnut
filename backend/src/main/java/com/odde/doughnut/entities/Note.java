@@ -270,16 +270,6 @@ public class Note extends NoteBase {
   }
 
   @JsonIgnore
-  public Note getGrandAsPossible() {
-    Note grand = this;
-    for (int i = 0; i < 2; i++)
-      if (grand.getParent() != null) {
-        grand = grand.getParent();
-      }
-    return grand;
-  }
-
-  @JsonIgnore
   public ClozedString getClozeDescription() {
     if (isDetailsBlankHtml()) return new ClozedString(null, "");
 

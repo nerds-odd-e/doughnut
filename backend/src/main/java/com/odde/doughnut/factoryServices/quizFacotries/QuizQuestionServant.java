@@ -54,10 +54,12 @@ public class QuizQuestionServant {
         note.getSiblings().stream().filter(notePredicate).collect(Collectors.toList());
     if (list.size() > 0) return list;
 
-    return note.getGrandAsPossible()
-        .getDescendants()
-        .filter(notePredicate)
-        .collect(Collectors.toList());
+    Note grand = note;
+    for (int i = 0; i < 2; i++)
+      if (grand.getParent() != null) {
+        grand = grand.getParent();
+      }
+    return grand.getDescendants().filter(notePredicate).collect(Collectors.toList());
   }
 
   private Optional<Link> chooseOneCategoryLink(Link link) {
