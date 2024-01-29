@@ -4,7 +4,7 @@ import com.odde.doughnut.entities.*;
 
 public class FromDifferentPartAsQuizPresenter extends QuizQuestionWithOptionsPresenter {
   protected final Link link;
-  private Link categoryLink;
+  private Thing categoryLink;
 
   public FromDifferentPartAsQuizPresenter(QuizQuestionEntity quizQuestion) {
     super(quizQuestion);

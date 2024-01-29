@@ -43,7 +43,9 @@ public record QuizQuestionDirector(
     }
 
     if (quizQuestionFactory instanceof SecondaryReviewPointsFactory secondaryReviewPointsFactory) {
-      quizQuestion.setCategoryLink(secondaryReviewPointsFactory.getCategoryLink());
+      if (secondaryReviewPointsFactory.getCategoryLink() != null) {
+        quizQuestion.setCategoryLink(secondaryReviewPointsFactory.getCategoryLink().getThing());
+      }
     }
     return quizQuestion;
   }

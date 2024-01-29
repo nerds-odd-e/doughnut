@@ -91,7 +91,7 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   @JoinColumn(name = "category_link_id", referencedColumnName = "id")
   @Getter
   @Setter
-  private Link categoryLink;
+  private Thing categoryLink;
 
   @Column(name = "option_thing_ids")
   @Getter

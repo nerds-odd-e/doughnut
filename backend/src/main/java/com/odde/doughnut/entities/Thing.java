@@ -86,4 +86,17 @@ public class Thing extends EntityIdentifiedByIdOnly {
     }
     return getNote().getTargetNote();
   }
+
+  @JsonIgnore
+  public String getLinkTypeLabel() {
+    return getLinkType().label;
+  }
+
+  @JsonIgnore
+  public Link.LinkType getLinkType() {
+    if (getLink() != null) {
+      return getLink().getLinkType();
+    }
+    return getNote().getLinkType();
+  }
 }
