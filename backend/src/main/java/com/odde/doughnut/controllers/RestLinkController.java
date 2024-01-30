@@ -88,20 +88,12 @@ class RestLinkController {
     }
     User user = currentUser.getEntity();
     Link link =
-        Link.createLink(
+        modelFactoryService.createLink(
             sourceNote,
             targetNote,
             user,
             linkCreation.linkType,
             testabilitySettings.getCurrentUTCTimestamp());
-    modelFactoryService.save(link);
-
-    //    Note note =
-    //        sourceNote.buildChildNote(
-    //            user, testabilitySettings.getCurrentUTCTimestamp(), ":" +
-    // linkCreation.linkType.label);
-    //    note.setTargetNote(targetNote);
-    //    modelFactoryService.save(note);
 
     return getNoteRealm(link.getThing(), user, linkCreation.fromTargetPerspective);
   }

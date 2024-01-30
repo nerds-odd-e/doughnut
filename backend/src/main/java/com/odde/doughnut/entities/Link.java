@@ -23,7 +23,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -38,23 +37,6 @@ import lombok.Setter;
 @JsonPropertyOrder({"clozeSource", "linkTypeLabel"})
 public class Link extends Thingy {
   public Link() {}
-
-  public static Link createLink(
-      Note sourceNote,
-      Note targetNote,
-      User user,
-      LinkType linkType,
-      Timestamp currentUTCTimestamp) {
-    if (linkType == null || linkType == Link.LinkType.NO_LINK) {
-      return null;
-    }
-    Link link = new Link();
-    link.setSourceNote(sourceNote);
-    link.setTargetNote(targetNote);
-    link.setLinkType(linkType);
-
-    return Thing.createThing(user, link, currentUTCTimestamp);
-  }
 
   @OneToOne(mappedBy = "link", cascade = CascadeType.ALL)
   @Getter
