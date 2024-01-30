@@ -7,12 +7,12 @@ import java.util.List;
 
 public class LinkSourceWithinSameLinkTypeQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory {
-  protected final Link link;
+  protected final Thing link;
   private final QuizQuestionServant servant;
   private List<? extends Thingy> cachedFillingOptions = null;
 
   public LinkSourceWithinSameLinkTypeQuizFactory(Thing thing, QuizQuestionServant servant) {
-    this.link = thing.getLink();
+    this.link = thing;
     this.servant = servant;
   }
 
@@ -29,6 +29,6 @@ public class LinkSourceWithinSameLinkTypeQuizFactory
 
   @Override
   public Link generateAnswer() {
-    return link;
+    return link.getLink();
   }
 }

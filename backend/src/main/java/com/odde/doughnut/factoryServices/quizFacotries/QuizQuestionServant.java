@@ -116,9 +116,8 @@ public class QuizQuestionServant {
     return chooseFromCohort(answerNote, n -> !n.equals(noteToAvoid) && !notesToAvoid.contains(n));
   }
 
-  public List<Note> chooseFromCohortAvoidSiblings(Link answerLink) {
-    List<Note> linkedSiblingsOfSameLinkType =
-        answerLink.getThing().getLinkedSiblingsOfSameLinkType(user);
+  public List<Note> chooseFromCohortAvoidSiblings(Thing answerLink) {
+    List<Note> linkedSiblingsOfSameLinkType = answerLink.getLinkedSiblingsOfSameLinkType(user);
     return chooseCohortAndAvoid(
         answerLink.getSourceNote(), answerLink.getTargetNote(), linkedSiblingsOfSameLinkType);
   }
