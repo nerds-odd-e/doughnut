@@ -327,6 +327,8 @@ declare namespace Generated {
         createdAt: string;
         note?: Note;
         link?: Link;
+        targetNote?: Note;
+        sourceNote?: Note;
     }
 
     interface NoteAccessories {

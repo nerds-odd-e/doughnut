@@ -82,7 +82,12 @@ public class Thing extends EntityIdentifiedByIdOnly {
     return getNote().getParent();
   }
 
-  @JsonIgnore
+  @Nullable
+  public Note getSourceNote() {
+    return getParentNote();
+  }
+
+  @Nullable
   public Note getTargetNote() {
     if (getLink() != null) {
       return getLink().getTargetNote();
