@@ -1,16 +1,15 @@
 package com.odde.doughnut.factoryServices.quizFacotries.presenters;
 
-import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.Thing;
 
 public class WhichSpecHasInstanceQuizPresenter extends QuizQuestionWithOptionsPresenter {
   private Thing instanceLink;
-  private final Link link;
+  private final Thing link;
 
   public WhichSpecHasInstanceQuizPresenter(QuizQuestionEntity quizQuestion) {
     super(quizQuestion);
-    this.link = quizQuestion.getThing().getLink();
+    this.link = quizQuestion.getThing();
     this.instanceLink = quizQuestion.getCategoryLink();
   }
 

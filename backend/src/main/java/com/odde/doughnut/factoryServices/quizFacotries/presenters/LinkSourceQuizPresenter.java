@@ -1,14 +1,14 @@
 package com.odde.doughnut.factoryServices.quizFacotries.presenters;
 
-import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.QuizQuestionEntity;
+import com.odde.doughnut.entities.Thing;
 
 public class LinkSourceQuizPresenter extends QuizQuestionWithOptionsPresenter {
-  protected final Link link;
+  protected final Thing link;
 
   public LinkSourceQuizPresenter(QuizQuestionEntity quizQuestion) {
     super(quizQuestion);
-    this.link = quizQuestion.getThing().getLink();
+    this.link = quizQuestion.getThing();
   }
 
   @Override

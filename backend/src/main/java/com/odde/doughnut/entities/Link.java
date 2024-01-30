@@ -233,11 +233,6 @@ public class Link extends Thingy {
     return LinkType.fromId(typeId);
   }
 
-  @JsonIgnore
-  public String getLinkTypeLabel() {
-    return getLinkType().label;
-  }
-
   public void setLinkType(LinkType linkType) {
     if (linkType == null) {
       typeId = null;
