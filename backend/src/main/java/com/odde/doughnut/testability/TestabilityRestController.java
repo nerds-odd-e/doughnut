@@ -189,11 +189,8 @@ class TestabilityRestController {
             Note.class, Integer.valueOf(linkInfo.get("target_id")));
     LinkType type = LinkType.fromLabel(linkInfo.get("type"));
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    Link link =
-        Link.createLink(
-            sourceNote, targetNote, sourceNote.getThing().getCreator(), type, currentUTCTimestamp);
-
-    modelFactoryService.save(link);
+    User creator = sourceNote.getThing().getCreator();
+    modelFactoryService.createLink(sourceNote, targetNote, creator, type, currentUTCTimestamp);
     return "OK";
   }
 

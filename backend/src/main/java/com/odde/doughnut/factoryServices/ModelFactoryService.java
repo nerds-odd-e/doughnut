@@ -7,6 +7,7 @@ import com.odde.doughnut.entities.repositories.*;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionPresenter;
 import com.odde.doughnut.models.*;
 import jakarta.persistence.EntityManager;
+import java.sql.Timestamp;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -133,5 +134,19 @@ public class ModelFactoryService {
 
   public Note convertToNote(NoteBase note) {
     return entityManager.find(Note.class, note.getId());
+  }
+
+  public Link createLink(
+      Note sourceNote,
+      Note targetNote,
+      User creator,
+      Link.LinkType type,
+      Timestamp currentUTCTimestamp) {
+    Link link = Link.createLink(sourceNote, targetNote, creator, type, currentUTCTimestamp);
+
+    if (link != null) {
+      save(link);
+    }
+    return link;
   }
 }
