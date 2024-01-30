@@ -20,7 +20,7 @@
     </NoteCardsView>
   </div>
 
-  <div v-if="link">
+  <div v-if="link.link">
     <div class="jumbotron py-4 mb-2">
       <LinkShow v-bind="{ link, storageAccessor }" />
     </div>
