@@ -19,7 +19,29 @@ public class LinkBuilder extends EntityBuilder<Thing> {
   }
 
   @Override
-  protected void beforeCreate(boolean needPersist) {}
+  protected void beforeCreate(boolean needPersist) {
+    if (entity == null) return;
+    if (needPersist) {
+      if (entity.getSourceNote() != null) {
+        if (entity.getCreator() == null) {
+          entity.setCreator(entity.getSourceNote().getThing().getCreator());
+        }
+      }
+    }
+  }
+
+  @Override
+  protected void afterCreate(boolean needPersist) {
+    if (entity == null) return;
+    if (needPersist) {
+      if (entity.getSourceNote() != null) {
+        makeMe.refresh(entity.getSourceNote());
+      }
+      if (entity.getTargetNote() != null) {
+        makeMe.refresh(entity.getTargetNote());
+      }
+    }
+  }
 
   public LinkBuilder creator(User user) {
     entity.setCreator(user);
@@ -31,8 +53,6 @@ public class LinkBuilder extends EntityBuilder<Thing> {
     entity.setSourceNote(from);
     entity.setLinkType(linkType);
     creator(from.getThing().getCreator());
-    from.getLinks().add(entity.getLink());
-    to.getRefers().add(entity.getLink());
     return this;
   }
 

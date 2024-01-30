@@ -21,15 +21,29 @@ import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
+@SpringBootTest
+@ActiveProfiles("test")
+@Transactional
 class QuizQuestionGeneratorTest {
-  MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
-  Note note = makeMe.aNote().inMemoryPlease();
+  @Autowired MakeMe makeMe;
+
+  Note note;
+
+  @BeforeEach
+  void setup() {
+    note = makeMe.aNote().please();
+  }
 
   @Test
   void note() {
-    makeMe.theNote(note).rememberSpelling();
+    makeMe.theNote(note).rememberSpelling().please();
     ReviewPoint reviewPoint = makeMe.aReviewPointFor(note).inMemoryPlease();
     List<QuizQuestionEntity.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
     assertThat(
@@ -38,7 +52,7 @@ class QuizQuestionGeneratorTest {
 
   @Test
   void linkExclusive() {
-    Note note2 = makeMe.aNote().linkTo(note).inMemoryPlease();
+    Note note2 = makeMe.aNote().linkTo(note).please();
     ReviewPoint reviewPoint = makeMe.aReviewPointFor(note2.getLinks().get(0)).inMemoryPlease();
     List<QuizQuestionEntity.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
     assertThat(
@@ -54,7 +68,7 @@ class QuizQuestionGeneratorTest {
 
   @Test
   void notAllLinkQuestionAreAvailableToAllLinkTypes() {
-    Note note2 = makeMe.aNote().linkTo(note, Link.LinkType.RELATED_TO).inMemoryPlease();
+    Note note2 = makeMe.aNote().linkTo(note, Link.LinkType.RELATED_TO).please();
     ReviewPoint reviewPoint = makeMe.aReviewPointFor(note2.getLinks().get(0)).inMemoryPlease();
     List<QuizQuestionEntity.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
     assertTrue(questionTypes.isEmpty());
