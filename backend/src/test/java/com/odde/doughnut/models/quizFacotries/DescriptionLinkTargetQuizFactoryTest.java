@@ -13,7 +13,6 @@ import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,7 +82,6 @@ class DescriptionLinkTargetQuizFactoryTest {
   @Nested
   class Answer {
     @Test
-    @Disabled
     void correct() {
       AnsweredQuestion answerResult =
           makeMe
