@@ -14,6 +14,5 @@ public class LinkModel {
 
   public void destroy() {
     modelFactoryService.remove(entity);
-    modelFactoryService.entityManager.flush();
   }
 }
