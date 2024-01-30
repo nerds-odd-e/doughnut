@@ -59,9 +59,9 @@ public class NoteViewer {
 
   public Stream<Thing> linksOfTypeThroughReverse(Link.LinkType linkType) {
     return note.getRefers().stream()
-        .filter(l -> l.getLinkType().equals(linkType))
-        .filter(l -> l.sourceVisibleAsTargetOrTo(viewer))
-        .map(Link::getThing);
+        .filter(l -> l.getThing().getLinkType().equals(linkType))
+        .filter(l -> l.getThing().sourceVisibleAsTargetOrTo(viewer))
+        .map(Thingy::getThing);
   }
 
   public NotePositionViewedByUser jsonNotePosition() {

@@ -193,12 +193,12 @@ public abstract class NoteBase extends Thingy {
   }
 
   @JsonIgnore
-  public List<Link> getLinks() {
+  public List<? extends Thingy> getLinks() {
     return links;
   }
 
   @JsonIgnore
-  public List<Link> getRefers() {
+  public List<? extends Thingy> getRefers() {
     return refers;
   }
 

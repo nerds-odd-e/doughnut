@@ -165,4 +165,12 @@ public class Thing extends EntityIdentifiedByIdOnly {
             .map(Thing::getTargetNote)
             .toList();
   }
+
+  @JsonIgnore
+  public boolean sourceVisibleAsTargetOrTo(User viewer) {
+    if (getSourceNote().getNotebook() == getTargetNote().getNotebook()) return true;
+    if (viewer == null) return false;
+
+    return viewer.canReferTo(getSourceNote().getNotebook());
+  }
 }

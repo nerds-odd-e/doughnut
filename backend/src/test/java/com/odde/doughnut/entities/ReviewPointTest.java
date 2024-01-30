@@ -28,7 +28,7 @@ public class ReviewPointTest {
     user = makeMe.aUser().please();
     note = makeMe.aNote().creatorAndOwner(user).please();
     Note note2 = makeMe.aNote().creatorAndOwner(user).linkTo(note).please();
-    link = note2.getLinks().get(0);
+    link = note2.getLinks().get(0).getThing().getLink();
     reviewPoint = makeMe.aReviewPointFor(note).by(user).inMemoryPlease();
   }
 

@@ -240,12 +240,4 @@ public class Link extends Thingy {
     }
     typeId = linkType.id;
   }
-
-  @JsonIgnore
-  public boolean sourceVisibleAsTargetOrTo(User viewer) {
-    if (sourceNote.getNotebook() == targetNote.getNotebook()) return true;
-    if (viewer == null) return false;
-
-    return viewer.canReferTo(sourceNote.getNotebook());
-  }
 }

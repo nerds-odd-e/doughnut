@@ -57,7 +57,7 @@ class RestLinkControllerTests {
       otherUser = makeMe.aUser().please();
       note1 = makeMe.aNote().creatorAndOwner(otherUser).please();
       note2 = makeMe.aNote().creatorAndOwner(otherUser).linkTo(note1).please();
-      link = note2.getLinks().get(0);
+      link = note2.getLinks().get(0).getThing().getLink();
     }
 
     @Test
@@ -66,7 +66,7 @@ class RestLinkControllerTests {
     }
 
     @Test
-    void shouldNotBeAbleToSeeItIfICanReadOneNote() throws UnexpectedNoAccessRightException {
+    void shouldNotBeAbleToSeeItIfICanReadOneNote() {
       makeMe.aBazaarNodebook(note1.getNotebook()).please();
       assertThrows(UnexpectedNoAccessRightException.class, () -> controller().show(link));
     }

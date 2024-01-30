@@ -7,10 +7,7 @@ import static org.hamcrest.Matchers.in;
 import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.controllers.json.QuizQuestion;
-import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.Thingy;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -41,7 +38,8 @@ class WhichSpecHasInstanceQuizFactoryTest {
     target = makeMe.aNote("element").under(top).please();
     source = makeMe.aNote("noble gas").under(top).linkTo(target, Link.LinkType.SPECIALIZE).please();
     anotherSource = makeMe.aNote("non-official name").under(top).please();
-    reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).by(userModel).inMemoryPlease();
+    reviewPoint =
+        makeMe.aReviewPointFor(source.getLinks().get(0).getThing()).by(userModel).inMemoryPlease();
     makeMe.refresh(top);
   }
 
@@ -81,7 +79,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
 
         @BeforeEach
         void setup() {
-          Link link = source.getLinks().get(1);
+          Thing link = source.getLinks().get(1).getThing();
 
           makeMe.aReviewPointFor(link).by(userModel).please();
           Thingy nl = source.getLinkChildren().get(1);
