@@ -4,6 +4,7 @@ import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
@@ -12,19 +13,13 @@ public class LinkBuilder extends EntityBuilder<Thing> {
   public LinkBuilder(MakeMe makeMe) {
     super(
         makeMe,
-        Thing.createThing(null, new Link(), new Timestamp(System.currentTimeMillis())).getThing());
+        ModelFactoryService.buildALink(
+                null, null, null, Link.LinkType.NO_LINK, new Timestamp(System.currentTimeMillis()))
+            .getThing());
   }
 
   @Override
-  protected void beforeCreate(boolean needPersist) {
-    if (entity.getSourceNote() == null) return;
-    makeMe
-        .aNote()
-        .creatorAndOwner(entity.getCreator())
-        .under(entity.getSourceNote())
-        .target(entity.getTargetNote(), entity.getLinkType())
-        .please(needPersist);
-  }
+  protected void beforeCreate(boolean needPersist) {}
 
   public LinkBuilder creator(User user) {
     entity.setCreator(user);
