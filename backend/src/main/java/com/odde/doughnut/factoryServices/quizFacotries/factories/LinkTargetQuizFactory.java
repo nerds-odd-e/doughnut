@@ -1,6 +1,5 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
-import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteBase;
 import com.odde.doughnut.entities.Thing;
@@ -9,13 +8,13 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
 
 public class LinkTargetQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
-  protected final Link link;
+  protected final Thing link;
   private QuizQuestionServant servant;
   protected final NoteBase answerNote;
   private List<Note> cachedFillingOptions = null;
 
   public LinkTargetQuizFactory(Thing thing, QuizQuestionServant servant) {
-    this.link = thing.getLink();
+    this.link = thing;
     this.servant = servant;
     this.answerNote = link.getTargetNote();
   }

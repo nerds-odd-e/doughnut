@@ -156,4 +156,13 @@ public class Thing extends EntityIdentifiedByIdOnly {
                 Link.LinkType.SPECIALIZE,
                 Link.LinkType.APPLICATION));
   }
+
+  @JsonIgnore
+  public List<Note> getPiblingOfTheSameLinkType(User user) {
+    return new NoteViewer(user, getSourceNote())
+        .linksOfTypeThroughDirect(List.of(getLinkType())).stream()
+            .filter(l -> !l.equals(this))
+            .map(Thing::getTargetNote)
+            .toList();
+  }
 }

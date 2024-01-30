@@ -14,7 +14,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.odde.doughnut.entities.QuizQuestionEntity.QuestionType;
 import com.odde.doughnut.entities.validators.ValidateLinkType;
-import com.odde.doughnut.models.NoteViewer;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,7 +24,6 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.Getter;
@@ -246,19 +244,6 @@ public class Link extends Thingy {
       return;
     }
     typeId = linkType.id;
-  }
-
-  @JsonIgnore
-  public List<Note> getPiblingOfTheSameLinkType(User viewer) {
-    return getPiblingLinksOfSameLinkType(viewer).stream().map(Thing::getTargetNote).toList();
-  }
-
-  @JsonIgnore
-  public List<Thing> getPiblingLinksOfSameLinkType(User viewer) {
-    return new NoteViewer(viewer, sourceNote)
-        .linksOfTypeThroughDirect(List.of(getLinkType())).stream()
-            .filter(l -> !l.equals(this))
-            .collect(Collectors.toList());
   }
 
   @JsonIgnore
