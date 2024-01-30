@@ -136,7 +136,7 @@ public class ModelFactoryService {
     return entityManager.find(Note.class, note.getId());
   }
 
-  public Link createLink(
+  public Thing createLink(
       Note sourceNote,
       Note targetNote,
       User creator,
@@ -158,6 +158,6 @@ public class ModelFactoryService {
     //    note.setTargetNote(targetNote);
     //    modelFactoryService.save(note);
 
-    return link;
+    return link.getThing();
   }
 }

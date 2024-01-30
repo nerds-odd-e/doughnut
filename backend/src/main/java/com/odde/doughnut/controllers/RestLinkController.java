@@ -87,7 +87,7 @@ class RestLinkController {
           .execute();
     }
     User user = currentUser.getEntity();
-    Link link =
+    Thing link =
         modelFactoryService.createLink(
             sourceNote,
             targetNote,
@@ -95,7 +95,7 @@ class RestLinkController {
             linkCreation.linkType,
             testabilitySettings.getCurrentUTCTimestamp());
 
-    return getNoteRealm(link.getThing(), user, linkCreation.fromTargetPerspective);
+    return getNoteRealm(link, user, linkCreation.fromTargetPerspective);
   }
 
   private NoteRealm getNoteRealm(Thing link, User user, Boolean fromTargetPerspective) {
