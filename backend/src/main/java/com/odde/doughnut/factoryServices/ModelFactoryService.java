@@ -127,6 +127,7 @@ public class ModelFactoryService {
   public <T extends EntityIdentifiedByIdOnly> T remove(T entity) {
     T nb = entityManager.merge(entity);
     entityManager.remove(nb);
+    entityManager.flush();
     return nb;
   }
 
