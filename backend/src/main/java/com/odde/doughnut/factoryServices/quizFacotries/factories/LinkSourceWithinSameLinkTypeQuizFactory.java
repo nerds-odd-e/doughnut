@@ -28,7 +28,10 @@ public class LinkSourceWithinSameLinkTypeQuizFactory
   }
 
   @Override
-  public Link generateAnswer() {
-    return link.getLink();
+  public Thingy generateAnswer() {
+    if (link.getLink() != null) {
+      return link.getLink();
+    }
+    return link.getNote();
   }
 }

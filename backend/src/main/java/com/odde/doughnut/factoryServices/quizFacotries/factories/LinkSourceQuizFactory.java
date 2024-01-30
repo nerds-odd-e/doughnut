@@ -6,19 +6,19 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
 
 public class LinkSourceQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
-  protected final Link link;
+  protected final Thing link;
   private QuizQuestionServant servant;
   private List<Note> cachedFillingOptions = null;
 
   public LinkSourceQuizFactory(Thing thing, QuizQuestionServant servant) {
-    this.link = thing.getLink();
+    this.link = thing;
     this.servant = servant;
   }
 
   @Override
   public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
-      cachedFillingOptions = servant.chooseFromCohortAvoidSiblings(link.getThing());
+      cachedFillingOptions = servant.chooseFromCohortAvoidSiblings(link);
     }
     return cachedFillingOptions;
   }
