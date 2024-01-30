@@ -82,8 +82,6 @@ class WhichSpecHasInstanceQuizFactoryTest {
           Thing link = source.getLinks().get(1).getThing();
 
           makeMe.aReviewPointFor(link).by(userModel).please();
-          Thingy nl = source.getLinkChildren().get(1);
-          //          makeMe.aReviewPointFor(nl.getThing().getNote()).by(userModel).please();
           makeMe.refresh(userModel.getEntity());
         }
 

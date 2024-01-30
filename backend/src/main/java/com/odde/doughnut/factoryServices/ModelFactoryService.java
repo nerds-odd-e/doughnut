@@ -154,17 +154,15 @@ public class ModelFactoryService {
       User creator,
       Link.LinkType type,
       Timestamp currentUTCTimestamp) {
-    Link link = new Link();
-    link.setSourceNote(sourceNote);
-    link.setTargetNote(targetNote);
-    link.setLinkType(type);
-    Thing.createThing(creator, link, currentUTCTimestamp);
+    //    Link link = new Link();
+    //    link.setSourceNote(sourceNote);
+    //    link.setTargetNote(targetNote);
+    //    link.setLinkType(type);
+    //    Thing.createThing(creator, link, currentUTCTimestamp);
 
-    //    Note note =
-    //        sourceNote.buildChildNote(
-    //            user, testabilitySettings.getCurrentUTCTimestamp(), ":" +
-    // linkCreation.linkType.label);
-    //    note.setTargetNote(targetNote);
-    return link;
+    Note note = sourceNote.buildChildNote(creator, currentUTCTimestamp, ":" + type.label);
+    note.setTargetNote(targetNote);
+
+    return note;
   }
 }

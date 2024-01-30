@@ -67,7 +67,7 @@ public abstract class NoteBase extends Thingy {
 
   @OneToMany(mappedBy = "targetNote")
   @JsonIgnore
-  private List<Link> refers = new ArrayList<>();
+  private List<Note> refers = new ArrayList<>();
 
   @OneToMany(mappedBy = "parent", cascade = CascadeType.DETACH)
   @JsonIgnore
@@ -102,7 +102,6 @@ public abstract class NoteBase extends Thingy {
   @JoinColumn(name = "parent_id", referencedColumnName = "id")
   @JsonIgnore
   @Getter
-  @Setter
   private Note parent;
 
   @Embedded @JsonIgnore @Getter private ReviewSetting reviewSetting = new ReviewSetting();
@@ -181,15 +180,15 @@ public abstract class NoteBase extends Thingy {
 
   @JsonIgnore
   public List<? extends Thingy> getLinkChildren() {
-    //    return getAllChildren().stream()
-    //        .filter(Note::usingLinkTypeAsTopicConstructor)
-    //        .collect(toList());
     return getLinks();
   }
 
   @JsonIgnore
   public List<? extends Thingy> getLinks() {
-    return links;
+    return getAllChildren().stream()
+        .filter(Note::usingLinkTypeAsTopicConstructor)
+        .collect(toList());
+    //    return links;
   }
 
   @JsonIgnore
