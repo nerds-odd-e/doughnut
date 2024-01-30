@@ -1,14 +1,14 @@
 <template>
   <div class="row">
     <div class="col-12 col-md-4 link-source">
-      <LinkNoteShow :note="link.sourceNote" />
+      <LinkNoteShow v-if="link.sourceNote" :note="link.sourceNote" />
     </div>
     <div class="col-12 col-md-4 text-center">
       <LinkNob v-bind="{ link, storageAccessor }" />
       <span class="badge bg-light text-dark"> {{ link.linkType }}</span>
     </div>
     <div class="col-12 col-md-4 link-target">
-      <LinkNoteShow :note="link.targetNote" />
+      <LinkNoteShow v-if="link.targetNote" :note="link.targetNote" />
     </div>
   </div>
 </template>
@@ -22,7 +22,7 @@ import { StorageAccessor } from "../../store/createNoteStorage";
 export default defineComponent({
   props: {
     link: {
-      type: Object as PropType<Generated.Link>,
+      type: Object as PropType<Generated.Thing>,
       required: true,
     },
     storageAccessor: {

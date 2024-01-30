@@ -21,12 +21,10 @@ describe("repetition page", () => {
         reviewPoint,
       });
       helper.apiMock
-        .expectingGet(
-          `/api/notes/${reviewPoint.thing.link?.targetNote.id}/position`,
-        )
+        .expectingGet(`/api/notes/${reviewPoint.thing.targetNote?.id}/position`)
         .andReturnOnce(notePosition);
       helper.apiMock.expectingGet(
-        `/api/notes/${reviewPoint.thing.link?.sourceNote.id}/position`,
+        `/api/notes/${reviewPoint.thing.sourceNote?.id}/position`,
       );
     });
 

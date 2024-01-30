@@ -21,6 +21,12 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
       assertAuthorizationUser((User) object);
     } else if (object instanceof Link) {
       assertAuthorizationLink((Link) object);
+    } else if (object instanceof Thing objectThing) {
+      if (objectThing.getLink() != null) {
+        assertAuthorizationLink(objectThing.getLink());
+      } else {
+        assertAuthorizationNote(objectThing.getNote());
+      }
     } else {
       throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unknown object type");
     }

@@ -110,6 +110,14 @@ public class Thing extends EntityIdentifiedByIdOnly {
     return getNote().getLinkType();
   }
 
+  public void setLinkType(Link.LinkType linkType) {
+    if (getLink() != null) {
+      getLink().setLinkType(linkType);
+      return;
+    }
+    getNote().setLinkType(linkType);
+  }
+
   @JsonIgnore
   public Stream<Thing> getSiblingLinksOfSameLinkType(User user) {
     return new NoteViewer(user, getTargetNote())

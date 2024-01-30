@@ -97,8 +97,8 @@ declare namespace Generated {
     }
 
     interface LinkViewed {
-        direct: Link[];
-        reverse: Link[];
+        direct: Thing[];
+        reverse: Thing[];
     }
 
     interface NoteCreationDTO extends NoteUpdateTopicDTO {
@@ -259,10 +259,13 @@ declare namespace Generated {
         positiveFeedback: boolean;
     }
 
-    interface Link extends Thingy {
-        sourceNote: Note;
-        targetNote: Note;
-        linkType: LinkType;
+    interface Thing extends EntityIdentifiedByIdOnly {
+        note?: Note;
+        link?: Link;
+        linkType?: LinkType;
+        sourceNote?: Note;
+        targetNote?: Note;
+        createdAt: string;
     }
 
     interface ReviewPoint extends EntityIdentifiedByIdOnly {
@@ -320,16 +323,10 @@ declare namespace Generated {
         id: number;
     }
 
-    interface Thingy extends EntityIdentifiedByIdOnly {
-    }
-
-    interface Thing extends EntityIdentifiedByIdOnly {
-        note?: Note;
-        link?: Link;
-        linkType?: LinkType;
-        sourceNote?: Note;
-        targetNote?: Note;
-        createdAt: string;
+    interface Link extends Thingy {
+        sourceNote: Note;
+        targetNote: Note;
+        linkType: LinkType;
     }
 
     interface NoteAccessories {
@@ -349,9 +346,9 @@ declare namespace Generated {
         deletedAt: string;
         updatedAt: string;
         wikidataId: string;
-        pictureWithMask?: PictureWithMask;
-        topic: string;
         parentId?: number;
+        topic: string;
+        pictureWithMask?: PictureWithMask;
     }
 
     interface Circle extends EntityIdentifiedByIdOnly {
@@ -374,6 +371,9 @@ declare namespace Generated {
          * All choices. Only one should be correct.
          */
         choices: string[];
+    }
+
+    interface Thingy extends EntityIdentifiedByIdOnly {
     }
 
     type ErrorType = "OPENAI_UNAUTHORIZED" | "BINDING_ERROR" | "OPENAI_TIMEOUT" | "OPENAI_SERVICE_ERROR" | "WIKIDATA_SERVICE_ERROR";

@@ -157,6 +157,10 @@ public abstract class NoteBase extends Thingy {
     return Link.LinkType.fromLabel(getTopicConstructor().substring(1));
   }
 
+  public void setLinkType(Link.LinkType linkType) {
+    setTopicConstructor(":" + linkType.label);
+  }
+
   protected boolean usingLinkTypeAsTopicConstructor() {
     return getLinkType() != null;
   }

@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.json.LinkCreation;
 import com.odde.doughnut.controllers.json.NoteRealm;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -50,20 +51,21 @@ class RestLinkController {
 
   @PostMapping(value = "/{link}")
   @Transactional
-  public NoteRealm updateLink(Link link, @RequestBody LinkCreation linkCreation)
+  public NoteRealm updateLink(@PathVariable Thing link, @RequestBody LinkCreation linkCreation)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(link);
     link.setLinkType(linkCreation.linkType);
+    modelFactoryService.save(link.getLink());
     modelFactoryService.save(link);
     return getNoteRealm(link, currentUser.getEntity(), linkCreation.fromTargetPerspective);
   }
 
   @PostMapping(value = "/{link}/{perspective}/delete")
   @Transactional
-  public NoteRealm deleteLink(@PathVariable Link link, @PathVariable String perspective)
+  public NoteRealm deleteLink(@PathVariable Thing link, @PathVariable String perspective)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(link);
-    modelFactoryService.remove(link);
+    modelFactoryService.remove(link.getLink());
     return getNoteRealm(link, currentUser.getEntity(), perspective.equals("tview"));
   }
 
@@ -101,10 +103,10 @@ class RestLinkController {
     //    note.setTargetNote(targetNote);
     //    modelFactoryService.save(note);
 
-    return getNoteRealm(link, user, linkCreation.fromTargetPerspective);
+    return getNoteRealm(link.getThing(), user, linkCreation.fromTargetPerspective);
   }
 
-  private NoteRealm getNoteRealm(Link link, User user, Boolean fromTargetPerspective) {
+  private NoteRealm getNoteRealm(Thing link, User user, Boolean fromTargetPerspective) {
     Note note = fromTargetPerspective ? link.getTargetNote() : link.getSourceNote();
     Note nn = modelFactoryService.entityManager.find(Note.class, note.getId());
     return new NoteViewer(user, nn).toJsonObject();

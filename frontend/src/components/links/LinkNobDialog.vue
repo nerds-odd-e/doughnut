@@ -4,6 +4,7 @@
     Source:
     <strong>
       <NoteTopicWithLink
+        v-if="link.sourceNote"
         class="link-title"
         v-bind="{ note: link.sourceNote }"
       />
@@ -21,6 +22,7 @@
     Target:
     <strong>
       <NoteTopicWithLink
+        v-if="link.targetNote"
         class="link-title"
         v-bind="{ note: link.targetNote }"
       />
@@ -43,7 +45,7 @@ export default defineComponent({
   },
   props: {
     link: {
-      type: Object as PropType<Generated.Link>,
+      type: Object as PropType<Generated.Thing>,
       required: true,
     },
     storageAccessor: {

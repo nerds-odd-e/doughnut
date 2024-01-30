@@ -5,7 +5,7 @@
       v-if="!!reverse"
       :inverse-icon="true"
     />
-    <NoteTopicWithLink class="link-title" v-bind="{ note }" />
+    <NoteTopicWithLink v-if="note" class="link-title" v-bind="{ note }" />
     <LinkNob
       v-bind="{ link, colors, storageAccessor }"
       v-if="!reverse"
@@ -23,7 +23,7 @@ import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   props: {
-    link: { type: Object as PropType<Generated.Link>, required: true },
+    link: { type: Object as PropType<Generated.Thing>, required: true },
     reverse: Boolean,
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,

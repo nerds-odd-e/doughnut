@@ -52,7 +52,7 @@ export default defineComponent({
       return this.reviewPoint.thing?.note?.id;
     },
     link() {
-      return this.reviewPoint.thing.link;
+      return this.reviewPoint.thing;
     },
   },
 });

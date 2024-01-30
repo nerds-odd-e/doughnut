@@ -1,6 +1,6 @@
 <template>
   <span class="link-nob">
-    <PopButton :title="link.linkType">
+    <PopButton v-if="link.linkType" :title="link.linkType">
       <template #button_face>
         <SvgLinkTypeIcon
           :link-type="link.linkType"
@@ -27,7 +27,7 @@ import { StorageAccessor } from "../../store/createNoteStorage";
 export default defineComponent({
   props: {
     link: {
-      type: Object as PropType<Generated.Link>,
+      type: Object as PropType<Generated.Thing>,
       required: true,
     },
     storageAccessor: {
