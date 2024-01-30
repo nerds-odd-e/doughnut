@@ -84,6 +84,14 @@ public class Thing extends EntityIdentifiedByIdOnly {
     return getNote().getParent();
   }
 
+  public void setSourceNote(Note from) {
+    if (getLink() != null) {
+      getLink().setSourceNote(from);
+      return;
+    }
+    getNote().setParentNote(from);
+  }
+
   @Nullable
   public Note getSourceNote() {
     return getParentNote();
@@ -95,6 +103,14 @@ public class Thing extends EntityIdentifiedByIdOnly {
       return getLink().getTargetNote();
     }
     return getNote().getTargetNote();
+  }
+
+  public void setTargetNote(Note to) {
+    if (getLink() != null) {
+      getLink().setTargetNote(to);
+      return;
+    }
+    getNote().setTargetNote(to);
   }
 
   @JsonIgnore

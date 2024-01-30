@@ -27,8 +27,8 @@ public class LinkBuilder extends EntityBuilder<Thing> {
   }
 
   public LinkBuilder between(Note from, Note to, Link.LinkType linkType) {
-    entity.getLink().setTargetNote(to);
-    entity.getLink().setSourceNote(from);
+    entity.setTargetNote(to);
+    entity.setSourceNote(from);
     entity.setLinkType(linkType);
     creator(from.getThing().getCreator());
     from.getLinks().add(entity.getLink());
