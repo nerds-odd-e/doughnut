@@ -62,13 +62,17 @@ public class MakeMe extends MakeMeWithoutDB {
   }
 
   public ReviewPointBuilder aReviewPointFor(Note note) {
-    ReviewPoint reviewPoint = ReviewPoint.buildReviewPointForThing(note.getThing());
-    return new ReviewPointBuilder(reviewPoint, this).forNote(note);
+    return aReviewPointFor(note.getThing());
+  }
+
+  public ReviewPointBuilder aReviewPointFor(Thing thing) {
+    ReviewPoint reviewPoint = ReviewPoint.buildReviewPointForThing(thing);
+    ReviewPointBuilder reviewPointBuilder = new ReviewPointBuilder(reviewPoint, this);
+    return reviewPointBuilder.forThing(thing);
   }
 
   public ReviewPointBuilder aReviewPointFor(Link link) {
-    ReviewPoint reviewPoint = ReviewPoint.buildReviewPointForThing(link.getThing());
-    return new ReviewPointBuilder(reviewPoint, this).forLink(link);
+    return aReviewPointFor(link.getThing());
   }
 
   public ReviewPointBuilder aReviewPointBy(UserModel user) {

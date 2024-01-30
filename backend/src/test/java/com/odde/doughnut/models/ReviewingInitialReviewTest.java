@@ -85,7 +85,7 @@ public class ReviewingInitialReviewTest {
 
     @Nested
     class ReviewPointFromLink {
-      Link note1ToNote2;
+      Thing note1ToNote2;
       Note anotherNote;
 
       @BeforeEach
@@ -105,7 +105,7 @@ public class ReviewingInitialReviewTest {
         assertThat(reviewPoints, hasSize(5));
         assertThat(reviewPoints.get(0).getNote(), equalTo(note1));
         assertThat(reviewPoints.get(1).getNote(), equalTo(note2));
-        assertThat(reviewPoints.get(3).getThing().getLink(), equalTo(note1ToNote2));
+        assertThat(reviewPoints.get(3).getThing(), equalTo(note1ToNote2));
         assertThat(reviewPoints.get(4).getNote(), equalTo(anotherNote));
       }
 
@@ -124,19 +124,19 @@ public class ReviewingInitialReviewTest {
           assertThat(reviewPoints.get(1).getNote(), equalTo(anotherNote));
           assertThat(reviewPoints.get(2).getNote(), equalTo(note2));
           assertThat(reviewPoints.get(3).getNote(), equalTo(note1));
-          assertThat(reviewPoints.get(4).getThing().getLink(), equalTo(note1ToNote2));
+          assertThat(reviewPoints.get(4).getThing(), equalTo(note1ToNote2));
         }
 
         @Test
         void shouldReturnLinksOrderedByLevels() {
-          Link aLevel2Link = makeMe.aLink().between(anotherNote, note2).please();
+          Thing aLevel2Link = makeMe.aLink().between(anotherNote, note2).please();
           makeMe.refresh(userModel.getEntity());
           List<ReviewPoint> reviewPoints = getAllDueReviewPoints();
           assertThat(reviewPoints, hasSize(7));
           assertThat(reviewPoints.get(1).getNote(), equalTo(anotherNote));
           assertThat(reviewPoints.get(3).getNote(), equalTo(note2));
-          assertThat(reviewPoints.get(4).getThing().getLink(), equalTo(aLevel2Link));
-          assertThat(reviewPoints.get(6).getThing().getLink(), equalTo(note1ToNote2));
+          assertThat(reviewPoints.get(4).getThing(), equalTo(aLevel2Link));
+          assertThat(reviewPoints.get(6).getThing(), equalTo(note1ToNote2));
         }
 
         @Test

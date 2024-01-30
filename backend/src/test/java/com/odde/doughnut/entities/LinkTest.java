@@ -51,10 +51,10 @@ public class LinkTest {
 
     @Test
     public void shouldNeverUseTheNoLinkType() {
-      Link link = makeMe.aLink().inMemoryPlease();
+      Thing link = makeMe.aLink().inMemoryPlease();
       link.setLinkType(NO_LINK);
       ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-      Set<ConstraintViolation<Link>> violations = factory.getValidator().validate(link);
+      Set<ConstraintViolation<Link>> violations = factory.getValidator().validate(link.getLink());
       assertThat(violations, is(not(empty())));
       List<String> errorFields =
           violations.stream().map(v -> v.getPropertyPath().toString()).collect(toList());

@@ -11,6 +11,7 @@ import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -35,7 +36,7 @@ class FromSamePartAsQuizFactoryTest {
   Note ugly;
   Note pretty;
   Note tall;
-  Link subjectivePerspective;
+  Thing subjectivePerspective;
   ReviewPoint reviewPoint;
 
   @BeforeEach
@@ -51,7 +52,7 @@ class FromSamePartAsQuizFactoryTest {
     subjectivePerspective =
         makeMe.aLink().between(subjective, perspective, Link.LinkType.PART).please();
     makeMe.aLink().between(objective, perspective, Link.LinkType.PART).please();
-    Link uglySubjective =
+    Thing uglySubjective =
         makeMe.aLink().between(ugly, subjective, Link.LinkType.TAGGED_BY).please();
     reviewPoint = makeMe.aReviewPointFor(uglySubjective).by(userModel).inMemoryPlease();
     makeMe.refresh(top);
@@ -64,7 +65,7 @@ class FromSamePartAsQuizFactoryTest {
 
   @Nested
   class WhenThereIsAnCousin {
-    Link cousin;
+    Thing cousin;
 
     @BeforeEach
     void setup() {

@@ -7,11 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.controllers.json.QuizQuestion;
-import com.odde.doughnut.entities.AnsweredQuestion;
-import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.Link.LinkType;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -37,8 +34,8 @@ class FromDifferentPartAsQuizFactoryTest {
   Note pretty;
   Note tall;
   Note kind;
-  Link subjectivePerspective;
-  Link kindSubjective;
+  Thing subjectivePerspective;
+  Thing kindSubjective;
   ReviewPoint uglySubjectiveRp;
 
   @BeforeEach
@@ -56,7 +53,7 @@ class FromDifferentPartAsQuizFactoryTest {
         makeMe.aLink().between(subjective, perspective, Link.LinkType.PART).please();
     makeMe.aLink().between(objective, perspective, Link.LinkType.PART).please();
     kindSubjective = makeMe.aLink().between(kind, subjective, Link.LinkType.TAGGED_BY).please();
-    Link uglySubjective =
+    Thing uglySubjective =
         makeMe.aLink().between(ugly, subjective, Link.LinkType.TAGGED_BY).please();
     uglySubjectiveRp = makeMe.aReviewPointFor(uglySubjective).by(userModel).inMemoryPlease();
     makeMe.refresh(top);
@@ -69,7 +66,7 @@ class FromDifferentPartAsQuizFactoryTest {
 
   @Nested
   class WhenThereIsACousin {
-    Link prettySubjective;
+    Thing prettySubjective;
 
     @BeforeEach
     void setup() {

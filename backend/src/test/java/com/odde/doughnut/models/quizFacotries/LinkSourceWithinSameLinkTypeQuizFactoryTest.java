@@ -5,9 +5,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.controllers.json.QuizQuestion;
-import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -29,7 +29,7 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
   Note target;
   Note source;
   Note anotherSource;
-  Link sourceTarget;
+  Thing sourceTarget;
   ReviewPoint reviewPoint;
 
   @BeforeEach

@@ -1,9 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
-import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.EntityBuilder;
@@ -17,13 +14,8 @@ public class ReviewPointBuilder extends EntityBuilder<ReviewPoint> {
     initiallyReviewedOn(makeMe.aTimestamp().of(0, 0).please());
   }
 
-  public ReviewPointBuilder forNote(Note note) {
-    entity.setThing(note.getThing());
-    return this;
-  }
-
-  public ReviewPointBuilder forLink(Link link) {
-    entity.setThing(link.getThing());
+  public ReviewPointBuilder forThing(Thing thing) {
+    entity.setThing(thing);
     return this;
   }
 
