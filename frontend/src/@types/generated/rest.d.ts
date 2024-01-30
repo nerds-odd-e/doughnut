@@ -327,6 +327,7 @@ declare namespace Generated {
         createdAt: string;
         note?: Note;
         link?: Link;
+        linkType?: LinkType;
         targetNote?: Note;
         sourceNote?: Note;
     }

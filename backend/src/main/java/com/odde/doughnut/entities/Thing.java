@@ -100,7 +100,7 @@ public class Thing extends EntityIdentifiedByIdOnly {
     return getLinkType().label;
   }
 
-  @JsonIgnore
+  @Nullable
   public Link.LinkType getLinkType() {
     if (getLink() != null) {
       return getLink().getLinkType();
