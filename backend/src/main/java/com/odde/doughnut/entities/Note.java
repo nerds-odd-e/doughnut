@@ -7,7 +7,6 @@ import java.util.*;
 
 @Entity
 @Table(name = "note")
-@JsonPropertyOrder({"topic", "topicConstructor", "details", "parentId", "updatedAt"})
 public class Note extends NoteBase {
   public static final int MAX_TITLE_LENGTH = 150;
 

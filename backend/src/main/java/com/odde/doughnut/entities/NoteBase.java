@@ -6,6 +6,7 @@ import static java.util.stream.Collectors.toList;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.algorithms.HtmlOrMarkdown;
 import com.odde.doughnut.algorithms.NoteTitle;
@@ -25,6 +26,7 @@ import org.hibernate.annotations.Where;
 import org.springframework.beans.BeanUtils;
 
 @MappedSuperclass
+@JsonPropertyOrder({"topic", "topicConstructor", "details", "parentId", "updatedAt"})
 public abstract class NoteBase extends Thingy {
 
   @OneToOne(mappedBy = "note", cascade = CascadeType.ALL)

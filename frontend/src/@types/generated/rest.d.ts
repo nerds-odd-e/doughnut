@@ -337,17 +337,17 @@ declare namespace Generated {
     }
 
     interface NoteBase extends Thingy {
-        noteAccessories: NoteAccessories;
+        topic: string;
+        topicConstructor: string;
         /**
          * The details of the note is in markdown format.
          */
         details: string;
-        topicConstructor: string;
-        deletedAt: string;
-        updatedAt: string;
-        wikidataId: string;
         parentId?: number;
-        topic: string;
+        updatedAt: string;
+        noteAccessories: NoteAccessories;
+        deletedAt: string;
+        wikidataId: string;
         pictureWithMask?: PictureWithMask;
     }
 
