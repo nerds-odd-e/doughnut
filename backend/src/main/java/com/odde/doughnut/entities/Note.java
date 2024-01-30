@@ -1,6 +1,5 @@
 package com.odde.doughnut.entities;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.*;
