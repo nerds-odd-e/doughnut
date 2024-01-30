@@ -8,7 +8,6 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.LinkModel;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -64,8 +63,7 @@ class RestLinkController {
   public NoteRealm deleteLink(@PathVariable Link link, @PathVariable String perspective)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(link);
-    LinkModel linkModel = modelFactoryService.toLinkModel(link);
-    linkModel.destroy();
+    modelFactoryService.remove(link);
     return getNoteRealm(link, currentUser.getEntity(), perspective.equals("tview"));
   }
 

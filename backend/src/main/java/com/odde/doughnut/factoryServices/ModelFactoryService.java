@@ -76,10 +76,6 @@ public class ModelFactoryService {
     return toCircleModel(circle);
   }
 
-  public LinkModel toLinkModel(Link link) {
-    return new LinkModel(link, this);
-  }
-
   public SubscriptionModel toSubscriptionModel(Subscription sub) {
     return new SubscriptionModel(sub, this);
   }
