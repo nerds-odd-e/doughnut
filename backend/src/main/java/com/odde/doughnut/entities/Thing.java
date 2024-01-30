@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.models.NoteViewer;
 import jakarta.persistence.CascadeType;
@@ -18,6 +19,7 @@ import org.springframework.lang.Nullable;
 
 @Entity
 @Table(name = "thing")
+@JsonPropertyOrder({"note", "link", "linkType", "sourceNote", "targetNote", "createdAt"})
 public class Thing extends EntityIdentifiedByIdOnly {
 
   @Column(name = "created_at")

@@ -324,12 +324,12 @@ declare namespace Generated {
     }
 
     interface Thing extends EntityIdentifiedByIdOnly {
-        createdAt: string;
         note?: Note;
         link?: Link;
         linkType?: LinkType;
-        targetNote?: Note;
         sourceNote?: Note;
+        targetNote?: Note;
+        createdAt: string;
     }
 
     interface NoteAccessories {
