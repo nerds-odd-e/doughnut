@@ -157,7 +157,7 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
     }
     Note result;
     if (thing.getLink() != null) {
-      result = thing.getLink().getSourceNote();
+      result = thing.getSourceNote();
     } else {
       result = thing.getNote();
     }

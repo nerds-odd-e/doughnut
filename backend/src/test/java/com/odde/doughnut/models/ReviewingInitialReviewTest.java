@@ -234,7 +234,7 @@ public class ReviewingInitialReviewTest {
       makeMe.theNote(note2).skipReview().please();
       makeMe.theNote(note1).skipReview().linkTo(note2).please();
       ReviewPoint reviewPoint = getOneInitialReviewPoint(reviewingOnDay1);
-      assertThat(reviewPoint.getThing().getLink().getSourceNote(), equalTo(note1));
+      assertThat(reviewPoint.getThing().getSourceNote(), equalTo(note1));
     }
 
     @Test

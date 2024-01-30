@@ -3,12 +3,12 @@ package com.odde.doughnut.factoryServices.quizFacotries.presenters;
 import com.odde.doughnut.entities.*;
 
 public class FromDifferentPartAsQuizPresenter extends QuizQuestionWithOptionsPresenter {
-  protected final Link link;
+  protected final Thing link;
   private Thing categoryLink;
 
   public FromDifferentPartAsQuizPresenter(QuizQuestionEntity quizQuestion) {
     super(quizQuestion);
-    this.link = quizQuestion.getThing().getLink();
+    this.link = quizQuestion.getThing();
     this.categoryLink = quizQuestion.getCategoryLink();
   }
 
