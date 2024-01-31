@@ -4,13 +4,12 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class FromSamePartAsQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
 
   private final ParentGrandLinkHelper parentGrandLinkHelper;
-  private Thing cachedAnswerLink = null;
+  private Note cachedAnswerLink = null;
   private List<Note> cachedFillingOptions = null;
   private final Note link;
   private final QuizQuestionServant servant;
@@ -24,11 +23,11 @@ public class FromSamePartAsQuizFactory
   @Override
   public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
-      List<Thing> remoteCousins = parentGrandLinkHelper.getCousinLinksAvoidingSiblings();
+      List<Note> remoteCousins = parentGrandLinkHelper.getCousinLinksAvoidingSiblings();
       cachedFillingOptions =
           servant.chooseFillingOptionsRandomly(remoteCousins).stream()
-              .map(Thing::getParentNote)
-              .collect(Collectors.toList());
+              .map(Note::getParent)
+              .toList();
     }
     return cachedFillingOptions;
   }
@@ -36,17 +35,17 @@ public class FromSamePartAsQuizFactory
   @Override
   public Note generateAnswer() {
     if (getAnswerLink() == null) return null;
-    return getAnswerLink().getParentNote();
+    return getAnswerLink().getParent();
   }
 
   @Override
-  public Thing getCategoryLink() {
+  public Note getCategoryLink() {
     return parentGrandLinkHelper.getParentGrandLink();
   }
 
-  protected Thing getAnswerLink() {
+  protected Note getAnswerLink() {
     if (cachedAnswerLink == null) {
-      List<Thing> backwardPeers =
+      List<Note> backwardPeers =
           servant.getSiblingLinksOfSameLinkTypeHavingReviewPoint(link.getThing()).toList();
       cachedAnswerLink = servant.randomizer.chooseOneRandomly(backwardPeers).orElse(null);
     }

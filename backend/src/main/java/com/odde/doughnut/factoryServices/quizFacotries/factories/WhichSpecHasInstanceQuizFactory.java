@@ -1,14 +1,13 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
 
 public class WhichSpecHasInstanceQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
-  private Thing cachedInstanceLink = null;
+  private Note cachedInstanceLink = null;
   private List<Note> cachedFillingOptions = null;
   private final Note link;
   private final QuizQuestionServant servant;
@@ -23,20 +22,21 @@ public class WhichSpecHasInstanceQuizFactory
     if (cachedFillingOptions != null) {
       return cachedFillingOptions;
     }
-    this.cachedFillingOptions = servant.chooseBackwardPeers(cachedInstanceLink, link.getThing());
+    this.cachedFillingOptions =
+        servant.chooseBackwardPeers(cachedInstanceLink.getThing(), link.getThing());
     return cachedFillingOptions;
   }
 
   @Override
   public Note generateAnswer() {
-    Thing instanceLink = getInstanceLink();
+    Note instanceLink = getInstanceLink();
     if (instanceLink == null) return null;
-    return instanceLink.getParentNote();
+    return instanceLink.getParent();
   }
 
-  private Thing getInstanceLink() {
+  private Note getInstanceLink() {
     if (cachedInstanceLink == null) {
-      List<Thing> candidates =
+      List<Note> candidates =
           servant.getLinksFromSameSourceHavingReviewPoint(link.getThing()).toList();
       cachedInstanceLink = servant.randomizer.chooseOneRandomly(candidates).orElse(null);
     }
@@ -44,7 +44,7 @@ public class WhichSpecHasInstanceQuizFactory
   }
 
   @Override
-  public Thing getCategoryLink() {
+  public Note getCategoryLink() {
     return getInstanceLink();
   }
 }

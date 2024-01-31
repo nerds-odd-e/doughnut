@@ -100,7 +100,7 @@ public class Thing extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public Stream<Thing> getSiblingLinksOfSameLinkType(User user) {
+  public Stream<Note> getSiblingLinksOfSameLinkType(User user) {
     return new NoteViewer(user, getTargetNote())
         .linksOfTypeThroughReverse(getLinkType())
         .filter(l -> !l.equals(this));
@@ -108,11 +108,11 @@ public class Thing extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public List<Note> getLinkedSiblingsOfSameLinkType(User user) {
-    return getSiblingLinksOfSameLinkType(user).map(Thing::getParentNote).toList();
+    return getSiblingLinksOfSameLinkType(user).map(Note::getParent).toList();
   }
 
   @JsonIgnore
-  public List<Thing> categoryLinksOfTarget(User user) {
+  public List<Note> categoryLinksOfTarget(User user) {
     return new NoteViewer(user, getTargetNote())
         .linksOfTypeThroughDirect(
             List.of(LinkType.PART, LinkType.INSTANCE, LinkType.SPECIALIZE, LinkType.APPLICATION));

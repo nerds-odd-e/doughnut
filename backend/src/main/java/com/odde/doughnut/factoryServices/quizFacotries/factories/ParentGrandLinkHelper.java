@@ -1,11 +1,11 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
-import com.odde.doughnut.entities.Thing;
+import com.odde.doughnut.entities.Note;
 import java.util.List;
 
 public interface ParentGrandLinkHelper {
 
-  Thing getParentGrandLink();
+  Note getParentGrandLink();
 
-  List<Thing> getCousinLinksAvoidingSiblings();
+  List<Note> getCousinLinksAvoidingSiblings();
 }

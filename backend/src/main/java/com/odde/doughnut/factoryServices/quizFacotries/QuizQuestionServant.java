@@ -62,7 +62,7 @@ public class QuizQuestionServant {
     return grand.getDescendants().filter(notePredicate).collect(Collectors.toList());
   }
 
-  private Optional<Thing> chooseOneCategoryLink(Note link) {
+  private Optional<Note> chooseOneCategoryLink(Note link) {
     return randomizer.chooseOneRandomly(link.getThing().categoryLinksOfTarget(this.user));
   }
 
@@ -70,23 +70,23 @@ public class QuizQuestionServant {
     return randomizer.randomlyChoose(maxFillingOptionCount, candidates).toList();
   }
 
-  public Stream<Thing> getSiblingLinksOfSameLinkTypeHavingReviewPoint(Thing link) {
+  public Stream<Note> getSiblingLinksOfSameLinkTypeHavingReviewPoint(Thing link) {
     return linksWithReviewPoint(link.getSiblingLinksOfSameLinkType(this.user));
   }
 
-  public Stream<Thing> getLinksFromSameSourceHavingReviewPoint(Thing link) {
-    List<Thing> list =
+  public Stream<Note> getLinksFromSameSourceHavingReviewPoint(Thing link) {
+    List<Note> list =
         new NoteViewer(this.user, link.getParentNote())
             .linksOfTypeThroughDirect(candidateQuestionLinkTypes);
     return linksWithReviewPoint(list.stream()).filter(l -> !link.equals(l));
   }
 
-  private Stream<Thing> linksWithReviewPoint(Stream<Thing> cousinLinksOfSameLinkType) {
+  private Stream<Note> linksWithReviewPoint(Stream<Note> cousinLinksOfSameLinkType) {
     return cousinLinksOfSameLinkType.filter(l -> getReviewPoint(l) != null);
   }
 
   public ParentGrandLinkHelper getParentGrandLinkHelper(Note link) {
-    Thing parentGrandLink = chooseOneCategoryLink(link).orElse(null);
+    Note parentGrandLink = chooseOneCategoryLink(link).orElse(null);
     if (parentGrandLink == null) return new NullParentGrandLinkHelper();
     return new ParentGrandLinkHelperImpl(this.user, link, parentGrandLink);
   }
@@ -101,7 +101,7 @@ public class QuizQuestionServant {
     return chooseFillingOptionsRandomly(backwardPeers);
   }
 
-  public ReviewPoint getReviewPoint(Thing thing) {
+  public ReviewPoint getReviewPoint(Note thing) {
     UserModel userModel = modelFactoryService.toUserModel(user);
     return userModel.getReviewPointFor(thing);
   }
@@ -110,8 +110,8 @@ public class QuizQuestionServant {
     List<Note> uncles =
         new NoteViewer(user, note.getParent())
             .linksOfTypeThroughDirect(List.of(note.getLinkType())).stream()
-                .filter(l -> !l.equals(note.getThing()))
-                .map(Thing::getTargetNote)
+                .filter(l -> !l.equals(note))
+                .map(Note::getTargetNote)
                 .toList();
     return chooseCohortAndAvoid(answerNote, note.getParent(), uncles);
   }

@@ -29,17 +29,17 @@ public class FromDifferentPartAsQuizFactory
     if (getCategoryLink() == null) {
       return null;
     }
-    List<Thing> cousinLinks =
+    List<Note> cousinLinks =
         servant
             .getSiblingLinksOfSameLinkTypeHavingReviewPoint(link.getThing())
             .collect(Collectors.toList());
     return servant.chooseFillingOptionsRandomly(cousinLinks).stream()
-        .map(Thing::getParentNote)
+        .map(Note::getParent)
         .collect(Collectors.toList());
   }
 
   @Override
-  public Thing getCategoryLink() {
+  public Note getCategoryLink() {
     return parentGrandLinkHelper.getParentGrandLink();
   }
 
@@ -48,7 +48,7 @@ public class FromDifferentPartAsQuizFactory
     return servant
         .randomizer
         .chooseOneRandomly(parentGrandLinkHelper.getCousinLinksAvoidingSiblings())
-        .map(Thing::getParentNote)
+        .map(Note::getParent)
         .orElse(null);
   }
 }

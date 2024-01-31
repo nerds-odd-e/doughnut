@@ -96,8 +96,15 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   @ManyToOne(cascade = CascadeType.DETACH)
   @JoinColumn(name = "category_link_id", referencedColumnName = "id")
   @Getter
-  @Setter
   private Thing categoryLink;
+
+  public void setCategoryLink(Note categoryLink) {
+    if (categoryLink == null) {
+      this.categoryLink = null;
+      return;
+    }
+    this.categoryLink = categoryLink.getThing();
+  }
 
   @Column(name = "option_thing_ids")
   @Getter

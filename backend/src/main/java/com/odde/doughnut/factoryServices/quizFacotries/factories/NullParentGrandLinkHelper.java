@@ -1,17 +1,17 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
-import com.odde.doughnut.entities.Thing;
+import com.odde.doughnut.entities.Note;
 import java.util.List;
 
 public class NullParentGrandLinkHelper implements ParentGrandLinkHelper {
 
   @Override
-  public Thing getParentGrandLink() {
+  public Note getParentGrandLink() {
     return null;
   }
 
   @Override
-  public List<Thing> getCousinLinksAvoidingSiblings() {
+  public List<Note> getCousinLinksAvoidingSiblings() {
     return List.of();
   }
 }

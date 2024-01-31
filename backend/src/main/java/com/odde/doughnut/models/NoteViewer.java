@@ -41,27 +41,28 @@ public class NoteViewer {
                     type,
                     new LinkViewed() {
                       {
-                        setDirect(linksOfTypeThroughDirect(List.of(type)).stream().toList());
-                        setReverse(linksOfTypeThroughReverse(type).toList());
+                        setDirect(
+                            linksOfTypeThroughDirect(List.of(type)).stream()
+                                .map(Note::getThing)
+                                .toList());
+                        setReverse(linksOfTypeThroughReverse(type).map(Note::getThing).toList());
                       }
                     }))
         .filter(x -> x.getValue().notEmpty())
         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
-  public List<Thing> linksOfTypeThroughDirect(List<LinkType> linkTypes) {
+  public List<Note> linksOfTypeThroughDirect(List<LinkType> linkTypes) {
     return note.getLinkChildren().stream()
         .filter(l -> l.targetVisibleAsSourceOrTo(viewer))
         .filter(l -> linkTypes.contains(l.getLinkType()))
-        .map(Note::getThing)
         .toList();
   }
 
-  public Stream<Thing> linksOfTypeThroughReverse(LinkType linkType) {
+  public Stream<Note> linksOfTypeThroughReverse(LinkType linkType) {
     return note.getRefers().stream()
         .filter(l -> l.getThing().getLinkType().equals(linkType))
-        .filter(l -> l.getThing().sourceVisibleAsTargetOrTo(viewer))
-        .map(Note::getThing);
+        .filter(l -> l.getThing().sourceVisibleAsTargetOrTo(viewer));
   }
 
   public NotePositionViewedByUser jsonNotePosition() {
