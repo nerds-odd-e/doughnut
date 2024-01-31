@@ -106,9 +106,14 @@ public class QuizQuestionServant {
     return userModel.getReviewPointFor(thing);
   }
 
-  public List<Note> chooseFromCohortAvoidUncles(Thing link1, NoteBase answerNote) {
-    List<Note> uncles = link1.getPiblingOfTheSameLinkType(user);
-    return chooseCohortAndAvoid(answerNote, link1.getSourceNote(), uncles);
+  public List<Note> chooseFromCohortAvoidUncles(Note note, NoteBase answerNote) {
+    List<Note> uncles =
+        new NoteViewer(user, note.getParent())
+            .linksOfTypeThroughDirect(List.of(note.getLinkType())).stream()
+                .filter(l -> !l.equals(note.getThing()))
+                .map(Thing::getTargetNote)
+                .toList();
+    return chooseCohortAndAvoid(answerNote, note.getParent(), uncles);
   }
 
   private List<Note> chooseCohortAndAvoid(
