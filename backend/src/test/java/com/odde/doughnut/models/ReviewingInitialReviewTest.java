@@ -28,10 +28,6 @@ public class ReviewingInitialReviewTest {
   Timestamp day0;
   Reviewing reviewingOnDay1;
 
-  public ReviewPoint getOneInitialReviewPoint(Reviewing reviewing) {
-    return reviewing.getDueInitialReviewPoints().findFirst().orElse(null);
-  }
-
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
@@ -44,7 +40,7 @@ public class ReviewingInitialReviewTest {
   @Test
   void whenThereIsNoNotesForUser() {
     makeMe.aNote().creatorAndOwner(anotherUser).please();
-    assertThat(getOneInitialReviewPoint(reviewingOnDay1), is(nullValue()));
+    assertThat(getFirstInitialReviewPoint(reviewingOnDay1), is(nullValue()));
     assertThat(reviewingOnDay1.getReviewStatus().toInitialReviewCount, equalTo(0));
   }
 
@@ -63,23 +59,23 @@ public class ReviewingInitialReviewTest {
     @Test
     void shouldReturnTheFirstNoteAndThenTheSecondWhenThereAreTwo() {
       assertThat(reviewingOnDay1.getReviewStatus().toInitialReviewCount, equalTo(2));
-      assertThat(getOneInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note1));
+      assertThat(getFirstInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note1));
       makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
       assertThat(reviewingOnDay1.getReviewStatus().toInitialReviewCount, equalTo(1));
-      assertThat(getOneInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note2));
+      assertThat(getFirstInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note2));
     }
 
     @Test
     void shouldReturnTheSecondNoteIfItsLevelIsLower() {
       makeMe.aReviewSettingFor(note1).level(2).please();
       makeMe.aReviewSettingFor(note2).level(1).please();
-      assertThat(getOneInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note2));
+      assertThat(getFirstInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note2));
     }
 
     @Test
     void shouldNotIncludeNoteThatIsSkippedForReview() {
       makeMe.theNote(note1).skipReview().linkTo(note2).please();
-      assertThat(getOneInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note2));
+      assertThat(getFirstInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note2));
     }
 
     @Nested
@@ -160,13 +156,13 @@ public class ReviewingInitialReviewTest {
 
       @Test
       void shouldReturnOneIfUsersDailySettingIsOne() {
-        assertThat(getOneInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note1));
+        assertThat(getFirstInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note1));
       }
 
       @Test
       void shouldNotIncludeNotesThatAreAlreadyReviewed() {
         makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
-        assertThat(getOneInitialReviewPoint(reviewingOnDay1), is(nullValue()));
+        assertThat(getFirstInitialReviewPoint(reviewingOnDay1), is(nullValue()));
       }
 
       @Test
@@ -177,13 +173,13 @@ public class ReviewingInitialReviewTest {
             .initiallyReviewedOn(day1)
             .removedFromReview()
             .please();
-        assertThat(getOneInitialReviewPoint(reviewingOnDay1).getNote(), is(note2));
+        assertThat(getFirstInitialReviewPoint(reviewingOnDay1).getNote(), is(note2));
       }
 
       @Test
       void shouldIncludeNotesThatAreReviewedByOtherPeople() {
         makeMe.aReviewPointFor(note1).by(anotherUser).initiallyReviewedOn(day1).please();
-        assertThat(getOneInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note1));
+        assertThat(getFirstInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note1));
       }
 
       @Test
@@ -191,7 +187,7 @@ public class ReviewingInitialReviewTest {
         makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
         Timestamp day1_23 = makeMe.aTimestamp().of(1, 23).fromShanghai().please();
         Reviewing reviewing = userModel.createReviewing(day1_23, ZoneId.of("Asia/Shanghai"));
-        assertThat(getOneInitialReviewPoint(reviewing), is(nullValue()));
+        assertThat(getFirstInitialReviewPoint(reviewing), is(nullValue()));
       }
 
       @Test
@@ -199,7 +195,7 @@ public class ReviewingInitialReviewTest {
         makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
         Timestamp day2 = makeMe.aTimestamp().of(2, 1).fromShanghai().please();
         Reviewing reviewing = userModel.createReviewing(day2, ZoneId.of("Asia/Shanghai"));
-        assertThat(getOneInitialReviewPoint(reviewing).getNote(), equalTo(note2));
+        assertThat(getFirstInitialReviewPoint(reviewing).getNote(), equalTo(note2));
       }
     }
   }
@@ -226,14 +222,14 @@ public class ReviewingInitialReviewTest {
 
     @Test
     void shouldReturnReviewPointForNote() {
-      assertThat(getOneInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note1));
+      assertThat(getFirstInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note1));
     }
 
     @Test
     void shouldReturnReviewPointForLink() {
       makeMe.theNote(note2).skipReview().please();
       makeMe.theNote(note1).skipReview().linkTo(note2).please();
-      ReviewPoint reviewPoint = getOneInitialReviewPoint(reviewingOnDay1);
+      ReviewPoint reviewPoint = getFirstInitialReviewPoint(reviewingOnDay1);
       assertThat(reviewPoint.getThing().getSourceNote(), equalTo(note1));
     }
 
@@ -241,7 +237,7 @@ public class ReviewingInitialReviewTest {
     void reviewedMoreThanPlanned() {
       makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
       makeMe.aReviewPointFor(note2).by(userModel).initiallyReviewedOn(day1).please();
-      assertThat(getOneInitialReviewPoint(reviewingOnDay1), nullValue());
+      assertThat(getFirstInitialReviewPoint(reviewingOnDay1), nullValue());
     }
   }
 
@@ -258,7 +254,11 @@ public class ReviewingInitialReviewTest {
 
     @Test
     void shouldNotBeReviewed() {
-      assertThat(getOneInitialReviewPoint(reviewingOnDay1), is(nullValue()));
+      assertThat(getFirstInitialReviewPoint(reviewingOnDay1), is(nullValue()));
     }
+  }
+
+  private ReviewPoint getFirstInitialReviewPoint(Reviewing reviewing) {
+    return reviewing.getDueInitialReviewPoints().findFirst().orElse(null);
   }
 }
