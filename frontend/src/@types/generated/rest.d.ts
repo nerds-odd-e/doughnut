@@ -267,13 +267,13 @@ declare namespace Generated {
     }
 
     interface ReviewPoint extends EntityIdentifiedByIdOnly {
-        thing: Thing;
         lastReviewedAt: string;
         nextReviewAt: string;
         initialReviewedAt: string;
         repetitionCount: number;
         forgettingCurveIndex: number;
         removedFromReview: boolean;
+        thing: Thing;
     }
 
     interface ReviewSetting {

@@ -35,7 +35,12 @@ public class ReviewPoint extends EntityIdentifiedByIdOnly {
   @JoinColumn(name = "note_id")
   @Getter
   @Setter
+  @JsonIgnore
   private Note note;
+
+  public Thing getThing() {
+    return getNote().getThing();
+  }
 
   @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "user_id", referencedColumnName = "id")
