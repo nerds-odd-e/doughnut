@@ -328,7 +328,7 @@ declare namespace Generated {
         useParentPicture: boolean;
     }
 
-    interface NoteBase extends Thingy {
+    interface NoteBase extends EntityIdentifiedByIdOnly {
         topic: string;
         topicConstructor: string;
         /**
@@ -363,9 +363,6 @@ declare namespace Generated {
          * All choices. Only one should be correct.
          */
         choices: string[];
-    }
-
-    interface Thingy extends EntityIdentifiedByIdOnly {
     }
 
     type ErrorType = "OPENAI_UNAUTHORIZED" | "BINDING_ERROR" | "OPENAI_TIMEOUT" | "OPENAI_SERVICE_ERROR" | "WIKIDATA_SERVICE_ERROR";

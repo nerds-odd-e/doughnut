@@ -27,7 +27,7 @@ import org.springframework.beans.BeanUtils;
 
 @MappedSuperclass
 @JsonPropertyOrder({"topic", "topicConstructor", "details", "parentId", "updatedAt"})
-public abstract class NoteBase extends Thingy {
+public abstract class NoteBase extends EntityIdentifiedByIdOnly {
 
   @OneToOne(mappedBy = "note", cascade = CascadeType.ALL)
   @Getter
@@ -105,6 +105,14 @@ public abstract class NoteBase extends Thingy {
   public void setDeletedAt(Timestamp value) {
     this.deletedAt = value;
     if (this.thing != null) this.thing.setDeletedAt(value);
+  }
+
+  @JsonIgnore
+  public boolean targetVisibleAsSourceOrTo(User viewer) {
+    Thing thing = getThing();
+    if (thing.getParentNote().getNotebook() == thing.getTargetNote().getNotebook()) return true;
+    if (viewer == null) return false;
+    return viewer.canReferTo(thing.getTargetNote().getNotebook());
   }
 
   @JsonIgnore

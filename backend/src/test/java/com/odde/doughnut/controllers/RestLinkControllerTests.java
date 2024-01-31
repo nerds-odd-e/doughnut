@@ -78,7 +78,7 @@ class RestLinkControllerTests {
       assertThat(note3.getChildren(), hasSize(0));
       assertThat(note3.getLinkChildren(), hasSize(1));
       assertThat(
-          note3.getLinkChildren().get(0).getNoteTopic(),
+          note3.getLinkChildren().get(0).getTopic(),
           equalTo("[flower tea] is an application of [flower]"));
     }
 
