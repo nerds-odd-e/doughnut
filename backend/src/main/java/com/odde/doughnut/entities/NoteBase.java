@@ -56,6 +56,11 @@ public abstract class NoteBase extends EntityIdentifiedByIdOnly {
   @Column(name = "topic_constructor")
   private String topicConstructor = "";
 
+  @Column(name = "created_at")
+  @Setter
+  @Getter
+  private Timestamp createdAt;
+
   @Column(name = "deleted_at")
   @Getter
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)

@@ -16,7 +16,6 @@ class ReviewPointBuilder extends Builder<Generated.ReviewPoint> {
       removedFromReview: false,
       thing: {
         id: generateId(),
-        createdAt: "",
       },
     };
   }

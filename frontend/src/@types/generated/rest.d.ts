@@ -264,7 +264,6 @@ declare namespace Generated {
         linkType?: LinkType;
         sourceNote?: Note;
         targetNote?: Note;
-        createdAt: string;
     }
 
     interface ReviewPoint extends EntityIdentifiedByIdOnly {
@@ -338,6 +337,7 @@ declare namespace Generated {
         parentId?: number;
         updatedAt: string;
         noteAccessories: NoteAccessories;
+        createdAt: string;
         deletedAt: string;
         wikidataId: string;
         pictureWithMask?: PictureWithMask;

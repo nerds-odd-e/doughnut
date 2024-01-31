@@ -2,7 +2,6 @@ package com.odde.doughnut.entities;
 
 import jakarta.persistence.*;
 import java.sql.Timestamp;
-import java.util.*;
 
 @Entity
 @Table(name = "note")
@@ -15,9 +14,13 @@ public class Note extends NoteBase {
     final Note note = new Note();
     note.setUpdatedAt(currentUTCTimestamp);
     note.setTopicConstructor(topicConstructor);
+    note.setCreatedAt(currentUTCTimestamp);
     note.setUpdatedAt(currentUTCTimestamp);
 
-    Thing.createThing(user, note, currentUTCTimestamp);
+    final Thing thing = new Thing();
+    thing.setNote(note);
+    thing.setCreator(user);
+    note.setThing(thing);
     return note;
   }
 

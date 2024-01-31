@@ -13,6 +13,7 @@ class NoteBuilder extends Builder<Generated.Note> {
       details: "<p>Desc</p>",
       wikidataId: "",
       deletedAt: "",
+      createdAt: new Date().toISOString(),
       noteAccessories: {
         url: "",
         pictureUrl: "",

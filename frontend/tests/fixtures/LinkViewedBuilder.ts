@@ -59,7 +59,6 @@ class LinkViewedBuilder extends Builder<LinksMap> {
   private link(): Generated.Thing {
     return {
       id: generateId(),
-      createdAt: new Date().toISOString(),
       targetNote: this.toNote.note,
       sourceNote: this.fromNote.note,
       linkType: "using",

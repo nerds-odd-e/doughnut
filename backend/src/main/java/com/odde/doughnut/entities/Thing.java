@@ -22,11 +22,6 @@ import org.springframework.lang.Nullable;
 @JsonPropertyOrder({"note", "link", "linkType", "sourceNote", "targetNote", "createdAt"})
 public class Thing extends EntityIdentifiedByIdOnly {
 
-  @Column(name = "created_at")
-  @Setter
-  @Getter
-  private Timestamp createdAt;
-
   @Column(name = "deleted_at")
   @JsonIgnore
   @Setter
@@ -45,15 +40,6 @@ public class Thing extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   private User creator;
-
-  public static Note createThing(User user, Note note, Timestamp currentUTCTimestamp) {
-    final Thing thing = new Thing();
-    thing.setNote(note);
-    thing.setCreator(user);
-    thing.setCreatedAt(currentUTCTimestamp);
-    note.setThing(thing);
-    return note;
-  }
 
   @JsonIgnore
   public ClozedString getClozeSource() {
