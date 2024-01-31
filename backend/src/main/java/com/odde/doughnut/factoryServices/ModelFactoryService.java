@@ -154,14 +154,9 @@ public class ModelFactoryService {
       User creator,
       Link.LinkType type,
       Timestamp currentUTCTimestamp) {
-    //    Link link = new Link();
-    //    link.setSourceNote(sourceNote);
-    //    link.setTargetNote(targetNote);
-    //    link.setLinkType(type);
-    //    Thing.createThing(creator, link, currentUTCTimestamp);
-
     Note note = sourceNote.buildChildNote(creator, currentUTCTimestamp, ":" + type.label);
     note.setTargetNote(targetNote);
+    note.getReviewSetting().setLevel(Math.max(sourceNote.getReviewSetting().getLevel(), targetNote.getReviewSetting().getLevel()));
 
     return note;
   }
