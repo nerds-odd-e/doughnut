@@ -110,6 +110,7 @@ public class ReviewingInitialReviewTest {
         void Note1And2HaveDifferentLevels() {
           makeMe.theNote(note1).level(5).please();
           makeMe.theNote(note2).level(2).please();
+          makeMe.theNote(note1ToNote2.getNote()).level(5).please();
         }
 
         @Test
