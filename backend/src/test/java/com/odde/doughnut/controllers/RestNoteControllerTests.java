@@ -8,10 +8,8 @@ import static org.mockito.ArgumentMatchers.any;
 import com.odde.doughnut.controllers.json.NoteCreationDTO;
 import com.odde.doughnut.controllers.json.NoteRealm;
 import com.odde.doughnut.controllers.json.WikidataAssociationCreation;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.Link.LinkType;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteAccessories;
-import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.TimestampOperations;
@@ -20,6 +18,7 @@ import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.odde.doughnut.testability.TestabilitySettings;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
 import java.sql.Timestamp;
@@ -506,6 +505,38 @@ class RestNoteControllerTests {
               () -> controller.updateWikidataId(note, wikidataAssociationCreation));
       assertThat(
           bindException.getMessage(), stringContainsInOrder("Duplicate Wikidata ID Detected."));
+    }
+  }
+
+  @Nested
+  class UpdateReviewSetting {
+    Note source;
+    Note target;
+    Thing link;
+
+    @BeforeEach
+    void setup() {
+      source = makeMe.aNote().creatorAndOwner(userModel).please();
+      target = makeMe.aNote().creatorAndOwner(userModel).please();
+      link = makeMe.aLink().between(source, target).please();
+    }
+
+    @Test
+    void shouldUpdateLinkLevel() throws UnexpectedNoAccessRightException {
+      @Valid ReviewSetting reviewSetting = new ReviewSetting();
+      reviewSetting.setLevel(4);
+      controller.updateReviewSetting(source, reviewSetting);
+      makeMe.refresh(link);
+      assertThat(link.getLevel(), is(4));
+    }
+
+    @Test
+    void shouldUpdateReferenceLevel() throws UnexpectedNoAccessRightException {
+      @Valid ReviewSetting reviewSetting = new ReviewSetting();
+      reviewSetting.setLevel(4);
+      controller.updateReviewSetting(target, reviewSetting);
+      makeMe.refresh(link);
+      assertThat(link.getLevel(), is(4));
     }
   }
 }
