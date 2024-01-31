@@ -19,8 +19,6 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
       assertAuthorizationSubscription((Subscription) object);
     } else if (object instanceof User) {
       assertAuthorizationUser((User) object);
-    } else if (object instanceof Link) {
-      assertAuthorizationLink((Link) object);
     } else if (object instanceof Thing objectThing) {
       assertAuthorizationNote(objectThing.getNote());
     } else {
@@ -35,8 +33,6 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
       assertReadAuthorizationNotebook((Notebook) object);
     } else if (object instanceof Subscription) {
       assertReadAuthorization((Subscription) object);
-    } else if (object instanceof Link) {
-      assertReadAuthorizationLink((Link) object);
     } else if (object instanceof Answer) {
       assertReadAuthorizationAnswer((Answer) object);
     } else if (object instanceof QuizQuestionEntity) {
@@ -130,12 +126,6 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
     }
   }
 
-  private void assertAuthorizationLink(Link link) throws UnexpectedNoAccessRightException {
-    if (!link.getSourceNote().getThing().getCreator().getId().equals(user.getId())) {
-      throw new UnexpectedNoAccessRightException();
-    }
-  }
-
   public void assertAdminAuthorization() throws UnexpectedNoAccessRightException {
     if (!isAdmin()) {
       throw new UnexpectedNoAccessRightException();
@@ -154,9 +144,5 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
 
   public static void throwUserNotFound() {
     throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User Not Found");
-  }
-
-  private void assertReadAuthorizationLink(Link link) throws UnexpectedNoAccessRightException {
-    assertReadAuthorizationNote(link.getSourceNote());
   }
 }

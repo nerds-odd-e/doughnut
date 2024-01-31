@@ -61,10 +61,6 @@ public abstract class NoteBase extends Thingy {
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private Timestamp deletedAt;
 
-  @OneToMany(mappedBy = "sourceNote")
-  @JsonIgnore
-  private List<Link> links = new ArrayList<>();
-
   @OneToMany(mappedBy = "targetNote")
   @JsonIgnore
   private List<Note> refers = new ArrayList<>();
