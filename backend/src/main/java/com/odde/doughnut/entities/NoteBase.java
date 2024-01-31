@@ -310,7 +310,7 @@ public abstract class NoteBase extends Thingy {
 
   @JsonIgnore
   public Stream<Note> getDescendants() {
-    return getAllChildren().stream().flatMap(c -> Stream.concat(Stream.of(c), c.getDescendants()));
+    return getChildren().stream().flatMap(c -> Stream.concat(Stream.of(c), c.getDescendants()));
   }
 
   @JsonIgnore
