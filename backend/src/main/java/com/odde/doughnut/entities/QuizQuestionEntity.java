@@ -155,13 +155,7 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
     if (thing == null) {
       return null;
     }
-    Note result;
-    if (thing.getLink() != null) {
-      result = thing.getSourceNote();
-    } else {
-      result = thing.getNote();
-    }
-    return result;
+    return thing.getNote();
   }
 
   public MCQWithAnswer getMcqWithAnswer() {

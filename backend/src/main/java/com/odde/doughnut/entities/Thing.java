@@ -41,8 +41,6 @@ public class Thing extends EntityIdentifiedByIdOnly {
 
   @OneToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "link_id", referencedColumnName = "id")
-  @Getter
-  @Setter
   @Nullable
   private Link link;
 
