@@ -24,8 +24,8 @@ public interface ReviewPointRepository extends CrudRepository<ReviewPoint, Integ
   Stream<ReviewPoint> findAllByUserAndNextReviewAtLessThanEqualOrderByNextReviewAt(
       Integer userId, @Param("nextReviewAt") Timestamp nextReviewAt);
 
-  @Query(value = "SELECT * " + byUserId + "AND rp.thing_id =:thingId", nativeQuery = true)
-  ReviewPoint findByUserAndThing(Integer userId, @Param("thingId") Integer thingId);
+  @Query(value = "SELECT * " + byUserId + "AND rp.note_id =:noteId", nativeQuery = true)
+  ReviewPoint findByUserAndNote(Integer userId, @Param("noteId") Integer noteId);
 
   String byUserId =
       " FROM review_point rp "

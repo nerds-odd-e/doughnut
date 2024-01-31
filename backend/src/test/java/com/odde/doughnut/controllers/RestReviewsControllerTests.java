@@ -145,7 +145,7 @@ class RestReviewsControllerTests {
       @Test
       void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
         reviewPoint = makeMe.aReviewPointFor(noteByAnotherUser).by(anotherUser).please();
-        answer = makeMe.anAnswer().ofSpellingQuestion(reviewPoint.getThing().getNote()).please();
+        answer = makeMe.anAnswer().ofSpellingQuestion(reviewPoint.getNote()).please();
         assertThrows(UnexpectedNoAccessRightException.class, () -> controller.showAnswer(answer));
       }
 
@@ -155,7 +155,7 @@ class RestReviewsControllerTests {
         answer =
             makeMe
                 .anAnswer()
-                .ofSpellingQuestion(reviewPoint.getThing().getNote())
+                .ofSpellingQuestion(reviewPoint.getNote())
                 .answerWithSpelling("xx")
                 .please();
         makeMe

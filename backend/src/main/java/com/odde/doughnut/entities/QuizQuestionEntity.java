@@ -159,7 +159,7 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public ReviewPoint getReviewPointFor(UserModel userModel) {
-    return userModel.getReviewPointFor(thing);
+    return userModel.getReviewPointFor(getNote());
   }
 
   @JsonIgnore

@@ -14,11 +14,6 @@ public class ReviewPointBuilder extends EntityBuilder<ReviewPoint> {
     initiallyReviewedOn(makeMe.aTimestamp().of(0, 0).please());
   }
 
-  public ReviewPointBuilder forThing(Thing thing) {
-    entity.setThing(thing);
-    return this;
-  }
-
   public ReviewPointBuilder by(UserModel userModel) {
     return by(userModel.getEntity());
   }

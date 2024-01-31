@@ -2,7 +2,6 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -42,13 +41,13 @@ public class UserModel implements ReviewScope {
 
   @Override
   public int getThingsHaveNotBeenReviewedAtAllCount() {
-    return modelFactoryService.thingRepository.countByOwnershipWhereThereIsNoReviewPoint(
+    return modelFactoryService.noteReviewRepository.countByOwnershipWhereThereIsNoReviewPoint(
         entity.getId(), entity.getOwnership().getId());
   }
 
   @Override
-  public Stream<Thing> getThingHaveNotBeenReviewedAtAll() {
-    return modelFactoryService.thingRepository.findByOwnershipWhereThereIsNoReviewPoint(
+  public Stream<Note> getThingHaveNotBeenReviewedAtAll() {
+    return modelFactoryService.noteReviewRepository.findByOwnershipWhereThereIsNoReviewPoint(
         entity.getId(), entity.getOwnership().getId());
   }
 
@@ -78,13 +77,9 @@ public class UserModel implements ReviewScope {
   }
 
   public ReviewPoint getReviewPointFor(Note note) {
-    return getReviewPointFor(note.getThing());
-  }
-
-  public ReviewPoint getReviewPointFor(Thing thing) {
     if (entity == null) return null;
-    return modelFactoryService.reviewPointRepository.findByUserAndThing(
-        entity.getId(), thing.getId());
+    return modelFactoryService.reviewPointRepository.findByUserAndNote(
+        entity.getId(), note.getId());
   }
 
   public <T> void assertAuthorization(T object) throws UnexpectedNoAccessRightException {

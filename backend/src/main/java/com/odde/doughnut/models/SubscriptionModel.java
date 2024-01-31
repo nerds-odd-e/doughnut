@@ -1,7 +1,7 @@
 package com.odde.doughnut.models;
 
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Subscription;
-import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.util.List;
 import java.util.stream.Stream;
@@ -17,20 +17,20 @@ public class SubscriptionModel implements ReviewScope {
 
   @Override
   public int getThingsHaveNotBeenReviewedAtAllCount() {
-    return modelFactoryService.thingRepository.countByAncestorWhereThereIsNoReviewPoint(
+    return modelFactoryService.noteReviewRepository.countByAncestorWhereThereIsNoReviewPoint(
         entity.getUser().getId(), entity.getNotebook().getId());
   }
 
   @Override
-  public Stream<Thing> getThingHaveNotBeenReviewedAtAll() {
-    return modelFactoryService.thingRepository.findByAncestorWhereThereIsNoReviewPoint(
+  public Stream<Note> getThingHaveNotBeenReviewedAtAll() {
+    return modelFactoryService.noteReviewRepository.findByAncestorWhereThereIsNoReviewPoint(
         entity.getUser().getId(), entity.getNotebook().getId());
   }
 
-  public int needToLearnCountToday(List<Integer> thingIds) {
+  public int needToLearnCountToday(List<Integer> noteIds) {
     int count =
-        modelFactoryService.thingRepository.countByAncestorAndInTheList(
-            entity.getNotebook().getId(), thingIds);
+        modelFactoryService.noteReviewRepository.countByAncestorAndInTheList(
+            entity.getNotebook().getId(), noteIds);
     return Math.max(0, entity.getDailyTargetOfNewNotes() - count);
   }
 }

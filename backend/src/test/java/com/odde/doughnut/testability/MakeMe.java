@@ -64,7 +64,8 @@ public class MakeMe extends MakeMeWithoutDB {
   public ReviewPointBuilder aReviewPointFor(Note note) {
     ReviewPoint reviewPoint = ReviewPoint.buildReviewPointForThing(note);
     ReviewPointBuilder reviewPointBuilder = new ReviewPointBuilder(reviewPoint, this);
-    return reviewPointBuilder.forThing(note.getThing());
+    reviewPointBuilder.entity.setNote(note);
+    return reviewPointBuilder;
   }
 
   public ReviewPointBuilder aReviewPointBy(UserModel user) {

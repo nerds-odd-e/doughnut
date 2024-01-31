@@ -22,7 +22,7 @@ import lombok.Setter;
 public class ReviewPoint extends EntityIdentifiedByIdOnly {
   public static ReviewPoint buildReviewPointForThing(Note note) {
     ReviewPoint entity = new ReviewPoint();
-    entity.setThing(note.getThing());
+    entity.setNote(note);
     return entity;
   }
 
@@ -32,10 +32,10 @@ public class ReviewPoint extends EntityIdentifiedByIdOnly {
   }
 
   @ManyToOne
-  @JoinColumn(name = "thing_id")
+  @JoinColumn(name = "note_id")
   @Getter
   @Setter
-  private Thing thing;
+  private Note note;
 
   @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "user_id", referencedColumnName = "id")
@@ -76,11 +76,6 @@ public class ReviewPoint extends EntityIdentifiedByIdOnly {
 
   private ReviewPoint() {}
 
-  @JsonIgnore
-  public Note getNote() {
-    return this.thing.getNote();
-  }
-
   public boolean isInitialReviewOnSameDay(Timestamp currentTime, ZoneId timeZone) {
     return TimestampOperations.getDayId(getInitialReviewedAt(), timeZone)
         == TimestampOperations.getDayId(currentTime, timeZone);
@@ -89,8 +84,8 @@ public class ReviewPoint extends EntityIdentifiedByIdOnly {
   public List<QuizQuestionEntity.QuestionType> availableQuestionTypes(
       Boolean aiQuestionTypeOnlyForReview) {
     List<QuizQuestionEntity.QuestionType> questionTypes = new ArrayList<>();
-    if (this.getThing().getLinkType() != null) {
-      Collections.addAll(questionTypes, this.getThing().getLinkType().getQuestionTypes());
+    if (this.getNote().getLinkType() != null) {
+      Collections.addAll(questionTypes, this.getNote().getLinkType().getQuestionTypes());
     } else {
       if (aiQuestionTypeOnlyForReview) {
         questionTypes.add(QuestionType.AI_QUESTION);

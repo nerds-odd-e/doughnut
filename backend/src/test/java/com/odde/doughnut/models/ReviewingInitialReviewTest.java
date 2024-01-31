@@ -99,7 +99,7 @@ public class ReviewingInitialReviewTest {
         List<ReviewPoint> reviewPoints = getAllDueReviewPoints();
         assertThat(reviewPoints, hasSize(4));
         assertThat(reviewPoints.get(0).getNote(), equalTo(note1));
-        assertThat(reviewPoints.get(2).getThing(), equalTo(note1ToNote2));
+        assertThat(reviewPoints.get(2).getNote(), equalTo(note1ToNote2.getNote()));
         assertThat(reviewPoints.get(1).getNote(), equalTo(note2));
         assertThat(reviewPoints.get(3).getNote(), equalTo(anotherNote));
       }
@@ -120,7 +120,7 @@ public class ReviewingInitialReviewTest {
           assertThat(reviewPoints.get(0).getNote(), equalTo(anotherNote));
           assertThat(reviewPoints.get(1).getNote(), equalTo(note2));
           assertThat(reviewPoints.get(2).getNote(), equalTo(note1));
-          assertThat(reviewPoints.get(3).getThing(), equalTo(note1ToNote2));
+          assertThat(reviewPoints.get(3).getNote(), equalTo(note1ToNote2.getNote()));
         }
 
         @Test
@@ -131,8 +131,8 @@ public class ReviewingInitialReviewTest {
           assertThat(reviewPoints, hasSize(5));
           assertThat(reviewPoints.get(0).getNote(), equalTo(anotherNote));
           assertThat(reviewPoints.get(1).getNote(), equalTo(note2));
-          assertThat(reviewPoints.get(2).getThing(), equalTo(aLevel2Link));
-          assertThat(reviewPoints.get(4).getThing(), equalTo(note1ToNote2));
+          assertThat(reviewPoints.get(2).getNote(), equalTo(aLevel2Link.getNote()));
+          assertThat(reviewPoints.get(4).getNote(), equalTo(note1ToNote2.getNote()));
         }
 
         @Test
@@ -231,7 +231,7 @@ public class ReviewingInitialReviewTest {
       makeMe.theNote(note2).skipReview().please();
       makeMe.theNote(note1).skipReview().linkTo(note2).please();
       ReviewPoint reviewPoint = getFirstInitialReviewPoint(reviewingOnDay1);
-      assertThat(reviewPoint.getThing().getSourceNote(), equalTo(note1));
+      assertThat(reviewPoint.getNote().getParent(), equalTo(note1));
     }
 
     @Test
