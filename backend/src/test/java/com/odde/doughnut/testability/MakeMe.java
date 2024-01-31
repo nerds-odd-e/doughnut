@@ -71,10 +71,6 @@ public class MakeMe extends MakeMeWithoutDB {
     return reviewPointBuilder.forThing(thing);
   }
 
-  public ReviewPointBuilder aReviewPointFor(Link link) {
-    return aReviewPointFor(link.getThing());
-  }
-
   public ReviewPointBuilder aReviewPointBy(UserModel user) {
     Note note = aNote().please();
     return aReviewPointFor(note).by(user);

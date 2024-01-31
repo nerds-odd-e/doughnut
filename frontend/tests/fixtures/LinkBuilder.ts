@@ -11,12 +11,6 @@ class LinkBuilder extends Builder<Generated.Thing> {
       sourceNote: this.sourceNoteBuilder.do().note,
       targetNote: new NoteRealmBuilder().do().note,
       createdAt: new Date().toISOString(),
-      link: {
-        id: 8,
-        linkType: "related to",
-        sourceNote: this.sourceNoteBuilder.do().note,
-        targetNote: new NoteRealmBuilder().do().note,
-      },
     };
   }
 }

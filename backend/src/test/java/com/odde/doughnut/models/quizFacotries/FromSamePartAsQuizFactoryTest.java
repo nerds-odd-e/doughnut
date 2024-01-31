@@ -8,10 +8,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.controllers.json.QuizQuestion;
-import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.Thing;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -49,11 +46,9 @@ class FromSamePartAsQuizFactoryTest {
     ugly = makeMe.aNote("ugly").under(top).please();
     pretty = makeMe.aNote("pretty").under(top).please();
     tall = makeMe.aNote("tall").under(top).please();
-    subjectivePerspective =
-        makeMe.aLink().between(subjective, perspective, Link.LinkType.PART).please();
-    makeMe.aLink().between(objective, perspective, Link.LinkType.PART).please();
-    Thing uglySubjective =
-        makeMe.aLink().between(ugly, subjective, Link.LinkType.TAGGED_BY).please();
+    subjectivePerspective = makeMe.aLink().between(subjective, perspective, LinkType.PART).please();
+    makeMe.aLink().between(objective, perspective, LinkType.PART).please();
+    Thing uglySubjective = makeMe.aLink().between(ugly, subjective, LinkType.TAGGED_BY).please();
     reviewPoint = makeMe.aReviewPointFor(uglySubjective).by(userModel).inMemoryPlease();
     makeMe.refresh(top);
   }
@@ -69,7 +64,7 @@ class FromSamePartAsQuizFactoryTest {
 
     @BeforeEach
     void setup() {
-      cousin = makeMe.aLink().between(pretty, subjective, Link.LinkType.TAGGED_BY).please();
+      cousin = makeMe.aLink().between(pretty, subjective, LinkType.TAGGED_BY).please();
       makeMe.refresh(userModel.getEntity());
     }
 
@@ -83,7 +78,7 @@ class FromSamePartAsQuizFactoryTest {
 
       @BeforeEach
       void setup() {
-        makeMe.aLink().between(tall, objective, Link.LinkType.TAGGED_BY).please();
+        makeMe.aLink().between(tall, objective, LinkType.TAGGED_BY).please();
         makeMe.refresh(userModel.getEntity());
       }
 

@@ -1,7 +1,7 @@
 package com.odde.doughnut.factoryServices.quizFacotries;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.Link.LinkType;
+import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.NullParentGrandLinkHelper;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.ParentGrandLinkHelper;

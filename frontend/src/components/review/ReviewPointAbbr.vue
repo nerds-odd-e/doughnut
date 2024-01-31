@@ -5,7 +5,7 @@
       {{ noteTitle }}
     </span>
 
-    <span v-if="link">
+    <span v-if="link.linkType">
       <span>
         {{ sourceNoteTitle }}
       </span>
@@ -32,16 +32,16 @@ export default defineComponent({
       return this.reviewPoint?.thing.note;
     },
     link() {
-      return this.reviewPoint?.thing.link;
+      return this.reviewPoint?.thing;
     },
     noteTitle() {
       return this.note?.topic;
     },
     sourceNoteTitle() {
-      return this.link?.sourceNote.topic;
+      return this.link?.sourceNote?.topic;
     },
     targetNoteTitle() {
-      return this.link?.targetNote.topic;
+      return this.link?.targetNote?.topic;
     },
   },
 });

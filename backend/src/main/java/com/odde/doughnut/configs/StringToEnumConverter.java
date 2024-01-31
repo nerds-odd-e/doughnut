@@ -1,6 +1,6 @@
 package com.odde.doughnut.configs;
 
-import com.odde.doughnut.entities.Link.LinkType;
+import com.odde.doughnut.entities.LinkType;
 import org.springframework.core.convert.converter.Converter;
 
 public class StringToEnumConverter implements Converter<String, LinkType> {

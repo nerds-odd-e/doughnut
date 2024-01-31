@@ -140,9 +140,9 @@ public class ModelFactoryService {
       Note sourceNote,
       Note targetNote,
       User creator,
-      Link.LinkType type,
+      LinkType type,
       Timestamp currentUTCTimestamp) {
-    if (type == null || type == Link.LinkType.NO_LINK) return null;
+    if (type == null || type == LinkType.NO_LINK) return null;
     Thingy link = buildALink(sourceNote, targetNote, creator, type, currentUTCTimestamp);
     save(link);
     return link.getThing();
@@ -152,7 +152,7 @@ public class ModelFactoryService {
       Note sourceNote,
       Note targetNote,
       User creator,
-      Link.LinkType type,
+      LinkType type,
       Timestamp currentUTCTimestamp) {
     Note note = sourceNote.buildChildNote(creator, currentUTCTimestamp, ":" + type.label);
     note.setTargetNote(targetNote);

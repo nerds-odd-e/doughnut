@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers.json;
 
-import com.odde.doughnut.entities.Link.LinkType;
+import com.odde.doughnut.entities.LinkType;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;

@@ -1,10 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
-import com.odde.doughnut.entities.Circle;
-import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Ownership;
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.EntityBuilder;
@@ -70,10 +66,10 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder linkTo(Note referTo) {
-    return linkTo(referTo, Link.LinkType.SPECIALIZE);
+    return linkTo(referTo, LinkType.SPECIALIZE);
   }
 
-  public NoteBuilder linkTo(Note referTo, Link.LinkType linkType) {
+  public NoteBuilder linkTo(Note referTo, LinkType linkType) {
     linkBuilders.add(makeMe.aLink().between(entity, referTo, linkType));
     return this;
   }

@@ -2,7 +2,7 @@ package com.odde.doughnut.testability;
 
 import com.odde.doughnut.controllers.json.QuestionSuggestionParams;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.Link.LinkType;
+import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.factoryServices.ModelFactoryService;

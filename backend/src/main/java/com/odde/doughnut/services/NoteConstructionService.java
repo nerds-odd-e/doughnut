@@ -1,6 +1,6 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
@@ -17,7 +17,7 @@ public record NoteConstructionService(
   public Note createNoteWithWikidataInfo(
       Note parentNote,
       WikidataIdWithApi wikidataIdWithApi,
-      Link.LinkType linkTypeToParent,
+      LinkType linkTypeToParent,
       String topicConstructor)
       throws DuplicateWikidataIdException, IOException, InterruptedException {
     Note note = parentNote.buildChildNote(user, currentUTCTimestamp, topicConstructor);
@@ -46,19 +46,12 @@ public record NoteConstructionService(
                 .ifPresentOrElse(
                     existingNote -> {
                       modelFactoryService.createLink(
-                          parentNote,
-                          existingNote,
-                          user,
-                          Link.LinkType.RELATED_TO,
-                          currentUTCTimestamp);
+                          parentNote, existingNote, user, LinkType.RELATED_TO, currentUTCTimestamp);
                     },
                     () -> {
                       try {
                         createNoteWithWikidataInfo(
-                            parentNote,
-                            subWikidataIdWithApi,
-                            Link.LinkType.RELATED_TO,
-                            subNoteTitle);
+                            parentNote, subWikidataIdWithApi, LinkType.RELATED_TO, subNoteTitle);
                       } catch (Exception | DuplicateWikidataIdException e) {
                         throw new RuntimeException(e);
                       }

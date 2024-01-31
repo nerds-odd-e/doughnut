@@ -261,7 +261,6 @@ declare namespace Generated {
 
     interface Thing extends EntityIdentifiedByIdOnly {
         note?: Note;
-        link?: Link;
         linkType?: LinkType;
         sourceNote?: Note;
         targetNote?: Note;
@@ -320,12 +319,6 @@ declare namespace Generated {
 
     interface EntityIdentifiedByIdOnly {
         id: number;
-    }
-
-    interface Link extends Thingy {
-        sourceNote: Note;
-        targetNote: Note;
-        linkType: LinkType;
     }
 
     interface NoteAccessories {

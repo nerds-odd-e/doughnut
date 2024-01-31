@@ -26,7 +26,7 @@ public abstract class Thingy extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public Link.LinkType getNoteLinkType() {
+  public LinkType getNoteLinkType() {
     return getThing().getLinkType();
   }
 }

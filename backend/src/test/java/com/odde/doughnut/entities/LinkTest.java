@@ -1,7 +1,7 @@
 package com.odde.doughnut.entities;
 
-import static com.odde.doughnut.entities.Link.LinkType.RELATED_TO;
-import static com.odde.doughnut.entities.Link.LinkType.SPECIALIZE;
+import static com.odde.doughnut.entities.LinkType.RELATED_TO;
+import static com.odde.doughnut.entities.LinkType.SPECIALIZE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
@@ -50,7 +50,7 @@ public class LinkTest {
 
       @Test
       void AIsRelatedToB() {
-        final Map<Link.LinkType, LinkViewed> allLinks = new NoteViewer(null, noteA).getAllLinks();
+        final Map<LinkType, LinkViewed> allLinks = new NoteViewer(null, noteA).getAllLinks();
         assertThat(allLinks.keySet(), contains(RELATED_TO));
         assertThat(getLinkedNotes(RELATED_TO, allLinks), contains(noteB));
       }
@@ -65,14 +65,14 @@ public class LinkTest {
 
       @Test
       void ABelongToB() {
-        final Map<Link.LinkType, LinkViewed> allLinks = new NoteViewer(null, noteA).getAllLinks();
+        final Map<LinkType, LinkViewed> allLinks = new NoteViewer(null, noteA).getAllLinks();
         assertThat(allLinks.keySet(), contains(SPECIALIZE));
         assertThat(getLinkedNotes(SPECIALIZE, allLinks), contains(noteB));
       }
 
       @Test
       void BHasA() {
-        final Map<Link.LinkType, LinkViewed> allLinks = new NoteViewer(null, noteB).getAllLinks();
+        final Map<LinkType, LinkViewed> allLinks = new NoteViewer(null, noteB).getAllLinks();
         assertThat(allLinks.keySet(), contains(SPECIALIZE));
         assertThat(allLinks.get(SPECIALIZE).getReverse(), hasSize(1));
       }
@@ -137,8 +137,7 @@ public class LinkTest {
     }
   }
 
-  private List<Note> getLinkedNotes(
-      Link.LinkType linkType, Map<Link.LinkType, LinkViewed> allLinks) {
+  private List<Note> getLinkedNotes(LinkType linkType, Map<LinkType, LinkViewed> allLinks) {
     return allLinks.get(linkType).getDirect().stream().map(Thing::getTargetNote).toList();
   }
 }

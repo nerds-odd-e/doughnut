@@ -1,9 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
-import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Thing;
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
@@ -45,7 +42,7 @@ public class LinkBuilder extends EntityBuilder<Thing> {
     return this;
   }
 
-  public LinkBuilder between(Note from, Note to, Link.LinkType linkType) {
+  public LinkBuilder between(Note from, Note to, LinkType linkType) {
     this.entity =
         ModelFactoryService.buildALink(
                 from, to, null, linkType, new Timestamp(System.currentTimeMillis()))
@@ -55,6 +52,6 @@ public class LinkBuilder extends EntityBuilder<Thing> {
   }
 
   public LinkBuilder between(Note from, Note to) {
-    return between(from, to, Link.LinkType.SPECIALIZE);
+    return between(from, to, LinkType.SPECIALIZE);
   }
 }

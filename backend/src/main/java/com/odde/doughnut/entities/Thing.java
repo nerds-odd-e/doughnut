@@ -102,11 +102,11 @@ public class Thing extends EntityIdentifiedByIdOnly {
   }
 
   @Nullable
-  public Link.LinkType getLinkType() {
+  public LinkType getLinkType() {
     return getNote().getLinkType();
   }
 
-  public void setLinkType(Link.LinkType linkType) {
+  public void setLinkType(LinkType linkType) {
     getNote().setLinkType(linkType);
   }
 
@@ -126,11 +126,7 @@ public class Thing extends EntityIdentifiedByIdOnly {
   public List<Thing> categoryLinksOfTarget(User user) {
     return new NoteViewer(user, getTargetNote())
         .linksOfTypeThroughDirect(
-            List.of(
-                Link.LinkType.PART,
-                Link.LinkType.INSTANCE,
-                Link.LinkType.SPECIALIZE,
-                Link.LinkType.APPLICATION));
+            List.of(LinkType.PART, LinkType.INSTANCE, LinkType.SPECIALIZE, LinkType.APPLICATION));
   }
 
   @JsonIgnore

@@ -33,8 +33,8 @@ public class NoteViewer {
     return nvb;
   }
 
-  public Map<Link.LinkType, LinkViewed> getAllLinks() {
-    return Arrays.stream(Link.LinkType.values())
+  public Map<LinkType, LinkViewed> getAllLinks() {
+    return Arrays.stream(LinkType.values())
         .map(
             type ->
                 Map.entry(
@@ -49,7 +49,7 @@ public class NoteViewer {
         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
-  public List<Thing> linksOfTypeThroughDirect(List<Link.LinkType> linkTypes) {
+  public List<Thing> linksOfTypeThroughDirect(List<LinkType> linkTypes) {
     return note.getLinkChildren().stream()
         .filter(l -> l.targetVisibleAsSourceOrTo(viewer))
         .filter(l -> linkTypes.contains(l.getNoteLinkType()))
@@ -57,7 +57,7 @@ public class NoteViewer {
         .toList();
   }
 
-  public Stream<Thing> linksOfTypeThroughReverse(Link.LinkType linkType) {
+  public Stream<Thing> linksOfTypeThroughReverse(LinkType linkType) {
     return note.getRefers().stream()
         .filter(l -> l.getThing().getLinkType().equals(linkType))
         .filter(l -> l.getThing().sourceVisibleAsTargetOrTo(viewer))

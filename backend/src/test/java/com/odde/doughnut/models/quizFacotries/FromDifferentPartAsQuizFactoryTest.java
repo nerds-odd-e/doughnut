@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.Link.LinkType;
+import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -49,12 +49,10 @@ class FromDifferentPartAsQuizFactoryTest {
     pretty = makeMe.aNote("pretty").under(top).please();
     kind = makeMe.aNote("kind").under(top).please();
     tall = makeMe.aNote("tall").under(top).please();
-    subjectivePerspective =
-        makeMe.aLink().between(subjective, perspective, Link.LinkType.PART).please();
-    makeMe.aLink().between(objective, perspective, Link.LinkType.PART).please();
-    kindSubjective = makeMe.aLink().between(kind, subjective, Link.LinkType.TAGGED_BY).please();
-    Thing uglySubjective =
-        makeMe.aLink().between(ugly, subjective, Link.LinkType.TAGGED_BY).please();
+    subjectivePerspective = makeMe.aLink().between(subjective, perspective, LinkType.PART).please();
+    makeMe.aLink().between(objective, perspective, LinkType.PART).please();
+    kindSubjective = makeMe.aLink().between(kind, subjective, LinkType.TAGGED_BY).please();
+    Thing uglySubjective = makeMe.aLink().between(ugly, subjective, LinkType.TAGGED_BY).please();
     uglySubjectiveRp = makeMe.aReviewPointFor(uglySubjective).by(userModel).inMemoryPlease();
     makeMe.refresh(top);
   }
@@ -70,8 +68,7 @@ class FromDifferentPartAsQuizFactoryTest {
 
     @BeforeEach
     void setup() {
-      prettySubjective =
-          makeMe.aLink().between(pretty, subjective, Link.LinkType.TAGGED_BY).please();
+      prettySubjective = makeMe.aLink().between(pretty, subjective, LinkType.TAGGED_BY).please();
       makeMe.refresh(userModel.getEntity());
     }
 
@@ -85,7 +82,7 @@ class FromDifferentPartAsQuizFactoryTest {
 
       @BeforeEach
       void setup() {
-        makeMe.aLink().between(tall, objective, Link.LinkType.TAGGED_BY).please();
+        makeMe.aLink().between(tall, objective, LinkType.TAGGED_BY).please();
         makeMe.aReviewPointFor(kindSubjective).by(userModel).please();
         makeMe.refresh(userModel.getEntity());
       }
@@ -124,7 +121,7 @@ class FromDifferentPartAsQuizFactoryTest {
         class WhenTheSupposedDifferentChoiceIsAlsoHavingTheSamePart {
           @BeforeEach
           void setup() {
-            makeMe.aLink().between(tall, subjective, Link.LinkType.TAGGED_BY).please();
+            makeMe.aLink().between(tall, subjective, LinkType.TAGGED_BY).please();
           }
 
           @Test
@@ -139,7 +136,7 @@ class FromDifferentPartAsQuizFactoryTest {
 
           @BeforeEach
           void setup() {
-            makeMe.aLink().between(ugly, objective, Link.LinkType.TAGGED_BY).please();
+            makeMe.aLink().between(ugly, objective, LinkType.TAGGED_BY).please();
           }
 
           @Test

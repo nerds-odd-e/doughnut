@@ -15,10 +15,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestionEntity;
-import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,7 +66,7 @@ class QuizQuestionGeneratorTest {
 
   @Test
   void notAllLinkQuestionAreAvailableToAllLinkTypes() {
-    Note note2 = makeMe.aNote().linkTo(note, Link.LinkType.RELATED_TO).please();
+    Note note2 = makeMe.aNote().linkTo(note, LinkType.RELATED_TO).please();
     ReviewPoint reviewPoint =
         makeMe.aReviewPointFor(note2.getLinks().get(0).getThing()).inMemoryPlease();
     List<QuizQuestionEntity.QuestionType> questionTypes = getQuestionTypes(reviewPoint);

@@ -9,7 +9,7 @@ import com.odde.doughnut.controllers.json.NoteCreationDTO;
 import com.odde.doughnut.controllers.json.NoteRealm;
 import com.odde.doughnut.controllers.json.WikidataAssociationCreation;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.Link.LinkType;
+import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.TimestampOperations;

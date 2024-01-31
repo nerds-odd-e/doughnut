@@ -36,7 +36,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
     userModel = makeMe.aUser().toModelPlease();
     top = makeMe.aNote("top").creatorAndOwner(userModel).please();
     target = makeMe.aNote("element").under(top).please();
-    source = makeMe.aNote("noble gas").under(top).linkTo(target, Link.LinkType.SPECIALIZE).please();
+    source = makeMe.aNote("noble gas").under(top).linkTo(target, LinkType.SPECIALIZE).please();
     anotherSource = makeMe.aNote("non-official name").under(top).please();
     reviewPoint =
         makeMe.aReviewPointFor(source.getLinks().get(0).getThing()).by(userModel).inMemoryPlease();
@@ -52,7 +52,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
   class WhenTheNoteHasInstance {
     @BeforeEach
     void setup() {
-      makeMe.theNote(source).linkTo(anotherSource, Link.LinkType.INSTANCE).please();
+      makeMe.theNote(source).linkTo(anotherSource, LinkType.INSTANCE).please();
     }
 
     @Test
@@ -66,7 +66,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
 
       @BeforeEach
       void setup() {
-        metal = makeMe.aNote("metal").under(top).linkTo(target, Link.LinkType.SPECIALIZE).please();
+        metal = makeMe.aNote("metal").under(top).linkTo(target, LinkType.SPECIALIZE).please();
       }
 
       @Test
@@ -102,7 +102,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
 
           @BeforeEach
           void setup() {
-            makeMe.theNote(metal).linkTo(anotherSource, Link.LinkType.INSTANCE).please();
+            makeMe.theNote(metal).linkTo(anotherSource, LinkType.INSTANCE).please();
           }
 
           @Test
@@ -119,7 +119,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
             makeMe
                 .aNote("something else")
                 .under(top)
-                .linkTo(anotherSource, Link.LinkType.INSTANCE)
+                .linkTo(anotherSource, LinkType.INSTANCE)
                 .please();
             makeMe.refresh(top);
           }

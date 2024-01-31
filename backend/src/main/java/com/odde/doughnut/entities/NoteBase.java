@@ -144,12 +144,12 @@ public abstract class NoteBase extends Thingy {
   }
 
   @JsonIgnore
-  public Link.LinkType getLinkType() {
+  public LinkType getLinkType() {
     if (!getTopicConstructor().startsWith(":")) return null;
-    return Link.LinkType.fromLabel(getTopicConstructor().substring(1));
+    return LinkType.fromLabel(getTopicConstructor().substring(1));
   }
 
-  public void setLinkType(Link.LinkType linkType) {
+  public void setLinkType(LinkType linkType) {
     setTopicConstructor(":" + linkType.label);
   }
 
@@ -159,7 +159,7 @@ public abstract class NoteBase extends Thingy {
 
   protected String getLinkConstructor() {
     if (usingLinkTypeAsTopicConstructor()) {
-      Link.LinkType linkType = getLinkType();
+      LinkType linkType = getLinkType();
       if (linkType == null)
         throw new RuntimeException("Invalid link type: " + getTopicConstructor());
       return "%P is " + linkType.label + " %T";
