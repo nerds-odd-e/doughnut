@@ -2,7 +2,14 @@
   <div class="alert alert-danger" v-if="reviewPoint.removedFromReview">
     This review point has been removed from reviewing.
   </div>
-  <div v-if="noteId">
+  <div v-if="link.linkType">
+    <div class="jumbotron py-4 mb-2">
+      <LinkShow v-bind="{ link, storageAccessor }" />
+    </div>
+    <slot />
+  </div>
+
+  <div v-else-if="noteId">
     <NoteCardsView
       v-if="noteId"
       v-bind="{
@@ -18,13 +25,6 @@
     >
       <slot />
     </NoteCardsView>
-  </div>
-
-  <div v-if="link.link">
-    <div class="jumbotron py-4 mb-2">
-      <LinkShow v-bind="{ link, storageAccessor }" />
-    </div>
-    <slot />
   </div>
 </template>
 

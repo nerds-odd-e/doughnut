@@ -241,6 +241,16 @@ Cypress.Commands.add(
           break
         }
 
+        case "link": {
+          if (additional_info) {
+            const [linkType, targetNote] = additional_info.commonSenseSplit("; ")
+            cy.findByText(topic)
+            cy.findByText(targetNote)
+            cy.get(".badge").contains(linkType)
+          }
+          break
+        }
+
         default:
           expect(review_type).equal("a known review page type")
       }
