@@ -48,6 +48,7 @@ public class Reviewing {
     return reviewScope
         .getThingHaveNotBeenReviewedAtAll()
         .limit(count)
+        .map(Thing::getNote)
         .map(ReviewPoint::buildReviewPointForThing);
   }
 

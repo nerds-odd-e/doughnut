@@ -53,7 +53,8 @@ class FromDifferentPartAsQuizFactoryTest {
     makeMe.aLink().between(objective, perspective, LinkType.PART).please();
     kindSubjective = makeMe.aLink().between(kind, subjective, LinkType.TAGGED_BY).please();
     Thing uglySubjective = makeMe.aLink().between(ugly, subjective, LinkType.TAGGED_BY).please();
-    uglySubjectiveRp = makeMe.aReviewPointFor(uglySubjective).by(userModel).inMemoryPlease();
+    uglySubjectiveRp =
+        makeMe.aReviewPointFor(uglySubjective.getNote()).by(userModel).inMemoryPlease();
     makeMe.refresh(top);
   }
 
@@ -83,7 +84,7 @@ class FromDifferentPartAsQuizFactoryTest {
       @BeforeEach
       void setup() {
         makeMe.aLink().between(tall, objective, LinkType.TAGGED_BY).please();
-        makeMe.aReviewPointFor(kindSubjective).by(userModel).please();
+        makeMe.aReviewPointFor(kindSubjective.getNote()).by(userModel).please();
         makeMe.refresh(userModel.getEntity());
       }
 
@@ -98,7 +99,7 @@ class FromDifferentPartAsQuizFactoryTest {
 
         @BeforeEach
         void setup() {
-          makeMe.aReviewPointFor(prettySubjective).by(userModel).please();
+          makeMe.aReviewPointFor(prettySubjective.getNote()).by(userModel).please();
           makeMe.refresh(userModel.getEntity());
         }
 

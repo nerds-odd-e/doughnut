@@ -20,9 +20,9 @@ import lombok.Setter;
 @Entity
 @Table(name = "review_point")
 public class ReviewPoint extends EntityIdentifiedByIdOnly {
-  public static ReviewPoint buildReviewPointForThing(Thing thing) {
+  public static ReviewPoint buildReviewPointForThing(Note note) {
     ReviewPoint entity = new ReviewPoint();
-    entity.setThing(thing);
+    entity.setThing(note.getThing());
     return entity;
   }
 

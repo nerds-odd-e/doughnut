@@ -41,7 +41,7 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
     sourceTarget = makeMe.aLink().between(source, target).please();
     Note cheese = makeMe.aNote("Note cheese").under(top).please();
     anotherSource = makeMe.aNote("blue cheese").under(top).linkTo(cheese).please();
-    reviewPoint = makeMe.aReviewPointFor(sourceTarget).inMemoryPlease();
+    reviewPoint = makeMe.aReviewPointFor(sourceTarget.getNote()).inMemoryPlease();
     makeMe.refresh(top);
     makeMe.refresh(anotherSource);
   }

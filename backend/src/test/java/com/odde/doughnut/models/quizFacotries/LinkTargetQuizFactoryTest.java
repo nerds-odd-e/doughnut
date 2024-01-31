@@ -40,7 +40,7 @@ class LinkTargetQuizFactoryTest {
     target = makeMe.aNote("target").under(top).please();
     source = makeMe.aNote("source").under(top).linkTo(target).please();
     anotherTarget = makeMe.aNote("another note").under(top).please();
-    reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0).getThing()).inMemoryPlease();
+    reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
     makeMe.refresh(top);
   }
 

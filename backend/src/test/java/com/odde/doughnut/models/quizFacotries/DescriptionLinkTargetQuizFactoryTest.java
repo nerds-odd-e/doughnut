@@ -45,8 +45,7 @@ class DescriptionLinkTargetQuizFactoryTest {
             .under(top)
             .linkTo(target)
             .please();
-    reviewPoint =
-        makeMe.aReviewPointFor(source.getLinks().get(0).getThing()).by(userModel).inMemoryPlease();
+    reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).by(userModel).inMemoryPlease();
     anotherSource = makeMe.aNote("pompeii").under(top).please();
     makeMe.refresh(top);
   }

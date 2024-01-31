@@ -49,7 +49,7 @@ class FromSamePartAsQuizFactoryTest {
     subjectivePerspective = makeMe.aLink().between(subjective, perspective, LinkType.PART).please();
     makeMe.aLink().between(objective, perspective, LinkType.PART).please();
     Thing uglySubjective = makeMe.aLink().between(ugly, subjective, LinkType.TAGGED_BY).please();
-    reviewPoint = makeMe.aReviewPointFor(uglySubjective).by(userModel).inMemoryPlease();
+    reviewPoint = makeMe.aReviewPointFor(uglySubjective.getNote()).by(userModel).inMemoryPlease();
     makeMe.refresh(top);
   }
 
@@ -91,7 +91,7 @@ class FromSamePartAsQuizFactoryTest {
       class WhenThereIsViceReviewPoint {
         @BeforeEach
         void setup() {
-          makeMe.aReviewPointFor(cousin).by(userModel).please();
+          makeMe.aReviewPointFor(cousin.getNote()).by(userModel).please();
           makeMe.refresh(userModel.getEntity());
         }
 

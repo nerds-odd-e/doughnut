@@ -6,6 +6,7 @@ import com.odde.doughnut.controllers.json.ReviewStatus;
 import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.AnsweredQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.ReviewPointModel;
@@ -72,7 +73,11 @@ class RestReviewsController {
     currentUser.assertLoggedIn();
     ReviewPoint reviewPoint =
         ReviewPoint.buildReviewPointForThing(
-            modelFactoryService.thingRepository.findById(initialInfo.thingId).orElse(null));
+            modelFactoryService
+                .thingRepository
+                .findById(initialInfo.thingId)
+                .map(Thing::getNote)
+                .orElse(null));
     reviewPoint.setRemovedFromReview(initialInfo.skipReview);
 
     ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPoint);

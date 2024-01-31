@@ -50,8 +50,7 @@ class QuizQuestionGeneratorTest {
   @Test
   void linkExclusive() {
     Note note2 = makeMe.aNote().linkTo(note).please();
-    ReviewPoint reviewPoint =
-        makeMe.aReviewPointFor(note2.getLinks().get(0).getThing()).inMemoryPlease();
+    ReviewPoint reviewPoint = makeMe.aReviewPointFor(note2.getLinks().get(0)).inMemoryPlease();
     List<QuizQuestionEntity.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
     assertThat(
         questionTypes,
@@ -67,8 +66,7 @@ class QuizQuestionGeneratorTest {
   @Test
   void notAllLinkQuestionAreAvailableToAllLinkTypes() {
     Note note2 = makeMe.aNote().linkTo(note, LinkType.RELATED_TO).please();
-    ReviewPoint reviewPoint =
-        makeMe.aReviewPointFor(note2.getLinks().get(0).getThing()).inMemoryPlease();
+    ReviewPoint reviewPoint = makeMe.aReviewPointFor(note2.getLinks().get(0)).inMemoryPlease();
     List<QuizQuestionEntity.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
     assertTrue(questionTypes.isEmpty());
   }
