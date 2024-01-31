@@ -57,7 +57,6 @@ public class Thing extends EntityIdentifiedByIdOnly {
       User user, T thingy, Timestamp currentUTCTimestamp) {
     final Thing thing = new Thing();
     if (thingy instanceof Note note) thing.setNote(note);
-    if (thingy instanceof Link link) thing.setLink(link);
     thing.setCreator(user);
     thing.setCreatedAt(currentUTCTimestamp);
     thingy.setThing(thing);
@@ -78,17 +77,10 @@ public class Thing extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public Note getParentNote() {
-    if (getLink() != null) {
-      return getLink().getSourceNote();
-    }
     return getNote().getParent();
   }
 
   public void setSourceNote(Note from) {
-    if (getLink() != null) {
-      getLink().setSourceNote(from);
-      return;
-    }
     getNote().setParentNote(from);
   }
 
@@ -99,17 +91,10 @@ public class Thing extends EntityIdentifiedByIdOnly {
 
   @Nullable
   public Note getTargetNote() {
-    if (getLink() != null) {
-      return getLink().getTargetNote();
-    }
     return getNote().getTargetNote();
   }
 
   public void setTargetNote(Note to) {
-    if (getLink() != null) {
-      getLink().setTargetNote(to);
-      return;
-    }
     getNote().setTargetNote(to);
   }
 
@@ -120,17 +105,10 @@ public class Thing extends EntityIdentifiedByIdOnly {
 
   @Nullable
   public Link.LinkType getLinkType() {
-    if (getLink() != null) {
-      return getLink().getLinkType();
-    }
     return getNote().getLinkType();
   }
 
   public void setLinkType(Link.LinkType linkType) {
-    if (getLink() != null) {
-      getLink().setLinkType(linkType);
-      return;
-    }
     getNote().setLinkType(linkType);
   }
 
@@ -176,11 +154,6 @@ public class Thing extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public Integer getLevel() {
-    if (getLink() != null) {
-      return Math.max(
-          getLink().getSourceNote().getReviewSetting().getLevel(),
-          getLink().getTargetNote().getReviewSetting().getLevel());
-    }
     return getNote().getReviewSetting().getLevel();
   }
 
