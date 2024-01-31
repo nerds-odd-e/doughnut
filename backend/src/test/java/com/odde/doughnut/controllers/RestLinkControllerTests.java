@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.json.LinkCreation;
-import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Link.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
@@ -43,41 +42,6 @@ class RestLinkControllerTests {
 
   RestLinkController controller() {
     return new RestLinkController(modelFactoryService, new TestabilitySettings(), userModel);
-  }
-
-  @Nested
-  class showLinkTest {
-    User otherUser;
-    Note note1;
-    Note note2;
-    Link link;
-
-    @BeforeEach
-    void setup() {
-      otherUser = makeMe.aUser().please();
-      note1 = makeMe.aNote().creatorAndOwner(otherUser).please();
-      note2 = makeMe.aNote().creatorAndOwner(otherUser).linkTo(note1).please();
-      link = note2.getLinks().get(0).getThing().getLink();
-    }
-
-    @Test
-    void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-      assertThrows(UnexpectedNoAccessRightException.class, () -> controller().show(link));
-    }
-
-    @Test
-    void shouldNotBeAbleToSeeItIfICanReadOneNote() {
-      makeMe.aBazaarNodebook(note1.getNotebook()).please();
-      assertThrows(UnexpectedNoAccessRightException.class, () -> controller().show(link));
-    }
-
-    @Test
-    void shouldBeAbleToSeeItIfICanReadBothNote() throws UnexpectedNoAccessRightException {
-      makeMe.aBazaarNodebook(note1.getNotebook()).please();
-      makeMe.aBazaarNodebook(note2.getNotebook()).please();
-      Link linkViewedByUser = controller().show(link);
-      assertThat(linkViewedByUser.getId(), equalTo(link.getId()));
-    }
   }
 
   @Nested

@@ -2,7 +2,6 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.json.LinkCreation;
 import com.odde.doughnut.controllers.json.NoteRealm;
-import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.entities.User;
@@ -17,7 +16,6 @@ import jakarta.validation.Valid;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,12 +39,6 @@ class RestLinkController {
     this.modelFactoryService = modelFactoryService;
     this.testabilitySettings = testabilitySettings;
     this.currentUser = currentUser;
-  }
-
-  @GetMapping("/seemsdead/{link}")
-  public Link show(@PathVariable("link") Link link) throws UnexpectedNoAccessRightException {
-    currentUser.assertReadAuthorization(link);
-    return link;
   }
 
   @PostMapping(value = "/{link}")
