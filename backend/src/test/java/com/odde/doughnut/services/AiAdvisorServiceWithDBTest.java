@@ -60,7 +60,7 @@ class AiAdvisorServiceWithDBTest {
               .please();
       Note note = makeMe.aNote().please();
       quizQuestionEntity =
-          makeMe.aQuestion().ofAIGeneratedQuestion(aiGeneratedQuestion, note.getThing()).please();
+          makeMe.aQuestion().ofAIGeneratedQuestion(aiGeneratedQuestion, note).please();
     }
 
     @Test

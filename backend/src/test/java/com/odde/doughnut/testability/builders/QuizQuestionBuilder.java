@@ -6,7 +6,6 @@ import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionGenerator;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -18,8 +17,8 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
     super(makeMe, new QuizQuestionEntity());
   }
 
-  private void ofThing(Thing thing) {
-    entity.setThing(thing);
+  private void ofNote(Note note) {
+    entity.setNote(note);
   }
 
   public QuizQuestionBuilder buildValid(
@@ -44,18 +43,18 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
     return makeMe.modelFactoryService.toQuizQuestion(quizQuestion, makeMe.aUser().please());
   }
 
-  public QuizQuestionBuilder ofNote(Note note) {
-    return spellingQuestionOfReviewPoint(note.getThing());
+  public QuizQuestionBuilder spellingQuestionOfNote(Note note) {
+    return spellingQuestionOfReviewPoint(note);
   }
 
-  public QuizQuestionBuilder spellingQuestionOfReviewPoint(Thing thing) {
-    ofThing(thing);
+  public QuizQuestionBuilder spellingQuestionOfReviewPoint(Note note) {
+    ofNote(note);
     entity.setQuestionType(QuizQuestionEntity.QuestionType.SPELLING);
     return this;
   }
 
-  public QuizQuestionBuilder ofAIGeneratedQuestion(MCQWithAnswer mcqWithAnswer, Thing thing) {
-    ofThing(thing);
+  public QuizQuestionBuilder ofAIGeneratedQuestion(MCQWithAnswer mcqWithAnswer, Note note) {
+    ofNote(note);
     entity.setQuestionType(AI_QUESTION);
     entity.setRawJsonQuestion(mcqWithAnswer.toJsonString());
     entity.setCorrectAnswerIndex(mcqWithAnswer.correctChoiceIndex);

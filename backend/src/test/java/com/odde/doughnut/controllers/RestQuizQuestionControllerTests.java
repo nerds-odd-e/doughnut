@@ -80,8 +80,7 @@ class RestQuizQuestionControllerTests {
               .by(currentUser)
               .forgettingCurveAndNextReviewAt(200)
               .please();
-      quizQuestionEntity =
-          makeMe.aQuestion().spellingQuestionOfReviewPoint(answerNote.getThing()).please();
+      quizQuestionEntity = makeMe.aQuestion().spellingQuestionOfReviewPoint(answerNote).please();
       answer =
           makeMe.anAnswer().answerWithSpelling(answerNote.getTopicConstructor()).inMemoryPlease();
     }
@@ -125,7 +124,7 @@ class RestQuizQuestionControllerTests {
       @BeforeEach
       void setup() {
         quizQuestionEntity =
-            makeMe.aQuestion().spellingQuestionOfReviewPoint(reviewPoint.getThing()).please();
+            makeMe.aQuestion().spellingQuestionOfReviewPoint(reviewPoint.getNote()).please();
         answer = makeMe.anAnswer().answerWithSpelling("wrong").inMemoryPlease();
       }
 
@@ -176,8 +175,7 @@ class RestQuizQuestionControllerTests {
     void setup() throws QuizQuestionNotPossibleException {
       note = makeMe.aNote().creatorAndOwner(currentUser).please();
       mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      quizQuestionEntity =
-          makeMe.aQuestion().ofAIGeneratedQuestion(mcqWithAnswer, note.getThing()).please();
+      quizQuestionEntity = makeMe.aQuestion().ofAIGeneratedQuestion(mcqWithAnswer, note).please();
     }
 
     @Test
@@ -301,7 +299,7 @@ class RestQuizQuestionControllerTests {
     void setUp() {
       note = makeMe.aNote().please();
 
-      quizQuestionEntity = makeMe.aQuestion().ofNote(note).please();
+      quizQuestionEntity = makeMe.aQuestion().spellingQuestionOfNote(note).please();
     }
 
     @Test
@@ -345,7 +343,7 @@ class RestQuizQuestionControllerTests {
       MCQWithAnswer aiGeneratedQuestion = makeMe.aMCQWithAnswer().please();
       Note note = makeMe.aNote().please();
       quizQuestionEntity =
-          makeMe.aQuestion().ofAIGeneratedQuestion(aiGeneratedQuestion, note.getThing()).please();
+          makeMe.aQuestion().ofAIGeneratedQuestion(aiGeneratedQuestion, note).please();
     }
 
     @Test

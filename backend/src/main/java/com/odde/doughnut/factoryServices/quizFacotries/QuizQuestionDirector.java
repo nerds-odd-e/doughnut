@@ -23,7 +23,7 @@ public record QuizQuestionDirector(
     quizQuestionFactory.validatePossibility();
 
     QuizQuestionEntity quizQuestion = new QuizQuestionEntity();
-    quizQuestion.setThing(thing);
+    quizQuestion.setNote(thing.getNote());
     quizQuestion.setQuestionType(questionType);
 
     if (quizQuestionFactory instanceof QuestionRawJsonFactory rawJsonFactory) {

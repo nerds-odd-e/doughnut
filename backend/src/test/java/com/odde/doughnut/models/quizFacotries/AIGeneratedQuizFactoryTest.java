@@ -75,7 +75,7 @@ class AIGeneratedQuizFactoryTest {
   }
 
   private QuizQuestionBuilder questionBuilder() {
-    return makeMe.aQuestion().ofAIGeneratedQuestion(mcqWithAnswer, note.getThing());
+    return makeMe.aQuestion().ofAIGeneratedQuestion(mcqWithAnswer, note);
   }
 
   private QuizQuestion buildQuestion() {

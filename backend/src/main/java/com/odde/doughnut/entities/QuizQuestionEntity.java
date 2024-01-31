@@ -74,7 +74,6 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   @ManyToOne(cascade = CascadeType.DETACH)
   @JoinColumn(name = "thing_id", referencedColumnName = "id")
   @Getter
-  @Setter
   private Thing thing;
 
   @Column(name = "question_type")
@@ -120,6 +119,11 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public QuizQuestionPresenter buildPresenter() {
     return getQuestionType().presenter.apply(this);
+  }
+
+  @JsonIgnore
+  public void setNote(Note note) {
+    this.thing = note.getThing();
   }
 
   public void setChoicesAndRightAnswer(Note answerNote, List<Note> options, Randomizer randomizer) {
