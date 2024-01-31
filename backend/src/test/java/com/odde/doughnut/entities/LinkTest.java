@@ -131,6 +131,25 @@ public class LinkTest {
     }
   }
 
+  @Nested
+  class LevelOfLink {
+    Note source;
+    Note target;
+
+    @BeforeEach
+    void setup() {
+      source = makeMe.aNote().please();
+      target = makeMe.aNote().please();
+    }
+
+    @Test
+    void shouldGetReversedLinkIfItBelongsToTheUser() {
+      makeMe.theNote(source).level(5).please();
+      Thing link = makeMe.aLink().between(source, target).inMemoryPlease();
+      assertThat(link.getLevel(), is(5));
+    }
+  }
+
   private List<Note> getLinkedNotes(
       Link.LinkType linkType, Map<Link.LinkType, LinkViewed> allLinks) {
     return allLinks.get(linkType).getDirect().stream().map(Thing::getTargetNote).toList();

@@ -173,4 +173,12 @@ public class Thing extends EntityIdentifiedByIdOnly {
 
     return viewer.canReferTo(getSourceNote().getNotebook());
   }
+
+  @JsonIgnore
+  public Integer getLevel() {
+    if (getLink() != null) {
+      return getLink().getSourceNote().getMasterReviewSetting().getLevel();
+    }
+    return getNote().getMasterReviewSetting().getLevel();
+  }
 }
