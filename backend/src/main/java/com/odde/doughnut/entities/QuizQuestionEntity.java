@@ -122,15 +122,14 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
     return getQuestionType().presenter.apply(this);
   }
 
-  public void setChoicesAndRightAnswer(
-      Thingy answerNote, List<? extends Thingy> options, Randomizer randomizer) {
-    List<Thingy> optionsEntities = new ArrayList<>(options);
+  public void setChoicesAndRightAnswer(Note answerNote, List<Note> options, Randomizer randomizer) {
+    List<Note> optionsEntities = new ArrayList<>(options);
     optionsEntities.add(answerNote);
-    List<Thingy> shuffled = randomizer.shuffle(optionsEntities);
+    List<Note> shuffled = randomizer.shuffle(optionsEntities);
     setCorrectAnswerIndex(shuffled.indexOf(answerNote));
     setOptionThingIds(
         shuffled.stream()
-            .map(Thingy::getThing)
+            .map(Note::getThing)
             .map(Thing::getId)
             .map(Object::toString)
             .collect(Collectors.joining(",")));

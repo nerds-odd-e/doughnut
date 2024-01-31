@@ -9,7 +9,7 @@ public class LinkSourceWithinSameLinkTypeQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory {
   protected final Thing link;
   private final QuizQuestionServant servant;
-  private List<? extends Thingy> cachedFillingOptions = null;
+  private List<Note> cachedFillingOptions = null;
 
   public LinkSourceWithinSameLinkTypeQuizFactory(Thing thing, QuizQuestionServant servant) {
     this.link = thing;
@@ -17,7 +17,7 @@ public class LinkSourceWithinSameLinkTypeQuizFactory
   }
 
   @Override
-  public List<? extends Thingy> generateFillingOptions() {
+  public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
       cachedFillingOptions =
           servant.chooseFromCohortAvoidSiblings(link).stream()
@@ -28,7 +28,7 @@ public class LinkSourceWithinSameLinkTypeQuizFactory
   }
 
   @Override
-  public Thingy generateAnswer() {
+  public Note generateAnswer() {
     return link.getNote();
   }
 }

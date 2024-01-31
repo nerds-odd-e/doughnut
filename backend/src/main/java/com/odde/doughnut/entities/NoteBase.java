@@ -175,20 +175,19 @@ public abstract class NoteBase extends Thingy {
   }
 
   @JsonIgnore
-  public List<? extends Thingy> getLinkChildren() {
+  public List<Note> getLinkChildren() {
     return getLinks();
   }
 
   @JsonIgnore
-  public List<? extends Thingy> getLinks() {
+  public List<Note> getLinks() {
     return getAllChildren().stream()
         .filter(Note::usingLinkTypeAsTopicConstructor)
         .collect(toList());
-    //    return links;
   }
 
   @JsonIgnore
-  public List<? extends Thingy> getRefers() {
+  public List<Note> getRefers() {
     return refers;
   }
 
@@ -310,7 +309,7 @@ public abstract class NoteBase extends Thingy {
   }
 
   @JsonIgnore
-  public Stream<Thingy> getLinksAndRefers() {
+  public Stream<Note> getLinksAndRefers() {
     return Stream.concat(getLinks().stream(), getRefers().stream());
   }
 

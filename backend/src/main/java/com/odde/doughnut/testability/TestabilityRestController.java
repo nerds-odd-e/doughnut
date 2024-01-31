@@ -165,7 +165,7 @@ class TestabilityRestController {
     seedInfo.buildNoteTree(user, ownership, titleNoteMap, this.modelFactoryService);
     seedInfo.saveByOriginalOrder(titleNoteMap, this.modelFactoryService);
     return titleNoteMap.values().stream()
-        .collect(Collectors.toMap(note -> note.getTopicConstructor(), Thingy::getId));
+        .collect(Collectors.toMap(note -> note.getTopicConstructor(), Note::getId));
   }
 
   private Ownership getOwnership(SeedInfo seedInfo, User user) {

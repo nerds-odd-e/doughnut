@@ -46,14 +46,13 @@ public class Thing extends EntityIdentifiedByIdOnly {
   @Setter
   private User creator;
 
-  public static <T extends Thingy> T createThing(
-      User user, T thingy, Timestamp currentUTCTimestamp) {
+  public static Note createThing(User user, Note note, Timestamp currentUTCTimestamp) {
     final Thing thing = new Thing();
-    if (thingy instanceof Note note) thing.setNote(note);
+    thing.setNote(note);
     thing.setCreator(user);
     thing.setCreatedAt(currentUTCTimestamp);
-    thingy.setThing(thing);
-    return thingy;
+    note.setThing(thing);
+    return note;
   }
 
   @JsonIgnore

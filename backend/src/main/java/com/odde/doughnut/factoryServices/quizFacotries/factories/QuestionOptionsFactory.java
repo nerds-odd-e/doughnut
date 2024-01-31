@@ -1,12 +1,12 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
-import com.odde.doughnut.entities.Thingy;
+import com.odde.doughnut.entities.Note;
 import java.util.List;
 
 public interface QuestionOptionsFactory {
-  Thingy generateAnswer();
+  Note generateAnswer();
 
-  List<? extends Thingy> generateFillingOptions();
+  List<Note> generateFillingOptions();
 
   default int minimumOptionCount() {
     return 2;

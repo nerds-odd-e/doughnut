@@ -1,8 +1,8 @@
 package com.odde.doughnut.factoryServices.quizFacotries;
 
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.Thing;
-import com.odde.doughnut.entities.Thingy;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.QuestionOptionsFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.QuestionRawJsonFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.SecondaryReviewPointsFactory;
@@ -31,11 +31,11 @@ public record QuizQuestionDirector(
     }
 
     if (quizQuestionFactory instanceof QuestionOptionsFactory optionsFactory) {
-      Thingy answerNote = optionsFactory.generateAnswer();
+      Note answerNote = optionsFactory.generateAnswer();
       if (answerNote == null) {
         throw new QuizQuestionNotPossibleException();
       }
-      List<? extends Thingy> options = optionsFactory.generateFillingOptions();
+      List<Note> options = optionsFactory.generateFillingOptions();
       if (options.size() < optionsFactory.minimumOptionCount() - 1) {
         throw new QuizQuestionNotPossibleException();
       }

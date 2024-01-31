@@ -143,12 +143,12 @@ public class ModelFactoryService {
       LinkType type,
       Timestamp currentUTCTimestamp) {
     if (type == null || type == LinkType.NO_LINK) return null;
-    Thingy link = buildALink(sourceNote, targetNote, creator, type, currentUTCTimestamp);
+    Note link = buildALink(sourceNote, targetNote, creator, type, currentUTCTimestamp);
     save(link);
     return link.getThing();
   }
 
-  public static Thingy buildALink(
+  public static Note buildALink(
       Note sourceNote,
       Note targetNote,
       User creator,

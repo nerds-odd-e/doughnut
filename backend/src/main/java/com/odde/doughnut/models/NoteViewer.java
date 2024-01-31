@@ -53,7 +53,7 @@ public class NoteViewer {
     return note.getLinkChildren().stream()
         .filter(l -> l.targetVisibleAsSourceOrTo(viewer))
         .filter(l -> linkTypes.contains(l.getNoteLinkType()))
-        .map(Thingy::getThing)
+        .map(Note::getThing)
         .toList();
   }
 
@@ -61,7 +61,7 @@ public class NoteViewer {
     return note.getRefers().stream()
         .filter(l -> l.getThing().getLinkType().equals(linkType))
         .filter(l -> l.getThing().sourceVisibleAsTargetOrTo(viewer))
-        .map(Thingy::getThing);
+        .map(Note::getThing);
   }
 
   public NotePositionViewedByUser jsonNotePosition() {
