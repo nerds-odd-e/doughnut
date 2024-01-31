@@ -47,7 +47,7 @@ class RestLinkController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(link);
     link.setLinkType(linkCreation.linkType);
-    modelFactoryService.save(link.getLink());
+    modelFactoryService.save(link.getNote());
     modelFactoryService.save(link);
     return getNoteRealm(link, currentUser.getEntity(), linkCreation.fromTargetPerspective);
   }
@@ -57,7 +57,7 @@ class RestLinkController {
   public NoteRealm deleteLink(@PathVariable Thing link, @PathVariable String perspective)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(link);
-    modelFactoryService.remove(link.getLink());
+    modelFactoryService.remove(link.getNote());
     return getNoteRealm(link, currentUser.getEntity(), perspective.equals("tview"));
   }
 
