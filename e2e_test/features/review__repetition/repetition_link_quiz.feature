@@ -15,7 +15,7 @@ Feature: Repetition Link Quiz
     Given It's day 1, 8 hour
     And I do these initial reviews in sequence:
       | review_type | topic |
-      | link        | Moon  |
+      | single note | Moon  |
     When I am repeat-reviewing my old note on day 2
     Then I should be asked link question "Moon" "a specialization of" with options "Earth, Mars"
     When I choose answer "<answer>"
