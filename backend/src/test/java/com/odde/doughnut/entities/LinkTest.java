@@ -1,27 +1,19 @@
 package com.odde.doughnut.entities;
 
-import static com.odde.doughnut.entities.Link.LinkType.NO_LINK;
 import static com.odde.doughnut.entities.Link.LinkType.RELATED_TO;
 import static com.odde.doughnut.entities.Link.LinkType.SPECIALIZE;
-import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.controllers.json.LinkViewed;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.testability.MakeMe;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.ValidatorFactory;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -47,18 +39,6 @@ public class LinkTest {
       Note top = makeMe.aNote().please();
       noteA = makeMe.aNote("noteA").under(top).please();
       noteB = makeMe.aNote("noteB").under(top).please();
-    }
-
-    @Test
-    public void shouldNeverUseTheNoLinkType() {
-      Link link = new Link();
-      link.setLinkType(NO_LINK);
-      ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-      Set<ConstraintViolation<Link>> violations = factory.getValidator().validate(link);
-      assertThat(violations, is(not(empty())));
-      List<String> errorFields =
-          violations.stream().map(v -> v.getPropertyPath().toString()).collect(toList());
-      assertThat(errorFields, contains("linkType"));
     }
 
     @Nested

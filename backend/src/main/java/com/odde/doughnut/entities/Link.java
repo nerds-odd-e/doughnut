@@ -13,7 +13,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.odde.doughnut.entities.QuizQuestionEntity.QuestionType;
-import com.odde.doughnut.entities.validators.ValidateLinkType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,7 +29,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@ValidateLinkType
 @Table(name = "link")
 @JsonPropertyOrder({"clozeSource", "linkTypeLabel"})
 public class Link extends Thingy {
