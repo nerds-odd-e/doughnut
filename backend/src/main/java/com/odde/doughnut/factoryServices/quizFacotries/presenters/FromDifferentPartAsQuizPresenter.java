@@ -3,19 +3,19 @@ package com.odde.doughnut.factoryServices.quizFacotries.presenters;
 import com.odde.doughnut.entities.*;
 
 public class FromDifferentPartAsQuizPresenter extends QuizQuestionWithOptionsPresenter {
-  protected final Thing link;
+  protected final Note link;
   private Thing categoryLink;
 
   public FromDifferentPartAsQuizPresenter(QuizQuestionEntity quizQuestion) {
     super(quizQuestion);
-    this.link = quizQuestion.getThing();
+    this.link = quizQuestion.getNote();
     this.categoryLink = quizQuestion.getCategoryLink();
   }
 
   @Override
   public String stem() {
     return "<p>Which one <mark>is "
-        + link.getLinkTypeLabel()
+        + link.getLinkType().label
         + "</mark> a <em>DIFFERENT</em> "
         + categoryLink.getLinkType().nameOfSource
         + " of <mark>"
@@ -25,6 +25,6 @@ public class FromDifferentPartAsQuizPresenter extends QuizQuestionWithOptionsPre
 
   @Override
   public String mainTopic() {
-    return link.getSourceNote().getTopicConstructor();
+    return link.getParent().getTopicConstructor();
   }
 }

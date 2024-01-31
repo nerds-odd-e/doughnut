@@ -1,17 +1,18 @@
 package com.odde.doughnut.factoryServices.quizFacotries.presenters;
 
 import com.odde.doughnut.controllers.json.QuizQuestion;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.Thing;
 import java.util.List;
 import java.util.stream.Stream;
 
 public class LinkSourceWithinSameLinkTypeQuizPresenter extends QuizQuestionWithOptionsPresenter {
-  protected final Thing link;
+  protected final Note link;
 
   public LinkSourceWithinSameLinkTypeQuizPresenter(QuizQuestionEntity quizQuestion) {
     super(quizQuestion);
-    this.link = quizQuestion.getThing();
+    this.link = quizQuestion.getNote();
   }
 
   @Override
@@ -21,7 +22,7 @@ public class LinkSourceWithinSameLinkTypeQuizPresenter extends QuizQuestionWithO
 
   @Override
   public String stem() {
-    return "Which one <em>is immediately " + link.getLinkTypeLabel() + "</em>:";
+    return "Which one <em>is immediately " + link.getLinkType().label + "</em>:";
   }
 
   @Override

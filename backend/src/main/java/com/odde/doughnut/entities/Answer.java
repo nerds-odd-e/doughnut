@@ -45,7 +45,7 @@ public class Answer extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public boolean isCorrect() {
     if (question.getQuestionType() == QuizQuestionEntity.QuestionType.SPELLING) {
-      return question.getThing().getNote().matchAnswer(getSpellingAnswer());
+      return question.getNote().matchAnswer(getSpellingAnswer());
     }
     return Objects.equals(getChoiceIndex(), question.getCorrectAnswerIndex());
   }

@@ -3,24 +3,24 @@ package com.odde.doughnut.factoryServices.quizFacotries.presenters;
 import com.odde.doughnut.entities.*;
 
 public class FromSamePartAsQuizPresenter extends QuizQuestionWithOptionsPresenter {
-  protected final Thing link;
+  protected final Note link;
   private final Thing categoryLink;
 
   public FromSamePartAsQuizPresenter(QuizQuestionEntity quizQuestion) {
     super(quizQuestion);
-    this.link = quizQuestion.getThing();
+    this.link = quizQuestion.getNote();
     this.categoryLink = quizQuestion.getCategoryLink();
   }
 
   @Override
   public String mainTopic() {
-    return link.getSourceNote().getTopicConstructor();
+    return link.getParent().getTopicConstructor();
   }
 
   @Override
   public String stem() {
     return "<p>Which one <mark>is "
-        + link.getLinkTypeLabel()
+        + link.getLinkType().label
         + "</mark> the same "
         + categoryLink.getLinkType().nameOfSource
         + " of <mark>"

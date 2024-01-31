@@ -34,7 +34,7 @@ public class SuggestedQuestionForFineTuningModel {
       Timestamp currentUTCTimestamp) {
     entity.setUser(user);
     entity.setCreatedAt(currentUTCTimestamp);
-    entity.preserveNoteContent(quizQuestion.getThing().getNote());
+    entity.preserveNoteContent(quizQuestion.getNote());
     entity.preserveQuestion(quizQuestion.getMcqWithAnswer());
     entity.setComment(suggestionCreationParams.comment);
     entity.setPositiveFeedback(suggestionCreationParams.isPositiveFeedback);

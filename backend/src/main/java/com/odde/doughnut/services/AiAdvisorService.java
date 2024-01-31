@@ -84,7 +84,7 @@ public class AiAdvisorService {
 
   public QuizQuestionContestResult contestQuestion(
       QuizQuestionEntity quizQuestionEntity, String modelName) {
-    return getAiQuestionGenerator(quizQuestionEntity.getThing().getNote(), modelName)
+    return getAiQuestionGenerator(quizQuestionEntity.getNote(), modelName)
         .evaluateQuestion(quizQuestionEntity.getMcqWithAnswer())
         .map(e -> e.getQuizQuestionContestResult(quizQuestionEntity.getCorrectAnswerIndex()))
         .orElse(null);

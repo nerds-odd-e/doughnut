@@ -10,7 +10,7 @@ public class PictureTitleSelectionQuizPresenter extends ClozeTitleSelectionQuizP
 
   public PictureTitleSelectionQuizPresenter(QuizQuestionEntity quizQuestion) {
     super(quizQuestion);
-    note = quizQuestion.getThing().getNote();
+    note = quizQuestion.getNote();
   }
 
   @Override

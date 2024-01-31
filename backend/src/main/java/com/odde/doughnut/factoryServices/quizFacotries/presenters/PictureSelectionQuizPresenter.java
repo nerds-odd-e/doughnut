@@ -13,7 +13,7 @@ public class PictureSelectionQuizPresenter extends QuizQuestionWithOptionsPresen
 
   public PictureSelectionQuizPresenter(QuizQuestionEntity quizQuestion) {
     super(quizQuestion);
-    this.note = quizQuestion.getThing().getNote();
+    this.note = quizQuestion.getNote();
   }
 
   @Override

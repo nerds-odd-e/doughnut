@@ -1,14 +1,14 @@
 package com.odde.doughnut.factoryServices.quizFacotries.presenters;
 
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
-import com.odde.doughnut.entities.Thing;
 
 public class LinkSourceQuizPresenter extends QuizQuestionWithOptionsPresenter {
-  protected final Thing link;
+  protected final Note link;
 
   public LinkSourceQuizPresenter(QuizQuestionEntity quizQuestion) {
     super(quizQuestion);
-    this.link = quizQuestion.getThing();
+    this.link = quizQuestion.getNote();
   }
 
   @Override
@@ -18,6 +18,6 @@ public class LinkSourceQuizPresenter extends QuizQuestionWithOptionsPresenter {
 
   @Override
   public String stem() {
-    return "Which one <em>is immediately " + link.getLinkTypeLabel() + "</em>:";
+    return "Which one <em>is immediately " + link.getLinkType().label + "</em>:";
   }
 }

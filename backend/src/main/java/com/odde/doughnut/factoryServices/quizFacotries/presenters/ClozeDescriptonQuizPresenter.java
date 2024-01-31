@@ -8,7 +8,7 @@ public abstract class ClozeDescriptonQuizPresenter extends QuizQuestionWithOptio
 
   public ClozeDescriptonQuizPresenter(QuizQuestionEntity quizQuestion) {
     super(quizQuestion);
-    this.note = quizQuestion.getThing().getNote();
+    this.note = quizQuestion.getNote();
   }
 
   @Override
