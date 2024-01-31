@@ -220,10 +220,6 @@ public abstract class NoteBase extends Thingy {
     parent = parentNote;
   }
 
-  public void mergeMasterReviewSetting(ReviewSetting reviewSetting) {
-    BeanUtils.copyProperties(reviewSetting, getReviewSetting());
-  }
-
   public void updateNoteContent(NoteAccessories noteAccessories) {
     if (noteAccessories.getUploadPicture() == null) {
       noteAccessories.setUploadPicture(getNoteAccessories().getUploadPicture());
@@ -315,6 +311,11 @@ public abstract class NoteBase extends Thingy {
   @JsonIgnore
   public Stream<Note> getDescendants() {
     return getAllChildren().stream().flatMap(c -> Stream.concat(Stream.of(c), c.getDescendants()));
+  }
+
+  @JsonIgnore
+  public Stream<Thingy> getLinksAndRefers() {
+    return Stream.concat(getLinks().stream(), getRefers().stream());
   }
 
   public static class NoteBrief {

@@ -156,7 +156,11 @@ public class ModelFactoryService {
       Timestamp currentUTCTimestamp) {
     Note note = sourceNote.buildChildNote(creator, currentUTCTimestamp, ":" + type.label);
     note.setTargetNote(targetNote);
-    note.getReviewSetting().setLevel(Math.max(sourceNote.getReviewSetting().getLevel(), targetNote.getReviewSetting().getLevel()));
+    note.getReviewSetting()
+        .setLevel(
+            Math.max(
+                sourceNote.getReviewSetting().getLevel(),
+                targetNote.getReviewSetting().getLevel()));
 
     return note;
   }

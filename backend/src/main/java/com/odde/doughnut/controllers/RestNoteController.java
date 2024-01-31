@@ -16,6 +16,7 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
+import org.springframework.beans.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.*;
 import org.springframework.web.bind.annotation.*;
@@ -173,8 +174,14 @@ class RestNoteController {
       @PathVariable("note") Note note, @Valid @RequestBody ReviewSetting reviewSetting)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
-    note.mergeMasterReviewSetting(reviewSetting);
+    BeanUtils.copyProperties(reviewSetting, note.getReviewSetting());
     modelFactoryService.save(note);
+    note.getLinksAndRefers()
+        .forEach(
+            link -> {
+              link.getThing().setLevelIfHigher(reviewSetting.getLevel());
+              modelFactoryService.save(link);
+            });
     return new RedirectToNoteResponse(note.getId());
   }
 }

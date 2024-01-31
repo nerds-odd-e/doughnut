@@ -183,4 +183,9 @@ public class Thing extends EntityIdentifiedByIdOnly {
     }
     return getNote().getReviewSetting().getLevel();
   }
+
+  @JsonIgnore
+  public void setLevelIfHigher(Integer level) {
+    getNote().getReviewSetting().setLevel(Math.max(getLevel(), level));
+  }
 }
