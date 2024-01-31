@@ -45,19 +45,15 @@ class LinkSourceQuizFactoryTest {
   void shouldReturnNullIfCannotFindEnoughOptions() {
     makeMe.aLink().between(anotherSource, target).please();
     makeMe.refresh(top);
-    assertThat(buildLinkTargetQuizQuestion(), is(nullValue()));
+    QuizQuestion actual = buildLinkSourceQuizQuestion();
+    assertThat(actual, is(nullValue()));
   }
 
   @Nested
   class WhenThereAreMoreThanOneOptions {
-    @BeforeEach
-    void setup() {
-      makeMe.refresh(top);
-    }
-
     @Test
     void shouldIncludeRightAnswers() {
-      QuizQuestion quizQuestion = buildLinkTargetQuizQuestion();
+      QuizQuestion quizQuestion = buildLinkSourceQuizQuestion();
       assertThat(
           quizQuestion.getStem(),
           equalTo("Which one <em>is immediately a specialization of</em>:"));
@@ -69,7 +65,7 @@ class LinkSourceQuizFactoryTest {
     }
   }
 
-  private QuizQuestion buildLinkTargetQuizQuestion() {
+  private QuizQuestion buildLinkSourceQuizQuestion() {
     return makeMe.buildAQuestion(LINK_SOURCE, reviewPoint);
   }
 
