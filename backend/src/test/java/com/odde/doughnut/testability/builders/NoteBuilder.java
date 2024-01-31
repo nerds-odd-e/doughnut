@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Ownership;
-import com.odde.doughnut.entities.ReviewSetting;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
@@ -110,7 +109,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder skipReview() {
-    ensureReviewSetting().setSkipReview(true);
+    entity.getMasterReviewSetting().setSkipReview(true);
     return this;
   }
 
@@ -136,15 +135,8 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder rememberSpelling() {
-    ensureReviewSetting().setRememberSpelling(true);
+    entity.getMasterReviewSetting().setRememberSpelling(true);
     return this;
-  }
-
-  private ReviewSetting ensureReviewSetting() {
-    if (entity.getMasterReviewSetting() == null) {
-      entity.setMasterReviewSetting(new ReviewSetting());
-    }
-    return entity.getMasterReviewSetting();
   }
 
   public NoteBuilder updatedAt(Timestamp timestamp) {
@@ -186,6 +178,11 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   public NoteBuilder wikidataId(String wikidataId) {
     entity.setWikidataId(wikidataId);
+    return this;
+  }
+
+  public NoteBuilder level(int i) {
+    entity.getMasterReviewSetting().setLevel(i);
     return this;
   }
 }

@@ -97,9 +97,7 @@ class TestabilityRestController {
       note.setDetails(details);
       note.setUpdatedAt(currentUTCTimestamp);
       if (skipReview != null) {
-        ReviewSetting masterReviewSetting = new ReviewSetting();
-        masterReviewSetting.setSkipReview(skipReview);
-        note.setMasterReviewSetting(masterReviewSetting);
+        note.getMasterReviewSetting().setSkipReview(skipReview);
       }
       content.setUrl(url);
       content.setPictureMask(pictureMask);

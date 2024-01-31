@@ -112,10 +112,6 @@ public class MakeMe extends MakeMeWithoutDB {
     return modelFactoryService.toUserModel(null);
   }
 
-  public ReviewSettingBuilder aReviewSettingFor(Note note) {
-    return new ReviewSettingBuilder(this, note);
-  }
-
   public QuizQuestionBuilder aQuestion() {
     return new QuizQuestionBuilder(this);
   }

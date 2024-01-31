@@ -58,10 +58,10 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
   String selectLinkWithLevelFromNotes =
       ", GREATEST(IFNULL(source.level, 0), IFNULL(target.level, 0)) as level from link "
           + "INNER JOIN ("
-          + " SELECT sourceNote.id, srs.level as level FROM note sourceNote LEFT JOIN review_setting srs ON sourceNote.master_review_setting_id = srs.id) as source "
+          + " SELECT sourceNote.id, sourceNote.level as level FROM note sourceNote) as source "
           + " ON source.id = link.source_id "
           + "INNER JOIN ("
-          + " SELECT targetNote.id, trs.level as level FROM note targetNote LEFT JOIN review_setting trs ON targetNote.master_review_setting_id = trs.id) as target "
+          + " SELECT targetNote.id, targetNote.level as level FROM note targetNote) as target "
           + " ON target.id = link.target_id ";
 
   String joinNotebook =
@@ -88,8 +88,8 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
   String orderByDate = whereThereIsNoReviewPoint + " ORDER BY level, thing.created_at";
 
   String whereNoteIsNotSkipped =
-      " LEFT JOIN review_setting rs "
-          + "   ON note.master_review_setting_id = rs.id "
+      " LEFT JOIN note rs "
+          + "   ON note.id = rs.id "
           + " WHERE rs.skip_review IS NOT TRUE "
           + "   AND note.deleted_at IS NULL "
           + ") jnote ON jnote.id = thing.note_id ";
@@ -97,7 +97,8 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
   String fromNotebook =
       " JOIN note ns ON ns.id = note.id " + "   AND ns.notebook_id = :notebookId ";
 
-  String selectThingJoinNote = "LEFT JOIN (" + " SELECT note.id as id, rs.level as level FROM note";
+  String selectThingJoinNote =
+      "LEFT JOIN (" + " SELECT note.id as id, note.level as level FROM note";
 
   String selectThings =
       selectThingsJoinLink

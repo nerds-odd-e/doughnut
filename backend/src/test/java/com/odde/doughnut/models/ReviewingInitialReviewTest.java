@@ -67,8 +67,8 @@ public class ReviewingInitialReviewTest {
 
     @Test
     void shouldReturnTheSecondNoteIfItsLevelIsLower() {
-      makeMe.aReviewSettingFor(note1).level(2).please();
-      makeMe.aReviewSettingFor(note2).level(1).please();
+      makeMe.theNote(note1).level(2).please();
+      makeMe.theNote(note2).level(1).please();
       assertThat(getFirstInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note2));
     }
 
@@ -108,8 +108,8 @@ public class ReviewingInitialReviewTest {
       class WithLevels {
         @BeforeEach
         void Note1And2HaveDifferentLevels() {
-          makeMe.aReviewSettingFor(note1).level(5).please();
-          makeMe.aReviewSettingFor(note2).level(2).please();
+          makeMe.theNote(note1).level(5).please();
+          makeMe.theNote(note2).level(2).please();
         }
 
         @Test

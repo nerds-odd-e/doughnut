@@ -105,12 +105,7 @@ public abstract class NoteBase extends Thingy {
   @Setter
   private Note parent;
 
-  @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "master_review_setting_id", referencedColumnName = "id")
-  @JsonIgnore
-  @Getter
-  @Setter
-  private ReviewSetting masterReviewSetting;
+  @Embedded @JsonIgnore @Getter private ReviewSetting masterReviewSetting = new ReviewSetting();
 
   public void setDeletedAt(Timestamp value) {
     this.deletedAt = value;
@@ -227,12 +222,7 @@ public abstract class NoteBase extends Thingy {
   }
 
   public void mergeMasterReviewSetting(ReviewSetting reviewSetting) {
-    ReviewSetting current = getMasterReviewSetting();
-    if (current == null) {
-      setMasterReviewSetting(reviewSetting);
-    } else {
-      BeanUtils.copyProperties(reviewSetting, getMasterReviewSetting());
-    }
+    BeanUtils.copyProperties(reviewSetting, getMasterReviewSetting());
   }
 
   public void updateNoteContent(NoteAccessories noteAccessories) {

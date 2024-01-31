@@ -278,11 +278,7 @@ declare namespace Generated {
         removedFromReview: boolean;
     }
 
-    interface ReviewSetting {
-        id: number;
-        rememberSpelling: boolean;
-        skipReview: boolean;
-        level: number;
+    interface ReviewSetting extends ReviewSettingBase {
     }
 
     interface Note extends NoteBase {
@@ -327,6 +323,12 @@ declare namespace Generated {
         sourceNote: Note;
         targetNote: Note;
         linkType: LinkType;
+    }
+
+    interface ReviewSettingBase {
+        rememberSpelling: boolean;
+        skipReview: boolean;
+        level: number;
     }
 
     interface NoteAccessories {
