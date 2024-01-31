@@ -7,12 +7,12 @@ import java.util.List;
 
 public class LinkSourceWithinSameLinkTypeQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory {
-  protected final Thing link;
+  protected final Note link;
   private final QuizQuestionServant servant;
   private List<Note> cachedFillingOptions = null;
 
-  public LinkSourceWithinSameLinkTypeQuizFactory(Thing thing, QuizQuestionServant servant) {
-    this.link = thing;
+  public LinkSourceWithinSameLinkTypeQuizFactory(Note note, QuizQuestionServant servant) {
+    this.link = note;
     this.servant = servant;
   }
 
@@ -20,7 +20,7 @@ public class LinkSourceWithinSameLinkTypeQuizFactory
   public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
       cachedFillingOptions =
-          servant.chooseFromCohortAvoidSiblings(link).stream()
+          servant.chooseFromCohortAvoidSiblings(link.getThing()).stream()
               .flatMap(n -> servant.randomizer.chooseOneRandomly(n.getLinkChildren()).stream())
               .toList();
     }
@@ -29,6 +29,6 @@ public class LinkSourceWithinSameLinkTypeQuizFactory
 
   @Override
   public Note generateAnswer() {
-    return link.getNote();
+    return link;
   }
 }

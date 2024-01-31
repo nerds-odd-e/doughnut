@@ -10,11 +10,11 @@ public class WhichSpecHasInstanceQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
   private Thing cachedInstanceLink = null;
   private List<Note> cachedFillingOptions = null;
-  private final Thing link;
+  private final Note link;
   private final QuizQuestionServant servant;
 
-  public WhichSpecHasInstanceQuizFactory(Thing thing, QuizQuestionServant servant) {
-    this.link = thing;
+  public WhichSpecHasInstanceQuizFactory(Note note, QuizQuestionServant servant) {
+    this.link = note;
     this.servant = servant;
   }
 
@@ -23,7 +23,7 @@ public class WhichSpecHasInstanceQuizFactory
     if (cachedFillingOptions != null) {
       return cachedFillingOptions;
     }
-    this.cachedFillingOptions = servant.chooseBackwardPeers(cachedInstanceLink, link);
+    this.cachedFillingOptions = servant.chooseBackwardPeers(cachedInstanceLink, link.getThing());
     return cachedFillingOptions;
   }
 
@@ -36,7 +36,8 @@ public class WhichSpecHasInstanceQuizFactory
 
   private Thing getInstanceLink() {
     if (cachedInstanceLink == null) {
-      List<Thing> candidates = servant.getLinksFromSameSourceHavingReviewPoint(link).toList();
+      List<Thing> candidates =
+          servant.getLinksFromSameSourceHavingReviewPoint(link.getThing()).toList();
       cachedInstanceLink = servant.randomizer.chooseOneRandomly(candidates).orElse(null);
     }
     return cachedInstanceLink;

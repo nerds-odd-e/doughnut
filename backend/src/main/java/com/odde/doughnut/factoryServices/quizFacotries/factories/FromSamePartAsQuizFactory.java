@@ -12,11 +12,11 @@ public class FromSamePartAsQuizFactory
   private final ParentGrandLinkHelper parentGrandLinkHelper;
   private Thing cachedAnswerLink = null;
   private List<Note> cachedFillingOptions = null;
-  private final Thing link;
+  private final Note link;
   private final QuizQuestionServant servant;
 
-  public FromSamePartAsQuizFactory(Thing thing, QuizQuestionServant servant) {
-    link = thing;
+  public FromSamePartAsQuizFactory(Note note, QuizQuestionServant servant) {
+    link = note;
     this.servant = servant;
     parentGrandLinkHelper = servant.getParentGrandLinkHelper(link);
   }
@@ -47,7 +47,7 @@ public class FromSamePartAsQuizFactory
   protected Thing getAnswerLink() {
     if (cachedAnswerLink == null) {
       List<Thing> backwardPeers =
-          servant.getSiblingLinksOfSameLinkTypeHavingReviewPoint(link).toList();
+          servant.getSiblingLinksOfSameLinkTypeHavingReviewPoint(link.getThing()).toList();
       cachedAnswerLink = servant.randomizer.chooseOneRandomly(backwardPeers).orElse(null);
     }
     return cachedAnswerLink;

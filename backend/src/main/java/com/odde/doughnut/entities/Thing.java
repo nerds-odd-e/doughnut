@@ -56,11 +56,6 @@ public class Thing extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public boolean isDescriptionBlankHtml() {
-    return getNote().isDetailsBlankHtml();
-  }
-
-  @JsonIgnore
   public ClozedString getClozeSource() {
     NoteBase source = getParentNote();
     NoteBase target = getTargetNote();

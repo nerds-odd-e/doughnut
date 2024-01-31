@@ -10,11 +10,11 @@ public class FromDifferentPartAsQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
 
   private final ParentGrandLinkHelper parentGrandLinkHelper;
-  private final Thing link;
+  private final Note link;
   private final QuizQuestionServant servant;
 
-  public FromDifferentPartAsQuizFactory(Thing thing, QuizQuestionServant servant) {
-    link = thing;
+  public FromDifferentPartAsQuizFactory(Note note, QuizQuestionServant servant) {
+    link = note;
     this.servant = servant;
     parentGrandLinkHelper = servant.getParentGrandLinkHelper(link);
   }
@@ -30,7 +30,9 @@ public class FromDifferentPartAsQuizFactory
       return null;
     }
     List<Thing> cousinLinks =
-        servant.getSiblingLinksOfSameLinkTypeHavingReviewPoint(link).collect(Collectors.toList());
+        servant
+            .getSiblingLinksOfSameLinkTypeHavingReviewPoint(link.getThing())
+            .collect(Collectors.toList());
     return servant.chooseFillingOptionsRandomly(cousinLinks).stream()
         .map(Thing::getParentNote)
         .collect(Collectors.toList());

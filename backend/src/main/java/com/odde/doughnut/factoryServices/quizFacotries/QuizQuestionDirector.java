@@ -18,7 +18,7 @@ public record QuizQuestionDirector(
   private QuizQuestionEntity buildAQuestionOfType(
       QuizQuestionEntity.QuestionType questionType, Thing thing, QuizQuestionServant servant)
       throws QuizQuestionNotPossibleException {
-    QuizQuestionFactory quizQuestionFactory = questionType.factory.apply(thing, servant);
+    QuizQuestionFactory quizQuestionFactory = questionType.factory.apply(thing.getNote(), servant);
 
     quizQuestionFactory.validatePossibility();
 
