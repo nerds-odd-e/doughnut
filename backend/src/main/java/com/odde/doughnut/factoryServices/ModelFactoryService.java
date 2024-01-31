@@ -136,7 +136,7 @@ public class ModelFactoryService {
     return entityManager.find(Note.class, note.getId());
   }
 
-  public Thing createLink(
+  public Note createLink(
       Note sourceNote,
       Note targetNote,
       User creator,
@@ -145,7 +145,7 @@ public class ModelFactoryService {
     if (type == null || type == LinkType.NO_LINK) return null;
     Note link = buildALink(sourceNote, targetNote, creator, type, currentUTCTimestamp);
     save(link);
-    return link.getThing();
+    return link;
   }
 
   public static Note buildALink(
