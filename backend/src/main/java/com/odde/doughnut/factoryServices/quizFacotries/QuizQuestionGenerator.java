@@ -13,7 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 public record QuizQuestionGenerator(
     User user,
-    Thing thing,
+    Note thing,
     Randomizer randomizer,
     ModelFactoryService modelFactoryService,
     AiAdvisorService aiAdvisorService) {

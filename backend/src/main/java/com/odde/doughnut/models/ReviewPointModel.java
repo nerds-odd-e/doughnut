@@ -38,7 +38,7 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
       Randomizer randomizer, AiAdvisorService aiAdvisorService) {
     QuizQuestionGenerator quizQuestionGenerator =
         new QuizQuestionGenerator(
-            entity.getUser(), entity.getThing(), randomizer, modelFactoryService, aiAdvisorService);
+            entity.getUser(), entity.getNote(), randomizer, modelFactoryService, aiAdvisorService);
     return quizQuestionGenerator;
   }
 

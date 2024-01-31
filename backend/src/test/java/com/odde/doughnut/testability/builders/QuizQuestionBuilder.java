@@ -26,7 +26,7 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
     QuizQuestionGenerator builder =
         new QuizQuestionGenerator(
             reviewPoint.getUser(),
-            reviewPoint.getThing(),
+            reviewPoint.getNote(),
             new NonRandomizer(),
             makeMe.modelFactoryService,
             null);

@@ -71,7 +71,7 @@ class RestQuizQuestionController {
   private QuizQuestion generateAIQuestion(Thing thing) {
     QuizQuestionGenerator quizQuestionGenerator =
         new QuizQuestionGenerator(
-            currentUser.getEntity(), thing, null, modelFactoryService, aiAdvisorService);
+            currentUser.getEntity(), thing.getNote(), null, modelFactoryService, aiAdvisorService);
     return quizQuestionGenerator.generateAQuestionOfFirstPossibleType(
         List.of(QuizQuestionEntity.QuestionType.AI_QUESTION));
   }

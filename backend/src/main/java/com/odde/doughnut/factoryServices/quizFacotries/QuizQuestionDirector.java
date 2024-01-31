@@ -2,7 +2,6 @@ package com.odde.doughnut.factoryServices.quizFacotries;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
-import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.QuestionOptionsFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.QuestionRawJsonFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.SecondaryReviewPointsFactory;
@@ -11,19 +10,19 @@ import java.util.List;
 public record QuizQuestionDirector(
     QuizQuestionEntity.QuestionType questionType, QuizQuestionServant servant) {
 
-  public QuizQuestionEntity invoke(Thing thing) throws QuizQuestionNotPossibleException {
-    return buildAQuestionOfType(questionType, thing, servant);
+  public QuizQuestionEntity invoke(Note note) throws QuizQuestionNotPossibleException {
+    return buildAQuestionOfType(questionType, note, servant);
   }
 
   private QuizQuestionEntity buildAQuestionOfType(
-      QuizQuestionEntity.QuestionType questionType, Thing thing, QuizQuestionServant servant)
+      QuizQuestionEntity.QuestionType questionType, Note note, QuizQuestionServant servant)
       throws QuizQuestionNotPossibleException {
-    QuizQuestionFactory quizQuestionFactory = questionType.factory.apply(thing.getNote(), servant);
+    QuizQuestionFactory quizQuestionFactory = questionType.factory.apply(note, servant);
 
     quizQuestionFactory.validatePossibility();
 
     QuizQuestionEntity quizQuestion = new QuizQuestionEntity();
-    quizQuestion.setNote(thing.getNote());
+    quizQuestion.setNote(note);
     quizQuestion.setQuestionType(questionType);
 
     if (quizQuestionFactory instanceof QuestionRawJsonFactory rawJsonFactory) {
