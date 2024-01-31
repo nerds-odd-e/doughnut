@@ -2,10 +2,7 @@ package com.odde.doughnut.models.quizFacotries;
 
 import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.LINK_SOURCE;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.in;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.Note;
@@ -66,6 +63,7 @@ class LinkSourceQuizFactoryTest {
           equalTo("Which one <em>is immediately a specialization of</em>:"));
       assertThat(quizQuestion.getMainTopic(), equalTo(target.getTopicConstructor()));
       List<String> options = toOptionStrings(quizQuestion);
+      assertThat(options, hasSize(2));
       assertThat(anotherSource.getTopicConstructor(), in(options));
       assertThat("tomato sauce", in(options));
     }
