@@ -105,7 +105,7 @@ public abstract class NoteBase extends Thingy {
   @Setter
   private Note parent;
 
-  @Embedded @JsonIgnore @Getter private ReviewSetting masterReviewSetting = new ReviewSetting();
+  @Embedded @JsonIgnore @Getter private ReviewSetting reviewSetting = new ReviewSetting();
 
   public void setDeletedAt(Timestamp value) {
     this.deletedAt = value;
@@ -222,7 +222,7 @@ public abstract class NoteBase extends Thingy {
   }
 
   public void mergeMasterReviewSetting(ReviewSetting reviewSetting) {
-    BeanUtils.copyProperties(reviewSetting, getMasterReviewSetting());
+    BeanUtils.copyProperties(reviewSetting, getReviewSetting());
   }
 
   public void updateNoteContent(NoteAccessories noteAccessories) {

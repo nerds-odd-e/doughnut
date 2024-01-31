@@ -28,7 +28,7 @@ public class SpellingQuizFactory implements QuizQuestionFactory {
     if (answerNote.isDetailsBlankHtml()) {
       return false;
     }
-    ReviewSetting reviewSetting = answerNote.getMasterReviewSetting();
+    ReviewSetting reviewSetting = answerNote.getReviewSetting();
     return reviewSetting != null && reviewSetting.getRememberSpelling();
   }
 }

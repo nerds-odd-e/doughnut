@@ -177,8 +177,8 @@ public class Thing extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public Integer getLevel() {
     if (getLink() != null) {
-      return getLink().getSourceNote().getMasterReviewSetting().getLevel();
+      return getLink().getSourceNote().getReviewSetting().getLevel();
     }
-    return getNote().getMasterReviewSetting().getLevel();
+    return getNote().getReviewSetting().getLevel();
   }
 }

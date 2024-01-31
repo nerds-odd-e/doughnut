@@ -124,7 +124,7 @@ class RestNoteController {
     noteInfo.setReviewPoint(currentUser.getReviewPointFor(note));
     noteInfo.setNote(new NoteViewer(currentUser.getEntity(), note).toJsonObject());
     noteInfo.setCreatedAt(note.getThing().getCreatedAt());
-    noteInfo.setReviewSetting(note.getMasterReviewSetting());
+    noteInfo.setReviewSetting(note.getReviewSetting());
     return noteInfo;
   }
 
