@@ -43,7 +43,7 @@ class RestLinkController {
     this.currentUser = currentUser;
   }
 
-  @GetMapping("/{link}")
+  @GetMapping("/seemsdead/{link}")
   public Link show(@PathVariable("link") Link link) throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(link);
     return link;
