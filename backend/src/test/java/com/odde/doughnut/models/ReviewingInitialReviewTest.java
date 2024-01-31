@@ -99,8 +99,8 @@ public class ReviewingInitialReviewTest {
         List<ReviewPoint> reviewPoints = getAllDueReviewPoints();
         assertThat(reviewPoints, hasSize(4));
         assertThat(reviewPoints.get(0).getNote(), equalTo(note1));
-        assertThat(reviewPoints.get(1).getNote(), equalTo(note2));
         assertThat(reviewPoints.get(2).getThing(), equalTo(note1ToNote2));
+        assertThat(reviewPoints.get(1).getNote(), equalTo(note2));
         assertThat(reviewPoints.get(3).getNote(), equalTo(anotherNote));
       }
 
