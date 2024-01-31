@@ -143,9 +143,32 @@ public class LinkTest {
     }
 
     @Test
-    void shouldGetReversedLinkIfItBelongsToTheUser() {
+    void shouldGetSourceLevelWhenItIsHigher() {
       makeMe.theNote(source).level(5).please();
       Thing link = makeMe.aLink().between(source, target).inMemoryPlease();
+      assertThat(link.getLevel(), is(5));
+    }
+
+    @Test
+    void shouldGetTargetLevelWhenItIsHigher() {
+      makeMe.theNote(target).level(5).please();
+      Thing link = makeMe.aLink().between(source, target).inMemoryPlease();
+      assertThat(link.getLevel(), is(5));
+    }
+
+    @Test
+    void linkLevelGetUpdatedWhenTargetLevelChange() {
+      Thing link = makeMe.aLink().between(source, target).please();
+      makeMe.theNote(target).level(5).please();
+      makeMe.refresh(link);
+      assertThat(link.getLevel(), is(5));
+    }
+
+    @Test
+    void linkLevelGetUpdatedWhenSourceLevelChange() {
+      Thing link = makeMe.aLink().between(source, target).please();
+      makeMe.theNote(source).level(5).please();
+      makeMe.refresh(link);
       assertThat(link.getLevel(), is(5));
     }
   }
