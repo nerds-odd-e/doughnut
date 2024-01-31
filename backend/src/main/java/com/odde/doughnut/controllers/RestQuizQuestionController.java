@@ -48,7 +48,7 @@ class RestQuizQuestionController {
   @Transactional
   public QuizQuestion generateQuestion(@RequestParam(value = "note") Note note) {
     currentUser.assertLoggedIn();
-    return generateAIQuestion(note.getThing());
+    return generateAIQuestion(note);
   }
 
   @PostMapping("/{quizQuestion}/contest")
@@ -65,13 +65,13 @@ class RestQuizQuestionController {
   public QuizQuestion regenerate(
       @PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity) {
     currentUser.assertLoggedIn();
-    return generateAIQuestion(quizQuestionEntity.getThing());
+    return generateAIQuestion(quizQuestionEntity.getNote());
   }
 
-  private QuizQuestion generateAIQuestion(Thing thing) {
+  private QuizQuestion generateAIQuestion(Note thing) {
     QuizQuestionGenerator quizQuestionGenerator =
         new QuizQuestionGenerator(
-            currentUser.getEntity(), thing.getNote(), null, modelFactoryService, aiAdvisorService);
+            currentUser.getEntity(), thing, null, modelFactoryService, aiAdvisorService);
     return quizQuestionGenerator.generateAQuestionOfFirstPossibleType(
         List.of(QuizQuestionEntity.QuestionType.AI_QUESTION));
   }

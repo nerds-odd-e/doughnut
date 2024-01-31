@@ -76,6 +76,11 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   @Getter
   private Thing thing;
 
+  @JsonIgnore
+  public Note getNote() {
+    return thing.getNote();
+  }
+
   @Column(name = "question_type")
   @Getter
   @Setter
