@@ -114,10 +114,9 @@ public abstract class NoteBase extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public boolean targetVisibleAsSourceOrTo(User viewer) {
-    Thing thing = getThing();
-    if (thing.getParentNote().getNotebook() == thing.getTargetNote().getNotebook()) return true;
+    if (getParent().getNotebook() == getTargetNote().getNotebook()) return true;
     if (viewer == null) return false;
-    return viewer.canReferTo(thing.getTargetNote().getNotebook());
+    return viewer.canReferTo(getTargetNote().getNotebook());
   }
 
   @JsonIgnore

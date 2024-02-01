@@ -13,7 +13,6 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import jakarta.annotation.Resource;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -61,10 +60,7 @@ class RestReviewsController {
     Reviewing reviewing =
         currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp(), timeZone);
 
-    return reviewing
-        .getDueInitialReviewPoints()
-        .map(ReviewPoint::getThing)
-        .collect(Collectors.toList());
+    return reviewing.getDueInitialReviewPoints().map(Note::getThing).toList();
   }
 
   @PostMapping(path = "")

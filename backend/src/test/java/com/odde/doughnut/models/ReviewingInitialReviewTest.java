@@ -59,23 +59,23 @@ public class ReviewingInitialReviewTest {
     @Test
     void shouldReturnTheFirstNoteAndThenTheSecondWhenThereAreTwo() {
       assertThat(reviewingOnDay1.getReviewStatus().toInitialReviewCount, equalTo(2));
-      assertThat(getFirstInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note1));
+      assertThat(getFirstInitialReviewPoint(reviewingOnDay1), equalTo(note1));
       makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
       assertThat(reviewingOnDay1.getReviewStatus().toInitialReviewCount, equalTo(1));
-      assertThat(getFirstInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note2));
+      assertThat(getFirstInitialReviewPoint(reviewingOnDay1), equalTo(note2));
     }
 
     @Test
     void shouldReturnTheSecondNoteIfItsLevelIsLower() {
       makeMe.theNote(note1).level(2).please();
       makeMe.theNote(note2).level(1).please();
-      assertThat(getFirstInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note2));
+      assertThat(getFirstInitialReviewPoint(reviewingOnDay1), equalTo(note2));
     }
 
     @Test
     void shouldNotIncludeNoteThatIsSkippedForReview() {
       makeMe.theNote(note1).skipReview().linkTo(note2).please();
-      assertThat(getFirstInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note2));
+      assertThat(getFirstInitialReviewPoint(reviewingOnDay1), equalTo(note2));
     }
 
     @Nested
@@ -90,18 +90,18 @@ public class ReviewingInitialReviewTest {
         makeMe.refresh(userModel.getEntity());
       }
 
-      private List<ReviewPoint> getAllDueReviewPoints() {
+      private List<Note> getAllDueReviewPoints() {
         return reviewingOnDay1.getDueInitialReviewPoints().collect(Collectors.toList());
       }
 
       @Test
       void shouldReturnLinkBeforeAnotherNote() {
-        List<ReviewPoint> reviewPoints = getAllDueReviewPoints();
+        List<Note> reviewPoints = getAllDueReviewPoints();
         assertThat(reviewPoints, hasSize(4));
-        assertThat(reviewPoints.get(0).getNote(), equalTo(note1));
-        assertThat(reviewPoints.get(2).getNote(), equalTo(note1ToNote2.getNote()));
-        assertThat(reviewPoints.get(1).getNote(), equalTo(note2));
-        assertThat(reviewPoints.get(3).getNote(), equalTo(anotherNote));
+        assertThat(reviewPoints.get(0), equalTo(note1));
+        assertThat(reviewPoints.get(2), equalTo(note1ToNote2.getNote()));
+        assertThat(reviewPoints.get(1), equalTo(note2));
+        assertThat(reviewPoints.get(3), equalTo(anotherNote));
       }
 
       @Nested
@@ -115,34 +115,34 @@ public class ReviewingInitialReviewTest {
 
         @Test
         void shouldReturnReviewPointForLowerLevelNoteOrLink() {
-          List<ReviewPoint> reviewPoints = getAllDueReviewPoints();
+          List<Note> reviewPoints = getAllDueReviewPoints();
           assertThat(reviewPoints, hasSize(4));
-          assertThat(reviewPoints.get(0).getNote(), equalTo(anotherNote));
-          assertThat(reviewPoints.get(1).getNote(), equalTo(note2));
-          assertThat(reviewPoints.get(2).getNote(), equalTo(note1));
-          assertThat(reviewPoints.get(3).getNote(), equalTo(note1ToNote2.getNote()));
+          assertThat(reviewPoints.get(0), equalTo(anotherNote));
+          assertThat(reviewPoints.get(1), equalTo(note2));
+          assertThat(reviewPoints.get(2), equalTo(note1));
+          assertThat(reviewPoints.get(3), equalTo(note1ToNote2.getNote()));
         }
 
         @Test
         void shouldReturnLinksOrderedByLevels() {
           Thing aLevel2Link = makeMe.aLink().between(anotherNote, note2).please();
           makeMe.refresh(userModel.getEntity());
-          List<ReviewPoint> reviewPoints = getAllDueReviewPoints();
+          List<Note> reviewPoints = getAllDueReviewPoints();
           assertThat(reviewPoints, hasSize(5));
-          assertThat(reviewPoints.get(0).getNote(), equalTo(anotherNote));
-          assertThat(reviewPoints.get(1).getNote(), equalTo(note2));
-          assertThat(reviewPoints.get(2).getNote(), equalTo(aLevel2Link.getNote()));
-          assertThat(reviewPoints.get(4).getNote(), equalTo(note1ToNote2.getNote()));
+          assertThat(reviewPoints.get(0), equalTo(anotherNote));
+          assertThat(reviewPoints.get(1), equalTo(note2));
+          assertThat(reviewPoints.get(2), equalTo(aLevel2Link.getNote()));
+          assertThat(reviewPoints.get(4), equalTo(note1ToNote2.getNote()));
         }
 
         @Test
         void shouldNotReturnReviewPointForLinkIfCreatedByOtherPeople() {
           makeMe.theNote(note1).notebookOwnership(makeMe.aUser().please()).please();
           makeMe.refresh(userModel.getEntity());
-          List<ReviewPoint> reviewPoints = getAllDueReviewPoints();
+          List<Note> reviewPoints = getAllDueReviewPoints();
           assertThat(reviewPoints, hasSize(2));
-          assertThat(reviewPoints.get(0).getNote(), equalTo(anotherNote));
-          assertThat(reviewPoints.get(1).getNote(), equalTo(note2));
+          assertThat(reviewPoints.get(0), equalTo(anotherNote));
+          assertThat(reviewPoints.get(1), equalTo(note2));
         }
       }
     }
@@ -157,7 +157,7 @@ public class ReviewingInitialReviewTest {
 
       @Test
       void shouldReturnOneIfUsersDailySettingIsOne() {
-        assertThat(getFirstInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note1));
+        assertThat(getFirstInitialReviewPoint(reviewingOnDay1), equalTo(note1));
       }
 
       @Test
@@ -174,13 +174,13 @@ public class ReviewingInitialReviewTest {
             .initiallyReviewedOn(day1)
             .removedFromReview()
             .please();
-        assertThat(getFirstInitialReviewPoint(reviewingOnDay1).getNote(), is(note2));
+        assertThat(getFirstInitialReviewPoint(reviewingOnDay1), is(note2));
       }
 
       @Test
       void shouldIncludeNotesThatAreReviewedByOtherPeople() {
         makeMe.aReviewPointFor(note1).by(anotherUser).initiallyReviewedOn(day1).please();
-        assertThat(getFirstInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note1));
+        assertThat(getFirstInitialReviewPoint(reviewingOnDay1), equalTo(note1));
       }
 
       @Test
@@ -196,7 +196,7 @@ public class ReviewingInitialReviewTest {
         makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
         Timestamp day2 = makeMe.aTimestamp().of(2, 1).fromShanghai().please();
         Reviewing reviewing = userModel.createReviewing(day2, ZoneId.of("Asia/Shanghai"));
-        assertThat(getFirstInitialReviewPoint(reviewing).getNote(), equalTo(note2));
+        assertThat(getFirstInitialReviewPoint(reviewing), equalTo(note2));
       }
     }
   }
@@ -223,15 +223,15 @@ public class ReviewingInitialReviewTest {
 
     @Test
     void shouldReturnReviewPointForNote() {
-      assertThat(getFirstInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note1));
+      assertThat(getFirstInitialReviewPoint(reviewingOnDay1), equalTo(note1));
     }
 
     @Test
     void shouldReturnReviewPointForLink() {
       makeMe.theNote(note2).skipReview().please();
       makeMe.theNote(note1).skipReview().linkTo(note2).please();
-      ReviewPoint reviewPoint = getFirstInitialReviewPoint(reviewingOnDay1);
-      assertThat(reviewPoint.getNote().getParent(), equalTo(note1));
+      Note noteToReview = getFirstInitialReviewPoint(reviewingOnDay1);
+      assertThat(noteToReview.getParent(), equalTo(note1));
     }
 
     @Test
@@ -259,7 +259,7 @@ public class ReviewingInitialReviewTest {
     }
   }
 
-  private ReviewPoint getFirstInitialReviewPoint(Reviewing reviewing) {
+  private Note getFirstInitialReviewPoint(Reviewing reviewing) {
     return reviewing.getDueInitialReviewPoints().findFirst().orElse(null);
   }
 }

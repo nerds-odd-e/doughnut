@@ -2,6 +2,7 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.controllers.json.DueReviewPoints;
 import com.odde.doughnut.controllers.json.ReviewStatus;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteBase;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -27,7 +28,7 @@ public class Reviewing {
     this.modelFactoryService = modelFactoryService;
   }
 
-  public Stream<ReviewPoint> getDueInitialReviewPoints() {
+  public Stream<Note> getDueInitialReviewPoints() {
     int count = remainingDailyNewNotesCount();
     if (count == 0) {
       return Stream.empty();
@@ -47,11 +48,8 @@ public class Reviewing {
         .limit(count);
   }
 
-  private Stream<ReviewPoint> getDueNewReviewPoint(ReviewScope reviewScope, int count) {
-    return reviewScope
-        .getThingHaveNotBeenReviewedAtAll()
-        .limit(count)
-        .map(ReviewPoint::buildReviewPointForNote);
+  private Stream<Note> getDueNewReviewPoint(ReviewScope reviewScope, int count) {
+    return reviewScope.getThingHaveNotBeenReviewedAtAll().limit(count);
   }
 
   private Stream<ReviewPoint> getReviewPointsNeedToRepeat(int dueInDays) {
