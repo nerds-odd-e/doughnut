@@ -10,7 +10,6 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.lang.Nullable;
@@ -72,14 +71,7 @@ public class Thing extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public Stream<Note> getSiblingLinksOfSameLinkType(User user) {
-    return note.targetNoteViewer(user)
-        .linksOfTypeThroughReverse(getLinkType())
-        .filter(l -> !l.equals(this));
-  }
-
-  @JsonIgnore
   public List<Note> getLinkedSiblingsOfSameLinkType(User user) {
-    return getSiblingLinksOfSameLinkType(user).map(Note::getParent).toList();
+    return note.getSiblingLinksOfSameLinkType(user).map(Note::getParent).toList();
   }
 }

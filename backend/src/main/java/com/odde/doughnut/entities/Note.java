@@ -1,8 +1,10 @@
 package com.odde.doughnut.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.models.NoteViewer;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
+import java.util.stream.Stream;
 
 @Entity
 @Table(name = "note")
@@ -41,5 +43,12 @@ public class Note extends NoteBase {
 
   public NoteViewer targetNoteViewer(User user) {
     return new NoteViewer(user, getTargetNote());
+  }
+
+  @JsonIgnore
+  public Stream<Note> getSiblingLinksOfSameLinkType(User user) {
+    return targetNoteViewer(user)
+        .linksOfTypeThroughReverse(getLinkType())
+        .filter(l -> !l.equals(this));
   }
 }

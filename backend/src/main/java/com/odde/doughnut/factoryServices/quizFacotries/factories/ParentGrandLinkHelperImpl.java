@@ -31,7 +31,6 @@ public record ParentGrandLinkHelperImpl(User user, Note link, Note parentGrandLi
                 .map(Note::getTargetNote)
                 .toList();
     return parentGrandLink
-        .getThing()
         .getSiblingLinksOfSameLinkType(user)
         .filter(cl1 -> !linkTargetOfType.contains(cl1.getParent()));
   }

@@ -46,7 +46,7 @@ public class FromSamePartAsQuizFactory
   protected Note getAnswerLink() {
     if (cachedAnswerLink == null) {
       List<Note> backwardPeers =
-          servant.getSiblingLinksOfSameLinkTypeHavingReviewPoint(link.getThing()).toList();
+          servant.getSiblingLinksOfSameLinkTypeHavingReviewPoint(link).toList();
       cachedAnswerLink = servant.randomizer.chooseOneRandomly(backwardPeers).orElse(null);
     }
     return cachedAnswerLink;

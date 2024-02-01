@@ -65,7 +65,7 @@ public class QuizQuestionServant {
     return randomizer.randomlyChoose(maxFillingOptionCount, candidates).toList();
   }
 
-  public Stream<Note> getSiblingLinksOfSameLinkTypeHavingReviewPoint(Thing link) {
+  public Stream<Note> getSiblingLinksOfSameLinkTypeHavingReviewPoint(Note link) {
     return linksWithReviewPoint(link.getSiblingLinksOfSameLinkType(this.user));
   }
 
