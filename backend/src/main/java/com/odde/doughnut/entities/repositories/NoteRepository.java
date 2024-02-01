@@ -3,12 +3,16 @@ package com.odde.doughnut.entities.repositories;
 import com.odde.doughnut.entities.Note;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.stream.Stream;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface NoteRepository extends CrudRepository<Note, Integer> {
+
+  @Query(value = "SELECT note.* FROM note where id in (:ids)", nativeQuery = true)
+  Stream<Note> findAllByIds(List<Integer> ids);
 
   @Query(value = selectFromNote + " where topic_constructor = :key limit 1", nativeQuery = true)
   Note findFirstByTopicConstructor(@Param("key") String key);

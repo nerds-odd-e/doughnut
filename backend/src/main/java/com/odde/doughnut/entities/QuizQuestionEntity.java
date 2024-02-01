@@ -102,7 +102,7 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   @Column(name = "option_thing_ids")
   @Getter
   @Setter
-  private String optionThingIds = "";
+  private String optionNoteIds = "";
 
   @Column(name = "correct_answer_index")
   @Getter
@@ -133,19 +133,14 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
     optionsEntities.add(answerNote);
     List<Note> shuffled = randomizer.shuffle(optionsEntities);
     setCorrectAnswerIndex(shuffled.indexOf(answerNote));
-    setOptionThingIds(
-        shuffled.stream()
-            .map(Note::getThing)
-            .map(Thing::getId)
-            .map(Object::toString)
-            .collect(Collectors.joining(",")));
+    setOptionNoteIds(
+        shuffled.stream().map(Note::getId).map(Object::toString).collect(Collectors.joining(",")));
   }
 
   @JsonIgnore
-  public List<Integer> getChoiceThingIds() {
-    String optionThingIds = getOptionThingIds();
-    if (Strings.isBlank(optionThingIds)) return List.of();
-    return Arrays.stream(optionThingIds.split(","))
+  public List<Integer> getChoiceNoteIds() {
+    if (Strings.isBlank(optionNoteIds)) return List.of();
+    return Arrays.stream(optionNoteIds.split(","))
         .map(Integer::parseInt)
         .collect(Collectors.toList());
   }

@@ -2,7 +2,6 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.models.NoteViewer;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -40,13 +39,6 @@ public class Thing extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   private User creator;
-
-  @JsonIgnore
-  public ClozedString getClozeSource() {
-    NoteBase source = getParentNote();
-    NoteBase target = getTargetNote();
-    return ClozedString.htmlClozedString(source.getTopicConstructor()).hide(target.getNoteTitle());
-  }
 
   @JsonIgnore
   public Note getParentNote() {

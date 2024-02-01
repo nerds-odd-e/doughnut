@@ -8,10 +8,8 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionPresenter;
 import com.odde.doughnut.models.*;
 import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -105,12 +103,6 @@ public class ModelFactoryService {
             .jsonNotebookViewedByUser(quizQuestionEntity.getHeadNoteOfNotebook().getNotebook()),
         presenter.getOptions(this),
         presenter.pictureWithMask());
-  }
-
-  public Stream<Thing> getThingStreamAndKeepOriginalOrder(List<Integer> idList) {
-    return thingRepository
-        .findAllByIds(idList)
-        .sorted(Comparator.comparing(v -> idList.indexOf(v.getId())));
   }
 
   public SuggestedQuestionForFineTuningModel toSuggestedQuestionForFineTuningService(

@@ -1,9 +1,10 @@
 package com.odde.doughnut.factoryServices.quizFacotries.presenters;
 
+import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteBase;
 import com.odde.doughnut.entities.QuizQuestionEntity;
-import com.odde.doughnut.entities.Thing;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -26,12 +27,17 @@ public class LinkSourceWithinSameLinkTypeQuizPresenter extends QuizQuestionWithO
   }
 
   @Override
-  protected List<QuizQuestion.Choice> getOptionsFromThings(Stream<Thing> noteStream) {
+  protected List<QuizQuestion.Choice> getOptionsFromNote(Stream<Note> noteStream) {
     return noteStream
         .map(
-            thing -> {
+            note -> {
               QuizQuestion.Choice choice = new QuizQuestion.Choice();
-              choice.setDisplay(thing.getClozeSource().clozeTitle());
+              NoteBase source = note.getParent();
+              NoteBase target = note.getTargetNote();
+              choice.setDisplay(
+                  ClozedString.htmlClozedString(source.getTopicConstructor())
+                      .hide(target.getNoteTitle())
+                      .clozeTitle());
               return choice;
             })
         .toList();
