@@ -527,7 +527,7 @@ class RestNoteControllerTests {
       reviewSetting.setLevel(4);
       controller.updateReviewSetting(source, reviewSetting);
       makeMe.refresh(link);
-      assertThat(link.getLevel(), is(4));
+      assertThat(getLevel(link), is(4));
     }
 
     @Test
@@ -536,7 +536,11 @@ class RestNoteControllerTests {
       reviewSetting.setLevel(4);
       controller.updateReviewSetting(target, reviewSetting);
       makeMe.refresh(link);
-      assertThat(link.getLevel(), is(4));
+      assertThat(getLevel(link), is(4));
+    }
+
+    private static Integer getLevel(Thing link) {
+      return link.getNote().getReviewSetting().getLevel();
     }
   }
 }

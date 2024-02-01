@@ -1,5 +1,6 @@
 package com.odde.doughnut.entities;
 
+import com.odde.doughnut.models.NoteViewer;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 
@@ -36,5 +37,9 @@ public class Note extends NoteBase {
     notebook.setOwnership(ownership);
     notebook.setHeadNote(this);
     setNotebook(notebook);
+  }
+
+  public NoteViewer targetNoteViewer(User user) {
+    return new NoteViewer(user, getTargetNote());
   }
 }

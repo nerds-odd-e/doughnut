@@ -12,7 +12,6 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -62,10 +61,6 @@ public class QuizQuestionServant {
     return grand.getDescendants().filter(notePredicate).collect(Collectors.toList());
   }
 
-  private Optional<Note> chooseOneCategoryLink(Note link) {
-    return randomizer.chooseOneRandomly(link.getThing().categoryLinksOfTarget(this.user));
-  }
-
   public <T> List<T> chooseFillingOptionsRandomly(List<T> candidates) {
     return randomizer.randomlyChoose(maxFillingOptionCount, candidates).toList();
   }
@@ -86,7 +81,17 @@ public class QuizQuestionServant {
   }
 
   public ParentGrandLinkHelper getParentGrandLinkHelper(Note link) {
-    Note parentGrandLink = chooseOneCategoryLink(link).orElse(null);
+    Note parentGrandLink =
+        randomizer
+            .chooseOneRandomly(
+                link.targetNoteViewer(this.user)
+                    .linksOfTypeThroughDirect(
+                        List.of(
+                            LinkType.PART,
+                            LinkType.INSTANCE,
+                            LinkType.SPECIALIZE,
+                            LinkType.APPLICATION)))
+            .orElse(null);
     if (parentGrandLink == null) return new NullParentGrandLinkHelper();
     return new ParentGrandLinkHelperImpl(this.user, link, parentGrandLink);
   }

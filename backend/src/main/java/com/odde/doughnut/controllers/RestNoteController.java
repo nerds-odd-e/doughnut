@@ -179,7 +179,8 @@ class RestNoteController {
     note.getLinksAndRefers()
         .forEach(
             link -> {
-              link.getThing().setLevelIfHigher(reviewSetting.getLevel());
+              link.getReviewSetting()
+                  .setLevel(Math.max(link.getReviewSetting().getLevel(), reviewSetting.getLevel()));
               modelFactoryService.save(link);
             });
     return new RedirectToNoteResponse(note.getId());

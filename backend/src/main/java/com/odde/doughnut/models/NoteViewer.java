@@ -61,8 +61,13 @@ public class NoteViewer {
 
   public Stream<Note> linksOfTypeThroughReverse(LinkType linkType) {
     return note.getRefers().stream()
-        .filter(l -> l.getThing().getLinkType().equals(linkType))
-        .filter(l -> l.getThing().sourceVisibleAsTargetOrTo(viewer));
+        .filter(l -> l.getLinkType().equals(linkType))
+        .filter(
+            l -> {
+              if (l.getParent().getNotebook() == l.getTargetNote().getNotebook()) return true;
+              if (viewer == null) return false;
+              return viewer.canReferTo(l.getParent().getNotebook());
+            });
   }
 
   public NotePositionViewedByUser jsonNotePosition() {

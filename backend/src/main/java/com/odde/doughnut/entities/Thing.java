@@ -2,7 +2,6 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.odde.doughnut.models.NoteViewer;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -63,11 +62,6 @@ public class Thing extends EntityIdentifiedByIdOnly {
     getNote().setTargetNote(to);
   }
 
-  @JsonIgnore
-  public String getLinkTypeLabel() {
-    return getLinkType().label;
-  }
-
   @Nullable
   public LinkType getLinkType() {
     return getNote().getLinkType();
@@ -79,7 +73,7 @@ public class Thing extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public Stream<Note> getSiblingLinksOfSameLinkType(User user) {
-    return new NoteViewer(user, getTargetNote())
+    return note.targetNoteViewer(user)
         .linksOfTypeThroughReverse(getLinkType())
         .filter(l -> !l.equals(this));
   }
@@ -87,30 +81,5 @@ public class Thing extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public List<Note> getLinkedSiblingsOfSameLinkType(User user) {
     return getSiblingLinksOfSameLinkType(user).map(Note::getParent).toList();
-  }
-
-  @JsonIgnore
-  public List<Note> categoryLinksOfTarget(User user) {
-    return new NoteViewer(user, getTargetNote())
-        .linksOfTypeThroughDirect(
-            List.of(LinkType.PART, LinkType.INSTANCE, LinkType.SPECIALIZE, LinkType.APPLICATION));
-  }
-
-  @JsonIgnore
-  public boolean sourceVisibleAsTargetOrTo(User viewer) {
-    if (getSourceNote().getNotebook() == getTargetNote().getNotebook()) return true;
-    if (viewer == null) return false;
-
-    return viewer.canReferTo(getSourceNote().getNotebook());
-  }
-
-  @JsonIgnore
-  public Integer getLevel() {
-    return getNote().getReviewSetting().getLevel();
-  }
-
-  @JsonIgnore
-  public void setLevelIfHigher(Integer level) {
-    getNote().getReviewSetting().setLevel(Math.max(getLevel(), level));
   }
 }
