@@ -72,16 +72,10 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   }
 
   @ManyToOne(cascade = CascadeType.DETACH)
-  @JoinColumn(name = "thing_id", referencedColumnName = "id")
-  private Thing thing;
-
-  public Note getNote() {
-    return thing.getNote();
-  }
-
-  public void setNote(Note note) {
-    this.thing = note.getThing();
-  }
+  @JoinColumn(name = "note_id", referencedColumnName = "id")
+  @Getter
+  @Setter
+  private Note note;
 
   @Column(name = "question_type")
   @Getter
@@ -148,14 +142,6 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public ReviewPoint getReviewPointFor(UserModel userModel) {
     return userModel.getReviewPointFor(getNote());
-  }
-
-  @JsonIgnore
-  public Note getHeadNoteOfNotebook() {
-    if (thing == null) {
-      return null;
-    }
-    return thing.getNote();
   }
 
   public MCQWithAnswer getMcqWithAnswer() {
