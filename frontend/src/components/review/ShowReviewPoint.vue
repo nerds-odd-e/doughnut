@@ -2,36 +2,19 @@
   <div class="alert alert-danger" v-if="reviewPoint.removedFromReview">
     This review point has been removed from reviewing.
   </div>
-  <div v-if="link.linkType">
-    <div class="jumbotron py-4 mb-2">
-      <LinkShow v-bind="{ link, storageAccessor }" />
-    </div>
+  <ShowThing
+    v-bind="{ thing: reviewPoint.thing, expandInfo, storageAccessor }"
+    @level-changed="$emit('levelChanged', $event)"
+    @self-evaluated="$emit('selfEvaluated', $event)"
+  >
     <slot />
-  </div>
-
-  <div v-else-if="noteId">
-    <NoteCardsView
-      v-if="noteId"
-      v-bind="{
-        noteId,
-        expandChildren: false,
-        readonly: false,
-        expandInfo,
-        storageAccessor,
-      }"
-      :key="noteId"
-      @level-changed="$emit('levelChanged', $event)"
-      @self-evaluated="$emit('selfEvaluated', $event)"
-    >
-      <slot />
-    </NoteCardsView>
-  </div>
+  </ShowThing>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import LinkShow from "../links/LinkShow.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
+import ShowThing from "./ShowThing.vue";
 
 export default defineComponent({
   props: {
@@ -46,14 +29,6 @@ export default defineComponent({
     },
   },
   emits: ["levelChanged", "selfEvaluated"],
-  components: { LinkShow },
-  computed: {
-    noteId() {
-      return this.reviewPoint.thing?.note?.id;
-    },
-    link() {
-      return this.reviewPoint.thing;
-    },
-  },
+  components: { ShowThing },
 });
 </script>
