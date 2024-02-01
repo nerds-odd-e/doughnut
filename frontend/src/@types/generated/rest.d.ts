@@ -259,11 +259,12 @@ declare namespace Generated {
         positiveFeedback: boolean;
     }
 
-    interface Thing extends EntityIdentifiedByIdOnly {
+    interface Thing {
         note?: Note;
         linkType?: LinkType;
         sourceNote?: Note;
         targetNote?: Note;
+        id?: number;
     }
 
     interface ReviewPoint extends EntityIdentifiedByIdOnly {
