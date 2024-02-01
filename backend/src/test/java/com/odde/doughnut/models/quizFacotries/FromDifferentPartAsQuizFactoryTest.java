@@ -34,8 +34,8 @@ class FromDifferentPartAsQuizFactoryTest {
   Note pretty;
   Note tall;
   Note kind;
-  Thing subjectivePerspective;
-  Thing kindSubjective;
+  Note subjectivePerspective;
+  Note kindSubjective;
   ReviewPoint uglySubjectiveRp;
 
   @BeforeEach
@@ -52,9 +52,8 @@ class FromDifferentPartAsQuizFactoryTest {
     subjectivePerspective = makeMe.aLink().between(subjective, perspective, LinkType.PART).please();
     makeMe.aLink().between(objective, perspective, LinkType.PART).please();
     kindSubjective = makeMe.aLink().between(kind, subjective, LinkType.TAGGED_BY).please();
-    Thing uglySubjective = makeMe.aLink().between(ugly, subjective, LinkType.TAGGED_BY).please();
-    uglySubjectiveRp =
-        makeMe.aReviewPointFor(uglySubjective.getNote()).by(userModel).inMemoryPlease();
+    Note uglySubjective = makeMe.aLink().between(ugly, subjective, LinkType.TAGGED_BY).please();
+    uglySubjectiveRp = makeMe.aReviewPointFor(uglySubjective).by(userModel).inMemoryPlease();
     makeMe.refresh(top);
   }
 
@@ -65,7 +64,7 @@ class FromDifferentPartAsQuizFactoryTest {
 
   @Nested
   class WhenThereIsACousin {
-    Thing prettySubjective;
+    Note prettySubjective;
 
     @BeforeEach
     void setup() {
@@ -84,7 +83,7 @@ class FromDifferentPartAsQuizFactoryTest {
       @BeforeEach
       void setup() {
         makeMe.aLink().between(tall, objective, LinkType.TAGGED_BY).please();
-        makeMe.aReviewPointFor(kindSubjective.getNote()).by(userModel).please();
+        makeMe.aReviewPointFor(kindSubjective).by(userModel).please();
         makeMe.refresh(userModel.getEntity());
       }
 
@@ -99,7 +98,7 @@ class FromDifferentPartAsQuizFactoryTest {
 
         @BeforeEach
         void setup() {
-          makeMe.aReviewPointFor(prettySubjective.getNote()).by(userModel).please();
+          makeMe.aReviewPointFor(prettySubjective).by(userModel).please();
           makeMe.refresh(userModel.getEntity());
         }
 

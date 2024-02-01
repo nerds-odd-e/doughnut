@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.*;
 import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -29,7 +28,7 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
   Note target;
   Note source;
   Note anotherSource;
-  Thing sourceTarget;
+  Note sourceTarget;
   ReviewPoint reviewPoint;
 
   @BeforeEach
@@ -41,7 +40,7 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
     sourceTarget = makeMe.aLink().between(source, target).please();
     Note cheese = makeMe.aNote("Note cheese").under(top).please();
     anotherSource = makeMe.aNote("blue cheese").under(top).linkTo(cheese).please();
-    reviewPoint = makeMe.aReviewPointFor(sourceTarget.getNote()).inMemoryPlease();
+    reviewPoint = makeMe.aReviewPointFor(sourceTarget).inMemoryPlease();
     makeMe.refresh(top);
     makeMe.refresh(anotherSource);
   }

@@ -6,7 +6,7 @@ import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 
-public class LinkBuilder extends EntityBuilder<Thing> {
+public class LinkBuilder extends EntityBuilder<Note> {
   User creator = null;
 
   public LinkBuilder(MakeMe makeMe) {
@@ -17,19 +17,19 @@ public class LinkBuilder extends EntityBuilder<Thing> {
   protected void beforeCreate(boolean needPersist) {
     if (entity == null) return;
     if (creator == null) {
-      if (entity.getSourceNote() != null) {
-        this.creator = entity.getSourceNote().getThing().getCreator();
+      if (entity.getParent() != null) {
+        this.creator = entity.getParent().getThing().getCreator();
       }
     }
-    entity.setCreator(this.creator);
+    entity.getThing().setCreator(this.creator);
   }
 
   @Override
   protected void afterCreate(boolean needPersist) {
     if (entity == null) return;
     if (needPersist) {
-      if (entity.getSourceNote() != null) {
-        makeMe.refresh(entity.getSourceNote());
+      if (entity.getParent() != null) {
+        makeMe.refresh(entity.getParent());
       }
       if (entity.getTargetNote() != null) {
         makeMe.refresh(entity.getTargetNote());
@@ -45,8 +45,7 @@ public class LinkBuilder extends EntityBuilder<Thing> {
   public LinkBuilder between(Note from, Note to, LinkType linkType) {
     this.entity =
         ModelFactoryService.buildALink(
-                from, to, null, linkType, new Timestamp(System.currentTimeMillis()))
-            .getThing();
+            from, to, null, linkType, new Timestamp(System.currentTimeMillis()));
     creator(from.getThing().getCreator());
     return this;
   }

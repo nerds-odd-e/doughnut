@@ -80,7 +80,7 @@ public class ReviewingInitialReviewTest {
 
     @Nested
     class ReviewPointFromLink {
-      Thing note1ToNote2;
+      Note note1ToNote2;
       Note anotherNote;
 
       @BeforeEach
@@ -99,7 +99,7 @@ public class ReviewingInitialReviewTest {
         List<Note> reviewPoints = getAllDueReviewPoints();
         assertThat(reviewPoints, hasSize(4));
         assertThat(reviewPoints.get(0), equalTo(note1));
-        assertThat(reviewPoints.get(2), equalTo(note1ToNote2.getNote()));
+        assertThat(reviewPoints.get(2), equalTo(note1ToNote2));
         assertThat(reviewPoints.get(1), equalTo(note2));
         assertThat(reviewPoints.get(3), equalTo(anotherNote));
       }
@@ -110,7 +110,7 @@ public class ReviewingInitialReviewTest {
         void Note1And2HaveDifferentLevels() {
           makeMe.theNote(note1).level(5).please();
           makeMe.theNote(note2).level(2).please();
-          makeMe.theNote(note1ToNote2.getNote()).level(5).please();
+          makeMe.theNote(note1ToNote2).level(5).please();
         }
 
         @Test
@@ -120,19 +120,19 @@ public class ReviewingInitialReviewTest {
           assertThat(reviewPoints.get(0), equalTo(anotherNote));
           assertThat(reviewPoints.get(1), equalTo(note2));
           assertThat(reviewPoints.get(2), equalTo(note1));
-          assertThat(reviewPoints.get(3), equalTo(note1ToNote2.getNote()));
+          assertThat(reviewPoints.get(3), equalTo(note1ToNote2));
         }
 
         @Test
         void shouldReturnLinksOrderedByLevels() {
-          Thing aLevel2Link = makeMe.aLink().between(anotherNote, note2).please();
+          Note aLevel2Link = makeMe.aLink().between(anotherNote, note2).please();
           makeMe.refresh(userModel.getEntity());
           List<Note> reviewPoints = getAllDueReviewPoints();
           assertThat(reviewPoints, hasSize(5));
           assertThat(reviewPoints.get(0), equalTo(anotherNote));
           assertThat(reviewPoints.get(1), equalTo(note2));
-          assertThat(reviewPoints.get(2), equalTo(aLevel2Link.getNote()));
-          assertThat(reviewPoints.get(4), equalTo(note1ToNote2.getNote()));
+          assertThat(reviewPoints.get(2), equalTo(aLevel2Link));
+          assertThat(reviewPoints.get(4), equalTo(note1ToNote2));
         }
 
         @Test

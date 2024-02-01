@@ -512,7 +512,7 @@ class RestNoteControllerTests {
   class UpdateReviewSetting {
     Note source;
     Note target;
-    Thing link;
+    Note link;
 
     @BeforeEach
     void setup() {
@@ -539,8 +539,8 @@ class RestNoteControllerTests {
       assertThat(getLevel(link), is(4));
     }
 
-    private static Integer getLevel(Thing link) {
-      return link.getNote().getReviewSetting().getLevel();
+    private static Integer getLevel(Note link) {
+      return link.getReviewSetting().getLevel();
     }
   }
 }

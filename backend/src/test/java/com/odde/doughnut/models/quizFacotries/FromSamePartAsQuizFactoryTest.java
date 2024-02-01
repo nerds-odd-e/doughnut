@@ -33,7 +33,7 @@ class FromSamePartAsQuizFactoryTest {
   Note ugly;
   Note pretty;
   Note tall;
-  Thing subjectivePerspective;
+  Note subjectivePerspective;
   ReviewPoint reviewPoint;
 
   @BeforeEach
@@ -48,8 +48,8 @@ class FromSamePartAsQuizFactoryTest {
     tall = makeMe.aNote("tall").under(top).please();
     subjectivePerspective = makeMe.aLink().between(subjective, perspective, LinkType.PART).please();
     makeMe.aLink().between(objective, perspective, LinkType.PART).please();
-    Thing uglySubjective = makeMe.aLink().between(ugly, subjective, LinkType.TAGGED_BY).please();
-    reviewPoint = makeMe.aReviewPointFor(uglySubjective.getNote()).by(userModel).inMemoryPlease();
+    Note uglySubjective = makeMe.aLink().between(ugly, subjective, LinkType.TAGGED_BY).please();
+    reviewPoint = makeMe.aReviewPointFor(uglySubjective).by(userModel).inMemoryPlease();
     makeMe.refresh(top);
   }
 
@@ -60,7 +60,7 @@ class FromSamePartAsQuizFactoryTest {
 
   @Nested
   class WhenThereIsAnCousin {
-    Thing cousin;
+    Note cousin;
 
     @BeforeEach
     void setup() {
@@ -91,7 +91,7 @@ class FromSamePartAsQuizFactoryTest {
       class WhenThereIsViceReviewPoint {
         @BeforeEach
         void setup() {
-          makeMe.aReviewPointFor(cousin.getNote()).by(userModel).please();
+          makeMe.aReviewPointFor(cousin).by(userModel).please();
           makeMe.refresh(userModel.getEntity());
         }
 
