@@ -66,7 +66,7 @@
     "got": "^14.1.0",
     "jsdom": "^24.0.0",
     "mountebank": "^2.9.1",
-    "npm-run-all": "^4.1.5",
+    "npm-run-all2": "^6.1.2",
     "openapi-typescript": "^6.7.4",
     "prettier": "^3.2.4",
     "superagent": "^8.1.2",
