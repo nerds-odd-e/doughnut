@@ -19,7 +19,7 @@
     </ProgressBar>
     <InitialReview
       v-if="!minimized && reviewPoint"
-      v-bind="{ reviewPoint, storageAccessor }"
+      v-bind="{ thing: reviewPoint.thing, storageAccessor }"
       @initial-review-done="initialReviewDone"
       @reload-needed="onReloadNeeded"
       :key="reviewPoint.thing.id"

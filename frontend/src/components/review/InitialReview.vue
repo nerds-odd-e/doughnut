@@ -1,20 +1,21 @@
 <template>
   <ContainerPage v-bind="{ contentExists: true }">
-    <ShowReviewPoint
-      v-bind="{ reviewPoint, expandInfo: true, storageAccessor }"
+    <ShowThing
+      v-bind="{ thing, expandInfo: true, storageAccessor }"
       @level-changed="$emit('reloadNeeded', $event)"
     >
+      <slot />
       <InitialReviewButtons
         :key="buttonKey"
         @do-initial-review="processForm($event)"
       />
-    </ShowReviewPoint>
+    </ShowThing>
   </ContainerPage>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import ShowReviewPoint from "./ShowReviewPoint.vue";
+import ShowThing from "./ShowThing.vue";
 import InitialReviewButtons from "./InitialReviewButtons.vue";
 import ContainerPage from "../../pages/commons/ContainerPage.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
@@ -27,8 +28,8 @@ export default defineComponent({
     return { ...useLoadingApi(), ...usePopups() };
   },
   props: {
-    reviewPoint: {
-      type: Object as PropType<Generated.ReviewPoint>,
+    thing: {
+      type: Object as PropType<Generated.Thing>,
       required: true,
     },
     storageAccessor: {
@@ -38,13 +39,13 @@ export default defineComponent({
   },
   emits: ["reloadNeeded", "initialReviewDone"],
   components: {
-    ShowReviewPoint,
+    ShowThing,
     ContainerPage,
     InitialReviewButtons,
   },
   computed: {
     buttonKey() {
-      return this.reviewPoint?.thing?.id;
+      return this.thing.id;
     },
   },
 
@@ -60,7 +61,7 @@ export default defineComponent({
       }
       this.api.reviewMethods
         .doInitialReview({
-          noteId: this.reviewPoint.thing.note!.id,
+          noteId: this.thing.note!.id,
           skipReview,
         })
         .then((data) => {

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { flushPromises } from "@vue/test-utils";
 import InitialReviewPage from "@/pages/InitialReviewPage.vue";
-import ShowReviewPoint from "@/components/review/ShowReviewPoint.vue";
+import ShowThing from "@/components/review/ShowThing.vue";
 import mockBrowserTimeZone from "../helpers/mockBrowserTimeZone";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
@@ -63,7 +63,7 @@ describe("repeat page", () => {
         helper.apiMock
           .expectingGet("/api/reviews/initial?timezone=Europe%2FAmsterdam")
           .andReturnOnce([]);
-        wrapper.findComponent(ShowReviewPoint).vm.$emit(event);
+        wrapper.findComponent(ShowThing).vm.$emit(event);
       });
     });
   });
