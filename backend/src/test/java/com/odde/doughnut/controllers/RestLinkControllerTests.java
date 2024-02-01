@@ -63,9 +63,9 @@ class RestLinkControllerTests {
     void createdSuccessfully()
         throws CyclicLinkDetectedException, BindException, UnexpectedNoAccessRightException {
       Note note3 = makeMe.aNote().creatorAndOwner(userModel).please();
-      long beforeThingCount = makeMe.modelFactoryService.thingRepository.count();
+      long beforeThingCount = makeMe.modelFactoryService.noteRepository.count();
       controller().linkNoteFinalize(note3, note2, linkCreation, makeMe.successfulBindingResult());
-      long afterThingCount = makeMe.modelFactoryService.thingRepository.count();
+      long afterThingCount = makeMe.modelFactoryService.noteRepository.count();
       assertThat(afterThingCount, equalTo(beforeThingCount + 1));
     }
 

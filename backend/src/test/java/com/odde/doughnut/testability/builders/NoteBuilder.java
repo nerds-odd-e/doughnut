@@ -28,7 +28,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   private void buildCreatorIfNotExist() {
-    if (entity.getThing().getCreator() == null) {
+    if (entity.getCreator() == null) {
       creatorBuilder = makeMe.aUser();
       creator(creatorBuilder.inMemoryPlease());
     }
@@ -36,10 +36,9 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   public NoteBuilder asHeadNoteOfANotebook(Ownership ownership) {
     if (entity.getNotebook() != null)
-      throw new AssertionError(
-          "Can add notebook for `" + entity.toString() + "`, a notebook already exist.");
+      throw new AssertionError("Can add notebook for `" + entity + "`, a notebook already exist.");
     buildCreatorIfNotExist();
-    entity.buildNotebookForHeadNote(ownership, entity.getThing().getCreator());
+    entity.buildNotebookForHeadNote(ownership, entity.getCreator());
     return this;
   }
 
@@ -48,9 +47,9 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder creator(User user) {
-    if (entity.getThing().getCreator() != null)
+    if (entity.getCreator() != null)
       throw new AssertionError("creator already set for " + entity.toString());
-    entity.getThing().setCreator(user);
+    entity.setCreator(user);
     return this;
   }
 
@@ -61,7 +60,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   public NoteBuilder under(Note parentNote) {
     entity.setParentNote(parentNote);
     parentNote.getAllChildren().add(entity);
-    if (entity.getThing().getCreator() == null) creator(parentNote.getThing().getCreator());
+    if (entity.getCreator() == null) creator(parentNote.getCreator());
     return this;
   }
 
@@ -85,12 +84,12 @@ public class NoteBuilder extends EntityBuilder<Note> {
   @Override
   protected void beforeCreate(boolean needPersist) {
     buildCreatorIfNotExist();
-    if (entity.getThing().getCreator() == null) {
+    if (entity.getCreator() == null) {
       creator(makeMe.aUser().please(needPersist));
     }
     if (creatorBuilder != null) creatorBuilder.please(needPersist);
     if (entity.getNotebook() == null) {
-      asHeadNoteOfANotebook(entity.getThing().getCreator().getOwnership());
+      asHeadNoteOfANotebook(entity.getCreator().getOwnership());
     }
     if (entity.getNotebook().getId() == null && needPersist) {
       makeMe.modelFactoryService.save(entity.getNotebook());

@@ -157,9 +157,9 @@ class RestNoteControllerTests {
     @Test
     void shouldBeAbleToCreateAThing()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      long beforeThingCount = makeMe.modelFactoryService.thingRepository.count();
+      long beforeThingCount = makeMe.modelFactoryService.noteRepository.count();
       controller.createNote(parent, noteCreation);
-      long afterThingCount = makeMe.modelFactoryService.thingRepository.count();
+      long afterThingCount = makeMe.modelFactoryService.noteRepository.count();
       assertThat(afterThingCount, equalTo(beforeThingCount + 1));
     }
 

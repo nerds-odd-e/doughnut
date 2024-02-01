@@ -18,10 +18,10 @@ public class LinkBuilder extends EntityBuilder<Note> {
     if (entity == null) return;
     if (creator == null) {
       if (entity.getParent() != null) {
-        this.creator = entity.getParent().getThing().getCreator();
+        this.creator = entity.getParent().getCreator();
       }
     }
-    entity.getThing().setCreator(this.creator);
+    entity.setCreator(this.creator);
   }
 
   @Override
@@ -46,7 +46,7 @@ public class LinkBuilder extends EntityBuilder<Note> {
     this.entity =
         ModelFactoryService.buildALink(
             from, to, null, linkType, new Timestamp(System.currentTimeMillis()));
-    creator(from.getThing().getCreator());
+    creator(from.getCreator());
     return this;
   }
 

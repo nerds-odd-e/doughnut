@@ -60,7 +60,7 @@ class RestReviewsController {
     Reviewing reviewing =
         currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp(), timeZone);
 
-    return reviewing.getDueInitialReviewPoints().map(Note::getThing).toList();
+    return reviewing.getDueInitialReviewPoints().map(Note::buildNoteThing).toList();
   }
 
   @PostMapping(path = "")

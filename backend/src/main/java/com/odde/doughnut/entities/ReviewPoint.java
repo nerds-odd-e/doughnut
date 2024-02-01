@@ -39,7 +39,7 @@ public class ReviewPoint extends EntityIdentifiedByIdOnly {
   private Note note;
 
   public Thing getThing() {
-    return getNote().getThing();
+    return getNote().buildNoteThing();
   }
 
   @ManyToOne(cascade = CascadeType.PERSIST)

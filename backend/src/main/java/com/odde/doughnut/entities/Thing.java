@@ -53,14 +53,4 @@ public class Thing extends EntityIdentifiedByIdOnly {
   public void setLinkType(LinkType linkType) {
     getNote().setLinkType(linkType);
   }
-
-  @JsonIgnore
-  public User getCreator() {
-    return getNote().getCreator();
-  }
-
-  @JsonIgnore
-  public void setCreator(User creator) {
-    getNote().setCreator(creator);
-  }
 }

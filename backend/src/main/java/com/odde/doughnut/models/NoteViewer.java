@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 public class NoteViewer {
 
   private User viewer;
-  private NoteBase note;
+  private Note note;
   private JsonViewer jsonViewer;
 
   public NoteViewer(User viewer, Note note) {
@@ -27,7 +27,7 @@ public class NoteViewer {
     nvb.setId(note.getId());
     nvb.setLinks(getAllLinks());
     nvb.setChildren(note.getChildren());
-    nvb.setNote(note.getThing().getNote());
+    nvb.setNote(note);
     nvb.setNotePosition(jsonNotePosition());
 
     return nvb;
@@ -43,9 +43,10 @@ public class NoteViewer {
                       {
                         setDirect(
                             linksOfTypeThroughDirect(List.of(type)).stream()
-                                .map(Note::getThing)
+                                .map(Note::buildNoteThing)
                                 .toList());
-                        setReverse(linksOfTypeThroughReverse(type).map(Note::getThing).toList());
+                        setReverse(
+                            linksOfTypeThroughReverse(type).map(Note::buildNoteThing).toList());
                       }
                     }))
         .filter(x -> x.getValue().notEmpty())

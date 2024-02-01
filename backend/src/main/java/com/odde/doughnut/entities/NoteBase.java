@@ -29,12 +29,6 @@ import org.springframework.beans.BeanUtils;
 @JsonPropertyOrder({"topic", "topicConstructor", "details", "parentId", "updatedAt"})
 public abstract class NoteBase extends EntityIdentifiedByIdOnly {
 
-  @OneToOne(mappedBy = "note", cascade = CascadeType.ALL)
-  @Getter
-  @Setter
-  @JsonIgnore
-  private Thing thing;
-
   @OneToOne
   @JoinColumn(name = "creator_id")
   @JsonIgnore

@@ -20,11 +20,7 @@ public class Note extends NoteBase {
     note.setTopicConstructor(topicConstructor);
     note.setCreatedAt(currentUTCTimestamp);
     note.setUpdatedAt(currentUTCTimestamp);
-
-    final Thing thing = new Thing();
-    thing.setNote(note);
-    thing.setCreator(user);
-    note.setThing(thing);
+    note.setCreator(user);
     return note;
   }
 
@@ -56,5 +52,11 @@ public class Note extends NoteBase {
   @JsonIgnore
   public List<Note> getLinkedSiblingsOfSameLinkType(User user) {
     return getSiblingLinksOfSameLinkType(user).map(Note::getParent).toList();
+  }
+
+  public Thing buildNoteThing() {
+    Thing result = new Thing();
+    result.setNote(this);
+    return result;
   }
 }
