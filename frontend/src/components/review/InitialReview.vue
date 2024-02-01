@@ -60,7 +60,7 @@ export default defineComponent({
       }
       this.api.reviewMethods
         .doInitialReview({
-          thingId: this.reviewPoint.thing.id,
+          noteId: this.reviewPoint.thing.note!.id,
           skipReview,
         })
         .then((data) => {

@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers.json;
 
 public class InitialInfo {
-  public Integer thingId;
+  public Integer noteId;
   public Boolean skipReview;
 }

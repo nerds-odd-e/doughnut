@@ -85,7 +85,7 @@ declare namespace Generated {
     }
 
     interface InitialInfo {
-        thingId: number;
+        noteId: number;
         skipReview: boolean;
     }
 

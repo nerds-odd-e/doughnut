@@ -51,7 +51,7 @@ public class Reviewing {
     return reviewScope
         .getThingHaveNotBeenReviewedAtAll()
         .limit(count)
-        .map(ReviewPoint::buildReviewPointForThing);
+        .map(ReviewPoint::buildReviewPointForNote);
   }
 
   private Stream<ReviewPoint> getReviewPointsNeedToRepeat(int dueInDays) {

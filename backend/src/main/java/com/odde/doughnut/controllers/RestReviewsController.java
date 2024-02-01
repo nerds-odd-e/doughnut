@@ -3,10 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.json.DueReviewPoints;
 import com.odde.doughnut.controllers.json.InitialInfo;
 import com.odde.doughnut.controllers.json.ReviewStatus;
-import com.odde.doughnut.entities.Answer;
-import com.odde.doughnut.entities.AnsweredQuestion;
-import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.Thing;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.ReviewPointModel;
@@ -72,12 +69,8 @@ class RestReviewsController {
   public ReviewPoint create(@RequestBody InitialInfo initialInfo) {
     currentUser.assertLoggedIn();
     ReviewPoint reviewPoint =
-        ReviewPoint.buildReviewPointForThing(
-            modelFactoryService
-                .thingRepository
-                .findById(initialInfo.thingId)
-                .map(Thing::getNote)
-                .orElse(null));
+        ReviewPoint.buildReviewPointForNote(
+            modelFactoryService.entityManager.find(Note.class, initialInfo.noteId));
     reviewPoint.setRemovedFromReview(initialInfo.skipReview);
 
     ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPoint);
