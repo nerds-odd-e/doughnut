@@ -16,7 +16,7 @@ public record ParentGrandLinkHelperImpl(User user, Note link, Note parentGrandLi
 
   @Override
   public List<Note> getCousinLinksAvoidingSiblings() {
-    List<Note> linkedSiblingsOfSameLinkType = link.getThing().getLinkedSiblingsOfSameLinkType(user);
+    List<Note> linkedSiblingsOfSameLinkType = link.getLinkedSiblingsOfSameLinkType(user);
     return getUncles()
         .flatMap(
             p -> new NoteViewer(user, p.getParent()).linksOfTypeThroughReverse(link.getLinkType()))

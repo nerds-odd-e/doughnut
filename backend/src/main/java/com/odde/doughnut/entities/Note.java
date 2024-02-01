@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.models.NoteViewer;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.stream.Stream;
 
 @Entity
@@ -50,5 +51,10 @@ public class Note extends NoteBase {
     return targetNoteViewer(user)
         .linksOfTypeThroughReverse(getLinkType())
         .filter(l -> !l.equals(this));
+  }
+
+  @JsonIgnore
+  public List<Note> getLinkedSiblingsOfSameLinkType(User user) {
+    return getSiblingLinksOfSameLinkType(user).map(Note::getParent).toList();
   }
 }

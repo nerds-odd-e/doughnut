@@ -20,7 +20,7 @@ public class LinkSourceWithinSameLinkTypeQuizFactory
   public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
       cachedFillingOptions =
-          servant.chooseFromCohortAvoidSiblings(link.getThing()).stream()
+          servant.chooseFromCohortAvoidSiblings(link).stream()
               .flatMap(n -> servant.randomizer.chooseOneRandomly(n.getLinkChildren()).stream())
               .toList();
     }

@@ -96,7 +96,7 @@ public class QuizQuestionServant {
     return new ParentGrandLinkHelperImpl(this.user, link, parentGrandLink);
   }
 
-  public List<Note> chooseBackwardPeers(Thing instanceLink, Thing link1) {
+  public List<Note> chooseBackwardPeers(Note instanceLink, Note link1) {
     List<Note> instanceReverse = instanceLink.getLinkedSiblingsOfSameLinkType(user);
     List<Note> specReverse = link1.getLinkedSiblingsOfSameLinkType(user);
     List<Note> backwardPeers =
@@ -126,10 +126,10 @@ public class QuizQuestionServant {
     return chooseFromCohort(answerNote, n -> !n.equals(noteToAvoid) && !notesToAvoid.contains(n));
   }
 
-  public List<Note> chooseFromCohortAvoidSiblings(Thing answerLink) {
+  public List<Note> chooseFromCohortAvoidSiblings(Note answerLink) {
     List<Note> linkedSiblingsOfSameLinkType = answerLink.getLinkedSiblingsOfSameLinkType(user);
     return chooseCohortAndAvoid(
-        answerLink.getSourceNote(), answerLink.getTargetNote(), linkedSiblingsOfSameLinkType);
+        answerLink.getParent(), answerLink.getTargetNote(), linkedSiblingsOfSameLinkType);
   }
 
   public GlobalSettingsService getGlobalSettingsService() {

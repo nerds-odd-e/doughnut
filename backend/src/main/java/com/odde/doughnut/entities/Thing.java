@@ -9,7 +9,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.sql.Timestamp;
-import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.lang.Nullable;
@@ -68,10 +67,5 @@ public class Thing extends EntityIdentifiedByIdOnly {
 
   public void setLinkType(LinkType linkType) {
     getNote().setLinkType(linkType);
-  }
-
-  @JsonIgnore
-  public List<Note> getLinkedSiblingsOfSameLinkType(User user) {
-    return note.getSiblingLinksOfSameLinkType(user).map(Note::getParent).toList();
   }
 }
