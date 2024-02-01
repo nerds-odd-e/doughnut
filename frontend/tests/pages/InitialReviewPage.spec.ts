@@ -34,11 +34,12 @@ describe("repeat page", () => {
   describe("normal view", () => {
     const noteRealm = makeMe.aNoteRealm.please();
     const reviewPoint = makeMe.aReviewPoint.ofNote(noteRealm).please();
+    const { thing } = reviewPoint;
 
     beforeEach(() => {
       helper.apiMock
         .expectingGet("/api/reviews/initial?timezone=Europe%2FAmsterdam")
-        .andReturnOnce([reviewPoint, reviewPoint]);
+        .andReturnOnce([thing, thing]);
       helper.apiMock.expectingGet(`/api/notes/${noteRealm.id}/note-info`);
       helper.apiMock
         .expectingGet(`/api/notes/${noteRealm.id}`)
@@ -73,7 +74,7 @@ describe("repeat page", () => {
     const reviewPoint = makeMe.aReviewPoint.ofNote(noteRealm).please();
     helper.apiMock
       .expectingGet("/api/reviews/initial?timezone=Europe%2FAmsterdam")
-      .andReturnOnce([reviewPoint]);
+      .andReturnOnce([reviewPoint.thing]);
     const wrapper = renderer
       .withStorageProps({ minimized: true })
       .currentRoute({ name: "initial" })
@@ -91,7 +92,7 @@ describe("repeat page", () => {
     const reviewPoint = makeMe.aReviewPoint.ofLink(link).please();
     helper.apiMock
       .expectingGet("/api/reviews/initial?timezone=Europe%2FAmsterdam")
-      .andReturnOnce([reviewPoint]);
+      .andReturnOnce([reviewPoint.thing]);
     const wrapper = renderer
       .withStorageProps({ minimized: true })
       .currentRoute({ name: "initial" })

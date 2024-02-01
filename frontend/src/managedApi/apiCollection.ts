@@ -122,7 +122,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     async initialReview() {
       return (await managedApi.restGet(
         `reviews/initial?${timezoneParam()}`,
-      )) as Generated.ReviewPoint[];
+      )) as Generated.Thing[];
     },
 
     async doInitialReview(data: Generated.InitialInfo) {

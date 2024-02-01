@@ -1,5 +1,5 @@
 <template>
-  <ContainerPage v-bind="{ contentExists: !!reviewPoint }">
+  <ContainerPage v-bind="{ contentExists: !!thing }">
     <ProgressBar
       :class="minimized ? 'initial-review-paused' : ''"
       v-bind="{
@@ -13,16 +13,16 @@
           <a title="Go back to review">
             <SvgResume width="30" height="30" />
           </a>
-          <ThingAbbr v-if="reviewPoint" v-bind="{ thing: reviewPoint.thing }" />
+          <ThingAbbr v-if="thing" v-bind="{ thing }" />
         </div>
       </template>
     </ProgressBar>
     <InitialReview
-      v-if="!minimized && reviewPoint"
-      v-bind="{ thing: reviewPoint.thing, storageAccessor }"
+      v-if="!minimized && thing"
+      v-bind="{ thing, storageAccessor }"
       @initial-review-done="initialReviewDone"
       @reload-needed="onReloadNeeded"
-      :key="reviewPoint.thing.id"
+      :key="thing.id"
     />
   </ContainerPage>
 </template>
@@ -60,15 +60,15 @@ export default defineComponent({
   data() {
     return {
       finished: 0,
-      reviewPoints: [] as Generated.ReviewPoint[],
+      things: [] as Generated.Thing[],
     };
   },
   computed: {
-    reviewPoint() {
-      return this.reviewPoints[0];
+    thing() {
+      return this.things[0];
     },
     remainingInitialReviewCountForToday() {
-      return this.reviewPoints.length;
+      return this.things.length;
     },
   },
   methods: {
@@ -77,8 +77,8 @@ export default defineComponent({
     },
     initialReviewDone() {
       this.finished += 1;
-      this.reviewPoints.shift();
-      if (this.reviewPoints.length === 0) {
+      this.things.shift();
+      if (this.things.length === 0) {
         this.$router.push({ name: "reviews" });
         return;
       }
@@ -92,7 +92,7 @@ export default defineComponent({
           this.$router.push({ name: "reviews" });
           return;
         }
-        this.reviewPoints = resp;
+        this.things = resp;
       });
     },
   },
