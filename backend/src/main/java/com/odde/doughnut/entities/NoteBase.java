@@ -35,6 +35,13 @@ public abstract class NoteBase extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private Thing thing;
 
+  @OneToOne
+  @JoinColumn(name = "creator_id")
+  @JsonIgnore
+  @Getter
+  @Setter
+  private User creator;
+
   @ManyToOne
   @JoinColumn(name = "notebook_id", referencedColumnName = "id")
   @JsonIgnore

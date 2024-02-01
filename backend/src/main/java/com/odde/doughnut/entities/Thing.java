@@ -22,13 +22,6 @@ public class Thing extends EntityIdentifiedByIdOnly {
   @Nullable
   private Note note;
 
-  @OneToOne
-  @JoinColumn(name = "creator_id")
-  @JsonIgnore
-  @Getter
-  @Setter
-  private User creator;
-
   @JsonIgnore
   public Note getParentNote() {
     return getNote().getParent();
@@ -59,5 +52,15 @@ public class Thing extends EntityIdentifiedByIdOnly {
 
   public void setLinkType(LinkType linkType) {
     getNote().setLinkType(linkType);
+  }
+
+  @JsonIgnore
+  public User getCreator() {
+    return getNote().getCreator();
+  }
+
+  @JsonIgnore
+  public void setCreator(User creator) {
+    getNote().setCreator(creator);
   }
 }
