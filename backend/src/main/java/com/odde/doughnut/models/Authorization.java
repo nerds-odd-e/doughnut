@@ -19,8 +19,6 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
       assertAuthorizationSubscription((Subscription) object);
     } else if (object instanceof User) {
       assertAuthorizationUser((User) object);
-    } else if (object instanceof Thing objectThing) {
-      assertAuthorizationNote(objectThing.getNote());
     } else {
       throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unknown object type");
     }
@@ -39,17 +37,11 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
       assertReadAuthorizationQuizQuestion((QuizQuestionEntity) object);
     } else if (object instanceof ReviewPoint) {
       assertReadAuthorizationReviewPoint((ReviewPoint) object);
-    } else if (object instanceof Thing) {
-      assertReadAuthorizationThing((Thing) object);
     } else if (object instanceof User) {
       assertAuthorizationUser((User) object);
     } else {
       throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unknown object type");
     }
-  }
-
-  private void assertReadAuthorizationThing(Thing object) throws UnexpectedNoAccessRightException {
-    assertReadAuthorizationNote(object.getNote());
   }
 
   private void assertReadAuthorizationReviewPoint(ReviewPoint object)

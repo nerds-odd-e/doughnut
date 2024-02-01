@@ -61,6 +61,7 @@ public abstract class NoteBase extends EntityIdentifiedByIdOnly {
   @Getter
   private Timestamp createdAt;
 
+  @Setter
   @Column(name = "deleted_at")
   @Getter
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -106,11 +107,6 @@ public abstract class NoteBase extends EntityIdentifiedByIdOnly {
   private Note parent;
 
   @Embedded @JsonIgnore @Getter private ReviewSetting reviewSetting = new ReviewSetting();
-
-  public void setDeletedAt(Timestamp value) {
-    this.deletedAt = value;
-    if (this.thing != null) this.thing.setDeletedAt(value);
-  }
 
   @JsonIgnore
   public boolean targetVisibleAsSourceOrTo(User viewer) {
