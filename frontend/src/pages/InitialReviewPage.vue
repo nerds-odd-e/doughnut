@@ -13,7 +13,7 @@
           <a title="Go back to review">
             <SvgResume width="30" height="30" />
           </a>
-          <ReviewPointAbbr v-if="reviewPoint" v-bind="{ reviewPoint }" />
+          <ThingAbbr v-if="reviewPoint" v-bind="{ thing: reviewPoint.thing }" />
         </div>
       </template>
     </ProgressBar>
@@ -32,7 +32,7 @@ import { defineComponent, PropType } from "vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import ProgressBar from "../components/commons/ProgressBar.vue";
 import SvgResume from "../components/svgs/SvgResume.vue";
-import ReviewPointAbbr from "../components/review/ReviewPointAbbr.vue";
+import ThingAbbr from "../components/review/ThingAbbr.vue";
 import InitialReview from "../components/review/InitialReview.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
 import { StorageAccessor } from "../store/createNoteStorage";
@@ -53,7 +53,7 @@ export default defineComponent({
     ContainerPage,
     InitialReview,
     ProgressBar,
-    ReviewPointAbbr,
+    ThingAbbr,
     SvgResume,
   },
   emits: ["update-reviewing"],

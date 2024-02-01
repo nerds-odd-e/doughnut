@@ -1,8 +1,8 @@
 <template>
   <div v-if="reviewPoint">
-    <ReviewPointAbbr
+    <ThingAbbr
       v-if="!toggleReviewPoint"
-      v-bind="{ reviewPoint }"
+      v-bind="{ thing: reviewPoint.thing }"
       @click="toggleReviewPoint = true"
     />
     <div v-else>
@@ -30,7 +30,7 @@ import NoteInfoReviewPoint from "@/components/notes/NoteInfoReviewPoint.vue";
 import AnswerResult from "./AnswerResult.vue";
 import QuizQuestion from "./QuizQuestion.vue";
 import ShowReviewPoint from "./ShowReviewPoint.vue";
-import ReviewPointAbbr from "./ReviewPointAbbr.vue";
+import ThingAbbr from "./ThingAbbr.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
@@ -50,7 +50,7 @@ export default defineComponent({
     QuizQuestion,
     ShowReviewPoint,
     NoteInfoReviewPoint,
-    ReviewPointAbbr,
+    ThingAbbr,
   },
   data() {
     return {

@@ -193,6 +193,7 @@ declare module 'vue' {
     TextArea: typeof import('./src/components/form/TextArea.vue')['default']
     TextContentWrapper: typeof import('./src/components/notes/TextContentWrapper.vue')['default']
     TextInput: typeof import('./src/components/form/TextInput.vue')['default']
+    ThingAbbr: typeof import('./src/components/review/ThingAbbr.vue')['default']
     Tool: typeof import('./src/components/svgs/link_types/Tool.vue')['default']
     ToolbarFrame: typeof import('./src/components/toolbars/ToolbarFrame.vue')['default']
     ToolbarOver: typeof import('./src/components/commons/ToolbarOver.vue')['default']
