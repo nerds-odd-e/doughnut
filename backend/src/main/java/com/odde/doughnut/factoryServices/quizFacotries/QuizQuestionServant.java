@@ -74,9 +74,9 @@ public class QuizQuestionServant {
     return linksWithReviewPoint(link.getSiblingLinksOfSameLinkType(this.user));
   }
 
-  public Stream<Note> getLinksFromSameSourceHavingReviewPoint(Thing link) {
+  public Stream<Note> getLinksFromSameSourceHavingReviewPoint(Note link) {
     List<Note> list =
-        new NoteViewer(this.user, link.getParentNote())
+        new NoteViewer(this.user, link.getParent())
             .linksOfTypeThroughDirect(candidateQuestionLinkTypes);
     return linksWithReviewPoint(list.stream()).filter(l -> !link.equals(l));
   }

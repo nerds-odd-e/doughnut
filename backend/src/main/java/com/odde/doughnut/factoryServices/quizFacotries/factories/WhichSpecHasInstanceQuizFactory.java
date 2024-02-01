@@ -36,8 +36,7 @@ public class WhichSpecHasInstanceQuizFactory
 
   private Note getInstanceLink() {
     if (cachedInstanceLink == null) {
-      List<Note> candidates =
-          servant.getLinksFromSameSourceHavingReviewPoint(link.getThing()).toList();
+      List<Note> candidates = servant.getLinksFromSameSourceHavingReviewPoint(link).toList();
       cachedInstanceLink = servant.randomizer.chooseOneRandomly(candidates).orElse(null);
     }
     return cachedInstanceLink;
