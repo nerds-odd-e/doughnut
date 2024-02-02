@@ -2,14 +2,12 @@ package com.odde.doughnut.configs;
 
 import java.util.stream.Stream;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.stereotype.Component;
 
 @Component
 public class CommonConfiguration {
 
-  void commonConfig(
-      HttpSecurity http, AbstractAuthenticationFilterConfigurer authenticationFilterConfigurer)
+  void commonConfig(HttpSecurity http, HttpSecurity authenticationFilterConfigurer)
       throws Exception {
 
     String[] backendRoutes = {
