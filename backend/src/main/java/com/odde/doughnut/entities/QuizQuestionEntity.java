@@ -28,37 +28,43 @@ import org.apache.logging.log4j.util.Strings;
 public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
 
   public enum QuestionType {
-    CLOZE_SELECTION(1, ClozeTitleSelectionQuizFactory::new, ClozeTitleSelectionQuizPresenter::new),
-    SPELLING(2, SpellingQuizFactory::new, SpellingQuizPresenter::new),
+    CLOZE_SELECTION(
+        1, ClozeTitleSelectionQuizFactory::new, null, ClozeTitleSelectionQuizPresenter::new),
+    SPELLING(2, SpellingQuizFactory::new, null, SpellingQuizPresenter::new),
     PICTURE_TITLE(
-        3, PictureTitleSelectionQuizFactory::new, PictureTitleSelectionQuizPresenter::new),
-    PICTURE_SELECTION(4, PictureSelectionQuizFactory::new, PictureSelectionQuizPresenter::new),
-    LINK_TARGET(5, LinkTargetQuizFactory::new, LinkTargetQuizPresenter::new),
-    LINK_SOURCE(6, LinkSourceQuizFactory::new, LinkSourceQuizPresenter::new),
+        3, PictureTitleSelectionQuizFactory::new, null, PictureTitleSelectionQuizPresenter::new),
+    PICTURE_SELECTION(
+        4, PictureSelectionQuizFactory::new, null, PictureSelectionQuizPresenter::new),
+    LINK_TARGET(5, LinkTargetQuizFactory::new, null, LinkTargetQuizPresenter::new),
+    LINK_SOURCE(6, LinkSourceQuizFactory::new, null, LinkSourceQuizPresenter::new),
     LINK_SOURCE_WITHIN_SAME_LINK_TYPE(
         14,
         LinkSourceWithinSameLinkTypeQuizFactory::new,
+        null,
         LinkSourceWithinSameLinkTypeQuizPresenter::new),
-    CLOZE_LINK_TARGET(7, ClozeLinkTargetQuizFactory::new, ClozeLinkTargetQuizPresenter::new),
+    CLOZE_LINK_TARGET(7, ClozeLinkTargetQuizFactory::new, null, ClozeLinkTargetQuizPresenter::new),
     DESCRIPTION_LINK_TARGET(
-        8, DescriptionLinkTargetQuizFactory::new, DescriptionLinkTargetQuizPresenter::new),
+        8, DescriptionLinkTargetQuizFactory::new, null, DescriptionLinkTargetQuizPresenter::new),
     WHICH_SPEC_HAS_INSTANCE(
-        9, WhichSpecHasInstanceQuizFactory::new, WhichSpecHasInstanceQuizPresenter::new),
-    FROM_SAME_PART_AS(10, FromSamePartAsQuizFactory::new, FromSamePartAsQuizPresenter::new),
+        9, WhichSpecHasInstanceQuizFactory::new, null, WhichSpecHasInstanceQuizPresenter::new),
+    FROM_SAME_PART_AS(10, FromSamePartAsQuizFactory::new, null, FromSamePartAsQuizPresenter::new),
     FROM_DIFFERENT_PART_AS(
-        11, FromDifferentPartAsQuizFactory::new, FromDifferentPartAsQuizPresenter::new),
-    AI_QUESTION(12, AiQuestionFactory::new, AiQuestionPresenter::new);
+        11, FromDifferentPartAsQuizFactory::new, null, FromDifferentPartAsQuizPresenter::new),
+    AI_QUESTION(12, AiQuestionFactory::new, null, AiQuestionPresenter::new);
 
     public final Integer id;
     public final BiFunction<Note, QuizQuestionServant, QuizQuestionFactory> factory;
+    public final BiFunction<Note, QuizQuestionServant, QuizQuestionFactory> factoryForLinkingNote;
     public final Function<QuizQuestionEntity, QuizQuestionPresenter> presenter;
 
     QuestionType(
         Integer id,
         BiFunction<Note, QuizQuestionServant, QuizQuestionFactory> factory,
+        BiFunction<Note, QuizQuestionServant, QuizQuestionFactory> factoryForLinkingNote,
         Function<QuizQuestionEntity, QuizQuestionPresenter> presenter) {
       this.id = id;
       this.factory = factory;
+      this.factoryForLinkingNote = factoryForLinkingNote;
       this.presenter = presenter;
     }
 
