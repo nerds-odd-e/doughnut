@@ -59,7 +59,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   public NoteBuilder under(Note parentNote) {
     entity.setParentNote(parentNote);
-    parentNote.getAllChildren().add(entity);
+    parentNote.getChildren().add(entity);
     if (entity.getCreator() == null) creator(parentNote.getCreator());
     return this;
   }

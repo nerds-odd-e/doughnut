@@ -21,7 +21,7 @@ public class LinkSourceWithinSameLinkTypeQuizFactory
     if (cachedFillingOptions == null) {
       cachedFillingOptions =
           servant.chooseFromCohortAvoidSiblings(link).stream()
-              .flatMap(n -> servant.randomizer.chooseOneRandomly(n.getLinkChildren()).stream())
+              .flatMap(n -> servant.randomizer.chooseOneRandomly(n.getLinks()).stream())
               .toList();
     }
     return cachedFillingOptions;

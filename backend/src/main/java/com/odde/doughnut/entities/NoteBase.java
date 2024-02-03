@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities;
 
 import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
-import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -74,10 +73,17 @@ public abstract class NoteBase extends EntityIdentifiedByIdOnly {
 
   @OneToMany(mappedBy = "parent", cascade = CascadeType.DETACH)
   @JsonIgnore
-  @Where(clause = "deleted_at is null")
+  @Where(clause = "deleted_at is null and target_note_id is not null")
   @OrderBy("sibling_order")
   @Getter
-  private final List<Note> allChildren = new ArrayList<>();
+  private final List<Note> links = new ArrayList<>();
+
+  @OneToMany(mappedBy = "parent", cascade = CascadeType.DETACH)
+  @JsonIgnore
+  @Where(clause = "deleted_at is null and target_note_id is null")
+  @OrderBy("sibling_order")
+  @Getter
+  private final List<Note> children = new ArrayList<>();
 
   @Column(name = "updated_at")
   @Getter
@@ -142,13 +148,6 @@ public abstract class NoteBase extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public List<Note> getChildren() {
-    return getAllChildren().stream()
-        .filter(nc -> !nc.usingLinkTypeAsTopicConstructor())
-        .collect(toList());
-  }
-
-  @JsonIgnore
   public LinkType getLinkType() {
     if (!getTopicConstructor().startsWith(":")) return null;
     return LinkType.fromLabel(getTopicConstructor().substring(1));
@@ -181,18 +180,6 @@ public abstract class NoteBase extends EntityIdentifiedByIdOnly {
       p = p.getParent();
     }
     return result;
-  }
-
-  @JsonIgnore
-  public List<Note> getLinkChildren() {
-    return getLinks();
-  }
-
-  @JsonIgnore
-  public List<Note> getLinks() {
-    return getAllChildren().stream()
-        .filter(Note::usingLinkTypeAsTopicConstructor)
-        .collect(toList());
   }
 
   @JsonIgnore
