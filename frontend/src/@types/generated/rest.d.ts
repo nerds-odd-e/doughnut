@@ -259,7 +259,7 @@ declare namespace Generated {
     }
 
     interface Thing {
-        note?: Note;
+        note?: NoteBase;
         linkType?: LinkType;
         sourceNote?: Note;
         targetNote?: Note;
@@ -324,13 +324,6 @@ declare namespace Generated {
         id: number;
     }
 
-    interface NoteAccessories {
-        url: string;
-        pictureUrl: string;
-        pictureMask: string;
-        useParentPicture: boolean;
-    }
-
     interface NoteBase extends EntityIdentifiedByIdOnly {
         topic: string;
         topicConstructor: string;
@@ -345,6 +338,13 @@ declare namespace Generated {
         deletedAt: string;
         wikidataId: string;
         pictureWithMask?: PictureWithMask;
+    }
+
+    interface NoteAccessories {
+        url: string;
+        pictureUrl: string;
+        pictureMask: string;
+        useParentPicture: boolean;
     }
 
     interface Notebook extends EntityIdentifiedByIdOnly {
