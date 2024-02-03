@@ -67,11 +67,22 @@ public class NoteViewer {
   }
 
   public NotePositionViewedByUser jsonNotePosition() {
+    NotePositionViewedByUser nvb = jsonNotePositionWithoutAncestors();
+    nvb.setAncestors(note.getAncestors());
+    return nvb;
+  }
+
+  public NotePositionViewedByUser jsonHeadNotePosition() {
+    NotePositionViewedByUser nvb = jsonNotePositionWithoutAncestors();
+    nvb.setAncestors(List.of(note.getNotebook().getHeadNote()));
+    return nvb;
+  }
+
+  private NotePositionViewedByUser jsonNotePositionWithoutAncestors() {
     NotePositionViewedByUser nvb = new NotePositionViewedByUser();
     nvb.setNoteId(note.getId());
     nvb.setFromBazaar(viewer == null || !viewer.owns(note.getNotebook()));
     nvb.setCircle(note.getNotebook().getOwnership().getCircle());
-    nvb.setAncestors(note.getAncestors());
     return nvb;
   }
 }
