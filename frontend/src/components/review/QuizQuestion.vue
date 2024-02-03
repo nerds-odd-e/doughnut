@@ -1,5 +1,5 @@
 <template>
-  <Breadcrumb v-bind="quizQuestion.headNotePosition" />
+  <Breadcrumb v-bind="{ notePosition: quizQuestion.headNotePosition }" />
   <div class="quiz-instruction">
     <ShowPicture
       v-if="quizQuestion.pictureWithMask"

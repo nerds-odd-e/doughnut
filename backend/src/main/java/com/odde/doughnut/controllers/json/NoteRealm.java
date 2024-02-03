@@ -11,7 +11,6 @@ public class NoteRealm {
 
   @Getter @Setter private Map<LinkType, LinkViewed> links;
 
-
   @Getter private Note note;
 
   @Getter @Setter private NotePositionViewedByUser notePosition;

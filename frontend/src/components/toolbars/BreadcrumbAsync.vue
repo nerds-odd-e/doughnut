@@ -1,6 +1,6 @@
 <template>
   <LoadingPage v-bind="{ contentExists: !!notePosition }">
-    <Breadcrumb v-bind="notePosition">
+    <Breadcrumb v-if="notePosition" v-bind="{ notePosition }">
       <slot />
     </Breadcrumb>
   </LoadingPage>
