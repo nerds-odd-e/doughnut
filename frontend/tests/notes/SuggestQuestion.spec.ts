@@ -8,10 +8,8 @@ helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("QuizQuestion", () => {
   describe("suggest question for fine tuning AI", () => {
-    const notebook: Generated.NotebookViewedByUser = makeMe.aNotebook.please();
     const quizQuestion: Generated.QuizQuestion = makeMe.aQuizQuestion
       .withQuestionType("AI_QUESTION")
-      .inNotebook(notebook)
       .please();
 
     let wrapper;

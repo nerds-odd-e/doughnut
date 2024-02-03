@@ -23,9 +23,7 @@ public class JsonViewer {
     notebookViewedByUser.setId(notebook.getId());
     notebookViewedByUser.setHeadNoteId(notebook.getHeadNote().getId());
     notebookViewedByUser.setHeadNote(notebook.getHeadNote());
-    notebookViewedByUser.setOwnership(notebook.getOwnership());
     notebookViewedByUser.setSkipReviewEntirely(notebook.getSkipReviewEntirely());
-    notebookViewedByUser.setFromBazaar(viewer == null || !viewer.owns(notebook));
     return notebookViewedByUser;
   }
 

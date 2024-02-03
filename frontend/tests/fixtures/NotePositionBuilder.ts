@@ -1,8 +1,13 @@
 import Builder from "./Builder";
-import NotebookBuilder from "./NotebookBuilder";
+import NoteBuilder from "./NoteBuilder";
+import generateId from "./generateId";
 
 class NotePositionBuilder extends Builder<Generated.NotePositionViewedByUser> {
-  notebookBuilder = new NotebookBuilder();
+  fromBazaar: boolean = false;
+
+  circle?: Generated.Circle = undefined;
+
+  headNoteBuilder = new NoteBuilder();
 
   headNote?: Generated.Note;
 
@@ -12,20 +17,23 @@ class NotePositionBuilder extends Builder<Generated.NotePositionViewedByUser> {
   }
 
   inBazaar(): NotePositionBuilder {
-    this.notebookBuilder.fromBazzar();
+    this.fromBazaar = true;
     return this;
   }
 
   inCircle(value: string): NotePositionBuilder {
-    this.notebookBuilder.inCircle(value);
+    this.circle = {
+      id: generateId(),
+      name: value,
+    };
     return this;
   }
 
   do(): Generated.NotePositionViewedByUser {
-    const notebook = this.notebookBuilder.headNote(this.headNote).do();
     return {
-      noteId: notebook.headNoteId,
-      notebook,
+      noteId: generateId(),
+      fromBazaar: this.fromBazaar,
+      circle: this.circle,
       ancestors: [],
     };
   }

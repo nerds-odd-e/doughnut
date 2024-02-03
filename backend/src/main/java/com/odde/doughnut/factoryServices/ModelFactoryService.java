@@ -98,7 +98,7 @@ public class ModelFactoryService {
         quizQuestionEntity.getQuestionType(),
         presenter.stem(),
         presenter.mainTopic(),
-        new JsonViewer(user).jsonNotebookViewedByUser(quizQuestionEntity.getNote().getNotebook()),
+        new NoteViewer(user, quizQuestionEntity.getNote().getNotebook().getHeadNote()).jsonNotePosition(),
         presenter.getOptions(this),
         presenter.pictureWithMask());
   }

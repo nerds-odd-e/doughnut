@@ -31,18 +31,11 @@ import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue";
 export default defineComponent({
   props: {
     ancestors: Array,
-    notebook: Object as PropType<Generated.NotebookViewedByUser>,
+    circle: Object as PropType<Generated.Circle>,
+    fromBazaar: Boolean,
   },
   components: {
     BasicBreadcrumb,
-  },
-  computed: {
-    fromBazaar() {
-      return this.notebook?.fromBazaar;
-    },
-    circle() {
-      return this.notebook ? this.notebook.ownership.circle : undefined;
-    },
   },
 });
 </script>

@@ -1,13 +1,17 @@
 import Builder from "./Builder";
+import NotePositionBuilder from "./NotePositionBuilder";
 import generateId from "./generateId";
 
 class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
+  notePositionBuilder: NotePositionBuilder = new NotePositionBuilder();
+
   quizQuestion: Generated.QuizQuestion = {
     quizQuestionId: generateId(),
     questionType: "SPELLING",
     choices: [],
     stem: "answer",
     mainTopic: "",
+    headNotePosition: this.notePositionBuilder.do(),
   };
 
   withClozeSelectionQuestion() {
@@ -16,11 +20,6 @@ class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
 
   withQuestionType(questionType: Generated.QuestionType) {
     this.quizQuestion.questionType = questionType;
-    return this;
-  }
-
-  inNotebook(notebook: Generated.NotebookViewedByUser) {
-    this.quizQuestion.notebook = notebook;
     return this;
   }
 
@@ -38,6 +37,7 @@ class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
   }
 
   do(): Generated.QuizQuestion {
+    this.quizQuestion.headNotePosition = this.notePositionBuilder.do();
     return this.quizQuestion;
   }
 }

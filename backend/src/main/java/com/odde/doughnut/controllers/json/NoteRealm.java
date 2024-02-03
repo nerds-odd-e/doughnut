@@ -8,13 +8,23 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class NoteRealm {
-  @Getter @Setter private Integer id;
 
   @Getter @Setter private Map<LinkType, LinkViewed> links;
 
-  @Getter @Setter private List<Note> children;
 
-  @Getter @Setter private Note note;
+  @Getter private Note note;
 
   @Getter @Setter private NotePositionViewedByUser notePosition;
+
+  public NoteRealm(Note note) {
+    this.note = note;
+  }
+
+  public Integer getId() {
+    return note.getId();
+  }
+
+  public List<Note> getChildren() {
+    return note.getChildren();
+  }
 }

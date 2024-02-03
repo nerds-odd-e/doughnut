@@ -115,16 +115,17 @@ declare namespace Generated {
 
     interface NotePositionViewedByUser {
         noteId: number;
-        notebook: NotebookViewedByUser;
+        fromBazaar: boolean;
+        circle?: Circle;
         ancestors: Note[];
     }
 
     interface NoteRealm {
-        id: number;
         links: { [P in LinkType]?: LinkViewed };
-        children: Note[];
         note: Note;
         notePosition: NotePositionViewedByUser;
+        id: number;
+        children: Note[];
     }
 
     interface NoteUpdateDetailsDTO {
@@ -140,8 +141,6 @@ declare namespace Generated {
         headNoteId: number;
         headNote: Note;
         skipReviewEntirely: boolean;
-        fromBazaar: boolean;
-        ownership: Ownership;
     }
 
     interface NotebooksViewedByUser {
@@ -167,7 +166,7 @@ declare namespace Generated {
         questionType: QuestionType;
         stem: string;
         mainTopic: string;
-        notebook?: NotebookViewedByUser;
+        headNotePosition: NotePositionViewedByUser;
         choices: Choice[];
         pictureWithMask?: PictureWithMask;
     }
@@ -283,12 +282,11 @@ declare namespace Generated {
         level: number;
     }
 
-    interface Note extends NoteBase {
+    interface Circle extends EntityIdentifiedByIdOnly {
+        name: string;
     }
 
-    interface Ownership {
-        id: number;
-        circle?: Circle;
+    interface Note extends NoteBase {
     }
 
     interface Subscription extends EntityIdentifiedByIdOnly {
@@ -317,6 +315,11 @@ declare namespace Generated {
         pictureMask: string;
     }
 
+    interface Ownership {
+        id: number;
+        circle?: Circle;
+    }
+
     interface EntityIdentifiedByIdOnly {
         id: number;
     }
@@ -342,10 +345,6 @@ declare namespace Generated {
         deletedAt: string;
         wikidataId: string;
         pictureWithMask?: PictureWithMask;
-    }
-
-    interface Circle extends EntityIdentifiedByIdOnly {
-        name: string;
     }
 
     interface Notebook extends EntityIdentifiedByIdOnly {

@@ -98,7 +98,7 @@ class RestNoteControllerTests {
       makeMe.refresh(userModel.getEntity());
       final NoteRealm noteRealm = controller.show(note);
       assertThat(noteRealm.getNote().getTopicConstructor(), equalTo(note.getTopicConstructor()));
-      assertThat(noteRealm.getNotePosition().getNotebook().getFromBazaar(), is(true));
+      assertThat(noteRealm.getNotePosition().getFromBazaar(), is(true));
     }
 
     @Test
@@ -107,7 +107,7 @@ class RestNoteControllerTests {
       makeMe.refresh(userModel.getEntity());
       final NoteRealm noteRealm = controller.show(note);
       assertThat(noteRealm.getId(), equalTo(note.getId()));
-      assertThat(noteRealm.getNotePosition().getNotebook().getFromBazaar(), is(false));
+      assertThat(noteRealm.getNotePosition().getFromBazaar(), is(false));
     }
   }
 

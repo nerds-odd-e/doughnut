@@ -14,20 +14,15 @@ public class NoteViewer {
 
   private User viewer;
   private Note note;
-  private JsonViewer jsonViewer;
 
   public NoteViewer(User viewer, Note note) {
     this.viewer = viewer;
     this.note = note;
-    this.jsonViewer = new JsonViewer(viewer);
   }
 
   public NoteRealm toJsonObject() {
-    NoteRealm nvb = new NoteRealm();
-    nvb.setId(note.getId());
+    NoteRealm nvb = new NoteRealm(note);
     nvb.setLinks(getAllLinks());
-    nvb.setChildren(note.getChildren());
-    nvb.setNote(note);
     nvb.setNotePosition(jsonNotePosition());
 
     return nvb;
@@ -74,7 +69,8 @@ public class NoteViewer {
   public NotePositionViewedByUser jsonNotePosition() {
     NotePositionViewedByUser nvb = new NotePositionViewedByUser();
     nvb.setNoteId(note.getId());
-    nvb.setNotebook(jsonViewer.jsonNotebookViewedByUser(note.getNotebook()));
+    nvb.setFromBazaar(viewer == null || !viewer.owns(note.getNotebook()));
+    nvb.setCircle(note.getNotebook().getOwnership().getCircle());
     nvb.setAncestors(note.getAncestors());
     return nvb;
   }
