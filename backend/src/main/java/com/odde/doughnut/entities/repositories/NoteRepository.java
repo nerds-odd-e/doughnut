@@ -1,10 +1,8 @@
 package com.odde.doughnut.entities.repositories;
 
 import com.odde.doughnut.entities.Note;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Stream;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -67,20 +65,4 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
 
   String searchForLinkTarget =
       " AND REGEXP_LIKE(topic_constructor, :pattern) AND note.deleted_at IS NULL ";
-
-  @Modifying
-  @Query(
-      value =
-          " UPDATE note JOIN notes_closure ON notes_closure.note_id = note.id AND notes_closure.ancestor_id = :#{#note.id} SET deleted_at = :currentUTCTimestamp WHERE deleted_at IS NULL",
-      nativeQuery = true)
-  void softDeleteDescendants(
-      @Param("note") Note note, @Param("currentUTCTimestamp") Timestamp currentUTCTimestamp);
-
-  @Modifying
-  @Query(
-      value =
-          " UPDATE note JOIN notes_closure ON notes_closure.note_id = note.id AND notes_closure.ancestor_id = :#{#note.id} SET deleted_at = NULL WHERE deleted_at = :currentUTCTimestamp",
-      nativeQuery = true)
-  void undoDeleteDescendants(
-      @Param("note") Note note, @Param("currentUTCTimestamp") Timestamp currentUTCTimestamp);
 }

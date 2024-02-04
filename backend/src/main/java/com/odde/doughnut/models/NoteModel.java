@@ -25,7 +25,6 @@ public class NoteModel {
 
     entity.setDeletedAt(currentUTCTimestamp);
     modelFactoryService.save(entity);
-    modelFactoryService.noteRepository.softDeleteDescendants(entity, currentUTCTimestamp);
   }
 
   public void restore() {
@@ -35,7 +34,6 @@ public class NoteModel {
         modelFactoryService.save(entity.getNotebook());
       }
     }
-    modelFactoryService.noteRepository.undoDeleteDescendants(entity, entity.getDeletedAt());
     entity.setDeletedAt(null);
     modelFactoryService.save(entity);
   }
