@@ -25,7 +25,8 @@ import lombok.Setter;
 import org.hibernate.annotations.Where;
 import org.springframework.beans.BeanUtils;
 
-@MappedSuperclass
+@Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "hierarchical_note")
 @JsonPropertyOrder({"topic", "topicConstructor", "details", "parentId", "updatedAt"})
 public abstract class NoteBase extends EntityIdentifiedByIdOnly {
 

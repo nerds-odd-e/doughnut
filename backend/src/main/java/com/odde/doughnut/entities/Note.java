@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Entity
-@Table(name = "note")
+@Table(name = "hierarchical_note")
+@PrimaryKeyJoinColumn(name = "note_id")
 public class Note extends NoteBase {
   public static final int MAX_TITLE_LENGTH = 150;
 
