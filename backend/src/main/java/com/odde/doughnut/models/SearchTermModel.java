@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.util.Strings;
 
@@ -37,7 +36,7 @@ public class SearchTermModel {
   }
 
   private String getPattern() {
-    return Pattern.quote(searchTerm.getTrimmedSearchKey());
+    return "%" + searchTerm.getTrimmedSearchKey() + "%";
   }
 
   public List<Note> searchForNotes() {

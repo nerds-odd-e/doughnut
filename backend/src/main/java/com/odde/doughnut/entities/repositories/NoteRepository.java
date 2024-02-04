@@ -63,6 +63,5 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
           + "             WHERE notebook.ownership_id = ownership.id "
           + joinNotebooksEnd;
 
-  String searchForLinkTarget =
-      " AND REGEXP_LIKE(topic_constructor, :pattern) AND note.deleted_at IS NULL ";
+  String searchForLinkTarget = " AND topic_constructor LIKE :pattern AND note.deleted_at IS NULL ";
 }
