@@ -17,6 +17,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Getter;
@@ -84,6 +85,12 @@ public abstract class NoteBase extends EntityIdentifiedByIdOnly {
   @OrderBy("sibling_order")
   @Getter
   private final List<Note> children = new ArrayList<>();
+
+  @OneToMany(
+      mappedBy =
+          "note") // Ensure this matches the field name in ReviewPoint that refers back to Note
+  @JsonIgnore
+  private Set<ReviewPoint> reviewPoints;
 
   @Column(name = "updated_at")
   @Getter

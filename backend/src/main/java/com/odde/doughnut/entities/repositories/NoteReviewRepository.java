@@ -8,69 +8,37 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface NoteReviewRepository extends CrudRepository<Note, Integer> {
-  String selectThingsFrom = "SELECT nx.*  from note nx  ";
+  String selectThingsFrom = "SELECT n  from Note n  ";
 
-  @Query(
-      value = selectThingsFrom + selectNoteThings + joinReviewPoint + whereClaus + orderByDate,
-      nativeQuery = true)
+  @Query(value = selectThingsFrom + selectNoteThings + joinReviewPoint + whereClaus + orderByDate)
   Stream<Note> findByOwnershipWhereThereIsNoReviewPoint(Integer userId, Integer ownershipId);
 
   @Query(
       value =
-          "SELECT count(1) as count from note nx "
-              + selectNoteThings
-              + joinReviewPoint
-              + whereClaus,
-      nativeQuery = true)
+          "SELECT count(1) as count from Note n " + selectNoteThings + joinReviewPoint + whereClaus)
   int countByOwnershipWhereThereIsNoReviewPoint(Integer userId, Integer ownershipId);
 
-  @Query(
-      value =
-          selectThingsFrom
-              + selectThingJoinNote
-              + joinReviewPoint
-              + whereClaus
-              + fromNotebook
-              + orderByDate,
-      nativeQuery = true)
+  @Query(value = selectThingsFrom + joinReviewPoint + whereClaus + fromNotebook + orderByDate)
   Stream<Note> findByAncestorWhereThereIsNoReviewPoint(Integer userId, Integer notebookId);
 
   @Query(
-      value =
-          "SELECT count(1) as count from note nx "
-              + selectThingJoinNote
-              + joinReviewPoint
-              + whereClaus
-              + fromNotebook,
-      nativeQuery = true)
+      value = "SELECT count(1) as count from Note n " + joinReviewPoint + whereClaus + fromNotebook)
   int countByAncestorWhereThereIsNoReviewPoint(Integer userId, Integer notebookId);
 
-  @Query(
-      value =
-          "SELECT count(1) as count from note nx "
-              + selectThingJoinNote
-              + " WHERE nx.id in :noteIds"
-              + fromNotebook,
-      nativeQuery = true)
+  @Query(value = "SELECT count(1) as count from Note n " + " WHERE n.id in :noteIds" + fromNotebook)
   int countByAncestorAndInTheList(Integer notebookId, @Param("noteIds") List<Integer> noteIds);
 
   String whereClaus =
       " WHERE "
-          + "   rp.id IS NULL "
-          + "   AND nx.skip_review IS NOT TRUE "
-          + "   AND nx.deleted_at IS NULL ";
+          + "   rp IS NULL "
+          + "   AND COALESCE(n.reviewSetting.skipReview, FALSE) = FALSE "
+          + "   AND n.deletedAt IS NULL ";
 
-  String joinReviewPoint =
-      " LEFT JOIN review_point rp" + " ON nx.id = rp.note_id " + "   AND rp.user_id = :userId";
+  String joinReviewPoint = " LEFT JOIN n.reviewPoints rp ON rp.user.id = :userId";
 
-  String orderByDate = " ORDER BY level, created_at, id";
+  String orderByDate = " ORDER BY n.reviewSetting.level, n.createdAt, n.id";
 
-  String fromNotebook = "   AND nx.notebook_id = :notebookId ";
+  String fromNotebook = "   AND n.notebook.id = :notebookId ";
 
-  String selectThingJoinNote = " ";
-
-  String selectNoteThings =
-      selectThingJoinNote
-          + " JOIN notebook ON notebook.id = nx.notebook_id "
-          + " AND notebook.ownership_id = :ownershipId ";
+  String selectNoteThings = " JOIN n.notebook nb " + " ON nb.ownership.id = :ownershipId ";
 }
