@@ -25,7 +25,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   @Query(value = inAllMySubscriptions + searchForTopicLike1)
   Stream<Note> searchForUserInAllMySubscriptions(Integer userId, @Param("pattern") String pattern);
 
-  @Query(value = inAllMyCircles + searchForTopicLike, nativeQuery = true)
+  @Query(value = inAllMyCircles + searchForTopicLike1)
   Stream<Note> searchForUserInAllMyCircle(Integer userId, @Param("pattern") String pattern);
 
   @Query(
@@ -42,7 +42,6 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   List<Note> noteWithWikidataIdWithinNotebook(
       @Param("notebookId") Integer notebookId, @Param("wikidataId") String wikidataId);
 
-  String joinNotebooksBegin = selectFromNote + "  JOIN notebook ON notebook.id = note.notebook_id ";
   String joinNotebooksBegin1 = selectFromNote1 + "  JOIN n.notebook nb ";
 
   String inAllMySubscriptions =
@@ -51,11 +50,11 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   String inAllMyNotebooks = joinNotebooksBegin1 + "             ON nb.ownership.user.id = :userId ";
 
   String inAllMyCircles =
-      joinNotebooksBegin
-          + "             JOIN circle_user ON circle_user.user_id = :userId "
-          + "             JOIN circle ON circle.id = circle_user.circle_id "
-          + "             JOIN ownership ON circle.id = ownership.circle_id "
-          + "             AND notebook.ownership_id = ownership.id ";
+      joinNotebooksBegin1
+          + "            JOIN nb.ownership o "
+          + "              JOIN o.circle c "
+          + "              JOIN c.members m"
+          + "                ON m.id = :userId ";
 
   String searchForTopicLike = " WHERE topic_constructor LIKE :pattern AND note.deleted_at IS NULL ";
   String searchForTopicLike1 = " WHERE n.topicConstructor LIKE :pattern AND n.deletedAt IS NULL ";
