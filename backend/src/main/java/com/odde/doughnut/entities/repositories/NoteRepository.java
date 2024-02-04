@@ -17,16 +17,18 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
 
   String selectFromNote = "SELECT note.*  from note";
 
-  @Query(value = inAllMyNotebooksAndSubscriptions + searchForLinkTarget, nativeQuery = true)
-  Stream<Note> searchForUserInAllMyNotebooksAndSubscriptions(
-      Integer userId, @Param("pattern") String pattern);
+  @Query(value = inAllMyNotebooks + searchForTopicLike, nativeQuery = true)
+  Stream<Note> searchForUserInAllMyNotebooks(Integer userId, String pattern);
 
-  @Query(value = inAllMyNotebooksSubscriptionsAndCircles + searchForLinkTarget, nativeQuery = true)
+  @Query(value = inAllMySubscriptions + searchForTopicLike, nativeQuery = true)
+  Stream<Note> searchForUserInAllMySubscriptions(Integer userId, @Param("pattern") String pattern);
+
+  @Query(value = inAllMyNotebooksSubscriptionsAndCircles + searchForTopicLike, nativeQuery = true)
   Stream<Note> searchForUserInAllMyNotebooksSubscriptionsAndCircle(
       Integer userId, @Param("pattern") String pattern);
 
   @Query(
-      value = selectFromNote + " WHERE note.notebook_id = :notebookId " + searchForLinkTarget,
+      value = selectFromNote + " WHERE note.notebook_id = :notebookId " + searchForTopicLike,
       nativeQuery = true)
   Stream<Note> searchInNotebook(Integer notebookId, @Param("pattern") String pattern);
 
@@ -39,21 +41,23 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   List<Note> noteWithWikidataIdWithinNotebook(
       @Param("notebookId") Integer notebookId, @Param("wikidataId") String wikidataId);
 
+  String unionNotebooksFromSubscription =
+      "          SELECT notebook_id as id FROM subscription "
+          + "             WHERE subscription.user_id = :userId ";
+
   String joinNotebooksBegin =
       selectFromNote + "  JOIN (" + "          SELECT notebook.id FROM notebook ";
 
-  String joinNotebooksEnd =
-      "          UNION "
-          + "          SELECT notebook_id FROM subscription "
-          + "             WHERE subscription.user_id = :userId "
-          + "       ) nb ON nb.id = note.notebook_id "
-          + "  WHERE 1=1 ";
+  String joinNotebooksEnd1 = "       ) nb ON nb.id = note.notebook_id " + "  WHERE 1=1 ";
 
-  String inAllMyNotebooksAndSubscriptions =
+  String inAllMySubscriptions =
+      selectFromNote + "  JOIN (" + unionNotebooksFromSubscription + joinNotebooksEnd1;
+
+  String inAllMyNotebooks =
       joinNotebooksBegin
           + "             JOIN ownership ON ownership.user_id = :userId "
           + "             WHERE notebook.ownership_id = ownership.id "
-          + joinNotebooksEnd;
+          + joinNotebooksEnd1;
 
   String inAllMyNotebooksSubscriptionsAndCircles =
       joinNotebooksBegin
@@ -61,7 +65,9 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
           + "             LEFT JOIN circle ON circle.id = circle_user.circle_id "
           + "             JOIN ownership ON circle.id = ownership.circle_id OR ownership.user_id = :userId "
           + "             WHERE notebook.ownership_id = ownership.id "
-          + joinNotebooksEnd;
+          + "          UNION "
+          + unionNotebooksFromSubscription
+          + joinNotebooksEnd1;
 
-  String searchForLinkTarget = " AND topic_constructor LIKE :pattern AND note.deleted_at IS NULL ";
+  String searchForTopicLike = " AND topic_constructor LIKE :pattern AND note.deleted_at IS NULL ";
 }

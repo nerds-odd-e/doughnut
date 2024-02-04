@@ -21,13 +21,15 @@ public class SearchTermModel {
   }
 
   private Stream<Note> search() {
+    Stream inMyNotebooks = noteRepository.searchForUserInAllMyNotebooks(user.getId(), getPattern());
     if (searchTerm.getAllMyCircles()) {
       return noteRepository.searchForUserInAllMyNotebooksSubscriptionsAndCircle(
           user.getId(), getPattern());
     }
     if (searchTerm.getAllMyNotebooksAndSubscriptions()) {
-      return noteRepository.searchForUserInAllMyNotebooksAndSubscriptions(
-          user.getId(), getPattern());
+      return Stream.concat(
+          inMyNotebooks,
+          noteRepository.searchForUserInAllMySubscriptions(user.getId(), getPattern()));
     }
     Integer notebookId = null;
     if (searchTerm.note != null) {
