@@ -8,15 +8,13 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Entity
-@Table(name = "hierarchical_note")
-@PrimaryKeyJoinColumn(name = "note_id")
-public class Note extends NoteBase {
+@Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "note")
+public abstract class Note extends NoteBase {
   public static final int MAX_TITLE_LENGTH = 150;
 
-  private Note() {}
-
   public static Note createNote(User user, Timestamp currentUTCTimestamp, String topicConstructor) {
-    final Note note = new Note();
+    final Note note = new HierarchicalNote();
     note.setUpdatedAt(currentUTCTimestamp);
     note.setTopicConstructor(topicConstructor);
     note.setCreatedAt(currentUTCTimestamp);
