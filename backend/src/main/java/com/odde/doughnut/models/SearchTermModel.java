@@ -21,21 +21,29 @@ public class SearchTermModel {
   }
 
   private Stream<Note> search() {
-    Stream inMyNotebooks = noteRepository.searchForUserInAllMyNotebooks(user.getId(), getPattern());
     if (searchTerm.getAllMyCircles()) {
-      return noteRepository.searchForUserInAllMyNotebooksSubscriptionsAndCircle(
-          user.getId(), getPattern());
+      return Stream.concat(
+          searchInMyNotebooksAndSubscriptions(),
+          noteRepository.searchForUserInAllMyCircle(user.getId(), getPattern()));
     }
     if (searchTerm.getAllMyNotebooksAndSubscriptions()) {
-      return Stream.concat(
-          inMyNotebooks,
-          noteRepository.searchForUserInAllMySubscriptions(user.getId(), getPattern()));
+      return searchInMyNotebooksAndSubscriptions();
     }
     Integer notebookId = null;
     if (searchTerm.note != null) {
       notebookId = searchTerm.note.getNotebook().getId();
     }
     return noteRepository.searchInNotebook(notebookId, getPattern());
+  }
+
+  private Stream<Note> searchInMyNotebooksAndSubscriptions() {
+    return Stream.concat(
+        searchInMyNotebooks(),
+        noteRepository.searchForUserInAllMySubscriptions(user.getId(), getPattern()));
+  }
+
+  private Stream<Note> searchInMyNotebooks() {
+    return noteRepository.searchForUserInAllMyNotebooks(user.getId(), getPattern());
   }
 
   private String getPattern() {

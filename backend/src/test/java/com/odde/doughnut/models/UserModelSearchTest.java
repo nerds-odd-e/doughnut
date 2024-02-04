@@ -1,8 +1,7 @@
 package com.odde.doughnut.models;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.controllers.json.SearchTerm;
@@ -95,28 +94,31 @@ public class UserModelSearchTest {
     void setup() {
       noteInTheSameNotebook = makeMe.aNote(commonPhrase + " same notebook").under(note).please();
       noteFromMyOtherNotebook =
-          makeMe.aNote(commonPhrase + " same notebook").creatorAndOwner(user).please();
+          makeMe.aNote(commonPhrase + " other notebook").creatorAndOwner(user).please();
       Circle circle = makeMe.aCircle().hasMember(user).hasMember(anotherUser).please();
       circleNote = makeMe.aNote(commonPhrase + " circle").inCircle(circle).please();
     }
 
     @ParameterizedTest
     @CsvSource({
-      "false, false, false, false, false",
-      "true,  false, true,  true,  false",
-      "true,  true,  true,  true,  true",
+      "false, false, false, false, false, 1",
+      "true,  false, true,  true,  false, 3",
+      "true,  true,  true,  true,  true, 4",
     })
     void testSearch(
         boolean allMyNotebooksAndSubscriptions,
         boolean allMyCircle,
         boolean expectOtherNotebooks,
         boolean expectSubscription,
-        boolean expectCircleNote) {
+        boolean expectCircleNote,
+        int expectedCount) {
       searchTerm.setSearchKey(commonPhrase);
       searchTerm.setAllMyNotebooksAndSubscriptions(allMyNotebooksAndSubscriptions);
       searchTerm.setAllMyCircles(allMyCircle);
+      List<Note> actual = search();
+      assertThat(actual, hasSize(expectedCount));
       assertThat(
-          search(),
+          actual,
           containsInAnyOrder(
               expectedNotes(expectOtherNotebooks, expectSubscription, expectCircleNote)));
     }

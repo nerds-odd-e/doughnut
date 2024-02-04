@@ -23,9 +23,8 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   @Query(value = inAllMySubscriptions + searchForTopicLike, nativeQuery = true)
   Stream<Note> searchForUserInAllMySubscriptions(Integer userId, @Param("pattern") String pattern);
 
-  @Query(value = inAllMyNotebooksSubscriptionsAndCircles + searchForTopicLike, nativeQuery = true)
-  Stream<Note> searchForUserInAllMyNotebooksSubscriptionsAndCircle(
-      Integer userId, @Param("pattern") String pattern);
+  @Query(value = inAllMyCircles + searchForTopicLike, nativeQuery = true)
+  Stream<Note> searchForUserInAllMyCircle(Integer userId, @Param("pattern") String pattern);
 
   @Query(
       value = selectFromNote + " WHERE note.notebook_id = :notebookId " + searchForTopicLike,
@@ -59,14 +58,12 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
           + "             WHERE notebook.ownership_id = ownership.id "
           + joinNotebooksEnd1;
 
-  String inAllMyNotebooksSubscriptionsAndCircles =
+  String inAllMyCircles =
       joinNotebooksBegin
-          + "             LEFT JOIN circle_user ON circle_user.user_id = :userId "
-          + "             LEFT JOIN circle ON circle.id = circle_user.circle_id "
-          + "             JOIN ownership ON circle.id = ownership.circle_id OR ownership.user_id = :userId "
+          + "             JOIN circle_user ON circle_user.user_id = :userId "
+          + "             JOIN circle ON circle.id = circle_user.circle_id "
+          + "             JOIN ownership ON circle.id = ownership.circle_id "
           + "             WHERE notebook.ownership_id = ownership.id "
-          + "          UNION "
-          + unionNotebooksFromSubscription
           + joinNotebooksEnd1;
 
   String searchForTopicLike = " AND topic_constructor LIKE :pattern AND note.deleted_at IS NULL ";
