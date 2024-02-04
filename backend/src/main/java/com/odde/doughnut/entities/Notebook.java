@@ -1,13 +1,9 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import java.sql.Timestamp;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -44,4 +40,8 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @Column(name = "deleted_at")
   @Setter
   private Timestamp deletedAt;
+
+  @OneToMany(mappedBy = "notebook", cascade = CascadeType.DETACH)
+  @JsonIgnore
+  private List<Subscription> subscriptions;
 }

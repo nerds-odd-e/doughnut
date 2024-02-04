@@ -22,7 +22,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   @Query(value = inAllMyNotebooks + searchForTopicLike1)
   Stream<Note> searchForUserInAllMyNotebooks(Integer userId, String pattern);
 
-  @Query(value = inAllMySubscriptions + searchForTopicLike, nativeQuery = true)
+  @Query(value = inAllMySubscriptions + searchForTopicLike1)
   Stream<Note> searchForUserInAllMySubscriptions(Integer userId, @Param("pattern") String pattern);
 
   @Query(value = inAllMyCircles + searchForTopicLike, nativeQuery = true)
@@ -43,15 +43,12 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
       @Param("notebookId") Integer notebookId, @Param("wikidataId") String wikidataId);
 
   String joinNotebooksBegin = selectFromNote + "  JOIN notebook ON notebook.id = note.notebook_id ";
-  String joinNotebooksBegin1 = selectFromNote1 + "  JOIN n.notebook ";
+  String joinNotebooksBegin1 = selectFromNote1 + "  JOIN n.notebook nb ";
 
   String inAllMySubscriptions =
-      selectFromNote
-          + "  JOIN subscription "
-          + "             ON subscription.user_id = :userId AND subscription.notebook_id = note.notebook_id ";
+      joinNotebooksBegin1 + " JOIN nb.subscriptions s ON s.user.id = :userId ";
 
-  String inAllMyNotebooks =
-      joinNotebooksBegin1 + "             ON n.notebook.ownership.user.id = :userId ";
+  String inAllMyNotebooks = joinNotebooksBegin1 + "             ON nb.ownership.user.id = :userId ";
 
   String inAllMyCircles =
       joinNotebooksBegin
