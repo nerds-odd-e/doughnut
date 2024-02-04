@@ -9,13 +9,15 @@ import org.springframework.data.repository.query.Param;
 
 public interface NoteRepository extends CrudRepository<Note, Integer> {
 
-  @Query(value = "SELECT note.* FROM note where id in (:ids)", nativeQuery = true)
+  String selectFromNote1 = "SELECT n FROM Note n";
+
+  @Query(value = selectFromNote1 + " WHERE n.id IN (:ids)")
   Stream<Note> findAllByIds(List<Integer> ids);
 
-  @Query(value = selectFromNote + " where topic_constructor = :key limit 1", nativeQuery = true)
-  Note findFirstByTopicConstructor(@Param("key") String key);
-
   String selectFromNote = "SELECT note.*  from note";
+
+  @Query(value = selectFromNote1 + " where n.topicConstructor = :key")
+  Note findFirstByTopicConstructor(@Param("key") String key);
 
   @Query(value = inAllMyNotebooks + searchForTopicLike, nativeQuery = true)
   Stream<Note> searchForUserInAllMyNotebooks(Integer userId, String pattern);
