@@ -18,17 +18,17 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   String selectFromNote = "SELECT note.*  from note";
 
   @Query(value = inAllMyNotebooksAndSubscriptions + searchForLinkTarget, nativeQuery = true)
-  List<Note> searchForUserInAllMyNotebooksAndSubscriptions(
+  Stream<Note> searchForUserInAllMyNotebooksAndSubscriptions(
       Integer userId, @Param("pattern") String pattern);
 
   @Query(value = inAllMyNotebooksSubscriptionsAndCircles + searchForLinkTarget, nativeQuery = true)
-  List<Note> searchForUserInAllMyNotebooksSubscriptionsAndCircle(
+  Stream<Note> searchForUserInAllMyNotebooksSubscriptionsAndCircle(
       Integer userId, @Param("pattern") String pattern);
 
   @Query(
       value = selectFromNote + " WHERE note.notebook_id = :notebookId " + searchForLinkTarget,
       nativeQuery = true)
-  List<Note> searchInNotebook(Integer notebookId, @Param("pattern") String pattern);
+  Stream<Note> searchInNotebook(Integer notebookId, @Param("pattern") String pattern);
 
   @Query(
       value =

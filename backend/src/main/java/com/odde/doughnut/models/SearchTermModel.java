@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.logging.log4j.util.Strings;
 
 public class SearchTermModel {
@@ -19,7 +20,7 @@ public class SearchTermModel {
     this.noteRepository = noteRepository;
   }
 
-  private List<Note> search() {
+  private Stream<Note> search() {
     if (searchTerm.getAllMyCircles()) {
       return noteRepository.searchForUserInAllMyNotebooksSubscriptionsAndCircle(
           user.getId(), getPattern());
@@ -49,8 +50,6 @@ public class SearchTermModel {
       avoidNoteId = searchTerm.note.getId();
     }
     Integer finalAvoidNoteId = avoidNoteId;
-    return search().stream()
-        .filter(n -> !n.getId().equals(finalAvoidNoteId))
-        .collect(Collectors.toList());
+    return search().filter(n -> !n.getId().equals(finalAvoidNoteId)).collect(Collectors.toList());
   }
 }
