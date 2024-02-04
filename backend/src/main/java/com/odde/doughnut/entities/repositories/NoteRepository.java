@@ -19,7 +19,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   @Query(value = selectFromNote1 + " where n.topicConstructor = :key")
   Note findFirstByTopicConstructor(@Param("key") String key);
 
-  @Query(value = inAllMyNotebooks + searchForTopicLike, nativeQuery = true)
+  @Query(value = inAllMyNotebooks + searchForTopicLike1)
   Stream<Note> searchForUserInAllMyNotebooks(Integer userId, String pattern);
 
   @Query(value = inAllMySubscriptions + searchForTopicLike, nativeQuery = true)
@@ -43,6 +43,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
       @Param("notebookId") Integer notebookId, @Param("wikidataId") String wikidataId);
 
   String joinNotebooksBegin = selectFromNote + "  JOIN notebook ON notebook.id = note.notebook_id ";
+  String joinNotebooksBegin1 = selectFromNote1 + "  JOIN n.notebook ";
 
   String inAllMySubscriptions =
       selectFromNote
@@ -50,9 +51,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
           + "             ON subscription.user_id = :userId AND subscription.notebook_id = note.notebook_id ";
 
   String inAllMyNotebooks =
-      joinNotebooksBegin
-          + "             JOIN ownership ON ownership.user_id = :userId "
-          + "             AND notebook.ownership_id = ownership.id ";
+      joinNotebooksBegin1 + "             ON n.notebook.ownership.user.id = :userId ";
 
   String inAllMyCircles =
       joinNotebooksBegin
@@ -62,4 +61,5 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
           + "             AND notebook.ownership_id = ownership.id ";
 
   String searchForTopicLike = " WHERE topic_constructor LIKE :pattern AND note.deleted_at IS NULL ";
+  String searchForTopicLike1 = " WHERE n.topicConstructor LIKE :pattern AND n.deletedAt IS NULL ";
 }
