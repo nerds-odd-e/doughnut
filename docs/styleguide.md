@@ -1,12 +1,18 @@
 # Style Guide
+
 - For typescript code, turn on autofix on save in VSCode IDE:
   - Install these following VSCode extensions/plugins:
     1. [Vue.volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
     2. [esbenp.prettier-vscode](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
     3. [dbaeumer.vscode-eslint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
+
 ```json
-"eslint.autoFixOnSave": true
+"editor.codeActionsOnSave": {
+  "source.organizeImports": "explicit",
+  "source.fixAll": "explicit"
+}
 ```
+
 - Use [EditorConfig](https://editorconfig.org/) for general coding styles.
   - Most Editors / IDEs support EditorConfig already.  
     [Download a plugin](https://editorconfig.org/#download) if your tool doesn't support it
@@ -18,4 +24,4 @@
     - :warning: For IntelliJ, download
       the [IntelliJ Java Google Style file](https://raw.githubusercontent.com/google/styleguide/gh-pages/intellij-java-google-style.xml)
       and import it into File→Settings→Editor→Code Style.  
-      ![](images/import_google_java_style.png)
+      ![Google Java Style](images/import_google_java_style.png)
