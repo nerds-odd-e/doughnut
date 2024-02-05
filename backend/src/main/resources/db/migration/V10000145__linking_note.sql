@@ -3,7 +3,7 @@ CREATE TABLE linking_note (
     note_id INT UNSIGNED NOT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY unq_note_id (note_id),
-    CONSTRAINT fk_linking_note_note_id FOREIGN KEY (note_id) REFERENCES note (id) ON DELETE CASCADE,
+    CONSTRAINT fk_linking_note_note_id FOREIGN KEY (note_id) REFERENCES note (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO linking_note (note_id)
