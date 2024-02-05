@@ -19,7 +19,7 @@ describe("adding new note", () => {
   const note = makeMe.aNote.topicConstructor("mythical").please();
 
   it("search for duplicate", async () => {
-    helper.apiMock.expectingPost(`/api/notes/search`).andReturnOnce([note]);
+    helper.apiMock.expectingPost(`/api/notes/123/search`).andReturnOnce([note]);
     const wrapper = helper
       .component(NoteNewDialog)
       .withStorageProps({ parentId: 123 })
@@ -60,7 +60,7 @@ describe("adding new note", () => {
     let wrapper: VueWrapper<ComponentPublicInstance>;
 
     beforeEach(() => {
-      helper.apiMock.expectingPost(`/api/notes/search`).andReturnOnce([]);
+      helper.apiMock.expectingPost(`/api/notes/123/search`).andReturnOnce([]);
       wrapper = helper
         .component(NoteNewDialog)
         .withStorageProps({ parentId: 123 })

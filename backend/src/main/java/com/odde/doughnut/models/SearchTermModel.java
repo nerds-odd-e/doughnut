@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.logging.log4j.util.Strings;
 
@@ -20,7 +19,7 @@ public class SearchTermModel {
     this.noteRepository = noteRepository;
   }
 
-  private Stream<Note> search() {
+  private Stream<Note> search(Integer notebookId) {
     if (searchTerm.getAllMyCircles()) {
       return Stream.concat(
           searchInMyNotebooksAndSubscriptions(),
@@ -28,10 +27,6 @@ public class SearchTermModel {
     }
     if (searchTerm.getAllMyNotebooksAndSubscriptions()) {
       return searchInMyNotebooksAndSubscriptions();
-    }
-    Integer notebookId = null;
-    if (searchTerm.note != null) {
-      notebookId = searchTerm.note.getNotebook().getId();
     }
     return noteRepository.searchInNotebook(notebookId, getPattern());
   }
@@ -50,16 +45,24 @@ public class SearchTermModel {
     return "%" + searchTerm.getTrimmedSearchKey() + "%";
   }
 
+  public List<Note> searchForNotesInRelateTo(Note note) {
+    if (Strings.isBlank(searchTerm.getTrimmedSearchKey())) {
+      return List.of();
+    }
+    Integer avoidNoteId = null;
+    if (note != null) {
+      avoidNoteId = note.getId();
+    }
+    Integer finalAvoidNoteId = avoidNoteId;
+    return search(note.getNotebook().getId())
+        .filter(n -> !n.getId().equals(finalAvoidNoteId))
+        .toList();
+  }
+
   public List<Note> searchForNotes() {
     if (Strings.isBlank(searchTerm.getTrimmedSearchKey())) {
       return List.of();
     }
-
-    Integer avoidNoteId = null;
-    if (searchTerm.note != null) {
-      avoidNoteId = searchTerm.note.getId();
-    }
-    Integer finalAvoidNoteId = avoidNoteId;
-    return search().filter(n -> !n.getId().equals(finalAvoidNoteId)).collect(Collectors.toList());
+    return search(null).toList();
   }
 }

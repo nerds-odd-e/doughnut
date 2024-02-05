@@ -190,7 +190,6 @@ declare namespace Generated {
     interface SearchTerm {
         allMyNotebooksAndSubscriptions: boolean;
         allMyCircles: boolean;
-        note?: number;
         searchKey: string;
     }
 

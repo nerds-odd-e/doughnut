@@ -36,14 +36,13 @@ public class UserModelSearchTest {
   void setup() {
     user = makeMe.aUser().please();
     note = makeMe.aNote().creatorAndOwner(user).please();
-    searchTerm.note = note;
     searchTermModel =
         new SearchTermModel(user, makeMe.modelFactoryService.noteRepository, searchTerm);
     anotherUser = makeMe.aUser().toModelPlease();
   }
 
   private List<Note> search() {
-    return searchTermModel.searchForNotes();
+    return searchTermModel.searchForNotesInRelateTo(note);
   }
 
   @Test

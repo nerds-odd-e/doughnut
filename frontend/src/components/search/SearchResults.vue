@@ -116,10 +116,10 @@ export default defineComponent({
 
       this.timeoutId = debounced(async () => {
         const originalTrimmedKey = this.trimmedSearchKey;
-        const result = await this.api.relativeSearch({
-          ...this.searchTerm,
-          note: this.noteId,
-        });
+        const result = await this.api.relativeSearch(
+          this.noteId,
+          this.searchTerm,
+        );
         this.recentResult = result;
         this.cachedSearches[originalTrimmedKey] = result;
       });

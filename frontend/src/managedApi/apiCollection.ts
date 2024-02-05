@@ -217,7 +217,16 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
   },
 
-  async relativeSearch(searchTerm: Generated.SearchTerm) {
+  async relativeSearch(
+    noteId: undefined | Doughnut.ID,
+    searchTerm: Generated.SearchTerm,
+  ) {
+    if (noteId) {
+      return (await managedApi.restPost(
+        `notes/${noteId}/search`,
+        searchTerm,
+      )) as Generated.Note[];
+    }
     return (await managedApi.restPost(
       `notes/search`,
       searchTerm,

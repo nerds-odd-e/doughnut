@@ -137,6 +137,15 @@ class RestNoteController {
     return searchTermModel.searchForNotes();
   }
 
+  @PostMapping("/{note}/search")
+  @Transactional
+  public List<Note> searchForLinkTargetWithin(
+      @PathVariable("note") Note note, @Valid @RequestBody SearchTerm searchTerm) {
+    SearchTermModel searchTermModel =
+        modelFactoryService.toSearchTermModel(currentUser.getEntity(), searchTerm);
+    return searchTermModel.searchForNotesInRelateTo(note);
+  }
+
   @PostMapping(value = "/{note}/delete")
   @Transactional
   public List<NoteRealm> deleteNote(@PathVariable("note") Note note)
