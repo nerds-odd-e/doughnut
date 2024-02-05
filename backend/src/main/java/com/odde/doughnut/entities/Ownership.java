@@ -60,7 +60,8 @@ public class Ownership {
       Timestamp currentUTCTimestamp,
       ModelFactoryService modelFactoryService,
       String topicConstructor) {
-    final Note note = HierarchicalNote.createNote(user, currentUTCTimestamp, topicConstructor);
+    final Note note =
+        HierarchicalNote.createNote(user, null, currentUTCTimestamp, topicConstructor);
     note.buildNotebookForHeadNote(this, user);
     modelFactoryService.save(note.getNotebook());
     modelFactoryService.save(note);

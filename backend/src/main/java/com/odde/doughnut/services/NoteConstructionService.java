@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.entities.HierarchicalNote;
 import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
@@ -20,7 +21,8 @@ public record NoteConstructionService(
       LinkType linkTypeToParent,
       String topicConstructor)
       throws DuplicateWikidataIdException, IOException, InterruptedException {
-    Note note = parentNote.buildChildNote(user, currentUTCTimestamp, topicConstructor);
+    Note note =
+        HierarchicalNote.createNote(user, parentNote, currentUTCTimestamp, topicConstructor);
     modelFactoryService.save(note);
     modelFactoryService.createLink(
         note, note.getParent(), user, linkTypeToParent, currentUTCTimestamp);

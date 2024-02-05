@@ -13,10 +13,14 @@ import java.util.stream.Stream;
 public abstract class Note extends NoteBase {
   public static final int MAX_TITLE_LENGTH = 150;
 
-  public Note buildChildNote(User user, Timestamp currentUTCTimestamp, String topicConstructor) {
-    Note note = HierarchicalNote.createNote(user, currentUTCTimestamp, topicConstructor);
-    note.setParentNote(this);
-    return note;
+  protected void initialize(
+      User user, Note parentNote, Timestamp currentUTCTimestamp, String topicConstructor) {
+    setParentNote(parentNote);
+    setUpdatedAt(currentUTCTimestamp);
+    setTopicConstructor(topicConstructor);
+    setCreatedAt(currentUTCTimestamp);
+    setUpdatedAt(currentUTCTimestamp);
+    setCreator(user);
   }
 
   public void buildNotebookForHeadNote(Ownership ownership, User creator) {

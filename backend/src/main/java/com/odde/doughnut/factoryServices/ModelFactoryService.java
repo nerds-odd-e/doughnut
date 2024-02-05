@@ -139,13 +139,14 @@ public class ModelFactoryService {
     return link;
   }
 
-  public static Note buildALink(
+  public static LinkingNote buildALink(
       Note sourceNote,
       Note targetNote,
       User creator,
       LinkType type,
       Timestamp currentUTCTimestamp) {
-    Note note = sourceNote.buildChildNote(creator, currentUTCTimestamp, ":" + type.label);
+    LinkingNote note =
+        LinkingNote.createLink(creator, sourceNote, currentUTCTimestamp, ":" + type.label);
     note.setTargetNote(targetNote);
     note.getReviewSetting()
         .setLevel(

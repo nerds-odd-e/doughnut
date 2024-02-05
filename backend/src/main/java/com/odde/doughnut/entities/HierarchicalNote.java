@@ -11,13 +11,10 @@ import java.sql.Timestamp;
 public class HierarchicalNote extends Note {
   private HierarchicalNote() {}
 
-  public static Note createNote(User user, Timestamp currentUTCTimestamp, String topicConstructor) {
+  public static Note createNote(
+      User user, Note parentNote, Timestamp currentUTCTimestamp, String topicConstructor) {
     final Note note = new HierarchicalNote();
-    note.setUpdatedAt(currentUTCTimestamp);
-    note.setTopicConstructor(topicConstructor);
-    note.setCreatedAt(currentUTCTimestamp);
-    note.setUpdatedAt(currentUTCTimestamp);
-    note.setCreator(user);
+    note.initialize(user, parentNote, currentUTCTimestamp, topicConstructor);
     return note;
   }
 }

@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Where;
 import org.springframework.beans.BeanUtils;
 
@@ -69,14 +70,15 @@ public abstract class NoteBase extends EntityIdentifiedByIdOnly {
   private Timestamp deletedAt;
 
   @OneToMany(mappedBy = "targetNote")
+  @Filter(name = "notDeleted", condition = "deleted_at is null")
   @JsonIgnore
   @Getter
   private List<LinkingNote> refers = new ArrayList<>();
 
   @OneToMany(mappedBy = "parent", cascade = CascadeType.DETACH)
   @JsonIgnore
-  @Where(clause = "deleted_at is null")
-  @OrderBy("sibling_order")
+  @Filter(name = "notDeleted", condition = "deleted_at is null")
+  @OrderBy("siblingOrder")
   @Getter
   private final List<LinkingNote> links = new ArrayList<>();
 
