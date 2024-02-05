@@ -19,18 +19,16 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   @Query(value = selectFromNote1 + " where n.topicConstructor = :key")
   Note findFirstByTopicConstructor(@Param("key") String key);
 
-  @Query(value = inAllMyNotebooks + searchForTopicLike1)
+  @Query(value = inAllMyNotebooks + searchForTopicLike)
   Stream<Note> searchForUserInAllMyNotebooks(Integer userId, String pattern);
 
-  @Query(value = inAllMySubscriptions + searchForTopicLike1)
+  @Query(value = inAllMySubscriptions + searchForTopicLike)
   Stream<Note> searchForUserInAllMySubscriptions(Integer userId, @Param("pattern") String pattern);
 
-  @Query(value = inAllMyCircles + searchForTopicLike1)
+  @Query(value = inAllMyCircles + searchForTopicLike)
   Stream<Note> searchForUserInAllMyCircle(Integer userId, @Param("pattern") String pattern);
 
-  @Query(
-      value = selectFromNote + searchForTopicLike + " AND note.notebook_id = :notebookId ",
-      nativeQuery = true)
+  @Query(value = selectFromNote1 + searchForTopicLike + " AND n.notebook.id = :notebookId ")
   Stream<Note> searchInNotebook(Integer notebookId, @Param("pattern") String pattern);
 
   @Query(
@@ -42,20 +40,17 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   List<Note> noteWithWikidataIdWithinNotebook(
       @Param("notebookId") Integer notebookId, @Param("wikidataId") String wikidataId);
 
-  String joinNotebooksBegin1 = selectFromNote1 + "  JOIN n.notebook nb ";
-
   String inAllMySubscriptions =
-      joinNotebooksBegin1 + " JOIN nb.subscriptions s ON s.user.id = :userId ";
+      selectFromNote1 + " JOIN n.notebook.subscriptions s ON s.user.id = :userId ";
 
-  String inAllMyNotebooks = joinNotebooksBegin1 + "             ON nb.ownership.user.id = :userId ";
+  String inAllMyNotebooks =
+      selectFromNote1 + "  JOIN n.notebook nb ON nb.ownership.user.id = :userId ";
 
   String inAllMyCircles =
-      joinNotebooksBegin1
-          + "            JOIN nb.ownership o "
-          + "              JOIN o.circle c "
-          + "              JOIN c.members m"
+      selectFromNote1
+          + "  JOIN n.notebook nb "
+          + "              JOIN nb.ownership.circle.members m"
           + "                ON m.id = :userId ";
 
-  String searchForTopicLike = " WHERE topic_constructor LIKE :pattern AND note.deleted_at IS NULL ";
-  String searchForTopicLike1 = " WHERE n.topicConstructor LIKE :pattern AND n.deletedAt IS NULL ";
+  String searchForTopicLike = " WHERE n.topicConstructor LIKE :pattern AND n.deletedAt IS NULL ";
 }
