@@ -3,7 +3,6 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.controllers.json.DueReviewPoints;
 import com.odde.doughnut.controllers.json.ReviewStatus;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteBase;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
@@ -34,10 +33,7 @@ public class Reviewing {
       return Stream.empty();
     }
     List<Integer> alreadyInitialReviewed =
-        getNewReviewPointsOfToday().stream()
-            .map(ReviewPoint::getNote)
-            .map(NoteBase::getId)
-            .toList();
+        getNewReviewPointsOfToday().stream().map(ReviewPoint::getNote).map(Note::getId).toList();
     return Stream.concat(
             getSubscriptionModelStream()
                 .flatMap(

@@ -66,7 +66,7 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
     }
   }
 
-  private void assertReadAuthorizationNote(NoteBase note) throws UnexpectedNoAccessRightException {
+  private void assertReadAuthorizationNote(Note note) throws UnexpectedNoAccessRightException {
     assertReadAuthorizationNotebook(note.getNotebook());
   }
 

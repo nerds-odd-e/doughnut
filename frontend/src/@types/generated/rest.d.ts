@@ -258,7 +258,7 @@ declare namespace Generated {
     }
 
     interface Thing {
-        note?: NoteBase;
+        note?: Note;
         linkType?: LinkType;
         sourceNote?: Note;
         targetNote?: Note;
@@ -285,7 +285,20 @@ declare namespace Generated {
         name: string;
     }
 
-    interface Note extends NoteBase {
+    interface Note extends EntityIdentifiedByIdOnly {
+        topic: string;
+        topicConstructor: string;
+        /**
+         * The details of the note is in markdown format.
+         */
+        details: string;
+        parentId?: number;
+        updatedAt: string;
+        noteAccessories: NoteAccessories;
+        createdAt: string;
+        deletedAt: string;
+        wikidataId: string;
+        pictureWithMask?: PictureWithMask;
     }
 
     interface Subscription extends EntityIdentifiedByIdOnly {
@@ -321,22 +334,6 @@ declare namespace Generated {
 
     interface EntityIdentifiedByIdOnly {
         id: number;
-    }
-
-    interface NoteBase extends EntityIdentifiedByIdOnly {
-        topic: string;
-        topicConstructor: string;
-        /**
-         * The details of the note is in markdown format.
-         */
-        details: string;
-        parentId?: number;
-        updatedAt: string;
-        noteAccessories: NoteAccessories;
-        createdAt: string;
-        deletedAt: string;
-        wikidataId: string;
-        pictureWithMask?: PictureWithMask;
     }
 
     interface NoteAccessories {

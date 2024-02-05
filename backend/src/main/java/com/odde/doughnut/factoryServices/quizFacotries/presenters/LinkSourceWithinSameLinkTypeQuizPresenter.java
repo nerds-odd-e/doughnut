@@ -3,7 +3,6 @@ package com.odde.doughnut.factoryServices.quizFacotries.presenters;
 import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteBase;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import java.util.List;
 import java.util.stream.Stream;
@@ -32,8 +31,8 @@ public class LinkSourceWithinSameLinkTypeQuizPresenter extends QuizQuestionWithO
         .map(
             note -> {
               QuizQuestion.Choice choice = new QuizQuestion.Choice();
-              NoteBase source = note.getParent();
-              NoteBase target = note.getTargetNote();
+              Note source = note.getParent();
+              Note target = note.getTargetNote();
               choice.setDisplay(
                   ClozedString.htmlClozedString(source.getTopicConstructor())
                       .hide(target.getNoteTitle())
