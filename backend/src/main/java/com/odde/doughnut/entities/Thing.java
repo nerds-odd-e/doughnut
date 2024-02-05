@@ -7,7 +7,7 @@ import org.springframework.lang.Nullable;
 
 @JsonPropertyOrder({"note", "link", "linkType", "sourceNote", "targetNote", "createdAt"})
 public class Thing {
-  @Getter @Setter @Nullable private NoteBase note;
+  @Getter @Setter @Nullable private Note note;
 
   @Nullable
   public Integer getId() {

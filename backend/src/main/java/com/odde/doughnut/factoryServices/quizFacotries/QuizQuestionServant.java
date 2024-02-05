@@ -43,17 +43,17 @@ public class QuizQuestionServant {
     this.aiAdvisorService = aiAdvisorService;
   }
 
-  public List<Note> chooseFromCohort(NoteBase answerNote, Predicate<Note> notePredicate) {
+  public List<Note> chooseFromCohort(Note answerNote, Predicate<Note> notePredicate) {
     List<Note> list = getCohort(answerNote, n -> !n.equals(answerNote) && notePredicate.test(n));
     return randomizer.randomlyChoose(maxFillingOptionCount, list).toList();
   }
 
-  public List<Note> getCohort(NoteBase note, Predicate<Note> notePredicate) {
+  public List<Note> getCohort(Note note, Predicate<Note> notePredicate) {
     List<Note> list =
         note.getSiblings().stream().filter(notePredicate).collect(Collectors.toList());
     if (list.size() > 0) return list;
 
-    Note grand = modelFactoryService.convertToNote(note);
+    Note grand = note;
     for (int i = 0; i < 2; i++)
       if (grand.getParent() != null) {
         grand = grand.getParent();
@@ -111,7 +111,7 @@ public class QuizQuestionServant {
     return userModel.getReviewPointFor(thing);
   }
 
-  public List<Note> chooseFromCohortAvoidUncles(Note note, NoteBase answerNote) {
+  public List<Note> chooseFromCohortAvoidUncles(Note note, Note answerNote) {
     List<Note> uncles =
         new NoteViewer(user, note.getParent())
             .linksOfTypeThroughDirect(List.of(note.getLinkType())).stream()
@@ -122,7 +122,7 @@ public class QuizQuestionServant {
   }
 
   private List<Note> chooseCohortAndAvoid(
-      NoteBase answerNote, Note noteToAvoid, List<Note> notesToAvoid) {
+      Note answerNote, Note noteToAvoid, List<Note> notesToAvoid) {
     return chooseFromCohort(answerNote, n -> !n.equals(noteToAvoid) && !notesToAvoid.contains(n));
   }
 

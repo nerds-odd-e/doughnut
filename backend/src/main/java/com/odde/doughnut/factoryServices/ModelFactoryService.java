@@ -123,10 +123,6 @@ public class ModelFactoryService {
     return nb;
   }
 
-  public Note convertToNote(NoteBase note) {
-    return entityManager.find(Note.class, note.getId());
-  }
-
   public Note createLink(
       Note sourceNote,
       Note targetNote,
