@@ -70,14 +70,15 @@ public abstract class NoteBase extends EntityIdentifiedByIdOnly {
 
   @OneToMany(mappedBy = "targetNote")
   @JsonIgnore
-  private List<Note> refers = new ArrayList<>();
+  @Getter
+  private List<LinkingNote> refers = new ArrayList<>();
 
   @OneToMany(mappedBy = "parent", cascade = CascadeType.DETACH)
   @JsonIgnore
-  @Where(clause = "deleted_at is null and target_note_id is not null")
+  @Where(clause = "deleted_at is null")
   @OrderBy("sibling_order")
   @Getter
-  private final List<Note> links = new ArrayList<>();
+  private final List<LinkingNote> links = new ArrayList<>();
 
   @OneToMany(mappedBy = "parent", cascade = CascadeType.DETACH)
   @JsonIgnore
@@ -187,11 +188,6 @@ public abstract class NoteBase extends EntityIdentifiedByIdOnly {
       p = p.getParent();
     }
     return result;
-  }
-
-  @JsonIgnore
-  public List<Note> getRefers() {
-    return refers;
   }
 
   public String getTopic() {

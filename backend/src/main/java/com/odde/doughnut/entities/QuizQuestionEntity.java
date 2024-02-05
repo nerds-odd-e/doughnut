@@ -128,7 +128,8 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
     return getQuestionType().presenter.apply(this);
   }
 
-  public void setChoicesAndRightAnswer(Note answerNote, List<Note> options, Randomizer randomizer) {
+  public void setChoicesAndRightAnswer(
+      Note answerNote, List<? extends Note> options, Randomizer randomizer) {
     List<Note> optionsEntities = new ArrayList<>(options);
     optionsEntities.add(answerNote);
     List<Note> shuffled = randomizer.shuffle(optionsEntities);

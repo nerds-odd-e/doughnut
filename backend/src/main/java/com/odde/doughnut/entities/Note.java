@@ -32,7 +32,7 @@ public abstract class Note extends NoteBase {
   }
 
   @JsonIgnore
-  public Stream<Note> getSiblingLinksOfSameLinkType(User user) {
+  public Stream<LinkingNote> getSiblingLinksOfSameLinkType(User user) {
     return targetNoteViewer(user)
         .linksOfTypeThroughReverse(getLinkType())
         .filter(l -> !l.equals(this));

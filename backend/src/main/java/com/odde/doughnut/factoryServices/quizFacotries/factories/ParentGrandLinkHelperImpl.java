@@ -1,5 +1,6 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
+import com.odde.doughnut.entities.LinkingNote;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.models.NoteViewer;
@@ -15,7 +16,7 @@ public record ParentGrandLinkHelperImpl(User user, Note link, Note parentGrandLi
   }
 
   @Override
-  public List<Note> getCousinLinksAvoidingSiblings() {
+  public List<LinkingNote> getCousinLinksAvoidingSiblings() {
     List<Note> linkedSiblingsOfSameLinkType = link.getLinkedSiblingsOfSameLinkType(user);
     return getUncles()
         .flatMap(
@@ -24,7 +25,7 @@ public record ParentGrandLinkHelperImpl(User user, Note link, Note parentGrandLi
         .toList();
   }
 
-  private Stream<Note> getUncles() {
+  private Stream<LinkingNote> getUncles() {
     List<Note> linkTargetOfType =
         new NoteViewer(user, link.getParent())
             .linksOfTypeThroughDirect(List.of(link.getLinkType())).stream()

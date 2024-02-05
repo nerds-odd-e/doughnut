@@ -23,7 +23,7 @@ public class FromSamePartAsQuizFactory
   @Override
   public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
-      List<Note> remoteCousins = parentGrandLinkHelper.getCousinLinksAvoidingSiblings();
+      List<LinkingNote> remoteCousins = parentGrandLinkHelper.getCousinLinksAvoidingSiblings();
       cachedFillingOptions =
           servant.chooseFillingOptionsRandomly(remoteCousins).stream()
               .map(Note::getParent)
@@ -45,7 +45,7 @@ public class FromSamePartAsQuizFactory
 
   protected Note getAnswerLink() {
     if (cachedAnswerLink == null) {
-      List<Note> backwardPeers =
+      List<LinkingNote> backwardPeers =
           servant.getSiblingLinksOfSameLinkTypeHavingReviewPoint(link).toList();
       cachedAnswerLink = servant.randomizer.chooseOneRandomly(backwardPeers).orElse(null);
     }

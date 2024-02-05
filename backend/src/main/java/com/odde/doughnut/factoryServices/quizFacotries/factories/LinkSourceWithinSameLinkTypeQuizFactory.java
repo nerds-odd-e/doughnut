@@ -9,7 +9,7 @@ public class LinkSourceWithinSameLinkTypeQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory {
   protected final Note link;
   private final QuizQuestionServant servant;
-  private List<Note> cachedFillingOptions = null;
+  private List<LinkingNote> cachedFillingOptions = null;
 
   public LinkSourceWithinSameLinkTypeQuizFactory(Note note, QuizQuestionServant servant) {
     this.link = note;
@@ -17,7 +17,7 @@ public class LinkSourceWithinSameLinkTypeQuizFactory
   }
 
   @Override
-  public List<Note> generateFillingOptions() {
+  public List<LinkingNote> generateFillingOptions() {
     if (cachedFillingOptions == null) {
       cachedFillingOptions =
           servant.chooseFromCohortAvoidSiblings(link).stream()

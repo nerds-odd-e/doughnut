@@ -48,14 +48,14 @@ public class NoteViewer {
         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
-  public List<Note> linksOfTypeThroughDirect(List<LinkType> linkTypes) {
+  public List<LinkingNote> linksOfTypeThroughDirect(List<LinkType> linkTypes) {
     return note.getLinks().stream()
         .filter(l -> l.targetVisibleAsSourceOrTo(viewer))
         .filter(l -> linkTypes.contains(l.getLinkType()))
         .toList();
   }
 
-  public Stream<Note> linksOfTypeThroughReverse(LinkType linkType) {
+  public Stream<LinkingNote> linksOfTypeThroughReverse(LinkType linkType) {
     return note.getRefers().stream()
         .filter(l -> l.getLinkType().equals(linkType))
         .filter(

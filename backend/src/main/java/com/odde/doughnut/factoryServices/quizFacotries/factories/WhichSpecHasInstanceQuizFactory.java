@@ -1,5 +1,6 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
+import com.odde.doughnut.entities.LinkingNote;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
@@ -35,7 +36,7 @@ public class WhichSpecHasInstanceQuizFactory
 
   private Note getInstanceLink() {
     if (cachedInstanceLink == null) {
-      List<Note> candidates = servant.getLinksFromSameSourceHavingReviewPoint(link).toList();
+      List<LinkingNote> candidates = servant.getLinksFromSameSourceHavingReviewPoint(link).toList();
       cachedInstanceLink = servant.randomizer.chooseOneRandomly(candidates).orElse(null);
     }
     return cachedInstanceLink;

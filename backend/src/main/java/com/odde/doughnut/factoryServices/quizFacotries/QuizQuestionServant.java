@@ -65,18 +65,18 @@ public class QuizQuestionServant {
     return randomizer.randomlyChoose(maxFillingOptionCount, candidates).toList();
   }
 
-  public Stream<Note> getSiblingLinksOfSameLinkTypeHavingReviewPoint(Note link) {
+  public Stream<LinkingNote> getSiblingLinksOfSameLinkTypeHavingReviewPoint(Note link) {
     return linksWithReviewPoint(link.getSiblingLinksOfSameLinkType(this.user));
   }
 
-  public Stream<Note> getLinksFromSameSourceHavingReviewPoint(Note link) {
-    List<Note> list =
+  public Stream<LinkingNote> getLinksFromSameSourceHavingReviewPoint(Note link) {
+    List<LinkingNote> list =
         new NoteViewer(this.user, link.getParent())
             .linksOfTypeThroughDirect(candidateQuestionLinkTypes);
     return linksWithReviewPoint(list.stream()).filter(l -> !link.equals(l));
   }
 
-  private Stream<Note> linksWithReviewPoint(Stream<Note> cousinLinksOfSameLinkType) {
+  private Stream<LinkingNote> linksWithReviewPoint(Stream<LinkingNote> cousinLinksOfSameLinkType) {
     return cousinLinksOfSameLinkType.filter(l -> getReviewPoint(l) != null);
   }
 

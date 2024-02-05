@@ -6,7 +6,7 @@ import java.util.List;
 public interface QuestionOptionsFactory {
   Note generateAnswer();
 
-  List<Note> generateFillingOptions();
+  List<? extends Note> generateFillingOptions();
 
   default int minimumOptionCount() {
     return 2;

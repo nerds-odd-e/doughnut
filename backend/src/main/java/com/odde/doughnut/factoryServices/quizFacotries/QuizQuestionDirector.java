@@ -34,7 +34,7 @@ public record QuizQuestionDirector(
       if (answerNote == null) {
         throw new QuizQuestionNotPossibleException();
       }
-      List<Note> options = optionsFactory.generateFillingOptions();
+      List<? extends Note> options = optionsFactory.generateFillingOptions();
       if (options.size() < optionsFactory.minimumOptionCount() - 1) {
         throw new QuizQuestionNotPossibleException();
       }
