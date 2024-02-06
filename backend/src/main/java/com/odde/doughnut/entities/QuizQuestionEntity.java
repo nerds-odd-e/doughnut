@@ -35,21 +35,21 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
         3, PictureTitleSelectionQuizFactory::new, null, PictureTitleSelectionQuizPresenter::new),
     PICTURE_SELECTION(
         4, PictureSelectionQuizFactory::new, null, PictureSelectionQuizPresenter::new),
-    LINK_TARGET(5, LinkTargetQuizFactory::new, null, LinkTargetQuizPresenter::new),
-    LINK_SOURCE(6, LinkSourceQuizFactory::new, null, LinkSourceQuizPresenter::new),
+    LINK_TARGET(5, null, LinkTargetQuizFactory::new, LinkTargetQuizPresenter::new),
+    LINK_SOURCE(6, null, LinkSourceQuizFactory::new, LinkSourceQuizPresenter::new),
     LINK_SOURCE_WITHIN_SAME_LINK_TYPE(
         14,
-        LinkSourceWithinSameLinkTypeQuizFactory::new,
         null,
+        LinkSourceWithinSameLinkTypeQuizFactory::new,
         LinkSourceWithinSameLinkTypeQuizPresenter::new),
-    CLOZE_LINK_TARGET(7, ClozeLinkTargetQuizFactory::new, null, ClozeLinkTargetQuizPresenter::new),
+    CLOZE_LINK_TARGET(7, null, ClozeLinkTargetQuizFactory::new, ClozeLinkTargetQuizPresenter::new),
     DESCRIPTION_LINK_TARGET(
-        8, DescriptionLinkTargetQuizFactory::new, null, DescriptionLinkTargetQuizPresenter::new),
+        8, null, DescriptionLinkTargetQuizFactory::new, DescriptionLinkTargetQuizPresenter::new),
     WHICH_SPEC_HAS_INSTANCE(
-        9, WhichSpecHasInstanceQuizFactory::new, null, WhichSpecHasInstanceQuizPresenter::new),
-    FROM_SAME_PART_AS(10, FromSamePartAsQuizFactory::new, null, FromSamePartAsQuizPresenter::new),
+        9, null, WhichSpecHasInstanceQuizFactory::new, WhichSpecHasInstanceQuizPresenter::new),
+    FROM_SAME_PART_AS(10, null, FromSamePartAsQuizFactory::new, FromSamePartAsQuizPresenter::new),
     FROM_DIFFERENT_PART_AS(
-        11, FromDifferentPartAsQuizFactory::new, null, FromDifferentPartAsQuizPresenter::new),
+        11, null, FromDifferentPartAsQuizFactory::new, FromDifferentPartAsQuizPresenter::new),
     AI_QUESTION(12, AiQuestionFactory::new, null, AiQuestionPresenter::new);
 
     public final Integer id;
@@ -74,6 +74,11 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
 
     public static QuestionType fromId(Integer id) {
       return idMap.getOrDefault(id, null);
+    }
+
+    public QuizQuestionFactory getQuizQuestionFactory(Note note, QuizQuestionServant servant) {
+      if (note instanceof HierarchicalNote) return factory.apply(note, servant);
+      return factoryForLinkingNote.apply(note, servant);
     }
   }
 

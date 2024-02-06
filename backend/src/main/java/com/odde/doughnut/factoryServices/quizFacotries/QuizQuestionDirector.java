@@ -11,13 +11,8 @@ public record QuizQuestionDirector(
     QuizQuestionEntity.QuestionType questionType, QuizQuestionServant servant) {
 
   public QuizQuestionEntity invoke(Note note) throws QuizQuestionNotPossibleException {
-    return buildAQuestionOfType(questionType, note, servant);
-  }
-
-  private QuizQuestionEntity buildAQuestionOfType(
-      QuizQuestionEntity.QuestionType questionType, Note note, QuizQuestionServant servant)
-      throws QuizQuestionNotPossibleException {
-    QuizQuestionFactory quizQuestionFactory = questionType.factory.apply(note, servant);
+    QuizQuestionFactory quizQuestionFactory;
+    quizQuestionFactory = questionType.getQuizQuestionFactory(note, servant);
 
     quizQuestionFactory.validatePossibility();
 
