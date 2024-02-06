@@ -94,7 +94,7 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   private String rawJsonQuestion;
 
   @ManyToOne(cascade = CascadeType.DETACH)
-  @JoinColumn(name = "category_link_id", referencedColumnName = "id")
+  @JoinColumn(name = "category_link_id")
   @Getter
   @Setter
   private Note categoryLink;

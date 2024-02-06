@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers.json;
 
+import com.odde.doughnut.entities.HierarchicalNote;
 import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
 import java.util.List;
@@ -23,7 +24,7 @@ public class NoteRealm {
     return note.getId();
   }
 
-  public List<Note> getChildren() {
+  public List<HierarchicalNote> getChildren() {
     return note.getChildren();
   }
 }

@@ -125,7 +125,7 @@ declare namespace Generated {
         note: Note;
         notePosition: NotePositionViewedByUser;
         id: number;
-        children: Note[];
+        children: HierarchicalNote[];
     }
 
     interface NoteUpdateDetailsDTO {
@@ -299,6 +299,9 @@ declare namespace Generated {
         deletedAt: string;
         wikidataId: string;
         pictureWithMask?: PictureWithMask;
+    }
+
+    interface HierarchicalNote extends Note {
     }
 
     interface Subscription extends EntityIdentifiedByIdOnly {

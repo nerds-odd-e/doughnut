@@ -23,8 +23,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.Where;
 import org.springframework.beans.BeanUtils;
 
 @Entity
@@ -74,28 +72,18 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   private Timestamp deletedAt;
 
   @OneToMany(mappedBy = "targetNote")
-  @Filter(name = "notDeleted", condition = "deleted_at is null")
-  @JsonIgnore
-  @Getter
   private List<LinkingNote> refers = new ArrayList<>();
 
   @OneToMany(mappedBy = "parent", cascade = CascadeType.DETACH)
-  @JsonIgnore
-  @Filter(name = "notDeleted", condition = "deleted_at is null")
   @OrderBy("siblingOrder")
-  @Getter
   private final List<LinkingNote> links = new ArrayList<>();
 
   @OneToMany(mappedBy = "parent", cascade = CascadeType.DETACH)
   @JsonIgnore
-  @Where(clause = "deleted_at is null and target_note_id is null")
-  @OrderBy("sibling_order")
-  @Getter
-  private final List<Note> children = new ArrayList<>();
+  @OrderBy("siblingOrder")
+  private final List<HierarchicalNote> children = new ArrayList<>();
 
-  @OneToMany(
-      mappedBy =
-          "note") // Ensure this matches the field name in ReviewPoint that refers back to Note
+  @OneToMany(mappedBy = "note")
   @JsonIgnore
   private Set<ReviewPoint> reviewPoints;
 
@@ -130,6 +118,25 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   @Embedded @JsonIgnore @Getter private ReviewSetting reviewSetting = new ReviewSetting();
 
   @JsonIgnore
+  public List<HierarchicalNote> getChildren() {
+    return filterDeleted(children);
+  }
+
+  @JsonIgnore
+  public List<LinkingNote> getLinks() {
+    return filterDeleted(links);
+  }
+
+  @JsonIgnore
+  public List<LinkingNote> getRefers() {
+    return filterDeleted(refers);
+  }
+
+  private static <T extends Note> List<T> filterDeleted(List<T> notes) {
+    return notes.stream().filter(n -> n.getDeletedAt() == null).toList();
+  }
+
+  @JsonIgnore
   public boolean targetVisibleAsSourceOrTo(User viewer) {
     if (getParent().getNotebook() == getTargetNote().getNotebook()) return true;
     if (viewer == null) return false;
@@ -142,7 +149,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public List<Note> getSiblings() {
+  public List<HierarchicalNote> getSiblings() {
     if (getParent() == null) {
       return new ArrayList<>();
     }
@@ -240,12 +247,12 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     }
   }
 
-  private Optional<Note> nextSibling() {
+  private Optional<HierarchicalNote> nextSibling() {
     return getSiblings().stream().filter(nc -> nc.getSiblingOrder() > siblingOrder).findFirst();
   }
 
   private long getSiblingOrderToInsertBehindMe() {
-    Optional<Note> nextSiblingNote = nextSibling();
+    Optional<HierarchicalNote> nextSiblingNote = nextSibling();
     return nextSiblingNote
         .map(x -> (siblingOrder + x.getSiblingOrder()) / 2)
         .orElse(siblingOrder + SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT);

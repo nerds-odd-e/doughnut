@@ -39,7 +39,7 @@ public class ModelFactoryService {
 
   public NoteMotionModel toNoteMotionModel(Note sourceNote, Note targetNote, Boolean asFirstChild) {
     if (!asFirstChild) {
-      List<Note> children = targetNote.getChildren();
+      List<HierarchicalNote> children = targetNote.getChildren();
       if (!children.isEmpty()) {
         return toNoteMotionModel(new NoteMotion(children.getLast(), false), sourceNote);
       }
