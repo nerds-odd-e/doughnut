@@ -39,7 +39,7 @@ public class FromSamePartAsQuizFactory
   }
 
   @Override
-  public Note getCategoryLink() {
+  public LinkingNote getCategoryLink() {
     return parentGrandLinkHelper.getParentGrandLink();
   }
 

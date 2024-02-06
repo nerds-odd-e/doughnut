@@ -37,7 +37,7 @@ public class FromDifferentPartAsQuizFactory
   }
 
   @Override
-  public Note getCategoryLink() {
+  public LinkingNote getCategoryLink() {
     return parentGrandLinkHelper.getParentGrandLink();
   }
 

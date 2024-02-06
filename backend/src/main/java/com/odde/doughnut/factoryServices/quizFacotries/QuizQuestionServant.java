@@ -81,7 +81,7 @@ public class QuizQuestionServant {
   }
 
   public ParentGrandLinkHelper getParentGrandLinkHelper(Note link) {
-    Note parentGrandLink =
+    LinkingNote parentGrandLink =
         randomizer
             .chooseOneRandomly(
                 link.targetNoteViewer(this.user)

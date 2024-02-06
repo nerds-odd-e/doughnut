@@ -8,7 +8,7 @@ import java.util.List;
 
 public class WhichSpecHasInstanceQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
-  private Note cachedInstanceLink = null;
+  private LinkingNote cachedInstanceLink = null;
   private List<Note> cachedFillingOptions = null;
   private final Note link;
   private final QuizQuestionServant servant;
@@ -34,7 +34,7 @@ public class WhichSpecHasInstanceQuizFactory
     return instanceLink.getParent();
   }
 
-  private Note getInstanceLink() {
+  private LinkingNote getInstanceLink() {
     if (cachedInstanceLink == null) {
       List<LinkingNote> candidates = servant.getLinksFromSameSourceHavingReviewPoint(link).toList();
       cachedInstanceLink = servant.randomizer.chooseOneRandomly(candidates).orElse(null);
@@ -43,7 +43,7 @@ public class WhichSpecHasInstanceQuizFactory
   }
 
   @Override
-  public Note getCategoryLink() {
+  public LinkingNote getCategoryLink() {
     return getInstanceLink();
   }
 }
