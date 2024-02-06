@@ -6,6 +6,7 @@ import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Entity
 @Table(name = "linking_note")
@@ -18,6 +19,13 @@ public class LinkingNote extends Note {
     final LinkingNote note = new LinkingNote();
     note.initialize(user, parentNote, currentUTCTimestamp, topicConstructor);
     return note;
+  }
+
+  @JsonIgnore
+  public Stream<LinkingNote> getSiblingLinksOfSameLinkType(User user) {
+    return targetNoteViewer(user)
+        .linksOfTypeThroughReverse(getLinkType())
+        .filter(l -> !l.equals(this));
   }
 
   @JsonIgnore

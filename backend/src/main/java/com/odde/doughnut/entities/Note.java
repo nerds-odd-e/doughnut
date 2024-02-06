@@ -366,13 +366,6 @@ The note of current focus (in JSON format):
     return new NoteViewer(user, getTargetNote());
   }
 
-  @JsonIgnore
-  public Stream<LinkingNote> getSiblingLinksOfSameLinkType(User user) {
-    return targetNoteViewer(user)
-        .linksOfTypeThroughReverse(getLinkType())
-        .filter(l -> !l.equals(this));
-  }
-
   public Thing buildNoteThing() {
     Thing result = new Thing();
     result.setNote(this);
