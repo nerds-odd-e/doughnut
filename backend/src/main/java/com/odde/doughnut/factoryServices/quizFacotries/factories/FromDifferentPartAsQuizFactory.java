@@ -10,10 +10,10 @@ public class FromDifferentPartAsQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
 
   private final ParentGrandLinkHelper parentGrandLinkHelper;
-  private final Note link;
+  private final LinkingNote link;
   private final QuizQuestionServant servant;
 
-  public FromDifferentPartAsQuizFactory(Note note, QuizQuestionServant servant) {
+  public FromDifferentPartAsQuizFactory(LinkingNote note, QuizQuestionServant servant) {
     link = note;
     this.servant = servant;
     parentGrandLinkHelper = servant.getParentGrandLinkHelper(link);

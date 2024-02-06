@@ -6,12 +6,12 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
 
 public class LinkSourceQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
-  protected final Note link;
+  protected final LinkingNote link;
   private QuizQuestionServant servant;
   private List<Note> cachedFillingOptions = null;
 
-  public LinkSourceQuizFactory(Note thing, QuizQuestionServant servant) {
-    this.link = thing;
+  public LinkSourceQuizFactory(LinkingNote link, QuizQuestionServant servant) {
+    this.link = link;
     this.servant = servant;
   }
 

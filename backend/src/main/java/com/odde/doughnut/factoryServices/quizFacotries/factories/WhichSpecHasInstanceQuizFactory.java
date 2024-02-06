@@ -10,10 +10,10 @@ public class WhichSpecHasInstanceQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
   private LinkingNote cachedInstanceLink = null;
   private List<Note> cachedFillingOptions = null;
-  private final Note link;
+  private final LinkingNote link;
   private final QuizQuestionServant servant;
 
-  public WhichSpecHasInstanceQuizFactory(Note note, QuizQuestionServant servant) {
+  public WhichSpecHasInstanceQuizFactory(LinkingNote note, QuizQuestionServant servant) {
     this.link = note;
     this.servant = servant;
   }

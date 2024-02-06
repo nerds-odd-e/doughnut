@@ -7,11 +7,11 @@ import java.util.List;
 
 public class LinkSourceWithinSameLinkTypeQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory {
-  protected final Note link;
+  protected final LinkingNote link;
   private final QuizQuestionServant servant;
   private List<LinkingNote> cachedFillingOptions = null;
 
-  public LinkSourceWithinSameLinkTypeQuizFactory(Note note, QuizQuestionServant servant) {
+  public LinkSourceWithinSameLinkTypeQuizFactory(LinkingNote note, QuizQuestionServant servant) {
     this.link = note;
     this.servant = servant;
   }

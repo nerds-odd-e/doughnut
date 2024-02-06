@@ -373,11 +373,6 @@ The note of current focus (in JSON format):
         .filter(l -> !l.equals(this));
   }
 
-  @JsonIgnore
-  public List<Note> getLinkedSiblingsOfSameLinkType(User user) {
-    return getSiblingLinksOfSameLinkType(user).map(Note::getParent).toList();
-  }
-
   public Thing buildNoteThing() {
     Thing result = new Thing();
     result.setNote(this);

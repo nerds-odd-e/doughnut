@@ -80,7 +80,7 @@ public class QuizQuestionServant {
     return cousinLinksOfSameLinkType.filter(l -> getReviewPoint(l) != null);
   }
 
-  public ParentGrandLinkHelper getParentGrandLinkHelper(Note link) {
+  public ParentGrandLinkHelper getParentGrandLinkHelper(LinkingNote link) {
     LinkingNote parentGrandLink =
         randomizer
             .chooseOneRandomly(
@@ -96,7 +96,7 @@ public class QuizQuestionServant {
     return new ParentGrandLinkHelperImpl(this.user, link, parentGrandLink);
   }
 
-  public List<Note> chooseBackwardPeers(Note instanceLink, Note link1) {
+  public List<Note> chooseBackwardPeers(LinkingNote instanceLink, LinkingNote link1) {
     List<Note> instanceReverse = instanceLink.getLinkedSiblingsOfSameLinkType(user);
     List<Note> specReverse = link1.getLinkedSiblingsOfSameLinkType(user);
     List<Note> backwardPeers =
@@ -126,7 +126,7 @@ public class QuizQuestionServant {
     return chooseFromCohort(answerNote, n -> !n.equals(noteToAvoid) && !notesToAvoid.contains(n));
   }
 
-  public List<Note> chooseFromCohortAvoidSiblings(Note answerLink) {
+  public List<Note> chooseFromCohortAvoidSiblings(LinkingNote answerLink) {
     List<Note> linkedSiblingsOfSameLinkType = answerLink.getLinkedSiblingsOfSameLinkType(user);
     return chooseCohortAndAvoid(
         answerLink.getParent(), answerLink.getTargetNote(), linkedSiblingsOfSameLinkType);

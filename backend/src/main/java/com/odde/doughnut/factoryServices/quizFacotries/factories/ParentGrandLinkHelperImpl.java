@@ -7,7 +7,7 @@ import com.odde.doughnut.models.NoteViewer;
 import java.util.List;
 import java.util.stream.Stream;
 
-public record ParentGrandLinkHelperImpl(User user, Note link, LinkingNote parentGrandLink)
+public record ParentGrandLinkHelperImpl(User user, LinkingNote link, LinkingNote parentGrandLink)
     implements ParentGrandLinkHelper {
 
   @Override
