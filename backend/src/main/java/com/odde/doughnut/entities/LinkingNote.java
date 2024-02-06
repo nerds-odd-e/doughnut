@@ -32,4 +32,10 @@ public class LinkingNote extends Note {
   public List<Note> getLinkedSiblingsOfSameLinkType(User user) {
     return getSiblingLinksOfSameLinkType(user).map(Note::getParent).toList();
   }
+
+  protected String getLinkConstructor() {
+    LinkType linkType = getLinkType();
+    if (linkType == null) throw new RuntimeException("Invalid link type: " + getTopicConstructor());
+    return "%P is " + linkType.label + " %T";
+  }
 }

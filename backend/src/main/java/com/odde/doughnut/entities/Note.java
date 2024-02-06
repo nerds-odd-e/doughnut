@@ -178,17 +178,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     setTopicConstructor(":" + linkType.label);
   }
 
-  protected boolean usingLinkTypeAsTopicConstructor() {
-    return getLinkType() != null;
-  }
-
   protected String getLinkConstructor() {
-    if (usingLinkTypeAsTopicConstructor()) {
-      LinkType linkType = getLinkType();
-      if (linkType == null)
-        throw new RuntimeException("Invalid link type: " + getTopicConstructor());
-      return "%P is " + linkType.label + " %T";
-    }
     return getTopicConstructor();
   }
 
