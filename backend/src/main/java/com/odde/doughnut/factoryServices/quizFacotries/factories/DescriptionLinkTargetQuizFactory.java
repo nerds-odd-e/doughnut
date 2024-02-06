@@ -1,14 +1,13 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.LinkingNote;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 
 public class DescriptionLinkTargetQuizFactory extends LinkTargetQuizFactory
     implements SecondaryReviewPointsFactory {
 
-  public DescriptionLinkTargetQuizFactory(Note note, QuizQuestionServant servant) {
+  public DescriptionLinkTargetQuizFactory(LinkingNote note, QuizQuestionServant servant) {
     super(note, servant);
   }
 

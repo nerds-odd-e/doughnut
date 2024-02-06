@@ -54,13 +54,14 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
 
     public final Integer id;
     public final BiFunction<Note, QuizQuestionServant, QuizQuestionFactory> factory;
-    public final BiFunction<Note, QuizQuestionServant, QuizQuestionFactory> factoryForLinkingNote;
+    public final BiFunction<LinkingNote, QuizQuestionServant, QuizQuestionFactory>
+        factoryForLinkingNote;
     public final Function<QuizQuestionEntity, QuizQuestionPresenter> presenter;
 
     QuestionType(
         Integer id,
         BiFunction<Note, QuizQuestionServant, QuizQuestionFactory> factory,
-        BiFunction<Note, QuizQuestionServant, QuizQuestionFactory> factoryForLinkingNote,
+        BiFunction<LinkingNote, QuizQuestionServant, QuizQuestionFactory> factoryForLinkingNote,
         Function<QuizQuestionEntity, QuizQuestionPresenter> presenter) {
       this.id = id;
       this.factory = factory;
@@ -77,8 +78,8 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
     }
 
     public QuizQuestionFactory getQuizQuestionFactory(Note note, QuizQuestionServant servant) {
-      if (note instanceof HierarchicalNote) return factory.apply(note, servant);
-      return factoryForLinkingNote.apply(note, servant);
+      if (note instanceof LinkingNote ln) return factoryForLinkingNote.apply(ln, servant);
+      return factory.apply(note, servant);
     }
   }
 
