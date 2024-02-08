@@ -6,6 +6,7 @@ import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Table;
 import jakarta.persistence.metamodel.EntityType;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -54,23 +55,9 @@ public class DBCleanerWorker {
     Set<EntityType<?>> entities = metamodel.getEntities();
 
     return entities.stream()
-        .map(
-            e -> {
-              Table annotation = e.getJavaType().getAnnotation(Table.class);
-              return annotation.name();
-            })
+        .map(e -> e.getJavaType().getAnnotation(Table.class))
+        .filter(Objects::nonNull)
+        .map(Table::name)
         .collect(Collectors.toList());
-  }
-
-  public static String camelToSnake(String camel) {
-    String underscore;
-    underscore = String.valueOf(Character.toLowerCase(camel.charAt(0)));
-    for (int i = 1; i < camel.length(); i++) {
-      underscore +=
-          Character.isLowerCase(camel.charAt(i))
-              ? String.valueOf(camel.charAt(i))
-              : "_" + Character.toLowerCase(camel.charAt(i));
-    }
-    return underscore;
   }
 }

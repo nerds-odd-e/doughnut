@@ -15,7 +15,7 @@
       v-html="quizQuestion.stem"
     ></div>
 
-    <div v-if="quizQuestion.questionType === 'SPELLING'">
+    <div v-if="!quizQuestion.choices || quizQuestion.choices.length === 0">
       <form @submit.prevent.once="submitAnswer({ spellingAnswer: answer })">
         <TextInput
           scope-name="review_point"
