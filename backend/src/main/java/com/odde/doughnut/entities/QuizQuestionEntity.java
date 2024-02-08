@@ -27,7 +27,7 @@ import org.apache.logging.log4j.util.Strings;
 @Table(name = "quiz_question")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "question_type", discriminatorType = DiscriminatorType.INTEGER)
-public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
+public abstract class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
 
   public enum QuestionType {
     CLOZE_SELECTION(
@@ -132,9 +132,7 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public QuizQuestionPresenter buildPresenter() {
-    return getQuestionType().presenter.apply(this);
-  }
+  public abstract QuizQuestionPresenter buildPresenter();
 
   public void setChoicesAndRightAnswer(
       Note answerNote, List<? extends Note> options, Randomizer randomizer) {
