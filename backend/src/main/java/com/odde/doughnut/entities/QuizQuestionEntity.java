@@ -25,6 +25,8 @@ import org.apache.logging.log4j.util.Strings;
 //
 @Entity
 @Table(name = "quiz_question")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "question_type", discriminatorType = DiscriminatorType.INTEGER)
 public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
 
   public enum QuestionType {
@@ -89,7 +91,7 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   @Setter
   private Note note;
 
-  @Column(name = "question_type")
+  @Column(name = "question_type", insertable = false, updatable = false)
   @Getter
   @Setter
   private Integer questionTypeId;
