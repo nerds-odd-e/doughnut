@@ -166,4 +166,8 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
       throw new RuntimeException(e);
     }
   }
+
+  public boolean checkAnswer(Answer answer) {
+    return Objects.equals(answer.getChoiceIndex(), getCorrectAnswerIndex());
+  }
 }

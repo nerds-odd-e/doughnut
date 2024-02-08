@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.entities.quizQuestions.QuizQuestionSpelling;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,7 +8,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.sql.Timestamp;
-import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.lang.Nullable;
@@ -45,14 +43,7 @@ public class Answer extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public boolean isCorrect() {
-      return checkAnswer(this);
-  }
-
-  private boolean checkAnswer(Answer answer) {
-    if (question instanceof QuizQuestionSpelling) {
-      return question.getNote().matchAnswer(answer.getSpellingAnswer());
-    }
-    return Objects.equals(answer.getChoiceIndex(), question.getCorrectAnswerIndex());
+    return question.checkAnswer(this);
   }
 
   @JsonIgnore
