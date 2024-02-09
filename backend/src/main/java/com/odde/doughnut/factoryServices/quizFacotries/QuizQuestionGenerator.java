@@ -12,7 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 public record QuizQuestionGenerator(
     User user,
-    Note thing,
+    Note note,
     Randomizer randomizer,
     ModelFactoryService modelFactoryService,
     AiAdvisorService aiAdvisorService) {
@@ -22,7 +22,7 @@ public record QuizQuestionGenerator(
       QuizQuestionServant servant =
           new QuizQuestionServant(user, randomizer, modelFactoryService, aiAdvisorService);
       QuizQuestionEntity quizQuestion =
-          new QuizQuestionDirector(questionType, servant).invoke(thing);
+          new QuizQuestionDirector(questionType, servant).invoke(note);
       return Optional.of(quizQuestion);
     } catch (QuizQuestionNotPossibleException e) {
       return Optional.empty();
@@ -39,5 +39,10 @@ public record QuizQuestionGenerator(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
     modelFactoryService.save(quizQuestionEntity);
     return quizQuestionEntity;
+  }
+
+  public QuizQuestionEntity generateAQuestionOfRandomType() {
+    return generateAQuestionOfFirstPossibleType(
+        randomizer.shuffle(note.getAvailableQuestionTypes(user.getAiQuestionTypeOnlyForReview())));
   }
 }

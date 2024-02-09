@@ -135,12 +135,12 @@ public enum LinkType {
       new QuizQuestionEntity.QuestionType[] {LINK_TARGET, LINK_SOURCE, DESCRIPTION_LINK_TARGET}),
   SIMILAR_TO(
       22,
-      "thing",
+      "note",
       "similar to",
       "similar to",
       new QuizQuestionEntity.QuestionType[] {LINK_TARGET, LINK_SOURCE, DESCRIPTION_LINK_TARGET}),
   CONFUSE_WITH(
-      23, "thing", "confused with", "confused with", new QuizQuestionEntity.QuestionType[] {});
+      23, "note", "confused with", "confused with", new QuizQuestionEntity.QuestionType[] {});
 
   @JsonValue public final String label;
   public final String nameOfSource;

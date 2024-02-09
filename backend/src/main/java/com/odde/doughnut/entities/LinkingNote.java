@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -37,5 +38,11 @@ public class LinkingNote extends Note {
     LinkType linkType = getLinkType();
     if (linkType == null) throw new RuntimeException("Invalid link type: " + getTopicConstructor());
     return "%P is " + linkType.label + " %T";
+  }
+
+  @Override
+  public List<QuizQuestionEntity.QuestionType> getAvailableQuestionTypes(
+      Boolean aiQuestionTypeOnlyForReview) {
+    return Arrays.stream(getLinkType().getQuestionTypes()).toList();
   }
 }

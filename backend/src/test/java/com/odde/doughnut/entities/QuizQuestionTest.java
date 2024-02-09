@@ -8,7 +8,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.controllers.json.QuizQuestion;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionGenerator;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
+import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
@@ -45,10 +47,7 @@ class QuizQuestionTest {
   void aNoteWithNoDescriptionHasNoQuiz() {
     Note note = makeMe.aNote().withNoDescription().creatorAndOwner(userModel).please();
 
-    ReviewPointModel reviewPointModel = getReviewPointModel(note);
-    assertThrows(
-        ResponseStatusException.class,
-        () -> reviewPointModel.generateAQuizQuestion(randomizer, userModel.getEntity(), null));
+    assertThrows(ResponseStatusException.class, () -> generateQuizQuestion(note));
   }
 
   @Test
@@ -58,7 +57,7 @@ class QuizQuestionTest {
     Note note =
         makeMe.aNote().under(top).titleConstructor("abc").details("abc has 3 letters").please();
     makeMe.refresh(top);
-    QuizQuestion quizQuestion = getQuizQuestion(note);
+    QuizQuestion quizQuestion = generateQuizQuestion(note);
     assertThat(
         quizQuestion.getStem(),
         containsString(
@@ -68,17 +67,14 @@ class QuizQuestionTest {
   @Nested
   class ClozeSelectionQuiz {
     private List<String> getOptions(Note note) {
-      QuizQuestion quizQuestion = getQuizQuestion(note);
+      QuizQuestion quizQuestion = generateQuizQuestion(note);
       return quizQuestion.getChoices().stream().map(QuizQuestion.Choice::getDisplay).toList();
     }
 
     @Test
     void aNoteWithNoSiblingsShouldNotGenerateAnyQuestion() {
       Note note = makeMe.aNote().please();
-      ReviewPointModel reviewPointModel = getReviewPointModel(note);
-      assertThrows(
-          ResponseStatusException.class,
-          () -> reviewPointModel.generateAQuizQuestion(randomizer, userModel.getEntity(), null));
+      assertThrows(ResponseStatusException.class, () -> generateQuizQuestion(note));
     }
 
     @Nested
@@ -139,7 +135,7 @@ class QuizQuestionTest {
     @Test
     void typeShouldBeSpellingQuiz() {
       assertThat(
-          getQuizQuestion(note).getQuestionType(),
+          generateQuizQuestion(note).getQuestionType(),
           equalTo(QuizQuestionEntity.QuestionType.SPELLING));
     }
 
@@ -147,12 +143,10 @@ class QuizQuestionTest {
     void shouldAlwaysChooseAIQuestionIfConfigured() throws QuizQuestionNotPossibleException {
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       userModel.getEntity().setAiQuestionTypeOnlyForReview(true);
-      ReviewPointModel reviewPoint = getReviewPointModel(note);
       AiAdvisorService aiAdvisorService = mock(AiAdvisorService.class);
       when(aiAdvisorService.generateQuestion(any(), any())).thenReturn(mcqWithAnswer);
       QuizQuestion randomQuizQuestion =
-          reviewPoint.generateAQuizQuestion(
-              new RealRandomizer(), userModel.getEntity(), aiAdvisorService);
+          QuizQuestionTest.this.generateQuizQuestion(note, new RealRandomizer(), aiAdvisorService);
       assertThat(
           randomQuizQuestion.getQuestionType(),
           equalTo(QuizQuestionEntity.QuestionType.AI_QUESTION));
@@ -161,9 +155,7 @@ class QuizQuestionTest {
 
     @Test
     void shouldReturnTheSameType() {
-      ReviewPointModel reviewPoint = getReviewPointModel(note);
-      QuizQuestion randomQuizQuestion =
-          reviewPoint.generateAQuizQuestion(new RealRandomizer(), userModel.getEntity(), null);
+      QuizQuestion randomQuizQuestion = generateQuizQuestion(note, new RealRandomizer(), null);
       Set<QuizQuestionEntity.QuestionType> types = new HashSet<>();
       for (int i = 0; i < 3; i++) {
         types.add(randomQuizQuestion.getQuestionType());
@@ -174,10 +166,8 @@ class QuizQuestionTest {
     @Test
     void shouldChooseTypeRandomly() {
       Set<QuizQuestionEntity.QuestionType> types = new HashSet<>();
-      ReviewPointModel reviewPoint = getReviewPointModel(note);
       for (int i = 0; i < 10; i++) {
-        QuizQuestion randomQuizQuestion =
-            reviewPoint.generateAQuizQuestion(new RealRandomizer(), userModel.getEntity(), null);
+        QuizQuestion randomQuizQuestion = generateQuizQuestion(note, new RealRandomizer(), null);
         types.add(randomQuizQuestion.getQuestionType());
       }
       assertThat(
@@ -188,9 +178,17 @@ class QuizQuestionTest {
     }
   }
 
-  private QuizQuestion getQuizQuestion(Note note) {
-    ReviewPointModel reviewPointModel = getReviewPointModel(note);
-    return reviewPointModel.generateAQuizQuestion(randomizer, userModel.getEntity(), null);
+  private QuizQuestion generateQuizQuestion(
+      Note note, Randomizer randomizer1, AiAdvisorService aiAdvisorService) {
+    QuizQuestionGenerator quizQuestionGenerator =
+        new QuizQuestionGenerator(
+            userModel.getEntity(), note, randomizer1, makeMe.modelFactoryService, aiAdvisorService);
+    QuizQuestionEntity quizQuestionEntity = quizQuestionGenerator.generateAQuestionOfRandomType();
+    return makeMe.modelFactoryService.toQuizQuestion(quizQuestionEntity, userModel.getEntity());
+  }
+
+  private QuizQuestion generateQuizQuestion(Note note) {
+    return generateQuizQuestion(note, randomizer, null);
   }
 
   private ReviewPointModel getReviewPointModel(Note note) {

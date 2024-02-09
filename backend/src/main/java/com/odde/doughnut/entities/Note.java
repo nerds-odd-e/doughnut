@@ -312,23 +312,8 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     return Stream.concat(getLinks().stream(), getRefers().stream());
   }
 
-  public List<QuizQuestionEntity.QuestionType> getAvailableQuestionTypes(
-      Boolean aiQuestionTypeOnlyForReview) {
-    List<QuizQuestionEntity.QuestionType> questionTypes = new ArrayList<>();
-    if (getLinkType() != null) {
-      Collections.addAll(questionTypes, getLinkType().getQuestionTypes());
-    } else {
-      if (aiQuestionTypeOnlyForReview) {
-        questionTypes.add(QuizQuestionEntity.QuestionType.AI_QUESTION);
-      } else {
-        questionTypes.add(QuizQuestionEntity.QuestionType.SPELLING);
-        questionTypes.add(QuizQuestionEntity.QuestionType.CLOZE_SELECTION);
-        questionTypes.add(QuizQuestionEntity.QuestionType.PICTURE_TITLE);
-        questionTypes.add(QuizQuestionEntity.QuestionType.PICTURE_SELECTION);
-      }
-    }
-    return questionTypes;
-  }
+  public abstract List<QuizQuestionEntity.QuestionType> getAvailableQuestionTypes(
+      Boolean aiQuestionTypeOnlyForReview);
 
   public static class NoteBrief {
     public String contextPath;

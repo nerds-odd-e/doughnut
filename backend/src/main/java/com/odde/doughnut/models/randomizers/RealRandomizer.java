@@ -1,16 +1,14 @@
 package com.odde.doughnut.models.randomizers;
 
 import com.odde.doughnut.models.Randomizer;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 public class RealRandomizer implements Randomizer {
   @Override
   public <T> List<T> shuffle(List<T> list) {
-    Collections.shuffle(list);
-    return list;
+    List<T> newList = new ArrayList<>(list);
+    Collections.shuffle(newList);
+    return newList;
   }
 
   @Override

@@ -1,6 +1,7 @@
 package com.odde.doughnut.models.randomizers;
 
 import com.odde.doughnut.models.Randomizer;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -12,7 +13,9 @@ public class NonRandomizer implements Randomizer {
   @Override
   public <T> List<T> shuffle(List<T> list) {
     if (alwaysChoose.equals("last")) {
-      Collections.reverse(list);
+      List<T> newList = new ArrayList<>(list);
+      Collections.reverse(newList);
+      return newList;
     }
     return list;
   }

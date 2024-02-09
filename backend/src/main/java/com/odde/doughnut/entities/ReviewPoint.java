@@ -10,7 +10,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.sql.Timestamp;
 import java.time.ZoneId;
-import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -81,11 +80,6 @@ public class ReviewPoint extends EntityIdentifiedByIdOnly {
   public boolean isInitialReviewOnSameDay(Timestamp currentTime, ZoneId timeZone) {
     return TimestampOperations.getDayId(getInitialReviewedAt(), timeZone)
         == TimestampOperations.getDayId(currentTime, timeZone);
-  }
-
-  public List<QuizQuestionEntity.QuestionType> availableQuestionTypes(
-      Boolean aiQuestionTypeOnlyForReview) {
-    return this.getNote().getAvailableQuestionTypes(aiQuestionTypeOnlyForReview);
   }
 
   public Timestamp calculateNextReviewAt() {
