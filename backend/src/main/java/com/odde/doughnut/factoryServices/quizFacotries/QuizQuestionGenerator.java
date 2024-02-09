@@ -1,6 +1,5 @@
 package com.odde.doughnut.factoryServices.quizFacotries;
 
-import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.QuizQuestionEntity.QuestionType;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -30,7 +29,7 @@ public record QuizQuestionGenerator(
     }
   }
 
-  public QuizQuestion generateAQuestionOfFirstPossibleType(List<QuestionType> shuffled) {
+  public QuizQuestionEntity generateAQuestionOfFirstPossibleType(List<QuestionType> shuffled) {
     QuizQuestionEntity quizQuestionEntity =
         shuffled.stream()
             .map(this::buildQuizQuestion)
@@ -39,6 +38,6 @@ public record QuizQuestionGenerator(
             .orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
     modelFactoryService.save(quizQuestionEntity);
-    return modelFactoryService.toQuizQuestion(quizQuestionEntity, user);
+    return quizQuestionEntity;
   }
 }

@@ -72,8 +72,10 @@ class RestQuizQuestionController {
     QuizQuestionGenerator quizQuestionGenerator =
         new QuizQuestionGenerator(
             currentUser.getEntity(), thing, null, modelFactoryService, aiAdvisorService);
-    return quizQuestionGenerator.generateAQuestionOfFirstPossibleType(
-        List.of(QuizQuestionEntity.QuestionType.AI_QUESTION));
+    QuizQuestionEntity quizQuestionEntity =
+        quizQuestionGenerator.generateAQuestionOfFirstPossibleType(
+            List.of(QuizQuestionEntity.QuestionType.AI_QUESTION));
+    return modelFactoryService.toQuizQuestion(quizQuestionEntity, currentUser.getEntity());
   }
 
   @PostMapping("/{quizQuestion}/answer")

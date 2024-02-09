@@ -25,21 +25,24 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
 
   public QuizQuestion generateAQuizQuestion(
       Randomizer randomizer, User user, AiAdvisorService aiAdvisorService) {
-    return getQuizQuestionGenerator(randomizer, aiAdvisorService)
-        .generateAQuestionOfFirstPossibleType(shuffleAvailableQuestionTypes(randomizer, user));
+    QuizQuestionGenerator quizQuestionGenerator =
+        getQuizQuestionGenerator(randomizer, aiAdvisorService);
+    QuizQuestionEntity quizQuestionEntity =
+        quizQuestionGenerator.generateAQuestionOfFirstPossibleType(
+            shuffleAvailableQuestionTypes(
+                entity, randomizer, user.getAiQuestionTypeOnlyForReview()));
+    return modelFactoryService.toQuizQuestion(quizQuestionEntity, user);
   }
 
-  private List<QuizQuestionEntity.QuestionType> shuffleAvailableQuestionTypes(
-      Randomizer randomizer, User user) {
-    return randomizer.shuffle(entity.availableQuestionTypes(user.getAiQuestionTypeOnlyForReview()));
+  private static List<QuizQuestionEntity.QuestionType> shuffleAvailableQuestionTypes(
+      ReviewPoint entity, Randomizer randomizer, Boolean aiQuestionTypeOnlyForReview) {
+    return randomizer.shuffle(entity.availableQuestionTypes(aiQuestionTypeOnlyForReview));
   }
 
   private QuizQuestionGenerator getQuizQuestionGenerator(
       Randomizer randomizer, AiAdvisorService aiAdvisorService) {
-    QuizQuestionGenerator quizQuestionGenerator =
-        new QuizQuestionGenerator(
-            entity.getUser(), entity.getNote(), randomizer, modelFactoryService, aiAdvisorService);
-    return quizQuestionGenerator;
+    return new QuizQuestionGenerator(
+        entity.getUser(), entity.getNote(), randomizer, modelFactoryService, aiAdvisorService);
   }
 
   public void markAsRepeated(Timestamp currentUTCTimestamp, boolean successful) {

@@ -41,8 +41,7 @@ class QuizQuestionGeneratorTest {
   @Test
   void note() {
     makeMe.theNote(note).rememberSpelling().please();
-    ReviewPoint reviewPoint = makeMe.aReviewPointFor(note).inMemoryPlease();
-    List<QuizQuestionEntity.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
+    List<QuizQuestionEntity.QuestionType> questionTypes = getQuestionTypes(note);
     assertThat(
         questionTypes, contains(SPELLING, CLOZE_SELECTION, PICTURE_TITLE, PICTURE_SELECTION));
   }
@@ -50,8 +49,7 @@ class QuizQuestionGeneratorTest {
   @Test
   void linkExclusive() {
     Note note2 = makeMe.aNote().linkTo(note).please();
-    ReviewPoint reviewPoint = makeMe.aReviewPointFor(note2.getLinks().get(0)).inMemoryPlease();
-    List<QuizQuestionEntity.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
+    List<QuizQuestionEntity.QuestionType> questionTypes = getQuestionTypes(note2.getLinks().get(0));
     assertThat(
         questionTypes,
         containsInAnyOrder(
@@ -66,12 +64,11 @@ class QuizQuestionGeneratorTest {
   @Test
   void notAllLinkQuestionAreAvailableToAllLinkTypes() {
     Note note2 = makeMe.aNote().linkTo(note, LinkType.RELATED_TO).please();
-    ReviewPoint reviewPoint = makeMe.aReviewPointFor(note2.getLinks().get(0)).inMemoryPlease();
-    List<QuizQuestionEntity.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
+    List<QuizQuestionEntity.QuestionType> questionTypes = getQuestionTypes(note2.getLinks().get(0));
     assertTrue(questionTypes.isEmpty());
   }
 
-  private List<QuizQuestionEntity.QuestionType> getQuestionTypes(ReviewPoint reviewPoint) {
-    return reviewPoint.availableQuestionTypes(false);
+  private List<QuizQuestionEntity.QuestionType> getQuestionTypes(Note note) {
+    return note.getAvailableQuestionTypes(false);
   }
 }

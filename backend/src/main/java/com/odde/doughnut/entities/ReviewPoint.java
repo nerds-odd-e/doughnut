@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.entities.QuizQuestionEntity.QuestionType;
 import com.odde.doughnut.models.TimestampOperations;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -11,8 +10,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.sql.Timestamp;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -88,20 +85,7 @@ public class ReviewPoint extends EntityIdentifiedByIdOnly {
 
   public List<QuizQuestionEntity.QuestionType> availableQuestionTypes(
       Boolean aiQuestionTypeOnlyForReview) {
-    List<QuizQuestionEntity.QuestionType> questionTypes = new ArrayList<>();
-    if (this.getNote().getLinkType() != null) {
-      Collections.addAll(questionTypes, this.getNote().getLinkType().getQuestionTypes());
-    } else {
-      if (aiQuestionTypeOnlyForReview) {
-        questionTypes.add(QuestionType.AI_QUESTION);
-      } else {
-        questionTypes.add(QuestionType.SPELLING);
-        questionTypes.add(QuestionType.CLOZE_SELECTION);
-        questionTypes.add(QuestionType.PICTURE_TITLE);
-        questionTypes.add(QuestionType.PICTURE_SELECTION);
-      }
-    }
-    return questionTypes;
+    return this.getNote().getAvailableQuestionTypes(aiQuestionTypeOnlyForReview);
   }
 
   public Timestamp calculateNextReviewAt() {

@@ -123,14 +123,14 @@ public class ModelFactoryService {
     return nb;
   }
 
-  public Note createLink(
+  public LinkingNote createLink(
       Note sourceNote,
       Note targetNote,
       User creator,
       LinkType type,
       Timestamp currentUTCTimestamp) {
     if (type == null || type == LinkType.NO_LINK) return null;
-    Note link = buildALink(sourceNote, targetNote, creator, type, currentUTCTimestamp);
+    LinkingNote link = buildALink(sourceNote, targetNote, creator, type, currentUTCTimestamp);
     save(link);
     return link;
   }
