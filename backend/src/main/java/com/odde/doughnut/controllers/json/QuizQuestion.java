@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers.json;
 
 import com.odde.doughnut.entities.PictureWithMask;
-import com.odde.doughnut.entities.QuizQuestionEntity;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -12,8 +11,6 @@ import org.springframework.lang.Nullable;
 @AllArgsConstructor
 public class QuizQuestion {
   @Getter public Integer quizQuestionId;
-
-  @Getter public QuizQuestionEntity.QuestionType questionType;
 
   @Getter public String stem;
 

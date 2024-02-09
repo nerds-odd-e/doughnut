@@ -8,9 +8,7 @@ helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("QuizQuestion", () => {
   describe("suggest question for fine tuning AI", () => {
-    const quizQuestion: Generated.QuizQuestion = makeMe.aQuizQuestion
-      .withQuestionType("AI_QUESTION")
-      .please();
+    const quizQuestion: Generated.QuizQuestion = makeMe.aQuizQuestion.please();
 
     let wrapper;
 

@@ -122,15 +122,6 @@ public abstract class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   @Setter
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
-  public void setQuestionType(QuestionType questionType) {
-    this.questionTypeId = questionType.id;
-  }
-
-  @JsonIgnore
-  public QuestionType getQuestionType() {
-    return QuestionType.fromId(questionTypeId);
-  }
-
   @JsonIgnore
   public abstract QuizQuestionPresenter buildPresenter();
 

@@ -7,21 +7,11 @@ class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
 
   quizQuestion: Generated.QuizQuestion = {
     quizQuestionId: generateId(),
-    questionType: "SPELLING",
     choices: [],
     stem: "answer",
     mainTopic: "",
     headNotePosition: this.notePositionBuilder.do(),
   };
-
-  withClozeSelectionQuestion() {
-    return this.withQuestionType("CLOZE_SELECTION");
-  }
-
-  withQuestionType(questionType: Generated.QuestionType) {
-    this.quizQuestion.questionType = questionType;
-    return this;
-  }
 
   withQuestionStem(stem: string) {
     this.quizQuestion.stem = stem;

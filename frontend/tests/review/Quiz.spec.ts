@@ -6,7 +6,7 @@ import makeMe from "../fixtures/makeMe";
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
-const quizQuestion = makeMe.aQuizQuestion.withClozeSelectionQuestion().please();
+const quizQuestion = makeMe.aQuizQuestion.please();
 
 describe("repeat page", () => {
   const mountPage = async (reviewPoints: number[], eagerFetchCount: number) => {

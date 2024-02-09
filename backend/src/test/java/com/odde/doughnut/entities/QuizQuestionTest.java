@@ -136,9 +136,7 @@ class QuizQuestionTest {
 
     @Test
     void typeShouldBeSpellingQuiz() {
-      assertThat(
-          generateQuizQuestion(note).getQuestionType(),
-          equalTo(QuizQuestionEntity.QuestionType.SPELLING));
+      assertThat(generateQuizQuestionEntity(note), instanceOf(QuizQuestionSpelling.class));
     }
 
     @Test

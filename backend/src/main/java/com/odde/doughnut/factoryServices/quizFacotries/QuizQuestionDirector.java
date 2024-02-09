@@ -48,7 +48,6 @@ public record QuizQuestionDirector(
       throw new RuntimeException("Unknown question type");
     }
     quizQuestion.setNote(note);
-    quizQuestion.setQuestionType(questionType);
 
     if (quizQuestionFactory instanceof QuestionRawJsonFactory rawJsonFactory) {
       rawJsonFactory.generateRawJsonQuestion(quizQuestion);

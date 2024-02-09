@@ -23,7 +23,6 @@ const createWrapper = async () => {
 
 describe("NoteChatDialog TestMe", () => {
   const quizQuestion = makeMe.aQuizQuestion
-    .withQuestionType("AI_QUESTION")
     .withQuestionStem("any question?")
     .withChoices(["option A", "option B", "option C"])
     .please();
@@ -54,7 +53,6 @@ describe("NoteChatDialog TestMe", () => {
     let wrapper: VueWrapper;
 
     const newQuestion = makeMe.aQuizQuestion
-      .withQuestionType("AI_QUESTION")
       .withQuestionStem("is it raining?")
       .please();
 
