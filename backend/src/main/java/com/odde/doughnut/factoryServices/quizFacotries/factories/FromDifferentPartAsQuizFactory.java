@@ -1,6 +1,7 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.quizQuestions.QuizQuestionFromDifferentPartAs;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
@@ -48,5 +49,10 @@ public class FromDifferentPartAsQuizFactory
         .chooseOneRandomly(parentGrandLinkHelper.getCousinLinksAvoidingSiblings())
         .map(Note::getParent)
         .orElse(null);
+  }
+
+  @Override
+  public QuizQuestionEntity buildQuizQuestion() {
+    return new QuizQuestionFromDifferentPartAs();
   }
 }

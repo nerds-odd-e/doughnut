@@ -1,6 +1,8 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.QuizQuestionEntity;
+import com.odde.doughnut.entities.quizQuestions.QuizQuestionClozeSelection;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
@@ -31,5 +33,10 @@ public class ClozeTitleSelectionQuizFactory implements QuestionOptionsFactory, Q
     if (note.isDetailsBlankHtml()) {
       throw new QuizQuestionNotPossibleException();
     }
+  }
+
+  @Override
+  public QuizQuestionEntity buildQuizQuestion() {
+    return new QuizQuestionClozeSelection();
   }
 }

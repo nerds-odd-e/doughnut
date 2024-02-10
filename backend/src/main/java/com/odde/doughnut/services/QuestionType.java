@@ -46,38 +46,9 @@ public enum QuestionType {
       quizQuestionFactory = factory.apply(note, servant1);
     }
 
-    quizQuestionFactory.validatePossibility();
+    QuizQuestionEntity quizQuestion = quizQuestionFactory.buildQuizQuestion();
 
-    QuizQuestionEntity quizQuestion;
-    if (this == CLOZE_SELECTION) {
-      quizQuestion = new QuizQuestionClozeSelection();
-    } else if (this == SPELLING) {
-      quizQuestion = new QuizQuestionSpelling();
-    } else if (this == PICTURE_TITLE) {
-      quizQuestion = new QuizQuestionPictureTitle();
-    } else if (this == PICTURE_SELECTION) {
-      quizQuestion = new QuizQuestionPictureSelection();
-    } else if (this == LINK_TARGET) {
-      quizQuestion = new QuizQuestionLinkTarget();
-    } else if (this == LINK_SOURCE) {
-      quizQuestion = new QuizQuestionLinkSource();
-    } else if (this == LINK_SOURCE_WITHIN_SAME_LINK_TYPE) {
-      quizQuestion = new QuizQuestionLinkSourceWithSameLinkType();
-    } else if (this == CLOZE_LINK_TARGET) {
-      quizQuestion = new QuizQuestionClozeLinkTarget();
-    } else if (this == DESCRIPTION_LINK_TARGET) {
-      quizQuestion = new QuizQuestionDescriptionLinkTarget();
-    } else if (this == WHICH_SPEC_HAS_INSTANCE) {
-      quizQuestion = new QuizQuestionWhichSpecHasInstance();
-    } else if (this == FROM_SAME_PART_AS) {
-      quizQuestion = new QuizQuestionFromSamePartAs();
-    } else if (this == FROM_DIFFERENT_PART_AS) {
-      quizQuestion = new QuizQuestionFromDifferentPartAs();
-    } else if (this == AI_QUESTION) {
-      quizQuestion = new QuizQuestionAIQuestion();
-    } else {
-      throw new RuntimeException("Unknown question type");
-    }
+    quizQuestionFactory.validatePossibility();
     quizQuestion.setNote(note);
 
     if (quizQuestionFactory instanceof QuestionRawJsonFactory rawJsonFactory) {

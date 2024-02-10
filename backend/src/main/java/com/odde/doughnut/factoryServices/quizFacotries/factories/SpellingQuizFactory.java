@@ -1,7 +1,9 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.ReviewSetting;
+import com.odde.doughnut.entities.quizQuestions.QuizQuestionSpelling;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
@@ -21,6 +23,11 @@ public class SpellingQuizFactory implements QuizQuestionFactory {
     if (!needSpellingQuiz()) {
       throw new QuizQuestionNotPossibleException();
     }
+  }
+
+  @Override
+  public QuizQuestionEntity buildQuizQuestion() {
+    return new QuizQuestionSpelling();
   }
 
   private boolean needSpellingQuiz() {

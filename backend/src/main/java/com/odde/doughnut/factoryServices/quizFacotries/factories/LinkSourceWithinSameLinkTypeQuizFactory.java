@@ -1,6 +1,7 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.quizQuestions.QuizQuestionLinkSourceWithSameLinkType;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
@@ -30,5 +31,10 @@ public class LinkSourceWithinSameLinkTypeQuizFactory
   @Override
   public Note generateAnswer() {
     return link;
+  }
+
+  @Override
+  public QuizQuestionEntity buildQuizQuestion() {
+    return new QuizQuestionLinkSourceWithSameLinkType();
   }
 }

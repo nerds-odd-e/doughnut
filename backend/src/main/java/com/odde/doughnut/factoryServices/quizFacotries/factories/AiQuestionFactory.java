@@ -2,6 +2,7 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
+import com.odde.doughnut.entities.quizQuestions.QuizQuestionAIQuestion;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
@@ -25,5 +26,10 @@ public class AiQuestionFactory implements QuizQuestionFactory, QuestionRawJsonFa
             servant.getGlobalSettingsService().getGlobalSettingQuestionGeneration().getValue());
     quizQuestion.setRawJsonQuestion(MCQWithAnswer.toJsonString());
     quizQuestion.setCorrectAnswerIndex(MCQWithAnswer.correctChoiceIndex);
+  }
+
+  @Override
+  public QuizQuestionEntity buildQuizQuestion() {
+    return new QuizQuestionAIQuestion();
   }
 }

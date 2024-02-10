@@ -2,6 +2,8 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.LinkingNote;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.QuizQuestionEntity;
+import com.odde.doughnut.entities.quizQuestions.QuizQuestionWhichSpecHasInstance;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
@@ -45,5 +47,10 @@ public class WhichSpecHasInstanceQuizFactory
   @Override
   public LinkingNote getCategoryLink() {
     return getInstanceLink();
+  }
+
+  @Override
+  public QuizQuestionEntity buildQuizQuestion() {
+    return new QuizQuestionWhichSpecHasInstance();
   }
 }

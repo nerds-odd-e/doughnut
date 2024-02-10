@@ -1,6 +1,7 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.quizQuestions.QuizQuestionFromSamePartAs;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
@@ -50,5 +51,10 @@ public class FromSamePartAsQuizFactory
       cachedAnswerLink = servant.randomizer.chooseOneRandomly(backwardPeers).orElse(null);
     }
     return cachedAnswerLink;
+  }
+
+  @Override
+  public QuizQuestionEntity buildQuizQuestion() {
+    return new QuizQuestionFromSamePartAs();
   }
 }
