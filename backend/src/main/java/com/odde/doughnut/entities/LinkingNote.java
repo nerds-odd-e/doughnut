@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.services.QuestionType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
@@ -41,8 +42,7 @@ public class LinkingNote extends Note {
   }
 
   @Override
-  public List<QuizQuestionEntity.QuestionType> getAvailableQuestionTypes(
-      Boolean aiQuestionTypeOnlyForReview) {
+  public List<QuestionType> getAvailableQuestionTypes(Boolean aiQuestionTypeOnlyForReview) {
     return Arrays.stream(getLinkType().getQuestionTypes()).toList();
   }
 }

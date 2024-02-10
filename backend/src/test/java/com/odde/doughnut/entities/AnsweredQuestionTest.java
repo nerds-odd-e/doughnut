@@ -1,6 +1,6 @@
 package com.odde.doughnut.entities;
 
-import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.SPELLING;
+import static com.odde.doughnut.services.QuestionType.SPELLING;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.testability.MakeMe;

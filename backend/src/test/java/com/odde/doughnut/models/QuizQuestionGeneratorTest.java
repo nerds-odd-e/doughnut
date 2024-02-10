@@ -1,21 +1,22 @@
 package com.odde.doughnut.models;
 
-import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.CLOZE_SELECTION;
-import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.DESCRIPTION_LINK_TARGET;
-import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.FROM_DIFFERENT_PART_AS;
-import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.FROM_SAME_PART_AS;
-import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.LINK_SOURCE;
-import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.LINK_TARGET;
-import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.PICTURE_SELECTION;
-import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.PICTURE_TITLE;
-import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.SPELLING;
-import static com.odde.doughnut.entities.QuizQuestionEntity.QuestionType.WHICH_SPEC_HAS_INSTANCE;
+import static com.odde.doughnut.services.QuestionType.CLOZE_SELECTION;
+import static com.odde.doughnut.services.QuestionType.DESCRIPTION_LINK_TARGET;
+import static com.odde.doughnut.services.QuestionType.FROM_DIFFERENT_PART_AS;
+import static com.odde.doughnut.services.QuestionType.FROM_SAME_PART_AS;
+import static com.odde.doughnut.services.QuestionType.LINK_SOURCE;
+import static com.odde.doughnut.services.QuestionType.LINK_TARGET;
+import static com.odde.doughnut.services.QuestionType.PICTURE_SELECTION;
+import static com.odde.doughnut.services.QuestionType.PICTURE_TITLE;
+import static com.odde.doughnut.services.QuestionType.SPELLING;
+import static com.odde.doughnut.services.QuestionType.WHICH_SPEC_HAS_INSTANCE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.services.QuestionType;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +42,7 @@ class QuizQuestionGeneratorTest {
   @Test
   void note() {
     makeMe.theNote(note).rememberSpelling().please();
-    List<QuizQuestionEntity.QuestionType> questionTypes = getQuestionTypes(note);
+    List<QuestionType> questionTypes = getQuestionTypes(note);
     assertThat(
         questionTypes, contains(SPELLING, CLOZE_SELECTION, PICTURE_TITLE, PICTURE_SELECTION));
   }
@@ -49,7 +50,7 @@ class QuizQuestionGeneratorTest {
   @Test
   void linkExclusive() {
     Note note2 = makeMe.aNote().linkTo(note).please();
-    List<QuizQuestionEntity.QuestionType> questionTypes = getQuestionTypes(note2.getLinks().get(0));
+    List<QuestionType> questionTypes = getQuestionTypes(note2.getLinks().get(0));
     assertThat(
         questionTypes,
         containsInAnyOrder(
@@ -64,11 +65,11 @@ class QuizQuestionGeneratorTest {
   @Test
   void notAllLinkQuestionAreAvailableToAllLinkTypes() {
     Note note2 = makeMe.aNote().linkTo(note, LinkType.RELATED_TO).please();
-    List<QuizQuestionEntity.QuestionType> questionTypes = getQuestionTypes(note2.getLinks().get(0));
+    List<QuestionType> questionTypes = getQuestionTypes(note2.getLinks().get(0));
     assertTrue(questionTypes.isEmpty());
   }
 
-  private List<QuizQuestionEntity.QuestionType> getQuestionTypes(Note note) {
+  private List<QuestionType> getQuestionTypes(Note note) {
     return note.getAvailableQuestionTypes(false);
   }
 }

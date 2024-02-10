@@ -1,10 +1,10 @@
 package com.odde.doughnut.factoryServices.quizFacotries;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.QuizQuestionEntity.QuestionType;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.services.AiAdvisorService;
+import com.odde.doughnut.services.QuestionType;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;

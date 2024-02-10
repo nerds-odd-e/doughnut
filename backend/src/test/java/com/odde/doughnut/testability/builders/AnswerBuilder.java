@@ -1,6 +1,7 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.services.QuestionType;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
@@ -18,8 +19,7 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
     }
   }
 
-  public AnswerBuilder withValidQuestion(
-      QuizQuestionEntity.QuestionType questionType, ReviewPoint reviewPoint) {
+  public AnswerBuilder withValidQuestion(QuestionType questionType, ReviewPoint reviewPoint) {
     entity.setQuestion(makeMe.aQuestion().buildValid(questionType, reviewPoint).inMemoryPlease());
     if (entity.getQuestion() == null)
       throw new RuntimeException(

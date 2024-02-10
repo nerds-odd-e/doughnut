@@ -1,5 +1,6 @@
 package com.odde.doughnut.entities;
 
+import com.odde.doughnut.services.QuestionType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
@@ -20,15 +21,14 @@ public class HierarchicalNote extends Note {
   }
 
   @Override
-  public List<QuizQuestionEntity.QuestionType> getAvailableQuestionTypes(
-      Boolean aiQuestionTypeOnlyForReview) {
+  public List<QuestionType> getAvailableQuestionTypes(Boolean aiQuestionTypeOnlyForReview) {
     if (aiQuestionTypeOnlyForReview) {
-      return List.of(QuizQuestionEntity.QuestionType.AI_QUESTION);
+      return List.of(QuestionType.AI_QUESTION);
     }
     return List.of(
-        QuizQuestionEntity.QuestionType.SPELLING,
-        QuizQuestionEntity.QuestionType.CLOZE_SELECTION,
-        QuizQuestionEntity.QuestionType.PICTURE_TITLE,
-        QuizQuestionEntity.QuestionType.PICTURE_SELECTION);
+        QuestionType.SPELLING,
+        QuestionType.CLOZE_SELECTION,
+        QuestionType.PICTURE_TITLE,
+        QuestionType.PICTURE_SELECTION);
   }
 }

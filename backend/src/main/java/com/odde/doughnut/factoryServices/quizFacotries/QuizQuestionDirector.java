@@ -6,10 +6,10 @@ import com.odde.doughnut.entities.quizQuestions.*;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.QuestionOptionsFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.QuestionRawJsonFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.SecondaryReviewPointsFactory;
+import com.odde.doughnut.services.QuestionType;
 import java.util.List;
 
-public record QuizQuestionDirector(
-    QuizQuestionEntity.QuestionType questionType, QuizQuestionServant servant) {
+public record QuizQuestionDirector(QuestionType questionType, QuizQuestionServant servant) {
 
   public QuizQuestionEntity invoke(Note note) throws QuizQuestionNotPossibleException {
     QuizQuestionFactory quizQuestionFactory;
@@ -18,31 +18,31 @@ public record QuizQuestionDirector(
     quizQuestionFactory.validatePossibility();
 
     QuizQuestionEntity quizQuestion;
-    if (questionType == QuizQuestionEntity.QuestionType.CLOZE_SELECTION) {
+    if (questionType == QuestionType.CLOZE_SELECTION) {
       quizQuestion = new QuizQuestionClozeSelection();
-    } else if (questionType == QuizQuestionEntity.QuestionType.SPELLING) {
+    } else if (questionType == QuestionType.SPELLING) {
       quizQuestion = new QuizQuestionSpelling();
-    } else if (questionType == QuizQuestionEntity.QuestionType.PICTURE_TITLE) {
+    } else if (questionType == QuestionType.PICTURE_TITLE) {
       quizQuestion = new QuizQuestionPictureTitle();
-    } else if (questionType == QuizQuestionEntity.QuestionType.PICTURE_SELECTION) {
+    } else if (questionType == QuestionType.PICTURE_SELECTION) {
       quizQuestion = new QuizQuestionPictureSelection();
-    } else if (questionType == QuizQuestionEntity.QuestionType.LINK_TARGET) {
+    } else if (questionType == QuestionType.LINK_TARGET) {
       quizQuestion = new QuizQuestionLinkTarget();
-    } else if (questionType == QuizQuestionEntity.QuestionType.LINK_SOURCE) {
+    } else if (questionType == QuestionType.LINK_SOURCE) {
       quizQuestion = new QuizQuestionLinkSource();
-    } else if (questionType == QuizQuestionEntity.QuestionType.LINK_SOURCE_WITHIN_SAME_LINK_TYPE) {
+    } else if (questionType == QuestionType.LINK_SOURCE_WITHIN_SAME_LINK_TYPE) {
       quizQuestion = new QuizQuestionLinkSourceWithSameLinkType();
-    } else if (questionType == QuizQuestionEntity.QuestionType.CLOZE_LINK_TARGET) {
+    } else if (questionType == QuestionType.CLOZE_LINK_TARGET) {
       quizQuestion = new QuizQuestionClozeLinkTarget();
-    } else if (questionType == QuizQuestionEntity.QuestionType.DESCRIPTION_LINK_TARGET) {
+    } else if (questionType == QuestionType.DESCRIPTION_LINK_TARGET) {
       quizQuestion = new QuizQuestionDescriptionLinkTarget();
-    } else if (questionType == QuizQuestionEntity.QuestionType.WHICH_SPEC_HAS_INSTANCE) {
+    } else if (questionType == QuestionType.WHICH_SPEC_HAS_INSTANCE) {
       quizQuestion = new QuizQuestionWhichSpecHasInstance();
-    } else if (questionType == QuizQuestionEntity.QuestionType.FROM_SAME_PART_AS) {
+    } else if (questionType == QuestionType.FROM_SAME_PART_AS) {
       quizQuestion = new QuizQuestionFromSamePartAs();
-    } else if (questionType == QuizQuestionEntity.QuestionType.FROM_DIFFERENT_PART_AS) {
+    } else if (questionType == QuestionType.FROM_DIFFERENT_PART_AS) {
       quizQuestion = new QuizQuestionFromDifferentPartAs();
-    } else if (questionType == QuizQuestionEntity.QuestionType.AI_QUESTION) {
+    } else if (questionType == QuestionType.AI_QUESTION) {
       quizQuestion = new QuizQuestionAIQuestion();
     } else {
       throw new RuntimeException("Unknown question type");

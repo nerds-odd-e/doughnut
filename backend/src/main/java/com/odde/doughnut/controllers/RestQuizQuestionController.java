@@ -10,6 +10,7 @@ import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.QuestionType;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import jakarta.annotation.Resource;
@@ -74,7 +75,7 @@ class RestQuizQuestionController {
             currentUser.getEntity(), thing, null, modelFactoryService, aiAdvisorService);
     QuizQuestionEntity quizQuestionEntity =
         quizQuestionGenerator.generateAQuestionOfFirstPossibleType(
-            List.of(QuizQuestionEntity.QuestionType.AI_QUESTION));
+            List.of(QuestionType.AI_QUESTION));
     return modelFactoryService.toQuizQuestion(quizQuestionEntity, currentUser.getEntity());
   }
 

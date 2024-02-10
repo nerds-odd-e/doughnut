@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.QuestionType;
 import com.odde.doughnut.testability.builders.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -109,8 +110,7 @@ public class MakeMe extends MakeMeWithoutDB {
     return new QuizQuestionBuilder(this);
   }
 
-  public QuizQuestion buildAQuestion(
-      QuizQuestionEntity.QuestionType questionType, ReviewPoint reviewPoint) {
+  public QuizQuestion buildAQuestion(QuestionType questionType, ReviewPoint reviewPoint) {
     return aQuestion().buildValid(questionType, reviewPoint).ViewedByUserPlease();
   }
 

@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.quizQuestions.QuizQuestionAIQuestion;
 import com.odde.doughnut.entities.quizQuestions.QuizQuestionSpelling;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionGenerator;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
+import com.odde.doughnut.services.QuestionType;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
@@ -23,8 +24,7 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
     this.note = note;
   }
 
-  public QuizQuestionBuilder buildValid(
-      QuizQuestionEntity.QuestionType questionType, ReviewPoint reviewPoint) {
+  public QuizQuestionBuilder buildValid(QuestionType questionType, ReviewPoint reviewPoint) {
     QuizQuestionGenerator builder =
         new QuizQuestionGenerator(
             reviewPoint.getUser(),
