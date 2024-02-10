@@ -91,11 +91,6 @@ public abstract class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   @Setter
   private Note note;
 
-  @Column(name = "question_type", insertable = false, updatable = false)
-  @Getter
-  @Setter
-  private Integer questionTypeId;
-
   @Column(name = "raw_json_question")
   @Getter
   @Setter
