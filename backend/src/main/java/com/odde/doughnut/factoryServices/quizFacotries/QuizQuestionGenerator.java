@@ -21,8 +21,7 @@ public record QuizQuestionGenerator(
     try {
       QuizQuestionServant servant =
           new QuizQuestionServant(user, randomizer, modelFactoryService, aiAdvisorService);
-      QuizQuestionEntity quizQuestion =
-          new QuizQuestionDirector(questionType, servant).invoke(note);
+      QuizQuestionEntity quizQuestion = questionType.buildQuizQuestion(note, servant);
       return Optional.of(quizQuestion);
     } catch (QuizQuestionNotPossibleException e) {
       return Optional.empty();
