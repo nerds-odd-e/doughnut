@@ -17,11 +17,6 @@ public record QuizQuestionGenerator(
     ModelFactoryService modelFactoryService,
     AiAdvisorService aiAdvisorService) {
 
-  public Optional<QuizQuestionEntity> buildQuizQuestion(QuestionType questionType) {
-    QuizQuestionFactory quizQuestionFactory = questionType.getQuizQuestionFactory(note);
-    return getQuizQuestionEntity(quizQuestionFactory);
-  }
-
   public Optional<QuizQuestionEntity> getQuizQuestionEntity(
       QuizQuestionFactory quizQuestionFactory) {
     QuizQuestionServant servant =
@@ -38,7 +33,8 @@ public record QuizQuestionGenerator(
   public QuizQuestionEntity generateAQuestionOfFirstPossibleType(List<QuestionType> shuffled) {
     QuizQuestionEntity quizQuestionEntity =
         shuffled.stream()
-            .map(this::buildQuizQuestion)
+            .map(t -> t.getQuizQuestionFactory(note))
+            .map(this::getQuizQuestionEntity)
             .flatMap(Optional::stream)
             .findFirst()
             .orElseThrow(

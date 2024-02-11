@@ -1,8 +1,8 @@
 package com.odde.doughnut.entities;
 
-import static com.odde.doughnut.services.QuestionType.SPELLING;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.odde.doughnut.factoryServices.quizFacotries.factories.SpellingQuizFactory;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -22,6 +22,7 @@ class AnsweredQuestionTest {
   class ClozeSelectionQuestion {
     Note note;
     ReviewPoint reviewPoint;
+    SpellingQuizFactory spellingQuizFactory;
 
     @BeforeEach
     void setup() {
@@ -31,6 +32,7 @@ class AnsweredQuestionTest {
           makeMe.aNote("this / that").details("description").under(top).rememberSpelling().please();
       makeMe.aNote().under(top).please();
       reviewPoint = makeMe.aReviewPointFor(note).by(user).please();
+      spellingQuizFactory = new SpellingQuizFactory(reviewPoint.getNote());
       makeMe.refresh(top);
     }
 
@@ -39,7 +41,7 @@ class AnsweredQuestionTest {
       AnsweredQuestion answer =
           makeMe
               .anAnswerViewedByUser()
-              .validQuestionOfType(SPELLING, reviewPoint)
+              .validQuestionOfType(reviewPoint, spellingQuizFactory)
               .answerWithSpelling("this")
               .inMemoryPlease();
       assertTrue(answer.correct);
@@ -50,7 +52,7 @@ class AnsweredQuestionTest {
       AnsweredQuestion answer =
           makeMe
               .anAnswerViewedByUser()
-              .validQuestionOfType(SPELLING, reviewPoint)
+              .validQuestionOfType(reviewPoint, spellingQuizFactory)
               .answerWithSpelling("this ")
               .inMemoryPlease();
       assertTrue(answer.correct);
@@ -61,7 +63,7 @@ class AnsweredQuestionTest {
       AnsweredQuestion answerResult =
           makeMe
               .anAnswerViewedByUser()
-              .validQuestionOfType(SPELLING, reviewPoint)
+              .validQuestionOfType(reviewPoint, spellingQuizFactory)
               .answerWithSpelling("this / that")
               .inMemoryPlease();
       assertTrue(answerResult.correct);

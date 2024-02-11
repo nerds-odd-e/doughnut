@@ -1,6 +1,5 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import static com.odde.doughnut.services.QuestionType.FROM_DIFFERENT_PART_AS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -177,13 +176,20 @@ class FromDifferentPartAsQuizFactoryTest {
 
         @Nested
         class Answer {
+          FromDifferentPartAsQuizFactory quizQuestionFactory;
+
+          @BeforeEach
+          void setup() {
+            quizQuestionFactory =
+                new FromDifferentPartAsQuizFactory((LinkingNote) uglySubjectiveRp.getNote());
+          }
 
           @Test
           void correct() {
             AnsweredQuestion answerResult =
                 makeMe
                     .anAnswerViewedByUser()
-                    .validQuestionOfType(FROM_DIFFERENT_PART_AS, uglySubjectiveRp)
+                    .validQuestionOfType(uglySubjectiveRp, quizQuestionFactory)
                     .choiceIndex(2)
                     .inMemoryPlease();
             assertTrue(answerResult.correct);
@@ -194,7 +200,7 @@ class FromDifferentPartAsQuizFactoryTest {
             AnsweredQuestion answerResult =
                 makeMe
                     .anAnswerViewedByUser()
-                    .validQuestionOfType(FROM_DIFFERENT_PART_AS, uglySubjectiveRp)
+                    .validQuestionOfType(uglySubjectiveRp, quizQuestionFactory)
                     .choiceIndex(1)
                     .inMemoryPlease();
             assertFalse(answerResult.correct);

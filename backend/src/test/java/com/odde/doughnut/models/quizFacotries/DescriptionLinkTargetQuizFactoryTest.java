@@ -1,6 +1,5 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import static com.odde.doughnut.services.QuestionType.DESCRIPTION_LINK_TARGET;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.nullValue;
@@ -89,7 +88,9 @@ class DescriptionLinkTargetQuizFactoryTest {
       AnsweredQuestion answerResult =
           makeMe
               .anAnswerViewedByUser()
-              .validQuestionOfType(DESCRIPTION_LINK_TARGET, reviewPoint)
+              .validQuestionOfType(
+                  reviewPoint,
+                  new DescriptionLinkTargetQuizFactory((LinkingNote) reviewPoint.getNote()))
               .choiceIndex(1)
               .inMemoryPlease();
       assertTrue(answerResult.correct);
