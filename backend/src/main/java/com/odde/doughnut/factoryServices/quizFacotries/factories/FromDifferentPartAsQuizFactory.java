@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class FromDifferentPartAsQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
 
-  private final ParentGrandLinkHelper parentGrandLinkHelper;
+  private final ParentGrandLinkHelperImpl parentGrandLinkHelper;
   private final LinkingNote link;
   private final QuizQuestionServant servant;
 
@@ -39,7 +39,7 @@ public class FromDifferentPartAsQuizFactory
 
   @Override
   public LinkingNote getCategoryLink() {
-    return parentGrandLinkHelper.getParentGrandLink();
+    return parentGrandLinkHelper.parentGrandLink();
   }
 
   @Override

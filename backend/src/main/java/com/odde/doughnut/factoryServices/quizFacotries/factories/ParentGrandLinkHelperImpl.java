@@ -7,16 +7,10 @@ import com.odde.doughnut.models.NoteViewer;
 import java.util.List;
 import java.util.stream.Stream;
 
-public record ParentGrandLinkHelperImpl(User user, LinkingNote link, LinkingNote parentGrandLink)
-    implements ParentGrandLinkHelper {
+public record ParentGrandLinkHelperImpl(User user, LinkingNote link, LinkingNote parentGrandLink) {
 
-  @Override
-  public LinkingNote getParentGrandLink() {
-    return parentGrandLink;
-  }
-
-  @Override
   public List<LinkingNote> getCousinLinksAvoidingSiblings() {
+    if (parentGrandLink == null) return List.of();
     List<Note> linkedSiblingsOfSameLinkType = link.getLinkedSiblingsOfSameLinkType(user);
     return getUncles()
         .flatMap(

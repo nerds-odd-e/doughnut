@@ -3,8 +3,6 @@ package com.odde.doughnut.factoryServices.quizFacotries;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.factoryServices.quizFacotries.factories.NullParentGrandLinkHelper;
-import com.odde.doughnut.factoryServices.quizFacotries.factories.ParentGrandLinkHelper;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.ParentGrandLinkHelperImpl;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.Randomizer;
@@ -80,7 +78,7 @@ public class QuizQuestionServant {
     return cousinLinksOfSameLinkType.filter(l -> getReviewPoint(l) != null);
   }
 
-  public ParentGrandLinkHelper getParentGrandLinkHelper(LinkingNote link) {
+  public ParentGrandLinkHelperImpl getParentGrandLinkHelper(LinkingNote link) {
     LinkingNote parentGrandLink =
         randomizer
             .chooseOneRandomly(
@@ -92,7 +90,6 @@ public class QuizQuestionServant {
                             LinkType.SPECIALIZE,
                             LinkType.APPLICATION)))
             .orElse(null);
-    if (parentGrandLink == null) return new NullParentGrandLinkHelper();
     return new ParentGrandLinkHelperImpl(this.user, link, parentGrandLink);
   }
 
