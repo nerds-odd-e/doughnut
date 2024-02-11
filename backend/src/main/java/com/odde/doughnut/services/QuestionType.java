@@ -2,13 +2,9 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.LinkingNote;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestionEntity;
-import com.odde.doughnut.entities.quizQuestions.*;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.*;
-import java.util.List;
 import java.util.function.BiFunction;
 
 public enum QuestionType {
@@ -35,41 +31,5 @@ public enum QuestionType {
       BiFunction<LinkingNote, QuizQuestionServant, QuizQuestionFactory> factoryForLinkingNote) {
     this.factory = factory;
     this.factoryForLinkingNote = factoryForLinkingNote;
-  }
-
-  public QuizQuestionEntity buildQuizQuestion(Note note, QuizQuestionServant servant1)
-      throws QuizQuestionNotPossibleException {
-    QuizQuestionFactory quizQuestionFactory;
-    if (note instanceof LinkingNote ln) {
-      quizQuestionFactory = factoryForLinkingNote.apply(ln, servant1);
-    } else {
-      quizQuestionFactory = factory.apply(note, servant1);
-    }
-
-    QuizQuestionEntity quizQuestion = quizQuestionFactory.buildQuizQuestion();
-
-    quizQuestionFactory.validatePossibility();
-    quizQuestion.setNote(note);
-
-    if (quizQuestionFactory instanceof QuestionRawJsonFactory rawJsonFactory) {
-      rawJsonFactory.generateRawJsonQuestion(quizQuestion);
-    }
-
-    if (quizQuestionFactory instanceof QuestionOptionsFactory optionsFactory) {
-      Note answerNote = optionsFactory.generateAnswer();
-      if (answerNote == null) {
-        throw new QuizQuestionNotPossibleException();
-      }
-      List<? extends Note> options = optionsFactory.generateFillingOptions();
-      if (options.size() < optionsFactory.minimumOptionCount() - 1) {
-        throw new QuizQuestionNotPossibleException();
-      }
-      quizQuestion.setChoicesAndRightAnswer(answerNote, options, servant1.randomizer);
-    }
-
-    if (quizQuestionFactory instanceof SecondaryReviewPointsFactory secondaryReviewPointsFactory) {
-      quizQuestion.setCategoryLink(secondaryReviewPointsFactory.getCategoryLink());
-    }
-    return quizQuestion;
   }
 }

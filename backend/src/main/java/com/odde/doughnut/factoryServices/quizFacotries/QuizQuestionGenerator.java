@@ -21,7 +21,14 @@ public record QuizQuestionGenerator(
     try {
       QuizQuestionServant servant =
           new QuizQuestionServant(user, randomizer, modelFactoryService, aiAdvisorService);
-      QuizQuestionEntity quizQuestion = questionType.buildQuizQuestion(note, servant);
+      QuizQuestionFactory quizQuestionFactory;
+      if (note instanceof LinkingNote ln) {
+        quizQuestionFactory = questionType.factoryForLinkingNote.apply(ln, servant);
+      } else {
+        quizQuestionFactory = questionType.factory.apply(note, servant);
+      }
+      QuizQuestionEntity quizQuestion = quizQuestionFactory.buildQuizQuestion(servant);
+      quizQuestion.setNote(note);
       return Optional.of(quizQuestion);
     } catch (QuizQuestionNotPossibleException e) {
       return Optional.empty();
