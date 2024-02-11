@@ -1,12 +1,13 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import static com.odde.doughnut.services.QuestionType.LINK_SOURCE_WITHIN_SAME_LINK_TYPE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.controllers.json.QuizQuestion;
+import com.odde.doughnut.entities.LinkingNote;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.factoryServices.quizFacotries.factories.LinkSourceWithinSameLinkTypeQuizFactory;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -82,7 +83,9 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
   }
 
   private QuizQuestion buildLinkTargetQuizQuestion() {
-    return makeMe.buildAQuestion(LINK_SOURCE_WITHIN_SAME_LINK_TYPE, reviewPoint);
+    return makeMe.buildAQuestion(
+        new LinkSourceWithinSameLinkTypeQuizFactory((LinkingNote) reviewPoint.getNote()),
+        reviewPoint);
   }
 
   private List<String> toOptionStrings(QuizQuestion quizQuestion) {

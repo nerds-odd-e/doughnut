@@ -1,12 +1,13 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import static com.odde.doughnut.services.QuestionType.CLOZE_LINK_TARGET;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.odde.doughnut.controllers.json.QuizQuestion;
+import com.odde.doughnut.entities.LinkingNote;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.factoryServices.quizFacotries.factories.ClozeLinkTargetQuizFactory;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,6 +53,7 @@ class ClozeLinkTargetQuizFactoryTest {
   }
 
   private QuizQuestion buildQuestion() {
-    return makeMe.buildAQuestion(CLOZE_LINK_TARGET, reviewPoint);
+    return makeMe.buildAQuestion(
+        new ClozeLinkTargetQuizFactory((LinkingNote) reviewPoint.getNote()), reviewPoint);
   }
 }

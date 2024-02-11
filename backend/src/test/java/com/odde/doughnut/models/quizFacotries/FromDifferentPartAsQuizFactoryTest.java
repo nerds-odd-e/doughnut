@@ -9,6 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.LinkType;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
+import com.odde.doughnut.factoryServices.quizFacotries.factories.FromDifferentPartAsQuizFactory;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -203,7 +205,9 @@ class FromDifferentPartAsQuizFactoryTest {
   }
 
   private QuizQuestion buildQuestion() {
-    return makeMe.buildAQuestion(FROM_DIFFERENT_PART_AS, uglySubjectiveRp);
+    QuizQuestionFactory quizQuestionFactory =
+        new FromDifferentPartAsQuizFactory((LinkingNote) uglySubjectiveRp.getNote());
+    return makeMe.buildAQuestion(quizQuestionFactory, uglySubjectiveRp);
   }
 
   private List<String> toOptionStrings(QuizQuestion quizQuestion) {

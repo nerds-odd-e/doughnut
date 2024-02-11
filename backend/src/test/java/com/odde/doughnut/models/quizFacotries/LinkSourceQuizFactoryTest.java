@@ -1,12 +1,13 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import static com.odde.doughnut.services.QuestionType.LINK_SOURCE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.controllers.json.QuizQuestion;
+import com.odde.doughnut.entities.LinkingNote;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.factoryServices.quizFacotries.factories.LinkSourceQuizFactory;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -66,7 +67,8 @@ class LinkSourceQuizFactoryTest {
   }
 
   private QuizQuestion buildLinkSourceQuizQuestion() {
-    return makeMe.buildAQuestion(LINK_SOURCE, reviewPoint);
+    return makeMe.buildAQuestion(
+        new LinkSourceQuizFactory((LinkingNote) reviewPoint.getNote()), reviewPoint);
   }
 
   private List<String> toOptionStrings(QuizQuestion quizQuestion) {

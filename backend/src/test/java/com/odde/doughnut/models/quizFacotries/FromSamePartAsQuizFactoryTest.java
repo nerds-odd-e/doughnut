@@ -1,6 +1,5 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import static com.odde.doughnut.services.QuestionType.FROM_SAME_PART_AS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.in;
@@ -9,6 +8,7 @@ import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.factoryServices.quizFacotries.factories.FromSamePartAsQuizFactory;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -113,7 +113,8 @@ class FromSamePartAsQuizFactoryTest {
   }
 
   private QuizQuestion buildQuestion() {
-    return makeMe.buildAQuestion(FROM_SAME_PART_AS, reviewPoint);
+    return makeMe.buildAQuestion(
+        new FromSamePartAsQuizFactory((LinkingNote) reviewPoint.getNote()), reviewPoint);
   }
 
   private List<String> toOptionStrings(QuizQuestion quizQuestion) {

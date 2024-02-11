@@ -1,12 +1,12 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import static com.odde.doughnut.services.QuestionType.PICTURE_SELECTION;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.factoryServices.quizFacotries.factories.PictureSelectionQuizFactory;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -103,7 +103,8 @@ class PictureSelectionQuizFactoryTest {
   }
 
   private QuizQuestion buildQuestion() {
-    return makeMe.buildAQuestion(PICTURE_SELECTION, reviewPoint);
+    return makeMe.buildAQuestion(
+        new PictureSelectionQuizFactory(reviewPoint.getNote()), reviewPoint);
   }
 
   private List<String> toOptionStrings(QuizQuestion quizQuestion) {

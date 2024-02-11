@@ -1,12 +1,12 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import static com.odde.doughnut.services.QuestionType.CLOZE_SELECTION;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.factoryServices.quizFacotries.factories.ClozeTitleSelectionQuizFactory;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,7 +58,8 @@ class QuizQuestionTypesClozeSelectionTest {
     }
 
     private QuizQuestion buildClozeQuizQuestion() {
-      return makeMe.buildAQuestion(CLOZE_SELECTION, reviewPoint);
+      return makeMe.buildAQuestion(
+          new ClozeTitleSelectionQuizFactory(reviewPoint.getNote()), reviewPoint);
     }
 
     private List<String> toOptionStrings(QuizQuestion quizQuestion) {
