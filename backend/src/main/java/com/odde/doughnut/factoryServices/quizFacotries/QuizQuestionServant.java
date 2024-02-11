@@ -3,7 +3,6 @@ package com.odde.doughnut.factoryServices.quizFacotries;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.factoryServices.quizFacotries.factories.ParentGrandLinkHelperImpl;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.UserModel;
@@ -78,19 +77,17 @@ public class QuizQuestionServant {
     return cousinLinksOfSameLinkType.filter(l -> getReviewPoint(l) != null);
   }
 
-  public ParentGrandLinkHelperImpl getParentGrandLinkHelper(LinkingNote link) {
-    LinkingNote parentGrandLink =
-        randomizer
-            .chooseOneRandomly(
-                link.targetNoteViewer(this.user)
-                    .linksOfTypeThroughDirect(
-                        List.of(
-                            LinkType.PART,
-                            LinkType.INSTANCE,
-                            LinkType.SPECIALIZE,
-                            LinkType.APPLICATION)))
-            .orElse(null);
-    return new ParentGrandLinkHelperImpl(this.user, link, parentGrandLink);
+  public LinkingNote getParentGrandLink(LinkingNote link) {
+    return randomizer
+        .chooseOneRandomly(
+            link.targetNoteViewer(this.user)
+                .linksOfTypeThroughDirect(
+                    List.of(
+                        LinkType.PART,
+                        LinkType.INSTANCE,
+                        LinkType.SPECIALIZE,
+                        LinkType.APPLICATION)))
+        .orElse(null);
   }
 
   public List<Note> chooseBackwardPeers(LinkingNote instanceLink, LinkingNote link1) {
@@ -131,5 +128,25 @@ public class QuizQuestionServant {
 
   public GlobalSettingsService getGlobalSettingsService() {
     return new GlobalSettingsService(modelFactoryService);
+  }
+
+  public List<LinkingNote> getCousinLinksAvoidingSiblings(
+      LinkingNote link, LinkingNote parentGrandLink) {
+    if (parentGrandLink == null) return List.of();
+    List<Note> linkedSiblingsOfSameLinkType = link.getLinkedSiblingsOfSameLinkType(user);
+    List<Note> linkTargetOfType =
+        new NoteViewer(user, link.getParent())
+            .linksOfTypeThroughDirect(List.of(link.getLinkType())).stream()
+                .map(Note::getTargetNote)
+                .toList();
+    Stream<LinkingNote> uncles =
+        parentGrandLink
+            .getSiblingLinksOfSameLinkType(user)
+            .filter(cl1 -> !linkTargetOfType.contains(cl1.getParent()));
+    return uncles
+        .flatMap(
+            p -> new NoteViewer(user, p.getParent()).linksOfTypeThroughReverse(link.getLinkType()))
+        .filter(cousinLink -> !linkedSiblingsOfSameLinkType.contains(cousinLink.getParent()))
+        .toList();
   }
 }

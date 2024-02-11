@@ -10,14 +10,14 @@ import java.util.stream.Collectors;
 public class FromDifferentPartAsQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
 
-  private final ParentGrandLinkHelperImpl parentGrandLinkHelper;
+  private final LinkingNote parentGrandLink;
   private final LinkingNote link;
   private final QuizQuestionServant servant;
 
   public FromDifferentPartAsQuizFactory(LinkingNote note, QuizQuestionServant servant) {
     link = note;
     this.servant = servant;
-    parentGrandLinkHelper = servant.getParentGrandLinkHelper(link);
+    parentGrandLink = servant.getParentGrandLink(link);
   }
 
   @Override
@@ -39,14 +39,14 @@ public class FromDifferentPartAsQuizFactory
 
   @Override
   public LinkingNote getCategoryLink() {
-    return parentGrandLinkHelper.parentGrandLink();
+    return parentGrandLink;
   }
 
   @Override
   public Note generateAnswer() {
     return servant
         .randomizer
-        .chooseOneRandomly(parentGrandLinkHelper.getCousinLinksAvoidingSiblings())
+        .chooseOneRandomly(servant.getCousinLinksAvoidingSiblings(link, parentGrandLink))
         .map(Note::getParent)
         .orElse(null);
   }

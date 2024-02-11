@@ -9,7 +9,7 @@ import java.util.List;
 public class FromSamePartAsQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
 
-  private final ParentGrandLinkHelperImpl parentGrandLinkHelper;
+  private final LinkingNote parentGrandLink;
   private Note cachedAnswerLink = null;
   private List<Note> cachedFillingOptions = null;
   private final LinkingNote link;
@@ -18,13 +18,14 @@ public class FromSamePartAsQuizFactory
   public FromSamePartAsQuizFactory(LinkingNote note, QuizQuestionServant servant) {
     link = note;
     this.servant = servant;
-    parentGrandLinkHelper = servant.getParentGrandLinkHelper(link);
+    parentGrandLink = servant.getParentGrandLink(link);
   }
 
   @Override
   public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
-      List<LinkingNote> remoteCousins = parentGrandLinkHelper.getCousinLinksAvoidingSiblings();
+      List<LinkingNote> remoteCousins =
+          servant.getCousinLinksAvoidingSiblings(link, parentGrandLink);
       cachedFillingOptions =
           servant.chooseFillingOptionsRandomly(remoteCousins).stream()
               .map(Note::getParent)
@@ -41,7 +42,7 @@ public class FromSamePartAsQuizFactory
 
   @Override
   public LinkingNote getCategoryLink() {
-    return parentGrandLinkHelper.parentGrandLink();
+    return parentGrandLink;
   }
 
   protected Note getAnswerLink() {
