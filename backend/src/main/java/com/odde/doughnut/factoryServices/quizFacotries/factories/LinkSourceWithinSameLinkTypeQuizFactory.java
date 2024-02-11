@@ -9,16 +9,14 @@ import java.util.List;
 public class LinkSourceWithinSameLinkTypeQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory {
   protected final LinkingNote link;
-  private final QuizQuestionServant servant;
   private List<LinkingNote> cachedFillingOptions = null;
 
-  public LinkSourceWithinSameLinkTypeQuizFactory(LinkingNote note, QuizQuestionServant servant) {
+  public LinkSourceWithinSameLinkTypeQuizFactory(LinkingNote note) {
     this.link = note;
-    this.servant = servant;
   }
 
   @Override
-  public List<LinkingNote> generateFillingOptions() {
+  public List<LinkingNote> generateFillingOptions(QuizQuestionServant servant) {
     if (cachedFillingOptions == null) {
       cachedFillingOptions =
           servant.chooseFromCohortAvoidSiblings(link).stream()
@@ -29,12 +27,12 @@ public class LinkSourceWithinSameLinkTypeQuizFactory
   }
 
   @Override
-  public Note generateAnswer() {
+  public Note generateAnswer(QuizQuestionServant servant) {
     return link;
   }
 
   @Override
-  public QuizQuestionEntity buildQuizQuestion() {
+  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
     return new QuizQuestionLinkSourceWithSameLinkType();
   }
 }

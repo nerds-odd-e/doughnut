@@ -10,18 +10,16 @@ import java.util.List;
 
 public class LinkTargetQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
   protected final LinkingNote link;
-  private QuizQuestionServant servant;
   protected final Note answerNote;
   private List<Note> cachedFillingOptions = null;
 
-  public LinkTargetQuizFactory(LinkingNote note, QuizQuestionServant servant) {
+  public LinkTargetQuizFactory(LinkingNote note) {
     this.link = note;
-    this.servant = servant;
     this.answerNote = link.getTargetNote();
   }
 
   @Override
-  public List<Note> generateFillingOptions() {
+  public List<Note> generateFillingOptions(QuizQuestionServant servant) {
     if (cachedFillingOptions == null) {
       cachedFillingOptions = servant.chooseFromCohortAvoidUncles(link, answerNote);
     }
@@ -29,12 +27,12 @@ public class LinkTargetQuizFactory implements QuizQuestionFactory, QuestionOptio
   }
 
   @Override
-  public Note generateAnswer() {
+  public Note generateAnswer(QuizQuestionServant servant) {
     return answerNote;
   }
 
   @Override
-  public QuizQuestionEntity buildQuizQuestion() {
+  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
     return new QuizQuestionLinkTarget();
   }
 }

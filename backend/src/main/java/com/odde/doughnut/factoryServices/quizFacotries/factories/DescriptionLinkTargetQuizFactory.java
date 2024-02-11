@@ -6,11 +6,10 @@ import com.odde.doughnut.entities.quizQuestions.QuizQuestionDescriptionLinkTarge
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 
-public class DescriptionLinkTargetQuizFactory extends LinkTargetQuizFactory
-    implements SecondaryReviewPointsFactory {
+public class DescriptionLinkTargetQuizFactory extends LinkTargetQuizFactory {
 
-  public DescriptionLinkTargetQuizFactory(LinkingNote note, QuizQuestionServant servant) {
-    super(note, servant);
+  public DescriptionLinkTargetQuizFactory(LinkingNote note) {
+    super(note);
   }
 
   @Override
@@ -22,12 +21,7 @@ public class DescriptionLinkTargetQuizFactory extends LinkTargetQuizFactory
   }
 
   @Override
-  public LinkingNote getCategoryLink() {
-    return null;
-  }
-
-  @Override
-  public QuizQuestionEntity buildQuizQuestion() {
+  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
     return new QuizQuestionDescriptionLinkTarget();
   }
 }

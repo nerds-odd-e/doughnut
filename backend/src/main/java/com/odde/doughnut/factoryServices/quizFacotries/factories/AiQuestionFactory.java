@@ -10,15 +10,14 @@ import com.odde.doughnut.services.ai.MCQWithAnswer;
 
 public class AiQuestionFactory implements QuizQuestionFactory {
   private Note note;
-  private QuizQuestionServant servant;
 
-  public AiQuestionFactory(Note note, QuizQuestionServant servant) {
+  public AiQuestionFactory(Note note) {
     this.note = note;
-    this.servant = servant;
   }
 
   @Override
-  public QuizQuestionEntity buildQuizQuestion() throws QuizQuestionNotPossibleException {
+  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant)
+      throws QuizQuestionNotPossibleException {
     QuizQuestionAIQuestion quizQuestionAIQuestion = new QuizQuestionAIQuestion();
     MCQWithAnswer MCQWithAnswer =
         servant.aiAdvisorService.generateQuestion(

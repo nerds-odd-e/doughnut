@@ -8,16 +8,14 @@ import java.util.List;
 
 public class LinkSourceQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
   protected final LinkingNote link;
-  private QuizQuestionServant servant;
   private List<Note> cachedFillingOptions = null;
 
-  public LinkSourceQuizFactory(LinkingNote link, QuizQuestionServant servant) {
+  public LinkSourceQuizFactory(LinkingNote link) {
     this.link = link;
-    this.servant = servant;
   }
 
   @Override
-  public List<Note> generateFillingOptions() {
+  public List<Note> generateFillingOptions(QuizQuestionServant servant) {
     if (cachedFillingOptions == null) {
       cachedFillingOptions = servant.chooseFromCohortAvoidSiblings(link);
     }
@@ -25,12 +23,12 @@ public class LinkSourceQuizFactory implements QuizQuestionFactory, QuestionOptio
   }
 
   @Override
-  public Note generateAnswer() {
+  public Note generateAnswer(QuizQuestionServant servant) {
     return link.getParent();
   }
 
   @Override
-  public QuizQuestionEntity buildQuizQuestion() {
+  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
     return new QuizQuestionLinkSource();
   }
 }

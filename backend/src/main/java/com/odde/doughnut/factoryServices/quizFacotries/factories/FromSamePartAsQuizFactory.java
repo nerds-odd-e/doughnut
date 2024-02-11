@@ -6,23 +6,27 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
 
-public class FromSamePartAsQuizFactory
-    implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
+public class FromSamePartAsQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
 
-  private final LinkingNote parentGrandLink;
+  private LinkingNote parentGrandLink;
   private Note cachedAnswerLink = null;
   private List<Note> cachedFillingOptions = null;
   private final LinkingNote link;
-  private final QuizQuestionServant servant;
 
-  public FromSamePartAsQuizFactory(LinkingNote note, QuizQuestionServant servant) {
+  public FromSamePartAsQuizFactory(LinkingNote note) {
     link = note;
-    this.servant = servant;
-    parentGrandLink = servant.getParentGrandLink(link);
   }
 
   @Override
-  public List<Note> generateFillingOptions() {
+  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
+    QuizQuestionFromSamePartAs quizQuestionFromSamePartAs = new QuizQuestionFromSamePartAs();
+    this.parentGrandLink = servant.getParentGrandLink(link);
+    quizQuestionFromSamePartAs.setCategoryLink(parentGrandLink);
+    return quizQuestionFromSamePartAs;
+  }
+
+  @Override
+  public List<Note> generateFillingOptions(QuizQuestionServant servant) {
     if (cachedFillingOptions == null) {
       List<LinkingNote> remoteCousins =
           servant.getCousinLinksAvoidingSiblings(link, parentGrandLink);
@@ -35,27 +39,17 @@ public class FromSamePartAsQuizFactory
   }
 
   @Override
-  public Note generateAnswer() {
-    if (getAnswerLink() == null) return null;
-    return getAnswerLink().getParent();
+  public Note generateAnswer(QuizQuestionServant servant) {
+    if (getAnswerLink(servant) == null) return null;
+    return getAnswerLink(servant).getParent();
   }
 
-  @Override
-  public LinkingNote getCategoryLink() {
-    return parentGrandLink;
-  }
-
-  protected Note getAnswerLink() {
+  protected Note getAnswerLink(QuizQuestionServant servant) {
     if (cachedAnswerLink == null) {
       List<LinkingNote> backwardPeers =
           servant.getSiblingLinksOfSameLinkTypeHavingReviewPoint(link).toList();
       cachedAnswerLink = servant.randomizer.chooseOneRandomly(backwardPeers).orElse(null);
     }
     return cachedAnswerLink;
-  }
-
-  @Override
-  public QuizQuestionEntity buildQuizQuestion() {
-    return new QuizQuestionFromSamePartAs();
   }
 }

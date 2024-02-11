@@ -7,12 +7,12 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 
 public class ClozeLinkTargetQuizFactory extends LinkTargetQuizFactory {
 
-  public ClozeLinkTargetQuizFactory(LinkingNote note, QuizQuestionServant servant) {
-    super(note, servant);
+  public ClozeLinkTargetQuizFactory(LinkingNote note) {
+    super(note);
   }
 
   @Override
-  public QuizQuestionEntity buildQuizQuestion() {
+  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
     return new QuizQuestionClozeLinkTarget();
   }
 }

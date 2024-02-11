@@ -11,10 +11,8 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 public class SpellingQuizFactory implements QuizQuestionFactory {
 
   protected final Note answerNote;
-  protected QuizQuestionServant servant;
 
-  public SpellingQuizFactory(Note note, QuizQuestionServant servant) {
-    this.servant = servant;
+  public SpellingQuizFactory(Note note) {
     this.answerNote = note;
   }
 
@@ -26,7 +24,7 @@ public class SpellingQuizFactory implements QuizQuestionFactory {
   }
 
   @Override
-  public QuizQuestionEntity buildQuizQuestion() {
+  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
     return new QuizQuestionSpelling();
   }
 

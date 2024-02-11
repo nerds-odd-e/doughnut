@@ -3,32 +3,31 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.LinkingNote;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.*;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public enum QuestionType {
   CLOZE_SELECTION(ClozeTitleSelectionQuizFactory::new, null),
-  SPELLING(SpellingQuizFactory::new, null),
+  SPELLING(note -> new SpellingQuizFactory(note), null),
   PICTURE_TITLE(PictureTitleSelectionQuizFactory::new, null),
-  PICTURE_SELECTION(PictureSelectionQuizFactory::new, null),
-  LINK_TARGET(null, LinkTargetQuizFactory::new),
-  LINK_SOURCE(null, LinkSourceQuizFactory::new),
-  LINK_SOURCE_WITHIN_SAME_LINK_TYPE(null, LinkSourceWithinSameLinkTypeQuizFactory::new),
-  CLOZE_LINK_TARGET(null, ClozeLinkTargetQuizFactory::new),
-  DESCRIPTION_LINK_TARGET(null, DescriptionLinkTargetQuizFactory::new),
-  WHICH_SPEC_HAS_INSTANCE(null, WhichSpecHasInstanceQuizFactory::new),
+  PICTURE_SELECTION(note -> new PictureSelectionQuizFactory(note), null),
+  LINK_TARGET(null, note -> new LinkTargetQuizFactory(note)),
+  LINK_SOURCE(null, link -> new LinkSourceQuizFactory(link)),
+  LINK_SOURCE_WITHIN_SAME_LINK_TYPE(
+      null, note -> new LinkSourceWithinSameLinkTypeQuizFactory(note)),
+  CLOZE_LINK_TARGET(null, note -> new ClozeLinkTargetQuizFactory(note)),
+  DESCRIPTION_LINK_TARGET(null, note -> new DescriptionLinkTargetQuizFactory(note)),
+  WHICH_SPEC_HAS_INSTANCE(null, note -> new WhichSpecHasInstanceQuizFactory(note)),
   FROM_SAME_PART_AS(null, FromSamePartAsQuizFactory::new),
   FROM_DIFFERENT_PART_AS(null, FromDifferentPartAsQuizFactory::new),
-  AI_QUESTION(AiQuestionFactory::new, null);
+  AI_QUESTION(note -> new AiQuestionFactory(note), null);
 
-  public final BiFunction<Note, QuizQuestionServant, QuizQuestionFactory> factory;
-  public final BiFunction<LinkingNote, QuizQuestionServant, QuizQuestionFactory>
-      factoryForLinkingNote;
+  public final Function<Note, QuizQuestionFactory> factory;
+  public final Function<LinkingNote, QuizQuestionFactory> factoryForLinkingNote;
 
   QuestionType(
-      BiFunction<Note, QuizQuestionServant, QuizQuestionFactory> factory,
-      BiFunction<LinkingNote, QuizQuestionServant, QuizQuestionFactory> factoryForLinkingNote) {
+      Function<Note, QuizQuestionFactory> factory,
+      Function<LinkingNote, QuizQuestionFactory> factoryForLinkingNote) {
     this.factory = factory;
     this.factoryForLinkingNote = factoryForLinkingNote;
   }

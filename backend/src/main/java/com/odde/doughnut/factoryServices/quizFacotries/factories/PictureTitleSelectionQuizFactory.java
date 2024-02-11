@@ -7,8 +7,8 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleEx
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 
 public class PictureTitleSelectionQuizFactory extends ClozeTitleSelectionQuizFactory {
-  public PictureTitleSelectionQuizFactory(Note note, QuizQuestionServant servant) {
-    super(note, servant);
+  public PictureTitleSelectionQuizFactory(Note note) {
+    super(note);
   }
 
   @Override
@@ -19,7 +19,7 @@ public class PictureTitleSelectionQuizFactory extends ClozeTitleSelectionQuizFac
   }
 
   @Override
-  public QuizQuestionEntity buildQuizQuestion() {
+  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
     return new QuizQuestionPictureTitle();
   }
 }

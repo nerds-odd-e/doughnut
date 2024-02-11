@@ -9,48 +9,37 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
 
 public class WhichSpecHasInstanceQuizFactory
-    implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
-  private LinkingNote cachedInstanceLink = null;
+    implements QuizQuestionFactory, QuestionOptionsFactory {
+  private LinkingNote instanceLink = null;
   private List<Note> cachedFillingOptions = null;
   private final LinkingNote link;
-  private final QuizQuestionServant servant;
 
-  public WhichSpecHasInstanceQuizFactory(LinkingNote note, QuizQuestionServant servant) {
+  public WhichSpecHasInstanceQuizFactory(LinkingNote note) {
     this.link = note;
-    this.servant = servant;
   }
 
   @Override
-  public List<Note> generateFillingOptions() {
+  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
+    List<LinkingNote> candidates = servant.getLinksFromSameSourceHavingReviewPoint(link).toList();
+    instanceLink = servant.randomizer.chooseOneRandomly(candidates).orElse(null);
+    QuizQuestionWhichSpecHasInstance quizQuestionWhichSpecHasInstance =
+        new QuizQuestionWhichSpecHasInstance();
+    quizQuestionWhichSpecHasInstance.setCategoryLink(instanceLink);
+    return quizQuestionWhichSpecHasInstance;
+  }
+
+  @Override
+  public List<Note> generateFillingOptions(QuizQuestionServant servant) {
     if (cachedFillingOptions != null) {
       return cachedFillingOptions;
     }
-    this.cachedFillingOptions = servant.chooseBackwardPeers(cachedInstanceLink, link);
+    this.cachedFillingOptions = servant.chooseBackwardPeers(instanceLink, link);
     return cachedFillingOptions;
   }
 
   @Override
-  public Note generateAnswer() {
-    Note instanceLink = getInstanceLink();
+  public Note generateAnswer(QuizQuestionServant servant) {
     if (instanceLink == null) return null;
     return instanceLink.getParent();
-  }
-
-  private LinkingNote getInstanceLink() {
-    if (cachedInstanceLink == null) {
-      List<LinkingNote> candidates = servant.getLinksFromSameSourceHavingReviewPoint(link).toList();
-      cachedInstanceLink = servant.randomizer.chooseOneRandomly(candidates).orElse(null);
-    }
-    return cachedInstanceLink;
-  }
-
-  @Override
-  public LinkingNote getCategoryLink() {
-    return getInstanceLink();
-  }
-
-  @Override
-  public QuizQuestionEntity buildQuizQuestion() {
-    return new QuizQuestionWhichSpecHasInstance();
   }
 }

@@ -23,9 +23,9 @@ public record QuizQuestionGenerator(
           new QuizQuestionServant(user, randomizer, modelFactoryService, aiAdvisorService);
       QuizQuestionFactory quizQuestionFactory;
       if (note instanceof LinkingNote ln) {
-        quizQuestionFactory = questionType.factoryForLinkingNote.apply(ln, servant);
+        quizQuestionFactory = questionType.factoryForLinkingNote.apply(ln);
       } else {
-        quizQuestionFactory = questionType.factory.apply(note, servant);
+        quizQuestionFactory = questionType.factory.apply(note);
       }
       QuizQuestionEntity quizQuestion = quizQuestionFactory.buildQuizQuestion(servant);
       quizQuestion.setNote(note);

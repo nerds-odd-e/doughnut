@@ -11,20 +11,18 @@ import java.util.List;
 public class ClozeTitleSelectionQuizFactory implements QuestionOptionsFactory, QuizQuestionFactory {
 
   protected final Note note;
-  protected QuizQuestionServant servant;
 
-  public ClozeTitleSelectionQuizFactory(Note note, QuizQuestionServant servant) {
+  public ClozeTitleSelectionQuizFactory(Note note) {
     this.note = note;
-    this.servant = servant;
   }
 
   @Override
-  public Note generateAnswer() {
+  public Note generateAnswer(QuizQuestionServant servant) {
     return note;
   }
 
   @Override
-  public List<Note> generateFillingOptions() {
+  public List<Note> generateFillingOptions(QuizQuestionServant servant) {
     return servant.chooseFromCohort(note, n -> true);
   }
 
@@ -36,7 +34,7 @@ public class ClozeTitleSelectionQuizFactory implements QuestionOptionsFactory, Q
   }
 
   @Override
-  public QuizQuestionEntity buildQuizQuestion() {
+  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
     return new QuizQuestionClozeSelection();
   }
 }

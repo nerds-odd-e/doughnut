@@ -10,20 +10,18 @@ import java.util.List;
 
 public class PictureSelectionQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
   private final Note answerNote;
-  private QuizQuestionServant servant;
 
-  public PictureSelectionQuizFactory(Note note, QuizQuestionServant servant) {
+  public PictureSelectionQuizFactory(Note note) {
     this.answerNote = note;
-    this.servant = servant;
   }
 
   @Override
-  public List<Note> generateFillingOptions() {
+  public List<Note> generateFillingOptions(QuizQuestionServant servant) {
     return servant.chooseFromCohort(answerNote, n -> n.getPictureWithMask().isPresent());
   }
 
   @Override
-  public Note generateAnswer() {
+  public Note generateAnswer(QuizQuestionServant servant) {
     return answerNote;
   }
 
@@ -35,7 +33,7 @@ public class PictureSelectionQuizFactory implements QuizQuestionFactory, Questio
   }
 
   @Override
-  public QuizQuestionEntity buildQuizQuestion() {
+  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
     return new QuizQuestionPictureSelection();
   }
 }

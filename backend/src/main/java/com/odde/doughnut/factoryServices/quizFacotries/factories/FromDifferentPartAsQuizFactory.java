@@ -7,17 +7,21 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FromDifferentPartAsQuizFactory
-    implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
+public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
 
-  private final LinkingNote parentGrandLink;
+  private LinkingNote parentGrandLink;
   private final LinkingNote link;
-  private final QuizQuestionServant servant;
 
-  public FromDifferentPartAsQuizFactory(LinkingNote note, QuizQuestionServant servant) {
+  public FromDifferentPartAsQuizFactory(LinkingNote note) {
     link = note;
-    this.servant = servant;
+  }
+
+  @Override
+  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
     parentGrandLink = servant.getParentGrandLink(link);
+    QuizQuestionFromDifferentPartAs quizQuestion = new QuizQuestionFromDifferentPartAs();
+    quizQuestion.setCategoryLink(parentGrandLink);
+    return quizQuestion;
   }
 
   @Override
@@ -26,8 +30,8 @@ public class FromDifferentPartAsQuizFactory
   }
 
   @Override
-  public List<Note> generateFillingOptions() {
-    if (getCategoryLink() == null) {
+  public List<Note> generateFillingOptions(QuizQuestionServant servant) {
+    if (parentGrandLink == null) {
       return null;
     }
     List<Note> cousinLinks =
@@ -38,21 +42,11 @@ public class FromDifferentPartAsQuizFactory
   }
 
   @Override
-  public LinkingNote getCategoryLink() {
-    return parentGrandLink;
-  }
-
-  @Override
-  public Note generateAnswer() {
+  public Note generateAnswer(QuizQuestionServant servant) {
     return servant
         .randomizer
         .chooseOneRandomly(servant.getCousinLinksAvoidingSiblings(link, parentGrandLink))
         .map(Note::getParent)
         .orElse(null);
-  }
-
-  @Override
-  public QuizQuestionEntity buildQuizQuestion() {
-    return new QuizQuestionFromDifferentPartAs();
   }
 }
