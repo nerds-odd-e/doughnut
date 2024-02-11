@@ -8,19 +8,18 @@ import java.util.function.Function;
 
 public enum QuestionType {
   CLOZE_SELECTION(ClozeTitleSelectionQuizFactory::new, null),
-  SPELLING(note -> new SpellingQuizFactory(note), null),
+  SPELLING(SpellingQuizFactory::new, null),
   PICTURE_TITLE(PictureTitleSelectionQuizFactory::new, null),
-  PICTURE_SELECTION(note -> new PictureSelectionQuizFactory(note), null),
-  LINK_TARGET(null, note -> new LinkTargetQuizFactory(note)),
-  LINK_SOURCE(null, link -> new LinkSourceQuizFactory(link)),
-  LINK_SOURCE_WITHIN_SAME_LINK_TYPE(
-      null, note -> new LinkSourceWithinSameLinkTypeQuizFactory(note)),
-  CLOZE_LINK_TARGET(null, note -> new ClozeLinkTargetQuizFactory(note)),
-  DESCRIPTION_LINK_TARGET(null, note -> new DescriptionLinkTargetQuizFactory(note)),
-  WHICH_SPEC_HAS_INSTANCE(null, note -> new WhichSpecHasInstanceQuizFactory(note)),
+  PICTURE_SELECTION(PictureSelectionQuizFactory::new, null),
+  LINK_TARGET(null, LinkTargetQuizFactory::new),
+  LINK_SOURCE(null, LinkSourceQuizFactory::new),
+  LINK_SOURCE_WITHIN_SAME_LINK_TYPE(null, LinkSourceWithinSameLinkTypeQuizFactory::new),
+  CLOZE_LINK_TARGET(null, ClozeLinkTargetQuizFactory::new),
+  DESCRIPTION_LINK_TARGET(null, DescriptionLinkTargetQuizFactory::new),
+  WHICH_SPEC_HAS_INSTANCE(null, WhichSpecHasInstanceQuizFactory::new),
   FROM_SAME_PART_AS(null, FromSamePartAsQuizFactory::new),
   FROM_DIFFERENT_PART_AS(null, FromDifferentPartAsQuizFactory::new),
-  AI_QUESTION(note -> new AiQuestionFactory(note), null);
+  AI_QUESTION(AiQuestionFactory::new, null);
 
   public final Function<Note, QuizQuestionFactory> factory;
   public final Function<LinkingNote, QuizQuestionFactory> factoryForLinkingNote;
@@ -30,5 +29,15 @@ public enum QuestionType {
       Function<LinkingNote, QuizQuestionFactory> factoryForLinkingNote) {
     this.factory = factory;
     this.factoryForLinkingNote = factoryForLinkingNote;
+  }
+
+  public QuizQuestionFactory getQuizQuestionFactory(Note note1) {
+    QuizQuestionFactory quizQuestionFactory;
+    if (note1 instanceof LinkingNote ln) {
+      quizQuestionFactory = factoryForLinkingNote.apply(ln);
+    } else {
+      quizQuestionFactory = factory.apply(note1);
+    }
+    return quizQuestionFactory;
   }
 }

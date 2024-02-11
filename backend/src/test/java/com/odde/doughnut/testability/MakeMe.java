@@ -3,6 +3,7 @@ package com.odde.doughnut.testability;
 import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.QuestionType;
@@ -111,7 +112,12 @@ public class MakeMe extends MakeMeWithoutDB {
   }
 
   public QuizQuestion buildAQuestion(QuestionType questionType, ReviewPoint reviewPoint) {
-    return aQuestion().buildValid(questionType, reviewPoint).ViewedByUserPlease();
+    return this.buildAQuestion(
+        questionType.getQuizQuestionFactory(reviewPoint.getNote()), reviewPoint);
+  }
+
+  public QuizQuestion buildAQuestion(QuizQuestionFactory factory, ReviewPoint reviewPoint) {
+    return aQuestion().buildValid(reviewPoint, factory).ViewedByUserPlease();
   }
 
   public FailureReportBuilder aFailureReport() {

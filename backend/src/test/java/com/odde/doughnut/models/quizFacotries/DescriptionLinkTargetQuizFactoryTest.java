@@ -8,8 +8,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.AnsweredQuestion;
+import com.odde.doughnut.entities.LinkingNote;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
+import com.odde.doughnut.factoryServices.quizFacotries.factories.DescriptionLinkTargetQuizFactory;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -94,6 +97,8 @@ class DescriptionLinkTargetQuizFactoryTest {
   }
 
   private QuizQuestion buildQuestion() {
-    return makeMe.buildAQuestion(DESCRIPTION_LINK_TARGET, reviewPoint);
+    LinkingNote note1 = (LinkingNote) reviewPoint.getNote();
+    QuizQuestionFactory quizQuestionFactory = new DescriptionLinkTargetQuizFactory(note1);
+    return makeMe.buildAQuestion(quizQuestionFactory, reviewPoint);
   }
 }

@@ -18,15 +18,15 @@ public record QuizQuestionGenerator(
     AiAdvisorService aiAdvisorService) {
 
   public Optional<QuizQuestionEntity> buildQuizQuestion(QuestionType questionType) {
+    QuizQuestionFactory quizQuestionFactory = questionType.getQuizQuestionFactory(note);
+    return getQuizQuestionEntity(quizQuestionFactory);
+  }
+
+  public Optional<QuizQuestionEntity> getQuizQuestionEntity(
+      QuizQuestionFactory quizQuestionFactory) {
+    QuizQuestionServant servant =
+        new QuizQuestionServant(user, randomizer, modelFactoryService, aiAdvisorService);
     try {
-      QuizQuestionServant servant =
-          new QuizQuestionServant(user, randomizer, modelFactoryService, aiAdvisorService);
-      QuizQuestionFactory quizQuestionFactory;
-      if (note instanceof LinkingNote ln) {
-        quizQuestionFactory = questionType.factoryForLinkingNote.apply(ln);
-      } else {
-        quizQuestionFactory = questionType.factory.apply(note);
-      }
       QuizQuestionEntity quizQuestion = quizQuestionFactory.buildQuizQuestion(servant);
       quizQuestion.setNote(note);
       return Optional.of(quizQuestion);

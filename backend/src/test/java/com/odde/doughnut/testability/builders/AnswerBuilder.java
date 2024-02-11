@@ -20,7 +20,11 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
   }
 
   public AnswerBuilder withValidQuestion(QuestionType questionType, ReviewPoint reviewPoint) {
-    entity.setQuestion(makeMe.aQuestion().buildValid(questionType, reviewPoint).inMemoryPlease());
+    entity.setQuestion(
+        makeMe
+            .aQuestion()
+            .buildValid(reviewPoint, questionType.getQuizQuestionFactory(reviewPoint.getNote()))
+            .inMemoryPlease());
     if (entity.getQuestion() == null)
       throw new RuntimeException(
           "Failed to generate a question of type "
