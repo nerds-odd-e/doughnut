@@ -1,22 +1,13 @@
 package com.odde.doughnut.models;
 
-import static com.odde.doughnut.services.QuestionType.CLOZE_SELECTION;
-import static com.odde.doughnut.services.QuestionType.DESCRIPTION_LINK_TARGET;
-import static com.odde.doughnut.services.QuestionType.FROM_DIFFERENT_PART_AS;
-import static com.odde.doughnut.services.QuestionType.FROM_SAME_PART_AS;
-import static com.odde.doughnut.services.QuestionType.LINK_SOURCE;
-import static com.odde.doughnut.services.QuestionType.LINK_TARGET;
-import static com.odde.doughnut.services.QuestionType.PICTURE_SELECTION;
-import static com.odde.doughnut.services.QuestionType.PICTURE_TITLE;
-import static com.odde.doughnut.services.QuestionType.SPELLING;
-import static com.odde.doughnut.services.QuestionType.WHICH_SPEC_HAS_INSTANCE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.services.QuestionType;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
+import com.odde.doughnut.factoryServices.quizFacotries.factories.*;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,34 +33,41 @@ class QuizQuestionGeneratorTest {
   @Test
   void note() {
     makeMe.theNote(note).rememberSpelling().please();
-    List<QuestionType> questionTypes = getQuestionTypes(note);
+    var questionTypes = getQuestionTypes(note);
     assertThat(
-        questionTypes, contains(SPELLING, CLOZE_SELECTION, PICTURE_TITLE, PICTURE_SELECTION));
+        questionTypes,
+        contains(
+            SpellingQuizFactory.class,
+            ClozeTitleSelectionQuizFactory.class,
+            PictureTitleSelectionQuizFactory.class,
+            PictureSelectionQuizFactory.class));
   }
 
   @Test
   void linkExclusive() {
     Note note2 = makeMe.aNote().linkTo(note).please();
-    List<QuestionType> questionTypes = getQuestionTypes(note2.getLinks().get(0));
+    var questionTypes = getQuestionTypes(note2.getLinks().get(0));
     assertThat(
         questionTypes,
         containsInAnyOrder(
-            LINK_TARGET,
-            LINK_SOURCE,
-            WHICH_SPEC_HAS_INSTANCE,
-            FROM_SAME_PART_AS,
-            FROM_DIFFERENT_PART_AS,
-            DESCRIPTION_LINK_TARGET));
+            LinkTargetQuizFactory.class,
+            LinkSourceQuizFactory.class,
+            WhichSpecHasInstanceQuizFactory.class,
+            FromSamePartAsQuizFactory.class,
+            FromDifferentPartAsQuizFactory.class,
+            DescriptionLinkTargetQuizFactory.class));
   }
 
   @Test
   void notAllLinkQuestionAreAvailableToAllLinkTypes() {
     Note note2 = makeMe.aNote().linkTo(note, LinkType.RELATED_TO).please();
-    List<QuestionType> questionTypes = getQuestionTypes(note2.getLinks().get(0));
+    var questionTypes = getQuestionTypes(note2.getLinks().get(0));
     assertTrue(questionTypes.isEmpty());
   }
 
-  private List<QuestionType> getQuestionTypes(Note note) {
-    return note.getAvailableQuestionTypes(false);
+  private List<? extends Class<? extends QuizQuestionFactory>> getQuestionTypes(Note note) {
+    return note.getQuizQuestionFactories(false).stream()
+        .map(QuizQuestionFactory::getClass)
+        .toList();
   }
 }

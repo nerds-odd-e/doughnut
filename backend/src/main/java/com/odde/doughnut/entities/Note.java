@@ -10,8 +10,8 @@ import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.algorithms.HtmlOrMarkdown;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.models.NoteViewer;
-import com.odde.doughnut.services.QuestionType;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
@@ -313,7 +313,8 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     return Stream.concat(getLinks().stream(), getRefers().stream());
   }
 
-  public abstract List<QuestionType> getAvailableQuestionTypes(Boolean aiQuestionTypeOnlyForReview);
+  public abstract List<QuizQuestionFactory> getQuizQuestionFactories(
+      Boolean aiQuestionTypeOnlyForReview);
 
   public static class NoteBrief {
     public String contextPath;

@@ -18,8 +18,7 @@ public enum QuestionType {
   DESCRIPTION_LINK_TARGET(null, DescriptionLinkTargetQuizFactory::new),
   WHICH_SPEC_HAS_INSTANCE(null, WhichSpecHasInstanceQuizFactory::new),
   FROM_SAME_PART_AS(null, FromSamePartAsQuizFactory::new),
-  FROM_DIFFERENT_PART_AS(null, FromDifferentPartAsQuizFactory::new),
-  AI_QUESTION(AiQuestionFactory::new, null);
+  FROM_DIFFERENT_PART_AS(null, FromDifferentPartAsQuizFactory::new);
 
   public final Function<Note, QuizQuestionFactory> factory;
   public final Function<LinkingNote, QuizQuestionFactory> factoryForLinkingNote;

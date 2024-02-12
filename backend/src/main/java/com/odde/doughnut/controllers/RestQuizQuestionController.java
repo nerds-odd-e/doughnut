@@ -5,20 +5,22 @@ import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.controllers.json.QuizQuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionGenerator;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
+import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFactory;
 import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.QuestionType;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/quiz-questions")
@@ -70,13 +72,18 @@ class RestQuizQuestionController {
   }
 
   private QuizQuestion generateAIQuestion(Note thing) {
-    QuizQuestionGenerator quizQuestionGenerator =
-        new QuizQuestionGenerator(
-            currentUser.getEntity(), thing, null, modelFactoryService, aiAdvisorService);
-    QuizQuestionEntity quizQuestionEntity =
-        quizQuestionGenerator.generateAQuestionOfFirstPossibleType(
-            List.of(QuestionType.AI_QUESTION));
-    return modelFactoryService.toQuizQuestion(quizQuestionEntity, currentUser.getEntity());
+    AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(thing);
+    QuizQuestionServant servant =
+        new QuizQuestionServant(
+            currentUser.getEntity(), null, modelFactoryService, aiAdvisorService);
+    try {
+      QuizQuestionEntity quizQuestionEntity = aiQuestionFactory.buildQuizQuestion(servant);
+      quizQuestionEntity.setNote(thing);
+      modelFactoryService.save(quizQuestionEntity);
+      return modelFactoryService.toQuizQuestion(quizQuestionEntity, currentUser.getEntity());
+    } catch (QuizQuestionNotPossibleException e) {
+      throw (new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
+    }
   }
 
   @PostMapping("/{quizQuestion}/answer")

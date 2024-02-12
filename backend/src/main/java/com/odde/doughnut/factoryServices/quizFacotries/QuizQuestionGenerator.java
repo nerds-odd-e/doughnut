@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.services.AiAdvisorService;
-import com.odde.doughnut.services.QuestionType;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
@@ -17,7 +16,7 @@ public record QuizQuestionGenerator(
     ModelFactoryService modelFactoryService,
     AiAdvisorService aiAdvisorService) {
 
-  public Optional<QuizQuestionEntity> getQuizQuestionEntity(
+  private Optional<QuizQuestionEntity> getQuizQuestionEntity(
       QuizQuestionFactory quizQuestionFactory) {
     QuizQuestionServant servant =
         new QuizQuestionServant(user, randomizer, modelFactoryService, aiAdvisorService);
@@ -30,10 +29,10 @@ public record QuizQuestionGenerator(
     }
   }
 
-  public QuizQuestionEntity generateAQuestionOfFirstPossibleType(List<QuestionType> shuffled) {
+  private QuizQuestionEntity generateAQuestionOfFirstPossibleType(
+      List<QuizQuestionFactory> quizQuestionFactoryStream) {
     QuizQuestionEntity quizQuestionEntity =
-        shuffled.stream()
-            .map(t -> t.getQuizQuestionFactory(note))
+        quizQuestionFactoryStream.stream()
             .map(this::getQuizQuestionEntity)
             .flatMap(Optional::stream)
             .findFirst()
@@ -45,6 +44,6 @@ public record QuizQuestionGenerator(
 
   public QuizQuestionEntity generateAQuestionOfRandomType() {
     return generateAQuestionOfFirstPossibleType(
-        randomizer.shuffle(note.getAvailableQuestionTypes(user.getAiQuestionTypeOnlyForReview())));
+        randomizer.shuffle(note.getQuizQuestionFactories(user.getAiQuestionTypeOnlyForReview())));
   }
 }

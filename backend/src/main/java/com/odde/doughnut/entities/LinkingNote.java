@@ -1,7 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.services.QuestionType;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import jakarta.persistence.Entity;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
@@ -42,7 +42,9 @@ public class LinkingNote extends Note {
   }
 
   @Override
-  public List<QuestionType> getAvailableQuestionTypes(Boolean aiQuestionTypeOnlyForReview) {
-    return Arrays.stream(getLinkType().getQuestionTypes()).toList();
+  public List<QuizQuestionFactory> getQuizQuestionFactories(Boolean aiQuestionTypeOnlyForReview) {
+    return Arrays.stream(getLinkType().getQuestionTypes())
+        .map(t -> t.getQuizQuestionFactory(this))
+        .toList();
   }
 }

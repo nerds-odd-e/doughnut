@@ -7,7 +7,8 @@ import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.quizQuestions.QuizQuestionAIQuestion;
 import com.odde.doughnut.entities.quizQuestions.QuizQuestionSpelling;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionGenerator;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.EntityBuilder;
@@ -26,14 +27,16 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
 
   public QuizQuestionBuilder buildValid(
       ReviewPoint reviewPoint, QuizQuestionFactory quizQuestionFactory) {
-    QuizQuestionGenerator builder =
-        new QuizQuestionGenerator(
-            reviewPoint.getUser(),
-            reviewPoint.getNote(),
-            new NonRandomizer(),
-            makeMe.modelFactoryService,
-            null);
-    this.entity = builder.getQuizQuestionEntity(quizQuestionFactory).orElse(null);
+    QuizQuestionServant servant =
+        new QuizQuestionServant(
+            reviewPoint.getUser(), new NonRandomizer(), makeMe.modelFactoryService, null);
+    try {
+      QuizQuestionEntity quizQuestion = quizQuestionFactory.buildQuizQuestion(servant);
+      quizQuestion.setNote(reviewPoint.getNote());
+      this.entity = quizQuestion;
+    } catch (QuizQuestionNotPossibleException e) {
+      this.entity = null;
+    }
     return this;
   }
 

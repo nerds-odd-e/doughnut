@@ -4,10 +4,6 @@ import static com.odde.doughnut.services.QuestionType.*;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.odde.doughnut.services.QuestionType;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.Getter;
 
 public enum LinkType {
@@ -160,10 +156,6 @@ public enum LinkType {
     this.questionTypes = questionTypes;
   }
 
-  private static final Map<Integer, LinkType> idMap =
-      Collections.unmodifiableMap(
-          Arrays.stream(values()).collect(Collectors.toMap(x -> x.id, x -> x)));
-
   public static LinkType fromLabel(String text) {
     for (LinkType b : LinkType.values()) {
       if (b.label.equalsIgnoreCase(text)) {
@@ -171,9 +163,5 @@ public enum LinkType {
       }
     }
     return null;
-  }
-
-  public static LinkType fromId(Integer id) {
-    return idMap.getOrDefault(id, null);
   }
 }
