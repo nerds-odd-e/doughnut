@@ -66,8 +66,6 @@ class QuizQuestionGeneratorTest {
   }
 
   private List<? extends Class<? extends QuizQuestionFactory>> getQuestionTypes(Note note) {
-    return note.getQuizQuestionFactories(false).stream()
-        .map(QuizQuestionFactory::getClass)
-        .toList();
+    return note.getQuizQuestionFactories().stream().map(QuizQuestionFactory::getClass).toList();
   }
 }

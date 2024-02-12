@@ -6,13 +6,16 @@ import com.odde.doughnut.entities.quizQuestions.QuizQuestionAIQuestion;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
+import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 
 public class AiQuestionFactory implements QuizQuestionFactory {
   private Note note;
+  private final AiAdvisorService aiAdvisorService;
 
-  public AiQuestionFactory(Note note) {
+  public AiQuestionFactory(Note note, AiAdvisorService aiAdvisorService) {
     this.note = note;
+    this.aiAdvisorService = aiAdvisorService;
   }
 
   @Override
@@ -20,7 +23,7 @@ public class AiQuestionFactory implements QuizQuestionFactory {
       throws QuizQuestionNotPossibleException {
     QuizQuestionAIQuestion quizQuestionAIQuestion = new QuizQuestionAIQuestion();
     MCQWithAnswer MCQWithAnswer =
-        servant.aiAdvisorService.generateQuestion(
+        aiAdvisorService.generateQuestion(
             note,
             servant.getGlobalSettingsService().getGlobalSettingQuestionGeneration().getValue());
     quizQuestionAIQuestion.setRawJsonQuestion(MCQWithAnswer.toJsonString());

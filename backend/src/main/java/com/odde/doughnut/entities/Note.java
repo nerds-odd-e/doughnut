@@ -313,8 +313,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     return Stream.concat(getLinks().stream(), getRefers().stream());
   }
 
-  public abstract List<QuizQuestionFactory> getQuizQuestionFactories(
-      Boolean aiQuestionTypeOnlyForReview);
+  public abstract List<QuizQuestionFactory> getQuizQuestionFactories();
 
   public static class NoteBrief {
     public String contextPath;

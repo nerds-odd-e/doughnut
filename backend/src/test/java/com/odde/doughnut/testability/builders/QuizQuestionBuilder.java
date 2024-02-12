@@ -29,7 +29,7 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
       ReviewPoint reviewPoint, QuizQuestionFactory quizQuestionFactory) {
     QuizQuestionServant servant =
         new QuizQuestionServant(
-            reviewPoint.getUser(), new NonRandomizer(), makeMe.modelFactoryService, null);
+            reviewPoint.getUser(), new NonRandomizer(), makeMe.modelFactoryService);
     try {
       QuizQuestionEntity quizQuestion = quizQuestionFactory.buildQuizQuestion(servant);
       quizQuestion.setNote(reviewPoint.getNote());

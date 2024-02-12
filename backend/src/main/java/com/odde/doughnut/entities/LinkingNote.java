@@ -42,7 +42,7 @@ public class LinkingNote extends Note {
   }
 
   @Override
-  public List<QuizQuestionFactory> getQuizQuestionFactories(Boolean aiQuestionTypeOnlyForReview) {
+  public List<QuizQuestionFactory> getQuizQuestionFactories() {
     return Arrays.stream(getLinkType().getQuestionTypes())
         .map(t -> t.getQuizQuestionFactory(this))
         .toList();

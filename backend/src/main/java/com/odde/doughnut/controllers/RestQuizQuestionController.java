@@ -72,10 +72,9 @@ class RestQuizQuestionController {
   }
 
   private QuizQuestion generateAIQuestion(Note thing) {
-    AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(thing);
+    AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(thing, aiAdvisorService);
     QuizQuestionServant servant =
-        new QuizQuestionServant(
-            currentUser.getEntity(), null, modelFactoryService, aiAdvisorService);
+        new QuizQuestionServant(currentUser.getEntity(), null, modelFactoryService);
     try {
       QuizQuestionEntity quizQuestionEntity = aiQuestionFactory.buildQuizQuestion(servant);
       quizQuestionEntity.setNote(thing);

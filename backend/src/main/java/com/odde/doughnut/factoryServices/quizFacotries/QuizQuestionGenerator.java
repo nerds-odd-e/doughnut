@@ -2,6 +2,7 @@ package com.odde.doughnut.factoryServices.quizFacotries;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFactory;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.services.AiAdvisorService;
 import java.util.List;
@@ -18,8 +19,7 @@ public record QuizQuestionGenerator(
 
   private Optional<QuizQuestionEntity> getQuizQuestionEntity(
       QuizQuestionFactory quizQuestionFactory) {
-    QuizQuestionServant servant =
-        new QuizQuestionServant(user, randomizer, modelFactoryService, aiAdvisorService);
+    QuizQuestionServant servant = new QuizQuestionServant(user, randomizer, modelFactoryService);
     try {
       QuizQuestionEntity quizQuestion = quizQuestionFactory.buildQuizQuestion(servant);
       quizQuestion.setNote(note);
@@ -43,7 +43,14 @@ public record QuizQuestionGenerator(
   }
 
   public QuizQuestionEntity generateAQuestionOfRandomType() {
-    return generateAQuestionOfFirstPossibleType(
-        randomizer.shuffle(note.getQuizQuestionFactories(user.getAiQuestionTypeOnlyForReview())));
+
+    List<QuizQuestionFactory> shuffled;
+    if (note instanceof HierarchicalNote && user.getAiQuestionTypeOnlyForReview()) {
+      AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(note, aiAdvisorService);
+      shuffled = List.of(aiQuestionFactory);
+    } else {
+      shuffled = randomizer.shuffle(note.getQuizQuestionFactories());
+    }
+    return generateAQuestionOfFirstPossibleType(shuffled);
   }
 }

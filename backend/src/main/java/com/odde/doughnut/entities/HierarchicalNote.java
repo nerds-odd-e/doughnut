@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities;
 
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
-import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFactory;
 import com.odde.doughnut.services.QuestionType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.PrimaryKeyJoinColumn;
@@ -23,18 +22,13 @@ public class HierarchicalNote extends Note {
   }
 
   @Override
-  public List<QuizQuestionFactory> getQuizQuestionFactories(Boolean aiQuestionTypeOnlyForReview) {
-    List<QuestionType> result;
-    if (aiQuestionTypeOnlyForReview) {
-      return List.of(new AiQuestionFactory(this));
-    } else {
-      result =
-          List.of(
-              QuestionType.SPELLING,
-              QuestionType.CLOZE_SELECTION,
-              QuestionType.PICTURE_TITLE,
-              QuestionType.PICTURE_SELECTION);
-    }
+  public List<QuizQuestionFactory> getQuizQuestionFactories() {
+    List<QuestionType> result =
+        List.of(
+            QuestionType.SPELLING,
+            QuestionType.CLOZE_SELECTION,
+            QuestionType.PICTURE_TITLE,
+            QuestionType.PICTURE_SELECTION);
     return result.stream().map(t -> t.getQuizQuestionFactory(this)).toList();
   }
 }
