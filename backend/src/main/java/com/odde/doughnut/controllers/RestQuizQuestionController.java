@@ -77,7 +77,6 @@ class RestQuizQuestionController {
         new QuizQuestionServant(currentUser.getEntity(), null, modelFactoryService);
     try {
       QuizQuestionEntity quizQuestionEntity = aiQuestionFactory.buildQuizQuestion(servant);
-      quizQuestionEntity.setNote(thing);
       modelFactoryService.save(quizQuestionEntity);
       return modelFactoryService.toQuizQuestion(quizQuestionEntity, currentUser.getEntity());
     } catch (QuizQuestionNotPossibleException e) {

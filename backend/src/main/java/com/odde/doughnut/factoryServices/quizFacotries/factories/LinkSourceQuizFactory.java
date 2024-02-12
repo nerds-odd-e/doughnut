@@ -29,6 +29,6 @@ public class LinkSourceQuizFactory implements QuizQuestionFactory, QuestionOptio
 
   @Override
   public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
-    return new QuizQuestionLinkSource();
+    return new QuizQuestionLinkSource(link);
   }
 }

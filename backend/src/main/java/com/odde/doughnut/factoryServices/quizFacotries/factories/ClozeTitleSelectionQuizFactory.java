@@ -35,6 +35,6 @@ public class ClozeTitleSelectionQuizFactory implements QuestionOptionsFactory, Q
 
   @Override
   public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
-    return new QuizQuestionClozeSelection();
+    return new QuizQuestionClozeSelection(note);
   }
 }

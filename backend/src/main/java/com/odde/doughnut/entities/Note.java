@@ -294,7 +294,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public String getContextPathString() {
     return getAncestors().stream()
-        .map(note -> note.getTopicConstructor())
+        .map(Note::getTopicConstructor)
         .collect(Collectors.joining(" › "));
   }
 
@@ -313,6 +313,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     return Stream.concat(getLinks().stream(), getRefers().stream());
   }
 
+  @JsonIgnore
   public abstract List<QuizQuestionFactory> getQuizQuestionFactories();
 
   public static class NoteBrief {

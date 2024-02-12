@@ -19,7 +19,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory, QuestionO
 
   @Override
   public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
-    QuizQuestionFromSamePartAs quizQuestionFromSamePartAs = new QuizQuestionFromSamePartAs();
+    QuizQuestionFromSamePartAs quizQuestionFromSamePartAs = new QuizQuestionFromSamePartAs(link);
     this.parentGrandLink = servant.getParentGrandLink(link);
     quizQuestionFromSamePartAs.setCategoryLink(parentGrandLink);
     return quizQuestionFromSamePartAs;

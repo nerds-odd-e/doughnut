@@ -15,14 +15,8 @@ import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
 public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
-  private Note note;
-
   public QuizQuestionBuilder(MakeMe makeMe) {
     super(makeMe, null);
-  }
-
-  private void ofNote(Note note) {
-    this.note = note;
   }
 
   public QuizQuestionBuilder buildValid(
@@ -31,9 +25,7 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
         new QuizQuestionServant(
             reviewPoint.getUser(), new NonRandomizer(), makeMe.modelFactoryService);
     try {
-      QuizQuestionEntity quizQuestion = quizQuestionFactory.buildQuizQuestion(servant);
-      quizQuestion.setNote(reviewPoint.getNote());
-      this.entity = quizQuestion;
+      this.entity = quizQuestionFactory.buildQuizQuestion(servant);
     } catch (QuizQuestionNotPossibleException e) {
       this.entity = null;
     }
@@ -41,15 +33,7 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
   }
 
   @Override
-  protected void beforeCreate(boolean needPersist) {
-    if (entity == null) {
-      return;
-    }
-
-    if (note != null) {
-      entity.setNote(note);
-    }
-  }
+  protected void beforeCreate(boolean needPersist) {}
 
   public QuizQuestion ViewedByUserPlease() {
     QuizQuestionEntity quizQuestion = inMemoryPlease();
@@ -62,14 +46,12 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
   }
 
   public QuizQuestionBuilder spellingQuestionOfReviewPoint(Note note) {
-    ofNote(note);
-    this.entity = new QuizQuestionSpelling();
+    this.entity = new QuizQuestionSpelling(note);
     return this;
   }
 
   public QuizQuestionBuilder ofAIGeneratedQuestion(MCQWithAnswer mcqWithAnswer, Note note) {
-    ofNote(note);
-    this.entity = new QuizQuestionAIQuestion();
+    this.entity = new QuizQuestionAIQuestion(note);
     entity.setRawJsonQuestion(mcqWithAnswer.toJsonString());
     entity.setCorrectAnswerIndex(mcqWithAnswer.correctChoiceIndex);
     return this;

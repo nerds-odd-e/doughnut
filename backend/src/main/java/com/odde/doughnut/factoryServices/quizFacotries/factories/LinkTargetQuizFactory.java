@@ -33,6 +33,6 @@ public class LinkTargetQuizFactory implements QuizQuestionFactory, QuestionOptio
 
   @Override
   public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
-    return new QuizQuestionLinkTarget();
+    return new QuizQuestionLinkTarget(link);
   }
 }

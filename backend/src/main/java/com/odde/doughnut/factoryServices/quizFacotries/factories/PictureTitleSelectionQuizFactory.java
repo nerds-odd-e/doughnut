@@ -20,6 +20,6 @@ public class PictureTitleSelectionQuizFactory extends ClozeTitleSelectionQuizFac
 
   @Override
   public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
-    return new QuizQuestionPictureTitle();
+    return new QuizQuestionPictureTitle(note);
   }
 }

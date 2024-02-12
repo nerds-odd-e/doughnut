@@ -23,7 +23,7 @@ public class WhichSpecHasInstanceQuizFactory
     List<LinkingNote> candidates = servant.getLinksFromSameSourceHavingReviewPoint(link).toList();
     instanceLink = servant.randomizer.chooseOneRandomly(candidates).orElse(null);
     QuizQuestionWhichSpecHasInstance quizQuestionWhichSpecHasInstance =
-        new QuizQuestionWhichSpecHasInstance();
+        new QuizQuestionWhichSpecHasInstance(link);
     quizQuestionWhichSpecHasInstance.setCategoryLink(instanceLink);
     return quizQuestionWhichSpecHasInstance;
   }

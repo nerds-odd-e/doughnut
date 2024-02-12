@@ -21,7 +21,7 @@ public class AiQuestionFactory implements QuizQuestionFactory {
   @Override
   public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant)
       throws QuizQuestionNotPossibleException {
-    QuizQuestionAIQuestion quizQuestionAIQuestion = new QuizQuestionAIQuestion();
+    QuizQuestionAIQuestion quizQuestionAIQuestion = new QuizQuestionAIQuestion(note);
     MCQWithAnswer MCQWithAnswer =
         aiAdvisorService.generateQuestion(
             note,

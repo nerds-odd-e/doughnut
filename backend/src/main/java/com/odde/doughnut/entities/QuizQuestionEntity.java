@@ -28,8 +28,7 @@ public abstract class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   @ManyToOne(cascade = CascadeType.DETACH)
   @JoinColumn(name = "note_id", referencedColumnName = "id")
   @Getter
-  @Setter
-  private Note note;
+  private final Note note;
 
   @Column(name = "raw_json_question")
   @Getter
@@ -56,6 +55,10 @@ public abstract class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
+
+  public QuizQuestionEntity(Note note) {
+    this.note = note;
+  }
 
   @JsonIgnore
   public abstract QuizQuestionPresenter buildPresenter();
