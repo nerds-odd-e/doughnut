@@ -39,14 +39,14 @@ public class CommonConfiguration {
     String[] allRoutes =
         Stream.concat(Stream.of(backendRoutes), Stream.of(frontendRoutes)).toArray(String[]::new);
 
-    http.authorizeHttpRequests()
-        .requestMatchers("/robots.txt")
-        .permitAll()
-        .requestMatchers(allRoutes)
-        .permitAll()
-        .anyRequest()
-        .authenticated()
-        .and()
+    http.authorizeHttpRequests(
+            auth ->
+                auth.requestMatchers("/robots.txt")
+                    .permitAll()
+                    .requestMatchers(allRoutes)
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated())
         .logout(
             l ->
                 l.logoutUrl("/logout")
