@@ -26,7 +26,7 @@
     "lodash": "^4.17.21",
     "marked": "^12.0.0",
     "mini-debounce": "^1.0.8",
-    "quill": "2.0.0-rc.0",
+    "quill": "2.0.0-rc.1",
     "turndown": "^7.1.2",
     "unplugin-vue-components": "0.26.0",
     "vue": "3.4.18",
