@@ -33,6 +33,9 @@ public class LinkSourceWithinSameLinkTypeQuizFactory
 
   @Override
   public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
-    return new QuizQuestionLinkSourceWithSameLinkType(link);
+    QuizQuestionLinkSourceWithSameLinkType quizQuestionLinkSourceWithSameLinkType =
+        new QuizQuestionLinkSourceWithSameLinkType();
+    quizQuestionLinkSourceWithSameLinkType.setNote(link);
+    return quizQuestionLinkSourceWithSameLinkType;
   }
 }

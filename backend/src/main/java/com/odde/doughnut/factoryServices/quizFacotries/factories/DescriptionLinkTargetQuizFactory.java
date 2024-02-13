@@ -22,6 +22,9 @@ public class DescriptionLinkTargetQuizFactory extends LinkTargetQuizFactory {
 
   @Override
   public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
-    return new QuizQuestionDescriptionLinkTarget(link);
+    QuizQuestionDescriptionLinkTarget quizQuestionDescriptionLinkTarget =
+        new QuizQuestionDescriptionLinkTarget();
+    quizQuestionDescriptionLinkTarget.setNote(link);
+    return quizQuestionDescriptionLinkTarget;
   }
 }

@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities.quizQuestions;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionPresenter;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.*;
@@ -12,10 +11,6 @@ import java.util.*;
 @Entity
 @DiscriminatorValue("1")
 public class QuizQuestionClozeSelection extends QuizQuestionEntity {
-
-  public QuizQuestionClozeSelection(Note note) {
-    super(note);
-  }
 
   @JsonIgnore
   public QuizQuestionPresenter buildPresenter() {

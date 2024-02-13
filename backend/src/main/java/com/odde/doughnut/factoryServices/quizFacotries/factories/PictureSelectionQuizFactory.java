@@ -34,6 +34,9 @@ public class PictureSelectionQuizFactory implements QuizQuestionFactory, Questio
 
   @Override
   public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
-    return new QuizQuestionPictureSelection(answerNote);
+
+    QuizQuestionPictureSelection quizQuestion = new QuizQuestionPictureSelection();
+    quizQuestion.setNote(answerNote);
+    return quizQuestion;
   }
 }

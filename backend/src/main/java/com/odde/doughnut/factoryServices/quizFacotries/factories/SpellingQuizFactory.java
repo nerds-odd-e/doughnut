@@ -25,7 +25,9 @@ public class SpellingQuizFactory implements QuizQuestionFactory {
 
   @Override
   public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
-    return new QuizQuestionSpelling(answerNote);
+    QuizQuestionSpelling quizQuestionSpelling = new QuizQuestionSpelling();
+    quizQuestionSpelling.setNote(answerNote);
+    return quizQuestionSpelling;
   }
 
   private boolean needSpellingQuiz() {

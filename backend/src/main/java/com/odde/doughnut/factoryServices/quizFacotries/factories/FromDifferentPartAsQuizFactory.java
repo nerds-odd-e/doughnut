@@ -19,7 +19,8 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, Ques
   @Override
   public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
     parentGrandLink = servant.getParentGrandLink(link);
-    QuizQuestionFromDifferentPartAs quizQuestion = new QuizQuestionFromDifferentPartAs(link);
+    QuizQuestionFromDifferentPartAs quizQuestion = new QuizQuestionFromDifferentPartAs();
+    quizQuestion.setNote(link);
     quizQuestion.setCategoryLink(parentGrandLink);
     return quizQuestion;
   }

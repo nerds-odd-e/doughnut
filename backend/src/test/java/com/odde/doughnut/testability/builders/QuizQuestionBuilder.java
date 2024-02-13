@@ -46,12 +46,16 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
   }
 
   public QuizQuestionBuilder spellingQuestionOfReviewPoint(Note note) {
-    this.entity = new QuizQuestionSpelling(note);
+    QuizQuestionSpelling quizQuestionSpelling = new QuizQuestionSpelling();
+    quizQuestionSpelling.setNote(note);
+    this.entity = quizQuestionSpelling;
     return this;
   }
 
   public QuizQuestionBuilder ofAIGeneratedQuestion(MCQWithAnswer mcqWithAnswer, Note note) {
-    this.entity = new QuizQuestionAIQuestion(note);
+    QuizQuestionAIQuestion quizQuestionAIQuestion = new QuizQuestionAIQuestion();
+    quizQuestionAIQuestion.setNote(note);
+    this.entity = quizQuestionAIQuestion;
     entity.setRawJsonQuestion(mcqWithAnswer.toJsonString());
     entity.setCorrectAnswerIndex(mcqWithAnswer.correctChoiceIndex);
     return this;

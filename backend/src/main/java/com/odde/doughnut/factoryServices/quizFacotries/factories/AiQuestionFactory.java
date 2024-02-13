@@ -17,7 +17,8 @@ public class AiQuestionFactory {
   }
 
   public QuizQuestionEntity create(QuizQuestionServant servant) {
-    QuizQuestionAIQuestion quizQuestionAIQuestion = new QuizQuestionAIQuestion(note);
+    QuizQuestionAIQuestion quizQuestionAIQuestion = new QuizQuestionAIQuestion();
+    quizQuestionAIQuestion.setNote(note);
     MCQWithAnswer MCQWithAnswer =
         aiAdvisorService.generateQuestion(
             note,

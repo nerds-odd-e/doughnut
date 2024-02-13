@@ -13,6 +13,8 @@ public class ClozeLinkTargetQuizFactory extends LinkTargetQuizFactory {
 
   @Override
   public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
-    return new QuizQuestionClozeLinkTarget(link);
+    QuizQuestionClozeLinkTarget quizQuestionClozeLinkTarget = new QuizQuestionClozeLinkTarget();
+    quizQuestionClozeLinkTarget.setNote(link);
+    return quizQuestionClozeLinkTarget;
   }
 }

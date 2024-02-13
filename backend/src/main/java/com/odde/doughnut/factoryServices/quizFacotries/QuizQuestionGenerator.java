@@ -43,8 +43,7 @@ public record QuizQuestionGenerator(
     if (note instanceof HierarchicalNote && user.getAiQuestionTypeOnlyForReview()) {
       AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(note, aiAdvisorService);
       result =
-          aiQuestionFactory.create(
-              new QuizQuestionServant(user, randomizer, modelFactoryService));
+          aiQuestionFactory.create(new QuizQuestionServant(user, randomizer, modelFactoryService));
     } else {
       List<QuizQuestionFactory> shuffled;
       shuffled = randomizer.shuffle(note.getQuizQuestionFactories());
