@@ -27,12 +27,11 @@ public class NonProductConfiguration {
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable);
-    http.authorizeHttpRequests()
-        .requestMatchers("/api/healthcheck", "/api/testability/**", "/api-docs.yaml")
-        .permitAll()
-        .and()
-        .rememberMe()
-        .alwaysRemember(true);
+    http.authorizeHttpRequests(
+            auth ->
+                auth.requestMatchers("/api/healthcheck", "/api/testability/**", "/api-docs.yaml")
+                    .permitAll())
+        .rememberMe(rememberMe -> rememberMe.alwaysRemember(true));
 
     commonConfiguration.commonConfig(
         http, http.httpBasic(Customizer.withDefaults()).formLogin(Customizer.withDefaults()));
