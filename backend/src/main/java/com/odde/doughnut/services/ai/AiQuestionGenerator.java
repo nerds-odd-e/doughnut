@@ -2,7 +2,6 @@ package com.odde.doughnut.services.ai;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.AiToolList;
@@ -20,11 +19,11 @@ public class AiQuestionGenerator {
     this.openAiApiHandler = openAiApiHandler;
   }
 
-  public MCQWithAnswer getAiGeneratedQuestion() throws QuizQuestionNotPossibleException {
+  public MCQWithAnswer getAiGeneratedQuestion() {
     AiToolList tool = AiToolFactory.mcqWithAnswerAiTool();
     return requestAndGetFunctionCallArguments(tool)
         .flatMap(MCQWithAnswer::getValidQuestion)
-        .orElseThrow(QuizQuestionNotPossibleException::new);
+        .orElse(null);
   }
 
   public Optional<QuestionEvaluation> evaluateQuestion(MCQWithAnswer question) {

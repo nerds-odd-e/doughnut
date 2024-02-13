@@ -30,26 +30,31 @@ public record QuizQuestionGenerator(
 
   private QuizQuestionEntity generateAQuestionOfFirstPossibleType(
       List<QuizQuestionFactory> quizQuestionFactoryStream) {
-    QuizQuestionEntity quizQuestionEntity =
-        quizQuestionFactoryStream.stream()
-            .map(this::getQuizQuestionEntity)
-            .flatMap(Optional::stream)
-            .findFirst()
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
-    modelFactoryService.save(quizQuestionEntity);
-    return quizQuestionEntity;
+    return quizQuestionFactoryStream.stream()
+        .map(this::getQuizQuestionEntity)
+        .flatMap(Optional::stream)
+        .findFirst()
+        .orElse(null);
   }
 
   public QuizQuestionEntity generateAQuestionOfRandomType() {
+    QuizQuestionEntity result;
 
-    List<QuizQuestionFactory> shuffled;
     if (note instanceof HierarchicalNote && user.getAiQuestionTypeOnlyForReview()) {
       AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(note, aiAdvisorService);
-      shuffled = List.of(aiQuestionFactory);
+      result =
+          aiQuestionFactory.create(
+              new QuizQuestionServant(user, randomizer, modelFactoryService));
     } else {
+      List<QuizQuestionFactory> shuffled;
       shuffled = randomizer.shuffle(note.getQuizQuestionFactories());
+      result = generateAQuestionOfFirstPossibleType(shuffled);
     }
-    return generateAQuestionOfFirstPossibleType(shuffled);
+    if (result == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated");
+    }
+
+    modelFactoryService.save(result);
+    return result;
   }
 }

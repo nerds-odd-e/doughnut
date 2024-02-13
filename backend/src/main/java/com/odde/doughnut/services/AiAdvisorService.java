@@ -3,7 +3,6 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.controllers.json.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.services.ai.*;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
@@ -28,8 +27,7 @@ public class AiAdvisorService {
     return openAiApiHandler.getOpenAiImage(prompt);
   }
 
-  public MCQWithAnswer generateQuestion(Note note, String modelName)
-      throws QuizQuestionNotPossibleException {
+  public MCQWithAnswer generateQuestion(Note note, String modelName) {
     return getAiQuestionGenerator(note, modelName).getAiGeneratedQuestion();
   }
 

@@ -12,7 +12,6 @@ import com.odde.doughnut.entities.quizQuestions.QuizQuestionAIQuestion;
 import com.odde.doughnut.entities.quizQuestions.QuizQuestionClozeSelection;
 import com.odde.doughnut.entities.quizQuestions.QuizQuestionSpelling;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionGenerator;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
@@ -140,7 +139,7 @@ class QuizQuestionTest {
     }
 
     @Test
-    void shouldAlwaysChooseAIQuestionIfConfigured() throws QuizQuestionNotPossibleException {
+    void shouldAlwaysChooseAIQuestionIfConfigured() {
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       userModel.getEntity().setAiQuestionTypeOnlyForReview(true);
       AiAdvisorService aiAdvisorService = mock(AiAdvisorService.class);

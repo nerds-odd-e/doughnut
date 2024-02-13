@@ -5,7 +5,6 @@ import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.controllers.json.QuizQuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFactory;
 import com.odde.doughnut.models.AnswerModel;
@@ -75,13 +74,12 @@ class RestQuizQuestionController {
     AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(thing, aiAdvisorService);
     QuizQuestionServant servant =
         new QuizQuestionServant(currentUser.getEntity(), null, modelFactoryService);
-    try {
-      QuizQuestionEntity quizQuestionEntity = aiQuestionFactory.buildQuizQuestion(servant);
-      modelFactoryService.save(quizQuestionEntity);
-      return modelFactoryService.toQuizQuestion(quizQuestionEntity, currentUser.getEntity());
-    } catch (QuizQuestionNotPossibleException e) {
+    QuizQuestionEntity quizQuestionEntity = aiQuestionFactory.create(servant);
+    if (quizQuestionEntity == null) {
       throw (new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
     }
+    modelFactoryService.save(quizQuestionEntity);
+    return modelFactoryService.toQuizQuestion(quizQuestionEntity, currentUser.getEntity());
   }
 
   @PostMapping("/{quizQuestion}/answer")
