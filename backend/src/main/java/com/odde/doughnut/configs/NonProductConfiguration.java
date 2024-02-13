@@ -46,17 +46,17 @@ public class NonProductConfiguration {
   @Bean
   public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) throws Exception {
     InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-    createUser(manager, "user", passwordEncoder.encode("password"), "USER");
-    createUser(manager, "old_learner", passwordEncoder.encode("password"), "USER");
-    createUser(manager, "another_old_learner", passwordEncoder.encode("password"), "USER");
-    createUser(manager, "manual", passwordEncoder.encode("password"), "USER");
-    createUser(manager, "admin", passwordEncoder.encode("password"), "USER");
-    createUser(manager, "non_admin", passwordEncoder.encode("password"), "USER");
+    createUser(manager, "user", passwordEncoder.encode("password"));
+    createUser(manager, "old_learner", passwordEncoder.encode("password"));
+    createUser(manager, "another_old_learner", passwordEncoder.encode("password"));
+    createUser(manager, "manual", passwordEncoder.encode("password"));
+    createUser(manager, "admin", passwordEncoder.encode("password"));
+    createUser(manager, "non_admin", passwordEncoder.encode("password"));
     return manager;
   }
 
   private void createUser(
-      InMemoryUserDetailsManager manager, String userName, String password, String role) {
-    manager.createUser(User.withUsername(userName).password(password).roles(role).build());
+      InMemoryUserDetailsManager manager, String userName, String password) {
+    manager.createUser(User.withUsername(userName).password(password).roles("USER").build());
   }
 }
