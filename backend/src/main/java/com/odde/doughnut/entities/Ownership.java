@@ -15,35 +15,32 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.lang.Nullable;
 
+@Getter
 @Entity
 @Table(name = "ownership")
 public class Ownership {
   @Id
-  @Getter
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
   @OneToOne
   @JoinColumn(name = "user_id")
   @JsonIgnore
-  @Getter
   @Setter
   private User user;
 
   @OneToOne
   @JoinColumn(name = "circle_id")
   @Setter
-  @Getter
   @Nullable
   private Circle circle;
 
   @OneToMany(mappedBy = "ownership")
-  @Where(clause = "deleted_at is null")
+  @SQLRestriction(value = "deleted_at is null")
   @JsonIgnore
-  @Getter
   @Setter
   private List<Notebook> notebooks = new ArrayList<>();
 
