@@ -18,8 +18,7 @@ public record QuizQuestionGenerator(
     AiAdvisorService aiAdvisorService) {
 
   private Optional<QuizQuestionEntity> getQuizQuestionEntity(
-      QuizQuestionFactory quizQuestionFactory) {
-    QuizQuestionServant servant = new QuizQuestionServant(user, randomizer, modelFactoryService);
+      QuizQuestionFactory quizQuestionFactory, QuizQuestionServant servant) {
     try {
       QuizQuestionEntity quizQuestion = quizQuestionFactory.buildQuizQuestion(servant);
       return Optional.of(quizQuestion);
@@ -29,25 +28,25 @@ public record QuizQuestionGenerator(
   }
 
   private QuizQuestionEntity generateAQuestionOfFirstPossibleType(
-      List<QuizQuestionFactory> quizQuestionFactoryStream) {
+      List<QuizQuestionFactory> quizQuestionFactoryStream, QuizQuestionServant servant) {
     return quizQuestionFactoryStream.stream()
-        .map(this::getQuizQuestionEntity)
+        .map(quizQuestionFactory -> getQuizQuestionEntity(quizQuestionFactory, servant))
         .flatMap(Optional::stream)
         .findFirst()
         .orElse(null);
   }
 
   public QuizQuestionEntity generateAQuestionOfRandomType() {
+    QuizQuestionServant servant = new QuizQuestionServant(user, randomizer, modelFactoryService);
     QuizQuestionEntity result;
 
     if (note instanceof HierarchicalNote && user.getAiQuestionTypeOnlyForReview()) {
       AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(note, aiAdvisorService);
-      result =
-          aiQuestionFactory.create(new QuizQuestionServant(user, randomizer, modelFactoryService));
+      result = aiQuestionFactory.create(servant);
     } else {
       List<QuizQuestionFactory> shuffled;
       shuffled = randomizer.shuffle(note.getQuizQuestionFactories());
-      result = generateAQuestionOfFirstPossibleType(shuffled);
+      result = generateAQuestionOfFirstPossibleType(shuffled, servant);
     }
     if (result == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated");

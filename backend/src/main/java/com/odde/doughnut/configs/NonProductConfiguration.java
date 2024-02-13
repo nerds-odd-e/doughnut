@@ -55,8 +55,7 @@ public class NonProductConfiguration {
     return manager;
   }
 
-  private void createUser(
-      InMemoryUserDetailsManager manager, String userName, String password) {
+  private void createUser(InMemoryUserDetailsManager manager, String userName, String password) {
     manager.createUser(User.withUsername(userName).password(password).roles("USER").build());
   }
 }
