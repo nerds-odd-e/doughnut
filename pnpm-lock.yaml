@@ -133,8 +133,8 @@ importers:
         specifier: ^1.0.8
         version: 1.0.8
       quill:
-        specifier: 2.0.0-rc.1
-        version: 2.0.0-rc.1
+        specifier: 2.0.0-rc.2
+        version: 2.0.0-rc.2
       turndown:
         specifier: ^7.1.2
         version: 7.1.2
@@ -6927,8 +6927,8 @@ packages:
       quill-delta: 3.6.3
     dev: false
 
-  /quill@2.0.0-rc.1:
-    resolution: {integrity: sha512-SyN+Gb+94VgEL4MCWLdclOhkjPyDejpCM/Iekoifcx/Hlgn3F6kPRi1XqRo0GhIfzWcVtywQ3cZ5frkRrsjUxQ==}
+  /quill@2.0.0-rc.2:
+    resolution: {integrity: sha512-3uh7uZqXpN4t0HmHCjBHXSaeSgYNij6LP1t8ncEjr6+JMq5zR6svpH5Frx7Lxmxv1DUHYDE28eV7R3f4r8Z2Kw==}
     engines: {npm: '>=8.2.3'}
     dependencies:
       eventemitter3: 5.0.1
