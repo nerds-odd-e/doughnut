@@ -80,7 +80,7 @@ class RestQuizQuestionController {
       throw (new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
     }
     modelFactoryService.save(quizQuestionEntity);
-    return modelFactoryService.toQuizQuestion(quizQuestionEntity, currentUser.getEntity());
+    return modelFactoryService.toQuizQuestion(quizQuestionEntity);
   }
 
   @PostMapping("/{quizQuestion}/answer")

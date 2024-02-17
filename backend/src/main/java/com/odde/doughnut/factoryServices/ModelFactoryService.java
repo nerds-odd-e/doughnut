@@ -91,13 +91,13 @@ public class ModelFactoryService {
     return new AnswerModel(answer, this);
   }
 
-  public QuizQuestion toQuizQuestion(QuizQuestionEntity quizQuestionEntity, User user) {
+  public QuizQuestion toQuizQuestion(QuizQuestionEntity quizQuestionEntity) {
     QuizQuestionPresenter presenter = quizQuestionEntity.buildPresenter();
     return new QuizQuestion(
         quizQuestionEntity.getId(),
         presenter.stem(),
         presenter.mainTopic(),
-        new NoteViewer(user, quizQuestionEntity.getNote()).jsonHeadNotePosition(),
+        quizQuestionEntity.getNote().getNotebook().getHeadNote(),
         presenter.getOptions(this),
         presenter.pictureWithMask());
   }

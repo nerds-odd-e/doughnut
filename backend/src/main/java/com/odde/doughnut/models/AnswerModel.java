@@ -26,7 +26,7 @@ public class AnswerModel {
     answerResult.correct = answer.isCorrect();
     answerResult.correctChoiceIndex = getQuestion().getCorrectAnswerIndex();
     answerResult.choiceIndex = answer.getChoiceIndex();
-    answerResult.quizQuestion = modelFactoryService.toQuizQuestion(getQuestion(), user);
+    answerResult.quizQuestion = modelFactoryService.toQuizQuestion(getQuestion());
     return answerResult;
   }
 

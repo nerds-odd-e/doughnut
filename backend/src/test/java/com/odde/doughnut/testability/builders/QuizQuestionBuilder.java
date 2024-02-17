@@ -38,7 +38,7 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
   public QuizQuestion ViewedByUserPlease() {
     QuizQuestionEntity quizQuestion = inMemoryPlease();
     if (quizQuestion == null) return null;
-    return makeMe.modelFactoryService.toQuizQuestion(quizQuestion, makeMe.aUser().please());
+    return makeMe.modelFactoryService.toQuizQuestion(quizQuestion);
   }
 
   public QuizQuestionBuilder spellingQuestionOfNote(Note note) {

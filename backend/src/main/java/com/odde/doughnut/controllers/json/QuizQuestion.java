@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers.json;
 
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PictureWithMask;
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +17,7 @@ public class QuizQuestion {
 
   @Getter public String mainTopic;
 
-  @Getter public NotePositionViewedByUser headNotePosition;
+  @Getter public Note headNote;
 
   @Getter public List<Choice> choices;
 

@@ -147,8 +147,7 @@ class QuizQuestionTest {
       QuizQuestionEntity randomQuizQuestion =
           generateQuizQuestion(note, new RealRandomizer(), aiAdvisorService);
       assertThat(randomQuizQuestion, instanceOf(QuizQuestionAIQuestion.class));
-      QuizQuestion qq =
-          makeMe.modelFactoryService.toQuizQuestion(randomQuizQuestion, userModel.getEntity());
+      QuizQuestion qq = makeMe.modelFactoryService.toQuizQuestion(randomQuizQuestion);
       assertThat(qq.stem, containsString(mcqWithAnswer.stem));
     }
 
@@ -190,6 +189,6 @@ class QuizQuestionTest {
 
   private QuizQuestion generateQuizQuestion(Note note) {
     QuizQuestionEntity entity = generateQuizQuestionEntity(note);
-    return makeMe.modelFactoryService.toQuizQuestion(entity, userModel.getEntity());
+    return makeMe.modelFactoryService.toQuizQuestion(entity);
   }
 }

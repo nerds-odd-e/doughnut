@@ -69,7 +69,7 @@ class RestReviewPointController {
             aiAdvisorService);
     QuizQuestionEntity quizQuestionEntity =
         quizQuestionGenerator.generateAQuestionOfRandomType(questionGenerationModelName);
-    return modelFactoryService.toQuizQuestion(quizQuestionEntity, user);
+    return modelFactoryService.toQuizQuestion(quizQuestionEntity);
   }
 
   @PostMapping(path = "/{reviewPoint}/remove")

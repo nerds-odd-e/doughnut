@@ -1,16 +1,14 @@
 import Builder from "./Builder";
-import NotePositionBuilder from "./NotePositionBuilder";
+import NoteBuilder from "./NoteBuilder";
 import generateId from "./generateId";
 
 class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
-  notePositionBuilder: NotePositionBuilder = new NotePositionBuilder();
-
   quizQuestion: Generated.QuizQuestion = {
     quizQuestionId: generateId(),
     choices: [],
     stem: "answer",
     mainTopic: "",
-    headNotePosition: this.notePositionBuilder.do(),
+    headNote: new NoteBuilder().do(),
   };
 
   withQuestionStem(stem: string) {
@@ -27,7 +25,6 @@ class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
   }
 
   do(): Generated.QuizQuestion {
-    this.quizQuestion.headNotePosition = this.notePositionBuilder.do();
     return this.quizQuestion;
   }
 }

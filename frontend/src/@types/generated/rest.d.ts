@@ -165,7 +165,7 @@ declare namespace Generated {
         quizQuestionId: number;
         stem: string;
         mainTopic: string;
-        headNotePosition: NotePositionViewedByUser;
+        headNote: Note;
         choices: Choice[];
         pictureWithMask?: PictureWithMask;
     }

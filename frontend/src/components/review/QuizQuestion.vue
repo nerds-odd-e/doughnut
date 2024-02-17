@@ -1,5 +1,5 @@
 <template>
-  <Breadcrumb v-bind="{ notePosition: quizQuestion.headNotePosition }" />
+  <BasicBreadcrumb :ancestors="[quizQuestion.headNote]" />
   <div class="quiz-instruction">
     <ShowPicture
       v-if="quizQuestion.pictureWithMask"
@@ -66,7 +66,7 @@ import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopups";
 import QuizQuestionChoices from "./QuizQuestionChoices.vue";
 import SuggestQuestionForFineTuning from "../ai/SuggestQuestionForFineTuning.vue";
-import Breadcrumb from "../toolbars/Breadcrumb.vue";
+import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue";
 import SvgRaiseHand from "../svgs/SvgRaiseHand.vue";
 
 export default defineComponent({
@@ -87,7 +87,7 @@ export default defineComponent({
     ShowPicture,
     TextInput,
     QuizQuestionChoices,
-    Breadcrumb,
+    BasicBreadcrumb,
     SvgRaiseHand,
     SuggestQuestionForFineTuning,
   },
