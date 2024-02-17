@@ -6,7 +6,7 @@ public class FromDifferentPartAsQuizPresenter extends QuizQuestionWithOptionsPre
   protected final Note link;
   private Note categoryLink;
 
-  public FromDifferentPartAsQuizPresenter(QuizQuestionEntity quizQuestion) {
+  public FromDifferentPartAsQuizPresenter(QuizQuestionWithNoteChoices quizQuestion) {
     super(quizQuestion);
     this.link = quizQuestion.getNote();
     this.categoryLink = quizQuestion.getCategoryLink();

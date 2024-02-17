@@ -1,12 +1,12 @@
 package com.odde.doughnut.factoryServices.quizFacotries.presenters;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestionEntity;
+import com.odde.doughnut.entities.QuizQuestionWithNoteChoices;
 
 public abstract class ClozeDescriptonQuizPresenter extends QuizQuestionWithOptionsPresenter {
   protected final Note note;
 
-  public ClozeDescriptonQuizPresenter(QuizQuestionEntity quizQuestion) {
+  public ClozeDescriptonQuizPresenter(QuizQuestionWithNoteChoices quizQuestion) {
     super(quizQuestion);
     this.note = quizQuestion.getNote();
   }

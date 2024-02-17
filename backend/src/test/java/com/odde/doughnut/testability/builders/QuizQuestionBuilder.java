@@ -57,7 +57,6 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
     quizQuestionAIQuestion.setNote(note);
     quizQuestionAIQuestion.setRawJsonQuestion(mcqWithAnswer.toJsonString());
     this.entity = quizQuestionAIQuestion;
-    entity.setCorrectAnswerIndex(mcqWithAnswer.correctChoiceIndex);
     return this;
   }
 }

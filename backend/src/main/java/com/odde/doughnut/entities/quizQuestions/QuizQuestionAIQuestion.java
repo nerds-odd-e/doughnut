@@ -39,11 +39,11 @@ public class QuizQuestionAIQuestion extends QuizQuestionEntity {
 
   @Override
   public boolean checkAnswer(Answer answer) {
-    return Objects.equals(answer.getChoiceIndex(), getCorrectAnswerIndex1());
+    return Objects.equals(answer.getChoiceIndex(), getCorrectAnswerIndex());
   }
 
   @Override
-  public Integer getCorrectAnswerIndex1() {
+  public Integer getCorrectAnswerIndex() {
     return getMcqWithAnswer().correctChoiceIndex;
   }
 }
