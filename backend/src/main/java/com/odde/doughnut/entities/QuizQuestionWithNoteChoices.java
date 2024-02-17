@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
 
+@Entity
 public abstract class QuizQuestionWithNoteChoices extends QuizQuestionEntity {
 
   @ManyToOne(cascade = CascadeType.DETACH)

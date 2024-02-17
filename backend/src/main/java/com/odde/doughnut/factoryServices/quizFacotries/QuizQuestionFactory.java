@@ -19,18 +19,17 @@ public interface QuizQuestionFactory {
 
     validatePossibility();
 
-    if (quizQuestion instanceof QuizQuestionWithNoteChoices qq) {
-      if (this instanceof QuestionOptionsFactory optionsFactory) {
-        Note answerNote = optionsFactory.generateAnswer(servant);
-        if (answerNote == null) {
-          throw new QuizQuestionNotPossibleException();
-        }
-        List<? extends Note> options = optionsFactory.generateFillingOptions(servant);
-        if (options.size() < optionsFactory.minimumOptionCount() - 1) {
-          throw new QuizQuestionNotPossibleException();
-        }
-        qq.setChoicesAndRightAnswer(answerNote, options, servant.randomizer);
+    if (this instanceof QuestionOptionsFactory optionsFactory) {
+      QuizQuestionWithNoteChoices qq = (QuizQuestionWithNoteChoices) quizQuestion;
+      Note answerNote = optionsFactory.generateAnswer(servant);
+      if (answerNote == null) {
+        throw new QuizQuestionNotPossibleException();
       }
+      List<? extends Note> options = optionsFactory.generateFillingOptions(servant);
+      if (options.size() < optionsFactory.minimumOptionCount() - 1) {
+        throw new QuizQuestionNotPossibleException();
+      }
+      qq.setChoicesAndRightAnswer(answerNote, options, servant.randomizer);
     }
 
     return quizQuestion;
