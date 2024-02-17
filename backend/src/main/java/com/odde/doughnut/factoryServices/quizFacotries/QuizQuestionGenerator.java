@@ -44,8 +44,7 @@ public record QuizQuestionGenerator(
       AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(note, aiAdvisorService);
       result = aiQuestionFactory.create(questionGenerationModelName);
     } else {
-      List<QuizQuestionFactory> shuffled;
-      shuffled = randomizer.shuffle(note.getQuizQuestionFactories());
+      List<QuizQuestionFactory> shuffled = randomizer.shuffle(note.getQuizQuestionFactories());
       result = generateAQuestionOfFirstPossibleType(shuffled, servant);
     }
     if (result == null) {

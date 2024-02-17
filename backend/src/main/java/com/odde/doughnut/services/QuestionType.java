@@ -7,10 +7,6 @@ import com.odde.doughnut.factoryServices.quizFacotries.factories.*;
 import java.util.function.Function;
 
 public enum QuestionType {
-  CLOZE_SELECTION(ClozeTitleSelectionQuizFactory::new, null),
-  SPELLING(SpellingQuizFactory::new, null),
-  PICTURE_TITLE(PictureTitleSelectionQuizFactory::new, null),
-  PICTURE_SELECTION(PictureSelectionQuizFactory::new, null),
   LINK_TARGET(null, LinkTargetQuizFactory::new),
   LINK_SOURCE(null, LinkSourceQuizFactory::new),
   LINK_SOURCE_WITHIN_SAME_LINK_TYPE(null, LinkSourceWithinSameLinkTypeQuizFactory::new),
