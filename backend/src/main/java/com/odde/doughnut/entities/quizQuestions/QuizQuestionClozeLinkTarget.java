@@ -2,8 +2,8 @@ package com.odde.doughnut.entities.quizQuestions;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.entities.QuizQuestionWithNoteChoices;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionPresenter;
 import com.odde.doughnut.factoryServices.quizFacotries.presenters.ClozeLinkTargetQuizPresenter;
+import com.odde.doughnut.factoryServices.quizFacotries.presenters.QuizQuestionWithOptionsPresenter;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
@@ -12,7 +12,7 @@ import jakarta.persistence.Entity;
 public class QuizQuestionClozeLinkTarget extends QuizQuestionWithNoteChoices {
 
   @JsonIgnore
-  public QuizQuestionPresenter buildPresenter() {
+  public QuizQuestionWithOptionsPresenter buildPresenter() {
     return new ClozeLinkTargetQuizPresenter(this);
   }
 }

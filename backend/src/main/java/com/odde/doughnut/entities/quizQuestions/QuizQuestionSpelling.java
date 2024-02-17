@@ -1,25 +1,38 @@
 package com.odde.doughnut.entities.quizQuestions;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.Answer;
+import com.odde.doughnut.entities.PictureWithMask;
 import com.odde.doughnut.entities.QuizQuestionEntity;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionPresenter;
-import com.odde.doughnut.factoryServices.quizFacotries.presenters.SpellingQuizPresenter;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import java.util.List;
+import java.util.Optional;
 
 @Entity
 @DiscriminatorValue("2")
 public class QuizQuestionSpelling extends QuizQuestionEntity {
 
-  @JsonIgnore
-  public QuizQuestionPresenter buildPresenter() {
-    return new SpellingQuizPresenter(this);
-  }
-
   @Override
   public Integer getCorrectAnswerIndex() {
     return null;
+  }
+
+  public List<QuizQuestion.Choice> getOptions(ModelFactoryService modelFactoryService) {
+    return List.of();
+  }
+
+  public String getStem() {
+    return getNote().getClozeDescription().clozeDetails();
+  }
+
+  public String getMainTopic() {
+    return "";
+  }
+
+  public Optional<PictureWithMask> getPictureWithMask() {
+    return Optional.empty();
   }
 
   @Override

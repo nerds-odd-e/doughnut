@@ -45,6 +45,6 @@ public class AnswerModel {
   }
 
   private ReviewPoint getReviewPoint(User user) {
-    return getQuestion().getReviewPointFor(modelFactoryService.toUserModel(user));
+    return modelFactoryService.toUserModel(user).getReviewPointFor(getQuestion().getNote());
   }
 }

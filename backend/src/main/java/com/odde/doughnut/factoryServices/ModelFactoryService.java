@@ -4,7 +4,6 @@ import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.controllers.json.SearchTerm;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.*;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionPresenter;
 import com.odde.doughnut.models.*;
 import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
@@ -92,14 +91,13 @@ public class ModelFactoryService {
   }
 
   public QuizQuestion toQuizQuestion(QuizQuestionEntity quizQuestionEntity) {
-    QuizQuestionPresenter presenter = quizQuestionEntity.buildPresenter();
     return new QuizQuestion(
         quizQuestionEntity.getId(),
-        presenter.stem(),
-        presenter.mainTopic(),
+        quizQuestionEntity.getStem(),
+        quizQuestionEntity.getMainTopic(),
         quizQuestionEntity.getNote().getNotebook().getHeadNote(),
-        presenter.getOptions(this),
-        presenter.pictureWithMask());
+        quizQuestionEntity.getOptions(this),
+        quizQuestionEntity.getPictureWithMask());
   }
 
   public SuggestedQuestionForFineTuningModel toSuggestedQuestionForFineTuningService(

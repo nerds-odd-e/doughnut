@@ -3,15 +3,18 @@ package com.odde.doughnut.entities.quizQuestions;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.Answer;
+import com.odde.doughnut.entities.PictureWithMask;
 import com.odde.doughnut.entities.QuizQuestionEntity;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionPresenter;
-import com.odde.doughnut.factoryServices.quizFacotries.presenters.AiQuestionPresenter;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,14 +35,32 @@ public class QuizQuestionAIQuestion extends QuizQuestionEntity {
     }
   }
 
-  @JsonIgnore
-  public QuizQuestionPresenter buildPresenter() {
-    return new AiQuestionPresenter(this);
-  }
-
   @Override
   public boolean checkAnswer(Answer answer) {
     return Objects.equals(answer.getChoiceIndex(), getCorrectAnswerIndex());
+  }
+
+  public List<QuizQuestion.Choice> getOptions(ModelFactoryService modelFactoryService) {
+    return getMcqWithAnswer().choices.stream()
+        .map(
+            choice -> {
+              QuizQuestion.Choice option = new QuizQuestion.Choice();
+              option.setDisplay(choice);
+              return option;
+            })
+        .toList();
+  }
+
+  public String getStem() {
+    return getMcqWithAnswer().stem;
+  }
+
+  public String getMainTopic() {
+    return null;
+  }
+
+  public Optional<PictureWithMask> getPictureWithMask() {
+    return Optional.empty();
   }
 
   @Override

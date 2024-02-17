@@ -49,11 +49,7 @@ public class Answer extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public String getAnswerDisplay(ModelFactoryService modelFactoryService) {
     if (question != null && choiceIndex != null) {
-      return question
-          .buildPresenter()
-          .getOptions(modelFactoryService)
-          .get(choiceIndex)
-          .getDisplay();
+      return question.getOptions(modelFactoryService).get(choiceIndex).getDisplay();
     }
     return getSpellingAnswer();
   }

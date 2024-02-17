@@ -1,10 +1,12 @@
 package com.odde.doughnut.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.controllers.json.QuizQuestion;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.*;
-import com.odde.doughnut.models.UserModel;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
+import java.util.List;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,15 +27,15 @@ public abstract class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   @Setter
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
-  @JsonIgnore
-  public abstract QuizQuestionPresenter buildPresenter();
-
-  @JsonIgnore
-  public ReviewPoint getReviewPointFor(UserModel userModel) {
-    return userModel.getReviewPointFor(getNote());
-  }
-
   public abstract Integer getCorrectAnswerIndex();
 
   public abstract boolean checkAnswer(Answer answer);
+
+  public abstract List<QuizQuestion.Choice> getOptions(ModelFactoryService modelFactoryService);
+
+  public abstract String getStem();
+
+  public abstract String getMainTopic();
+
+  public abstract Optional<PictureWithMask> getPictureWithMask();
 }
