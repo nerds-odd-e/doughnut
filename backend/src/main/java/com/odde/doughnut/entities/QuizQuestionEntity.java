@@ -1,12 +1,9 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.factoryServices.quizFacotries.*;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.*;
@@ -15,10 +12,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
 
-//
-// The class name has Entity suffix so that it can be distinguished from the QuizQuestion class,
-// which is used in the frontend from the data consumer's perspective.
-//
 @Entity
 @Table(name = "quiz_question")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -30,11 +23,6 @@ public abstract class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   private Note note;
-
-  @Column(name = "raw_json_question")
-  @Getter
-  @Setter
-  private String rawJsonQuestion;
 
   @ManyToOne(cascade = CascadeType.DETACH)
   @JoinColumn(name = "category_link_id")
@@ -81,14 +69,6 @@ public abstract class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public ReviewPoint getReviewPointFor(UserModel userModel) {
     return userModel.getReviewPointFor(getNote());
-  }
-
-  public MCQWithAnswer getMcqWithAnswer() {
-    try {
-      return new ObjectMapper().readValue(getRawJsonQuestion(), MCQWithAnswer.class);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   public boolean checkAnswer(Answer answer) {

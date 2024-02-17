@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.json.QuestionSuggestionCreationParams;
 import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.controllers.json.QuizQuestionContestResult;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.quizQuestions.QuizQuestionAIQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFactory;
 import com.odde.doughnut.models.AnswerModel;
@@ -55,7 +56,7 @@ class RestQuizQuestionController {
   @PostMapping("/{quizQuestion}/contest")
   @Transactional
   public QuizQuestionContestResult contest(
-      @PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity) {
+      @PathVariable("quizQuestion") QuizQuestionAIQuestion quizQuestionEntity) {
     currentUser.assertLoggedIn();
     return aiAdvisorService.contestQuestion(
         quizQuestionEntity, globalSettingsService.getGlobalSettingEvaluation().getValue());
@@ -99,7 +100,7 @@ class RestQuizQuestionController {
   @PostMapping("/{quizQuestion}/suggest-fine-tuning")
   @Transactional
   public SuggestedQuestionForFineTuning suggestQuestionForFineTuning(
-      @PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity,
+      @PathVariable("quizQuestion") QuizQuestionAIQuestion quizQuestionEntity,
       @Valid @RequestBody QuestionSuggestionCreationParams suggestion) {
     SuggestedQuestionForFineTuning sqft = new SuggestedQuestionForFineTuning();
     var suggestedQuestionForFineTuningService =

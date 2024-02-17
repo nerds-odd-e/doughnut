@@ -24,7 +24,6 @@ public class AiQuestionFactory {
       return null;
     }
     quizQuestionAIQuestion.setRawJsonQuestion(MCQWithAnswer.toJsonString());
-    quizQuestionAIQuestion.setCorrectAnswerIndex(MCQWithAnswer.correctChoiceIndex);
     return quizQuestionAIQuestion;
   }
 }

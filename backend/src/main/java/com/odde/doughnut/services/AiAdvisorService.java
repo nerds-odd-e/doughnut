@@ -2,7 +2,7 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.json.*;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestionEntity;
+import com.odde.doughnut.entities.quizQuestions.QuizQuestionAIQuestion;
 import com.odde.doughnut.services.ai.*;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
@@ -81,7 +81,7 @@ public class AiAdvisorService {
   }
 
   public QuizQuestionContestResult contestQuestion(
-      QuizQuestionEntity quizQuestionEntity, String modelName) {
+      QuizQuestionAIQuestion quizQuestionEntity, String modelName) {
     return getAiQuestionGenerator(quizQuestionEntity.getNote(), modelName)
         .evaluateQuestion(quizQuestionEntity.getMcqWithAnswer())
         .map(e -> e.getQuizQuestionContestResult(quizQuestionEntity.getCorrectAnswerIndex()))
