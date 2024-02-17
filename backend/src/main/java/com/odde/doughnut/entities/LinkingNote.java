@@ -44,7 +44,7 @@ public class LinkingNote extends Note {
   @Override
   public List<QuizQuestionFactory> getQuizQuestionFactories() {
     return Arrays.stream(getLinkType().getQuestionTypes())
-        .map(t -> t.getQuizQuestionFactory(this))
+        .map(t -> t.factoryForLinkingNote.apply(this))
         .toList();
   }
 }

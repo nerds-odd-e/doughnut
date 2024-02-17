@@ -1,20 +1,20 @@
 package com.odde.doughnut.entities;
 
-import static com.odde.doughnut.services.QuestionType.*;
+import static com.odde.doughnut.services.LinkQuestionType.*;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.odde.doughnut.services.QuestionType;
+import com.odde.doughnut.services.LinkQuestionType;
 import lombok.Getter;
 
 public enum LinkType {
-  NO_LINK(0, "no link", "no link", "", new QuestionType[] {}),
-  RELATED_TO(1, "related note", "related to", "related to", new QuestionType[] {}),
+  NO_LINK(0, "no link", "no link", "", new LinkQuestionType[] {}),
+  RELATED_TO(1, "related note", "related to", "related to", new LinkQuestionType[] {}),
   SPECIALIZE(
       2,
       "specification",
       "a specialization of",
       "a generalization of",
-      new QuestionType[] {
+      new LinkQuestionType[] {
         LINK_TARGET,
         LINK_SOURCE,
         WHICH_SPEC_HAS_INSTANCE,
@@ -27,7 +27,7 @@ public enum LinkType {
       "application",
       "an application of",
       "applied to",
-      new QuestionType[] {
+      new LinkQuestionType[] {
         LINK_TARGET,
         LINK_SOURCE_WITHIN_SAME_LINK_TYPE,
         WHICH_SPEC_HAS_INSTANCE,
@@ -41,7 +41,7 @@ public enum LinkType {
       "instance",
       "an instance of",
       "has instances",
-      new QuestionType[] {
+      new LinkQuestionType[] {
         LINK_TARGET,
         LINK_SOURCE,
         WHICH_SPEC_HAS_INSTANCE,
@@ -54,7 +54,7 @@ public enum LinkType {
       "part",
       "a part of",
       "has parts",
-      new QuestionType[] {
+      new LinkQuestionType[] {
         LINK_TARGET,
         LINK_SOURCE,
         WHICH_SPEC_HAS_INSTANCE,
@@ -67,7 +67,7 @@ public enum LinkType {
       "tag target",
       "tagged by",
       "tagging",
-      new QuestionType[] {
+      new LinkQuestionType[] {
         LINK_TARGET,
         LINK_SOURCE,
         WHICH_SPEC_HAS_INSTANCE,
@@ -79,7 +79,7 @@ public enum LinkType {
       "attribute",
       "an attribute of",
       "has attributes",
-      new QuestionType[] {
+      new LinkQuestionType[] {
         LINK_TARGET,
         LINK_SOURCE,
         WHICH_SPEC_HAS_INSTANCE,
@@ -92,19 +92,19 @@ public enum LinkType {
       "opposition",
       "the opposite of",
       "the opposite of",
-      new QuestionType[] {LINK_TARGET, LINK_SOURCE, DESCRIPTION_LINK_TARGET}),
+      new LinkQuestionType[] {LINK_TARGET, LINK_SOURCE, DESCRIPTION_LINK_TARGET}),
   AUTHOR_OF(
       14,
       "author",
       "author of",
       "brought by",
-      new QuestionType[] {LINK_TARGET, LINK_SOURCE, DESCRIPTION_LINK_TARGET}),
+      new LinkQuestionType[] {LINK_TARGET, LINK_SOURCE, DESCRIPTION_LINK_TARGET}),
   USES(
       15,
       "user",
       "using",
       "used by",
-      new QuestionType[] {
+      new LinkQuestionType[] {
         LINK_TARGET,
         LINK_SOURCE,
         WHICH_SPEC_HAS_INSTANCE,
@@ -117,7 +117,7 @@ public enum LinkType {
       "example",
       "an example of",
       "has examples",
-      new QuestionType[] {
+      new LinkQuestionType[] {
         LINK_SOURCE_WITHIN_SAME_LINK_TYPE,
         CLOZE_LINK_TARGET,
         FROM_SAME_PART_AS,
@@ -128,27 +128,27 @@ public enum LinkType {
       "precedence",
       "before",
       "after",
-      new QuestionType[] {LINK_TARGET, LINK_SOURCE, DESCRIPTION_LINK_TARGET}),
+      new LinkQuestionType[] {LINK_TARGET, LINK_SOURCE, DESCRIPTION_LINK_TARGET}),
   SIMILAR_TO(
       22,
       "note",
       "similar to",
       "similar to",
-      new QuestionType[] {LINK_TARGET, LINK_SOURCE, DESCRIPTION_LINK_TARGET}),
-  CONFUSE_WITH(23, "note", "confused with", "confused with", new QuestionType[] {});
+      new LinkQuestionType[] {LINK_TARGET, LINK_SOURCE, DESCRIPTION_LINK_TARGET}),
+  CONFUSE_WITH(23, "note", "confused with", "confused with", new LinkQuestionType[] {});
 
   @JsonValue public final String label;
   public final String nameOfSource;
   public final Integer id;
   public String reversedLabel;
-  @Getter private final QuestionType[] questionTypes;
+  @Getter private final LinkQuestionType[] questionTypes;
 
   LinkType(
       Integer id,
       String nameOfSource,
       String label,
       String reversedLabel,
-      QuestionType[] questionTypes) {
+      LinkQuestionType[] questionTypes) {
     this.nameOfSource = nameOfSource;
     this.label = label;
     this.id = id;
