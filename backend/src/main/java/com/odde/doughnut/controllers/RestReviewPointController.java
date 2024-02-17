@@ -11,6 +11,7 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionGenerator;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
+import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import jakarta.annotation.Resource;
@@ -55,6 +56,10 @@ class RestReviewPointController {
     currentUser.assertLoggedIn();
     User user = currentUser.getEntity();
     Randomizer randomizer = testabilitySettings.getRandomizer();
+    String questionGenerationModelName =
+        new GlobalSettingsService(modelFactoryService)
+            .getGlobalSettingQuestionGeneration()
+            .getValue();
     QuizQuestionGenerator quizQuestionGenerator =
         new QuizQuestionGenerator(
             reviewPoint.getUser(),
@@ -62,7 +67,8 @@ class RestReviewPointController {
             randomizer,
             modelFactoryService,
             aiAdvisorService);
-    QuizQuestionEntity quizQuestionEntity = quizQuestionGenerator.generateAQuestionOfRandomType();
+    QuizQuestionEntity quizQuestionEntity =
+        quizQuestionGenerator.generateAQuestionOfRandomType(questionGenerationModelName);
     return modelFactoryService.toQuizQuestion(quizQuestionEntity, user);
   }
 

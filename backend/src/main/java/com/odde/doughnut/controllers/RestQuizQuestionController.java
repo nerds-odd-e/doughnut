@@ -5,7 +5,6 @@ import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.controllers.json.QuizQuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFactory;
 import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.UserModel;
@@ -72,9 +71,11 @@ class RestQuizQuestionController {
 
   private QuizQuestion generateAIQuestion(Note thing) {
     AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(thing, aiAdvisorService);
-    QuizQuestionServant servant =
-        new QuizQuestionServant(currentUser.getEntity(), null, modelFactoryService);
-    QuizQuestionEntity quizQuestionEntity = aiQuestionFactory.create(servant);
+    String questionGenerationModelName =
+        new GlobalSettingsService(modelFactoryService)
+            .getGlobalSettingQuestionGeneration()
+            .getValue();
+    QuizQuestionEntity quizQuestionEntity = aiQuestionFactory.create(questionGenerationModelName);
     if (quizQuestionEntity == null) {
       throw (new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
     }

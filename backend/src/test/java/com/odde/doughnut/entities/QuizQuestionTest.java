@@ -181,7 +181,7 @@ class QuizQuestionTest {
     QuizQuestionGenerator quizQuestionGenerator =
         new QuizQuestionGenerator(
             userModel.getEntity(), note, randomizer1, makeMe.modelFactoryService, aiAdvisorService);
-    return quizQuestionGenerator.generateAQuestionOfRandomType();
+    return quizQuestionGenerator.generateAQuestionOfRandomType("gpt3");
   }
 
   private QuizQuestionEntity generateQuizQuestionEntity(Note note) {

@@ -36,13 +36,13 @@ public record QuizQuestionGenerator(
         .orElse(null);
   }
 
-  public QuizQuestionEntity generateAQuestionOfRandomType() {
+  public QuizQuestionEntity generateAQuestionOfRandomType(String questionGenerationModelName) {
     QuizQuestionServant servant = new QuizQuestionServant(user, randomizer, modelFactoryService);
     QuizQuestionEntity result;
 
     if (note instanceof HierarchicalNote && user.getAiQuestionTypeOnlyForReview()) {
       AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(note, aiAdvisorService);
-      result = aiQuestionFactory.create(servant);
+      result = aiQuestionFactory.create(questionGenerationModelName);
     } else {
       List<QuizQuestionFactory> shuffled;
       shuffled = randomizer.shuffle(note.getQuizQuestionFactories());

@@ -3,7 +3,6 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.quizQuestions.QuizQuestionAIQuestion;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 
@@ -16,13 +15,11 @@ public class AiQuestionFactory {
     this.aiAdvisorService = aiAdvisorService;
   }
 
-  public QuizQuestionEntity create(QuizQuestionServant servant) {
+  public QuizQuestionEntity create(String questionGenerationModelName) {
     QuizQuestionAIQuestion quizQuestionAIQuestion = new QuizQuestionAIQuestion();
     quizQuestionAIQuestion.setNote(note);
     MCQWithAnswer MCQWithAnswer =
-        aiAdvisorService.generateQuestion(
-            note,
-            servant.getGlobalSettingsService().getGlobalSettingQuestionGeneration().getValue());
+        aiAdvisorService.generateQuestion(note, questionGenerationModelName);
     if (MCQWithAnswer == null) {
       return null;
     }
