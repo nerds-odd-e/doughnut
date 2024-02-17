@@ -74,4 +74,8 @@ public abstract class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   public boolean checkAnswer(Answer answer) {
     return Objects.equals(answer.getChoiceIndex(), getCorrectAnswerIndex());
   }
+
+  public Integer getCorrectAnswerIndex1() {
+    return getCorrectAnswerIndex();
+  }
 }

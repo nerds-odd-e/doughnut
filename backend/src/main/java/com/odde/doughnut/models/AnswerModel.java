@@ -24,7 +24,7 @@ public class AnswerModel {
     answerResult.answerDisplay = answer.getAnswerDisplay(modelFactoryService);
     answerResult.reviewPoint = getReviewPoint(user);
     answerResult.correct = answer.isCorrect();
-    answerResult.correctChoiceIndex = getQuestion().getCorrectAnswerIndex();
+    answerResult.correctChoiceIndex = getQuestion().getCorrectAnswerIndex1();
     answerResult.choiceIndex = answer.getChoiceIndex();
     answerResult.quizQuestion = modelFactoryService.toQuizQuestion(getQuestion());
     return answerResult;

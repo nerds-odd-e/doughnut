@@ -39,8 +39,7 @@ public class SuggestedQuestionForFineTuningModel {
     entity.setComment(suggestionCreationParams.comment);
     entity.setPositiveFeedback(suggestionCreationParams.isPositiveFeedback);
     if (suggestionCreationParams.isPositiveFeedback) {
-      entity.setRealCorrectAnswers(
-          "%d".formatted(quizQuestion.getMcqWithAnswer().correctChoiceIndex));
+      entity.setRealCorrectAnswers("%d".formatted(quizQuestion.getCorrectAnswerIndex1()));
     }
     return modelFactoryService.save(entity);
   }
