@@ -11,7 +11,7 @@ import org.springframework.lang.Nullable;
 
 @AllArgsConstructor
 public class QuizQuestion {
-  @Getter public Integer quizQuestionId;
+  @Getter public Integer id;
 
   @Getter public String stem;
 

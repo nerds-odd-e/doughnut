@@ -101,7 +101,7 @@ export default defineComponent({
     async submitAnswer(answerData: Partial<Generated.Answer>) {
       try {
         const answerResult = await this.api.quizQuestions.processAnswer(
-          this.quizQuestion.quizQuestionId,
+          this.quizQuestion.id,
           answerData,
         );
         this.$emit("answered", answerResult);

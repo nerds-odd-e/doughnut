@@ -18,7 +18,7 @@
             storageAccessor,
           }"
           @answered="onAnswered($event)"
-          :key="currentQuizQuestion.quizQuestionId"
+          :key="currentQuizQuestion.id"
         />
       </template>
     </LoadingPage>

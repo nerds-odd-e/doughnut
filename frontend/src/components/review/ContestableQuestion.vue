@@ -84,7 +84,7 @@ export default defineComponent({
     async contest() {
       this.currentQuestionLegitMessage = "";
       const contestResult = await this.api.quizQuestions.contest(
-        this.currentQuestion.quizQuestionId,
+        this.currentQuestion.id,
       );
 
       if (!contestResult.rejected) {
@@ -94,7 +94,7 @@ export default defineComponent({
           badQuestionReason: contestResult.reason,
         });
         this.currentQuestion = await this.api.quizQuestions.regenerateQuestion(
-          this.currentQuestion.quizQuestionId,
+          this.currentQuestion.id,
         );
       } else {
         this.currentQuestionLegitMessage = contestResult.reason;

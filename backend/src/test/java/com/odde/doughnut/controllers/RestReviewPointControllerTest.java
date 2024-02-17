@@ -141,7 +141,7 @@ class RestReviewPointControllerTest {
       ReviewPoint rp = makeMe.aReviewPointFor(note).by(userModel).please();
       makeMe.refresh(note);
       QuizQuestion quizQuestion = controller.generateRandomQuestion(rp);
-      assertThat(quizQuestion.quizQuestionId, notNullValue());
+      assertThat(quizQuestion.id, notNullValue());
     }
   }
 

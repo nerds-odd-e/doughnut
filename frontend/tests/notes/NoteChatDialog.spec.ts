@@ -64,12 +64,10 @@ describe("NoteChatDialog TestMe", () => {
       wrapper.find("button").trigger("click");
       await flushPromises();
       helper.apiMock.expectingPost(
-        `/api/quiz-questions/${quizQuestion.quizQuestionId}/contest`,
+        `/api/quiz-questions/${quizQuestion.id}/contest`,
       );
       helper.apiMock
-        .expectingPost(
-          `/api/quiz-questions/${quizQuestion.quizQuestionId}/regenerate`,
-        )
+        .expectingPost(`/api/quiz-questions/${quizQuestion.id}/regenerate`)
         .andReturnOnce(newQuestion);
       vitest.clearAllMocks();
     });

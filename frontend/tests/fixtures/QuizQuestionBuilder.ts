@@ -4,7 +4,7 @@ import generateId from "./generateId";
 
 class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
   quizQuestion: Generated.QuizQuestion = {
-    quizQuestionId: generateId(),
+    id: generateId(),
     choices: [],
     stem: "answer",
     mainTopic: "",

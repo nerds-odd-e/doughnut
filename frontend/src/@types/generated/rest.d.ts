@@ -162,7 +162,7 @@ declare namespace Generated {
     }
 
     interface QuizQuestion {
-        quizQuestionId: number;
+        id: number;
         stem: string;
         mainTopic: string;
         headNote: Note;

@@ -58,7 +58,7 @@ const { quizQuestion } = props;
 
 async function suggestQuestionForFineTuning() {
   await api.quizQuestions.suggestQuestionForFineTuning(
-    quizQuestion.quizQuestionId,
+    quizQuestion.id,
     params.value,
   );
   emit("closeDialog");
