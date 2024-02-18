@@ -31,4 +31,8 @@ public class QuizQuestionPictureSelection extends QuizQuestionWithNoteChoices {
     choice.setPicture(true);
     return choice;
   }
+
+  public String getStem() {
+    return buildPresenter().stem();
+  }
 }

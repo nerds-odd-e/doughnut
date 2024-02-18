@@ -15,4 +15,12 @@ public class QuizQuestionFromSamePartAs extends QuizQuestionWithNoteChoices {
   public QuizQuestionWithOptionsPresenter buildPresenter() {
     return new FromSamePartAsQuizPresenter(this);
   }
+
+  public String getStem() {
+    return buildPresenter().stem();
+  }
+
+  public String getMainTopic() {
+    return buildPresenter().mainTopic();
+  }
 }

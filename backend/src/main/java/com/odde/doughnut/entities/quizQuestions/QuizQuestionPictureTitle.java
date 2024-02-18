@@ -22,4 +22,12 @@ public class QuizQuestionPictureTitle extends QuizQuestionWithNoteChoices {
   public Optional<PictureWithMask> getPictureWithMask() {
     return getNote().getPictureWithMask();
   }
+
+  public String getStem() {
+    return buildPresenter().stem();
+  }
+
+  public String getMainTopic() {
+    return buildPresenter().mainTopic();
+  }
 }

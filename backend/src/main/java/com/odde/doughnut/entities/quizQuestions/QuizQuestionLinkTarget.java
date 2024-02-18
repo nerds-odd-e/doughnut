@@ -15,4 +15,12 @@ public class QuizQuestionLinkTarget extends QuizQuestionWithNoteChoices {
   public QuizQuestionWithOptionsPresenter buildPresenter() {
     return new LinkTargetQuizPresenter(this);
   }
+
+  public String getStem() {
+    return buildPresenter().stem();
+  }
+
+  public String getMainTopic() {
+    return buildPresenter().mainTopic();
+  }
 }

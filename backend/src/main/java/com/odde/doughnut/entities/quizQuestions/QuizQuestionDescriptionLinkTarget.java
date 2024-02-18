@@ -1,9 +1,7 @@
 package com.odde.doughnut.entities.quizQuestions;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.entities.QuizQuestionWithNoteChoices;
-import com.odde.doughnut.factoryServices.quizFacotries.presenters.DescriptionLinkTargetQuizPresenter;
-import com.odde.doughnut.factoryServices.quizFacotries.presenters.QuizQuestionWithOptionsPresenter;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
@@ -11,8 +9,16 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("8")
 public class QuizQuestionDescriptionLinkTarget extends QuizQuestionWithNoteChoices {
 
-  @JsonIgnore
-  public QuizQuestionWithOptionsPresenter buildPresenter() {
-    return new DescriptionLinkTargetQuizPresenter(this);
+  public String getStem() {
+    ClozedString clozeDescription =
+        getNote().getParent().getClozeDescription().hide(getNote().getTargetNote().getNoteTitle());
+    return "<p>The following descriptions is "
+        + getNote().getLinkType().label
+        + ":</p>"
+        + clozeDescription.clozeDetails();
+  }
+
+  public String getMainTopic() {
+    return "";
   }
 }

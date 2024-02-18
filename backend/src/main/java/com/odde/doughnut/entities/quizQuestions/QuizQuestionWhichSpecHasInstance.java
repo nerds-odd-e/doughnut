@@ -15,4 +15,12 @@ public class QuizQuestionWhichSpecHasInstance extends QuizQuestionWithNoteChoice
   public QuizQuestionWithOptionsPresenter buildPresenter() {
     return new WhichSpecHasInstanceQuizPresenter(this);
   }
+
+  public String getStem() {
+    return buildPresenter().stem();
+  }
+
+  public String getMainTopic() {
+    return buildPresenter().mainTopic();
+  }
 }

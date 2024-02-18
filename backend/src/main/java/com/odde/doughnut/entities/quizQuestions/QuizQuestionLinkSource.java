@@ -14,4 +14,12 @@ public class QuizQuestionLinkSource extends QuizQuestionWithNoteChoices {
   public QuizQuestionWithOptionsPresenter buildPresenter() {
     return new LinkSourceQuizPresenter(this);
   }
+
+  public String getStem() {
+    return buildPresenter().stem();
+  }
+
+  public String getMainTopic() {
+    return buildPresenter().mainTopic();
+  }
 }

@@ -15,4 +15,12 @@ public class QuizQuestionFromDifferentPartAs extends QuizQuestionWithNoteChoices
   public QuizQuestionWithOptionsPresenter buildPresenter() {
     return new FromDifferentPartAsQuizPresenter(this);
   }
+
+  public String getStem() {
+    return buildPresenter().stem();
+  }
+
+  public String getMainTopic() {
+    return buildPresenter().mainTopic();
+  }
 }

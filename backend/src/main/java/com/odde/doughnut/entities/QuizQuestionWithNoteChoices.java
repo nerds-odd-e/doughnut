@@ -3,7 +3,6 @@ package com.odde.doughnut.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.factoryServices.quizFacotries.presenters.QuizQuestionWithOptionsPresenter;
 import com.odde.doughnut.models.Randomizer;
 import jakarta.persistence.*;
 import java.util.*;
@@ -49,9 +48,6 @@ public abstract class QuizQuestionWithNoteChoices extends QuizQuestionEntity {
         .collect(Collectors.toList());
   }
 
-  @JsonIgnore
-  protected abstract QuizQuestionWithOptionsPresenter buildPresenter();
-
   public List<QuizQuestion.Choice> getOptions(ModelFactoryService modelFactoryService) {
     List<Integer> idList = getChoiceNoteIds();
     return modelFactoryService
@@ -66,14 +62,6 @@ public abstract class QuizQuestionWithNoteChoices extends QuizQuestionEntity {
     QuizQuestion.Choice choice = new QuizQuestion.Choice();
     choice.setDisplay(note.getTopicConstructor());
     return choice;
-  }
-
-  public String getStem() {
-    return buildPresenter().stem();
-  }
-
-  public String getMainTopic() {
-    return buildPresenter().mainTopic();
   }
 
   public Optional<PictureWithMask> getPictureWithMask() {
