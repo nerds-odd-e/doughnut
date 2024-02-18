@@ -7,19 +7,13 @@ import com.odde.doughnut.factoryServices.quizFacotries.factories.QuestionOptions
 import java.util.List;
 
 public interface QuizQuestionFactory {
-  default void validateBasicPossibility() throws QuizQuestionNotPossibleException {}
-
-  QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant)
-      throws QuizQuestionNotPossibleException;
 
   default QuizQuestionEntity buildQuizQuestion(QuizQuestionServant servant)
       throws QuizQuestionNotPossibleException {
 
-    QuizQuestionEntity quizQuestion = buildQuizQuestionObj(servant);
-
-    validateBasicPossibility();
-
     if (this instanceof QuestionOptionsFactory optionsFactory) {
+      QuizQuestionEntity quizQuestion = optionsFactory.buildQuizQuestionObj(servant);
+      optionsFactory.validateBasicPossibility();
       QuizQuestionWithNoteChoices qq = (QuizQuestionWithNoteChoices) quizQuestion;
       Note answerNote = optionsFactory.generateAnswer(servant);
       if (answerNote == null) {
@@ -30,8 +24,8 @@ public interface QuizQuestionFactory {
         throw new QuizQuestionNotPossibleException();
       }
       qq.setChoicesAndRightAnswer(answerNote, options, servant.randomizer);
+      return quizQuestion;
     }
-
-    return quizQuestion;
+    return null;
   }
 }

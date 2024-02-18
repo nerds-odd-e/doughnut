@@ -18,7 +18,9 @@ public class AiQuestionFactory implements QuizQuestionFactory {
     this.aiQuestionGenerator = questionGenerator;
   }
 
-  public QuizQuestionEntity create() throws QuizQuestionNotPossibleException {
+  @Override
+  public QuizQuestionEntity buildQuizQuestion(QuizQuestionServant servant)
+      throws QuizQuestionNotPossibleException {
     QuizQuestionAIQuestion quizQuestionAIQuestion = new QuizQuestionAIQuestion();
     quizQuestionAIQuestion.setNote(note);
     MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note);
@@ -27,11 +29,5 @@ public class AiQuestionFactory implements QuizQuestionFactory {
     }
     quizQuestionAIQuestion.setRawJsonQuestion(MCQWithAnswer.toJsonString());
     return quizQuestionAIQuestion;
-  }
-
-  @Override
-  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant)
-      throws QuizQuestionNotPossibleException {
-    return create();
   }
 }

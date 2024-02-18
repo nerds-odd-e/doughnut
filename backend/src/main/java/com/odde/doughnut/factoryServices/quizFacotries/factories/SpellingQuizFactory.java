@@ -17,14 +17,11 @@ public class SpellingQuizFactory implements QuizQuestionFactory {
   }
 
   @Override
-  public void validateBasicPossibility() throws QuizQuestionNotPossibleException {
+  public QuizQuestionEntity buildQuizQuestion(QuizQuestionServant servant)
+      throws QuizQuestionNotPossibleException {
     if (!needSpellingQuiz()) {
       throw new QuizQuestionNotPossibleException();
     }
-  }
-
-  @Override
-  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
     QuizQuestionSpelling quizQuestionSpelling = new QuizQuestionSpelling();
     quizQuestionSpelling.setNote(answerNote);
     return quizQuestionSpelling;

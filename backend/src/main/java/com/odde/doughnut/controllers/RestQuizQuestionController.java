@@ -72,7 +72,7 @@ class RestQuizQuestionController {
   private QuizQuestion generateAIQuestion(Note note) {
     AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(note, aiQuestionGenerator);
     try {
-      QuizQuestionEntity quizQuestionEntity = aiQuestionFactory.buildQuizQuestionObj(null);
+      QuizQuestionEntity quizQuestionEntity = aiQuestionFactory.buildQuizQuestion(null);
       modelFactoryService.save(quizQuestionEntity);
       return modelFactoryService.toQuizQuestion(quizQuestionEntity);
     } catch (QuizQuestionNotPossibleException e) {
