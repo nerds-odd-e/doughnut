@@ -9,7 +9,6 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFactory;
 import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
@@ -26,7 +25,6 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping("/api/quiz-questions")
 class RestQuizQuestionController {
-  private final AiAdvisorService aiAdvisorService;
   private final ModelFactoryService modelFactoryService;
 
   private final UserModel currentUser;
@@ -34,7 +32,6 @@ class RestQuizQuestionController {
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
-  private final GlobalSettingsService globalSettingsService;
   private final OpenAiApiHandler openAiHandler;
 
   public RestQuizQuestionController(
@@ -42,12 +39,10 @@ class RestQuizQuestionController {
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings) {
-    this.aiAdvisorService = new AiAdvisorService(openAiApi);
     this.openAiHandler = new OpenAiApiHandler(openAiApi);
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
-    this.globalSettingsService = new GlobalSettingsService(modelFactoryService);
   }
 
   @PostMapping("/generate-question")
@@ -62,8 +57,7 @@ class RestQuizQuestionController {
   public QuizQuestionContestResult contest(
       @PathVariable("quizQuestion") QuizQuestionAIQuestion quizQuestionEntity) {
     currentUser.assertLoggedIn();
-    return getAiQuestionGenerator(globalSettingsService.getGlobalSettingEvaluation().getValue())
-        .getQuizQuestionContestResult(quizQuestionEntity);
+    return getAiQuestionGenerator().getQuizQuestionContestResult(quizQuestionEntity);
   }
 
   @PostMapping("/{quizQuestion}/regenerate")
@@ -75,10 +69,7 @@ class RestQuizQuestionController {
   }
 
   private QuizQuestion generateAIQuestion(Note note) {
-    String questionGenerationModelName =
-        globalSettingsService.getGlobalSettingQuestionGeneration().getValue();
-    AiQuestionFactory aiQuestionFactory =
-        new AiQuestionFactory(note, getAiQuestionGenerator(questionGenerationModelName));
+    AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(note, getAiQuestionGenerator());
     QuizQuestionEntity quizQuestionEntity = aiQuestionFactory.create();
     if (quizQuestionEntity == null) {
       throw (new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
@@ -87,8 +78,8 @@ class RestQuizQuestionController {
     return modelFactoryService.toQuizQuestion(quizQuestionEntity);
   }
 
-  private AiQuestionGenerator getAiQuestionGenerator(String questionGenerationModelName) {
-    return new AiQuestionGenerator(openAiHandler, questionGenerationModelName);
+  private AiQuestionGenerator getAiQuestionGenerator() {
+    return new AiQuestionGenerator(openAiHandler, new GlobalSettingsService(modelFactoryService));
   }
 
   @PostMapping("/{quizQuestion}/answer")

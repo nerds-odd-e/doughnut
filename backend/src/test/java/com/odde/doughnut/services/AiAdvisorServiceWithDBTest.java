@@ -37,7 +37,10 @@ class AiAdvisorServiceWithDBTest {
   @BeforeEach
   void Setup() {
     MockitoAnnotations.openMocks(this);
-    aiQuestionGenerator = new AiQuestionGenerator(new OpenAiApiHandler(openAiApi), "gpt");
+    GlobalSettingsService globalSettingsService =
+        new GlobalSettingsService(makeMe.modelFactoryService);
+    aiQuestionGenerator =
+        new AiQuestionGenerator(new OpenAiApiHandler(openAiApi), globalSettingsService);
   }
 
   @Nested

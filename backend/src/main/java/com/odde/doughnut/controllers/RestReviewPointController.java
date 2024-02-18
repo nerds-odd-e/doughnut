@@ -4,7 +4,6 @@ import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.controllers.json.SelfEvaluation;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionGenerator;
@@ -55,18 +54,14 @@ class RestReviewPointController {
   @Transactional
   public QuizQuestion generateRandomQuestion(@PathVariable("reviewPoint") ReviewPoint reviewPoint) {
     currentUser.assertLoggedIn();
-    User user = currentUser.getEntity();
     Randomizer randomizer = testabilitySettings.getRandomizer();
-    String questionGenerationModelName =
-        new GlobalSettingsService(modelFactoryService)
-            .getGlobalSettingQuestionGeneration()
-            .getValue();
     QuizQuestionGenerator quizQuestionGenerator =
         new QuizQuestionGenerator(
             reviewPoint.getUser(), reviewPoint.getNote(), randomizer, modelFactoryService);
     QuizQuestionEntity quizQuestionEntity =
         quizQuestionGenerator.generateAQuestionOfRandomType(
-            new AiQuestionGenerator(openAiApiHandler, questionGenerationModelName));
+            new AiQuestionGenerator(
+                openAiApiHandler, new GlobalSettingsService(modelFactoryService)));
     return modelFactoryService.toQuizQuestion(quizQuestionEntity);
   }
 
