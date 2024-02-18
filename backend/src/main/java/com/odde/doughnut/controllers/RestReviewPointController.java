@@ -10,8 +10,9 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionGenerator;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.ai.AiQuestionGenerator;
+import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import jakarta.annotation.Resource;
@@ -25,7 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/api/review-points")
 class RestReviewPointController {
   private final ModelFactoryService modelFactoryService;
-  private final AiAdvisorService aiAdvisorService;
+  private final OpenAiApiHandler openAiApiHandler;
   private UserModel currentUser;
 
   @Resource(name = "testabilitySettings")
@@ -36,7 +37,7 @@ class RestReviewPointController {
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings) {
-    this.aiAdvisorService = new AiAdvisorService(openAiApi);
+    this.openAiApiHandler = new OpenAiApiHandler(openAiApi);
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
@@ -65,10 +66,9 @@ class RestReviewPointController {
             reviewPoint.getUser(),
             reviewPoint.getNote(),
             randomizer,
-            modelFactoryService,
-            aiAdvisorService);
+            modelFactoryService);
     QuizQuestionEntity quizQuestionEntity =
-        quizQuestionGenerator.generateAQuestionOfRandomType(questionGenerationModelName);
+        quizQuestionGenerator.generateAQuestionOfRandomType(new AiQuestionGenerator(openAiApiHandler, questionGenerationModelName));
     return modelFactoryService.toQuizQuestion(quizQuestionEntity);
   }
 

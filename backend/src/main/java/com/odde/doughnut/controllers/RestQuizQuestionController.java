@@ -11,10 +11,13 @@ import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.ai.AiQuestionGenerator;
+import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +36,7 @@ class RestQuizQuestionController {
   private final TestabilitySettings testabilitySettings;
 
   private final GlobalSettingsService globalSettingsService;
+  private final OpenAiApiHandler openAiHandler;
 
   public RestQuizQuestionController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
@@ -40,6 +44,7 @@ class RestQuizQuestionController {
       UserModel currentUser,
       TestabilitySettings testabilitySettings) {
     this.aiAdvisorService = new AiAdvisorService(openAiApi);
+    this.openAiHandler = new OpenAiApiHandler(openAiApi);
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
@@ -72,17 +77,21 @@ class RestQuizQuestionController {
 
   private QuizQuestion generateAIQuestion(Note note) {
     String questionGenerationModelName =
-        new GlobalSettingsService(modelFactoryService)
+        globalSettingsService
             .getGlobalSettingQuestionGeneration()
             .getValue();
-    AiQuestionFactory aiQuestionFactory =
-        new AiQuestionFactory(note, questionGenerationModelName, aiAdvisorService);
+      AiQuestionFactory aiQuestionFactory =
+        new AiQuestionFactory(note, getAiQuestionGenerator(questionGenerationModelName));
     QuizQuestionEntity quizQuestionEntity = aiQuestionFactory.create();
     if (quizQuestionEntity == null) {
       throw (new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
     }
     modelFactoryService.save(quizQuestionEntity);
     return modelFactoryService.toQuizQuestion(quizQuestionEntity);
+  }
+
+  private AiQuestionGenerator getAiQuestionGenerator(String questionGenerationModelName) {
+      return new AiQuestionGenerator(openAiHandler, questionGenerationModelName);
   }
 
   @PostMapping("/{quizQuestion}/answer")

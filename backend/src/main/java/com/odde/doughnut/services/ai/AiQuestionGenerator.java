@@ -1,40 +1,28 @@
 package com.odde.doughnut.services.ai;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.odde.doughnut.controllers.json.QuizQuestionContestResult;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.quizQuestions.QuizQuestionAIQuestion;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
-import com.odde.doughnut.services.ai.tools.AiToolFactory;
-import com.odde.doughnut.services.ai.tools.AiToolList;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
-import java.util.Optional;
 
-public class AiQuestionGenerator {
-  private final OpenAiApiHandler openAiApiHandler;
-  private final OpenAIChatRequestBuilder chatAboutNoteRequestBuilder;
-
-  public AiQuestionGenerator(Note note, OpenAiApiHandler openAiApiHandler, String modelName) {
-    this.chatAboutNoteRequestBuilder =
+public record AiQuestionGenerator(OpenAiApiHandler openAiApiHandler, String modelName) {
+  public AiQuestionGeneratorForNote forNote(Note note) {
+    OpenAIChatRequestBuilder chatAboutNoteRequestBuilder =
         OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(modelName, note);
-    this.openAiApiHandler = openAiApiHandler;
+    return new AiQuestionGeneratorForNote(openAiApiHandler, chatAboutNoteRequestBuilder);
   }
 
-  public MCQWithAnswer getAiGeneratedQuestion() {
-    AiToolList tool = AiToolFactory.mcqWithAnswerAiTool();
-    return requestAndGetFunctionCallArguments(tool)
-        .flatMap(MCQWithAnswer::getValidQuestion)
-        .orElse(null);
+  public MCQWithAnswer getAiGeneratedQuestion(Note note) {
+    return forNote(note)
+      .getAiGeneratedQuestion();
   }
 
-  public Optional<QuestionEvaluation> evaluateQuestion(MCQWithAnswer question) {
-    AiToolList questionEvaluationAiTool = AiToolFactory.questionEvaluationAiTool(question);
-    return requestAndGetFunctionCallArguments(questionEvaluationAiTool)
-        .flatMap(QuestionEvaluation::getQuestionEvaluation);
-  }
 
-  private Optional<JsonNode> requestAndGetFunctionCallArguments(AiToolList tool) {
-    ChatCompletionRequest chatRequest =
-        chatAboutNoteRequestBuilder.addTool(tool).maxTokens(1500).build();
-    return openAiApiHandler.getFunctionCallArguments(chatRequest);
+  public QuizQuestionContestResult getQuizQuestionContestResult(QuizQuestionAIQuestion quizQuestionEntity) {
+    return forNote(quizQuestionEntity.getNote())
+      .evaluateQuestion(quizQuestionEntity.getMcqWithAnswer())
+      .map(e -> e.getQuizQuestionContestResult(quizQuestionEntity.getCorrectAnswerIndex()))
+      .orElse(null);
   }
 }

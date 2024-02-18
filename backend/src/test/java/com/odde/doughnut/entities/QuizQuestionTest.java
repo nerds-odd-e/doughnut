@@ -17,6 +17,8 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.models.randomizers.RealRandomizer;
 import com.odde.doughnut.services.AiAdvisorService;
+import com.odde.doughnut.services.ai.AiQuestionGenerator;
+import com.odde.doughnut.services.ai.AiQuestionGeneratorForNote;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.HashSet;
@@ -142,10 +144,10 @@ class QuizQuestionTest {
     void shouldAlwaysChooseAIQuestionIfConfigured() {
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       userModel.getEntity().setAiQuestionTypeOnlyForReview(true);
-      AiAdvisorService aiAdvisorService = mock(AiAdvisorService.class);
-      when(aiAdvisorService.generateQuestion(any(), any())).thenReturn(mcqWithAnswer);
+      AiQuestionGenerator questionGenerator = mock(AiQuestionGenerator.class);
+      when(questionGenerator.getAiGeneratedQuestion(any())).thenReturn(mcqWithAnswer);
       QuizQuestionEntity randomQuizQuestion =
-          generateQuizQuestion(note, new RealRandomizer(), aiAdvisorService);
+          generateQuizQuestion(note, new RealRandomizer(), questionGenerator);
       assertThat(randomQuizQuestion, instanceOf(QuizQuestionAIQuestion.class));
       QuizQuestion qq = makeMe.modelFactoryService.toQuizQuestion(randomQuizQuestion);
       assertThat(qq.stem, containsString(mcqWithAnswer.stem));
@@ -167,7 +169,7 @@ class QuizQuestionTest {
       Set<Class<? extends QuizQuestionEntity>> types = new HashSet<>();
       for (int i = 0; i < 10; i++) {
         QuizQuestionEntity randomQuizQuestion =
-            generateQuizQuestion(note, new RealRandomizer(), null);
+            generateQuizQuestion(note, new RealRandomizer(),null);
         types.add(randomQuizQuestion.getClass());
       }
       assertThat(
@@ -176,15 +178,15 @@ class QuizQuestionTest {
   }
 
   private QuizQuestionEntity generateQuizQuestion(
-      Note note, Randomizer randomizer1, AiAdvisorService aiAdvisorService) {
+    Note note, Randomizer randomizer1, AiQuestionGenerator aiQuestionGenerator) {
     QuizQuestionGenerator quizQuestionGenerator =
         new QuizQuestionGenerator(
-            userModel.getEntity(), note, randomizer1, makeMe.modelFactoryService, aiAdvisorService);
-    return quizQuestionGenerator.generateAQuestionOfRandomType("gpt3");
+            userModel.getEntity(), note, randomizer1, makeMe.modelFactoryService);
+    return quizQuestionGenerator.generateAQuestionOfRandomType(aiQuestionGenerator);
   }
 
   private QuizQuestionEntity generateQuizQuestionEntity(Note note) {
-    return generateQuizQuestion(note, randomizer, null);
+    return generateQuizQuestion(note, randomizer,null);
   }
 
   private QuizQuestion generateQuizQuestion(Note note) {

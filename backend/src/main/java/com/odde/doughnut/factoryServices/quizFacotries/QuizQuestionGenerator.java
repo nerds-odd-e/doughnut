@@ -7,6 +7,8 @@ import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.services.AiAdvisorService;
 import java.util.List;
 import java.util.Optional;
+
+import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -14,8 +16,7 @@ public record QuizQuestionGenerator(
     User user,
     Note note,
     Randomizer randomizer,
-    ModelFactoryService modelFactoryService,
-    AiAdvisorService aiAdvisorService) {
+    ModelFactoryService modelFactoryService) {
 
   private Optional<QuizQuestionEntity> getQuizQuestionEntity(
       QuizQuestionFactory quizQuestionFactory, QuizQuestionServant servant) {
@@ -36,13 +37,13 @@ public record QuizQuestionGenerator(
         .orElse(null);
   }
 
-  public QuizQuestionEntity generateAQuestionOfRandomType(String questionGenerationModelName) {
+  public QuizQuestionEntity generateAQuestionOfRandomType(AiQuestionGenerator questionGenerator) {
     QuizQuestionServant servant = new QuizQuestionServant(user, randomizer, modelFactoryService);
     QuizQuestionEntity result;
 
     if (note instanceof HierarchicalNote && user.getAiQuestionTypeOnlyForReview()) {
       AiQuestionFactory aiQuestionFactory =
-          new AiQuestionFactory(note, questionGenerationModelName, aiAdvisorService);
+          new AiQuestionFactory(note, questionGenerator);
       result = aiQuestionFactory.create();
     } else {
       List<QuizQuestionFactory> shuffled = randomizer.shuffle(note.getQuizQuestionFactories());

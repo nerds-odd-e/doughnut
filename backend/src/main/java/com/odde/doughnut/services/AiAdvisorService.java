@@ -10,6 +10,7 @@ import com.theokanning.openai.assistants.*;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +26,6 @@ public class AiAdvisorService {
 
   public String getImage(String prompt) {
     return openAiApiHandler.getOpenAiImage(prompt);
-  }
-
-  public MCQWithAnswer generateQuestion(Note note, String modelName) {
-    return getAiQuestionGenerator(note, modelName).getAiGeneratedQuestion();
   }
 
   public AiCompletionResponse getAiCompletion(
@@ -61,8 +58,8 @@ public class AiAdvisorService {
     return "";
   }
 
-  private AiQuestionGenerator getAiQuestionGenerator(Note note, String modelName) {
-    return new AiQuestionGenerator(note, openAiApiHandler, modelName);
+  private AiQuestionGenerator getAiQuestionGenerator(String modelName) {
+    return new AiQuestionGenerator(openAiApiHandler, modelName);
   }
 
   public List<String> getAvailableGptModels() {
@@ -82,10 +79,7 @@ public class AiAdvisorService {
 
   public QuizQuestionContestResult contestQuestion(
       QuizQuestionAIQuestion quizQuestionEntity, String modelName) {
-    return getAiQuestionGenerator(quizQuestionEntity.getNote(), modelName)
-        .evaluateQuestion(quizQuestionEntity.getMcqWithAnswer())
-        .map(e -> e.getQuizQuestionContestResult(quizQuestionEntity.getCorrectAnswerIndex()))
-        .orElse(null);
+      return getAiQuestionGenerator(modelName).getQuizQuestionContestResult(quizQuestionEntity);
   }
 
   public String uploadAndTriggerFineTuning(
