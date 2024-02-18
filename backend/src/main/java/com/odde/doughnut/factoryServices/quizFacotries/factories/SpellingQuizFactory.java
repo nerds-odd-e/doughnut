@@ -17,7 +17,7 @@ public class SpellingQuizFactory implements QuizQuestionFactory {
   }
 
   @Override
-  public void validatePossibility() throws QuizQuestionNotPossibleException {
+  public void validateBasicPossibility() throws QuizQuestionNotPossibleException {
     if (!needSpellingQuiz()) {
       throw new QuizQuestionNotPossibleException();
     }

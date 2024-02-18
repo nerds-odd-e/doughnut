@@ -27,7 +27,7 @@ public class ClozeTitleSelectionQuizFactory implements QuestionOptionsFactory, Q
   }
 
   @Override
-  public void validatePossibility() throws QuizQuestionNotPossibleException {
+  public void validateBasicPossibility() throws QuizQuestionNotPossibleException {
     if (note.isDetailsBlankHtml()) {
       throw new QuizQuestionNotPossibleException();
     }

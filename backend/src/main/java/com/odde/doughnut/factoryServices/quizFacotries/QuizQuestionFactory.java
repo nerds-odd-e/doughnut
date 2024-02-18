@@ -7,7 +7,7 @@ import com.odde.doughnut.factoryServices.quizFacotries.factories.QuestionOptions
 import java.util.List;
 
 public interface QuizQuestionFactory {
-  default void validatePossibility() throws QuizQuestionNotPossibleException {}
+  default void validateBasicPossibility() throws QuizQuestionNotPossibleException {}
 
   QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant)
       throws QuizQuestionNotPossibleException;
@@ -17,7 +17,7 @@ public interface QuizQuestionFactory {
 
     QuizQuestionEntity quizQuestion = buildQuizQuestionObj(servant);
 
-    validatePossibility();
+    validateBasicPossibility();
 
     if (this instanceof QuestionOptionsFactory optionsFactory) {
       QuizQuestionWithNoteChoices qq = (QuizQuestionWithNoteChoices) quizQuestion;

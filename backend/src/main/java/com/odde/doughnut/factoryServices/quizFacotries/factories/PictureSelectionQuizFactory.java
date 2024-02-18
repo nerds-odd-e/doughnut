@@ -26,7 +26,7 @@ public class PictureSelectionQuizFactory implements QuizQuestionFactory, Questio
   }
 
   @Override
-  public void validatePossibility() throws QuizQuestionNotPossibleException {
+  public void validateBasicPossibility() throws QuizQuestionNotPossibleException {
     if (answerNote.getPictureWithMask().isEmpty()) {
       throw new QuizQuestionNotPossibleException();
     }
