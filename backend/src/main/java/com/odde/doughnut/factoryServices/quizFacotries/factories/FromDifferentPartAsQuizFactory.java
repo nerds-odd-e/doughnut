@@ -2,12 +2,11 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.quizQuestions.QuizQuestionFromDifferentPartAs;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
+public class FromDifferentPartAsQuizFactory extends QuestionOptionsFactory {
 
   private LinkingNote parentGrandLink;
   private final LinkingNote link;
@@ -17,7 +16,7 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, Ques
   }
 
   @Override
-  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
+  public QuizQuestionFromDifferentPartAs buildQuizQuestionObj(QuizQuestionServant servant) {
     parentGrandLink = servant.getParentGrandLink(link);
     QuizQuestionFromDifferentPartAs quizQuestion = new QuizQuestionFromDifferentPartAs();
     quizQuestion.setNote(link);

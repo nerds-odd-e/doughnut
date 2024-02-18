@@ -2,11 +2,10 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.quizQuestions.QuizQuestionFromSamePartAs;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
 
-public class FromSamePartAsQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
+public class FromSamePartAsQuizFactory extends QuestionOptionsFactory {
 
   private LinkingNote parentGrandLink;
   private Note cachedAnswerLink = null;
@@ -18,7 +17,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory, QuestionO
   }
 
   @Override
-  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
+  public QuizQuestionFromSamePartAs buildQuizQuestionObj(QuizQuestionServant servant) {
     QuizQuestionFromSamePartAs quizQuestionFromSamePartAs = new QuizQuestionFromSamePartAs();
     quizQuestionFromSamePartAs.setNote(link);
     this.parentGrandLink = servant.getParentGrandLink(link);
