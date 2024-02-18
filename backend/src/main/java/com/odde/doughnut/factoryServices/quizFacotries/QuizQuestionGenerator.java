@@ -36,13 +36,13 @@ public record QuizQuestionGenerator(
     QuizQuestionServant servant = new QuizQuestionServant(user, randomizer, modelFactoryService);
     QuizQuestionEntity result;
 
+    List<QuizQuestionFactory> shuffled;
     if (note instanceof HierarchicalNote && user.getAiQuestionTypeOnlyForReview()) {
-      AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(note, questionGenerator);
-      result = aiQuestionFactory.create();
+      shuffled = List.of(new AiQuestionFactory(note, questionGenerator));
     } else {
-      List<QuizQuestionFactory> shuffled = randomizer.shuffle(note.getQuizQuestionFactories());
-      result = generateAQuestionOfFirstPossibleType(shuffled, servant);
+      shuffled = randomizer.shuffle(note.getQuizQuestionFactories());
     }
+    result = generateAQuestionOfFirstPossibleType(shuffled, servant);
     if (result == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated");
     }

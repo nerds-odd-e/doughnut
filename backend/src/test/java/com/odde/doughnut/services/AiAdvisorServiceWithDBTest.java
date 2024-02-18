@@ -10,7 +10,6 @@ import com.odde.doughnut.entities.quizQuestions.QuizQuestionAIQuestion;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
-import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.client.OpenAiApi;
@@ -39,8 +38,7 @@ class AiAdvisorServiceWithDBTest {
     MockitoAnnotations.openMocks(this);
     GlobalSettingsService globalSettingsService =
         new GlobalSettingsService(makeMe.modelFactoryService);
-    aiQuestionGenerator =
-        new AiQuestionGenerator(new OpenAiApiHandler(openAiApi), globalSettingsService);
+    aiQuestionGenerator = new AiQuestionGenerator(openAiApi, globalSettingsService);
   }
 
   @Nested

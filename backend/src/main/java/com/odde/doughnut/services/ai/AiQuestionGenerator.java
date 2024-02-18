@@ -6,13 +6,15 @@ import com.odde.doughnut.entities.quizQuestions.QuizQuestionAIQuestion;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
+import com.theokanning.openai.client.OpenAiApi;
 
 public record AiQuestionGenerator(
-    OpenAiApiHandler openAiApiHandler, GlobalSettingsService globalSettingsService) {
+    OpenAiApi openAiApi, GlobalSettingsService globalSettingsService) {
   private AiQuestionGeneratorForNote forNote(Note note, String modelName1) {
     OpenAIChatRequestBuilder chatAboutNoteRequestBuilder =
         OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(modelName1, note);
-    return new AiQuestionGeneratorForNote(openAiApiHandler, chatAboutNoteRequestBuilder);
+    return new AiQuestionGeneratorForNote(
+        new OpenAiApiHandler(openAiApi), chatAboutNoteRequestBuilder);
   }
 
   public MCQWithAnswer getAiGeneratedQuestion(Note note) {

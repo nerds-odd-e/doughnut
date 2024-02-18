@@ -8,15 +8,8 @@ import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import java.util.Optional;
 
-public class AiQuestionGeneratorForNote {
-  private final OpenAiApiHandler openAiApiHandler;
-  private final OpenAIChatRequestBuilder chatAboutNoteRequestBuilder;
-
-  public AiQuestionGeneratorForNote(
-      OpenAiApiHandler openAiApiHandler, OpenAIChatRequestBuilder chatAboutNoteRequestBuilder) {
-    this.openAiApiHandler = openAiApiHandler;
-    this.chatAboutNoteRequestBuilder = chatAboutNoteRequestBuilder;
-  }
+public record AiQuestionGeneratorForNote(
+    OpenAiApiHandler openAiApiHandler, OpenAIChatRequestBuilder chatAboutNoteRequestBuilder) {
 
   public MCQWithAnswer getAiGeneratedQuestion() {
     AiToolList tool = AiToolFactory.mcqWithAnswerAiTool();

@@ -11,7 +11,6 @@ import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
-import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import jakarta.annotation.Resource;
@@ -25,21 +24,23 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/api/review-points")
 class RestReviewPointController {
   private final ModelFactoryService modelFactoryService;
-  private final OpenAiApiHandler openAiApiHandler;
   private UserModel currentUser;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
+
+  private final AiQuestionGenerator questionGenerator;
 
   public RestReviewPointController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings) {
-    this.openAiApiHandler = new OpenAiApiHandler(openAiApi);
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
+    questionGenerator =
+        new AiQuestionGenerator(openAiApi, new GlobalSettingsService(modelFactoryService));
   }
 
   @GetMapping("/{reviewPoint}")
@@ -59,9 +60,7 @@ class RestReviewPointController {
         new QuizQuestionGenerator(
             reviewPoint.getUser(), reviewPoint.getNote(), randomizer, modelFactoryService);
     QuizQuestionEntity quizQuestionEntity =
-        quizQuestionGenerator.generateAQuestionOfRandomType(
-            new AiQuestionGenerator(
-                openAiApiHandler, new GlobalSettingsService(modelFactoryService)));
+        quizQuestionGenerator.generateAQuestionOfRandomType(questionGenerator);
     return modelFactoryService.toQuizQuestion(quizQuestionEntity);
   }
 
