@@ -1,9 +1,6 @@
 package com.odde.doughnut.entities.quizQuestions;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.entities.QuizQuestionWithNoteChoices;
-import com.odde.doughnut.factoryServices.quizFacotries.presenters.FromDifferentPartAsQuizPresenter;
-import com.odde.doughnut.factoryServices.quizFacotries.presenters.QuizQuestionWithOptionsPresenter;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
@@ -11,16 +8,17 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("12")
 public class QuizQuestionFromDifferentPartAs extends QuizQuestionWithNoteChoices {
 
-  @JsonIgnore
-  public QuizQuestionWithOptionsPresenter buildPresenter() {
-    return new FromDifferentPartAsQuizPresenter(this);
-  }
-
   public String getStem() {
-    return buildPresenter().stem();
+    return "<p>Which one <mark>is "
+        + getNote().getLinkType().label
+        + "</mark> a <em>DIFFERENT</em> "
+        + getCategoryLink().getLinkType().nameOfSource
+        + " of <mark>"
+        + getCategoryLink().getTargetNote().getTopicConstructor()
+        + "</mark> than:";
   }
 
   public String getMainTopic() {
-    return buildPresenter().mainTopic();
+    return getNote().getParent().getTopicConstructor();
   }
 }

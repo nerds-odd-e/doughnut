@@ -1,10 +1,7 @@
 package com.odde.doughnut.entities.quizQuestions;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.entities.PictureWithMask;
 import com.odde.doughnut.entities.QuizQuestionWithNoteChoices;
-import com.odde.doughnut.factoryServices.quizFacotries.presenters.PictureTitleSelectionQuizPresenter;
-import com.odde.doughnut.factoryServices.quizFacotries.presenters.QuizQuestionWithOptionsPresenter;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import java.util.Optional;
@@ -13,21 +10,16 @@ import java.util.Optional;
 @DiscriminatorValue("3")
 public class QuizQuestionPictureTitle extends QuizQuestionWithNoteChoices {
 
-  @JsonIgnore
-  public QuizQuestionWithOptionsPresenter buildPresenter() {
-    return new PictureTitleSelectionQuizPresenter(this);
-  }
-
   @Override
   public Optional<PictureWithMask> getPictureWithMask() {
     return getNote().getPictureWithMask();
   }
 
   public String getStem() {
-    return buildPresenter().stem();
+    return getNote().getClozeDescription().clozeDetails();
   }
 
   public String getMainTopic() {
-    return buildPresenter().mainTopic();
+    return "";
   }
 }
