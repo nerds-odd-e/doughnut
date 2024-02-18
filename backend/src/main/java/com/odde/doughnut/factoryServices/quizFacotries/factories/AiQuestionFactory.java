@@ -10,8 +10,7 @@ public class AiQuestionFactory {
   private Note note;
   AiQuestionGenerator aiQuestionGenerator;
 
-  public AiQuestionFactory(
-    Note note, AiQuestionGenerator questionGenerator) {
+  public AiQuestionFactory(Note note, AiQuestionGenerator questionGenerator) {
     this.note = note;
     this.aiQuestionGenerator = questionGenerator;
   }
@@ -19,8 +18,7 @@ public class AiQuestionFactory {
   public QuizQuestionEntity create() {
     QuizQuestionAIQuestion quizQuestionAIQuestion = new QuizQuestionAIQuestion();
     quizQuestionAIQuestion.setNote(note);
-    MCQWithAnswer MCQWithAnswer =
-      aiQuestionGenerator.getAiGeneratedQuestion(note);
+    MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note);
     if (MCQWithAnswer == null) {
       return null;
     }

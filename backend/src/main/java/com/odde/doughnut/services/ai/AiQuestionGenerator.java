@@ -14,15 +14,14 @@ public record AiQuestionGenerator(OpenAiApiHandler openAiApiHandler, String mode
   }
 
   public MCQWithAnswer getAiGeneratedQuestion(Note note) {
-    return forNote(note)
-      .getAiGeneratedQuestion();
+    return forNote(note).getAiGeneratedQuestion();
   }
 
-
-  public QuizQuestionContestResult getQuizQuestionContestResult(QuizQuestionAIQuestion quizQuestionEntity) {
+  public QuizQuestionContestResult getQuizQuestionContestResult(
+      QuizQuestionAIQuestion quizQuestionEntity) {
     return forNote(quizQuestionEntity.getNote())
-      .evaluateQuestion(quizQuestionEntity.getMcqWithAnswer())
-      .map(e -> e.getQuizQuestionContestResult(quizQuestionEntity.getCorrectAnswerIndex()))
-      .orElse(null);
+        .evaluateQuestion(quizQuestionEntity.getMcqWithAnswer())
+        .map(e -> e.getQuizQuestionContestResult(quizQuestionEntity.getCorrectAnswerIndex()))
+        .orElse(null);
   }
 }

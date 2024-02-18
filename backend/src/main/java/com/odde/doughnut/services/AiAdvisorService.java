@@ -10,7 +10,6 @@ import com.theokanning.openai.assistants.*;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,7 +78,7 @@ public class AiAdvisorService {
 
   public QuizQuestionContestResult contestQuestion(
       QuizQuestionAIQuestion quizQuestionEntity, String modelName) {
-      return getAiQuestionGenerator(modelName).getQuizQuestionContestResult(quizQuestionEntity);
+    return getAiQuestionGenerator(modelName).getQuizQuestionContestResult(quizQuestionEntity);
   }
 
   public String uploadAndTriggerFineTuning(

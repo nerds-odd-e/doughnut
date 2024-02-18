@@ -16,9 +16,7 @@ import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.models.randomizers.RealRandomizer;
-import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
-import com.odde.doughnut.services.ai.AiQuestionGeneratorForNote;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.HashSet;
@@ -169,7 +167,7 @@ class QuizQuestionTest {
       Set<Class<? extends QuizQuestionEntity>> types = new HashSet<>();
       for (int i = 0; i < 10; i++) {
         QuizQuestionEntity randomQuizQuestion =
-            generateQuizQuestion(note, new RealRandomizer(),null);
+            generateQuizQuestion(note, new RealRandomizer(), null);
         types.add(randomQuizQuestion.getClass());
       }
       assertThat(
@@ -178,7 +176,7 @@ class QuizQuestionTest {
   }
 
   private QuizQuestionEntity generateQuizQuestion(
-    Note note, Randomizer randomizer1, AiQuestionGenerator aiQuestionGenerator) {
+      Note note, Randomizer randomizer1, AiQuestionGenerator aiQuestionGenerator) {
     QuizQuestionGenerator quizQuestionGenerator =
         new QuizQuestionGenerator(
             userModel.getEntity(), note, randomizer1, makeMe.modelFactoryService);
@@ -186,7 +184,7 @@ class QuizQuestionTest {
   }
 
   private QuizQuestionEntity generateQuizQuestionEntity(Note note) {
-    return generateQuizQuestion(note, randomizer,null);
+    return generateQuizQuestion(note, randomizer, null);
   }
 
   private QuizQuestion generateQuizQuestion(Note note) {

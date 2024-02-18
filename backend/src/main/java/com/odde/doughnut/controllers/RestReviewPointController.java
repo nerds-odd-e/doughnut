@@ -63,12 +63,10 @@ class RestReviewPointController {
             .getValue();
     QuizQuestionGenerator quizQuestionGenerator =
         new QuizQuestionGenerator(
-            reviewPoint.getUser(),
-            reviewPoint.getNote(),
-            randomizer,
-            modelFactoryService);
+            reviewPoint.getUser(), reviewPoint.getNote(), randomizer, modelFactoryService);
     QuizQuestionEntity quizQuestionEntity =
-        quizQuestionGenerator.generateAQuestionOfRandomType(new AiQuestionGenerator(openAiApiHandler, questionGenerationModelName));
+        quizQuestionGenerator.generateAQuestionOfRandomType(
+            new AiQuestionGenerator(openAiApiHandler, questionGenerationModelName));
     return modelFactoryService.toQuizQuestion(quizQuestionEntity);
   }
 

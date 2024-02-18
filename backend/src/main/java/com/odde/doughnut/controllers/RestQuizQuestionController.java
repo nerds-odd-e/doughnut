@@ -17,7 +17,6 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,10 +76,8 @@ class RestQuizQuestionController {
 
   private QuizQuestion generateAIQuestion(Note note) {
     String questionGenerationModelName =
-        globalSettingsService
-            .getGlobalSettingQuestionGeneration()
-            .getValue();
-      AiQuestionFactory aiQuestionFactory =
+        globalSettingsService.getGlobalSettingQuestionGeneration().getValue();
+    AiQuestionFactory aiQuestionFactory =
         new AiQuestionFactory(note, getAiQuestionGenerator(questionGenerationModelName));
     QuizQuestionEntity quizQuestionEntity = aiQuestionFactory.create();
     if (quizQuestionEntity == null) {
@@ -91,7 +88,7 @@ class RestQuizQuestionController {
   }
 
   private AiQuestionGenerator getAiQuestionGenerator(String questionGenerationModelName) {
-      return new AiQuestionGenerator(openAiHandler, questionGenerationModelName);
+    return new AiQuestionGenerator(openAiHandler, questionGenerationModelName);
   }
 
   @PostMapping("/{quizQuestion}/answer")
