@@ -62,8 +62,8 @@ class RestQuizQuestionController {
   public QuizQuestionContestResult contest(
       @PathVariable("quizQuestion") QuizQuestionAIQuestion quizQuestionEntity) {
     currentUser.assertLoggedIn();
-    return aiAdvisorService.contestQuestion(
-        quizQuestionEntity, globalSettingsService.getGlobalSettingEvaluation().getValue());
+    return getAiQuestionGenerator(globalSettingsService.getGlobalSettingEvaluation().getValue())
+        .getQuizQuestionContestResult(quizQuestionEntity);
   }
 
   @PostMapping("/{quizQuestion}/regenerate")

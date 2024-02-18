@@ -2,7 +2,6 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.json.*;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.quizQuestions.QuizQuestionAIQuestion;
 import com.odde.doughnut.services.ai.*;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
@@ -57,10 +56,6 @@ public class AiAdvisorService {
     return "";
   }
 
-  private AiQuestionGenerator getAiQuestionGenerator(String modelName) {
-    return new AiQuestionGenerator(openAiApiHandler, modelName);
-  }
-
   public List<String> getAvailableGptModels() {
     List<String> modelVersionOptions = new ArrayList<>();
 
@@ -76,11 +71,6 @@ public class AiAdvisorService {
     return modelVersionOptions;
   }
 
-  public QuizQuestionContestResult contestQuestion(
-      QuizQuestionAIQuestion quizQuestionEntity, String modelName) {
-    return getAiQuestionGenerator(modelName).getQuizQuestionContestResult(quizQuestionEntity);
-  }
-
   public String uploadAndTriggerFineTuning(
       List<OpenAIChatGPTFineTuningExample> examples, String question) throws IOException {
     String fileId = openAiApiHandler.uploadFineTuningExamples(examples, question);
@@ -88,8 +78,6 @@ public class AiAdvisorService {
   }
 
   private ContentCompletionService getContentCompletionService() {
-    ContentCompletionService contentCompletionService =
-        new ContentCompletionService(openAiApiHandler);
-    return contentCompletionService;
+    return new ContentCompletionService(openAiApiHandler);
   }
 }

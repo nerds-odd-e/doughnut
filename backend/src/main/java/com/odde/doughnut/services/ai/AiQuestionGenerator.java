@@ -7,7 +7,7 @@ import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 
 public record AiQuestionGenerator(OpenAiApiHandler openAiApiHandler, String modelName) {
-  public AiQuestionGeneratorForNote forNote(Note note) {
+  private AiQuestionGeneratorForNote forNote(Note note) {
     OpenAIChatRequestBuilder chatAboutNoteRequestBuilder =
         OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(modelName, note);
     return new AiQuestionGeneratorForNote(openAiApiHandler, chatAboutNoteRequestBuilder);

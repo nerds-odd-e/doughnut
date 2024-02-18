@@ -7,8 +7,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.json.QuizQuestionContestResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.quizQuestions.QuizQuestionAIQuestion;
+import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
+import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.client.OpenAiApi;
@@ -28,14 +30,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class AiAdvisorServiceWithDBTest {
 
-  private AiAdvisorService aiAdvisorService;
+  private AiQuestionGenerator aiQuestionGenerator;
   @Mock private OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
 
   @BeforeEach
   void Setup() {
     MockitoAnnotations.openMocks(this);
-    aiAdvisorService = new AiAdvisorService(openAiApi);
+    aiQuestionGenerator = new AiQuestionGenerator(new OpenAiApiHandler(openAiApi), "gpt");
   }
 
   @Nested
@@ -68,7 +70,7 @@ class AiAdvisorServiceWithDBTest {
     void rejected() {
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(questionEvaluation, "");
       QuizQuestionContestResult contest =
-          aiAdvisorService.contestQuestion(quizQuestionEntity, "gpt-4");
+          aiQuestionGenerator.getQuizQuestionContestResult(quizQuestionEntity);
       assertTrue(contest.rejected);
       Assertions.assertThat(contest.reason)
           .isEqualTo("This seems to be a legitimate question. Please answer it.");
@@ -79,7 +81,7 @@ class AiAdvisorServiceWithDBTest {
       questionEvaluation.feasibleQuestion = false;
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(questionEvaluation, "");
       QuizQuestionContestResult contest =
-          aiAdvisorService.contestQuestion(quizQuestionEntity, "gpt-4");
+          aiQuestionGenerator.getQuizQuestionContestResult(quizQuestionEntity);
       assertFalse(contest.rejected);
     }
 
@@ -89,7 +91,7 @@ class AiAdvisorServiceWithDBTest {
           new ObjectMapper().readTree(""), "");
       assertThrows(
           RuntimeException.class,
-          () -> aiAdvisorService.contestQuestion(quizQuestionEntity, "gpt-4"));
+          () -> aiQuestionGenerator.getQuizQuestionContestResult(quizQuestionEntity));
     }
   }
 }
