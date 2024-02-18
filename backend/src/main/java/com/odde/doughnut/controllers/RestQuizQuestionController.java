@@ -70,13 +70,14 @@ class RestQuizQuestionController {
     return generateAIQuestion(quizQuestionEntity.getNote());
   }
 
-  private QuizQuestion generateAIQuestion(Note thing) {
-    AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(thing, aiAdvisorService);
+  private QuizQuestion generateAIQuestion(Note note) {
     String questionGenerationModelName =
         new GlobalSettingsService(modelFactoryService)
             .getGlobalSettingQuestionGeneration()
             .getValue();
-    QuizQuestionEntity quizQuestionEntity = aiQuestionFactory.create(questionGenerationModelName);
+    AiQuestionFactory aiQuestionFactory =
+        new AiQuestionFactory(note, questionGenerationModelName, aiAdvisorService);
+    QuizQuestionEntity quizQuestionEntity = aiQuestionFactory.create();
     if (quizQuestionEntity == null) {
       throw (new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
     }

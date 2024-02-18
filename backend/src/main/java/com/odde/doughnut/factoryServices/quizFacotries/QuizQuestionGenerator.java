@@ -41,8 +41,9 @@ public record QuizQuestionGenerator(
     QuizQuestionEntity result;
 
     if (note instanceof HierarchicalNote && user.getAiQuestionTypeOnlyForReview()) {
-      AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(note, aiAdvisorService);
-      result = aiQuestionFactory.create(questionGenerationModelName);
+      AiQuestionFactory aiQuestionFactory =
+          new AiQuestionFactory(note, questionGenerationModelName, aiAdvisorService);
+      result = aiQuestionFactory.create();
     } else {
       List<QuizQuestionFactory> shuffled = randomizer.shuffle(note.getQuizQuestionFactories());
       result = generateAQuestionOfFirstPossibleType(shuffled, servant);
