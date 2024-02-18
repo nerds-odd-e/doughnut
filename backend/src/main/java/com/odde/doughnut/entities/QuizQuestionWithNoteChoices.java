@@ -53,7 +53,19 @@ public abstract class QuizQuestionWithNoteChoices extends QuizQuestionEntity {
   protected abstract QuizQuestionWithOptionsPresenter buildPresenter();
 
   public List<QuizQuestion.Choice> getOptions(ModelFactoryService modelFactoryService) {
-    return buildPresenter().getOptions(modelFactoryService);
+    List<Integer> idList = getChoiceNoteIds();
+    return modelFactoryService
+        .noteRepository
+        .findAllByIds(idList)
+        .sorted(Comparator.comparing(v -> idList.indexOf(v.getId())))
+        .map(this::noteToChoice)
+        .toList();
+  }
+
+  protected QuizQuestion.Choice noteToChoice(Note note) {
+    QuizQuestion.Choice choice = new QuizQuestion.Choice();
+    choice.setDisplay(note.getTopicConstructor());
+    return choice;
   }
 
   public String getStem() {
@@ -65,7 +77,7 @@ public abstract class QuizQuestionWithNoteChoices extends QuizQuestionEntity {
   }
 
   public Optional<PictureWithMask> getPictureWithMask() {
-    return buildPresenter().pictureWithMask();
+    return Optional.empty();
   }
 
   public boolean checkAnswer(Answer answer) {

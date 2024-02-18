@@ -1,10 +1,7 @@
 package com.odde.doughnut.factoryServices.quizFacotries.presenters;
 
-import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionWithNoteChoices;
-import java.util.List;
-import java.util.stream.Stream;
 
 public class PictureSelectionQuizPresenter extends QuizQuestionWithOptionsPresenter {
 
@@ -23,19 +20,5 @@ public class PictureSelectionQuizPresenter extends QuizQuestionWithOptionsPresen
   @Override
   public String stem() {
     return "";
-  }
-
-  @Override
-  protected List<QuizQuestion.Choice> getOptionsFromNote(Stream<Note> noteStream) {
-    return noteStream
-        .map(
-            note -> {
-              QuizQuestion.Choice choice = new QuizQuestion.Choice();
-              choice.setDisplay(note.getTopicConstructor());
-              choice.setPictureWithMask(note.getPictureWithMask().orElse(null));
-              choice.setPicture(true);
-              return choice;
-            })
-        .toList();
   }
 }
