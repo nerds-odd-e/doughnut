@@ -52,7 +52,7 @@
     "@types/testing-library__cypress": "^5.0.13",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
-    "cypress": "13.6.4",
+    "cypress": "13.6.5",
     "cypress-file-upload": "^5.0.8",
     "esbuild": "^0.20.1",
     "eslint": "^8.56.0",
