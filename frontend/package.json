@@ -61,7 +61,7 @@
     "optionator": "^0.9.3",
     "postcss": "^8.4.35",
     "prettier": "^3.2.5",
-    "sass": "^1.71.0",
+    "sass": "^1.71.1",
     "sass-loader": "14.1.0",
     "style-loader": "^3.3.4",
     "typescript": "5.3.3",
