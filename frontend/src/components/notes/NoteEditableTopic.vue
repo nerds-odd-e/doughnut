@@ -46,7 +46,7 @@ export default defineComponent({
     };
   },
   watch: {
-    note() {
+    noteTopicConstructor() {
       this.localTopicConstructor = this.noteTopicConstructor;
     },
   },
