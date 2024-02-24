@@ -1,5 +1,10 @@
 <template>
-  <slot :update="onUpdate" :blur="onBlur" :errors="errors" />
+  <slot
+    :value="localValue"
+    :update="onUpdate"
+    :blur="onBlur"
+    :errors="errors"
+  />
 </template>
 
 <script lang="ts">
@@ -28,6 +33,10 @@ export default defineComponent({
       type: String as PropType<"edit topic" | "edit details">,
       required: true,
     },
+    value: {
+      type: String,
+      required: true,
+    },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,
@@ -35,6 +44,7 @@ export default defineComponent({
   },
   data() {
     return {
+      localValue: this.value,
       errors: {} as Record<string, string>,
     };
   },
@@ -42,6 +52,7 @@ export default defineComponent({
   methods: {
     onUpdate(noteId: number, newValue: string) {
       this.errors = {};
+      this.localValue = newValue;
       this.changer(noteId, newValue, this.setError);
     },
     onBlur() {
@@ -57,6 +68,11 @@ export default defineComponent({
         return;
       }
       this.errors = errs;
+    },
+  },
+  watch: {
+    value() {
+      this.localValue = this.value;
     },
   },
   unmounted() {

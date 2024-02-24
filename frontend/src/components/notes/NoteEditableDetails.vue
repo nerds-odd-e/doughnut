@@ -1,14 +1,15 @@
 <template>
-  <TextContentWrapper :storage-accessor="storageAccessor" field="edit details">
-    <template #default="{ update, blur }">
+  <TextContentWrapper
+    :value="noteDetails"
+    :storage-accessor="storageAccessor"
+    field="edit details"
+  >
+    <template #default="{ value, update, blur }">
       <RichMarkdownEditor
         :multiple-line="true"
         scope-name="note"
-        :model-value="localDetails"
-        @update:model-value="
-          update(noteId, $event);
-          localDetails = $event;
-        "
+        :model-value="value"
+        @update:model-value="update(noteId, $event)"
         @blur="blur"
       />
     </template>
@@ -33,16 +34,6 @@ export default defineComponent({
   components: {
     RichMarkdownEditor,
     TextContentWrapper,
-  },
-  data() {
-    return {
-      localDetails: this.noteDetails,
-    };
-  },
-  watch: {
-    noteDetails() {
-      this.localDetails = this.noteDetails;
-    },
   },
 });
 </script>

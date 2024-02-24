@@ -1,15 +1,16 @@
 <template>
-  <TextContentWrapper :storage-accessor="storageAccessor" field="edit topic">
-    <template #default="{ update, blur, errors }">
+  <TextContentWrapper
+    :value="noteTopicConstructor"
+    :storage-accessor="storageAccessor"
+    field="edit topic"
+  >
+    <template #default="{ value, update, blur, errors }">
       <EditableText
         role="topic"
         class="note-topic"
         scope-name="note"
-        :model-value="localTopicConstructor"
-        @update:model-value="
-          update(noteId, $event);
-          localTopicConstructor = $event;
-        "
+        :model-value="value"
+        @update:model-value="update(noteId, $event)"
         @blur="blur"
         :errors="errors.topic"
       >
@@ -40,16 +41,6 @@ export default defineComponent({
     EditableText,
     TextContentWrapper,
     NoteTopic,
-  },
-  data() {
-    return {
-      localTopicConstructor: this.noteTopicConstructor,
-    };
-  },
-  watch: {
-    noteTopicConstructor() {
-      this.localTopicConstructor = this.noteTopicConstructor;
-    },
   },
 });
 </script>
