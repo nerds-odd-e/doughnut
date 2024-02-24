@@ -8,25 +8,28 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+import { defineComponent, PropType, ref } from "vue";
 import { debounce } from "lodash";
 import { type StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   setup(props) {
-    const changerInner = (
+    const savedVersion = ref(0);
+    const changerInner = async (
       noteId: number,
       newValue: string,
+      version: number,
       errorHander: (errs: unknown) => void,
     ) => {
-      props.storageAccessor
+      await props.storageAccessor
         .storedApi()
         .updateTextField(noteId, props.field, newValue)
         .catch(errorHander);
+      savedVersion.value = version;
     };
     const changer = debounce(changerInner, 1000);
 
-    return { changer };
+    return { changer, savedVersion };
   },
   props: {
     field: {
@@ -45,15 +48,17 @@ export default defineComponent({
   data() {
     return {
       localValue: this.value,
+      version: 0,
       errors: {} as Record<string, string>,
     };
   },
 
   methods: {
     onUpdate(noteId: number, newValue: string) {
+      this.version += 1;
       this.errors = {};
       this.localValue = newValue;
-      this.changer(noteId, newValue, this.setError);
+      this.changer(noteId, newValue, this.version, this.setError);
     },
     onBlur() {
       this.changer.flush();
@@ -72,6 +77,9 @@ export default defineComponent({
   },
   watch: {
     value() {
+      if (this.version !== this.savedVersion) {
+        return;
+      }
       this.localValue = this.value;
     },
   },

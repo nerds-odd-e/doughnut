@@ -57,18 +57,56 @@ describe("in place edit on title", () => {
     wrapper.unmount();
   });
 
-  const editTitle = async (wrapper: VueWrapper<ComponentPublicInstance>) => {
+  const editTitle = async (
+    wrapper: VueWrapper<ComponentPublicInstance>,
+    newValue: string,
+  ) => {
     await wrapper.find('[role="topic"]').trigger("click");
-    await wrapper.find('[role="topic"] input').setValue("updated");
+    await wrapper.find('[role="topic"] input').setValue(newValue);
+  };
+
+  const editTitleThenBlur = async (
+    wrapper: VueWrapper<ComponentPublicInstance>,
+  ) => {
+    await editTitle(wrapper, "updated");
     await wrapper.find('[role="topic"] input').trigger("blur");
   };
 
   it("should save content when blur text field title", async () => {
     const wrapper = mountComponent(note);
+    await editTitle(wrapper, "updated");
     helper.apiMock.expectingPatch(
       `/api/text_content/${note.id}/topic-constructor`,
     );
-    await editTitle(wrapper);
+    await wrapper.find('[role="topic"] input').trigger("blur");
+  });
+
+  it("should not change content if there's unsaved changed", async () => {
+    const wrapper = mountComponent(note);
+    await editTitle(wrapper, "updated");
+
+    await wrapper.setProps({
+      note: { ...note, topicConstructor: "different value" },
+    });
+    expect(
+      wrapper.find<HTMLInputElement>('[role="topic"] input').element.value,
+    ).toBe("updated");
+
+    // the saving will still happen because the component is unmounted
+    helper.apiMock.expectingPatch(
+      `/api/text_content/${note.id}/topic-constructor`,
+    );
+  });
+
+  it("should change content if there's no unsaved changed but change from prop", async () => {
+    const wrapper = mountComponent(note);
+    await wrapper.setProps({
+      note: { ...note, topicConstructor: "different value" },
+    });
+    await wrapper.find('[role="topic"]').trigger("click");
+    expect(
+      wrapper.find<HTMLInputElement>('[role="topic"] input').element.value,
+    ).toBe("different value");
   });
 
   describe("saved and having error", () => {
@@ -87,7 +125,7 @@ describe("in place edit on title", () => {
             errorType: "BINDING_ERROR",
           }),
         });
-      await editTitle(wrapper);
+      await editTitleThenBlur(wrapper);
       await flushPromises();
     });
 
@@ -101,7 +139,7 @@ describe("in place edit on title", () => {
       helper.apiMock.expectingPatch(
         `/api/text_content/${note.id}/topic-constructor`,
       );
-      await editTitle(wrapper);
+      await editTitleThenBlur(wrapper);
       await flushPromises();
       expect(wrapper.findAll(".error-msg")).toHaveLength(0);
     });
@@ -136,7 +174,7 @@ describe("in place edit on title", () => {
         .andRespondOnce({
           status: 401,
         });
-      await editTitle(wrapper);
+      await editTitleThenBlur(wrapper);
       await flushPromises();
       expect(wrapper.find(".error-msg").text()).toBe(
         "You are not authorized to edit this note. Perhaps you are not logged in?",
