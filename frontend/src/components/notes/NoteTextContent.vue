@@ -1,23 +1,10 @@
 <template>
   <div style="display: flex">
-    <TextContentWrapper :storage-accessor="storageAccessor" field="edit topic">
-      <template #default="{ update, blur, errors }">
-        <EditableText
-          role="topic"
-          class="note-topic"
-          scope-name="note"
-          :model-value="localTopicConstructor"
-          @update:model-value="
-            update(note.id, $event);
-            localTopicConstructor = $event;
-          "
-          @blur="blur"
-          :errors="errors.topic"
-        >
-          <h2><NoteTopic v-bind="{ topic: note.topic }" /></h2>
-        </EditableText>
-      </template>
-    </TextContentWrapper>
+    <NoteEditableTopic
+      :note-id="note.id"
+      :note-topic-constructor="note.topicConstructor"
+      :storage-accessor="storageAccessor"
+    />
     <slot name="topic-additional" />
   </div>
   <div role="details" class="note-content">
@@ -44,11 +31,10 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import EditableText from "../form/EditableText.vue";
 import RichMarkdownEditor from "../form/RichMarkdownEditor.vue";
 import { type StorageAccessor } from "../../store/createNoteStorage";
 import TextContentWrapper from "./TextContentWrapper.vue";
-import NoteTopic from "./NoteTopic.vue";
+import NoteEditableTopic from "./NoteEditableTopic.vue";
 
 export default defineComponent({
   props: {
@@ -59,10 +45,9 @@ export default defineComponent({
     },
   },
   components: {
-    EditableText,
     RichMarkdownEditor,
     TextContentWrapper,
-    NoteTopic,
+    NoteEditableTopic,
   },
   data() {
     return {

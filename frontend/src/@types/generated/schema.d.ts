@@ -97,6 +97,9 @@ export interface paths {
   "/api/notes/{note}/updateWikidataId": {
     post: operations["updateWikidataId"];
   };
+  "/api/notes/{note}/search": {
+    post: operations["searchForLinkTargetWithin"];
+  };
   "/api/notes/{note}/review-setting": {
     post: operations["updateReviewSetting"];
   };
@@ -116,7 +119,6 @@ export interface paths {
     post: operations["createNotebook"];
   };
   "/api/links/{link}": {
-    get: operations["show_2"];
     post: operations["updateLink"];
   };
   "/api/links/{link}/{perspective}/delete": {
@@ -227,7 +229,7 @@ export interface paths {
     get: operations["failureReports"];
   };
   "/api/failure-reports/{failureReport}": {
-    get: operations["show_3"];
+    get: operations["show_2"];
   };
   "/api/data_upgrade": {
     get: operations["dataUpgrade"];
@@ -322,6 +324,8 @@ export interface components {
       id?: number;
       noteAccessories?: components["schemas"]["NoteAccessories"];
       /** Format: date-time */
+      createdAt?: string;
+      /** Format: date-time */
       deletedAt?: string;
       wikidataId?: string;
       pictureWithMask?: components["schemas"]["PictureWithMask"];
@@ -362,14 +366,27 @@ export interface components {
     };
     InitialInfo: {
       /** Format: int32 */
-      thingId?: number;
+      noteId?: number;
       skipReview?: boolean;
     };
-    Link: {
+    ReviewPoint: {
       /** Format: int32 */
       id?: number;
-      sourceNote?: components["schemas"]["Note"];
-      targetNote?: components["schemas"]["Note"];
+      /** Format: date-time */
+      lastReviewedAt?: string;
+      /** Format: date-time */
+      nextReviewAt?: string;
+      /** Format: date-time */
+      initialReviewedAt?: string;
+      /** Format: int32 */
+      repetitionCount?: number;
+      /** Format: int32 */
+      forgettingCurveIndex?: number;
+      removedFromReview?: boolean;
+      thing?: components["schemas"]["Thing"];
+    };
+    Thing: {
+      note?: components["schemas"]["Note"];
       /** @enum {string} */
       linkType?:
         | "no link"
@@ -387,49 +404,27 @@ export interface components {
         | "before"
         | "similar to"
         | "confused with";
-    };
-    ReviewPoint: {
+      sourceNote?: components["schemas"]["Note"];
+      targetNote?: components["schemas"]["Note"];
       /** Format: int32 */
       id?: number;
-      thing?: components["schemas"]["Thing"];
-      /** Format: date-time */
-      lastReviewedAt?: string;
-      /** Format: date-time */
-      nextReviewAt?: string;
-      /** Format: date-time */
-      initialReviewedAt?: string;
-      /** Format: int32 */
-      repetitionCount?: number;
-      /** Format: int32 */
-      forgettingCurveIndex?: number;
-      removedFromReview?: boolean;
-    };
-    Thing: {
-      /** Format: int32 */
-      id?: number;
-      /** Format: date-time */
-      createdAt?: string;
-      note?: components["schemas"]["Note"];
-      link?: components["schemas"]["Link"];
     };
     SelfEvaluation: {
       /** Format: int32 */
       adjustment?: number;
     };
-    QuizQuestionEntity: {
+    QuizQuestionAIQuestion: {
       /** Format: int32 */
       id?: number;
-      thing?: components["schemas"]["Thing"];
-      /** Format: int32 */
-      questionTypeId?: number;
-      rawJsonQuestion?: string;
-      categoryLink?: components["schemas"]["Link"];
-      optionThingIds?: string;
-      /** Format: int32 */
-      correctAnswerIndex?: number;
+      note?: components["schemas"]["Note"];
       /** Format: date-time */
       createdAt?: string;
-      mcqWithAnswer?: components["schemas"]["MCQWithAnswer"];
+      rawJsonQuestion?: string;
+      /** Format: int32 */
+      correctAnswerIndex?: number;
+      pictureWithMask?: components["schemas"]["PictureWithMask"];
+      stem?: string;
+      mainTopic?: string;
     };
     QuestionSuggestionCreationParams: {
       comment?: string;
@@ -446,42 +441,29 @@ export interface components {
       createdAt?: string;
       positiveFeedback?: boolean;
     };
+    QuizQuestionEntity: {
+      /** Format: int32 */
+      id?: number;
+      note?: components["schemas"]["Note"];
+      /** Format: date-time */
+      createdAt?: string;
+      /** Format: int32 */
+      correctAnswerIndex?: number;
+      pictureWithMask?: components["schemas"]["PictureWithMask"];
+      stem?: string;
+      mainTopic?: string;
+    };
     Choice: {
       display?: string;
       pictureWithMask?: components["schemas"]["PictureWithMask"];
       picture?: boolean;
     };
-    NotebookViewedByUser: {
-      /** Format: int32 */
-      id?: number;
-      /** Format: int32 */
-      headNoteId?: number;
-      headNote?: components["schemas"]["Note"];
-      skipReviewEntirely?: boolean;
-      fromBazaar?: boolean;
-      ownership?: components["schemas"]["Ownership"];
-    };
     QuizQuestion: {
       /** Format: int32 */
-      quizQuestionId?: number;
-      /** @enum {string} */
-      questionType?:
-        | "CLOZE_SELECTION"
-        | "SPELLING"
-        | "PICTURE_TITLE"
-        | "PICTURE_SELECTION"
-        | "LINK_TARGET"
-        | "LINK_SOURCE"
-        | "LINK_SOURCE_WITHIN_SAME_LINK_TYPE"
-        | "CLOZE_LINK_TARGET"
-        | "DESCRIPTION_LINK_TARGET"
-        | "WHICH_SPEC_HAS_INSTANCE"
-        | "FROM_SAME_PART_AS"
-        | "FROM_DIFFERENT_PART_AS"
-        | "AI_QUESTION";
+      id?: number;
       stem?: string;
       mainTopic?: string;
-      notebook?: components["schemas"]["NotebookViewedByUser"];
+      headNote?: components["schemas"]["Note"];
       choices?: components["schemas"]["Choice"][];
       pictureWithMask?: components["schemas"]["PictureWithMask"];
     };
@@ -529,32 +511,54 @@ export interface components {
         | "confused with";
       wikidataId?: string;
     };
+    HierarchicalNote: {
+      topic?: string;
+      topicConstructor?: string;
+      details?: string;
+      /** Format: int32 */
+      parentId?: number;
+      /** Format: date-time */
+      updatedAt?: string;
+      /** Format: int32 */
+      id?: number;
+      noteAccessories?: components["schemas"]["NoteAccessories"];
+      /** Format: date-time */
+      createdAt?: string;
+      /** Format: date-time */
+      deletedAt?: string;
+      wikidataId?: string;
+      pictureWithMask?: components["schemas"]["PictureWithMask"];
+    };
     LinkViewed: {
-      direct?: components["schemas"]["Link"][];
-      reverse?: components["schemas"]["Link"][];
+      direct?: components["schemas"]["Thing"][];
+      reverse?: components["schemas"]["Thing"][];
     };
     NotePositionViewedByUser: {
       /** Format: int32 */
       noteId?: number;
-      notebook?: components["schemas"]["NotebookViewedByUser"];
+      fromBazaar?: boolean;
+      circle?: components["schemas"]["Circle"];
       ancestors?: components["schemas"]["Note"][];
     };
     NoteRealm: {
-      /** Format: int32 */
-      id?: number;
       links?: {
         [key: string]: components["schemas"]["LinkViewed"];
       };
-      children?: components["schemas"]["Note"][];
       note?: components["schemas"]["Note"];
       notePosition?: components["schemas"]["NotePositionViewedByUser"];
+      /** Format: int32 */
+      id?: number;
+      children?: components["schemas"]["HierarchicalNote"][];
     };
     WikidataAssociationCreation: {
       wikidataId?: string;
     };
+    SearchTerm: {
+      searchKey?: string;
+      allMyNotebooksAndSubscriptions?: boolean;
+      allMyCircles?: boolean;
+    };
     ReviewSetting: {
-      /** Format: int32 */
-      id?: number;
       rememberSpelling?: boolean;
       skipReview?: boolean;
       /** Format: int32 */
@@ -563,13 +567,6 @@ export interface components {
     RedirectToNoteResponse: {
       /** Format: int32 */
       noteId?: number;
-    };
-    SearchTerm: {
-      searchKey?: string;
-      allMyNotebooksAndSubscriptions?: boolean;
-      allMyCircles?: boolean;
-      /** Format: int32 */
-      note?: number;
     };
     LinkCreation: {
       /** @enum {string} */
@@ -597,7 +594,7 @@ export interface components {
       invitationCode: string;
     };
     AiCompletionParams: {
-      detailsToComplete?: string;
+      detailsToComplete1?: string;
     };
     AiCompletionRequiredAction: {
       toolCallId?: string;
@@ -623,7 +620,7 @@ export interface components {
       assistantMessage?: string;
     };
     AiCompletionAnswerClarifyingQuestionParams: {
-      detailsToComplete?: string;
+      detailsToComplete1?: string;
       threadId?: string;
       runId?: string;
       toolCallId?: string;
@@ -669,6 +666,14 @@ export interface components {
       /** Format: date-time */
       createdAt?: string;
       reviewSetting?: components["schemas"]["ReviewSetting"];
+    };
+    NotebookViewedByUser: {
+      /** Format: int32 */
+      id?: number;
+      /** Format: int32 */
+      headNoteId?: number;
+      headNote?: components["schemas"]["Note"];
+      skipReviewEntirely?: boolean;
     };
     NotebooksViewedByUser: {
       notebooks?: components["schemas"]["NotebookViewedByUser"][];
@@ -1263,7 +1268,7 @@ export interface operations {
   suggestQuestionForFineTuning: {
     parameters: {
       path: {
-        quizQuestion: components["schemas"]["QuizQuestionEntity"];
+        quizQuestion: components["schemas"]["QuizQuestionAIQuestion"];
       };
     };
     requestBody: {
@@ -1310,7 +1315,7 @@ export interface operations {
   contest: {
     parameters: {
       path: {
-        quizQuestion: components["schemas"]["QuizQuestionEntity"];
+        quizQuestion: components["schemas"]["QuizQuestionAIQuestion"];
       };
     };
     responses: {
@@ -1417,6 +1422,32 @@ export interface operations {
       200: {
         content: {
           "*/*": components["schemas"]["NoteRealm"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "*/*": string;
+        };
+      };
+    };
+  };
+  searchForLinkTargetWithin: {
+    parameters: {
+      path: {
+        note: components["schemas"]["Note"];
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SearchTerm"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          "*/*": components["schemas"]["Note"][];
         };
       };
       /** @description Internal Server Error */
@@ -1558,31 +1589,10 @@ export interface operations {
       };
     };
   };
-  show_2: {
-    parameters: {
-      path: {
-        link: components["schemas"]["Link"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          "*/*": components["schemas"]["Link"];
-        };
-      };
-      /** @description Internal Server Error */
-      500: {
-        content: {
-          "*/*": string;
-        };
-      };
-    };
-  };
   updateLink: {
     parameters: {
-      query: {
-        link: components["schemas"]["Link"];
+      path: {
+        link: components["schemas"]["Note"];
       };
     };
     requestBody: {
@@ -1608,7 +1618,7 @@ export interface operations {
   deleteLink: {
     parameters: {
       path: {
-        link: components["schemas"]["Link"];
+        link: components["schemas"]["Note"];
         perspective: string;
       };
     };
@@ -2202,7 +2212,7 @@ export interface operations {
       /** @description OK */
       200: {
         content: {
-          "*/*": components["schemas"]["ReviewPoint"][];
+          "*/*": components["schemas"]["Thing"][];
         };
       };
       /** @description Internal Server Error */
@@ -2382,7 +2392,7 @@ export interface operations {
       };
     };
   };
-  show_3: {
+  show_2: {
     parameters: {
       query: {
         failureReport: components["schemas"]["FailureReport"];
