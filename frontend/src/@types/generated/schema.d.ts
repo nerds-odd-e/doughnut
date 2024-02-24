@@ -420,11 +420,11 @@ export interface components {
       /** Format: date-time */
       createdAt?: string;
       rawJsonQuestion?: string;
+      stem?: string;
+      mainTopic?: string;
       /** Format: int32 */
       correctAnswerIndex?: number;
       pictureWithMask?: components["schemas"]["PictureWithMask"];
-      stem?: string;
-      mainTopic?: string;
     };
     QuestionSuggestionCreationParams: {
       comment?: string;
@@ -447,11 +447,11 @@ export interface components {
       note?: components["schemas"]["Note"];
       /** Format: date-time */
       createdAt?: string;
+      stem?: string;
+      mainTopic?: string;
       /** Format: int32 */
       correctAnswerIndex?: number;
       pictureWithMask?: components["schemas"]["PictureWithMask"];
-      stem?: string;
-      mainTopic?: string;
     };
     Choice: {
       display?: string;
@@ -594,7 +594,7 @@ export interface components {
       invitationCode: string;
     };
     AiCompletionParams: {
-      detailsToComplete1?: string;
+      detailsToComplete?: string;
     };
     AiCompletionRequiredAction: {
       toolCallId?: string;
@@ -620,7 +620,7 @@ export interface components {
       assistantMessage?: string;
     };
     AiCompletionAnswerClarifyingQuestionParams: {
-      detailsToComplete1?: string;
+      detailsToComplete?: string;
       threadId?: string;
       runId?: string;
       toolCallId?: string;
