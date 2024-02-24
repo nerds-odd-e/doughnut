@@ -13,7 +13,7 @@
         @blur="blur"
         :errors="errors.topic"
       >
-        <h2><NoteTopic v-bind="{ topic: noteTopicConstructor }" /></h2>
+        <h2><NoteTopic v-bind="{ topic: noteTopic }" /></h2>
       </EditableText>
     </template>
   </TextContentWrapper>
@@ -30,6 +30,7 @@ export default defineComponent({
   props: {
     noteId: { type: Number, required: true },
     noteTopicConstructor: { type: String, required: true },
+    noteTopic: { type: String, required: true },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,

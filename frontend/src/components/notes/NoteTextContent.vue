@@ -3,6 +3,7 @@
     <NoteEditableTopic
       :note-id="note.id"
       :note-topic-constructor="note.topicConstructor"
+      :note-topic="note.topic"
       :storage-accessor="storageAccessor"
     />
     <slot name="topic-additional" />
