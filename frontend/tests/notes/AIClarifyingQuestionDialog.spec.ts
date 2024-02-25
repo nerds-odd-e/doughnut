@@ -1,10 +1,11 @@
 import AIClarifyingQuestionDialog from "@/components/notes/AIClarifyingQuestionDialog.vue";
 import { VueWrapper } from "@vue/test-utils";
+import { ClarifyingQuestion } from "@/generated/backend";
 import helper from "../helpers";
 
 describe("answering a clarifying question for note details geeration", () => {
   let wrapper: VueWrapper;
-  const clarifyingQuestion: Generated.ClarifyingQuestion = {
+  const clarifyingQuestion: ClarifyingQuestion = {
     question: "Do you mean American Football or European Football?",
   };
   const clarifyingHistory = [

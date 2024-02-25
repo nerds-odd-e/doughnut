@@ -67,7 +67,7 @@ export default defineComponent({
     return {
       quizQuestion: undefined as Generated.QuizQuestion | undefined,
       chatInput: "",
-      assistantMessage: "",
+      assistantMessage: "" as string | undefined,
       answered: false,
     };
   },

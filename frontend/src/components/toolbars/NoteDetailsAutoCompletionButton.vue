@@ -25,7 +25,7 @@
 import { defineComponent, PropType } from "vue";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import { StorageAccessor } from "@/store/createNoteStorage";
-import { Note } from "@/generated/backend";
+import { ClarifyingQuestion, Note } from "@/generated/backend";
 import SvgRobot from "../svgs/SvgRobot.vue";
 import AIClarifyingQuestionDialog from "../notes/AIClarifyingQuestionDialog.vue";
 import Modal from "../commons/Modal.vue";
@@ -55,7 +55,7 @@ export default defineComponent({
     return {
       isUnmounted: false,
       threadRespons: undefined as undefined | Generated.AiCompletionResponse,
-      clarifyingQuestion: undefined as undefined | Generated.ClarifyingQuestion,
+      clarifyingQuestion: undefined as undefined | ClarifyingQuestion,
       clarifyingHistory: [] as Generated.ClarifyingQuestionAndAnswer[],
     };
   },

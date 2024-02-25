@@ -29,12 +29,13 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { ClarifyingQuestion } from "@/generated/backend";
 import TextInput from "../form/TextInput.vue";
 
 export default defineComponent({
   props: {
     clarifyingQuestion: {
-      type: Object as PropType<Generated.ClarifyingQuestion>,
+      type: Object as PropType<ClarifyingQuestion>,
       required: true,
     },
     clarifyingHistory: {

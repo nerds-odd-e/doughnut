@@ -1,7 +1,11 @@
 import { describe, it, vi, expect, beforeEach, afterEach } from "vitest";
 import { flushPromises } from "@vue/test-utils";
 import RepeatPage from "@/pages/RepeatPage.vue";
-import { AnsweredQuestion, QuizQuestion } from "@/generated/backend";
+import {
+  AnsweredQuestion,
+  DueReviewPoints,
+  QuizQuestion,
+} from "@/generated/backend";
 import mockBrowserTimeZone from "../helpers/mockBrowserTimeZone";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
@@ -40,7 +44,7 @@ beforeEach(() => {
 
 describe("repeat page", () => {
   const mountPage = async (
-    repetition: Generated.DueReviewPoints | Record<string, never>,
+    repetition: DueReviewPoints | Record<string, never>,
   ) => {
     helper.apiMock
       .expectingGet("/api/reviews/repeat?timezone=Asia%2FShanghai&dueindays=0")
@@ -60,7 +64,7 @@ describe("repeat page", () => {
   });
 
   describe('repeat page with "just review" quiz', () => {
-    let repetition: Generated.DueReviewPoints;
+    let repetition: DueReviewPoints;
     let quizQuestion: QuizQuestion;
     const reviewPointId = 123;
     const secondReviewPointId = 456;

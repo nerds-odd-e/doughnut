@@ -1,8 +1,9 @@
+import { DueReviewPoints } from "@/generated/backend";
 import Builder from "./Builder";
 
-class RepetitionBuilder extends Builder<Generated.DueReviewPoints> {
+class RepetitionBuilder extends Builder<DueReviewPoints> {
   // eslint-disable-next-line class-methods-use-this
-  do(): Generated.DueReviewPoints {
+  do(): DueReviewPoints {
     return {
       toRepeat: [],
       dueInDays: 0,

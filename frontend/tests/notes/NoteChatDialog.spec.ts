@@ -2,6 +2,7 @@ import { VueWrapper, flushPromises } from "@vue/test-utils";
 import { beforeEach, expect } from "vitest";
 import NoteChatDialog from "@/components/notes/NoteChatDialog.vue";
 import scrollToElement from "@/components/commons/scrollToElement";
+import { ChatResponse } from "@/generated/backend";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
@@ -91,7 +92,7 @@ describe("NoteChatDialog Conversation", () => {
   it("When the chat button is clicked, the anwser from AI will be displayed", async () => {
     // Given
     const expected = "I'm ChatGPT";
-    const response: Generated.ChatResponse = { assistantMessage: expected };
+    const response: ChatResponse = { assistantMessage: expected };
     // setUp
     helper.apiMock
       .expectingPost(`/api/ai/chat?note=${note.id}`)

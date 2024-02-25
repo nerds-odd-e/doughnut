@@ -2,6 +2,8 @@ import { User } from "@/generated/backend/models/User";
 import {
   AiCompletionAnswerClarifyingQuestionParams,
   AiCompletionParams,
+  ChatResponse,
+  DueReviewPoints,
   GlobalAiModelSettings,
   Note,
   NoteRealm,
@@ -158,7 +160,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     async getDueReviewPoints(dueInDays?: number) {
       const res = (await managedApi.restGet(
         `reviews/repeat?${timezoneParam()}&dueindays=${dueInDays ?? ""}`,
-      )) as Generated.DueReviewPoints;
+      )) as DueReviewPoints;
       return res;
     },
 
@@ -369,12 +371,15 @@ const apiCollection = (managedApi: ManagedApi) => ({
         {},
       )) as Record<string, string>;
     },
-    async chat(noteId: Doughnut.ID, userMessage: string): Promise<string> {
+    async chat(
+      noteId: Doughnut.ID,
+      userMessage: string,
+    ): Promise<string | undefined> {
       const request: Generated.ChatRequest = { userMessage };
       const res = (await managedApi.restPost(
         `ai/chat?note=${noteId}`,
         request,
-      )) as Generated.ChatResponse;
+      )) as ChatResponse;
       return res.assistantMessage;
     },
 
