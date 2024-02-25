@@ -1,10 +1,11 @@
 package com.odde.doughnut.controllers.json;
 
+import jakarta.validation.constraints.NotNull;
 import java.util.Map;
 
 public class WikidataSearchEntity {
   public String id;
-  public String label;
+  @NotNull public String label;
   public String description;
 
   public WikidataSearchEntity(Map<String, Object> object) {

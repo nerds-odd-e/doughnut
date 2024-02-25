@@ -42,6 +42,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { WikidataSearchEntity } from "@/generated/backend";
 import TextInput from "../form/TextInput.vue";
 import SvgSearchWikidata from "../svgs/SvgSearchWikidata.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
@@ -62,7 +63,7 @@ export default defineComponent({
   },
   data() {
     return {
-      wikiSearchSuggestions: [] as Generated.WikidataSearchEntity[],
+      wikiSearchSuggestions: [] as WikidataSearchEntity[],
       selectedOption: "",
     };
   },

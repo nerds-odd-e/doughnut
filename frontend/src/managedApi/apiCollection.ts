@@ -6,8 +6,11 @@ import {
   DueReviewPoints,
   GlobalAiModelSettings,
   Note,
+  NotePositionViewedByUser,
   NoteRealm,
   SuggestedQuestionForFineTuning,
+  WikidataEntityData,
+  WikidataSearchEntity,
 } from "@/generated/backend";
 import ManagedApi from "./ManagedApi";
 
@@ -325,7 +328,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     async getNotePosition(noteId: Doughnut.ID) {
       return (await managedApi.restGet(
         `notes/${noteId}/position`,
-      )) as Generated.NotePositionViewedByUser;
+      )) as NotePositionViewedByUser;
     },
   },
   wikidata: {
@@ -342,13 +345,13 @@ const apiCollection = (managedApi: ManagedApi) => ({
     async getWikidataEntityById(wikidataId: string) {
       return (await managedApi.restGet(
         `wikidata/entity-data/${wikidataId}`,
-      )) as Generated.WikidataEntityData;
+      )) as WikidataEntityData;
     },
 
     async getWikidatas(keyword: string) {
       return (await managedApi.restGet(
         `wikidata/search/${keyword}`,
-      )) as Generated.WikidataSearchEntity[];
+      )) as WikidataSearchEntity[];
     },
   },
   settings: {

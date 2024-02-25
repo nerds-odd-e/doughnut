@@ -1,7 +1,8 @@
+import { WikidataSearchEntity } from "@/generated/backend";
 import Builder from "./Builder";
 
-class WikidataSearchEntityBuilder extends Builder<Generated.WikidataSearchEntity> {
-  data: Generated.WikidataSearchEntity;
+class WikidataSearchEntityBuilder extends Builder<WikidataSearchEntity> {
+  data: WikidataSearchEntity;
 
   constructor() {
     super();

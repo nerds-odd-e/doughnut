@@ -39,6 +39,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { WikidataSearchEntity } from "@/generated/backend";
 import NoteFormTopicOnly from "./NoteFormTopicOnly.vue";
 import SearchResults from "../search/SearchResults.vue";
 import LinkTypeSelectCompact from "../links/LinkTypeSelectCompact.vue";
@@ -97,7 +98,7 @@ export default defineComponent({
           this.processing = false;
         });
     },
-    onSelectWikidataEntry(selectedSuggestion: Generated.WikidataSearchEntity) {
+    onSelectWikidataEntry(selectedSuggestion: WikidataSearchEntity) {
       const currentLabel = this.creationData.topicConstructor.toUpperCase();
       const newLabel = selectedSuggestion.label.toUpperCase();
 

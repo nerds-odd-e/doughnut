@@ -1,9 +1,9 @@
-import { Note } from "@/generated/backend";
+import { Note, NotePositionViewedByUser } from "@/generated/backend";
 import Builder from "./Builder";
 import NoteBuilder from "./NoteBuilder";
 import generateId from "./generateId";
 
-class NotePositionBuilder extends Builder<Generated.NotePositionViewedByUser> {
+class NotePositionBuilder extends Builder<NotePositionViewedByUser> {
   fromBazaar: boolean = false;
 
   circle?: Generated.Circle = undefined;
@@ -30,7 +30,7 @@ class NotePositionBuilder extends Builder<Generated.NotePositionViewedByUser> {
     return this;
   }
 
-  do(): Generated.NotePositionViewedByUser {
+  do(): NotePositionViewedByUser {
     return {
       noteId: generateId(),
       fromBazaar: this.fromBazaar,

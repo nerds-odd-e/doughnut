@@ -8,6 +8,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { NotePositionViewedByUser } from "@/generated/backend";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
 import Breadcrumb from "./Breadcrumb.vue";
@@ -25,7 +26,7 @@ export default defineComponent({
   },
   data() {
     return {
-      notePosition: undefined as Generated.NotePositionViewedByUser | undefined,
+      notePosition: undefined as NotePositionViewedByUser | undefined,
     };
   },
   methods: {

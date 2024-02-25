@@ -4,7 +4,7 @@
 /* eslint-disable */
 export type WikidataSearchEntity = {
     id?: string;
-    label?: string;
+    label: string;
     description?: string;
 };
 

@@ -29,12 +29,13 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { NotePositionViewedByUser } from "@/generated/backend";
 import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue";
 
 export default defineComponent({
   props: {
     notePosition: {
-      type: Object as PropType<Generated.NotePositionViewedByUser>,
+      type: Object as PropType<NotePositionViewedByUser>,
       required: true,
     },
   },

@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type WikidataEntityData = {
-    WikidataTitleInEnglish?: string;
-    WikipediaEnglishUrl?: string;
+    WikidataTitleInEnglish: string;
+    WikipediaEnglishUrl: string;
 };
 
