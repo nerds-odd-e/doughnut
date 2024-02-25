@@ -33,13 +33,14 @@
 
 <script lang="ts">
 import { PropType } from "vue";
+import { SuggestedQuestionForFineTuning } from "@/generated/backend";
 import SuggestedQuestionRow from "./SuggestedQuestionRow.vue";
 import Modal from "../commons/Modal.vue";
 
 export default {
   props: {
     suggestedQuestions: {
-      type: Array as PropType<Generated.SuggestedQuestionForFineTuning[]>,
+      type: Array as PropType<SuggestedQuestionForFineTuning[]>,
       required: true,
     },
   },

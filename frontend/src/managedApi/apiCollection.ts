@@ -1,4 +1,5 @@
 import { User } from "@/generated/backend/models/User";
+import { SuggestedQuestionForFineTuning } from "@/generated/backend";
 import ManagedApi from "./ManagedApi";
 
 const timezoneParam = () => {
@@ -165,7 +166,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     async getSuggestedQuestionsForFineTuning() {
       return (await managedApi.restGet(
         "fine-tuning/all-suggested-questions-for-fine-tuning",
-      )) as Generated.SuggestedQuestionForFineTuning[];
+      )) as SuggestedQuestionForFineTuning[];
     },
     async postUploadAndTriggerFineTuning() {
       await managedApi.restPost(
@@ -186,13 +187,13 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return (await managedApi.restPost(
         `fine-tuning/${id}/duplicate`,
         {},
-      )) as Generated.SuggestedQuestionForFineTuning;
+      )) as SuggestedQuestionForFineTuning;
     },
     async deleteSuggestedQuestionForFineTuning(id: Doughnut.ID) {
       return (await managedApi.restPost(
         `fine-tuning/${id}/delete`,
         {},
-      )) as Generated.SuggestedQuestionForFineTuning;
+      )) as SuggestedQuestionForFineTuning;
     },
   },
   circleMethods: {

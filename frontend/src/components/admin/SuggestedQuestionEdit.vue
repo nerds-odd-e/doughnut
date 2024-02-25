@@ -52,6 +52,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import _ from "lodash";
+import { SuggestedQuestionForFineTuning } from "@/generated/backend";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import TextInput from "../form/TextInput.vue";
 import TextArea from "../form/TextArea.vue";
@@ -70,7 +71,7 @@ export default defineComponent({
   },
   props: {
     modelValue: {
-      type: Object as PropType<Generated.SuggestedQuestionForFineTuning>,
+      type: Object as PropType<SuggestedQuestionForFineTuning>,
       required: true,
     },
   },

@@ -13,6 +13,7 @@
 
 <script lang="ts">
 import { ContentLoader } from "vue-content-loader";
+import { SuggestedQuestionForFineTuning } from "@/generated/backend";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import SuggestedQuestionList from "./SuggestedQuestionList.vue";
 
@@ -23,7 +24,7 @@ export default {
   data() {
     return {
       suggestedQuestions: undefined as
-        | Generated.SuggestedQuestionForFineTuning[]
+        | SuggestedQuestionForFineTuning[]
         | undefined,
       fineTuningDataResultMsg: "",
       showAlert: false,
@@ -31,7 +32,7 @@ export default {
     };
   },
   methods: {
-    async duplicated(duplicated: Generated.SuggestedQuestionForFineTuning) {
+    async duplicated(duplicated: SuggestedQuestionForFineTuning) {
       this.suggestedQuestions = [...this.suggestedQuestions!, duplicated];
     },
     async triggerFineTuning() {

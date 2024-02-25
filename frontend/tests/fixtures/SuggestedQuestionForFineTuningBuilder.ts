@@ -1,7 +1,8 @@
+import { SuggestedQuestionForFineTuning } from "@/generated/backend";
 import Builder from "./Builder";
 
-class SuggestQuestionForFineTuningBuilder extends Builder<Generated.SuggestedQuestionForFineTuning> {
-  data: Generated.SuggestedQuestionForFineTuning;
+class SuggestQuestionForFineTuningBuilder extends Builder<SuggestedQuestionForFineTuning> {
+  data: SuggestedQuestionForFineTuning;
 
   constructor() {
     super();

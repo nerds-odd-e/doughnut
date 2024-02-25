@@ -26,6 +26,7 @@
 
 <script lang="ts">
 import { PropType } from "vue";
+import { SuggestedQuestionForFineTuning } from "@/generated/backend";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopups";
 
@@ -35,7 +36,7 @@ export default {
   },
   props: {
     suggestedQuestion: {
-      type: Object as PropType<Generated.SuggestedQuestionForFineTuning>,
+      type: Object as PropType<SuggestedQuestionForFineTuning>,
       required: true,
     },
   },
@@ -61,9 +62,7 @@ export default {
     },
   },
   methods: {
-    async duplicateQuestion(
-      suggested: Generated.SuggestedQuestionForFineTuning,
-    ) {
+    async duplicateQuestion(suggested: SuggestedQuestionForFineTuning) {
       const duplicated =
         await this.api.fineTuning.duplicateSuggestedQuestionForFineTuning(
           suggested.id,
@@ -73,9 +72,7 @@ export default {
     chatStarter() {
       this.popups.alert(this.chatStarterMessage);
     },
-    async deleteSuggestedQuestion(
-      suggested: Generated.SuggestedQuestionForFineTuning,
-    ) {
+    async deleteSuggestedQuestion(suggested: SuggestedQuestionForFineTuning) {
       if (
         await this.popups.confirm(
           `Are you sure to delete this suggestion (${suggested.preservedQuestion.stem})?`,
