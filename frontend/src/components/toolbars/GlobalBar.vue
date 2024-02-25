@@ -30,6 +30,7 @@
 
 <script lang="ts">
 import { PropType, defineComponent } from "vue";
+import { User } from "@/generated/backend";
 import PopButton from "../commons/Popups/PopButton.vue";
 import SvgSidebar from "../svgs/SvgSidebar.vue";
 import GlobalSidebar from "./GlobalSidebar.vue";
@@ -45,7 +46,7 @@ export default defineComponent({
       required: true,
     },
     apiStatus: { type: Object as PropType<ApiStatus>, required: true },
-    user: { type: Object as PropType<Generated.User> },
+    user: { type: Object as PropType<User> },
   },
   components: {
     PopButton,

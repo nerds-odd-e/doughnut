@@ -50,6 +50,7 @@
 <script lang="ts">
 import { PropType, defineComponent } from "vue";
 import LoadingPage from "@/pages/commons/LoadingPage.vue";
+import { User } from "@/generated/backend";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import PopButton from "../commons/Popups/PopButton.vue";
 import CircleNewDialog from "../circles/CircleNewDialog.vue";
@@ -62,7 +63,7 @@ export default defineComponent({
     return useLoadingApi();
   },
   props: {
-    user: { type: Object as PropType<Generated.User> },
+    user: { type: Object as PropType<User> },
   },
   data() {
     return {

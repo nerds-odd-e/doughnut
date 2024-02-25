@@ -4,6 +4,7 @@ import ManagedApi from "@/managedApi/ManagedApi";
 import GlobalBar from "@/components/toolbars/GlobalBar.vue";
 import NoteEditingHistory from "@/store/NoteEditingHistory";
 import createNoteStorage, { StorageAccessor } from "@/store/createNoteStorage";
+import { User } from "@/generated/backend/models/User";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
@@ -12,7 +13,7 @@ helper.resetWithApiMock(beforeEach, afterEach);
 describe("global bar", () => {
   let noteEditingHistory: NoteEditingHistory;
   let histories: StorageAccessor;
-  let user: Generated.User;
+  let user: User;
 
   beforeEach(() => {
     user = makeMe.aUser().please();

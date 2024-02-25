@@ -8,6 +8,7 @@ import usePopups from "./components/commons/Popups/usePopups";
 import createNoteStorage from "./store/createNoteStorage";
 import ManagedApi, { ApiStatus } from "./managedApi/ManagedApi";
 import GlobalBar from "./components/toolbars/GlobalBar.vue";
+import { User } from "./generated/backend";
 
 export default defineComponent({
   setup() {
@@ -29,7 +30,7 @@ export default defineComponent({
   data() {
     return {
       externalIdentifier: undefined as undefined | string,
-      user: undefined as undefined | Generated.User,
+      user: undefined as undefined | User,
       featureToggle: false,
       environment: "production",
       userLoaded: false,

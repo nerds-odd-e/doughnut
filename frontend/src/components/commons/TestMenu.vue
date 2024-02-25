@@ -26,6 +26,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { User } from "@/generated/backend";
 import PopButton from "./Popups/PopButton.vue";
 import CheckInput from "../form/CheckInput.vue";
 import TextInput from "../form/TextInput.vue";
@@ -37,7 +38,7 @@ export default defineComponent({
   },
   props: {
     featureToggle: Boolean,
-    user: Object as PropType<Generated.User>,
+    user: Object as PropType<User>,
   },
   emits: ["featureToggle"],
   components: {

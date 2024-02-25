@@ -33,6 +33,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { User } from "@/generated/backend";
 import PopButton from "../commons/Popups/PopButton.vue";
 import UserProfileDialog from "./UserProfileDialog.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
@@ -43,7 +44,7 @@ export default defineComponent({
     return useLoadingApi();
   },
   props: {
-    user: { type: Object as PropType<Generated.User>, required: true },
+    user: { type: Object as PropType<User>, required: true },
   },
   emits: ["updateUser"],
   components: {

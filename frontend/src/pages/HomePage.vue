@@ -73,11 +73,12 @@
 import { defineComponent, PropType } from "vue";
 import PopButton from "@/components/commons/Popups/PopButton.vue";
 import GlobalSidebar from "@/components/toolbars/GlobalSidebar.vue";
+import { User } from "@/generated/backend";
 
 export default defineComponent({
   props: {
     user: {
-      type: Object as PropType<Generated.User>,
+      type: Object as PropType<User>,
       required: false,
     },
   },

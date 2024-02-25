@@ -1,5 +1,6 @@
 import { defineComponent, h, PropType } from "vue";
 import { RouterView } from "vue-router";
+import { User } from "@/generated/backend";
 import usePopups from "../../components/commons/Popups/usePopups";
 import routerScopeGuard from "../../routes/relative_routes";
 import { StorageAccessor } from "../../store/createNoteStorage";
@@ -19,7 +20,7 @@ function NestedPage(
         required: true,
       },
       user: {
-        type: Object as PropType<Generated.User>,
+        type: Object as PropType<User>,
         required: true,
       },
     },

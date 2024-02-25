@@ -1,3 +1,4 @@
+import { User } from "@/generated/backend/models/User";
 import ManagedApi from "./ManagedApi";
 
 const timezoneParam = () => {
@@ -22,19 +23,16 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return res;
     },
 
-    async updateUser(userId: Doughnut.ID, data: Generated.User) {
+    async updateUser(userId: Doughnut.ID, data: User) {
       const res = (await managedApi.restPatchMultiplePartForm(
         `user/${userId}`,
         data,
-      )) as Generated.User;
+      )) as User;
       return res;
     },
 
-    async createUser(data: Generated.User) {
-      return (await managedApi.restPostMultiplePartForm(
-        `user`,
-        data,
-      )) as Generated.User;
+    async createUser(data: User) {
+      return (await managedApi.restPostMultiplePartForm(`user`, data)) as User;
     },
   },
 

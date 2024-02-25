@@ -1,8 +1,9 @@
+import { User } from "@/generated/backend/models/User";
 import Builder from "./Builder";
 import generateId from "./generateId";
 
-class UserBuilder extends Builder<Generated.User> {
-  data: Generated.User;
+class UserBuilder extends Builder<User> {
+  data: User;
 
   constructor() {
     super();
@@ -23,7 +24,7 @@ class UserBuilder extends Builder<Generated.User> {
     return this;
   }
 
-  do(): Generated.User {
+  do(): User {
     return this.data;
   }
 }

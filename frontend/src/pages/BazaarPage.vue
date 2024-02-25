@@ -17,6 +17,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { User } from "@/generated/backend";
 import NotebookBazaarViewCards from "../components/bazaar/NotebookBazaarViewCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
@@ -28,7 +29,7 @@ export default defineComponent({
   components: { ContainerPage, NotebookBazaarViewCards },
   props: {
     user: {
-      type: Object as PropType<Generated.User>,
+      type: Object as PropType<User>,
       required: false,
     },
   },
