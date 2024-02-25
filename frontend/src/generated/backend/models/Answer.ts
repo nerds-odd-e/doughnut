@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type Answer = {
-    id?: number;
+    id: number;
     spellingAnswer?: string;
     choiceIndex?: number;
 };

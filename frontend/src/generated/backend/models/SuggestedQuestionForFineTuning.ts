@@ -4,9 +4,9 @@
 /* eslint-disable */
 import type { MCQWithAnswer } from './MCQWithAnswer';
 export type SuggestedQuestionForFineTuning = {
-    id?: number;
+    id: number;
     comment?: string;
-    preservedQuestion?: MCQWithAnswer;
+    preservedQuestion: MCQWithAnswer;
     preservedNoteContent?: string;
     realCorrectAnswers?: string;
     createdAt?: string;

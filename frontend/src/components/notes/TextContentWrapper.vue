@@ -38,7 +38,7 @@ export default defineComponent({
     },
     value: {
       type: String,
-      required: true,
+      required: false,
     },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,

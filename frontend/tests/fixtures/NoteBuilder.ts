@@ -1,4 +1,4 @@
-import { Note } from "@/generated/backend";
+import { Note, NoteRealm } from "@/generated/backend";
 import Builder from "./Builder";
 import generateId from "./generateId";
 
@@ -56,7 +56,7 @@ class NoteBuilder extends Builder<Note> {
     return this;
   }
 
-  under(value: Generated.NoteRealm): NoteBuilder {
+  under(value: NoteRealm): NoteBuilder {
     value.children ||= [];
     value.children.push(this.data);
     this.data.parentId = value.id;

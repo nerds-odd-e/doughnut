@@ -1,13 +1,14 @@
 import { flushPromises } from "@vue/test-utils";
 import { screen } from "@testing-library/vue";
 import NoteShowPage from "@/pages/NoteShowPage.vue";
+import { NoteRealm } from "@/generated/backend";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("NoteRealm", () => {
-  let noteRealm: Generated.NoteRealm;
+  let noteRealm: NoteRealm;
 
   beforeEach(() => {
     noteRealm = makeMe.aNoteRealm.please();

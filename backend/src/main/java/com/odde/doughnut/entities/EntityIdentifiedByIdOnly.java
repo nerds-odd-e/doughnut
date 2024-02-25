@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 import lombok.Getter;
 
@@ -9,6 +10,7 @@ public class EntityIdentifiedByIdOnly {
   @Id
   @Getter
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @NotNull
   protected Integer id;
 
   @Override

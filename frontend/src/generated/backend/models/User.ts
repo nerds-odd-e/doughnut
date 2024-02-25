@@ -4,7 +4,7 @@
 /* eslint-disable */
 import type { Ownership } from './Ownership';
 export type User = {
-    id?: number;
+    id: number;
     name: string;
     externalIdentifier?: string;
     ownership?: Ownership;

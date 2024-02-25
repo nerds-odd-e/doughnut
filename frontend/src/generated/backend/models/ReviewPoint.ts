@@ -4,13 +4,13 @@
 /* eslint-disable */
 import type { Thing } from './Thing';
 export type ReviewPoint = {
-    id?: number;
+    id: number;
     lastReviewedAt?: string;
     nextReviewAt?: string;
     initialReviewedAt?: string;
     repetitionCount?: number;
     forgettingCurveIndex?: number;
     removedFromReview?: boolean;
-    thing?: Thing;
+    thing: Thing;
 };
 

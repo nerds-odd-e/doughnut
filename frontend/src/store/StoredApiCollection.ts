@@ -1,40 +1,39 @@
 import { Router } from "vue-router";
+import { NoteRealm } from "@/generated/backend";
 import ManagedApi from "../managedApi/ManagedApi";
 import apiCollection from "../managedApi/apiCollection";
 import NoteEditingHistory from "./NoteEditingHistory";
 import NoteStorage from "./NoteStorage";
 
 export interface StoredApi {
-  getNoteRealmAndReloadPosition(
-    noteId: Doughnut.ID,
-  ): Promise<Generated.NoteRealm>;
+  getNoteRealmAndReloadPosition(noteId: Doughnut.ID): Promise<NoteRealm>;
 
   createNote(
     router: Router,
     parentId: Doughnut.ID,
     data: Generated.NoteCreationDTO,
-  ): Promise<Generated.NoteRealm>;
+  ): Promise<NoteRealm>;
 
   createLink(
     sourceId: Doughnut.ID,
     targetId: Doughnut.ID,
     data: Generated.LinkCreation,
-  ): Promise<Generated.NoteRealm>;
+  ): Promise<NoteRealm>;
 
   updateLink(
     linkId: Doughnut.ID,
     data: Generated.LinkCreation,
-  ): Promise<Generated.NoteRealm>;
+  ): Promise<NoteRealm>;
 
   deleteLink(
     linkId: Doughnut.ID,
     fromTargetPerspective: boolean,
-  ): Promise<Generated.NoteRealm>;
+  ): Promise<NoteRealm>;
 
   updateNoteAccessories(
     noteId: Doughnut.ID,
     noteAccessories: Generated.NoteAccessories,
-  ): Promise<Generated.NoteRealm>;
+  ): Promise<NoteRealm>;
 
   updateTextField(
     noteId: Doughnut.ID,
@@ -45,14 +44,14 @@ export interface StoredApi {
   updateWikidataId(
     noteId: Doughnut.ID,
     data: Generated.WikidataAssociationCreation,
-  ): Promise<Generated.NoteRealm>;
+  ): Promise<NoteRealm>;
 
-  undo(router: Router): Promise<Generated.NoteRealm>;
+  undo(router: Router): Promise<NoteRealm>;
 
   deleteNote(
     router: Router,
     noteId: Doughnut.ID,
-  ): Promise<Generated.NoteRealm | undefined>;
+  ): Promise<NoteRealm | undefined>;
 }
 export default class StoredApiCollection implements StoredApi {
   noteEditingHistory: NoteEditingHistory;
@@ -72,10 +71,7 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  private routerReplaceFocus(
-    router: Router,
-    focusOnNote?: Generated.NoteRealm,
-  ) {
+  private routerReplaceFocus(router: Router, focusOnNote?: NoteRealm) {
     if (!focusOnNote) {
       return router.replace({ name: "notebooks" });
     }
@@ -108,18 +104,18 @@ export default class StoredApiCollection implements StoredApi {
       return (await this.managedApi.restPatchMultiplePartForm(
         `text_content/${noteId}/topic-constructor`,
         { topicConstructor: content },
-      )) as Generated.NoteRealm;
+      )) as NoteRealm;
     }
     return (await this.managedApi.restPatchMultiplePartForm(
       `text_content/${noteId}/details`,
       { details: content },
-    )) as Generated.NoteRealm;
+    )) as NoteRealm;
   }
 
   async updateWikidataId(
     noteId: Doughnut.ID,
     data: Generated.WikidataAssociationCreation,
-  ): Promise<Generated.NoteRealm> {
+  ): Promise<NoteRealm> {
     return this.storage.refreshNoteRealm(
       await this.statelessApi.wikidata.updateWikidataId(noteId, data),
     );
@@ -150,16 +146,13 @@ export default class StoredApiCollection implements StoredApi {
       (await this.managedApi.restPost(
         `links/create/${sourceId}/${targetId}`,
         data,
-      )) as Generated.NoteRealm,
+      )) as NoteRealm,
     );
   }
 
   async updateLink(linkId: Doughnut.ID, data: Generated.LinkCreation) {
     return this.storage.refreshNoteRealm(
-      (await this.managedApi.restPost(
-        `links/${linkId}`,
-        data,
-      )) as Generated.NoteRealm,
+      (await this.managedApi.restPost(`links/${linkId}`, data)) as NoteRealm,
     );
   }
 
@@ -168,7 +161,7 @@ export default class StoredApiCollection implements StoredApi {
       (await this.managedApi.restPost(
         `links/${linkId}/${fromTargetPerspective ? "tview" : "sview"}/delete`,
         {},
-      )) as Generated.NoteRealm,
+      )) as NoteRealm,
     );
   }
 
@@ -180,7 +173,7 @@ export default class StoredApiCollection implements StoredApi {
       (await this.managedApi.restPatchMultiplePartForm(
         `notes/${noteId}`,
         noteContentData,
-      )) as Generated.NoteRealm,
+      )) as NoteRealm,
     );
   }
 
@@ -191,7 +184,7 @@ export default class StoredApiCollection implements StoredApi {
   ) {
     const currentNote = this.storage.refOfNoteRealm(noteId).value?.note;
     if (currentNote) {
-      const old: string =
+      const old =
         field === "edit topic"
           ? currentNote.topicConstructor
           : currentNote.details;
@@ -220,7 +213,7 @@ export default class StoredApiCollection implements StoredApi {
     return (await this.managedApi.restPatch(
       `notes/${undone.noteId}/undo-delete`,
       {},
-    )) as Generated.NoteRealm;
+    )) as NoteRealm;
   }
 
   async undo(router: Router) {
@@ -236,15 +229,13 @@ export default class StoredApiCollection implements StoredApi {
     const res = (await this.managedApi.restPost(
       `notes/${noteId}/delete`,
       {},
-    )) as Generated.NoteRealm[];
+    )) as NoteRealm[];
     this.noteEditingHistory.deleteNote(noteId);
     if (res.length === 0) {
       this.routerReplaceFocus(router);
       return undefined;
     }
-    const noteRealm = this.storage.refreshNoteRealm(
-      res[0] as Generated.NoteRealm,
-    );
+    const noteRealm = this.storage.refreshNoteRealm(res[0] as NoteRealm);
     this.routerReplaceFocus(router, noteRealm);
     return noteRealm;
   }

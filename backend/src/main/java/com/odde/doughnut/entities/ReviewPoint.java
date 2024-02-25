@@ -8,6 +8,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import lombok.Getter;
@@ -34,6 +35,7 @@ public class ReviewPoint extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private Note note;
 
+  @NotNull
   public Thing getThing() {
     return getNote().buildNoteThing();
   }

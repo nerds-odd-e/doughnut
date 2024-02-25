@@ -8,9 +8,9 @@ import type { Note } from './Note';
 import type { NotePositionViewedByUser } from './NotePositionViewedByUser';
 export type NoteRealm = {
     links?: Record<string, LinkViewed>;
-    note?: Note;
-    notePosition?: NotePositionViewedByUser;
-    id?: number;
+    note: Note;
+    notePosition: NotePositionViewedByUser;
+    id: number;
     children?: Array<HierarchicalNote>;
 };
 

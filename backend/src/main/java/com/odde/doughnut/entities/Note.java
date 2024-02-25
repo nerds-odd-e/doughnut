@@ -14,6 +14,7 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.models.NoteViewer;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.util.*;
@@ -44,7 +45,8 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   @Setter
   private Notebook notebook;
 
-  @Embedded @Valid @Getter private final NoteAccessories noteAccessories = new NoteAccessories();
+  @NotNull @Embedded @Valid @Getter
+  private final NoteAccessories noteAccessories = new NoteAccessories();
 
   @Column(name = "description")
   @Getter
@@ -56,6 +58,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   @Column(name = "topic_constructor")
+  @NotNull
   private String topicConstructor = "";
 
   @Column(name = "created_at")
@@ -191,6 +194,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     return result;
   }
 
+  @NotNull
   public String getTopic() {
     String constructor = getLinkConstructor();
     if (!constructor.contains("%P")) return constructor;

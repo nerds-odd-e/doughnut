@@ -1,7 +1,11 @@
+import {
+  NotebookViewedByUser,
+  NotebooksViewedByUser,
+} from "@/generated/backend";
 import Builder from "./Builder";
 
-class NotebooksBuilder extends Builder<Generated.NotebooksViewedByUser> {
-  data: Generated.NotebooksViewedByUser;
+class NotebooksBuilder extends Builder<NotebooksViewedByUser> {
+  data: NotebooksViewedByUser;
 
   constructor() {
     super();
@@ -11,12 +15,12 @@ class NotebooksBuilder extends Builder<Generated.NotebooksViewedByUser> {
     };
   }
 
-  notebooks(notebook: Generated.NotebookViewedByUser) {
+  notebooks(notebook: NotebookViewedByUser) {
     this.data.notebooks = [...this.data.notebooks, notebook];
     return this;
   }
 
-  do(): Generated.NotebooksViewedByUser {
+  do(): NotebooksViewedByUser {
     return this.data;
   }
 }

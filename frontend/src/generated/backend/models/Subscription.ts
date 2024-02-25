@@ -8,7 +8,7 @@ import type { User } from './User';
 export type Subscription = {
     headNote?: Note;
     title?: string;
-    id?: number;
+    id: number;
     dailyTargetOfNewNotes?: number;
     user?: User;
     notebook?: Notebook;

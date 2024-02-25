@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type Circle = {
-    id?: number;
+    id: number;
     name: string;
 };
 

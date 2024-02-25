@@ -1,22 +1,23 @@
+import { NoteRealm } from "@/generated/backend";
 import { Ref, ref } from "vue";
 
 export default interface NoteStorage {
-  refreshNoteRealm(data: Generated.NoteRealm): Generated.NoteRealm;
-  refOfNoteRealm(noteId: Doughnut.ID): Ref<Generated.NoteRealm | undefined>;
+  refreshNoteRealm(data: NoteRealm): NoteRealm;
+  refOfNoteRealm(noteId: Doughnut.ID): Ref<NoteRealm | undefined>;
 }
 
 export class StorageImplementation implements NoteStorage {
-  cache: Map<Doughnut.ID, Ref<Generated.NoteRealm | undefined>> = new Map();
+  cache: Map<Doughnut.ID, Ref<NoteRealm | undefined>> = new Map();
 
-  refreshNoteRealm(noteRealm: Generated.NoteRealm): Generated.NoteRealm {
+  refreshNoteRealm(noteRealm: NoteRealm): NoteRealm {
     this.refOfNoteRealm(noteRealm?.id).value = noteRealm;
     return noteRealm;
   }
 
-  refOfNoteRealm(noteId: Doughnut.ID): Ref<Generated.NoteRealm | undefined> {
+  refOfNoteRealm(noteId: Doughnut.ID): Ref<NoteRealm | undefined> {
     if (!this.cache.has(noteId)) {
       this.cache.set(noteId, ref(undefined));
     }
-    return this.cache.get(noteId) as Ref<Generated.NoteRealm | undefined>;
+    return this.cache.get(noteId) as Ref<NoteRealm | undefined>;
   }
 }

@@ -7,7 +7,7 @@
   <p v-if="currentQuestionLegitMessage">{{ currentQuestionLegitMessage }}</p>
   <ContentLoader v-if="regenerating" />
   <div class="quiz-question" v-else>
-    <AnsweredQuestion
+    <AnsweredQuestionComponent
       v-if="answeredQuestion"
       :answered-question="answeredQuestion"
       :storage-accessor="storageAccessor"
@@ -36,7 +36,7 @@ import { defineComponent, PropType } from "vue";
 import type { StorageAccessor } from "@/store/createNoteStorage";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import QuizQuestion from "./QuizQuestion.vue";
-import AnsweredQuestion from "./AnsweredQuestion.vue";
+import AnsweredQuestionComponent from "./AnsweredQuestionComponent.vue";
 
 export default defineComponent({
   setup() {
@@ -55,7 +55,7 @@ export default defineComponent({
   emits: ["need-scroll", "answered"],
   components: {
     QuizQuestion,
-    AnsweredQuestion,
+    AnsweredQuestionComponent,
   },
   data() {
     return {

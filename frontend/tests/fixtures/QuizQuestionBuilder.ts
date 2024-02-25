@@ -1,9 +1,10 @@
+import { QuizQuestion } from "@/generated/backend";
 import Builder from "./Builder";
 import NoteBuilder from "./NoteBuilder";
 import generateId from "./generateId";
 
-class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
-  quizQuestion: Generated.QuizQuestion = {
+class QuizQuestionBuilder extends Builder<QuizQuestion> {
+  quizQuestion: QuizQuestion = {
     id: generateId(),
     choices: [],
     stem: "answer",
@@ -24,7 +25,7 @@ class QuizQuestionBuilder extends Builder<Generated.QuizQuestion> {
     return this;
   }
 
-  do(): Generated.QuizQuestion {
+  do(): QuizQuestion {
     return this.quizQuestion;
   }
 }

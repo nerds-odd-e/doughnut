@@ -25,7 +25,7 @@ import TextContentWrapper from "./TextContentWrapper.vue";
 export default defineComponent({
   props: {
     noteId: { type: Number, required: true },
-    noteDetails: { type: String, required: true },
+    noteDetails: { type: String, required: false },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,

@@ -5,7 +5,7 @@
 import type { NotebookViewedByUser } from './NotebookViewedByUser';
 import type { Subscription } from './Subscription';
 export type NotebooksViewedByUser = {
-    notebooks?: Array<NotebookViewedByUser>;
+    notebooks: Array<NotebookViewedByUser>;
     subscriptions?: Array<Subscription>;
 };
 

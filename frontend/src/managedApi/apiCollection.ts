@@ -1,7 +1,10 @@
 import { User } from "@/generated/backend/models/User";
 import {
+  AiCompletionAnswerClarifyingQuestionParams,
+  AiCompletionParams,
   GlobalAiModelSettings,
   Note,
+  NoteRealm,
   SuggestedQuestionForFineTuning,
 } from "@/generated/backend";
 import ManagedApi from "./ManagedApi";
@@ -311,12 +314,10 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return (await managedApi.restPostMultiplePartForm(
         `notes/${parentId}/create`,
         data,
-      )) as Generated.NoteRealm;
+      )) as NoteRealm;
     },
     async getNoteRealm(noteId: Doughnut.ID) {
-      return (await managedApi.restGet(
-        `notes/${noteId}`,
-      )) as Generated.NoteRealm;
+      return (await managedApi.restGet(`notes/${noteId}`)) as NoteRealm;
     },
 
     async getNotePosition(noteId: Doughnut.ID) {
@@ -333,7 +334,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return (await managedApi.restPost(
         `notes/${noteId}/updateWikidataId`,
         data,
-      )) as Generated.NoteRealm;
+      )) as NoteRealm;
     },
 
     async getWikidataEntityById(wikidataId: string) {
@@ -381,10 +382,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return (await managedApi.restGet(`ai/available-gpt-models`)) as string[];
     },
 
-    async askAiCompletion(
-      noteId: Doughnut.ID,
-      request: Generated.AiCompletionParams,
-    ) {
+    async askAiCompletion(noteId: Doughnut.ID, request: AiCompletionParams) {
       return (await managedApi.restPost(
         `ai/${noteId}/completion`,
         request,
@@ -392,7 +390,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
 
     async answerCompletionClarifyingQuestion(
-      request: Generated.AiCompletionAnswerClarifyingQuestionParams,
+      request: AiCompletionAnswerClarifyingQuestionParams,
     ) {
       return (await managedApi.restPost(
         `ai/answer-clarifying-question`,

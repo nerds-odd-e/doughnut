@@ -1,11 +1,12 @@
 import { merge } from "lodash";
+import { NoteRealm } from "@/generated/backend";
 import Builder from "./Builder";
 import LinkViewedBuilder from "./LinkViewedBuilder";
 import NoteBuilder from "./NoteBuilder";
 import NotePositionBuilder from "./NotePositionBuilder";
 
-class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
-  data: Generated.NoteRealm;
+class NoteRealmBuilder extends Builder<NoteRealm> {
+  data: NoteRealm;
 
   noteBuilder;
 
@@ -50,7 +51,7 @@ class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
     return this;
   }
 
-  under(value: Generated.NoteRealm): NoteRealmBuilder {
+  under(value: NoteRealm): NoteRealmBuilder {
     value?.children?.push(this.data.note);
     this.data.note.parentId = value.id;
 
@@ -66,7 +67,7 @@ class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
     return this.linkTo(new NoteRealmBuilder().topicConstructor(title).do());
   }
 
-  linkTo(note: Generated.NoteRealm): NoteRealmBuilder {
+  linkTo(note: NoteRealm): NoteRealmBuilder {
     merge(
       this.data.links,
       new LinkViewedBuilder("using", this.data, note).please(),
@@ -74,7 +75,7 @@ class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
     return this;
   }
 
-  do(): Generated.NoteRealm {
+  do(): NoteRealm {
     this.data.note = this.noteBuilder.do();
     this.data.notePosition = this.notePositionBuilder.do();
     return this.data;

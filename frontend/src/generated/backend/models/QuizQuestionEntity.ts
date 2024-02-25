@@ -5,7 +5,7 @@
 import type { Note } from './Note';
 import type { PictureWithMask } from './PictureWithMask';
 export type QuizQuestionEntity = {
-    id?: number;
+    id: number;
     note?: Note;
     createdAt?: string;
     stem?: string;

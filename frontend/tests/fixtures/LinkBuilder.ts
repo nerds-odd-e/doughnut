@@ -1,10 +1,11 @@
+import { Thing } from "@/generated/backend";
 import Builder from "./Builder";
 import NoteRealmBuilder from "./NoteRealmBuilder";
 
-class LinkBuilder extends Builder<Generated.Thing> {
+class LinkBuilder extends Builder<Thing> {
   sourceNoteBuilder = new NoteRealmBuilder();
 
-  do(): Generated.Thing {
+  do(): Thing {
     return {
       id: 8,
       linkType: "related to",

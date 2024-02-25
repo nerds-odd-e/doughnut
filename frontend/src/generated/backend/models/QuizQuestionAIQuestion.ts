@@ -5,7 +5,7 @@
 import type { Note } from './Note';
 import type { PictureWithMask } from './PictureWithMask';
 export type QuizQuestionAIQuestion = {
-    id?: number;
+    id: number;
     note?: Note;
     createdAt?: string;
     rawJsonQuestion?: string;

@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <LoadingPage v-bind="{ contentExists: !!answeredQuestion }">
-      <AnsweredQuestion
+      <AnsweredQuestionComponent
         v-if="answeredQuestion"
         v-bind="{ answeredQuestion, storageAccessor }"
         @self-evaluated="onSelfEvaluated($event)"
@@ -14,7 +14,7 @@
 import { defineComponent, PropType } from "vue";
 import LoadingPage from "./commons/LoadingPage.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
-import AnsweredQuestion from "../components/review/AnsweredQuestion.vue";
+import AnsweredQuestionComponent from "../components/review/AnsweredQuestionComponent.vue";
 import { StorageAccessor } from "../store/createNoteStorage";
 
 export default defineComponent({
@@ -30,7 +30,7 @@ export default defineComponent({
   },
   components: {
     LoadingPage,
-    AnsweredQuestion,
+    AnsweredQuestionComponent,
   },
   data() {
     return {

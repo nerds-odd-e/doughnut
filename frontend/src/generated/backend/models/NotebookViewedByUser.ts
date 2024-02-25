@@ -6,7 +6,7 @@ import type { Note } from './Note';
 export type NotebookViewedByUser = {
     id?: number;
     headNoteId?: number;
-    headNote?: Note;
+    headNote: Note;
     skipReviewEntirely?: boolean;
 };
 

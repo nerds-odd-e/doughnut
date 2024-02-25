@@ -1,3 +1,5 @@
+import { Thing } from "@/generated/backend/models/Thing";
+import { NoteRealm } from "@/generated/backend";
 import LinksMap from "../../src/models/LinksMap";
 import Builder from "./Builder";
 import generateId from "./generateId";
@@ -9,15 +11,11 @@ class LinkViewedBuilder extends Builder<LinksMap> {
 
   isReverse: boolean;
 
-  fromNote: Generated.NoteRealm;
+  fromNote: NoteRealm;
 
-  toNote: Generated.NoteRealm;
+  toNote: NoteRealm;
 
-  constructor(
-    linkType: Generated.LinkType,
-    from: Generated.NoteRealm,
-    to: Generated.NoteRealm,
-  ) {
+  constructor(linkType: Generated.LinkType, from: NoteRealm, to: NoteRealm) {
     super();
     this.linkType = linkType;
     this.cnt = 1;
@@ -56,7 +54,7 @@ class LinkViewedBuilder extends Builder<LinksMap> {
     };
   }
 
-  private link(): Generated.Thing {
+  private link(): Thing {
     return {
       id: generateId(),
       targetNote: this.toNote.note,

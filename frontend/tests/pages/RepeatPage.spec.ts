@@ -1,6 +1,7 @@
 import { describe, it, vi, expect, beforeEach, afterEach } from "vitest";
 import { flushPromises } from "@vue/test-utils";
 import RepeatPage from "@/pages/RepeatPage.vue";
+import { AnsweredQuestion, QuizQuestion } from "@/generated/backend";
 import mockBrowserTimeZone from "../helpers/mockBrowserTimeZone";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
@@ -60,7 +61,7 @@ describe("repeat page", () => {
 
   describe('repeat page with "just review" quiz', () => {
     let repetition: Generated.DueReviewPoints;
-    let quizQuestion: Generated.QuizQuestion;
+    let quizQuestion: QuizQuestion;
     const reviewPointId = 123;
     const secondReviewPointId = 456;
 
@@ -85,7 +86,7 @@ describe("repeat page", () => {
 
     it("should show progress", async () => {
       const wrapper = await mountPage(repetition);
-      const answerResult: Generated.AnsweredQuestion = {
+      const answerResult: AnsweredQuestion = {
         answerId: 1,
         correct: false,
         answerDisplay: "my answer",

@@ -4,7 +4,7 @@
 /* eslint-disable */
 import type { Thing } from './Thing';
 export type LinkViewed = {
-    direct?: Array<Thing>;
-    reverse?: Array<Thing>;
+    direct: Array<Thing>;
+    reverse: Array<Thing>;
 };
 

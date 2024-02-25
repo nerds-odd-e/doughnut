@@ -5,7 +5,7 @@
 import type { Note } from './Note';
 import type { Ownership } from './Ownership';
 export type Notebook = {
-    id?: number;
+    id: number;
     ownership?: Ownership;
     headNote?: Note;
     skipReviewEntirely?: boolean;

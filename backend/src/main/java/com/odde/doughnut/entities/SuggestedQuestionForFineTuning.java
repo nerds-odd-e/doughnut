@@ -9,11 +9,11 @@ import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.AiToolList;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.lang.Nullable;
@@ -26,7 +26,7 @@ public class SuggestedQuestionForFineTuning extends EntityIdentifiedByIdOnly {
   @JoinColumn(name = "user_id")
   @Getter
   @Setter
-  @NonNull
+  @NotNull
   @JsonIgnore
   private User user;
 
@@ -41,6 +41,7 @@ public class SuggestedQuestionForFineTuning extends EntityIdentifiedByIdOnly {
   private boolean isPositiveFeedback;
 
   @Column(name = "preserved_question")
+  @NotNull
   private String preservedQuestion;
 
   @Column(name = "preserved_note_content")

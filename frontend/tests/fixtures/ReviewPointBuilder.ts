@@ -1,8 +1,10 @@
+import { Thing } from "@/generated/backend/models/Thing";
+import { NoteRealm, ReviewPoint } from "@/generated/backend";
 import Builder from "./Builder";
 import generateId from "./generateId";
 
-class ReviewPointBuilder extends Builder<Generated.ReviewPoint> {
-  data: Generated.ReviewPoint;
+class ReviewPointBuilder extends Builder<ReviewPoint> {
+  data: ReviewPoint;
 
   constructor() {
     super();
@@ -20,17 +22,17 @@ class ReviewPointBuilder extends Builder<Generated.ReviewPoint> {
     };
   }
 
-  ofNote(note: Generated.NoteRealm): ReviewPointBuilder {
+  ofNote(note: NoteRealm): ReviewPointBuilder {
     this.data.thing.note = note.note;
     return this;
   }
 
-  ofLink(link: Generated.Thing): ReviewPointBuilder {
+  ofLink(link: Thing): ReviewPointBuilder {
     this.data.thing = link;
     return this;
   }
 
-  do(): Generated.ReviewPoint {
+  do(): ReviewPoint {
     return this.data;
   }
 }
