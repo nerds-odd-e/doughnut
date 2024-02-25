@@ -1,5 +1,6 @@
 import { VueWrapper, flushPromises } from "@vue/test-utils";
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue";
+import { Note } from "@/generated/backend";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
@@ -7,7 +8,7 @@ helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("Save wikidata id", () => {
   const wikidataId = "Q123";
-  async function putWikidataIdAndSubmit(note: Generated.Note) {
+  async function putWikidataIdAndSubmit(note: Note) {
     const wrapper = helper
       .component(WikidataAssociationDialog)
       .withStorageProps({

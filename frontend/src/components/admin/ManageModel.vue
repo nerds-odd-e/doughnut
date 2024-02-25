@@ -8,15 +8,14 @@
 </template>
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
+import { GlobalAiModelSettings } from "@/generated/backend";
 import ManageModelInner from "./ManageModelInner.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
 
 const { api } = useLoadingApi();
 const modelList = ref<string[] | undefined>(undefined);
-const selectedModels = ref<Generated.GlobalAiModelSettings | undefined>(
-  undefined,
-);
+const selectedModels = ref<GlobalAiModelSettings | undefined>(undefined);
 
 onMounted(() => {
   Promise.all([
@@ -29,7 +28,7 @@ onMounted(() => {
   });
 });
 
-const save = async (settings: Generated.GlobalAiModelSettings) => {
+const save = async (settings: GlobalAiModelSettings) => {
   selectedModels.value = await api.settings.setManageModelSelected(settings);
 };
 </script>

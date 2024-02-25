@@ -18,13 +18,14 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { Note } from "@/generated/backend";
 import LinkNoteFinalize from "./LinkNoteFinalize.vue";
 import SearchNote from "../search/SearchNote.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   props: {
-    note: Object as PropType<Generated.Note>,
+    note: Object as PropType<Note>,
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,
@@ -36,7 +37,7 @@ export default defineComponent({
     return {
       targetNote: undefined,
     } as {
-      targetNote: Generated.Note | undefined;
+      targetNote: Note | undefined;
     };
   },
 });

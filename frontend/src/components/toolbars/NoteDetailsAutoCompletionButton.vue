@@ -25,6 +25,7 @@
 import { defineComponent, PropType } from "vue";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import { StorageAccessor } from "@/store/createNoteStorage";
+import { Note } from "@/generated/backend";
 import SvgRobot from "../svgs/SvgRobot.vue";
 import AIClarifyingQuestionDialog from "../notes/AIClarifyingQuestionDialog.vue";
 import Modal from "../commons/Modal.vue";
@@ -41,7 +42,7 @@ export default defineComponent({
       required: true,
     },
     note: {
-      type: Object as PropType<Generated.Note>,
+      type: Object as PropType<Note>,
       required: true,
     },
   },

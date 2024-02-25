@@ -1,5 +1,9 @@
 import { User } from "@/generated/backend/models/User";
-import { SuggestedQuestionForFineTuning } from "@/generated/backend";
+import {
+  GlobalAiModelSettings,
+  Note,
+  SuggestedQuestionForFineTuning,
+} from "@/generated/backend";
 import ManagedApi from "./ManagedApi";
 
 const timezoneParam = () => {
@@ -224,12 +228,9 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return (await managedApi.restPost(
         `notes/${noteId}/search`,
         searchTerm,
-      )) as Generated.Note[];
+      )) as Note[];
     }
-    return (await managedApi.restPost(
-      `notes/search`,
-      searchTerm,
-    )) as Generated.Note[];
+    return (await managedApi.restPost(`notes/search`, searchTerm)) as Note[];
   },
 
   async getBazaar() {
@@ -351,13 +352,13 @@ const apiCollection = (managedApi: ManagedApi) => ({
     async getManageModelSelected() {
       return (await managedApi.restGet(
         `settings/current-model-version`,
-      )) as Generated.GlobalAiModelSettings;
+      )) as GlobalAiModelSettings;
     },
-    async setManageModelSelected(settings: Generated.GlobalAiModelSettings) {
+    async setManageModelSelected(settings: GlobalAiModelSettings) {
       return (await managedApi.restPost(
         `settings/current-model-version`,
         settings,
-      )) as Generated.GlobalAiModelSettings;
+      )) as GlobalAiModelSettings;
     },
   },
   ai: {

@@ -35,6 +35,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { Note } from "@/generated/backend";
 import TextInput from "../form/TextInput.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import { StorageAccessor } from "../../store/createNoteStorage";
@@ -44,7 +45,7 @@ export default defineComponent({
     return { ...useLoadingApi() };
   },
   props: {
-    note: { type: Object as PropType<Generated.Note>, required: true },
+    note: { type: Object as PropType<Note>, required: true },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,

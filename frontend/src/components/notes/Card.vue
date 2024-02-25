@@ -13,12 +13,13 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { Note } from "@/generated/backend";
 import NoteTopicWithLink from "./NoteTopicWithLink.vue";
 import NoteShortDetails from "./NoteShortDetails.vue";
 
 export default defineComponent({
   props: {
-    note: { type: Object as PropType<Generated.Note>, required: true },
+    note: { type: Object as PropType<Note>, required: true },
   },
   components: {
     NoteTopicWithLink,

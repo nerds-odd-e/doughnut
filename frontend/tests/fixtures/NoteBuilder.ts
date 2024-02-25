@@ -1,8 +1,9 @@
+import { Note } from "@/generated/backend";
 import Builder from "./Builder";
 import generateId from "./generateId";
 
-class NoteBuilder extends Builder<Generated.Note> {
-  data: Generated.Note;
+class NoteBuilder extends Builder<Note> {
+  data: Note;
 
   constructor() {
     super();
@@ -24,7 +25,7 @@ class NoteBuilder extends Builder<Generated.Note> {
     };
   }
 
-  for(note: Generated.Note | undefined) {
+  for(note: Note | undefined) {
     if (note) {
       this.data = note;
     }
@@ -68,7 +69,7 @@ class NoteBuilder extends Builder<Generated.Note> {
     return this;
   }
 
-  do(): Generated.Note {
+  do(): Note {
     return this.data;
   }
 }

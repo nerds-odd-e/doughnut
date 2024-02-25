@@ -1,3 +1,4 @@
+import { Note } from "@/generated/backend";
 import Builder from "./Builder";
 import generateId from "./generateId";
 import NoteBuilder from "./NoteBuilder";
@@ -17,7 +18,7 @@ class NotebookBuilder extends Builder<Generated.NotebookViewedByUser> {
     };
   }
 
-  headNote(headNote: Generated.Note | undefined) {
+  headNote(headNote: Note | undefined) {
     this.notebuilder.for(headNote);
     return this;
   }

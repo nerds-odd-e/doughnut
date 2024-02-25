@@ -2,6 +2,7 @@ import { VueWrapper, flushPromises } from "@vue/test-utils";
 import { ComponentPublicInstance } from "vue";
 import NoteTextContent from "@/components/notes/NoteTextContent.vue";
 import TextContentWrapper from "@/components/notes/TextContentWrapper.vue";
+import { Note } from "@/generated/backend";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
@@ -9,9 +10,7 @@ helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("in place edit on title", () => {
   const note = makeMe.aNote.topicConstructor("Dummy Title").please();
-  const mountComponent = (
-    n: Generated.Note,
-  ): VueWrapper<ComponentPublicInstance> => {
+  const mountComponent = (n: Note): VueWrapper<ComponentPublicInstance> => {
     return helper
       .component(NoteTextContent)
       .withStorageProps({

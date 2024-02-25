@@ -75,6 +75,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { StorageAccessor } from "@/store/createNoteStorage";
+import { Note } from "@/generated/backend";
 import NoteNewButton from "./NoteNewButton.vue";
 import SvgAddChild from "../svgs/SvgAddChild.vue";
 import SvgEdit from "../svgs/SvgEdit.vue";
@@ -96,7 +97,7 @@ export default defineComponent({
       required: true,
     },
     note: {
-      type: Object as PropType<Generated.Note>,
+      type: Object as PropType<Note>,
       required: true,
     },
   },

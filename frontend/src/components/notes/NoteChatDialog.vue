@@ -44,6 +44,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import type { StorageAccessor } from "@/store/createNoteStorage";
+import { Note } from "@/generated/backend";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import ContestableQuestion from "../review/ContestableQuestion.vue";
 import scrollToElement from "../commons/scrollToElement";
@@ -53,7 +54,7 @@ export default defineComponent({
     return useLoadingApi();
   },
   props: {
-    selectedNote: { type: Object as PropType<Generated.Note>, required: true },
+    selectedNote: { type: Object as PropType<Note>, required: true },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,

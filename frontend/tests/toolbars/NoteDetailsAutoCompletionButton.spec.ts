@@ -1,6 +1,7 @@
 import { flushPromises } from "@vue/test-utils";
 import NoteDetailsAutoCompletionButton from "@/components/toolbars/NoteDetailsAutoCompletionButton.vue";
 import AIClarifyingQuestionDialog from "@/components/notes/AIClarifyingQuestionDialog.vue";
+import { Note } from "@/generated/backend";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
@@ -9,9 +10,7 @@ describe("NoteDetailsAutoCompletionButton", () => {
 
   helper.resetWithApiMock(beforeEach, afterEach);
 
-  const triggerAutoCompletionWithoutFlushPromises = async (
-    n: Generated.Note,
-  ) => {
+  const triggerAutoCompletionWithoutFlushPromises = async (n: Note) => {
     const wrapper = helper
       .component(NoteDetailsAutoCompletionButton)
       .withStorageProps({ note: n })
@@ -20,7 +19,7 @@ describe("NoteDetailsAutoCompletionButton", () => {
     return wrapper;
   };
 
-  const triggerAutoCompletion = async (n: Generated.Note) => {
+  const triggerAutoCompletion = async (n: Note) => {
     const wrapper = triggerAutoCompletionWithoutFlushPromises(n);
     await flushPromises();
     return wrapper;

@@ -1,3 +1,4 @@
+import { Note } from "@/generated/backend";
 import Builder from "./Builder";
 import NoteBuilder from "./NoteBuilder";
 import generateId from "./generateId";
@@ -9,9 +10,9 @@ class NotePositionBuilder extends Builder<Generated.NotePositionViewedByUser> {
 
   headNoteBuilder = new NoteBuilder();
 
-  headNote?: Generated.Note;
+  headNote?: Note;
 
-  for(note: Generated.Note) {
+  for(note: Note) {
     this.headNote = note;
     return this;
   }

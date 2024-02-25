@@ -11,6 +11,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { Note } from "@/generated/backend";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteShell from "./NoteShell.vue";
 import NoteContent from "./NoteContent.vue";
@@ -19,7 +20,7 @@ import LinksMap from "../../models/LinksMap";
 
 export default defineComponent({
   props: {
-    note: { type: Object as PropType<Generated.Note>, required: true },
+    note: { type: Object as PropType<Note>, required: true },
     links: {
       type: Object as PropType<LinksMap>,
     },

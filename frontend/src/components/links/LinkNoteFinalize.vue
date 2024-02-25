@@ -39,6 +39,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { Note } from "@/generated/backend";
 import LinkTypeSelect from "./LinkTypeSelect.vue";
 import CheckInput from "../form/CheckInput.vue";
 import RadioButtons from "../form/RadioButtons.vue";
@@ -54,8 +55,8 @@ export default defineComponent({
   },
   name: "LinkNoteFinalize",
   props: {
-    note: { type: Object as PropType<Generated.Note>, required: true },
-    targetNote: { type: Object as PropType<Generated.Note>, required: true },
+    note: { type: Object as PropType<Note>, required: true },
+    targetNote: { type: Object as PropType<Note>, required: true },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,

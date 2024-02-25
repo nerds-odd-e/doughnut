@@ -16,13 +16,14 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { Note } from "@/generated/backend";
 import BreadcrumbAsync from "../toolbars/BreadcrumbAsync.vue";
 import Card from "../notes/Card.vue";
 
 export default defineComponent({
   name: "LinkNoteShow",
   props: {
-    note: { type: Object as PropType<Generated.Note>, required: true },
+    note: { type: Object as PropType<Note>, required: true },
   },
   components: { BreadcrumbAsync, Card },
 });

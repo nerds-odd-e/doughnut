@@ -26,6 +26,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { debounce } from "mini-debounce";
+import { Note } from "@/generated/backend";
 import CheckInput from "../form/CheckInput.vue";
 import Cards from "../notes/Cards.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
@@ -55,10 +56,10 @@ export default defineComponent({
         global: {},
         local: {},
       } as {
-        global: Record<string, Generated.Note[]>;
-        local: Record<string, Generated.Note[]>;
+        global: Record<string, Note[]>;
+        local: Record<string, Note[]>;
       },
-      recentResult: undefined as Generated.Note[] | undefined,
+      recentResult: undefined as Note[] | undefined,
       timeoutId: null as unknown as ReturnType<typeof setTimeout>,
     };
   },

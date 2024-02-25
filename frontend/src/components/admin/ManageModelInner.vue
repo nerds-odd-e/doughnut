@@ -40,6 +40,7 @@
 </template>
 <script lang="ts" setup>
 import { PropType, ref } from "vue";
+import { GlobalAiModelSettings } from "@/generated/backend";
 import Select from "../form/Select.vue";
 
 const props = defineProps({
@@ -48,7 +49,7 @@ const props = defineProps({
     required: true,
   },
   selectedModels: {
-    type: Object as PropType<Generated.GlobalAiModelSettings>,
+    type: Object as PropType<GlobalAiModelSettings>,
     required: true,
   },
 });
