@@ -16,6 +16,7 @@ import {
   ReviewSetting,
   SuggestedQuestionForFineTuning,
   Thing,
+  WikidataAssociationCreation,
   WikidataEntityData,
   WikidataSearchEntity,
 } from "@/generated/backend";
@@ -329,7 +330,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
   wikidata: {
     async updateWikidataId(
       noteId: Doughnut.ID,
-      data: Generated.WikidataAssociationCreation,
+      data: WikidataAssociationCreation,
     ) {
       return (await managedApi.restPost(
         `notes/${noteId}/updateWikidataId`,

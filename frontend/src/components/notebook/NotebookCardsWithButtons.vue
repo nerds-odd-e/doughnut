@@ -18,11 +18,12 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { NotebookViewedByUser } from "@/generated/backend";
 import Card from "../notes/Card.vue";
 
 export default defineComponent({
   props: {
-    notebooks: Array as PropType<Array<Generated.NotebookViewedByUser>>,
+    notebooks: Array as PropType<Array<NotebookViewedByUser>>,
   },
   components: { Card },
 });

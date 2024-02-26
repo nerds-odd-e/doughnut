@@ -3,6 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export type WikidataAssociationCreation = {
-    wikidataId?: string;
+    wikidataId: string;
 };
 

@@ -35,7 +35,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { Note } from "@/generated/backend";
+import { Note, WikidataAssociationCreation } from "@/generated/backend";
 import TextInput from "../form/TextInput.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import { StorageAccessor } from "../../store/createNoteStorage";
@@ -57,7 +57,7 @@ export default defineComponent({
     return {
       associationData: {
         wikidataId: this.note.wikidataId,
-      } as Generated.WikidataAssociationCreation,
+      } as WikidataAssociationCreation,
       conflictWikidataTitle: undefined as undefined | string,
       wikidataIdError: undefined as undefined | string,
     };

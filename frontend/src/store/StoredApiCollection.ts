@@ -4,6 +4,7 @@ import {
   NoteAccessories,
   NoteCreationDTO,
   NoteRealm,
+  WikidataAssociationCreation,
 } from "@/generated/backend";
 import ManagedApi from "../managedApi/ManagedApi";
 import apiCollection from "../managedApi/apiCollection";
@@ -45,7 +46,7 @@ export interface StoredApi {
 
   updateWikidataId(
     noteId: Doughnut.ID,
-    data: Generated.WikidataAssociationCreation,
+    data: WikidataAssociationCreation,
   ): Promise<NoteRealm>;
 
   undo(router: Router): Promise<NoteRealm>;
@@ -116,7 +117,7 @@ export default class StoredApiCollection implements StoredApi {
 
   async updateWikidataId(
     noteId: Doughnut.ID,
-    data: Generated.WikidataAssociationCreation,
+    data: WikidataAssociationCreation,
   ): Promise<NoteRealm> {
     return this.storage.refreshNoteRealm(
       await this.statelessApi.wikidata.updateWikidataId(noteId, data),
