@@ -1,4 +1,4 @@
-import { Note, NotePositionViewedByUser } from "@/generated/backend";
+import { Circle, Note, NotePositionViewedByUser } from "@/generated/backend";
 import Builder from "./Builder";
 import NoteBuilder from "./NoteBuilder";
 import generateId from "./generateId";
@@ -6,7 +6,7 @@ import generateId from "./generateId";
 class NotePositionBuilder extends Builder<NotePositionViewedByUser> {
   fromBazaar: boolean = false;
 
-  circle?: Generated.Circle = undefined;
+  circle?: Circle = undefined;
 
   headNoteBuilder = new NoteBuilder();
 

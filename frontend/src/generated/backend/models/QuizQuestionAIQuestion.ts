@@ -9,9 +9,9 @@ export type QuizQuestionAIQuestion = {
     note?: Note;
     createdAt?: string;
     rawJsonQuestion?: string;
+    correctAnswerIndex?: number;
     stem?: string;
     mainTopic?: string;
     pictureWithMask?: PictureWithMask;
-    correctAnswerIndex?: number;
 };
 

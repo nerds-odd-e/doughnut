@@ -8,7 +8,7 @@ class LinkBuilder extends Builder<Thing> {
   do(): Thing {
     return {
       id: 8,
-      linkType: "related to",
+      linkType: Thing.linkType.RELATED_TO,
       sourceNote: this.sourceNoteBuilder.do().note,
       targetNote: new NoteRealmBuilder().do().note,
     };

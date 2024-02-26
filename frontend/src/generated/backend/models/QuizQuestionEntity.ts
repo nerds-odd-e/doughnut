@@ -8,9 +8,9 @@ export type QuizQuestionEntity = {
     id: number;
     note?: Note;
     createdAt?: string;
+    correctAnswerIndex?: number;
     stem?: string;
     mainTopic?: string;
     pictureWithMask?: PictureWithMask;
-    correctAnswerIndex?: number;
 };
 

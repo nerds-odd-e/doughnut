@@ -59,7 +59,7 @@ class LinkViewedBuilder extends Builder<LinksMap> {
       id: generateId(),
       targetNote: this.toNote.note,
       sourceNote: this.fromNote.note,
-      linkType: "using",
+      linkType: Thing.linkType.USING,
     };
   }
 }
