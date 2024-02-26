@@ -9,10 +9,10 @@ export type HierarchicalNote = {
     topicConstructor: string;
     details?: string;
     parentId?: number;
-    updatedAt?: string;
+    updatedAt: string;
     id: number;
     noteAccessories: NoteAccessories;
-    createdAt?: string;
+    createdAt: string;
     readonly deletedAt?: string;
     wikidataId?: string;
     pictureWithMask?: PictureWithMask;

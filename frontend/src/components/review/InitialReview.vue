@@ -15,6 +15,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { Thing } from "@/generated/backend";
 import ShowThing from "./ShowThing.vue";
 import InitialReviewButtons from "./InitialReviewButtons.vue";
 import ContainerPage from "../../pages/commons/ContainerPage.vue";
@@ -29,7 +30,7 @@ export default defineComponent({
   },
   props: {
     thing: {
-      type: Object as PropType<Generated.Thing>,
+      type: Object as PropType<Thing>,
       required: true,
     },
     storageAccessor: {

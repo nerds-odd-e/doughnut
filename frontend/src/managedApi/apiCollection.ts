@@ -2,14 +2,20 @@ import { User } from "@/generated/backend/models/User";
 import {
   AiCompletionAnswerClarifyingQuestionParams,
   AiCompletionParams,
+  AnsweredQuestion,
   ChatResponse,
   DueReviewPoints,
   GlobalAiModelSettings,
   Note,
   NoteCreationDTO,
+  NoteInfo,
   NotePositionViewedByUser,
   NoteRealm,
+  QuizQuestion,
+  ReviewPoint,
+  ReviewSetting,
   SuggestedQuestionForFineTuning,
+  Thing,
   WikidataEntityData,
   WikidataSearchEntity,
 } from "@/generated/backend";
@@ -51,20 +57,16 @@ const apiCollection = (managedApi: ManagedApi) => ({
   },
 
   quizQuestions: {
-    async generateQuestion(
-      noteId: Doughnut.ID,
-    ): Promise<Generated.QuizQuestion> {
+    async generateQuestion(noteId: Doughnut.ID): Promise<QuizQuestion> {
       const url = `quiz-questions/generate-question?note=${noteId}`;
-      return (await managedApi.restPost(url, {})) as Generated.QuizQuestion;
+      return (await managedApi.restPost(url, {})) as QuizQuestion;
     },
 
-    async regenerateQuestion(
-      quizQuestionId: number,
-    ): Promise<Generated.QuizQuestion> {
+    async regenerateQuestion(quizQuestionId: number): Promise<QuizQuestion> {
       return managedApi.restPost(
         `quiz-questions/${quizQuestionId}/regenerate`,
         {},
-      ) as Promise<Generated.QuizQuestion>;
+      ) as Promise<QuizQuestion>;
     },
 
     async contest(
@@ -93,7 +95,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
       const res = (await managedApi.restPost(
         `quiz-questions/${quizQuestionId}/answer`,
         data,
-      )) as Generated.AnsweredQuestion;
+      )) as AnsweredQuestion;
       return res;
     },
   },
@@ -103,14 +105,14 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return (await managedApi.restPost(
         `review-points/${reviewPointId}/mark-as-repeated?successful=${successful}`,
         {},
-      )) as Generated.ReviewPoint;
+      )) as ReviewPoint;
     },
 
     async removeFromReview(reviewPointId: Doughnut.ID) {
       return (await managedApi.restPost(
         `review-points/${reviewPointId}/remove`,
         {},
-      )) as Generated.ReviewPoint;
+      )) as ReviewPoint;
     },
 
     async overview() {
@@ -118,36 +120,30 @@ const apiCollection = (managedApi: ManagedApi) => ({
         `reviews/overview?${timezoneParam()}`,
       )) as Generated.ReviewStatus;
     },
-    updateReviewSetting(
-      noteId: Doughnut.ID,
-      data: Omit<Generated.ReviewSetting, "id">,
-    ) {
+    updateReviewSetting(noteId: Doughnut.ID, data: Omit<ReviewSetting, "id">) {
       return managedApi.restPost(`notes/${noteId}/review-setting`, data);
     },
 
     async getReviewPoint(reviewPointId: Doughnut.ID) {
       return (await managedApi.restGet(
         `review-points/${reviewPointId}`,
-      )) as Generated.ReviewPoint;
+      )) as ReviewPoint;
     },
 
     async initialReview() {
       return (await managedApi.restGet(
         `reviews/initial?${timezoneParam()}`,
-      )) as Generated.Thing[];
+      )) as Thing[];
     },
 
     async doInitialReview(data: Generated.InitialInfo) {
-      return (await managedApi.restPost(
-        `reviews`,
-        data,
-      )) as Generated.ReviewPoint;
+      return (await managedApi.restPost(`reviews`, data)) as ReviewPoint;
     },
 
     async getAnswer(answerId: Doughnut.ID) {
       return (await managedApi.restGet(
         `reviews/answers/${answerId}`,
-      )) as Generated.AnsweredQuestion;
+      )) as AnsweredQuestion;
     },
 
     async selfEvaluate(
@@ -157,7 +153,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
       const res = (await managedApi.restPost(
         `review-points/${reviewPointId}/self-evaluate`,
         data,
-      )) as Generated.ReviewPoint;
+      )) as ReviewPoint;
       return res;
     },
 
@@ -171,7 +167,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     async getRandomQuestionForReviewPoint(reviewPointId: Doughnut.ID) {
       const res = (await managedApi.restGet(
         `review-points/${reviewPointId}/random-question`,
-      )) as Generated.QuizQuestion;
+      )) as QuizQuestion;
       return res;
     },
   },
@@ -278,9 +274,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
   },
   async getNoteInfo(noteId: Doughnut.ID) {
-    return (await managedApi.restGet(
-      `notes/${noteId}/note-info`,
-    )) as Generated.NoteInfo;
+    return (await managedApi.restGet(`notes/${noteId}/note-info`)) as NoteInfo;
   },
 
   notebookMethods: {

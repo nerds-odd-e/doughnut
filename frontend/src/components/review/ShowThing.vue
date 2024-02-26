@@ -27,13 +27,14 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { Thing } from "@/generated/backend";
 import LinkShow from "../links/LinkShow.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   props: {
     thing: {
-      type: Object as PropType<Generated.Thing>,
+      type: Object as PropType<Thing>,
       required: true,
     },
     expandInfo: { type: Boolean, default: false },

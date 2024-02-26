@@ -44,7 +44,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import type { StorageAccessor } from "@/store/createNoteStorage";
-import { Note } from "@/generated/backend";
+import { Note, QuizQuestion } from "@/generated/backend";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import ContestableQuestion from "../review/ContestableQuestion.vue";
 import scrollToElement from "../commons/scrollToElement";
@@ -65,7 +65,7 @@ export default defineComponent({
   },
   data() {
     return {
-      quizQuestion: undefined as Generated.QuizQuestion | undefined,
+      quizQuestion: undefined as QuizQuestion | undefined,
       chatInput: "",
       assistantMessage: "" as string | undefined,
       answered: false,

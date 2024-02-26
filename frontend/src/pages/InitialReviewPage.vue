@@ -29,6 +29,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { Thing } from "@/generated/backend";
 import ContainerPage from "./commons/ContainerPage.vue";
 import ProgressBar from "../components/commons/ProgressBar.vue";
 import SvgResume from "../components/svgs/SvgResume.vue";
@@ -60,7 +61,7 @@ export default defineComponent({
   data() {
     return {
       finished: 0,
-      things: [] as Generated.Thing[],
+      things: [] as Thing[],
     };
   },
   computed: {

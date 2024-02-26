@@ -3,8 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export type NoteCreationDTO = {
-    topicConstructor?: string;
-    linkTypeToParent?: NoteCreationDTO.linkTypeToParent;
+    topicConstructor: string;
+    linkTypeToParent: NoteCreationDTO.linkTypeToParent;
     wikidataId?: string;
 };
 export namespace NoteCreationDTO {

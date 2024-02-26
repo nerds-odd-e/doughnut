@@ -2187,10 +2187,12 @@ components:
           type: string
     Note:
       required:
+      - createdAt
       - id
       - noteAccessories
       - topic
       - topicConstructor
+      - updatedAt
       type: object
       properties:
         topic:
@@ -2299,6 +2301,7 @@ components:
     ReviewPoint:
       required:
       - id
+      - nextReviewAt
       - thing
       type: object
       properties:
@@ -2445,6 +2448,8 @@ components:
         picture:
           type: boolean
     QuizQuestion:
+      required:
+      - id
       type: object
       properties:
         id:
@@ -2503,6 +2508,9 @@ components:
         quizQuestion:
           $ref: '#/components/schemas/QuizQuestion'
     NoteCreationDTO:
+      required:
+      - linkTypeToParent
+      - topicConstructor
       type: object
       properties:
         topicConstructor:
@@ -2532,10 +2540,12 @@ components:
           type: string
     HierarchicalNote:
       required:
+      - createdAt
       - id
       - noteAccessories
       - topic
       - topicConstructor
+      - updatedAt
       type: object
       properties:
         topic:
@@ -2748,6 +2758,8 @@ components:
         answer:
           type: string
     NoteUpdateTopicDTO:
+      required:
+      - topicConstructor
       type: object
       properties:
         topicConstructor:
@@ -2814,6 +2826,9 @@ components:
           type: integer
           format: int32
     NoteInfo:
+      required:
+      - createdAt
+      - note
       type: object
       properties:
         reviewPoint:

@@ -6,7 +6,7 @@ import type { Choice } from './Choice';
 import type { Note } from './Note';
 import type { PictureWithMask } from './PictureWithMask';
 export type QuizQuestion = {
-    id?: number;
+    id: number;
     stem?: string;
     mainTopic?: string;
     headNote?: Note;

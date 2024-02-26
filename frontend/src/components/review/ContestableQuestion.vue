@@ -2,7 +2,7 @@
   <div v-for="(q, index) in prevQuizQuestions" :key="index">
     <h3>Previous Question Contested ...</h3>
     <p>{{ q.badQuestionReason }}</p>
-    <QuizQuestion :quiz-question="q.quizeQuestion" :disabled="true" />
+    <QuizQuestionC :quiz-question="q.quizeQuestion" :disabled="true" />
   </div>
   <p v-if="currentQuestionLegitMessage">{{ currentQuestionLegitMessage }}</p>
   <ContentLoader v-if="regenerating" />
@@ -12,7 +12,7 @@
       :answered-question="answeredQuestion"
       :storage-accessor="storageAccessor"
     />
-    <QuizQuestion
+    <QuizQuestionC
       v-else
       :quiz-question="currentQuestion"
       @answered="onAnswered($event)"
@@ -27,15 +27,16 @@
       >
         <SvgContest />
       </a>
-    </QuizQuestion>
+    </QuizQuestionC>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import type { StorageAccessor } from "@/store/createNoteStorage";
+import { AnsweredQuestion, QuizQuestion } from "@/generated/backend";
 import useLoadingApi from "../../managedApi/useLoadingApi";
-import QuizQuestion from "./QuizQuestion.vue";
+import QuizQuestionC from "./QuizQuestion.vue";
 import AnsweredQuestionComponent from "./AnsweredQuestionComponent.vue";
 
 export default defineComponent({
@@ -44,7 +45,7 @@ export default defineComponent({
   },
   props: {
     quizQuestion: {
-      type: Object as PropType<Generated.QuizQuestion>,
+      type: Object as PropType<QuizQuestion>,
       required: true,
     },
     storageAccessor: {
@@ -54,7 +55,7 @@ export default defineComponent({
   },
   emits: ["need-scroll", "answered"],
   components: {
-    QuizQuestion,
+    QuizQuestionC,
     AnsweredQuestionComponent,
   },
   data() {
@@ -62,9 +63,9 @@ export default defineComponent({
       regenerating: false,
       currentQuestionLegitMessage: "",
       currentQuestion: this.quizQuestion,
-      answeredQuestion: undefined as Generated.AnsweredQuestion | undefined,
+      answeredQuestion: undefined as AnsweredQuestion | undefined,
       prevQuizQuestions: [] as {
-        quizeQuestion: Generated.QuizQuestion;
+        quizeQuestion: QuizQuestion;
         badQuestionReason: string;
       }[],
       chatInput: "",
@@ -102,7 +103,7 @@ export default defineComponent({
       this.regenerating = false;
       this.scrollToBottom();
     },
-    onAnswered(answeredQuestion: Generated.AnsweredQuestion) {
+    onAnswered(answeredQuestion: AnsweredQuestion) {
       this.answeredQuestion = answeredQuestion;
       this.$emit("answered", answeredQuestion);
     },

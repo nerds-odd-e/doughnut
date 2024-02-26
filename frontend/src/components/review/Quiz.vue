@@ -28,6 +28,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import _ from "lodash";
+import { AnsweredQuestion, QuizQuestion } from "@/generated/backend";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import JustReview from "./JustReview.vue";
@@ -65,7 +66,7 @@ export default defineComponent({
   },
   data() {
     return {
-      quizQuestionCache: [] as (Generated.QuizQuestion | undefined)[],
+      quizQuestionCache: [] as (QuizQuestion | undefined)[],
       eagerFetchUntil: 0,
       fetching: false,
     };
@@ -138,7 +139,7 @@ export default defineComponent({
       await this.fetchNextQuestion();
     },
 
-    onAnswered(answerResult: Generated.AnsweredQuestion) {
+    onAnswered(answerResult: AnsweredQuestion) {
       this.$emit("answered", answerResult);
     },
   },

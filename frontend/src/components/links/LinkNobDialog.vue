@@ -34,7 +34,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { LinkCreation } from "@/generated/backend";
+import { LinkCreation, Thing } from "@/generated/backend";
 import LinkTypeSelect from "./LinkTypeSelect.vue";
 import NoteTopicWithLink from "../notes/NoteTopicWithLink.vue";
 import usePopups from "../commons/Popups/usePopups";
@@ -46,7 +46,7 @@ export default defineComponent({
   },
   props: {
     link: {
-      type: Object as PropType<Generated.Thing>,
+      type: Object as PropType<Thing>,
       required: true,
     },
     storageAccessor: {

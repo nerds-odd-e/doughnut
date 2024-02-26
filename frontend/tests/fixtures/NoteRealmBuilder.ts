@@ -1,5 +1,5 @@
 import { merge } from "lodash";
-import { NoteRealm } from "@/generated/backend";
+import { NoteRealm, Thing } from "@/generated/backend";
 import Builder from "./Builder";
 import LinkViewedBuilder from "./LinkViewedBuilder";
 import NoteBuilder from "./NoteBuilder";
@@ -70,7 +70,7 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
   linkTo(note: NoteRealm): NoteRealmBuilder {
     merge(
       this.data.links,
-      new LinkViewedBuilder("using", this.data, note).please(),
+      new LinkViewedBuilder(Thing.linkType.USING, this.data, note).please(),
     );
     return this;
   }

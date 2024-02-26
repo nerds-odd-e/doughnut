@@ -40,6 +40,7 @@
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
+import { QuizQuestion } from "@/generated/backend";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
 const params = ref<Generated.QuestionSuggestionCreationParams>({
@@ -49,7 +50,7 @@ const params = ref<Generated.QuestionSuggestionCreationParams>({
 const { api } = useLoadingApi();
 
 const props = defineProps<{
-  quizQuestion: Generated.QuizQuestion;
+  quizQuestion: QuizQuestion;
 }>();
 
 const emit = defineEmits(["closeDialog"]);

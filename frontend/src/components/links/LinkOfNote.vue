@@ -16,6 +16,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { Thing } from "@/generated/backend";
 import NoteTopicWithLink from "../notes/NoteTopicWithLink.vue";
 import LinkNob from "./LinkNob.vue";
 import { colors } from "../../colors";
@@ -23,7 +24,7 @@ import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   props: {
-    link: { type: Object as PropType<Generated.Thing>, required: true },
+    link: { type: Object as PropType<Thing>, required: true },
     reverse: Boolean,
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,

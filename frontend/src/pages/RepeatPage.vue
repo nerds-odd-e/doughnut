@@ -42,6 +42,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import _ from "lodash";
+import { AnsweredQuestion } from "@/generated/backend";
 import Quiz from "../components/review/Quiz.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
@@ -68,7 +69,7 @@ export default defineComponent({
     return {
       toRepeat: undefined as number[] | undefined,
       currentIndex: 0,
-      previousResults: [] as (Generated.AnsweredQuestion | undefined)[],
+      previousResults: [] as (AnsweredQuestion | undefined)[],
       previousResultCursor: undefined as number | undefined,
     };
   },
@@ -108,7 +109,7 @@ export default defineComponent({
       }
     },
 
-    onAnswered(answerResult?: Generated.AnsweredQuestion) {
+    onAnswered(answerResult?: AnsweredQuestion) {
       this.currentIndex += 1;
       this.previousResults.push(answerResult);
       if (!answerResult) return;

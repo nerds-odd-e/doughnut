@@ -46,6 +46,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { ReviewPoint } from "@/generated/backend";
 import SvgNoReview from "../svgs/SvgNoReview.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopups";
@@ -58,7 +59,7 @@ export default defineComponent({
   },
   props: {
     reviewPoint: {
-      type: Object as PropType<Generated.ReviewPoint>,
+      type: Object as PropType<ReviewPoint>,
       required: true,
     },
   },

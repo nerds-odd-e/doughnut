@@ -64,6 +64,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   @Column(name = "created_at")
   @Setter
   @Getter
+  @NotNull
   private Timestamp createdAt;
 
   @Setter
@@ -91,6 +92,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   @Column(name = "updated_at")
   @Getter
   @Setter
+  @NotNull
   private Timestamp updatedAt;
 
   @Column(name = "wikidata_id")

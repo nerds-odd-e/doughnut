@@ -10,8 +10,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { Thing } from "@/generated/backend";
+import { defineComponent } from "vue";
 import SvgLinkTypeSpecialize from "./link_types/SvgLinkTypeSpecialize.vue";
 import SvgLinkTypeRelated from "./link_types/SvgLinkTypeRelated.vue";
 import SvgLinkTypeApplication from "./link_types/SvgLinkTypeApplication.vue";
@@ -30,7 +29,7 @@ import SvgFolder from "./link_types/SvgFolder.vue";
 
 export default defineComponent({
   props: {
-    linkType: { type: String as PropType<Thing.linkType>, required: true },
+    linkType: { type: String, required: true },
     width: String,
     height: String,
     inverseIcon: Boolean,

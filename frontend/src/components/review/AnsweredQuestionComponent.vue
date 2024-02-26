@@ -27,6 +27,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import NoteInfoReviewPoint from "@/components/notes/NoteInfoReviewPoint.vue";
+import { AnsweredQuestion } from "@/generated/backend";
 import AnswerResult from "./AnswerResult.vue";
 import QuizQuestion from "./QuizQuestion.vue";
 import ShowReviewPoint from "./ShowReviewPoint.vue";
@@ -36,7 +37,7 @@ import { StorageAccessor } from "../../store/createNoteStorage";
 export default defineComponent({
   props: {
     answeredQuestion: {
-      type: Object as PropType<Generated.AnsweredQuestion>,
+      type: Object as PropType<AnsweredQuestion>,
       required: true,
     },
     storageAccessor: {

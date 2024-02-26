@@ -12,6 +12,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { AnsweredQuestion, ReviewPoint } from "@/generated/backend";
 import LoadingPage from "./commons/LoadingPage.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
 import AnsweredQuestionComponent from "../components/review/AnsweredQuestionComponent.vue";
@@ -34,7 +35,7 @@ export default defineComponent({
   },
   data() {
     return {
-      answeredQuestion: undefined as Generated.AnsweredQuestion | undefined,
+      answeredQuestion: undefined as AnsweredQuestion | undefined,
     };
   },
   computed: {
@@ -43,7 +44,7 @@ export default defineComponent({
     },
   },
   methods: {
-    onSelfEvaluated(reviewPoint: Generated.ReviewPoint) {
+    onSelfEvaluated(reviewPoint: ReviewPoint) {
       if (!this.answeredQuestion) return;
       this.answeredQuestion = {
         ...this.answeredQuestion,

@@ -34,12 +34,13 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { NoteInfo, ReviewPoint } from "@/generated/backend";
 import ReviewSettingForm from "../review/ReviewSettingForm.vue";
 import NoteInfoReviewPoint from "./NoteInfoReviewPoint.vue";
 
 export default defineComponent({
   props: {
-    noteInfo: { type: Object as PropType<Generated.NoteInfo>, required: true },
+    noteInfo: { type: Object as PropType<NoteInfo>, required: true },
   },
   emits: ["levelChanged", "selfEvaluated"],
   data() {
@@ -54,7 +55,7 @@ export default defineComponent({
   },
   components: { ReviewSettingForm, NoteInfoReviewPoint },
   methods: {
-    onSelfEvaluated(reviewPoint: Generated.ReviewPoint) {
+    onSelfEvaluated(reviewPoint: ReviewPoint) {
       this.reviewPoint = reviewPoint;
       this.$emit("selfEvaluated", reviewPoint);
     },

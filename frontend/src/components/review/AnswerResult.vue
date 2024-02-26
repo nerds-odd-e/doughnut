@@ -10,12 +10,13 @@
 </template>
 
 <script lang="ts">
+import { AnsweredQuestion } from "@/generated/backend";
 import { defineComponent, PropType } from "vue";
 
 export default defineComponent({
   props: {
     answeredQuestion: {
-      type: Object as PropType<Generated.AnsweredQuestion>,
+      type: Object as PropType<AnsweredQuestion>,
       required: true,
     },
   },

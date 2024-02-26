@@ -9,7 +9,7 @@
   >
     i...
   </span>
-  <NoteInfo
+  <NoteInfoC
     v-if="noteInfo?.note"
     :note-info="noteInfo"
     @level-changed="$emit('levelChanged', $event)"
@@ -19,7 +19,8 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import NoteInfo from "./NoteInfo.vue";
+import { NoteInfo } from "@/generated/backend";
+import NoteInfoC from "./NoteInfo.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default defineComponent({
@@ -28,9 +29,9 @@ export default defineComponent({
   },
   props: { noteId: { type: Number, required: true }, expanded: Boolean },
   emits: ["levelChanged", "selfEvaluated"],
-  components: { NoteInfo },
+  components: { NoteInfoC },
   data() {
-    return { noteInfo: undefined as undefined | Generated.NoteInfo };
+    return { noteInfo: undefined as undefined | NoteInfo };
   },
   methods: {
     fetchData() {

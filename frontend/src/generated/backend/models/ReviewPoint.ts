@@ -6,7 +6,7 @@ import type { Thing } from './Thing';
 export type ReviewPoint = {
     id: number;
     lastReviewedAt?: string;
-    nextReviewAt?: string;
+    nextReviewAt: string;
     initialReviewedAt?: string;
     repetitionCount?: number;
     forgettingCurveIndex?: number;

@@ -7,8 +7,8 @@ import type { ReviewPoint } from './ReviewPoint';
 import type { ReviewSetting } from './ReviewSetting';
 export type NoteInfo = {
     reviewPoint?: ReviewPoint;
-    note?: NoteRealm;
-    createdAt?: string;
+    note: NoteRealm;
+    createdAt: string;
     reviewSetting?: ReviewSetting;
 };
 

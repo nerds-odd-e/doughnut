@@ -55,6 +55,7 @@ public class ReviewPoint extends EntityIdentifiedByIdOnly {
   @Column(name = "next_review_at")
   @Getter
   @Setter
+  @NotNull
   private Timestamp nextReviewAt;
 
   @Column(name = "initial_reviewed_at")

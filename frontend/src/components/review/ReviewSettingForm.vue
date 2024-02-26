@@ -31,6 +31,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { ReviewSetting } from "@/generated/backend";
 import CheckInput from "../form/CheckInput.vue";
 import RadioButtons from "../form/RadioButtons.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
@@ -42,7 +43,7 @@ export default defineComponent({
   props: {
     noteId: { type: Number, required: true },
     reviewSetting: {
-      type: Object as PropType<Generated.ReviewSetting>,
+      type: Object as PropType<ReviewSetting>,
       required: false,
     },
   },
@@ -51,14 +52,14 @@ export default defineComponent({
   data() {
     return {
       formData: (this.reviewSetting ? this.reviewSetting : {}) as Omit<
-        Generated.ReviewSetting,
+        ReviewSetting,
         "id"
       >,
-      errors: {} as Partial<Generated.ReviewSetting>,
+      errors: {} as Partial<ReviewSetting>,
     };
   },
   methods: {
-    updateModelValue(newValue: Partial<Generated.ReviewSetting>) {
+    updateModelValue(newValue: Partial<ReviewSetting>) {
       this.formData = {
         ...this.formData,
         ...newValue,

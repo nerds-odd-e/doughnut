@@ -18,12 +18,13 @@
 </template>
 
 <script lang="ts">
+import { Thing } from "@/generated/backend";
 import { defineComponent, PropType } from "vue";
 
 export default defineComponent({
   props: {
     thing: {
-      type: Object as PropType<Generated.Thing>,
+      type: Object as PropType<Thing>,
       required: true,
     },
   },

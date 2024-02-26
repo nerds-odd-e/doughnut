@@ -19,6 +19,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { Thing } from "@/generated/backend";
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue";
 import PopButton from "../commons/Popups/PopButton.vue";
 import LinkNobDialog from "./LinkNobDialog.vue";
@@ -27,7 +28,7 @@ import { StorageAccessor } from "../../store/createNoteStorage";
 export default defineComponent({
   props: {
     link: {
-      type: Object as PropType<Generated.Thing>,
+      type: Object as PropType<Thing>,
       required: true,
     },
     storageAccessor: {

@@ -15,7 +15,7 @@ import TextInput from "../form/TextInput.vue";
 
 export default defineComponent({
   props: {
-    modelValue: { type: String, required: true },
+    modelValue: { type: String },
     errors: { type: String },
   },
   emits: ["update:modelValue"],

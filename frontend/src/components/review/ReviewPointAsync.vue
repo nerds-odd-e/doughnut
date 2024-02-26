@@ -11,6 +11,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { ReviewPoint } from "@/generated/backend";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
 import ShowReviewPoint from "./ShowReviewPoint.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
@@ -33,11 +34,11 @@ export default defineComponent({
   },
   data() {
     return {
-      reviewPoint: undefined as Generated.ReviewPoint | undefined,
+      reviewPoint: undefined as ReviewPoint | undefined,
     };
   },
   methods: {
-    onSelfEvaluted(reviewPoint: Generated.ReviewPoint) {
+    onSelfEvaluted(reviewPoint: ReviewPoint) {
       this.reviewPoint = reviewPoint;
     },
     async fetchData() {

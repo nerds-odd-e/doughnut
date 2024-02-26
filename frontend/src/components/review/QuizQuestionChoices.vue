@@ -1,5 +1,5 @@
 <template>
-  <ol class="choices" v-if="choices.length > 0" type="A">
+  <ol class="choices" v-if="choices && choices.length > 0" type="A">
     <li class="choice" v-for="(choice, index) in choices" :key="index">
       <button
         :class="{
@@ -67,13 +67,13 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { Choice } from "@/generated/backend";
 import ShowPicture from "../notes/ShowPicture.vue";
 
 export default defineComponent({
   props: {
     choices: {
-      type: Object as PropType<Generated.Choice[]>,
-      required: true,
+      type: Object as PropType<Choice[]>,
     },
     correctChoiceIndex: Number,
     answerChoiceIndex: Number,
