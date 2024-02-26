@@ -34,6 +34,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { LinkCreation } from "@/generated/backend";
 import LinkTypeSelect from "./LinkTypeSelect.vue";
 import NoteTopicWithLink from "../notes/NoteTopicWithLink.vue";
 import usePopups from "../commons/Popups/usePopups";
@@ -65,7 +66,7 @@ export default defineComponent({
       formData: {
         linkType: this.link.linkType,
         fromTargetPerspective: this.inverseIcon,
-      } as Generated.LinkCreation,
+      } as LinkCreation,
       linkFormErrors: { linkType: undefined as string | undefined },
     };
   },

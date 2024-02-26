@@ -1,5 +1,10 @@
 import { Router } from "vue-router";
-import { NoteRealm } from "@/generated/backend";
+import {
+  LinkCreation,
+  NoteAccessories,
+  NoteCreationDTO,
+  NoteRealm,
+} from "@/generated/backend";
 import ManagedApi from "../managedApi/ManagedApi";
 import apiCollection from "../managedApi/apiCollection";
 import NoteEditingHistory from "./NoteEditingHistory";
@@ -11,19 +16,16 @@ export interface StoredApi {
   createNote(
     router: Router,
     parentId: Doughnut.ID,
-    data: Generated.NoteCreationDTO,
+    data: NoteCreationDTO,
   ): Promise<NoteRealm>;
 
   createLink(
     sourceId: Doughnut.ID,
     targetId: Doughnut.ID,
-    data: Generated.LinkCreation,
+    data: LinkCreation,
   ): Promise<NoteRealm>;
 
-  updateLink(
-    linkId: Doughnut.ID,
-    data: Generated.LinkCreation,
-  ): Promise<NoteRealm>;
+  updateLink(linkId: Doughnut.ID, data: LinkCreation): Promise<NoteRealm>;
 
   deleteLink(
     linkId: Doughnut.ID,
@@ -32,7 +34,7 @@ export interface StoredApi {
 
   updateNoteAccessories(
     noteId: Doughnut.ID,
-    noteAccessories: Generated.NoteAccessories,
+    noteAccessories: NoteAccessories,
   ): Promise<NoteRealm>;
 
   updateTextField(
@@ -129,7 +131,7 @@ export default class StoredApiCollection implements StoredApi {
   async createNote(
     router: Router,
     parentId: Doughnut.ID,
-    data: Generated.NoteCreationDTO,
+    data: NoteCreationDTO,
   ) {
     const nrwp = await this.statelessApi.noteMethods.createNote(parentId, data);
     const focus = this.storage.refreshNoteRealm(nrwp);
@@ -140,7 +142,7 @@ export default class StoredApiCollection implements StoredApi {
   async createLink(
     sourceId: Doughnut.ID,
     targetId: Doughnut.ID,
-    data: Generated.LinkCreation,
+    data: LinkCreation,
   ) {
     return this.storage.refreshNoteRealm(
       (await this.managedApi.restPost(
@@ -150,7 +152,7 @@ export default class StoredApiCollection implements StoredApi {
     );
   }
 
-  async updateLink(linkId: Doughnut.ID, data: Generated.LinkCreation) {
+  async updateLink(linkId: Doughnut.ID, data: LinkCreation) {
     return this.storage.refreshNoteRealm(
       (await this.managedApi.restPost(`links/${linkId}`, data)) as NoteRealm,
     );
@@ -167,7 +169,7 @@ export default class StoredApiCollection implements StoredApi {
 
   async updateNoteAccessories(
     noteId: Doughnut.ID,
-    noteContentData: Generated.NoteAccessories,
+    noteContentData: NoteAccessories,
   ) {
     return this.storage.refreshNoteRealm(
       (await this.managedApi.restPatchMultiplePartForm(

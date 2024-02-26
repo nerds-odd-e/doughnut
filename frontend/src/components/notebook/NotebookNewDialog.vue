@@ -10,6 +10,7 @@
 
 <script lang="ts">
 import { PropType } from "vue";
+import { NoteCreationDTO } from "@/generated/backend";
 import NoteFormTopicOnly from "../notes/NoteFormTopicOnly.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
@@ -23,7 +24,7 @@ export default {
   },
   data() {
     return {
-      noteFormData: { topicConstructor: "" } as Generated.NoteCreationDTO,
+      noteFormData: { topicConstructor: "" } as NoteCreationDTO,
       errors: { topicConstructor: undefined as undefined | string },
     };
   },

@@ -39,7 +39,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { WikidataSearchEntity } from "@/generated/backend";
+import { NoteCreationDTO, WikidataSearchEntity } from "@/generated/backend";
 import NoteFormTopicOnly from "./NoteFormTopicOnly.vue";
 import SearchResults from "../search/SearchResults.vue";
 import LinkTypeSelectCompact from "../links/LinkTypeSelectCompact.vue";
@@ -65,7 +65,7 @@ export default defineComponent({
   emits: ["closeDialog"],
   data() {
     return {
-      creationData: <Generated.NoteCreationDTO>{
+      creationData: <NoteCreationDTO>{
         linkTypeToParent: "no link",
         topicConstructor: "",
         wikidataId: "",

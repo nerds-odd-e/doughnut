@@ -6,6 +6,7 @@ import {
   DueReviewPoints,
   GlobalAiModelSettings,
   Note,
+  NoteCreationDTO,
   NotePositionViewedByUser,
   NoteRealm,
   SuggestedQuestionForFineTuning,
@@ -285,7 +286,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
   notebookMethods: {
     async createNotebook(
       circle: Generated.Circle | undefined,
-      data: Generated.NoteCreationDTO,
+      data: NoteCreationDTO,
     ) {
       const url = (() => {
         if (circle) {
@@ -315,7 +316,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
   },
 
   noteMethods: {
-    async createNote(parentId: Doughnut.ID, data: Generated.NoteCreationDTO) {
+    async createNote(parentId: Doughnut.ID, data: NoteCreationDTO) {
       return (await managedApi.restPostMultiplePartForm(
         `notes/${parentId}/create`,
         data,

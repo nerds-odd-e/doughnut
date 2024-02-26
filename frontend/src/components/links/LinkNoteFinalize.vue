@@ -39,7 +39,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { Note } from "@/generated/backend";
+import { LinkCreation, Note } from "@/generated/backend";
 import LinkTypeSelect from "./LinkTypeSelect.vue";
 import CheckInput from "../form/CheckInput.vue";
 import RadioButtons from "../form/RadioButtons.vue";
@@ -70,7 +70,7 @@ export default defineComponent({
         asFirstChild: false,
         linkType: "no link",
         moveUnder: false,
-      } as Generated.LinkCreation,
+      } as LinkCreation,
       linkFormErrors: {
         asFirstChild: undefined as string | undefined,
         linkType: undefined as string | undefined,
