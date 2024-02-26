@@ -6,12 +6,12 @@ import type { Note } from './Note';
 import type { PictureWithMask } from './PictureWithMask';
 export type QuizQuestionAIQuestion = {
     id: number;
+    stem?: string;
+    correctAnswerIndex?: number;
+    mainTopic?: string;
+    pictureWithMask?: PictureWithMask;
     note?: Note;
     createdAt?: string;
     rawJsonQuestion?: string;
-    correctAnswerIndex?: number;
-    stem?: string;
-    mainTopic?: string;
-    pictureWithMask?: PictureWithMask;
 };
 

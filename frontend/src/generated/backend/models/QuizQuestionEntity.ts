@@ -6,11 +6,11 @@ import type { Note } from './Note';
 import type { PictureWithMask } from './PictureWithMask';
 export type QuizQuestionEntity = {
     id: number;
-    note?: Note;
-    createdAt?: string;
-    correctAnswerIndex?: number;
     stem?: string;
+    correctAnswerIndex?: number;
     mainTopic?: string;
     pictureWithMask?: PictureWithMask;
+    note?: Note;
+    createdAt?: string;
 };
 
