@@ -1,5 +1,7 @@
+import { Thing } from "@/generated/backend";
+
 interface LinkTypeOption {
-  label: Generated.LinkType;
+  label: Thing.linkType;
   reversedLabel: string;
 }
 

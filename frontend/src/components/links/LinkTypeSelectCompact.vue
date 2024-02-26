@@ -28,6 +28,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { startCase, camelCase } from "lodash";
+import { Thing } from "@/generated/backend";
 import PopButton from "../commons/Popups/PopButton.vue";
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue";
 import LinkTypeSelect from "./LinkTypeSelect.vue";
@@ -37,8 +38,8 @@ export default defineComponent({
   props: {
     scopeName: String,
     modelValue: {
-      type: String as PropType<Generated.LinkType>,
-      default: () => "no link" as Generated.LinkType,
+      type: String as PropType<Thing.linkType>,
+      default: () => "no link" as Thing.linkType,
     },
     errors: String,
     allowEmpty: { type: Boolean, default: false },

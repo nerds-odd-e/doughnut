@@ -5,7 +5,7 @@ import Builder from "./Builder";
 import generateId from "./generateId";
 
 class LinkViewedBuilder extends Builder<LinksMap> {
-  linkType: Generated.LinkType;
+  linkType: Thing.linkType;
 
   cnt: number;
 
@@ -15,7 +15,7 @@ class LinkViewedBuilder extends Builder<LinksMap> {
 
   toNote: NoteRealm;
 
-  constructor(linkType: Generated.LinkType, from: NoteRealm, to: NoteRealm) {
+  constructor(linkType: Thing.linkType, from: NoteRealm, to: NoteRealm) {
     super();
     this.linkType = linkType;
     this.cnt = 1;
