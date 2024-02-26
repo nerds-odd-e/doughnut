@@ -7,7 +7,6 @@ import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
-import org.springframework.lang.Nullable;
 
 @AllArgsConstructor
 public class QuizQuestion {
@@ -27,6 +26,6 @@ public class QuizQuestion {
   public static class Choice {
     private boolean isPicture = false;
     private String display;
-    @Nullable private PictureWithMask pictureWithMask;
+    private PictureWithMask pictureWithMask;
   }
 }

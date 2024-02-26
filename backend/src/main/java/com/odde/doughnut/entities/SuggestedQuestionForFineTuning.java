@@ -16,7 +16,6 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.lang.Nullable;
 
 @Entity
 @Table(name = "suggested_question_for_fine_tuning")
@@ -57,7 +56,6 @@ public class SuggestedQuestionForFineTuning extends EntityIdentifiedByIdOnly {
   @Column(name = "created_at")
   @Getter
   @Setter
-  @Nullable
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
   public MCQWithAnswer getPreservedQuestion() {

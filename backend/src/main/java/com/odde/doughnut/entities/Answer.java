@@ -10,7 +10,6 @@ import jakarta.persistence.Table;
 import java.sql.Timestamp;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.lang.Nullable;
 
 @Entity
 @Table(name = "quiz_answer")
@@ -18,20 +17,17 @@ public class Answer extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   @Column(name = "answer")
-  @Nullable
   String spellingAnswer;
 
   @Getter
   @Setter
   @Column(name = "choice_index")
-  @Nullable
   Integer choiceIndex;
 
   @ManyToOne
   @JoinColumn(name = "quiz_question_id", referencedColumnName = "id")
   @Getter
   @Setter
-  @Nullable
   @JsonIgnore
   QuizQuestionEntity question;
 

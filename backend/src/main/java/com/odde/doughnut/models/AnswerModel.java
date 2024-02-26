@@ -3,7 +3,6 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
-import org.jetbrains.annotations.Nullable;
 
 public class AnswerModel {
   public final Answer answer;
@@ -30,7 +29,6 @@ public class AnswerModel {
     return answerResult;
   }
 
-  @Nullable
   private QuizQuestionEntity getQuestion() {
     return answer.getQuestion();
   }

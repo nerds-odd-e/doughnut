@@ -16,7 +16,6 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
-import org.springframework.lang.Nullable;
 
 @Getter
 @Entity
@@ -35,7 +34,6 @@ public class Ownership {
   @OneToOne
   @JoinColumn(name = "circle_id")
   @Setter
-  @Nullable
   private Circle circle;
 
   @OneToMany(mappedBy = "ownership")
