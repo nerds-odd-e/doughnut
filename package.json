@@ -24,7 +24,7 @@
     "backend:test": "backend/gradlew -p backend testDBMigrate -Dspring.profiles.active=test && backend/gradlew -p backend test --build-cache --parallel",
     "backend:build": "backend/gradlew -p backend build -x test --build-cache --parallel",
     "backend:prod_build": "backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel",
-    "generateTypescript": "pnpx openapi-typescript-codegen -i ./open_api_docs.yaml -o ./frontend/src/generated/backend -c fetch --name DoughnutApi ",
+    "generateTypeScript": "pnpx openapi-typescript-codegen -i ./open_api_docs.yaml -o ./frontend/src/generated/backend -c fetch --name DoughnutApi ",
     "cy:format": "pnpm --frozen-lockfile --silent install && pnpm eslint e2e_test --fix",
     "cy:lint": "pnpm --frozen-lockfile --silent install && pnpm eslint e2e_test",
     "cy:open": "cypress open --e2e",
