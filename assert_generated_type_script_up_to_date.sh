@@ -7,6 +7,7 @@ export targetFolder=frontend/src/generated/backend
 
 rm -rf "$savedFolder"
 mkdir -p "$savedFolder"
+cp -r "$targetFolder/" "$savedFolder/"
 
 pnpm generateTypeScript
 
