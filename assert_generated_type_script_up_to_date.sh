@@ -7,11 +7,11 @@ export targetFolder=frontend/src/generated/backend
 
 rm -rf "$savedFolder"
 mkdir -p "$savedFolder"
-cp -r "$targetFolder/" "$savedFolder/"
+cp -r "$targetFolder" "$savedFolder"
 
 pnpm generateTypeScript
 
-if diff -r "$targetFolder" "$savedFolder"; then
+if diff -r "$targetFolder" "$savedFolder/backend"; then
   echo "The generated typescript interfaces are up-to-date"
 else
   echo "The generated typescript interfaces are out of date"
