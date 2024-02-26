@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities.quizQuestions;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.json.QuizQuestion;
@@ -20,6 +21,7 @@ import lombok.Setter;
 
 @Entity
 @DiscriminatorValue("11")
+@JsonPropertyOrder({"id", "stem", "options", "correctAnswerIndex", "mainTopic", "pictureWithMask"})
 public class QuizQuestionAIQuestion extends QuizQuestionEntity {
   @Column(name = "raw_json_question")
   @Getter

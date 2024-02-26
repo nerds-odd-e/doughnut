@@ -1,5 +1,6 @@
 package com.odde.doughnut.entities;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.controllers.json.QuizQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.*;
@@ -14,6 +15,7 @@ import lombok.Setter;
 @Table(name = "quiz_question")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "question_type", discriminatorType = DiscriminatorType.INTEGER)
+@JsonPropertyOrder({"id", "stem", "options", "correctAnswerIndex", "mainTopic", "pictureWithMask"})
 public abstract class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
 
   @ManyToOne(cascade = CascadeType.DETACH)

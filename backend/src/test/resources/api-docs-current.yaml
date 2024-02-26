@@ -1,0 +1,2912 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost
+  description: Generated server url
+paths:
+  /api/user:
+    get:
+      tags:
+      - rest-user-controller
+      operationId: getUserProfile
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/User'
+    post:
+      tags:
+      - rest-user-controller
+      operationId: createUser
+      parameters:
+      - name: user
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/User'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/User'
+  /api/testability/use_real_sandbox_github_and_close_all_github_issues:
+    post:
+      tags:
+      - testability-rest-controller
+      operationId: closeAllGithubIssues
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/testability/update_current_user:
+    post:
+      tags:
+      - testability-rest-controller
+      operationId: updateCurrentUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/testability/trigger_exception:
+    post:
+      tags:
+      - testability-rest-controller
+      operationId: triggerException
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/testability/time_travel_relative_to_now:
+    post:
+      tags:
+      - testability-rest-controller
+      operationId: timeTravelRelativeToNow
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeTravelRelativeToNow'
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: object
+  /api/testability/time_travel:
+    post:
+      tags:
+      - testability-rest-controller
+      operationId: timeTravel
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeTravel'
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: object
+  /api/testability/share_to_bazaar:
+    post:
+      tags:
+      - testability-rest-controller
+      operationId: shareToBazaar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/testability/seed_suggested_questions:
+    post:
+      tags:
+      - testability-rest-controller
+      operationId: seedSuggestedQuestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeedSuggestedQuestions'
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/testability/seed_notes:
+    post:
+      tags:
+      - testability-rest-controller
+      operationId: seedNote
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeedInfo'
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+  /api/testability/seed_circle:
+    post:
+      tags:
+      - testability-rest-controller
+      operationId: seedCircle
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/testability/replace_service_url:
+    post:
+      tags:
+      - testability-rest-controller
+      operationId: replaceServiceUrl
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+  /api/testability/randomizer:
+    post:
+      tags:
+      - testability-rest-controller
+      operationId: randomizer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Randomization'
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: object
+  /api/testability/link_notes:
+    post:
+      tags:
+      - testability-rest-controller
+      operationId: linkNotes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/testability/feature_toggle:
+    get:
+      tags:
+      - testability-rest-controller
+      operationId: getFeatureToggle
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: boolean
+    post:
+      tags:
+      - testability-rest-controller
+      operationId: enableFeatureToggle
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: object
+  /api/testability/clean_db_and_reset_testability_settings:
+    post:
+      tags:
+      - testability-rest-controller
+      operationId: resetDBAndTestabilitySettings
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/subscriptions/{subscription}:
+    post:
+      tags:
+      - rest-subscription-controller
+      operationId: update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Subscription'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Subscription'
+  /api/subscriptions/{subscription}/delete:
+    post:
+      tags:
+      - rest-subscription-controller
+      operationId: destroySubscription
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Subscription'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: integer
+                  format: int32
+  /api/subscriptions/notebooks/{notebook}/subscribe:
+    post:
+      tags:
+      - rest-subscription-controller
+      operationId: createSubscription
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Notebook'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Subscription'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Subscription'
+  /api/settings/current-model-version:
+    get:
+      tags:
+      - rest-global-settings-controller
+      operationId: getCurrentModelVersions
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GlobalAiModelSettings'
+    post:
+      tags:
+      - rest-global-settings-controller
+      operationId: setCurrentModelVersions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GlobalAiModelSettings'
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GlobalAiModelSettings'
+  /api/reviews:
+    post:
+      tags:
+      - rest-reviews-controller
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InitialInfo'
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ReviewPoint'
+  /api/review-points/{reviewPoint}/self-evaluate:
+    post:
+      tags:
+      - rest-review-point-controller
+      operationId: selfEvaluate
+      parameters:
+      - name: reviewPoint
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/ReviewPoint'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SelfEvaluation'
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ReviewPoint'
+  /api/review-points/{reviewPoint}/remove:
+    post:
+      tags:
+      - rest-review-point-controller
+      operationId: removeFromRepeating
+      parameters:
+      - name: reviewPoint
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/ReviewPoint'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ReviewPoint'
+  /api/review-points/{reviewPoint}/mark-as-repeated:
+    post:
+      tags:
+      - rest-review-point-controller
+      operationId: markAsRepeated
+      parameters:
+      - name: reviewPoint
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/ReviewPoint'
+      - name: successful
+        in: query
+        required: true
+        schema:
+          type: boolean
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ReviewPoint'
+  /api/quiz-questions/{quizQuestion}/suggest-fine-tuning:
+    post:
+      tags:
+      - rest-quiz-question-controller
+      operationId: suggestQuestionForFineTuning
+      parameters:
+      - name: quizQuestion
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/QuizQuestionAIQuestion'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionSuggestionCreationParams'
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SuggestedQuestionForFineTuning'
+  /api/quiz-questions/{quizQuestion}/regenerate:
+    post:
+      tags:
+      - rest-quiz-question-controller
+      operationId: regenerate
+      parameters:
+      - name: quizQuestion
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/QuizQuestionEntity'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/QuizQuestion'
+  /api/quiz-questions/{quizQuestion}/contest:
+    post:
+      tags:
+      - rest-quiz-question-controller
+      operationId: contest
+      parameters:
+      - name: quizQuestion
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/QuizQuestionAIQuestion'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/QuizQuestionContestResult'
+  /api/quiz-questions/{quizQuestion}/answer:
+    post:
+      tags:
+      - rest-quiz-question-controller
+      operationId: answerQuiz
+      parameters:
+      - name: quizQuestion
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/QuizQuestionEntity'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Answer'
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AnsweredQuestion'
+  /api/quiz-questions/generate-question:
+    post:
+      tags:
+      - rest-quiz-question-controller
+      operationId: generateQuestion
+      parameters:
+      - name: note
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Note'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/QuizQuestion'
+  /api/notes/{parentNote}/create:
+    post:
+      tags:
+      - rest-note-controller
+      operationId: createNote
+      parameters:
+      - name: parentNote
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Note'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteCreationDTO'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NoteRealm'
+  /api/notes/{note}/updateWikidataId:
+    post:
+      tags:
+      - rest-note-controller
+      operationId: updateWikidataId
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Note'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WikidataAssociationCreation'
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NoteRealm'
+  /api/notes/{note}/search:
+    post:
+      tags:
+      - rest-note-controller
+      operationId: searchForLinkTargetWithin
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Note'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchTerm'
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Note'
+  /api/notes/{note}/review-setting:
+    post:
+      tags:
+      - rest-note-controller
+      operationId: updateReviewSetting
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Note'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewSetting'
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RedirectToNoteResponse'
+  /api/notes/{note}/delete:
+    post:
+      tags:
+      - rest-note-controller
+      operationId: deleteNote
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Note'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NoteRealm'
+  /api/notes/search:
+    post:
+      tags:
+      - rest-note-controller
+      operationId: searchForLinkTarget
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchTerm'
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Note'
+  /api/notebooks/{notebook}:
+    post:
+      tags:
+      - rest-notebook-controller
+      operationId: update_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Notebook'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Notebook'
+  /api/notebooks/{notebook}/share:
+    post:
+      tags:
+      - rest-notebook-controller
+      operationId: shareNote
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Notebook'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Notebook'
+  /api/notebooks/create:
+    post:
+      tags:
+      - rest-notebook-controller
+      operationId: createNotebook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteCreationDTO'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RedirectToNoteResponse'
+  /api/links/{link}:
+    post:
+      tags:
+      - rest-link-controller
+      operationId: updateLink
+      parameters:
+      - name: link
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Note'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LinkCreation'
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NoteRealm'
+  /api/links/{link}/{perspective}/delete:
+    post:
+      tags:
+      - rest-link-controller
+      operationId: deleteLink
+      parameters:
+      - name: link
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Note'
+      - name: perspective
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NoteRealm'
+  /api/links/create/{sourceNote}/{targetNote}:
+    post:
+      tags:
+      - rest-link-controller
+      operationId: linkNoteFinalize
+      parameters:
+      - name: sourceNote
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Note'
+      - name: targetNote
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Note'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LinkCreation'
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NoteRealm'
+  /api/fine-tuning/{suggestedQuestion}/duplicate:
+    post:
+      tags:
+      - rest-fine-tuning-data-controller
+      operationId: duplicate
+      parameters:
+      - name: suggestedQuestion
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/SuggestedQuestionForFineTuning'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SuggestedQuestionForFineTuning'
+  /api/fine-tuning/{suggestedQuestion}/delete:
+    post:
+      tags:
+      - rest-fine-tuning-data-controller
+      operationId: delete
+      parameters:
+      - name: suggestedQuestion
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/SuggestedQuestionForFineTuning'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SuggestedQuestionForFineTuning'
+  /api/fine-tuning/upload-and-trigger-fine-tuning:
+    post:
+      tags:
+      - rest-fine-tuning-data-controller
+      operationId: uploadAndTriggerFineTuning
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+  /api/circles:
+    get:
+      tags:
+      - rest-circle-controller
+      operationId: index
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Circle'
+    post:
+      tags:
+      - rest-circle-controller
+      operationId: createCircle
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Circle'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Circle'
+  /api/circles/{circle}/notebooks:
+    post:
+      tags:
+      - rest-circle-controller
+      operationId: createNotebook_1
+      parameters:
+      - name: circle
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Circle'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteCreationDTO'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RedirectToNoteResponse'
+  /api/circles/join:
+    post:
+      tags:
+      - rest-circle-controller
+      operationId: joinCircle
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CircleJoiningByInvitation'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Circle'
+  /api/ai/{note}/completion:
+    post:
+      tags:
+      - rest-ai-controller
+      operationId: getCompletion
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Note'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AiCompletionParams'
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AiCompletionResponse'
+  /api/ai/recreate-all-assistants:
+    post:
+      tags:
+      - rest-ai-controller
+      operationId: recreateAllAssistants
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+  /api/ai/generate-image:
+    post:
+      tags:
+      - rest-ai-controller
+      operationId: generateImage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AiGeneratedImage'
+  /api/ai/chat:
+    post:
+      tags:
+      - rest-ai-controller
+      operationId: chat
+      parameters:
+      - name: note
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Note'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+  /api/ai/answer-clarifying-question:
+    post:
+      tags:
+      - rest-ai-controller
+      operationId: answerCompletionClarifyingQuestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AiCompletionAnswerClarifyingQuestionParams'
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AiCompletionResponse'
+  /api/user/{user}:
+    patch:
+      tags:
+      - rest-user-controller
+      operationId: updateUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/User'
+  /api/text_content/{note}/topic-constructor:
+    patch:
+      tags:
+      - rest-text-content-controller
+      operationId: updateNoteTopicConstructor
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Note'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteUpdateTopicDTO'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NoteRealm'
+  /api/text_content/{note}/details:
+    patch:
+      tags:
+      - rest-text-content-controller
+      operationId: updateNoteDetails
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Note'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteUpdateDetailsDTO'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NoteRealm'
+  /api/notes/{note}:
+    get:
+      tags:
+      - rest-note-controller
+      operationId: show_1
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Note'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NoteRealm'
+    patch:
+      tags:
+      - rest-note-controller
+      operationId: updateNote
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Note'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteAccessories'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NoteRealm'
+  /api/notes/{note}/undo-delete:
+    patch:
+      tags:
+      - rest-note-controller
+      operationId: undoDeleteNote
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Note'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NoteRealm'
+  /api/fine-tuning/{suggestedQuestion}/update-suggested-question-for-fine-tuning:
+    patch:
+      tags:
+      - rest-fine-tuning-data-controller
+      operationId: updateSuggestedQuestionForFineTuning
+      parameters:
+      - name: suggestedQuestion
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/SuggestedQuestionForFineTuning'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionSuggestionParams'
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SuggestedQuestionForFineTuning'
+  /api/wikidata/search/{search}:
+    get:
+      tags:
+      - rest-wikidata-controller
+      operationId: searchWikidata
+      parameters:
+      - name: search
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WikidataSearchEntity'
+  /api/wikidata/entity-data/{wikidataId}:
+    get:
+      tags:
+      - rest-wikidata-controller
+      operationId: fetchWikidataEntityDataByID
+      parameters:
+      - name: wikidataId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/WikidataEntityData'
+  /api/user/current-user-info:
+    get:
+      tags:
+      - rest-current-user-info-controller
+      operationId: currentUserInfo
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CurrentUserInfo'
+  /api/testability/github_issues:
+    get:
+      tags:
+      - testability-rest-controller
+      operationId: githubIssues
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties:
+                    type: object
+  /api/reviews/repeat:
+    get:
+      tags:
+      - rest-reviews-controller
+      operationId: repeatReview
+      parameters:
+      - name: timezone
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: dueindays
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/DueReviewPoints'
+  /api/reviews/overview:
+    get:
+      tags:
+      - rest-reviews-controller
+      operationId: overview
+      parameters:
+      - name: timezone
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ReviewStatus'
+  /api/reviews/initial:
+    get:
+      tags:
+      - rest-reviews-controller
+      operationId: initialReview
+      parameters:
+      - name: timezone
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Thing'
+  /api/reviews/answers/{answer}:
+    get:
+      tags:
+      - rest-reviews-controller
+      operationId: showAnswer
+      parameters:
+      - name: answer
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Answer'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AnsweredQuestion'
+  /api/review-points/{reviewPoint}:
+    get:
+      tags:
+      - rest-review-point-controller
+      operationId: show
+      parameters:
+      - name: reviewPoint
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ReviewPoint'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ReviewPoint'
+  /api/review-points/{reviewPoint}/random-question:
+    get:
+      tags:
+      - rest-review-point-controller
+      operationId: generateRandomQuestion
+      parameters:
+      - name: reviewPoint
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ReviewPoint'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/QuizQuestion'
+  /api/notes/{note}/position:
+    get:
+      tags:
+      - rest-note-controller
+      operationId: getPosition
+      parameters:
+      - name: note
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Note'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NotePositionViewedByUser'
+  /api/notes/{note}/note-info:
+    get:
+      tags:
+      - rest-note-controller
+      operationId: getNoteInfo
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Note'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NoteInfo'
+  /api/notebooks:
+    get:
+      tags:
+      - rest-notebook-controller
+      operationId: myNotebooks
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NotebooksViewedByUser'
+  /api/healthcheck:
+    get:
+      tags:
+      - rest-health-check-controller
+      operationId: ping
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/fine-tuning/all-suggested-questions-for-fine-tuning:
+    get:
+      tags:
+      - rest-fine-tuning-data-controller
+      operationId: getAllSuggestedQuestions
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SuggestedQuestionForFineTuning'
+  /api/failure-reports:
+    get:
+      tags:
+      - rest-failure-report-controller
+      operationId: failureReports
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/failure-reports/{failureReport}:
+    get:
+      tags:
+      - rest-failure-report-controller
+      operationId: show_2
+      parameters:
+      - name: failureReport
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/FailureReport'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/FailureReportForView'
+  /api/data_upgrade:
+    get:
+      tags:
+      - rest-health-check-controller
+      operationId: dataUpgrade
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: object
+  /api/circles/{circle}:
+    get:
+      tags:
+      - rest-circle-controller
+      operationId: showCircle
+      parameters:
+      - name: circle
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Circle'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CircleForUserView'
+  /api/bazaar:
+    get:
+      tags:
+      - rest-bazaar-controller
+      operationId: bazaar
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NotebooksViewedByUser'
+  /api/ai/available-gpt-models:
+    get:
+      tags:
+      - rest-ai-controller
+      operationId: getAvailableGptModels
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+components:
+  schemas:
+    Circle:
+      required:
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          maxLength: 255
+          minLength: 1
+          type: string
+    Ownership:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        circle:
+          $ref: '#/components/schemas/Circle'
+    User:
+      required:
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          maxLength: 100
+          minLength: 1
+          type: string
+        externalIdentifier:
+          type: string
+        ownership:
+          $ref: '#/components/schemas/Ownership'
+        dailyNewNotesCount:
+          type: integer
+          format: int32
+        spaceIntervals:
+          pattern: "^\\d+((,\\s*\\d+){1,1000})*$"
+          type: string
+        aiQuestionTypeOnlyForReview:
+          type: boolean
+        admin:
+          type: boolean
+    TimeTravelRelativeToNow:
+      type: object
+      properties:
+        hours:
+          type: integer
+          format: int32
+    TimeTravel:
+      type: object
+      properties:
+        travel_to:
+          type: string
+    MCQWithAnswer:
+      required:
+      - choices
+      - correctChoiceIndex
+      type: object
+      properties:
+        stem:
+          type: string
+        choices:
+          type: array
+          items:
+            type: string
+        correctChoiceIndex:
+          type: integer
+          format: int32
+    QuestionSuggestionParams:
+      type: object
+      properties:
+        comment:
+          type: string
+        preservedQuestion:
+          $ref: '#/components/schemas/MCQWithAnswer'
+        preservedNoteContent:
+          type: string
+        positiveFeedback:
+          type: boolean
+        realCorrectAnswers:
+          type: string
+    SeedSuggestedQuestions:
+      type: object
+      properties:
+        examples:
+          type: array
+          writeOnly: true
+          items:
+            $ref: '#/components/schemas/QuestionSuggestionParams'
+    SeedInfo:
+      type: object
+      properties:
+        seedNotes:
+          type: array
+          writeOnly: true
+          items:
+            $ref: '#/components/schemas/SeedNote'
+        externalIdentifier:
+          type: string
+          writeOnly: true
+        circleName:
+          type: string
+          writeOnly: true
+    SeedNote:
+      type: object
+      properties:
+        topicConstructor:
+          type: string
+        details:
+          type: string
+          writeOnly: true
+        testingParent:
+          type: string
+          writeOnly: true
+        skipReview:
+          type: boolean
+          writeOnly: true
+        url:
+          type: string
+          writeOnly: true
+        pictureUrl:
+          type: string
+          writeOnly: true
+        pictureMask:
+          type: string
+          writeOnly: true
+        wikidataId:
+          type: string
+          writeOnly: true
+    Randomization:
+      type: object
+      properties:
+        choose:
+          type: string
+    Note:
+      required:
+      - id
+      - noteAccessories
+      - topic
+      - topicConstructor
+      type: object
+      properties:
+        topic:
+          type: string
+        topicConstructor:
+          maxLength: 150
+          minLength: 1
+          type: string
+        details:
+          type: string
+        parentId:
+          type: integer
+          format: int32
+        updatedAt:
+          type: string
+          format: date-time
+        id:
+          type: integer
+          format: int32
+        noteAccessories:
+          $ref: '#/components/schemas/NoteAccessories'
+        createdAt:
+          type: string
+          format: date-time
+        deletedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        wikidataId:
+          type: string
+        pictureWithMask:
+          $ref: '#/components/schemas/PictureWithMask'
+    NoteAccessories:
+      type: object
+      properties:
+        url:
+          type: string
+        pictureUrl:
+          type: string
+        pictureMask:
+          pattern: "^(((-?[0-9.]+\\s+){3}-?[0-9.]+\\s+)*((-?[0-9.]+\\s+){3}-?[0-9.]+))?$"
+          type: string
+        useParentPicture:
+          type: boolean
+    Notebook:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        ownership:
+          $ref: '#/components/schemas/Ownership'
+        headNote:
+          $ref: '#/components/schemas/Note'
+        skipReviewEntirely:
+          type: boolean
+        deletedAt:
+          type: string
+          format: date-time
+          writeOnly: true
+    PictureWithMask:
+      type: object
+      properties:
+        notePicture:
+          type: string
+        pictureMask:
+          type: string
+    Subscription:
+      required:
+      - id
+      type: object
+      properties:
+        headNote:
+          $ref: '#/components/schemas/Note'
+        title:
+          type: string
+        id:
+          type: integer
+          format: int32
+        dailyTargetOfNewNotes:
+          type: integer
+          format: int32
+        user:
+          $ref: '#/components/schemas/User'
+        notebook:
+          $ref: '#/components/schemas/Notebook'
+    GlobalAiModelSettings:
+      type: object
+      properties:
+        questionGenerationModel:
+          type: string
+        evaluationModel:
+          type: string
+        othersModel:
+          type: string
+    InitialInfo:
+      type: object
+      properties:
+        noteId:
+          type: integer
+          format: int32
+        skipReview:
+          type: boolean
+    ReviewPoint:
+      required:
+      - id
+      - thing
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        lastReviewedAt:
+          type: string
+          format: date-time
+        nextReviewAt:
+          type: string
+          format: date-time
+        initialReviewedAt:
+          type: string
+          format: date-time
+        repetitionCount:
+          type: integer
+          format: int32
+        forgettingCurveIndex:
+          type: integer
+          format: int32
+        removedFromReview:
+          type: boolean
+        thing:
+          $ref: '#/components/schemas/Thing'
+    Thing:
+      type: object
+      properties:
+        note:
+          $ref: '#/components/schemas/Note'
+        linkType:
+          type: string
+          enum:
+          - no link
+          - related to
+          - a specialization of
+          - an application of
+          - an instance of
+          - a part of
+          - tagged by
+          - an attribute of
+          - the opposite of
+          - author of
+          - using
+          - an example of
+          - before
+          - similar to
+          - confused with
+        sourceNote:
+          $ref: '#/components/schemas/Note'
+        targetNote:
+          $ref: '#/components/schemas/Note'
+        id:
+          type: integer
+          format: int32
+    SelfEvaluation:
+      type: object
+      properties:
+        adjustment:
+          type: integer
+          format: int32
+    QuizQuestionAIQuestion:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        stem:
+          type: string
+        correctAnswerIndex:
+          type: integer
+          format: int32
+        mainTopic:
+          type: string
+        pictureWithMask:
+          $ref: '#/components/schemas/PictureWithMask'
+        note:
+          $ref: '#/components/schemas/Note'
+        createdAt:
+          type: string
+          format: date-time
+        rawJsonQuestion:
+          type: string
+    QuestionSuggestionCreationParams:
+      type: object
+      properties:
+        comment:
+          type: string
+        isPositiveFeedback:
+          type: boolean
+    SuggestedQuestionForFineTuning:
+      required:
+      - id
+      - preservedQuestion
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        comment:
+          type: string
+        preservedQuestion:
+          $ref: '#/components/schemas/MCQWithAnswer'
+        preservedNoteContent:
+          type: string
+        realCorrectAnswers:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        positiveFeedback:
+          type: boolean
+    QuizQuestionEntity:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        stem:
+          type: string
+        correctAnswerIndex:
+          type: integer
+          format: int32
+        mainTopic:
+          type: string
+        pictureWithMask:
+          $ref: '#/components/schemas/PictureWithMask'
+        note:
+          $ref: '#/components/schemas/Note'
+        createdAt:
+          type: string
+          format: date-time
+    Choice:
+      type: object
+      properties:
+        display:
+          type: string
+        pictureWithMask:
+          $ref: '#/components/schemas/PictureWithMask'
+        picture:
+          type: boolean
+    QuizQuestion:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        stem:
+          type: string
+        mainTopic:
+          type: string
+        headNote:
+          $ref: '#/components/schemas/Note'
+        choices:
+          type: array
+          items:
+            $ref: '#/components/schemas/Choice'
+        pictureWithMask:
+          $ref: '#/components/schemas/PictureWithMask'
+    QuizQuestionContestResult:
+      type: object
+      properties:
+        reason:
+          type: string
+        rejected:
+          type: boolean
+    Answer:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        spellingAnswer:
+          type: string
+        choiceIndex:
+          type: integer
+          format: int32
+    AnsweredQuestion:
+      type: object
+      properties:
+        answerId:
+          type: integer
+          format: int32
+        correct:
+          type: boolean
+        correctChoiceIndex:
+          type: integer
+          format: int32
+        choiceIndex:
+          type: integer
+          format: int32
+        answerDisplay:
+          type: string
+        reviewPoint:
+          $ref: '#/components/schemas/ReviewPoint'
+        quizQuestion:
+          $ref: '#/components/schemas/QuizQuestion'
+    NoteCreationDTO:
+      type: object
+      properties:
+        topicConstructor:
+          maxLength: 150
+          minLength: 1
+          type: string
+        linkTypeToParent:
+          type: string
+          enum:
+          - no link
+          - related to
+          - a specialization of
+          - an application of
+          - an instance of
+          - a part of
+          - tagged by
+          - an attribute of
+          - the opposite of
+          - author of
+          - using
+          - an example of
+          - before
+          - similar to
+          - confused with
+        wikidataId:
+          pattern: ^$|Q\d+
+          type: string
+    HierarchicalNote:
+      required:
+      - id
+      - noteAccessories
+      - topic
+      - topicConstructor
+      type: object
+      properties:
+        topic:
+          type: string
+        topicConstructor:
+          maxLength: 150
+          minLength: 1
+          type: string
+        details:
+          type: string
+        parentId:
+          type: integer
+          format: int32
+        updatedAt:
+          type: string
+          format: date-time
+        id:
+          type: integer
+          format: int32
+        noteAccessories:
+          $ref: '#/components/schemas/NoteAccessories'
+        createdAt:
+          type: string
+          format: date-time
+        deletedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        wikidataId:
+          type: string
+        pictureWithMask:
+          $ref: '#/components/schemas/PictureWithMask'
+    LinkViewed:
+      required:
+      - direct
+      - reverse
+      type: object
+      properties:
+        direct:
+          type: array
+          items:
+            $ref: '#/components/schemas/Thing'
+        reverse:
+          type: array
+          items:
+            $ref: '#/components/schemas/Thing'
+    NotePositionViewedByUser:
+      type: object
+      properties:
+        noteId:
+          type: integer
+          format: int32
+        fromBazaar:
+          type: boolean
+        circle:
+          $ref: '#/components/schemas/Circle'
+        ancestors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Note'
+    NoteRealm:
+      required:
+      - id
+      - note
+      - notePosition
+      type: object
+      properties:
+        links:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/LinkViewed'
+        note:
+          $ref: '#/components/schemas/Note'
+        notePosition:
+          $ref: '#/components/schemas/NotePositionViewedByUser'
+        id:
+          type: integer
+          format: int32
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/HierarchicalNote'
+    WikidataAssociationCreation:
+      type: object
+      properties:
+        wikidataId:
+          type: string
+    SearchTerm:
+      type: object
+      properties:
+        searchKey:
+          type: string
+          writeOnly: true
+        allMyNotebooksAndSubscriptions:
+          type: boolean
+        allMyCircles:
+          type: boolean
+    ReviewSetting:
+      type: object
+      properties:
+        rememberSpelling:
+          type: boolean
+        skipReview:
+          type: boolean
+        level:
+          type: integer
+          format: int32
+    RedirectToNoteResponse:
+      type: object
+      properties:
+        noteId:
+          type: integer
+          format: int32
+    LinkCreation:
+      required:
+      - linkType
+      type: object
+      properties:
+        linkType:
+          type: string
+          enum:
+          - no link
+          - related to
+          - a specialization of
+          - an application of
+          - an instance of
+          - a part of
+          - tagged by
+          - an attribute of
+          - the opposite of
+          - author of
+          - using
+          - an example of
+          - before
+          - similar to
+          - confused with
+        fromTargetPerspective:
+          type: boolean
+        moveUnder:
+          type: boolean
+        asFirstChild:
+          type: boolean
+    CircleJoiningByInvitation:
+      required:
+      - invitationCode
+      type: object
+      properties:
+        invitationCode:
+          maxLength: 20
+          minLength: 10
+          type: string
+    AiCompletionParams:
+      type: object
+      properties:
+        detailsToComplete:
+          type: string
+    AiCompletionRequiredAction:
+      type: object
+      properties:
+        toolCallId:
+          type: string
+        clarifyingQuestion:
+          $ref: '#/components/schemas/ClarifyingQuestion'
+        contentToAppend:
+          type: string
+    AiCompletionResponse:
+      type: object
+      properties:
+        threadId:
+          type: string
+        runId:
+          type: string
+        requiredAction:
+          $ref: '#/components/schemas/AiCompletionRequiredAction'
+        lastMessage:
+          type: string
+    ClarifyingQuestion:
+      required:
+      - question
+      type: object
+      properties:
+        question:
+          type: string
+    AiGeneratedImage:
+      type: object
+      properties:
+        b64encoded:
+          type: string
+    ChatRequest:
+      type: object
+      properties:
+        userMessage:
+          type: string
+    ChatResponse:
+      type: object
+      properties:
+        assistantMessage:
+          type: string
+    AiCompletionAnswerClarifyingQuestionParams:
+      type: object
+      properties:
+        detailsToComplete:
+          type: string
+        threadId:
+          type: string
+        runId:
+          type: string
+        toolCallId:
+          type: string
+        answer:
+          type: string
+    NoteUpdateTopicDTO:
+      type: object
+      properties:
+        topicConstructor:
+          maxLength: 150
+          minLength: 1
+          type: string
+    NoteUpdateDetailsDTO:
+      type: object
+      properties:
+        details:
+          type: string
+    WikidataSearchEntity:
+      required:
+      - label
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        description:
+          type: string
+    WikidataEntityData:
+      required:
+      - WikidataTitleInEnglish
+      - WikipediaEnglishUrl
+      type: object
+      properties:
+        WikidataTitleInEnglish:
+          type: string
+        WikipediaEnglishUrl:
+          type: string
+    CurrentUserInfo:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        externalIdentifier:
+          type: string
+    DueReviewPoints:
+      type: object
+      properties:
+        toRepeat:
+          type: array
+          items:
+            type: integer
+            format: int32
+        dueInDays:
+          type: integer
+          format: int32
+    ReviewStatus:
+      type: object
+      properties:
+        toRepeatCount:
+          type: integer
+          format: int32
+        learntCount:
+          type: integer
+          format: int32
+        notLearntCount:
+          type: integer
+          format: int32
+        toInitialReviewCount:
+          type: integer
+          format: int32
+    NoteInfo:
+      type: object
+      properties:
+        reviewPoint:
+          $ref: '#/components/schemas/ReviewPoint'
+        note:
+          $ref: '#/components/schemas/NoteRealm'
+        createdAt:
+          type: string
+          format: date-time
+        reviewSetting:
+          $ref: '#/components/schemas/ReviewSetting'
+    NotebookViewedByUser:
+      required:
+      - headNote
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        headNoteId:
+          type: integer
+          format: int32
+        headNote:
+          $ref: '#/components/schemas/Note'
+        skipReviewEntirely:
+          type: boolean
+    NotebooksViewedByUser:
+      required:
+      - notebooks
+      type: object
+      properties:
+        notebooks:
+          type: array
+          items:
+            $ref: '#/components/schemas/NotebookViewedByUser'
+        subscriptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subscription'
+    FailureReport:
+      required:
+      - createDatetime
+      - errorDetail
+      - errorName
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        errorName:
+          type: string
+        errorDetail:
+          type: string
+        issueNumber:
+          type: integer
+          format: int32
+        createDatetime:
+          type: string
+          format: date-time
+        githubIssue:
+          $ref: '#/components/schemas/GithubIssue'
+    GithubIssue:
+      type: object
+      properties:
+        title:
+          type: string
+        body:
+          type: string
+    FailureReportForView:
+      type: object
+      properties:
+        failureReport:
+          $ref: '#/components/schemas/FailureReport'
+        githubIssueUrl:
+          type: string
+    CircleForUserView:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+        invitationCode:
+          type: string
+        notebooks:
+          $ref: '#/components/schemas/NotebooksViewedByUser'
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserForOtherUserView'
+    UserForOtherUserView:
+      type: object
+      properties:
+        name:
+          type: string
