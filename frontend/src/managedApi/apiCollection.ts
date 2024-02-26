@@ -14,6 +14,7 @@ import {
   QuizQuestion,
   ReviewPoint,
   ReviewSetting,
+  Subscription,
   SuggestedQuestionForFineTuning,
   Thing,
   WikidataAssociationCreation,
@@ -255,16 +256,13 @@ const apiCollection = (managedApi: ManagedApi) => ({
     return managedApi.restGet(`failure-reports/${failureReportId}`);
   },
   subscriptionMethods: {
-    subscribe(notebookId: Doughnut.ID, data: Generated.Subscription) {
+    subscribe(notebookId: Doughnut.ID, data: Subscription) {
       return managedApi.restPostMultiplePartForm(
         `subscriptions/notebooks/${notebookId}/subscribe`,
         data,
       );
     },
-    updateSubscription(
-      subscriptionId: Doughnut.ID,
-      data: Generated.Subscription,
-    ) {
+    updateSubscription(subscriptionId: Doughnut.ID, data: Subscription) {
       return managedApi.restPostMultiplePartForm(
         `subscriptions/${subscriptionId}`,
         data,

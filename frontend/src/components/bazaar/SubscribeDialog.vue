@@ -14,6 +14,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { Subscription } from "@/generated/backend";
 import TextInput from "../form/TextInput.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
@@ -29,7 +30,7 @@ export default defineComponent({
   components: { TextInput },
   data() {
     return {
-      formData: { dailyTargetOfNewNotes: 5 } as Generated.Subscription,
+      formData: { dailyTargetOfNewNotes: 5 } as Subscription,
       errors: {},
     };
   },

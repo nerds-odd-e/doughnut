@@ -2509,7 +2509,6 @@ components:
           $ref: '#/components/schemas/QuizQuestion'
     NoteCreationDTO:
       required:
-      - linkTypeToParent
       - topicConstructor
       type: object
       properties:
