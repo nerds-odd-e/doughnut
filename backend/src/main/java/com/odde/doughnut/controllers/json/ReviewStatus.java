@@ -1,9 +1,10 @@
 package com.odde.doughnut.controllers.json;
 
-public class ReviewStatus {
-  public int toRepeatCount;
-  public int learntCount;
-  public int notLearntCount;
+import jakarta.validation.constraints.NotNull;
 
-  public int toInitialReviewCount;
+public class ReviewStatus {
+  @NotNull public int toRepeatCount;
+  @NotNull public int learntCount;
+  @NotNull public int notLearntCount;
+  @NotNull public int toInitialReviewCount;
 }

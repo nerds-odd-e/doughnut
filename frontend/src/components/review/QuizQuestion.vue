@@ -60,7 +60,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { QuizQuestion } from "@/generated/backend";
+import { Answer, QuizQuestion } from "@/generated/backend";
 import ShowPicture from "../notes/ShowPicture.vue";
 import TextInput from "../form/TextInput.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
@@ -99,7 +99,7 @@ export default defineComponent({
     };
   },
   methods: {
-    async submitAnswer(answerData: Partial<Generated.Answer>) {
+    async submitAnswer(answerData: Partial<Answer>) {
       try {
         const answerResult = await this.api.quizQuestions.processAnswer(
           this.quizQuestion.id,

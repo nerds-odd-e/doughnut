@@ -1,4 +1,3 @@
-import { User } from "@/generated/backend/models/User";
 import {
   AiCompletionAnswerClarifyingQuestionParams,
   AiCompletionParams,
@@ -9,6 +8,7 @@ import {
   ChatResponse,
   Circle,
   CircleForUserView,
+  CurrentUserInfo,
   DueReviewPoints,
   GlobalAiModelSettings,
   Note,
@@ -19,14 +19,25 @@ import {
   Notebook,
   NotebooksViewedByUser,
   QuizQuestion,
+  QuestionSuggestionCreationParams,
+  QuizQuestionContestResult,
+  RedirectToNoteResponse,
   ReviewPoint,
   ReviewSetting,
   Subscription,
   SuggestedQuestionForFineTuning,
   Thing,
+  User,
   WikidataAssociationCreation,
   WikidataEntityData,
   WikidataSearchEntity,
+  Answer,
+  ReviewStatus,
+  InitialInfo,
+  SelfEvaluation,
+  QuestionSuggestionParams,
+  CircleJoiningByInvitation,
+  SearchTerm,
 } from "@/generated/backend";
 import ManagedApi from "./ManagedApi";
 
@@ -48,7 +59,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     async getCurrentUserInfo() {
       const res = (await managedApi.restGet(
         `user/current-user-info`,
-      )) as Generated.CurrentUserInfo;
+      )) as CurrentUserInfo;
       return res;
     },
 
@@ -78,18 +89,16 @@ const apiCollection = (managedApi: ManagedApi) => ({
       ) as Promise<QuizQuestion>;
     },
 
-    async contest(
-      quizQuestionId: number,
-    ): Promise<Generated.QuizQuestionContestResult> {
+    async contest(quizQuestionId: number): Promise<QuizQuestionContestResult> {
       return managedApi.restPost(
         `quiz-questions/${quizQuestionId}/contest`,
         {},
-      ) as Promise<Generated.QuizQuestionContestResult>;
+      ) as Promise<QuizQuestionContestResult>;
     },
 
     async suggestQuestionForFineTuning(
       quizQuestionId: number,
-      suggestedQuestion: Generated.QuestionSuggestionCreationParams,
+      suggestedQuestion: QuestionSuggestionCreationParams,
     ): Promise<string> {
       return managedApi.restPost(
         `quiz-questions/${quizQuestionId}/suggest-fine-tuning`,
@@ -97,10 +106,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
       ) as Promise<string>;
     },
 
-    async processAnswer(
-      quizQuestionId: Doughnut.ID,
-      data: Partial<Generated.Answer>,
-    ) {
+    async processAnswer(quizQuestionId: Doughnut.ID, data: Partial<Answer>) {
       const res = (await managedApi.restPost(
         `quiz-questions/${quizQuestionId}/answer`,
         data,
@@ -127,7 +133,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     async overview() {
       return (await managedApi.restGet(
         `reviews/overview?${timezoneParam()}`,
-      )) as Generated.ReviewStatus;
+      )) as ReviewStatus;
     },
     updateReviewSetting(noteId: Doughnut.ID, data: Omit<ReviewSetting, "id">) {
       return managedApi.restPost(`notes/${noteId}/review-setting`, data);
@@ -145,7 +151,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
       )) as Thing[];
     },
 
-    async doInitialReview(data: Generated.InitialInfo) {
+    async doInitialReview(data: InitialInfo) {
       return (await managedApi.restPost(`reviews`, data)) as ReviewPoint;
     },
 
@@ -155,10 +161,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
       )) as AnsweredQuestion;
     },
 
-    async selfEvaluate(
-      reviewPointId: Doughnut.ID,
-      data: Generated.SelfEvaluation,
-    ) {
+    async selfEvaluate(reviewPointId: Doughnut.ID, data: SelfEvaluation) {
       const res = (await managedApi.restPost(
         `review-points/${reviewPointId}/self-evaluate`,
         data,
@@ -194,7 +197,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
     async suggestedQuestionForFineTuningUpdate(
       suggestedId: Doughnut.ID,
-      suggestedQuestion: Generated.QuestionSuggestionParams,
+      suggestedQuestion: QuestionSuggestionParams,
     ): Promise<string> {
       return managedApi.restPatch(
         `fine-tuning/${suggestedId}/update-suggested-question-for-fine-tuning`,
@@ -226,7 +229,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
         data,
       )) as Circle;
     },
-    joinCircle(data: Generated.CircleJoiningByInvitation) {
+    joinCircle(data: CircleJoiningByInvitation) {
       return managedApi.restPostMultiplePartForm(`circles/join`, data);
     },
     async getCirclesOfCurrentUser() {
@@ -236,7 +239,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
 
   async relativeSearch(
     noteId: undefined | Doughnut.ID,
-    searchTerm: Generated.SearchTerm,
+    searchTerm: SearchTerm,
   ) {
     if (noteId) {
       return (await managedApi.restPost(
@@ -293,7 +296,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return (await managedApi.restPostMultiplePartForm(
         url,
         data,
-      )) as Generated.RedirectToNoteResponse;
+      )) as RedirectToNoteResponse;
     },
 
     async getNotebooks() {

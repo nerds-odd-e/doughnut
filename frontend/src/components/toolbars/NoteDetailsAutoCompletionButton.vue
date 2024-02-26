@@ -30,6 +30,7 @@ import {
   ClarifyingQuestion,
   Note,
 } from "@/generated/backend";
+import ClarifyingQuestionAndAnswer from "@/models/ClarifyingQuestionAndAnswer";
 import SvgRobot from "../svgs/SvgRobot.vue";
 import AIClarifyingQuestionDialog from "../notes/AIClarifyingQuestionDialog.vue";
 import Modal from "../commons/Modal.vue";
@@ -60,7 +61,7 @@ export default defineComponent({
       isUnmounted: false,
       threadRespons: undefined as undefined | AiCompletionResponse,
       clarifyingQuestion: undefined as undefined | ClarifyingQuestion,
-      clarifyingHistory: [] as Generated.ClarifyingQuestionAndAnswer[],
+      clarifyingHistory: [] as ClarifyingQuestionAndAnswer[],
     };
   },
   methods: {
@@ -90,7 +91,7 @@ export default defineComponent({
         );
     },
     async clarifyingQuestionAnswered(
-      clarifyingQuestionAndAnswer: Generated.ClarifyingQuestionAndAnswer,
+      clarifyingQuestionAndAnswer: ClarifyingQuestionAndAnswer,
     ) {
       this.clarifyingHistory.push(clarifyingQuestionAndAnswer);
       const response = await this.api.ai.answerCompletionClarifyingQuestion({

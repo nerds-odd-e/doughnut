@@ -26,7 +26,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { debounce } from "mini-debounce";
-import { Note } from "@/generated/backend";
+import { Note, SearchTerm } from "@/generated/backend";
 import CheckInput from "../form/CheckInput.vue";
 import Cards from "../notes/Cards.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
@@ -46,12 +46,12 @@ export default defineComponent({
         searchKey: "",
         allMyNotebooksAndSubscriptions: false,
         allMyCircles: false,
-      } as Generated.SearchTerm,
+      } as SearchTerm,
       oldSearchTerm: {
         searchKey: "",
         allMyNotebooksAndSubscriptions: false,
         allMyCircles: false,
-      } as Generated.SearchTerm,
+      } as SearchTerm,
       cache: {
         global: {},
         local: {},

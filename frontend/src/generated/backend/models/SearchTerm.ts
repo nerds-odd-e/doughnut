@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type SearchTerm = {
-    searchKey?: string;
+    searchKey: string;
     allMyNotebooksAndSubscriptions?: boolean;
     allMyCircles?: boolean;
 };

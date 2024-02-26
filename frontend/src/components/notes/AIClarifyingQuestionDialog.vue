@@ -30,6 +30,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { ClarifyingQuestion } from "@/generated/backend";
+import ClarifyingQuestionAndAnswer from "@/models/ClarifyingQuestionAndAnswer";
 import TextInput from "../form/TextInput.vue";
 
 export default defineComponent({
@@ -39,7 +40,7 @@ export default defineComponent({
       required: true,
     },
     clarifyingHistory: {
-      type: Array as PropType<Generated.ClarifyingQuestionAndAnswer[]>,
+      type: Array as PropType<ClarifyingQuestionAndAnswer[]>,
       required: true,
     },
   },
@@ -52,7 +53,7 @@ export default defineComponent({
   },
   methods: {
     handleFormSubmit() {
-      this.$emit("submit", <Generated.ClarifyingQuestionAndAnswer>{
+      this.$emit("submit", <ClarifyingQuestionAndAnswer>{
         questionFromAI: this.clarifyingQuestion,
         answerFromUser: this.answerToAI,
       });

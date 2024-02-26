@@ -61,12 +61,12 @@ export default defineComponent({
   data() {
     return {
       regenerating: false,
-      currentQuestionLegitMessage: "",
+      currentQuestionLegitMessage: undefined as string | undefined,
       currentQuestion: this.quizQuestion,
       answeredQuestion: undefined as AnsweredQuestion | undefined,
       prevQuizQuestions: [] as {
         quizeQuestion: QuizQuestion;
-        badQuestionReason: string;
+        badQuestionReason: string | undefined;
       }[],
       chatInput: "",
       assistantMessage: "",

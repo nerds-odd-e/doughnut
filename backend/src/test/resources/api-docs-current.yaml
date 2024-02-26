@@ -2120,6 +2120,9 @@ components:
           type: integer
           format: int32
     QuestionSuggestionParams:
+      required:
+      - preservedQuestion
+      - realCorrectAnswers
       type: object
       properties:
         comment:
@@ -2635,11 +2638,12 @@ components:
         wikidataId:
           type: string
     SearchTerm:
+      required:
+      - searchKey
       type: object
       properties:
         searchKey:
           type: string
-          writeOnly: true
         allMyNotebooksAndSubscriptions:
           type: boolean
         allMyCircles:
@@ -2812,6 +2816,11 @@ components:
           type: integer
           format: int32
     ReviewStatus:
+      required:
+      - learntCount
+      - notLearntCount
+      - toInitialReviewCount
+      - toRepeatCount
       type: object
       properties:
         toRepeatCount:

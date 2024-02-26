@@ -5,9 +5,9 @@
 import type { MCQWithAnswer } from './MCQWithAnswer';
 export type QuestionSuggestionParams = {
     comment?: string;
-    preservedQuestion?: MCQWithAnswer;
+    preservedQuestion: MCQWithAnswer;
     preservedNoteContent?: string;
     positiveFeedback?: boolean;
-    realCorrectAnswers?: string;
+    realCorrectAnswers: string;
 };
 

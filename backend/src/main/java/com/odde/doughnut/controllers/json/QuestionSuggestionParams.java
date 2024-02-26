@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers.json;
 
 import com.odde.doughnut.services.ai.MCQWithAnswer;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
@@ -8,8 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class QuestionSuggestionParams {
   public String comment;
-  public MCQWithAnswer preservedQuestion;
+  @NotNull public MCQWithAnswer preservedQuestion;
   public String preservedNoteContent;
   public boolean positiveFeedback;
-  public String realCorrectAnswers;
+  @NotNull public String realCorrectAnswers;
 }

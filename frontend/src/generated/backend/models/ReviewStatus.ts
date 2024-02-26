@@ -3,9 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export type ReviewStatus = {
-    toRepeatCount?: number;
-    learntCount?: number;
-    notLearntCount?: number;
-    toInitialReviewCount?: number;
+    toRepeatCount: number;
+    learntCount: number;
+    notLearntCount: number;
+    toInitialReviewCount: number;
 };
 

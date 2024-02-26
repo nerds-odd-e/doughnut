@@ -52,7 +52,10 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import _ from "lodash";
-import { SuggestedQuestionForFineTuning } from "@/generated/backend";
+import {
+  QuestionSuggestionParams,
+  SuggestedQuestionForFineTuning,
+} from "@/generated/backend";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import TextInput from "../form/TextInput.vue";
 import TextArea from "../form/TextArea.vue";
@@ -78,9 +81,7 @@ export default defineComponent({
   emits: ["update:modelValue"],
   data() {
     return {
-      suggestionParams: <Generated.QuestionSuggestionParams>(
-        _.cloneDeep(this.modelValue)
-      ),
+      suggestionParams: <QuestionSuggestionParams>_.cloneDeep(this.modelValue),
       errors: {
         preservedQuestion: {
           stem: "",
@@ -103,8 +104,8 @@ export default defineComponent({
       this.$emit("update:modelValue", updated);
     },
     validateSuggestedQuestion(
-      params: Generated.QuestionSuggestionParams,
-    ): Generated.QuestionSuggestionParams | undefined {
+      params: QuestionSuggestionParams,
+    ): QuestionSuggestionParams | undefined {
       const validated = _.cloneDeep(params);
       validated.preservedQuestion.choices = validated.preservedQuestion.choices
         .map((choice) => choice?.trim())

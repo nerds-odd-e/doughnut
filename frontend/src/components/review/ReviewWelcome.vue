@@ -68,12 +68,13 @@
 </template>
 
 <script lang="ts">
+import { ReviewStatus } from "@/generated/backend";
 import { defineComponent, PropType } from "vue";
 
 export default defineComponent({
   props: {
     reviewing: {
-      type: Object as PropType<Generated.ReviewStatus>,
+      type: Object as PropType<ReviewStatus>,
       required: true,
     },
   },

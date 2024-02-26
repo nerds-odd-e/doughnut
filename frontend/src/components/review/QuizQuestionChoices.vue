@@ -67,7 +67,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { Choice } from "@/generated/backend";
+import { Answer, Choice } from "@/generated/backend";
 import ShowPicture from "../notes/ShowPicture.vue";
 
 export default defineComponent({
@@ -95,7 +95,7 @@ export default defineComponent({
     isOptionCorrect(index: number) {
       return index === this.correctChoiceIndex;
     },
-    async submitAnswer(answerData: Partial<Generated.Answer>) {
+    async submitAnswer(answerData: Partial<Answer>) {
       this.$emit("answer", answerData);
     },
   },

@@ -1,11 +1,12 @@
 package com.odde.doughnut.controllers.json;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 public class SearchTerm {
-  @Setter private String searchKey = "";
+  @NotNull @Getter @Setter private String searchKey = "";
 
   @Getter @Setter private Boolean allMyNotebooksAndSubscriptions = false;
 
