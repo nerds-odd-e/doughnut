@@ -1,13 +1,14 @@
 package com.odde.doughnut.controllers.json;
 
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
 public class CircleForUserView {
-  @Setter @Getter Integer id;
-  @Setter @Getter String name;
-  @Setter @Getter String invitationCode;
-  @Setter @Getter NotebooksViewedByUser notebooks;
-  @Setter @Getter List<UserForOtherUserView> members;
+  @NotNull @Setter @Getter Integer id;
+  @NotNull @Setter @Getter String name;
+  @NotNull @Setter @Getter String invitationCode;
+  @NotNull @Setter @Getter NotebooksViewedByUser notebooks;
+  @NotNull @Setter @Getter List<UserForOtherUserView> members;
 }

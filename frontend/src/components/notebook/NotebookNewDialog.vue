@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import { PropType } from "vue";
-import { NoteCreationDTO } from "@/generated/backend";
+import { Circle, NoteCreationDTO } from "@/generated/backend";
 import NoteFormTopicOnly from "../notes/NoteFormTopicOnly.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
@@ -18,7 +18,7 @@ export default {
   setup() {
     return useLoadingApi();
   },
-  props: { circle: { type: Object as PropType<Generated.Circle> } },
+  props: { circle: { type: Object as PropType<Circle> } },
   components: {
     NoteFormTopicOnly,
   },

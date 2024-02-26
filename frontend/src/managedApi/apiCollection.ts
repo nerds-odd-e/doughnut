@@ -4,6 +4,8 @@ import {
   AiCompletionParams,
   AnsweredQuestion,
   ChatResponse,
+  Circle,
+  CircleForUserView,
   DueReviewPoints,
   GlobalAiModelSettings,
   Note,
@@ -211,19 +213,19 @@ const apiCollection = (managedApi: ManagedApi) => ({
     async getCircle(circleId: Doughnut.ID) {
       return (await managedApi.restGet(
         `circles/${circleId}`,
-      )) as Generated.CircleForUserView;
+      )) as CircleForUserView;
     },
-    async createCircle(data: Generated.Circle) {
+    async createCircle(data: Circle) {
       return (await managedApi.restPostMultiplePartForm(
         "circles",
         data,
-      )) as Generated.Circle;
+      )) as Circle;
     },
     joinCircle(data: Generated.CircleJoiningByInvitation) {
       return managedApi.restPostMultiplePartForm(`circles/join`, data);
     },
     async getCirclesOfCurrentUser() {
-      return (await managedApi.restGet("circles")) as Generated.Circle[];
+      return (await managedApi.restGet("circles")) as Circle[];
     },
   },
 
@@ -277,10 +279,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
   },
 
   notebookMethods: {
-    async createNotebook(
-      circle: Generated.Circle | undefined,
-      data: NoteCreationDTO,
-    ) {
+    async createNotebook(circle: Circle | undefined, data: NoteCreationDTO) {
       const url = (() => {
         if (circle) {
           return `circles/${circle.id}/notebooks`;

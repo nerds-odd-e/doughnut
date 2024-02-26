@@ -13,6 +13,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { Circle } from "@/generated/backend";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import TextInput from "../form/TextInput.vue";
 
@@ -24,7 +25,7 @@ export default defineComponent({
   components: { TextInput },
   data() {
     return {
-      formData: {} as Generated.Circle,
+      formData: {} as Circle,
       errors: {},
     };
   },

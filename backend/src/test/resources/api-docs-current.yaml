@@ -2906,6 +2906,12 @@ components:
         githubIssueUrl:
           type: string
     CircleForUserView:
+      required:
+      - id
+      - invitationCode
+      - members
+      - name
+      - notebooks
       type: object
       properties:
         id:

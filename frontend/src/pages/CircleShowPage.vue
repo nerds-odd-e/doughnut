@@ -40,6 +40,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { CircleForUserView } from "@/generated/backend";
 import SvgMissingAvatar from "../components/svgs/SvgMissingAvatar.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import NotebookCardsWithButtons from "../components/notebook/NotebookCardsWithButtons.vue";
@@ -71,7 +72,7 @@ export default defineComponent({
 
   data() {
     return {
-      circle: null as Generated.CircleForUserView | null,
+      circle: null as CircleForUserView | null,
       timer: null as NodeJS.Timeout | null,
     };
   },
