@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { User } from "@/generated/backend";
+import { NotebooksViewedByUser, User } from "@/generated/backend";
 import NotebookBazaarViewCards from "../components/bazaar/NotebookBazaarViewCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
@@ -35,7 +35,7 @@ export default defineComponent({
   },
   data() {
     return {
-      notebooksViewedByUser: null as Generated.NotebooksViewedByUser | null,
+      notebooksViewedByUser: null as NotebooksViewedByUser | null,
     };
   },
 

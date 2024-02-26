@@ -2,7 +2,10 @@ import { User } from "@/generated/backend/models/User";
 import {
   AiCompletionAnswerClarifyingQuestionParams,
   AiCompletionParams,
+  AiCompletionResponse,
+  AiGeneratedImage,
   AnsweredQuestion,
+  ChatRequest,
   ChatResponse,
   Circle,
   CircleForUserView,
@@ -13,6 +16,8 @@ import {
   NoteInfo,
   NotePositionViewedByUser,
   NoteRealm,
+  Notebook,
+  NotebooksViewedByUser,
   QuizQuestion,
   ReviewPoint,
   ReviewSetting,
@@ -243,9 +248,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
   },
 
   async getBazaar() {
-    return (await managedApi.restGet(
-      "bazaar",
-    )) as Generated.NotebooksViewedByUser;
+    return (await managedApi.restGet("bazaar")) as NotebooksViewedByUser;
   },
   shareToBazaar(notebookId: Doughnut.ID) {
     return managedApi.restPost(`notebooks/${notebookId}/share`, {});
@@ -294,12 +297,10 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
 
     async getNotebooks() {
-      return (await managedApi.restGet(
-        `notebooks`,
-      )) as Generated.NotebooksViewedByUser;
+      return (await managedApi.restGet(`notebooks`)) as NotebooksViewedByUser;
     },
 
-    updateNotebookSettings(notebookId: Doughnut.ID, data: Generated.Notebook) {
+    updateNotebookSettings(notebookId: Doughnut.ID, data: Notebook) {
       return managedApi.restPostMultiplePartForm(
         `notebooks/${notebookId}`,
         data,
@@ -371,7 +372,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
       noteId: Doughnut.ID,
       userMessage: string,
     ): Promise<string | undefined> {
-      const request: Generated.ChatRequest = { userMessage };
+      const request: ChatRequest = { userMessage };
       const res = (await managedApi.restPost(
         `ai/chat?note=${noteId}`,
         request,
@@ -387,7 +388,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return (await managedApi.restPost(
         `ai/${noteId}/completion`,
         request,
-      )) as Generated.AiCompletionResponse;
+      )) as AiCompletionResponse;
     },
 
     async answerCompletionClarifyingQuestion(
@@ -396,14 +397,14 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return (await managedApi.restPost(
         `ai/answer-clarifying-question`,
         request,
-      )) as Generated.AiCompletionResponse;
+      )) as AiCompletionResponse;
     },
 
     async generateImage(prompt: string) {
       return (await managedApi.restPost(
         `ai/generate-image`,
         prompt,
-      )) as Generated.AiGeneratedImage;
+      )) as AiGeneratedImage;
     },
   },
   testability: {

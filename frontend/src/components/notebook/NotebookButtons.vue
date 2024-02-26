@@ -19,6 +19,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { Notebook } from "@/generated/backend";
 import SvgBazaarShare from "../svgs/SvgBazaarShare.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopups";
@@ -31,7 +32,7 @@ export default defineComponent({
     return { ...useLoadingApi(), ...usePopups() };
   },
   props: {
-    notebook: { type: Object as PropType<Generated.Notebook>, required: true },
+    notebook: { type: Object as PropType<Notebook>, required: true },
   },
   components: {
     SvgBazaarShare,

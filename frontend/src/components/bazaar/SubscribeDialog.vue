@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { Subscription } from "@/generated/backend";
+import { Notebook, Subscription } from "@/generated/backend";
 import TextInput from "../form/TextInput.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
@@ -23,7 +23,7 @@ export default defineComponent({
     return { ...useLoadingApi() };
   },
   props: {
-    notebook: { type: Object as PropType<Generated.Notebook>, required: true },
+    notebook: { type: Object as PropType<Notebook>, required: true },
     loggedIn: Boolean,
   },
   emits: ["closeDialog"],

@@ -16,13 +16,14 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { Notebook } from "@/generated/backend";
 import PopButton from "../commons/Popups/PopButton.vue";
 import SubscribeDialog from "./SubscribeDialog.vue";
 import SvgAdd from "../svgs/SvgAdd.vue";
 
 export default defineComponent({
   props: {
-    notebook: { type: Object as PropType<Generated.Notebook>, required: true },
+    notebook: { type: Object as PropType<Notebook>, required: true },
     loggedIn: Boolean,
   },
   components: {
