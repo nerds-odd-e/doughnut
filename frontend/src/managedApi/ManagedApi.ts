@@ -1,3 +1,4 @@
+import { DoughnutApi } from "@/generated/backend";
 import Api from "./Api";
 import { JsonData } from "./window/RestfulFetch";
 
@@ -18,10 +19,13 @@ class ManagedApi {
 
   private silentMode?: boolean;
 
+  doughnutApi: DoughnutApi;
+
   constructor(apiStatus: ApiStatus, silent?: boolean) {
     this.apiStatus = apiStatus;
     this.api = new Api("/api/");
     this.silentMode = silent;
+    this.doughnutApi = new DoughnutApi({ BASE: "" });
   }
 
   get silent(): ManagedApi {

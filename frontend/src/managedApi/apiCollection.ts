@@ -53,7 +53,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
 
     currentUser() {
-      return managedApi.restGet(`user`);
+      return managedApi.doughnutApi.restUserController.getUserProfile();
     },
 
     async getCurrentUserInfo() {
