@@ -25,7 +25,7 @@ class RestUserController {
 
   @PostMapping("")
   @Transactional
-  public User createUser(Principal principal, User user) {
+  public User createUser(Principal principal, @RequestBody User user) {
     if (principal == null) Authorization.throwUserNotFound();
     user.setExternalIdentifier(principal.getName());
     modelFactoryService.save(user);

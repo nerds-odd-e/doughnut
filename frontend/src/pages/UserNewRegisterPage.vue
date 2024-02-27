@@ -45,7 +45,9 @@ export default defineComponent({
   methods: {
     async processForm() {
       try {
-        const user = await this.api.userMethods.createUser(this.formData);
+        const user = await this.managedApi.restUserController.createUser(
+          this.formData,
+        );
         this.$emit("updateUser", user);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {

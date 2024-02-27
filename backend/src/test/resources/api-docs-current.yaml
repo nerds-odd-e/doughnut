@@ -28,12 +28,12 @@ paths:
       tags:
       - rest-user-controller
       operationId: createUser
-      parameters:
-      - name: user
-        in: query
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
         required: true
-        schema:
-          $ref: '#/components/schemas/User'
       responses:
         "500":
           description: Internal Server Error

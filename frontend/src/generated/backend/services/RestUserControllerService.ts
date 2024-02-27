@@ -22,19 +22,18 @@ export class RestUserControllerService {
         });
     }
     /**
-     * @param user
+     * @param requestBody
      * @returns User OK
      * @throws ApiError
      */
     public createUser(
-        user: User,
+        requestBody: User,
     ): CancelablePromise<User> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/user',
-            query: {
-                'user': user,
-            },
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 500: `Internal Server Error`,
             },

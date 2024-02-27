@@ -26,7 +26,6 @@ import {
   Subscription,
   SuggestedQuestionForFineTuning,
   Thing,
-  User,
   WikidataAssociationCreation,
   WikidataEntityData,
   WikidataSearchEntity,
@@ -49,10 +48,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
   userMethods: {
     logout() {
       return managedApi.restPostWithHtmlResponse(`/logout`, {});
-    },
-
-    async createUser(data: User) {
-      return (await managedApi.restPostMultiplePartForm(`user`, data)) as User;
     },
   },
 
