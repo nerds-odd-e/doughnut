@@ -12,20 +12,18 @@ type ApiStatus = {
   errors: ApiError[];
 };
 
-class ManagedApi {
+class ManagedApi extends DoughnutApi {
   apiStatus: ApiStatus;
 
   api: Api;
 
   private silentMode?: boolean;
 
-  doughnutApi: DoughnutApi;
-
   constructor(apiStatus: ApiStatus, silent?: boolean) {
+    super({ BASE: "" });
     this.apiStatus = apiStatus;
     this.api = new Api("/api/");
     this.silentMode = silent;
-    this.doughnutApi = new DoughnutApi({ BASE: "" });
   }
 
   get silent(): ManagedApi {

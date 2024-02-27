@@ -55,7 +55,7 @@ export default {
   },
   methods: {
     async fetchData() {
-      this.formData = await this.api.userMethods.currentUser();
+      this.formData = await this.managedApi.restUserController.getUserProfile();
     },
     async processForm() {
       const updated = await this.api.userMethods

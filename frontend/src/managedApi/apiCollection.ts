@@ -8,7 +8,6 @@ import {
   ChatResponse,
   Circle,
   CircleForUserView,
-  CurrentUserInfo,
   DueReviewPoints,
   GlobalAiModelSettings,
   Note,
@@ -52,15 +51,8 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return managedApi.restPostWithHtmlResponse(`/logout`, {});
     },
 
-    currentUser() {
-      return managedApi.doughnutApi.restUserController.getUserProfile();
-    },
-
     async getCurrentUserInfo() {
-      const res = (await managedApi.restGet(
-        `user/current-user-info`,
-      )) as CurrentUserInfo;
-      return res;
+      return managedApi.restCurrentUserInfoController.currentUserInfo();
     },
 
     async updateUser(userId: Doughnut.ID, data: User) {

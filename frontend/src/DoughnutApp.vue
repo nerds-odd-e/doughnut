@@ -70,7 +70,8 @@ export default defineComponent({
   async mounted() {
     this.environment = this.api.testability.getEnvironment();
     this.featureToggle = await this.api.testability.getFeatureToggle();
-    const userInfo = await this.api.userMethods.getCurrentUserInfo();
+    const userInfo =
+      await this.managedApi.restCurrentUserInfoController.currentUserInfo();
     this.user = userInfo.user;
     this.externalIdentifier = userInfo.externalIdentifier;
     this.userLoaded = true;
