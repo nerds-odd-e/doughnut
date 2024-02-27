@@ -1396,7 +1396,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/User'
+          type: integer
       requestBody:
         content:
           application/json:

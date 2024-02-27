@@ -6,6 +6,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Authorization;
 import com.odde.doughnut.models.UserModel;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.security.Principal;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +39,8 @@ class RestUserController {
 
   @PatchMapping("/{user}")
   @Transactional
-  public User updateUser(@PathVariable User user, @Valid @RequestBody UserDTO updates)
+  public User updateUser(
+      @PathVariable @Schema(type = "integer") User user, @Valid @RequestBody UserDTO updates)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(user);
     user.setName(updates.getName());

@@ -64,7 +64,7 @@ export default defineComponent({
     },
     async processForm() {
       if (!this.formData) return;
-      const updated = await this.api.userMethods
+      const updated = await this.managedApi.restUserController
         .updateUser(this.formData.id, this.formData)
         .catch((err) => {
           this.errors = err;

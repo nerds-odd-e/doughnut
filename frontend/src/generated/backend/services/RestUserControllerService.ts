@@ -47,7 +47,7 @@ export class RestUserControllerService {
      * @throws ApiError
      */
     public updateUser(
-        user: User,
+        user: number,
         requestBody: UserDTO,
     ): CancelablePromise<User> {
         return this.httpRequest.request({
