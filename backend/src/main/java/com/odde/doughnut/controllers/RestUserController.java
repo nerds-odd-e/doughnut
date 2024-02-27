@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.json.UserDTO;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -35,12 +36,16 @@ class RestUserController {
     return currentUser.getEntity();
   }
 
-  @PutMapping("")
+  @PatchMapping("/{user}")
   @Transactional
-  public User updateUser(@Valid @RequestBody User updatedUser)
+  public User updateUser(@PathVariable User user, @Valid @RequestBody UserDTO updates)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(updatedUser);
-    modelFactoryService.save(updatedUser);
-    return updatedUser;
+    currentUser.assertAuthorization(user);
+    user.setName(updates.getName());
+    user.setSpaceIntervals(updates.getSpaceIntervals());
+    user.setDailyNewNotesCount(updates.getDailyNewNotesCount());
+    user.setAiQuestionTypeOnlyForReview(updates.getAiQuestionTypeOnlyForReview());
+    modelFactoryService.save(user);
+    return user;
   }
 }

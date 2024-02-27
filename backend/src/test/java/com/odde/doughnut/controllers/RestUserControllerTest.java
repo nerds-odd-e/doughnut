@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.doughnut.controllers.json.UserDTO;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
@@ -38,13 +39,25 @@ class RestUserControllerTest {
 
   @Test
   void updateUserSuccessfully() throws UnexpectedNoAccessRightException {
-    User response = controller.updateUser(userModel.getEntity());
-    assertThat(response, equalTo(userModel.getEntity()));
+    UserDTO dto = new UserDTO();
+    dto.setName("new name");
+    dto.setSpaceIntervals("1,2,3,4,5,6,7,8,9,10,11,12,13,14,15");
+    dto.setDailyNewNotesCount(12);
+    dto.setAiQuestionTypeOnlyForReview(true);
+    User response = controller.updateUser(userModel.getEntity(), dto);
+    assertThat(response.getName(), equalTo(dto.getName()));
+    assertThat(response.getSpaceIntervals(), equalTo(dto.getSpaceIntervals()));
+    assertThat(response.getDailyNewNotesCount(), equalTo(dto.getDailyNewNotesCount()));
+    assertThat(
+        response.getAiQuestionTypeOnlyForReview(), equalTo(dto.getAiQuestionTypeOnlyForReview()));
   }
 
   @Test
   void updateOtherUserProfile() {
+    UserDTO dto = new UserDTO();
+    dto.setName("new name");
     User anotherUser = makeMe.aUser().please();
-    assertThrows(UnexpectedNoAccessRightException.class, () -> controller.updateUser(anotherUser));
+    assertThrows(
+        UnexpectedNoAccessRightException.class, () -> controller.updateUser(anotherUser, dto));
   }
 }

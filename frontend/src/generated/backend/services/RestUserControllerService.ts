@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { User } from '../models/User';
+import type { UserDTO } from '../models/UserDTO';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestUserControllerService {
@@ -15,24 +16,6 @@ export class RestUserControllerService {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/user',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param requestBody
-     * @returns User OK
-     * @throws ApiError
-     */
-    public updateUser(
-        requestBody: User,
-    ): CancelablePromise<User> {
-        return this.httpRequest.request({
-            method: 'PUT',
-            url: '/api/user',
-            body: requestBody,
-            mediaType: 'application/json',
             errors: {
                 500: `Internal Server Error`,
             },
@@ -52,6 +35,29 @@ export class RestUserControllerService {
             query: {
                 'user': user,
             },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param user
+     * @param requestBody
+     * @returns User OK
+     * @throws ApiError
+     */
+    public updateUser(
+        user: User,
+        requestBody: UserDTO,
+    ): CancelablePromise<User> {
+        return this.httpRequest.request({
+            method: 'PATCH',
+            url: '/api/user/{user}',
+            path: {
+                'user': user,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 500: `Internal Server Error`,
             },

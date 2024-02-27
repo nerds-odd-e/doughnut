@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,11 +14,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "user")
 public class User extends EntityIdentifiedByIdOnly {
-  @NotNull
-  @Size(min = 1, max = 100)
-  @Getter
-  @Setter
-  private String name;
+  @NotNull @Getter @Setter private String name;
 
   @Column(name = "external_identifier")
   @Getter
@@ -44,7 +38,6 @@ public class User extends EntityIdentifiedByIdOnly {
   @Setter
   private Integer dailyNewNotesCount = 15;
 
-  @Pattern(regexp = "^\\d+((,\\s*\\d+){1,1000})*$", message = "must be numbers separated by ','")
   @Column(name = "space_intervals")
   @Getter
   @Setter
