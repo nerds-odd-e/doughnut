@@ -55,11 +55,8 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return managedApi.restCurrentUserInfoController.currentUserInfo();
     },
 
-    async updateUser(userId: Doughnut.ID, data: User) {
-      const res = (await managedApi.restPatchMultiplePartForm(
-        `user/${userId}`,
-        data,
-      )) as User;
+    async updateUser(_userId: Doughnut.ID, data: User) {
+      const res = (await managedApi.restPatch(`user`, data)) as User;
       return res;
     },
 

@@ -8,11 +8,7 @@ import com.odde.doughnut.models.UserModel;
 import jakarta.validation.Valid;
 import java.security.Principal;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/user")
@@ -39,11 +35,12 @@ class RestUserController {
     return currentUser.getEntity();
   }
 
-  @PatchMapping("/{user}")
+  @PutMapping("")
   @Transactional
-  public @Valid User updateUser(@Valid User user) throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(user);
-    modelFactoryService.save(user);
-    return user;
+  public User updateUser(@Valid @RequestBody User updatedUser)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(updatedUser);
+    modelFactoryService.save(updatedUser);
+    return updatedUser;
   }
 }

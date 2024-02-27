@@ -21,6 +21,24 @@ export class RestUserControllerService {
         });
     }
     /**
+     * @param requestBody
+     * @returns User OK
+     * @throws ApiError
+     */
+    public updateUser(
+        requestBody: User,
+    ): CancelablePromise<User> {
+        return this.httpRequest.request({
+            method: 'PUT',
+            url: '/api/user',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @param user
      * @returns User OK
      * @throws ApiError
@@ -34,24 +52,6 @@ export class RestUserControllerService {
             query: {
                 'user': user,
             },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param requestBody
-     * @returns User OK
-     * @throws ApiError
-     */
-    public updateUser(
-        requestBody?: User,
-    ): CancelablePromise<User> {
-        return this.httpRequest.request({
-            method: 'PATCH',
-            url: '/api/user/{user}',
-            body: requestBody,
-            mediaType: 'application/json',
             errors: {
                 500: `Internal Server Error`,
             },
