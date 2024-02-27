@@ -19,7 +19,9 @@ class ApiMockBuilderImpl implements ApiMockBuilder {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   andReturnOnce(value: any): ApiMockExpectation {
-    this.expectation.response = JSON.stringify(value);
+    this.andRespondOnce({
+      headers: { "Content-Type": "application/json" },
+       body: JSON.stringify(value) });
     return this.expectation;
   }
 
