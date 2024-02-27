@@ -4,7 +4,6 @@
 /* eslint-disable */
 import type { Answer } from '../models/Answer';
 import type { AnsweredQuestion } from '../models/AnsweredQuestion';
-import type { Note } from '../models/Note';
 import type { QuestionSuggestionCreationParams } from '../models/QuestionSuggestionCreationParams';
 import type { QuizQuestion } from '../models/QuizQuestion';
 import type { QuizQuestionAIQuestion } from '../models/QuizQuestionAIQuestion';
@@ -105,7 +104,7 @@ export class RestQuizQuestionControllerService {
      * @throws ApiError
      */
     public generateQuestion(
-        note: Note,
+        note: number,
     ): CancelablePromise<QuizQuestion> {
         return this.httpRequest.request({
             method: 'POST',

@@ -84,9 +84,10 @@ export default defineComponent({
       }
     },
     async generateQuestion() {
-      this.quizQuestion = await this.api.quizQuestions.generateQuestion(
-        this.selectedNote.id,
-      );
+      this.quizQuestion =
+        await this.managedApi.restQuizQuestionController.generateQuestion(
+          this.selectedNote.id,
+        );
       this.scrollToBottom();
     },
     async generateChatAnswer() {

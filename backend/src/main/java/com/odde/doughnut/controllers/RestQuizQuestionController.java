@@ -14,6 +14,7 @@ import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -48,7 +49,8 @@ class RestQuizQuestionController {
 
   @PostMapping("/generate-question")
   @Transactional
-  public QuizQuestion generateQuestion(@RequestParam(value = "note") Note note) {
+  public QuizQuestion generateQuestion(
+      @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
     return generateAIQuestion(note);
   }
