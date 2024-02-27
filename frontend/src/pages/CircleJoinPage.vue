@@ -24,7 +24,8 @@ export default {
   },
   beforeRouteEnter(_to, _from, next) {
     next(async (vm) => {
-      const x = await vm.api.userMethods.getCurrentUserInfo();
+      const x =
+        await vm.managedApi.restCurrentUserInfoController.currentUserInfo();
       if (!x?.user) {
         loginOrRegisterAndHaltThisThread();
         next(false);

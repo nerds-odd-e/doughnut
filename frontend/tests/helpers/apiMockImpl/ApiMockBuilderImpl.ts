@@ -21,7 +21,8 @@ class ApiMockBuilderImpl implements ApiMockBuilder {
   andReturnOnce(value: any): ApiMockExpectation {
     this.andRespondOnce({
       headers: { "Content-Type": "application/json" },
-       body: JSON.stringify(value) });
+      body: JSON.stringify(value),
+    });
     return this.expectation;
   }
 
