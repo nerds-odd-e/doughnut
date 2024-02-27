@@ -37,6 +37,7 @@ import {
   QuestionSuggestionParams,
   CircleJoiningByInvitation,
   SearchTerm,
+  UserDTO,
 } from "@/generated/backend";
 import ManagedApi from "./ManagedApi";
 
@@ -55,7 +56,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return managedApi.restCurrentUserInfoController.currentUserInfo();
     },
 
-    async updateUser(userId: Doughnut.ID, data: User) {
+    async updateUser(userId: Doughnut.ID, data: UserDTO) {
       const res = (await managedApi.restPatch(`user/${userId}`, data)) as User;
       return res;
     },

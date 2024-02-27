@@ -1,8 +1,11 @@
 <template>
   <ContainerPage
-    v-bind="{ contentExists: !!formData, title: 'Edit User Setting' }"
+    v-bind="{
+      contentExists: formData !== undefined,
+      title: 'Edit User Setting',
+    }"
   >
-    <div v-if="!!formData">
+    <div v-if="formData">
       <form @submit.prevent.once="processForm">
         <TextInput
           scope-name="user"
@@ -35,13 +38,15 @@
   </ContainerPage>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
+import { User } from "@/generated/backend";
 import ContainerPage from "../../pages/commons/ContainerPage.vue";
 import CheckInput from "../form/CheckInput.vue";
 import TextInput from "../form/TextInput.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
-export default {
+export default defineComponent({
   setup() {
     return { ...useLoadingApi() };
   },
@@ -49,8 +54,8 @@ export default {
   emits: ["user-updated"],
   data() {
     return {
-      formData: null,
-      errors: {},
+      formData: undefined as undefined | User,
+      errors: {} as Record<string, string>,
     };
   },
   methods: {
@@ -58,6 +63,7 @@ export default {
       this.formData = await this.managedApi.restUserController.getUserProfile();
     },
     async processForm() {
+      if (!this.formData) return;
       const updated = await this.api.userMethods
         .updateUser(this.formData.id, this.formData)
         .catch((err) => {
@@ -70,5 +76,5 @@ export default {
   mounted() {
     this.fetchData();
   },
-};
+});
 </script>
