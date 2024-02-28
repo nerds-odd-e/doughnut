@@ -43,8 +43,8 @@ export default defineComponent({
   methods: {
     async shareNotebook() {
       if (await this.popups.confirm(`Confirm to share?`)) {
-        this.api
-          .shareToBazaar(this.notebook.id)
+        this.managedApi.restNotebookController
+          .shareNotebook(this.notebook.id)
           .then(() => this.$router.push({ name: "notebooks" }));
       }
     },

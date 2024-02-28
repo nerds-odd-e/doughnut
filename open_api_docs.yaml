@@ -936,13 +936,13 @@ paths:
     post:
       tags:
       - rest-notebook-controller
-      operationId: shareNote
+      operationId: shareNotebook
       parameters:
       - name: notebook
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/Notebook'
+          type: integer
       responses:
         "500":
           description: Internal Server Error

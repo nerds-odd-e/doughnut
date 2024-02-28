@@ -12,6 +12,7 @@ import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.models.JsonViewer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,11 +77,12 @@ class RestNotebookController {
 
   @PostMapping(value = "/{notebook}/share")
   @Transactional
-  public Notebook shareNote(@PathVariable("notebook") Notebook notebook)
+  public Notebook shareNotebook(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(notebook);
     BazaarModel bazaar = modelFactoryService.toBazaarModel();
-    bazaar.shareNote(notebook);
+    bazaar.shareNotebook(notebook);
     return notebook;
   }
 }

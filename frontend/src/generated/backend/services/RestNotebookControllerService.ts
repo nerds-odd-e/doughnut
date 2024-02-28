@@ -33,8 +33,8 @@ export class RestNotebookControllerService {
      * @returns Notebook OK
      * @throws ApiError
      */
-    public shareNote(
-        notebook: Notebook,
+    public shareNotebook(
+        notebook: number,
     ): CancelablePromise<Notebook> {
         return this.httpRequest.request({
             method: 'POST',

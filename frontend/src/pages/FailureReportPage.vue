@@ -39,10 +39,12 @@ export default {
   },
   methods: {
     fetchData() {
-      this.api.getFailureReport(this.failureReportId).then((res) => {
-        this.failureReport = res.failureReport;
-        this.githubIssueUrl = res.githubIssueUrl;
-      });
+      this.managedApi.restFailureReportController
+        .show2(this.failureReportId)
+        .then((res) => {
+          this.failureReport = res.failureReport;
+          this.githubIssueUrl = res.githubIssueUrl;
+        });
     },
   },
   mounted() {

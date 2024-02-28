@@ -41,7 +41,7 @@ export default defineComponent({
 
   methods: {
     fetchData() {
-      this.api.getBazaar().then((res) => {
+      this.managedApi.restBazaarController.bazaar().then((res) => {
         this.notebooksViewedByUser = res;
       });
     },

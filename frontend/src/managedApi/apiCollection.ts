@@ -7,7 +7,6 @@ import {
   ChatResponse,
   Circle,
   GlobalAiModelSettings,
-  Note,
   NoteCreationDTO,
   NoteInfo,
   NotePositionViewedByUser,
@@ -19,7 +18,6 @@ import {
   WikidataAssociationCreation,
   WikidataEntityData,
   WikidataSearchEntity,
-  SearchTerm,
 } from "@/generated/backend";
 import ManagedApi from "./ManagedApi";
 
@@ -35,16 +33,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
   },
 
-  async getBazaar() {
-    return (await managedApi.restGet("bazaar")) as NotebooksViewedByUser;
-  },
-  shareToBazaar(notebookId: Doughnut.ID) {
-    return managedApi.restPost(`notebooks/${notebookId}/share`, {});
-  },
-
-  getFailureReport(failureReportId: Doughnut.ID) {
-    return managedApi.restGet(`failure-reports/${failureReportId}`);
-  },
   subscriptionMethods: {
     subscribe(notebookId: Doughnut.ID, data: Subscription) {
       return managedApi.restPostMultiplePartForm(

@@ -20,7 +20,7 @@ public class BazaarModel {
     return notes;
   }
 
-  public void shareNote(Notebook notebook) {
+  public void shareNotebook(Notebook notebook) {
     BazaarNotebook bazaarNotebook = new BazaarNotebook();
     bazaarNotebook.setNotebook(notebook);
     modelFactoryService.save(bazaarNotebook);

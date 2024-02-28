@@ -115,7 +115,10 @@ export default defineComponent({
           searchTerm,
         )) as Note[];
       }
-      return (await this.managedApi.restPost(`notes/search`, searchTerm)) as Note[];
+      return (await this.managedApi.restPost(
+        `notes/search`,
+        searchTerm,
+      )) as Note[];
     },
 
     search() {
@@ -130,10 +133,7 @@ export default defineComponent({
 
       this.timeoutId = debounced(async () => {
         const originalTrimmedKey = this.trimmedSearchKey;
-        const result = await this.relativeSearch(
-          this.noteId,
-          this.searchTerm,
-        );
+        const result = await this.relativeSearch(this.noteId, this.searchTerm);
         this.recentResult = result;
         this.cachedSearches[originalTrimmedKey] = result;
       });

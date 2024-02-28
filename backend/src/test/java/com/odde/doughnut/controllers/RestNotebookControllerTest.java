@@ -67,7 +67,7 @@ class RestNotebookControllerTest {
     @Test
     void shareMyNote() throws UnexpectedNoAccessRightException {
       long oldCount = modelFactoryService.bazaarNotebookRepository.count();
-      controller.shareNote(topNote.getNotebook());
+      controller.shareNotebook(topNote.getNotebook());
       assertThat(modelFactoryService.bazaarNotebookRepository.count(), equalTo(oldCount + 1));
     }
 
@@ -76,7 +76,8 @@ class RestNotebookControllerTest {
       User anotherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
       assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.shareNote(note.getNotebook()));
+          UnexpectedNoAccessRightException.class,
+          () -> controller.shareNotebook(note.getNotebook()));
     }
   }
 

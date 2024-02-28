@@ -207,7 +207,7 @@ class TestabilityRestController {
   @Transactional
   public String shareToBazaar(@RequestBody HashMap<String, String> map) {
     Note note = noteRepository.findFirstByTopicConstructor(map.get("noteTopic"));
-    modelFactoryService.toBazaarModel().shareNote(note.getNotebook());
+    modelFactoryService.toBazaarModel().shareNotebook(note.getNotebook());
     return "OK";
   }
 
