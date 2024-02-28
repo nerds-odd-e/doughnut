@@ -97,7 +97,7 @@ describe("repeat page", () => {
         quizQuestion: makeMe.aQuizQuestion.please(),
       };
       helper.apiMock
-        .expectingPost(
+        .expectingPatch(
           `/api/review-points/${reviewPointId}/mark-as-repeated?successful=true`,
         )
         .andReturnOnce(answerResult);

@@ -60,8 +60,8 @@ export default defineComponent({
         )
           return;
       }
-      this.api.reviewMethods
-        .doInitialReview({
+      this.managedApi.restReviewsController
+        .create({
           noteId: this.thing.note!.id,
           skipReview,
         })

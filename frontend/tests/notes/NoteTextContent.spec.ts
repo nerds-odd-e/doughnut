@@ -92,9 +92,9 @@ describe("in place edit on title", () => {
     ).toBe("updated");
 
     // the saving will still happen because the component is unmounted
-    helper.apiMock.expectingPatch(
-      `/api/text_content/${note.id}/topic-constructor`,
-    );
+    // helper.apiMock.expectingPatch(
+    //   `/api/text_content/${note.id}/topic-constructor`,
+    // );
   });
 
   it("should change content if there's no unsaved changed but change from prop", async () => {

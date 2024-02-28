@@ -10,6 +10,8 @@
 <script lang="ts">
 import { defineComponent, PropType, ref } from "vue";
 import { debounce } from "lodash";
+import { ApiError } from "@/generated/backend";
+import BadRequestError from "@/managedApi/window/BadRequestError";
 import { type StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
@@ -63,8 +65,7 @@ export default defineComponent({
     onBlur() {
       this.changer.flush();
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setError(errs: any) {
+    setError(errs: ApiError) {
       if (errs.status === 401) {
         this.errors = {
           topic:
@@ -72,7 +73,11 @@ export default defineComponent({
         };
         return;
       }
-      this.errors = errs;
+      if (errs.status === 400) {
+        const jsonResponse = JSON.parse(errs.body);
+        const errors = new BadRequestError(jsonResponse);
+        this.errors = errors as unknown as Record<string, string>;
+      }
     },
   },
   watch: {

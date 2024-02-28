@@ -104,15 +104,14 @@ export default class StoredApiCollection implements StoredApi {
     content: string,
   ) {
     if (field === "edit topic") {
-      return (await this.managedApi.restPatchMultiplePartForm(
-        `text_content/${noteId}/topic-constructor`,
+      return this.managedApi.restTextContentController.updateNoteTopicConstructor(
+        noteId,
         { topicConstructor: content },
-      )) as NoteRealm;
+      );
     }
-    return (await this.managedApi.restPatchMultiplePartForm(
-      `text_content/${noteId}/details`,
-      { details: content },
-    )) as NoteRealm;
+    return this.managedApi.restTextContentController.updateNoteDetails(noteId, {
+      details: content,
+    });
   }
 
   async updateWikidataId(
