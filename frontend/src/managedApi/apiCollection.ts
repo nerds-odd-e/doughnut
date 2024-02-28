@@ -35,19 +35,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
   },
 
-  async relativeSearch(
-    noteId: undefined | Doughnut.ID,
-    searchTerm: SearchTerm,
-  ) {
-    if (noteId) {
-      return (await managedApi.restPost(
-        `notes/${noteId}/search`,
-        searchTerm,
-      )) as Note[];
-    }
-    return (await managedApi.restPost(`notes/search`, searchTerm)) as Note[];
-  },
-
   async getBazaar() {
     return (await managedApi.restGet("bazaar")) as NotebooksViewedByUser;
   },

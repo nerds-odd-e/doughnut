@@ -105,6 +105,19 @@ export default defineComponent({
     },
   },
   methods: {
+    async relativeSearch(
+      noteId: undefined | Doughnut.ID,
+      searchTerm: SearchTerm,
+    ) {
+      if (noteId) {
+        return (await this.managedApi.restPost(
+          `notes/${noteId}/search`,
+          searchTerm,
+        )) as Note[];
+      }
+      return (await this.managedApi.restPost(`notes/search`, searchTerm)) as Note[];
+    },
+
     search() {
       if (
         Object.prototype.hasOwnProperty.call(
@@ -117,7 +130,7 @@ export default defineComponent({
 
       this.timeoutId = debounced(async () => {
         const originalTrimmedKey = this.trimmedSearchKey;
-        const result = await this.api.relativeSearch(
+        const result = await this.relativeSearch(
           this.noteId,
           this.searchTerm,
         );
