@@ -3,21 +3,27 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Subscription } from '../models/Subscription';
+import type { SubscriptionDTO } from '../models/SubscriptionDTO';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestSubscriptionControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
+     * @param subscription
      * @param requestBody
      * @returns Subscription OK
      * @throws ApiError
      */
     public update(
-        requestBody?: Subscription,
+        subscription: number,
+        requestBody: SubscriptionDTO,
     ): CancelablePromise<Subscription> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/subscriptions/{subscription}',
+            path: {
+                'subscription': subscription,
+            },
             body: requestBody,
             mediaType: 'application/json',
             errors: {
@@ -26,18 +32,13 @@ export class RestSubscriptionControllerService {
         });
     }
     /**
-     * @param requestBody
      * @returns number OK
      * @throws ApiError
      */
-    public destroySubscription(
-        requestBody?: Subscription,
-    ): CancelablePromise<Array<number>> {
+    public destroySubscription(): CancelablePromise<Array<number>> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/subscriptions/{subscription}/delete',
-            body: requestBody,
-            mediaType: 'application/json',
             errors: {
                 500: `Internal Server Error`,
             },
@@ -51,7 +52,7 @@ export class RestSubscriptionControllerService {
      */
     public createSubscription(
         notebook: number,
-        requestBody?: Subscription,
+        requestBody: SubscriptionDTO,
     ): CancelablePromise<Subscription> {
         return this.httpRequest.request({
             method: 'POST',

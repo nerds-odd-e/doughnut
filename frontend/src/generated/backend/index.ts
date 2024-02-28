@@ -63,6 +63,7 @@ export type { SeedNote } from './models/SeedNote';
 export type { SeedSuggestedQuestions } from './models/SeedSuggestedQuestions';
 export type { SelfEvaluation } from './models/SelfEvaluation';
 export type { Subscription } from './models/Subscription';
+export type { SubscriptionDTO } from './models/SubscriptionDTO';
 export type { SuggestedQuestionForFineTuning } from './models/SuggestedQuestionForFineTuning';
 export { Thing } from './models/Thing';
 export type { TimeTravel } from './models/TimeTravel';

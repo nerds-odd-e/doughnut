@@ -35,8 +35,8 @@ export default {
       if (
         await this.popups.confirm(`Confirm to unsubscribe from this notebook?`)
       ) {
-        this.api.subscriptionMethods
-          .deleteSubscription(this.subscription.id)
+        this.managedApi.restSubscriptionController
+          .delete(this.subscription.id)
           .then(() => {
             this.$emit("updated");
           });

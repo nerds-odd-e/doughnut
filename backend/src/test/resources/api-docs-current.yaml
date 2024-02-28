@@ -412,11 +412,18 @@ paths:
       tags:
       - rest-subscription-controller
       operationId: update
+      parameters:
+      - name: subscription
+        in: path
+        required: true
+        schema:
+          type: integer
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Subscription'
+              $ref: '#/components/schemas/SubscriptionDTO'
+        required: true
       responses:
         "500":
           description: Internal Server Error
@@ -435,11 +442,7 @@ paths:
       tags:
       - rest-subscription-controller
       operationId: destroySubscription
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Subscription'
+      parameters: []
       responses:
         "500":
           description: Internal Server Error
@@ -471,7 +474,8 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Subscription'
+              $ref: '#/components/schemas/SubscriptionDTO'
+        required: true
       responses:
         "500":
           description: Internal Server Error
@@ -2196,6 +2200,12 @@ components:
       properties:
         choose:
           type: string
+    SubscriptionDTO:
+      type: object
+      properties:
+        dailyTargetOfNewNotes:
+          type: integer
+          format: int32
     Note:
       required:
       - createdAt
@@ -2292,6 +2302,8 @@ components:
           $ref: '#/components/schemas/User'
         notebook:
           $ref: '#/components/schemas/Notebook'
+        fromDTO:
+          $ref: '#/components/schemas/SubscriptionDTO'
     GlobalAiModelSettings:
       type: object
       properties:

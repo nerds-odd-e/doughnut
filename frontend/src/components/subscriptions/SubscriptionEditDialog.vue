@@ -31,8 +31,8 @@ export default {
 
   methods: {
     processForm() {
-      this.api.subscriptionMethods
-        .updateSubscription(this.subscription.id, this.formData)
+      this.managedApi.restSubscriptionController
+        .update(this.subscription.id, this.formData)
         .then(() => {
           this.$router.push({ name: "notebooks" });
         })

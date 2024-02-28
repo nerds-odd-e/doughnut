@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.odde.doughnut.controllers.dto.SubscriptionDTO;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,5 +38,9 @@ public class Subscription extends EntityIdentifiedByIdOnly {
 
   public Note getHeadNote() {
     return notebook.getHeadNote();
+  }
+
+  public void setFromDTO(SubscriptionDTO subscriptionDTO) {
+    setDailyTargetOfNewNotes(subscriptionDTO.getDailyTargetOfNewNotes());
   }
 }

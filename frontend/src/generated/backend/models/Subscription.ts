@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { Note } from './Note';
 import type { Notebook } from './Notebook';
+import type { SubscriptionDTO } from './SubscriptionDTO';
 import type { User } from './User';
 export type Subscription = {
     headNote?: Note;
@@ -12,5 +13,6 @@ export type Subscription = {
     dailyTargetOfNewNotes?: number;
     user?: User;
     notebook?: Notebook;
+    fromDTO?: SubscriptionDTO;
 };
 

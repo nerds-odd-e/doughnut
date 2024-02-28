@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.doughnut.controllers.dto.SubscriptionDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.Subscription;
@@ -43,7 +44,7 @@ class RestSubscriptionControllerTest {
 
   @Test
   void subscribeToNoteSuccessfully() throws UnexpectedNoAccessRightException {
-    Subscription subscription = makeMe.aSubscription().inMemoryPlease();
+    SubscriptionDTO subscription = new SubscriptionDTO();
     Subscription result = controller.createSubscription(notebook, subscription);
     assertEquals(topNote, result.getHeadNote());
     assertEquals(userModel.getEntity(), result.getUser());
@@ -52,7 +53,7 @@ class RestSubscriptionControllerTest {
   @Test
   void notAllowToSubscribeToNoneBazaarNote() {
     Note anotherNote = makeMe.aNote().creatorAndOwner(makeMe.aUser().please()).please();
-    Subscription subscription = makeMe.aSubscription().inMemoryPlease();
+    SubscriptionDTO subscription = new SubscriptionDTO();
     assertThrows(
         UnexpectedNoAccessRightException.class,
         () -> controller.createSubscription(anotherNote.getNotebook(), subscription));

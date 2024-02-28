@@ -14,7 +14,6 @@ import {
   Notebook,
   NotebooksViewedByUser,
   RedirectToNoteResponse,
-  Subscription,
   WikidataAssociationCreation,
   WikidataEntityData,
   WikidataSearchEntity,
@@ -33,23 +32,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
   },
 
-  subscriptionMethods: {
-    subscribe(notebookId: Doughnut.ID, data: Subscription) {
-      return managedApi.restPostMultiplePartForm(
-        `subscriptions/notebooks/${notebookId}/subscribe`,
-        data,
-      );
-    },
-    updateSubscription(subscriptionId: Doughnut.ID, data: Subscription) {
-      return managedApi.restPostMultiplePartForm(
-        `subscriptions/${subscriptionId}`,
-        data,
-      );
-    },
-    deleteSubscription(subscriptionId: Doughnut.ID) {
-      return managedApi.restPost(`subscriptions/${subscriptionId}/delete`, {});
-    },
-  },
   async getNoteInfo(noteId: Doughnut.ID) {
     return (await managedApi.restGet(`notes/${noteId}/note-info`)) as NoteInfo;
   },

@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.dto.SubscriptionDTO;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -9,10 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/subscriptions")
@@ -30,10 +28,12 @@ class RestSubscriptionController {
   @Transactional
   public @Valid Subscription createSubscription(
       @PathVariable(name = "notebook") @Schema(type = "integer") Notebook notebook,
-      @Valid Subscription subscription)
+      @Valid @RequestBody SubscriptionDTO subscriptionDTO)
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(notebook);
+    Subscription subscription = new Subscription();
     subscription.setNotebook(notebook);
+    subscription.setFromDTO(subscriptionDTO);
     subscription.setUser(currentUser.getEntity());
     modelFactoryService.save(subscription);
     return subscription;
@@ -41,14 +41,20 @@ class RestSubscriptionController {
 
   @PostMapping("/{subscription}")
   @Transactional
-  public @Valid Subscription update(@Valid Subscription subscription) {
+  public @Valid Subscription update(
+      @PathVariable(name = "subscription") @Schema(type = "integer") Subscription subscription,
+      @Valid @RequestBody SubscriptionDTO subscriptionDTO)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertReadAuthorization(subscription.getNotebook());
+    subscription.setFromDTO(subscriptionDTO);
     modelFactoryService.save(subscription);
     return subscription;
   }
 
   @PostMapping("/{subscription}/delete")
   @Transactional
-  public List<Integer> destroySubscription(@Valid Subscription subscription)
+  public List<Integer> destroySubscription(
+      @PathVariable(name = "notebook") @Schema(type = "integer") Subscription subscription)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(subscription);
     modelFactoryService.remove(subscription);

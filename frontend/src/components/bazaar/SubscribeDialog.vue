@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { Notebook, Subscription } from "@/generated/backend";
+import { Notebook, SubscriptionDTO } from "@/generated/backend";
 import TextInput from "../form/TextInput.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
@@ -30,15 +30,15 @@ export default defineComponent({
   components: { TextInput },
   data() {
     return {
-      formData: { dailyTargetOfNewNotes: 5 } as Subscription,
+      formData: { dailyTargetOfNewNotes: 5 } as SubscriptionDTO,
       errors: {},
     };
   },
 
   methods: {
     processForm() {
-      this.api.subscriptionMethods
-        .subscribe(this.notebook.id, this.formData)
+      this.managedApi.restSubscriptionController
+        .createSubscription(this.notebook.id, this.formData)
         .then(() => {
           this.$emit("closeDialog");
           this.$router.push({ name: "notebooks" });
