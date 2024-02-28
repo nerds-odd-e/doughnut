@@ -231,7 +231,7 @@ export class RestNoteControllerService {
      * @throws ApiError
      */
     public getNoteInfo(
-        note: Note,
+        note: number,
     ): CancelablePromise<NoteInfo> {
         return this.httpRequest.request({
             method: 'GET',

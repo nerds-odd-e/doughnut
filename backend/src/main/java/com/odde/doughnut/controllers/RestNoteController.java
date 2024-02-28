@@ -119,7 +119,7 @@ class RestNoteController {
   }
 
   @GetMapping("/{note}/note-info")
-  public NoteInfo getNoteInfo(@PathVariable("note") Note note)
+  public NoteInfo getNoteInfo(@PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
     NoteInfo noteInfo = new NoteInfo();

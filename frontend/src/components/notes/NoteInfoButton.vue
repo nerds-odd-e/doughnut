@@ -35,6 +35,11 @@ export default defineComponent({
   },
   methods: {
     fetchData() {
+      this.managedApi.restNoteController
+        .getNoteInfo(this.noteId)
+        .then((articles) => {
+          this.noteInfo = articles;
+        });
       this.api.getNoteInfo(this.noteId).then((articles) => {
         this.noteInfo = articles;
       });

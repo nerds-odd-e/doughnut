@@ -8,7 +8,6 @@ import {
   Circle,
   GlobalAiModelSettings,
   NoteCreationDTO,
-  NoteInfo,
   NotePositionViewedByUser,
   NoteRealm,
   Notebook,
@@ -30,10 +29,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
     logout() {
       return managedApi.restPostWithHtmlResponse(`/logout`, {});
     },
-  },
-
-  async getNoteInfo(noteId: Doughnut.ID) {
-    return (await managedApi.restGet(`notes/${noteId}/note-info`)) as NoteInfo;
   },
 
   notebookMethods: {
