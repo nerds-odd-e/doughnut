@@ -97,7 +97,7 @@ export default defineComponent({
       const validated = this.validateSuggestedQuestion(this.suggestionParams);
       if (!validated) return;
       const updated =
-        await this.api.fineTuning.suggestedQuestionForFineTuningUpdate(
+        await this.managedApi.restFineTuningDataController.updateSuggestedQuestionForFineTuning(
           this.modelValue.id,
           validated,
         );

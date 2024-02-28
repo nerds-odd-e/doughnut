@@ -129,7 +129,7 @@ export default defineComponent({
       if (reviewPointId === undefined) return;
       try {
         const question =
-          await this.silentApi.reviewMethods.getRandomQuestionForReviewPoint(
+          await this.managedApi.silent.restReviewPointController.generateRandomQuestion(
             reviewPointId,
           );
         this.quizQuestionCache.push(question);

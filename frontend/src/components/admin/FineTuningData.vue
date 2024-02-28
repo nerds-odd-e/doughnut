@@ -37,7 +37,7 @@ export default {
     },
     async triggerFineTuning() {
       try {
-        await this.api.fineTuning.postUploadAndTriggerFineTuning();
+        await this.managedApi.restFineTuningDataController.uploadAndTriggerFineTuning();
         this.fineTuningDataResultMsg = "Training initiated.";
       } catch (error) {
         const errorInstance = error as Error;
@@ -50,7 +50,7 @@ export default {
   components: { ContentLoader, SuggestedQuestionList },
   async mounted() {
     this.suggestedQuestions =
-      await this.api.fineTuning.getSuggestedQuestionsForFineTuning();
+      await this.managedApi.restFineTuningDataController.getAllSuggestedQuestions();
   },
 };
 </script>

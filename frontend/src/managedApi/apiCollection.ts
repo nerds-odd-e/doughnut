@@ -15,14 +15,11 @@ import {
   NoteRealm,
   Notebook,
   NotebooksViewedByUser,
-  QuizQuestion,
   RedirectToNoteResponse,
   Subscription,
-  SuggestedQuestionForFineTuning,
   WikidataAssociationCreation,
   WikidataEntityData,
   WikidataSearchEntity,
-  QuestionSuggestionParams,
   CircleJoiningByInvitation,
   SearchTerm,
 } from "@/generated/backend";
@@ -40,48 +37,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
   },
 
-  reviewMethods: {
-    async getRandomQuestionForReviewPoint(reviewPointId: Doughnut.ID) {
-      const res = (await managedApi.restGet(
-        `review-points/${reviewPointId}/random-question`,
-      )) as QuizQuestion;
-      return res;
-    },
-  },
-  fineTuning: {
-    async getSuggestedQuestionsForFineTuning() {
-      return (await managedApi.restGet(
-        "fine-tuning/all-suggested-questions-for-fine-tuning",
-      )) as SuggestedQuestionForFineTuning[];
-    },
-    async postUploadAndTriggerFineTuning() {
-      await managedApi.restPost(
-        "fine-tuning/upload-and-trigger-fine-tuning",
-        {},
-      );
-    },
-    async suggestedQuestionForFineTuningUpdate(
-      suggestedId: Doughnut.ID,
-      suggestedQuestion: QuestionSuggestionParams,
-    ): Promise<string> {
-      return managedApi.restPatch(
-        `fine-tuning/${suggestedId}/update-suggested-question-for-fine-tuning`,
-        suggestedQuestion,
-      ) as Promise<string>;
-    },
-    async duplicateSuggestedQuestionForFineTuning(id: Doughnut.ID) {
-      return (await managedApi.restPost(
-        `fine-tuning/${id}/duplicate`,
-        {},
-      )) as SuggestedQuestionForFineTuning;
-    },
-    async deleteSuggestedQuestionForFineTuning(id: Doughnut.ID) {
-      return (await managedApi.restPost(
-        `fine-tuning/${id}/delete`,
-        {},
-      )) as SuggestedQuestionForFineTuning;
-    },
-  },
   circleMethods: {
     async getCircle(circleId: Doughnut.ID) {
       return (await managedApi.restGet(

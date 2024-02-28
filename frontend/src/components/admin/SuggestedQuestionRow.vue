@@ -64,7 +64,7 @@ export default {
   methods: {
     async duplicateQuestion(suggested: SuggestedQuestionForFineTuning) {
       const duplicated =
-        await this.api.fineTuning.duplicateSuggestedQuestionForFineTuning(
+        await this.managedApi.restFineTuningDataController.duplicate(
           suggested.id,
         );
       this.$emit("duplicated", duplicated);
@@ -78,9 +78,7 @@ export default {
           `Are you sure to delete this suggestion (${suggested.preservedQuestion.stem})?`,
         )
       ) {
-        await this.api.fineTuning.deleteSuggestedQuestionForFineTuning(
-          suggested.id,
-        );
+        await this.managedApi.restFineTuningDataController.delete(suggested.id);
       }
     },
   },
