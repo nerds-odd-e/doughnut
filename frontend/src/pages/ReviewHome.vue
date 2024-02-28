@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import { timezoneParam } from "@/managedApi/apiCollection";
 import ReviewWelcome from "../components/review/ReviewWelcome.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
@@ -20,8 +21,9 @@ export default {
   },
   components: { ReviewWelcome, ContainerPage },
   methods: {
-    fetchData() {
-      this.api.reviewMethods.overview().then((res) => (this.reviewing = res));
+    async fetchData() {
+      this.reviewing =
+        await this.managedApi.restReviewsController.overview(timezoneParam());
     },
   },
   mounted() {
