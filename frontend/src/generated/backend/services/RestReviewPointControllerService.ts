@@ -62,7 +62,7 @@ export class RestReviewPointControllerService {
         successful: boolean,
     ): CancelablePromise<ReviewPoint> {
         return this.httpRequest.request({
-            method: 'POST',
+            method: 'PATCH',
             url: '/api/review-points/{reviewPoint}/mark-as-repeated',
             path: {
                 'reviewPoint': reviewPoint,

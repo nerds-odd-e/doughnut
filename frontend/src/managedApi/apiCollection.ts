@@ -20,10 +20,8 @@ import {
   QuizQuestion,
   RedirectToNoteResponse,
   ReviewPoint,
-  ReviewSetting,
   Subscription,
   SuggestedQuestionForFineTuning,
-  Thing,
   WikidataAssociationCreation,
   WikidataEntityData,
   WikidataSearchEntity,
@@ -37,6 +35,11 @@ import ManagedApi from "./ManagedApi";
 
 export const timezoneParam = () => {
   const { timeZone } = Intl.DateTimeFormat().resolvedOptions();
+  return timeZone;
+};
+
+const timezoneParam1 = () => {
+  const { timeZone } = Intl.DateTimeFormat().resolvedOptions();
   return `timezone=${encodeURIComponent(timeZone)}`;
 };
 
@@ -48,22 +51,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
   },
 
   reviewMethods: {
-    updateReviewSetting(noteId: Doughnut.ID, data: Omit<ReviewSetting, "id">) {
-      return managedApi.restPost(`notes/${noteId}/review-setting`, data);
-    },
-
-    async getReviewPoint(reviewPointId: Doughnut.ID) {
-      return (await managedApi.restGet(
-        `review-points/${reviewPointId}`,
-      )) as ReviewPoint;
-    },
-
-    async initialReview() {
-      return (await managedApi.restGet(
-        `reviews/initial?${timezoneParam()}`,
-      )) as Thing[];
-    },
-
     async doInitialReview(data: InitialInfo) {
       return (await managedApi.restPost(`reviews`, data)) as ReviewPoint;
     },
@@ -84,7 +71,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
 
     async getDueReviewPoints(dueInDays?: number) {
       const res = (await managedApi.restGet(
-        `reviews/repeat?${timezoneParam()}&dueindays=${dueInDays ?? ""}`,
+        `reviews/repeat?${timezoneParam1()}&dueindays=${dueInDays ?? ""}`,
       )) as DueReviewPoints;
       return res;
     },
