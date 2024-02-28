@@ -101,10 +101,11 @@ export default defineComponent({
   methods: {
     async submitAnswer(answerData: AnswerDTO) {
       try {
-        const answerResult = await this.api.quizQuestions.processAnswer(
-          this.quizQuestion.id,
-          answerData,
-        );
+        const answerResult =
+          await this.managedApi.restQuizQuestionController.answerQuiz(
+            this.quizQuestion.id,
+            answerData,
+          );
         this.$emit("answered", answerResult);
       } catch (_e) {
         await this.popups.alert(
