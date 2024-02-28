@@ -30,7 +30,6 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { Thing } from "@/generated/backend";
-import { timezoneParam } from "@/managedApi/apiCollection";
 import ContainerPage from "./commons/ContainerPage.vue";
 import ProgressBar from "../components/commons/ProgressBar.vue";
 import SvgResume from "../components/svgs/SvgResume.vue";
@@ -89,15 +88,13 @@ export default defineComponent({
       this.loadInitialReview();
     },
     loadInitialReview() {
-      this.managedApi.restReviewsController
-        .initialReview(timezoneParam())
-        .then((resp) => {
-          if (resp.length === 0) {
-            this.$router.push({ name: "reviews" });
-            return;
-          }
-          this.things = resp;
-        });
+      this.api.reviewMethods.initialReview().then((resp) => {
+        if (resp.length === 0) {
+          this.$router.push({ name: "reviews" });
+          return;
+        }
+        this.things = resp;
+      });
     },
   },
   mounted() {

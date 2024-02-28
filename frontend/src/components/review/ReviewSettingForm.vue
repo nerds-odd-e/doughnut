@@ -51,17 +51,20 @@ export default defineComponent({
   emits: ["levelChanged"],
   data() {
     return {
-      formData: (this.reviewSetting ? this.reviewSetting : {}) as ReviewSetting,
+      formData: (this.reviewSetting ? this.reviewSetting : {}) as Omit<
+        ReviewSetting,
+        "id"
+      >,
       errors: {} as Partial<ReviewSetting>,
     };
   },
   methods: {
-    updateModelValue(newValue: ReviewSetting) {
+    updateModelValue(newValue: Partial<ReviewSetting>) {
       this.formData = {
         ...this.formData,
         ...newValue,
       };
-      this.managedApi.restNoteController
+      this.api.reviewMethods
         .updateReviewSetting(this.noteId, this.formData)
         .then(() => {
           if (newValue.level !== undefined) {

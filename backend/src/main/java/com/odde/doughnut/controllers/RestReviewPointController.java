@@ -91,7 +91,7 @@ class RestReviewPointController {
     return reviewPoint;
   }
 
-  @PatchMapping(path = "/{reviewPoint}/mark-as-repeated")
+  @PostMapping(path = "/{reviewPoint}/mark-as-repeated")
   @Transactional
   public ReviewPoint markAsRepeated(
       @PathVariable("reviewPoint") @Schema(type = "integer") ReviewPoint reviewPoint,
