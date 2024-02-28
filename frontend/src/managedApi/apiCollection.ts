@@ -27,6 +27,7 @@ import {
   WikidataAssociationCreation,
   WikidataEntityData,
   WikidataSearchEntity,
+  ReviewStatus,
   InitialInfo,
   SelfEvaluation,
   QuestionSuggestionParams,
@@ -35,7 +36,7 @@ import {
 } from "@/generated/backend";
 import ManagedApi from "./ManagedApi";
 
-export const timezoneParam = () => {
+const timezoneParam = () => {
   const { timeZone } = Intl.DateTimeFormat().resolvedOptions();
   return `timezone=${encodeURIComponent(timeZone)}`;
 };
@@ -48,6 +49,18 @@ const apiCollection = (managedApi: ManagedApi) => ({
   },
 
   reviewMethods: {
+    async removeFromReview(reviewPointId: Doughnut.ID) {
+      return (await managedApi.restPost(
+        `review-points/${reviewPointId}/remove`,
+        {},
+      )) as ReviewPoint;
+    },
+
+    async overview() {
+      return (await managedApi.restGet(
+        `reviews/overview?${timezoneParam()}`,
+      )) as ReviewStatus;
+    },
     updateReviewSetting(noteId: Doughnut.ID, data: Omit<ReviewSetting, "id">) {
       return managedApi.restPost(`notes/${noteId}/review-setting`, data);
     },

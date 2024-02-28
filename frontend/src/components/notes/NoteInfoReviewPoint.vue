@@ -84,8 +84,8 @@ export default defineComponent({
       ) {
         return;
       }
-      this.managedApi.restReviewPointController
-        .removeFromRepeating(this.reviewPoint.id)
+      this.api.reviewMethods
+        .removeFromReview(this.reviewPoint.id)
         .then((reviewPoint) => {
           this.$emit("selfEvaluated", reviewPoint);
         });
