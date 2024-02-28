@@ -15,11 +15,7 @@ import jakarta.validation.Valid;
 import java.sql.Timestamp;
 import java.util.function.Consumer;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/text_content")
@@ -44,7 +40,7 @@ class RestTextContentController {
   @Transactional
   public NoteRealm updateNoteTopicConstructor(
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
-      @Valid @ModelAttribute NoteUpdateTopicDTO topicDTO)
+      @Valid @RequestBody NoteUpdateTopicDTO topicDTO)
       throws UnexpectedNoAccessRightException {
     return updateNote(note, n -> n.setTopicConstructor(topicDTO.getTopicConstructor()));
   }
@@ -53,7 +49,7 @@ class RestTextContentController {
   @Transactional
   public NoteRealm updateNoteDetails(
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
-      @Valid @ModelAttribute NoteUpdateDetailsDTO detailsDTO)
+      @Valid @RequestBody NoteUpdateDetailsDTO detailsDTO)
       throws UnexpectedNoAccessRightException {
     return updateNote(note, n -> n.setDetails(detailsDTO.getDetails()));
   }

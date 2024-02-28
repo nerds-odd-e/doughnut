@@ -1403,6 +1403,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/NoteUpdateTopicDTO'
+        required: true
       responses:
         "500":
           description: Internal Server Error
@@ -1432,6 +1433,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/NoteUpdateDetailsDTO'
+        required: true
       responses:
         "500":
           description: Internal Server Error

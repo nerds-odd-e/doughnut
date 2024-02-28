@@ -17,7 +17,7 @@ export class RestTextContentControllerService {
      */
     public updateNoteTopicConstructor(
         note: number,
-        requestBody?: NoteUpdateTopicDTO,
+        requestBody: NoteUpdateTopicDTO,
     ): CancelablePromise<NoteRealm> {
         return this.httpRequest.request({
             method: 'PATCH',
@@ -40,7 +40,7 @@ export class RestTextContentControllerService {
      */
     public updateNoteDetails(
         note: number,
-        requestBody?: NoteUpdateDetailsDTO,
+        requestBody: NoteUpdateDetailsDTO,
     ): CancelablePromise<NoteRealm> {
         return this.httpRequest.request({
             method: 'PATCH',
