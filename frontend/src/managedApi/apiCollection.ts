@@ -157,9 +157,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
     return managedApi.restPost(`notebooks/${notebookId}/share`, {});
   },
 
-  getFailureReports() {
-    return managedApi.restGet("failure-reports");
-  },
   getFailureReport(failureReportId: Doughnut.ID) {
     return managedApi.restGet(`failure-reports/${failureReportId}`);
   },

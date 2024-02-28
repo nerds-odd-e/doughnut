@@ -39,14 +39,17 @@ export default {
   },
   methods: {
     fetchData() {
-      this.api
-        .getFailureReports()
+      this.managedApi.restFailureReportController
+        .failureReports()
         .then((res) => {
           this.failureReports = res;
         })
-        .catch(
-          () => (this.errorMessage = "It seems you cannot access this page."),
-        );
+        .catch((err) => {
+          if (err.status === 401) {
+            throw err;
+          }
+          this.errorMessage = "It seems you cannot access this page.";
+        });
     },
   },
   mounted() {
