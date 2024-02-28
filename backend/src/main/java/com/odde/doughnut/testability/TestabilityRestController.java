@@ -1,6 +1,6 @@
 package com.odde.doughnut.testability;
 
-import com.odde.doughnut.controllers.json.QuestionSuggestionParams;
+import com.odde.doughnut.controllers.dto.QuestionSuggestionParams;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.repositories.NoteRepository;

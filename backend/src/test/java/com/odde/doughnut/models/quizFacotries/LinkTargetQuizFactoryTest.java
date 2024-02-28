@@ -6,7 +6,7 @@ import static org.hamcrest.Matchers.in;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
-import com.odde.doughnut.controllers.json.QuizQuestion;
+import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.entities.LinkingNote;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;

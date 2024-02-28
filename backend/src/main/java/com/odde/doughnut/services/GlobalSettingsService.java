@@ -1,6 +1,6 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.controllers.json.GlobalAiModelSettings;
+import com.odde.doughnut.controllers.dto.GlobalAiModelSettings;
 import com.odde.doughnut.entities.GlobalSettings;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;

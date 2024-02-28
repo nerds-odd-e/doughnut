@@ -5,9 +5,9 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 
-import com.odde.doughnut.controllers.json.NoteCreationDTO;
-import com.odde.doughnut.controllers.json.NoteRealm;
-import com.odde.doughnut.controllers.json.WikidataAssociationCreation;
+import com.odde.doughnut.controllers.dto.NoteCreationDTO;
+import com.odde.doughnut.controllers.dto.NoteRealm;
+import com.odde.doughnut.controllers.dto.WikidataAssociationCreation;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;

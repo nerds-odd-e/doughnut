@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator;
-import com.odde.doughnut.controllers.json.AiCompletionRequiredAction;
+import com.odde.doughnut.controllers.dto.AiCompletionRequiredAction;
 import com.theokanning.openai.assistants.AssistantFunction;
 import com.theokanning.openai.assistants.AssistantToolsEnum;
 import com.theokanning.openai.assistants.Tool;

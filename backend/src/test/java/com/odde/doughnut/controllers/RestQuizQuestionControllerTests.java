@@ -8,9 +8,10 @@ import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.controllers.json.QuestionSuggestionCreationParams;
-import com.odde.doughnut.controllers.json.QuizQuestion;
-import com.odde.doughnut.controllers.json.QuizQuestionContestResult;
+import com.odde.doughnut.controllers.dto.AnswerDTO;
+import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
+import com.odde.doughnut.controllers.dto.QuizQuestion;
+import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.quizQuestions.QuizQuestionAIQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -70,7 +71,7 @@ class RestQuizQuestionControllerTests {
   class answer {
     ReviewPoint reviewPoint;
     QuizQuestionEntity quizQuestionEntity;
-    Answer answer;
+    AnswerDTO answerDTO = new AnswerDTO();
 
     @BeforeEach
     void setup() {
@@ -82,14 +83,13 @@ class RestQuizQuestionControllerTests {
               .forgettingCurveAndNextReviewAt(200)
               .please();
       quizQuestionEntity = makeMe.aQuestion().spellingQuestionOfReviewPoint(answerNote).please();
-      answer =
-          makeMe.anAnswer().answerWithSpelling(answerNote.getTopicConstructor()).inMemoryPlease();
+      answerDTO.setSpellingAnswer(answerNote.getTopicConstructor());
     }
 
     @Test
     void shouldValidateTheAnswerAndUpdateReviewPoint() {
       Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
-      AnsweredQuestion answerResult = controller.answerQuiz(quizQuestionEntity, answer);
+      AnsweredQuestion answerResult = controller.answerQuiz(quizQuestionEntity, answerDTO);
       assertTrue(answerResult.correct);
       assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
     }
@@ -98,7 +98,7 @@ class RestQuizQuestionControllerTests {
     void shouldNoteIncreaseIndexIfRepeatImmediately() {
       testabilitySettings.timeTravelTo(reviewPoint.getLastReviewedAt());
       Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
-      controller.answerQuiz(quizQuestionEntity, answer);
+      controller.answerQuiz(quizQuestionEntity, answerDTO);
       assertThat(reviewPoint.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
     }
 
@@ -106,7 +106,7 @@ class RestQuizQuestionControllerTests {
     void shouldIncreaseTheIndex() {
       testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
       Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
-      controller.answerQuiz(quizQuestionEntity, answer);
+      controller.answerQuiz(quizQuestionEntity, answerDTO);
       assertThat(reviewPoint.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
       assertThat(
           reviewPoint.getLastReviewedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
@@ -114,7 +114,7 @@ class RestQuizQuestionControllerTests {
 
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-      Answer answer = new Answer();
+      AnswerDTO answer = new AnswerDTO();
       assertThrows(
           ResponseStatusException.class,
           () -> nullUserController().answerQuiz(quizQuestionEntity, answer));
@@ -126,14 +126,14 @@ class RestQuizQuestionControllerTests {
       void setup() {
         quizQuestionEntity =
             makeMe.aQuestion().spellingQuestionOfReviewPoint(reviewPoint.getNote()).please();
-        answer = makeMe.anAnswer().answerWithSpelling("wrong").inMemoryPlease();
+        answerDTO.setSpellingAnswer("wrong");
       }
 
       @Test
       void shouldValidateTheWrongAnswer() {
         testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
         Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
-        AnsweredQuestion answerResult = controller.answerQuiz(quizQuestionEntity, answer);
+        AnsweredQuestion answerResult = controller.answerQuiz(quizQuestionEntity, answerDTO);
         assertFalse(answerResult.correct);
         assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
       }
@@ -143,14 +143,14 @@ class RestQuizQuestionControllerTests {
         testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
         Timestamp lastReviewedAt = reviewPoint.getLastReviewedAt();
         Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
-        controller.answerQuiz(quizQuestionEntity, answer);
+        controller.answerQuiz(quizQuestionEntity, answerDTO);
         assertThat(reviewPoint.getForgettingCurveIndex(), lessThan(oldForgettingCurveIndex));
         assertThat(reviewPoint.getLastReviewedAt(), equalTo(lastReviewedAt));
       }
 
       @Test
       void shouldRepeatTheNextDay() {
-        controller.answerQuiz(quizQuestionEntity, answer);
+        controller.answerQuiz(quizQuestionEntity, answerDTO);
         assertThat(
             reviewPoint.getNextReviewAt(),
             lessThan(

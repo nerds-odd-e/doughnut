@@ -9,7 +9,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.odde.doughnut.controllers.json.LinkViewed;
+import com.odde.doughnut.controllers.dto.LinkViewed;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;

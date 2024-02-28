@@ -1,8 +1,8 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.json.DueReviewPoints;
-import com.odde.doughnut.controllers.json.InitialInfo;
-import com.odde.doughnut.controllers.json.ReviewStatus;
+import com.odde.doughnut.controllers.dto.DueReviewPoints;
+import com.odde.doughnut.controllers.dto.InitialInfo;
+import com.odde.doughnut.controllers.dto.ReviewStatus;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;

@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.controllers.json.QuizQuestionContestResult;
+import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.quizQuestions.QuizQuestionAIQuestion;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;

@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { Answer } from '../models/Answer';
+import type { AnswerDTO } from '../models/AnswerDTO';
 import type { AnsweredQuestion } from '../models/AnsweredQuestion';
 import type { QuestionSuggestionCreationParams } from '../models/QuestionSuggestionCreationParams';
 import type { QuizQuestion } from '../models/QuizQuestion';
@@ -81,7 +81,7 @@ export class RestQuizQuestionControllerService {
      */
     public answerQuiz(
         quizQuestion: number,
-        requestBody: Answer,
+        requestBody: AnswerDTO,
     ): CancelablePromise<AnsweredQuestion> {
         return this.httpRequest.request({
             method: 'POST',

@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import com.odde.doughnut.controllers.json.AiCompletionAnswerClarifyingQuestionParams;
-import com.odde.doughnut.controllers.json.AiCompletionParams;
-import com.odde.doughnut.controllers.json.AiCompletionResponse;
+import com.odde.doughnut.controllers.dto.AiCompletionAnswerClarifyingQuestionParams;
+import com.odde.doughnut.controllers.dto.AiCompletionParams;
+import com.odde.doughnut.controllers.dto.AiCompletionResponse;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;

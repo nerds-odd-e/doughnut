@@ -1,6 +1,6 @@
 package com.odde.doughnut.services.wikidataApis;
 
-import com.odde.doughnut.controllers.json.WikidataEntityData;
+import com.odde.doughnut.controllers.dto.WikidataEntityData;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;

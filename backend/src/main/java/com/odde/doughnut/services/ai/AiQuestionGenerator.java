@@ -1,6 +1,6 @@
 package com.odde.doughnut.services.ai;
 
-import com.odde.doughnut.controllers.json.QuizQuestionContestResult;
+import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.quizQuestions.QuizQuestionAIQuestion;
 import com.odde.doughnut.services.GlobalSettingsService;

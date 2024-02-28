@@ -2,7 +2,6 @@ package com.odde.doughnut.controllers.dto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.odde.doughnut.controllers.json.UserDTO;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
 import jakarta.validation.ConstraintViolation;

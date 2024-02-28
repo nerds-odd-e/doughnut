@@ -1,6 +1,6 @@
 package com.odde.doughnut.testability;
 
-import com.odde.doughnut.controllers.json.QuizQuestion;
+import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;

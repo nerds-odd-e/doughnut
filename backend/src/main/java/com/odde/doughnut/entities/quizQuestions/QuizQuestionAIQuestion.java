@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.controllers.json.QuizQuestion;
+import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.PictureWithMask;
 import com.odde.doughnut.entities.QuizQuestionEntity;

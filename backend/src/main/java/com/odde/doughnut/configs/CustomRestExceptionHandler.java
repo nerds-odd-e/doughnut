@@ -1,6 +1,6 @@
 package com.odde.doughnut.configs;
 
-import com.odde.doughnut.controllers.json.ApiError;
+import com.odde.doughnut.controllers.dto.ApiError;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;

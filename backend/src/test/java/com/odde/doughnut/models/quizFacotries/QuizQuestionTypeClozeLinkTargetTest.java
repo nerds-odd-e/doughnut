@@ -3,7 +3,7 @@ package com.odde.doughnut.models.quizFacotries;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-import com.odde.doughnut.controllers.json.QuizQuestion;
+import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.entities.LinkingNote;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;

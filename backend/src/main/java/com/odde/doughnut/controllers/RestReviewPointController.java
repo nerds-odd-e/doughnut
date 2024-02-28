@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.json.QuizQuestion;
-import com.odde.doughnut.controllers.json.SelfEvaluation;
+import com.odde.doughnut.controllers.dto.QuizQuestion;
+import com.odde.doughnut.controllers.dto.SelfEvaluation;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;

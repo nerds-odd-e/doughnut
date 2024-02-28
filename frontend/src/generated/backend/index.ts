@@ -16,6 +16,7 @@ export type { AiCompletionRequiredAction } from './models/AiCompletionRequiredAc
 export type { AiCompletionResponse } from './models/AiCompletionResponse';
 export type { AiGeneratedImage } from './models/AiGeneratedImage';
 export type { Answer } from './models/Answer';
+export type { AnswerDTO } from './models/AnswerDTO';
 export type { AnsweredQuestion } from './models/AnsweredQuestion';
 export type { ChatRequest } from './models/ChatRequest';
 export type { ChatResponse } from './models/ChatResponse';

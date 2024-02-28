@@ -726,7 +726,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Answer'
+              $ref: '#/components/schemas/AnswerDTO'
         required: true
       responses:
         "500":
@@ -2435,14 +2435,9 @@ components:
           type: string
         rejected:
           type: boolean
-    Answer:
-      required:
-      - id
+    AnswerDTO:
       type: object
       properties:
-        id:
-          type: integer
-          format: int32
         spellingAnswer:
           type: string
         choiceIndex:
@@ -2810,6 +2805,21 @@ components:
         toInitialReviewCount:
           type: integer
           format: int32
+    Answer:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        spellingAnswer:
+          type: string
+        choiceIndex:
+          type: integer
+          format: int32
+        fromDTO:
+          $ref: '#/components/schemas/AnswerDTO'
     NoteInfo:
       required:
       - createdAt

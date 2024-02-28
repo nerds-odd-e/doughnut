@@ -1,6 +1,6 @@
 package com.odde.doughnut.exceptions;
 
-import com.odde.doughnut.controllers.json.ApiError;
+import com.odde.doughnut.controllers.dto.ApiError;
 import org.springframework.http.HttpStatus;
 
 public class WikidataServiceErrorException extends ApiException {

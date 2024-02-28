@@ -27,13 +27,13 @@ import {
   WikidataAssociationCreation,
   WikidataEntityData,
   WikidataSearchEntity,
-  Answer,
   ReviewStatus,
   InitialInfo,
   SelfEvaluation,
   QuestionSuggestionParams,
   CircleJoiningByInvitation,
   SearchTerm,
+  AnswerDTO,
 } from "@/generated/backend";
 import ManagedApi from "./ManagedApi";
 
@@ -50,7 +50,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
   },
 
   quizQuestions: {
-    async processAnswer(quizQuestionId: Doughnut.ID, data: Partial<Answer>) {
+    async processAnswer(quizQuestionId: Doughnut.ID, data: AnswerDTO) {
       const res = (await managedApi.restPost(
         `quiz-questions/${quizQuestionId}/answer`,
         data,

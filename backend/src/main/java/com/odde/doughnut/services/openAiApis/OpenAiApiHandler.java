@@ -4,7 +4,7 @@ import static com.odde.doughnut.services.openAiApis.ApiExecutor.blockGet;
 import static java.lang.Thread.sleep;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.odde.doughnut.controllers.json.AiCompletionAnswerClarifyingQuestionParams;
+import com.odde.doughnut.controllers.dto.AiCompletionAnswerClarifyingQuestionParams;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.theokanning.openai.assistants.Assistant;

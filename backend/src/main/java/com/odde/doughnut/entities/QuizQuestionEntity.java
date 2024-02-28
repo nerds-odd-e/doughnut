@@ -1,9 +1,8 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.odde.doughnut.controllers.json.QuizQuestion;
+import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.factoryServices.quizFacotries.*;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;

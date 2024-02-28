@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -48,5 +49,10 @@ public class Answer extends EntityIdentifiedByIdOnly {
       return question.getOptions(modelFactoryService).get(choiceIndex).getDisplay();
     }
     return getSpellingAnswer();
+  }
+
+  public void setFromDTO(AnswerDTO answerDTO) {
+    setSpellingAnswer(answerDTO.getSpellingAnswer());
+    setChoiceIndex(answerDTO.getChoiceIndex());
   }
 }

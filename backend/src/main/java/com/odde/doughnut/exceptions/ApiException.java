@@ -1,6 +1,6 @@
 package com.odde.doughnut.exceptions;
 
-import com.odde.doughnut.controllers.json.ApiError;
+import com.odde.doughnut.controllers.dto.ApiError;
 
 public class ApiException extends RuntimeException {
   private final ApiError apiError;

@@ -1,6 +1,6 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.controllers.json.*;
+import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.*;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;

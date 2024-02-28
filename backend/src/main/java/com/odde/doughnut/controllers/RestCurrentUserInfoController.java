@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
-import com.odde.doughnut.controllers.json.CurrentUserInfo;
+import com.odde.doughnut.controllers.dto.CurrentUserInfo;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

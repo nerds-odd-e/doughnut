@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.controllers.json.QuizQuestionContestResult;
+import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
 import java.util.Optional;
 
 public class QuestionEvaluation {

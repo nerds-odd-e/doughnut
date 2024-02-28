@@ -1,8 +1,8 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.json.NoteRealm;
-import com.odde.doughnut.controllers.json.NoteUpdateDetailsDTO;
-import com.odde.doughnut.controllers.json.NoteUpdateTopicDTO;
+import com.odde.doughnut.controllers.dto.NoteRealm;
+import com.odde.doughnut.controllers.dto.NoteUpdateDetailsDTO;
+import com.odde.doughnut.controllers.dto.NoteUpdateTopicDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;

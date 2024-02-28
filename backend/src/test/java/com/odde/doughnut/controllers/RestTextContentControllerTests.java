@@ -4,9 +4,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.odde.doughnut.controllers.json.NoteRealm;
-import com.odde.doughnut.controllers.json.NoteUpdateDetailsDTO;
-import com.odde.doughnut.controllers.json.NoteUpdateTopicDTO;
+import com.odde.doughnut.controllers.dto.NoteRealm;
+import com.odde.doughnut.controllers.dto.NoteUpdateDetailsDTO;
+import com.odde.doughnut.controllers.dto.NoteUpdateTopicDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;

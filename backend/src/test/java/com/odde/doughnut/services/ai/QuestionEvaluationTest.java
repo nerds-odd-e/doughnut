@@ -3,7 +3,7 @@ package com.odde.doughnut.services.ai;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
-import com.odde.doughnut.controllers.json.QuizQuestionContestResult;
+import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
 import org.junit.jupiter.api.Test;
 
 class QuestionEvaluationTest {

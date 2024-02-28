@@ -1,8 +1,8 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.controllers.json.LinkViewed;
-import com.odde.doughnut.controllers.json.NotePositionViewedByUser;
-import com.odde.doughnut.controllers.json.NoteRealm;
+import com.odde.doughnut.controllers.dto.LinkViewed;
+import com.odde.doughnut.controllers.dto.NotePositionViewedByUser;
+import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.*;
 import java.util.Arrays;
 import java.util.List;

@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
-import com.odde.doughnut.controllers.json.CurrentUserInfo;
+import com.odde.doughnut.controllers.dto.CurrentUserInfo;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.Test;

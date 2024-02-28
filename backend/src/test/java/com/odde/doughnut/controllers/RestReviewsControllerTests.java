@@ -6,8 +6,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.odde.doughnut.controllers.json.DueReviewPoints;
-import com.odde.doughnut.controllers.json.InitialInfo;
+import com.odde.doughnut.controllers.dto.DueReviewPoints;
+import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;

@@ -1,8 +1,8 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.json.NoteCreationDTO;
-import com.odde.doughnut.controllers.json.NotebooksViewedByUser;
-import com.odde.doughnut.controllers.json.RedirectToNoteResponse;
+import com.odde.doughnut.controllers.dto.NoteCreationDTO;
+import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
+import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;

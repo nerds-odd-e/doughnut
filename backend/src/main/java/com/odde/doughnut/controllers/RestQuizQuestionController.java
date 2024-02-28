@@ -1,8 +1,9 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.json.QuestionSuggestionCreationParams;
-import com.odde.doughnut.controllers.json.QuizQuestion;
-import com.odde.doughnut.controllers.json.QuizQuestionContestResult;
+import com.odde.doughnut.controllers.dto.AnswerDTO;
+import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
+import com.odde.doughnut.controllers.dto.QuizQuestion;
+import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.quizQuestions.QuizQuestionAIQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -88,9 +89,11 @@ class RestQuizQuestionController {
   @Transactional
   public AnsweredQuestion answerQuiz(
       @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestionEntity quizQuestionEntity,
-      @Valid @RequestBody Answer answer) {
+      @Valid @RequestBody AnswerDTO answerDTO) {
     currentUser.assertLoggedIn();
+    Answer answer = new Answer();
     answer.setQuestion(quizQuestionEntity);
+    answer.setFromDTO(answerDTO);
     AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
     answerModel.makeAnswerToQuestion(
         testabilitySettings.getCurrentUTCTimestamp(), currentUser.getEntity());

@@ -1,6 +1,6 @@
 package com.odde.doughnut.entities.quizQuestions;
 
-import com.odde.doughnut.controllers.json.QuizQuestion;
+import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.PictureWithMask;
 import com.odde.doughnut.entities.QuizQuestionEntity;

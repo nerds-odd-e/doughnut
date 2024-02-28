@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.odde.doughnut.controllers.json.ChatRequest;
-import com.odde.doughnut.controllers.json.ChatResponse;
+import com.odde.doughnut.controllers.dto.ChatRequest;
+import com.odde.doughnut.controllers.dto.ChatResponse;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
