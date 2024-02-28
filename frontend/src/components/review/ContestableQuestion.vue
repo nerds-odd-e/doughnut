@@ -84,9 +84,10 @@ export default defineComponent({
     },
     async contest() {
       this.currentQuestionLegitMessage = "";
-      const contestResult = await this.api.quizQuestions.contest(
-        this.currentQuestion.id,
-      );
+      const contestResult =
+        await this.managedApi.restQuizQuestionController.contest(
+          this.currentQuestion.id,
+        );
 
       if (!contestResult.rejected) {
         this.regenerating = true;
@@ -94,9 +95,10 @@ export default defineComponent({
           quizeQuestion: this.currentQuestion,
           badQuestionReason: contestResult.reason,
         });
-        this.currentQuestion = await this.api.quizQuestions.regenerateQuestion(
-          this.currentQuestion.id,
-        );
+        this.currentQuestion =
+          await this.managedApi.restQuizQuestionController.regenerate(
+            this.currentQuestion.id,
+          );
       } else {
         this.currentQuestionLegitMessage = contestResult.reason;
       }

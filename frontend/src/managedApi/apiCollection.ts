@@ -18,8 +18,6 @@ import {
   Notebook,
   NotebooksViewedByUser,
   QuizQuestion,
-  QuestionSuggestionCreationParams,
-  QuizQuestionContestResult,
   RedirectToNoteResponse,
   ReviewPoint,
   ReviewSetting,
@@ -52,30 +50,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
   },
 
   quizQuestions: {
-    async regenerateQuestion(quizQuestionId: number): Promise<QuizQuestion> {
-      return managedApi.restPost(
-        `quiz-questions/${quizQuestionId}/regenerate`,
-        {},
-      ) as Promise<QuizQuestion>;
-    },
-
-    async contest(quizQuestionId: number): Promise<QuizQuestionContestResult> {
-      return managedApi.restPost(
-        `quiz-questions/${quizQuestionId}/contest`,
-        {},
-      ) as Promise<QuizQuestionContestResult>;
-    },
-
-    async suggestQuestionForFineTuning(
-      quizQuestionId: number,
-      suggestedQuestion: QuestionSuggestionCreationParams,
-    ): Promise<string> {
-      return managedApi.restPost(
-        `quiz-questions/${quizQuestionId}/suggest-fine-tuning`,
-        suggestedQuestion,
-      ) as Promise<string>;
-    },
-
     async processAnswer(quizQuestionId: Doughnut.ID, data: Partial<Answer>) {
       const res = (await managedApi.restPost(
         `quiz-questions/${quizQuestionId}/answer`,

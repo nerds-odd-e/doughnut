@@ -50,7 +50,7 @@ const params = ref<QuestionSuggestionCreationParams>({
   isPositiveFeedback: false,
   comment: "",
 });
-const { api } = useLoadingApi();
+const { managedApi } = useLoadingApi();
 
 const props = defineProps<{
   quizQuestion: QuizQuestion;
@@ -61,7 +61,7 @@ const emit = defineEmits(["closeDialog"]);
 const { quizQuestion } = props;
 
 async function suggestQuestionForFineTuning() {
-  await api.quizQuestions.suggestQuestionForFineTuning(
+  await managedApi.restQuizQuestionController.suggestQuestionForFineTuning(
     quizQuestion.id,
     params.value,
   );
