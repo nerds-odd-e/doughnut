@@ -1,6 +1,5 @@
 import HttpResponseError from "./HttpResponseError";
 import BadRequestError from "./BadRequestError";
-import loginOrRegisterAndHaltThisThread from "./loginOrRegisterAndHaltThisThread";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type JsonData = any;
@@ -53,16 +52,11 @@ const request = async (
   }
   if (res.status === 401) {
     if (method === "GET") {
-      await loginOrRegisterAndHaltThisThread();
+      // eslint-disable-next-line no-throw-literal
+      throw "Unauthorized";
     }
-    if (
-      // eslint-disable-next-line no-alert
-      window.confirm(
-        "You are logged out. Do you want to log in (and lose the current changes)?",
-      )
-    ) {
-      await loginOrRegisterAndHaltThisThread();
-    }
+    // eslint-disable-next-line no-throw-literal
+    throw "Unauthorized non-GET request";
   }
   let errorMsg = "";
 
