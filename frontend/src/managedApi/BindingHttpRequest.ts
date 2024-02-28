@@ -21,9 +21,6 @@ export default function BindingHttpRequest(
         this.around(originalPromise)
           .then(resolve)
           .catch((error: unknown) => {
-            if (error instanceof Error) {
-              apiStatusHandler.addError(error.message);
-            }
             if (error instanceof ApiError && error.status === 401) {
               if (
                 error.request.method === "GET" ||
@@ -35,6 +32,9 @@ export default function BindingHttpRequest(
                 loginOrRegisterAndHaltThisThread();
                 return;
               }
+            }
+            if (error instanceof ApiError) {
+              apiStatusHandler.addError(error.message);
             }
             reject(error);
           });

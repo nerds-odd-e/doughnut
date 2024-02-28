@@ -110,7 +110,7 @@ describe("repeat page", () => {
         )
         .andReturnOnce(quizQuestion);
 
-      for (let i = 0; i < 10; i += 1) {
+      for (let i = 0; i < 20; i += 1) {
         // eslint-disable-next-line no-await-in-loop
         await wrapper.vm.$nextTick();
         expect(wrapper.find(".progress-text").text()).toContainEither(

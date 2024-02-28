@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import { ContentLoader } from "vue-content-loader";
-import { SuggestedQuestionForFineTuning } from "@/generated/backend";
+import { ApiError, SuggestedQuestionForFineTuning } from "@/generated/backend";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import SuggestedQuestionList from "./SuggestedQuestionList.vue";
 
@@ -40,7 +40,7 @@ export default {
         await this.managedApi.restFineTuningDataController.uploadAndTriggerFineTuning();
         this.fineTuningDataResultMsg = "Training initiated.";
       } catch (error) {
-        const errorInstance = error as Error;
+        const errorInstance = error as ApiError;
         this.fineTuningDataResultMsg = errorInstance.message;
       }
       this.showAlert = true;
