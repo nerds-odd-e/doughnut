@@ -557,10 +557,10 @@ paths:
       operationId: selfEvaluate
       parameters:
       - name: reviewPoint
-        in: path
+        in: query
         required: true
         schema:
-          type: integer
+          $ref: '#/components/schemas/ReviewPoint'
       requestBody:
         content:
           application/json:
@@ -587,10 +587,10 @@ paths:
       operationId: removeFromRepeating
       parameters:
       - name: reviewPoint
-        in: path
+        in: query
         required: true
         schema:
-          type: integer
+          $ref: '#/components/schemas/ReviewPoint'
       responses:
         "500":
           description: Internal Server Error
@@ -611,10 +611,10 @@ paths:
       operationId: markAsRepeated
       parameters:
       - name: reviewPoint
-        in: path
+        in: query
         required: true
         schema:
-          type: integer
+          $ref: '#/components/schemas/ReviewPoint'
       - name: successful
         in: query
         required: true
@@ -1784,7 +1784,7 @@ paths:
         in: path
         required: true
         schema:
-          type: integer
+          $ref: '#/components/schemas/ReviewPoint'
       responses:
         "500":
           description: Internal Server Error
@@ -1808,7 +1808,7 @@ paths:
         in: path
         required: true
         schema:
-          type: integer
+          $ref: '#/components/schemas/ReviewPoint'
       responses:
         "500":
           description: Internal Server Error

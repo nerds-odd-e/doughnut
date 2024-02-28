@@ -40,7 +40,7 @@ export default defineComponent({
       if (this.reviewPointId === undefined) {
         return;
       }
-      await this.managedApi.restReviewPointController.markAsRepeated(
+      await this.api.reviewMethods.markAsRepeated(
         this.reviewPointId,
         successful,
       );

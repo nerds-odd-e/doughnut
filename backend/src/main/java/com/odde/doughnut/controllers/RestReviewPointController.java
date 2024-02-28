@@ -13,7 +13,6 @@ import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -45,8 +44,7 @@ class RestReviewPointController {
   }
 
   @GetMapping("/{reviewPoint}")
-  public ReviewPoint show(
-      @PathVariable("reviewPoint") @Schema(type = "integer") ReviewPoint reviewPoint)
+  public ReviewPoint show(@PathVariable("reviewPoint") ReviewPoint reviewPoint)
       throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(reviewPoint);
@@ -55,8 +53,7 @@ class RestReviewPointController {
 
   @GetMapping("/{reviewPoint}/random-question")
   @Transactional
-  public QuizQuestion generateRandomQuestion(
-      @PathVariable("reviewPoint") @Schema(type = "integer") ReviewPoint reviewPoint) {
+  public QuizQuestion generateRandomQuestion(@PathVariable("reviewPoint") ReviewPoint reviewPoint) {
     currentUser.assertLoggedIn();
     Randomizer randomizer = testabilitySettings.getRandomizer();
     QuizQuestionGenerator quizQuestionGenerator =
@@ -69,8 +66,7 @@ class RestReviewPointController {
 
   @PostMapping(path = "/{reviewPoint}/remove")
   @Transactional
-  public ReviewPoint removeFromRepeating(
-      @PathVariable("reviewPoint") @Schema(type = "integer") ReviewPoint reviewPoint) {
+  public ReviewPoint removeFromRepeating(ReviewPoint reviewPoint) {
     reviewPoint.setRemovedFromReview(true);
     modelFactoryService.save(reviewPoint);
     return reviewPoint;
@@ -79,8 +75,7 @@ class RestReviewPointController {
   @PostMapping(path = "/{reviewPoint}/self-evaluate")
   @Transactional
   public ReviewPoint selfEvaluate(
-      @PathVariable("reviewPoint") @Schema(type = "integer") ReviewPoint reviewPoint,
-      @RequestBody SelfEvaluation selfEvaluation) {
+      ReviewPoint reviewPoint, @RequestBody SelfEvaluation selfEvaluation) {
     if (reviewPoint == null || reviewPoint.getId() == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The review point does not exist.");
     }
@@ -94,8 +89,7 @@ class RestReviewPointController {
   @PostMapping(path = "/{reviewPoint}/mark-as-repeated")
   @Transactional
   public ReviewPoint markAsRepeated(
-      @PathVariable("reviewPoint") @Schema(type = "integer") ReviewPoint reviewPoint,
-      @RequestParam("successful") boolean successful) {
+      ReviewPoint reviewPoint, @RequestParam("successful") boolean successful) {
     currentUser.assertLoggedIn();
     modelFactoryService
         .toReviewPointModel(reviewPoint)

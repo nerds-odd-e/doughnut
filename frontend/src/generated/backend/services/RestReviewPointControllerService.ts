@@ -16,13 +16,13 @@ export class RestReviewPointControllerService {
      * @throws ApiError
      */
     public selfEvaluate(
-        reviewPoint: number,
+        reviewPoint: ReviewPoint,
         requestBody: SelfEvaluation,
     ): CancelablePromise<ReviewPoint> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/review-points/{reviewPoint}/self-evaluate',
-            path: {
+            query: {
                 'reviewPoint': reviewPoint,
             },
             body: requestBody,
@@ -38,12 +38,12 @@ export class RestReviewPointControllerService {
      * @throws ApiError
      */
     public removeFromRepeating(
-        reviewPoint: number,
+        reviewPoint: ReviewPoint,
     ): CancelablePromise<ReviewPoint> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/review-points/{reviewPoint}/remove',
-            path: {
+            query: {
                 'reviewPoint': reviewPoint,
             },
             errors: {
@@ -58,16 +58,14 @@ export class RestReviewPointControllerService {
      * @throws ApiError
      */
     public markAsRepeated(
-        reviewPoint: number,
+        reviewPoint: ReviewPoint,
         successful: boolean,
     ): CancelablePromise<ReviewPoint> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/review-points/{reviewPoint}/mark-as-repeated',
-            path: {
-                'reviewPoint': reviewPoint,
-            },
             query: {
+                'reviewPoint': reviewPoint,
                 'successful': successful,
             },
             errors: {
@@ -81,7 +79,7 @@ export class RestReviewPointControllerService {
      * @throws ApiError
      */
     public show(
-        reviewPoint: number,
+        reviewPoint: ReviewPoint,
     ): CancelablePromise<ReviewPoint> {
         return this.httpRequest.request({
             method: 'GET',
@@ -100,7 +98,7 @@ export class RestReviewPointControllerService {
      * @throws ApiError
      */
     public generateRandomQuestion(
-        reviewPoint: number,
+        reviewPoint: ReviewPoint,
     ): CancelablePromise<QuizQuestion> {
         return this.httpRequest.request({
             method: 'GET',

@@ -33,6 +33,7 @@ import {
   QuestionSuggestionParams,
   CircleJoiningByInvitation,
   SearchTerm,
+  AnswerDTO,
 } from "@/generated/backend";
 import ManagedApi from "./ManagedApi";
 
@@ -48,7 +49,24 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
   },
 
+  quizQuestions: {
+    async processAnswer(quizQuestionId: Doughnut.ID, data: AnswerDTO) {
+      const res = (await managedApi.restPost(
+        `quiz-questions/${quizQuestionId}/answer`,
+        data,
+      )) as AnsweredQuestion;
+      return res;
+    },
+  },
+
   reviewMethods: {
+    async markAsRepeated(reviewPointId: Doughnut.ID, successful: boolean) {
+      return (await managedApi.restPost(
+        `review-points/${reviewPointId}/mark-as-repeated?successful=${successful}`,
+        {},
+      )) as ReviewPoint;
+    },
+
     async removeFromReview(reviewPointId: Doughnut.ID) {
       return (await managedApi.restPost(
         `review-points/${reviewPointId}/remove`,
