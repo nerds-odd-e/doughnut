@@ -82,7 +82,9 @@ export default defineComponent({
       this.timer = setTimeout(() => {
         this.fetchData();
       }, 5000);
-      this.circle = await this.api.circleMethods.getCircle(this.circleId);
+      this.circle = await this.managedApi.restCircleController.showCircle(
+        this.circleId,
+      );
     },
   },
 

@@ -1164,6 +1164,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Circle'
+        required: true
       responses:
         "500":
           description: Internal Server Error
@@ -1216,6 +1217,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CircleJoiningByInvitation'
+        required: true
       responses:
         "500":
           description: Internal Server Error
@@ -2000,7 +2002,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/Circle'
+          type: integer
       responses:
         "500":
           description: Internal Server Error

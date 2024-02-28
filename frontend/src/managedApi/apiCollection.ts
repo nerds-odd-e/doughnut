@@ -6,7 +6,6 @@ import {
   ChatRequest,
   ChatResponse,
   Circle,
-  CircleForUserView,
   GlobalAiModelSettings,
   Note,
   NoteCreationDTO,
@@ -20,7 +19,6 @@ import {
   WikidataAssociationCreation,
   WikidataEntityData,
   WikidataSearchEntity,
-  CircleJoiningByInvitation,
   SearchTerm,
 } from "@/generated/backend";
 import ManagedApi from "./ManagedApi";
@@ -34,26 +32,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
   userMethods: {
     logout() {
       return managedApi.restPostWithHtmlResponse(`/logout`, {});
-    },
-  },
-
-  circleMethods: {
-    async getCircle(circleId: Doughnut.ID) {
-      return (await managedApi.restGet(
-        `circles/${circleId}`,
-      )) as CircleForUserView;
-    },
-    async createCircle(data: Circle) {
-      return (await managedApi.restPostMultiplePartForm(
-        "circles",
-        data,
-      )) as Circle;
-    },
-    joinCircle(data: CircleJoiningByInvitation) {
-      return managedApi.restPostMultiplePartForm(`circles/join`, data);
-    },
-    async getCirclesOfCurrentUser() {
-      return (await managedApi.restGet("circles")) as Circle[];
     },
   },
 

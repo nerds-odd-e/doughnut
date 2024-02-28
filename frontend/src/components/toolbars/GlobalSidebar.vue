@@ -73,7 +73,7 @@ export default defineComponent({
   emits: ["updateUser"],
   methods: {
     fetchData() {
-      this.api.circleMethods.getCirclesOfCurrentUser().then((res) => {
+      this.managedApi.restCircleController.index().then((res) => {
         this.circles = res;
       });
     },

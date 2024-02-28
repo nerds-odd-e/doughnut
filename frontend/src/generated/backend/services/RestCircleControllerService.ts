@@ -30,7 +30,7 @@ export class RestCircleControllerService {
      * @throws ApiError
      */
     public createCircle(
-        requestBody?: Circle,
+        requestBody: Circle,
     ): CancelablePromise<Circle> {
         return this.httpRequest.request({
             method: 'POST',
@@ -71,7 +71,7 @@ export class RestCircleControllerService {
      * @throws ApiError
      */
     public joinCircle(
-        requestBody?: CircleJoiningByInvitation,
+        requestBody: CircleJoiningByInvitation,
     ): CancelablePromise<Circle> {
         return this.httpRequest.request({
             method: 'POST',
@@ -89,7 +89,7 @@ export class RestCircleControllerService {
      * @throws ApiError
      */
     public showCircle(
-        circle: Circle,
+        circle: number,
     ): CancelablePromise<CircleForUserView> {
         return this.httpRequest.request({
             method: 'GET',

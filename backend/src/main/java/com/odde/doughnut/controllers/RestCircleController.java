@@ -13,6 +13,7 @@ import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.JsonViewer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -20,12 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/circles")
@@ -47,7 +43,8 @@ class RestCircleController {
   }
 
   @GetMapping("/{circle}")
-  public CircleForUserView showCircle(@PathVariable("circle") Circle circle)
+  public CircleForUserView showCircle(
+      @PathVariable("circle") @Schema(type = "integer") Circle circle)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(circle);
     JsonViewer jsonViewer = new JsonViewer(currentUser.getEntity());
@@ -62,7 +59,7 @@ class RestCircleController {
 
   @PostMapping("")
   @Transactional
-  public Circle createCircle(@Valid Circle circle) {
+  public Circle createCircle(@Valid @RequestBody Circle circle) {
     CircleModel circleModel = modelFactoryService.toCircleModel(circle);
     circleModel.joinAndSave(currentUser.getEntity());
     return circle;
@@ -70,7 +67,7 @@ class RestCircleController {
 
   @PostMapping("/join")
   @Transactional
-  public Circle joinCircle(@Valid CircleJoiningByInvitation circleJoiningByInvitation)
+  public Circle joinCircle(@Valid @RequestBody CircleJoiningByInvitation circleJoiningByInvitation)
       throws BindException {
     CircleModel circleModel =
         modelFactoryService.findCircleByInvitationCode(

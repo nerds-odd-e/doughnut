@@ -32,7 +32,7 @@ export default defineComponent({
 
   methods: {
     processForm() {
-      this.api.circleMethods
+      this.managedApi.restCircleController
         .createCircle(this.formData)
         .then((res) => {
           this.$emit("closeDialog");

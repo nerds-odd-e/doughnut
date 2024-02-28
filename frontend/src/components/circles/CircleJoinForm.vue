@@ -33,7 +33,7 @@ export default {
 
   methods: {
     processForm() {
-      this.api.circleMethods
+      this.managedApi.restCircleController
         .joinCircle(this.formData)
         .then((res) => {
           this.$router.push({
