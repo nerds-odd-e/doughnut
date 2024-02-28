@@ -2,67 +2,39 @@ import { DoughnutApi } from "@/generated/backend";
 import Api from "./Api";
 import { JsonData } from "./window/RestfulFetch";
 import BindingHttpRequest from "./BindingHttpRequest";
-
-type ApiError = {
-  id: number;
-  message: string;
-};
-
-type ApiStatus = {
-  states: boolean[];
-  errors: ApiError[];
-};
+import ApiStatusHandler, { ApiError, ApiStatus } from "./ApiStatusHandler";
 
 class ManagedApi extends DoughnutApi {
   apiStatus: ApiStatus;
 
+  apiStatusHandler: ApiStatusHandler;
+
   api: Api;
 
-  private silentMode?: boolean;
-
   constructor(apiStatus: ApiStatus, silent?: boolean) {
-    super({ BASE: "" }, BindingHttpRequest);
+    super({ BASE: "" }, BindingHttpRequest(apiStatus, silent));
     this.apiStatus = apiStatus;
+    this.apiStatusHandler = new ApiStatusHandler(apiStatus, silent);
     this.api = new Api("/api/");
-    this.silentMode = silent;
   }
 
   get silent(): ManagedApi {
     return new ManagedApi(this.apiStatus, true);
   }
 
-  private assignLoading(value: boolean) {
-    if (this.silentMode) return;
-    if (value) {
-      this.apiStatus.states.push(true);
-    } else {
-      this.apiStatus.states.pop();
-    }
-  }
-
-  private addError(message: string): void {
-    const id = Date.now();
-    this.apiStatus.errors.push({ message, id });
-    setTimeout(() => {
-      this.apiStatus.errors = this.apiStatus.errors.filter(
-        (error) => error.id !== id,
-      );
-    }, 2000);
-  }
-
   async around<T>(promise: Promise<T>): Promise<T> {
-    this.assignLoading(true);
+    this.apiStatusHandler.assignLoading(true);
     try {
       try {
         return await promise;
       } catch (error) {
         if (error instanceof Error) {
-          this.addError(error.message);
+          this.apiStatusHandler.addError(error.message);
         }
         throw error;
       }
     } finally {
-      this.assignLoading(false);
+      this.apiStatusHandler.assignLoading(false);
     }
   }
 

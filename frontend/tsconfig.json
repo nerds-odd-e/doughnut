@@ -30,7 +30,8 @@
   "files": [
     "./vite.config.ts",
     "./src/components/form/markdownizer.ts",
-"./src/managedApi/BindingHttpRequest.ts"
+"./src/managedApi/BindingHttpRequest.ts",
+"./src/managedApi/ApiStatusHandler.ts"
   ],
   "include": [
     "src/**/*.ts",
