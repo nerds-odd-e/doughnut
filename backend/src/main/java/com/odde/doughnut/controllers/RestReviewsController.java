@@ -10,6 +10,7 @@ import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.Reviewing;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import java.time.ZoneId;
 import java.util.List;
@@ -92,7 +93,8 @@ class RestReviewsController {
 
   @GetMapping(path = "/answers/{answer}")
   @Transactional
-  public AnsweredQuestion showAnswer(@PathVariable("answer") Answer answer)
+  public AnsweredQuestion showAnswer(
+      @PathVariable("answer") @Schema(type = "integer") Answer answer)
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(answer);
     return modelFactoryService.toAnswerModel(answer).getAnswerViewedByUser(currentUser.getEntity());

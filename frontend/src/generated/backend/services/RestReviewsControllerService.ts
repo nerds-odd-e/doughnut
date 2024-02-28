@@ -2,7 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { Answer } from '../models/Answer';
 import type { AnsweredQuestion } from '../models/AnsweredQuestion';
 import type { DueReviewPoints } from '../models/DueReviewPoints';
 import type { InitialInfo } from '../models/InitialInfo';
@@ -97,7 +96,7 @@ export class RestReviewsControllerService {
      * @throws ApiError
      */
     public showAnswer(
-        answer: Answer,
+        answer: number,
     ): CancelablePromise<AnsweredQuestion> {
         return this.httpRequest.request({
             method: 'GET',

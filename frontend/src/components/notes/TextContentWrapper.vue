@@ -65,18 +65,20 @@ export default defineComponent({
     onBlur() {
       this.changer.flush();
     },
-    setError(errs: ApiError) {
-      if (errs.status === 401) {
-        this.errors = {
-          topic:
-            "You are not authorized to edit this note. Perhaps you are not logged in?",
-        };
-        return;
-      }
-      if (errs.status === 400) {
-        const jsonResponse = JSON.parse(errs.body);
-        const errors = new BadRequestError(jsonResponse);
-        this.errors = errors as unknown as Record<string, string>;
+    setError(errs: unknown) {
+      if (errs instanceof ApiError) {
+        if (errs.status === 401) {
+          this.errors = {
+            topic:
+              "You are not authorized to edit this note. Perhaps you are not logged in?",
+          };
+          return;
+        }
+        if (errs.status === 400) {
+          const jsonResponse = JSON.parse(errs.body);
+          const errors = new BadRequestError(jsonResponse);
+          this.errors = errors as unknown as Record<string, string>;
+        }
       }
     },
   },

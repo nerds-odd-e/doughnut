@@ -52,9 +52,8 @@ export default defineComponent({
       };
     },
     async fetchData() {
-      this.answeredQuestion = await this.api.reviewMethods.getAnswer(
-        this.answerId,
-      );
+      this.answeredQuestion =
+        await this.managedApi.restReviewsController.showAnswer(this.answerId);
     },
   },
   watch: {

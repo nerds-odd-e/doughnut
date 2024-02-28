@@ -3,7 +3,6 @@ import {
   AiCompletionParams,
   AiCompletionResponse,
   AiGeneratedImage,
-  AnsweredQuestion,
   ChatRequest,
   ChatResponse,
   Circle,
@@ -25,7 +24,6 @@ import {
   WikidataAssociationCreation,
   WikidataEntityData,
   WikidataSearchEntity,
-  InitialInfo,
   SelfEvaluation,
   QuestionSuggestionParams,
   CircleJoiningByInvitation,
@@ -51,16 +49,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
   },
 
   reviewMethods: {
-    async doInitialReview(data: InitialInfo) {
-      return (await managedApi.restPost(`reviews`, data)) as ReviewPoint;
-    },
-
-    async getAnswer(answerId: Doughnut.ID) {
-      return (await managedApi.restGet(
-        `reviews/answers/${answerId}`,
-      )) as AnsweredQuestion;
-    },
-
     async selfEvaluate(reviewPointId: Doughnut.ID, data: SelfEvaluation) {
       const res = (await managedApi.restPost(
         `review-points/${reviewPointId}/self-evaluate`,
