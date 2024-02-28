@@ -7,7 +7,6 @@ import {
   ChatResponse,
   Circle,
   CircleForUserView,
-  DueReviewPoints,
   GlobalAiModelSettings,
   Note,
   NoteCreationDTO,
@@ -18,13 +17,11 @@ import {
   NotebooksViewedByUser,
   QuizQuestion,
   RedirectToNoteResponse,
-  ReviewPoint,
   Subscription,
   SuggestedQuestionForFineTuning,
   WikidataAssociationCreation,
   WikidataEntityData,
   WikidataSearchEntity,
-  SelfEvaluation,
   QuestionSuggestionParams,
   CircleJoiningByInvitation,
   SearchTerm,
@@ -36,11 +33,6 @@ export const timezoneParam = () => {
   return timeZone;
 };
 
-const timezoneParam1 = () => {
-  const { timeZone } = Intl.DateTimeFormat().resolvedOptions();
-  return `timezone=${encodeURIComponent(timeZone)}`;
-};
-
 const apiCollection = (managedApi: ManagedApi) => ({
   userMethods: {
     logout() {
@@ -49,21 +41,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
   },
 
   reviewMethods: {
-    async selfEvaluate(reviewPointId: Doughnut.ID, data: SelfEvaluation) {
-      const res = (await managedApi.restPost(
-        `review-points/${reviewPointId}/self-evaluate`,
-        data,
-      )) as ReviewPoint;
-      return res;
-    },
-
-    async getDueReviewPoints(dueInDays?: number) {
-      const res = (await managedApi.restGet(
-        `reviews/repeat?${timezoneParam1()}&dueindays=${dueInDays ?? ""}`,
-      )) as DueReviewPoints;
-      return res;
-    },
-
     async getRandomQuestionForReviewPoint(reviewPointId: Doughnut.ID) {
       const res = (await managedApi.restGet(
         `review-points/${reviewPointId}/random-question`,

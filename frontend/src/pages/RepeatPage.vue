@@ -43,6 +43,7 @@
 import { defineComponent, PropType } from "vue";
 import _ from "lodash";
 import { AnsweredQuestion } from "@/generated/backend";
+import { timezoneParam } from "@/managedApi/apiCollection";
 import Quiz from "../components/review/Quiz.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
@@ -98,7 +99,10 @@ export default defineComponent({
 
     async loadMore(dueInDays?: number) {
       this.toRepeat = (
-        await this.api.reviewMethods.getDueReviewPoints(dueInDays)
+        await this.managedApi.restReviewsController.repeatReview(
+          timezoneParam(),
+          dueInDays,
+        )
       ).toRepeat;
       this.currentIndex = 0;
       if (this.toRepeat?.length === 0) {
