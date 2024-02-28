@@ -756,6 +756,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/NoteCreationDTO'
+        required: true
       responses:
         "500":
           description: Internal Server Error
@@ -918,11 +919,18 @@ paths:
       tags:
       - rest-notebook-controller
       operationId: update_1
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Notebook'
+              $ref: '#/components/schemas/NotebookDTO'
+        required: true
       responses:
         "500":
           description: Internal Server Error
@@ -2278,6 +2286,13 @@ components:
           type: string
           format: date-time
           writeOnly: true
+        fromDTO:
+          $ref: '#/components/schemas/NotebookDTO'
+    NotebookDTO:
+      type: object
+      properties:
+        skipReviewEntirely:
+          type: boolean
     PictureWithMask:
       type: object
       properties:

@@ -133,7 +133,10 @@ export default class StoredApiCollection implements StoredApi {
     parentId: Doughnut.ID,
     data: NoteCreationDTO,
   ) {
-    const nrwp = await this.statelessApi.noteMethods.createNote(parentId, data);
+    const nrwp = await this.managedApi.restNoteController.createNote(
+      parentId,
+      data,
+    );
     const focus = this.storage.refreshNoteRealm(nrwp);
     this.routerReplaceFocus(router, focus);
     return focus;

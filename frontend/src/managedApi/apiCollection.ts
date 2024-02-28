@@ -6,11 +6,8 @@ import {
   ChatRequest,
   ChatResponse,
   GlobalAiModelSettings,
-  NoteCreationDTO,
   NotePositionViewedByUser,
   NoteRealm,
-  Notebook,
-  NotebooksViewedByUser,
   WikidataAssociationCreation,
   WikidataEntityData,
   WikidataSearchEntity,
@@ -29,26 +26,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
   },
 
-  notebookMethods: {
-    async getNotebooks() {
-      return (await managedApi.restGet(`notebooks`)) as NotebooksViewedByUser;
-    },
-
-    updateNotebookSettings(notebookId: Doughnut.ID, data: Notebook) {
-      return managedApi.restPostMultiplePartForm(
-        `notebooks/${notebookId}`,
-        data,
-      );
-    },
-  },
-
   noteMethods: {
-    async createNote(parentId: Doughnut.ID, data: NoteCreationDTO) {
-      return (await managedApi.restPostMultiplePartForm(
-        `notes/${parentId}/create`,
-        data,
-      )) as NoteRealm;
-    },
     async getNoteRealm(noteId: Doughnut.ID) {
       return (await managedApi.restGet(`notes/${noteId}`)) as NoteRealm;
     },

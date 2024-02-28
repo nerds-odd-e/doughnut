@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.doughnut.controllers.dto.NotebookDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
@@ -88,7 +89,8 @@ class RestNotebookControllerTest {
       User anotherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
       assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.update(note.getNotebook()));
+          UnexpectedNoAccessRightException.class,
+          () -> controller.update(note.getNotebook(), new NotebookDTO()));
     }
   }
 }

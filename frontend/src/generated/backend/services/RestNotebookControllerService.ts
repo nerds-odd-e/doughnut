@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Notebook } from '../models/Notebook';
+import type { NotebookDTO } from '../models/NotebookDTO';
 import type { NotebooksViewedByUser } from '../models/NotebooksViewedByUser';
 import type { NoteCreationDTO } from '../models/NoteCreationDTO';
 import type { RedirectToNoteResponse } from '../models/RedirectToNoteResponse';
@@ -11,16 +12,21 @@ import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestNotebookControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
+     * @param notebook
      * @param requestBody
      * @returns Notebook OK
      * @throws ApiError
      */
     public update1(
-        requestBody?: Notebook,
+        notebook: number,
+        requestBody: NotebookDTO,
     ): CancelablePromise<Notebook> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/notebooks/{notebook}',
+            path: {
+                'notebook': notebook,
+            },
             body: requestBody,
             mediaType: 'application/json',
             errors: {

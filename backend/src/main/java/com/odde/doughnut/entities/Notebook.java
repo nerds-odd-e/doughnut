@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.controllers.dto.NotebookDTO;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
@@ -44,4 +45,8 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @OneToMany(mappedBy = "notebook", cascade = CascadeType.DETACH)
   @JsonIgnore
   private List<Subscription> subscriptions;
+
+  public void setFromDTO(NotebookDTO notebookDTO) {
+    setSkipReviewEntirely(notebookDTO.getSkipReviewEntirely());
+  }
 }

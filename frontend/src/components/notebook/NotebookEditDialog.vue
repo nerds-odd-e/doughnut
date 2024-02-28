@@ -31,8 +31,8 @@ export default {
 
   methods: {
     processForm() {
-      this.api.notebookMethods
-        .updateNotebookSettings(this.notebook.id, this.formData)
+      this.managedApi.restNotebookController
+        .update1(this.notebook.id, this.formData)
         .then(() => {
           this.$router.push({ name: "notebooks" });
         })

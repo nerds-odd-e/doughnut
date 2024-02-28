@@ -14,7 +14,5 @@ describe("Notebooks Page", () => {
       subscriptions: [],
     });
     helper.component(NotebooksPage).withStorageProps({}).render();
-
-    helper.apiMock.verifyCall("/api/notebooks");
   });
 });

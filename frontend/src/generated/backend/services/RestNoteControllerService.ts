@@ -24,7 +24,7 @@ export class RestNoteControllerService {
      */
     public createNote(
         parentNote: number,
-        requestBody?: NoteCreationDTO,
+        requestBody: NoteCreationDTO,
     ): CancelablePromise<NoteRealm> {
         return this.httpRequest.request({
             method: 'POST',

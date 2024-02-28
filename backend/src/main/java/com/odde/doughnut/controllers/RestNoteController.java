@@ -69,7 +69,7 @@ class RestNoteController {
   @Transactional
   public NoteRealm createNote(
       @PathVariable(name = "parentNote") @Schema(type = "integer") Note parentNote,
-      @Valid @ModelAttribute NoteCreationDTO noteCreation)
+      @Valid @RequestBody NoteCreationDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
     currentUser.assertAuthorization(parentNote);
     User user = currentUser.getEntity();

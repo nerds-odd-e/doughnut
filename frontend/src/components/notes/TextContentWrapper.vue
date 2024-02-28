@@ -74,11 +74,9 @@ export default defineComponent({
           };
           return;
         }
-        if (errs.status === 400) {
-          const jsonResponse = JSON.parse(errs.body);
-          const errors = new BadRequestError(jsonResponse);
-          this.errors = errors as unknown as Record<string, string>;
-        }
+      }
+      if (errs instanceof BadRequestError) {
+        this.errors = errs as unknown as Record<string, string>;
       }
     },
   },

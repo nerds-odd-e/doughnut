@@ -43,7 +43,7 @@ export default defineComponent({
   },
   methods: {
     fetchData() {
-      this.api.notebookMethods.getNotebooks().then((res) => {
+      this.managedApi.restNotebookController.myNotebooks().then((res) => {
         this.notebooks = res.notebooks;
         this.subscriptions = res.subscriptions;
       });
