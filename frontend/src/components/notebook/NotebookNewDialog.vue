@@ -29,9 +29,19 @@ export default {
     };
   },
   methods: {
+    createNotebook() {
+      if (this.circle) {
+        return this.managedApi.restCircleController.createNotebookInCircle(
+          this.circle.id,
+          this.noteFormData,
+        );
+      }
+      return this.managedApi.restNotebookController.createNotebook(
+        this.noteFormData,
+      );
+    },
     processForm() {
-      this.api.notebookMethods
-        .createNotebook(this.circle, this.noteFormData)
+      this.createNotebook()
         .then((res) =>
           this.$router.push({
             name: "noteShow",

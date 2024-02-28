@@ -3,9 +3,7 @@ import NoteInfoButton from "@/components/notes/NoteInfoButton.vue";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
-beforeEach(() => {
-  fetchMock.resetMocks();
-});
+helper.resetWithApiMock(beforeEach, afterEach);
 
 const stubResponse = {
   reviewPoint: makeMe.aReviewPoint.please(),
@@ -14,7 +12,9 @@ const stubResponse = {
 
 describe("note info", () => {
   it("should render values", async () => {
-    fetchMock.mockResponseOnce(JSON.stringify(stubResponse));
+    helper.apiMock
+      .expectingGet(`/api/notes/123/note-info`)
+      .andReturnOnce(stubResponse);
     const wrapper = helper
       .component(NoteInfoButton)
       .withProps({

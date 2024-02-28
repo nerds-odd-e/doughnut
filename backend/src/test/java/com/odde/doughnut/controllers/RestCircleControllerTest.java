@@ -66,7 +66,7 @@ class RestCircleControllerTest {
       noteCreation.setTopicConstructor("new title");
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.createNotebook(circle, noteCreation));
+          () -> controller.createNotebookInCircle(circle, noteCreation));
     }
   }
 

@@ -5,14 +5,12 @@ import {
   AiGeneratedImage,
   ChatRequest,
   ChatResponse,
-  Circle,
   GlobalAiModelSettings,
   NoteCreationDTO,
   NotePositionViewedByUser,
   NoteRealm,
   Notebook,
   NotebooksViewedByUser,
-  RedirectToNoteResponse,
   WikidataAssociationCreation,
   WikidataEntityData,
   WikidataSearchEntity,
@@ -32,20 +30,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
   },
 
   notebookMethods: {
-    async createNotebook(circle: Circle | undefined, data: NoteCreationDTO) {
-      const url = (() => {
-        if (circle) {
-          return `circles/${circle.id}/notebooks`;
-        }
-        return `notebooks/create`;
-      })();
-
-      return (await managedApi.restPostMultiplePartForm(
-        url,
-        data,
-      )) as RedirectToNoteResponse;
-    },
-
     async getNotebooks() {
       return (await managedApi.restGet(`notebooks`)) as NotebooksViewedByUser;
     },

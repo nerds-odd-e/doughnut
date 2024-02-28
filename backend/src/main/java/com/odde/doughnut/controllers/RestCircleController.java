@@ -92,8 +92,9 @@ class RestCircleController {
 
   @PostMapping({"/{circle}/notebooks"})
   @Transactional
-  public RedirectToNoteResponse createNotebook(
-      Circle circle, @Valid @ModelAttribute NoteCreationDTO noteCreation)
+  public RedirectToNoteResponse createNotebookInCircle(
+      @PathVariable @Schema(type = "integer") Circle circle,
+      @Valid @RequestBody NoteCreationDTO noteCreation)
       throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
     currentUser.assertAuthorization(circle);

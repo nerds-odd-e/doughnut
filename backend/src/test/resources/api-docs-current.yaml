@@ -970,6 +970,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/NoteCreationDTO'
+        required: true
       responses:
         "500":
           description: Internal Server Error
@@ -1186,18 +1187,19 @@ paths:
     post:
       tags:
       - rest-circle-controller
-      operationId: createNotebook_1
+      operationId: createNotebookInCircle
       parameters:
       - name: circle
-        in: query
+        in: path
         required: true
         schema:
-          $ref: '#/components/schemas/Circle'
+          type: integer
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/NoteCreationDTO'
+        required: true
       responses:
         "500":
           description: Internal Server Error

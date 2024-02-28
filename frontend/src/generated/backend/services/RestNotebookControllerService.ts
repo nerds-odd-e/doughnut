@@ -53,7 +53,7 @@ export class RestNotebookControllerService {
      * @throws ApiError
      */
     public createNotebook(
-        requestBody?: NoteCreationDTO,
+        requestBody: NoteCreationDTO,
     ): CancelablePromise<RedirectToNoteResponse> {
         return this.httpRequest.request({
             method: 'POST',

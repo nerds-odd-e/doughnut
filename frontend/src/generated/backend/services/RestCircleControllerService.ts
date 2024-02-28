@@ -48,14 +48,14 @@ export class RestCircleControllerService {
      * @returns RedirectToNoteResponse OK
      * @throws ApiError
      */
-    public createNotebook1(
-        circle: Circle,
-        requestBody?: NoteCreationDTO,
+    public createNotebookInCircle(
+        circle: number,
+        requestBody: NoteCreationDTO,
     ): CancelablePromise<RedirectToNoteResponse> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/circles/{circle}/notebooks',
-            query: {
+            path: {
                 'circle': circle,
             },
             body: requestBody,

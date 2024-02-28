@@ -40,9 +40,6 @@ export default defineComponent({
         .then((articles) => {
           this.noteInfo = articles;
         });
-      this.api.getNoteInfo(this.noteId).then((articles) => {
-        this.noteInfo = articles;
-      });
     },
 
     toggleNoteInfo() {
