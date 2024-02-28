@@ -14,7 +14,7 @@ export class RestFineTuningDataControllerService {
      * @throws ApiError
      */
     public duplicate(
-        suggestedQuestion: SuggestedQuestionForFineTuning,
+        suggestedQuestion: number,
     ): CancelablePromise<SuggestedQuestionForFineTuning> {
         return this.httpRequest.request({
             method: 'POST',
@@ -33,7 +33,7 @@ export class RestFineTuningDataControllerService {
      * @throws ApiError
      */
     public delete(
-        suggestedQuestion: SuggestedQuestionForFineTuning,
+        suggestedQuestion: number,
     ): CancelablePromise<SuggestedQuestionForFineTuning> {
         return this.httpRequest.request({
             method: 'POST',
@@ -66,7 +66,7 @@ export class RestFineTuningDataControllerService {
      * @throws ApiError
      */
     public updateSuggestedQuestionForFineTuning(
-        suggestedQuestion: SuggestedQuestionForFineTuning,
+        suggestedQuestion: number,
         requestBody: QuestionSuggestionParams,
     ): CancelablePromise<SuggestedQuestionForFineTuning> {
         return this.httpRequest.request({

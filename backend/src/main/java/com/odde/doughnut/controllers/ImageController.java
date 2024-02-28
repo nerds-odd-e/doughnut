@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Image;
 import com.odde.doughnut.entities.repositories.ImageBlobRepository;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -20,7 +21,8 @@ public class ImageController {
 
   @GetMapping("/{image}/{fileName}")
   public ResponseEntity<byte[]> show(
-      @PathVariable("image") Image image, @PathVariable("fileName") String filename) {
+      @PathVariable("image") @Schema(type = "integer") Image image,
+      @PathVariable("fileName") String filename) {
     return ResponseEntity.ok()
         .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + image.getName() + "\"")
         .header(HttpHeaders.CONTENT_TYPE, image.getType())

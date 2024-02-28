@@ -2,7 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { Note } from '../models/Note';
 import type { NoteRealm } from '../models/NoteRealm';
 import type { NoteUpdateDetailsDTO } from '../models/NoteUpdateDetailsDTO';
 import type { NoteUpdateTopicDTO } from '../models/NoteUpdateTopicDTO';
@@ -17,7 +16,7 @@ export class RestTextContentControllerService {
      * @throws ApiError
      */
     public updateNoteTopicConstructor(
-        note: Note,
+        note: number,
         requestBody?: NoteUpdateTopicDTO,
     ): CancelablePromise<NoteRealm> {
         return this.httpRequest.request({
@@ -40,7 +39,7 @@ export class RestTextContentControllerService {
      * @throws ApiError
      */
     public updateNoteDetails(
-        note: Note,
+        note: number,
         requestBody?: NoteUpdateDetailsDTO,
     ): CancelablePromise<NoteRealm> {
         return this.httpRequest.request({

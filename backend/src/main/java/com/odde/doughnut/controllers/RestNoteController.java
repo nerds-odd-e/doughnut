@@ -13,6 +13,7 @@ import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.doughnut.testability.TestabilitySettings;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
@@ -46,7 +47,7 @@ class RestNoteController {
   @PostMapping(value = "/{note}/updateWikidataId")
   @Transactional
   public NoteRealm updateWikidataId(
-      @PathVariable(name = "note") Note note,
+      @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @RequestBody WikidataAssociationCreation wikidataAssociationCreation)
       throws BindException, UnexpectedNoAccessRightException, IOException, InterruptedException {
     currentUser.assertAuthorization(note);
@@ -67,7 +68,7 @@ class RestNoteController {
   @PostMapping(value = "/{parentNote}/create")
   @Transactional
   public NoteRealm createNote(
-      @PathVariable(name = "parentNote") Note parentNote,
+      @PathVariable(name = "parentNote") @Schema(type = "integer") Note parentNote,
       @Valid @ModelAttribute NoteCreationDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
     currentUser.assertAuthorization(parentNote);
@@ -104,7 +105,7 @@ class RestNoteController {
   @PatchMapping(path = "/{note}")
   @Transactional
   public NoteRealm updateNote(
-      @PathVariable(name = "note") Note note,
+      @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @Valid @ModelAttribute NoteAccessories noteAccessories)
       throws UnexpectedNoAccessRightException, IOException {
     currentUser.assertAuthorization(note);
@@ -140,7 +141,8 @@ class RestNoteController {
   @PostMapping("/{note}/search")
   @Transactional
   public List<Note> searchForLinkTargetWithin(
-      @PathVariable("note") Note note, @Valid @RequestBody SearchTerm searchTerm) {
+      @PathVariable("note") @Schema(type = "integer") Note note,
+      @Valid @RequestBody SearchTerm searchTerm) {
     SearchTermModel searchTermModel =
         modelFactoryService.toSearchTermModel(currentUser.getEntity(), searchTerm);
     return searchTermModel.searchForNotesInRelateTo(note);
@@ -180,7 +182,8 @@ class RestNoteController {
   @PostMapping(value = "/{note}/review-setting")
   @Transactional
   public RedirectToNoteResponse updateReviewSetting(
-      @PathVariable("note") Note note, @Valid @RequestBody ReviewSetting reviewSetting)
+      @PathVariable("note") @Schema(type = "integer") Note note,
+      @Valid @RequestBody ReviewSetting reviewSetting)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
     BeanUtils.copyProperties(reviewSetting, note.getReviewSetting());

@@ -39,7 +39,7 @@ export class RestLinkControllerService {
      * @throws ApiError
      */
     public deleteLink(
-        link: Note,
+        link: number,
         perspective: string,
     ): CancelablePromise<NoteRealm> {
         return this.httpRequest.request({
@@ -62,8 +62,8 @@ export class RestLinkControllerService {
      * @throws ApiError
      */
     public linkNoteFinalize(
-        sourceNote: Note,
-        targetNote: Note,
+        sourceNote: number,
+        targetNote: number,
         requestBody: LinkCreation,
     ): CancelablePromise<NoteRealm> {
         return this.httpRequest.request({

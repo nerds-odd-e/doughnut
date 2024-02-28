@@ -10,6 +10,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,7 +53,8 @@ class RestLinkController {
 
   @PostMapping(value = "/{link}/{perspective}/delete")
   @Transactional
-  public NoteRealm deleteLink(@PathVariable Note link, @PathVariable String perspective)
+  public NoteRealm deleteLink(
+      @PathVariable @Schema(type = "integer") Note link, @PathVariable String perspective)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(link);
     modelFactoryService.remove(link);
@@ -62,8 +64,8 @@ class RestLinkController {
   @PostMapping(value = "/create/{sourceNote}/{targetNote}")
   @Transactional
   public NoteRealm linkNoteFinalize(
-      @PathVariable Note sourceNote,
-      @PathVariable Note targetNote,
+      @PathVariable @Schema(type = "integer") Note sourceNote,
+      @PathVariable @Schema(type = "integer") Note targetNote,
       @RequestBody @Valid LinkCreation linkCreation,
       BindingResult bindingResult)
       throws UnexpectedNoAccessRightException, CyclicLinkDetectedException, BindException {

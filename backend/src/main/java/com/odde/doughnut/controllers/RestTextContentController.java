@@ -9,6 +9,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.sql.Timestamp;
@@ -42,7 +43,8 @@ class RestTextContentController {
   @PatchMapping(path = "/{note}/topic-constructor")
   @Transactional
   public NoteRealm updateNoteTopicConstructor(
-      @PathVariable(name = "note") Note note, @Valid @ModelAttribute NoteUpdateTopicDTO topicDTO)
+      @PathVariable(name = "note") @Schema(type = "integer") Note note,
+      @Valid @ModelAttribute NoteUpdateTopicDTO topicDTO)
       throws UnexpectedNoAccessRightException {
     return updateNote(note, n -> n.setTopicConstructor(topicDTO.getTopicConstructor()));
   }
@@ -50,7 +52,7 @@ class RestTextContentController {
   @PatchMapping(path = "/{note}/details")
   @Transactional
   public NoteRealm updateNoteDetails(
-      @PathVariable(name = "note") Note note,
+      @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @Valid @ModelAttribute NoteUpdateDetailsDTO detailsDTO)
       throws UnexpectedNoAccessRightException {
     return updateNote(note, n -> n.setDetails(detailsDTO.getDetails()));

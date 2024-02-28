@@ -20,7 +20,7 @@ export class RestAiControllerService {
      * @throws ApiError
      */
     public getCompletion(
-        note: Note,
+        note: number,
         requestBody: AiCompletionParams,
     ): CancelablePromise<AiCompletionResponse> {
         return this.httpRequest.request({

@@ -8,6 +8,7 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.FineTuningService;
 import com.theokanning.openai.client.OpenAiApi;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.IOException;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +35,8 @@ class RestFineTuningDataController {
   @PatchMapping("/{suggestedQuestion}/update-suggested-question-for-fine-tuning")
   @Transactional
   public SuggestedQuestionForFineTuning updateSuggestedQuestionForFineTuning(
-      @PathVariable("suggestedQuestion") SuggestedQuestionForFineTuning suggestedQuestion,
+      @PathVariable("suggestedQuestion") @Schema(type = "integer")
+          SuggestedQuestionForFineTuning suggestedQuestion,
       @RequestBody QuestionSuggestionParams suggestion)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
@@ -46,7 +48,8 @@ class RestFineTuningDataController {
   @PostMapping("/{suggestedQuestion}/duplicate")
   @Transactional
   public SuggestedQuestionForFineTuning duplicate(
-      @PathVariable("suggestedQuestion") SuggestedQuestionForFineTuning suggestedQuestion)
+      @PathVariable("suggestedQuestion") @Schema(type = "integer")
+          SuggestedQuestionForFineTuning suggestedQuestion)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
     return modelFactoryService
@@ -57,7 +60,8 @@ class RestFineTuningDataController {
   @PostMapping("/{suggestedQuestion}/delete")
   @Transactional
   public SuggestedQuestionForFineTuning delete(
-      @PathVariable("suggestedQuestion") SuggestedQuestionForFineTuning suggestedQuestion)
+      @PathVariable("suggestedQuestion") @Schema(type = "integer")
+          SuggestedQuestionForFineTuning suggestedQuestion)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
     return modelFactoryService.toSuggestedQuestionForFineTuningService(suggestedQuestion).delete();

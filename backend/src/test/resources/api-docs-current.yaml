@@ -466,7 +466,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/Notebook'
+          type: integer
       requestBody:
         content:
           application/json:
@@ -643,7 +643,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/QuizQuestionAIQuestion'
+          type: integer
       requestBody:
         content:
           application/json:
@@ -673,7 +673,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/QuizQuestionEntity'
+          type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -697,7 +697,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/QuizQuestionAIQuestion'
+          type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -721,7 +721,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/QuizQuestionEntity'
+          type: integer
       requestBody:
         content:
           application/json:
@@ -775,7 +775,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/Note'
+          type: integer
       requestBody:
         content:
           application/json:
@@ -804,7 +804,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/Note'
+          type: integer
       requestBody:
         content:
           application/json:
@@ -834,7 +834,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/Note'
+          type: integer
       requestBody:
         content:
           application/json:
@@ -866,7 +866,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/Note'
+          type: integer
       requestBody:
         content:
           application/json:
@@ -1048,7 +1048,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/Note'
+          type: integer
       - name: perspective
         in: path
         required: true
@@ -1077,12 +1077,12 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/Note'
+          type: integer
       - name: targetNote
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/Note'
+          type: integer
       requestBody:
         content:
           application/json:
@@ -1112,7 +1112,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/SuggestedQuestionForFineTuning'
+          type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -1136,7 +1136,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/SuggestedQuestionForFineTuning'
+          type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -1268,7 +1268,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/Note'
+          type: integer
       requestBody:
         content:
           application/json:
@@ -1426,7 +1426,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/Note'
+          type: integer
       requestBody:
         content:
           application/json:
@@ -1455,7 +1455,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/Note'
+          type: integer
       requestBody:
         content:
           application/json:
@@ -1507,7 +1507,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/Note'
+          type: integer
       requestBody:
         content:
           application/json:
@@ -1560,7 +1560,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/SuggestedQuestionForFineTuning'
+          type: integer
       requestBody:
         content:
           application/json:
@@ -2370,30 +2370,6 @@ components:
         adjustment:
           type: integer
           format: int32
-    QuizQuestionAIQuestion:
-      required:
-      - id
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        stem:
-          type: string
-        correctAnswerIndex:
-          type: integer
-          format: int32
-        mainTopic:
-          type: string
-        pictureWithMask:
-          $ref: '#/components/schemas/PictureWithMask'
-        note:
-          $ref: '#/components/schemas/Note'
-        createdAt:
-          type: string
-          format: date-time
-        rawJsonQuestion:
-          type: string
     QuestionSuggestionCreationParams:
       type: object
       properties:
@@ -2423,28 +2399,6 @@ components:
           format: date-time
         positiveFeedback:
           type: boolean
-    QuizQuestionEntity:
-      required:
-      - id
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        stem:
-          type: string
-        correctAnswerIndex:
-          type: integer
-          format: int32
-        mainTopic:
-          type: string
-        pictureWithMask:
-          $ref: '#/components/schemas/PictureWithMask'
-        note:
-          $ref: '#/components/schemas/Note'
-        createdAt:
-          type: string
-          format: date-time
     Choice:
       type: object
       properties:

@@ -23,7 +23,7 @@ export class RestNoteControllerService {
      * @throws ApiError
      */
     public createNote(
-        parentNote: Note,
+        parentNote: number,
         requestBody?: NoteCreationDTO,
     ): CancelablePromise<NoteRealm> {
         return this.httpRequest.request({
@@ -46,7 +46,7 @@ export class RestNoteControllerService {
      * @throws ApiError
      */
     public updateWikidataId(
-        note: Note,
+        note: number,
         requestBody: WikidataAssociationCreation,
     ): CancelablePromise<NoteRealm> {
         return this.httpRequest.request({
@@ -69,7 +69,7 @@ export class RestNoteControllerService {
      * @throws ApiError
      */
     public searchForLinkTargetWithin(
-        note: Note,
+        note: number,
         requestBody: SearchTerm,
     ): CancelablePromise<Array<Note>> {
         return this.httpRequest.request({
@@ -92,7 +92,7 @@ export class RestNoteControllerService {
      * @throws ApiError
      */
     public updateReviewSetting(
-        note: Note,
+        note: number,
         requestBody: ReviewSetting,
     ): CancelablePromise<RedirectToNoteResponse> {
         return this.httpRequest.request({
@@ -171,7 +171,7 @@ export class RestNoteControllerService {
      * @throws ApiError
      */
     public updateNote(
-        note: Note,
+        note: number,
         requestBody?: NoteAccessories,
     ): CancelablePromise<NoteRealm> {
         return this.httpRequest.request({

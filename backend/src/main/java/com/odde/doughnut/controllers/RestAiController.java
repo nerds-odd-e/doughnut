@@ -10,6 +10,7 @@ import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.assistants.Assistant;
 import com.theokanning.openai.client.OpenAiApi;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +46,8 @@ public class RestAiController {
   @PostMapping("/{note}/completion")
   @Transactional
   public AiCompletionResponse getCompletion(
-      @PathVariable(name = "note") Note note, @RequestBody AiCompletionParams aiCompletionParams) {
+      @PathVariable(name = "note") @Schema(type = "integer") Note note,
+      @RequestBody AiCompletionParams aiCompletionParams) {
     currentUser.assertLoggedIn();
     return aiAdvisorService.getAiCompletion(aiCompletionParams, note, getAssistantId());
   }

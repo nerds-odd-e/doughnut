@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +29,8 @@ class RestSubscriptionController {
   @PostMapping("/notebooks/{notebook}/subscribe")
   @Transactional
   public @Valid Subscription createSubscription(
-      @PathVariable(name = "notebook") Notebook notebook, @Valid Subscription subscription)
+      @PathVariable(name = "notebook") @Schema(type = "integer") Notebook notebook,
+      @Valid Subscription subscription)
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(notebook);
     subscription.setNotebook(notebook);

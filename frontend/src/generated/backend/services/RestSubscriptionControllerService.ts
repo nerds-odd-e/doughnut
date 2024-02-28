@@ -2,7 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { Notebook } from '../models/Notebook';
 import type { Subscription } from '../models/Subscription';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -51,7 +50,7 @@ export class RestSubscriptionControllerService {
      * @throws ApiError
      */
     public createSubscription(
-        notebook: Notebook,
+        notebook: number,
         requestBody?: Subscription,
     ): CancelablePromise<Subscription> {
         return this.httpRequest.request({

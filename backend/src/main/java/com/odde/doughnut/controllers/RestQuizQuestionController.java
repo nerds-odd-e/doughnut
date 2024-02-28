@@ -58,7 +58,8 @@ class RestQuizQuestionController {
   @PostMapping("/{quizQuestion}/contest")
   @Transactional
   public QuizQuestionContestResult contest(
-      @PathVariable("quizQuestion") QuizQuestionAIQuestion quizQuestionEntity) {
+      @PathVariable("quizQuestion") @Schema(type = "integer")
+          QuizQuestionAIQuestion quizQuestionEntity) {
     currentUser.assertLoggedIn();
     return aiQuestionGenerator.getQuizQuestionContestResult(quizQuestionEntity);
   }
@@ -66,7 +67,8 @@ class RestQuizQuestionController {
   @PostMapping("/{quizQuestion}/regenerate")
   @Transactional
   public QuizQuestion regenerate(
-      @PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity) {
+      @PathVariable("quizQuestion") @Schema(type = "integer")
+          QuizQuestionEntity quizQuestionEntity) {
     currentUser.assertLoggedIn();
     return generateAIQuestion(quizQuestionEntity.getNote());
   }
@@ -85,7 +87,7 @@ class RestQuizQuestionController {
   @PostMapping("/{quizQuestion}/answer")
   @Transactional
   public AnsweredQuestion answerQuiz(
-      @PathVariable("quizQuestion") QuizQuestionEntity quizQuestionEntity,
+      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestionEntity quizQuestionEntity,
       @Valid @RequestBody Answer answer) {
     currentUser.assertLoggedIn();
     answer.setQuestion(quizQuestionEntity);
@@ -98,7 +100,8 @@ class RestQuizQuestionController {
   @PostMapping("/{quizQuestion}/suggest-fine-tuning")
   @Transactional
   public SuggestedQuestionForFineTuning suggestQuestionForFineTuning(
-      @PathVariable("quizQuestion") QuizQuestionAIQuestion quizQuestionEntity,
+      @PathVariable("quizQuestion") @Schema(type = "integer")
+          QuizQuestionAIQuestion quizQuestionEntity,
       @Valid @RequestBody QuestionSuggestionCreationParams suggestion) {
     SuggestedQuestionForFineTuning sqft = new SuggestedQuestionForFineTuning();
     var suggestedQuestionForFineTuningService =

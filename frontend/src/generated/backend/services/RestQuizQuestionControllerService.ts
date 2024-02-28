@@ -6,9 +6,7 @@ import type { Answer } from '../models/Answer';
 import type { AnsweredQuestion } from '../models/AnsweredQuestion';
 import type { QuestionSuggestionCreationParams } from '../models/QuestionSuggestionCreationParams';
 import type { QuizQuestion } from '../models/QuizQuestion';
-import type { QuizQuestionAIQuestion } from '../models/QuizQuestionAIQuestion';
 import type { QuizQuestionContestResult } from '../models/QuizQuestionContestResult';
-import type { QuizQuestionEntity } from '../models/QuizQuestionEntity';
 import type { SuggestedQuestionForFineTuning } from '../models/SuggestedQuestionForFineTuning';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -21,7 +19,7 @@ export class RestQuizQuestionControllerService {
      * @throws ApiError
      */
     public suggestQuestionForFineTuning(
-        quizQuestion: QuizQuestionAIQuestion,
+        quizQuestion: number,
         requestBody: QuestionSuggestionCreationParams,
     ): CancelablePromise<SuggestedQuestionForFineTuning> {
         return this.httpRequest.request({
@@ -43,7 +41,7 @@ export class RestQuizQuestionControllerService {
      * @throws ApiError
      */
     public regenerate(
-        quizQuestion: QuizQuestionEntity,
+        quizQuestion: number,
     ): CancelablePromise<QuizQuestion> {
         return this.httpRequest.request({
             method: 'POST',
@@ -62,7 +60,7 @@ export class RestQuizQuestionControllerService {
      * @throws ApiError
      */
     public contest(
-        quizQuestion: QuizQuestionAIQuestion,
+        quizQuestion: number,
     ): CancelablePromise<QuizQuestionContestResult> {
         return this.httpRequest.request({
             method: 'POST',
@@ -82,7 +80,7 @@ export class RestQuizQuestionControllerService {
      * @throws ApiError
      */
     public answerQuiz(
-        quizQuestion: QuizQuestionEntity,
+        quizQuestion: number,
         requestBody: Answer,
     ): CancelablePromise<AnsweredQuestion> {
         return this.httpRequest.request({
