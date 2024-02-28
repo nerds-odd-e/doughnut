@@ -29,7 +29,8 @@
   },
   "files": [
     "./vite.config.ts",
-    "./src/components/form/markdownizer.ts"
+    "./src/components/form/markdownizer.ts",
+"./src/managedApi/BindingHttpRequest.ts"
   ],
   "include": [
     "src/**/*.ts",

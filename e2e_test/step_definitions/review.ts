@@ -107,9 +107,6 @@ Then("I have selected the choice {string}", (choice: string) => {
 })
 
 Then("I choose yes I remember", () => {
-  cy.on("uncaught:exception", () => {
-    return false
-  })
   cy.yesIRemember()
 })
 

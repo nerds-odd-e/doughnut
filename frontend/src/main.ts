@@ -6,7 +6,6 @@ import "bootstrap/scss/bootstrap.scss";
 import "bootstrap";
 import DoughnutAppVue from "./DoughnutApp.vue";
 import loginOrRegisterAndHaltThisThread from "./managedApi/window/loginOrRegisterAndHaltThisThread";
-import { ApiError } from "./generated/backend";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -27,18 +26,6 @@ app.directive("focus", {
 });
 
 window.onunhandledrejection = (event: PromiseRejectionEvent) => {
-  if (event.reason instanceof ApiError && event.reason.status === 401) {
-    if (
-      event.reason.request.method !== "GET" ||
-      // eslint-disable-next-line no-alert
-      window.confirm(
-        "You are logged out. Do you want to log in (and lose the current changes)?",
-      )
-    ) {
-      loginOrRegisterAndHaltThisThread();
-      return;
-    }
-  }
   // eslint-disable-next-line
   if (event.reason === "Unauthorized") {
     loginOrRegisterAndHaltThisThread();

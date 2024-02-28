@@ -1,6 +1,7 @@
 import { DoughnutApi } from "@/generated/backend";
 import Api from "./Api";
 import { JsonData } from "./window/RestfulFetch";
+import BindingHttpRequest from "./BindingHttpRequest";
 
 type ApiError = {
   id: number;
@@ -20,7 +21,7 @@ class ManagedApi extends DoughnutApi {
   private silentMode?: boolean;
 
   constructor(apiStatus: ApiStatus, silent?: boolean) {
-    super({ BASE: "" });
+    super({ BASE: "" }, BindingHttpRequest);
     this.apiStatus = apiStatus;
     this.api = new Api("/api/");
     this.silentMode = silent;
