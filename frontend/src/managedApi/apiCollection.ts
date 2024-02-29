@@ -8,7 +8,10 @@ export const timezoneParam = () => {
 const apiCollection = (managedApi: ManagedApi) => ({
   userMethods: {
     logout() {
-      return managedApi.restPostWithHtmlResponse(`/logout`, {});
+      return managedApi.request.request({
+        method: "POST",
+        url: "logout",
+      });
     },
   },
 });
