@@ -7,6 +7,8 @@ class ManagedApi extends DoughnutApi {
 
   apiStatusHandler: ApiStatusHandler;
 
+  silentApi: ManagedApi | undefined = undefined;
+
   constructor(apiStatus: ApiStatus, silent?: boolean) {
     super({ BASE: "" }, BindingHttpRequest(apiStatus, silent));
     this.apiStatus = apiStatus;
@@ -14,7 +16,10 @@ class ManagedApi extends DoughnutApi {
   }
 
   get silent(): ManagedApi {
-    return new ManagedApi(this.apiStatus, true);
+    if (!this.silentApi) {
+      this.silentApi = new ManagedApi(this.apiStatus, true);
+    }
+    return this.silentApi;
   }
 
   logout() {
