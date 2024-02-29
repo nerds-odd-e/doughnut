@@ -110,13 +110,12 @@ export default defineComponent({
       searchTerm: SearchTerm,
     ) {
       if (noteId) {
-        return (await this.managedApi.restPost(
-          `notes/${noteId}/search`,
+        return (await this.managedApi.restNoteController.searchForLinkTargetWithin(
+          noteId,
           searchTerm,
         )) as Note[];
       }
-      return (await this.managedApi.restPost(
-        `notes/search`,
+      return (await this.managedApi.restNoteController.searchForLinkTarget(
         searchTerm,
       )) as Note[];
     },
