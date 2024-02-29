@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Note } from '../models/Note';
-import type { NoteAccessories } from '../models/NoteAccessories';
+import type { NoteAccessoriesDTO } from '../models/NoteAccessoriesDTO';
 import type { NoteCreationDTO } from '../models/NoteCreationDTO';
 import type { NoteInfo } from '../models/NoteInfo';
 import type { NotePositionViewedByUser } from '../models/NotePositionViewedByUser';
@@ -170,9 +170,9 @@ export class RestNoteControllerService {
      * @returns NoteRealm OK
      * @throws ApiError
      */
-    public updateNote(
+    public updateNoteAccessories(
         note: number,
-        requestBody?: NoteAccessories,
+        requestBody?: NoteAccessoriesDTO,
     ): CancelablePromise<NoteRealm> {
         return this.httpRequest.request({
             method: 'PATCH',

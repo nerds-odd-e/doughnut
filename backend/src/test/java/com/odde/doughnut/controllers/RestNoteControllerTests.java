@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 
+import com.odde.doughnut.controllers.dto.NoteAccessoriesDTO;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.WikidataAssociationCreation;
@@ -363,6 +364,7 @@ class RestNoteControllerTests {
   @Nested
   class updateNoteTest {
     Note note;
+    NoteAccessoriesDTO noteAccessoriesDTO = new NoteAccessoriesDTO();
 
     @BeforeEach
     void setup() {
@@ -371,14 +373,15 @@ class RestNoteControllerTests {
 
     @Test
     void shouldBeAbleToSaveNoteWhenValid() throws UnexpectedNoAccessRightException, IOException {
-      NoteRealm response = controller.updateNote(note, note.getNoteAccessories());
+      NoteRealm response = controller.updateNoteAccessories(note, noteAccessoriesDTO);
       assertThat(response.getId(), equalTo(note.getId()));
     }
 
     @Test
     void shouldAddUploadedPicture() throws UnexpectedNoAccessRightException, IOException {
-      makeMe.theNote(note).withNewlyUploadedPicture();
-      controller.updateNote(note, note.getNoteAccessories());
+      noteAccessoriesDTO.setUploadPictureProxy(
+          makeMe.anUploadedPicture().toMultiplePartFilePlease());
+      controller.updateNoteAccessories(note, noteAccessoriesDTO);
       assertThat(note.getNoteAccessories().getUploadPicture(), is(not(nullValue())));
     }
 
@@ -386,8 +389,7 @@ class RestNoteControllerTests {
     void shouldNotRemoveThePictureIfNoNewPictureInTheUpdate()
         throws UnexpectedNoAccessRightException, IOException {
       makeMe.theNote(note).withUploadedPicture();
-      NoteAccessories newContent = makeMe.aNote().inMemoryPlease().getNoteAccessories();
-      controller.updateNote(note, newContent);
+      controller.updateNoteAccessories(note, noteAccessoriesDTO);
       assertThat(note.getNoteAccessories().getUploadPicture(), is(not(nullValue())));
     }
   }

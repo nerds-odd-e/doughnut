@@ -1,6 +1,6 @@
 package com.odde.doughnut.entities.validators;
 
-import com.odde.doughnut.entities.NoteAccessories;
+import com.odde.doughnut.controllers.dto.NoteAccessoriesDTO;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ public class ValidateNotePictureValidator
 
   @Override
   public boolean isValid(Object value, ConstraintValidatorContext context) {
-    final NoteAccessories noteAccessories = (NoteAccessories) value;
+    final NoteAccessoriesDTO noteAccessories = (NoteAccessoriesDTO) value;
     List<String> fieldsWithValue = new ArrayList<>();
     if (noteAccessories.getUploadPictureProxy() != null
         && !noteAccessories.getUploadPictureProxy().isEmpty()) {

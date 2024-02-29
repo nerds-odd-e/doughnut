@@ -1519,7 +1519,7 @@ paths:
     patch:
       tags:
       - rest-note-controller
-      operationId: updateNote
+      operationId: updateNoteAccessories
       parameters:
       - name: note
         in: path
@@ -1530,7 +1530,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NoteAccessories'
+              $ref: '#/components/schemas/NoteAccessoriesDTO'
       responses:
         "500":
           description: Internal Server Error
@@ -2264,7 +2264,6 @@ components:
         pictureUrl:
           type: string
         pictureMask:
-          pattern: "^(((-?[0-9.]+\\s+){3}-?[0-9.]+\\s+)*((-?[0-9.]+\\s+){3}-?[0-9.]+))?$"
           type: string
         useParentPicture:
           type: boolean
@@ -2779,6 +2778,21 @@ components:
       properties:
         details:
           type: string
+    NoteAccessoriesDTO:
+      type: object
+      properties:
+        url:
+          type: string
+        pictureUrl:
+          type: string
+        pictureMask:
+          pattern: "^(((-?[0-9.]+\\s+){3}-?[0-9.]+\\s+)*((-?[0-9.]+\\s+){3}-?[0-9.]+))?$"
+          type: string
+        useParentPicture:
+          type: boolean
+        uploadPictureProxy:
+          type: string
+          format: binary
     WikidataSearchEntity:
       required:
       - label

@@ -105,16 +105,15 @@ class RestNoteController {
 
   @PatchMapping(path = "/{note}")
   @Transactional
-  public NoteRealm updateNote(
+  public NoteRealm updateNoteAccessories(
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
-      @Valid @ModelAttribute NoteAccessories noteAccessories)
+      @Valid @ModelAttribute NoteAccessoriesDTO noteAccessoriesDTO)
       throws UnexpectedNoAccessRightException, IOException {
     currentUser.assertAuthorization(note);
 
     final User user = currentUser.getEntity();
-    noteAccessories.fetchUploadedPicture(user);
     note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
-    note.updateNoteContent(noteAccessories);
+    note.setFromDTO(noteAccessoriesDTO, user);
     modelFactoryService.save(note);
     return new NoteViewer(user, note).toJsonObject();
   }

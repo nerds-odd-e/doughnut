@@ -5,6 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.odde.doughnut.controllers.dto.NoteAccessoriesDTO;
 import com.odde.doughnut.testability.MakeMe;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Path;
@@ -72,7 +73,7 @@ public class NoteTest {
   @Nested
   class ValidationTest {
     private Validator validator;
-    private final Note note = makeMe.aNote().inMemoryPlease();
+    private final NoteAccessoriesDTO note = new NoteAccessoriesDTO();
 
     @BeforeEach
     public void setUp() {
@@ -87,38 +88,35 @@ public class NoteTest {
 
     @Test
     public void goodMask() {
-      note.getNoteAccessories().setPictureMask("1 -2.3 3 -4");
+      note.setPictureMask("1 -2.3 3 -4");
       assertThat(getViolations(), is(empty()));
     }
 
     @Test
     public void goodMaskWith2Rect() {
-      note.getNoteAccessories().setPictureMask("-1 2 3 4 11 22 33 44");
+      note.setPictureMask("-1 2 3 4 11 22 33 44");
       assertThat(getViolations(), is(empty()));
     }
 
     @Test
     public void masksNeedToBeFourNumbers() {
-      note.getNoteAccessories().setPictureMask("1 2 3 4 5 6 7");
+      note.setPictureMask("1 2 3 4 5 6 7");
       assertThat(getViolations(), is(not(empty())));
       Path propertyPath = getViolations().stream().findFirst().get().getPropertyPath();
-      assertThat(propertyPath.toString(), equalTo("noteAccessories.pictureMask"));
+      assertThat(propertyPath.toString(), equalTo("pictureMask"));
     }
 
     @Test
     public void withBothUploadPictureProxyAndPicture() {
-      note.getNoteAccessories()
-          .setUploadPictureProxy(makeMe.anUploadedPicture().toMultiplePartFilePlease());
-      note.getNoteAccessories().setPictureUrl("http://url/img");
+      note.setUploadPictureProxy(makeMe.anUploadedPicture().toMultiplePartFilePlease());
+      note.setPictureUrl("http://url/img");
       assertThat(getViolations(), is(not(empty())));
       List<String> errorFields =
           getViolations().stream().map(v -> v.getPropertyPath().toString()).collect(toList());
-      assertThat(
-          errorFields,
-          containsInAnyOrder("noteAccessories.uploadPicture", "noteAccessories.pictureUrl"));
+      assertThat(errorFields, containsInAnyOrder("uploadPicture", "pictureUrl"));
     }
 
-    private Set<ConstraintViolation<Note>> getViolations() {
+    private Set<ConstraintViolation<NoteAccessoriesDTO>> getViolations() {
       return validator.validate(note);
     }
   }

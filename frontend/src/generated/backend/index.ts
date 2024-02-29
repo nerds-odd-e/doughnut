@@ -37,6 +37,7 @@ export type { LinkViewed } from './models/LinkViewed';
 export type { MCQWithAnswer } from './models/MCQWithAnswer';
 export type { Note } from './models/Note';
 export type { NoteAccessories } from './models/NoteAccessories';
+export type { NoteAccessoriesDTO } from './models/NoteAccessoriesDTO';
 export type { Notebook } from './models/Notebook';
 export type { NotebookDTO } from './models/NotebookDTO';
 export type { NotebooksViewedByUser } from './models/NotebooksViewedByUser';

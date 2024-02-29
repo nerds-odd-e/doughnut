@@ -10,12 +10,14 @@ import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.algorithms.HtmlOrMarkdown;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
+import com.odde.doughnut.controllers.dto.NoteAccessoriesDTO;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.models.NoteViewer;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -221,11 +223,12 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     parent = parentNote;
   }
 
-  public void updateNoteContent(NoteAccessories noteAccessories) {
-    if (noteAccessories.getUploadPicture() == null) {
-      noteAccessories.setUploadPicture(getNoteAccessories().getUploadPicture());
+  public void setFromDTO(NoteAccessoriesDTO noteAccessoriesDTO, User user) throws IOException {
+    BeanUtils.copyProperties(noteAccessoriesDTO, getNoteAccessories());
+    Image uploadPicture = noteAccessoriesDTO.fetchUploadedPicture(user);
+    if (uploadPicture != null) {
+      getNoteAccessories().setUploadPicture(uploadPicture);
     }
-    BeanUtils.copyProperties(noteAccessories, getNoteAccessories());
   }
 
   @JsonIgnore

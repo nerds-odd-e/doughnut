@@ -150,13 +150,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
-  public NoteBuilder withNewlyUploadedPicture() {
-    entity
-        .getNoteAccessories()
-        .setUploadPictureProxy(makeMe.anUploadedPicture().toMultiplePartFilePlease());
-    return this;
-  }
-
   public void withUploadedPicture() {
     entity.getNoteAccessories().setUploadPicture(makeMe.anImage().please());
   }
