@@ -12,9 +12,9 @@ describe("NoteRealm", () => {
 
   beforeEach(() => {
     noteRealm = makeMe.aNoteRealm.please();
-    helper.apiMock
-      .expectingGet(`/api/notes/${noteRealm.id}`)
-      .andReturnOnce(noteRealm);
+    helper.managedApi.restNoteController.show1 = vitest
+      .fn()
+      .mockResolvedValue(noteRealm);
   });
 
   describe("rendering a note realm", () => {
@@ -28,6 +28,9 @@ describe("NoteRealm", () => {
         .render();
       await flushPromises();
       expect(screen.getAllByRole("topic")).toHaveLength(1);
+      expect(helper.managedApi.restNoteController.show1).toBeCalledWith(
+        noteRealm.id,
+      );
     });
   });
 });

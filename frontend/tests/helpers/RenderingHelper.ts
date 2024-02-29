@@ -13,27 +13,29 @@ class RenderingHelper {
 
   private route = {};
 
-  private managedApi = new ManagedApi({ states: [], errors: [] });
+  private managedApi;
 
-  private global = {
-    directives: {
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      focus() {},
-    },
-    provide: {
-      managedApi: this.managedApi,
-    },
-    stubs: {
-      "router-view": true,
-      "router-link": {
-        props: ["to"],
-        template: `<a class="router-link" :to='JSON.stringify(to)'><slot/></a>`,
-      },
-    },
-  };
+  private global;
 
-  constructor(comp: DefineComponent) {
+  constructor(comp: DefineComponent, managedApi: ManagedApi) {
     this.comp = comp;
+    this.managedApi = managedApi;
+    this.global = {
+      directives: {
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        focus() {},
+      },
+      provide: {
+        managedApi: this.managedApi,
+      },
+      stubs: {
+        "router-view": true,
+        "router-link": {
+          props: ["to"],
+          template: `<a class="router-link" :to='JSON.stringify(to)'><slot/></a>`,
+        },
+      },
+    };
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
