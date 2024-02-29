@@ -35,7 +35,7 @@ export default function BindingHttpRequest(
                   return;
                 }
               }
-              apiStatusHandler.addError(error.message);
+              apiStatusHandler.addError(error.body.message);
 
               if (error.status === 400) {
                 const jsonResponse =

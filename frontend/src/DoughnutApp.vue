@@ -69,7 +69,9 @@ export default defineComponent({
 
   async mounted() {
     this.environment = this.api.testability.getEnvironment();
-    this.featureToggle = await this.api.testability.getFeatureToggle();
+    this.featureToggle =
+      this.api.testability.getEnvironment() === "testing" &&
+      (await this.managedApi.testabilityRestController.getFeatureToggle());
     const userInfo =
       await this.managedApi.restCurrentUserInfoController.currentUserInfo();
     this.user = userInfo.user;

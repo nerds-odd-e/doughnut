@@ -18,12 +18,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
         ? "production"
         : "testing";
     },
-    async getFeatureToggle() {
-      return (
-        !window.location.href.includes("odd-e.com") &&
-        ((await managedApi.restGet(`testability/feature_toggle`)) as boolean)
-      );
-    },
 
     async setFeatureToggle(data: boolean) {
       const res = await managedApi.restPost(`testability/feature_toggle`, {

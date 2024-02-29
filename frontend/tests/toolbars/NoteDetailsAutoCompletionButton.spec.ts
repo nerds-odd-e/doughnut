@@ -82,9 +82,9 @@ describe("NoteDetailsAutoCompletionButton", () => {
       });
     const wrapper = await triggerAutoCompletion(note);
     const dialog = wrapper.getComponent(AIClarifyingQuestionDialog);
-    dialog.find("input#note-answerToAI").setValue("I mean this");
+    await dialog.find("input#note-answerToAI").setValue("I mean this");
     helper.apiMock.expectingPost(`/api/ai/answer-clarifying-question`);
-    dialog.find("input[type='submit']").trigger("click");
+    await dialog.find("input[type='submit']").trigger("click");
     helper.apiMock.verifyCall(
       `/api/ai/answer-clarifying-question`,
       expect.objectContaining({
