@@ -49,7 +49,7 @@ export default defineComponent({
     async askForImage() {
       try {
         this.b64Json = (
-          await this.api.ai.generateImage(this.prompt)
+          await this.managedApi.restAiController.generateImage(this.prompt)
         ).b64encoded;
       } catch (_) {
         this.promptError = "There is a problem";

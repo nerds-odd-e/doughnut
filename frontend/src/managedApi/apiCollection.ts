@@ -1,9 +1,3 @@
-import {
-  AiCompletionAnswerClarifyingQuestionParams,
-  AiCompletionParams,
-  AiCompletionResponse,
-  AiGeneratedImage,
-} from "@/generated/backend";
 import ManagedApi from "./ManagedApi";
 
 export const timezoneParam = () => {
@@ -18,34 +12,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
   },
 
-  ai: {
-    async getAvailableGptModels() {
-      return (await managedApi.restGet(`ai/available-gpt-models`)) as string[];
-    },
-
-    async askAiCompletion(noteId: Doughnut.ID, request: AiCompletionParams) {
-      return (await managedApi.restPost(
-        `ai/${noteId}/completion`,
-        request,
-      )) as AiCompletionResponse;
-    },
-
-    async answerCompletionClarifyingQuestion(
-      request: AiCompletionAnswerClarifyingQuestionParams,
-    ) {
-      return (await managedApi.restPost(
-        `ai/answer-clarifying-question`,
-        request,
-      )) as AiCompletionResponse;
-    },
-
-    async generateImage(prompt: string) {
-      return (await managedApi.restPost(
-        `ai/generate-image`,
-        prompt,
-      )) as AiGeneratedImage;
-    },
-  },
   testability: {
     getEnvironment() {
       return window.location.href.includes("odd-e.com")

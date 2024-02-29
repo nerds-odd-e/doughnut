@@ -13,13 +13,13 @@ import ManageModelInner from "./ManageModelInner.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
 
-const { api, managedApi } = useLoadingApi();
+const { managedApi } = useLoadingApi();
 const modelList = ref<string[] | undefined>(undefined);
 const selectedModels = ref<GlobalAiModelSettings | undefined>(undefined);
 
 onMounted(() => {
   Promise.all([
-    api.ai.getAvailableGptModels(),
+    managedApi.restAiController.getAvailableGptModels(),
     managedApi.restGlobalSettingsController.getCurrentModelVersions(),
   ]).then((results) => {
     const [modelListRes, selectedModelRes] = results;

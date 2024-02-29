@@ -66,9 +66,12 @@ export default defineComponent({
   },
   methods: {
     async initialAutoCompleteDetails() {
-      const response = await this.api.ai.askAiCompletion(this.note.id, {
-        detailsToComplete: this.note.details,
-      });
+      const response = await this.managedApi.restAiController.getCompletion(
+        this.note.id,
+        {
+          detailsToComplete: this.note.details,
+        },
+      );
 
       return this.autoCompleteDetails(response);
     },
@@ -94,13 +97,16 @@ export default defineComponent({
       clarifyingQuestionAndAnswer: ClarifyingQuestionAndAnswer,
     ) {
       this.clarifyingHistory.push(clarifyingQuestionAndAnswer);
-      const response = await this.api.ai.answerCompletionClarifyingQuestion({
-        detailsToComplete: this.note.details,
-        answer: clarifyingQuestionAndAnswer.answerFromUser,
-        threadId: this.threadRespons!.threadId,
-        runId: this.threadRespons!.runId,
-        toolCallId: this.threadRespons!.requiredAction!.toolCallId,
-      });
+      const response =
+        await this.managedApi.restAiController.answerCompletionClarifyingQuestion(
+          {
+            detailsToComplete: this.note.details,
+            answer: clarifyingQuestionAndAnswer.answerFromUser,
+            threadId: this.threadRespons!.threadId,
+            runId: this.threadRespons!.runId,
+            toolCallId: this.threadRespons!.requiredAction!.toolCallId,
+          },
+        );
       await this.autoCompleteDetails(response);
     },
   },
