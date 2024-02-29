@@ -8,14 +8,15 @@ import { User } from "@/generated/backend/models/User";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
-helper.resetWithApiMock(beforeEach, afterEach);
-
 describe("global bar", () => {
   let noteEditingHistory: NoteEditingHistory;
   let histories: StorageAccessor;
   let user: User;
 
   beforeEach(() => {
+    helper.managedApi.restCircleController.index = vitest
+      .fn()
+      .mockResolvedValue([]);
     user = makeMe.aUser().please();
     noteEditingHistory = new NoteEditingHistory();
     histories = createNoteStorage(
@@ -33,9 +34,9 @@ describe("global bar", () => {
         apiStatus: { states: [] },
       })
       .mount();
-    helper.apiMock.expectingGet("/api/circles");
     wrapper.find("[role='button']").trigger("click");
     await flushPromises();
+    expect(helper.managedApi.restCircleController.index).toBeCalled();
   });
 
   it("fetch API to be called ONCE", async () => {

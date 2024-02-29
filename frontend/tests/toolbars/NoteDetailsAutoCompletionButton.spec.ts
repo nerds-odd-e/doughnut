@@ -1,14 +1,35 @@
 import { flushPromises } from "@vue/test-utils";
 import NoteDetailsAutoCompletionButton from "@/components/toolbars/NoteDetailsAutoCompletionButton.vue";
 import AIClarifyingQuestionDialog from "@/components/notes/AIClarifyingQuestionDialog.vue";
-import { Note } from "@/generated/backend";
+import {
+  AiCompletionParams,
+  AiCompletionResponse,
+  CancelablePromise,
+  Note,
+} from "@/generated/backend";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
 describe("NoteDetailsAutoCompletionButton", () => {
   const note = makeMe.aNote.please();
+  const mockedGetCompletion = vitest.fn<
+    [number, AiCompletionParams],
+    CancelablePromise<AiCompletionResponse>
+  >();
+  const mockedAnswerClarifyingQuestion = vitest.fn().mockResolvedValue({
+    requiredAction: {
+      contentToAppend: "auto completed content",
+    },
+  });
+  const mockedUpldateDetails = vitest.fn();
 
-  helper.resetWithApiMock(beforeEach, afterEach);
+  beforeEach(() => {
+    helper.managedApi.restAiController.getCompletion = mockedGetCompletion;
+    helper.managedApi.restAiController.answerCompletionClarifyingQuestion =
+      mockedAnswerClarifyingQuestion;
+    helper.managedApi.restTextContentController.updateNoteDetails =
+      mockedUpldateDetails;
+  });
 
   const triggerAutoCompletionWithoutFlushPromises = async (n: Note) => {
     const wrapper = helper
@@ -27,80 +48,76 @@ describe("NoteDetailsAutoCompletionButton", () => {
 
   it("ask api to generate details when details is empty", async () => {
     const noteWithNoDetails = makeMe.aNote.details("").please();
-    const expectation = helper.apiMock
-      .expectingPost(`/api/ai/${noteWithNoDetails.id}/completion`)
-      .andReturnOnce({
-        requiredAction: { contentToAppend: "auto completed content" },
-      });
-    helper.apiMock.expectingPatch(
-      `/api/text_content/${noteWithNoDetails.id}/details`,
-    );
-    await triggerAutoCompletion(noteWithNoDetails);
-    expect(expectation.actualRequestJsonBody()).toMatchObject({
-      detailsToComplete: "",
+    mockedGetCompletion.mockResolvedValue({
+      requiredAction: { contentToAppend: "auto completed content" },
     });
+    await triggerAutoCompletion(noteWithNoDetails);
+    expect(mockedGetCompletion).toHaveBeenCalledWith(
+      noteWithNoDetails.id,
+      expect.objectContaining({ detailsToComplete: "" }),
+    );
+    expect(mockedUpldateDetails).toHaveBeenCalledWith(
+      noteWithNoDetails.id,
+      expect.anything(),
+    );
   });
 
   it("ask api be called once when clicking the auto-complete button", async () => {
-    const expectation = helper.apiMock
-      .expectingPost(`/api/ai/${note.id}/completion`)
-      .andReturnOnce({
-        requiredAction: { contentToAppend: "auto completed content" },
-      });
-    helper.apiMock.expectingPatch(`/api/text_content/${note.id}/details`);
-    await triggerAutoCompletion(note);
-    expect(expectation.actualRequestJsonBody()).toMatchObject({
-      detailsToComplete: "<p>Desc</p>",
+    mockedGetCompletion.mockResolvedValue({
+      requiredAction: { contentToAppend: "auto completed content" },
     });
+    await triggerAutoCompletion(note);
+    expect(mockedGetCompletion).toHaveBeenCalledWith(
+      note.id,
+      expect.objectContaining({
+        detailsToComplete: "<p>Desc</p>",
+      }),
+    );
+    expect(mockedUpldateDetails).toHaveBeenCalled();
   });
 
   it("get more completed content and update", async () => {
-    helper.apiMock
-      .expectingPost(`/api/ai/${note.id}/completion`)
-      .andReturnOnce({
-        requiredAction: {
-          contentToAppend: "auto completed content",
-        },
-      });
-    helper.apiMock.expectingPatch(`/api/text_content/${note.id}/details`);
+    mockedGetCompletion.mockResolvedValue({
+      requiredAction: {
+        contentToAppend: "auto completed content",
+      },
+    });
 
     await triggerAutoCompletion(note);
+
+    expect(mockedUpldateDetails).toHaveBeenCalled();
   });
 
   it("ask for clarifying question", async () => {
-    helper.apiMock
-      .expectingPost(`/api/ai/${note.id}/completion`)
-      .andReturnOnce({
-        runId: "run-id",
-        threadId: "thread-id",
-        requiredAction: {
-          toolCallId: "tool-call-id",
-          clarifyingQuestion: {
-            question: "what do you mean?",
-          },
+    mockedGetCompletion.mockResolvedValue({
+      runId: "run-id",
+      threadId: "thread-id",
+      requiredAction: {
+        toolCallId: "tool-call-id",
+        clarifyingQuestion: {
+          question: "what do you mean?",
         },
-      });
+      },
+    });
     const wrapper = await triggerAutoCompletion(note);
     const dialog = wrapper.getComponent(AIClarifyingQuestionDialog);
     await dialog.find("input#note-answerToAI").setValue("I mean this");
-    helper.apiMock.expectingPost(`/api/ai/answer-clarifying-question`);
     await dialog.find("input[type='submit']").trigger("click");
-    helper.apiMock.verifyCall(
-      `/api/ai/answer-clarifying-question`,
+    expect(mockedAnswerClarifyingQuestion).toHaveBeenCalledWith(
       expect.objectContaining({
-        body: expect.stringContaining("tool-call-id"),
+        toolCallId: "tool-call-id",
       }),
     );
   });
 
   it("stop updating if the component is unmounted", async () => {
-    helper.apiMock
-      .expectingPost(`/api/ai/${note.id}/completion`)
-      .andReturnOnce({
+    mockedGetCompletion.mockReturnValue(
+      new CancelablePromise(() => ({
         requiredAction: {
           contentToAppend: "auto completed content",
         },
-      });
+      })),
+    );
 
     const wrapper = await triggerAutoCompletionWithoutFlushPromises(note);
     wrapper.unmount();

@@ -9,9 +9,9 @@ describe("note wth child cards", () => {
   it("should render note with one child", async () => {
     const noteParent = makeMe.aNoteRealm.topicConstructor("parent").please();
     makeMe.aNoteRealm.topicConstructor("child").under(noteParent).please();
-    helper.apiMock
-      .expectingGet(`/api/notes/${noteParent.id}`)
-      .andReturnOnce(noteParent);
+    helper.managedApi.restNoteController.show1 = vitest
+      .fn()
+      .mockResolvedValue(noteParent);
     helper
       .component(NoteCardsView)
       .withStorageProps({
@@ -22,5 +22,8 @@ describe("note wth child cards", () => {
     await screen.findByText("parent");
     await screen.findByText("child");
     expect(screen.getAllByRole("topic")).toHaveLength(1);
+    expect(helper.managedApi.restNoteController.show1).toBeCalledWith(
+      noteParent.id,
+    );
   });
 });
