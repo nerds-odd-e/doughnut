@@ -1528,7 +1528,7 @@ paths:
           type: integer
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
               $ref: '#/components/schemas/NoteAccessoriesDTO'
       responses:

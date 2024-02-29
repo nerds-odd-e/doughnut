@@ -166,13 +166,13 @@ export class RestNoteControllerService {
     }
     /**
      * @param note
-     * @param requestBody
+     * @param formData
      * @returns NoteRealm OK
      * @throws ApiError
      */
     public updateNoteAccessories(
         note: number,
-        requestBody?: NoteAccessoriesDTO,
+        formData?: NoteAccessoriesDTO,
     ): CancelablePromise<NoteRealm> {
         return this.httpRequest.request({
             method: 'PATCH',
@@ -180,8 +180,8 @@ export class RestNoteControllerService {
             path: {
                 'note': note,
             },
-            body: requestBody,
-            mediaType: 'application/json',
+            formData: formData,
+            mediaType: 'multipart/form-data',
             errors: {
                 500: `Internal Server Error`,
             },

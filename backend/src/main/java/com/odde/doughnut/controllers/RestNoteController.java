@@ -18,6 +18,7 @@ import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import org.springframework.beans.BeanUtils;
+import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.*;
 import org.springframework.web.bind.annotation.*;
@@ -103,7 +104,9 @@ class RestNoteController {
     return new NoteViewer(user, note).toJsonObject();
   }
 
-  @PatchMapping(path = "/{note}")
+  @PatchMapping(
+      path = "/{note}",
+      consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @Transactional
   public NoteRealm updateNoteAccessories(
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
