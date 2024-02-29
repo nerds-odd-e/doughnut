@@ -872,7 +872,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/Note'
+          type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -1502,7 +1502,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/Note'
+          type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -1554,7 +1554,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/Note'
+          type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -1847,10 +1847,10 @@ paths:
       operationId: getPosition
       parameters:
       - name: note
-        in: query
+        in: path
         required: true
         schema:
-          $ref: '#/components/schemas/Note'
+          type: integer
       responses:
         "500":
           description: Internal Server Error

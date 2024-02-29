@@ -6,7 +6,6 @@ import {
   ChatRequest,
   ChatResponse,
   GlobalAiModelSettings,
-  NotePositionViewedByUser,
   NoteRealm,
   WikidataAssociationCreation,
   WikidataEntityData,
@@ -26,17 +25,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
   },
 
-  noteMethods: {
-    async getNoteRealm(noteId: Doughnut.ID) {
-      return (await managedApi.restGet(`notes/${noteId}`)) as NoteRealm;
-    },
-
-    async getNotePosition(noteId: Doughnut.ID) {
-      return (await managedApi.restGet(
-        `notes/${noteId}/position`,
-      )) as NotePositionViewedByUser;
-    },
-  },
   wikidata: {
     async updateWikidataId(
       noteId: Doughnut.ID,

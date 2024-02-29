@@ -124,7 +124,7 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   async getNoteRealmAndReloadPosition(noteId: Doughnut.ID) {
-    const nrwp = await this.statelessApi.noteMethods.getNoteRealm(noteId);
+    const nrwp = await this.managedApi.restNoteController.show1(noteId);
     return this.storage.refreshNoteRealm(nrwp);
   }
 

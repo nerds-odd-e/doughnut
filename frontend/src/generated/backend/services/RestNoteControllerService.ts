@@ -114,7 +114,7 @@ export class RestNoteControllerService {
      * @throws ApiError
      */
     public deleteNote(
-        note: Note,
+        note: number,
     ): CancelablePromise<Array<NoteRealm>> {
         return this.httpRequest.request({
             method: 'POST',
@@ -151,7 +151,7 @@ export class RestNoteControllerService {
      * @throws ApiError
      */
     public show1(
-        note: Note,
+        note: number,
     ): CancelablePromise<NoteRealm> {
         return this.httpRequest.request({
             method: 'GET',
@@ -193,7 +193,7 @@ export class RestNoteControllerService {
      * @throws ApiError
      */
     public undoDeleteNote(
-        note: Note,
+        note: number,
     ): CancelablePromise<NoteRealm> {
         return this.httpRequest.request({
             method: 'PATCH',
@@ -212,12 +212,12 @@ export class RestNoteControllerService {
      * @throws ApiError
      */
     public getPosition(
-        note: Note,
+        note: number,
     ): CancelablePromise<NotePositionViewedByUser> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/notes/{note}/position',
-            query: {
+            path: {
                 'note': note,
             },
             errors: {
