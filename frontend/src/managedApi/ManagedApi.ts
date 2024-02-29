@@ -22,6 +22,13 @@ class ManagedApi extends DoughnutApi {
     return new ManagedApi(this.apiStatus, true);
   }
 
+  logout() {
+    return this.request.request({
+      method: "POST",
+      url: "logout",
+    });
+  }
+
   async around<T>(promise: Promise<T>): Promise<T> {
     this.apiStatusHandler.assignLoading(true);
     try {

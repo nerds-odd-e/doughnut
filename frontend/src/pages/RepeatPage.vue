@@ -43,8 +43,8 @@
 import { defineComponent, PropType } from "vue";
 import _ from "lodash";
 import { AnsweredQuestion } from "@/generated/backend";
-import { timezoneParam } from "@/managedApi/apiCollection";
 import getEnvironment from "@/managedApi/window/getEnvironment";
+import timezoneParam from "@/managedApi/window/timezoneParam";
 import Quiz from "../components/review/Quiz.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";

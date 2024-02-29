@@ -54,7 +54,7 @@ export default defineComponent({
   },
   methods: {
     async logout() {
-      await this.api.userMethods.logout();
+      await this.managedApi.logout();
       window.location.href = "/bazaar";
     },
   },
