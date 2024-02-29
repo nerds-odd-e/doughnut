@@ -11,14 +11,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return managedApi.restPostWithHtmlResponse(`/logout`, {});
     },
   },
-
-  testability: {
-    getEnvironment() {
-      return window.location.href.includes("odd-e.com")
-        ? "production"
-        : "testing";
-    },
-  },
 });
 
 export default apiCollection;

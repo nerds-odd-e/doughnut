@@ -44,6 +44,7 @@ import { defineComponent, PropType } from "vue";
 import _ from "lodash";
 import { AnsweredQuestion } from "@/generated/backend";
 import { timezoneParam } from "@/managedApi/apiCollection";
+import getEnvironment from "@/managedApi/window/getEnvironment";
 import Quiz from "../components/review/Quiz.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
@@ -108,7 +109,7 @@ export default defineComponent({
       if (this.toRepeat?.length === 0) {
         return;
       }
-      if (this.api.testability.getEnvironment() !== "testing") {
+      if (getEnvironment() !== "testing") {
         this.toRepeat = _.shuffle(this.toRepeat);
       }
     },

@@ -9,6 +9,7 @@ import createNoteStorage from "./store/createNoteStorage";
 import ManagedApi, { ApiStatus } from "./managedApi/ManagedApi";
 import GlobalBar from "./components/toolbars/GlobalBar.vue";
 import { User } from "./generated/backend";
+import getEnvironment from "./managedApi/window/getEnvironment";
 
 export default defineComponent({
   setup() {
@@ -68,9 +69,9 @@ export default defineComponent({
   },
 
   async mounted() {
-    this.environment = this.api.testability.getEnvironment();
+    this.environment = getEnvironment();
     this.featureToggle =
-      this.api.testability.getEnvironment() === "testing" &&
+      this.environment === "testing" &&
       (await this.managedApi.testabilityRestController.getFeatureToggle());
     const userInfo =
       await this.managedApi.restCurrentUserInfoController.currentUserInfo();
