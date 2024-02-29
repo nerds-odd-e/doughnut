@@ -18,20 +18,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
         ? "production"
         : "testing";
     },
-
-    async setFeatureToggle(data: boolean) {
-      const res = await managedApi.restPost(`testability/feature_toggle`, {
-        enabled: data,
-      });
-      return res;
-    },
-
-    async setRandomizer(data: string) {
-      const res = await managedApi.restPost(`testability/randomizer`, {
-        choose: data,
-      });
-      return res;
-    },
   },
 });
 

@@ -53,10 +53,14 @@ export default defineComponent({
   },
   methods: {
     updateRandomSelector() {
-      this.api.testability.setRandomizer(this.randomSelector);
+      this.managedApi.testabilityRestController.randomizer({
+        choose: this.randomSelector,
+      });
     },
     updateFeatureToggle(value) {
-      this.api.testability.setFeatureToggle(value);
+      this.managedApi.testabilityRestController.enableFeatureToggle({
+        enabled: value,
+      });
       this.$emit("featureToggle", value);
     },
   },
