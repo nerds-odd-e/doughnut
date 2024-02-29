@@ -3,9 +3,6 @@ import {
   AiCompletionParams,
   AiCompletionResponse,
   AiGeneratedImage,
-  ChatRequest,
-  ChatResponse,
-  GlobalAiModelSettings,
 } from "@/generated/backend";
 import ManagedApi from "./ManagedApi";
 
@@ -21,38 +18,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
   },
 
-  settings: {
-    async getManageModelSelected() {
-      return (await managedApi.restGet(
-        `settings/current-model-version`,
-      )) as GlobalAiModelSettings;
-    },
-    async setManageModelSelected(settings: GlobalAiModelSettings) {
-      return (await managedApi.restPost(
-        `settings/current-model-version`,
-        settings,
-      )) as GlobalAiModelSettings;
-    },
-  },
   ai: {
-    async recreateAllAssistants() {
-      return (await managedApi.restPost(
-        `ai/recreate-all-assistants`,
-        {},
-      )) as Record<string, string>;
-    },
-    async chat(
-      noteId: Doughnut.ID,
-      userMessage: string,
-    ): Promise<string | undefined> {
-      const request: ChatRequest = { userMessage };
-      const res = (await managedApi.restPost(
-        `ai/chat?note=${noteId}`,
-        request,
-      )) as ChatResponse;
-      return res.assistantMessage;
-    },
-
     async getAvailableGptModels() {
       return (await managedApi.restGet(`ai/available-gpt-models`)) as string[];
     },

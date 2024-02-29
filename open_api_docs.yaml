@@ -1329,7 +1329,7 @@ paths:
         in: query
         required: true
         schema:
-          $ref: '#/components/schemas/Note'
+          type: integer
       requestBody:
         content:
           application/json:

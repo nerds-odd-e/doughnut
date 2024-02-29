@@ -8,7 +8,6 @@ import type { AiCompletionResponse } from '../models/AiCompletionResponse';
 import type { AiGeneratedImage } from '../models/AiGeneratedImage';
 import type { ChatRequest } from '../models/ChatRequest';
 import type { ChatResponse } from '../models/ChatResponse';
-import type { Note } from '../models/Note';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestAiControllerService {
@@ -74,7 +73,7 @@ export class RestAiControllerService {
      * @throws ApiError
      */
     public chat(
-        note: Note,
+        note: number,
         requestBody: ChatRequest,
     ): CancelablePromise<ChatResponse> {
         return this.httpRequest.request({

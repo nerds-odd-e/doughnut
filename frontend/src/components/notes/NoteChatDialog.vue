@@ -91,10 +91,11 @@ export default defineComponent({
       this.scrollToBottom();
     },
     async generateChatAnswer() {
-      this.assistantMessage = await this.api.ai.chat(
-        this.selectedNote.id,
-        this.chatInput,
-      );
+      this.assistantMessage = (
+        await this.managedApi.restAiController.chat(this.selectedNote.id, {
+          userMessage: this.chatInput,
+        })
+      ).assistantMessage;
       this.answered = true;
     },
   },

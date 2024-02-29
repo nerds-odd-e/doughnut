@@ -63,7 +63,8 @@ public class RestAiController {
   @PostMapping("/chat")
   @Transactional
   public ChatResponse chat(
-      @RequestParam(value = "note") Note note, @RequestBody ChatRequest request)
+      @RequestParam(value = "note") @Schema(type = "integer") Note note,
+      @RequestBody ChatRequest request)
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
     String userMessage = request.getUserMessage();

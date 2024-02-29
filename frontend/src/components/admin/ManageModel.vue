@@ -13,14 +13,14 @@ import ManageModelInner from "./ManageModelInner.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
 
-const { api } = useLoadingApi();
+const { api, managedApi } = useLoadingApi();
 const modelList = ref<string[] | undefined>(undefined);
 const selectedModels = ref<GlobalAiModelSettings | undefined>(undefined);
 
 onMounted(() => {
   Promise.all([
     api.ai.getAvailableGptModels(),
-    api.settings.getManageModelSelected(),
+    managedApi.restGlobalSettingsController.getCurrentModelVersions(),
   ]).then((results) => {
     const [modelListRes, selectedModelRes] = results;
     modelList.value = modelListRes;
@@ -29,6 +29,9 @@ onMounted(() => {
 });
 
 const save = async (settings: GlobalAiModelSettings) => {
-  selectedModels.value = await api.settings.setManageModelSelected(settings);
+  selectedModels.value =
+    await managedApi.restGlobalSettingsController.setCurrentModelVersions(
+      settings,
+    );
 };
 </script>
