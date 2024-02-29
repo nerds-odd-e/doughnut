@@ -119,7 +119,7 @@ export default class StoredApiCollection implements StoredApi {
     data: WikidataAssociationCreation,
   ): Promise<NoteRealm> {
     return this.storage.refreshNoteRealm(
-      await this.statelessApi.wikidata.updateWikidataId(noteId, data),
+      await this.managedApi.restNoteController.updateWikidataId(noteId, data),
     );
   }
 

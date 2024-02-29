@@ -37,8 +37,11 @@ export default defineComponent({
       return `https://www.wikidata.org/wiki/${this.wikidataId}`;
     },
     async getWikidataItem() {
-      return (await this.api.wikidata.getWikidataEntityById(this.wikidataId))
-        .WikipediaEnglishUrl;
+      return (
+        await this.managedApi.restWikidataController.fetchWikidataEntityDataById(
+          this.wikidataId,
+        )
+      ).WikipediaEnglishUrl;
     },
   },
 });

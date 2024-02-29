@@ -65,9 +65,10 @@ export default defineComponent({
   methods: {
     async validateAndSave() {
       try {
-        const res = await this.api.wikidata.getWikidataEntityById(
-          this.associationData.wikidataId,
-        );
+        const res =
+          await this.managedApi.restWikidataController.fetchWikidataEntityDataById(
+            this.associationData.wikidataId,
+          );
         if (
           res.WikidataTitleInEnglish !== "" &&
           res.WikidataTitleInEnglish.toUpperCase() !==

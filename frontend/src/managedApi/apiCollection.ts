@@ -6,10 +6,6 @@ import {
   ChatRequest,
   ChatResponse,
   GlobalAiModelSettings,
-  NoteRealm,
-  WikidataAssociationCreation,
-  WikidataEntityData,
-  WikidataSearchEntity,
 } from "@/generated/backend";
 import ManagedApi from "./ManagedApi";
 
@@ -25,29 +21,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
   },
 
-  wikidata: {
-    async updateWikidataId(
-      noteId: Doughnut.ID,
-      data: WikidataAssociationCreation,
-    ) {
-      return (await managedApi.restPost(
-        `notes/${noteId}/updateWikidataId`,
-        data,
-      )) as NoteRealm;
-    },
-
-    async getWikidataEntityById(wikidataId: string) {
-      return (await managedApi.restGet(
-        `wikidata/entity-data/${wikidataId}`,
-      )) as WikidataEntityData;
-    },
-
-    async getWikidatas(keyword: string) {
-      return (await managedApi.restGet(
-        `wikidata/search/${keyword}`,
-      )) as WikidataSearchEntity[];
-    },
-  },
   settings: {
     async getManageModelSelected() {
       return (await managedApi.restGet(
