@@ -1,7 +1,7 @@
 import { Router } from "vue-router";
 import {
   LinkCreation,
-  NoteAccessories,
+  NoteAccessoriesDTO,
   NoteCreationDTO,
   NoteRealm,
   WikidataAssociationCreation,
@@ -34,7 +34,7 @@ export interface StoredApi {
 
   updateNoteAccessories(
     noteId: Doughnut.ID,
-    noteAccessories: NoteAccessories,
+    noteAccessories: NoteAccessoriesDTO,
   ): Promise<NoteRealm>;
 
   updateTextField(
@@ -143,35 +143,32 @@ export default class StoredApiCollection implements StoredApi {
     data: LinkCreation,
   ) {
     return this.storage.refreshNoteRealm(
-      (await this.managedApi.restLinkController.linkNoteFinalize(
+      await this.managedApi.restLinkController.linkNoteFinalize(
         sourceId,
         targetId,
         data,
-      )) as NoteRealm,
+      ),
     );
   }
 
   async updateLink(linkId: Doughnut.ID, data: LinkCreation) {
     return this.storage.refreshNoteRealm(
-      (await this.managedApi.restLinkController.updateLink(
-        linkId,
-        data,
-      )) as NoteRealm,
+      await this.managedApi.restLinkController.updateLink(linkId, data),
     );
   }
 
   async deleteLink(linkId: Doughnut.ID, fromTargetPerspective: boolean) {
     return this.storage.refreshNoteRealm(
-      (await this.managedApi.restLinkController.deleteLink(
+      await this.managedApi.restLinkController.deleteLink(
         linkId,
         fromTargetPerspective ? "tview" : "sview",
-      )) as NoteRealm,
+      ),
     );
   }
 
   async updateNoteAccessories(
     noteId: Doughnut.ID,
-    noteContentData: NoteAccessories,
+    noteContentData: NoteAccessoriesDTO,
   ) {
     return this.storage.refreshNoteRealm(
       (await this.managedApi.restPatchMultiplePartForm(
@@ -230,15 +227,13 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   async deleteNote(router: Router, noteId: Doughnut.ID) {
-    const res = (await this.managedApi.restNoteController.deleteNote(
-      noteId,
-    )) as NoteRealm[];
+    const res = await this.managedApi.restNoteController.deleteNote(noteId);
     this.noteEditingHistory.deleteNote(noteId);
     if (res.length === 0) {
       this.routerReplaceFocus(router);
       return undefined;
     }
-    const noteRealm = this.storage.refreshNoteRealm(res[0] as NoteRealm);
+    const noteRealm = this.storage.refreshNoteRealm(res[0]!);
     this.routerReplaceFocus(router, noteRealm);
     return noteRealm;
   }

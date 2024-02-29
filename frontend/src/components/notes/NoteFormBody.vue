@@ -49,14 +49,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { PropType, defineComponent } from "vue";
+import { NoteAccessoriesDTO } from "@/generated/backend";
 import TextInput from "../form/TextInput.vue";
 import CheckInput from "../form/CheckInput.vue";
 import ImageInput from "../form/ImageInput.vue";
 
 export default defineComponent({
   props: {
-    modelValue: { type: Object, required: true },
+    modelValue: {
+      type: Object as PropType<NoteAccessoriesDTO>,
+      required: true,
+    },
     errors: {
       type: Object,
       default() {

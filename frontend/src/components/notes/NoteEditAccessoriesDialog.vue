@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { Note } from "@/generated/backend";
+import { Note, NoteAccessoriesDTO } from "@/generated/backend";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import NoteFormBody from "./NoteFormBody.vue";
 
@@ -30,8 +30,7 @@ export default defineComponent({
   data() {
     const { ...rest } = this.note.noteAccessories;
     return {
-      /* eslint-disable  @typescript-eslint/no-explicit-any */
-      formData: rest as any,
+      formData: rest as NoteAccessoriesDTO,
       noteFormErrors: {},
     };
   },
