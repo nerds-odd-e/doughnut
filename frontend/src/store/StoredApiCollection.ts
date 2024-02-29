@@ -171,10 +171,10 @@ export default class StoredApiCollection implements StoredApi {
     noteContentData: NoteAccessoriesDTO,
   ) {
     return this.storage.refreshNoteRealm(
-      (await this.managedApi.restPatchMultiplePartForm(
-        `notes/${noteId}`,
+      await this.managedApi.restNoteController.updateNoteAccessories(
+        noteId,
         noteContentData,
-      )) as NoteRealm,
+      ),
     );
   }
 
@@ -211,10 +211,7 @@ export default class StoredApiCollection implements StoredApi {
         undone.textContent!,
       );
     }
-    return (await this.managedApi.restPatch(
-      `notes/${undone.noteId}/undo-delete`,
-      {},
-    )) as NoteRealm;
+    return this.managedApi.restNoteController.undoDeleteNote(undone.noteId);
   }
 
   async undo(router: Router) {

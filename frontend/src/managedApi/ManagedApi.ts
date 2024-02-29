@@ -1,6 +1,5 @@
 import { DoughnutApi } from "@/generated/backend";
 import Api from "./Api";
-import { JsonData } from "./window/RestfulFetch";
 import BindingHttpRequest from "./BindingHttpRequest";
 import ApiStatusHandler, { ApiError, ApiStatus } from "./ApiStatusHandler";
 
@@ -27,42 +26,6 @@ class ManagedApi extends DoughnutApi {
       method: "POST",
       url: "logout",
     });
-  }
-
-  async around<T>(promise: Promise<T>): Promise<T> {
-    this.apiStatusHandler.assignLoading(true);
-    try {
-      try {
-        return await promise;
-      } catch (error) {
-        if (error instanceof Error) {
-          this.apiStatusHandler.addError(error.message);
-        }
-        throw error;
-      }
-    } finally {
-      this.apiStatusHandler.assignLoading(false);
-    }
-  }
-
-  restPatch(url: string, data: JsonData) {
-    return this.around(this.api.restPatch(url, data));
-  }
-
-  restDelete(url: string, data: JsonData) {
-    return this.around(this.api.restDelete(url, data));
-  }
-
-  restPostMultiplePartForm(url: string, data: JsonData) {
-    return this.around(this.api.restPostMultiplePartForm(url, data));
-  }
-
-  restPatchMultiplePartForm(url: string, data: JsonData) {
-    return this.around(this.api.restPatchMultiplePartForm(url, data));
-  }
-
-  restPostWithHtmlResponse(url: string, data: JsonData) {
-    return this.around(this.api.restPostWithHtmlResponse(url, data));
   }
 }
 
