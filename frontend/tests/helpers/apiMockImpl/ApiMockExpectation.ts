@@ -1,5 +1,6 @@
 import { MockParams } from "vitest-fetch-mock";
-import { HttpMethod } from "../../../src/managedApi/window/RestfulFetch";
+
+export type HttpMethod = "GET" | "POST" | "PATCH" | "DELETE";
 
 class ApiMockExpectation {
   url: string;

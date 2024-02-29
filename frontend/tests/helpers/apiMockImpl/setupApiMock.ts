@@ -1,7 +1,6 @@
-import { HttpMethod } from "@/managedApi/window/RestfulFetch";
 import { ApiMock } from "../ApiMock";
 import ApiMockBuilderImpl from "./ApiMockBuilderImpl";
-import ApiMockExpectation from "./ApiMockExpectation";
+import ApiMockExpectation, { HttpMethod } from "./ApiMockExpectation";
 
 function rejectFromArray<T>(array: T[], predicate: (value: T) => unknown): T[] {
   const firstMatch = array.findIndex(predicate);

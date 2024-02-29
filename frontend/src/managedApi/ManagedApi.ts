@@ -1,5 +1,4 @@
 import { DoughnutApi } from "@/generated/backend";
-import Api from "./Api";
 import BindingHttpRequest from "./BindingHttpRequest";
 import ApiStatusHandler, { ApiError, ApiStatus } from "./ApiStatusHandler";
 
@@ -8,13 +7,10 @@ class ManagedApi extends DoughnutApi {
 
   apiStatusHandler: ApiStatusHandler;
 
-  api: Api;
-
   constructor(apiStatus: ApiStatus, silent?: boolean) {
     super({ BASE: "" }, BindingHttpRequest(apiStatus, silent));
     this.apiStatus = apiStatus;
     this.apiStatusHandler = new ApiStatusHandler(apiStatus, silent);
-    this.api = new Api("/api/");
   }
 
   get silent(): ManagedApi {
