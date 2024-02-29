@@ -45,10 +45,6 @@ class ManagedApi extends DoughnutApi {
     }
   }
 
-  restPost(url: string, data: JsonData) {
-    return this.around(this.api.restPost(url, data));
-  }
-
   restPatch(url: string, data: JsonData) {
     return this.around(this.api.restPatch(url, data));
   }

@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { LinkCreation } from '../models/LinkCreation';
-import type { Note } from '../models/Note';
 import type { NoteRealm } from '../models/NoteRealm';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -16,7 +15,7 @@ export class RestLinkControllerService {
      * @throws ApiError
      */
     public updateLink(
-        link: Note,
+        link: number,
         requestBody: LinkCreation,
     ): CancelablePromise<NoteRealm> {
         return this.httpRequest.request({

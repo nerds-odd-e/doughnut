@@ -143,8 +143,9 @@ export default class StoredApiCollection implements StoredApi {
     data: LinkCreation,
   ) {
     return this.storage.refreshNoteRealm(
-      (await this.managedApi.restPost(
-        `links/create/${sourceId}/${targetId}`,
+      (await this.managedApi.restLinkController.linkNoteFinalize(
+        sourceId,
+        targetId,
         data,
       )) as NoteRealm,
     );
@@ -152,15 +153,18 @@ export default class StoredApiCollection implements StoredApi {
 
   async updateLink(linkId: Doughnut.ID, data: LinkCreation) {
     return this.storage.refreshNoteRealm(
-      (await this.managedApi.restPost(`links/${linkId}`, data)) as NoteRealm,
+      (await this.managedApi.restLinkController.updateLink(
+        linkId,
+        data,
+      )) as NoteRealm,
     );
   }
 
   async deleteLink(linkId: Doughnut.ID, fromTargetPerspective: boolean) {
     return this.storage.refreshNoteRealm(
-      (await this.managedApi.restPost(
-        `links/${linkId}/${fromTargetPerspective ? "tview" : "sview"}/delete`,
-        {},
+      (await this.managedApi.restLinkController.deleteLink(
+        linkId,
+        fromTargetPerspective ? "tview" : "sview",
       )) as NoteRealm,
     );
   }
@@ -226,9 +230,8 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   async deleteNote(router: Router, noteId: Doughnut.ID) {
-    const res = (await this.managedApi.restPost(
-      `notes/${noteId}/delete`,
-      {},
+    const res = (await this.managedApi.restNoteController.deleteNote(
+      noteId,
     )) as NoteRealm[];
     this.noteEditingHistory.deleteNote(noteId);
     if (res.length === 0) {

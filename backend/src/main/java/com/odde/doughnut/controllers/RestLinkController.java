@@ -43,7 +43,8 @@ class RestLinkController {
 
   @PostMapping(value = "/{link}")
   @Transactional
-  public NoteRealm updateLink(@PathVariable Note link, @RequestBody LinkCreation linkCreation)
+  public NoteRealm updateLink(
+      @PathVariable @Schema(type = "integer") Note link, @RequestBody LinkCreation linkCreation)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(link);
     link.setLinkType(linkCreation.linkType);
