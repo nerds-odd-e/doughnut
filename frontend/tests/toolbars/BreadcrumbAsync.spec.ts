@@ -3,17 +3,16 @@ import BreadcrumbAsync from "@/components/toolbars/BreadcrumbAsync.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
-helper.resetWithApiMock(beforeEach, afterEach);
-
 describe("repetition page", () => {
   describe("repetition page for a link", () => {
     const notePosition = makeMe.aNotePosition.please();
     const noteId = 123;
+    const mockedNotePositionCall = vitest
+      .fn()
+      .mockResolvedValueOnce(notePosition);
 
     beforeEach(async () => {
-      helper.apiMock
-        .expectingGet(`/api/notes/${noteId}/position`)
-        .andReturnOnce(notePosition);
+      helper.managedApi.restNoteController.getPosition = mockedNotePositionCall;
     });
 
     it("render the breadcrumber", async () => {
@@ -23,6 +22,7 @@ describe("repetition page", () => {
         .mount();
       await flushPromises();
       expect(wrapper.find(".breadcrumb-item").text()).toEqual("My Notes");
+      expect(mockedNotePositionCall).toHaveBeenCalledWith(noteId);
     });
 
     it("reload when id changes", async () => {
@@ -33,12 +33,11 @@ describe("repetition page", () => {
       await flushPromises();
       const anotherNotePosition = makeMe.aNotePosition.inBazaar().please();
       const anotherNoteId = noteId + 1;
-      helper.apiMock
-        .expectingGet(`/api/notes/${anotherNoteId}/position`)
-        .andReturnOnce(anotherNotePosition);
+      mockedNotePositionCall.mockResolvedValueOnce(anotherNotePosition);
       wrapper.setProps({ noteId: anotherNoteId });
       await flushPromises();
       expect(wrapper.find(".breadcrumb-item").text()).toEqual("Bazaar");
+      expect(mockedNotePositionCall).toHaveBeenCalledWith(anotherNoteId);
     });
   });
 });
