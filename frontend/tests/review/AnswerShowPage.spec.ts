@@ -23,9 +23,9 @@ describe("repetition page", () => {
       helper.apiMock
         .expectingGet(`/api/notes/${reviewPoint.thing.targetNote?.id}/position`)
         .andReturnOnce(notePosition);
-      helper.apiMock.expectingGet(
-        `/api/notes/${reviewPoint.thing.sourceNote?.id}/position`,
-      );
+      helper.apiMock
+        .expectingGet(`/api/notes/${reviewPoint.thing.sourceNote?.id}/position`)
+        .andReturnOnce(notePosition);
     });
 
     it("click on note when doing review", async () => {

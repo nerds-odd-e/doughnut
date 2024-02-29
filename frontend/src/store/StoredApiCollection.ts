@@ -7,7 +7,6 @@ import {
   WikidataAssociationCreation,
 } from "@/generated/backend";
 import ManagedApi from "../managedApi/ManagedApi";
-import apiCollection from "../managedApi/apiCollection";
 import NoteEditingHistory from "./NoteEditingHistory";
 import NoteStorage from "./NoteStorage";
 
@@ -82,10 +81,6 @@ export default class StoredApiCollection implements StoredApi {
       name: "noteShow",
       params: { noteId: focusOnNote.id },
     });
-  }
-
-  private get statelessApi(): ReturnType<typeof apiCollection> {
-    return apiCollection(this.managedApi);
   }
 
   private async updateTextContentWithoutUndo(
