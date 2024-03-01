@@ -1,4 +1,4 @@
-# syntax=docker.io/docker/dockerfile:1.6
+# syntax=docker.io/docker/dockerfile:1.6.0
 FROM gitpod/workspace-full-vnc
 # ---------------------------------------------------
 # -------------------- USER root --------------------
@@ -71,7 +71,7 @@ WORKDIR /home/gitpod
 
 # Install Nix
 RUN touch .bash_profile \
-    && curl https://nixos.org/releases/nix/nix-2.20.1/install | sh
+    && curl https://nixos.org/releases/nix/nix-2.20.4/install | sh
 
 RUN echo '. /home/gitpod/.nix-profile/etc/profile.d/nix.sh' >> /home/gitpod/.bashrc
 RUN mkdir -p /home/gitpod/.config/nixpkgs && echo '{ allowUnfree = true; }' >> /home/gitpod/.config/nixpkgs/config.nix

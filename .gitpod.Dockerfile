@@ -1,5 +1,5 @@
-# syntax=docker.io/docker/dockerfile:1.6
-FROM yeongsheng/doughnut-gitpod:2024-02-13
+# syntax=docker.io/docker/dockerfile:1.6.0
+FROM yeongsheng/doughnut-gitpod:2024-03-01
 
 # -----------------------------------------------------
 # -------------------- USER gitpod --------------------
