@@ -1,13 +1,13 @@
-name: 'Mobile action'
-description: 'Setup flutter stuff'
+name: "Mobile action"
+description: "Setup flutter stuff"
 inputs:
   flutter-version:
-    description: 'The Flutter version to make available on the path'
+    description: "The Flutter version to make available on the path"
     required: false
   channel:
-    description: 'The Flutter build release channel'
+    description: "The Flutter build release channel"
     required: false
-    default: 'stable'
+    default: "stable"
 runs:
   using: "composite"
   steps:
