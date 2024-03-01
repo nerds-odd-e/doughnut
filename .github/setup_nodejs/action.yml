@@ -1,21 +1,23 @@
 name: "Setup NodeJS"
 description: "Setup NodeJS"
 inputs:
-  node-version:
+  node_version:
     description: "NodeJS Version"
     required: true
-    default: ${{ vars.NODE_VERSION }}
+  pnpm_version:
+    description: "PNPM Version"
+    required: true
 runs:
   using: "composite"
   steps:
     - name: Setup NodeJS
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ inputs.node-version }}
+        node-version: ${{ inputs.node_version }}
     - name: Setup pnpm & install deps
       uses: pnpm/action-setup@v2
       with:
-        version: ${{ vars.PNPM_VERSION }}
+        version: ${{ inputs.pnpm_version }}
         run_install: |
           - recursive: true
             args: [--frozen-lockfile, --strict-peer-dependencies]

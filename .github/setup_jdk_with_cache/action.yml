@@ -1,10 +1,9 @@
 name: "Setup JDK with Gradle cache"
 description: "Setup JDK with Gradle cache"
 inputs:
-  java-version:
+  java_version:
     description: "JDK Version"
     required: true
-    default: ${{ vars.JAVA_VERSION }}
   distribution:
     description: "JDK Type e.g. Zulu, Adopt, OpenJDK"
     required: true
@@ -19,7 +18,7 @@ runs:
     - name: Set up JDK
       uses: actions/setup-java@v4
       with:
-        java-version: ${{ inputs.java-version }}
+        java-version: ${{ inputs.java_version }}
         distribution: ${{ inputs.distribution }}
         architecture: ${{ inputs.architecture }}
     - name: Cache local gradle repository & artifacts
