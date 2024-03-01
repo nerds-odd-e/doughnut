@@ -3,29 +3,27 @@ import AnsweredQuestionPage from "@/pages/AnsweredQuestionPage.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
-helper.resetWithApiMock(beforeEach, afterEach);
-
 describe("repetition page", () => {
   describe("repetition page for a link", () => {
     const link = makeMe.aLink.please();
     const reviewPoint = makeMe.aReviewPoint.ofLink(link).please();
     const notePosition = makeMe.aNotePosition.please();
+    const mockedShowAnswerCall = vitest.fn();
+    const mockedNotePositionCall = vitest.fn();
 
     beforeEach(async () => {
-      helper.apiMock.expectingGet("/api/reviews/answers/1").andReturnOnce({
-        answerResult: {
-          answerId: 1,
-          correct: true,
-        },
-        answerDisplay: "",
-        reviewPoint,
-      });
-      helper.apiMock
-        .expectingGet(`/api/notes/${reviewPoint.thing.targetNote?.id}/position`)
-        .andReturnOnce(notePosition);
-      helper.apiMock
-        .expectingGet(`/api/notes/${reviewPoint.thing.sourceNote?.id}/position`)
-        .andReturnOnce(notePosition);
+      vitest.resetAllMocks();
+      helper.managedApi.restReviewsController.showAnswer =
+        mockedShowAnswerCall.mockResolvedValue({
+          answerResult: {
+            answerId: 1,
+            correct: true,
+          },
+          answerDisplay: "",
+          reviewPoint,
+        });
+      helper.managedApi.restNoteController.getPosition =
+        mockedNotePositionCall.mockResolvedValue(notePosition);
     });
 
     it("click on note when doing review", async () => {
@@ -37,6 +35,13 @@ describe("repetition page", () => {
       await flushPromises();
       wrapper.find(".review-point-abbr").trigger("click");
       await flushPromises();
+      expect(mockedShowAnswerCall).toHaveBeenCalledWith(1);
+      expect(mockedNotePositionCall).toHaveBeenCalledWith(
+        reviewPoint.thing.targetNote?.id,
+      );
+      expect(mockedNotePositionCall).toHaveBeenCalledWith(
+        reviewPoint.thing.sourceNote?.id,
+      );
       expect(
         JSON.parse(
           wrapper.find(".link-target .router-link").attributes().to as string,
