@@ -24,11 +24,14 @@ env:
   GITHUB_FOR_ISSUES_API_TOKEN: ${{ secrets.GH_ISSUES_API_TOKEN }}
   OPENAI_API_TOKEN: ${{ secrets.OPENAI_API_TOKEN }}
   FLUTTER_VERSION: "3.7.12"
+  PNPM_VERSION: "8.15.4"
+  NODE_VERSION: "21"
+  JAVA_VERSION: "21"
 
 jobs:
   Linting:
     name: Backend + Frontend + Cypress Lint
-    runs-on: ubuntu-22.04
+    runs-on: ${{ env.RUNNER_OS }}
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/setup_jdk_with_cache
@@ -37,7 +40,7 @@ jobs:
 
   Backend-unit-tests:
     name: Backend Unit tests
-    runs-on: ubuntu-22.04
+    runs-on: ${{ env.RUNNER_OS }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup MySQL DB Server
@@ -52,7 +55,7 @@ jobs:
 
   Frontend-unit-tests:
     name: Frontend Unit tests
-    runs-on: ubuntu-22.04
+    runs-on: ${{ env.RUNNER_OS }}
     env:
       FRONTEND_UT_CONSOLE_OUTPUT_AS_FAILURE: true
     steps:
@@ -63,7 +66,7 @@ jobs:
 
   Package-artifacts:
     name: Package backend & frontend artifacts for deployment
-    runs-on: ubuntu-22.04
+    runs-on: ${{ env.RUNNER_OS }}
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/setup_jdk_with_cache
@@ -79,7 +82,7 @@ jobs:
 
   E2E-tests:
     name: End-to-End tests with Database
-    runs-on: ubuntu-22.04
+    runs-on: ${{ env.RUNNER_OS }}
     strategy:
       matrix:
         spec:
@@ -127,7 +130,7 @@ jobs:
 
   Deploy:
     name: GCP MIG Rolling Update Deploy
-    runs-on: ubuntu-22.04
+    runs-on: ${{ env.RUNNER_OS }}
     needs:
       [
         Linting,
@@ -154,7 +157,7 @@ jobs:
 
   Notify-on-failure:
     name: Single slack/discord notification on CI/CD failure
-    runs-on: ubuntu-22.04
+    runs-on: ${{ env.RUNNER_OS }}
     needs:
       [
         Linting,
@@ -178,7 +181,7 @@ jobs:
       #     github-token: ${{ env.GITHUB_TOKEN }}
       #     discord-webhook: ${{ env.DISCORD_WEBHOOK_URL }}
   # mobile-unit-test:
-  #   runs-on: ubuntu-22.04
+  #   runs-on: ${{ env.RUNNER_OS }}
   #   steps:
   #     - uses: actions/checkout@v4
   #     - uses: subosito/flutter-action@v2
@@ -194,7 +197,7 @@ jobs:
   #       device:
   #         - "iPhone 15"
   #     fail-fast: false
-  #   runs-on: ubuntu-22.04
+  #   runs-on: ${{ env.RUNNER_OS }}
   #   steps:
   #     - name: List Simulators
   #       run: xcrun xctrace list devices
@@ -212,7 +215,7 @@ jobs:
   #     - run: dart test_driver/app_test.dart
   #       working-directory: ./doughnut_mobile
   # drive_android:
-  #   runs-on: ubuntu-22.04
+  #   runs-on: ${{ env.RUNNER_OS }}
   #   #creates a build matrix for your jobs
   #   strategy:
   #     #set of different configurations of the virtual environment.
