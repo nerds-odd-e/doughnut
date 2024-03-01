@@ -9,10 +9,15 @@ describe("Notebooks Page", () => {
   it("fetch API to be called ONCE", async () => {
     const notebook = makeMe.aNotebook.please();
 
-    helper.apiMock.expectingGet("/api/notebooks").andReturnOnce({
-      notebooks: [notebook],
-      subscriptions: [],
-    });
+    helper.managedApi.restNotebookController.myNotebooks = vi
+      .fn()
+      .mockResolvedValue({
+        notebooks: [notebook],
+        subscriptions: [],
+      });
     helper.component(NotebooksPage).withStorageProps({}).render();
+    expect(
+      helper.managedApi.restNotebookController.myNotebooks,
+    ).toBeCalledTimes(1);
   });
 });

@@ -8,13 +8,20 @@ import makeMe from "../fixtures/makeMe";
 import RenderingHelper from "../helpers/RenderingHelper";
 
 let renderer: RenderingHelper;
-let mockRouterPush = vi.fn();
+const mockRouterPush = vi.fn();
+const mockedInitialReviewCall = vi.fn();
+const mockedNoteInfoCall = vi.fn();
+const mockedGetNoteCall = vi.fn();
 
 helper.resetWithApiMock(beforeEach, afterEach);
 mockBrowserTimeZone("Europe/Amsterdam", beforeEach, afterEach);
 
 beforeEach(() => {
-  mockRouterPush = vi.fn();
+  helper.managedApi.restReviewsController.initialReview =
+    mockedInitialReviewCall;
+  helper.managedApi.restNoteController.getNoteInfo =
+    mockedNoteInfoCall.mockResolvedValue({});
+  helper.managedApi.restNoteController.show1 = mockedGetNoteCall;
   renderer = helper
     .component(InitialReviewPage)
     .withStorageProps({})
@@ -23,12 +30,11 @@ beforeEach(() => {
 
 describe("repeat page", () => {
   it("redirect to review page if nothing to review", async () => {
-    helper.apiMock
-      .expectingGet("/api/reviews/initial?timezone=Europe%2FAmsterdam")
-      .andReturnOnce([]);
+    mockedInitialReviewCall.mockResolvedValue([]);
     renderer.currentRoute({ name: "initial" }).mount();
     await flushPromises();
     expect(mockRouterPush).toHaveBeenCalledWith({ name: "reviews" });
+    expect(mockedInitialReviewCall).toBeCalledWith("Europe/Amsterdam");
   });
 
   describe("normal view", () => {
@@ -37,13 +43,8 @@ describe("repeat page", () => {
     const { thing } = reviewPoint;
 
     beforeEach(() => {
-      helper.apiMock
-        .expectingGet("/api/reviews/initial?timezone=Europe%2FAmsterdam")
-        .andReturnOnce([thing, thing]);
-      helper.apiMock.expectingGet(`/api/notes/${noteRealm.id}/note-info`);
-      helper.apiMock
-        .expectingGet(`/api/notes/${noteRealm.id}`)
-        .andReturnOnce(noteRealm);
+      mockedInitialReviewCall.mockResolvedValue([thing, thing]);
+      mockedGetNoteCall.mockResolvedValue(noteRealm);
     });
 
     it("normal view", async () => {
@@ -55,15 +56,14 @@ describe("repeat page", () => {
       expect(wrapper.find(".progress-text").text()).toContain(
         "Initial Review: 0/2",
       );
+      expect(mockedGetNoteCall).toBeCalledWith(noteRealm.id);
     });
 
     (["levelChanged"] as "levelChanged"[]).forEach((event) => {
       it(`reloads when ${event}`, async () => {
         const wrapper = renderer.currentRoute({ name: "initial" }).mount();
         await flushPromises();
-        helper.apiMock
-          .expectingGet("/api/reviews/initial?timezone=Europe%2FAmsterdam")
-          .andReturnOnce([]);
+        mockedInitialReviewCall.mockResolvedValue([]);
         wrapper.findComponent(ShowThing).vm.$emit(event);
       });
     });
@@ -72,9 +72,7 @@ describe("repeat page", () => {
   it("minimized view", async () => {
     const noteRealm = makeMe.aNoteRealm.please();
     const reviewPoint = makeMe.aReviewPoint.ofNote(noteRealm).please();
-    helper.apiMock
-      .expectingGet("/api/reviews/initial?timezone=Europe%2FAmsterdam")
-      .andReturnOnce([reviewPoint.thing]);
+    mockedInitialReviewCall.mockResolvedValue([reviewPoint.thing]);
     const wrapper = renderer
       .withStorageProps({ minimized: true })
       .currentRoute({ name: "initial" })
@@ -90,9 +88,7 @@ describe("repeat page", () => {
   it("minimized view for link", async () => {
     const link = makeMe.aLink.please();
     const reviewPoint = makeMe.aReviewPoint.ofLink(link).please();
-    helper.apiMock
-      .expectingGet("/api/reviews/initial?timezone=Europe%2FAmsterdam")
-      .andReturnOnce([reviewPoint.thing]);
+    mockedInitialReviewCall.mockResolvedValue([reviewPoint.thing]);
     const wrapper = renderer
       .withStorageProps({ minimized: true })
       .currentRoute({ name: "initial" })
