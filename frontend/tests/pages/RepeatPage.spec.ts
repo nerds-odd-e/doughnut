@@ -51,7 +51,9 @@ describe("repeat page", () => {
         mockedReviewPointCall.mockResolvedValue(makeMe.aReviewPoint.please());
       helper.managedApi.silent.restReviewPointController.generateRandomQuestion =
         mockedRandomQuestionCall;
-      mockedRandomQuestionCall.mockRejectedValueOnce(makeMe.a404Error.please());
+      mockedRandomQuestionCall.mockRejectedValueOnce(
+        makeMe.anApiError.please(),
+      );
       mockedRepeatCall.mockResolvedValue(
         makeMe.aDueReviewPointsList
           .toRepeat([firstReviewPointId, secondReviewPointId, 3])

@@ -10,8 +10,6 @@
 <script lang="ts">
 import { defineComponent, PropType, ref } from "vue";
 import { debounce } from "lodash";
-import { ApiError } from "@/generated/backend";
-import BadRequestError from "@/managedApi/window/BadRequestError";
 import { type StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
@@ -65,19 +63,16 @@ export default defineComponent({
     onBlur() {
       this.changer.flush();
     },
-    setError(errs: unknown) {
-      if (errs instanceof ApiError) {
-        if (errs.status === 401) {
-          this.errors = {
-            topic:
-              "You are not authorized to edit this note. Perhaps you are not logged in?",
-          };
-          return;
-        }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setError(errs: any) {
+      if (errs.status === 401) {
+        this.errors = {
+          topic:
+            "You are not authorized to edit this note. Perhaps you are not logged in?",
+        };
+        return;
       }
-      if (errs instanceof BadRequestError) {
-        this.errors = errs as unknown as Record<string, string>;
-      }
+      this.errors = errs as unknown as Record<string, string>;
     },
   },
   watch: {

@@ -76,7 +76,7 @@ class MakeMe {
     return new SuggestedQuestionForFineTuningBuilder();
   }
 
-  static get a404Error(): ApiErrorBuilder {
+  static get anApiError(): ApiErrorBuilder {
     return new ApiErrorBuilder().error404();
   }
 }

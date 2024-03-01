@@ -3,7 +3,7 @@ import { ApiRequestOptions } from "@/generated/backend/core/ApiRequestOptions";
 import { FetchHttpRequest } from "@/generated/backend/core/FetchHttpRequest";
 import loginOrRegisterAndHaltThisThread from "./window/loginOrRegisterAndHaltThisThread";
 import ApiStatusHandler, { ApiStatus } from "./ApiStatusHandler";
-import BadRequestError from "./window/BadRequestError";
+import assignBadRequestProperties from "./window/assignBadRequestProperties";
 
 export default function BindingHttpRequest(
   apiStatus: ApiStatus,
@@ -44,8 +44,7 @@ export default function BindingHttpRequest(
                   typeof error.body === "string"
                     ? JSON.parse(error.body)
                     : error.body;
-                reject(new BadRequestError(jsonResponse));
-                return;
+                assignBadRequestProperties(error, jsonResponse);
               }
             }
             reject(error);

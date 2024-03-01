@@ -19,12 +19,39 @@ class ApiErrorBuilder extends Builder<ApiError> {
 
   message: string = "not found";
 
+  errors: Record<string, unknown> = {};
+
+  of401() {
+    this.response = {
+      ...this.response,
+      status: 401,
+    };
+    return this;
+  }
+
+  ofBindingError(errors: Record<string, unknown>) {
+    this.errors = errors;
+    this.response = {
+      ...this.response,
+      status: 400,
+    };
+    this.message = "bad request";
+    return this;
+  }
+
   error404(): ApiErrorBuilder {
+    this.response = {
+      ...this.response,
+      status: 404,
+    };
     return this;
   }
 
   do() {
-    return new ApiError(this.request, this.response, this.message);
+    return {
+      ...new ApiError(this.request, this.response, this.message),
+      ...this.errors,
+    };
   }
 }
 

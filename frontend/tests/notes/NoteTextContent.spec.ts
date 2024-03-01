@@ -6,7 +6,7 @@ import { Note } from "@/generated/backend";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
-helper.resetWithApiMock(beforeEach, afterEach);
+const mockedUpdateTopicCall = vi.fn();
 
 describe("in place edit on title", () => {
   const note = makeMe.aNote.topicConstructor("Dummy Title").please();
@@ -18,6 +18,12 @@ describe("in place edit on title", () => {
       })
       .mount();
   };
+
+  beforeEach(() => {
+    vi.resetAllMocks();
+    helper.managedApi.restTextContentController.updateNoteTopicConstructor =
+      mockedUpdateTopicCall;
+  });
 
   it("should display text field when one single click on title", async () => {
     const wrapper = mountComponent(note);
@@ -50,10 +56,10 @@ describe("in place edit on title", () => {
     const wrapper = mountComponent(note);
     await wrapper.find('[role="topic"]').trigger("click");
     await wrapper.find('[role="topic"] input').setValue("updated");
-    helper.apiMock.expectingPatch(
-      `/api/text_content/${note.id}/topic-constructor`,
-    );
     wrapper.unmount();
+    expect(mockedUpdateTopicCall).toBeCalledWith(note.id, {
+      topicConstructor: "updated",
+    });
   });
 
   const editTitle = async (
@@ -74,10 +80,10 @@ describe("in place edit on title", () => {
   it("should save content when blur text field title", async () => {
     const wrapper = mountComponent(note);
     await editTitle(wrapper, "updated");
-    helper.apiMock.expectingPatch(
-      `/api/text_content/${note.id}/topic-constructor`,
-    );
     await wrapper.find('[role="topic"] input').trigger("blur");
+    expect(mockedUpdateTopicCall).toBeCalledWith(note.id, {
+      topicConstructor: "updated",
+    });
   });
 
   it("should not change content if there's unsaved changed", async () => {
@@ -91,10 +97,7 @@ describe("in place edit on title", () => {
       wrapper.find<HTMLInputElement>('[role="topic"] input').element.value,
     ).toBe("updated");
 
-    // the saving will still happen because the component is unmounted
-    // helper.apiMock.expectingPatch(
-    //   `/api/text_content/${note.id}/topic-constructor`,
-    // );
+    expect(mockedUpdateTopicCall).not.toBeCalled();
   });
 
   it("should change content if there's no unsaved changed but change from prop", async () => {
@@ -112,18 +115,13 @@ describe("in place edit on title", () => {
     let wrapper: VueWrapper<ComponentPublicInstance>;
     beforeEach(async () => {
       wrapper = mountComponent(note);
-      helper.apiMock
-        .expectingPatch(`/api/text_content/${note.id}/topic-constructor`)
-        .andRespondOnce({
-          status: 400,
-          body: JSON.stringify({
-            message: "binding error",
-            errors: {
-              topic: "size must be between 1 and 100",
-            },
-            errorType: "BINDING_ERROR",
-          }),
-        });
+      mockedUpdateTopicCall.mockRejectedValueOnce(
+        makeMe.anApiError
+          .ofBindingError({
+            topic: "size must be between 1 and 100",
+          })
+          .please(),
+      );
       await editTitleThenBlur(wrapper);
       await flushPromises();
     });
@@ -135,12 +133,10 @@ describe("in place edit on title", () => {
     });
 
     it("should clean up errors when editing", async () => {
-      helper.apiMock.expectingPatch(
-        `/api/text_content/${note.id}/topic-constructor`,
-      );
       await editTitleThenBlur(wrapper);
       await flushPromises();
       expect(wrapper.findAll(".error-msg")).toHaveLength(0);
+      expect(mockedUpdateTopicCall).toBeCalledTimes(2);
     });
   });
 
@@ -149,8 +145,7 @@ describe("in place edit on title", () => {
     const wrapper = mountComponent(note);
     await flushPromises();
     wrapper.unmount();
-    // no api calls expected. Test will fail if there is any.
-    // because the initial details is not changed.
+    expect(mockedUpdateTopicCall).toBeCalledTimes(0);
   });
 
   describe("with mocked window.confirm", () => {
@@ -168,11 +163,9 @@ describe("in place edit on title", () => {
 
     it("should display error when no authorization to save", async () => {
       const wrapper = mountComponent(note);
-      helper.apiMock
-        .expectingPatch(`/api/text_content/${note.id}/topic-constructor`)
-        .andRespondOnce({
-          status: 401,
-        });
+      mockedUpdateTopicCall.mockRejectedValueOnce(
+        makeMe.anApiError.of401().please(),
+      );
       await editTitleThenBlur(wrapper);
       await flushPromises();
       expect(wrapper.find(".error-msg").text()).toBe(
