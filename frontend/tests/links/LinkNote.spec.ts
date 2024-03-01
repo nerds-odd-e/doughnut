@@ -3,10 +3,6 @@ import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
 describe("LinkNoteFinalize", () => {
-  beforeEach(() => {
-    helper.reset();
-  });
-
   it("going back", async () => {
     const note = makeMe.aNoteRealm.please();
     const wrapper = helper

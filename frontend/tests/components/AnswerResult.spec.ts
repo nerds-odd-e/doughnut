@@ -4,8 +4,6 @@ import { AnsweredQuestion } from "@/generated/backend";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
-helper.resetWithApiMock(beforeEach, afterEach);
-
 describe("AnswerResult", () => {
   const answeredQuestion: AnsweredQuestion = {
     answerId: 1,

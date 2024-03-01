@@ -8,7 +8,6 @@ describe("a link lists of a note", () => {
   let renderer: RenderingHelper;
 
   beforeEach(() => {
-    helper.reset();
     renderer = helper.component(NoteFrameOfLinks);
   });
 

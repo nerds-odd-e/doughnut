@@ -11,8 +11,6 @@ let renderer: RenderingHelper;
 const mockRouterPush = vi.fn();
 const mockedRepeatCall = vi.fn();
 
-helper.resetWithApiMock(beforeEach, afterEach);
-
 beforeEach(() => {
   vitest.resetAllMocks();
   helper.managedApi.restReviewsController.repeatReview = mockedRepeatCall;

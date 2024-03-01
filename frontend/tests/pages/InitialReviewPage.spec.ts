@@ -13,7 +13,6 @@ const mockedInitialReviewCall = vi.fn();
 const mockedNoteInfoCall = vi.fn();
 const mockedGetNoteCall = vi.fn();
 
-helper.resetWithApiMock(beforeEach, afterEach);
 mockBrowserTimeZone("Europe/Amsterdam", beforeEach, afterEach);
 
 beforeEach(() => {

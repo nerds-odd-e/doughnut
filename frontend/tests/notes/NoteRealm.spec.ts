@@ -5,8 +5,6 @@ import { NoteRealm } from "@/generated/backend";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
-helper.resetWithApiMock(beforeEach, afterEach);
-
 describe("NoteRealm", () => {
   let noteRealm: NoteRealm;
 

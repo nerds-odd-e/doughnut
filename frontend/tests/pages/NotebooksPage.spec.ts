@@ -1,9 +1,7 @@
-import { describe, it, beforeEach, afterEach } from "vitest";
+import { describe, it } from "vitest";
 import NotebooksPage from "@/pages/NotebooksPage.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
-
-helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("Notebooks Page", () => {
   it("fetch API to be called ONCE", async () => {

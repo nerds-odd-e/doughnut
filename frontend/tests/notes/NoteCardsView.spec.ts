@@ -3,8 +3,6 @@ import NoteCardsView from "@/components/notes/views/NoteCardsView.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
-helper.resetWithApiMock(beforeEach, afterEach);
-
 describe("note wth child cards", () => {
   it("should render note with one child", async () => {
     const noteParent = makeMe.aNoteRealm.topicConstructor("parent").please();

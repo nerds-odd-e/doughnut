@@ -1,9 +1,7 @@
-import { describe, it, beforeEach, afterEach } from "vitest";
+import { describe, it } from "vitest";
 import CircleShowPage from "@/pages/CircleShowPage.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
-
-helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("circle show page", () => {
   it("fetch API to be called ONCE on mount", async () => {

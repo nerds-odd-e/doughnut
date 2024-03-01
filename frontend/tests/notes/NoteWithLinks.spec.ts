@@ -2,8 +2,6 @@ import NoteWithLinks from "@/components/notes/NoteWithLinks.vue";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
-helper.resetWithApiMock(beforeEach, afterEach);
-
 describe("new/updated pink banner", () => {
   beforeAll(() => {
     Date.now = vi.fn(() => new Date(Date.UTC(2017, 1, 14)).valueOf());
