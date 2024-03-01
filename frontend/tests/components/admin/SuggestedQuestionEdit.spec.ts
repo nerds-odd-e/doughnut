@@ -20,11 +20,14 @@ describe("Edit Suggested Question", () => {
     });
 
     it("call the api to make update", async () => {
-      helper.apiMock.expectingPatch(
-        `/api/fine-tuning/1357/update-suggested-question-for-fine-tuning`,
-      );
+      helper.managedApi.restFineTuningDataController.updateSuggestedQuestionForFineTuning =
+        vi.fn().mockResolvedValue({});
       wrapper.get("button.btn-success").trigger("click");
       await flushPromises();
+      expect(
+        helper.managedApi.restFineTuningDataController
+          .updateSuggestedQuestionForFineTuning,
+      ).toHaveBeenCalledWith(1357, expect.anything());
     });
 
     it("requires more than 1 choice", async () => {

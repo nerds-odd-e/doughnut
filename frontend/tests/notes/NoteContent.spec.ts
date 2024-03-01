@@ -5,8 +5,6 @@ import createNoteStorage from "../../src/store/createNoteStorage";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
-helper.resetWithApiMock(beforeEach, afterEach);
-
 describe("undo editing", () => {
   it("should call addEditingToUndoHistory on submitChange", async () => {
     const histories = createNoteStorage(
@@ -17,9 +15,6 @@ describe("undo editing", () => {
       .topicConstructor("Dummy Title")
       .please();
     histories.refreshNoteRealm(noteRealm);
-    helper.apiMock.expectingPatch(
-      `/api/text_content/${noteRealm.id}/topic-constructor`,
-    );
 
     const updatedTitle = "updated";
     const wrapper = helper

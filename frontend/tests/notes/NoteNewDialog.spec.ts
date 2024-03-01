@@ -4,11 +4,19 @@ import NoteNewDialog from "@/components/notes/NoteNewDialog.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
-helper.resetWithApiMock(beforeEach, afterEach);
+const mockedSearch = vitest.fn();
+const mockedSearchWithin = vitest.fn();
+const mockedCreateNote = vitest.fn();
 
 describe("adding new note", () => {
   beforeEach(() => {
     vi.useFakeTimers();
+    vi.resetAllMocks();
+    helper.managedApi.restNoteController.searchForLinkTarget = mockedSearch;
+    helper.managedApi.restNoteController.searchForLinkTargetWithin =
+      mockedSearchWithin;
+    helper.managedApi.restNoteController.createNote =
+      mockedCreateNote.mockResolvedValue({});
   });
 
   afterEach(() => {
@@ -19,7 +27,7 @@ describe("adding new note", () => {
   const note = makeMe.aNote.topicConstructor("mythical").please();
 
   it("search for duplicate", async () => {
-    helper.apiMock.expectingPost(`/api/notes/123/search`).andReturnOnce([note]);
+    mockedSearchWithin.mockResolvedValue([note]);
     const wrapper = helper
       .component(NoteNewDialog)
       .withStorageProps({ parentId: 123 })
@@ -30,6 +38,10 @@ describe("adding new note", () => {
     await flushPromises();
 
     expect(wrapper.text()).toContain("mythical");
+    expect(mockedSearchWithin).toHaveBeenCalledWith(
+      123,
+      expect.objectContaining({ searchKey: "myth" }),
+    );
   });
 
   describe("submit form", () => {
@@ -45,22 +57,25 @@ describe("adding new note", () => {
     });
 
     it("call the api", async () => {
-      helper.apiMock.expectingPost(`/api/notes/123/create`);
       await wrapper.find("form").trigger("submit");
+      expect(mockedCreateNote).toHaveBeenCalledWith(123, expect.anything());
     });
 
     it("call the api once only", async () => {
-      helper.apiMock.expectingPost(`/api/notes/123/create`);
       await wrapper.find("form").trigger("submit");
       await wrapper.find("form").trigger("submit");
+      expect(mockedCreateNote).toHaveBeenCalledTimes(1);
     });
   });
 
   describe("search wikidata entry", () => {
     let wrapper: VueWrapper<ComponentPublicInstance>;
+    const mockedWikidataSearch = vitest.fn();
 
     beforeEach(() => {
-      helper.apiMock.expectingPost(`/api/notes/123/search`).andReturnOnce([]);
+      mockedSearchWithin.mockResolvedValue([]);
+      helper.managedApi.restWikidataController.searchWikidata =
+        mockedWikidataSearch;
       wrapper = helper
         .component(NoteNewDialog)
         .withStorageProps({ parentId: 123 })
@@ -98,14 +113,13 @@ describe("adding new note", () => {
       let select;
       beforeEach(async () => {
         const searchResult = makeMe.aWikidataSearchEntity.label("dog").please();
-        helper.apiMock
-          .expectingGet(`/api/wikidata/search/dog`)
-          .andReturnOnce([searchResult]);
+        mockedWikidataSearch.mockResolvedValue([searchResult]);
         select = await searchWikidata("dog");
       });
 
       it("focus on the select", async () => {
         expect(select.element).toHaveFocus();
+        expect(mockedWikidataSearch).toHaveBeenCalledWith("dog");
       });
 
       it("remove the select when lose focus", async () => {
@@ -128,14 +142,13 @@ describe("adding new note", () => {
           .label(wikidataTitle)
           .please();
 
-        helper.apiMock
-          .expectingGet(`/api/wikidata/search/${searchTitle}`)
-          .andReturnOnce([searchResult]);
+        mockedWikidataSearch.mockResolvedValue([searchResult]);
         await searchAndSelectFirstResult(searchTitle);
 
         action();
         await flushPromises();
 
+        expect(mockedWikidataSearch).toHaveBeenCalledWith(searchTitle);
         expect((<HTMLInputElement>titleInput().element).value).toBe(
           expectedTitle,
         );

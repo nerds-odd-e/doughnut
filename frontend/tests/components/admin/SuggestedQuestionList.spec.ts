@@ -1,3 +1,4 @@
+import { flushPromises } from "@vue/test-utils";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import SuggestedQuestionList from "@/components/admin/SuggestedQuestionList.vue";
 import usePopups from "../../../src/components/commons/Popups/usePopups";
@@ -47,11 +48,13 @@ describe("Edit Suggested Question", () => {
           .component(SuggestedQuestionList)
           .withProps({ suggestedQuestions: [suggestedQuestion] })
           .mount();
-        helper.apiMock.expectingPost(
-          `/api/fine-tuning/${suggestedQuestion.id}/delete`,
-        );
+        helper.managedApi.restFineTuningDataController.delete = vi.fn();
         matchByText(wrapper, /Del/, "button")!.trigger("click");
         usePopups().popups.done(true);
+        await flushPromises();
+        expect(
+          helper.managedApi.restFineTuningDataController.delete,
+        ).toHaveBeenCalledWith(suggestedQuestion.id);
       });
     });
   });

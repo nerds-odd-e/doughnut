@@ -8,8 +8,6 @@ import helper from "../helpers";
 
 vitest.mock("@/components/commons/scrollToElement");
 
-helper.resetWithApiMock(beforeEach, afterEach);
-
 const note = makeMe.aNoteRealm.please();
 const createWrapper = async () => {
   const wrapper = helper
@@ -23,27 +21,31 @@ const createWrapper = async () => {
 };
 
 describe("NoteChatDialog TestMe", () => {
+  const mockedGenerateQuestion = vitest.fn();
+
+  beforeEach(() => {
+    helper.managedApi.restQuizQuestionController.generateQuestion =
+      mockedGenerateQuestion;
+  });
+
   const quizQuestion = makeMe.aQuizQuestion
     .withQuestionStem("any question?")
     .withChoices(["option A", "option B", "option C"])
     .please();
 
   it("render the question returned", async () => {
-    helper.apiMock
-      .expectingPost(`/api/quiz-questions/generate-question?note=${note.id}`)
-      .andReturnOnce(quizQuestion);
+    mockedGenerateQuestion.mockResolvedValue(quizQuestion);
     const wrapper = await createWrapper();
     wrapper.find("button").trigger("click");
     await flushPromises();
     expect(wrapper.text()).toContain("any question?");
     expect(wrapper.text()).toContain("option A");
     expect(wrapper.text()).toContain("option C");
+    expect(mockedGenerateQuestion).toHaveBeenCalledWith(note.id);
   });
 
   it("scroll to bottom", async () => {
-    helper.apiMock
-      .expectingPost(`/api/quiz-questions/generate-question?note=${note.id}`)
-      .andReturnOnce(quizQuestion);
+    mockedGenerateQuestion.mockResolvedValue(quizQuestion);
     const wrapper = await createWrapper();
     wrapper.find("button").trigger("click");
     await flushPromises();
@@ -52,28 +54,32 @@ describe("NoteChatDialog TestMe", () => {
 
   describe("NoteChatDialog Conversation", () => {
     let wrapper: VueWrapper;
+    const mockedContest = vitest.fn();
+    const mockedRegenerate = vitest.fn();
 
     const newQuestion = makeMe.aQuizQuestion
       .withQuestionStem("is it raining?")
       .please();
 
     beforeEach(async () => {
-      helper.apiMock
-        .expectingPost(`/api/quiz-questions/generate-question?note=${note.id}`)
-        .andReturnOnce(quizQuestion);
+      mockedGenerateQuestion.mockResolvedValueOnce(quizQuestion);
+      helper.managedApi.restQuizQuestionController.contest =
+        mockedContest.mockResolvedValue({});
+      helper.managedApi.restQuizQuestionController.regenerate =
+        mockedRegenerate.mockResolvedValue(newQuestion);
       wrapper = await createWrapper();
       wrapper.find("button").trigger("click");
       await flushPromises();
-      helper.apiMock.expectingPost(
-        `/api/quiz-questions/${quizQuestion.id}/contest`,
-      );
-      helper.apiMock
-        .expectingPost(`/api/quiz-questions/${quizQuestion.id}/regenerate`)
-        .andReturnOnce(newQuestion);
-      vitest.clearAllMocks();
     });
 
-    it.skip("regenerate question when asked", async () => {
+    it("calls the api", async () => {
+      wrapper.find("a#try-again").trigger("click");
+      await flushPromises();
+      expect(mockedContest).toHaveBeenCalledWith(quizQuestion.id);
+      expect(mockedRegenerate).toHaveBeenCalledWith(quizQuestion.id);
+    });
+
+    it("regenerate question when asked", async () => {
       wrapper.find("a#try-again").trigger("click");
       await flushPromises();
       expect(wrapper.text()).toContain("any question?");
@@ -90,24 +96,24 @@ describe("NoteChatDialog TestMe", () => {
 
 describe("NoteChatDialog Conversation", () => {
   it("When the chat button is clicked, the anwser from AI will be displayed", async () => {
-    // Given
     const expected = "I'm ChatGPT";
     const response: ChatResponse = { assistantMessage: expected };
-    // setUp
-    helper.apiMock
-      .expectingPost(`/api/ai/chat?note=${note.id}`)
-      .andReturnOnce(response);
+    helper.managedApi.restAiController.chat = vi
+      .fn()
+      .mockResolvedValue(response);
 
-    // When
     const wrapper = await createWrapper();
 
     await wrapper.find("#chat-input").setValue("What's your name?");
     await wrapper.find("#chat-button").trigger("submit");
     await flushPromises();
 
-    // Then
     wrapper.find(".chat-answer-container").isVisible();
     const actual = wrapper.find("#chat-answer").text();
     expect(actual).toBe(expected);
+    expect(helper.managedApi.restAiController.chat).toHaveBeenCalledWith(
+      note.id,
+      expect.anything(),
+    );
   });
 });
