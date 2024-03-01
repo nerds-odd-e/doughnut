@@ -1,3 +1,4 @@
+import "vitest-fetch-mock";
 import { Router } from "vue-router";
 import ManagedApi from "@/managedApi/ManagedApi";
 import makeMe from "./fixtures/makeMe";
