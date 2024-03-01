@@ -4,8 +4,6 @@ import { Note } from "@/generated/backend";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
-helper.resetWithApiMock(beforeEach, afterEach);
-
 describe("Save wikidata id", () => {
   const wikidataId = "Q123";
   async function putWikidataIdAndSubmit(note: Note) {
@@ -50,16 +48,21 @@ describe("Save wikidata id", () => {
         .wikidataTitle(wikidataTitle)
         .please();
 
-      helper.apiMock
-        .expectingGet(`/api/wikidata/entity-data/${wikidataId}`)
-        .andReturnOnce(wikidata);
+      helper.managedApi.restWikidataController.fetchWikidataEntityDataById = vi
+        .fn()
+        .mockResolvedValue(wikidata);
+      helper.managedApi.restNoteController.updateWikidataId = vi
+        .fn()
+        .mockResolvedValue({});
 
-      if (shouldSave) {
-        helper.apiMock.expectingPost(`/api/notes/${note.id}/updateWikidataId`);
-      }
       const wrapper = await putWikidataIdAndSubmit(note);
       await userAction(wrapper);
-      helper.apiMock.assertNoUnexpectedOrMissedCalls();
+      expect(
+        helper.managedApi.restWikidataController.fetchWikidataEntityDataById,
+      ).toBeCalledWith(wikidataId);
+      expect(
+        helper.managedApi.restNoteController.updateWikidataId,
+      ).toBeCalledTimes(shouldSave ? 1 : 0);
     },
   );
 });
