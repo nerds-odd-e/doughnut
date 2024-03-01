@@ -1,11 +1,9 @@
 import { flushPromises } from "@vue/test-utils";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import SuggestedQuestionList from "@/components/admin/SuggestedQuestionList.vue";
 import usePopups from "../../../src/components/commons/Popups/usePopups";
 import helper, { matchByText } from "../../helpers";
 import makeMe from "../../fixtures/makeMe";
-
-helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("Edit Suggested Question", () => {
   describe("suggest question for fine tuning AI", () => {

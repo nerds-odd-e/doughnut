@@ -1,7 +1,4 @@
 import ManagedApi, { ApiStatus } from "@/managedApi/ManagedApi";
-import helper from "../helpers";
-
-helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("managdApi", () => {
   const apiStatus: ApiStatus = { states: [], errors: [] };
@@ -10,11 +7,10 @@ describe("managdApi", () => {
   describe("set the loading status", () => {
     it("should set the loading status", async () => {
       let interimStateLength = 0;
-      helper.apiMock
-        .expectingGet(`/api/user`)
-        .andRespondWithAsyncPromiseResolve(() => {
-          interimStateLength = apiStatus.states.length;
-        });
+      fetchMock.mockIf("/api/user", () => {
+        interimStateLength = apiStatus.states.length;
+        return "";
+      });
       await managedApi.restUserController.getUserProfile();
       expect(interimStateLength).toBeGreaterThan(0);
       expect(apiStatus.states.length).toBe(0);
@@ -22,11 +18,10 @@ describe("managdApi", () => {
 
     it("should not set the loading status in silent mode", async () => {
       let interimStateLength = 0;
-      helper.apiMock
-        .expectingGet(`/api/user`)
-        .andRespondWithAsyncPromiseResolve(() => {
-          interimStateLength = apiStatus.states.length;
-        });
+      fetchMock.mockIf("/api/user", () => {
+        interimStateLength = apiStatus.states.length;
+        return "";
+      });
       await managedApi.silent.restUserController.getUserProfile();
       expect(interimStateLength).toBe(0);
     });
@@ -35,7 +30,7 @@ describe("managdApi", () => {
   describe("collect error msg", () => {
     beforeEach(() => {
       vitest.useFakeTimers();
-      helper.apiMock.expectingGet(`/api/user`).andRespondOnceWith404();
+      fetchMock.once("/api/user", { status: 404 });
     });
 
     const callApiAndIgnoreError = async () => {
