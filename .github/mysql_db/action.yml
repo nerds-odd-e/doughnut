@@ -4,7 +4,7 @@ inputs:
   mysql_version:
     description: "MySQL Server Version"
     required: true
-    default: ${{ env.MYSQL_VERSION }}
+    default: ${{ vars.MYSQL_VERSION }}
   mysql_charset:
     description: "MySQL DB server character set"
     required: true
@@ -26,11 +26,11 @@ inputs:
   mysql_db_host_port:
     description: "MySQL DB host port"
     required: true
-    default: ${{ env.MYSQL_PORT }}
+    default: ${{ vars.MYSQL_PORT }}
   mysql_db_container_port:
     description: "MySQL DB container port"
     required: true
-    default: ${{ env.MYSQL_PORT }}
+    default: ${{ vars.MYSQL_PORT }}
 runs:
   using: "composite"
   steps:

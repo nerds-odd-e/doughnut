@@ -4,7 +4,7 @@ inputs:
   java-version:
     description: "JDK Version"
     required: true
-    default: ${{ env.JAVA_VERSION }}
+    default: ${{ vars.JAVA_VERSION }}
   distribution:
     description: "JDK Type e.g. Zulu, Adopt, OpenJDK"
     required: true

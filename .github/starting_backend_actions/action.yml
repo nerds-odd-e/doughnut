@@ -16,13 +16,13 @@ runs:
     - name: Set up JDK
       uses: actions/setup-java@v4
       with:
-        java-version: ${{ env.JAVA_VERSION }}
+        java-version: ${{ vars.JAVA_VERSION }}
         distribution: "zulu"
         architecture: x64
     - name: Setup MySQL DB Server 8.0
       uses: ankane/setup-mysql@v1
       with:
-        mysql-version: ${{ env.MYSQL_VERSION }}
+        mysql-version: ${{ vars.MYSQL_VERSION }}
         database: "doughnut_e2e_test"
     - run: |
         mysql -uroot -e "CREATE USER '${{ inputs.dbuser }}'@'localhost' IDENTIFIED BY '${{ inputs.dbpassword }}'"

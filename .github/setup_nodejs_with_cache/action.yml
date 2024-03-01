@@ -4,7 +4,7 @@ inputs:
   node-version:
     description: "NodeJS Version"
     required: true
-    default: ${{ env.NODE_VERSION }}
+    default: ${{ vars.NODE_VERSION }}
 runs:
   using: "composite"
   steps:
@@ -15,7 +15,7 @@ runs:
     - name: Install pnpm
       uses: pnpm/action-setup@v2
       with:
-        version: ${{ env.PNPM_VERSION }}
+        version: ${{ vars.PNPM_VERSION }}
         run_install: false
     - name: Get pnpm store directory
       shell: bash
