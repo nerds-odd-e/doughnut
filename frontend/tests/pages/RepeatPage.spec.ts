@@ -1,41 +1,21 @@
 import { describe, it, vi, expect, beforeEach, afterEach } from "vitest";
 import { flushPromises } from "@vue/test-utils";
 import RepeatPage from "@/pages/RepeatPage.vue";
-import {
-  AnsweredQuestion,
-  DueReviewPoints,
-  QuizQuestion,
-} from "@/generated/backend";
+import { AnsweredQuestion } from "@/generated/backend";
 import mockBrowserTimeZone from "../helpers/mockBrowserTimeZone";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 import RenderingHelper from "../helpers/RenderingHelper";
 
 let renderer: RenderingHelper;
-let mockRouterPush = vi.fn();
+const mockRouterPush = vi.fn();
+const mockedRepeatCall = vi.fn();
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
-expect.extend({
-  toContainEither(received, arg1, arg2) {
-    const pass = received.includes(arg1) || received.includes(arg2);
-    if (pass) {
-      return {
-        message: () =>
-          `expected "${received}" not to contain either "${arg1}" or "${arg2}"`,
-        pass: true,
-      };
-    }
-    return {
-      message: () =>
-        `expected "${received}" to contain either "${arg1}" or "${arg2}"`,
-      pass: false,
-    };
-  },
-});
-
 beforeEach(() => {
-  mockRouterPush = vi.fn();
+  vitest.resetAllMocks();
+  helper.managedApi.restReviewsController.repeatReview = mockedRepeatCall;
   renderer = helper
     .component(RepeatPage)
     .withMockRouterPush(mockRouterPush)
@@ -43,12 +23,7 @@ beforeEach(() => {
 });
 
 describe("repeat page", () => {
-  const mountPage = async (
-    repetition: DueReviewPoints | Record<string, never>,
-  ) => {
-    helper.apiMock
-      .expectingGet("/api/reviews/repeat?timezone=Asia%2FShanghai&dueindays=0")
-      .andReturnOnce(repetition);
+  const mountPage = async () => {
     const wrapper = renderer.currentRoute({ name: "repeat" }).mount();
     await flushPromises();
     return wrapper;
@@ -58,66 +33,63 @@ describe("repeat page", () => {
 
   it("redirect to review page if nothing to repeat", async () => {
     const repetition = makeMe.aDueReviewPointsList.please();
-    const wrapper = await mountPage(repetition);
-    await flushPromises();
+    mockedRepeatCall.mockResolvedValue(repetition);
+    const wrapper = await mountPage();
     expect(wrapper.findAll("button").length).toBe(4);
+    expect(mockedRepeatCall).toHaveBeenCalledWith("Asia/Shanghai", 0);
   });
 
   describe('repeat page with "just review" quiz', () => {
-    let repetition: DueReviewPoints;
-    let quizQuestion: QuizQuestion;
-    const reviewPointId = 123;
+    const firstReviewPointId = 123;
     const secondReviewPointId = 456;
+    const mockedRandomQuestionCall = vi.fn();
+    const mockedReviewPointCall = vi.fn();
 
     beforeEach(() => {
       vi.useFakeTimers();
-      const reviewPoint = makeMe.aReviewPoint.please();
-      repetition = makeMe.aDueReviewPointsList.please();
-      quizQuestion = makeMe.aQuizQuestion.please();
-      repetition.toRepeat = [reviewPointId, secondReviewPointId, 3];
-      helper.apiMock
-        .expectingGet(`/api/review-points/${reviewPointId}/random-question`)
-        .andRespondOnceWith404();
-      helper.apiMock
-        .expectingGet(`/api/review-points/${reviewPointId}`)
-        .andReturnOnce(reviewPoint);
+      helper.managedApi.restReviewPointController.show =
+        mockedReviewPointCall.mockResolvedValue(makeMe.aReviewPoint.please());
+      helper.managedApi.silent.restReviewPointController.generateRandomQuestion =
+        mockedRandomQuestionCall;
+      mockedRandomQuestionCall.mockRejectedValueOnce(makeMe.a404Error.please());
+      mockedRepeatCall.mockResolvedValue(
+        makeMe.aDueReviewPointsList
+          .toRepeat([firstReviewPointId, secondReviewPointId, 3])
+          .please(),
+      );
     });
 
     it("shows the progress", async () => {
-      const wrapper = await mountPage(repetition);
+      const wrapper = await mountPage();
       expect(wrapper.find(".progress-text").text()).toContain("0/3");
+      expect(mockedRandomQuestionCall).toHaveBeenCalledWith(firstReviewPointId);
     });
 
     it("should show progress", async () => {
-      const wrapper = await mountPage(repetition);
+      const wrapper = await mountPage();
       const answerResult: AnsweredQuestion = {
         answerId: 1,
         correct: false,
         answerDisplay: "my answer",
         quizQuestion: makeMe.aQuizQuestion.please(),
       };
-      helper.apiMock
-        .expectingPatch(
-          `/api/review-points/${reviewPointId}/mark-as-repeated?successful=true`,
-        )
-        .andReturnOnce(answerResult);
+      const mockedMarkAsRepeatedCall = vi.fn().mockResolvedValue(answerResult);
+      helper.managedApi.restReviewPointController.markAsRepeated =
+        mockedMarkAsRepeatedCall;
+      const quizQuestion = makeMe.aQuizQuestion.please();
+      mockedRandomQuestionCall.mockResolvedValueOnce(quizQuestion);
       vi.runOnlyPendingTimers();
       await flushPromises();
       await wrapper.find("button.btn-primary").trigger("click");
-      helper.apiMock
-        .expectingGet(
-          `/api/review-points/${secondReviewPointId}/random-question`,
-        )
-        .andReturnOnce(quizQuestion);
-
-      for (let i = 0; i < 20; i += 1) {
-        // eslint-disable-next-line no-await-in-loop
-        await wrapper.vm.$nextTick();
-        expect(wrapper.find(".progress-text").text()).toContainEither(
-          "0/3",
-          "1/3",
-        );
-      }
+      expect(mockedMarkAsRepeatedCall).toHaveBeenCalledWith(
+        firstReviewPointId,
+        true,
+      );
+      await flushPromises();
+      expect(wrapper.find(".progress-text").text()).toContain("1/3");
+      expect(mockedRandomQuestionCall).toHaveBeenCalledWith(
+        secondReviewPointId,
+      );
     });
   });
 });

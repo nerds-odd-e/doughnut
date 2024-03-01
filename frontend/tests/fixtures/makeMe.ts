@@ -13,6 +13,7 @@ import WikidataEntityBuilder from "./WikidataEntityBuilder";
 import WikidataSearchEntityBuilder from "./WikidataSearchEntityBuilder";
 import QuizQuestionBuilder from "./QuizQuestionBuilder";
 import SuggestedQuestionForFineTuningBuilder from "./SuggestedQuestionForFineTuningBuilder";
+import ApiErrorBuilder from "./ApiErrorBuilder";
 
 class MakeMe {
   static aUser() {
@@ -73,6 +74,10 @@ class MakeMe {
 
   static get aSuggestedQuestionForFineTuning(): SuggestedQuestionForFineTuningBuilder {
     return new SuggestedQuestionForFineTuningBuilder();
+  }
+
+  static get a404Error(): ApiErrorBuilder {
+    return new ApiErrorBuilder().error404();
   }
 }
 
