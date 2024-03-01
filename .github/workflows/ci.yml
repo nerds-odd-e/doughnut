@@ -121,7 +121,7 @@ jobs:
           mysql_version: ${{ vars.MYSQL_VERSION }}
           mysql_db_host_port: ${{ vars.MYSQL_PORT }}
           mysql_db_container_port: ${{ vars.MYSQL_PORT }}
-          mysql_db_instance: ${{ env.MYSQL_UT_DB }}
+          mysql_db_instance: ${{ env.MYSQL_E2E_DB }}
           mysql_db_user: ${{ env.MYSQL_DB_USER }}
           mysql_db_password: ${{ env.MYSQL_DB_PASSWORD }}
       - name: Setup JDK with cache

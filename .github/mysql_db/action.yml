@@ -3,7 +3,9 @@ description: "Run MySQL DB container"
 inputs:
   mysql_version:
     description: "MySQL DB Server Version"
+    type: string
     required: true
+    default: "8.0"
   mysql_charset:
     description: "MySQL DB server character set"
     required: true
@@ -24,10 +26,14 @@ inputs:
     required: true
   mysql_db_host_port:
     description: "MySQL DB host port"
+    type: number
     required: true
+    default: 3309
   mysql_db_container_port:
     description: "MySQL DB container port"
+    type: number
     required: true
+    default: 3309
 runs:
   using: "composite"
   steps:
