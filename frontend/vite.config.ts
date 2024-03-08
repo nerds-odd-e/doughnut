@@ -4,6 +4,7 @@ import { fileURLToPath, URL } from "url";
 import vue from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
 import checker from 'vite-plugin-checker';
+import VueDevTools from 'vite-plugin-vue-devtools'
 import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import viteCompression from 'vite-plugin-compression';
@@ -31,6 +32,7 @@ export default defineConfig({
     }
   },
   plugins: [
+    VueDevTools(),
     tsconfigPaths(),
     checker({
       vueTsc: true,
