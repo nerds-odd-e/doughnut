@@ -45,7 +45,7 @@ runs:
         mysql -uroot -e "FLUSH PRIVILEGES"
       shell: bash
     - name: Setup pnpm & install deps
-      uses: pnpm/action-setup@v2
+      uses: pnpm/action-setup@v3
       with:
         version: ${{ inputs.pnpm_version }}
         run_install: |
