@@ -11,7 +11,7 @@
     "preinstall": "npx only-allow pnpm",
     "postinstall": "syncpack fix-mismatches",
     "dev": "vite --host",
-    "build": "vite build --emptyOutDir",
+    "build": "vue-tsc --noEmit && vite build --emptyOutDir",
     "serve": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
