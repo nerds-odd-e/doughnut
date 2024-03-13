@@ -1,0 +1,3 @@
+base:
+  '*':
+    - doughnut_app

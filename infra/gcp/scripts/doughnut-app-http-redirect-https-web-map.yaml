@@ -1,0 +1,16 @@
+kind: compute#urlMap
+name: doughnut-app-web-map-http
+defaultUrlRedirect:
+   redirectResponseCode: MOVED_PERMANENTLY_DEFAULT
+   httpsRedirect: True
+tests:
+- description: Test with no query parameters
+  host: foobar
+  path: /test/
+  expectedOutputUrl: https://foobar/test/
+  expectedRedirectResponseCode: 301
+- description: Test with query parameters
+  host: foobar
+  path: /test/?parameter1=value1&parameter2=value2
+  expectedOutputUrl: https://foobar/test/?parameter1=value1&parameter2=value2
+  expectedRedirectResponseCode: 301
