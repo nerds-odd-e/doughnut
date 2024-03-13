@@ -1,0 +1,41 @@
+{
+    "variables": {
+      "version": "1.0-Mar2024",
+      "do_token": "{{env `DIGITALOCEAN_API_TOKEN`}}"
+    },
+    "builders": [{
+      "type": "digitalocean",
+      "api_token": "{{user `do_token`}}",
+      "image": "ubuntu-22-04-x64",
+      "region": "sgp1",
+      "size": "m-4vcpu-32gb",
+      "ssh_username": "root",
+      "droplet_name": "lia-2024-{{user `version`}}",
+      "snapshot_name": "lia-2024-{{user `version`}}-{{timestamp}}"
+    }],
+    "provisioners": [{
+      "type": "shell",
+      "inline": [
+        "sleep 50",
+        "export DEBIAN_FRONTEND=noninteractive && apt-get update -y && apt-get upgrade -y && apt-get install -y xrdp ubuntu-desktop",
+        "adduser xrdp ssl-cert",
+        "ufw allow from 0.0.0.0/0 to any port 22",
+        "ufw allow from 0.0.0.0/0 to any port 3389",
+        "ufw enable",
+        "adduser --disabled-password --gecos '' lia",
+        "usermod -aG sudo lia",
+        "sed -i 's/crypt_level=high/crypt_level=low/g' /etc/xrdp/xrdp.ini",
+        "export DEBIAN_FRONTEND=noninteractive && apt-get install -y git-all vim net-tools software-properties-common apt-transport-https wget libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb bat lsof git-extras unzip zip bash-completion xclip fasd fzf zoxide",
+        "wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | gpg --dearmor | tee /etc/apt/trusted.gpg.d/microsoft.gpg",
+        "add-apt-repository deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main",
+        "add-apt-repository deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main",
+        "DEBIAN_FRONTEND=noninteractive dpkg-reconfigure -p critical dash",
+        "export DEBIAN_FRONTEND=noninteractive && apt-get -y install code",
+        "curl https://raw.githubusercontent.com/ellie/atuin/main/install.sh | bash",
+        "curl -L https://nixos.org/nix/install | sh -s -- --daemon",
+        "sudo -u lia mkdir -p /home/lia/.config/nix && sudo -u lia touch /home/lia/.config/nix/nix.conf",
+        "sudo -u lia echo 'experimental-features = nix-command flakes' >> /home/lia/.config/nix/nix.conf",
+        "systemctl enable xrdp"
+      ]
+    }]
+  }
