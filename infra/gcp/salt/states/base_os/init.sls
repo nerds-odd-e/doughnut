@@ -45,6 +45,7 @@ doughnut-app-deps:
         - cmd: os-dist-upgrade
         - cmd: doughnut-jre
         - file: /etc/profile.d/doughnut_env.sh
+        
 zulu{{ pillar['doughnut_app']['jre_version'] }}-linux_amd64.deb:
   file.managed:
     - name: /tmp/zulu{{ pillar['doughnut_app']['jre_version'] }}-linux_amd64.deb

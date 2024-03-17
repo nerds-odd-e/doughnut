@@ -1,41 +1,55 @@
 {
     "variables": {
-      "version": "1.0-Mar2024",
-      "do_token": "{{env `DIGITALOCEAN_API_TOKEN`}}"
+      "version": "Mar2024",
+      "image": "ubuntu-22-04-x64",
+      "region": "sgp1",
+      "size": "c-16",
+      "do_token": "{{env `DIGITALOCEAN_API_TOKEN`}}",
+      "lia_password": "{{env `LIA_PASSWORD`}}",
+      "ssh_username": "root"
     },
     "builders": [{
       "type": "digitalocean",
       "api_token": "{{user `do_token`}}",
-      "image": "ubuntu-22-04-x64",
-      "region": "sgp1",
-      "size": "m-4vcpu-32gb",
-      "ssh_username": "root",
-      "droplet_name": "lia-2024-{{user `version`}}",
-      "snapshot_name": "lia-2024-{{user `version`}}-{{timestamp}}"
+      "ssh_username": "{{user `ssh_username`}}",
+      "image": "{{user `image`}}",
+      "region": "{{user `region`}}",
+      "size": "{{user `size`}}",
+      "droplet_name": "lia-{{user `version`}}",
+      "snapshot_name": "lia-{{user `version`}}-{{timestamp}}"
     }],
     "provisioners": [{
       "type": "shell",
       "inline": [
         "sleep 50",
-        "export DEBIAN_FRONTEND=noninteractive && apt-get update -y && apt-get upgrade -y && apt-get install -y xrdp ubuntu-desktop",
+        "dpkg-reconfigure -p critical dash",
+        "curl -fSsL https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor | sudo tee /usr/share/keyrings/google-chrome.gpg > /dev/null",
+        "echo deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main | sudo tee /etc/apt/sources.list.d/google-chrome.list",
+        "wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | gpg --dearmor | tee /etc/apt/trusted.gpg.d/microsoft.gpg",
+        "add-apt-repository deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main",
+        "apt-get update -y && apt-get upgrade -y && apt-get install -y zsh xrdp ubuntu-desktop code google-chrome-stable git-all vim net-tools software-properties-common apt-transport-https wget libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb bat lsof git-extras git-secret unzip zip bash-completion xclip fasd fzf zoxide whois",
+        "snap install intellij-idea-community --classic",
         "adduser xrdp ssl-cert",
+        "export ENCRYPTED_LIA_PASSWORD=$(echo $LIA_PASSWORD | openssl passwd -6 -stdin) && useradd -m -d /home/lia -s /usr/bin/zsh -p $ENCRYPTED_LIA_PASSWORD lia",
+        "usermod -aG sudo lia",
+        "sed -i 's/crypt_level=high/crypt_level=low/g' /etc/xrdp/xrdp.ini",
         "ufw allow from 0.0.0.0/0 to any port 22",
         "ufw allow from 0.0.0.0/0 to any port 3389",
         "ufw enable",
-        "adduser --disabled-password --gecos '' lia",
-        "usermod -aG sudo lia",
-        "sed -i 's/crypt_level=high/crypt_level=low/g' /etc/xrdp/xrdp.ini",
-        "export DEBIAN_FRONTEND=noninteractive && apt-get install -y git-all vim net-tools software-properties-common apt-transport-https wget libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb bat lsof git-extras unzip zip bash-completion xclip fasd fzf zoxide",
-        "wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | gpg --dearmor | tee /etc/apt/trusted.gpg.d/microsoft.gpg",
-        "add-apt-repository deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main",
-        "add-apt-repository deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main",
-        "DEBIAN_FRONTEND=noninteractive dpkg-reconfigure -p critical dash",
-        "export DEBIAN_FRONTEND=noninteractive && apt-get -y install code",
         "curl https://raw.githubusercontent.com/ellie/atuin/main/install.sh | bash",
         "curl -L https://nixos.org/nix/install | sh -s -- --daemon",
         "sudo -u lia mkdir -p /home/lia/.config/nix && sudo -u lia touch /home/lia/.config/nix/nix.conf",
         "sudo -u lia echo 'experimental-features = nix-command flakes' >> /home/lia/.config/nix/nix.conf",
+        "sudo -u lia curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh",
+        "sudo -u lia echo 'eval $(zoxide init bash)' >> /home/lia/.bashrc",
+        "sudo -u lia echo 'eval $(zoxide init zsh)' >> /home/lia/.zshrc",
+        "sudo -u lia git clone https://github.com/nerds-odd-e/doughnut.git /home/lia/doughnut",
+        "sudo -u lia sudo ln -s /snap/intellij-idea-community/current/bin/idea.sh /usr/local/bin/idea",
         "systemctl enable xrdp"
+      ],
+      "environment_vars": [
+        "DEBIAN_FRONTEND=noninteractive",
+        "LIA_PASSWORD={{user `lia_password`}}"
       ]
     }]
   }
