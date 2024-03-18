@@ -44,7 +44,7 @@
         "sudo -u lia echo 'eval $(zoxide init bash)' >> /home/lia/.bashrc",
         "sudo -u lia echo 'eval $(zoxide init zsh)' >> /home/lia/.zshrc",
         "sudo -u lia git clone https://github.com/nerds-odd-e/doughnut.git /home/lia/doughnut",
-        "sudo -u lia sudo ln -s /snap/intellij-idea-community/current/bin/idea.sh /usr/local/bin/idea",
+        "ln -s /snap/intellij-idea-community/current/bin/idea.sh /usr/local/bin/idea",
         "systemctl enable xrdp"
       ],
       "environment_vars": [
