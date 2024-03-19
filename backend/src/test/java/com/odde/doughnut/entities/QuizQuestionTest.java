@@ -165,7 +165,7 @@ class QuizQuestionTest {
     @Test
     void shouldChooseTypeRandomly() {
       Set<Class<? extends QuizQuestionEntity>> types = new HashSet<>();
-      for (int i = 0; i < 10; i++) {
+      for (int i = 0; i < 20; i++) {
         QuizQuestionEntity randomQuizQuestion =
             generateQuizQuestion(note, new RealRandomizer(), null);
         types.add(randomQuizQuestion.getClass());
