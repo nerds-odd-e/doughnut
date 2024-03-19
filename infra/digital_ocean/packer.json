@@ -39,7 +39,6 @@
         "curl -L https://nixos.org/nix/install | sh -s -- --daemon",
         "sudo -u lia mkdir -p /home/lia/.config/nix && sudo -u lia touch /home/lia/.config/nix/nix.conf",
         "sudo -u lia echo 'experimental-features = nix-command flakes' >> /home/lia/.config/nix/nix.conf",
-        "sudo -u lia curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh",
         "sudo -u lia git clone https://github.com/nerds-odd-e/doughnut.git /home/lia/doughnut",
         "ln -s /snap/intellij-idea-community/current/bin/idea.sh /usr/local/bin/idea",
         "systemctl enable xrdp"
