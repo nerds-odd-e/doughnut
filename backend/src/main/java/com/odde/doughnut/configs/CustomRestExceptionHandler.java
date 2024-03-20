@@ -37,10 +37,10 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
 
   @Override
   protected ResponseEntity<Object> handleMethodArgumentNotValid(
-    MethodArgumentNotValidException ex,
-    @NotNull HttpHeaders headers,
-    @NotNull HttpStatusCode status,
-    @NotNull WebRequest request) {
+      MethodArgumentNotValidException ex,
+      @NotNull HttpHeaders headers,
+      @NotNull HttpStatusCode status,
+      @NotNull WebRequest request) {
     final ApiError apiError = new ApiError("binding error", ApiError.ErrorType.BINDING_ERROR);
     for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
       apiError.add(error.getField(), error.getDefaultMessage());
