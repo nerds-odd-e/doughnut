@@ -1,6 +1,7 @@
 package com.odde.doughnut.configs;
 
 import com.odde.doughnut.controllers.dto.ApiError;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -21,9 +22,9 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
   @Override
   protected ResponseEntity<Object> handleBindException(
       final BindException ex,
-      final HttpHeaders headers,
-      final HttpStatusCode status,
-      final WebRequest request) {
+      final @NotNull HttpHeaders headers,
+      final @NotNull HttpStatusCode status,
+      final @NotNull WebRequest request) {
     final ApiError apiError = new ApiError("binding error", ApiError.ErrorType.BINDING_ERROR);
     for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
       apiError.add(error.getField(), error.getDefaultMessage());
@@ -36,10 +37,10 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
 
   @Override
   protected ResponseEntity<Object> handleMethodArgumentNotValid(
-      MethodArgumentNotValidException ex,
-      HttpHeaders headers,
-      HttpStatusCode status,
-      WebRequest request) {
+    MethodArgumentNotValidException ex,
+    @NotNull HttpHeaders headers,
+    @NotNull HttpStatusCode status,
+    @NotNull WebRequest request) {
     final ApiError apiError = new ApiError("binding error", ApiError.ErrorType.BINDING_ERROR);
     for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
       apiError.add(error.getField(), error.getDefaultMessage());
