@@ -1,32 +1,36 @@
 # Definition of Done
 
-## External Quality
+## Source Quality
 
-- Zero downtime during deployment
-- Guaranteed user data integrity and security, at all times
-- No known defects; all bugs fixed with highest priority
-- User manual updated, and users notified
-- Approved by the Product Owner (does not block deployment)
+- Changes are committed to the `main` or `trunk` branch of the mono-repo.
+- The code, tests, and documentation are free of lint errors.
+- All code changes is reviewed by at least one other developer unless it's from pair/mob programming.
+- English is used for all code, tests, and documentation.
 
-## Internal Quality
+## Modular Integrity
 
-- No lint errors
-- Treat compiler or runtime warnings as errors
-- All code smells either resolved or justified
-  - Eliminate code duplication
+- Compiler and runtime warnings are treated as errors.
+- All code is fully unit tested.
+- Code quality is ensured by addressing or justifying all code smells:
+  - Duplicate code is eliminated.
   - Minimize code elements for functionality
   - Use domain-specific names to reveal intent
-  - No dead code, even if accompanied by unit tests
-  - Comment where necessary
-- End-to-end tested with all services integrated
-- Complete unit testing for all code
-- All external dependencies up-to-date and tested against latest stable versions
-- Use English for code, tests, and documentation
+  - There is no unused code, even if it's covered by tests.
+  - Comments are added where necessary
 
-## CI/CD System
+## System Integration
 
-- All changes checked into the mono-repo on the `main` (or `trunk`) branch
-- Pass CI system
-- Automatic production deployment on every successful CI build
-- CI build completion within 10 minutes
-- Any existing automation must have accompanying 'autonomation' to halt the CI system if assumptions for the automation are invalidated
+- No known defects; all bugs fixed with highest priority
+- Automated end-to-end tested with all services integrated
+- Exploratory testing is performed to ensure the system is usable and reliable.
+- All external dependencies are current and verified against the latest stable versions.
+- The CI system successfully processes all changes.
+- CI builds are completed in 10 minutes or less.
+
+## Deployment and User Experience
+
+- Production deployment is automatic upon each successful CI build.
+- Deployments occur with zero downtime.
+- User data integrity and security are assured at all times.
+- The user manual is kept up-to-date, and users are informed of changes.
+- Product Owner approval is obtained but does not hinder deployment.
