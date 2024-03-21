@@ -21,7 +21,7 @@ download_nixpkg_manager_install_script() {
 }
 
 configure_nix_flakes() {
-  if [ ! -f "${HOME}/.config/nix/nix/nix.conf" ]; then
+  if [ ! -f "${HOME}/.config/nix/nix.conf" ]; then
     mkdir -p "${HOME}/.config/nix"
     touch "${HOME}/.config/nix/nix.conf"
   fi
@@ -35,6 +35,7 @@ EOF
 
 allow_nix_unfree() {
   mkdir -p "${HOME}/.config/nixpkgs"
+  touch "${HOME}/.config/nixpkgs/config.nix"
   cat <<-EOF > "${HOME}/.config/nixpkgs/config.nix"
   { allowUnfree = true; }
 EOF

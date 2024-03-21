@@ -17,7 +17,7 @@ in mkShell {
     libiconv
     git
     git-secret
-    gitAndTools.delta
+    delta
     gitleaks
     binutils-unwrapped
     hostname
@@ -48,17 +48,12 @@ in mkShell {
     uutils-coreutils
     google-cloud-sdk
     yamllint
-    atuin
-    chezmoi
     nix-direnv
     nixfmt
-    qemu
-    podman
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp
     apple_sdk.CoreServices
     apple_sdk.Security
-    pinentry_mac
     sequelpro
     cocoapods
     xcbuild
