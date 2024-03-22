@@ -20,19 +20,23 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice()
 public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
   @Override
-  protected ResponseEntity<Object> handleBindException(
-      final BindException ex,
+  protected ResponseEntity<Object> handleExceptionInternal(
+      final Exception ex,
+      final Object body,
       final @NotNull HttpHeaders headers,
       final @NotNull HttpStatusCode status,
       final @NotNull WebRequest request) {
     final ApiError apiError = new ApiError("binding error", ApiError.ErrorType.BINDING_ERROR);
-    for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
-      apiError.add(error.getField(), error.getDefaultMessage());
+    if (ex instanceof BindException bindException) {
+      for (final FieldError error : bindException.getBindingResult().getFieldErrors()) {
+        apiError.add(error.getField(), error.getDefaultMessage());
+      }
+      for (final ObjectError error : bindException.getBindingResult().getGlobalErrors()) {
+        apiError.add(error.getObjectName(), error.getDefaultMessage());
+      }
+      return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
-    for (final ObjectError error : ex.getBindingResult().getGlobalErrors()) {
-      apiError.add(error.getObjectName(), error.getDefaultMessage());
-    }
-    return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    return super.handleExceptionInternal(ex, body, headers, status, request);
   }
 
   @Override
