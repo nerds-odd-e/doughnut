@@ -68,6 +68,7 @@ pnpm --frozen-lockfile recursive install && pnpm frontend:build && pnpm sut
 
 - Rerun it each time you reset the database.
 
+
 #### 2.1 Run full backend unit tests suite from terminal/CLI
 
 - From doughnut source root directory:
