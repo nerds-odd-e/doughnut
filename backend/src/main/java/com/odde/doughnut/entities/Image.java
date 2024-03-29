@@ -41,7 +41,7 @@ public class Image {
   @Getter
   private Integer imageBlobId;
 
-  @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+  @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JoinColumn(name = "image_blob_id", referencedColumnName = "id")
   @JsonIgnore
   @Getter
