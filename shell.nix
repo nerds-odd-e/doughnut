@@ -52,11 +52,9 @@ in mkShell {
     nixfmt
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp
+    apple_sdk.CoreFoundation
     apple_sdk.CoreServices
-    apple_sdk.Security
     sequelpro
-    cocoapods
-    xcbuild
   ] ++ lib.optionals (!stdenv.isDarwin) [
     sequeler
     ungoogled-chromium
