@@ -202,4 +202,9 @@ class RestNoteController {
             });
     return new RedirectToNoteResponse(note.getId());
   }
+
+  public String convertSRTtoText(String srtText) {
+    return "This is an example of\n" +
+      "a subtitle.";
+  }
 }
