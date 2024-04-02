@@ -351,3 +351,11 @@ Given("My note already has {string}",
   (newAttachFile: string) => {
 
 })
+
+Then("I should see {string} in topic {string}",
+  (fixedText: string, topic: string) => {
+})
+
+Then("I should see an error message {string}",
+  (errorMessage: string) => {
+})
