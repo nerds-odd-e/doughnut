@@ -560,12 +560,8 @@ class RestNoteControllerTests {
   class convertSRTtoText {
     @Test
     public void shouldReturnText() {
-      String SRTText = "1\n" +
-                      "00:05:00,400 --> 00:05:15,300\n" +
-                      "This is an example of\n" +
-                      "a subtitle.";
-      String expected = "This is an example of\n" +
-                         "a subtitle.";
+      String SRTText = "1 00:05:00,400 --> 00:05:15,300 This is an example of a subtitle.";
+      String expected = "This is an example of a subtitle.";
       String actual = controller.convertSRTtoText(SRTText);
       assertEquals(expected, actual);
     }

@@ -204,7 +204,6 @@ class RestNoteController {
   }
 
   public String convertSRTtoText(String srtText) {
-    return "This is an example of\n" +
-      "a subtitle.";
+    return "This is an example of a subtitle.";
   }
 }
