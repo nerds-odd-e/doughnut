@@ -324,3 +324,21 @@ When("I download attachment audio file", (noteTopic: string) => {
 Then("I should download the attachment from my note details", (noteTopic: string) => {
   cy.shouldHaveAttachment(noteTopic);
 })
+
+When(
+  "I attach audio file {string} to my note",
+  (newAttachFile: string) => {
+    
+  }
+)
+
+Then("I should see {string} in my note", 
+  (newAttachFile: string) => {
+     
+})
+
+Given("My note already has {string}", 
+  (newAttachFile: string) => {
+     
+})
+
