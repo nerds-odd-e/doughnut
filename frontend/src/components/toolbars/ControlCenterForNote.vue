@@ -44,7 +44,10 @@
           <SvgSearchForLink />
         </template>
         <template #default="{ closer }">
-          <LinkNoteDialog v-bind="{ note, storageAccessor }" @close-dialog="closer" />
+          <LinkNoteDialog
+            v-bind="{ note, storageAccessor }"
+            @close-dialog="closer"
+          />
         </template>
       </PopButton>
       <PopButton title="fix miss spells">
