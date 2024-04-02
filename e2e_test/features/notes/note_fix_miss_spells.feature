@@ -10,11 +10,13 @@ Feature: Note Fix Miss Spells
       | LeSS in Action   | I have an apple phone |
 
   Scenario: Fix miss spell of a note
-    And I ask GPT to fix miss spells of note topic "LeSS in Action":
+    Given I have a note that has miss spells
+    When I ask GPT to fix miss spells of note topic "LeSS in Action":
       | Topic          | Details               |
       | LeSS in Action | I have an Apple phone |
     Then I should see "I have an Apple phone" in topic "LeSS in Action"
 
   Scenario: Fix miss spell of a note topic "LeSS in Action" with broken srt format
-    And I ask GPT to fix miss spells of note topic "LeSS in Action"
+    Given I have a note that has broken SRT format
+    When I ask GPT to fix miss spells of note topic "LeSS in Action" with broken SRT format
     Then I should see an error message "SRT format is wrong"
