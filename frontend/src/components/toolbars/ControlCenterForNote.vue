@@ -44,10 +44,12 @@
           <SvgSearchForLink />
         </template>
         <template #default="{ closer }">
-          <LinkNoteDialog
-            v-bind="{ note, storageAccessor }"
-            @close-dialog="closer"
-          />
+          <LinkNoteDialog v-bind="{ note, storageAccessor }" @close-dialog="closer" />
+        </template>
+      </PopButton>
+      <PopButton title="fix miss spells">
+        <template #button_face>
+          <SvgFixMissSpells />
         </template>
       </PopButton>
       <div class="dropdown">
@@ -90,6 +92,7 @@ import NoteEditAccessoriesDialog from "../notes/NoteEditAccessoriesDialog.vue";
 import SvgWikidata from "../svgs/SvgWikidata.vue";
 import WikidataAssociationDialog from "../notes/WikidataAssociationDialog.vue";
 import SvgSearchForLink from "../svgs/SvgSearchForLink.vue";
+import SvgFixMissSpells from "../svgs/SvgFixMissSpells.vue";
 import LinkNoteDialog from "../links/LinkNoteDialog.vue";
 import SvgCog from "../svgs/SvgCog.vue";
 import NoteDeleteButton from "./NoteDeleteButton.vue";
@@ -116,6 +119,7 @@ export default defineComponent({
     SvgWikidata,
     WikidataAssociationDialog,
     SvgSearchForLink,
+    SvgFixMissSpells,
     LinkNoteDialog,
     SvgCog,
     NoteDeleteButton,

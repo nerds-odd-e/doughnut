@@ -1,4 +1,3 @@
-@ignore
 Feature: Attach audio file
   As a learner, I want to attach audio file to my notes so that I can review them in the future.
 

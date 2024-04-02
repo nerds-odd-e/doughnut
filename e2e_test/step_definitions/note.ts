@@ -55,6 +55,16 @@ When("I update note {string} to become:", (noteTopic: string, data: DataTable) =
   cy.inPlaceEdit(data.hashes()[0])
 })
 
+When("I ask GPT to fix miss spells of note topic {string}", (noteTopic: string) => {
+  start.jumpToNotePage(noteTopic)
+  // WIP: implement step definition
+})
+
+When("I ask GPT to fix miss spells of note topic {string} with broken SRT format", (noteTopic: string) => {
+  start.jumpToNotePage(noteTopic)
+  // WIP: implement step definition
+})
+
 When("I update note accessories of {string} to become:", (noteTopic: string, data: DataTable) => {
   start.jumpToNotePage(noteTopic)
   cy.openAndSubmitNoteAccessoriesFormWith(noteTopic, data.hashes()[0])
@@ -315,4 +325,37 @@ When(
 
 Then("I should see a child note {string}", (childTopic: string) => {
   cy.findCardTitle(childTopic)
+})
+
+When("I download attachment audio file", (noteTopic: string) => {
+  start.downloadAttachment(noteTopic)
+})
+
+Then("I should download the attachment from my note details", (noteTopic: string) => {
+  cy.shouldHaveAttachment(noteTopic);
+})
+
+When(
+  "I attach audio file {string} to my note",
+  (newAttachFile: string) => {
+
+  }
+)
+
+Then("I should see {string} in my note",
+  (newAttachFile: string) => {
+
+})
+
+Given("My note already has {string}",
+  (newAttachFile: string) => {
+
+})
+
+Then("I should see {string} in topic {string}",
+  (fixedText: string, topic: string) => {
+})
+
+Then("I should see an error message {string}",
+  (errorMessage: string) => {
 })

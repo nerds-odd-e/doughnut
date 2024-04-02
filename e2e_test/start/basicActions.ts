@@ -47,4 +47,8 @@ export default {
     this.loginAsAdmin()
     return this.goToAdminDashboard()
   },
+
+  downloadAttachment(noteTopic : string ) {
+    console.log("downloading" + noteTopic)
+  }
 }
