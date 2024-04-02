@@ -71,6 +71,7 @@ declare module 'vue' {
     NoteEditableTopic: typeof import('./src/components/notes/NoteEditableTopic.vue')['default']
     NoteEditAccessoriesDialog: typeof import('./src/components/notes/NoteEditAccessoriesDialog.vue')['default']
     NoteFormBody: typeof import('./src/components/notes/NoteFormBody.vue')['default']
+    NoteFormContentOnly: typeof import('./src/components/notes/NoteFormContentOnly.vue')['default']
     NoteFormTopicOnly: typeof import('./src/components/notes/NoteFormTopicOnly.vue')['default']
     NoteFrameOfLinks: typeof import('./src/components/links/NoteFrameOfLinks.vue')['default']
     NoteInfo: typeof import('./src/components/notes/NoteInfo.vue')['default']

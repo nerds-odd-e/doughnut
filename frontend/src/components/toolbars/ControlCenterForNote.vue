@@ -8,6 +8,13 @@
         <SvgAddChild />
       </NoteNewButton>
 
+      <NoteNewButton
+        button-title="Extract Child Note"
+        v-bind="{ parentId: note.id, storageAccessor }"
+      >
+        <SvgAddChild />
+      </NoteNewButton>
+
       <PopButton title="edit note">
         <template #button_face>
           <SvgEdit />
