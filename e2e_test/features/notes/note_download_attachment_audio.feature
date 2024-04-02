@@ -10,7 +10,11 @@ Feature: Download attachment
     And there is an attachment audio for current note
 
   Scenario: Download attachment audio file from note details successful
+    And I download attachment audio file
+    And The server found the attchment file
     Then I should download the attachment from my note details
 
   Scenario: Download attachment audio file from note details with error the attachment audio cannot find from server
+    And I download attachment audio file
+    And The server does not found the attchment file
     Then I should see the error message when attachment not found from server

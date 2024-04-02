@@ -316,3 +316,11 @@ When(
 Then("I should see a child note {string}", (childTopic: string) => {
   cy.findCardTitle(childTopic)
 })
+
+When("I download attachment audio file", (noteTopic: string) => {
+  start.downloadAttachment(noteTopic)
+})
+
+Then("I should download the attachment from my note details", (noteTopic: string) => {
+  cy.shouldHaveAttachment(noteTopic);
+})
