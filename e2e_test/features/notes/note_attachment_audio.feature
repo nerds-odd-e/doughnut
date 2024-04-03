@@ -1,4 +1,7 @@
- Background:
+Feature: Attach audio file
+  As a learner, I want to attach audio file to my notes so that I can review them in the future.
+
+  Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
       | topicConstructor | testingParent  | details             |
