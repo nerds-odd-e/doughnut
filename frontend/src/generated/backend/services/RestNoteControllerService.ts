@@ -5,6 +5,7 @@
 import type { Note } from '../models/Note';
 import type { NoteAccessoriesDTO } from '../models/NoteAccessoriesDTO';
 import type { NoteCreationDTO } from '../models/NoteCreationDTO';
+import type { NoteFormatConvertResponse } from '../models/NoteFormatConvertResponse';
 import type { NoteInfo } from '../models/NoteInfo';
 import type { NotePositionViewedByUser } from '../models/NotePositionViewedByUser';
 import type { NoteRealm } from '../models/NoteRealm';
@@ -166,12 +167,12 @@ export class RestNoteControllerService {
     }
     /**
      * @param srtText
-     * @returns string OK
+     * @returns NoteFormatConvertResponse OK
      * @throws ApiError
      */
     public convertSrTtoText(
         srtText: string,
-    ): CancelablePromise<string> {
+    ): CancelablePromise<NoteFormatConvertResponse> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/notes/convert-srt-to-text',

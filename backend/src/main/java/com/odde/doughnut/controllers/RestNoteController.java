@@ -17,6 +17,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
@@ -213,17 +215,28 @@ class RestNoteController {
   }
 
   @PostMapping(value = "/convert-srt-to-text")
-  public String convertSRTtoText(String srtText) {
+  public NoteFormatConvertResponse convertSRTtoText(String srtText) {
     if (srtText == null || srtText.isBlank()) {
-      return "Input text is invalid";
+      return new NoteFormatConvertResponse(400, "Input text is invalid");
     }
-    StringBuilder result = new StringBuilder();
-    for (String text : srtText.split("\n+")) {
-      if (text.substring(0, 1).matches("[a-zA-Z]")) {
-        result.append(text);
-        result.append("\n");
+    if (!isSRTFormat(srtText)) {
+      return new NoteFormatConvertResponse(201, "Input text is not srt format");
+    }
+    StringBuilder text = new StringBuilder();
+    for (String line : srtText.split("\n+")) {
+      if (line.substring(0, 1).matches("[a-zA-Z]")) {
+        text.append(line);
+        text.append("\n");
       }
     }
-    return result.toString();
+    return new NoteFormatConvertResponse(200, text.toString());
+  }
+
+  public boolean isSRTFormat(String input) {
+    String timeCodePattern = "\\d{2}:\\d{2}:\\d{2},\\d{3} --> \\d{2}:\\d{2}:\\d{2},\\d{3}";
+    String subtitlePattern = "[^\\s].*";
+    Pattern pattern = Pattern.compile(timeCodePattern + "\\n" + subtitlePattern);
+    Matcher matcher = pattern.matcher(input);
+    return matcher.find();
   }
 }

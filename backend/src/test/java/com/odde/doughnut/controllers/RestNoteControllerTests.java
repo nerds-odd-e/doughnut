@@ -5,10 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 
-import com.odde.doughnut.controllers.dto.NoteAccessoriesDTO;
-import com.odde.doughnut.controllers.dto.NoteCreationDTO;
-import com.odde.doughnut.controllers.dto.NoteRealm;
-import com.odde.doughnut.controllers.dto.WikidataAssociationCreation;
+import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -581,33 +578,42 @@ class RestNoteControllerTests {
   class convertSRTtoText {
     @Test
     public void shouldReturnErrorMessage() {
-      String actual = controller.convertSRTtoText("");
-      assertEquals("Input text is invalid", actual);
+      NoteFormatConvertResponse actual = controller.convertSRTtoText("");
+      assertEquals("Input text is invalid", actual.getResult());
 
       actual = controller.convertSRTtoText(null);
-      assertEquals("Input text is invalid", actual);
+      assertEquals("Input text is invalid", actual.getResult());
 
-      actual = controller.convertSRTtoText("   ");
-      assertEquals("Input text is invalid", actual);
+      actual = controller.convertSRTtoText("  ");
+      assertEquals("Input text is invalid", actual.getResult());
+
+      actual = controller.convertSRTtoText("\n\n\t\r\n");
+      assertEquals("Input text is invalid", actual.getResult());
+
+      actual = controller.convertSRTtoText("this is normal text");
+      assertEquals("Input text is not srt format", actual.getResult());
+
+      actual = controller.convertSRTtoText("this is normal text\nthis is normal text line 2");
+      assertEquals("Input text is not srt format", actual.getResult());
     }
 
     @Test
     public void shouldReturnTextFormatOneCase() {
       String SRTText = "1\n00:05:00,400 --> 00:05:15,300\nThis is an example of a subtitle.";
-      String actual = controller.convertSRTtoText(SRTText);
-      assertEquals("This is an example of a subtitle.\n", actual);
+      NoteFormatConvertResponse actual = controller.convertSRTtoText(SRTText);
+      assertEquals("This is an example of a subtitle.\n", actual.getResult());
 
       SRTText = "1\n00:03:00,400 --> 00:02:15,300\nThis is another example.";
       actual = controller.convertSRTtoText(SRTText);
-      assertEquals("This is another example.\n", actual);
+      assertEquals("This is another example.\n", actual.getResult());
     }
 
     @Test
     public void shouldReturnTextFormatNCase() {
       String SRTText =
           "1\n00:05:00,400 --> 00:05:15,300\nThis is an example of a subtitle.\n\n2\n00:06:00,400 --> 00:06:15,300\nThis is Second";
-      String actual = controller.convertSRTtoText(SRTText);
-      assertEquals("This is an example of a subtitle.\nThis is Second\n", actual);
+      NoteFormatConvertResponse actual = controller.convertSRTtoText(SRTText);
+      assertEquals("This is an example of a subtitle.\nThis is Second\n", actual.getResult());
     }
   }
 }

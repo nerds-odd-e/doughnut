@@ -961,7 +961,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: string
+                $ref: '#/components/schemas/NoteFormatConvertResponse'
   /api/notebooks/{notebook}:
     post:
       tags:
@@ -2697,6 +2697,14 @@ components:
         noteId:
           type: integer
           format: int32
+    NoteFormatConvertResponse:
+      type: object
+      properties:
+        resultCode:
+          type: integer
+          format: int32
+        result:
+          type: string
     LinkCreation:
       required:
       - linkType
