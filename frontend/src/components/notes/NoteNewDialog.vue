@@ -55,6 +55,7 @@ import SuggestTopic from "./SuggestTopic.vue";
 export default defineComponent({
   components: {
     NoteFormTopicOnly,
+    NoteFormContentOnly,
     SearchResults,
     LinkTypeSelectCompact,
     WikidataSearchByLabel,
