@@ -338,8 +338,6 @@ Then("I should download the attachment from my note details", (noteTopic: string
   cy.shouldHaveAttachment(noteTopic)
 })
 
-When("I attach audio file {string} to my note", (newAttachFile: string) => {})
-
 Then("I should see {string} in my note", (newAttachFile: string) => {})
 
 Given("My note already has {string}", (newAttachFile: string) => {})
@@ -359,6 +357,19 @@ Then(
   },
 )
 
+When(
+  "I attach audio file {string} to my note",
+  (newAttachFile: string) => {
+    cy.findByTitle("edit note").click({ force: true })
+    cy.fixture(newAttachFile).then(fileContent => {
+      cy.get("#note-attachAudio").attachFile({
+        fileContent: fileContent.toString(),
+        fileName: newAttachFile,
+        mimeType: 'audio/mp3',
+      });
+    });
+  }
+)
 
 When("I create a notebook with {string} topic", (topic: string) => {
   start.routerToNotebooksPage().creatingNotebook(topic)
