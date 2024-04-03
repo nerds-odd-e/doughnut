@@ -359,3 +359,14 @@ Then("I should see {string} in topic {string}",
 Then("I should see an error message {string}",
   (errorMessage: string) => {
 })
+
+Given("I have a note with {string}",
+  (noteDetails: string) => {}
+)
+
+When("I ask GPT to correct the misspellings in the note with topic {string}", (fixedText) => {
+})
+
+Then("I should see {string} in the details of the note with topic {string}", (newNoteDetails: string, noteTopic: string) => {
+  start.jumpToNotePage(noteTopic)
+})
