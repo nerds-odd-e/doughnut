@@ -416,7 +416,11 @@ class RestNoteControllerTests {
 
     @Test
     void shouldBeAbleToFixMissSpellsWhenValid() throws UnexpectedNoAccessRightException, IOException {
-
+      Note note = makeMe.aNote().creatorAndOwner(userModel).please();
+      makeMe.refresh(userModel.getEntity());
+      final NoteRealm noteRealm = controller.fixMissSpells(note);
+      assertThat(noteRealm.getId(), equalTo(note.getId()));
+      assertThat(noteRealm.getNotePosition().getFromBazaar(), is(false));
     }
   }
 
