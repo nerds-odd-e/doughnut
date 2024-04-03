@@ -62,7 +62,8 @@
           />
         </template>
       </PopButton>
-      <PopButton title="fix miss spells">
+      <!-- WIP: Backend for fix miss spells has not implemented yet -->
+      <PopButton title="fix miss spells" v-if="false">
         <template #button_face>
           <SvgFixMissSpells />
         </template>
