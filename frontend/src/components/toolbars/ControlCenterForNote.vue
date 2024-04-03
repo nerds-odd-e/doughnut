@@ -27,6 +27,30 @@
         </template>
       </PopButton>
 
+      <PopButton title="convert SRT">
+        <template #button_face>
+          <SvgHappy />
+        </template>
+        <template #default="{ closer }">
+          <NoteEditAccessoriesDialog
+            v-bind="{ note, storageAccessor }"
+            @close-dialog="closer"
+          />
+        </template>
+      </PopButton>
+
+      <PopButton title="Audio attachment">
+        <template #button_face>
+          <SvgAttach />
+        </template>
+        <template #default="{ closer }">
+          <NoteEditAccessoriesDialog
+            v-bind="{ note, storageAccessor }"
+            @close-dialog="closer"
+          />
+        </template>
+      </PopButton>
+
       <PopButton title="associate wikidata">
         <template #button_face>
           <SvgWikidata />
@@ -103,6 +127,7 @@ import NoteDeleteButton from "./NoteDeleteButton.vue";
 import PopButton from "../commons/Popups/PopButton.vue";
 import AIGenerateImageDialog from "../notes/AIGenerateImageDialog.vue";
 import NoteDetailsAutoCompletionButton from "./NoteDetailsAutoCompletionButton.vue";
+import SvgHappy from "../svgs/SvgHappy.vue";
 
 export default defineComponent({
   props: {

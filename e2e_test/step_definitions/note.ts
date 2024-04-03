@@ -378,3 +378,17 @@ When("I create a notebook with {string} topic", (topic: string) => {
 Then("I should see {string} topic", (topic: string) => {
   cy.findNoteTopic(topic)
 })
+Given("I have note with {string}", (noteTopic: string) => {
+  start.testability().seedNotes([{ topicConstructor: noteTopic }])
+})
+
+When("I open the note details {string}", (noteTopic: string) => {
+  start.jumpToNotePage(noteTopic)
+})
+
+Then(
+  "I should see button convert",
+  () => {
+    cy.findByTitle("convert SRT").should("exist")
+  },
+)
