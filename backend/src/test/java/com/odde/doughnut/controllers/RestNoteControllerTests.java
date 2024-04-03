@@ -592,10 +592,22 @@ class RestNoteControllerTests {
     }
 
     @Test
-    public void shouldReturnTextFormat() {
+    public void shouldReturnTextFormatOneCase() {
       String SRTText = "1\n00:05:00,400 --> 00:05:15,300\nThis is an example of a subtitle.";
       String actual = controller.convertSRTtoText(SRTText);
-      assertEquals("This is an example of a subtitle.", actual);
+      assertEquals("This is an example of a subtitle.\n", actual);
+
+      SRTText = "1\n00:03:00,400 --> 00:02:15,300\nThis is another example.";
+      actual = controller.convertSRTtoText(SRTText);
+      assertEquals("This is another example.\n", actual);
+    }
+
+    @Test
+    public void shouldReturnTextFormatNCase() {
+      String SRTText =
+          "1\n00:05:00,400 --> 00:05:15,300\nThis is an example of a subtitle.\n\n2\n00:06:00,400 --> 00:06:15,300\nThis is Second";
+      String actual = controller.convertSRTtoText(SRTText);
+      assertEquals("This is an example of a subtitle.\nThis is Second\n", actual);
     }
   }
 }

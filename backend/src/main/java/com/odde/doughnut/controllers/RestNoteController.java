@@ -218,9 +218,10 @@ class RestNoteController {
       return "Input text is invalid";
     }
     StringBuilder result = new StringBuilder();
-    for (String text : srtText.split("\n")) {
+    for (String text : srtText.split("\n+")) {
       if (text.substring(0, 1).matches("[a-zA-Z]")) {
         result.append(text);
+        result.append("\n");
       }
     }
     return result.toString();
