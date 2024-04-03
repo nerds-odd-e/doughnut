@@ -2849,9 +2849,6 @@ components:
         uploadPictureProxy:
           type: string
           format: binary
-        attachAudioProxy:
-          type: string
-          format: binary
     WikidataSearchEntity:
       required:
       - label
