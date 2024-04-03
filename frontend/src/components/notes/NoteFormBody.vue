@@ -46,6 +46,17 @@
       $emit('update:modelValue', { ...modelValue, url: $event })
     "
   />
+
+  <AudioInput
+    scope-name="note"
+    field="attachAudio"
+    placeholder="Optional. upload own audio."
+    :errors="errors.uploadPictureProxy"
+    :model-value="modelValue.uploadPictureProxy"
+    @update:model-value="
+      $emit('update:modelValue', { ...modelValue, uploadPictureProxy: $event })
+    "
+  />
 </template>
 
 <script lang="ts">
@@ -54,6 +65,7 @@ import { NoteAccessoriesDTO } from "@/generated/backend";
 import TextInput from "../form/TextInput.vue";
 import CheckInput from "../form/CheckInput.vue";
 import ImageInput from "../form/ImageInput.vue";
+import AudioInput from "../form/AudioInput.vue";
 
 export default defineComponent({
   props: {
@@ -69,6 +81,6 @@ export default defineComponent({
     },
   },
   emits: ["update:modelValue"],
-  components: { TextInput, CheckInput, ImageInput },
+  components: { TextInput, CheckInput, ImageInput, AudioInput },
 });
 </script>

@@ -27,18 +27,6 @@
         </template>
       </PopButton>
 
-      <PopButton title="Audio attachment">
-        <template #button_face>
-          <SvgAttach />
-        </template>
-        <template #default="{ closer }">
-          <NoteEditAccessoriesDialog
-            v-bind="{ note, storageAccessor }"
-            @close-dialog="closer"
-          />
-        </template>
-      </PopButton>
-
       <PopButton title="associate wikidata">
         <template #button_face>
           <SvgWikidata />
@@ -104,7 +92,6 @@ import { Note } from "@/generated/backend";
 import NoteNewButton from "./NoteNewButton.vue";
 import SvgAddChild from "../svgs/SvgAddChild.vue";
 import SvgEdit from "../svgs/SvgEdit.vue";
-import SvgAttach from "../svgs/SvgAttach.vue";
 import NoteEditAccessoriesDialog from "../notes/NoteEditAccessoriesDialog.vue";
 import SvgWikidata from "../svgs/SvgWikidata.vue";
 import WikidataAssociationDialog from "../notes/WikidataAssociationDialog.vue";
@@ -132,7 +119,6 @@ export default defineComponent({
     NoteNewButton,
     SvgAddChild,
     SvgEdit,
-    SvgAttach,
     NoteEditAccessoriesDialog,
     SvgWikidata,
     WikidataAssociationDialog,
