@@ -206,7 +206,7 @@ class RestNoteController {
   @PostMapping(value = "/{note}/fix-miss-spells")
   @Transactional
   public NoteRealm fixMissSpells(@PathVariable("note") @Schema(type = "integer") Note note)
-    throws UnexpectedNoAccessRightException {
+      throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
     User user = currentUser.getEntity();
     return new NoteViewer(user, note).toJsonObject();
