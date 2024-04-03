@@ -7,7 +7,7 @@ Feature: Convert SRT format to Text
     And there are some notes for the current user:
       | topicConstructor | details             |
       | SRT format   | 1 00:05:00,400 --> 00:05:15,300 This is an example of a subtitle. |
-
+  
   Scenario: Convert srt format to text
     Given I have note with SRT format
     When I convert it to text format
@@ -23,4 +23,10 @@ Feature: Convert SRT format to Text
     When I convert it to text format
     Then I get the notification that note is already text format
 
+  Scenario: convert button is dsiplay
+    Given there are some notes for the current user:
+      | topicConstructor                        | details                                                                                                                                                                                                     |
+      | Potentially shippable product increment | The output of every Sprint is called a Potentially Shippable Product Increment. The work of all the teams must be integrated before the end of every Sprint—the integration must be done during the Sprint. |
+    When I open the note detals 
+    Then I should see button convert
 
