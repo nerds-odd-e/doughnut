@@ -79,7 +79,7 @@ declare module 'vue' {
     NoteInfo: typeof import('./src/components/notes/NoteInfo.vue')['default']
     NoteInfoButton: typeof import('./src/components/notes/NoteInfoButton.vue')['default']
     NoteInfoReviewPoint: typeof import('./src/components/notes/NoteInfoReviewPoint.vue')['default']
-    NoteNewButton: typeof import('./src/components/notes/NoteNewButton.vue')['default']
+    NoteNewButton: typeof import('./src/components/toolbars/NoteNewButton.vue')['default']
     NoteNewDialog: typeof import('./src/components/notes/NoteNewDialog.vue')['default']
     NoteRealmLoader: typeof import('./src/components/notes/views/NoteRealmLoader.vue')['default']
     NoteShell: typeof import('./src/components/notes/NoteShell.vue')['default']

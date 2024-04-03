@@ -4,8 +4,10 @@ Feature: Attach audio file
   Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
-      | topicConstructor | testingParent  | details             |
-      | FourK            |                | I'm testing.        |
+      | topicConstructor | testingParent | details      |
+      | LeSS in Action   |               | I'm testing. |
+    When I create a notebook with "LeSS in Action" topic
+    Then I should see "LeSS in Action" topic
 
   Scenario Outline: Attach audio file
     When I attach audio file "<audio_file>" to my note

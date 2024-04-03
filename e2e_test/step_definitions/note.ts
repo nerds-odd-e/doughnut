@@ -358,3 +358,12 @@ Then(
     start.jumpToNotePage(noteTopic)
   },
 )
+
+
+When("I create a notebook with {string} topic", (topic: string) => {
+  start.routerToNotebooksPage().creatingNotebook(topic)
+})
+
+Then("I should see {string} topic", (topic: string) => {
+  cy.findNoteTopic(topic)
+})
