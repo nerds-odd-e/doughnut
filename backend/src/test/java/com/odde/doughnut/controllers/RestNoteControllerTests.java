@@ -580,11 +580,22 @@ class RestNoteControllerTests {
   @Nested
   class convertSRTtoText {
     @Test
-    public void shouldReturnText() {
-      String SRTText = "1 00:05:00,400 --> 00:05:15,300 This is an example of a subtitle.";
-      String expected = "This is an example of a subtitle.";
+    public void shouldReturnErrorMessage() {
+      String actual = controller.convertSRTtoText("");
+      assertEquals("Input text is invalid", actual);
+
+      actual = controller.convertSRTtoText(null);
+      assertEquals("Input text is invalid", actual);
+
+      actual = controller.convertSRTtoText("   ");
+      assertEquals("Input text is invalid", actual);
+    }
+
+    @Test
+    public void shouldReturnTextFormat() {
+      String SRTText = "1\n00:05:00,400 --> 00:05:15,300\nThis is an example of a subtitle.";
       String actual = controller.convertSRTtoText(SRTText);
-      assertEquals(expected, actual);
+      assertEquals("This is an example of a subtitle.", actual);
     }
   }
 }

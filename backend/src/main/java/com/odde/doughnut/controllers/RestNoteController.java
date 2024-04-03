@@ -212,7 +212,17 @@ class RestNoteController {
     return new NoteViewer(user, note).toJsonObject();
   }
 
+  @PostMapping(value = "/convert-srt-to-text")
   public String convertSRTtoText(String srtText) {
-    return "This is an example of a subtitle.";
+    if (srtText == null || srtText.isBlank()) {
+      return "Input text is invalid";
+    }
+    StringBuilder result = new StringBuilder();
+    for (String text : srtText.split("\n")) {
+      if (text.substring(0, 1).matches("[a-zA-Z]")) {
+        result.append(text);
+      }
+    }
+    return result.toString();
   }
 }

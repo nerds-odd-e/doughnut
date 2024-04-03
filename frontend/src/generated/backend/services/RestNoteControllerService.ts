@@ -165,6 +165,25 @@ export class RestNoteControllerService {
         });
     }
     /**
+     * @param srtText
+     * @returns string OK
+     * @throws ApiError
+     */
+    public convertSrTtoText(
+        srtText: string,
+    ): CancelablePromise<string> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/notes/convert-srt-to-text',
+            query: {
+                'srtText': srtText,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @param note
      * @returns NoteRealm OK
      * @throws ApiError

@@ -938,6 +938,30 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Note'
+  /api/notes/convert-srt-to-text:
+    post:
+      tags:
+      - rest-note-controller
+      operationId: convertSRTtoText
+      parameters:
+      - name: srtText
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
   /api/notebooks/{notebook}:
     post:
       tags:
