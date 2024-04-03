@@ -13,7 +13,7 @@
         :errors="noteFormErrors.topicConstructor"
       />
       <NoteFormContentOnly
-        v-model="creationData.topicConstructor"
+        v-model="creationData.topicContent"
         :errors="noteFormErrors.topicConstructor"
       />
       <SuggestTopic
@@ -73,6 +73,7 @@ export default defineComponent({
       creationData: <NoteCreationDTO>{
         linkTypeToParent: "no link",
         topicConstructor: "",
+        topicContent: "This is sample content",
         wikidataId: "",
       },
       noteFormErrors: {

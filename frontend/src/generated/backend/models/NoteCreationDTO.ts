@@ -4,6 +4,7 @@
 /* eslint-disable */
 export type NoteCreationDTO = {
     topicConstructor: string;
+    topicContent: string;
     linkTypeToParent?: NoteCreationDTO.linkTypeToParent;
     wikidataId?: string;
 };
