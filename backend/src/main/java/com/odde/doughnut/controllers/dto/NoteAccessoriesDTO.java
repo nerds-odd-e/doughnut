@@ -5,11 +5,10 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.validators.ValidateNotePicture;
 import com.odde.doughnut.models.ImageBuilder;
 import jakarta.validation.constraints.Pattern;
+import java.io.IOException;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 @ValidateNotePicture
 public class NoteAccessoriesDTO {
@@ -28,7 +27,7 @@ public class NoteAccessoriesDTO {
 
   @Getter @Setter private MultipartFile uploadPictureProxy;
 
-//  @Getter @Setter private MultipartFile attachAudioProxy;
+  //  @Getter @Setter private MultipartFile attachAudioProxy;
 
   public Image fetchUploadedPicture(User user) throws IOException {
     MultipartFile file = getUploadPictureProxy();
@@ -38,12 +37,11 @@ public class NoteAccessoriesDTO {
     return null;
   }
 
-
-//  public Audio fetchAttachAudio(User user) throws IOException {
-//    MultipartFile file = getAttachAudioProxy();
-//    if (file != null && !file.isEmpty()) {
-//      return null;
-//    }
-//    return null;
-//  }
+  //  public Audio fetchAttachAudio(User user) throws IOException {
+  //    MultipartFile file = getAttachAudioProxy();
+  //    if (file != null && !file.isEmpty()) {
+  //      return null;
+  //    }
+  //    return null;
+  //  }
 }
