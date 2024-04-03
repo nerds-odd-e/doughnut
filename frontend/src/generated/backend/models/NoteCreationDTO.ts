@@ -6,6 +6,7 @@ export type NoteCreationDTO = {
     topicConstructor: string;
     linkTypeToParent?: NoteCreationDTO.linkTypeToParent;
     wikidataId?: string;
+    topicContent: string;
 };
 export namespace NoteCreationDTO {
     export enum linkTypeToParent {

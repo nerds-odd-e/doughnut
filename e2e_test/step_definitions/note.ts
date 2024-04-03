@@ -73,6 +73,12 @@ When("I update note accessories of {string} to become:", (noteTopic: string, dat
   cy.openAndSubmitNoteAccessoriesFormWith(noteTopic, data.hashes()[0])
 })
 
+When("I create child note", () => {
+//     start.jumpToNotePage("My Notes/parent_note")
+    start.jumpToNotePage("parent_note").addingChildNote()
+  }
+)
+
 When(
   "I should see note {string} has a picture and a url {string}",
   (noteTopic: string, expectedUrl: string) => {
@@ -137,6 +143,12 @@ Then(
   },
 )
 
+Then(
+"New child note detail will be added",
+  () => {
+    start.routerToNotebooksPage().navigateToPath()
+  }
+)
 Then("I should see {notepath} with these children", (notePath: NotePath, data: DataTable) => {
   start.routerToNotebooksPage().navigateToPath(notePath)
   cy.expectNoteCards(data.hashes())
