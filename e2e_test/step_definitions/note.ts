@@ -60,10 +60,13 @@ When("I ask GPT to fix miss spells of note topic {string}", (noteTopic: string) 
   // WIP: implement step definition
 })
 
-When("I ask GPT to fix miss spells of note topic {string} with broken SRT format", (noteTopic: string) => {
-  start.jumpToNotePage(noteTopic)
-  // WIP: implement step definition
-})
+When(
+  "I ask GPT to fix miss spells of note topic {string} with broken SRT format",
+  (noteTopic: string) => {
+    start.jumpToNotePage(noteTopic)
+    // WIP: implement step definition
+  },
+)
 
 When("I update note accessories of {string} to become:", (noteTopic: string, data: DataTable) => {
   start.jumpToNotePage(noteTopic)
@@ -332,41 +335,26 @@ When("I download attachment audio file", (noteTopic: string) => {
 })
 
 Then("I should download the attachment from my note details", (noteTopic: string) => {
-  cy.shouldHaveAttachment(noteTopic);
+  cy.shouldHaveAttachment(noteTopic)
 })
 
-When(
-  "I attach audio file {string} to my note",
-  (newAttachFile: string) => {
+When("I attach audio file {string} to my note", (newAttachFile: string) => {})
 
-  }
+Then("I should see {string} in my note", (newAttachFile: string) => {})
+
+Given("My note already has {string}", (newAttachFile: string) => {})
+
+Then("I should see {string} in topic {string}", (fixedText: string, topic: string) => {})
+
+Then("I should see an error message {string}", (errorMessage: string) => {})
+
+Given("I have a note with {string}", (noteDetails: string) => {})
+
+When("I ask GPT to correct the misspellings in the note with topic {string}", (fixedText) => {})
+
+Then(
+  "I should see {string} in the details of the note with topic {string}",
+  (newNoteDetails: string, noteTopic: string) => {
+    start.jumpToNotePage(noteTopic)
+  },
 )
-
-Then("I should see {string} in my note",
-  (newAttachFile: string) => {
-
-})
-
-Given("My note already has {string}",
-  (newAttachFile: string) => {
-
-})
-
-Then("I should see {string} in topic {string}",
-  (fixedText: string, topic: string) => {
-})
-
-Then("I should see an error message {string}",
-  (errorMessage: string) => {
-})
-
-Given("I have a note with {string}",
-  (noteDetails: string) => {}
-)
-
-When("I ask GPT to correct the misspellings in the note with topic {string}", (fixedText) => {
-})
-
-Then("I should see {string} in the details of the note with topic {string}", (newNoteDetails: string, noteTopic: string) => {
-  start.jumpToNotePage(noteTopic)
-})

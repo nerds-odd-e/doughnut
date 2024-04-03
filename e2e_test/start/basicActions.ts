@@ -48,7 +48,7 @@ export default {
     return this.goToAdminDashboard()
   },
 
-  downloadAttachment(noteTopic : string ) {
+  downloadAttachment(noteTopic: string) {
     console.log("downloading" + noteTopic)
-  }
+  },
 }
