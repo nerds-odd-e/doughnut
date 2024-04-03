@@ -405,6 +405,22 @@ class RestNoteControllerTests {
   }
 
   @Nested
+  class FixMissSpells {
+    Note note;
+    NoteAccessoriesDTO noteAccessoriesDTO = new NoteAccessoriesDTO();
+
+    @BeforeEach
+    void setup() {
+      note = makeMe.aNote("new").creatorAndOwner(userModel).please();
+    }
+
+    @Test
+    void shouldBeAbleToFixMissSpellsWhenValid() throws UnexpectedNoAccessRightException, IOException {
+
+    }
+  }
+
+  @Nested
   class DeleteNoteTest {
     Note subject;
     Note parent;
