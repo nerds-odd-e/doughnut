@@ -39,18 +39,6 @@
         </template>
       </PopButton>
 
-      <PopButton title="Audio attachment">
-        <template #button_face>
-          <SvgAttach />
-        </template>
-        <template #default="{ closer }">
-          <NoteEditAccessoriesDialog
-            v-bind="{ note, storageAccessor }"
-            @close-dialog="closer"
-          />
-        </template>
-      </PopButton>
-
       <PopButton title="associate wikidata">
         <template #button_face>
           <SvgWikidata />
