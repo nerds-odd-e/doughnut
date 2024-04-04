@@ -740,11 +740,11 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/QuizQuestion'
-  /api/notes/{parentNote}/create:
+  /api/notes/{parentNote}/extract:
     post:
       tags:
       - rest-note-controller
-      operationId: createNote
+      operationId: extractNote
       parameters:
       - name: parentNote
         in: path
@@ -770,17 +770,17 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/NoteRealm'
-  /api/notes/{parentNote}/extract:
+  /api/notes/{parentNote}/create:
     post:
       tags:
-        - rest-note-controller
-      operationId: extractNote
+      - rest-note-controller
+      operationId: createNote
       parameters:
-        - name: parentNote
-          in: path
-          required: true
-          schema:
-            type: integer
+      - name: parentNote
+        in: path
+        required: true
+        schema:
+          type: integer
       requestBody:
         content:
           application/json:
@@ -2597,6 +2597,8 @@ components:
           - confused with
         wikidataId:
           pattern: ^$|Q\d+
+          type: string
+        details:
           type: string
     HierarchicalNote:
       required:
