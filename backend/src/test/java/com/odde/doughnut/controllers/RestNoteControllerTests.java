@@ -10,6 +10,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.AttachmentAudioDto;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
@@ -679,5 +680,12 @@ class RestNoteControllerTests {
       long afterThingCount = makeMe.modelFactoryService.noteRepository.count();
       assertThat(afterThingCount, equalTo(beforeThingCount + 1));
     }
+  }
+
+  @Test
+  public void shouldDownloadAudioSuccessfulWithEmptyAudioFile() {
+    AttachmentAudioDto attachmentAudioDto = controller.download(null);
+    assertNull(attachmentAudioDto.getFileName());
+    assertNull(attachmentAudioDto.getData());
   }
 }
