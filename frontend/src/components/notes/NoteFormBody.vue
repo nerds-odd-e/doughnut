@@ -3,8 +3,6 @@
     scope-name="note"
     field="uploadPicture"
     placeholder="Optional. upload own picture."
-    accept="*"
-    title="Upload picture file"
     :errors="errors.uploadPictureProxy"
     :model-value="modelValue.uploadPictureProxy"
     @update:model-value="
