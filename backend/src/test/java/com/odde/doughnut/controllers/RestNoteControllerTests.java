@@ -402,6 +402,25 @@ class RestNoteControllerTests {
   }
 
   @Nested
+  class attachAudioNoteTest {
+    Note note;
+    NoteAccessoriesDTO noteAccessoriesDTO = new NoteAccessoriesDTO();
+
+    @BeforeEach
+    void setup() {
+      note = makeMe.aNote("new").creatorAndOwner(userModel).please();
+    }
+
+    @Test
+    void shouldAttachAudioFile() throws UnexpectedNoAccessRightException, IOException {
+      noteAccessoriesDTO.setAttachAudioProxy(
+        makeMe.anUploadedAudio().toMultiplePartFilePlease()
+      );
+      controller.updateNoteAccessories(note, noteAccessoriesDTO);
+    }
+  }
+
+  @Nested
   class FixMissSpells {
     Note note;
     NoteAccessoriesDTO noteAccessoriesDTO = new NoteAccessoriesDTO();
