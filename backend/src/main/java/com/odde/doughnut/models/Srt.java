@@ -8,14 +8,20 @@ import java.util.regex.Pattern;
 
 public class Srt {
   private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss,SSS");
+  public static final int GAP_TIME = 2 * 60;
 
-  private String srtText;
+  private final String srtText;
 
   private static final String ARROW_REGEX = " --> ";
 
   private static final String NEWLINE_REGEX = "\n";
 
   private static final String SPACE_REGEX = "\s";
+
+  private static final String TIME_CODE_PATTERN =
+      "\\d{2}:\\d{2}:\\d{2},\\d{3} --> \\d{2}:\\d{2}:\\d{2},\\d{3}";
+
+  private static final String SUBTITLE_PATTERN = "[^\\s].*";
 
   public Srt(String srtText) {
     this.srtText = srtText;
@@ -43,7 +49,7 @@ public class Srt {
       String nextStartTimeStr = paragraphs[i + 1].split(NEWLINE_REGEX)[1].split(ARROW_REGEX)[0];
       LocalTime nextStartTime = parseTimestamp(nextStartTimeStr);
       Duration gap = Duration.between(endTime, nextStartTime);
-      if (gap.getSeconds() >= (2 * 60)) {
+      if (gap.getSeconds() >= GAP_TIME) {
         text.append(NEWLINE_REGEX);
       } else {
         text.append(SPACE_REGEX);
@@ -59,9 +65,7 @@ public class Srt {
     if (srtText == null || srtText.isBlank()) {
       return false;
     }
-    String timeCodePattern = "\\d{2}:\\d{2}:\\d{2},\\d{3} --> \\d{2}:\\d{2}:\\d{2},\\d{3}";
-    String subtitlePattern = "[^\\s].*";
-    Pattern pattern = Pattern.compile(timeCodePattern + "\\n" + subtitlePattern);
+    Pattern pattern = Pattern.compile(TIME_CODE_PATTERN + "\\n" + SUBTITLE_PATTERN);
     Matcher matcher = pattern.matcher(srtText);
     return matcher.find();
   }
