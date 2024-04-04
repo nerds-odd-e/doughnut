@@ -9,6 +9,9 @@
           v-if="note.wikidataId"
           :wikidata-id="note.wikidataId"
         />
+        <button class="btn btn-sm btn-secondary" title="Download audio file">
+          <i class="fas fa-download"></i> Download audio file
+        </button>
       </div>
     </template>
 

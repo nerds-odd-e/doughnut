@@ -74,10 +74,9 @@ When("I update note accessories of {string} to become:", (noteTopic: string, dat
 })
 
 When("I create child note", () => {
-//     start.jumpToNotePage("My Notes/parent_note")
-    start.jumpToNotePage("parent_note").addingChildNote()
-  }
-)
+  //     start.jumpToNotePage("My Notes/parent_note")
+  start.jumpToNotePage("parent_note").addingChildNote()
+})
 
 When(
   "I should see note {string} has a picture and a url {string}",
@@ -143,12 +142,9 @@ Then(
   },
 )
 
-Then(
-"New child note detail will be added",
-  () => {
-    start.routerToNotebooksPage().navigateToPath()
-  }
-)
+Then("New child note detail will be added", () => {
+  start.routerToNotebooksPage().navigateToPath()
+})
 Then("I should see {notepath} with these children", (notePath: NotePath, data: DataTable) => {
   start.routerToNotebooksPage().navigateToPath(notePath)
   cy.expectNoteCards(data.hashes())
@@ -352,7 +348,17 @@ Then("I should download the attachment from my note details", (noteTopic: string
 
 Then("I should see {string} in my note", (newAttachFile: string) => {})
 
-Given("My note already has {string}", (newAttachFile: string) => {})
+Given("My note already has spring.mp3", () => {
+  cy.findByTitle("Download audio file")
+})
+
+Given("My note already has {string}", () => {
+  cy.findByTitle("Download audio file")
+})
+
+Then("I can download audio file spring.mp3 in my note", () => {
+  cy.findByTitle("Download audio file").click()
+})
 
 Then("I should see {string} in topic {string}", (fixedText: string, topic: string) => {})
 
@@ -369,19 +375,16 @@ Then(
   },
 )
 
-When(
-  "I attach audio file {string} to my note",
-  (newAttachFile: string) => {
-    cy.findByTitle("edit note").click({ force: true })
-    cy.fixture(newAttachFile).then(fileContent => {
-      cy.findByTitle("Attach audio file").attachFile({
-        fileContent: fileContent.toString(),
-        fileName: newAttachFile,
-        mimeType: 'audio/mp3',
-      });
-    });
-  }
-)
+When("I attach audio file {string} to my note", (newAttachFile: string) => {
+  cy.findByTitle("edit note").click({ force: true })
+  cy.fixture(newAttachFile).then((fileContent) => {
+    cy.findByTitle("Attach audio file").attachFile({
+      fileContent: fileContent.toString(),
+      fileName: newAttachFile,
+      mimeType: "audio/mp3",
+    })
+  })
+})
 
 When("I create a notebook with {string} topic", (topic: string) => {
   start.routerToNotebooksPage().creatingNotebook(topic)
@@ -390,6 +393,7 @@ When("I create a notebook with {string} topic", (topic: string) => {
 Then("I should see {string} topic", (topic: string) => {
   cy.findNoteTopic(topic)
 })
+
 Given("I have note with {string}", (noteTopic: string) => {
   start.testability().seedNotes([{ topicConstructor: noteTopic }])
 })
@@ -398,9 +402,6 @@ When("I open the note details {string}", (noteTopic: string) => {
   start.jumpToNotePage(noteTopic)
 })
 
-Then(
-  "I should see button convert",
-  () => {
-    cy.findByTitle("convert SRT").should("exist")
-  },
-)
+Then("I should see button convert", () => {
+  cy.findByTitle("convert SRT").should("exist")
+})

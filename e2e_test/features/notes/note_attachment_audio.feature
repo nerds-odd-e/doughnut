@@ -1,4 +1,4 @@
-Feature: Attach audio file
+Feature: Attach or download audio file
   As a learner, I want to attach audio file to my notes so that I can review them in the future.
 
   Background:
@@ -22,3 +22,7 @@ Feature: Attach audio file
     Given My note already has "spring.mp3"
     When I attach audio file "autumn.mp3" to my note
     Then I should see "autumn.mp3" in my note
+
+  Scenario: Download the audio file successful
+    Given My note already has "spring.mp3"
+    Then I can download audio file spring.mp3 in my note
