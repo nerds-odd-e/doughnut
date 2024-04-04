@@ -7,6 +7,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.SearchTermModel;
+import com.odde.doughnut.models.Srt;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.WikidataService;
@@ -17,8 +18,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
@@ -216,27 +215,10 @@ class RestNoteController {
 
   @PostMapping(value = "/convert-srt-to-text")
   public NoteFormatConvertResponse convertSRTtoText(String srtText) {
-    if (srtText == null || srtText.isBlank()) {
-      return new NoteFormatConvertResponse(400, "Input text is invalid");
+    Srt srt = new Srt(srtText);
+    if (!srt.isSRTFormat()) {
+      return new NoteFormatConvertResponse(400, "Input text is not srt format");
     }
-    if (!isSRTFormat(srtText)) {
-      return new NoteFormatConvertResponse(201, "Input text is not srt format");
-    }
-    StringBuilder text = new StringBuilder();
-    for (String line : srtText.split("\n+")) {
-      if (line.substring(0, 1).matches("[a-zA-Z]")) {
-        text.append(line);
-        text.append("\n");
-      }
-    }
-    return new NoteFormatConvertResponse(200, text.toString());
-  }
-
-  public boolean isSRTFormat(String input) {
-    String timeCodePattern = "\\d{2}:\\d{2}:\\d{2},\\d{3} --> \\d{2}:\\d{2}:\\d{2},\\d{3}";
-    String subtitlePattern = "[^\\s].*";
-    Pattern pattern = Pattern.compile(timeCodePattern + "\\n" + subtitlePattern);
-    Matcher matcher = pattern.matcher(input);
-    return matcher.find();
+    return new NoteFormatConvertResponse(200, srt.convertSrtToText());
   }
 }

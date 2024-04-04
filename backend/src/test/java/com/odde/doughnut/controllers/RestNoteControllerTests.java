@@ -596,16 +596,16 @@ class RestNoteControllerTests {
     @Test
     public void shouldReturnErrorMessage() {
       NoteFormatConvertResponse actual = controller.convertSRTtoText("");
-      assertEquals("Input text is invalid", actual.getResult());
+      assertEquals("Input text is not srt format", actual.getResult());
 
       actual = controller.convertSRTtoText(null);
-      assertEquals("Input text is invalid", actual.getResult());
+      assertEquals("Input text is not srt format", actual.getResult());
 
       actual = controller.convertSRTtoText("  ");
-      assertEquals("Input text is invalid", actual.getResult());
+      assertEquals("Input text is not srt format", actual.getResult());
 
       actual = controller.convertSRTtoText("\n\n\t\r\n");
-      assertEquals("Input text is invalid", actual.getResult());
+      assertEquals("Input text is not srt format", actual.getResult());
 
       actual = controller.convertSRTtoText("this is normal text");
       assertEquals("Input text is not srt format", actual.getResult());
