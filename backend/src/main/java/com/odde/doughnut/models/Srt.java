@@ -23,7 +23,7 @@ public class Srt {
 
   public String convertSrtToText() {
     StringBuilder text = new StringBuilder();
-    //Split the SRT first
+    // Split the SRT first
     String[] paragraphs = srtText.split("\n\n");
     for (int i = 0; i < paragraphs.length; i++) {
 
@@ -37,7 +37,8 @@ public class Srt {
     return text.toString();
   }
 
-  private void checkForParagraph(int i, String[] paragraphs, LocalTime endTime, StringBuilder text) {
+  private void checkForParagraph(
+      int i, String[] paragraphs, LocalTime endTime, StringBuilder text) {
     if (i < paragraphs.length - 1) {
       String nextStartTimeStr = paragraphs[i + 1].split(NEWLINE_REGEX)[1].split(ARROW_REGEX)[0];
       LocalTime nextStartTime = parseTimestamp(nextStartTimeStr);
