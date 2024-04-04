@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers.dto;
 
+import com.odde.doughnut.entities.Audio;
 import com.odde.doughnut.entities.Image;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.validators.ValidateNotePicture;
@@ -37,11 +38,11 @@ public class NoteAccessoriesDTO {
     return null;
   }
 
-  //  public Audio fetchAttachAudio(User user) throws IOException {
-  //    MultipartFile file = getAttachAudioProxy();
-  //    if (file != null && !file.isEmpty()) {
-  //      return null;
-  //    }
-  //    return null;
-  //  }
+  public Audio fetchAttachAudio(User user) throws IOException {
+    MultipartFile file = getAttachAudioProxy();
+    if (file != null && !file.isEmpty()) {
+      return null;
+    }
+    return null;
+  }
 }

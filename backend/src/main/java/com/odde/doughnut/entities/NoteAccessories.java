@@ -33,6 +33,13 @@ public class NoteAccessories {
   @Setter
   private Image uploadPicture;
 
+  @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  @JoinColumn(name = "audio_id", referencedColumnName = "id")
+  @JsonIgnore
+  @Getter
+  @Setter
+  private Audio uploadAudio;
+
   @Column(name = "use_parent_picture")
   @Getter
   @Setter
