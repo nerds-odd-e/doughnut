@@ -8,5 +8,6 @@ export type NoteAccessoriesDTO = {
     pictureMask?: string;
     useParentPicture?: boolean;
     uploadPictureProxy?: Blob;
+    attachAudioProxy?: Blob;
 };
 
