@@ -222,12 +222,7 @@ When(
   },
 )
 
-Given("I extract the note detail", () => {
-<<<<<<< HEAD
-=======
-  
->>>>>>> b9e8f966e (update selection text to extract)
-})
+Given("I extract the note detail", () => {})
 
 // This step definition is for demo purpose
 Then("*for demo* I should see there are {int} descendants", (numberOfDescendants: number) => {
@@ -385,11 +380,7 @@ Then(
 When("I attach audio file {string} to my note", (newAttachFile: string) => {
   cy.findByTitle("edit note").click({ force: true })
   cy.fixture(newAttachFile).then((fileContent) => {
-<<<<<<< HEAD
     cy.findByTitle("Attach audio file").attachFile({
-=======
-    cy.get("#note-attachAudio").attachFile({
->>>>>>> b9e8f966e (update selection text to extract)
       fileContent: fileContent.toString(),
       fileName: newAttachFile,
       mimeType: "audio/mp3",
