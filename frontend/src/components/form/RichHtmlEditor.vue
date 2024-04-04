@@ -7,6 +7,7 @@
     @blur="onBlurTextField"
     @update:content="onUpdateContent"
     @focus="hadFocus = true"
+    @selection-change="setSelection"
   />
 </template>
 
@@ -15,6 +16,9 @@ import { defineComponent } from "vue";
 import { QuillEditor } from "@vueup/vue-quill";
 
 import "quill/dist/quill.snow.css";
+import { ref } from "vue";
+
+const quillEditor = ref();
 
 export default defineComponent({
   props: {
@@ -63,8 +67,16 @@ export default defineComponent({
       this.$emit("update:modelValue", this.localValue);
     },
     onBlurTextField() {
+      alert('Blur')
       this.$emit("blur");
     },
+    setSelection(data) {
+        const range = data.range;
+        // remove html tag
+        const textContent = this.localValue?.replaceAll('<p>', '').replaceAll('</p>', '');
+        const selectedValue = textContent.substring(range.index, range.index + range.length)
+        alert('Range: ' + selectedValue)
+    }
   },
 });
 </script>

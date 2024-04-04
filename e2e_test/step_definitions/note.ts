@@ -222,6 +222,9 @@ When(
   },
 )
 
+Given("I extract the note detail", () => {
+})
+
 // This step definition is for demo purpose
 Then("*for demo* I should see there are {int} descendants", (numberOfDescendants: number) => {
   cy.findByText("" + numberOfDescendants, {
