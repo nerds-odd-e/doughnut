@@ -374,7 +374,7 @@ When(
   (newAttachFile: string) => {
     cy.findByTitle("edit note").click({ force: true })
     cy.fixture(newAttachFile).then(fileContent => {
-      cy.get("#note-attachAudio").attachFile({
+      cy.findByTitle("Attach audio file").attachFile({
         fileContent: fileContent.toString(),
         fileName: newAttachFile,
         mimeType: 'audio/mp3',

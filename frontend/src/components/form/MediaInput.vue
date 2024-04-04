@@ -1,10 +1,11 @@
 <template>
-  <InputWithType v-bind="{ scopeName, field, errors }">
+  <InputWithType v-bind="{ scopeName, field, errors, accept, title }">
     <input
       :class="`file-input-control form-control ${!!errors ? 'is-invalid' : ''}`"
       :id="`${scopeName}-${field}`"
       type="file"
-      accept=".mp3, .m4a"
+      :title="`${title}`"
+      :accept="`${accept}`"
       :name="field"
       @change="update($event.target.files[0])"
       :placeholder="placeholder"
@@ -23,6 +24,8 @@ export default {
     modelValue: String,
     scopeName: String,
     field: String,
+    accept: { type: String, default: null },
+    title: { type: String, default: null },
     placeholder: { type: String, default: null },
     autofocus: { type: Boolean, default: false },
     errors: Object,
