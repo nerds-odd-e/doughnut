@@ -12,6 +12,11 @@
         v-model="creationData.topicConstructor"
         :errors="noteFormErrors.topicConstructor"
       />
+      <NoteFormContentOnly
+        v-if="extractnote === 'true'"
+        v-model="myContent"
+        :errors="noteFormErrors.topicConstructor"
+      />
       <SuggestTopic
         :original-topic="creationData.topicConstructor"
         :suggested-topic="suggestedTopic"
@@ -41,6 +46,7 @@
 import { defineComponent, PropType } from "vue";
 import { NoteCreationDTO, WikidataSearchEntity } from "@/generated/backend";
 import NoteFormTopicOnly from "./NoteFormTopicOnly.vue";
+import NoteFormContentOnly from "./NoteFormContentOnly.vue";
 import SearchResults from "../search/SearchResults.vue";
 import LinkTypeSelectCompact from "../links/LinkTypeSelectCompact.vue";
 import WikidataSearchByLabel from "./WikidataSearchByLabel.vue";
@@ -50,6 +56,7 @@ import SuggestTopic from "./SuggestTopic.vue";
 export default defineComponent({
   components: {
     NoteFormTopicOnly,
+    NoteFormContentOnly,
     SearchResults,
     LinkTypeSelectCompact,
     WikidataSearchByLabel,
@@ -61,10 +68,16 @@ export default defineComponent({
       type: Object as PropType<StorageAccessor>,
       required: true,
     },
+    extractnote: {
+      type: String,
+      required: false,
+    },
   },
   emits: ["closeDialog"],
   data() {
+    const selectedContent = sessionStorage.getItem("selectedContent") || "";
     return {
+      myContent: selectedContent,
       creationData: <NoteCreationDTO>{
         linkTypeToParent: "no link",
         topicConstructor: "",

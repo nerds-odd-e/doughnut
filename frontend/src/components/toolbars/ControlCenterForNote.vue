@@ -8,13 +8,12 @@
         <SvgAddChild />
       </NoteNewButton>
 
-      <NoteNewButton
-        v-if="false"
+      <NoteExtractButton
         button-title="Extract Child Note"
         v-bind="{ parentId: note.id, storageAccessor }"
       >
         <SvgClose />
-      </NoteNewButton>
+      </NoteExtractButton>
 
       <PopButton title="edit note">
         <template #button_face>
@@ -103,6 +102,7 @@ import { defineComponent, PropType } from "vue";
 import { StorageAccessor } from "@/store/createNoteStorage";
 import { Note } from "@/generated/backend";
 import NoteNewButton from "./NoteNewButton.vue";
+import NoteExtractButton from "./NoteExtractButton.vue";
 import SvgAddChild from "../svgs/SvgAddChild.vue";
 import SvgEdit from "../svgs/SvgEdit.vue";
 import NoteEditAccessoriesDialog from "../notes/NoteEditAccessoriesDialog.vue";
@@ -131,6 +131,7 @@ export default defineComponent({
   },
   components: {
     NoteNewButton,
+    NoteExtractButton,
     SvgAddChild,
     SvgEdit,
     NoteEditAccessoriesDialog,

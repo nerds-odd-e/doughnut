@@ -7,6 +7,7 @@
       <NoteNewDialog
         v-bind="{ parentId, storageAccessor }"
         @close-dialog="closer"
+        extractnote="true"
       />
     </template>
   </PopButton>

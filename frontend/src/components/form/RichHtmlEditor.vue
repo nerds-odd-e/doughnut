@@ -75,7 +75,8 @@ export default defineComponent({
       const textContent = this.localValue
         ?.replaceAll("<p>", "")
         .replaceAll("</p>", "");
-      textContent?.substring(index, index + length);
+      const selectedText = textContent?.substring(index, index + length);
+      sessionStorage.setItem("selectedContent", selectedText || "");
     },
   },
 });
