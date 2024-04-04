@@ -593,41 +593,57 @@ class RestNoteControllerTests {
 
   @Nested
   class convertSRTtoText {
+    Note note;
+
+    @BeforeEach
+    void setup() {
+      note = makeMe.aNote("SRT").creatorAndOwner(userModel).please();
+    }
+
     @Test
     public void shouldReturnErrorMessage() {
-      NoteFormatConvertResponse actual = controller.convertSRTtoText("");
-      assertEquals("Input text is not srt format", actual.getResult());
+      note.setDetails("");
+      BindException bindException =
+          assertThrows(BindException.class, () -> controller.convertSRTtoText(note));
+      assertThat(bindException.getMessage(), stringContainsInOrder("Input text is not srt format"));
 
-      actual = controller.convertSRTtoText(null);
-      assertEquals("Input text is not srt format", actual.getResult());
+      note.setDetails(null);
+      bindException = assertThrows(BindException.class, () -> controller.convertSRTtoText(note));
+      assertThat(bindException.getMessage(), stringContainsInOrder("Input text is not srt format"));
 
-      actual = controller.convertSRTtoText("  ");
-      assertEquals("Input text is not srt format", actual.getResult());
+      note.setDetails("  ");
+      bindException = assertThrows(BindException.class, () -> controller.convertSRTtoText(note));
+      assertThat(bindException.getMessage(), stringContainsInOrder("Input text is not srt format"));
 
-      actual = controller.convertSRTtoText("\n\n\t\r\n");
-      assertEquals("Input text is not srt format", actual.getResult());
+      note.setDetails("\\n\\n\\t\\r\\n");
+      bindException = assertThrows(BindException.class, () -> controller.convertSRTtoText(note));
+      assertThat(bindException.getMessage(), stringContainsInOrder("Input text is not srt format"));
 
-      actual = controller.convertSRTtoText("this is normal text");
-      assertEquals("Input text is not srt format", actual.getResult());
+      note.setDetails("this is normal text");
+      bindException = assertThrows(BindException.class, () -> controller.convertSRTtoText(note));
+      assertThat(bindException.getMessage(), stringContainsInOrder("Input text is not srt format"));
 
-      actual = controller.convertSRTtoText("this is normal text\nthis is normal text line 2");
-      assertEquals("Input text is not srt format", actual.getResult());
+      note.setDetails("this is normal text\nthis is normal text line 2");
+      bindException = assertThrows(BindException.class, () -> controller.convertSRTtoText(note));
+      assertThat(bindException.getMessage(), stringContainsInOrder("Input text is not srt format"));
     }
 
     @Test
-    public void shouldReturnTextFormatOneCase() {
-      String SRTText = "1\n00:05:00,400 --> 00:05:15,300\nThis is an example of a subtitle.";
-      NoteFormatConvertResponse actual = controller.convertSRTtoText(SRTText);
-      assertTrue(actual.getResult().contains("This is an example of a subtitle."));
+    public void shouldReturnTextFormatOneCase()
+        throws BindException, UnexpectedNoAccessRightException {
+      note.setDetails("1\n00:05:00,400 --> 00:05:15,300\nThis is an example of a subtitle.");
+      NoteRealm actual = controller.convertSRTtoText(note);
+      assertTrue(actual.getNote().getDetails().contains("This is an example of a subtitle."));
     }
 
     @Test
-    public void shouldReturnTextFormatNCase() {
-      String SRTText =
-          "1\n00:05:00,400 --> 00:05:15,300\nThis is an example of a subtitle.\n\n2\n00:06:00,400 --> 00:06:15,300\nThis is Second";
-      NoteFormatConvertResponse actual = controller.convertSRTtoText(SRTText);
-      assertTrue(actual.getResult().contains("This is an example of a subtitle."));
-      assertTrue(actual.getResult().contains("This is Second"));
+    public void shouldReturnTextFormatNCase()
+        throws UnexpectedNoAccessRightException, BindException {
+      note.setDetails(
+          "1\n00:05:00,400 --> 00:05:15,300\nThis is an example of a subtitle.\n\n2\n00:06:00,400 --> 00:06:15,300\nThis is Second");
+      NoteRealm actual = controller.convertSRTtoText(note);
+      assertEquals(
+          "This is an example of a subtitle. This is Second", actual.getNote().getDetails());
     }
   }
 }

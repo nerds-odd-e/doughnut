@@ -38,4 +38,12 @@ class SrtTest {
     assertTrue(srt.convertSrtToText().contains("This is an example of a subtitle."));
     assertTrue(srt.convertSrtToText().contains("This is Second"));
   }
+
+  @Test
+  public void shouldReturnOneParagraph() {
+    Srt srt =
+        new Srt(
+            "1\n00:00:00,000 --> 00:02:00,000\nThis is an example of a subtitle.\n\n2\n00:02:00,000 --> 00:05:00,000\nThis is Second");
+    assertEquals("This is an example of a subtitle. This is Second", srt.convertSrtToText());
+  }
 }

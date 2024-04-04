@@ -943,12 +943,7 @@ paths:
       tags:
       - rest-note-controller
       operationId: convertSRTtoText
-      parameters:
-      - name: srtText
-        in: query
-        required: true
-        schema:
-          type: string
+      parameters: []
       responses:
         "500":
           description: Internal Server Error
@@ -961,7 +956,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/NoteFormatConvertResponse'
+                $ref: '#/components/schemas/NoteRealm'
   /api/notebooks/{notebook}:
     post:
       tags:
@@ -2697,14 +2692,6 @@ components:
         noteId:
           type: integer
           format: int32
-    NoteFormatConvertResponse:
-      type: object
-      properties:
-        resultCode:
-          type: integer
-          format: int32
-        result:
-          type: string
     LinkCreation:
       required:
       - linkType

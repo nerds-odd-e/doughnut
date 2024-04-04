@@ -14,10 +14,13 @@ public class Srt {
 
   public String convertSrtToText() {
     StringBuilder text = new StringBuilder();
-    for (String line : srtText.split("\n+")) {
-      if (line.substring(0, 1).matches("[a-zA-Z]")) {
-        text.append(line);
-        text.append("\n");
+    String[] lines = srtText.split("\n+");
+    for (int i = 0; i < lines.length; i++) {
+      if (lines[i].substring(0, 1).matches("[a-zA-Z]")) {
+        text.append(lines[i]);
+        if (i < lines.length - 1) {
+          text.append("\s");
+        }
       }
     }
     return text.toString();

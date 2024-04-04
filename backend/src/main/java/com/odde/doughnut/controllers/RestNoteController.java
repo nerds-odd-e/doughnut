@@ -214,11 +214,17 @@ class RestNoteController {
   }
 
   @PostMapping(value = "/convert-srt-to-text")
-  public NoteFormatConvertResponse convertSRTtoText(String srtText) {
-    Srt srt = new Srt(srtText);
+  public NoteRealm convertSRTtoText(@PathVariable("note") @Schema(type = "integer") Note note)
+      throws BindException, UnexpectedNoAccessRightException {
+    currentUser.assertReadAuthorization(note);
+    Srt srt = new Srt(note.getDetails());
     if (!srt.isSRTFormat()) {
-      return new NoteFormatConvertResponse(400, "Input text is not srt format");
+      BindingResult bindingResult = new BeanPropertyBindingResult(note, "note");
+      bindingResult.rejectValue("details", "convertError", "Input text is not srt format");
+      throw new BindException(bindingResult);
     }
-    return new NoteFormatConvertResponse(200, srt.convertSrtToText());
+    note.setDetails(srt.convertSrtToText());
+    User user = currentUser.getEntity();
+    return new NoteViewer(user, note).toJsonObject();
   }
 }
