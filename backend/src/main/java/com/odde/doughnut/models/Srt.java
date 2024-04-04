@@ -9,19 +9,14 @@ import java.util.regex.Pattern;
 public class Srt {
   private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss,SSS");
   public static final int GAP_TIME = 2 * 60;
-
+  public static final String NEW_PARAGRAPH_REGEX = "\n\n";
   private final String srtText;
-
   private static final String ARROW_REGEX = " --> ";
-
   private static final String NEWLINE_REGEX = "\n";
-
-  private static final String SPACE_REGEX = "\s";
-
+  private static final String SPACE_REGEX = " ";
   private static final String TIME_CODE_PATTERN =
       "\\d{2}:\\d{2}:\\d{2},\\d{3} --> \\d{2}:\\d{2}:\\d{2},\\d{3}";
-
-  private static final String SUBTITLE_PATTERN = "[^\\s].*";
+  private static final String SUBTITLE_PATTERN = "\\S.*";
 
   public Srt(String srtText) {
     this.srtText = srtText;
@@ -30,7 +25,7 @@ public class Srt {
   public String convertSrtToText() {
     StringBuilder text = new StringBuilder();
     // Split the SRT first
-    String[] paragraphs = srtText.split("\n\n");
+    String[] paragraphs = srtText.split(NEW_PARAGRAPH_REGEX);
     for (int i = 0; i < paragraphs.length; i++) {
 
       String[] lines = paragraphs[i].split(NEWLINE_REGEX);
