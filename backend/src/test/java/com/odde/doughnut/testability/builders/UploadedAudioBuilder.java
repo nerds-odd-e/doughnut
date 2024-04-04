@@ -1,13 +1,10 @@
 package com.odde.doughnut.testability.builders;
 
+import java.awt.*;
+import java.io.*;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.*;
 
 public class UploadedAudioBuilder {
   private String name = "file";
@@ -33,6 +30,6 @@ public class UploadedAudioBuilder {
   }
 
   private ByteArrayOutputStream buildAudio() throws IOException {
-      return new ByteArrayOutputStream();
+    return new ByteArrayOutputStream();
   }
 }

@@ -413,9 +413,7 @@ class RestNoteControllerTests {
 
     @Test
     void shouldAttachAudioFile() throws UnexpectedNoAccessRightException, IOException {
-      noteAccessoriesDTO.setAttachAudioProxy(
-        makeMe.anUploadedAudio().toMultiplePartFilePlease()
-      );
+      noteAccessoriesDTO.setAttachAudioProxy(makeMe.anUploadedAudio().toMultiplePartFilePlease());
       controller.updateNoteAccessories(note, noteAccessoriesDTO);
     }
   }
