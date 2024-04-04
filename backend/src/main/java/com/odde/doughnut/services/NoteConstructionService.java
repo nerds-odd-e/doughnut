@@ -59,4 +59,18 @@ public record NoteConstructionService(
                       }
                     }));
   }
+
+  public Note createNoteWithDetail(
+    Note parentNote,
+    LinkType linkTypeToParent,
+    String topicConstructor,
+    String details) {
+    Note note =
+      HierarchicalNote.createNote(user, parentNote, currentUTCTimestamp, topicConstructor);
+    note.setDetails(details);
+    modelFactoryService.save(note);
+    modelFactoryService.createLink(
+      note, note.getParent(), user, linkTypeToParent, currentUTCTimestamp);
+    return note;
+  }
 }

@@ -92,6 +92,24 @@ class RestNoteController {
     }
   }
 
+  @PostMapping(value = "/{parentNote}/extract")
+  @Transactional
+  public NoteRealm extractNote(
+    @PathVariable(name = "parentNote") @Schema(type = "integer") Note parentNote,
+    @Valid @RequestBody NoteCreationDTO noteCreation)
+    throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(parentNote);
+    User user = currentUser.getEntity();
+    Note note =
+      getNoteConstructionService(user)
+        .createNoteWithDetail(
+          parentNote,
+          noteCreation.getLinkTypeToParent(),
+          noteCreation.getTopicConstructor(),
+          noteCreation.getDetails());
+    return new NoteViewer(user, note).toJsonObject();
+  }
+
   private NoteConstructionService getNoteConstructionService(User user) {
     return new NoteConstructionService(
         user, testabilitySettings.getCurrentUTCTimestamp(), modelFactoryService);

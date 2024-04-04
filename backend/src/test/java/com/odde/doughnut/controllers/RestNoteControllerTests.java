@@ -646,4 +646,36 @@ class RestNoteControllerTests {
           "This is an example of a subtitle. This is Second", actual.getNote().getDetails());
     }
   }
+
+  @Nested
+  class ExtractNoteTest {
+
+    Note parent;
+    NoteCreationDTO noteCreation = new NoteCreationDTO();
+
+    @BeforeEach
+    void setup() {
+      parent = makeMe.aNote().creatorAndOwner(userModel).please();
+      noteCreation.setTopicConstructor("new title");
+      noteCreation.setDetails("details test");
+      noteCreation.setLinkTypeToParent(LinkType.NO_LINK);
+    }
+
+    @Test
+    void shouldBeAbleToExtractNoteWhenValid()
+      throws UnexpectedNoAccessRightException, BindException {
+      NoteRealm response = controller.extractNote(parent, noteCreation);
+      assertThat(response.getId(), not(nullValue()));
+      assertEquals("details test", response.getNote().getDetails());
+    }
+
+    @Test
+    void shouldBeAbleToExtractAThing()
+      throws UnexpectedNoAccessRightException, BindException {
+      long beforeThingCount = makeMe.modelFactoryService.noteRepository.count();
+      controller.extractNote(parent, noteCreation);
+      long afterThingCount = makeMe.modelFactoryService.noteRepository.count();
+      assertThat(afterThingCount, equalTo(beforeThingCount + 1));
+    }
+  }
 }
