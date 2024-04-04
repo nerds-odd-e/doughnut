@@ -13,8 +13,5 @@ public class NoteCreationDTO extends NoteUpdateTopicDTO {
   @Pattern(regexp = "^$|Q\\d+", message = "The wikidata Id should be Q<numbers>")
   public String wikidataId;
 
-  @Getter
-  @Setter
-  public String details;
-
+  @Getter @Setter public String details;
 }

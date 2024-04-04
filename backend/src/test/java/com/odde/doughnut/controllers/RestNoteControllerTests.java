@@ -663,15 +663,14 @@ class RestNoteControllerTests {
 
     @Test
     void shouldBeAbleToExtractNoteWhenValid()
-      throws UnexpectedNoAccessRightException, BindException {
+        throws UnexpectedNoAccessRightException, BindException {
       NoteRealm response = controller.extractNote(parent, noteCreation);
       assertThat(response.getId(), not(nullValue()));
       assertEquals("details test", response.getNote().getDetails());
     }
 
     @Test
-    void shouldBeAbleToExtractAThing()
-      throws UnexpectedNoAccessRightException, BindException {
+    void shouldBeAbleToExtractAThing() throws UnexpectedNoAccessRightException, BindException {
       long beforeThingCount = makeMe.modelFactoryService.noteRepository.count();
       controller.extractNote(parent, noteCreation);
       long afterThingCount = makeMe.modelFactoryService.noteRepository.count();
