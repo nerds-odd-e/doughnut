@@ -12,10 +12,6 @@
         v-model="creationData.topicConstructor"
         :errors="noteFormErrors.topicConstructor"
       />
-      <NoteFormContentOnly
-        v-model="creationData.topicConstructor"
-        :errors="noteFormErrors.topicConstructor"
-      />
       <SuggestTopic
         :original-topic="creationData.topicConstructor"
         :suggested-topic="suggestedTopic"
@@ -45,7 +41,6 @@
 import { defineComponent, PropType } from "vue";
 import { NoteCreationDTO, WikidataSearchEntity } from "@/generated/backend";
 import NoteFormTopicOnly from "./NoteFormTopicOnly.vue";
-import NoteFormContentOnly from "./NoteFormContentOnly.vue";
 import SearchResults from "../search/SearchResults.vue";
 import LinkTypeSelectCompact from "../links/LinkTypeSelectCompact.vue";
 import WikidataSearchByLabel from "./WikidataSearchByLabel.vue";
@@ -55,7 +50,6 @@ import SuggestTopic from "./SuggestTopic.vue";
 export default defineComponent({
   components: {
     NoteFormTopicOnly,
-    NoteFormContentOnly,
     SearchResults,
     LinkTypeSelectCompact,
     WikidataSearchByLabel,

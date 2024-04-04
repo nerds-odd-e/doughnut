@@ -9,6 +9,7 @@
       </NoteNewButton>
 
       <NoteNewButton
+        v-if="false"
         button-title="Extract Child Note"
         v-bind="{ parentId: note.id, storageAccessor }"
       >

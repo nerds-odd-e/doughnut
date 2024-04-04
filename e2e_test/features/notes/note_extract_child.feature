@@ -7,7 +7,7 @@ Feature: Extract Child Note
       | Topic       | Details                    |
       | parent_note | This is child note example |
 
-  @focus
+  @ignore
   Scenario: Extract the note
     When I extract the note detail
     Then I create a note belonging to "parent_note":

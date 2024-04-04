@@ -12,11 +12,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 import { QuillEditor } from "@vueup/vue-quill";
 
 import "quill/dist/quill.snow.css";
-import { ref } from "vue";
 
 const quillEditor = ref();
 
@@ -67,16 +66,17 @@ export default defineComponent({
       this.$emit("update:modelValue", this.localValue);
     },
     onBlurTextField() {
-      alert('Blur')
       this.$emit("blur");
     },
     setSelection(data) {
-        const range = data.range;
-        // remove html tag
-        const textContent = this.localValue?.replaceAll('<p>', '').replaceAll('</p>', '');
-        const selectedValue = textContent.substring(range.index, range.index + range.length)
-        alert('Range: ' + selectedValue)
-    }
+      const { range } = data;
+      const { index, length } = range;
+      // remove html tag
+      const textContent = this.localValue
+        ?.replaceAll("<p>", "")
+        .replaceAll("</p>", "");
+      textContent?.substring(index, index + length);
+    },
   },
 });
 </script>
