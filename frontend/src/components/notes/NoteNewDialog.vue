@@ -98,6 +98,21 @@ export default defineComponent({
       this.processing = true;
       this.noteFormErrors.wikidataId = undefined;
       this.noteFormErrors.topicConstructor = undefined;
+      if (this.extractnote === 'true') {
+        this.storageAccessor
+        .storedApi()
+        .createExtractNote(this.$router, this.parentId, this.creationData)
+        .then(() => {
+          this.$emit("closeDialog");
+        })
+        .catch((res) => {
+          this.noteFormErrors = res;
+        })
+        .finally(() => {
+          this.processing = false;
+        });
+        return;
+      }
       this.storageAccessor
         .storedApi()
         .createNote(this.$router, this.parentId, this.creationData)

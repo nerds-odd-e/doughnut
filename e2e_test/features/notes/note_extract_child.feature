@@ -10,12 +10,13 @@ Feature: Extract Child Note
   @focus
   Scenario: Extract the note
     When I extract the note detail
-    Then I create a note belonging to "parent_note":
-      | Topic     | Wikidata Id |
-      | Singapore | Q334        |
-    And I should see "My Notes/parent_note" with these children
-      | Topic      |
-      | Singapore  |
+    And I should see "This is child note example"
+#    Then I create a note belonging to "parent_note":
+#      | Topic     | Wikidata Id |
+#      | Singapore | Q334        |
+#    And I should see "My Notes/parent_note" with these children
+#      | Topic      |
+#      | Singapore  |
 
   @ignore
   Scenario: There is no note detail

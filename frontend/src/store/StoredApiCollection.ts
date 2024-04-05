@@ -19,6 +19,12 @@ export interface StoredApi {
     data: NoteCreationDTO,
   ): Promise<NoteRealm>;
 
+  createExtractNote(
+    router: Router,
+    parentId: Doughnut.ID,
+    data: NoteCreationDTO,
+  ): Promise<NoteRealm>;
+
   createLink(
     sourceId: Doughnut.ID,
     targetId: Doughnut.ID,
@@ -70,6 +76,20 @@ export default class StoredApiCollection implements StoredApi {
     this.managedApi = managedApi;
     this.noteEditingHistory = undoHistory;
     this.storage = storage;
+  }
+  
+  async createExtractNote(
+    router: Router,
+    parentId: Doughnut.ID,
+    data: NoteCreationDTO,
+  ) {
+    const nrwp = await this.managedApi.restNoteController.createNote(
+      parentId,
+      data,
+    );
+    const focus = this.storage.refreshNoteRealm(nrwp);
+    this.routerReplaceFocus(router, focus);
+    return focus;
   }
 
   // eslint-disable-next-line class-methods-use-this

@@ -70,13 +70,15 @@ export default defineComponent({
     },
     setSelection(data) {
       const { range } = data;
-      const { index, length } = range;
-      // remove html tag
-      const textContent = this.localValue
-        ?.replaceAll("<p>", "")
-        .replaceAll("</p>", "");
-      const selectedText = textContent?.substring(index, index + length);
-      sessionStorage.setItem("selectedContent", selectedText || "");
+      if (range != null) {
+        const { index, length } = range;
+        // remove html tag
+        const textContent = this.localValue
+          ?.replaceAll("<p>", "")
+          .replaceAll("</p>", "");
+        const selectedText = textContent?.substring(index, index + length);
+        sessionStorage.setItem("selectedContent", selectedText || "");
+      }
     },
   },
 });
