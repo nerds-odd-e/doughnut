@@ -22,13 +22,13 @@ export class RestNoteControllerService {
      * @returns NoteRealm OK
      * @throws ApiError
      */
-    public createNote(
+    public extractNote(
         parentNote: number,
         requestBody: NoteCreationDTO,
     ): CancelablePromise<NoteRealm> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/notes/{parentNote}/create',
+            url: '/api/notes/{parentNote}/extract',
             path: {
                 'parentNote': parentNote,
             },
@@ -45,13 +45,13 @@ export class RestNoteControllerService {
      * @returns NoteRealm OK
      * @throws ApiError
      */
-    public extractNote(
+    public createNote(
         parentNote: number,
         requestBody: NoteCreationDTO,
     ): CancelablePromise<NoteRealm> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/notes/{parentNote}/extract',
+            url: '/api/notes/{parentNote}/create',
             path: {
                 'parentNote': parentNote,
             },
