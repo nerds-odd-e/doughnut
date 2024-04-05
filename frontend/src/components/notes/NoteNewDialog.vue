@@ -82,6 +82,7 @@ export default defineComponent({
         linkTypeToParent: "no link",
         topicConstructor: "",
         wikidataId: "",
+        details: "",
       },
       noteFormErrors: {
         linkTypeToParent: undefined,
@@ -98,19 +99,20 @@ export default defineComponent({
       this.processing = true;
       this.noteFormErrors.wikidataId = undefined;
       this.noteFormErrors.topicConstructor = undefined;
-      if (this.extractnote === 'true') {
+      this.creationData.details = this.myContent;
+      if (this.extractnote === "true") {
         this.storageAccessor
-        .storedApi()
-        .createExtractNote(this.$router, this.parentId, this.creationData)
-        .then(() => {
-          this.$emit("closeDialog");
-        })
-        .catch((res) => {
-          this.noteFormErrors = res;
-        })
-        .finally(() => {
-          this.processing = false;
-        });
+          .storedApi()
+          .createExtractNote(this.$router, this.parentId, this.creationData)
+          .then(() => {
+            this.$emit("closeDialog");
+          })
+          .catch((res) => {
+            this.noteFormErrors = res;
+          })
+          .finally(() => {
+            this.processing = false;
+          });
         return;
       }
       this.storageAccessor

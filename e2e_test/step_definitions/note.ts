@@ -223,18 +223,15 @@ When(
 )
 
 Given("I extract the note detail", () => {
-    cy.get('.ql-editor').type('{selectall}')
-    start.jumpToNotePage("parent_note").extractChildNote()
-    cy.get('#note-topic').type("sample note")
-    cy.findByText("Submit").click()
-  }
-)
+  cy.get(".ql-editor").type("{selectall}")
+  start.jumpToNotePage("parent_note").extractChildNote()
+  cy.get("#note-topic").type("sample note")
+  cy.findByText("Submit").click()
+})
 
 Given("I should see {string}", (text: string) => {
-    cy.findByText(text).should('exist')
-  }
-)
-
+  cy.findByText(text).should("exist")
+})
 
 // This step definition is for demo purpose
 Then("*for demo* I should see there are {int} descendants", (numberOfDescendants: number) => {

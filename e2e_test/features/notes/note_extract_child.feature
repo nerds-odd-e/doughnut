@@ -3,20 +3,13 @@ Feature: Extract Child Note
   Background:
     Given I am logged in as an existing user
     And I have a note with the topic "parent_note"
-    Given I update note "parent_note" to become:
+    And I update note "parent_note" to become:
       | Topic       | Details                    |
       | parent_note | This is child note example |
 
-  @focus
   Scenario: Extract the note
     When I extract the note detail
-    And I should see "This is child note example"
-#    Then I create a note belonging to "parent_note":
-#      | Topic     | Wikidata Id |
-#      | Singapore | Q334        |
-#    And I should see "My Notes/parent_note" with these children
-#      | Topic      |
-#      | Singapore  |
+    Then I should see "This is child note example"
 
   @ignore
   Scenario: There is no note detail

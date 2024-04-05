@@ -12,7 +12,7 @@
         button-title="Extract Child Note"
         v-bind="{ parentId: note.id, storageAccessor }"
       >
-        <SvgClose />
+        <SvgExtract />
       </NoteExtractButton>
 
       <PopButton title="edit note">

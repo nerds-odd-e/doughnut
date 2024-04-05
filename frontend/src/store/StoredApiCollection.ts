@@ -77,13 +77,13 @@ export default class StoredApiCollection implements StoredApi {
     this.noteEditingHistory = undoHistory;
     this.storage = storage;
   }
-  
+
   async createExtractNote(
     router: Router,
     parentId: Doughnut.ID,
     data: NoteCreationDTO,
   ) {
-    const nrwp = await this.managedApi.restNoteController.createNote(
+    const nrwp = await this.managedApi.restNoteController.createExtractNote(
       parentId,
       data,
     );
