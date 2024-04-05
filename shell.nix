@@ -9,7 +9,7 @@ in mkShell {
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
     python312
-    pipenv
+    poetry
     nodejs_21
     corepack_21
     zsh
