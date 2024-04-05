@@ -64,7 +64,7 @@
     "sass": "^1.74.1",
     "sass-loader": "14.1.1",
     "style-loader": "^3.3.4",
-    "typescript": "5.4.3",
+    "typescript": "5.4.4",
     "unplugin-auto-import": "^0.17.5",
     "vite": "5.2.8",
     "vite-plugin-checker": "0.6.4",
