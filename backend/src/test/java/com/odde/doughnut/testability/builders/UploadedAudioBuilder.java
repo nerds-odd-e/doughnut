@@ -24,14 +24,32 @@ public class UploadedAudioBuilder {
   public InputStreamSource toInputSteamSource() {
     return new InputStreamSource() {
       @Override
-      public InputStream getInputStream() throws IOException {
-        return new ByteArrayInputStream(buildAudio().toByteArray());
+      public @NotNull InputStream getInputStream() throws IOException {
+        // Replace this byte array with your actual MP3 data
+        byte[] mp3Data =
+            new byte[] {
+              // Your MP3 data here...
+              // For example, you can add some placeholder bytes:
+              (byte) 0xFF, (byte) 0xF3, (byte) 0x44, (byte) 0x1A, // Example bytes
+              // Add more bytes as needed to make it non-empty
+            };
+
+        // Create a ByteArrayInputStream from the byte array
+        return new ByteArrayInputStream(mp3Data);
       }
     };
   }
 
   @Contract(value = " -> new", pure = true)
   private @NotNull ByteArrayOutputStream buildAudio() throws IOException {
-    return new ByteArrayOutputStream();
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    byte[] buffer = new byte[100];
+    int bytesRead;
+    try (InputStream inputStream = toInputSteamSource().getInputStream()) {
+      while ((bytesRead = inputStream.read(buffer)) != -1) {
+        outputStream.write(buffer, 0, bytesRead);
+      }
+    }
+    return outputStream;
   }
 }

@@ -1,11 +1,14 @@
 package com.odde.doughnut.models;
 
+import com.odde.doughnut.algorithms.AudioUtils;
 import com.odde.doughnut.entities.*;
 import java.io.IOException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.multipart.MultipartFile;
 
 public class AudioBuilder {
+
+  private final AudioUtils audioUtils = new AudioUtils();
 
   public AudioBuilder() {}
 
@@ -22,6 +25,8 @@ public class AudioBuilder {
   }
 
   AudioBlob getAudioBlob(MultipartFile file) throws IOException {
-    return new AudioBlob();
+    AudioBlob audioBlob = new AudioBlob();
+    audioBlob.setData(audioUtils.readAudioFile(file));
+    return audioBlob;
   }
 }
