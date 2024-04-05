@@ -1,7 +1,8 @@
 package com.odde.doughnut.testability.builders;
 
-import java.awt.*;
 import java.io.*;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,7 +30,8 @@ public class UploadedAudioBuilder {
     };
   }
 
-  private ByteArrayOutputStream buildAudio() throws IOException {
+  @Contract(value = " -> new", pure = true)
+  private @NotNull ByteArrayOutputStream buildAudio() throws IOException {
     return new ByteArrayOutputStream();
   }
 }

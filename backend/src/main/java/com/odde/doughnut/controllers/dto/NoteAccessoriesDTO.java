@@ -4,6 +4,7 @@ import com.odde.doughnut.entities.Audio;
 import com.odde.doughnut.entities.Image;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.validators.ValidateNotePicture;
+import com.odde.doughnut.models.AudioBuilder;
 import com.odde.doughnut.models.ImageBuilder;
 import jakarta.validation.constraints.Pattern;
 import java.io.IOException;
@@ -41,7 +42,7 @@ public class NoteAccessoriesDTO {
   public Audio fetchAttachAudio(User user) throws IOException {
     MultipartFile file = getAttachAudioProxy();
     if (file != null && !file.isEmpty()) {
-      return null;
+      return new AudioBuilder().buildAudioFromAttachAudio(user, file);
     }
     return null;
   }
