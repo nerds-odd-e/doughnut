@@ -19,7 +19,7 @@ export interface StoredApi {
     data: NoteCreationDTO,
   ): Promise<NoteRealm>;
 
-  createExtractNote(
+  extractNote(
     router: Router,
     parentId: Doughnut.ID,
     data: NoteCreationDTO,
@@ -78,12 +78,12 @@ export default class StoredApiCollection implements StoredApi {
     this.storage = storage;
   }
 
-  async createExtractNote(
+  async extractNote(
     router: Router,
     parentId: Doughnut.ID,
     data: NoteCreationDTO,
   ) {
-    const nrwp = await this.managedApi.restNoteController.createExtractNote(
+    const nrwp = await this.managedApi.restNoteController.extractNote(
       parentId,
       data,
     );

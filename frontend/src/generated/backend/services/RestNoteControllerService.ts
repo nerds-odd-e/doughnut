@@ -63,29 +63,6 @@ export class RestNoteControllerService {
         });
     }
     /**
-     * @param parentNote
-     * @param requestBody
-     * @returns NoteRealm OK
-     * @throws ApiError
-     */
-    public createExtractNote(
-        parentNote: number,
-        requestBody: NoteCreationDTO,
-    ): CancelablePromise<NoteRealm> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/notes/{parentNote}/extract',
-            path: {
-                'parentNote': parentNote,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
      * @param note
      * @param requestBody
      * @returns NoteRealm OK

@@ -103,7 +103,7 @@ export default defineComponent({
       if (this.extractnote === "true") {
         this.storageAccessor
           .storedApi()
-          .createExtractNote(this.$router, this.parentId, this.creationData)
+          .extractNote(this.$router, this.parentId, this.creationData)
           .then(() => {
             this.$emit("closeDialog");
           })
