@@ -30,8 +30,15 @@
       </div>
     </template>
   </NoteTextContent>
-  <button @click="download()" class="btn btn-sm btn-secondary" title="Download audio file">
-          <i class="fas fa-download"></i> Download audio file
+  <div>
+    <a>My attach file:</a>
+  </div>
+  <button
+    @click="download()"
+    class="btn btn-sm btn-secondary"
+    title="Download audio file"
+  >
+    <i class="fas fa-download"></i> Download audio file
   </button>
 </template>
 
@@ -63,23 +70,23 @@ export default defineComponent({
   methods: {
     async download() {
       try {
-    const response = await this.managedApi.restNoteController.download(1); // Call server endpoint
+        await this.managedApi.restNoteController.download(1); // Call server endpoint
 
-    // Assuming server response is an object with 'fileName' and 'data' properties
-    const { fileName, data } = response;
+        // // Assuming server response is an object with 'fileName' and 'data' properties
+        // const { fileName, data } = response;
 
-    // Trigger file download in browser
-    const blob = new Blob([data], { type: 'application/octet-stream' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', fileName); // Optional: set filename
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  } catch (error) {
-    console.error(`Error downloading file:`, error);
-  }
+        // // Trigger file download in browser
+        // const blob = new Blob([data], { type: 'application/octet-stream' });
+        // const url = URL.createObjectURL(blob);
+        // const link = document.createElement('a');
+        // link.href = url;
+        // link.setAttribute('download', fileName); // Optional: set filename
+        // document.body.appendChild(link);
+        // link.click();
+        // document.body.removeChild(link);
+      } catch (error) {
+        // console.error(`Error downloading file:`, error);
+      }
     },
   },
 });
