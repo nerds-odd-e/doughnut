@@ -5,10 +5,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.NoteViewer;
-import com.odde.doughnut.models.SearchTermModel;
-import com.odde.doughnut.models.Srt;
-import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.models.*;
 import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
@@ -16,7 +13,10 @@ import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import java.io.IOException;
+
+import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.MediaType;
@@ -244,5 +244,37 @@ class RestNoteController {
     note.setDetails(srt.convertSrtToText());
     User user = currentUser.getEntity();
     return new NoteViewer(user, note).toJsonObject();
+  }
+
+  @GetMapping("/{note}/download")
+  public AttachmentAudioDto download(@PathVariable("note") Integer nodeId) throws IOException {
+    if(nodeId == null) {
+      return new AttachmentAudioDto();
+    }
+    return getAttachment("/home/lia/Downloads/example_song.mp3");
+  }
+
+  public static AttachmentAudioDto getAttachment(String filePath) throws IOException {
+    Path path = Paths.get(filePath);
+    File foundFile = path.toFile();
+    if (!path.toFile().exists()) {
+      throw new FileNotFoundException("MP3 file not found");
+    }
+
+    try (InputStream inputStream = new FileInputStream(foundFile)) {
+      long fileSize = foundFile.length();
+      byte[] data = new byte[(int) fileSize];
+      int totalBytesRead = 0;
+      int bytesRead;
+
+      while ((bytesRead = inputStream.read(data, totalBytesRead, (int) (fileSize - totalBytesRead))) > 0) {
+        totalBytesRead += bytesRead;
+      }
+
+      AttachmentAudioDto attachmentAudioDto = new AttachmentAudioDto();
+      attachmentAudioDto.setFileName(foundFile.getName());
+      attachmentAudioDto.setData(data);
+      return attachmentAudioDto;
+    }
   }
 }
