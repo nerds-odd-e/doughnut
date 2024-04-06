@@ -53,6 +53,11 @@
     placeholder="Optional. upload own audio."
     accept=".mp3, .m4a"
     title="Attach audio file"
+    :errors="errors.uploadPictureProxy"
+    :model-value="modelValue.uploadPictureProxy"
+    @update:model-value="
+      $emit('update:modelValue', { ...modelValue, uploadPictureProxy: $event })
+    "
   />
 </template>
 
