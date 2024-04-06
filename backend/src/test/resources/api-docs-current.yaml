@@ -1961,30 +1961,6 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/NoteInfo'
-  /api/notes/{note}/download:
-    get:
-      tags:
-      - rest-note-controller
-      operationId: download
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/AttachmentAudioDto'
   /api/notebooks:
     get:
       tags:
@@ -2969,14 +2945,6 @@ components:
           format: date-time
         reviewSetting:
           $ref: '#/components/schemas/ReviewSetting'
-    AttachmentAudioDto:
-      type: object
-      properties:
-        fileName:
-          type: string
-        data:
-          type: string
-          format: byte
     NotebookViewedByUser:
       required:
       - headNote

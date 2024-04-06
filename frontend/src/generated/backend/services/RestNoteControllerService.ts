@@ -2,7 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { AttachmentAudioDto } from '../models/AttachmentAudioDto';
 import type { Note } from '../models/Note';
 import type { NoteAccessoriesDTO } from '../models/NoteAccessoriesDTO';
 import type { NoteCreationDTO } from '../models/NoteCreationDTO';
@@ -292,25 +291,6 @@ export class RestNoteControllerService {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/notes/{note}/note-info',
-            path: {
-                'note': note,
-            },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param note
-     * @returns AttachmentAudioDto OK
-     * @throws ApiError
-     */
-    public download(
-        note: number,
-    ): CancelablePromise<AttachmentAudioDto> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/api/notes/{note}/download',
             path: {
                 'note': note,
             },

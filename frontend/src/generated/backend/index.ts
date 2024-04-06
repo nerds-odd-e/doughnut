@@ -17,7 +17,6 @@ export type { AiCompletionResponse } from './models/AiCompletionResponse';
 export type { AiGeneratedImage } from './models/AiGeneratedImage';
 export type { AnswerDTO } from './models/AnswerDTO';
 export type { AnsweredQuestion } from './models/AnsweredQuestion';
-export type { AttachmentAudioDto } from './models/AttachmentAudioDto';
 export type { ChatRequest } from './models/ChatRequest';
 export type { ChatResponse } from './models/ChatResponse';
 export type { Choice } from './models/Choice';
