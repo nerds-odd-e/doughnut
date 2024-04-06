@@ -28,12 +28,4 @@ CREATE TABLE `audio_blob` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---
--- Add audio column to table `note`
---
-
-ALTER TABLE note
-ADD COLUMN audio_id INT UNSIGNED NULL,
-ADD FOREIGN KEY (audio_id) REFERENCES audio (id) ON DELETE CASCADE ON UPDATE RESTRICT;
-
 SET foreign_key_checks = 1;
