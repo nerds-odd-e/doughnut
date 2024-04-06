@@ -688,4 +688,10 @@ class RestNoteControllerTests {
     assertNotNull(attachmentAudioDto.getFileName());
     assertNotNull(attachmentAudioDto.getData());
   }
+
+  public void shouldDownloadAudioSuccessfulWithEmptyAudioFile() {
+    AttachmentAudioDto attachmentAudioDto = controller.download(null);
+    assertNull(attachmentAudioDto.getFileName());
+    assertNull(attachmentAudioDto.getData());
+  }
 }
