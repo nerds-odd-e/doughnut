@@ -1,10 +1,8 @@
 package com.odde.doughnut.controllers.dto;
 
-import com.odde.doughnut.entities.Audio;
 import com.odde.doughnut.entities.Image;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.validators.ValidateNotePicture;
-import com.odde.doughnut.models.AudioBuilder;
 import com.odde.doughnut.models.ImageBuilder;
 import jakarta.validation.constraints.Pattern;
 import java.io.IOException;
@@ -35,14 +33,6 @@ public class NoteAccessoriesDTO {
     MultipartFile file = getUploadPictureProxy();
     if (file != null && !file.isEmpty()) {
       return new ImageBuilder().buildImageFromUploadedPicture(user, file);
-    }
-    return null;
-  }
-
-  public Audio fetchAttachAudio(User user) throws IOException {
-    MultipartFile file = getAttachAudioProxy();
-    if (file != null && !file.isEmpty()) {
-      return new AudioBuilder().buildAudioFromAttachAudio(user, file);
     }
     return null;
   }
