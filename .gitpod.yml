@@ -51,7 +51,6 @@ vscode:
   extensions:
     - esbenp.prettier-vscode
     - dbaeumer.vscode-eslint
-    - Vue.volar
     - HansUXdev.bootstrap5-snippets
     - Shelex.vscode-cy-helper
     - mtxr.sqltools
