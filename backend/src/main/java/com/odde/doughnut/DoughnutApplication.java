@@ -14,9 +14,9 @@ public class DoughnutApplication {
   }
 
   private static void migrateTestDb(ConfigurableApplicationContext run) {
-    if (!"testDBMigrate".equals(System.getProperty("odd-e.doughnut.task"))) {
-      return;
-    }
+    //    if (!"testDBMigrate".equals(System.getProperty("odd-e.doughnut.task"))) {
+    //      return;
+    //    }
     try (run) {
       Flyway flyway = run.getBean(Flyway.class);
       flyway.repair();

@@ -229,10 +229,6 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     if (uploadPicture != null) {
       getNoteAccessories().setUploadPicture(uploadPicture);
     }
-    Audio uploadAudio = noteAccessoriesDTO.fetchAttachAudio(user);
-    if (uploadAudio != null) {
-      getNoteAccessories().setUploadAudio(uploadAudio);
-    }
   }
 
   @JsonIgnore
