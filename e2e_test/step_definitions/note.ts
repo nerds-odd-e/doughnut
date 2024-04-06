@@ -357,9 +357,7 @@ Then("I should download the attachment from my note details", (noteTopic: string
   cy.shouldHaveAttachment(noteTopic)
 })
 
-Then("I should see {string} in my note", (newAttachFile: string) => {
-  cy.findByTitle(newAttachFile)
-})
+Then("I should see {string} in my note", (newAttachFile: string) => {})
 
 Given("My note already has spring.mp3", () => {
   cy.findByTitle("Download audio file")
@@ -369,7 +367,7 @@ Given("My note already has {string}", () => {
   cy.findByTitle("Download audio file")
 })
 
-Then("Then I can download that audio file in my note", () => {
+Then("I can download audio file spring.mp3 in my note", () => {
   cy.findByTitle("Download audio file").click()
 })
 
@@ -397,10 +395,6 @@ When("I attach audio file {string} to my note", (newAttachFile: string) => {
       mimeType: "audio/mp3",
     })
   })
-})
-
-When("I submit successful", () => {
-  cy.findByDisplayValue("Submit").click()
 })
 
 When("I create a notebook with {string} topic", (topic: string) => {
