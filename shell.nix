@@ -49,7 +49,7 @@ in mkShell {
     google-cloud-sdk
     yamllint
     nix-direnv
-    nixfmt
+    nixfmt-classic
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp
     apple_sdk.CoreFoundation
