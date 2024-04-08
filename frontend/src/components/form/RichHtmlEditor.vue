@@ -7,17 +7,14 @@
     @blur="onBlurTextField"
     @update:content="onUpdateContent"
     @focus="hadFocus = true"
-    @selection-change="setSelection"
   />
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent } from "vue";
 import { QuillEditor } from "@vueup/vue-quill";
 
 import "quill/dist/quill.snow.css";
-
-const quillEditor = ref();
 
 export default defineComponent({
   props: {
@@ -67,18 +64,6 @@ export default defineComponent({
     },
     onBlurTextField() {
       this.$emit("blur");
-    },
-    setSelection(data) {
-      const { range } = data;
-      if (range != null) {
-        const { index, length } = range;
-        // remove html tag
-        const textContent = this.localValue
-          ?.replaceAll("<p>", "")
-          .replaceAll("</p>", "");
-        const selectedText = textContent?.substring(index, index + length);
-        sessionStorage.setItem("selectedContent", selectedText || "");
-      }
     },
   },
 });

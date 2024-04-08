@@ -7,7 +7,6 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.SearchTermModel;
-import com.odde.doughnut.models.Srt;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.WikidataService;
@@ -90,24 +89,6 @@ class RestNoteController {
       bindingResult.rejectValue("wikidataId", "duplicate", "Duplicate Wikidata ID Detected.");
       throw new BindException(bindingResult);
     }
-  }
-
-  @PostMapping(value = "/{parentNote}/extract")
-  @Transactional
-  public NoteRealm extractNote(
-      @PathVariable(name = "parentNote") @Schema(type = "integer") Note parentNote,
-      @Valid @RequestBody NoteCreationDTO noteCreation)
-      throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(parentNote);
-    User user = currentUser.getEntity();
-    Note note =
-        getNoteConstructionService(user)
-            .createNoteWithDetail(
-                parentNote,
-                noteCreation.getLinkTypeToParent(),
-                noteCreation.getTopicConstructor(),
-                noteCreation.getDetails());
-    return new NoteViewer(user, note).toJsonObject();
   }
 
   private NoteConstructionService getNoteConstructionService(User user) {
@@ -220,29 +201,5 @@ class RestNoteController {
               modelFactoryService.save(link);
             });
     return new RedirectToNoteResponse(note.getId());
-  }
-
-  @PostMapping(value = "/{note}/fix-miss-spells")
-  @Transactional
-  public NoteRealm fixMissSpells(@PathVariable("note") @Schema(type = "integer") Note note)
-      throws UnexpectedNoAccessRightException {
-    currentUser.assertReadAuthorization(note);
-    User user = currentUser.getEntity();
-    return new NoteViewer(user, note).toJsonObject();
-  }
-
-  @PostMapping(value = "/convert-srt-to-text")
-  public NoteRealm convertSRTtoText(@PathVariable("note") @Schema(type = "integer") Note note)
-      throws BindException, UnexpectedNoAccessRightException {
-    currentUser.assertReadAuthorization(note);
-    Srt srt = new Srt(note.getDetails());
-    if (!srt.isSRTFormat()) {
-      BindingResult bindingResult = new BeanPropertyBindingResult(note, "note");
-      bindingResult.rejectValue("details", "convertError", "Input text is not srt format");
-      throw new BindException(bindingResult);
-    }
-    note.setDetails(srt.convertSrtToText());
-    User user = currentUser.getEntity();
-    return new NoteViewer(user, note).toJsonObject();
   }
 }

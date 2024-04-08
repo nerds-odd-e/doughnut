@@ -8,28 +8,9 @@
         <SvgAddChild />
       </NoteNewButton>
 
-      <NoteExtractButton
-        button-title="Extract Child Note"
-        v-bind="{ parentId: note.id, storageAccessor }"
-      >
-        <SvgExtract />
-      </NoteExtractButton>
-
       <PopButton title="edit note">
         <template #button_face>
           <SvgEdit />
-        </template>
-        <template #default="{ closer }">
-          <NoteEditAccessoriesDialog
-            v-bind="{ note, storageAccessor }"
-            @close-dialog="closer"
-          />
-        </template>
-      </PopButton>
-
-      <PopButton title="convert SRT">
-        <template #button_face>
-          <SvgHappy />
         </template>
         <template #default="{ closer }">
           <NoteEditAccessoriesDialog
@@ -60,12 +41,6 @@
             v-bind="{ note, storageAccessor }"
             @close-dialog="closer"
           />
-        </template>
-      </PopButton>
-      <!-- WIP: Backend for fix miss spells has not implemented yet -->
-      <PopButton title="fix miss spells" v-if="false">
-        <template #button_face>
-          <SvgFixMissSpells />
         </template>
       </PopButton>
       <div class="dropdown">
@@ -102,21 +77,18 @@ import { defineComponent, PropType } from "vue";
 import { StorageAccessor } from "@/store/createNoteStorage";
 import { Note } from "@/generated/backend";
 import NoteNewButton from "./NoteNewButton.vue";
-import NoteExtractButton from "./NoteExtractButton.vue";
 import SvgAddChild from "../svgs/SvgAddChild.vue";
 import SvgEdit from "../svgs/SvgEdit.vue";
 import NoteEditAccessoriesDialog from "../notes/NoteEditAccessoriesDialog.vue";
 import SvgWikidata from "../svgs/SvgWikidata.vue";
 import WikidataAssociationDialog from "../notes/WikidataAssociationDialog.vue";
 import SvgSearchForLink from "../svgs/SvgSearchForLink.vue";
-import SvgFixMissSpells from "../svgs/SvgFixMissSpells.vue";
 import LinkNoteDialog from "../links/LinkNoteDialog.vue";
 import SvgCog from "../svgs/SvgCog.vue";
 import NoteDeleteButton from "./NoteDeleteButton.vue";
 import PopButton from "../commons/Popups/PopButton.vue";
 import AIGenerateImageDialog from "../notes/AIGenerateImageDialog.vue";
 import NoteDetailsAutoCompletionButton from "./NoteDetailsAutoCompletionButton.vue";
-import SvgHappy from "../svgs/SvgHappy.vue";
 
 export default defineComponent({
   props: {
@@ -131,14 +103,12 @@ export default defineComponent({
   },
   components: {
     NoteNewButton,
-    NoteExtractButton,
     SvgAddChild,
     SvgEdit,
     NoteEditAccessoriesDialog,
     SvgWikidata,
     WikidataAssociationDialog,
     SvgSearchForLink,
-    SvgFixMissSpells,
     LinkNoteDialog,
     SvgCog,
     NoteDeleteButton,

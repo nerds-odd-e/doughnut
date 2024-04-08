@@ -31,10 +31,6 @@ public class MakeMeWithoutDB {
     return new UploadedPictureBuilder();
   }
 
-  public UploadedAudioBuilder anUploadedAudio() {
-    return new UploadedAudioBuilder();
-  }
-
   public WikidataEntityJsonBuilder wikidataEntityJson() {
     return new WikidataEntityJsonBuilder();
   }

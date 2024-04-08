@@ -12,11 +12,6 @@
         v-model="creationData.topicConstructor"
         :errors="noteFormErrors.topicConstructor"
       />
-      <NoteFormContentOnly
-        v-if="extractnote === 'true'"
-        v-model="myContent"
-        :errors="noteFormErrors.topicConstructor"
-      />
       <SuggestTopic
         :original-topic="creationData.topicConstructor"
         :suggested-topic="suggestedTopic"
@@ -46,7 +41,6 @@
 import { defineComponent, PropType } from "vue";
 import { NoteCreationDTO, WikidataSearchEntity } from "@/generated/backend";
 import NoteFormTopicOnly from "./NoteFormTopicOnly.vue";
-import NoteFormContentOnly from "./NoteFormContentOnly.vue";
 import SearchResults from "../search/SearchResults.vue";
 import LinkTypeSelectCompact from "../links/LinkTypeSelectCompact.vue";
 import WikidataSearchByLabel from "./WikidataSearchByLabel.vue";
@@ -56,7 +50,6 @@ import SuggestTopic from "./SuggestTopic.vue";
 export default defineComponent({
   components: {
     NoteFormTopicOnly,
-    NoteFormContentOnly,
     SearchResults,
     LinkTypeSelectCompact,
     WikidataSearchByLabel,
@@ -68,21 +61,14 @@ export default defineComponent({
       type: Object as PropType<StorageAccessor>,
       required: true,
     },
-    extractnote: {
-      type: String,
-      required: false,
-    },
   },
   emits: ["closeDialog"],
   data() {
-    const selectedContent = sessionStorage.getItem("selectedContent") || "";
     return {
-      myContent: selectedContent,
       creationData: <NoteCreationDTO>{
         linkTypeToParent: "no link",
         topicConstructor: "",
         wikidataId: "",
-        details: "",
       },
       noteFormErrors: {
         linkTypeToParent: undefined,
@@ -99,22 +85,6 @@ export default defineComponent({
       this.processing = true;
       this.noteFormErrors.wikidataId = undefined;
       this.noteFormErrors.topicConstructor = undefined;
-      this.creationData.details = this.myContent;
-      if (this.extractnote === "true") {
-        this.storageAccessor
-          .storedApi()
-          .extractNote(this.$router, this.parentId, this.creationData)
-          .then(() => {
-            this.$emit("closeDialog");
-          })
-          .catch((res) => {
-            this.noteFormErrors = res;
-          })
-          .finally(() => {
-            this.processing = false;
-          });
-        return;
-      }
       this.storageAccessor
         .storedApi()
         .createNote(this.$router, this.parentId, this.creationData)

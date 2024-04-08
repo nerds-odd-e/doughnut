@@ -22,29 +22,6 @@ export class RestNoteControllerService {
      * @returns NoteRealm OK
      * @throws ApiError
      */
-    public extractNote(
-        parentNote: number,
-        requestBody: NoteCreationDTO,
-    ): CancelablePromise<NoteRealm> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/notes/{parentNote}/extract',
-            path: {
-                'parentNote': parentNote,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param parentNote
-     * @param requestBody
-     * @returns NoteRealm OK
-     * @throws ApiError
-     */
     public createNote(
         parentNote: number,
         requestBody: NoteCreationDTO,
@@ -136,25 +113,6 @@ export class RestNoteControllerService {
      * @returns NoteRealm OK
      * @throws ApiError
      */
-    public fixMissSpells(
-        note: number,
-    ): CancelablePromise<NoteRealm> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/notes/{note}/fix-miss-spells',
-            path: {
-                'note': note,
-            },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param note
-     * @returns NoteRealm OK
-     * @throws ApiError
-     */
     public deleteNote(
         note: number,
     ): CancelablePromise<Array<NoteRealm>> {
@@ -182,19 +140,6 @@ export class RestNoteControllerService {
             url: '/api/notes/search',
             body: requestBody,
             mediaType: 'application/json',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @returns NoteRealm OK
-     * @throws ApiError
-     */
-    public convertSrTtoText(): CancelablePromise<NoteRealm> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/notes/convert-srt-to-text',
             errors: {
                 500: `Internal Server Error`,
             },

@@ -1,31 +1,15 @@
 <template>
-  <InputWithType v-bind="{ scopeName, field, errors, accept, title }">
+  <InputWithType v-bind="{ scopeName, field, errors }">
     <input
       :class="`file-input-control form-control ${!!errors ? 'is-invalid' : ''}`"
       :id="`${scopeName}-${field}`"
       type="file"
-      :accept="`${accept}`"
       :name="field"
       @change="update($event.target.files[0])"
       :placeholder="placeholder"
       :autofocus="autofocus"
       autocomplete="off"
       autocapitalize="off"
-      v-if="title !== undefined"
-      :title="`${title}`"
-    />
-    <input
-      :class="`file-input-control form-control ${!!errors ? 'is-invalid' : ''}`"
-      :id="`${scopeName}-${field}`"
-      type="file"
-      :accept="`${accept}`"
-      :name="field"
-      @change="update($event.target.files[0])"
-      :placeholder="placeholder"
-      :autofocus="autofocus"
-      autocomplete="off"
-      autocapitalize="off"
-      v-else
     />
   </InputWithType>
 </template>
@@ -38,8 +22,6 @@ export default {
     modelValue: String,
     scopeName: String,
     field: String,
-    accept: { type: String, default: "*" },
-    title: { type: String, default: undefined },
     placeholder: { type: String, default: null },
     autofocus: { type: Boolean, default: false },
     errors: Object,

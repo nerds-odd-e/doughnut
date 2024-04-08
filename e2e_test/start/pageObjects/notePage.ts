@@ -48,11 +48,6 @@ export const assumeNotePage = (noteTopic?: string) => {
       this.toolbarButton("Add Child Note").click()
       return noteCreationForm
     },
-    extractChildNote() {
-      cy.pageIsNotLoading()
-      this.toolbarButton("Extract Child Note").click()
-      return noteCreationForm
-    },
     addingSiblingNote() {
       cy.pageIsNotLoading()
       this.toolbarButton("Add Sibling Note").click()

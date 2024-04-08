@@ -27,8 +27,6 @@ public class NoteAccessoriesDTO {
 
   @Getter @Setter private MultipartFile uploadPictureProxy;
 
-  @Getter @Setter private MultipartFile attachAudioProxy;
-
   public Image fetchUploadedPicture(User user) throws IOException {
     MultipartFile file = getUploadPictureProxy();
     if (file != null && !file.isEmpty()) {

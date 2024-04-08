@@ -5,7 +5,10 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 
-import com.odde.doughnut.controllers.dto.*;
+import com.odde.doughnut.controllers.dto.NoteAccessoriesDTO;
+import com.odde.doughnut.controllers.dto.NoteCreationDTO;
+import com.odde.doughnut.controllers.dto.NoteRealm;
+import com.odde.doughnut.controllers.dto.WikidataAssociationCreation;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -402,44 +405,6 @@ class RestNoteControllerTests {
   }
 
   @Nested
-  class attachAudioNoteTest {
-    Note note;
-    NoteAccessoriesDTO noteAccessoriesDTO = new NoteAccessoriesDTO();
-
-    @BeforeEach
-    void setup() {
-      note = makeMe.aNote("new").creatorAndOwner(userModel).please();
-    }
-
-    @Test
-    void shouldAttachAudioFile() throws UnexpectedNoAccessRightException, IOException {
-      noteAccessoriesDTO.setAttachAudioProxy(makeMe.anUploadedAudio().toMultiplePartFilePlease());
-      controller.updateNoteAccessories(note, noteAccessoriesDTO);
-    }
-  }
-
-  @Nested
-  class FixMissSpells {
-    Note note;
-    NoteAccessoriesDTO noteAccessoriesDTO = new NoteAccessoriesDTO();
-
-    @BeforeEach
-    void setup() {
-      note = makeMe.aNote("new").creatorAndOwner(userModel).please();
-    }
-
-    @Test
-    void shouldBeAbleToFixMissSpellsWhenValid()
-        throws UnexpectedNoAccessRightException, IOException {
-      Note note = makeMe.aNote().creatorAndOwner(userModel).please();
-      makeMe.refresh(userModel.getEntity());
-      final NoteRealm noteRealm = controller.fixMissSpells(note);
-      assertThat(noteRealm.getId(), equalTo(note.getId()));
-      assertThat(noteRealm.getNotePosition().getFromBazaar(), is(false));
-    }
-  }
-
-  @Nested
   class DeleteNoteTest {
     Note subject;
     Note parent;
@@ -588,93 +553,6 @@ class RestNoteControllerTests {
 
     private static Integer getLevel(Note link) {
       return link.getReviewSetting().getLevel();
-    }
-  }
-
-  @Nested
-  class convertSRTtoText {
-    Note note;
-
-    @BeforeEach
-    void setup() {
-      note = makeMe.aNote("SRT").creatorAndOwner(userModel).please();
-    }
-
-    @Test
-    public void shouldReturnErrorMessage() {
-      note.setDetails("");
-      BindException bindException =
-          assertThrows(BindException.class, () -> controller.convertSRTtoText(note));
-      assertThat(bindException.getMessage(), stringContainsInOrder("Input text is not srt format"));
-
-      note.setDetails(null);
-      bindException = assertThrows(BindException.class, () -> controller.convertSRTtoText(note));
-      assertThat(bindException.getMessage(), stringContainsInOrder("Input text is not srt format"));
-
-      note.setDetails("  ");
-      bindException = assertThrows(BindException.class, () -> controller.convertSRTtoText(note));
-      assertThat(bindException.getMessage(), stringContainsInOrder("Input text is not srt format"));
-
-      note.setDetails("\\n\\n\\t\\r\\n");
-      bindException = assertThrows(BindException.class, () -> controller.convertSRTtoText(note));
-      assertThat(bindException.getMessage(), stringContainsInOrder("Input text is not srt format"));
-
-      note.setDetails("this is normal text");
-      bindException = assertThrows(BindException.class, () -> controller.convertSRTtoText(note));
-      assertThat(bindException.getMessage(), stringContainsInOrder("Input text is not srt format"));
-
-      note.setDetails("this is normal text\nthis is normal text line 2");
-      bindException = assertThrows(BindException.class, () -> controller.convertSRTtoText(note));
-      assertThat(bindException.getMessage(), stringContainsInOrder("Input text is not srt format"));
-    }
-
-    @Test
-    public void shouldReturnTextFormatOneCase()
-        throws BindException, UnexpectedNoAccessRightException {
-      note.setDetails("1\n00:05:00,400 --> 00:05:15,300\nThis is an example of a subtitle.");
-      NoteRealm actual = controller.convertSRTtoText(note);
-      assertTrue(actual.getNote().getDetails().contains("This is an example of a subtitle."));
-    }
-
-    @Test
-    public void shouldReturnTextFormatNCase()
-        throws UnexpectedNoAccessRightException, BindException {
-      note.setDetails(
-          "1\n00:05:00,400 --> 00:05:15,300\nThis is an example of a subtitle.\n\n2\n00:06:00,400 --> 00:06:15,300\nThis is Second");
-      NoteRealm actual = controller.convertSRTtoText(note);
-      assertEquals(
-          "This is an example of a subtitle. This is Second", actual.getNote().getDetails());
-    }
-  }
-
-  @Nested
-  class ExtractNoteTest {
-
-    Note parent;
-    NoteCreationDTO noteCreation = new NoteCreationDTO();
-
-    @BeforeEach
-    void setup() {
-      parent = makeMe.aNote().creatorAndOwner(userModel).please();
-      noteCreation.setTopicConstructor("new title");
-      noteCreation.setDetails("details test");
-      noteCreation.setLinkTypeToParent(LinkType.NO_LINK);
-    }
-
-    @Test
-    void shouldBeAbleToExtractNoteWhenValid()
-        throws UnexpectedNoAccessRightException, BindException {
-      NoteRealm response = controller.extractNote(parent, noteCreation);
-      assertThat(response.getId(), not(nullValue()));
-      assertEquals("details test", response.getNote().getDetails());
-    }
-
-    @Test
-    void shouldBeAbleToExtractAThing() throws UnexpectedNoAccessRightException, BindException {
-      long beforeThingCount = makeMe.modelFactoryService.noteRepository.count();
-      controller.extractNote(parent, noteCreation);
-      long afterThingCount = makeMe.modelFactoryService.noteRepository.count();
-      assertThat(afterThingCount, equalTo(beforeThingCount + 1));
     }
   }
 }
