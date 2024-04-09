@@ -32,6 +32,7 @@ declare module 'vue' {
     FineTuningData: typeof import('./src/components/admin/FineTuningData.vue')['default']
     GlobalBar: typeof import('./src/components/toolbars/GlobalBar.vue')['default']
     GlobalSidebar: typeof import('./src/components/toolbars/GlobalSidebar.vue')['default']
+    ImageInput: typeof import('./src/components/form/ImageInput.vue')['default']
     InitialReview: typeof import('./src/components/review/InitialReview.vue')['default']
     InitialReviewButtons: typeof import('./src/components/review/InitialReviewButtons.vue')['default']
     InputWithType: typeof import('./src/components/form/InputWithType.vue')['default']
