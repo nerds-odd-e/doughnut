@@ -58,4 +58,5 @@ vscode:
     - GabrielBB.vscode-lombok
     - jnoortheen.nix-ide
     - unifiedjs.vscode-mdx
-    - ZixuanChen.vitest-explorer
+    - antfu.vite
+    - vitest.explorer
