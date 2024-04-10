@@ -25,7 +25,7 @@ env:
 
 jobs:
   Linting:
-    name: Backend + Frontend + Cypress Lint
+    name: Backend + Frontend + Cypress Static Code Analysis
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -36,6 +36,7 @@ jobs:
         with:
           node_version: ${{ vars.NODE_VERSION }}
           pnpm_version: ${{ vars.PNPM_VERSION }}
+      - run: bash -c ./assert_generated_type_script_up_to_date.sh
       - run: pnpm lint:all
 
   Backend-unit-tests:
@@ -69,7 +70,6 @@ jobs:
         with:
           node_version: ${{ vars.NODE_VERSION }}
           pnpm_version: ${{ vars.PNPM_VERSION }}
-      - run: bash -c ./assert_generated_type_script_up_to_date.sh
       - run: pnpm frontend:test
 
   Package-artifacts:
