@@ -137,6 +137,19 @@ To trigger the test DB migration manually, run `backend/gradlew migrateTestDB`.
 
 We chose Vue3 + Vite to build our frontend.
 
+The TypeScript code calling the backend services is generated from the backend code. Run
+
+```bash
+pnpm generateTypeScript
+```
+
+To do the code generation. There are two steps in this command:
+
+1. Generate openAPI docs from the backend service into `./open_api_docs.yaml`.
+2. Generate TypeScript interfaces from the openAPI docs, into `frontend/src/generated`.
+
+If the step 1 is not done, a unit test will fail. If the step 2 is not done, CI will fail (`./assert_generated_type_script_up_to_date.sh`).
+
 #### How-to
 
 ##### Run frontend unit tests (with Vitest)
