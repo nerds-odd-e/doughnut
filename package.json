@@ -21,7 +21,7 @@
     "frontend:sut": "pnpm --frozen-lockfile --silent recursive install && pnpm -C frontend dev",
     "backend:format": "backend/gradlew -p backend spotlessApply",
     "backend:lint": "backend/gradlew -p backend lint",
-    "backend:test": "backend/gradlew -p backend testDBMigrate -Dspring.profiles.active=test && backend/gradlew -p backend test --build-cache --parallel",
+    "backend:test": "backend/gradlew -p backend migrateTestDB -Dspring.profiles.active=test && backend/gradlew -p backend test --build-cache --parallel",
     "backend:build": "backend/gradlew -p backend build -x test --build-cache --parallel",
     "backend:prod_build": "backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel",
     "generateTypeScript": "pnpx openapi-typescript-codegen -i ./open_api_docs.yaml -o ./frontend/src/generated/backend -c fetch --name DoughnutApi ",

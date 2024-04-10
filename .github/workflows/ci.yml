@@ -55,7 +55,7 @@ jobs:
       - uses: ./.github/setup_jdk_with_cache
         with:
           java_version: ${{ vars.JAVA_VERSION }}
-      - run: backend/gradlew -p backend testDBMigrate -Dspring.profiles.active=test
+      - run: backend/gradlew -p backend migrateTestDB -Dspring.profiles.active=test
       - run: backend/gradlew -p backend test -Dspring.profiles.active=test --parallel
 
   Frontend-unit-tests:
