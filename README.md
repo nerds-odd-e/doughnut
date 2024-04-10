@@ -112,7 +112,7 @@ For MS Windows WSL2 users:
 | Start only the Cypress IDE            | `pnpm cy:open` (starts Cypress IDE ONLY)                                                                                                        |
 | Run all e2e test                      | `pnpm t` (compile frontend assets, start backend SUT, mountebank virtual service provider & cypress headless e2e testing)                       |
 | Run cypress IDE                       | `pnpm test:open` (starts frontend SUT in HMR mode, backend SUT, mountebank virtual service provider & cypress IDE)                              |
-| Generate TypeScript Interfaces        | `pnpm generateTypeScript` (Generate TypeScript Interfaces from backend JSON classes. Should run manually every time backend JSON class changes) |
+| Generate TypeScript Interfaces        | `pnpm generateTypeScript` (Generate TypeScript Interfaces from backend JSON classes. Should run manually every time backend service changes) |
 
 #### Structure
 

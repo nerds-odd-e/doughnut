@@ -24,8 +24,9 @@ class OpenApiDocsTests {
     //
     // This test compares the current OpenAPI documentation with the approved 'true copy'.
     // If the current documentation does not match the 'true copy', the test will fail.
-    // If the changes are intended, copy the current documentation over the 'true copy' and rerun
-    // the test.
+    // If the changes are intended, run command:
+    //    pnpm generateTypeScript
+    // to regenerate the 'true copy' openAPI docs and then the TypeScript code based on it.
     //
     // In case the generated OpenAPI documentation contains entity fields in random order,
     // use @JsonPropertyOrder annotation in the entity class to specify the order of the fields.
