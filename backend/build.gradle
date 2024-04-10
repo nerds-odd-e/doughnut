@@ -60,18 +60,6 @@ test {
   }
 }
 
-tasks.register("testDBMigrate") {
-  group = "application"
-  description = "Runs DB mirgration for test profile"
-  doFirst {
-    tasks.bootRun.configure {
-      systemProperty("spring.profiles.active", "test")
-      systemProperty("odd-e.doughnut.task", "testDBMigrate")
-    }
-  }
-  finalizedBy("bootRun")
-}
-
 tasks.register("bootRunE2E") {
   group = "application"
   description = "Runs Doughnut SpringBoot application in e2e profile"
@@ -94,4 +82,24 @@ spotless {
 
 tasks.register("lint") {
   dependsOn spotlessCheck
+}
+
+def configureSpringBootTask = { task, description, taskName ->
+  task.group = 'application'
+  task.description = description
+  task.classpath = sourceSets.main.runtimeClasspath
+  task.mainClass = 'com.odde.doughnut.DoughnutApplication'
+  task.systemProperty("spring.profiles.active", "test")
+  task.args = ['--server.port=0'] // Using 0 will let Spring Boot pick a random available port
+  task.systemProperty("odd-e.doughnut.task", taskName)
+}
+
+// Register and configure the migrateTestDB task
+tasks.register("migrateTestDB", JavaExec) {
+  configureSpringBootTask(delegate, "Runs DB migration for test profile", "migrateTestDB")
+}
+
+// Register and configure the generateOpenAPIDocs task
+tasks.register('generateOpenAPIDocs', JavaExec) {
+  configureSpringBootTask(delegate, 'Generate OpenAPI documentation', "generateOpenAPIDocs")
 }
