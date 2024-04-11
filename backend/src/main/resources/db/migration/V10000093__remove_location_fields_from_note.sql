@@ -1,2 +1,0 @@
-ALTER TABLE note DROP COLUMN latitude;
-ALTER TABLE note DROP COLUMN longitude;

@@ -1,3 +1,0 @@
-ALTER TABLE note DROP COLUMN title;
-ALTER TABLE note DROP COLUMN description;
-ALTER TABLE note DROP COLUMN updated_at;
