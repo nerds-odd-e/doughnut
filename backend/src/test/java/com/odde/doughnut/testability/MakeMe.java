@@ -121,4 +121,8 @@ public class MakeMe extends MakeMeWithoutDB {
   public SuggestedQuestionForFineTuningBuilder aQuestionSuggestionForFineTunining() {
     return new SuggestedQuestionForFineTuningBuilder(this);
   }
+
+  public AudioBuilder anAudio() {
+    return new AudioBuilder(new Audio(), this);
+  }
 }
