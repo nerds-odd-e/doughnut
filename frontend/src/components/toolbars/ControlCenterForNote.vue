@@ -25,10 +25,10 @@
           <SvgEdit />
         </template>
         <template #default="{ closer }">
-        <NoteEditUploadAudioDialog
-          v-bind="{ note, storageAccessor }"
-          @close-dialog="closer"
-        />
+          <NoteEditUploadAudioDialog
+            v-bind="{ note, storageAccessor }"
+            @close-dialog="closer"
+          />
         </template>
       </PopButton>
 

@@ -9,18 +9,17 @@
       $emit('update:modelValue', { ...modelValue, uploadPictureProxy: $event })
     "
   />
-
-
 </template>
 
 <script lang="ts">
 import { PropType, defineComponent } from "vue";
+import { NoteAccessories } from "@/generated/backend";
 import AudioFileInput from "../form/AudioFileInput.vue";
 
 export default defineComponent({
   props: {
     modelValue: {
-      type: Object as PropType<any>,
+      type: Object as PropType<NoteAccessories>,
       required: true,
     },
     errors: {

@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { Note,  } from "@/generated/backend";
+import { Note, NoteAccessories } from "@/generated/backend";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import NoteUploadAudioForm from "./NoteUploadAudioForm.vue";
 
@@ -30,14 +30,14 @@ export default defineComponent({
   data() {
     const { ...rest } = this.note.noteAccessories;
     return {
-      formData: rest as {},
+      formData: rest as NoteAccessories,
       noteFormErrors: {},
     };
   },
 
   methods: {
     processForm() {
-      console.log('[DATA]', this.formData)
+      console.log("[DATA]", this.formData);
     },
   },
 });
