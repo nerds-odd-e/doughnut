@@ -47,7 +47,7 @@ run `sudo dpkg-reconfigure dash` and answer "No" to reconfigure to `bash` as def
 
 :window: **WSL2 with WSLg**:
 ##### [Additional things to note for Microsoft Windows10/Windows11 developers using WSL2g with Ubuntu-23.04.](./docs/wsl2.md)
-##### :warning: DO NOT CLONE doughnut source to a MS Windows direction!!! Instead, in your WSL2 session, `cd ~` then `git clone git@github.com:nerds-odd-e/doughnut.git`
+##### :warning: DO NOT CLONE doughnut source to a MS Windows directory (e.g. `/mnt/c/`)!!! Instead, in your WSL2 session, `cd ~` then `git clone git@github.com:nerds-odd-e/doughnut.git`
 
 :warning: Nix and [sdkman](https://sdkman.io/) don't play very well together. A simple way around is to move or rename `~/.sdkman` dir and comment out sdkman related config in `~/.<SHELL>rc`.
 

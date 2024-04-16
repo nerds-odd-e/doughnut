@@ -1,5 +1,7 @@
 # WSL2 development environment setup
 
+### :warning: DO NOT CLONE doughnut source to a MS Windows directory (e.g. `/mnt/c/`)!!! Instead, in your WSL2 session, `cd ~` then `git clone git@github.com:nerds-odd-e/doughnut.git`
+
 ### 1. Ensure you install WSL2g with Ubuntu-23.04 from official Microsoft Store
 
 Follow this [youtube video tutorial on how to install WSL2 with WSLg](https://www.youtube.com/watch?v=FQ6ahcJOVz0) (Linux GUI enabled in WSL2) so you can run cypress in `cypress:open` mode.
