@@ -406,11 +406,20 @@ class RestNoteControllerTests {
     }
 
     @Test
-    void shouldBeReturnSameFileNameAsTheUploadedFile()
-        throws UnexpectedNoAccessRightException, IOException {
+    void shouldReturnSameFileNameAsTheUploadedFile()
+      throws Exception {
       MultipartFile multipartFile = new MockMultipartFile("podcast.mp3", new byte[] {});
       String fileName = controller.upload(note, multipartFile);
       assertEquals(fileName, multipartFile.getOriginalFilename());
+    }
+
+    @Test
+    void shouldFailOnInvalidAudioFileFormat()
+      throws UnexpectedNoAccessRightException, IOException {
+      MultipartFile multipartFile = new MockMultipartFile("something.txt", new byte[] {});
+      assertThrows (Exception.class, () -> {
+        controller.upload(note, multipartFile);
+      });
     }
   }
 
