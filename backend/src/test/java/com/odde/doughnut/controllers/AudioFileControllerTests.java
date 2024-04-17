@@ -48,7 +48,7 @@ class AudioFileControllerTests {
   @Test
   void convertAudioToSRT() {
     MockMultipartFile mockFile =
-        new MockMultipartFile("file", "test.mp4", "text/plain", "test".getBytes());
+        new MockMultipartFile("file", "test.mp3", "text/plain", "test".getBytes());
     ResponseEntity<String> resp = controller.convertAudioToSRT(mockFile);
     assertThat(resp.getStatusCode(), equalTo(HttpStatus.OK));
     assertThat(resp.getBody(), equalTo("test"));

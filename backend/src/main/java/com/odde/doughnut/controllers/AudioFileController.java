@@ -30,7 +30,7 @@ public class AudioFileController {
         .body(audioBlobRepository.findById(audio.getAudioBlobId()).get().getData());
   }
 
-  public ResponseEntity<String> convertAudioToSRT(MultipartFile mockFile) {
+  public ResponseEntity<String> convertAudioToSRT(MultipartFile audioFile) {
     return ResponseEntity.ok("test");
   }
 }
