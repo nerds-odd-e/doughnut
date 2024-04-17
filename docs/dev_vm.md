@@ -8,11 +8,13 @@
 6. Run `cd ~/doughnut && nix develop`
 7. Run `pnpm test`. This will run all end-to-end tests in headless mode. 
 8. Setup GitHub Personal Access Token (since the doughnut repo is cloned via HTTPS).
-  * Go to your GitHub settings.
-  * Click on "Developer settings."
-  * Select "Personal access tokens."
+  * Go to your GitHub settings
+  * Click on "Developer settings"
+  * Select "Personal access tokens"
   * Click on "Generate new token (classic)"
-  * Give your token a descriptive name, select the "repo" scope, and click "Generate token."
-  * Important: Make sure to copy your new personal access token. You won’t be able to see it again!
-  * run `git config --global credential.helper cache` 
-  * Each time you are prompted for a username and password, use your GitHub username and the personal access token, respectively.
+  * Give your token a descriptive name
+  * Select the "repo" scope, and click "Generate token."
+  * **Important:** Make sure to copy your new personal access token. You won’t be able to see it again!
+  * run `git config --global credential.helper cache`
+  * Each time you're prompted for a username and password, use your GitHub username and the personal access token, respectively.
+
