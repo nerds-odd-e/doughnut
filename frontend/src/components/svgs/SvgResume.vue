@@ -1,5 +1,7 @@
 <template>
   <svg
+    width="20px"
+    height="20px"
     version="1.1"
     id="Layer_1"
     xmlns="http://www.w3.org/2000/svg"
@@ -11,7 +13,7 @@
     xml:space="preserve"
   >
     <g>
-      <circle cx="243" cy="243" r="243" fill="rgba(50, 150, 50, 0.8)"></circle>
+      <circle cx="243" cy="243" r="243" fill="black"></circle>
       <polygon
         points="181.062,336.575 343.938,242.5 181.062,148.425 	"
         fill="white"

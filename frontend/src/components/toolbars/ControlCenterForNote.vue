@@ -22,7 +22,7 @@
 
       <PopButton v-if="isTesting" title="Upload audio">
         <template #button_face>
-          <SvgEdit />
+          <SvgResume />
         </template>
         <template #default="{ closer }">
           <NoteEditUploadAudioDialog
@@ -103,6 +103,7 @@ import NoteDeleteButton from "./NoteDeleteButton.vue";
 import PopButton from "../commons/Popups/PopButton.vue";
 import AIGenerateImageDialog from "../notes/AIGenerateImageDialog.vue";
 import NoteDetailsAutoCompletionButton from "./NoteDetailsAutoCompletionButton.vue";
+import SvgResume from "../svgs/SvgResume.vue";
 
 export default defineComponent({
   props: {
@@ -126,6 +127,7 @@ export default defineComponent({
     SvgSearchForLink,
     LinkNoteDialog,
     SvgCog,
+    SvgResume,
     NoteDeleteButton,
     PopButton,
     AIGenerateImageDialog,

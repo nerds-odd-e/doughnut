@@ -20,8 +20,8 @@ Feature: Note Upload Audio File
 
     Scenario: Upload audio into a note
 #        Given I have an audio file named "podcast.mp3"
-        When I upload "podcast.mp3" to note "lunar"
-        Then I must be able to download the "podcast.mp3" from the note
+        When I upload an audio-file "harvard.wav" to the note "lunar"
+        Then I must be able to download the "harvard.wav" from the note "lunar"
 
     Scenario: Upload audio into a note with big file size
         Given I have a 2 GB audio file named "big_podcast.mp3"
