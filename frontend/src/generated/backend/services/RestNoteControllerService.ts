@@ -208,6 +208,31 @@ export class RestNoteControllerService {
     }
     /**
      * @param note
+     * @param formData
+     * @returns string OK
+     * @throws ApiError
+     */
+    public upload(
+        note: number,
+        formData?: {
+            file: Blob;
+        },
+    ): CancelablePromise<string> {
+        return this.httpRequest.request({
+            method: 'PATCH',
+            url: '/api/notes/{note}/audio',
+            path: {
+                'note': note,
+            },
+            formData: formData,
+            mediaType: 'multipart/form-data',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param note
      * @returns NotePositionViewedByUser OK
      * @throws ApiError
      */
