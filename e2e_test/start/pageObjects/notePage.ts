@@ -38,7 +38,7 @@ export const assumeNotePage = (noteTopic?: string) => {
       return this.toolbarButton("edit note")
     },
     editAudioButton() {
-      return this.toolbarButton("edit audio")
+      return this.toolbarButton("Upload audio")
     },
     updateNoteAccessories(attributes: Record<string, string>) {
       this.editNoteButton().click().submitWith(attributes)

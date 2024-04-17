@@ -65,6 +65,19 @@ When("I upload an audio-file {string} to the note {string}", (fileName: string, 
   cy.openAndSubmitNoteAudioFormWith(noteTopic, fileName)
 })
 
+When("I convert the audio-file to SRT without saving", () => {
+  assert.fail("not implemented");
+})
+
+
+When("I save and convert the audio-file to SRT", () => {
+  assert.fail("not implemented");
+})
+
+Then("I should see the extracted SRT content", () => {
+  assert.fail("not implemented");
+})
+
 When(
   "I should see note {string} has a picture and a url {string}",
   (noteTopic: string, expectedUrl: string) => {
