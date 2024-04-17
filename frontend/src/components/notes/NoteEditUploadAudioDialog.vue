@@ -6,6 +6,12 @@
       :errors="noteFormErrors"
     />
     <input type="submit" value="Submit" class="btn btn-primary" />
+    <input
+      type="submit"
+      value="Convert Only"
+      class="btn btn-primary"
+      id="note-convertOnly"
+    />
   </form>
 </template>
 
