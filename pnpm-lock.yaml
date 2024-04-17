@@ -148,8 +148,8 @@ importers:
         specifier: 2.0.1
         version: 2.0.1(vue@3.4.23)
       vue-router:
-        specifier: 4.3.0
-        version: 4.3.0(vue@3.4.23)
+        specifier: 4.3.1
+        version: 4.3.1(vue@3.4.23)
     devDependencies:
       '@testing-library/vue':
         specifier: ^8.0.3
@@ -8715,8 +8715,8 @@ packages:
       - supports-color
     dev: true
 
-  /vue-router@4.3.0(vue@3.4.23):
-    resolution: {integrity: sha512-dqUcs8tUeG+ssgWhcPbjHvazML16Oga5w34uCUmsk7i0BcnskoLGwjpa15fqMr2Fa5JgVBrdL2MEgqz6XZ/6IQ==}
+  /vue-router@4.3.1(vue@3.4.23):
+    resolution: {integrity: sha512-D0h3oyP6vp28BOvxv2hVpiqFTjTJizCf1BuMmCibc8UW0Ll/N80SWqDd/hqPMaZfzW1j+s2s+aTRyBIP9ElzOw==}
     peerDependencies:
       vue: ^3.2.0
     dependencies:
