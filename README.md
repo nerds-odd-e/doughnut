@@ -134,7 +134,7 @@ You can find the database migrations in `backend/src/main/resources/db.migration
 The migrations are run automatically when the backend app starts up.
 It will also run the migrations for test when you run `pnpm backend:test`.
 To trigger the test DB migration manually, run `backend/gradlew migrateTestDB`.
-To connect to the local DB: `mysql --socket=./mysql/mysql/mysql.sock -u doughnut -p` (password=doughnut).
+To connect to the local DB: `mysql -S $MYSQL_HOME/mysql.sock -u doughnut -p` (password=doughnut).
 
 
 ### 6. Vue3 web-app frontend
