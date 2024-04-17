@@ -49,7 +49,7 @@ class AudioFileControllerTests {
   void convertAudioToSRT() {
     MockMultipartFile mockFile =
         new MockMultipartFile("file", "test.mp3", "text/plain", "test".getBytes());
-    ResponseEntity<String> resp = controller.convertAudioToSRT(mockFile);
+    ResponseEntity<String> resp = controller.upload(mockFile, true);
     assertThat(resp.getStatusCode(), equalTo(HttpStatus.OK));
     assertThat(resp.getBody(), equalTo("test"));
   }

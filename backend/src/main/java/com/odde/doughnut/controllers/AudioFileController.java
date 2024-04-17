@@ -6,9 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @Controller
@@ -30,7 +28,9 @@ public class AudioFileController {
         .body(audioBlobRepository.findById(audio.getAudioBlobId()).get().getData());
   }
 
-  public ResponseEntity<String> convertAudioToSRT(MultipartFile audioFile) {
+  @PostMapping()
+  public ResponseEntity<String> upload(@RequestBody MultipartFile audioFile,
+                                       @PathVariable("convert") Boolean toConvert) {
     return ResponseEntity.ok("test");
   }
 }
