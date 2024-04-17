@@ -15,7 +15,6 @@ export type Note = {
     createdAt: string;
     readonly deletedAt?: string;
     wikidataId?: string;
-    noteAudio?: string;
     pictureWithMask?: PictureWithMask;
 };
 

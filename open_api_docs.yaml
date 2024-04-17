@@ -2352,8 +2352,6 @@ components:
           readOnly: true
         wikidataId:
           type: string
-        noteAudio:
-          type: string
         pictureWithMask:
           $ref: '#/components/schemas/PictureWithMask'
     NoteAccessories:
@@ -2662,8 +2660,6 @@ components:
           format: date-time
           readOnly: true
         wikidataId:
-          type: string
-        noteAudio:
           type: string
         pictureWithMask:
           $ref: '#/components/schemas/PictureWithMask'

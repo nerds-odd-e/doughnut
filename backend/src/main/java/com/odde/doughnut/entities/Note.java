@@ -371,8 +371,4 @@ The note of current focus (in JSON format):
     result.setNote(this);
     return result;
   }
-
-  public Optional<String> getNoteAudio() {
-    return getNoteAccessories().getNoteAudio();
-  }
 }
