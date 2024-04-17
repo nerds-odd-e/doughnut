@@ -20,6 +20,8 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.odde.doughnut.testability.TestabilitySettings;
 import jakarta.validation.Valid;
+
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.sql.Timestamp;
@@ -34,9 +36,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
+import org.springframework.web.multipart.MultipartFile;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -401,6 +405,13 @@ class RestNoteControllerTests {
       makeMe.theNote(note).withUploadedPicture();
       controller.updateNoteAccessories(note, noteAccessoriesDTO);
       assertThat(note.getNoteAccessories().getUploadPicture(), is(not(nullValue())));
+    }
+
+    @Test
+    void shouldBeReturnSameFileNameAsTheUploadedFile() throws UnexpectedNoAccessRightException, IOException {
+      MultipartFile multipartFile = new MockMultipartFile("podcast.mp3", new byte[]{});
+      String fileName = controller.upload(note, multipartFile);
+      assertEquals(fileName, multipartFile.getOriginalFilename());
     }
   }
 
