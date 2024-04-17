@@ -4,7 +4,7 @@
     field="uploadAudioFile"
     placeholder="Optional. upload own picture."
     :errors="errors.uploadAudioFileProxy"
-    :model-value="modelValue.uploadAudioFileProxy"
+    :model-value="modelValue.uploadPictureProxy"
     @update:model-value="
       $emit('update:modelValue', { ...modelValue, uploadPictureProxy: $event })
     "
@@ -13,13 +13,13 @@
 
 <script lang="ts">
 import { PropType, defineComponent } from "vue";
-import { NoteAccessories } from "@/generated/backend";
+import { NoteAccessoriesDTO } from "@/generated/backend";
 import AudioFileInput from "../form/AudioFileInput.vue";
 
 export default defineComponent({
   props: {
     modelValue: {
-      type: Object as PropType<NoteAccessories>,
+      type: Object as PropType<NoteAccessoriesDTO>,
       required: true,
     },
     errors: {
