@@ -34,13 +34,13 @@ class AudioFileControllerTests {
   @Test
   void getContent() {
     Audio audio = makeMe.anAudio().please();
-       makeMe.refresh(audio);
-       assertNotNull(audio);
-       ResponseEntity<byte[]> resp = controller.show(audio, "filename");
-       assertThat(resp.getStatusCode(), equalTo(HttpStatus.OK));
-       assertThat(resp.getHeaders().getContentType().toString(), equalTo("audio/mp3"));
-       assertThat(
-           resp.getHeaders().getContentDisposition().toString(),
-           equalTo("inline; filename=\"example.mp3\""));
+    makeMe.refresh(audio);
+    assertNotNull(audio);
+    ResponseEntity<byte[]> resp = controller.show(audio, "filename");
+    assertThat(resp.getStatusCode(), equalTo(HttpStatus.OK));
+    assertThat(resp.getHeaders().getContentType().toString(), equalTo("audio/mp3"));
+    assertThat(
+        resp.getHeaders().getContentDisposition().toString(),
+        equalTo("inline; filename=\"example.mp3\""));
   }
 }
