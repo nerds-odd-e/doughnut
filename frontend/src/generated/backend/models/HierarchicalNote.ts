@@ -16,5 +16,6 @@ export type HierarchicalNote = {
     readonly deletedAt?: string;
     wikidataId?: string;
     pictureWithMask?: PictureWithMask;
+    noteAudio?: string;
 };
 

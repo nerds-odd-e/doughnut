@@ -46,4 +46,19 @@ public class NoteAccessories {
     if (Strings.isBlank(pictureUrl)) return Optional.empty();
     return Optional.of(pictureUrl);
   }
+
+  @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  @JoinColumn(name = "audio_id", referencedColumnName = "id")
+  @JsonIgnore
+  @Getter
+  @Setter
+  private Audio uploadAudio;
+
+  @JsonIgnore
+  public Optional<String> getNoteAudio() {
+    if (uploadAudio != null) {
+      return Optional.of("/audio/" + uploadAudio.getId() + "/" + uploadAudio.getName());
+    }
+    return null;
+  }
 }

@@ -2290,6 +2290,8 @@ components:
           type: string
         pictureWithMask:
           $ref: '#/components/schemas/PictureWithMask'
+        noteAudio:
+          type: string
     NoteAccessories:
       type: object
       properties:
@@ -2599,6 +2601,8 @@ components:
           type: string
         pictureWithMask:
           $ref: '#/components/schemas/PictureWithMask'
+        noteAudio:
+          type: string
     LinkViewed:
       required:
       - direct
