@@ -26,7 +26,7 @@ export class RestFailureReportControllerService {
      * @returns FailureReportForView OK
      * @throws ApiError
      */
-    public show2(
+    public show3(
         failureReport: FailureReport,
     ): CancelablePromise<FailureReportForView> {
         return this.httpRequest.request({
