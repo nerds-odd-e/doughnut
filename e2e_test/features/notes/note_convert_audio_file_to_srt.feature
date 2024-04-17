@@ -15,5 +15,4 @@ Feature: Note Convert Audio File to SRT
     When I upload an audio-file "harvard.wav" to the note "podcast"
     And I save and convert the audio-file to SRT
     Then I should see the extracted SRT content
-    And the audio-file should be attached to the note "podcast"
-
+    And I must be able to download the "harvard.wav" from the note
