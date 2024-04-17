@@ -29,8 +29,8 @@ public class AudioFileController {
   }
 
   @PostMapping()
-  public ResponseEntity<String> upload(@RequestBody MultipartFile audioFile,
-                                       @PathVariable("convert") Boolean toConvert) {
+  public ResponseEntity<String> upload(
+      @RequestBody MultipartFile audioFile, @PathVariable("convert") Boolean toConvert) {
     return ResponseEntity.ok("test");
   }
 }
