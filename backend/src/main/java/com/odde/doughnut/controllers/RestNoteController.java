@@ -129,9 +129,10 @@ class RestNoteController {
   public String upload(
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @RequestParam("file") MultipartFile file)
-    throws Exception {
+      throws Exception {
     String filename = file.getOriginalFilename();
-    if(!filename.endsWith("mp3")) {
+    System.out.println(filename);
+    if (!(filename.endsWith(".mp3") || filename.endsWith(".m4a") || filename.endsWith(".wav"))) {
       throw new Exception("Invalid format");
     }
     return filename;

@@ -406,20 +406,49 @@ class RestNoteControllerTests {
     }
 
     @Test
-    void shouldReturnSameFileNameAsTheUploadedFile()
-      throws Exception {
-      MultipartFile multipartFile = new MockMultipartFile("podcast.mp3", new byte[] {});
+    void shouldReturnSameFileNameAsTheUploadedFileMp3() throws Exception {
+      String filename = "podcast.mp3";
+      MultipartFile multipartFile = new MockMultipartFile(filename, filename, null, new byte[] {});
       String fileName = controller.upload(note, multipartFile);
       assertEquals(fileName, multipartFile.getOriginalFilename());
     }
 
     @Test
-    void shouldFailOnInvalidAudioFileFormat()
-      throws UnexpectedNoAccessRightException, IOException {
+    void shouldReturnSameFileNameAsTheUploadedFileM4a() throws Exception {
+      String filename = "podcast.m4a";
+      MultipartFile multipartFile = new MockMultipartFile(filename, filename, null, new byte[] {});
+      String fileName = controller.upload(note, multipartFile);
+      assertEquals(fileName, multipartFile.getOriginalFilename());
+    }
+
+    @Test
+    void shouldReturnSameFileNameAsTheUploadedFileWav() throws Exception {
+      String filename = "podcast.wav";
+      MultipartFile multipartFile = new MockMultipartFile(filename, filename, null, new byte[] {});
+      String fileName = controller.upload(note, multipartFile);
+      assertEquals(fileName, multipartFile.getOriginalFilename());
+    }
+
+    @Test
+    void shouldFailOnInvalidAudioFileFormatTxt()
+        throws UnexpectedNoAccessRightException, IOException {
       MultipartFile multipartFile = new MockMultipartFile("something.txt", new byte[] {});
-      assertThrows (Exception.class, () -> {
-        controller.upload(note, multipartFile);
-      });
+      assertThrows(
+          Exception.class,
+          () -> {
+            controller.upload(note, multipartFile);
+          });
+    }
+
+    @Test
+    void shouldFailOnInvalidAudioFileFormatAvi()
+        throws UnexpectedNoAccessRightException, IOException {
+      MultipartFile multipartFile = new MockMultipartFile("youtube.avi", new byte[] {});
+      assertThrows(
+          Exception.class,
+          () -> {
+            controller.upload(note, multipartFile);
+          });
     }
   }
 

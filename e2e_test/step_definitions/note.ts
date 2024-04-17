@@ -60,25 +60,28 @@ When("I update note accessories of {string} to become:", (noteTopic: string, dat
   cy.openAndSubmitNoteAccessoriesFormWith(noteTopic, data.hashes()[0])
 })
 
-When("I upload an audio-file {string} to the note {string}", (fileName: string, noteTopic: string) => {
-  start.jumpToNotePage(noteTopic);
-  start.assumeNotePage().editAudioButton().click();
-  cy.get("#note-uploadAudioFile").attachFile(fileName);
-})
+When(
+  "I upload an audio-file {string} to the note {string}",
+  (fileName: string, noteTopic: string) => {
+    start.jumpToNotePage(noteTopic)
+    start.assumeNotePage().editAudioButton().click()
+    cy.get("#note-uploadAudioFile").attachFile(fileName)
+  },
+)
 
 When("I convert the audio-file to SRT without saving", () => {
-  cy.get("#note-convertToSrt").check();
-  cy.get("#note-convertOnly").click();
+  cy.get("#note-convertToSrt").check()
+  cy.get("#note-convertOnly").click()
 })
 
 When("I save and convert the audio-file to SRT", () => {
-  cy.get("#note-convertToSrt").check();
-  cy.get("#note-saveAndConvert").click();
+  cy.get("#note-convertToSrt").check()
+  cy.get("#note-saveAndConvert").click()
 })
 
 Then("I should see the extracted SRT content", () => {
-  cy.get("#note-convertedSrt").should("exist");
-  cy.get("#note-convertedSrt").should("not.be.empty");
+  cy.get("#note-convertedSrt").should("exist")
+  cy.get("#note-convertedSrt").should("not.be.empty")
 })
 
 When(
