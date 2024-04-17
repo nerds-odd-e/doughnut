@@ -37,7 +37,7 @@ export default defineComponent({
 
   methods: {
     processForm() {
-      console.log("[DATA]", this.formData);
+      return;
     },
   },
 });
