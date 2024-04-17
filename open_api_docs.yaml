@@ -2352,10 +2352,10 @@ components:
           readOnly: true
         wikidataId:
           type: string
-        noteAudio:
-          type: string
         pictureWithMask:
           $ref: '#/components/schemas/PictureWithMask'
+        noteAudio:
+          type: string
     NoteAccessories:
       type: object
       properties:
@@ -2663,10 +2663,10 @@ components:
           readOnly: true
         wikidataId:
           type: string
-        noteAudio:
-          type: string
         pictureWithMask:
           $ref: '#/components/schemas/PictureWithMask'
+        noteAudio:
+          type: string
     LinkViewed:
       required:
       - direct

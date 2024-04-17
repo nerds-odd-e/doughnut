@@ -150,7 +150,7 @@ export class RestNoteControllerService {
      * @returns NoteRealm OK
      * @throws ApiError
      */
-    public show2(
+    public show1(
         note: number,
     ): CancelablePromise<NoteRealm> {
         return this.httpRequest.request({
@@ -212,7 +212,7 @@ export class RestNoteControllerService {
      * @returns string OK
      * @throws ApiError
      */
-    public upload1(
+    public upload(
         note: number,
         formData?: {
             file: Blob;
