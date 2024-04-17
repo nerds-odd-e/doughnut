@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @SessionScope
@@ -119,6 +120,25 @@ class RestNoteController {
     note.setFromDTO(noteAccessoriesDTO, user);
     modelFactoryService.save(note);
     return new NoteViewer(user, note).toJsonObject();
+  }
+
+  @PatchMapping(
+    path = "/{note}/audio",
+    consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  @Transactional
+  public String upload(
+    @PathVariable(name = "note") @Schema(type = "integer") Note note,
+    @RequestParam("file") MultipartFile file)
+    //@Valid @ModelAttribute NoteAccessoriesDTO noteAccessoriesDTO)
+    throws UnexpectedNoAccessRightException, IOException {
+    //currentUser.assertAuthorization(note);
+
+    final User user = currentUser.getEntity();
+    //note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
+    //note.setFromDTO(noteAccessoriesDTO, user);
+    //modelFactoryService.save(note);
+    //return new NoteViewer(user, note).toJsonObject();
+    return file.getOriginalFilename();
   }
 
   @GetMapping("/{note}/note-info")
