@@ -20,8 +20,6 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.odde.doughnut.testability.TestabilitySettings;
 import jakarta.validation.Valid;
-
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.sql.Timestamp;
@@ -408,8 +406,9 @@ class RestNoteControllerTests {
     }
 
     @Test
-    void shouldBeReturnSameFileNameAsTheUploadedFile() throws UnexpectedNoAccessRightException, IOException {
-      MultipartFile multipartFile = new MockMultipartFile("podcast.mp3", new byte[]{});
+    void shouldBeReturnSameFileNameAsTheUploadedFile()
+        throws UnexpectedNoAccessRightException, IOException {
+      MultipartFile multipartFile = new MockMultipartFile("podcast.mp3", new byte[] {});
       String fileName = controller.upload(note, multipartFile);
       assertEquals(fileName, multipartFile.getOriginalFilename());
     }

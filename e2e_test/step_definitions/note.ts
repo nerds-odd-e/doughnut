@@ -60,27 +60,29 @@ When("I update note accessories of {string} to become:", (noteTopic: string, dat
   cy.openAndSubmitNoteAccessoriesFormWith(noteTopic, data.hashes()[0])
 })
 
-When("I upload an audio-file {string} to the note {string}", (fileName: string, noteTopic: string) => {
-  start.jumpToNotePage(noteTopic);
-  start.assumeNotePage().editAudioButton().click();
-  cy.get("#audio-file").attachFile(fileName);
-})
+When(
+  "I upload an audio-file {string} to the note {string}",
+  (fileName: string, noteTopic: string) => {
+    start.jumpToNotePage(noteTopic)
+    start.assumeNotePage().editAudioButton().click()
+    cy.get("#audio-file").attachFile(fileName)
+  },
+)
 
 When("I convert the audio-file to SRT without saving", () => {
-  assert.fail("not implemented");
+  assert.fail("not implemented")
   // check the convert to SRT checkbox
   // click the convert only button
 })
 
-
 When("I save and convert the audio-file to SRT", () => {
-  assert.fail("not implemented");
+  assert.fail("not implemented")
   // check the convert to SRT checkbox
   // click the convert & save button
 })
 
 Then("I should see the extracted SRT content", () => {
-  assert.fail("not implemented");
+  assert.fail("not implemented")
   // check if popup has opened
   // check if the SRT content is displayed in the popup
 })

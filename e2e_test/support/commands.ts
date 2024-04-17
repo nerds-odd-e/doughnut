@@ -80,7 +80,6 @@ Cypress.Commands.add(
   },
 )
 
-
 Cypress.Commands.add("clearFocusedText", () => {
   // cy.clear for now is an alias of cy.type('{selectall}{backspace}')
   // it doesn't clear the text sometimes.
