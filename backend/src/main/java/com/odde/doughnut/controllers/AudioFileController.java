@@ -1,9 +1,14 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.entities.Audio;
+import com.odde.doughnut.entities.Image;
 import com.odde.doughnut.entities.repositories.AudioBlobRepository;
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -15,15 +20,14 @@ public class AudioFileController {
     this.audioBlobRepository = audioBlobRepository;
   }
 
-  @GetMapping("/audio")
-  public ResponseEntity<byte[]> show() {
-    //     @PathVariable("image") @Schema(type = "integer") Image image,
-    //     @PathVariable("fileName") String filename) {
-    //   return ResponseEntity.ok()
-    //       .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + image.getName() +
-    // "\"")
-    //       .header(HttpHeaders.CONTENT_TYPE, image.getType())
-    //       .body(imageBlobRepository.findById(image.getImageBlobId()).get().getData());
-    return null;
+  @GetMapping("/{audio}/{fileName}")
+  public ResponseEntity<byte[]> show(
+    @PathVariable("audio") @Schema(type = "integer") Audio audio,
+    @PathVariable("fileName") String filename) {
+       return ResponseEntity.ok()
+           .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + audio.getName() +
+     "\"")
+           .header(HttpHeaders.CONTENT_TYPE, audio.getType())
+           .body(audioBlobRepository.findById(audio.getAudioBlobId()).get().getData());
   }
 }
