@@ -13,6 +13,7 @@
       id="note-convertOnly"
     />
   </form>
+  <textarea id="note-convertedSrt"></textarea>
 </template>
 
 <script lang="ts">

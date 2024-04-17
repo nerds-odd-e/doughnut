@@ -79,9 +79,8 @@ When("I save and convert the audio-file to SRT", () => {
   cy.get("#note-saveAndConvert").click()
 })
 
-Then("I should see the extracted SRT content", () => {
-  cy.get("#note-convertedSrt").should("exist")
-  cy.get("#note-convertedSrt").should("not.be.empty")
+Then("I should see the extracted SRT content {string}", (srtContent: string) => {
+  cy.get("textarea").should("have.value", srtContent)
 })
 
 When(
