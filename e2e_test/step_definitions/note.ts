@@ -69,6 +69,14 @@ When(
   },
 )
 
+Then(
+  "I must be able to download the {string} from the note {string}",
+  (fileName: string, noteTopic: string) => {
+    start.jumpToNotePage(noteTopic)
+    start.assumeNotePage().downloadAudioFile(fileName)
+  },
+)
+
 When("I convert the audio-file to SRT without saving", () => {
   cy.get("#note-convertToSrt").check()
   cy.get("#note-convertOnly").click()

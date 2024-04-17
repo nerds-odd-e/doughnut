@@ -9,6 +9,7 @@
     <slot name="topic-additional" />
   </div>
   <div role="details" class="note-content">
+    <button>Download harvard.wav</button>
     <NoteEditableDetails
       :note-id="note.id"
       :note-details="note.details"

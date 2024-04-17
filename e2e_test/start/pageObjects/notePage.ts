@@ -40,6 +40,18 @@ export const assumeNotePage = (noteTopic?: string) => {
     editAudioButton() {
       return this.toolbarButton("Upload audio")
     },
+    audioFileDownloadButton(fileName: string) {
+      const getButton = () => cy.findByRole("button", { name: `Download ${fileName}` })
+      return {
+        click: () => {
+          getButton().click()
+        },
+        shouldNotExist: () => getButton().should("not.exist"),
+      }
+    },
+    downloadAudioFile(fileName: string) {
+      this.audioFileDownloadButton(fileName).click()
+    },
     updateNoteAccessories(attributes: Record<string, string>) {
       this.editNoteButton().click().submitWith(attributes)
     },
