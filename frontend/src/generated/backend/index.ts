@@ -77,6 +77,7 @@ export type { WikidataAssociationCreation } from './models/WikidataAssociationCr
 export type { WikidataEntityData } from './models/WikidataEntityData';
 export type { WikidataSearchEntity } from './models/WikidataSearchEntity';
 
+export { AudioFileControllerService } from './services/AudioFileControllerService';
 export { RestAiControllerService } from './services/RestAiControllerService';
 export { RestBazaarControllerService } from './services/RestBazaarControllerService';
 export { RestCircleControllerService } from './services/RestCircleControllerService';

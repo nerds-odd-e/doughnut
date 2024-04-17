@@ -80,7 +80,7 @@ export class RestReviewPointControllerService {
      * @returns ReviewPoint OK
      * @throws ApiError
      */
-    public show(
+    public show1(
         reviewPoint: number,
     ): CancelablePromise<ReviewPoint> {
         return this.httpRequest.request({
