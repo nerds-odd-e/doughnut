@@ -9,9 +9,9 @@ const submittableForm = {
     cy.get('input[value="Submit"]').click()
   },
   submitWithAudio: (fileName: string) => {
-    cy.formField('audio').attachFile(fileName)
+    cy.formField("audio").attachFile(fileName)
     cy.get('input[value="Submit"]').click()
-  }
+  },
 }
 
 export default submittableForm

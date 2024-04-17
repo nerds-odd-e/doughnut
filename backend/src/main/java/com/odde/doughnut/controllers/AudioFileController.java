@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 @RequestMapping("/audio")
@@ -27,5 +28,9 @@ public class AudioFileController {
         .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + audio.getName() + "\"")
         .header(HttpHeaders.CONTENT_TYPE, audio.getType())
         .body(audioBlobRepository.findById(audio.getAudioBlobId()).get().getData());
+  }
+
+  public ResponseEntity<String> convertAudioToSRT(MultipartFile mockFile) {
+    return ResponseEntity.ok("test");
   }
 }

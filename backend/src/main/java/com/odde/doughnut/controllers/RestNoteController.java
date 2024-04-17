@@ -123,21 +123,21 @@ class RestNoteController {
   }
 
   @PatchMapping(
-    path = "/{note}/audio",
-    consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+      path = "/{note}/audio",
+      consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @Transactional
   public String upload(
-    @PathVariable(name = "note") @Schema(type = "integer") Note note,
-    @RequestParam("file") MultipartFile file)
-    //@Valid @ModelAttribute NoteAccessoriesDTO noteAccessoriesDTO)
-    throws UnexpectedNoAccessRightException, IOException {
-    //currentUser.assertAuthorization(note);
+      @PathVariable(name = "note") @Schema(type = "integer") Note note,
+      @RequestParam("file") MultipartFile file)
+      // @Valid @ModelAttribute NoteAccessoriesDTO noteAccessoriesDTO)
+      throws UnexpectedNoAccessRightException, IOException {
+    // currentUser.assertAuthorization(note);
 
     final User user = currentUser.getEntity();
-    //note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
-    //note.setFromDTO(noteAccessoriesDTO, user);
-    //modelFactoryService.save(note);
-    //return new NoteViewer(user, note).toJsonObject();
+    // note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
+    // note.setFromDTO(noteAccessoriesDTO, user);
+    // modelFactoryService.save(note);
+    // return new NoteViewer(user, note).toJsonObject();
     return file.getOriginalFilename();
   }
 

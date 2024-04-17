@@ -80,13 +80,9 @@ Cypress.Commands.add(
   },
 )
 
-Cypress.Commands.add(
-  "openAndSubmitNoteAudioFormWith",
-  (noteTopic: string, fileName: string) => {
-    start.assumeNotePage(noteTopic).updateAudio(fileName)
-  },
-)
-
+Cypress.Commands.add("openAndSubmitNoteAudioFormWith", (noteTopic: string, fileName: string) => {
+  start.assumeNotePage(noteTopic).updateAudio(fileName)
+})
 
 Cypress.Commands.add("clearFocusedText", () => {
   // cy.clear for now is an alias of cy.type('{selectall}{backspace}')
