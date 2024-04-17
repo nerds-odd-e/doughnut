@@ -60,6 +60,11 @@ When("I update note accessories of {string} to become:", (noteTopic: string, dat
   cy.openAndSubmitNoteAccessoriesFormWith(noteTopic, data.hashes()[0])
 })
 
+When("I upload an audio-file {string} to the note {string}", (fileName: string, noteTopic: string) => {
+  start.jumpToNotePage(noteTopic)
+  cy.openAndSubmitNoteAudioFormWith(noteTopic, fileName)
+})
+
 When(
   "I should see note {string} has a picture and a url {string}",
   (noteTopic: string, expectedUrl: string) => {

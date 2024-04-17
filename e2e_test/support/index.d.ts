@@ -43,6 +43,10 @@ declare namespace Cypress {
       noteTopic: string,
       NoteAccessoriesAttributes: Record<string, string>,
     ): Chainable<any>
+    openAndSubmitNoteAudioFormWith(
+      noteTopic: string,
+      fileName: string,
+    ): Chainable<any>
     openSidebar(): Chainable<any>
     pageIsNotLoading(): Chainable<any>
     clearFocusedText(): Chainable<any>
