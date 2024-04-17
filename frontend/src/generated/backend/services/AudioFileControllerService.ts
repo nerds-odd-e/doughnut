@@ -37,7 +37,7 @@ export class AudioFileControllerService {
      * @returns string OK
      * @throws ApiError
      */
-    public show(
+    public downloadAudio(
         audio: number,
         fileName: string,
     ): CancelablePromise<string> {

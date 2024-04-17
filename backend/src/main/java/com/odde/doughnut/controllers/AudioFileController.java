@@ -28,7 +28,7 @@ public class AudioFileController {
   }
 
   @GetMapping("/{audio}/{fileName}")
-  public ResponseEntity<byte[]> show(
+  public ResponseEntity<byte[]> downloadAudio(
       @PathVariable("audio") @Schema(type = "integer") Audio audio,
       @PathVariable("fileName") String filename) {
     return ResponseEntity.ok()

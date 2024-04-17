@@ -1529,7 +1529,7 @@ paths:
     get:
       tags:
       - rest-note-controller
-      operationId: show_2
+      operationId: show_1
       parameters:
       - name: note
         in: path
@@ -1670,7 +1670,7 @@ paths:
     get:
       tags:
       - audio-file-controller
-      operationId: show
+      operationId: downloadAudio
       parameters:
       - name: audio
         in: path
@@ -1894,7 +1894,7 @@ paths:
     get:
       tags:
       - rest-review-point-controller
-      operationId: show_1
+      operationId: show
       parameters:
       - name: reviewPoint
         in: path
@@ -2064,7 +2064,7 @@ paths:
     get:
       tags:
       - rest-failure-report-controller
-      operationId: show_3
+      operationId: show_2
       parameters:
       - name: failureReport
         in: query

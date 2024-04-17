@@ -150,7 +150,7 @@ export class RestNoteControllerService {
      * @returns NoteRealm OK
      * @throws ApiError
      */
-    public show2(
+    public show1(
         note: number,
     ): CancelablePromise<NoteRealm> {
         return this.httpRequest.request({

@@ -44,7 +44,7 @@ class AudioFileControllerTests {
     Audio audio = makeMe.anAudio().please();
     makeMe.refresh(audio);
     assertNotNull(audio);
-    ResponseEntity<byte[]> resp = controller.show(audio, "filename");
+    ResponseEntity<byte[]> resp = controller.downloadAudio(audio, "filename");
     assertThat(resp.getStatusCode(), equalTo(HttpStatus.OK));
     assertThat(resp.getHeaders().getContentType().toString(), equalTo("audio/mp3"));
     assertThat(
