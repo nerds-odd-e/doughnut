@@ -77,9 +77,8 @@ When("I save and convert the audio-file to SRT", () => {
 })
 
 Then("I should see the extracted SRT content", () => {
-  assert.fail("not implemented")
-  // check if popup has opened
-  // check if the SRT content is displayed in the popup
+  cy.get("#note-convertedSrt").should("exist");
+  cy.get("#note-convertedSrt").should("not.be.empty");
 })
 
 When(
