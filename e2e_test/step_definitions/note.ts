@@ -66,7 +66,6 @@ When(
     start.jumpToNotePage(noteTopic)
     start.assumeNotePage().editAudioButton().click()
     cy.get("#note-uploadAudioFile").attachFile(fileName)
-    cy.findByText("Save Only").click()
   },
 )
 
@@ -77,6 +76,15 @@ Then(
     start.assumeNotePage().downloadAudioFile(fileName)
   },
 )
+
+// Given(
+//   "I uploaded an audio-file {string} to the note {string} ",
+//   (fileName: string, noteTo)
+// )
+
+When("I save the audio-file", () => {
+  cy.findAllByText("Save Only").click()
+})
 
 When("I convert the audio-file to SRT without saving", () => {
   cy.findAllByText("Convert Only").click()
