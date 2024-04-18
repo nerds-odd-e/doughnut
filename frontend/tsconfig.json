@@ -5,7 +5,7 @@
     "moduleResolution": "Node",
     "jsx": "preserve",
     "resolveJsonModule": true,
-    "baseUrl": "./",
+    "baseUrl": ".",
     "lib": [
       "es2022",
       "dom",
@@ -18,9 +18,7 @@
       "node"
     ],
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
+      "@/*": ["src/*"]
     },
   },
   "compileOnSave": true,
@@ -30,8 +28,8 @@
   "files": [
     "./vite.config.ts",
     "./src/components/form/markdownizer.ts",
-"./src/managedApi/BindingHttpRequest.ts",
-"./src/managedApi/ApiStatusHandler.ts"
+    "./src/managedApi/BindingHttpRequest.ts",
+    "./src/managedApi/ApiStatusHandler.ts"
   ],
   "include": [
     "src/**/*.ts",

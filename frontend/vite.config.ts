@@ -67,11 +67,6 @@ export default defineConfig({
       "/testability": "http://localhost:9081",
     },
   },
-  resolve: {
-    alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url))
-    },
-  },
   base: "/",
   build: {
     outDir: "../backend/src/main/resources/static",
