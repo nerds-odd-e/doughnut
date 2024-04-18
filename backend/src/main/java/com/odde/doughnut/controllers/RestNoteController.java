@@ -131,7 +131,6 @@ class RestNoteController {
       @RequestParam("file") MultipartFile file)
       throws Exception {
     String filename = file.getOriginalFilename();
-    System.out.println(filename);
     if (!(filename.endsWith(".mp3") || filename.endsWith(".m4a") || filename.endsWith(".wav"))) {
       throw new Exception("Invalid format");
     }
