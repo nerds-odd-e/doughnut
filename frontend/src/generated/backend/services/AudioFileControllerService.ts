@@ -33,20 +33,17 @@ export class AudioFileControllerService {
     }
     /**
      * @param audio
-     * @param fileName
      * @returns string OK
      * @throws ApiError
      */
     public downloadAudio(
         audio: number,
-        fileName: string,
     ): CancelablePromise<string> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/audio/{audio}/{fileName}',
+            url: '/audio/{audio}',
             path: {
                 'audio': audio,
-                'fileName': fileName,
             },
             errors: {
                 500: `Internal Server Error`,

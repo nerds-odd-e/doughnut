@@ -1666,7 +1666,7 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/SuggestedQuestionForFineTuning'
-  /audio/{audio}/{fileName}:
+  /audio/{audio}:
     get:
       tags:
       - audio-file-controller
@@ -1677,11 +1677,6 @@ paths:
         required: true
         schema:
           type: integer
-      - name: fileName
-        in: path
-        required: true
-        schema:
-          type: string
       responses:
         "500":
           description: Internal Server Error

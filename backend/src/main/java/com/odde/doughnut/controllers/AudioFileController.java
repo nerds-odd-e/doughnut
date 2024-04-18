@@ -27,10 +27,9 @@ public class AudioFileController {
     this.restTemplate = restTemplate;
   }
 
-  @GetMapping("/{audio}/{fileName}")
+  @GetMapping("/{audio}")
   public ResponseEntity<byte[]> downloadAudio(
-      @PathVariable("audio") @Schema(type = "integer") Audio audio,
-      @PathVariable("fileName") String filename) {
+      @PathVariable("audio") @Schema(type = "integer") Audio audio) {
     return ResponseEntity.ok()
         .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + audio.getName() + "\"")
         .header(HttpHeaders.CONTENT_TYPE, audio.getType())
