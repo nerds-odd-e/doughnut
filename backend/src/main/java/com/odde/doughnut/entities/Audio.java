@@ -9,12 +9,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "audio")
-public class Audio {
-  @Id
-  @Getter
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
-
+public class Audio extends EntityIdentifiedByIdOnly{
   @NotNull
   @Size(min = 1, max = 255)
   @Getter

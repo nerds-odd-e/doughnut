@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.BeanUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -229,6 +230,21 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     if (uploadPicture != null) {
       getNoteAccessories().setUploadPicture(uploadPicture);
     }
+  }
+
+  public void setAudio(MultipartFile file, User user) throws IOException {
+
+    Audio audio = new Audio();
+    audio.setUser(user);
+    audio.setStorageType("db");
+    audio.setName(file.getOriginalFilename());
+    audio.setType(file.getContentType());
+
+    AudioBlob audioBlob = new AudioBlob();
+    audioBlob.setData(file.getBytes());
+    audio.setAudioBlob(audioBlob);
+
+    getNoteAccessories().setUploadAudio(audio);
   }
 
   @JsonIgnore
