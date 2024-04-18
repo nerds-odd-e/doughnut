@@ -31,7 +31,7 @@
     "unplugin-vue-components": "0.26.0",
     "vue": "3.4.23",
     "vue-content-loader": "2.0.1",
-    "vue-router": "4.3.1"
+    "vue-router": "4.3.2"
   },
   "devDependencies": {
     "@testing-library/vue": "^8.0.3",
