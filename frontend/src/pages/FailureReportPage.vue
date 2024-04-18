@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import useLoadingApi from "../managedApi/useLoadingApi";
+import useLoadingApi from "@/managedApi/useLoadingApi";
 import ContainerPage from "./commons/ContainerPage.vue";
 
 export default {

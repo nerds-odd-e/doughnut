@@ -49,11 +49,11 @@
 
 <script lang="ts">
 import { PropType, defineComponent } from "vue";
-import LoadingPage from "@/pages/commons/LoadingPage.vue";
 import { Circle, User } from "@/generated/backend";
-import useLoadingApi from "../../managedApi/useLoadingApi";
-import PopButton from "../commons/Popups/PopButton.vue";
-import CircleNewDialog from "../circles/CircleNewDialog.vue";
+import useLoadingApi from "@/managedApi/useLoadingApi";
+import LoadingPage from "@/pages/commons/LoadingPage.vue";
+import PopButton from "@/components/commons/Popups/PopButton.vue";
+import CircleNewDialog from "@/components/circles/CircleNewDialog.vue";
 import BrandBar from "./BrandBar.vue";
 import ToolbarFrame from "./ToolbarFrame.vue";
 import ReviewButton from "./ReviewButton.vue";

@@ -56,7 +56,7 @@ import {
   QuestionSuggestionParams,
   SuggestedQuestionForFineTuning,
 } from "@/generated/backend";
-import useLoadingApi from "../../managedApi/useLoadingApi";
+import useLoadingApi from "@/managedApi/useLoadingApi";
 import TextInput from "../form/TextInput.vue";
 import TextArea from "../form/TextArea.vue";
 import CheckInput from "../form/CheckInput.vue";

@@ -7,7 +7,7 @@ import {
   NoteRealm,
   WikidataAssociationCreation,
 } from "@/generated/backend";
-import ManagedApi from "../managedApi/ManagedApi";
+import ManagedApi from "@/managedApi/ManagedApi";
 import NoteEditingHistory from "./NoteEditingHistory";
 import NoteStorage from "./NoteStorage";
 

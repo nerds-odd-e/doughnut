@@ -43,9 +43,9 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import type { StorageAccessor } from "@/store/createNoteStorage";
 import { Note, QuizQuestion } from "@/generated/backend";
-import useLoadingApi from "../../managedApi/useLoadingApi";
+import useLoadingApi from "@/managedApi/useLoadingApi";
+import type { StorageAccessor } from "@/store/createNoteStorage";
 import ContestableQuestion from "../review/ContestableQuestion.vue";
 import scrollToElement from "../commons/scrollToElement";
 

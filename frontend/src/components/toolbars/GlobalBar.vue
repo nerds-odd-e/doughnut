@@ -31,12 +31,12 @@
 <script lang="ts">
 import { PropType, defineComponent } from "vue";
 import { User } from "@/generated/backend";
-import PopButton from "../commons/Popups/PopButton.vue";
-import SvgSidebar from "../svgs/SvgSidebar.vue";
+import { ApiStatus } from "@/managedApi/ManagedApi";
+import { StorageAccessor } from "@/store/createNoteStorage";
+import PopButton from "@/components/commons/Popups/PopButton.vue";
+import SvgSidebar from "@/components/svgs/SvgSidebar.vue";
 import GlobalSidebar from "./GlobalSidebar.vue";
 import ToolbarFrame from "./ToolbarFrame.vue";
-import { ApiStatus } from "../../managedApi/ManagedApi";
-import { StorageAccessor } from "../../store/createNoteStorage";
 import BrandBar from "./BrandBar.vue";
 
 export default defineComponent({

@@ -20,8 +20,8 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { NoteInfo } from "@/generated/backend";
+import useLoadingApi from "@/managedApi/useLoadingApi";
 import NoteInfoC from "./NoteInfo.vue";
-import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default defineComponent({
   setup() {

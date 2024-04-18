@@ -44,7 +44,7 @@ import {
   QuestionSuggestionCreationParams,
   QuizQuestion,
 } from "@/generated/backend";
-import useLoadingApi from "../../managedApi/useLoadingApi";
+import useLoadingApi from "@/managedApi/useLoadingApi";
 
 const params = ref<QuestionSuggestionCreationParams>({
   isPositiveFeedback: false,

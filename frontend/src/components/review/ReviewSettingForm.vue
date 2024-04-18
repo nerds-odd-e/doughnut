@@ -32,9 +32,9 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { ReviewSetting } from "@/generated/backend";
+import useLoadingApi from "@/managedApi/useLoadingApi";
 import CheckInput from "../form/CheckInput.vue";
 import RadioButtons from "../form/RadioButtons.vue";
-import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default defineComponent({
   setup() {

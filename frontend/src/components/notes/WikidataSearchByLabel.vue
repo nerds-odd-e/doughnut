@@ -43,9 +43,9 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { WikidataSearchEntity } from "@/generated/backend";
+import useLoadingApi from "@/managedApi/useLoadingApi";
 import TextInput from "../form/TextInput.vue";
 import SvgSearchWikidata from "../svgs/SvgSearchWikidata.vue";
-import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default defineComponent({
   setup() {

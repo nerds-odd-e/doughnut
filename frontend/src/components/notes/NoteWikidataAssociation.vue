@@ -11,9 +11,9 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import SvgAssociation from "../svgs/SvgAssociation.vue";
-import useLoadingApi from "../../managedApi/useLoadingApi";
-import nonBlockingPopup from "../../managedApi/window/nonBlockingPopup";
+import useLoadingApi from "@/managedApi/useLoadingApi";
+import nonBlockingPopup from "@/managedApi/window/nonBlockingPopup";
+import SvgAssociation from "@/components/svgs/SvgAssociation.vue";
 
 export default defineComponent({
   setup() {

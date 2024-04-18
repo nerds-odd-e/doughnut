@@ -29,10 +29,10 @@
 import { defineComponent, PropType } from "vue";
 import _ from "lodash";
 import { AnsweredQuestion, QuizQuestion } from "@/generated/backend";
-import useLoadingApi from "../../managedApi/useLoadingApi";
-import { StorageAccessor } from "../../store/createNoteStorage";
+import useLoadingApi from "@/managedApi/useLoadingApi";
+import { StorageAccessor } from "@/store/createNoteStorage";
+import LoadingPage from "@/pages/commons/LoadingPage.vue";
 import JustReview from "./JustReview.vue";
-import LoadingPage from "../../pages/commons/LoadingPage.vue";
 import ContestableQuestion from "./ContestableQuestion.vue";
 
 export default defineComponent({

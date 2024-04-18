@@ -47,8 +47,8 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { ReviewPoint } from "@/generated/backend";
+import useLoadingApi from "@/managedApi/useLoadingApi";
 import SvgNoReview from "../svgs/SvgNoReview.vue";
-import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopups";
 import SvgSad from "../svgs/SvgSad.vue";
 import SvgHappy from "../svgs/SvgHappy.vue";

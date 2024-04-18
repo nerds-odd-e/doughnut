@@ -16,8 +16,8 @@
 </template>
 
 <script>
+import useLoadingApi from "@/managedApi/useLoadingApi";
 import SvgUnsubscribe from "../svgs/SvgUnsubscribe.vue";
-import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopups";
 import PopButton from "../commons/Popups/PopButton.vue";
 import SvgEdit from "../svgs/SvgEdit.vue";

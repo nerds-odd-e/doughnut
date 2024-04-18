@@ -13,10 +13,10 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { AnsweredQuestion, ReviewPoint } from "@/generated/backend";
+import useLoadingApi from "@/managedApi/useLoadingApi";
+import AnsweredQuestionComponent from "@/components/review/AnsweredQuestionComponent.vue";
+import { StorageAccessor } from "@/store/createNoteStorage";
 import LoadingPage from "./commons/LoadingPage.vue";
-import useLoadingApi from "../managedApi/useLoadingApi";
-import AnsweredQuestionComponent from "../components/review/AnsweredQuestionComponent.vue";
-import { StorageAccessor } from "../store/createNoteStorage";
 
 export default defineComponent({
   setup() {

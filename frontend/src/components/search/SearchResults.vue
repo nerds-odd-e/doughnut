@@ -27,9 +27,9 @@
 import { defineComponent } from "vue";
 import { debounce } from "mini-debounce";
 import { Note, SearchTerm } from "@/generated/backend";
+import useLoadingApi from "@/managedApi/useLoadingApi";
 import CheckInput from "../form/CheckInput.vue";
 import Cards from "../notes/Cards.vue";
-import useLoadingApi from "../../managedApi/useLoadingApi";
 
 const debounced = debounce((callback) => callback(), 500);
 

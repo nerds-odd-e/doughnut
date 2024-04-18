@@ -15,8 +15,8 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { Notebook, SubscriptionDTO } from "@/generated/backend";
-import TextInput from "../form/TextInput.vue";
-import useLoadingApi from "../../managedApi/useLoadingApi";
+import useLoadingApi from "@/managedApi/useLoadingApi";
+import TextInput from "@/components/form/TextInput.vue";
 
 export default defineComponent({
   setup() {

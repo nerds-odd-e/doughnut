@@ -36,9 +36,9 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { Note, WikidataAssociationCreation } from "@/generated/backend";
+import useLoadingApi from "@/managedApi/useLoadingApi";
+import { StorageAccessor } from "@/store/createNoteStorage";
 import TextInput from "../form/TextInput.vue";
-import useLoadingApi from "../../managedApi/useLoadingApi";
-import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   setup() {

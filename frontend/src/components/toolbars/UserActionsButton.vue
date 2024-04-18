@@ -34,10 +34,10 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { User } from "@/generated/backend";
-import PopButton from "../commons/Popups/PopButton.vue";
+import useLoadingApi from "@/managedApi/useLoadingApi";
+import PopButton from "@/components/commons/Popups/PopButton.vue";
+import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue";
 import UserProfileDialog from "./UserProfileDialog.vue";
-import useLoadingApi from "../../managedApi/useLoadingApi";
-import SvgMissingAvatar from "../svgs/SvgMissingAvatar.vue";
 
 export default defineComponent({
   setup() {

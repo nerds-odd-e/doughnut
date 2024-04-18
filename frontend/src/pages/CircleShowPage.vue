@@ -41,14 +41,14 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { CircleForUserView } from "@/generated/backend";
-import SvgMissingAvatar from "../components/svgs/SvgMissingAvatar.vue";
+import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue";
+import NotebookCardsWithButtons from "@/components/notebook/NotebookCardsWithButtons.vue";
+import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue";
+import NotebookButtons from "@/components/notebook/NotebookButtons.vue";
+import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue";
+import useLoadingApi from "@/managedApi/useLoadingApi";
+import { StorageAccessor } from "@/store/createNoteStorage";
 import ContainerPage from "./commons/ContainerPage.vue";
-import NotebookCardsWithButtons from "../components/notebook/NotebookCardsWithButtons.vue";
-import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
-import NotebookButtons from "../components/notebook/NotebookButtons.vue";
-import BazaarNotebookButtons from "../components/bazaar/BazaarNotebookButtons.vue";
-import useLoadingApi from "../managedApi/useLoadingApi";
-import { StorageAccessor } from "../store/createNoteStorage";
 
 export default defineComponent({
   setup() {

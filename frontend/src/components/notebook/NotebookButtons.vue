@@ -20,12 +20,12 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { Notebook } from "@/generated/backend";
-import SvgBazaarShare from "../svgs/SvgBazaarShare.vue";
-import useLoadingApi from "../../managedApi/useLoadingApi";
-import usePopups from "../commons/Popups/usePopups";
-import PopButton from "../commons/Popups/PopButton.vue";
+import useLoadingApi from "@/managedApi/useLoadingApi";
+import SvgBazaarShare from "@/components/svgs/SvgBazaarShare.vue";
+import usePopups from "@/components/commons/Popups/usePopups";
+import PopButton from "@/components/commons/Popups/PopButton.vue";
+import SvgEditNotebook from "@/components/svgs/SvgEditNotebook.vue";
 import NotebookEditDialog from "./NotebookEditDialog.vue";
-import SvgEditNotebook from "../svgs/SvgEditNotebook.vue";
 
 export default defineComponent({
   setup() {

@@ -22,9 +22,9 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { User } from "@/generated/backend";
+import useLoadingApi from "@/managedApi/useLoadingApi";
+import TextInput from "@/components/form/TextInput.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
-import TextInput from "../components/form/TextInput.vue";
-import useLoadingApi from "../managedApi/useLoadingApi";
 
 export default defineComponent({
   setup() {

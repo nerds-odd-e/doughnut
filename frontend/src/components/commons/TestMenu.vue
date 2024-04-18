@@ -27,10 +27,10 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { User } from "@/generated/backend";
+import useLoadingApi from "@/managedApi/useLoadingApi";
 import PopButton from "./Popups/PopButton.vue";
 import CheckInput from "../form/CheckInput.vue";
 import TextInput from "../form/TextInput.vue";
-import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default defineComponent({
   setup() {

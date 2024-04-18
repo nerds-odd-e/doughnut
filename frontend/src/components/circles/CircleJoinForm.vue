@@ -13,8 +13,8 @@
 </template>
 
 <script>
-import TextInput from "../form/TextInput.vue";
-import useLoadingApi from "../../managedApi/useLoadingApi";
+import useLoadingApi from "@/managedApi/useLoadingApi";
+import TextInput from "@/components/form/TextInput.vue";
 
 export default {
   setup() {

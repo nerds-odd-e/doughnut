@@ -35,7 +35,7 @@
 import { defineComponent, PropType } from "vue";
 import type { StorageAccessor } from "@/store/createNoteStorage";
 import { AnsweredQuestion, QuizQuestion } from "@/generated/backend";
-import useLoadingApi from "../../managedApi/useLoadingApi";
+import useLoadingApi from "@/managedApi/useLoadingApi";
 import QuizQuestionC from "./QuizQuestion.vue";
 import AnsweredQuestionComponent from "./AnsweredQuestionComponent.vue";
 

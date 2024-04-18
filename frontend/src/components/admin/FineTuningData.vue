@@ -14,7 +14,7 @@
 <script lang="ts">
 import { ContentLoader } from "vue-content-loader";
 import { ApiError, SuggestedQuestionForFineTuning } from "@/generated/backend";
-import useLoadingApi from "../../managedApi/useLoadingApi";
+import useLoadingApi from "@/managedApi/useLoadingApi";
 import SuggestedQuestionList from "./SuggestedQuestionList.vue";
 
 export default {

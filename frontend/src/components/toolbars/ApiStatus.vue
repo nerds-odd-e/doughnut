@@ -10,9 +10,9 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { ApiStatus } from "../../managedApi/ManagedApi";
-import LoadingThinBar from "../commons/LoadingThinBar.vue";
-import LastErrorMessage from "../commons/LastErrorMessage.vue";
+import { ApiStatus } from "@/managedApi/ManagedApi";
+import LoadingThinBar from "@/components/commons/LoadingThinBar.vue";
+import LastErrorMessage from "@/components/commons/LastErrorMessage.vue";
 
 export default defineComponent({
   props: {

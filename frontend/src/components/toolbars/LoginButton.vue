@@ -11,8 +11,8 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import loginOrRegisterAndHaltThisThread from "../../managedApi/window/loginOrRegisterAndHaltThisThread";
-import SvgLogin from "../svgs/SvgLogin.vue";
+import loginOrRegisterAndHaltThisThread from "@/managedApi/window/loginOrRegisterAndHaltThisThread";
+import SvgLogin from "@/components/svgs/SvgLogin.vue";
 
 export default defineComponent({
   methods: {

@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import useLoadingApi from "../../managedApi/useLoadingApi";
+import useLoadingApi from "@/managedApi/useLoadingApi";
 import TextInput from "../form/TextInput.vue";
 
 export default {

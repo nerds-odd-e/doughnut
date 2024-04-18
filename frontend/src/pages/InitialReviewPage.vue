@@ -31,13 +31,13 @@
 import { defineComponent, PropType } from "vue";
 import { Thing } from "@/generated/backend";
 import timezoneParam from "@/managedApi/window/timezoneParam";
+import useLoadingApi from "@/managedApi/useLoadingApi";
+import ProgressBar from "@/components/commons/ProgressBar.vue";
+import SvgResume from "@/components/svgs/SvgResume.vue";
+import ThingAbbr from "@/components/review/ThingAbbr.vue";
+import InitialReview from "@/components/review/InitialReview.vue";
+import { StorageAccessor } from "@/store/createNoteStorage";
 import ContainerPage from "./commons/ContainerPage.vue";
-import ProgressBar from "../components/commons/ProgressBar.vue";
-import SvgResume from "../components/svgs/SvgResume.vue";
-import ThingAbbr from "../components/review/ThingAbbr.vue";
-import InitialReview from "../components/review/InitialReview.vue";
-import useLoadingApi from "../managedApi/useLoadingApi";
-import { StorageAccessor } from "../store/createNoteStorage";
 
 export default defineComponent({
   name: "InitialReviewPage",

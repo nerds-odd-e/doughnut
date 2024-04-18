@@ -41,10 +41,10 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { User } from "@/generated/backend";
-import ContainerPage from "../../pages/commons/ContainerPage.vue";
-import CheckInput from "../form/CheckInput.vue";
-import TextInput from "../form/TextInput.vue";
-import useLoadingApi from "../../managedApi/useLoadingApi";
+import useLoadingApi from "@/managedApi/useLoadingApi";
+import ContainerPage from "@/pages/commons/ContainerPage.vue";
+import CheckInput from "@/components/form/CheckInput.vue";
+import TextInput from "@/components/form/TextInput.vue";
 
 export default defineComponent({
   setup() {

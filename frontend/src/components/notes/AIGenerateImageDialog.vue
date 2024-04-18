@@ -13,7 +13,7 @@
 import { defineComponent, PropType } from "vue";
 import type { StorageAccessor } from "@/store/createNoteStorage";
 import { Note } from "@/generated/backend";
-import useLoadingApi from "../../managedApi/useLoadingApi";
+import useLoadingApi from "@/managedApi/useLoadingApi";
 import TextInput from "../form/TextInput.vue";
 
 export default defineComponent({

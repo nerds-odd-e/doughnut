@@ -61,9 +61,9 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { AnswerDTO, QuizQuestion } from "@/generated/backend";
+import useLoadingApi from "@/managedApi/useLoadingApi";
 import ShowPicture from "../notes/ShowPicture.vue";
 import TextInput from "../form/TextInput.vue";
-import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopups";
 import QuizQuestionChoices from "./QuizQuestionChoices.vue";
 import SuggestQuestionForFineTuning from "../ai/SuggestQuestionForFineTuning.vue";

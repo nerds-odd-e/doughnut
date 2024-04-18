@@ -14,10 +14,10 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import useLoadingApi from "@/managedApi/useLoadingApi";
+import { StorageAccessor } from "@/store/createNoteStorage";
 import ReviewPointAsync from "./ReviewPointAsync.vue";
-import useLoadingApi from "../../managedApi/useLoadingApi";
 import SelfEvaluateButtons from "./SelfEvaluateButtons.vue";
-import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   setup() {

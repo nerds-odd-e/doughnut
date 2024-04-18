@@ -12,7 +12,7 @@
 
 <script lang="ts" setup>
 import { ref } from "vue";
-import useLoadingApi from "../../managedApi/useLoadingApi";
+import useLoadingApi from "@/managedApi/useLoadingApi";
 
 const { managedApi } = useLoadingApi();
 const assistants = ref<Record<string, string> | undefined>(undefined);

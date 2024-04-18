@@ -9,9 +9,9 @@
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
 import { GlobalAiModelSettings } from "@/generated/backend";
+import useLoadingApi from "@/managedApi/useLoadingApi";
+import LoadingPage from "@/pages/commons/LoadingPage.vue";
 import ManageModelInner from "./ManageModelInner.vue";
-import useLoadingApi from "../../managedApi/useLoadingApi";
-import LoadingPage from "../../pages/commons/LoadingPage.vue";
 
 const { managedApi } = useLoadingApi();
 const modelList = ref<string[] | undefined>(undefined);

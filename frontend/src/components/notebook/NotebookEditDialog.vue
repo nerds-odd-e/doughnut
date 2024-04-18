@@ -12,8 +12,8 @@
 </template>
 
 <script>
-import useLoadingApi from "../../managedApi/useLoadingApi";
-import CheckInput from "../form/CheckInput.vue";
+import useLoadingApi from "@/managedApi/useLoadingApi";
+import CheckInput from "@/components/form/CheckInput.vue";
 
 export default {
   setup() {

@@ -15,11 +15,11 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { NotebookViewedByUser, Subscription } from "@/generated/backend";
-import NotebookViewCards from "../components/notebook/NotebookViewCards.vue";
-import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
-import NotebookSubscriptionCards from "../components/subscriptions/NotebookSubscriptionCards.vue";
+import useLoadingApi from "@/managedApi/useLoadingApi";
+import NotebookViewCards from "@/components/notebook/NotebookViewCards.vue";
+import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue";
+import NotebookSubscriptionCards from "@/components/subscriptions/NotebookSubscriptionCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
-import useLoadingApi from "../managedApi/useLoadingApi";
 
 export default defineComponent({
   setup() {

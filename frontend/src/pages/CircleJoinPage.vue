@@ -5,10 +5,10 @@
 </template>
 
 <script lang="js">
-import CircleJoinForm from "../components/circles/CircleJoinForm.vue";
+import CircleJoinForm from "@/components/circles/CircleJoinForm.vue";
+import loginOrRegisterAndHaltThisThread from "@/managedApi/window/loginOrRegisterAndHaltThisThread";
+import useLoadingApi from "@/managedApi/useLoadingApi";
 import ContainerPage from "./commons/ContainerPage.vue";
-import loginOrRegisterAndHaltThisThread from "../managedApi/window/loginOrRegisterAndHaltThisThread";
-import useLoadingApi from "../managedApi/useLoadingApi";
 
 export default {
   setup() {

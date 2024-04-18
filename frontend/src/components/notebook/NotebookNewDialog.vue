@@ -11,8 +11,8 @@
 <script lang="ts">
 import { PropType } from "vue";
 import { Circle, NoteCreationDTO } from "@/generated/backend";
-import NoteFormTopicOnly from "../notes/NoteFormTopicOnly.vue";
-import useLoadingApi from "../../managedApi/useLoadingApi";
+import useLoadingApi from "@/managedApi/useLoadingApi";
+import NoteFormTopicOnly from "@/components/notes/NoteFormTopicOnly.vue";
 
 export default {
   setup() {

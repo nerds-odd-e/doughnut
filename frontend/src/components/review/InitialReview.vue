@@ -16,12 +16,12 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { Thing } from "@/generated/backend";
+import useLoadingApi from "@/managedApi/useLoadingApi";
+import { StorageAccessor } from "@/store/createNoteStorage";
+import ContainerPage from "@/pages/commons/ContainerPage.vue";
 import ShowThing from "./ShowThing.vue";
 import InitialReviewButtons from "./InitialReviewButtons.vue";
-import ContainerPage from "../../pages/commons/ContainerPage.vue";
-import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopups";
-import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   name: "InitialReview",

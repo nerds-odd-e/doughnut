@@ -9,8 +9,8 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { NotePositionViewedByUser } from "@/generated/backend";
-import useLoadingApi from "../../managedApi/useLoadingApi";
-import LoadingPage from "../../pages/commons/LoadingPage.vue";
+import useLoadingApi from "@/managedApi/useLoadingApi";
+import LoadingPage from "@/pages/commons/LoadingPage.vue";
 import Breadcrumb from "./Breadcrumb.vue";
 
 export default defineComponent({
