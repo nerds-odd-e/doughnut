@@ -7,17 +7,11 @@
     />
     <input type="submit" value="Save Only" class="btn btn-primary" />
     <input
-      type="submit"
       value="Save and Convert"
       class="btn btn-primary"
       @click="convertToSRT"
     />
-    <input
-      type="submit"
-      value="Convert Only"
-      class="btn btn-primary"
-      @click="convertToSRT"
-    />
+    <input value="Convert Only" class="btn btn-primary" @click="convertToSRT" />
   </form>
   <textarea :value="srt"></textarea>
 </template>
@@ -59,7 +53,17 @@ export default defineComponent({
         });
     },
     convertToSRT() {
-      this.srt = "1\n00:00:00,000 --> 00:00:02,000\nHello, this is a test.";
+      this.storageAccessor
+        .storedApi()
+        .convertAudio(true, this.formData)
+        .then(
+          () =>
+            (this.srt =
+              "1\n00:00:00,000 --> 00:00:02,000\nHello, this is a test."),
+        )
+        .catch((error) => {
+          this.noteFormErrors = error;
+        });
     },
   },
 });
