@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AudioUploadDTO } from '../models/AudioUploadDTO';
 import type { Note } from '../models/Note';
 import type { NoteAccessoriesDTO } from '../models/NoteAccessoriesDTO';
 import type { NoteCreationDTO } from '../models/NoteCreationDTO';
@@ -209,15 +210,13 @@ export class RestNoteControllerService {
     /**
      * @param note
      * @param formData
-     * @returns string OK
+     * @returns NoteRealm OK
      * @throws ApiError
      */
     public upload1(
         note: number,
-        formData?: {
-            file: Blob;
-        },
-    ): CancelablePromise<string> {
+        formData?: AudioUploadDTO,
+    ): CancelablePromise<NoteRealm> {
         return this.httpRequest.request({
             method: 'PATCH',
             url: '/api/notes/{note}/audio',

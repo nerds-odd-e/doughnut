@@ -9,7 +9,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "audio")
-public class Audio extends EntityIdentifiedByIdOnly{
+public class Audio extends EntityIdentifiedByIdOnly {
   @NotNull
   @Size(min = 1, max = 255)
   @Getter

@@ -1616,13 +1616,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              required:
-              - file
-              type: object
-              properties:
-                file:
-                  type: string
-                  format: binary
+              $ref: '#/components/schemas/AudioUploadDTO'
       responses:
         "500":
           description: Internal Server Error
@@ -1635,7 +1629,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: string
+                $ref: '#/components/schemas/NoteRealm'
   /api/fine-tuning/{suggestedQuestion}/update-suggested-question-for-fine-tuning:
     patch:
       tags:
@@ -2889,6 +2883,12 @@ components:
         useParentPicture:
           type: boolean
         uploadPictureProxy:
+          type: string
+          format: binary
+    AudioUploadDTO:
+      type: object
+      properties:
+        uploadAudioFile:
           type: string
           format: binary
     WikidataSearchEntity:

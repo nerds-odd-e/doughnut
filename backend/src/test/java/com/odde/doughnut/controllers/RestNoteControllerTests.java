@@ -5,10 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 
-import com.odde.doughnut.controllers.dto.NoteAccessoriesDTO;
-import com.odde.doughnut.controllers.dto.NoteCreationDTO;
-import com.odde.doughnut.controllers.dto.NoteRealm;
-import com.odde.doughnut.controllers.dto.WikidataAssociationCreation;
+import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -38,7 +35,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
-import org.springframework.web.multipart.MultipartFile;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -367,6 +363,7 @@ class RestNoteControllerTests {
   class updateNoteTest {
     Note note;
     NoteAccessoriesDTO noteAccessoriesDTO = new NoteAccessoriesDTO();
+    AudioUploadDTO audioUploadDTO = new AudioUploadDTO();
 
     @BeforeEach
     void setup() {
@@ -408,46 +405,67 @@ class RestNoteControllerTests {
     @Test
     void shouldReturnSameFileNameAsTheUploadedFileMp3() throws Exception {
       String filename = "podcast.mp3";
-      MultipartFile multipartFile = new MockMultipartFile(filename, filename, null, new byte[] {});
-      String fileName = controller.upload(note, multipartFile);
-      assertEquals(fileName, multipartFile.getOriginalFilename());
+      audioUploadDTO.setUploadAudioFile(
+          new MockMultipartFile(filename, filename, "audio/mp3", new byte[] {}));
+      NoteRealm noteRealm = controller.upload(note, audioUploadDTO);
+      assertEquals(
+          noteRealm.getNote().getNoteAccessories().getAudioName().get(),
+          audioUploadDTO.getUploadAudioFile().getOriginalFilename());
     }
 
     @Test
     void shouldReturnSameFileNameAsTheUploadedFileM4a() throws Exception {
       String filename = "podcast.m4a";
-      MultipartFile multipartFile = new MockMultipartFile(filename, filename, null, new byte[] {});
-      String fileName = controller.upload(note, multipartFile);
-      assertEquals(fileName, multipartFile.getOriginalFilename());
+      audioUploadDTO.setUploadAudioFile(
+          new MockMultipartFile(filename, filename, "audio/m4a", new byte[] {}));
+      NoteRealm noteRealm = controller.upload(note, audioUploadDTO);
+      assertEquals(
+          noteRealm.getNote().getNoteAccessories().getAudioName().get(),
+          audioUploadDTO.getUploadAudioFile().getOriginalFilename());
     }
 
     @Test
     void shouldReturnSameFileNameAsTheUploadedFileWav() throws Exception {
       String filename = "podcast.wav";
-      MultipartFile multipartFile = new MockMultipartFile(filename, filename, null, new byte[] {});
-      String fileName = controller.upload(note, multipartFile);
-      assertEquals(fileName, multipartFile.getOriginalFilename());
+      audioUploadDTO.setUploadAudioFile(
+          new MockMultipartFile(filename, filename, "audio/wav", new byte[] {}));
+      NoteRealm noteRealm = controller.upload(note, audioUploadDTO);
+      assertEquals(
+          noteRealm.getNote().getNoteAccessories().getAudioName().get(),
+          audioUploadDTO.getUploadAudioFile().getOriginalFilename());
     }
 
     @Test
     void shouldFailOnInvalidAudioFileFormatTxt()
         throws UnexpectedNoAccessRightException, IOException {
-      MultipartFile multipartFile = new MockMultipartFile("something.txt", new byte[] {});
+      audioUploadDTO.setUploadAudioFile(new MockMultipartFile("something.txt", new byte[] {}));
+
       assertThrows(
           Exception.class,
           () -> {
-            controller.upload(note, multipartFile);
+            controller.upload(note, audioUploadDTO);
           });
+    }
+
+    @Test
+    void shouldPersistAudioToNoteAfterUpload() throws Exception {
+      String filename = "podcast.wav";
+      audioUploadDTO.setUploadAudioFile(
+          new MockMultipartFile(filename, filename, "audio/wav", new byte[] {}));
+      NoteRealm noteRealm = controller.upload(note, audioUploadDTO);
+      Note newNote = makeMe.modelFactoryService.noteRepository.findById(note.getId()).get();
+      assertEquals(filename, newNote.getNoteAccessories().getUploadAudio().getName());
     }
 
     @Test
     void shouldFailOnInvalidAudioFileFormatAvi()
         throws UnexpectedNoAccessRightException, IOException {
-      MultipartFile multipartFile = new MockMultipartFile("youtube.avi", new byte[] {});
+      audioUploadDTO.setUploadAudioFile(new MockMultipartFile("youtube.avi", new byte[] {}));
+
       assertThrows(
           Exception.class,
           () -> {
-            controller.upload(note, multipartFile);
+            controller.upload(note, audioUploadDTO);
           });
     }
   }

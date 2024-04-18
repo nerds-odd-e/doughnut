@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @SessionScope
@@ -126,15 +125,22 @@ class RestNoteController {
       path = "/{note}/audio",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @Transactional
-  public String upload(
+  public NoteRealm upload(
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
-      @RequestParam("file") MultipartFile file)
-      throws Exception {
-    String filename = file.getOriginalFilename();
+      @Valid @ModelAttribute AudioUploadDTO audioUploadDTO)
+      throws UnexpectedNoAccessRightException, IOException, Exception {
+    String filename = audioUploadDTO.getUploadAudioFile().getOriginalFilename();
     if (!(filename.endsWith(".mp3") || filename.endsWith(".m4a") || filename.endsWith(".wav"))) {
       throw new Exception("Invalid format");
     }
-    return filename;
+
+    final User user = currentUser.getEntity();
+    note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
+    note.setAudio(audioUploadDTO.getUploadAudioFile(), user);
+    modelFactoryService.save(note.getNoteAccessories().getUploadAudio());
+    modelFactoryService.save(note);
+
+    return new NoteViewer(user, note).toJsonObject();
   }
 
   @GetMapping("/{note}/note-info")
