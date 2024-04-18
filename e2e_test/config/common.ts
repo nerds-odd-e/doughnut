@@ -41,6 +41,9 @@ const commonConfig = {
             })
           })
         },
+        fileExists(filePath) {
+          return existsSync(filePath);
+        }
       })
 
       return config

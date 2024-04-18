@@ -51,6 +51,8 @@ export const assumeNotePage = (noteTopic?: string) => {
     },
     downloadAudioFile(fileName: string) {
       this.audioFileDownloadButton(fileName).click()
+      const downloadsFolder = Cypress.config("downloadsFolder")
+      cy.task("fileExists", downloadsFolder + "/" + fileName).should("equal", true)
     },
     updateNoteAccessories(attributes: Record<string, string>) {
       this.editNoteButton().click().submitWith(attributes)
