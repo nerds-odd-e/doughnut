@@ -1,4 +1,4 @@
-@ignore
+
 Feature: Note Convert Audio File to SRT
   As a learner, I want to be able to convert an audio-file to SRT
 
@@ -9,8 +9,14 @@ Feature: Note Convert Audio File to SRT
   Scenario: Convert audio-file to SRT without saving
     When I upload an audio-file "harvard.wav" to the note "podcast"
     And I convert the audio-file to SRT without saving
-    Then I should see the extracted SRT content "1\n00:00:00,000 --> 00:00:02,000\nHello, this is a test."
-
+    Then I should see the extracted SRT content 
+    """
+    1
+    00:00:00,000 --> 00:00:02,000
+    Hello, this is a test.
+    """
+    
+@ignore
   Scenario: Convert audio-file to SRT
     When I upload an audio-file "harvard.wav" to the note "podcast"
     And I save and convert the audio-file to SRT

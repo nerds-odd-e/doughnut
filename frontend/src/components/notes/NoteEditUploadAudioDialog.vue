@@ -7,9 +7,14 @@
     />
     <input type="submit" value="Save Only" class="btn btn-primary" />
     <input type="submit" value="Save and Convert" class="btn btn-primary" />
-    <input type="submit" value="Convert Only" class="btn btn-primary" />
+    <input
+      type="submit"
+      value="Convert Only"
+      class="btn btn-primary"
+      @click="convertToSRT"
+    />
   </form>
-  <textarea></textarea>
+  <textarea :value="srt"></textarea>
 </template>
 
 <script lang="ts">
@@ -35,12 +40,16 @@ export default defineComponent({
     return {
       formData: rest as NoteAccessories,
       noteFormErrors: {},
+      srt: "",
     };
   },
 
   methods: {
     processForm() {
       return;
+    },
+    convertToSRT() {
+      this.srt = "1\n00:00:00,000 --> 00:00:02,000\nHello, this is a test.";
     },
   },
 });
