@@ -174,4 +174,14 @@ public class NoteBuilder extends EntityBuilder<Note> {
     entity.getReviewSetting().setLevel(i);
     return this;
   }
+
+  public NoteBuilder audio(String filename) {
+    if (filename == null) {
+      return this;
+    }
+    Audio audio = new Audio();
+    audio.setName(filename);
+    entity.getNoteAccessories().setUploadAudio(audio);
+    return this;
+  }
 }

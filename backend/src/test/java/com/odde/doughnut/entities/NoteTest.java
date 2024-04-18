@@ -3,7 +3,7 @@ package com.odde.doughnut.entities;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.NoteAccessoriesDTO;
 import com.odde.doughnut.testability.MakeMe;
@@ -119,5 +119,19 @@ public class NoteTest {
     private Set<ConstraintViolation<NoteAccessoriesDTO>> getViolations() {
       return validator.validate(note);
     }
+  }
+
+  @Test
+  void noAudioAttachedToNote() {
+    Note note = makeMe.aNote().audio(null).inMemoryPlease();
+    assertNull(note.getNoteAccessories().getAudioId());
+    assertNull(note.getNoteAccessories().getAudioName());
+  }
+
+  @Test
+  void audioAttachedToNote() {
+    Note note = makeMe.aNote().audio("podcast.mp3").inMemoryPlease();
+
+    assertEquals(note.getNoteAccessories().getAudioName().get(), "podcast.mp3");
   }
 }
