@@ -2365,6 +2365,8 @@ components:
           type: string
         useParentPicture:
           type: boolean
+        noteAudio:
+          type: string
     Notebook:
       required:
       - id

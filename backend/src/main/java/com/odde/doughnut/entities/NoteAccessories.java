@@ -54,7 +54,7 @@ public class NoteAccessories {
   @Setter
   private Audio uploadAudio;
 
-  @JsonIgnore
+
   public Optional<String> getNoteAudio() {
     if (uploadAudio != null) {
       return Optional.of("/audio/" + uploadAudio.getId() + "/" + uploadAudio.getName());

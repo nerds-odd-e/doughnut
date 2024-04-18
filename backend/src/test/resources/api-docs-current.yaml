@@ -1529,7 +1529,7 @@ paths:
     get:
       tags:
       - rest-note-controller
-      operationId: show_1
+      operationId: show_2
       parameters:
       - name: note
         in: path
@@ -1666,22 +1666,17 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/SuggestedQuestionForFineTuning'
-  /audio/{audio}/{fileName}:
+  /audio/{audio}:
     get:
       tags:
       - audio-file-controller
-      operationId: downloadAudio
+      operationId: show
       parameters:
       - name: audio
         in: path
         required: true
         schema:
           type: integer
-      - name: fileName
-        in: path
-        required: true
-        schema:
-          type: string
       responses:
         "500":
           description: Internal Server Error
@@ -1894,7 +1889,7 @@ paths:
     get:
       tags:
       - rest-review-point-controller
-      operationId: show
+      operationId: show_1
       parameters:
       - name: reviewPoint
         in: path
@@ -2064,7 +2059,7 @@ paths:
     get:
       tags:
       - rest-failure-report-controller
-      operationId: show_2
+      operationId: show_3
       parameters:
       - name: failureReport
         in: query
@@ -2365,6 +2360,8 @@ components:
           type: string
         useParentPicture:
           type: boolean
+        noteAudio:
+          type: string
     Notebook:
       required:
       - id
