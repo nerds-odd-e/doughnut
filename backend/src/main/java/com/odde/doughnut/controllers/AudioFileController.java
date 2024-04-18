@@ -1,8 +1,10 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.dto.AudioUploadDTO;
 import com.odde.doughnut.entities.Audio;
 import com.odde.doughnut.entities.repositories.AudioBlobRepository;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -10,10 +12,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/audio")
+@RequestMapping("/api/audio")
 public class AudioFileController {
   private final AudioBlobRepository audioBlobRepository;
 
@@ -36,12 +37,12 @@ public class AudioFileController {
         .body(audioBlobRepository.findById(audio.getAudioBlobId()).get().getData());
   }
 
-  @PostMapping("/{convert}")
+  @PostMapping(value = "/{convert}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<String> upload(
-      @RequestBody MultipartFile audioFile, @PathVariable("convert") Boolean toConvert) {
+      @Valid @ModelAttribute AudioUploadDTO audioFile, @PathVariable("convert") Boolean toConvert) {
     if (toConvert) {
       var url = "https://api.openai.com/v1/audio/transcriptions";
-      var filename = audioFile.getOriginalFilename();
+      var filename = audioFile.getUploadAudioFile().getOriginalFilename();
 
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -54,7 +55,7 @@ public class AudioFileController {
       fileMap.add(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString());
       HttpEntity<byte[]> fileEntity;
       try {
-        fileEntity = new HttpEntity<>(audioFile.getBytes(), fileMap);
+        fileEntity = new HttpEntity<>(audioFile.getUploadAudioFile().getBytes(), fileMap);
       } catch (IOException e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body("Error reading audio file");
@@ -69,6 +70,6 @@ public class AudioFileController {
 
       return restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
     }
-    return ResponseEntity.ok("test");
+    return ResponseEntity.ok("Successfully uploaded audio file");
   }
 }

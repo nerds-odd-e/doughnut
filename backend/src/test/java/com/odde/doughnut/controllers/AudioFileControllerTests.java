@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
+import com.odde.doughnut.controllers.dto.AudioUploadDTO;
 import com.odde.doughnut.entities.Audio;
 import com.odde.doughnut.entities.repositories.AudioBlobRepository;
 import com.odde.doughnut.testability.MakeMe;
@@ -58,14 +59,15 @@ class AudioFileControllerTests {
   void convertAudioToSRT() {
     MockMultipartFile mockFile =
         new MockMultipartFile("file", "test.mp3", "text/plain", "test".getBytes());
-
+    var dto = new AudioUploadDTO();
+    dto.setUploadAudioFile(mockFile);
     // Mocking the response entity
     ResponseEntity<String> mockResponseEntity = new ResponseEntity<>("test", HttpStatus.OK);
     when(restTemplate.exchange(
             any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
         .thenReturn(mockResponseEntity);
 
-    ResponseEntity<String> resp = controller.upload(mockFile, true);
+    ResponseEntity<String> resp = controller.upload(dto, true);
 
     assertThat(resp.getStatusCode(), equalTo(HttpStatus.OK));
     assertThat(resp.getBody(), equalTo("test"));

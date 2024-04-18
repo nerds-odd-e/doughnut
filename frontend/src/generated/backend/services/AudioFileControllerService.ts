@@ -2,30 +2,29 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AudioUploadDTO } from '../models/AudioUploadDTO';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class AudioFileControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
      * @param convert
-     * @param requestBody
+     * @param formData
      * @returns string OK
      * @throws ApiError
      */
     public upload(
         convert: boolean,
-        requestBody: {
-            audioFile?: Blob;
-        },
+        formData?: AudioUploadDTO,
     ): CancelablePromise<string> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/audio/{convert}',
+            url: '/api/audio/{convert}',
             path: {
                 'convert': convert,
             },
-            body: requestBody,
-            mediaType: 'application/json',
+            formData: formData,
+            mediaType: 'multipart/form-data',
             errors: {
                 500: `Internal Server Error`,
             },
@@ -41,7 +40,7 @@ export class AudioFileControllerService {
     ): CancelablePromise<string> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/audio/{audio}',
+            url: '/api/audio/{audio}',
             path: {
                 'audio': audio,
             },
