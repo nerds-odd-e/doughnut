@@ -3,11 +3,11 @@
 /* tslint:disable */
 /* eslint-disable */
 export type NoteAccessories = {
+    audioName?: string;
+    audioId?: number;
     url?: string;
     pictureUrl?: string;
     pictureMask?: string;
     useParentPicture?: boolean;
-    audioId?: number;
-    audioName?: string;
 };
 

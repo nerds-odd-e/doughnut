@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -12,6 +13,8 @@ import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
 
 @Embeddable
+@JsonPropertyOrder({"audio", "audioName", "audioId"})
+
 public class NoteAccessories {
 
   @Getter @Setter private String url;
