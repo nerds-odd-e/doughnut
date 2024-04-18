@@ -5,15 +5,11 @@
       v-model="formData"
       :errors="noteFormErrors"
     />
-    <input type="submit" value="Submit" class="btn btn-primary" />
-    <input
-      type="submit"
-      value="Convert Only"
-      class="btn btn-primary"
-      id="note-convertOnly"
-    />
+    <input type="submit" value="Save Only" class="btn btn-primary" />
+    <input type="submit" value="Save and Convert" class="btn btn-primary" />
+    <input type="submit" value="Convert Only" class="btn btn-primary" />
   </form>
-  <textarea id="note-convertedSrt"></textarea>
+  <textarea></textarea>
 </template>
 
 <script lang="ts">

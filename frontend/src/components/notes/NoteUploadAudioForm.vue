@@ -9,19 +9,12 @@
       $emit('update:modelValue', { ...modelValue, uploadPictureProxy: $event })
     "
   />
-  <CheckInput
-    scope-name="note"
-    field="convertToSrt"
-    v-model="formData.convertToSrt"
-    :errors="errors.convertToSrt"
-  />
 </template>
 
 <script lang="ts">
 import { PropType, defineComponent } from "vue";
 import { NoteAccessoriesDTO } from "@/generated/backend";
 import AudioFileInput from "../form/AudioFileInput.vue";
-import CheckInput from "../form/CheckInput.vue";
 
 export default defineComponent({
   props: {
