@@ -54,9 +54,16 @@ public class NoteAccessories {
   @Setter
   private Audio uploadAudio;
 
-  public Optional<String> getNoteAudio() {
+  public Optional<Integer> getAudioId() {
     if (uploadAudio != null) {
-      return Optional.of("/audio/" + uploadAudio.getId() + "/" + uploadAudio.getName());
+      return Optional.of(uploadAudio.getId());
+    }
+    return null;
+  }
+
+  public Optional<String> getAudioName() {
+    if (uploadAudio != null) {
+      return Optional.of(uploadAudio.getName());
     }
     return null;
   }

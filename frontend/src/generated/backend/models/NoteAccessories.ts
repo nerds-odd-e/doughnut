@@ -7,6 +7,7 @@ export type NoteAccessories = {
     pictureUrl?: string;
     pictureMask?: string;
     useParentPicture?: boolean;
-    noteAudio?: string;
+    audioId?: number;
+    audioName?: string;
 };
 
