@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.repositories.AudioBlobRepository;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -48,21 +47,21 @@ public class AudioFileController {
       headers.setContentType(MediaType.MULTIPART_FORM_DATA);
       headers.setBearerAuth(openAiToken);
 
-      MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-      assert filename != null;
+      MultiValueMap<String, String> fileMap = new LinkedMultiValueMap<>();
+      ContentDisposition contentDisposition =
+          ContentDisposition.builder("form-data").name("file").filename(filename).build();
+
+      fileMap.add(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString());
+      HttpEntity<byte[]> fileEntity;
       try {
-        body.add(
-            "file",
-            new ByteArrayResource(audioFile.getBytes()) {
-              @Override
-              public String getFilename() {
-                return filename;
-              }
-            });
+        fileEntity = new HttpEntity<>(audioFile.getBytes(), fileMap);
       } catch (IOException e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body("Error reading audio file");
       }
+
+      MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+      body.add("file", fileEntity);
       body.add("model", "whisper-1");
       body.add("response_format", "srt");
 
