@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -402,33 +403,11 @@ class RestNoteControllerTests {
       assertThat(note.getNoteAccessories().getUploadPicture(), is(not(nullValue())));
     }
 
-    @Test
-    void shouldReturnSameFileNameAsTheUploadedFileMp3() throws Exception {
-      String filename = "podcast.mp3";
+    @ParameterizedTest
+    @ValueSource(strings = {"podcast.mp3", "podcast.m4a", "podcast.wav"})
+    void shouldSucceedOnValidAudioFileFormat(String filename) throws Exception {
       audioUploadDTO.setUploadAudioFile(
           new MockMultipartFile(filename, filename, "audio/mp3", new byte[] {}));
-      NoteRealm noteRealm = controller.upload(note, audioUploadDTO);
-      assertEquals(
-          noteRealm.getNote().getNoteAccessories().getAudioName().get(),
-          audioUploadDTO.getUploadAudioFile().getOriginalFilename());
-    }
-
-    @Test
-    void shouldReturnSameFileNameAsTheUploadedFileM4a() throws Exception {
-      String filename = "podcast.m4a";
-      audioUploadDTO.setUploadAudioFile(
-          new MockMultipartFile(filename, filename, "audio/m4a", new byte[] {}));
-      NoteRealm noteRealm = controller.upload(note, audioUploadDTO);
-      assertEquals(
-          noteRealm.getNote().getNoteAccessories().getAudioName().get(),
-          audioUploadDTO.getUploadAudioFile().getOriginalFilename());
-    }
-
-    @Test
-    void shouldReturnSameFileNameAsTheUploadedFileWav() throws Exception {
-      String filename = "podcast.wav";
-      audioUploadDTO.setUploadAudioFile(
-          new MockMultipartFile(filename, filename, "audio/wav", new byte[] {}));
       NoteRealm noteRealm = controller.upload(note, audioUploadDTO);
       assertEquals(
           noteRealm.getNote().getNoteAccessories().getAudioName().get(),
@@ -452,7 +431,7 @@ class RestNoteControllerTests {
       String filename = "podcast.wav";
       audioUploadDTO.setUploadAudioFile(
           new MockMultipartFile(filename, filename, "audio/wav", new byte[] {}));
-      NoteRealm noteRealm = controller.upload(note, audioUploadDTO);
+      controller.upload(note, audioUploadDTO);
       Note newNote = makeMe.modelFactoryService.noteRepository.findById(note.getId()).get();
       assertEquals(filename, newNote.getNoteAccessories().getUploadAudio().getName());
     }
