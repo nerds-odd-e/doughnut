@@ -414,10 +414,11 @@ class RestNoteControllerTests {
           audioUploadDTO.getUploadAudioFile().getOriginalFilename());
     }
 
-    @Test
-    void shouldFailOnInvalidAudioFileFormatTxt()
+    @ParameterizedTest
+    @ValueSource(strings = {"something.txt", "youtube.avi"})
+    void shouldFailOnInvalidAudioFileFormatTxt(String filename)
         throws UnexpectedNoAccessRightException, IOException {
-      audioUploadDTO.setUploadAudioFile(new MockMultipartFile("something.txt", new byte[] {}));
+      audioUploadDTO.setUploadAudioFile(new MockMultipartFile(filename, new byte[] {}));
 
       assertThrows(
           Exception.class,
@@ -434,18 +435,6 @@ class RestNoteControllerTests {
       controller.upload(note, audioUploadDTO);
       Note newNote = makeMe.modelFactoryService.noteRepository.findById(note.getId()).get();
       assertEquals(filename, newNote.getNoteAccessories().getUploadAudio().getName());
-    }
-
-    @Test
-    void shouldFailOnInvalidAudioFileFormatAvi()
-        throws UnexpectedNoAccessRightException, IOException {
-      audioUploadDTO.setUploadAudioFile(new MockMultipartFile("youtube.avi", new byte[] {}));
-
-      assertThrows(
-          Exception.class,
-          () -> {
-            controller.upload(note, audioUploadDTO);
-          });
     }
   }
 
