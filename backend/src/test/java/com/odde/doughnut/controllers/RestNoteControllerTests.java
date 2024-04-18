@@ -416,9 +416,25 @@ class RestNoteControllerTests {
 
     @ParameterizedTest
     @ValueSource(strings = {"something.txt", "youtube.avi"})
-    void shouldFailOnInvalidAudioFileFormatTxt(String filename)
+    void shouldFailOnInvalidAudioFileFormat(String filename)
         throws UnexpectedNoAccessRightException, IOException {
-      audioUploadDTO.setUploadAudioFile(new MockMultipartFile(filename, new byte[] {}));
+      byte[] bytes = new byte[1024 * 1024 * 10];
+      audioUploadDTO.setUploadAudioFile(
+          new MockMultipartFile(filename, filename, "audio/mp3", new byte[] {}));
+
+      assertThrows(
+          Exception.class,
+          () -> {
+            controller.upload(note, audioUploadDTO);
+          });
+    }
+
+    @Test
+    void shouldFailOnFileSize() throws UnexpectedNoAccessRightException, IOException {
+      String filename = "big_file.mp3";
+      byte[] bytes = new byte[1024 * 1024 * 20];
+      audioUploadDTO.setUploadAudioFile(
+          new MockMultipartFile(filename, filename, "audio/mp3", bytes));
 
       assertThrows(
           Exception.class,

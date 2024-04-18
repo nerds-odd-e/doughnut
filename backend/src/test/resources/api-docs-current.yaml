@@ -2346,6 +2346,11 @@ components:
     NoteAccessories:
       type: object
       properties:
+        audioName:
+          type: string
+        audioId:
+          type: integer
+          format: int32
         url:
           type: string
         pictureUrl:
@@ -2354,11 +2359,6 @@ components:
           type: string
         useParentPicture:
           type: boolean
-        audioName:
-          type: string
-        audioId:
-          type: integer
-          format: int32
     Notebook:
       required:
       - id

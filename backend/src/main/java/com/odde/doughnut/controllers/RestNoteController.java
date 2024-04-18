@@ -134,6 +134,10 @@ class RestNoteController {
       throw new Exception("Invalid format");
     }
 
+    if (audioUploadDTO.getUploadAudioFile().getSize() >= 1024 * 1024 * 20) {
+      throw new Exception("Size Exceeded");
+    }
+
     final User user = currentUser.getEntity();
     note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     note.setAudio(audioUploadDTO.getUploadAudioFile(), user);
