@@ -54,8 +54,7 @@ public class AudioFileController {
 
       HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-      ResponseEntity<String> response =
-          restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+      return restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
     }
     return ResponseEntity.ok("test");
   }

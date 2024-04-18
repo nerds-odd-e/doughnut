@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.entities.Audio;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,10 +61,12 @@ class AudioFileControllerTests {
 
     // Mocking the response entity
     ResponseEntity<String> mockResponseEntity = new ResponseEntity<>("test", HttpStatus.OK);
-    when(restTemplate.exchange(any(), any(HttpMethod.class), any(), any(Class.class)))
+    when(restTemplate.exchange(
+            any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
         .thenReturn(mockResponseEntity);
 
     ResponseEntity<String> resp = controller.upload(mockFile, true);
+
     assertThat(resp.getStatusCode(), equalTo(HttpStatus.OK));
     assertThat(resp.getBody(), equalTo("test"));
   }
