@@ -7,9 +7,9 @@
       :storage-accessor="storageAccessor"
     />
     <slot name="topic-additional" />
+    <button v-if="isTesting">Download harvard.wav</button>
   </div>
   <div role="details" class="note-content">
-    <button>Download harvard.wav</button>
     <NoteEditableDetails
       :note-id="note.id"
       :note-details="note.details"
@@ -22,6 +22,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { Note } from "@/generated/backend";
+import getEnvironment from "@/managedApi/window/getEnvironment";
 import { type StorageAccessor } from "../../store/createNoteStorage";
 import NoteEditableTopic from "./NoteEditableTopic.vue";
 import NoteEditableDetails from "./NoteEditableDetails.vue";
@@ -37,6 +38,11 @@ export default defineComponent({
   components: {
     NoteEditableTopic,
     NoteEditableDetails,
+  },
+  computed: {
+    isTesting() {
+      return getEnvironment() === "testing";
+    },
   },
 });
 </script>
