@@ -82,7 +82,7 @@ When("I convert the audio-file to SRT without saving", () => {
 })
 
 When("I save and convert the audio-file to SRT", () => {
-  cy.get("#note-saveAndConvert").click()
+  cy.findAllByText("Save and Convert").click()
 })
 
 Then("I should see the extracted SRT content", (srtContent: string) => {

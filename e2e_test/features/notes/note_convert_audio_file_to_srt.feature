@@ -15,10 +15,13 @@ Feature: Note Convert Audio File to SRT
     00:00:00,000 --> 00:00:02,000
     Hello, this is a test.
     """
-    
-@ignore
+
   Scenario: Convert audio-file to SRT
     When I upload an audio-file "harvard.wav" to the note "podcast"
     And I save and convert the audio-file to SRT
-    Then I should see the extracted SRT content
-    And I must be able to download the "harvard.wav" from the note
+    Then I should see the extracted SRT content 
+    """
+    1
+    00:00:00,000 --> 00:00:02,000
+    Hello, this is a test.
+    """

@@ -6,7 +6,12 @@
       :errors="noteFormErrors"
     />
     <input type="submit" value="Save Only" class="btn btn-primary" />
-    <input type="submit" value="Save and Convert" class="btn btn-primary" />
+    <input
+      type="submit"
+      value="Save and Convert"
+      class="btn btn-primary"
+      @click="convertToSRT"
+    />
     <input
       type="submit"
       value="Convert Only"
