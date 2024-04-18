@@ -19,7 +19,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { Note } from "@/generated/backend";
+import { Note, AudioUploadDTO } from "@/generated/backend";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import NoteUploadAudioForm from "./NoteUploadAudioForm.vue";
 
@@ -37,7 +37,7 @@ export default defineComponent({
   emits: ["closeDialog"],
   data() {
     return {
-      formData: {} as { file: Blob },
+      formData: {} as AudioUploadDTO,
       noteFormErrors: {},
       srt: "",
     };

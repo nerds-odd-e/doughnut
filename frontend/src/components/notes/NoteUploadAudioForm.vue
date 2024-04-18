@@ -2,22 +2,23 @@
   <AudioFileInput
     scope-name="note"
     field="uploadAudioFile"
-    :errors="errors.file"
-    :model-value="modelValue.file"
+    :errors="errors.uploadAudioFile"
+    :model-value="modelValue.uploadAudioFile"
     @update:model-value="
-      $emit('update:modelValue', { ...modelValue, file: $event })
+      $emit('update:modelValue', { ...modelValue, uploadAudioFile: $event })
     "
   />
 </template>
 
 <script lang="ts">
 import { PropType, defineComponent } from "vue";
+import { AudioUploadDTO } from "@/generated/backend";
 import AudioFileInput from "../form/AudioFileInput.vue";
 
 export default defineComponent({
   props: {
     modelValue: {
-      type: Object as PropType<{ file: Blob }>,
+      type: Object as PropType<AudioUploadDTO>,
       required: true,
     },
     errors: {

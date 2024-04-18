@@ -1,5 +1,6 @@
 import { Router } from "vue-router";
 import {
+  AudioUploadDTO,
   LinkCreation,
   NoteAccessoriesDTO,
   NoteCreationDTO,
@@ -55,7 +56,7 @@ export interface StoredApi {
     noteId: Doughnut.ID,
   ): Promise<NoteRealm | undefined>;
 
-  uploadAudio(note: Doughnut.ID, formData: { file: Blob }): Promise<void>;
+  uploadAudio(note: Doughnut.ID, formData: AudioUploadDTO): Promise<void>;
 }
 export default class StoredApiCollection implements StoredApi {
   noteEditingHistory: NoteEditingHistory;
@@ -237,12 +238,7 @@ export default class StoredApiCollection implements StoredApi {
     return noteRealm;
   }
 
-  async uploadAudio(
-    note: number,
-    formData?: {
-      file: Blob;
-    },
-  ) {
+  async uploadAudio(note: number, formData?: AudioUploadDTO) {
     await this.managedApi.restNoteController.upload1(note, formData);
   }
 }
