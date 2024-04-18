@@ -54,6 +54,8 @@ export interface StoredApi {
     router: Router,
     noteId: Doughnut.ID,
   ): Promise<NoteRealm | undefined>;
+
+  uploadAudio(note: Doughnut.ID, formData: { file: Blob }): Promise<void>;
 }
 export default class StoredApiCollection implements StoredApi {
   noteEditingHistory: NoteEditingHistory;
@@ -233,5 +235,14 @@ export default class StoredApiCollection implements StoredApi {
     const noteRealm = this.storage.refreshNoteRealm(res[0]!);
     this.routerReplaceFocus(router, noteRealm);
     return noteRealm;
+  }
+
+  async uploadAudio(
+    note: number,
+    formData?: {
+      file: Blob;
+    },
+  ) {
+    await this.managedApi.restNoteController.upload1(note, formData);
   }
 }

@@ -19,7 +19,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { Note, NoteAccessories } from "@/generated/backend";
+import { Note } from "@/generated/backend";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import NoteUploadAudioForm from "./NoteUploadAudioForm.vue";
 
@@ -36,9 +36,8 @@ export default defineComponent({
   },
   emits: ["closeDialog"],
   data() {
-    const { ...rest } = this.note.noteAccessories;
     return {
-      formData: rest as NoteAccessories,
+      formData: {} as { file: Blob },
       noteFormErrors: {},
       srt: "",
     };
@@ -46,7 +45,13 @@ export default defineComponent({
 
   methods: {
     processForm() {
-      return;
+      this.storageAccessor
+        .storedApi()
+        .uploadAudio(this.note.id, this.formData)
+        .then(() => this.$emit("closeDialog"))
+        .catch((error) => {
+          this.noteFormErrors = error;
+        });
     },
     convertToSRT() {
       this.srt = "1\n00:00:00,000 --> 00:00:02,000\nHello, this is a test.";
