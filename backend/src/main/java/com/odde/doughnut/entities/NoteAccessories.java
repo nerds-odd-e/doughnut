@@ -14,7 +14,6 @@ import org.apache.logging.log4j.util.Strings;
 
 @Embeddable
 @JsonPropertyOrder({"audio", "audioName", "audioId"})
-
 public class NoteAccessories {
 
   @Getter @Setter private String url;
