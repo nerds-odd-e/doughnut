@@ -56,7 +56,11 @@ export interface StoredApi {
     noteId: Doughnut.ID,
   ): Promise<NoteRealm | undefined>;
 
-  uploadAudio(note: Doughnut.ID, formData: AudioUploadDTO): Promise<void>;
+  uploadAudio(
+    noteId: Doughnut.ID,
+    formData: AudioUploadDTO,
+  ): Promise<NoteRealm>;
+  downloadAudio(audioId: Doughnut.ID): Promise<void>;
 }
 export default class StoredApiCollection implements StoredApi {
   noteEditingHistory: NoteEditingHistory;
@@ -238,7 +242,13 @@ export default class StoredApiCollection implements StoredApi {
     return noteRealm;
   }
 
-  async uploadAudio(note: number, formData?: AudioUploadDTO) {
-    await this.managedApi.restNoteController.upload1(note, formData);
+  async uploadAudio(noteId: number, formData?: AudioUploadDTO) {
+    return this.storage.refreshNoteRealm(
+      await this.managedApi.restNoteController.upload1(noteId, formData),
+    );
+  }
+
+  async downloadAudio(noteId: number) {
+    await this.managedApi.audioFileController.downloadAudio(noteId);
   }
 }

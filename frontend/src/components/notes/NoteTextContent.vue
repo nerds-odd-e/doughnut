@@ -7,7 +7,12 @@
       :storage-accessor="storageAccessor"
     />
     <slot name="topic-additional" />
-    <button v-if="isTesting">Download harvard.wav</button>
+    <button
+      @click="downloadAudioFile(note.noteAccessories.audioId!)"
+      v-if="note.noteAccessories.audioName && isTesting"
+    >
+      Download {{ note.noteAccessories.audioName }}
+    </button>
   </div>
   <div role="details" class="note-content">
     <NoteEditableDetails
@@ -42,6 +47,11 @@ export default defineComponent({
   computed: {
     isTesting() {
       return getEnvironment() === "testing";
+    },
+  },
+  methods: {
+    async downloadAudioFile(audioId: number) {
+      await this.storageAccessor.storedApi().downloadAudio(audioId);
     },
   },
 });
