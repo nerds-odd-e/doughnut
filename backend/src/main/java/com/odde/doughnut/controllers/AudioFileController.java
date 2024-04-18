@@ -3,8 +3,9 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.entities.Audio;
 import com.odde.doughnut.entities.repositories.AudioBlobRepository;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.IOException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -49,8 +50,21 @@ public class AudioFileController {
 
       MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
       assert filename != null;
-      body.add("file", new FileSystemResource(filename));
+      try {
+        body.add(
+            "file",
+            new ByteArrayResource(audioFile.getBytes()) {
+              @Override
+              public String getFilename() {
+                return filename;
+              }
+            });
+      } catch (IOException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body("Error reading audio file");
+      }
       body.add("model", "whisper-1");
+      body.add("response_format", "srt");
 
       HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 

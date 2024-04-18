@@ -77,6 +77,7 @@ in mkShell {
     export PNPM_HOME="$(readlink -e $(type -p pnpm) | sed -e 's/\/bin\/pnpm//g')"
     export NODE_PATH="$(readlink -e $(type -p node) | sed  -e 's/\/bin\/node//g')"
     export PUB_CACHE="''${PUB_CACHE:-$PWD/.pub-cache}"
+    export OPENAI_API_TOKEN="''${AI_TOKEN}"
 
     export MYSQL_BASEDIR=${pkgs.mysql80}
     export MYSQL_HOME="''${MYSQL_HOME:-$PWD/mysql}"
