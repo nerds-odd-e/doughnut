@@ -5,13 +5,17 @@
       v-model="formData"
       :errors="noteFormErrors"
     />
-    <input type="submit" value="Save Only" class="btn btn-primary" />
+    <input type="submit" value="Save" class="btn btn-primary" />
     <input
-      value="Save and Convert"
+      value="Save and Convert to SRT"
       class="btn btn-primary"
       @click="convertToSRT"
     />
-    <input value="Convert Only" class="btn btn-primary" @click="convertToSRT" />
+    <input
+      value="Convert to SRT"
+      class="btn btn-primary"
+      @click="convertToSRT"
+    />
   </form>
   <textarea :value="srt"></textarea>
 </template>

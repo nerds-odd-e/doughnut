@@ -83,15 +83,15 @@ Then(
 // )
 
 When("I save the audio-file", () => {
-  cy.findAllByText("Save Only").click()
+  cy.findAllByText("Save").click()
 })
 
 When("I convert the audio-file to SRT without saving", () => {
-  cy.findAllByDisplayValue("Convert Only").click()
+  cy.findAllByDisplayValue("Convert to SRT").click()
 })
 
 When("I save and convert the audio-file to SRT", () => {
-  cy.findAllByDisplayValue("Save and Convert").click()
+  cy.findAllByDisplayValue("Save and Convert to SRT").click()
 })
 
 When(
