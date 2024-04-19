@@ -250,7 +250,11 @@ export default class StoredApiCollection implements StoredApi {
     convert?: boolean,
   ) {
     return this.storage.refreshNoteRealm(
-      await this.managedApi.restNoteController.upload1(noteId, convert, formData),
+      await this.managedApi.restNoteController.upload1(
+        noteId,
+        convert,
+        formData,
+      ),
     );
   }
 
