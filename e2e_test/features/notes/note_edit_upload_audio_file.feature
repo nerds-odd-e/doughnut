@@ -7,7 +7,6 @@ Feature: Note Upload Audio File
         And I have a note with the topic "lunar"
 
 
-@focus
     Scenario: Upload audio into a note
 #        Given I have an audio file named "podcast.mp3"
         When I upload an audio-file "Alison.mp3" to the note "lunar"
