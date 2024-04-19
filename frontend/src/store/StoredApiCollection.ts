@@ -254,6 +254,10 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   async convertAudio(convert: boolean, formData?: AudioUploadDTO) {
-    await this.managedApi.audioFileController.upload(convert, formData);
+    const res = await this.managedApi.audioFileController.upload(
+      convert,
+      formData,
+    );
+    return res;
   }
 }

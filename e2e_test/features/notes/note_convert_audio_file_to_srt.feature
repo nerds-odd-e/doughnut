@@ -13,7 +13,10 @@ Feature: Note Convert Audio File to SRT
     """
     1
     00:00:00,000 --> 00:00:02,000
-    Hello, this is a test.
+    You
+
+
+
     """
 
   Scenario: Convert audio-file to SRT
@@ -23,5 +26,8 @@ Feature: Note Convert Audio File to SRT
     """
     1
     00:00:00,000 --> 00:00:02,000
-    Hello, this is a test.
+    You
+
+
+    
     """

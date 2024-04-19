@@ -62,11 +62,9 @@ export default defineComponent({
       this.storageAccessor
         .storedApi()
         .convertAudio(true, this.formData)
-        .then(
-          () =>
-            (this.srt =
-              "1\n00:00:00,000 --> 00:00:02,000\nHello, this is a test."),
-        )
+        .then((response: string) => {
+          this.srt = response;
+        })
         .catch((error) => {
           this.noteFormErrors = error;
         });
