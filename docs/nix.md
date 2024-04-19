@@ -46,32 +46,41 @@ cd doughnut
 nix develop
 ```
 
-All development tool commands henceforth should be run within `nix develop -c $SHELL`
+All development tool commands henceforth should be run within `nix develop`
 Run E2E profile springboot backend server with gradle (backend app started on port 9081)
 
 ```bash
 # from doughnut source root dir
-pnpm --frozen-lockfile recursive install && pnpm frontend:build
 pnpm sut
 ```
 
 Open your browser to visit http://localhost:9081
 
+Run backend unit tests
+
+```
+# from doughnut source root dir
+pnpm backend:test
+```
+
+Run frontend unit tests
+
+```
+# from doughnut source root dir
+pnpm frontend:test
+```
+
 Run E2E profile with backend server & frontend in dev mode & Cypress IDE (frontend app on port 5173; backend app on port 9081)
-For MS Windows users, you need to ensure your WSL2 Linux has `xvfb` installed. This is not managed by Nix!
+:warning: For MS Windows users, you need to ensure your WSL2 Linux has `xvfb` installed. This is not managed by Nix! (see [Additional things to note for Microsoft Windows10/Windows11 developers using WSL2g with Ubuntu-23.04.](./wsl2.md))
 
 ```bash
 # from doughnut source root dir
-pnpm --frozen-lockfile recursive install && pnpm frontend:sut
-pnpm sut
-pnpm start:mb
-pnpm cy:open
+pnpm test:open
 ```
 
 Run headless E2E (doughnut full stack started on port 9081)
 
 ```bash
 # from doughnut source root dir
-pnpm --frozen-lockfile recursive install && pnpm frontend:build
 pnpm t
 ```
