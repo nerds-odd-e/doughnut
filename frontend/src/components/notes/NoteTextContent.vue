@@ -10,7 +10,7 @@
     <button
       class="btn btn-sm download-btn"
       @click="downloadAudioFile(note.noteAccessories.audioId!)"
-      v-if="note.noteAccessories.audioName && isTesting"
+      v-if="note.noteAccessories.audioName"
     >
       Download {{ note.noteAccessories.audioName }}
     </button>
@@ -28,7 +28,6 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { Note } from "@/generated/backend";
-import getEnvironment from "@/managedApi/window/getEnvironment";
 import { type StorageAccessor } from "../../store/createNoteStorage";
 import NoteEditableTopic from "./NoteEditableTopic.vue";
 import NoteEditableDetails from "./NoteEditableDetails.vue";
@@ -44,11 +43,6 @@ export default defineComponent({
   components: {
     NoteEditableTopic,
     NoteEditableDetails,
-  },
-  computed: {
-    isTesting() {
-      return getEnvironment() === "testing";
-    },
   },
   methods: {
     async downloadAudioFile(audioId: number) {

@@ -20,7 +20,7 @@
         </template>
       </PopButton>
 
-      <PopButton v-if="isTesting" title="Upload audio">
+      <PopButton title="Upload audio">
         <template #button_face>
           <SvgResume />
         </template>
@@ -88,7 +88,6 @@
 import { defineComponent, PropType } from "vue";
 import { StorageAccessor } from "@/store/createNoteStorage";
 import { Note } from "@/generated/backend";
-import getEnvironment from "@/managedApi/window/getEnvironment";
 import NoteNewButton from "./NoteNewButton.vue";
 import SvgAddChild from "../svgs/SvgAddChild.vue";
 import SvgEdit from "../svgs/SvgEdit.vue";
@@ -132,11 +131,6 @@ export default defineComponent({
     PopButton,
     AIGenerateImageDialog,
     NoteDetailsAutoCompletionButton,
-  },
-  computed: {
-    isTesting() {
-      return getEnvironment() === "testing";
-    },
   },
 });
 </script>
