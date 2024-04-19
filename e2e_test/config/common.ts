@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import createBundler from "@bahmutov/cypress-esbuild-preprocessor"
-import { addCucumberPreprocessorPlugin } from "@badeball/cypress-cucumber-preprocessor"
+import createBundler from "@bahmutov/cypress-esbuild-preprocessor";
+import { addCucumberPreprocessorPlugin } from "@badeball/cypress-cucumber-preprocessor";
 import { createEsbuildPlugin } from "@badeball/cypress-cucumber-preprocessor/esbuild";
-import { existsSync, rmdir } from "fs"
+import { existsSync, rmdir } from "fs";
 
 const commonConfig = {
   chromeWebSecurity: false,
@@ -15,43 +15,52 @@ const commonConfig = {
   trashAssetsBeforeRuns: true,
   environment: "ci",
   e2e: {
-    setupNodeEvents(on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions) {
-      addCucumberPreprocessorPlugin(on, config)
+    async setupNodeEvents(
+      on: Cypress.PluginEvents,
+      config: Cypress.PluginConfigOptions,
+    ): Promise<Cypress.PluginConfigOptions> {
+      await addCucumberPreprocessorPlugin(on, config);
+
       on(
         "file:preprocessor",
         createBundler({
           plugins: [createEsbuildPlugin(config)],
         }),
-      )
+      );
+
       on("task", {
         deleteFolder(folderName) {
-          console.log("deleting folder %s", folderName)
+          console.log("deleting folder %s", folderName);
 
           return new Promise((resolve, reject) => {
             if (!existsSync(folderName)) {
-              resolve(null)
-              return
+              resolve(null);
+              return;
             }
             rmdir(folderName, { maxRetries: 10, recursive: true }, (err) => {
               if (err) {
-                console.error(err)
-                return reject(err)
+                console.error(err);
+                return reject(err);
               }
-              resolve(null)
-            })
-          })
+              resolve(null);
+            });
+          });
         },
         fileExists(filePath) {
           return existsSync(filePath);
-        }
-      })
+        },
+      });
 
-      return config
+      return config;
     },
     supportFile: "e2e_test/support/e2e.ts",
     specPattern: "e2e_test/features/**/*.feature",
-    excludeSpecPattern: ["**/*.{js,ts}", "**/__snapshots__/*", "**/__image_snapshots__/*"],
+    excludeSpecPattern: [
+      "**/*.{js,ts}",
+      "**/__snapshots__/*",
+      "**/__image_snapshots__/*",
+    ],
   },
-}
+};
 
-export default commonConfig
+export default commonConfig;
