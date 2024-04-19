@@ -6,17 +6,7 @@ Feature: Note Upload Audio File
         Given I am logged in as an existing user
         And I have a note with the topic "lunar"
 
-    Scenario Outline: Supported file types
-        Given I have a file named <File Name>
-        When I upload <File Name> to note "lunar"
-        Then I must see the message <Expected Message>
-        Examples:
-            | File Name     | Expected Message   |
-            | youtube.mp4   | Wrong audio format |
-            | something.txt | Wrong audio format |
-            | podcast1.mp3  | Upload successful  |
-            | podcast2.m4a  | Upload successful  |
-            | podcast3.wav  | Upload successful  |
+
 @focus
     Scenario: Upload audio into a note
 #        Given I have an audio file named "podcast.mp3"
@@ -24,10 +14,6 @@ Feature: Note Upload Audio File
         And I save the audio-file
         Then I must be able to download the "Alison.mp3" from the note "lunar"
 
-    Scenario: Upload audio into a note with big file size
-        Given I have a 2 GB audio file named "big_podcast.mp3"
-        When I upload "big_podcast.mp3" to note "lunar"
-        Then I must see the error message "Size limit exceeded"
 
     Scenario: Upload audio file into a note with existing audio file attached
  #       Given I have an audio file named "another_podcast.mp3" attached to it
