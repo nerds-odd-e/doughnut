@@ -53,7 +53,9 @@ export default defineComponent({
         .uploadAudio(this.note.id, this.formData)
         .then(() => this.$emit("closeDialog"))
         .catch((error) => {
-          this.noteFormErrors = {uploadAudioFile: error.body.message ?? "Unexpected error occured"};
+          this.noteFormErrors = {
+            uploadAudioFile: error.body.message ?? "Unexpected error occured",
+          };
         });
     },
     convertToSRT() {
