@@ -9,7 +9,7 @@
     <input
       value="Save and Convert to SRT"
       class="btn btn-primary"
-      @click="convertToSRT"
+      @click="uploadAudioAndConvertToSRT"
     />
     <input
       value="Convert to SRT"
@@ -22,7 +22,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { Note, AudioUploadDTO } from "@/generated/backend";
+import { Note, AudioUploadDTO, NoteRealm } from "@/generated/backend";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import NoteUploadAudioForm from "./NoteUploadAudioForm.vue";
 
@@ -50,8 +50,21 @@ export default defineComponent({
     uploadAudio() {
       this.storageAccessor
         .storedApi()
-        .uploadAudio(this.note.id, this.formData)
+        .uploadAudio(this.note.id, this.formData, false)
         .then(() => this.$emit("closeDialog"))
+        .catch((error) => {
+          this.noteFormErrors = {
+            uploadAudioFile: error.body.message ?? "Unexpected error occured",
+          };
+        });
+    },
+    uploadAudioAndConvertToSRT() {
+      this.storageAccessor
+        .storedApi()
+        .uploadAudio(this.note.id, this.formData, true)
+        .then((response: NoteRealm) => {
+          this.srt = response.note.srt ?? "";
+        })
         .catch((error) => {
           this.noteFormErrors = {
             uploadAudioFile: error.body.message ?? "Unexpected error occured",
@@ -61,8 +74,8 @@ export default defineComponent({
     convertToSRT() {
       this.storageAccessor
         .storedApi()
-        .convertAudio(true, this.formData)
-        .then((response: string) => {
+        .convertAudio(this.formData)
+        .then((response) => {
           this.srt = response;
         })
         .catch((error) => {

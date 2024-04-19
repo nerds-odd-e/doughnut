@@ -487,7 +487,7 @@ class RestNoteControllerTests {
               any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
           .thenReturn(mockResponseEntity);
 
-      String resp = controller.convertSrt(dto);
+      String resp = controller.convertSrt(dto).getBody();
 
       assertThat(resp, equalTo("test"));
     }

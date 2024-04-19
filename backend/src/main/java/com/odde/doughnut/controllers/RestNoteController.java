@@ -150,7 +150,7 @@ class RestNoteController {
     validateFile(audioUploadDTO, filename);
 
     if (isConverting) {
-      var srt = convertSrt(audioUploadDTO);
+      var srt = convertSrt(audioUploadDTO).getBody();
       note.setSrt(srt);
     }
 
@@ -184,7 +184,7 @@ class RestNoteController {
       path = "/convertSrt",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @Transactional
-  public String convertSrt(@Valid @ModelAttribute AudioUploadDTO audioFile) {
+  public ResponseEntity<String> convertSrt(@Valid @ModelAttribute AudioUploadDTO audioFile) {
     var url = "https://api.openai.com/v1/audio/transcriptions";
     var filename = audioFile.getUploadAudioFile().getOriginalFilename();
 
@@ -212,7 +212,7 @@ class RestNoteController {
     HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
     var response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-    return response.getBody();
+    return response;
   }
 
   @GetMapping("/{note}/note-info")
