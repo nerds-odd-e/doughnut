@@ -32,7 +32,7 @@ public class AudioFileController {
   public ResponseEntity<byte[]> downloadAudio(
       @PathVariable("audio") @Schema(type = "integer") Audio audio) {
     return ResponseEntity.ok()
-        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + audio.getName() + "\"")
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + audio.getName() + "\"")
         .header(HttpHeaders.CONTENT_TYPE, audio.getType())
         .body(audioBlobRepository.findById(audio.getAudioBlobId()).get().getData());
   }

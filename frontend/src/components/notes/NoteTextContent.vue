@@ -8,6 +8,7 @@
     />
     <slot name="topic-additional" />
     <button
+      class="btn btn-sm download-btn"
       @click="downloadAudioFile(note.noteAccessories.audioId!)"
       v-if="note.noteAccessories.audioName && isTesting"
     >
@@ -51,8 +52,20 @@ export default defineComponent({
   },
   methods: {
     async downloadAudioFile(audioId: number) {
-      await this.storageAccessor.storedApi().downloadAudio(audioId);
+      const audioUrl = `/api/audio/${audioId}`;
+
+      const link = document.createElement("a");
+      link.href = audioUrl;
+
+      link.download = this.note.noteAccessories.audioName!;
+
+      link.click();
     },
   },
 });
 </script>
+<style scoped>
+.download-btn {
+  text-decoration: underline;
+}
+</style>
