@@ -118,7 +118,7 @@ class ServiceMocker {
     cy.get(`@${this.stubsName}`).then((stubs) => {
       const newStubs = [...stubs, stub]
       cy.wrap(newStubs).as(this.stubsName)
-      return this.mountebank.addStubsToImposter(newStubs)
+      return this.mountebank.addStubsToImposter(newStubs as Stub[])
     })
   }
 }
