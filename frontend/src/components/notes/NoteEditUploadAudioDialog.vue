@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent.once="processForm">
+  <form @submit.prevent.once="uploadAudio">
     <NoteUploadAudioForm
       v-if="!!formData"
       v-model="formData"
@@ -47,13 +47,13 @@ export default defineComponent({
   },
 
   methods: {
-    processForm() {
+    uploadAudio() {
       this.storageAccessor
         .storedApi()
         .uploadAudio(this.note.id, this.formData)
         .then(() => this.$emit("closeDialog"))
         .catch((error) => {
-          this.noteFormErrors = error;
+          this.noteFormErrors = {uploadAudioFile: error.body.message ?? "Unexpected error occured"};
         });
     },
     convertToSRT() {
