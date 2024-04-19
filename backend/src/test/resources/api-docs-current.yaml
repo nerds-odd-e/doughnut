@@ -1632,7 +1632,7 @@ paths:
           type: integer
       - name: isConverting
         in: query
-        required: true
+        required: false
         schema:
           type: boolean
       requestBody:

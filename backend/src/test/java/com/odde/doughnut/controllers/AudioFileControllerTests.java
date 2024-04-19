@@ -30,11 +30,14 @@ import org.springframework.web.client.RestTemplate;
 @Transactional
 class AudioFileControllerTests {
 
-  @Autowired AudioBlobRepository audioBlobRepository;
+  @Autowired
+  AudioBlobRepository audioBlobRepository;
 
-  @Mock RestTemplate restTemplate;
+  @Mock
+  RestTemplate restTemplate;
 
-  @Autowired MakeMe makeMe;
+  @Autowired
+  MakeMe makeMe;
   AudioFileController controller;
 
   @BeforeEach
@@ -51,21 +54,21 @@ class AudioFileControllerTests {
     assertThat(resp.getStatusCode(), equalTo(HttpStatus.OK));
     assertThat(resp.getHeaders().getContentType().toString(), equalTo("audio/mp3"));
     assertThat(
-        resp.getHeaders().getContentDisposition().toString(),
-        equalTo("inline; filename=\"example.mp3\""));
+      resp.getHeaders().getContentDisposition().toString(),
+      equalTo("attachment; filename=\"example.mp3\""));
   }
 
   @Test
   void convertAudioToSRT() {
     MockMultipartFile mockFile =
-        new MockMultipartFile("file", "test.mp3", "text/plain", "test".getBytes());
+      new MockMultipartFile("file", "test.mp3", "text/plain", "test".getBytes());
     var dto = new AudioUploadDTO();
     dto.setUploadAudioFile(mockFile);
     // Mocking the response entity
     ResponseEntity<String> mockResponseEntity = new ResponseEntity<>("test", HttpStatus.OK);
     when(restTemplate.exchange(
-            any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
-        .thenReturn(mockResponseEntity);
+      any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
+      .thenReturn(mockResponseEntity);
 
     ResponseEntity<String> resp = controller.upload(dto, true);
 
