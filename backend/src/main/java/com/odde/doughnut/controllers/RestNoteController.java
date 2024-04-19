@@ -1,5 +1,7 @@
 package com.odde.doughnut.controllers;
 
+import static java.util.Objects.requireNonNull;
+
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
@@ -18,31 +20,42 @@ import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import org.springframework.beans.BeanUtils;
-import org.springframework.http.MediaType;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.validation.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.annotation.SessionScope;
 
 @RestController
 @SessionScope
 @RequestMapping("/api/notes")
 class RestNoteController {
+
+  @Value("${spring.openai.token}")
+  private String openAiToken;
+
   private final ModelFactoryService modelFactoryService;
-  private UserModel currentUser;
+  private final UserModel currentUser;
   private final WikidataService wikidataService;
   private final TestabilitySettings testabilitySettings;
+  private final RestTemplate restTemplate;
 
   public RestNoteController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       HttpClientAdapter httpClientAdapter,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      RestTemplate restTemplate) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
     this.wikidataService =
         new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
+    this.restTemplate = restTemplate;
   }
 
   @PostMapping(value = "/{note}/updateWikidataId")
@@ -127,24 +140,79 @@ class RestNoteController {
   @Transactional
   public NoteRealm upload(
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
-      @Valid @ModelAttribute AudioUploadDTO audioUploadDTO)
-      throws UnexpectedNoAccessRightException, IOException, Exception {
-    String filename = audioUploadDTO.getUploadAudioFile().getOriginalFilename();
-    if (!(filename.endsWith(".mp3") || filename.endsWith(".m4a") || filename.endsWith(".wav"))) {
-      throw new Exception("Invalid format");
-    }
-
-    if (audioUploadDTO.getUploadAudioFile().getSize() >= 1024 * 1024 * 20) {
-      throw new Exception("Size Exceeded");
-    }
+      @Valid @ModelAttribute AudioUploadDTO audioUploadDTO,
+      @RequestParam(required = false) Boolean isConverting)
+      throws Exception {
 
     final User user = currentUser.getEntity();
+
+    String filename = audioUploadDTO.getUploadAudioFile().getOriginalFilename();
+    validateFile(audioUploadDTO, filename);
+
+    if (isConverting) {
+      var srt = convertSrt(audioUploadDTO);
+      note.setSrt(srt);
+    }
+
     note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     note.setAudio(audioUploadDTO.getUploadAudioFile(), user);
     modelFactoryService.save(note.getNoteAccessories().getUploadAudio());
     modelFactoryService.save(note);
 
     return new NoteViewer(user, note).toJsonObject();
+  }
+
+  private static void validateFile(AudioUploadDTO audioUploadDTO, String filename)
+      throws Exception {
+    validateFileType(requireNonNull(filename));
+    validateFileSize(audioUploadDTO);
+  }
+
+  private static void validateFileSize(AudioUploadDTO audioUploadDTO) throws Exception {
+    if (audioUploadDTO.getUploadAudioFile().getSize() >= 1024 * 1024 * 20) {
+      throw new Exception("Size Exceeded");
+    }
+  }
+
+  private static void validateFileType(String filename) throws Exception {
+    if (!(filename.endsWith(".mp3") || filename.endsWith(".m4a") || filename.endsWith(".wav"))) {
+      throw new Exception("Invalid format");
+    }
+  }
+
+  @PostMapping(
+      path = "/convertSrt",
+      consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  @Transactional
+  public String convertSrt(@Valid @ModelAttribute AudioUploadDTO audioFile) {
+    var url = "https://api.openai.com/v1/audio/transcriptions";
+    var filename = audioFile.getUploadAudioFile().getOriginalFilename();
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+    headers.setBearerAuth(openAiToken);
+
+    MultiValueMap<String, String> fileMap = new LinkedMultiValueMap<>();
+    ContentDisposition contentDisposition =
+        ContentDisposition.builder("form-data").name("file").filename(filename).build();
+
+    fileMap.add(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString());
+    HttpEntity<byte[]> fileEntity;
+    try {
+      fileEntity = new HttpEntity<>(audioFile.getUploadAudioFile().getBytes(), fileMap);
+    } catch (IOException e) {
+      throw new RuntimeException("Exception while reading the audio file", e);
+    }
+
+    MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+    body.add("file", fileEntity);
+    body.add("model", "whisper-1");
+    body.add("response_format", "srt");
+
+    HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+    var response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+    return response.getBody();
   }
 
   @GetMapping("/{note}/note-info")

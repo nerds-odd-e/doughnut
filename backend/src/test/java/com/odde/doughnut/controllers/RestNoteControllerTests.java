@@ -2,8 +2,11 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
@@ -32,10 +35,15 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
+import org.springframework.web.client.RestTemplate;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -45,6 +53,7 @@ class RestNoteControllerTests {
 
   @Autowired MakeMe makeMe;
   @Mock HttpClientAdapter httpClientAdapter;
+  @Mock RestTemplate restTemplate;
   private UserModel userModel;
   RestNoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -55,7 +64,7 @@ class RestNoteControllerTests {
 
     controller =
         new RestNoteController(
-            modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
+            modelFactoryService, userModel, httpClientAdapter, testabilitySettings, restTemplate);
   }
 
   private void mockWikidataEntity(String wikidataId, String label)
@@ -408,7 +417,7 @@ class RestNoteControllerTests {
     void shouldSucceedOnValidAudioFileFormat(String filename) throws Exception {
       audioUploadDTO.setUploadAudioFile(
           new MockMultipartFile(filename, filename, "audio/mp3", new byte[] {}));
-      NoteRealm noteRealm = controller.upload(note, audioUploadDTO);
+      NoteRealm noteRealm = controller.upload(note, audioUploadDTO, false);
       assertEquals(
           noteRealm.getNote().getNoteAccessories().getAudioName().get(),
           audioUploadDTO.getUploadAudioFile().getOriginalFilename());
@@ -425,7 +434,7 @@ class RestNoteControllerTests {
       assertThrows(
           Exception.class,
           () -> {
-            controller.upload(note, audioUploadDTO);
+            controller.upload(note, audioUploadDTO, false);
           });
     }
 
@@ -439,7 +448,7 @@ class RestNoteControllerTests {
       assertThrows(
           Exception.class,
           () -> {
-            controller.upload(note, audioUploadDTO);
+            controller.upload(note, audioUploadDTO, false);
           });
     }
 
@@ -448,9 +457,39 @@ class RestNoteControllerTests {
       String filename = "podcast.wav";
       audioUploadDTO.setUploadAudioFile(
           new MockMultipartFile(filename, filename, "audio/wav", new byte[] {}));
-      controller.upload(note, audioUploadDTO);
+      controller.upload(note, audioUploadDTO, false);
       Note newNote = makeMe.modelFactoryService.noteRepository.findById(note.getId()).get();
       assertEquals(filename, newNote.getNoteAccessories().getUploadAudio().getName());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"podcast.mp3", "podcast.m4a", "podcast.wav"})
+    void isUoloadingAndConverting(String filename) throws Exception {
+      audioUploadDTO.setUploadAudioFile(
+          new MockMultipartFile(filename, filename, "audio/mp3", new byte[] {}));
+      ResponseEntity<String> mockResponseEntity = new ResponseEntity<>("test", HttpStatus.OK);
+      when(restTemplate.exchange(
+              any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
+          .thenReturn(mockResponseEntity);
+      NoteRealm noteRealm = controller.upload(note, audioUploadDTO, true);
+      assertEquals(noteRealm.getNote().getSrt(), "test");
+    }
+
+    @Test
+    void convertAudioToSRT() {
+      MockMultipartFile mockFile =
+          new MockMultipartFile("file", "test.mp3", "text/plain", "test".getBytes());
+      var dto = new AudioUploadDTO();
+      dto.setUploadAudioFile(mockFile);
+      // Mocking the response entity
+      ResponseEntity<String> mockResponseEntity = new ResponseEntity<>("test", HttpStatus.OK);
+      when(restTemplate.exchange(
+              any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
+          .thenReturn(mockResponseEntity);
+
+      String resp = controller.convertSrt(dto);
+
+      assertThat(resp, equalTo("test"));
     }
   }
 

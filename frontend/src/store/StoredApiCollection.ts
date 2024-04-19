@@ -245,7 +245,7 @@ export default class StoredApiCollection implements StoredApi {
 
   async uploadAudio(noteId: number, formData?: AudioUploadDTO) {
     return this.storage.refreshNoteRealm(
-      await this.managedApi.restNoteController.upload1(noteId, formData),
+      await this.managedApi.restNoteController.upload1(noteId, false, formData),
     );
   }
 

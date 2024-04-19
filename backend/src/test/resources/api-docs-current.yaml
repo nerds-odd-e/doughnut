@@ -913,6 +913,29 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Note'
+  /api/notes/convertSrt:
+    post:
+      tags:
+      - rest-note-controller
+      operationId: convertSrt
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AudioUploadDTO'
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
   /api/notebooks/{notebook}:
     post:
       tags:
@@ -1607,6 +1630,11 @@ paths:
         required: true
         schema:
           type: integer
+      - name: isConverting
+        in: query
+        required: true
+        schema:
+          type: boolean
       requestBody:
         content:
           multipart/form-data:
@@ -2336,6 +2364,8 @@ components:
           readOnly: true
         wikidataId:
           type: string
+        srt:
+          type: string
         pictureWithMask:
           $ref: '#/components/schemas/PictureWithMask'
     NoteAccessories:
@@ -2650,6 +2680,8 @@ components:
           readOnly: true
         wikidataId:
           type: string
+        srt:
+          type: string
         pictureWithMask:
           $ref: '#/components/schemas/PictureWithMask'
     LinkViewed:
@@ -2736,6 +2768,12 @@ components:
         noteId:
           type: integer
           format: int32
+    AudioUploadDTO:
+      type: object
+      properties:
+        uploadAudioFile:
+          type: string
+          format: binary
     LinkCreation:
       required:
       - linkType
@@ -2774,12 +2812,6 @@ components:
           maxLength: 20
           minLength: 10
           type: string
-    AudioUploadDTO:
-      type: object
-      properties:
-        uploadAudioFile:
-          type: string
-          format: binary
     AiCompletionParams:
       type: object
       properties:

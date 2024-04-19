@@ -147,6 +147,24 @@ export class RestNoteControllerService {
         });
     }
     /**
+     * @param formData
+     * @returns string OK
+     * @throws ApiError
+     */
+    public convertSrt(
+        formData?: AudioUploadDTO,
+    ): CancelablePromise<string> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/notes/convertSrt',
+            formData: formData,
+            mediaType: 'multipart/form-data',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @param note
      * @returns NoteRealm OK
      * @throws ApiError
@@ -209,12 +227,14 @@ export class RestNoteControllerService {
     }
     /**
      * @param note
+     * @param isConverting
      * @param formData
      * @returns NoteRealm OK
      * @throws ApiError
      */
     public upload1(
         note: number,
+        isConverting?: boolean,
         formData?: AudioUploadDTO,
     ): CancelablePromise<NoteRealm> {
         return this.httpRequest.request({
@@ -222,6 +242,9 @@ export class RestNoteControllerService {
             url: '/api/notes/{note}/audio',
             path: {
                 'note': note,
+            },
+            query: {
+                'isConverting': isConverting,
             },
             formData: formData,
             mediaType: 'multipart/form-data',
