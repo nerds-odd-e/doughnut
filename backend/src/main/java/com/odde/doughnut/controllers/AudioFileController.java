@@ -38,38 +38,34 @@ public class AudioFileController {
   }
 
   @PostMapping(value = "/{convert}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<String> upload(
-      @Valid @ModelAttribute AudioUploadDTO audioFile, @PathVariable("convert") Boolean toConvert) {
-    if (toConvert) {
-      var url = "https://api.openai.com/v1/audio/transcriptions";
-      var filename = audioFile.getUploadAudioFile().getOriginalFilename();
+  public ResponseEntity<String> uploadAudio(@Valid @ModelAttribute AudioUploadDTO audioFile) {
+    var url = "https://api.openai.com/v1/audio/transcriptions";
+    var filename = audioFile.getUploadAudioFile().getOriginalFilename();
 
-      HttpHeaders headers = new HttpHeaders();
-      headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-      headers.setBearerAuth(openAiToken);
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+    headers.setBearerAuth(openAiToken);
 
-      MultiValueMap<String, String> fileMap = new LinkedMultiValueMap<>();
-      ContentDisposition contentDisposition =
-          ContentDisposition.builder("form-data").name("file").filename(filename).build();
+    MultiValueMap<String, String> fileMap = new LinkedMultiValueMap<>();
+    ContentDisposition contentDisposition =
+        ContentDisposition.builder("form-data").name("file").filename(filename).build();
 
-      fileMap.add(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString());
-      HttpEntity<byte[]> fileEntity;
-      try {
-        fileEntity = new HttpEntity<>(audioFile.getUploadAudioFile().getBytes(), fileMap);
-      } catch (IOException e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body("Error reading audio file");
-      }
-
-      MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-      body.add("file", fileEntity);
-      body.add("model", "whisper-1");
-      body.add("response_format", "srt");
-
-      HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-
-      return restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+    fileMap.add(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString());
+    HttpEntity<byte[]> fileEntity;
+    try {
+      fileEntity = new HttpEntity<>(audioFile.getUploadAudioFile().getBytes(), fileMap);
+    } catch (IOException e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body("Error reading audio file");
     }
-    return ResponseEntity.ok("Successfully uploaded audio file");
+
+    MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+    body.add("file", fileEntity);
+    body.add("model", "whisper-1");
+    body.add("response_format", "srt");
+
+    HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+    return restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
   }
 }

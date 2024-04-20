@@ -1271,13 +1271,7 @@ paths:
     post:
       tags:
       - audio-file-controller
-      operationId: upload
-      parameters:
-      - name: convert
-        in: path
-        required: true
-        schema:
-          type: boolean
+      operationId: uploadAudio
       requestBody:
         content:
           multipart/form-data:
@@ -1623,7 +1617,7 @@ paths:
     patch:
       tags:
       - rest-note-controller
-      operationId: upload_1
+      operationId: upload
       parameters:
       - name: note
         in: path

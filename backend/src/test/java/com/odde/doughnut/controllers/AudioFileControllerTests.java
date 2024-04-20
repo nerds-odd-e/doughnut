@@ -67,7 +67,7 @@ class AudioFileControllerTests {
             any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
         .thenReturn(mockResponseEntity);
 
-    ResponseEntity<String> resp = controller.upload(dto, true);
+    ResponseEntity<String> resp = controller.uploadAudio(dto);
 
     assertThat(resp.getStatusCode(), equalTo(HttpStatus.OK));
     assertThat(resp.getBody(), equalTo("test"));

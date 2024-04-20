@@ -8,21 +8,16 @@ import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class AudioFileControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
-     * @param convert
      * @param formData
      * @returns string OK
      * @throws ApiError
      */
-    public upload(
-        convert: boolean,
+    public uploadAudio(
         formData?: AudioUploadDTO,
     ): CancelablePromise<string> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/audio/{convert}',
-            path: {
-                'convert': convert,
-            },
             formData: formData,
             mediaType: 'multipart/form-data',
             errors: {
