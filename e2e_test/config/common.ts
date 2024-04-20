@@ -3,6 +3,7 @@ import createBundler from "@bahmutov/cypress-esbuild-preprocessor";
 import { addCucumberPreprocessorPlugin } from "@badeball/cypress-cucumber-preprocessor";
 import { createEsbuildPlugin } from "@badeball/cypress-cucumber-preprocessor/esbuild";
 import { existsSync, rmdir } from "fs";
+import { count } from "console";
 
 const commonConfig = {
   chromeWebSecurity: false,
@@ -46,18 +47,24 @@ const commonConfig = {
             });
           });
         },
-        fileShouldExistSoon(filePath, retryCount = 50) {
-          if (existsSync(filePath)) {
-            return true;
-          } else if (retryCount > 0) {
+        fileShouldExistSoon(filePath, retryCount = 50): Promise<boolean> {
+          const checker  = (count: number): Promise<boolean> => {
             return new Promise((resolve) => {
+              if (existsSync(filePath)) {
+                resolve(true);
+                return;
+              }
+              if (count === 0) {
+                resolve(false);
+                return;
+              }
               setTimeout(() => {
-                resolve(this.fileShouldExistSoon(filePath, retryCount - 1));
-              }, 100);
-            });
-          } else {
-            return false;
-          }
+                  checker(count - 1)
+                  .then((result) => resolve(result));
+                }, 100);
+          });
+        };
+        return checker(retryCount);
         },
       });
 
