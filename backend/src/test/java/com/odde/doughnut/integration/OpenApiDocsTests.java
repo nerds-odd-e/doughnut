@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,17 +36,17 @@ class OpenApiDocsTests {
     ResultActions perform = this.mockMvc.perform(get("/api-docs.yaml"));
     String currentApiDocs = perform.andReturn().getResponse().getContentAsString();
 
-    String currentDocsPath = "src/test/resources/api-docs-current.yaml";
+    Path tempFile = Files.createTempFile("api-docs-current", ".yaml");
     String trueCopyPath = "../open_api_docs.yaml";
 
-    Files.writeString(Paths.get(currentDocsPath), currentApiDocs);
+    Files.writeString(tempFile, currentApiDocs);
     String trueCopy = new String(Files.readAllBytes(Paths.get(trueCopyPath)));
 
     assertThat(currentApiDocs)
         .as(
             "The current OpenAPI documentation does not match the approved 'true copy'. "
                 + "Please review the changes in '%s'. If the changes are intended, "
-                    .formatted(currentDocsPath)
+                    .formatted(tempFile)
                 + "copy it over '%s' and rerun the test.".formatted(trueCopyPath))
         .isEqualTo(trueCopy);
   }

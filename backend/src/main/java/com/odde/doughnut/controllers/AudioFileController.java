@@ -5,10 +5,11 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.http.*;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/api/audio")
+@Controller
+@RequestMapping("/attachments/audio")
 public class AudioFileController {
   private final UserModel currentUser;
 

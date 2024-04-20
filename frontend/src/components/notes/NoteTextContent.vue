@@ -46,7 +46,7 @@ export default defineComponent({
   },
   methods: {
     async downloadAudioFile(audioId: number) {
-      const audioUrl = `/api/audio/${audioId}`;
+      const audioUrl = `/attachments/audio/${audioId}`;
 
       const link = document.createElement("a");
       link.href = audioUrl;

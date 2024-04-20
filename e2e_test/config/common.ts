@@ -46,8 +46,18 @@ const commonConfig = {
             });
           });
         },
-        fileExists(filePath) {
-          return existsSync(filePath);
+        fileShouldExistSoon(filePath, retryCount = 50) {
+          if (existsSync(filePath)) {
+            return true;
+          } else if (retryCount > 0) {
+            return new Promise((resolve) => {
+              setTimeout(() => {
+                resolve(this.fileShouldExistSoon(filePath, retryCount - 1));
+              }, 100);
+            });
+          } else {
+            return false;
+          }
         },
       });
 
