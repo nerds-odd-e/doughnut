@@ -61,7 +61,6 @@ export interface StoredApi {
     formData: AudioUploadDTO,
     convert: boolean,
   ): Promise<NoteRealm>;
-  downloadAudio(audioId: Doughnut.ID): Promise<void>;
   convertAudio(formData: AudioUploadDTO);
 }
 export default class StoredApiCollection implements StoredApi {
@@ -256,10 +255,6 @@ export default class StoredApiCollection implements StoredApi {
         formData,
       ),
     );
-  }
-
-  async downloadAudio(noteId: number) {
-    await this.managedApi.audioFileController.downloadAudio(noteId);
   }
 
   async convertAudio(formData: AudioUploadDTO) {
