@@ -43,7 +43,8 @@ public class NoteAccessories {
   @JsonIgnore
   public Optional<String> getNotePicture() {
     if (uploadPicture != null) {
-      return Optional.of("/images/" + uploadPicture.getId() + "/" + uploadPicture.getName());
+      return Optional.of(
+          "/attachments/images/" + uploadPicture.getId() + "/" + uploadPicture.getName());
     }
     if (Strings.isBlank(pictureUrl)) return Optional.empty();
     return Optional.of(pictureUrl);

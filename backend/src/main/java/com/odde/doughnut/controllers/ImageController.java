@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/images")
+@RequestMapping("/attachments/images")
 public class ImageController {
 
   public ImageController() {}

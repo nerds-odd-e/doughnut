@@ -16,7 +16,7 @@ public class CommonConfiguration {
       "/odd-e.png",
       "/odd-e.ico",
       "/webjars/**",
-      "/images/**",
+      "/attachments/**",
       "/assets/**",
       "/api/**"
     };

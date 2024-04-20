@@ -62,7 +62,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": "http://localhost:9081",
-      "/images": "http://localhost:9081",
+      "/attachments": "http://localhost:9081",
       "/logout": "http://localhost:9081",
       "/testability": "http://localhost:9081",
     },
