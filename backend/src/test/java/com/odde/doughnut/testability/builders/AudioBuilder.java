@@ -2,6 +2,7 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.Audio;
 import com.odde.doughnut.entities.AudioBlob;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
@@ -33,5 +34,10 @@ public class AudioBuilder extends EntityBuilder<Audio> {
     if (entity.getUser() == null) {
       entity.setUser(makeMe.aUser().please());
     }
+  }
+
+  public AudioBuilder user(User user) {
+    entity.setUser(user);
+    return this;
   }
 }

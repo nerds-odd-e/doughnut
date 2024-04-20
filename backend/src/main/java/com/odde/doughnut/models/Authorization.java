@@ -25,22 +25,19 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
   }
 
   public <T> void assertReadAuthorization(T object) throws UnexpectedNoAccessRightException {
-    if (object instanceof Note) {
-      assertReadAuthorizationNote((Note) object);
-    } else if (object instanceof Notebook) {
-      assertReadAuthorizationNotebook((Notebook) object);
-    } else if (object instanceof Subscription) {
-      assertReadAuthorization((Subscription) object);
-    } else if (object instanceof Answer) {
-      assertReadAuthorizationAnswer((Answer) object);
-    } else if (object instanceof QuizQuestionEntity) {
-      assertReadAuthorizationQuizQuestion((QuizQuestionEntity) object);
-    } else if (object instanceof ReviewPoint) {
-      assertReadAuthorizationReviewPoint((ReviewPoint) object);
-    } else if (object instanceof User) {
-      assertAuthorizationUser((User) object);
-    } else {
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unknown object type");
+    switch (object) {
+      case Note note -> assertReadAuthorizationNote(note);
+      case Notebook notebook -> assertReadAuthorizationNotebook(notebook);
+      case Subscription subscription -> assertReadAuthorization(subscription);
+      case Answer answer -> assertReadAuthorizationAnswer(answer);
+      case QuizQuestionEntity quizQuestionEntity ->
+          assertReadAuthorizationQuizQuestion(quizQuestionEntity);
+      case ReviewPoint reviewPoint -> assertReadAuthorizationReviewPoint(reviewPoint);
+      case User user -> assertAuthorizationUser(user);
+      case Audio audio -> assertAuthorizationUser(audio.getUser());
+      default ->
+          throw new ResponseStatusException(
+              HttpStatus.INTERNAL_SERVER_ERROR, "Unknown object type");
     }
   }
 
