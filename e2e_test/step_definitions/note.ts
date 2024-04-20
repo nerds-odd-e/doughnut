@@ -77,11 +77,6 @@ Then(
   },
 )
 
-// Given(
-//   "I uploaded an audio-file {string} to the note {string} ",
-//   (fileName: string, noteTo)
-// )
-
 When("I save the audio-file", () => {
   cy.findAllByText("Save").click()
 })
