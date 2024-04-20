@@ -2,10 +2,8 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.odde.doughnut.entities.Audio;
-import com.odde.doughnut.entities.repositories.AudioBlobRepository;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,22 +18,17 @@ import org.springframework.transaction.annotation.Transactional;
 @ActiveProfiles("test")
 @Transactional
 class AudioFileControllerTests {
-
-  @Autowired AudioBlobRepository audioBlobRepository;
-
   @Autowired MakeMe makeMe;
   AudioFileController controller;
 
   @BeforeEach
   void setup() {
-    controller = new AudioFileController(audioBlobRepository);
+    controller = new AudioFileController();
   }
 
   @Test
   void getContent() {
     Audio audio = makeMe.anAudio().please();
-    makeMe.refresh(audio);
-    assertNotNull(audio);
     ResponseEntity<byte[]> resp = controller.downloadAudio(audio);
     assertThat(resp.getStatusCode(), equalTo(HttpStatus.OK));
     assertThat(resp.getHeaders().getContentType().toString(), equalTo("audio/mp3"));

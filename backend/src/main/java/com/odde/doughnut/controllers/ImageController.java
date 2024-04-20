@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Image;
-import com.odde.doughnut.entities.repositories.ImageBlobRepository;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -13,11 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/images")
 public class ImageController {
-  private final ImageBlobRepository imageBlobRepository;
 
-  public ImageController(ImageBlobRepository imageBlobRepository) {
-    this.imageBlobRepository = imageBlobRepository;
-  }
+  public ImageController() {}
 
   @GetMapping("/{image}/{fileName}")
   public ResponseEntity<byte[]> show(
@@ -26,6 +22,6 @@ public class ImageController {
     return ResponseEntity.ok()
         .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + image.getName() + "\"")
         .header(HttpHeaders.CONTENT_TYPE, image.getType())
-        .body(imageBlobRepository.findById(image.getImageBlobId()).get().getData());
+        .body(image.getImageBlob().getData());
   }
 }

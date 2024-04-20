@@ -23,10 +23,6 @@ public class Audio extends EntityIdentifiedByIdOnly {
   @Setter
   private String storageType;
 
-  @Column(name = "audio_blob_id", insertable = false, updatable = false)
-  @Getter
-  private Integer audioBlobId;
-
   @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JoinColumn(name = "audio_blob_id", referencedColumnName = "id")
   @JsonIgnore

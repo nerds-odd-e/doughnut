@@ -1267,35 +1267,6 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/Circle'
-  /api/audio/{convert}:
-    post:
-      tags:
-      - audio-file-controller
-      operationId: upload
-      parameters:
-      - name: convert
-        in: path
-        required: true
-        schema:
-          type: boolean
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/AudioUploadDTO'
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: string
   /api/ai/{note}/completion:
     post:
       tags:
@@ -1623,7 +1594,7 @@ paths:
     patch:
       tags:
       - rest-note-controller
-      operationId: upload_1
+      operationId: upload
       parameters:
       - name: note
         in: path

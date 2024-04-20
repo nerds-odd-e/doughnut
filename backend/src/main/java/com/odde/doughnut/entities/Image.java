@@ -37,10 +37,6 @@ public class Image {
   @Setter
   private String storageType;
 
-  @Column(name = "image_blob_id", insertable = false, updatable = false)
-  @Getter
-  private Integer imageBlobId;
-
   @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JoinColumn(name = "image_blob_id", referencedColumnName = "id")
   @JsonIgnore

@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.odde.doughnut.entities.Image;
-import com.odde.doughnut.entities.repositories.ImageBlobRepository;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,20 +18,17 @@ import org.springframework.transaction.annotation.Transactional;
 @ActiveProfiles("test")
 @Transactional
 class ImageControllerTests {
-  @Autowired ImageBlobRepository imageBlobRepository;
-
   @Autowired MakeMe makeMe;
   ImageController controller;
 
   @BeforeEach
   void setup() {
-    controller = new ImageController(imageBlobRepository);
+    controller = new ImageController();
   }
 
   @Test
   void contentType() {
     Image image = makeMe.anImage().please();
-    makeMe.refresh(image);
     ResponseEntity<byte[]> resp = controller.show(image, "filename");
     assertThat(resp.getStatusCode(), equalTo(HttpStatus.OK));
     assertThat(resp.getHeaders().getContentType().toString(), equalTo("image/png"));
