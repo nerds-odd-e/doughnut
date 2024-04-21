@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "image_blob")
+@Table(name = "attachment_blob")
 public class ImageBlob {
   @Id
   @Getter

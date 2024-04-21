@@ -37,7 +37,7 @@ class AttachmentControllerTests {
   @Test
   void imageDownload() {
     Image image = makeMe.anImage().please();
-    ResponseEntity<byte[]> resp = controller.show(image, "filename");
+    ResponseEntity<byte[]> resp = controller.showImage(image, "filename");
     assertThat(resp.getStatusCode(), Matchers.equalTo(HttpStatus.OK));
     assertThat(resp.getHeaders().getContentType().toString(), Matchers.equalTo("image/png"));
     assertThat(

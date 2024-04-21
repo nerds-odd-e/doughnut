@@ -30,7 +30,7 @@ public class AttachmentController {
   }
 
   @GetMapping("/images/{image}/{fileName}")
-  public ResponseEntity<byte[]> show(
+  public ResponseEntity<byte[]> showImage(
       @PathVariable("image") @Schema(type = "integer") Image image,
       @PathVariable("fileName") String filename) {
     return ResponseEntity.ok()
