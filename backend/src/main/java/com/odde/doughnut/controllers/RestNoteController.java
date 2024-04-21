@@ -157,6 +157,13 @@ class RestNoteController {
     return new NoteViewer(user, note).toJsonObject();
   }
 
+  @PatchMapping(path = "/{note}/audio-to-srt")
+  @Transactional
+  public ResponseEntity<String> convertAudioToSRT(
+      @PathVariable(name = "note") @Schema(type = "integer") Note note) {
+    return ResponseEntity.ok().body("\"1\\n00:00:00,000 --> 00:00:02,000\\nYou\\n\\n\\n\"");
+  }
+
   @PostMapping(
       path = "/convertSrt",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})

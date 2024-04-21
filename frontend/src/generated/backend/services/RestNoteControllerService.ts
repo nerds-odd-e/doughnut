@@ -255,6 +255,25 @@ export class RestNoteControllerService {
     }
     /**
      * @param note
+     * @returns string OK
+     * @throws ApiError
+     */
+    public convertAudioToSrt(
+        note: number,
+    ): CancelablePromise<string> {
+        return this.httpRequest.request({
+            method: 'PATCH',
+            url: '/api/notes/{note}/audio-to-srt',
+            path: {
+                'note': note,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param note
      * @returns NotePositionViewedByUser OK
      * @throws ApiError
      */
