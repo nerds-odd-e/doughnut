@@ -5,10 +5,12 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.Audio;
+import com.odde.doughnut.entities.Image;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,15 +23,26 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class AudioFileControllerTests {
+class AttachmentControllerTests {
   @Autowired MakeMe makeMe;
-  AudioFileController controller;
+  AttachmentController controller;
   UserModel currentUser;
 
   @BeforeEach
   void setup() {
     currentUser = makeMe.aUser().toModelPlease();
-    controller = new AudioFileController(currentUser);
+    controller = new AttachmentController(currentUser);
+  }
+
+  @Test
+  void imageDownload() {
+    Image image = makeMe.anImage().please();
+    ResponseEntity<byte[]> resp = controller.show(image, "filename");
+    assertThat(resp.getStatusCode(), Matchers.equalTo(HttpStatus.OK));
+    assertThat(resp.getHeaders().getContentType().toString(), Matchers.equalTo("image/png"));
+    assertThat(
+        resp.getHeaders().getContentDisposition().toString(),
+        Matchers.equalTo("inline; filename=\"example.png\""));
   }
 
   @Test
