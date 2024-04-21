@@ -23,19 +23,13 @@ public class AttachmentController {
       @PathVariable("audio") @Schema(type = "integer") Audio audio)
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(audio);
-    return ResponseEntity.ok()
-        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + audio.getName() + "\"")
-        .header(HttpHeaders.CONTENT_TYPE, audio.getType())
-        .body(audio.getBlob().getData());
+    return audio.getResponseEntity("attachment");
   }
 
   @GetMapping("/images/{image}/{fileName}")
   public ResponseEntity<byte[]> showImage(
       @PathVariable("image") @Schema(type = "integer") Image image,
       @PathVariable("fileName") String filename) {
-    return ResponseEntity.ok()
-        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + image.getName() + "\"")
-        .header(HttpHeaders.CONTENT_TYPE, image.getType())
-        .body(image.getBlob().getData());
+    return image.getResponseEntity("inline");
   }
 }

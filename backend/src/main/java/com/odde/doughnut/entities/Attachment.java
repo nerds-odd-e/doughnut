@@ -6,9 +6,11 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 
 @MappedSuperclass
-abstract class Attachment extends EntityIdentifiedByIdOnly {
+public abstract class Attachment extends EntityIdentifiedByIdOnly {
   @NotNull
   @Size(min = 1, max = 255)
   @Getter
@@ -35,4 +37,11 @@ abstract class Attachment extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   private User user;
+
+  public ResponseEntity<byte[]> getResponseEntity(String disposition) {
+    return ResponseEntity.ok()
+        .header(HttpHeaders.CONTENT_DISPOSITION, disposition + "; filename=\"" + getName() + "\"")
+        .header(HttpHeaders.CONTENT_TYPE, getType())
+        .body(getBlob().getData());
+  }
 }
