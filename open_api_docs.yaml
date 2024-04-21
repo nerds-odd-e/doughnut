@@ -1594,7 +1594,7 @@ paths:
     patch:
       tags:
       - rest-note-controller
-      operationId: upload
+      operationId: uploadAudio
       parameters:
       - name: note
         in: path

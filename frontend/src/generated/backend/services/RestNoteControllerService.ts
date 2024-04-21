@@ -232,7 +232,7 @@ export class RestNoteControllerService {
      * @returns NoteRealm OK
      * @throws ApiError
      */
-    public upload(
+    public uploadAudio(
         note: number,
         isConverting?: boolean,
         formData?: AudioUploadDTO,

@@ -1,7 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import static java.util.Objects.requireNonNull;
-
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
@@ -15,11 +13,13 @@ import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.doughnut.testability.TestabilitySettings;
+import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +45,7 @@ class RestNoteController {
   private final RestTemplate restTemplate;
 
   public RestNoteController(
+      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       HttpClientAdapter httpClientAdapter,
@@ -138,16 +139,12 @@ class RestNoteController {
       path = "/{note}/audio",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @Transactional
-  public NoteRealm upload(
+  public NoteRealm uploadAudio(
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @Valid @ModelAttribute AudioUploadDTO audioUploadDTO,
       @RequestParam(required = false) Boolean isConverting)
       throws Exception {
-
-    final User user = currentUser.getEntity();
-
-    String filename = audioUploadDTO.getUploadAudioFile().getOriginalFilename();
-    validateFile(audioUploadDTO, filename);
+    audioUploadDTO.validate();
 
     if (isConverting) {
       var srt = convertSrt(audioUploadDTO).getBody();
@@ -155,29 +152,12 @@ class RestNoteController {
     }
 
     note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
+    final User user = currentUser.getEntity();
     note.setAudio(audioUploadDTO.getUploadAudioFile(), user);
     modelFactoryService.save(note.getNoteAccessories().getUploadAudio());
     modelFactoryService.save(note);
 
     return new NoteViewer(user, note).toJsonObject();
-  }
-
-  private static void validateFile(AudioUploadDTO audioUploadDTO, String filename)
-      throws Exception {
-    validateFileType(requireNonNull(filename));
-    validateFileSize(audioUploadDTO);
-  }
-
-  private static void validateFileSize(AudioUploadDTO audioUploadDTO) throws Exception {
-    if (audioUploadDTO.getUploadAudioFile().getSize() >= 1024 * 1024 * 20) {
-      throw new Exception("Size Exceeded");
-    }
-  }
-
-  private static void validateFileType(String filename) throws Exception {
-    if (!(filename.endsWith(".mp3") || filename.endsWith(".m4a") || filename.endsWith(".wav"))) {
-      throw new Exception("Invalid format");
-    }
   }
 
   @PostMapping(

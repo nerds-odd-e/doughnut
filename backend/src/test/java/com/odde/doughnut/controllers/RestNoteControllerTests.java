@@ -19,6 +19,7 @@ import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.odde.doughnut.testability.TestabilitySettings;
+import com.theokanning.openai.client.OpenAiApi;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
@@ -52,6 +53,7 @@ class RestNoteControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
 
   @Autowired MakeMe makeMe;
+  @Mock OpenAiApi openAiApi;
   @Mock HttpClientAdapter httpClientAdapter;
   @Mock RestTemplate restTemplate;
   private UserModel userModel;
@@ -64,7 +66,12 @@ class RestNoteControllerTests {
 
     controller =
         new RestNoteController(
-            modelFactoryService, userModel, httpClientAdapter, testabilitySettings, restTemplate);
+            openAiApi,
+            modelFactoryService,
+            userModel,
+            httpClientAdapter,
+            testabilitySettings,
+            restTemplate);
   }
 
   private void mockWikidataEntity(String wikidataId, String label)
@@ -417,7 +424,7 @@ class RestNoteControllerTests {
     void shouldSucceedOnValidAudioFileFormat(String filename) throws Exception {
       audioUploadDTO.setUploadAudioFile(
           new MockMultipartFile(filename, filename, "audio/mp3", new byte[] {}));
-      NoteRealm noteRealm = controller.upload(note, audioUploadDTO, false);
+      NoteRealm noteRealm = controller.uploadAudio(note, audioUploadDTO, false);
       assertEquals(
           noteRealm.getNote().getNoteAccessories().getAudioName().get(),
           audioUploadDTO.getUploadAudioFile().getOriginalFilename());
@@ -434,7 +441,7 @@ class RestNoteControllerTests {
       assertThrows(
           Exception.class,
           () -> {
-            controller.upload(note, audioUploadDTO, false);
+            controller.uploadAudio(note, audioUploadDTO, false);
           });
     }
 
@@ -448,7 +455,7 @@ class RestNoteControllerTests {
       assertThrows(
           Exception.class,
           () -> {
-            controller.upload(note, audioUploadDTO, false);
+            controller.uploadAudio(note, audioUploadDTO, false);
           });
     }
 
@@ -457,7 +464,7 @@ class RestNoteControllerTests {
       String filename = "podcast.wav";
       audioUploadDTO.setUploadAudioFile(
           new MockMultipartFile(filename, filename, "audio/wav", new byte[] {}));
-      controller.upload(note, audioUploadDTO, false);
+      controller.uploadAudio(note, audioUploadDTO, false);
       Note newNote = makeMe.modelFactoryService.noteRepository.findById(note.getId()).get();
       assertEquals(filename, newNote.getNoteAccessories().getUploadAudio().getName());
     }
@@ -471,7 +478,7 @@ class RestNoteControllerTests {
       when(restTemplate.exchange(
               any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
           .thenReturn(mockResponseEntity);
-      NoteRealm noteRealm = controller.upload(note, audioUploadDTO, true);
+      NoteRealm noteRealm = controller.uploadAudio(note, audioUploadDTO, true);
       assertEquals(noteRealm.getNote().getSrt(), "test");
     }
 
