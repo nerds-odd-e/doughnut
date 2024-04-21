@@ -464,15 +464,15 @@ class RestNoteControllerTests {
 
     @ParameterizedTest
     @ValueSource(strings = {"podcast.mp3", "podcast.m4a", "podcast.wav"})
-    void isUoloadingAndConverting(String filename) throws Exception {
+    void convertingFormat(String filename) throws Exception {
       audioUploadDTO.setUploadAudioFile(
           new MockMultipartFile(filename, filename, "audio/mp3", new byte[] {}));
       ResponseEntity<String> mockResponseEntity = new ResponseEntity<>("test", HttpStatus.OK);
       when(restTemplate.exchange(
               any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
           .thenReturn(mockResponseEntity);
-      NoteRealm noteRealm = controller.uploadAudio(note, audioUploadDTO, true);
-      assertEquals(noteRealm.getNote().getSrt(), "test");
+      String result = controller.convertSrt(audioUploadDTO).getBody();
+      assertEquals("test", result);
     }
 
     @Test

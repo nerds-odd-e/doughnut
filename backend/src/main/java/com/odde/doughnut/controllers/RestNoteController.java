@@ -143,11 +143,6 @@ class RestNoteController {
       throws Exception {
     audioUploadDTO.validate();
 
-    if (isConverting) {
-      var srt = convertSrt(audioUploadDTO).getBody();
-      note.setSrt(srt);
-    }
-
     note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     final User user = currentUser.getEntity();
     note.setAudio(audioUploadDTO.getUploadAudioFile(), user);

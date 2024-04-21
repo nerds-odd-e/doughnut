@@ -387,6 +387,4 @@ The note of current focus (in JSON format):
     result.setNote(this);
     return result;
   }
-
-  @Transient @Getter @Setter public String srt;
 }
