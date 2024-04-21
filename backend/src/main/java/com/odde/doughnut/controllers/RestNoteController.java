@@ -13,13 +13,11 @@ import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.doughnut.testability.TestabilitySettings;
-import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,7 +43,6 @@ class RestNoteController {
   private final RestTemplate restTemplate;
 
   public RestNoteController(
-      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       HttpClientAdapter httpClientAdapter,
@@ -191,8 +188,7 @@ class RestNoteController {
 
     HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-    var response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-    return response;
+    return restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
   }
 
   @GetMapping("/{note}/note-info")

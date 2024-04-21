@@ -19,7 +19,6 @@ import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.odde.doughnut.testability.TestabilitySettings;
-import com.theokanning.openai.client.OpenAiApi;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
@@ -53,7 +52,6 @@ class RestNoteControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
 
   @Autowired MakeMe makeMe;
-  @Mock OpenAiApi openAiApi;
   @Mock HttpClientAdapter httpClientAdapter;
   @Mock RestTemplate restTemplate;
   private UserModel userModel;
@@ -66,12 +64,7 @@ class RestNoteControllerTests {
 
     controller =
         new RestNoteController(
-            openAiApi,
-            modelFactoryService,
-            userModel,
-            httpClientAdapter,
-            testabilitySettings,
-            restTemplate);
+            modelFactoryService, userModel, httpClientAdapter, testabilitySettings, restTemplate);
   }
 
   private void mockWikidataEntity(String wikidataId, String label)
