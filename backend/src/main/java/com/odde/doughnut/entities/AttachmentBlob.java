@@ -11,7 +11,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "attachment_blob")
-public class ImageBlob {
+public class AttachmentBlob {
   @Id
   @Getter
   @GeneratedValue(strategy = GenerationType.IDENTITY)

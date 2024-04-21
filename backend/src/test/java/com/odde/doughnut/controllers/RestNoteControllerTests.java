@@ -392,7 +392,7 @@ class RestNoteControllerTests {
           makeMe.anUploadedPicture().toMultiplePartFilePlease());
       controller.updateNoteAccessories(note, noteAccessoriesDTO);
       assertThat(note.getNoteAccessories().getUploadPicture(), is(not(nullValue())));
-      note.getNoteAccessories().getUploadPicture().getImageBlob().getData();
+      note.getNoteAccessories().getUploadPicture().getBlob().getData();
     }
 
     @Test
@@ -400,7 +400,7 @@ class RestNoteControllerTests {
       noteAccessoriesDTO.setUploadPictureProxy(
           makeMe.anUploadedPicture().toMultiplePartFilePlease());
       controller.updateNoteAccessories(note, noteAccessoriesDTO);
-      byte[] data = note.getNoteAccessories().getUploadPicture().getImageBlob().getData();
+      byte[] data = note.getNoteAccessories().getUploadPicture().getBlob().getData();
       assertThat(data.length, is(68));
     }
 

@@ -26,7 +26,7 @@ public class AttachmentController {
     return ResponseEntity.ok()
         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + audio.getName() + "\"")
         .header(HttpHeaders.CONTENT_TYPE, audio.getType())
-        .body(audio.getAudioBlob().getData());
+        .body(audio.getBlob().getData());
   }
 
   @GetMapping("/images/{image}/{fileName}")
@@ -36,6 +36,6 @@ public class AttachmentController {
     return ResponseEntity.ok()
         .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + image.getName() + "\"")
         .header(HttpHeaders.CONTENT_TYPE, image.getType())
-        .body(image.getImageBlob().getData());
+        .body(image.getBlob().getData());
   }
 }

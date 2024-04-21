@@ -240,9 +240,9 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     audio.setName(file.getOriginalFilename());
     audio.setType(file.getContentType());
 
-    AudioBlob audioBlob = new AudioBlob();
+    AttachmentBlob audioBlob = new AttachmentBlob();
     audioBlob.setData(file.getBytes());
-    audio.setAudioBlob(audioBlob);
+    audio.setBlob(audioBlob);
 
     getNoteAccessories().setUploadAudio(audio);
   }

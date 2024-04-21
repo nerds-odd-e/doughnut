@@ -24,11 +24,11 @@ public class Audio extends EntityIdentifiedByIdOnly {
   private String storageType;
 
   @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  @JoinColumn(name = "audio_blob_id", referencedColumnName = "id")
+  @JoinColumn(name = "attachment_blob_id", referencedColumnName = "id")
   @JsonIgnore
   @Getter
   @Setter
-  private AudioBlob audioBlob;
+  private AttachmentBlob blob;
 
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", referencedColumnName = "id")

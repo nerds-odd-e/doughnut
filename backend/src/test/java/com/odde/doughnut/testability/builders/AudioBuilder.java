@@ -1,7 +1,7 @@
 package com.odde.doughnut.testability.builders;
 
+import com.odde.doughnut.entities.AttachmentBlob;
 import com.odde.doughnut.entities.Audio;
-import com.odde.doughnut.entities.AudioBlob;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
@@ -13,10 +13,10 @@ public class AudioBuilder extends EntityBuilder<Audio> {
 
   @Override
   protected void beforeCreate(boolean needPersist) {
-    if (entity.getAudioBlob() == null) {
-      AudioBlob audioBlob = new AudioBlob();
+    if (entity.getBlob() == null) {
+      AttachmentBlob audioBlob = new AttachmentBlob();
       audioBlob.setData("DEADBEEF".getBytes());
-      entity.setAudioBlob(audioBlob);
+      entity.setBlob(audioBlob);
     }
 
     if (entity.getStorageType() == null) {
