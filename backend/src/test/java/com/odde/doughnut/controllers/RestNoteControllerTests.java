@@ -476,7 +476,7 @@ class RestNoteControllerTests {
     }
 
     @Test
-    void convertAudioToSRT() {
+    void convertAudioToSRT() throws IOException {
       MockMultipartFile mockFile =
           new MockMultipartFile("file", "test.mp3", "text/plain", "test".getBytes());
       var dto = new AudioUploadDTO();

@@ -156,17 +156,24 @@ class RestNoteController {
   @Transactional
   public ResponseEntity<String> convertAudioToSRT(
       @PathVariable(name = "note") @Schema(type = "integer") Note note) {
-    return ResponseEntity.ok().body("\"1\\n00:00:00,000 --> 00:00:02,000\\nYou\\n\\n\\n\"");
+    Audio audio = note.getNoteAccessories().getUploadAudio();
+    return audioToSrt(audio.getName(), audio.getBlob().getData());
   }
 
   @PostMapping(
       path = "/convertSrt",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @Transactional
-  public ResponseEntity<String> convertSrt(@Valid @ModelAttribute AudioUploadDTO audioFile) {
-    var url = "https://api.openai.com/v1/audio/transcriptions";
-    var filename = audioFile.getUploadAudioFile().getOriginalFilename();
+  public ResponseEntity<String> convertSrt(@Valid @ModelAttribute AudioUploadDTO audioFile)
+      throws IOException {
 
+    return audioToSrt(
+        audioFile.getUploadAudioFile().getOriginalFilename(),
+        audioFile.getUploadAudioFile().getBytes());
+  }
+
+  private ResponseEntity<String> audioToSrt(String filename, byte[] bytes) {
+    var url = "https://api.openai.com/v1/audio/transcriptions";
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.MULTIPART_FORM_DATA);
     headers.setBearerAuth(openAiToken);
@@ -176,15 +183,9 @@ class RestNoteController {
         ContentDisposition.builder("form-data").name("file").filename(filename).build();
 
     fileMap.add(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString());
-    HttpEntity<byte[]> fileEntity;
-    try {
-      fileEntity = new HttpEntity<>(audioFile.getUploadAudioFile().getBytes(), fileMap);
-    } catch (IOException e) {
-      throw new RuntimeException("Exception while reading the audio file", e);
-    }
 
     MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-    body.add("file", fileEntity);
+    body.add("file", new HttpEntity<byte[]>(bytes, fileMap));
     body.add("model", "whisper-1");
     body.add("response_format", "srt");
 
