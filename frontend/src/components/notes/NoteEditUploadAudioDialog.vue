@@ -22,7 +22,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { Note, AudioUploadDTO, NoteRealm } from "@/generated/backend";
+import { Note, AudioUploadDTO } from "@/generated/backend";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import NoteUploadAudioForm from "./NoteUploadAudioForm.vue";
 
@@ -47,40 +47,42 @@ export default defineComponent({
   },
 
   methods: {
-    uploadAudio() {
-      this.storageAccessor
-        .storedApi()
-        .uploadAudio(this.note.id, this.formData, false)
-        .then(() => this.$emit("closeDialog"))
-        .catch((error) => {
-          this.noteFormErrors = {
-            uploadAudioFile: error.body.message ?? "Unexpected error occured",
-          };
-        });
+    async uploadAudio() {
+      try {
+        await this.storageAccessor
+          .storedApi()
+          .uploadAudio(this.note.id, this.formData, false);
+        this.$emit("closeDialog");
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        this.noteFormErrors = {
+          uploadAudioFile: error.body.message ?? "Unexpected error occured",
+        };
+      }
     },
-    uploadAudioAndConvertToSRT() {
-      this.storageAccessor
-        .storedApi()
-        .uploadAudio(this.note.id, this.formData, true)
-        .then((response: NoteRealm) => {
-          this.srt = response.note.srt ?? "";
-        })
-        .catch((error) => {
-          this.noteFormErrors = {
-            uploadAudioFile: error.body.message ?? "Unexpected error occured",
-          };
-        });
+    async uploadAudioAndConvertToSRT() {
+      try {
+        const response = await this.storageAccessor
+          .storedApi()
+          .uploadAudio(this.note.id, this.formData, true);
+        this.srt = response.note.srt ?? "";
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        this.noteFormErrors = {
+          uploadAudioFile: error.body.message ?? "Unexpected error occured",
+        };
+      }
     },
-    convertToSRT() {
-      this.storageAccessor
-        .storedApi()
-        .convertAudio(this.formData)
-        .then((response) => {
-          this.srt = response;
-        })
-        .catch((error) => {
-          this.noteFormErrors = error;
-        });
+    async convertToSRT() {
+      try {
+        const response = await this.storageAccessor
+          .storedApi()
+          .convertAudio(this.formData);
+        this.srt = response;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        this.noteFormErrors = error;
+      }
     },
   },
 });
