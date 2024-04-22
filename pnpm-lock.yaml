@@ -12,15 +12,15 @@ importers:
   .:
     dependencies:
       '@cucumber/cucumber':
-        specifier: ^10.4.0
-        version: 10.4.0
+        specifier: ^10.5.1
+        version: 10.5.1
     devDependencies:
       '@anev/ts-mountebank':
         specifier: 1.8.0
         version: 1.8.0
       '@badeball/cypress-cucumber-preprocessor':
-        specifier: ^20.0.3
-        version: 20.0.3(cypress@13.8.0)(typescript@5.4.5)
+        specifier: ^20.0.4
+        version: 20.0.4(cypress@13.8.0)(typescript@5.4.5)
       '@bahmutov/cypress-esbuild-preprocessor':
         specifier: ^2.2.0
         version: 2.2.0(esbuild@0.20.2)
@@ -473,8 +473,8 @@ packages:
   '@badeball/cypress-configuration@6.1.1':
     resolution: {integrity: sha512-0IcJFMiCRo33Ofrvxxojt5QRJWyxApymHuuy981FeXnOGz4UsWKgr/hRupeXkw2cKXvah+j+880kXliygxPOSQ==}
 
-  '@badeball/cypress-cucumber-preprocessor@20.0.3':
-    resolution: {integrity: sha512-cc7rYEFEVRAZ13LQ2WEnG84VJNO+ErpNsNBP/5eP2JC+2v8WvcVgm8fcqKLOiNgyEWaRuiT+MkU3DXKbBbFVSg==}
+  '@badeball/cypress-cucumber-preprocessor@20.0.4':
+    resolution: {integrity: sha512-1izlopsaJLPVjPN4XV3WhviZOgwXleVMsiTuDYHbJq3QiTUdHUzbticy8cMxtUTKa2dKZZSJTzZIGcXP5wEuag==}
     engines: {node: '>=18.0.0'}
     hasBin: true
     peerDependencies:
@@ -503,8 +503,8 @@ packages:
   '@cucumber/cucumber-expressions@17.1.0':
     resolution: {integrity: sha512-PCv/ppsPynniKPWJr5v566daCVe+pbxQpHGrIu/Ev57cCH9Rv+X0F6lio4Id3Z64TaG7btCRLUGewIgLwmrwOA==}
 
-  '@cucumber/cucumber@10.4.0':
-    resolution: {integrity: sha512-pFPu4tCzHJUm1S4GfWUlhJYYqfbVPCmYCADehuhNU+MR29mvy49DQE6WS6aVdwABPawzpBs0H8EuQYA8Vh9Yqw==}
+  '@cucumber/cucumber@10.5.1':
+    resolution: {integrity: sha512-10l/nDbCPNs9y/rO1o9hIlVHmMyLqjvsGNqAO5UX7IlPmslgXLxTbFp7MM1DuSbUq5zuNGfgHymlSvIOARYeUA==}
     engines: {node: 18 || >=20}
     hasBin: true
 
@@ -5435,17 +5435,17 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@badeball/cypress-cucumber-preprocessor@20.0.3(cypress@13.8.0)(typescript@5.4.5)':
+  '@badeball/cypress-cucumber-preprocessor@20.0.4(cypress@13.8.0)(typescript@5.4.5)':
     dependencies:
       '@badeball/cypress-configuration': 6.1.1
       '@cucumber/ci-environment': 10.0.1
-      '@cucumber/cucumber': 10.4.0
+      '@cucumber/cucumber': 10.5.1
       '@cucumber/cucumber-expressions': 17.1.0
       '@cucumber/gherkin': 27.0.0
       '@cucumber/html-formatter': 20.4.0(@cucumber/messages@22.0.0)
       '@cucumber/message-streams': 4.0.1(@cucumber/messages@22.0.0)
       '@cucumber/messages': 22.0.0
-      '@cucumber/pretty-formatter': 1.0.1(@cucumber/cucumber@10.4.0)(@cucumber/messages@22.0.0)
+      '@cucumber/pretty-formatter': 1.0.1(@cucumber/cucumber@10.5.1)(@cucumber/messages@22.0.0)
       '@cucumber/tag-expressions': 6.1.0
       base64-js: 1.5.1
       chalk: 4.1.2
@@ -5484,7 +5484,7 @@ snapshots:
     dependencies:
       regexp-match-indices: 1.0.2
 
-  '@cucumber/cucumber@10.4.0':
+  '@cucumber/cucumber@10.5.1':
     dependencies:
       '@cucumber/ci-environment': 10.0.1
       '@cucumber/cucumber-expressions': 17.1.0
@@ -5582,9 +5582,9 @@ snapshots:
       reflect-metadata: 0.2.1
       uuid: 9.0.1
 
-  '@cucumber/pretty-formatter@1.0.1(@cucumber/cucumber@10.4.0)(@cucumber/messages@22.0.0)':
+  '@cucumber/pretty-formatter@1.0.1(@cucumber/cucumber@10.5.1)(@cucumber/messages@22.0.0)':
     dependencies:
-      '@cucumber/cucumber': 10.4.0
+      '@cucumber/cucumber': 10.5.1
       '@cucumber/messages': 22.0.0
       ansi-styles: 5.2.0
       cli-table3: 0.6.4
@@ -8006,7 +8006,7 @@ snapshots:
       fs.realpath: 1.0.0
       inflight: 1.0.6
       inherits: 2.0.4
-      minimatch: 5.0.1
+      minimatch: 5.1.6
       once: 1.4.0
 
   global-dirs@3.0.1:
