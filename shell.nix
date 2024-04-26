@@ -10,8 +10,8 @@ in mkShell {
   buildInputs = [
     python312
     poetry
-    nodejs_21
-    corepack_21
+    nodejs_22
+    corepack_22
     zsh
     jdk21
     libiconv
