@@ -5,6 +5,7 @@
 import type { BaseHttpRequest } from './core/BaseHttpRequest';
 import type { OpenAPIConfig } from './core/OpenAPI';
 import { FetchHttpRequest } from './core/FetchHttpRequest';
+import { RestAiAudioControllerService } from './services/RestAiAudioControllerService';
 import { RestAiControllerService } from './services/RestAiControllerService';
 import { RestBazaarControllerService } from './services/RestBazaarControllerService';
 import { RestCircleControllerService } from './services/RestCircleControllerService';
@@ -26,6 +27,7 @@ import { RestWikidataControllerService } from './services/RestWikidataController
 import { TestabilityRestControllerService } from './services/TestabilityRestControllerService';
 type HttpRequestConstructor = new (config: OpenAPIConfig) => BaseHttpRequest;
 export class DoughnutApi {
+    public readonly restAiAudioController: RestAiAudioControllerService;
     public readonly restAiController: RestAiControllerService;
     public readonly restBazaarController: RestBazaarControllerService;
     public readonly restCircleController: RestCircleControllerService;
@@ -58,6 +60,7 @@ export class DoughnutApi {
             HEADERS: config?.HEADERS,
             ENCODE_PATH: config?.ENCODE_PATH,
         });
+        this.restAiAudioController = new RestAiAudioControllerService(this.request);
         this.restAiController = new RestAiControllerService(this.request);
         this.restBazaarController = new RestBazaarControllerService(this.request);
         this.restCircleController = new RestCircleControllerService(this.request);

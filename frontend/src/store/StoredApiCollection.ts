@@ -258,6 +258,6 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   convertAudio(formData: AudioUploadDTO) {
-    return this.managedApi.restNoteController.convertSrt(formData);
+    return this.managedApi.restAiAudioController.convertSrt(formData);
   }
 }

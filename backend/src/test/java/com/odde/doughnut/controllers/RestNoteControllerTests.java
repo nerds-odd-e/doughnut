@@ -5,8 +5,6 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
@@ -35,15 +33,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
-import org.springframework.web.client.RestTemplate;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -53,7 +46,6 @@ class RestNoteControllerTests {
 
   @Autowired MakeMe makeMe;
   @Mock HttpClientAdapter httpClientAdapter;
-  @Mock RestTemplate restTemplate;
   private UserModel userModel;
   RestNoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -64,7 +56,7 @@ class RestNoteControllerTests {
 
     controller =
         new RestNoteController(
-            modelFactoryService, userModel, httpClientAdapter, testabilitySettings, restTemplate);
+            modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
   }
 
   private void mockWikidataEntity(String wikidataId, String label)
@@ -425,9 +417,7 @@ class RestNoteControllerTests {
 
     @ParameterizedTest
     @ValueSource(strings = {"something.txt", "youtube.avi"})
-    void shouldFailOnInvalidAudioFileFormat(String filename)
-        throws UnexpectedNoAccessRightException, IOException {
-      byte[] bytes = new byte[1024 * 1024 * 10];
+    void shouldFailOnInvalidAudioFileFormat(String filename) {
       audioUploadDTO.setUploadAudioFile(
           new MockMultipartFile(filename, filename, "audio/mp3", new byte[] {}));
 
@@ -439,7 +429,7 @@ class RestNoteControllerTests {
     }
 
     @Test
-    void shouldFailOnFileSize() throws UnexpectedNoAccessRightException, IOException {
+    void shouldFailOnFileSize() {
       String filename = "big_file.mp3";
       byte[] bytes = new byte[1024 * 1024 * 20];
       audioUploadDTO.setUploadAudioFile(
@@ -460,36 +450,6 @@ class RestNoteControllerTests {
       controller.uploadAudio(note, audioUploadDTO, false);
       Note newNote = makeMe.modelFactoryService.noteRepository.findById(note.getId()).get();
       assertEquals(filename, newNote.getNoteAccessories().getUploadAudio().getName());
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"podcast.mp3", "podcast.m4a", "podcast.wav"})
-    void convertingFormat(String filename) throws Exception {
-      audioUploadDTO.setUploadAudioFile(
-          new MockMultipartFile(filename, filename, "audio/mp3", new byte[] {}));
-      ResponseEntity<String> mockResponseEntity = new ResponseEntity<>("test", HttpStatus.OK);
-      when(restTemplate.exchange(
-              any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
-          .thenReturn(mockResponseEntity);
-      String result = controller.convertSrt(audioUploadDTO).getBody();
-      assertEquals("test", result);
-    }
-
-    @Test
-    void convertAudioToSRT() throws IOException {
-      MockMultipartFile mockFile =
-          new MockMultipartFile("file", "test.mp3", "text/plain", "test".getBytes());
-      var dto = new AudioUploadDTO();
-      dto.setUploadAudioFile(mockFile);
-      // Mocking the response entity
-      ResponseEntity<String> mockResponseEntity = new ResponseEntity<>("test", HttpStatus.OK);
-      when(restTemplate.exchange(
-              any(String.class), eq(HttpMethod.POST), any(HttpEntity.class), eq(String.class)))
-          .thenReturn(mockResponseEntity);
-
-      String resp = controller.convertSrt(dto).getBody();
-
-      assertThat(resp, equalTo("test"));
     }
   }
 

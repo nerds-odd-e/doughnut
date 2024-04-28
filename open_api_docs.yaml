@@ -916,7 +916,7 @@ paths:
   /api/notes/convertSrt:
     post:
       tags:
-      - rest-note-controller
+      - rest-ai-audio-controller
       operationId: convertSrt
       requestBody:
         content:
@@ -1627,7 +1627,7 @@ paths:
   /api/notes/{note}/audio-to-srt:
     patch:
       tags:
-      - rest-note-controller
+      - rest-ai-audio-controller
       operationId: convertAudioToSRT
       parameters:
       - name: note
