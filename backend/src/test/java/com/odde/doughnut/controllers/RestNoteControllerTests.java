@@ -365,7 +365,6 @@ class RestNoteControllerTests {
   class updateNoteTest {
     Note note;
     NoteAccessoriesDTO noteAccessoriesDTO = new NoteAccessoriesDTO();
-    AudioUploadDTO audioUploadDTO = new AudioUploadDTO();
 
     @BeforeEach
     void setup() {
@@ -402,6 +401,17 @@ class RestNoteControllerTests {
       makeMe.theNote(note).withUploadedPicture();
       controller.updateNoteAccessories(note, noteAccessoriesDTO);
       assertThat(note.getNoteAccessories().getUploadPicture(), is(not(nullValue())));
+    }
+  }
+
+  @Nested
+  class uploadAudioTest {
+    Note note;
+    AudioUploadDTO audioUploadDTO = new AudioUploadDTO();
+
+    @BeforeEach
+    void setup() {
+      note = makeMe.aNote("new").creatorAndOwner(userModel).please();
     }
 
     @ParameterizedTest
