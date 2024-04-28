@@ -209,14 +209,12 @@ export class RestNoteControllerService {
     }
     /**
      * @param note
-     * @param isConverting
      * @param formData
      * @returns NoteRealm OK
      * @throws ApiError
      */
     public uploadAudio(
         note: number,
-        isConverting?: boolean,
         formData?: AudioUploadDTO,
     ): CancelablePromise<NoteRealm> {
         return this.httpRequest.request({
@@ -224,9 +222,6 @@ export class RestNoteControllerService {
             url: '/api/notes/{note}/audio',
             path: {
                 'note': note,
-            },
-            query: {
-                'isConverting': isConverting,
             },
             formData: formData,
             mediaType: 'multipart/form-data',

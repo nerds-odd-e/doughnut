@@ -409,7 +409,7 @@ class RestNoteControllerTests {
     void shouldSucceedOnValidAudioFileFormat(String filename) throws Exception {
       audioUploadDTO.setUploadAudioFile(
           new MockMultipartFile(filename, filename, "audio/mp3", new byte[] {}));
-      NoteRealm noteRealm = controller.uploadAudio(note, audioUploadDTO, false);
+      NoteRealm noteRealm = controller.uploadAudio(note, audioUploadDTO);
       assertEquals(
           noteRealm.getNote().getNoteAccessories().getAudioName().get(),
           audioUploadDTO.getUploadAudioFile().getOriginalFilename());
@@ -424,7 +424,7 @@ class RestNoteControllerTests {
       assertThrows(
           Exception.class,
           () -> {
-            controller.uploadAudio(note, audioUploadDTO, false);
+            controller.uploadAudio(note, audioUploadDTO);
           });
     }
 
@@ -438,7 +438,7 @@ class RestNoteControllerTests {
       assertThrows(
           Exception.class,
           () -> {
-            controller.uploadAudio(note, audioUploadDTO, false);
+            controller.uploadAudio(note, audioUploadDTO);
           });
     }
 
@@ -447,7 +447,7 @@ class RestNoteControllerTests {
       String filename = "podcast.wav";
       audioUploadDTO.setUploadAudioFile(
           new MockMultipartFile(filename, filename, "audio/wav", new byte[] {}));
-      controller.uploadAudio(note, audioUploadDTO, false);
+      controller.uploadAudio(note, audioUploadDTO);
       Note newNote = makeMe.modelFactoryService.noteRepository.findById(note.getId()).get();
       assertEquals(filename, newNote.getNoteAccessories().getUploadAudio().getName());
     }

@@ -128,8 +128,7 @@ class RestNoteController {
   @Transactional
   public NoteRealm uploadAudio(
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
-      @Valid @ModelAttribute AudioUploadDTO audioUploadDTO,
-      @RequestParam(required = false) Boolean isConverting)
+      @Valid @ModelAttribute AudioUploadDTO audioUploadDTO)
       throws Exception {
     audioUploadDTO.validate();
 

@@ -55,7 +55,7 @@ export default defineComponent({
       try {
         await this.storageAccessor
           .storedApi()
-          .uploadAudio(this.note.id, this.formData, false);
+          .uploadAudio(this.note.id, this.formData);
         this.$emit("closeDialog");
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
@@ -68,7 +68,7 @@ export default defineComponent({
       try {
         await this.storageAccessor
           .storedApi()
-          .uploadAudio(this.note.id, this.formData, true);
+          .uploadAudio(this.note.id, this.formData);
         this.srt =
           await this.managedApi.restAiAudioController.convertAudioToSrt(
             this.note.id,
