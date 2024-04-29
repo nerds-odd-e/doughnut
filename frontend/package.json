@@ -29,7 +29,7 @@
     "quill": "2.0.0",
     "turndown": "^7.1.3",
     "unplugin-vue-components": "0.26.0",
-    "vue": "3.4.25",
+    "vue": "3.4.26",
     "vue-content-loader": "2.0.1",
     "vue-router": "4.3.2"
   },
