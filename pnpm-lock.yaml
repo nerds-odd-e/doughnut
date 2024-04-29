@@ -19,8 +19,8 @@ importers:
         specifier: 1.8.0
         version: 1.8.0
       '@badeball/cypress-cucumber-preprocessor':
-        specifier: ^20.0.4
-        version: 20.0.4(cypress@13.8.1)(typescript@5.4.5)
+        specifier: ^20.0.5
+        version: 20.0.5(cypress@13.8.1)(typescript@5.4.5)
       '@bahmutov/cypress-esbuild-preprocessor':
         specifier: ^2.2.0
         version: 2.2.0(esbuild@0.20.2)
@@ -473,8 +473,8 @@ packages:
   '@badeball/cypress-configuration@6.1.1':
     resolution: {integrity: sha512-0IcJFMiCRo33Ofrvxxojt5QRJWyxApymHuuy981FeXnOGz4UsWKgr/hRupeXkw2cKXvah+j+880kXliygxPOSQ==}
 
-  '@badeball/cypress-cucumber-preprocessor@20.0.4':
-    resolution: {integrity: sha512-1izlopsaJLPVjPN4XV3WhviZOgwXleVMsiTuDYHbJq3QiTUdHUzbticy8cMxtUTKa2dKZZSJTzZIGcXP5wEuag==}
+  '@badeball/cypress-cucumber-preprocessor@20.0.5':
+    resolution: {integrity: sha512-KmlyvOOq5XjVbCIiCmY/+QyUA2CQPeBoa9AJD7N1UrnuI9EDvZkO11UHdcu+uG2x2V5k8ZBijIqYW/xvsHK4Wg==}
     engines: {node: '>=18.0.0'}
     hasBin: true
     peerDependencies:
@@ -520,16 +520,8 @@ packages:
     resolution: {integrity: sha512-clk4q39uj7pztZuZtyI54V8lRsCUz0Y/p8XRjIeHh7ExeEztpWkp4ca9q1FjUOPfQQ8E7OgqFbqoQQXZ1Bx7fw==}
     hasBin: true
 
-  '@cucumber/gherkin@27.0.0':
-    resolution: {integrity: sha512-j5rCsjqzRiC3iVTier3sa0kzyNbkcAmF7xr7jKnyO7qDeK3Z8Ye1P3KSVpeQRMY+KCDJ3WbTDdyxH0FwfA/fIw==}
-
   '@cucumber/gherkin@28.0.0':
     resolution: {integrity: sha512-Ee6zJQq0OmIUPdW0mSnsCsrWA2PZAELNDPICD2pLfs0Oz7RAPgj80UsD2UCtqyAhw2qAR62aqlktKUlai5zl/A==}
-
-  '@cucumber/html-formatter@20.4.0':
-    resolution: {integrity: sha512-TnLSXC5eJd8AXHENo69f5z+SixEVtQIf7Q2dZuTpT/Y8AOkilGpGl1MQR1Vp59JIw+fF3EQSUKdf+DAThCxUNg==}
-    peerDependencies:
-      '@cucumber/messages': '>=18'
 
   '@cucumber/html-formatter@21.3.1':
     resolution: {integrity: sha512-M1zbre7e8MsecXheqNv62BKY5J06YJSv1LmsD7sJ3mu5t1jirLjj2It1HqPsX5CQAfg9n69xFRugPgLMSte9TA==}
@@ -540,9 +532,6 @@ packages:
     resolution: {integrity: sha512-Kxap9uP5jD8tHUZVjTWgzxemi/0uOsbGjd4LBOSxcJoOCRbESFwemUzilJuzNTB8pcTQUh8D5oudUyxfkJOKmA==}
     peerDependencies:
       '@cucumber/messages': '>=17.1.1'
-
-  '@cucumber/messages@22.0.0':
-    resolution: {integrity: sha512-EuaUtYte9ilkxcKmfqGF9pJsHRUU0jwie5ukuZ/1NPTuHS1LxHPsGEODK17RPRbZHOFhqybNzG2rHAwThxEymg==}
 
   '@cucumber/messages@24.1.0':
     resolution: {integrity: sha512-hxVHiBurORcobhVk80I9+JkaKaNXkW6YwGOEFIh/2aO+apAN+5XJgUUWjng9NwqaQrW1sCFuawLB1AuzmBaNdQ==}
@@ -1176,9 +1165,6 @@ packages:
 
   '@types/turndown@5.0.4':
     resolution: {integrity: sha512-28GI33lCCkU4SGH1GvjDhFgOVr+Tym4PXGBIU1buJUa6xQolniPArtUT+kv42RR2N9MsMLInkr904Aq+ESHBJg==}
-
-  '@types/uuid@9.0.1':
-    resolution: {integrity: sha512-rFT3ak0/2trgvp4yYZo5iKFEPsET7vKydKF+VRCxlQ9bpheehyAJH89dAkaLEq/j/RZXJIqcgsmPJKUP1Z28HA==}
 
   '@types/uuid@9.0.8':
     resolution: {integrity: sha512-jg+97EGIcY9AGHJJRaaPVgetKDsrTgbRjQ5Msgjh/DQKEFl0DtyRr/VCOyD1T2R1MNeWPK/u7JoGhlDZnKBAfA==}
@@ -1982,15 +1968,6 @@ packages:
   cors@2.8.5:
     resolution: {integrity: sha512-KIHbLJqu73RGr/hnbrO9uBeixNGuvSQjul/jdFvS/KFSIH1hWVd1ng7zOHx+YrEfInLG7q4n6GHQ9cDtxv/P6g==}
     engines: {node: '>= 0.10'}
-
-  cosmiconfig@8.3.6:
-    resolution: {integrity: sha512-kcZ6+W5QzcJ3P1Mt+83OUv/oHFqZHIx8DuxG6eZ5RGMERoLqp4BuGjhHLYGK+Kf5XVkQvqBSmAy/nGWN3qDgEA==}
-    engines: {node: '>=14'}
-    peerDependencies:
-      typescript: '>=4.9.5'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
 
   cosmiconfig@9.0.0:
     resolution: {integrity: sha512-itvL5h8RETACmOTFc4UfIyB2RfEHi71Ax6E/PivVxq9NseKbOWpeyHEOIbmAw1rs8Ak0VursQNww7lf7YtUwzg==}
@@ -4084,9 +4061,6 @@ packages:
     resolution: {integrity: sha512-tYkDkVVtYkSVhuQ4zBgfvciymHaeuel+zFKXShfDnFP5SyVEP7qo70Rf1jTOTCx3vGNAbnEi/xFkcfQVMIBWag==}
     engines: {node: '>=12'}
 
-  reflect-metadata@0.1.13:
-    resolution: {integrity: sha512-Ts1Y/anZELhSsjMcU605fU9RE4Oi3p5ORujwbIKXfWa+0Zxs510Qrmrce5/Jowq3cHSZSJqBjypxmHarc+vEWg==}
-
   reflect-metadata@0.2.1:
     resolution: {integrity: sha512-i5lLI6iw9AU3Uu4szRNPPEkomnkjRTaVt9hy/bn5g/oSzekBSMeLZblcjP74AW0vBabqERLLIrz+gR8QYR54Tw==}
 
@@ -4805,10 +4779,6 @@ packages:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
     hasBin: true
 
-  uuid@9.0.0:
-    resolution: {integrity: sha512-MXcSTerfPa4uqyzStbRoTgt5XIe3x5+42+q1sDuy3R5MDk66URdLMOZe5aPX/SQd+kuYAh0FdP/pO28IkQyTeg==}
-    hasBin: true
-
   uuid@9.0.1:
     resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
     hasBin: true
@@ -5483,27 +5453,27 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@badeball/cypress-cucumber-preprocessor@20.0.4(cypress@13.8.1)(typescript@5.4.5)':
+  '@badeball/cypress-cucumber-preprocessor@20.0.5(cypress@13.8.1)(typescript@5.4.5)':
     dependencies:
       '@badeball/cypress-configuration': 6.1.1
       '@cucumber/ci-environment': 10.0.1
       '@cucumber/cucumber': 10.6.0
       '@cucumber/cucumber-expressions': 17.1.0
-      '@cucumber/gherkin': 27.0.0
-      '@cucumber/html-formatter': 20.4.0(@cucumber/messages@22.0.0)
-      '@cucumber/message-streams': 4.0.1(@cucumber/messages@22.0.0)
-      '@cucumber/messages': 22.0.0
-      '@cucumber/pretty-formatter': 1.0.1(@cucumber/cucumber@10.6.0)(@cucumber/messages@22.0.0)
+      '@cucumber/gherkin': 28.0.0
+      '@cucumber/html-formatter': 21.3.1(@cucumber/messages@24.1.0)
+      '@cucumber/message-streams': 4.0.1(@cucumber/messages@24.1.0)
+      '@cucumber/messages': 24.1.0
+      '@cucumber/pretty-formatter': 1.0.1(@cucumber/cucumber@10.6.0)(@cucumber/messages@24.1.0)
       '@cucumber/tag-expressions': 6.1.0
       base64-js: 1.5.1
       chalk: 4.1.2
       cli-table: 0.3.11
       common-ancestor-path: 1.0.1
-      cosmiconfig: 8.3.6(typescript@5.4.5)
+      cosmiconfig: 9.0.0(typescript@5.4.5)
       cypress: 13.8.1
       debug: 4.3.4(supports-color@8.1.1)
       error-stack-parser: 2.1.4
-      esbuild: 0.19.12
+      esbuild: 0.20.2
       glob: 10.3.12
       is-path-inside: 3.0.3
       mocha: 10.4.0
@@ -5592,36 +5562,17 @@ snapshots:
       commander: 12.0.0
       source-map-support: 0.5.21
 
-  '@cucumber/gherkin@27.0.0':
-    dependencies:
-      '@cucumber/messages': 22.0.0
-
   '@cucumber/gherkin@28.0.0':
     dependencies:
       '@cucumber/messages': 24.1.0
-
-  '@cucumber/html-formatter@20.4.0(@cucumber/messages@22.0.0)':
-    dependencies:
-      '@cucumber/messages': 22.0.0
 
   '@cucumber/html-formatter@21.3.1(@cucumber/messages@24.1.0)':
     dependencies:
       '@cucumber/messages': 24.1.0
 
-  '@cucumber/message-streams@4.0.1(@cucumber/messages@22.0.0)':
-    dependencies:
-      '@cucumber/messages': 22.0.0
-
   '@cucumber/message-streams@4.0.1(@cucumber/messages@24.1.0)':
     dependencies:
       '@cucumber/messages': 24.1.0
-
-  '@cucumber/messages@22.0.0':
-    dependencies:
-      '@types/uuid': 9.0.1
-      class-transformer: 0.5.1
-      reflect-metadata: 0.1.13
-      uuid: 9.0.0
 
   '@cucumber/messages@24.1.0':
     dependencies:
@@ -5630,10 +5581,10 @@ snapshots:
       reflect-metadata: 0.2.1
       uuid: 9.0.1
 
-  '@cucumber/pretty-formatter@1.0.1(@cucumber/cucumber@10.6.0)(@cucumber/messages@22.0.0)':
+  '@cucumber/pretty-formatter@1.0.1(@cucumber/cucumber@10.6.0)(@cucumber/messages@24.1.0)':
     dependencies:
       '@cucumber/cucumber': 10.6.0
-      '@cucumber/messages': 22.0.0
+      '@cucumber/messages': 24.1.0
       ansi-styles: 5.2.0
       cli-table3: 0.6.4
       figures: 3.2.0
@@ -6127,8 +6078,6 @@ snapshots:
   '@types/triple-beam@1.3.5': {}
 
   '@types/turndown@5.0.4': {}
-
-  '@types/uuid@9.0.1': {}
 
   '@types/uuid@9.0.8': {}
 
@@ -7095,15 +7044,6 @@ snapshots:
     dependencies:
       object-assign: 4.1.1
       vary: 1.1.2
-
-  cosmiconfig@8.3.6(typescript@5.4.5):
-    dependencies:
-      import-fresh: 3.3.0
-      js-yaml: 4.1.0
-      parse-json: 5.2.0
-      path-type: 4.0.0
-    optionalDependencies:
-      typescript: 5.4.5
 
   cosmiconfig@9.0.0(typescript@5.4.5):
     dependencies:
@@ -8086,7 +8026,7 @@ snapshots:
       fs.realpath: 1.0.0
       inflight: 1.0.6
       inherits: 2.0.4
-      minimatch: 5.0.1
+      minimatch: 5.1.6
       once: 1.4.0
 
   global-dirs@3.0.1:
@@ -9416,8 +9356,6 @@ snapshots:
       indent-string: 5.0.0
       strip-indent: 4.0.0
 
-  reflect-metadata@0.1.13: {}
-
   reflect-metadata@0.2.1: {}
 
   regenerator-runtime@0.14.1: {}
@@ -10114,8 +10052,6 @@ snapshots:
   utils-merge@1.0.1: {}
 
   uuid@8.3.2: {}
-
-  uuid@9.0.0: {}
 
   uuid@9.0.1: {}
 
