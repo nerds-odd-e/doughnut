@@ -7,6 +7,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.ai.client.OpenAiApi2;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.assistants.Assistant;
 import com.theokanning.openai.client.OpenAiApi;
@@ -33,7 +34,7 @@ public class RestAiController {
   private final TestabilitySettings testabilitySettings;
 
   public RestAiController(
-      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
+      @Qualifier("testableOpenAiApi") OpenAiApi2 openAiApi,
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings) {

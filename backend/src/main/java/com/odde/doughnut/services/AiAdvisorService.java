@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.*;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
+import com.odde.doughnut.services.ai.client.OpenAiApi2;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.assistants.*;
 import com.theokanning.openai.client.OpenAiApi;
@@ -18,7 +19,7 @@ public class AiAdvisorService {
 
   private final OpenAiApiHandler openAiApiHandler;
 
-  public AiAdvisorService(OpenAiApi openAiApi) {
+  public AiAdvisorService(OpenAiApi2 openAiApi) {
     openAiApiHandler = new OpenAiApiHandler(openAiApi);
   }
 

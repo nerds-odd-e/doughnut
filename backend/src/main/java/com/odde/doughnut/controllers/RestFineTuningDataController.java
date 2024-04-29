@@ -7,6 +7,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.FineTuningService;
+import com.odde.doughnut.services.ai.client.OpenAiApi2;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.IOException;
@@ -25,7 +26,7 @@ class RestFineTuningDataController {
   private final AiAdvisorService aiAdvisorService;
 
   public RestFineTuningDataController(
-      ModelFactoryService modelFactoryService, UserModel currentUser, OpenAiApi openAiApi) {
+      ModelFactoryService modelFactoryService, UserModel currentUser, OpenAiApi2 openAiApi) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.fineTuningService = new FineTuningService(this.modelFactoryService, openAiApi);

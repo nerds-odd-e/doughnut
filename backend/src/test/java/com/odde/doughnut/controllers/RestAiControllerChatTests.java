@@ -9,6 +9,7 @@ import com.odde.doughnut.controllers.dto.ChatResponse;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.ai.client.OpenAiApi2;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
@@ -32,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class RestAiControllerChatTests {
 
-  @Mock private OpenAiApi openAiApi;
+  @Mock private OpenAiApi2 openAiApi;
 
   @Autowired MakeMe makeMe;
   RestAiController controller;

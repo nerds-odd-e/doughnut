@@ -11,6 +11,7 @@ import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
+import com.odde.doughnut.services.ai.client.OpenAiApi2;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -33,7 +34,7 @@ class RestReviewPointController {
   private final AiQuestionGenerator questionGenerator;
 
   public RestReviewPointController(
-      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
+      @Qualifier("testableOpenAiApi") OpenAiApi2 openAiApi,
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings) {

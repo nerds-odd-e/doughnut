@@ -11,6 +11,7 @@ import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.services.ai.client.OpenAiApi2;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.file.File;
@@ -35,7 +36,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
   RestFineTuningDataController controller;
-  @Mock private OpenAiApi openAiApi;
+  @Mock private OpenAiApi2 openAiApi;
 
   @BeforeEach
   void setup() {

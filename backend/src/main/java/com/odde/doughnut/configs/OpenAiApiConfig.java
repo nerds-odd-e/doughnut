@@ -1,5 +1,6 @@
 package com.odde.doughnut.configs;
 
+import com.odde.doughnut.services.ai.client.OpenAiApi2;
 import com.odde.doughnut.services.openAiApis.ApiExecutor;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
@@ -16,7 +17,7 @@ public class OpenAiApiConfig {
   @Bean
   @SessionScope
   @Qualifier("testableOpenAiApi")
-  public OpenAiApi getTestableOpenAiApi(
+  public OpenAiApi2 getTestableOpenAiApi(
       @Value("${spring.openai.token}") String openAiToken,
       @Autowired TestabilitySettings testabilitySettings) {
     return ApiExecutor.getOpenAiApi(openAiToken, testabilitySettings.getOpenAiApiUrl());

@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.odde.doughnut.services.ai.client.OpenAiApi2;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.assistants.Assistant;
 import com.theokanning.openai.assistants.AssistantRequest;
@@ -18,7 +19,7 @@ import org.mockito.*;
 class AiAdvisorServiceCompletionAssistantTest {
 
   private AiAdvisorService aiAdvisorService;
-  @Mock private OpenAiApi openAiApi;
+  @Mock private OpenAiApi2 openAiApi;
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
   @BeforeEach

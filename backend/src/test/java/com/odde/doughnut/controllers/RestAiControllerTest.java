@@ -14,6 +14,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
+import com.odde.doughnut.services.ai.client.OpenAiApi2;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIAssistantMock;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -53,7 +54,8 @@ class RestAiControllerTest {
   UserModel currentUser;
 
   Note note;
-  @Mock OpenAiApi openAiApi;
+  @Mock
+  OpenAiApi2 openAiApi;
   @Autowired MakeMe makeMe;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
 

@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
+import com.odde.doughnut.services.ai.client.OpenAiApi2;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.client.OpenAiApi;
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ public class FineTuningService {
 
   public final OpenAiApiHandler openAiApiHandler;
 
-  public FineTuningService(ModelFactoryService modelFactoryService, OpenAiApi openAiApi) {
+  public FineTuningService(ModelFactoryService modelFactoryService, OpenAiApi2 openAiApi) {
     this.modelFactoryService = modelFactoryService;
     this.openAiApiHandler = new OpenAiApiHandler(openAiApi);
   }

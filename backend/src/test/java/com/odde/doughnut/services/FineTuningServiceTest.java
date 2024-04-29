@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.ChatMessageForFineTuning;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
+import com.odde.doughnut.services.ai.client.OpenAiApi2;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.client.OpenAiApi;
 import java.util.List;
@@ -27,7 +28,7 @@ class FineTuningServiceTest {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
   private FineTuningService fineTuningService;
-  @Mock private OpenAiApi openAiApi;
+  @Mock private OpenAiApi2 openAiApi;
 
   @BeforeEach
   void setup() {
