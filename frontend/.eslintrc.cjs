@@ -37,6 +37,13 @@ module.exports = {
     "prettier",
   ],
   ignorePatterns: [
+    ".git",
+    ".github",
+    "dist",
+    "node_modules",
+    "*.md",
+    "index.html",
+    "components.d.ts",
     "tsconfig.json",
     ".eslintrc.cjs",
     "vite.config.ts",
