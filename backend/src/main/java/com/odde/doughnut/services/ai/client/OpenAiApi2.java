@@ -84,15 +84,20 @@ public interface OpenAiApi2 {
   @POST("/v1/chat/completions")
   Call<ResponseBody> createChatCompletionStream(@Body ChatCompletionRequest var1);
 
-  /** @deprecated */
+  /**
+   * @deprecated
+   */
   @Deprecated
   @POST("/v1/engines/{engine_id}/completions")
-  Single<CompletionResult> createCompletion(@Path("engine_id") String var1, @Body CompletionRequest var2);
+  Single<CompletionResult> createCompletion(
+      @Path("engine_id") String var1, @Body CompletionRequest var2);
 
   @POST("/v1/edits")
   Single<EditResult> createEdit(@Body EditRequest var1);
 
-  /** @deprecated */
+  /**
+   * @deprecated
+   */
   @Deprecated
   @POST("/v1/engines/{engine_id}/edits")
   Single<EditResult> createEdit(@Path("engine_id") String var1, @Body EditRequest var2);
@@ -100,10 +105,13 @@ public interface OpenAiApi2 {
   @POST("/v1/embeddings")
   Single<EmbeddingResult> createEmbeddings(@Body EmbeddingRequest var1);
 
-  /** @deprecated */
+  /**
+   * @deprecated
+   */
   @Deprecated
   @POST("/v1/engines/{engine_id}/embeddings")
-  Single<EmbeddingResult> createEmbeddings(@Path("engine_id") String var1, @Body EmbeddingRequest var2);
+  Single<EmbeddingResult> createEmbeddings(
+      @Path("engine_id") String var1, @Body EmbeddingRequest var2);
 
   @GET("/v1/files")
   Single<OpenAiResponse<File>> listFiles();
@@ -135,9 +143,12 @@ public interface OpenAiApi2 {
   Single<FineTuningJob> cancelFineTuningJob(@Path("fine_tuning_job_id") String var1);
 
   @GET("/v1/fine_tuning/jobs/{fine_tuning_job_id}/events")
-  Single<OpenAiResponse<FineTuningEvent>> listFineTuningJobEvents(@Path("fine_tuning_job_id") String var1);
+  Single<OpenAiResponse<FineTuningEvent>> listFineTuningJobEvents(
+      @Path("fine_tuning_job_id") String var1);
 
-  /** @deprecated */
+  /**
+   * @deprecated
+   */
   @Deprecated
   @POST("/v1/fine-tunes")
   Single<FineTuneResult> createFineTune(@Body FineTuneRequest var1);
@@ -145,22 +156,30 @@ public interface OpenAiApi2 {
   @POST("/v1/completions")
   Single<CompletionResult> createFineTuneCompletion(@Body CompletionRequest var1);
 
-  /** @deprecated */
+  /**
+   * @deprecated
+   */
   @Deprecated
   @GET("/v1/fine-tunes")
   Single<OpenAiResponse<FineTuneResult>> listFineTunes();
 
-  /** @deprecated */
+  /**
+   * @deprecated
+   */
   @Deprecated
   @GET("/v1/fine-tunes/{fine_tune_id}")
   Single<FineTuneResult> retrieveFineTune(@Path("fine_tune_id") String var1);
 
-  /** @deprecated */
+  /**
+   * @deprecated
+   */
   @Deprecated
   @POST("/v1/fine-tunes/{fine_tune_id}/cancel")
   Single<FineTuneResult> cancelFineTune(@Path("fine_tune_id") String var1);
 
-  /** @deprecated */
+  /**
+   * @deprecated
+   */
   @Deprecated
   @GET("/v1/fine-tunes/{fine_tune_id}/events")
   Single<OpenAiResponse<FineTuneEvent>> listFineTuneEvents(@Path("fine_tune_id") String var1);
@@ -189,25 +208,34 @@ public interface OpenAiApi2 {
   @POST("/v1/moderations")
   Single<ModerationResult> createModeration(@Body ModerationRequest var1);
 
-  /** @deprecated */
+  /**
+   * @deprecated
+   */
   @Deprecated
   @GET("v1/engines")
   Single<OpenAiResponse<Engine>> getEngines();
 
-  /** @deprecated */
+  /**
+   * @deprecated
+   */
   @Deprecated
   @GET("/v1/engines/{engine_id}")
   Single<Engine> getEngine(@Path("engine_id") String var1);
 
-  /** @deprecated */
+  /**
+   * @deprecated
+   */
   @Deprecated
   @GET("v1/dashboard/billing/subscription")
   Single<Subscription> subscription();
 
-  /** @deprecated */
+  /**
+   * @deprecated
+   */
   @Deprecated
   @GET("v1/dashboard/billing/usage")
-  Single<BillingUsage> billingUsage(@Query("start_date") LocalDate var1, @Query("end_date") LocalDate var2);
+  Single<BillingUsage> billingUsage(
+      @Query("start_date") LocalDate var1, @Query("end_date") LocalDate var2);
 
   @Headers({"OpenAI-Beta: assistants=v1"})
   @POST("/v1/assistants")
@@ -219,7 +247,8 @@ public interface OpenAiApi2 {
 
   @Headers({"OpenAI-Beta: assistants=v1"})
   @POST("/v1/assistants/{assistant_id}")
-  Single<Assistant> modifyAssistant(@Path("assistant_id") String var1, @Body ModifyAssistantRequest var2);
+  Single<Assistant> modifyAssistant(
+      @Path("assistant_id") String var1, @Body ModifyAssistantRequest var2);
 
   @Headers({"OpenAI-Beta: assistants=v1"})
   @DELETE("/v1/assistants/{assistant_id}")
@@ -231,19 +260,23 @@ public interface OpenAiApi2 {
 
   @Headers({"OpenAI-Beta: assistants=v1"})
   @POST("/v1/assistants/{assistant_id}/files")
-  Single<AssistantFile> createAssistantFile(@Path("assistant_id") String var1, @Body AssistantFileRequest var2);
+  Single<AssistantFile> createAssistantFile(
+      @Path("assistant_id") String var1, @Body AssistantFileRequest var2);
 
   @Headers({"OpenAI-Beta: assistants=v1"})
   @GET("/v1/assistants/{assistant_id}/files/{file_id}")
-  Single<AssistantFile> retrieveAssistantFile(@Path("assistant_id") String var1, @Path("file_id") String var2);
+  Single<AssistantFile> retrieveAssistantFile(
+      @Path("assistant_id") String var1, @Path("file_id") String var2);
 
   @Headers({"OpenAI-Beta: assistants=v1"})
   @DELETE("/v1/assistants/{assistant_id}/files/{file_id}")
-  Single<DeleteResult> deleteAssistantFile(@Path("assistant_id") String var1, @Path("file_id") String var2);
+  Single<DeleteResult> deleteAssistantFile(
+      @Path("assistant_id") String var1, @Path("file_id") String var2);
 
   @Headers({"OpenAI-Beta: assistants=v1"})
   @GET("/v1/assistants/{assistant_id}/files")
-  Single<OpenAiResponse<Assistant>> listAssistantFiles(@Path("assistant_id") String var1, @QueryMap Map<String, Object> var2);
+  Single<OpenAiResponse<Assistant>> listAssistantFiles(
+      @Path("assistant_id") String var1, @QueryMap Map<String, Object> var2);
 
   @Headers({"OpenAI-Beta: assistants=v1"})
   @POST("/v1/threads")
@@ -271,7 +304,10 @@ public interface OpenAiApi2 {
 
   @Headers({"OpenAI-Beta: assistants=v1"})
   @POST("/v1/threads/{thread_id}/messages/{message_id}")
-  Single<Message> modifyMessage(@Path("thread_id") String var1, @Path("message_id") String var2, @Body ModifyMessageRequest var3);
+  Single<Message> modifyMessage(
+      @Path("thread_id") String var1,
+      @Path("message_id") String var2,
+      @Body ModifyMessageRequest var3);
 
   @Headers({"OpenAI-Beta: assistants=v1"})
   @GET("/v1/threads/{thread_id}/messages")
@@ -279,19 +315,27 @@ public interface OpenAiApi2 {
 
   @Headers({"OpenAI-Beta: assistants=v1"})
   @GET("/v1/threads/{thread_id}/messages")
-  Single<OpenAiResponse<Message>> listMessages(@Path("thread_id") String var1, @QueryMap Map<String, Object> var2);
+  Single<OpenAiResponse<Message>> listMessages(
+      @Path("thread_id") String var1, @QueryMap Map<String, Object> var2);
 
   @Headers({"OpenAI-Beta: assistants=v1"})
   @GET("/v1/threads/{thread_id}/messages/{message_id}/files/{file_id}")
-  Single<MessageFile> retrieveMessageFile(@Path("thread_id") String var1, @Path("message_id") String var2, @Path("file_id") String var3);
+  Single<MessageFile> retrieveMessageFile(
+      @Path("thread_id") String var1,
+      @Path("message_id") String var2,
+      @Path("file_id") String var3);
 
   @Headers({"OpenAI-Beta: assistants=v1"})
   @GET("/v1/threads/{thread_id}/messages/{message_id}/files")
-  Single<OpenAiResponse<MessageFile>> listMessageFiles(@Path("thread_id") String var1, @Path("message_id") String var2);
+  Single<OpenAiResponse<MessageFile>> listMessageFiles(
+      @Path("thread_id") String var1, @Path("message_id") String var2);
 
   @Headers({"OpenAI-Beta: assistants=v1"})
   @GET("/v1/threads/{thread_id}/messages/{message_id}/files")
-  Single<OpenAiResponse<MessageFile>> listMessageFiles(@Path("thread_id") String var1, @Path("message_id") String var2, @QueryMap Map<String, Object> var3);
+  Single<OpenAiResponse<MessageFile>> listMessageFiles(
+      @Path("thread_id") String var1,
+      @Path("message_id") String var2,
+      @QueryMap Map<String, Object> var3);
 
   @Headers({"OpenAI-Beta: assistants=v1"})
   @POST("/v1/threads/{thread_id}/runs")
@@ -303,15 +347,20 @@ public interface OpenAiApi2 {
 
   @Headers({"OpenAI-Beta: assistants=v1"})
   @POST("/v1/threads/{thread_id}/runs/{run_id}")
-  Single<Run> modifyRun(@Path("thread_id") String var1, @Path("run_id") String var2, @Body Map<String, String> var3);
+  Single<Run> modifyRun(
+      @Path("thread_id") String var1, @Path("run_id") String var2, @Body Map<String, String> var3);
 
   @Headers({"OpenAI-Beta: assistants=v1"})
   @GET("/v1/threads/{thread_id}/runs")
-  Single<OpenAiResponse<Run>> listRuns(@Path("thread_id") String var1, @QueryMap Map<String, String> var2);
+  Single<OpenAiResponse<Run>> listRuns(
+      @Path("thread_id") String var1, @QueryMap Map<String, String> var2);
 
   @Headers({"OpenAI-Beta: assistants=v1"})
   @POST("/v1/threads/{thread_id}/runs/{run_id}/submit_tool_outputs")
-  Single<Run> submitToolOutputs(@Path("thread_id") String var1, @Path("run_id") String var2, @Body SubmitToolOutputsRequest var3);
+  Single<Run> submitToolOutputs(
+      @Path("thread_id") String var1,
+      @Path("run_id") String var2,
+      @Body SubmitToolOutputsRequest var3);
 
   @Headers({"OpenAI-Beta: assistants=v1"})
   @POST("/v1/threads/{thread_id}/runs/{run_id}/cancel")
@@ -323,9 +372,13 @@ public interface OpenAiApi2 {
 
   @Headers({"OpenAI-Beta: assistants=v1"})
   @GET("/v1/threads/{thread_id}/runs/{run_id}/steps/{step_id}")
-  Single<RunStep> retrieveRunStep(@Path("thread_id") String var1, @Path("run_id") String var2, @Path("step_id") String var3);
+  Single<RunStep> retrieveRunStep(
+      @Path("thread_id") String var1, @Path("run_id") String var2, @Path("step_id") String var3);
 
   @Headers({"OpenAI-Beta: assistants=v1"})
   @GET("/v1/threads/{thread_id}/runs/{run_id}/steps")
-  Single<OpenAiResponse<RunStep>> listRunSteps(@Path("thread_id") String var1, @Path("run_id") String var2, @QueryMap Map<String, String> var3);
+  Single<OpenAiResponse<RunStep>> listRunSteps(
+      @Path("thread_id") String var1,
+      @Path("run_id") String var2,
+      @QueryMap Map<String, String> var3);
 }

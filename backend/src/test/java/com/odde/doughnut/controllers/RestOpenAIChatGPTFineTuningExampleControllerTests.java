@@ -13,7 +13,6 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.client.OpenAiApi2;
 import com.odde.doughnut.testability.MakeMe;
-import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.file.File;
 import com.theokanning.openai.fine_tuning.FineTuningJob;
 import io.reactivex.Single;

@@ -25,7 +25,6 @@ import com.odde.doughnut.services.ai.client.OpenAiApi2;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.odde.doughnut.testability.TestabilitySettings;
-import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import java.sql.Timestamp;
 import org.assertj.core.api.Assertions;
@@ -45,8 +44,7 @@ import org.springframework.web.server.ResponseStatusException;
 @ActiveProfiles("test")
 @Transactional
 class RestQuizQuestionControllerTests {
-  @Mock
-  OpenAiApi2 openAiApi;
+  @Mock OpenAiApi2 openAiApi;
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
   private UserModel currentUser;

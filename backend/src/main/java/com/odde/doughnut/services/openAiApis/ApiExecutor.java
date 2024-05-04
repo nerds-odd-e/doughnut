@@ -21,7 +21,6 @@ import io.reactivex.Single;
 import java.net.SocketTimeoutException;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
-
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import org.springframework.http.HttpStatus;
@@ -56,7 +55,11 @@ public record ApiExecutor() {
   }
 
   public static OkHttpClient defaultClient(String token, Duration timeout) {
-    return (new OkHttpClient.Builder()).addInterceptor(new AuthenticationInterceptor(token)).connectionPool(new ConnectionPool(5, 1L, TimeUnit.SECONDS)).readTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS).build();
+    return (new OkHttpClient.Builder())
+        .addInterceptor(new AuthenticationInterceptor(token))
+        .connectionPool(new ConnectionPool(5, 1L, TimeUnit.SECONDS))
+        .readTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS)
+        .build();
   }
 
   public static <T> T blockGet(Single<T> apply) {

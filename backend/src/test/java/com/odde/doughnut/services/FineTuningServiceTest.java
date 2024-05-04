@@ -10,7 +10,6 @@ import com.odde.doughnut.services.ai.ChatMessageForFineTuning;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.services.ai.client.OpenAiApi2;
 import com.odde.doughnut.testability.MakeMe;
-import com.theokanning.openai.client.OpenAiApi;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;

@@ -10,7 +10,6 @@ import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.client.OpenAiApi2;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.assistants.Assistant;
-import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import java.util.HashMap;
