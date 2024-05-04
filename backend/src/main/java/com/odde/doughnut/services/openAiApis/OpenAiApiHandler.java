@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.controllers.dto.AiCompletionAnswerClarifyingQuestionParams;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
-import com.odde.doughnut.services.ai.client.OpenAiApi2;
 import com.theokanning.openai.assistants.Assistant;
 import com.theokanning.openai.assistants.AssistantRequest;
 import com.theokanning.openai.client.OpenAiApi;
@@ -35,9 +34,9 @@ import okhttp3.RequestBody;
 import org.springframework.http.HttpStatus;
 
 public class OpenAiApiHandler {
-  private final OpenAiApi2 openAiApi;
+  private final OpenAiApi openAiApi;
 
-  public OpenAiApiHandler(OpenAiApi2 openAiApi) {
+  public OpenAiApiHandler(OpenAiApi openAiApi) {
     this.openAiApi = openAiApi;
   }
 

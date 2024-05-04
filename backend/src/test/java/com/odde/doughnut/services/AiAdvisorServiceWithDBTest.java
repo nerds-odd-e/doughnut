@@ -10,7 +10,6 @@ import com.odde.doughnut.entities.quizQuestions.QuizQuestionAIQuestion;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
-import com.odde.doughnut.services.ai.client.OpenAiApi2;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.client.OpenAiApi;
@@ -31,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 class AiAdvisorServiceWithDBTest {
 
   private AiQuestionGenerator aiQuestionGenerator;
-  @Mock private OpenAiApi2 openAiApi;
+  @Mock private OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
 
   @BeforeEach

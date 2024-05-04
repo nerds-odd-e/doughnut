@@ -5,12 +5,11 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.quizQuestions.QuizQuestionAIQuestion;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
-import com.odde.doughnut.services.ai.client.OpenAiApi2;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.client.OpenAiApi;
 
 public record AiQuestionGenerator(
-  OpenAiApi2 openAiApi, GlobalSettingsService globalSettingsService) {
+    OpenAiApi openAiApi, GlobalSettingsService globalSettingsService) {
   private AiQuestionGeneratorForNote forNote(Note note, String modelName1) {
     OpenAIChatRequestBuilder chatAboutNoteRequestBuilder =
         OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(modelName1, note);

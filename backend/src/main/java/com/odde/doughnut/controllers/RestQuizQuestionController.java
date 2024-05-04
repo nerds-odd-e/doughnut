@@ -13,7 +13,6 @@ import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
-import com.odde.doughnut.services.ai.client.OpenAiApi2;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -38,7 +37,7 @@ class RestQuizQuestionController {
   private AiQuestionGenerator aiQuestionGenerator;
 
   public RestQuizQuestionController(
-      @Qualifier("testableOpenAiApi") OpenAiApi2 openAiApi,
+      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings) {

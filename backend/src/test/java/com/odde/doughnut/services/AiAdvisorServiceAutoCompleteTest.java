@@ -16,7 +16,6 @@ import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.services.ai.ClarifyingQuestion;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
-import com.odde.doughnut.services.ai.client.OpenAiApi2;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIAssistantMock;
 import com.theokanning.openai.OpenAiError;
@@ -40,7 +39,7 @@ import retrofit2.Response;
 class AiAdvisorServiceAutoCompleteTest {
 
   private AiAdvisorService aiAdvisorService;
-  @Mock private OpenAiApi2 openAiApi;
+  @Mock private OpenAiApi openAiApi;
   MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
   OpenAIAssistantMock openAIAssistantMock;
 

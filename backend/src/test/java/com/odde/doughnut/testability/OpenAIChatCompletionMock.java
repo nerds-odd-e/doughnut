@@ -4,7 +4,6 @@ import static com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder.ask
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.services.ai.client.OpenAiApi2;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.runs.*;
@@ -12,7 +11,7 @@ import io.reactivex.Single;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
-public record OpenAIChatCompletionMock(OpenAiApi2 openAiApi) {
+public record OpenAIChatCompletionMock(OpenAiApi openAiApi) {
   public void mockChatCompletionAndReturnFunctionCall(Object result, String functionName) {
     mockChatCompletionAndReturnFunctionCallJsonNode(
         new ObjectMapper().valueToTree(result), functionName);

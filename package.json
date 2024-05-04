@@ -85,6 +85,5 @@
     "overrides": {
       "ejs@<3.1.7": ">=3.1.7"
     }
-  },
-  "packageManager": "pnpm@9.0.6"
+  }
 }

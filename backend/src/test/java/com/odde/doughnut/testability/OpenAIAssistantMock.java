@@ -7,7 +7,6 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.services.ai.client.OpenAiApi2;
 import com.theokanning.openai.OpenAiResponse;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.messages.Message;
@@ -19,7 +18,7 @@ import java.util.List;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
-public record OpenAIAssistantMock(OpenAiApi2 openAiApi) {
+public record OpenAIAssistantMock(OpenAiApi openAiApi) {
 
   public void mockThreadRunCompletionToolCalled(Object result, String runId) {
     mockCreateRunInProcess(runId);
