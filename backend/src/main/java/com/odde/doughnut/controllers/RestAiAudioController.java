@@ -27,24 +27,19 @@ class RestAiAudioController {
 
   @PatchMapping(path = "/{note}/audio-to-srt")
   @Transactional
-  public ResponseEntity<String> convertAudioToSRT(
-      @PathVariable(name = "note") @Schema(type = "integer") Note note) throws IOException {
+  public SrtDto convertAudioToSRT(@PathVariable(name = "note") @Schema(type = "integer") Note note)
+      throws IOException {
     Audio audio = note.getNoteAccessories().getUploadAudio();
-    String transcription =
-        aiAdvisorService.getTranscription(audio.getName(), audio.getBlob().getData());
-    return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).body(transcription);
+    return aiAdvisorService.getTranscription(audio.getName(), audio.getBlob().getData());
   }
 
   @PostMapping(
       path = "/convertSrt",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @Transactional
-  public ResponseEntity<String> convertSrt(@Valid @ModelAttribute AudioUploadDTO audioFile)
-      throws IOException {
+  public SrtDto convertSrt(@Valid @ModelAttribute AudioUploadDTO audioFile) throws IOException {
 
     String filename = audioFile.getUploadAudioFile().getOriginalFilename();
-    String transcription =
-        aiAdvisorService.getTranscription(filename, audioFile.getUploadAudioFile().getBytes());
-    return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).body(transcription);
+    return aiAdvisorService.getTranscription(filename, audioFile.getUploadAudioFile().getBytes());
   }
 }

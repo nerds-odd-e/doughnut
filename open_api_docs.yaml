@@ -935,7 +935,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: string
+                $ref: '#/components/schemas/SrtDto'
   /api/notebooks/{notebook}:
     post:
       tags:
@@ -1642,7 +1642,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: string
+                $ref: '#/components/schemas/SrtDto'
   /api/fine-tuning/{suggestedQuestion}/update-suggested-question-for-fine-tuning:
     patch:
       tags:
@@ -2735,6 +2735,13 @@ components:
         uploadAudioFile:
           type: string
           format: binary
+    SrtDto:
+      required:
+      - srt
+      type: object
+      properties:
+        srt:
+          type: string
     LinkCreation:
       required:
       - linkType

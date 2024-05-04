@@ -5,6 +5,7 @@ import {
   NoteAccessoriesDTO,
   NoteCreationDTO,
   NoteRealm,
+  SrtDto,
   WikidataAssociationCreation,
 } from "@/generated/backend";
 import ManagedApi from "@/managedApi/ManagedApi";
@@ -60,7 +61,7 @@ export interface StoredApi {
     noteId: Doughnut.ID,
     formData: AudioUploadDTO,
   ): Promise<NoteRealm>;
-  convertAudio(formData: AudioUploadDTO);
+  convertAudio(formData: AudioUploadDTO): Promise<SrtDto>;
 }
 export default class StoredApiCollection implements StoredApi {
   noteEditingHistory: NoteEditingHistory;

@@ -69,10 +69,11 @@ export default defineComponent({
         await this.storageAccessor
           .storedApi()
           .uploadAudio(this.note.id, this.formData);
-        this.srt =
+        this.srt = (
           await this.managedApi.restAiAudioController.convertAudioToSrt(
             this.note.id,
-          );
+          )
+        ).srt;
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
@@ -86,7 +87,7 @@ export default defineComponent({
         const response = await this.storageAccessor
           .storedApi()
           .convertAudio(this.formData);
-        this.srt = response;
+        this.srt = response.srt;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         this.noteFormErrors = error;

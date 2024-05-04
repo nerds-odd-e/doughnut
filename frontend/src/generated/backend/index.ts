@@ -65,6 +65,7 @@ export type { SeedInfo } from './models/SeedInfo';
 export type { SeedNote } from './models/SeedNote';
 export type { SeedSuggestedQuestions } from './models/SeedSuggestedQuestions';
 export type { SelfEvaluation } from './models/SelfEvaluation';
+export type { SrtDto } from './models/SrtDto';
 export type { Subscription } from './models/Subscription';
 export type { SubscriptionDTO } from './models/SubscriptionDTO';
 export type { SuggestedQuestionForFineTuning } from './models/SuggestedQuestionForFineTuning';

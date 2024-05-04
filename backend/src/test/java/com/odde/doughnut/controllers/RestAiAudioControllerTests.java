@@ -60,7 +60,7 @@ class RestAiAudioControllerTests {
     void convertingFormat(String filename) throws Exception {
       audioUploadDTO.setUploadAudioFile(
           new MockMultipartFile(filename, filename, "audio/mp3", new byte[] {}));
-      String result = controller.convertSrt(audioUploadDTO).getBody();
+      String result = controller.convertSrt(audioUploadDTO).getSrt();
       assertEquals("test", result);
     }
 
@@ -70,7 +70,7 @@ class RestAiAudioControllerTests {
           new MockMultipartFile("file", "test.mp3", "text/plain", "test".getBytes());
       var dto = new AudioUploadDTO();
       dto.setUploadAudioFile(mockFile);
-      String resp = controller.convertSrt(dto).getBody();
+      String resp = controller.convertSrt(dto).getSrt();
       assertThat(resp, equalTo("test"));
     }
   }

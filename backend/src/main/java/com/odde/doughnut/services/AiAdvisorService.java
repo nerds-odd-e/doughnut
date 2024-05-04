@@ -84,7 +84,7 @@ public class AiAdvisorService {
     return new ContentCompletionService(openAiApiHandler);
   }
 
-  public String getTranscription(String filename, byte[] bytes) throws IOException {
+  public SrtDto getTranscription(String filename, byte[] bytes) throws IOException {
     RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), bytes);
 
     MultipartBody.Part body = MultipartBody.Part.createFormData("file", filename, requestFile);

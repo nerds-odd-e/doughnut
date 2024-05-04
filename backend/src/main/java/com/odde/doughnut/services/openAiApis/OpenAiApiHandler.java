@@ -5,6 +5,7 @@ import static java.lang.Thread.sleep;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.controllers.dto.AiCompletionAnswerClarifyingQuestionParams;
+import com.odde.doughnut.controllers.dto.SrtDto;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.theokanning.openai.assistants.Assistant;
@@ -172,7 +173,11 @@ public class OpenAiApiHandler {
     return blockGet(openAiApi.listMessages(threadId)).getData().getLast();
   }
 
-  public String getTranscription(RequestBody requestBody) throws IOException {
-    return blockGet(((OpenAiApiExtended) openAiApi).createTranscriptionSrt(requestBody)).string();
+  public SrtDto getTranscription(RequestBody requestBody) throws IOException {
+    String string =
+        blockGet(((OpenAiApiExtended) openAiApi).createTranscriptionSrt(requestBody)).string();
+    SrtDto srtDto = new SrtDto();
+    srtDto.setSrt(string);
+    return srtDto;
   }
 }
