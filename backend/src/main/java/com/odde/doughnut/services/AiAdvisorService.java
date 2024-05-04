@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 
 public class AiAdvisorService {
 
@@ -79,5 +82,21 @@ public class AiAdvisorService {
 
   private ContentCompletionService getContentCompletionService() {
     return new ContentCompletionService(openAiApiHandler);
+  }
+
+  public String getTranscription(String filename, byte[] bytes) throws IOException {
+    RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), bytes);
+
+    MultipartBody.Part body = MultipartBody.Part.createFormData("file", filename, requestFile);
+
+    MultipartBody.Builder builder =
+        new MultipartBody.Builder()
+            .setType(MultipartBody.FORM)
+            .addPart(body)
+            .addFormDataPart("model", "whisper-1")
+            .addFormDataPart("response_format", "srt");
+
+    RequestBody requestBody = builder.build();
+    return openAiApiHandler.getTranscription(requestBody);
   }
 }

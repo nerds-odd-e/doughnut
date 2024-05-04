@@ -171,4 +171,8 @@ public class OpenAiApiHandler {
   public Message getThreadLastMessage(String threadId) {
     return blockGet(openAiApi.listMessages(threadId)).getData().getLast();
   }
+
+  public String getTranscription(RequestBody requestBody) throws IOException {
+    return blockGet(((OpenAiApiExtended) openAiApi).createTranscriptionSrt(requestBody)).string();
+  }
 }
