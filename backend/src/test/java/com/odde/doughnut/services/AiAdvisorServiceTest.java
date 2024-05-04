@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.odde.doughnut.services.ai.client.OpenAiApi2;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.image.Image;
 import com.theokanning.openai.image.ImageResult;
 import io.reactivex.Single;

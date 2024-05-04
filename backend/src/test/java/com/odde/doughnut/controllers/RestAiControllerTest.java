@@ -20,6 +20,7 @@ import com.odde.doughnut.testability.OpenAIAssistantMock;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.OpenAiResponse;
 import com.theokanning.openai.assistants.Assistant;
+import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.image.Image;
 import com.theokanning.openai.image.ImageResult;
@@ -53,7 +54,8 @@ class RestAiControllerTest {
   UserModel currentUser;
 
   Note note;
-  @Mock OpenAiApi2 openAiApi;
+  @Mock
+  OpenAiApi2 openAiApi;
   @Autowired MakeMe makeMe;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
 

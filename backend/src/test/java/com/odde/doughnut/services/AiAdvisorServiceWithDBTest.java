@@ -13,6 +13,7 @@ import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.services.ai.client.OpenAiApi2;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.theokanning.openai.client.OpenAiApi;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;

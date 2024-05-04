@@ -8,6 +8,7 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.FineTuningService;
 import com.odde.doughnut.services.ai.client.OpenAiApi2;
+import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.IOException;
 import java.util.List;

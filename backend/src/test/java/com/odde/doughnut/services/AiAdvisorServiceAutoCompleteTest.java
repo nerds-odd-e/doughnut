@@ -21,6 +21,7 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIAssistantMock;
 import com.theokanning.openai.OpenAiError;
 import com.theokanning.openai.OpenAiHttpException;
+import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.messages.Message;
 import com.theokanning.openai.runs.SubmitToolOutputRequestItem;
 import com.theokanning.openai.runs.SubmitToolOutputsRequest;

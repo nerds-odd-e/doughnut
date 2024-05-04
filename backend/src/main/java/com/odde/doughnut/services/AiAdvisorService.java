@@ -7,6 +7,7 @@ import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.client.OpenAiApi2;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.assistants.*;
+import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import java.io.IOException;

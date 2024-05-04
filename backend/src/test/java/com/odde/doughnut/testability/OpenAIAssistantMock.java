@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.services.ai.client.OpenAiApi2;
 import com.theokanning.openai.OpenAiResponse;
+import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.messages.Message;
 import com.theokanning.openai.messages.MessageContent;
 import com.theokanning.openai.messages.content.Text;
