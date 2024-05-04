@@ -7,7 +7,6 @@ import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.theokanning.openai.OpenAiHttpException;
-import com.theokanning.openai.client.OpenAiApi;
 import io.reactivex.Single;
 import java.net.SocketTimeoutException;
 import java.time.Duration;
@@ -18,7 +17,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 public record ApiExecutor() {
-  public static OpenAiApi getOpenAiApi(String openAiToken, String baseUrl) {
+  public static OpenAiApiExtended getOpenAiApi(String openAiToken, String baseUrl) {
     ObjectMapper mapper = defaultObjectMapper();
     OkHttpClient client = defaultClient(openAiToken, Duration.ofSeconds(60));
     Retrofit retrofit =
@@ -29,7 +28,7 @@ public record ApiExecutor() {
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .build();
 
-    return retrofit.create(OpenAiApi.class);
+    return retrofit.create(OpenAiApiExtended.class);
   }
 
   public static <T> T blockGet(Single<T> apply) {
