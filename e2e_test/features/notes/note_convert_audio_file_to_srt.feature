@@ -7,9 +7,9 @@ Feature: Note Convert Audio File to SRT
     And I have a note with the topic "podcast"
 
   Scenario: Convert audio-file to SRT without saving
-    When I upload an audio-file "sample-3s.mp3" to the note "podcast"
+    When I try to upload an audio-file "sample-3s.mp3" to the note "podcast"
     And I convert the audio-file to SRT without saving
-    Then I should see the extracted SRT content 
+    Then I should see the extracted SRT content
     """
     1
     00:00:00,000 --> 00:00:02,000
@@ -20,14 +20,14 @@ Feature: Note Convert Audio File to SRT
     """
 
   Scenario: Convert audio-file to SRT
-    When I upload an audio-file "sample-3s.mp3" to the note "podcast"
+    When I try to upload an audio-file "sample-3s.mp3" to the note "podcast"
     And I save and convert the audio-file to SRT
-    Then I should see the extracted SRT content 
+    Then I should see the extracted SRT content
     """
     1
     00:00:00,000 --> 00:00:02,000
     You
 
 
-    
+
     """

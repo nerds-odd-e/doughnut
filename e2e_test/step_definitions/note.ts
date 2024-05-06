@@ -66,6 +66,7 @@ When(
     start.jumpToNotePage(noteTopic)
     start.assumeNotePage().editAudioButton().click()
     cy.get("#note-uploadAudioFile").attachFile(fileName)
+    cy.findAllByText("Save").click()
   },
 )
 
@@ -76,10 +77,6 @@ Then(
     start.assumeNotePage().downloadAudioFile(fileName)
   },
 )
-
-When("I save the audio-file", () => {
-  cy.findAllByText("Save").click()
-})
 
 When("I convert the audio-file to SRT without saving", () => {
   cy.findAllByDisplayValue("Convert to SRT").click()
@@ -359,3 +356,12 @@ When(
 Then("I should see a child note {string}", (childTopic: string) => {
   cy.findCardTitle(childTopic)
 })
+
+When(
+  "I try to upload an audio-file {string} to the note {string}",
+  (fileName: string, noteTopic: string) => {
+    start.jumpToNotePage(noteTopic)
+    start.assumeNotePage().editAudioButton().click()
+    cy.get("#note-uploadAudioFile").attachFile(fileName)
+  },
+)
