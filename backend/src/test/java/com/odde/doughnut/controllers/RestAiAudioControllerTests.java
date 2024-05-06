@@ -45,12 +45,10 @@ class RestAiAudioControllerTests {
 
   @Nested
   class ConvertAudioToSRT {
-    Note note;
     AudioUploadDTO audioUploadDTO = new AudioUploadDTO();
 
     @BeforeEach
     void setup() {
-      note = makeMe.aNote("new").creatorAndOwner(userModel).please();
       when(openAiApi.createTranscriptionSrt(any(RequestBody.class)))
           .thenReturn(Single.just(ResponseBody.create("test", null)));
     }
@@ -72,6 +70,24 @@ class RestAiAudioControllerTests {
       dto.setUploadAudioFile(mockFile);
       String resp = controller.convertSrt(dto).getSrt();
       assertThat(resp, equalTo("test"));
+    }
+  }
+
+  @Nested
+  class ConvertNoteAudioToSRT {
+    Note note;
+
+    @BeforeEach
+    void setup() {
+      note = makeMe.aNote("new").creatorAndOwner(userModel).audio("dog.mp3").please();
+      when(openAiApi.createTranscriptionSrt(any(RequestBody.class)))
+          .thenReturn(Single.just(ResponseBody.create("test", null)));
+    }
+
+    @Test
+    void convert() throws Exception {
+      String result = controller.convertNoteAudioToSRT(note).getSrt();
+      assertEquals("test", result);
     }
   }
 }

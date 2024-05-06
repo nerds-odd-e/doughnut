@@ -1623,7 +1623,7 @@ paths:
     patch:
       tags:
       - rest-ai-audio-controller
-      operationId: convertAudioToSRT
+      operationId: convertNoteAudioToSRT
       parameters:
       - name: note
         in: path

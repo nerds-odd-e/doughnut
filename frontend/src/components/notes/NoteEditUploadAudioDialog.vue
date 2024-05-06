@@ -70,7 +70,7 @@ export default defineComponent({
           .storedApi()
           .uploadAudio(this.note.id, this.formData);
         this.srt = (
-          await this.managedApi.restAiAudioController.convertAudioToSrt(
+          await this.managedApi.restAiAudioController.convertNoteAudioToSrt(
             this.note.id,
           )
         ).srt;

@@ -27,8 +27,8 @@ class RestAiAudioController {
 
   @PatchMapping(path = "/{note}/audio-to-srt")
   @Transactional
-  public SrtDto convertAudioToSRT(@PathVariable(name = "note") @Schema(type = "integer") Note note)
-      throws IOException {
+  public SrtDto convertNoteAudioToSRT(
+      @PathVariable(name = "note") @Schema(type = "integer") Note note) throws IOException {
     Audio audio = note.getNoteAccessories().getUploadAudio();
     return aiAdvisorService.getTranscription(audio.getName(), audio.getBlob().getData());
   }
@@ -38,7 +38,6 @@ class RestAiAudioController {
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @Transactional
   public SrtDto convertSrt(@Valid @ModelAttribute AudioUploadDTO audioFile) throws IOException {
-
     String filename = audioFile.getUploadAudioFile().getOriginalFilename();
     return aiAdvisorService.getTranscription(filename, audioFile.getUploadAudioFile().getBytes());
   }

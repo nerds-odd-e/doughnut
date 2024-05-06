@@ -31,7 +31,7 @@ export class RestAiAudioControllerService {
      * @returns SrtDto OK
      * @throws ApiError
      */
-    public convertAudioToSrt(
+    public convertNoteAudioToSrt(
         note: number,
     ): CancelablePromise<SrtDto> {
         return this.httpRequest.request({

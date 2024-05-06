@@ -85,7 +85,7 @@ public class AiAdvisorService {
   }
 
   public SrtDto getTranscription(String filename, byte[] bytes) throws IOException {
-    RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), bytes);
+    RequestBody requestFile = RequestBody.create(bytes, MediaType.parse("multipart/form-data"));
 
     MultipartBody.Part body = MultipartBody.Part.createFormData("file", filename, requestFile);
 

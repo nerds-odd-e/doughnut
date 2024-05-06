@@ -15,6 +15,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   UserBuilder creatorBuilder = null;
   List<LinkBuilder> linkBuilders = new ArrayList<>();
+  private String audioFilename = null;
 
   public NoteBuilder(Note note, MakeMe makeMe) {
     super(makeMe, note);
@@ -94,6 +95,11 @@ public class NoteBuilder extends EntityBuilder<Note> {
     }
     if (entity.getNotebook().getId() == null && needPersist) {
       makeMe.modelFactoryService.save(entity.getNotebook());
+    }
+    if (audioFilename != null) {
+      entity
+          .getNoteAccessories()
+          .setUploadAudio(makeMe.anAudio().name(audioFilename).please(needPersist));
     }
   }
 
@@ -176,12 +182,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder audio(String filename) {
-    if (filename == null) {
-      return this;
-    }
-    Audio audio = new Audio();
-    audio.setName(filename);
-    entity.getNoteAccessories().setUploadAudio(audio);
+    this.audioFilename = filename;
     return this;
   }
 }

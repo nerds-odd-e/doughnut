@@ -40,4 +40,9 @@ public class AudioBuilder extends EntityBuilder<Audio> {
     entity.setUser(user);
     return this;
   }
+
+  public AudioBuilder name(String audioFilename) {
+    entity.setName(audioFilename);
+    return this;
+  }
 }
