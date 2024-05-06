@@ -6,8 +6,8 @@
   "author": "Terry Yin <terry.yinzhe@gmail.com>",
   "license": "MIT",
   "engines": {
-    "node": ">=20",
-    "pnpm": ">=9.0"
+    "node": ">=22",
+    "pnpm": ">=9.0.6"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
