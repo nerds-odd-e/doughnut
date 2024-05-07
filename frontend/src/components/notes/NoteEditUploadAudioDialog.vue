@@ -59,9 +59,7 @@ export default defineComponent({
         this.$emit("closeDialog");
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        this.noteFormErrors = {
-          uploadAudioFile: error.body.message ?? "Unexpected error occured",
-        };
+        this.noteFormErrors = error;
       }
     },
     async uploadAudioAndConvertToSRT() {
@@ -77,9 +75,7 @@ export default defineComponent({
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        this.noteFormErrors = {
-          uploadAudioFile: error.body.message ?? "Unexpected error occured",
-        };
+        this.noteFormErrors = error;
       }
     },
     async convertToSRT() {

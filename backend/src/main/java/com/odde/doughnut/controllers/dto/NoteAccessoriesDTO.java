@@ -2,8 +2,8 @@ package com.odde.doughnut.controllers.dto;
 
 import com.odde.doughnut.entities.Image;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.validators.ValidateNotePicture;
 import com.odde.doughnut.models.ImageBuilder;
+import com.odde.doughnut.validators.ValidateNotePicture;
 import jakarta.validation.constraints.Pattern;
 import java.io.IOException;
 import lombok.Getter;

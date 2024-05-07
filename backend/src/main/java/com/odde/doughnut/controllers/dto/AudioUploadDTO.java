@@ -2,12 +2,18 @@ package com.odde.doughnut.controllers.dto;
 
 import static java.util.Objects.requireNonNull;
 
+import com.odde.doughnut.validators.ValidAudioFile;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 public class AudioUploadDTO {
-  @Getter @Setter private MultipartFile uploadAudioFile;
+  @ValidAudioFile(
+      maxSize = 20 * 1024 * 1024,
+      allowedTypes = {"audio/mpeg", "audio/wav", "audio/mp4"})
+  @Getter
+  @Setter
+  private MultipartFile uploadAudioFile;
 
   public void validate() throws Exception {
     String filename = getUploadAudioFile().getOriginalFilename();

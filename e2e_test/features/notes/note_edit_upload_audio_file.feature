@@ -10,10 +10,9 @@ Feature: Note Upload Audio File
         When I upload an audio-file "Alison.mp3" to the note "lunar"
         Then I must be able to download the "Alison.mp3" from the note "lunar"
 
-    @ignore
     Scenario: I must not be able to upload an audio file with an invalid format
         When I upload an audio-file "moon.jpg" to the note "lunar"
-        Then I should see an error "Invalid file format" on "Upload Audio File"
+        Then I should see an error "Invalid file type: image/jpeg. Allowed types are: audio/mpeg, audio/wav, audio/mp4" on "Upload Audio File"
 
     Scenario: Upload audio file into a note with existing audio file attached
         Given I upload an audio-file "Alison.mp3" to the note "lunar"

@@ -1,4 +1,4 @@
-package com.odde.doughnut.entities.validators;
+package com.odde.doughnut.validators;
 
 import com.odde.doughnut.controllers.dto.NoteAccessoriesDTO;
 import jakarta.validation.ConstraintValidator;

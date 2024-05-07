@@ -1,4 +1,4 @@
-package com.odde.doughnut.entities.validators;
+package com.odde.doughnut.validators;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.TYPE;
