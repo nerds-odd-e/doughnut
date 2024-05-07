@@ -4,13 +4,14 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.web.multipart.MultipartFile;
 
-public class AudioFileValidator implements ConstraintValidator<ValidAudioFile, MultipartFile> {
+public class MultipartFileValidator
+    implements ConstraintValidator<ValidateMultipartFile, MultipartFile> {
 
   private String[] allowedContentTypes;
   private long maxFileSize;
 
   @Override
-  public void initialize(ValidAudioFile constraintAnnotation) {
+  public void initialize(ValidateMultipartFile constraintAnnotation) {
     this.allowedContentTypes = constraintAnnotation.allowedTypes();
     this.maxFileSize = constraintAnnotation.maxSize();
   }

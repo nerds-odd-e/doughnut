@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -412,44 +411,6 @@ class RestNoteControllerTests {
     @BeforeEach
     void setup() {
       note = makeMe.aNote("new").creatorAndOwner(userModel).please();
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"podcast.mp3", "podcast.m4a", "podcast.wav"})
-    void shouldSucceedOnValidAudioFileFormat(String filename) throws Exception {
-      audioUploadDTO.setUploadAudioFile(
-          new MockMultipartFile(filename, filename, "audio/mp3", new byte[] {}));
-      NoteRealm noteRealm = controller.uploadAudio(note, audioUploadDTO);
-      assertEquals(
-          noteRealm.getNote().getNoteAccessories().getAudioName().get(),
-          audioUploadDTO.getUploadAudioFile().getOriginalFilename());
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"something.txt", "youtube.avi"})
-    void shouldFailOnInvalidAudioFileFormat(String filename) {
-      audioUploadDTO.setUploadAudioFile(
-          new MockMultipartFile(filename, filename, "audio/mp3", new byte[] {}));
-
-      assertThrows(
-          Exception.class,
-          () -> {
-            controller.uploadAudio(note, audioUploadDTO);
-          });
-    }
-
-    @Test
-    void shouldFailOnFileSize() {
-      String filename = "big_file.mp3";
-      byte[] bytes = new byte[1024 * 1024 * 20];
-      audioUploadDTO.setUploadAudioFile(
-          new MockMultipartFile(filename, filename, "audio/mp3", bytes));
-
-      assertThrows(
-          Exception.class,
-          () -> {
-            controller.uploadAudio(note, audioUploadDTO);
-          });
     }
 
     @Test

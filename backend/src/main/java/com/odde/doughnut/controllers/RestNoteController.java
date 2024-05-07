@@ -129,9 +129,7 @@ class RestNoteController {
   public NoteRealm uploadAudio(
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @Valid @ModelAttribute AudioUploadDTO audioUploadDTO)
-      throws Exception {
-    audioUploadDTO.validate();
-
+      throws IOException {
     note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     final User user = currentUser.getEntity();
     note.setAudio(audioUploadDTO.getUploadAudioFile(), user);
