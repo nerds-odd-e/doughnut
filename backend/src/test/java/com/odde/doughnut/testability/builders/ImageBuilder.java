@@ -18,10 +18,6 @@ public class ImageBuilder extends EntityBuilder<Image> {
       entity.setBlob(attachmentBlob);
     }
 
-    if (entity.getStorageType() == null) {
-      entity.setStorageType("db");
-    }
-
     if (entity.getName() == null) {
       entity.setName("example.png");
     }

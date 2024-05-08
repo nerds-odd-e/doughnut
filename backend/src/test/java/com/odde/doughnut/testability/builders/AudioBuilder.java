@@ -19,10 +19,6 @@ public class AudioBuilder extends EntityBuilder<Audio> {
       entity.setBlob(audioBlob);
     }
 
-    if (entity.getStorageType() == null) {
-      entity.setStorageType("db");
-    }
-
     if (entity.getName() == null) {
       entity.setName("example.mp3");
     }

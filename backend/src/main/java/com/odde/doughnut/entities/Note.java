@@ -236,7 +236,6 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
 
     Audio audio = new Audio();
     audio.setUser(user);
-    audio.setStorageType("db");
     audio.setName(file.getOriginalFilename());
     audio.setType(file.getContentType());
 

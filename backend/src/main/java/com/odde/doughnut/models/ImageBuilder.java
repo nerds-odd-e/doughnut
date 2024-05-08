@@ -15,7 +15,6 @@ public class ImageBuilder {
   public Image buildImageFromUploadedPicture(User user, MultipartFile file) throws IOException {
     Image image = new Image();
     image.setUser(user);
-    image.setStorageType("db");
     image.setName(file.getOriginalFilename());
     image.setType(file.getContentType());
     AttachmentBlob attachmentBlob = getImageBlob(file);
@@ -23,7 +22,7 @@ public class ImageBuilder {
     return image;
   }
 
-  AttachmentBlob getImageBlob(MultipartFile file) throws IOException {
+  private AttachmentBlob getImageBlob(MultipartFile file) throws IOException {
     byte[] data = imageUtils.toResizedImageByteArray(file, file.getOriginalFilename());
     AttachmentBlob attachmentBlob = new AttachmentBlob();
     attachmentBlob.setData(data);

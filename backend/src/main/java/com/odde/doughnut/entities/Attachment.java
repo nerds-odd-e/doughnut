@@ -19,11 +19,6 @@ public abstract class Attachment extends EntityIdentifiedByIdOnly {
 
   @Getter @Setter private String type;
 
-  @Column(name = "storage_type")
-  @Getter
-  @Setter
-  private String storageType;
-
   @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JoinColumn(name = "attachment_blob_id", referencedColumnName = "id")
   @JsonIgnore
