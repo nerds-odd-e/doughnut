@@ -132,7 +132,7 @@ class RestNoteController {
       throws IOException {
     note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     final User user = currentUser.getEntity();
-    note.setAudio(audioUploadDTO.getUploadAudioFile(), user);
+    note.setAudio(audioUploadDTO, user);
     modelFactoryService.save(note.getNoteAccessories().getAudioAttachment());
     modelFactoryService.save(note);
 

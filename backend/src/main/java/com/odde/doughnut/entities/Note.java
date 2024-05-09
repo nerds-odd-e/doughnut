@@ -10,6 +10,7 @@ import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.algorithms.HtmlOrMarkdown;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
+import com.odde.doughnut.controllers.dto.AudioUploadDTO;
 import com.odde.doughnut.controllers.dto.NoteAccessoriesDTO;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.models.NoteViewer;
@@ -25,7 +26,6 @@ import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.BeanUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -232,17 +232,9 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     }
   }
 
-  public void setAudio(MultipartFile file, User user) throws IOException {
-
-    Audio audio = new Audio();
+  public void setAudio(AudioUploadDTO audioUploadDTO, User user) throws IOException {
+    Audio audio = audioUploadDTO.fetchUploadedAudio();
     audio.setUser(user);
-    audio.setName(file.getOriginalFilename());
-    audio.setContentType(file.getContentType());
-
-    AttachmentBlob audioBlob = new AttachmentBlob();
-    audioBlob.setData(file.getBytes());
-    audio.setBlob(audioBlob);
-
     getNoteAccessories().setAudioAttachment(audio);
   }
 
