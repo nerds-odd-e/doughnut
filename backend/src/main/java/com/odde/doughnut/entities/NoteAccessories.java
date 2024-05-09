@@ -2,15 +2,19 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.odde.doughnut.controllers.dto.AudioUploadDTO;
+import com.odde.doughnut.controllers.dto.NoteAccessoriesDTO;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.io.IOException;
 import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.BeanUtils;
 
 @Embeddable
 @JsonPropertyOrder({"audio", "audioName", "audioId"})
@@ -69,5 +73,21 @@ public class NoteAccessories {
       return Optional.of(audioAttachment.getName());
     }
     return null;
+  }
+
+  @JsonIgnore
+  public void setAudio(AudioUploadDTO audioUploadDTO, User user) throws IOException {
+    Audio audio = audioUploadDTO.fetchUploadedAudio();
+    audio.setUser(user);
+    setAudioAttachment(audio);
+  }
+
+  @JsonIgnore
+  public void setFromDTO(NoteAccessoriesDTO noteAccessoriesDTO, User user) throws IOException {
+    BeanUtils.copyProperties(noteAccessoriesDTO, this);
+    Image uploadPicture = noteAccessoriesDTO.fetchUploadedPicture(user);
+    if (uploadPicture != null) {
+      setImageAttachment(uploadPicture);
+    }
   }
 }

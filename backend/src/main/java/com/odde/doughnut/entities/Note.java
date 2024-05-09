@@ -10,22 +10,18 @@ import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.algorithms.HtmlOrMarkdown;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
-import com.odde.doughnut.controllers.dto.AudioUploadDTO;
-import com.odde.doughnut.controllers.dto.NoteAccessoriesDTO;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.models.NoteViewer;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.BeanUtils;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -49,7 +45,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   private Notebook notebook;
 
   @NotNull @Embedded @Valid @Getter
-  private final NoteAccessories noteAccessories = new NoteAccessories();
+  public final NoteAccessories noteAccessories = new NoteAccessories();
 
   @Column(name = "description")
   @Getter
@@ -222,20 +218,6 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     if (parentNote == null) return;
     setNotebook(parentNote.getNotebook());
     parent = parentNote;
-  }
-
-  public void setFromDTO(NoteAccessoriesDTO noteAccessoriesDTO, User user) throws IOException {
-    BeanUtils.copyProperties(noteAccessoriesDTO, getNoteAccessories());
-    Image uploadPicture = noteAccessoriesDTO.fetchUploadedPicture(user);
-    if (uploadPicture != null) {
-      getNoteAccessories().setImageAttachment(uploadPicture);
-    }
-  }
-
-  public void setAudio(AudioUploadDTO audioUploadDTO, User user) throws IOException {
-    Audio audio = audioUploadDTO.fetchUploadedAudio();
-    audio.setUser(user);
-    getNoteAccessories().setAudioAttachment(audio);
   }
 
   @JsonIgnore

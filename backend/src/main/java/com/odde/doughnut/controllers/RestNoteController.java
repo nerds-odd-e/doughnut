@@ -117,7 +117,7 @@ class RestNoteController {
 
     final User user = currentUser.getEntity();
     note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
-    note.setFromDTO(noteAccessoriesDTO, user);
+    note.getNoteAccessories().setFromDTO(noteAccessoriesDTO, user);
     modelFactoryService.save(note);
     return new NoteViewer(user, note).toJsonObject();
   }
@@ -132,7 +132,7 @@ class RestNoteController {
       throws IOException {
     note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     final User user = currentUser.getEntity();
-    note.setAudio(audioUploadDTO, user);
+    note.getNoteAccessories().setAudio(audioUploadDTO, user);
     modelFactoryService.save(note.getNoteAccessories().getAudioAttachment());
     modelFactoryService.save(note);
 
