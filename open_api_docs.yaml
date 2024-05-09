@@ -2883,7 +2883,7 @@ components:
           type: string
         useParentPicture:
           type: boolean
-        uploadPictureProxy:
+        uploadPicture:
           type: string
           format: binary
     WikidataSearchEntity:

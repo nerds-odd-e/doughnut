@@ -133,7 +133,7 @@ class RestNoteController {
     note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     final User user = currentUser.getEntity();
     note.setAudio(audioUploadDTO.getUploadAudioFile(), user);
-    modelFactoryService.save(note.getNoteAccessories().getUploadAudio());
+    modelFactoryService.save(note.getNoteAccessories().getAudioAttachment());
     modelFactoryService.save(note);
 
     return new NoteViewer(user, note).toJsonObject();

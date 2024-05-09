@@ -33,7 +33,7 @@ public class NoteAccessories {
   @JsonIgnore
   @Getter
   @Setter
-  private Image uploadPicture;
+  private Image imageAttachment;
 
   @Column(name = "use_parent_picture")
   @Getter
@@ -42,9 +42,9 @@ public class NoteAccessories {
 
   @JsonIgnore
   public Optional<String> getNotePicture() {
-    if (uploadPicture != null) {
+    if (imageAttachment != null) {
       return Optional.of(
-          "/attachments/images/" + uploadPicture.getId() + "/" + uploadPicture.getName());
+          "/attachments/images/" + imageAttachment.getId() + "/" + imageAttachment.getName());
     }
     if (Strings.isBlank(pictureUrl)) return Optional.empty();
     return Optional.of(pictureUrl);
@@ -55,18 +55,18 @@ public class NoteAccessories {
   @JsonIgnore
   @Getter
   @Setter
-  private Audio uploadAudio;
+  private Audio audioAttachment;
 
   public Optional<Integer> getAudioId() {
-    if (uploadAudio != null) {
-      return Optional.of(uploadAudio.getId());
+    if (audioAttachment != null) {
+      return Optional.of(audioAttachment.getId());
     }
     return null;
   }
 
   public Optional<String> getAudioName() {
-    if (uploadAudio != null) {
-      return Optional.of(uploadAudio.getName());
+    if (audioAttachment != null) {
+      return Optional.of(audioAttachment.getName());
     }
     return null;
   }

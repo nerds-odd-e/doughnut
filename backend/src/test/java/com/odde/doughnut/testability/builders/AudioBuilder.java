@@ -23,8 +23,8 @@ public class AudioBuilder extends EntityBuilder<Audio> {
       entity.setName("example.mp3");
     }
 
-    if (entity.getType() == null) {
-      entity.setType("audio/mp3");
+    if (entity.getContentType() == null) {
+      entity.setContentType("audio/mp3");
     }
 
     if (entity.getUser() == null) {

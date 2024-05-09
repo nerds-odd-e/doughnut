@@ -16,7 +16,7 @@ public class ImageBuilder {
     Image image = new Image();
     image.setUser(user);
     image.setName(file.getOriginalFilename());
-    image.setType(file.getContentType());
+    image.setContentType(file.getContentType());
     AttachmentBlob attachmentBlob = getImageBlob(file);
     image.setBlob(attachmentBlob);
     return image;

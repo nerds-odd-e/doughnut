@@ -3,10 +3,10 @@
     scope-name="note"
     field="uploadPicture"
     placeholder="Optional. upload own picture."
-    :errors="errors.uploadPictureProxy"
-    :model-value="modelValue.uploadPictureProxy"
+    :errors="errors.uploadPicture"
+    :model-value="modelValue.uploadPicture"
     @update:model-value="
-      $emit('update:modelValue', { ...modelValue, uploadPictureProxy: $event })
+      $emit('update:modelValue', { ...modelValue, uploadPicture: $event })
     "
   />
   <TextInput

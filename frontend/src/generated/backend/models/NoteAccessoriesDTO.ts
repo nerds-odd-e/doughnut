@@ -7,6 +7,6 @@ export type NoteAccessoriesDTO = {
     pictureUrl?: string;
     pictureMask?: string;
     useParentPicture?: boolean;
-    uploadPictureProxy?: Blob;
+    uploadPicture?: Blob;
 };
 

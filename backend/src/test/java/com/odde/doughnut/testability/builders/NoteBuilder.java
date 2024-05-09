@@ -99,7 +99,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
     if (audioFilename != null) {
       entity
           .getNoteAccessories()
-          .setUploadAudio(makeMe.anAudio().name(audioFilename).please(needPersist));
+          .setAudioAttachment(makeMe.anAudio().name(audioFilename).please(needPersist));
     }
   }
 
@@ -157,7 +157,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public void withUploadedPicture() {
-    entity.getNoteAccessories().setUploadPicture(makeMe.anImage().please());
+    entity.getNoteAccessories().setImageAttachment(makeMe.anImage().please());
   }
 
   public NoteBuilder notebookOwnership(User user) {

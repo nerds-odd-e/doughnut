@@ -25,10 +25,10 @@ public class NoteAccessoriesDTO {
 
   @Getter @Setter private Boolean useParentPicture = false;
 
-  @Getter @Setter private MultipartFile uploadPictureProxy;
+  @Getter @Setter private MultipartFile uploadPicture;
 
   public Image fetchUploadedPicture(User user) throws IOException {
-    MultipartFile file = getUploadPictureProxy();
+    MultipartFile file = getUploadPicture();
     if (file != null && !file.isEmpty()) {
       return new ImageBuilder().buildImageFromUploadedPicture(user, file);
     }

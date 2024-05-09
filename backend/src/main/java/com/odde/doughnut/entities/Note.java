@@ -228,7 +228,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     BeanUtils.copyProperties(noteAccessoriesDTO, getNoteAccessories());
     Image uploadPicture = noteAccessoriesDTO.fetchUploadedPicture(user);
     if (uploadPicture != null) {
-      getNoteAccessories().setUploadPicture(uploadPicture);
+      getNoteAccessories().setImageAttachment(uploadPicture);
     }
   }
 
@@ -237,13 +237,13 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     Audio audio = new Audio();
     audio.setUser(user);
     audio.setName(file.getOriginalFilename());
-    audio.setType(file.getContentType());
+    audio.setContentType(file.getContentType());
 
     AttachmentBlob audioBlob = new AttachmentBlob();
     audioBlob.setData(file.getBytes());
     audio.setBlob(audioBlob);
 
-    getNoteAccessories().setUploadAudio(audio);
+    getNoteAccessories().setAudioAttachment(audio);
   }
 
   @JsonIgnore

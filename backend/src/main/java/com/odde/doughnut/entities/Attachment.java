@@ -17,7 +17,10 @@ public abstract class Attachment extends EntityIdentifiedByIdOnly {
   @Setter
   private String name;
 
-  @Getter @Setter private String type;
+  @Column(name = "type")
+  @Getter
+  @Setter
+  private String contentType;
 
   @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JoinColumn(name = "attachment_blob_id", referencedColumnName = "id")
@@ -36,7 +39,7 @@ public abstract class Attachment extends EntityIdentifiedByIdOnly {
   public ResponseEntity<byte[]> getResponseEntity(String disposition) {
     return ResponseEntity.ok()
         .header(HttpHeaders.CONTENT_DISPOSITION, disposition + "; filename=\"" + getName() + "\"")
-        .header(HttpHeaders.CONTENT_TYPE, getType())
+        .header(HttpHeaders.CONTENT_TYPE, getContentType())
         .body(getBlob().getData());
   }
 }

@@ -17,8 +17,8 @@ public class ValidateNotePictureValidator
   public boolean isValid(Object value, ConstraintValidatorContext context) {
     final NoteAccessoriesDTO noteAccessories = (NoteAccessoriesDTO) value;
     List<String> fieldsWithValue = new ArrayList<>();
-    if (noteAccessories.getUploadPictureProxy() != null
-        && !noteAccessories.getUploadPictureProxy().isEmpty()) {
+    if (noteAccessories.getUploadPicture() != null
+        && !noteAccessories.getUploadPicture().isEmpty()) {
       fieldsWithValue.add("uploadPicture");
     }
     if (!Strings.isEmpty(noteAccessories.getPictureUrl())) {

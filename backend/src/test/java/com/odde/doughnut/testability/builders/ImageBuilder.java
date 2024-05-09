@@ -22,8 +22,8 @@ public class ImageBuilder extends EntityBuilder<Image> {
       entity.setName("example.png");
     }
 
-    if (entity.getType() == null) {
-      entity.setType("image/png");
+    if (entity.getContentType() == null) {
+      entity.setContentType("image/png");
     }
 
     if (entity.getUser() == null) {

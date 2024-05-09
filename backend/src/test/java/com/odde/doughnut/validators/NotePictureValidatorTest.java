@@ -53,7 +53,7 @@ public class NotePictureValidatorTest {
 
   @Test
   public void withBothUploadPictureProxyAndPicture() {
-    note.setUploadPictureProxy(makeMe.anUploadedPicture().toMultiplePartFilePlease());
+    note.setUploadPicture(makeMe.anUploadedPicture().toMultiplePartFilePlease());
     note.setPictureUrl("http://url/img");
     assertThat(getViolations(), is(not(empty())));
     List<String> errorFields =

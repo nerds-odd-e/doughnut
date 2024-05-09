@@ -29,7 +29,7 @@ class RestAiAudioController {
   @Transactional
   public SrtDto convertNoteAudioToSRT(
       @PathVariable(name = "note") @Schema(type = "integer") Note note) throws IOException {
-    Audio audio = note.getNoteAccessories().getUploadAudio();
+    Audio audio = note.getNoteAccessories().getAudioAttachment();
     return aiAdvisorService.getTranscription(audio.getName(), audio.getBlob().getData());
   }
 
