@@ -18,7 +18,7 @@ import org.springframework.beans.BeanUtils;
 
 @Embeddable
 @JsonPropertyOrder({"audio", "audioName", "audioId"})
-public class NoteAccessories {
+public class NoteAccessory {
 
   @Getter @Setter private String url;
 

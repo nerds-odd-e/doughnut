@@ -9,10 +9,10 @@
     <slot name="topic-additional" />
     <button
       class="btn btn-sm download-btn"
-      @click="downloadAudioFile(note.noteAccessories.audioId!)"
-      v-if="note.noteAccessories.audioName"
+      @click="downloadAudioFile(note.noteAccessory.audioId!)"
+      v-if="note.noteAccessory.audioName"
     >
-      Download {{ note.noteAccessories.audioName }}
+      Download {{ note.noteAccessory.audioName }}
     </button>
   </div>
   <div role="details" class="note-content">
@@ -51,7 +51,7 @@ export default defineComponent({
       const link = document.createElement("a");
       link.href = audioUrl;
 
-      link.download = this.note.noteAccessories.audioName!;
+      link.download = this.note.noteAccessory.audioName!;
 
       link.click();
     },

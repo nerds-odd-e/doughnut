@@ -36,7 +36,7 @@ export interface StoredApi {
 
   updateNoteAccessories(
     noteId: Doughnut.ID,
-    noteAccessories: NoteAccessoriesDTO,
+    noteAccessory: NoteAccessoriesDTO,
   ): Promise<NoteRealm>;
 
   updateTextField(

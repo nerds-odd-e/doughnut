@@ -2295,7 +2295,7 @@ components:
       required:
       - createdAt
       - id
-      - noteAccessories
+      - noteAccessory
       - topic
       - topicConstructor
       - updatedAt
@@ -2318,8 +2318,8 @@ components:
         id:
           type: integer
           format: int32
-        noteAccessories:
-          $ref: '#/components/schemas/NoteAccessories'
+        noteAccessory:
+          $ref: '#/components/schemas/NoteAccessory'
         createdAt:
           type: string
           format: date-time
@@ -2331,7 +2331,7 @@ components:
           type: string
         pictureWithMask:
           $ref: '#/components/schemas/PictureWithMask'
-    NoteAccessories:
+    NoteAccessory:
       type: object
       properties:
         audioName:
@@ -2609,7 +2609,7 @@ components:
       required:
       - createdAt
       - id
-      - noteAccessories
+      - noteAccessory
       - topic
       - topicConstructor
       - updatedAt
@@ -2632,8 +2632,8 @@ components:
         id:
           type: integer
           format: int32
-        noteAccessories:
-          $ref: '#/components/schemas/NoteAccessories'
+        noteAccessory:
+          $ref: '#/components/schemas/NoteAccessory'
         createdAt:
           type: string
           format: date-time

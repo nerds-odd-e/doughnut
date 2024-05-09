@@ -44,8 +44,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   @Setter
   private Notebook notebook;
 
-  @NotNull @Embedded @Valid @Getter
-  public final NoteAccessories noteAccessories = new NoteAccessories();
+  @NotNull @Embedded @Valid @Getter public final NoteAccessory noteAccessory = new NoteAccessory();
 
   @Column(name = "description")
   @Getter
@@ -271,16 +270,16 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
             (pic) -> {
               PictureWithMask pictureWithMask = new PictureWithMask();
               pictureWithMask.notePicture = pic;
-              pictureWithMask.pictureMask = getNoteAccessories().getPictureMask();
+              pictureWithMask.pictureMask = getNoteAccessory().getPictureMask();
               return pictureWithMask;
             });
   }
 
   protected Optional<String> getNotePicture() {
-    if (getNoteAccessories().getUseParentPicture() && getParent() != null) {
+    if (getNoteAccessory().getUseParentPicture() && getParent() != null) {
       return getParent().getNotePicture();
     }
-    return getNoteAccessories().getNotePicture();
+    return getNoteAccessory().getNotePicture();
   }
 
   public void prependDescription(String addition) {

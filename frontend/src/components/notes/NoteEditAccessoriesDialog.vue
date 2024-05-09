@@ -28,7 +28,7 @@ export default defineComponent({
   },
   emits: ["closeDialog"],
   data() {
-    const { ...rest } = this.note.noteAccessories;
+    const { ...rest } = this.note.noteAccessory;
     return {
       formData: rest as NoteAccessoriesDTO,
       noteFormErrors: {},

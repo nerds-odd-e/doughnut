@@ -380,15 +380,15 @@ class RestNoteControllerTests {
     void shouldAddUploadedPicture() throws UnexpectedNoAccessRightException, IOException {
       noteAccessoriesDTO.setUploadPicture(makeMe.anUploadedPicture().toMultiplePartFilePlease());
       controller.updateNoteAccessories(note, noteAccessoriesDTO);
-      assertThat(note.getNoteAccessories().getImageAttachment(), is(not(nullValue())));
-      note.getNoteAccessories().getImageAttachment().getBlob().getData();
+      assertThat(note.getNoteAccessory().getImageAttachment(), is(not(nullValue())));
+      note.getNoteAccessory().getImageAttachment().getBlob().getData();
     }
 
     @Test
     void shouldSaveTheBlogData() throws UnexpectedNoAccessRightException, IOException {
       noteAccessoriesDTO.setUploadPicture(makeMe.anUploadedPicture().toMultiplePartFilePlease());
       controller.updateNoteAccessories(note, noteAccessoriesDTO);
-      byte[] data = note.getNoteAccessories().getImageAttachment().getBlob().getData();
+      byte[] data = note.getNoteAccessory().getImageAttachment().getBlob().getData();
       assertThat(data.length, is(68));
     }
 
@@ -397,7 +397,7 @@ class RestNoteControllerTests {
         throws UnexpectedNoAccessRightException, IOException {
       makeMe.theNote(note).withUploadedPicture();
       controller.updateNoteAccessories(note, noteAccessoriesDTO);
-      assertThat(note.getNoteAccessories().getImageAttachment(), is(not(nullValue())));
+      assertThat(note.getNoteAccessory().getImageAttachment(), is(not(nullValue())));
     }
   }
 
@@ -418,7 +418,7 @@ class RestNoteControllerTests {
           new MockMultipartFile(filename, filename, "audio/wav", new byte[] {}));
       controller.uploadAudio(note, audioUploadDTO);
       Note newNote = makeMe.modelFactoryService.noteRepository.findById(note.getId()).get();
-      assertEquals(filename, newNote.getNoteAccessories().getAudioAttachment().getName());
+      assertEquals(filename, newNote.getNoteAccessory().getAudioAttachment().getName());
     }
   }
 

@@ -49,7 +49,7 @@ public class NoteTest {
       Note child = makeMe.aNote().under(parent).useParentPicture().inMemoryPlease();
       assertThat(
           child.getPictureWithMask().get().notePicture,
-          equalTo(parent.getNoteAccessories().getPictureUrl()));
+          equalTo(parent.getNoteAccessory().getPictureUrl()));
     }
 
     @Test
@@ -63,14 +63,14 @@ public class NoteTest {
   @Test
   void noAudioAttachedToNote() {
     Note note = makeMe.aNote().audio(null).inMemoryPlease();
-    assertNull(note.getNoteAccessories().getAudioId());
-    assertNull(note.getNoteAccessories().getAudioName());
+    assertNull(note.getNoteAccessory().getAudioId());
+    assertNull(note.getNoteAccessory().getAudioName());
   }
 
   @Test
   void audioAttachedToNote() {
     Note note = makeMe.aNote().audio("podcast.mp3").inMemoryPlease();
 
-    assertEquals(note.getNoteAccessories().getAudioName().get(), "podcast.mp3");
+    assertEquals(note.getNoteAccessory().getAudioName().get(), "podcast.mp3");
   }
 }

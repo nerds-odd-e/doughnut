@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { NoteAccessories } from './NoteAccessories';
+import type { NoteAccessory } from './NoteAccessory';
 import type { PictureWithMask } from './PictureWithMask';
 export type HierarchicalNote = {
     topic: string;
@@ -11,7 +11,7 @@ export type HierarchicalNote = {
     parentId?: number;
     updatedAt: string;
     id: number;
-    noteAccessories: NoteAccessories;
+    noteAccessory: NoteAccessory;
     createdAt: string;
     readonly deletedAt?: string;
     wikidataId?: string;

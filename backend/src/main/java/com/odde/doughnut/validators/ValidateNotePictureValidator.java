@@ -15,16 +15,15 @@ public class ValidateNotePictureValidator
 
   @Override
   public boolean isValid(Object value, ConstraintValidatorContext context) {
-    final NoteAccessoriesDTO noteAccessories = (NoteAccessoriesDTO) value;
+    final NoteAccessoriesDTO noteAccessory = (NoteAccessoriesDTO) value;
     List<String> fieldsWithValue = new ArrayList<>();
-    if (noteAccessories.getUploadPicture() != null
-        && !noteAccessories.getUploadPicture().isEmpty()) {
+    if (noteAccessory.getUploadPicture() != null && !noteAccessory.getUploadPicture().isEmpty()) {
       fieldsWithValue.add("uploadPicture");
     }
-    if (!Strings.isEmpty(noteAccessories.getPictureUrl())) {
+    if (!Strings.isEmpty(noteAccessory.getPictureUrl())) {
       fieldsWithValue.add("pictureUrl");
     }
-    if (noteAccessories.getUseParentPicture()) {
+    if (noteAccessory.getUseParentPicture()) {
       fieldsWithValue.add("useParentPicture");
     }
 

@@ -15,7 +15,7 @@ class NoteBuilder extends Builder<Note> {
       wikidataId: "",
       deletedAt: "",
       createdAt: new Date().toISOString(),
-      noteAccessories: {
+      noteAccessory: {
         url: "",
         pictureUrl: "",
         pictureMask: "",

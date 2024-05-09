@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type NoteAccessories = {
+export type NoteAccessory = {
     audioName?: string;
     audioId?: number;
     url?: string;
