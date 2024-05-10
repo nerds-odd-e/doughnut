@@ -85,8 +85,7 @@ public class NoteAccessory extends EntityIdentifiedByIdOnly {
     }
   }
 
-  @JsonIgnore
-  PictureWithMask getPictureWithMask() {
+  public PictureWithMask getPictureWithMask() {
     String url = getNoteAccessoryContainingPicture().getUrlOfImage();
     if (url == null) return null;
 

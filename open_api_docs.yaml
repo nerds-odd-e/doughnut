@@ -2351,6 +2351,8 @@ components:
           type: string
         useParentPicture:
           type: boolean
+        pictureWithMask:
+          $ref: '#/components/schemas/PictureWithMask'
     Notebook:
       required:
       - id

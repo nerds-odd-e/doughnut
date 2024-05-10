@@ -14,9 +14,9 @@
 
     <template #note-content-other>
       <ShowPicture
-        v-if="note.pictureWithMask"
+        v-if="note.noteAccessory?.pictureWithMask"
         class="text-center"
-        v-bind="note.pictureWithMask"
+        v-bind="note.noteAccessory.pictureWithMask"
         :opacity="0.2"
       />
       <div v-if="!!note?.noteAccessory?.url">
