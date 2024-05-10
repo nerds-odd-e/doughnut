@@ -31,18 +31,7 @@
           />
         </template>
       </PopButton>
-
-      <PopButton title="associate wikidata">
-        <template #button_face>
-          <SvgWikidata />
-        </template>
-        <template #default="{ closer }">
-          <WikidataAssociationDialog
-            v-bind="{ note, storageAccessor }"
-            @close-dialog="closer"
-          />
-        </template>
-      </PopButton>
+      <WikidataButton v-bind="{ note, storageAccessor }" />
       <NoteDetailsAutoCompletionButton v-bind="{ note, storageAccessor }" />
       <PopButton title="search and link note">
         <template #button_face>
@@ -93,8 +82,7 @@ import SvgAddChild from "../svgs/SvgAddChild.vue";
 import SvgEdit from "../svgs/SvgEdit.vue";
 import NoteEditAccessoriesDialog from "../notes/NoteEditAccessoriesDialog.vue";
 import NoteEditUploadAudioDialog from "../notes/NoteEditUploadAudioDialog.vue";
-import SvgWikidata from "../svgs/SvgWikidata.vue";
-import WikidataAssociationDialog from "../notes/WikidataAssociationDialog.vue";
+import WikidataButton from "./WikidataButton.vue";
 import SvgSearchForLink from "../svgs/SvgSearchForLink.vue";
 import LinkNoteDialog from "../links/LinkNoteDialog.vue";
 import SvgCog from "../svgs/SvgCog.vue";
@@ -121,8 +109,7 @@ export default defineComponent({
     SvgEdit,
     NoteEditAccessoriesDialog,
     NoteEditUploadAudioDialog,
-    SvgWikidata,
-    WikidataAssociationDialog,
+    WikidataButton,
     SvgSearchForLink,
     LinkNoteDialog,
     SvgCog,

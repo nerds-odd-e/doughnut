@@ -206,6 +206,7 @@ declare module 'vue' {
     UserActionsButton: typeof import('./src/components/toolbars/UserActionsButton.vue')['default']
     UserProfileDialog: typeof import('./src/components/toolbars/UserProfileDialog.vue')['default']
     WikidataAssociationDialog: typeof import('./src/components/notes/WikidataAssociationDialog.vue')['default']
+    WikidataButton: typeof import('./src/components/toolbars/WikidataButton.vue')['default']
     WikidataSearchByLabel: typeof import('./src/components/notes/WikidataSearchByLabel.vue')['default']
   }
 }
