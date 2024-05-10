@@ -5,6 +5,7 @@
 import type { AudioUploadDTO } from '../models/AudioUploadDTO';
 import type { Note } from '../models/Note';
 import type { NoteAccessoriesDTO } from '../models/NoteAccessoriesDTO';
+import type { NoteAccessory } from '../models/NoteAccessory';
 import type { NoteCreationDTO } from '../models/NoteCreationDTO';
 import type { NoteInfo } from '../models/NoteInfo';
 import type { NotePositionViewedByUser } from '../models/NotePositionViewedByUser';
@@ -260,6 +261,25 @@ export class RestNoteControllerService {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/notes/{note}/note-info',
+            path: {
+                'note': note,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param note
+     * @returns NoteAccessory OK
+     * @throws ApiError
+     */
+    public showNoteAccessory(
+        note: number,
+    ): CancelablePromise<NoteAccessory> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/notes/{note}/accessory',
             path: {
                 'note': note,
             },

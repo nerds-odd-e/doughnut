@@ -139,6 +139,13 @@ class RestNoteController {
     return new NoteViewer(user, note).toJsonObject();
   }
 
+  @GetMapping("/{note}/accessory")
+  public NoteAccessory showNoteAccessory(@PathVariable("note") @Schema(type = "integer") Note note)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertReadAuthorization(note);
+    return note.getNoteAccessory();
+  }
+
   @GetMapping("/{note}/note-info")
   public NoteInfo getNoteInfo(@PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {

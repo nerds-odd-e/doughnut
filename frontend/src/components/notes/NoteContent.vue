@@ -12,16 +12,13 @@
       </div>
     </template>
   </NoteTextContent>
-  <NoteAccessory
-    v-if="note.noteAccessory"
-    :note-accessory="note.noteAccessory"
-  />
+  <NoteAccessoryAsync :note-id="note.id" :note-accessory="note.noteAccessory" />
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { Note } from "@/generated/backend";
-import NoteAccessory from "./NoteAccessory.vue";
+import NoteAccessoryAsync from "./NoteAccessoryAsync.vue";
 import NoteWikidataAssociation from "./NoteWikidataAssociation.vue";
 import type { StorageAccessor } from "../../store/createNoteStorage";
 import NoteTextContent from "./NoteTextContent.vue";
@@ -35,7 +32,7 @@ export default defineComponent({
     },
   },
   components: {
-    NoteAccessory,
+    NoteAccessoryAsync,
     NoteWikidataAssociation,
     NoteTextContent,
   },

@@ -57,6 +57,8 @@ declare module 'vue' {
     ManageModelInner: typeof import('./src/components/admin/ManageModelInner.vue')['default']
     Modal: typeof import('./src/components/commons/Modal.vue')['default']
     NoteAccessory: typeof import('./src/components/notes/NoteAccessory.vue')['default']
+    NoteAccessoryAsync: typeof import('./src/components/notes/NoteAccessoryAsync.vue')['default']
+    NoteAccessoryDisplay: typeof import('./src/components/notes/NoteAccessoryDisplay.vue')['default']
     NotebookBazaarViewCards: typeof import('./src/components/bazaar/NotebookBazaarViewCards.vue')['default']
     NotebookButtons: typeof import('./src/components/notebook/NotebookButtons.vue')['default']
     NotebookCardsWithButtons: typeof import('./src/components/notebook/NotebookCardsWithButtons.vue')['default']

@@ -1963,6 +1963,30 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/NoteInfo'
+  /api/notes/{note}/accessory:
+    get:
+      tags:
+      - rest-note-controller
+      operationId: showNoteAccessory
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NoteAccessory'
   /api/notebooks:
     get:
       tags:
