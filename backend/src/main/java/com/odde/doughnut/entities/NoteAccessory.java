@@ -86,34 +86,32 @@ public class NoteAccessory extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  private Optional<String> getUrlOfImage() {
+  PictureWithMask getPictureWithMask() {
+    String url = getNoteAccessoryContainingPicture().getUrlOfImage();
+    if (url == null) return null;
+
+    PictureWithMask pictureWithMask = new PictureWithMask();
+    pictureWithMask.notePicture = url;
+    pictureWithMask.pictureMask = pictureMask;
+    return pictureWithMask;
+  }
+
+  private NoteAccessory getNoteAccessoryContainingPicture() {
+    if (useParentPicture
+        && note.getParent() != null
+        && note.getParent().getNoteAccessory() != null) {
+      return this.note.getParent().getNoteAccessory();
+    }
+    return this;
+  }
+
+  private String getUrlOfImage() {
     if (imageAttachment != null) {
-      return Optional.of(
-          "/attachments/images/" + imageAttachment.getId() + "/" + imageAttachment.getName());
+      return "/attachments/images/" + imageAttachment.getId() + "/" + imageAttachment.getName();
     }
-    if (Strings.isBlank(pictureUrl)) return Optional.empty();
-    return Optional.of(pictureUrl);
-  }
-
-  @JsonIgnore
-  private Optional<String> getNotePicture() {
-    if (useParentPicture) {
-      if (note.getParent() != null && note.getParent().getNoteAccessory() != null) {
-        return note.getParent().getNoteAccessory().getUrlOfImage();
-      }
+    if (!Strings.isBlank(pictureUrl)) {
+      return pictureUrl;
     }
-    return getUrlOfImage();
-  }
-
-  @JsonIgnore
-  Optional<PictureWithMask> getPictureWithMask() {
-    return getNotePicture()
-        .map(
-            (pic) -> {
-              PictureWithMask pictureWithMask = new PictureWithMask();
-              pictureWithMask.notePicture = pic;
-              pictureWithMask.pictureMask = this.pictureMask;
-              return pictureWithMask;
-            });
+    return null;
   }
 }

@@ -268,7 +268,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   public Optional<PictureWithMask> getPictureWithMask() {
     if (this.noteAccessory == null) return Optional.empty();
 
-    return noteAccessory.getPictureWithMask();
+    return Optional.ofNullable(noteAccessory.getPictureWithMask());
   }
 
   public void prependDescription(String addition) {
