@@ -7,13 +7,6 @@
       :storage-accessor="storageAccessor"
     />
     <slot name="topic-additional" />
-    <button
-      class="btn btn-sm download-btn"
-      @click="downloadAudioFile(note?.noteAccessory?.audioId!)"
-      v-if="note?.noteAccessory?.audioName"
-    >
-      Download {{ note.noteAccessory.audioName }}
-    </button>
   </div>
   <div role="details" class="note-content">
     <NoteEditableDetails
@@ -43,20 +36,6 @@ export default defineComponent({
   components: {
     NoteEditableTopic,
     NoteEditableDetails,
-  },
-  methods: {
-    async downloadAudioFile(audioId: number) {
-      const audioUrl = `/attachments/audio/${audioId}`;
-
-      const link = document.createElement("a");
-      link.href = audioUrl;
-
-      if (this.note.noteAccessory) {
-        link.download = this.note.noteAccessory.audioName!;
-      }
-
-      link.click();
-    },
   },
 });
 </script>

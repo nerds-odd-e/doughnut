@@ -28,6 +28,13 @@
           >{{ note.noteAccessory.url }}</a
         >
       </div>
+      <button
+        class="btn btn-sm download-btn"
+        @click="downloadAudioFile(note?.noteAccessory?.audioId!)"
+        v-if="note?.noteAccessory?.audioName"
+      >
+        Download {{ note.noteAccessory.audioName }}
+      </button>
     </template>
   </NoteTextContent>
 </template>
@@ -52,6 +59,20 @@ export default defineComponent({
     ShowPicture,
     NoteWikidataAssociation,
     NoteTextContent,
+  },
+  methods: {
+    async downloadAudioFile(audioId: number) {
+      const audioUrl = `/attachments/audio/${audioId}`;
+
+      const link = document.createElement("a");
+      link.href = audioUrl;
+
+      if (this.note.noteAccessory) {
+        link.download = this.note.noteAccessory.audioName!;
+      }
+
+      link.click();
+    },
   },
 });
 </script>
