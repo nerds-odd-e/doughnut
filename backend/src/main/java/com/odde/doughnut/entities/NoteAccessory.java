@@ -48,16 +48,6 @@ public class NoteAccessory extends EntityIdentifiedByIdOnly {
   @Setter
   private Boolean useParentPicture = false;
 
-  @JsonIgnore
-  public Optional<String> getNotePicture() {
-    if (imageAttachment != null) {
-      return Optional.of(
-          "/attachments/images/" + imageAttachment.getId() + "/" + imageAttachment.getName());
-    }
-    if (Strings.isBlank(pictureUrl)) return Optional.empty();
-    return Optional.of(pictureUrl);
-  }
-
   @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinColumn(name = "audio_id", referencedColumnName = "id")
   @JsonIgnore
@@ -93,5 +83,37 @@ public class NoteAccessory extends EntityIdentifiedByIdOnly {
     if (uploadPicture != null) {
       setImageAttachment(uploadPicture);
     }
+  }
+
+  @JsonIgnore
+  private Optional<String> getUrlOfImage() {
+    if (imageAttachment != null) {
+      return Optional.of(
+          "/attachments/images/" + imageAttachment.getId() + "/" + imageAttachment.getName());
+    }
+    if (Strings.isBlank(pictureUrl)) return Optional.empty();
+    return Optional.of(pictureUrl);
+  }
+
+  @JsonIgnore
+  private Optional<String> getNotePicture() {
+    if (useParentPicture) {
+      if (note.getParent() != null && note.getParent().getNoteAccessory() != null) {
+        return note.getParent().getNoteAccessory().getUrlOfImage();
+      }
+    }
+    return getUrlOfImage();
+  }
+
+  @JsonIgnore
+  Optional<PictureWithMask> getPictureWithMask() {
+    return getNotePicture()
+        .map(
+            (pic) -> {
+              PictureWithMask pictureWithMask = new PictureWithMask();
+              pictureWithMask.notePicture = pic;
+              pictureWithMask.pictureMask = this.pictureMask;
+              return pictureWithMask;
+            });
   }
 }

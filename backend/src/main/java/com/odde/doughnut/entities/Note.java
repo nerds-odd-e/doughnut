@@ -266,23 +266,9 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   }
 
   public Optional<PictureWithMask> getPictureWithMask() {
-    if (getNoteAccessory() == null) return Optional.empty();
+    if (this.noteAccessory == null) return Optional.empty();
 
-    return getNotePicture()
-        .map(
-            (pic) -> {
-              PictureWithMask pictureWithMask = new PictureWithMask();
-              pictureWithMask.notePicture = pic;
-              pictureWithMask.pictureMask = getNoteAccessory().getPictureMask();
-              return pictureWithMask;
-            });
-  }
-
-  protected Optional<String> getNotePicture() {
-    if (getNoteAccessory().getUseParentPicture() && getParent() != null) {
-      return getParent().getNotePicture();
-    }
-    return getNoteAccessory().getNotePicture();
+    return noteAccessory.getPictureWithMask();
   }
 
   public void prependDescription(String addition) {
