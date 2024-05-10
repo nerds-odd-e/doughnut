@@ -12,37 +12,16 @@
       </div>
     </template>
   </NoteTextContent>
-
-  <div role="accessory">
-    <ShowPicture
-      v-if="note.noteAccessory?.pictureWithMask"
-      class="text-center"
-      v-bind="note.noteAccessory.pictureWithMask"
-      :opacity="0.2"
-    />
-    <div v-if="!!note?.noteAccessory?.url">
-      <label id="note-url" v-text="'Url:'" />
-      <a
-        aria-labelledby="note-url"
-        :href="note.noteAccessory.url"
-        target="_blank"
-        >{{ note.noteAccessory.url }}</a
-      >
-    </div>
-    <button
-      class="btn btn-sm download-btn"
-      @click="downloadAudioFile(note?.noteAccessory?.audioId!)"
-      v-if="note?.noteAccessory?.audioName"
-    >
-      Download {{ note.noteAccessory.audioName }}
-    </button>
-  </div>
+  <NoteAccessory
+    v-if="note.noteAccessory"
+    :note-accessory="note.noteAccessory"
+  />
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { Note } from "@/generated/backend";
-import ShowPicture from "./ShowPicture.vue";
+import NoteAccessory from "./NoteAccessory.vue";
 import NoteWikidataAssociation from "./NoteWikidataAssociation.vue";
 import type { StorageAccessor } from "../../store/createNoteStorage";
 import NoteTextContent from "./NoteTextContent.vue";
@@ -56,23 +35,9 @@ export default defineComponent({
     },
   },
   components: {
-    ShowPicture,
+    NoteAccessory,
     NoteWikidataAssociation,
     NoteTextContent,
-  },
-  methods: {
-    async downloadAudioFile(audioId: number) {
-      const audioUrl = `/attachments/audio/${audioId}`;
-
-      const link = document.createElement("a");
-      link.href = audioUrl;
-
-      if (this.note.noteAccessory) {
-        link.download = this.note.noteAccessory.audioName!;
-      }
-
-      link.click();
-    },
   },
 });
 </script>
