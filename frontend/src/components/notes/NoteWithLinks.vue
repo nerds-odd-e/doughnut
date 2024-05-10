@@ -1,7 +1,23 @@
 <template>
   <NoteShell v-if="note" v-bind="{ id: note.id, updatedAt: note.updatedAt }">
     <NoteFrameOfLinks v-if="links" v-bind="{ links, storageAccessor }">
-      <NoteContent v-bind="{ note, storageAccessor }" />
+      <div class="alert alert-warning" v-if="note.deletedAt">
+        This note has been deleted
+      </div>
+      <NoteTextContent :note="note" :storage-accessor="storageAccessor">
+        <template #topic-additional>
+          <div class="header-options">
+            <NoteWikidataAssociation
+              v-if="note.wikidataId"
+              :wikidata-id="note.wikidataId"
+            />
+          </div>
+        </template>
+      </NoteTextContent>
+      <NoteAccessoryAsync
+        :note-id="note.id"
+        :note-accessory="note.noteAccessory"
+      />
     </NoteFrameOfLinks>
     <template #footer>
       <slot name="footer" />
@@ -13,8 +29,10 @@
 import { defineComponent, PropType } from "vue";
 import { Note } from "@/generated/backend";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
+import NoteAccessoryAsync from "./NoteAccessoryAsync.vue";
+import NoteWikidataAssociation from "./NoteWikidataAssociation.vue";
 import NoteShell from "./NoteShell.vue";
-import NoteContent from "./NoteContent.vue";
+import NoteTextContent from "./NoteTextContent.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import LinksMap from "../../models/LinksMap";
 
@@ -32,7 +50,9 @@ export default defineComponent({
   components: {
     NoteFrameOfLinks,
     NoteShell,
-    NoteContent,
+    NoteAccessoryAsync,
+    NoteWikidataAssociation,
+    NoteTextContent,
   },
 });
 </script>
