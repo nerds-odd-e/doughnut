@@ -5,6 +5,7 @@
 export type NoteAccessory = {
     audioName?: string;
     audioId?: number;
+    id: number;
     url?: string;
     pictureUrl?: string;
     pictureMask?: string;

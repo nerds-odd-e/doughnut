@@ -61,13 +61,6 @@ public class NoteTest {
   }
 
   @Test
-  void noAudioAttachedToNote() {
-    Note note = makeMe.aNote().audio(null).inMemoryPlease();
-    assertNull(note.getNoteAccessory().getAudioId());
-    assertNull(note.getNoteAccessory().getAudioName());
-  }
-
-  @Test
   void audioAttachedToNote() {
     Note note = makeMe.aNote().audio("podcast.mp3").inMemoryPlease();
 

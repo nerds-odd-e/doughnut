@@ -16,6 +16,7 @@ class NoteBuilder extends Builder<Note> {
       deletedAt: "",
       createdAt: new Date().toISOString(),
       noteAccessory: {
+        id: generateId(),
         url: "",
         pictureUrl: "",
         pictureMask: "",

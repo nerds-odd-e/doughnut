@@ -13,7 +13,6 @@ import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.models.NoteViewer;
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.sql.Timestamp;
@@ -44,7 +43,9 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   @Setter
   private Notebook notebook;
 
-  @NotNull @Embedded @Valid @Getter public final NoteAccessory noteAccessory = new NoteAccessory();
+  @OneToOne(mappedBy = "note", cascade = CascadeType.ALL)
+  @Getter
+  private NoteAccessory noteAccessory;
 
   @Column(name = "description")
   @Getter
@@ -265,6 +266,8 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   }
 
   public Optional<PictureWithMask> getPictureWithMask() {
+    if (getNoteAccessory() == null) return Optional.empty();
+
     return getNotePicture()
         .map(
             (pic) -> {
@@ -312,6 +315,15 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public abstract List<QuizQuestionFactory> getQuizQuestionFactories();
+
+  @JsonIgnore
+  public NoteAccessory getOrInitializeNoteAccessory() {
+    if (noteAccessory == null) {
+      noteAccessory = new NoteAccessory();
+      noteAccessory.setNote(this);
+    }
+    return noteAccessory;
+  }
 
   public static class NoteBrief {
     public String contextPath;

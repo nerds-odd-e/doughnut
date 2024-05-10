@@ -19,7 +19,7 @@
         v-bind="note.pictureWithMask"
         :opacity="0.2"
       />
-      <div v-if="!!note.noteAccessory.url">
+      <div v-if="!!note?.noteAccessory?.url">
         <label id="note-url" v-text="'Url:'" />
         <a
           aria-labelledby="note-url"

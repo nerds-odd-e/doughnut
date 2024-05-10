@@ -4,11 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.controllers.dto.AudioUploadDTO;
 import com.odde.doughnut.controllers.dto.NoteAccessoriesDTO;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import java.io.IOException;
 import java.util.Optional;
 import lombok.Getter;
@@ -16,9 +12,17 @@ import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeanUtils;
 
-@Embeddable
+@Entity
+@Table(name = "note_accessory")
 @JsonPropertyOrder({"audio", "audioName", "audioId"})
-public class NoteAccessory {
+public class NoteAccessory extends EntityIdentifiedByIdOnly {
+
+  @ManyToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "note_id", referencedColumnName = "id")
+  @JsonIgnore
+  @Getter
+  @Setter
+  private Note note;
 
   @Getter @Setter private String url;
 

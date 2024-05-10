@@ -91,7 +91,7 @@ class TestabilityRestController {
 
     private Note buildNote(User user, Timestamp currentUTCTimestamp) {
       Note note = HierarchicalNote.createNote(user, null, currentUTCTimestamp, "");
-      NoteAccessory content = note.getNoteAccessory();
+      NoteAccessory content = note.getOrInitializeNoteAccessory();
 
       note.setTopicConstructor(topicConstructor);
       note.setDetails(details);

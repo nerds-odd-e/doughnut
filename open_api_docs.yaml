@@ -2295,7 +2295,6 @@ components:
       required:
       - createdAt
       - id
-      - noteAccessory
       - topic
       - topicConstructor
       - updatedAt
@@ -2332,11 +2331,16 @@ components:
         pictureWithMask:
           $ref: '#/components/schemas/PictureWithMask'
     NoteAccessory:
+      required:
+      - id
       type: object
       properties:
         audioName:
           type: string
         audioId:
+          type: integer
+          format: int32
+        id:
           type: integer
           format: int32
         url:
@@ -2609,7 +2613,6 @@ components:
       required:
       - createdAt
       - id
-      - noteAccessory
       - topic
       - topicConstructor
       - updatedAt

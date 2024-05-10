@@ -11,7 +11,7 @@ export type Note = {
     parentId?: number;
     updatedAt: string;
     id: number;
-    noteAccessory: NoteAccessory;
+    noteAccessory?: NoteAccessory;
     createdAt: string;
     readonly deletedAt?: string;
     wikidataId?: string;

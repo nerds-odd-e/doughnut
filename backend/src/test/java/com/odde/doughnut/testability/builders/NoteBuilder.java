@@ -98,7 +98,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
     }
     if (audioFilename != null) {
       entity
-          .getNoteAccessory()
+          .getOrInitializeNoteAccessory()
           .setAudioAttachment(makeMe.anAudio().name(audioFilename).please(needPersist));
     }
   }
@@ -147,17 +147,17 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder pictureUrl(String picture) {
-    entity.getNoteAccessory().setPictureUrl(picture);
+    entity.getOrInitializeNoteAccessory().setPictureUrl(picture);
     return this;
   }
 
   public NoteBuilder useParentPicture() {
-    entity.getNoteAccessory().setUseParentPicture(true);
+    entity.getOrInitializeNoteAccessory().setUseParentPicture(true);
     return this;
   }
 
   public void withUploadedPicture() {
-    entity.getNoteAccessory().setImageAttachment(makeMe.anImage().please());
+    entity.getOrInitializeNoteAccessory().setImageAttachment(makeMe.anImage().please());
   }
 
   public NoteBuilder notebookOwnership(User user) {
