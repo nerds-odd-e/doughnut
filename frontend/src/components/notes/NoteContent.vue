@@ -11,32 +11,32 @@
         />
       </div>
     </template>
-
-    <template #note-content-other>
-      <ShowPicture
-        v-if="note.noteAccessory?.pictureWithMask"
-        class="text-center"
-        v-bind="note.noteAccessory.pictureWithMask"
-        :opacity="0.2"
-      />
-      <div v-if="!!note?.noteAccessory?.url">
-        <label id="note-url" v-text="'Url:'" />
-        <a
-          aria-labelledby="note-url"
-          :href="note.noteAccessory.url"
-          target="_blank"
-          >{{ note.noteAccessory.url }}</a
-        >
-      </div>
-      <button
-        class="btn btn-sm download-btn"
-        @click="downloadAudioFile(note?.noteAccessory?.audioId!)"
-        v-if="note?.noteAccessory?.audioName"
-      >
-        Download {{ note.noteAccessory.audioName }}
-      </button>
-    </template>
   </NoteTextContent>
+
+  <div role="accessory">
+    <ShowPicture
+      v-if="note.noteAccessory?.pictureWithMask"
+      class="text-center"
+      v-bind="note.noteAccessory.pictureWithMask"
+      :opacity="0.2"
+    />
+    <div v-if="!!note?.noteAccessory?.url">
+      <label id="note-url" v-text="'Url:'" />
+      <a
+        aria-labelledby="note-url"
+        :href="note.noteAccessory.url"
+        target="_blank"
+        >{{ note.noteAccessory.url }}</a
+      >
+    </div>
+    <button
+      class="btn btn-sm download-btn"
+      @click="downloadAudioFile(note?.noteAccessory?.audioId!)"
+      v-if="note?.noteAccessory?.audioName"
+    >
+      Download {{ note.noteAccessory.audioName }}
+    </button>
+  </div>
 </template>
 
 <script lang="ts">

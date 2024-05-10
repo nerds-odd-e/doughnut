@@ -14,7 +14,6 @@
       :note-details="note.details"
       :storage-accessor="storageAccessor"
     />
-    <slot name="note-content-other" />
   </div>
 </template>
 
