@@ -2328,8 +2328,6 @@ components:
           readOnly: true
         wikidataId:
           type: string
-        pictureWithMask:
-          $ref: '#/components/schemas/PictureWithMask'
     NoteAccessory:
       required:
       - id
@@ -2648,8 +2646,6 @@ components:
           readOnly: true
         wikidataId:
           type: string
-        pictureWithMask:
-          $ref: '#/components/schemas/PictureWithMask'
     LinkViewed:
       required:
       - direct

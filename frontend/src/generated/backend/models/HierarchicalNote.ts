@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { NoteAccessory } from './NoteAccessory';
-import type { PictureWithMask } from './PictureWithMask';
 export type HierarchicalNote = {
     topic: string;
     topicConstructor: string;
@@ -15,6 +14,5 @@ export type HierarchicalNote = {
     createdAt: string;
     readonly deletedAt?: string;
     wikidataId?: string;
-    pictureWithMask?: PictureWithMask;
 };
 

@@ -265,6 +265,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     return Optional.ofNullable(parent.id);
   }
 
+  @JsonIgnore
   public Optional<PictureWithMask> getPictureWithMask() {
     if (this.noteAccessory == null) return Optional.empty();
 

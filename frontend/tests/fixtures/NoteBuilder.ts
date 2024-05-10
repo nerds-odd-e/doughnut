@@ -50,7 +50,7 @@ class NoteBuilder extends Builder<Note> {
   }
 
   picture(value: string): NoteBuilder {
-    this.data.pictureWithMask = {
+    this.data.noteAccessory!.pictureWithMask = {
       notePicture: value,
       pictureMask: "",
     };
