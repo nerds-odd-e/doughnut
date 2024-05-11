@@ -17,8 +17,6 @@ declare namespace Cypress {
     expectFieldErrorMessage(field: string, message: string): Chainable<any>
     expectNoteCards(expectedCards: any): Chainable<any>
     findCardTitle(topic: string): Chainable<any>
-    findWikiAssociationButton(): Chainable<any>
-    expectALinkThatOpensANewWindowWithURL(url: string): Chainable<any>
     expectAMapTo(latitude: string, longitude: string): Chainable<any>
     findUserSettingsButton(userName: string): Chainable<any>
     failure(): Chainable<any>

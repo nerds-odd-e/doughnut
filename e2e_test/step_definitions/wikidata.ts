@@ -12,11 +12,11 @@ When("I associate the note {string} with wikidata id {string}", (topic: string, 
 When("I need to confirm the association with different label {string}", (wikidataTitle: string) => {
   cy.findAllByText(wikidataTitle).should("exist")
   cy.findByRole("button", { name: "Confirm" }).click()
-  cy.findWikiAssociationButton()
+  start.assumeNotePage().wikidataOptions().hasAssociation()
 })
 
 Then("I don't need to confirm the association with different label {string}", () => {
-  cy.findWikiAssociationButton()
+  start.assumeNotePage().wikidataOptions().hasAssociation()
 })
 
 Given(
@@ -58,8 +58,11 @@ Then("I should see an error {string} on {string}", (message: string, field: stri
 Then(
   "the Wiki association of note {string} should link to {string}",
   (topic: string, associationUrl: string) => {
-    start.assumeNotePage(topic)
-    cy.findWikiAssociationButton().expectALinkThatOpensANewWindowWithURL(associationUrl)
+    start
+      .assumeNotePage(topic)
+      .wikidataOptions()
+      .hasAssociation()
+      .expectALinkThatOpensANewWindowWithURL(associationUrl)
   },
 )
 
