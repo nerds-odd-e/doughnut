@@ -1,6 +1,7 @@
 import { assumeChatAboutNotePage } from "./chatAboutNotePage"
 import submittableForm from "../submittableForm"
 import noteCreationForm from "./noteForms/noteCreationForm"
+import { cli } from "cypress"
 
 export const assumeNotePage = (noteTopic?: string) => {
   if (noteTopic) {
@@ -13,6 +14,13 @@ export const assumeNotePage = (noteTopic?: string) => {
       click: () => {
         getButton().click()
         return { ...submittableForm }
+      },
+      clickIfNotOpen: () => {
+        getButton().then(($btn) => {
+          if ($btn.attr("aria-expanded") === "false") {
+            cy.wrap($btn).click()
+          }
+        })
       },
       shouldNotExist: () => getButton().should("not.exist"),
     }
@@ -88,7 +96,7 @@ export const assumeNotePage = (noteTopic?: string) => {
       return assumeChatAboutNotePage()
     },
     wikidataOptions() {
-      const openWikidataOptions = () => privateToolbarButton("wikidata options").click()
+      const openWikidataOptions = () => privateToolbarButton("wikidata options").clickIfNotOpen()
 
       return {
         associate(wikiID: string) {
