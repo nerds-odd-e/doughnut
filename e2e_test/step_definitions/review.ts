@@ -93,7 +93,7 @@ Then("I am learning new note on day {int}", (day: number) => {
 })
 
 Then("I set the level of {string} to be {int}", (noteTopic: string, level: number) => {
-  cy.findNoteTopic(noteTopic)
+  start.assumeNotePage(noteTopic)
   cy.formField("Level").then(($control) => {
     cy.wrap($control).within(() => {
       cy.findByRole("button", { name: "" + level }).click()
@@ -152,7 +152,7 @@ Then("I choose answer {string}", (noteTopic: string) => {
 })
 
 Then("I should see the information of note {string}", (noteTopic: string) => {
-  cy.findNoteTopic(noteTopic)
+  start.assumeNotePage(noteTopic)
 })
 
 Then("I should see that my answer {string} is incorrect", (answer) => {

@@ -4,7 +4,7 @@ import noteCreationForm from "./noteForms/noteCreationForm"
 
 export const assumeNotePage = (noteTopic?: string) => {
   if (noteTopic) {
-    cy.findNoteTopic(noteTopic)
+    cy.findByText(noteTopic, { selector: "[role=topic] *" })
   }
 
   const privateToolbarButton = (btnTextOrTitle: string) => {

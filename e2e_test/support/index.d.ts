@@ -16,7 +16,6 @@ declare namespace Cypress {
     expectExactLinkTargets(targets: any): Chainable<any>
     expectFieldErrorMessage(field: string, message: string): Chainable<any>
     expectNoteCards(expectedCards: any): Chainable<any>
-    findNoteTopic(topic: string): Chainable<any>
     findCardTitle(topic: string): Chainable<any>
     findWikiAssociationButton(): Chainable<any>
     expectALinkThatOpensANewWindowWithURL(url: string): Chainable<any>

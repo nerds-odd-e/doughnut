@@ -58,7 +58,7 @@ Then("I should see an error {string} on {string}", (message: string, field: stri
 Then(
   "the Wiki association of note {string} should link to {string}",
   (topic: string, associationUrl: string) => {
-    cy.findNoteTopic(topic)
+    start.assumeNotePage(topic)
     cy.findWikiAssociationButton().expectALinkThatOpensANewWindowWithURL(associationUrl)
   },
 )

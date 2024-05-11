@@ -130,5 +130,5 @@ Then("I delete the link from {string} to {string}", (noteTopic: string, targetTi
   cy.findByRole("button", { name: "Delete" }).click()
   cy.findByRole("button", { name: "OK" }).click()
   cy.contains(targetTitle).should("not.exist")
-  cy.findNoteTopic(noteTopic) // remain on the same note page
+  start.assumeNotePage(noteTopic) // remain on the same note page
 })

@@ -1,3 +1,5 @@
+import { assumeNotePage } from "./notePage"
+
 const assumeAnsweredQuestionPage = () => {
   return {
     expectLastAnswerToBeCorrect() {
@@ -8,7 +10,7 @@ const assumeAnsweredQuestionPage = () => {
     showReviewPoint(noteTopic?: string) {
       cy.findByText("Review Point:").click()
       if (noteTopic) {
-        cy.findNoteTopic(noteTopic)
+        assumeNotePage(noteTopic)
       }
       return {
         expectReviewPointInfo(attrs: { [key: string]: string }) {

@@ -110,17 +110,16 @@ When(
 )
 
 When("I can change the topic {string} to {string}", (noteTopic: string, newNoteTopic: string) => {
-  cy.findNoteTopic(noteTopic)
+  start.assumeNotePage(noteTopic)
   cy.inPlaceEdit({ topic: newNoteTopic })
-  cy.findNoteTopic(newNoteTopic)
+  start.assumeNotePage(newNoteTopic)
 })
 
 Given(
   "I update note topic {string} to become {string}",
   (noteTopic: string, newNoteTopic: string) => {
     start.jumpToNotePage(noteTopic)
-    cy.findNoteTopic(noteTopic).click()
-    cy.replaceFocusedTextAndEnter(newNoteTopic)
+    cy.inPlaceEdit({ topic: newNoteTopic })
   },
 )
 
@@ -194,7 +193,6 @@ When("I should see that the note creation is not successful", () => {
 
 Then("I should see the note {string} is marked as deleted", (noteTopic: string) => {
   start.jumpToNotePage(noteTopic)
-  cy.findNoteTopic(noteTopic)
   cy.findByText("This note has been deleted")
 })
 
@@ -289,7 +287,7 @@ When("I undo {string} again", (undoType: string) => {
 })
 
 Then("the deleted notebook with topic {string} should be restored", (topic: string) => {
-  cy.findNoteTopic(topic)
+  start.assumeNotePage(topic)
 })
 
 Then("there should be no more undo to do", () => {
