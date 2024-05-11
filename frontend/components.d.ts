@@ -27,7 +27,7 @@ declare module 'vue' {
     ContentLoader: typeof import('./src/components/commons/ContentLoader.vue')['default']
     ContestableQuestion: typeof import('./src/components/review/ContestableQuestion.vue')['default']
     ControlCenterForNote: typeof import('./src/components/toolbars/ControlCenterForNote.vue')['default']
-    copy: typeof import('./src/components/notes/NoteContent copy.vue')['default']
+    copy: typeof import('./src/components/toolbars/WikidataButton copy.vue')['default']
     EditableText: typeof import('./src/components/form/EditableText.vue')['default']
     FailureReportList: typeof import('./src/components/admin/FailureReportList.vue')['default']
     Feather: typeof import('./src/components/svgs/link_types/Feather.vue')['default']
@@ -207,6 +207,7 @@ declare module 'vue' {
     UserProfileDialog: typeof import('./src/components/toolbars/UserProfileDialog.vue')['default']
     WikidataAssociationDialog: typeof import('./src/components/notes/WikidataAssociationDialog.vue')['default']
     WikidataButton: typeof import('./src/components/toolbars/WikidataButton.vue')['default']
+    WikidataIdEditButton: typeof import('./src/components/toolbars/WikidataIdEditButton.vue')['default']
     WikidataSearchByLabel: typeof import('./src/components/notes/WikidataSearchByLabel.vue')['default']
   }
 }

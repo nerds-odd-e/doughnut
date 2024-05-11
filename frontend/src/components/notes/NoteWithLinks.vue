@@ -4,16 +4,7 @@
       <div class="alert alert-warning" v-if="note.deletedAt">
         This note has been deleted
       </div>
-      <NoteTextContent :note="note" :storage-accessor="storageAccessor">
-        <template #topic-additional>
-          <div class="header-options">
-            <NoteWikidataAssociation
-              v-if="note.wikidataId"
-              :wikidata-id="note.wikidataId"
-            />
-          </div>
-        </template>
-      </NoteTextContent>
+      <NoteTextContent :note="note" :storage-accessor="storageAccessor" />
       <NoteAccessoryAsync
         :note-id="note.id"
         :note-accessory="note.noteAccessory"
@@ -30,7 +21,6 @@ import { defineComponent, PropType } from "vue";
 import { Note } from "@/generated/backend";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteAccessoryAsync from "./NoteAccessoryAsync.vue";
-import NoteWikidataAssociation from "./NoteWikidataAssociation.vue";
 import NoteShell from "./NoteShell.vue";
 import NoteTextContent from "./NoteTextContent.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
@@ -51,7 +41,6 @@ export default defineComponent({
     NoteFrameOfLinks,
     NoteShell,
     NoteAccessoryAsync,
-    NoteWikidataAssociation,
     NoteTextContent,
   },
 });

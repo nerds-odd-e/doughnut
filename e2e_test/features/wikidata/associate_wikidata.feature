@@ -52,5 +52,5 @@ Feature: associate wikidata ID to note
       | Dog              | Q123       | Animals       |
       | Canine           | Q456       | Animals       |
     And Wikidata.org has an entity "Q123" with label "Canine"
-    And I associate the note "Canine" with wikidata id "Q123"
+    And I change the note "Canine" to associate with wikidata id "Q123"
     Then I should see an error "Duplicate Wikidata ID Detected." on "Wikidata Id"

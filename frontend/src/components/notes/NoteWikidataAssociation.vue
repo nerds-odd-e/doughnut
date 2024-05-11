@@ -1,12 +1,13 @@
 <template>
-  <a
-    class="btn"
+  <button
+    class="btn btn-sm"
     role="button"
     title="Wiki Association"
     @click="onClickWikidata"
   >
     <SvgAssociation />
-  </a>
+    Go to Wikidata
+  </button>
 </template>
 
 <script lang="ts">

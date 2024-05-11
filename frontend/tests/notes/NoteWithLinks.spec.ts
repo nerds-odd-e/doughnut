@@ -32,27 +32,6 @@ describe("new/updated pink banner", () => {
   );
 });
 
-describe("note associated with wikidata", () => {
-  it("should display icon besides title when note is linked", async () => {
-    const noteRealm = makeMe.aNoteRealm
-      .topicConstructor("Dummy Title")
-      .wikidataId("DummyId")
-      .please();
-
-    const wrapper = helper
-      .component(NoteWithLinks)
-      .withStorageProps({
-        note: noteRealm.note,
-        links: noteRealm.links,
-      })
-      .mount();
-
-    const element = await wrapper.find('[role="button"]');
-    element.isVisible();
-    expect(element.attributes("title")).toMatch("Wiki Association");
-  });
-});
-
 describe("undo editing", () => {
   it("should call addEditingToUndoHistory on submitChange", async () => {
     const histories = createNoteStorage(

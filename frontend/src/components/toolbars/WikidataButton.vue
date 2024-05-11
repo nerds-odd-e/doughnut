@@ -1,17 +1,28 @@
 <template>
-  <div class="dropdown">
-    <PopButton title="associate wikidata">
-      <template #button_face>
+  <div v-if="note.wikidataId" class="btn-group">
+    <div class="dropdown">
+      <button
+        id="dropdownMenuButton"
+        aria-expanded="false"
+        aria-haspopup="true"
+        class="btn dropdown-toggle"
+        data-bs-toggle="dropdown"
+        role="button"
+        title="wikidata options"
+      >
         <SvgWikidata />
-      </template>
-      <template #default="{ closer }">
-        <WikidataAssociationDialog
+      </button>
+
+      <div class="dropdown-menu">
+        <NoteWikidataAssociation :wikidata-id="note.wikidataId" />
+        <WikidataIdEditButton
           v-bind="{ note, storageAccessor }"
-          @close-dialog="closer"
+          title="Edit Wikidata Id"
         />
-      </template>
-    </PopButton>
+      </div>
+    </div>
   </div>
+  <WikidataIdEditButton v-else v-bind="{ note, storageAccessor }" />
 </template>
 
 <script lang="ts">
@@ -19,8 +30,7 @@ import { defineComponent, PropType } from "vue";
 import { StorageAccessor } from "@/store/createNoteStorage";
 import { Note } from "@/generated/backend";
 import SvgWikidata from "../svgs/SvgWikidata.vue";
-import WikidataAssociationDialog from "../notes/WikidataAssociationDialog.vue";
-import PopButton from "../commons/Popups/PopButton.vue";
+import WikidataIdEditButton from "./WikidataIdEditButton.vue";
 
 export default defineComponent({
   props: {
@@ -35,8 +45,7 @@ export default defineComponent({
   },
   components: {
     SvgWikidata,
-    WikidataAssociationDialog,
-    PopButton,
+    WikidataIdEditButton,
   },
 });
 </script>

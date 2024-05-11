@@ -9,6 +9,13 @@ When("I associate the note {string} with wikidata id {string}", (topic: string, 
   start.jumpToNotePage(topic).associateNoteWithWikidataId(wikiID)
 })
 
+When(
+  "I change the note {string} to associate with wikidata id {string}",
+  (topic: string, wikiID: string) => {
+    start.jumpToNotePage(topic).wikidataOptions().reassociationWith(wikiID)
+  },
+)
+
 When("I need to confirm the association with different label {string}", (wikidataTitle: string) => {
   cy.findAllByText(wikidataTitle).should("exist")
   cy.findByRole("button", { name: "Confirm" }).click()

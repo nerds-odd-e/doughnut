@@ -1,13 +1,10 @@
 <template>
-  <div style="display: flex">
-    <NoteEditableTopic
-      :note-id="note.id"
-      :note-topic-constructor="note.topicConstructor"
-      :note-topic="note.topic"
-      :storage-accessor="storageAccessor"
-    />
-    <slot name="topic-additional" />
-  </div>
+  <NoteEditableTopic
+    :note-id="note.id"
+    :note-topic-constructor="note.topicConstructor"
+    :note-topic="note.topic"
+    :storage-accessor="storageAccessor"
+  />
   <div role="details" class="note-content">
     <NoteEditableDetails
       :note-id="note.id"

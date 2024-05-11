@@ -92,9 +92,14 @@ export const assumeNotePage = (noteTopic?: string) => {
       return assumeChatAboutNotePage()
     },
     wikidataOptions() {
+      privateToolbarButton("wikidata options").click()
       return {
+        reassociationWith(wikiID: string) {
+          privateToolbarButton("Edit Wikidata Id").click()
+          cy.replaceFocusedTextAndEnter(wikiID)
+        },
         hasAssociation() {
-          const elm = () => cy.findByRole("button", { name: "Wiki Association" })
+          const elm = () => cy.findByRole("button", { name: "Go to Wikidata" })
           elm()
 
           return {
