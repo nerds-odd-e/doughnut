@@ -1,7 +1,6 @@
 import { assumeChatAboutNotePage } from "./chatAboutNotePage"
 import submittableForm from "../submittableForm"
 import noteCreationForm from "./noteForms/noteCreationForm"
-import { cli } from "cypress"
 
 export const assumeNotePage = (noteTopic?: string) => {
   if (noteTopic) {
