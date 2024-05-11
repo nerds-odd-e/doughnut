@@ -78,10 +78,6 @@ export const assumeNotePage = (noteTopic?: string) => {
       cy.findByRole("button", { name: "OK" }).click()
       cy.pageIsNotLoading()
     },
-    associateNoteWithWikidataId(wikiID: string) {
-      this.toolbarButton("associate wikidata").click()
-      cy.replaceFocusedTextAndEnter(wikiID)
-    },
     aiSuggestDetailsForNote: () => {
       cy.on("uncaught:exception", () => {
         return false
@@ -92,14 +88,23 @@ export const assumeNotePage = (noteTopic?: string) => {
       return assumeChatAboutNotePage()
     },
     wikidataOptions() {
-      privateToolbarButton("wikidata options").click()
+      const openWikidataOptions = () => privateToolbarButton("wikidata options").click()
+
       return {
+        associate(wikiID: string) {
+          privateToolbarButton("associate wikidata").click()
+          cy.replaceFocusedTextAndEnter(wikiID)
+        },
         reassociationWith(wikiID: string) {
+          openWikidataOptions()
           privateToolbarButton("Edit Wikidata Id").click()
           cy.replaceFocusedTextAndEnter(wikiID)
         },
         hasAssociation() {
-          const elm = () => cy.findByRole("button", { name: "Go to Wikidata" })
+          openWikidataOptions()
+          const elm = () => {
+            return cy.findByRole("button", { name: "Go to Wikidata" })
+          }
           elm()
 
           return {

@@ -6,7 +6,7 @@ import { DataTable, Given, Then, When } from "@badeball/cypress-cucumber-preproc
 import start, { mock_services } from "../start"
 
 When("I associate the note {string} with wikidata id {string}", (topic: string, wikiID: string) => {
-  start.jumpToNotePage(topic).associateNoteWithWikidataId(wikiID)
+  start.jumpToNotePage(topic).wikidataOptions().associate(wikiID)
 })
 
 When(
