@@ -1,20 +1,22 @@
 <template>
-  <span
-    v-if="!noteInfo"
-    @click="toggleNoteInfo()"
-    class="info-button"
-    role="button"
-    title="note info"
-    width="100%"
-  >
-    i...
-  </span>
-  <NoteInfoC
-    v-if="noteInfo?.note"
-    :note-info="noteInfo"
-    @level-changed="$emit('levelChanged', $event)"
-    @self-evaluated="$emit('selfEvaluated', $event)"
-  />
+  <div class="note-info">
+    <span
+      v-if="!noteInfo"
+      @click="toggleNoteInfo()"
+      class="info-button"
+      role="button"
+      title="note info"
+      width="100%"
+    >
+      i...
+    </span>
+    <NoteInfoC
+      v-if="noteInfo?.note"
+      :note-info="noteInfo"
+      @level-changed="$emit('levelChanged', $event)"
+      @self-evaluated="$emit('selfEvaluated', $event)"
+    />
+  </div>
 </template>
 
 <script lang="ts">
@@ -59,6 +61,11 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.note-info {
+  display: flex;
+  width: 100%;
+  background-color: #f0f0f0;
+}
 .info-button {
   width: 100%;
   align-items: center;

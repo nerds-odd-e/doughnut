@@ -2,33 +2,37 @@
   <NoteRealmLoader v-bind="{ noteId, storageAccessor }">
     <template #default="{ noteRealm }">
       <div v-if="noteRealm" :key="noteId">
-        <Breadcrumb v-bind="{ notePosition: noteRealm.notePosition }">
-          <NoteNewButton
-            v-if="noteRealm.note.parentId && !readonly"
-            v-bind="{ parentId: noteRealm.note.parentId, storageAccessor }"
-            button-title="Add Sibling Note"
-          >
-            <SvgAddSibling />
-          </NoteNewButton>
-        </Breadcrumb>
-        <ControlCenterForNote
-          v-if="!readonly"
-          v-bind="{ note: noteRealm.note, storageAccessor }"
-        />
-        <NoteWithLinks
-          v-bind="{
-            note: noteRealm.note,
-            links: noteRealm.links,
-            storageAccessor,
-          }"
-        />
-        <NoteInfoButton
-          :note-id="noteId"
-          :expanded="expandInfo"
-          :key="noteId"
-          @level-changed="$emit('levelChanged', $event)"
-          @self-evaluated="$emit('selfEvaluated', $event)"
-        />
+        <NoteShell
+          v-bind="{ id: noteRealm.id, updatedAt: noteRealm.note.updatedAt }"
+        >
+          <Breadcrumb v-bind="{ notePosition: noteRealm.notePosition }">
+            <NoteNewButton
+              v-if="noteRealm.note.parentId && !readonly"
+              v-bind="{ parentId: noteRealm.note.parentId, storageAccessor }"
+              button-title="Add Sibling Note"
+            >
+              <SvgAddSibling />
+            </NoteNewButton>
+          </Breadcrumb>
+          <ControlCenterForNote
+            v-if="!readonly"
+            v-bind="{ note: noteRealm.note, storageAccessor }"
+          />
+          <NoteWithLinks
+            v-bind="{
+              note: noteRealm.note,
+              links: noteRealm.links,
+              storageAccessor,
+            }"
+          />
+          <NoteInfoButton
+            :note-id="noteId"
+            :expanded="expandInfo"
+            :key="noteId"
+            @level-changed="$emit('levelChanged', $event)"
+            @self-evaluated="$emit('selfEvaluated', $event)"
+          />
+        </NoteShell>
         <Cards v-if="expandChildren" :notes="noteRealm.children" />
         <slot />
         <NoteChatDialog
@@ -48,6 +52,7 @@ import Breadcrumb from "../../toolbars/Breadcrumb.vue";
 import ControlCenterForNote from "../../toolbars/ControlCenterForNote.vue";
 import { StorageAccessor } from "../../../store/createNoteStorage";
 import NoteChatDialog from "../NoteChatDialog.vue";
+import NoteShell from "../NoteShell.vue";
 
 export default defineComponent({
   props: {
@@ -67,6 +72,7 @@ export default defineComponent({
     NoteInfoButton,
     Breadcrumb,
     ControlCenterForNote,
+    NoteShell,
     NoteChatDialog,
   },
 });
