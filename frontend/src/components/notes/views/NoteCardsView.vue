@@ -40,7 +40,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import NoteWithLinks from "../NoteWithLinks.vue";
+import NoteWithLinks from "../core/NoteWithLinks.vue";
 import Cards from "../Cards.vue";
 import NoteInfoBar from "../NoteInfoBar.vue";
 import Breadcrumb from "../../toolbars/Breadcrumb.vue";

@@ -70,11 +70,11 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import LinkOfNote from "./LinkOfNote.vue";
-import LinksReader from "../../models/LinksReader";
-import { reverseLabel } from "../../models/linkTypeOptions";
-import { StorageAccessor } from "../../store/createNoteStorage";
-import LinksMap from "../../models/LinksMap";
+import LinkOfNote from "../../links/LinkOfNote.vue";
+import LinksReader from "../../../models/LinksReader";
+import { reverseLabel } from "../../../models/linkTypeOptions";
+import { StorageAccessor } from "../../../store/createNoteStorage";
+import LinksMap from "../../../models/LinksMap";
 
 export default defineComponent({
   props: {

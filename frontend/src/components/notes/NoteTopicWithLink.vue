@@ -10,7 +10,7 @@
 <script lang="ts">
 import { PropType, defineComponent } from "vue";
 import { Note } from "@/generated/backend";
-import NoteTopic from "./NoteTopic.vue";
+import NoteTopic from "./core/NoteTopic.vue";
 
 export default defineComponent({
   props: {

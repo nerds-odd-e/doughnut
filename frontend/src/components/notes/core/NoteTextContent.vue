@@ -5,7 +5,7 @@
     :note-topic="note.topic"
     :storage-accessor="storageAccessor"
   />
-  <div role="details" class="note-content">
+  <div role="details" class="note-details">
     <NoteEditableDetails
       :note-id="note.id"
       :note-details="note.details"
@@ -17,7 +17,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { Note } from "@/generated/backend";
-import { type StorageAccessor } from "../../store/createNoteStorage";
+import { type StorageAccessor } from "../../../store/createNoteStorage";
 import NoteEditableTopic from "./NoteEditableTopic.vue";
 import NoteEditableDetails from "./NoteEditableDetails.vue";
 

@@ -1,39 +1,46 @@
 <template>
   <TextContentWrapper
-    :value="noteDetails"
+    :value="noteTopicConstructor"
     :storage-accessor="storageAccessor"
-    field="edit details"
+    field="edit topic"
   >
-    <template #default="{ value, update, blur }">
-      <RichMarkdownEditor
-        :multiple-line="true"
+    <template #default="{ value, update, blur, errors }">
+      <EditableText
+        role="topic"
+        class="note-topic"
         scope-name="note"
         :model-value="value"
         @update:model-value="update(noteId, $event)"
         @blur="blur"
-      />
+        :errors="errors.topic"
+      >
+        <h2><NoteTopic v-bind="{ topic: noteTopic }" /></h2>
+      </EditableText>
     </template>
   </TextContentWrapper>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import RichMarkdownEditor from "../form/RichMarkdownEditor.vue";
-import { type StorageAccessor } from "../../store/createNoteStorage";
+import EditableText from "../../form/EditableText.vue";
+import { type StorageAccessor } from "../../../store/createNoteStorage";
 import TextContentWrapper from "./TextContentWrapper.vue";
+import NoteTopic from "./NoteTopic.vue";
 
 export default defineComponent({
   props: {
     noteId: { type: Number, required: true },
-    noteDetails: { type: String, required: false },
+    noteTopicConstructor: { type: String, required: true },
+    noteTopic: { type: String, required: true },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,
     },
   },
   components: {
-    RichMarkdownEditor,
+    EditableText,
     TextContentWrapper,
+    NoteTopic,
   },
 });
 </script>

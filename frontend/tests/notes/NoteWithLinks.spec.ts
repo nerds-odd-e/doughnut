@@ -1,5 +1,5 @@
 import { flushPromises } from "@vue/test-utils";
-import NoteWithLinks from "@/components/notes/NoteWithLinks.vue";
+import NoteWithLinks from "@/components/notes/core/NoteWithLinks.vue";
 import ManagedApi from "@/managedApi/ManagedApi";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";

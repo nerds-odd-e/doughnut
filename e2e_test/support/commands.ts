@@ -225,7 +225,7 @@ Cypress.Commands.add(
       switch (review_type) {
         case "single note": {
           if (additional_info) {
-            cy.get(".note-body").should("contain", additional_info)
+            cy.get(".note-details").should("contain", additional_info)
           }
           break
         }
@@ -233,7 +233,7 @@ Cypress.Commands.add(
         case "picture note": {
           if (additional_info) {
             const [expectedDetails, expectedPicture] = additional_info.commonSenseSplit("; ")
-            cy.get(".note-body").should("contain", expectedDetails)
+            cy.get(".note-details").should("contain", expectedDetails)
             cy.get("#note-picture")
               .find("img")
               .should("have.attr", "src")

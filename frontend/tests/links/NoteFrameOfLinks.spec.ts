@@ -1,4 +1,4 @@
-import NoteFrameOfLinks from "@/components/links/NoteFrameOfLinks.vue";
+import NoteFrameOfLinks from "@/components/notes/core/NoteFrameOfLinks.vue";
 import { Thing } from "@/generated/backend";
 import makeMe from "../fixtures/makeMe";
 import RenderingHelper from "../helpers/RenderingHelper";
