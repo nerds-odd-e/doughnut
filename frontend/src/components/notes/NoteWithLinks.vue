@@ -1,14 +1,16 @@
 <template>
-  <NoteFrameOfLinks v-if="links" v-bind="{ links, storageAccessor }">
-    <div class="alert alert-warning" v-if="note.deletedAt">
-      This note has been deleted
-    </div>
-    <NoteTextContent :note="note" :storage-accessor="storageAccessor" />
-    <NoteAccessoryAsync
-      :note-id="note.id"
-      :note-accessory="note.noteAccessory"
-    />
-  </NoteFrameOfLinks>
+  <NoteShell v-bind="{ id: note.id, updatedAt: note.updatedAt }">
+    <NoteFrameOfLinks v-if="links" v-bind="{ links, storageAccessor }">
+      <div class="alert alert-warning" v-if="note.deletedAt">
+        This note has been deleted
+      </div>
+      <NoteTextContent :note="note" :storage-accessor="storageAccessor" />
+      <NoteAccessoryAsync
+        :note-id="note.id"
+        :note-accessory="note.noteAccessory"
+      />
+    </NoteFrameOfLinks>
+  </NoteShell>
 </template>
 
 <script lang="ts">
@@ -19,6 +21,7 @@ import NoteAccessoryAsync from "./NoteAccessoryAsync.vue";
 import NoteTextContent from "./NoteTextContent.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import LinksMap from "../../models/LinksMap";
+import NoteShell from "./NoteShell.vue";
 
 export default defineComponent({
   props: {
@@ -35,6 +38,7 @@ export default defineComponent({
     NoteFrameOfLinks,
     NoteAccessoryAsync,
     NoteTextContent,
+    NoteShell,
   },
 });
 </script>

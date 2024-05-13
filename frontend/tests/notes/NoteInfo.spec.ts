@@ -1,5 +1,5 @@
 import { flushPromises } from "@vue/test-utils";
-import NoteInfoButton from "@/components/notes/NoteInfoButton.vue";
+import NoteInfoBar from "@/components/notes/NoteInfoBar.vue";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
@@ -14,7 +14,7 @@ describe("note info", () => {
       .fn()
       .mockResolvedValue(stubResponse);
     const wrapper = helper
-      .component(NoteInfoButton)
+      .component(NoteInfoBar)
       .withProps({
         noteId: 123,
         expanded: true,
