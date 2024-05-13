@@ -7,6 +7,7 @@ const submittableForm = {
       }
     }
     cy.get('input[value="Submit"]').click()
+    cy.pageIsNotLoading()
   },
 }
 

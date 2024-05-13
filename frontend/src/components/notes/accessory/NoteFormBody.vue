@@ -51,9 +51,9 @@
 <script lang="ts">
 import { PropType, defineComponent } from "vue";
 import { NoteAccessoriesDTO } from "@/generated/backend";
-import TextInput from "../form/TextInput.vue";
-import CheckInput from "../form/CheckInput.vue";
-import ImageInput from "../form/ImageInput.vue";
+import TextInput from "../../form/TextInput.vue";
+import CheckInput from "../../form/CheckInput.vue";
+import ImageInput from "../../form/ImageInput.vue";
 
 export default defineComponent({
   props: {

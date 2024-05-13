@@ -1,11 +1,8 @@
 import { Router } from "vue-router";
 import {
-  AudioUploadDTO,
   LinkCreation,
-  NoteAccessoriesDTO,
   NoteCreationDTO,
   NoteRealm,
-  SrtDto,
   WikidataAssociationCreation,
 } from "@/generated/backend";
 import ManagedApi from "@/managedApi/ManagedApi";
@@ -34,11 +31,6 @@ export interface StoredApi {
     fromTargetPerspective: boolean,
   ): Promise<NoteRealm>;
 
-  updateNoteAccessories(
-    noteId: Doughnut.ID,
-    noteAccessory: NoteAccessoriesDTO,
-  ): Promise<NoteRealm>;
-
   updateTextField(
     noteId: Doughnut.ID,
     field: "edit topic" | "edit details",
@@ -56,8 +48,6 @@ export interface StoredApi {
     router: Router,
     noteId: Doughnut.ID,
   ): Promise<NoteRealm | undefined>;
-
-  convertAudio(formData: AudioUploadDTO): Promise<SrtDto>;
 }
 export default class StoredApiCollection implements StoredApi {
   noteEditingHistory: NoteEditingHistory;
@@ -170,18 +160,6 @@ export default class StoredApiCollection implements StoredApi {
     );
   }
 
-  async updateNoteAccessories(
-    noteId: Doughnut.ID,
-    noteContentData: NoteAccessoriesDTO,
-  ) {
-    return this.storage.refreshNoteRealm(
-      await this.managedApi.restNoteController.updateNoteAccessories(
-        noteId,
-        noteContentData,
-      ),
-    );
-  }
-
   async updateTextField(
     noteId: Doughnut.ID,
     field: "edit topic" | "edit details",
@@ -237,9 +215,5 @@ export default class StoredApiCollection implements StoredApi {
     const noteRealm = this.storage.refreshNoteRealm(res[0]!);
     this.routerReplaceFocus(router, noteRealm);
     return noteRealm;
-  }
-
-  convertAudio(formData: AudioUploadDTO) {
-    return this.managedApi.restAiAudioController.convertSrt(formData);
   }
 }

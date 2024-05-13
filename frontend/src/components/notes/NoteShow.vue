@@ -49,7 +49,7 @@ import NoteInfoBar from "./NoteInfoBar.vue";
 import Breadcrumb from "../toolbars/Breadcrumb.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import NoteChatDialog from "./NoteChatDialog.vue";
-import NoteAccessoryAsync from "./NoteAccessoryAsync.vue";
+import NoteAccessoryAsync from "./accessory/NoteAccessoryAsync.vue";
 
 export default defineComponent({
   props: {

@@ -16,6 +16,7 @@ import { defineComponent } from "vue";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import { NoteAccessory } from "@/generated/backend";
 import NoteAccessoryDisplay from "./NoteAccessoryDisplay.vue";
+import NoteAccessoryToolbar from "./NoteAccessoryToolbar.vue";
 
 export default defineComponent({
   setup() {
@@ -26,6 +27,7 @@ export default defineComponent({
   },
   components: {
     NoteAccessoryDisplay,
+    NoteAccessoryToolbar,
   },
   data() {
     return {

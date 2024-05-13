@@ -68,7 +68,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { AnswerDTO, Choice } from "@/generated/backend";
-import ShowPicture from "../notes/ShowPicture.vue";
+import ShowPicture from "../notes/accessory/ShowPicture.vue";
 
 export default defineComponent({
   props: {

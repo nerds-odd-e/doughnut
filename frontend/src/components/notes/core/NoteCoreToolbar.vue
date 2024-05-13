@@ -11,18 +11,6 @@
           <SvgAddChild />
         </NoteNewButton>
 
-        <PopButton title="edit note">
-          <template #button_face>
-            <SvgEdit />
-          </template>
-          <template #default="{ closer }">
-            <NoteEditAccessoriesDialog
-              v-bind="{ note, storageAccessor }"
-              @close-dialog="closer"
-            />
-          </template>
-        </PopButton>
-
         <WikidataButton v-bind="{ note, storageAccessor }" />
         <NoteDetailsAutoCompletionButton v-bind="{ note, storageAccessor }" />
         <PopButton title="search and link note">
@@ -72,8 +60,6 @@ import { StorageAccessor } from "@/store/createNoteStorage";
 import { Note } from "@/generated/backend";
 import NoteNewButton from "./NoteNewButton.vue";
 import SvgAddChild from "../../svgs/SvgAddChild.vue";
-import SvgEdit from "../../svgs/SvgEdit.vue";
-import NoteEditAccessoriesDialog from "../NoteEditAccessoriesDialog.vue";
 import WikidataButton from "./WikidataButton.vue";
 import SvgSearchForLink from "../../svgs/SvgSearchForLink.vue";
 import LinkNoteDialog from "../../links/LinkNoteDialog.vue";
@@ -98,8 +84,6 @@ export default defineComponent({
   components: {
     NoteNewButton,
     SvgAddChild,
-    SvgEdit,
-    NoteEditAccessoriesDialog,
     WikidataButton,
     SvgSearchForLink,
     LinkNoteDialog,

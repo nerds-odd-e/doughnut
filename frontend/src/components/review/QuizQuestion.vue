@@ -62,7 +62,7 @@
 import { defineComponent, PropType } from "vue";
 import { AnswerDTO, QuizQuestion } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
-import ShowPicture from "../notes/ShowPicture.vue";
+import ShowPicture from "../notes/accessory/ShowPicture.vue";
 import TextInput from "../form/TextInput.vue";
 import usePopups from "../commons/Popups/usePopups";
 import QuizQuestionChoices from "./QuizQuestionChoices.vue";

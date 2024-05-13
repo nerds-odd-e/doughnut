@@ -1,5 +1,17 @@
 <template>
   <ToolbarFrame>
+    <PopButton title="edit note">
+      <template #button_face>
+        <SvgEdit />
+      </template>
+      <template #default="{ closer }">
+        <NoteEditAccessoriesDialog
+          v-bind="{ noteId }"
+          @close-dialog="handleCloseDialog(closer)"
+        />
+      </template>
+    </PopButton>
+
     <PopButton title="Upload audio">
       <template #button_face>
         <SvgResume />
@@ -16,9 +28,11 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import NoteEditUploadAudioDialog from "../NoteEditUploadAudioDialog.vue";
+import NoteEditUploadAudioDialog from "./NoteEditUploadAudioDialog.vue";
 import PopButton from "../../commons/Popups/PopButton.vue";
 import SvgResume from "../../svgs/SvgResume.vue";
+import SvgEdit from "../../svgs/SvgEdit.vue";
+import NoteEditAccessoriesDialog from "./NoteEditAccessoriesDialog.vue";
 
 export default defineComponent({
   props: {

@@ -13,7 +13,7 @@
 <script lang="ts">
 import { PropType, defineComponent } from "vue";
 import { AudioUploadDTO } from "@/generated/backend";
-import AudioFileInput from "../form/AudioFileInput.vue";
+import AudioFileInput from "../../form/AudioFileInput.vue";
 
 export default defineComponent({
   props: {
