@@ -40,13 +40,13 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import NoteWithLinks from "../core/NoteWithLinks.vue";
-import Cards from "../Cards.vue";
-import NoteInfoBar from "../NoteInfoBar.vue";
-import Breadcrumb from "../../toolbars/Breadcrumb.vue";
-import { StorageAccessor } from "../../../store/createNoteStorage";
-import NoteChatDialog from "../NoteChatDialog.vue";
-import NoteAccessoryAsync from "../NoteAccessoryAsync.vue";
+import NoteWithLinks from "./core/NoteWithLinks.vue";
+import Cards from "./Cards.vue";
+import NoteInfoBar from "./NoteInfoBar.vue";
+import Breadcrumb from "../toolbars/Breadcrumb.vue";
+import { StorageAccessor } from "../../store/createNoteStorage";
+import NoteChatDialog from "./NoteChatDialog.vue";
+import NoteAccessoryAsync from "./NoteAccessoryAsync.vue";
 
 export default defineComponent({
   props: {

@@ -1,5 +1,5 @@
 import { screen } from "@testing-library/vue";
-import NoteCardsView from "@/components/notes/views/NoteCardsView.vue";
+import NoteShow from "@/components/notes/NoteShow.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
@@ -11,7 +11,7 @@ describe("note wth child cards", () => {
       .fn()
       .mockResolvedValue(noteParent);
     helper
-      .component(NoteCardsView)
+      .component(NoteShow)
       .withStorageProps({
         noteId: noteParent.id,
         expandChildren: true,

@@ -7,7 +7,7 @@
   </div>
 
   <div v-else-if="noteId">
-    <NoteCardsView
+    <NoteShow
       v-if="noteId"
       v-bind="{
         noteId,
@@ -21,7 +21,7 @@
       @self-evaluated="$emit('selfEvaluated', $event)"
     >
       <slot />
-    </NoteCardsView>
+    </NoteShow>
   </div>
 </template>
 

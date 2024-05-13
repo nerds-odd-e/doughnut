@@ -7,7 +7,7 @@
 <script lang="ts">
 import { defineComponent, PropType, watch, toRefs, reactive } from "vue";
 import LoadingPage from "@/pages/commons/LoadingPage.vue";
-import { StorageAccessor } from "../../../store/createNoteStorage";
+import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   setup(props) {
@@ -19,7 +19,7 @@ export default defineComponent({
       () => noteId,
       () => {
         throw new Error(
-          "NoteCardsView: noteId changed. Please make noteId the key in the parent component.",
+          "NoteShow: noteId changed. Please make noteId the key in the parent component.",
         );
       },
     );

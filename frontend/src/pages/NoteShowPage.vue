@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <NoteCardsView
+    <NoteShow
       v-bind="{
         noteId,
         expandChildren: true,
@@ -15,7 +15,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { User } from "@/generated/backend";
-import NoteCardsView from "../components/notes/views/NoteCardsView.vue";
+import NoteShow from "../components/notes/NoteShow.vue";
 import { StorageAccessor } from "../store/createNoteStorage";
 
 export default defineComponent({
@@ -27,6 +27,6 @@ export default defineComponent({
     },
     user: { type: Object as PropType<User> },
   },
-  components: { NoteCardsView },
+  components: { NoteShow },
 });
 </script>
