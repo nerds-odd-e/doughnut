@@ -10,18 +10,24 @@
           <SvgAddSibling />
         </NoteNewButton>
       </Breadcrumb>
-      <NoteWithLinks
-        v-bind="{
-          note: noteRealm.note,
-          links: noteRealm.links,
-          readonly,
-          storageAccessor,
-        }"
-      />
-      <NoteAccessoryAsync
-        :note-id="noteRealm.id"
-        :note-accessory="noteRealm.note.noteAccessory"
-      />
+      <div class="row">
+        <div class="col-md-8">
+          <NoteWithLinks
+            v-bind="{
+              note: noteRealm.note,
+              links: noteRealm.links,
+              readonly,
+              storageAccessor,
+            }"
+          />
+        </div>
+        <div class="col-md-4">
+          <NoteAccessoryAsync
+            :note-id="noteRealm.id"
+            :note-accessory="noteRealm.note.noteAccessory"
+          />
+        </div>
+      </div>
       <NoteInfoBar
         :note-id="noteId"
         :expanded="expandInfo"
