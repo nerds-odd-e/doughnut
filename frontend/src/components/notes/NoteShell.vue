@@ -1,5 +1,5 @@
 <template>
-  <div class="note-body" :style="`border-color: ${bgColor}`">
+  <div class="note-body" :style="`background-color: ${bgColor}`">
     <slot />
   </div>
 </template>

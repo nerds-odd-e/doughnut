@@ -4,6 +4,7 @@ import ManagedApi from "@/managedApi/ManagedApi";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 import createNoteStorage from "../../src/store/createNoteStorage";
+import { read } from "fs";
 
 describe("new/updated pink banner", () => {
   beforeAll(() => {
@@ -22,11 +23,15 @@ describe("new/updated pink banner", () => {
 
       const wrapper = helper
         .component(NoteWithLinks)
-        .withStorageProps({ note: note.note, links: note.links })
+        .withStorageProps({
+          note: note.note,
+          links: note.links,
+          readonly: false,
+        })
         .mount();
 
       expect(wrapper.find(".note-body").element).toHaveStyle(
-        `border-color: ${expectedColor};`,
+        `background-color: ${expectedColor};`,
       );
     },
   );

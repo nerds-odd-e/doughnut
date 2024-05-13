@@ -18,7 +18,6 @@ export default defineComponent({});
 
 <style scoped lang="scss">
 .toolbar {
-  background-color: #cee0fa;
   padding: 0px 5px;
 }
 </style>

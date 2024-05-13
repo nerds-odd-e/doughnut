@@ -261,11 +261,11 @@ Then(
     cy.pageIsNotLoading()
     start.jumpToNotePage(left)
     cy.get(".note-body")
-      .invoke("css", "border-color")
+      .invoke("css", "background-color")
       .then((val) => (leftColor = val))
     start.jumpToNotePage(right)
     cy.get(".note-body")
-      .invoke("css", "border-color")
+      .invoke("css", "background-color")
       .then((val) => {
         const leftColorIndex = parseInt(leftColor.match(/\d+/)[0])
         const rightColorIndex = parseInt(val.match(/\d+/)[0])

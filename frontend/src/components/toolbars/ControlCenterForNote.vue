@@ -1,76 +1,78 @@
 <template>
-  <ToolbarFrame>
-    <div class="btn-group btn-group-sm">
-      <NoteNewButton
-        button-title="Add Child Note"
-        v-bind="{ parentId: note.id, storageAccessor }"
-      >
-        <SvgAddChild />
-      </NoteNewButton>
-
-      <PopButton title="edit note">
-        <template #button_face>
-          <SvgEdit />
-        </template>
-        <template #default="{ closer }">
-          <NoteEditAccessoriesDialog
-            v-bind="{ note, storageAccessor }"
-            @close-dialog="closer"
-          />
-        </template>
-      </PopButton>
-
-      <PopButton title="Upload audio">
-        <template #button_face>
-          <SvgResume />
-        </template>
-        <template #default="{ closer }">
-          <NoteEditUploadAudioDialog
-            v-bind="{ note, storageAccessor }"
-            @close-dialog="closer"
-          />
-        </template>
-      </PopButton>
-      <WikidataButton v-bind="{ note, storageAccessor }" />
-      <NoteDetailsAutoCompletionButton v-bind="{ note, storageAccessor }" />
-      <PopButton title="search and link note">
-        <template #button_face>
-          <SvgSearchForLink />
-        </template>
-        <template #default="{ closer }">
-          <LinkNoteDialog
-            v-bind="{ note, storageAccessor }"
-            @close-dialog="closer"
-          />
-        </template>
-      </PopButton>
-      <div class="dropdown">
-        <button
-          id="dropdownMenuButton"
-          aria-expanded="false"
-          aria-haspopup="true"
-          class="btn dropdown-toggle"
-          data-bs-toggle="dropdown"
-          role="button"
-          title="more options"
+  <NoteShell v-bind="{ id: note.id, updatedAt: note.updatedAt }">
+    <ToolbarFrame>
+      <div class="btn-group btn-group-sm">
+        <NoteNewButton
+          button-title="Add Child Note"
+          v-bind="{ parentId: note.id, storageAccessor }"
         >
-          <SvgCog />
-        </button>
-        <div class="dropdown-menu dropdown-menu-end">
-          <PopButton
-            btn-class="dropdown-item btn-primary"
-            title="Generate Image with DALL-E"
+          <SvgAddChild />
+        </NoteNewButton>
+
+        <PopButton title="edit note">
+          <template #button_face>
+            <SvgEdit />
+          </template>
+          <template #default="{ closer }">
+            <NoteEditAccessoriesDialog
+              v-bind="{ note, storageAccessor }"
+              @close-dialog="closer"
+            />
+          </template>
+        </PopButton>
+
+        <PopButton title="Upload audio">
+          <template #button_face>
+            <SvgResume />
+          </template>
+          <template #default="{ closer }">
+            <NoteEditUploadAudioDialog
+              v-bind="{ note, storageAccessor }"
+              @close-dialog="closer"
+            />
+          </template>
+        </PopButton>
+        <WikidataButton v-bind="{ note, storageAccessor }" />
+        <NoteDetailsAutoCompletionButton v-bind="{ note, storageAccessor }" />
+        <PopButton title="search and link note">
+          <template #button_face>
+            <SvgSearchForLink />
+          </template>
+          <template #default="{ closer }">
+            <LinkNoteDialog
+              v-bind="{ note, storageAccessor }"
+              @close-dialog="closer"
+            />
+          </template>
+        </PopButton>
+        <div class="dropdown">
+          <button
+            id="dropdownMenuButton"
+            aria-expanded="false"
+            aria-haspopup="true"
+            class="btn dropdown-toggle"
+            data-bs-toggle="dropdown"
+            role="button"
+            title="more options"
           >
-            <AIGenerateImageDialog v-bind="{ note, storageAccessor }" />
-          </PopButton>
-          <NoteDeleteButton
-            class="dropdown-item"
-            v-bind="{ noteId: note.id, storageAccessor }"
-          />
+            <SvgCog />
+          </button>
+          <div class="dropdown-menu dropdown-menu-end">
+            <PopButton
+              btn-class="dropdown-item btn-primary"
+              title="Generate Image with DALL-E"
+            >
+              <AIGenerateImageDialog v-bind="{ note, storageAccessor }" />
+            </PopButton>
+            <NoteDeleteButton
+              class="dropdown-item"
+              v-bind="{ noteId: note.id, storageAccessor }"
+            />
+          </div>
         </div>
       </div>
-    </div>
-  </ToolbarFrame>
+    </ToolbarFrame>
+  </NoteShell>
 </template>
 
 <script lang="ts">
@@ -91,6 +93,7 @@ import PopButton from "../commons/Popups/PopButton.vue";
 import AIGenerateImageDialog from "../notes/AIGenerateImageDialog.vue";
 import NoteDetailsAutoCompletionButton from "./NoteDetailsAutoCompletionButton.vue";
 import SvgResume from "../svgs/SvgResume.vue";
+import NoteShell from "../notes/NoteShell.vue";
 
 export default defineComponent({
   props: {
@@ -117,6 +120,7 @@ export default defineComponent({
     NoteDeleteButton,
     PopButton,
     AIGenerateImageDialog,
+    NoteShell,
     NoteDetailsAutoCompletionButton,
   },
 });

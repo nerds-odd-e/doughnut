@@ -58,3 +58,9 @@ export default defineComponent({
   emits: ["updateUser", "clearErrorMessage"],
 });
 </script>
+
+<style scoped lang="scss">
+.toolbar {
+  background-color: #cee0fa;
+}
+</style>

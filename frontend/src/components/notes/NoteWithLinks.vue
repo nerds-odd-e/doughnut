@@ -1,13 +1,11 @@
 <template>
-  <NoteShell v-bind="{ id: note.id, updatedAt: note.updatedAt }">
-    <ControlCenterForNote v-if="!readonly" v-bind="{ note, storageAccessor }" />
-    <NoteFrameOfLinks v-if="links" v-bind="{ links, storageAccessor }">
-      <div class="alert alert-warning" v-if="note.deletedAt">
-        This note has been deleted
-      </div>
-      <NoteTextContent :note="note" :storage-accessor="storageAccessor" />
-    </NoteFrameOfLinks>
-  </NoteShell>
+  <ControlCenterForNote v-if="!readonly" v-bind="{ note, storageAccessor }" />
+  <NoteFrameOfLinks v-if="links" v-bind="{ links, storageAccessor }">
+    <div class="alert alert-warning" v-if="note.deletedAt">
+      This note has been deleted
+    </div>
+    <NoteTextContent :note="note" :storage-accessor="storageAccessor" />
+  </NoteFrameOfLinks>
 </template>
 
 <script lang="ts">
@@ -17,7 +15,6 @@ import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteTextContent from "./NoteTextContent.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import LinksMap from "../../models/LinksMap";
-import NoteShell from "./NoteShell.vue";
 import ControlCenterForNote from "../toolbars/ControlCenterForNote.vue";
 
 export default defineComponent({
@@ -36,7 +33,6 @@ export default defineComponent({
     NoteFrameOfLinks,
     NoteTextContent,
     ControlCenterForNote,
-    NoteShell,
   },
 });
 </script>
