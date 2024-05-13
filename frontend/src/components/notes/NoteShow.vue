@@ -22,7 +22,7 @@
           />
         </div>
         <div class="col-md-4">
-          <NoteAccessoryAsync :note-id="noteRealm.id" />
+          <NoteAccessoryAsync v-bind="{ noteId: noteRealm.id, readonly }" />
         </div>
       </div>
       <NoteInfoBar

@@ -44,6 +44,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   private Notebook notebook;
 
   @OneToOne(mappedBy = "note", cascade = CascadeType.ALL)
+  @JsonIgnore
   @Getter
   private NoteAccessory noteAccessory;
 

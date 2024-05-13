@@ -2,7 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { NoteAccessory } from './NoteAccessory';
 export type Note = {
     topic: string;
     topicConstructor: string;
@@ -10,7 +9,6 @@ export type Note = {
     parentId?: number;
     updatedAt: string;
     id: number;
-    noteAccessory?: NoteAccessory;
     createdAt: string;
     readonly deletedAt?: string;
     wikidataId?: string;

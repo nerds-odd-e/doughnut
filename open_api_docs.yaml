@@ -2341,8 +2341,6 @@ components:
         id:
           type: integer
           format: int32
-        noteAccessory:
-          $ref: '#/components/schemas/NoteAccessory'
         createdAt:
           type: string
           format: date-time
@@ -2352,29 +2350,6 @@ components:
           readOnly: true
         wikidataId:
           type: string
-    NoteAccessory:
-      required:
-      - id
-      type: object
-      properties:
-        audioName:
-          type: string
-        audioId:
-          type: integer
-          format: int32
-        id:
-          type: integer
-          format: int32
-        url:
-          type: string
-        pictureUrl:
-          type: string
-        pictureMask:
-          type: string
-        useParentPicture:
-          type: boolean
-        pictureWithMask:
-          $ref: '#/components/schemas/PictureWithMask'
     Notebook:
       required:
       - id
@@ -2400,13 +2375,6 @@ components:
       properties:
         skipReviewEntirely:
           type: boolean
-    PictureWithMask:
-      type: object
-      properties:
-        notePicture:
-          type: string
-        pictureMask:
-          type: string
     Subscription:
       required:
       - id
@@ -2548,6 +2516,13 @@ components:
           $ref: '#/components/schemas/PictureWithMask'
         picture:
           type: boolean
+    PictureWithMask:
+      type: object
+      properties:
+        notePicture:
+          type: string
+        pictureMask:
+          type: string
     QuizQuestion:
       required:
       - id
@@ -2659,8 +2634,6 @@ components:
         id:
           type: integer
           format: int32
-        noteAccessory:
-          $ref: '#/components/schemas/NoteAccessory'
         createdAt:
           type: string
           format: date-time
@@ -2985,6 +2958,29 @@ components:
           format: date-time
         reviewSetting:
           $ref: '#/components/schemas/ReviewSetting'
+    NoteAccessory:
+      required:
+      - id
+      type: object
+      properties:
+        audioName:
+          type: string
+        audioId:
+          type: integer
+          format: int32
+        id:
+          type: integer
+          format: int32
+        url:
+          type: string
+        pictureUrl:
+          type: string
+        pictureMask:
+          type: string
+        useParentPicture:
+          type: boolean
+        pictureWithMask:
+          $ref: '#/components/schemas/PictureWithMask'
     NotebookViewedByUser:
       required:
       - headNote

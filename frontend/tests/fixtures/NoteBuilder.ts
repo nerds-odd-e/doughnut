@@ -15,13 +15,6 @@ class NoteBuilder extends Builder<Note> {
       wikidataId: "",
       deletedAt: "",
       createdAt: new Date().toISOString(),
-      noteAccessory: {
-        id: generateId(),
-        url: "",
-        pictureUrl: "",
-        pictureMask: "",
-        useParentPicture: false,
-      },
       updatedAt: "2021-08-24T08:46:44.000+00:00",
     };
   }
@@ -46,14 +39,6 @@ class NoteBuilder extends Builder<Note> {
 
   details(value: string): NoteBuilder {
     this.data.details = value;
-    return this;
-  }
-
-  picture(value: string): NoteBuilder {
-    this.data.noteAccessory!.pictureWithMask = {
-      notePicture: value,
-      pictureMask: "",
-    };
     return this;
   }
 

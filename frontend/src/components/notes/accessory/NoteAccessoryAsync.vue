@@ -5,6 +5,7 @@
       :note-accessory="noteAccessory"
     />
     <NoteAccessoryToolbar
+      v-if="!readonly"
       v-bind="{ noteId }"
       @note-accessory-updated="noteAccessoryUpdated"
     />
@@ -24,6 +25,7 @@ export default defineComponent({
   },
   props: {
     noteId: { type: Number, required: true },
+    readonly: { type: Boolean, required: true },
   },
   components: {
     NoteAccessoryDisplay,
