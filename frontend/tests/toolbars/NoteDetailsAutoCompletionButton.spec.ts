@@ -1,5 +1,4 @@
 import { flushPromises } from "@vue/test-utils";
-import NoteDetailsAutoCompletionButton from "@/components/toolbars/NoteDetailsAutoCompletionButton.vue";
 import AIClarifyingQuestionDialog from "@/components/notes/AIClarifyingQuestionDialog.vue";
 import {
   AiCompletionParams,
@@ -7,6 +6,7 @@ import {
   CancelablePromise,
   Note,
 } from "@/generated/backend";
+import NoteDetailsAutoCompletionButton from "@/components/notes/core/NoteDetailsAutoCompletionButton.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 

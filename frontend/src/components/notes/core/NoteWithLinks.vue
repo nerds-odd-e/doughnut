@@ -1,5 +1,5 @@
 <template>
-  <ControlCenterForNote v-if="!readonly" v-bind="{ note, storageAccessor }" />
+  <NoteCoreToolbar v-if="!readonly" v-bind="{ note, storageAccessor }" />
   <NoteFrameOfLinks v-if="links" v-bind="{ links, storageAccessor }">
     <div class="alert alert-warning" v-if="note.deletedAt">
       This note has been deleted
@@ -15,7 +15,7 @@ import NoteFrameOfLinks from "./NoteFrameOfLinks.vue";
 import NoteTextContent from "./NoteTextContent.vue";
 import { StorageAccessor } from "../../../store/createNoteStorage";
 import LinksMap from "../../../models/LinksMap";
-import ControlCenterForNote from "./ControlCenterForNote.vue";
+import NoteCoreToolbar from "./NoteCoreToolbar.vue";
 
 export default defineComponent({
   props: {
@@ -32,7 +32,7 @@ export default defineComponent({
   components: {
     NoteFrameOfLinks,
     NoteTextContent,
-    ControlCenterForNote,
+    NoteCoreToolbar,
   },
 });
 </script>
