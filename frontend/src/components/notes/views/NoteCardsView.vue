@@ -10,16 +10,17 @@
           <SvgAddSibling />
         </NoteNewButton>
       </Breadcrumb>
-      <ControlCenterForNote
-        v-if="!readonly"
-        v-bind="{ note: noteRealm.note, storageAccessor }"
-      />
       <NoteWithLinks
         v-bind="{
           note: noteRealm.note,
           links: noteRealm.links,
+          readonly,
           storageAccessor,
         }"
+      />
+      <NoteAccessoryAsync
+        :note-id="noteRealm.id"
+        :note-accessory="noteRealm.note.noteAccessory"
       />
       <NoteInfoBar
         :note-id="noteId"
@@ -43,9 +44,9 @@ import NoteWithLinks from "../NoteWithLinks.vue";
 import Cards from "../Cards.vue";
 import NoteInfoBar from "../NoteInfoBar.vue";
 import Breadcrumb from "../../toolbars/Breadcrumb.vue";
-import ControlCenterForNote from "../../toolbars/ControlCenterForNote.vue";
 import { StorageAccessor } from "../../../store/createNoteStorage";
 import NoteChatDialog from "../NoteChatDialog.vue";
+import NoteAccessoryAsync from "../NoteAccessoryAsync.vue";
 
 export default defineComponent({
   props: {
@@ -64,7 +65,7 @@ export default defineComponent({
     Cards,
     NoteInfoBar,
     Breadcrumb,
-    ControlCenterForNote,
+    NoteAccessoryAsync,
     NoteChatDialog,
   },
 });
