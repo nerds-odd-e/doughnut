@@ -31,9 +31,9 @@ import {
   Note,
 } from "@/generated/backend";
 import ClarifyingQuestionAndAnswer from "@/models/ClarifyingQuestionAndAnswer";
-import SvgRobot from "../svgs/SvgRobot.vue";
-import AIClarifyingQuestionDialog from "../notes/AIClarifyingQuestionDialog.vue";
-import Modal from "../commons/Modal.vue";
+import SvgRobot from "../../svgs/SvgRobot.vue";
+import AIClarifyingQuestionDialog from "../AIClarifyingQuestionDialog.vue";
+import Modal from "../../commons/Modal.vue";
 
 export default defineComponent({
   setup() {

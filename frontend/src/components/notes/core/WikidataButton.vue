@@ -29,7 +29,7 @@
 import { defineComponent, PropType } from "vue";
 import { StorageAccessor } from "@/store/createNoteStorage";
 import { Note } from "@/generated/backend";
-import SvgWikidata from "../svgs/SvgWikidata.vue";
+import SvgWikidata from "../../svgs/SvgWikidata.vue";
 import WikidataIdEditButton from "./WikidataIdEditButton.vue";
 
 export default defineComponent({

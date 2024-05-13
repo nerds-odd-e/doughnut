@@ -1,5 +1,7 @@
 <template>
-  <NoteShell v-bind="{ id: note.id, updatedAt: note.updatedAt }">
+  <NoteRecentUpdateIndicator
+    v-bind="{ id: note.id, updatedAt: note.updatedAt }"
+  >
     <ToolbarFrame>
       <div class="btn-group btn-group-sm">
         <NoteNewButton
@@ -72,7 +74,7 @@
         </div>
       </div>
     </ToolbarFrame>
-  </NoteShell>
+  </NoteRecentUpdateIndicator>
 </template>
 
 <script lang="ts">
@@ -80,20 +82,20 @@ import { defineComponent, PropType } from "vue";
 import { StorageAccessor } from "@/store/createNoteStorage";
 import { Note } from "@/generated/backend";
 import NoteNewButton from "./NoteNewButton.vue";
-import SvgAddChild from "../svgs/SvgAddChild.vue";
-import SvgEdit from "../svgs/SvgEdit.vue";
-import NoteEditAccessoriesDialog from "../notes/NoteEditAccessoriesDialog.vue";
-import NoteEditUploadAudioDialog from "../notes/NoteEditUploadAudioDialog.vue";
+import SvgAddChild from "../../svgs/SvgAddChild.vue";
+import SvgEdit from "../../svgs/SvgEdit.vue";
+import NoteEditAccessoriesDialog from "../NoteEditAccessoriesDialog.vue";
+import NoteEditUploadAudioDialog from "../NoteEditUploadAudioDialog.vue";
 import WikidataButton from "./WikidataButton.vue";
-import SvgSearchForLink from "../svgs/SvgSearchForLink.vue";
-import LinkNoteDialog from "../links/LinkNoteDialog.vue";
-import SvgCog from "../svgs/SvgCog.vue";
+import SvgSearchForLink from "../../svgs/SvgSearchForLink.vue";
+import LinkNoteDialog from "../../links/LinkNoteDialog.vue";
+import SvgCog from "../../svgs/SvgCog.vue";
 import NoteDeleteButton from "./NoteDeleteButton.vue";
-import PopButton from "../commons/Popups/PopButton.vue";
-import AIGenerateImageDialog from "../notes/AIGenerateImageDialog.vue";
+import PopButton from "../../commons/Popups/PopButton.vue";
+import AIGenerateImageDialog from "../AIGenerateImageDialog.vue";
 import NoteDetailsAutoCompletionButton from "./NoteDetailsAutoCompletionButton.vue";
-import SvgResume from "../svgs/SvgResume.vue";
-import NoteShell from "../notes/NoteShell.vue";
+import SvgResume from "../../svgs/SvgResume.vue";
+import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue";
 
 export default defineComponent({
   props: {
@@ -120,7 +122,7 @@ export default defineComponent({
     NoteDeleteButton,
     PopButton,
     AIGenerateImageDialog,
-    NoteShell,
+    NoteRecentUpdateIndicator,
     NoteDetailsAutoCompletionButton,
   },
 });

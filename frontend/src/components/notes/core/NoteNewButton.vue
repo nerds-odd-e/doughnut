@@ -14,9 +14,9 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import NoteNewDialog from "../notes/NoteNewDialog.vue";
-import PopButton from "../commons/Popups/PopButton.vue";
-import { StorageAccessor } from "../../store/createNoteStorage";
+import NoteNewDialog from "../NoteNewDialog.vue";
+import PopButton from "../../commons/Popups/PopButton.vue";
+import { StorageAccessor } from "../../../store/createNoteStorage";
 
 export default defineComponent({
   props: {

@@ -15,7 +15,7 @@ import NoteFrameOfLinks from "./NoteFrameOfLinks.vue";
 import NoteTextContent from "./NoteTextContent.vue";
 import { StorageAccessor } from "../../../store/createNoteStorage";
 import LinksMap from "../../../models/LinksMap";
-import ControlCenterForNote from "../../toolbars/ControlCenterForNote.vue";
+import ControlCenterForNote from "./ControlCenterForNote.vue";
 
 export default defineComponent({
   props: {
