@@ -67,6 +67,7 @@ When(
     start.assumeNotePage().editAudioButton().click()
     cy.get("#note-uploadAudioFile").attachFile(fileName)
     cy.findAllByText("Save").click()
+    cy.pageIsNotLoading()
   },
 )
 

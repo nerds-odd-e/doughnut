@@ -1,9 +1,18 @@
 <template>
-  <NoteAccessoryDisplay v-if="noteAccessory" :note-accessory="noteAccessory" />
+  <div>
+    <NoteAccessoryDisplay
+      v-if="noteAccessory"
+      :note-accessory="noteAccessory"
+    />
+    <NoteAccessoryToolbar
+      v-bind="{ noteId }"
+      @note-accessory-updated="noteAccessoryUpdated"
+    />
+  </div>
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent } from "vue";
+import { defineComponent } from "vue";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import { NoteAccessory } from "@/generated/backend";
 import NoteAccessoryDisplay from "./NoteAccessoryDisplay.vue";
@@ -14,20 +23,22 @@ export default defineComponent({
   },
   props: {
     noteId: { type: Number, required: true },
-    noteAccessory: { type: Object as PropType<NoteAccessory> },
   },
   components: {
     NoteAccessoryDisplay,
   },
   data() {
     return {
-      noteAccessory1: undefined as NoteAccessory | undefined,
+      noteAccessory: undefined as NoteAccessory | undefined,
     };
   },
   methods: {
     async fetchData() {
-      this.noteAccessory1 =
+      this.noteAccessory =
         await this.managedApi.restNoteController.showNoteAccessory(this.noteId);
+    },
+    noteAccessoryUpdated() {
+      this.fetchData();
     },
   },
   mounted() {

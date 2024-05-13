@@ -23,17 +23,6 @@
           </template>
         </PopButton>
 
-        <PopButton title="Upload audio">
-          <template #button_face>
-            <SvgResume />
-          </template>
-          <template #default="{ closer }">
-            <NoteEditUploadAudioDialog
-              v-bind="{ note, storageAccessor }"
-              @close-dialog="closer"
-            />
-          </template>
-        </PopButton>
         <WikidataButton v-bind="{ note, storageAccessor }" />
         <NoteDetailsAutoCompletionButton v-bind="{ note, storageAccessor }" />
         <PopButton title="search and link note">
@@ -85,7 +74,6 @@ import NoteNewButton from "./NoteNewButton.vue";
 import SvgAddChild from "../../svgs/SvgAddChild.vue";
 import SvgEdit from "../../svgs/SvgEdit.vue";
 import NoteEditAccessoriesDialog from "../NoteEditAccessoriesDialog.vue";
-import NoteEditUploadAudioDialog from "../NoteEditUploadAudioDialog.vue";
 import WikidataButton from "./WikidataButton.vue";
 import SvgSearchForLink from "../../svgs/SvgSearchForLink.vue";
 import LinkNoteDialog from "../../links/LinkNoteDialog.vue";
@@ -94,7 +82,6 @@ import NoteDeleteButton from "./NoteDeleteButton.vue";
 import PopButton from "../../commons/Popups/PopButton.vue";
 import AIGenerateImageDialog from "../AIGenerateImageDialog.vue";
 import NoteDetailsAutoCompletionButton from "./NoteDetailsAutoCompletionButton.vue";
-import SvgResume from "../../svgs/SvgResume.vue";
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue";
 
 export default defineComponent({
@@ -113,12 +100,10 @@ export default defineComponent({
     SvgAddChild,
     SvgEdit,
     NoteEditAccessoriesDialog,
-    NoteEditUploadAudioDialog,
     WikidataButton,
     SvgSearchForLink,
     LinkNoteDialog,
     SvgCog,
-    SvgResume,
     NoteDeleteButton,
     PopButton,
     AIGenerateImageDialog,

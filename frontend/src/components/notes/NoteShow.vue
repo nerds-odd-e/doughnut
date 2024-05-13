@@ -22,10 +22,7 @@
           />
         </div>
         <div class="col-md-4">
-          <NoteAccessoryAsync
-            :note-id="noteRealm.id"
-            :note-accessory="noteRealm.note.noteAccessory"
-          />
+          <NoteAccessoryAsync :note-id="noteRealm.id" />
         </div>
       </div>
       <NoteInfoBar

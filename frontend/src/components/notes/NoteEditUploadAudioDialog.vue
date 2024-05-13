@@ -21,10 +21,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { Note, AudioUploadDTO } from "@/generated/backend";
+import { defineComponent } from "vue";
+import { AudioUploadDTO } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
-import { StorageAccessor } from "../../store/createNoteStorage";
 import NoteUploadAudioForm from "./NoteUploadAudioForm.vue";
 
 export default defineComponent({
@@ -35,11 +34,7 @@ export default defineComponent({
     NoteUploadAudioForm,
   },
   props: {
-    note: { type: Object as PropType<Note>, required: true },
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
+    noteId: { type: Number, required: true },
   },
   emits: ["closeDialog"],
   data() {
@@ -53,9 +48,10 @@ export default defineComponent({
   methods: {
     async uploadAudio() {
       try {
-        await this.storageAccessor
-          .storedApi()
-          .uploadAudio(this.note.id, this.formData);
+        await this.managedApi.restNoteController.uploadAudio(
+          this.noteId,
+          this.formData,
+        );
         this.$emit("closeDialog");
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
@@ -64,12 +60,13 @@ export default defineComponent({
     },
     async uploadAudioAndConvertToSRT() {
       try {
-        await this.storageAccessor
-          .storedApi()
-          .uploadAudio(this.note.id, this.formData);
+        await this.managedApi.restNoteController.uploadAudio(
+          this.noteId,
+          this.formData,
+        );
         this.srt = (
           await this.managedApi.restAiAudioController.convertNoteAudioToSrt(
-            this.note.id,
+            this.noteId,
           )
         ).srt;
 
@@ -80,9 +77,9 @@ export default defineComponent({
     },
     async convertToSRT() {
       try {
-        const response = await this.storageAccessor
-          .storedApi()
-          .convertAudio(this.formData);
+        const response = await this.managedApi.restAiAudioController.convertSrt(
+          this.formData,
+        );
         this.srt = response.srt;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
