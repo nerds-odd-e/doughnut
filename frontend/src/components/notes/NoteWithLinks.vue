@@ -10,9 +10,6 @@
         :note-accessory="note.noteAccessory"
       />
     </NoteFrameOfLinks>
-    <template #footer>
-      <slot name="footer" />
-    </template>
   </NoteShell>
 </template>
 

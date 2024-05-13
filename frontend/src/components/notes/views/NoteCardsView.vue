@@ -21,17 +21,14 @@
             links: noteRealm.links,
             storageAccessor,
           }"
-        >
-          <template #footer>
-            <NoteInfoButton
-              :note-id="noteId"
-              :expanded="expandInfo"
-              :key="noteId"
-              @level-changed="$emit('levelChanged', $event)"
-              @self-evaluated="$emit('selfEvaluated', $event)"
-            />
-          </template>
-        </NoteWithLinks>
+        />
+        <NoteInfoButton
+          :note-id="noteId"
+          :expanded="expandInfo"
+          :key="noteId"
+          @level-changed="$emit('levelChanged', $event)"
+          @self-evaluated="$emit('selfEvaluated', $event)"
+        />
         <Cards v-if="expandChildren" :notes="noteRealm.children" />
         <slot />
         <NoteChatDialog
