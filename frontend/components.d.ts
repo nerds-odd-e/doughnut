@@ -80,6 +80,7 @@ declare module 'vue' {
     NoteFormTopicOnly: typeof import('./src/components/notes/NoteFormTopicOnly.vue')['default']
     NoteFrameOfLinks: typeof import('./src/components/links/NoteFrameOfLinks.vue')['default']
     NoteInfo: typeof import('./src/components/notes/NoteInfo.vue')['default']
+    NoteInfoBar: typeof import('./src/components/notes/NoteInfoBar.vue')['default']
     NoteInfoButton: typeof import('./src/components/notes/NoteInfoButton.vue')['default']
     NoteInfoReviewPoint: typeof import('./src/components/notes/NoteInfoReviewPoint.vue')['default']
     NoteNewButton: typeof import('./src/components/toolbars/NoteNewButton.vue')['default']

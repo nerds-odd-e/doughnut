@@ -25,7 +25,7 @@
               storageAccessor,
             }"
           />
-          <NoteInfoButton
+          <NoteInfoBar
             :note-id="noteId"
             :expanded="expandInfo"
             :key="noteId"
@@ -47,7 +47,7 @@
 import { defineComponent, PropType } from "vue";
 import NoteWithLinks from "../NoteWithLinks.vue";
 import Cards from "../Cards.vue";
-import NoteInfoButton from "../NoteInfoButton.vue";
+import NoteInfoBar from "../NoteInfoBar.vue";
 import Breadcrumb from "../../toolbars/Breadcrumb.vue";
 import ControlCenterForNote from "../../toolbars/ControlCenterForNote.vue";
 import { StorageAccessor } from "../../../store/createNoteStorage";
@@ -69,7 +69,7 @@ export default defineComponent({
   components: {
     NoteWithLinks,
     Cards,
-    NoteInfoButton,
+    NoteInfoBar,
     Breadcrumb,
     ControlCenterForNote,
     NoteShell,

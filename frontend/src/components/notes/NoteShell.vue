@@ -44,5 +44,4 @@ export default defineComponent({
   border-right-width: 3px;
   border-left-width: 1px;
 }
-
 </style>
