@@ -4,7 +4,6 @@ import ManagedApi from "@/managedApi/ManagedApi";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 import createNoteStorage from "../../src/store/createNoteStorage";
-import { read } from "fs";
 
 describe("new/updated pink banner", () => {
   beforeAll(() => {
