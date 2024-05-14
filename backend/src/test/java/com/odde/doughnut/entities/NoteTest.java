@@ -41,21 +41,21 @@ public class NoteTest {
   }
 
   @Nested
-  class Picture {
+  class Image {
 
     @Test
-    void useParentPicture() {
+    void useParentImage() {
       Note parent = makeMe.aNote().imageUrl("https://img.com/xxx.jpg").inMemoryPlease();
-      Note child = makeMe.aNote().under(parent).useParentPicture().inMemoryPlease();
+      Note child = makeMe.aNote().under(parent).useParentImage().inMemoryPlease();
       assertThat(
-          child.getImageWithMask().get().notePicture,
+          child.getImageWithMask().get().noteImage,
           equalTo(parent.getNoteAccessory().getImageUrl()));
     }
 
     @Test
-    void useParentPictureWhenTheUrlIsEmptyString() {
+    void UseParentImageWhenTheUrlIsEmptyString() {
       Note parent = makeMe.aNote().imageUrl("").inMemoryPlease();
-      Note child = makeMe.aNote().under(parent).useParentPicture().inMemoryPlease();
+      Note child = makeMe.aNote().under(parent).useParentImage().inMemoryPlease();
       assertTrue(child.getImageWithMask().isEmpty());
     }
   }

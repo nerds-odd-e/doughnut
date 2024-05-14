@@ -11,8 +11,8 @@ import java.lang.annotation.Target;
 
 @Target({TYPE, ANNOTATION_TYPE})
 @Retention(RUNTIME)
-@Constraint(validatedBy = ValidateNotePictureValidator.class)
-public @interface ValidateNotePicture {
+@Constraint(validatedBy = ValidateNoteImageValidator.class)
+public @interface ValidateNoteImage {
   String message() default "";
 
   Class<?>[] groups() default {};

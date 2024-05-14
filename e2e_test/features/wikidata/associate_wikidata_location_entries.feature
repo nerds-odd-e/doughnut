@@ -1,7 +1,7 @@
 Feature: Note creation/edit for a location
   As a learner
   I want to to create a note for a location
-  So that a note can be created with a details, location(longitude and latitude), map and picture
+  So that a note can be created with a details, location(longitude and latitude), map and image
 
   Background:
     Given I am logged in as an existing user
@@ -25,7 +25,7 @@ Feature: Note creation/edit for a location
     Then the note details on the current page should be "Location: 1.3'N, 103.8'E\nThe red dot"
 
   @usingMockedWikidataService
-  Scenario: A note can be created for a location with a map and identifying picture
+  Scenario: A note can be created for a location with a map and identifying image
     When I create a note belonging to "places":
       | Topic     | Wikidata Id |
       | Singapore | Q334        |

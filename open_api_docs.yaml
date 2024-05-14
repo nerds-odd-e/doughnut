@@ -2514,12 +2514,12 @@ components:
           type: string
         imageWithMask:
           $ref: '#/components/schemas/ImageWithMask'
-        picture:
+        image:
           type: boolean
     ImageWithMask:
       type: object
       properties:
-        notePicture:
+        noteImage:
           type: string
         imageMask:
           type: string
@@ -2879,9 +2879,9 @@ components:
         imageMask:
           pattern: "^(((-?[0-9.]+\\s+){3}-?[0-9.]+\\s+)*((-?[0-9.]+\\s+){3}-?[0-9.]+))?$"
           type: string
-        useParentPicture:
+        useParentImage:
           type: boolean
-        uploadPicture:
+        uploadImage:
           type: string
           format: binary
     WikidataSearchEntity:
@@ -2977,7 +2977,7 @@ components:
           type: string
         imageMask:
           type: string
-        useParentPicture:
+        useParentImage:
           type: boolean
         imageWithMask:
           $ref: '#/components/schemas/ImageWithMask'

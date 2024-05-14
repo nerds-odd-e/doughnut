@@ -104,10 +104,10 @@ Then("I should see the extracted SRT content", (srtContent: string) => {
 })
 
 When(
-  "I should see note {string} has a picture and a url {string}",
+  "I should see note {string} has a image and a url {string}",
   (noteTopic: string, expectedUrl: string) => {
     start.jumpToNotePage(noteTopic)
-    cy.get("#note-picture").should("exist")
+    cy.get("#note-image").should("exist")
     cy.findByLabelText("Url:").should("have.attr", "href", expectedUrl)
   },
 )

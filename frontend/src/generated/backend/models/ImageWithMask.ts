@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type ImageWithMask = {
-    notePicture?: string;
+    noteImage?: string;
     imageMask?: string;
 };
 

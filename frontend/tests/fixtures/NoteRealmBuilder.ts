@@ -46,8 +46,8 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
     return this;
   }
 
-  picture(value: string): NoteRealmBuilder {
-    this.noteBuilder.picture(value);
+  image(value: string): NoteRealmBuilder {
+    this.noteBuilder.image(value);
     return this;
   }
 

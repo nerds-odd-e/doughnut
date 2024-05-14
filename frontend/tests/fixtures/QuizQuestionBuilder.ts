@@ -19,7 +19,7 @@ class QuizQuestionBuilder extends Builder<QuizQuestion> {
 
   withChoices(choices: string[]) {
     this.quizQuestion.choices = choices.map((choice) => ({
-      picture: false,
+      image: false,
       display: choice,
     }));
     return this;

@@ -43,10 +43,10 @@ public class NoteAccessory extends EntityIdentifiedByIdOnly {
   @Setter
   private Image imageAttachment;
 
-  @Column(name = "use_parent_picture")
+  @Column(name = "use_parent_image")
   @Getter
   @Setter
-  private Boolean useParentPicture = false;
+  private Boolean useParentImage = false;
 
   @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinColumn(name = "audio_id", referencedColumnName = "id")
@@ -79,9 +79,9 @@ public class NoteAccessory extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public void setFromDTO(NoteAccessoriesDTO noteAccessoriesDTO, User user) throws IOException {
     BeanUtils.copyProperties(noteAccessoriesDTO, this);
-    Image uploadPicture = noteAccessoriesDTO.fetchUploadedPicture(user);
-    if (uploadPicture != null) {
-      setImageAttachment(uploadPicture);
+    Image uploadImage = noteAccessoriesDTO.fetchUploadedPicture(user);
+    if (uploadImage != null) {
+      setImageAttachment(uploadImage);
     }
   }
 
@@ -90,15 +90,13 @@ public class NoteAccessory extends EntityIdentifiedByIdOnly {
     if (url == null) return null;
 
     ImageWithMask imageWithMask = new ImageWithMask();
-    imageWithMask.notePicture = url;
+    imageWithMask.noteImage = url;
     imageWithMask.imageMask = imageMask;
     return imageWithMask;
   }
 
   private NoteAccessory getNoteAccessoryContainingPicture() {
-    if (useParentPicture
-        && note.getParent() != null
-        && note.getParent().getNoteAccessory() != null) {
+    if (useParentImage && note.getParent() != null && note.getParent().getNoteAccessory() != null) {
       return this.note.getParent().getNoteAccessory();
     }
     return this;

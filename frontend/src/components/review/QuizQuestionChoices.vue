@@ -10,7 +10,7 @@
         @click.once="submitAnswer({ choiceIndex: index })"
         :disabled="disabled"
       >
-        <div v-if="!choice.picture" v-html="choice.display" />
+        <div v-if="!choice.image" v-html="choice.display" />
         <div v-else>
           <ShowPicture v-bind="choice.imageWithMask" :opacity="1" />
         </div>

@@ -151,8 +151,8 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
-  public NoteBuilder useParentPicture() {
-    entity.getOrInitializeNoteAccessory().setUseParentPicture(true);
+  public NoteBuilder useParentImage() {
+    entity.getOrInitializeNoteAccessory().setUseParentImage(true);
     return this;
   }
 

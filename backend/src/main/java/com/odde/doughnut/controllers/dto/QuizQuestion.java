@@ -25,7 +25,7 @@ public class QuizQuestion {
 
   @Data
   public static class Choice {
-    private boolean isPicture = false;
+    private boolean isImage = false;
     private String display;
     private ImageWithMask imageWithMask;
   }

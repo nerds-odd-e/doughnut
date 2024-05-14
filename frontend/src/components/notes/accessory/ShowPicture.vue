@@ -1,7 +1,7 @@
 <template>
-  <div class="note-picture text-center" v-if="!!notePicture">
-    <div style="position: relative; display: inline-block" id="note-picture">
-      <img :src="notePicture" />
+  <div class="note-image text-center" v-if="!!noteImage">
+    <div style="position: relative; display: inline-block" id="note-image">
+      <img :src="noteImage" />
       <svg
         v-if="!!imageMask"
         viewBox="0 0 100 100"
@@ -30,7 +30,7 @@
 
 <script setup>
 const props = defineProps({
-  notePicture: String,
+  noteImage: String,
   imageMask: String,
   opacity: Number,
 });
@@ -51,7 +51,7 @@ const getMasks = () => {
 </script>
 
 <style lang="sass" scoped>
-.note-picture
+.note-image
   width: 100%
   height: 100%
   img

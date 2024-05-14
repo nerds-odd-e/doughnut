@@ -10,7 +10,7 @@ export type NoteAccessory = {
     url?: string;
     imageUrl?: string;
     imageMask?: string;
-    useParentPicture?: boolean;
+    useParentImage?: boolean;
     imageWithMask?: ImageWithMask;
 };
 

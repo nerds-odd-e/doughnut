@@ -13,7 +13,7 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class NotePictureValidatorTest {
+public class NoteImageValidatorTest {
 
   MakeMeWithoutDB makeMe = MakeMe.makeMeWithoutFactoryService();
 
@@ -52,13 +52,13 @@ public class NotePictureValidatorTest {
   }
 
   @Test
-  public void withBothUploadPictureProxyAndPicture() {
-    note.setUploadPicture(makeMe.anUploadedPicture().toMultiplePartFilePlease());
+  public void withBothUploadImageProxyAndPicture() {
+    note.setUploadImage(makeMe.anUploadedPicture().toMultiplePartFilePlease());
     note.setImageUrl("http://url/img");
     assertThat(getViolations(), is(not(empty())));
     List<String> errorFields =
         getViolations().stream().map(v -> v.getPropertyPath().toString()).collect(toList());
-    assertThat(errorFields, containsInAnyOrder("uploadPicture", "imageUrl"));
+    assertThat(errorFields, containsInAnyOrder("uploadImage", "imageUrl"));
   }
 
   private Set<ConstraintViolation<NoteAccessoriesDTO>> getViolations() {

@@ -79,9 +79,7 @@ export const assumeNotePage = (noteTopic?: string) => {
     updateNoteImage(attributes: Record<string, string>) {
       this.editNoteImage()
         .click()
-        .submitWith(
-          filterAttributes(attributes, ["Upload Picture", "Image Url", "Use Parent Picture"]),
-        )
+        .submitWith(filterAttributes(attributes, ["Upload Image", "Image Url", "Use Parent Image"]))
       return this
     },
     updateNoteUrl(attributes: Record<string, string>) {

@@ -6,6 +6,6 @@ import type { ImageWithMask } from './ImageWithMask';
 export type Choice = {
     display?: string;
     imageWithMask?: ImageWithMask;
-    picture?: boolean;
+    image?: boolean;
 };
 

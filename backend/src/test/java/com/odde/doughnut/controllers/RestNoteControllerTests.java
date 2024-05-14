@@ -378,7 +378,7 @@ class RestNoteControllerTests {
 
     @Test
     void shouldAddUploadedPicture() throws UnexpectedNoAccessRightException, IOException {
-      noteAccessoriesDTO.setUploadPicture(makeMe.anUploadedPicture().toMultiplePartFilePlease());
+      noteAccessoriesDTO.setUploadImage(makeMe.anUploadedPicture().toMultiplePartFilePlease());
       controller.updateNoteAccessories(note, noteAccessoriesDTO);
       assertThat(note.getNoteAccessory().getImageAttachment(), is(not(nullValue())));
       note.getNoteAccessory().getImageAttachment().getBlob().getData();
@@ -386,7 +386,7 @@ class RestNoteControllerTests {
 
     @Test
     void shouldSaveTheBlogData() throws UnexpectedNoAccessRightException, IOException {
-      noteAccessoriesDTO.setUploadPicture(makeMe.anUploadedPicture().toMultiplePartFilePlease());
+      noteAccessoriesDTO.setUploadImage(makeMe.anUploadedPicture().toMultiplePartFilePlease());
       controller.updateNoteAccessories(note, noteAccessoriesDTO);
       byte[] data = note.getNoteAccessory().getImageAttachment().getBlob().getData();
       assertThat(data.length, is(68));

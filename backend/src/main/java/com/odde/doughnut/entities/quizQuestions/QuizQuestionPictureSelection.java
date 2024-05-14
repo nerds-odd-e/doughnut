@@ -20,7 +20,7 @@ public class QuizQuestionPictureSelection extends QuizQuestionWithNoteChoices {
     QuizQuestion.Choice choice = new QuizQuestion.Choice();
     choice.setDisplay(note.getTopicConstructor());
     choice.setImageWithMask(note.getImageWithMask().orElse(null));
-    choice.setPicture(true);
+    choice.setImage(true);
     return choice;
   }
 

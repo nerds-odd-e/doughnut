@@ -223,11 +223,11 @@ Cypress.Commands.add(
           break
         }
 
-        case "picture note": {
+        case "image note": {
           if (additional_info) {
             const [expectedDetails, expectedPicture] = additional_info.commonSenseSplit("; ")
             cy.get(".note-details").should("contain", expectedDetails)
-            cy.get("#note-picture")
+            cy.get("#note-image")
               .find("img")
               .should("have.attr", "src")
               .should("include", expectedPicture)

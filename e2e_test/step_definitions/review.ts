@@ -118,13 +118,13 @@ Then(
 )
 
 Then(
-  "I should be asked picture question {string} with options {string}",
+  "I should be asked image question {string} with options {string}",
   (pictureInQuestion: string, options: string) => {
     cy.shouldSeeQuizWithOptions([], options)
   },
 )
 
-Then("I should be asked picture selection question {string} with {string}", (question: string) => {
+Then("I should be asked image selection question {string} with {string}", (question: string) => {
   cy.shouldSeeQuizWithOptions([question], "")
 })
 

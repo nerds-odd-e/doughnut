@@ -15,7 +15,7 @@ Feature: Review Pages
       | review_type  | topic    | additional_info             |
       | single note  | Sedition | Incite violence             |
       | single note  | Sedation | Put to sleep                |
-      | picture note | Sedative | Sleep medicine; a_slide.jpg |
+      | image note | Sedative | Sleep medicine; a_slide.jpg |
       | link         | Sedition | similar to; Sedation        |
       | initial done |          |                             |
 

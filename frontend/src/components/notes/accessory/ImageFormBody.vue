@@ -1,18 +1,18 @@
 <template>
   <ImageInput
     scope-name="note"
-    field="uploadPicture"
-    placeholder="Optional. upload own picture."
-    :errors="errors.uploadPicture"
-    :model-value="modelValue.uploadPicture"
+    field="uploadImage"
+    placeholder="Optional. upload own image."
+    :errors="errors.uploadImage"
+    :model-value="modelValue.uploadImage"
     @update:model-value="
-      $emit('update:modelValue', { ...modelValue, uploadPicture: $event })
+      $emit('update:modelValue', { ...modelValue, uploadImage: $event })
     "
   />
   <TextInput
     scope-name="note"
     field="imageUrl"
-    placeholder="Full url of existing picture."
+    placeholder="Full url of existing image."
     :errors="errors.imageUrl"
     :model-value="modelValue.imageUrl"
     @update:model-value="
@@ -21,11 +21,11 @@
   />
   <CheckInput
     scope-name="note"
-    field="useParentPicture"
-    :model-value="modelValue.useParentPicture"
-    :errors="errors.useParentPicture"
+    field="useParentImage"
+    :model-value="modelValue.useParentImage"
+    :errors="errors.useParentImage"
     @update:model-value="
-      $emit('update:modelValue', { ...modelValue, useParentPicture: $event })
+      $emit('update:modelValue', { ...modelValue, useParentImage: $event })
     "
   />
   <TextInput

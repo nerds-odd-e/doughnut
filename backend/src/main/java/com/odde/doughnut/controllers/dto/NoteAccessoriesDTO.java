@@ -3,14 +3,14 @@ package com.odde.doughnut.controllers.dto;
 import com.odde.doughnut.entities.Image;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.models.ImageBuilder;
-import com.odde.doughnut.validators.ValidateNotePicture;
+import com.odde.doughnut.validators.ValidateNoteImage;
 import jakarta.validation.constraints.Pattern;
 import java.io.IOException;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
-@ValidateNotePicture
+@ValidateNoteImage
 public class NoteAccessoriesDTO {
   @Getter @Setter private String url;
 
@@ -23,12 +23,12 @@ public class NoteAccessoriesDTO {
   @Setter
   private String imageMask;
 
-  @Getter @Setter private Boolean useParentPicture = false;
+  @Getter @Setter private Boolean useParentImage = false;
 
-  @Getter @Setter private MultipartFile uploadPicture;
+  @Getter @Setter private MultipartFile uploadImage;
 
   public Image fetchUploadedPicture(User user) throws IOException {
-    MultipartFile file = getUploadPicture();
+    MultipartFile file = getUploadImage();
     if (file != null && !file.isEmpty()) {
       return new ImageBuilder().buildImageFromUploadedPicture(user, file);
     }
