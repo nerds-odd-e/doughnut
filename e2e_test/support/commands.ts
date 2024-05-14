@@ -73,13 +73,6 @@ Cypress.Commands.add("expectBreadcrumb", (items: string) => {
   )
 })
 
-Cypress.Commands.add(
-  "openAndSubmitNoteAccessoriesFormWith",
-  (noteTopic: string, noteAccessoriesAttributes: Record<string, string>) => {
-    start.assumeNotePage(noteTopic).updateNoteAccessories(noteAccessoriesAttributes)
-  },
-)
-
 Cypress.Commands.add("clearFocusedText", () => {
   // cy.clear for now is an alias of cy.type('{selectall}{backspace}')
   // it doesn't clear the text sometimes.

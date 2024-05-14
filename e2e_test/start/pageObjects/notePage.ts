@@ -42,7 +42,7 @@ export const assumeNotePage = (noteTopic?: string) => {
       return privateToolbarButton(btnTextOrTitle)
     },
     editNoteButton() {
-      return this.toolbarButton("edit note")
+      return this.toolbarButton("edit note image")
     },
     editAudioButton() {
       return this.toolbarButton("Upload audio")
