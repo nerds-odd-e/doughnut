@@ -2,7 +2,7 @@
   <NoteRecentUpdateIndicator
     v-bind="{ id: note.id, updatedAt: note.updatedAt }"
   >
-    <ToolbarFrame>
+    <nav class="navbar justify-content-between">
       <div class="btn-group btn-group-sm">
         <NoteNewButton
           button-title="Add Child Note"
@@ -50,7 +50,7 @@
           </div>
         </div>
       </div>
-    </ToolbarFrame>
+    </nav>
   </NoteRecentUpdateIndicator>
 </template>
 

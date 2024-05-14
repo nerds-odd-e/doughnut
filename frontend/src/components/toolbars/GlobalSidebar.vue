@@ -2,12 +2,12 @@
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <BrandBar />
   </nav>
-  <ToolbarFrame class="fixed-bottom-within-sidebar">
+  <nav class="navbar justify-content-between fixed-bottom-within-sidebar">
     <UserActionsButton
       v-bind="{ user }"
       @update-user="$emit('updateUser', $event)"
     />
-  </ToolbarFrame>
+  </nav>
   <LoadingPage v-bind="{ contentExists: circles }">
     <ul class="list-group">
       <li v-if="user?.admin" class="list-group-item">
@@ -55,7 +55,6 @@ import LoadingPage from "@/pages/commons/LoadingPage.vue";
 import PopButton from "@/components/commons/Popups/PopButton.vue";
 import CircleNewDialog from "@/components/circles/CircleNewDialog.vue";
 import BrandBar from "./BrandBar.vue";
-import ToolbarFrame from "./ToolbarFrame.vue";
 import ReviewButton from "./ReviewButton.vue";
 
 export default defineComponent({
@@ -86,7 +85,6 @@ export default defineComponent({
     CircleNewDialog,
     LoadingPage,
     BrandBar,
-    ToolbarFrame,
     ReviewButton,
   },
 });

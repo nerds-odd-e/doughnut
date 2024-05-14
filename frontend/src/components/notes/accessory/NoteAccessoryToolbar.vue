@@ -1,41 +1,43 @@
 <template>
-  <ToolbarFrame>
-    <PopButton title="edit note image">
-      <template #button_face>
-        <SvgImage />
-      </template>
-      <template #default="{ closer }">
-        <NoteEditImageDialog
-          v-bind="{ noteId }"
-          @close-dialog="handleCloseDialog(closer)"
-        />
-      </template>
-    </PopButton>
+  <nav class="navbar">
+    <div class="btn-group btn-group-sm ms-auto">
+      <PopButton title="edit note image">
+        <template #button_face>
+          <SvgImage />
+        </template>
+        <template #default="{ closer }">
+          <NoteEditImageDialog
+            v-bind="{ noteId }"
+            @close-dialog="handleCloseDialog(closer)"
+          />
+        </template>
+      </PopButton>
 
-    <PopButton title="edit note url">
-      <template #button_face>
-        <SvgUrlIndicator />
-      </template>
-      <template #default="{ closer }">
-        <NoteEditUrlDialog
-          v-bind="{ noteId }"
-          @close-dialog="handleCloseDialog(closer)"
-        />
-      </template>
-    </PopButton>
+      <PopButton title="edit note url">
+        <template #button_face>
+          <SvgUrlIndicator />
+        </template>
+        <template #default="{ closer }">
+          <NoteEditUrlDialog
+            v-bind="{ noteId }"
+            @close-dialog="handleCloseDialog(closer)"
+          />
+        </template>
+      </PopButton>
 
-    <PopButton title="Upload audio">
-      <template #button_face>
-        <SvgResume />
-      </template>
-      <template #default="{ closer }">
-        <NoteEditUploadAudioDialog
-          v-bind="{ noteId }"
-          @close-dialog="handleCloseDialog(closer)"
-        />
-      </template>
-    </PopButton>
-  </ToolbarFrame>
+      <PopButton title="Upload audio">
+        <template #button_face>
+          <SvgResume />
+        </template>
+        <template #default="{ closer }">
+          <NoteEditUploadAudioDialog
+            v-bind="{ noteId }"
+            @close-dialog="handleCloseDialog(closer)"
+          />
+        </template>
+      </PopButton>
+    </div>
+  </nav>
 </template>
 
 <script lang="ts">

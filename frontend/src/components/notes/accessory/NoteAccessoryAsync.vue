@@ -1,13 +1,13 @@
 <template>
-  <div>
-    <NoteAccessoryDisplay
-      v-if="noteAccessory"
-      :note-accessory="noteAccessory"
-    />
+  <div class="note-accessory">
     <NoteAccessoryToolbar
       v-if="!readonly"
       v-bind="{ noteId }"
       @note-accessory-updated="noteAccessoryUpdated"
+    />
+    <NoteAccessoryDisplay
+      v-if="noteAccessory"
+      :note-accessory="noteAccessory"
     />
   </div>
 </template>
@@ -50,3 +50,10 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.note-accessory {
+  background-color: #f0f0f0;
+  height: 100%;
+}
+</style>

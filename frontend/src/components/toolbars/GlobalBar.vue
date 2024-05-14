@@ -1,5 +1,5 @@
 <template>
-  <ToolbarFrame>
+  <nav class="navbar justify-content-between global-bar">
     <PopButton v-if="user" title="open sidebar" :sidebar="'left'">
       <template #button_face>
         <SvgSidebar />
@@ -25,7 +25,7 @@
       :api-status="apiStatus"
       @clear-error-message="$emit('clearErrorMessage')"
     />
-  </ToolbarFrame>
+  </nav>
 </template>
 
 <script lang="ts">
@@ -36,7 +36,6 @@ import { StorageAccessor } from "@/store/createNoteStorage";
 import PopButton from "@/components/commons/Popups/PopButton.vue";
 import SvgSidebar from "@/components/svgs/SvgSidebar.vue";
 import GlobalSidebar from "./GlobalSidebar.vue";
-import ToolbarFrame from "./ToolbarFrame.vue";
 import BrandBar from "./BrandBar.vue";
 
 export default defineComponent({
@@ -52,7 +51,6 @@ export default defineComponent({
     PopButton,
     SvgSidebar,
     GlobalSidebar,
-    ToolbarFrame,
     BrandBar,
   },
   emits: ["updateUser", "clearErrorMessage"],
@@ -60,7 +58,7 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-.toolbar {
+.global-bar {
   background-color: #cee0fa;
 }
 </style>
