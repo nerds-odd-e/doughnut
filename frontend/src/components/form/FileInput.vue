@@ -10,7 +10,7 @@
       :autofocus="autofocus"
       autocomplete="off"
       autocapitalize="off"
-      accept=".mp3, .m4a, .wav"
+      :accept="accept"
     />
   </InputWithType>
 </template>
@@ -23,6 +23,7 @@ export default {
     modelValue: String,
     scopeName: String,
     field: String,
+    accept: String,
     placeholder: { type: String, default: null },
     autofocus: { type: Boolean, default: false },
     errors: Object,

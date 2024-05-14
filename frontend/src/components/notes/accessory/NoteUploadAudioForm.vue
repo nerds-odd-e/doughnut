@@ -1,7 +1,8 @@
 <template>
-  <AudioFileInput
+  <FileInput
     scope-name="note"
     field="uploadAudioFile"
+    accept=".mp3, .m4a, .wav"
     :errors="errors.uploadAudioFile"
     :model-value="modelValue.uploadAudioFile"
     @update:model-value="
@@ -13,7 +14,7 @@
 <script lang="ts">
 import { PropType, defineComponent } from "vue";
 import { AudioUploadDTO } from "@/generated/backend";
-import AudioFileInput from "../../form/AudioFileInput.vue";
+import FileInput from "../../form/FileInput.vue";
 
 export default defineComponent({
   props: {
@@ -34,6 +35,6 @@ export default defineComponent({
     };
   },
   emits: ["update:modelValue"],
-  components: { AudioFileInput },
+  components: { FileInput },
 });
 </script>

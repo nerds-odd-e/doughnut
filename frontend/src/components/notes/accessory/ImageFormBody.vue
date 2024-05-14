@@ -1,5 +1,5 @@
 <template>
-  <ImageInput
+  <FileInput
     scope-name="note"
     field="uploadImage"
     placeholder="Optional. upload own image."
@@ -44,7 +44,7 @@ import { PropType, defineComponent } from "vue";
 import { NoteAccessoriesDTO } from "@/generated/backend";
 import TextInput from "../../form/TextInput.vue";
 import CheckInput from "../../form/CheckInput.vue";
-import ImageInput from "../../form/ImageInput.vue";
+import FileInput from "../../form/FileInput.vue";
 
 export default defineComponent({
   props: {
@@ -60,6 +60,6 @@ export default defineComponent({
     },
   },
   emits: ["update:modelValue"],
-  components: { TextInput, CheckInput, ImageInput },
+  components: { TextInput, CheckInput, FileInput },
 });
 </script>
