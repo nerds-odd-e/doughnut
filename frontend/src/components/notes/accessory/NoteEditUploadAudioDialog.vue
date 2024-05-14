@@ -7,11 +7,6 @@
     />
     <input type="submit" value="Save" class="btn btn-primary" />
     <input
-      value="Save and Convert to SRT"
-      class="btn btn-primary"
-      @click="uploadAudioAndConvertToSRT"
-    />
-    <input
       value="Convert to SRT"
       class="btn btn-primary"
       @click="convertToSRT"
@@ -53,23 +48,6 @@ export default defineComponent({
           this.formData,
         );
         this.$emit("closeDialog");
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        this.noteFormErrors = error;
-      }
-    },
-    async uploadAudioAndConvertToSRT() {
-      try {
-        await this.managedApi.restNoteController.uploadAudio(
-          this.noteId,
-          this.formData,
-        );
-        this.srt = (
-          await this.managedApi.restAiAudioController.convertNoteAudioToSrt(
-            this.noteId,
-          )
-        ).srt;
-
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         this.noteFormErrors = error;

@@ -85,10 +85,6 @@ When("I convert the audio-file to SRT without saving", () => {
   cy.findAllByDisplayValue("Convert to SRT").click()
 })
 
-When("I save and convert the audio-file to SRT", () => {
-  cy.findAllByDisplayValue("Save and Convert to SRT").click()
-})
-
 Then("I should see the extracted SRT content", (srtContent: string) => {
   cy.get("textarea").should("have.value", srtContent)
 })
