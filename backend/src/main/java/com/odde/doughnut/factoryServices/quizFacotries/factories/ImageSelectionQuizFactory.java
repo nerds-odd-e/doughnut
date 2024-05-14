@@ -1,15 +1,15 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.quizQuestions.QuizQuestionPictureSelection;
+import com.odde.doughnut.entities.quizQuestions.QuizQuestionImageSelection;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
 
-public class PictureSelectionQuizFactory extends QuestionOptionsFactory {
+public class ImageSelectionQuizFactory extends QuestionOptionsFactory {
   private final Note answerNote;
 
-  public PictureSelectionQuizFactory(Note note) {
+  public ImageSelectionQuizFactory(Note note) {
     this.answerNote = note;
   }
 
@@ -31,9 +31,9 @@ public class PictureSelectionQuizFactory extends QuestionOptionsFactory {
   }
 
   @Override
-  public QuizQuestionPictureSelection buildQuizQuestionObj(QuizQuestionServant servant) {
+  public QuizQuestionImageSelection buildQuizQuestionObj(QuizQuestionServant servant) {
 
-    QuizQuestionPictureSelection quizQuestion = new QuizQuestionPictureSelection();
+    QuizQuestionImageSelection quizQuestion = new QuizQuestionImageSelection();
     quizQuestion.setNote(answerNote);
     return quizQuestion;
   }

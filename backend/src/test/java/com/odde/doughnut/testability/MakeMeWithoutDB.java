@@ -27,8 +27,8 @@ public class MakeMeWithoutDB {
     return new TimestampBuilder();
   }
 
-  public UploadedPictureBuilder anUploadedPicture() {
-    return new UploadedPictureBuilder();
+  public UploadedImageBuilder anUploadedImage() {
+    return new UploadedImageBuilder();
   }
 
   public WikidataEntityJsonBuilder wikidataEntityJson() {

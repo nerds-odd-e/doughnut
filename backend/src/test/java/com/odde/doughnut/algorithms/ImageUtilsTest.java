@@ -46,6 +46,6 @@ class ImageUtilsTest {
   }
 
   private InputStreamSource buildImage(int width, int height) throws IOException {
-    return makeMe.anUploadedPicture().metrics(width, height).toInputSteamSource();
+    return makeMe.anUploadedImage().metrics(width, height).toInputSteamSource();
   }
 }

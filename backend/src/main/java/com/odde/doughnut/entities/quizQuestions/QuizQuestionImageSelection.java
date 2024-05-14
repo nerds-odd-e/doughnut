@@ -8,7 +8,7 @@ import jakarta.persistence.Entity;
 
 @Entity
 @DiscriminatorValue("4")
-public class QuizQuestionPictureSelection extends QuizQuestionWithNoteChoices {
+public class QuizQuestionImageSelection extends QuizQuestionWithNoteChoices {
 
   @Override
   public String getMainTopic() {

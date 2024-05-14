@@ -1,7 +1,7 @@
 <template>
   <BasicBreadcrumb :ancestors="[quizQuestion.headNote]" />
   <div class="quiz-instruction">
-    <ShowPicture
+    <ShowImage
       v-if="quizQuestion.imageWithMask"
       v-bind="quizQuestion.imageWithMask"
       :opacity="1"
@@ -62,7 +62,7 @@
 import { defineComponent, PropType } from "vue";
 import { AnswerDTO, QuizQuestion } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
-import ShowPicture from "../notes/accessory/ShowPicture.vue";
+import ShowImage from "../notes/accessory/ShowImage.vue";
 import TextInput from "../form/TextInput.vue";
 import usePopups from "../commons/Popups/usePopups";
 import QuizQuestionChoices from "./QuizQuestionChoices.vue";
@@ -85,7 +85,7 @@ export default defineComponent({
     disabled: Boolean,
   },
   components: {
-    ShowPicture,
+    ShowImage,
     TextInput,
     QuizQuestionChoices,
     BasicBreadcrumb,

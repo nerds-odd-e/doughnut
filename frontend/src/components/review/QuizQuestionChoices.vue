@@ -12,7 +12,7 @@
       >
         <div v-if="!choice.image" v-html="choice.display" />
         <div v-else>
-          <ShowPicture v-bind="choice.imageWithMask" :opacity="1" />
+          <ShowImage v-bind="choice.imageWithMask" :opacity="1" />
         </div>
       </button>
     </li>
@@ -68,7 +68,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { AnswerDTO, Choice } from "@/generated/backend";
-import ShowPicture from "../notes/accessory/ShowPicture.vue";
+import ShowImage from "../notes/accessory/ShowImage.vue";
 
 export default defineComponent({
   props: {
@@ -80,7 +80,7 @@ export default defineComponent({
     disabled: Boolean,
   },
   components: {
-    ShowPicture,
+    ShowImage,
   },
   emits: ["answer"],
   data() {

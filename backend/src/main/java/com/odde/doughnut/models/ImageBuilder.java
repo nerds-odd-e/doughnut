@@ -12,7 +12,7 @@ public class ImageBuilder {
 
   public ImageBuilder() {}
 
-  public Image buildImageFromUploadedPicture(User user, MultipartFile file) throws IOException {
+  public Image buildImageFromUploadedImage(User user, MultipartFile file) throws IOException {
     Image image = new Image();
     image.setUser(user);
     image.setName(file.getOriginalFilename());

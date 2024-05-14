@@ -27,10 +27,10 @@ public class NoteAccessoriesDTO {
 
   @Getter @Setter private MultipartFile uploadImage;
 
-  public Image fetchUploadedPicture(User user) throws IOException {
+  public Image fetchUploadedImage(User user) throws IOException {
     MultipartFile file = getUploadImage();
     if (file != null && !file.isEmpty()) {
-      return new ImageBuilder().buildImageFromUploadedPicture(user, file);
+      return new ImageBuilder().buildImageFromUploadedImage(user, file);
     }
     return null;
   }

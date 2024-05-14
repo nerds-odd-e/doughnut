@@ -1,6 +1,6 @@
 <template>
   <div role="accessory">
-    <ShowPicture
+    <ShowImage
       v-if="noteAccessory.imageWithMask"
       class="text-center"
       v-bind="noteAccessory.imageWithMask"
@@ -25,14 +25,14 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { NoteAccessory } from "@/generated/backend";
-import ShowPicture from "./ShowPicture.vue";
+import ShowImage from "./ShowImage.vue";
 
 export default defineComponent({
   props: {
     noteAccessory: { type: Object as PropType<NoteAccessory>, required: true },
   },
   components: {
-    ShowPicture,
+    ShowImage,
   },
   methods: {
     async downloadAudioFile(audioId: number) {

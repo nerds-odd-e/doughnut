@@ -52,8 +52,8 @@ public class NoteImageValidatorTest {
   }
 
   @Test
-  public void withBothUploadImageProxyAndPicture() {
-    note.setUploadImage(makeMe.anUploadedPicture().toMultiplePartFilePlease());
+  public void withBothUploadImageProxyAndImage() {
+    note.setUploadImage(makeMe.anUploadedImage().toMultiplePartFilePlease());
     note.setImageUrl("http://url/img");
     assertThat(getViolations(), is(not(empty())));
     List<String> errorFields =

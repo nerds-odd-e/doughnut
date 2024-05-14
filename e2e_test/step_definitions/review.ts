@@ -119,7 +119,7 @@ Then(
 
 Then(
   "I should be asked image question {string} with options {string}",
-  (pictureInQuestion: string, options: string) => {
+  (imageInQuestion: string, options: string) => {
     cy.shouldSeeQuizWithOptions([], options)
   },
 )

@@ -6,7 +6,7 @@ import static org.hamcrest.Matchers.*;
 import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.factoryServices.quizFacotries.factories.PictureSelectionQuizFactory;
+import com.odde.doughnut.factoryServices.quizFacotries.factories.ImageSelectionQuizFactory;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class PictureSelectionQuizFactoryTest {
+class ImageSelectionQuizFactoryTest {
   @Autowired MakeMe makeMe;
   UserModel userModel;
   Note top;
@@ -45,24 +45,24 @@ class PictureSelectionQuizFactoryTest {
   }
 
   @Test
-  void shouldReturnNullIfCannotFindPicture() {
+  void shouldReturnNullIfCannotFindImage() {
     assertThat(buildQuestion(), is(nullValue()));
   }
 
   @Nested
-  class WhenThereIsPicture {
+  class WhenThereIsImage {
     @BeforeEach
     void setup() {
       makeMe.theNote(source).imageUrl("http://img/img.jpg").please();
     }
 
     @Test
-    void shouldReturnNullIfCannotFindPicture() {
+    void shouldReturnNullIfCannotFindImage() {
       assertThat(buildQuestion(), is(nullValue()));
     }
 
     @Nested
-    class WhenThereIsAnotherPictureNote {
+    class WhenThereIsAnotherImageNote {
       @BeforeEach
       void setup() {
         makeMe.theNote(brother).imageUrl("http://img/img2.jpg").please();
@@ -79,7 +79,7 @@ class PictureSelectionQuizFactoryTest {
     }
 
     @Nested
-    class WhenThereIsAnotherPictureInUncleNote {
+    class WhenThereIsAnotherImageInUncleNote {
       @BeforeEach
       void setup() {
         makeMe.theNote(uncle).imageUrl("http://img/img2.jpg").please();
@@ -103,8 +103,7 @@ class PictureSelectionQuizFactoryTest {
   }
 
   private QuizQuestion buildQuestion() {
-    return makeMe.buildAQuestion(
-        new PictureSelectionQuizFactory(reviewPoint.getNote()), reviewPoint);
+    return makeMe.buildAQuestion(new ImageSelectionQuizFactory(reviewPoint.getNote()), reviewPoint);
   }
 
   private List<String> toOptionStrings(QuizQuestion quizQuestion) {

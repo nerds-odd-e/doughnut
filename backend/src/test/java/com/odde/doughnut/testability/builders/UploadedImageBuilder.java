@@ -11,7 +11,7 @@ import org.springframework.core.io.InputStreamSource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-public class UploadedPictureBuilder {
+public class UploadedImageBuilder {
   private int width = 2;
   private int height = 2;
   private String name = "file";
@@ -36,7 +36,7 @@ public class UploadedPictureBuilder {
     };
   }
 
-  public UploadedPictureBuilder metrics(int width, int height) {
+  public UploadedImageBuilder metrics(int width, int height) {
     this.width = width;
     this.height = height;
     return this;

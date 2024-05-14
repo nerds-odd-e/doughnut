@@ -2,7 +2,7 @@
   <ToolbarFrame>
     <PopButton title="edit note image">
       <template #button_face>
-        <SvgPictureIndicator />
+        <SvgImage />
       </template>
       <template #default="{ closer }">
         <NoteEditImageDialog
@@ -43,7 +43,7 @@ import { defineComponent } from "vue";
 import NoteEditUploadAudioDialog from "./NoteEditUploadAudioDialog.vue";
 import PopButton from "../../commons/Popups/PopButton.vue";
 import SvgResume from "../../svgs/SvgResume.vue";
-import SvgPictureIndicator from "../../svgs/SvgPictureIndicator.vue";
+import SvgImage from "../../svgs/SvgImage.vue";
 import SvgUrlIndicator from "../../svgs/SvgUrlIndicator.vue";
 import NoteEditImageDialog from "./NoteEditImageDialog.vue";
 import NoteEditUrlDialog from "./NoteEditUrlDialog.vue";
@@ -61,7 +61,7 @@ export default defineComponent({
     NoteEditImageDialog,
     NoteEditUrlDialog,
     SvgResume,
-    SvgPictureIndicator,
+    SvgImage,
     SvgUrlIndicator,
     PopButton,
   },

@@ -156,7 +156,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
-  public void withUploadedPicture() {
+  public void withUploadedImage() {
     entity.getOrInitializeNoteAccessory().setImageAttachment(makeMe.anImage().please());
   }
 

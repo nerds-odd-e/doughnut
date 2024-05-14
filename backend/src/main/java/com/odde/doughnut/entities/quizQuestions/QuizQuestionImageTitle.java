@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @Entity
 @DiscriminatorValue("3")
-public class QuizQuestionPictureTitle extends QuizQuestionWithNoteChoices {
+public class QuizQuestionImageTitle extends QuizQuestionWithNoteChoices {
 
   @Override
   public Optional<ImageWithMask> getImageWithMask() {
