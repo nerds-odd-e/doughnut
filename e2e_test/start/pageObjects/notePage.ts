@@ -62,18 +62,9 @@ export const assumeNotePage = (noteTopic?: string) => {
     editAudioButton() {
       return this.toolbarButton("Upload audio")
     },
-    audioFileDownloadButton(fileName: string) {
-      const getButton = () => cy.findByRole("button", { name: `Download ${fileName}` })
-      return {
-        click: () => {
-          getButton().click()
-        },
-        shouldNotExist: () => getButton().should("not.exist"),
-      }
-    },
     downloadAudioFile(fileName: string) {
-      this.audioFileDownloadButton(fileName).click()
       const downloadsFolder = Cypress.config("downloadsFolder")
+      cy.findByRole("button", { name: `Download ${fileName}` }).click()
       cy.task("fileShouldExistSoon", downloadsFolder + "/" + fileName).should("equal", true)
     },
     updateNoteImage(attributes: Record<string, string>) {
