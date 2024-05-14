@@ -146,8 +146,8 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
-  public NoteBuilder pictureUrl(String picture) {
-    entity.getOrInitializeNoteAccessory().setPictureUrl(picture);
+  public NoteBuilder imageUrl(String url) {
+    entity.getOrInitializeNoteAccessory().setPictureUrl(url);
     return this;
   }
 

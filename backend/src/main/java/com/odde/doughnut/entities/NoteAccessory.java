@@ -26,12 +26,12 @@ public class NoteAccessory extends EntityIdentifiedByIdOnly {
 
   @Getter @Setter private String url;
 
-  @Column(name = "picture_url")
+  @Column(name = "image_url")
   @Getter
   @Setter
   private String pictureUrl;
 
-  @Column(name = "picture_mask")
+  @Column(name = "image_mask")
   @Getter
   @Setter
   private String pictureMask;

@@ -53,7 +53,7 @@ class PictureSelectionQuizFactoryTest {
   class WhenThereIsPicture {
     @BeforeEach
     void setup() {
-      makeMe.theNote(source).pictureUrl("http://img/img.jpg").please();
+      makeMe.theNote(source).imageUrl("http://img/img.jpg").please();
     }
 
     @Test
@@ -65,7 +65,7 @@ class PictureSelectionQuizFactoryTest {
     class WhenThereIsAnotherPictureNote {
       @BeforeEach
       void setup() {
-        makeMe.theNote(brother).pictureUrl("http://img/img2.jpg").please();
+        makeMe.theNote(brother).imageUrl("http://img/img2.jpg").please();
       }
 
       @Test
@@ -82,7 +82,7 @@ class PictureSelectionQuizFactoryTest {
     class WhenThereIsAnotherPictureInUncleNote {
       @BeforeEach
       void setup() {
-        makeMe.theNote(uncle).pictureUrl("http://img/img2.jpg").please();
+        makeMe.theNote(uncle).imageUrl("http://img/img2.jpg").please();
       }
 
       @Test
@@ -94,7 +94,7 @@ class PictureSelectionQuizFactoryTest {
 
       @Test
       void shouldNotIncludeUncleIfEnoughOptions() {
-        makeMe.theNote(brother).pictureUrl("http://img/img2.jpg").please();
+        makeMe.theNote(brother).imageUrl("http://img/img2.jpg").please();
         QuizQuestion quizQuestion = buildQuestion();
         List<String> options = toOptionStrings(quizQuestion);
         assertThat(uncle.getTopicConstructor(), not(in(options)));
