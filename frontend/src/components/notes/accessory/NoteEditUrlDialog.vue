@@ -1,6 +1,6 @@
 <template>
   <form v-if="noteAccessory" @submit.prevent.once="processForm">
-    <NoteFormBody
+    <UrlFormBody
       v-if="!!formData"
       v-model="formData"
       :errors="noteFormErrors"
@@ -13,14 +13,14 @@
 import { defineComponent } from "vue";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import { NoteAccessoriesDTO, NoteAccessory } from "@/generated/backend";
-import NoteFormBody from "./NoteFormBody.vue";
+import UrlFormBody from "./UrlFormBody.vue";
 
 export default defineComponent({
   setup() {
     return useLoadingApi();
   },
   components: {
-    NoteFormBody,
+    UrlFormBody,
   },
   props: {
     noteId: { type: Number, required: true },

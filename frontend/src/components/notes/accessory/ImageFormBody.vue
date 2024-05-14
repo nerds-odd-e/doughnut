@@ -37,15 +37,6 @@
       $emit('update:modelValue', { ...modelValue, pictureMask: $event })
     "
   />
-  <TextInput
-    scope-name="note"
-    field="url"
-    :model-value="modelValue.url"
-    :errors="errors.url"
-    @update:model-value="
-      $emit('update:modelValue', { ...modelValue, url: $event })
-    "
-  />
 </template>
 
 <script lang="ts">

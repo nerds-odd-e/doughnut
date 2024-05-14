@@ -2,6 +2,21 @@ import { assumeChatAboutNotePage } from "./chatAboutNotePage"
 import submittableForm from "../submittableForm"
 import noteCreationForm from "./noteForms/noteCreationForm"
 
+function filterAttributes(attributes: Record<string, string>, keysToKeep: string[]) {
+  return Object.keys(attributes)
+    .filter((key) => keysToKeep.includes(key))
+    .reduce(
+      (obj, key) => {
+        const val = attributes[key]
+        if (val) {
+          obj[key] = val
+        }
+        return obj
+      },
+      {} as Record<string, string>,
+    )
+}
+
 export const assumeNotePage = (noteTopic?: string) => {
   if (noteTopic) {
     cy.findByText(noteTopic, { selector: "[role=topic] *" })
@@ -41,7 +56,7 @@ export const assumeNotePage = (noteTopic?: string) => {
     toolbarButton: (btnTextOrTitle: string) => {
       return privateToolbarButton(btnTextOrTitle)
     },
-    editNoteButton() {
+    editNoteImage() {
       return this.toolbarButton("edit note image")
     },
     editAudioButton() {
@@ -61,9 +76,21 @@ export const assumeNotePage = (noteTopic?: string) => {
       const downloadsFolder = Cypress.config("downloadsFolder")
       cy.task("fileShouldExistSoon", downloadsFolder + "/" + fileName).should("equal", true)
     },
-    updateNoteAccessories(attributes: Record<string, string>) {
-      this.editNoteButton().click().submitWith(attributes)
+    updateNoteImage(attributes: Record<string, string>) {
+      this.editNoteImage()
+        .click()
+        .submitWith(
+          filterAttributes(attributes, ["Upload Picture", "Picture Url", "Use Parent Picture"]),
+        )
+      return this
     },
+    updateNoteUrl(attributes: Record<string, string>) {
+      this.toolbarButton("edit note url")
+        .click()
+        .submitWith(filterAttributes(attributes, ["Url"]))
+      return this
+    },
+
     startSearchingAndLinkNote() {
       this.toolbarButton("search and link note").click()
     },

@@ -1,11 +1,23 @@
 <template>
   <ToolbarFrame>
-    <PopButton title="edit note">
+    <PopButton title="edit note image">
       <template #button_face>
-        <SvgEdit />
+        <SvgPictureIndicator />
       </template>
       <template #default="{ closer }">
-        <NoteEditAccessoriesDialog
+        <NoteEditImageDialog
+          v-bind="{ noteId }"
+          @close-dialog="handleCloseDialog(closer)"
+        />
+      </template>
+    </PopButton>
+
+    <PopButton title="edit note url">
+      <template #button_face>
+        <SvgUrlIndicator />
+      </template>
+      <template #default="{ closer }">
+        <NoteEditUrlDialog
           v-bind="{ noteId }"
           @close-dialog="handleCloseDialog(closer)"
         />
@@ -31,8 +43,10 @@ import { defineComponent } from "vue";
 import NoteEditUploadAudioDialog from "./NoteEditUploadAudioDialog.vue";
 import PopButton from "../../commons/Popups/PopButton.vue";
 import SvgResume from "../../svgs/SvgResume.vue";
-import SvgEdit from "../../svgs/SvgEdit.vue";
-import NoteEditAccessoriesDialog from "./NoteEditAccessoriesDialog.vue";
+import SvgPictureIndicator from "../../svgs/SvgPictureIndicator.vue";
+import SvgUrlIndicator from "../../svgs/SvgUrlIndicator.vue";
+import NoteEditImageDialog from "./NoteEditImageDialog.vue";
+import NoteEditUrlDialog from "./NoteEditUrlDialog.vue";
 
 export default defineComponent({
   props: {
@@ -44,7 +58,11 @@ export default defineComponent({
   emits: ["note-accessory-updated"],
   components: {
     NoteEditUploadAudioDialog,
+    NoteEditImageDialog,
+    NoteEditUrlDialog,
     SvgResume,
+    SvgPictureIndicator,
+    SvgUrlIndicator,
     PopButton,
   },
   methods: {

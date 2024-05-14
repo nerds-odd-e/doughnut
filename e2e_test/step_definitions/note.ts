@@ -56,7 +56,10 @@ When("I update note {string} to become:", (noteTopic: string, data: DataTable) =
 })
 
 When("I update note accessories of {string} to become:", (noteTopic: string, data: DataTable) => {
-  start.jumpToNotePage(noteTopic).updateNoteAccessories(data.hashes()[0]!)
+  start
+    .jumpToNotePage(noteTopic)
+    .updateNoteImage(data.hashes()[0]!)
+    .updateNoteUrl(data.hashes()[0]!)
 })
 
 When(
