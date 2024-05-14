@@ -89,16 +89,6 @@ When("I save and convert the audio-file to SRT", () => {
   cy.findAllByDisplayValue("Save and Convert to SRT").click()
 })
 
-When(
-  "I provide a URL to an audio-file {string} to the note {string}",
-  (url: string, noteTopic: string) => {
-    start.jumpToNotePage(noteTopic)
-    start.assumeNotePage().editAudioButton().click()
-    cy.findAllByPlaceholderText("URL").type(url)
-    cy.findAllByText("Convert Only").click()
-  },
-)
-
 Then("I should see the extracted SRT content", (srtContent: string) => {
   cy.get("textarea").should("have.value", srtContent)
 })
