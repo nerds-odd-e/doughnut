@@ -4,7 +4,7 @@ Feature: Repetition Picture Quiz
   Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
-      | topicConstructor | skipReview | testingParent | pictureUrl                         | pictureMask           |
+      | topicConstructor | skipReview | testingParent | imageUrl                         | imageMask           |
       | Space            | true       |               |                                    |                       |
       | Earth            |            | Space         | https://picsum.photos/id/237/20/30 | 20 40 70 30 40 80 5 8 |
       | Moon             |            | Space         | https://picsum.photos/id/238/20/30 | 30 40 20 30           |

@@ -1,6 +1,6 @@
 package com.odde.doughnut.entities;
 
-public class PictureWithMask {
+public class ImageWithMask {
   public String notePicture;
-  public String pictureMask;
+  public String imageMask;
 }

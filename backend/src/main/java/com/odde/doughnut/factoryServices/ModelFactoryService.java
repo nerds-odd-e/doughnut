@@ -97,7 +97,7 @@ public class ModelFactoryService {
         quizQuestionEntity.getMainTopic(),
         quizQuestionEntity.getNote().getNotebook().getHeadNote(),
         quizQuestionEntity.getOptions(this),
-        quizQuestionEntity.getPictureWithMask());
+        quizQuestionEntity.getImageWithMask());
   }
 
   public SuggestedQuestionForFineTuningModel toSuggestedQuestionForFineTuningService(

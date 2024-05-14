@@ -11,12 +11,12 @@
   />
   <TextInput
     scope-name="note"
-    field="pictureUrl"
+    field="imageUrl"
     placeholder="Full url of existing picture."
-    :errors="errors.pictureUrl"
-    :model-value="modelValue.pictureUrl"
+    :errors="errors.imageUrl"
+    :model-value="modelValue.imageUrl"
     @update:model-value="
-      $emit('update:modelValue', { ...modelValue, pictureUrl: $event })
+      $emit('update:modelValue', { ...modelValue, imageUrl: $event })
     "
   />
   <CheckInput
@@ -30,11 +30,11 @@
   />
   <TextInput
     scope-name="note"
-    field="pictureMask"
-    :model-value="modelValue.pictureMask"
-    :errors="errors.pictureMask"
+    field="imageMask"
+    :model-value="modelValue.imageMask"
+    :errors="errors.imageMask"
     @update:model-value="
-      $emit('update:modelValue', { ...modelValue, pictureMask: $event })
+      $emit('update:modelValue', { ...modelValue, imageMask: $event })
     "
   />
 </template>

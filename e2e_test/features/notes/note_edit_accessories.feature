@@ -11,8 +11,8 @@ Feature: Note Edit Accessories
       | https://moon.com  | moon.jpg        |
     Then I should see note "lunar" has a picture and a url "https://moon.com"
 
-  Scenario: Edit a note with picture url
+  Scenario: Edit a note with Image url
     When I update note accessories of "lunar" to become:
-      | Url               | Picture Url     |
+      | Url               | Image Url     |
       | https://moon.com  | moon.jpg        |
     Then I should see note "lunar" has a picture and a url "https://moon.com"

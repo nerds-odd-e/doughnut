@@ -1,6 +1,6 @@
 package com.odde.doughnut.entities.quizQuestions;
 
-import com.odde.doughnut.entities.PictureWithMask;
+import com.odde.doughnut.entities.ImageWithMask;
 import com.odde.doughnut.entities.QuizQuestionWithNoteChoices;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
@@ -11,8 +11,8 @@ import java.util.Optional;
 public class QuizQuestionPictureTitle extends QuizQuestionWithNoteChoices {
 
   @Override
-  public Optional<PictureWithMask> getPictureWithMask() {
-    return getNote().getPictureWithMask();
+  public Optional<ImageWithMask> getImageWithMask() {
+    return getNote().getImageWithMask();
   }
 
   public String getStem() {

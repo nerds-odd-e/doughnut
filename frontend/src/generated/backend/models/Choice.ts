@@ -2,10 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { PictureWithMask } from './PictureWithMask';
+import type { ImageWithMask } from './ImageWithMask';
 export type Choice = {
     display?: string;
-    pictureWithMask?: PictureWithMask;
+    imageWithMask?: ImageWithMask;
     picture?: boolean;
 };
 

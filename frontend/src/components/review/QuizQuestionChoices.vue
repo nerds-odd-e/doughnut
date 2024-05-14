@@ -12,7 +12,7 @@
       >
         <div v-if="!choice.picture" v-html="choice.display" />
         <div v-else>
-          <ShowPicture v-bind="choice.pictureWithMask" :opacity="1" />
+          <ShowPicture v-bind="choice.imageWithMask" :opacity="1" />
         </div>
       </button>
     </li>

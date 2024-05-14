@@ -85,8 +85,8 @@ class TestabilityRestController {
     @Setter private String testingParent;
     @Setter private Boolean skipReview;
     @Setter private String url;
-    @Setter private String pictureUrl;
-    @Setter private String pictureMask;
+    @Setter private String imageUrl;
+    @Setter private String imageMask;
     @Setter private String wikidataId;
 
     private Note buildNote(User user, Timestamp currentUTCTimestamp) {
@@ -100,8 +100,8 @@ class TestabilityRestController {
         note.getReviewSetting().setSkipReview(skipReview);
       }
       content.setUrl(url);
-      content.setPictureMask(pictureMask);
-      content.setPictureUrl(pictureUrl);
+      content.setImageMask(imageMask);
+      content.setImageUrl(imageUrl);
 
       note.setWikidataId(wikidataId);
       note.setUpdatedAt(currentUTCTimestamp);

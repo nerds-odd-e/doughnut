@@ -29,12 +29,12 @@ public class NoteAccessory extends EntityIdentifiedByIdOnly {
   @Column(name = "image_url")
   @Getter
   @Setter
-  private String pictureUrl;
+  private String imageUrl;
 
   @Column(name = "image_mask")
   @Getter
   @Setter
-  private String pictureMask;
+  private String imageMask;
 
   @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinColumn(name = "image_id", referencedColumnName = "id")
@@ -85,14 +85,14 @@ public class NoteAccessory extends EntityIdentifiedByIdOnly {
     }
   }
 
-  public PictureWithMask getPictureWithMask() {
+  public ImageWithMask getImageWithMask() {
     String url = getNoteAccessoryContainingPicture().getUrlOfImage();
     if (url == null) return null;
 
-    PictureWithMask pictureWithMask = new PictureWithMask();
-    pictureWithMask.notePicture = url;
-    pictureWithMask.pictureMask = pictureMask;
-    return pictureWithMask;
+    ImageWithMask imageWithMask = new ImageWithMask();
+    imageWithMask.notePicture = url;
+    imageWithMask.imageMask = imageMask;
+    return imageWithMask;
   }
 
   private NoteAccessory getNoteAccessoryContainingPicture() {
@@ -108,8 +108,8 @@ public class NoteAccessory extends EntityIdentifiedByIdOnly {
     if (imageAttachment != null) {
       return "/attachments/images/" + imageAttachment.getId() + "/" + imageAttachment.getName();
     }
-    if (!Strings.isBlank(pictureUrl)) {
-      return pictureUrl;
+    if (!Strings.isBlank(imageUrl)) {
+      return imageUrl;
     }
     return null;
   }

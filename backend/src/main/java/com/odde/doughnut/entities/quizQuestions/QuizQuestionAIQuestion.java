@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.entities.Answer;
-import com.odde.doughnut.entities.PictureWithMask;
+import com.odde.doughnut.entities.ImageWithMask;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -21,7 +21,7 @@ import lombok.Setter;
 
 @Entity
 @DiscriminatorValue("11")
-@JsonPropertyOrder({"id", "stem", "options", "correctAnswerIndex", "mainTopic", "pictureWithMask"})
+@JsonPropertyOrder({"id", "stem", "options", "correctAnswerIndex", "mainTopic", "imageWithMask"})
 public class QuizQuestionAIQuestion extends QuizQuestionEntity {
   @Column(name = "raw_json_question")
   @Getter
@@ -61,7 +61,7 @@ public class QuizQuestionAIQuestion extends QuizQuestionEntity {
     return null;
   }
 
-  public Optional<PictureWithMask> getPictureWithMask() {
+  public Optional<ImageWithMask> getImageWithMask() {
     return Optional.empty();
   }
 

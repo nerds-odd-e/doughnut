@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers.dto;
 
+import com.odde.doughnut.entities.ImageWithMask;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.PictureWithMask;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
@@ -21,12 +21,12 @@ public class QuizQuestion {
 
   @Getter public List<Choice> choices;
 
-  @Getter public Optional<PictureWithMask> pictureWithMask;
+  @Getter public Optional<ImageWithMask> imageWithMask;
 
   @Data
   public static class Choice {
     private boolean isPicture = false;
     private String display;
-    private PictureWithMask pictureWithMask;
+    private ImageWithMask imageWithMask;
   }
 }

@@ -15,7 +15,7 @@ public class PictureSelectionQuizFactory extends QuestionOptionsFactory {
 
   @Override
   public List<Note> generateFillingOptions(QuizQuestionServant servant) {
-    return servant.chooseFromCohort(answerNote, n -> n.getPictureWithMask().isPresent());
+    return servant.chooseFromCohort(answerNote, n -> n.getImageWithMask().isPresent());
   }
 
   @Override
@@ -25,7 +25,7 @@ public class PictureSelectionQuizFactory extends QuestionOptionsFactory {
 
   @Override
   public void validateBasicPossibility() throws QuizQuestionNotPossibleException {
-    if (answerNote.getPictureWithMask().isEmpty()) {
+    if (answerNote.getImageWithMask().isEmpty()) {
       throw new QuizQuestionNotPossibleException();
     }
   }

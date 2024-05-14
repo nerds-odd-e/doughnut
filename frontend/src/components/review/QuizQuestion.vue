@@ -2,8 +2,8 @@
   <BasicBreadcrumb :ancestors="[quizQuestion.headNote]" />
   <div class="quiz-instruction">
     <ShowPicture
-      v-if="quizQuestion.pictureWithMask"
-      v-bind="quizQuestion.pictureWithMask"
+      v-if="quizQuestion.imageWithMask"
+      v-bind="quizQuestion.imageWithMask"
       :opacity="1"
     />
     <h2 v-if="!!quizQuestion.mainTopic" class="text-center">

@@ -8,8 +8,8 @@ export type SeedNote = {
     testingParent?: string;
     skipReview?: boolean;
     url?: string;
-    pictureUrl?: string;
-    pictureMask?: string;
+    imageUrl?: string;
+    imageMask?: string;
     wikidataId?: string;
 };
 

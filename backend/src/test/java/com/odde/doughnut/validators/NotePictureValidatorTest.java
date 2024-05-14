@@ -33,32 +33,32 @@ public class NotePictureValidatorTest {
 
   @Test
   public void goodMask() {
-    note.setPictureMask("1 -2.3 3 -4");
+    note.setImageMask("1 -2.3 3 -4");
     assertThat(getViolations(), is(empty()));
   }
 
   @Test
   public void goodMaskWith2Rect() {
-    note.setPictureMask("-1 2 3 4 11 22 33 44");
+    note.setImageMask("-1 2 3 4 11 22 33 44");
     assertThat(getViolations(), is(empty()));
   }
 
   @Test
   public void masksNeedToBeFourNumbers() {
-    note.setPictureMask("1 2 3 4 5 6 7");
+    note.setImageMask("1 2 3 4 5 6 7");
     assertThat(getViolations(), is(not(empty())));
     Path propertyPath = getViolations().stream().findFirst().get().getPropertyPath();
-    assertThat(propertyPath.toString(), equalTo("pictureMask"));
+    assertThat(propertyPath.toString(), equalTo("imageMask"));
   }
 
   @Test
   public void withBothUploadPictureProxyAndPicture() {
     note.setUploadPicture(makeMe.anUploadedPicture().toMultiplePartFilePlease());
-    note.setPictureUrl("http://url/img");
+    note.setImageUrl("http://url/img");
     assertThat(getViolations(), is(not(empty())));
     List<String> errorFields =
         getViolations().stream().map(v -> v.getPropertyPath().toString()).collect(toList());
-    assertThat(errorFields, containsInAnyOrder("uploadPicture", "pictureUrl"));
+    assertThat(errorFields, containsInAnyOrder("uploadPicture", "imageUrl"));
   }
 
   private Set<ConstraintViolation<NoteAccessoriesDTO>> getViolations() {

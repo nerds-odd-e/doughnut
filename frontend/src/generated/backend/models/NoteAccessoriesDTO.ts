@@ -4,8 +4,8 @@
 /* eslint-disable */
 export type NoteAccessoriesDTO = {
     url?: string;
-    pictureUrl?: string;
-    pictureMask?: string;
+    imageUrl?: string;
+    imageMask?: string;
     useParentPicture?: boolean;
     uploadPicture?: Blob;
 };

@@ -14,7 +14,7 @@ import lombok.Setter;
 @Table(name = "quiz_question")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "question_type", discriminatorType = DiscriminatorType.INTEGER)
-@JsonPropertyOrder({"id", "stem", "options", "correctAnswerIndex", "mainTopic", "pictureWithMask"})
+@JsonPropertyOrder({"id", "stem", "options", "correctAnswerIndex", "mainTopic", "imageWithMask"})
 public abstract class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
 
   @ManyToOne(cascade = CascadeType.DETACH)
@@ -38,5 +38,5 @@ public abstract class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
 
   public abstract String getMainTopic();
 
-  public abstract Optional<PictureWithMask> getPictureWithMask();
+  public abstract Optional<ImageWithMask> getImageWithMask();
 }

@@ -20,8 +20,8 @@ public class ValidateNotePictureValidator
     if (noteAccessory.getUploadPicture() != null && !noteAccessory.getUploadPicture().isEmpty()) {
       fieldsWithValue.add("uploadPicture");
     }
-    if (!Strings.isEmpty(noteAccessory.getPictureUrl())) {
-      fieldsWithValue.add("pictureUrl");
+    if (!Strings.isEmpty(noteAccessory.getImageUrl())) {
+      fieldsWithValue.add("imageUrl");
     }
     if (noteAccessory.getUseParentPicture()) {
       fieldsWithValue.add("useParentPicture");

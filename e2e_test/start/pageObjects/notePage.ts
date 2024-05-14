@@ -80,7 +80,7 @@ export const assumeNotePage = (noteTopic?: string) => {
       this.editNoteImage()
         .click()
         .submitWith(
-          filterAttributes(attributes, ["Upload Picture", "Picture Url", "Use Parent Picture"]),
+          filterAttributes(attributes, ["Upload Picture", "Image Url", "Use Parent Picture"]),
         )
       return this
     },

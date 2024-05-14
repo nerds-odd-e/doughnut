@@ -14,14 +14,14 @@ import org.springframework.web.multipart.MultipartFile;
 public class NoteAccessoriesDTO {
   @Getter @Setter private String url;
 
-  @Getter @Setter private String pictureUrl;
+  @Getter @Setter private String imageUrl;
 
   @Pattern(
       regexp = "^(((-?[0-9.]+\\s+){3}-?[0-9.]+\\s+)*((-?[0-9.]+\\s+){3}-?[0-9.]+))?$",
       message = "must be 'x y width height [x y width height...]'")
   @Getter
   @Setter
-  private String pictureMask;
+  private String imageMask;
 
   @Getter @Setter private Boolean useParentPicture = false;
 

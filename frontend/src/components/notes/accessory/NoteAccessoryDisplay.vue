@@ -1,9 +1,9 @@
 <template>
   <div role="accessory">
     <ShowPicture
-      v-if="noteAccessory.pictureWithMask"
+      v-if="noteAccessory.imageWithMask"
       class="text-center"
-      v-bind="noteAccessory.pictureWithMask"
+      v-bind="noteAccessory.imageWithMask"
       :opacity="0.2"
     />
     <div v-if="!!noteAccessory.url">

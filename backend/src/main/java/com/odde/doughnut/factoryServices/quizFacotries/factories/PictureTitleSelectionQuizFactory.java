@@ -13,7 +13,7 @@ public class PictureTitleSelectionQuizFactory extends ClozeTitleSelectionQuizFac
 
   @Override
   public void validateBasicPossibility() throws QuizQuestionNotPossibleException {
-    if (note.getPictureWithMask().isEmpty()) {
+    if (note.getImageWithMask().isEmpty()) {
       throw new QuizQuestionNotPossibleException();
     }
   }

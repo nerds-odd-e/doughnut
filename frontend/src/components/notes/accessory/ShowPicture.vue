@@ -3,7 +3,7 @@
     <div style="position: relative; display: inline-block" id="note-picture">
       <img :src="notePicture" />
       <svg
-        v-if="!!pictureMask"
+        v-if="!!imageMask"
         viewBox="0 0 100 100"
         style="
           position: absolute;
@@ -31,7 +31,7 @@
 <script setup>
 const props = defineProps({
   notePicture: String,
-  pictureMask: String,
+  imageMask: String,
   opacity: Number,
 });
 
@@ -43,7 +43,7 @@ const createGroups = (arr, perGroup) => {
 };
 
 const getMasks = () => {
-  return createGroups(props.pictureMask.split(/\s+/), 4).map((arr, index) => {
+  return createGroups(props.imageMask.split(/\s+/), 4).map((arr, index) => {
     const [x, y, width, height] = arr;
     return { index, x, y, width, height };
   });

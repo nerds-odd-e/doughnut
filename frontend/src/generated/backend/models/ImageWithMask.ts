@@ -2,8 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type PictureWithMask = {
+export type ImageWithMask = {
     notePicture?: string;
-    pictureMask?: string;
+    imageMask?: string;
 };
 
