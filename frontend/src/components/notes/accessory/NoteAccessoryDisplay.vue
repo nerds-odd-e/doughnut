@@ -14,17 +14,17 @@
     </div>
     <button
       class="btn btn-sm download-btn"
-      @click="downloadAudioFile(noteAccessory.audioId!)"
-      v-if="noteAccessory.audioName"
+      @click="downloadAudioFile(noteAccessory.audioAttachment)"
+      v-if="noteAccessory.audioAttachment"
     >
-      Download {{ noteAccessory.audioName }}
+      Download {{ noteAccessory.audioAttachment.name }}
     </button>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { NoteAccessory } from "@/generated/backend";
+import { Audio, NoteAccessory } from "@/generated/backend";
 import ShowImage from "./ShowImage.vue";
 
 export default defineComponent({
@@ -35,11 +35,11 @@ export default defineComponent({
     ShowImage,
   },
   methods: {
-    async downloadAudioFile(audioId: number) {
-      const audioUrl = `/attachments/audio/${audioId}`;
+    async downloadAudioFile(audioAttachment: Audio) {
+      const audioUrl = `/attachments/audio/${audioAttachment.id}`;
       const link = document.createElement("a");
       link.href = audioUrl;
-      link.download = this.noteAccessory.audioName!;
+      link.download = audioAttachment.name!;
       link.click();
     },
   },

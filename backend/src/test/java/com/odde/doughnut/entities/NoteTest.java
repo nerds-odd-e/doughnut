@@ -58,11 +58,4 @@ public class NoteTest {
       assertNull(child.getImageWithMask());
     }
   }
-
-  @Test
-  void audioAttachedToNote() {
-    Note note = makeMe.aNote().audio("podcast.mp3").inMemoryPlease();
-
-    assertEquals(note.getNoteAccessory().getAudioName().get(), "podcast.mp3");
-  }
 }

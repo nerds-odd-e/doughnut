@@ -2958,16 +2958,26 @@ components:
           format: date-time
         reviewSetting:
           $ref: '#/components/schemas/ReviewSetting'
+    Audio:
+      required:
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          maxLength: 255
+          minLength: 1
+          type: string
+        contentType:
+          type: string
     NoteAccessory:
       required:
       - id
       type: object
       properties:
-        audioName:
-          type: string
-        audioId:
-          type: integer
-          format: int32
         id:
           type: integer
           format: int32
@@ -2979,6 +2989,8 @@ components:
           type: string
         useParentImage:
           type: boolean
+        audioAttachment:
+          $ref: '#/components/schemas/Audio'
         imageWithMask:
           $ref: '#/components/schemas/ImageWithMask'
     NotebookViewedByUser:

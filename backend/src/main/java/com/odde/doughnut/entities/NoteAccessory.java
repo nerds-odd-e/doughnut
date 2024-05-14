@@ -1,12 +1,10 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.controllers.dto.AudioUploadDTO;
 import com.odde.doughnut.controllers.dto.NoteAccessoriesDTO;
 import jakarta.persistence.*;
 import java.io.IOException;
-import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
@@ -14,7 +12,6 @@ import org.springframework.beans.BeanUtils;
 
 @Entity
 @Table(name = "note_accessory")
-@JsonPropertyOrder({"audio", "audioName", "audioId"})
 public class NoteAccessory extends EntityIdentifiedByIdOnly {
 
   @ManyToOne(cascade = CascadeType.ALL)
@@ -50,24 +47,9 @@ public class NoteAccessory extends EntityIdentifiedByIdOnly {
 
   @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinColumn(name = "audio_id", referencedColumnName = "id")
-  @JsonIgnore
   @Getter
   @Setter
   private Audio audioAttachment;
-
-  public Optional<Integer> getAudioId() {
-    if (audioAttachment != null) {
-      return Optional.of(audioAttachment.getId());
-    }
-    return null;
-  }
-
-  public Optional<String> getAudioName() {
-    if (audioAttachment != null) {
-      return Optional.of(audioAttachment.getName());
-    }
-    return null;
-  }
 
   @JsonIgnore
   public void setAudio(AudioUploadDTO audioUploadDTO, User user) throws IOException {

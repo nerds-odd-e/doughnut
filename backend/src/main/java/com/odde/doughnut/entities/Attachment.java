@@ -36,6 +36,7 @@ public abstract class Attachment extends EntityIdentifiedByIdOnly {
   @Setter
   private User user;
 
+  @JsonIgnore
   public ResponseEntity<byte[]> getResponseEntity(String disposition) {
     return ResponseEntity.ok()
         .header(HttpHeaders.CONTENT_DISPOSITION, disposition + "; filename=\"" + getName() + "\"")
