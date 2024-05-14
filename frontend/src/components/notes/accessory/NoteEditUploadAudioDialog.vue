@@ -12,7 +12,7 @@
       @click="convertToSRT"
     />
   </form>
-  <textarea :value="srt"></textarea>
+  <TextArea :field="`convertedSrt`" v-model="convertedSrt" :rows="8" />
 </template>
 
 <script lang="ts">
@@ -20,6 +20,7 @@ import { defineComponent } from "vue";
 import { AudioUploadDTO } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import NoteUploadAudioForm from "./NoteUploadAudioForm.vue";
+import TextArea from "../../form/TextArea.vue";
 
 export default defineComponent({
   setup() {
@@ -27,6 +28,7 @@ export default defineComponent({
   },
   components: {
     NoteUploadAudioForm,
+    TextArea,
   },
   props: {
     noteId: { type: Number, required: true },
@@ -36,7 +38,7 @@ export default defineComponent({
     return {
       formData: {} as AudioUploadDTO,
       noteFormErrors: {},
-      srt: "",
+      convertedSrt: "",
     };
   },
 
@@ -58,7 +60,7 @@ export default defineComponent({
         const response = await this.managedApi.restAiAudioController.convertSrt(
           this.formData,
         );
-        this.srt = response.srt;
+        this.convertedSrt = response.srt;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         this.noteFormErrors = error;
