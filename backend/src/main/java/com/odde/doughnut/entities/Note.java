@@ -267,10 +267,10 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public Optional<ImageWithMask> getImageWithMask() {
-    if (this.noteAccessory == null) return Optional.empty();
+  public ImageWithMask getImageWithMask() {
+    if (this.noteAccessory == null) return null;
 
-    return Optional.ofNullable(noteAccessory.getImageWithMask());
+    return noteAccessory.getImageWithMask();
   }
 
   public void prependDescription(String addition) {

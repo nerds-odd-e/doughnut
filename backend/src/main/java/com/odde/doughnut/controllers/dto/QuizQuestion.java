@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.ImageWithMask;
 import com.odde.doughnut.entities.Note;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -21,7 +20,7 @@ public class QuizQuestion {
 
   @Getter public List<Choice> choices;
 
-  @Getter public Optional<ImageWithMask> imageWithMask;
+  @Getter public ImageWithMask imageWithMask;
 
   @Data
   public static class Choice {

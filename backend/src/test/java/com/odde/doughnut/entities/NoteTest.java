@@ -48,15 +48,14 @@ public class NoteTest {
       Note parent = makeMe.aNote().imageUrl("https://img.com/xxx.jpg").inMemoryPlease();
       Note child = makeMe.aNote().under(parent).useParentImage().inMemoryPlease();
       assertThat(
-          child.getImageWithMask().get().noteImage,
-          equalTo(parent.getNoteAccessory().getImageUrl()));
+          child.getImageWithMask().noteImage, equalTo(parent.getNoteAccessory().getImageUrl()));
     }
 
     @Test
     void UseParentImageWhenTheUrlIsEmptyString() {
       Note parent = makeMe.aNote().imageUrl("").inMemoryPlease();
       Note child = makeMe.aNote().under(parent).useParentImage().inMemoryPlease();
-      assertTrue(child.getImageWithMask().isEmpty());
+      assertNull(child.getImageWithMask());
     }
   }
 

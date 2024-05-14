@@ -6,7 +6,6 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -38,5 +37,5 @@ public abstract class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
 
   public abstract String getMainTopic();
 
-  public abstract Optional<ImageWithMask> getImageWithMask();
+  public abstract ImageWithMask getImageWithMask();
 }

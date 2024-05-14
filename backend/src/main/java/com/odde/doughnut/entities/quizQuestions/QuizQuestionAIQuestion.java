@@ -15,7 +15,6 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -61,8 +60,8 @@ public class QuizQuestionAIQuestion extends QuizQuestionEntity {
     return null;
   }
 
-  public Optional<ImageWithMask> getImageWithMask() {
-    return Optional.empty();
+  public ImageWithMask getImageWithMask() {
+    return null;
   }
 
   @Override

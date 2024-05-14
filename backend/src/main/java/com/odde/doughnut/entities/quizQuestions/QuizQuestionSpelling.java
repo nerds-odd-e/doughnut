@@ -8,7 +8,6 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import java.util.List;
-import java.util.Optional;
 
 @Entity
 @DiscriminatorValue("2")
@@ -31,8 +30,8 @@ public class QuizQuestionSpelling extends QuizQuestionEntity {
     return "";
   }
 
-  public Optional<ImageWithMask> getImageWithMask() {
-    return Optional.empty();
+  public ImageWithMask getImageWithMask() {
+    return null;
   }
 
   @Override

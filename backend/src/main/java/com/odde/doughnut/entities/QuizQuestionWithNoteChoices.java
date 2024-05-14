@@ -64,8 +64,8 @@ public abstract class QuizQuestionWithNoteChoices extends QuizQuestionEntity {
     return choice;
   }
 
-  public Optional<ImageWithMask> getImageWithMask() {
-    return Optional.empty();
+  public ImageWithMask getImageWithMask() {
+    return null;
   }
 
   public boolean checkAnswer(Answer answer) {
