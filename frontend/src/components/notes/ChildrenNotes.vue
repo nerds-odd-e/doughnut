@@ -35,7 +35,12 @@
               expandChildren: false,
             }"
           />
-          <h5 v-else class="card-title w-100" @click="highlight(note.id)">
+          <h5
+            v-else
+            class="card-title w-100"
+            @click="highlight(note.id)"
+            @dblclick="navigateTo(note.id)"
+          >
             <NoteTopic v-bind="{ topic: note.topic }" />
           </h5>
         </div>
@@ -82,6 +87,9 @@ export default defineComponent({
     },
     highlight(noteId: number) {
       this.openedNotes.push(noteId);
+    },
+    navigateTo(noteId: number) {
+      this.$router.push({ name: "noteShow", params: { noteId } });
     },
   },
 });
