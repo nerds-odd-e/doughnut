@@ -10,13 +10,12 @@ Feature: Note tree view
       | ATDD             | LeSS in Action |
       | TPP              | TDD            |
 
-  @ignore
   Scenario: the note should be rendered with parent reference
     Given I navigate to to "My Notes/LeSS in Action" note
     When I collapse the children of note "LeSS in Action"
     Then I should see the note "LeSS in Action" with 2 children collapse
-    When I expend the children of note "LeSS in Action"
+    When I expand the children of note "LeSS in Action"
     Then I should see the children notes:
-      | topic |
+      | note-topic |
       | TDD   |
       | ATDD  |
