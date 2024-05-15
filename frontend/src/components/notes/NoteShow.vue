@@ -21,20 +21,20 @@
             }"
           />
         </div>
-        <NoteRecentUpdateIndicator
-          class="col-md-4 d-flex flex-column"
-          v-bind="{ id: noteRealm.id, updatedAt: noteRealm.note.updatedAt }"
-        >
-          <NoteAccessoryAsync v-bind="{ noteId: noteRealm.id, readonly }" />
-          <NoteInfoBar
-            class="mt-auto"
-            :note-id="noteId"
-            :expanded="expandInfo"
-            :key="noteId"
-            @level-changed="$emit('levelChanged', $event)"
-            @self-evaluated="$emit('selfEvaluated', $event)"
-          />
-        </NoteRecentUpdateIndicator>
+        <div class="col-md-4 d-flex flex-column">
+          <NoteRecentUpdateIndicator
+            v-bind="{ id: noteRealm.id, updatedAt: noteRealm.note.updatedAt }"
+          >
+            <NoteAccessoryAsync v-bind="{ noteId: noteRealm.id, readonly }" />
+            <NoteInfoBar
+              :note-id="noteId"
+              :expanded="expandInfo"
+              :key="noteId"
+              @level-changed="$emit('levelChanged', $event)"
+              @self-evaluated="$emit('selfEvaluated', $event)"
+            />
+          </NoteRecentUpdateIndicator>
+        </div>
       </div>
       <ChildrenNotes v-if="expandChildren" :notes="noteRealm.children" />
       <slot />

@@ -1,5 +1,8 @@
 <template>
-  <div class="note-body" :style="`background-color: ${bgColor}`">
+  <div
+    class="note-recent-update-indicator h-100 d-flex flex-column"
+    :style="`background-color: ${bgColor}`"
+  >
     <slot />
   </div>
 </template>

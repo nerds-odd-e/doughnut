@@ -249,11 +249,11 @@ Then(
     let leftColor: string
     cy.pageIsNotLoading()
     start.jumpToNotePage(left)
-    cy.get(".note-body")
+    cy.get(".note-recent-update-indicator")
       .invoke("css", "background-color")
       .then((val) => (leftColor = val))
     start.jumpToNotePage(right)
-    cy.get(".note-body")
+    cy.get(".note-recent-update-indicator")
       .invoke("css", "background-color")
       .then((val) => {
         const leftColorIndex = parseInt(leftColor.match(/\d+/)[0])
