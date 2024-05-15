@@ -50,6 +50,9 @@ export const assumeNotePage = (noteTopic?: string) => {
       cy.findCardTitle(noteTopic).click()
       return assumeNotePage(noteTopic)
     },
+    collapseChildren: () => {
+      cy.findByRole("button", { name: "collapse children" })
+    },
     findNoteDetails: (expected: string) => {
       expected.split("\\n").forEach((line) => cy.get("[role=details]").should("contain", line))
     },

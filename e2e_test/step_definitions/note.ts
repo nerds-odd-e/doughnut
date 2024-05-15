@@ -352,3 +352,7 @@ When(
     cy.get("#note-uploadAudioFile").attachFile(fileName)
   },
 )
+
+When("I collapse the children of note {string}", (noteTopic: string) => {
+  start.assumeNotePage(noteTopic).collapseChildren()
+})
