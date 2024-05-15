@@ -1,5 +1,5 @@
 <template>
-  <div class="note-accessory">
+  <div class="note-accessory text-break">
     <NoteAccessoryToolbar
       v-if="!readonly"
       v-bind="{ noteId }"
