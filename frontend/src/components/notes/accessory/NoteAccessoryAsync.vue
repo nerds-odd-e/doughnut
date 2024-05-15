@@ -1,5 +1,5 @@
 <template>
-  <div class="note-accessory text-break">
+  <div class="text-break">
     <NoteAccessoryToolbar
       v-if="!readonly"
       v-bind="{ noteId }"
@@ -50,10 +50,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style scoped>
-.note-accessory {
-  background-color: #f0f0f0;
-  height: 100%;
-}
-</style>

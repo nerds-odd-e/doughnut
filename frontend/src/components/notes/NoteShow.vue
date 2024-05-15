@@ -11,7 +11,7 @@
         </NoteNewButton>
       </Breadcrumb>
       <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-8 d-flex flex-column">
           <NoteWithLinks
             v-bind="{
               note: noteRealm.note,
@@ -21,18 +21,22 @@
             }"
           />
         </div>
-        <div class="col-md-4">
+        <NoteRecentUpdateIndicator
+          class="col-md-4 d-flex flex-column"
+          v-bind="{ id: noteRealm.id, updatedAt: noteRealm.note.updatedAt }"
+        >
           <NoteAccessoryAsync v-bind="{ noteId: noteRealm.id, readonly }" />
-        </div>
+          <NoteInfoBar
+            class="mt-auto"
+            :note-id="noteId"
+            :expanded="expandInfo"
+            :key="noteId"
+            @level-changed="$emit('levelChanged', $event)"
+            @self-evaluated="$emit('selfEvaluated', $event)"
+          />
+        </NoteRecentUpdateIndicator>
       </div>
-      <NoteInfoBar
-        :note-id="noteId"
-        :expanded="expandInfo"
-        :key="noteId"
-        @level-changed="$emit('levelChanged', $event)"
-        @self-evaluated="$emit('selfEvaluated', $event)"
-      />
-      <Cards v-if="expandChildren" :notes="noteRealm.children" />
+      <ChildrenNotes v-if="expandChildren" :notes="noteRealm.children" />
       <slot />
       <NoteChatDialog
         v-bind="{ selectedNote: noteRealm.note, storageAccessor }"
@@ -44,12 +48,13 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import NoteWithLinks from "./core/NoteWithLinks.vue";
-import Cards from "./Cards.vue";
+import ChildrenNotes from "./ChildrenNotes.vue";
 import NoteInfoBar from "./NoteInfoBar.vue";
 import Breadcrumb from "../toolbars/Breadcrumb.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import NoteChatDialog from "./NoteChatDialog.vue";
 import NoteAccessoryAsync from "./accessory/NoteAccessoryAsync.vue";
+import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue";
 
 export default defineComponent({
   props: {
@@ -65,11 +70,12 @@ export default defineComponent({
   emits: ["levelChanged", "selfEvaluated"],
   components: {
     NoteWithLinks,
-    Cards,
+    ChildrenNotes,
     NoteInfoBar,
     Breadcrumb,
     NoteAccessoryAsync,
     NoteChatDialog,
+    NoteRecentUpdateIndicator,
   },
 });
 </script>

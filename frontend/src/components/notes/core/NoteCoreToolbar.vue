@@ -1,57 +1,53 @@
 <template>
-  <NoteRecentUpdateIndicator
-    v-bind="{ id: note.id, updatedAt: note.updatedAt }"
-  >
-    <nav class="navbar justify-content-between">
-      <div class="btn-group btn-group-sm">
-        <NoteNewButton
-          button-title="Add Child Note"
-          v-bind="{ parentId: note.id, storageAccessor }"
-        >
-          <SvgAddChild />
-        </NoteNewButton>
+  <nav class="navbar justify-content-between bg-light">
+    <div class="btn-group btn-group-sm">
+      <NoteNewButton
+        button-title="Add Child Note"
+        v-bind="{ parentId: note.id, storageAccessor }"
+      >
+        <SvgAddChild />
+      </NoteNewButton>
 
-        <WikidataButton v-bind="{ note, storageAccessor }" />
-        <NoteDetailsAutoCompletionButton v-bind="{ note, storageAccessor }" />
-        <PopButton title="search and link note">
-          <template #button_face>
-            <SvgSearchForLink />
-          </template>
-          <template #default="{ closer }">
-            <LinkNoteDialog
-              v-bind="{ note, storageAccessor }"
-              @close-dialog="closer"
-            />
-          </template>
-        </PopButton>
-        <div class="dropdown">
-          <button
-            id="dropdownMenuButton"
-            aria-expanded="false"
-            aria-haspopup="true"
-            class="btn dropdown-toggle"
-            data-bs-toggle="dropdown"
-            role="button"
-            title="more options"
+      <WikidataButton v-bind="{ note, storageAccessor }" />
+      <NoteDetailsAutoCompletionButton v-bind="{ note, storageAccessor }" />
+      <PopButton title="search and link note">
+        <template #button_face>
+          <SvgSearchForLink />
+        </template>
+        <template #default="{ closer }">
+          <LinkNoteDialog
+            v-bind="{ note, storageAccessor }"
+            @close-dialog="closer"
+          />
+        </template>
+      </PopButton>
+      <div class="dropdown">
+        <button
+          id="dropdownMenuButton"
+          aria-expanded="false"
+          aria-haspopup="true"
+          class="btn dropdown-toggle"
+          data-bs-toggle="dropdown"
+          role="button"
+          title="more options"
+        >
+          <SvgCog />
+        </button>
+        <div class="dropdown-menu dropdown-menu-end">
+          <PopButton
+            btn-class="dropdown-item btn-primary"
+            title="Generate Image with DALL-E"
           >
-            <SvgCog />
-          </button>
-          <div class="dropdown-menu dropdown-menu-end">
-            <PopButton
-              btn-class="dropdown-item btn-primary"
-              title="Generate Image with DALL-E"
-            >
-              <AIGenerateImageDialog v-bind="{ note, storageAccessor }" />
-            </PopButton>
-            <NoteDeleteButton
-              class="dropdown-item"
-              v-bind="{ noteId: note.id, storageAccessor }"
-            />
-          </div>
+            <AIGenerateImageDialog v-bind="{ note, storageAccessor }" />
+          </PopButton>
+          <NoteDeleteButton
+            class="dropdown-item"
+            v-bind="{ noteId: note.id, storageAccessor }"
+          />
         </div>
       </div>
-    </nav>
-  </NoteRecentUpdateIndicator>
+    </div>
+  </nav>
 </template>
 
 <script lang="ts">
@@ -68,7 +64,6 @@ import NoteDeleteButton from "./NoteDeleteButton.vue";
 import PopButton from "../../commons/Popups/PopButton.vue";
 import AIGenerateImageDialog from "../AIGenerateImageDialog.vue";
 import NoteDetailsAutoCompletionButton from "./NoteDetailsAutoCompletionButton.vue";
-import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue";
 
 export default defineComponent({
   props: {
@@ -91,7 +86,6 @@ export default defineComponent({
     NoteDeleteButton,
     PopButton,
     AIGenerateImageDialog,
-    NoteRecentUpdateIndicator,
     NoteDetailsAutoCompletionButton,
   },
 });
