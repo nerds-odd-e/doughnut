@@ -26,14 +26,18 @@
           <div role="collapsed-children-count">{{ notes.length }}</div>
         </div>
         <div v-else v-for="note in notes" :key="note.id">
-          <Card v-bind="{ note }">
-            <template #cardHeader>
-              <slot name="cardHeader" :note="note" />
-            </template>
-            <template #button>
-              <slot name="button" :note="note" />
-            </template>
-          </Card>
+          <NoteShow
+            v-if="openedNotes.includes(note.id)"
+            v-bind="{
+              noteId: note.id,
+              storageAccessor,
+              readonly,
+              expandChildren: false,
+            }"
+          />
+          <h5 v-else class="card-title w-100" @click="highlight(note.id)">
+            <NoteTopic v-bind="{ topic: note.topic }" />
+          </h5>
         </div>
       </div>
     </div>
@@ -43,7 +47,8 @@
 <script lang="ts">
 import { PropType, defineComponent, ref } from "vue";
 import { Note } from "@/generated/backend";
-import Card from "./Card.vue";
+import { StorageAccessor } from "@/store/createNoteStorage";
+import NoteTopic from "./core/NoteTopic.vue";
 import SvgCollapse from "../svgs/SvgCollapse.vue";
 import SvgExpand from "../svgs/SvgExpand.vue";
 
@@ -56,14 +61,27 @@ export default defineComponent({
   props: {
     notes: { type: Array as PropType<Note[]>, required: true },
     expandChildren: { type: Boolean, required: true },
+    readonly: { type: Boolean, default: true },
+    storageAccessor: {
+      type: Object as PropType<StorageAccessor>,
+      required: true,
+    },
   },
-  components: { Card, SvgCollapse, SvgExpand },
+  components: { NoteTopic, SvgCollapse, SvgExpand },
+  data() {
+    return {
+      openedNotes: [] as number[],
+    };
+  },
   methods: {
     collapse() {
       this.internalExpandChildren = false;
     },
     expand() {
       this.internalExpandChildren = true;
+    },
+    highlight(noteId: number) {
+      this.openedNotes.push(noteId);
     },
   },
 });

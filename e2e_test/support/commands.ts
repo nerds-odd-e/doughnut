@@ -130,7 +130,7 @@ Cypress.Commands.add("clickRadioByLabel", (labelText) => {
 })
 
 Cypress.Commands.add("expectNoteCards", (expectedCards: string[]) => {
-  cy.get("a.card-title").should("have.length", expectedCards.length)
+  cy.get(".card-title").should("have.length", expectedCards.length)
   expectedCards.forEach((elem) => {
     // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     for (const propName in elem as any) {
@@ -258,7 +258,7 @@ Cypress.Commands.add(
   },
 )
 
-Cypress.Commands.add("findCardTitle", (topic) => cy.findByText(topic, { selector: "a.card-title" }))
+Cypress.Commands.add("findCardTitle", (topic) => cy.findByText(topic, { selector: ".card-title" }))
 
 Cypress.Commands.add("yesIRemember", () => {
   cy.findByRole("button", { name: "Yes, I remember" })

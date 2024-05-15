@@ -40,7 +40,10 @@
           </NoteRecentUpdateIndicator>
         </div>
       </div>
-      <ChildrenNotes v-bind="{ expandChildren }" :notes="noteRealm.children" />
+      <ChildrenNotes
+        v-bind="{ expandChildren, storageAccessor }"
+        :notes="noteRealm.children"
+      />
       <slot />
       <NoteChatDialog
         v-bind="{ selectedNote: noteRealm.note, storageAccessor }"

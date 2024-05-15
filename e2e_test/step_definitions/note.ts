@@ -362,7 +362,7 @@ When("I expand the children of note {string}", (noteTopic: string) => {
 })
 
 When(
-  "I should see the note {string} with {int} children collapse",
+  "I should see the note {string} with {int} children collapsed",
   (noteTopic: string, childrenCount: number) => {
     start.assumeNotePage(noteTopic).collapsedChildrenWithCount(childrenCount)
   },
@@ -371,3 +371,10 @@ When(
 Then("I should see the children notes:", (data: DataTable) => {
   cy.expectNoteCards(data.hashes())
 })
+
+Then(
+  "I highlight the child note {string} of note {string}",
+  (childNoteTopic: string, noteTopic: string) => {
+    start.jumpToNotePage(noteTopic).highlightChild(childNoteTopic)
+  },
+)

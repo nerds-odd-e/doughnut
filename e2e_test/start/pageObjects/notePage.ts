@@ -56,6 +56,9 @@ export const assumeNotePage = (noteTopic?: string) => {
     expandChildren: () => {
       cy.findByRole("button", { name: "expand children" }).click()
     },
+    highlightChild: (topic: string) => {
+      cy.findCardTitle(topic).click()
+    },
     collapsedChildrenWithCount: (count: number) => {
       cy.findByText(count, { selector: "[role=collapsed-children-count]" })
     },
