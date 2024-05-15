@@ -23,7 +23,7 @@
     <div class="col">
       <div class="row">
         <div v-if="!internalExpandChildren">
-          <div role="collapsed-children-count">2</div>
+          <div role="collapsed-children-count">{{ notes.length }}</div>
         </div>
         <div v-else v-for="note in notes" :key="note.id">
           <Card v-bind="{ note }">
