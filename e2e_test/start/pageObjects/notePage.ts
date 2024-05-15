@@ -51,7 +51,11 @@ export const assumeNotePage = (noteTopic?: string) => {
       return assumeNotePage(noteTopic)
     },
     collapseChildren: () => {
-      cy.findByRole("button", { name: "collapse children" })
+      cy.findByRole("button", { name: "collapse children" }).click()
+    },
+    collapsedChildrenWithCount: (count: number) => {
+      cy.findByText(count, { selector: "[role=collapsed-children-count]" })
+
     },
     findNoteDetails: (expected: string) => {
       expected.split("\\n").forEach((line) => cy.get("[role=details]").should("contain", line))
