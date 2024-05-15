@@ -1,16 +1,7 @@
 <template>
   <NoteRealmLoader v-bind="{ noteId, storageAccessor }">
     <template #default="{ noteRealm }">
-      <Breadcrumb v-bind="{ notePosition: noteRealm.notePosition }">
-        <NoteNewButton
-          v-if="noteRealm.note.parentId && !readonly"
-          v-bind="{ parentId: noteRealm.note.parentId, storageAccessor }"
-          button-title="Add Sibling Note"
-        >
-          <SvgAddSibling />
-        </NoteNewButton>
-      </Breadcrumb>
-
+      <Breadcrumb v-bind="{ notePosition: noteRealm.notePosition }" />
       <div class="row">
         <div class="col-md-8 d-flex flex-column p-0">
           <NoteWithLinks

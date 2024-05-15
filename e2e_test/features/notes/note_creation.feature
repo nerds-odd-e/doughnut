@@ -26,17 +26,13 @@ Feature: Nested Note creation
       |       |
     Then I should see that the note creation is not successful
 
-  Scenario: Create a new sibling note
-    Given I create a note belonging to "LeSS in Action":
-      | Topic        |
-      | Re-quirement |
-    When I create a sibling note of "Re-quirement":
+  Scenario: Create a new child note with link to parent
+    When I create a note belonging to "LeSS in Action":
       | Topic     | Link Type To Parent |
       | Re-Design | a specialization of |
-    And I should see "My Notes/LeSS in Action" with these children
+    Then I should see "My Notes/LeSS in Action" with these children
       | note-topic   |
-      | Re-quirement |
-      | Re-Design    |
       | team         |
       | tech         |
+      | Re-Design    |
     And On the current page, I should see "LeSS in Action" has link "a specialization of" "Re-Design"

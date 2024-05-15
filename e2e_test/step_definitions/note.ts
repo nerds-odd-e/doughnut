@@ -170,11 +170,6 @@ When("I delete note {string}", (noteTopic: string) => {
   start.jumpToNotePage(noteTopic).deleteNote()
 })
 
-When("I create a sibling note of {string}:", (noteTopic: string, data: DataTable) => {
-  expect(data.hashes().length).to.equal(1)
-  start.assumeNotePage(noteTopic).addingSiblingNote().createNoteWithAttributes(data.hashes()[0]!)
-})
-
 When("I should see that the note creation is not successful", () => {
   cy.expectFieldErrorMessage("Topic", "size must be between 1 and 150")
   cy.dismissLastErrorMessage()
