@@ -1,6 +1,7 @@
 import { flushPromises } from "@vue/test-utils";
 import { screen } from "@testing-library/vue";
 import NoteShow from "@/components/notes/NoteShow.vue";
+import { NoteRealm } from "@/generated/backend";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
@@ -38,25 +39,48 @@ describe("new/updated pink banner", () => {
   );
 });
 
-describe("note wth child cards", () => {
-  it("should render note with one child", async () => {
-    const noteParent = makeMe.aNoteRealm.topicConstructor("parent").please();
-    makeMe.aNoteRealm.topicConstructor("child").under(noteParent).please();
+describe("note wth children", () => {
+  const note = makeMe.aNoteRealm.please();
+
+  const render = (n: NoteRealm) => {
     helper.managedApi.restNoteController.show1 = vitest
       .fn()
-      .mockResolvedValue(noteParent);
+      .mockResolvedValue(n);
     helper
       .component(NoteShow)
       .withStorageProps({
-        noteId: noteParent.id,
+        noteId: n.id,
         expandChildren: true,
       })
       .render();
-    await screen.findByText("parent");
-    await screen.findByText("child");
-    expect(screen.getAllByRole("topic")).toHaveLength(1);
-    expect(helper.managedApi.restNoteController.show1).toBeCalledWith(
-      noteParent.id,
-    );
+  };
+
+  it("should call the api", async () => {
+    render(note);
+    expect(helper.managedApi.restNoteController.show1).toBeCalledWith(note.id);
+  });
+
+  it("should not render children control if no child", async () => {
+    render(note);
+    await flushPromises();
+    expect(screen.queryAllByTitle("collapse children")).toHaveLength(0);
+  });
+
+  describe("with children", () => {
+    const parentNote = makeMe.aNoteRealm.topicConstructor("parent").please();
+    makeMe.aNoteRealm.topicConstructor("child").under(parentNote).please();
+
+    it("should not render children control if no child", async () => {
+      render(parentNote);
+      await flushPromises();
+      expect(screen.queryAllByTitle("collapse children")).toHaveLength(1);
+    });
+
+    it("should render note with one child", async () => {
+      render(parentNote);
+      await screen.findByText("parent");
+      await screen.findByText("child");
+      expect(screen.getAllByRole("topic")).toHaveLength(1);
+    });
   });
 });

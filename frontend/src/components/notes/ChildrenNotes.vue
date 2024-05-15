@@ -1,5 +1,5 @@
 <template>
-  <div class="row">
+  <div v-if="notes.length > 0" class="row">
     <div class="col-auto bg-light p-0" style="width: 40px">
       <button
         class="btn btn-sm"
