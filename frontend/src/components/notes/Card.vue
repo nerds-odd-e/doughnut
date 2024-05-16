@@ -2,7 +2,7 @@
   <div class="card">
     <slot name="cardHeader" />
     <div class="card-body">
-      <h5 class="card-title">
+      <h5>
         <NoteTopicWithLink v-bind="{ note }" class="card-title" />
       </h5>
       <NoteShortDetails :details="note.details" />
