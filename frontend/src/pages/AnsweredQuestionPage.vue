@@ -4,7 +4,6 @@
       <AnsweredQuestionComponent
         v-if="answeredQuestion"
         v-bind="{ answeredQuestion, storageAccessor }"
-        @self-evaluated="onSelfEvaluated($event)"
       />
     </LoadingPage>
   </div>
@@ -12,7 +11,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { AnsweredQuestion, ReviewPoint } from "@/generated/backend";
+import { AnsweredQuestion } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import AnsweredQuestionComponent from "@/components/review/AnsweredQuestionComponent.vue";
 import { StorageAccessor } from "@/store/createNoteStorage";
@@ -44,13 +43,6 @@ export default defineComponent({
     },
   },
   methods: {
-    onSelfEvaluated(reviewPoint: ReviewPoint) {
-      if (!this.answeredQuestion) return;
-      this.answeredQuestion = {
-        ...this.answeredQuestion,
-        reviewPoint,
-      };
-    },
     async fetchData() {
       this.answeredQuestion =
         await this.managedApi.restReviewsController.showAnswer(this.answerId);

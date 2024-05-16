@@ -7,10 +7,7 @@
     />
     <div v-else>
       <ShowReviewPoint v-bind="{ reviewPoint, storageAccessor }" />
-      <NoteInfoReviewPoint
-        v-model="reviewPoint"
-        @update:model-value="$emit('self-evaluated', $event)"
-      />
+      <NoteInfoReviewPoint v-model="reviewPoint" />
     </div>
   </div>
   <QuizQuestion
@@ -45,7 +42,6 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["self-evaluated"],
   components: {
     AnswerResult,
     QuizQuestion,
