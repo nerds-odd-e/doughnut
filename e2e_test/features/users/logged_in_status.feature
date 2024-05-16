@@ -15,7 +15,7 @@ Feature: Logged in status
       | Triangle         | Shape         |
     And I navigate to "My Notes/Shape" note
     When my session is logged out
-    Then I should be asked to log in again when I click the link "Triangle"
+    Then I should be asked to log in again when I dblclick the link "Triangle"
     When I login as "old_learner" I should see "Triangle"
 
   @mockBrowserTime
