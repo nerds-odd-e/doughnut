@@ -25,8 +25,8 @@
     <li v-if="reviewPoint">
       <h6>Review Point</h6>
       <NoteInfoReviewPoint
-        v-bind="{ reviewPoint }"
-        @self-evaluated="onSelfEvaluated($event)"
+        v-model="reviewPoint"
+        @update:model-value="onSelfEvaluated($event)"
       />
     </li>
   </ul>

@@ -2,19 +2,19 @@
   <label
     >Repetition Count:
     <span class="statistics-value">{{
-      reviewPoint.repetitionCount
+      localReviewPoint.repetitionCount
     }}</span></label
   >
   <label
     >Forgetting Curive Index:
     <span class="statistics-value">{{
-      reviewPoint.forgettingCurveIndex
+      localReviewPoint.forgettingCurveIndex
     }}</span></label
   >
   <label
     >Next Review:
     <span class="statistics-value">{{
-      new Date(reviewPoint.nextReviewAt).toLocaleString()
+      new Date(localReviewPoint.nextReviewAt).toLocaleString()
     }}</span></label
   >
   <div class="btn-group" role="group" aria-label="First group">
@@ -45,7 +45,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+import { defineComponent, PropType, ref, watch } from "vue";
 import { ReviewPoint } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import SvgNoReview from "../svgs/SvgNoReview.vue";
@@ -54,43 +54,56 @@ import SvgSad from "../svgs/SvgSad.vue";
 import SvgHappy from "../svgs/SvgHappy.vue";
 
 export default defineComponent({
-  setup() {
-    return { ...useLoadingApi(), ...usePopups() };
-  },
-  props: {
-    reviewPoint: {
-      type: Object as PropType<ReviewPoint>,
-      required: true,
-    },
-  },
-  emits: ["selfEvaluated"],
-  components: { SvgNoReview, SvgSad, SvgHappy },
-  methods: {
-    async selfEvaluate(adjustment: number) {
+  setup(props, { emit }) {
+    const localReviewPoint = ref<ReviewPoint>(props.modelValue);
+    const { managedApi } = useLoadingApi();
+    const { popups } = usePopups();
+
+    watch(
+      () => props.modelValue,
+      (newVal) => {
+        localReviewPoint.value = newVal;
+      },
+      { immediate: true },
+    );
+
+    const selfEvaluate = async (adjustment: number) => {
       const reviewPoint =
-        await this.managedApi.restReviewPointController.selfEvaluate(
-          this.reviewPoint.id,
+        await managedApi.restReviewPointController.selfEvaluate(
+          localReviewPoint.value.id,
           {
             adjustment,
           },
         );
-      this.$emit("selfEvaluated", reviewPoint);
-    },
+      localReviewPoint.value = reviewPoint;
+      emit("update:modelValue", reviewPoint);
+    };
 
-    async removeFromReview() {
+    const removeFromReview = async () => {
       if (
-        !(await this.popups.confirm(
+        !(await popups.confirm(
           `Confirm to hide this from reviewing in the future?`,
         ))
       ) {
         return;
       }
-      this.managedApi.restReviewPointController
-        .removeFromRepeating(this.reviewPoint.id)
+      managedApi.restReviewPointController
+        .removeFromRepeating(localReviewPoint.value.id)
         .then((reviewPoint) => {
-          this.$emit("selfEvaluated", reviewPoint);
+          localReviewPoint.value = reviewPoint;
+          emit("update:modelValue", reviewPoint);
         });
+    };
+
+    return { localReviewPoint, selfEvaluate, removeFromReview };
+  },
+  props: {
+    modelValue: {
+      type: Object as PropType<ReviewPoint>,
+      required: true,
     },
   },
+  emits: ["update:modelValue"],
+  components: { SvgNoReview, SvgSad, SvgHappy },
 });
 </script>

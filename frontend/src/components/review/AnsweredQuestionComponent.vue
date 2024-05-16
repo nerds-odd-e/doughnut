@@ -8,8 +8,8 @@
     <div v-else>
       <ShowReviewPoint v-bind="{ reviewPoint, storageAccessor }" />
       <NoteInfoReviewPoint
-        v-bind="{ reviewPoint }"
-        @self-evaluated="$emit('self-evaluated', $event)"
+        v-model="reviewPoint"
+        @update:model-value="$emit('self-evaluated', $event)"
       />
     </div>
   </div>
