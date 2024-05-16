@@ -26,7 +26,7 @@
           <div role="collapsed-children-count">{{ notes.length }}</div>
         </div>
         <div v-else v-for="note in notes" :key="note.id">
-          <NoteShowInner
+          <NoteShow
             v-if="openedNotes.includes(note.id)"
             v-bind="{
               noteId: note.id,
@@ -38,7 +38,6 @@
           <h5
             v-else
             class="card-title w-100"
-            role="topic"
             @click="highlight(note.id)"
             @dblclick="navigateTo(note.id)"
           >
