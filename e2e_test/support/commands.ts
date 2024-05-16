@@ -182,7 +182,7 @@ Cypress.Commands.add("startSearching", () => {
 })
 
 Cypress.Commands.add("expectExactLinkTargets", (targets) => {
-  cy.get(".search-result .card-title a")
+  cy.get(".search-result a.card-title")
     .then((elms) => Cypress._.map(elms, "innerText"))
     .should("deep.equal", targets)
 })
