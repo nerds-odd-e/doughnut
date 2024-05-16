@@ -12,32 +12,30 @@
   </div>
   <div ref="bottomOfTheChat" style="height: 140px; display: block"></div>
 
-  <div class="chat-container">
-    <div class="container">
-      <button
-        v-if="!quizQuestion"
-        class="btn btn-secondary"
-        @click="generateQuestion"
+  <div class="container">
+    <button
+      v-if="!quizQuestion"
+      class="btn btn-secondary"
+      @click="generateQuestion"
+    >
+      Test me
+    </button>
+    <form class="chat-input-container" @submit.prevent="generateChatAnswer">
+      <input id="chat-input" class="chat-input-text" v-model="chatInput" />
+      <input
+        :disabled="isButtonDisabled"
+        type="submit"
+        value="Chat"
+        id="chat-button"
+        class="btn float-btn btn-secondary"
+      />
+    </form>
+    <p class="text-center">
+      <i
+        >Ask question to AI about this note. Each question ignores the chat
+        history, unlike ChatGPT.</i
       >
-        Test me
-      </button>
-      <form class="chat-input-container" @submit.prevent="generateChatAnswer">
-        <input id="chat-input" class="chat-input-text" v-model="chatInput" />
-        <input
-          :disabled="isButtonDisabled"
-          type="submit"
-          value="Chat"
-          id="chat-button"
-          class="btn float-btn btn-secondary"
-        />
-      </form>
-      <p class="text-center">
-        <i
-          >Ask question to AI about this note. Each question ignores the chat
-          history, unlike ChatGPT.</i
-        >
-      </p>
-    </div>
+    </p>
   </div>
 </template>
 
@@ -103,16 +101,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.chat-container {
-  position: fixed;
-  width: 100%;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  bottom: 10px;
-  right: 0;
-  z-index: 1000;
-}
-
 span {
   display: block;
   overflow: hidden;

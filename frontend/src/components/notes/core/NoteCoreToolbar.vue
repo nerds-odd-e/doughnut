@@ -10,6 +10,19 @@
 
       <WikidataButton v-bind="{ note, storageAccessor }" />
       <NoteDetailsAutoCompletionButton v-bind="{ note, storageAccessor }" />
+
+      <PopButton title="Chat with AI">
+        <template #button_face>
+          <SvgChat />
+        </template>
+        <template #default="{ closer }">
+          <NoteChatDialog
+            v-bind="{ selectedNote: note, storageAccessor }"
+            @close-dialog="closer"
+          />
+        </template>
+      </PopButton>
+
       <PopButton title="search and link note">
         <template #button_face>
           <SvgSearchForLink />
@@ -21,6 +34,7 @@
           />
         </template>
       </PopButton>
+
       <div class="dropdown">
         <button
           id="dropdownMenuButton"
@@ -60,10 +74,12 @@ import WikidataButton from "./WikidataButton.vue";
 import SvgSearchForLink from "../../svgs/SvgSearchForLink.vue";
 import LinkNoteDialog from "../../links/LinkNoteDialog.vue";
 import SvgCog from "../../svgs/SvgCog.vue";
+import SvgChat from "../../svgs/SvgChat.vue";
 import NoteDeleteButton from "./NoteDeleteButton.vue";
 import PopButton from "../../commons/Popups/PopButton.vue";
 import AIGenerateImageDialog from "../AIGenerateImageDialog.vue";
 import NoteDetailsAutoCompletionButton from "./NoteDetailsAutoCompletionButton.vue";
+import NoteChatDialog from "../NoteChatDialog.vue";
 
 export default defineComponent({
   props: {
@@ -83,10 +99,12 @@ export default defineComponent({
     SvgSearchForLink,
     LinkNoteDialog,
     SvgCog,
+    SvgChat,
     NoteDeleteButton,
     PopButton,
     AIGenerateImageDialog,
     NoteDetailsAutoCompletionButton,
+    NoteChatDialog,
   },
 });
 </script>

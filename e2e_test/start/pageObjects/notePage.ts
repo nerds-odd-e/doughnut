@@ -115,6 +115,7 @@ export const assumeNotePage = (noteTopic?: string) => {
       cy.findByRole("button", { name: "auto-complete details" }).click()
     },
     chatAboutNote() {
+      this.toolbarButton("Chat with AI").click()
       return assumeChatAboutNotePage()
     },
     wikidataOptions() {
