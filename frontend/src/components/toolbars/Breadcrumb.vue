@@ -21,9 +21,6 @@
         </template>
       </template>
     </template>
-    <template #additional>
-      <slot />
-    </template>
   </BasicBreadcrumb>
 </template>
 
