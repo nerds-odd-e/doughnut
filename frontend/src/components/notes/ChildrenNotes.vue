@@ -37,6 +37,7 @@
           />
           <h5
             v-else
+            role="topic"
             class="card-title w-100"
             @click="highlight(note.id)"
             @dblclick="navigateTo(note.id)"
