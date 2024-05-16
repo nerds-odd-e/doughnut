@@ -1,7 +1,4 @@
 <template>
-  <div class="alert alert-danger" v-if="reviewPoint.removedFromReview">
-    This review point has been removed from reviewing.
-  </div>
   <ShowThing
     v-bind="{ thing: reviewPoint.thing, expandInfo, storageAccessor }"
     @level-changed="$emit('levelChanged', $event)"

@@ -1,4 +1,7 @@
 <template>
+  <div class="alert alert-danger" v-if="localReviewPoint.removedFromReview">
+    This review point has been removed from reviewing.
+  </div>
   <label
     >Repetition Count:
     <span class="statistics-value">{{
