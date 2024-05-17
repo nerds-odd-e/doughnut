@@ -6,7 +6,7 @@
       @click="toggleReviewPoint = true"
     />
     <div v-else>
-      <ShowReviewPoint v-bind="{ reviewPoint, storageAccessor }" />
+      <ShowThing v-bind="{ thing: reviewPoint.thing, storageAccessor }" />
       <NoteInfoReviewPoint v-model="reviewPoint" />
     </div>
   </div>
@@ -27,7 +27,7 @@ import NoteInfoReviewPoint from "@/components/notes/NoteInfoReviewPoint.vue";
 import { AnsweredQuestion } from "@/generated/backend";
 import AnswerResult from "./AnswerResult.vue";
 import QuizQuestion from "./QuizQuestion.vue";
-import ShowReviewPoint from "./ShowReviewPoint.vue";
+import ShowThing from "./ShowThing.vue";
 import ThingAbbr from "./ThingAbbr.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
@@ -45,7 +45,7 @@ export default defineComponent({
   components: {
     AnswerResult,
     QuizQuestion,
-    ShowReviewPoint,
+    ShowThing,
     NoteInfoReviewPoint,
     ThingAbbr,
   },
