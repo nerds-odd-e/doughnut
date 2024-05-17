@@ -18,7 +18,6 @@
       }"
       :key="noteId"
       @level-changed="$emit('levelChanged', $event)"
-      @self-evaluated="$emit('selfEvaluated', $event)"
     >
       <slot />
     </NoteShow>
@@ -43,7 +42,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["levelChanged", "selfEvaluated"],
+  emits: ["levelChanged"],
   components: { LinkShow },
   computed: {
     noteId() {

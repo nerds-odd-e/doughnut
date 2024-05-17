@@ -3,7 +3,6 @@
     <ShowThing
       v-if="reviewPoint"
       v-bind="{ thing: reviewPoint.thing, expandInfo: false, storageAccessor }"
-      @self-evaluated="onSelfEvaluted($event)"
     />
   </LoadingPage>
 </template>
@@ -37,9 +36,6 @@ export default defineComponent({
     };
   },
   methods: {
-    onSelfEvaluted(reviewPoint: ReviewPoint) {
-      this.reviewPoint = reviewPoint;
-    },
     async fetchData() {
       this.reviewPoint = await this.managedApi.restReviewPointController.show(
         this.reviewPointId,
