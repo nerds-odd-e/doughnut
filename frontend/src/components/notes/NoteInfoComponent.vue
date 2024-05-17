@@ -42,7 +42,7 @@ export default defineComponent({
   props: {
     noteInfo: { type: Object as PropType<NoteInfo>, required: true },
   },
-  emits: ["levelChanged", "selfEvaluated"],
+  emits: ["levelChanged"],
   data() {
     return {
       reviewPoint: this.noteInfo.reviewPoint,
@@ -57,7 +57,6 @@ export default defineComponent({
   methods: {
     onSelfEvaluated(reviewPoint: ReviewPoint) {
       this.reviewPoint = reviewPoint;
-      this.$emit("selfEvaluated", reviewPoint);
     },
   },
 });

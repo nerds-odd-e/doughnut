@@ -8,11 +8,10 @@
   >
     i...
   </span>
-  <NoteInfoC
+  <NoteInfoComponent
     v-if="noteInfo?.note"
     :note-info="noteInfo"
     @level-changed="$emit('levelChanged', $event)"
-    @self-evaluated="$emit('selfEvaluated', $event)"
   />
 </template>
 
@@ -20,15 +19,15 @@
 import { defineComponent } from "vue";
 import { NoteInfo } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
-import NoteInfoC from "./NoteInfo.vue";
+import NoteInfoComponent from "./NoteInfoComponent.vue";
 
 export default defineComponent({
   setup() {
     return useLoadingApi();
   },
   props: { noteId: { type: Number, required: true }, expanded: Boolean },
-  emits: ["levelChanged", "selfEvaluated"],
-  components: { NoteInfoC },
+  emits: ["levelChanged"],
+  components: { NoteInfoComponent },
   data() {
     return { noteInfo: undefined as undefined | NoteInfo };
   },

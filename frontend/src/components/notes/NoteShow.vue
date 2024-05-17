@@ -26,7 +26,6 @@
               :expanded="expandInfo"
               :key="noteId"
               @level-changed="$emit('levelChanged', $event)"
-              @self-evaluated="$emit('selfEvaluated', $event)"
             />
           </NoteRecentUpdateIndicator>
         </div>
@@ -61,7 +60,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["levelChanged", "selfEvaluated"],
+  emits: ["levelChanged"],
   components: {
     NoteWithLinks,
     ChildrenNotes,
