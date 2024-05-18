@@ -1,5 +1,9 @@
 <template>
   <div class="row">
+    <NoteCoreToolbar
+      v-if="!readonly"
+      v-bind="{ note: noteRealm.note, storageAccessor }"
+    />
     <div class="col-md-8 d-flex flex-column p-0">
       <NoteWithLinks
         v-bind="{
@@ -47,6 +51,7 @@ import ChildrenNotes from "./ChildrenNotes.vue";
 import NoteInfoBar from "./NoteInfoBar.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import NoteAccessoryAsync from "./accessory/NoteAccessoryAsync.vue";
+import NoteCoreToolbar from "./core/NoteCoreToolbar.vue";
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue";
 
 export default defineComponent({
@@ -66,6 +71,7 @@ export default defineComponent({
     NoteInfoBar,
     NoteAccessoryAsync,
     NoteRecentUpdateIndicator,
+    NoteCoreToolbar,
   },
   data() {
     return {

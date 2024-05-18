@@ -9,7 +9,6 @@
       :note-topic="note.topic"
       :storage-accessor="storageAccessor"
     />
-    <NoteCoreToolbar v-if="!readonly" v-bind="{ note, storageAccessor }" />
     <div role="details" class="note-details">
       <NoteEditableDetails
         :note-id="note.id"
@@ -26,7 +25,6 @@ import { Note } from "@/generated/backend";
 import NoteFrameOfLinks from "./NoteFrameOfLinks.vue";
 import { StorageAccessor } from "../../../store/createNoteStorage";
 import LinksMap from "../../../models/LinksMap";
-import NoteCoreToolbar from "./NoteCoreToolbar.vue";
 import NoteEditableTopic from "./NoteEditableTopic.vue";
 import NoteEditableDetails from "./NoteEditableDetails.vue";
 
@@ -44,7 +42,6 @@ export default defineComponent({
   },
   components: {
     NoteFrameOfLinks,
-    NoteCoreToolbar,
     NoteEditableTopic,
     NoteEditableDetails,
   },
