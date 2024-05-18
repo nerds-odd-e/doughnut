@@ -7,30 +7,29 @@
           noteRealm,
           expandChildren,
           readonly,
+          highlightNoteId,
           storageAccessor,
         }"
+        @highlight-note="highlightNoteId = $event"
       />
     </template>
   </NoteRealmLoader>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from "vue";
+<script setup lang="ts">
+import { PropType, defineProps, ref } from "vue";
 import Breadcrumb from "../toolbars/Breadcrumb.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
-export default defineComponent({
-  props: {
-    noteId: { type: Number, required: true },
-    expandChildren: { type: Boolean, required: true },
-    readonly: { type: Boolean, default: true },
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
-  },
-  components: {
-    Breadcrumb,
+const props = defineProps({
+  noteId: { type: Number, required: true },
+  expandChildren: { type: Boolean, required: true },
+  readonly: { type: Boolean, default: true },
+  storageAccessor: {
+    type: Object as PropType<StorageAccessor>,
+    required: true,
   },
 });
+
+const highlightNoteId = ref(props.noteId);
 </script>

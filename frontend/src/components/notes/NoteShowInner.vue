@@ -1,5 +1,8 @@
 <template>
-  <div class="row">
+  <div
+    class="row"
+    :class="highlightNoteId === noteRealm.id ? 'highlighted' : ''"
+  >
     <NoteCoreToolbar
       v-if="!readonly"
       v-bind="{ note: noteRealm.note, storageAccessor }"
@@ -34,13 +37,14 @@
     </div>
   </div>
   <ChildrenNotes
-    v-bind="{ expandChildren, readonly, storageAccessor }"
+    v-bind="{ expandChildren, readonly, highlightNoteId, storageAccessor }"
     :notes="noteRealm.children ?? []"
+    @highlight-note="$emit('highlight-note', $event)"
   />
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from "vue";
+<script setup lang="ts">
+import { PropType, ref } from "vue";
 import { NoteRealm, NoteAccessory } from "@/generated/backend";
 import NoteWithLinks from "./core/NoteWithLinks.vue";
 import ChildrenNotes from "./ChildrenNotes.vue";
@@ -50,29 +54,25 @@ import NoteAccessoryAsync from "./accessory/NoteAccessoryAsync.vue";
 import NoteCoreToolbar from "./core/NoteCoreToolbar.vue";
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue";
 
-export default defineComponent({
-  props: {
-    noteRealm: { type: Object as PropType<NoteRealm>, required: true },
-    expandChildren: { type: Boolean, required: true },
-    expandInfo: { type: Boolean, default: false },
-    readonly: { type: Boolean, default: true },
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
-  },
-  components: {
-    NoteWithLinks,
-    ChildrenNotes,
-    NoteInfoBar,
-    NoteAccessoryAsync,
-    NoteRecentUpdateIndicator,
-    NoteCoreToolbar,
-  },
-  data() {
-    return {
-      updatedNoteAccessory: undefined as NoteAccessory | undefined,
-    };
+defineProps({
+  noteRealm: { type: Object as PropType<NoteRealm>, required: true },
+  expandChildren: { type: Boolean, required: true },
+  highlightNoteId: { type: Number, required: true },
+  expandInfo: { type: Boolean, default: false },
+  readonly: { type: Boolean, default: true },
+  storageAccessor: {
+    type: Object as PropType<StorageAccessor>,
+    required: true,
   },
 });
+
+const emit = defineEmits(["highlight-note"]);
+
+const updatedNoteAccessory = ref<NoteAccessory | undefined>(undefined);
 </script>
+
+<style scoped>
+.highlighted {
+  border: 1px dashed gray;
+}
+</style>

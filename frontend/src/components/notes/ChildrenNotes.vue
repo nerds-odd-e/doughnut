@@ -34,6 +34,7 @@
               <NoteShowInner
                 v-bind="{
                   noteRealm,
+                  highlightNoteId,
                   expandChildren: false,
                   readonly,
                   storageAccessor,
@@ -56,48 +57,45 @@
   </div>
 </template>
 
-<script lang="ts">
-import { PropType, defineComponent, ref } from "vue";
+<script setup lang="ts">
+import { PropType, ref } from "vue";
+import { useRouter } from "vue-router";
 import { Note } from "@/generated/backend";
 import { StorageAccessor } from "@/store/createNoteStorage";
 import NoteTopic from "./core/NoteTopic.vue";
 import SvgCollapse from "../svgs/SvgCollapse.vue";
 import SvgExpand from "../svgs/SvgExpand.vue";
 
-export default defineComponent({
-  setup(props) {
-    return {
-      internalExpandChildren: ref(props.expandChildren),
-    };
-  },
-  props: {
-    notes: { type: Array as PropType<Note[]>, required: true },
-    expandChildren: { type: Boolean, required: true },
-    readonly: { type: Boolean, default: true },
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
-  },
-  components: { NoteTopic, SvgCollapse, SvgExpand },
-  data() {
-    return {
-      openedNotes: [] as number[],
-    };
-  },
-  methods: {
-    collapse() {
-      this.internalExpandChildren = false;
-    },
-    expand() {
-      this.internalExpandChildren = true;
-    },
-    highlight(noteId: number) {
-      this.openedNotes.push(noteId);
-    },
-    navigateTo(noteId: number) {
-      this.$router.push({ name: "noteShow", params: { noteId } });
-    },
+const props = defineProps({
+  notes: { type: Array as PropType<Note[]>, required: true },
+  expandChildren: { type: Boolean, required: true },
+  readonly: { type: Boolean, required: true },
+  highlightNoteId: { type: Number, required: true },
+  storageAccessor: {
+    type: Object as PropType<StorageAccessor>,
+    required: true,
   },
 });
+
+const emit = defineEmits(["highlight-note"]);
+
+const internalExpandChildren = ref(props.expandChildren);
+const openedNotes = ref<number[]>([]);
+
+const collapse = () => {
+  internalExpandChildren.value = false;
+};
+
+const expand = () => {
+  internalExpandChildren.value = true;
+};
+
+const highlight = (noteId: number) => {
+  openedNotes.value.push(noteId);
+  emit("highlight-note", noteId);
+};
+
+const navigateTo = (noteId: number) => {
+  useRouter().push({ name: "noteShow", params: { noteId } });
+};
 </script>

@@ -18,8 +18,10 @@ function filterAttributes(attributes: Record<string, string>, keysToKeep: string
 }
 
 export const assumeNotePage = (noteTopic?: string) => {
+  const findNoteTopic = (topic) => cy.findByText(topic, { selector: "[role=topic] *" })
+
   if (noteTopic) {
-    cy.findByText(noteTopic, { selector: "[role=topic] *" })
+    findNoteTopic(noteTopic)
   }
 
   const privateToolbarButton = (btnTextOrTitle: string) => {
@@ -58,6 +60,9 @@ export const assumeNotePage = (noteTopic?: string) => {
     },
     highlightChild: (topic: string) => {
       cy.findCardTitle(topic).click()
+      cy.get(".highlighted").within(() => {
+        findNoteTopic(topic)
+      })
     },
     collapsedChildrenWithCount: (count: number) => {
       cy.findByText(count, { selector: "[role=collapsed-children-count]" })
