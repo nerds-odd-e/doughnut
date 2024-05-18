@@ -1,7 +1,14 @@
 <template>
   <ContainerPage v-bind="{ contentExists: true }">
     <ShowThing
-      v-bind="{ thing, expandInfo: true, storageAccessor }"
+      v-bind="{ thing, expandInfo: false, storageAccessor }"
+      @level-changed="$emit('reloadNeeded', $event)"
+    />
+    <NoteInfoBar
+      v-if="thing.note"
+      :note-id="thing.note.id"
+      :expanded="true"
+      :key="thing.note.id"
       @level-changed="$emit('reloadNeeded', $event)"
     />
     <InitialReviewButtons
@@ -18,6 +25,7 @@ import useLoadingApi from "@/managedApi/useLoadingApi";
 import { StorageAccessor } from "@/store/createNoteStorage";
 import ContainerPage from "@/pages/commons/ContainerPage.vue";
 import ShowThing from "./ShowThing.vue";
+import NoteInfoBar from "../notes/NoteInfoBar.vue";
 import InitialReviewButtons from "./InitialReviewButtons.vue";
 import usePopups from "../commons/Popups/usePopups";
 
@@ -40,6 +48,7 @@ export default defineComponent({
   components: {
     ShowThing,
     ContainerPage,
+    NoteInfoBar,
     InitialReviewButtons,
   },
   computed: {
