@@ -3,12 +3,11 @@
     <ShowThing
       v-bind="{ thing, expandInfo: true, storageAccessor }"
       @level-changed="$emit('reloadNeeded', $event)"
-    >
-      <InitialReviewButtons
-        :key="buttonKey"
-        @do-initial-review="processForm($event)"
-      />
-    </ShowThing>
+    />
+    <InitialReviewButtons
+      :key="buttonKey"
+      @do-initial-review="processForm($event)"
+    />
   </ContainerPage>
 </template>
 

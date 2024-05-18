@@ -18,9 +18,7 @@
       }"
       :key="noteId"
       @level-changed="$emit('levelChanged', $event)"
-    >
-      <slot />
-    </NoteShow>
+    />
   </div>
 </template>
 

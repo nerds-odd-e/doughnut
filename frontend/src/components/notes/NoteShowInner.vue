@@ -34,6 +34,7 @@
         v-bind="{ expandChildren, storageAccessor }"
         :notes="noteRealm.children"
       />
+      <slot />
     </template>
   </NoteRealmLoader>
 </template>
