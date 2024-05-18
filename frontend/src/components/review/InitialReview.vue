@@ -4,7 +4,6 @@
       v-bind="{ thing, expandInfo: true, storageAccessor }"
       @level-changed="$emit('reloadNeeded', $event)"
     >
-      <slot />
       <InitialReviewButtons
         :key="buttonKey"
         @do-initial-review="processForm($event)"
