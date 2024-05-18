@@ -31,7 +31,6 @@
             v-bind="{ noteId: note.id, storageAccessor }"
           >
             <template #default="{ noteRealm }">
-              <Breadcrumb v-bind="{ notePosition: noteRealm.notePosition }" />
               <NoteShowInner
                 v-bind="{
                   noteRealm,
