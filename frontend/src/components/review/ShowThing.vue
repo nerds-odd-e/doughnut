@@ -13,11 +13,9 @@
         noteId,
         expandChildren: false,
         readonly: false,
-        expandInfo,
         storageAccessor,
       }"
       :key="noteId"
-      @level-changed="$emit('levelChanged', $event)"
     />
   </div>
 </template>
@@ -34,13 +32,11 @@ export default defineComponent({
       type: Object as PropType<Thing>,
       required: true,
     },
-    expandInfo: { type: Boolean, default: false },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,
     },
   },
-  emits: ["levelChanged"],
   components: { LinkShow },
   computed: {
     noteId() {

@@ -1,9 +1,6 @@
 <template>
   <ContainerPage v-bind="{ contentExists: true }">
-    <ShowThing
-      v-bind="{ thing, expandInfo: false, storageAccessor }"
-      @level-changed="$emit('reloadNeeded', $event)"
-    />
+    <ShowThing v-bind="{ thing, storageAccessor }" />
     <NoteInfoBar
       v-if="thing.note"
       :note-id="thing.note.id"

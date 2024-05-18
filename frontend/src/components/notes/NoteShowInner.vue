@@ -20,9 +20,8 @@
         <NoteAccessoryAsync v-bind="{ noteId: noteRealm.id, readonly }" />
         <NoteInfoBar
           :note-id="noteRealm.id"
-          :expanded="expandInfo"
+          :expanded="false"
           :key="noteRealm.id"
-          @level-changed="$emit('levelChanged', $event)"
         />
       </NoteRecentUpdateIndicator>
     </div>
@@ -54,7 +53,6 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["levelChanged"],
   components: {
     NoteWithLinks,
     ChildrenNotes,

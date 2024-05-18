@@ -6,11 +6,9 @@
         v-bind="{
           noteRealm,
           expandChildren,
-          expandInfo,
           readonly,
           storageAccessor,
         }"
-        @level-changed="$emit('levelChanged', $event)"
       />
     </template>
   </NoteRealmLoader>
@@ -25,14 +23,12 @@ export default defineComponent({
   props: {
     noteId: { type: Number, required: true },
     expandChildren: { type: Boolean, required: true },
-    expandInfo: { type: Boolean, default: false },
     readonly: { type: Boolean, default: true },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,
     },
   },
-  emits: ["levelChanged"],
   components: {
     Breadcrumb,
   },
