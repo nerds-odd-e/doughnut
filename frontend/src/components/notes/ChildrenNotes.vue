@@ -26,15 +26,23 @@
           <div role="collapsed-children-count">{{ notes.length }}</div>
         </div>
         <div v-else v-for="note in notes" :key="note.id">
-          <NoteShow
+          <NoteRealmLoader
             v-if="openedNotes.includes(note.id)"
-            v-bind="{
-              noteId: note.id,
-              storageAccessor,
-              readonly,
-              expandChildren: false,
-            }"
-          />
+            v-bind="{ noteId: note.id, storageAccessor }"
+          >
+            <template #default="{ noteRealm }">
+              <Breadcrumb v-bind="{ notePosition: noteRealm.notePosition }" />
+              <NoteShowInner
+                v-bind="{
+                  noteRealm,
+                  expandChildren: false,
+                  readonly,
+                  storageAccessor,
+                }"
+              />
+            </template>
+          </NoteRealmLoader>
+
           <h5
             v-else
             class="card-title w-100"
