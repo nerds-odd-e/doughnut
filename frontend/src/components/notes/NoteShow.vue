@@ -2,37 +2,15 @@
   <NoteRealmLoader v-bind="{ noteId, storageAccessor }">
     <template #default="{ noteRealm }">
       <Breadcrumb v-bind="{ notePosition: noteRealm.notePosition }" />
-      <div class="row">
-        <div class="col-md-8 d-flex flex-column p-0">
-          <NoteWithLinks
-            v-bind="{
-              note: noteRealm.note,
-              links: noteRealm.links,
-              readonly,
-              storageAccessor,
-            }"
-          />
-        </div>
-        <div class="col-md-4 d-flex flex-column p-0">
-          <NoteRecentUpdateIndicator
-            v-bind="{
-              id: noteRealm.id,
-              updatedAt: noteRealm.note.updatedAt,
-            }"
-          >
-            <NoteAccessoryAsync v-bind="{ noteId: noteRealm.id, readonly }" />
-            <NoteInfoBar
-              :note-id="noteId"
-              :expanded="expandInfo"
-              :key="noteId"
-              @level-changed="$emit('levelChanged', $event)"
-            />
-          </NoteRecentUpdateIndicator>
-        </div>
-      </div>
-      <ChildrenNotes
-        v-bind="{ expandChildren, storageAccessor }"
-        :notes="noteRealm.children"
+      <NoteShowInner
+        v-bind="{
+          noteRealm,
+          expandChildren,
+          expandInfo,
+          readonly,
+          storageAccessor,
+        }"
+        @level-changed="$emit('levelChanged', $event)"
       />
     </template>
   </NoteRealmLoader>
@@ -40,13 +18,8 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import NoteWithLinks from "./core/NoteWithLinks.vue";
-import ChildrenNotes from "./ChildrenNotes.vue";
-import NoteInfoBar from "./NoteInfoBar.vue";
 import Breadcrumb from "../toolbars/Breadcrumb.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
-import NoteAccessoryAsync from "./accessory/NoteAccessoryAsync.vue";
-import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue";
 
 export default defineComponent({
   props: {
@@ -61,12 +34,7 @@ export default defineComponent({
   },
   emits: ["levelChanged"],
   components: {
-    NoteWithLinks,
-    ChildrenNotes,
-    NoteInfoBar,
     Breadcrumb,
-    NoteAccessoryAsync,
-    NoteRecentUpdateIndicator,
   },
 });
 </script>
