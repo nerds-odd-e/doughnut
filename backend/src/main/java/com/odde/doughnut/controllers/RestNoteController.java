@@ -109,7 +109,7 @@ class RestNoteController {
       path = "/{note}",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @Transactional
-  public NoteRealm updateNoteAccessories(
+  public NoteAccessory updateNoteAccessories(
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @Valid @ModelAttribute NoteAccessoriesDTO noteAccessoriesDTO)
       throws UnexpectedNoAccessRightException, IOException {
@@ -119,14 +119,14 @@ class RestNoteController {
     note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     note.getOrInitializeNoteAccessory().setFromDTO(noteAccessoriesDTO, user);
     modelFactoryService.save(note);
-    return new NoteViewer(user, note).toJsonObject();
+    return note.getNoteAccessory();
   }
 
   @PatchMapping(
       path = "/{note}/audio",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @Transactional
-  public NoteRealm uploadAudio(
+  public NoteAccessory uploadAudio(
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @Valid @ModelAttribute AudioUploadDTO audioUploadDTO)
       throws IOException {
@@ -136,7 +136,7 @@ class RestNoteController {
     modelFactoryService.save(note.getNoteAccessory().getAudioAttachment());
     modelFactoryService.save(note);
 
-    return new NoteViewer(user, note).toJsonObject();
+    return note.getNoteAccessory();
   }
 
   @GetMapping("/{note}/accessory")

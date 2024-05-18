@@ -45,11 +45,11 @@ export default defineComponent({
   methods: {
     async uploadAudio() {
       try {
-        await this.managedApi.restNoteController.uploadAudio(
+        const na = await this.managedApi.restNoteController.uploadAudio(
           this.noteId,
           this.formData,
         );
-        this.$emit("closeDialog");
+        this.$emit("closeDialog", na);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         this.noteFormErrors = error;

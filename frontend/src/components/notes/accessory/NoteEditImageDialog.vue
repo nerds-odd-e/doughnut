@@ -45,7 +45,7 @@ export default defineComponent({
     processForm() {
       this.managedApi.restNoteController
         .updateNoteAccessories(this.noteId, this.formData)
-        .then(() => this.$emit("closeDialog"))
+        .then((na) => this.$emit("closeDialog", na))
         .catch((error) => {
           this.noteFormErrors = error;
         });

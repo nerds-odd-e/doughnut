@@ -1,10 +1,5 @@
 <template>
   <div class="text-break">
-    <NoteAccessoryToolbar
-      v-if="!readonly"
-      v-bind="{ noteId }"
-      @note-accessory-updated="noteAccessoryUpdated"
-    />
     <NoteAccessoryDisplay
       v-if="noteAccessory"
       :note-accessory="noteAccessory"
@@ -13,11 +8,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { PropType, defineComponent } from "vue";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import { NoteAccessory } from "@/generated/backend";
 import NoteAccessoryDisplay from "./NoteAccessoryDisplay.vue";
-import NoteAccessoryToolbar from "./NoteAccessoryToolbar.vue";
 
 export default defineComponent({
   setup() {
@@ -26,23 +20,27 @@ export default defineComponent({
   props: {
     noteId: { type: Number, required: true },
     readonly: { type: Boolean, required: true },
+    updatedNoteAccessory: {
+      type: Object as PropType<NoteAccessory>,
+    },
   },
   components: {
     NoteAccessoryDisplay,
-    NoteAccessoryToolbar,
   },
   data() {
     return {
       noteAccessory: undefined as NoteAccessory | undefined,
     };
   },
+  watch: {
+    updatedNoteAccessory() {
+      this.noteAccessory = this.updatedNoteAccessory;
+    },
+  },
   methods: {
     async fetchData() {
       this.noteAccessory =
         await this.managedApi.restNoteController.showNoteAccessory(this.noteId);
-    },
-    noteAccessoryUpdated() {
-      this.fetchData();
     },
   },
   mounted() {

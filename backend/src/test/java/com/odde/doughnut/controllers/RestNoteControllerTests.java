@@ -372,8 +372,8 @@ class RestNoteControllerTests {
 
     @Test
     void shouldBeAbleToSaveNoteWhenValid() throws UnexpectedNoAccessRightException, IOException {
-      NoteRealm response = controller.updateNoteAccessories(note, noteAccessoriesDTO);
-      assertThat(response.getId(), equalTo(note.getId()));
+      NoteAccessory response = controller.updateNoteAccessories(note, noteAccessoriesDTO);
+      assertThat(response.getNote().getId(), equalTo(note.getId()));
     }
 
     @Test

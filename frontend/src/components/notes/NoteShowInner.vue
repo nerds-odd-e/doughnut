@@ -17,7 +17,14 @@
           updatedAt: noteRealm.note.updatedAt,
         }"
       >
-        <NoteAccessoryAsync v-bind="{ noteId: noteRealm.id, readonly }" />
+        <NoteAccessoryToolbar
+          v-if="!readonly"
+          v-bind="{ noteId: noteRealm.id }"
+          @note-accessory-updated="updatedNoteAccessory = $event"
+        />
+        <NoteAccessoryAsync
+          v-bind="{ noteId: noteRealm.id, updatedNoteAccessory, readonly }"
+        />
         <NoteInfoBar
           :note-id="noteRealm.id"
           :expanded="false"
@@ -34,7 +41,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { NoteRealm } from "@/generated/backend";
+import { NoteRealm, NoteAccessory } from "@/generated/backend";
 import NoteWithLinks from "./core/NoteWithLinks.vue";
 import ChildrenNotes from "./ChildrenNotes.vue";
 import NoteInfoBar from "./NoteInfoBar.vue";
@@ -59,6 +66,11 @@ export default defineComponent({
     NoteInfoBar,
     NoteAccessoryAsync,
     NoteRecentUpdateIndicator,
+  },
+  data() {
+    return {
+      updatedNoteAccessory: undefined as NoteAccessory | undefined,
+    };
   },
 });
 </script>

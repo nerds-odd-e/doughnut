@@ -169,13 +169,13 @@ export class RestNoteControllerService {
     /**
      * @param note
      * @param formData
-     * @returns NoteRealm OK
+     * @returns NoteAccessory OK
      * @throws ApiError
      */
     public updateNoteAccessories(
         note: number,
         formData?: NoteAccessoriesDTO,
-    ): CancelablePromise<NoteRealm> {
+    ): CancelablePromise<NoteAccessory> {
         return this.httpRequest.request({
             method: 'PATCH',
             url: '/api/notes/{note}',
@@ -211,13 +211,13 @@ export class RestNoteControllerService {
     /**
      * @param note
      * @param formData
-     * @returns NoteRealm OK
+     * @returns NoteAccessory OK
      * @throws ApiError
      */
     public uploadAudio(
         note: number,
         formData?: AudioUploadDTO,
-    ): CancelablePromise<NoteRealm> {
+    ): CancelablePromise<NoteAccessory> {
         return this.httpRequest.request({
             method: 'PATCH',
             url: '/api/notes/{note}/audio',

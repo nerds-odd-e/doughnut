@@ -8,7 +8,7 @@
         <template #default="{ closer }">
           <NoteEditImageDialog
             v-bind="{ noteId }"
-            @close-dialog="handleCloseDialog(closer)"
+            @close-dialog="handleCloseDialog(closer, $event)"
           />
         </template>
       </PopButton>
@@ -20,7 +20,7 @@
         <template #default="{ closer }">
           <NoteEditUrlDialog
             v-bind="{ noteId }"
-            @close-dialog="handleCloseDialog(closer)"
+            @close-dialog="handleCloseDialog(closer, $event)"
           />
         </template>
       </PopButton>
@@ -32,7 +32,7 @@
         <template #default="{ closer }">
           <NoteEditUploadAudioDialog
             v-bind="{ noteId }"
-            @close-dialog="handleCloseDialog(closer)"
+            @close-dialog="handleCloseDialog(closer, $event)"
           />
         </template>
       </PopButton>
@@ -42,6 +42,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { NoteAccessory } from "@/generated/backend";
 import NoteEditUploadAudioDialog from "./NoteEditUploadAudioDialog.vue";
 import PopButton from "../../commons/Popups/PopButton.vue";
 import SvgResume from "../../svgs/SvgResume.vue";
@@ -68,8 +69,10 @@ export default defineComponent({
     PopButton,
   },
   methods: {
-    handleCloseDialog(closer) {
-      this.$emit("note-accessory-updated");
+    handleCloseDialog(closer, na: NoteAccessory) {
+      if (na) {
+        this.$emit("note-accessory-updated", na);
+      }
       closer();
     },
   },
