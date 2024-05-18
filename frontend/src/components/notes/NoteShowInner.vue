@@ -3,6 +3,7 @@
     <NoteCoreToolbar
       v-if="!readonly"
       v-bind="{ note: noteRealm.note, storageAccessor }"
+      @note-accessory-updated="updatedNoteAccessory = $event"
     />
     <div class="col-md-8 d-flex flex-column p-0">
       <NoteWithLinks
@@ -21,11 +22,6 @@
           updatedAt: noteRealm.note.updatedAt,
         }"
       >
-        <NoteAccessoryToolbar
-          v-if="!readonly"
-          v-bind="{ noteId: noteRealm.id }"
-          @note-accessory-updated="updatedNoteAccessory = $event"
-        />
         <NoteAccessoryAsync
           v-bind="{ noteId: noteRealm.id, updatedNoteAccessory, readonly }"
         />

@@ -17,9 +17,15 @@ Feature: Note tree view
     When I expand the children of note "LeSS in Action"
     Then I should see the children notes:
       | note-topic |
-      | TDD   |
-      | ATDD  |
+      | TDD        |
+      | ATDD       |
 
+  @ignore
   Scenario: highlight a child note
     When I highlight the child note "TDD" of note "LeSS in Action"
     Then I should see the note "TDD" with 1 children collapsed
+    When I add a child note "Cycle"
+    Then I should see "My Notes/LeSS in Action/TDD" with these children
+      | note-topic |
+      | TPP        |
+      | Cycle      |

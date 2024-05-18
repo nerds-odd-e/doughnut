@@ -131,6 +131,10 @@ When("I create a note belonging to {string}:", (noteTopic: string, data: DataTab
   start.jumpToNotePage(noteTopic).addingChildNote().createNoteWithAttributes(data.hashes()[0]!)
 })
 
+When("I add a child note {string}", (noteTopic: string) => {
+  start.assumeNotePage().addingChildNote().createNoteWithAttributes({ Topic: noteTopic })
+})
+
 When("I am creating a note under {notepath}", (notePath: NotePath) => {
   start.routerToNotebooksPage().navigateToPath(notePath).addingChildNote()
 })

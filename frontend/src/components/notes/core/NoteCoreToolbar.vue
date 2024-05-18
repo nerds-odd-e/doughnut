@@ -61,6 +61,10 @@
         </div>
       </div>
     </div>
+    <NoteAccessoryToolbar
+      v-bind="{ noteId: note.id }"
+      @note-accessory-updated="$emit('note-accessory-updated', $event)"
+    />
   </nav>
 </template>
 
@@ -92,6 +96,7 @@ export default defineComponent({
       required: true,
     },
   },
+  emits: ["note-accessory-updated"],
   components: {
     NoteNewButton,
     SvgAddChild,
