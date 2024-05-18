@@ -1,10 +1,22 @@
 <template>
-  <NoteCoreToolbar v-if="!readonly" v-bind="{ note, storageAccessor }" />
   <NoteFrameOfLinks v-if="links" v-bind="{ links, storageAccessor }">
     <div class="alert alert-warning" v-if="note.deletedAt">
       This note has been deleted
     </div>
-    <NoteTextContent :note="note" :storage-accessor="storageAccessor" />
+    <NoteEditableTopic
+      :note-id="note.id"
+      :note-topic-constructor="note.topicConstructor"
+      :note-topic="note.topic"
+      :storage-accessor="storageAccessor"
+    />
+    <NoteCoreToolbar v-if="!readonly" v-bind="{ note, storageAccessor }" />
+    <div role="details" class="note-details">
+      <NoteEditableDetails
+        :note-id="note.id"
+        :note-details="note.details"
+        :storage-accessor="storageAccessor"
+      />
+    </div>
   </NoteFrameOfLinks>
 </template>
 
@@ -12,10 +24,11 @@
 import { defineComponent, PropType } from "vue";
 import { Note } from "@/generated/backend";
 import NoteFrameOfLinks from "./NoteFrameOfLinks.vue";
-import NoteTextContent from "./NoteTextContent.vue";
 import { StorageAccessor } from "../../../store/createNoteStorage";
 import LinksMap from "../../../models/LinksMap";
 import NoteCoreToolbar from "./NoteCoreToolbar.vue";
+import NoteEditableTopic from "./NoteEditableTopic.vue";
+import NoteEditableDetails from "./NoteEditableDetails.vue";
 
 export default defineComponent({
   props: {
@@ -31,8 +44,9 @@ export default defineComponent({
   },
   components: {
     NoteFrameOfLinks,
-    NoteTextContent,
     NoteCoreToolbar,
+    NoteEditableTopic,
+    NoteEditableDetails,
   },
 });
 </script>

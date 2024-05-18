@@ -27,7 +27,7 @@
     </div>
   </div>
   <ChildrenNotes
-    v-bind="{ expandChildren, storageAccessor }"
+    v-bind="{ expandChildren, readonly, storageAccessor }"
     :notes="noteRealm.children ?? []"
   />
 </template>
