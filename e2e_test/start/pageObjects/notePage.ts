@@ -53,7 +53,9 @@ export const assumeNotePage = (noteTopic?: string) => {
       return assumeNotePage(noteTopic)
     },
     collapseChildren: () => {
-      cy.findByRole("button", { name: "collapse children" }).click()
+      cy.get("main").within(() => {
+        cy.findByRole("button", { name: "collapse children" }).click()
+      })
     },
     expandChildren: () => {
       cy.findByRole("button", { name: "expand children" }).click()

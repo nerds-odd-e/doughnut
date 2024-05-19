@@ -14,7 +14,12 @@
             id="sidebar"
             role="sidebar"
           >
-            xxxx
+            <Sidebar
+              v-bind="{
+                noteRealm,
+                storageAccessor,
+              }"
+            />
           </div>
           <main
             class="flex-grow-1 d-lg-block"
@@ -42,6 +47,7 @@
 <script setup lang="ts">
 import { PropType, defineProps, ref } from "vue";
 import Breadcrumb from "../toolbars/Breadcrumb.vue";
+import Sidebar from "./Sidebar.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
 defineProps({

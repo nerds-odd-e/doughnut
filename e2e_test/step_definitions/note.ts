@@ -368,7 +368,7 @@ When(
 )
 
 Then("I should see the children notes:", (data: DataTable) => {
-  cy.expectNoteCards(data.hashes())
+  cy.get("main").within(() => cy.expectNoteCards(data.hashes()))
 })
 
 Then(

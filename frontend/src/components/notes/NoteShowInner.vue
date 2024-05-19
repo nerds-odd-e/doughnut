@@ -63,9 +63,3 @@ defineProps({
 
 const updatedNoteAccessory = ref<NoteAccessory | undefined>(undefined);
 </script>
-
-<style scoped>
-.highlighted {
-  border: 1px dashed gray;
-}
-</style>
