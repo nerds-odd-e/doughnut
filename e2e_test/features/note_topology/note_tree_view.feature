@@ -20,7 +20,6 @@ Feature: Note tree view
       | TDD        |
       | ATDD       |
 
-  @ignore
   Scenario: expand side bar to see the note tree
     Given I am on a window 500 * 500
     And I navigate to to "My Notes/LeSS in Action" note

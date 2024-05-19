@@ -9,12 +9,17 @@
         </nav>
         <div class="d-flex">
           <div
-            class="d-lg-block collapse flex-column flex-shrink-0"
+            class="d-lg-block flex-column flex-shrink-0"
+            :class="{ 'd-none': sidebarCollapsedForSmallScreen }"
             id="sidebar"
+            role="sidebar"
           >
             xxxx
           </div>
-          <main class="flex-grow-1">
+          <main
+            class="flex-grow-1 d-lg-block"
+            :class="{ 'd-none': !sidebarCollapsedForSmallScreen }"
+          >
             <div class="container-fluid">
               <!-- Your main content goes here -->
               <Breadcrumb v-bind="{ notePosition: noteRealm.notePosition }" />
@@ -35,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, defineProps } from "vue";
+import { PropType, defineProps, ref } from "vue";
 import Breadcrumb from "../toolbars/Breadcrumb.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
@@ -49,7 +54,11 @@ defineProps({
   },
 });
 
-const toggleSideBar = () => {};
+const sidebarCollapsedForSmallScreen = ref(true);
+
+const toggleSideBar = () => {
+  sidebarCollapsedForSmallScreen.value = !sidebarCollapsedForSmallScreen.value;
+};
 </script>
 
 <style lang="scss" scoped>

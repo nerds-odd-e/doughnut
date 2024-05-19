@@ -45,11 +45,3 @@ Then("I go to the testability page to turn on the feature toggle", () => {
   cy.findByText("Testability").click()
   cy.formField("Feature Toggle").click()
 })
-
-Then("I am on a window {int} * {int}", (width: number, height: number) => {
-  cy.viewport(width, height)
-})
-
-Then("I expand the side bar", () => {
-  cy.findByRole("button", { name: "toggle sidebar" }).click()
-})

@@ -1,6 +1,7 @@
 import { assumeAdminDashboardPage } from "./pageObjects/adminPages/adminDashboardPage"
 import { assumeChatAboutNotePage } from "./pageObjects/chatAboutNotePage"
 import { assumeNotePage } from "./pageObjects/notePage"
+import { sidebar } from "./pageObjects/sidebar"
 import { routerToNotebooksPage } from "./pageObjects/notebooksPage"
 import { navigateToCircle } from "./pageObjects/circlePage"
 import { assumeAnsweredQuestionPage } from "./pageObjects/AnsweredQuestionPage"
@@ -9,6 +10,7 @@ import { assumeClarifyingQuestionDialog } from "./pageObjects/clarifyingQuestion
 import testability from "./testability"
 
 export default {
+  sidebar,
   assumeNotePage,
   assumeAnsweredQuestionPage,
   assumeChatAboutNotePage,
