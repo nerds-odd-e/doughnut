@@ -26,30 +26,7 @@
           <div role="collapsed-children-count">{{ notes.length }}</div>
         </div>
         <div v-else v-for="note in notes" :key="note.id">
-          <NoteRealmLoader
-            v-if="openedNotes.includes(note.id)"
-            v-bind="{ noteId: note.id, storageAccessor }"
-          >
-            <template #default="{ noteRealm }">
-              <NoteShowInner
-                v-bind="{
-                  noteRealm,
-                  expandChildren: false,
-                  readonly,
-                  storageAccessor,
-                }"
-              />
-            </template>
-          </NoteRealmLoader>
-
-          <h5
-            v-else
-            class="card-title w-100"
-            @click="highlight(note.id)"
-            @dblclick="navigateTo(note.id)"
-          >
-            <NoteTopic v-bind="{ topic: note.topic }" />
-          </h5>
+          <NoteTopicWithLink class="w-100 card-title" v-bind="{ note }" />
         </div>
       </div>
     </div>
@@ -58,12 +35,11 @@
 
 <script setup lang="ts">
 import { PropType, ref } from "vue";
-import { useRouter } from "vue-router";
 import { Note } from "@/generated/backend";
 import { StorageAccessor } from "@/store/createNoteStorage";
-import NoteTopic from "./core/NoteTopic.vue";
 import SvgCollapse from "../svgs/SvgCollapse.vue";
 import SvgExpand from "../svgs/SvgExpand.vue";
+import NoteTopicWithLink from "./NoteTopicWithLink.vue";
 
 const props = defineProps({
   notes: { type: Array as PropType<Note[]>, required: true },
@@ -76,7 +52,6 @@ const props = defineProps({
 });
 
 const internalExpandChildren = ref(props.expandChildren);
-const openedNotes = ref<number[]>([]);
 
 const collapse = () => {
   internalExpandChildren.value = false;
@@ -84,13 +59,5 @@ const collapse = () => {
 
 const expand = () => {
   internalExpandChildren.value = true;
-};
-
-const highlight = (noteId: number) => {
-  openedNotes.value.push(noteId);
-};
-
-const navigateTo = (noteId: number) => {
-  useRouter().push({ name: "noteShow", params: { noteId } });
 };
 </script>

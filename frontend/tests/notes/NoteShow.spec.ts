@@ -65,22 +65,4 @@ describe("note wth children", () => {
     await flushPromises();
     expect(screen.queryAllByTitle("collapse children")).toHaveLength(0);
   });
-
-  describe("with children", () => {
-    const parentNote = makeMe.aNoteRealm.topicConstructor("parent").please();
-    makeMe.aNoteRealm.topicConstructor("child").under(parentNote).please();
-
-    it("should not render children control if no child", async () => {
-      render(parentNote);
-      await flushPromises();
-      expect(screen.queryAllByTitle("collapse children")).toHaveLength(1);
-    });
-
-    it("should render note with one child", async () => {
-      render(parentNote);
-      await screen.findByText("parent");
-      await screen.findByText("child");
-      expect(screen.getAllByRole("topic")).toHaveLength(1);
-    });
-  });
 });

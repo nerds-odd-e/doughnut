@@ -15,5 +15,5 @@ Then("I expand the side bar", () => {
 })
 
 Then("I should see the note tree in the sidebar", (data: DataTable) => {
-  start.sidebar().expectItems(data.hashes());
+  start.sidebar().expectItems(data.hashes())
 })

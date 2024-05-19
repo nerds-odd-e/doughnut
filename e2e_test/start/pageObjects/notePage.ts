@@ -49,7 +49,7 @@ export const assumeNotePage = (noteTopic?: string) => {
 
   return {
     navigateToChild: (noteTopic: string) => {
-      cy.findCardTitle(noteTopic).dblclick()
+      cy.findCardTitle(noteTopic).click()
       return assumeNotePage(noteTopic)
     },
     collapseChildren: () => {
