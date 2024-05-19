@@ -49,7 +49,9 @@ export const assumeNotePage = (noteTopic?: string) => {
 
   return {
     navigateToChild: (noteTopic: string) => {
-      cy.findCardTitle(noteTopic).click()
+      cy.get("main").within(() => {
+        cy.findCardTitle(noteTopic).click()
+      })
       return assumeNotePage(noteTopic)
     },
     collapseChildren: () => {
@@ -59,6 +61,11 @@ export const assumeNotePage = (noteTopic?: string) => {
     },
     expandChildren: () => {
       cy.findByRole("button", { name: "expand children" }).click()
+    },
+    expectChildren: (children: Record<string, string>[]) => {
+      cy.get("main").within(() => {
+        cy.expectNoteCards(children)
+      })
     },
     highlightChild: (topic: string) => {
       cy.findCardTitle(topic).click()

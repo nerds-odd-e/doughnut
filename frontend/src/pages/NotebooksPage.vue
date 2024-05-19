@@ -3,7 +3,9 @@
     <p>
       <NotebookNewButton>Add New Notebook</NotebookNewButton>
     </p>
-    <NotebookViewCards :notebooks="notebooks" />
+    <main>
+      <NotebookViewCards :notebooks="notebooks" />
+    </main>
     <h2>Subscribed Notes</h2>
     <NotebookSubscriptionCards
       :subscriptions="subscriptions"

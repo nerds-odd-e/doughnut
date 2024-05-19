@@ -157,8 +157,7 @@ Then(
 )
 
 Then("I should see {notepath} with these children", (notePath: NotePath, data: DataTable) => {
-  start.routerToNotebooksPage().navigateToPath(notePath)
-  cy.expectNoteCards(data.hashes())
+  start.routerToNotebooksPage().navigateToPath(notePath).expectChildren(data.hashes())
 })
 
 When("I delete notebook {string}", (noteTopic: string) => {
