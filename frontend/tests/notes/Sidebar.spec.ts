@@ -71,6 +71,6 @@ describe("Sidebar", () => {
     render(firstGeneration);
     const secondGen = await screen.findByText(secondGeneration.note.topic);
     const sibling = await screen.findByText(firstGenerationSibling.note.topic);
-    expect(isBefore(sibling, secondGen)).toBe(true);
+    expect(isBefore(secondGen, sibling)).toBe(true);
   });
 });

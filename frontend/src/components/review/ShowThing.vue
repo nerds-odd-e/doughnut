@@ -1,8 +1,8 @@
 <template>
   <div v-if="thing.linkType">
-    <div class="jumbotron py-4 mb-2">
+    <main class="jumbotron py-4 mb-2">
       <LinkShow v-bind="{ link: thing, storageAccessor }" />
-    </div>
+    </main>
     <slot />
   </div>
 

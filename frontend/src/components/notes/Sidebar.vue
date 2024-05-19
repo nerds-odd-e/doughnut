@@ -5,14 +5,18 @@
     >
       <template #default="{ noteRealm: nr }">
         <SidebarLevel
-          v-bind="{ expandChildren: true, readonly: false, storageAccessor }"
+          v-bind="{
+            activeNoteRealm: noteRealm,
+            storageAccessor,
+          }"
           :notes="nr.children ?? []"
         />
       </template>
     </NoteRealmLoader>
   </template>
   <SidebarLevel
-    v-bind="{ expandChildren: true, readonly: false, storageAccessor }"
+    v-else
+    v-bind="{ activeNoteRealm: noteRealm, storageAccessor }"
     :notes="noteRealm.children ?? []"
   />
 </template>
