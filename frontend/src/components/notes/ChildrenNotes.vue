@@ -34,7 +34,6 @@
               <NoteShowInner
                 v-bind="{
                   noteRealm,
-                  highlightNoteId,
                   expandChildren: false,
                   readonly,
                   storageAccessor,
@@ -70,14 +69,11 @@ const props = defineProps({
   notes: { type: Array as PropType<Note[]>, required: true },
   expandChildren: { type: Boolean, required: true },
   readonly: { type: Boolean, required: true },
-  highlightNoteId: { type: Number, required: true },
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,
     required: true,
   },
 });
-
-const emit = defineEmits(["highlight-note"]);
 
 const internalExpandChildren = ref(props.expandChildren);
 const openedNotes = ref<number[]>([]);
@@ -92,7 +88,6 @@ const expand = () => {
 
 const highlight = (noteId: number) => {
   openedNotes.value.push(noteId);
-  emit("highlight-note", noteId);
 };
 
 const navigateTo = (noteId: number) => {

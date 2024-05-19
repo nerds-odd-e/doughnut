@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="row"
-    :class="highlightNoteId === noteRealm.id ? 'highlighted' : ''"
-  >
+  <div class="row">
     <NoteCoreToolbar
       v-if="!readonly"
       v-bind="{ note: noteRealm.note, storageAccessor }"
@@ -37,9 +34,8 @@
     </div>
   </div>
   <ChildrenNotes
-    v-bind="{ expandChildren, readonly, highlightNoteId, storageAccessor }"
+    v-bind="{ expandChildren, readonly, storageAccessor }"
     :notes="noteRealm.children ?? []"
-    @highlight-note="$emit('highlight-note', $event)"
   />
 </template>
 
@@ -57,7 +53,6 @@ import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue";
 defineProps({
   noteRealm: { type: Object as PropType<NoteRealm>, required: true },
   expandChildren: { type: Boolean, required: true },
-  highlightNoteId: { type: Number, required: true },
   expandInfo: { type: Boolean, default: false },
   readonly: { type: Boolean, default: true },
   storageAccessor: {
@@ -65,8 +60,6 @@ defineProps({
     required: true,
   },
 });
-
-const emit = defineEmits(["highlight-note"]);
 
 const updatedNoteAccessory = ref<NoteAccessory | undefined>(undefined);
 </script>

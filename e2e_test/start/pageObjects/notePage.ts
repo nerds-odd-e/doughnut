@@ -60,9 +60,6 @@ export const assumeNotePage = (noteTopic?: string) => {
     },
     highlightChild: (topic: string) => {
       cy.findCardTitle(topic).click()
-      cy.get(".highlighted").within(() => {
-        findNoteTopic(topic)
-      })
     },
     collapsedChildrenWithCount: (count: number) => {
       cy.findByText(count, { selector: "[role=collapsed-children-count]" })
