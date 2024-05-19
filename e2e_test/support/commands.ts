@@ -214,7 +214,7 @@ Cypress.Commands.add(
     if (review_type == "initial done") {
       cy.findByText("You have achieved your daily new notes goal.").should("be.visible")
     } else {
-      cy.findByText(topic)
+      cy.findByText(topic, { selector: "main *" })
       switch (review_type) {
         case "single note": {
           if (additional_info) {

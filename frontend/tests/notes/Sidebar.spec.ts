@@ -1,7 +1,6 @@
 import { screen } from "@testing-library/vue";
 import Sidebar from "@/components/notes/Sidebar.vue";
 import { NoteRealm } from "@/generated/backend";
-import { flushPromises } from "@vue/test-utils";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
@@ -14,6 +13,10 @@ describe("Sidebar", () => {
   const firstGenerationSibling = makeMe.aNoteRealm
     .topicConstructor("first gen sibling")
     .under(topNoteRealm)
+    .please();
+  const secondGeneration = makeMe.aNoteRealm
+    .topicConstructor("2nd gen")
+    .under(firstGeneration)
     .please();
 
   const render = (n: NoteRealm) => {
@@ -51,14 +54,14 @@ describe("Sidebar", () => {
       .fn()
       .mockResolvedValue(topNoteRealm);
     render(firstGeneration);
-    await flushPromises();
-    await flushPromises();
-    await flushPromises();
-    await flushPromises();
-    await flushPromises();
-    await flushPromises();
-    await flushPromises();
-    await flushPromises();
     await screen.findByText(firstGenerationSibling.note.topic);
+  });
+
+  it("should have child note of active first gen", async () => {
+    helper.managedApi.restNoteController.show1 = vitest
+      .fn()
+      .mockResolvedValue(topNoteRealm);
+    render(firstGeneration);
+    await screen.findByText(secondGeneration.note.topic);
   });
 });
