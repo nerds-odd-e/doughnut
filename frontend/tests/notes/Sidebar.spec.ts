@@ -73,4 +73,13 @@ describe("Sidebar", () => {
     const sibling = await screen.findByText(firstGenerationSibling.note.topic);
     expect(isBefore(secondGen, sibling)).toBe(true);
   });
+
+  it("should start from notebook top", async () => {
+    helper.managedApi.restNoteController.show1 = vitest
+      .fn()
+      .mockResolvedValueOnce(topNoteRealm)
+      .mockResolvedValueOnce(firstGeneration);
+    render(secondGeneration);
+    await screen.findByText(firstGeneration.note.topic);
+  });
 });
