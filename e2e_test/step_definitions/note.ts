@@ -1,3 +1,4 @@
+import { assumeNotePage } from './../start/pageObjects/notePage';
 /// <reference types="cypress" />
 /// <reference types="../support" />
 // @ts-check
@@ -341,7 +342,7 @@ When(
 )
 
 Then("I should see a child note {string}", (childTopic: string) => {
-  cy.findCardTitle(childTopic)
+  start.assumeNotePage().expectChildren([{ topic: childTopic }])
 })
 
 When(
