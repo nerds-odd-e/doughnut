@@ -30,7 +30,6 @@ Feature: Note tree view
       | TDD        |
       | ATDD       |
 
-  @ignore
   Scenario: Side bar should show the whole notebook
     And I navigate to "My Notes/LeSS in Action/TDD" note
     Then I should see the note tree in the sidebar
