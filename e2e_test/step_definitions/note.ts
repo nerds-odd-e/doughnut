@@ -239,8 +239,8 @@ When("I should be asked to log in again when I click the link {string}", (noteTo
   })
   cy.get("main").within(() => {
     cy.findCardTitle(noteTopic).click()
-    cy.get("#username").should("exist")
   })
+  cy.get("#username").should("exist")
 })
 
 Then(
