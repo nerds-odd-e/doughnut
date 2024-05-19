@@ -3,10 +3,16 @@
     <NoteRealmLoader
       v-bind="{ noteId: noteRealm.note.parentId, storageAccessor }"
     >
-      <template #default="{}"> </template>
+      <template #default="{ noteRealm: nr }">
+        <ChildrenNotes
+          v-bind="{ expandChildren: true, readonly: false, storageAccessor }"
+          :notes="nr.children ?? []"
+        />
+      </template>
     </NoteRealmLoader>
   </template>
   <ChildrenNotes
+    v-else
     v-bind="{ expandChildren: true, readonly: false, storageAccessor }"
     :notes="noteRealm.children ?? []"
   />
@@ -16,6 +22,7 @@
 import { PropType } from "vue";
 import { NoteRealm } from "@/generated/backend";
 import ChildrenNotes from "./ChildrenNotes.vue";
+import NoteRealmLoader from "./NoteRealmLoader.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
 defineProps({

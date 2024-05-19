@@ -11,11 +11,12 @@ describe("Sidebar", () => {
     .topicConstructor("first gen")
     .under(topNoteRealm)
     .please();
+  const firstGenerationSibling = makeMe.aNoteRealm
+    .topicConstructor("first gen sibling")
+    .under(topNoteRealm)
+    .please();
 
   const render = (n: NoteRealm) => {
-    helper.managedApi.restNoteController.show1 = vitest
-      .fn()
-      .mockResolvedValue(n);
     helper
       .component(Sidebar)
       .withStorageProps({
@@ -23,6 +24,10 @@ describe("Sidebar", () => {
       })
       .render();
   };
+
+  beforeEach(() => {
+    helper.managedApi.restNoteController.show1 = vitest.fn();
+  });
 
   it("should not call the api if top note", async () => {
     render(topNoteRealm);
@@ -36,9 +41,24 @@ describe("Sidebar", () => {
 
   it("should call the api if not top note", async () => {
     render(firstGeneration);
-    await flushPromises();
     expect(helper.managedApi.restNoteController.show1).toBeCalledWith(
       topNoteRealm.id,
     );
+  });
+
+  it("should have siblings", async () => {
+    helper.managedApi.restNoteController.show1 = vitest
+      .fn()
+      .mockResolvedValue(topNoteRealm);
+    render(firstGeneration);
+    await flushPromises();
+    await flushPromises();
+    await flushPromises();
+    await flushPromises();
+    await flushPromises();
+    await flushPromises();
+    await flushPromises();
+    await flushPromises();
+    await screen.findByText(firstGenerationSibling.note.topic);
   });
 });
