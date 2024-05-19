@@ -9,8 +9,9 @@ Feature: Note tree view
       | TDD              | LeSS in Action |
       | ATDD             | LeSS in Action |
       | TPP              | TDD            |
+      | Const            | TPP            |
 
-  Scenario: the note should be rendered with parent reference
+  Scenario: a note can have children
     Given I navigate to to "My Notes/LeSS in Action" note
     When I collapse the children of note "LeSS in Action"
     Then I should see the note "LeSS in Action" with 2 children collapsed
@@ -27,6 +28,15 @@ Feature: Note tree view
     Then I should see the note tree in the sidebar
       | note-topic |
       | TDD        |
+      | ATDD       |
+
+  @ignore
+  Scenario: Side bar should show the whole notebook
+    And I navigate to to "My Notes/LeSS in Action/TDD" note
+    Then I should see the note tree in the sidebar
+      | note-topic |
+      | TDD        |
+      | TPP        |
       | ATDD       |
 
   @ignore

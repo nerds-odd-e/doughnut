@@ -8,15 +8,17 @@
         </NotebookNewButton>
       </p>
 
-      <NotebookCardsWithButtons :notebooks="circle.notebooks.notebooks">
-        <template #default="{ notebook }">
-          <NotebookButtons v-bind="{ notebook }" class="card-header-btn">
-            <template #additional-buttons>
-              <BazaarNotebookButtons :notebook="notebook" :logged-in="true" />
-            </template>
-          </NotebookButtons>
-        </template>
-      </NotebookCardsWithButtons>
+      <main>
+        <NotebookCardsWithButtons :notebooks="circle.notebooks.notebooks">
+          <template #default="{ notebook }">
+            <NotebookButtons v-bind="{ notebook }" class="card-header-btn">
+              <template #additional-buttons>
+                <BazaarNotebookButtons :notebook="notebook" :logged-in="true" />
+              </template>
+            </NotebookButtons>
+          </template>
+        </NotebookCardsWithButtons>
+      </main>
 
       <nav class="nav justify-content-end">
         <div
