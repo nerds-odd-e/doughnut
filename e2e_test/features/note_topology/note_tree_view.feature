@@ -21,6 +21,16 @@ Feature: Note tree view
       | ATDD       |
 
   @ignore
+  Scenario: expand side bar to see the note tree
+    Given I am on a window 500 * 500
+    And I navigate to to "My Notes/LeSS in Action" note
+    When I expand the side bar
+    Then I should see the note tree in the sidebar
+      | note-topic |
+      | TDD        |
+      | ATDD       |
+
+  @ignore
   Scenario: highlight a child note
     When I highlight the child note "TDD" of note "LeSS in Action"
     Then I should see the note "TDD" with 1 children collapsed
