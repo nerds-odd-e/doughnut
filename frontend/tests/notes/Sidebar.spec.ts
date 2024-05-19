@@ -4,6 +4,13 @@ import { NoteRealm } from "@/generated/backend";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
+function isBefore(node1: Node, node2: Node) {
+  return !!(
+    // eslint-disable-next-line no-bitwise
+    (node1.compareDocumentPosition(node2) & Node.DOCUMENT_POSITION_FOLLOWING)
+  );
+}
+
 describe("Sidebar", () => {
   const topNoteRealm = makeMe.aNoteRealm.topicConstructor("top").please();
   const firstGeneration = makeMe.aNoteRealm
@@ -62,6 +69,8 @@ describe("Sidebar", () => {
       .fn()
       .mockResolvedValue(topNoteRealm);
     render(firstGeneration);
-    await screen.findByText(secondGeneration.note.topic);
+    const secondGen = await screen.findByText(secondGeneration.note.topic);
+    const sibling = await screen.findByText(firstGenerationSibling.note.topic);
+    expect(isBefore(sibling, secondGen)).toBe(true);
   });
 });

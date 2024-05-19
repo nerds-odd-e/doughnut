@@ -105,7 +105,7 @@ Then(
 
 Then("I should see {string} has no link to {string}", (noteTopic: string, targetTitle: string) => {
   start.jumpToNotePage(noteTopic)
-  cy.findByText(targetTitle).should("not.exist")
+  cy.findByText(targetTitle, { selector: "main *" }).should("not.exist")
 })
 
 Then(
@@ -129,6 +129,6 @@ Then("I delete the link from {string} to {string}", (noteTopic: string, targetTi
   cy.clickLinkNob(targetTitle)
   cy.findByRole("button", { name: "Delete" }).click()
   cy.findByRole("button", { name: "OK" }).click()
-  cy.contains(targetTitle).should("not.exist")
+  cy.get("main").should("not.contain", targetTitle)
   start.assumeNotePage(noteTopic) // remain on the same note page
 })
