@@ -81,5 +81,6 @@ describe("Sidebar", () => {
       .mockResolvedValueOnce(firstGeneration);
     render(secondGeneration);
     await screen.findByText(firstGeneration.note.topic);
+    await screen.findByText(secondGeneration.note.topic);
   });
 });

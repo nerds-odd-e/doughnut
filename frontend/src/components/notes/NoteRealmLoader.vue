@@ -1,49 +1,30 @@
 <template>
   <LoadingPage v-bind="{ contentExists: !!noteRealm }">
-    <slot :note-realm="noteRealm" />
+    <slot v-if="noteRealm" :note-realm="noteRealm" />
   </LoadingPage>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType, watch, toRefs, reactive } from "vue";
+<script setup lang="ts">
+import { PropType, ref } from "vue";
 import LoadingPage from "@/pages/commons/LoadingPage.vue";
+import { NoteRealm } from "@/generated/backend";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
-export default defineComponent({
-  setup(props) {
-    const { noteId, storageAccessor } = toRefs(props);
-    const noteRealmObj = reactive({
-      noteRealm: storageAccessor.value.refOfNoteRealm(noteId.value),
-    });
-    watch(
-      () => noteId,
-      () => {
-        throw new Error(
-          "NoteShow: noteId changed. Please make noteId the key in the parent component.",
-        );
-      },
-    );
-    return noteRealmObj;
-  },
-  props: {
-    noteId: { type: Number, required: true },
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
-  },
-  components: {
-    LoadingPage,
-  },
-  methods: {
-    fetchData() {
-      this.storageAccessor
-        .storedApi()
-        .getNoteRealmAndReloadPosition(this.noteId);
-    },
-  },
-  mounted() {
-    this.fetchData();
+const props = defineProps({
+  noteId: { type: Number, required: true },
+  justLoaded: { type: Object as PropType<NoteRealm>, required: false },
+  storageAccessor: {
+    type: Object as PropType<StorageAccessor>,
+    required: true,
   },
 });
+
+const noteRealm =
+  props.justLoaded?.id === props.noteId
+    ? ref(props.justLoaded)
+    : props.storageAccessor.refOfNoteRealm(props.noteId);
+
+if (props.justLoaded?.id !== props.noteId) {
+  props.storageAccessor.storedApi().getNoteRealmAndReloadPosition(props.noteId);
+}
 </script>
