@@ -12,7 +12,7 @@ Feature: Note tree view
       | Const            | TPP            |
 
   Scenario: a note can have children
-    Given I navigate to to "My Notes/LeSS in Action" note
+    Given I navigate to "My Notes/LeSS in Action" note
     When I collapse the children of note "LeSS in Action"
     Then I should see the note "LeSS in Action" with 2 children collapsed
     When I expand the children of note "LeSS in Action"
@@ -23,7 +23,7 @@ Feature: Note tree view
 
   Scenario: expand side bar to see the note tree
     Given I am on a window 500 * 500
-    And I navigate to to "My Notes/LeSS in Action" note
+    And I navigate to "My Notes/LeSS in Action" note
     When I expand the side bar
     Then I should see the note tree in the sidebar
       | note-topic |
@@ -32,7 +32,7 @@ Feature: Note tree view
 
   @ignore
   Scenario: Side bar should show the whole notebook
-    And I navigate to to "My Notes/LeSS in Action/TDD" note
+    And I navigate to "My Notes/LeSS in Action/TDD" note
     Then I should see the note tree in the sidebar
       | note-topic |
       | TDD        |

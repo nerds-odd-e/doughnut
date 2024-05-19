@@ -10,8 +10,8 @@ Feature: Note parent reference
       | Usually, %P is in-person | LeSS in Action |
 
   Scenario: the note should be rendered with parent reference
-    When I navigate to to "My Notes/LeSS in Action" note
+    When I navigate to "My Notes/LeSS in Action" note
     Then I should see a child note "Usually, [LeSS in Action] is in-person"
 
   Scenario: the topic constructor is editable
-    When I navigate to to "My Notes/LeSS in Action/Usually, [LeSS in Action] is in-person" note
+    When I navigate to "My Notes/LeSS in Action/Usually, [LeSS in Action] is in-person" note
