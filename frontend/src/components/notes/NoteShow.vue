@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, defineProps, ref } from "vue";
+import { PropType, ref } from "vue";
 import Breadcrumb from "../toolbars/Breadcrumb.vue";
 import Sidebar from "./Sidebar.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";

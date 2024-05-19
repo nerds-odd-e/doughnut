@@ -1,4 +1,3 @@
-import { assumeNotePage } from './../start/pageObjects/notePage';
 /// <reference types="cypress" />
 /// <reference types="../support" />
 // @ts-check

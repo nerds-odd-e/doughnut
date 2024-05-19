@@ -1,4 +1,11 @@
 <template>
+  <template v-if="noteRealm.note.parentId">
+    <NoteRealmLoader
+      v-bind="{ noteId: noteRealm.note.parentId, storageAccessor }"
+    >
+      <template #default="{}"> </template>
+    </NoteRealmLoader>
+  </template>
   <ChildrenNotes
     v-bind="{ expandChildren: true, readonly: false, storageAccessor }"
     :notes="noteRealm.children ?? []"
