@@ -69,7 +69,7 @@ class RestNoteController {
 
   @PostMapping(value = "/{parentNote}/create")
   @Transactional
-  public NoteRealm createNote(
+  public NoteCreationRresult createNote(
       @PathVariable(name = "parentNote") @Schema(type = "integer") Note parentNote,
       @Valid @RequestBody NoteCreationDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
@@ -84,7 +84,9 @@ class RestNoteController {
                   wikidataService.wrapWikidataIdWithApi(noteCreation.wikidataId),
                   noteCreation.getLinkTypeToParent(),
                   noteCreation.getTopicConstructor());
-      return new NoteViewer(user, note).toJsonObject();
+      return new NoteCreationRresult(
+          new NoteViewer(user, note).toJsonObject(),
+          new NoteViewer(user, parentNote).toJsonObject());
     } catch (DuplicateWikidataIdException e) {
       BindingResult bindingResult = new BeanPropertyBindingResult(noteCreation, "noteCreation");
       bindingResult.rejectValue("wikidataId", "duplicate", "Duplicate Wikidata ID Detected.");

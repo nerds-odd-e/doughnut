@@ -7,6 +7,7 @@ import type { Note } from '../models/Note';
 import type { NoteAccessoriesDTO } from '../models/NoteAccessoriesDTO';
 import type { NoteAccessory } from '../models/NoteAccessory';
 import type { NoteCreationDTO } from '../models/NoteCreationDTO';
+import type { NoteCreationRresult } from '../models/NoteCreationRresult';
 import type { NoteInfo } from '../models/NoteInfo';
 import type { NotePositionViewedByUser } from '../models/NotePositionViewedByUser';
 import type { NoteRealm } from '../models/NoteRealm';
@@ -21,13 +22,13 @@ export class RestNoteControllerService {
     /**
      * @param parentNote
      * @param requestBody
-     * @returns NoteRealm OK
+     * @returns NoteCreationRresult OK
      * @throws ApiError
      */
     public createNote(
         parentNote: number,
         requestBody: NoteCreationDTO,
-    ): CancelablePromise<NoteRealm> {
+    ): CancelablePromise<NoteCreationRresult> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/notes/{parentNote}/create',

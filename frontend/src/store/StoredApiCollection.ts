@@ -131,7 +131,8 @@ export default class StoredApiCollection implements StoredApi {
       parentId,
       data,
     );
-    const focus = this.storage.refreshNoteRealm(nrwp);
+    const focus = this.storage.refreshNoteRealm(nrwp.created);
+    this.storage.refreshNoteRealm(nrwp.parent);
     this.routerReplaceFocus(router, focus);
     return focus;
   }

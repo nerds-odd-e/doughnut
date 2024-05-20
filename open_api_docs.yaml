@@ -768,7 +768,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/NoteRealm'
+                $ref: '#/components/schemas/NoteCreationRresult'
   /api/notes/{note}/updateWikidataId:
     post:
       tags:
@@ -2657,6 +2657,16 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Thing'
+    NoteCreationRresult:
+      required:
+      - created
+      - parent
+      type: object
+      properties:
+        created:
+          $ref: '#/components/schemas/NoteRealm'
+        parent:
+          $ref: '#/components/schemas/NoteRealm'
     NotePositionViewedByUser:
       type: object
       properties:
