@@ -1,31 +1,30 @@
 <template>
-  <ContentLoader v-if="!noteRealm" />
-  <div v-else>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <button role="button" title="toggle sidebar" @click="toggleSideBar">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-    </nav>
-    <div class="d-flex">
-      <div
-        class="d-lg-block flex-column flex-shrink-0"
-        :class="{ 'd-none': sidebarCollapsedForSmallScreen }"
-        id="sidebar"
-        role="sidebar"
-      >
-        <Sidebar
-          v-bind="{
-            noteRealm,
-            storageAccessor,
-          }"
-        />
-      </div>
-      <main
-        class="flex-grow-1 d-lg-block"
-        :class="{ 'd-none': !sidebarCollapsedForSmallScreen }"
-      >
-        <div class="container-fluid">
-          <!-- Your main content goes here -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <button role="button" title="toggle sidebar" @click="toggleSideBar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  </nav>
+  <div class="d-flex">
+    <div
+      class="d-lg-block flex-column flex-shrink-0"
+      :class="{ 'd-none': sidebarCollapsedForSmallScreen }"
+      id="sidebar"
+      role="sidebar"
+    >
+      <Sidebar
+        v-bind="{
+          noteRealm,
+          storageAccessor,
+        }"
+      />
+    </div>
+    <main
+      class="flex-grow-1 d-lg-block"
+      :class="{ 'd-none': !sidebarCollapsedForSmallScreen }"
+    >
+      <div class="container-fluid">
+        <ContentLoader v-if="!noteRealm" />
+        <div v-else>
           <Breadcrumb v-bind="{ notePosition: noteRealm.notePosition }" />
           <NoteShowInner
             v-bind="{
@@ -36,8 +35,8 @@
             }"
           />
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   </div>
 </template>
 
