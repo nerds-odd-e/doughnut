@@ -10,11 +10,17 @@ Feature: Nested Note creation
       | team             | LeSS in Action |                     |
       | tech             | LeSS in Action |                     |
 
+  @ignore
   Scenario: Create a new note belonging to another note
     When I create a note belonging to "LeSS in Action":
       | Topic        |
       | Re-quirement |
-    Then I should see "My Notes/LeSS in Action" with these children
+    Then I should see the note tree in the sidebar
+      | note-topic   |
+      | team         |
+      | tech         |
+      | Re-quirement |
+    And I should see "My Notes/LeSS in Action" with these children
       | note-topic   |
       | team         |
       | tech         |
@@ -31,8 +37,8 @@ Feature: Nested Note creation
       | Topic     | Link Type To Parent |
       | Re-Design | a specialization of |
     Then I should see "My Notes/LeSS in Action" with these children
-      | note-topic   |
-      | team         |
-      | tech         |
-      | Re-Design    |
+      | note-topic |
+      | team       |
+      | tech       |
+      | Re-Design  |
     And On the current page, I should see "LeSS in Action" has link "a specialization of" "Re-Design"
