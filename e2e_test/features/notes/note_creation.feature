@@ -10,7 +10,6 @@ Feature: Nested Note creation
       | team             | LeSS in Action |                     |
       | tech             | LeSS in Action |                     |
 
-  @ignore
   Scenario: Create a new note belonging to another note
     When I create a note belonging to "LeSS in Action":
       | Topic        |

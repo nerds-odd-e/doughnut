@@ -36,56 +36,66 @@ describe("Sidebar", () => {
       .render();
   };
 
-  it("should not call the api if top note", async () => {
-    helper.managedApi.restNoteController.show1 = vitest.fn();
+  it("should call the api once if top note", async () => {
+    helper.managedApi.restNoteController.show1 = vitest
+      .fn()
+      .mockResolvedValueOnce(topNoteRealm);
     render(topNoteRealm);
-    expect(helper.managedApi.restNoteController.show1).not.toBeCalled();
-  });
-
-  it("should render the children notes", async () => {
-    render(topNoteRealm);
+    expect(helper.managedApi.restNoteController.show1).toBeCalled();
     await screen.findByText(firstGeneration.note.topic);
   });
 
-  it("should call the api if not top note", async () => {
-    helper.managedApi.restNoteController.show1 = vitest
-      .fn()
-      .mockResolvedValue(topNoteRealm);
-    render(firstGeneration);
-    expect(helper.managedApi.restNoteController.show1).toBeCalledWith(
-      topNoteRealm.id,
-    );
-  });
+  describe("first generation", () => {
+    beforeEach(() => {
+      helper.managedApi.restNoteController.show1 = vitest
+        .fn()
+        .mockResolvedValueOnce(topNoteRealm)
+        .mockResolvedValueOnce(firstGeneration);
+    });
 
-  it("should have siblings", async () => {
-    helper.managedApi.restNoteController.show1 = vitest
-      .fn()
-      .mockResolvedValue(topNoteRealm);
-    render(firstGeneration);
-    await screen.findByText(firstGenerationSibling.note.topic);
-  });
+    it("should call the api if not top note", async () => {
+      render(firstGeneration);
+      await flushPromises();
+      expect(helper.managedApi.restNoteController.show1).toBeCalledWith(
+        topNoteRealm.id,
+      );
+      expect(helper.managedApi.restNoteController.show1).toBeCalledWith(
+        firstGeneration.id,
+      );
+    });
 
-  it("should have child note of active first gen", async () => {
-    helper.managedApi.restNoteController.show1 = vitest
-      .fn()
-      .mockResolvedValue(topNoteRealm);
-    render(firstGeneration);
-    const secondGen = await screen.findByText(secondGeneration.note.topic);
-    const sibling = await screen.findByText(firstGenerationSibling.note.topic);
-    expect(isBefore(secondGen, sibling)).toBe(true);
+    it("should have siblings", async () => {
+      render(firstGeneration);
+      await flushPromises();
+      await flushPromises();
+      await screen.findByText(firstGenerationSibling.note.topic);
+    });
+
+    it("should have child note of active first gen", async () => {
+      render(firstGeneration);
+      const secondGen = await screen.findByText(secondGeneration.note.topic);
+      const sibling = await screen.findByText(
+        firstGenerationSibling.note.topic,
+      );
+      expect(isBefore(secondGen, sibling)).toBe(true);
+    });
   });
 
   it("should start from notebook top", async () => {
     helper.managedApi.restNoteController.show1 = vitest
       .fn()
       .mockResolvedValueOnce(topNoteRealm)
-      .mockResolvedValueOnce(firstGeneration);
+      .mockResolvedValueOnce(firstGeneration)
+      .mockResolvedValueOnce(secondGeneration);
     render(secondGeneration);
     await screen.findByText(firstGeneration.note.topic);
     await screen.findByText(secondGeneration.note.topic);
   });
 
   it("should disable the menu and keep the content when loading", async () => {
+    helper.managedApi.restNoteController.show1 = vitest
+      .fn()
+      .mockResolvedValueOnce(topNoteRealm);
     const { rerender } = render(topNoteRealm);
     await flushPromises();
     await rerender({ noteRealm: undefined });
