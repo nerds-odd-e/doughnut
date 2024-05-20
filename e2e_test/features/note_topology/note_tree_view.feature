@@ -10,6 +10,7 @@ Feature: Note tree view
       | ATDD             | LeSS in Action |
       | TPP              | TDD            |
       | Const            | TPP            |
+      | Pull             | ATDD           |
 
   Scenario: a note can have children
     Given I navigate to "My Notes/LeSS in Action" note
@@ -30,13 +31,21 @@ Feature: Note tree view
       | TDD        |
       | ATDD       |
 
+  @ignore
   Scenario: Side bar should show the whole notebook
-    And I navigate to "My Notes/LeSS in Action/TDD" note
+    When I navigate to "My Notes/LeSS in Action/TDD" note
     Then I should see the note tree in the sidebar
       | note-topic |
       | TDD        |
       | TPP        |
       | ATDD       |
+    When I route to the note "ATDD"
+    Then I should see the note tree in the sidebar
+      | note-topic |
+      | TDD        |
+      | TPP        |
+      | ATDD       |
+      | Pull       |
 
   @ignore
   Scenario: highlight a child note

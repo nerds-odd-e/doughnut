@@ -378,3 +378,7 @@ Then(
     start.jumpToNotePage(noteTopic).highlightChild(childNoteTopic)
   },
 )
+
+When("I route to the note {string}", (noteTopic: string) => {
+  start.jumpToNotePage(noteTopic)
+})
