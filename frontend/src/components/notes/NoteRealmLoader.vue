@@ -18,5 +18,7 @@ const props = defineProps({
 });
 
 const noteRealm = props.storageAccessor.refOfNoteRealm(props.noteId);
-props.storageAccessor.storedApi().getNoteRealmAndReloadPosition(props.noteId);
+props.storageAccessor
+  .storedApi()
+  .getNoteRealmRefAndReloadPosition(props.noteId);
 </script>

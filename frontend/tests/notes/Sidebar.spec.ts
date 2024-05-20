@@ -35,11 +35,8 @@ describe("Sidebar", () => {
       .render();
   };
 
-  beforeEach(() => {
-    helper.managedApi.restNoteController.show1 = vitest.fn();
-  });
-
   it("should not call the api if top note", async () => {
+    helper.managedApi.restNoteController.show1 = vitest.fn();
     render(topNoteRealm);
     expect(helper.managedApi.restNoteController.show1).not.toBeCalled();
   });
@@ -50,6 +47,9 @@ describe("Sidebar", () => {
   });
 
   it("should call the api if not top note", async () => {
+    helper.managedApi.restNoteController.show1 = vitest
+      .fn()
+      .mockResolvedValue(topNoteRealm);
     render(firstGeneration);
     expect(helper.managedApi.restNoteController.show1).toBeCalledWith(
       topNoteRealm.id,

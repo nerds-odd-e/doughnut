@@ -6,11 +6,14 @@ import {
   WikidataAssociationCreation,
 } from "@/generated/backend";
 import ManagedApi from "@/managedApi/ManagedApi";
+import { Ref } from "vue";
 import NoteEditingHistory from "./NoteEditingHistory";
 import NoteStorage from "./NoteStorage";
 
 export interface StoredApi {
-  getNoteRealmAndReloadPosition(noteId: Doughnut.ID): Promise<NoteRealm>;
+  getNoteRealmRefAndReloadPosition(
+    noteId: Doughnut.ID,
+  ): Ref<NoteRealm | undefined>;
 
   createNote(
     router: Router,
@@ -112,9 +115,11 @@ export default class StoredApiCollection implements StoredApi {
     );
   }
 
-  async getNoteRealmAndReloadPosition(noteId: Doughnut.ID) {
-    const nrwp = await this.managedApi.restNoteController.show1(noteId);
-    return this.storage.refreshNoteRealm(nrwp);
+  getNoteRealmRefAndReloadPosition(noteId: Doughnut.ID) {
+    this.managedApi.restNoteController
+      .show1(noteId)
+      .then((noteRealm) => this.storage.refreshNoteRealm(noteRealm));
+    return this.storage.refOfNoteRealm(noteId);
   }
 
   async createNote(

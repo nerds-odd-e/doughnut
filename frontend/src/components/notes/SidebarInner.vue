@@ -36,11 +36,9 @@ const props = defineProps({
 const noteRealm =
   props.activeNoteRealm.id === props.noteId
     ? ref(props.activeNoteRealm)
-    : props.storageAccessor.refOfNoteRealm(props.noteId);
-
-if (props.activeNoteRealm.id !== props.noteId) {
-  props.storageAccessor.storedApi().getNoteRealmAndReloadPosition(props.noteId);
-}
+    : props.storageAccessor
+        .storedApi()
+        .getNoteRealmRefAndReloadPosition(props.noteId);
 
 const expandedIds = ref([
   ...(props.activeNoteRealm.notePosition.ancestors?.map((note) => note.id) ??
