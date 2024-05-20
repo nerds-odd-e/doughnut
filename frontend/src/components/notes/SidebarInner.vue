@@ -12,6 +12,7 @@
               activeNoteRealm,
               storageAccessor,
             }"
+            :key="note.id"
           />
         </div>
       </div>
@@ -20,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, ref } from "vue";
+import { PropType, ref, watch } from "vue";
 import { NoteRealm } from "@/generated/backend";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
@@ -37,9 +38,17 @@ const noteRealm = props.storageAccessor
   .storedApi()
   .getNoteRealmRefAndLoadWhenNeeded(props.noteId);
 
-const expandedIds = ref([
-  ...(props.activeNoteRealm.notePosition.ancestors?.map((note) => note.id) ??
-    []),
-  props.activeNoteRealm.note.id,
-]);
+const expandedIds = ref([props.activeNoteRealm.note.id]);
+
+watch(
+  () => props.activeNoteRealm.notePosition.ancestors,
+  (newAncestors) => {
+    const uniqueIds = new Set([
+      ...expandedIds.value,
+      ...(newAncestors?.map((note) => note.id) ?? []),
+    ]);
+    expandedIds.value = Array.from(uniqueIds);
+  },
+  { immediate: true },
+);
 </script>
