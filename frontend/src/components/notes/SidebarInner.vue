@@ -6,9 +6,7 @@
         <div v-for="note in noteRealm?.children" :key="note.id">
           <NoteTopicWithLink class="w-100 card-title" v-bind="{ note }" />
           <SidebarInner
-            v-if="
-              activeNoteRealm.id === note.id || inActiveNoteAncestors(note.id)
-            "
+            v-if="expandedIds.some((id) => id === note.id)"
             v-bind="{
               noteId: note.id,
               activeNoteRealm,
@@ -22,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, ref } from "vue";
+import { PropType, ref, watch } from "vue";
 import { NoteRealm } from "@/generated/backend";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
@@ -35,12 +33,6 @@ const props = defineProps({
   },
 });
 
-const inActiveNoteAncestors = (id: number) => {
-  return props.activeNoteRealm.notePosition.ancestors?.some(
-    (note) => note.id === id,
-  );
-};
-
 const noteRealm =
   props.activeNoteRealm.id === props.noteId
     ? ref(props.activeNoteRealm)
@@ -49,4 +41,10 @@ const noteRealm =
 if (props.activeNoteRealm.id !== props.noteId) {
   props.storageAccessor.storedApi().getNoteRealmAndReloadPosition(props.noteId);
 }
+
+const expandedIds = ref([
+  ...(props.activeNoteRealm.notePosition.ancestors?.map((note) => note.id) ??
+    []),
+  props.activeNoteRealm.note.id,
+]);
 </script>
