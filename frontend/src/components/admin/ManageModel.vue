@@ -4,13 +4,13 @@
     v-if="modelList && selectedModels"
     @save="save"
   />
-  <LoadingPage v-else />
+  <ContentLoader v-else />
 </template>
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
 import { GlobalAiModelSettings } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
-import LoadingPage from "@/pages/commons/LoadingPage.vue";
+import ContentLoader from "@/components/commons/ContentLoader.vue";
 import ManageModelInner from "./ManageModelInner.vue";
 
 const { managedApi } = useLoadingApi();

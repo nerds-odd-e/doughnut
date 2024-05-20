@@ -1,14 +1,13 @@
 <template>
-  <LoadingPage v-bind="{ contentExists: !!notePosition }">
-    <Breadcrumb v-if="notePosition" v-bind="{ notePosition }" />
-  </LoadingPage>
+  <ContentLoader v-if="!notePosition" />
+  <Breadcrumb v-else v-bind="{ notePosition }" />
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 import { NotePositionViewedByUser } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
-import LoadingPage from "@/pages/commons/LoadingPage.vue";
+import ContentLoader from "@/components/commons/ContentLoader.vue";
 import Breadcrumb from "./Breadcrumb.vue";
 
 export default defineComponent({
@@ -19,7 +18,7 @@ export default defineComponent({
     noteId: { type: Number, required: true },
   },
   components: {
-    LoadingPage,
+    ContentLoader,
     Breadcrumb,
   },
   data() {

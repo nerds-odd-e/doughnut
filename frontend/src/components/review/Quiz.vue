@@ -1,27 +1,26 @@
 <template>
   <div v-if="!minimized" class="content">
-    <LoadingPage :content-exists="currentQuestionFetched">
-      <template v-if="currentQuestionFetched">
-        <div v-if="!currentQuizQuestion">
-          <JustReview
-            v-bind="{
-              reviewPointId: currentReviewPointId,
-              storageAccessor,
-            }"
-            @reviewed="onAnswered($event)"
-          />
-        </div>
-        <ContestableQuestion
-          v-else
+    <ContentLoader v-if="!currentQuestionFetched" />
+    <template v-else>
+      <div v-if="!currentQuizQuestion">
+        <JustReview
           v-bind="{
-            quizQuestion: currentQuizQuestion,
+            reviewPointId: currentReviewPointId,
             storageAccessor,
           }"
-          @answered="onAnswered($event)"
-          :key="currentQuizQuestion.id"
+          @reviewed="onAnswered($event)"
         />
-      </template>
-    </LoadingPage>
+      </div>
+      <ContestableQuestion
+        v-else
+        v-bind="{
+          quizQuestion: currentQuizQuestion,
+          storageAccessor,
+        }"
+        @answered="onAnswered($event)"
+        :key="currentQuizQuestion.id"
+      />
+    </template>
   </div>
 </template>
 
@@ -31,7 +30,7 @@ import _ from "lodash";
 import { AnsweredQuestion, QuizQuestion } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import { StorageAccessor } from "@/store/createNoteStorage";
-import LoadingPage from "@/pages/commons/LoadingPage.vue";
+import ContentLoader from "@/components/commons/ContentLoader.vue";
 import JustReview from "./JustReview.vue";
 import ContestableQuestion from "./ContestableQuestion.vue";
 
@@ -61,7 +60,7 @@ export default defineComponent({
   emits: ["answered"],
   components: {
     JustReview,
-    LoadingPage,
+    ContentLoader,
     ContestableQuestion,
   },
   data() {

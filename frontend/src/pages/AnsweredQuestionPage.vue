@@ -1,11 +1,10 @@
 <template>
   <div class="container">
-    <LoadingPage v-bind="{ contentExists: !!answeredQuestion }">
-      <AnsweredQuestionComponent
-        v-if="answeredQuestion"
-        v-bind="{ answeredQuestion, storageAccessor }"
-      />
-    </LoadingPage>
+    <ContentLoader v-if="!answeredQuestion" />
+    <AnsweredQuestionComponent
+      v-else
+      v-bind="{ answeredQuestion, storageAccessor }"
+    />
   </div>
 </template>
 
@@ -15,7 +14,7 @@ import { AnsweredQuestion } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import AnsweredQuestionComponent from "@/components/review/AnsweredQuestionComponent.vue";
 import { StorageAccessor } from "@/store/createNoteStorage";
-import LoadingPage from "./commons/LoadingPage.vue";
+import ContentLoader from "@/components/commons/ContentLoader.vue";
 
 export default defineComponent({
   setup() {
@@ -29,7 +28,7 @@ export default defineComponent({
     },
   },
   components: {
-    LoadingPage,
+    ContentLoader,
     AnsweredQuestionComponent,
   },
   data() {

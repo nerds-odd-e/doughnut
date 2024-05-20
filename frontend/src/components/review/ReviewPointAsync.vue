@@ -1,10 +1,9 @@
 <template>
-  <LoadingPage v-bind="{ contentExists: !!reviewPoint }">
-    <ShowThing
-      v-if="reviewPoint"
-      v-bind="{ thing: reviewPoint.thing, expandInfo: false, storageAccessor }"
-    />
-  </LoadingPage>
+  <ContentLoader v-if="!reviewPoint" />
+  <ShowThing
+    v-else
+    v-bind="{ thing: reviewPoint.thing, expandInfo: false, storageAccessor }"
+  />
 </template>
 
 <script lang="ts">
@@ -12,7 +11,7 @@ import { defineComponent, PropType } from "vue";
 import { ReviewPoint } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import { StorageAccessor } from "@/store/createNoteStorage";
-import LoadingPage from "@/pages/commons/LoadingPage.vue";
+import ContentLoader from "@/components/commons/ContentLoader.vue";
 import ShowThing from "./ShowThing.vue";
 
 export default defineComponent({
@@ -27,7 +26,7 @@ export default defineComponent({
     },
   },
   components: {
-    LoadingPage,
+    ContentLoader,
     ShowThing,
   },
   data() {

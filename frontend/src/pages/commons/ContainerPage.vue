@@ -1,14 +1,15 @@
 <template>
   <div class="container">
-    <LoadingPage v-bind="{ contentExists }">
+    <ContentLoader v-if="!contentExists" />
+    <template v-else>
       <h2 v-if="!!title">{{ title }}</h2>
       <slot />
-    </LoadingPage>
+    </template>
   </div>
 </template>
 
 <script setup>
-import LoadingPage from "./LoadingPage.vue";
+import ContentLoader from "@/components/commons/ContentLoader.vue";
 
 const props = defineProps({
   title: String,
