@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, ref } from "vue";
+import { PropType, computed, ref, toRefs } from "vue";
 import LoadingPage from "@/pages/commons/LoadingPage.vue";
 import Breadcrumb from "../toolbars/Breadcrumb.vue";
 import Sidebar from "./Sidebar.vue";
@@ -59,9 +59,15 @@ const props = defineProps({
   },
 });
 
-const noteRealm = props.storageAccessor
-  .storedApi()
-  .getNoteRealmRefAndReloadPosition(props.noteId);
+const reactiveProps = toRefs(props);
+
+const noteRealmRef = computed(() =>
+  reactiveProps.storageAccessor.value
+    .storedApi()
+    .getNoteRealmRefAndReloadPosition(reactiveProps.noteId.value),
+);
+
+const noteRealm = computed(() => noteRealmRef.value?.value);
 
 const sidebarCollapsedForSmallScreen = ref(true);
 

@@ -7,7 +7,6 @@
         readonly: !user,
         storageAccessor,
       }"
-      :key="noteId"
     />
   </div>
 </template>
