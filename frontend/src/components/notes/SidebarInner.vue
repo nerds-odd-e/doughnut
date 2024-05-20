@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, ref, watch } from "vue";
+import { PropType, ref } from "vue";
 import { NoteRealm } from "@/generated/backend";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
