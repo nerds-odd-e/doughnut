@@ -15,6 +15,10 @@ export interface StoredApi {
     noteId: Doughnut.ID,
   ): Ref<NoteRealm | undefined>;
 
+  getNoteRealmRefAndLoadWhenNeeded(
+    noteId: Doughnut.ID,
+  ): Ref<NoteRealm | undefined>;
+
   createNote(
     router: Router,
     parentId: Doughnut.ID,
@@ -115,11 +119,21 @@ export default class StoredApiCollection implements StoredApi {
     );
   }
 
-  getNoteRealmRefAndReloadPosition(noteId: Doughnut.ID) {
+  private loadNote(noteId: Doughnut.ID) {
     this.managedApi.restNoteController
       .show1(noteId)
       .then((noteRealm) => this.storage.refreshNoteRealm(noteRealm));
+  }
+
+  getNoteRealmRefAndReloadPosition(noteId: Doughnut.ID) {
+    this.loadNote(noteId);
     return this.storage.refOfNoteRealm(noteId);
+  }
+
+  getNoteRealmRefAndLoadWhenNeeded(noteId: Doughnut.ID) {
+    const result = this.storage.refOfNoteRealm(noteId);
+    if (!result.value) this.loadNote(noteId);
+    return result;
   }
 
   async createNote(
