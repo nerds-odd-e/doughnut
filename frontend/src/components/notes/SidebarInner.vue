@@ -46,6 +46,7 @@ watch(
     const uniqueIds = new Set([
       ...expandedIds.value,
       ...(newAncestors?.map((note) => note.id) ?? []),
+      props.activeNoteRealm.note.id,
     ]);
     expandedIds.value = Array.from(uniqueIds);
   },
