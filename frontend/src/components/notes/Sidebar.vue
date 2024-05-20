@@ -1,13 +1,17 @@
 <template>
   <SidebarInner
-    v-if="noteRealm && headNoteId"
-    v-bind="{ noteId: headNoteId, activeNoteRealm: noteRealm, storageAccessor }"
+    v-if="lastDefinedNoteRealm && headNoteId"
+    v-bind="{
+      noteId: headNoteId,
+      activeNoteRealm: lastDefinedNoteRealm,
+      storageAccessor,
+    }"
     :key="headNoteId"
   />
 </template>
 
 <script setup lang="ts">
-import { PropType, computed, toRefs } from "vue";
+import { PropType, Ref, computed, ref, toRefs, watch } from "vue";
 import { NoteRealm } from "@/generated/backend";
 import { first } from "lodash";
 import SidebarInner from "./SidebarInner.vue";
@@ -23,9 +27,22 @@ const props = defineProps({
 
 const reactiveProps = toRefs(props);
 
+const lastDefinedNoteRealm: Ref<NoteRealm | undefined> = ref(undefined);
+
+watch(
+  () => reactiveProps.noteRealm?.value,
+  (newNoteRealm) => {
+    if (newNoteRealm !== undefined) {
+      lastDefinedNoteRealm.value = newNoteRealm;
+    }
+  },
+  { immediate: true },
+);
+
 const headNoteId = computed(() => {
-  if (!reactiveProps.noteRealm?.value) return undefined;
-  const { ancestors } = reactiveProps.noteRealm.value.notePosition;
-  return first(ancestors)?.id ?? reactiveProps.noteRealm.value.note.id;
+  const noteRealm = lastDefinedNoteRealm.value;
+  if (!noteRealm) return undefined;
+  const { ancestors } = noteRealm.notePosition;
+  return first(ancestors)?.id ?? noteRealm.note.id;
 });
 </script>

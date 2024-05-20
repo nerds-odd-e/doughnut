@@ -1,6 +1,7 @@
 import { screen } from "@testing-library/vue";
 import Sidebar from "@/components/notes/Sidebar.vue";
 import { NoteRealm } from "@/generated/backend";
+import { flushPromises } from "@vue/test-utils";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
@@ -27,7 +28,7 @@ describe("Sidebar", () => {
     .please();
 
   const render = (n: NoteRealm) => {
-    helper
+    return helper
       .component(Sidebar)
       .withStorageProps({
         noteRealm: n,
@@ -82,5 +83,13 @@ describe("Sidebar", () => {
     render(secondGeneration);
     await screen.findByText(firstGeneration.note.topic);
     await screen.findByText(secondGeneration.note.topic);
+  });
+
+  it("should disable the menu and keep the content when loading", async () => {
+    const { rerender } = render(topNoteRealm);
+    await flushPromises();
+    rerender({ noteRealm: undefined });
+    await flushPromises();
+    await screen.findByText(firstGeneration.note.topic);
   });
 });
