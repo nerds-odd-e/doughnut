@@ -88,7 +88,7 @@ describe("Sidebar", () => {
   it("should disable the menu and keep the content when loading", async () => {
     const { rerender } = render(topNoteRealm);
     await flushPromises();
-    rerender({ noteRealm: undefined });
+    await rerender({ noteRealm: undefined });
     await flushPromises();
     await screen.findByText(firstGeneration.note.topic);
   });

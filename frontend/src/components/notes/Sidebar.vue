@@ -1,5 +1,6 @@
 <template>
   <SidebarInner
+    :class="{ 'is-disabled': !noteRealm }"
     v-if="lastDefinedNoteRealm && headNoteId"
     v-bind="{
       noteId: headNoteId,
@@ -46,3 +47,10 @@ const headNoteId = computed(() => {
   return first(ancestors)?.id ?? noteRealm.note.id;
 });
 </script>
+
+<style scoped>
+.is-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+</style>
