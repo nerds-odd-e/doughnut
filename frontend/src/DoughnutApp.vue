@@ -1,84 +1,59 @@
-<script lang="ts">
-import { defineComponent, provide, Ref, ref } from "vue";
+<script setup lang="ts">
+import { computed, onMounted, provide, Ref, ref } from "vue";
+import { useRoute } from "vue-router";
 import Popups from "./components/commons/Popups/Popups.vue";
 import TestMenu from "./components/commons/TestMenu.vue";
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
-import { withLoadingApi } from "./managedApi/useLoadingApi";
-import usePopups from "./components/commons/Popups/usePopups";
 import createNoteStorage from "./store/createNoteStorage";
 import ManagedApi, { ApiStatus } from "./managedApi/ManagedApi";
 import GlobalBar from "./components/toolbars/GlobalBar.vue";
 import { User } from "./generated/backend";
 import getEnvironment from "./managedApi/window/getEnvironment";
 
-export default defineComponent({
-  setup() {
-    const apiStatus: Ref<ApiStatus> = ref({
-      errors: [],
-      states: [],
-    });
-    const managedApi = new ManagedApi(apiStatus.value);
-    const storageAccessor = createNoteStorage(managedApi);
-    provide("managedApi", managedApi);
+const apiStatus: Ref<ApiStatus> = ref({
+  errors: [],
+  states: [],
+});
+const managedApi = new ManagedApi(apiStatus.value);
+const storageAccessor = ref(createNoteStorage(managedApi));
+provide("managedApi", managedApi);
+const $route = useRoute();
 
-    return {
-      apiStatus,
-      storageAccessor,
-      ...withLoadingApi(managedApi),
-      ...usePopups(),
-    };
-  },
-  data() {
-    return {
-      externalIdentifier: undefined as undefined | string,
-      user: undefined as undefined | User,
-      featureToggle: false,
-      environment: "production",
-      userLoaded: false,
-    };
-  },
+const externalIdentifier = ref<string | undefined>();
+const user = ref<User | undefined>();
+const featureToggle = ref(false);
+const environment = ref("production");
+const userLoaded = ref(false);
 
-  components: {
-    Popups,
-    TestMenu,
-    UserNewRegisterPage,
-    GlobalBar,
-  },
+const newUser = computed(() => {
+  return !user.value && !!externalIdentifier.value;
+});
+const routeViewProps = computed(() => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const props = {} as any;
+  if ($route.meta.useNoteStorageAccessor) {
+    props.storageAccessor = storageAccessor.value;
+  }
+  if ($route.meta.userProp) {
+    props.user = user;
+  }
+  return props;
+});
 
-  methods: {
-    clearErrorMessage(_id: number) {
-      this.apiStatus.errors = [];
-    },
-  },
+const clearErrorMessage = (_id: number) => {
+  apiStatus.value.errors = [];
+};
 
-  computed: {
-    newUser() {
-      return !this.user && !!this.externalIdentifier;
-    },
-    routeViewProps() {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const props = {} as any;
-      if (this.$route.meta.useNoteStorageAccessor) {
-        props.storageAccessor = this.storageAccessor;
-      }
-      if (this.$route.meta.userProp) {
-        props.user = this.user;
-      }
-      return props;
-    },
-  },
-
-  async mounted() {
-    this.environment = getEnvironment();
-    this.featureToggle =
-      this.environment === "testing" &&
-      (await this.managedApi.testabilityRestController.getFeatureToggle());
-    const userInfo =
-      await this.managedApi.restCurrentUserInfoController.currentUserInfo();
-    this.user = userInfo.user;
-    this.externalIdentifier = userInfo.externalIdentifier;
-    this.userLoaded = true;
-  },
+onMounted(async () => {
+  environment.value = getEnvironment();
+  featureToggle.value =
+    environment.value === "testing" &&
+    (await managedApi.testabilityRestController.getFeatureToggle());
+  const userInfo =
+    await managedApi.restCurrentUserInfoController.currentUserInfo();
+  user.value = userInfo.user;
+  externalIdentifier.value = userInfo.externalIdentifier;
+  userLoaded.value = true;
 });
 </script>
 
