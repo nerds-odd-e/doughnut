@@ -14,7 +14,7 @@
           role="button"
           title="expand children"
           class="badge bg-secondary rounded-pill"
-          >{{ childrenCount(note.id) }}</span
+          >{{ childrenCount(note.id) ?? "..." }}</span
         >
       </div>
       <SidebarInner
