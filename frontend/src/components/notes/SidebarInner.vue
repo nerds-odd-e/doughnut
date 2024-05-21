@@ -5,7 +5,10 @@
       :key="note.id"
       class="list-group-item list-group-item-action pb-0 pe-0 border-0"
     >
-      <NoteTopicWithLink class="w-100 card-title" v-bind="{ note }" />
+      <div class="d-flex w-100 justify-content-between align-items-start">
+        <NoteTopicWithLink class="card-title" v-bind="{ note }" />
+        <span class="badge bg-secondary rounded-pill">14</span>
+      </div>
       <SidebarInner
         v-if="expandedIds.some((id) => id === note.id)"
         v-bind="{

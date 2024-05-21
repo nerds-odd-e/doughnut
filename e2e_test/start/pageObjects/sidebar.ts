@@ -1,9 +1,9 @@
 export const sidebar = () => {
-  cy.get("[role=sidebar]").should("exist")
+  cy.get("aside").should("exist")
 
   return {
     expectItems: (items) => {
-      cy.get("[role=sidebar]").within(() => {
+      cy.get("aside").within(() => {
         cy.expectNoteCards(items)
       })
     },

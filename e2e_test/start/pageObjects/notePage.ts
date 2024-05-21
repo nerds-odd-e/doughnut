@@ -67,9 +67,6 @@ export const assumeNotePage = (noteTopic?: string) => {
         cy.expectNoteCards(children)
       })
     },
-    highlightChild: (topic: string) => {
-      cy.findCardTitle(topic).click()
-    },
     collapsedChildrenWithCount: (count: number) => {
       cy.findByText(count, { selector: "[role=collapsed-children-count]" })
     },

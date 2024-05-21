@@ -47,11 +47,11 @@ Feature: Note tree view
       | Pull       |
 
   @ignore
-  Scenario: highlight a child note
-    When I highlight the child note "TDD" of note "LeSS in Action"
-    Then I should see the note "TDD" with 1 children collapsed
-    When I add a child note "Cycle"
-    Then I should see "My Notes/LeSS in Action/TDD" with these children
+  Scenario: expand and collapse children in the sidebar
+    Given I navigate to "My Notes/LeSS in Action" note
+    When I expand the children of note "TDD"
+    Then I should see the note tree in the sidebar
       | note-topic |
+      | TDD        |
       | TPP        |
-      | Cycle      |
+      | ATDD       |

@@ -131,10 +131,6 @@ When("I create a note belonging to {string}:", (noteTopic: string, data: DataTab
   start.jumpToNotePage(noteTopic).addingChildNote().createNoteWithAttributes(data.hashes()[0]!)
 })
 
-When("I add a child note {string}", (noteTopic: string) => {
-  start.assumeNotePage().addingChildNote().createNoteWithAttributes({ Topic: noteTopic })
-})
-
 When("I am creating a note under {notepath}", (notePath: NotePath) => {
   start.routerToNotebooksPage().navigateToPath(notePath).addingChildNote()
 })
@@ -371,13 +367,6 @@ When(
 Then("I should see the children notes:", (data: DataTable) => {
   cy.get("main").within(() => cy.expectNoteCards(data.hashes()))
 })
-
-Then(
-  "I highlight the child note {string} of note {string}",
-  (childNoteTopic: string, noteTopic: string) => {
-    start.jumpToNotePage(noteTopic).highlightChild(childNoteTopic)
-  },
-)
 
 When("I route to the note {string}", (noteTopic: string) => {
   start.jumpToNotePage(noteTopic)
