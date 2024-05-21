@@ -46,7 +46,6 @@ Feature: Note tree view
       | ATDD       |
       | Pull       |
 
-  @ignore
   Scenario: expand and collapse children in the sidebar
     Given I navigate to "My Notes/LeSS in Action" note
     When I expand the children of note "TDD" in the sidebar

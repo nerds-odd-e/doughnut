@@ -8,8 +8,12 @@ export const sidebar = () => {
       })
     },
     expand: (noteTopic: string) => {
-      cy.findByText(noteTopic).parent().within(() => {
-        cy.findByRole("button", { name: "expand children" }).click()
+      cy.get("aside").within(() => {
+        cy.findByText(noteTopic)
+          .parent()
+          .within(() => {
+            cy.findByTitle("expand children").click()
+          })
       })
     },
   }

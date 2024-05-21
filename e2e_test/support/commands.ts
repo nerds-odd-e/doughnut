@@ -394,5 +394,5 @@ Cypress.Commands.add("expectAMapTo", (latitude: string, longitude: string) => {
 })
 
 Cypress.Commands.add("dismissLastErrorMessage", () => {
-  cy.get(".last-error-message").click()
+  cy.get(".last-error-message").click({ force: true })
 })

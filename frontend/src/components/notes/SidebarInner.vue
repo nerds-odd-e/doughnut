@@ -7,7 +7,13 @@
     >
       <div class="d-flex w-100 justify-content-between align-items-start">
         <NoteTopicWithLink class="card-title" v-bind="{ note }" />
-        <span class="badge bg-secondary rounded-pill">14</span>
+        <span
+          role="button"
+          title="expand children"
+          class="badge bg-secondary rounded-pill"
+          @click="expandChildren(note.id)"
+          >14</span
+        >
       </div>
       <SidebarInner
         v-if="expandedIds.some((id) => id === note.id)"
@@ -41,6 +47,15 @@ const noteRealm = props.storageAccessor
   .getNoteRealmRefAndLoadWhenNeeded(props.noteId);
 
 const expandedIds = ref([props.activeNoteRealm.note.id]);
+
+const expandChildren = (noteId: number) => {
+  const index = expandedIds.value.indexOf(noteId);
+  if (index === -1) {
+    expandedIds.value.push(noteId);
+  } else {
+    expandedIds.value.splice(index, 1);
+  }
+};
 
 watch(
   () => props.activeNoteRealm.notePosition.ancestors,
