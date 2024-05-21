@@ -10,10 +10,14 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="d-flex flex-grow-1 justify-content-between">
-        <Breadcrumb
-          v-if="noteRealm"
-          v-bind="{ notePosition: noteRealm?.notePosition }"
-        />
+        <NoteRealmLoader v-bind="{ noteId: currentNoteId.id, storageAccessor }">
+          <template #default="{ noteRealm }">
+            <Breadcrumb
+              v-if="noteRealm"
+              v-bind="{ notePosition: noteRealm?.notePosition }"
+            />
+          </template>
+        </NoteRealmLoader>
         <div class="btn-group">
           <span class="btn btn-sm" role="button" title="edit note">
             <SvgEdit />
@@ -44,13 +48,4 @@ const currentNoteIdRef = computed(() =>
   reactiveProps.storageAccessor.value.currentNoteIdRef(),
 );
 const currentNoteId = computed(() => currentNoteIdRef.value?.value);
-
-const noteRealmRef = computed(() => {
-  if (currentNoteId.value?.id === undefined) return undefined;
-  return reactiveProps.storageAccessor.value
-    .storedApi()
-    .getNoteRealmRef(currentNoteId.value.id);
-});
-
-const noteRealm = computed(() => noteRealmRef.value?.value);
 </script>
