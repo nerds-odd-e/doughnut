@@ -182,7 +182,7 @@ Then("I should see the note {string} is marked as deleted", (noteTopic: string) 
 Then("I should not see note {string} at the top level of all my notes", (noteTopic: string) => {
   cy.pageIsNotLoading()
   cy.findByText("Notebooks")
-  cy.findCardTitle(noteTopic).should("not.exist")
+  cy.get("main").within(() => cy.findCardTitle(noteTopic).should("not.exist"))
 })
 
 When("I navigate to {notepath} note", (notePath: NotePath) => {
