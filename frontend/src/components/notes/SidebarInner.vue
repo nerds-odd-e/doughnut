@@ -5,14 +5,16 @@
       :key="note.id"
       class="list-group-item list-group-item-action pb-0 pe-0 border-0"
     >
-      <div class="d-flex w-100 justify-content-between align-items-start">
+      <div
+        class="d-flex w-100 justify-content-between align-items-start"
+        @click="toggleChildren(note.id)"
+      >
         <NoteTopicWithLink class="card-title" v-bind="{ note }" />
         <span
           role="button"
           title="expand children"
           class="badge bg-secondary rounded-pill"
-          @click="expandChildren(note.id)"
-          >14</span
+          >{{ childrenCount(note.id) }}</span
         >
       </div>
       <SidebarInner
@@ -48,13 +50,19 @@ const noteRealm = props.storageAccessor
 
 const expandedIds = ref([props.activeNoteRealm.note.id]);
 
-const expandChildren = (noteId: number) => {
+const toggleChildren = (noteId: number) => {
   const index = expandedIds.value.indexOf(noteId);
   if (index === -1) {
     expandedIds.value.push(noteId);
   } else {
     expandedIds.value.splice(index, 1);
   }
+};
+
+const childrenCount = (noteId: number) => {
+  const noteRef = props.storageAccessor.refOfNoteRealm(noteId);
+  if (!noteRef.value) return undefined;
+  return noteRef.value.children?.length ?? 0;
 };
 
 watch(
