@@ -25,8 +25,7 @@ const props = defineProps({ ancestors: Array });
 
 <style lang="scss" scoped>
 .breadcrumb {
-  margin-bottom: 0;
-  background-color: #cee0fa;
+  margin-bottom: 0 !important;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

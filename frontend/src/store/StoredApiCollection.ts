@@ -19,6 +19,8 @@ export interface StoredApi {
     noteId: Doughnut.ID,
   ): Ref<NoteRealm | undefined>;
 
+  getNoteRealmRef(noteId: Doughnut.ID): Ref<NoteRealm | undefined>;
+
   createNote(
     router: Router,
     parentId: Doughnut.ID,
@@ -134,6 +136,10 @@ export default class StoredApiCollection implements StoredApi {
     const result = this.storage.refOfNoteRealm(noteId);
     if (!result.value) this.loadNote(noteId);
     return result;
+  }
+
+  getNoteRealmRef(noteId: Doughnut.ID) {
+    return this.storage.refOfNoteRealm(noteId);
   }
 
   async createNote(

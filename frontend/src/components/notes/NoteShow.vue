@@ -1,23 +1,15 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <button
-      role="button"
-      class="d-lg-none"
-      title="toggle sidebar"
-      @click="toggleSideBar"
-    >
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <Breadcrumb
-      v-if="noteRealm"
-      v-bind="{ notePosition: noteRealm?.notePosition }"
-    />
-  </nav>
+  <NoteTopBar
+    v-bind="{
+      noteId,
+      storageAccessor,
+    }"
+    @toggle-sidebar="toggleSideBar"
+  />
   <div class="d-flex">
     <div
       class="d-lg-block flex-column flex-shrink-0"
       :class="{ 'd-none': sidebarCollapsedForSmallScreen }"
-      id="sidebar"
       role="sidebar"
     >
       <Sidebar
@@ -51,7 +43,6 @@
 <script setup lang="ts">
 import { PropType, computed, ref, toRefs } from "vue";
 import ContentLoader from "@/components/commons/ContentLoader.vue";
-import Breadcrumb from "../toolbars/Breadcrumb.vue";
 import Sidebar from "./Sidebar.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
