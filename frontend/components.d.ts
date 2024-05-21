@@ -90,6 +90,7 @@ declare module 'vue' {
     NoteShow: typeof import('./src/components/notes/NoteShow.vue')['default']
     NoteShowinner: typeof import('./src/components/notes/NoteShowinner.vue')['default']
     NoteShowInner: typeof import('./src/components/notes/NoteShowInner.vue')['default']
+    NoteSidebar: typeof import('./src/components/notes/NoteSidebar.vue')['default']
     NoteTextContent: typeof import('./src/components/notes/core/NoteTextContent.vue')['default']
     NoteTopBar: typeof import('./src/components/notes/NoteTopBar.vue')['default']
     NoteTopic: typeof import('./src/components/notes/core/NoteTopic.vue')['default']

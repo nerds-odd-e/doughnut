@@ -13,9 +13,8 @@
           :class="{ 'd-none': sidebarCollapsedForSmallScreen }"
           role="sidebar"
         >
-          <Sidebar
+          <NoteSidebar
             v-bind="{
-              noteRealm,
               storageAccessor,
             }"
           />
@@ -47,7 +46,6 @@
 <script setup lang="ts">
 import { PropType, ref, toRefs, watch } from "vue";
 import ContentLoader from "@/components/commons/ContentLoader.vue";
-import Sidebar from "./Sidebar.vue";
 import NoteRealmLoader from "./NoteRealmLoader.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
