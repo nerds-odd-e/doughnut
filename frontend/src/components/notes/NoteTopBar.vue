@@ -30,7 +30,6 @@ import Breadcrumb from "../toolbars/Breadcrumb.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
 const props = defineProps({
-  noteId: { type: Number, required: true },
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,
     required: true,
@@ -41,11 +40,17 @@ const emit = defineEmits(["toggle-sidebar"]);
 
 const reactiveProps = toRefs(props);
 
-const noteRealmRef = computed(() =>
-  reactiveProps.storageAccessor.value
-    .storedApi()
-    .getNoteRealmRef(reactiveProps.noteId.value),
+const currentNoteIdRef = computed(() =>
+  reactiveProps.storageAccessor.value.currentNoteIdRef(),
 );
+const currentNoteId = computed(() => currentNoteIdRef.value?.value);
+
+const noteRealmRef = computed(() => {
+  if (currentNoteId.value?.id === undefined) return undefined;
+  return reactiveProps.storageAccessor.value
+    .storedApi()
+    .getNoteRealmRef(currentNoteId.value.id);
+});
 
 const noteRealm = computed(() => noteRealmRef.value?.value);
 </script>

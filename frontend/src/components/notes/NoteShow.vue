@@ -1,7 +1,6 @@
 <template>
   <NoteTopBar
     v-bind="{
-      noteId: currentNoteId?.id,
       storageAccessor,
     }"
     @toggle-sidebar="toggleSideBar"
@@ -66,12 +65,6 @@ const noteRealmRef = computed(() =>
 );
 
 const noteRealm = computed(() => noteRealmRef.value?.value);
-
-const currentNoteIdRef = computed(() =>
-  reactiveProps.storageAccessor.value.currentNoteIdRef(),
-);
-
-const currentNoteId = computed(() => currentNoteIdRef.value?.value);
 
 watch(
   () => reactiveProps.noteId.value,
