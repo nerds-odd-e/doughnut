@@ -1,7 +1,7 @@
 <template>
   <NoteTopBar
     v-bind="{
-      noteId,
+      noteId: currentNoteId?.id,
       storageAccessor,
     }"
     @toggle-sidebar="toggleSideBar"
@@ -33,6 +33,7 @@
               readonly,
               storageAccessor,
             }"
+            :key="noteId"
           />
         </div>
       </div>
@@ -41,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, computed, ref, toRefs } from "vue";
+import { PropType, computed, ref, toRefs, watch } from "vue";
 import ContentLoader from "@/components/commons/ContentLoader.vue";
 import Sidebar from "./Sidebar.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
@@ -65,6 +66,22 @@ const noteRealmRef = computed(() =>
 );
 
 const noteRealm = computed(() => noteRealmRef.value?.value);
+
+const currentNoteIdRef = computed(() =>
+  reactiveProps.storageAccessor.value.currentNoteIdRef(),
+);
+
+const currentNoteId = computed(() => currentNoteIdRef.value?.value);
+
+watch(
+  () => reactiveProps.noteId.value,
+  (newNoteId) => {
+    reactiveProps.storageAccessor.value.currentNoteIdRef().value = {
+      id: newNoteId,
+    };
+  },
+  { immediate: true },
+);
 
 const sidebarCollapsedForSmallScreen = ref(true);
 

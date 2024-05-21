@@ -1,11 +1,16 @@
 import ManagedApi from "@/managedApi/ManagedApi";
+import { Ref, ref } from "vue";
 import NoteEditingHistory, { HistoryRecord } from "./NoteEditingHistory";
 import NoteStorage, { StorageImplementation } from "./NoteStorage";
 import StoredApiCollection, { StoredApi } from "./StoredApiCollection";
 
+type CurrentNoteId = {
+  id: number | undefined;
+};
 interface StorageAccessor extends NoteStorage {
   storedApi(): StoredApi;
   peekUndo(): null | HistoryRecord;
+  currentNoteIdRef(): Ref<CurrentNoteId>;
 }
 
 class AccessorImplementation
@@ -15,6 +20,8 @@ class AccessorImplementation
   noteEditingHistory: NoteEditingHistory;
 
   managedApi: ManagedApi;
+
+  currentNoteIdRefValue = ref({ id: undefined });
 
   constructor(managedApi: ManagedApi, noteEditingHistory?: NoteEditingHistory) {
     super();
@@ -36,6 +43,10 @@ class AccessorImplementation
       this.noteEditingHistory,
       this,
     );
+  }
+
+  currentNoteIdRef() {
+    return this.currentNoteIdRefValue;
   }
 }
 
