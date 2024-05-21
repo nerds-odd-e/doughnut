@@ -35,7 +35,7 @@ const routeViewProps = computed(() => {
     props.storageAccessor = storageAccessor.value;
   }
   if ($route.meta.userProp) {
-    props.user = user;
+    props.user = user.value;
   }
   return props;
 });
