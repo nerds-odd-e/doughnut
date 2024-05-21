@@ -1,5 +1,8 @@
 <template>
-  <NoteRealmLoader v-bind="{ noteId: currentNoteId.id, storageAccessor }">
+  <NoteRealmLoader
+    v-if="currentNoteId?.id"
+    v-bind="{ noteId: currentNoteId.id, storageAccessor }"
+  >
     <template #default="{ noteRealm }">
       <slot :note-realm="noteRealm" />
     </template>

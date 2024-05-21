@@ -44,6 +44,11 @@ const clearErrorMessage = (_id: number) => {
   apiStatus.value.errors = [];
 };
 
+const sidebarCollapsedForSmallScreen = ref(true);
+const toggleSideBar = () => {
+  sidebarCollapsedForSmallScreen.value = !sidebarCollapsedForSmallScreen.value;
+};
+
 onMounted(async () => {
   environment.value = getEnvironment();
   featureToggle.value =
@@ -62,12 +67,32 @@ onMounted(async () => {
   <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
   <template v-else>
     <template v-if="userLoaded">
-      <GlobalBar
-        v-bind="{ storageAccessor, user, apiStatus }"
-        @update-user="user = $event"
-        @clear-error-message="clearErrorMessage($event)"
-      />
-      <router-view v-bind="routeViewProps" />
+      <div clas="d-flex flex-column vh-100">
+        <GlobalBar
+          v-bind="{ storageAccessor, user, apiStatus }"
+          @update-user="user = $event"
+          @clear-error-message="clearErrorMessage($event)"
+          @toggle-sidebar="toggleSideBar"
+        />
+        <div class="d-flex flex-grow-1 overflow-auto h-full">
+          <aside
+            class="d-lg-block flex-shrink-0 overflow-auto"
+            :class="{ 'd-none': sidebarCollapsedForSmallScreen }"
+          >
+            <NoteSidebar
+              v-bind="{
+                storageAccessor,
+              }"
+            />
+          </aside>
+          <main
+            class="flex-grow-1 overflow-auto"
+            :class="{ 'd-none': !sidebarCollapsedForSmallScreen }"
+          >
+            <router-view v-bind="routeViewProps" />
+          </main>
+        </div>
+      </div>
     </template>
     <TestMenu
       v-if="environment === 'testing'"
@@ -77,3 +102,18 @@ onMounted(async () => {
     />
   </template>
 </template>
+
+<style scoped lang="scss">
+@import "bootstrap/scss/bootstrap";
+
+aside {
+  width: 100%;
+  @include media-breakpoint-up(lg) {
+    width: 18rem;
+  }
+}
+
+.h-full {
+  height: calc(100vh - 4rem);
+}
+</style>

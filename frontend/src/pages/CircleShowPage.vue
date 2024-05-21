@@ -8,7 +8,7 @@
         </NotebookNewButton>
       </p>
 
-      <main>
+      <div>
         <NotebookCardsWithButtons :notebooks="circle.notebooks.notebooks">
           <template #default="{ notebook }">
             <NotebookButtons v-bind="{ notebook }" class="card-header-btn">
@@ -18,7 +18,7 @@
             </NotebookButtons>
           </template>
         </NotebookCardsWithButtons>
-      </main>
+      </div>
 
       <nav class="nav justify-content-end">
         <div
