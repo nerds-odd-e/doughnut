@@ -5,45 +5,50 @@
     }"
     @toggle-sidebar="toggleSideBar"
   />
-  <div class="d-flex">
-    <div
-      class="d-lg-block flex-column flex-shrink-0 sidebar"
-      :class="{ 'd-none': sidebarCollapsedForSmallScreen }"
-      role="sidebar"
-    >
-      <Sidebar
-        v-bind="{
-          noteRealm,
-          storageAccessor,
-        }"
-      />
-    </div>
-    <main
-      class="flex-grow-1 d-lg-block"
-      :class="{ 'd-none': !sidebarCollapsedForSmallScreen }"
-    >
-      <div class="container-fluid">
-        <ContentLoader v-if="!noteRealm" />
-        <div v-else>
-          <NoteShowInner
+  <NoteRealmLoader v-bind="{ noteId, storageAccessor }">
+    <template #default="{ noteRealm }">
+      <div class="d-flex">
+        <div
+          class="d-lg-block flex-column flex-shrink-0 sidebar"
+          :class="{ 'd-none': sidebarCollapsedForSmallScreen }"
+          role="sidebar"
+        >
+          <Sidebar
             v-bind="{
               noteRealm,
-              expandChildren,
-              readonly,
               storageAccessor,
             }"
-            :key="noteId"
           />
         </div>
+        <main
+          class="flex-grow-1 d-lg-block"
+          :class="{ 'd-none': !sidebarCollapsedForSmallScreen }"
+        >
+          <div class="container-fluid">
+            <ContentLoader v-if="!noteRealm" />
+            <div v-else>
+              <NoteShowInner
+                v-bind="{
+                  noteRealm,
+                  expandChildren,
+                  readonly,
+                  storageAccessor,
+                }"
+                :key="noteId"
+              />
+            </div>
+          </div>
+        </main>
       </div>
-    </main>
-  </div>
+    </template>
+  </NoteRealmLoader>
 </template>
 
 <script setup lang="ts">
-import { PropType, computed, ref, toRefs, watch } from "vue";
+import { PropType, ref, toRefs, watch } from "vue";
 import ContentLoader from "@/components/commons/ContentLoader.vue";
 import Sidebar from "./Sidebar.vue";
+import NoteRealmLoader from "./NoteRealmLoader.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
 const props = defineProps({
@@ -57,14 +62,6 @@ const props = defineProps({
 });
 
 const reactiveProps = toRefs(props);
-
-const noteRealmRef = computed(() =>
-  reactiveProps.storageAccessor.value
-    .storedApi()
-    .getNoteRealmRefAndReloadPosition(reactiveProps.noteId.value),
-);
-
-const noteRealm = computed(() => noteRealmRef.value?.value);
 
 watch(
   () => reactiveProps.noteId.value,
