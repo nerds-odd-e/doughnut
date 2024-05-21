@@ -8,7 +8,7 @@
   />
   <div class="d-flex">
     <div
-      class="d-lg-block flex-column flex-shrink-0"
+      class="d-lg-block flex-column flex-shrink-0 sidebar"
       :class="{ 'd-none': sidebarCollapsedForSmallScreen }"
       role="sidebar"
     >
@@ -76,7 +76,7 @@ const toggleSideBar = () => {
 <style lang="scss" scoped>
 @import "bootstrap/scss/bootstrap";
 
-#sidebar {
+.sidebar {
   width: 100%;
   @include media-breakpoint-up(lg) {
     width: 18rem;

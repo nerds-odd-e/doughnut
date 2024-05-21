@@ -23,7 +23,7 @@ export default defineComponent({
 
     return {
       apiStatus,
-      storageAccessor: ref(storageAccessor),
+      storageAccessor,
       ...withLoadingApi(managedApi),
       ...usePopups(),
     };
