@@ -1,8 +1,17 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <button role="button" title="toggle sidebar" @click="toggleSideBar">
+    <button
+      role="button"
+      class="d-lg-none"
+      title="toggle sidebar"
+      @click="toggleSideBar"
+    >
       <span class="navbar-toggler-icon"></span>
     </button>
+    <Breadcrumb
+      v-if="noteRealm"
+      v-bind="{ notePosition: noteRealm?.notePosition }"
+    />
   </nav>
   <div class="d-flex">
     <div
@@ -25,7 +34,6 @@
       <div class="container-fluid">
         <ContentLoader v-if="!noteRealm" />
         <div v-else>
-          <Breadcrumb v-bind="{ notePosition: noteRealm.notePosition }" />
           <NoteShowInner
             v-bind="{
               noteRealm,

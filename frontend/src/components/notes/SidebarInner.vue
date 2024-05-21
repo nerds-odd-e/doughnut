@@ -1,6 +1,6 @@
 <template>
   <div v-if="(noteRealm?.children?.length ?? 0) > 0" class="row">
-    <div class="col-auto bg-light p-0" style="width: 40px"></div>
+    <div class="col-auto bg-light p-0" style="width: 10px"></div>
     <div class="col">
       <div class="row">
         <div v-for="note in noteRealm?.children" :key="note.id">
