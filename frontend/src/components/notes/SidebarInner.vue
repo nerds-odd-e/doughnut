@@ -1,23 +1,22 @@
 <template>
-  <div v-if="(noteRealm?.children?.length ?? 0) > 0" class="row">
-    <div class="col-auto bg-light p-0" style="width: 10px"></div>
-    <div class="col">
-      <div class="row">
-        <div v-for="note in noteRealm?.children" :key="note.id">
-          <NoteTopicWithLink class="w-100 card-title" v-bind="{ note }" />
-          <SidebarInner
-            v-if="expandedIds.some((id) => id === note.id)"
-            v-bind="{
-              noteId: note.id,
-              activeNoteRealm,
-              storageAccessor,
-            }"
-            :key="note.id"
-          />
-        </div>
-      </div>
-    </div>
-  </div>
+  <ul v-if="(noteRealm?.children?.length ?? 0) > 0" class="list-group">
+    <li
+      v-for="note in noteRealm?.children"
+      :key="note.id"
+      class="list-group-item list-group-item-action pb-0 pe-0 border-0"
+    >
+      <NoteTopicWithLink class="w-100 card-title" v-bind="{ note }" />
+      <SidebarInner
+        v-if="expandedIds.some((id) => id === note.id)"
+        v-bind="{
+          noteId: note.id,
+          activeNoteRealm,
+          storageAccessor,
+        }"
+        :key="note.id"
+      />
+    </li>
+  </ul>
 </template>
 
 <script setup lang="ts">
