@@ -357,6 +357,10 @@ When("I expand the children of note {string}", (noteTopic: string) => {
   start.assumeNotePage(noteTopic).expandChildren()
 })
 
+When("I expand the children of note {string} in the sidebar", (noteTopic: string) => {
+  start.sidebar().expand(noteTopic)
+})
+
 When(
   "I should see the note {string} with {int} children collapsed",
   (noteTopic: string, childrenCount: number) => {

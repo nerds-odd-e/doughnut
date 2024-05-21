@@ -7,5 +7,10 @@ export const sidebar = () => {
         cy.expectNoteCards(items)
       })
     },
+    expand: (noteTopic: string) => {
+      cy.findByText(noteTopic).parent().within(() => {
+        cy.findByRole("button", { name: "expand children" }).click()
+      })
+    },
   }
 }

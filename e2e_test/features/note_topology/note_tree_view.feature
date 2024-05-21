@@ -49,7 +49,7 @@ Feature: Note tree view
   @ignore
   Scenario: expand and collapse children in the sidebar
     Given I navigate to "My Notes/LeSS in Action" note
-    When I expand the children of note "TDD"
+    When I expand the children of note "TDD" in the sidebar
     Then I should see the note tree in the sidebar
       | note-topic |
       | TDD        |
