@@ -7,8 +7,12 @@ FROM gitpod/workspace-full-vnc
 USER root
 
 # Install Cypress dependencies.
-RUN apt-get -y update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y lsb-release ca-certificates curl apt-utils \
+    && curl -sSLo /tmp/debsuryorg-archive-keyring.deb https://packages.sury.org/debsuryorg-archive-keyring.deb \
+    && dpkg -i /tmp/debsuryorg-archive-keyring.deb \
+    && sh -c 'echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libgtk2.0-0 \
     libgtk-3-0 \
     libgbm-dev \
@@ -24,7 +28,7 @@ RUN apt-get -y update \
     htop \
     lsof \
     net-tools \
-    git-all \
+    git \
     vim \
     git-extras \
     unzip \
@@ -49,9 +53,6 @@ RUN apt-get -y update \
     && rm -rf /home/gitpod/.nix-profile \
     && rm -rf /home/gitpod/.config/nixpkgs
 
-RUN apt-get -y update \
-    && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
-
 # use bash over dash for /bin/sh
 RUN DEBIAN_FRONTEND=noninteractive dpkg-reconfigure -p critical dash
 
@@ -71,7 +72,7 @@ WORKDIR /home/gitpod
 
 # Install Nix
 RUN touch .bash_profile \
-    && curl https://nixos.org/releases/nix/nix-2.22.0/install | sh
+    && curl https://nixos.org/releases/nix/nix-2.22.1/install | sh
 
 RUN echo '. /home/gitpod/.nix-profile/etc/profile.d/nix.sh' >> /home/gitpod/.bashrc
 RUN mkdir -p /home/gitpod/.config/nixpkgs && echo '{ allowUnfree = true; }' >> /home/gitpod/.config/nixpkgs/config.nix
@@ -83,6 +84,10 @@ RUN mkdir -p /home/gitpod/.config/nix \
 # xclip & nix develop
 RUN echo "test -f ./sh_profile && source ./sh_profile" >> /home/gitpod/.bashrc \
     && echo "test -f ./sh_profile && source ./sh_profile" >> /home/gitpod/.zshrc
+
+# atuin
+RUN echo 'eval "$(atuin init bash)"' >> ~/.bashrc \
+    && echo 'eval "$(atuin init zsh)"' >> ~/.zshrc
 
 EXPOSE 5173
 EXPOSE 3309
