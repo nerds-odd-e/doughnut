@@ -66,28 +66,26 @@ onMounted(async () => {
 
 <template>
   <Popups />
-  <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
-  <template v-else>
-    <template v-if="userLoaded">
-      <div clas="d-flex flex-column vh-100">
-        <GlobalBar
-          v-bind="{ storageAccessor, user, apiStatus }"
-          @update-user="user = $event"
-          @clear-error-message="clearErrorMessage($event)"
-          @toggle-sidebar="toggleSideBar"
-        />
-        <div class="overflow-auto h-full">
-          <router-view v-bind="routeViewProps" />
-        </div>
+  <div clas="d-flex flex-column vh-100">
+    <GlobalBar
+      v-bind="{ storageAccessor, user, apiStatus }"
+      @update-user="user = $event"
+      @clear-error-message="clearErrorMessage($event)"
+      @toggle-sidebar="toggleSideBar"
+    />
+    <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
+    <template v-else-if="userLoaded">
+      <div class="overflow-auto h-full">
+        <router-view v-bind="routeViewProps" />
       </div>
     </template>
-    <TestMenu
-      v-if="environment === 'testing'"
-      :feature-toggle="featureToggle"
-      :user="user"
-      @feature-toggle="featureToggle = $event"
-    />
-  </template>
+  </div>
+  <TestMenu
+    v-if="environment === 'testing'"
+    :feature-toggle="featureToggle"
+    :user="user"
+    @feature-toggle="featureToggle = $event"
+  />
 </template>
 
 <style scoped lang="scss">
