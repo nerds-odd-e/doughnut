@@ -1,13 +1,13 @@
 <template>
   <teleport to="#head-status">
-    <CurrentNoteRealmLoader v-bind="{ storageAccessor }">
+    <NoteRealmLoader v-bind="{ noteId, storageAccessor }">
       <template #default="{ noteRealm }">
         <Breadcrumb
           v-if="noteRealm"
           v-bind="{ notePosition: noteRealm?.notePosition }"
         />
       </template>
-    </CurrentNoteRealmLoader>
+    </NoteRealmLoader>
   </teleport>
   <div class="d-flex flex-grow-1">
     <aside
@@ -16,6 +16,7 @@
     >
       <NoteSidebar
         v-bind="{
+          noteId,
           storageAccessor,
         }"
       />

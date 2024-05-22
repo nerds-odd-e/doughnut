@@ -20,12 +20,12 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, toRefs, watch } from "vue";
+import { PropType } from "vue";
 import ContentLoader from "@/components/commons/ContentLoader.vue";
 import NoteRealmLoader from "./NoteRealmLoader.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
-const props = defineProps({
+defineProps({
   noteId: { type: Number, required: true },
   expandChildren: { type: Boolean, required: true },
   readonly: { type: Boolean, default: true },
@@ -34,16 +34,4 @@ const props = defineProps({
     required: true,
   },
 });
-
-const reactiveProps = toRefs(props);
-
-watch(
-  () => reactiveProps.noteId.value,
-  (newNoteId) => {
-    reactiveProps.storageAccessor.value.currentNoteIdRef().value = {
-      id: newNoteId,
-    };
-  },
-  { immediate: true },
-);
 </script>
