@@ -74,23 +74,25 @@ onMounted(async () => {
           @clear-error-message="clearErrorMessage($event)"
           @toggle-sidebar="toggleSideBar"
         />
-        <div class="d-flex flex-grow-1 overflow-auto h-full">
-          <aside
-            class="d-lg-block flex-shrink-0 overflow-auto"
-            :class="{ 'd-none': sidebarCollapsedForSmallScreen }"
-          >
-            <NoteSidebar
-              v-bind="{
-                storageAccessor,
-              }"
-            />
-          </aside>
-          <main
-            class="flex-grow-1 overflow-auto"
-            :class="{ 'd-none': !sidebarCollapsedForSmallScreen }"
-          >
-            <router-view v-bind="routeViewProps" />
-          </main>
+        <div class="overflow-auto h-full">
+          <div class="d-flex flex-grow-1">
+            <aside
+              class="d-lg-block flex-shrink-0 overflow-auto"
+              :class="{ 'd-none': sidebarCollapsedForSmallScreen }"
+            >
+              <NoteSidebar
+                v-bind="{
+                  storageAccessor,
+                }"
+              />
+            </aside>
+            <main
+              class="flex-grow-1 overflow-auto"
+              :class="{ 'd-none': !sidebarCollapsedForSmallScreen }"
+            >
+              <router-view v-bind="routeViewProps" />
+            </main>
+          </div>
         </div>
       </div>
     </template>
