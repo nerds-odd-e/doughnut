@@ -9,7 +9,7 @@
         class="d-flex w-100 justify-content-between align-items-start"
         @click="toggleChildren(note.id)"
       >
-        <NoteTopicWithLink class="card-title" v-bind="{ note }" />
+        <NoteTopicWithLink class="card-title" v-bind="{ note }" @click.stop />
         <span
           role="button"
           title="expand children"
