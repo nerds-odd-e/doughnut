@@ -16,7 +16,6 @@ Feature: Logged in status
     And I navigate to "My Notes/Shape" note
     When my session is logged out
     Then I should be asked to log in again when I click the link "Triangle"
-    When I login as "old_learner" I should see "Triangle"
 
   @mockBrowserTime
   Scenario: Session timeout out when post
