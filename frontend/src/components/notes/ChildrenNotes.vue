@@ -25,9 +25,7 @@
         <div v-if="!internalExpandChildren">
           <div role="collapsed-children-count">{{ notes.length }}</div>
         </div>
-        <div v-else v-for="note in notes" :key="note.id">
-          <NoteTopicWithLink class="w-100 card-title" v-bind="{ note }" />
-        </div>
+        <Cards v-else :notes="notes" :columns="2" />
       </div>
     </div>
   </div>
@@ -39,7 +37,6 @@ import { Note } from "@/generated/backend";
 import { StorageAccessor } from "@/store/createNoteStorage";
 import SvgCollapse from "../svgs/SvgCollapse.vue";
 import SvgExpand from "../svgs/SvgExpand.vue";
-import NoteTopicWithLink from "./NoteTopicWithLink.vue";
 
 const props = defineProps({
   notes: { type: Array as PropType<Note[]>, required: true },

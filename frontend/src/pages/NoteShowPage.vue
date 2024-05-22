@@ -21,7 +21,7 @@
   </teleport>
   <div class="d-flex flex-grow-1">
     <aside
-      class="d-lg-block flex-shrink-0 overflow-auto"
+      class="d-lg-block flex-shrink-0 overflow-auto me-3"
       :class="{ 'd-none': sidebarCollapsedForSmallScreen }"
     >
       <NoteSidebar
