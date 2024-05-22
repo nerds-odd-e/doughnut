@@ -230,6 +230,7 @@ Then("*for demo* I should see there are {int} descendants", (numberOfDescendants
 })
 
 When("I should be asked to log in again when I click the link {string}", (noteTopic: string) => {
+  cy.pageIsNotLoading();
   cy.on("uncaught:exception", () => {
     return false
   })
