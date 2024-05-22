@@ -1,28 +1,19 @@
 <template>
   <nav class="navbar justify-content-between global-bar sticky-top">
     <div class="container-fluid d-flex">
-      <div class="btn-group">
-        <PopButton v-if="user" title="open sidebar" :sidebar="'left'">
-          <template #button_face>
-            <SvgSidebar />
-          </template>
-          <GlobalSidebar
-            :user="user"
-            @update-user="$emit('updateUser', $event)"
-          />
-        </PopButton>
-        <LoginButton v-else />
-        <button
-          role="button"
-          class="d-lg-none btn btn-sm"
-          title="toggle sidebar"
-          @click="$emit('toggle-sidebar')"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-      </div>
+      <PopButton v-if="user" title="open sidebar" :sidebar="'left'">
+        <template #button_face>
+          <SvgSidebar />
+        </template>
+        <GlobalSidebar
+          :user="user"
+          @update-user="$emit('updateUser', $event)"
+        />
+      </PopButton>
+      <LoginButton v-else />
+
       <div class="d-flex flex-grow-1 justify-content-between">
-        <div id="head-status" />
+        <div class="d-flex" id="head-status" />
         <div class="btn-group btn-group-sm">
           <PopButton v-if="user" title="search note">
             <template #button_face>
@@ -63,7 +54,7 @@ defineProps({
   apiStatus: { type: Object as PropType<ApiStatus>, required: true },
   user: { type: Object as PropType<User> },
 });
-defineEmits(["updateUser", "clearErrorMessage", "toggle-sidebar"]);
+defineEmits(["updateUser", "clearErrorMessage"]);
 </script>
 
 <style scoped lang="scss">

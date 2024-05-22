@@ -23,7 +23,6 @@ function NestedPage(
         type: Object as PropType<User>,
         required: true,
       },
-      sidebarCollapsedForSmallScreen: { type: Boolean, required: false },
     },
     computed: {
       isNested() {

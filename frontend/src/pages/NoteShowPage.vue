@@ -1,5 +1,15 @@
 <template>
   <teleport to="#head-status">
+    <div class="btn-group">
+      <button
+        role="button"
+        class="d-lg-none btn btn-sm"
+        title="toggle sidebar"
+        @click="toggleSideBar"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
     <NoteRealmLoader v-bind="{ noteId, storageAccessor }">
       <template #default="{ noteRealm }">
         <Breadcrumb
@@ -25,38 +35,38 @@
       class="flex-grow-1 overflow-auto"
       :class="{ 'd-none': !sidebarCollapsedForSmallScreen }"
     >
-      <div class="container">
-        <NoteShow
-          v-bind="{
-            noteId,
-            expandChildren: true,
-            readonly: !user,
-            storageAccessor,
-          }"
-        />
-      </div>
+      <NoteShow
+        v-bind="{
+          noteId,
+          expandChildren: true,
+          readonly: !user,
+          storageAccessor,
+        }"
+      />
     </main>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from "vue";
+<script setup lang="ts">
+import { PropType, ref } from "vue";
 import { User } from "@/generated/backend";
 import NoteShow from "../components/notes/NoteShow.vue";
 import { StorageAccessor } from "../store/createNoteStorage";
 
-export default defineComponent({
-  props: {
-    noteId: { type: Number, required: true },
-    sidebarCollapsedForSmallScreen: { type: Boolean, required: false },
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
-    user: { type: Object as PropType<User> },
+defineProps({
+  noteId: { type: Number, required: true },
+  storageAccessor: {
+    type: Object as PropType<StorageAccessor>,
+    required: true,
   },
-  components: { NoteShow },
+  user: { type: Object as PropType<User> },
 });
+
+const sidebarCollapsedForSmallScreen = ref(true);
+
+const toggleSideBar = () => {
+  sidebarCollapsedForSmallScreen.value = !sidebarCollapsedForSmallScreen.value;
+};
 </script>
 
 <style scoped lang="scss">

@@ -25,11 +25,6 @@ const featureToggle = ref(false);
 const environment = ref("production");
 const userLoaded = ref(false);
 
-const sidebarCollapsedForSmallScreen = ref(true);
-const toggleSideBar = () => {
-  sidebarCollapsedForSmallScreen.value = !sidebarCollapsedForSmallScreen.value;
-};
-
 const newUser = computed(() => {
   return !user.value && !!externalIdentifier.value;
 });
@@ -37,7 +32,6 @@ const newUser = computed(() => {
 const routeViewProps = computed(() => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const props = {} as any;
-  props.sidebarCollapsedForSmallScreen = sidebarCollapsedForSmallScreen.value;
   if ($route.meta.useNoteStorageAccessor) {
     props.storageAccessor = storageAccessor.value;
   }
@@ -71,7 +65,6 @@ onMounted(async () => {
       v-bind="{ storageAccessor, user, apiStatus }"
       @update-user="user = $event"
       @clear-error-message="clearErrorMessage($event)"
-      @toggle-sidebar="toggleSideBar"
     />
     <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
     <template v-else-if="userLoaded">
