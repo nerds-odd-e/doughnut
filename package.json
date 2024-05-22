@@ -52,13 +52,13 @@
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.0",
     "@testing-library/cypress": "10.0.1",
     "@types/cypress-cucumber-preprocessor": "^4.0.5",
-    "@types/node": "^20.12.10",
+    "@types/node": "^20.12.12",
     "@types/testing-library__cypress": "^5.0.13",
-    "@typescript-eslint/eslint-plugin": "^7.8.0",
-    "@typescript-eslint/parser": "^7.8.0",
-    "cypress": "13.9.0",
+    "@typescript-eslint/eslint-plugin": "^7.10.0",
+    "@typescript-eslint/parser": "^7.10.0",
+    "cypress": "13.10.0",
     "cypress-file-upload": "^5.0.8",
-    "esbuild": "^0.21.1",
+    "esbuild": "^0.21.3",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-chai-friendly": "^0.7.4",
@@ -67,10 +67,10 @@
     "eslint-plugin-testing-library": "^6.2.2",
     "eslint-plugin-unused-imports": "^3.2.0",
     "github_action_sound": "^1.0.4",
-    "got": "^14.2.1",
+    "got": "^14.3.0",
     "jsdom": "^24.0.0",
     "mountebank": "^2.9.1",
-    "npm-run-all2": "^6.1.2",
+    "npm-run-all2": "^6.2.0",
     "openapi-typescript-codegen": "^0.29.0",
     "prettier": "^3.2.5",
     "superagent": "^9.0.2",
@@ -79,7 +79,7 @@
     "wait-on": "^7.2.0"
   },
   "dependencies": {
-    "@cucumber/cucumber": "^10.6.0"
+    "@cucumber/cucumber": "^10.7.0"
   },
   "pnpm": {
     "overrides": {
