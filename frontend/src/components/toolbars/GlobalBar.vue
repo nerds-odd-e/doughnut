@@ -29,6 +29,7 @@
           <NoteUndoButton v-bind="{ storageAccessor }" />
         </div>
         <ApiStatus
+          v-if="user"
           :api-status="apiStatus"
           @clear-error-message="$emit('clearErrorMessage')"
         />
