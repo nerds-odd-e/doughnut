@@ -53,31 +53,24 @@
   </nav>
 </template>
 
-<script lang="ts">
-import { PropType, defineComponent } from "vue";
+<script setup lang="ts">
+import { PropType } from "vue";
 import { User } from "@/generated/backend";
-import { ApiStatus } from "@/managedApi/ManagedApi";
+import { type ApiStatus } from "@/managedApi/ManagedApi";
 import { StorageAccessor } from "@/store/createNoteStorage";
 import PopButton from "@/components/commons/Popups/PopButton.vue";
 import SvgSidebar from "@/components/svgs/SvgSidebar.vue";
 import GlobalSidebar from "./GlobalSidebar.vue";
 
-export default defineComponent({
-  props: {
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
-    apiStatus: { type: Object as PropType<ApiStatus>, required: true },
-    user: { type: Object as PropType<User> },
+defineProps({
+  storageAccessor: {
+    type: Object as PropType<StorageAccessor>,
+    required: true,
   },
-  components: {
-    PopButton,
-    SvgSidebar,
-    GlobalSidebar,
-  },
-  emits: ["updateUser", "clearErrorMessage", "toggle-sidebar"],
+  apiStatus: { type: Object as PropType<ApiStatus>, required: true },
+  user: { type: Object as PropType<User> },
 });
+defineEmits(["updateUser", "clearErrorMessage", "toggle-sidebar"]);
 </script>
 
 <style scoped lang="scss">
