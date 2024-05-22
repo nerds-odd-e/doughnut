@@ -22,14 +22,7 @@
         </button>
       </div>
       <div class="d-flex flex-grow-1 justify-content-between">
-        <CurrentNoteRealmLoader v-bind="{ storageAccessor }">
-          <template #default="{ noteRealm }">
-            <Breadcrumb
-              v-if="noteRealm"
-              v-bind="{ notePosition: noteRealm?.notePosition }"
-            />
-          </template>
-        </CurrentNoteRealmLoader>
+        <div id="head-status" />
         <div class="btn-group btn-group-sm">
           <PopButton v-if="user" title="search note">
             <template #button_face>

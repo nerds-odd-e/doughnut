@@ -1,4 +1,14 @@
 <template>
+  <teleport to="#head-status">
+    <CurrentNoteRealmLoader v-bind="{ storageAccessor }">
+      <template #default="{ noteRealm }">
+        <Breadcrumb
+          v-if="noteRealm"
+          v-bind="{ notePosition: noteRealm?.notePosition }"
+        />
+      </template>
+    </CurrentNoteRealmLoader>
+  </teleport>
   <div class="d-flex flex-grow-1">
     <aside
       class="d-lg-block flex-shrink-0 overflow-auto"
