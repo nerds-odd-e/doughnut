@@ -15,6 +15,8 @@ WORKDIR /home/gitpod
 RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh
 
 # atuin
-RUN curl --proto '=https' --tlsv1.2 -sSf https://setup.atuin.sh | sh
+RUN curl -o install-atuin --proto '=https' --tlsv1.2 -sSf https://setup.atuin.sh \
+    && chmod +x ./install-atuin \
+    && ./install-atuin
 RUN echo 'eval "$(atuin init bash)"' >> ~/.bashrc \
     && echo 'eval "$(atuin init zsh)"' >> ~/.zshrc
