@@ -334,9 +334,7 @@ Cypress.Commands.add("shouldSeeQuizWithOptions", (questionParts: string[], optio
   questionParts.forEach((part) => {
     cy.get(".quiz-instruction").contains(part)
   })
-  cy.get("main").within(() => {
-    options.commonSenseSplit(",").forEach((option: string) => cy.findByText(option))
-  })
+  options.commonSenseSplit(",").forEach((option: string) => cy.findByText(option))
 })
 
 Cypress.Commands.add("formField", (label) => {
