@@ -1,12 +1,12 @@
 <template>
-  <div v-if="thing.linkType">
+  <main v-if="thing.linkType">
     <div class="jumbotron py-4 mb-2">
       <LinkShow v-bind="{ link: thing, storageAccessor }" />
     </div>
     <slot />
-  </div>
+  </main>
 
-  <div v-else-if="noteId">
+  <main v-else-if="noteId">
     <NoteShow
       v-if="noteId"
       v-bind="{
@@ -16,7 +16,7 @@
         storageAccessor,
       }"
     />
-  </div>
+  </main>
 </template>
 
 <script lang="ts">

@@ -25,12 +25,19 @@ const featureToggle = ref(false);
 const environment = ref("production");
 const userLoaded = ref(false);
 
+const sidebarCollapsedForSmallScreen = ref(true);
+const toggleSideBar = () => {
+  sidebarCollapsedForSmallScreen.value = !sidebarCollapsedForSmallScreen.value;
+};
+
 const newUser = computed(() => {
   return !user.value && !!externalIdentifier.value;
 });
+
 const routeViewProps = computed(() => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const props = {} as any;
+  props.sidebarCollapsedForSmallScreen = sidebarCollapsedForSmallScreen.value;
   if ($route.meta.useNoteStorageAccessor) {
     props.storageAccessor = storageAccessor.value;
   }
@@ -42,11 +49,6 @@ const routeViewProps = computed(() => {
 
 const clearErrorMessage = (_id: number) => {
   apiStatus.value.errors = [];
-};
-
-const sidebarCollapsedForSmallScreen = ref(true);
-const toggleSideBar = () => {
-  sidebarCollapsedForSmallScreen.value = !sidebarCollapsedForSmallScreen.value;
 };
 
 onMounted(async () => {
@@ -75,24 +77,7 @@ onMounted(async () => {
           @toggle-sidebar="toggleSideBar"
         />
         <div class="overflow-auto h-full">
-          <div class="d-flex flex-grow-1">
-            <aside
-              class="d-lg-block flex-shrink-0 overflow-auto"
-              :class="{ 'd-none': sidebarCollapsedForSmallScreen }"
-            >
-              <NoteSidebar
-                v-bind="{
-                  storageAccessor,
-                }"
-              />
-            </aside>
-            <main
-              class="flex-grow-1 overflow-auto"
-              :class="{ 'd-none': !sidebarCollapsedForSmallScreen }"
-            >
-              <router-view v-bind="routeViewProps" />
-            </main>
-          </div>
+          <router-view v-bind="routeViewProps" />
         </div>
       </div>
     </template>
@@ -106,15 +91,6 @@ onMounted(async () => {
 </template>
 
 <style scoped lang="scss">
-@import "bootstrap/scss/bootstrap";
-
-aside {
-  width: 100%;
-  @include media-breakpoint-up(lg) {
-    width: 18rem;
-  }
-}
-
 .h-full {
   height: calc(100vh - 4rem);
 }
