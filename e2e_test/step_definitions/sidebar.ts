@@ -17,3 +17,7 @@ Then("I expand the side bar", () => {
 Then("I should see the note tree in the sidebar", (data: DataTable) => {
   start.sidebar().expectItems(data.hashes())
 })
+
+Then("I should see the note {string} highlighted in the sidebar", (noteTopic: string) => {
+  start.sidebar().itemInViewport(noteTopic)
+})

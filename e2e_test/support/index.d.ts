@@ -55,5 +55,6 @@ declare namespace Cypress {
     undoLast(undoThpe: string): Chainable<any>
     unsubscribeFromNotebook(noteTopic: string): Chainable<any>
     yesIRemember(): Chainable<any>
+    isInViewport(): Chainable<any>
   }
 }

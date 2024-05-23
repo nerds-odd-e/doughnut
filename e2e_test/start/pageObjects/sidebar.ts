@@ -7,6 +7,11 @@ export const sidebar = () => {
         cy.expectNoteCards(items)
       })
     },
+    itemInViewport: (noteTopic: string) => {
+      cy.get("aside").within(() => {
+        cy.findByText(noteTopic).isInViewport()
+      })
+    },
     expand: (noteTopic: string) => {
       cy.get("aside").within(() => {
         cy.findByText(noteTopic)
