@@ -27,3 +27,9 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.card:hover {
+  background-color: #f8f9fa !important;
+}
+</style>
