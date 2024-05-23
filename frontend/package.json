@@ -31,6 +31,7 @@
     "unplugin-vue-components": "0.27.0",
     "vue": "3.4.27",
     "vue-content-loader": "2.0.1",
+    "vue-draggable-plus": "^0.4.1",
     "vue-router": "4.3.2"
   },
   "devDependencies": {

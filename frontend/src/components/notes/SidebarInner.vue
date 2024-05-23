@@ -1,5 +1,11 @@
 <template>
-  <ul v-if="(noteRealm?.children?.length ?? 0) > 0" class="list-group">
+  <VueDraggable
+    tag="ul"
+    v-model="dragList"
+    v-if="(noteRealm?.children?.length ?? 0) > 0"
+    ghost-class="ghost"
+    class="list-group"
+  >
     <li
       v-for="note in noteRealm?.children"
       :key="note.id"
@@ -29,11 +35,12 @@
         :key="note.id"
       />
     </li>
-  </ul>
+  </VueDraggable>
 </template>
 
 <script setup lang="ts">
-import { PropType, ref, watch } from "vue";
+import { PropType, computed, ref, watch } from "vue";
+import { VueDraggable } from "vue-draggable-plus";
 import { NoteRealm } from "@/generated/backend";
 import ScrollTo from "@/components/commons/ScrollTo.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
@@ -68,6 +75,13 @@ const childrenCount = (noteId: number) => {
   return noteRef.value.children?.length ?? 0;
 };
 
+const dragList = computed({
+  get: () => {
+    return noteRealm.value?.children?.map((note) => ({ id: note.id })) ?? [];
+  },
+  set: () => {},
+});
+
 watch(
   () => props.activeNoteRealm.notePosition.ancestors,
   (newAncestors) => {
@@ -81,3 +95,10 @@ watch(
   { immediate: true },
 );
 </script>
+
+<style scoped>
+.ghost {
+  opacity: 0.5;
+  background: #c8ebfb;
+}
+</style>
