@@ -1,4 +1,4 @@
-import { defineComponent, h, PropType } from "vue";
+import { defineComponent, Fragment, h, PropType } from "vue";
 import { RouterView } from "vue-router";
 import { User } from "@/generated/backend";
 import usePopups from "../../components/commons/Popups/usePopups";
@@ -43,7 +43,7 @@ function NestedPage(
       routerScopeGuard(scopeName)(to, next);
     },
     render() {
-      return h("div", { class: "content" }, [
+      return h(Fragment, {}, [
         h(WrappedComponent, { ...this.$props, minimized: this.isNested }),
         h(RouterView, { ...this.$props }),
       ]);
