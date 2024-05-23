@@ -170,6 +170,8 @@ Cypress.Commands.add("clickButtonOnCardBody", (noteTopic, buttonTitle) => {
     cy.wrap($card)
       .parent()
       .parent()
+      .parent()
+      .parent()
       .findByText(buttonTitle)
       .then(($button) => {
         cy.wrap($button).click()
