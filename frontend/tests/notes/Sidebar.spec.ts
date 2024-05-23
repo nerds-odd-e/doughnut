@@ -68,10 +68,20 @@ describe("Sidebar", () => {
       );
     });
 
-    it("should have siblings", async () => {
+    it("should scroll to active note", async () => {
       render(firstGeneration);
       await flushPromises();
-      await flushPromises();
+      expect(window.HTMLElement.prototype.scrollIntoView).toBeCalled();
+      expect(
+        /* eslint-disable */
+        (await screen.findByText(firstGeneration.note.topic)).parentNode
+          ?.parentNode,
+        /* eslint-enable */
+      ).toHaveClass("active");
+    });
+
+    it("should have siblings", async () => {
+      render(firstGeneration);
       await screen.findByText(firstGenerationSibling.note.topic);
     });
 
