@@ -7,7 +7,7 @@
         <template #cardHeader>
           <slot name="cardHeader" :note="note" />
         </template>
-        <template #button>
+        <template #button v-if="$slots.button">
           <slot name="button" :note="note" />
         </template>
       </Card>
