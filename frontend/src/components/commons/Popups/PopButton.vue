@@ -3,7 +3,7 @@
     :class="`btn btn-sm ${btnClass}`"
     :aria-label="ariaLabel"
     role="button"
-    @click="show = true"
+    @click.prevent="show = true"
     :title="title"
   >
     <slot name="button_face" />
