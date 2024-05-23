@@ -1,12 +1,8 @@
 <template>
-  <div class="row">
-    <div
-      :class="`col-12 col-sm-6 col-md-${12 / (columns - 1)} col-lg-${
-        12 / columns
-      }`"
-      v-for="note in notes"
-      :key="note.id"
-    >
+  <div
+    :class="`row row-cols-1 row-cols-md-${columns - 1} row-cols-lg-${columns} g-3`"
+  >
+    <div class="col" v-for="note in notes" :key="note.id">
       <Card v-bind="{ note }">
         <template #cardHeader>
           <slot name="cardHeader" :note="note" />

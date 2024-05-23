@@ -21,12 +21,10 @@
       </button>
     </div>
     <div class="col">
-      <div class="row">
-        <div v-if="!internalExpandChildren">
-          <div role="collapsed-children-count">{{ notes.length }}</div>
-        </div>
-        <Cards v-else :notes="notes" :columns="2" />
+      <div v-if="!internalExpandChildren">
+        <div role="collapsed-children-count">{{ notes.length }}</div>
       </div>
+      <Cards v-else :notes="notes" :columns="2" />
     </div>
   </div>
 </template>
