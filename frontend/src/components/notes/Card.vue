@@ -1,19 +1,21 @@
 <template>
-  <router-link
-    :to="{ name: 'noteShow', params: { noteId: note.id } }"
-    class="text-decoration-none"
-  >
-    <div class="card">
-      <slot name="cardHeader" />
+  <div class="card">
+    <slot name="cardHeader" />
+    <router-link
+      :to="{ name: 'noteShow', params: { noteId: note.id } }"
+      class="text-decoration-none"
+    >
       <div class="card-body">
         <h5>
           <NoteTopicWithLink v-bind="{ note }" class="card-title" />
         </h5>
         <NoteShortDetails :details="note.details" />
-        <slot name="button" :note="note" />
       </div>
+    </router-link>
+    <div class="card-footer" v-if="$slots.button">
+      <slot name="button" :note="note" />
     </div>
-  </router-link>
+  </div>
 </template>
 
 <script lang="ts">
