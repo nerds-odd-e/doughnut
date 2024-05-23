@@ -68,9 +68,7 @@ onMounted(async () => {
     />
     <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
     <template v-else-if="userLoaded">
-      <div class="d-flex flex-grow-1 overflow-auto h-full">
-        <router-view v-bind="routeViewProps" />
-      </div>
+      <router-view v-bind="routeViewProps" />
     </template>
   </div>
   <TestMenu
@@ -80,9 +78,3 @@ onMounted(async () => {
     @feature-toggle="featureToggle = $event"
   />
 </template>
-
-<style scoped lang="scss">
-.h-full {
-  height: calc(100vh - 4rem);
-}
-</style>
