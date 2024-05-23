@@ -68,7 +68,7 @@ onMounted(async () => {
     />
     <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
     <template v-else-if="userLoaded">
-      <div class="overflow-auto h-full">
+      <div class="d-flex flex-grow-1 overflow-auto h-full">
         <router-view v-bind="routeViewProps" />
       </div>
     </template>

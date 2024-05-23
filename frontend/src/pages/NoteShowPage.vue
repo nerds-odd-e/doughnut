@@ -19,32 +19,30 @@
       </template>
     </NoteRealmLoader>
   </teleport>
-  <div class="d-flex flex-grow-1">
-    <aside
-      class="d-lg-block flex-shrink-0 overflow-auto me-3"
-      :class="{ 'd-none': sidebarCollapsedForSmallScreen }"
-    >
-      <NoteSidebar
-        v-bind="{
-          noteId,
-          storageAccessor,
-        }"
-      />
-    </aside>
-    <main
-      class="flex-grow-1 overflow-auto"
-      :class="{ 'd-none': !sidebarCollapsedForSmallScreen }"
-    >
-      <NoteShow
-        v-bind="{
-          noteId,
-          expandChildren: true,
-          readonly: !user,
-          storageAccessor,
-        }"
-      />
-    </main>
-  </div>
+  <aside
+    class="d-lg-block flex-shrink-0 overflow-auto me-3"
+    :class="{ 'd-none': sidebarCollapsedForSmallScreen }"
+  >
+    <NoteSidebar
+      v-bind="{
+        noteId,
+        storageAccessor,
+      }"
+    />
+  </aside>
+  <main
+    class="flex-grow-1 overflow-auto"
+    :class="{ 'd-none': !sidebarCollapsedForSmallScreen }"
+  >
+    <NoteShow
+      v-bind="{
+        noteId,
+        expandChildren: true,
+        readonly: !user,
+        storageAccessor,
+      }"
+    />
+  </main>
 </template>
 
 <script setup lang="ts">
