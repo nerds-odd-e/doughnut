@@ -9,7 +9,10 @@
     />
     <SearchResults v-bind="{ noteId, inputSearchKey }">
       <template #button="{ note }">
-        <button class="btn btn-primary" @click="$emit('selected', note)">
+        <button
+          class="btn btn-primary"
+          @click.prevent="$emit('selected', note)"
+        >
           Select
         </button>
       </template>

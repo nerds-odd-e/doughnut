@@ -1,14 +1,19 @@
 <template>
-  <div class="card">
-    <slot name="cardHeader" />
-    <div class="card-body">
-      <h5>
-        <NoteTopicWithLink v-bind="{ note }" class="card-title" />
-      </h5>
-      <NoteShortDetails :details="note.details" />
-      <slot name="button" :note="note" />
+  <router-link
+    :to="{ name: 'noteShow', params: { noteId: note.id } }"
+    class="text-decoration-none"
+  >
+    <div class="card">
+      <slot name="cardHeader" />
+      <div class="card-body">
+        <h5>
+          <NoteTopicWithLink v-bind="{ note }" class="card-title" />
+        </h5>
+        <NoteShortDetails :details="note.details" />
+        <slot name="button" :note="note" />
+      </div>
     </div>
-  </div>
+  </router-link>
 </template>
 
 <script lang="ts">
