@@ -4,6 +4,7 @@
       v-for="note in noteRealm?.children"
       :key="note.id"
       class="list-group-item list-group-item-action pb-0 pe-0 border-0"
+      :class="{ active: note.id === activeNoteRealm.note.id }"
     >
       <div
         class="d-flex w-100 justify-content-between align-items-start"

@@ -36,6 +36,10 @@ describe("Sidebar", () => {
       .render();
   };
 
+  beforeEach(() => {
+    window.HTMLElement.prototype.scrollIntoView = vitest.fn();
+  });
+
   it("should call the api once if top note", async () => {
     helper.managedApi.restNoteController.show1 = vitest
       .fn()
