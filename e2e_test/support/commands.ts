@@ -396,13 +396,3 @@ Cypress.Commands.add("expectAMapTo", (latitude: string, longitude: string) => {
 Cypress.Commands.add("dismissLastErrorMessage", () => {
   cy.get(".last-error-message").click({ force: true })
 })
-
-Cypress.Commands.add("isInViewport", { prevSubject: true }, (element) => {
-  cy.get(element).then(($el) => {
-    const bottom = Cypress.$(cy.state("window")).height()
-    const rect = $el[0].getBoundingClientRect()
-
-    expect(rect.top).not.to.be.greaterThan(bottom)
-    expect(rect.bottom).not.to.be.greaterThan(bottom)
-  })
-})
