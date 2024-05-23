@@ -1,42 +1,44 @@
 <template>
-  <div class="header" :class="currentResult ? 'repeat-paused' : ''">
-    <RepeatProgressBar
-      v-bind="{
-        finished,
-        toRepeatCount,
-        previousResultCursor,
-      }"
-      @view-last-result="viewLastResult($event)"
-    >
-    </RepeatProgressBar>
-  </div>
-  <template v-if="toRepeat != undefined">
-    <Quiz
-      v-if="toRepeatCount !== 0"
-      :minimized="minimized"
-      :review-points="toRepeat"
-      :current-index="currentIndex"
-      :eager-fetch-count="eagerFetchCount ?? 5"
-      :storage-accessor="storageAccessor"
-      @answered="onAnswered($event)"
-    />
-    <template v-else-if="!minimized">
-      <div class="alert alert-success">
-        You have finished all repetitions for this half a day!
-      </div>
-      <div>
-        <button role="button" class="btn btn-secondary" @click="loadMore(3)">
-          Load more from next 3 days
-        </button>
-        <button role="button" class="btn btn-secondary" @click="loadMore(7)">
-          Load more from next 7 days
-        </button>
-        <button role="button" class="btn btn-secondary" @click="loadMore(14)">
-          Load more from next 14 days
-        </button>
-      </div>
+  <div class="container">
+    <div class="header" :class="currentResult ? 'repeat-paused' : ''">
+      <RepeatProgressBar
+        v-bind="{
+          finished,
+          toRepeatCount,
+          previousResultCursor,
+        }"
+        @view-last-result="viewLastResult($event)"
+      >
+      </RepeatProgressBar>
+    </div>
+    <template v-if="toRepeat != undefined">
+      <Quiz
+        v-if="toRepeatCount !== 0"
+        :minimized="minimized"
+        :review-points="toRepeat"
+        :current-index="currentIndex"
+        :eager-fetch-count="eagerFetchCount ?? 5"
+        :storage-accessor="storageAccessor"
+        @answered="onAnswered($event)"
+      />
+      <template v-else-if="!minimized">
+        <div class="alert alert-success">
+          You have finished all repetitions for this half a day!
+        </div>
+        <div>
+          <button role="button" class="btn btn-secondary" @click="loadMore(3)">
+            Load more from next 3 days
+          </button>
+          <button role="button" class="btn btn-secondary" @click="loadMore(7)">
+            Load more from next 7 days
+          </button>
+          <button role="button" class="btn btn-secondary" @click="loadMore(14)">
+            Load more from next 14 days
+          </button>
+        </div>
+      </template>
     </template>
-  </template>
+  </div>
 </template>
 
 <script lang="ts">
