@@ -10,6 +10,7 @@
         @click="toggleChildren(note.id)"
       >
         <NoteTopicWithLink class="card-title" v-bind="{ note }" @click.stop />
+        <ScrollTo v-if="note.id === activeNoteRealm.note.id" />
         <span
           role="button"
           title="expand children"
@@ -33,6 +34,7 @@
 <script setup lang="ts">
 import { PropType, ref, watch } from "vue";
 import { NoteRealm } from "@/generated/backend";
+import ScrollTo from "@/components/commons/ScrollTo.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
 const props = defineProps({
