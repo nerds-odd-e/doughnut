@@ -17,3 +17,14 @@ Then("I expand the side bar", () => {
 Then("I should see the note tree in the sidebar", (data: DataTable) => {
   start.sidebar().expectItems(data.hashes())
 })
+
+Then("I move the note {string} to the top of the siblings", (noteToMove: string) => {
+  start.sidebar().moveItemToTopOfItsSiblings(noteToMove)
+})
+
+Then(
+  "I should see the note {string} before the note {string} in the sidebar",
+  (noteMoved: string, noteStayed: string) => {
+    start.sidebar().siblingOrder(noteMoved, noteStayed)
+  },
+)

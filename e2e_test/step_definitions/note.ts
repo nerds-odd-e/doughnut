@@ -337,7 +337,7 @@ When(
 )
 
 Then("I should see a child note {string}", (childTopic: string) => {
-  start.assumeNotePage().expectChildren([{ topic: childTopic }])
+  start.assumeNotePage().expectChildren([{ "note-topic": childTopic }])
 })
 
 When(

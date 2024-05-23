@@ -54,3 +54,9 @@ Feature: Note tree view
       | TDD        |
       | TPP        |
       | ATDD       |
+
+  @ignore
+  Scenario: moving a note within the parent
+    Given I navigate to "My Notes/LeSS in Action" note
+    When I move the note "ATDD" to the top of the siblings
+    Then I should see the note "ATDD" before the note "TDD" in the sidebar

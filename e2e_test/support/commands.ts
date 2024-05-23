@@ -129,15 +129,14 @@ Cypress.Commands.add("clickRadioByLabel", (labelText) => {
   cy.findByText(labelText, { selector: "label" }).click({ force: true })
 })
 
-Cypress.Commands.add("expectNoteCards", (expectedCards: string[]) => {
+Cypress.Commands.add("expectNoteCards", (expectedCards: Record<string, string>[]) => {
   cy.get(".card-title").should("have.length", expectedCards.length)
   expectedCards.forEach((elem) => {
-    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-    for (const propName in elem as any) {
+    for (const propName in elem) {
       if (propName === "note-topic") {
-        cy.findCardTitle(elem[propName] as string)
+        cy.findCardTitle(elem[propName]!)
       } else {
-        cy.findByText(elem[propName] as string)
+        cy.findByText(elem[propName]!)
       }
     }
   })
