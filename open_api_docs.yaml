@@ -22,7 +22,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: "#/components/schemas/User"
     post:
       tags:
       - rest-user-controller
@@ -31,7 +31,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: "#/components/schemas/User"
         required: true
       responses:
         "500":
@@ -45,7 +45,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: "#/components/schemas/User"
   /api/testability/use_real_sandbox_github_and_close_all_github_issues:
     post:
       tags:
@@ -117,7 +117,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TimeTravelRelativeToNow'
+              $ref: "#/components/schemas/TimeTravelRelativeToNow"
         required: true
       responses:
         "500":
@@ -143,7 +143,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TimeTravel'
+              $ref: "#/components/schemas/TimeTravel"
         required: true
       responses:
         "500":
@@ -195,7 +195,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SeedSuggestedQuestions'
+              $ref: "#/components/schemas/SeedSuggestedQuestions"
         required: true
       responses:
         "500":
@@ -219,7 +219,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SeedInfo'
+              $ref: "#/components/schemas/SeedInfo"
         required: true
       responses:
         "500":
@@ -300,7 +300,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Randomization'
+              $ref: "#/components/schemas/Randomization"
         required: true
       responses:
         "500":
@@ -421,7 +421,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SubscriptionDTO'
+              $ref: "#/components/schemas/SubscriptionDTO"
         required: true
       responses:
         "500":
@@ -435,7 +435,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/Subscription'
+                $ref: "#/components/schemas/Subscription"
   /api/subscriptions/{subscription}/delete:
     post:
       tags:
@@ -473,7 +473,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SubscriptionDTO'
+              $ref: "#/components/schemas/SubscriptionDTO"
         required: true
       responses:
         "500":
@@ -487,7 +487,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/Subscription'
+                $ref: "#/components/schemas/Subscription"
   /api/settings/current-model-version:
     get:
       tags:
@@ -505,7 +505,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/GlobalAiModelSettings'
+                $ref: "#/components/schemas/GlobalAiModelSettings"
     post:
       tags:
       - rest-global-settings-controller
@@ -514,7 +514,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GlobalAiModelSettings'
+              $ref: "#/components/schemas/GlobalAiModelSettings"
         required: true
       responses:
         "500":
@@ -528,7 +528,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/GlobalAiModelSettings'
+                $ref: "#/components/schemas/GlobalAiModelSettings"
   /api/reviews:
     post:
       tags:
@@ -538,7 +538,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InitialInfo'
+              $ref: "#/components/schemas/InitialInfo"
         required: true
       responses:
         "500":
@@ -552,7 +552,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/ReviewPoint'
+                $ref: "#/components/schemas/ReviewPoint"
   /api/review-points/{reviewPoint}/self-evaluate:
     post:
       tags:
@@ -568,7 +568,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SelfEvaluation'
+              $ref: "#/components/schemas/SelfEvaluation"
         required: true
       responses:
         "500":
@@ -582,7 +582,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/ReviewPoint'
+                $ref: "#/components/schemas/ReviewPoint"
   /api/review-points/{reviewPoint}/remove:
     post:
       tags:
@@ -606,7 +606,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/ReviewPoint'
+                $ref: "#/components/schemas/ReviewPoint"
   /api/quiz-questions/{quizQuestion}/suggest-fine-tuning:
     post:
       tags:
@@ -622,7 +622,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/QuestionSuggestionCreationParams'
+              $ref: "#/components/schemas/QuestionSuggestionCreationParams"
         required: true
       responses:
         "500":
@@ -636,7 +636,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/SuggestedQuestionForFineTuning'
+                $ref: "#/components/schemas/SuggestedQuestionForFineTuning"
   /api/quiz-questions/{quizQuestion}/regenerate:
     post:
       tags:
@@ -660,7 +660,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/QuizQuestion'
+                $ref: "#/components/schemas/QuizQuestion"
   /api/quiz-questions/{quizQuestion}/contest:
     post:
       tags:
@@ -684,7 +684,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/QuizQuestionContestResult'
+                $ref: "#/components/schemas/QuizQuestionContestResult"
   /api/quiz-questions/{quizQuestion}/answer:
     post:
       tags:
@@ -700,7 +700,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AnswerDTO'
+              $ref: "#/components/schemas/AnswerDTO"
         required: true
       responses:
         "500":
@@ -714,7 +714,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/AnsweredQuestion'
+                $ref: "#/components/schemas/AnsweredQuestion"
   /api/quiz-questions/generate-question:
     post:
       tags:
@@ -738,7 +738,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/QuizQuestion'
+                $ref: "#/components/schemas/QuizQuestion"
   /api/notes/{parentNote}/create:
     post:
       tags:
@@ -754,7 +754,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NoteCreationDTO'
+              $ref: "#/components/schemas/NoteCreationDTO"
         required: true
       responses:
         "500":
@@ -768,7 +768,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/NoteCreationRresult'
+                $ref: "#/components/schemas/NoteCreationRresult"
   /api/notes/{note}/updateWikidataId:
     post:
       tags:
@@ -784,7 +784,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/WikidataAssociationCreation'
+              $ref: "#/components/schemas/WikidataAssociationCreation"
         required: true
       responses:
         "500":
@@ -798,7 +798,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/NoteRealm'
+                $ref: "#/components/schemas/NoteRealm"
   /api/notes/{note}/search:
     post:
       tags:
@@ -814,7 +814,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SearchTerm'
+              $ref: "#/components/schemas/SearchTerm"
         required: true
       responses:
         "500":
@@ -830,7 +830,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Note'
+                  $ref: "#/components/schemas/Note"
   /api/notes/{note}/review-setting:
     post:
       tags:
@@ -846,7 +846,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ReviewSetting'
+              $ref: "#/components/schemas/ReviewSetting"
         required: true
       responses:
         "500":
@@ -860,7 +860,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/RedirectToNoteResponse'
+                $ref: "#/components/schemas/RedirectToNoteResponse"
   /api/notes/{note}/delete:
     post:
       tags:
@@ -886,7 +886,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/NoteRealm'
+                  $ref: "#/components/schemas/NoteRealm"
   /api/notes/search:
     post:
       tags:
@@ -896,7 +896,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SearchTerm'
+              $ref: "#/components/schemas/SearchTerm"
         required: true
       responses:
         "500":
@@ -912,7 +912,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Note'
+                  $ref: "#/components/schemas/Note"
   /api/notes/convertSrt:
     post:
       tags:
@@ -922,7 +922,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/AudioUploadDTO'
+              $ref: "#/components/schemas/AudioUploadDTO"
       responses:
         "500":
           description: Internal Server Error
@@ -935,7 +935,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/SrtDto'
+                $ref: "#/components/schemas/SrtDto"
   /api/notebooks/{notebook}:
     post:
       tags:
@@ -951,7 +951,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NotebookDTO'
+              $ref: "#/components/schemas/NotebookDTO"
         required: true
       responses:
         "500":
@@ -965,7 +965,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/Notebook'
+                $ref: "#/components/schemas/Notebook"
   /api/notebooks/{notebook}/share:
     post:
       tags:
@@ -989,7 +989,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/Notebook'
+                $ref: "#/components/schemas/Notebook"
   /api/notebooks/create:
     post:
       tags:
@@ -999,7 +999,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NoteCreationDTO'
+              $ref: "#/components/schemas/NoteCreationDTO"
         required: true
       responses:
         "500":
@@ -1013,7 +1013,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/RedirectToNoteResponse'
+                $ref: "#/components/schemas/RedirectToNoteResponse"
   /api/links/{link}:
     post:
       tags:
@@ -1029,7 +1029,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LinkCreation'
+              $ref: "#/components/schemas/LinkCreation"
         required: true
       responses:
         "500":
@@ -1043,7 +1043,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/NoteRealm'
+                $ref: "#/components/schemas/NoteRealm"
   /api/links/{link}/{perspective}/delete:
     post:
       tags:
@@ -1072,7 +1072,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/NoteRealm'
+                $ref: "#/components/schemas/NoteRealm"
   /api/links/create/{sourceNote}/{targetNote}:
     post:
       tags:
@@ -1093,7 +1093,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LinkCreation'
+              $ref: "#/components/schemas/LinkCreation"
         required: true
       responses:
         "500":
@@ -1107,7 +1107,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/NoteRealm'
+                $ref: "#/components/schemas/NoteRealm"
   /api/fine-tuning/{suggestedQuestion}/duplicate:
     post:
       tags:
@@ -1131,7 +1131,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/SuggestedQuestionForFineTuning'
+                $ref: "#/components/schemas/SuggestedQuestionForFineTuning"
   /api/fine-tuning/{suggestedQuestion}/delete:
     post:
       tags:
@@ -1155,7 +1155,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/SuggestedQuestionForFineTuning'
+                $ref: "#/components/schemas/SuggestedQuestionForFineTuning"
   /api/fine-tuning/upload-and-trigger-fine-tuning:
     post:
       tags:
@@ -1189,7 +1189,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Circle'
+                  $ref: "#/components/schemas/Circle"
     post:
       tags:
       - rest-circle-controller
@@ -1198,7 +1198,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Circle'
+              $ref: "#/components/schemas/Circle"
         required: true
       responses:
         "500":
@@ -1212,7 +1212,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/Circle'
+                $ref: "#/components/schemas/Circle"
   /api/circles/{circle}/notebooks:
     post:
       tags:
@@ -1228,7 +1228,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NoteCreationDTO'
+              $ref: "#/components/schemas/NoteCreationDTO"
         required: true
       responses:
         "500":
@@ -1242,7 +1242,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/RedirectToNoteResponse'
+                $ref: "#/components/schemas/RedirectToNoteResponse"
   /api/circles/join:
     post:
       tags:
@@ -1252,7 +1252,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CircleJoiningByInvitation'
+              $ref: "#/components/schemas/CircleJoiningByInvitation"
         required: true
       responses:
         "500":
@@ -1266,7 +1266,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/Circle'
+                $ref: "#/components/schemas/Circle"
   /api/ai/{note}/completion:
     post:
       tags:
@@ -1282,7 +1282,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AiCompletionParams'
+              $ref: "#/components/schemas/AiCompletionParams"
         required: true
       responses:
         "500":
@@ -1296,7 +1296,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/AiCompletionResponse'
+                $ref: "#/components/schemas/AiCompletionResponse"
   /api/ai/recreate-all-assistants:
     post:
       tags:
@@ -1340,7 +1340,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/AiGeneratedImage'
+                $ref: "#/components/schemas/AiGeneratedImage"
   /api/ai/chat:
     post:
       tags:
@@ -1356,7 +1356,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ChatRequest'
+              $ref: "#/components/schemas/ChatRequest"
         required: true
       responses:
         "500":
@@ -1370,7 +1370,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/ChatResponse'
+                $ref: "#/components/schemas/ChatResponse"
   /api/ai/answer-clarifying-question:
     post:
       tags:
@@ -1380,7 +1380,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AiCompletionAnswerClarifyingQuestionParams'
+              $ref: "#/components/schemas/AiCompletionAnswerClarifyingQuestionParams"
         required: true
       responses:
         "500":
@@ -1394,7 +1394,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/AiCompletionResponse'
+                $ref: "#/components/schemas/AiCompletionResponse"
   /api/user/{user}:
     patch:
       tags:
@@ -1410,7 +1410,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserDTO'
+              $ref: "#/components/schemas/UserDTO"
         required: true
       responses:
         "500":
@@ -1424,7 +1424,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: "#/components/schemas/User"
   /api/text_content/{note}/topic-constructor:
     patch:
       tags:
@@ -1440,7 +1440,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NoteUpdateTopicDTO'
+              $ref: "#/components/schemas/NoteUpdateTopicDTO"
         required: true
       responses:
         "500":
@@ -1454,7 +1454,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/NoteRealm'
+                $ref: "#/components/schemas/NoteRealm"
   /api/text_content/{note}/details:
     patch:
       tags:
@@ -1470,7 +1470,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NoteUpdateDetailsDTO'
+              $ref: "#/components/schemas/NoteUpdateDetailsDTO"
         required: true
       responses:
         "500":
@@ -1484,7 +1484,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/NoteRealm'
+                $ref: "#/components/schemas/NoteRealm"
   /api/review-points/{reviewPoint}/mark-as-repeated:
     patch:
       tags:
@@ -1513,7 +1513,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/ReviewPoint'
+                $ref: "#/components/schemas/ReviewPoint"
   /api/notes/{note}:
     get:
       tags:
@@ -1537,7 +1537,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/NoteRealm'
+                $ref: "#/components/schemas/NoteRealm"
     patch:
       tags:
       - rest-note-controller
@@ -1552,7 +1552,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/NoteAccessoriesDTO'
+              $ref: "#/components/schemas/NoteAccessoriesDTO"
       responses:
         "500":
           description: Internal Server Error
@@ -1565,7 +1565,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/NoteAccessory'
+                $ref: "#/components/schemas/NoteAccessory"
   /api/notes/{note}/undo-delete:
     patch:
       tags:
@@ -1589,7 +1589,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/NoteRealm'
+                $ref: "#/components/schemas/NoteRealm"
   /api/notes/{note}/audio:
     patch:
       tags:
@@ -1605,7 +1605,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/AudioUploadDTO'
+              $ref: "#/components/schemas/AudioUploadDTO"
       responses:
         "500":
           description: Internal Server Error
@@ -1618,7 +1618,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/NoteAccessory'
+                $ref: "#/components/schemas/NoteAccessory"
   /api/notes/{note}/audio-to-srt:
     patch:
       tags:
@@ -1642,7 +1642,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/SrtDto'
+                $ref: "#/components/schemas/SrtDto"
   /api/fine-tuning/{suggestedQuestion}/update-suggested-question-for-fine-tuning:
     patch:
       tags:
@@ -1658,7 +1658,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/QuestionSuggestionParams'
+              $ref: "#/components/schemas/QuestionSuggestionParams"
         required: true
       responses:
         "500":
@@ -1672,7 +1672,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/SuggestedQuestionForFineTuning'
+                $ref: "#/components/schemas/SuggestedQuestionForFineTuning"
   /api/wikidata/search/{search}:
     get:
       tags:
@@ -1698,7 +1698,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/WikidataSearchEntity'
+                  $ref: "#/components/schemas/WikidataSearchEntity"
   /api/wikidata/entity-data/{wikidataId}:
     get:
       tags:
@@ -1722,7 +1722,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/WikidataEntityData'
+                $ref: "#/components/schemas/WikidataEntityData"
   /api/user/current-user-info:
     get:
       tags:
@@ -1740,7 +1740,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/CurrentUserInfo'
+                $ref: "#/components/schemas/CurrentUserInfo"
   /api/testability/github_issues:
     get:
       tags:
@@ -1792,7 +1792,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/DueReviewPoints'
+                $ref: "#/components/schemas/DueReviewPoints"
   /api/reviews/overview:
     get:
       tags:
@@ -1816,7 +1816,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/ReviewStatus'
+                $ref: "#/components/schemas/ReviewStatus"
   /api/reviews/initial:
     get:
       tags:
@@ -1842,7 +1842,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Thing'
+                  $ref: "#/components/schemas/Thing"
   /api/reviews/answers/{answer}:
     get:
       tags:
@@ -1866,7 +1866,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/AnsweredQuestion'
+                $ref: "#/components/schemas/AnsweredQuestion"
   /api/review-points/{reviewPoint}:
     get:
       tags:
@@ -1890,7 +1890,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/ReviewPoint'
+                $ref: "#/components/schemas/ReviewPoint"
   /api/review-points/{reviewPoint}/random-question:
     get:
       tags:
@@ -1914,7 +1914,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/QuizQuestion'
+                $ref: "#/components/schemas/QuizQuestion"
   /api/notes/{note}/position:
     get:
       tags:
@@ -1938,7 +1938,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/NotePositionViewedByUser'
+                $ref: "#/components/schemas/NotePositionViewedByUser"
   /api/notes/{note}/note-info:
     get:
       tags:
@@ -1962,7 +1962,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/NoteInfo'
+                $ref: "#/components/schemas/NoteInfo"
   /api/notes/{note}/accessory:
     get:
       tags:
@@ -1986,7 +1986,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/NoteAccessory'
+                $ref: "#/components/schemas/NoteAccessory"
   /api/notebooks:
     get:
       tags:
@@ -2004,7 +2004,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/NotebooksViewedByUser'
+                $ref: "#/components/schemas/NotebooksViewedByUser"
   /api/healthcheck:
     get:
       tags:
@@ -2042,7 +2042,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/SuggestedQuestionForFineTuning'
+                  $ref: "#/components/schemas/SuggestedQuestionForFineTuning"
   /api/failure-reports:
     get:
       tags:
@@ -2071,7 +2071,7 @@ paths:
         in: query
         required: true
         schema:
-          $ref: '#/components/schemas/FailureReport'
+          $ref: "#/components/schemas/FailureReport"
       responses:
         "500":
           description: Internal Server Error
@@ -2084,7 +2084,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/FailureReportForView'
+                $ref: "#/components/schemas/FailureReportForView"
   /api/data_upgrade:
     get:
       tags:
@@ -2128,7 +2128,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/CircleForUserView'
+                $ref: "#/components/schemas/CircleForUserView"
   /api/bazaar:
     get:
       tags:
@@ -2146,7 +2146,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/NotebooksViewedByUser'
+                $ref: "#/components/schemas/NotebooksViewedByUser"
   /api/ai/available-gpt-models:
     get:
       tags:
@@ -2189,7 +2189,7 @@ components:
           type: integer
           format: int32
         circle:
-          $ref: '#/components/schemas/Circle'
+          $ref: "#/components/schemas/Circle"
     User:
       required:
       - id
@@ -2204,7 +2204,7 @@ components:
         externalIdentifier:
           type: string
         ownership:
-          $ref: '#/components/schemas/Ownership'
+          $ref: "#/components/schemas/Ownership"
         dailyNewNotesCount:
           type: integer
           format: int32
@@ -2249,7 +2249,7 @@ components:
         comment:
           type: string
         preservedQuestion:
-          $ref: '#/components/schemas/MCQWithAnswer'
+          $ref: "#/components/schemas/MCQWithAnswer"
         preservedNoteContent:
           type: string
         positiveFeedback:
@@ -2263,7 +2263,7 @@ components:
           type: array
           writeOnly: true
           items:
-            $ref: '#/components/schemas/QuestionSuggestionParams'
+            $ref: "#/components/schemas/QuestionSuggestionParams"
     SeedInfo:
       type: object
       properties:
@@ -2271,7 +2271,7 @@ components:
           type: array
           writeOnly: true
           items:
-            $ref: '#/components/schemas/SeedNote'
+            $ref: "#/components/schemas/SeedNote"
         externalIdentifier:
           type: string
           writeOnly: true
@@ -2359,9 +2359,9 @@ components:
           type: integer
           format: int32
         ownership:
-          $ref: '#/components/schemas/Ownership'
+          $ref: "#/components/schemas/Ownership"
         headNote:
-          $ref: '#/components/schemas/Note'
+          $ref: "#/components/schemas/Note"
         skipReviewEntirely:
           type: boolean
         deletedAt:
@@ -2369,7 +2369,7 @@ components:
           format: date-time
           writeOnly: true
         fromDTO:
-          $ref: '#/components/schemas/NotebookDTO'
+          $ref: "#/components/schemas/NotebookDTO"
     NotebookDTO:
       type: object
       properties:
@@ -2381,7 +2381,7 @@ components:
       type: object
       properties:
         headNote:
-          $ref: '#/components/schemas/Note'
+          $ref: "#/components/schemas/Note"
         title:
           type: string
         id:
@@ -2391,11 +2391,11 @@ components:
           type: integer
           format: int32
         user:
-          $ref: '#/components/schemas/User'
+          $ref: "#/components/schemas/User"
         notebook:
-          $ref: '#/components/schemas/Notebook'
+          $ref: "#/components/schemas/Notebook"
         fromDTO:
-          $ref: '#/components/schemas/SubscriptionDTO'
+          $ref: "#/components/schemas/SubscriptionDTO"
     GlobalAiModelSettings:
       type: object
       properties:
@@ -2441,12 +2441,12 @@ components:
         removedFromReview:
           type: boolean
         thing:
-          $ref: '#/components/schemas/Thing'
+          $ref: "#/components/schemas/Thing"
     Thing:
       type: object
       properties:
         note:
-          $ref: '#/components/schemas/Note'
+          $ref: "#/components/schemas/Note"
         linkType:
           type: string
           enum:
@@ -2466,9 +2466,9 @@ components:
           - similar to
           - confused with
         sourceNote:
-          $ref: '#/components/schemas/Note'
+          $ref: "#/components/schemas/Note"
         targetNote:
-          $ref: '#/components/schemas/Note'
+          $ref: "#/components/schemas/Note"
         id:
           type: integer
           format: int32
@@ -2497,7 +2497,7 @@ components:
         comment:
           type: string
         preservedQuestion:
-          $ref: '#/components/schemas/MCQWithAnswer'
+          $ref: "#/components/schemas/MCQWithAnswer"
         preservedNoteContent:
           type: string
         realCorrectAnswers:
@@ -2513,7 +2513,7 @@ components:
         display:
           type: string
         imageWithMask:
-          $ref: '#/components/schemas/ImageWithMask'
+          $ref: "#/components/schemas/ImageWithMask"
         image:
           type: boolean
     ImageWithMask:
@@ -2536,13 +2536,13 @@ components:
         mainTopic:
           type: string
         headNote:
-          $ref: '#/components/schemas/Note'
+          $ref: "#/components/schemas/Note"
         choices:
           type: array
           items:
-            $ref: '#/components/schemas/Choice'
+            $ref: "#/components/schemas/Choice"
         imageWithMask:
-          $ref: '#/components/schemas/ImageWithMask'
+          $ref: "#/components/schemas/ImageWithMask"
     QuizQuestionContestResult:
       type: object
       properties:
@@ -2575,9 +2575,9 @@ components:
         answerDisplay:
           type: string
         reviewPoint:
-          $ref: '#/components/schemas/ReviewPoint'
+          $ref: "#/components/schemas/ReviewPoint"
         quizQuestion:
-          $ref: '#/components/schemas/QuizQuestion'
+          $ref: "#/components/schemas/QuizQuestion"
     NoteCreationDTO:
       required:
       - topicConstructor
@@ -2652,11 +2652,11 @@ components:
         direct:
           type: array
           items:
-            $ref: '#/components/schemas/Thing'
+            $ref: "#/components/schemas/Thing"
         reverse:
           type: array
           items:
-            $ref: '#/components/schemas/Thing'
+            $ref: "#/components/schemas/Thing"
     NoteCreationRresult:
       required:
       - created
@@ -2664,9 +2664,9 @@ components:
       type: object
       properties:
         created:
-          $ref: '#/components/schemas/NoteRealm'
+          $ref: "#/components/schemas/NoteRealm"
         parent:
-          $ref: '#/components/schemas/NoteRealm'
+          $ref: "#/components/schemas/NoteRealm"
     NotePositionViewedByUser:
       type: object
       properties:
@@ -2676,11 +2676,11 @@ components:
         fromBazaar:
           type: boolean
         circle:
-          $ref: '#/components/schemas/Circle'
+          $ref: "#/components/schemas/Circle"
         ancestors:
           type: array
           items:
-            $ref: '#/components/schemas/Note'
+            $ref: "#/components/schemas/Note"
     NoteRealm:
       required:
       - id
@@ -2691,18 +2691,18 @@ components:
         links:
           type: object
           additionalProperties:
-            $ref: '#/components/schemas/LinkViewed'
+            $ref: "#/components/schemas/LinkViewed"
         note:
-          $ref: '#/components/schemas/Note'
+          $ref: "#/components/schemas/Note"
         notePosition:
-          $ref: '#/components/schemas/NotePositionViewedByUser'
+          $ref: "#/components/schemas/NotePositionViewedByUser"
         id:
           type: integer
           format: int32
         children:
           type: array
           items:
-            $ref: '#/components/schemas/HierarchicalNote'
+            $ref: "#/components/schemas/HierarchicalNote"
     WikidataAssociationCreation:
       required:
       - wikidataId
@@ -2799,7 +2799,7 @@ components:
         toolCallId:
           type: string
         clarifyingQuestion:
-          $ref: '#/components/schemas/ClarifyingQuestion'
+          $ref: "#/components/schemas/ClarifyingQuestion"
         contentToAppend:
           type: string
     AiCompletionResponse:
@@ -2810,7 +2810,7 @@ components:
         runId:
           type: string
         requiredAction:
-          $ref: '#/components/schemas/AiCompletionRequiredAction'
+          $ref: "#/components/schemas/AiCompletionRequiredAction"
         lastMessage:
           type: string
     ClarifyingQuestion:
@@ -2926,9 +2926,9 @@ components:
         useParentImage:
           type: boolean
         audioAttachment:
-          $ref: '#/components/schemas/Audio'
+          $ref: "#/components/schemas/Audio"
         imageWithMask:
-          $ref: '#/components/schemas/ImageWithMask'
+          $ref: "#/components/schemas/ImageWithMask"
     WikidataSearchEntity:
       required:
       - label
@@ -2954,7 +2954,7 @@ components:
       type: object
       properties:
         user:
-          $ref: '#/components/schemas/User'
+          $ref: "#/components/schemas/User"
         externalIdentifier:
           type: string
     DueReviewPoints:
@@ -2995,14 +2995,14 @@ components:
       type: object
       properties:
         reviewPoint:
-          $ref: '#/components/schemas/ReviewPoint'
+          $ref: "#/components/schemas/ReviewPoint"
         note:
-          $ref: '#/components/schemas/NoteRealm'
+          $ref: "#/components/schemas/NoteRealm"
         createdAt:
           type: string
           format: date-time
         reviewSetting:
-          $ref: '#/components/schemas/ReviewSetting'
+          $ref: "#/components/schemas/ReviewSetting"
     NotebookViewedByUser:
       required:
       - headNote
@@ -3015,7 +3015,7 @@ components:
           type: integer
           format: int32
         headNote:
-          $ref: '#/components/schemas/Note'
+          $ref: "#/components/schemas/Note"
         skipReviewEntirely:
           type: boolean
     NotebooksViewedByUser:
@@ -3026,11 +3026,11 @@ components:
         notebooks:
           type: array
           items:
-            $ref: '#/components/schemas/NotebookViewedByUser'
+            $ref: "#/components/schemas/NotebookViewedByUser"
         subscriptions:
           type: array
           items:
-            $ref: '#/components/schemas/Subscription'
+            $ref: "#/components/schemas/Subscription"
     FailureReport:
       required:
       - createDatetime
@@ -3052,7 +3052,7 @@ components:
           type: string
           format: date-time
         githubIssue:
-          $ref: '#/components/schemas/GithubIssue'
+          $ref: "#/components/schemas/GithubIssue"
     GithubIssue:
       type: object
       properties:
@@ -3064,7 +3064,7 @@ components:
       type: object
       properties:
         failureReport:
-          $ref: '#/components/schemas/FailureReport'
+          $ref: "#/components/schemas/FailureReport"
         githubIssueUrl:
           type: string
     CircleForUserView:
@@ -3084,11 +3084,11 @@ components:
         invitationCode:
           type: string
         notebooks:
-          $ref: '#/components/schemas/NotebooksViewedByUser'
+          $ref: "#/components/schemas/NotebooksViewedByUser"
         members:
           type: array
           items:
-            $ref: '#/components/schemas/UserForOtherUserView'
+            $ref: "#/components/schemas/UserForOtherUserView"
     UserForOtherUserView:
       type: object
       properties:
