@@ -77,7 +77,7 @@ describe("Sidebar", () => {
         (await screen.findByText(firstGeneration.note.topic)).parentNode
           ?.parentNode,
         /* eslint-enable */
-      ).toHaveClass("active");
+      ).toHaveClass("active-item");
     });
 
     it("should have siblings", async () => {
