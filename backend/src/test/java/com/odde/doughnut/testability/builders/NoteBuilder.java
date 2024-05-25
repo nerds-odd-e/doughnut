@@ -193,7 +193,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder after(Note note) {
-    under(note);
+    under(note.getParent());
     entity.updateSiblingOrder(note, false);
     return this;
   }

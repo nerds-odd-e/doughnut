@@ -240,8 +240,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
 
   protected Long theSiblingOrderItTakesToMoveRelativeToMe(boolean asFirstChildOfNote) {
     if (!asFirstChildOfNote) {
-      Optional<HierarchicalNote> nextSiblingNote = nextSibling();
-      return nextSiblingNote
+      return nextSibling()
           .map(x -> (siblingOrder + x.getSiblingOrder()) / 2)
           .orElse(siblingOrder + SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT);
     }

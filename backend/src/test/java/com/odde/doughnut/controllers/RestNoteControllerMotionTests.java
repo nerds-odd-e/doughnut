@@ -87,6 +87,7 @@ class RestNoteControllerMotionTests {
       @Test
       void makeSureTheInitialStateIsAsExpected() {
         assertThat(previousOlder.getSiblingOrder(), lessThan(subject.getSiblingOrder()));
+        assertThat(subject.getSiblingOrder(), lessThan(previousYounger.getSiblingOrder()));
       }
 
       @Test
@@ -95,8 +96,19 @@ class RestNoteControllerMotionTests {
               CyclicLinkDetectedException,
               MovementNotPossibleException {
         var noteRealm = controller.moveAfter(subject, parent, "asFirstChild");
-        assertThat(noteRealm.getId(), equalTo(parent.getId()));
         assertThat(subject.getSiblingOrder(), lessThan(previousOlder.getSiblingOrder()));
+        assertThat(noteRealm.getNote(), equalTo(parent));
+      }
+
+      @Test
+      void shouldMoveUpToAsSecondChild()
+          throws UnexpectedNoAccessRightException,
+              CyclicLinkDetectedException,
+              MovementNotPossibleException {
+        var noteRealm = controller.moveAfter(subject, previousYounger, "");
+        assertThat(previousOlder.getSiblingOrder(), lessThan(previousYounger.getSiblingOrder()));
+        assertThat(previousYounger.getSiblingOrder(), lessThan(subject.getSiblingOrder()));
+        assertThat(noteRealm.getNote(), equalTo(parent));
       }
     }
   }
