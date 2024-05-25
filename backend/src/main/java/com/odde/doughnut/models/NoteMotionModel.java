@@ -47,5 +47,8 @@ public class NoteMotionModel {
             .orElse(false)) {
       throw new MovementNotPossibleException();
     }
+    if (!asFirstChildOfNote && relativeToNote.getParent() == null) {
+      throw new MovementNotPossibleException();
+    }
   }
 }

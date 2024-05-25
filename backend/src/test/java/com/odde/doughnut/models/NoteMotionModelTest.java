@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
+import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,16 +41,22 @@ public class NoteMotionModelTest {
   }
 
   void move(Note subject, Note relativeNote, boolean asFirstChildOfNote)
-      throws CyclicLinkDetectedException {
+      throws CyclicLinkDetectedException, MovementNotPossibleException {
     NoteMotionModel noteMotionModel =
         modelFactoryService.motionOfMoveAfter(subject, relativeNote, asFirstChildOfNote);
+    noteMotionModel.validate();
     noteMotionModel.execute();
   }
 
   @Test
-  void moveBehind() throws CyclicLinkDetectedException {
+  void moveBehind() throws CyclicLinkDetectedException, MovementNotPossibleException {
     move(firstChild, secondChild, false);
     assertOrder(secondChild, firstChild);
+  }
+
+  @Test
+  void moveBehindTop() {
+    assertThrows(MovementNotPossibleException.class, () -> move(firstChild, topNote, false));
   }
 
   private void assertOrder(Note note1, Note note2) {
@@ -59,25 +66,27 @@ public class NoteMotionModelTest {
   }
 
   @Test
-  void moveSecondBehindFirst() throws CyclicLinkDetectedException {
+  void moveSecondBehindFirst() throws CyclicLinkDetectedException, MovementNotPossibleException {
     move(secondChild, firstChild, false);
     assertOrder(firstChild, secondChild);
   }
 
   @Test
-  void moveSecondToBeTheFirstSibling() throws CyclicLinkDetectedException {
+  void moveSecondToBeTheFirstSibling()
+      throws CyclicLinkDetectedException, MovementNotPossibleException {
     move(secondChild, topNote, true);
     assertOrder(secondChild, firstChild);
   }
 
   @Test
-  void moveUnder() throws CyclicLinkDetectedException {
+  void moveUnder() throws CyclicLinkDetectedException, MovementNotPossibleException {
     move(firstChild, secondChild, true);
     assertThat(firstChild.getParent(), equalTo(secondChild));
   }
 
   @Test
-  void moveBothToTheEndInSequence() throws CyclicLinkDetectedException {
+  void moveBothToTheEndInSequence()
+      throws CyclicLinkDetectedException, MovementNotPossibleException {
     move(firstChild, secondChild, false);
     move(secondChild, firstChild, false);
     assertOrder(firstChild, secondChild);
@@ -95,7 +104,8 @@ public class NoteMotionModelTest {
     }
 
     @Test
-    void moveAfterNoteOfDifferentLevel() throws CyclicLinkDetectedException {
+    void moveAfterNoteOfDifferentLevel()
+        throws CyclicLinkDetectedException, MovementNotPossibleException {
       move(secondChild, thirdLevel, false);
       assertThat(secondChild.getParent(), equalTo(firstChild));
     }
@@ -106,7 +116,7 @@ public class NoteMotionModelTest {
     }
 
     @Test
-    void moveWithOwnChild() throws CyclicLinkDetectedException {
+    void moveWithOwnChild() throws CyclicLinkDetectedException, MovementNotPossibleException {
       move(firstChild, secondChild, true);
       assertThat(firstChild.getAncestors(), contains(topNote, secondChild));
       assertThat(thirdLevel.getAncestors(), contains(topNote, secondChild, firstChild));
@@ -124,7 +134,8 @@ public class NoteMotionModelTest {
     }
 
     @Test
-    void moveBetweenSecondAndThird() throws CyclicLinkDetectedException {
+    void moveBetweenSecondAndThird()
+        throws CyclicLinkDetectedException, MovementNotPossibleException {
       move(firstChild, secondChild, false);
       assertOrder(secondChild, firstChild);
       assertOrder(firstChild, thirdChild);
