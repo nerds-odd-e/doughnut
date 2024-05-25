@@ -1,5 +1,5 @@
 <template>
-  <h1>Admin Dashboard</h1>
+  <ContainerPage v-bind="{ contentExists: true, title: 'Admin Dashboard' }" />
   <ul class="nav nav-tabs">
     <li class="nav-item">
       <a
@@ -52,6 +52,7 @@ import FineTuningData from "../components/admin/FineTuningData.vue";
 import FailureReportList from "../components/admin/FailureReportList.vue";
 import ManageModel from "../components/admin/ManageModel.vue";
 import ManageAssistant from "../components/admin/ManageAssistant.vue";
+import ContainerPage from "./commons/ContainerPage.vue";
 
 export default {
   data() {
@@ -69,6 +70,7 @@ export default {
     FailureReportList,
     ManageModel,
     ManageAssistant,
+    ContainerPage,
   },
 };
 </script>
