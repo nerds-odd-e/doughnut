@@ -42,12 +42,18 @@ class RestNoteControllerMotionTests {
     controller =
         new RestNoteController(
             modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
-    subject = makeMe.aNote("subject").please();
+    subject = makeMe.aNote("subject").creatorAndOwner(userModel).please();
+  }
+
+  @Test
+  void shouldCheckAccessRight() {
+    Note note = makeMe.aNote().please();
+    assertThrows(UnexpectedNoAccessRightException.class, () -> controller.moveUp(note));
   }
 
   @Test
   void shouldNotMoveUpIfThereIsNoPreviousSibling() {
-    assertThrows(UnexpectedNoAccessRightException.class, () -> controller.moveUp(subject));
+    assertThrows(MovementNotPossibleException.class, () -> controller.moveUp(subject));
   }
 
   @Nested
