@@ -60,6 +60,6 @@ defineEmits(["updateUser", "clearErrorMessage"]);
 
 <style scoped lang="scss">
 .global-bar {
-  background-color: #cee0fa;
+  border-bottom: 1px solid #e9ecef;
 }
 </style>

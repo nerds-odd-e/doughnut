@@ -3,7 +3,7 @@
     <div class="btn-group">
       <button
         role="button"
-        class="d-lg-none btn btn-sm"
+        class="d-md-none btn btn-sm"
         title="toggle sidebar"
         @click="toggleSideBar"
       >
@@ -21,7 +21,7 @@
   </teleport>
   <div class="d-flex flex-grow-1 overflow-auto h-full">
     <aside
-      class="d-lg-block flex-shrink-0 overflow-auto me-3"
+      class="d-md-block flex-shrink-0 overflow-auto me-3"
       :class="{ 'd-none': sidebarCollapsedForSmallScreen }"
     >
       <NoteSidebar
@@ -74,7 +74,7 @@ const toggleSideBar = () => {
 
 aside {
   width: 100%;
-  @include media-breakpoint-up(lg) {
+  @include media-breakpoint-up(md) {
     width: 18rem;
   }
 }

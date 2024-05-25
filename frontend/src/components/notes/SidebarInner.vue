@@ -4,13 +4,18 @@
       v-for="note in noteRealm?.children"
       :key="note.id"
       class="list-group-item list-group-item-action pb-0 pe-0 border-0"
-      :class="{ active: note.id === activeNoteRealm.note.id }"
+      :class="{ 'active-item': note.id === activeNoteRealm.note.id }"
     >
       <div
         class="d-flex w-100 justify-content-between align-items-start"
         @click="toggleChildren(note.id)"
       >
-        <NoteTopicWithLink class="card-title" v-bind="{ note }" @click.stop />
+        <NoteTopicWithLink
+          class="card-title"
+          :class="{ 'active-topic': note.id === activeNoteRealm.note.id }"
+          v-bind="{ note }"
+          @click.stop
+        />
         <ScrollTo v-if="note.id === activeNoteRealm.note.id" />
         <span
           role="button"
@@ -81,3 +86,13 @@ watch(
   { immediate: true },
 );
 </script>
+
+<style lang="scss" scoped>
+.active-item {
+  border-left: 3px solid #007bff !important;
+}
+
+.active-topic {
+  font-weight: bold;
+}
+</style>
