@@ -1,7 +1,8 @@
 <template>
-  <ContainerPage v-bind="{ contentExists: !!circle }">
+  <ContainerPage
+    v-bind="{ contentExists: !!circle, title: `Circle: ${circle?.name}` }"
+  >
     <div v-if="circle">
-      <h1>{{ circle.name }}</h1>
       <p>
         <NotebookNewButton :circle="circle">
           Add New Notebook In This Circle

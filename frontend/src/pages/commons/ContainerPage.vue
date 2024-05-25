@@ -1,8 +1,11 @@
 <template>
-  <div class="container">
+  <teleport v-if="title" to="#head-status">
+    <h2>{{ title }}</h2>
+  </teleport>
+
+  <div class="container mt-3">
     <ContentLoader v-if="!contentExists" />
     <template v-else>
-      <h2 v-if="!!title">{{ title }}</h2>
       <slot />
     </template>
   </div>

@@ -1,8 +1,13 @@
 <template>
   <p v-if="!!errorMessage" v-text="errorMessage"></p>
-  <ContainerPage v-else v-bind="{ contentExists: !!failureReports }">
+  <ContainerPage
+    v-else
+    v-bind="{
+      contentExists: !!failureReports,
+      title: 'Failure Report List',
+    }"
+  >
     <div v-if="!!failureReports">
-      <h2>Failure report list</h2>
       <div
         class="failure-report"
         v-for="element in failureReports"
