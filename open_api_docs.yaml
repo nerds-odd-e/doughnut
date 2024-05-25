@@ -894,7 +894,9 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/NoteRealm"
+                type: array
+                items:
+                  $ref: "#/components/schemas/NoteRealm"
   /api/notes/{note}/delete:
     post:
       tags:

@@ -40,10 +40,11 @@ public class NoteMotionModel {
   }
 
   public void validate() throws MovementNotPossibleException {
-    if (relativeToNote.getChildren().stream()
-        .findFirst()
-        .map(n -> n.getId().equals(subject.getId()))
-        .orElse(false)) {
+    if (asFirstChildOfNote
+        && relativeToNote.getChildren().stream()
+            .findFirst()
+            .map(n -> n.getId().equals(subject.getId()))
+            .orElse(false)) {
       throw new MovementNotPossibleException();
     }
   }

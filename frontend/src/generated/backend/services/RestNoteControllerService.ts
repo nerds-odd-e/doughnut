@@ -122,7 +122,7 @@ export class RestNoteControllerService {
         note: number,
         targetNote: number,
         asFirstChild: string,
-    ): CancelablePromise<NoteRealm> {
+    ): CancelablePromise<Array<NoteRealm>> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/notes/{note}/move-after/{targetNote}/{asFirstChild}',

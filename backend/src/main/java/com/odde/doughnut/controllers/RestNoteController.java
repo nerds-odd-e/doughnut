@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Stream;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
@@ -235,7 +236,7 @@ class RestNoteController {
 
   @PostMapping(value = "/{note}/move-after/{targetNote}/{asFirstChild}")
   @Transactional
-  public NoteRealm moveAfter(
+  public List<NoteRealm> moveAfter(
       @PathVariable @Schema(type = "integer") Note note,
       @PathVariable @Schema(type = "integer") Note targetNote,
       @PathVariable @Schema(type = "string") String asFirstChild)
@@ -249,7 +250,12 @@ class RestNoteController {
     NoteMotionModel noteMotion =
         modelFactoryService.motionOfMoveAfter(note, targetNote, asFirstChildBoolean);
     noteMotion.validate();
+    Note parentBefore = note.getParent();
     noteMotion.execute();
-    return new NoteViewer(currentUser.getEntity(), note.getParent()).toJsonObject();
+
+    return Stream.of(parentBefore, note.getParent())
+        .distinct()
+        .map(parent -> new NoteViewer(currentUser.getEntity(), parent).toJsonObject())
+        .toList();
   }
 }

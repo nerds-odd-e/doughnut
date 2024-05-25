@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -95,9 +95,10 @@ class RestNoteControllerMotionTests {
           throws UnexpectedNoAccessRightException,
               CyclicLinkDetectedException,
               MovementNotPossibleException {
-        var noteRealm = controller.moveAfter(subject, parent, "asFirstChild");
+        var noteRealms = controller.moveAfter(subject, parent, "asFirstChild");
         assertThat(subject.getSiblingOrder(), lessThan(previousOlder.getSiblingOrder()));
-        assertThat(noteRealm.getNote(), equalTo(parent));
+        assertThat(noteRealms.size(), equalTo(1));
+        assertThat(noteRealms.get(0).getNote(), equalTo(parent));
       }
 
       @Test
@@ -105,10 +106,23 @@ class RestNoteControllerMotionTests {
           throws UnexpectedNoAccessRightException,
               CyclicLinkDetectedException,
               MovementNotPossibleException {
-        var noteRealm = controller.moveAfter(subject, previousYounger, "");
+        var noteRealms = controller.moveAfter(subject, previousYounger, "");
         assertThat(previousOlder.getSiblingOrder(), lessThan(previousYounger.getSiblingOrder()));
         assertThat(previousYounger.getSiblingOrder(), lessThan(subject.getSiblingOrder()));
-        assertThat(noteRealm.getNote(), equalTo(parent));
+        assertThat(noteRealms.get(0).getNote(), equalTo(parent));
+      }
+
+      @Test
+      void shouldMoveToAfterParent()
+          throws UnexpectedNoAccessRightException,
+              CyclicLinkDetectedException,
+              MovementNotPossibleException {
+        Note grand = makeMe.aNote("grand").under(subject).please();
+        makeMe.refresh(subject);
+        var noteRealms = controller.moveAfter(grand, subject, "");
+        makeMe.refresh(subject);
+        assertThat(grand.getParent(), equalTo(parent));
+        assertThat(noteRealms.size(), equalTo(2));
       }
     }
   }
