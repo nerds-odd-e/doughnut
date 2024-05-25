@@ -1,13 +1,4 @@
 <template>
-  <span
-    v-if="!noteInfo"
-    @click="toggleNoteInfo()"
-    role="button"
-    title="note info"
-    width="100%"
-  >
-    i...
-  </span>
   <NoteInfoComponent
     v-if="noteInfo?.note"
     :note-info="noteInfo"
@@ -25,7 +16,7 @@ export default defineComponent({
   setup() {
     return useLoadingApi();
   },
-  props: { noteId: { type: Number, required: true }, expanded: Boolean },
+  props: { noteId: { type: Number, required: true } },
   emits: ["levelChanged"],
   components: { NoteInfoComponent },
   data() {
@@ -39,19 +30,9 @@ export default defineComponent({
           this.noteInfo = articles;
         });
     },
-
-    toggleNoteInfo() {
-      if (!this.noteInfo) {
-        this.fetchData();
-      } else {
-        this.noteInfo = undefined;
-      }
-    },
   },
   mounted() {
-    if (this.expanded) {
-      this.fetchData();
-    }
+    this.fetchData();
   },
 });
 </script>

@@ -21,7 +21,7 @@ describe("note info", () => {
       })
       .mount();
     await flushPromises();
-    expect(wrapper.findAll(".statistics-value")).toHaveLength(5);
+    expect(wrapper.findAll(".statistics-value")).toHaveLength(3);
     expect(helper.managedApi.restNoteController.getNoteInfo).toBeCalledWith(
       123,
     );

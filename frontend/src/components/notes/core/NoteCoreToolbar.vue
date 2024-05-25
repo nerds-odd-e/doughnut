@@ -58,6 +58,12 @@
         <div class="dropdown-menu dropdown-menu-end">
           <PopButton
             btn-class="dropdown-item btn-primary"
+            title="Note Review Settings"
+          >
+            <NoteInfoBar v-bind="{ noteId: note.id }" />
+          </PopButton>
+          <PopButton
+            btn-class="dropdown-item btn-primary"
             title="Generate Image with DALL-E"
           >
             <AIGenerateImageDialog v-bind="{ note, storageAccessor }" />
@@ -94,6 +100,7 @@ import PopButton from "../../commons/Popups/PopButton.vue";
 import AIGenerateImageDialog from "../AIGenerateImageDialog.vue";
 import NoteDetailsAutoCompletionButton from "./NoteDetailsAutoCompletionButton.vue";
 import NoteChatDialog from "../NoteChatDialog.vue";
+import NoteInfoBar from "../NoteInfoBar.vue";
 
 const props = defineProps({
   storageAccessor: {

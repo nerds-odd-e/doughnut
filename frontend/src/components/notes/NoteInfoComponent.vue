@@ -1,35 +1,16 @@
 <template>
-  <ul>
-    <li v-if="noteInfo.note">
-      <h6>Note</h6>
-      <label
-        >Created:
-        <span class="statistics-value">{{
-          new Date(noteInfo.createdAt).toLocaleString()
-        }}</span></label
-      >
-      <label
-        >Last Content Updated:
-        <span class="statistics-value">{{
-          new Date(noteInfo.note.note.updatedAt).toLocaleString()
-        }}</span></label
-      >
-    </li>
-    <li>
-      <h6>Review Settings</h6>
-      <ReviewSettingForm
-        v-bind="{ noteId: noteInfo.note.id, reviewSetting }"
-        @level-changed="$emit('levelChanged', $event)"
-      />
-    </li>
-    <li v-if="reviewPoint">
-      <h6>Review Point</h6>
-      <NoteInfoReviewPoint
-        v-model="reviewPoint"
-        @update:model-value="onSelfEvaluated($event)"
-      />
-    </li>
-  </ul>
+  <h6>Review Settings</h6>
+  <ReviewSettingForm
+    v-bind="{ noteId: noteInfo.note.id, reviewSetting }"
+    @level-changed="$emit('levelChanged', $event)"
+  />
+  <template v-if="reviewPoint">
+    <h6>Review Point</h6>
+    <NoteInfoReviewPoint
+      v-model="reviewPoint"
+      @update:model-value="onSelfEvaluated($event)"
+    />
+  </template>
 </template>
 
 <script lang="ts">
