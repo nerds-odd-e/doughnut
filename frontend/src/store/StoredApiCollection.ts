@@ -42,6 +42,8 @@ export interface StoredApi {
 
   moveUp(noteId: Doughnut.ID): Promise<NoteRealm | void>;
 
+  moveDown(noteId: Doughnut.ID): Promise<NoteRealm | void>;
+
   updateTextField(
     noteId: Doughnut.ID,
     field: "edit topic" | "edit details",
@@ -188,21 +190,45 @@ export default class StoredApiCollection implements StoredApi {
     );
   }
 
-  async moveUp(noteId: Doughnut.ID) {
+  private siblingsOf(noteId: Doughnut.ID) {
     const noteRealm = this.storage.refOfNoteRealm(noteId);
-    if (!noteRealm.value) return;
+    if (!noteRealm.value) return {};
     const { parentId } = noteRealm.value.note;
-    if (!parentId) return;
-    const siblings = this.storage.refOfNoteRealm(parentId).value?.children;
+    if (!parentId) return {};
+    return {
+      parentId,
+      siblings: this.storage.refOfNoteRealm(parentId).value?.children,
+    };
+  }
+
+  private refreshNoteRealms(noteRealms: NoteRealm[]) {
+    noteRealms.forEach((n) => this.storage.refreshNoteRealm(n));
+  }
+
+  async moveUp(noteId: Doughnut.ID) {
+    const { parentId, siblings } = this.siblingsOf(noteId);
     if (!siblings) return;
     const currentIndex = siblings.map((n) => n.id).indexOf(noteId);
-    (
+    this.refreshNoteRealms(
       await this.managedApi.restNoteController.moveAfter(
         noteId,
         currentIndex === 1 ? parentId : siblings[currentIndex - 2]!.id,
         currentIndex === 1 ? "asFirstChild" : "after",
-      )
-    ).forEach((n) => this.storage.refreshNoteRealm(n));
+      ),
+    );
+  }
+
+  async moveDown(noteId: Doughnut.ID) {
+    const { siblings } = this.siblingsOf(noteId);
+    if (!siblings) return;
+    const currentIndex = siblings.map((n) => n.id).indexOf(noteId);
+    this.refreshNoteRealms(
+      await this.managedApi.restNoteController.moveAfter(
+        noteId,
+        siblings[currentIndex + 1]!.id,
+        "after",
+      ),
+    );
   }
 
   async updateTextField(

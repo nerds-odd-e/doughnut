@@ -130,6 +130,10 @@ export const assumeNotePage = (noteTopic?: string) => {
       cy.pageIsNotLoading()
       this.toolbarButton("Move up").click()
     },
+    moveDownAmongSiblings() {
+      cy.pageIsNotLoading()
+      this.toolbarButton("Move down").click()
+    },
     wikidataOptions() {
       const openWikidataOptions = () => privateToolbarButton("wikidata options").clickIfNotOpen()
 

@@ -148,6 +148,7 @@ declare module 'vue' {
     SvgCollapse: typeof import('./src/components/svgs/SvgCollapse.vue')['default']
     SvgContest: typeof import('./src/components/svgs/SvgContest.vue')['default']
     SvgDescriptionIndicator: typeof import('./src/components/svgs/SvgDescriptionIndicator.vue')['default']
+    SvgDown: typeof import('./src/components/svgs/SvgDown.vue')['default']
     SvgDownload: typeof import('./src/components/svgs/SvgDownload.vue')['default']
     SvgEdit: typeof import('./src/components/svgs/SvgEdit.vue')['default']
     SvgEditNotebook: typeof import('./src/components/svgs/SvgEditNotebook.vue')['default']

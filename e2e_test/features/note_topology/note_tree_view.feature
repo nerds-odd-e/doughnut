@@ -67,3 +67,5 @@ Feature: Note tree view
     And I should see the note "TDD" before the note "CI" in the sidebar
     When I move the note "CI" up among its siblings
     Then I should see the note "CI" before the note "TDD" in the sidebar
+    When I move the note "CI" down among its siblings
+    Then I should see the note "TDD" before the note "CI" in the sidebar
